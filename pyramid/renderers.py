@@ -249,21 +249,23 @@ class JSON(object):
                 ct = response.content_type
                 if ct == response.default_content_type:
                     response.content_type = 'application/json'
-
-            def default(obj):
-                if hasattr(obj, '__json__'):
-                    return obj.__json__(request)
-                obj_iface = providedBy(obj)
-                adapters = self.components.adapters
-                result = adapters.lookup((obj_iface,), IJSONAdapter,
-                                         default=_marker)
-                if result is _marker:
-                    raise TypeError('%r is not JSON serializable' % (obj,))
-                return result(obj, request)
-
+            default = self._make_default(request)
             return self.serializer(value, default=default, **self.kw)
         
         return _render
+
+    def _make_default(self, request):
+        def default(obj):
+            if hasattr(obj, '__json__'):
+                return obj.__json__(request)
+            obj_iface = providedBy(obj)
+            adapters = self.components.adapters
+            result = adapters.lookup((obj_iface,), IJSONAdapter,
+                                     default=_marker)
+            if result is _marker:
+                raise TypeError('%r is not JSON serializable' % (obj,))
+            return result(obj, request)
+        return default
 
 json_renderer_factory = JSON() # bw compat
 
@@ -339,18 +341,7 @@ class JSONP(JSON):
         plain-JSON encoded string with content-type ``application/json``"""
         def _render(value, system):
             request = system['request']
-            
-            def default(obj):
-                if hasattr(obj, '__json__'):
-                    return obj.__json__(request)
-                obj_iface = providedBy(obj)
-                adapters = self.components.adapters
-                result = adapters.lookup((obj_iface,), IJSONAdapter,
-                                         default=_marker)
-                if result is _marker:
-                    raise TypeError('%r is not JSON serializable' % (obj,))
-                return result(obj, request)
-
+            default = self._make_default(request)
             val = self.serializer(value, default=default, **self.kw)
             callback = request.GET.get(self.param_name)
             if callback is None:
