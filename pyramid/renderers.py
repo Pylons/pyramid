@@ -3,7 +3,10 @@ import os
 import pkg_resources
 import threading
 
-from zope.interface import implementer
+from zope.interface import (
+    implementer,
+    providedBy,
+    )
 from zope.interface.registry import Components
 
 from pyramid.interfaces import (
@@ -215,17 +218,18 @@ class JSON(object):
             self.add_adapter(type, adapter)
 
     def add_adapter(self, type_or_iface, adapter):
-        """ When an object of type (or interface) ``type_or_iface``
-        fails to automatically encode using the serializer, the renderer
-        will use the adapter ``adapter`` to convert it into a
-        JSON-serializable object.
+        """ When an object of type (or interface) ``type_or_iface`` fails to
+        automatically encode using the serializer, the renderer will use the
+        adapter ``adapter`` to convert it into a JSON-serializable object.
+        The adapter must accept two arguments: the object and the currently
+        active request.
 
         .. code-block:: python
 
            class Foo(object):
                x = 5
 
-           def foo_adapter(obj):
+           def foo_adapter(obj, request):
                return obj.x
 
            renderer = JSON(indent=4)
@@ -245,25 +249,21 @@ class JSON(object):
                 ct = response.content_type
                 if ct == response.default_content_type:
                     response.content_type = 'application/json'
-            return self.serializer(value, default=self.default, **self.kw)
+
+            def default(obj):
+                if hasattr(obj, '__json__'):
+                    return obj.__json__(request)
+                obj_iface = providedBy(obj)
+                adapters = self.components.adapters
+                result = adapters.lookup((obj_iface,), IJSONAdapter,
+                                         default=_marker)
+                if result is _marker:
+                    raise TypeError('%r is not JSON serializable' % (obj,))
+                return result(obj, request)
+
+            return self.serializer(value, default=default, **self.kw)
+        
         return _render
-
-    def default(self, obj):
-        """ Returns a JSON-serializable representation of ``obj``. If
-        no representation can be found, a ``TypeError`` is raised.
-
-        If the object implements the ``__json__`` magic method, it will
-        be preferred. Otherwise, attempt to adapt ``obj`` into a
-        serializable type using one of the registered adapters.
-        """
-        if hasattr(obj, '__json__'):
-            return obj.__json__()
-
-        result = self.components.queryAdapter(obj, IJSONAdapter,
-                                              default=_marker)
-        if result is not _marker:
-            return result
-        raise TypeError('%r is not JSON serializable' % (obj,))
 
 json_renderer_factory = JSON() # bw compat
 
@@ -339,7 +339,18 @@ class JSONP(JSON):
         plain-JSON encoded string with content-type ``application/json``"""
         def _render(value, system):
             request = system['request']
-            val = self.serializer(value, default=self.default, **self.kw)
+            
+            def default(obj):
+                if hasattr(obj, '__json__'):
+                    return obj.__json__(request)
+
+                result = self.components.queryAdapter(obj, IJSONAdapter,
+                                                      default=_marker)
+                if result is not _marker:
+                    return result
+                raise TypeError('%r is not JSON serializable' % (obj,))
+
+            val = self.serializer(value, default=default, **self.kw)
             callback = request.GET.get(self.param_name)
             if callback is None:
                 ct = 'application/json'

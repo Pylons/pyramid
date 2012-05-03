@@ -241,7 +241,8 @@ Serializing Custom Objects
 Custom objects can be made easily JSON-serializable in Pyramid by defining a
 ``__json__`` method on the object's class. This method should return values
 natively JSON-serializable (such as ints, lists, dictionaries, strings, and
-so forth).
+so forth).  It should accept a single additional argument, ``request``, which
+will be the active request object at render time.
 
 .. code-block:: python
    :linenos:
@@ -252,7 +253,7 @@ so forth).
        def __init__(self, x):
            self.x = x
 
-       def __json__(self):
+       def __json__(self, request):
            return {'x':self.x}
 
    @view_config(renderer='json')
@@ -269,8 +270,7 @@ to the renderer is not a serializable type, and has no ``__json__`` method,
 usually a :exc:`TypeError` will be raised during serialization.  You can
 change this behavior by creating a custom JSON renderer and adding adapters
 to handle custom types. The renderer will attempt to adapt non-serializable
-objects using the registered adapters. It will raise a :exc:`TypeError` if it
-can't determine what to do with the object.  A short example follows:
+objects using the registered adapters. A short example follows:
 
 .. code-block:: python
    :linenos:
@@ -278,11 +278,18 @@ can't determine what to do with the object.  A short example follows:
    from pyramid.renderers import JSON
 
    json_renderer = JSON()
-   json_renderer.add_adapter(datetime.datetime, lambda x: x.isoformat())
+   def datetime_adapter(obj, request):
+       return obj.isoformat()
+   json_renderer.add_adapter(datetime.datetime, datetime_adapter)
 
    # then during configuration ....
    config = Configurator()
    config.add_renderer('json', json_renderer)
+
+The adapter should accept two arguments: the object needing to be serialized
+and ``request``, which will be the current request object at render time.
+The adapter should raise a :exc:`TypeError` if it can't determine what to do
+with the object.
 
 See :class:`pyramid.renderers.JSON` and
 :ref:`adding_and_overriding_renderers` for more information.

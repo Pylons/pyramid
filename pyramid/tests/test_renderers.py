@@ -370,22 +370,26 @@ class TestJSON(unittest.TestCase):
         self.assertEqual(request.response.content_type, 'text/mishmash')
 
     def test_with_custom_adapter(self):
+        request = testing.DummyRequest()
         from datetime import datetime
-        def adapter(obj):
+        def adapter(obj, req):
+            self.assertEqual(req, request)
             return obj.isoformat()
         now = datetime.utcnow()
         renderer = self._makeOne()
         renderer.add_adapter(datetime, adapter)
-        result = renderer(None)({'a':now}, {})
+        result = renderer(None)({'a':now}, {'request':request})
         self.assertEqual(result, '{"a": "%s"}' % now.isoformat())
 
     def test_with_custom_adapter2(self):
+        request = testing.DummyRequest()
         from datetime import datetime
-        def adapter(obj):
+        def adapter(obj, req):
+            self.assertEqual(req, request)
             return obj.isoformat()
         now = datetime.utcnow()
         renderer = self._makeOne(adapters=((datetime, adapter),))
-        result = renderer(None)({'a':now}, {})
+        result = renderer(None)({'a':now}, {'request':request})
         self.assertEqual(result, '{"a": "%s"}' % now.isoformat())
 
     def test_with_custom_serializer(self):
@@ -404,15 +408,18 @@ class TestJSON(unittest.TestCase):
         self.assertTrue('default' in serializer.kw)
 
     def test_with_object_adapter(self):
+        request = testing.DummyRequest()
+        outerself = self
         class MyObject(object):
             def __init__(self, x):
                 self.x = x
-            def __json__(self):
+            def __json__(self, req):
+                outerself.assertEqual(req, request)
                 return {'x': self.x}
 
         objects = [MyObject(1), MyObject(2)]
         renderer = self._makeOne()(None)
-        result = renderer(objects, {})
+        result = renderer(objects, {'request':request})
         self.assertEqual(result, '[{"x": 1}, {"x": 2}]')
 
     def test_with_object_adapter_no___json__(self):
