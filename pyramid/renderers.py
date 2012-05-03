@@ -218,11 +218,11 @@ class JSON(object):
             self.add_adapter(type, adapter)
 
     def add_adapter(self, type_or_iface, adapter):
-        """ When an object of type (or interface) ``type_or_iface`` fails to
-        automatically encode using the serializer, the renderer will use the
-        adapter ``adapter`` to convert it into a JSON-serializable object.
-        The adapter must accept two arguments: the object and the currently
-        active request.
+        """ When an object of the type (or interface) ``type_or_iface`` fails
+        to automatically encode using the serializer, the renderer will use
+        the adapter ``adapter`` to convert it into a JSON-serializable
+        object.  The adapter must accept two arguments: the object and the
+        currently active request.
 
         .. code-block:: python
 
@@ -234,7 +234,11 @@ class JSON(object):
 
            renderer = JSON(indent=4)
            renderer.add_adapter(Foo, foo_adapter)
-        """
+
+        When you've done this, the JSON renderer will be able to serialize
+        instances of the ``Foo`` class when they're encountered in your view
+        results."""
+        
         self.components.registerAdapter(adapter, (type_or_iface,),
                                         IJSONAdapter)
 
@@ -301,7 +305,7 @@ class JSONP(JSON):
 
     The arguments passed to this class' constructor mean the same thing as
     the arguments passed to :class:`pyramid.renderers.JSON` (including
-    ``default``).
+    ``serializer`` and ``adapters``).
 
     Once this renderer is registered via
     :meth:`~pyramid.config.Configurator.add_renderer` as above, you can use
