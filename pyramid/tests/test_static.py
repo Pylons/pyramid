@@ -38,11 +38,9 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
         inst = self._makeOne('pyramid.tests:fixtures/static')
         request = self._makeRequest({'PATH_INFO':''})
         context = DummyContext()
-        response = inst(context, request)
-        response.prepare(request.environ)
-        self.assertEqual(response.status, '301 Moved Permanently')
-        self.assertTrue(b'http://example.com:6543/' in response.body)
-        
+        from pyramid.httpexceptions import HTTPMovedPermanently
+        self.assertRaises(HTTPMovedPermanently, inst, context, request)
+
     def test_path_info_slash_means_index_html(self):
         inst = self._makeOne('pyramid.tests:fixtures/static')
         request = self._makeRequest()
@@ -70,16 +68,16 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
         inst = self._makeOne('pyramid.tests:fixtures/static')
         request = self._makeRequest({'PATH_INFO':'/subdir/../../minimal.pt'})
         context = DummyContext()
-        response = inst(context, request)
-        self.assertEqual(response.status, '404 Not Found')
+        from pyramid.httpexceptions import HTTPNotFound
+        self.assertRaises(HTTPNotFound, inst, context, request)
 
     def test_oob_dotdotslash_encoded(self):
         inst = self._makeOne('pyramid.tests:fixtures/static')
         request = self._makeRequest(
             {'PATH_INFO':'/subdir/%2E%2E%2F%2E%2E/minimal.pt'})
         context = DummyContext()
-        response = inst(context, request)
-        self.assertEqual(response.status, '404 Not Found')
+        from pyramid.httpexceptions import HTTPNotFound
+        self.assertRaises(HTTPNotFound, inst, context, request)
 
     def test_oob_os_sep(self):
         import os
@@ -88,15 +86,15 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
         request = self._makeRequest({'PATH_INFO':'/subdir/%s%sminimal.pt' %
                                      (dds, dds)})
         context = DummyContext()
-        response = inst(context, request)
-        self.assertEqual(response.status, '404 Not Found')
+        from pyramid.httpexceptions import HTTPNotFound
+        self.assertRaises(HTTPNotFound, inst, context, request)
 
     def test_resource_doesnt_exist(self):
         inst = self._makeOne('pyramid.tests:fixtures/static')
         request = self._makeRequest({'PATH_INFO':'/notthere'})
         context = DummyContext()
-        response = inst(context, request)
-        self.assertEqual(response.status, '404 Not Found')
+        from pyramid.httpexceptions import HTTPNotFound
+        self.assertRaises(HTTPNotFound, inst, context, request)
 
     def test_resource_isdir(self):
         inst = self._makeOne('pyramid.tests:fixtures/static')
@@ -174,8 +172,8 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
         inst = self._makeOne('pyramid.tests:fixtures/static')
         request = self._makeRequest({'PATH_INFO':'/notthere.html'})
         context = DummyContext()
-        response = inst(context, request)
-        self.assertEqual(response.status, '404 Not Found')
+        from pyramid.httpexceptions import HTTPNotFound
+        self.assertRaises(HTTPNotFound, inst, context, request)
 
     def test_resource_with_content_encoding(self):
         inst = self._makeOne('pyramid.tests:fixtures/static')
@@ -233,11 +231,9 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
         request = self._makeRequest({'PATH_INFO':''})
         request.subpath = ()
         context = DummyContext()
-        response = inst(context, request)
-        response.prepare(request.environ)
-        self.assertEqual(response.status, '301 Moved Permanently')
-        self.assertTrue(b'http://example.com:6543/' in response.body)
-        
+        from pyramid.httpexceptions import HTTPMovedPermanently
+        self.assertRaises(HTTPMovedPermanently, inst, context, request)
+
     def test_path_info_slash_means_index_html(self):
         inst = self._makeOne('pyramid.tests:fixtures/static')
         request = self._makeRequest()
@@ -251,33 +247,33 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
         request = self._makeRequest()
         request.subpath = ('.', 'index.html')
         context = DummyContext()
-        response = inst(context, request)
-        self.assertEqual(response.status, '404 Not Found')
+        from pyramid.httpexceptions import HTTPNotFound
+        self.assertRaises(HTTPNotFound, inst, context, request)
 
     def test_oob_emptyelement(self):
         inst = self._makeOne('pyramid.tests:fixtures/static')
         request = self._makeRequest()
         request.subpath = ('', 'index.html')
         context = DummyContext()
-        response = inst(context, request)
-        self.assertEqual(response.status, '404 Not Found')
+        from pyramid.httpexceptions import HTTPNotFound
+        self.assertRaises(HTTPNotFound, inst, context, request)
 
     def test_oob_dotdotslash(self):
         inst = self._makeOne('pyramid.tests:fixtures/static')
         request = self._makeRequest()
         request.subpath = ('subdir', '..', '..', 'minimal.pt')
         context = DummyContext()
-        response = inst(context, request)
-        self.assertEqual(response.status, '404 Not Found')
+        from pyramid.httpexceptions import HTTPNotFound
+        self.assertRaises(HTTPNotFound, inst, context, request)
 
     def test_oob_dotdotslash_encoded(self):
         inst = self._makeOne('pyramid.tests:fixtures/static')
         request = self._makeRequest()
         request.subpath = ('subdir', '%2E%2E', '%2E%2E', 'minimal.pt')
         context = DummyContext()
-        response = inst(context, request)
-        self.assertEqual(response.status, '404 Not Found')
-
+        from pyramid.httpexceptions import HTTPNotFound
+        self.assertRaises(HTTPNotFound, inst, context, request)
+        
     def test_oob_os_sep(self):
         import os
         inst = self._makeOne('pyramid.tests:fixtures/static')
@@ -285,16 +281,16 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
         request = self._makeRequest()
         request.subpath = ('subdir', dds, dds, 'minimal.pt')
         context = DummyContext()
-        response = inst(context, request)
-        self.assertEqual(response.status, '404 Not Found')
+        from pyramid.httpexceptions import HTTPNotFound
+        self.assertRaises(HTTPNotFound, inst, context, request)
 
     def test_resource_doesnt_exist(self):
         inst = self._makeOne('pyramid.tests:fixtures/static')
         request = self._makeRequest()
         request.subpath = ('notthere,')
         context = DummyContext()
-        response = inst(context, request)
-        self.assertEqual(response.status, '404 Not Found')
+        from pyramid.httpexceptions import HTTPNotFound
+        self.assertRaises(HTTPNotFound, inst, context, request)
 
     def test_resource_isdir(self):
         inst = self._makeOne('pyramid.tests:fixtures/static')
@@ -361,8 +357,8 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
         request = self._makeRequest()
         request.subpath = ('notthere.html',)
         context = DummyContext()
-        response = inst(context, request)
-        self.assertEqual(response.status, '404 Not Found')
+        from pyramid.httpexceptions import HTTPNotFound
+        self.assertRaises(HTTPNotFound, inst, context, request)
 
 class DummyContext:
     pass
