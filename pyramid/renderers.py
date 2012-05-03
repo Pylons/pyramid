@@ -343,12 +343,13 @@ class JSONP(JSON):
             def default(obj):
                 if hasattr(obj, '__json__'):
                     return obj.__json__(request)
-
-                result = self.components.queryAdapter(obj, IJSONAdapter,
-                                                      default=_marker)
-                if result is not _marker:
-                    return result
-                raise TypeError('%r is not JSON serializable' % (obj,))
+                obj_iface = providedBy(obj)
+                adapters = self.components.adapters
+                result = adapters.lookup((obj_iface,), IJSONAdapter,
+                                         default=_marker)
+                if result is _marker:
+                    raise TypeError('%r is not JSON serializable' % (obj,))
+                return result(obj, request)
 
             val = self.serializer(value, default=default, **self.kw)
             callback = request.GET.get(self.param_name)
