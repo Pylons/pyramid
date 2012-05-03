@@ -1105,6 +1105,12 @@ class IAssetDescriptor(Interface):
         Returns True if asset exists, otherwise returns False.
         """
 
+class IJSONAdapter(Interface):
+    """
+    Marker interface for objects that can convert an arbitrary object
+    into a JSON-serializable primitive.
+    """
+
 # configuration phases: a lower phase number means the actions associated
 # with this phase will be executed earlier than those with later phase
 # numbers.  The default phase number is 0, FTR.
