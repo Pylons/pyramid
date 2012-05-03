@@ -67,10 +67,10 @@ Preparation, Windows
 Making a Project
 ================
 
-Your next step is to create a project.  :app:`Pyramid` supplies a
-variety of scaffolds to generate sample projects.  We will use the
-``alchemy`` scaffold, which generates an application
-that uses :term:`SQLAlchemy` and :term:`URL dispatch`.
+Your next step is to create a project.  For this tutorial, we will use the
+:term:`scaffold` named ``alchemy``, which generates an application
+that uses :term:`SQLAlchemy` and :term:`URL dispatch`.  :app:`Pyramid`
+supplies a variety of scaffolds to generate sample projects.
 
 The below instructions assume your current working directory is the
 "virtualenv" named "pyramidtut".
@@ -254,7 +254,7 @@ The output to your console should be something like this::
   2011-11-26 14:42:25,140 INFO  [sqlalchemy.engine.base.Engine][MainThread] 
                                 COMMIT
 
-Success!  You should now have a ``tutorial.db`` file in your current working
+Success!  You should now have a ``tutorial.sqlite`` file in your current working
 directory.  This will be a SQLite database with a single table defined in it
 (``models``).
 

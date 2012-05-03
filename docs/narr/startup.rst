@@ -42,8 +42,8 @@ Here's a high-level time-ordered overview of what happens when you press
    ``[pipeline:main]``, or ``[composite:main]`` in the ``.ini`` file.  This
    section represents the configuration of a :term:`WSGI` application that
    will be served.  If you're using a simple application (e.g.
-   ``[app:main]``), the application :term:`entry point` or :term:`dotted
-   Python name` will be named on the ``use=`` line within the section's
+   ``[app:main]``), the application's ``paste.app_factory`` :term:`entry
+   point` will be named on the ``use=`` line within the section's
    configuration.  If, instead of a simple application, you're using a WSGI
    :term:`pipeline` (e.g. a ``[pipeline:main]`` section), the application
    named on the "last" element will refer to your :app:`Pyramid` application.
@@ -59,11 +59,11 @@ Here's a high-level time-ordered overview of what happens when you press
    system for this application.  See :ref:`logging_config` for more
    information.
 
-#. The application's *constructor* named by the entry point reference or
-   dotted Python name on the ``use=`` line of the section representing your
-   :app:`Pyramid` application is passed the key/value parameters mentioned
-   within the section in which it's defined.  The constructor is meant to
-   return a :term:`router` instance, which is a :term:`WSGI` application.
+#. The application's *constructor* named by the entry point reference on the
+   ``use=`` line of the section representing your :app:`Pyramid` application
+   is passed the key/value parameters mentioned within the section in which
+   it's defined.  The constructor is meant to return a :term:`router`
+   instance, which is a :term:`WSGI` application.
 
    For :app:`Pyramid` applications, the constructor will be a function named
    ``main`` in the ``__init__.py`` file within the :term:`package` in which

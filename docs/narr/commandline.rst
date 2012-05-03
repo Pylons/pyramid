@@ -460,7 +460,7 @@ to the console.
 
 You can add request header values by using the ``--header`` option::
 
-   $ bin/prequest --header=Host=example.com development.ini /
+   $ bin/prequest --header=Host:example.com development.ini /
 
 Headers are added to the WSGI environment by converting them to their
 CGI/WSGI equivalents (e.g. ``Host=example.com`` will insert the ``HTTP_HOST``
@@ -718,7 +718,7 @@ we'll pretend you have a distribution with a package in it named
    def settings_show():
        description = """\
        Print the deployment settings for a Pyramid application.  Example:
-       'psettings deployment.ini'
+       'show_settings deployment.ini'
        """
        usage = "usage: %prog config_uri"
        parser = optparse.OptionParser(
