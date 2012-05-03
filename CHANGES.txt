@@ -17,6 +17,9 @@ Features
   values natively serializable by ``json.dumps`` (such as ints, lists,
   dictionaries, strings, and so forth).
 
+- The JSON renderer now allows for the definition of custom type adapters to
+  convert unknown objects to JSON serializations.
+
 - As of this release, the ``request_method`` predicate, when used, will also
   imply that ``HEAD`` is implied when you use ``GET``.  For example, using
   ``@view_config(request_method='GET')`` is equivalent to using

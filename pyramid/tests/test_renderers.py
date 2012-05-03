@@ -369,28 +369,60 @@ class TestJSON(unittest.TestCase):
         renderer({'a':1}, {'request':request})
         self.assertEqual(request.response.content_type, 'text/mishmash')
 
-    def test_with_custom_encoder(self):
+    def test_with_custom_adapter(self):
+        request = testing.DummyRequest()
         from datetime import datetime
-        def default(obj):
+        def adapter(obj, req):
+            self.assertEqual(req, request)
             return obj.isoformat()
         now = datetime.utcnow()
-        renderer = self._makeOne(default=default)(None)
-        result = renderer({'a':now}, {})
+        renderer = self._makeOne()
+        renderer.add_adapter(datetime, adapter)
+        result = renderer(None)({'a':now}, {'request':request})
         self.assertEqual(result, '{"a": "%s"}' % now.isoformat())
 
-    def test_with_object_encoder(self):
+    def test_with_custom_adapter2(self):
+        request = testing.DummyRequest()
+        from datetime import datetime
+        def adapter(obj, req):
+            self.assertEqual(req, request)
+            return obj.isoformat()
+        now = datetime.utcnow()
+        renderer = self._makeOne(adapters=((datetime, adapter),))
+        result = renderer(None)({'a':now}, {'request':request})
+        self.assertEqual(result, '{"a": "%s"}' % now.isoformat())
+
+    def test_with_custom_serializer(self):
+        class Serializer(object):
+            def __call__(self, obj, **kw):
+                self.obj = obj
+                self.kw = kw
+                return 'foo'
+        serializer = Serializer()
+        renderer = self._makeOne(serializer=serializer, baz=5)
+        obj = {'a':'b'}
+        result = renderer(None)(obj, {})
+        self.assertEqual(result, 'foo')
+        self.assertEqual(serializer.obj, obj)
+        self.assertEqual(serializer.kw['baz'], 5)
+        self.assertTrue('default' in serializer.kw)
+
+    def test_with_object_adapter(self):
+        request = testing.DummyRequest()
+        outerself = self
         class MyObject(object):
             def __init__(self, x):
                 self.x = x
-            def __json__(self):
+            def __json__(self, req):
+                outerself.assertEqual(req, request)
                 return {'x': self.x}
 
         objects = [MyObject(1), MyObject(2)]
         renderer = self._makeOne()(None)
-        result = renderer(objects, {})
+        result = renderer(objects, {'request':request})
         self.assertEqual(result, '[{"x": 1}, {"x": 2}]')
 
-    def test_with_object_encoder_no___json__(self):
+    def test_with_object_adapter_no___json__(self):
         class MyObject(object):
             def __init__(self, x):
                 self.x = x

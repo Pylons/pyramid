@@ -3,11 +3,16 @@ import os
 import pkg_resources
 import threading
 
-from zope.interface import implementer
+from zope.interface import (
+    implementer,
+    providedBy,
+    )
+from zope.interface.registry import Components
 
 from pyramid.interfaces import (
     IChameleonLookup,
     IChameleonTranslate,
+    IJSONAdapter,
     IRendererGlobalsFactory,
     IRendererFactory,
     IResponseFactory,
@@ -157,6 +162,8 @@ def string_renderer_factory(info):
         return value
     return _render
 
+_marker = object()
+
 class JSON(object):
     """ Renderer that returns a JSON-encoded string.
 
@@ -183,27 +190,53 @@ class JSON(object):
        def myview(request):
            return {'greeting':'Hello world'}
 
+    Custom objects can be serialized using the renderer by either
+    implementing the ``__json__`` magic method, or by registering
+    adapters with the renderer.  See
+    :ref:`json_serializing_custom_objects` for more information.
+
+    The default serializer uses ``json.JSONEncoder``. A different
+    serializer can be specified via the ``serializer`` argument.
+    Custom serializers should accept the object, a callback
+    ``default``, and any extra ``kw`` keyword argments passed during
+    renderer construction.
+
     .. note::
 
        This feature is new in Pyramid 1.4. Prior to 1.4 there was
        no public API for supplying options to the underlying
-       :func:`json.dumps` without defining a custom renderer.
-
-    You can pass a ``default`` argument to this class' constructor (which
-    should be a function) to customize what happens when it attempts to
-    serialize types unrecognized by the base ``json`` module.  See
-    :ref:`json_serializing_custom_objects` for more information.
+       serializer without defining a custom renderer.
     """
 
-    def __init__(self, **kw):
-        """ Any keyword arguments will be passed to the ``json.dumps``
-        function.  A notable exception is the keyword argument ``default``,
-        which is wrapped in a function that sniffs for ``__json__``
-        attributes before it is passed along to ``json.dumps``"""
-        # we wrap the default callback with our own to get __json__ attr
-        # sniffing
-        self._default = kw.pop('default', None)
+    def __init__(self, serializer=json.dumps, adapters=(), **kw):
+        """ Any keyword arguments will be passed to the ``serializer``
+        function."""
+        self.serializer = serializer
         self.kw = kw
+        self.components = Components()
+        for type, adapter in adapters:
+            self.add_adapter(type, adapter)
+
+    def add_adapter(self, type_or_iface, adapter):
+        """ When an object of type (or interface) ``type_or_iface`` fails to
+        automatically encode using the serializer, the renderer will use the
+        adapter ``adapter`` to convert it into a JSON-serializable object.
+        The adapter must accept two arguments: the object and the currently
+        active request.
+
+        .. code-block:: python
+
+           class Foo(object):
+               x = 5
+
+           def foo_adapter(obj, request):
+               return obj.x
+
+           renderer = JSON(indent=4)
+           renderer.add_adapter(Foo, foo_adapter)
+        """
+        self.components.registerAdapter(adapter, (type_or_iface,),
+                                        IJSONAdapter)
 
     def __call__(self, info):
         """ Returns a plain JSON-encoded string with content-type
@@ -216,22 +249,21 @@ class JSON(object):
                 ct = response.content_type
                 if ct == response.default_content_type:
                     response.content_type = 'application/json'
-            return self._dumps(value)
+
+            def default(obj):
+                if hasattr(obj, '__json__'):
+                    return obj.__json__(request)
+                obj_iface = providedBy(obj)
+                adapters = self.components.adapters
+                result = adapters.lookup((obj_iface,), IJSONAdapter,
+                                         default=_marker)
+                if result is _marker:
+                    raise TypeError('%r is not JSON serializable' % (obj,))
+                return result(obj, request)
+
+            return self.serializer(value, default=default, **self.kw)
+        
         return _render
-
-    def _default_encode(self, obj):
-        if hasattr(obj, '__json__'):
-            return obj.__json__()
-
-        if self._default is not None:
-            return self._default(obj)
-        raise TypeError('%r is not JSON serializable' % (obj,))
-
-    def _dumps(self, obj):
-        """ Encode a Python object to a JSON string.
-
-        By default, this uses the :func:`json.dumps` from the stdlib."""
-        return json.dumps(obj, default=self._default_encode, **self.kw)
 
 json_renderer_factory = JSON() # bw compat
 
@@ -307,7 +339,18 @@ class JSONP(JSON):
         plain-JSON encoded string with content-type ``application/json``"""
         def _render(value, system):
             request = system['request']
-            val = self._dumps(value)
+            
+            def default(obj):
+                if hasattr(obj, '__json__'):
+                    return obj.__json__(request)
+
+                result = self.components.queryAdapter(obj, IJSONAdapter,
+                                                      default=_marker)
+                if result is not _marker:
+                    return result
+                raise TypeError('%r is not JSON serializable' % (obj,))
+
+            val = self.serializer(value, default=default, **self.kw)
             callback = request.GET.get(self.param_name)
             if callback is None:
                 ct = 'application/json'
