@@ -593,11 +593,12 @@ it is to shoehorn a route into an ordered list of other routes, or to create
 another entire instance of an application to service a department and glue
 code to allow disparate apps to share data.  It's a great fit for sites that
 naturally lend themselves to changing departmental hierarchies, such as
-content management systems and document management systems.  Traversal also lends itself well to
-systems that require very granular security ("Bob can edit *this* document"
-as opposed to "Bob can edit documents").
+content management systems and document management systems.  Traversal also
+lends itself well to systems that require very granular security ("Bob can
+edit *this* document" as opposed to "Bob can edit documents").
 
-Example: :ref:`hello_traversal_chapter` and :ref:`much_ado_about_traversal_chapter`.
+Examples: :ref:`hello_traversal_chapter` and
+:ref:`much_ado_about_traversal_chapter`.
 
 Tweens
 ~~~~~~
