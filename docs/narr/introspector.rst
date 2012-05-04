@@ -32,7 +32,7 @@ callable:
     from pyramid.response import Response
 
     @view_config(route_name='bar')
-    def route_accepts(request):
+    def show_current_route_pattern(request):
         introspector = request.registry.introspector
         route_name = request.matched_route.name
         route_intr = introspector.get('routes', route_name)

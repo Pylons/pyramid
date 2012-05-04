@@ -801,6 +801,34 @@ within a function called when another user uses the
 
 See also :ref:`add_directive`.
 
+Programmatic Introspection
+--------------------------
+
+If you're building a large system that other users may plug code into, it's
+useful to be able to get an enumeration of what code they plugged in *at
+application runtime*.  For example, you might want to show them a set of tabs
+at the top of the screen based on an enumeration of views they registered.
+
+This is possible using Pyramid's :term:`introspector`.
+
+Here's an example of using Pyramid's introspector from within a view
+callable:
+
+.. code-block:: python
+   :linenos:
+
+    from pyramid.view import view_config
+    from pyramid.response import Response
+
+    @view_config(route_name='bar')
+    def show_current_route_pattern(request):
+        introspector = request.registry.introspector
+        route_name = request.matched_route.name
+        route_intr = introspector.get('routes', route_name)
+        return Response(str(route_intr['pattern']))
+
+See also :ref:`using_introspection`.
+
 Testing
 ~~~~~~~
 
