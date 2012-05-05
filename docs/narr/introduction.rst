@@ -830,6 +830,14 @@ callable:
 
 See also :ref:`using_introspection`.
 
+Python 3 Compatibility
+----------------------
+
+Pyramid and most of its add-ons are Python 3 compatible.  If you develop a
+Pyramid application today, you won't need to worry that five years from now
+you'll be backwatered because there are language features you'd like to use
+but your framework doesn't support newer Python versions.
+
 Testing
 ~~~~~~~
 
