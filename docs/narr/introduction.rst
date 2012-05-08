@@ -534,14 +534,14 @@ Configuration extensibility
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Unlike other systems, Pyramid provides a structured "include" mechanism (see
-:meth:`~pyramid.config.Configurator.include`) that allows you to compose
+:meth:`~pyramid.config.Configurator.include`) that allows you to combine
 applications from multiple Python packages.  All the configuration statements
 that can be performed in your "main" Pyramid application can also be
 performed by included packages including the addition of views, routes,
 subscribers, and even authentication and authorization policies. You can even
 extend or override an existing application by including another application's
 configuration in your own, overriding or adding new views and routes to
-it.  This has the potential to allow you to compose a big application out of
+it.  This has the potential to allow you to create a big application out of
 many other smaller ones.  For example, if you want to reuse an existing
 application that already has a bunch of routes, you can just use the
 ``include`` statement with a ``route_prefix``; the new application will live
