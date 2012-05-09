@@ -48,6 +48,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
     'repoze.sphinx.autointerface',
+    'sphinx.ext.viewcode',
 #    'sphinx.ext.intersphinx'
     ]
 
