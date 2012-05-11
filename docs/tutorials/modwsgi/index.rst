@@ -99,7 +99,8 @@ commands and files.
     .. code-block:: apache
 
        # Use only 1 Python sub-interpreter.  Multiple sub-interpreters
-       # play badly with C extensions.
+       # play badly with C extensions.  See
+       # http://stackoverflow.com/a/10558360/209039
        WSGIApplicationGroup %{GLOBAL}
        WSGIPassAuthorization On
        WSGIDaemonProcess pyramid user=chrism group=staff threads=4 \
