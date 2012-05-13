@@ -1569,7 +1569,7 @@ Pyramid Doesn't Offer Pluggable Apps
 ------------------------------------
 
 It is "Pyramidic" to compose multiple external sources into the same
-configuration using :meth:`~pyramid.config.Configuration.include`.  Any
+configuration using :meth:`~pyramid.config.Configurator.include`.  Any
 number of includes can be done to compose an application; includes can even
 be done from within other includes.  Any directive can be used within an
 include that can be used outside of one (such as
