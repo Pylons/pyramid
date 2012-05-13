@@ -375,73 +375,6 @@ at least some ZCA concepts.  In some places it's used unabashedly, and will
 be forever.  We know it's quirky, but it's also useful and fundamentally
 understandable if you take the time to do some reading about it.
 
-Pyramid Uses Interfaces Too Liberally
--------------------------------------
-
-In this `TOPP Engineering blog entry
-<http://www.coactivate.org/projects/topp-engineering/blog/2008/10/20/what-bothers-me-about-the-component-architecture/>`_,
-Ian Bicking asserts that the way :mod:`repoze.bfg` used a Zope interface to
-represent an HTTP request method added too much indirection for not enough
-gain.  We agreed in general, and for this reason, :mod:`repoze.bfg` version
-1.1 (and subsequent versions including :app:`Pyramid` 1.0+) added :term:`view
-predicate` and :term:`route predicate` modifiers to view configuration.
-Predicates are request-specific (or :term:`context` -specific) matching
-narrowers which don't use interfaces.  Instead, each predicate uses a
-domain-specific string as a match value.
-
-For example, to write a view configuration which matches only requests with
-the ``POST`` HTTP request method, you might write a ``@view_config``
-decorator which mentioned the ``request_method`` predicate:
-
-.. code-block:: python
-   :linenos:
-
-   from pyramid.view import view_config
-   @view_config(name='post_view', request_method='POST', renderer='json')
-   def post_view(request):
-       return 'POSTed'
-
-You might further narrow the matching scenario by adding an ``accept``
-predicate that narrows matching to something that accepts a JSON response:
-
-.. code-block:: python
-   :linenos:
-
-   from pyramid.view import view_config
-   @view_config(name='post_view', request_method='POST', 
-                accept='application/json', renderer='json')
-   def post_view(request):
-       return 'POSTed'
-
-Such a view would only match when the request indicated that HTTP request
-method was ``POST`` and that the remote user agent passed
-``application/json`` (or, for that matter, ``application/*``) in its
-``Accept`` request header.
-
-Under the hood, these features make no use of interfaces.
-
-Many prebaked predicates exist.  However, use of only prebaked predicates,
-however, doesn't entirely meet Ian's criterion.  He would like to be able to
-match a request using a lambda or another function which interrogates the
-request imperatively.  In :mod:`repoze.bfg` version 1.2, we acommodate this
-by allowing people to define custom view predicates:
-
-.. code-block:: python
-   :linenos:
-
-   from pyramid.view import view_config
-   from pyramid.response import Response
-
-   def subpath(context, request):
-       return request.subpath and request.subpath[0] == 'abc'
-
-   @view_config(custom_predicates=(subpath,))
-   def aview(request):
-       return Response('OK')
-
-The above view will only match when the first element of the request's
-:term:`subpath` is ``abc``.
-
 .. _zcml_encouragement:
 
 Pyramid "Encourages Use of ZCML"
@@ -711,33 +644,22 @@ over 2K lines of Python code, excluding tests.
 Pyramid Has Too Many Dependencies
 ---------------------------------
 
-This is true.  At the time of this writing, the total number of Python
-package distributions that :app:`Pyramid` depends upon transitively is 15 if
-you use Python 2.7, or 17 if you use Python 2.5 or 2.6.  This is a lot more
-than zero package distribution dependencies: a metric which various Python
-microframeworks and Django boast.
+This is true.  At the time of this writing (Pyramid 1.3), the total number of
+Python package distributions that :app:`Pyramid` depends upon transitively is
+if you use Python 3.2 or Python 2.7 is 10.  If you use Python 2.6, Pyramid
+will pull in 12 package distributions.  This is a lot more than zero package
+distribution dependencies: a metric which various Python microframeworks and
+Django boast.
 
-The :mod:`zope.component`, package on which :app:`Pyramid` depends has
-transitive dependencies on several other packages (:mod:`zope.event`, and
-:mod:`zope.interface`).  :app:`Pyramid` also has its own direct dependencies,
-such as :term:`PasteDeploy`, :term:`Chameleon`, :term:`Mako`, :term:`WebOb`,
-:mod:`zope.deprecation` and some of these in turn have their own transitive
-dependencies.
+However, Pyramid 1.2 relied on 15 packages under Python 2.7 and 17 packages
+under Python 2.6, so we've made progress here.  A port to Python 3 completed
+in Pyramid 1.3 helped us shed a good number of dependencies by forcing us to
+make better packaging decisions.
 
-We try not to reinvent too many wheels (at least the ones that don't need
-reinventing), and this comes at the cost of some number of dependencies.
-However, "number of package distributions" is just not a terribly great
-metric to measure complexity.  For example, the :mod:`zope.event`
-distribution on which :app:`Pyramid` depends has a grand total of four lines
-of runtime code.
-
-In the meantime, :app:`Pyramid` has a number of package distribution
-dependencies comparable to similarly-targeted frameworks such as Pylons 1.X.
-It may be in the future that we shed more dependencies as the result of a
-port to Python 3 (the less code we need to port, the better).  In the future,
-we may also move templating system dependencies out of the core and place
-them in add-on packages, to be included by developers instead of by the
-framework.  This would reduce the number of core dependencies by about five.
+In the future, we may also move templating system dependencies out of the
+core and place them in add-on packages, to be included by developers instead
+of by the framework.  This would reduce the number of core dependencies by
+about five, leaving us with only five remaining core dependencies.
 
 Pyramid "Cheats" To Obtain Speed
 --------------------------------
