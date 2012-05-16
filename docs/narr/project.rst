@@ -144,13 +144,13 @@ directories which he creates within his ``~/projects`` directory.  On
 Windows, it's a good idea to put project directories within a directory that
 contains no space characters, so it's wise to *avoid* a path that contains
 i.e. ``My Documents``.  As a result, the author, when he uses Windows, just
-puts his projects in ``C:\\projects``.
+puts his projects in ``C:\projects``.
 
 .. warning:: 
 
    You’ll need to avoid using ``pcreate`` to create a project with the same
    as a Python standard library component. In particular, this means you
-   should avoid using names the names ``site`` or ``test``, both of which
+   should avoid using the names ``site`` or ``test``, both of which
    conflict with Python standard library packages.  You should also avoid
    using the name ``pyramid``, which will conflict with Pyramid itself.
 
@@ -684,7 +684,7 @@ testing your application, packaging, and distributing your application.
 
 .. note::
 
-  ``setup.py`` is the defacto standard which Python developers use to
+  ``setup.py`` is the de facto standard which Python developers use to
   distribute their reusable code.  You can read more about ``setup.py`` files
   and their usage in the `Setuptools documentation
   <http://peak.telecommunity.com/DevCenter/setuptools>`_ and `The
@@ -966,7 +966,7 @@ named ``views`` instead of within a single ``views.py`` file, you might:
 You can then continue to add view callable functions to the ``blog.py``
 module, but you can also add other ``.py`` files which contain view callable
 functions to the ``views`` directory.  As long as you use the
-``@view_config`` directive to register views in conjuction with
+``@view_config`` directive to register views in conjunction with
 ``config.scan()`` they will be picked up automatically when the application
 is restarted.
 
@@ -994,7 +994,7 @@ run a :app:`Pyramid` application is purely conventional based on the output
 of its scaffolding.  But we strongly recommend using while developing your
 application, because many other convenience introspection commands (such as
 ``pviews``, ``prequest``, ``proutes`` and others) are also implemented in
-terms of configuration availaibility of this ``.ini`` file format.  It also
+terms of configuration availability of this ``.ini`` file format.  It also
 configures Pyramid logging and provides the ``--reload`` switch for
 convenient restarting of the server when code changes.
 
