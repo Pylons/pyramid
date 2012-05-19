@@ -23,6 +23,10 @@ Bug Fixes
   empty list.  This was incorrect, it should have unconditionally returned
   ``[Everyone]``, and now does.
 
+- Fix incompatibility with recently released zope.interface 4.0.  Symptom:
+  ``TypeError: Class advice impossible in Python3. Use the @provider class
+  decorator instead.``
+
 1.3 (2012-03-21)
 ================
 
