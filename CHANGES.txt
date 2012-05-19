@@ -41,6 +41,10 @@ Bug Fixes
   backwards incompatibility when methods that declared only a request
   argument were used.  See https://github.com/Pylons/pyramid/issues/503
 
+- Fix an incompatibility under Python 3.X with ``zope.interface`` 4.0.
+  ``Symptom: TypeError: Class advice impossible in Python3.  Use the
+  @provider class decorator instead.``
+
 1.3b3 (2012-03-17)
 ==================
 

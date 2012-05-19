@@ -5,9 +5,9 @@ from functools import wraps
 
 from zope.interface import (
     Interface,
-    classProvides,
     implementedBy,
     implementer,
+    provider,
     )
 
 from zope.interface.interfaces import IInterface
@@ -385,8 +385,8 @@ class ViewDeriver(object):
         return decorator(view)
 
 @implementer(IViewMapper)
+@provider(IViewMapperFactory)
 class DefaultViewMapper(object):
-    classProvides(IViewMapperFactory)
     def __init__(self, **kw):
         self.attr = kw.get('attr')
 
