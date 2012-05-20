@@ -1,3 +1,14 @@
+1.3.2 (2012-05-19)
+==================
+
+- Version 1.3.1 was a brownbag release, at very least on Windows and possibly
+  on other operating systems, due to the existence of a stray ``"package``
+  directory (quote included) in the root directory of the 1.3.1 tarball.
+  This directory and its contents was present because the tarball was created
+  using a release version of ``setuptools-git`` rather than a
+  ``setuptools-git`` installed from a checkout.  The only change in this
+  release is to correct the packaging error in 1.3.1.
+
 1.3.1 (2012-05-19)
 ==================
 
