@@ -46,8 +46,9 @@ Releasing Pyramid
 
 - Create a release tag.
 
-- Make sure your system Python has ``setuptools-git`` installed and release to
-  PyPI::
+- Make sure your system Python has ``setuptools-git`` (the version at
+  https://github.com/wichert/setuptools-git, *not* the released version
+  0.4.2) installed and release to PyPI::
 
   $ python setup.py sdist register upload
 
