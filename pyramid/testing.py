@@ -1,5 +1,6 @@
 import copy
 import os
+from contextlib import contextmanager
 
 from zope.deprecation import deprecated
 
@@ -941,3 +942,37 @@ def skip_on(*platforms): # pragma: no  cover
             return wrapper
     return decorator
 skip_on.os_name = os.name # for testing
+
+@contextmanager
+def testConfig(registry=None,
+        request=None,
+        hook_zca=True,
+        autocommit=True,
+        settings=None):
+    """Returns a context manager for test set up.
+
+    This context manager calls :func:`pyramid.testing.testSetup` when
+    entering and :func:`pyramid.testing.tearDown` when exiting.
+
+    All arguments are passed directly to :func:`pyramid.testing.testSetup`.
+    If the ZCA is hooked, it will always be un-hooked in tearDown.
+
+    This context manager allows you to write test code like this:
+
+    .. code-block:: python
+        :linenos:
+
+        with testConfig() as config:
+            config.add_route('bar', '/bar/{id}')
+            req = DummyRequest()
+            resp = myview(req),
+    """
+    config = setUp(registry=registry,
+            request=request,
+            hook_zca=hook_zca,
+            autocommit=autocommit,
+            settings=settings)
+    try:
+        yield config
+    finally:
+        tearDown(unhook_zca=hook_zca)
