@@ -149,7 +149,7 @@ puts his projects in ``C:\projects``.
 .. warning:: 
 
    You’ll need to avoid using ``pcreate`` to create a project with the same
-   as a Python standard library component. In particular, this means you
+   name as a Python standard library component. In particular, this means you
    should avoid using the names ``site`` or ``test``, both of which
    conflict with Python standard library packages.  You should also avoid
    using the name ``pyramid``, which will conflict with Pyramid itself.
