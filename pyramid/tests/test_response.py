@@ -31,11 +31,13 @@ class TestFileResponse(unittest.TestCase):
         path = self._getPath()
         r = self._makeOne(path, content_type='image/jpeg')
         self.assertEqual(r.content_type, 'image/jpeg')
+        r.app_iter.close()
 
     def test_without_content_type(self):
         path = self._getPath()
         r = self._makeOne(path)
         self.assertEqual(r.content_type, 'text/plain')
+        r.app_iter.close()
 
 class TestFileIter(unittest.TestCase):
     def _makeOne(self, file, block_size):
