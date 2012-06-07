@@ -289,6 +289,21 @@ keys added to the renderer globals dictionary by all
 :class:`pyramid.events.BeforeRender` subscribers and renderer globals
 factories must be unique.
 
+The dictionary returned from the view is accessible through the
+:attr:`rendering_val` attribute of a :class:`~pyramid.events.BeforeRender`
+event, like so:
+
+.. code-block:: python
+    :linenos:
+
+    from pyramid.events import subscriber
+    from pyramid.events import BeforeRender
+
+    @subscriber(BeforeRender)
+    def read_return(event):
+        # 'mykey' is returned from the view
+        print(event.rendering_val['mykey'])
+
 See the API documentation for the :class:`~pyramid.events.BeforeRender` event
 interface at :class:`pyramid.interfaces.IBeforeRender`.
 
