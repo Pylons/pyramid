@@ -48,23 +48,6 @@ checkout.
   $ cd starter
   $ ../bin/python setup.py develop
 
-Building the HTML Docs
------------------------
-
-- Check out Pyramid from Github.
-
-- Create a virtualenv or reuse an existing one that you're using to develop
-  Pyramid.
-
-- Run  ``$yourvenv/bin/python setup.py dev docs``.
-
-- cd to ``docs`` within the Pyramid checkout and execute ``make clean html
-  SPHINXBUILD=$yourvenv/bin/sphinx-build``.  The ``SPHINXBUILD=...`` hair is
-  there in order to tell it to use the virtualenv Python, which will have
-  both Sphinx and Pyramid (for API documentation generation) installed.
-
-- The rendered HTML docs will end up in ``docs/_build/html``.
-
 Adding Features
 ---------------
 
@@ -130,23 +113,28 @@ Test Coverage
   ``nose`` and ``coverage`` into your virtualenv, and running ``setup.py
   nosetests --with-coverage``.
 
-Documentation Coverage
-----------------------
+Documentation Coverage and Building HTML Documentation
+------------------------------------------------------
 
-- If you fix a bug, and the bug requires an API or behavior
-  modification, all documentation in this package which references
-  that API or behavior must change to reflect the bug fix, ideally in
-  the same commit that fixes the bug or adds the feature.
+If you fix a bug, and the bug requires an API or behavior modification, all
+documentation in this package which references that API or behavior must
+change to reflect the bug fix, ideally in the same commit that fixes the bug
+or adds the feature.
 
-- To build and review docs:
+To build and review docs (where ``$yourvenv`` refers to the virtualenv you're
+using to develop Pyramid):
 
-  1. Install ``tests_require`` dependencies from Pyramid's setup.py into your
-     virtualenv.
+1. Run ``$yourvenv/bin/python setup.py dev docs``.  This will cause Sphinx
+   and all development requirements to be installed in your virtualenv.
 
-  2. From the ``docs`` directory of the Pyramid checkout run ``make html
-     SPHINXBUILD=/path/to/your/virtualenv/bin/sphinx-build``.
+2. cd to the ``docs`` directory within your Pyramid checkout and execute
+   ``make clean html SPHINXBUILD=$yourvenv/bin/sphinx-build``.  The
+   ``SPHINXBUILD=...`` hair is there in order to tell it to use the
+   virtualenv Python, which will have both Sphinx and Pyramid (for API
+   documentation generation) installed.
 
-  3.  Open the _build/html/index.html file to see the resulting rendering.
+3. Open the ``docs/_build/html/index.html`` file to see the resulting HTML
+   rendering.
 
 Change Log
 ----------
