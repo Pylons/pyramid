@@ -654,8 +654,11 @@ use the following command:
 
 .. code-block:: python
 
-   import logging.config
-   logging.config.fileConfig('/path/to/my/development.ini')
+   import pyramid.paster
+   pyramid.paster.setup_logging('/path/to/my/development.ini')
+
+See :ref:`logging_chapter` for more information on logging within
+:app:`Pyramid`.
 
 .. index::
    single: console script
