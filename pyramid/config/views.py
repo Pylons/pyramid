@@ -1001,6 +1001,9 @@ class ViewsConfiguratorMixin(object):
                 # GET implies HEAD too
                 request_method = as_sorted_tuple(request_method + ('HEAD',))
 
+        if accept is not None:
+            accept = accept.lower()
+
         order, predicates, phash = make_predicates(xhr=xhr,
             request_method=request_method, path_info=path_info,
             request_param=request_param, header=header, accept=accept,
