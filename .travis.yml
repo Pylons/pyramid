@@ -11,4 +11,3 @@ matrix:
     - python: pypy
 
 script: python setup.py test
-
