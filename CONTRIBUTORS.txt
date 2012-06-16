@@ -174,3 +174,5 @@ Contributors
 - Marin Rukavina, 2012/05/03
 
 - Marc Abramowitz, 2012/06/13
+
+- Brian Sutherland, 2012/06/16
