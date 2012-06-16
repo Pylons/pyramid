@@ -65,10 +65,11 @@ def render(renderer_name, value, request=None, package=None):
     dictionary.  For other renderers, this will need to be whatever
     sort of value the renderer expects.
 
-    The 'system' values supplied to the renderer will include a basic
-    set of top-level system names, such as ``request``, ``context``,
-    and ``renderer_name``.  If :term:`renderer globals` have been
-    specified, these will also be used to agument the value.
+    The 'system' values supplied to the renderer will include a basic set of
+    top-level system names, such as ``request``, ``context``,
+    ``renderer_name``, and ``view``.  See :ref:`renderer_system_values` for
+    the full list.  If :term:`renderer globals` have been specified, these
+    will also be used to agument the value.
 
     Supply a ``request`` parameter in order to provide the renderer
     with the most correct 'system' values (``request`` and ``context``
@@ -108,10 +109,11 @@ def render_to_response(renderer_name, value, request=None, package=None):
     dictionary.  For other renderers, this will need to be whatever
     sort of value the renderer expects.
 
-    The 'system' values supplied to the renderer will include a basic
-    set of top-level system names, such as ``request``, ``context``,
-    and ``renderer_name``.  If :term:`renderer globals` have been
-    specified, these will also be used to agument the value.
+    The 'system' values supplied to the renderer will include a basic set of
+    top-level system names, such as ``request``, ``context``,
+    ``renderer_name``, and ``view``.  See :ref:`renderer_system_values` for
+    the full list.  If :term:`renderer globals` have been specified, these
+    will also be used to agument the value.
 
     Supply a ``request`` parameter in order to provide the renderer
     with the most correct 'system' values (``request`` and ``context``
