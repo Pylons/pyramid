@@ -200,10 +200,34 @@ class BeforeRender(dict):
     setting an overriding value (which can be done using ``.get`` or
     ``__contains__`` of the event object).
 
-    The event has an additional attribute named ``rendering_val``.  This is
-    the (non-system) value returned by a view or passed to ``render*`` as
-    ``value``.  This feature is new in Pyramid 1.2.
-    
+    The dictionary returned from the view is accessible through the
+    :attr:`rendering_val` attribute of a :class:`~pyramid.events.BeforeRender`
+    event.
+
+    Suppose you return ``{'mykey': 'somevalue', 'mykey2': 'somevalue2'}`` from
+    your view callable, like so::
+
+      from pyramid.view import view_config
+
+      @view_config(renderer='some_renderer')
+      def myview(request):
+          return {'mykey': 'somevalue', 'mykey2': 'somevalue2'}
+
+    :attr:`rendering_val` can be used to access these values from the
+    :class:`~pyramid.events.BeforeRender` object::
+
+      from pyramid.events import subscriber
+      from pyramid.events import BeforeRender
+
+      @subscriber(BeforeRender)
+      def read_return(event):
+          # {'mykey': 'somevalue'} is returned from the view
+          print(event.rendering_val['mykey'])
+
+    In other words, :attr:`rendering_val` is the (non-system) value returned by a
+    view or passed to ``render*`` as ``value``.  This feature is new in Pyramid
+    1.2.
+
     For a description of the values present in the renderer globals dictionary,
     see :ref:`renderer_system_values`.
 
