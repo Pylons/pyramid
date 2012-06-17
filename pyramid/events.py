@@ -202,17 +202,29 @@ class BeforeRender(dict):
 
     The dictionary returned from the view is accessible through the
     :attr:`rendering_val` attribute of a :class:`~pyramid.events.BeforeRender`
-    event, like so::
+    event.
+
+    Suppose you return ``{'mykey': 'somevalue', 'mykey2': 'somevalue2'}`` from
+    your view callable, like so::
+
+      from pyramid.view import view_config
+
+      @view_config(renderer='some_renderer')
+      def myview(request):
+          return {'mykey': 'somevalue', 'mykey2': 'somevalue2'}
+
+    :attr:`rendering_val` can be used to access these values from the
+    :class:`~pyramid.events.BeforeRender` object::
 
       from pyramid.events import subscriber
       from pyramid.events import BeforeRender
 
       @subscriber(BeforeRender)
       def read_return(event):
-          # "mykey" is returned from the view
+          # {'mykey': 'somevalue'} is returned from the view
           print(event.rendering_val['mykey'])
 
-    In other words, ``rendering_val`` is the (non-system) value returned by a
+    In other words, :attr:`rendering_val` is the (non-system) value returned by a
     view or passed to ``render*`` as ``value``.  This feature is new in Pyramid
     1.2.
 
