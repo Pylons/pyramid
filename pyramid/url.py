@@ -711,7 +711,7 @@ class URLMethodsMixin(object):
            _app_url=request.script_name)``.
            :meth:`pyramid.request.Request.current_route_path` is, in fact,
            implemented in terms of
-           `:meth:`pyramid.request.Request.current_route_url` in just this
+           :meth:`pyramid.request.Request.current_route_url` in just this
            way. As a result, any ``_app_url`` passed within the ``**kw``
            values to ``current_route_path`` will be ignored.
         """
