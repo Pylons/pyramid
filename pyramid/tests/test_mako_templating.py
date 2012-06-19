@@ -402,6 +402,11 @@ class TestIntegration(unittest.TestCase):
         result = render('hello_inherit_pkg.mak', {}).replace('\r','')
         self.assertEqual(result, text_('Layout\nHello World!\n'))
 
+    def test_render_namespace(self):
+        from pyramid.renderers import render
+        result = render('hellocompo.mak', {}).replace('\r','')
+        self.assertEqual(result, text_('\nNamespace\nHello \nWorld!\n'))
+
     def test_render_to_response(self):
         from pyramid.renderers import render_to_response
         result = render_to_response('helloworld.mak', {'a':1})
