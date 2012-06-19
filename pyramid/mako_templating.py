@@ -80,8 +80,10 @@ class MakoRendererFactoryHelper(object):
         p = re.compile(
                 r'(?P<path>[\w_.:/]+)'
                 r'(?:\#(?P<defname>[\w_]+))?'
+                r'(\.(?P<ext>.*))'
                 )
-        path, defname = p.match(info.name).group("path", "defname")
+        asset, defname, ext = p.match(info.name).group('path', 'defname', 'ext')
+        path = '%s.%s' % (asset, ext)
         registry = info.registry
         settings = info.settings
         settings_prefix = self.settings_prefix
@@ -176,6 +178,9 @@ class MakoLookupTemplateRenderer(object):
         if self.defname is None:
             if isinstance(value, tuple):
                 self.defname, value = value
+        else:
+            if isinstance(value, tuple):
+                _, value = value
         try:
             system.update(value)
         except (TypeError, ValueError):

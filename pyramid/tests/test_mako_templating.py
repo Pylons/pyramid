@@ -353,6 +353,14 @@ class MakoLookupTemplateRendererTests(Base, unittest.TestCase):
         self.assertTrue(isinstance(result, text_type))
         self.assertEqual(result, text_('result'))
 
+    def test_call_with_defname_with_tuple_value(self):
+        lookup = DummyLookup()
+        instance = self._makeOne('path', 'defname', lookup)
+        result = instance(('defname', {}), {'context':1})
+        self.assertEqual(lookup.deffed, 'defname')
+        self.assertEqual(result, text_('result'))
+        self.assertEqual(lookup.values, {'_context':1})
+
     def test_call_with_nondict_value(self):
         lookup = DummyLookup()
         instance = self._makeOne('path', None, lookup)
