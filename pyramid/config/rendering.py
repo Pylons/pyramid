@@ -21,6 +21,7 @@ DEFAULT_RENDERERS = (
     ('.pt', chameleon_zpt.renderer_factory),
     ('.mak', mako_renderer_factory),
     ('.mako', mako_renderer_factory),
+    ('.makodef', mako_renderer_factory),
     ('json', renderers.json_renderer_factory),
     ('string', renderers.string_renderer_factory),
     )

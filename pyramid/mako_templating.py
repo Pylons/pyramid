@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 import threading
 
@@ -76,7 +77,11 @@ class MakoRendererFactoryHelper(object):
         self.settings_prefix = settings_prefix
 
     def __call__(self, info):
-        path = info.name
+        p = re.compile(
+                r'(?P<path>[\w_.:/]+)'
+                r'(?:\#(?P<defname>[\w_]+))?'
+                )
+        path, defname = p.match(info.name).group("path", "defname")
         registry = info.registry
         settings = info.settings
         settings_prefix = self.settings_prefix
@@ -141,7 +146,7 @@ class MakoRendererFactoryHelper(object):
             finally:
                 registry_lock.release()
 
-        return MakoLookupTemplateRenderer(path, lookup)
+        return MakoLookupTemplateRenderer(path, defname, lookup)
 
 renderer_factory = MakoRendererFactoryHelper('mako.')
 
@@ -156,8 +161,9 @@ class MakoRenderingException(Exception):
 
 @implementer(ITemplateRenderer)
 class MakoLookupTemplateRenderer(object):
-    def __init__(self, path, lookup):
+    def __init__(self, path, defname, lookup):
         self.path = path
+        self.defname = defname
         self.lookup = lookup
  
     def implementation(self):
@@ -167,16 +173,13 @@ class MakoLookupTemplateRenderer(object):
         context = system.pop('context', None)
         if context is not None:
             system['_context'] = context
-        def_name = None
-        if isinstance(value, tuple):
-            def_name, value = value
         try:
             system.update(value)
         except (TypeError, ValueError):
             raise ValueError('renderer was passed non-dictionary as value')
         template = self.implementation()
-        if def_name is not None:
-            template = template.get_def(def_name)
+        if self.defname is not None:
+            template = template.get_def(self.defname)
         try:
             result = template.render_unicode(**system)
         except:
