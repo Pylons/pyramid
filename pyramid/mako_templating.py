@@ -78,11 +78,11 @@ class MakoRendererFactoryHelper(object):
 
     def __call__(self, info):
         p = re.compile(
-                r'(?P<path>[\w_.:/]+)'
+                r'(?P<asset>[\w_.:/]+)'
                 r'(?:\#(?P<defname>[\w_]+))?'
                 r'(\.(?P<ext>.*))'
                 )
-        asset, defname, ext = p.match(info.name).group('path', 'defname', 'ext')
+        asset, defname, ext = p.match(info.name).group('asset', 'defname', 'ext')
         path = '%s.%s' % (asset, ext)
         registry = info.registry
         settings = info.settings
