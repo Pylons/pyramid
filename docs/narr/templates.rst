@@ -718,7 +718,7 @@ Using def inside Mako Templates
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To use a def inside a Mako template, given a :term:`Mako` template file named 
-``foo.mak`` and a def named ``bar``, you can configure the template as a 
+``foo.mak`` and a defname ``bar``, you can configure the template as a 
 :term:`renderer` like so:
 
 .. code-block:: python
