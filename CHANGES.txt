@@ -42,7 +42,7 @@ Features
   and ``HTTPMovedPermanently`` exceptions, so these can be caught by the
   NotFound view (and other exception views).
 
-- The mako renderer now accepts a defname and returns the template def 
+- The mako renderer now accepts a def name and returns the template def 
   result for the view being called. The uri format using an asset spec is 
   package:path/to/template#defname.mako. The old way of returning a tuple 
   from the view is supported for backward compatibility, ('defname', {}).
