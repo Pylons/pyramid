@@ -397,6 +397,11 @@ class TestIntegration(unittest.TestCase):
         result = render('helloinherit.mak', {}).replace('\r','')
         self.assertEqual(result, text_('Layout\nHello World!\n'))
 
+    def test_render_inheritance_from_pkg_spec(self):
+        from pyramid.renderers import render
+        result = render('pyramid.tests:fixtures/helloinherit.mak', {}).replace('\r','')
+        self.assertEqual(result, text_('Layout\nHello World!\n'))
+
     def test_render_inheritance_pkg_spec(self):
         from pyramid.renderers import render
         result = render('hello_inherit_pkg.mak', {}).replace('\r','')
