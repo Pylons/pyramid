@@ -163,6 +163,13 @@ class MakoRenderingException(Exception):
 
 @implementer(ITemplateRenderer)
 class MakoLookupTemplateRenderer(object):
+    """ Render a :term:`Mako` template using the template
+    implied by the ``path`` argument.The ``path`` argument may be a
+    package-relative path, an absolute path, or a :term:`asset
+    specification`. If a defname is defined, in the form of 
+    package:path/to/template#defname.mako, a function named ``defname`` 
+    inside the template will then be rendered.
+    """
     def __init__(self, path, defname, lookup):
         self.path = path
         self.defname = defname
