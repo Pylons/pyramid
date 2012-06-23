@@ -28,6 +28,10 @@ class IMakoLookup(Interface):
     pass
 
 class PkgResourceTemplateLookup(TemplateLookup):
+    def __init__(self, *args, **kwargs):
+        super(PkgResourceTemplateLookup, self).__init__(*args, **kwargs)
+        self._adjusted_dict = {}
+
     """TemplateLookup subclass that handles asset specification URIs"""
     def adjust_uri(self, uri, relativeto):
         """Called from within a Mako template, avoids adjusting the
@@ -36,6 +40,8 @@ class PkgResourceTemplateLookup(TemplateLookup):
         isabs = os.path.isabs(uri)
         if (not isabs) and (':' in uri):
             return uri
+        if relativeto in self._adjusted_dict:
+            return TemplateLookup.adjust_uri(self, uri, self._adjusted_dict[relativeto])
         return TemplateLookup.adjust_uri(self, uri, relativeto)
 
     def get_template(self, uri):
@@ -54,6 +60,7 @@ class PkgResourceTemplateLookup(TemplateLookup):
             # store the generated python code in the mako module_directory or
             # in the temporary location of mako's modules
             adjusted = uri.replace(':', '$')
+            self._adjusted_dict[adjusted] = uri
             try:
                 if self.filesystem_checks:
                     return self._check(adjusted, self._collection[adjusted])
@@ -63,7 +70,7 @@ class PkgResourceTemplateLookup(TemplateLookup):
                 pname, path = resolve_asset_spec(uri)
                 srcfile = abspath_from_asset_spec(path, pname)
                 if os.path.isfile(srcfile):
-                    return self._load(srcfile, uri)
+                    return self._load(srcfile, adjusted)
                 raise exceptions.TopLevelLookupException(
                     "Can not locate template for uri %r" % uri)
         return TemplateLookup.get_template(self, uri)
