@@ -6,8 +6,8 @@ python:
   - pypy
   - 3.2
 
-matrix:
-  allow_failures:
-    - python: pypy
+#matrix:
+#  allow_failures:
+#    - python: pypy
 
 script: python setup.py test
