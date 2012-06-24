@@ -13,3 +13,7 @@ matrix:
     - python: pypy
 
 script: python setup.py test
+
+notifications:
+  email:
+    - pyramid-checkins@lists.repoze.org
