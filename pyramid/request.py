@@ -1,4 +1,7 @@
-import json
+try:
+    import simplejson as json
+except ImportError:
+    import json
 
 from zope.deprecation import deprecate
 from zope.deprecation.deprecation import deprecated

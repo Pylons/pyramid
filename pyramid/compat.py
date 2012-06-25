@@ -219,7 +219,10 @@ except ImportError: # pragma: no cover
 
 # "json" is not an API; it's here to support older pyramid_debugtoolbar
 # versions which attempt to import it
-import json
+try:
+    import simplejson as json
+except ImportError:
+    import json
 
     
 if PY3: # pragma: no cover
