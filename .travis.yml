@@ -6,8 +6,14 @@ python:
   - pypy
   - 3.2
 
+# Why does travis-ci's PyPy blow up?  Pyramid's tests
+# run fine under tox.
 matrix:
   allow_failures:
     - python: pypy
 
 script: python setup.py test
+
+notifications:
+  email:
+    - pyramid-checkins@lists.repoze.org
