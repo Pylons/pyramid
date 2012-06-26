@@ -371,6 +371,10 @@ class TestViewConfigDecorator(unittest.TestCase):
         self.assertEqual(decorator.mapper, 'mapper')
         self.assertEqual(decorator.decorator, 'decorator')
         self.assertEqual(decorator.match_param, 'match_param')
+
+    def test_create_decorator_tuple(self):
+        decorator = self._makeOne(decorator=('decorator1', 'decorator2'))
+        self.assertEqual(decorator.decorator, ('decorator1', 'decorator2'))
         
     def test_call_function(self):
         decorator = self._makeOne()

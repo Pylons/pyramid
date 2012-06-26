@@ -245,7 +245,7 @@ Responses:
 def makedirs(dir, verbosity, pad):
     parent = os.path.dirname(os.path.abspath(dir))
     if not os.path.exists(parent):
-        makedirs(parent, verbosity, pad)
+        makedirs(parent, verbosity, pad)  # pragma: no cover
     os.mkdir(dir)
 
 def substitute_filename(fn, vars):
