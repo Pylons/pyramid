@@ -837,11 +837,12 @@ class ViewsConfiguratorMixin(object):
 
         decorator
 
-          A :term:`dotted Python name` to function (or the function itself)
+          A :term:`dotted Python name` to function (or the function itself,
+          or a list or tuple of the aforementioned)
           which will be used to decorate the registered :term:`view
-          callable`.  The decorator function will be called with the view
+          callable`.  The decorator function(s) will be called with the view
           callable as a single argument.  The view callable it is passed will
-          accept ``(context, request)``.  The decorator must return a
+          accept ``(context, request)``.  The decorator(s) must return a
           replacement view callable which also accepts ``(context,
           request)``.
 
@@ -1071,7 +1072,18 @@ class ViewsConfiguratorMixin(object):
         for_ = self.maybe_dotted(for_)
         containment = self.maybe_dotted(containment)
         mapper = self.maybe_dotted(mapper)
-        decorator = self.maybe_dotted(decorator)
+
+        def combine(*decorators):
+            def decorated(view_callable):
+                for decorator in decorators:
+                    view_callable = decorator(view_callable)
+                return view_callable
+            return decorated
+
+        if isinstance(decorator, (tuple, list)):
+            decorator = combine(*map(self.maybe_dotted, decorator))
+        else:
+            decorator = self.maybe_dotted(decorator)
 
         if not view:
             if renderer:
