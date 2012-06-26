@@ -846,6 +846,27 @@ class ViewsConfiguratorMixin(object):
           replacement view callable which also accepts ``(context,
           request)``.
 
+          If decorator is a tuple or list of callables, the callables will be
+          combined and used in the order provided as a decorator.
+          For example::
+
+            @view_config(..., decorator=[decorator1, decorator2])
+            def myview(request):
+                ....
+
+          Is similar to doing::
+
+            @view_config(...)
+            @decorator2
+            @decorator1
+            def myview(request):
+                ...
+
+          Except with the existing benefits of ``decorator=`` (having a common
+          decorator syntax for all view calling conventions and not having to
+          think about preserving function attributes such as ``__name__`` and
+          ``__module__`` within decorator logic).
+
         mapper
 
           A Python object or :term:`dotted Python name` which refers to a
