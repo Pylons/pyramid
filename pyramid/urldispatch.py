@@ -148,7 +148,9 @@ def _compile_route(route):
         name = pat.pop() # unicode
         name = name[1:-1]
         if ':' in name:
-            name, reg = name.split(':')
+            # reg may contain colons as well,
+            # so we must strictly split name into two parts
+            name, reg = name.split(':', 1)
         else:
             reg = '[^/]+'
         gen.append('%%(%s)s' % native_(name)) # native
