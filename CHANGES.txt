@@ -9,6 +9,9 @@ Bug Fixes
   return the empty list.  This was incorrect, it should have unconditionally
   returned ``[Everyone]``, and now does.
 
+- Explicit url dispatch regexes can now contain colons.
+  https://github.com/Pylons/pyramid/issues/629
+
 Features
 --------
 
