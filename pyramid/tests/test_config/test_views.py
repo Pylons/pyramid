@@ -184,6 +184,28 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         result = wrapper(None, None)
         self.assertEqual(result, 'OK')
 
+    def test_add_view_with_decorator_tuple(self):
+        from pyramid.renderers import null_renderer
+        def view(request):
+            """ ABC """
+            return 'OK'
+        def view_wrapper1(fn):
+            def inner(context, request):
+                return 'wrapped1' + fn(context, request)
+            return inner
+        def view_wrapper2(fn):
+            def inner(context, request):
+                return 'wrapped2' + fn(context, request)
+            return inner
+        config = self._makeOne(autocommit=True)
+        config.add_view(view=view, decorator=(view_wrapper1, view_wrapper2),
+                        renderer=null_renderer)
+        wrapper = self._getViewCallable(config)
+        self.assertFalse(wrapper is view)
+        self.assertEqual(wrapper.__doc__, view.__doc__)
+        result = wrapper(None, None)
+        self.assertEqual(result, 'wrapped2wrapped1OK')
+
     def test_add_view_with_http_cache(self):
         import datetime
         from pyramid.response import Response
