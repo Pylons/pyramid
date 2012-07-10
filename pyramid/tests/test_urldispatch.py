@@ -312,6 +312,14 @@ class TestCompileRoute(unittest.TestCase):
         self.assertEqual(generator({'baz':1, 'buz':2, 'bar': 'html'}),
                          '/foo/1/biz/2.html')
 
+    def test_custom_regex_with_colons(self):
+        matcher, generator = self._callFUT('foo/{baz}/biz/{buz:(?:[^/\.]+)}.{bar}')
+        self.assertEqual(matcher('/foo/baz/biz/buz.bar'),
+                         {'baz':'baz', 'buz':'buz', 'bar':'bar'})
+        self.assertEqual(matcher('foo/baz/biz/buz/bar'), None)
+        self.assertEqual(generator({'baz':1, 'buz':2, 'bar': 'html'}),
+                         '/foo/1/biz/2.html')
+
     def test_mixed_newstyle_oldstyle_pattern_defaults_to_newstyle(self):
         # pattern: '\\/foo\\/(?P<baz>abc)\\/biz\\/(?P<buz>[^/]+)\\/bar$'
         # note presence of :abc in pattern (oldstyle match)
