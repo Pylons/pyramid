@@ -4,6 +4,11 @@ Next release
 - Backport bug fix from master: Explicit url dispatch regexes can now contain
   colons.  https://github.com/Pylons/pyramid/issues/629
 
+- Backport bug fix from master: On at least one 64-bit Ubuntu system under
+  Python 3.2, using the ``view_config`` decorator caused a ``RuntimeError:
+  dictionary changed size during iteration`` exception.  It no longer does.
+  See https://github.com/Pylons/pyramid/issues/635 for more information.
+
 1.3.2 (2012-05-19)
 ==================
 

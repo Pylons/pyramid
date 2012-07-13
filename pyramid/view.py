@@ -199,7 +199,7 @@ class view_config(object):
                  custom_predicates=default, context=default,
                  decorator=default, mapper=default, http_cache=default,
                  match_param=default):
-        L = locals()
+        L = dict(locals()) # See issue #635 for dict() rationale
         if (context is not default) or (for_ is not default):
             L['context'] = context or for_
         for k, v in L.items():
@@ -367,7 +367,7 @@ class notfound_view_config(object):
                  path_info=default,  custom_predicates=default, 
                  decorator=default, mapper=default, match_param=default, 
                  append_slash=False):
-        L = locals()
+        L = dict(locals()) # See issue #635 for dict() rationale
         for k, v in L.items():
             if k not in ('self', 'L') and v is not default:
                 self.__dict__[k] = v
@@ -432,7 +432,7 @@ class forbidden_view_config(object):
                  xhr=default, accept=default, header=default,
                  path_info=default,  custom_predicates=default, 
                  decorator=default, mapper=default, match_param=default):
-        L = locals()
+        L = dict(locals()) # See issue #635 for dict() rationale
         for k, v in L.items():
             if k not in ('self', 'L') and v is not default:
                 self.__dict__[k] = v
