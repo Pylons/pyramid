@@ -179,11 +179,14 @@ class view_config(object):
     ``request_type``, ``route_name``, ``request_method``, ``request_param``,
     ``containment``, ``xhr``, ``accept``, ``header``, ``path_info``,
     ``custom_predicates``, ``decorator``, ``mapper``, ``http_cache``,
-    and ``match_param``.
+    ``match_param``, and ``depth``.
 
     The meanings of these arguments are the same as the arguments passed to
     :meth:`pyramid.config.Configurator.add_view`.  If any argument is left
-    out, its default will be the equivalent ``add_view`` default.
+    out, its default will be the equivalent ``add_view`` default.  Only the
+    ``depth`` argument is not passed to
+    :meth:`pyramid.config.Configurator.add_view``.  Instead, it is used to
+    support use of ``view_config`` inside another decorator.
 
     See :ref:`mapping_views_using_a_decorator_section` for details about
     using :class:`view_config`.
@@ -198,7 +201,7 @@ class view_config(object):
                  header=default, path_info=default,
                  custom_predicates=default, context=default,
                  decorator=default, mapper=default, http_cache=default,
-                 match_param=default):
+                 match_param=default, depth=default):
         L = dict(locals()) # See issue #635 for dict() rationale
         if (context is not default) or (for_ is not default):
             L['context'] = context or for_
@@ -208,12 +211,15 @@ class view_config(object):
 
     def __call__(self, wrapped):
         settings = self.__dict__.copy()
+        depth = settings.pop('depth', 1)
+        print 'Venusian depth:', depth
 
         def callback(context, name, ob):
             config = context.config.with_package(info.module)
             config.add_view(view=ob, **settings)
 
-        info = self.venusian.attach(wrapped, callback, category='pyramid')
+        info = self.venusian.attach(wrapped, callback,
+                                    category='pyramid', depth=depth)
 
         if info.scope == 'class':
             # if the decorator was attached to a method in a class, or
