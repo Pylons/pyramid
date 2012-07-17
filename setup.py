@@ -37,8 +37,6 @@ except IOError:
 
 install_requires=[
     'setuptools',
-    'Chameleon >= 1.2.3',
-    'Mako >= 0.3.6', # strict_undefined
     'WebOb >= 1.2dev', # response.text / py3 compat
     'repoze.lru >= 0.4', # py3 compat
     'zope.interface >= 3.8.0',  # has zope.interface.registry
@@ -66,6 +64,14 @@ testing_extras = tests_require + [
     'coverage',
     'virtualenv', # for scaffolding tests
     ]
+
+mako_extras = [
+    'Mako >= 0.3.6'
+]
+
+chameleon_extras = [
+    'Chameleon >= 1.2.3'
+]
 
 setup(name='pyramid',
       version='1.4dev',
@@ -96,6 +102,8 @@ setup(name='pyramid',
       zip_safe=False,
       install_requires = install_requires,
       extras_require = {
+          'chameleon':chameleon_extras,
+          'mako':mako_extras,
           'testing':testing_extras,
           'docs':docs_extras,
           },
