@@ -73,9 +73,10 @@ commands and files.
 
     .. code-block:: python
 
-       from pyramid.paster import get_app
-       application = get_app(
-         '/Users/chrism/modwsgi/env/myapp/production.ini', 'main')
+       from pyramid.paster import get_app, setup_logging
+       ini_path = '/Users/chrism/modwsgi/env/myapp/production.ini'
+       setup_logging(ini_path)
+       application = get_app(ini_path, 'main')
 
     The first argument to ``get_app`` is the project configuration file
     name.  It's best to use the ``production.ini`` file provided by your
@@ -84,6 +85,10 @@ commands and files.
     that should be loaded by ``mod_wsgi``.  The assignment to the name
     ``application`` is important: mod_wsgi requires finding such an
     assignment when it opens the file.
+
+    The call to ``setup_logging`` initializes the standard library's
+    `logging` module to allow logging within your application.
+    See :ref:`logging_config`.
 
 #.  Make the ``pyramid.wsgi`` script executable.
 
