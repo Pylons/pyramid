@@ -4,6 +4,8 @@ Next release
 Bug Fixes
 ---------
 
+- Fix PEP8-warnings in scaffolds.
+
 - Forward port from 1.3 branch: When no authentication policy was configured,
   a call to ``pyramid.security.effective_principals`` would unconditionally
   return the empty list.  This was incorrect, it should have unconditionally
