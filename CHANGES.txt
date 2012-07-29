@@ -54,3 +54,7 @@ Features
   result for the view being called. The uri format using an asset spec is 
   package:path/to/template#defname.mako. The old way of returning a tuple 
   from the view is supported for backward compatibility, ('defname', {}).
+
+- When there is a predicate mismatch exception (seen when no view matches for
+  a given request due to predicates not working), the exception now contains
+  a textual description of the predicate which didn't match.
