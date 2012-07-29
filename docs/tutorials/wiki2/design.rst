@@ -20,7 +20,7 @@ Models
 We'll be using a SQLite database to hold our wiki data, and we'll be using
 :term:`SQLAlchemy` to access the data in this database.
 
-Within the database, we define a single table named `tables`, whose elements
+Within the database, we define a single table named `pages`, whose elements
 will store the wiki pages.  There are two columns: `name` and `data`.
 
 URLs like ``/PageName`` will try to find an element in 

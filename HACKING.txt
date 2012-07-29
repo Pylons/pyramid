@@ -127,13 +127,19 @@ using to develop Pyramid):
 1. Run ``$yourvenv/bin/python setup.py dev docs``.  This will cause Sphinx
    and all development requirements to be installed in your virtualenv.
 
-2. cd to the ``docs`` directory within your Pyramid checkout and execute
+2. Update all git submodules from the top-level of your Pyramid checkout, like
+   so:
+     git submodule update --init --recursive
+   This will checkout theme subrepositories and prevent error conditions when
+   HTML docs are generated.
+
+3. cd to the ``docs`` directory within your Pyramid checkout and execute
    ``make clean html SPHINXBUILD=$yourvenv/bin/sphinx-build``.  The
    ``SPHINXBUILD=...`` hair is there in order to tell it to use the
    virtualenv Python, which will have both Sphinx and Pyramid (for API
    documentation generation) installed.
 
-3. Open the ``docs/_build/html/index.html`` file to see the resulting HTML
+4. Open the ``docs/_build/html/index.html`` file to see the resulting HTML
    rendering.
 
 Change Log

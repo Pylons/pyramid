@@ -315,7 +315,7 @@ class MakoLookupTemplateRendererTests(Base, unittest.TestCase):
     def test_instance_implements_ITemplate(self):
         from zope.interface.verify import verifyObject
         from pyramid.interfaces import ITemplateRenderer
-        verifyObject(ITemplateRenderer, self._makeOne(None, None))
+        verifyObject(ITemplateRenderer, self._makeOne(None, None, None))
 
     def test_class_implements_ITemplate(self):
         from zope.interface.verify import verifyClass
@@ -324,7 +324,7 @@ class MakoLookupTemplateRendererTests(Base, unittest.TestCase):
 
     def test_call(self):
         lookup = DummyLookup()
-        instance = self._makeOne('path', lookup)
+        instance = self._makeOne('path', None, lookup)
         result = instance({}, {'system':1})
         self.assertTrue(isinstance(result, text_type))
         self.assertEqual(result, text_('result'))
@@ -332,7 +332,7 @@ class MakoLookupTemplateRendererTests(Base, unittest.TestCase):
     def test_call_with_system_context(self):
         # lame
         lookup = DummyLookup()
-        instance = self._makeOne('path', lookup)
+        instance = self._makeOne('path', None, lookup)
         result = instance({}, {'context':1})
         self.assertTrue(isinstance(result, text_type))
         self.assertEqual(result, text_('result'))
@@ -340,21 +340,36 @@ class MakoLookupTemplateRendererTests(Base, unittest.TestCase):
 
     def test_call_with_tuple_value(self):
         lookup = DummyLookup()
-        instance = self._makeOne('path', lookup)
+        instance = self._makeOne('path', None, lookup)
         result = instance(('fub', {}), {'context':1})
         self.assertEqual(lookup.deffed, 'fub')
         self.assertEqual(result, text_('result'))
         self.assertEqual(lookup.values, {'_context':1})
 
+    def test_call_with_defname(self):
+        lookup = DummyLookup()
+        instance = self._makeOne('path', 'defname', lookup)
+        result = instance({}, {'system':1})
+        self.assertTrue(isinstance(result, text_type))
+        self.assertEqual(result, text_('result'))
+
+    def test_call_with_defname_with_tuple_value(self):
+        lookup = DummyLookup()
+        instance = self._makeOne('path', 'defname', lookup)
+        result = instance(('defname', {}), {'context':1})
+        self.assertEqual(lookup.deffed, 'defname')
+        self.assertEqual(result, text_('result'))
+        self.assertEqual(lookup.values, {'_context':1})
+
     def test_call_with_nondict_value(self):
         lookup = DummyLookup()
-        instance = self._makeOne('path', lookup)
+        instance = self._makeOne('path', None, lookup)
         self.assertRaises(ValueError, instance, None, {})
 
     def test_call_render_raises(self):
         from pyramid.mako_templating import MakoRenderingException
         lookup = DummyLookup(exc=NotImplementedError)
-        instance = self._makeOne('path', lookup)
+        instance = self._makeOne('path', None, lookup)
         try:
             instance({}, {})
         except MakoRenderingException as e:
@@ -364,7 +379,7 @@ class MakoLookupTemplateRendererTests(Base, unittest.TestCase):
 
     def test_implementation(self):
         lookup = DummyLookup()
-        instance = self._makeOne('path', lookup)
+        instance = self._makeOne('path', None, lookup)
         result = instance.implementation().render_unicode()
         self.assertTrue(isinstance(result, text_type))
         self.assertEqual(result, text_('result'))
@@ -401,6 +416,11 @@ class TestIntegration(unittest.TestCase):
         from pyramid.renderers import render
         result = render('hello_inherit_pkg.mak', {}).replace('\r','')
         self.assertEqual(result, text_('Layout\nHello World!\n'))
+
+    def test_render_namespace(self):
+        from pyramid.renderers import render
+        result = render('hellocompo.mak', {}).replace('\r','')
+        self.assertEqual(result, text_('\nNamespace\nHello \nWorld!\n'))
 
     def test_render_to_response(self):
         from pyramid.renderers import render_to_response

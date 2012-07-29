@@ -9,6 +9,14 @@ Bug Fixes
   return the empty list.  This was incorrect, it should have unconditionally
   returned ``[Everyone]``, and now does.
 
+- Explicit url dispatch regexes can now contain colons.
+  https://github.com/Pylons/pyramid/issues/629
+
+- On at least one 64-bit Ubuntu system under Python 3.2, using the
+  ``view_config`` decorator caused a ``RuntimeError: dictionary changed size
+  during iteration`` exception.  It no longer does.  See
+  https://github.com/Pylons/pyramid/issues/635 for more information.
+
 Features
 --------
 
@@ -41,3 +49,8 @@ Features
 - The static view machinery now raises (rather than returns) ``HTTPNotFound``
   and ``HTTPMovedPermanently`` exceptions, so these can be caught by the
   NotFound view (and other exception views).
+
+- The mako renderer now accepts a def name and returns the template def 
+  result for the view being called. The uri format using an asset spec is 
+  package:path/to/template#defname.mako. The old way of returning a tuple 
+  from the view is supported for backward compatibility, ('defname', {}).

@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 import threading
 
@@ -76,7 +77,13 @@ class MakoRendererFactoryHelper(object):
         self.settings_prefix = settings_prefix
 
     def __call__(self, info):
-        path = info.name
+        p = re.compile(
+                r'(?P<asset>[\w_.:/]+)'
+                r'(?:\#(?P<defname>[\w_]+))?'
+                r'(\.(?P<ext>.*))'
+                )
+        asset, defname, ext = p.match(info.name).group('asset', 'defname', 'ext')
+        path = '%s.%s' % (asset, ext)
         registry = info.registry
         settings = info.settings
         settings_prefix = self.settings_prefix
@@ -141,7 +148,7 @@ class MakoRendererFactoryHelper(object):
             finally:
                 registry_lock.release()
 
-        return MakoLookupTemplateRenderer(path, lookup)
+        return MakoLookupTemplateRenderer(path, defname, lookup)
 
 renderer_factory = MakoRendererFactoryHelper('mako.')
 
@@ -156,8 +163,16 @@ class MakoRenderingException(Exception):
 
 @implementer(ITemplateRenderer)
 class MakoLookupTemplateRenderer(object):
-    def __init__(self, path, lookup):
+    """ Render a :term:`Mako` template using the template
+    implied by the ``path`` argument.The ``path`` argument may be a
+    package-relative path, an absolute path, or a :term:`asset
+    specification`. If a defname is defined, in the form of 
+    package:path/to/template#defname.mako, a function named ``defname`` 
+    inside the template will then be rendered.
+    """
+    def __init__(self, path, defname, lookup):
         self.path = path
+        self.defname = defname
         self.lookup = lookup
  
     def implementation(self):
@@ -167,16 +182,19 @@ class MakoLookupTemplateRenderer(object):
         context = system.pop('context', None)
         if context is not None:
             system['_context'] = context
-        def_name = None
-        if isinstance(value, tuple):
-            def_name, value = value
+        if self.defname is None:
+            if isinstance(value, tuple):
+                self.defname, value = value
+        else:
+            if isinstance(value, tuple):
+                _, value = value
         try:
             system.update(value)
         except (TypeError, ValueError):
             raise ValueError('renderer was passed non-dictionary as value')
         template = self.implementation()
-        if def_name is not None:
-            template = template.get_def(def_name)
+        if self.defname is not None:
+            template = template.get_def(self.defname)
         try:
             result = template.render_unicode(**system)
         except:

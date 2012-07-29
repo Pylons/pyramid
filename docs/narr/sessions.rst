@@ -151,13 +151,12 @@ Using Alternate Session Factories
 ---------------------------------
 
 At the time of this writing, exactly one alternate session factory
-implementation exists, named ``pyramid_beaker``. This is a session
-factory that uses the `Beaker <http://beaker.groovie.org/>`_ library
-as a backend.  Beaker has support for file-based sessions, database
-based sessions, and encrypted cookie-based sessions.  See
-`http://github.com/Pylons/pyramid_beaker
-<http://github.com/Pylons/pyramid_beaker>`_ for more information about
-``pyramid_beaker``.
+implementation exists, named ``pyramid_beaker``. This is a session factory
+that uses the `Beaker <http://beaker.groovie.org/>`_ library as a backend.
+Beaker has support for file-based sessions, database based sessions, and
+encrypted cookie-based sessions.  See `the pyramid_beaker documentation
+<http://docs.pylonsproject.org/projects/pyramid_beaker/en/latest/>`_ for more
+information about ``pyramid_beaker``.
 
 .. index::
    single: session factory (custom)

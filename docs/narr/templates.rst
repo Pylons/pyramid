@@ -714,6 +714,22 @@ This template doesn't use any advanced features of Mako, only the
 :term:`renderer globals`.  See the `the Mako documentation
 <http://www.makotemplates.org/>`_ to use more advanced features.
 
+Using def inside Mako Templates
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To use a def inside a Mako template, given a :term:`Mako` template file named 
+``foo.mak`` and a def named ``bar``, you can configure the template as a 
+:term:`renderer` like so:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.view import view_config
+
+   @view_config(renderer='foo#bar.mak')
+   def my_view(request):
+       return {'project':'my project'}
+
 .. index::
    single: automatic reloading of templates
    single: template automatic reload
