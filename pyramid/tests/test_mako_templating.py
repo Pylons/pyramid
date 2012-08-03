@@ -135,7 +135,7 @@ class Test_renderer_factory(Base, unittest.TestCase):
         self._callFUT(info)
         lookup = self._getLookup()
         self.assertEqual(lookup.template_args['input_encoding'], 'utf-16')
-        
+
     def test_with_error_handler(self):
         settings = {'mako.directories':self.templates_dir,
                     'mako.error_handler':'pyramid.tests'}
@@ -383,7 +383,7 @@ class MakoLookupTemplateRendererTests(Base, unittest.TestCase):
         result = instance.implementation().render_unicode()
         self.assertTrue(isinstance(result, text_type))
         self.assertEqual(result, text_('result'))
-        
+
 class TestIntegration(unittest.TestCase):
     def setUp(self):
         import pyramid.mako_templating
@@ -406,7 +406,7 @@ class TestIntegration(unittest.TestCase):
         self.config.add_settings({'reload_templates': True})
         result = render('helloworld.mak', {'a':1}).replace('\r','')
         self.assertEqual(result, text_('\nHello föö\n', 'utf-8'))
-    
+
     def test_render_inheritance(self):
         from pyramid.renderers import render
         result = render('helloinherit.mak', {}).replace('\r','')
@@ -434,7 +434,7 @@ class TestIntegration(unittest.TestCase):
                                     {'a':1})
         self.assertEqual(result.ubody.replace('\r', ''),
                          text_('\nHello föö\n', 'utf-8'))
-    
+
     def test_render_with_abs_path(self):
         from pyramid.renderers import render
         result = render('/helloworld.mak', {'a':1}).replace('\r','')
@@ -446,7 +446,7 @@ class TestIntegration(unittest.TestCase):
         self.assertEqual(
             result.implementation().render_unicode().replace('\r',''),
             text_('\nHello föö\n', 'utf-8'))
-    
+
     def test_template_not_found(self):
         from pyramid.renderers import render
         from mako.exceptions import TemplateLookupException
@@ -484,7 +484,7 @@ class TestPkgResourceTemplateLookup(unittest.TestCase):
         inst = self._makeOne(directories=[fixturedir])
         result = inst.get_template('helloworld.mak')
         self.assertFalse(result is None)
-        
+
     def test_get_template_asset_spec_with_filesystem_checks(self):
         inst = self._makeOne(filesystem_checks=True)
         result = inst.get_template('pyramid.tests:fixtures/helloworld.mak')
@@ -498,7 +498,17 @@ class TestPkgResourceTemplateLookup(unittest.TestCase):
             self.assertFalse(result is None)
         finally:
             shutil.rmtree(tmpdir, ignore_errors=True)
-        
+
+    def test_get_template_asset_spec_with_uri_adjusted(self):
+        inst = self._makeOne(filesystem_checks=True)
+        result = inst.get_template('pyramid.tests$fixtures/helloworld.mak')
+        self.assertFalse(result is None)
+
+    def test_get_template_asset_spec_with_uri_not_adjusted(self):
+        inst = self._makeOne(filesystem_checks=True)
+        result = inst.get_template('pyramid.tests:fixtures/helloworld.mak')
+        self.assertFalse(result is None)
+
     def test_get_template_asset_spec_missing(self):
         from mako.exceptions import TopLevelLookupException
         fixturedir = self.get_fixturedir()
@@ -510,7 +520,7 @@ class TestMakoRenderingException(unittest.TestCase):
     def _makeOne(self, text):
         from pyramid.mako_templating import MakoRenderingException
         return MakoRenderingException(text)
-    
+
     def test_repr_and_str(self):
         exc = self._makeOne('text')
         self.assertEqual(str(exc), 'text')
@@ -519,7 +529,7 @@ class TestMakoRenderingException(unittest.TestCase):
 class DummyLookup(object):
     def __init__(self, exc=None):
         self.exc = exc
-        
+
     def get_template(self, path):
         self.path = path
         return self
@@ -533,8 +543,8 @@ class DummyLookup(object):
             raise self.exc
         self.values = values
         return text_('result')
-        
+
 class DummyRendererInfo(object):
     def __init__(self, kw):
         self.__dict__.update(kw)
-        
+

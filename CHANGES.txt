@@ -17,6 +17,12 @@ Bug Fixes
   during iteration`` exception.  It no longer does.  See
   https://github.com/Pylons/pyramid/issues/635 for more information.
 
+- In Mako Templates lookup, check if the uri is already adjusted and bring
+  it back to an asset spec. Normally occurs with inherited templates or
+  included components.
+  https://github.com/Pylons/pyramid/issues/606
+  https://github.com/Pylons/pyramid/issues/607
+
 Features
 --------
 
@@ -50,9 +56,9 @@ Features
   and ``HTTPMovedPermanently`` exceptions, so these can be caught by the
   NotFound view (and other exception views).
 
-- The mako renderer now accepts a def name and returns the template def 
-  result for the view being called. The uri format using an asset spec is 
-  package:path/to/template#defname.mako. The old way of returning a tuple 
+- The mako renderer now accepts a def name and returns the template def
+  result for the view being called. The uri format using an asset spec is
+  package:path/to/template#defname.mako. The old way of returning a tuple
   from the view is supported for backward compatibility, ('defname', {}).
 
 - When there is a predicate mismatch exception (seen when no view matches for

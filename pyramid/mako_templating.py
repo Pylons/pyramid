@@ -42,12 +42,17 @@ class PkgResourceTemplateLookup(TemplateLookup):
     def get_template(self, uri):
         """Fetch a template from the cache, or check the filesystem
         for it
-        
+
         In addition to the basic filesystem lookup, this subclass will
         use pkg_resource to load a file using the asset
         specification syntax.
-        
+
         """
+        if '$' in uri:
+            # Checks if the uri is already adjusted and brings it back to
+            # an asset spec. Normally occurs with inherited templates or
+            # included components.
+            uri = uri.replace('$', ':')
         isabs = os.path.isabs(uri)
         if (not isabs) and (':' in uri):
             # Windows can't cope with colons in filenames, so we replace the
@@ -70,7 +75,7 @@ class PkgResourceTemplateLookup(TemplateLookup):
         return TemplateLookup.get_template(self, uri)
 
 
-registry_lock = threading.Lock() 
+registry_lock = threading.Lock()
 
 class MakoRendererFactoryHelper(object):
     def __init__(self, settings_prefix=None):
@@ -143,7 +148,7 @@ class MakoRendererFactoryHelper(object):
 
             registry_lock.acquire()
             try:
-                registry.registerUtility(lookup, IMakoLookup, 
+                registry.registerUtility(lookup, IMakoLookup,
                                          name=settings_prefix)
             finally:
                 registry_lock.release()
@@ -166,15 +171,15 @@ class MakoLookupTemplateRenderer(object):
     """ Render a :term:`Mako` template using the template
     implied by the ``path`` argument.The ``path`` argument may be a
     package-relative path, an absolute path, or a :term:`asset
-    specification`. If a defname is defined, in the form of 
-    package:path/to/template#defname.mako, a function named ``defname`` 
+    specification`. If a defname is defined, in the form of
+    package:path/to/template#defname.mako, a function named ``defname``
     inside the template will then be rendered.
     """
     def __init__(self, path, defname, lookup):
         self.path = path
         self.defname = defname
         self.lookup = lookup
- 
+
     def implementation(self):
         return self.lookup.get_template(self.path)
 
