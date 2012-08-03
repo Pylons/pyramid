@@ -824,6 +824,7 @@ def setUp(registry=None, request=None, hook_zca=True, autocommit=True,
             # ``render_template`` and friends went behind the back of
             # any existing renderer factory lookup system.
             config.add_renderer(name, renderer)
+        config.add_default_view_predicates()
     config.commit()
     global have_zca
     try:

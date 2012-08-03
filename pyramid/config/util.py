@@ -324,14 +324,26 @@ class TopologicalSorter(object):
         self.names = []
         self.req_before = set()
         self.req_after = set()
+        self.name2before = {}
+        self.name2after = {}
         self.name2val = {}
         self.order = []
         self.default_before = default_before
         self.default_after = default_after
         self.first = first
         self.last = last
-        
+
+    def remove(self, name):
+        if name in self.names:
+            self.names.remove(name)
+            del self.name2val[name]
+            for u in self.name2after.get(name, []):
+                self.order.remove((u, name))
+            for u in self.name2before.get(name, []):
+                self.order.remove((name, u))
+                
     def add(self, name, val, after=None, before=None):
+        self.remove(name)
         self.names.append(name)
         self.name2val[name] = val
         if after is None and before is None:
@@ -340,11 +352,13 @@ class TopologicalSorter(object):
         if after is not None:
             if not is_nonstr_iter(after):
                 after = (after,)
+            self.name2after[name] = after
             self.order += [(u, name) for u in after]
             self.req_after.add(name)
         if before is not None:
             if not is_nonstr_iter(before):
                 before = (before,)
+            self.name2before[name] = before
             self.order += [(name, o) for o in before]
             self.req_before.add(name)
 
@@ -432,3 +446,43 @@ class CyclicDependencyError(Exception):
             L.append('%r sorts before %r' % (dependent, dependees))
         msg = 'Implicit ordering cycle:' + '; '.join(L)
         return msg
+
+class PredicateList(object):
+    def __init__(self):
+        self.sorter = TopologicalSorter()
+
+    def add(self, name, factory, weighs_more_than=None, weighs_less_than=None):
+        self.sorter.add(name, factory, after=weighs_more_than,
+                        before=weighs_less_than)
+
+    def make(self, **kw):
+        ordered = self.sorter.sorted()
+        phash = md5()
+        weights = []
+        predicates = []
+        for order, (name, predicate_factory) in enumerate(ordered):
+            vals = kw.pop(name, None)
+            if vals is None:
+                continue
+            if not isinstance(vals, SequenceOfPredicateValues):
+                vals = (vals,)
+            for val in vals:
+                predicate = predicate_factory(val)
+                hashes = predicate.__phash__()
+                if not is_nonstr_iter(hashes):
+                    hashes = [hashes]
+                for h in hashes:
+                    phash.update(bytes_(h))
+                predicate = predicate_factory(val)
+                weights.append(1 << order)
+                predicates.append(predicate)
+        if kw:
+            raise ConfigurationError('Unknown predicate values: %r' % (kw,))
+        score = 0
+        for bit in weights:
+            score = score | bit
+        order = (MAX_ORDER - score) / (len(predicates) + 1)
+        return order, predicates, phash.hexdigest()
+
+class SequenceOfPredicateValues(tuple):
+    pass

@@ -353,6 +353,8 @@ class Configurator(
         for name, renderer in DEFAULT_RENDERERS:
             self.add_renderer(name, renderer)
 
+        self.add_default_view_predicates()
+
         if exceptionresponse_view is not None:
             exceptionresponse_view = self.maybe_dotted(exceptionresponse_view)
             self.add_view(exceptionresponse_view, context=IExceptionResponse)

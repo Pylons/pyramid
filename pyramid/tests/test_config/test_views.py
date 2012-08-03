@@ -970,8 +970,8 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         wrapper = self._getViewCallable(config)
         self.assertTrue(IMultiView.providedBy(wrapper))
         request = self._makeRequest(config)
-        self.assertEqual(wrapper.__discriminator__(foo, request)[5], IFoo)
-        self.assertEqual(wrapper.__discriminator__(bar, request)[5], IBar)
+        self.assertTrue('IFoo' in wrapper.__discriminator__(foo, request)[5])
+        self.assertTrue('IBar' in wrapper.__discriminator__(bar, request)[5])
 
     def test_add_view_with_template_renderer(self):
         from pyramid.tests import test_config
@@ -1217,8 +1217,8 @@ class TestViewsConfigurationMixin(unittest.TestCase):
     def test_add_view_with_header_badregex(self):
         view = lambda *arg: 'OK'
         config = self._makeOne()
-        self.assertRaises(ConfigurationError,
-                          config.add_view, view=view, header='Host:a\\')
+        config.add_view(view, header='Host:a\\')
+        self.assertRaises(ConfigurationError, config.commit)
 
     def test_add_view_with_header_noval_match(self):
         from pyramid.renderers import null_renderer
@@ -1323,8 +1323,8 @@ class TestViewsConfigurationMixin(unittest.TestCase):
     def test_add_view_with_path_info_badregex(self):
         view = lambda *arg: 'OK'
         config = self._makeOne()
-        self.assertRaises(ConfigurationError,
-                          config.add_view, view=view, path_info='\\')
+        config.add_view(view, path_info='\\')
+        self.assertRaises(ConfigurationError, config.commit)
 
     def test_add_view_with_path_info_match(self):
         from pyramid.renderers import null_renderer

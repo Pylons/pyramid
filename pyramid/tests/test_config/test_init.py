@@ -349,7 +349,7 @@ class ConfiguratorTests(unittest.TestCase):
         config.setup_registry()
         self.assertEqual(reg.has_listeners, True)
 
-    def test_setup_registry_registers_default_exceptionresponse_view(self):
+    def test_setup_registry_registers_default_exceptionresponse_views(self):
         from webob.exc import WSGIHTTPException
         from pyramid.interfaces import IExceptionResponse
         from pyramid.view import default_exceptionresponse_view
@@ -357,12 +357,23 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne(reg)
         views = []
         config.add_view = lambda *arg, **kw: views.append((arg, kw))
+        config.add_default_view_predicates = lambda *arg: None
         config._add_tween = lambda *arg, **kw: False
         config.setup_registry()
         self.assertEqual(views[0], ((default_exceptionresponse_view,),
                                     {'context':IExceptionResponse}))
         self.assertEqual(views[1], ((default_exceptionresponse_view,),
                                     {'context':WSGIHTTPException}))
+
+    def test_setup_registry_registers_default_view_predicates(self):
+        reg = DummyRegistry()
+        config = self._makeOne(reg)
+        vp_called = []
+        config.add_view = lambda *arg, **kw: None
+        config.add_default_view_predicates = lambda *arg: vp_called.append(True)
+        config._add_tween = lambda *arg, **kw: False
+        config.setup_registry()
+        self.assertTrue(vp_called)
 
     def test_setup_registry_registers_default_webob_iresponse_adapter(self):
         from webob import Response
@@ -1940,10 +1951,11 @@ class DummyEvent:
     pass
 
 class DummyRegistry(object):
-    def __init__(self, adaptation=None):
+    def __init__(self, adaptation=None, util=None):
         self.utilities = []
         self.adapters = []
         self.adaptation = adaptation
+        self.util = util
     def subscribers(self, events, name):
         self.events = events
         return events
@@ -1953,6 +1965,8 @@ class DummyRegistry(object):
         self.adapters.append((arg, kw))
     def queryAdapter(self, *arg, **kw):
         return self.adaptation
+    def queryUtility(self, *arg, **kw):
+        return self.util
 
 from pyramid.interfaces import IResponse
 @implementer(IResponse)
@@ -1983,3 +1997,6 @@ class DummyIntrospectable(object):
     def register(self, introspector, action_info):
         self.registered.append((introspector, action_info))
         
+class DummyPredicateList(object):
+    def add(self, name, factory, weighs_more_than=None, weighs_less_than=None):
+        pass

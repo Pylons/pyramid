@@ -20,6 +20,7 @@ from pyramid.interfaces import (
     IException,
     IExceptionViewClassifier,
     IMultiView,
+    IPredicateList,
     IRendererFactory,
     IRequest,
     IResponse,
@@ -65,12 +66,15 @@ from pyramid.view import (
 
 from pyramid.util import object_description
 
+from pyramid.config import predicates
+
 from pyramid.config.util import (
     DEFAULT_PHASH,
     MAX_ORDER,
     action_method,
     as_sorted_tuple,
-    make_predicates,
+    PredicateList,
+    SequenceOfPredicateValues,
     )
 
 urljoin = urlparse.urljoin
@@ -272,11 +276,11 @@ class ViewDeriver(object):
 
     @wraps_view
     def predicated_view(self, view):
-        predicates = self.kw.get('predicates', ())
-        if not predicates:
+        preds = self.kw.get('predicates', ())
+        if not preds:
             return view
         def predicate_wrapper(context, request):
-            for predicate in predicates:
+            for predicate in preds:
                 if not predicate(context, request):
                     view_name = getattr(view, '__name__', view)
                     raise PredicateMismatch(
@@ -285,9 +289,9 @@ class ViewDeriver(object):
             return view(context, request)        
         def checker(context, request):
             return all((predicate(context, request) for predicate in
-                        predicates))
+                        preds))
         predicate_wrapper.__predicated__ = checker
-        predicate_wrapper.__predicates__ = predicates
+        predicate_wrapper.__predicates__ = preds
         return predicate_wrapper
 
     @wraps_view
@@ -634,10 +638,10 @@ class ViewsConfiguratorMixin(object):
     def add_view(self, view=None, name="", for_=None, permission=None,
                  request_type=None, route_name=None, request_method=None,
                  request_param=None, containment=None, attr=None,
-                 renderer=None, wrapper=None, xhr=False, accept=None,
+                 renderer=None, wrapper=None, xhr=None, accept=None,
                  header=None, path_info=None, custom_predicates=(),
                  context=None, decorator=None, mapper=None, http_cache=None,
-                 match_param=None):
+                 match_param=None, **other_predicates):
         """ Add a :term:`view configuration` to the current
         configuration state.  Arguments to ``add_view`` are broken
         down below into *predicate* arguments and *non-predicate*
@@ -1003,12 +1007,6 @@ class ViewsConfiguratorMixin(object):
                 # GET implies HEAD too
                 request_method = as_sorted_tuple(request_method + ('HEAD',))
 
-        order, predicates, phash = make_predicates(xhr=xhr,
-            request_method=request_method, path_info=path_info,
-            request_param=request_param, header=header, accept=accept,
-            containment=containment, request_type=request_type,
-            match_param=match_param, custom=custom_predicates)
-
         if context is None:
             context = for_
 
@@ -1024,12 +1022,24 @@ class ViewsConfiguratorMixin(object):
                 registry = self.registry)
 
         introspectables = []
-        discriminator = [
-            'view', context, name, request_type, IView, containment,
-            request_param, request_method, route_name, attr,
-            xhr, accept, header, path_info, match_param]
-        discriminator.extend(sorted([hash(x) for x in custom_predicates]))
-        discriminator = tuple(discriminator)
+        pvals = other_predicates
+        pvals.update(
+            dict(
+                xhr=xhr,
+                request_method=request_method,
+                path_info=path_info,
+                request_param=request_param,
+                header=header,
+                accept=accept,
+                containment=containment,
+                request_type=request_type,
+                match_param=match_param,
+                custom=SequenceOfPredicateValues(custom_predicates),
+                )
+            )
+            
+        discriminator = ('view', context, name, route_name, attr,
+                         str(sorted(pvals.items())))
         if inspect.isclass(view) and attr:
             view_desc = 'method %r of %s' % (
                 attr, self.object_description(view))
@@ -1057,9 +1067,13 @@ class ViewsConfiguratorMixin(object):
                  decorator=decorator,
                  )
             )
+        view_intr.update(**other_predicates)
         introspectables.append(view_intr)
+        predlist = self.view_predlist
 
         def register(permission=permission, renderer=renderer):
+            order, preds, phash = predlist.make(**pvals)
+            view_intr.update({'phash':phash})
             request_iface = IRequest
             if route_name is not None:
                 request_iface = self.registry.queryUtility(IRouteRequest,
@@ -1087,7 +1101,7 @@ class ViewsConfiguratorMixin(object):
             # __no_permission_required__ handled by _secure_view
             deriver = ViewDeriver(registry=self.registry,
                                   permission=permission,
-                                  predicates=predicates,
+                                  predicates=preds,
                                   attr=attr,
                                   renderer=renderer,
                                   wrapper_viewname=wrapper,
@@ -1229,6 +1243,66 @@ class ViewsConfiguratorMixin(object):
             perm_intr.relate('views', discriminator)
             introspectables.append(perm_intr)
         self.action(discriminator, register, introspectables=introspectables)
+
+    @property
+    def view_predlist(self):
+        predlist = self.registry.queryUtility(IPredicateList, name='view')
+        if predlist is None:
+            predlist = PredicateList()
+            self.registry.registerUtility(predlist, IPredicateList, name='view')
+        return predlist
+
+    @action_method
+    def add_view_predicate(self, name, factory, weighs_more_than=None,
+                           weighs_less_than=None):
+        """ Adds a view predicate factory.  The view predicate can later be
+        named as a keyword argument to
+        :meth:`pyramid.config.Configurator.add_view`.
+
+        ``name`` should be the name of the predicate.  It must be a valid
+        Python identifier (it will be used as a keyword argument to
+        ``add_view``).
+
+        ``factory`` should be a :term:`predicate factory`.
+        """
+        discriminator = ('view predicate', name)
+        intr = self.introspectable(
+            'view predicates',
+            discriminator,
+            'view predicate named %s' % name,
+            'view predicate')
+        intr['name'] = name
+        intr['factory'] = factory
+        intr['weighs_more_than'] = weighs_more_than
+        intr['weighs_less_than'] = weighs_less_than
+        def register():
+            predlist = self.view_predlist
+            predlist.add(name, factory, weighs_more_than=weighs_more_than,
+                         weighs_less_than=weighs_less_than)
+        self.action(discriminator, register, introspectables=(intr,),
+                    order=PHASE1_CONFIG) # must be registered before views added
+
+    def add_default_view_predicates(self):
+        self.add_view_predicate(
+            'xhr', predicates.XHRPredicate)
+        self.add_view_predicate(
+            'request_method', predicates.RequestMethodPredicate)
+        self.add_view_predicate(
+            'path_info', predicates.PathInfoPredicate)
+        self.add_view_predicate(
+            'request_param', predicates.RequestParamPredicate)
+        self.add_view_predicate(
+            'header', predicates.HeaderPredicate)
+        self.add_view_predicate(
+            'accept', predicates.AcceptPredicate)
+        self.add_view_predicate(
+            'containment', predicates.ContainmentPredicate)
+        self.add_view_predicate(
+            'request_type', predicates.RequestTypePredicate)
+        self.add_view_predicate(
+            'match_param', predicates.MatchParamPredicate)
+        self.add_view_predicate(
+            'custom', predicates.CustomPredicate)
 
     def derive_view(self, view, attr=None, renderer=None):
         """
