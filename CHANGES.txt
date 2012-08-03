@@ -9,6 +9,12 @@ Next release
   dictionary changed size during iteration`` exception.  It no longer does.
   See https://github.com/Pylons/pyramid/issues/635 for more information.
 
+- Backport bug fix from master: - In Mako Templates lookup, check if the uri
+  is already adjusted and bring it back to an asset spec. Normally occurs with
+  inherited templates or included components.
+  https://github.com/Pylons/pyramid/issues/606
+  https://github.com/Pylons/pyramid/issues/607
+
 1.3.2 (2012-05-19)
 ==================
 
@@ -691,7 +697,7 @@ Bug Fixes
   predicate argument.  See https://github.com/Pylons/pyramid/pull/308
 
 - The AuthTktCookieHelper could potentially generate Unicode headers
-  inappropriately when the ``tokens`` argument to remember was used.  See 
+  inappropriately when the ``tokens`` argument to remember was used.  See
   https://github.com/Pylons/pyramid/pull/314.
 
 - The AuthTktAuthenticationPolicy did not use a timing-attack-aware string
