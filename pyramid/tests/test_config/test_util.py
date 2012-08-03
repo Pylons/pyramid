@@ -368,6 +368,255 @@ class TestActionInfo(unittest.TestCase):
         self.assertEqual(str(inst),
                          "Line 0 of file filename:\n       linerepr  ")
 
+class TestTopologicalSorter(unittest.TestCase):
+    def _makeOne(self, *arg, **kw):
+        from pyramid.config.util import TopologicalSorter
+        return TopologicalSorter(*arg, **kw)
+
+    def test_add(self):
+        from pyramid.config.util import LAST
+        sorter = self._makeOne()
+        sorter.add('name', 'factory')
+        self.assertEqual(sorter.names, ['name'])
+        self.assertEqual(sorter.name2val,
+                         {'name':'factory'})
+        self.assertEqual(sorter.order, [('name', LAST)])
+        sorter.add('name2', 'factory2')
+        self.assertEqual(sorter.names, ['name',  'name2'])
+        self.assertEqual(sorter.name2val,
+                         {'name':'factory', 'name2':'factory2'})
+        self.assertEqual(sorter.order,
+                         [('name', LAST), ('name2', LAST)])
+        sorter.add('name3', 'factory3', before='name2')
+        self.assertEqual(sorter.names,
+                         ['name',  'name2', 'name3'])
+        self.assertEqual(sorter.name2val,
+                         {'name':'factory', 'name2':'factory2',
+                          'name3':'factory3'})
+        self.assertEqual(sorter.order,
+                         [('name', LAST), ('name2', LAST),
+                          ('name3', 'name2')])
+
+    def test_sorted_ordering_1(self):
+        sorter = self._makeOne()
+        sorter.add('name1', 'factory1')
+        sorter.add('name2', 'factory2')
+        self.assertEqual(sorter.sorted(),
+                         [
+                             ('name1', 'factory1'),
+                             ('name2', 'factory2'),
+                             ])
+
+    def test_sorted_ordering_2(self):
+        from pyramid.config.util import FIRST
+        sorter = self._makeOne()
+        sorter.add('name1', 'factory1')
+        sorter.add('name2', 'factory2', after=FIRST)
+        self.assertEqual(sorter.sorted(),
+                         [
+                             ('name2', 'factory2'),
+                             ('name1', 'factory1'),
+                             ])
+
+    def test_sorted_ordering_3(self):
+        from pyramid.config.util import FIRST
+        sorter = self._makeOne()
+        add = sorter.add
+        add('auth', 'auth_factory', after='browserid')
+        add('dbt', 'dbt_factory') 
+        add('retry', 'retry_factory', before='txnmgr', after='exceptionview')
+        add('browserid', 'browserid_factory')
+        add('txnmgr', 'txnmgr_factory', after='exceptionview')
+        add('exceptionview', 'excview_factory', after=FIRST)
+        self.assertEqual(sorter.sorted(),
+                         [
+                             ('exceptionview', 'excview_factory'),
+                             ('retry', 'retry_factory'),
+                             ('txnmgr', 'txnmgr_factory'),
+                             ('dbt', 'dbt_factory'),
+                             ('browserid', 'browserid_factory'),
+                             ('auth', 'auth_factory'),
+                             ])
+
+    def test_sorted_ordering_4(self):
+        from pyramid.config.util import FIRST
+        sorter = self._makeOne()
+        add = sorter.add
+        add('exceptionview', 'excview_factory', after=FIRST)
+        add('auth', 'auth_factory', after='browserid')
+        add('retry', 'retry_factory', before='txnmgr', after='exceptionview')
+        add('browserid', 'browserid_factory')
+        add('txnmgr', 'txnmgr_factory', after='exceptionview')
+        add('dbt', 'dbt_factory') 
+        self.assertEqual(sorter.sorted(),
+                         [
+                             ('exceptionview', 'excview_factory'),
+                             ('retry', 'retry_factory'),
+                             ('txnmgr', 'txnmgr_factory'),
+                             ('browserid', 'browserid_factory'),
+                             ('auth', 'auth_factory'),
+                             ('dbt', 'dbt_factory'),
+                             ])
+
+    def test_sorted_ordering_5(self):
+        from pyramid.config.util import LAST, FIRST
+        sorter = self._makeOne()
+        add = sorter.add
+        add('exceptionview', 'excview_factory')
+        add('auth', 'auth_factory', after=FIRST)
+        add('retry', 'retry_factory', before='txnmgr', after='exceptionview')
+        add('browserid', 'browserid_factory', after=FIRST)
+        add('txnmgr', 'txnmgr_factory', after='exceptionview', before=LAST)
+        add('dbt', 'dbt_factory') 
+        self.assertEqual(sorter.sorted(),
+                         [
+                             ('browserid', 'browserid_factory'),
+                             ('auth', 'auth_factory'),
+                             ('exceptionview', 'excview_factory'),
+                             ('retry', 'retry_factory'),
+                             ('txnmgr', 'txnmgr_factory'), 
+                             ('dbt', 'dbt_factory'),
+                             ])
+
+    def test_sorted_ordering_missing_before_partial(self):
+        from pyramid.exceptions import ConfigurationError
+        sorter = self._makeOne()
+        add = sorter.add
+        add('dbt', 'dbt_factory')
+        add('auth', 'auth_factory', after='browserid')
+        add('retry', 'retry_factory', before='txnmgr', after='exceptionview')
+        add('browserid', 'browserid_factory')
+        self.assertRaises(ConfigurationError, sorter.sorted)
+
+    def test_sorted_ordering_missing_after_partial(self):
+        from pyramid.exceptions import ConfigurationError
+        sorter = self._makeOne()
+        add = sorter.add
+        add('dbt', 'dbt_factory')
+        add('auth', 'auth_factory', after='txnmgr')
+        add('retry', 'retry_factory', before='dbt', after='exceptionview')
+        add('browserid', 'browserid_factory')
+        self.assertRaises(ConfigurationError, sorter.sorted)
+
+    def test_sorted_ordering_missing_before_and_after_partials(self):
+        from pyramid.exceptions import ConfigurationError
+        sorter = self._makeOne()
+        add = sorter.add
+        add('dbt', 'dbt_factory')
+        add('auth', 'auth_factory', after='browserid')
+        add('retry', 'retry_factory', before='foo', after='txnmgr')
+        add('browserid', 'browserid_factory')
+        self.assertRaises(ConfigurationError, sorter.sorted)
+
+    def test_sorted_ordering_missing_before_partial_with_fallback(self):
+        from pyramid.config.util import LAST
+        sorter = self._makeOne()
+        add = sorter.add
+        add('exceptionview', 'excview_factory', before=LAST)
+        add('auth', 'auth_factory', after='browserid')
+        add('retry', 'retry_factory', before=('txnmgr', LAST),
+                                      after='exceptionview')
+        add('browserid', 'browserid_factory')
+        add('dbt', 'dbt_factory') 
+        self.assertEqual(sorter.sorted(),
+                         [
+                             ('exceptionview', 'excview_factory'),
+                             ('retry', 'retry_factory'),
+                             ('browserid', 'browserid_factory'),
+                             ('auth', 'auth_factory'),
+                             ('dbt', 'dbt_factory'),
+                             ])
+
+    def test_sorted_ordering_missing_after_partial_with_fallback(self):
+        from pyramid.config.util import FIRST
+        sorter = self._makeOne()
+        add = sorter.add
+        add('exceptionview', 'excview_factory', after=FIRST)
+        add('auth', 'auth_factory', after=('txnmgr','browserid'))
+        add('retry', 'retry_factory', after='exceptionview')
+        add('browserid', 'browserid_factory')
+        add('dbt', 'dbt_factory')
+        self.assertEqual(sorter.sorted(),
+                         [
+                             ('exceptionview', 'excview_factory'),
+                             ('retry', 'retry_factory'),
+                             ('browserid', 'browserid_factory'),
+                             ('auth', 'auth_factory'),
+                             ('dbt', 'dbt_factory'),
+                             ])
+
+    def test_sorted_ordering_with_partial_fallbacks(self):
+        from pyramid.config.util import LAST
+        sorter = self._makeOne()
+        add = sorter.add
+        add('exceptionview', 'excview_factory', before=('wontbethere', LAST))
+        add('retry', 'retry_factory', after='exceptionview')
+        add('browserid', 'browserid_factory', before=('wont2', 'exceptionview'))
+        self.assertEqual(sorter.sorted(),
+                         [
+                             ('browserid', 'browserid_factory'),
+                             ('exceptionview', 'excview_factory'),
+                             ('retry', 'retry_factory'),
+                             ])
+
+    def test_sorted_ordering_with_multiple_matching_fallbacks(self):
+        from pyramid.config.util import LAST
+        sorter = self._makeOne()
+        add = sorter.add
+        add('exceptionview', 'excview_factory', before=LAST)
+        add('retry', 'retry_factory', after='exceptionview')
+        add('browserid', 'browserid_factory', before=('retry', 'exceptionview'))
+        self.assertEqual(sorter.sorted(),
+                         [
+                             ('browserid', 'browserid_factory'),
+                             ('exceptionview', 'excview_factory'),
+                             ('retry', 'retry_factory'),
+                             ])
+
+    def test_sorted_ordering_with_missing_fallbacks(self):
+        from pyramid.exceptions import ConfigurationError
+        from pyramid.config.util import LAST
+        sorter = self._makeOne()
+        add = sorter.add
+        add('exceptionview', 'excview_factory', before=LAST)
+        add('retry', 'retry_factory', after='exceptionview')
+        add('browserid', 'browserid_factory', before=('txnmgr', 'auth'))
+        self.assertRaises(ConfigurationError, sorter.sorted)
+
+    def test_sorted_ordering_conflict_direct(self):
+        from pyramid.config.util import CyclicDependencyError
+        sorter = self._makeOne()
+        add = sorter.add
+        add('browserid', 'browserid_factory')
+        add('auth', 'auth_factory', before='browserid', after='browserid')
+        self.assertRaises(CyclicDependencyError, sorter.sorted)
+
+    def test_sorted_ordering_conflict_indirect(self):
+        from pyramid.config.util import CyclicDependencyError
+        sorter = self._makeOne()
+        add = sorter.add
+        add('browserid', 'browserid_factory')
+        add('auth', 'auth_factory', before='browserid')
+        add('dbt', 'dbt_factory', after='browserid', before='auth')
+        self.assertRaises(CyclicDependencyError, sorter.sorted)
+
+class TestSingleton(unittest.TestCase):
+    def test_repr(self):
+        from pyramid.config.util import Singleton
+        r = repr(Singleton('ABC'))
+        self.assertEqual(r, 'ABC')
+
+class TestCyclicDependencyError(unittest.TestCase):
+    def _makeOne(self, cycles):
+        from pyramid.config.util import CyclicDependencyError
+        return CyclicDependencyError(cycles)
+
+    def test___str__(self):
+        exc = self._makeOne({'a':['c', 'd'], 'c':['a']})
+        result = str(exc)
+        self.assertTrue("'a' sorts before ['c', 'd']" in result)
+        self.assertTrue("'c' sorts before ['a']" in result)
+
 class DummyCustomPredicate(object):
     def __init__(self):
         self.__text__ = 'custom predicate'

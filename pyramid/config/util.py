@@ -300,3 +300,135 @@ def as_sorted_tuple(val):
     val = tuple(sorted(val))
     return val
 
+# under = after
+# over = before
+
+class Singleton(object):
+    def __init__(self, repr):
+        self.repr = repr
+
+    def __repr__(self):
+        return self.repr
+
+FIRST = Singleton('FIRST')
+LAST = Singleton('LAST')
+
+class TopologicalSorter(object):
+    def __init__(
+        self,
+        default_before=LAST,
+        default_after=None,
+        first=FIRST,
+        last=LAST,
+        ):
+        self.names = []
+        self.req_before = set()
+        self.req_after = set()
+        self.name2val = {}
+        self.order = []
+        self.default_before = default_before
+        self.default_after = default_after
+        self.first = first
+        self.last = last
+        
+    def add(self, name, val, after=None, before=None):
+        self.names.append(name)
+        self.name2val[name] = val
+        if after is None and before is None:
+            before = self.default_before
+            after = self.default_after
+        if after is not None:
+            if not is_nonstr_iter(after):
+                after = (after,)
+            self.order += [(u, name) for u in after]
+            self.req_after.add(name)
+        if before is not None:
+            if not is_nonstr_iter(before):
+                before = (before,)
+            self.order += [(name, o) for o in before]
+            self.req_before.add(name)
+
+    def sorted(self):
+        order = [(self.first, self.last)]
+        roots = []
+        graph = {}
+        names = [self.first, self.last]
+        names.extend(self.names)
+
+        for a, b in self.order:
+            order.append((a, b))
+
+        def add_node(node):
+            if not node in graph:
+                roots.append(node)
+                graph[node] = [0] # 0 = number of arcs coming into this node
+
+        def add_arc(fromnode, tonode):
+            graph[fromnode].append(tonode)
+            graph[tonode][0] += 1
+            if tonode in roots:
+                roots.remove(tonode)
+
+        for name in names:
+            add_node(name)
+
+        has_before, has_after = set(), set()
+        for a, b in order:
+            if a in names and b in names: # deal with missing dependencies
+                add_arc(a, b)
+                has_before.add(a)
+                has_after.add(b)
+
+        if not self.req_before.issubset(has_before):
+            raise ConfigurationError(
+                'Unsatisfied before dependencies: %s'
+                % (', '.join(sorted(self.req_before - has_before)))
+            )
+        if not self.req_after.issubset(has_after):
+            raise ConfigurationError(
+                'Unsatisfied after dependencies: %s'
+                % (', '.join(sorted(self.req_after - has_after)))
+            )
+
+        sorted_names = []
+
+        while roots:
+            root = roots.pop(0)
+            sorted_names.append(root)
+            children = graph[root][1:]
+            for child in children:
+                arcs = graph[child][0]
+                arcs -= 1
+                graph[child][0] = arcs 
+                if arcs == 0:
+                    roots.insert(0, child)
+            del graph[root]
+
+        if graph:
+            # loop in input
+            cycledeps = {}
+            for k, v in graph.items():
+                cycledeps[k] = v[1:]
+            raise CyclicDependencyError(cycledeps)
+
+        result = []
+
+        for name in sorted_names:
+            if name in self.names:
+                result.append((name, self.name2val[name]))
+
+        return result
+
+class CyclicDependencyError(Exception):
+    def __init__(self, cycles):
+        self.cycles = cycles
+
+    def __str__(self):
+        L = []
+        cycles = self.cycles
+        for cycle in cycles:
+            dependent = cycle
+            dependees = cycles[cycle]
+            L.append('%r sorts before %r' % (dependent, dependees))
+        msg = 'Implicit ordering cycle:' + '; '.join(L)
+        return msg
