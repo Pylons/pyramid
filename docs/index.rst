@@ -13,15 +13,9 @@ Here is one of the simplest :app:`Pyramid` applications you can make:
 
 .. literalinclude:: narr/helloworld.py
 
-When saved to ``helloworld.py``, the above application can be run via:
-
-.. code-block:: text
-
-   $ easy_install pyramid
-   $ python helloworld.py
-
-When you visit ``http://localhost:8080/hello/world`` in a browser, you will
-see the text ``Hello, world!``.
+After you install :app:`Pyramid` and run this application. When you visit
+``http://localhost:8080/hello/world`` in a browser, you will see the
+text ``Hello, world!``
 
 See :ref:`firstapp_chapter` for a full explanation of how this application
 works. Read the :ref:`html_narrative_documentation` to understand how
