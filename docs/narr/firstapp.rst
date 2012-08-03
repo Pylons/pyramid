@@ -8,7 +8,8 @@ Creating Your First :app:`Pyramid` Application
 
 In this chapter, we will walk through the creation of a tiny :app:`Pyramid`
 application.  After we're finished creating the application, we'll explain in
-more detail how it works.
+more detail how it works. It assumes you already have :app:`Pyramid` installed.
+If you do not, head over to the :ref:`installing_chapter` section.
 
 .. _helloworld_imperative:
 
