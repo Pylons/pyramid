@@ -49,6 +49,9 @@ class PkgResourceTemplateLookup(TemplateLookup):
 
         """
         if '$' in uri:
+            # Checks if the uri is already adjusted and brings it back to
+            # an asset spec. Normally occurs with inherited templates or
+            # included components.
             uri = uri.replace('$', ':')
         isabs = os.path.isabs(uri)
         if (not isabs) and (':' in uri):
