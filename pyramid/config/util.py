@@ -1,6 +1,8 @@
 import re
 import traceback
 
+from functools import update_wrapper
+
 from zope.interface import implementer
 
 from pyramid.interfaces import IActionInfo
@@ -59,9 +61,10 @@ def action_method(wrapped):
         finally:
             self._ainfo.pop()
         return result
-    wrapper.__name__ = wrapped.__name__
-    wrapper.__doc__ = wrapped.__doc__
-    wrapper.__docobj__ = wrapped # for sphinx
+
+    if hasattr(wrapped, '__name__'):
+        update_wrapper(wrapper, wrapped)
+    wrapper.__docobj__ = wrapped
     return wrapper
 
 def make_predicates(xhr=None, request_method=None, path_info=None,
