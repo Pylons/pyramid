@@ -18,26 +18,25 @@ class XHRPredicate(object):
         self.val = bool(val)
 
     def __text__(self):
-        return 'xhr = True'
+        return 'xhr = %s' % self.val
 
     def __phash__(self):
-        return 'xhr:%r' % (self.val,)
+        return 'xhr:%s' % self.val
 
     def __call__(self, context, request):
-        return request.is_xhr
-
+        return bool(request.is_xhr) is self.val
 
 class RequestMethodPredicate(object):
     def __init__(self, val):
         self.val = as_sorted_tuple(val)
 
     def __text__(self):
-        return 'request method = %r' % (self.val,)
+        return 'request method = %s' % (','.join(self.val))
 
     def __phash__(self):
         L = []
         for v in self.val:
-            L.append('request_method:%r' % v)
+            L.append('request_method:%s' % v)
         return L
 
     def __call__(self, context, request):
@@ -56,7 +55,7 @@ class PathInfoPredicate(object):
         return 'path_info = %s' % (self.orig,)
 
     def __phash__(self):
-        return 'path_info:%r' % (self.orig,)
+        return 'path_info:%s' % (self.orig,)
 
     def __call__(self, context, request):
         return self.val.match(request.upath_info) is not None
@@ -67,6 +66,7 @@ class RequestParamPredicate(object):
         v = None
         if '=' in name:
             name, v = name.split('=', 1)
+            name, v = name.strip(), v.strip()
         if v is None:
             self.text = 'request_param %s' % (name,)
         else:
@@ -78,7 +78,7 @@ class RequestParamPredicate(object):
         return self.text
 
     def __phash__(self):
-        return 'request_param:%r=%r' % (self.name, self.val)
+        return 'request_param:%s=%r' % (self.name, self.val)
 
     def __call__(self, context, request):
         if self.val is None:
