@@ -113,6 +113,12 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
     # any predicates get an order of MAX_ORDER, meaning that they will
     # be tried very last.
 
+    # NB: each predicate callable constructed by this function (or examined
+    # by this function, in the case of custom predicates) must leave this
+    # function with a ``__text__`` attribute.  The subsystem which reports
+    # errors when no predicates match depends upon the existence of this
+    # attribute on each predicate callable.
+
     predicates = []
     weights = []
     h = md5()
@@ -273,6 +279,7 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
             tvalue = tgenerate(m) # tvalue will be urlquoted string
             m['traverse'] = traversal_path(tvalue) # will be seq of unicode
             return True
+        traverse_predicate.__text__ = 'traverse matchdict pseudo-predicate'
         # This isn't actually a predicate, it's just a infodict
         # modifier that injects ``traverse`` into the matchdict.  As a
         # result, the ``traverse_predicate`` function above always

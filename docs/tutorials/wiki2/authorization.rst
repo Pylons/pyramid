@@ -353,7 +353,7 @@ when we're done:
 
 .. literalinclude:: src/authorization/tutorial/views.py
    :linenos:
-   :emphasize-lines: 11,14-18,31,37,58,61,73,76,88,91-117,119-123
+   :emphasize-lines: 11,14-18,25,31,37,58,61,73,76,88,91-117,119-123
    :language: python
 
 (Only the highlighted lines need to be added.)

@@ -2905,6 +2905,7 @@ class TestViewDeriver(unittest.TestCase):
         view = lambda *arg: response
         def predicate1(context, request):
             return False
+        predicate1.__text__ = 'text'
         deriver = self._makeOne(predicates=[predicate1])
         result = deriver(view)
         request = self._makeRequest()
@@ -2912,7 +2913,8 @@ class TestViewDeriver(unittest.TestCase):
         try:
             result(None, None)
         except PredicateMismatch as e:
-            self.assertEqual(e.detail, 'predicate mismatch for view <lambda>')
+            self.assertEqual(e.detail,
+                             'predicate mismatch for view <lambda> (text)')
         else: # pragma: no cover
             raise AssertionError
 
@@ -2921,6 +2923,7 @@ class TestViewDeriver(unittest.TestCase):
         def myview(request): pass
         def predicate1(context, request):
             return False
+        predicate1.__text__ = 'text'
         deriver = self._makeOne(predicates=[predicate1])
         result = deriver(myview)
         request = self._makeRequest()
@@ -2928,7 +2931,29 @@ class TestViewDeriver(unittest.TestCase):
         try:
             result(None, None)
         except PredicateMismatch as e:
-            self.assertEqual(e.detail, 'predicate mismatch for view myview')
+            self.assertEqual(e.detail,
+                             'predicate mismatch for view myview (text)')
+        else: # pragma: no cover
+            raise AssertionError
+
+    def test_predicate_mismatch_exception_has_text_in_detail(self):
+        from pyramid.exceptions import PredicateMismatch
+        def myview(request): pass
+        def predicate1(context, request):
+            return True
+        predicate1.__text__ = 'pred1'
+        def predicate2(context, request):
+            return False
+        predicate2.__text__ = 'pred2'
+        deriver = self._makeOne(predicates=[predicate1, predicate2])
+        result = deriver(myview)
+        request = self._makeRequest()
+        request.method = 'POST'
+        try:
+            result(None, None)
+        except PredicateMismatch as e:
+            self.assertEqual(e.detail,
+                             'predicate mismatch for view myview (pred2)')
         else: # pragma: no cover
             raise AssertionError
             
@@ -2974,9 +2999,11 @@ class TestViewDeriver(unittest.TestCase):
         def predicate1(context, request):
             predicates.append(True)
             return True
+        predicate1.__text__ = 'text'
         def predicate2(context, request):
             predicates.append(True)
             return False
+        predicate2.__text__ = 'text'
         deriver = self._makeOne(predicates=[predicate1, predicate2])
         result = deriver(view)
         request = self._makeRequest()
