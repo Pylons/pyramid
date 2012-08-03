@@ -43,3 +43,11 @@ def dummy_extend(config, discrim):
 def dummy_extend2(config, discrim):
     config.action(discrim, None, config.registry)
 
+from functools import partial
+dummy_partial = partial(dummy_extend, discrim='partial')
+
+class DummyCallable(object):
+    def __call__(self, config, discrim):
+        config.action(discrim, None, config.package)
+dummy_callable = DummyCallable()
+
