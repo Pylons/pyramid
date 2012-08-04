@@ -17,11 +17,10 @@ class XHRPredicate(object):
     def __init__(self, val):
         self.val = bool(val)
 
-    def __text__(self):
+    def text(self):
         return 'xhr = %s' % self.val
 
-    def __phash__(self):
-        return 'xhr:%s' % self.val
+    phash = text
 
     def __call__(self, context, request):
         return bool(request.is_xhr) is self.val
@@ -30,14 +29,10 @@ class RequestMethodPredicate(object):
     def __init__(self, val):
         self.val = as_sorted_tuple(val)
 
-    def __text__(self):
-        return 'request method = %s' % (','.join(self.val))
+    def text(self):
+        return 'request_method = %s' % (','.join(self.val))
 
-    def __phash__(self):
-        L = []
-        for v in self.val:
-            L.append('request_method:%s' % v)
-        return L
+    phash = text
 
     def __call__(self, context, request):
         return request.method in self.val
@@ -51,11 +46,10 @@ class PathInfoPredicate(object):
             raise ConfigurationError(why.args[0])
         self.val = val
 
-    def __text__(self):
+    def text(self):
         return 'path_info = %s' % (self.orig,)
 
-    def __phash__(self):
-        return 'path_info:%s' % (self.orig,)
+    phash = text
 
     def __call__(self, context, request):
         return self.val.match(request.upath_info) is not None
@@ -68,17 +62,16 @@ class RequestParamPredicate(object):
             name, v = name.split('=', 1)
             name, v = name.strip(), v.strip()
         if v is None:
-            self.text = 'request_param %s' % (name,)
+            self._text = 'request_param %s' % (name,)
         else:
-            self.text = 'request_param %s = %s' % (name, v)
+            self._text = 'request_param %s = %s' % (name, v)
         self.name = name
         self.val = v
 
-    def __text__(self):
-        return self.text
+    def text(self):
+        return self._text
 
-    def __phash__(self):
-        return 'request_param:%s=%r' % (self.name, self.val)
+    phash = text
 
     def __call__(self, context, request):
         if self.val is None:
@@ -97,17 +90,16 @@ class HeaderPredicate(object):
             except re.error as why:
                 raise ConfigurationError(why.args[0])
         if v is None:
-            self.text = 'header %s' % (name,)
+            self._text = 'header %s' % (name,)
         else:
-            self.text = 'header %s = %s' % (name, v)
+            self._text = 'header %s = %s' % (name, v)
         self.name = name
         self.val = v
 
-    def __text__(self):
-        return self.text
+    def text(self):
+        return self._text
 
-    def __phash__(self):
-        return 'header:%r=%r' % (self.name, self.val)
+    phash = text
 
     def __call__(self, context, request):
         if self.val is None:
@@ -121,11 +113,10 @@ class AcceptPredicate(object):
     def __init__(self, val):
         self.val = val
 
-    def __text__(self):
+    def text(self):
         return 'accept = %s' % (self.val,)
 
-    def __phash__(self):
-        return 'accept:%r' % (self.val,)
+    phash = text
 
     def __call__(self, context, request):
         return self.val in request.accept
@@ -134,11 +125,10 @@ class ContainmentPredicate(object):
     def __init__(self, val):
         self.val = val
 
-    def __text__(self):
+    def text(self):
         return 'containment = %s' % (self.val,)
 
-    def __phash__(self):
-        return 'containment:%r' % hash(self.val)
+    phash = text
 
     def __call__(self, context, request):
         ctx = getattr(request, 'context', context)
@@ -148,11 +138,10 @@ class RequestTypePredicate(object):
     def __init__(self, val):
         self.val = val
 
-    def __text__(self):
+    def text(self):
         return 'request_type = %s' % (self.val,)
 
-    def __phash__(self):
-        return 'request_type:%r' % hash(self.val)
+    phash = text
 
     def __call__(self, context, request):
         return self.val.providedBy(request)
@@ -163,18 +152,15 @@ class MatchParamPredicate(object):
             val = (val,)
         val = sorted(val)
         self.val = val
-        self.reqs = [
-            (x.strip(), y.strip()) for x, y in [ p.split('=', 1) for p in val ]
-            ]
+        reqs = [ p.split('=', 1) for p in val ]
+        self.reqs = [ (x.strip(), y.strip()) for x, y in reqs ]
 
-    def __text__(self):
-        return 'match_param %s' % (self.val,)
+    def text(self):
+        return 'match_param %s' % ','.join(
+            ['%s=%s' % (x,y) for x, y in self.reqs]
+            )
 
-    def __phash__(self):
-        L = []
-        for k, v in self.reqs:
-            L.append('match_param:%r=%r' % (k, v))
-        return L
+    phash = text
 
     def __call__(self, context, request):
         for k, v in self.reqs:
@@ -186,10 +172,10 @@ class CustomPredicate(object):
     def __init__(self, func):
         self.func = func
 
-    def __text__(self):
+    def text(self):
         return getattr(self.func, '__text__', repr(self.func))
 
-    def __phash__(self):
+    def phash(self):
         return 'custom:%r' % hash(self.func)
 
     def __call__(self, context, request):
@@ -201,10 +187,10 @@ class TraversePredicate(object):
         _, self.tgenerate = _compile_route(val)
         self.val = val
         
-    def __text__(self):
+    def text(self):
         return 'traverse matchdict pseudo-predicate'
 
-    def __phash__(self):
+    def phash(self):
         return ''
 
     def __call__(self, context, request):
@@ -214,5 +200,3 @@ class TraversePredicate(object):
         tvalue = self.tgenerate(m)
         m['traverse'] = traversal_path(tvalue)
         return True
-    
-        

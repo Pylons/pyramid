@@ -285,7 +285,7 @@ class ViewDeriver(object):
                     view_name = getattr(view, '__name__', view)
                     raise PredicateMismatch(
                          'predicate mismatch for view %s (%s)' % (
-                         view_name, predicate.__text__))
+                         view_name, predicate.text()))
             return view(context, request)        
         def checker(context, request):
             return all((predicate(context, request) for predicate in

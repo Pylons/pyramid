@@ -468,7 +468,7 @@ class PredicateList(object):
                 vals = (vals,)
             for val in vals:
                 predicate = predicate_factory(val)
-                hashes = predicate.__phash__()
+                hashes = predicate.phash()
                 if not is_nonstr_iter(hashes):
                     hashes = [hashes]
                 for h in hashes:

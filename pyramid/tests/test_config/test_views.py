@@ -400,7 +400,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         from pyramid.interfaces import IViewClassifier
         from pyramid.interfaces import IMultiView
         phash = md5()
-        phash.update(b'xhr:True')
+        phash.update(b'xhr = True')
         view = lambda *arg: 'NOT OK'
         view.__phash__ = phash.hexdigest()
         config = self._makeOne(autocommit=True)
@@ -424,7 +424,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         from pyramid.interfaces import IExceptionViewClassifier
         from pyramid.interfaces import IMultiView
         phash = md5()
-        phash.update(b'xhr:True')
+        phash.update(b'xhr = True')
         view = lambda *arg: 'NOT OK'
         view.__phash__ = phash.hexdigest()
         config = self._makeOne(autocommit=True)
@@ -2905,7 +2905,7 @@ class TestViewDeriver(unittest.TestCase):
         view = lambda *arg: response
         def predicate1(context, request):
             return False
-        predicate1.__text__ = 'text'
+        predicate1.text = lambda *arg: 'text'
         deriver = self._makeOne(predicates=[predicate1])
         result = deriver(view)
         request = self._makeRequest()
@@ -2923,7 +2923,7 @@ class TestViewDeriver(unittest.TestCase):
         def myview(request): pass
         def predicate1(context, request):
             return False
-        predicate1.__text__ = 'text'
+        predicate1.text = lambda *arg: 'text'
         deriver = self._makeOne(predicates=[predicate1])
         result = deriver(myview)
         request = self._makeRequest()
@@ -2941,10 +2941,10 @@ class TestViewDeriver(unittest.TestCase):
         def myview(request): pass
         def predicate1(context, request):
             return True
-        predicate1.__text__ = 'pred1'
+        predicate1.text = lambda *arg: 'pred1'
         def predicate2(context, request):
             return False
-        predicate2.__text__ = 'pred2'
+        predicate2.text = lambda *arg: 'pred2'
         deriver = self._makeOne(predicates=[predicate1, predicate2])
         result = deriver(myview)
         request = self._makeRequest()
@@ -2999,11 +2999,11 @@ class TestViewDeriver(unittest.TestCase):
         def predicate1(context, request):
             predicates.append(True)
             return True
-        predicate1.__text__ = 'text'
+        predicate1.text = lambda *arg: 'text'
         def predicate2(context, request):
             predicates.append(True)
             return False
-        predicate2.__text__ = 'text'
+        predicate2.text = lambda *arg: 'text'
         deriver = self._makeOne(predicates=[predicate1, predicate2])
         result = deriver(view)
         request = self._makeRequest()

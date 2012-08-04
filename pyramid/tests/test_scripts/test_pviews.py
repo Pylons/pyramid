@@ -309,7 +309,7 @@ class TestPViewsCommand(unittest.TestCase):
         L = []
         command.out = L.append
         def predicate(): pass
-        predicate.__text__ = "predicate = x"
+        predicate.text = lambda *arg: "predicate = x"
         view = dummy.DummyView(context='context', view_name='a')
         view.__predicates__ = [predicate]
         command._find_view = lambda arg1, arg2: view
@@ -448,7 +448,7 @@ class TestPViewsCommand(unittest.TestCase):
         L = []
         command.out = L.append
         def predicate(): pass
-        predicate.__text__ = "predicate = x"
+        predicate.text = lambda *arg: "predicate = x"
         view = dummy.DummyView(context='context')
         view.__name__ = 'view'
         view.__view_attr__ = 'call'
