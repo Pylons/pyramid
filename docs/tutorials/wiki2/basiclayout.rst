@@ -100,7 +100,7 @@ used when the URL is ``/``:
       :language: py
 
 Since this route has a ``pattern`` equalling ``/`` it is the route that will
-be matched when the URL ``/`` is visted, e.g. ``http://localhost:6543/``.
+be matched when the URL ``/`` is visited, e.g. ``http://localhost:6543/``.
 
 ``main`` next calls the ``scan`` method of the configurator, which will
 recursively scan our ``tutorial`` package, looking for ``@view_config`` (and
@@ -190,7 +190,7 @@ Next we set up a SQLAlchemy "DBSession" object:
 ``scoped_session`` allows us to access our database connection globally.
 ``sessionmaker`` creates a database session object.  We pass to
 ``sessionmaker`` the ``extension=ZopeTransactionExtension()`` extension
-option in order to allow the system to automatically manage datbase
+option in order to allow the system to automatically manage database
 transactions.  With ``ZopeTransactionExtension`` activated, our application
 will automatically issue a transaction commit after every request unless an
 exception is raised, in which case the transaction will be aborted.
