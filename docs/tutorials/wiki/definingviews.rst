@@ -251,7 +251,7 @@ wiki page. It includes:
 - A ``div`` element that is replaced with the ``content``
   value provided by the view (rows 45-47).  ``content``
   contains HTML, so the ``structure`` keyword is used
-  to prevent escaping it (i.e. changing ">" to &gt;, etc.)
+  to prevent escaping it (i.e. changing ">" to "&gt;", etc.)
 - A link that points
   at the "edit" URL which invokes the ``edit_page`` view for
   the page being viewed (rows 49-51).
