@@ -1,10 +1,32 @@
 import unittest
 from pyramid.compat import text_
 
-class Test__make_predicates(unittest.TestCase):
+class TestPredicateList(unittest.TestCase):
+
+    def _makeOne(self):
+        from pyramid.config.util import PredicateList
+        from pyramid.config import predicates
+        inst = PredicateList()
+        for name, factory in (
+            ('xhr', predicates.XHRPredicate),
+            ('request_method', predicates.RequestMethodPredicate),
+            ('path_info', predicates.PathInfoPredicate),
+            ('request_param', predicates.RequestParamPredicate),
+            ('header', predicates.HeaderPredicate),
+            ('accept', predicates.AcceptPredicate),
+            ('containment', predicates.ContainmentPredicate),
+            ('request_type', predicates.RequestTypePredicate),
+            ('match_param', predicates.MatchParamPredicate),
+            ('custom', predicates.CustomPredicate),
+            ('traverse', predicates.TraversePredicate),
+            ):
+            inst.add(name, factory)
+        return inst
+
     def _callFUT(self, **kw):
-        from pyramid.config.util import make_predicates
-        return make_predicates(**kw)
+        inst = self._makeOne()
+        config = DummyConfigurator()
+        return inst.make(config, **kw)
 
     def test_ordering_xhr_and_request_method_trump_only_containment(self):
         order1, _, _ = self._callFUT(xhr=True, request_method='GET')
@@ -12,6 +34,7 @@ class Test__make_predicates(unittest.TestCase):
         self.assertTrue(order1 < order2)
 
     def test_ordering_number_of_predicates(self):
+        from pyramid.config.util import predvalseq
         order1, _, _ = self._callFUT(
             xhr='xhr',
             request_method='request_method',
@@ -22,7 +45,7 @@ class Test__make_predicates(unittest.TestCase):
             accept='accept',
             containment='containment',
             request_type='request_type',
-            custom=(DummyCustomPredicate(),),
+            custom=predvalseq([DummyCustomPredicate()]),
             )
         order2, _, _ = self._callFUT(
             xhr='xhr',
@@ -34,7 +57,7 @@ class Test__make_predicates(unittest.TestCase):
             accept='accept',
             containment='containment',
             request_type='request_type',
-            custom=(DummyCustomPredicate(),),
+            custom=predvalseq([DummyCustomPredicate()]),
             )
         order3, _, _ = self._callFUT(
             xhr='xhr',
@@ -114,6 +137,7 @@ class Test__make_predicates(unittest.TestCase):
         self.assertTrue(order12 > order10)
 
     def test_ordering_importance_of_predicates(self):
+        from pyramid.config.util import predvalseq
         order1, _, _ = self._callFUT(
             xhr='xhr',
             )
@@ -142,7 +166,7 @@ class Test__make_predicates(unittest.TestCase):
             match_param='foo=bar',
             )
         order10, _, _ = self._callFUT(
-            custom=(DummyCustomPredicate(),),
+            custom=predvalseq([DummyCustomPredicate()]),
             )
         self.assertTrue(order1 > order2)
         self.assertTrue(order2 > order3)
@@ -155,12 +179,13 @@ class Test__make_predicates(unittest.TestCase):
         self.assertTrue(order9 > order10)
 
     def test_ordering_importance_and_number(self):
+        from pyramid.config.util import predvalseq
         order1, _, _ = self._callFUT(
             xhr='xhr',
             request_method='request_method',
             )
         order2, _, _ = self._callFUT(
-            custom=(DummyCustomPredicate(),),
+            custom=predvalseq([DummyCustomPredicate()]),
             )
         self.assertTrue(order1 < order2)
 
@@ -170,7 +195,7 @@ class Test__make_predicates(unittest.TestCase):
             )
         order2, _, _ = self._callFUT(
             request_method='request_method',
-            custom=(DummyCustomPredicate(),),
+            custom=predvalseq([DummyCustomPredicate()]),
             )
         self.assertTrue(order1 > order2)
 
@@ -181,7 +206,7 @@ class Test__make_predicates(unittest.TestCase):
             )
         order2, _, _ = self._callFUT(
             request_method='request_method',
-            custom=(DummyCustomPredicate(),),
+            custom=predvalseq([DummyCustomPredicate()]),
             )
         self.assertTrue(order1 < order2)
 
@@ -193,18 +218,19 @@ class Test__make_predicates(unittest.TestCase):
         order2, _, _ = self._callFUT(
             xhr='xhr',
             request_method='request_method',
-            custom=(DummyCustomPredicate(),),
+            custom=predvalseq([DummyCustomPredicate()]),
             )
         self.assertTrue(order1 > order2)
 
     def test_different_custom_predicates_with_same_hash(self):
+        from pyramid.config.util import predvalseq
         class PredicateWithHash(object):
             def __hash__(self):
                 return 1
         a = PredicateWithHash()
         b = PredicateWithHash()
-        _, _, a_phash = self._callFUT(custom=(a,))
-        _, _, b_phash = self._callFUT(custom=(b,))
+        _, _, a_phash = self._callFUT(custom=predvalseq([a]))
+        _, _, b_phash = self._callFUT(custom=predvalseq([b]))
         self.assertEqual(a_phash, b_phash)
 
     def test_traverse_has_remainder_already(self):
@@ -244,12 +270,14 @@ class Test__make_predicates(unittest.TestCase):
              )
 
     def test_custom_predicates_can_affect_traversal(self):
+        from pyramid.config.util import predvalseq
         def custom(info, request):
             m = info['match']
             m['dummy'] = 'foo'
             return True
-        _, predicates, _ = self._callFUT(custom=(custom,),
-                                         traverse='/1/:dummy/:a')
+        _, predicates, _ = self._callFUT(
+            custom=predvalseq([custom]),
+            traverse='/1/:dummy/:a')
         self.assertEqual(len(predicates), 2)
         info = {'match':{'a':'a'}}
         request = DummyRequest()
@@ -259,6 +287,7 @@ class Test__make_predicates(unittest.TestCase):
                                  'traverse':('1', 'foo', 'a')}})
 
     def test_predicate_text_is_correct(self):
+        from pyramid.config.util import predvalseq
         _, predicates, _ = self._callFUT(
             xhr='xhr',
             request_method='request_method',
@@ -268,23 +297,27 @@ class Test__make_predicates(unittest.TestCase):
             accept='accept',
             containment='containment',
             request_type='request_type',
-            custom=(DummyCustomPredicate(),
+            custom=predvalseq(
+                [
+                    DummyCustomPredicate(),
                     DummyCustomPredicate.classmethod_predicate,
-                    DummyCustomPredicate.classmethod_predicate_no_text),
+                    DummyCustomPredicate.classmethod_predicate_no_text,
+                ]
+            ),
             match_param='foo=bar')
-        self.assertEqual(predicates[0].__text__, 'xhr = True')
-        self.assertEqual(predicates[1].__text__,
-                         "request method = ['request_method']")
-        self.assertEqual(predicates[2].__text__, 'path_info = path_info')
-        self.assertEqual(predicates[3].__text__, 'request_param param')
-        self.assertEqual(predicates[4].__text__, 'header header')
-        self.assertEqual(predicates[5].__text__, 'accept = accept')
-        self.assertEqual(predicates[6].__text__, 'containment = containment')
-        self.assertEqual(predicates[7].__text__, 'request_type = request_type')
-        self.assertEqual(predicates[8].__text__, "match_param ['foo=bar']")
-        self.assertEqual(predicates[9].__text__, 'custom predicate')
-        self.assertEqual(predicates[10].__text__, 'classmethod predicate')
-        self.assertEqual(predicates[11].__text__, '<unknown custom predicate>')
+        self.assertEqual(predicates[0].text(), 'xhr = True')
+        self.assertEqual(predicates[1].text(),
+                         "request_method = request_method")
+        self.assertEqual(predicates[2].text(), 'path_info = path_info')
+        self.assertEqual(predicates[3].text(), 'request_param param')
+        self.assertEqual(predicates[4].text(), 'header header')
+        self.assertEqual(predicates[5].text(), 'accept = accept')
+        self.assertEqual(predicates[6].text(), 'containment = containment')
+        self.assertEqual(predicates[7].text(), 'request_type = request_type')
+        self.assertEqual(predicates[8].text(), "match_param foo=bar")
+        self.assertEqual(predicates[9].text(), 'custom predicate')
+        self.assertEqual(predicates[10].text(), 'classmethod predicate')
+        self.assertTrue(predicates[11].text().startswith('custom predicate'))
 
     def test_match_param_from_string(self):
         _, predicates, _ = self._callFUT(match_param='foo=bar')
@@ -641,3 +674,7 @@ class DummyRequest:
         self.params = {}
         self.cookies = {}
 
+class DummyConfigurator(object):
+    def maybe_dotted(self, thing):
+        return thing
+    

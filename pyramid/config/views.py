@@ -69,12 +69,13 @@ from pyramid.util import object_description
 from pyramid.config import predicates
 
 from pyramid.config.util import (
+    Deferred,
     DEFAULT_PHASH,
     MAX_ORDER,
     action_method,
     as_sorted_tuple,
     PredicateList,
-    SequenceOfPredicateValues,
+    predvalseq,
     )
 
 urljoin = urlparse.urljoin
@@ -635,13 +636,31 @@ def viewdefaults(wrapped):
 class ViewsConfiguratorMixin(object):
     @viewdefaults
     @action_method
-    def add_view(self, view=None, name="", for_=None, permission=None,
-                 request_type=None, route_name=None, request_method=None,
-                 request_param=None, containment=None, attr=None,
-                 renderer=None, wrapper=None, xhr=None, accept=None,
-                 header=None, path_info=None, custom_predicates=(),
-                 context=None, decorator=None, mapper=None, http_cache=None,
-                 match_param=None, **other_predicates):
+    def add_view(
+        self,
+        view=None,
+        name="",
+        for_=None,
+        permission=None,
+        request_type=None,
+        route_name=None,
+        request_method=None,
+        request_param=None,
+        containment=None,
+        attr=None,
+        renderer=None,
+        wrapper=None,
+        xhr=None,
+        accept=None,
+        header=None,
+        path_info=None,
+        custom_predicates=(),
+        context=None,
+        decorator=None,
+        mapper=None,
+        http_cache=None,
+        match_param=None,
+        **other_predicates):
         """ Add a :term:`view configuration` to the current
         configuration state.  Arguments to ``add_view`` are broken
         down below into *predicate* arguments and *non-predicate*
@@ -664,23 +683,26 @@ class ViewsConfiguratorMixin(object):
 
         permission
 
-          The name of a :term:`permission` that the user must possess
-          in order to invoke the :term:`view callable`.  See
-          :ref:`view_security_section` for more information about view
-          security and permissions.  If ``permission`` is omitted, a
-          *default* permission may be used for this view registration
-          if one was named as the
+          A :term:`permission` that the user must possess in order to invoke
+          the :term:`view callable`.  See :ref:`view_security_section` for
+          more information about view security and permissions.  This is
+          often a string like ``view`` or ``edit``.
+
+          If ``permission`` is omitted, a *default* permission may be used
+          for this view registration if one was named as the
           :class:`pyramid.config.Configurator` constructor's
           ``default_permission`` argument, or if
-          :meth:`pyramid.config.Configurator.set_default_permission`
-          was used prior to this view registration.  Pass the string
-          :data:`pyramid.security.NO_PERMISSION_REQUIRED` as the
-          permission argument to explicitly indicate that the view should
-          always be executable by entirely anonymous users, regardless of
-          the default permission, bypassing any :term:`authorization
-          policy` that may be in effect.
+          :meth:`pyramid.config.Configurator.set_default_permission` was used
+          prior to this view registration.  Pass the value
+          :data:`pyramid.security.NO_PERMISSION_REQUIRED` as the permission
+          argument to explicitly indicate that the view should always be
+          executable by entirely anonymous users, regardless of the default
+          permission, bypassing any :term:`authorization policy` that may be
+          in effect.
 
         attr
+
+          This knob is most useful when the view definition is a class.
 
           The view machinery defaults to using the ``__call__`` method
           of the :term:`view callable` (or the function itself, if the
@@ -690,8 +712,7 @@ class ViewsConfiguratorMixin(object):
           class, and the class has a method named ``index`` and you
           wanted to use this method instead of the class' ``__call__``
           method to return the response, you'd say ``attr="index"`` in the
-          view configuration for the view.  This is
-          most useful when the view definition is a class.
+          view configuration for the view.
 
         renderer
 
@@ -975,9 +996,15 @@ class ViewsConfiguratorMixin(object):
           Each custom predicate callable should accept two arguments:
           ``context`` and ``request`` and should return either
           ``True`` or ``False`` after doing arbitrary evaluation of
-          the context and/or the request.  If all callables return
-          ``True``, the associated view callable will be considered
-          viable for a given request.
+          the context and/or the request.  
+
+        other_predicates
+
+          Pass a key/value pair here to use a third-party predicate registered
+          via :meth:`pyramid.config.Configurator.add_view_predicate`.  More
+          than one key/value pair can be used at the same time.  See
+          :ref:`registering_thirdparty_predicates` for more information
+          about third-party predicates.
 
         """
         view = self.maybe_dotted(view)
@@ -1034,17 +1061,26 @@ class ViewsConfiguratorMixin(object):
                 containment=containment,
                 request_type=request_type,
                 match_param=match_param,
-                custom=SequenceOfPredicateValues(custom_predicates),
+                custom=predvalseq(custom_predicates),
                 )
             )
-            
-        discriminator = ('view', context, name, route_name, attr,
-                         str(sorted(pvals.items())))
+
+        def discrim_func():
+            # We need to defer the discriminator until we know what the phash
+            # is.  It can't be computed any sooner because thirdparty
+            # predicates may not yet exist when add_view is called.
+            order, preds, phash = predlist.make(self, **pvals)
+            view_intr.update({'phash':phash, 'order':order, 'predicates':preds})
+            return ('view', context, name, route_name, phash)
+
+        discriminator = Deferred(discrim_func)
+
         if inspect.isclass(view) and attr:
             view_desc = 'method %r of %s' % (
                 attr, self.object_description(view))
         else:
             view_desc = self.object_description(view)
+            
         view_intr = self.introspectable('views',
                                         discriminator,
                                         view_desc,
@@ -1072,8 +1108,10 @@ class ViewsConfiguratorMixin(object):
         predlist = self.view_predlist
 
         def register(permission=permission, renderer=renderer):
-            order, preds, phash = predlist.make(**pvals)
-            view_intr.update({'phash':phash})
+            # the discrim_func above is guaranteed to have been called already
+            order = view_intr['order']
+            preds = view_intr['predicates']
+            phash = view_intr['phash']
             request_iface = IRequest
             if route_name is not None:
                 request_iface = self.registry.queryUtility(IRouteRequest,
@@ -1098,21 +1136,28 @@ class ViewsConfiguratorMixin(object):
                 # (reg'd in phase 1)
                 permission = self.registry.queryUtility(IDefaultPermission)
 
+            # added by discrim_func above during conflict resolving
+            preds = view_intr['predicates']
+            order = view_intr['order']
+            phash = view_intr['phash']
+
             # __no_permission_required__ handled by _secure_view
-            deriver = ViewDeriver(registry=self.registry,
-                                  permission=permission,
-                                  predicates=preds,
-                                  attr=attr,
-                                  renderer=renderer,
-                                  wrapper_viewname=wrapper,
-                                  viewname=name,
-                                  accept=accept,
-                                  order=order,
-                                  phash=phash,
-                                  package=self.package,
-                                  mapper=mapper,
-                                  decorator=decorator,
-                                  http_cache=http_cache)
+            deriver = ViewDeriver(
+                registry=self.registry,
+                permission=permission,
+                predicates=preds,
+                attr=attr,
+                renderer=renderer,
+                wrapper_viewname=wrapper,
+                viewname=name,
+                accept=accept,
+                order=order,
+                phash=phash,
+                package=self.package,
+                mapper=mapper,
+                decorator=decorator,
+                http_cache=http_cache,
+                )
             derived_view = deriver(view)
             derived_view.__discriminator__ = lambda *arg: discriminator
             # __discriminator__ is used by superdynamic systems
@@ -1217,19 +1262,25 @@ class ViewsConfiguratorMixin(object):
                         IMultiView, name=name)
 
         if mapper:
-            mapper_intr = self.introspectable('view mappers',
-                                              discriminator,
-                                              'view mapper for %s' % view_desc,
-                                              'view mapper')
+            mapper_intr = self.introspectable(
+                'view mappers',
+                discriminator,
+                'view mapper for %s' % view_desc,
+                'view mapper'
+                )
             mapper_intr['mapper'] = mapper
             mapper_intr.relate('views', discriminator)
             introspectables.append(mapper_intr)
         if route_name:
             view_intr.relate('routes', route_name) # see add_route
         if renderer is not None and renderer.name and '.' in renderer.name:
-            # it's a template
-            tmpl_intr = self.introspectable('templates', discriminator,
-                                            renderer.name, 'template')
+            # the renderer is a template
+            tmpl_intr = self.introspectable(
+                'templates',
+                discriminator,
+                renderer.name,
+                'template'
+                )
             tmpl_intr.relate('views', discriminator)
             tmpl_intr['name'] = renderer.name
             tmpl_intr['type'] = renderer.type
@@ -1237,8 +1288,13 @@ class ViewsConfiguratorMixin(object):
             tmpl_intr.relate('renderer factories', renderer.type)
             introspectables.append(tmpl_intr)
         if permission is not None:
-            perm_intr = self.introspectable('permissions', permission,
-                                            permission, 'permission')
+            # if a permission exists, register a permission introspectable
+            perm_intr = self.introspectable(
+                'permissions',
+                permission,
+                permission,
+                'permission'
+                )
             perm_intr['value'] = permission
             perm_intr.relate('views', discriminator)
             introspectables.append(perm_intr)
@@ -1255,13 +1311,14 @@ class ViewsConfiguratorMixin(object):
     @action_method
     def add_view_predicate(self, name, factory, weighs_more_than=None,
                            weighs_less_than=None):
-        """ Adds a view predicate factory.  The view predicate can later be
-        named as a keyword argument to
-        :meth:`pyramid.config.Configurator.add_view`.
+        """ Adds a view predicate factory.  The associated view predicate can
+        later be named as a keyword argument to
+        :meth:`pyramid.config.Configurator.add_view` in the
+        ``other_predicates`` anonyous keyword argument dictionary.
 
         ``name`` should be the name of the predicate.  It must be a valid
         Python identifier (it will be used as a keyword argument to
-        ``add_view``).
+        ``add_view`` by others).
 
         ``factory`` should be a :term:`predicate factory`.
         """
@@ -1283,26 +1340,19 @@ class ViewsConfiguratorMixin(object):
                     order=PHASE1_CONFIG) # must be registered before views added
 
     def add_default_view_predicates(self):
-        self.add_view_predicate(
-            'xhr', predicates.XHRPredicate)
-        self.add_view_predicate(
-            'request_method', predicates.RequestMethodPredicate)
-        self.add_view_predicate(
-            'path_info', predicates.PathInfoPredicate)
-        self.add_view_predicate(
-            'request_param', predicates.RequestParamPredicate)
-        self.add_view_predicate(
-            'header', predicates.HeaderPredicate)
-        self.add_view_predicate(
-            'accept', predicates.AcceptPredicate)
-        self.add_view_predicate(
-            'containment', predicates.ContainmentPredicate)
-        self.add_view_predicate(
-            'request_type', predicates.RequestTypePredicate)
-        self.add_view_predicate(
-            'match_param', predicates.MatchParamPredicate)
-        self.add_view_predicate(
-            'custom', predicates.CustomPredicate)
+        for (name, factory) in (
+            ('xhr', predicates.XHRPredicate),
+            ('request_method', predicates.RequestMethodPredicate),
+            ('path_info', predicates.PathInfoPredicate),
+            ('request_param', predicates.RequestParamPredicate),
+            ('header', predicates.HeaderPredicate),
+            ('accept', predicates.AcceptPredicate),
+            ('containment', predicates.ContainmentPredicate),
+            ('request_type', predicates.RequestTypePredicate),
+            ('match_param', predicates.MatchParamPredicate),
+            ('custom', predicates.CustomPredicate),
+            ):
+            self.add_view_predicate(name, factory)
 
     def derive_view(self, view, attr=None, renderer=None):
         """

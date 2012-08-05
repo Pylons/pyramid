@@ -5,7 +5,7 @@ from pyramid.compat import text_
 class TestXHRPredicate(unittest.TestCase):
     def _makeOne(self, val):
         from pyramid.config.predicates import XHRPredicate
-        return XHRPredicate(val)
+        return XHRPredicate(val, None)
     
     def test___call___true(self):
         inst = self._makeOne(True)
@@ -32,7 +32,7 @@ class TestXHRPredicate(unittest.TestCase):
 class TestRequestMethodPredicate(unittest.TestCase):
     def _makeOne(self, val):
         from pyramid.config.predicates import RequestMethodPredicate
-        return RequestMethodPredicate(val)
+        return RequestMethodPredicate(val, None)
     
     def test___call___true_single(self):
         inst = self._makeOne('GET')
@@ -66,7 +66,7 @@ class TestRequestMethodPredicate(unittest.TestCase):
 class TestPathInfoPredicate(unittest.TestCase):
     def _makeOne(self, val):
         from pyramid.config.predicates import PathInfoPredicate
-        return PathInfoPredicate(val)
+        return PathInfoPredicate(val, None)
 
     def test_ctor_compilefail(self):
         from pyramid.exceptions import ConfigurationError
@@ -97,7 +97,7 @@ class TestPathInfoPredicate(unittest.TestCase):
 class TestRequestParamPredicate(unittest.TestCase):
     def _makeOne(self, val):
         from pyramid.config.predicates import RequestParamPredicate
-        return RequestParamPredicate(val)
+        return RequestParamPredicate(val, None)
 
     def test___call___true_exists(self):
         inst = self._makeOne('abc')
@@ -139,7 +139,7 @@ class TestRequestParamPredicate(unittest.TestCase):
 class TestMatchParamPredicate(unittest.TestCase):
     def _makeOne(self, val):
         from pyramid.config.predicates import MatchParamPredicate
-        return MatchParamPredicate(val)
+        return MatchParamPredicate(val, None)
 
     def test___call___true_single(self):
         inst = self._makeOne('abc=1')
@@ -174,7 +174,7 @@ class TestMatchParamPredicate(unittest.TestCase):
 class TestCustomPredicate(unittest.TestCase):
     def _makeOne(self, val):
         from pyramid.config.predicates import CustomPredicate
-        return CustomPredicate(val)
+        return CustomPredicate(val, None)
 
     def test___call___true(self):
         def func(context, request):
@@ -203,17 +203,17 @@ class TestCustomPredicate(unittest.TestCase):
     def test_text_func_repr(self):
         pred = predicate()
         inst = self._makeOne(pred)
-        self.assertTrue(inst.text(), 'predicate')
+        self.assertEqual(inst.text(), u'custom predicate: object predicate')
 
     def test_phash(self):
         pred = predicate()
         inst = self._makeOne(pred)
-        self.assertTrue(inst.phash(), 'custom:1')
+        self.assertEqual(inst.phash(), 'custom:1')
 
 class TestTraversePredicate(unittest.TestCase):
     def _makeOne(self, val):
         from pyramid.config.predicates import TraversePredicate
-        return TraversePredicate(val)
+        return TraversePredicate(val, None)
     
     def test___call__traverse_has_remainder_already(self):
         inst = self._makeOne('/1/:a/:b')

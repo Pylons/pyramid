@@ -158,7 +158,7 @@ class RoutesConfiguratorMixinTests(unittest.TestCase):
         def pred2(context, request): pass
         config.add_route('name', 'path', custom_predicates=(pred1, pred2))
         route = self._assertRoute(config, 'name', 'path', 2)
-        self.assertEqual(route.predicates, [pred1, pred2])
+        self.assertEqual(len(route.predicates), 2)
 
     def test_add_route_with_header(self):
         config = self._makeOne(autocommit=True)

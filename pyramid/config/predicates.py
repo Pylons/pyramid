@@ -11,10 +11,12 @@ from pyramid.traversal import (
 
 from pyramid.urldispatch import _compile_route
 
+from pyramid.util import object_description
+
 from .util import as_sorted_tuple
 
 class XHRPredicate(object):
-    def __init__(self, val):
+    def __init__(self, val, config):
         self.val = bool(val)
 
     def text(self):
@@ -26,7 +28,7 @@ class XHRPredicate(object):
         return bool(request.is_xhr) is self.val
 
 class RequestMethodPredicate(object):
-    def __init__(self, val):
+    def __init__(self, val, config):
         self.val = as_sorted_tuple(val)
 
     def text(self):
@@ -38,7 +40,7 @@ class RequestMethodPredicate(object):
         return request.method in self.val
 
 class PathInfoPredicate(object):
-    def __init__(self, val):
+    def __init__(self, val, config):
         self.orig = val
         try:
             val = re.compile(val)
@@ -55,7 +57,7 @@ class PathInfoPredicate(object):
         return self.val.match(request.upath_info) is not None
     
 class RequestParamPredicate(object):
-    def __init__(self, val):
+    def __init__(self, val, config):
         name = val
         v = None
         if '=' in name:
@@ -80,7 +82,7 @@ class RequestParamPredicate(object):
     
 
 class HeaderPredicate(object):
-    def __init__(self, val):
+    def __init__(self, val, config):
         name = val
         v = None
         if ':' in name:
@@ -110,7 +112,7 @@ class HeaderPredicate(object):
         return self.val.match(val) is not None
 
 class AcceptPredicate(object):
-    def __init__(self, val):
+    def __init__(self, val, config):
         self.val = val
 
     def text(self):
@@ -122,8 +124,8 @@ class AcceptPredicate(object):
         return self.val in request.accept
 
 class ContainmentPredicate(object):
-    def __init__(self, val):
-        self.val = val
+    def __init__(self, val, config):
+        self.val = config.maybe_dotted(val)
 
     def text(self):
         return 'containment = %s' % (self.val,)
@@ -135,7 +137,7 @@ class ContainmentPredicate(object):
         return find_interface(ctx, self.val) is not None
     
 class RequestTypePredicate(object):
-    def __init__(self, val):
+    def __init__(self, val, config):
         self.val = val
 
     def text(self):
@@ -147,7 +149,7 @@ class RequestTypePredicate(object):
         return self.val.providedBy(request)
     
 class MatchParamPredicate(object):
-    def __init__(self, val):
+    def __init__(self, val, config):
         if not is_nonstr_iter(val):
             val = (val,)
         val = sorted(val)
@@ -169,13 +171,23 @@ class MatchParamPredicate(object):
         return True
     
 class CustomPredicate(object):
-    def __init__(self, func):
+    def __init__(self, func, config):
         self.func = func
 
     def text(self):
-        return getattr(self.func, '__text__', repr(self.func))
+        return getattr(
+            self.func,
+            '__text__',
+            'custom predicate: %s' % object_description(self.func)
+            )
 
     def phash(self):
+        # using hash() here rather than id() is intentional: we
+        # want to allow custom predicates that are part of
+        # frameworks to be able to define custom __hash__
+        # functions for custom predicates, so that the hash output
+        # of predicate instances which are "logically the same"
+        # may compare equal.
         return 'custom:%r' % hash(self.func)
 
     def __call__(self, context, request):
@@ -183,7 +195,11 @@ class CustomPredicate(object):
     
     
 class TraversePredicate(object):
-    def __init__(self, val):
+    # Can only be used as a *route* "predicate"; it adds 'traverse' to the
+    # matchdict if it's specified in the routing args.  This causes the
+    # ResourceTreeTraverser to use the resolved traverse pattern as the
+    # traversal path.
+    def __init__(self, val, config):
         _, self.tgenerate = _compile_route(val)
         self.val = val
         
@@ -191,12 +207,18 @@ class TraversePredicate(object):
         return 'traverse matchdict pseudo-predicate'
 
     def phash(self):
+        # This isn't actually a predicate, it's just a infodict modifier that
+        # injects ``traverse`` into the matchdict.  As a result, we don't
+        # need to update the hash.
         return ''
 
     def __call__(self, context, request):
         if 'traverse' in context:
             return True
         m = context['match']
-        tvalue = self.tgenerate(m)
+        tvalue = self.tgenerate(m)  # tvalue will be urlquoted string
         m['traverse'] = traversal_path(tvalue)
+        # This isn't actually a predicate, it's just a infodict modifier that
+        # injects ``traverse`` into the matchdict.  As a result, we just
+        # return True.
         return True

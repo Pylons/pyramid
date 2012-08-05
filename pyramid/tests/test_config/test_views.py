@@ -118,7 +118,8 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         self.assertEqual(wrapper.__module__, view.__module__)
         self.assertEqual(wrapper.__name__, view.__name__)
         self.assertEqual(wrapper.__doc__, view.__doc__)
-        self.assertEqual(wrapper.__discriminator__(None, None)[0], 'view')
+        self.assertEqual(wrapper.__discriminator__(None, None).resolve()[0],
+                         'view')
 
     def test_add_view_view_callable_dottedname(self):
         from pyramid.renderers import null_renderer
@@ -970,8 +971,10 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         wrapper = self._getViewCallable(config)
         self.assertTrue(IMultiView.providedBy(wrapper))
         request = self._makeRequest(config)
-        self.assertTrue('IFoo' in wrapper.__discriminator__(foo, request)[5])
-        self.assertTrue('IBar' in wrapper.__discriminator__(bar, request)[5])
+        self.assertNotEqual(
+            wrapper.__discriminator__(foo, request),
+            wrapper.__discriminator__(bar, request),
+            )
 
     def test_add_view_with_template_renderer(self):
         from pyramid.tests import test_config
