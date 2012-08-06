@@ -203,7 +203,7 @@ class TestCustomPredicate(unittest.TestCase):
     def test_text_func_repr(self):
         pred = predicate()
         inst = self._makeOne(pred)
-        self.assertEqual(inst.text(), u'custom predicate: object predicate')
+        self.assertEqual(inst.text(), 'custom predicate: object predicate')
 
     def test_phash(self):
         pred = predicate()

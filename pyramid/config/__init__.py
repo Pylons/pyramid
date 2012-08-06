@@ -1084,7 +1084,8 @@ def resolveConflicts(actions):
     other conflicting actions.
     """
 
-    def orderandpos((n, v)):
+    def orderandpos(v):
+        n, v = v
         if not isinstance(v, dict):
             # old-style tuple action
             v = expand_action(*v)
@@ -1092,7 +1093,8 @@ def resolveConflicts(actions):
 
     sactions = sorted(enumerate(actions), key=orderandpos)
 
-    def orderonly((n,v)):
+    def orderonly(v):
+        n, v = v
         if not isinstance(v, dict):
             # old-style tuple action
             v = expand_action(*v)
