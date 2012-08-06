@@ -286,6 +286,13 @@ class Test__make_predicates(unittest.TestCase):
         self.assertEqual(predicates[10].__text__, 'classmethod predicate')
         self.assertEqual(predicates[11].__text__, '<unknown custom predicate>')
 
+    def test_predicate_text_for_params_is_correct(self):
+        _, predicates, _ = self._callFUT(request_param='abc=123',
+                                         match_param=('foo=bar', 'qux'))
+        self.assertEqual(predicates[0].__text__, "request_param ['abc=123']")
+        self.assertEqual(predicates[1].__text__,
+                         "match_param ['foo=bar', 'qux']")
+
     def test_match_param_from_string(self):
         _, predicates, _ = self._callFUT(match_param='foo=bar')
         request = DummyRequest()
