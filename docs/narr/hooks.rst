@@ -1238,6 +1238,10 @@ implict and explicit tween chains used by an application.  See
 Adding A Third Party View or Route Predicate
 --------------------------------------------
 
+.. note::
+
+   Third-party predicates are a feature new as of Pyramid 1.4.
+
 View and route predicates used during view configuration allow you to narrow
 the set of circumstances under which a view or route will match.  For
 example, the ``request_method`` view predicate can be used to ensure a view

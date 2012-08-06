@@ -1000,11 +1000,12 @@ class ViewsConfiguratorMixin(object):
 
         other_predicates
 
-          Pass a key/value pair here to use a third-party predicate registered
-          via :meth:`pyramid.config.Configurator.add_view_predicate`.  More
-          than one key/value pair can be used at the same time.  See
-          :ref:`registering_thirdparty_predicates` for more information
-          about third-party predicates.
+          Pass a key/value pair here to use a third-party predicate
+          registered via
+          :meth:`pyramid.config.Configurator.add_view_predicate`.  More than
+          one key/value pair can be used at the same time.  See
+          :ref:`registering_thirdparty_predicates` for more information about
+          third-party predicates.  This argument is new as of Pyramid 1.4.
 
         """
         view = self.maybe_dotted(view)
@@ -1321,6 +1322,12 @@ class ViewsConfiguratorMixin(object):
         ``add_view`` by others).
 
         ``factory`` should be a :term:`predicate factory`.
+
+        See :ref:`registering_thirdparty_predicates` for more information.
+
+        .. note::
+
+           This method is new as of Pyramid 1.4.
         """
         discriminator = ('view predicate', name)
         intr = self.introspectable(
