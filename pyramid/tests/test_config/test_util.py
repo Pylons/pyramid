@@ -361,15 +361,10 @@ class TestPredicateList(unittest.TestCase):
         hash2, _, __= self._callFUT(request_method='GET')
         self.assertEqual(hash1, hash2)
 
-    def test_match_param_hashable(self):
-        # https://github.com/Pylons/pyramid/issues/425
-        import pyramid.testing
-        def view(request): pass
-        config = pyramid.testing.setUp(autocommit=False)
-        config.add_route('foo', '/foo/{a}/{b}')
-        config.add_view(view, route_name='foo', match_param='a=bar')
-        config.add_view(view, route_name='foo', match_param=('a=bar', 'b=baz'))
-        config.commit()
+    def test_unknown_predicate(self):
+        from pyramid.exceptions import ConfigurationError
+        self.assertRaises(ConfigurationError, self._callFUT, unknown=1)
+        
 
 class TestActionInfo(unittest.TestCase):
     def _getTargetClass(self):
@@ -405,6 +400,25 @@ class TestTopologicalSorter(unittest.TestCase):
     def _makeOne(self, *arg, **kw):
         from pyramid.config.util import TopologicalSorter
         return TopologicalSorter(*arg, **kw)
+
+    def test_remove(self):
+        inst = self._makeOne()
+        inst.names.append('name')
+        inst.name2val['name'] = 1
+        inst.req_after.add('name')
+        inst.req_before.add('name')
+        inst.name2after['name'] = ('bob',)
+        inst.name2before['name'] = ('fred',)
+        inst.order.append(('bob', 'name'))
+        inst.order.append(('name', 'fred'))
+        inst.remove('name')
+        self.assertFalse(inst.names)
+        self.assertFalse(inst.req_before)
+        self.assertFalse(inst.req_after)
+        self.assertFalse(inst.name2before)
+        self.assertFalse(inst.name2after)
+        self.assertFalse(inst.name2val)
+        self.assertFalse(inst.order)
 
     def test_add(self):
         from pyramid.config.util import LAST

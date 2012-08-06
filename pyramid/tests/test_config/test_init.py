@@ -1994,6 +1994,3 @@ class DummyIntrospectable(object):
     def register(self, introspector, action_info):
         self.registered.append((introspector, action_info))
         
-class DummyPredicateList(object):
-    def add(self, name, factory, weighs_more_than=None, weighs_less_than=None):
-        pass
