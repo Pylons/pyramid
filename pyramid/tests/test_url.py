@@ -2,10 +2,8 @@ import os
 import unittest
 import warnings
 
-from pyramid.testing import (
-    setUp,
-    tearDown,
-    )
+from pyramid import testing
+
 from pyramid.compat import (
     text_,
     native_,
@@ -14,10 +12,10 @@ from pyramid.compat import (
 
 class TestURLMethodsMixin(unittest.TestCase):
     def setUp(self):
-        self.config = setUp()
+        self.config = testing.setUp()
 
     def tearDown(self):
-        tearDown()
+        testing.tearDown()
         
     def _makeOne(self, environ=None):
         from pyramid.url import URLMethodsMixin

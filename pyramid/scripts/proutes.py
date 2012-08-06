@@ -15,10 +15,10 @@ class PRoutesCommand(object):
     route, the pattern of the route, and the view callable which will be
     invoked when the route is matched.
 
-    This command accepts one positional argument named "config_uri".  It
+    This command accepts one positional argument named 'config_uri'.  It
     specifies the PasteDeploy config file to use for the interactive
-    shell. The format is "inifile#name". If the name is left off, "main"
-    will be assumed.  Example: "proutes myapp.ini".
+    shell. The format is 'inifile#name'. If the name is left off, 'main'
+    will be assumed.  Example: 'proutes myapp.ini'.
 
     """
     bootstrap = (bootstrap,)

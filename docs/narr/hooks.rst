@@ -1232,3 +1232,101 @@ Displaying Tween Ordering
 The ``ptweens`` command-line utility can be used to report the current
 implict and explicit tween chains used by an application.  See
 :ref:`displaying_tweens`.
+
+.. _registering_thirdparty_predicates:
+
+Adding A Third Party View or Route Predicate
+--------------------------------------------
+
+.. note::
+
+   Third-party predicates are a feature new as of Pyramid 1.4.
+
+View and route predicates used during view configuration allow you to narrow
+the set of circumstances under which a view or route will match.  For
+example, the ``request_method`` view predicate can be used to ensure a view
+callable is only invoked when the request's method is ``POST``:
+
+.. code-block:: python
+
+    @view_config(request_method='POST')
+    def someview(request):
+        ...
+
+Likewise, a similar predicate can be used as a *route* predicate:
+
+.. code-block:: python
+
+    config.add_route('name', '/foo', request_method='POST')
+
+Many other built-in predicates exists (``request_param``, and others).  You
+can add third-party predicates to the list of available predicates by using
+one of :meth:`pyramid.config.Configurator.add_view_predicate` or
+:meth:`pyramid.config.Configurator.add_route_predicate`.  The former adds a
+view predicate, the latter a route predicate.
+
+When using one of those APIs, you pass a *name* and a *factory* to add a
+predicate during Pyramid's configuration stage.  For example:
+
+.. code-block:: python
+
+    config.add_view_predicate('content_type', ContentTypePredicate)
+
+The above example adds a new predicate named ``content_type`` to the list of
+available predicates for views.  This will allow the following view
+configuration statement to work:
+
+.. code-block:: python
+   :linenos:
+
+   @view_config(content_type='File')
+   def aview(request): ...
+
+The first argument to :meth:`pyramid.config.Configurator.add_view_predicate`,
+the name, is a string representing the name that is expected to be passed to
+``view_config`` (or its imperative analogue ``add_view``).
+
+The second argument is a predicate factory.  A predicate factory is most
+often a class with a constructor (``__init__``), a ``text`` method, a
+``phash`` method and a ``__call__`` method.  For example:
+
+.. code-block:: python
+   :linenos:
+
+    class ContentTypePredicate(object):
+        def __init__(self, val, config):
+            self.val = val
+
+        def text(self):
+            return 'content_type = %s' % (self.val,)
+
+        phash = text
+
+        def __call__(self, context, request):
+            return getattr(context, 'content_type', None) == self.val
+
+The constructor of a predicate factory takes two arguments: ``val`` and
+``config``.  The ``val`` argument will be the argument passed to
+``view_config`` (or ``add_view``).  In the example above, it will be the
+string ``File``.  The second arg, ``config`` will be the Configurator
+instance at the time of configuration.
+
+The ``text`` method must return a string.  It should be useful to describe
+the behavior of the predicate in error messages.
+
+The ``phash`` method must return a string or a sequence of strings.  It's
+most often the same as ``text``, as long as ``text`` uniquely describes the
+predicate's name and the value passed to the constructor.  If ``text`` is
+more general, or doesn't describe things that way, ``phash`` should return a
+string with the name and the value serialized.  The result of ``phash`` is
+not seen in output anywhere, it just informs the uniqueness constraints for
+view configuration.
+
+The ``__call__`` method of a predicate factory must accept a resource
+(``context``) and a request, and must return ``True`` or ``False``.  It is
+the "meat" of the predicate.
+
+You can use the same predicate factory as both a view predicate and as a
+route predicate, but you'll need to call ``add_view_predicate`` and
+``add_route_predicate`` separately with the same factory.
+

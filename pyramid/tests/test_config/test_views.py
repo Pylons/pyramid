@@ -118,7 +118,8 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         self.assertEqual(wrapper.__module__, view.__module__)
         self.assertEqual(wrapper.__name__, view.__name__)
         self.assertEqual(wrapper.__doc__, view.__doc__)
-        self.assertEqual(wrapper.__discriminator__(None, None)[0], 'view')
+        self.assertEqual(wrapper.__discriminator__(None, None).resolve()[0],
+                         'view')
 
     def test_add_view_view_callable_dottedname(self):
         from pyramid.renderers import null_renderer
@@ -400,7 +401,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         from pyramid.interfaces import IViewClassifier
         from pyramid.interfaces import IMultiView
         phash = md5()
-        phash.update(b'xhr:True')
+        phash.update(b'xhr = True')
         view = lambda *arg: 'NOT OK'
         view.__phash__ = phash.hexdigest()
         config = self._makeOne(autocommit=True)
@@ -424,7 +425,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         from pyramid.interfaces import IExceptionViewClassifier
         from pyramid.interfaces import IMultiView
         phash = md5()
-        phash.update(b'xhr:True')
+        phash.update(b'xhr = True')
         view = lambda *arg: 'NOT OK'
         view.__phash__ = phash.hexdigest()
         config = self._makeOne(autocommit=True)
@@ -970,8 +971,10 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         wrapper = self._getViewCallable(config)
         self.assertTrue(IMultiView.providedBy(wrapper))
         request = self._makeRequest(config)
-        self.assertEqual(wrapper.__discriminator__(foo, request)[5], IFoo)
-        self.assertEqual(wrapper.__discriminator__(bar, request)[5], IBar)
+        self.assertNotEqual(
+            wrapper.__discriminator__(foo, request),
+            wrapper.__discriminator__(bar, request),
+            )
 
     def test_add_view_with_template_renderer(self):
         from pyramid.tests import test_config
@@ -1217,8 +1220,8 @@ class TestViewsConfigurationMixin(unittest.TestCase):
     def test_add_view_with_header_badregex(self):
         view = lambda *arg: 'OK'
         config = self._makeOne()
-        self.assertRaises(ConfigurationError,
-                          config.add_view, view=view, header='Host:a\\')
+        config.add_view(view, header='Host:a\\')
+        self.assertRaises(ConfigurationError, config.commit)
 
     def test_add_view_with_header_noval_match(self):
         from pyramid.renderers import null_renderer
@@ -1323,8 +1326,8 @@ class TestViewsConfigurationMixin(unittest.TestCase):
     def test_add_view_with_path_info_badregex(self):
         view = lambda *arg: 'OK'
         config = self._makeOne()
-        self.assertRaises(ConfigurationError,
-                          config.add_view, view=view, path_info='\\')
+        config.add_view(view, path_info='\\')
+        self.assertRaises(ConfigurationError, config.commit)
 
     def test_add_view_with_path_info_match(self):
         from pyramid.renderers import null_renderer
@@ -2905,6 +2908,7 @@ class TestViewDeriver(unittest.TestCase):
         view = lambda *arg: response
         def predicate1(context, request):
             return False
+        predicate1.text = lambda *arg: 'text'
         deriver = self._makeOne(predicates=[predicate1])
         result = deriver(view)
         request = self._makeRequest()
@@ -2912,7 +2916,8 @@ class TestViewDeriver(unittest.TestCase):
         try:
             result(None, None)
         except PredicateMismatch as e:
-            self.assertEqual(e.detail, 'predicate mismatch for view <lambda>')
+            self.assertEqual(e.detail,
+                             'predicate mismatch for view <lambda> (text)')
         else: # pragma: no cover
             raise AssertionError
 
@@ -2921,6 +2926,7 @@ class TestViewDeriver(unittest.TestCase):
         def myview(request): pass
         def predicate1(context, request):
             return False
+        predicate1.text = lambda *arg: 'text'
         deriver = self._makeOne(predicates=[predicate1])
         result = deriver(myview)
         request = self._makeRequest()
@@ -2928,7 +2934,29 @@ class TestViewDeriver(unittest.TestCase):
         try:
             result(None, None)
         except PredicateMismatch as e:
-            self.assertEqual(e.detail, 'predicate mismatch for view myview')
+            self.assertEqual(e.detail,
+                             'predicate mismatch for view myview (text)')
+        else: # pragma: no cover
+            raise AssertionError
+
+    def test_predicate_mismatch_exception_has_text_in_detail(self):
+        from pyramid.exceptions import PredicateMismatch
+        def myview(request): pass
+        def predicate1(context, request):
+            return True
+        predicate1.text = lambda *arg: 'pred1'
+        def predicate2(context, request):
+            return False
+        predicate2.text = lambda *arg: 'pred2'
+        deriver = self._makeOne(predicates=[predicate1, predicate2])
+        result = deriver(myview)
+        request = self._makeRequest()
+        request.method = 'POST'
+        try:
+            result(None, None)
+        except PredicateMismatch as e:
+            self.assertEqual(e.detail,
+                             'predicate mismatch for view myview (pred2)')
         else: # pragma: no cover
             raise AssertionError
             
@@ -2974,9 +3002,11 @@ class TestViewDeriver(unittest.TestCase):
         def predicate1(context, request):
             predicates.append(True)
             return True
+        predicate1.text = lambda *arg: 'text'
         def predicate2(context, request):
             predicates.append(True)
             return False
+        predicate2.text = lambda *arg: 'text'
         deriver = self._makeOne(predicates=[predicate1, predicate2])
         result = deriver(view)
         request = self._makeRequest()

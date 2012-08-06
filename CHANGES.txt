@@ -12,8 +12,34 @@ Bug Fixes
 - Explicit url dispatch regexes can now contain colons.
   https://github.com/Pylons/pyramid/issues/629
 
+- On at least one 64-bit Ubuntu system under Python 3.2, using the
+  ``view_config`` decorator caused a ``RuntimeError: dictionary changed size
+  during iteration`` exception.  It no longer does.  See
+  https://github.com/Pylons/pyramid/issues/635 for more information.
+
+- In Mako Templates lookup, check if the uri is already adjusted and bring
+  it back to an asset spec. Normally occurs with inherited templates or
+  included components.
+  https://github.com/Pylons/pyramid/issues/606
+  https://github.com/Pylons/pyramid/issues/607
+
 Features
 --------
+
+- Third-party custom view and route predicates can now be added for use by
+  view authors via ``pyramid.config.Configurator.add_view_predicate`` and
+  ``pyramid.config.Configurator.add_route_predicate``.  So, for example,
+  doing this::
+
+     config.add_view_predicate('abc', my.package.ABCPredicate)
+
+  Might allow a view author to do this in an application that configured that
+  predicate::
+
+     @view_config(abc=1)
+
+  See "Adding A Third Party View or Route Predicate" in the Hooks chapter for
+  more information.
 
 - Custom objects can be made easily JSON-serializable in Pyramid by defining
   a ``__json__`` method on the object's class. This method should return
@@ -45,7 +71,11 @@ Features
   and ``HTTPMovedPermanently`` exceptions, so these can be caught by the
   NotFound view (and other exception views).
 
-- The mako renderer now accepts a def name and returns the template def 
-  result for the view being called. The uri format using an asset spec is 
-  package:path/to/template#defname.mako. The old way of returning a tuple 
+- The mako renderer now accepts a def name and returns the template def
+  result for the view being called. The uri format using an asset spec is
+  package:path/to/template#defname.mako. The old way of returning a tuple
   from the view is supported for backward compatibility, ('defname', {}).
+
+- When there is a predicate mismatch exception (seen when no view matches for
+  a given request due to predicates not working), the exception now contains
+  a textual description of the predicate which didn't match.
