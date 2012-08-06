@@ -1295,7 +1295,7 @@ often a class with a constructor (``__init__``), a ``text`` method, a
 
     class ContentTypePredicate(object):
         def __init__(self, val, config):
-            self.val
+            self.val = val
 
         def text(self):
             return 'content_type = %s' % (self.val,)
