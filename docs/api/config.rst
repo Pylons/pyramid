@@ -66,6 +66,8 @@
      .. automethod:: add_response_adapter
      .. automethod:: add_traverser
      .. automethod:: add_tween
+     .. automethod:: add_route_predicate
+     .. automethod:: add_view_predicate
      .. automethod:: set_request_factory
      .. automethod:: set_root_factory
      .. automethod:: set_session_factory

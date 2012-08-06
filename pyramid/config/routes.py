@@ -1,9 +1,11 @@
 import warnings
 
 from pyramid.interfaces import (
+    IPredicateList,
     IRequest,
     IRouteRequest,
     IRoutesMapper,
+    PHASE1_CONFIG,
     PHASE2_CONFIG,
     )
 
@@ -13,9 +15,12 @@ from pyramid.urldispatch import RoutesMapper
 
 from pyramid.config.util import (
     action_method,
-    make_predicates,
     as_sorted_tuple,
+    PredicateList,
+    predvalseq,
     )
+
+from pyramid.config import predicates
 
 class RoutesConfiguratorMixin(object):
     @action_method
@@ -28,7 +33,7 @@ class RoutesConfiguratorMixin(object):
                   factory=None,
                   for_=None,
                   header=None,
-                  xhr=False,
+                  xhr=None,
                   accept=None,
                   path_info=None,
                   request_method=None,
@@ -44,7 +49,7 @@ class RoutesConfiguratorMixin(object):
                   path=None,
                   pregenerator=None,
                   static=False,
-                  ):
+                  **other_predicates):
         """ Add a :term:`route configuration` to the current
         configuration state, as well as possibly a :term:`view
         configuration` to be used to specify a :term:`view callable`
@@ -254,6 +259,14 @@ class RoutesConfiguratorMixin(object):
           :ref:`custom_route_predicates` for more information about
           ``info``.
 
+        other_predicates
+
+          Pass a key/value pair here to use a third-party predicate registered
+          via :meth:`pyramid.config.Configurator.add_view_predicate`.  More
+          than one key/value pair can be used at the same time.  See
+          :ref:`registering_thirdparty_predicates` for more information
+          about third-party predicates.
+          
         View-Related Arguments
 
         .. warning::
@@ -351,17 +364,6 @@ class RoutesConfiguratorMixin(object):
         if request_method is not None:
             request_method = as_sorted_tuple(request_method)
 
-        ignored, predicates, ignored = make_predicates(
-            xhr=xhr,
-            request_method=request_method,
-            path_info=path_info,
-            request_param=request_param,
-            header=header,
-            accept=accept,
-            traverse=traverse,
-            custom=custom_predicates
-            )
-
         factory = self.maybe_dotted(factory)
         if pattern is None:
             pattern = path
@@ -417,8 +419,24 @@ class RoutesConfiguratorMixin(object):
                     request_iface, IRouteRequest, name=name)
 
         def register_connect():
+            pvals = other_predicates
+            pvals.update(
+                dict(
+                    xhr=xhr,
+                    request_method=request_method,
+                    path_info=path_info,
+                    request_param=request_param,
+                    header=header,
+                    accept=accept,
+                    traverse=traverse,
+                    custom=predvalseq(custom_predicates),
+                    )
+                )
+
+            predlist = self.route_predlist
+            _, preds, _ = predlist.make(self, **pvals)
             route = mapper.connect(
-                name, pattern, factory, predicates=predicates,
+                name, pattern, factory, predicates=preds,
                 pregenerator=pregenerator, static=static
                 )
             intr['object'] = route
@@ -447,6 +465,59 @@ class RoutesConfiguratorMixin(object):
                 attr=view_attr,
             )
 
+    @property
+    def route_predlist(self):
+        predlist = self.registry.queryUtility(IPredicateList, name='route')
+        if predlist is None:
+            predlist = PredicateList()
+            self.registry.registerUtility(predlist, IPredicateList,
+                                          name='route')
+        return predlist
+
+    @action_method
+    def add_route_predicate(self, name, factory, weighs_more_than=None,
+                           weighs_less_than=None):
+        """ Adds a route predicate factory.  The view predicate can later be
+        named as a keyword argument to
+        :meth:`pyramid.config.Configurator.add_route`.
+
+        ``name`` should be the name of the predicate.  It must be a valid
+        Python identifier (it will be used as a keyword argument to
+        ``add_view``).
+
+        ``factory`` should be a :term:`predicate factory`.
+        """
+        discriminator = ('route predicate', name)
+        intr = self.introspectable(
+            'route predicates',
+            discriminator,
+            'route predicate named %s' % name,
+            'route predicate')
+        intr['name'] = name
+        intr['factory'] = factory
+        intr['weighs_more_than'] = weighs_more_than
+        intr['weighs_less_than'] = weighs_less_than
+        def register():
+            predlist = self.route_predlist
+            predlist.add(name, factory, weighs_more_than=weighs_more_than,
+                         weighs_less_than=weighs_less_than)
+        # must be registered before routes connected
+        self.action(discriminator, register, introspectables=(intr,),
+                    order=PHASE1_CONFIG) 
+
+    def add_default_route_predicates(self):
+        for (name, factory) in (
+            ('xhr', predicates.XHRPredicate),
+            ('request_method', predicates.RequestMethodPredicate),
+            ('path_info', predicates.PathInfoPredicate),
+            ('request_param', predicates.RequestParamPredicate),
+            ('header', predicates.HeaderPredicate),
+            ('accept', predicates.AcceptPredicate),
+            ('custom', predicates.CustomPredicate),
+            ('traverse', predicates.TraversePredicate),
+            ):
+            self.add_route_predicate(name, factory)
+    
     def get_routes_mapper(self):
         """ Return the :term:`routes mapper` object associated with
         this configurator's :term:`registry`."""

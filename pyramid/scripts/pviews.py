@@ -17,11 +17,11 @@ class PViewsCommand(object):
     each route+predicate set, print each view that might match and its
     predicates.
 
-    This command accepts two positional arguments: "config_uri" specifies the
+    This command accepts two positional arguments: 'config_uri' specifies the
     PasteDeploy config file to use for the interactive shell. The format is
-    "inifile#name". If the name is left off, "main" will be assumed.  "url"
+    'inifile#name'. If the name is left off, 'main' will be assumed.  'url'
     specifies the path info portion of a URL that will be used to find
-    matching views.  Example: "proutes myapp.ini#main /url"
+    matching views.  Example: 'proutes myapp.ini#main /url'
     """
     stdout = sys.stdout
 
@@ -223,7 +223,7 @@ class PViewsCommand(object):
                 self.out("%srequired permission = %s" % (indent, permission))
             predicates = getattr(view_wrapper, '__predicates__', None)
             if predicates is not None:
-                predicate_text = ', '.join([p.__text__ for p in predicates])
+                predicate_text = ', '.join([p.text() for p in predicates])
                 self.out("%sview predicates (%s)" % (indent, predicate_text))
 
     def run(self):

@@ -349,7 +349,7 @@ class ConfiguratorTests(unittest.TestCase):
         config.setup_registry()
         self.assertEqual(reg.has_listeners, True)
 
-    def test_setup_registry_registers_default_exceptionresponse_view(self):
+    def test_setup_registry_registers_default_exceptionresponse_views(self):
         from webob.exc import WSGIHTTPException
         from pyramid.interfaces import IExceptionResponse
         from pyramid.view import default_exceptionresponse_view
@@ -357,12 +357,23 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne(reg)
         views = []
         config.add_view = lambda *arg, **kw: views.append((arg, kw))
+        config.add_default_view_predicates = lambda *arg: None
         config._add_tween = lambda *arg, **kw: False
         config.setup_registry()
         self.assertEqual(views[0], ((default_exceptionresponse_view,),
                                     {'context':IExceptionResponse}))
         self.assertEqual(views[1], ((default_exceptionresponse_view,),
                                     {'context':WSGIHTTPException}))
+
+    def test_setup_registry_registers_default_view_predicates(self):
+        reg = DummyRegistry()
+        config = self._makeOne(reg)
+        vp_called = []
+        config.add_view = lambda *arg, **kw: None
+        config.add_default_view_predicates = lambda *arg: vp_called.append(True)
+        config._add_tween = lambda *arg, **kw: False
+        config.setup_registry()
+        self.assertTrue(vp_called)
 
     def test_setup_registry_registers_default_webob_iresponse_adapter(self):
         from webob import Response
@@ -1385,13 +1396,9 @@ class TestConfiguratorDeprecatedFeatures(unittest.TestCase):
         try:
             config.commit()
         except ConfigurationConflictError as why:
-            c1, c2, c3, c4, c5, c6 = _conflictFunctions(why)
+            c1, c2 = _conflictFunctions(why)
             self.assertEqual(c1, 'test_conflict_route_with_view')
             self.assertEqual(c2, 'test_conflict_route_with_view')
-            self.assertEqual(c3, 'test_conflict_route_with_view')
-            self.assertEqual(c4, 'test_conflict_route_with_view')
-            self.assertEqual(c5, 'test_conflict_route_with_view')
-            self.assertEqual(c6, 'test_conflict_route_with_view')
         else: # pragma: no cover
             raise AssertionError
 
@@ -1682,6 +1689,7 @@ class Test_resolveConflicts(unittest.TestCase):
             (3, f, (3,), {}, ('y',)),
             (None, f, (5,), {}, ('y',)),
             ])
+        result = list(result)
         self.assertEqual(
             result,
             [{'info': None,
@@ -1743,6 +1751,7 @@ class Test_resolveConflicts(unittest.TestCase):
             expand_action(3, f, (3,), {}, ('y',)),
             expand_action(None, f, (5,), {}, ('y',)),
             ])
+        result = list(result)
         self.assertEqual(
             result,
             [{'info': None,
@@ -1794,32 +1803,31 @@ class Test_resolveConflicts(unittest.TestCase):
 
     def test_it_conflict(self):
         from pyramid.tests.test_config import dummyfactory as f
-        self.assertRaises(
-            ConfigurationConflictError,
-            self._callFUT, [
-                (None, f),
-                (1, f, (2,), {}, ('x',), 'eek'),
-                (1, f, (3,), {}, ('y',), 'ack'),
-                (4, f, (4,), {}, ('y',)),
-                (3, f, (3,), {}, ('y',)),
-                (None, f, (5,), {}, ('y',)),
-                ]
-            )
+        result = self._callFUT([
+            (None, f),
+            (1, f, (2,), {}, ('x',), 'eek'),     # will conflict
+            (1, f, (3,), {}, ('y',), 'ack'),     # will conflict
+            (4, f, (4,), {}, ('y',)),
+            (3, f, (3,), {}, ('y',)),
+            (None, f, (5,), {}, ('y',)),
+            ])
+        self.assertRaises(ConfigurationConflictError, list, result)
 
     def test_it_with_actions_grouped_by_order(self):
         from pyramid.tests.test_config import dummyfactory as f
         from pyramid.config import expand_action
         result = self._callFUT([
-            expand_action(None, f),
-            expand_action(1, f, (1,), {}, (), 'third', 10),
+            expand_action(None, f),                                 # X
+            expand_action(1, f, (1,), {}, (), 'third', 10),         # X
             expand_action(1, f, (2,), {}, ('x',), 'fourth', 10),
             expand_action(1, f, (3,), {}, ('y',), 'fifth', 10),
-            expand_action(2, f, (1,), {}, (), 'sixth', 10),
-            expand_action(3, f, (1,), {}, (), 'seventh', 10),
-            expand_action(5, f, (4,), {}, ('y',), 'eighth', 99999),
-            expand_action(4, f, (3,), {}, (), 'first', 5),
+            expand_action(2, f, (1,), {}, (), 'sixth', 10),         # X
+            expand_action(3, f, (1,), {}, (), 'seventh', 10),       # X
+            expand_action(5, f, (4,), {}, ('y',), 'eighth', 99999), # X
+            expand_action(4, f, (3,), {}, (), 'first', 5),          # X
             expand_action(4, f, (5,), {}, ('y',), 'second', 5),
             ])
+        result = list(result)
         self.assertEqual(len(result), 6)
         # resolved actions should be grouped by (order, i)
         self.assertEqual(
@@ -1940,10 +1948,11 @@ class DummyEvent:
     pass
 
 class DummyRegistry(object):
-    def __init__(self, adaptation=None):
+    def __init__(self, adaptation=None, util=None):
         self.utilities = []
         self.adapters = []
         self.adaptation = adaptation
+        self.util = util
     def subscribers(self, events, name):
         self.events = events
         return events
@@ -1953,6 +1962,8 @@ class DummyRegistry(object):
         self.adapters.append((arg, kw))
     def queryAdapter(self, *arg, **kw):
         return self.adaptation
+    def queryUtility(self, *arg, **kw):
+        return self.util
 
 from pyramid.interfaces import IResponse
 @implementer(IResponse)

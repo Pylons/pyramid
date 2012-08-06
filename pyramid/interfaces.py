@@ -1111,6 +1111,9 @@ class IJSONAdapter(Interface):
     into a JSON-serializable primitive.
     """
 
+class IPredicateList(Interface):
+    """ Interface representing a predicate list """
+
 # configuration phases: a lower phase number means the actions associated
 # with this phase will be executed earlier than those with later phase
 # numbers.  The default phase number is 0, FTR.

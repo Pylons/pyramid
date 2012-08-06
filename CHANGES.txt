@@ -26,6 +26,21 @@ Bug Fixes
 Features
 --------
 
+- Third-party custom view and route predicates can now be added for use by
+  view authors via ``pyramid.config.Configurator.add_view_predicate`` and
+  ``pyramid.config.Configurator.add_route_predicate``.  So, for example,
+  doing this::
+
+     config.add_view_predicate('abc', my.package.ABCPredicate)
+
+  Might allow a view author to do this in an application that configured that
+  predicate::
+
+     @view_config(abc=1)
+
+  See "Adding A Third Party View or Route Predicate" in the Hooks chapter for
+  more information.
+
 - Custom objects can be made easily JSON-serializable in Pyramid by defining
   a ``__json__`` method on the object's class. This method should return
   values natively serializable by ``json.dumps`` (such as ints, lists,

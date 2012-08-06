@@ -994,3 +994,9 @@ Glossary
       Aka ``gunicorn``, a fast :term:`WSGI` server that runs on UNIX under
       Python 2.5+ (although at the time of this writing does not support
       Python 3).  See http://gunicorn.org/ for detailed information.
+
+   predicate factory
+      A callable which is used by a third party during the registration of a
+      route or view predicates to extend the view and route configuration
+      system.  See :ref:`registering_thirdparty_predicates` for more
+      information.
