@@ -280,3 +280,4 @@ def shortrepr(object, closer):
     if len(r) > 100:
         r = r[:100] + ' ... %s' % closer
     return r
+

@@ -176,6 +176,14 @@ class Test_makedirs(unittest.TestCase):
         self._callFUT(target, 2, None)
         shutil.rmtree(tmpdir)
 
+    def test_makedirs_no_parent_dir(self):
+        import shutil
+        import tempfile
+        tmpdir = tempfile.mkdtemp()
+        target = os.path.join(tmpdir, 'nonexistent_subdir', 'non2')
+        self._callFUT(target, 2, None)
+        shutil.rmtree(tmpdir)
+
 class Test_support_functions(unittest.TestCase):
 
     def _call_html_quote(self, *arg, **kw):

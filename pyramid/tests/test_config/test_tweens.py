@@ -179,28 +179,12 @@ class TestTweens(unittest.TestCase):
                                            ('name2', 'factory2')])
 
     def test_add_implicit(self):
-        from pyramid.tweens import INGRESS
         tweens = self._makeOne()
         tweens.add_implicit('name', 'factory')
-        self.assertEqual(tweens.names, ['name'])
-        self.assertEqual(tweens.factories,
-                         {'name':'factory'})
-        self.assertEqual(tweens.order, [(INGRESS, 'name')])
         tweens.add_implicit('name2', 'factory2')
-        self.assertEqual(tweens.names, ['name',  'name2'])
-        self.assertEqual(tweens.factories,
-                         {'name':'factory', 'name2':'factory2'})
-        self.assertEqual(tweens.order,
-                         [(INGRESS, 'name'), (INGRESS, 'name2')])
-        tweens.add_implicit('name3', 'factory3', over='name2')
-        self.assertEqual(tweens.names,
-                         ['name',  'name2', 'name3'])
-        self.assertEqual(tweens.factories,
-                         {'name':'factory', 'name2':'factory2',
-                          'name3':'factory3'})
-        self.assertEqual(tweens.order,
-                         [(INGRESS, 'name'), (INGRESS, 'name2'),
-                          ('name3', 'name2')])
+        self.assertEqual(tweens.sorter.sorted(),
+                         [('name2',  'factory2'),
+                          ('name', 'factory')])
 
     def test___call___explicit(self):
         tweens = self._makeOne()
@@ -212,18 +196,13 @@ class TestTweens(unittest.TestCase):
         self.assertEqual(tweens(None, None), '123')
 
     def test___call___implicit(self):
-        from pyramid.tweens import INGRESS
         tweens = self._makeOne()
         def factory1(handler, registry):
             return handler
         def factory2(handler, registry):
             return '123'
-        tweens.names = ['name', 'name2']
-        tweens.alias_to_name = {'name':'name', 'name2':'name2'}
-        tweens.name_to_alias = {'name':'name', 'name2':'name2'}
-        tweens.req_under = set(['name', 'name2'])
-        tweens.order = [(INGRESS, 'name'), (INGRESS, 'name2')]
-        tweens.factories = {'name':factory1, 'name2':factory2}
+        tweens.add_implicit('name2', factory2)
+        tweens.add_implicit('name1', factory1)
         self.assertEqual(tweens(None, None), '123')
 
     def test_implicit_ordering_1(self):
@@ -413,7 +392,7 @@ class TestTweens(unittest.TestCase):
         self.assertRaises(ConfigurationError, tweens.implicit)
 
     def test_implicit_ordering_conflict_direct(self):
-        from pyramid.config.tweens import CyclicDependencyError
+        from pyramid.config.util import CyclicDependencyError
         tweens = self._makeOne()
         add = tweens.add_implicit
         add('browserid', 'browserid_factory')
@@ -421,22 +400,11 @@ class TestTweens(unittest.TestCase):
         self.assertRaises(CyclicDependencyError, tweens.implicit)
 
     def test_implicit_ordering_conflict_indirect(self):
-        from pyramid.config.tweens import CyclicDependencyError
+        from pyramid.config.util import CyclicDependencyError
         tweens = self._makeOne()
         add = tweens.add_implicit
         add('browserid', 'browserid_factory')
         add('auth', 'auth_factory', over='browserid')
         add('dbt', 'dbt_factory', under='browserid', over='auth')
         self.assertRaises(CyclicDependencyError, tweens.implicit)
-
-class TestCyclicDependencyError(unittest.TestCase):
-    def _makeOne(self, cycles):
-        from pyramid.config.tweens import CyclicDependencyError
-        return CyclicDependencyError(cycles)
-
-    def test___str__(self):
-        exc = self._makeOne({'a':['c', 'd'], 'c':['a']})
-        result = str(exc)
-        self.assertTrue("'a' sorts over ['c', 'd']" in result)
-        self.assertTrue("'c' sorts over ['a']" in result)
 
