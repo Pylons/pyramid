@@ -41,6 +41,12 @@ Features
   See "Adding A Third Party View or Route Predicate" in the Hooks chapter for
   more information.
 
+  Note that changes made to support the above feature now means that only
+  actions registered using the same "order" can conflict with one another.
+  It used to be the case that actions registered at different orders could
+  potentially conflict, but to my knowledge nothing ever depended on this
+  behavior (it was a bit silly).
+
 - Custom objects can be made easily JSON-serializable in Pyramid by defining
   a ``__json__`` method on the object's class. This method should return
   values natively serializable by ``json.dumps`` (such as ints, lists,
