@@ -259,17 +259,15 @@ class TestPkgResourcesAssetDescriptor(unittest.TestCase):
     def _makeOne(self, pkg='pyramid.tests', path='test_asset.py'):
         return self._getTargetClass()(pkg, path)
 
-    def test_class_implements(self):
+    def test_class_conforms_to_IAssetDescriptor(self):
         from pyramid.interfaces import IAssetDescriptor
         from zope.interface.verify import verifyClass
-        klass = self._getTargetClass()
-        verifyClass(IAssetDescriptor, klass)
+        verifyClass(IAssetDescriptor, self._getTargetClass())
         
-    def test_instance_implements(self):
+    def test_instance_conforms_to_IAssetDescriptor(self):
         from pyramid.interfaces import IAssetDescriptor
         from zope.interface.verify import verifyObject
-        inst = self._makeOne()
-        verifyObject(IAssetDescriptor, inst)
+        verifyObject(IAssetDescriptor, self._makeOne())
 
     def test_absspec(self):
         inst = self._makeOne()
@@ -316,17 +314,15 @@ class TestFSAssetDescriptor(unittest.TestCase):
     def _makeOne(self, path=os.path.join(here, 'test_asset.py')):
         return self._getTargetClass()(path)
 
-    def test_class_implements(self):
+    def test_class_conforms_to_IAssetDescriptor(self):
         from pyramid.interfaces import IAssetDescriptor
         from zope.interface.verify import verifyClass
-        klass = self._getTargetClass()
-        verifyClass(IAssetDescriptor, klass)
+        verifyClass(IAssetDescriptor, self._getTargetClass())
         
-    def test_instance_implements(self):
+    def test_instance_conforms_to_IAssetDescriptor(self):
         from pyramid.interfaces import IAssetDescriptor
         from zope.interface.verify import verifyObject
-        inst = self._makeOne()
-        verifyObject(IAssetDescriptor, inst)
+        verifyObject(IAssetDescriptor, self._makeOne())
 
     def test_absspec(self):
         inst = self._makeOne()
