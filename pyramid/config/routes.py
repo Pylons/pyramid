@@ -10,6 +10,7 @@ from pyramid.interfaces import (
     )
 
 from pyramid.exceptions import ConfigurationError
+from pyramid.registry import predvalseq
 from pyramid.request import route_request_iface
 from pyramid.urldispatch import RoutesMapper
 
@@ -17,7 +18,6 @@ from pyramid.config.util import (
     action_method,
     as_sorted_tuple,
     PredicateList,
-    predvalseq,
     )
 
 from pyramid.config import predicates

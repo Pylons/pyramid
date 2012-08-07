@@ -45,6 +45,8 @@ from pyramid.registry import (
     Introspectable,
     Introspector,
     Registry,
+    Deferred,
+    undefer,
     )
 
 from pyramid.router import Router
@@ -72,7 +74,6 @@ from pyramid.config.tweens import TweensConfiguratorMixin
 from pyramid.config.util import (
     action_method,
     ActionInfo,
-    Deferred,
     )
 from pyramid.config.views import ViewsConfiguratorMixin
 from pyramid.config.zca import ZCAConfiguratorMixin
@@ -1066,11 +1067,6 @@ class ActionState(object):
         finally:
             if clear:
                 del self.actions[:]
-
-def undefer(v):
-    if isinstance(v, Deferred):
-        v = v.resolve()
-    return v
 
 # this function is licensed under the ZPL (stolen from Zope)
 def resolveConflicts(actions):

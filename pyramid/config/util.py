@@ -11,6 +11,8 @@ from pyramid.compat import (
 
 from pyramid.exceptions import ConfigurationError
 
+from pyramid.registry import predvalseq
+
 from hashlib import md5
 
 MAX_ORDER = 1 << 30
@@ -293,14 +295,4 @@ class PredicateList(object):
             score = score | bit
         order = (MAX_ORDER - score) / (len(preds) + 1)
         return order, preds, phash.hexdigest()
-
-class predvalseq(tuple):
-    pass
-
-class Deferred(object):
-    def __init__(self, func):
-        self.func = func
-
-    def resolve(self):
-        return self.func()
 

@@ -33,6 +33,10 @@ class TestRequestMethodPredicate(unittest.TestCase):
     def _makeOne(self, val):
         from pyramid.config.predicates import RequestMethodPredicate
         return RequestMethodPredicate(val, None)
+
+    def test_ctor_get_but_no_head(self):
+        inst = self._makeOne('GET')
+        self.assertEqual(inst.val, ('GET', 'HEAD'))
     
     def test___call___true_single(self):
         inst = self._makeOne('GET')

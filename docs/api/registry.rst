@@ -38,3 +38,17 @@
 
    This class is new as of :app:`Pyramid` 1.3.
 
+.. autoclass:: Deferred
+
+   This class is new as of :app:`Pyramid` 1.4.
+
+.. autofunction:: undefer
+
+   This function is new as of :app:`Pyramid` 1.4.
+
+.. autoclass:: predvalseq
+
+   This class is new as of :app:`Pyramid` 1.4.
+
+
+

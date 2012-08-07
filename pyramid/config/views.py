@@ -55,6 +55,11 @@ from pyramid.httpexceptions import (
     HTTPNotFound,
     )
 
+from pyramid.registry import (
+    predvalseq,
+    Deferred,
+    )
+
 from pyramid.security import NO_PERMISSION_REQUIRED
 from pyramid.static import static_view
 from pyramid.threadlocal import get_current_registry
@@ -64,18 +69,17 @@ from pyramid.view import (
     AppendSlashNotFoundViewFactory,
     )
 
-from pyramid.util import object_description
+from pyramid.util import (
+    object_description,
+    )
 
 from pyramid.config import predicates
 
 from pyramid.config.util import (
-    Deferred,
     DEFAULT_PHASH,
     MAX_ORDER,
     action_method,
-    as_sorted_tuple,
     PredicateList,
-    predvalseq,
     )
 
 urljoin = urlparse.urljoin
@@ -1028,12 +1032,6 @@ class ViewsConfiguratorMixin(object):
             if not IInterface.providedBy(request_type):
                 raise ConfigurationError(
                     'request_type must be an interface, not %s' % request_type)
-
-        if request_method is not None:
-            request_method = as_sorted_tuple(request_method)
-            if 'GET' in request_method and 'HEAD' not in request_method:
-                # GET implies HEAD too
-                request_method = as_sorted_tuple(request_method + ('HEAD',))
 
         if context is None:
             context = for_

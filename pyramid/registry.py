@@ -191,14 +191,20 @@ class Introspectable(dict):
     def unrelate(self, category_name, discriminator):
         self._relations.append((False, category_name, discriminator))
 
+    def _assert_resolved(self):
+        assert undefer(self.discriminator) is self.discriminator
+
     @property
     def discriminator_hash(self):
+        self._assert_resolved()
         return hash(self.discriminator)
 
     def __hash__(self):
+        self._assert_resolved()
         return hash((self.category_name,) + (self.discriminator,))
 
     def __repr__(self):
+        self._assert_resolved()
         return '<%s category %r, discriminator %r>' % (self.__class__.__name__,
                                                        self.category_name,
                                                        self.discriminator)
@@ -209,9 +215,11 @@ class Introspectable(dict):
     __bool__ = __nonzero__ # py3
 
     def register(self, introspector, action_info):
+        self.discriminator = undefer(self.discriminator)
         self.action_info = action_info
         introspector.add(self)
         for relate, category_name, discriminator in self._relations:
+            discriminator = undefer(discriminator)
             if relate:
                 method = introspector.relate
             else:
@@ -220,5 +228,30 @@ class Introspectable(dict):
                 (self.category_name, self.discriminator),
                 (category_name, discriminator)
                 )
+
+class Deferred(object):
+    """ Can be used by a third-party configuration extender to wrap a
+    :term:`discriminator` during configuration if an immediately hashable
+    discriminator cannot be computed because it relies on unresolved values.
+    The function should accept no arguments and should return a hashable
+    discriminator."""
+    def __init__(self, func):
+        self.func = func
+
+    def resolve(self):
+        return self.func()
+
+def undefer(v):
+    """ Function which accepts an object and returns it unless it is a
+    :class:`pyramid.registry.Deferred` instance.  If it is an instance of
+    that class, its ``resolve`` method is called, and the result of the
+    method is returned."""
+    if isinstance(v, Deferred):
+        v = v.resolve()
+    return v
+
+class predvalseq(tuple):
+    """ A subtype of tuple used to represent a sequence of predicate values """
+    pass
 
 global_registry = Registry('global')
