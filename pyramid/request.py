@@ -376,7 +376,7 @@ class Request(BaseRequest, DeprecatedRequestMethodsMixin, URLMethodsMixin,
             return False
         return adapted is ob
 
-    @property
+    @reify
     def json_body(self):
         return json.loads(text_(self.body, self.charset))
 
