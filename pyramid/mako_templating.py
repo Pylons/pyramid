@@ -69,7 +69,7 @@ class PkgResourceTemplateLookup(TemplateLookup):
                 pname, path = resolve_asset_spec(uri)
                 srcfile = abspath_from_asset_spec(path, pname)
                 if os.path.isfile(srcfile):
-                    return self._load(srcfile, adjusted)
+                    return self._load(srcfile, uri)
                 raise exceptions.TopLevelLookupException(
                     "Can not locate template for uri %r" % uri)
         return TemplateLookup.get_template(self, uri)
