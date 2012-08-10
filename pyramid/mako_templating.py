@@ -1,4 +1,5 @@
 import os
+import posixpath
 import sys
 import threading
 
@@ -36,6 +37,16 @@ class PkgResourceTemplateLookup(TemplateLookup):
         isabs = os.path.isabs(uri)
         if (not isabs) and (':' in uri):
             return uri
+        if not(isabs) and ('$' in uri):
+            return uri.replace('$', ':')
+        if relativeto is not None:
+            relativeto = relativeto.replace('$', ':')
+            if not(':' in uri) and (':' in relativeto):
+                pkg, relto = relativeto.split(':')
+                _uri = posixpath.join(posixpath.dirname(relto), uri)
+                return '{0}:{1}'.format(pkg, _uri)
+            if not(':' in uri) and not(':' in relativeto):
+                return posixpath.join(posixpath.dirname(relativeto), uri)
         return TemplateLookup.adjust_uri(self, uri, relativeto)
 
     def get_template(self, uri):
@@ -47,11 +58,6 @@ class PkgResourceTemplateLookup(TemplateLookup):
         specification syntax.
 
         """
-        if '$' in uri:
-            # Checks if the uri is already adjusted and brings it back to
-            # an asset spec. Normally occurs with inherited templates or
-            # included components.
-            uri = uri.replace('$', ':')
         isabs = os.path.isabs(uri)
         if (not isabs) and (':' in uri):
             # Windows can't cope with colons in filenames, so we replace the
