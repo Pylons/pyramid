@@ -176,3 +176,5 @@ Contributors
 - Marc Abramowitz, 2012/06/13
 
 - Jeff Cook, 2012/06/16
+
+- Roman Kozlovskyi, 2012/08/11
