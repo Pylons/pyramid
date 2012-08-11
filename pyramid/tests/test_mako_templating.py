@@ -479,6 +479,26 @@ class TestPkgResourceTemplateLookup(unittest.TestCase):
         result = inst.adjust_uri('a:b', None)
         self.assertEqual(result, 'a:b')
 
+    def test_adjust_uri_asset_spec_with_modified_asset_spec(self):
+        inst = self._makeOne()
+        result = inst.adjust_uri('a$b', None)
+        self.assertEqual(result, 'a:b')
+
+    def test_adjust_uri_not_asset_spec_with_relativeto_asset_spec(self):
+        inst = self._makeOne()
+        result = inst.adjust_uri('c', 'a:b')
+        self.assertEqual(result, 'a:c')
+
+    def test_adjust_uri_not_asset_spec_with_relativeto_modified_asset_spec(self):
+        inst = self._makeOne()
+        result = inst.adjust_uri('c', 'a$b')
+        self.assertEqual(result, 'a:c')
+
+    def test_adjust_uri_not_asset_spec_with_relativeto_not_asset_spec(self):
+        inst = self._makeOne()
+        result = inst.adjust_uri('b', '../a')
+        self.assertEqual(result, '../b')
+
     def test_get_template_not_asset_spec(self):
         fixturedir = self.get_fixturedir()
         inst = self._makeOne(directories=[fixturedir])
@@ -498,16 +518,6 @@ class TestPkgResourceTemplateLookup(unittest.TestCase):
             self.assertFalse(result is None)
         finally:
             shutil.rmtree(tmpdir, ignore_errors=True)
-
-    def test_get_template_asset_spec_with_uri_adjusted(self):
-        inst = self._makeOne(filesystem_checks=True)
-        result = inst.get_template('pyramid.tests$fixtures/helloworld.mak')
-        self.assertFalse(result is None)
-
-    def test_get_template_asset_spec_with_uri_not_adjusted(self):
-        inst = self._makeOne(filesystem_checks=True)
-        result = inst.get_template('pyramid.tests:fixtures/helloworld.mak')
-        self.assertFalse(result is None)
 
     def test_get_template_asset_spec_missing(self):
         from mako.exceptions import TopLevelLookupException
