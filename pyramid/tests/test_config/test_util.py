@@ -217,6 +217,12 @@ class Test__make_predicates(unittest.TestCase):
         self.assertEqual(result, True)
         self.assertEqual(info, {'traverse':'abc'})
 
+    def test_traverse_has_text(self):
+        order, predicates, phash = self._callFUT(traverse='/1/:a/:b')
+        self.assertEqual(len(predicates), 1)
+        pred = predicates[0]
+        self.assertEqual(pred.__text__, 'traverse predicate /1/:a/:b')
+
     def test_traverse_matches(self):
         order, predicates, phash = self._callFUT(traverse='/1/:a/:b')
         self.assertEqual(len(predicates), 1)

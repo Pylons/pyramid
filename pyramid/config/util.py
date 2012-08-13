@@ -64,6 +64,16 @@ def action_method(wrapped):
     wrapper.__docobj__ = wrapped # for sphinx
     return wrapper
 
+def _set_predicate_text(predicate, text):
+    try:
+        predicate.__text__ = text
+    except AttributeError:
+        # if this happens the predicate is probably a classmethod
+        if hasattr(predicate, '__func__'):
+            predicate.__func__.__text__ = text
+        else: # pragma: no cover ; 2.5 doesn't have __func__
+            predicate.im_func.__text__ = text
+
 def make_predicates(xhr=None, request_method=None, path_info=None,
                     request_param=None, match_param=None, header=None,
                     accept=None, containment=None, request_type=None,
@@ -240,15 +250,7 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
     if custom:
         for num, predicate in enumerate(custom):
             if getattr(predicate, '__text__', None) is None:
-                text = '<unknown custom predicate>'
-                try:
-                    predicate.__text__ = text
-                except AttributeError:
-                    # if this happens the predicate is probably a classmethod
-                    if hasattr(predicate, '__func__'):
-                        predicate.__func__.__text__ = text
-                    else: # pragma: no cover ; 2.5 doesn't have __func__
-                        predicate.im_func.__text__ = text
+                _set_predicate_text(predicate, '<unknown custom predicate>')
             predicates.append(predicate)
             # using hash() here rather than id() is intentional: we
             # want to allow custom predicates that are part of
@@ -273,6 +275,8 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
             tvalue = tgenerate(m) # tvalue will be urlquoted string
             m['traverse'] = traversal_path(tvalue) # will be seq of unicode
             return True
+        _set_predicate_text(
+            traverse_predicate, 'traverse predicate %s' % (traverse))
         # This isn't actually a predicate, it's just a infodict
         # modifier that injects ``traverse`` into the matchdict.  As a
         # result, the ``traverse_predicate`` function above always
