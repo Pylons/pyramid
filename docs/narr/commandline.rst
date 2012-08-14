@@ -349,7 +349,7 @@ setting) orderings using the ``ptweens`` command.  Tween factories
 will show up represented by their standard Python dotted name in the
 ``ptweens`` output.
 
-For example, here's the ``pwteens`` command run against a system
+For example, here's the ``ptweens`` command run against a system
 configured without any explicit tweens:
 
 .. code-block:: text
@@ -367,7 +367,7 @@ configured without any explicit tweens:
    1           pyramid.tweens.excview_tween_factory                excview
    -           -                                                   MAIN
 
-Here's the ``pwteens`` command run against a system configured *with*
+Here's the ``ptweens`` command run against a system configured *with*
 explicit tweens defined in its ``development.ini`` file:
 
 .. code-block:: text
