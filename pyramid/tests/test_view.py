@@ -87,7 +87,7 @@ class Test_notfound_view_config(BaseTest, unittest.TestCase):
         config = call_venusian(venusian)
         settings = config.settings
         self.assertEqual(len(settings), 1)
-        self.assertEqual(len(settings[0]), 5)
+        self.assertEqual(len(settings[0]), 4)
         self.assertEqual(settings[0]['venusian'], venusian)
         self.assertEqual(settings[0]['view'], None) # comes from call_venusian
         self.assertEqual(settings[0]['attr'], 'view')
@@ -368,6 +368,10 @@ class TestViewConfigDecorator(unittest.TestCase):
         self.assertEqual(decorator.mapper, 'mapper')
         self.assertEqual(decorator.decorator, 'decorator')
         self.assertEqual(decorator.match_param, 'match_param')
+
+    def test_create_with_other_predicates(self):
+        decorator = self._makeOne(foo=1)
+        self.assertEqual(decorator.foo, 1)
         
     def test_call_function(self):
         decorator = self._makeOne()

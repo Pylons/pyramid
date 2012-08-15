@@ -20,7 +20,7 @@ from pyramid.config.util import (
     PredicateList,
     )
 
-from pyramid.config import predicates
+import pyramid.config.predicates
 
 class RoutesConfiguratorMixin(object):
     @action_method
@@ -49,7 +49,7 @@ class RoutesConfiguratorMixin(object):
                   path=None,
                   pregenerator=None,
                   static=False,
-                  **other_predicates):
+                  **predicates):
         """ Add a :term:`route configuration` to the current
         configuration state, as well as possibly a :term:`view
         configuration` to be used to specify a :term:`view callable`
@@ -259,7 +259,7 @@ class RoutesConfiguratorMixin(object):
           :ref:`custom_route_predicates` for more information about
           ``info``.
 
-        other_predicates
+        predicates
 
           Pass a key/value pair here to use a third-party predicate
           registered via
@@ -420,7 +420,7 @@ class RoutesConfiguratorMixin(object):
                     request_iface, IRouteRequest, name=name)
 
         def register_connect():
-            pvals = other_predicates
+            pvals = predicates.copy()
             pvals.update(
                 dict(
                     xhr=xhr,
@@ -513,15 +513,16 @@ class RoutesConfiguratorMixin(object):
                     order=PHASE1_CONFIG) 
 
     def add_default_route_predicates(self):
+        p = pyramid.config.predicates
         for (name, factory) in (
-            ('xhr', predicates.XHRPredicate),
-            ('request_method', predicates.RequestMethodPredicate),
-            ('path_info', predicates.PathInfoPredicate),
-            ('request_param', predicates.RequestParamPredicate),
-            ('header', predicates.HeaderPredicate),
-            ('accept', predicates.AcceptPredicate),
-            ('custom', predicates.CustomPredicate),
-            ('traverse', predicates.TraversePredicate),
+            ('xhr', p.XHRPredicate),
+            ('request_method', p.RequestMethodPredicate),
+            ('path_info', p.PathInfoPredicate),
+            ('request_param', p.RequestParamPredicate),
+            ('header', p.HeaderPredicate),
+            ('accept', p.AcceptPredicate),
+            ('custom', p.CustomPredicate),
+            ('traverse', p.TraversePredicate),
             ):
             self.add_route_predicate(name, factory)
     

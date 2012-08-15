@@ -1701,6 +1701,38 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         result = view(None, request)
         self.assertEqual(result, 'OK')
 
+    def test_add_forbidden_view_allows_other_predicates(self):
+        from pyramid.renderers import null_renderer
+        config = self._makeOne(autocommit=True)
+        # doesnt blow up
+        config.add_view_predicate('dummy', DummyPredicate)
+        config.add_forbidden_view(renderer=null_renderer, dummy='abc')
+
+    def test_add_forbidden_view_disallows_name(self):
+        config = self._makeOne(autocommit=True)
+        self.assertRaises(ConfigurationError,
+                          config.add_forbidden_view, name='foo')
+
+    def test_add_forbidden_view_disallows_permission(self):
+        config = self._makeOne(autocommit=True)
+        self.assertRaises(ConfigurationError,
+                          config.add_forbidden_view, permission='foo')
+
+    def test_add_forbidden_view_disallows_context(self):
+        config = self._makeOne(autocommit=True)
+        self.assertRaises(ConfigurationError,
+                          config.add_forbidden_view, context='foo')
+
+    def test_add_forbidden_view_disallows_for_(self):
+        config = self._makeOne(autocommit=True)
+        self.assertRaises(ConfigurationError,
+                          config.add_forbidden_view, for_='foo')
+
+    def test_add_forbidden_view_disallows_http_cache(self):
+        config = self._makeOne(autocommit=True)
+        self.assertRaises(ConfigurationError,
+                          config.add_forbidden_view, http_cache='foo')
+
     def test_add_notfound_view(self):
         from pyramid.renderers import null_renderer
         from zope.interface import implementedBy
@@ -1716,6 +1748,38 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         result = view(None, request)
         self.assertEqual(result, (None, request))
 
+    def test_add_notfound_view_allows_other_predicates(self):
+        from pyramid.renderers import null_renderer
+        config = self._makeOne(autocommit=True)
+        # doesnt blow up
+        config.add_view_predicate('dummy', DummyPredicate)
+        config.add_notfound_view(renderer=null_renderer, dummy='abc')
+
+    def test_add_notfound_view_disallows_name(self):
+        config = self._makeOne(autocommit=True)
+        self.assertRaises(ConfigurationError,
+                          config.add_notfound_view, name='foo')
+
+    def test_add_notfound_view_disallows_permission(self):
+        config = self._makeOne(autocommit=True)
+        self.assertRaises(ConfigurationError,
+                          config.add_notfound_view, permission='foo')
+
+    def test_add_notfound_view_disallows_context(self):
+        config = self._makeOne(autocommit=True)
+        self.assertRaises(ConfigurationError,
+                          config.add_notfound_view, context='foo')
+
+    def test_add_notfound_view_disallows_for_(self):
+        config = self._makeOne(autocommit=True)
+        self.assertRaises(ConfigurationError,
+                          config.add_notfound_view, for_='foo')
+
+    def test_add_notfound_view_disallows_http_cache(self):
+        config = self._makeOne(autocommit=True)
+        self.assertRaises(ConfigurationError,
+                          config.add_notfound_view, http_cache='foo')
+        
     def test_add_notfound_view_append_slash(self):
         from pyramid.response import Response
         from pyramid.renderers import null_renderer
@@ -3973,3 +4037,13 @@ class DummyViewDefaultsClass(object):
         pass
     def __call__(self):
         return 'OK'
+
+class DummyPredicate(object):
+    def __init__(self, val, config):
+        self.val = val
+
+    def text(self):
+        return 'dummy'
+
+    phash = text
+
