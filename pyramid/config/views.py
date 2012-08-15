@@ -73,7 +73,7 @@ from pyramid.util import (
     object_description,
     )
 
-from pyramid.config import predicates
+import pyramid.config.predicates
 
 from pyramid.config.util import (
     DEFAULT_PHASH,
@@ -664,7 +664,7 @@ class ViewsConfiguratorMixin(object):
         mapper=None,
         http_cache=None,
         match_param=None,
-        **other_predicates):
+        **predicates):
         """ Add a :term:`view configuration` to the current
         configuration state.  Arguments to ``add_view`` are broken
         down below into *predicate* arguments and *non-predicate*
@@ -1002,7 +1002,7 @@ class ViewsConfiguratorMixin(object):
           ``True`` or ``False`` after doing arbitrary evaluation of
           the context and/or the request.  
 
-        other_predicates
+        predicates
 
           Pass a key/value pair here to use a third-party predicate
           registered via
@@ -1048,7 +1048,7 @@ class ViewsConfiguratorMixin(object):
                 registry = self.registry)
 
         introspectables = []
-        pvals = other_predicates
+        pvals = predicates.copy()
         pvals.update(
             dict(
                 xhr=xhr,
@@ -1102,7 +1102,7 @@ class ViewsConfiguratorMixin(object):
                  decorator=decorator,
                  )
             )
-        view_intr.update(**other_predicates)
+        view_intr.update(**predicates)
         introspectables.append(view_intr)
         predlist = self.view_predlist
 
@@ -1313,7 +1313,7 @@ class ViewsConfiguratorMixin(object):
         """ Adds a view predicate factory.  The associated view predicate can
         later be named as a keyword argument to
         :meth:`pyramid.config.Configurator.add_view` in the
-        ``other_predicates`` anonyous keyword argument dictionary.
+        ``predicates`` anonyous keyword argument dictionary.
 
         ``name`` should be the name of the predicate.  It must be a valid
         Python identifier (it will be used as a keyword argument to
@@ -1345,17 +1345,18 @@ class ViewsConfiguratorMixin(object):
                     order=PHASE1_CONFIG) # must be registered before views added
 
     def add_default_view_predicates(self):
+        p = pyramid.config.predicates
         for (name, factory) in (
-            ('xhr', predicates.XHRPredicate),
-            ('request_method', predicates.RequestMethodPredicate),
-            ('path_info', predicates.PathInfoPredicate),
-            ('request_param', predicates.RequestParamPredicate),
-            ('header', predicates.HeaderPredicate),
-            ('accept', predicates.AcceptPredicate),
-            ('containment', predicates.ContainmentPredicate),
-            ('request_type', predicates.RequestTypePredicate),
-            ('match_param', predicates.MatchParamPredicate),
-            ('custom', predicates.CustomPredicate),
+            ('xhr', p.XHRPredicate),
+            ('request_method', p.RequestMethodPredicate),
+            ('path_info', p.PathInfoPredicate),
+            ('request_param', p.RequestParamPredicate),
+            ('header', p.HeaderPredicate),
+            ('accept', p.AcceptPredicate),
+            ('containment', p.ContainmentPredicate),
+            ('request_type', p.RequestTypePredicate),
+            ('match_param', p.MatchParamPredicate),
+            ('custom', p.CustomPredicate),
             ):
             self.add_view_predicate(name, factory)
 
@@ -1476,11 +1477,26 @@ class ViewsConfiguratorMixin(object):
 
     @action_method
     def add_forbidden_view(
-            self, view=None, attr=None, renderer=None,  wrapper=None,
-            route_name=None, request_type=None, request_method=None, 
-            request_param=None, containment=None, xhr=None, accept=None,
-            header=None, path_info=None,  custom_predicates=(), decorator=None,
-            mapper=None, match_param=None):
+        self,
+        view=None,
+        attr=None,
+        renderer=None,
+        wrapper=None,
+        route_name=None,
+        request_type=None,
+        request_method=None, 
+        request_param=None,
+        containment=None,
+        xhr=None,
+        accept=None,
+        header=None,
+        path_info=None,
+        custom_predicates=(),
+        decorator=None,
+        mapper=None,
+        match_param=None,
+        **predicates
+        ):
         """ Add a forbidden view to the current configuration state.  The
         view will be called when Pyramid or application code raises a
         :exc:`pyramid.httpexceptions.HTTPForbidden` exception and the set of
@@ -1497,12 +1513,23 @@ class ViewsConfiguratorMixin(object):
         All arguments have the same meaning as
         :meth:`pyramid.config.Configurator.add_view` and each predicate
         argument restricts the set of circumstances under which this notfound
-        view will be invoked.
+        view will be invoked.  Unlike
+        :meth:`pyramid.config.Configurator.add_view`, this method will raise
+        an exception if passed ``name``, ``permission``, ``context``,
+        ``for_``, or ``http_cache`` keyword arguments.  These argument values
+        make no sense in the context of a forbidden view.
 
         .. note::
 
            This method is new as of Pyramid 1.3.
         """
+        for arg in ('name', 'permission', 'context', 'for_', 'http_cache'):
+            if arg in predicates:
+                raise ConfigurationError(
+                    '%s may not be used as an argument to add_forbidden_view'
+                    % arg
+                    )
+        
         settings = dict(
             view=view,
             context=HTTPForbidden,
@@ -1524,17 +1551,34 @@ class ViewsConfiguratorMixin(object):
             attr=attr,
             renderer=renderer,
             )
+        settings.update(predicates)
         return self.add_view(**settings)
 
     set_forbidden_view = add_forbidden_view # deprecated sorta-bw-compat alias
     
     @action_method
     def add_notfound_view(
-            self, view=None, attr=None, renderer=None,  wrapper=None,
-            route_name=None, request_type=None, request_method=None, 
-            request_param=None, containment=None, xhr=None, accept=None,
-            header=None, path_info=None,  custom_predicates=(), decorator=None,
-            mapper=None, match_param=None, append_slash=False):
+        self,
+        view=None,
+        attr=None,
+        renderer=None,
+        wrapper=None,
+        route_name=None,
+        request_type=None,
+        request_method=None, 
+        request_param=None,
+        containment=None,
+        xhr=None,
+        accept=None,
+        header=None,
+        path_info=None,
+        custom_predicates=(),
+        decorator=None,
+        mapper=None,
+        match_param=None,
+        append_slash=False,
+        **predicates
+        ):
         """ Add a default notfound view to the current configuration state.
         The view will be called when Pyramid or application code raises an
         :exc:`pyramid.httpexceptions.HTTPForbidden` exception (e.g. when a
@@ -1550,7 +1594,11 @@ class ViewsConfiguratorMixin(object):
         All arguments except ``append_slash`` have the same meaning as
         :meth:`pyramid.config.Configurator.add_view` and each predicate
         argument restricts the set of circumstances under which this notfound
-        view will be invoked.
+        view will be invoked.  Unlike
+        :meth:`pyramid.config.Configurator.add_view`, this method will raise
+        an exception if passed ``name``, ``permission``, ``context``,
+        ``for_``, or ``http_cache`` keyword arguments.  These argument values
+        make no sense in the context of a notfound view.
 
         If ``append_slash`` is ``True``, when this notfound view is invoked,
         and the current path info does not end in a slash, the notfound logic
@@ -1564,6 +1612,13 @@ class ViewsConfiguratorMixin(object):
 
            This method is new as of Pyramid 1.3.
         """
+        for arg in ('name', 'permission', 'context', 'for_', 'http_cache'):
+            if arg in predicates:
+                raise ConfigurationError(
+                    '%s may not be used as an argument to add_notfound_view'
+                    % arg
+                    )
+                    
         settings = dict(
             view=view,
             context=HTTPNotFound,
@@ -1583,6 +1638,7 @@ class ViewsConfiguratorMixin(object):
             route_name=route_name,
             permission=NO_PERMISSION_REQUIRED,
             )
+        settings.update(predicates)
         if append_slash:
             view = self._derive_view(view, attr=attr, renderer=renderer)
             view = AppendSlashNotFoundViewFactory(view)
