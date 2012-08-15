@@ -803,7 +803,7 @@ within a function called when another user uses the
 See also :ref:`add_directive`.
 
 Programmatic Introspection
---------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you're building a large system that other users may plug code into, it's
 useful to be able to get an enumeration of what code they plugged in *at
@@ -831,7 +831,7 @@ callable:
 See also :ref:`using_introspection`.
 
 Python 3 Compatibility
-----------------------
+~~~~~~~~~~~~~~~~~~~~~~
 
 Pyramid and most of its add-ons are Python 3 compatible.  If you develop a
 Pyramid application today, you won't need to worry that five years from now
