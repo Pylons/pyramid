@@ -1,5 +1,3 @@
-import types
-
 from zope.interface import implementer
 
 from pyramid.compat import iteritems_
@@ -206,6 +204,6 @@ def _set_request_extensions(event):
     request = event.request
     exts = request.registry.queryUtility(IRequestExtensions)
     for name, fn in iteritems_(exts.methods):
-        method = types.MethodType(fn, request, request.__class__)
+        method = fn.__get__(request, request.__class__)
         setattr(request, name, method)
     request._set_properties(exts.descriptors)
