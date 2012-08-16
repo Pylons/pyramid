@@ -2,10 +2,8 @@ import os
 import unittest
 import warnings
 
-from pyramid.testing import (
-    setUp,
-    tearDown,
-    )
+from pyramid import testing
+
 from pyramid.compat import (
     text_,
     native_,
@@ -14,10 +12,10 @@ from pyramid.compat import (
 
 class TestURLMethodsMixin(unittest.TestCase):
     def setUp(self):
-        self.config = setUp()
+        self.config = testing.setUp()
 
     def tearDown(self):
-        tearDown()
+        testing.tearDown()
         
     def _makeOne(self, environ=None):
         from pyramid.url import URLMethodsMixin
@@ -112,6 +110,14 @@ class TestURLMethodsMixin(unittest.TestCase):
                                                            ('b', uc)])
         self.assertEqual(result,
             'http://example.com:5432/context/a?a=hi+there&b=La+Pe%C3%B1a')
+
+    def test_resource_url_with_query_empty(self):
+        request = self._makeOne()
+        self._registerResourceURL(request.registry)
+        context = DummyContext()
+        result = request.resource_url(context, 'a', query=[])
+        self.assertEqual(result,
+            'http://example.com:5432/context/a')
 
     def test_resource_url_anchor_is_after_root_when_no_elements(self):
         request = self._makeOne()
@@ -333,6 +339,15 @@ class TestURLMethodsMixin(unittest.TestCase):
         result = request.route_url('flub', _query={'q':'1'})
         self.assertEqual(result,
                          'http://example.com:5432/1/2/3?q=1')
+
+    def test_route_url_with_empty_query(self):
+        from pyramid.interfaces import IRoutesMapper
+        request = self._makeOne()
+        mapper = DummyRoutesMapper(route=DummyRoute('/1/2/3'))
+        request.registry.registerUtility(mapper, IRoutesMapper)
+        result = request.route_url('flub', _query={})
+        self.assertEqual(result,
+                         'http://example.com:5432/1/2/3')
 
     def test_route_url_with_app_url(self):
         from pyramid.interfaces import IRoutesMapper

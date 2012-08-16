@@ -372,6 +372,7 @@ def registerRoute(pattern, name, factory=None):
     """
     reg = get_current_registry()
     config = Configurator(registry=reg)
+    config.setup_registry()
     result = config.add_route(name, pattern, factory=factory)
     config.commit()
     return result
@@ -824,6 +825,8 @@ def setUp(registry=None, request=None, hook_zca=True, autocommit=True,
             # ``render_template`` and friends went behind the back of
             # any existing renderer factory lookup system.
             config.add_renderer(name, renderer)
+        config.add_default_view_predicates()
+        config.add_default_route_predicates()
     config.commit()
     global have_zca
     try:

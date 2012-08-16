@@ -20,7 +20,7 @@ Models
 We'll be using a SQLite database to hold our wiki data, and we'll be using
 :term:`SQLAlchemy` to access the data in this database.
 
-Within the database, we define a single table named `tables`, whose elements
+Within the database, we define a single table named `pages`, whose elements
 will store the wiki pages.  There are two columns: `name` and `data`.
 
 URLs like ``/PageName`` will try to find an element in 
@@ -36,9 +36,16 @@ page.
 Views
 -----
 
-There will be four views to handle the normal operations of adding and
-editing wiki pages, and viewing pages and the wiki front page.  Two
-additional views will handle the login and logout tasks related to security.
+There will be three views to handle the normal operations of adding,
+editing and viewing wiki pages, plus one view for the wiki front page.
+Two templates will be used, one for viewing, and one for both for adding
+and editing wiki pages.
+
+The default templating systems in :app:`Pyramid` are
+:term:`Chameleon` and :term:`Mako`.  Chameleon is a variant of
+:term:`ZPT`, which is an XML-based templating language.  Mako is a
+non-XML-based templating language.  Because we had to pick one,
+we chose Chameleon for this tutorial.
 
 Security
 --------
@@ -67,6 +74,8 @@ use to do this are below.
 - Permission declarations are added to the views to assert the security
   policies as each request is handled.
 
+Two additional views and one template will handle the login and
+logout tasks.
 
 Summary
 -------

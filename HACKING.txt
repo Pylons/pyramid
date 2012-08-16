@@ -30,11 +30,13 @@ checkout.
   $ env/bin/easy_install setuptools-git
 
 - Install Pyramid from the checkout into the virtualenv using ``setup.py
-  develop`` (running ``setup.py develop`` *must* be done while the current
-  working directory is the ``pyramid`` checkout directory)::
+  dev``.  ``setup.py dev`` is an alias for "setup.py develop" which also
+  installs testing requirements such as nose and coverage.  Running
+  ``setup.py dev`` *must* be done while the current working directory is the
+  ``pyramid`` checkout directory::
 
   $ cd pyramid
-  $ ../env/bin/python setup.py develop
+  $ ../env/bin/python setup.py dev
 
 - At that point, you should be able to create new Pyramid projects by using
   ``pcreate``::
@@ -85,6 +87,9 @@ Coding Style
   2 newlines between classes.  But 80-column lines, in particular, are
   mandatory.
 
+- Please do not remove trailing whitespace.  Configure your editor to reduce
+  diff noise.
+
 Running Tests
 --------------
 
@@ -110,26 +115,37 @@ Test Coverage
 
 - The codebase *must* have 100% test statement coverage after each commit.
   You can test coverage via ``tox -e coverage``, or alternately by installing
-  ``nose`` and ``coverage`` into your virtualenv, and running ``setup.py
-  nosetests --with-coverage``.
+  ``nose`` and ``coverage`` into your virtualenv (easiest via ``setup.py
+  dev``) , and running ``setup.py nosetests --with-coverage``.
 
-Documentation Coverage
-----------------------
+Documentation Coverage and Building HTML Documentation
+------------------------------------------------------
 
-- If you fix a bug, and the bug requires an API or behavior
-  modification, all documentation in this package which references
-  that API or behavior must change to reflect the bug fix, ideally in
-  the same commit that fixes the bug or adds the feature.
+If you fix a bug, and the bug requires an API or behavior modification, all
+documentation in this package which references that API or behavior must
+change to reflect the bug fix, ideally in the same commit that fixes the bug
+or adds the feature.
 
-- To build and review docs:
+To build and review docs (where ``$yourvenv`` refers to the virtualenv you're
+using to develop Pyramid):
 
-  1. Install ``tests_require`` dependencies from Pyramid's setup.py into your
-     virtualenv.
+1. Run ``$yourvenv/bin/python setup.py dev docs``.  This will cause Sphinx
+   and all development requirements to be installed in your virtualenv.
 
-  2. From the ``docs`` directory of the Pyramid checkout run ``make html
-     SPHINXBUILD=/path/to/your/virtualenv/bin/sphinx-build``.
+2. Update all git submodules from the top-level of your Pyramid checkout, like
+   so:
+     git submodule update --init --recursive
+   This will checkout theme subrepositories and prevent error conditions when
+   HTML docs are generated.
 
-  3.  Open the _build/html/index.html file to see the resulting rendering.
+3. cd to the ``docs`` directory within your Pyramid checkout and execute
+   ``make clean html SPHINXBUILD=$yourvenv/bin/sphinx-build``.  The
+   ``SPHINXBUILD=...`` hair is there in order to tell it to use the
+   virtualenv Python, which will have both Sphinx and Pyramid (for API
+   documentation generation) installed.
+
+4. Open the ``docs/_build/html/index.html`` file to see the resulting HTML
+   rendering.
 
 Change Log
 ----------

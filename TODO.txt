@@ -4,6 +4,13 @@ Pyramid TODOs
 Nice-to-Have
 ------------
 
+- config.set_registry_attr (with conflict detection).
+
+- _fix_registry should dictify the registry being fixed.
+
+- Provide the presumed renderer name to the called view as an attribute of
+  the request.
+
 - Have action methods return their discriminators.
 
 - Add docs about upgrading between Pyramid versions (e.g. how to see
@@ -64,8 +71,6 @@ Nice-to-Have
   app1" and "domain app1.localhost = app1"), ProxyPreserveHost and the nginx
   equivalent, preserving HTTPS URLs.
 
-- _fix_registry should dictify the registry being fixed.
-
 - Make "localizer" a property of request (instead of requiring
   "get_localizer(request)"?
 
@@ -122,6 +127,9 @@ Future
   in 1.2).
 
 - 1.5: Remove ``pyramid.requests.DeprecatedRequestMethodsMixin``.
+
+- 1.5: Maybe? deprecate set_request_property in favor of pointing people at
+  set_request_method.
 
 - 1.6: Remove IContextURL and TraversalContextURL.
 

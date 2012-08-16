@@ -547,7 +547,7 @@ add to your application:
 
    config.add_route('idea', 'ideas/{idea}')
    config.add_route('user', 'users/{user}')
-   config.add_route('tag', 'tags/{tags}')
+   config.add_route('tag', 'tags/{tag}')
 
    config.add_view('mypackage.views.idea_view', route_name='idea')
    config.add_view('mypackage.views.user_view', route_name='user')
@@ -954,7 +954,7 @@ will be prepended with the first:
    from pyramid.config import Configurator
 
    def timing_include(config):
-       config.add_route('show_times', /times')
+       config.add_route('show_times', '/times')
 
    def users_include(config):
        config.add_route('show_users', '/show')
@@ -966,7 +966,7 @@ will be prepended with the first:
 
 In the above configuration, the ``show_users`` route will still have an
 effective route pattern of ``/users/show``.  The ``show_times`` route
-however, will have an effective pattern of ``/users/timing/show_times``.
+however, will have an effective pattern of ``/users/timing/times``.
 
 Route prefixes have no impact on the requirement that the set of route
 *names* in any given Pyramid configuration must be entirely unique.  If you
@@ -981,7 +981,7 @@ that may be added in the future.  For example:
    from pyramid.config import Configurator
 
    def timing_include(config):
-       config.add_route('timing.show_times', /times')
+       config.add_route('timing.show_times', '/times')
 
    def users_include(config):
        config.add_route('users.show_users', '/show')

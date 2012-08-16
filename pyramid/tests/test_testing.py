@@ -253,6 +253,7 @@ class Test_registerSubscriber(TestBase):
 
 class Test_registerRoute(TestBase):
     def test_registerRoute(self):
+        from pyramid.config import Configurator
         from pyramid.request import Request
         from pyramid.interfaces import IRoutesMapper
         from pyramid.testing import registerRoute
@@ -261,6 +262,8 @@ class Test_registerRoute(TestBase):
         self.assertEqual(len(mapper.routelist), 1)
         request = Request.blank('/')
         request.registry = self.registry
+        config = Configurator(registry=self.registry)
+        config.setup_registry()
         self.assertEqual(request.route_url('home', pagename='abc'),
                          'http://localhost/abc')
 

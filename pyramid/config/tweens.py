@@ -16,7 +16,10 @@ from pyramid.tweens import (
     EXCVIEW,
     )
 
-from pyramid.config.util import action_method
+from pyramid.config.util import (
+    action_method,
+    TopologicalSorter,
+    )
 
 class TweensConfiguratorMixin(object):
     def add_tween(self, tween_factory, under=None, over=None):
@@ -177,119 +180,24 @@ class TweensConfiguratorMixin(object):
         introspectables.append(intr)
         self.action(discriminator, register, introspectables=introspectables)
 
-class CyclicDependencyError(Exception):
-    def __init__(self, cycles):
-        self.cycles = cycles
-
-    def __str__(self):
-        L = []
-        cycles = self.cycles
-        for cycle in cycles:
-            dependent = cycle
-            dependees = cycles[cycle]
-            L.append('%r sorts over %r' % (dependent, dependees))
-        msg = 'Implicit tween ordering cycle:' + '; '.join(L)
-        return msg
-
 @implementer(ITweens)
 class Tweens(object):
     def __init__(self):
+        self.sorter = TopologicalSorter(
+            default_before=None,
+            default_after=INGRESS,
+            first=INGRESS,
+            last=MAIN)
         self.explicit = []
-        self.names = []
-        self.req_over = set()
-        self.req_under = set()
-        self.factories = {}
-        self.order = []
 
     def add_explicit(self, name, factory):
         self.explicit.append((name, factory))
 
     def add_implicit(self, name, factory, under=None, over=None):
-        self.names.append(name)
-        self.factories[name] = factory
-        if under is None and over is None:
-            under = INGRESS
-        if under is not None:
-            if not is_nonstr_iter(under):
-                under = (under,)
-            self.order += [(u, name) for u in under]
-            self.req_under.add(name)
-        if over is not None:
-            if not is_nonstr_iter(over):
-                over = (over,)
-            self.order += [(name, o) for o in over]
-            self.req_over.add(name)
+        self.sorter.add(name, factory, after=under, before=over)
 
     def implicit(self):
-        order = [(INGRESS, MAIN)]
-        roots = []
-        graph = {}
-        names = [INGRESS, MAIN]
-        names.extend(self.names)
-
-        for a, b in self.order:
-            order.append((a, b))
-
-        def add_node(node):
-            if not node in graph:
-                roots.append(node)
-                graph[node] = [0] # 0 = number of arcs coming into this node
-
-        def add_arc(fromnode, tonode):
-            graph[fromnode].append(tonode)
-            graph[tonode][0] += 1
-            if tonode in roots:
-                roots.remove(tonode)
-
-        for name in names:
-            add_node(name)
-
-        has_over, has_under = set(), set()
-        for a, b in order:
-            if a in names and b in names: # deal with missing dependencies
-                add_arc(a, b)
-                has_over.add(a)
-                has_under.add(b)
-
-        if not self.req_over.issubset(has_over):
-            raise ConfigurationError(
-                'Detected tweens with no satisfied over dependencies: %s'
-                % (', '.join(sorted(self.req_over - has_over)))
-            )
-        if not self.req_under.issubset(has_under):
-            raise ConfigurationError(
-                'Detected tweens with no satisfied under dependencies: %s'
-                % (', '.join(sorted(self.req_under - has_under)))
-            )
-
-        sorted_names = []
-
-        while roots:
-            root = roots.pop(0)
-            sorted_names.append(root)
-            children = graph[root][1:]
-            for child in children:
-                arcs = graph[child][0]
-                arcs -= 1
-                graph[child][0] = arcs 
-                if arcs == 0:
-                    roots.insert(0, child)
-            del graph[root]
-
-        if graph:
-            # loop in input
-            cycledeps = {}
-            for k, v in graph.items():
-                cycledeps[k] = v[1:]
-            raise CyclicDependencyError(cycledeps)
-
-        result = []
-
-        for name in sorted_names:
-            if name in self.names:
-                result.append((name, self.factories[name]))
-
-        return result
+        return self.sorter.sorted()
 
     def __call__(self, handler, registry):
         if self.explicit:

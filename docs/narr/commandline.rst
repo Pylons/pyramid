@@ -349,7 +349,7 @@ setting) orderings using the ``ptweens`` command.  Tween factories
 will show up represented by their standard Python dotted name in the
 ``ptweens`` output.
 
-For example, here's the ``pwteens`` command run against a system
+For example, here's the ``ptweens`` command run against a system
 configured without any explicit tweens:
 
 .. code-block:: text
@@ -367,7 +367,7 @@ configured without any explicit tweens:
    1           pyramid.tweens.excview_tween_factory                excview
    -           -                                                   MAIN
 
-Here's the ``pwteens`` command run against a system configured *with*
+Here's the ``ptweens`` command run against a system configured *with*
 explicit tweens defined in its ``development.ini`` file:
 
 .. code-block:: text
@@ -460,7 +460,7 @@ to the console.
 
 You can add request header values by using the ``--header`` option::
 
-   $ bin/prequest --header=Host=example.com development.ini /
+   $ bin/prequest --header=Host:example.com development.ini /
 
 Headers are added to the WSGI environment by converting them to their
 CGI/WSGI equivalents (e.g. ``Host=example.com`` will insert the ``HTTP_HOST``
@@ -654,8 +654,11 @@ use the following command:
 
 .. code-block:: python
 
-   import logging.config
-   logging.config.fileConfig('/path/to/my/development.ini')
+   import pyramid.paster
+   pyramid.paster.setup_logging('/path/to/my/development.ini')
+
+See :ref:`logging_chapter` for more information on logging within
+:app:`Pyramid`.
 
 .. index::
    single: console script
@@ -718,7 +721,7 @@ we'll pretend you have a distribution with a package in it named
    def settings_show():
        description = """\
        Print the deployment settings for a Pyramid application.  Example:
-       'psettings deployment.ini'
+       'show_settings deployment.ini'
        """
        usage = "usage: %prog config_uri"
        parser = optparse.OptionParser(

@@ -3,11 +3,16 @@ import os
 import pkg_resources
 import threading
 
-from zope.interface import implementer
+from zope.interface import (
+    implementer,
+    providedBy,
+    )
+from zope.interface.registry import Components
 
 from pyramid.interfaces import (
     IChameleonLookup,
     IChameleonTranslate,
+    IJSONAdapter,
     IRendererGlobalsFactory,
     IRendererFactory,
     IResponseFactory,
@@ -60,10 +65,11 @@ def render(renderer_name, value, request=None, package=None):
     dictionary.  For other renderers, this will need to be whatever
     sort of value the renderer expects.
 
-    The 'system' values supplied to the renderer will include a basic
-    set of top-level system names, such as ``request``, ``context``,
-    and ``renderer_name``.  If :term:`renderer globals` have been
-    specified, these will also be used to agument the value.
+    The 'system' values supplied to the renderer will include a basic set of
+    top-level system names, such as ``request``, ``context``,
+    ``renderer_name``, and ``view``.  See :ref:`renderer_system_values` for
+    the full list.  If :term:`renderer globals` have been specified, these
+    will also be used to agument the value.
 
     Supply a ``request`` parameter in order to provide the renderer
     with the most correct 'system' values (``request`` and ``context``
@@ -103,10 +109,11 @@ def render_to_response(renderer_name, value, request=None, package=None):
     dictionary.  For other renderers, this will need to be whatever
     sort of value the renderer expects.
 
-    The 'system' values supplied to the renderer will include a basic
-    set of top-level system names, such as ``request``, ``context``,
-    and ``renderer_name``.  If :term:`renderer globals` have been
-    specified, these will also be used to agument the value.
+    The 'system' values supplied to the renderer will include a basic set of
+    top-level system names, such as ``request``, ``context``,
+    ``renderer_name``, and ``view``.  See :ref:`renderer_system_values` for
+    the full list.  If :term:`renderer globals` have been specified, these
+    will also be used to agument the value.
 
     Supply a ``request`` parameter in order to provide the renderer
     with the most correct 'system' values (``request`` and ``context``
@@ -157,40 +164,13 @@ def string_renderer_factory(info):
         return value
     return _render
 
-class ObjectJSONEncoder(json.JSONEncoder):
-    """ The default JSON object encoder (a subclass of json.Encoder) used by
-    :class:`pyramid.renderers.JSON` and :class:`pyramid.renderers.JSONP`.  It
-    is used when an object returned from a view and presented to a JSON-based
-    renderer is not a builtin Python type otherwise serializable to JSON.
-    
-    This ``json.Encoder`` subclass overrides the ``json.Encoder.default``
-    method.  The overridden method looks for a ``__json__`` attribute on the
-    object it is passed.  If it's found, the encoder will assume it's
-    callable, and will call it with no arguments to obtain a value.  The
-    overridden ``default`` method will then return that value (which must be
-    a JSON-serializable basic Python type).
-
-    If the object passed to the overridden ``default`` method has no
-    ``__json__`` attribute, the ``json.JSONEncoder.default`` method is called
-    with the object that it was passed (which will end up raising a
-    :exc:`TypeError`, as it would with any other unserializable type).
-
-    This class will be used only when you set a JSON or JSONP
-    renderer and you do not define your own custom encoder class.
-
-    .. note:: This feature is new in Pyramid 1.4.
-    """
-
-    def default(self, obj):
-        if hasattr(obj, '__json__'):
-            return obj.__json__()
-        return json.JSONEncoder.default(self, obj)
+_marker = object()
 
 class JSON(object):
     """ Renderer that returns a JSON-encoded string.
 
     Configure a custom JSON renderer using the
-    :meth:`pyramid.config.Configurator.add_renderer` API at application
+    :meth:`~pyramid.config.Configurator.add_renderer` API at application
     startup time:
 
     .. code-block:: python
@@ -198,12 +178,11 @@ class JSON(object):
        from pyramid.config import Configurator
 
        config = Configurator()
-       config.add_renderer('myjson', JSON(indent=4, cls=MyJSONEncoder))
+       config.add_renderer('myjson', JSON(indent=4))
 
-    Once this renderer is registered via
-    :meth:`~pyramid.config.Configurator.add_renderer` as above, you can use
+    Once this renderer is registered as above, you can use
     ``myjson`` as the ``renderer=`` parameter to ``@view_config`` or
-    :meth:`pyramid.config.Configurator.add_view``:
+    :meth:`~pyramid.config.Configurator.add_view``:
 
     .. code-block:: python
 
@@ -213,19 +192,57 @@ class JSON(object):
        def myview(request):
            return {'greeting':'Hello world'}
 
+    Custom objects can be serialized using the renderer by either
+    implementing the ``__json__`` magic method, or by registering
+    adapters with the renderer.  See
+    :ref:`json_serializing_custom_objects` for more information.
+
+    The default serializer uses ``json.JSONEncoder``. A different
+    serializer can be specified via the ``serializer`` argument.
+    Custom serializers should accept the object, a callback
+    ``default``, and any extra ``kw`` keyword argments passed during
+    renderer construction.
+
     .. note::
 
        This feature is new in Pyramid 1.4. Prior to 1.4 there was
        no public API for supplying options to the underlying
-       :func:`json.dumps` without defining a custom renderer.
-
+       serializer without defining a custom renderer.
     """
 
-    def __init__(self, **kw):
-        """ Any keyword arguments will be forwarded to
-        :func:`json.dumps`.
-        """
+    def __init__(self, serializer=json.dumps, adapters=(), **kw):
+        """ Any keyword arguments will be passed to the ``serializer``
+        function."""
+        self.serializer = serializer
         self.kw = kw
+        self.components = Components()
+        for type, adapter in adapters:
+            self.add_adapter(type, adapter)
+
+    def add_adapter(self, type_or_iface, adapter):
+        """ When an object of the type (or interface) ``type_or_iface`` fails
+        to automatically encode using the serializer, the renderer will use
+        the adapter ``adapter`` to convert it into a JSON-serializable
+        object.  The adapter must accept two arguments: the object and the
+        currently active request.
+
+        .. code-block:: python
+
+           class Foo(object):
+               x = 5
+
+           def foo_adapter(obj, request):
+               return obj.x
+
+           renderer = JSON(indent=4)
+           renderer.add_adapter(Foo, foo_adapter)
+
+        When you've done this, the JSON renderer will be able to serialize
+        instances of the ``Foo`` class when they're encountered in your view
+        results."""
+        
+        self.components.registerAdapter(adapter, (type_or_iface,),
+                                        IJSONAdapter)
 
     def __call__(self, info):
         """ Returns a plain JSON-encoded string with content-type
@@ -238,23 +255,30 @@ class JSON(object):
                 ct = response.content_type
                 if ct == response.default_content_type:
                     response.content_type = 'application/json'
-            return self.value_to_json(value)
+            default = self._make_default(request)
+            return self.serializer(value, default=default, **self.kw)
+        
         return _render
 
-    def value_to_json(self, value):
-        """ Convert a Python object to a JSON string.
-
-        By default, this uses the :func:`json.dumps` from the stdlib."""
-        if not self.kw.get('cls'):
-            self.kw['cls'] = ObjectJSONEncoder
-        return json.dumps(value, **self.kw)
+    def _make_default(self, request):
+        def default(obj):
+            if hasattr(obj, '__json__'):
+                return obj.__json__(request)
+            obj_iface = providedBy(obj)
+            adapters = self.components.adapters
+            result = adapters.lookup((obj_iface,), IJSONAdapter,
+                                     default=_marker)
+            if result is _marker:
+                raise TypeError('%r is not JSON serializable' % (obj,))
+            return result(obj, request)
+        return default
 
 json_renderer_factory = JSON() # bw compat
 
 class JSONP(JSON):
     """ `JSONP <http://en.wikipedia.org/wiki/JSONP>`_ renderer factory helper
     which implements a hybrid json/jsonp renderer.  JSONP is useful for
-    making cross-domain AJAX requests.
+    making cross-domain AJAX requests.  
 
     Configure a JSONP renderer using the
     :meth:`pyramid.config.Configurator.add_renderer` API at application
@@ -267,9 +291,9 @@ class JSONP(JSON):
        config = Configurator()
        config.add_renderer('jsonp', JSONP(param_name='callback'))
 
-    The class also accepts arbitrary keyword arguments; all keyword arguments
-    except ``param_name`` are passed to the ``json.dumps`` function as
-    keyword arguments:
+    The class' constructor also accepts arbitrary keyword arguments.  All
+    keyword arguments except ``param_name`` are passed to the ``json.dumps``
+    function as its keyword arguments.
 
     .. code-block:: python
 
@@ -280,6 +304,10 @@ class JSONP(JSON):
     
     .. note:: The ability of this class to accept a ``**kw`` in its
        constructor is new as of Pyramid 1.4.
+
+    The arguments passed to this class' constructor mean the same thing as
+    the arguments passed to :class:`pyramid.renderers.JSON` (including
+    ``serializer`` and ``adapters``).
 
     Once this renderer is registered via
     :meth:`~pyramid.config.Configurator.add_renderer` as above, you can use
@@ -319,7 +347,8 @@ class JSONP(JSON):
         plain-JSON encoded string with content-type ``application/json``"""
         def _render(value, system):
             request = system['request']
-            val = self.value_to_json(value)
+            default = self._make_default(request)
+            val = self.serializer(value, default=default, **self.kw)
             callback = request.GET.get(self.param_name)
             if callback is None:
                 ct = 'application/json'

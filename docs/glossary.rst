@@ -290,7 +290,7 @@ Glossary
      :term:`principal` (or principals) associated with a request.
 
    WSGI
-     `Web Server Gateway Interface <http://wsgi.org/>`_.  This is a
+     `Web Server Gateway Interface <http://www.wsgi.org/>`_.  This is a
      Python standard for connecting web applications to web servers,
      similar to the concept of Java Servlets.  :app:`Pyramid` requires
      that your application be served as a WSGI application.
@@ -299,7 +299,7 @@ Glossary
      *Middleware* is a :term:`WSGI` concept.  It is a WSGI component
      that acts both as a server and an application.  Interesting uses
      for middleware exist, such as caching, content-transport
-     encoding, and other functions.  See `WSGI.org <http://wsgi.org>`_
+     encoding, and other functions.  See `WSGI.org <http://www.wsgi.org>`_
      or `PyPI <http://python.org/pypi>`_ to find middleware for your
      application.
 
@@ -922,9 +922,9 @@ Glossary
      http://docs.pylonsproject.org/projects/pyramid_debugtoolbar/dev/ .
 
    scaffold
-     A project template that helps users get started writing a Pyramid
-     application quickly.  Scaffolds are usually used via the ``pcreate``
-     command.
+     A project template that generates some of the major parts of a Pyramid
+     application and helps users to quickly get started writing larger
+     applications.  Scaffolds are usually used via the ``pcreate`` command.
 
    pyramid_exclog
      A package which logs Pyramid application exception (error) information
@@ -994,3 +994,9 @@ Glossary
       Aka ``gunicorn``, a fast :term:`WSGI` server that runs on UNIX under
       Python 2.5+ (although at the time of this writing does not support
       Python 3).  See http://gunicorn.org/ for detailed information.
+
+   predicate factory
+      A callable which is used by a third party during the registration of a
+      route or view predicates to extend the view and route configuration
+      system.  See :ref:`registering_thirdparty_predicates` for more
+      information.

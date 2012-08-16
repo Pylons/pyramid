@@ -534,14 +534,14 @@ Configuration extensibility
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Unlike other systems, Pyramid provides a structured "include" mechanism (see
-:meth:`~pyramid.config.Configurator.include`) that allows you to compose
+:meth:`~pyramid.config.Configurator.include`) that allows you to combine
 applications from multiple Python packages.  All the configuration statements
 that can be performed in your "main" Pyramid application can also be
 performed by included packages including the addition of views, routes,
 subscribers, and even authentication and authorization policies. You can even
 extend or override an existing application by including another application's
 configuration in your own, overriding or adding new views and routes to
-it.  This has the potential to allow you to compose a big application out of
+it.  This has the potential to allow you to create a big application out of
 many other smaller ones.  For example, if you want to reuse an existing
 application that already has a bunch of routes, you can just use the
 ``include`` statement with a ``route_prefix``; the new application will live
@@ -593,11 +593,12 @@ it is to shoehorn a route into an ordered list of other routes, or to create
 another entire instance of an application to service a department and glue
 code to allow disparate apps to share data.  It's a great fit for sites that
 naturally lend themselves to changing departmental hierarchies, such as
-content management systems and document management systems.  Traversal also lends itself well to
-systems that require very granular security ("Bob can edit *this* document"
-as opposed to "Bob can edit documents").
+content management systems and document management systems.  Traversal also
+lends itself well to systems that require very granular security ("Bob can
+edit *this* document" as opposed to "Bob can edit documents").
 
-Example: :ref:`hello_traversal_chapter` and :ref:`much_ado_about_traversal_chapter`.
+Examples: :ref:`hello_traversal_chapter` and
+:ref:`much_ado_about_traversal_chapter`.
 
 Tweens
 ~~~~~~
@@ -800,6 +801,42 @@ within a function called when another user uses the
 :meth:`~pyramid.config.Configurator.include` method against your code.
 
 See also :ref:`add_directive`.
+
+Programmatic Introspection
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you're building a large system that other users may plug code into, it's
+useful to be able to get an enumeration of what code they plugged in *at
+application runtime*.  For example, you might want to show them a set of tabs
+at the top of the screen based on an enumeration of views they registered.
+
+This is possible using Pyramid's :term:`introspector`.
+
+Here's an example of using Pyramid's introspector from within a view
+callable:
+
+.. code-block:: python
+   :linenos:
+
+    from pyramid.view import view_config
+    from pyramid.response import Response
+
+    @view_config(route_name='bar')
+    def show_current_route_pattern(request):
+        introspector = request.registry.introspector
+        route_name = request.matched_route.name
+        route_intr = introspector.get('routes', route_name)
+        return Response(str(route_intr['pattern']))
+
+See also :ref:`using_introspection`.
+
+Python 3 Compatibility
+~~~~~~~~~~~~~~~~~~~~~~
+
+Pyramid and most of its add-ons are Python 3 compatible.  If you develop a
+Pyramid application today, you won't need to worry that five years from now
+you'll be backwatered because there are language features you'd like to use
+but your framework doesn't support newer Python versions.
 
 Testing
 ~~~~~~~

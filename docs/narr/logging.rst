@@ -14,7 +14,7 @@ how to send log messages to loggers that you've configured.
    which help configure logging.  All of the scaffolds which ship along with
    :app:`Pyramid` do this.  If you're not using a scaffold, or if you've used
    a third-party scaffold which does not create these files, the
-   configuration information in this chapter will not be applicable.
+   configuration information in this chapter may not be applicable.
 
 .. _logging_config:
 
@@ -36,10 +36,11 @@ application-related and logging-related sections in the configuration file
 can coexist peacefully, and the logging-related sections in the file are used
 from when you run ``pserve``.
 
-The ``pserve`` command calls the `logging.fileConfig function
+The ``pserve`` command calls the :func:`pyramid.paster.setup_logging`
+function, a thin wrapper around the `logging.fileConfig
 <http://docs.python.org/lib/logging-config-api.html>`_ using the specified
 ini file if it contains a ``[loggers]`` section (all of the
-scaffold-generated ``.ini`` files do). ``logging.fileConfig`` reads the
+scaffold-generated ``.ini`` files do). ``setup_logging`` reads the
 logging configuration from the ini file upon which ``pserve`` was
 invoked.
 

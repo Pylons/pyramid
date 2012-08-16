@@ -36,9 +36,16 @@ be used as the wiki home page.
 Views
 -----
 
-There will be four views to handle the normal operations of
-viewing, editing and adding wiki pages.  Two additional views
-will handle the login and logout tasks related to security.
+There will be three views to handle the normal operations of adding,
+editing and viewing wiki pages, plus one view for the wiki front page.
+Two templates will be used, one for viewing, and one for both for adding
+and editing wiki pages.
+
+The default templating systems in :app:`Pyramid` are
+:term:`Chameleon` and :term:`Mako`.  Chameleon is a variant of
+:term:`ZPT`, which is an XML-based templating language.  Mako is a
+non-XML-based templating language.  Because we had to pick one,
+we chose Chameleon for this tutorial.
 
 Security
 --------
@@ -52,11 +59,11 @@ use to do this are below.
 - GROUPS, a dictionary mapping user names to a 
   list of groups they belong to.
 
-- *groupfinder*, an *authorization callback* that looks up
+- ``groupfinder``, an *authorization callback* that looks up
   USERS and GROUPS.  It will be provided in a new
   *security.py* file.
 
-- An :term:`ACL` is attached to the root resource.  Each
+- An :term:`ACL` is attached to the root :term:`resource`.  Each
   row below details an :term:`ACE`:
 
   +----------+----------------+----------------+
@@ -70,6 +77,8 @@ use to do this are below.
 - Permission declarations are added to the views to assert the security
   policies as each request is handled.
 
+Two additional views and one template will handle the login and
+logout tasks.
 
 Summary
 -------

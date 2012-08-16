@@ -36,6 +36,7 @@
      .. automethod:: set_authentication_policy
      .. automethod:: set_authorization_policy
      .. automethod:: set_default_permission
+     .. automethod:: add_permission
 
    :methodcategory:`Setting Request Properties`
 
@@ -66,6 +67,8 @@
      .. automethod:: add_response_adapter
      .. automethod:: add_traverser
      .. automethod:: add_tween
+     .. automethod:: add_route_predicate
+     .. automethod:: add_view_predicate
      .. automethod:: set_request_factory
      .. automethod:: set_root_factory
      .. automethod:: set_session_factory

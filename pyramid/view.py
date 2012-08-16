@@ -138,15 +138,6 @@ def render_view(context, request, name='', secure=True):
         return None
     return ''.join(iterable)
 
-class _default(object):
-    def __nonzero__(self):
-        return False
-    __bool__ = __nonzero__
-    def __repr__(self): # pragma: no cover
-        return '(default)'
-
-default = _default()
-
 class view_config(object):
     """ A function, class or method :term:`decorator` which allows a
     developer to create view registrations nearer to a :term:`view
@@ -174,12 +165,12 @@ class view_config(object):
              backwards compatibility purposes, as the name
              :class:`pyramid.view.bfg_view`.
 
-    The following arguments are supported to
+    The following keyword arguments are supported to
     :class:`pyramid.view.view_config`: ``context``, ``permission``, ``name``,
     ``request_type``, ``route_name``, ``request_method``, ``request_param``,
     ``containment``, ``xhr``, ``accept``, ``header``, ``path_info``,
     ``custom_predicates``, ``decorator``, ``mapper``, ``http_cache``,
-    and ``match_param``.
+    ``match_param``, and ``predicates``.
 
     The meanings of these arguments are the same as the arguments passed to
     :meth:`pyramid.config.Configurator.add_view`.  If any argument is left
@@ -190,21 +181,11 @@ class view_config(object):
 
     """
     venusian = venusian # for testing injection
-    def __init__(self, name=default, request_type=default, for_=default,
-                 permission=default, route_name=default,
-                 request_method=default, request_param=default,
-                 containment=default, attr=default, renderer=default,
-                 wrapper=default, xhr=default, accept=default,
-                 header=default, path_info=default,
-                 custom_predicates=default, context=default,
-                 decorator=default, mapper=default, http_cache=default,
-                 match_param=default):
-        L = locals()
-        if (context is not default) or (for_ is not default):
-            L['context'] = context or for_
-        for k, v in L.items():
-            if k not in ('self', 'L') and v is not default:
-                setattr(self, k, v)
+    def __init__(self, **settings):
+        if 'for_' in settings:
+            if settings.get('context') is None:
+                settings['context'] = settings['for_']
+        self.__dict__.update(settings)
 
     def __call__(self, wrapped):
         settings = self.__dict__.copy()
@@ -326,7 +307,7 @@ class notfound_view_config(object):
     The notfound_view_config constructor accepts most of the same arguments
     as the constructor of :class:`pyramid.view.view_config`.  It can be used
     in the same places, and behaves in largely the same way, except it always
-    registers a not found exception view instead of a "normal" view.
+    registers a not found exception view instead of a 'normal' view.
 
     Example:
 
@@ -335,7 +316,7 @@ class notfound_view_config(object):
         from pyramid.view import notfound_view_config
         from pyramid.response import Response
           
-        notfound_view_config()
+        @notfound_view_config()
         def notfound(request):
             return Response('Not found, dude!', status='404 Not Found')
 
@@ -360,17 +341,8 @@ class notfound_view_config(object):
 
     venusian = venusian
 
-    def __init__(self, request_type=default, request_method=default,
-                 route_name=default, request_param=default, attr=default,
-                 renderer=default, containment=default, wrapper=default, 
-                 xhr=default, accept=default, header=default,
-                 path_info=default,  custom_predicates=default, 
-                 decorator=default, mapper=default, match_param=default, 
-                 append_slash=False):
-        L = locals()
-        for k, v in L.items():
-            if k not in ('self', 'L') and v is not default:
-                self.__dict__[k] = v
+    def __init__(self, **settings):
+        self.__dict__.update(settings)
 
     def __call__(self, wrapped):
         settings = self.__dict__.copy()
@@ -400,7 +372,7 @@ class forbidden_view_config(object):
     The forbidden_view_config constructor accepts most of the same arguments
     as the constructor of :class:`pyramid.view.view_config`.  It can be used
     in the same places, and behaves in largely the same way, except it always
-    registers a forbidden exception view instead of a "normal" view.
+    registers a forbidden exception view instead of a 'normal' view.
 
     Example:
 
@@ -409,13 +381,13 @@ class forbidden_view_config(object):
         from pyramid.view import forbidden_view_config
         from pyramid.response import Response
           
-        forbidden_view_config()
+        @forbidden_view_config()
         def notfound(request):
             return Response('You are not allowed', status='401 Unauthorized')
 
-    All have the same meaning as :meth:`pyramid.view.view_config` and each
-    predicate argument restricts the set of circumstances under which this
-    notfound view will be invoked.
+    All arguments passed to this function have the same meaning as
+    :meth:`pyramid.view.view_config` and each predicate argument restricts
+    the set of circumstances under which this notfound view will be invoked.
 
     See :ref:`changing_the_forbidden_view` for detailed usage information.
 
@@ -426,16 +398,8 @@ class forbidden_view_config(object):
 
     venusian = venusian
 
-    def __init__(self, request_type=default, request_method=default,
-                 route_name=default, request_param=default, attr=default,
-                 renderer=default, containment=default, wrapper=default, 
-                 xhr=default, accept=default, header=default,
-                 path_info=default,  custom_predicates=default, 
-                 decorator=default, mapper=default, match_param=default):
-        L = locals()
-        for k, v in L.items():
-            if k not in ('self', 'L') and v is not default:
-                self.__dict__[k] = v
+    def __init__(self, **settings):
+        self.__dict__.update(settings)
 
     def __call__(self, wrapped):
         settings = self.__dict__.copy()

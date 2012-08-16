@@ -177,13 +177,15 @@ using the API of the ``request.response`` attribute.  See
 .. index::
    pair: renderer; JSON
 
+.. _json_renderer:
+
 JSON Renderer
 ~~~~~~~~~~~~~
 
-The ``json`` renderer renders view callable results to :term:`JSON`.  It
-passes the return value through the ``json.dumps`` standard library function,
-and wraps the result in a response object.  It also sets the response
-content-type to ``application/json``.
+The ``json`` renderer renders view callable results to :term:`JSON`.  By
+default, it passes the return value through the ``json.dumps`` standard
+library function, and wraps the result in a response object.  It also sets
+the response content-type to ``application/json``.
 
 Here's an example of a view that returns a dictionary.  Since the ``json``
 renderer is specified in the configuration for this view, the view will
@@ -207,11 +209,11 @@ representing the JSON serialization of the return value:
    '{"content": "Hello!"}'
 
 The return value needn't be a dictionary, but the return value must contain
-values serializable by ``json.dumps``.
+values serializable by the configured serializer (by default ``json.dumps``).
 
 .. note::
 
-   Extra arguments can be passed to ``json.dumps`` by overriding the default
+   Extra arguments can be passed to the serializer by overriding the default
    ``json`` renderer. See :class:`pyramid.renderers.JSON` and
    :ref:`adding_and_overriding_renderers` for more information.
 
@@ -223,9 +225,9 @@ You can configure a view to use the JSON renderer by naming ``json`` as the
    :linenos:
 
    config.add_view('myproject.views.hello_world',
-                    name='hello',
-                    context='myproject.resources.Hello',
-                    renderer='json')
+                   name='hello',
+                   context='myproject.resources.Hello',
+                   renderer='json')
 
 Views which use the JSON renderer can vary non-body response attributes by
 using the api of the ``request.response`` attribute.  See
@@ -238,8 +240,9 @@ Serializing Custom Objects
 
 Custom objects can be made easily JSON-serializable in Pyramid by defining a
 ``__json__`` method on the object's class. This method should return values
-natively serializable by ``json.dumps`` (such as ints, lists, dictionaries,
-strings, and so forth).
+natively JSON-serializable (such as ints, lists, dictionaries, strings, and
+so forth).  It should accept a single additional argument, ``request``, which
+will be the active request object at render time.
 
 .. code-block:: python
    :linenos:
@@ -250,7 +253,7 @@ strings, and so forth).
        def __init__(self, x):
            self.x = x
 
-       def __json__(self):
+       def __json__(self, request):
            return {'x':self.x}
 
    @view_config(renderer='json')
@@ -260,20 +263,40 @@ strings, and so forth).
    # the JSON value returned by ``objects`` will be:
    #    [{"x": 1}, {"x": 2}]
 
+If you aren't the author of the objects being serialized, it won't be
+possible (or at least not reasonable) to add a custom ``__json__`` method to
+to their classes in order to influence serialization.  If the object passed
+to the renderer is not a serializable type, and has no ``__json__`` method,
+usually a :exc:`TypeError` will be raised during serialization.  You can
+change this behavior by creating a custom JSON renderer and adding adapters
+to handle custom types. The renderer will attempt to adapt non-serializable
+objects using the registered adapters. A short example follows:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.renderers import JSON
+
+   json_renderer = JSON()
+   def datetime_adapter(obj, request):
+       return obj.isoformat()
+   json_renderer.add_adapter(datetime.datetime, datetime_adapter)
+
+   # then during configuration ....
+   config = Configurator()
+   config.add_renderer('json', json_renderer)
+
+The adapter should accept two arguments: the object needing to be serialized
+and ``request``, which will be the current request object at render time.
+The adapter should raise a :exc:`TypeError` if it can't determine what to do
+with the object.
+
+See :class:`pyramid.renderers.JSON` and
+:ref:`adding_and_overriding_renderers` for more information.
+
 .. note::
 
-   Honoring the ``__json__`` method of custom objects is a feature new in
-   Pyramid 1.4.
-
-.. warning::
-
-   The machinery which performs the ``__json__`` method-calling magic is in
-   the :class:`pyramid.renderers.ObjectJSONEncoder` class.  This class will
-   be used for encoding any non-basic Python object when you use the default
-   ```json`` or ``jsonp`` renderers.  But if you later define your own custom
-   JSON renderer and pass it a "cls" argument signifying a different encoder,
-   the encoder you pass will override Pyramid's use of
-   :class:`pyramid.renderers.ObjectJSONEncoder`.
+   Serializing custom objects is a feature new in Pyramid 1.4.
 
 .. index::
    pair: renderer; JSONP

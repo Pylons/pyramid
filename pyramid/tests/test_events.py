@@ -9,13 +9,13 @@ class NewRequestEventTests(unittest.TestCase):
     def _makeOne(self, request):
         return self._getTargetClass()(request)
 
-    def test_class_implements(self):
+    def test_class_conforms_to_INewRequest(self):
         from pyramid.interfaces import INewRequest
         from zope.interface.verify import verifyClass
         klass = self._getTargetClass()
         verifyClass(INewRequest, klass)
         
-    def test_instance_implements(self):
+    def test_instance_conforms_to_INewRequest(self):
         from pyramid.interfaces import INewRequest
         from zope.interface.verify import verifyObject
         request = DummyRequest()
@@ -35,13 +35,13 @@ class NewResponseEventTests(unittest.TestCase):
     def _makeOne(self, request, response):
         return self._getTargetClass()(request, response)
 
-    def test_class_implements(self):
+    def test_class_conforms_to_INewResponse(self):
         from pyramid.interfaces import INewResponse
         from zope.interface.verify import verifyClass
         klass = self._getTargetClass()
         verifyClass(INewResponse, klass)
         
-    def test_instance_implements(self):
+    def test_instance_conforms_to_INewResponse(self):
         from pyramid.interfaces import INewResponse
         from zope.interface.verify import verifyObject
         request = DummyRequest()
@@ -57,68 +57,72 @@ class NewResponseEventTests(unittest.TestCase):
         self.assertEqual(inst.response, response)
 
 class ApplicationCreatedEventTests(unittest.TestCase):
-    def test_alias_object_implements(self):
-        from pyramid.events import WSGIApplicationCreatedEvent
-        event = WSGIApplicationCreatedEvent(object())
-        from pyramid.interfaces import IWSGIApplicationCreatedEvent
-        from pyramid.interfaces import IApplicationCreated
-        from zope.interface.verify import verifyObject
-        verifyObject(IWSGIApplicationCreatedEvent, event)
-        verifyObject(IApplicationCreated, event)
+    def _getTargetClass(self):
+        from pyramid.events import ApplicationCreated
+        return ApplicationCreated
 
-    def test_alias_class_implements(self):
-        from pyramid.events import WSGIApplicationCreatedEvent
-        from pyramid.interfaces import IWSGIApplicationCreatedEvent
+    def _makeOne(self, context=object()):
+        return self._getTargetClass()(context)
+
+    def test_class_conforms_to_IApplicationCreated(self):
         from pyramid.interfaces import IApplicationCreated
         from zope.interface.verify import verifyClass
-        verifyClass(IWSGIApplicationCreatedEvent, WSGIApplicationCreatedEvent)
-        verifyClass(IApplicationCreated, WSGIApplicationCreatedEvent)
+        verifyClass(IApplicationCreated, self._getTargetClass())
 
-    def test_object_implements(self):
-        from pyramid.events import ApplicationCreated
-        event = ApplicationCreated(object())
+    def test_object_conforms_to_IApplicationCreated(self):
         from pyramid.interfaces import IApplicationCreated
         from zope.interface.verify import verifyObject
-        verifyObject(IApplicationCreated, event)
+        verifyObject(IApplicationCreated, self._makeOne())
 
-    def test_class_implements(self):
-        from pyramid.events import ApplicationCreated
-        from pyramid.interfaces import IApplicationCreated
+class WSGIApplicationCreatedEventTests(ApplicationCreatedEventTests):
+    def _getTargetClass(self):
+        from pyramid.events import WSGIApplicationCreatedEvent
+        return WSGIApplicationCreatedEvent
+
+    def test_class_conforms_to_IWSGIApplicationCreatedEvent(self):
+        from pyramid.interfaces import IWSGIApplicationCreatedEvent
         from zope.interface.verify import verifyClass
-        verifyClass(IApplicationCreated, ApplicationCreated)
+        verifyClass(IWSGIApplicationCreatedEvent, self._getTargetClass())
+
+    def test_object_conforms_to_IWSGIApplicationCreatedEvent(self):
+        from pyramid.interfaces import IWSGIApplicationCreatedEvent
+        from zope.interface.verify import verifyObject
+        verifyObject(IWSGIApplicationCreatedEvent, self._makeOne())
 
 class ContextFoundEventTests(unittest.TestCase):
-    def test_alias_class_implements(self):
-        from zope.interface.verify import verifyClass
-        from pyramid.events import AfterTraversal
-        from pyramid.interfaces import IAfterTraversal
-        from pyramid.interfaces import IContextFound
-        verifyClass(IAfterTraversal, AfterTraversal)
-        verifyClass(IContextFound, AfterTraversal)
-        
-    def test_alias_instance_implements(self):
-        from zope.interface.verify import verifyObject
-        from pyramid.events import AfterTraversal
-        from pyramid.interfaces import IAfterTraversal
-        from pyramid.interfaces import IContextFound
-        request = DummyRequest()
-        inst = AfterTraversal(request)
-        verifyObject(IAfterTraversal, inst)
-        verifyObject(IContextFound, inst)
+    def _getTargetClass(self):
+        from pyramid.events import ContextFound
+        return ContextFound
 
-    def test_class_implements(self):
+    def _makeOne(self, request=None):
+        if request is None:
+            request = DummyRequest()
+        return self._getTargetClass()(request)
+
+    def test_class_conforms_to_IContextFound(self):
         from zope.interface.verify import verifyClass
-        from pyramid.events import ContextFound
         from pyramid.interfaces import IContextFound
-        verifyClass(IContextFound, ContextFound)
+        verifyClass(IContextFound, self._getTargetClass())
         
-    def test_instance_implements(self):
+    def test_instance_conforms_to_IContextFound(self):
         from zope.interface.verify import verifyObject
-        from pyramid.events import ContextFound
         from pyramid.interfaces import IContextFound
-        request = DummyRequest()
-        inst = ContextFound(request)
-        verifyObject(IContextFound, inst)
+        verifyObject(IContextFound, self._makeOne())
+
+class AfterTraversalEventTests(ContextFoundEventTests):
+    def _getTargetClass(self):
+        from pyramid.events import AfterTraversal
+        return AfterTraversal
+
+    def test_class_conforms_to_IAfterTraversal(self):
+        from zope.interface.verify import verifyClass
+        from pyramid.interfaces import IAfterTraversal
+        verifyClass(IAfterTraversal, self._getTargetClass())
+        
+    def test_instance_conforms_to_IAfterTraversal(self):
+        from zope.interface.verify import verifyObject
+        from pyramid.interfaces import IAfterTraversal
+        verifyObject(IAfterTraversal, self._makeOne())
 
 class TestSubscriber(unittest.TestCase):
     def setUp(self):
