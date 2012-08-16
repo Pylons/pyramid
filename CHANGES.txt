@@ -108,9 +108,8 @@ Features
 Deprecations
 ------------
 
-- The documentation for
-  ``pyramid.config.Configurator.set_request_property`` has been removed.
-  The method remains usable but the more featureful
-  ``pyramid.config.Configurator.set_request_method`` should be used in its
-  place. It has all of the same capabilities but can also extend the
-  request object with methods.
+- The ``pyramid.config.Configurator.set_request_property`` has been
+  documentation-deprecated.  The method remains usable but the more
+  featureful ``pyramid.config.Configurator.set_request_method`` should be
+  used in its place (it has all of the same capabilities but can also extend
+  the request object with methods).

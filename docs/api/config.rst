@@ -41,6 +41,7 @@
    :methodcategory:`Extending the Request Object`
 
      .. automethod:: set_request_method
+     .. automethod:: set_request_property
 
    :methodcategory:`Using I18N`
 
