@@ -43,7 +43,6 @@ from pyramid.registry import (
     Introspectable,
     Introspector,
     Registry,
-    Deferred,
     undefer,
     )
 
@@ -551,10 +550,9 @@ class Configurator(
             introspectables = ()
 
         if autocommit:
-            if isinstance(discriminator, Deferred):
-                # callables can depend on the side effects of resolving a
-                # deferred discriminator
-                discriminator.resolve()
+            # callables can depend on the side effects of resolving a
+            # deferred discriminator
+            undefer(discriminator)
             if callable is not None:
                 callable(*args, **kw)
             for introspectable in introspectables:
