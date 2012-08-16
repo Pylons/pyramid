@@ -4,7 +4,6 @@ import logging
 import operator
 import os
 import sys
-import types
 import warnings
 import venusian
 
@@ -23,7 +22,6 @@ from pyramid.compat import (
     text_,
     reraise,
     string_types,
-    PY3,
     )
 
 from pyramid.events import ApplicationCreated
@@ -45,7 +43,6 @@ from pyramid.registry import (
     Introspectable,
     Introspector,
     Registry,
-    Deferred,
     undefer,
     )
 
@@ -553,10 +550,9 @@ class Configurator(
             introspectables = ()
 
         if autocommit:
-            if isinstance(discriminator, Deferred):
-                # callables can depend on the side effects of resolving a
-                # deferred discriminator
-                discriminator.resolve()
+            # callables can depend on the side effects of resolving a
+            # deferred discriminator
+            undefer(discriminator)
             if callable is not None:
                 callable(*args, **kw)
             for introspectable in introspectables:
@@ -786,10 +782,9 @@ class Configurator(
         c, action_wrap = c
         if action_wrap:
             c = action_method(c)
-        if PY3: # pragma: no cover
-            m = types.MethodType(c, self)
-        else:
-            m = types.MethodType(c, self, self.__class__)
+        # Create a bound method (works on both Py2 and Py3)
+        # http://stackoverflow.com/a/1015405/209039
+        m = c.__get__(self, self.__class__)
         return m
 
     def with_package(self, package):

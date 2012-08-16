@@ -89,3 +89,12 @@ class ConfiguratorSecurityMethodsTests(unittest.TestCase):
         self.assertEqual(config.registry.getUtility(IDefaultPermission),
                          'view')
 
+    def test_add_permission(self):
+        config = self._makeOne(autocommit=True)
+        config.add_permission('perm')
+        cat = config.registry.introspector.get_category('permissions')
+        self.assertEqual(len(cat), 1)
+        D = cat[0]
+        intr = D['introspectable']
+        self.assertEqual(intr['value'], 'perm')
+
