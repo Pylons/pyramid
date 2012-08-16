@@ -85,3 +85,18 @@ Features
 - When there is a predicate mismatch exception (seen when no view matches for
   a given request due to predicates not working), the exception now contains
   a textual description of the predicate which didn't match.
+
+- An ``add_permission`` directive method was added to the Configurator.  This
+  directive registers a free-standing permission introspectable into the
+  Pyramid introspection system.  Frameworks built atop Pyramid can thus use
+  the the ``permissions`` introspectable category data to build a
+  comprehensive list of permissions supported by a running system.  Before
+  this method was added, permissions were already registered in this
+  introspectable category as a side effect of naming them in an ``add_view``
+  call, this method just makes it possible to arrange for a permission to be
+  put into the ``permissions`` introspectable category without naming it
+  along with an associated view.  Here's an example of usage of
+  ``add_permission``::
+
+      config = Configurator()
+      config.add_permission('view')
