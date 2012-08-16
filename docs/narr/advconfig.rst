@@ -296,7 +296,7 @@ These are the methods of the configurator which provide conflict detection:
 :meth:`~pyramid.config.Configurator.add_renderer`,
 :meth:`~pyramid.config.Configurator.set_request_factory`,
 :meth:`~pyramid.config.Configurator.set_session_factory`,
-:meth:`~pyramid.config.Configurator.set_request_property`,
+:meth:`~pyramid.config.Configurator.set_request_method`,
 :meth:`~pyramid.config.Configurator.set_root_factory`,
 :meth:`~pyramid.config.Configurator.set_view_mapper`,
 :meth:`~pyramid.config.Configurator.set_authentication_policy`,
