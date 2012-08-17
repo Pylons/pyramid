@@ -38,8 +38,9 @@
      .. automethod:: set_default_permission
      .. automethod:: add_permission
 
-   :methodcategory:`Setting Request Properties`
+   :methodcategory:`Extending the Request Object`
 
+     .. automethod:: set_request_method
      .. automethod:: set_request_property
 
    :methodcategory:`Using I18N`
