@@ -136,13 +136,12 @@ class PServeCommand(object):
             metavar="GROUP",
             help="Set the group (usually only possible when run as root)")
 
-    if hasattr(os, 'fork'):
-        parser.add_option(
-            '--stop-daemon',
-            dest='stop_daemon',
-            action='store_true',
-            help=('Stop a daemonized server (given a PID file, or default '
-                'pyramid.pid file)'))
+    parser.add_option(
+        '--stop-daemon',
+        dest='stop_daemon',
+        action='store_true',
+        help=('Stop a daemonized server (given a PID file, or default '
+              'pyramid.pid file)'))
 
     _scheme_re = re.compile(r'^[a-z][a-z]+:', re.I)
 

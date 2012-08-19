@@ -23,9 +23,6 @@ Bug Fixes
   https://github.com/Pylons/pyramid/issues/606
   https://github.com/Pylons/pyramid/issues/607
 
-- ``pserve``: don't show --stop-daemon option on Windows.
-  https://github.com/Pylons/pyramid/pull/661
-
 Features
 --------
 
