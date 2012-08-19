@@ -17,11 +17,14 @@ Bug Fixes
   during iteration`` exception.  It no longer does.  See
   https://github.com/Pylons/pyramid/issues/635 for more information.
 
-- In Mako Templates lookup, check if the uri is already adjusted and bring
+- In Mako Templates lookup, cyheck if the uri is already adjusted and bring
   it back to an asset spec. Normally occurs with inherited templates or
   included components.
   https://github.com/Pylons/pyramid/issues/606
   https://github.com/Pylons/pyramid/issues/607
+
+- ``pserve``: don't show --stop-daemon option on Windows.
+  https://github.com/Pylons/pyramid/pull/661
 
 Features
 --------
