@@ -42,6 +42,8 @@ class PkgResourceTemplateLookup(TemplateLookup):
         if relativeto is not None:
             relativeto = relativeto.replace('$', ':')
             if not(':' in uri) and (':' in relativeto):
+                if uri.startswith('/'):
+                    return uri
                 pkg, relto = relativeto.split(':')
                 _uri = posixpath.join(posixpath.dirname(relto), uri)
                 return '{0}:{1}'.format(pkg, _uri)

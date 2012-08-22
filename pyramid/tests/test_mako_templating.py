@@ -479,6 +479,16 @@ class TestPkgResourceTemplateLookup(unittest.TestCase):
         result = inst.adjust_uri('b', '../a')
         self.assertEqual(result, '../b')
 
+    def test_adjust_uri_not_asset_spec_abs_with_relativeto_asset_spec(self):
+        inst = self._makeOne()
+        result = inst.adjust_uri('/c', 'a:b')
+        self.assertEqual(result, '/c')
+
+    def test_adjust_uri_asset_spec_with_relativeto_not_asset_spec_abs(self):
+        inst = self._makeOne()
+        result = inst.adjust_uri('a:b', '/c')
+        self.assertEqual(result, 'a:b')
+
     def test_get_template_not_asset_spec(self):
         fixturedir = self.get_fixturedir()
         inst = self._makeOne(directories=[fixturedir])
