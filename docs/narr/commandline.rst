@@ -463,7 +463,7 @@ You can add request header values by using the ``--header`` option::
    $ bin/prequest --header=Host:example.com development.ini /
 
 Headers are added to the WSGI environment by converting them to their
-CGI/WSGI equivalents (e.g. ``Host=example.com`` will insert the ``HTTP_HOST``
+CGI/WSGI equivalents (e.g. ``Host:example.com`` will insert the ``HTTP_HOST``
 header variable as the value ``example.com``).  Multiple ``--header`` options
 can be supplied.  The special header value ``content-type`` sets the
 ``CONTENT_TYPE`` in the WSGI environment.
