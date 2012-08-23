@@ -27,6 +27,11 @@ Bug Fixes
   when mixing up inheritance with asset specs.
   https://github.com/Pylons/pyramid/issues/662
 
+- HTTP Accept headers were not being normalized causing potentially
+  conflicting view registrations to go unnoticed. Two views that only
+  differ in the case ('text/html' vs. 'text/HTML') will now raise an error.
+  https://github.com/Pylons/pyramid/pull/620
+
 Features
 --------
 
