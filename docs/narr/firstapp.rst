@@ -218,7 +218,7 @@ WSGI Application Serving
 .. ignore-next-block
 .. literalinclude:: helloworld.py
    :linenos:
-   :lines: 14
+   :lines: 14-15
 
 Finally, we actually serve the application to requestors by starting up a
 WSGI server.  We happen to use the :mod:`wsgiref` ``make_server`` server
