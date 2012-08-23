@@ -109,6 +109,11 @@ Features
       config = Configurator()
       config.add_permission('view')
 
+- The ``UnencryptedCookieSessionFactoryConfig`` now accepts
+  ``signed_serialize`` and ``signed_deserialize`` hooks which may be used
+  to influence how the sessions are marshalled (by default this is done
+  with HMAC+pickle).
+
 Deprecations
 ------------
 
