@@ -17,11 +17,20 @@ Bug Fixes
   during iteration`` exception.  It no longer does.  See
   https://github.com/Pylons/pyramid/issues/635 for more information.
 
-- In Mako Templates lookup, cyheck if the uri is already adjusted and bring
+- In Mako Templates lookup, check if the uri is already adjusted and bring
   it back to an asset spec. Normally occurs with inherited templates or
   included components.
   https://github.com/Pylons/pyramid/issues/606
   https://github.com/Pylons/pyramid/issues/607
+
+- In Mako Templates lookup, check for absolute uri (using mako directories) 
+  when mixing up inheritance with asset specs.
+  https://github.com/Pylons/pyramid/issues/662
+
+- HTTP Accept headers were not being normalized causing potentially
+  conflicting view registrations to go unnoticed. Two views that only
+  differ in the case ('text/html' vs. 'text/HTML') will now raise an error.
+  https://github.com/Pylons/pyramid/pull/620
 
 Features
 --------
@@ -104,6 +113,11 @@ Features
 
       config = Configurator()
       config.add_permission('view')
+
+- The ``UnencryptedCookieSessionFactoryConfig`` now accepts
+  ``signed_serialize`` and ``signed_deserialize`` hooks which may be used
+  to influence how the sessions are marshalled (by default this is done
+  with HMAC+pickle).
 
 Deprecations
 ------------

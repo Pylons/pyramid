@@ -1047,6 +1047,9 @@ class ViewsConfiguratorMixin(object):
                 name=renderer, package=self.package,
                 registry = self.registry)
 
+        if accept is not None:
+            accept = accept.lower()
+
         introspectables = []
         pvals = predicates.copy()
         pvals.update(
