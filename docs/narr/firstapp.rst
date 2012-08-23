@@ -112,7 +112,7 @@ defined imports and function definitions, placed within the confines of an
 
 .. literalinclude:: helloworld.py
    :linenos:
-   :lines: 8-13
+   :lines: 9-14
 
 Let's break this down piece-by-piece.
 
@@ -121,7 +121,7 @@ Configurator Construction
 
 .. literalinclude:: helloworld.py
    :linenos:
-   :lines: 8-9
+   :lines: 9-10
 
 The ``if __name__ == '__main__':`` line in the code sample above represents a
 Python idiom: the code inside this if clause is not invoked unless the script
@@ -154,7 +154,7 @@ Adding Configuration
 .. ignore-next-block
 .. literalinclude:: helloworld.py
    :linenos:
-   :lines: 10-11
+   :lines: 11-12
 
 First line above calls the :meth:`pyramid.config.Configurator.add_route`
 method, which registers a :term:`route` to match any url path that begins
@@ -174,7 +174,7 @@ WSGI Application Creation
 .. ignore-next-block
 .. literalinclude:: helloworld.py
    :linenos:
-   :lines: 12
+   :lines: 13
 
 After configuring views and ending configuration, the script creates a WSGI
 *application* via the :meth:`pyramid.config.Configurator.make_wsgi_app`
@@ -203,7 +203,7 @@ WSGI Application Serving
 .. ignore-next-block
 .. literalinclude:: helloworld.py
    :linenos:
-   :lines: 13
+   :lines: 14
 
 Finally, we actually serve the application to requestors by starting up a
 WSGI server.  We happen to use the :func:`paste.httpserver.serve` WSGI server
