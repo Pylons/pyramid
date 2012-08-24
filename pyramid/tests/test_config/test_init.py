@@ -1421,6 +1421,32 @@ class TestConfigurator_add_directive(unittest.TestCase):
         self.assertEqual(action['callable'], None)
         self.assertEqual(action['args'], test_config)
 
+    def test_add_directive_with_partial(self):
+        from pyramid.tests import test_config
+        config = self.config
+        config.add_directive(
+                'dummy_partial', 'pyramid.tests.test_config.dummy_partial')
+        self.assertTrue(hasattr(config, 'dummy_partial'))
+        config.dummy_partial()
+        after = config.action_state
+        action = after.actions[-1]
+        self.assertEqual(action['discriminator'], 'partial')
+        self.assertEqual(action['callable'], None)
+        self.assertEqual(action['args'], test_config)
+
+    def test_add_directive_with_custom_callable(self):
+        from pyramid.tests import test_config
+        config = self.config
+        config.add_directive(
+                'dummy_callable', 'pyramid.tests.test_config.dummy_callable')
+        self.assertTrue(hasattr(config, 'dummy_callable'))
+        config.dummy_callable('discrim')
+        after = config.action_state
+        action = after.actions[-1]
+        self.assertEqual(action['discriminator'], 'discrim')
+        self.assertEqual(action['callable'], None)
+        self.assertEqual(action['args'], test_config)
+
     def test_extend_with_python_callable(self):
         from pyramid.tests import test_config
         config = self.config
