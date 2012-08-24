@@ -32,6 +32,11 @@ Bug Fixes
   differ in the case ('text/html' vs. 'text/HTML') will now raise an error.
   https://github.com/Pylons/pyramid/pull/620
 
+- Configurator.add_directive now accepts arbitrary callables like partials or
+  objects implementing ``__call__`` which dont have ``__name__`` and
+  ``__doc__`` attributes.  See https://github.com/Pylons/pyramid/issues/621
+  and https://github.com/Pylons/pyramid/pull/647.
+
 Features
 --------
 
