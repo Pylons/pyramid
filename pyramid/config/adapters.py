@@ -69,9 +69,9 @@ class AdaptersConfiguratorMixin(object):
     def _derive_subscriber(self, subscriber, predicates):
         if not predicates:
             return subscriber
-        def subscriber_wrapper(event):
-            if all((predicate(event) for predicate in predicates)):
-                return subscriber(event)
+        def subscriber_wrapper(*arg):
+            if all((predicate(*arg) for predicate in predicates)):
+                return subscriber(*arg)
         if hasattr(subscriber, '__name__'):
             update_wrapper(subscriber_wrapper, subscriber)
         return subscriber_wrapper
