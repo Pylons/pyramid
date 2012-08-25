@@ -71,7 +71,7 @@ class AdaptersConfiguratorMixin(object):
             return subscriber
         def subscriber_wrapper(event):
             if all((predicate(event) for predicate in predicates)):
-                subscriber(event)
+                return subscriber(event)
         if hasattr(subscriber, '__name__'):
             update_wrapper(subscriber_wrapper, subscriber)
         return subscriber_wrapper
