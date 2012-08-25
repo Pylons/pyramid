@@ -1105,7 +1105,7 @@ class ViewsConfiguratorMixin(object):
             )
         view_intr.update(**predicates)
         introspectables.append(view_intr)
-        predlist = self._get_predlist('view')
+        predlist = self.get_predlist('view')
 
         def register(permission=permission, renderer=renderer):
             # the discrim_func above is guaranteed to have been called already

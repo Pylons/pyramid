@@ -93,7 +93,7 @@ class AdaptersConfiguratorMixinTests(unittest.TestCase):
         def subscriber(event):
             L.append(event)
         config = self._makeOne(autocommit=True)
-        predlist = config._get_predlist('subscriber')
+        predlist = config.get_predlist('subscriber')
         jam_predicate = predicate_maker('jam')
         jim_predicate = predicate_maker('jim')
         predlist.add('jam', jam_predicate)
@@ -120,7 +120,7 @@ class AdaptersConfiguratorMixinTests(unittest.TestCase):
         def subscriber(event):
             L.append(event)
         config = self._makeOne(autocommit=True)
-        predlist = config._get_predlist('subscriber')
+        predlist = config.get_predlist('subscriber')
         jam_predicate = predicate_maker('jam')
         jim_predicate = predicate_maker('jim')
         predlist.add('jam', jam_predicate)
@@ -146,7 +146,7 @@ class AdaptersConfiguratorMixinTests(unittest.TestCase):
         L = []
         def subscriber(event): L.append(event)
         config = self._makeOne(autocommit=True)
-        predlist = config._get_predlist('subscriber')
+        predlist = config.get_predlist('subscriber')
         jam_predicate = predicate_maker('jam')
         jim_predicate = predicate_maker('jim')
         predlist.add('jam', jam_predicate)
@@ -169,7 +169,7 @@ class AdaptersConfiguratorMixinTests(unittest.TestCase):
         L = []
         def subscriber(event): L.append(event)
         config = self._makeOne(autocommit=True)
-        predlist = config._get_predlist('subscriber')
+        predlist = config.get_predlist('subscriber')
         jam_predicate = predicate_maker('jam')
         jim_predicate = predicate_maker('jim')
         predlist.add('jam', jam_predicate)

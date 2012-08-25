@@ -49,7 +49,7 @@ class AdaptersConfiguratorMixin(object):
             iface = (iface,)
 
         def register():
-            predlist = self._get_predlist('subscriber')
+            predlist = self.get_predlist('subscriber')
             order, preds, phash = predlist.make(self, **predicates)
             intr.update({'phash':phash, 'order':order, 'predicates':preds})
             derived_subscriber = self._derive_subscriber(subscriber, preds)

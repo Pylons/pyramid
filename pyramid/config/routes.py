@@ -432,7 +432,7 @@ class RoutesConfiguratorMixin(object):
                     )
                 )
 
-            predlist = self._get_predlist('route')
+            predlist = self.get_predlist('route')
             _, preds, _ = predlist.make(self, **pvals)
             route = mapper.connect(
                 name, pattern, factory, predicates=preds,

@@ -492,7 +492,7 @@ class Configurator(
         _get_introspector, _set_introspector, _del_introspector
         )
 
-    def _get_predlist(self, name):
+    def get_predlist(self, name):
         predlist = self.registry.queryUtility(IPredicateList, name=name)
         if predlist is None:
             predlist = PredicateList()
@@ -512,7 +512,7 @@ class Configurator(
         intr['weighs_more_than'] = weighs_more_than
         intr['weighs_less_than'] = weighs_less_than
         def register():
-            predlist = self._get_predlist(type)
+            predlist = self.get_predlist(type)
             predlist.add(name, factory, weighs_more_than=weighs_more_than,
                          weighs_less_than=weighs_less_than)
         self.action(discriminator, register, introspectables=(intr,),
