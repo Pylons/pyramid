@@ -70,6 +70,17 @@ class AdaptersConfiguratorMixin(object):
         if not predicates:
             return subscriber
         def subscriber_wrapper(*arg):
+            # We need to accept *arg and pass it along because zope
+            # subscribers are designed poorly.  Notification will always call
+            # an associated subscriber with all of the objects involved in
+            # the subscription lookup, despite the fact that the event sender
+            # always has the option to attach those objects to the event
+            # object itself (and usually does). It would be much saner if the
+            # registry just used extra args passed to notify to do the lookup
+            # but only called event subscribers with the actual event object,
+            # or if we had been smart enough early on to always wrap
+            # subscribers in something that threw away the extra args, but
+            # c'est la vie.
             if all((predicate(*arg) for predicate in predicates)):
                 return subscriber(*arg)
         if hasattr(subscriber, '__name__'):
