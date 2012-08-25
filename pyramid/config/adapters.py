@@ -55,10 +55,12 @@ class AdaptersConfiguratorMixin(object):
             derived_subscriber = self._derive_subscriber(subscriber, preds)
             self.registry.registerHandler(derived_subscriber, iface)
             
-        intr = self.introspectable('subscribers',
-                                   id(subscriber),
-                                   self.object_description(subscriber),
-                                   'subscriber')
+        intr = self.introspectable(
+            'subscribers',
+            id(subscriber),
+            self.object_description(subscriber),
+            'subscriber'
+            )
         
         intr['subscriber'] = subscriber
         intr['interfaces'] = iface
