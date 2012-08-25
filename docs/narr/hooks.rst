@@ -1235,17 +1235,23 @@ implict and explicit tween chains used by an application.  See
 
 .. _registering_thirdparty_predicates:
 
-Adding A Third Party View or Route Predicate
---------------------------------------------
+Adding A Third Party View, Route, or Subscriber Predicate
+---------------------------------------------------------
 
 .. note::
 
-   Third-party predicates are a feature new as of Pyramid 1.4.
+   Third-party view, route, and subscriber predicates are a feature new as of
+   Pyramid 1.4.
 
-View and route predicates used during view configuration allow you to narrow
-the set of circumstances under which a view or route will match.  For
-example, the ``request_method`` view predicate can be used to ensure a view
-callable is only invoked when the request's method is ``POST``:
+.. _view_and_route_predicates:
+
+View and Route Predicates
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+View and route predicates used during configuration allow you to narrow the
+set of circumstances under which a view or route will match.  For example,
+the ``request_method`` view predicate can be used to ensure a view callable
+is only invoked when the request's method is ``POST``:
 
 .. code-block:: python
 
@@ -1286,9 +1292,9 @@ The first argument to :meth:`pyramid.config.Configurator.add_view_predicate`,
 the name, is a string representing the name that is expected to be passed to
 ``view_config`` (or its imperative analogue ``add_view``).
 
-The second argument is a predicate factory.  A predicate factory is most
-often a class with a constructor (``__init__``), a ``text`` method, a
-``phash`` method and a ``__call__`` method.  For example:
+The second argument is a view or route predicate factory.  A view or route
+predicate factory is most often a class with a constructor (``__init__``), a
+``text`` method, a ``phash`` method and a ``__call__`` method.  For example:
 
 .. code-block:: python
    :linenos:
@@ -1329,4 +1335,100 @@ the "meat" of the predicate.
 You can use the same predicate factory as both a view predicate and as a
 route predicate, but you'll need to call ``add_view_predicate`` and
 ``add_route_predicate`` separately with the same factory.
+
+.. _subscriber_predicates:
+
+Subscriber Predicates
+~~~~~~~~~~~~~~~~~~~~~
+
+Subscriber predicates work almost exactly like view and route predicates.
+They narrow the set of circumstances in which a subscriber will be called.
+There are several minor differences between a subscriber predicate and a
+view/route predicate:
+
+- There are no default subscriber predicates.  You must register one to use
+  one.
+
+- The ``__call__`` method of a subscriber predicate accepts a single
+  ``event`` object instead of a ``context`` and a ``request``.
+
+- Not every subscriber predicate can be used with every event type.  Some
+  subscriber predicates will assume a certain event type.
+
+Here's an example of a subscriber predicate that can be used in conjunction
+with a subscriber that subscribes to the :class:`pyramid.events.NewReqest`
+event type.
+
+.. code-block:: python
+   :linenos:
+
+    class RequestPathStartsWith(object):
+        def __init__(self, val, config):
+            self.val = val
+
+        def text(self):
+            return 'path_startswith = %s' % (self.val,)
+
+        phash = text
+
+        def __call__(self, event):
+            return event.request.path.startswith(self.val)
+
+Once you've created a subscriber predicate, it may registered via
+:meth:`pyramid.config.Configurator.add_subscriber_predicate`.  For example:
+
+.. code-block:: python
+
+    config.add_subscriber_predicate(
+        'request_path_startswith', RequestPathStartsWith)
+
+Once a subscriber predicate is registered, you can use it in a call to
+:meth:`pyramid.config.Configurator.add_subscriber` or to
+:class:`pyramid.events.subscriber`.  Here's an example of using the
+previously registered ``request_path_startswith`` predicate in a call to
+:meth:`~pyramid.config.Configurator.add_subscriber`:
+
+.. code-block:: python
+   :linenos:
+
+    # define a subscriber in your code
+
+    def yosubscriber(event):
+        event.request.yo = 'YO!'
+
+    # and at configuration time
+
+    config.add_subscriber(yosubscriber, NewRequest, 
+           request_path_startswith='/add_yo')
+
+Here's the same subscriber/predicate/event-type combination used via
+:class:`~pyramid.events.subscriber`.
+
+.. code-block:: python
+   :linenos:
+
+    from pyramid.events import subscriber
+
+    @subscriber(NewRequest, request_path_startswith='/add_yo')
+    def yosubscriber(event):
+        event.request.yo = 'YO!'
+
+In either of the above configurations, the ``yosubscriber`` callable will
+only be called if the request path starts with ``/add_yo``.  Otherwise the
+event subscriber will not be called.
+
+Note that the ``request_path_startswith`` subscriber you defined can be used
+with events that have a ``request`` attribute, but not ones that do not.  So,
+for example, the predicate can be used with subscribers registered for
+:class:`pyramid.events.NewRequest` and :class:`pyramid.events.ContextFound`
+events, but it cannot be used with subscribers registered for
+:class:`pyramid.events.ApplicationCreated` because the latter type of event
+has no ``request`` attribute.  The point being: unlike route and view
+predicates, not every type of subscriber predicate will necessarily be
+applicable for use in every subscriber registration.  It is not the
+responsibility of the predicate author to make every predicate make sense for
+every event type; it is the responsibility of the predicate consumer to use
+predicates that make sense for a particular event type registration.
+
+
 

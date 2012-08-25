@@ -997,6 +997,7 @@ Glossary
 
    predicate factory
       A callable which is used by a third party during the registration of a
-      route or view predicates to extend the view and route configuration
+      route, view, or subscriber predicates to extend the configuration
       system.  See :ref:`registering_thirdparty_predicates` for more
       information.
+

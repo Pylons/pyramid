@@ -1,3 +1,5 @@
+from functools import update_wrapper
+
 from zope.interface import Interface
 
 from pyramid.interfaces import (
@@ -6,39 +8,102 @@ from pyramid.interfaces import (
     IResourceURL,
     )
 
-from pyramid.config.util import action_method
+from pyramid.config.util import (
+    action_method,
+    )
+
 
 class AdaptersConfiguratorMixin(object):
     @action_method
-    def add_subscriber(self, subscriber, iface=None):
+    def add_subscriber(self, subscriber, iface=None, **predicates):
         """Add an event :term:`subscriber` for the event stream
-        implied by the supplied ``iface`` interface.  The
-        ``subscriber`` argument represents a callable object (or a
-        :term:`dotted Python name` which identifies a callable); it
-        will be called with a single object ``event`` whenever
-        :app:`Pyramid` emits an :term:`event` associated with the
-        ``iface``, which may be an :term:`interface` or a class or a
-        :term:`dotted Python name` to a global object representing an
-        interface or a class.  Using the default ``iface`` value,
-        ``None`` will cause the subscriber to be registered for all
-        event types. See :ref:`events_chapter` for more information
-        about events and subscribers."""
+        implied by the supplied ``iface`` interface.
+
+        The ``subscriber`` argument represents a callable object (or a
+        :term:`dotted Python name` which identifies a callable); it will be
+        called with a single object ``event`` whenever :app:`Pyramid` emits
+        an :term:`event` associated with the ``iface``, which may be an
+        :term:`interface` or a class or a :term:`dotted Python name` to a
+        global object representing an interface or a class.
+
+        Using the default ``iface`` value, ``None`` will cause the subscriber
+        to be registered for all event types. See :ref:`events_chapter` for
+        more information about events and subscribers.
+
+        Any number of predicate keyword arguments may be passed in
+        ``**predicates``.  Each predicate named will narrow the set of
+        circumstances that the subscriber will be invoked.  Each named
+        predicate must have been registered via
+        :meth:`pyramid.config.Configurator.add_subscriber_predicate` before it
+        can be used.  See :ref:`subscriber_predicates` for more information.
+
+        .. note::
+
+           THe ``**predicates`` argument is new as of Pyramid 1.4.
+        """
         dotted = self.maybe_dotted
         subscriber, iface = dotted(subscriber), dotted(iface)
         if iface is None:
             iface = (Interface,)
         if not isinstance(iface, (tuple, list)):
             iface = (iface,)
+
         def register():
-            self.registry.registerHandler(subscriber, iface)
+            predlist = self._get_predlist('subscriber')
+            order, preds, phash = predlist.make(self, **predicates)
+            intr.update({'phash':phash, 'order':order, 'predicates':preds})
+            derived_subscriber = self._derive_subscriber(subscriber, preds)
+            self.registry.registerHandler(derived_subscriber, iface)
+            
         intr = self.introspectable('subscribers',
                                    id(subscriber),
                                    self.object_description(subscriber),
                                    'subscriber')
+        
         intr['subscriber'] = subscriber
         intr['interfaces'] = iface
+        
         self.action(None, register, introspectables=(intr,))
         return subscriber
+
+    def _derive_subscriber(self, subscriber, predicates):
+        if not predicates:
+            return subscriber
+        def subscriber_wrapper(event):
+            if all((predicate(event) for predicate in predicates)):
+                subscriber(event)
+        if hasattr(subscriber, '__name__'):
+            update_wrapper(subscriber_wrapper, subscriber)
+        return subscriber_wrapper
+        
+    @action_method
+    def add_subscriber_predicate(self, name, factory, weighs_more_than=None,
+                                 weighs_less_than=None):
+        """
+        Adds a subscriber predicate factory.  The associated subscriber
+        predicate can later be named as a keyword argument to
+        :meth:`pyramid.config.Configurator.add_subscriber` in the
+        ``**predicates`` anonyous keyword argument dictionary.
+
+        ``name`` should be the name of the predicate.  It must be a valid
+        Python identifier (it will be used as a ``**predicates`` keyword
+        argument to :meth:`~pyramid.config.Configurator.add_subscriber`).
+
+        ``factory`` should be a :term:`predicate factory`.
+
+        See :ref:`subscriber_predicates` for more information.
+
+        .. note::
+
+           This method is new as of Pyramid 1.4.
+        """
+        self._add_predicate(
+            'subscriber',
+            name,
+            factory,
+            weighs_more_than=weighs_more_than,
+            weighs_less_than=weighs_less_than
+            )
 
     @action_method
     def add_response_adapter(self, adapter, type_or_iface):
@@ -203,4 +268,3 @@ class AdaptersConfiguratorMixin(object):
         intr['resource_iface'] = resource_iface
         self.action(discriminator, register, introspectables=(intr,))
 
-        

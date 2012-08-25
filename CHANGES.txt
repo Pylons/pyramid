@@ -40,9 +40,11 @@ Bug Fixes
 Features
 --------
 
-- Third-party custom view and route predicates can now be added for use by
-  view authors via ``pyramid.config.Configurator.add_view_predicate`` and
-  ``pyramid.config.Configurator.add_route_predicate``.  So, for example,
+- Third-party custom view, route, and subscriber predicates can now be added
+  for use by view authors via
+  ``pyramid.config.Configurator.add_view_predicate``,
+  ``pyramid.config.Configurator.add_route_predicate`` and
+  ``pyramid.config.Configurator.add_subscriber_predicate``.  So, for example,
   doing this::
 
      config.add_view_predicate('abc', my.package.ABCPredicate)
@@ -52,8 +54,9 @@ Features
 
      @view_config(abc=1)
 
-  See "Adding A Third Party View or Route Predicate" in the Hooks chapter for
-  more information.
+  Similar features exist for ``add_route``, and ``add_subscriber``.  See
+  "Adding A Third Party View, Route, or Subscriber Predicate" in the Hooks
+  chapter for more information.
 
   Note that changes made to support the above feature now means that only
   actions registered using the same "order" can conflict with one another.

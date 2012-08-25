@@ -81,6 +81,121 @@ class AdaptersConfiguratorMixinTests(unittest.TestCase):
         config.registry.subscribers((event.object, IDummy), None)
         self.assertEqual(len(L), 1)
 
+    def test_add_subscriber_with_specific_type_and_predicates_True(self):
+        from zope.interface import implementer
+        from zope.interface import Interface
+        class IEvent(Interface):
+            pass
+        @implementer(IEvent)
+        class Event:
+            pass
+        L = []
+        def subscriber(event):
+            L.append(event)
+        config = self._makeOne(autocommit=True)
+        predlist = config._get_predlist('subscriber')
+        jam_predicate = predicate_maker('jam')
+        jim_predicate = predicate_maker('jim')
+        predlist.add('jam', jam_predicate)
+        predlist.add('jim', jim_predicate)
+        config.add_subscriber(subscriber, IEvent, jam=True, jim=True)
+        event = Event()
+        event.jam = True
+        event.jim = True
+        config.registry.notify(event)
+        self.assertEqual(len(L), 1)
+        self.assertEqual(L[0], event)
+        config.registry.notify(object())
+        self.assertEqual(len(L), 1)
+
+    def test_add_subscriber_with_default_type_predicates_True(self):
+        from zope.interface import implementer
+        from zope.interface import Interface
+        class IEvent(Interface):
+            pass
+        @implementer(IEvent)
+        class Event:
+            pass
+        L = []
+        def subscriber(event):
+            L.append(event)
+        config = self._makeOne(autocommit=True)
+        predlist = config._get_predlist('subscriber')
+        jam_predicate = predicate_maker('jam')
+        jim_predicate = predicate_maker('jim')
+        predlist.add('jam', jam_predicate)
+        predlist.add('jim', jim_predicate)
+        config.add_subscriber(subscriber, jam=True, jim=True)
+        event = Event()
+        event.jam = True
+        event.jim = True
+        config.registry.notify(event)
+        self.assertEqual(len(L), 1)
+        self.assertEqual(L[0], event)
+        config.registry.notify(object())
+        self.assertEqual(len(L), 1)
+
+    def test_add_subscriber_with_specific_type_and_predicates_False(self):
+        from zope.interface import implementer
+        from zope.interface import Interface
+        class IEvent(Interface):
+            pass
+        @implementer(IEvent)
+        class Event:
+            pass
+        L = []
+        def subscriber(event): L.append(event)
+        config = self._makeOne(autocommit=True)
+        predlist = config._get_predlist('subscriber')
+        jam_predicate = predicate_maker('jam')
+        jim_predicate = predicate_maker('jim')
+        predlist.add('jam', jam_predicate)
+        predlist.add('jim', jim_predicate)
+        config.add_subscriber(subscriber, IEvent, jam=True, jim=True)
+        event = Event()
+        event.jam = True
+        event.jim = False
+        config.registry.notify(event)
+        self.assertEqual(len(L), 0)
+
+    def test_add_subscriber_with_default_type_predicates_False(self):
+        from zope.interface import implementer
+        from zope.interface import Interface
+        class IEvent(Interface):
+            pass
+        @implementer(IEvent)
+        class Event:
+            pass
+        L = []
+        def subscriber(event): L.append(event)
+        config = self._makeOne(autocommit=True)
+        predlist = config._get_predlist('subscriber')
+        jam_predicate = predicate_maker('jam')
+        jim_predicate = predicate_maker('jim')
+        predlist.add('jam', jam_predicate)
+        predlist.add('jim', jim_predicate)
+        config.add_subscriber(subscriber, jam=True, jim=True)
+        event = Event()
+        event.jam = False
+        event.jim = True
+        config.registry.notify(event)
+        self.assertEqual(len(L), 0)
+
+    def test_add_subscriber_predicate(self):
+        config = self._makeOne()
+        L = []
+        def add_predicate(type, name, factory, weighs_less_than=None,
+                          weighs_more_than=None):
+            self.assertEqual(type, 'subscriber')
+            self.assertEqual(name, 'name')
+            self.assertEqual(factory, 'factory')
+            self.assertEqual(weighs_more_than, 1)
+            self.assertEqual(weighs_less_than, 2)
+            L.append(1)
+        config._add_predicate = add_predicate
+        config.add_subscriber_predicate('name', 'factory', 1, 2)
+        self.assertTrue(L)
+        
     def test_add_response_adapter(self):
         from pyramid.interfaces import IResponse
         config = self._makeOne(autocommit=True)
@@ -228,4 +343,14 @@ class DummyResourceURL(object):
         self.resource = resource
         self.request = request
         
-        
+def predicate_maker(name):
+    class Predicate(object):
+        def __init__(self, val, config):
+            self.val = val
+        def phash(self):
+            return 'phash'
+        text = phash
+        def __call__(self, event):
+            return getattr(event, name, None) == self.val
+    return Predicate
+

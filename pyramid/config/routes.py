@@ -1,7 +1,6 @@
 import warnings
 
 from pyramid.interfaces import (
-    IPredicateList,
     IRequest,
     IRouteRequest,
     IRoutesMapper,
@@ -17,7 +16,6 @@ from pyramid.urldispatch import RoutesMapper
 from pyramid.config.util import (
     action_method,
     as_sorted_tuple,
-    PredicateList,
     )
 
 import pyramid.config.predicates
@@ -265,7 +263,7 @@ class RoutesConfiguratorMixin(object):
           registered via
           :meth:`pyramid.config.Configurator.add_view_predicate`.  More than
           one key/value pair can be used at the same time.  See
-          :ref:`registering_thirdparty_predicates` for more information about
+          :ref:`view_and_route_predicates` for more information about
           third-party predicates.  This argument is new as of Pyramid 1.4.
           
         View-Related Arguments
@@ -434,7 +432,7 @@ class RoutesConfiguratorMixin(object):
                     )
                 )
 
-            predlist = self.route_predlist
+            predlist = self._get_predlist('route')
             _, preds, _ = predlist.make(self, **pvals)
             route = mapper.connect(
                 name, pattern, factory, predicates=preds,
@@ -466,15 +464,6 @@ class RoutesConfiguratorMixin(object):
                 attr=view_attr,
             )
 
-    @property
-    def route_predlist(self):
-        predlist = self.registry.queryUtility(IPredicateList, name='route')
-        if predlist is None:
-            predlist = PredicateList()
-            self.registry.registerUtility(predlist, IPredicateList,
-                                          name='route')
-        return predlist
-
     @action_method
     def add_route_predicate(self, name, factory, weighs_more_than=None,
                            weighs_less_than=None):
@@ -488,29 +477,19 @@ class RoutesConfiguratorMixin(object):
 
         ``factory`` should be a :term:`predicate factory`.
 
-        See :ref:`registering_thirdparty_predicates` for more information.
+        See :ref:`view_and_route_predicates` for more information.
 
         .. note::
 
            This method is new as of Pyramid 1.4.
         """
-        discriminator = ('route predicate', name)
-        intr = self.introspectable(
-            'route predicates',
-            discriminator,
-            'route predicate named %s' % name,
-            'route predicate')
-        intr['name'] = name
-        intr['factory'] = factory
-        intr['weighs_more_than'] = weighs_more_than
-        intr['weighs_less_than'] = weighs_less_than
-        def register():
-            predlist = self.route_predlist
-            predlist.add(name, factory, weighs_more_than=weighs_more_than,
-                         weighs_less_than=weighs_less_than)
-        # must be registered before routes connected
-        self.action(discriminator, register, introspectables=(intr,),
-                    order=PHASE1_CONFIG) 
+        self._add_predicate(
+            'route',
+            name,
+            factory,
+            weighs_more_than=weighs_more_than,
+            weighs_less_than=weighs_less_than
+            )
 
     def add_default_route_predicates(self):
         p = pyramid.config.predicates

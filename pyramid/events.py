@@ -14,9 +14,10 @@ from pyramid.interfaces import (
     )
 
 class subscriber(object):
-    """ Decorator activated via a :term:`scan` which treats the
-    function being decorated as an event subscriber for the set of
-    interfaces passed as ``*ifaces`` to the decorator constructor.
+    """ Decorator activated via a :term:`scan` which treats the function
+    being decorated as an event subscriber for the set of interfaces passed
+    as ``*ifaces`` and the set of predicate terms passed as ``**predicates``
+    to the decorator constructor.
 
     For example:
 
@@ -61,16 +62,22 @@ class subscriber(object):
        config = Configurator()
        config.scan('somepackage_containing_subscribers')
 
+    Any ``**predicate`` arguments will be passed along to
+    :meth:`pyramid.config.Configurator.add_subscriber`.  See
+    :ref:`subscriber_predicates` for a description of how predicates can
+    narrow the set of circumstances in which a subscriber will be called.
+
     """
     venusian = venusian # for unit testing
 
-    def __init__(self, *ifaces):
+    def __init__(self, *ifaces, **predicates):
         self.ifaces = ifaces
+        self.predicates = predicates
 
     def register(self, scanner, name, wrapped):
         config = scanner.config
         for iface in self.ifaces or (Interface,):
-            config.add_subscriber(wrapped, iface)
+            config.add_subscriber(wrapped, iface, **self.predicates)
 
     def __call__(self, wrapped):
         self.venusian.attach(wrapped, self.register, category='pyramid')
