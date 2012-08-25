@@ -87,7 +87,7 @@ def UnencryptedCookieSessionFactoryConfig(
     cookie_max_age=None,
     cookie_path='/',
     cookie_domain=None,
-    cookie_secure=False, 
+    cookie_secure=False,
     cookie_httponly=False,
     cookie_on_exception=True,
     signed_serialize=signed_serialize,
@@ -246,7 +246,7 @@ def UnencryptedCookieSessionFactoryConfig(
         # CSRF API methods
         @manage_accessed
         def new_csrf_token(self):
-            token = text_(binascii.hexlify(os.urandom(20)))
+            token = binascii.hexlify(os.urandom(20)).decode('ascii')
             self['_csrft_'] = token
             return token
 
