@@ -2045,11 +2045,28 @@ class TestMultiView(unittest.TestCase):
 
     def test_add_with_phash_override_accept(self):
         mv = self._makeOne()
-        mv.add('view2', 100, accept='text/html', phash='abc')
-        mv.add('view3', 100, accept='text/html', phash='abc')
-        mv.add('view4', 99, accept='text/html', phash='def')
+        def view1(): pass
+        def view2(): pass
+        def view3(): pass
+        mv.add(view1, 100, accept='text/html', phash='abc')
+        mv.add(view2, 100, accept='text/html', phash='abc')
+        mv.add(view3, 99, accept='text/html', phash='def')
         self.assertEqual(mv.media_views['text/html'],
-                         [(99, 'view4', 'def'), (100, 'view3', 'abc')])
+                         [(99, view3, 'def'), (100, view2, 'abc')])
+
+    def test_add_with_phash_override_accept2(self):
+        mv = self._makeOne()
+        def view1(): pass
+        def view2(): pass
+        def view3(): pass
+        mv.add(view1, 100, accept='text/html', phash='abc')
+        mv.add(view2, 100, accept='text/html', phash='def')
+        mv.add(view3, 99, accept='text/html', phash='ghi')
+        self.assertEqual(mv.media_views['text/html'],
+                         [(99, view3, 'ghi'),
+                          (100, view1, 'abc'),
+                          (100, view2, 'def')]
+                         )
 
     def test_multiple_with_functions_as_views(self):
         # this failed on py3 at one point, because functions aren't orderable
