@@ -573,7 +573,7 @@ class MultiView(object):
                     return
             else:
                 subset.append((order, view, phash))
-                subset.sort()
+                subset.sort(key=operator.itemgetter(0))
             accepts = set(self.accepts)
             accepts.add(accept)
             self.accepts = list(accepts) # dedupe

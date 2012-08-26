@@ -37,6 +37,11 @@ Bug Fixes
   ``__doc__`` attributes.  See https://github.com/Pylons/pyramid/issues/621
   and https://github.com/Pylons/pyramid/pull/647.
 
+- Forward-port from 1.3 branch: when registering multiple views with an
+  ``accept`` predicate in a Pyramid application runing under Python 3, you
+  might have received a ``TypeError: unorderable types: function() <
+  function()`` exception.
+
 Features
 --------
 
