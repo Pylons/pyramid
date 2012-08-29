@@ -27,7 +27,7 @@ def renderer_factory(info):
 
 @implementer(ITemplateRenderer)
 class TextTemplateRenderer(object):
-    def __init__(self, path, lookup):
+    def __init__(self, path, lookup, macro=None):
         self.path = path
         self.lookup = lookup
 

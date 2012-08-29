@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import pkg_resources
 import threading
 
@@ -426,7 +427,7 @@ class ChameleonRendererLookup(object):
                 raise ValueError('Missing template file: %s' % spec)
             renderer = registry.queryUtility(ITemplateRenderer, name=spec)
             if renderer is None:
-                renderer = self.impl(spec, self)
+                renderer = self.impl(spec, self, macro=None)
                 # cache the template
                 try:
                     self.lock.acquire()
@@ -438,6 +439,14 @@ class ChameleonRendererLookup(object):
             # spec is a package:relpath asset spec
             renderer = registry.queryUtility(ITemplateRenderer, name=spec)
             if renderer is None:
+                p = re.compile(
+                    r'(?P<asset>[\w_.:/]+)'
+                    r'(?:\#(?P<defname>[\w_]+))?'
+                    r'(\.(?P<ext>.*))'
+                    )
+                asset, macro, ext = p.match(spec).group(
+                    'asset', 'defname', 'ext')
+                spec = '%s.%s' % (asset, ext)
                 try:
                     package_name, filename = spec.split(':', 1)
                 except ValueError: # pragma: no cover
@@ -450,7 +459,7 @@ class ChameleonRendererLookup(object):
                 if not pkg_resources.resource_exists(package_name, filename):
                     raise ValueError(
                         'Missing template asset: %s (%s)' % (spec, abspath))
-                renderer = self.impl(abspath, self)
+                renderer = self.impl(abspath, self, macro=macro)
                 settings = info.settings
                 if not settings.get('reload_assets'):
                     # cache the template

@@ -26,25 +26,34 @@ def renderer_factory(info):
 
 @implementer(ITemplateRenderer)
 class ZPTTemplateRenderer(object):
-    def __init__(self, path, lookup):
+    def __init__(self, path, lookup, macro=None):
         self.path = path
         self.lookup = lookup
+        self.macro = macro
 
     @reify # avoid looking up reload_templates before manager pushed
     def template(self):
         if sys.platform.startswith('java'): # pragma: no cover
             raise RuntimeError(
                 'Chameleon templates are not compatible with Jython')
-        return PageTemplateFile(self.path,
-                                auto_reload=self.lookup.auto_reload,
-                                debug=self.lookup.debug,
-                                translate=self.lookup.translate)
+        tf = PageTemplateFile(self.path,
+                              auto_reload=self.lookup.auto_reload,
+                              debug=self.lookup.debug,
+                              translate=self.lookup.translate)
+        if self.macro:
+            # render only the portion of the template included in a
+            # define-macro named the value of self.macro
+            macro_renderer = tf.macros[self.macro].include
+            tf._render = macro_renderer
+        return tf
 
     def implementation(self):
         return self.template
     
     def __call__(self, value, system):
         try:
+            system['renderer'] = self
+            system['template'] = self.template
             system.update(value)
         except (TypeError, ValueError):
             raise ValueError('renderer was passed non-dictionary as value')
