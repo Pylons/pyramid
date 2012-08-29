@@ -542,7 +542,7 @@ Sommetime you'd like to render a macro inside of a Chameleon ZPT template
 instead of the full Chameleon ZPT template. To render the content of a
 ``define-macro`` field inside a Chameleon ZPT template, given a Chameleon
 template file named ``foo.pt`` and a macro named ``bar`` defined within it
-(e.g. ``<div metal:define-macro="bar">...</div>``, you can configure the
+(e.g. ``<div metal:define-macro="bar">...</div>``), you can configure the
 template as a :term:`renderer` like so:
 
 .. code-block:: python
@@ -554,8 +554,8 @@ template as a :term:`renderer` like so:
    def my_view(request):
        return {'project':'my project'}
 
-The above will render the ``bar`` macro from within the ``foo.pt`` template
-instead of the entire template.
+The above will render only the ``bar`` macro defined within the ``foo.pt``
+template instead of the entire template.
 
 .. note::
 
