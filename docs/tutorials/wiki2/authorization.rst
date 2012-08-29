@@ -186,7 +186,7 @@ one makes it a :term:`forbidden view`.  The forbidden view is
 displayed whenever Pyramid or your application raises an
 :class:`pyramid.httpexceptions.HTTPForbidden` exception.  In this
 case, we'll be relying on the forbidden view to show the login form
-whenver someone attempts to execute an action which they're not yet
+whenever someone attempts to execute an action which they're not yet
 authorized to perform.
 
 The ``logout`` view callable is decorated with a ``@view_config`` decorator
