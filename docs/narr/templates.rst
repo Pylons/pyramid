@@ -535,8 +535,8 @@ And ``templates/mytemplate.pt`` might look like so:
     </html>
 
 
-Using A Chameleon Macro Name Within a Chameleon ZPT Template
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Using A Chameleon Macro Name Within a Renderer Name
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Sommetime you'd like to render a macro inside of a Chameleon ZPT template
 instead of the full Chameleon ZPT template. To render the content of a
