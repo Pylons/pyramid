@@ -52,6 +52,8 @@ class ZPTTemplateRenderer(object):
     
     def __call__(self, value, system):
         try:
+            system['renderer'] = self
+            system['template'] = self.template
             system.update(value)
         except (TypeError, ValueError):
             raise ValueError('renderer was passed non-dictionary as value')
