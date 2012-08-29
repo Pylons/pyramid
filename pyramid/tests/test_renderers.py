@@ -292,7 +292,7 @@ class TestChameleonRendererLookup(unittest.TestCase):
         if path.endswith('.pyc'): # pragma: no cover
             path = path[:-1]
         self.assertTrue(factory.path.startswith(path))
-        self.assertEqual(factory.kw, {})
+        self.assertEqual(factory.kw, {'macro':None})
 
     def test___call__reload_assets_true(self):
         import pyramid.tests
