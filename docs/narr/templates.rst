@@ -557,6 +557,9 @@ template as a :term:`renderer` like so:
 The above will render the ``bar`` macro from within the ``foo.pt`` template
 instead of the entire template.
 
+.. note::
+
+   This feature is new in Pyramid 1.4.
 
 .. index::
    single: Chameleon text templates
@@ -757,6 +760,10 @@ configure the template as a :term:`renderer` like so:
 
 The above will render the ``bar`` def from within the ``foo.mak`` template
 instead of the entire template.
+
+.. note::
+
+   This feature is new in Pyramid 1.4.
 
 .. index::
    single: automatic reloading of templates
