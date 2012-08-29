@@ -20,7 +20,6 @@ from pyramid.interfaces import (
     IException,
     IExceptionViewClassifier,
     IMultiView,
-    IPredicateList,
     IRendererFactory,
     IRequest,
     IResponse,
@@ -79,7 +78,6 @@ from pyramid.config.util import (
     DEFAULT_PHASH,
     MAX_ORDER,
     action_method,
-    PredicateList,
     )
 
 urljoin = urlparse.urljoin
@@ -575,7 +573,7 @@ class MultiView(object):
                     return
             else:
                 subset.append((order, view, phash))
-                subset.sort()
+                subset.sort(key=operator.itemgetter(0))
             accepts = set(self.accepts)
             accepts.add(accept)
             self.accepts = list(accepts) # dedupe
@@ -1008,7 +1006,7 @@ class ViewsConfiguratorMixin(object):
           registered via
           :meth:`pyramid.config.Configurator.add_view_predicate`.  More than
           one key/value pair can be used at the same time.  See
-          :ref:`registering_thirdparty_predicates` for more information about
+          :ref:`view_and_route_predicates` for more information about
           third-party predicates.  This argument is new as of Pyramid 1.4.
 
         """
@@ -1046,6 +1044,9 @@ class ViewsConfiguratorMixin(object):
             renderer = renderers.RendererHelper(
                 name=renderer, package=self.package,
                 registry = self.registry)
+
+        if accept is not None:
+            accept = accept.lower()
 
         introspectables = []
         pvals = predicates.copy()
@@ -1104,7 +1105,7 @@ class ViewsConfiguratorMixin(object):
             )
         view_intr.update(**predicates)
         introspectables.append(view_intr)
-        predlist = self.view_predlist
+        predlist = self.get_predlist('view')
 
         def register(permission=permission, renderer=renderer):
             # the discrim_func above is guaranteed to have been called already
@@ -1299,14 +1300,6 @@ class ViewsConfiguratorMixin(object):
             introspectables.append(perm_intr)
         self.action(discriminator, register, introspectables=introspectables)
 
-    @property
-    def view_predlist(self):
-        predlist = self.registry.queryUtility(IPredicateList, name='view')
-        if predlist is None:
-            predlist = PredicateList()
-            self.registry.registerUtility(predlist, IPredicateList, name='view')
-        return predlist
-
     @action_method
     def add_view_predicate(self, name, factory, weighs_more_than=None,
                            weighs_less_than=None):
@@ -1321,28 +1314,19 @@ class ViewsConfiguratorMixin(object):
 
         ``factory`` should be a :term:`predicate factory`.
 
-        See :ref:`registering_thirdparty_predicates` for more information.
+        See :ref:`view_and_route_predicates` for more information.
 
         .. note::
 
            This method is new as of Pyramid 1.4.
         """
-        discriminator = ('view predicate', name)
-        intr = self.introspectable(
-            'view predicates',
-            discriminator,
-            'view predicate named %s' % name,
-            'view predicate')
-        intr['name'] = name
-        intr['factory'] = factory
-        intr['weighs_more_than'] = weighs_more_than
-        intr['weighs_less_than'] = weighs_less_than
-        def register():
-            predlist = self.view_predlist
-            predlist.add(name, factory, weighs_more_than=weighs_more_than,
-                         weighs_less_than=weighs_less_than)
-        self.action(discriminator, register, introspectables=(intr,),
-                    order=PHASE1_CONFIG) # must be registered before views added
+        self._add_predicate(
+            'view',
+            name,
+            factory,
+            weighs_more_than=weighs_more_than,
+            weighs_less_than=weighs_less_than
+            )
 
     def add_default_view_predicates(self):
         p = pyramid.config.predicates

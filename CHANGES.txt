@@ -23,12 +23,33 @@ Bug Fixes
   https://github.com/Pylons/pyramid/issues/606
   https://github.com/Pylons/pyramid/issues/607
 
+- In Mako Templates lookup, check for absolute uri (using mako directories) 
+  when mixing up inheritance with asset specs.
+  https://github.com/Pylons/pyramid/issues/662
+
+- HTTP Accept headers were not being normalized causing potentially
+  conflicting view registrations to go unnoticed. Two views that only
+  differ in the case ('text/html' vs. 'text/HTML') will now raise an error.
+  https://github.com/Pylons/pyramid/pull/620
+
+- Configurator.add_directive now accepts arbitrary callables like partials or
+  objects implementing ``__call__`` which dont have ``__name__`` and
+  ``__doc__`` attributes.  See https://github.com/Pylons/pyramid/issues/621
+  and https://github.com/Pylons/pyramid/pull/647.
+
+- Forward-port from 1.3 branch: when registering multiple views with an
+  ``accept`` predicate in a Pyramid application runing under Python 3, you
+  might have received a ``TypeError: unorderable types: function() <
+  function()`` exception.
+
 Features
 --------
 
-- Third-party custom view and route predicates can now be added for use by
-  view authors via ``pyramid.config.Configurator.add_view_predicate`` and
-  ``pyramid.config.Configurator.add_route_predicate``.  So, for example,
+- Third-party custom view, route, and subscriber predicates can now be added
+  for use by view authors via
+  ``pyramid.config.Configurator.add_view_predicate``,
+  ``pyramid.config.Configurator.add_route_predicate`` and
+  ``pyramid.config.Configurator.add_subscriber_predicate``.  So, for example,
   doing this::
 
      config.add_view_predicate('abc', my.package.ABCPredicate)
@@ -38,8 +59,9 @@ Features
 
      @view_config(abc=1)
 
-  See "Adding A Third Party View or Route Predicate" in the Hooks chapter for
-  more information.
+  Similar features exist for ``add_route``, and ``add_subscriber``.  See
+  "Adding A Third Party View, Route, or Subscriber Predicate" in the Hooks
+  chapter for more information.
 
   Note that changes made to support the above feature now means that only
   actions registered using the same "order" can conflict with one another.
@@ -115,6 +137,11 @@ Features
 
       config = Configurator()
       config.add_permission('view')
+
+- The ``UnencryptedCookieSessionFactoryConfig`` now accepts
+  ``signed_serialize`` and ``signed_deserialize`` hooks which may be used
+  to influence how the sessions are marshalled (by default this is done
+  with HMAC+pickle).
 
 Deprecations
 ------------

@@ -12,6 +12,8 @@ from webob.exc import WSGIHTTPException as WebobWSGIHTTPException
 from pyramid.interfaces import (
     IDebugLogger,
     IExceptionResponse,
+    IPredicateList,
+    PHASE1_CONFIG,
     )
 
 from pyramid.asset import resolve_asset_spec
@@ -71,6 +73,7 @@ from pyramid.config.tweens import TweensConfiguratorMixin
 from pyramid.config.util import (
     action_method,
     ActionInfo,
+    PredicateList,
     )
 from pyramid.config.views import ViewsConfiguratorMixin
 from pyramid.config.zca import ZCAConfiguratorMixin
@@ -488,6 +491,32 @@ class Configurator(
     introspector = property(
         _get_introspector, _set_introspector, _del_introspector
         )
+
+    def get_predlist(self, name):
+        predlist = self.registry.queryUtility(IPredicateList, name=name)
+        if predlist is None:
+            predlist = PredicateList()
+            self.registry.registerUtility(predlist, IPredicateList, name=name)
+        return predlist
+
+    def _add_predicate(self, type, name, factory, weighs_more_than=None,
+                       weighs_less_than=None):
+        discriminator = ('%s predicate' % type, name)
+        intr = self.introspectable(
+            '%s predicates' % type,
+            discriminator,
+            '%s predicate named %s' % (type, name),
+            '%s predicate' % type)
+        intr['name'] = name
+        intr['factory'] = factory
+        intr['weighs_more_than'] = weighs_more_than
+        intr['weighs_less_than'] = weighs_less_than
+        def register():
+            predlist = self.get_predlist(type)
+            predlist.add(name, factory, weighs_more_than=weighs_more_than,
+                         weighs_less_than=weighs_less_than)
+        self.action(discriminator, register, introspectables=(intr,),
+                    order=PHASE1_CONFIG) # must be registered early
 
     @property
     def action_info(self):

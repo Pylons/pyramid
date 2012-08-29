@@ -646,6 +646,24 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         request.accept = DummyAccept('text/html', 'text/html')
         self.assertEqual(wrapper(None, request), 'OK2')
 
+    def test_add_view_mixed_case_replaces_existing_view(self):
+        from pyramid.renderers import null_renderer
+        def view(context, request): return 'OK'
+        def view2(context, request): return 'OK2'
+        def view3(context, request): return 'OK3'
+        config = self._makeOne(autocommit=True)
+        config.add_view(view=view, renderer=null_renderer)
+        config.add_view(view=view2, accept='text/html', renderer=null_renderer)
+        config.add_view(view=view3, accept='text/HTML', renderer=null_renderer)
+        wrapper = self._getViewCallable(config)
+        self.assertTrue(IMultiView.providedBy(wrapper))
+        self.assertEqual(len(wrapper.media_views.items()),1)
+        self.assertFalse('text/HTML' in wrapper.media_views)
+        self.assertEqual(wrapper(None, None), 'OK')
+        request = DummyRequest()
+        request.accept = DummyAccept('text/html', 'text/html')
+        self.assertEqual(wrapper(None, request), 'OK3')
+
     def test_add_views_with_accept_multiview_replaces_existing(self):
         from pyramid.renderers import null_renderer
         def view(context, request): return 'OK'
@@ -2122,11 +2140,28 @@ class TestMultiView(unittest.TestCase):
 
     def test_add_with_phash_override_accept(self):
         mv = self._makeOne()
-        mv.add('view2', 100, accept='text/html', phash='abc')
-        mv.add('view3', 100, accept='text/html', phash='abc')
-        mv.add('view4', 99, accept='text/html', phash='def')
+        def view1(): pass
+        def view2(): pass
+        def view3(): pass
+        mv.add(view1, 100, accept='text/html', phash='abc')
+        mv.add(view2, 100, accept='text/html', phash='abc')
+        mv.add(view3, 99, accept='text/html', phash='def')
         self.assertEqual(mv.media_views['text/html'],
-                         [(99, 'view4', 'def'), (100, 'view3', 'abc')])
+                         [(99, view3, 'def'), (100, view2, 'abc')])
+
+    def test_add_with_phash_override_accept2(self):
+        mv = self._makeOne()
+        def view1(): pass
+        def view2(): pass
+        def view3(): pass
+        mv.add(view1, 100, accept='text/html', phash='abc')
+        mv.add(view2, 100, accept='text/html', phash='def')
+        mv.add(view3, 99, accept='text/html', phash='ghi')
+        self.assertEqual(mv.media_views['text/html'],
+                         [(99, view3, 'ghi'),
+                          (100, view1, 'abc'),
+                          (100, view2, 'def')]
+                         )
 
     def test_multiple_with_functions_as_views(self):
         # this failed on py3 at one point, because functions aren't orderable

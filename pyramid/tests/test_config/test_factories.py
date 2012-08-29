@@ -125,9 +125,9 @@ class TestFactoriesMixin(unittest.TestCase):
             request = DummyRequest(config.registry)
         event = Event()
         config.registry.notify(event)
-        exts = event.request.extensions
-        self.assertTrue('foo' in exts[0])
-        self.assertTrue('bar' in exts[1])
+        exts = list(sorted(event.request.extensions))
+        self.assertEqual('bar', exts[0])
+        self.assertEqual('foo', exts[1])
 
     def test_set_request_method_subscriber(self):
         from zope.interface import implementer

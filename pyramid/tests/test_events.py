@@ -131,9 +131,9 @@ class TestSubscriber(unittest.TestCase):
     def tearDown(self):
         testing.tearDown()
 
-    def _makeOne(self, *ifaces):
+    def _makeOne(self, *ifaces, **predicates):
         from pyramid.events import subscriber
-        return subscriber(*ifaces)
+        return subscriber(*ifaces, **predicates)
 
     def test_register_single(self):
         from zope.interface import Interface
@@ -189,6 +189,16 @@ class TestSubscriber(unittest.TestCase):
         dec(foo)
         self.assertEqual(dummy_venusian.attached,
                          [(foo, dec.register, 'pyramid')])
+
+    def test_regsister_with_predicates(self):
+        from zope.interface import Interface
+        dec = self._makeOne(a=1)
+        def foo(): pass
+        config = DummyConfigurator()
+        scanner = Dummy()
+        scanner.config = config
+        dec.register(scanner, None, foo)
+        self.assertEqual(config.subscribed, [(foo, Interface, {'a':1})])
 
 class TestBeforeRender(unittest.TestCase):
     def _makeOne(self, system, val=None):
@@ -264,8 +274,11 @@ class DummyConfigurator(object):
     def __init__(self):
         self.subscribed = []
 
-    def add_subscriber(self, wrapped, ifaces):
-        self.subscribed.append((wrapped, ifaces))
+    def add_subscriber(self, wrapped, ifaces, **predicates):
+        if not predicates:
+            self.subscribed.append((wrapped, ifaces))
+        else:
+            self.subscribed.append((wrapped, ifaces, predicates))
 
 class DummyRegistry(object):
     pass

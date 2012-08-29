@@ -24,17 +24,6 @@ Nice-to-Have
 - Modify the urldispatch chapter examples to assume a scan rather than
   ``add_view``.
 
-- Context manager for creating a new configurator (replacing
-  ``with_package``).  E.g.::
-
-    with config.partial(package='bar') as c:
-        c.add_view(...)
-
-  or::
-
-    with config.partial(introspection=False) as c:
-        c.add_view(..)
-
 - Introspection:
 
   * ``default root factory`` category (prevent folks from needing to searh
@@ -114,7 +103,7 @@ Future
 - 1.4: Remove ``chameleon_text`` / ``chameleon_zpt`` deprecated functions
   (render_*)
 
-- 1.4: Remove ``pyramid.configuration.ConfigurationError`` (deprecated).
+- 1.4: Remove ``pyramid.configuration`` (deprecated).
 
 - 1.4: Remove ``pyramid.paster.PyramidTemplate`` (deprecated).
 
@@ -128,7 +117,7 @@ Future
 
 - 1.5: Remove ``pyramid.requests.DeprecatedRequestMethodsMixin``.
 
-- 1.5: Maybe? deprecate set_request_property in favor of pointing people at
+- 1.6: Maybe? deprecate set_request_property in favor of pointing people at
   set_request_method.
 
 - 1.6: Remove IContextURL and TraversalContextURL.
@@ -152,3 +141,15 @@ Probably Bad Ideas
 
 - http://pythonguy.wordpress.com/2011/06/22/dynamic-variables-revisited/
   instead of thread locals
+
+- Context manager for creating a new configurator (replacing
+  ``with_package``).  E.g.::
+
+    with config.partial(package='bar') as c:
+        c.add_view(...)
+
+  or::
+
+    with config.partial(introspection=False) as c:
+        c.add_view(..)
+
