@@ -534,6 +534,33 @@ And ``templates/mytemplate.pt`` might look like so:
       </span>
     </html>
 
+
+Using A Chameleon Macro Name Within a Renderer Name
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Sommetime you'd like to render a macro inside of a Chameleon ZPT template
+instead of the full Chameleon ZPT template. To render the content of a
+``define-macro`` field inside a Chameleon ZPT template, given a Chameleon
+template file named ``foo.pt`` and a macro named ``bar`` defined within it
+(e.g. ``<div metal:define-macro="bar">...</div>``, you can configure the
+template as a :term:`renderer` like so:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.view import view_config
+
+   @view_config(renderer='foo#bar.pt')
+   def my_view(request):
+       return {'project':'my project'}
+
+The above will render the ``bar`` macro from within the ``foo.pt`` template
+instead of the entire template.
+
+.. note::
+
+   This feature is new in Pyramid 1.4.
+
 .. index::
    single: Chameleon text templates
 
@@ -714,12 +741,13 @@ This template doesn't use any advanced features of Mako, only the
 :term:`renderer globals`.  See the `the Mako documentation
 <http://www.makotemplates.org/>`_ to use more advanced features.
 
-Using def inside Mako Templates
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Using A Mako def name Within a Renderer Name
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To use a def inside a Mako template, given a :term:`Mako` template file named 
-``foo.mak`` and a def named ``bar``, you can configure the template as a 
-:term:`renderer` like so:
+Sommetime you'd like to render a ``def`` inside of a Mako template instead of
+the full Mako template. To render a def inside a Mako template, given a
+:term:`Mako` template file named ``foo.mak`` and a def named ``bar``, you can
+configure the template as a :term:`renderer` like so:
 
 .. code-block:: python
    :linenos:
@@ -729,6 +757,13 @@ To use a def inside a Mako template, given a :term:`Mako` template file named
    @view_config(renderer='foo#bar.mak')
    def my_view(request):
        return {'project':'my project'}
+
+The above will render the ``bar`` def from within the ``foo.mak`` template
+instead of the entire template.
+
+.. note::
+
+   This feature is new in Pyramid 1.4.
 
 .. index::
    single: automatic reloading of templates

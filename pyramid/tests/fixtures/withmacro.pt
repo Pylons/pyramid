@@ -1,0 +1,3 @@
+<metal:m define-macro="foo">
+  Hello!
+</metal:m>

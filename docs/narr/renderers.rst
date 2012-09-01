@@ -306,7 +306,9 @@ See :class:`pyramid.renderers.JSON` and
 JSONP Renderer
 ~~~~~~~~~~~~~~
 
-.. note:: This feature is new in Pyramid 1.1.
+.. note::
+
+   This feature is new in Pyramid 1.1.
 
 :class:`pyramid.renderers.JSONP` is a `JSONP
 <http://en.wikipedia.org/wiki/JSONP>`_ renderer factory helper which

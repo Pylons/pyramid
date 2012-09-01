@@ -103,10 +103,21 @@ Features
   and ``HTTPMovedPermanently`` exceptions, so these can be caught by the
   NotFound view (and other exception views).
 
-- The mako renderer now accepts a def name and returns the template def
-  result for the view being called. The uri format using an asset spec is
-  package:path/to/template#defname.mako. The old way of returning a tuple
-  from the view is supported for backward compatibility, ('defname', {}).
+- The Mako renderer now accepts a def name in an asset spect.  When the def
+  name is present in the asset spec, the system will render the template def
+  within the template and will return the result. An example asset spec is
+  ``package:path/to/template#defname.mako``. This will render the def named
+  ``defname`` inside the ``template.pt`` package instead of rendering the
+  entire template.  The old way of returning a tuple from the view is
+  supported for backward compatibility, ('defname', {}).
+
+- The Chameleon ZPT renderer now accepts a macro name in an asset spec.  When
+  the macro name is present in the asset spec, the system will render the
+  macro listed as a ``define-macro`` and return the result instead of
+  rendering the entire template.  An example asset spec:
+  ``package:path/to/template#macroname.pt``.  This will render the macro
+  defined as ``macroname`` within the ``template.pt`` template instead of the
+  entire templae.
 
 - When there is a predicate mismatch exception (seen when no view matches for
   a given request due to predicates not working), the exception now contains

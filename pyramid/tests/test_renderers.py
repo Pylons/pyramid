@@ -292,7 +292,32 @@ class TestChameleonRendererLookup(unittest.TestCase):
         if path.endswith('.pyc'): # pragma: no cover
             path = path[:-1]
         self.assertTrue(factory.path.startswith(path))
-        self.assertEqual(factory.kw, {})
+        self.assertEqual(factory.kw, {'macro':None})
+
+    def test___call__spec_withmacro(self):
+        import os
+        from pyramid import tests
+        module_name = tests.__name__
+        relpath = 'fixtures/withmacro#foo.pt'
+        renderer = {}
+        factory = DummyFactory(renderer)
+        spec = '%s:%s' % (module_name, relpath)
+        info = DummyRendererInfo({
+            'name':spec,
+            'package':None,
+            'registry':self.config.registry,
+            'settings':{},
+            'type':'type',
+            })
+        lookup = self._makeOne(factory)
+        result = lookup(info)
+        self.assertTrue(result is renderer)
+        path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            'fixtures',
+            'withmacro.pt')
+        self.assertTrue(factory.path.startswith(path))
+        self.assertEqual(factory.kw, {'macro':'foo'})
 
     def test___call__reload_assets_true(self):
         import pyramid.tests
