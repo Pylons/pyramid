@@ -954,7 +954,7 @@ will be prepended with the first:
    from pyramid.config import Configurator
 
    def timing_include(config):
-       config.add_route('show_times', /times')
+       config.add_route('show_times', '/times')
 
    def users_include(config):
        config.add_route('show_users', '/show')
@@ -981,7 +981,7 @@ that may be added in the future.  For example:
    from pyramid.config import Configurator
 
    def timing_include(config):
-       config.add_route('timing.show_times', /times')
+       config.add_route('timing.show_times', '/times')
 
    def users_include(config):
        config.add_route('users.show_users', '/show')
