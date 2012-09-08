@@ -629,20 +629,10 @@ class ResourceTreeTraverser(object):
         self.root = root
 
     def __call__(self, request):
-        try:
-            environ = request.environ
-        except AttributeError:
-            # In BFG 1.0 and before, this API expected an environ
-            # rather than a request; some bit of code may still be
-            # passing us an environ.  If so, deal.
-            environ = request
-            depwarn = ('Passing an environ dictionary directly to a traverser '
-                       'is deprecated in Pyramid 1.1.  Pass a request object '
-                       'instead.')
-            warnings.warn(depwarn, DeprecationWarning, 2)
+        matchdict = request.matchdict
+        environ = request.environ
 
-        if 'bfg.routes.matchdict' in environ:
-            matchdict = environ['bfg.routes.matchdict']
+        if matchdict is not None:
 
             path = matchdict.get('traverse', '/') or '/'
             if is_nonstr_iter(path):
@@ -663,7 +653,7 @@ class ResourceTreeTraverser(object):
             subpath = ()
             try:
                 # empty if mounted under a path in mod_wsgi, for example
-                path = decode_path_info(environ['PATH_INFO'] or '/')
+                path = request.path_info
             except KeyError:
                 path = '/'
             except UnicodeDecodeError as e:

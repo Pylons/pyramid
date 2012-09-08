@@ -84,13 +84,6 @@ class Router(object):
                            request.url)
                     logger and logger.debug(msg)
             else:
-                # TODO: kill off bfg.routes.* environ keys
-                # when traverser requires request arg, and
-                # cant cope with environ anymore (they are
-                # docs-deprecated as of BFG 1.3)
-                environ = request.environ
-                environ['bfg.routes.route'] = route 
-                environ['bfg.routes.matchdict'] = match
                 attrs['matchdict'] = match
                 attrs['matched_route'] = route
 
@@ -105,7 +98,8 @@ class Router(object):
                             request.url,
                             route.name,
                             request.path_info,
-                            route.pattern, match,
+                            route.pattern,
+                            match,
                             ', '.join([p.__text__ for p in route.predicates]))
                         )
                     logger and logger.debug(msg)
