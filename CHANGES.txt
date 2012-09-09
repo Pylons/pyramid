@@ -198,6 +198,38 @@ Backwards Incompatibilities
   instead or use the ``settings`` attribute of the registry available from
   the request (``request.registry.settings``).
 
+- These APIs from the ``pyramid.testing`` module were removed.  They have
+  been printing deprecation warnings since Pyramid 1.0:
+
+  * ``registerDummySecurityPolicy``, use
+    ``pyramid.config.Configurator.testing_securitypolicy`` instead.
+
+  * ``registerResources`` (aka ``registerModels``, use
+    ``pyramid.config.Configurator.testing_resources`` instead.
+
+  * ``registerEventListener``, use
+    ``pyramid.config.Configurator.testing_add_subscriber`` instead.
+
+  * ``registerTemplateRenderer`` (aka `registerDummyRenderer``), use
+    ``pyramid.config.Configurator.testing_add_template`` instead.
+
+  * ``registerView``, use ``pyramid.config.Configurator.add_view`` instead.
+
+  * ``registerUtility``, use
+    ``pyramid.config.Configurator.registry.registerUtility`` instead.
+
+  * ``registerAdapter``, use
+    ``pyramid.config.Configurator.registry.registerAdapter`` instead.
+
+  * ``registerSubscriber``, use 
+    ``pyramid.config.Configurator.add_subscriber`` instead.
+
+  * ``registerRoute``, use 
+    ``pyramid.config.Configurator.add_route`` instead.
+
+  * ``registerSettings``, use 
+    ``pyramid.config.Configurator.add_settings`` instead.
+
 Dependencies
 ------------
 
