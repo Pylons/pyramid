@@ -183,6 +183,10 @@ Backwards Incompatibilities
   ``pyramid.renderers.render()`` or ``pyramid.renderers.render_to_response``
   respectively instead of these functions.
 
+- The ``pyramid.configuration`` module was removed.  It had been deprecated
+  since Pyramid 1.0 and printed a deprecation warning upon its use.  Use
+  ``pyramid.config`` instead.
+
 Dependencies
 ------------
 
