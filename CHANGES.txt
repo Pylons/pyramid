@@ -192,6 +192,12 @@ Backwards Incompatibilities
   depended on this, adjust your code to import
   ``pyramid.scaffolds.PyramidTemplate`` instead.
 
+- The ``pyramid.settings.get_settings()`` API was removed.  It had been
+  printing a deprecation warning since Pyramid 1.0.  If your code depended on
+  this API, use ``pyramid.threadlocal.get_current_registry().settings``
+  instead or use the ``settings`` attribute of the registry available from
+  the request (``request.registry.settings``).
+
 Dependencies
 ------------
 

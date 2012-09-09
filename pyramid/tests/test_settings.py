@@ -1,30 +1,4 @@
 import unittest
-from pyramid import testing
-
-class TestGetSettings(unittest.TestCase):
-    def setUp(self):
-        from pyramid.registry import Registry
-        registry = Registry('testing')
-        self.config = testing.setUp(registry=registry)
-        from zope.deprecation import __show__
-        __show__.off()
-
-    def tearDown(self):
-        self.config.end()
-        from zope.deprecation import __show__
-        __show__.on()
-        
-    def _callFUT(self):
-        from pyramid.settings import get_settings
-        return get_settings()
-
-    def test_it_nosettings(self):
-        self.assertEqual(self._callFUT()['reload_templates'], False)
-
-    def test_it_withsettings(self):
-        settings = {'a':1}
-        self.config.registry.settings = settings
-        self.assertEqual(self._callFUT(), settings)
 
 class Test_asbool(unittest.TestCase):
     def _callFUT(self, s):
