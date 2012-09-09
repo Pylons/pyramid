@@ -98,9 +98,6 @@ Nice-to-Have
 Future
 ------
 
-- 1.4: Remove ``chameleon_text`` / ``chameleon_zpt`` deprecated functions
-  (render_*)
-
 - 1.4: Remove ``pyramid.configuration`` (deprecated).
 
 - 1.4: Remove ``pyramid.paster.PyramidTemplate`` (deprecated).
