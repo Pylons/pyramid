@@ -7,13 +7,9 @@ from pyramid.compat import text_type
 class Base(object):
     def setUp(self):
         self.config = testing.setUp()
-        from zope.deprecation import __show__
-        __show__.off()
 
     def tearDown(self):
         testing.tearDown()
-        from zope.deprecation import __show__
-        __show__.on()
 
     def _getTemplatePath(self, name):
         import os

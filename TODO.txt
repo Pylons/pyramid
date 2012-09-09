@@ -98,7 +98,7 @@ Nice-to-Have
 Future
 ------
 
-- 1.5: Remove all deprecated ``pyramid.testing`` functions.
+- 1.5: remove ``pyramid.view.static``.
 
 - 1.5: turn ``pyramid.settings.Settings`` into a function that returns the
   original dict (after ``__getattr__`` deprecation period, it was deprecated
