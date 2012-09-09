@@ -98,8 +98,6 @@ Nice-to-Have
 Future
 ------
 
-- 1.4: Remove ``pyramid.settings.get_settings`` (deprecated).
-
 - 1.5: Remove all deprecated ``pyramid.testing`` functions.
 
 - 1.5: turn ``pyramid.settings.Settings`` into a function that returns the
