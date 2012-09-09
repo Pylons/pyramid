@@ -187,6 +187,11 @@ Backwards Incompatibilities
   since Pyramid 1.0 and printed a deprecation warning upon its use.  Use
   ``pyramid.config`` instead.
 
+- The ``pyramid.paster.PyramidTemplate`` API was removed.  It had been
+  deprecated since Pyramid 1.1 and issued a warning on import.  If your code
+  depended on this, adjust your code to import
+  ``pyramid.scaffolds.PyramidTemplate`` instead.
+
 Dependencies
 ------------
 
