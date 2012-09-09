@@ -155,7 +155,7 @@ Deprecations
 Backwards Incompatibilities
 ---------------------------
 
-- The Pyramid router no longer adds the values ``bfg.routes.route`` and
+- The Pyramid router no longer adds the values ``bfg.routes.route`` or
   ``bfg.routes.matchdict`` to the request's WSGI environment dictionary.
   These values were docs-deprecated in ``repoze.bfg`` 1.0 (effectively seven
   minor releases ago).  If your code depended on these values, use

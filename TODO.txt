@@ -98,8 +98,6 @@ Nice-to-Have
 Future
 ------
 
-- 1.4: Kill off ``bfg.routes`` envvars in router.
-
 - 1.4: Remove ``chameleon_text`` / ``chameleon_zpt`` deprecated functions
   (render_*)
 
