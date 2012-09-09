@@ -614,6 +614,7 @@ else:
             _segment_cache[(segment, safe)] = result
             return result
     
+slash = text_('/')
 
 @implementer(ITraverser)
 class ResourceTreeTraverser(object):
@@ -629,17 +630,17 @@ class ResourceTreeTraverser(object):
         self.root = root
 
     def __call__(self, request):
-        matchdict = request.matchdict
         environ = request.environ
+        matchdict = request.matchdict
 
         if matchdict is not None:
 
-            path = matchdict.get('traverse', '/') or '/'
+            path = matchdict.get('traverse', slash) or slash
             if is_nonstr_iter(path):
                 # this is a *traverse stararg (not a {traverse})
                 # routing has already decoded these elements, so we just
                 # need to join them
-                path = '/'.join(path) or '/'
+                path = slash.join(path) or slash
 
             subpath = matchdict.get('subpath', ())
             if not is_nonstr_iter(subpath):
@@ -653,9 +654,10 @@ class ResourceTreeTraverser(object):
             subpath = ()
             try:
                 # empty if mounted under a path in mod_wsgi, for example
-                path = request.path_info
+                path = request.path_info or slash
             except KeyError:
-                path = '/'
+                # if environ['PATH_INFO'] is just not there
+                path = slash
             except UnicodeDecodeError as e:
                 raise URLDecodeError(e.encoding, e.object, e.start, e.end,
                                      e.reason)
@@ -674,7 +676,7 @@ class ResourceTreeTraverser(object):
         root = self.root
         ob = vroot = root
 
-        if vpath == '/': # invariant: vpath must not be empty
+        if vpath == slash: # invariant: vpath must not be empty
             # prevent a call to traversal_path if we know it's going
             # to return the empty tuple
             vpath_tuple = ()

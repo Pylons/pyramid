@@ -151,3 +151,32 @@ Deprecations
   featureful ``pyramid.config.Configurator.set_request_method`` should be
   used in its place (it has all of the same capabilities but can also extend
   the request object with methods).
+
+Backwards Incompatibilities
+---------------------------
+
+- The Pyramid router no longer adds the values ``bfg.routes.route`` and
+  ``bfg.routes.matchdict`` to the request's WSGI environment dictionary.
+  These values were docs-deprecated in ``repoze.bfg`` 1.0 (effectively seven
+  minor releases ago).  If your code depended on these values, use
+  request.matched_route and request.matchdict instead.
+
+- It is no longer possible to pass an environ dictionary directly to
+  ``pyramid.traversal.ResourceTreeTraverser.__call__`` (aka
+  ``ModelGraphTraverser.__call__``).  Instead, you must pass a request
+  object.  Passing an environment instead of a request has generated a
+  deprecation warning since Pyramid 1.1.
+
+- Pyramid will no longer work properly if you use the
+  ``webob.request.LegacyRequest`` as a request factory.  Instances of the
+  LegacyRequest class have a ``request.path_info`` which return a string.
+  This Pyramid release assumes that ``request.path_info`` will
+  unconditionally be Unicode.
+
+Dependencies
+------------
+
+- Pyramid now requires WebOb 1.2b3+ (the prior Pyramid release only relied on
+  1.2dev+).  This is to ensure that we obtain a version of WebOb that returns
+  ``request.path_info`` as text.
+
