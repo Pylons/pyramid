@@ -16,11 +16,6 @@ class Base(object):
         here = os.path.abspath(os.path.dirname(__file__))
         return os.path.join(here, 'fixtures', name)
 
-    def _registerUtility(self, utility, iface, name=''):
-        reg = self.config.registry
-        reg.registerUtility(utility, iface, name=name)
-        return reg
-        
 class ZPTTemplateRendererTests(Base, unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.chameleon_zpt import ZPTTemplateRenderer
