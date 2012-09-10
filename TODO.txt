@@ -106,8 +106,8 @@ Future
 
 - 1.5: Remove ``pyramid.requests.DeprecatedRequestMethodsMixin``.
 
-- 1.6: Maybe? deprecate set_request_property in favor of pointing people at
-  set_request_method.
+- 1.5: Maybe? deprecate set_request_property in favor of pointing people at
+  add_request_method, schedule removal for 1.8?
 
 - 1.6: Remove IContextURL and TraversalContextURL.
 

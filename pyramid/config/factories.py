@@ -96,7 +96,7 @@ class FactoriesConfiguratorMixin(object):
         self.action(IRequestFactory, register, introspectables=(intr,))
 
     @action_method
-    def set_request_method(self,
+    def add_request_method(self,
                            callable=None,
                            name=None,
                            property=False,
@@ -187,12 +187,12 @@ class FactoriesConfiguratorMixin(object):
         .. warning::
 
            This method has been deprecated as of Pyramid 1.4.
-           :meth:`pyramid.config.Configurator.set_request_method` should be
+           :meth:`pyramid.config.Configurator.add_request_method` should be
            used instead.
 
         .. versionadded:: 1.3
         """
-        self.set_request_method(
+        self.add_request_method(
             callable, name=name, property=not reify, reify=reify)
 
 @implementer(IRequestExtensions)

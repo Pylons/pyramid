@@ -87,7 +87,7 @@ Features
   HEAD is a variant of GET that omits the body, and WebOb has special support
   to return an empty body when a HEAD is used.
 
-- ``config.set_request_method`` has been introduced to support extending
+- ``config.add_request_method`` has been introduced to support extending
   request objects with arbitrary callables. This method expands on the
   previous ``config.set_request_property`` by supporting methods as well as
   properties. This method now causes less code to be executed at
@@ -149,7 +149,7 @@ Deprecations
 
 - The ``pyramid.config.Configurator.set_request_property`` has been
   documentation-deprecated.  The method remains usable but the more
-  featureful ``pyramid.config.Configurator.set_request_method`` should be
+  featureful ``pyramid.config.Configurator.add_request_method`` should be
   used in its place (it has all of the same capabilities but can also extend
   the request object with methods).
 
