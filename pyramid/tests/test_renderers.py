@@ -664,7 +664,7 @@ class TestRendererHelper(unittest.TestCase):
         request.response = Response()
         helper = self._makeOne('loo.foo')
         response = helper._make_response(None, request)
-        self.assertEqual(response.body, '')
+        self.assertEqual(response.body, b'')
         
     def test__make_response_with_content_type(self):
         from pyramid.response import Response
