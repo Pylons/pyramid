@@ -28,6 +28,8 @@ class TextTemplateRenderer(object):
     def __init__(self, path, lookup, macro=None):
         self.path = path
         self.lookup = lookup
+        # text template renderers have no macros, so we ignore the
+        # macro arg
 
     @reify # avoid looking up reload_templates before manager pushed
     def template(self):

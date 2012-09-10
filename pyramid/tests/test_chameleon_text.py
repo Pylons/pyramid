@@ -1,10 +1,11 @@
+import sys
 import unittest
 
 from pyramid.compat import binary_type
 from pyramid.testing import skip_on
 from pyramid import testing
 
-class Base:
+class Base(object):
     def setUp(self):
         self.config = testing.setUp()
 
@@ -15,6 +16,18 @@ class Base:
         import os
         here = os.path.abspath(os.path.dirname(__file__))
         return os.path.join(here, 'fixtures', name)
+
+class Test_renderer_factory(Base, unittest.TestCase):
+    def _callFUT(self, info):
+        from pyramid.chameleon_text import renderer_factory
+        return renderer_factory(info)
+
+    def test_it(self):
+        # this test is way too functional
+        from pyramid.chameleon_text import TextTemplateRenderer
+        info = DummyInfo()
+        result = self._callFUT(info)
+        self.assertEqual(result.__class__, TextTemplateRenderer)
 
 class TextTemplateRendererTests(Base, unittest.TestCase):
     def _getTargetClass(self):
@@ -123,4 +136,20 @@ class DummyLookup(object):
     auto_reload=True
     debug = True
     def translate(self, msg): pass
+
+class DummyRegistry(object):
+    def queryUtility(self, iface, name):
+        self.queried = iface, name
+        return None
+
+    def registerUtility(self, impl, iface, name):
+        self.registered = impl, iface, name
+    
+class DummyInfo(object):
+    def __init__(self):
+        self.registry = DummyRegistry()
+        self.type = '.pt'
+        self.name = 'fixtures/minimal.pt'
+        self.package = sys.modules[__name__]
+        self.settings = {}
     
