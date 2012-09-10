@@ -10,8 +10,6 @@ documentation is organized alphabetically by module name.
 
    api/authorization
    api/authentication
-   api/chameleon_text
-   api/chameleon_zpt
    api/compat
    api/config
    api/events

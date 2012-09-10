@@ -1,7 +1,5 @@
 import os
 
-import zope.deprecation
-
 from paste.deploy import (
     loadapp,
     appconfig,
@@ -10,14 +8,6 @@ from paste.deploy import (
 from pyramid.compat import configparser
 from logging.config import fileConfig
 from pyramid.scripting import prepare
-from pyramid.scaffolds import PyramidTemplate # bw compat
-
-PyramidTemplate = PyramidTemplate # pyflakes
-
-zope.deprecation.deprecated(
-    'PyramidTemplate', ('pyramid.paster.PyramidTemplate was moved to '
-                        'pyramid.scaffolds.PyramidTemplate in Pyramid 1.1'),
-)
 
 def get_app(config_uri, name=None, loadapp=loadapp):
     """ Return the WSGI application named ``name`` in the PasteDeploy

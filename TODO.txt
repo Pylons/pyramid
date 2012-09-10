@@ -98,18 +98,7 @@ Nice-to-Have
 Future
 ------
 
-- 1.4: Kill off ``bfg.routes`` envvars in router.
-
-- 1.4: Remove ``chameleon_text`` / ``chameleon_zpt`` deprecated functions
-  (render_*)
-
-- 1.4: Remove ``pyramid.configuration`` (deprecated).
-
-- 1.4: Remove ``pyramid.paster.PyramidTemplate`` (deprecated).
-
-- 1.4: Remove ``pyramid.settings.get_settings`` (deprecated).
-
-- 1.5: Remove all deprecated ``pyramid.testing`` functions.
+- 1.5: remove ``pyramid.view.static`` and ``pyramid.view.is_response``.
 
 - 1.5: turn ``pyramid.settings.Settings`` into a function that returns the
   original dict (after ``__getattr__`` deprecation period, it was deprecated

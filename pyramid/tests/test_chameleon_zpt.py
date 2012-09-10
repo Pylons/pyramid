@@ -7,24 +7,15 @@ from pyramid.compat import text_type
 class Base(object):
     def setUp(self):
         self.config = testing.setUp()
-        from zope.deprecation import __show__
-        __show__.off()
 
     def tearDown(self):
         testing.tearDown()
-        from zope.deprecation import __show__
-        __show__.on()
 
     def _getTemplatePath(self, name):
         import os
         here = os.path.abspath(os.path.dirname(__file__))
         return os.path.join(here, 'fixtures', name)
 
-    def _registerUtility(self, utility, iface, name=''):
-        reg = self.config.registry
-        reg.registerUtility(utility, iface, name=name)
-        return reg
-        
 class ZPTTemplateRendererTests(Base, unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.chameleon_zpt import ZPTTemplateRenderer
@@ -131,83 +122,6 @@ class ZPTTemplateRendererTests(Base, unittest.TestCase):
         self.assertEqual(result.rstrip('\n'),
                      '<div xmlns="http://www.w3.org/1999/xhtml">\n</div>')
         
-
-class RenderTemplateTests(Base, unittest.TestCase):
-    def _callFUT(self, name, **kw):
-        from pyramid.chameleon_zpt import render_template
-        return render_template(name, **kw)
-
-    @skip_on('java')
-    def test_it(self):
-        minimal = self._getTemplatePath('minimal.pt')
-        result = self._callFUT(minimal)
-        self.assertTrue(isinstance(result, text_type))
-        self.assertEqual(result.rstrip('\n'),
-                     '<div xmlns="http://www.w3.org/1999/xhtml">\n</div>')
-
-class RenderTemplateToResponseTests(Base, unittest.TestCase):
-    def _callFUT(self, name, **kw):
-        from pyramid.chameleon_zpt import render_template_to_response
-        return render_template_to_response(name, **kw)
-
-    @skip_on('java')
-    def test_it(self):
-        minimal = self._getTemplatePath('minimal.pt')
-        result = self._callFUT(minimal)
-        from webob import Response
-        self.assertTrue(isinstance(result, Response))
-        self.assertEqual(result.app_iter[0].rstrip(b'\n'),
-                     b'<div xmlns="http://www.w3.org/1999/xhtml">\n</div>')
-        self.assertEqual(result.status, '200 OK')
-        self.assertEqual(len(result.headerlist), 2)
-
-    @skip_on('java')
-    def test_iresponsefactory_override(self):
-        from webob import Response
-        class Response2(Response):
-            pass
-        from pyramid.interfaces import IResponseFactory
-        self._registerUtility(Response2, IResponseFactory)
-        minimal = self._getTemplatePath('minimal.pt')
-        result = self._callFUT(minimal)
-        self.assertTrue(isinstance(result, Response2))
-
-class GetRendererTests(Base, unittest.TestCase):
-    def _callFUT(self, name):
-        from pyramid.chameleon_zpt import get_renderer
-        return get_renderer(name)
-
-    @skip_on('java')
-    def test_it(self):
-        from pyramid.interfaces import IRendererFactory
-        class Dummy:
-            template = object()
-            def implementation(self): pass
-        renderer = Dummy()
-        def rf(spec):
-            return renderer
-        self._registerUtility(rf, IRendererFactory, name='foo')
-        result = self._callFUT('foo')
-        self.assertTrue(result is renderer)
-
-class GetTemplateTests(Base, unittest.TestCase):
-    def _callFUT(self, name):
-        from pyramid.chameleon_zpt import get_template
-        return get_template(name)
-
-    @skip_on('java')
-    def test_it(self):
-        from pyramid.interfaces import IRendererFactory
-        class Dummy:
-            template = object()
-            def implementation(self):
-                return self.template
-        renderer = Dummy()
-        def rf(spec):
-            return renderer
-        self._registerUtility(rf, IRendererFactory, name='foo')
-        result = self._callFUT('foo')
-        self.assertTrue(result is renderer.template)
 
 class DummyLookup(object):
     auto_reload=True

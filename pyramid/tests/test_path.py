@@ -138,9 +138,9 @@ class TestPackageOf(unittest.TestCase):
         self.assertEqual(result, tests)
 
     def test_it_module(self):
-        import pyramid.tests.test_configuration
+        import pyramid.tests.test_path
         from pyramid import tests
-        package = DummyPackageOrModule(pyramid.tests.test_configuration)
+        package = DummyPackageOrModule(pyramid.tests.test_path)
         result = self._callFUT(package)
         self.assertEqual(result, tests)
 
@@ -395,7 +395,7 @@ class TestDottedNameResolver(unittest.TestCase):
         self.assertEqual(result, self.__class__)
 
     def test__zope_dottedname_style_resolve_relative_leading_dots(self):
-        import pyramid.tests.test_configuration
+        import pyramid.tests.test_path
         typ = self._makeOne()
         result = typ._zope_dottedname_style(
             '..tests.test_path.TestDottedNameResolver', pyramid.tests)

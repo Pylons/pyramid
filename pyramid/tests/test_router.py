@@ -646,8 +646,6 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(request.context, context)
         self.assertEqual(request.root, root)
         matchdict = {'action':'action1', 'article':'article1'}
-        self.assertEqual(environ['bfg.routes.matchdict'], matchdict)
-        self.assertEqual(environ['bfg.routes.route'].name, 'foo')
         self.assertEqual(request.matchdict, matchdict)
         self.assertEqual(request.matched_route.name, 'foo')
         self.assertEqual(len(logger.messages), 1)
@@ -712,8 +710,6 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(request.context, context)
         self.assertEqual(request.root, root)
         matchdict = {'action':'action1', 'article':'article1'}
-        self.assertEqual(environ['bfg.routes.matchdict'], matchdict)
-        self.assertEqual(environ['bfg.routes.route'].name, 'foo')
         self.assertEqual(request.matchdict, matchdict)
         self.assertEqual(request.matched_route.name, 'foo')
         self.assertTrue(IFoo.providedBy(request))
