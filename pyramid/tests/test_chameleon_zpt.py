@@ -134,6 +134,15 @@ class ZPTTemplateRendererTests(Base, unittest.TestCase):
         self.assertTrue(isinstance(result, text_type))
         self.assertEqual(result.rstrip('\n'),
                      '<div xmlns="http://www.w3.org/1999/xhtml">\n</div>')
+
+    def test_macro_supplied(self):
+        minimal = self._getTemplatePath('withmacro.pt')
+        lookup = DummyLookup()
+        instance = self._makeOne(minimal, lookup, macro='foo')
+        result = instance.implementation()()
+        self.assertEqual(result, '\n  Hello!\n')
+        
+        
         
 
 class DummyLookup(object):
