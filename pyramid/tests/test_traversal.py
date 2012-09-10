@@ -128,10 +128,23 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         context = DummyContext()
         verifyObject(ITraverser, self._makeOne(context))
 
-    def test_call_with_no_pathinfo(self):
+    def test_call_with_empty_pathinfo(self):
         policy = self._makeOne(None)
         environ = self._getEnviron()
-        request = DummyRequest(environ)
+        request = DummyRequest(environ, path_info='')
+        result = policy(request)
+        self.assertEqual(result['context'], None)
+        self.assertEqual(result['view_name'], '')
+        self.assertEqual(result['subpath'], ())
+        self.assertEqual(result['traversed'], ())
+        self.assertEqual(result['root'], policy.root)
+        self.assertEqual(result['virtual_root'], policy.root)
+        self.assertEqual(result['virtual_root_path'], ())
+
+    def test_call_with_pathinfo_KeyError(self):
+        policy = self._makeOne(None)
+        environ = self._getEnviron()
+        request = DummyRequest(environ, toraise=KeyError)
         result = policy(request)
         self.assertEqual(result['context'], None)
         self.assertEqual(result['view_name'], '')
