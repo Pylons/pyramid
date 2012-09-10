@@ -632,14 +632,6 @@ class IDummy(Interface):
 class DummyEvent:
     pass
     
-
-class DummyRequest:
-    application_url = 'http://example.com'
-    def __init__(self, environ=None):
-        if environ is None:
-            environ = {}
-        self.environ = environ
-
 class DummyFactory:
     def __init__(self, environ):
         """ """
