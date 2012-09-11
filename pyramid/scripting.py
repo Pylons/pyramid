@@ -81,6 +81,8 @@ def prepare(request=None, registry=None):
     root_factory = registry.queryUtility(IRootFactory,
                                          default=DefaultRootFactory)
     root = root_factory(request)
+    if getattr(request, 'context', None) is None:
+        request.context = root
     return {'root':root, 'closer':closer, 'registry':registry,
             'request':request, 'root_factory':root_factory}
 
