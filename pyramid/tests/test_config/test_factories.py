@@ -112,36 +112,6 @@ class TestFactoriesMixin(unittest.TestCase):
         config.set_request_property(bar, name='bar')
         self.assertRaises(ConfigurationConflictError, config.commit)
 
-    def test_set_request_property_subscriber(self):
-        from zope.interface import implementer
-        from pyramid.interfaces import INewRequest
-        config = self._makeOne()
-        def foo(r): pass
-        config.set_request_property(foo, name='foo')
-        config.set_request_property(foo, name='bar', reify=True)
-        config.commit()
-        @implementer(INewRequest)
-        class Event(object):
-            request = DummyRequest(config.registry)
-        event = Event()
-        config.registry.notify(event)
-        exts = list(sorted(event.request.extensions))
-        self.assertEqual('bar', exts[0])
-        self.assertEqual('foo', exts[1])
-
-    def test_add_request_method_subscriber(self):
-        from zope.interface import implementer
-        from pyramid.interfaces import INewRequest
-        config = self._makeOne(autocommit=True)
-        def foo(r): return 'bar'
-        config.add_request_method(foo, name='foo')
-        @implementer(INewRequest)
-        class Event(object):
-            request = DummyRequest(config.registry)
-        event = Event()
-        config.registry.notify(event)
-        self.assertEqual('bar', event.request.foo())
-
     def test_add_request_method_with_callable(self):
         from pyramid.interfaces import IRequestExtensions
         config = self._makeOne(autocommit=True)

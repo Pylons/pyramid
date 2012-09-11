@@ -6,6 +6,7 @@ from zope.interface import (
 from pyramid.interfaces import (
     IDebugLogger,
     IRequest,
+    IRequestExtensions,
     IRootFactory,
     IRouteRequest,
     IRouter,
@@ -48,6 +49,7 @@ class Router(object):
         self.root_factory = q(IRootFactory, default=DefaultRootFactory)
         self.routes_mapper = q(IRoutesMapper)
         self.request_factory = q(IRequestFactory, default=Request)
+        self.request_extensions = q(IRequestExtensions)
         tweens = q(ITweens)
         if tweens is None:
             tweens = excview_tween_factory
@@ -178,6 +180,9 @@ class Router(object):
         try:
 
             try:
+                extensions = self.request_extensions
+                if extensions is not None:
+                    request._set_extensions(extensions)
                 response = self.handle_request(request)
                 has_listeners and notify(NewResponse(request, response))
 
@@ -192,4 +197,3 @@ class Router(object):
 
         finally:
             manager.pop()
-

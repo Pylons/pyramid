@@ -312,6 +312,38 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(app_iter, [b'abc'])
         self.assertEqual(start_response.status, '200 OK')
 
+    def test_call_with_request_extensions(self):
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IRequestExtensions
+        from pyramid.interfaces import IRequest
+        from pyramid.request import Request
+        context = DummyContext()
+        self._registerTraverserFactory(context)
+        class Extensions(object):
+            def __init__(self):
+                self.methods = {}
+                self.descriptors = {}
+        extensions = Extensions()
+        L = []
+        request = Request.blank('/')
+        request.request_iface = IRequest
+        request.registry = self.registry
+        request._set_extensions = lambda *x: L.extend(x)
+        def request_factory(environ):
+            return request
+        self.registry.registerUtility(extensions, IRequestExtensions)
+        environ = self._makeEnviron()
+        response = DummyResponse()
+        response.app_iter = ['Hello world']
+        view = DummyView(response)
+        self._registerView(self.config.derive_view(view), '',
+                           IViewClassifier, None, None)
+        router = self._makeOne()
+        router.request_factory = request_factory
+        start_response = DummyStartResponse()
+        router(environ, start_response)
+        self.assertEqual(L, [extensions])
+
     def test_call_view_registered_nonspecific_default_path(self):
         from pyramid.interfaces import IViewClassifier
         context = DummyContext()

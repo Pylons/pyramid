@@ -153,8 +153,6 @@ class FactoriesConfiguratorMixin(object):
             if exts is None:
                 exts = _RequestExtensions()
                 self.registry.registerUtility(exts, IRequestExtensions)
-                self.registry.registerHandler(_set_request_extensions,
-                                              (INewRequest,))
 
             plist = exts.descriptors if property else exts.methods
             plist[name] = callable
@@ -201,10 +199,3 @@ class _RequestExtensions(object):
         self.descriptors = {}
         self.methods = {}
 
-def _set_request_extensions(event):
-    request = event.request
-    exts = request.registry.queryUtility(IRequestExtensions)
-    for name, fn in iteritems_(exts.methods):
-        method = fn.__get__(request, request.__class__)
-        setattr(request, name, method)
-    request._set_properties(exts.descriptors)
