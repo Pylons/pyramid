@@ -150,7 +150,7 @@ class DummyRegistry(object):
     def __init__(self, utilities):
         self.utilities = utilities
 
-    def queryUtility(self, iface, default=None):
+    def queryUtility(self, iface, default=None): # pragma: no cover
         if self.utilities:
             return self.utilities.pop(0)
         return default

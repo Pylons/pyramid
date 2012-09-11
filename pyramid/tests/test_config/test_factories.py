@@ -157,14 +157,3 @@ class TestFactoriesMixin(unittest.TestCase):
         self.assertRaises(AttributeError, config.add_request_method)
 
 
-class DummyRequest(object):
-    extensions = None
-
-    def __init__(self, registry):
-        self.registry = registry
-
-    def _set_properties(self, properties):
-        if self.extensions is None:
-            self.extensions = []
-        self.extensions.extend(properties)
-
