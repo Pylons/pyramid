@@ -157,6 +157,9 @@ Features
   ``config.add_request_method`` are now available in the request object
   returned from ``pyramid.paster.bootstrap``.
 
+- ``request.context`` of environment request during ``bootstrap`` is now the
+  root object if a context isn't already set on a provided request.
+
 Deprecations
 ------------
 
