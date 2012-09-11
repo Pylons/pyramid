@@ -39,6 +39,7 @@ from pyramid.request import (
     )
 
 from pyramid.url import URLMethodsMixin
+from pyramid.util import InstancePropertyMixin
 
 _marker = object()
 
@@ -273,7 +274,7 @@ class DummySession(dict):
         
 @implementer(IRequest)
 class DummyRequest(DeprecatedRequestMethodsMixin, URLMethodsMixin,
-                   CallbackMethodsMixin):
+                   CallbackMethodsMixin, InstancePropertyMixin):
     """ A DummyRequest object (incompletely) imitates a :term:`request` object.
 
     The ``params``, ``environ``, ``headers``, ``path``, and

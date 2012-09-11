@@ -144,6 +144,9 @@ Features
   to influence how the sessions are marshalled (by default this is done
   with HMAC+pickle).
 
+- ``pyramid.testing.DummyRequest`` now supports methods supplied by the
+  ``pyramid.util.InstancePropertyMixin`` class such as ``set_property``.
+
 Deprecations
 ------------
 
