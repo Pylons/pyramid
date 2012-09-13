@@ -246,6 +246,12 @@ Backwards Incompatibilities
   * ``registerSettings``, use 
     ``pyramid.config.Configurator.add_settings`` instead.
 
+Documentation
+-------------
+
+- Added an "Upgrading Pyramid" chapter to the narrative documentation.  It
+  describes how to cope with deprecations and removals of Pyramid APIs.
+
 Dependencies
 ------------
 

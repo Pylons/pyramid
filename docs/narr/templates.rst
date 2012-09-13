@@ -46,20 +46,6 @@ within the body of a view callable like so:
                                  {'foo':1, 'bar':2}, 
                                  request=request)
 
-.. warning::
-
-   Earlier iterations of this documentation
-   (pre-version-1.3) encouraged the application developer to use
-   ZPT-specific APIs such as
-   :func:`pyramid.chameleon_zpt.render_template_to_response` and
-   :func:`pyramid.chameleon_zpt.render_template` to render templates
-   directly.  This style of rendering still works, but at least for
-   purposes of this documentation, those functions are deprecated.
-   Application developers are encouraged instead to use the functions
-   available in the :mod:`pyramid.renderers` module to perform
-   rendering tasks.  This set of functions works to render templates
-   for all renderer extensions registered with :app:`Pyramid`.
-
 The ``sample_view`` :term:`view callable` function above returns a
 :term:`response` object which contains the body of the
 ``templates/foo.pt`` template.  In this case, the ``templates``
@@ -79,12 +65,12 @@ prefix on Windows.
 .. warning::
 
    Only :term:`Chameleon` templates support defining a renderer for a
-   template relative to the location of the module where the view
-   callable is defined.  Mako templates, and other templating system
-   bindings work differently.  In particular, Mako templates use a
-   "lookup path" as defined by the ``mako.directories`` configuration
-   file instead of treating relative paths as relative to the current
-   view module.  See :ref:`mako_templates`.
+   template relative to the location of the module where the view callable is
+   defined.  Mako templates, and other templating system bindings work
+   differently.  In particular, Mako templates use a "lookup path" as defined
+   by the ``mako.directories`` configuration file instead of treating
+   relative paths as relative to the current view module.  See
+   :ref:`mako_templates`.
 
 The path can alternately be a :term:`asset specification` in the form
 ``some.dotted.package_name:relative/path``. This makes it possible to
@@ -599,10 +585,6 @@ When the template is rendered, it will show:
 .. code-block:: text
 
    Hello, world!
-
-If you'd rather use templates directly within a view callable (without
-the indirection of using a renderer), see :ref:`chameleon_text_module`
-for the API description.
 
 See also :ref:`built_in_renderers` for more general information about
 renderers, including Chameleon text renderers.

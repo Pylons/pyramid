@@ -1,3 +1,5 @@
+.. _changelog:
+
 :app:`Pyramid` Change History
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

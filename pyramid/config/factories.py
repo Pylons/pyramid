@@ -184,7 +184,7 @@ class FactoriesConfiguratorMixin(object):
 
         .. warning::
 
-           This method has been deprecated as of Pyramid 1.4.
+           This method has been docs-deprecated as of Pyramid 1.4.
            :meth:`pyramid.config.Configurator.add_request_method` should be
            used instead.
 
