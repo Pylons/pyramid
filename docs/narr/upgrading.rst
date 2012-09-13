@@ -120,7 +120,10 @@ the deprecation warning from being issued.  For example:
    $ python -Wd setup.py test -q
    # .. elided ...
    running build_ext
-   /home/chrism/projects/pyramid/env27/myproj/myproj/views.py:3: DeprecationWarning: static: The "pyramid.view.static" class is deprecated as of Pyramid 1.1; use the "pyramid.static.static_view" class instead with the "use_subpath" argument set to True.
+   /home/chrism/projects/pyramid/env27/myproj/myproj/views.py:3: 
+   DeprecationWarning: static: The "pyramid.view.static" class is deprecated 
+   as of Pyramid 1.1; use the "pyramid.static.static_view" class instead with 
+   the "use_subpath" argument set to True.
      from pyramid.view import static
    .
    ----------------------------------------------------------------------
