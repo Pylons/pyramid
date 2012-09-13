@@ -90,12 +90,7 @@ commands and files.
     `logging` module to allow logging within your application.
     See :ref:`logging_config`.
 
-#.  Make the ``pyramid.wsgi`` script executable.
-
-    .. code-block:: text
-
-       $ cd ~/modwsgi/env
-       $ chmod 755 pyramid.wsgi
+    There is no need to make this script executable.
 
 #.  Edit your Apache configuration and add some stuff.  I happened to
     create a file named ``/etc/apache2/other/modwsgi.conf`` on my own
