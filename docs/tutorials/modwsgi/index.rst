@@ -93,6 +93,10 @@ loving" that are outside the scope of this short tutorial.
     See :ref:`logging_config`.
 
     There is no need to make the ``pyramid.wsgi`` script executable.
+    However, you'll need to make sure that *two* users have access to change
+    into the ``~/modwsgi/env`` directory: your current user (mine is
+    ``chrism`` and the user that Apache will run as often named ``apache`` or
+    ``httpd``).  Make sure both of these users can "cd" into that directory.
 
 #.  Edit your Apache configuration and add some stuff.  I happened to
     create a file named ``/etc/apache2/other/modwsgi.conf`` on my own
