@@ -11,10 +11,7 @@ This guide will outline broad steps that can be used to get a :app:`Pyramid`
 application running under Apache via ``mod_wsgi``.  This particular tutorial
 was developed under Apple's Mac OS X platform (Snow Leopard, on a 32-bit
 Mac), but the instructions should be largely the same for all systems, delta
-specific path information for commands and files.  A caveat: this tutorial
-doesn't anticipate use of systems like Fedora and/or Red Hat Enterprise Linux
-or other with SELinux enabled by default; those systems will need "special
-loving" that are outside the scope of this short tutorial.
+specific path information for commands and files.
 
 .. note:: Unfortunately these instructions almost certainly won't work for
    deploying a :app:`Pyramid` application on a Windows system using
