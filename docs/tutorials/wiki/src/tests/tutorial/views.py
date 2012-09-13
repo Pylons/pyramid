@@ -51,17 +51,17 @@ def view_page(context, request):
              renderer='templates/edit.pt',
              permission='edit')
 def add_page(context, request):
-    name = request.subpath[0]
+    pagename = request.subpath[0]
     if 'form.submitted' in request.params:
         body = request.params['body']
         page = Page(body)
-        page.__name__ = name
+        page.__name__ = pagename
         page.__parent__ = context
-        context[name] = page
+        context[pagename] = page
         return HTTPFound(location = request.resource_url(page))
-    save_url = request.resource_url(context, 'add_page', name)
+    save_url = request.resource_url(context, 'add_page', pagename)
     page = Page('')
-    page.__name__ = name
+    page.__name__ = pagename
     page.__parent__ = context
 
     return dict(page = page, save_url = save_url,
