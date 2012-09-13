@@ -1,11 +1,11 @@
 Upgrading Pyramid
 =================
 
-When a new version of Pyramid is released, it will sometimes deprecate an old
-feature or remove an already-deprecated feature.  When features are removed
-from Pyramid, applications that depend on those features will begin to break.
-This chapter explains how to ensure your Pyramid applications keep working
-when you upgrade the Pyramid version you're using.
+When a new version of Pyramid is released, it will sometimes deprecate a
+feature or remove a feature that was deprecated in an older release.  When
+features are removed from Pyramid, applications that depend on those features
+will begin to break.  This chapter explains how to ensure your Pyramid
+applications keep working when you upgrade the Pyramid version you're using.
 
 .. sidebar::   About Release Numbering
 
