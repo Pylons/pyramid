@@ -3,6 +3,7 @@ from pyramid.exceptions import ConfigurationError
 from pyramid.request import Request
 
 from pyramid.interfaces import (
+    IRequestExtensions,
     IRequestFactory,
     IRootFactory,
     )
@@ -70,14 +71,18 @@ def prepare(request=None, registry=None):
                                  'before trying to activate it.')
     if request is None:
         request = _make_request('/', registry)
-    request.registry = registry
     threadlocals = {'registry':registry, 'request':request}
     threadlocal_manager.push(threadlocals)
+    extensions = registry.queryUtility(IRequestExtensions)
+    if extensions is not None:
+        request._set_extensions(extensions)
     def closer():
         threadlocal_manager.pop()
     root_factory = registry.queryUtility(IRootFactory,
                                          default=DefaultRootFactory)
     root = root_factory(request)
+    if getattr(request, 'context', None) is None:
+        request.context = root
     return {'root':root, 'closer':closer, 'registry':registry,
             'request':request, 'root_factory':root_factory}
 

@@ -1,6 +1,7 @@
 Next release
 ============
 
+
 Bug Fixes
 ---------
 
@@ -86,7 +87,7 @@ Features
   HEAD is a variant of GET that omits the body, and WebOb has special support
   to return an empty body when a HEAD is used.
 
-- ``config.set_request_method`` has been introduced to support extending
+- ``config.add_request_method`` has been introduced to support extending
   request objects with arbitrary callables. This method expands on the
   previous ``config.set_request_property`` by supporting methods as well as
   properties. This method now causes less code to be executed at
@@ -143,11 +144,118 @@ Features
   to influence how the sessions are marshalled (by default this is done
   with HMAC+pickle).
 
+- ``pyramid.testing.DummyRequest`` now supports methods supplied by the
+  ``pyramid.util.InstancePropertyMixin`` class such as ``set_property``.
+
+- Request properties and methods added via ``config.set_request_property`` or
+  ``config.add_request_method`` are now available to tweens.
+
+- Request properties and methods added via ``config.set_request_property`` or
+  ``config.add_request_method`` are now available to tweens.
+
+- Request properties and methods added via ``config.set_request_property`` or
+  ``config.add_request_method`` are now available in the request object
+  returned from ``pyramid.paster.bootstrap``.
+
+- ``request.context`` of environment request during ``bootstrap`` is now the
+  root object if a context isn't already set on a provided request.
+
 Deprecations
 ------------
 
 - The ``pyramid.config.Configurator.set_request_property`` has been
   documentation-deprecated.  The method remains usable but the more
-  featureful ``pyramid.config.Configurator.set_request_method`` should be
+  featureful ``pyramid.config.Configurator.add_request_method`` should be
   used in its place (it has all of the same capabilities but can also extend
   the request object with methods).
+
+Backwards Incompatibilities
+---------------------------
+
+- The Pyramid router no longer adds the values ``bfg.routes.route`` or
+  ``bfg.routes.matchdict`` to the request's WSGI environment dictionary.
+  These values were docs-deprecated in ``repoze.bfg`` 1.0 (effectively seven
+  minor releases ago).  If your code depended on these values, use
+  request.matched_route and request.matchdict instead.
+
+- It is no longer possible to pass an environ dictionary directly to
+  ``pyramid.traversal.ResourceTreeTraverser.__call__`` (aka
+  ``ModelGraphTraverser.__call__``).  Instead, you must pass a request
+  object.  Passing an environment instead of a request has generated a
+  deprecation warning since Pyramid 1.1.
+
+- Pyramid will no longer work properly if you use the
+  ``webob.request.LegacyRequest`` as a request factory.  Instances of the
+  LegacyRequest class have a ``request.path_info`` which return a string.
+  This Pyramid release assumes that ``request.path_info`` will
+  unconditionally be Unicode.
+
+- The functions from ``pyramid.chameleon_zpt`` and ``pyramid.chameleon_text``
+  named ``get_renderer``, ``get_template``, ``render_template``, and
+  ``render_template_to_response`` have been removed.  These have issued a
+  deprecation warning upon import since Pyramid 1.0.  Use
+  ``pyramid.renderers.get_renderer()``,
+  ``pyramid.renderers.get_renderer().implementation()``,
+  ``pyramid.renderers.render()`` or ``pyramid.renderers.render_to_response``
+  respectively instead of these functions.
+
+- The ``pyramid.configuration`` module was removed.  It had been deprecated
+  since Pyramid 1.0 and printed a deprecation warning upon its use.  Use
+  ``pyramid.config`` instead.
+
+- The ``pyramid.paster.PyramidTemplate`` API was removed.  It had been
+  deprecated since Pyramid 1.1 and issued a warning on import.  If your code
+  depended on this, adjust your code to import
+  ``pyramid.scaffolds.PyramidTemplate`` instead.
+
+- The ``pyramid.settings.get_settings()`` API was removed.  It had been
+  printing a deprecation warning since Pyramid 1.0.  If your code depended on
+  this API, use ``pyramid.threadlocal.get_current_registry().settings``
+  instead or use the ``settings`` attribute of the registry available from
+  the request (``request.registry.settings``).
+
+- These APIs from the ``pyramid.testing`` module were removed.  They have
+  been printing deprecation warnings since Pyramid 1.0:
+
+  * ``registerDummySecurityPolicy``, use
+    ``pyramid.config.Configurator.testing_securitypolicy`` instead.
+
+  * ``registerResources`` (aka ``registerModels``, use
+    ``pyramid.config.Configurator.testing_resources`` instead.
+
+  * ``registerEventListener``, use
+    ``pyramid.config.Configurator.testing_add_subscriber`` instead.
+
+  * ``registerTemplateRenderer`` (aka `registerDummyRenderer``), use
+    ``pyramid.config.Configurator.testing_add_template`` instead.
+
+  * ``registerView``, use ``pyramid.config.Configurator.add_view`` instead.
+
+  * ``registerUtility``, use
+    ``pyramid.config.Configurator.registry.registerUtility`` instead.
+
+  * ``registerAdapter``, use
+    ``pyramid.config.Configurator.registry.registerAdapter`` instead.
+
+  * ``registerSubscriber``, use 
+    ``pyramid.config.Configurator.add_subscriber`` instead.
+
+  * ``registerRoute``, use 
+    ``pyramid.config.Configurator.add_route`` instead.
+
+  * ``registerSettings``, use 
+    ``pyramid.config.Configurator.add_settings`` instead.
+
+Documentation
+-------------
+
+- Added an "Upgrading Pyramid" chapter to the narrative documentation.  It
+  describes how to cope with deprecations and removals of Pyramid APIs.
+
+Dependencies
+------------
+
+- Pyramid now requires WebOb 1.2b3+ (the prior Pyramid release only relied on
+  1.2dev+).  This is to ensure that we obtain a version of WebOb that returns
+  ``request.path_info`` as text.
+

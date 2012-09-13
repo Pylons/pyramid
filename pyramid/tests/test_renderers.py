@@ -533,6 +533,7 @@ class TestRendererHelper(unittest.TestCase):
         def renderer(*arg):
             def respond(*arg):
                 return arg
+            renderer.respond = respond
             return respond
         self.config.registry.registerUtility(renderer, IRendererFactory,
                                              name='.foo')
@@ -553,6 +554,11 @@ class TestRendererHelper(unittest.TestCase):
                                              request=request)
         self.assertEqual(response.body[0], 'values')
         self.assertEqual(response.body[1], {})
+
+    def test_get_renderer(self):
+        factory = self._registerRendererFactory()
+        helper = self._makeOne('loo.foo')
+        self.assertEqual(helper.get_renderer(), factory.respond)
 
     def test_render_view(self):
         self._registerRendererFactory()
@@ -652,6 +658,14 @@ class TestRendererHelper(unittest.TestCase):
         response = helper._make_response(la.encode('utf-8'), request)
         self.assertEqual(response.body, la.encode('utf-8'))
 
+    def test__make_response_result_is_None(self):
+        from pyramid.response import Response
+        request = testing.DummyRequest()
+        request.response = Response()
+        helper = self._makeOne('loo.foo')
+        response = helper._make_response(None, request)
+        self.assertEqual(response.body, b'')
+        
     def test__make_response_with_content_type(self):
         from pyramid.response import Response
         request = testing.DummyRequest()

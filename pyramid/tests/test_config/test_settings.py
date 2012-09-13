@@ -47,6 +47,15 @@ class TestSettingsConfiguratorMixin(unittest.TestCase):
         settings = reg.getUtility(ISettings)
         self.assertEqual(settings['a'], 1)
 
+    def test_add_settings_settings_None(self):
+        from pyramid.registry import Registry
+        from pyramid.interfaces import ISettings
+        reg = Registry()
+        config = self._makeOne(reg)
+        config.add_settings(None, a=1)
+        settings = reg.getUtility(ISettings)
+        self.assertEqual(settings['a'], 1)
+
 class TestSettings(unittest.TestCase):
         
     def _getTargetClass(self):

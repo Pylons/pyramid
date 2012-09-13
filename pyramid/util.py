@@ -2,6 +2,7 @@ import inspect
 import weakref
 
 from pyramid.compat import (
+    iteritems_,
     integer_types,
     string_types,
     text_,
@@ -73,6 +74,12 @@ class InstancePropertyMixin(object):
         parent = self.__class__
         cls = type(parent.__name__, (parent, object), attrs)
         self.__class__ = cls
+
+    def _set_extensions(self, extensions):
+        for name, fn in iteritems_(extensions.methods):
+            method = fn.__get__(self, self.__class__)
+            setattr(self, name, method)
+        self._set_properties(extensions.descriptors)
 
     def set_property(self, callable, name=None, reify=False):
         """ Add a callable or a property descriptor to the instance.

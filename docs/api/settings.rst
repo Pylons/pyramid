@@ -5,8 +5,6 @@
 
 .. automodule:: pyramid.settings
 
-  .. autofunction:: get_settings
-
   .. autofunction:: asbool
 
   .. autofunction:: aslist

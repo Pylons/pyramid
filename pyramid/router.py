@@ -6,6 +6,7 @@ from zope.interface import (
 from pyramid.interfaces import (
     IDebugLogger,
     IRequest,
+    IRequestExtensions,
     IRootFactory,
     IRouteRequest,
     IRouter,
@@ -48,6 +49,7 @@ class Router(object):
         self.root_factory = q(IRootFactory, default=DefaultRootFactory)
         self.routes_mapper = q(IRoutesMapper)
         self.request_factory = q(IRequestFactory, default=Request)
+        self.request_extensions = q(IRequestExtensions)
         tweens = q(ITweens)
         if tweens is None:
             tweens = excview_tween_factory
@@ -84,13 +86,6 @@ class Router(object):
                            request.url)
                     logger and logger.debug(msg)
             else:
-                # TODO: kill off bfg.routes.* environ keys
-                # when traverser requires request arg, and
-                # cant cope with environ anymore (they are
-                # docs-deprecated as of BFG 1.3)
-                environ = request.environ
-                environ['bfg.routes.route'] = route 
-                environ['bfg.routes.matchdict'] = match
                 attrs['matchdict'] = match
                 attrs['matched_route'] = route
 
@@ -105,7 +100,8 @@ class Router(object):
                             request.url,
                             route.name,
                             request.path_info,
-                            route.pattern, match,
+                            route.pattern,
+                            match,
                             ', '.join([p.__text__ for p in route.predicates]))
                         )
                     logger and logger.debug(msg)
@@ -184,6 +180,9 @@ class Router(object):
         try:
 
             try:
+                extensions = self.request_extensions
+                if extensions is not None:
+                    request._set_extensions(extensions)
                 response = self.handle_request(request)
                 has_listeners and notify(NewResponse(request, response))
 
@@ -198,4 +197,3 @@ class Router(object):
 
         finally:
             manager.pop()
-

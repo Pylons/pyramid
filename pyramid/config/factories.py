@@ -76,9 +76,9 @@ class FactoriesConfiguratorMixin(object):
         :class:`pyramid.request.Request` class (particularly
         ``__call__``, and ``blank``).
 
-        See :meth:`pyramid.config.Configurator.set_request_property`
+        See :meth:`pyramid.config.Configurator.add_request_method`
         for a less intrusive way to extend the request objects with
-        custom properties.
+        custom methods and properties.
 
         .. note::
 
@@ -96,7 +96,7 @@ class FactoriesConfiguratorMixin(object):
         self.action(IRequestFactory, register, introspectables=(intr,))
 
     @action_method
-    def set_request_method(self,
+    def add_request_method(self,
                            callable=None,
                            name=None,
                            property=False,
@@ -153,8 +153,6 @@ class FactoriesConfiguratorMixin(object):
             if exts is None:
                 exts = _RequestExtensions()
                 self.registry.registerUtility(exts, IRequestExtensions)
-                self.registry.registerHandler(_set_request_extensions,
-                                              (INewRequest,))
 
             plist = exts.descriptors if property else exts.methods
             plist[name] = callable
@@ -186,13 +184,13 @@ class FactoriesConfiguratorMixin(object):
 
         .. warning::
 
-           This method has been deprecated as of Pyramid 1.4.
-           :meth:`pyramid.config.Configurator.set_request_method` should be
+           This method has been docs-deprecated as of Pyramid 1.4.
+           :meth:`pyramid.config.Configurator.add_request_method` should be
            used instead.
 
         .. versionadded:: 1.3
         """
-        self.set_request_method(
+        self.add_request_method(
             callable, name=name, property=not reify, reify=reify)
 
 @implementer(IRequestExtensions)
@@ -201,10 +199,3 @@ class _RequestExtensions(object):
         self.descriptors = {}
         self.methods = {}
 
-def _set_request_extensions(event):
-    request = event.request
-    exts = request.registry.queryUtility(IRequestExtensions)
-    for name, fn in iteritems_(exts.methods):
-        method = fn.__get__(request, request.__class__)
-        setattr(request, name, method)
-    request._set_properties(exts.descriptors)

@@ -88,6 +88,7 @@ Narrative documentation in chapter form explaining how to use
    narr/advconfig
    narr/extconfig
    narr/scaffolding
+   narr/upgrading
    narr/threadlocals
    narr/zca
 

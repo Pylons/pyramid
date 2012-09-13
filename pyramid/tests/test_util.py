@@ -132,6 +132,20 @@ class Test_InstancePropertyMixin(unittest.TestCase):
         self.assertEqual(1, foo.x)
         self.assertEqual(2, foo.y)
 
+    def test__set_extensions(self):
+        inst = self._makeOne()
+        def foo(self, result):
+            return result
+        n, bar = inst._make_property(lambda _: 'bar', name='bar')
+        class Extensions(object):
+            def __init__(self):
+                self.methods = {'foo':foo}
+                self.descriptors = {'bar':bar}
+        extensions = Extensions()
+        inst._set_extensions(extensions)
+        self.assertEqual(inst.bar, 'bar')
+        self.assertEqual(inst.foo('abc'), 'abc')
+
 class Test_WeakOrderedSet(unittest.TestCase):
     def _makeOne(self):
         from pyramid.config import WeakOrderedSet

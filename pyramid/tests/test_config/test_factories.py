@@ -112,49 +112,19 @@ class TestFactoriesMixin(unittest.TestCase):
         config.set_request_property(bar, name='bar')
         self.assertRaises(ConfigurationConflictError, config.commit)
 
-    def test_set_request_property_subscriber(self):
-        from zope.interface import implementer
-        from pyramid.interfaces import INewRequest
-        config = self._makeOne()
-        def foo(r): pass
-        config.set_request_property(foo, name='foo')
-        config.set_request_property(foo, name='bar', reify=True)
-        config.commit()
-        @implementer(INewRequest)
-        class Event(object):
-            request = DummyRequest(config.registry)
-        event = Event()
-        config.registry.notify(event)
-        exts = list(sorted(event.request.extensions))
-        self.assertEqual('bar', exts[0])
-        self.assertEqual('foo', exts[1])
-
-    def test_set_request_method_subscriber(self):
-        from zope.interface import implementer
-        from pyramid.interfaces import INewRequest
-        config = self._makeOne(autocommit=True)
-        def foo(r): return 'bar'
-        config.set_request_method(foo, name='foo')
-        @implementer(INewRequest)
-        class Event(object):
-            request = DummyRequest(config.registry)
-        event = Event()
-        config.registry.notify(event)
-        self.assertEqual('bar', event.request.foo())
-
-    def test_set_request_method_with_callable(self):
+    def test_add_request_method_with_callable(self):
         from pyramid.interfaces import IRequestExtensions
         config = self._makeOne(autocommit=True)
         callable = lambda x: None
-        config.set_request_method(callable, name='foo')
+        config.add_request_method(callable, name='foo')
         exts = config.registry.getUtility(IRequestExtensions)
         self.assertTrue('foo' in exts.methods)
 
-    def test_set_request_method_with_unnamed_callable(self):
+    def test_add_request_method_with_unnamed_callable(self):
         from pyramid.interfaces import IRequestExtensions
         config = self._makeOne(autocommit=True)
         def foo(self): pass
-        config.set_request_method(foo)
+        config.add_request_method(foo)
         exts = config.registry.getUtility(IRequestExtensions)
         self.assertTrue('foo' in exts.methods)
 
@@ -163,38 +133,27 @@ class TestFactoriesMixin(unittest.TestCase):
         config = self._makeOne()
         def foo(self): pass
         def bar(self): pass
-        config.set_request_method(foo, name='bar')
-        config.set_request_method(bar, name='bar')
+        config.add_request_method(foo, name='bar')
+        config.add_request_method(bar, name='bar')
         self.assertRaises(ConfigurationConflictError, config.commit)
 
-    def test_set_request_method_with_None_callable(self):
+    def test_add_request_method_with_None_callable(self):
         from pyramid.interfaces import IRequestExtensions
         config = self._makeOne(autocommit=True)
-        config.set_request_method(name='foo')
+        config.add_request_method(name='foo')
         exts = config.registry.queryUtility(IRequestExtensions)
         self.assertTrue(exts is None)
 
-    def test_set_request_method_with_None_callable_conflict(self):
+    def test_add_request_method_with_None_callable_conflict(self):
         from pyramid.exceptions import ConfigurationConflictError
         config = self._makeOne()
         def bar(self): pass
-        config.set_request_method(name='foo')
-        config.set_request_method(bar, name='foo')
+        config.add_request_method(name='foo')
+        config.add_request_method(bar, name='foo')
         self.assertRaises(ConfigurationConflictError, config.commit)
 
-    def test_set_request_method_with_None_callable_and_no_name(self):
+    def test_add_request_method_with_None_callable_and_no_name(self):
         config = self._makeOne(autocommit=True)
-        self.assertRaises(AttributeError, config.set_request_method)
+        self.assertRaises(AttributeError, config.add_request_method)
 
-
-class DummyRequest(object):
-    extensions = None
-
-    def __init__(self, registry):
-        self.registry = registry
-
-    def _set_properties(self, properties):
-        if self.extensions is None:
-            self.extensions = []
-        self.extensions.extend(properties)
 

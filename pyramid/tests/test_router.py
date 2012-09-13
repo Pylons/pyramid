@@ -312,6 +312,38 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(app_iter, [b'abc'])
         self.assertEqual(start_response.status, '200 OK')
 
+    def test_call_with_request_extensions(self):
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IRequestExtensions
+        from pyramid.interfaces import IRequest
+        from pyramid.request import Request
+        context = DummyContext()
+        self._registerTraverserFactory(context)
+        class Extensions(object):
+            def __init__(self):
+                self.methods = {}
+                self.descriptors = {}
+        extensions = Extensions()
+        L = []
+        request = Request.blank('/')
+        request.request_iface = IRequest
+        request.registry = self.registry
+        request._set_extensions = lambda *x: L.extend(x)
+        def request_factory(environ):
+            return request
+        self.registry.registerUtility(extensions, IRequestExtensions)
+        environ = self._makeEnviron()
+        response = DummyResponse()
+        response.app_iter = ['Hello world']
+        view = DummyView(response)
+        self._registerView(self.config.derive_view(view), '',
+                           IViewClassifier, None, None)
+        router = self._makeOne()
+        router.request_factory = request_factory
+        start_response = DummyStartResponse()
+        router(environ, start_response)
+        self.assertEqual(L, [extensions])
+
     def test_call_view_registered_nonspecific_default_path(self):
         from pyramid.interfaces import IViewClassifier
         context = DummyContext()
@@ -646,8 +678,6 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(request.context, context)
         self.assertEqual(request.root, root)
         matchdict = {'action':'action1', 'article':'article1'}
-        self.assertEqual(environ['bfg.routes.matchdict'], matchdict)
-        self.assertEqual(environ['bfg.routes.route'].name, 'foo')
         self.assertEqual(request.matchdict, matchdict)
         self.assertEqual(request.matched_route.name, 'foo')
         self.assertEqual(len(logger.messages), 1)
@@ -712,8 +742,6 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(request.context, context)
         self.assertEqual(request.root, root)
         matchdict = {'action':'action1', 'article':'article1'}
-        self.assertEqual(environ['bfg.routes.matchdict'], matchdict)
-        self.assertEqual(environ['bfg.routes.route'].name, 'foo')
         self.assertEqual(request.matchdict, matchdict)
         self.assertEqual(request.matched_route.name, 'foo')
         self.assertTrue(IFoo.providedBy(request))

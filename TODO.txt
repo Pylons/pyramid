@@ -95,21 +95,49 @@ Nice-to-Have
 
 - Update App engine chapter with less creaky directions.
 
+- Idea from Zart:
+
+  diff --git a/pyramid/paster.py b/pyramid/paster.py
+  index b0e4d79..b3bd82a 100644
+  --- a/pyramid/paster.py
+  +++ b/pyramid/paster.py
+  @@ -8,6 +8,7 @@ from paste.deploy import (
+   from pyramid.compat import configparser
+   from logging.config import fileConfig
+   from pyramid.scripting import prepare
+  +from pyramid.config import Configurator
+   
+   def get_app(config_uri, name=None, loadapp=loadapp):
+       """ Return the WSGI application named ``name`` in the PasteDeploy
+  @@ -111,3 +112,10 @@ def bootstrap(config_uri, request=None):
+       env['app'] = app
+       return env
+   
+  +def make_pyramid_app(global_conf, app=None, **settings):
+  +    """Return pyramid application configured with provided settings"""
+  +    config = Configurator(package='pyramid', settings=settings)
+  +    if app:
+  +        config.include(app)
+  +    app = config.make_wsgi_app()
+  +    return app
+  diff --git a/setup.py b/setup.py
+  index 03ebb42..91e0e21 100644
+  --- a/setup.py
+  +++ b/setup.py
+  @@ -118,6 +118,8 @@ setup(name='pyramid',
+           [paste.server_runner]
+           wsgiref = pyramid.scripts.pserve:wsgiref_server_runner
+           cherrypy = pyramid.scripts.pserve:cherrypy_server_runner
+  +        [paster.app_factory]
+  +        main = pyramid.paster:make_pyramid_app
+         """
+         )
+ 
+
 Future
 ------
 
-- 1.4: Kill off ``bfg.routes`` envvars in router.
-
-- 1.4: Remove ``chameleon_text`` / ``chameleon_zpt`` deprecated functions
-  (render_*)
-
-- 1.4: Remove ``pyramid.configuration`` (deprecated).
-
-- 1.4: Remove ``pyramid.paster.PyramidTemplate`` (deprecated).
-
-- 1.4: Remove ``pyramid.settings.get_settings`` (deprecated).
-
-- 1.5: Remove all deprecated ``pyramid.testing`` functions.
+- 1.5: remove ``pyramid.view.static`` and ``pyramid.view.is_response``.
 
 - 1.5: turn ``pyramid.settings.Settings`` into a function that returns the
   original dict (after ``__getattr__`` deprecation period, it was deprecated
@@ -117,8 +145,8 @@ Future
 
 - 1.5: Remove ``pyramid.requests.DeprecatedRequestMethodsMixin``.
 
-- 1.6: Maybe? deprecate set_request_property in favor of pointing people at
-  set_request_method.
+- 1.5: Maybe? deprecate set_request_property in favor of pointing people at
+  add_request_method, schedule removal for 1.8?
 
 - 1.6: Remove IContextURL and TraversalContextURL.
 

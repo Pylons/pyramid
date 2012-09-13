@@ -85,8 +85,6 @@ API Reference
 
    api/authorization
    api/authentication
-   api/chameleon_text
-   api/chameleon_zpt
    api/config
    api/events
    api/exceptions

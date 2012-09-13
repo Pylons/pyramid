@@ -1,20 +1,14 @@
 import copy
 import os
 
-from zope.deprecation import deprecated
-
 from zope.interface import (
     implementer,
-    Interface,
     alsoProvides,
     )
 
 from pyramid.interfaces import (
     IRequest,
     IResponseFactory,
-    ISecuredView,
-    IView,
-    IViewClassifier,
     ISession,
     )
 
@@ -26,14 +20,12 @@ from pyramid.compat import (
 
 from pyramid.config import Configurator
 from pyramid.decorator import reify
-from pyramid.httpexceptions import HTTPForbidden
 from pyramid.response import Response
 from pyramid.registry import Registry
 
 from pyramid.security import (
     Authenticated,
     Everyone,
-    has_permission,
     )
 
 from pyramid.threadlocal import (
@@ -47,373 +39,9 @@ from pyramid.request import (
     )
 
 from pyramid.url import URLMethodsMixin
+from pyramid.util import InstancePropertyMixin
 
 _marker = object()
-
-def registerDummySecurityPolicy(userid=None, groupids=(), permissive=True):
-    """ Registers a pair of faux :app:`Pyramid` security policies:
-    a :term:`authentication policy` and a :term:`authorization
-    policy`.
-
-    The behavior of the registered :term:`authorization policy`
-    depends on the ``permissive`` argument.  If ``permissive`` is
-    true, a permissive :term:`authorization policy` is registered;
-    this policy allows all access.  If ``permissive`` is false, a
-    nonpermissive :term:`authorization policy` is registered; this
-    policy denies all access.
-
-    The behavior of the registered :term:`authentication policy`
-    depends on the values provided for the ``userid`` and ``groupids``
-    argument.  The authentication policy will return the userid
-    identifier implied by the ``userid`` argument and the group ids
-    implied by the ``groupids`` argument when the
-    :func:`pyramid.security.authenticated_userid` or
-    :func:`pyramid.security.effective_principals` APIs are used.
-
-    This function is most useful when testing code that uses the APIs named
-    :func:`pyramid.security.has_permission`,
-    :func:`pyramid.security.authenticated_userid`,
-    :func:`pyramid.security.unauthenticated_userid`,
-    :func:`pyramid.security.effective_principals`, and
-    :func:`pyramid.security.principals_allowed_by_permission`.
-
-    .. warning:: This API is deprecated as of :app:`Pyramid` 1.0.
-       Instead use the
-       :meth:`pyramid.config.Configurator.testing_securitypolicy`
-       method in your unit and integration tests.
-    """
-    registry = get_current_registry()
-    config = Configurator(registry=registry)
-    result = config.testing_securitypolicy(userid=userid, groupids=groupids,
-                                           permissive=permissive)
-    config.commit()
-    return result
-
-deprecated('registerDummySecurityPolicy',
-           'The testing.registerDummySecurityPolicy API is deprecated as of '
-           'Pyramid 1.0. Instead use the '
-           'pyramid.config.Configurator.testing_securitypolicy '
-           'method in your unit and integration tests.')
-
-def registerResources(resources):
-    """ Registers a dictionary of :term:`resource` objects that can be
-    resolved via the :func:`pyramid.traversal.find_resource` API.
-
-    The :func:`pyramid.traversal.find_resource` API is called with a
-    path as one of its arguments.  If the dictionary you register when
-    calling this method contains that path as a string key
-    (e.g. ``/foo/bar`` or ``foo/bar``), the corresponding value will
-    be returned to ``find_resource`` (and thus to your code) when
-    :func:`pyramid.traversal.find_resource` is called with an
-    equivalent path string or tuple.
-
-    .. warning:: This API is deprecated as of :app:`Pyramid` 1.0.
-       Instead use the
-       :meth:`pyramid.config.Configurator.testing_resources`
-       method in your unit and integration tests.
-
-    .. note:: For ancient backward compatibility purposes, this API can also
-       be accessed as :func:`pyramid.testing.registerModels`.
-    """
-    registry = get_current_registry()
-    config = Configurator(registry=registry)
-    result = config.testing_resources(resources)
-    config.commit()
-    return result
-
-deprecated('registerResources',
-           'The testing.registerResources API is deprecated as of '
-           'Pyramid 1.0. Instead use the '
-           'pyramid.config.Configurator.testing_resources '
-           'method in your unit and integration tests.')
-
-registerModels = registerResources
-
-deprecated('registerModels',
-           'The testing.registerModels API is deprecated as of '
-           'Pyramid 1.0. Instead use the '
-           'pyramid.config.Configurator.testing_resources '
-           'method in your unit and integration tests.')
-
-def registerEventListener(event_iface=None):
-    """ Registers an :term:`event` listener (aka :term:`subscriber`)
-    listening for events of the type ``event_iface``.  This method
-    returns a list object which is appended to by the subscriber
-    whenever an event is captured.
-
-    When an event is dispatched that matches ``event_iface``, that
-    event will be appended to the list.  You can then compare the
-    values in the list to expected event notifications.  This method
-    is useful when testing code that wants to call
-    :meth:`pyramid.registry.Registry.notify`.
-
-    The default value of ``event_iface`` (``None``) implies a
-    subscriber registered for *any* kind of event.
-
-    .. warning:: This API is deprecated as of :app:`Pyramid` 1.0.
-       Instead use the
-       :meth:`pyramid.config.Configurator.testing_add_subscriber`
-       method in your unit and integration tests.
-    """
-    registry = get_current_registry()
-    config = Configurator(registry=registry)
-    result = config.testing_add_subscriber(event_iface)
-    config.commit()
-    return result
-
-deprecated('registerEventListener',
-           'The testing.registerEventListener API is deprecated as of '
-           'Pyramid 1.0. Instead use the '
-           'pyramid.config.Configurator.testing_add_subscriber '
-           'method in your unit and integration tests.')
-
-def registerTemplateRenderer(path, renderer=None):
-    """ Register a template renderer at ``path`` (usually a relative
-    filename ala ``templates/foo.pt``) and return the renderer object.
-    If the ``renderer`` argument is None, a 'dummy' renderer will be
-    used.  This function is useful when testing code that calls the
-    :func:`pyramid.renderers.render` function or
-    :func:`pyramid.renderers.render_to_response` function or any
-    other ``render_*`` or ``get_*`` API of the
-    :mod:`pyramid.renderers` module.
-
-    .. warning:: This API is deprecated as of :app:`Pyramid` 1.0.
-       Instead use the
-       :meth:`pyramid.config.Configurator.testing_add_renderer`
-       method in your unit and integration tests.
-
-    """
-    registry = get_current_registry()
-    config = Configurator(registry=registry)
-    result = config.testing_add_template(path, renderer)
-    config.commit()
-    return result
-
-deprecated('registerTemplateRenderer',
-           'The testing.registerTemplateRenderer API is deprecated as of '
-           'Pyramid 1.0. Instead use the '
-           'pyramid.config.Configurator.testing_add_renderer '
-           'method in your unit and integration tests.')
-
-# registerDummyRenderer is a deprecated alias that should never be removed
-# (too much usage in the wild)
-registerDummyRenderer = registerTemplateRenderer
-
-deprecated('registerDummyRenderer',
-           'The testing.registerDummyRenderer API is deprecated as of '
-           'Pyramid 1.0. Instead use the '
-           'pyramid.config.Configurator.testing_add_renderer '
-           'method in your unit and integration tests.')
-
-def registerView(name, result='', view=None, for_=(Interface, Interface),
-                 permission=None):
-    """ Registers a :app:`Pyramid` :term:`view callable` under the
-    name implied by the ``name`` argument.  The view will return a
-    :term:`WebOb` :term:`Response` object with the value implied by
-    the ``result`` argument as its ``body`` attribute.  To gain more
-    control, if you pass in a non-``None`` ``view`` argument, this
-    value will be used as a view callable instead of an automatically
-    generated view callable (and ``result`` is not used).
-
-    To protect the view using a :term:`permission`, pass in a
-    non-``None`` value as ``permission``.  This permission will be
-    checked by any active :term:`authorization policy` when view
-    execution is attempted.
-
-    This function is useful when testing code which calls
-    :func:`pyramid.view.render_view_to_response`.
-
-    .. warning:: This API is deprecated as of :app:`Pyramid` 1.0.
-       Instead use the
-       :meth:`pyramid.config.Configurator.add_view`
-       method in your unit and integration tests.
-    """
-    for_ = (IViewClassifier, ) + for_
-    if view is None:
-        def view(context, request):
-            return Response(result)
-    if permission is None:
-        return registerAdapter(view, for_, IView, name)
-    else:
-        def _secure(context, request):
-            if not has_permission(permission, context, request):
-                raise HTTPForbidden('no permission')
-            else:
-                return view(context, request)
-        _secure.__call_permissive__ = view
-        def permitted(context, request):
-            return has_permission(permission, context, request)
-        _secure.__permitted__ = permitted
-        return registerAdapter(_secure, for_, ISecuredView, name)
-
-deprecated('registerView',
-           'The registerView API is deprecated as of '
-           'Pyramid 1.0. Instead use the '
-           'pyramid.config.Configurator.add_view '
-           'method in your unit and integration tests.')
-
-def registerUtility(impl, iface=Interface, name=''):
-    """ Register a ZCA utility component.
-
-    The ``impl`` argument specifies the implementation of the utility.
-    The ``iface`` argument specifies the :term:`interface` which will
-    be later required to look up the utility
-    (:class:`zope.interface.Interface`, by default).  The ``name``
-    argument implies the utility name; it is the empty string by
-    default.
-
-    See `The ZCA book <http://www.muthukadan.net/docs/zca.html>`_ for
-    more information about ZCA utilities.
-
-    .. warning:: This API is deprecated as of :app:`Pyramid` 1.0.
-       Instead use the :meth:`pyramid.Registry.registerUtility`
-       method.  The ``registry`` attribute of a :term:`Configurator`
-       in your unit and integration tests is an instance of the
-       :class:`pyramid.Registry` class.
-    """
-    reg = get_current_registry()
-    reg.registerUtility(impl, iface, name=name)
-    return impl
-
-deprecated('registerUtility',
-           'The registerUtility API is deprecated as of '
-           'Pyramid 1.0. Instead use the '
-           'pyramid.registry.registerUtility method (via '
-           'e.g. "config.registry.registerUtility(..)" '
-           'method in your unit and integration tests.')
-
-def registerAdapter(impl, for_=Interface, provides=Interface, name=''):
-    """ Register a ZCA adapter component.
-
-    The ``impl`` argument specifies the implementation of the
-    component (often a class).  The ``for_`` argument implies the
-    ``for`` interface type used for this registration; it is
-    :class:`zope.interface.Interface` by default.  If ``for`` is not a
-    tuple or list, it will be converted to a one-tuple before being
-    passed to underlying :meth:`pyramid.registry.registerAdapter`
-    API.
-
-    The ``provides`` argument specifies the ZCA 'provides' interface,
-    :class:`zope.interface.Interface` by default.
-
-    The ``name`` argument is the empty string by default; it implies
-    the name under which the adapter is registered.
-
-    See `The ZCA book <http://www.muthukadan.net/docs/zca.html>`_ for
-    more information about ZCA adapters.
-
-    .. warning:: This API is deprecated as of :app:`Pyramid` 1.0.
-       Instead use the :meth:`pyramid.Registry.registerAdapter`
-       method.  The ``registry`` attribute of a :term:`Configurator`
-       in your unit and integration tests is an instance of the
-       :class:`pyramid.Registry` class.
-    """
-    reg = get_current_registry()
-    if not isinstance(for_, (tuple, list)):
-        for_ = (for_,)
-    reg.registerAdapter(impl, for_, provides, name=name)
-    return impl
-
-deprecated('registerAdapter',
-           'The registerAdapter API is deprecated as of '
-           'Pyramid 1.0. Instead use the '
-           'pyramid.registry.registerAdapter method (via '
-           'e.g. "config.registry.registerAdapter(..)" '
-           'method in your unit and integration tests.')
-
-def registerSubscriber(subscriber, iface=Interface):
-    """ Register a ZCA subscriber component.
-
-    The ``subscriber`` argument specifies the implementation of the
-    subscriber component (often a function).
-
-    The ``iface`` argument is the interface type for which the
-    subscriber will be registered (:class:`zope.interface.Interface`
-    by default). If ``iface`` is not a tuple or list, it will be
-    converted to a one-tuple before being passed to the underlying ZCA
-    :meth:`pyramid.registry.registerHandler` method.
-
-    See `The ZCA book <http://www.muthukadan.net/docs/zca.html>`_ for
-    more information about ZCA subscribers.
-
-    .. warning:: This API is deprecated as of :app:`Pyramid` 1.0.
-       Instead use the
-       :meth:`pyramid.config.Configurator.add_subscriber`
-       method in your unit and integration tests.
-    """
-    registry = get_current_registry()
-    config = Configurator(registry)
-    result = config.add_subscriber(subscriber, iface=iface)
-    config.commit()
-    return result
-
-deprecated('registerSubscriber',
-           'The testing.registerSubscriber API is deprecated as of '
-           'Pyramid 1.0. Instead use the '
-           'pyramid.config.Configurator.add_subscriber '
-           'method in your unit and integration tests.')
-
-def registerRoute(pattern, name, factory=None):
-    """ Register a new :term:`route` using a pattern
-    (e.g. ``:pagename``), a name (e.g. ``home``), and an optional root
-    factory.
-
-    The ``pattern`` argument implies the route pattern.  The ``name``
-    argument implies the route name.  The ``factory`` argument implies
-    a :term:`root factory` associated with the route.
-
-    This API is useful for testing code that calls
-    e.g. :func:`pyramid.url.route_url`.
-
-    .. warning:: This API is deprecated as of :app:`Pyramid` 1.0.
-       Instead use the
-       :meth:`pyramid.config.Configurator.add_route`
-       method in your unit and integration tests.
-    """
-    reg = get_current_registry()
-    config = Configurator(registry=reg)
-    config.setup_registry()
-    result = config.add_route(name, pattern, factory=factory)
-    config.commit()
-    return result
-
-deprecated('registerRoute',
-           'The testing.registerRoute API is deprecated as of '
-           'Pyramid 1.0. Instead use the '
-           'pyramid.config.Configurator.add_route '
-           'method in your unit and integration tests.')
-
-def registerSettings(dictarg=None, **kw):
-    """Register one or more 'setting' key/value pairs.  A setting is
-    a single key/value pair in the dictionary-ish object returned from
-    the API :attr:`pyramid.registry.Registry.settings`.
-
-    You may pass a dictionary::
-
-       registerSettings({'external_uri':'http://example.com'})
-
-    Or a set of key/value pairs::
-
-       registerSettings(external_uri='http://example.com')
-
-    Use of this function is required when you need to test code that calls
-    the :attr:`pyramid.registry.Registry.settings` API and which uses return
-    values from that API.
-
-    .. warning:: This API is deprecated as of :app:`Pyramid` 1.0.
-       Instead use the
-       :meth:`pyramid.config.Configurator.add_settings`
-       method in your unit and integration tests.
-    """
-    registry = get_current_registry()
-    config = Configurator(registry=registry)
-    config.add_settings(dictarg, **kw)
-
-deprecated('registerSettings',
-           'The testing.registerSettings API is deprecated as of '
-           'Pyramid 1.0. Instead use the '
-           'pyramid.config.Configurator.add_settings '
-           'method in your unit and integration tests.')
 
 class DummyRootFactory(object):
     __parent__ = None
@@ -646,7 +274,7 @@ class DummySession(dict):
         
 @implementer(IRequest)
 class DummyRequest(DeprecatedRequestMethodsMixin, URLMethodsMixin,
-                   CallbackMethodsMixin):
+                   CallbackMethodsMixin, InstancePropertyMixin):
     """ A DummyRequest object (incompletely) imitates a :term:`request` object.
 
     The ``params``, ``environ``, ``headers``, ``path``, and
