@@ -2,7 +2,6 @@ import sys
 import unittest
 
 from pyramid.compat import binary_type
-from pyramid.testing import skip_on
 from pyramid import testing
 
 class Base(object):
@@ -50,7 +49,6 @@ class TextTemplateRendererTests(Base, unittest.TestCase):
         from pyramid.interfaces import ITemplateRenderer
         verifyClass(ITemplateRenderer, self._getTargetClass())
 
-    @skip_on('java')
     def test_template_reified(self):
         minimal = self._getTemplatePath('minimal.txt')
         lookup = DummyLookup()
@@ -59,7 +57,6 @@ class TextTemplateRendererTests(Base, unittest.TestCase):
         template  = instance.template
         self.assertEqual(template, instance.__dict__['template'])
 
-    @skip_on('java')
     def test_template_with_ichameleon_translate(self):
         minimal = self._getTemplatePath('minimal.txt')
         lookup = DummyLookup()
@@ -68,7 +65,6 @@ class TextTemplateRendererTests(Base, unittest.TestCase):
         template  = instance.template
         self.assertEqual(template.translate, lookup.translate)
 
-    @skip_on('java')
     def test_template_with_debug_templates(self):
         minimal = self._getTemplatePath('minimal.txt')
         lookup = DummyLookup()
@@ -78,7 +74,6 @@ class TextTemplateRendererTests(Base, unittest.TestCase):
         template  = instance.template
         self.assertEqual(template.debug, True)
 
-    @skip_on('java')
     def test_template_with_reload_templates(self):
         minimal = self._getTemplatePath('minimal.txt')
         lookup = DummyLookup()
@@ -88,7 +83,6 @@ class TextTemplateRendererTests(Base, unittest.TestCase):
         template  = instance.template
         self.assertEqual(template.auto_reload, True)
 
-    @skip_on('java')
     def test_template_without_reload_templates(self):
         minimal = self._getTemplatePath('minimal.txt')
         lookup = DummyLookup()
@@ -98,7 +92,6 @@ class TextTemplateRendererTests(Base, unittest.TestCase):
         template  = instance.template
         self.assertEqual(template.auto_reload, False)
 
-    @skip_on('java')
     def test_call(self):
         minimal = self._getTemplatePath('minimal.txt')
         lookup = DummyLookup()
@@ -107,14 +100,12 @@ class TextTemplateRendererTests(Base, unittest.TestCase):
         self.assertTrue(isinstance(result, binary_type))
         self.assertEqual(result, b'Hello.\n')
 
-    @skip_on('java')
     def test_call_with_nondict_value(self):
         minimal = self._getTemplatePath('minimal.txt')
         lookup = DummyLookup()
         instance = self._makeOne(minimal, lookup)
         self.assertRaises(ValueError, instance, None, {})
 
-    @skip_on('java')
     def test_call_nonminimal(self):
         nonminimal = self._getTemplatePath('nonminimal.txt')
         lookup = DummyLookup()
@@ -123,7 +114,6 @@ class TextTemplateRendererTests(Base, unittest.TestCase):
         self.assertTrue(isinstance(result, binary_type))
         self.assertEqual(result, b'Hello, Chris!\n')
 
-    @skip_on('java')
     def test_implementation(self):
         minimal = self._getTemplatePath('minimal.txt')
         lookup = DummyLookup()

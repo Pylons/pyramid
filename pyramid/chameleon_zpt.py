@@ -2,20 +2,9 @@ import sys
 
 from zope.interface import implementer
 
-from pyramid.compat import reraise
-
-try:
-    from chameleon.zpt.template import PageTemplateFile
-    PageTemplateFile # prevent pyflakes complaining about a redefinition below
-except ImportError: # pragma: no cover
-    exc_class, exc, tb = sys.exc_info()
-    # Chameleon doesn't work on non-CPython platforms
-    class PageTemplateFile(object):
-        def __init__(self, *arg, **kw):
-            reraise(ImportError, exc, tb)
+from chameleon.zpt.template import PageTemplateFile
 
 from pyramid.interfaces import ITemplateRenderer
-
 from pyramid.decorator import reify
 from pyramid import renderers
 
