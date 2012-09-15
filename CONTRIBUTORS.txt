@@ -177,6 +177,8 @@ Contributors
 
 - Marc Abramowitz, 2012/06/13
 
+- Brian Sutherland, 2012/06/16
+
 - Jeff Cook, 2012/06/16
 
 - Ian Wilson, 2012/06/17
@@ -184,3 +186,4 @@ Contributors
 - Roman Kozlovskyi, 2012/08/11
 
 - Domen Kozar, 2012/09/11
+

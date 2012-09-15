@@ -646,3 +646,58 @@ class DummyRendererInfo(object):
     def __init__(self, kw):
         self.__dict__.update(kw)
         
+class Test_testConfig(unittest.TestCase):
+
+    def _setUp(self, **kw):
+        self._log.append(('setUp', kw))
+        return 'fake config'
+
+    def _tearDown(self, **kw):
+        self._log.append(('tearDown', kw))
+
+    def setUp(self):
+        from pyramid import testing
+        self._log = []
+        self._orig_setUp = testing.setUp
+        testing.setUp = self._setUp
+        self._orig_tearDown = testing.tearDown
+        testing.tearDown = self._tearDown
+
+    def tearDown(self):
+        from pyramid import testing
+        testing.setUp = self._orig_setUp
+        testing.tearDown = self._orig_tearDown
+
+    def _callFUT(self, inner, **kw):
+        from pyramid.testing import testConfig
+        with testConfig(**kw) as config:
+            inner(config)
+
+    def test_ok_calls(self):
+        self.assertEqual(self._log, [])
+        def inner(config):
+            self.assertEqual(self._log,
+                    [('setUp',
+                        {'autocommit': True,
+                            'hook_zca': True,
+                            'registry': None,
+                            'request': None,
+                            'settings': None})])
+            self._log.pop()
+        self._callFUT(inner)
+        self.assertEqual(self._log,
+                [('tearDown', {'unhook_zca': True})])
+
+    def test_teardown_called_on_exception(self):
+        class TestException(Exception):
+            pass
+        def inner(config):
+            self._log = []
+            raise TestException('oops')
+        self.assertRaises(TestException, self._callFUT, inner)
+        self.assertEqual(self._log[0][0], 'tearDown')
+
+    def test_ok_get_config(self):
+        def inner(config):
+            self.assertEqual(config, 'fake config')
+        self._callFUT(inner)
