@@ -414,3 +414,10 @@ constraints: the routes they imply require relative ordering.  Such ordering
 constraints are not absolved by two-phase configuration.  Routes are still
 added in configuration execution order.
 
+More Information
+----------------
+
+For more information, see the article entitled `"A Whirlwind Rour of Advanced
+Configuration Tactics"
+<http://docs.pylonsproject.org/projects/pyramid_cookbook/en/latest/configuration/whirlwind_tour.html>`_
+in the Pyramid Cookbook.
