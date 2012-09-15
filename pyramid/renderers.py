@@ -429,12 +429,9 @@ class ChameleonRendererLookup(object):
             if renderer is None:
                 renderer = self.impl(spec, self, macro=None)
                 # cache the template
-                try:
-                    self.lock.acquire()
+                with self.lock:
                     registry.registerUtility(renderer,
                                              ITemplateRenderer, name=spec)
-                finally:
-                    self.lock.release()
         else:
             # spec is a package:relpath asset spec
             renderer = registry.queryUtility(ITemplateRenderer, name=spec)
@@ -445,7 +442,8 @@ class ChameleonRendererLookup(object):
                     r'(\.(?P<ext>.*))'
                     )
                 asset, macro, ext = p.match(spec).group(
-                    'asset', 'defname', 'ext')
+                    'asset', 'defname', 'ext'
+                    )
                 spec = '%s.%s' % (asset, ext)
                 try:
                     package_name, filename = spec.split(':', 1)
@@ -463,12 +461,9 @@ class ChameleonRendererLookup(object):
                 settings = info.settings
                 if not settings.get('reload_assets'):
                     # cache the template
-                    self.lock.acquire()
-                    try:
+                    with self.lock:
                         registry.registerUtility(renderer, ITemplateRenderer,
                                                  name=spec)
-                    finally:
-                        self.lock.release()
 
         return renderer
 
@@ -479,11 +474,8 @@ def template_renderer_factory(info, impl, lock=registry_lock):
     lookup = registry.queryUtility(IChameleonLookup, name=info.type)
     if lookup is None:
         lookup = ChameleonRendererLookup(impl, registry)
-        lock.acquire()
-        try:
+        with lock:
             registry.registerUtility(lookup, IChameleonLookup, name=info.type)
-        finally:
-            lock.release()
     return lookup(info)
 
 @implementer(IRendererInfo)

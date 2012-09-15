@@ -583,12 +583,8 @@ class LazyWriter(object):
 
     def open(self):
         if self.fileobj is None:
-            self.lock.acquire()
-            try:
-                if self.fileobj is None:
-                    self.fileobj = open(self.filename, self.mode)
-            finally:
-                self.lock.release()
+            with self.lock:
+                self.fileobj = open(self.filename, self.mode)
         return self.fileobj
 
     def close(self):

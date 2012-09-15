@@ -95,7 +95,9 @@ class MakoRendererFactoryHelper(object):
                 r'(?:\#(?P<defname>[\w_]+))?'
                 r'(\.(?P<ext>.*))'
                 )
-        asset, defname, ext = p.match(info.name).group('asset', 'defname', 'ext')
+        asset, defname, ext = p.match(info.name).group(
+            'asset', 'defname', 'ext'
+            )
         path = '%s.%s' % (asset, ext)
         registry = info.registry
         settings = info.settings
@@ -154,12 +156,9 @@ class MakoRendererFactoryHelper(object):
                 preprocessor=preprocessor
                 )
 
-            registry_lock.acquire()
-            try:
+            with registry_lock:
                 registry.registerUtility(lookup, IMakoLookup,
                                          name=settings_prefix)
-            finally:
-                registry_lock.release()
 
         return MakoLookupTemplateRenderer(path, defname, lookup)
 
