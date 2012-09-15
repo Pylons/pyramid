@@ -1,7 +1,6 @@
 import sys
 import unittest
 
-from pyramid.testing import skip_on
 from pyramid import testing
 from pyramid.compat import text_type
 
@@ -50,7 +49,6 @@ class ZPTTemplateRendererTests(Base, unittest.TestCase):
         from pyramid.interfaces import ITemplateRenderer
         verifyClass(ITemplateRenderer, self._getTargetClass())
 
-    @skip_on('java')
     def test_call(self):
         minimal = self._getTemplatePath('minimal.pt')
         lookup = DummyLookup()
@@ -60,7 +58,6 @@ class ZPTTemplateRendererTests(Base, unittest.TestCase):
         self.assertEqual(result.rstrip('\n'),
                      '<div xmlns="http://www.w3.org/1999/xhtml">\n</div>')
 
-    @skip_on('java')
     def test_template_reified(self):
         minimal = self._getTemplatePath('minimal.pt')
         lookup = DummyLookup()
@@ -69,7 +66,6 @@ class ZPTTemplateRendererTests(Base, unittest.TestCase):
         template  = instance.template
         self.assertEqual(template, instance.__dict__['template'])
 
-    @skip_on('java')
     def test_template_with_ichameleon_translate(self):
         minimal = self._getTemplatePath('minimal.pt')
         lookup = DummyLookup()
@@ -78,7 +74,6 @@ class ZPTTemplateRendererTests(Base, unittest.TestCase):
         template  = instance.template
         self.assertEqual(template.translate, lookup.translate)
 
-    @skip_on('java')
     def test_template_with_debug_templates(self):
         minimal = self._getTemplatePath('minimal.pt')
         lookup = DummyLookup()
@@ -88,7 +83,6 @@ class ZPTTemplateRendererTests(Base, unittest.TestCase):
         template  = instance.template
         self.assertEqual(template.debug, True)
 
-    @skip_on('java')
     def test_template_without_debug_templates(self):
         minimal = self._getTemplatePath('minimal.pt')
         lookup = DummyLookup()
@@ -98,7 +92,6 @@ class ZPTTemplateRendererTests(Base, unittest.TestCase):
         template  = instance.template
         self.assertEqual(template.debug, False)
 
-    @skip_on('java')
     def test_template_with_reload_templates(self):
         minimal = self._getTemplatePath('minimal.pt')
         lookup = DummyLookup()
@@ -108,7 +101,6 @@ class ZPTTemplateRendererTests(Base, unittest.TestCase):
         template  = instance.template
         self.assertEqual(template.auto_reload, True)
 
-    @skip_on('java')
     def test_template_without_reload_templates(self):
         minimal = self._getTemplatePath('minimal.pt')
         lookup = DummyLookup()
@@ -118,14 +110,12 @@ class ZPTTemplateRendererTests(Base, unittest.TestCase):
         template  = instance.template
         self.assertEqual(template.auto_reload, False)
 
-    @skip_on('java')
     def test_call_with_nondict_value(self):
         minimal = self._getTemplatePath('minimal.pt')
         lookup = DummyLookup()
         instance = self._makeOne(minimal, lookup)
         self.assertRaises(ValueError, instance, None, {})
 
-    @skip_on('java')
     def test_implementation(self):
         minimal = self._getTemplatePath('minimal.pt')
         lookup = DummyLookup()
