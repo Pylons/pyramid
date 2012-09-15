@@ -160,6 +160,9 @@ Features
 - ``request.context`` of environment request during ``bootstrap`` is now the
   root object if a context isn't already set on a provided request.
 
+- The ``pyramid.decorator.reify`` function is now an API, and was added to
+  the API documentation.
+
 Deprecations
 ------------
 
@@ -250,7 +253,9 @@ Documentation
 -------------
 
 - Added an "Upgrading Pyramid" chapter to the narrative documentation.  It
-  describes how to cope with deprecations and removals of Pyramid APIs.
+  describes how to cope with deprecations and removals of Pyramid APIs and
+  how to show Pyramid-generated deprecation warnings while running tests and
+  while running a server.
 
 Dependencies
 ------------

@@ -12,6 +12,7 @@ documentation is organized alphabetically by module name.
    api/authentication
    api/compat
    api/config
+   api/decorator
    api/events
    api/exceptions
    api/httpexceptions

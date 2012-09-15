@@ -293,7 +293,7 @@ class DummyRequest(DeprecatedRequestMethodsMixin, URLMethodsMixin,
     request.  For example, by default, the DummyRequest ``GET`` and ``POST``
     attributes are of type ``dict``, unlike a normal Request's GET and POST,
     which are of type ``MultiDict``. If your code uses the features of
-    MultiDict, you should either use a"real" :class:`pyramid.request.Request`
+    MultiDict, you should either use a real :class:`pyramid.request.Request`
     or adapt your DummyRequest by replacing the attributes with ``MultiDict``
     instances.
 

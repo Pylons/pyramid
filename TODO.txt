@@ -143,7 +143,8 @@ Future
   original dict (after ``__getattr__`` deprecation period, it was deprecated
   in 1.2).
 
-- 1.5: Remove ``pyramid.requests.DeprecatedRequestMethodsMixin``.
+- 1.5: Remove ``pyramid.requests.DeprecatedRequestMethodsMixin`` and code in
+  renderers module that looks for _response_content_type, et. al.
 
 - 1.5: Maybe? deprecate set_request_property in favor of pointing people at
   add_request_method, schedule removal for 1.8?
