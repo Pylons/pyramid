@@ -182,3 +182,5 @@ Contributors
 - Ian Wilson, 2012/06/17
 
 - Roman Kozlovskyi, 2012/08/11
+
+- Domen Kozar, 2012/09/11
