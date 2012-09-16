@@ -92,7 +92,9 @@ callable indirectly is the main advantage to using
 :meth:`pyramid.request.Request.subrequest` instead of simply importing the
 view callable and executing it directly.  Note that there's not much
 advantage to invoking a view using a subrequest if you *can* invoke a view
-callable directly.  It's much slower to use a subrequest.
+callable directly.  Subrequests are slower and are less convenient if you
+actually do want just the literal information returned by a function that
+happens to be a view callable.
 
 The :meth:`pyramid.request.Request.subrequest` API accepts two arguments: a
 positional argument ``request`` that must be provided, and and ``use_tweens``
