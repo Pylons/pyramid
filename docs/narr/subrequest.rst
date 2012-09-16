@@ -82,6 +82,11 @@ adapter will work too:
        server = make_server('0.0.0.0', 8080, app)
        server.serve_forever()
 
+Even though the ``view_two`` view callable returned a string, it was invoked
+in such a way that the ``string`` renderer associated with the view
+registration that was found turned it into a "real" response object for
+consumption by ``view_one``.
+
 Being able to unconditionally obtain a response object by invoking a view
 callable indirectly is the main advantage to using
 :meth:`pyramid.request.Request.subrequest` instead of simply importing the
