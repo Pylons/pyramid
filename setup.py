@@ -64,7 +64,7 @@ if not PY3:
 testing_extras = tests_require + ['nose', 'coverage']
 
 setup(name='pyramid',
-      version='1.3.3',
+      version='1.3.4',
       description=('The Pyramid web application development framework, a '
                    'Pylons project'),
       long_description=README + '\n\n' +  CHANGES,

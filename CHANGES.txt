@@ -1,5 +1,5 @@
-Next release
-============
+1.3.4 (2012-09-15)
+==================
 
 - When ``pyramid.debug_routematch`` was turned on and the ``traverse``
   predicate was used in any route, the router would raise an exception when
