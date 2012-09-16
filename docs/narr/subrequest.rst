@@ -84,10 +84,10 @@ adapter will work too:
 
 Being able to unconditionally obtain a response object by invoking a view
 callable indirectly is the main advantage to using
-:meth:`pyramid.request.Request.subrequest` instead of simply importing it and
-executing it directly.  Note that there's not much advantage to invoking a
-view using a subrequest if you *can* invoke a view callable directly.  It's
-much slower to use a subrequest.
+:meth:`pyramid.request.Request.subrequest` instead of simply importing the
+view callable and executing it directly.  Note that there's not much
+advantage to invoking a view using a subrequest if you *can* invoke a view
+callable directly.  It's much slower to use a subrequest.
 
 The :meth:`pyramid.request.Request.subrequest` API accepts two arguments: a
 positional argument ``request`` that must be provided, and and ``use_tweens``
@@ -141,3 +141,7 @@ subrequest's URL, its headers, its request method, and other attributes.  See
 the documentation for :class:`pyramid.request.Request` to understand how to
 massage your new request object into something that will match the view you'd
 like to call via a subrequest.
+
+We've demonstrated use of a subrequest from within a view callable, but you
+can use the :meth:`~pyramid.request.Request.subrequest` API from within a
+tween or an event handler as well.
