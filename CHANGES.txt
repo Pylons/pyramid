@@ -104,13 +104,13 @@ Features
   and ``HTTPMovedPermanently`` exceptions, so these can be caught by the
   NotFound view (and other exception views).
 
-- The Mako renderer now accepts a def name in an asset spect.  When the def
+- The Mako renderer now supports a def name in an asset spec.  When the def
   name is present in the asset spec, the system will render the template def
   within the template and will return the result. An example asset spec is
   ``package:path/to/template#defname.mako``. This will render the def named
-  ``defname`` inside the ``template.pt`` package instead of rendering the
-  entire template.  The old way of returning a tuple from the view is
-  supported for backward compatibility, ('defname', {}).
+  ``defname`` inside the ``template.mako`` template instead of rendering the
+  entire template.  The old way of returning a tuple in the form
+  ``('defname', {})`` from the view is supported for backward compatibility,
 
 - The Chameleon ZPT renderer now accepts a macro name in an asset spec.  When
   the macro name is present in the asset spec, the system will render the
@@ -146,9 +146,6 @@ Features
 
 - ``pyramid.testing.DummyRequest`` now supports methods supplied by the
   ``pyramid.util.InstancePropertyMixin`` class such as ``set_property``.
-
-- Request properties and methods added via ``config.set_request_property`` or
-  ``config.add_request_method`` are now available to tweens.
 
 - Request properties and methods added via ``config.set_request_property`` or
   ``config.add_request_method`` are now available to tweens.
