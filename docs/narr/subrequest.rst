@@ -96,6 +96,36 @@ callable directly.  Subrequests are slower and are less convenient if you
 actually do want just the literal information returned by a function that
 happens to be a view callable.
 
+Note that if a view callable invoked by a subrequest raises an exception, the
+exception will usually bubble up to the invoking code:
+
+.. code-block:: python
+
+   from wsgiref.simple_server import make_server
+   from pyramid.config import Configurator
+   from pyramid.request import Request
+
+   def view_one(request):
+       subreq = Request.blank('/view_two')
+       response = request.subrequest(subreq)
+       return response
+
+   def view_two(request):
+       raise ValueError('foo')
+
+   if __name__ == '__main__':
+       config = Configurator()
+       config.add_route('one', '/view_one')
+       config.add_route('two', '/view_two')
+       config.add_view(view_one, route_name='one')
+       config.add_view(view_two, route_name='two', renderer='string')
+       app = config.make_wsgi_app()
+       server = make_server('0.0.0.0', 8080, app)
+       server.serve_forever()
+
+In the above application, the call to ``request.subrequest(subreq)`` will
+raise a :exc:`ValueError` exception instead of obtaining a "500" response.
+
 The :meth:`pyramid.request.Request.subrequest` API accepts two arguments: a
 positional argument ``request`` that must be provided, and and ``use_tweens``
 keyword argument that is optional; it defaults to ``False``.
