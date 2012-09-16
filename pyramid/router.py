@@ -53,6 +53,7 @@ class Router(object):
         tweens = q(ITweens)
         if tweens is None:
             tweens = excview_tween_factory
+        self.orig_handle_request = self.handle_request
         self.handle_request = tweens(self.handle_request, registry)
         self.root_policy = self.root_factory # b/w compat
         self.registry = registry
@@ -161,6 +162,43 @@ class Router(object):
 
         return response
 
+    def subrequest(self, request, use_tweens=False):
+        registry = self.registry
+        has_listeners = self.registry.has_listeners
+        notify = self.registry.notify
+        threadlocals = {'registry':registry, 'request':request}
+        manager = self.threadlocal_manager
+        manager.push(threadlocals)
+        request.registry = registry
+        request.subrequest = self.subrequest
+        if use_tweens:
+            handle_request = self.handle_request
+        else:
+            handle_request = self.orig_handle_request
+        try:
+
+            try:
+                extensions = self.request_extensions
+                if extensions is not None:
+                    request._set_extensions(extensions)
+                response = handle_request(request)
+                has_listeners and notify(NewResponse(request, response))
+
+                if request.response_callbacks:
+                    request._process_response_callbacks(response)
+
+                # XXX before subrequest factoring, the below line
+                # actually invoked Response.__call__, passing it
+                # the start_response
+                return response
+
+            finally:
+                if request.finished_callbacks:
+                    request._process_finished_callbacks()
+
+        finally:
+            manager.pop()
+
     def __call__(self, environ, start_response):
         """
         Accept ``environ`` and ``start_response``; create a
@@ -169,31 +207,7 @@ class Router(object):
         within the application registry; call ``start_response`` and
         return an iterable.
         """
-        registry = self.registry
-        has_listeners = self.registry.has_listeners
-        notify = self.registry.notify
         request = self.request_factory(environ)
-        threadlocals = {'registry':registry, 'request':request}
-        manager = self.threadlocal_manager
-        manager.push(threadlocals)
-        request.registry = registry
-        try:
+        response = self.subrequest(request, use_tweens=True)
+        return response(request.environ, start_response)
 
-            try:
-                extensions = self.request_extensions
-                if extensions is not None:
-                    request._set_extensions(extensions)
-                response = self.handle_request(request)
-                has_listeners and notify(NewResponse(request, response))
-
-                if request.response_callbacks:
-                    request._process_response_callbacks(response)
-
-                return response(request.environ, start_response)
-
-            finally:
-                if request.finished_callbacks:
-                    request._process_finished_callbacks()
-
-        finally:
-            manager.pop()
