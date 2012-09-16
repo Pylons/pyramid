@@ -71,7 +71,8 @@ Subrequest Support
 - Developers may invoke a subrequest by using the
   :meth:`pyramid.request.Request.invoke_subrequest` API.  This allows a
   developer to obtain a response from one view callable by issuing a subrequest
-  from within a different view callable.
+  from within a different view callable.  See :ref:`subrequest_chapter` for
+  more information.
 
 Minor Feature Additions
 -----------------------
