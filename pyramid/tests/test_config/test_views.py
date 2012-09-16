@@ -650,8 +650,6 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         def view(context, request): return 'OK'
         def view2(context, request): return 'OK2'
         def view3(context, request): return 'OK3'
-        def get_val(obj, key):
-            return obj.get(key)
         config = self._makeOne(autocommit=True)
         config.add_view(view=view, renderer=null_renderer)
         config.add_view(view=view2, accept='text/html', renderer=null_renderer)
