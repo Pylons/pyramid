@@ -41,14 +41,20 @@ Glossary
    setuptools
      `Setuptools <http://peak.telecommunity.com/DevCenter/setuptools>`_
      builds on Python's ``distutils`` to provide easier building,
-     distribution, and installation of libraries and applications.
+     distribution, and installation of libraries and applications.  As of
+     this writing, setuptools runs under Python 2, but not under Python 3.
+     You can use :term:`distribute` under Python 3 instead.
+
+   distribute
+     `Distribute <http://packages.python.org/distribute/>`_ is a fork of
+     :term:`setuptools` which runs on both Python 2 and Python 3.
 
    pkg_resources
-     A module which ships with :term:`setuptools` that provides an API for
-     addressing "asset files" within a Python :term:`package`.  Asset files
-     are static files, template files, etc; basically anything
-     non-Python-source that lives in a Python package can be considered a
-     asset file.  See also `PkgResources
+     A module which ships with :term:`setuptools` and :term:`distribute` that
+     provides an API for addressing "asset files" within a Python
+     :term:`package`.  Asset files are static files, template files, etc;
+     basically anything non-Python-source that lives in a Python package can
+     be considered a asset file.  See also `PkgResources
      <http://peak.telecommunity.com/DevCenter/PkgResources>`_
 
    asset
@@ -84,7 +90,7 @@ Glossary
      (Setuptools/distutils terminology).  A file representing an
      installable library or application.  Distributions are usually
      files that have the suffix of ``.egg``, ``.tar.gz``, or ``.zip``.
-     Distributions are the target of Setuptools commands such as
+     Distributions are the target of Setuptools-related commands such as
      ``easy_install``.
 
    entry point
