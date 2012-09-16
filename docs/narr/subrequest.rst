@@ -98,7 +98,8 @@ actually do want just the literal information returned by a function that
 happens to be a view callable.
 
 Note that if a view callable invoked by a subrequest raises an exception, the
-exception will usually be converted to a response:
+exception will usually be converted to a response if you have a
+:term:`exception view` configured:
 
 .. code-block:: python
 
@@ -114,20 +115,26 @@ exception will usually be converted to a response:
    def view_two(request):
        raise ValueError('foo')
 
+   def excview(request):
+       request.response.body = b'An exception was raised'
+       request.response.status_int = 500
+       return request.response
+
    if __name__ == '__main__':
        config = Configurator()
        config.add_route('one', '/view_one')
        config.add_route('two', '/view_two')
        config.add_view(view_one, route_name='one')
        config.add_view(view_two, route_name='two', renderer='string')
+       config.add_view(excview, context=Exception)
        app = config.make_wsgi_app()
        server = make_server('0.0.0.0', 8080, app)
        server.serve_forever()
 
 Because the exception view handling tween is generally in the tween list, if
-we run the above code, the default :term:`exception view` will generate a
+we run the above code, the ``excview`` :term:`exception view` will generate a
 "500" error response, which will be returned to us within ``view_one``: a
-Python exception will not be raised.  
+Python exception will not be raised.
 
 The :meth:`pyramid.request.Request.invoke_subrequest` API accepts two
 arguments: a positional argument ``request`` that must be provided, and and
@@ -143,7 +150,8 @@ handler, and no tweens will be invoked.
 In the example above, the call to
 :meth:`~pyramid.request.Request.invoke_subrequest` will generally always
 return a Response object, even when the view it invokes raises an exception,
-because it uses the default ``use_tweens=True``.
+because it uses the default ``use_tweens=True`` and a :term:`exception view`
+is configured.
 
 We can cause the subrequest to not be run through the tween stack by passing
 ``use_tweens=False`` to the call to
@@ -163,12 +171,18 @@ We can cause the subrequest to not be run through the tween stack by passing
    def view_two(request):
        raise ValueError('foo')
 
+   def excview(request):
+       request.response.body = b'An exception was raised'
+       request.response.status_int = 500
+       return request.response
+
    if __name__ == '__main__':
        config = Configurator()
        config.add_route('one', '/view_one')
        config.add_route('two', '/view_two')
        config.add_view(view_one, route_name='one')
        config.add_view(view_two, route_name='two', renderer='string')
+       config.add_view(excview, context=Exception)
        app = config.make_wsgi_app()
        server = make_server('0.0.0.0', 8080, app)
        server.serve_forever()
@@ -176,7 +190,8 @@ We can cause the subrequest to not be run through the tween stack by passing
 In the above case, the call to ``request.invoke_subrequest(subreq)`` will
 actually raise a :exc:`ValueError` exception instead of retrieving a "500"
 response from the attempted invocation of ``view_two``, because the tween
-which invokes an exception view to generate a response is never run.
+which invokes an exception view to generate a response is never run, and
+therefore ``excview`` is never executed.
 
 This is one of the major differences between specifying the
 ``use_tweens=True`` and ``use_tweens=False`` arguments to
