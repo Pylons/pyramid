@@ -91,14 +91,14 @@ consumption by ``view_one``.
 Being able to unconditionally obtain a response object by invoking a view
 callable indirectly is the main advantage to using
 :meth:`pyramid.request.Request.invoke_subrequest` instead of simply importing
-the view callable and executing it directly.  Note that there's not much
+a view callable and executing it directly.  Note that there's not much
 advantage to invoking a view using a subrequest if you *can* invoke a view
 callable directly.  Subrequests are slower and are less convenient if you
 actually do want just the literal information returned by a function that
 happens to be a view callable.
 
 Note that if a view callable invoked by a subrequest raises an exception, the
-exception will usually bubble up to the invoking code:
+exception will usually be converted to a response:
 
 .. code-block:: python
 
@@ -124,23 +124,69 @@ exception will usually bubble up to the invoking code:
        server = make_server('0.0.0.0', 8080, app)
        server.serve_forever()
 
-In the above application, the call to ``request.invoke_subrequest(subreq)``
-will actually raise a :exc:`ValueError` exception instead of retrieving a
-"500" response from the attempted invocation of ``view_two``.
+Because the exception view handling tween is generally in the tween list, if
+we run the above code, the default :term:`exception view` will generate a
+"500" error response, which will be returned to us within ``view_one``: a
+Python exception will not be raised.  
 
 The :meth:`pyramid.request.Request.invoke_subrequest` API accepts two
 arguments: a positional argument ``request`` that must be provided, and and
-``use_tweens`` keyword argument that is optional; it defaults to ``False``.
+``use_tweens`` keyword argument that is optional; it defaults to ``True``.
 
 The ``request`` object passed to the API must be an object that implements
 the Pyramid request interface (such as a :class:`pyramid.request.Request`
 instance).  If ``use_tweens`` is ``True``, the request will be sent to the
 :term:`tween` in the tween stack closest to the request ingress.  If
 ``use_tweens`` is ``False``, the request will be sent to the main router
-handler, and no tweens will be invoked.  It's usually best to not invoke any
-tweens when executing a subrequest, because the original request will invoke
-any tween logic as necessary.  The
-:meth:`pyramid.request.Request.invoke_subrequest` function also:
+handler, and no tweens will be invoked.
+
+In the example above, the call to
+:meth:`~pyramid.request.Request.invoke_subrequest` will generally always
+return a Response object, even when the view it invokes raises an exception,
+because it uses the default ``use_tweens=True``.
+
+We can cause the subrequest to not be run through the tween stack by passing
+``use_tweens=False`` to the call to
+:meth:`~pyramid.request.Request.invoke_subrequest`, like this:
+
+.. code-block:: python
+
+   from wsgiref.simple_server import make_server
+   from pyramid.config import Configurator
+   from pyramid.request import Request
+
+   def view_one(request):
+       subreq = Request.blank('/view_two')
+       response = request.invoke_subrequest(subreq, use_tweens=False)
+       return response
+
+   def view_two(request):
+       raise ValueError('foo')
+
+   if __name__ == '__main__':
+       config = Configurator()
+       config.add_route('one', '/view_one')
+       config.add_route('two', '/view_two')
+       config.add_view(view_one, route_name='one')
+       config.add_view(view_two, route_name='two', renderer='string')
+       app = config.make_wsgi_app()
+       server = make_server('0.0.0.0', 8080, app)
+       server.serve_forever()
+
+In the above case, the call to ``request.invoke_subrequest(subreq)`` will
+actually raise a :exc:`ValueError` exception instead of retrieving a "500"
+response from the attempted invocation of ``view_two``, because the tween
+which invokes an exception view to generate a response is never run.
+
+This is one of the major differences between specifying the
+``use_tweens=True`` and ``use_tweens=False`` arguments to
+:meth:`~pyramid.request.Request.invoke_subrequest`.  ``use_tweens=True`` may
+also imply invoking transaction commit/abort for the logic executed in the
+subrequest if you've got ``pyramid_tm`` in the tween list, injecting debug
+HTML if you've got ``pyramid_debugtoolbar`` in the tween list, and other
+tween-related side effects as defined by your particular tween list.
+
+The :meth:`~pyramid.request.Request.invoke_subrequest` function also:
         
 - manages the threadlocal stack so that
   :func:`~pyramid.threadlocal.get_current_request` and
@@ -176,11 +222,18 @@ new request instead as demonstrated in the above example, using
 :meth:`pyramid.request.Request.blank`.  Once you've constructed a request
 object, you'll need to massage the it to match the view callable you'd like
 to be executed during the subrequest.  This can be done by adjusting the
-subrequest's URL, its headers, its request method, and other attributes.  See
-the documentation for :class:`pyramid.request.Request` to understand how to
-massage your new request object into something that will match the view you'd
-like to call via a subrequest.
+subrequest's URL, its headers, its request method, and other attributes.  The
+documentation for :class:`pyramid.request.Request` exposes the methods you
+should call and attributes you should set on the request you create to
+massage it into something that will actually match the view you'd like to
+call via a subrequest.
 
 We've demonstrated use of a subrequest from within a view callable, but you
 can use the :meth:`~pyramid.request.Request.invoke_subrequest` API from
-within a tween or an event handler as well.
+within a tween or an event handler as well.  It's usually a poor idea to
+invoke :meth:`~pyramid.request.Request.invoke_subrequest` from within a
+tween, because tweens already by definition have access to a function that
+will cause a subrequest (they are passed a ``handle`` function), but you can
+do it.  It's fine to invoke
+:meth:`~pyramid.request.Request.invoke_subrequest` from within an event
+handler, however.

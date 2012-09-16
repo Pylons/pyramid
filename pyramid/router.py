@@ -162,7 +162,7 @@ class Router(object):
 
         return response
 
-    def invoke_subrequest(self, request, use_tweens=False):
+    def invoke_subrequest(self, request, use_tweens=True):
         """
         Obtain a response object from the Pyramid application based on
         information in the ``request`` object provided.  The ``request``
@@ -212,10 +212,12 @@ class Router(object):
         manager.push(threadlocals)
         request.registry = registry
         request.invoke_subrequest = self.invoke_subrequest
+        
         if use_tweens:
             handle_request = self.handle_request
         else:
             handle_request = self.orig_handle_request
+
         try:
 
             try:

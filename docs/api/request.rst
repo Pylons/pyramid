@@ -161,7 +161,7 @@
       request, the value of this attribute will be ``None``. See
       :ref:`matched_route`.
 
-   .. method:: invoke_subrequest(request, use_tweens=False)
+   .. method:: invoke_subrequest(request, use_tweens=True)
 
       .. warning:: 
 
@@ -174,9 +174,9 @@
       ``True``, the request will be sent to the :term:`tween` in the tween
       stack closest to the request ingress.  If ``use_tweens`` is ``False``,
       the request will be sent to the main router handler, and no tweens will
-      be invoked.  This isn't *actually* a method of the Request object; it's
-      a callable added when the Pyramid router is invoked, or when a
-      subrequest is invoked.  This function also:
+      be invoked.
+
+      This function also:
         
       - manages the threadlocal stack (so that
         :func:`~pyramid.threadlocal.get_current_request` and
@@ -208,7 +208,11 @@
       - Calls any :term:`finished callback` functions defined within the
         request's lifetime.
 
-      See also :ref:`subrequest_chapter`.
+      ``invoke_subrequest`` isn't *actually* a method of the Request object;
+      it's a callable added when the Pyramid router is invoked, or when a
+      subrequest is invoked.  This means that it's not available for use on a
+      request provided by e.g. the ``pshell`` environment.  For more
+      information, see :ref:`subrequest_chapter`.
 
    .. automethod:: add_response_callback
 

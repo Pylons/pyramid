@@ -590,9 +590,17 @@ class SubrequestAppTest(unittest.TestCase):
     def tearDown(self):
         self.config.end()
 
-    def test_it(self):
+    def test_one(self):
         res = self.testapp.get('/view_one', status=200)
         self.assertTrue(b'This came from view_two' in res.body)
+
+    def test_three(self):
+        res = self.testapp.get('/view_three', status=500)
+        self.assertTrue(b'Bad stuff happened' in res.body)
+
+    def test_five(self):
+        res = self.testapp.get('/view_five', status=200)
+        self.assertTrue(b'Value error raised' in res.body)
 
 class RendererScanAppTest(IntegrationBase, unittest.TestCase):
     package = 'pyramid.tests.pkgs.rendererscanapp'
