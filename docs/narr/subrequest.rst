@@ -124,7 +124,8 @@ exception will usually bubble up to the invoking code:
        server.serve_forever()
 
 In the above application, the call to ``request.subrequest(subreq)`` will
-raise a :exc:`ValueError` exception instead of obtaining a "500" response.
+actually raise a :exc:`ValueError` exception instead of retrieving a "500"
+response from the attempted invocation of ``view_two``.
 
 The :meth:`pyramid.request.Request.subrequest` API accepts two arguments: a
 positional argument ``request`` that must be provided, and and ``use_tweens``
