@@ -69,9 +69,9 @@ Subrequest Support
 ~~~~~~~~~~~~~~~~~~
 
 - Developers may invoke a subrequest by using the
-  :meth:`pyramid.request.Request.subrequest` API.  This allows a developer to
-  obtain a response from one view callable by issuing a subrequest from within
-  a different view callable.
+  :meth:`pyramid.request.Request.invoke_subrequest` API.  This allows a
+  developer to obtain a response from one view callable by issuing a subrequest
+  from within a different view callable.
 
 Minor Feature Additions
 -----------------------
@@ -229,6 +229,12 @@ Backwards Incompatibilities
 
   * ``registerSettings``, use 
     :meth:`pyramid.config.Configurator.add_settings` instead.
+
+- In Pyramid 1.3 and previous, the ``__call__`` method of a Response object
+  returned by a view was invoked before any finished callbacks were executed.
+  As of this release, the ``__call__`` method of a Response object is invoked
+  *after* finished callbacks are executed.  This is in support of the
+  :meth:`pyramid.request.Request.invoke_subrequest` feature.
 
 Deprecations
 ------------

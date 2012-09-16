@@ -26,7 +26,7 @@ Here's an example application which uses a subrequest:
 
    def view_one(request):
        subreq = Request.blank('/view_two')
-       response = request.subrequest(subreq)
+       response = request.invoke_subrequest(subreq)
        return response
 
    def view_two(request):
@@ -45,13 +45,14 @@ Here's an example application which uses a subrequest:
 
 When ``/view_one`` is visted in a browser, the text printed in the browser
 pane will be ``This came from view_two``.  The ``view_one`` view used the
-:meth:`pyramid.request.Request.subrequest` API to obtain a response from
-another view (``view_two``) within the same application when it executed.  It
-did so by constructing a new request that had a URL that it knew would match
-the ``view_two`` view registration, and passed that new request along to
-:meth:`pyramid.request.Request.subrequest`.  The ``view_two`` view callable
-was invoked, and it returned a response.  The ``view_one`` view callable then
-simply returned the response it obtained from the ``view_two`` view callable.
+:meth:`pyramid.request.Request.invoke_subrequest` API to obtain a response
+from another view (``view_two``) within the same application when it
+executed.  It did so by constructing a new request that had a URL that it
+knew would match the ``view_two`` view registration, and passed that new
+request along to :meth:`pyramid.request.Request.invoke_subrequest`.  The
+``view_two`` view callable was invoked, and it returned a response.  The
+``view_one`` view callable then simply returned the response it obtained from
+the ``view_two`` view callable.
 
 Note that it doesn't matter if the view callable invoked via a subrequest
 actually returns a literal Response object.  Any view callable that uses a
@@ -66,7 +67,7 @@ adapter will work too:
 
    def view_one(request):
        subreq = Request.blank('/view_two')
-       response = request.subrequest(subreq)
+       response = request.invoke_subrequest(subreq)
        return response
 
    def view_two(request):
@@ -89,8 +90,8 @@ consumption by ``view_one``.
 
 Being able to unconditionally obtain a response object by invoking a view
 callable indirectly is the main advantage to using
-:meth:`pyramid.request.Request.subrequest` instead of simply importing the
-view callable and executing it directly.  Note that there's not much
+:meth:`pyramid.request.Request.invoke_subrequest` instead of simply importing
+the view callable and executing it directly.  Note that there's not much
 advantage to invoking a view using a subrequest if you *can* invoke a view
 callable directly.  Subrequests are slower and are less convenient if you
 actually do want just the literal information returned by a function that
@@ -107,7 +108,7 @@ exception will usually bubble up to the invoking code:
 
    def view_one(request):
        subreq = Request.blank('/view_two')
-       response = request.subrequest(subreq)
+       response = request.invoke_subrequest(subreq)
        return response
 
    def view_two(request):
@@ -123,13 +124,13 @@ exception will usually bubble up to the invoking code:
        server = make_server('0.0.0.0', 8080, app)
        server.serve_forever()
 
-In the above application, the call to ``request.subrequest(subreq)`` will
-actually raise a :exc:`ValueError` exception instead of retrieving a "500"
-response from the attempted invocation of ``view_two``.
+In the above application, the call to ``request.invoke_subrequest(subreq)``
+will actually raise a :exc:`ValueError` exception instead of retrieving a
+"500" response from the attempted invocation of ``view_two``.
 
-The :meth:`pyramid.request.Request.subrequest` API accepts two arguments: a
-positional argument ``request`` that must be provided, and and ``use_tweens``
-keyword argument that is optional; it defaults to ``False``.
+The :meth:`pyramid.request.Request.invoke_subrequest` API accepts two
+arguments: a positional argument ``request`` that must be provided, and and
+``use_tweens`` keyword argument that is optional; it defaults to ``False``.
 
 The ``request`` object passed to the API must be an object that implements
 the Pyramid request interface (such as a :class:`pyramid.request.Request`
@@ -138,16 +139,16 @@ instance).  If ``use_tweens`` is ``True``, the request will be sent to the
 ``use_tweens`` is ``False``, the request will be sent to the main router
 handler, and no tweens will be invoked.  It's usually best to not invoke any
 tweens when executing a subrequest, because the original request will invoke
-any tween logic as necessary.  The :meth:`pyramid.request.Request.subrequest`
-function also:
+any tween logic as necessary.  The
+:meth:`pyramid.request.Request.invoke_subrequest` function also:
         
 - manages the threadlocal stack so that
   :func:`~pyramid.threadlocal.get_current_request` and
   :func:`~pyramid.threadlocal.get_current_registry` work during a request 
   (they will return the subrequest instead of the original request)
 
-- Adds a ``registry`` attribute and a ``subrequest`` attribute to the request
-  object it's handed.
+- Adds a ``registry`` attribute and a ``invoke_subrequest`` attribute (a
+  callable) to the request object it's handed.
 
 - sets request extensions (such as those added via
   :meth:`~pyramid.config.Configurator.add_request_method` or
@@ -170,8 +171,8 @@ function also:
   lifetime.
 
 It's a poor idea to use the original ``request`` object as an argument to
-:meth:`~pyramid.request.Request.subrequest`.  You should construct a new
-request instead as demonstrated in the above example, using
+:meth:`~pyramid.request.Request.invoke_subrequest`.  You should construct a
+new request instead as demonstrated in the above example, using
 :meth:`pyramid.request.Request.blank`.  Once you've constructed a request
 object, you'll need to massage the it to match the view callable you'd like
 to be executed during the subrequest.  This can be done by adjusting the
@@ -181,5 +182,5 @@ massage your new request object into something that will match the view you'd
 like to call via a subrequest.
 
 We've demonstrated use of a subrequest from within a view callable, but you
-can use the :meth:`~pyramid.request.Request.subrequest` API from within a
-tween or an event handler as well.
+can use the :meth:`~pyramid.request.Request.invoke_subrequest` API from
+within a tween or an event handler as well.

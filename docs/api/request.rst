@@ -161,7 +161,7 @@
       request, the value of this attribute will be ``None``. See
       :ref:`matched_route`.
 
-   .. method:: subrequest(request, use_tweens=False)
+   .. method:: invoke_subrequest(request, use_tweens=False)
 
       .. warning:: 
 
@@ -184,7 +184,7 @@
         request)
 
       - Adds a ``registry`` attribute (the current Pyramid registry) and a
-        ``subrequest`` attribute (a callable) to the request object it's
+        ``invoke_subrequest`` attribute (a callable) to the request object it's
         handed.
 
       - sets request extensions (such as those added via

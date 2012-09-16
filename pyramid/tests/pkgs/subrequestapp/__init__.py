@@ -3,7 +3,7 @@ from pyramid.request import Request
 
 def view_one(request):
     subreq = Request.blank('/view_two')
-    response = request.subrequest(subreq)
+    response = request.invoke_subrequest(subreq)
     return response
 
 def view_two(request):

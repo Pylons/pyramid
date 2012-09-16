@@ -162,7 +162,7 @@ class Router(object):
 
         return response
 
-    def subrequest(self, request, use_tweens=False):
+    def invoke_subrequest(self, request, use_tweens=False):
         """
         Obtain a response object from the Pyramid application based on
         information in the ``request`` object provided.  The ``request``
@@ -178,8 +178,8 @@ class Router(object):
           :func:`~pyramid.threadlocal.get_current_registry` work during a
           request)
 
-        - Adds a ``registry`` attribute and a ``subrequest`` attribute to the
-          request object it's handed.
+        - Adds a ``registry`` attribute and a ``invoke_subrequest`` attribute
+          (a callable) to the request object it's handed.
 
         - sets request extensions (such as those added via
           :meth:`~pyramid.config.Configurator.add_request_method` or
@@ -211,7 +211,7 @@ class Router(object):
         manager = self.threadlocal_manager
         manager.push(threadlocals)
         request.registry = registry
-        request.subrequest = self.subrequest
+        request.invoke_subrequest = self.invoke_subrequest
         if use_tweens:
             handle_request = self.handle_request
         else:
@@ -228,9 +228,6 @@ class Router(object):
                 if request.response_callbacks:
                     request._process_response_callbacks(response)
 
-                # XXX before subrequest factoring, the below line
-                # actually invoked Response.__call__, passing it
-                # the start_response
                 return response
 
             finally:
@@ -249,6 +246,6 @@ class Router(object):
         return an iterable.
         """
         request = self.request_factory(environ)
-        response = self.subrequest(request, use_tweens=True)
+        response = self.invoke_subrequest(request, use_tweens=True)
         return response(request.environ, start_response)
 
