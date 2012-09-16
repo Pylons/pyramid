@@ -83,6 +83,7 @@ Narrative documentation in chapter form explaining how to use
    narr/traversal
    narr/security
    narr/hybrid
+   narr/subrequest
    narr/hooks
    narr/introspector
    narr/extending

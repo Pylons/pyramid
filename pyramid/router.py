@@ -201,7 +201,9 @@ class Router(object):
 
         - Calls any :term:`finished callback` functions defined within the
           request's lifetime.
-          """
+
+        See also :ref:`subrequest_chapter`.
+        """
         registry = self.registry
         has_listeners = self.registry.has_listeners
         notify = self.registry.notify

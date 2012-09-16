@@ -163,6 +163,9 @@ Features
 - Added the ``pyramid.testing.testConfig`` context manager, which can be used
   to generate a configurator in a test, e.g. ``with testing.testConfig(...):``.
 
+- Users can now invoke a subrequest from within view code using the
+  ``request.subrequest`` API.
+
 Deprecations
 ------------
 
@@ -256,6 +259,9 @@ Documentation
   describes how to cope with deprecations and removals of Pyramid APIs and
   how to show Pyramid-generated deprecation warnings while running tests and
   while running a server.
+
+- Added a "Invoking a Subrequest" chapter to the documentation.  It describes
+  how to use the new ``request.subrequest`` API.
 
 Dependencies
 ------------

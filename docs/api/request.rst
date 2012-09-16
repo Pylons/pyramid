@@ -163,6 +163,10 @@
 
    .. method:: subrequest(request, use_tweens=False)
 
+      .. warning:: 
+
+         This API was added in Pyramid 1.4a1.
+
       Obtain a response object from the Pyramid application based on
       information in the ``request`` object provided.  The ``request`` object
       must be an object that implements the Pyramid request interface (such
@@ -203,6 +207,8 @@
 
       - Calls any :term:`finished callback` functions defined within the
         request's lifetime.
+
+      See also :ref:`subrequest_chapter`.
 
    .. automethod:: add_response_callback
 

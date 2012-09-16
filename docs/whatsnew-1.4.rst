@@ -65,6 +65,14 @@ Partial Mako and Chameleon Template Renderings
   defined as ``macroname`` within the ``template.pt`` template instead of the
   entire templae.
 
+Subrequest Support
+~~~~~~~~~~~~~~~~~~
+
+- Developers may invoke a subrequest by using the
+  :meth:`pyramid.request.Request.subrequest` API.  This allows a developer to
+  obtain a response from one view callable by issuing a subrequest from within
+  a different view callable.
+
 Minor Feature Additions
 -----------------------
 
@@ -238,6 +246,8 @@ Documentation Enhancements
   It describes how to cope with deprecations and removals of Pyramid APIs and
   how to show Pyramid-generated deprecation warnings while running tests and
   while running a server.
+
+- Added a :ref:`subrequest_chapter` chapter to the narrative documentation.
 
 - Many cleanups and improvements to narrative and API docs.
 
