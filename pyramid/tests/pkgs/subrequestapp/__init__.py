@@ -11,8 +11,11 @@ def view_two(request):
 
 def view_three(request):
     subreq = Request.blank('/view_four')
-    response = request.invoke_subrequest(subreq, use_tweens=True)
-    return response
+    try:
+        return request.invoke_subrequest(subreq, use_tweens=True)
+    except: # pragma: no cover
+        request.response.body = b'Value error raised'
+        return request.response
 
 def view_four(request):
     raise ValueError('foo')
