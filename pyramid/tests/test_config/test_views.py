@@ -645,6 +645,26 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         request.accept = DummyAccept('text/html', 'text/html')
         self.assertEqual(wrapper(None, request), 'OK2')
 
+    def test_add_view_mixed_case_replaces_existing_view(self):
+        from pyramid.renderers import null_renderer
+        def view(context, request): return 'OK'
+        def view2(context, request): return 'OK2'
+        def view3(context, request): return 'OK3'
+        def get_val(obj, key):
+            return obj.get(key)
+        config = self._makeOne(autocommit=True)
+        config.add_view(view=view, renderer=null_renderer)
+        config.add_view(view=view2, accept='text/html', renderer=null_renderer)
+        config.add_view(view=view3, accept='text/HTML', renderer=null_renderer)
+        wrapper = self._getViewCallable(config)
+        self.assertTrue(IMultiView.providedBy(wrapper))
+        self.assertEqual(len(wrapper.media_views.items()),1)
+        self.assertFalse(wrapper.media_views.has_key('text/HTML'))
+        self.assertEqual(wrapper(None, None), 'OK')
+        request = DummyRequest()
+        request.accept = DummyAccept('text/html', 'text/html')
+        self.assertEqual(wrapper(None, request), 'OK3')
+        
     def test_add_views_with_accept_multiview_replaces_existing(self):
         from pyramid.renderers import null_renderer
         def view(context, request): return 'OK'

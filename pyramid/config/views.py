@@ -997,6 +997,9 @@ class ViewsConfiguratorMixin(object):
         if request_method is not None:
             request_method = as_sorted_tuple(request_method)
 
+        if accept is not None:
+            accept = accept.lower()
+
         order, predicates, phash = make_predicates(xhr=xhr,
             request_method=request_method, path_info=path_info,
             request_param=request_param, header=header, accept=accept,
