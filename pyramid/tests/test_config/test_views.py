@@ -659,7 +659,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         wrapper = self._getViewCallable(config)
         self.assertTrue(IMultiView.providedBy(wrapper))
         self.assertEqual(len(wrapper.media_views.items()),1)
-        self.assertFalse(wrapper.media_views.has_key('text/HTML'))
+        self.assertFalse('text/HTML' in wrapper.media_views)
         self.assertEqual(wrapper(None, None), 'OK')
         request = DummyRequest()
         request.accept = DummyAccept('text/html', 'text/html')
