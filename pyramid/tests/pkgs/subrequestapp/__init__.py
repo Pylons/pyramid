@@ -7,7 +7,7 @@ def view_one(request):
     return response
 
 def view_two(request):
-    request.response.body = 'This came from view_two'
+    request.response.body = b'This came from view_two'
     return request.response
 
 def main():
