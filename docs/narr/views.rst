@@ -338,6 +338,16 @@ exception views which have a name will be ignored.
 Exception views can be configured with any view registration mechanism:
 ``@view_config`` decorator or imperative ``add_view`` styles.
 
+.. note::
+
+   Pyramid's :term:`exception view` handling logic is implemented as a tween
+   factory function: :func:`pyramid.tweens.excview_tween_factory`.  If
+   Pyramid exception view handling is desired, and tween factories are
+   specified via the ``pyramid.tweens`` configuration setting, the
+   :func:`pyramid.tweens.excview_tween_factory` function must be added to the
+   ``pyramid.tweens`` configuration setting list explicitly.  If it is not
+   present, Pyramid will not perform exception view handling.
+
 .. index::
    single: view http redirect
    single: http redirect (from a view)

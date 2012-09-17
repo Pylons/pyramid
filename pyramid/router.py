@@ -162,7 +162,7 @@ class Router(object):
 
         return response
 
-    def invoke_subrequest(self, request, use_tweens=True):
+    def invoke_subrequest(self, request, use_tweens=False):
         """
         Obtain a response object from the Pyramid application based on
         information in the ``request`` object provided.  The ``request``

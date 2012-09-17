@@ -161,7 +161,7 @@
       request, the value of this attribute will be ``None``. See
       :ref:`matched_route`.
 
-   .. method:: invoke_subrequest(request, use_tweens=True)
+   .. method:: invoke_subrequest(request, use_tweens=False)
 
       .. warning:: 
 
@@ -198,6 +198,9 @@
       - causes a :class:`~pyramid.event.ContextFound` event to be sent
         when a context resource is found.
           
+      - Ensures that the user implied by the request passed has the necessary
+        authorization to invoke view callable before calling it.
+
       - causes a :class:`~pyramid.event.NewResponse` event to be sent when
         the Pyramid application returns a response.
 

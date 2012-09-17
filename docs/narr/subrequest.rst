@@ -55,9 +55,11 @@ request along to :meth:`pyramid.request.Request.invoke_subrequest`.  The
 the ``view_two`` view callable.
 
 Note that it doesn't matter if the view callable invoked via a subrequest
-actually returns a literal Response object.  Any view callable that uses a
+actually returns a *literal* Response object.  Any view callable that uses a
 renderer or which returns an object that can be interpreted by a response
-adapter will work too:
+adapter when found and invoked via
+:meth:`pyramid.request.Request.invoke_subrequest` will return a Response
+object:
 
 .. code-block:: python
 
@@ -97,8 +99,9 @@ callable directly.  Subrequests are slower and are less convenient if you
 actually do want just the literal information returned by a function that
 happens to be a view callable.
 
-Note that if a view callable invoked by a subrequest raises an exception, the
-exception will usually be converted to a response if you have a
+Note that, by default, if a view callable invoked by a subrequest raises an
+exception, the exception will be raised to the caller of
+:meth:`~pyramid.request.Request.invoke_subrequest` even if you have a
 :term:`exception view` configured:
 
 .. code-block:: python
@@ -131,14 +134,16 @@ exception will usually be converted to a response if you have a
        server = make_server('0.0.0.0', 8080, app)
        server.serve_forever()
 
-Because the exception view handling tween is generally in the tween list, if
-we run the above code, the ``excview`` :term:`exception view` will generate a
-"500" error response, which will be returned to us within ``view_one``: a
-Python exception will not be raised.
+When we run the above code and visit ``/view_one`` in a browser, the
+``excview`` :term:`exception view` will *not* be executed.  Instead, the call
+to :meth:`~pyramid.request.Request.invoke_subrequest` will cause a
+:exc:`ValueError` exception to be raised and a response will never be
+generated.  We can change this behavior; how to do so is described below in
+our discussion of the ``use_tweens`` argument.
 
 The :meth:`pyramid.request.Request.invoke_subrequest` API accepts two
 arguments: a positional argument ``request`` that must be provided, and and
-``use_tweens`` keyword argument that is optional; it defaults to ``True``.
+``use_tweens`` keyword argument that is optional; it defaults to ``False``.
 
 The ``request`` object passed to the API must be an object that implements
 the Pyramid request interface (such as a :class:`pyramid.request.Request`
@@ -148,13 +153,16 @@ instance).  If ``use_tweens`` is ``True``, the request will be sent to the
 handler, and no tweens will be invoked.
 
 In the example above, the call to
-:meth:`~pyramid.request.Request.invoke_subrequest` will generally always
-return a Response object, even when the view it invokes raises an exception,
-because it uses the default ``use_tweens=True`` and a :term:`exception view`
-is configured.
+:meth:`~pyramid.request.Request.invoke_subrequest` will always raise an
+exception.  This is because it's using the default value for ``use_tweens``,
+which is ``False``.  You can pass ``use_tweens=True`` instead to ensure that
+it will convert an exception to a Response if an :term:`exception view` is
+configured instead of raising the exception.  This because exception views
+are called by the exception view :term:`tween` as described in
+:ref:`exception_views` when any view raises an exception.
 
-We can cause the subrequest to not be run through the tween stack by passing
-``use_tweens=False`` to the call to
+We can cause the subrequest to be run through the tween stack by passing
+``use_tweens=True`` to the call to
 :meth:`~pyramid.request.Request.invoke_subrequest`, like this:
 
 .. code-block:: python
@@ -165,7 +173,7 @@ We can cause the subrequest to not be run through the tween stack by passing
 
    def view_one(request):
        subreq = Request.blank('/view_two')
-       response = request.invoke_subrequest(subreq, use_tweens=False)
+       response = request.invoke_subrequest(subreq, use_tweens=True)
        return response
 
    def view_two(request):
@@ -187,11 +195,11 @@ We can cause the subrequest to not be run through the tween stack by passing
        server = make_server('0.0.0.0', 8080, app)
        server.serve_forever()
 
-In the above case, the call to ``request.invoke_subrequest(subreq)`` will
-actually raise a :exc:`ValueError` exception instead of retrieving a "500"
-response from the attempted invocation of ``view_two``, because the tween
-which invokes an exception view to generate a response is never run, and
-therefore ``excview`` is never executed.
+In the above case, the call to ``request.invoke_subrequest(subreq)`` will not
+raise an exception.  Instead, it will retrieve a "500" response from the
+attempted invocation of ``view_two``, because the tween which invokes an
+exception view to generate a response is run, and therefore ``excview`` is
+executed.
 
 This is one of the major differences between specifying the
 ``use_tweens=True`` and ``use_tweens=False`` arguments to
@@ -201,7 +209,8 @@ subrequest if you've got ``pyramid_tm`` in the tween list, injecting debug
 HTML if you've got ``pyramid_debugtoolbar`` in the tween list, and other
 tween-related side effects as defined by your particular tween list.
 
-The :meth:`~pyramid.request.Request.invoke_subrequest` function also:
+The :meth:`~pyramid.request.Request.invoke_subrequest` function also
+unconditionally:
         
 - manages the threadlocal stack so that
   :func:`~pyramid.threadlocal.get_current_request` and
@@ -222,6 +231,9 @@ The :meth:`~pyramid.request.Request.invoke_subrequest` function also:
 - causes a :class:`~pyramid.event.ContextFound` event to be sent when a
   context resource is found.
   
+- Ensures that the user implied by the request passed has the necessary
+  authorization to invoke view callable before calling it.
+
 - causes a :class:`~pyramid.event.NewResponse` event to be sent when the
   Pyramid application returns a response.
 
@@ -230,6 +242,11 @@ The :meth:`~pyramid.request.Request.invoke_subrequest` function also:
 
 - Calls any :term:`finished callback` functions defined within the subrequest's
   lifetime.
+
+The invocation of a subrequest has more or less exactly the same effect as
+the invocation of a request received by the Pyramid router from a web client
+when ``use_tweens=True``.  When ``use_tweens=False``, the tweens are skipped
+but all the other steps take place.
 
 It's a poor idea to use the original ``request`` object as an argument to
 :meth:`~pyramid.request.Request.invoke_subrequest`.  You should construct a
