@@ -1,4 +1,4 @@
- Pylons Project Contributor Agreement
+Pylons Project Contributor Agreement
 ====================================
 
 The submitter agrees by adding his or her name within the section below named
@@ -176,3 +176,5 @@ Contributors
 - Marc Abramowitz, 2012/06/13
 
 - Jeff Cook, 2012/06/16
+
+- David Gay, 2012/09/16
