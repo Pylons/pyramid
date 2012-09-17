@@ -1,4 +1,4 @@
- Pylons Project Contributor Agreement
+Pylons Project Contributor Agreement
 ====================================
 
 The submitter agrees by adding his or her name within the section below named
@@ -187,3 +187,4 @@ Contributors
 
 - Domen Kozar, 2012/09/11
 
+- David Gay, 2012/09/16
