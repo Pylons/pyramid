@@ -94,10 +94,10 @@ Minor Feature Additions
 
 - :meth:`pyramid.config.Configurator.add_request_method` has been introduced
   to support extending request objects with arbitrary callables. This method
-  expands on the previous
+  expands on the now documentation-deprecated
   :meth:`pyramid.config.Configurator.set_request_property` by supporting
-  methods as well as properties. This method causes less code to be executed
-  at request construction time than
+  methods as well as properties. This method also causes less code to be
+  executed at request construction time than
   :meth:`~pyramid.config.Configurator.set_request_property`.
 
 - The static view machinery now raises rather than returns
@@ -133,13 +133,13 @@ Minor Feature Additions
   ``pyramid.util.InstancePropertyMixin`` class such as ``set_property``.
 
 - Request properties and methods added via
-  :meth:`pyramid.config.Configurator.set_request_property` or
-  :meth:`pyramid.config.Configurator.add_request_method` are now available to
+  :meth:`pyramid.config.Configurator.add_request_method` or
+  :meth:`pyramid.config.Configurator.set_request_property` are now available to
   tweens.
 
 - Request properties and methods added via
-  :meth:`pyramid.config.Configurator.set_request_property` or
-  :meth:`pyramid.config.Configurator.add_request_method` are now available 
+  :meth:`pyramid.config.Configurator.add_request_method` or
+  :meth:`pyramid.config.Configurator.set_request_property` are now available
   in the request object returned from :func:`pyramid.paster.bootstrap`.
 
 - ``request.context`` of environment request during
