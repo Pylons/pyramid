@@ -923,12 +923,13 @@ pyramid.tests.test_config.dummy_include2""",
         result = render_view_to_response(ctx, req, 'another_stacked_class2')
         self.assertEqual(result, 'another_stacked_class')
 
-        if not os.name.startswith('java'):
-            # on Jython, a class without an __init__ apparently accepts
-            # any number of arguments without raising a TypeError.
+        # NB: on Jython, a class without an __init__ apparently accepts
+        # any number of arguments without raising a TypeError, so the next
+        # assertion may fail there.  We don't support Jython at the moment,
+        # this is just a note to a future self.
 
-            self.assertRaises(TypeError,
-                              render_view_to_response, ctx, req, 'basemethod')
+        self.assertRaises(TypeError,
+                          render_view_to_response, ctx, req, 'basemethod')
 
         result = render_view_to_response(ctx, req, 'method1')
         self.assertEqual(result, 'method1')
