@@ -81,19 +81,26 @@ def signed_deserialize(serialized, secret, hmac=hmac):
 
     return pickle.loads(pickled)
 
-def check_csrf_token(request, token='csrf_token'):
+def check_csrf_token(request, token='csrf_token', raises=True):
     """ Check the CSRF token in the request's session against the value in
     ``request.params.get(token)``.  If ``token`` is not supplied, the string
     value ``csrf_token`` will be used as the token value.  If the value in
     ``request.params.get(token)`` doesn't match the value supplied by
-    ``request.session.get_csrf_token()``, this function will raise an
-    :exc:`pyramid.httpexceptions.HTTPBadRequest` exception.  If the CSRF
-    check is successful, this function will return ``True``.
+    ``request.session.get_csrf_token()``, and ``raises`` is ``True``, this
+    function will raise an :exc:`pyramid.httpexceptions.HTTPBadRequest`
+    exception.  If the check does succeed and ``raises`` is ``False``, this
+    function will return ``False``.  If the CSRF check is successful, this
+    function will return ``True`` unconditionally.
+
+    Note that using this function requires that a :term:`session factory` is
+    configured.
 
     .. versionadded:: 1.4a2
     """
     if request.params.get(token) != request.session.get_csrf_token():
-        raise HTTPBadRequest('incorrect CSRF token')
+        if raises:
+            raise HTTPBadRequest('incorrect CSRF token')
+        return False
     return True
 
 def UnencryptedCookieSessionFactoryConfig(

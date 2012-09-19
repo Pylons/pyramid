@@ -156,6 +156,12 @@ Minor Feature Additions
 - A new :func:`pyramid.session.check_csrf_token` convenience API function was
   added.
 
+- A ``check_csrf`` view predicate was added.  For example, you can now do
+  ``config.add_view(someview, check_csrf=True)``.  When the predicate is
+  checked, if the ``csrf_token`` value in ``request.params`` matches the csrf
+  token in the request's session, the view will be permitted to execute.
+  Otherwise, it will not be permitted to execute.
+
 Backwards Incompatibilities
 ---------------------------
 

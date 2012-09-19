@@ -393,6 +393,10 @@ introspectables in categories not described here.
 
     The ``match_param`` argument passed to ``add_view``.
 
+  ``csrf_token``
+
+    The ``csrf_token`` argument passed to ``add_view``.
+
   ``callable``
 
     The (resolved) ``view`` argument passed to ``add_view``.  Represents the
