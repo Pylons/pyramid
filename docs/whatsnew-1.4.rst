@@ -153,6 +153,9 @@ Minor Feature Additions
   used to generate a configurator in a test, e.g. ``with
   testing.testConfig(...):``.
 
+- A new :func:`pyramid.session.check_csrf_token` convenience API function was
+  added.
+
 Backwards Incompatibilities
 ---------------------------
 

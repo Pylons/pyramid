@@ -355,6 +355,26 @@ class Test_signed_deserialize(unittest.TestCase):
         serialized = 'bad' + serialize('123', 'secret')
         self.assertRaises(ValueError, self._callFUT, serialized, 'secret')
         
+class Test_check_csrf_token(unittest.TestCase):
+    def _callFUT(self, request, token):
+        from ..session import check_csrf_token
+        return check_csrf_token(request, token)
+
+    def test_success(self):
+        request = testing.DummyRequest()
+        request.params['csrf_token'] = request.session.get_csrf_token()
+        self.assertEqual(self._callFUT(request, 'csrf_token'), True)
+
+    def test_success_default_token(self):
+        from ..session import check_csrf_token
+        request = testing.DummyRequest()
+        request.params['csrf_token'] = request.session.get_csrf_token()
+        self.assertEqual(check_csrf_token(request), True)
+
+    def test_failure(self):
+        from pyramid.httpexceptions import HTTPBadRequest
+        request = testing.DummyRequest()
+        self.assertRaises(HTTPBadRequest, self._callFUT, request, 'csrf_token')
 
 class DummySessionFactory(dict):
     _dirty = False
