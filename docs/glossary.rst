@@ -818,9 +818,12 @@ Glossary
       application.
 
    session factory
-      A callable, which, when called with a single argument named
-      ``request`` (a :term:`request` object), returns a
-      :term:`session` object.
+      A callable, which, when called with a single argument named ``request``
+      (a :term:`request` object), returns a :term:`session` object.  See
+      :ref:`using_the_default_session_factory`,
+      :ref:`using_alternate_session_factories` and
+      :meth:`pyramid.config.Configurator.set_session_factory` for more
+      information.
 
    Mako
      `Mako <http://www.makotemplates.org/>`_ is a template language language
