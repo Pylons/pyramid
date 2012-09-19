@@ -1,5 +1,3 @@
-import sys
-
 from zope.interface import implementer
 
 from chameleon.zpt.template import PageTemplateFile
@@ -20,9 +18,6 @@ class ZPTTemplateRenderer(object):
 
     @reify # avoid looking up reload_templates before manager pushed
     def template(self):
-        if sys.platform.startswith('java'): # pragma: no cover
-            raise RuntimeError(
-                'Chameleon templates are not compatible with Jython')
         tf = PageTemplateFile(self.path,
                               auto_reload=self.lookup.auto_reload,
                               debug=self.lookup.debug,
