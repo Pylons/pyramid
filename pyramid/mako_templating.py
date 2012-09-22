@@ -91,7 +91,7 @@ class MakoRendererFactoryHelper(object):
 
     def __call__(self, info):
         p = re.compile(
-                r'(?P<asset>[\w_.:/]+)'
+                r'(?P<asset>[\w_.:/-]+)'
                 r'(?:\#(?P<defname>[\w_]+))?'
                 r'(\.(?P<ext>.*))'
                 )
