@@ -4,7 +4,6 @@ from pyramid.interfaces import (
     IRequest,
     IRouteRequest,
     IRoutesMapper,
-    PHASE1_CONFIG,
     PHASE2_CONFIG,
     )
 
