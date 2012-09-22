@@ -31,6 +31,20 @@ class Test_renderer_factory(Base, unittest.TestCase):
         from pyramid.mako_templating import IMakoLookup
         return self.config.registry.getUtility(IMakoLookup, name=name)
 
+    def test_hyphen_filenames(self):
+        from pyramid.mako_templating import renderer_factory
+
+        info = DummyRendererInfo({
+            'name':'app:moon-and-world.mak',
+            'package':None,
+            'registry':self.config.registry,
+            'settings':{},
+            'type': ''
+        })
+
+        result = renderer_factory(info)
+        self.assertEqual(result.path, 'app:moon-and-world.mak')
+
     def test_no_directories(self):
         info = DummyRendererInfo({
             'name':'pyramid.tests:fixtures/helloworld.mak',
