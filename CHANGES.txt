@@ -4,8 +4,9 @@ Next release
 Bug Fixes
 ---------
 
-- It is now possible to use asset specifications which contain a hyphen in
-  Mako asset spec names.  See https://github.com/Pylons/pyramid/pull/692
+- When trying to determine Mako defnames and Chameleon macro names in asset
+  specifications, take into account that the filename may have a hyphen in
+  it.  See https://github.com/Pylons/pyramid/pull/692
 
 Features
 --------
