@@ -437,7 +437,7 @@ class ChameleonRendererLookup(object):
             renderer = registry.queryUtility(ITemplateRenderer, name=spec)
             if renderer is None:
                 p = re.compile(
-                    r'(?P<asset>[\w_.:/]+)'
+                    r'(?P<asset>[\w_.:/-]+)'
                     r'(?:\#(?P<defname>[\w_]+))?'
                     r'(\.(?P<ext>.*))'
                     )

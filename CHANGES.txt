@@ -1,6 +1,26 @@
 Next release
 ============
 
+Bug Fixes
+---------
+
+- When trying to determine Mako defnames and Chameleon macro names in asset
+  specifications, take into account that the filename may have a hyphen in
+  it.  See https://github.com/Pylons/pyramid/pull/692
+
+Features
+--------
+
+- A new ``pyramid.session.check_csrf_token`` convenience function was added.
+
+- A ``check_csrf`` view predicate was added.  For example, you can now do
+  ``config.add_view(someview, check_csrf=True)``.  When the predicate is
+  checked, if the ``csrf_token`` value in ``request.params`` matches the CSRF
+  token in the request's session, the view will be permitted to execute.
+  Otherwise, it will not be permitted to execute.
+
+1.4a1 (2012-09-16)
+==================
 
 Bug Fixes
 ---------

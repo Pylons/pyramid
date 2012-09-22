@@ -81,7 +81,7 @@ copyright = '%s, Agendaless Consulting' % datetime.datetime.now().year
 # other places throughout the built documents.
 #
 # The short X.Y version.
-version = '1.4dev'
+version = '1.4a1'
 
 # The full version, including alpha/beta/rc tags.
 release = version
@@ -160,7 +160,7 @@ html_theme_path = ['_themes']
 html_theme = 'pyramid'
 html_theme_options = dict(
     github_url='https://github.com/Pylons/pyramid',
-    in_progress='true',
+#    in_progress='true',
     )
 # The style sheet to use for HTML and HTML Help pages. A file of that name
 # must exist either in Sphinx' static/ path, or in one of the custom paths
