@@ -140,6 +140,10 @@ Future
 - 1.5: Maybe? deprecate set_request_property in favor of pointing people at
   add_request_method, schedule removal for 1.8?
 
+- 1.5: Remove pyramid.config.rendering set_renderer_globals_factory maybe.
+
+- 1.5: remove pyramid.config.route _add_view_from_route function.
+
 - 1.6: Remove IContextURL and TraversalContextURL.
 
 Probably Bad Ideas
