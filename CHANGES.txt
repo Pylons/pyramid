@@ -19,6 +19,15 @@ Features
   token in the request's session, the view will be permitted to execute.
   Otherwise, it will not be permitted to execute.
 
+- Add ``Base.metadata.bind = engine`` to alchemy template, so that tables
+  defined imperatively will work.
+
+Documentation
+-------------
+
+- update wiki2 SQLA tutorial with the changes required after inserting
+  ``Base.metadata.bind = engine`` into the alchemy scaffold.
+
 1.4a1 (2012-09-16)
 ==================
 
