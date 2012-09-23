@@ -1,10 +1,11 @@
 from codecs import utf_8_decode
 from codecs import utf_8_encode
-from hashlib import md5
+import hashlib
 import base64
 import datetime
 import re
 import time as time_mod
+import warnings
 
 from zope.interface import implementer
 
@@ -254,8 +255,7 @@ class RemoteUserAuthenticationPolicy(CallbackAuthenticationPolicy):
     def forget(self, request):
         return []
 
-@implementer(IAuthenticationPolicy)
-class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
+class BaseAuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
     """ A :app:`Pyramid` :term:`authentication policy` which
     obtains data from a Pyramid "auth ticket" cookie.
 
@@ -357,6 +357,8 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
     Objects of this class implement the interface described by
     :class:`pyramid.interfaces.IAuthenticationPolicy`.
     """
+    hashalg = ''
+
     def __init__(self,
                  secret,
                  callback=None,
@@ -382,6 +384,7 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
             http_only=http_only,
             path=path,
             wild_domain=wild_domain,
+            hashalg=self.hashalg,
             )
         self.callback = callback
         self.debug = debug
@@ -398,6 +401,32 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
 
     def forget(self, request):
         return self.cookie.forget(request)
+
+@implementer(IAuthenticationPolicy)
+class SHA512AuthTktAuthenticationPolicy(BaseAuthTktAuthenticationPolicy):
+    __doc__ = """
+    .. versionadded:: 1.4
+    """ + BaseAuthTktAuthenticationPolicy.__doc__
+    hashalg = 'sha512'
+
+@implementer(IAuthenticationPolicy)
+class AuthTktAuthenticationPolicy(BaseAuthTktAuthenticationPolicy):
+    __doc__ = """
+    .. warning::
+
+        Deprecated in 1.4 due to security concerns,
+        use :class:`SHA512AuthTktAuthenticationPolicy` instead.
+
+    """ + BaseAuthTktAuthenticationPolicy.__doc__
+    hashalg = 'md5'
+
+    def __init__(self, *a, **kw):
+        warnings.warn('Deprecated due to the usage of md5, '
+                      'hash function known to have collisions. '
+                      'Use SHA512AuthTktAuthenticationPolicy instead.',
+                      DeprecationWarning,
+                      stacklevel=2)
+        super(AuthTktAuthenticationPolicy, self).__init__(*a, **kw)
 
 def b64encode(v):
     return base64.b64encode(bytes_(v)).strip().replace(b'\n', b'')
@@ -427,7 +456,8 @@ class AuthTicket(object):
     """
 
     def __init__(self, secret, userid, ip, tokens=(), user_data='',
-                 time=None, cookie_name='auth_tkt', secure=False):
+                 time=None, cookie_name='auth_tkt', secure=False,
+                 hashalg='md5'):
         self.secret = secret
         self.userid = userid
         self.ip = ip
@@ -439,11 +469,12 @@ class AuthTicket(object):
             self.time = time
         self.cookie_name = cookie_name
         self.secure = secure
+        self.hashalg = hashalg
 
     def digest(self):
         return calculate_digest(
             self.ip, self.time, self.secret, self.userid, self.tokens,
-            self.user_data)
+            self.user_data, self.hashalg)
 
     def cookie_value(self):
         v = '%s%08x%s!' % (self.digest(), int(self.time),
@@ -465,7 +496,7 @@ class BadTicket(Exception):
         Exception.__init__(self, msg)
 
 # this function licensed under the MIT license (stolen from Paste)
-def parse_ticket(secret, ticket, ip):
+def parse_ticket(secret, ticket, ip, hashalg):
     """
     Parse the ticket, returning (timestamp, userid, tokens, user_data).
 
@@ -473,13 +504,14 @@ def parse_ticket(secret, ticket, ip):
     with an explanation.
     """
     ticket = ticket.strip('"')
-    digest = ticket[:32]
+    digest_size = hashlib.new(hashalg).digest_size * 2
+    digest = ticket[:digest_size]
     try:
-        timestamp = int(ticket[32:40], 16)
+        timestamp = int(ticket[digest_size:digest_size + 8], 16)
     except ValueError as e:
         raise BadTicket('Timestamp is not a hex integer: %s' % e)
     try:
-        userid, data = ticket[40:].split('!', 1)
+        userid, data = ticket[digest_size + 8:].split('!', 1)
     except ValueError:
         raise BadTicket('userid is not followed by !')
     userid = url_unquote(userid)
@@ -491,7 +523,7 @@ def parse_ticket(secret, ticket, ip):
         user_data = data
 
     expected = calculate_digest(ip, timestamp, secret,
-                                userid, tokens, user_data)
+                                userid, tokens, user_data, hashalg)
 
     # Avoid timing attacks (see
     # http://seb.dbzteam.org/crypto/python-oauth-timing-hmac.pdf)
@@ -504,16 +536,19 @@ def parse_ticket(secret, ticket, ip):
     return (timestamp, userid, tokens, user_data)
 
 # this function licensed under the MIT license (stolen from Paste)
-def calculate_digest(ip, timestamp, secret, userid, tokens, user_data):
+def calculate_digest(ip, timestamp, secret, userid, tokens, user_data, hashalg):
     secret = bytes_(secret, 'utf-8')
     userid = bytes_(userid, 'utf-8')
     tokens = bytes_(tokens, 'utf-8')
     user_data = bytes_(user_data, 'utf-8')
-    digest0 = md5(
+    hash_obj = hashlib.new(hashalg)
+    hash_obj.update(
         encode_ip_timestamp(ip, timestamp) + secret + userid + b'\0'
-        + tokens + b'\0' + user_data).hexdigest()
-    digest = md5(bytes_(digest0) + secret).hexdigest()
-    return digest
+        + tokens + b'\0' + user_data)
+    digest = hash_obj.hexdigest()
+    hash_obj2 = hashlib.new(hashalg)
+    hash_obj2.update(bytes_(digest) + secret)
+    return hash_obj2.hexdigest()
 
 # this function licensed under the MIT license (stolen from Paste)
 def encode_ip_timestamp(ip, timestamp):
@@ -556,7 +591,7 @@ class AuthTktCookieHelper(object):
     
     def __init__(self, secret, cookie_name='auth_tkt', secure=False,
                  include_ip=False, timeout=None, reissue_time=None,
-                 max_age=None, http_only=False, path="/", wild_domain=True):
+                 max_age=None, http_only=False, path="/", wild_domain=True, hashalg='md5'):
         self.secret = secret
         self.cookie_name = cookie_name
         self.include_ip = include_ip
@@ -567,6 +602,7 @@ class AuthTktCookieHelper(object):
         self.http_only = http_only
         self.path = path
         self.wild_domain = wild_domain
+        self.hashalg = hashalg
 
         static_flags = []
         if self.secure:
@@ -635,7 +671,7 @@ class AuthTktCookieHelper(object):
         
         try:
             timestamp, userid, tokens, user_data = self.parse_ticket(
-                self.secret, cookie, remote_addr)
+                self.secret, cookie, remote_addr, self.hashalg)
         except self.BadTicket:
             return None
 
@@ -750,7 +786,8 @@ class AuthTktCookieHelper(object):
             tokens=tokens,
             user_data=user_data,
             cookie_name=self.cookie_name,
-            secure=self.secure)
+            secure=self.secure,
+            hashalg=self.hashalg)
 
         cookie_value = ticket.cookie_value()
         return self._get_cookies(environ, cookie_value, max_age)
