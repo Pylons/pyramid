@@ -162,6 +162,9 @@ Minor Feature Additions
   token in the request's session, the view will be permitted to execute.
   Otherwise, it will not be permitted to execute.
 
+- Add ``Base.metadata.bind = engine`` to ``alchemy`` scaffold, so that tables
+  defined imperatively will work.
+
 Backwards Incompatibilities
 ---------------------------
 
