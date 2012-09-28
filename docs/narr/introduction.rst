@@ -315,7 +315,7 @@ Rendered views can return dictionaries
 
 If you use a :term:`renderer`, you don't have to return a special kind of
 "webby" ``Response`` object from a view.  Instead, you can return a
-dictionary instead, and Pyramid will take care of converting that dictionary
+dictionary, and Pyramid will take care of converting that dictionary
 to a Response using a template on your behalf.  This makes the view easier to
 test, because you don't have to parse HTML in your tests; just make an
 assertion instead that the view returns "the right stuff" in the dictionary
