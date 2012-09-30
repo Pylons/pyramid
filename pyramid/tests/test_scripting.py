@@ -72,7 +72,7 @@ class Test_prepare(unittest.TestCase):
         self.assertEqual(self.default, self.manager.get())
         self.assertEqual(request.context, root)
 
-    def test_it_withrequest(self):
+    def test_it_withrequest_hasregistry(self):
         request = DummyRequest({})
         registry = request.registry = self._makeRegistry()
         info = self._callFUT(request=request)
@@ -85,6 +85,17 @@ class Test_prepare(unittest.TestCase):
         closer()
         self.assertEqual(self.default, self.manager.get())
         self.assertEqual(request.context, root)
+        self.assertEqual(request.registry, registry)
+
+    def test_it_withrequest_noregistry(self):
+        request = DummyRequest({})
+        registry = self._makeRegistry()
+        info = self._callFUT(request=request, registry=registry)
+        root, closer, request = info['root'], info['closer'], info['request']
+        closer()
+        self.assertEqual(request.context, root)
+        # should be set by prepare
+        self.assertEqual(request.registry, registry)
 
     def test_it_with_request_and_registry(self):
         request = DummyRequest({})

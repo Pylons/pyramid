@@ -71,6 +71,10 @@ def prepare(request=None, registry=None):
                                  'before trying to activate it.')
     if request is None:
         request = _make_request('/', registry)
+    # NB: even though _make_request might have already set registry on
+    # request, we reset it in case someone has passed in their own
+    # request.
+    request.registry = registry 
     threadlocals = {'registry':registry, 'request':request}
     threadlocal_manager.push(threadlocals)
     extensions = registry.queryUtility(IRequestExtensions)

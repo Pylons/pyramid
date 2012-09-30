@@ -1,3 +1,19 @@
+Next release
+============
+
+Bug Fixes
+---------
+
+- 1.4a ``pyramid.scripting.prepare`` behaved differently than 1.3 series
+  function of same name.  In particular, if passed a request, it would not
+  set the ``registry`` attribute of the request like 1.3 did.  A symptom
+  would be that passing a request to ``pyramid.paster.bootstrap`` (which uses
+  the function) that did not have a ``registry`` attribute could assume that
+  the registry would be attached to the request by Pyramid.  This assumption
+  could be made in 1.3, but not in 1.4.  The assumption can now be made in
+  1.4 too (a registry is attached to a request passed to bootstrap or
+  prepare).
+
 1.4a2 (2012-09-27)
 ==================
 
