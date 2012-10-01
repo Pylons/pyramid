@@ -202,7 +202,7 @@ class PServeCommand(object):
                         'circumstances (such as when there is an ImportError '
                         'raised at module scope), changes you make to the '
                         'offending module will not cause a restart '
-                        'and you will need to either change the __init__.py '
+                        'and you will need to change the __init__.py '
                         'of your application to force a reload.  If that '
                         'does not work, you will need to restart the process '
                         'by hand.')
