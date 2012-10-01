@@ -150,7 +150,8 @@ class PServeCommand(object):
     _reloader_environ_key = 'PYTHON_RELOADER_SHOULD_RUN'
     _monitor_environ_key = 'PASTE_MONITOR_SHOULD_RUN'
 
-    possible_subcommands = ('start', 'stop', 'restart', 'status')
+    possible_subcommands = ('start', 'stop', 'restart', 'status',
+                            'handle_reload_error')
 
     def __init__(self, argv, quiet=False):
         self.quiet = quiet
@@ -191,6 +192,34 @@ class PServeCommand(object):
                 install_reloader(int(self.options.reload_interval), [app_spec])
                 # if self.requires_config_file:
                 #     watch_file(self.args[0])
+                if cmd == 'handle_reload_error':
+                    self.out(
+                        'There was a reload error: your application did not '
+                        'start properly when restarted by the reloader. You  '
+                        'will need to examine the traceback above, and fix '
+                        'the issue.  The process will restart after each code '
+                        'change until the problem is fixed.  In some '
+                        'circumstances (such as when there is an ImportError '
+                        'raised at module scope), changes you make to the '
+                        'offending module will not cause a restart '
+                        'and you will need to either change the __init__.py '
+                        'of your application to force a reload.  If that '
+                        'does not work, you will need to restart the process '
+                        'by hand.')
+                    app_name = self.options.app_name
+                    base = os.getcwd()
+                    vars = self.parse_vars(restvars)
+                    if not self._scheme_re.search(app_spec):
+                        app_spec = 'config:' + app_spec
+                    try: # populate sys.modules
+                        app = self.loadapp(
+                            app_spec, name=app_name,
+                            relative_to=base, global_conf=vars)
+                    except: # but ignore any exceptions
+                        pass
+                    while 1:
+                        time.sleep(1)
+
             else:
                 return self.restart_with_reloader()
 
@@ -526,8 +555,10 @@ class PServeCommand(object):
             if reloader:
                 # Reloader always exits with code 3; but if we are
                 # a monitor, any exit code will restart
-                if exit_code != 3:
-                    return exit_code
+                while exit_code != 3:
+                    handle_error_args = args + ['handle_reload_error']
+                    proc = subprocess.Popen(handle_error_args, env=new_environ)
+                    exit_code = proc.wait()
             if self.verbose > 0:
                 self.out('%s %s %s' % ('-' * 20, 'Restarting', '-' * 20))
 
