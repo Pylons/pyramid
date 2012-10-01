@@ -192,33 +192,6 @@ class PServeCommand(object):
                 install_reloader(int(self.options.reload_interval), [app_spec])
                 # if self.requires_config_file:
                 #     watch_file(self.args[0])
-                if cmd == 'handle_reload_error':
-                    self.out(
-                        'There was a reload error: your application did not '
-                        'start properly when restarted by the reloader. You  '
-                        'will need to examine the traceback above, and fix '
-                        'the issue.  The process will restart after each code '
-                        'change until the problem is fixed.  In some '
-                        'circumstances (such as when there is an ImportError '
-                        'raised at module scope), changes you make to the '
-                        'offending module will not cause a restart '
-                        'and you will need to change the __init__.py '
-                        'of your application to force a reload.  If that '
-                        'does not work, you will need to restart the process '
-                        'by hand.')
-                    app_name = self.options.app_name
-                    base = os.getcwd()
-                    vars = self.parse_vars(restvars)
-                    if not self._scheme_re.search(app_spec):
-                        app_spec = 'config:' + app_spec
-                    try: # populate sys.modules
-                        app = self.loadapp(
-                            app_spec, name=app_name,
-                            relative_to=base, global_conf=vars)
-                    except: # but ignore any exceptions
-                        pass
-                    while 1:
-                        time.sleep(1)
 
             else:
                 return self.restart_with_reloader()
@@ -315,8 +288,22 @@ class PServeCommand(object):
 
         server = self.loadserver(server_spec, name=server_name,
                                  relative_to=base, global_conf=vars)
-        app = self.loadapp(app_spec, name=app_name,
-                           relative_to=base, global_conf=vars)
+        try: # populate sys.modules
+            app = self.loadapp(
+                app_spec, name=app_name,
+                relative_to=base, global_conf=vars)
+        except: # Handle SyntaxError
+            exc_type, exc_val, exc_tb = sys.exc_info()
+            if exc_type is SyntaxError:
+                traceback.print_exc()
+                self.out('Please fix syntax errors to continue')
+                try:
+                    time.sleep(4.5) #FIXME: disable sleep time while running not in reload mode
+                except KeyboardInterrupt:
+                    pass
+                return 3
+            else:
+                raise
 
         if self.verbose > 0:
             if hasattr(os, 'getpid'):
@@ -555,10 +542,9 @@ class PServeCommand(object):
             if reloader:
                 # Reloader always exits with code 3; but if we are
                 # a monitor, any exit code will restart
-                while exit_code != 3:
-                    handle_error_args = args + ['handle_reload_error']
-                    proc = subprocess.Popen(handle_error_args, env=new_environ)
-                    exit_code = proc.wait()
+                if exit_code != 3:
+                     return exit_code
+
             if self.verbose > 0:
                 self.out('%s %s %s' % ('-' * 20, 'Restarting', '-' * 20))
 
