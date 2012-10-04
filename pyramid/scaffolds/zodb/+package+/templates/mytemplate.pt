@@ -32,7 +32,7 @@
       <div class="bottom">
         <div id="left" class="align-right">
           <h2>Search documentation</h2>
-          <form method="get" action="http://docs.pylonsproject.org/projects/pyramid/en/1.3-branch/search.html">
+          <form method="get" action="http://docs.pylonsproject.org/projects/pyramid/en/1.4-branch/search.html">
                 <input type="text" id="q" name="q" value="" />
                 <input type="submit" id="x" value="Go" />
             </form>
@@ -44,22 +44,22 @@
               <a href="http://pylonsproject.org">Pylons Website</a>
             </li>
             <li>
-              <a href="http://docs.pylonsproject.org/projects/pyramid/en/1.3-branch/#narrative-documentation">Narrative Documentation</a>
+              <a href="http://docs.pylonsproject.org/projects/pyramid/en/1.4-branch/#narrative-documentation">Narrative Documentation</a>
             </li>
             <li>
-              <a href="http://docs.pylonsproject.org/projects/pyramid/en/1.3-branch/#reference-material">API Documentation</a>
+              <a href="http://docs.pylonsproject.org/projects/pyramid/en/1.4-branch/#reference-material">API Documentation</a>
             </li>
             <li>
-              <a href="http://docs.pylonsproject.org/projects/pyramid/en/1.3-branch/#tutorials">Tutorials</a>
+              <a href="http://docs.pylonsproject.org/projects/pyramid/en/1.4-branch/#tutorials">Tutorials</a>
             </li>
             <li>
-              <a href="http://docs.pylonsproject.org/projects/pyramid/en/1.3-branch/#detailed-change-history">Change History</a>
+              <a href="http://docs.pylonsproject.org/projects/pyramid/en/1.4-branch/#detailed-change-history">Change History</a>
             </li>
             <li>
-              <a href="http://docs.pylonsproject.org/projects/pyramid/en/1.3-branch/#sample-applications">Sample Applications</a>
+              <a href="http://docs.pylonsproject.org/projects/pyramid/en/1.4-branch/#sample-applications">Sample Applications</a>
             </li>
             <li>
-              <a href="http://docs.pylonsproject.org/projects/pyramid/en/1.3-branch/#support-and-development">Support and Development</a>
+              <a href="http://docs.pylonsproject.org/projects/pyramid/en/1.4-branch/#support-and-development">Support and Development</a>
             </li>
             <li>
               <a href="irc://irc.freenode.net#pyramid">IRC Channel</a>
@@ -70,7 +70,7 @@
     </div>
   </div>
   <div id="footer">
-    <div class="footer">&copy; Copyright 2008-2011, Agendaless Consulting.</div>
+    <div class="footer">&copy; Copyright 2008-2012, Agendaless Consulting.</div>
   </div>
 </body>
 </html>
