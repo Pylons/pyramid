@@ -295,6 +295,7 @@ class TestChameleonRendererLookup(unittest.TestCase):
         self.assertEqual(factory.kw, {'macro':None})
 
     def test___call__spec_withmacro(self):
+        from pyramid.interfaces import ITemplateRenderer
         import os
         from pyramid import tests
         module_name = tests.__name__
@@ -302,10 +303,11 @@ class TestChameleonRendererLookup(unittest.TestCase):
         renderer = {}
         factory = DummyFactory(renderer)
         spec = '%s:%s' % (module_name, relpath)
+        reg = self.config.registry
         info = DummyRendererInfo({
             'name':spec,
             'package':None,
-            'registry':self.config.registry,
+            'registry':reg,
             'settings':{},
             'type':'type',
             })
@@ -318,6 +320,9 @@ class TestChameleonRendererLookup(unittest.TestCase):
             'withmacro.pt')
         self.assertTrue(factory.path.startswith(path))
         self.assertEqual(factory.kw, {'macro':'foo'})
+        self.assertTrue(
+            reg.getUtility(ITemplateRenderer, name=spec) is renderer
+            )
 
     def test___call__reload_assets_true(self):
         import pyramid.tests
