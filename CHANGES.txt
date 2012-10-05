@@ -14,6 +14,13 @@ Bug Fixes
   1.4 too (a registry is attached to a request passed to bootstrap or
   prepare).
 
+- When registering a view configuration that named a Chameleon ZPT renderer
+  with a macro name in it (e.g. ``renderer='some/template#somemacro.pt``) as
+  well as a view configuration without a macro name it it that pointed to the
+  same template (e.g. ``renderer='some/template.pt'), internal caching could
+  confuse the two, and your code might have rendered one instead of the
+  other.
+
 1.4a2 (2012-09-27)
 ==================
 
