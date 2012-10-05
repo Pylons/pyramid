@@ -83,8 +83,9 @@ def signed_deserialize(serialized, secret, hmac=hmac):
 
 def check_csrf_token(request, token='csrf_token', raises=True):
     """ Check the CSRF token in the request's session against the value in
-    ``request.params.get(token)``.  If ``token`` is not supplied, the string
-    value ``csrf_token`` will be used as the token value.  If the value in
+    ``request.params.get(token)``.  If a ``token`` keyword is not supplied
+    to this function, the string ``csrf_token`` will be used to look up
+    the token within ``request.params``.  If the value in
     ``request.params.get(token)`` doesn't match the value supplied by
     ``request.session.get_csrf_token()``, and ``raises`` is ``True``, this
     function will raise an :exc:`pyramid.httpexceptions.HTTPBadRequest`
