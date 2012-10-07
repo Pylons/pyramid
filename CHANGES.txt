@@ -21,6 +21,25 @@ Bug Fixes
   confuse the two, and your code might have rendered one instead of the
   other.
 
+Features
+--------
+
+- The Configurator ``testing_securitypolicy`` method now returns the policy
+  object it creates.
+
+- The Configurator ``testing_securitypolicy`` method accepts two new
+  arguments: ``remember_result`` and ``forget_result``.  If supplied, these
+  values influence the result of the policy's ``remember`` and ``forget``
+  methods, respectively.
+
+- The DummySecurityPolicy created by ``testing_securitypolicy`` now sets a
+  ``forgotten`` value on the policy (the value ``True``) when its ``forget``
+  method is called.
+
+- The DummySecurityPolicy created by ``testing_securitypolicy`` now sets a
+  ``remembered`` value on the policy, which is the value of the ``principal``
+  argument it's called with when its ``remember`` method is called.
+
 1.4a2 (2012-09-27)
 ==================
 
