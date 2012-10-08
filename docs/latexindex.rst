@@ -54,6 +54,7 @@ Narrative Documentation
    narr/traversal
    narr/security
    narr/hybrid
+   narr/subrequest
    narr/hooks
    narr/introspector
    narr/extending

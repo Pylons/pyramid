@@ -115,7 +115,8 @@ listed in the following table:
 |                      |  redirect to          |             |            |            |
 |                      |  /PageName            |             |            |            |
 +----------------------+-----------------------+-------------+------------+------------+
-| /login               |  Display login form.  |  login      |  login.pt  |            |
+| /login               |  Display login form,  |  login      |  login.pt  |            |
+|                      |   Forbidden [3]_      |             |            |            |
 |                      |                       |             |            |            |
 |                      |  If the form was      |             |            |            |
 |                      |  submitted,           |             |            |            |

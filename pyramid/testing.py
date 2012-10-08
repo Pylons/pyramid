@@ -1,5 +1,6 @@
 import copy
 import os
+from contextlib import contextmanager
 
 from zope.interface import (
     implementer,
@@ -52,10 +53,17 @@ class DummyRootFactory(object):
 
 class DummySecurityPolicy(object):
     """ A standin for both an IAuthentication and IAuthorization policy """
-    def __init__(self, userid=None, groupids=(), permissive=True):
+    def __init__(self, userid=None, groupids=(), permissive=True,
+                 remember_result=None, forget_result=None):
         self.userid = userid
         self.groupids = groupids
         self.permissive = permissive
+        if remember_result is None:
+            remember_result = []
+        if forget_result is None:
+            forget_result = []
+        self.remember_result = remember_result
+        self.forget_result = forget_result
 
     def authenticated_userid(self, request):
         return self.userid
@@ -72,10 +80,12 @@ class DummySecurityPolicy(object):
         return effective_principals
 
     def remember(self, request, principal, **kw):
-        return []
+        self.remembered = principal
+        return self.remember_result
 
     def forget(self, request):
-        return []
+        self.forgotten = True
+        return self.forget_result
 
     def permits(self, context, principals, permission):
         return self.permissive
@@ -293,7 +303,7 @@ class DummyRequest(DeprecatedRequestMethodsMixin, URLMethodsMixin,
     request.  For example, by default, the DummyRequest ``GET`` and ``POST``
     attributes are of type ``dict``, unlike a normal Request's GET and POST,
     which are of type ``MultiDict``. If your code uses the features of
-    MultiDict, you should either use a"real" :class:`pyramid.request.Request`
+    MultiDict, you should either use a real :class:`pyramid.request.Request`
     or adapt your DummyRequest by replacing the attributes with ``MultiDict``
     instances.
 
@@ -572,3 +582,37 @@ def skip_on(*platforms): # pragma: no  cover
             return wrapper
     return decorator
 skip_on.os_name = os.name # for testing
+
+@contextmanager
+def testConfig(registry=None,
+        request=None,
+        hook_zca=True,
+        autocommit=True,
+        settings=None):
+    """Returns a context manager for test set up.
+
+    This context manager calls :func:`pyramid.testing.testSetup` when
+    entering and :func:`pyramid.testing.tearDown` when exiting.
+
+    All arguments are passed directly to :func:`pyramid.testing.testSetup`.
+    If the ZCA is hooked, it will always be un-hooked in tearDown.
+
+    This context manager allows you to write test code like this:
+
+    .. code-block:: python
+        :linenos:
+
+        with testConfig() as config:
+            config.add_route('bar', '/bar/{id}')
+            req = DummyRequest()
+            resp = myview(req),
+    """
+    config = setUp(registry=registry,
+            request=request,
+            hook_zca=hook_zca,
+            autocommit=autocommit,
+            settings=settings)
+    try:
+        yield config
+    finally:
+        tearDown(unhook_zca=hook_zca)

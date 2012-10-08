@@ -157,6 +157,30 @@ We use a "dummy" request implementation supplied by
 :class:`pyramid.testing.DummyRequest` because it's easier to construct
 than a "real" :app:`Pyramid` request object.
 
+Test setup using a context manager
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+An alternative style of setting up a test configuration is to use the
+`with` statement and :func:`pyramid.testing.testConfig` to create a
+context manager. The context manager will call
+:func:`pyramid.testing.setUp` before the code under test and
+:func:`pyramid.testing.tearDown` afterwards.
+
+This style is useful for small self-contained tests. For example:
+
+.. code-block:: python
+   :linenos:
+
+   import unittest
+
+   class MyTest(unittest.TestCase):
+
+       def test_my_function(self):
+           from pyramid import testing
+           with testing.testConfig() as config:
+               config.add_route('bar', '/bar/{id}')
+               my_function_which_needs_route_bar()
+
 What?
 ~~~~~
 

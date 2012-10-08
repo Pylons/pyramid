@@ -170,7 +170,7 @@ class view_config(object):
     ``request_type``, ``route_name``, ``request_method``, ``request_param``,
     ``containment``, ``xhr``, ``accept``, ``header``, ``path_info``,
     ``custom_predicates``, ``decorator``, ``mapper``, ``http_cache``,
-    ``match_param``, and ``predicates``.
+    ``match_param``, ``csrf_token``, and ``predicates``.
 
     The meanings of these arguments are the same as the arguments passed to
     :meth:`pyramid.config.Configurator.add_view`.  If any argument is left

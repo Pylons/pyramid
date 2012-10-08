@@ -112,7 +112,7 @@ parameter to our :term:`Configurator` constructor, that points to
 the class we created above:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
-   :lines: 19-20
+   :lines: 23-24
    :linenos:
    :emphasize-lines: 2
    :language: python
@@ -144,7 +144,7 @@ add these import statements:
 Now add those policies to the configuration:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
-   :lines: 16-22
+   :lines: 20-26
    :linenos:
    :emphasize-lines: 1-3,6-7
    :language: python
@@ -206,7 +206,7 @@ Go back to ``tutorial/tutorial/__init__.py`` and add these two
 routes:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
-   :lines: 25-26
+   :lines: 29-30
    :linenos:
    :language: python
 
@@ -333,7 +333,7 @@ when we're done:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
    :linenos:
-   :emphasize-lines: 2-3,7,16-18,20-22,25-26
+   :emphasize-lines: 2-3,7,23-24,20-26,29-30
    :language: python
 
 (Only the highlighted lines need to be added.)

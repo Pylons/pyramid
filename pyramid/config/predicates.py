@@ -13,6 +13,8 @@ from pyramid.urldispatch import _compile_route
 
 from pyramid.util import object_description
 
+from pyramid.session import check_csrf_token
+
 from .util import as_sorted_tuple
 
 class XHRPredicate(object):
@@ -226,3 +228,24 @@ class TraversePredicate(object):
         # injects ``traverse`` into the matchdict.  As a result, we just
         # return True.
         return True
+
+class CheckCSRFTokenPredicate(object):
+
+    check_csrf_token = staticmethod(check_csrf_token) # testing
+    
+    def __init__(self, val, config):
+        self.val = val
+
+    def text(self):
+        return 'check_csrf = %s' % (self.val,)
+
+    phash = text
+
+    def __call__(self, context, request):
+        val = self.val
+        if val:
+            if val is True:
+                val = 'csrf_token'
+            return self.check_csrf_token(request, val, raises=False)
+        return True
+

@@ -82,15 +82,6 @@ Nice-to-Have
 - Deprecate pyramid.security.view_execution_permitted (it only works for
   traversal).
 
-- Create a function which performs a recursive request.
-
-- Create a ``render_view`` that works by using config.derive_view against an
-  existing view callable instead of querying the registry (some sort of API
-  for rendering a view callable object to a response from within another view
-  callable). Possible idea: have config.add_view mark up the
-  function/method/class like @view_config does, then use the attached info to
-  derive a view callable whenever called via some API.
-
 - Provide a ``has_view`` function.
 
 - Update App engine chapter with less creaky directions.
@@ -143,10 +134,15 @@ Future
   original dict (after ``__getattr__`` deprecation period, it was deprecated
   in 1.2).
 
-- 1.5: Remove ``pyramid.requests.DeprecatedRequestMethodsMixin``.
+- 1.5: Remove ``pyramid.requests.DeprecatedRequestMethodsMixin`` and code in
+  renderers module that looks for _response_content_type, et. al.
 
 - 1.5: Maybe? deprecate set_request_property in favor of pointing people at
   add_request_method, schedule removal for 1.8?
+
+- 1.5: Remove pyramid.config.rendering set_renderer_globals_factory maybe.
+
+- 1.5: remove pyramid.config.route _add_view_from_route function.
 
 - 1.6: Remove IContextURL and TraversalContextURL.
 

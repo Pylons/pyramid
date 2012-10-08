@@ -161,6 +161,62 @@
       request, the value of this attribute will be ``None``. See
       :ref:`matched_route`.
 
+   .. method:: invoke_subrequest(request, use_tweens=False)
+
+      .. warning:: 
+
+         This API was added in Pyramid 1.4a1.
+
+      Obtain a response object from the Pyramid application based on
+      information in the ``request`` object provided.  The ``request`` object
+      must be an object that implements the Pyramid request interface (such
+      as a :class:`pyramid.request.Request` instance).  If ``use_tweens`` is
+      ``True``, the request will be sent to the :term:`tween` in the tween
+      stack closest to the request ingress.  If ``use_tweens`` is ``False``,
+      the request will be sent to the main router handler, and no tweens will
+      be invoked.
+
+      This function also:
+        
+      - manages the threadlocal stack (so that
+        :func:`~pyramid.threadlocal.get_current_request` and
+        :func:`~pyramid.threadlocal.get_current_registry` work during a
+        request)
+
+      - Adds a ``registry`` attribute (the current Pyramid registry) and a
+        ``invoke_subrequest`` attribute (a callable) to the request object it's
+        handed.
+
+      - sets request extensions (such as those added via
+        :meth:`~pyramid.config.Configurator.add_request_method` or
+        :meth:`~pyramid.config.Configurator.set_request_property`) on the
+        request it's passed.
+
+      - causes a :class:`~pyramid.event.NewRequest` event to be sent at the
+        beginning of request processing.
+
+      - causes a :class:`~pyramid.event.ContextFound` event to be sent
+        when a context resource is found.
+          
+      - Ensures that the user implied by the request passed has the necessary
+        authorization to invoke view callable before calling it.
+
+      - causes a :class:`~pyramid.event.NewResponse` event to be sent when
+        the Pyramid application returns a response.
+
+      - Calls any :term:`response callback` functions defined within the
+        request's lifetime if a response is obtained from the Pyramid
+        application.
+
+      - Calls any :term:`finished callback` functions defined within the
+        request's lifetime.
+
+      ``invoke_subrequest`` isn't *actually* a method of the Request object;
+      it's a callable added when the Pyramid router is invoked, or when a
+      subrequest is invoked.  This means that it's not available for use on a
+      request provided by e.g. the ``pshell`` environment.  For more
+      information, see :ref:`subrequest_chapter`.
+
    .. automethod:: add_response_callback
 
    .. automethod:: add_finished_callback

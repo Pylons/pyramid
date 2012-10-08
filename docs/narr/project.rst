@@ -286,11 +286,39 @@ Here's sample output from a run of ``pserve`` on UNIX:
 
    $ ../bin/pserve development.ini
    Starting server in PID 16601.
-   serving on 0.0.0.0:6543 view at http://127.0.0.1:6543
+   serving on http://0.0.0.0:6543
 
-By default, :app:`Pyramid` applications generated from a scaffold
-will listen on TCP port 6543.  You can shut down a server started this way by
-pressing ``Ctrl-C``.
+When you use ``pserve`` to start the application implied by the default
+rendering of a scaffold, it will respond to requests on *all* IP addresses
+possessed by your system, not just requests to ``localhost``.  This is what
+the ``0.0.0.0`` in ``serving on http://0.0.0.0:6543`` means.  The server will
+respond to requests made to ``127.0.0.1`` and on any external IP address.
+For example, your system might be configured to have an external IP address
+``192.168.1.50``.  If that's the case, if you use a browser running on the
+same system as Pyramid, it will be able to access the application via
+``http://127.0.0.1:6543/`` as well as via
+``http://129.168.1.50:6543/``. However, *other people* on other computers on
+the same network will also be able to visit your Pyramid application in their
+browser by visiting ``http://192.168.1.50:6543/``.
+
+If you want to restrict access such that only a browser running on the same
+machine as Pyramid will be able to access your Pyramid application, edit the
+``development.ini`` file, and replace the ``host`` value in the
+``[server:main]`` section.  Change it from ``0.0.0.0`` to ``127.0.0.1``.  For
+example::
+
+   [server:main]
+   use = egg:waitress#main
+   host = 127.0.0.1
+   port = 6543
+
+You can change the port on which the server runs on by changing the same
+portion of the ``development.ini`` file.  For example, you can change the
+``port = 6543`` line in the ``development.ini`` file's ``[server:main]``
+section to ``port = 8080`` to run the server on port 8080 instead of
+port 6543.
+
+You can shut down a server started this way by pressing ``Ctrl-C``.
 
 The default server used to run your Pyramid application when a project is
 created from a scaffold is named :term:`Waitress`.  This server is what
@@ -308,11 +336,6 @@ servers is that they're largely interchangeable, so if your application works
 under the default server, it will almost certainly work under any other
 server in production if you eventually choose to use a different one.  Don't
 worry about it right now.
-
-You can change the port on which the server runs on by changing the
-``development.ini`` file.  For example, you can change the ``port = 6543``
-line in the ``development.ini`` file's ``[server:main]`` section to ``port =
-8080`` to run the server on port 8080 instead of port 6543.
 
 For more detailed information about the startup process, see
 :ref:`startup_chapter`.  For more information about environment variables and

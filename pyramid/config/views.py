@@ -662,6 +662,7 @@ class ViewsConfiguratorMixin(object):
         mapper=None,
         http_cache=None,
         match_param=None,
+        check_csrf=None,
         **predicates):
         """ Add a :term:`view configuration` to the current
         configuration state.  Arguments to ``add_view`` are broken
@@ -989,6 +990,29 @@ class ViewsConfiguratorMixin(object):
           variable.  If the regex matches, this predicate will be
           ``True``.
 
+        check_csrf
+
+          If specified, this value should be one of ``None``, ``True``,
+          ``False``, or a string representing the 'check name'.  If the value
+          is ``True`` or a string, CSRF checking will be performed.  If the
+          value is ``False`` or ``None``, CSRF checking will not be performed.
+
+          If the value provided is a string, that string will be used as the
+          'check name'.  If the value provided is ``True``, ``csrf_token`` will
+          be used as the check name.
+
+          If CSRF checking is performed, the checked value will be the value
+          of ``request.params[check_name]``.  This value will be compared
+          against the value of ``request.session.get_csrf_token()``, and the
+          check will pass if these two values are the same.  If the check
+          passes, the associated view will be permitted to execute.  If the
+          check fails, the associated view will not be permitted to execute.
+
+          Note that using this feature requires a :term:`session factory` to
+          have been configured.
+         
+          .. versionadded:: 1.4a2
+
         custom_predicates
 
           This value should be a sequence of references to custom
@@ -1007,7 +1031,9 @@ class ViewsConfiguratorMixin(object):
           :meth:`pyramid.config.Configurator.add_view_predicate`.  More than
           one key/value pair can be used at the same time.  See
           :ref:`view_and_route_predicates` for more information about
-          third-party predicates.  This argument is new as of Pyramid 1.4.
+          third-party predicates.
+
+          .. versionadded: 1.4a1
 
         """
         view = self.maybe_dotted(view)
@@ -1061,6 +1087,7 @@ class ViewsConfiguratorMixin(object):
                 containment=containment,
                 request_type=request_type,
                 match_param=match_param,
+                check_csrf=check_csrf,
                 custom=predvalseq(custom_predicates),
                 )
             )
@@ -1098,6 +1125,7 @@ class ViewsConfiguratorMixin(object):
                  header=header,
                  path_info=path_info,
                  match_param=match_param,
+                 check_csrf=check_csrf,
                  callable=view,
                  mapper=mapper,
                  decorator=decorator,
@@ -1340,6 +1368,7 @@ class ViewsConfiguratorMixin(object):
             ('containment', p.ContainmentPredicate),
             ('request_type', p.RequestTypePredicate),
             ('match_param', p.MatchParamPredicate),
+            ('check_csrf', p.CheckCSRFTokenPredicate),
             ('custom', p.CustomPredicate),
             ):
             self.add_view_predicate(name, factory)

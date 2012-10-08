@@ -394,6 +394,28 @@ configured view.
   consideration when deciding whether or not to invoke the associated view
   callable.
 
+``check_csrf``
+  If specified, this value should be one of ``None``, ``True``, ``False``, or
+  a string representing the 'check name'.  If the value is ``True`` or a
+  string, CSRF checking will be performed.  If the value is ``False`` or
+  ``None``, CSRF checking will not be performed.
+
+  If the value provided is a string, that string will be used as the 'check
+  name'.  If the value provided is ``True``, ``csrf_token`` will be used as
+  the check name.
+
+  If CSRF checking is performed, the checked value will be the value of
+  ``request.params[check_name]``.  This value will be compared against the
+  value of ``request.session.get_csrf_token()``, and the check will pass if
+  these two values are the same.  If the check passes, the associated view
+  will be permitted to execute.  If the check fails, the associated view
+  will not be permitted to execute.
+
+  Note that using this feature requires a :term:`session factory` to have
+  been configured.
+
+  .. versionadded:: 1.4a2
+
 ``custom_predicates``
   If ``custom_predicates`` is specified, it must be a sequence of references
   to custom predicate callables.  Use custom predicates when no set of
@@ -406,6 +428,15 @@ configured view.
 
   If ``custom_predicates`` is not specified, no custom predicates are
   used.
+
+``predicates``
+  Pass a key/value pair here to use a third-party predicate registered via
+  :meth:`pyramid.config.Configurator.add_view_predicate`.  More than one
+  key/value pair can be used at the same time.  See
+  :ref:`view_and_route_predicates` for more information about third-party
+  predicates.
+
+  .. versionadded:: 1.4a1
 
 .. index::
    single: view_config decorator

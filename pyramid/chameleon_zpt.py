@@ -1,21 +1,8 @@
-import sys
-
 from zope.interface import implementer
 
-from pyramid.compat import reraise
-
-try:
-    from chameleon.zpt.template import PageTemplateFile
-    PageTemplateFile # prevent pyflakes complaining about a redefinition below
-except ImportError: # pragma: no cover
-    exc_class, exc, tb = sys.exc_info()
-    # Chameleon doesn't work on non-CPython platforms
-    class PageTemplateFile(object):
-        def __init__(self, *arg, **kw):
-            reraise(ImportError, exc, tb)
+from chameleon.zpt.template import PageTemplateFile
 
 from pyramid.interfaces import ITemplateRenderer
-
 from pyramid.decorator import reify
 from pyramid import renderers
 
@@ -31,9 +18,6 @@ class ZPTTemplateRenderer(object):
 
     @reify # avoid looking up reload_templates before manager pushed
     def template(self):
-        if sys.platform.startswith('java'): # pragma: no cover
-            raise RuntimeError(
-                'Chameleon templates are not compatible with Jython')
         tf = PageTemplateFile(self.path,
                               auto_reload=self.lookup.auto_reload,
                               debug=self.lookup.debug,

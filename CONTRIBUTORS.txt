@@ -1,4 +1,4 @@
- Pylons Project Contributor Agreement
+Pylons Project Contributor Agreement
 ====================================
 
 The submitter agrees by adding his or her name within the section below named
@@ -177,8 +177,14 @@ Contributors
 
 - Marc Abramowitz, 2012/06/13
 
+- Brian Sutherland, 2012/06/16
+
 - Jeff Cook, 2012/06/16
 
 - Ian Wilson, 2012/06/17
 
 - Roman Kozlovskyi, 2012/08/11
+
+- Domen Kozar, 2012/09/11
+
+- David Gay, 2012/09/16

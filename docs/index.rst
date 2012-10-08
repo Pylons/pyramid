@@ -37,6 +37,7 @@ What's New
 .. toctree::
    :maxdepth: 1
 
+   whatsnew-1.4
    whatsnew-1.3
    whatsnew-1.2
    whatsnew-1.1
@@ -82,6 +83,7 @@ Narrative documentation in chapter form explaining how to use
    narr/traversal
    narr/security
    narr/hybrid
+   narr/subrequest
    narr/hooks
    narr/introspector
    narr/extending

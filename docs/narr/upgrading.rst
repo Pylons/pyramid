@@ -1,3 +1,5 @@
+.. _upgrading_chapter:
+
 Upgrading Pyramid
 =================
 

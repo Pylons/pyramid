@@ -15,6 +15,7 @@ from pyramid.compat import (
     native_,
     )
 
+from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.interfaces import ISession
 from pyramid.util import strings_differ
 
@@ -79,6 +80,29 @@ def signed_deserialize(serialized, secret, hmac=hmac):
         raise ValueError('Invalid signature')
 
     return pickle.loads(pickled)
+
+def check_csrf_token(request, token='csrf_token', raises=True):
+    """ Check the CSRF token in the request's session against the value in
+    ``request.params.get(token)``.  If a ``token`` keyword is not supplied
+    to this function, the string ``csrf_token`` will be used to look up
+    the token within ``request.params``.  If the value in
+    ``request.params.get(token)`` doesn't match the value supplied by
+    ``request.session.get_csrf_token()``, and ``raises`` is ``True``, this
+    function will raise an :exc:`pyramid.httpexceptions.HTTPBadRequest`
+    exception.  If the check does succeed and ``raises`` is ``False``, this
+    function will return ``False``.  If the CSRF check is successful, this
+    function will return ``True`` unconditionally.
+
+    Note that using this function requires that a :term:`session factory` is
+    configured.
+
+    .. versionadded:: 1.4a2
+    """
+    if request.params.get(token) != request.session.get_csrf_token():
+        if raises:
+            raise HTTPBadRequest('incorrect CSRF token')
+        return False
+    return True
 
 def UnencryptedCookieSessionFactoryConfig(
     secret,

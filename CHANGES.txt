@@ -1,6 +1,77 @@
 Next release
 ============
 
+Bug Fixes
+---------
+
+- 1.4a ``pyramid.scripting.prepare`` behaved differently than 1.3 series
+  function of same name.  In particular, if passed a request, it would not
+  set the ``registry`` attribute of the request like 1.3 did.  A symptom
+  would be that passing a request to ``pyramid.paster.bootstrap`` (which uses
+  the function) that did not have a ``registry`` attribute could assume that
+  the registry would be attached to the request by Pyramid.  This assumption
+  could be made in 1.3, but not in 1.4.  The assumption can now be made in
+  1.4 too (a registry is attached to a request passed to bootstrap or
+  prepare).
+
+- When registering a view configuration that named a Chameleon ZPT renderer
+  with a macro name in it (e.g. ``renderer='some/template#somemacro.pt``) as
+  well as a view configuration without a macro name it it that pointed to the
+  same template (e.g. ``renderer='some/template.pt'), internal caching could
+  confuse the two, and your code might have rendered one instead of the
+  other.
+
+Features
+--------
+
+- The Configurator ``testing_securitypolicy`` method now returns the policy
+  object it creates.
+
+- The Configurator ``testing_securitypolicy`` method accepts two new
+  arguments: ``remember_result`` and ``forget_result``.  If supplied, these
+  values influence the result of the policy's ``remember`` and ``forget``
+  methods, respectively.
+
+- The DummySecurityPolicy created by ``testing_securitypolicy`` now sets a
+  ``forgotten`` value on the policy (the value ``True``) when its ``forget``
+  method is called.
+
+- The DummySecurityPolicy created by ``testing_securitypolicy`` now sets a
+  ``remembered`` value on the policy, which is the value of the ``principal``
+  argument it's called with when its ``remember`` method is called.
+
+1.4a2 (2012-09-27)
+==================
+
+Bug Fixes
+---------
+
+- When trying to determine Mako defnames and Chameleon macro names in asset
+  specifications, take into account that the filename may have a hyphen in
+  it.  See https://github.com/Pylons/pyramid/pull/692
+
+Features
+--------
+
+- A new ``pyramid.session.check_csrf_token`` convenience function was added.
+
+- A ``check_csrf`` view predicate was added.  For example, you can now do
+  ``config.add_view(someview, check_csrf=True)``.  When the predicate is
+  checked, if the ``csrf_token`` value in ``request.params`` matches the CSRF
+  token in the request's session, the view will be permitted to execute.
+  Otherwise, it will not be permitted to execute.
+
+- Add ``Base.metadata.bind = engine`` to alchemy template, so that tables
+  defined imperatively will work.
+
+Documentation
+-------------
+
+- update wiki2 SQLA tutorial with the changes required after inserting
+  ``Base.metadata.bind = engine`` into the alchemy scaffold.
+
+1.4a1 (2012-09-16)
+==================
 
 Bug Fixes
 ---------
@@ -33,11 +104,6 @@ Bug Fixes
   differ in the case ('text/html' vs. 'text/HTML') will now raise an error.
   https://github.com/Pylons/pyramid/pull/620
 
-- Configurator.add_directive now accepts arbitrary callables like partials or
-  objects implementing ``__call__`` which dont have ``__name__`` and
-  ``__doc__`` attributes.  See https://github.com/Pylons/pyramid/issues/621
-  and https://github.com/Pylons/pyramid/pull/647.
-
 - Forward-port from 1.3 branch: when registering multiple views with an
   ``accept`` predicate in a Pyramid application runing under Python 3, you
   might have received a ``TypeError: unorderable types: function() <
@@ -45,6 +111,11 @@ Bug Fixes
 
 Features
 --------
+
+- Configurator.add_directive now accepts arbitrary callables like partials or
+  objects implementing ``__call__`` which dont have ``__name__`` and
+  ``__doc__`` attributes.  See https://github.com/Pylons/pyramid/issues/621
+  and https://github.com/Pylons/pyramid/pull/647.
 
 - Third-party custom view, route, and subscriber predicates can now be added
   for use by view authors via
@@ -104,13 +175,13 @@ Features
   and ``HTTPMovedPermanently`` exceptions, so these can be caught by the
   NotFound view (and other exception views).
 
-- The Mako renderer now accepts a def name in an asset spect.  When the def
+- The Mako renderer now supports a def name in an asset spec.  When the def
   name is present in the asset spec, the system will render the template def
   within the template and will return the result. An example asset spec is
   ``package:path/to/template#defname.mako``. This will render the def named
-  ``defname`` inside the ``template.pt`` package instead of rendering the
-  entire template.  The old way of returning a tuple from the view is
-  supported for backward compatibility, ('defname', {}).
+  ``defname`` inside the ``template.mako`` template instead of rendering the
+  entire template.  The old way of returning a tuple in the form
+  ``('defname', {})`` from the view is supported for backward compatibility,
 
 - The Chameleon ZPT renderer now accepts a macro name in an asset spec.  When
   the macro name is present in the asset spec, the system will render the
@@ -151,14 +222,20 @@ Features
   ``config.add_request_method`` are now available to tweens.
 
 - Request properties and methods added via ``config.set_request_property`` or
-  ``config.add_request_method`` are now available to tweens.
-
-- Request properties and methods added via ``config.set_request_property`` or
   ``config.add_request_method`` are now available in the request object
   returned from ``pyramid.paster.bootstrap``.
 
 - ``request.context`` of environment request during ``bootstrap`` is now the
   root object if a context isn't already set on a provided request.
+
+- The ``pyramid.decorator.reify`` function is now an API, and was added to
+  the API documentation.
+
+- Added the ``pyramid.testing.testConfig`` context manager, which can be used
+  to generate a configurator in a test, e.g. ``with testing.testConfig(...):``.
+
+- Users can now invoke a subrequest from within view code using a new
+  ``request.invoke_subrequest`` API.
 
 Deprecations
 ------------
@@ -246,11 +323,22 @@ Backwards Incompatibilities
   * ``registerSettings``, use 
     ``pyramid.config.Configurator.add_settings`` instead.
 
+- In Pyramid 1.3 and previous, the ``__call__`` method of a Response object
+  was invoked before any finished callbacks were executed.  As of this
+  release, the ``__call__`` method of a Response object is invoked *after*
+  finished callbacks are executed.  This is in support of the
+  ``request.invoke_subrequest`` feature.
+
 Documentation
 -------------
 
 - Added an "Upgrading Pyramid" chapter to the narrative documentation.  It
-  describes how to cope with deprecations and removals of Pyramid APIs.
+  describes how to cope with deprecations and removals of Pyramid APIs and
+  how to show Pyramid-generated deprecation warnings while running tests and
+  while running a server.
+
+- Added a "Invoking a Subrequest" chapter to the documentation.  It describes
+  how to use the new ``request.invoke_subrequest`` API.
 
 Dependencies
 ------------

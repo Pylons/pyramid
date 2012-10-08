@@ -1,11 +1,9 @@
 from zope.interface import implementer
 
-from pyramid.compat import iteritems_
 from pyramid.config.util import action_method
 
 from pyramid.interfaces import (
     IDefaultRootFactory,
-    INewRequest,
     IRequestFactory,
     IRequestExtensions,
     IRootFactory,
