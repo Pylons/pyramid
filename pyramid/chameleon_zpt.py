@@ -18,10 +18,12 @@ class ZPTTemplateRenderer(object):
 
     @reify # avoid looking up reload_templates before manager pushed
     def template(self):
-        tf = PageTemplateFile(self.path,
-                              auto_reload=self.lookup.auto_reload,
-                              debug=self.lookup.debug,
-                              translate=self.lookup.translate)
+        tf = PageTemplateFile(
+            self.path,
+            auto_reload=self.lookup.auto_reload,
+            debug=self.lookup.debug,
+            translate=self.lookup.translate
+            )
         if self.macro:
             # render only the portion of the template included in a
             # define-macro named the value of self.macro
