@@ -14,7 +14,7 @@ class TestCallbackAuthenticationPolicyDebugging(unittest.TestCase):
 
     def tearDown(self):
         del self.config
-        
+
     def debug(self, msg):
         self.messages.append(msg)
 
@@ -151,7 +151,7 @@ class TestRepozeWho1AuthenticationPolicy(unittest.TestCase):
 
     def _makeOne(self, identifier_name='auth_tkt', callback=None):
         return self._getTargetClass()(identifier_name, callback)
-    
+
     def test_class_implements_IAuthenticationPolicy(self):
         from zope.interface.verify import verifyClass
         from pyramid.interfaces import IAuthenticationPolicy
@@ -251,7 +251,7 @@ class TestRepozeWho1AuthenticationPolicy(unittest.TestCase):
         result = policy.remember(request, 'fred')
         self.assertEqual(result[0], request.environ)
         self.assertEqual(result[1], {'repoze.who.userid':'fred'})
-        
+
     def test_forget_no_plugins(self):
         request = DummyRequest({})
         policy = self._makeOne()
@@ -276,7 +276,7 @@ class TestRemoteUserAuthenticationPolicy(unittest.TestCase):
 
     def _makeOne(self, environ_key='REMOTE_USER', callback=None):
         return self._getTargetClass()(environ_key, callback)
-    
+
     def test_class_implements_IAuthenticationPolicy(self):
         from zope.interface.verify import verifyClass
         from pyramid.interfaces import IAuthenticationPolicy
@@ -301,7 +301,7 @@ class TestRemoteUserAuthenticationPolicy(unittest.TestCase):
         request = DummyRequest({})
         policy = self._makeOne()
         self.assertEqual(policy.authenticated_userid(request), None)
-        
+
     def test_authenticated_userid(self):
         request = DummyRequest({'REMOTE_USER':'fred'})
         policy = self._makeOne()
@@ -326,7 +326,7 @@ class TestRemoteUserAuthenticationPolicy(unittest.TestCase):
         policy = self._makeOne()
         result = policy.remember(request, 'fred')
         self.assertEqual(result, [])
-        
+
     def test_forget(self):
         request = DummyRequest({'REMOTE_USER':'fred'})
         policy = self._makeOne()
@@ -375,7 +375,7 @@ class TestAutkTktAuthenticationPolicy(unittest.TestCase):
         request = DummyRequest({})
         policy = self._makeOne(None, None)
         self.assertEqual(policy.authenticated_userid(request), None)
-        
+
     def test_authenticated_userid_callback_returns_None(self):
         request = DummyRequest({})
         def callback(userid, request):
@@ -426,7 +426,7 @@ class TestAutkTktAuthenticationPolicy(unittest.TestCase):
         result = policy.remember(request, 'fred', a=1, b=2)
         self.assertEqual(policy.cookie.kw, {'a':1, 'b':2})
         self.assertEqual(result, [])
-        
+
     def test_forget(self):
         request = DummyRequest({})
         policy = self._makeOne(None, None)
@@ -482,7 +482,7 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         request = self._makeRequest(None)
         result = helper.identify(request)
         self.assertEqual(result, None)
-        
+
     def test_identify_good_cookie_include_ip(self):
         helper = self._makeOne('secret', include_ip=True)
         request = self._makeRequest('ticket')
@@ -605,7 +605,7 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         request = self._makeRequest('ticket')
         result = helper.identify(request)
         self.assertEqual(result, None)
-    
+
     def test_identify_cookie_timed_out(self):
         helper = self._makeOne('secret', timeout=1)
         request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=bogus'})
@@ -828,7 +828,7 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertEqual(result[1][0], 'Set-Cookie')
         self.assertTrue(result[1][1].endswith('; Path=/; Domain=example.com'))
         self.assertTrue(result[1][1].startswith('auth_tkt='))
-        
+
     def test_remember_binary_userid(self):
         import base64
         helper = self._makeOne('secret')
@@ -1106,6 +1106,78 @@ class TestSessionAuthenticationPolicy(unittest.TestCase):
         self.assertEqual(request.session.get('userid'), None)
         self.assertEqual(result, [])
 
+class TestBasicAuthAuthenticationPolicy(unittest.TestCase):
+    def _getTargetClass(self):
+        from pyramid.authentication import BasicAuthAuthenticationPolicy as cls
+        return cls
+
+    def _makeOne(self, check):
+        return self._getTargetClass()(check, realm='SomeRealm')
+
+    def test_class_implements_IAuthenticationPolicy(self):
+        from zope.interface.verify import verifyClass
+        from pyramid.interfaces import IAuthenticationPolicy
+        verifyClass(IAuthenticationPolicy, self._getTargetClass())
+
+    def test_unauthenticated_userid(self):
+        import base64
+        request = testing.DummyRequest()
+        request.headers['Authorization'] = 'Basic %s' % base64.b64encode(
+            'chrisr:password')
+        policy = self._makeOne(None)
+        self.assertEqual(policy.unauthenticated_userid(request), 'chrisr')
+
+    def test_unauthenticated_userid_no_credentials(self):
+        request = testing.DummyRequest()
+        policy = self._makeOne(None)
+        self.assertEqual(policy.unauthenticated_userid(request), None)
+
+    def test_unauthenticated_bad_header(self):
+        request = testing.DummyRequest()
+        request.headers['Authorization'] = '...'
+        policy = self._makeOne(None)
+        self.assertEqual(policy.unauthenticated_userid(request), None)
+
+    def test_unauthenticated_userid_not_basic(self):
+        request = testing.DummyRequest()
+        request.headers['Authorization'] = 'Complicated things'
+        policy = self._makeOne(None)
+        self.assertEqual(policy.unauthenticated_userid(request), None)
+
+    def test_unauthenticated_userid_corrupt_base64(self):
+        request = testing.DummyRequest()
+        request.headers['Authorization'] = 'Basic chrisr:password'
+        policy = self._makeOne(None)
+        self.assertEqual(policy.unauthenticated_userid(request), None)
+
+    def test_authenticated_userid(self):
+        import base64
+        request = testing.DummyRequest()
+        request.headers['Authorization'] = 'Basic %s' % base64.b64encode(
+            'chrisr:password')
+        def check(username, password, request):
+            return []
+        policy = self._makeOne(check)
+        self.assertEqual(policy.authenticated_userid(request), 'chrisr')
+
+    def test_unauthenticated_userid_invalid_payload(self):
+        import base64
+        request = testing.DummyRequest()
+        request.headers['Authorization'] = 'Basic %s' % base64.b64encode(
+            'chrisrpassword')
+        policy = self._makeOne(None)
+        self.assertEqual(policy.unauthenticated_userid(request), None)
+
+    def test_remember(self):
+        policy = self._makeOne(None)
+        self.assertEqual(policy.remember(None, None), [])
+
+    def test_forget(self):
+        policy = self._makeOne(None)
+        self.assertEqual(policy.forget(None), [
+            ('WWW-Authenticate', 'Basic realm="SomeRealm"')])
+
+
 class DummyContext:
     pass
 
@@ -1130,7 +1202,7 @@ class DummyRequest:
 class DummyWhoPlugin:
     def remember(self, environ, identity):
         return environ, identity
-    
+
     def forget(self, environ, identity):
         return environ, identity
 
@@ -1164,7 +1236,7 @@ class DummyAuthTktModule(object):
                 raise self.BadTicket()
             return self.timestamp, self.userid, self.tokens, self.user_data
         self.parse_ticket = parse_ticket
-        
+
         class AuthTicket(object):
             def __init__(self, secret, userid, remote_addr, **kw):
                 self.secret = secret
@@ -1186,4 +1258,4 @@ class DummyAuthTktModule(object):
 class DummyResponse:
     def __init__(self):
         self.headerlist = []
-        
+
