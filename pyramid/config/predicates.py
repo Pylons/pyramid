@@ -64,10 +64,7 @@ class PathInfoPredicate(object):
     
 class RequestParamPredicate(object):
     def __init__(self, val, config):
-        if not is_nonstr_iter(val):
-            val = (val,)
-        val = sorted(val)
-        self.val = val
+        val = as_sorted_tuple(val)
         reqs = []
         for p in val:
             k = p
@@ -76,6 +73,7 @@ class RequestParamPredicate(object):
                 k, v = p.split('=', 1)
                 k, v = k.strip(), v.strip()
             reqs.append((k, v))
+        self.val = val
         self.reqs = reqs
 
     def text(self):
@@ -163,9 +161,7 @@ class RequestTypePredicate(object):
     
 class MatchParamPredicate(object):
     def __init__(self, val, config):
-        if not is_nonstr_iter(val):
-            val = (val,)
-        val = sorted(val)
+        val = as_sorted_tuple(val)
         self.val = val
         reqs = [ p.split('=', 1) for p in val ]
         self.reqs = [ (x.strip(), y.strip()) for x, y in reqs ]
