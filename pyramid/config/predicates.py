@@ -80,7 +80,7 @@ class RequestParamPredicate(object):
 
     def text(self):
         return 'request_param %s' % ','.join(
-            ['%s = %s' % (x,y) if y else x for x, y in self.reqs]
+            ['%s=%s' % (x,y) if y else x for x, y in self.reqs]
         )
 
     phash = text
