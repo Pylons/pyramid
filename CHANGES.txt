@@ -8,6 +8,9 @@ Features
   predicate as a sequence.  Previously only a single string value was allowed.
   See https://github.com/Pylons/pyramid/pull/705
 
+- Comments with references to documentation sections placed in scaffold
+  ``.ini`` files.
+
 Bug Fixes
 ---------
 
