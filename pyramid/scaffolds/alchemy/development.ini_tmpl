@@ -1,3 +1,8 @@
+###
+# app configuration
+# http://docs.pylonsproject.org/projects/pyramid/en/latest/narr/environment.html
+###
+
 [app:main]
 use = egg:{{project}}
 
@@ -12,12 +17,23 @@ pyramid.includes =
 
 sqlalchemy.url = sqlite:///%(here)s/{{project}}.sqlite
 
+# By default, the toolbar only appears for clients from IP addresses
+# '127.0.0.1' and '::1'.
+# debugtoolbar.hosts = 127.0.0.1 ::1
+
+###
+# wsgi server configuration
+###
+
 [server:main]
 use = egg:waitress#main
 host = 0.0.0.0
 port = 6543
 
-# Begin logging configuration
+###
+# logging configuration
+# http://docs.pylonsproject.org/projects/pyramid/en/latest/narr/logging.html
+###
 
 [loggers]
 keys = root, {{package_logger}}, sqlalchemy
@@ -53,5 +69,3 @@ formatter = generic
 
 [formatter_generic]
 format = %(asctime)s %(levelname)-5.5s [%(name)s][%(threadName)s] %(message)s
-
-# End logging configuration
