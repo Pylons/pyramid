@@ -904,11 +904,12 @@ class ViewsConfiguratorMixin(object):
 
         request_param
 
-          This value can be any string.  A view declaration with this
-          argument ensures that the view will only be called when the
-          :term:`request` has a key in the ``request.params``
+          This value can be any string or any sequence of strings.  A view 
+          declaration with this argument ensures that the view will only be 
+          called when the :term:`request` has a key in the ``request.params``
           dictionary (an HTTP ``GET`` or ``POST`` variable) that has a
-          name which matches the supplied value.  If the value
+          name which matches the supplied value (if the value is a string)
+          or values (if the value is a tuple).  If any value
           supplied has a ``=`` sign in it,
           e.g. ``request_param="foo=123"``, then the key (``foo``)
           must both exist in the ``request.params`` dictionary, *and*
