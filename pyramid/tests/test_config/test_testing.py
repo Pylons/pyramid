@@ -23,6 +23,30 @@ class TestingConfiguratorMixinTests(unittest.TestCase):
         self.assertEqual(ut.groupids, ('group1', 'group2'))
         self.assertEqual(ut.permissive, False)
 
+    def test_testing_securitypolicy_remember_result(self):
+        from pyramid.security import remember
+        config = self._makeOne(autocommit=True)
+        pol = config.testing_securitypolicy(
+            'user', ('group1', 'group2'),
+            permissive=False, remember_result=True)
+        request = DummyRequest()
+        request.registry = config.registry
+        val = remember(request, 'fred')
+        self.assertEqual(pol.remembered, 'fred')
+        self.assertEqual(val, True)
+
+    def test_testing_securitypolicy_forget_result(self):
+        from pyramid.security import forget
+        config = self._makeOne(autocommit=True)
+        pol = config.testing_securitypolicy(
+            'user', ('group1', 'group2'),
+            permissive=False, forget_result=True)
+        request = DummyRequest()
+        request.registry = config.registry
+        val = forget(request)
+        self.assertEqual(pol.forgotten, True)
+        self.assertEqual(val, True)
+
     def test_testing_resources(self):
         from pyramid.traversal import find_resource
         from pyramid.interfaces import ITraverser

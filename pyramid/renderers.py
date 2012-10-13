@@ -367,6 +367,12 @@ class JSONP(JSON):
 
 @implementer(IChameleonLookup)
 class ChameleonRendererLookup(object):
+    spec_re = re.compile(
+        r'(?P<asset>[\w_.:/-]+)'
+        r'(?:\#(?P<defname>[\w_]+))?'
+        r'(\.(?P<ext>.*))'
+        )
+
     def __init__(self, impl, registry):
         self.impl = impl
         self.registry = registry
@@ -417,6 +423,12 @@ class ChameleonRendererLookup(object):
             return False
         return settings.get('reload_templates', False)
 
+    def _crack_spec(self, spec):
+        asset, macro, ext = self.spec_re.match(spec).group(
+            'asset', 'defname', 'ext'
+            )
+        return asset, macro, ext
+    
     def __call__(self, info):
         spec = self.get_spec(info.name, info.package)
         registry = info.registry
@@ -436,27 +448,22 @@ class ChameleonRendererLookup(object):
             # spec is a package:relpath asset spec
             renderer = registry.queryUtility(ITemplateRenderer, name=spec)
             if renderer is None:
-                p = re.compile(
-                    r'(?P<asset>[\w_.:/-]+)'
-                    r'(?:\#(?P<defname>[\w_]+))?'
-                    r'(\.(?P<ext>.*))'
-                    )
-                asset, macro, ext = p.match(spec).group(
-                    'asset', 'defname', 'ext'
-                    )
-                spec = '%s.%s' % (asset, ext)
+                asset, macro, ext = self._crack_spec(spec)
+                spec_without_macro = '%s.%s' % (asset, ext)
                 try:
-                    package_name, filename = spec.split(':', 1)
+                    package_name, filename = spec_without_macro.split(':', 1)
                 except ValueError: # pragma: no cover
                     # somehow we were passed a relative pathname; this
                     # should die
                     package_name = caller_package(4).__name__
-                    filename = spec
+                    filename = spec_without_macro
                 abspath = pkg_resources.resource_filename(package_name,
                                                           filename)
                 if not pkg_resources.resource_exists(package_name, filename):
                     raise ValueError(
-                        'Missing template asset: %s (%s)' % (spec, abspath))
+                        'Missing template asset: %s (%s)' % (
+                            spec_without_macro, abspath)
+                        )
                 renderer = self.impl(abspath, self, macro=macro)
                 settings = info.settings
                 if not settings.get('reload_assets'):

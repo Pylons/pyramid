@@ -53,10 +53,17 @@ class DummyRootFactory(object):
 
 class DummySecurityPolicy(object):
     """ A standin for both an IAuthentication and IAuthorization policy """
-    def __init__(self, userid=None, groupids=(), permissive=True):
+    def __init__(self, userid=None, groupids=(), permissive=True,
+                 remember_result=None, forget_result=None):
         self.userid = userid
         self.groupids = groupids
         self.permissive = permissive
+        if remember_result is None:
+            remember_result = []
+        if forget_result is None:
+            forget_result = []
+        self.remember_result = remember_result
+        self.forget_result = forget_result
 
     def authenticated_userid(self, request):
         return self.userid
@@ -73,10 +80,12 @@ class DummySecurityPolicy(object):
         return effective_principals
 
     def remember(self, request, principal, **kw):
-        return []
+        self.remembered = principal
+        return self.remember_result
 
     def forget(self, request):
-        return []
+        self.forgotten = True
+        return self.forget_result
 
     def permits(self, context, principals, permission):
         return self.permissive

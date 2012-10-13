@@ -19,7 +19,8 @@ from pyramid.config.util import action_method
 class TestingConfiguratorMixin(object):
     # testing API
     def testing_securitypolicy(self, userid=None, groupids=(),
-                               permissive=True):
+                               permissive=True, remember_result=None,
+                               forget_result=None):
         """Unit/integration testing helper: Registers a pair of faux
         :app:`Pyramid` security policies: a :term:`authentication
         policy` and a :term:`authorization policy`.
@@ -30,6 +31,24 @@ class TestingConfiguratorMixin(object):
         this policy allows all access.  If ``permissive`` is false, a
         nonpermissive :term:`authorization policy` is registered; this
         policy denies all access.
+
+        ``remember_result``, if provided, should be the result returned by
+        the ``remember`` method of the faux authentication policy.  If it is
+        not provided (or it is provided, and is ``None``), the default value
+        ``[]`` (the empty list) will be returned by ``remember``.
+
+        .. note::
+
+           ``remember_result`` is new as of Pyramid 1.4.
+
+        ``forget_result``, if provided, should be the result returned by
+        the ``forget`` method of the faux authentication policy.  If it is
+        not provided (or it is provided, and is ``None``), the default value
+        ``[]`` (the empty list) will be returned by ``forget``.
+
+        .. note::
+
+           ``forget_result`` is new as of Pyramid 1.4.
 
         The behavior of the registered :term:`authentication policy`
         depends on the values provided for the ``userid`` and
@@ -47,9 +66,12 @@ class TestingConfiguratorMixin(object):
         :func:`pyramid.security.principals_allowed_by_permission`.
         """
         from pyramid.testing import DummySecurityPolicy
-        policy = DummySecurityPolicy(userid, groupids, permissive)
+        policy = DummySecurityPolicy(
+            userid, groupids, permissive, remember_result, forget_result
+            )
         self.registry.registerUtility(policy, IAuthorizationPolicy)
         self.registry.registerUtility(policy, IAuthenticationPolicy)
+        return policy
 
     def testing_resources(self, resources):
         """Unit/integration testing helper: registers a dictionary of
