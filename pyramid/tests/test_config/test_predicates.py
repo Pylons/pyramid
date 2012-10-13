@@ -317,6 +317,70 @@ class Test_CheckCSRFTokenPredicate(unittest.TestCase):
         result = inst(None, request)
         self.assertEqual(result, True)
 
+class TestHeaderPredicate(unittest.TestCase):
+    def _makeOne(self, val):
+        from pyramid.config.predicates import HeaderPredicate
+        return HeaderPredicate(val, None)
+
+    def test___call___true_exists(self):
+        inst = self._makeOne('abc')
+        request = Dummy()
+        request.headers = {'abc':1}
+        result = inst(None, request)
+        self.assertTrue(result)
+
+    def test___call___true_withval(self):
+        inst = self._makeOne('abc:1')
+        request = Dummy()
+        request.headers = {'abc':'1'}
+        result = inst(None, request)
+        self.assertTrue(result)
+
+    def test___call___true_withregex(self):
+        inst = self._makeOne(r'abc:\d+')
+        request = Dummy()
+        request.headers = {'abc':'1'}
+        result = inst(None, request)
+        self.assertTrue(result)
+
+    def test___call___false_withregex(self):
+        inst = self._makeOne(r'abc:\d+')
+        request = Dummy()
+        request.headers = {'abc':'a'}
+        result = inst(None, request)
+        self.assertFalse(result)
+
+    def test___call___false(self):
+        inst = self._makeOne('abc')
+        request = Dummy()
+        request.headers = {}
+        result = inst(None, request)
+        self.assertFalse(result)
+
+    def test_text_exists(self):
+        inst = self._makeOne('abc')
+        self.assertEqual(inst.text(), 'header abc')
+
+    def test_text_withval(self):
+        inst = self._makeOne('abc:1')
+        self.assertEqual(inst.text(), 'header abc=1')
+
+    def test_text_withregex(self):
+        inst = self._makeOne(r'abc:\d+')
+        self.assertEqual(inst.text(), r'header abc=\d+')
+
+    def test_phash_exists(self):
+        inst = self._makeOne('abc')
+        self.assertEqual(inst.phash(), 'header abc')
+
+    def test_phash_withval(self):
+        inst = self._makeOne('abc:1')
+        self.assertEqual(inst.phash(), "header abc=1")
+
+    def test_phash_withregex(self):
+        inst = self._makeOne(r'abc:\d+')
+        self.assertEqual(inst.phash(), r'header abc=\d+')
+
 class predicate(object):
     def __repr__(self):
         return 'predicate'

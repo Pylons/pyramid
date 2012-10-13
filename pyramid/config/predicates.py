@@ -97,15 +97,15 @@ class HeaderPredicate(object):
         name = val
         v = None
         if ':' in name:
-            name, v = name.split(':', 1)
+            name, val_str = name.split(':', 1)
             try:
-                v = re.compile(v)
+                v = re.compile(val_str)
             except re.error as why:
                 raise ConfigurationError(why.args[0])
         if v is None:
             self._text = 'header %s' % (name,)
         else:
-            self._text = 'header %s = %s' % (name, v)
+            self._text = 'header %s=%s' % (name, val_str)
         self.name = name
         self.val = v
 
