@@ -64,28 +64,35 @@ class PathInfoPredicate(object):
     
 class RequestParamPredicate(object):
     def __init__(self, val, config):
-        name = val
-        v = None
-        if '=' in name:
-            name, v = name.split('=', 1)
-            name, v = name.strip(), v.strip()
-        if v is None:
-            self._text = 'request_param %s' % (name,)
-        else:
-            self._text = 'request_param %s = %s' % (name, v)
-        self.name = name
-        self.val = v
+        if not is_nonstr_iter(val):
+            val = (val,)
+        val = sorted(val)
+        self.val = val
+        reqs = []
+        for p in val:
+            k = p
+            v = None
+            if '=' in p:
+                k, v = p.split('=', 1)
+                k, v = k.strip(), v.strip()
+            reqs.append((k, v))
+        self.reqs = reqs
 
     def text(self):
-        return self._text
+        return 'request_param %s' % ','.join(
+            ['%s = %s' % (x,y) if y else x for x, y in self.reqs]
+        )
 
     phash = text
 
     def __call__(self, context, request):
-        if self.val is None:
-            return self.name in request.params
-        return request.params.get(self.name) == self.val
-    
+        for k, v in self.reqs:
+            actual = request.params.get(k)
+            if actual is None:
+                return False
+            if v is not None and actual != v:
+                return False
+        return True
 
 class HeaderPredicate(object):
     def __init__(self, val, config):

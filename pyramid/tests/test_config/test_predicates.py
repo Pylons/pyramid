@@ -117,6 +117,20 @@ class TestRequestParamPredicate(unittest.TestCase):
         result = inst(None, request)
         self.assertTrue(result)
 
+    def test___call___true_multi(self):
+        inst = self._makeOne(('abc', 'def =2 '))
+        request = Dummy()
+        request.params = {'abc':'1', 'def': '2'}
+        result = inst(None, request)
+        self.assertTrue(result)
+
+    def test___call___false_multi(self):
+        inst = self._makeOne(('abc=3', 'def =2 '))
+        request = Dummy()
+        request.params = {'abc':'3', 'def': '1'}
+        result = inst(None, request)
+        self.assertFalse(result)
+
     def test___call___false(self):
         inst = self._makeOne('abc')
         request = Dummy()
@@ -131,6 +145,10 @@ class TestRequestParamPredicate(unittest.TestCase):
     def test_text_withval(self):
         inst = self._makeOne('abc=  1')
         self.assertEqual(inst.text(), 'request_param abc = 1')
+
+    def test_text_multi(self):
+        inst = self._makeOne(('abc=  1', 'def'))
+        self.assertEqual(inst.text(), 'request_param abc = 1,def')
 
     def test_phash_exists(self):
         inst = self._makeOne('abc')
