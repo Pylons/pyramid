@@ -1,7 +1,5 @@
 import re
 
-from pyramid.compat import is_nonstr_iter
-
 from pyramid.exceptions import ConfigurationError
 
 from pyramid.traversal import (
