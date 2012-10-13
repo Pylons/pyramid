@@ -290,12 +290,13 @@ configured view.
   of the ``REQUEST_METHOD`` of the :term:`WSGI` environment.
 
 ``request_param``
-  This value can be any string.  A view declaration with this argument
-  ensures that the view will only be called when the :term:`request` has a
-  key in the ``request.params`` dictionary (an HTTP ``GET`` or ``POST``
-  variable) that has a name which matches the supplied value.
+  This value can be any string or a sequence of strings.  A view declaration 
+  with this argument ensures that the view will only be called when the 
+  :term:`request` has a key in the ``request.params`` dictionary (an HTTP 
+  ``GET`` or ``POST`` variable) that has a name which matches the a 
+  supplied value.
 
-  If the value supplied has a ``=`` sign in it,
+  If any value supplied has a ``=`` sign in it,
   e.g. ``request_param="foo=123"``, then the key (``foo``) must both exist
   in the ``request.params`` dictionary, *and* the value must match the right
   hand side of the expression (``123``) for the view to "match" the current
