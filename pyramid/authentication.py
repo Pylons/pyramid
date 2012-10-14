@@ -1,3 +1,4 @@
+import binascii
 from codecs import utf_8_decode
 from codecs import utf_8_encode
 from hashlib import md5
@@ -330,13 +331,13 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
        Optional.
 
     ``path``
- 
+
        Default: ``/``. The path for which the auth_tkt cookie is valid.
        May be desirable if the application only serves part of a domain.
        Optional.
- 
+
     ``http_only``
- 
+
        Default: ``False``. Hide cookie from JavaScript by setting the
        HttpOnly flag. Not honored by all browsers.
        Optional.
@@ -553,7 +554,7 @@ class AuthTktCookieHelper(object):
         text_type: ('b64unicode', lambda x: b64encode(utf_8_encode(x)[0])),
         binary_type: ('b64str', lambda x: b64encode(x)),
         }
-    
+
     def __init__(self, secret, cookie_name='auth_tkt', secure=False,
                  include_ip=False, timeout=None, reissue_time=None,
                  max_age=None, http_only=False, path="/", wild_domain=True):
@@ -632,7 +633,7 @@ class AuthTktCookieHelper(object):
             remote_addr = environ['REMOTE_ADDR']
         else:
             remote_addr = '0.0.0.0'
-        
+
         try:
             timestamp, userid, tokens, user_data = self.parse_ticket(
                 self.secret, cookie, remote_addr)
@@ -641,7 +642,7 @@ class AuthTktCookieHelper(object):
 
         now = self.now # service tests
 
-        if now is None: 
+        if now is None:
             now = time_mod.time()
 
         if self.timeout and ( (timestamp + self.timeout) < now ):
@@ -689,7 +690,7 @@ class AuthTktCookieHelper(object):
         environ = request.environ
         request._authtkt_reissue_revoked = True
         return self._get_cookies(environ, '', max_age=EXPIRE)
-    
+
     def remember(self, request, userid, max_age=None, tokens=()):
         """ Return a set of Set-Cookie headers; when set into a response,
         these headers will represent a valid authentication ticket.
@@ -783,7 +784,7 @@ class SessionAuthenticationPolicy(CallbackAuthenticationPolicy):
         Pyramid debug logger about the results of various authentication
         steps.  The output from debugging is useful for reporting to maillist
         or IRC channels when asking for support.
-       
+
     """
 
     def __init__(self, prefix='auth.', callback=None, debug=False):
@@ -806,3 +807,94 @@ class SessionAuthenticationPolicy(CallbackAuthenticationPolicy):
     def unauthenticated_userid(self, request):
         return request.session.get(self.userid_key)
 
+
+@implementer(IAuthenticationPolicy)
+class BasicAuthAuthenticationPolicy(CallbackAuthenticationPolicy):
+    """ A :app:`Pyramid` authentication policy which uses HTTP standard basic
+    authentication protocol to authenticate users.  To use this policy you will
+    need to provide a callback which checks the supplied user credentials
+    against your source of login data.
+
+    Constructor Arguments
+
+    ``check``
+
+       A callback function passed a username, password and request, in that
+       order as positional arguments.  Expected to return ``None`` if the
+       userid doesn't exist or a sequence of principal identifiers (possibly
+       empty) if the user does exist.
+
+    ``realm``
+
+       Default: ``"Realm"``.  The Basic Auth Realm string.  Usually displayed to
+       the user by the browser in the login dialog.
+
+    ``debug``
+
+        Default: ``False``.  If ``debug`` is ``True``, log messages to the
+        Pyramid debug logger about the results of various authentication
+        steps.  The output from debugging is useful for reporting to maillist
+        or IRC channels when asking for support.
+
+    **Issuing a challenge**
+
+    Regular browsers will not send username/password credentials unless they
+    first receive a challenge from the server.  The following recipe will
+    register a view that will send a Basic Auth challenge to the user whenever
+    there is an attempt to call a view which results in a Forbidden response::
+
+        from pyramid.httpexceptions import HTTPForbidden
+        from pyramid.httpexceptions import HTTPUnauthorized
+        from pyramid.security import forget
+        from pyramid.view import view_config
+
+        @view_config(context=HTTPForbidden)
+        def basic_challenge(request):
+            response = HTTPUnauthorized()
+            response.headers.update(forget(request))
+            return response
+    """
+    def __init__(self, check, realm='Realm', debug=False):
+        self.check = check
+        self.realm = realm
+        self.debug = debug
+
+    def unauthenticated_userid(self, request):
+        credentials = self._get_credentials(request)
+        if credentials:
+            return credentials[0]
+
+    def remember(self, request, principal, **kw):
+        return []
+
+    def forget(self, request):
+        return [('WWW-Authenticate', 'Basic realm="%s"' % self.realm)]
+
+    def callback(self, username, request):
+        # Username arg is ignored.  Unfortunately _get_credentials winds up
+        # getting called twice when authenticated_userid is called.  Avoiding
+        # that, however, winds up duplicating logic from the superclass.
+        credentials = self._get_credentials(request)
+        if credentials:
+            username, password = credentials
+            return self.check(username, password, request)
+
+    def _get_credentials(self, request):
+        authorization = request.headers.get('Authorization')
+        if not authorization:
+            return None
+        try:
+            authmeth, auth = authorization.split(' ', 1)
+        except ValueError: # not enough values to unpack
+            return None
+        if authmeth.lower() != 'basic':
+            return None
+        try:
+            auth = b64decode(auth.strip()).decode('ascii')
+        except (TypeError, binascii.Error): # can't decode
+            return None
+        try:
+            username, password = auth.split(':', 1)
+        except ValueError: # not enough values to unpack
+            return None
+        return username, password

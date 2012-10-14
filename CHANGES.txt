@@ -11,6 +11,9 @@ Features
 - Comments with references to documentation sections placed in scaffold
   ``.ini`` files.
 
+- Added an HTTP Basic authentication policy
+  at ``pyramid.authentication.BasicAuthAuthenticationPolicy``.
+
 Bug Fixes
 ---------
 
@@ -30,7 +33,7 @@ Bug Fixes
 - When registering a view configuration that named a Chameleon ZPT renderer
   with a macro name in it (e.g. ``renderer='some/template#somemacro.pt``) as
   well as a view configuration without a macro name it it that pointed to the
-  same template (e.g. ``renderer='some/template.pt'), internal caching could
+  same template (e.g. ``renderer='some/template.pt'``), internal caching could
   confuse the two, and your code might have rendered one instead of the
   other.
 
