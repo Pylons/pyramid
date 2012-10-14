@@ -826,7 +826,7 @@ class BasicAuthAuthenticationPolicy(CallbackAuthenticationPolicy):
 
     ``realm``
 
-       Default: ``Realm``.  The Basic Auth Realm string.  Usually displayed to
+       Default: ``"Realm"``.  The Basic Auth Realm string.  Usually displayed to
        the user by the browser in the login dialog.
 
     ``debug``
@@ -836,6 +836,23 @@ class BasicAuthAuthenticationPolicy(CallbackAuthenticationPolicy):
         steps.  The output from debugging is useful for reporting to maillist
         or IRC channels when asking for support.
 
+    **Issuing a challenge**
+
+    Regular browsers will not send username/password credentials unless they
+    first receive a challenge from the server.  The following recipe will
+    register a view that will send a Basic Auth challenge to the user whenever
+    there is an attempt to call a view which results in a Forbidden response::
+
+        from pyramid.httpexceptions import HTTPForbidden
+        from pyramid.httpexceptions import HTTPUnauthorized
+        from pyramid.security import forget
+        from pyramid.view import view_config
+
+        @view_config(context=HTTPForbidden)
+        def basic_challenge(request):
+            response = HTTPUnauthorized()
+            response.headers.update(forget(request))
+            return response
     """
     def __init__(self, check, realm='Realm', debug=False):
         self.check = check
