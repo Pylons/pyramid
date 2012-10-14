@@ -11,7 +11,8 @@ Features
 - Comments with references to documentation sections placed in scaffold
   ``.ini`` files.
 
-- Added an HTTP Basic authentication policy.
+- Added an HTTP Basic authentication policy
+  at ``pyramid.authentication.BasicAuthAuthenticationPolicy``.
 
 Bug Fixes
 ---------
