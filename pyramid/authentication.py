@@ -890,8 +890,8 @@ class BasicAuthAuthenticationPolicy(CallbackAuthenticationPolicy):
         if authmeth.lower() != 'basic':
             return None
         try:
-            auth = auth.strip().decode('base64')
-        except binascii.Error: # can't decode
+            auth = b64decode(auth.strip()).decode('ascii')
+        except (TypeError, binascii.Error): # can't decode
             return None
         try:
             username, password = auth.split(':', 1)

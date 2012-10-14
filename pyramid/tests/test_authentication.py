@@ -1123,7 +1123,7 @@ class TestBasicAuthAuthenticationPolicy(unittest.TestCase):
         import base64
         request = testing.DummyRequest()
         request.headers['Authorization'] = 'Basic %s' % base64.b64encode(
-            'chrisr:password')
+            bytes_('chrisr:password')).decode('ascii')
         policy = self._makeOne(None)
         self.assertEqual(policy.unauthenticated_userid(request), 'chrisr')
 
@@ -1154,7 +1154,7 @@ class TestBasicAuthAuthenticationPolicy(unittest.TestCase):
         import base64
         request = testing.DummyRequest()
         request.headers['Authorization'] = 'Basic %s' % base64.b64encode(
-            'chrisr:password')
+            bytes_('chrisr:password')).decode('ascii')
         def check(username, password, request):
             return []
         policy = self._makeOne(check)
@@ -1164,7 +1164,7 @@ class TestBasicAuthAuthenticationPolicy(unittest.TestCase):
         import base64
         request = testing.DummyRequest()
         request.headers['Authorization'] = 'Basic %s' % base64.b64encode(
-            'chrisrpassword')
+            bytes_('chrisrpassword')).decode('ascii')
         policy = self._makeOne(None)
         self.assertEqual(policy.unauthenticated_userid(request), None)
 
