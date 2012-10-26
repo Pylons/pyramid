@@ -117,6 +117,20 @@ class TestRequestParamPredicate(unittest.TestCase):
         result = inst(None, request)
         self.assertTrue(result)
 
+    def test___call___true_multi(self):
+        inst = self._makeOne(('abc', 'def =2 '))
+        request = Dummy()
+        request.params = {'abc':'1', 'def': '2'}
+        result = inst(None, request)
+        self.assertTrue(result)
+
+    def test___call___false_multi(self):
+        inst = self._makeOne(('abc=3', 'def =2 '))
+        request = Dummy()
+        request.params = {'abc':'3', 'def': '1'}
+        result = inst(None, request)
+        self.assertFalse(result)
+
     def test___call___false(self):
         inst = self._makeOne('abc')
         request = Dummy()
@@ -130,7 +144,11 @@ class TestRequestParamPredicate(unittest.TestCase):
 
     def test_text_withval(self):
         inst = self._makeOne('abc=  1')
-        self.assertEqual(inst.text(), 'request_param abc = 1')
+        self.assertEqual(inst.text(), 'request_param abc=1')
+
+    def test_text_multi(self):
+        inst = self._makeOne(('abc=  1', 'def'))
+        self.assertEqual(inst.text(), 'request_param abc=1,def')
 
     def test_phash_exists(self):
         inst = self._makeOne('abc')
@@ -138,7 +156,7 @@ class TestRequestParamPredicate(unittest.TestCase):
 
     def test_phash_withval(self):
         inst = self._makeOne('abc=   1')
-        self.assertEqual(inst.phash(), "request_param abc = 1")
+        self.assertEqual(inst.phash(), "request_param abc=1")
 
 class TestMatchParamPredicate(unittest.TestCase):
     def _makeOne(self, val):
@@ -298,6 +316,123 @@ class Test_CheckCSRFTokenPredicate(unittest.TestCase):
         request = Dummy()
         result = inst(None, request)
         self.assertEqual(result, True)
+
+class TestHeaderPredicate(unittest.TestCase):
+    def _makeOne(self, val):
+        from pyramid.config.predicates import HeaderPredicate
+        return HeaderPredicate(val, None)
+
+    def test___call___true_exists(self):
+        inst = self._makeOne('abc')
+        request = Dummy()
+        request.headers = {'abc':1}
+        result = inst(None, request)
+        self.assertTrue(result)
+
+    def test___call___true_withval(self):
+        inst = self._makeOne('abc:1')
+        request = Dummy()
+        request.headers = {'abc':'1'}
+        result = inst(None, request)
+        self.assertTrue(result)
+
+    def test___call___true_withregex(self):
+        inst = self._makeOne(r'abc:\d+')
+        request = Dummy()
+        request.headers = {'abc':'1'}
+        result = inst(None, request)
+        self.assertTrue(result)
+
+    def test___call___false_withregex(self):
+        inst = self._makeOne(r'abc:\d+')
+        request = Dummy()
+        request.headers = {'abc':'a'}
+        result = inst(None, request)
+        self.assertFalse(result)
+
+    def test___call___false(self):
+        inst = self._makeOne('abc')
+        request = Dummy()
+        request.headers = {}
+        result = inst(None, request)
+        self.assertFalse(result)
+
+    def test_text_exists(self):
+        inst = self._makeOne('abc')
+        self.assertEqual(inst.text(), 'header abc')
+
+    def test_text_withval(self):
+        inst = self._makeOne('abc:1')
+        self.assertEqual(inst.text(), 'header abc=1')
+
+    def test_text_withregex(self):
+        inst = self._makeOne(r'abc:\d+')
+        self.assertEqual(inst.text(), r'header abc=\d+')
+
+    def test_phash_exists(self):
+        inst = self._makeOne('abc')
+        self.assertEqual(inst.phash(), 'header abc')
+
+    def test_phash_withval(self):
+        inst = self._makeOne('abc:1')
+        self.assertEqual(inst.phash(), "header abc=1")
+
+    def test_phash_withregex(self):
+        inst = self._makeOne(r'abc:\d+')
+        self.assertEqual(inst.phash(), r'header abc=\d+')
+
+class Test_PhysicalPathPredicate(unittest.TestCase):
+    def _makeOne(self, val, config):
+        from pyramid.config.predicates import PhysicalPathPredicate
+        return PhysicalPathPredicate(val, config)
+
+    def test_text(self):
+        inst = self._makeOne('/', None)
+        self.assertEqual(inst.text(), "physical_path = ('',)")
+
+    def test_phash(self):
+        inst = self._makeOne('/', None)
+        self.assertEqual(inst.phash(), "physical_path = ('',)")
+        
+    def test_it_call_val_tuple_True(self):
+        inst = self._makeOne(('', 'abc'), None)
+        root = Dummy()
+        root.__name__ = ''
+        root.__parent__ = None
+        context = Dummy()
+        context.__name__ = 'abc'
+        context.__parent__ = root
+        self.assertTrue(inst(context, None))
+
+    def test_it_call_val_list_True(self):
+        inst = self._makeOne(['', 'abc'], None)
+        root = Dummy()
+        root.__name__ = ''
+        root.__parent__ = None
+        context = Dummy()
+        context.__name__ = 'abc'
+        context.__parent__ = root
+        self.assertTrue(inst(context, None))
+
+    def test_it_call_val_str_True(self):
+        inst = self._makeOne('/abc', None)
+        root = Dummy()
+        root.__name__ = ''
+        root.__parent__ = None
+        context = Dummy()
+        context.__name__ = 'abc'
+        context.__parent__ = root
+        self.assertTrue(inst(context, None))
+
+    def test_it_call_False(self):
+        inst = self._makeOne('/', None)
+        root = Dummy()
+        root.__name__ = ''
+        root.__parent__ = None
+        context = Dummy()
+        context.__name__ = 'abc'
+        context.__parent__ = root
+        self.assertFalse(inst(context, None))
 
 class predicate(object):
     def __repr__(self):

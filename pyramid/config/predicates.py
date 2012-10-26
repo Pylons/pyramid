@@ -1,18 +1,17 @@
 import re
 
-from pyramid.compat import is_nonstr_iter
-
 from pyramid.exceptions import ConfigurationError
+
+from pyramid.compat import is_nonstr_iter
 
 from pyramid.traversal import (
     find_interface,
     traversal_path,
+    resource_path_tuple
     )
 
 from pyramid.urldispatch import _compile_route
-
 from pyramid.util import object_description
-
 from pyramid.session import check_csrf_token
 
 from .util import as_sorted_tuple
@@ -64,43 +63,48 @@ class PathInfoPredicate(object):
     
 class RequestParamPredicate(object):
     def __init__(self, val, config):
-        name = val
-        v = None
-        if '=' in name:
-            name, v = name.split('=', 1)
-            name, v = name.strip(), v.strip()
-        if v is None:
-            self._text = 'request_param %s' % (name,)
-        else:
-            self._text = 'request_param %s = %s' % (name, v)
-        self.name = name
-        self.val = v
+        val = as_sorted_tuple(val)
+        reqs = []
+        for p in val:
+            k = p
+            v = None
+            if '=' in p:
+                k, v = p.split('=', 1)
+                k, v = k.strip(), v.strip()
+            reqs.append((k, v))
+        self.val = val
+        self.reqs = reqs
 
     def text(self):
-        return self._text
+        return 'request_param %s' % ','.join(
+            ['%s=%s' % (x,y) if y else x for x, y in self.reqs]
+        )
 
     phash = text
 
     def __call__(self, context, request):
-        if self.val is None:
-            return self.name in request.params
-        return request.params.get(self.name) == self.val
-    
+        for k, v in self.reqs:
+            actual = request.params.get(k)
+            if actual is None:
+                return False
+            if v is not None and actual != v:
+                return False
+        return True
 
 class HeaderPredicate(object):
     def __init__(self, val, config):
         name = val
         v = None
         if ':' in name:
-            name, v = name.split(':', 1)
+            name, val_str = name.split(':', 1)
             try:
-                v = re.compile(v)
+                v = re.compile(val_str)
             except re.error as why:
                 raise ConfigurationError(why.args[0])
         if v is None:
             self._text = 'header %s' % (name,)
         else:
-            self._text = 'header %s = %s' % (name, v)
+            self._text = 'header %s=%s' % (name, val_str)
         self.name = name
         self.val = v
 
@@ -156,9 +160,7 @@ class RequestTypePredicate(object):
     
 class MatchParamPredicate(object):
     def __init__(self, val, config):
-        if not is_nonstr_iter(val):
-            val = (val,)
-        val = sorted(val)
+        val = as_sorted_tuple(val)
         self.val = val
         reqs = [ p.split('=', 1) for p in val ]
         self.reqs = [ (x.strip(), y.strip()) for x, y in reqs ]
@@ -248,4 +250,20 @@ class CheckCSRFTokenPredicate(object):
                 val = 'csrf_token'
             return self.check_csrf_token(request, val, raises=False)
         return True
+
+class PhysicalPathPredicate(object):
+    def __init__(self, val, config):
+        if is_nonstr_iter(val):
+            self.val = tuple(val)
+        else:
+            val = tuple(filter(None, val.split('/')))
+            self.val = ('',) + val
+
+    def text(self):
+        return 'physical_path = %s' % (self.val,)
+
+    phash = text
+
+    def __call__(self, context, request):
+        return resource_path_tuple(context) == self.val
 

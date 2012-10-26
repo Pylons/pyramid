@@ -68,7 +68,7 @@ testing_extras = tests_require + [
     ]
 
 setup(name='pyramid',
-      version='1.4a2',
+      version='1.4a3',
       description=('The Pyramid web application development framework, a '
                    'Pylons project'),
       long_description=README + '\n\n' +  CHANGES,
@@ -79,6 +79,7 @@ setup(name='pyramid',
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.2",
+        "Programming Language :: Python :: 3.3",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
         "Framework :: Pyramid",

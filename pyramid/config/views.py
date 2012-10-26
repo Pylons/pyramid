@@ -904,11 +904,12 @@ class ViewsConfiguratorMixin(object):
 
         request_param
 
-          This value can be any string.  A view declaration with this
-          argument ensures that the view will only be called when the
-          :term:`request` has a key in the ``request.params``
+          This value can be any string or any sequence of strings.  A view 
+          declaration with this argument ensures that the view will only be 
+          called when the :term:`request` has a key in the ``request.params``
           dictionary (an HTTP ``GET`` or ``POST`` variable) that has a
-          name which matches the supplied value.  If the value
+          name which matches the supplied value (if the value is a string)
+          or values (if the value is a tuple).  If any value
           supplied has a ``=`` sign in it,
           e.g. ``request_param="foo=123"``, then the key (``foo``)
           must both exist in the ``request.params`` dictionary, *and*
@@ -1012,6 +1013,22 @@ class ViewsConfiguratorMixin(object):
           have been configured.
          
           .. versionadded:: 1.4a2
+
+        physical_path
+
+          If specified, this value should be a string or a tuple representing
+          the :term:`physical path` of the context found via traversal for this
+          predicate to match as true.  For example: ``physical_path='/'`` or
+          ``physical_path='/a/b/c'`` or ``physical_path=('', 'a', 'b', 'c')``.
+          This is not a path prefix match or a regex, it's a whole-path match.
+          It's useful when you want to always potentially show a view when some
+          object is traversed to, but you can't be sure about what kind of
+          object it will be, so you can't use the ``context`` predicate.  The
+          individual path elements inbetween slash characters or in tuple
+          elements should be the Unicode representation of the name of the
+          resource and should not be encoded in any way.
+
+          .. versionadded:: 1.4a3
 
         custom_predicates
 
@@ -1369,6 +1386,7 @@ class ViewsConfiguratorMixin(object):
             ('request_type', p.RequestTypePredicate),
             ('match_param', p.MatchParamPredicate),
             ('check_csrf', p.CheckCSRFTokenPredicate),
+            ('physical_path', p.PhysicalPathPredicate),
             ('custom', p.CustomPredicate),
             ):
             self.add_view_predicate(name, factory)
