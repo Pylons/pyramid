@@ -13,10 +13,10 @@ Releasing Pyramid
 
   Make sure statement coverage is at 100%::
 
-- Run Windows tests for Python 2.6, 2.7, and 3.2 if feasible.
+- Run Windows tests for Python 2.6, 2.7, 3.2, and 3.3 if feasible.
 
-- Make sure all scaffold tests pass (Py 2.6, 2.7, 3.2 and pypy on UNIX; this
-  doesn't work on Windows):
+- Make sure all scaffold tests pass (Py 2.6, 2.7, 3.2, 3.3 and pypy on UNIX;
+  this doesn't work on Windows):
 
   $ python pyramid/scaffolds/tests.py
 

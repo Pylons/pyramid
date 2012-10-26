@@ -165,6 +165,37 @@ Minor Feature Additions
 - Add ``Base.metadata.bind = engine`` to ``alchemy`` scaffold, so that tables
   defined imperatively will work.
 
+- Comments with references to documentation sections placed in scaffold
+  ``.ini`` files.
+
+- Allow multiple values to be specified to the ``request_param`` view/route
+  predicate as a sequence.  Previously only a single string value was allowed.
+  See https://github.com/Pylons/pyramid/pull/705
+
+- Added an HTTP Basic authentication policy
+  at :class:`pyramid.authentication.BasicAuthAuthenticationPolicy`.
+
+- The :meth:`pyramid.config.Configurator.testing_securitypolicy` method now
+  returns the policy object it creates.
+
+- The DummySecurityPolicy created by
+  :meth:`pyramid.config.testing_securitypolicy` now sets a ``forgotten`` value 
+  on the policy (the value ``True``) when its ``forget`` method is called.
+
+
+- The DummySecurityPolicy created by
+  :meth:`pyramid.config.testing_securitypolicy` now sets a
+  ``remembered`` value on the policy, which is the value of the ``principal``
+  argument it's called with when its ``remember`` method is called.
+
+- New ``physical_path`` view predicate.  If specified, this value should be a
+  string or a tuple representing the physical traversal path of the context
+  found via traversal for this predicate to match as true.  For example:
+  ``physical_path='/'`` or ``physical_path='/a/b/c'`` or ``physical_path=('',
+  'a', 'b', 'c')``.  It's useful when you want to always potentially show a
+  view when some object is traversed to, but you can't be sure about what kind
+  of object it will be, so you can't use the ``context`` predicate.  
+
 Backwards Incompatibilities
 ---------------------------
 
