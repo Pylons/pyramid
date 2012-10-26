@@ -2,15 +2,16 @@ import re
 
 from pyramid.exceptions import ConfigurationError
 
+from pyramid.compat import is_nonstr_iter
+
 from pyramid.traversal import (
     find_interface,
     traversal_path,
+    resource_path_tuple
     )
 
 from pyramid.urldispatch import _compile_route
-
 from pyramid.util import object_description
-
 from pyramid.session import check_csrf_token
 
 from .util import as_sorted_tuple
@@ -249,4 +250,20 @@ class CheckCSRFTokenPredicate(object):
                 val = 'csrf_token'
             return self.check_csrf_token(request, val, raises=False)
         return True
+
+class PhysicalPathPredicate(object):
+    def __init__(self, val, config):
+        if is_nonstr_iter(val):
+            self.val = tuple(val)
+        else:
+            val = tuple(filter(None, val.split('/')))
+            self.val = ('',) + val
+
+    def text(self):
+        return 'physical_path = %s' % (self.val,)
+
+    phash = text
+
+    def __call__(self, context, request):
+        return resource_path_tuple(context) == self.val
 

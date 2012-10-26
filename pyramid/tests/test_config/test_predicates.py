@@ -381,6 +381,59 @@ class TestHeaderPredicate(unittest.TestCase):
         inst = self._makeOne(r'abc:\d+')
         self.assertEqual(inst.phash(), r'header abc=\d+')
 
+class Test_PhysicalPathPredicate(unittest.TestCase):
+    def _makeOne(self, val, config):
+        from pyramid.config.predicates import PhysicalPathPredicate
+        return PhysicalPathPredicate(val, config)
+
+    def test_text(self):
+        inst = self._makeOne('/', None)
+        self.assertEqual(inst.text(), "physical_path = ('',)")
+
+    def test_phash(self):
+        inst = self._makeOne('/', None)
+        self.assertEqual(inst.phash(), "physical_path = ('',)")
+        
+    def test_it_call_val_tuple_True(self):
+        inst = self._makeOne(('', 'abc'), None)
+        root = Dummy()
+        root.__name__ = ''
+        root.__parent__ = None
+        context = Dummy()
+        context.__name__ = 'abc'
+        context.__parent__ = root
+        self.assertTrue(inst(context, None))
+
+    def test_it_call_val_list_True(self):
+        inst = self._makeOne(['', 'abc'], None)
+        root = Dummy()
+        root.__name__ = ''
+        root.__parent__ = None
+        context = Dummy()
+        context.__name__ = 'abc'
+        context.__parent__ = root
+        self.assertTrue(inst(context, None))
+
+    def test_it_call_val_str_True(self):
+        inst = self._makeOne('/abc', None)
+        root = Dummy()
+        root.__name__ = ''
+        root.__parent__ = None
+        context = Dummy()
+        context.__name__ = 'abc'
+        context.__parent__ = root
+        self.assertTrue(inst(context, None))
+
+    def test_it_call_False(self):
+        inst = self._makeOne('/', None)
+        root = Dummy()
+        root.__name__ = ''
+        root.__parent__ = None
+        context = Dummy()
+        context.__name__ = 'abc'
+        context.__parent__ = root
+        self.assertFalse(inst(context, None))
+
 class predicate(object):
     def __repr__(self):
         return 'predicate'

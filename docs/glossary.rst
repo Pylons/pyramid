@@ -481,10 +481,24 @@ Glossary
      :app:`Pyramid` to form a workflow system.
 
    virtual root
-     A resource object representing the "virtual" root of a request; this
-     is typically the physical root object (the object returned by the
-     application root factory) unless :ref:`vhosting_chapter` is in
-     use.
+     A resource object representing the "virtual" root of a request; this is
+     typically the :term:`physical root` object unless :ref:`vhosting_chapter`
+     is in use.
+
+   physical root
+     The object returned by the application :term:`root factory`.  Unlike the
+     the :term:`virtual root` of a request, it is not impacted by
+     :ref:`vhosting_chapter`: it will always be the actual object returned by
+     the root factory, never a subobject.
+
+   physical path
+     The path required by a traversal which resolve a :term:`resource` starting
+     from the :term:`physical root`.  For example, the physical path of the
+     ``abc`` subobject of the physical root object is ``/abc``.  Physical paths
+     can also be specified as tuples where the first element is the empty
+     string (representing the root), and every other element is a Unicode
+     object, e.g. ``('', 'abc')``.  Physical paths are also sometimes called
+     "traversal paths".
 
    lineage
      An ordered sequence of objects based on a ":term:`location` -aware"
