@@ -10,11 +10,13 @@ Authentication Policies
 
   .. autoclass:: AuthTktAuthenticationPolicy
 
-  .. autoclass:: RepozeWho1AuthenticationPolicy
-
   .. autoclass:: RemoteUserAuthenticationPolicy
 
   .. autoclass:: SessionAuthenticationPolicy
+
+  .. autoclass:: BasicAuthAuthenticationPolicy
+
+  .. autoclass:: RepozeWho1AuthenticationPolicy
 
 Helper Classes
 ~~~~~~~~~~~~~~
