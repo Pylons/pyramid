@@ -1,3 +1,11 @@
+Next release
+============
+
+Features
+--------
+
+- Added an ``effective_principals`` route and view predicate.
+
 1.4a3 (2012-10-26)
 ==================
 

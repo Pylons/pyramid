@@ -431,6 +431,18 @@ configured view.
 
   .. versionadded:: 1.4a3
 
+``effective_principals``
+
+  If specified, this value should be a :term:`principal` identifier or a
+  sequence of principal identifiers.  If the
+  :func:`pyramid.security.effective_principals` method indicates that every
+  principal named in the argument list is present in the current request, this
+  predicate will return True; otherwise it will return False.  For example:
+  ``effective_principals=pyramid.security.Authenticated`` or
+  ``effective_principals=('fred', 'group:admins')``.
+
+  .. versionadded:: 1.4a4
+
 ``custom_predicates``
   If ``custom_predicates`` is specified, it must be a sequence of references
   to custom predicate callables.  Use custom predicates when no set of

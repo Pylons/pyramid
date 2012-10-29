@@ -1,5 +1,7 @@
 import unittest
 
+from pyramid import testing
+
 from pyramid.compat import text_
 
 class TestXHRPredicate(unittest.TestCase):
@@ -433,6 +435,60 @@ class Test_PhysicalPathPredicate(unittest.TestCase):
         context.__name__ = 'abc'
         context.__parent__ = root
         self.assertFalse(inst(context, None))
+
+class Test_EffectivePrincipalsPredicate(unittest.TestCase):
+    def setUp(self):
+        self.config = testing.setUp()
+
+    def tearDown(self):
+        testing.tearDown()
+        
+    def _makeOne(self, val, config):
+        from pyramid.config.predicates import EffectivePrincipalsPredicate
+        return EffectivePrincipalsPredicate(val, config)
+
+    def test_text(self):
+        inst = self._makeOne(('verna', 'fred'), None)
+        self.assertEqual(inst.text(),
+                         "effective_principals = ['fred', 'verna']")
+
+    def test_text_noniter(self):
+        inst = self._makeOne('verna', None)
+        self.assertEqual(inst.text(),
+                         "effective_principals = ['verna']")
+
+    def test_phash(self):
+        inst = self._makeOne(('verna', 'fred'), None)
+        self.assertEqual(inst.phash(),
+                         "effective_principals = ['fred', 'verna']")
+
+    def test_it_call_no_authentication_policy(self):
+        request = testing.DummyRequest()
+        inst = self._makeOne(('verna', 'fred'), None)
+        context = Dummy()
+        self.assertFalse(inst(context, request))
+
+    def test_it_call_authentication_policy_provides_superset(self):
+        request = testing.DummyRequest()
+        self.config.testing_securitypolicy('fred', groupids=('verna', 'bambi'))
+        inst = self._makeOne(('verna', 'fred'), None)
+        context = Dummy()
+        self.assertTrue(inst(context, request))
+
+    def test_it_call_authentication_policy_provides_superset_implicit(self):
+        from pyramid.security import Authenticated
+        request = testing.DummyRequest()
+        self.config.testing_securitypolicy('fred', groupids=('verna', 'bambi'))
+        inst = self._makeOne(Authenticated, None)
+        context = Dummy()
+        self.assertTrue(inst(context, request))
+
+    def test_it_call_authentication_policy_doesnt_provide_superset(self):
+        request = testing.DummyRequest()
+        self.config.testing_securitypolicy('fred')
+        inst = self._makeOne(('verna', 'fred'), None)
+        context = Dummy()
+        self.assertFalse(inst(context, request))
 
 class predicate(object):
     def __repr__(self):
