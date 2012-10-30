@@ -9,14 +9,24 @@ Authentication Policies
 .. automodule:: pyramid.authentication
 
   .. autoclass:: AuthTktAuthenticationPolicy
+     :members:
+     :inherited-members:
 
   .. autoclass:: RemoteUserAuthenticationPolicy
+     :members:
+     :inherited-members:
 
   .. autoclass:: SessionAuthenticationPolicy
+     :members:
+     :inherited-members:
 
   .. autoclass:: BasicAuthAuthenticationPolicy
+     :members:
+     :inherited-members:
 
   .. autoclass:: RepozeWho1AuthenticationPolicy
+     :members:
+     :inherited-members:
 
 Helper Classes
 ~~~~~~~~~~~~~~

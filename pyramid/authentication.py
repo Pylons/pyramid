@@ -48,6 +48,15 @@ class CallbackAuthenticationPolicy(object):
             logger.debug(methodname + ': ' + msg)
 
     def authenticated_userid(self, request):
+        """ Return the authenticated userid or ``None``.
+
+        If no callback is registered, this will be the same as
+        ``unauthenticated_userid``.
+
+        If a ``callback`` is registered, this will return the userid if
+        and only if the callback returns a value that is not ``None``.
+
+        """
         debug = self.debug
         userid = self.unauthenticated_userid(request)
         if userid is None:
@@ -78,6 +87,28 @@ class CallbackAuthenticationPolicy(object):
             )
 
     def effective_principals(self, request):
+        """ A list of effective principals derived from request.
+
+        This will return a list of principals including, at least,
+        :data:`pyramid.security.Everyone`. If there is no authenticated
+        userid, or the ``callback`` returns ``None``, this will be the
+        only principal:
+
+        .. code-block:: python
+
+            return [Everyone]
+
+        If the ``callback`` does not return ``None`` and an authenticated
+        userid is found, then the principals will include
+        :data:`pyramid.security.Authenticated`, the ``authenticated_userid``
+        and the list of principals returned by the ``callback``:
+
+        .. code-block:: python
+
+            extra_principals = callback(userid, request)
+            return [Everyone, Authenticated, userid] + extra_principals
+
+        """
         debug = self.debug
         effective_principals = [Everyone]
         userid = self.unauthenticated_userid(request)
@@ -163,6 +194,15 @@ class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
         return identifier
 
     def authenticated_userid(self, request):
+        """ Return the authenticated userid or ``None``.
+
+        If no callback is registered, this will be the same as
+        ``unauthenticated_userid``.
+
+        If a ``callback`` is registered, this will return the userid if
+        and only if the callback returns a value that is not ``None``.
+
+        """
         identity = self._get_identity(request)
         if identity is None:
             return None
@@ -172,12 +212,25 @@ class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
             return identity['repoze.who.userid']
 
     def unauthenticated_userid(self, request):
+        """ Return the ``repoze.who.userid`` key from the detected identity."""
         identity = self._get_identity(request)
         if identity is None:
             return None
         return identity['repoze.who.userid']
 
     def effective_principals(self, request):
+        """ A list of effective principals derived from the identity.
+
+        This will return a list of principals including, at least,
+        :data:`pyramid.security.Everyone`. If there is no identity, or
+        the ``callback`` returns ``None``, this will be the only principal.
+
+        If the ``callback`` does not return ``None`` and an identity is
+        found, then the principals will include
+        :data:`pyramid.security.Authenticated`, the ``authenticated_userid``
+        and the list of principals returned by the ``callback``.
+
+        """
         effective_principals = [Everyone]
         identity = self._get_identity(request)
         if identity is None:
@@ -196,6 +249,7 @@ class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
         return effective_principals
 
     def remember(self, request, principal, **kw):
+        """ Store the ``principal`` as ``repoze.who.userid``."""
         identifier = self._get_identifier(request)
         if identifier is None:
             return []
@@ -204,6 +258,12 @@ class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
         return identifier.remember(environ, identity)
 
     def forget(self, request):
+        """ Forget the current authenticated user.
+
+        Return headers that, if included in a response, will delete the
+        cookie responsible for tracking the current user.
+
+        """
         identifier = self._get_identifier(request)
         if identifier is None:
             return []
@@ -247,12 +307,19 @@ class RemoteUserAuthenticationPolicy(CallbackAuthenticationPolicy):
         self.debug = debug
 
     def unauthenticated_userid(self, request):
+        """ The ``REMOTE_USER`` value found within the ``environ``."""
         return request.environ.get(self.environ_key)
 
     def remember(self, request, principal, **kw):
+        """ A no-op. The ``REMOTE_USER`` does not provide a protocol for
+        remembering the user. This will be application-specific and can
+        be done somewhere else or in a subclass."""
         return []
 
     def forget(self, request):
+        """ A no-op. The ``REMOTE_USER`` does not provide a protocol for
+        forgetting the user. This will be application-specific and can
+        be done somewhere else or in a subclass."""
         return []
 
 @implementer(IAuthenticationPolicy)
@@ -388,16 +455,23 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
         self.debug = debug
 
     def unauthenticated_userid(self, request):
+        """ The userid key within the auth_tkt cookie."""
         result = self.cookie.identify(request)
         if result:
             return result['userid']
 
     def remember(self, request, principal, **kw):
         """ Accepts the following kw args: ``max_age=<int-seconds>,
-        ``tokens=<sequence-of-ascii-strings>``"""
+        ``tokens=<sequence-of-ascii-strings>``.
+
+        Return a list of headers which will set appropriate cookies on
+        the response.
+
+        """
         return self.cookie.remember(request, principal, **kw)
 
     def forget(self, request):
+        """ A list of headers which will delete appropriate cookies."""
         return self.cookie.forget(request)
 
 def b64encode(v):
@@ -860,14 +934,21 @@ class BasicAuthAuthenticationPolicy(CallbackAuthenticationPolicy):
         self.debug = debug
 
     def unauthenticated_userid(self, request):
+        """ The userid parsed from the ``Authorization`` request header."""
         credentials = self._get_credentials(request)
         if credentials:
             return credentials[0]
 
     def remember(self, request, principal, **kw):
+        """ A no-op. Basic authentication does not provide a protocol for
+        remembering the user. Credentials are sent on every request.
+
+        """
         return []
 
     def forget(self, request):
+        """ Returns challenge headers. This should be attached to a response
+        to indicate that credentials are required."""
         return [('WWW-Authenticate', 'Basic realm="%s"' % self.realm)]
 
     def callback(self, username, request):
