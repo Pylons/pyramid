@@ -13,6 +13,7 @@ from pyramid.traversal import (
 from pyramid.urldispatch import _compile_route
 from pyramid.util import object_description
 from pyramid.session import check_csrf_token
+from pyramid.security import effective_principals
 
 from .util import as_sorted_tuple
 
@@ -267,3 +268,22 @@ class PhysicalPathPredicate(object):
     def __call__(self, context, request):
         return resource_path_tuple(context) == self.val
 
+class EffectivePrincipalsPredicate(object):
+    def __init__(self, val, config):
+        if is_nonstr_iter(val):
+            self.val = set(val)
+        else:
+            self.val = set((val,))
+
+    def text(self):
+        return 'effective_principals = %s' % sorted(list(self.val))
+
+    phash = text
+
+    def __call__(self, context, request):
+        req_principals = effective_principals(request)
+        if is_nonstr_iter(req_principals):
+            rpset = set(req_principals)
+            if self.val.issubset(rpset):
+                return True
+        return False

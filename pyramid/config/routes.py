@@ -238,6 +238,19 @@ class RoutesConfiguratorMixin(object):
           request, this predicate will be true.  If this predicate
           returns ``False``, route matching continues.
 
+        effective_principals
+
+          If specified, this value should be a :term:`principal` identifier or
+          a sequence of principal identifiers.  If the
+          :func:`pyramid.security.effective_principals` method indicates that
+          every principal named in the argument list is present in the current
+          request, this predicate will return True; otherwise it will return
+          False.  For example:
+          ``effective_principals=pyramid.security.Authenticated`` or
+          ``effective_principals=('fred', 'group:admins')``.
+
+          .. versionadded:: 1.4a4
+
         custom_predicates
 
           This value should be a sequence of references to custom
@@ -499,6 +512,7 @@ class RoutesConfiguratorMixin(object):
             ('request_param', p.RequestParamPredicate),
             ('header', p.HeaderPredicate),
             ('accept', p.AcceptPredicate),
+            ('effective_principals', p.EffectivePrincipalsPredicate),
             ('custom', p.CustomPredicate),
             ('traverse', p.TraversePredicate),
             ):
