@@ -133,7 +133,13 @@ def view_execution_permitted(context, request, name=''):
     view using the effective authentication/authorization policies and
     the ``request``.  Return a boolean result.  If no
     :term:`authorization policy` is in effect, or if the view is not
-    protected by a permission, return ``True``."""
+    protected by a permission, return ``True``. If no view can view found,
+    an exception will be raised.
+
+    .. versionchanged:: 1.4a4
+       An exception is raised if no view is found.
+
+    """
     try:
         reg = request.registry
     except AttributeError:
