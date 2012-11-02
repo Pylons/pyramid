@@ -63,10 +63,15 @@ application by using the ``session_factory`` argument to the
    this implementation is, by default, *unencrypted*.  You should not use it
    when you keep sensitive information in the session object, as the
    information can be easily read by both users of your application and third
-   parties who have access to your users' network traffic.  Use a different
-   session factory implementation (preferably one which keeps session data on
-   the server) for anything but the most basic of applications where "session
-   security doesn't matter".
+   parties who have access to your users' network traffic.  And if you use this
+   sessioning implementation, and you inadvertently create a cross-site
+   scripting vulnerability in your application, because the session data is
+   stored unencrypted in a cookie, it will also be easier for evildoers to
+   obtain the current user's cross-site scripting token.  In short, use a
+   different session factory implementation (preferably one which keeps session
+   data on the server) for anything but the most basic of applications where
+   "session security doesn't matter", and you are sure your application has no
+   cross-site scripting vulnerabilities.
 
 .. index::
    single: session object
