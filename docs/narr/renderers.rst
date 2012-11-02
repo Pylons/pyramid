@@ -329,7 +329,7 @@ time "by hand".  Configure a JSONP renderer using the
 Once this renderer is registered via
 :meth:`~pyramid.config.Configurator.add_renderer` as above, you can use
 ``jsonp`` as the ``renderer=`` parameter to ``@view_config`` or
-:meth:`pyramid.config.Configurator.add_view``:
+:meth:`pyramid.config.Configurator.add_view`:
 
 .. code-block:: python
 
