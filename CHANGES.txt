@@ -16,6 +16,11 @@ Features
 
 - Slightly better debug logging from RepozeWho1AuthenticationPolicy.
 
+- ``pyramid.security.view_execution_permitted`` used to return `True` if no
+  view could be found. It now raises a ``TypeError`` exception in that case, as
+  it doesn't make sense to assert that a nonexistent view is
+  execution-permitted. See https://github.com/Pylons/pyramid/issues/299.
+
 1.4a3 (2012-10-26)
 ==================
 

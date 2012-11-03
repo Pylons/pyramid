@@ -131,6 +131,28 @@ class TestViewExecutionPermitted(unittest.TestCase):
         return checker
 
     def test_no_permission(self):
+        from zope.interface import Interface
+        from pyramid.threadlocal import get_current_registry
+        from pyramid.interfaces import ISettings
+        from pyramid.interfaces import IView
+        from pyramid.interfaces import IViewClassifier
+        settings = dict(debug_authorization=True)
+        reg = get_current_registry()
+        reg.registerUtility(settings, ISettings)
+        context = DummyContext()
+        request = DummyRequest({})
+        class DummyView(object):
+            pass
+        view = DummyView()
+        reg.registerAdapter(view, (IViewClassifier, Interface, Interface),
+                            IView, '')
+        result = self._callFUT(context, request, '')
+        msg = result.msg
+        self.assertTrue("Allowed: view name '' in context" in msg)
+        self.assertTrue('(no permission defined)' in msg)
+        self.assertEqual(result, True)
+
+    def test_no_view_registered(self):
         from pyramid.threadlocal import get_current_registry
         from pyramid.interfaces import ISettings
         settings = dict(debug_authorization=True)
@@ -138,11 +160,7 @@ class TestViewExecutionPermitted(unittest.TestCase):
         reg.registerUtility(settings, ISettings)
         context = DummyContext()
         request = DummyRequest({})
-        result = self._callFUT(context, request, '')
-        msg = result.msg
-        self.assertTrue("Allowed: view name '' in context" in msg)
-        self.assertTrue('(no permission defined)' in msg)
-        self.assertEqual(result, True)
+        self.assertRaises(TypeError, self._callFUT, context, request, '')
 
     def test_with_permission(self):
         from zope.interface import Interface
