@@ -38,6 +38,17 @@ Bug Fixes
   be unmolested on the way out.  See
   https://github.com/Pylons/pyramid/issues/709
 
+Internals
+---------
+
+- Move ``TopologicalSorter`` from ``pyramid.config.util`` to ``pyramid.util``,
+  move ``CyclicDependencyError`` from ``pyramid.config.util`` to
+  ``pyramid.exceptions``, rename ``Singleton`` to ``Sentinel`` and move from
+  ``pyramid.config.util`` to ``pyramid.config.util``; this is in an effort to
+  move that stuff that may be an API one day out of ``pyramid.config.util,
+  because that package should never be imported from non-Pyramid code.
+  TopologicalSorter is still not an API, but may become one.
+
 1.4a3 (2012-10-26)
 ==================
 

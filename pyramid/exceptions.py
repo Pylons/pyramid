@@ -60,3 +60,21 @@ class ConfigurationExecutionError(ConfigurationError):
 
     def __str__(self):
         return "%s: %s\n  in:\n  %s" % (self.etype, self.evalue, self.info)
+
+class CyclicDependencyError(Exception):
+    """ The exception raised when the Pyramid topological sorter detects a
+    cyclic dependency."""
+    def __init__(self, cycles):
+        self.cycles = cycles
+
+    def __str__(self):
+        L = []
+        cycles = self.cycles
+        for cycle in cycles:
+            dependent = cycle
+            dependees = cycles[cycle]
+            L.append('%r sorts before %r' % (dependent, dependees))
+        msg = 'Implicit ordering cycle:' + '; '.join(L)
+        return msg
+
+
