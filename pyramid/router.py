@@ -25,8 +25,7 @@ from pyramid.events import (
     )
 
 from pyramid.httpexceptions import HTTPNotFound
-from pyramid.request import default_request_factory
-from pyramid.response import Response
+from pyramid.request import Request
 from pyramid.threadlocal import manager
 
 from pyramid.traversal import (
@@ -49,7 +48,7 @@ class Router(object):
         self.logger = q(IDebugLogger)
         self.root_factory = q(IRootFactory, default=DefaultRootFactory)
         self.routes_mapper = q(IRoutesMapper)
-        self.request_factory = q(IRequestFactory, default=default_request_factory)
+        self.request_factory = q(IRequestFactory, default=Request)
         self.request_extensions = q(IRequestExtensions)
         tweens = q(ITweens)
         if tweens is None:
