@@ -4,6 +4,7 @@ from pyramid.interfaces import (
     IAuthenticationPolicy,
     IAuthorizationPolicy,
     ISecuredView,
+    IView,
     IViewClassifier,
     )
 
@@ -132,7 +133,13 @@ def view_execution_permitted(context, request, name=''):
     view using the effective authentication/authorization policies and
     the ``request``.  Return a boolean result.  If no
     :term:`authorization policy` is in effect, or if the view is not
-    protected by a permission, return ``True``."""
+    protected by a permission, return ``True``. If no view can view found,
+    an exception will be raised.
+
+    .. versionchanged:: 1.4a4
+       An exception is raised if no view is found.
+
+    """
     try:
         reg = request.registry
     except AttributeError:
@@ -140,6 +147,11 @@ def view_execution_permitted(context, request, name=''):
     provides = [IViewClassifier] + map_(providedBy, (request, context))
     view = reg.adapters.lookup(provides, ISecuredView, name=name)
     if view is None:
+        view = reg.adapters.lookup(provides, IView, name=name)
+        if view is None:
+            raise TypeError('No registered view satisfies the constraints. '
+                            'It would not make sense to claim that this view '
+                            '"is" or "is not" permitted.')
         return Allowed(
             'Allowed: view name %r in context %r (no permission defined)' %
             (name, context))
