@@ -6,8 +6,6 @@ Nice-to-Have
 
 - config.set_registry_attr (with conflict detection).
 
-- _fix_registry should dictify the registry being fixed.
-
 - Provide the presumed renderer name to the called view as an attribute of
   the request.
 
@@ -173,4 +171,6 @@ Probably Bad Ideas
 
     with config.partial(introspection=False) as c:
         c.add_view(..)
+
+- _fix_registry should dictify the registry being fixed.
 
