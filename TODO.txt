@@ -13,9 +13,6 @@ Nice-to-Have
 
 - Have action methods return their discriminators.
 
-- Add docs about upgrading between Pyramid versions (e.g. how to see
-  deprecation warnings).
-
 - Fix renderers chapter to better document system values passed to template
   renderers.
 
