@@ -9,6 +9,7 @@ from webob import BaseRequest
 
 from pyramid.interfaces import (
     IRequest,
+    IRequestFactory,
     IResponse,
     ISessionFactory,
     IResponseFactory,
@@ -27,6 +28,12 @@ from pyramid.decorator import reify
 from pyramid.response import Response
 from pyramid.url import URLMethodsMixin
 from pyramid.util import InstancePropertyMixin
+
+
+@implementer(IRequestFactory)
+def default_request_factory(environ):
+	return Request(environ, ResponseClass=Response)
+
 
 class TemplateContext(object):
     pass
