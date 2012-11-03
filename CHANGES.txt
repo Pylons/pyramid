@@ -21,6 +21,13 @@ Features
   it doesn't make sense to assert that a nonexistent view is
   execution-permitted. See https://github.com/Pylons/pyramid/issues/299.
 
+- Get rid of shady monkeypatching of ``pyramid.request.Request`` and
+  ``pyramid.response.Response`` done within the ``__init__.py`` of Pyramid.
+  Webob no longer relies on this being done.  Instead, the ResponseClass
+  attribute of the Pyramid Request class is assigned to the Pyramid response
+  class; that's enough to satisfy WebOb and behave as it did before with the
+  monkeypatching.
+
 Bug Fixes
 ---------
 
