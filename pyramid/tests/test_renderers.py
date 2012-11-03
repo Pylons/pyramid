@@ -663,13 +663,23 @@ class TestRendererHelper(unittest.TestCase):
         response = helper._make_response(la.encode('utf-8'), request)
         self.assertEqual(response.body, la.encode('utf-8'))
 
-    def test__make_response_result_is_None(self):
+    def test__make_response_result_is_None_no_body(self):
         from pyramid.response import Response
         request = testing.DummyRequest()
         request.response = Response()
         helper = self._makeOne('loo.foo')
         response = helper._make_response(None, request)
         self.assertEqual(response.body, b'')
+
+    def test__make_response_result_is_None_existing_body_not_molested(self):
+        from pyramid.response import Response
+        request = testing.DummyRequest()
+        response = Response()
+        response.body = b'abc'
+        request.response = response
+        helper = self._makeOne('loo.foo')
+        response = helper._make_response(None, request)
+        self.assertEqual(response.body, b'abc')
         
     def test__make_response_with_content_type(self):
         from pyramid.response import Response

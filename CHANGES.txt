@@ -21,6 +21,16 @@ Features
   it doesn't make sense to assert that a nonexistent view is
   execution-permitted. See https://github.com/Pylons/pyramid/issues/299.
 
+Bug Fixes
+---------
+
+- In the past if a renderer returned ``None``, the body of the resulting
+  response would be set explicitly to the empty string.  Instead, now, the body
+  is left unchanged, which allows the renderer to set a body itself by using
+  e.g. ``request.response.body = b'foo'``.  The body set by the renderer will
+  be unmolested on the way out.  See
+  https://github.com/Pylons/pyramid/issues/709
+
 1.4a3 (2012-10-26)
 ==================
 

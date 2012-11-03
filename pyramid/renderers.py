@@ -573,13 +573,11 @@ class RendererHelper(object):
 
             response = response_factory()
 
-        if result is None:
-            result = ''
-
-        if isinstance(result, text_type):
-            response.text = result
-        else:
-            response.body = result
+        if result is not None:
+            if isinstance(result, text_type):
+                response.text = result
+            else:
+                response.body = result
 
         if request is not None:
             # deprecated mechanism to set up request.response_* attrs, see
