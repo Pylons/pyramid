@@ -47,6 +47,11 @@ class CallbackAuthenticationPolicy(object):
             methodname = classname + '.' + methodname
             logger.debug(methodname + ': ' + msg)
 
+    def _clean_principal(self, princid):
+        if princid in (Authenticated, Everyone):
+            princid = None
+        return princid
+
     def authenticated_userid(self, request):
         """ Return the authenticated userid or ``None``.
 
@@ -65,6 +70,14 @@ class CallbackAuthenticationPolicy(object):
                 'authenticated_userid',
                 request)
             return None
+        if self._clean_principal(userid) is None:
+            debug and self._log(
+                ('use of userid %r is disallowed by any built-in Pyramid '
+                 'security policy, returning None' % userid),
+                'authenticated_userid' ,
+                request)
+            return None
+            
         if self.callback is None:
             debug and self._log(
                 'there was no groupfinder callback; returning %r' % (userid,),
@@ -112,6 +125,7 @@ class CallbackAuthenticationPolicy(object):
         debug = self.debug
         effective_principals = [Everyone]
         userid = self.unauthenticated_userid(request)
+
         if userid is None:
             debug and self._log(
                 'unauthenticated_userid returned %r; returning %r' % (
@@ -120,6 +134,16 @@ class CallbackAuthenticationPolicy(object):
                 request
                 )
             return effective_principals
+
+        if self._clean_principal(userid) is None:
+            debug and self._log(
+                ('unauthenticated_userid returned disallowed %r; returning %r '
+                 'as if it was None' % (userid, effective_principals)),
+                'effective_principals',
+                request
+                )
+            return effective_principals
+            
         if self.callback is None:
             debug and self._log(
                 'groupfinder callback is None, so groups is []',
@@ -132,6 +156,7 @@ class CallbackAuthenticationPolicy(object):
                 'groupfinder callback returned %r as groups' % (groups,),
                 'effective_principals',
                 request)
+
         if groups is None: # is None!
             debug and self._log(
                 'returning effective principals: %r' % (
@@ -204,12 +229,36 @@ class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
 
         """
         identity = self._get_identity(request)
+
         if identity is None:
+            self.debug and self._log(
+                'repoze.who identity is None, returning None',
+                'authenticated_userid',
+                request)
             return None
+
+        userid = identity['repoze.who.userid']
+
+        if userid is None:
+            self.debug and self._log(
+                'repoze.who.userid is None, returning None' % userid,
+                'authenticated_userid',
+                request)
+            return None
+            
+        if self._clean_principal(userid) is None:
+            self.debug and self._log(
+                ('use of userid %r is disallowed by any built-in Pyramid '
+                 'security policy, returning None' % userid),
+                'authenticated_userid',
+                request)
+            return None
+
         if self.callback is None:
-            return identity['repoze.who.userid']
+            return userid
+
         if self.callback(identity, request) is not None: # is not None!
-            return identity['repoze.who.userid']
+            return userid
 
     def unauthenticated_userid(self, request):
         """ Return the ``repoze.who.userid`` key from the detected identity."""
@@ -233,19 +282,53 @@ class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
         """
         effective_principals = [Everyone]
         identity = self._get_identity(request)
+
         if identity is None:
+            self.debug and self._log(
+                ('repoze.who identity was None; returning %r' %
+                 effective_principals),
+                'effective_principals',
+                request
+                )
             return effective_principals
+
         if self.callback is None:
             groups = []
         else:
             groups = self.callback(identity, request)
+
         if groups is None: # is None!
+            self.debug and self._log(
+                ('security policy groups callback returned None; returning %r' %
+                 effective_principals),
+                'effective_principals',
+                request
+                )
             return effective_principals
+
         userid = identity['repoze.who.userid']
+
+        if userid is None:
+            self.debug and self._log(
+                ('repoze.who.userid was None; returning %r' %
+                 effective_principals),
+                'effective_principals',
+                request
+                )
+            return effective_principals
+
+        if self._clean_principal(userid) is None:
+            self.debug and self._log(
+                ('unauthenticated_userid returned disallowed %r; returning %r '
+                 'as if it was None' % (userid, effective_principals)),
+                'effective_principals',
+                request
+                )
+            return effective_principals
+
         effective_principals.append(Authenticated)
         effective_principals.append(userid)
         effective_principals.extend(groups)
-
         return effective_principals
 
     def remember(self, request, principal, **kw):

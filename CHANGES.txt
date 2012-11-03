@@ -6,6 +6,14 @@ Features
 
 - Added an ``effective_principals`` route and view predicate.
 
+- Do not allow the userid returned from the ``authenticated_userid`` or the
+  userid that is one of the list of principals returned by
+  ``effective_principals`` to be either of the strings ``system.Everyone`` or
+  ``system.Authenticated`` when any of the built-in authorization policies that
+  live in ``pyramid.authentication`` are in use.  These two strings are
+  reserved for internal usage by Pyramid and they will not be accepted as valid
+  userids.
+
 1.4a3 (2012-10-26)
 ==================
 

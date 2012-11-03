@@ -76,6 +76,30 @@ class TestCallbackAuthenticationPolicyDebugging(unittest.TestCase):
             "authenticated_userid: groupfinder callback returned []; "
             "returning 'fred'")
 
+    def test_authenticated_userid_fails_cleaning_as_Authenticated(self):
+        request = DummyRequest(registry=self.config.registry)
+        policy = self._makeOne(userid='system.Authenticated')
+        self.assertEqual(policy.authenticated_userid(request), None)
+        self.assertEqual(len(self.messages), 1)
+        self.assertEqual(
+            self.messages[0],
+            "pyramid.tests.test_authentication.MyAuthenticationPolicy."
+            "authenticated_userid: use of userid 'system.Authenticated' is "
+            "disallowed by any built-in Pyramid security policy, returning "
+            "None")
+
+    def test_authenticated_userid_fails_cleaning_as_Everyone(self):
+        request = DummyRequest(registry=self.config.registry)
+        policy = self._makeOne(userid='system.Everyone')
+        self.assertEqual(policy.authenticated_userid(request), None)
+        self.assertEqual(len(self.messages), 1)
+        self.assertEqual(
+            self.messages[0],
+            "pyramid.tests.test_authentication.MyAuthenticationPolicy."
+            "authenticated_userid: use of userid 'system.Everyone' is "
+            "disallowed by any built-in Pyramid security policy, returning "
+            "None")
+
     def test_effective_principals_no_unauthenticated_userid(self):
         request = DummyRequest(registry=self.config.registry)
         policy = self._makeOne()
@@ -144,6 +168,34 @@ class TestCallbackAuthenticationPolicyDebugging(unittest.TestCase):
             "effective_principals: returning effective principals: "
             "['system.Everyone', 'system.Authenticated', 'fred']")
 
+    def test_effective_principals_with_unclean_principal_Authenticated(self):
+        request = DummyRequest(registry=self.config.registry)
+        policy = self._makeOne(userid='system.Authenticated')
+        self.assertEqual(
+            policy.effective_principals(request),
+            ['system.Everyone'])
+        self.assertEqual(len(self.messages), 1)
+        self.assertEqual(
+            self.messages[0],
+            "pyramid.tests.test_authentication.MyAuthenticationPolicy."
+            "effective_principals: unauthenticated_userid returned disallowed "
+            "'system.Authenticated'; returning ['system.Everyone'] as if it "
+            "was None")
+
+    def test_effective_principals_with_unclean_principal_Everyone(self):
+        request = DummyRequest(registry=self.config.registry)
+        policy = self._makeOne(userid='system.Everyone')
+        self.assertEqual(
+            policy.effective_principals(request),
+            ['system.Everyone'])
+        self.assertEqual(len(self.messages), 1)
+        self.assertEqual(
+            self.messages[0],
+            "pyramid.tests.test_authentication.MyAuthenticationPolicy."
+            "effective_principals: unauthenticated_userid returned disallowed "
+            "'system.Everyone'; returning ['system.Everyone'] as if it "
+            "was None")
+
 class TestRepozeWho1AuthenticationPolicy(unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.authentication import RepozeWho1AuthenticationPolicy
@@ -184,6 +236,12 @@ class TestRepozeWho1AuthenticationPolicy(unittest.TestCase):
         policy = self._makeOne()
         self.assertEqual(policy.authenticated_userid(request), 'fred')
 
+    def test_authenticated_userid_repoze_who_userid_is_None(self):
+        request = DummyRequest(
+            {'repoze.who.identity':{'repoze.who.userid':None}})
+        policy = self._makeOne()
+        self.assertEqual(policy.authenticated_userid(request), None)
+
     def test_authenticated_userid_with_callback_returns_None(self):
         request = DummyRequest(
             {'repoze.who.identity':{'repoze.who.userid':'fred'}})
@@ -199,6 +257,20 @@ class TestRepozeWho1AuthenticationPolicy(unittest.TestCase):
             return ['agroup']
         policy = self._makeOne(callback=callback)
         self.assertEqual(policy.authenticated_userid(request), 'fred')
+
+    def test_authenticated_userid_unclean_principal_Authenticated(self):
+        request = DummyRequest(
+            {'repoze.who.identity':{'repoze.who.userid':'system.Authenticated'}}
+            )
+        policy = self._makeOne()
+        self.assertEqual(policy.authenticated_userid(request), None)
+
+    def test_authenticated_userid_unclean_principal_Everyone(self):
+        request = DummyRequest(
+            {'repoze.who.identity':{'repoze.who.userid':'system.Everyone'}}
+            )
+        policy = self._makeOne()
+        self.assertEqual(policy.authenticated_userid(request), None)
 
     def test_effective_principals_None(self):
         from pyramid.security import Everyone
@@ -235,6 +307,31 @@ class TestRepozeWho1AuthenticationPolicy(unittest.TestCase):
         def callback(identity, request):
             return None
         policy = self._makeOne(callback=callback)
+        self.assertEqual(policy.effective_principals(request), [Everyone])
+
+    def test_effective_principals_repoze_who_userid_is_None(self):
+        from pyramid.security import Everyone
+        request = DummyRequest(
+            {'repoze.who.identity':{'repoze.who.userid':None}}
+            )
+        policy = self._makeOne()
+        self.assertEqual(policy.effective_principals(request), [Everyone])
+
+    def test_effective_principals_repoze_who_userid_is_unclean_Everyone(self):
+        from pyramid.security import Everyone
+        request = DummyRequest(
+            {'repoze.who.identity':{'repoze.who.userid':'system.Everyone'}}
+            )
+        policy = self._makeOne()
+        self.assertEqual(policy.effective_principals(request), [Everyone])
+
+    def test_effective_principals_repoze_who_userid_is_unclean_Authenticated(
+        self):
+        from pyramid.security import Everyone
+        request = DummyRequest(
+            {'repoze.who.identity':{'repoze.who.userid':'system.Authenticated'}}
+            )
+        policy = self._makeOne()
         self.assertEqual(policy.effective_principals(request), [Everyone])
 
     def test_remember_no_plugins(self):
