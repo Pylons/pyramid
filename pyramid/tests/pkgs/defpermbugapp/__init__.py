@@ -17,7 +17,7 @@ def z_view(request):
 def includeme(config):
      from pyramid.authorization import ACLAuthorizationPolicy
      from pyramid.authentication import AuthTktAuthenticationPolicy
-     authn_policy = AuthTktAuthenticationPolicy('seekt1t')
+     authn_policy = AuthTktAuthenticationPolicy('seekt1t', hashalg='sha512')
      authz_policy = ACLAuthorizationPolicy()
      config.scan('pyramid.tests.pkgs.defpermbugapp')
      config._set_authentication_policy(authn_policy)
