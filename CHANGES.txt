@@ -38,6 +38,11 @@ Bug Fixes
   be unmolested on the way out.  See
   https://github.com/Pylons/pyramid/issues/709
 
+- In uncommon cases, the ``pyramid_excview_tween_factory`` might have
+  inadvertently raised a ``KeyError`` looking for ``request_iface`` as an
+  attribute of the request.  It no longer fails in this case.  See
+  https://github.com/Pylons/pyramid/issues/700
+
 Internals
 ---------
 

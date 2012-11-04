@@ -2,6 +2,7 @@ import sys
 
 from pyramid.interfaces import (
     IExceptionViewClassifier,
+    IRequest,
     IView,
     )
 
@@ -28,7 +29,9 @@ def excview_tween_factory(handler, registry):
             # sane (e.g. caching headers)
             if 'response' in attrs:
                 del attrs['response']
-            request_iface = attrs['request_iface']
+            # we use .get instead of .__getitem__ below due to
+            # https://github.com/Pylons/pyramid/issues/700
+            request_iface = attrs.get('request_iface', IRequest)
             provides = providedBy(exc)
             for_ = (IExceptionViewClassifier, request_iface.combined, provides)
             view_callable = adapters.lookup(for_, IView, default=None)
