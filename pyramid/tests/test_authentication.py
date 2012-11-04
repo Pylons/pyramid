@@ -431,75 +431,9 @@ class TestRemoteUserAuthenticationPolicy(unittest.TestCase):
         self.assertEqual(result, [])
 
 class TestAuthTktAuthenticationPolicy(unittest.TestCase):
-    def setUp(self):
-        from zope.deprecation import __show__
-        __show__.off()
-
-    def tearDown(self):
-        from zope.deprecation import __show__
-        __show__.on()
-        
     def _getTargetClass(self):
         from pyramid.authentication import AuthTktAuthenticationPolicy
         return AuthTktAuthenticationPolicy
-
-    def _makeOne(self, callback, cookieidentity, **kw):
-        inst = self._getTargetClass()('secret', callback, **kw)
-        inst.cookie = DummyCookieHelper(cookieidentity)
-        return inst
-
-    def test_is_subclass(self):
-        from pyramid.authentication import BaseAuthTktAuthenticationPolicy
-        inst = self._makeOne(None, None)
-        self.assertTrue(isinstance(inst, BaseAuthTktAuthenticationPolicy))
-
-    def test_md5(self):
-        inst = self._makeOne(None, None)
-        self.assertEqual(inst.hashalg, 'md5')
-
-    def test_class_implements_IAuthenticationPolicy(self):
-        from zope.interface.verify import verifyClass
-        from pyramid.interfaces import IAuthenticationPolicy
-        verifyClass(IAuthenticationPolicy, self._getTargetClass())
-
-    def test_instance_implements_IAuthenticationPolicy(self):
-        from zope.interface.verify import verifyObject
-        from pyramid.interfaces import IAuthenticationPolicy
-        verifyObject(IAuthenticationPolicy, self._makeOne(None, None))
-
-class TestSHA512AuthTktAuthenticationPolicy(unittest.TestCase):
-    def _getTargetClass(self):
-        from pyramid.authentication import SHA512AuthTktAuthenticationPolicy
-        return SHA512AuthTktAuthenticationPolicy
-
-    def _makeOne(self, callback, cookieidentity, **kw):
-        inst = self._getTargetClass()('secret', callback, **kw)
-        inst.cookie = DummyCookieHelper(cookieidentity)
-        return inst
-
-    def test_is_subclass(self):
-        from pyramid.authentication import BaseAuthTktAuthenticationPolicy
-        inst = self._makeOne(None, None)
-        self.assertTrue(isinstance(inst, BaseAuthTktAuthenticationPolicy))
-
-    def test_sha512(self):
-        inst = self._makeOne(None, None)
-        self.assertEqual(inst.hashalg, 'sha512')
-
-    def test_class_implements_IAuthenticationPolicy(self):
-        from zope.interface.verify import verifyClass
-        from pyramid.interfaces import IAuthenticationPolicy
-        verifyClass(IAuthenticationPolicy, self._getTargetClass())
-
-    def test_instance_implements_IAuthenticationPolicy(self):
-        from zope.interface.verify import verifyObject
-        from pyramid.interfaces import IAuthenticationPolicy
-        verifyObject(IAuthenticationPolicy, self._makeOne(None, None))
-
-class TestBaseAutkTktAuthenticationPolicy(unittest.TestCase):
-    def _getTargetClass(self):
-        from pyramid.authentication import BaseAuthTktAuthenticationPolicy
-        return BaseAuthTktAuthenticationPolicy
 
     def _makeOne(self, callback, cookieidentity, **kw):
         inst = self._getTargetClass()('secret', callback, **kw)
@@ -511,8 +445,14 @@ class TestBaseAutkTktAuthenticationPolicy(unittest.TestCase):
         inst = self._getTargetClass()(
             'secret', callback=None, cookie_name=None, secure=False,
             include_ip=False, timeout=None, reissue_time=None,
+            hashalg='sha512',
             )
         self.assertEqual(inst.callback, None)
+
+    def test_hashalg_override(self):
+        # important to ensure hashalg is passed to cookie helper
+        inst = self._getTargetClass()('secret', hashalg='sha512')
+        self.assertEqual(inst.cookie.hashalg, 'sha512')
 
     def test_unauthenticated_userid_returns_None(self):
         request = DummyRequest({})
@@ -585,6 +525,16 @@ class TestBaseAutkTktAuthenticationPolicy(unittest.TestCase):
         policy = self._makeOne(None, None)
         result = policy.forget(request)
         self.assertEqual(result, [])
+
+    def test_class_implements_IAuthenticationPolicy(self):
+        from zope.interface.verify import verifyClass
+        from pyramid.interfaces import IAuthenticationPolicy
+        verifyClass(IAuthenticationPolicy, self._getTargetClass())
+
+    def test_instance_implements_IAuthenticationPolicy(self):
+        from zope.interface.verify import verifyObject
+        from pyramid.interfaces import IAuthenticationPolicy
+        verifyObject(IAuthenticationPolicy, self._makeOne(None, None))
 
 class TestAuthTktCookieHelper(unittest.TestCase):
     def _getTargetClass(self):
