@@ -430,7 +430,15 @@ class TestRemoteUserAuthenticationPolicy(unittest.TestCase):
         result = policy.forget(request)
         self.assertEqual(result, [])
 
-class TestAutkTktAuthenticationPolicy(unittest.TestCase):
+class TestAuthTktAuthenticationPolicy(unittest.TestCase):
+    def setUp(self):
+        from zope.deprecation import __show__
+        __show__.off()
+
+    def tearDown(self):
+        from zope.deprecation import __show__
+        __show__.on()
+        
     def _getTargetClass(self):
         from pyramid.authentication import AuthTktAuthenticationPolicy
         return AuthTktAuthenticationPolicy
@@ -459,7 +467,7 @@ class TestAutkTktAuthenticationPolicy(unittest.TestCase):
         from pyramid.interfaces import IAuthenticationPolicy
         verifyObject(IAuthenticationPolicy, self._makeOne(None, None))
 
-class TestSHA512AutkTktAuthenticationPolicy(unittest.TestCase):
+class TestSHA512AuthTktAuthenticationPolicy(unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.authentication import SHA512AuthTktAuthenticationPolicy
         return SHA512AuthTktAuthenticationPolicy
