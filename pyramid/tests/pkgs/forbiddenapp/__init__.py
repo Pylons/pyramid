@@ -16,7 +16,7 @@ def forbidden_view(context, request):
 def includeme(config):
      from pyramid.authentication import AuthTktAuthenticationPolicy
      from pyramid.authorization import ACLAuthorizationPolicy
-     authn_policy = AuthTktAuthenticationPolicy('seekr1t')
+     authn_policy = AuthTktAuthenticationPolicy('seekr1t', hashalg='sha512')
      authz_policy = ACLAuthorizationPolicy()
      config._set_authentication_policy(authn_policy)
      config._set_authorization_policy(authz_policy)

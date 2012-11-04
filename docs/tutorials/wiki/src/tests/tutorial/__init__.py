@@ -1,7 +1,7 @@
 from pyramid.config import Configurator
 from pyramid_zodbconn import get_connection
 
-from pyramid.authentication import SHA512AuthTktAuthenticationPolicy
+from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 
 from .models import appmaker
@@ -14,8 +14,8 @@ def root_factory(request):
 def main(global_config, **settings):
     """ This function returns a WSGI application.
     """
-    authn_policy = SHA512AuthTktAuthenticationPolicy(secret='sosecret',
-                                                     callback=groupfinder)
+    authn_policy = AuthTktAuthenticationPolicy(
+        'sosecret', callback=groupfinder, hashalg='sha512')
     authz_policy = ACLAuthorizationPolicy()
     config = Configurator(root_factory=root_factory, settings=settings)
     config.set_authentication_policy(authn_policy)
