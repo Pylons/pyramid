@@ -6,6 +6,7 @@ import base64
 import datetime
 import re
 import time as time_mod
+import warnings
 
 from zope.interface import implementer
 
@@ -405,6 +406,8 @@ class RemoteUserAuthenticationPolicy(CallbackAuthenticationPolicy):
         be done somewhere else or in a subclass."""
         return []
 
+_marker = object()
+
 @implementer(IAuthenticationPolicy)
 class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
     """A :app:`Pyramid` :term:`authentication policy` which
@@ -549,8 +552,20 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
                  http_only=False,
                  wild_domain=True,
                  debug=False,
-                 hashalg='md5',
+                 hashalg=_marker
                  ):
+        if hashalg is _marker:
+            hashalg = 'md5'
+            warnings.warn('The MD5 hash function is known to have collisions. '
+                          'We recommend instead that you update your code to '
+                          'use the SHA512 algorithm by setting '
+                          'hashalg=\'sha512\'. If you accept these risks '
+                          'and want to continue using MD5, explicitly set '
+                          'the hashalg=\'md5\' in your authentication policy. '
+                          'The default algorithm used in this policy is '
+                          'likely to change in the future.',
+                          DeprecationWarning,
+                          stacklevel=2)
         self.cookie = AuthTktCookieHelper(
             secret,
             cookie_name=cookie_name,

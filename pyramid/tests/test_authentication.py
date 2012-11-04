@@ -1,4 +1,5 @@
 import unittest
+import warnings
 from pyramid import testing
 from pyramid.compat import (
     text_,
@@ -439,6 +440,14 @@ class TestAuthTktAuthenticationPolicy(unittest.TestCase):
         inst = self._getTargetClass()('secret', callback, **kw)
         inst.cookie = DummyCookieHelper(cookieidentity)
         return inst
+
+    def setUp(self):
+        self.warnings = warnings.catch_warnings()
+        self.warnings.__enter__()
+        warnings.simplefilter('ignore', DeprecationWarning)
+
+    def tearDown(self):
+        self.warnings.__exit__(None, None, None)
 
     def test_allargs(self):
         # pass all known args

@@ -141,6 +141,9 @@ Future
 
 - 1.6: Remove IContextURL and TraversalContextURL.
 
+- 1.7: Change ``pyramid.authentication.AuthTktAuthenticationPolicy`` default
+  ``hashalg`` to ``sha512``.
+
 Probably Bad Ideas
 ------------------
 

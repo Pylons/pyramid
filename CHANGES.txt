@@ -48,6 +48,15 @@ Bug Fixes
   attribute of the request.  It no longer fails in this case.  See
   https://github.com/Pylons/pyramid/issues/700
 
+Deprecations
+------------
+
+- ``pyramid.authentication.AuthTktAuthenticationPolicy`` will emit a warning
+  if an application is using the policy without explicitly setting the
+  ``hashalg``. This is because the default is "md5" which is considered
+  insecure. If you really want "md5" then you must specify it explicitly to
+  get rid of the warning.
+
 Internals
 ---------
 
