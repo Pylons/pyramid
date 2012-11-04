@@ -14,7 +14,8 @@ Features
   reserved for internal usage by Pyramid and they will not be accepted as valid
   userids.
 
-- Slightly better debug logging from RepozeWho1AuthenticationPolicy.
+- Slightly better debug logging from
+  ``pyramid.authentication.RepozeWho1AuthenticationPolicy``.
 
 - ``pyramid.security.view_execution_permitted`` used to return `True` if no
   view could be found. It now raises a ``TypeError`` exception in that case, as
@@ -67,7 +68,7 @@ Internals
 - Move ``TopologicalSorter`` from ``pyramid.config.util`` to ``pyramid.util``,
   move ``CyclicDependencyError`` from ``pyramid.config.util`` to
   ``pyramid.exceptions``, rename ``Singleton`` to ``Sentinel`` and move from
-  ``pyramid.config.util`` to ``pyramid.config.util``; this is in an effort to
+  ``pyramid.config.util`` to ``pyramid.util``; this is in an effort to
   move that stuff that may be an API one day out of ``pyramid.config.util``,
   because that package should never be imported from non-Pyramid code.
   TopologicalSorter is still not an API, but may become one.
