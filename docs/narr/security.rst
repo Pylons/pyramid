@@ -90,9 +90,9 @@ For example:
    :linenos:
 
    from pyramid.config import Configurator
-   from pyramid.authentication import AuthTktAuthenticationPolicy
+   from pyramid.authentication import SHA512AuthTktAuthenticationPolicy
    from pyramid.authorization import ACLAuthorizationPolicy
-   authentication_policy = AuthTktAuthenticationPolicy('seekrit')
+   authentication_policy = SHA512AuthTktAuthenticationPolicy('seekrit')
    authorization_policy = ACLAuthorizationPolicy()
    config = Configurator()
    config.set_authentication_policy(authentication_policy)

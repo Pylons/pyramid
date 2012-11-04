@@ -430,10 +430,76 @@ class TestRemoteUserAuthenticationPolicy(unittest.TestCase):
         result = policy.forget(request)
         self.assertEqual(result, [])
 
-class TestAutkTktAuthenticationPolicy(unittest.TestCase):
+class TestAuthTktAuthenticationPolicy(unittest.TestCase):
+    def setUp(self):
+        from zope.deprecation import __show__
+        __show__.off()
+
+    def tearDown(self):
+        from zope.deprecation import __show__
+        __show__.on()
+        
     def _getTargetClass(self):
         from pyramid.authentication import AuthTktAuthenticationPolicy
         return AuthTktAuthenticationPolicy
+
+    def _makeOne(self, callback, cookieidentity, **kw):
+        inst = self._getTargetClass()('secret', callback, **kw)
+        inst.cookie = DummyCookieHelper(cookieidentity)
+        return inst
+
+    def test_is_subclass(self):
+        from pyramid.authentication import BaseAuthTktAuthenticationPolicy
+        inst = self._makeOne(None, None)
+        self.assertTrue(isinstance(inst, BaseAuthTktAuthenticationPolicy))
+
+    def test_md5(self):
+        inst = self._makeOne(None, None)
+        self.assertEqual(inst.hashalg, 'md5')
+
+    def test_class_implements_IAuthenticationPolicy(self):
+        from zope.interface.verify import verifyClass
+        from pyramid.interfaces import IAuthenticationPolicy
+        verifyClass(IAuthenticationPolicy, self._getTargetClass())
+
+    def test_instance_implements_IAuthenticationPolicy(self):
+        from zope.interface.verify import verifyObject
+        from pyramid.interfaces import IAuthenticationPolicy
+        verifyObject(IAuthenticationPolicy, self._makeOne(None, None))
+
+class TestSHA512AuthTktAuthenticationPolicy(unittest.TestCase):
+    def _getTargetClass(self):
+        from pyramid.authentication import SHA512AuthTktAuthenticationPolicy
+        return SHA512AuthTktAuthenticationPolicy
+
+    def _makeOne(self, callback, cookieidentity, **kw):
+        inst = self._getTargetClass()('secret', callback, **kw)
+        inst.cookie = DummyCookieHelper(cookieidentity)
+        return inst
+
+    def test_is_subclass(self):
+        from pyramid.authentication import BaseAuthTktAuthenticationPolicy
+        inst = self._makeOne(None, None)
+        self.assertTrue(isinstance(inst, BaseAuthTktAuthenticationPolicy))
+
+    def test_sha512(self):
+        inst = self._makeOne(None, None)
+        self.assertEqual(inst.hashalg, 'sha512')
+
+    def test_class_implements_IAuthenticationPolicy(self):
+        from zope.interface.verify import verifyClass
+        from pyramid.interfaces import IAuthenticationPolicy
+        verifyClass(IAuthenticationPolicy, self._getTargetClass())
+
+    def test_instance_implements_IAuthenticationPolicy(self):
+        from zope.interface.verify import verifyObject
+        from pyramid.interfaces import IAuthenticationPolicy
+        verifyObject(IAuthenticationPolicy, self._makeOne(None, None))
+
+class TestBaseAutkTktAuthenticationPolicy(unittest.TestCase):
+    def _getTargetClass(self):
+        from pyramid.authentication import BaseAuthTktAuthenticationPolicy
+        return BaseAuthTktAuthenticationPolicy
 
     def _makeOne(self, callback, cookieidentity, **kw):
         inst = self._getTargetClass()('secret', callback, **kw)
@@ -447,16 +513,6 @@ class TestAutkTktAuthenticationPolicy(unittest.TestCase):
             include_ip=False, timeout=None, reissue_time=None,
             )
         self.assertEqual(inst.callback, None)
-
-    def test_class_implements_IAuthenticationPolicy(self):
-        from zope.interface.verify import verifyClass
-        from pyramid.interfaces import IAuthenticationPolicy
-        verifyClass(IAuthenticationPolicy, self._getTargetClass())
-
-    def test_instance_implements_IAuthenticationPolicy(self):
-        from zope.interface.verify import verifyObject
-        from pyramid.interfaces import IAuthenticationPolicy
-        verifyObject(IAuthenticationPolicy, self._makeOne(None, None))
 
     def test_unauthenticated_userid_returns_None(self):
         request = DummyRequest({})
@@ -1068,6 +1124,14 @@ class TestAuthTicket(unittest.TestCase):
         result = ticket.digest()
         self.assertEqual(result, '126fd6224912187ee9ffa80e0b81420c')
 
+    def test_digest_sha512(self):
+        ticket = self._makeOne('secret', 'userid', '0.0.0.0',
+                               time=10, hashalg='sha512')
+        result = ticket.digest()
+        self.assertEqual(result, '74770b2e0d5b1a54c2a466ec567a40f7d7823576aa49'\
+                                 '3c65fc3445e9b44097f4a80410319ef8cb256a2e60b9'\
+                                 'c2002e48a9e33a3e8ee4379352c04ef96d2cb278')
+
     def test_cookie_value(self):
         ticket = self._makeOne('secret', 'userid', '0.0.0.0', time=10,
                                tokens=('a', 'b'))
@@ -1086,13 +1150,13 @@ class TestBadTicket(unittest.TestCase):
         self.assertTrue(isinstance(exc, Exception))
 
 class Test_parse_ticket(unittest.TestCase):
-    def _callFUT(self, secret, ticket, ip):
+    def _callFUT(self, secret, ticket, ip, hashalg='md5'):
         from pyramid.authentication import parse_ticket
-        return parse_ticket(secret, ticket, ip)
+        return parse_ticket(secret, ticket, ip, hashalg)
 
-    def _assertRaisesBadTicket(self, secret, ticket, ip):
+    def _assertRaisesBadTicket(self, secret, ticket, ip, hashalg='md5'):
         from pyramid.authentication import BadTicket
-        self.assertRaises(BadTicket,self._callFUT, secret, ticket, ip)
+        self.assertRaises(BadTicket,self._callFUT, secret, ticket, ip, hashalg)
 
     def test_bad_timestamp(self):
         ticket = 'x' * 64
@@ -1109,6 +1173,13 @@ class Test_parse_ticket(unittest.TestCase):
     def test_correct_with_user_data(self):
         ticket = '66f9cc3e423dc57c91df696cf3d1f0d80000000auserid!a,b!'
         result = self._callFUT('secret', ticket, '0.0.0.0')
+        self.assertEqual(result, (10, 'userid', ['a', 'b'], ''))
+
+    def test_correct_with_user_data_sha512(self):
+        ticket = '7d947cdef99bad55f8e3382a8bd089bb9dd0547f7925b7d189adc1160cab'\
+                 '0ec0e6888faa41eba641a18522b26f19109f3ffafb769767ba8a26d02aae'\
+                 'ae56599a0000000auserid!a,b!'
+        result = self._callFUT('secret', ticket, '0.0.0.0', 'sha512')
         self.assertEqual(result, (10, 'userid', ['a', 'b'], ''))
 
 class TestSessionAuthenticationPolicy(unittest.TestCase):
@@ -1319,13 +1390,14 @@ class DummyCookieHelper:
 
 class DummyAuthTktModule(object):
     def __init__(self, timestamp=0, userid='userid', tokens=(), user_data='',
-                 parse_raise=False):
+                 parse_raise=False, hashalg="md5"):
         self.timestamp = timestamp
         self.userid = userid
         self.tokens = tokens
         self.user_data = user_data
         self.parse_raise = parse_raise
-        def parse_ticket(secret, value, remote_addr):
+        self.hashalg = hashalg
+        def parse_ticket(secret, value, remote_addr, hashalg):
             self.secret = secret
             self.value = value
             self.remote_addr = remote_addr

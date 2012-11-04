@@ -1,5 +1,5 @@
 from pyramid.config import Configurator
-from pyramid.authentication import AuthTktAuthenticationPolicy
+from pyramid.authentication import SHA512AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 
 from sqlalchemy import engine_from_config
@@ -17,7 +17,7 @@ def main(global_config, **settings):
     engine = engine_from_config(settings, 'sqlalchemy.')
     DBSession.configure(bind=engine)
     Base.metadata.bind = engine
-    authn_policy = AuthTktAuthenticationPolicy(
+    authn_policy = SHA512AuthTktAuthenticationPolicy(
         'sosecret', callback=groupfinder)
     authz_policy = ACLAuthorizationPolicy()
     config = Configurator(settings=settings,
