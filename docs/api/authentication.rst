@@ -8,6 +8,8 @@ Authentication Policies
 
 .. automodule:: pyramid.authentication
 
+  .. autoclass:: SHA512AuthTktAuthenticationPolicy
+
   .. autoclass:: AuthTktAuthenticationPolicy
      :members:
      :inherited-members:
