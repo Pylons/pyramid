@@ -176,6 +176,13 @@ class view_config(object):
     :meth:`pyramid.config.Configurator.add_view`.  If any argument is left
     out, its default will be the equivalent ``add_view`` default.
 
+    An additional keyword argument named ``_depth`` is provided for people who
+    wish to reuse this class from another decorator.  It will be passed in to
+    the :term:`venusian` ``attach`` function as the depth of the callstack when
+    Venusian checks if the decorator is being used in a class or module
+    context.  It's not often used, but it can be useful in this circumstance.
+    See the ``attach`` function in Venusian for more information.
+
     See :ref:`mapping_views_using_a_decorator_section` for details about
     using :class:`view_config`.
 
@@ -189,12 +196,14 @@ class view_config(object):
 
     def __call__(self, wrapped):
         settings = self.__dict__.copy()
+        depth = settings.pop('_depth', 1)
 
         def callback(context, name, ob):
             config = context.config.with_package(info.module)
             config.add_view(view=ob, **settings)
 
-        info = self.venusian.attach(wrapped, callback, category='pyramid')
+        info = self.venusian.attach(wrapped, callback, category='pyramid',
+                                    depth=depth)
 
         if info.scope == 'class':
             # if the decorator was attached to a method in a class, or

@@ -519,6 +519,14 @@ class TestViewConfigDecorator(unittest.TestCase):
         self.assertTrue(renderer is renderer_helper)
         self.assertEqual(config.pkg, pyramid.tests)
 
+    def test_call_withdepth(self):
+        decorator = self._makeOne(_depth=2)
+        venusian = DummyVenusian()
+        decorator.venusian = venusian
+        def foo(): pass
+        decorator(foo)
+        self.assertEqual(venusian.depth, 2)
+
 class Test_append_slash_notfound_view(BaseTest, unittest.TestCase):
     def _callFUT(self, context, request):
         from pyramid.view import append_slash_notfound_view
@@ -746,8 +754,9 @@ class DummyVenusian(object):
         self.info = info
         self.attachments = []
 
-    def attach(self, wrapped, callback, category=None):
+    def attach(self, wrapped, callback, category=None, depth=1):
         self.attachments.append((wrapped, callback, category))
+        self.depth = depth
         return self.info
 
 class DummyRegistry(object):

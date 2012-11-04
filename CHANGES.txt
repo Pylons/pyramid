@@ -33,6 +33,10 @@ Features
   class; that's enough to satisfy WebOb and behave as it did before with the
   monkeypatching.
 
+- Allow a ``_depth`` argument to ``pyramid.view.view_config``, which will
+  permit limited composition reuse of the decorator by other software that
+  wants to provide custom decorators that are much like view_config.
+
 Bug Fixes
 ---------
 
