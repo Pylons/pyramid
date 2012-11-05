@@ -4,7 +4,7 @@ import unittest
 class Test_get_app(unittest.TestCase):
     def _callFUT(self, config_file, section_name, loadapp):
         from pyramid.paster import get_app
-        return get_app(config_file, section_name, loadapp)
+        return get_app(config_file, section_name, loadapp=loadapp)
 
     def test_it(self):
         app = DummyApp()

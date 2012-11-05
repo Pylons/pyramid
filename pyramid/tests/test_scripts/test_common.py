@@ -17,6 +17,19 @@ class Test_logging_file_config(unittest.TestCase):
     def fileConfig(self, config_file, dict):
         return config_file, dict
 
+class TestParseVars(unittest.TestCase):
+    def test_parse_vars_good(self):
+        from pyramid.scripts.common import parse_vars
+        vars = ['a=1', 'b=2']
+        result = parse_vars(vars)
+        self.assertEqual(result, {'a': '1', 'b': '2'})
+
+    def test_parse_vars_bad(self):
+        from pyramid.scripts.common import parse_vars
+        vars = ['a']
+        self.assertRaises(ValueError, parse_vars, vars)
+
+
 class DummyConfigParser(object):
     def read(self, x):
         pass
