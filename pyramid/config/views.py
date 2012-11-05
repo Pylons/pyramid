@@ -851,7 +851,9 @@ class ViewsConfiguratorMixin(object):
           used in the order provided as a decorator.
           For example::
 
-            @view_config(..., decorator=[decorator2, decorator1])
+            @view_config(...,
+                decorator=(decorator2,
+                           decorator1))
             def myview(request):
                 ....
 
