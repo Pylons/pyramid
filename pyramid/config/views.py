@@ -42,6 +42,7 @@ from pyramid.compat import (
     url_quote,
     WIN,
     is_bound_method,
+    is_nonstr_iter
     )
 
 from pyramid.exceptions import (
@@ -838,19 +839,19 @@ class ViewsConfiguratorMixin(object):
         decorator
 
           A :term:`dotted Python name` to function (or the function itself,
-          or a list or tuple of the aforementioned)
-          which will be used to decorate the registered :term:`view
-          callable`.  The decorator function(s) will be called with the view
-          callable as a single argument.  The view callable it is passed will
-          accept ``(context, request)``.  The decorator(s) must return a
+          or an iterable of the aforementioned) which will be used to
+          decorate the registered :term:`view callable`.  The decorator
+          function(s) will be called with the view callable as a single
+          argument.  The view callable it is passed will accept
+          ``(context, request)``.  The decorator(s) must return a
           replacement view callable which also accepts ``(context,
           request)``.
 
-          If decorator is a tuple or list of callables, the callables will be
-          combined and used in the order provided as a decorator.
+          If decorator is an iterable, the callables will be combined and
+          used in the order provided as a decorator.
           For example::
 
-            @view_config(..., decorator=[decorator1, decorator2])
+            @view_config(..., decorator=[decorator2, decorator1])
             def myview(request):
                 ....
 
@@ -1096,12 +1097,13 @@ class ViewsConfiguratorMixin(object):
 
         def combine(*decorators):
             def decorated(view_callable):
-                for decorator in decorators:
+                # reversed() is allows a more natural ordering in the api
+                for decorator in reversed(decorators):
                     view_callable = decorator(view_callable)
                 return view_callable
             return decorated
 
-        if isinstance(decorator, (tuple, list)):
+        if is_nonstr_iter(decorator):
             decorator = combine(*map(self.maybe_dotted, decorator))
         else:
             decorator = self.maybe_dotted(decorator)
