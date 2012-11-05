@@ -868,6 +868,8 @@ class ViewsConfiguratorMixin(object):
           think about preserving function attributes such as ``__name__`` and
           ``__module__`` within decorator logic).
 
+          Passing an iterable is only supported as of :app:`Pyramid` 1.4a4.
+
         mapper
 
           A Python object or :term:`dotted Python name` which refers to a
