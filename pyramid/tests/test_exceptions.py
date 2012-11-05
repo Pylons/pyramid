@@ -74,3 +74,15 @@ class TestConfigurationExecutionError(unittest.TestCase):
         exc = self._makeOne('etype', 'evalue', 'info')
         self.assertEqual(str(exc), 'etype: evalue\n  in:\n  info')
         
+class TestCyclicDependencyError(unittest.TestCase):
+    def _makeOne(self, cycles):
+        from pyramid.exceptions import CyclicDependencyError
+        return CyclicDependencyError(cycles)
+
+    def test___str__(self):
+        exc = self._makeOne({'a':['c', 'd'], 'c':['a']})
+        result = str(exc)
+        self.assertTrue("'a' sorts before ['c', 'd']" in result)
+        self.assertTrue("'c' sorts before ['a']" in result)
+
+

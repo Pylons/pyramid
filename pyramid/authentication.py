@@ -1,11 +1,12 @@
 import binascii
 from codecs import utf_8_decode
 from codecs import utf_8_encode
-from hashlib import md5
+import hashlib
 import base64
 import datetime
 import re
 import time as time_mod
+import warnings
 
 from zope.interface import implementer
 
@@ -47,7 +48,21 @@ class CallbackAuthenticationPolicy(object):
             methodname = classname + '.' + methodname
             logger.debug(methodname + ': ' + msg)
 
+    def _clean_principal(self, princid):
+        if princid in (Authenticated, Everyone):
+            princid = None
+        return princid
+
     def authenticated_userid(self, request):
+        """ Return the authenticated userid or ``None``.
+
+        If no callback is registered, this will be the same as
+        ``unauthenticated_userid``.
+
+        If a ``callback`` is registered, this will return the userid if
+        and only if the callback returns a value that is not ``None``.
+
+        """
         debug = self.debug
         userid = self.unauthenticated_userid(request)
         if userid is None:
@@ -56,6 +71,14 @@ class CallbackAuthenticationPolicy(object):
                 'authenticated_userid',
                 request)
             return None
+        if self._clean_principal(userid) is None:
+            debug and self._log(
+                ('use of userid %r is disallowed by any built-in Pyramid '
+                 'security policy, returning None' % userid),
+                'authenticated_userid' ,
+                request)
+            return None
+            
         if self.callback is None:
             debug and self._log(
                 'there was no groupfinder callback; returning %r' % (userid,),
@@ -78,9 +101,32 @@ class CallbackAuthenticationPolicy(object):
             )
 
     def effective_principals(self, request):
+        """ A list of effective principals derived from request.
+
+        This will return a list of principals including, at least,
+        :data:`pyramid.security.Everyone`. If there is no authenticated
+        userid, or the ``callback`` returns ``None``, this will be the
+        only principal:
+
+        .. code-block:: python
+
+            return [Everyone]
+
+        If the ``callback`` does not return ``None`` and an authenticated
+        userid is found, then the principals will include
+        :data:`pyramid.security.Authenticated`, the ``authenticated_userid``
+        and the list of principals returned by the ``callback``:
+
+        .. code-block:: python
+
+            extra_principals = callback(userid, request)
+            return [Everyone, Authenticated, userid] + extra_principals
+
+        """
         debug = self.debug
         effective_principals = [Everyone]
         userid = self.unauthenticated_userid(request)
+
         if userid is None:
             debug and self._log(
                 'unauthenticated_userid returned %r; returning %r' % (
@@ -89,6 +135,16 @@ class CallbackAuthenticationPolicy(object):
                 request
                 )
             return effective_principals
+
+        if self._clean_principal(userid) is None:
+            debug and self._log(
+                ('unauthenticated_userid returned disallowed %r; returning %r '
+                 'as if it was None' % (userid, effective_principals)),
+                'effective_principals',
+                request
+                )
+            return effective_principals
+            
         if self.callback is None:
             debug and self._log(
                 'groupfinder callback is None, so groups is []',
@@ -101,6 +157,7 @@ class CallbackAuthenticationPolicy(object):
                 'groupfinder callback returned %r as groups' % (groups,),
                 'effective_principals',
                 request)
+
         if groups is None: # is None!
             debug and self._log(
                 'returning effective principals: %r' % (
@@ -163,39 +220,120 @@ class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
         return identifier
 
     def authenticated_userid(self, request):
+        """ Return the authenticated userid or ``None``.
+
+        If no callback is registered, this will be the same as
+        ``unauthenticated_userid``.
+
+        If a ``callback`` is registered, this will return the userid if
+        and only if the callback returns a value that is not ``None``.
+
+        """
         identity = self._get_identity(request)
+
         if identity is None:
+            self.debug and self._log(
+                'repoze.who identity is None, returning None',
+                'authenticated_userid',
+                request)
             return None
+
+        userid = identity['repoze.who.userid']
+
+        if userid is None:
+            self.debug and self._log(
+                'repoze.who.userid is None, returning None' % userid,
+                'authenticated_userid',
+                request)
+            return None
+            
+        if self._clean_principal(userid) is None:
+            self.debug and self._log(
+                ('use of userid %r is disallowed by any built-in Pyramid '
+                 'security policy, returning None' % userid),
+                'authenticated_userid',
+                request)
+            return None
+
         if self.callback is None:
-            return identity['repoze.who.userid']
+            return userid
+
         if self.callback(identity, request) is not None: # is not None!
-            return identity['repoze.who.userid']
+            return userid
 
     def unauthenticated_userid(self, request):
+        """ Return the ``repoze.who.userid`` key from the detected identity."""
         identity = self._get_identity(request)
         if identity is None:
             return None
         return identity['repoze.who.userid']
 
     def effective_principals(self, request):
+        """ A list of effective principals derived from the identity.
+
+        This will return a list of principals including, at least,
+        :data:`pyramid.security.Everyone`. If there is no identity, or
+        the ``callback`` returns ``None``, this will be the only principal.
+
+        If the ``callback`` does not return ``None`` and an identity is
+        found, then the principals will include
+        :data:`pyramid.security.Authenticated`, the ``authenticated_userid``
+        and the list of principals returned by the ``callback``.
+
+        """
         effective_principals = [Everyone]
         identity = self._get_identity(request)
+
         if identity is None:
+            self.debug and self._log(
+                ('repoze.who identity was None; returning %r' %
+                 effective_principals),
+                'effective_principals',
+                request
+                )
             return effective_principals
+
         if self.callback is None:
             groups = []
         else:
             groups = self.callback(identity, request)
+
         if groups is None: # is None!
+            self.debug and self._log(
+                ('security policy groups callback returned None; returning %r' %
+                 effective_principals),
+                'effective_principals',
+                request
+                )
             return effective_principals
+
         userid = identity['repoze.who.userid']
+
+        if userid is None:
+            self.debug and self._log(
+                ('repoze.who.userid was None; returning %r' %
+                 effective_principals),
+                'effective_principals',
+                request
+                )
+            return effective_principals
+
+        if self._clean_principal(userid) is None:
+            self.debug and self._log(
+                ('unauthenticated_userid returned disallowed %r; returning %r '
+                 'as if it was None' % (userid, effective_principals)),
+                'effective_principals',
+                request
+                )
+            return effective_principals
+
         effective_principals.append(Authenticated)
         effective_principals.append(userid)
         effective_principals.extend(groups)
-
         return effective_principals
 
     def remember(self, request, principal, **kw):
+        """ Store the ``principal`` as ``repoze.who.userid``."""
         identifier = self._get_identifier(request)
         if identifier is None:
             return []
@@ -204,6 +342,12 @@ class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
         return identifier.remember(environ, identity)
 
     def forget(self, request):
+        """ Forget the current authenticated user.
+
+        Return headers that, if included in a response, will delete the
+        cookie responsible for tracking the current user.
+
+        """
         identifier = self._get_identifier(request)
         if identifier is None:
             return []
@@ -247,18 +391,34 @@ class RemoteUserAuthenticationPolicy(CallbackAuthenticationPolicy):
         self.debug = debug
 
     def unauthenticated_userid(self, request):
+        """ The ``REMOTE_USER`` value found within the ``environ``."""
         return request.environ.get(self.environ_key)
 
     def remember(self, request, principal, **kw):
+        """ A no-op. The ``REMOTE_USER`` does not provide a protocol for
+        remembering the user. This will be application-specific and can
+        be done somewhere else or in a subclass."""
         return []
 
     def forget(self, request):
+        """ A no-op. The ``REMOTE_USER`` does not provide a protocol for
+        forgetting the user. This will be application-specific and can
+        be done somewhere else or in a subclass."""
         return []
+
+_marker = object()
 
 @implementer(IAuthenticationPolicy)
 class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
-    """ A :app:`Pyramid` :term:`authentication policy` which
+    """A :app:`Pyramid` :term:`authentication policy` which
     obtains data from a Pyramid "auth ticket" cookie.
+
+    .. warning::
+
+       The default hash algorithm used in this policy is MD5 and has known
+       hash collision vulnerabilities. The risk of an exploit is low.
+       However, for improved authentication security, use
+       ``hashalg='sha512'``.
 
     Constructor Arguments
 
@@ -348,6 +508,33 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
        wildcard domain.
        Optional.
 
+    ``hashalg``
+
+       Default: ``md5`` (the literal string).
+
+       Any hash algorithm supported by Python's ``hashlib.new()`` function
+       can be used as the ``hashalg``.
+
+       Cookies generated by different instances of AuthTktAuthenticationPolicy
+       using different ``hashalg`` options are not compatible. Switching the
+       ``hashalg`` will imply that all existing users with a valid cookie will
+       be required to re-login.
+
+       A warning is emitted at startup if an explicit ``hashalg`` is not
+       passed.  This is for backwards compatibility reasons.
+
+       This option is available as of :app:`Pyramid` 1.4.
+
+       Optional.
+
+       .. note::
+
+          ``md5`` is the default for backwards compatibility reasons. However,
+          if you don't specify ``md5`` as the hashalg explicitly, a warning is
+          issued at application startup time.  An explicit value of ``sha512``
+          is recommended for improved security, and ``sha512`` will become the
+          default in a future Pyramid version.
+
     ``debug``
 
         Default: ``False``.  If ``debug`` is ``True``, log messages to the
@@ -358,6 +545,7 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
     Objects of this class implement the interface described by
     :class:`pyramid.interfaces.IAuthenticationPolicy`.
     """
+
     def __init__(self,
                  secret,
                  callback=None,
@@ -371,7 +559,32 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
                  http_only=False,
                  wild_domain=True,
                  debug=False,
+                 hashalg=_marker
                  ):
+        if hashalg is _marker:
+            hashalg = 'md5'
+            warnings.warn(
+                'The MD5 hash function used by default by the '
+                'AuthTktAuthenticationPolicy is known to be '
+                'susceptible to collision attacks.  It is the current default '
+                'for backwards compatibility reasons, but we recommend that '
+                'you use the SHA512 algorithm instead for improved security.  '
+                'Pass ``hashalg=\'sha512\'`` to the '
+                'AuthTktAuthenticationPolicy constructor to do so.\n\nNote '
+                'that a change to the hash algorithms will invalidate existing '
+                'auth tkt cookies set by your application.  If backwards '
+                'compatibility of existing auth tkt cookies is of greater '
+                'concern than the risk posed by the potential for a hash '
+                'collision, you\'ll want to continue using MD5 explicitly.  '
+                'To do so, pass ``hashalg=\'md5\'`` in your application to '
+                'the AuthTktAuthenticationPolicy constructor.   When you do so '
+                'this warning will not be emitted again.  The default '
+                'algorithm used in this policy will change in the future, so '
+                'setting an explicit hashalg will futureproof your '
+                'application.',
+                DeprecationWarning,
+                stacklevel=2
+                )
         self.cookie = AuthTktCookieHelper(
             secret,
             cookie_name=cookie_name,
@@ -383,21 +596,29 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
             http_only=http_only,
             path=path,
             wild_domain=wild_domain,
+            hashalg=hashalg,
             )
         self.callback = callback
         self.debug = debug
 
     def unauthenticated_userid(self, request):
+        """ The userid key within the auth_tkt cookie."""
         result = self.cookie.identify(request)
         if result:
             return result['userid']
 
     def remember(self, request, principal, **kw):
         """ Accepts the following kw args: ``max_age=<int-seconds>,
-        ``tokens=<sequence-of-ascii-strings>``"""
+        ``tokens=<sequence-of-ascii-strings>``.
+
+        Return a list of headers which will set appropriate cookies on
+        the response.
+
+        """
         return self.cookie.remember(request, principal, **kw)
 
     def forget(self, request):
+        """ A list of headers which will delete appropriate cookies."""
         return self.cookie.forget(request)
 
 def b64encode(v):
@@ -428,7 +649,8 @@ class AuthTicket(object):
     """
 
     def __init__(self, secret, userid, ip, tokens=(), user_data='',
-                 time=None, cookie_name='auth_tkt', secure=False):
+                 time=None, cookie_name='auth_tkt', secure=False,
+                 hashalg='md5'):
         self.secret = secret
         self.userid = userid
         self.ip = ip
@@ -440,11 +662,12 @@ class AuthTicket(object):
             self.time = time
         self.cookie_name = cookie_name
         self.secure = secure
+        self.hashalg = hashalg
 
     def digest(self):
         return calculate_digest(
             self.ip, self.time, self.secret, self.userid, self.tokens,
-            self.user_data)
+            self.user_data, self.hashalg)
 
     def cookie_value(self):
         v = '%s%08x%s!' % (self.digest(), int(self.time),
@@ -466,7 +689,7 @@ class BadTicket(Exception):
         Exception.__init__(self, msg)
 
 # this function licensed under the MIT license (stolen from Paste)
-def parse_ticket(secret, ticket, ip):
+def parse_ticket(secret, ticket, ip, hashalg='md5'):
     """
     Parse the ticket, returning (timestamp, userid, tokens, user_data).
 
@@ -474,13 +697,14 @@ def parse_ticket(secret, ticket, ip):
     with an explanation.
     """
     ticket = ticket.strip('"')
-    digest = ticket[:32]
+    digest_size = hashlib.new(hashalg).digest_size * 2
+    digest = ticket[:digest_size]
     try:
-        timestamp = int(ticket[32:40], 16)
+        timestamp = int(ticket[digest_size:digest_size + 8], 16)
     except ValueError as e:
         raise BadTicket('Timestamp is not a hex integer: %s' % e)
     try:
-        userid, data = ticket[40:].split('!', 1)
+        userid, data = ticket[digest_size + 8:].split('!', 1)
     except ValueError:
         raise BadTicket('userid is not followed by !')
     userid = url_unquote(userid)
@@ -492,7 +716,7 @@ def parse_ticket(secret, ticket, ip):
         user_data = data
 
     expected = calculate_digest(ip, timestamp, secret,
-                                userid, tokens, user_data)
+                                userid, tokens, user_data, hashalg)
 
     # Avoid timing attacks (see
     # http://seb.dbzteam.org/crypto/python-oauth-timing-hmac.pdf)
@@ -505,16 +729,20 @@ def parse_ticket(secret, ticket, ip):
     return (timestamp, userid, tokens, user_data)
 
 # this function licensed under the MIT license (stolen from Paste)
-def calculate_digest(ip, timestamp, secret, userid, tokens, user_data):
+def calculate_digest(ip, timestamp, secret, userid, tokens, user_data,
+                     hashalg='md5'):
     secret = bytes_(secret, 'utf-8')
     userid = bytes_(userid, 'utf-8')
     tokens = bytes_(tokens, 'utf-8')
     user_data = bytes_(user_data, 'utf-8')
-    digest0 = md5(
+    hash_obj = hashlib.new(hashalg)
+    hash_obj.update(
         encode_ip_timestamp(ip, timestamp) + secret + userid + b'\0'
-        + tokens + b'\0' + user_data).hexdigest()
-    digest = md5(bytes_(digest0) + secret).hexdigest()
-    return digest
+        + tokens + b'\0' + user_data)
+    digest = hash_obj.hexdigest()
+    hash_obj2 = hashlib.new(hashalg)
+    hash_obj2.update(bytes_(digest) + secret)
+    return hash_obj2.hexdigest()
 
 # this function licensed under the MIT license (stolen from Paste)
 def encode_ip_timestamp(ip, timestamp):
@@ -557,7 +785,8 @@ class AuthTktCookieHelper(object):
 
     def __init__(self, secret, cookie_name='auth_tkt', secure=False,
                  include_ip=False, timeout=None, reissue_time=None,
-                 max_age=None, http_only=False, path="/", wild_domain=True):
+                 max_age=None, http_only=False, path="/", wild_domain=True,
+                 hashalg='md5'):
         self.secret = secret
         self.cookie_name = cookie_name
         self.include_ip = include_ip
@@ -568,6 +797,7 @@ class AuthTktCookieHelper(object):
         self.http_only = http_only
         self.path = path
         self.wild_domain = wild_domain
+        self.hashalg = hashalg
 
         static_flags = []
         if self.secure:
@@ -636,7 +866,7 @@ class AuthTktCookieHelper(object):
 
         try:
             timestamp, userid, tokens, user_data = self.parse_ticket(
-                self.secret, cookie, remote_addr)
+                self.secret, cookie, remote_addr, self.hashalg)
         except self.BadTicket:
             return None
 
@@ -751,7 +981,9 @@ class AuthTktCookieHelper(object):
             tokens=tokens,
             user_data=user_data,
             cookie_name=self.cookie_name,
-            secure=self.secure)
+            secure=self.secure,
+            hashalg=self.hashalg
+            )
 
         cookie_value = ticket.cookie_value()
         return self._get_cookies(environ, cookie_value, max_age)
@@ -860,14 +1092,21 @@ class BasicAuthAuthenticationPolicy(CallbackAuthenticationPolicy):
         self.debug = debug
 
     def unauthenticated_userid(self, request):
+        """ The userid parsed from the ``Authorization`` request header."""
         credentials = self._get_credentials(request)
         if credentials:
             return credentials[0]
 
     def remember(self, request, principal, **kw):
+        """ A no-op. Basic authentication does not provide a protocol for
+        remembering the user. Credentials are sent on every request.
+
+        """
         return []
 
     def forget(self, request):
+        """ Returns challenge headers. This should be attached to a response
+        to indicate that credentials are required."""
         return [('WWW-Authenticate', 'Basic realm="%s"' % self.realm)]
 
     def callback(self, username, request):

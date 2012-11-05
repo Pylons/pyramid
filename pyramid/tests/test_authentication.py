@@ -1,4 +1,5 @@
 import unittest
+import warnings
 from pyramid import testing
 from pyramid.compat import (
     text_,
@@ -76,6 +77,30 @@ class TestCallbackAuthenticationPolicyDebugging(unittest.TestCase):
             "authenticated_userid: groupfinder callback returned []; "
             "returning 'fred'")
 
+    def test_authenticated_userid_fails_cleaning_as_Authenticated(self):
+        request = DummyRequest(registry=self.config.registry)
+        policy = self._makeOne(userid='system.Authenticated')
+        self.assertEqual(policy.authenticated_userid(request), None)
+        self.assertEqual(len(self.messages), 1)
+        self.assertEqual(
+            self.messages[0],
+            "pyramid.tests.test_authentication.MyAuthenticationPolicy."
+            "authenticated_userid: use of userid 'system.Authenticated' is "
+            "disallowed by any built-in Pyramid security policy, returning "
+            "None")
+
+    def test_authenticated_userid_fails_cleaning_as_Everyone(self):
+        request = DummyRequest(registry=self.config.registry)
+        policy = self._makeOne(userid='system.Everyone')
+        self.assertEqual(policy.authenticated_userid(request), None)
+        self.assertEqual(len(self.messages), 1)
+        self.assertEqual(
+            self.messages[0],
+            "pyramid.tests.test_authentication.MyAuthenticationPolicy."
+            "authenticated_userid: use of userid 'system.Everyone' is "
+            "disallowed by any built-in Pyramid security policy, returning "
+            "None")
+
     def test_effective_principals_no_unauthenticated_userid(self):
         request = DummyRequest(registry=self.config.registry)
         policy = self._makeOne()
@@ -144,6 +169,34 @@ class TestCallbackAuthenticationPolicyDebugging(unittest.TestCase):
             "effective_principals: returning effective principals: "
             "['system.Everyone', 'system.Authenticated', 'fred']")
 
+    def test_effective_principals_with_unclean_principal_Authenticated(self):
+        request = DummyRequest(registry=self.config.registry)
+        policy = self._makeOne(userid='system.Authenticated')
+        self.assertEqual(
+            policy.effective_principals(request),
+            ['system.Everyone'])
+        self.assertEqual(len(self.messages), 1)
+        self.assertEqual(
+            self.messages[0],
+            "pyramid.tests.test_authentication.MyAuthenticationPolicy."
+            "effective_principals: unauthenticated_userid returned disallowed "
+            "'system.Authenticated'; returning ['system.Everyone'] as if it "
+            "was None")
+
+    def test_effective_principals_with_unclean_principal_Everyone(self):
+        request = DummyRequest(registry=self.config.registry)
+        policy = self._makeOne(userid='system.Everyone')
+        self.assertEqual(
+            policy.effective_principals(request),
+            ['system.Everyone'])
+        self.assertEqual(len(self.messages), 1)
+        self.assertEqual(
+            self.messages[0],
+            "pyramid.tests.test_authentication.MyAuthenticationPolicy."
+            "effective_principals: unauthenticated_userid returned disallowed "
+            "'system.Everyone'; returning ['system.Everyone'] as if it "
+            "was None")
+
 class TestRepozeWho1AuthenticationPolicy(unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.authentication import RepozeWho1AuthenticationPolicy
@@ -184,6 +237,12 @@ class TestRepozeWho1AuthenticationPolicy(unittest.TestCase):
         policy = self._makeOne()
         self.assertEqual(policy.authenticated_userid(request), 'fred')
 
+    def test_authenticated_userid_repoze_who_userid_is_None(self):
+        request = DummyRequest(
+            {'repoze.who.identity':{'repoze.who.userid':None}})
+        policy = self._makeOne()
+        self.assertEqual(policy.authenticated_userid(request), None)
+
     def test_authenticated_userid_with_callback_returns_None(self):
         request = DummyRequest(
             {'repoze.who.identity':{'repoze.who.userid':'fred'}})
@@ -199,6 +258,20 @@ class TestRepozeWho1AuthenticationPolicy(unittest.TestCase):
             return ['agroup']
         policy = self._makeOne(callback=callback)
         self.assertEqual(policy.authenticated_userid(request), 'fred')
+
+    def test_authenticated_userid_unclean_principal_Authenticated(self):
+        request = DummyRequest(
+            {'repoze.who.identity':{'repoze.who.userid':'system.Authenticated'}}
+            )
+        policy = self._makeOne()
+        self.assertEqual(policy.authenticated_userid(request), None)
+
+    def test_authenticated_userid_unclean_principal_Everyone(self):
+        request = DummyRequest(
+            {'repoze.who.identity':{'repoze.who.userid':'system.Everyone'}}
+            )
+        policy = self._makeOne()
+        self.assertEqual(policy.authenticated_userid(request), None)
 
     def test_effective_principals_None(self):
         from pyramid.security import Everyone
@@ -235,6 +308,31 @@ class TestRepozeWho1AuthenticationPolicy(unittest.TestCase):
         def callback(identity, request):
             return None
         policy = self._makeOne(callback=callback)
+        self.assertEqual(policy.effective_principals(request), [Everyone])
+
+    def test_effective_principals_repoze_who_userid_is_None(self):
+        from pyramid.security import Everyone
+        request = DummyRequest(
+            {'repoze.who.identity':{'repoze.who.userid':None}}
+            )
+        policy = self._makeOne()
+        self.assertEqual(policy.effective_principals(request), [Everyone])
+
+    def test_effective_principals_repoze_who_userid_is_unclean_Everyone(self):
+        from pyramid.security import Everyone
+        request = DummyRequest(
+            {'repoze.who.identity':{'repoze.who.userid':'system.Everyone'}}
+            )
+        policy = self._makeOne()
+        self.assertEqual(policy.effective_principals(request), [Everyone])
+
+    def test_effective_principals_repoze_who_userid_is_unclean_Authenticated(
+        self):
+        from pyramid.security import Everyone
+        request = DummyRequest(
+            {'repoze.who.identity':{'repoze.who.userid':'system.Authenticated'}}
+            )
+        policy = self._makeOne()
         self.assertEqual(policy.effective_principals(request), [Everyone])
 
     def test_remember_no_plugins(self):
@@ -333,7 +431,7 @@ class TestRemoteUserAuthenticationPolicy(unittest.TestCase):
         result = policy.forget(request)
         self.assertEqual(result, [])
 
-class TestAutkTktAuthenticationPolicy(unittest.TestCase):
+class TestAuthTktAuthenticationPolicy(unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.authentication import AuthTktAuthenticationPolicy
         return AuthTktAuthenticationPolicy
@@ -343,23 +441,27 @@ class TestAutkTktAuthenticationPolicy(unittest.TestCase):
         inst.cookie = DummyCookieHelper(cookieidentity)
         return inst
 
+    def setUp(self):
+        self.warnings = warnings.catch_warnings()
+        self.warnings.__enter__()
+        warnings.simplefilter('ignore', DeprecationWarning)
+
+    def tearDown(self):
+        self.warnings.__exit__(None, None, None)
+
     def test_allargs(self):
         # pass all known args
         inst = self._getTargetClass()(
             'secret', callback=None, cookie_name=None, secure=False,
             include_ip=False, timeout=None, reissue_time=None,
+            hashalg='sha512',
             )
         self.assertEqual(inst.callback, None)
 
-    def test_class_implements_IAuthenticationPolicy(self):
-        from zope.interface.verify import verifyClass
-        from pyramid.interfaces import IAuthenticationPolicy
-        verifyClass(IAuthenticationPolicy, self._getTargetClass())
-
-    def test_instance_implements_IAuthenticationPolicy(self):
-        from zope.interface.verify import verifyObject
-        from pyramid.interfaces import IAuthenticationPolicy
-        verifyObject(IAuthenticationPolicy, self._makeOne(None, None))
+    def test_hashalg_override(self):
+        # important to ensure hashalg is passed to cookie helper
+        inst = self._getTargetClass()('secret', hashalg='sha512')
+        self.assertEqual(inst.cookie.hashalg, 'sha512')
 
     def test_unauthenticated_userid_returns_None(self):
         request = DummyRequest({})
@@ -432,6 +534,16 @@ class TestAutkTktAuthenticationPolicy(unittest.TestCase):
         policy = self._makeOne(None, None)
         result = policy.forget(request)
         self.assertEqual(result, [])
+
+    def test_class_implements_IAuthenticationPolicy(self):
+        from zope.interface.verify import verifyClass
+        from pyramid.interfaces import IAuthenticationPolicy
+        verifyClass(IAuthenticationPolicy, self._getTargetClass())
+
+    def test_instance_implements_IAuthenticationPolicy(self):
+        from zope.interface.verify import verifyObject
+        from pyramid.interfaces import IAuthenticationPolicy
+        verifyObject(IAuthenticationPolicy, self._makeOne(None, None))
 
 class TestAuthTktCookieHelper(unittest.TestCase):
     def _getTargetClass(self):
@@ -971,6 +1083,14 @@ class TestAuthTicket(unittest.TestCase):
         result = ticket.digest()
         self.assertEqual(result, '126fd6224912187ee9ffa80e0b81420c')
 
+    def test_digest_sha512(self):
+        ticket = self._makeOne('secret', 'userid', '0.0.0.0',
+                               time=10, hashalg='sha512')
+        result = ticket.digest()
+        self.assertEqual(result, '74770b2e0d5b1a54c2a466ec567a40f7d7823576aa49'\
+                                 '3c65fc3445e9b44097f4a80410319ef8cb256a2e60b9'\
+                                 'c2002e48a9e33a3e8ee4379352c04ef96d2cb278')
+
     def test_cookie_value(self):
         ticket = self._makeOne('secret', 'userid', '0.0.0.0', time=10,
                                tokens=('a', 'b'))
@@ -989,13 +1109,13 @@ class TestBadTicket(unittest.TestCase):
         self.assertTrue(isinstance(exc, Exception))
 
 class Test_parse_ticket(unittest.TestCase):
-    def _callFUT(self, secret, ticket, ip):
+    def _callFUT(self, secret, ticket, ip, hashalg='md5'):
         from pyramid.authentication import parse_ticket
-        return parse_ticket(secret, ticket, ip)
+        return parse_ticket(secret, ticket, ip, hashalg)
 
-    def _assertRaisesBadTicket(self, secret, ticket, ip):
+    def _assertRaisesBadTicket(self, secret, ticket, ip, hashalg='md5'):
         from pyramid.authentication import BadTicket
-        self.assertRaises(BadTicket,self._callFUT, secret, ticket, ip)
+        self.assertRaises(BadTicket,self._callFUT, secret, ticket, ip, hashalg)
 
     def test_bad_timestamp(self):
         ticket = 'x' * 64
@@ -1012,6 +1132,13 @@ class Test_parse_ticket(unittest.TestCase):
     def test_correct_with_user_data(self):
         ticket = '66f9cc3e423dc57c91df696cf3d1f0d80000000auserid!a,b!'
         result = self._callFUT('secret', ticket, '0.0.0.0')
+        self.assertEqual(result, (10, 'userid', ['a', 'b'], ''))
+
+    def test_correct_with_user_data_sha512(self):
+        ticket = '7d947cdef99bad55f8e3382a8bd089bb9dd0547f7925b7d189adc1160cab'\
+                 '0ec0e6888faa41eba641a18522b26f19109f3ffafb769767ba8a26d02aae'\
+                 'ae56599a0000000auserid!a,b!'
+        result = self._callFUT('secret', ticket, '0.0.0.0', 'sha512')
         self.assertEqual(result, (10, 'userid', ['a', 'b'], ''))
 
 class TestSessionAuthenticationPolicy(unittest.TestCase):
@@ -1222,13 +1349,14 @@ class DummyCookieHelper:
 
 class DummyAuthTktModule(object):
     def __init__(self, timestamp=0, userid='userid', tokens=(), user_data='',
-                 parse_raise=False):
+                 parse_raise=False, hashalg="md5"):
         self.timestamp = timestamp
         self.userid = userid
         self.tokens = tokens
         self.user_data = user_data
         self.parse_raise = parse_raise
-        def parse_ticket(secret, value, remote_addr):
+        self.hashalg = hashalg
+        def parse_ticket(secret, value, remote_addr, hashalg):
             self.secret = secret
             self.value = value
             self.remote_addr = remote_addr

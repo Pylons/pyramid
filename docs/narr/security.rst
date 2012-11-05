@@ -92,11 +92,11 @@ For example:
    from pyramid.config import Configurator
    from pyramid.authentication import AuthTktAuthenticationPolicy
    from pyramid.authorization import ACLAuthorizationPolicy
-   authentication_policy = AuthTktAuthenticationPolicy('seekrit')
-   authorization_policy = ACLAuthorizationPolicy()
+   authn_policy = AuthTktAuthenticationPolicy('seekrit', hashalg='sha512')
+   authz_policy = ACLAuthorizationPolicy()
    config = Configurator()
-   config.set_authentication_policy(authentication_policy)
-   config.set_authorization_policy(authorization_policy)
+   config.set_authentication_policy(authn_policy)
+   config.set_authorization_policy(authz_policy)
 
 .. note:: the ``authentication_policy`` and ``authorization_policy``
    arguments may also be passed to their respective methods mentioned above

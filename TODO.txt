@@ -4,17 +4,10 @@ Pyramid TODOs
 Nice-to-Have
 ------------
 
-- config.set_registry_attr (with conflict detection).
-
-- _fix_registry should dictify the registry being fixed.
-
 - Provide the presumed renderer name to the called view as an attribute of
   the request.
 
 - Have action methods return their discriminators.
-
-- Add docs about upgrading between Pyramid versions (e.g. how to see
-  deprecation warnings).
 
 - Fix renderers chapter to better document system values passed to template
   renderers.
@@ -146,6 +139,9 @@ Future
 
 - 1.6: Remove IContextURL and TraversalContextURL.
 
+- 1.7: Change ``pyramid.authentication.AuthTktAuthenticationPolicy`` default
+  ``hashalg`` to ``sha512``.
+
 Probably Bad Ideas
 ------------------
 
@@ -176,4 +172,9 @@ Probably Bad Ideas
 
     with config.partial(introspection=False) as c:
         c.add_view(..)
+
+- _fix_registry should dictify the registry being fixed.
+
+- config.set_registry_attr (with conflict detection)... bad idea because it
+  won't take effect until after a commit and folks will be confused by that.
 

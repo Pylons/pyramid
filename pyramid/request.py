@@ -328,6 +328,8 @@ class Request(BaseRequest, DeprecatedRequestMethodsMixin, URLMethodsMixin,
     matchdict = None
     matched_route = None
 
+    ResponseClass = Response
+
     @reify
     def tmpl_context(self):
         # docs-deprecated template context for Pylons-like apps; do not

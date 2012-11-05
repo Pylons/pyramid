@@ -20,7 +20,7 @@ def bar(request): # pragma: no cover
     return Response('OK bar')
 
 def includeme(config):
-    authn_policy = AuthTktAuthenticationPolicy('seekri1')
+    authn_policy = AuthTktAuthenticationPolicy('seekri1', hashalg='sha512')
     authz_policy = ACLAuthorizationPolicy()
     config.set_authentication_policy(authn_policy)
     config.set_authorization_policy(authz_policy)
