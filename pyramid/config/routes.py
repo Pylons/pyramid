@@ -382,7 +382,9 @@ class RoutesConfiguratorMixin(object):
             raise ConfigurationError('"pattern" argument may not be None')
 
         if self.route_prefix:
-            pattern = self.route_prefix.rstrip('/') + '/' + pattern.lstrip('/')
+            if pattern != '':
+                pattern = '/' + pattern.lstrip('/') 
+            pattern = self.route_prefix.rstrip('/') + pattern
 
         mapper = self.get_routes_mapper()
 
