@@ -52,6 +52,10 @@ Bug Fixes
   attribute of the request.  It no longer fails in this case.  See
   https://github.com/Pylons/pyramid/issues/700
 
+- Be more tolerant of potential error conditions in ``match_param`` and
+  ``physical_path`` predicate implementations; instead of raising an exception,
+  return False.
+
 Deprecations
 ------------
 
