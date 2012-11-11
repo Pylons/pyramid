@@ -37,6 +37,11 @@ Features
   permit limited composition reuse of the decorator by other software that
   wants to provide custom decorators that are much like view_config.
 
+- Allow an iterable of decorators to be passed to
+  ``pyramid.config.Configurator.add_view``. This allows views to be wrapped
+  by more than one decorator without requiring combining the decorators
+  yourself.
+
 Bug Fixes
 ---------
 

@@ -42,6 +42,7 @@ from pyramid.compat import (
     url_quote,
     WIN,
     is_bound_method,
+    is_nonstr_iter
     )
 
 from pyramid.exceptions import (
@@ -837,13 +838,39 @@ class ViewsConfiguratorMixin(object):
 
         decorator
 
-          A :term:`dotted Python name` to function (or the function itself)
-          which will be used to decorate the registered :term:`view
-          callable`.  The decorator function will be called with the view
-          callable as a single argument.  The view callable it is passed will
-          accept ``(context, request)``.  The decorator must return a
+          A :term:`dotted Python name` to function (or the function itself,
+          or an iterable of the aforementioned) which will be used to
+          decorate the registered :term:`view callable`.  The decorator
+          function(s) will be called with the view callable as a single
+          argument.  The view callable it is passed will accept
+          ``(context, request)``.  The decorator(s) must return a
           replacement view callable which also accepts ``(context,
           request)``.
+
+          If decorator is an iterable, the callables will be combined and
+          used in the order provided as a decorator.
+          For example::
+
+            @view_config(...,
+                decorator=(decorator2,
+                           decorator1))
+            def myview(request):
+                ....
+
+          Is similar to doing::
+
+            @view_config(...)
+            @decorator2
+            @decorator1
+            def myview(request):
+                ...
+
+          Except with the existing benefits of ``decorator=`` (having a common
+          decorator syntax for all view calling conventions and not having to
+          think about preserving function attributes such as ``__name__`` and
+          ``__module__`` within decorator logic).
+
+          Passing an iterable is only supported as of :app:`Pyramid` 1.4a4.
 
         mapper
 
@@ -1071,7 +1098,19 @@ class ViewsConfiguratorMixin(object):
         for_ = self.maybe_dotted(for_)
         containment = self.maybe_dotted(containment)
         mapper = self.maybe_dotted(mapper)
-        decorator = self.maybe_dotted(decorator)
+
+        def combine(*decorators):
+            def decorated(view_callable):
+                # reversed() is allows a more natural ordering in the api
+                for decorator in reversed(decorators):
+                    view_callable = decorator(view_callable)
+                return view_callable
+            return decorated
+
+        if is_nonstr_iter(decorator):
+            decorator = combine(*map(self.maybe_dotted, decorator))
+        else:
+            decorator = self.maybe_dotted(decorator)
 
         if not view:
             if renderer:

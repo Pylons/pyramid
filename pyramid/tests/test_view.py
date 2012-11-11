@@ -372,6 +372,10 @@ class TestViewConfigDecorator(unittest.TestCase):
     def test_create_with_other_predicates(self):
         decorator = self._makeOne(foo=1)
         self.assertEqual(decorator.foo, 1)
+
+    def test_create_decorator_tuple(self):
+        decorator = self._makeOne(decorator=('decorator1', 'decorator2'))
+        self.assertEqual(decorator.decorator, ('decorator1', 'decorator2'))
         
     def test_call_function(self):
         decorator = self._makeOne()
