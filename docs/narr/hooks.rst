@@ -180,11 +180,14 @@ as a forbidden view:
       config.scan()
 
 Like any other view, the forbidden view must accept at least a ``request``
-parameter, or both ``context`` and ``request``.  The ``context`` (available
-as ``request.context`` if you're using the request-only view argument
-pattern) is the context found by the router when the view invocation was
-denied.  The ``request`` is the current :term:`request` representing the
-denied action.
+parameter, or both ``context`` and ``request``.  If a forbidden view
+callable accepts both ``context`` and ``request``, the HTTP Exception is passed
+as context. The ``context`` as found by the router when view was
+denied (that you normally would expect) is available as
+``request.context``.  The ``request`` is the  current :term:`request`
+representing the denied action.
+
+
 
 Here's some sample code that implements a minimal forbidden view:
 
