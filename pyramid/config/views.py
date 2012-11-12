@@ -1,7 +1,6 @@
 import inspect
 import operator
 import os
-from functools import wraps
 
 from zope.interface import (
     Interface,
@@ -71,6 +70,8 @@ from pyramid.view import (
 
 from pyramid.util import (
     object_description,
+    viewdefaults,
+    action_method,
     )
 
 import pyramid.config.predicates
@@ -78,7 +79,6 @@ import pyramid.config.predicates
 from pyramid.config.util import (
     DEFAULT_PHASH,
     MAX_ORDER,
-    action_method,
     )
 
 urljoin = urlparse.urljoin
@@ -620,21 +620,6 @@ class MultiView(object):
             except PredicateMismatch:
                 continue
         raise PredicateMismatch(self.name)
-
-def viewdefaults(wrapped):
-    def wrapper(self, *arg, **kw):
-        defaults = {}
-        if arg:
-            view = arg[0]
-        else:
-            view = kw.get('view')
-        view = self.maybe_dotted(view)
-        if inspect.isclass(view):
-            defaults = getattr(view, '__view_defaults__', {}).copy()
-        defaults.update(kw)
-        defaults['_backframes'] = 3 # for action_method
-        return wrapped(self, *arg, **defaults)
-    return wraps(wrapped)(wrapper)
 
 class ViewsConfiguratorMixin(object):
     @viewdefaults

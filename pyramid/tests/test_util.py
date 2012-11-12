@@ -545,6 +545,37 @@ class TestSentinel(unittest.TestCase):
         r = repr(Sentinel('ABC'))
         self.assertEqual(r, 'ABC')
 
+class TestActionInfo(unittest.TestCase):
+    def _getTargetClass(self):
+        from pyramid.util import ActionInfo
+        return ActionInfo
+        
+    def _makeOne(self, filename, lineno, function, linerepr):
+        return self._getTargetClass()(filename, lineno, function, linerepr)
+
+    def test_class_conforms(self):
+        from zope.interface.verify import verifyClass
+        from pyramid.interfaces import IActionInfo
+        verifyClass(IActionInfo, self._getTargetClass())
+
+    def test_instance_conforms(self):
+        from zope.interface.verify import verifyObject
+        from pyramid.interfaces import IActionInfo
+        verifyObject(IActionInfo, self._makeOne('f', 0, 'f', 'f'))
+
+    def test_ctor(self):
+        inst = self._makeOne('filename', 10, 'function', 'src')
+        self.assertEqual(inst.file, 'filename')
+        self.assertEqual(inst.line, 10)
+        self.assertEqual(inst.function, 'function')
+        self.assertEqual(inst.src, 'src')
+
+    def test___str__(self):
+        inst = self._makeOne('filename', 0, 'function', '   linerepr  ')
+        self.assertEqual(str(inst),
+                         "Line 0 of file filename:\n       linerepr  ")
+
+
 def dummyfunc(): pass
 
 class Dummy(object):

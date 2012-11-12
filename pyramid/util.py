@@ -1,5 +1,9 @@
+import functools
 import inspect
+import traceback
 import weakref
+
+from zope.interface import implementer
 
 from pyramid.exceptions import (
     ConfigurationError,
@@ -15,6 +19,7 @@ from pyramid.compat import (
     PY3,
     )
 
+from pyramid.interfaces import IActionInfo
 from pyramid.path import DottedNameResolver as _DottedNameResolver
 
 class DottedNameResolver(_DottedNameResolver):
@@ -452,4 +457,66 @@ class TopologicalSorter(object):
                 result.append((name, self.name2val[name]))
 
         return result
+
+def viewdefaults(wrapped):
+    """ Decorator for add_view-like methods which takes into account
+    __view_defaults__ attached to view it is passed.  Not a documented API but
+    used by some external systems."""
+    def wrapper(self, *arg, **kw):
+        defaults = {}
+        if arg:
+            view = arg[0]
+        else:
+            view = kw.get('view')
+        view = self.maybe_dotted(view)
+        if inspect.isclass(view):
+            defaults = getattr(view, '__view_defaults__', {}).copy()
+        defaults.update(kw)
+        defaults['_backframes'] = 3 # for action_method
+        return wrapped(self, *arg, **defaults)
+    return functools.wraps(wrapped)(wrapper)
+
+@implementer(IActionInfo)
+class ActionInfo(object):
+    def __init__(self, file, line, function, src):
+        self.file = file
+        self.line = line
+        self.function = function
+        self.src = src
+
+    def __str__(self):
+        srclines = self.src.split('\n')
+        src = '\n'.join('    %s' % x for x in srclines)
+        return 'Line %s of file %s:\n%s' % (self.line, self.file, src)
+
+def action_method(wrapped):
+    """ Wrapper to provide the right conflict info report data when a method
+    that calls Configurator.action calls another that does the same.  Not a
+    documented API but used by some external systems."""
+    def wrapper(self, *arg, **kw):
+        if self._ainfo is None:
+            self._ainfo = []
+        info = kw.pop('_info', None)
+        # backframes for outer decorators to actionmethods
+        backframes = kw.pop('_backframes', 2)
+        if is_nonstr_iter(info) and len(info) == 4:
+            # _info permitted as extract_stack tuple
+            info = ActionInfo(*info)
+        if info is None:
+            try:
+                f = traceback.extract_stack(limit=3)
+                info = ActionInfo(*f[-backframes])
+            except: # pragma: no cover
+                info = ActionInfo(None, 0, '', '')
+        self._ainfo.append(info)
+        try:
+            result = wrapped(self, *arg, **kw)
+        finally:
+            self._ainfo.pop()
+        return result
+
+    if hasattr(wrapped, '__name__'):
+        functools.update_wrapper(wrapper, wrapped)
+    wrapper.__docobj__ = wrapped
+    return wrapper
 

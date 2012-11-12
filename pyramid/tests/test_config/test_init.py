@@ -772,7 +772,7 @@ pyramid.tests.test_config.dummy_include2""",
         self.assertEqual(config.action('discrim', kw={'a':1}), None)
 
     def test_action_autocommit_with_introspectables(self):
-        from pyramid.config.util import ActionInfo
+        from pyramid.util import ActionInfo
         config = self._makeOne(autocommit=True)
         intr = DummyIntrospectable()
         config.action('discrim', introspectables=(intr,))

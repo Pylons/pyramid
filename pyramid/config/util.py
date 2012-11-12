@@ -1,10 +1,4 @@
-import traceback
-
-from functools import update_wrapper
-
-from zope.interface import implementer
-
-from pyramid.interfaces import IActionInfo
+from hashlib import md5
 
 from pyramid.compat import (
     bytes_,
@@ -13,55 +7,18 @@ from pyramid.compat import (
 
 from pyramid.exceptions import ConfigurationError
 from pyramid.registry import predvalseq
-from pyramid.util import TopologicalSorter
 
-from hashlib import md5
+from pyramid.util import (
+    TopologicalSorter,
+    action_method,
+    ActionInfo,
+    )
+
+action_method = action_method # support bw compat imports
+ActionInfo = ActionInfo # support bw compat imports
 
 MAX_ORDER = 1 << 30
 DEFAULT_PHASH = md5().hexdigest()
-
-@implementer(IActionInfo)
-class ActionInfo(object):
-    def __init__(self, file, line, function, src):
-        self.file = file
-        self.line = line
-        self.function = function
-        self.src = src
-
-    def __str__(self):
-        srclines = self.src.split('\n')
-        src = '\n'.join('    %s' % x for x in srclines)
-        return 'Line %s of file %s:\n%s' % (self.line, self.file, src)
-
-def action_method(wrapped):
-    """ Wrapper to provide the right conflict info report data when a method
-    that calls Configurator.action calls another that does the same"""
-    def wrapper(self, *arg, **kw):
-        if self._ainfo is None:
-            self._ainfo = []
-        info = kw.pop('_info', None)
-        # backframes for outer decorators to actionmethods
-        backframes = kw.pop('_backframes', 2)
-        if is_nonstr_iter(info) and len(info) == 4:
-            # _info permitted as extract_stack tuple
-            info = ActionInfo(*info)
-        if info is None:
-            try:
-                f = traceback.extract_stack(limit=3)
-                info = ActionInfo(*f[-backframes])
-            except: # pragma: no cover
-                info = ActionInfo(None, 0, '', '')
-        self._ainfo.append(info)
-        try:
-            result = wrapped(self, *arg, **kw)
-        finally:
-            self._ainfo.pop()
-        return result
-
-    if hasattr(wrapped, '__name__'):
-        update_wrapper(wrapper, wrapped)
-    wrapper.__docobj__ = wrapped
-    return wrapper
 
 def as_sorted_tuple(val):
     if not is_nonstr_iter(val):
