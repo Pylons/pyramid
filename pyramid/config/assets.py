@@ -8,7 +8,7 @@ from pyramid.interfaces import IPackageOverrides
 from pyramid.exceptions import ConfigurationError
 from pyramid.threadlocal import get_current_registry
 
-from pyramid.config.util import action_method
+from pyramid.util import action_method
 
 class OverrideProvider(pkg_resources.DefaultProvider):
     def __init__(self, module):

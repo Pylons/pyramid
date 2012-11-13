@@ -6,7 +6,7 @@ from pyramid.interfaces import (
     PHASE1_CONFIG,
     )
 
-from pyramid.config.util import action_method
+from pyramid.util import action_method
 
 from pyramid import (
     renderers,

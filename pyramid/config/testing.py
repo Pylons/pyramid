@@ -14,7 +14,7 @@ from pyramid.traversal import (
     split_path_info,
     )
 
-from pyramid.config.util import action_method
+from pyramid.util import action_method
 
 class TestingConfiguratorMixin(object):
     # testing API

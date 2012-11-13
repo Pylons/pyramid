@@ -7,7 +7,7 @@ from pyramid.interfaces import (
     )
 
 from pyramid.exceptions import ConfigurationError
-from pyramid.config.util import action_method
+from pyramid.util import action_method
 
 class SecurityConfiguratorMixin(object):
     @action_method

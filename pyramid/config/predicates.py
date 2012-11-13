@@ -17,6 +17,8 @@ from pyramid.security import effective_principals
 
 from .util import as_sorted_tuple
 
+_marker = object()
+
 class XHRPredicate(object):
     def __init__(self, val, config):
         self.val = bool(val)
@@ -174,6 +176,9 @@ class MatchParamPredicate(object):
     phash = text
 
     def __call__(self, context, request):
+        if not request.matchdict:
+            # might be None
+            return False
         for k, v in self.reqs:
             if request.matchdict.get(k) != v:
                 return False
@@ -266,7 +271,9 @@ class PhysicalPathPredicate(object):
     phash = text
 
     def __call__(self, context, request):
-        return resource_path_tuple(context) == self.val
+        if getattr(context, '__name__', _marker) is not _marker:
+            return resource_path_tuple(context) == self.val
+        return False
 
 class EffectivePrincipalsPredicate(object):
     def __init__(self, val, config):

@@ -1,7 +1,5 @@
 from zope.interface import implementer
 
-from pyramid.config.util import action_method
-
 from pyramid.interfaces import (
     IDefaultRootFactory,
     IRequestFactory,
@@ -11,7 +9,11 @@ from pyramid.interfaces import (
     )
 
 from pyramid.traversal import DefaultRootFactory
-from pyramid.util import InstancePropertyMixin
+
+from pyramid.util import (
+    action_method,
+    InstancePropertyMixin,
+    )
 
 class FactoriesConfiguratorMixin(object):
     @action_method

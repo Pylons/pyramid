@@ -187,6 +187,13 @@ class TestMatchParamPredicate(unittest.TestCase):
         result = inst(None, request)
         self.assertFalse(result)
 
+    def test___call___matchdict_is_None(self):
+        inst = self._makeOne('abc=1')
+        request = Dummy()
+        request.matchdict = None
+        result = inst(None, request)
+        self.assertFalse(result)
+
     def test_text(self):
         inst = self._makeOne(('def=  1', 'abc =2'))
         self.assertEqual(inst.text(), 'match_param abc=2,def=1')
@@ -434,6 +441,11 @@ class Test_PhysicalPathPredicate(unittest.TestCase):
         context = Dummy()
         context.__name__ = 'abc'
         context.__parent__ = root
+        self.assertFalse(inst(context, None))
+
+    def test_it_call_context_has_no_name(self):
+        inst = self._makeOne('/', None)
+        context = Dummy()
         self.assertFalse(inst(context, None))
 
 class Test_EffectivePrincipalsPredicate(unittest.TestCase):

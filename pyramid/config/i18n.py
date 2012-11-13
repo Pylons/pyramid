@@ -13,8 +13,7 @@ from pyramid.exceptions import ConfigurationError
 from pyramid.i18n import get_localizer
 from pyramid.path import package_path
 from pyramid.threadlocal import get_current_request
-
-from pyramid.config.util import action_method
+from pyramid.util import action_method
 
 class I18NConfiguratorMixin(object):
     @action_method

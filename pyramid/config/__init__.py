@@ -70,15 +70,16 @@ from pyramid.config.security import SecurityConfiguratorMixin
 from pyramid.config.settings import SettingsConfiguratorMixin
 from pyramid.config.testing import TestingConfiguratorMixin
 from pyramid.config.tweens import TweensConfiguratorMixin
-from pyramid.config.util import (
-    action_method,
-    ActionInfo,
-    PredicateList,
-    )
+from pyramid.config.util import PredicateList
 from pyramid.config.views import ViewsConfiguratorMixin
 from pyramid.config.zca import ZCAConfiguratorMixin
 
 from pyramid.path import DottedNameResolver
+
+from pyramid.util import (
+    action_method,
+    ActionInfo,
+    )
 
 empty = text_('')
 _marker = object()
