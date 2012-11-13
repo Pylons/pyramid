@@ -486,6 +486,11 @@ Deprecations
   was designed to offer in Pylons.  It will continue to exist "forever" but
   it will not be recommended or mentioned in the docs.
 
+- Remove references to do-nothing ``pyramid.debug_templates`` setting in all
+  Pyramid-provided .ini files. This setting previously told Chameleon to render
+  better exceptions; now Chameleon always renders nice exceptions regardless of
+  the value of this setting.
+
 Known Issues
 ------------
 
