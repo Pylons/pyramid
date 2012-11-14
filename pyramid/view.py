@@ -2,6 +2,8 @@ import venusian
 
 from zope.interface import providedBy
 from zope.deprecation import deprecated
+from webob.compat import text_type
+
 
 from pyramid.interfaces import (
     IRoutesMapper,
@@ -136,7 +138,7 @@ def render_view(context, request, name='', secure=True):
     iterable = render_view_to_iterable(context, request, name, secure)
     if iterable is None:
         return None
-    return ''.join(iterable)
+    return b''.join((x.encode('utf-8') if isinstance(x, text_type) else x for x in  iterable))
 
 class view_config(object):
     """ A function, class or method :term:`decorator` which allows a
