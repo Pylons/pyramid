@@ -94,8 +94,8 @@ def render_view_to_iterable(context, request, name='', secure=True):
     :exc:`ValueError` if a view function is found and called but the
     view function's result does not have an ``app_iter`` attribute.
 
-    You can usually get the string representation of the return value
-    of this function by calling ``''.join(iterable)``, or just use
+    You can usually get the bytestring representation of the return value of
+    this function by calling ``b''.join(iterable)``, or just use
     :func:`pyramid.view.render_view` instead.
 
     If ``secure`` is ``True``, and the view is protected by a permission, the
