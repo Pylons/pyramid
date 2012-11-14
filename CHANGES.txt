@@ -61,6 +61,10 @@ Bug Fixes
   ``physical_path`` predicate implementations; instead of raising an exception,
   return False.
 
+- :func:`pyramid.view.render_view` was not functioning properly under
+  Python 3.x due to a byte/unicode discrepancy. See
+  http://github.com/Pylons/pyramid/issues/721
+
 Deprecations
 ------------
 

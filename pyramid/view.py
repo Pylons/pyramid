@@ -3,6 +3,7 @@ import venusian
 from zope.interface import providedBy
 from zope.deprecation import deprecated
 
+
 from pyramid.interfaces import (
     IRoutesMapper,
     IView,
@@ -116,7 +117,7 @@ def render_view(context, request, name='', secure=True):
     configuration` that matches the :term:`view name` ``name``
     registered against the specified ``context`` and ``request``
     and unwind the view response's ``app_iter`` (see
-    :ref:`the_response`) into a single string.  This function will
+    :ref:`the_response`) into a single bytestring.  This function will
     return ``None`` if a corresponding :term:`view callable` cannot be
     found (when no :term:`view configuration` matches the combination
     of ``name`` / ``context`` / and ``request``).  Additionally, this
@@ -136,7 +137,7 @@ def render_view(context, request, name='', secure=True):
     iterable = render_view_to_iterable(context, request, name, secure)
     if iterable is None:
         return None
-    return ''.join(iterable)
+    return b''.join(iterable)
 
 class view_config(object):
     """ A function, class or method :term:`decorator` which allows a
