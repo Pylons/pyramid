@@ -188,3 +188,5 @@ Contributors
 - Domen Kozar, 2012/09/11
 
 - David Gay, 2012/09/16
+
+- John Anderson, 2012/11/14
