@@ -224,12 +224,13 @@ class RenderViewToIterableTests(BaseTest, unittest.TestCase):
         response = DummyResponse()
         view = make_view(response)
         def anotherview(context, request):
-            return DummyResponse('anotherview')
+            return DummyResponse(b'anotherview')
         view.__call_permissive__ = anotherview
         self._registerView(request.registry, view, 'registered')
         iterable = self._callFUT(context, request, name='registered',
                                  secure=False)
-        self.assertEqual(iterable, ['anotherview'])
+        self.assertEqual(iterable, [b'anotherview'])
+
     def test_verify_output_bytestring(self):
         from pyramid.request import Request
         from pyramid.config import Configurator
@@ -294,7 +295,7 @@ class RenderViewTests(BaseTest, unittest.TestCase):
         response = DummyResponse()
         view = make_view(response)
         def anotherview(context, request):
-            return DummyResponse('anotherview')
+            return DummyResponse(b'anotherview')
         view.__call_permissive__ = anotherview
         self._registerView(request.registry, view, 'registered')
         s = self._callFUT(context, request, name='registered', secure=False)
