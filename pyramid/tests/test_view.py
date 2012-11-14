@@ -224,12 +224,29 @@ class RenderViewToIterableTests(BaseTest, unittest.TestCase):
         response = DummyResponse()
         view = make_view(response)
         def anotherview(context, request):
-            return DummyResponse('anotherview')
+            return DummyResponse(b'anotherview')
         view.__call_permissive__ = anotherview
         self._registerView(request.registry, view, 'registered')
         iterable = self._callFUT(context, request, name='registered',
                                  secure=False)
-        self.assertEqual(iterable, ['anotherview'])
+        self.assertEqual(iterable, [b'anotherview'])
+
+    def test_verify_output_bytestring(self):
+        from pyramid.request import Request
+        from pyramid.config import Configurator
+        from pyramid.view import render_view
+        from webob.compat import text_type
+        config = Configurator(settings={})
+        def view(request):
+            request.response.text = text_type('<body></body>')
+            return request.response
+
+        config.add_view(name='test', view=view)
+        config.commit()
+
+        r = Request({})
+        r.registry = config.registry
+        self.assertEqual(render_view(object(), r, 'test'), b'<body></body>')
 
     def test_call_request_has_no_registry(self):
         request = self._makeRequest()
@@ -261,7 +278,7 @@ class RenderViewTests(BaseTest, unittest.TestCase):
         view = make_view(response)
         self._registerView(request.registry, view, 'registered')
         s = self._callFUT(context, request, name='registered', secure=True)
-        self.assertEqual(s, '')
+        self.assertEqual(s, b'')
 
     def test_call_view_registered_insecure_no_call_permissive(self):
         context = self._makeContext()
@@ -270,7 +287,7 @@ class RenderViewTests(BaseTest, unittest.TestCase):
         view = make_view(response)
         self._registerView(request.registry, view, 'registered')
         s = self._callFUT(context, request, name='registered', secure=False)
-        self.assertEqual(s, '')
+        self.assertEqual(s, b'')
 
     def test_call_view_registered_insecure_with_call_permissive(self):
         context = self._makeContext()
@@ -278,11 +295,11 @@ class RenderViewTests(BaseTest, unittest.TestCase):
         response = DummyResponse()
         view = make_view(response)
         def anotherview(context, request):
-            return DummyResponse('anotherview')
+            return DummyResponse(b'anotherview')
         view.__call_permissive__ = anotherview
         self._registerView(request.registry, view, 'registered')
         s = self._callFUT(context, request, name='registered', secure=False)
-        self.assertEqual(s, 'anotherview')
+        self.assertEqual(s, b'anotherview')
 
 class TestIsResponse(unittest.TestCase):
     def setUp(self):

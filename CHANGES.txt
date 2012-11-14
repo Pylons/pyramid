@@ -1,12 +1,13 @@
-Next release
-============
+1.4a4 (2012-11-14)
+==================
 
 Features
 --------
 
 - ``pyramid.authentication.AuthTktAuthenticationPolicy`` has been updated to
   support newer hashing algorithms such as ``sha512``. Existing applications
-  should consider updating if possible.
+  should consider updating if possible for improved security over the default
+  md5 hashing.
 
 - Added an ``effective_principals`` route and view predicate.
 
@@ -21,17 +22,10 @@ Features
 - Slightly better debug logging from
   ``pyramid.authentication.RepozeWho1AuthenticationPolicy``.
 
-- ``pyramid.security.view_execution_permitted`` used to return `True` if no
+- ``pyramid.security.view_execution_permitted`` used to return ``True`` if no
   view could be found. It now raises a ``TypeError`` exception in that case, as
   it doesn't make sense to assert that a nonexistent view is
   execution-permitted. See https://github.com/Pylons/pyramid/issues/299.
-
-- Get rid of shady monkeypatching of ``pyramid.request.Request`` and
-  ``pyramid.response.Response`` done within the ``__init__.py`` of Pyramid.
-  Webob no longer relies on this being done.  Instead, the ResponseClass
-  attribute of the Pyramid Request class is assigned to the Pyramid response
-  class; that's enough to satisfy WebOb and behave as it did before with the
-  monkeypatching.
 
 - Allow a ``_depth`` argument to ``pyramid.view.view_config``, which will
   permit limited composition reuse of the decorator by other software that
@@ -61,14 +55,26 @@ Bug Fixes
   ``physical_path`` predicate implementations; instead of raising an exception,
   return False.
 
+- ``pyramid.view.render_view`` was not functioning properly under Python 3.x
+  due to a byte/unicode discrepancy. See
+  http://github.com/Pylons/pyramid/issues/721
+
 Deprecations
 ------------
 
-- ``pyramid.authentication.AuthTktAuthenticationPolicy`` will emit a warning
-  if an application is using the policy without explicitly setting the
-  ``hashalg``. This is because the default is "md5" which is considered
-  insecure. If you really want "md5" then you must specify it explicitly to
-  get rid of the warning.
+- ``pyramid.authentication.AuthTktAuthenticationPolicy`` will emit a warning if
+  an application is using the policy without explicitly passing a ``hashalg``
+  argument. This is because the default is "md5" which is considered
+  theoretically subject to collision attacks. If you really want "md5" then you
+  must specify it explicitly to get rid of the warning.
+
+Documentation
+-------------
+
+- All of the tutorials that use
+  ``pyramid.authentication.AuthTktAuthenticationPolicy`` now explicitly pass
+  ``sha512`` as a ``hashalg`` argument.
+
 
 Internals
 ---------
@@ -80,6 +86,13 @@ Internals
   move that stuff that may be an API one day out of ``pyramid.config.util``,
   because that package should never be imported from non-Pyramid code.
   TopologicalSorter is still not an API, but may become one.
+
+- Get rid of shady monkeypatching of ``pyramid.request.Request`` and
+  ``pyramid.response.Response`` done within the ``__init__.py`` of Pyramid.
+  Webob no longer relies on this being done.  Instead, the ResponseClass
+  attribute of the Pyramid Request class is assigned to the Pyramid response
+  class; that's enough to satisfy WebOb and behave as it did before with the
+  monkeypatching.
 
 1.4a3 (2012-10-26)
 ==================

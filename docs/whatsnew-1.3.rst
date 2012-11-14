@@ -289,13 +289,6 @@ Minor Feature Additions
   not a new feature, it just provides an API for adding a resource url
   adapter without needing to use the ZCA API.
 
-- The :meth:`pyramid.config.Configurator.scan` method can now be passed an
-  ``ignore`` argument, which can be a string, a callable, or a list
-  consisting of strings and/or callables.  This feature allows submodules,
-  subpackages, and global objects from being scanned.  See
-  http://readthedocs.org/docs/venusian/en/latest/#ignore-scan-argument for
-  more information about how to use the ``ignore`` argument to ``scan``.
-
 - Better error messages when a view callable returns a value that cannot be
   converted to a response (for example, when a view callable returns a
   dictionary without a renderer defined, or doesn't return any value at all).
