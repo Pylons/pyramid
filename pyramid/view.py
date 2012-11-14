@@ -117,7 +117,7 @@ def render_view(context, request, name='', secure=True):
     configuration` that matches the :term:`view name` ``name``
     registered against the specified ``context`` and ``request``
     and unwind the view response's ``app_iter`` (see
-    :ref:`the_response`) into a single string.  This function will
+    :ref:`the_response`) into a single bytestring.  This function will
     return ``None`` if a corresponding :term:`view callable` cannot be
     found (when no :term:`view configuration` matches the combination
     of ``name`` / ``context`` / and ``request``).  Additionally, this
