@@ -19,7 +19,10 @@ class TestPRoutesCommand(unittest.TestCase):
         route = dummy.DummyRoute('a', '/a')
         mapper = dummy.DummyMapper(route)
         cmd._get_mapper = lambda *arg: mapper
+        L = []
+        cmd.out = lambda msg: L.append(msg)
         cmd.run()
+        self.assertTrue('<unknown>' in ''.join(L))
 
     def test_bad_args(self):
         cmd = self._getTargetClass()([])
