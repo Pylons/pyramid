@@ -42,8 +42,12 @@ class PredicateList(object):
         ##     weighs_more_than = self.last_added or FIRST
         ##     weighs_less_than = LAST
         self.last_added = name
-        self.sorter.add(name, factory, after=weighs_more_than,
-                        before=weighs_less_than)
+        self.sorter.add(
+            name,
+            factory,
+            after=weighs_more_than,
+            before=weighs_less_than,
+            )
 
     def make(self, config, **kw):
         # Given a configurator and a list of keywords, a predicate list is

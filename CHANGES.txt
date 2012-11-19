@@ -1,3 +1,13 @@
+Next release
+============
+
+Bug Fixes
+---------
+
+- A failure when trying to locate the attribute ``__text__`` on route and view
+  predicates existed when the ``debug_routematch`` setting was true or when the
+  ``pviews`` command was used. See https://github.com/Pylons/pyramid/pull/727
+
 1.4a4 (2012-11-14)
 ==================
 
