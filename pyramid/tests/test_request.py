@@ -230,6 +230,13 @@ class TestRequest(unittest.TestCase):
         request.registry = self.config.registry
         self.assertEqual(request.is_response('abc'), False)
 
+    def test_is_response_true_ob_is_pyramid_response(self):
+        from pyramid.response import Response
+        r = Response('hello')
+        request = self._makeOne()
+        request.registry = self.config.registry
+        self.assertEqual(request.is_response(r), True)
+
     def test_is_response_false_adapter_is_not_self(self):
         from pyramid.interfaces import IResponse
         request = self._makeOne()

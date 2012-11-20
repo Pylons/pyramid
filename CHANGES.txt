@@ -1,6 +1,15 @@
 Next release
 ============
 
+Features
+--------
+
+- Small microspeed enhancement which anticipates that a
+  ``pyramid.response.Response`` object is likely to be returned from a view.
+  Some code is shortcut if the class of the object returned by a view is this
+  class.  A similar microoptimization was done to
+  ``pyramid.request.Request.is_response``.
+
 Bug Fixes
 ---------
 
