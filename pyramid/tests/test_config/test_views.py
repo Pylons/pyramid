@@ -2483,6 +2483,29 @@ class TestViewDeriver(unittest.TestCase):
         else: # pragma: no cover
             raise AssertionError
 
+    def test_function_returns_true_Response_no_renderer(self):
+        from pyramid.response import Response
+        r = Response('Hello')
+        def view(request):
+            return r
+        deriver = self._makeOne()
+        result = deriver(view)
+        self.assertFalse(result is view)
+        response = result(None, None)
+        self.assertEqual(response, r)
+
+    def test_function_returns_true_Response_with_renderer(self):
+        from pyramid.response import Response
+        r = Response('Hello')
+        def view(request):
+            return r
+        renderer = object()
+        deriver = self._makeOne(renderer=renderer)
+        result = deriver(view)
+        self.assertFalse(result is view)
+        response = result(None, None)
+        self.assertEqual(response, r)
+
     def test_requestonly_default_method_returns_non_adaptable(self):
         request = DummyRequest()
         class AView(object):
