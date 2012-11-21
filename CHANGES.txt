@@ -15,16 +15,10 @@ Features
   values in parameterized ``.ini`` file, e.g. ``pshell etc/development.ini
   http_port=8080``.  See https://github.com/Pylons/pyramid/pull/714
 
-- In order to normalize the relationship between event subscribers and
-  subscriber predicates, we now allow both subscribers and subscriber
-  predicates to accept only a single ``event`` argument even if they've been
-  subscribed for notifications that involve multiple interfaces.  Subscribers
-  and subscriber predicates that accept only one argument will receive the
-  first object passed to ``notify``; this is typically (but not always) the
-  event object.  The other objects involved in the subscription lookup will be
-  discarded.
-
-  For instance, if an event is sent by code like this::
+- A somewhat advanced and obscure feature of Pyramid event handlers is their
+  ability to handle "multi-interface" notifications.  These notifications have
+  traditionally presented multiple objects to the subscriber callable.  For
+  instance, if an event was sent by code like this::
 
      registry.notify(event, context)
 
@@ -33,28 +27,101 @@ Features
   its argument list::
 
      @subscriber([SomeEvent, SomeContextType])
-     def subscriber(event, context):
+     def asubscriber(event, context):
          pass
 
-  With the event-only feature you can now write an event subscriber that
-  accepts only ``event`` even if it subscribes to multiple interfaces::
+  In many subscriber callables registered this way, it was common for the logic
+  in the subscriber callable to completely ignore the second and following
+  arguments (e.g. ``context`` in the above example might be ignored), because
+  they usually existed as attributes of the event anyway.  You could usually
+  get the same value by doing ``event.context`` or similar in most cases.
+
+  The fact that you needed to put an extra argument which you usually ignored
+  in the subscriber callable body was only a minor annoyance until we added
+  "subscriber predicates" in a prior 1.4 alpha release.  Subscriber predicates
+  are used to narrow the set of circumstances under which a subscriber will be
+  executed.  Once those were added, the annoyance was escalated, because
+  subscriber predicates needed to accept the same argument list and arity as
+  the subscriber callables that they were configured against.  So, for example,
+  if you had these two subscriber registrations in your code::
 
      @subscriber([SomeEvent, SomeContextType])
-     def subscriber(event):
+     def asubscriber(event, context):
+         pass
+
+     @subscriber(SomeOtherEvent)
+     def asubscriber(event):
+         pass
+ 
+  And you wanted to use a subscriber predicate::
+
+     @subscriber([SomeEvent, SomeContextType], mypredicate=True)
+     def asubscriber(event, context):
+         pass
+
+     @subscriber(SomeOtherEvent, mypredicate=True)
+     def asubscriber(event):
+         pass
+
+  If you had previously written your ``mypredicate`` subscriber predicate that
+  accepted in such a way that it accepted only one argument in its
+  ``__call__``, you could not use it against a subscription which named more
+  than one interface in its subscriber interface list.  Similarly, if you had
+  written a subscriber predicate that accepted two arguments, you couldn't use
+  it against a registration that named only a single interface type.  For
+  example, if you created this predicate::
+
+    class MyPredicate(object):
+        # portions elided...
+        def __call__(self, event):
+            return self.val == event.context.foo
+
+  It would not work against a multi-interface-registered subscription.
+
+  To hack around this limitation, you needed to design a ``mypredicate``
+  predicate to expect to receive in its ``__call__`` either a single ``event``
+  argument (a SomeOtherEvent object) *or* a pair of arguments (a SomeEvent
+  object and a SomeContextType object), presumably by doing something like
+  this::
+
+    class MyPredicate(object):
+        # portions elided...
+        def __call__(self, event, context=None):
+            return self.val == event.context.foo
+
+  This was confusing and bad.
+
+  In order to allow people to ignore unused arguments to subscriber callables
+  and to normalize the relationship between event subscribers and subscriber
+  predicates, we now allow both subscribers and subscriber predicates to accept
+  only a single ``event`` argument even if they've been subscribed for
+  notifications that involve multiple interfaces.  Subscribers and subscriber
+  predicates that accept only one argument will receive the first object passed
+  to ``notify``; this is typically (but not always) the event object.  The
+  other objects involved in the subscription lookup will be discarded.  You can
+  now write an event subscriber that accepts only ``event`` even if it
+  subscribes to multiple interfaces::
+
+     @subscriber([SomeEvent, SomeContextType])
+     def asubscriber(event):
          # this will work!
 
-  Note, however, that if the event object is not the first object in the call
-  to ``notify``, you'll run into trouble.  For example, if notify is called
-  with the context argument first::
+  This prevents you from needing to match the subscriber callable parameters to
+  the subscription type unnecessarily, especially when you don't make use of
+  any argument in your subscribers except for the event object itself.
+
+  Note, however, that if the event object is not the first
+  object in the call to ``notify``, you'll run into trouble.  For example, if
+  notify is called with the context argument first::
 
      registry.notify(context, event)
 
-  You won't be able to take advantage of the feature.  It will "work", but the
-  object received by your event handler won't be the event object, it will be
-  the context object, which won't be very useful::
+  You won't be able to take advantage of the event-only feature.  It will
+  "work", but the object received by your event handler won't be the event
+  object, it will be the context object, which won't be very useful::
 
      @subscriber([SomeContextType, SomeEvent])
-     def subscriber(event):
+     def asubscriber(event):
          # bzzt! you'll be getting the context here as ``event``, and it'll 
          # be useless
 
@@ -63,55 +130,36 @@ Features
   and the first interface is not the event interface.  For example::
 
      @subscriber([SomeContextType, SomeEvent])
-     def subscriber(context, event):
+     def asubscriber(context, event):
          # this will still work!
 
   The event-only feature makes it possible to use a subscriber predicate that
   accepts only a request argument within both multiple-interface subscriber
-  registrations and single-interface subscriber registrations.  In the past, if
-  you had a subscriber predicate like this::
+  registrations and single-interface subscriber registrations.  You needn't
+  make slightly different variations of predicates depending on the
+  subscription type arguments.  Instead, just write all your subscriber
+  predicates so they only accept ``event`` in their ``__call__`` and they'll be
+  useful across all registrations for subscriptions that use an event as their
+  first argument, even ones which accept more than just ``event``.
 
-    class RequestPathStartsWith(object):
-        def __init__(self, val, config):
-            self.val = val
-
-        def text(self):
-            return 'path_startswith = %s' % (self.val,)
-
-        phash = text
-
-        def __call__(self, event):
-            return event.request.path.startswith(self.val)
-
-  If you attempted to use the above predicate to condition a subscription that
-  involved multiple interfaces, it would not work.  You had to change it to
-  accept the same arguments as the subscription itself.  For example, you might
-  have had to change its ``__call__`` method like so, adding a ``context``
-  argument::
-
-        def __call__(self, event, context):
-            return event.request.path.startswith(self.val)
-
-  With the event-only feature, you needn't make the change.  Instead, you can
-  write all predicates so they only accept ``event`` in their ``__call__`` and
-  they'll be useful across all registrations for subscriptions that use an
-  event as their first argument, even ones which accept more than just
-  ``event``.  However, the same caveat applies to predicates as to
-  subscriptions: if you're subscribing to a multi-interface event, and the
-  first interface is not the event interface, the predicate won't work
-  properly.  In such a case, you'll need to match the predicate ``__call__``
-  argument ordering and composition to the ordering of the interfaces.  For
-  example::
+  However, the same caveat applies to predicates as to subscriber callables: if
+  you're subscribing to a multi-interface event, and the first interface is not
+  the event interface, the predicate won't work properly.  In such a case,
+  you'll need to match the predicate ``__call__`` argument ordering and
+  composition to the ordering of the interfaces.  For example, if the
+  registration for the subscription uses ``[SomeContext, SomeEvent]``, you'll
+  need to reflect that in the ordering of the parameters of the predicate's
+  ``__call__`` method::
 
         def __call__(self, context, event):
             return event.request.path.startswith(self.val)
 
-  tl;dr: 1) Always use the event as the first argument to a multi-interface
-  subscription and 2) Use only ``event`` in your subscriber and subscriber
-  predicate parameter lists, no matter how many interfaces the subscriber is
-  notified with, as long as the event object is the first argument passed to
-  ``registry.notify``.  This will result in the maximum amount of reusability
-  of subscriber predicates.
+  tl;dr: 1) When using multi-interface subscriptions, always use the event type
+  as the first subscription registration argument and 2) When 1 is true, use
+  only ``event`` in your subscriber and subscriber predicate parameter lists,
+  no matter how many interfaces the subscriber is notified with.  This
+  combination will result in the maximum amount of reusability of subscriber
+  predicates and the least amount of thought on your part.  Drink responsibly.
 
 Bug Fixes
 ---------
