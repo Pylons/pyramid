@@ -22,6 +22,10 @@ Bug Fixes
   predicates existed when the ``debug_routematch`` setting was true or when the
   ``pviews`` command was used. See https://github.com/Pylons/pyramid/pull/727
 
+- XHR requests would only match views that specified xhr=True.
+  See https://github.com/Pylons/pyramid/issues/729
+  
+
 Documentation
 -------------
 
