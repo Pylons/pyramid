@@ -199,6 +199,18 @@ class TestPServeCommand(unittest.TestCase):
         msg = 'PID in %s is not valid (deleting)' % fn
         self.assertEqual(self.out_.getvalue(), msg)
 
+    def test_get_options_with_command(self):
+        inst = self._makeOne()
+        inst.args = ['foo', 'stop', 'a=1', 'b=2']
+        result = inst.get_options()
+        self.assertEqual(result, {'a': '1', 'b': '2'})
+
+    def test_get_options_no_command(self):
+        inst = self._makeOne()
+        inst.args = ['foo', 'a=1', 'b=2']
+        result = inst.get_options()
+        self.assertEqual(result, {'a': '1', 'b': '2'})
+
     def test_parse_vars_good(self):
         from pyramid.tests.test_scripts.dummy import DummyApp
 
@@ -217,20 +229,8 @@ class TestPServeCommand(unittest.TestCase):
         self.assertEqual(app.global_conf, {'a': '1', 'b': '2'})
 
     def test_parse_vars_bad(self):
-        from pyramid.tests.test_scripts.dummy import DummyApp
-
         inst = self._makeOne('development.ini', 'a')
-
         inst.loadserver = self._get_server
-
-
-        app = DummyApp()
-
-        def get_app(*args, **kwargs):
-            app.global_conf = kwargs.get('global_conf', None)
-
-        inst.loadapp = get_app
-
         self.assertRaises(ValueError, inst.run)
 
 class Test_read_pidfile(unittest.TestCase):

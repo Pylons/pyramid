@@ -13,8 +13,9 @@ def get_app(config_uri, name=None, options=None, loadapp=loadapp):
     """ Return the WSGI application named ``name`` in the PasteDeploy
     config file specified by ``config_uri``.
 
-    ``options`` are used as variable assignments like {'http_port': 8080}
-    and then use %(http_port)s in the config file.
+    ``options``, if passed, should be a dictionary used as variable assignments
+    like ``{'http_port': 8080}``.  This is useful if e.g. ``%(http_port)s`` is
+    used in the config file.
 
     If the ``name`` is None, this will attempt to parse the name from
     the ``config_uri`` string expecting the format ``inifile#name``.

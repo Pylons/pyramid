@@ -188,6 +188,7 @@ class PServeCommand(object):
             self.out('You must give a config file')
             return 2
         app_spec = self.args[0]
+
         if (len(self.args) > 1
             and self.args[1] in self.possible_subcommands):
             cmd = self.args[1]
