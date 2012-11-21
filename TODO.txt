@@ -4,6 +4,9 @@ Pyramid TODOs
 Nice-to-Have
 ------------
 
+- config.set_registry_attr with conflict detection... make sure the attr is
+  added before a commit, but register an action so a conflict can be detected.
+
 - Provide the presumed renderer name to the called view as an attribute of
   the request.
 
@@ -174,7 +177,4 @@ Probably Bad Ideas
         c.add_view(..)
 
 - _fix_registry should dictify the registry being fixed.
-
-- config.set_registry_attr (with conflict detection)... bad idea because it
-  won't take effect until after a commit and folks will be confused by that.
 
