@@ -174,6 +174,18 @@ class TestStaticAppBase(IntegrationBase):
     def test_oob_slash(self):
         self.testapp.get('/%2F/test_integration.py', status=404)
 
+class TestEventOnlySubscribers(IntegrationBase, unittest.TestCase):
+    package = 'pyramid.tests.pkgs.eventonly'
+
+    def test_sendfoo(self):
+        res = self.testapp.get('/sendfoo', status=200)
+        self.assertEqual(sorted(res.body.split()), ['foo', 'fooyup'])
+
+    def test_sendfoobar(self):
+        res = self.testapp.get('/sendfoobar', status=200)
+        self.assertEqual(sorted(res.body.split()),
+                         ['foobar', 'foobar2', 'foobaryup', 'foobaryup2'])
+
 class TestStaticAppUsingAbsPath(TestStaticAppBase, unittest.TestCase):
     package = 'pyramid.tests.pkgs.static_abspath'
 
