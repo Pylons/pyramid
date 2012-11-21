@@ -34,16 +34,16 @@ Features
   in the subscriber callable to completely ignore the second and following
   arguments (e.g. ``context`` in the above example might be ignored), because
   they usually existed as attributes of the event anyway.  You could usually
-  get the same value by doing ``event.context`` or similar in most cases.
+  get the same value by doing ``event.context`` or similar.
 
   The fact that you needed to put an extra argument which you usually ignored
   in the subscriber callable body was only a minor annoyance until we added
-  "subscriber predicates" in a prior 1.4 alpha release.  Subscriber predicates
-  are used to narrow the set of circumstances under which a subscriber will be
-  executed.  Once those were added, the annoyance was escalated, because
-  subscriber predicates needed to accept the same argument list and arity as
-  the subscriber callables that they were configured against.  So, for example,
-  if you had these two subscriber registrations in your code::
+  "subscriber predicates", used to narrow the set of circumstances under which
+  a subscriber will be executed, in a prior 1.4 alpha release.  Once those were
+  added, the annoyance was escalated, because subscriber predicates needed to
+  accept the same argument list and arity as the subscriber callables that they
+  were configured against.  So, for example, if you had these two subscriber
+  registrations in your code::
 
      @subscriber([SomeEvent, SomeContextType])
      def asubscriber(event, context):
@@ -56,33 +56,37 @@ Features
   And you wanted to use a subscriber predicate::
 
      @subscriber([SomeEvent, SomeContextType], mypredicate=True)
-     def asubscriber(event, context):
+     def asubscriber1(event, context):
          pass
 
      @subscriber(SomeOtherEvent, mypredicate=True)
-     def asubscriber(event):
+     def asubscriber2(event):
          pass
 
-  If you had previously written your ``mypredicate`` subscriber predicate that
-  accepted in such a way that it accepted only one argument in its
-  ``__call__``, you could not use it against a subscription which named more
-  than one interface in its subscriber interface list.  Similarly, if you had
-  written a subscriber predicate that accepted two arguments, you couldn't use
-  it against a registration that named only a single interface type.  For
-  example, if you created this predicate::
+  If an existing ``mypredicate`` subscriber predicate had been written in such
+  a way that it accepted only one argument in its ``__call__``, you could not
+  use it against a subscription which named more than one interface in its
+  subscriber interface list.  Similarly, if you had written a subscriber
+  predicate that accepted two arguments, you couldn't use it against a
+  registration that named only a single interface type.
+
+  For example, if you created this predicate::
 
     class MyPredicate(object):
         # portions elided...
         def __call__(self, event):
             return self.val == event.context.foo
 
-  It would not work against a multi-interface-registered subscription.
+  It would not work against a multi-interface-registered subscription, so in
+  the above example, when you attempted to use it against ``asubscriber1``, it
+  would fail at runtime with a TypeError, claiming something was attempting to
+  call it with too many arguments.
 
-  To hack around this limitation, you needed to design a ``mypredicate``
-  predicate to expect to receive in its ``__call__`` either a single ``event``
-  argument (a SomeOtherEvent object) *or* a pair of arguments (a SomeEvent
-  object and a SomeContextType object), presumably by doing something like
-  this::
+  To hack around this limitation, you were obligated to design the
+  ``mypredicate`` predicate to expect to receive in its ``__call__`` either a
+  single ``event`` argument (a SomeOtherEvent object) *or* a pair of arguments
+  (a SomeEvent object and a SomeContextType object), presumably by doing
+  something like this::
 
     class MyPredicate(object):
         # portions elided...
