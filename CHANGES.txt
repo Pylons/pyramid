@@ -24,7 +24,7 @@ Bug Fixes
 
 - XHR requests would only match views that specified xhr=True.
   See https://github.com/Pylons/pyramid/issues/729
-  
+
 
 Documentation
 -------------
