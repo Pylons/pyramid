@@ -10,6 +10,11 @@ Features
   class.  A similar microoptimization was done to
   ``pyramid.request.Request.is_response``.
 
+- Make it possible to use variable arguments on ``p*`` commands (``pserve``,
+  ``pshell``, ``pviews``, etc) in the form ``a=1 b=2`` so you can fill in
+  values in parameterized ``.ini`` file, e.g. ``pshell etc/development.ini
+  http_port=8080``.
+
 Bug Fixes
 ---------
 
