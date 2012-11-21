@@ -976,6 +976,13 @@ class ViewsConfiguratorMixin(object):
           This is useful for detecting AJAX requests issued from
           jQuery, Prototype and other Javascript libraries.
 
+          If this value is specifed and is ``False``, the :term:`request`
+          must not possess an ``HTTP_X_REQUESTED_WITH`` header that has the
+          value ``XMLHttpRequest`` for this view to be found and called.
+
+          If this value is not specified, this predicate will always
+          be true (the ``HTTP_X_REQUESTED_WITH`` header doesn't matter).
+
         accept
 
           The value of this argument represents a match query for one

@@ -21,15 +21,18 @@ _marker = object()
 
 class XHRPredicate(object):
     def __init__(self, val, config):
-        self.val = bool(val)
+        self.val = val
 
     def text(self):
-        return 'xhr = %s' % self.val
+        return 'xhr = %s' % (self.val,)
 
     phash = text
 
     def __call__(self, context, request):
-        return bool(request.is_xhr) is self.val
+        if self.val is None:
+            return True
+        else:
+            return bool(request.is_xhr) is bool(self.val)
 
 class RequestMethodPredicate(object):
     def __init__(self, val, config):
