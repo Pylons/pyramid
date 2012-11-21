@@ -188,7 +188,7 @@ class PViewsCommand(object):
         self.out("%sroute pattern: %s" % (indent, route.pattern))
         self.out("%sroute path: %s" % (indent, route.path))
         self.out("%ssubpath: %s" % (indent, '/'.join(attrs['subpath'])))
-        predicates = ', '.join([p.__text__ for p in route.predicates])
+        predicates = ', '.join([p.text() for p in route.predicates])
         if predicates != '':
             self.out("%sroute predicates (%s)" % (indent, predicates))
 

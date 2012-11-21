@@ -103,7 +103,7 @@ class Router(object):
                             request.path_info,
                             route.pattern,
                             match,
-                            ', '.join([p.__text__ for p in route.predicates]))
+                            ', '.join([p.text() for p in route.predicates]))
                         )
                     logger and logger.debug(msg)
 

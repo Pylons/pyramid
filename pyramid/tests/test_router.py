@@ -24,7 +24,7 @@ class TestRouter(unittest.TestCase):
         if mapper is None:
             mapper = RoutesMapper()
             self.registry.registerUtility(mapper, IRoutesMapper)
-        mapper.connect(name, path, factory)
+        return mapper.connect(name, path, factory)
 
     def _registerLogger(self):
         from pyramid.interfaces import IDebugLogger
@@ -657,7 +657,8 @@ class TestRouter(unittest.TestCase):
         root = object()
         def factory(request):
             return root
-        self._connectRoute('foo', 'archives/:action/:article', factory)
+        route = self._connectRoute('foo', 'archives/:action/:article', factory)
+        route.predicates = [DummyPredicate()]
         context = DummyContext()
         self._registerTraverserFactory(context)
         response = DummyResponse()
@@ -686,7 +687,11 @@ class TestRouter(unittest.TestCase):
             "route matched for url http://localhost:8080"
             "/archives/action1/article1; "
             "route_name: 'foo', "
-            "path_info: "))
+            "path_info: ")
+            )
+        self.assertTrue(
+            "predicates: 'predicate'" in logger.messages[0]
+            )
 
     def test_call_route_match_miss_debug_routematch(self):
         from pyramid.httpexceptions import HTTPNotFound
@@ -1158,6 +1163,12 @@ class TestRouter(unittest.TestCase):
         router = self._makeOne()
         start_response = DummyStartResponse()
         self.assertRaises(RuntimeError, router, environ, start_response)
+
+class DummyPredicate(object):
+    def __call__(self, info, request):
+        return True
+    def text(self):
+        return 'predicate'
 
 class DummyContext:
     pass

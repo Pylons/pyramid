@@ -59,6 +59,8 @@ from pyramid.registry import (
     Deferred,
     )
 
+from pyramid.response import Response
+
 from pyramid.security import NO_PERMISSION_REQUIRED
 from pyramid.static import static_view
 from pyramid.threadlocal import get_current_registry
@@ -341,25 +343,28 @@ class ViewDeriver(object):
         def rendered_view(context, request):
             renderer = view_renderer
             result = view(context, request)
-            registry = self.registry
-            # this must adapt, it can't do a simple interface check
-            # (avoid trying to render webob responses)
-            response = registry.queryAdapterOrSelf(result, IResponse)
-            if response is None:
-                attrs = getattr(request, '__dict__', {})
-                if 'override_renderer' in attrs:
-                    # renderer overridden by newrequest event or other
-                    renderer_name = attrs.pop('override_renderer')
-                    renderer = renderers.RendererHelper(
-                        name=renderer_name,
-                        package=self.kw.get('package'),
-                        registry = registry)
-                if '__view__' in attrs:
-                    view_inst = attrs.pop('__view__')
-                else:
-                    view_inst = getattr(view, '__original_view__', view)
-                response = renderer.render_view(request, result, view_inst,
-                                                context)
+            if result.__class__ is Response: # potential common case
+                response = result
+            else:
+                registry = self.registry
+                # this must adapt, it can't do a simple interface check
+                # (avoid trying to render webob responses)
+                response = registry.queryAdapterOrSelf(result, IResponse)
+                if response is None:
+                    attrs = getattr(request, '__dict__', {})
+                    if 'override_renderer' in attrs:
+                        # renderer overridden by newrequest event or other
+                        renderer_name = attrs.pop('override_renderer')
+                        renderer = renderers.RendererHelper(
+                            name=renderer_name,
+                            package=self.kw.get('package'),
+                            registry = registry)
+                    if '__view__' in attrs:
+                        view_inst = attrs.pop('__view__')
+                    else:
+                        view_inst = getattr(view, '__original_view__', view)
+                    response = renderer.render_view(request, result, view_inst,
+                                                    context)
             return response
 
         return rendered_view
@@ -368,21 +373,26 @@ class ViewDeriver(object):
         registry = self.registry
         def viewresult_to_response(context, request):
             result = view(context, request)
-            response = registry.queryAdapterOrSelf(result, IResponse)
-            if response is None:
-                if result is None:
-                    append = (' You may have forgotten to return a value from '
-                              'the view callable.')
-                elif isinstance(result, dict):
-                    append = (' You may have forgotten to define a renderer in '
-                              'the view configuration.')
-                else:
-                    append = ''
-                msg = ('Could not convert return value of the view callable %s '
-                      'into a response object. '
-                      'The value returned was %r.' + append)
-                    
-                raise ValueError(msg % (view_description(view), result))
+            if result.__class__ is Response: # common case
+                response = result
+            else:
+                response = registry.queryAdapterOrSelf(result, IResponse)
+                if response is None:
+                    if result is None:
+                        append = (' You may have forgotten to return a value '
+                                  'from the view callable.')
+                    elif isinstance(result, dict):
+                        append = (' You may have forgotten to define a '
+                                  'renderer in the view configuration.')
+                    else:
+                        append = ''
+
+                    msg = ('Could not convert return value of the view '
+                           'callable %s into a response object. '
+                           'The value returned was %r.' + append)
+
+                    raise ValueError(msg % (view_description(view), result))
+
             return response
 
         return viewresult_to_response

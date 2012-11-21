@@ -77,6 +77,11 @@ Subrequest Support
 Minor Feature Additions
 -----------------------
 
+- :class:`pyramid.authentication.AuthTktAuthenticationPolicy` has been updated
+  to support newer hashing algorithms such as ``sha512``. Existing applications
+  should consider updating if possible for improved security over the default
+  md5 hashing.
+
 - :meth:`pyramid.config.Configurator.add_directive` now accepts arbitrary
   callables like partials or objects implementing ``__call__`` which don't
   have ``__name__`` and ``__doc__`` attributes.  See
@@ -182,7 +187,6 @@ Minor Feature Additions
   :meth:`pyramid.config.testing_securitypolicy` now sets a ``forgotten`` value 
   on the policy (the value ``True``) when its ``forget`` method is called.
 
-
 - The DummySecurityPolicy created by
   :meth:`pyramid.config.testing_securitypolicy` now sets a
   ``remembered`` value on the policy, which is the value of the ``principal``
@@ -195,6 +199,31 @@ Minor Feature Additions
   'a', 'b', 'c')``.  It's useful when you want to always potentially show a
   view when some object is traversed to, but you can't be sure about what kind
   of object it will be, so you can't use the ``context`` predicate.  
+
+- Added an ``effective_principals`` route and view predicate.
+
+- Do not allow the userid returned from the
+  :func:`pyramid.security.authenticated_userid` or the userid that is one of the
+  list of principals returned by :func:`pyramid.security.effective_principals`
+  to be either of the strings ``system.Everyone`` or ``system.Authenticated``
+  when any of the built-in authorization policies that live in
+  :mod:`pyramid.authentication` are in use.  These two strings are reserved for
+  internal usage by Pyramid and they will no longer be accepted as valid
+  userids.
+
+- Allow a ``_depth`` argument to :class:`pyramid.view.view_config`, which will
+  permit limited composition reuse of the decorator by other software that
+  wants to provide custom decorators that are much like view_config.
+
+- Allow an iterable of decorators to be passed to
+  :meth:`pyramid.config.Configurator.add_view`. This allows views to be wrapped
+  by more than one decorator without requiring combining the decorators 
+  yourself.
+
+- :func:`pyramid.security.view_execution_permitted` used to return `True` if no
+  view could be found. It now raises a :exc:`TypeError` exception in that case,
+  as it doesn't make sense to assert that a nonexistent view is
+  execution-permitted. See https://github.com/Pylons/pyramid/issues/299.
 
 Backwards Incompatibilities
 ---------------------------
@@ -289,6 +318,12 @@ Deprecations
   used in its place (it has all of the same capabilities but can also extend
   the request object with methods).
 
+- :class:`pyramid.authentication.AuthTktAuthenticationPolicy` will emit a
+  deprecation warning if an application is using the policy without explicitly
+  passing a ``hashalg`` argument. This is because the default is "md5" which is
+  considered theoretically subject to collision attacks. If you really want
+  "md5" then you must specify it explicitly to get rid of the warning.
+
 Documentation Enhancements
 --------------------------
 
@@ -298,6 +333,10 @@ Documentation Enhancements
   while running a server.
 
 - Added a :ref:`subrequest_chapter` chapter to the narrative documentation.
+
+- All of the tutorials that use
+  :class:`pyramid.authentication.AuthTktAuthenticationPolicy` now explicitly 
+  pass ``sha512`` as a ``hashalg`` argument.
 
 - Many cleanups and improvements to narrative and API docs.
 

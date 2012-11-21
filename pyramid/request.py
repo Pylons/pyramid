@@ -372,6 +372,8 @@ class Request(BaseRequest, DeprecatedRequestMethodsMixin, URLMethodsMixin,
     def is_response(self, ob):
         """ Return ``True`` if the object passed as ``ob`` is a valid
         response object, ``False`` otherwise."""
+        if ob.__class__ is Response:
+            return True
         registry = self.registry
         adapted = registry.queryAdapterOrSelf(ob, IResponse)
         if adapted is None:
