@@ -17,6 +17,12 @@ Bug Fixes
   predicates existed when the ``debug_routematch`` setting was true or when the
   ``pviews`` command was used. See https://github.com/Pylons/pyramid/pull/727
 
+Documentation
+-------------
+
+- Sync up tutorial source files with the files that are rendered by the
+  scaffold that each uses.
+
 1.4a4 (2012-11-14)
 ==================
 
