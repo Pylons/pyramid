@@ -15,6 +15,104 @@ Features
   values in parameterized ``.ini`` file, e.g. ``pshell etc/development.ini
   http_port=8080``.  See https://github.com/Pylons/pyramid/pull/714
 
+- In order to normalize the relationship between event subscribers and
+  subscriber predicates, we now allow both subscribers and subscriber
+  predicates to accept only a single ``event`` argument even if they've been
+  subscribed for notifications that involve multiple interfaces.  Subscribers
+  and subscriber predicates that accept only one argument will receive the
+  first object passed to ``notify``; this is typically (but not always) the
+  event object.  The other objects involved in the subscription lookup will be
+  discarded.
+
+  For instance, if an event is sent by code like this::
+
+     registry.notify(event, context)
+
+  In the past, in order to catch such an event, you were obligated to write and
+  register an event subscriber that mentioned both the event and the context in
+  its argument list::
+
+     @subscriber([SomeEvent, SomeContextType])
+     def subscriber(event, context):
+         pass
+
+  With the event-only feature you can now write an event subscriber that
+  accepts only ``event`` even if it subscribes to multiple interfaces::
+
+     @subscriber([SomeEvent, SomeContextType])
+     def subscriber(event):
+         # this will work!
+
+  Note, however, that if the event object is not the first object in the call
+  to ``notify``, you'll run into trouble.  For example, if notify is called
+  with the context argument first::
+
+     registry.notify(context, event)
+
+  You won't be able to take advantage of the feature.  It will "work", but the
+  object received by your event handler won't be the event object, it will be
+  the context object, which won't be very useful::
+
+     @subscriber([SomeContextType, SomeEvent])
+     def subscriber(event):
+         # bzzt! you'll be getting the context here as ``event``, and it'll 
+         # be useless
+
+  Existing multiple-argument subscribers continue to work without issue, so you
+  should continue use those if your system notifies using multiple interfaces
+  and the first interface is not the event interface.  For example::
+
+     @subscriber([SomeContextType, SomeEvent])
+     def subscriber(context, event):
+         # this will still work!
+
+  The event-only feature makes it possible to use a subscriber predicate that
+  accepts only a request argument within both multiple-interface subscriber
+  registrations and single-interface subscriber registrations.  In the past, if
+  you had a subscriber predicate like this::
+
+    class RequestPathStartsWith(object):
+        def __init__(self, val, config):
+            self.val = val
+
+        def text(self):
+            return 'path_startswith = %s' % (self.val,)
+
+        phash = text
+
+        def __call__(self, event):
+            return event.request.path.startswith(self.val)
+
+  If you attempted to use the above predicate to condition a subscription that
+  involved multiple interfaces, it would not work.  You had to change it to
+  accept the same arguments as the subscription itself.  For example, you might
+  have had to change its ``__call__`` method like so, adding a ``context``
+  argument::
+
+        def __call__(self, event, context):
+            return event.request.path.startswith(self.val)
+
+  With the event-only feature, you needn't make the change.  Instead, you can
+  write all predicates so they only accept ``event`` in their ``__call__`` and
+  they'll be useful across all registrations for subscriptions that use an
+  event as their first argument, even ones which accept more than just
+  ``event``.  However, the same caveat applies to predicates as to
+  subscriptions: if you're subscribing to a multi-interface event, and the
+  first interface is not the event interface, the predicate won't work
+  properly.  In such a case, you'll need to match the predicate ``__call__``
+  argument ordering and composition to the ordering of the interfaces.  For
+  example::
+
+        def __call__(self, context, event):
+            return event.request.path.startswith(self.val)
+
+  tl;dr: 1) Always use the event as the first argument to a multi-interface
+  subscription and 2) Use only ``event`` in your subscriber and subscriber
+  predicate parameter lists, no matter how many interfaces the subscriber is
+  notified with, as long as the event object is the first argument passed to
+  ``registry.notify``.  This will result in the maximum amount of reusability
+  of subscriber predicates.
+
 Bug Fixes
 ---------
 

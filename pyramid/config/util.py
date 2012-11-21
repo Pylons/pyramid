@@ -1,10 +1,12 @@
 from hashlib import md5
+import inspect
 
 from pyramid.compat import (
     bytes_,
     is_nonstr_iter,
     )
 
+from pyramid.compat import im_func
 from pyramid.exceptions import ConfigurationError
 from pyramid.registry import predvalseq
 
@@ -110,3 +112,51 @@ class PredicateList(object):
         order = (MAX_ORDER - score) / (len(preds) + 1)
         return order, preds, phash.hexdigest()
 
+def takes_one_arg(callee, attr=None, argname=None):
+    ismethod = False
+    if attr is None:
+        attr = '__call__'
+    if inspect.isroutine(callee):
+        fn = callee
+    elif inspect.isclass(callee):
+        try:
+            fn = callee.__init__
+        except AttributeError:
+            return False
+        ismethod = hasattr(fn, '__call__')
+    else:
+        try:
+            fn = getattr(callee, attr)
+        except AttributeError:
+            return False
+
+    try:
+        argspec = inspect.getargspec(fn)
+    except TypeError:
+        return False
+
+    args = argspec[0]
+
+    if hasattr(fn, im_func) or ismethod:
+        # it's an instance method (or unbound method on py2)
+        if not args:
+            return False
+        args = args[1:]
+
+    if not args:
+        return False
+
+    if len(args) == 1:
+        return True
+
+    if argname:
+
+        defaults = argspec[3]
+        if defaults is None:
+            defaults = ()
+
+        if args[0] == argname:
+            if len(args) - len(defaults) == 1:
+                return True
+
+    return False

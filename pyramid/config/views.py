@@ -81,6 +81,7 @@ import pyramid.config.predicates
 from pyramid.config.util import (
     DEFAULT_PHASH,
     MAX_ORDER,
+    takes_one_arg,
     )
 
 urljoin = urlparse.urljoin
@@ -503,50 +504,7 @@ class DefaultViewMapper(object):
         return _attr_view
 
 def requestonly(view, attr=None):
-    ismethod = False
-    if attr is None:
-        attr = '__call__'
-    if inspect.isroutine(view):
-        fn = view
-    elif inspect.isclass(view):
-        try:
-            fn = view.__init__
-        except AttributeError:
-            return False
-        ismethod = hasattr(fn, '__call__')
-    else:
-        try:
-            fn = getattr(view, attr)
-        except AttributeError:
-            return False
-
-    try:
-        argspec = inspect.getargspec(fn)
-    except TypeError:
-        return False
-
-    args = argspec[0]
-
-    if hasattr(fn, im_func) or ismethod:
-        # it's an instance method (or unbound method on py2)
-        if not args:
-            return False
-        args = args[1:]
-    if not args:
-        return False
-
-    if len(args) == 1:
-        return True
-
-    defaults = argspec[3]
-    if defaults is None:
-        defaults = ()
-
-    if args[0] == 'request':
-        if len(args) - len(defaults) == 1:
-            return True
-
-    return False
+    return takes_one_arg(view, attr=attr, argname='request')
 
 @implementer(IMultiView)
 class MultiView(object):
