@@ -165,7 +165,7 @@ Configuration in ``development.ini``
 The ``development.ini`` (in the tutorial :term:`project` directory, as
 opposed to the tutorial :term:`package` directory) looks like this:
 
-.. literalinclude:: src/views/development.ini
+.. literalinclude:: src/basiclayout/development.ini
    :language: ini
 
 Note the existence of an ``[app:main]`` section which specifies our WSGI
