@@ -179,12 +179,12 @@ class TestEventOnlySubscribers(IntegrationBase, unittest.TestCase):
 
     def test_sendfoo(self):
         res = self.testapp.get('/sendfoo', status=200)
-        self.assertEqual(sorted(res.body.split()), ['foo', 'fooyup'])
+        self.assertEqual(sorted(res.body.split()), [b'foo', b'fooyup'])
 
     def test_sendfoobar(self):
         res = self.testapp.get('/sendfoobar', status=200)
         self.assertEqual(sorted(res.body.split()),
-                         ['foobar', 'foobar2', 'foobaryup', 'foobaryup2'])
+                         [b'foobar', b'foobar2', b'foobaryup', b'foobaryup2'])
 
 class TestStaticAppUsingAbsPath(TestStaticAppBase, unittest.TestCase):
     package = 'pyramid.tests.pkgs.static_abspath'
