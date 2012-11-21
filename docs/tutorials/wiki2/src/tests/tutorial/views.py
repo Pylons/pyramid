@@ -37,14 +37,13 @@ def view_wiki(request):
              permission='view')
 def view_page(request):
     pagename = request.matchdict['pagename']
-    session = DBSession()
-    page = session.query(Page).filter_by(name=pagename).first()
+    page = DBSession.query(Page).filter_by(name=pagename).first()
     if page is None:
         return HTTPNotFound('No such page')
 
     def check(match):
         word = match.group(1)
-        exists = session.query(Page).filter_by(name=word).all()
+        exists = DBSession.query(Page).filter_by(name=word).all()
         if exists:
             view_url = request.route_url('view_page', pagename=word)
             return '<a href="%s">%s</a>' % (view_url, word)
@@ -63,10 +62,9 @@ def view_page(request):
 def add_page(request):
     pagename = request.matchdict['pagename']
     if 'form.submitted' in request.params:
-        session = DBSession()
         body = request.params['body']
         page = Page(pagename, body)
-        session.add(page)
+        DBSession.add(page)
         return HTTPFound(location = request.route_url('view_page',
                                                       pagename=pagename))
     save_url = request.route_url('add_page', pagename=pagename)
@@ -78,11 +76,10 @@ def add_page(request):
              permission='edit')
 def edit_page(request):
     pagename = request.matchdict['pagename']
-    session = DBSession()
-    page = session.query(Page).filter_by(name=pagename).one()
+    page = DBSession.query(Page).filter_by(name=pagename).one()
     if 'form.submitted' in request.params:
         page.data = request.params['body']
-        session.add(page)
+        DBSession.add(page)
         return HTTPFound(location = request.route_url('view_page',
                                                       pagename=pagename))
     return dict(

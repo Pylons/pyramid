@@ -171,6 +171,12 @@ application.  Without being processed by ``scan``, the decorator effectively
 does nothing.  ``@view_config`` is inert without being detected via a
 :term:`scan`.
 
+The sample ``my_view()`` created by the scaffold uses a ``try:`` and ``except:``
+clause, to detect if there is a problem accessing the project database and
+provide an alternate error response.  That response will include the text
+shown at the end of the file, which will be displayed in the browser to
+inform the user about possible actions to take to solve the problem.
+
 Content Models with ``models.py``
 ---------------------------------
 
