@@ -24,7 +24,7 @@ class XHRPredicate(object):
         self.val = val
 
     def text(self):
-        return 'xhr = %s' % (self.val,)
+        return 'xhr = %s' % self.val
 
     phash = text
 
