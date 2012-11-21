@@ -331,6 +331,15 @@ class AdaptersConfiguratorMixinTests(unittest.TestCase):
         self.assertEqual(intr['adapter'], DummyResourceURL)
         self.assertEqual(intr['resource_iface'], DummyIface)
 
+class Test_eventonly(unittest.TestCase):
+    def _callFUT(self, callee):
+        from pyramid.config.adapters import eventonly
+        return eventonly(callee)
+
+    def test_defaults(self):
+        def acallable(event, a=1, b=2): pass
+        self.assertTrue(self._callFUT(acallable))
+
 class DummyTraverser(object):
     def __init__(self, root):
         self.root = root
