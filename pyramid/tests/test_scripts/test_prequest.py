@@ -13,9 +13,11 @@ class TestPRequestCommand(unittest.TestCase):
         cmd.out = self.out
         return cmd
 
-    def get_app(self, spec, app_name=None):
+    def get_app(self, spec, app_name=None, options=None):
         self._spec = spec
         self._app_name = app_name
+        self._options = options or {}
+
         def helloworld(environ, start_request):
             self._environ = environ
             self._path_info = environ['PATH_INFO']

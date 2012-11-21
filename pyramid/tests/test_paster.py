@@ -2,14 +2,16 @@ import os
 import unittest
 
 class Test_get_app(unittest.TestCase):
-    def _callFUT(self, config_file, section_name, loadapp):
+    def _callFUT(self, config_file, section_name, options=None, loadapp=None):
         from pyramid.paster import get_app
-        return get_app(config_file, section_name, loadapp)
+        return get_app(
+            config_file, section_name, options=options, loadapp=loadapp
+            )
 
     def test_it(self):
         app = DummyApp()
         loadapp = DummyLoadWSGI(app)
-        result = self._callFUT('/foo/bar/myapp.ini', 'myapp', loadapp)
+        result = self._callFUT('/foo/bar/myapp.ini', 'myapp', loadapp=loadapp)
         self.assertEqual(loadapp.config_name, 'config:/foo/bar/myapp.ini')
         self.assertEqual(loadapp.section_name, 'myapp')
         self.assertEqual(loadapp.relative_to, os.getcwd())
@@ -18,7 +20,9 @@ class Test_get_app(unittest.TestCase):
     def test_it_with_hash(self):
         app = DummyApp()
         loadapp = DummyLoadWSGI(app)
-        result = self._callFUT('/foo/bar/myapp.ini#myapp', None, loadapp)
+        result = self._callFUT(
+            '/foo/bar/myapp.ini#myapp', None, loadapp=loadapp
+            )
         self.assertEqual(loadapp.config_name, 'config:/foo/bar/myapp.ini')
         self.assertEqual(loadapp.section_name, 'myapp')
         self.assertEqual(loadapp.relative_to, os.getcwd())
@@ -27,10 +31,28 @@ class Test_get_app(unittest.TestCase):
     def test_it_with_hash_and_name_override(self):
         app = DummyApp()
         loadapp = DummyLoadWSGI(app)
-        result = self._callFUT('/foo/bar/myapp.ini#myapp', 'yourapp', loadapp)
+        result = self._callFUT(
+            '/foo/bar/myapp.ini#myapp', 'yourapp', loadapp=loadapp
+            )
         self.assertEqual(loadapp.config_name, 'config:/foo/bar/myapp.ini')
         self.assertEqual(loadapp.section_name, 'yourapp')
         self.assertEqual(loadapp.relative_to, os.getcwd())
+        self.assertEqual(result, app)
+
+    def test_it_with_options(self):
+        app = DummyApp()
+        loadapp = DummyLoadWSGI(app)
+        options = {'a':1}
+        result = self._callFUT(
+            '/foo/bar/myapp.ini#myapp',
+            'yourapp',
+            loadapp=loadapp,
+            options=options,
+            )
+        self.assertEqual(loadapp.config_name, 'config:/foo/bar/myapp.ini')
+        self.assertEqual(loadapp.section_name, 'yourapp')
+        self.assertEqual(loadapp.relative_to, os.getcwd())
+        self.assertEqual(loadapp.kw, {'global_conf':options})
         self.assertEqual(result, app)
 
 class Test_get_appsettings(unittest.TestCase):
@@ -132,10 +154,11 @@ class DummyLoadWSGI:
     def __init__(self, result):
         self.result = result
 
-    def __call__(self, config_name, name=None, relative_to=None):
+    def __call__(self, config_name, name=None, relative_to=None, **kw):
         self.config_name = config_name
         self.section_name = name
         self.relative_to = relative_to
+        self.kw = kw
         return self.result
 
 class DummyApp:

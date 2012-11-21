@@ -22,11 +22,14 @@ import threading
 import time
 import traceback
 
-from paste.deploy import loadapp, loadserver
+from paste.deploy import loadserver
+from paste.deploy import loadapp
 
 from pyramid.compat import WIN
 
 from pyramid.paster import setup_logging
+
+from pyramid.scripts.common import parse_vars
 
 MAXFD = 1024
 
@@ -160,6 +163,15 @@ class PServeCommand(object):
         if not self.quiet:
             print(msg)
 
+    def get_options(self):
+        if (len(self.args) > 1
+            and self.args[1] in self.possible_subcommands):
+            restvars = self.args[2:]
+        else:
+            restvars = self.args[1:]
+
+        return parse_vars(restvars)
+
     def run(self): # pragma: no cover
         if self.options.stop_daemon:
             return self.stop_daemon()
@@ -176,13 +188,12 @@ class PServeCommand(object):
             self.out('You must give a config file')
             return 2
         app_spec = self.args[0]
+
         if (len(self.args) > 1
             and self.args[1] in self.possible_subcommands):
             cmd = self.args[1]
-            restvars = self.args[2:]
         else:
             cmd = None
-            restvars = self.args[1:]
 
         if self.options.reload:
             if os.environ.get(self._reloader_environ_key):
@@ -218,7 +229,9 @@ class PServeCommand(object):
             self.options.daemon = True
 
         app_name = self.options.app_name
-        vars = self.parse_vars(restvars)
+
+        vars = self.get_options()
+
         if not self._scheme_re.search(app_spec):
             app_spec = 'config:' + app_spec
         server_name = self.options.server_name
@@ -286,8 +299,9 @@ class PServeCommand(object):
 
         server = self.loadserver(server_spec, name=server_name,
                                  relative_to=base, global_conf=vars)
-        app = self.loadapp(app_spec, name=app_name,
-                           relative_to=base, global_conf=vars)
+
+        app = self.loadapp(app_spec, name=app_name, relative_to=base,
+                global_conf=vars)
 
         if self.verbose > 0:
             if hasattr(os, 'getpid'):
@@ -310,27 +324,12 @@ class PServeCommand(object):
 
         serve()
 
-    def loadserver(self, server_spec, name, relative_to, **kw):# pragma:no cover
-        return loadserver(
-            server_spec, name=name, relative_to=relative_to, **kw)
-
     def loadapp(self, app_spec, name, relative_to, **kw): # pragma: no cover
         return loadapp(app_spec, name=name, relative_to=relative_to, **kw)
 
-    def parse_vars(self, args):
-        """
-        Given variables like ``['a=b', 'c=d']`` turns it into ``{'a':
-        'b', 'c': 'd'}``
-        """
-        result = {}
-        for arg in args:
-            if '=' not in arg:
-                raise ValueError(
-                    'Variable assignment %r invalid (no "=")'
-                    % arg)
-            name, value = arg.split('=', 1)
-            result[name] = value
-        return result
+    def loadserver(self, server_spec, name, relative_to, **kw):# pragma:no cover
+        return loadserver(
+            server_spec, name=name, relative_to=relative_to, **kw)
 
     def quote_first_command_arg(self, arg): # pragma: no cover
         """

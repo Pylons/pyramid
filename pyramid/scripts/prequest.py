@@ -5,6 +5,7 @@ import textwrap
 from pyramid.compat import url_unquote
 from pyramid.request import Request
 from pyramid.paster import get_app
+from pyramid.scripts.common import parse_vars
 
 def main(argv=sys.argv, quiet=False):
     command = PRequestCommand(argv, quiet)
@@ -101,7 +102,9 @@ class PRequestCommand(object):
                 name, value = item.split(':', 1)
                 headers[name] = value.strip()
 
-        app = self.get_app(app_spec, self.options.app_name)
+        app = self.get_app(app_spec, self.options.app_name,
+                options=parse_vars(self.args[2:]))
+
         request_method = (self.options.method or 'GET').upper()
 
         environ = {
