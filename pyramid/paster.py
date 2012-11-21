@@ -9,7 +9,7 @@ from pyramid.compat import configparser
 from logging.config import fileConfig
 from pyramid.scripting import prepare
 
-def get_app(config_uri, name=None, options={}, loadapp=loadapp):
+def get_app(config_uri, name=None, options=None, loadapp=loadapp):
     """ Return the WSGI application named ``name`` in the PasteDeploy
     config file specified by ``config_uri``.
 
@@ -72,7 +72,7 @@ def _getpathsec(config_uri, name):
         section = name
     return path, section
 
-def bootstrap(config_uri, request=None, options={}):
+def bootstrap(config_uri, request=None, options=None):
     """ Load a WSGI application from the PasteDeploy config file specified
     by ``config_uri``. The environment will be configured as if it is
     currently serving ``request``, leaving a natural environment in place
@@ -111,6 +111,10 @@ def bootstrap(config_uri, request=None, options={}):
     to those parameters. A request with default parameters is constructed
     for you if none is provided. You can mutate the request's ``environ``
     later to setup a specific host/port/scheme/etc.
+
+    ``options`` Is passed to get_app for use as variable assignments like 
+    {'http_port': 8080} and then use %(http_port)s in the
+    config file.
 
     See :ref:`writing_a_script` for more information about how to use this
     function.
