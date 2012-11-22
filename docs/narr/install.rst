@@ -253,9 +253,10 @@ your setuptools-enabled Python interpreter, use the ``easy_install`` command.
    systems.  We are aiming to not need to make the installation documentation
    Turing-complete.
 
-   ``pyenv`` will work fine.  However, if you use ``pyvenv`` instead, you'll
-   need to understand how to install software such as ``distribute`` into the
-   virtual environment manually, which this guide does not cover.
+   ``pyvenv`` will work fine.  However, if you use ``pyvenv`` instead of
+   ``virtualenv``, you'll need to understand how to install software such as
+   ``distribute`` into the virtual environment manually, which this guide does
+   not cover.
 
 .. code-block:: text
 
