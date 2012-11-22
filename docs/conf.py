@@ -81,7 +81,7 @@ copyright = '%s, Agendaless Consulting' % datetime.datetime.now().year
 # other places throughout the built documents.
 #
 # The short X.Y version.
-version = '1.4a4'
+version = '1.4b1'
 
 # The full version, including alpha/beta/rc tags.
 release = version
