@@ -225,6 +225,23 @@ Minor Feature Additions
   as it doesn't make sense to assert that a nonexistent view is
   execution-permitted. See https://github.com/Pylons/pyramid/issues/299.
 
+- Small microspeed enhancement which anticipates that a
+  :class:`pyramid.response.Response` object is likely to be returned from a 
+  view.  Some code is shortcut if the class of the object returned by a view is 
+  this class.  A similar microoptimization was done to
+  :func:`pyramid.request.Request.is_response`.
+
+- Make it possible to use variable arguments on all ``p*`` commands
+  (``pserve``, ``pshell``, ``pviews``, etc) in the form ``a=1 b=2`` so you can
+  fill in values in parameterized ``.ini`` file, e.g. ``pshell
+  etc/development.ini http_port=8080``.
+
+- In order to allow people to ignore unused arguments to subscriber callables
+  and to normalize the relationship between event subscribers and subscriber
+  predicates, we now allow both subscribers and subscriber predicates to accept
+  only a single ``event`` argument even if they've been subscribed for
+  notifications that involve multiple interfaces.
+
 Backwards Incompatibilities
 ---------------------------
 
