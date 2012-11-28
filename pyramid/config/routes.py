@@ -166,11 +166,14 @@ class RoutesConfiguratorMixin(object):
 
           This value should be either ``True`` or ``False``.  If this
           value is specified and is ``True``, the :term:`request` must
-          possess an ``HTTP_X_REQUESTED_WITH`` (aka
-          ``X-Requested-With``) header for this route to match.  This
-          is useful for detecting AJAX requests issued from jQuery,
-          Prototype and other Javascript libraries.  If this predicate
-          returns ``False``, route matching continues.
+          possess an ``HTTP_X_REQUESTED_WITH`` (aka ``X-Requested-With``)
+          header that has the value ``XMLHttpRequest`` for this route to match.
+          This is useful for detecting AJAX requests issued from jQuery,
+          Prototype and other Javascript libraries.
+          If this value is specifed and is ``False``, the :term:`request`
+          must not possess an ``HTTP_X_REQUESTED_WITH`` header that has the
+          value ``XMLHttpRequest`` for this route to match.
+          If this predicate returns ``False``, route matching continues.
 
         request_method
 

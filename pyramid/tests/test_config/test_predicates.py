@@ -10,16 +10,45 @@ class TestXHRPredicate(unittest.TestCase):
         return XHRPredicate(val, None)
     
     def test___call___true(self):
+        # The 4 cases where __call__() should return True:
+        # 1. Request must be XHR, and it is.
         inst = self._makeOne(True)
         request = Dummy()
         request.is_xhr = True
         result = inst(None, request)
         self.assertTrue(result)
         
+        # 2. Request must not be XHR, and it isn't.
+        inst = self._makeOne(False)
+        request = Dummy()
+        request.is_xhr = False
+        result = inst(None, request)
+        self.assertTrue(result)
+        
+        # 3. Don't care whether the request is XHR...
+        inst = self._makeOne(None)
+        request = Dummy()
+        request.is_xhr = True
+        result = inst(None, request)
+        self.assertTrue(result)
+        # 4. ... or not.
+        request.is_xhr = False
+        result = inst(None, request)
+        self.assertTrue(result)
+        
     def test___call___false(self):
+        # The 2 cases where __call__() should return False:
+        # 1. Request must be XHR, but it isn't.
         inst = self._makeOne(True)
         request = Dummy()
         request.is_xhr = False
+        result = inst(None, request)
+        self.assertFalse(result)
+
+        # 2. Request must not be XHR, but it is.
+        inst = self._makeOne(False)
+        request = Dummy()
+        request.is_xhr = True
         result = inst(None, request)
         self.assertFalse(result)
 

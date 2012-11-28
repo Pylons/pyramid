@@ -305,7 +305,7 @@ class TestPredicateList(unittest.TestCase):
                 ]
             ),
             match_param='foo=bar')
-        self.assertEqual(predicates[0].text(), 'xhr = True')
+        self.assertEqual(predicates[0].text(), 'xhr = xhr')
         self.assertEqual(predicates[1].text(),
                          "request_method = request_method")
         self.assertEqual(predicates[2].text(), 'path_info = path_info')
