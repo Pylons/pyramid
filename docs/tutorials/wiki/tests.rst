@@ -62,7 +62,7 @@ Change the ``requires`` list in ``setup.py`` to include ``WebTest``.
 .. literalinclude:: src/tests/setup.py
    :linenos:
    :language: python
-   :lines: 9-18
+   :lines: 9-19
 
 After we've added a dependency on WebTest in ``setup.py``, we need to rerun
 ``setup.py develop`` to get WebTest installed into our virtualenv.  Assuming
