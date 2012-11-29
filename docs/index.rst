@@ -200,7 +200,7 @@ To check out the trunk via ``git``, use this command:
 
 To find out how to become a contributor to :app:`Pyramid`, please see the
 `contributor's section of the documentation
-<http://docs.pylonsproject.org/index.html#contributing>`_.
+<http://docs.pylonsproject.org/en/latest/#contributing>`_.
 
 Index and Glossary
 ==================
