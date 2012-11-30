@@ -829,25 +829,25 @@ also informs Python that the directory which contains it is a *package*.
 #. Line 1 imports the :term:`Configurator` class from :mod:`pyramid.config`
    that we use later.
 
-#. Lines 3-10 define a function named ``main`` that returns a :app:`Pyramid`
+#. Lines 4-11 define a function named ``main`` that returns a :app:`Pyramid`
    WSGI application.  This function is meant to be called by the
    :term:`PasteDeploy` framework as a result of running ``pserve``.
 
    Within this function, application configuration is performed.
 
-   Line 6 creates an instance of a :term:`Configurator`.
+   Line 7 creates an instance of a :term:`Configurator`.
 
-   Line 7 registers a static view, which will serve up the files from the
+   Line 8 registers a static view, which will serve up the files from the
    ``myproject:static`` :term:`asset specification` (the ``static``
    directory of the ``myproject`` package).
 
-   Line 8 adds a :term:`route` to the configuration.  This route is later
+   Line 9 adds a :term:`route` to the configuration.  This route is later
    used by a view in the ``views`` module.
 
-   Line 9 calls ``config.scan()``, which picks up view registrations declared
+   Line 10 calls ``config.scan()``, which picks up view registrations declared
    elsewhere in the package (in this case, in the ``views.py`` module).
 
-   Line 10 returns a :term:`WSGI` application to the caller of the function
+   Line 11 returns a :term:`WSGI` application to the caller of the function
    (Pyramid's pserve).
 
 .. index::
@@ -865,7 +865,7 @@ and which returns a :term:`response`.
    :language: python
    :linenos:
 
-Lines 3-5 define and register a :term:`view callable` named ``my_view``.  The
+Lines 4-6 define and register a :term:`view callable` named ``my_view``.  The
 function named ``my_view`` is decorated with a ``view_config`` decorator
 (which is processed by the ``config.scan()`` line in our ``__init__.py``).
 The view_config decorator asserts that this view be found when a
