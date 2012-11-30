@@ -366,7 +366,7 @@ each of the following URLs, check that the result is as expected:
 - ``http://localhost:6543/add_page/SomePageName`` in a
   browser invokes the add view for a page.
 
-- To generate an error, visit ``http://localhost:6543/add_page`` which
+- To generate an error, visit ``http://localhost:6543/foobars/edit_page`` which
   will generate a ``NoResultFound: No row was found for one()`` error.
   You'll see an interactive traceback facility provided 
   by :term:`pyramid_debugtoolbar`.
