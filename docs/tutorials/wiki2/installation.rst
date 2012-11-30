@@ -2,7 +2,7 @@
 Installation
 ============
 
-This tutorial assumes that Python and virtualenv are already installed
+This tutorial assumes that Python and :term:`virtualenv` are already installed
 and working in your system. If you need help setting this up, you should
 refer to the chapters on :ref:`installing_chapter`.
 
@@ -98,9 +98,9 @@ Installing the Project in "Development Mode"
 
 In order to do development on the project easily, you must "register"
 the project as a development egg in your workspace using the
-``setup.py develop`` command.  In order to do so, cd to the "tutorial"
+``setup.py develop`` command.  In order to do so, cd to the `tutorial`
 directory you created in :ref:`sql_making_a_project`, and run the
-"setup.py develop" command using virtualenv Python interpreter.
+``setup.py develop`` command using the virtualenv Python interpreter.
 
 On UNIX:
 
@@ -158,8 +158,8 @@ test`` does but provides additional "coverage" information, exposing
 which lines of your project are "covered" (or not covered) by the
 tests.
 
-To get this functionality working, we'll need to install a couple of
-other packages into our ``virtualenv``: ``nose`` and ``coverage``:
+To get this functionality working, we'll need to install the ``nose`` and
+``coverage`` packages into our ``virtualenv``:
 
 On UNIX:
 
