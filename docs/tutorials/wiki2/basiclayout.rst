@@ -200,7 +200,6 @@ Next we set up a SQLAlchemy "DBSession" object:
 
    .. literalinclude:: src/basiclayout/tutorial/models.py
       :lines: 16
-      :linenos:
       :language: py
 
 ``scoped_session`` and ``sessionmaker`` are standard SQLAlchemy helpers.
