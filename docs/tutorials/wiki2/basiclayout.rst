@@ -51,15 +51,14 @@ The main function first creates a SQLAlchemy database engine using
 (something like ``sqlite://``):
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
-      :lines: 12
-      :linenos:
+      :lines: 13
       :language: py
 
 ``main`` then initializes our SQLAlchemy session object, passing it the
 engine:
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
-      :lines: 13
+      :lines: 14
       :language: py
 
 ``main`` subsequently initializes our SQLAlchemy declarative Base object,
@@ -71,13 +70,13 @@ forgotten about this tutorial, you won't be left scratching your head when it
 doesn't work.
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
-      :lines: 14
+      :lines: 15
       :language: py
 
 The next step of ``main`` is to construct a :term:`Configurator` object:
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
-      :lines: 15
+      :lines: 16
       :language: py
 
 ``settings`` is passed to the Configurator as a keyword argument with the
@@ -90,7 +89,7 @@ deployment-related values such as ``pyramid.reload_templates``,
 two arguments: ``static`` (the name), and ``static`` (the path):
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
-      :lines: 16
+      :lines: 17
       :language: py
 
 This registers a static resource view which will match any URL that starts
@@ -108,7 +107,7 @@ via the :meth:`pyramid.config.Configurator.add_route` method that will be
 used when the URL is ``/``:
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
-      :lines: 17
+      :lines: 18
       :language: py
 
 Since this route has a ``pattern`` equalling ``/`` it is the route that will
@@ -121,7 +120,7 @@ view configuration will be registered, which will allow one of our
 application URLs to be mapped to some code.
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
-      :lines: 18
+      :lines: 19
       :language: py
 
 Finally, ``main`` is finished configuring things, so it uses the
@@ -129,7 +128,7 @@ Finally, ``main`` is finished configuring things, so it uses the
 :term:`WSGI` application:
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
-      :lines: 19
+      :lines: 20
       :language: py
 
 View Declarations via ``views.py``

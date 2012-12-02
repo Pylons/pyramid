@@ -342,7 +342,7 @@ something like:
 .. literalinclude:: src/views/tutorial/__init__.py
    :linenos:
    :language: python
-   :emphasize-lines: 17-20
+   :emphasize-lines: 18-21
 
 (The highlighted lines are the ones that need to be added or edited.)
 
