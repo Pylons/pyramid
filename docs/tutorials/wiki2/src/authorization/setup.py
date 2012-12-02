@@ -20,7 +20,7 @@ requires = [
 setup(name='tutorial',
       version='0.0',
       description='tutorial',
-      long_description=README + '\n\n' +  CHANGES,
+      long_description=README + '\n\n' + CHANGES,
       classifiers=[
         "Programming Language :: Python",
         "Framework :: Pyramid",
@@ -43,4 +43,3 @@ setup(name='tutorial',
       initialize_tutorial_db = tutorial.scripts.initializedb:main
       """,
       )
-
