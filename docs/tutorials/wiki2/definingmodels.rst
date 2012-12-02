@@ -73,7 +73,7 @@ following:
 .. literalinclude:: src/models/tutorial/scripts/initializedb.py
    :linenos:
    :language: python
-   :emphasize-lines: 14,34
+   :emphasize-lines: 14,36
 
 (Only the highlighted lines need to be changed.)
 
