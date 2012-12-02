@@ -37,7 +37,6 @@ from pyramid import renderers
 from pyramid.compat import (
     string_types,
     urlparse,
-    im_func,
     url_quote,
     WIN,
     is_bound_method,
