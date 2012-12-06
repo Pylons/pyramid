@@ -541,7 +541,7 @@ class TestViewConfigDecorator(unittest.TestCase):
         self.assertEqual(config.pkg, pyramid.tests)
 
     def test_call_withdepth(self):
-        decorator = self._makeOne(_depth=2)
+        decorator = self._makeOne(_depth=1)
         venusian = DummyVenusian()
         decorator.venusian = venusian
         def foo(): pass
