@@ -471,8 +471,9 @@ def viewdefaults(wrapped):
         view = self.maybe_dotted(view)
         if inspect.isclass(view):
             defaults = getattr(view, '__view_defaults__', {}).copy()
+        if not '_backframes' in kw:
+            kw['_backframes'] = 1 # for action_method
         defaults.update(kw)
-        defaults['_backframes'] = 3 # for action_method
         return wrapped(self, *arg, **defaults)
     return functools.wraps(wrapped)(wrapper)
 
@@ -498,7 +499,7 @@ def action_method(wrapped):
             self._ainfo = []
         info = kw.pop('_info', None)
         # backframes for outer decorators to actionmethods
-        backframes = kw.pop('_backframes', 2)
+        backframes = kw.pop('_backframes', 0) + 2
         if is_nonstr_iter(info) and len(info) == 4:
             # _info permitted as extract_stack tuple
             info = ActionInfo(*info)
