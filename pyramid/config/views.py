@@ -1024,14 +1024,16 @@ class ViewsConfiguratorMixin(object):
 
         custom_predicates
 
-          This value should be a sequence of references to custom
-          predicate callables.  Use custom predicates when no set of
-          predefined predicates do what you need.  Custom predicates
-          can be combined with predefined predicates as necessary.
-          Each custom predicate callable should accept two arguments:
-          ``context`` and ``request`` and should return either
-          ``True`` or ``False`` after doing arbitrary evaluation of
-          the context and/or the request.  
+          This value should be a sequence of references to custom predicate
+          callables.  Use custom predicates when no set of predefined
+          predicates do what you need.  Custom predicates can be combined with
+          predefined predicates as necessary.  Each custom predicate callable
+          should accept two arguments: ``context`` and ``request`` and should
+          return either ``True`` or ``False`` after doing arbitrary evaluation
+          of the context and/or the request.  The ``predicates`` argument to
+          this method and the ability to register third-party view predicates
+          via :meth:`pyramid.config.Configurator.add_view_predicate` obsoletes
+          this argument, but it is kept around for backwards compatibility.
 
         predicates
 
