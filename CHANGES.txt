@@ -1,3 +1,15 @@
+next release
+============
+
+Backwards Incompatibilities
+---------------------------
+
+- Modified the ``_depth`` argument to ``pyramid.view.view_config`` to accept
+  a value relative to the invocation of ``view_config`` itself. Thus, when it
+  was previously expecting a value of ``1`` or greater, to reflect that
+  the caller of ``view_config`` is 1 stack frame away from ``venusian.attach``,
+  this implementation detail is now hidden.
+
 1.4b1 (2012-11-21)
 ==================
 
