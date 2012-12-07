@@ -10,6 +10,10 @@ Backwards Incompatibilities
   the caller of ``view_config`` is 1 stack frame away from ``venusian.attach``,
   this implementation detail is now hidden.
 
+- Modified the ``_backframes`` argument to ``pyramid.util.action_method`` in a
+  similar way to the changes described to ``_depth`` above.  This argument
+  remains undocumented, but might be used in the wild by some insane person.
+
 1.4b1 (2012-11-21)
 ==================
 
