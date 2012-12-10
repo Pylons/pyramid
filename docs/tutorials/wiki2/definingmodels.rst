@@ -2,7 +2,7 @@
 Defining the Domain Model
 =========================
 
-The first change we'll make to our stock pcreate-generated application will
+The first change we'll make to our stock ``pcreate``-generated application will
 be to define a :term:`domain model` constructor representing a wiki page.
 We'll do this inside our ``models.py`` file.
 
@@ -15,7 +15,7 @@ Making Edits to ``models.py``
 
 .. note::
 
-  There is nothing automagically special about the filename ``models.py``.  A
+  There is nothing special about the filename ``models.py``.  A
   project may have many models throughout its codebase in arbitrarily-named
   files.  Files implementing models often have ``model`` in their filenames
   (or they may live in a Python subpackage of your application package named
@@ -46,8 +46,8 @@ this class inherits from an instance of
 
 As you can see, our ``Page`` class has a class level attribute
 ``__tablename__`` which equals the string ``'pages'``.  This means that
-SQLAlchemy will store our wiki data in a SQL table named ``pages``.  Our Page
-class will also have class-level attributes named ``id``, ``name`` and
+SQLAlchemy will store our wiki data in a SQL table named ``pages``.  Our
+``Page`` class will also have class-level attributes named ``id``, ``name`` and
 ``data`` (all instances of :class:`sqlalchemy.Column`).  These will map to
 columns in the ``pages`` table.  The ``id`` attribute will be the primary key
 in the table.  The ``name`` attribute will be a text attribute, each value of

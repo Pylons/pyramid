@@ -45,7 +45,7 @@ When you invoke the ``pserve development.ini`` command, the ``main`` function
 above is executed.  It accepts some settings and returns a :term:`WSGI`
 application.  (See :ref:`startup_chapter` for more about ``pserve``.)
 
-The main function first creates a SQLAlchemy database engine using
+The main function first creates a :term:`SQLAlchemy` database engine using
 ``engine_from_config`` from the ``sqlalchemy.`` prefixed settings in the
 ``development.ini`` file's ``[app:main]`` section.  This will be a URI
 (something like ``sqlite://``):
@@ -61,7 +61,7 @@ engine:
       :lines: 14
       :language: py
 
-``main`` subsequently initializes our SQLAlchemy declarative Base object,
+``main`` subsequently initializes our SQLAlchemy declarative ``Base`` object,
 assigning the engine we created to the ``bind`` attribute of it's
 ``metadata`` object.  This allows table definitions done imperatively
 (instead of declaratively, via a class statement) to work.  We won't use any
@@ -93,9 +93,9 @@ two arguments: ``static`` (the name), and ``static`` (the path):
       :language: py
 
 This registers a static resource view which will match any URL that starts
-with the prefix ``/static`` (by virtue of the first argument to add_static
-view).  This will serve up static resources for us from within the ``static``
-directory of our ``tutorial`` package, in this case, via
+with the prefix ``/static`` (by virtue of the first argument to
+``add_static_view``).  This will serve up static resources for us from within
+the ``static`` directory of our ``tutorial`` package, in this case, via
 ``http://localhost:6543/static/`` and below (by virtue of the second argument
 to add_static_view).  With this declaration, we're saying that any URL that
 starts with ``/static`` should go to the static view; any remainder of its
@@ -113,8 +113,9 @@ used when the URL is ``/``:
 Since this route has a ``pattern`` equalling ``/`` it is the route that will
 be matched when the URL ``/`` is visited, e.g. ``http://localhost:6543/``.
 
-``main`` next calls the ``scan`` method of the configurator, which will
-recursively scan our ``tutorial`` package, looking for ``@view_config`` (and
+``main`` next calls the ``scan`` method of the configurator
+(:meth:`pyramid.config.Configurator.scan`), which will recursively scan our
+``tutorial`` package, looking for ``@view_config`` (and
 other special) decorators.  When it finds a ``@view_config`` decorator, a
 view configuration will be registered, which will allow one of our
 application URLs to be mapped to some code.
@@ -196,7 +197,7 @@ Let's examine this in detail. First, we need some imports to support later code:
       :linenos:
       :language: py
 
-Next we set up a SQLAlchemy "DBSession" object:
+Next we set up a SQLAlchemy ``DBSession`` object:
 
    .. literalinclude:: src/basiclayout/tutorial/models.py
       :lines: 16
@@ -228,8 +229,9 @@ To give a simple example of a  model class, we define one named ``MyModel``:
       :linenos:
       :language: py
 
-Our example model has an ``__init__`` that takes a two arguments (``name``,
-and ``value``).  It stores these values as ``self.name`` and ``self.value``
+Our example model has an ``__init__`` method that takes a two arguments
+(``name``, and ``value``).  It stores these values as ``self.name`` and
+``self.value``
 within the ``__init__`` function itself.  The ``MyModel`` class also has a
 ``__tablename__`` attribute.  This informs SQLAlchemy which table to use to
 store the data representing instances of this class.
