@@ -19,7 +19,7 @@ requires = [
 setup(name='{{project}}',
       version='0.0',
       description='{{project}}',
-      long_description=README + '\n\n' +  CHANGES,
+      long_description=README + '\n\n' + CHANGES,
       classifiers=[
         "Programming Language :: Python",
         "Framework :: Pyramid",
@@ -42,4 +42,3 @@ setup(name='{{project}}',
       initialize_{{project}}_db = {{package}}.scripts.initializedb:main
       """,
       )
-
