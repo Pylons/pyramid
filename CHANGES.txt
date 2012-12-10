@@ -1,5 +1,12 @@
-next release
-============
+1.4b2 (2012-12-10)
+==================
+
+Docs
+----
+
+- Scaffolding is now PEP-8 compliant (at least for a brief shining moment).
+
+- Tutorial improvements.
 
 Backwards Incompatibilities
 ---------------------------
