@@ -19,7 +19,7 @@ requires = [
 setup(name='{{project}}',
       version='0.0',
       description='{{project}}',
-      long_description=README + '\n\n' +  CHANGES,
+      long_description=README + '\n\n' + CHANGES,
       classifiers=[
         "Programming Language :: Python",
         "Framework :: Pyramid",
@@ -33,12 +33,11 @@ setup(name='{{project}}',
       packages=find_packages(),
       include_package_data=True,
       zip_safe=False,
-      install_requires = requires,
-      tests_require= requires,
+      install_requires=requires,
+      tests_require=requires,
       test_suite="{{package}}",
-      entry_points = """\
+      entry_points="""\
       [paste.app_factory]
       main = {{package}}:main
       """,
       )
-

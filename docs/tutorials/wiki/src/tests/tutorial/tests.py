@@ -30,6 +30,7 @@ class WikiModelTests(unittest.TestCase):
         self.assertEqual(wiki.__name__, None)
 
 class AppmakerTests(unittest.TestCase):
+
     def _callFUT(self, zodb_root):
         from .models import appmaker
         return appmaker(zodb_root)

@@ -15,10 +15,10 @@ requires = [
 setup(name='MyProject',
       version='0.0',
       description='MyProject',
-      long_description=README + '\n\n' +  CHANGES,
+      long_description=README + '\n\n' + CHANGES,
       classifiers=[
         "Programming Language :: Python",
-        "Framework :: Pylons",
+        "Framework :: Pyramid",
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
         ],
@@ -32,7 +32,7 @@ setup(name='MyProject',
       install_requires=requires,
       tests_require=requires,
       test_suite="myproject",
-      entry_points = """\
+      entry_points="""\
       [paste.app_factory]
       main = myproject:main
       """,

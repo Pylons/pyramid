@@ -21,6 +21,7 @@ from zope.sqlalchemy import ZopeTransactionExtension
 DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 Base = declarative_base()
 
+
 class Page(Base):
     """ The SQLAlchemy declarative model class for a Page object. """
     __tablename__ = 'pages'

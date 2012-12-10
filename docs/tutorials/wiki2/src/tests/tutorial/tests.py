@@ -1,6 +1,8 @@
 import unittest
 import transaction
+
 from pyramid import testing
+
 
 def _initTestingDB():
     from sqlalchemy import create_engine
@@ -16,6 +18,7 @@ def _initTestingDB():
         model = Page('FrontPage', 'This is the front page')
         DBSession.add(model)
     return DBSession
+
 
 def _registerRoutes(config):
     config.add_route('view_page', '{pagename}')
@@ -43,6 +46,7 @@ class PageModelTests(unittest.TestCase):
         self.assertEqual(instance.name, 'SomeName')
         self.assertEqual(instance.data, 'some data')
 
+
 class ViewWikiTests(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp()
@@ -59,6 +63,7 @@ class ViewWikiTests(unittest.TestCase):
         request = testing.DummyRequest()
         response = self._callFUT(request)
         self.assertEqual(response.location, 'http://example.com/FrontPage')
+
 
 class ViewPageTests(unittest.TestCase):
     def setUp(self):
@@ -93,6 +98,7 @@ class ViewPageTests(unittest.TestCase):
         self.assertEqual(info['edit_url'],
             'http://example.com/IDoExist/edit_page')
 
+
 class AddPageTests(unittest.TestCase):
     def setUp(self):
         self.session = _initTestingDB()
@@ -124,6 +130,7 @@ class AddPageTests(unittest.TestCase):
         self._callFUT(request)
         page = self.session.query(Page).filter_by(name='AnotherPage').one()
         self.assertEqual(page.data, 'Hello yo!')
+
 
 class EditPageTests(unittest.TestCase):
     def setUp(self):
@@ -161,6 +168,7 @@ class EditPageTests(unittest.TestCase):
         response = self._callFUT(request)
         self.assertEqual(response.location, 'http://example.com/abc')
         self.assertEqual(page.data, 'Hello yo!')
+
 
 class FunctionalTests(unittest.TestCase):
 

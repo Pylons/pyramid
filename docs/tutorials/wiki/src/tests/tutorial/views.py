@@ -64,8 +64,8 @@ def add_page(context, request):
     page.__name__ = pagename
     page.__parent__ = context
 
-    return dict(page = page, save_url = save_url,
-                logged_in = authenticated_userid(request))
+    return dict(page=page, save_url=save_url,
+                logged_in=authenticated_userid(request))
 
 @view_config(name='edit_page', context='.models.Page',
              renderer='templates/edit.pt',
@@ -75,9 +75,9 @@ def edit_page(context, request):
         context.data = request.params['body']
         return HTTPFound(location = request.resource_url(context))
 
-    return dict(page = context,
-                save_url = request.resource_url(context, 'edit_page'),
-                logged_in = authenticated_userid(request))
+    return dict(page=context,
+                save_url=request.resource_url(context, 'edit_page'),
+                logged_in=authenticated_userid(request))
 
 @view_config(context='.models.Wiki', name='login',
              renderer='templates/login.pt')

@@ -127,7 +127,7 @@ add these import statements:
 Now add those policies to the configuration:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
-   :lines: 17-22
+   :lines: 18-23
    :linenos:
    :emphasize-lines: 1-3,5-6
    :language: python
@@ -213,7 +213,7 @@ expire an auth ticket cookie.
 Now add the ``login`` and ``logout`` views:
 
 .. literalinclude:: src/authorization/tutorial/views.py
-   :lines: 87-120
+   :lines: 82-120
    :linenos:
    :language: python
 
@@ -306,7 +306,7 @@ when we're done:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
    :linenos:
-   :emphasize-lines: 4-5,8,17-19,21-22
+   :emphasize-lines: 4-5,8,18-20,22-23
    :language: python
 
 (Only the highlighted lines need to be added.)
