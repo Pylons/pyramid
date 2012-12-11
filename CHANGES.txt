@@ -1,3 +1,9 @@
+1.4b3 (2012-12-10)
+==================
+
+- Packaging release only, no code changes.  1.4b2 was a brownbag release due to
+  missing directories in the tarball.
+
 1.4b2 (2012-12-10)
 ==================
 
