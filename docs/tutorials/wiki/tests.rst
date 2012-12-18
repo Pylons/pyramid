@@ -17,8 +17,8 @@ We write tests for the model classes and the appmaker.  Changing
 ``tests.py``, we'll write a separate test class for each model class, and
 we'll write a test class for the ``appmaker``.
 
-To do so, we'll retain the ``tutorial.tests.ViewTests`` class provided as a
-result of the ``zodb`` project generator.  We'll add three test
+To do so, we'll retain the ``tutorial.tests.ViewTests`` class that was
+generated as part of the ``zodb`` scaffold.  We'll add three test
 classes: one for the ``Page`` model named ``PageModelTests``, one for the
 ``Wiki`` model named ``WikiModelTests``, and one for the appmaker named
 ``AppmakerTests``.
@@ -51,8 +51,8 @@ below:
    :linenos:
    :language: python
 
-Run the Tests
-=============
+Running the Tests
+=================
 
 We can run these tests by using ``setup.py test`` in the same way we did in
 :ref:`running_tests`.  However, first we must edit our ``setup.py`` to
@@ -63,6 +63,7 @@ Change the ``requires`` list in ``setup.py`` to include ``WebTest``.
    :linenos:
    :language: python
    :lines: 9-19
+   :emphasize-lines: 10
 
 After we've added a dependency on WebTest in ``setup.py``, we need to rerun
 ``setup.py develop`` to get WebTest installed into our virtualenv.  Assuming
