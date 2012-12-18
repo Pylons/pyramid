@@ -143,7 +143,7 @@ class FunctionalTests(unittest.TestCase):
                      'pyramid.includes': ['pyramid_zodbconn', 'pyramid_tm'] }
 
         app = main({}, **settings)
-        self.db = app.registry.zodb_database
+        self.db = app.registry._zodb_databases['']
         from webtest import TestApp
         self.testapp = TestApp(app)
 
