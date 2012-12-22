@@ -86,7 +86,7 @@ setup code.  However, the above :term:`scan` execution
 ``config.scan('mypackage')`` will pick up all :term:`configuration
 decoration`, including any objects decorated with the
 :class:`pyramid.view.view_config` decorator in the ``mypackage`` Python
-pakage.  For example, if you have a ``views.py`` in your package, a scan will
+package.  For example, if you have a ``views.py`` in your package, a scan will
 pick up any of its configuration decorators, so we can add one there that
 that references ``myroute`` as a ``route_name`` parameter:
 
