@@ -303,6 +303,9 @@ the following assumptions:
 
 - you are willing to use :term:`url dispatch` to map URLs to code.
 
+- you want to use ``ZopeTransactionExtension`` and ``pyramid_tm`` to scope
+  sessions to requests
+
 .. note::
 
    :app:`Pyramid` supports any persistent storage mechanism (e.g. object
