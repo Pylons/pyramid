@@ -986,7 +986,7 @@ there's a ``should_cache`` GET or POST variable:
 Note that the ``http_cache`` machinery will overwrite or add to caching
 headers you set within the view itself unless you use ``prevent_auto``.
 
-You can also turn of the effect of ``http_cache`` entirely for the duration
+You can also turn off the effect of ``http_cache`` entirely for the duration
 of a Pyramid application lifetime.  To do so, set the
 ``PYRAMID_PREVENT_HTTP_CACHE`` environment variable or the
 ``pyramid.prevent_http_cache`` configuration value setting to a true value.
