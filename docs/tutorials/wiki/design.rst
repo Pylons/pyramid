@@ -53,10 +53,10 @@ Security
 We'll eventually be adding security to our application.  The components we'll
 use to do this are below.
 
-- USERS, a dictionary mapping users names to their
+- USERS, a dictionary mapping usernames to their
   corresponding passwords.
 
-- GROUPS, a dictionary mapping user names to a 
+- GROUPS, a dictionary mapping usernames to a
   list of groups they belong to.
 
 - ``groupfinder``, an *authorization callback* that looks up
