@@ -167,10 +167,10 @@ installed:
    Python 2.7.3 (default, Aug  1 2012, 05:14:39) 
    [GCC 4.6.3] on linux2
    Type "help", "copyright", "credits" or "license" for more information.
-   >>> import setutptools
+   >>> import setuptools
    Traceback (most recent call last):
      File "<stdin>", line 1, in <module>
-   ImportError: No module named setutptools
+   ImportError: No module named setuptools
    >>>
 
 If ``import setuptools`` raises an :exc:`ImportError` as it does above, you
