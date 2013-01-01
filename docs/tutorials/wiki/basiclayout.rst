@@ -44,7 +44,7 @@ point happens to be the ``main`` function within the file named
    and image files, for us, in this case, at
    ``http://localhost:6543/static/`` and below.  The first argument is the
    "name" ``static``, which indicates that the URL path prefix of the view
-   will be ``/static``.  the The second argument of this tag is the "path",
+   will be ``/static``.  The second argument of this tag is the "path",
    which is a relative :term:`asset specification`, so it finds the resources
    it should serve within the ``static`` directory inside the ``tutorial``
    package.  The scaffold could have alternately used an *absolute* asset
