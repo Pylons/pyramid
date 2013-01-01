@@ -2,65 +2,46 @@
 Installation
 ============
 
-This tutorial assumes that Python and :term:`virtualenv` are already installed
-and working in your system. If you need help setting this up, you should
+This tutorial assumes that Python, :term:`virtualenv` and Pyramid are already
+installed and working in your system.
+If you need help setting this up, you should
 refer to the chapters on :ref:`installing_chapter`.
 
 Preparation
 ===========
 
-Please take the following steps to prepare for the tutorial.  The
-steps are slightly different depending on whether you're using UNIX or
-Windows.
+Please take the following steps to prepare for the tutorial.
+These steps are slightly different,
+depending on whether you're using UNIX or Windows.
 
 Preparation, UNIX
 -----------------
 
 #. Install SQLite3 and its development packages if you don't already
    have them installed.  Usually this is via your system's package
-   manager.  For example, on a Debian Linux system, do ``sudo apt-get
-   install libsqlite3-dev``.
-
-#. Use your Python's virtualenv to make a workspace:
+   manager.  On a Debian system, this would be:
 
    .. code-block:: text
 
-      $ path/to/my/Python-2.6/bin/virtualenv --no-site-packages pyramidtut
+      $ sudo apt-get install libsqlite3-dev
 
-#. Switch to the ``pyramidtut`` directory:
+#. Rename the virtualenv directory created in :ref:`installing_chapter` to
+   ``pyramidtut`` then switch to it:
 
    .. code-block:: text
 
       $ cd pyramidtut
 
-#. Use ``easy_install`` to get :app:`Pyramid` and its direct
-   dependencies installed:
-
-   .. code-block:: text
-
-      $ bin/easy_install pyramid
 
 Preparation, Windows
 --------------------
 
-#. Use your Python's virtualenv to make a workspace:
-
-   .. code-block:: text
-
-      c:\> c:\Python26\Scripts\virtualenv --no-site-packages pyramidtut
-
-#. Switch to the ``pyramidtut`` directory:
+#. Rename the virtualenv directory created in :ref:`installing_chapter` to
+   ``pyramidtut`` then switch to it:
 
    .. code-block:: text
 
       c:\> cd pyramidtut
-
-#. Use ``easy_install`` to get :app:`Pyramid` and its direct
-   dependencies installed:
-
-   .. code-block:: text
-
-      c:\pyramidtut> Scripts\easy_install pyramid
 
 .. _sql_making_a_project:
 
