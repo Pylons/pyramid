@@ -30,6 +30,7 @@ Front Matter
 
    copyright.rst
    conventions.rst
+   foreword.rst
 
 What's New
 ==========
@@ -216,6 +217,5 @@ Index and Glossary
    :hidden:
 
    glossary
-   foreword.rst
    latexindex.rst
 
