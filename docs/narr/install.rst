@@ -249,18 +249,17 @@ your setuptools-enabled Python interpreter, use the ``easy_install`` command.
 
 .. warning::
 
-   Even though Python 3.3 and better comes with ``pyvenv`` out of the box,
-   which is similar to ``virtualenv``, we suggest using ``virtualenv`` instead.
-   ``virtualenv`` works on well Python 3.3.  This isn't a recommendation made
-   for technical reasons, it's one made because it's not feasible for the
-   authors of this guide to explain setup using multiple virtual environment
-   systems.  We are aiming to not need to make the installation documentation
+   Python 3.3 includes ``pyvenv`` out of the box, which provides similar
+   functionality to ``virtualenv``.  We however suggest using ``virtualenv``
+   instead, which works well with Python 3.3.  This isn't a recommendation made
+   for technical reasons; it's made because it's not feasible for the authors
+   of this guide to explain setup using multiple virtual environment systems.
+   We are aiming to not need to make the installation documentation
    Turing-complete.
 
-   ``pyvenv`` will work fine.  However, if you use ``pyvenv`` instead of
-   ``virtualenv``, you'll need to understand how to install software such as
-   ``distribute`` into the virtual environment manually, which this guide does
-   not cover.
+   If you insist on using ``pyvenv``, you'll need to understand how to install
+   software such as ``distribute`` into the virtual environment manually,
+   which this guide does not cover.
 
 .. code-block:: text
 
