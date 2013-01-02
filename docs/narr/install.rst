@@ -52,9 +52,9 @@ command:
 
    $ sudo apt-get install python2.7-dev
 
-This command will install both the Python interpreter and its header files.
-Note that these headers are required by some dependencies you will use
-in this docomentation, not by Pyramid itself.
+This command will install both the Python interpreter and its development
+header files.  Note that the headers are required by some (optional) C
+extensions in software depended upon by Pyramid, not by Pyramid itself.
 
 Once these steps are performed, the Python interpreter will usually be
 invokable via ``python2.7`` from a shell prompt.
