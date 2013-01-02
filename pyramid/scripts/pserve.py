@@ -753,7 +753,7 @@ class Monitor(object): # pragma: no cover
     this).  
 
     Use the ``watch_file(filename)`` function to cause a reload/restart for
-    other other non-Python files (e.g., configuration files).  If you have
+    other non-Python files (e.g., configuration files).  If you have
     a dynamic set of files that grows over time you can use something like::
 
         def watch_config_files():

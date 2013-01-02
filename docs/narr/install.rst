@@ -52,6 +52,10 @@ command:
 
    $ sudo apt-get install python2.7-dev
 
+This command will install both the Python interpreter and its development
+header files.  Note that the headers are required by some (optional) C
+extensions in software depended upon by Pyramid, not by Pyramid itself.
+
 Once these steps are performed, the Python interpreter will usually be
 invokable via ``python2.7`` from a shell prompt.
 
@@ -167,10 +171,10 @@ installed:
    Python 2.7.3 (default, Aug  1 2012, 05:14:39) 
    [GCC 4.6.3] on linux2
    Type "help", "copyright", "credits" or "license" for more information.
-   >>> import setutptools
+   >>> import setuptools
    Traceback (most recent call last):
      File "<stdin>", line 1, in <module>
-   ImportError: No module named setutptools
+   ImportError: No module named setuptools
    >>>
 
 If ``import setuptools`` raises an :exc:`ImportError` as it does above, you
@@ -245,18 +249,17 @@ your setuptools-enabled Python interpreter, use the ``easy_install`` command.
 
 .. warning::
 
-   Even though Python 3.3 and better comes with ``pyvenv`` out of the box,
-   which is similar to ``virtualenv``, we suggest using ``virtualenv`` instead.
-   ``virtualenv`` works on well Python 3.3.  This isn't a recommendation made
-   for technical reasons, it's one made because it's not feasible for the
-   authors of this guide to explain setup using multiple virtual environment
-   systems.  We are aiming to not need to make the installation documentation
+   Python 3.3 includes ``pyvenv`` out of the box, which provides similar
+   functionality to ``virtualenv``.  We however suggest using ``virtualenv``
+   instead, which works well with Python 3.3.  This isn't a recommendation made
+   for technical reasons; it's made because it's not feasible for the authors
+   of this guide to explain setup using multiple virtual environment systems.
+   We are aiming to not need to make the installation documentation
    Turing-complete.
 
-   ``pyvenv`` will work fine.  However, if you use ``pyvenv`` instead of
-   ``virtualenv``, you'll need to understand how to install software such as
-   ``distribute`` into the virtual environment manually, which this guide does
-   not cover.
+   If you insist on using ``pyvenv``, you'll need to understand how to install
+   software such as ``distribute`` into the virtual environment manually,
+   which this guide does not cover.
 
 .. code-block:: text
 

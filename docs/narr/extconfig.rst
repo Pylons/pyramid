@@ -289,7 +289,7 @@ The ``title`` is a human-consumable string that can be used by introspection
 system frontends to show a friendly summary of this introspectable.
 
 The ``type_name`` is a value that can be used to subtype this introspectable
-within its category for for sorting and presentation purposes.  It can be any
+within its category for sorting and presentation purposes.  It can be any
 value.
 
 An introspectable is also dictionary-like.  It can contain any set of

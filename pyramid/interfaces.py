@@ -974,7 +974,7 @@ class IIntrospector(Interface):
         indirectly by :meth:`pyramid.interfaces.IIntrospector.register`"""
 
     def relate(*pairs):
-        """ Given any number of of ``(category_name, discriminator)`` pairs
+        """ Given any number of ``(category_name, discriminator)`` pairs
         passed as positional arguments, relate the associated introspectables
         to each other. The introspectable related to each pair must have
         already been added via ``.add`` or ``.add_intr``; a :exc:`KeyError`
@@ -986,7 +986,7 @@ class IIntrospector(Interface):
         """
 
     def unrelate(*pairs):
-        """ Given any number of of ``(category_name, discriminator)`` pairs
+        """ Given any number of ``(category_name, discriminator)`` pairs
         passed as positional arguments, unrelate the associated introspectables
         from each other. The introspectable related to each pair must have
         already been added via ``.add`` or ``.add_intr``; a :exc:`KeyError`

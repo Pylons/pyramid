@@ -38,13 +38,13 @@ point happens to be the ``main`` function within the file named
    factory is named ``root_factory``.
 
 #. *Line 15*.  Register a 'static view' which answers requests which start
-   with with URL path ``/static`` using the
+   with URL path ``/static`` using the
    :meth:`pyramid.config.Configurator.add_static_view method`.  This
    statement registers a view that will serve up static assets, such as CSS
    and image files, for us, in this case, at
    ``http://localhost:6543/static/`` and below.  The first argument is the
    "name" ``static``, which indicates that the URL path prefix of the view
-   will be ``/static``.  the The second argument of this tag is the "path",
+   will be ``/static``.  The second argument of this tag is the "path",
    which is a relative :term:`asset specification`, so it finds the resources
    it should serve within the ``static`` directory inside the ``tutorial``
    package.  The scaffold could have alternately used an *absolute* asset

@@ -109,7 +109,7 @@ class RoutesConfiguratorMixin(object):
           remainder marker in its pattern (see
           :ref:`using_traverse_in_a_route_pattern`).  The ``traverse``
           argument to add_route allows you to associate route patterns
-          with an arbitrary traversal path without using a a
+          with an arbitrary traversal path without using a
           ``*traverse`` remainder marker; instead you can use other
           match information.
 

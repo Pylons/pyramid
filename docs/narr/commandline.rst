@@ -758,7 +758,7 @@ we'll pretend you have a distribution with a package in it named
 
 This script uses the Python ``optparse`` module to allow us to make sense out
 of extra arguments passed to the script.  It uses the
-:func:`pyramid.paster.bootstrap` function to get information about the the
+:func:`pyramid.paster.bootstrap` function to get information about the
 application defined by a config file, and prints the deployment settings
 defined in that config file.
 

@@ -252,7 +252,7 @@ static assets that live *outside* the :app:`Pyramid` application.  This will
 happen when the :meth:`~pyramid.config.Configurator.add_static_view` API
 associated with the path fed to :meth:`~pyramid.request.Request.static_url`
 is a *URL* instead of a view name.  For example, the ``name`` argument may be
-``http://example.com`` while the the ``path`` given may be
+``http://example.com`` while the ``path`` given may be
 ``mypackage:images``:
 
 .. code-block:: python
