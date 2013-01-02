@@ -387,7 +387,7 @@ Features
 Bug Fixes
 ---------
 
-- The route pattern registered internally for a a local "static view"
+- The route pattern registered internally for a local "static view"
   (either via the ``static`` ZCML directive or via the
   ``add_static_view`` method of the configurator) was incorrect.  It
   was regsistered for e.g. ``static*traverse``, while it should have
@@ -688,7 +688,7 @@ Features
   A similar combining of routing and traversal is available when a
   route is matched which contains a ``*traverse`` remainder marker in
   its path.  The ``traverse`` argument allows you to associate route
-  patterns with an arbitrary traversal path without using a a
+  patterns with an arbitrary traversal path without using a
   ``*traverse`` remainder marker; instead you can use other match
   information.
 

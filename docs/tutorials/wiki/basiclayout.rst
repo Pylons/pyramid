@@ -38,7 +38,7 @@ point happens to be the ``main`` function within the file named
    factory is named ``root_factory``.
 
 #. *Line 15*.  Register a 'static view' which answers requests which start
-   with with URL path ``/static`` using the
+   with URL path ``/static`` using the
    :meth:`pyramid.config.Configurator.add_static_view method`.  This
    statement registers a view that will serve up static assets, such as CSS
    and image files, for us, in this case, at
