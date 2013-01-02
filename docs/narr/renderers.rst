@@ -264,7 +264,7 @@ will be the active request object at render time.
    #    [{"x": 1}, {"x": 2}]
 
 If you aren't the author of the objects being serialized, it won't be
-possible (or at least not reasonable) to add a custom ``__json__`` method to
+possible (or at least not reasonable) to add a custom ``__json__`` method
 to their classes in order to influence serialization.  If the object passed
 to the renderer is not a serializable type, and has no ``__json__`` method,
 usually a :exc:`TypeError` will be raised during serialization.  You can

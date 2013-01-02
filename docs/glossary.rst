@@ -486,8 +486,8 @@ Glossary
      is in use.
 
    physical root
-     The object returned by the application :term:`root factory`.  Unlike the
-     the :term:`virtual root` of a request, it is not impacted by
+     The object returned by the application :term:`root factory`.
+     Unlike the :term:`virtual root` of a request, it is not impacted by
      :ref:`vhosting_chapter`: it will always be the actual object returned by
      the root factory, never a subobject.
 
@@ -840,7 +840,7 @@ Glossary
       information.
 
    Mako
-     `Mako <http://www.makotemplates.org/>`_ is a template language language
+     `Mako <http://www.makotemplates.org/>`_ is a template language
      which refines the familiar ideas of componentized layout and inheritance
      using Python with Python scoping and calling semantics.
 
