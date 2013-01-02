@@ -308,6 +308,13 @@ following:
 You should perform any following commands that mention a "bin"
 directory from within the ``env`` virtualenv dir.
 
+If you use bash, consider using ``source bin/activate`` to make your
+shell environment wired to use the virtualenv.
+This means, for example, instead of running ``bin/python`` to run the
+interpreter in this isolated environment, you will run ``python``.
+This will only work as long as you remain in the same bash session.
+
+
 Installing :app:`Pyramid` Into the Virtual Python Environment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
