@@ -387,7 +387,7 @@ Features
 Bug Fixes
 ---------
 
-- The route pattern registered internally for a a local "static view"
+- The route pattern registered internally for a local "static view"
   (either via the ``static`` ZCML directive or via the
   ``add_static_view`` method of the configurator) was incorrect.  It
   was regsistered for e.g. ``static*traverse``, while it should have
@@ -688,7 +688,7 @@ Features
   A similar combining of routing and traversal is available when a
   route is matched which contains a ``*traverse`` remainder marker in
   its path.  The ``traverse`` argument allows you to associate route
-  patterns with an arbitrary traversal path without using a a
+  patterns with an arbitrary traversal path without using a
   ``*traverse`` remainder marker; instead you can use other match
   information.
 
@@ -1381,7 +1381,7 @@ Internal
   lookup, because the registration will always be made with a specific
   request interface, but registration may not be made with a specific
   context interface.  In general, when creating multiadapters, you
-  want to order the requires interfaces so that the the elements which
+  want to order the requires interfaces so that the elements which
   are more likely to be registered using specific interfaces are
   ordered before those which are less likely.
 
@@ -1860,7 +1860,7 @@ Backwards Incompatibilities
 Bug Fixes
 ---------
 
-- The the long description of this package (as shown on PyPI) was not
+- The long description of this package (as shown on PyPI) was not
   valid reStructuredText, and so was not renderable.
 
 - Trying to use an HTTP method name string such as ``GET`` as a
@@ -2920,7 +2920,7 @@ Deprecations
 - The import of ``repoze.bfg.security.Unauthorized`` is deprecated in
   favor of ``repoze.bfg.exceptions.Forbidden``.  The old location
   still functions but emits a deprecation warning.  The rename from
-  ``Unauthorized`` to ``Forbidden`` brings parity to the the name of
+  ``Unauthorized`` to ``Forbidden`` brings parity to the name of
   the exception and the system view it invokes when raised.
 
 Backwards Incompatibilities

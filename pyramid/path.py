@@ -175,7 +175,7 @@ class AssetResolver(Resolver):
 
         If ``spec`` is a *relative* asset specification (an asset
         specification without a ``:`` in it, e.g. ``templates/foo.pt``), the
-        ``package`` argument of the constructor is used as the the package
+        ``package`` argument of the constructor is used as the package
         portion of the asset spec.  For example:
 
         .. code-block:: python

@@ -378,7 +378,7 @@ class HTTPResetContent(HTTPOk):
     """
     subclass of :class:`~HTTPOk`
 
-    This indicates that the the server has fulfilled the request and
+    This indicates that the server has fulfilled the request and
     the user agent SHOULD reset the document view which caused the
     request to be sent.
     
@@ -754,7 +754,7 @@ class HTTPLengthRequired(HTTPClientError):
     """
     subclass of :class:`~HTTPClientError`
 
-    This indicates that the the server refuses to accept the request
+    This indicates that the server refuses to accept the request
     without a defined Content-Length.
     
     code: 411, title: Length Required

@@ -144,7 +144,7 @@ The ``check()`` function is used as the first argument to
 each WikiWord match found in the content.  If the wiki already contains a
 page with the matched WikiWord name, ``check()`` generates a view
 link to be used as the substitution value and returns it.  If the wiki does
-not already contain a page with with the matched WikiWord name, ``check()``
+not already contain a page with the matched WikiWord name, ``check()``
 generates an "add" link as the substitution value and returns it.
 
 As a result, the ``content`` variable is now a fully formed bit of HTML

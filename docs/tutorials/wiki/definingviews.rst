@@ -115,7 +115,7 @@ The curried function named ``check`` is used as the first argument to
 each WikiWord match found in the content.  If the wiki (our page's
 ``__parent__``) already contains a page with the matched WikiWord name, the
 ``check`` function generates a view link to be used as the substitution value
-and returns it.  If the wiki does not already contain a page with with the
+and returns it.  If the wiki does not already contain a page with the
 matched WikiWord name, the function generates an "add" link as the
 substitution value and returns it.
 
