@@ -228,7 +228,7 @@ listens only on the ``127.0.0.1`` interface, which is problematic if you're
 running the server on a remote system and you wish to access it with a web
 browser from a local system.  We also specify a TCP port number to listen on,
 which is 8080, passing it as the second argument.  The final argument is the
-``app`` object (a :term:`router`), which is the the application we wish to
+``app`` object (a :term:`router`), which is the application we wish to
 serve.  Finally, we call the server's ``serve_forever`` method, which starts
 the main loop in which it will wait for requests from the outside world.
 
