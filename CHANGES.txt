@@ -332,7 +332,7 @@ Bug Fixes
 
 - When registering a view configuration that named a Chameleon ZPT renderer
   with a macro name in it (e.g. ``renderer='some/template#somemacro.pt``) as
-  well as a view configuration without a macro name it it that pointed to the
+  well as a view configuration without a macro name in it that pointed to the
   same template (e.g. ``renderer='some/template.pt'``), internal caching could
   confuse the two, and your code might have rendered one instead of the
   other.
@@ -536,7 +536,7 @@ Features
 - An ``add_permission`` directive method was added to the Configurator.  This
   directive registers a free-standing permission introspectable into the
   Pyramid introspection system.  Frameworks built atop Pyramid can thus use
-  the the ``permissions`` introspectable category data to build a
+  the ``permissions`` introspectable category data to build a
   comprehensive list of permissions supported by a running system.  Before
   this method was added, permissions were already registered in this
   introspectable category as a side effect of naming them in an ``add_view``

@@ -109,7 +109,7 @@ supply the renderer with more correct system values (see
 to compose proper system values is present in the request.  If your
 template relies on the name ``request`` or ``context``, or if you've
 configured special :term:`renderer globals`, make sure to pass
-``request`` as a keyword argument in every call to to a
+``request`` as a keyword argument in every call to a
 ``pyramid.renderers.render_*`` function.
 
 Every view must return a :term:`response` object, except for views
