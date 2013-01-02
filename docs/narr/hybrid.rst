@@ -477,7 +477,7 @@ Registering a Default View for a Route That Has a ``view`` Attribute
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. warning:: As of :app:`Pyramid` 1.1 this section is slated to be removed in
-   a later documentation release because the the ability to add views
+   a later documentation release because the ability to add views
    directly to the :term:`route configuration` by passing a ``view`` argument
    to ``add_route`` has been deprecated.
 

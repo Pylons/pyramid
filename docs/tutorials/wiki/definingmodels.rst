@@ -63,7 +63,7 @@ contain the :term:`ReStructuredText` body representing the wiki page content.
 Note that ``Page`` objects don't have an initial ``__name__`` or
 ``__parent__`` attribute.  All objects in a traversal graph must have a
 ``__name__`` and a ``__parent__`` attribute.  We don't specify these here
-because both ``__name__`` and ``__parent__`` will be set by by a :term:`view`
+because both ``__name__`` and ``__parent__`` will be set by a :term:`view`
 function when a Page is added to our Wiki mapping.
 
 As a last step, we want to change the ``appmaker`` function in our

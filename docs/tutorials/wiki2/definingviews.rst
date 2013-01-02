@@ -144,7 +144,7 @@ The ``check()`` function is used as the first argument to
 each WikiWord match found in the content.  If the wiki already contains a
 page with the matched WikiWord name, ``check()`` generates a view
 link to be used as the substitution value and returns it.  If the wiki does
-not already contain a page with with the matched WikiWord name, ``check()``
+not already contain a page with the matched WikiWord name, ``check()``
 generates an "add" link as the substitution value and returns it.
 
 As a result, the ``content`` variable is now a fully formed bit of HTML
@@ -358,7 +358,7 @@ each of the following URLs, check that the result is as expected:
   of the FrontPage page object.
 
 - ``http://localhost:6543/FrontPage`` in a browser invokes
-  the ``view_page`` view of the front page page object.
+  the ``view_page`` view of the front page object.
 
 - ``http://localhost:6543/FrontPage/edit_page`` in a browser
   invokes the edit view for the front page object.

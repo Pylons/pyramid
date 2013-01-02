@@ -194,7 +194,7 @@ class URLMethodsMixin(object):
         names are ignored.
 
         If the route object which matches the ``route_name`` argument has
-        a :term:`pregenerator`, the ``*elements`` and ``**kw`` arguments
+        a :term:`pregenerator`, the ``*elements`` and ``**kw``
         arguments passed to this function might be augmented or changed.
         """
         try:
