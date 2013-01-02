@@ -414,7 +414,7 @@ def virtual_root(resource, request):
     'virtual root path': the :func:`pyramid.traversal.find_resource`
     API will be used to find the virtual root resource using this path;
     if the resource is found, it will be returned.  If the
-    ``HTTP_X_VHM_ROOT`` key is is not present in the WSGI environment,
+    ``HTTP_X_VHM_ROOT`` key is not present in the WSGI environment,
     the physical :term:`root` of the resource tree will be returned instead.
 
     Virtual roots are not useful at all in applications that use

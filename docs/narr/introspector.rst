@@ -496,7 +496,7 @@ introspectables in categories not described here.
 ``translation directories``
 
   Each introspectable in the ``asset overrides`` category represents an
-  individual element in a ``specs`` argument passed to to
+  individual element in a ``specs`` argument passed to
   :meth:`pyramid.config.Configurator.add_translation_dirs`; each will have
   the following data.
 

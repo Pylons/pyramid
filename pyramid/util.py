@@ -71,7 +71,7 @@ class InstancePropertyMixin(object):
 
         ``attrs`` is a sequence of 2-tuples *or* a data structure with
         an ``.items()`` method which returns a sequence of 2-tuples
-        (presumably a dictionary). It will be used used to add several
+        (presumably a dictionary). It will be used to add several
         properties to the instance in a manner that is more efficient
         than simply calling ``set_property`` repeatedly.
         """

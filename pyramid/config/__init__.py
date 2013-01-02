@@ -244,7 +244,7 @@ class Configurator(
     prepended to their pattern. This parameter is new in Pyramid 1.2.
 
     If ``introspection`` is passed, it must be a boolean value.  If it's
-    ``True``, introspection values during actions will be kept for for use
+    ``True``, introspection values during actions will be kept for use
     for tools like the debug toolbar.  If it's ``False``, introspection
     values provided by registrations will be ignored.  By default, it is
     ``True``.  This parameter is new as of Pyramid 1.3.

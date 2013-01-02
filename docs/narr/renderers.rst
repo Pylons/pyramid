@@ -264,7 +264,7 @@ will be the active request object at render time.
    #    [{"x": 1}, {"x": 2}]
 
 If you aren't the author of the objects being serialized, it won't be
-possible (or at least not reasonable) to add a custom ``__json__`` method to
+possible (or at least not reasonable) to add a custom ``__json__`` method
 to their classes in order to influence serialization.  If the object passed
 to the renderer is not a serializable type, and has no ``__json__`` method,
 usually a :exc:`TypeError` will be raised during serialization.  You can
@@ -366,7 +366,7 @@ For example (Javascript):
                  '&callback=?';
    jqhxr = $.getJSON(api_url);
 
-The string ``callback=?`` above in the the ``url`` param to the JQuery
+The string ``callback=?`` above in the ``url`` param to the JQuery
 ``getAjax`` function indicates to jQuery that the query should be made as
 a JSONP request; the ``callback`` parameter will be automatically filled
 in for you and used.
