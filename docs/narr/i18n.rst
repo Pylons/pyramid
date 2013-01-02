@@ -301,7 +301,7 @@ You need to add a few boilerplate lines to your application's ``setup.py``
 file in order to properly generate :term:`gettext` files from your
 application.
 
-.. note:: See :ref:`project_narr` to learn about about the
+.. note:: See :ref:`project_narr` to learn about the
   composition of an application's ``setup.py`` file.
 
 In particular, add the ``Babel`` and ``lingua`` distributions to the

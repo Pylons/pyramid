@@ -251,7 +251,7 @@
       Assigning to one is still supported but will cause a deprecation
       warning to be emitted, and eventually the feature will be removed.  For
       new code, instead of assigning ``response_*`` attributes to the
-      request, use API of the the :attr:`pyramid.request.Request.response`
+      request, use API of the :attr:`pyramid.request.Request.response`
       object (exposed to view code as ``request.response``) to influence
       rendered response behavior.
 

@@ -873,7 +873,7 @@ means:
 
 #) When I use the security proxy machinery, I can have a view that
    conditionally displays certain HTML elements (like form fields) or
-   prevents certain attributes from being modified depending on the the
+   prevents certain attributes from being modified depending on the
    permissions that the accessing user possesses with respect to a context
    object.
 
