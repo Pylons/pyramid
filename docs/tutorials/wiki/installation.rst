@@ -2,52 +2,15 @@
 Installation
 ============
 
-For the most part, the installation process for this tutorial
-duplicates the steps described in :ref:`installing_chapter` and
-:ref:`project_narr`, however it also explains how to install
-additional libraries for tutorial purposes.
-
 Preparation
-========================
+===========
 
-Please take the following steps to prepare for the tutorial.  The
-steps to prepare for the tutorial are slightly different depending on
-whether you're using UNIX or Windows.
+Follow the steps in :ref:`installing_chapter`, but name the virtualenv
+directory ``pyramidtut``.
 
 Preparation, UNIX
 -----------------
 
-#. If you don't already have a Python 2.6 interpreter installed on
-   your system, obtain, install, or find `Python 2.6
-   <http://python.org/download/releases/2.6.6/>`_ for your system.
-
-#. Make sure the Python development headers are installed on your system.  If
-   you've installed Python from source, these will already be installed.  If
-   you're using a system Python, you may have to install a ``python-dev``
-   package (e.g. ``apt-get python-dev``).  The headers are not required for
-   Pyramid itself, just for dependencies of the tutorial.
-
-#. Install the latest `setuptools` into the Python you
-   obtained/installed/found in the step above: download `ez_setup.py
-   <http://peak.telecommunity.com/dist/ez_setup.py>`_ and run it using
-   the ``python`` interpreter of your Python 2.6 installation:
-
-   .. code-block:: text
-
-    $ /path/to/my/Python-2.6/bin/python ez_setup.py
-
-#. Use that Python's `bin/easy_install` to install `virtualenv`:
-
-   .. code-block:: text
-
-    $ /path/to/my/Python-2.6/bin/easy_install virtualenv
-
-#. Use that Python's virtualenv to make a workspace:
-
-   .. code-block:: text
-
-     $ path/to/my/Python-2.6/bin/virtualenv --no-site-packages \
-               pyramidtut
 
 #. Switch to the ``pyramidtut`` directory:
 
@@ -55,18 +18,7 @@ Preparation, UNIX
 
      $ cd pyramidtut
 
-#. (Optional) Consider using ``source bin/activate`` to make your
-   shell environment wired to use the virtualenv.
-
-#. Use ``easy_install`` to get :app:`Pyramid` and its direct
-   dependencies installed:
-
-   .. code-block:: text
-
-     $ bin/easy_install pyramid
-
-#. Use ``easy_install`` to install ``docutils``, ``pyramid_tm``,
-   ``pyramid_zodbconn``, ``pyramid_debugtoolbar``, ``nose`` and ``coverage``:
+#. Install tutorial dependencies:
 
    .. code-block:: text
 
@@ -76,30 +28,6 @@ Preparation, UNIX
 Preparation, Windows
 --------------------
 
-#. Install, or find `Python 2.6
-   <http://python.org/download/releases/2.6.6/>`_ for your system.
-
-#. Install the latest `setuptools` into the Python you
-   obtained/installed/found in the step above: download `ez_setup.py
-   <http://peak.telecommunity.com/dist/ez_setup.py>`_ and run it using
-   the ``python`` interpreter of your Python 2.6 installation using a
-   command prompt:
-
-   .. code-block:: text
-
-    c:\> c:\Python26\python ez_setup.py
-
-#. Use that Python's `bin/easy_install` to install `virtualenv`:
-
-   .. code-block:: text
-
-    c:\> c:\Python26\Scripts\easy_install virtualenv
-
-#. Use that Python's virtualenv to make a workspace:
-
-   .. code-block:: text
-
-     c:\> c:\Python26\Scripts\virtualenv --no-site-packages pyramidtut
 
 #. Switch to the ``pyramidtut`` directory:
 
@@ -107,18 +35,7 @@ Preparation, Windows
 
      c:\> cd pyramidtut
 
-#. (Optional) Consider using ``bin\activate.bat`` to make your shell
-   environment wired to use the virtualenv.
-
-#. Use ``easy_install`` to get :app:`Pyramid` and its direct
-   dependencies installed:
-
-   .. code-block:: text
-
-     c:\pyramidtut> Scripts\easy_install pyramid
-
-#. Use ``easy_install`` to install ``docutils``, ``pyramid_tm``,
-   ``pyramid_zodbconn``, ``pyramid_debugtoolbar``, ``nose`` and ``coverage``:
+#. Install tutorial dependencies:
 
    .. code-block:: text
 
