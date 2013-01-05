@@ -156,7 +156,7 @@ auth ticket that may be included in the request, and an
 ``ACLAuthorizationPolicy`` that uses an ACL to determine the allow or deny
 outcome for a view.
 
-Note that the :class:`pyramid.authentication.AuthTktAuthenticationPolicy`
+Note that the :class:`~pyramid.authentication.AuthTktAuthenticationPolicy`
 constructor accepts two arguments: ``secret`` and ``callback``.  ``secret`` is
 a string representing an encryption key used by the "authentication ticket"
 machinery represented by this policy: it is required.  The ``callback`` is the
