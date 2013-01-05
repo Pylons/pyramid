@@ -151,10 +151,10 @@ Now add those policies to the configuration:
 
 (Only the highlighted lines need to be added.)
 
-We are enabling an ``AuthTktAuthenticationPolicy``, it is based in an
-auth ticket that may be included in the request, and an
-``ACLAuthorizationPolicy`` that uses an ACL to determine the allow or deny
-outcome for a view.
+We are enabling an ``AuthTktAuthenticationPolicy``, which is based in an
+auth ticket that may be included in the request.
+We are also enabling an ``ACLAuthorizationPolicy``, which uses an ACL to
+determine the *allow* or *deny* outcome for a view.
 
 Note that the :class:`pyramid.authentication.AuthTktAuthenticationPolicy`
 constructor accepts two arguments: ``secret`` and ``callback``.  ``secret`` is
