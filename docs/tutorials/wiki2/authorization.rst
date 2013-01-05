@@ -14,7 +14,7 @@ anyone with access to the server to view pages.
 
 We will also add a login page and a logout link on all the
 pages.  The login page will be shown when a user is denied
-access to any of the views that require a permission, instead of
+access to any of the views that require permission, instead of
 a default "403 Forbidden" page.
 
 We will implement the access control with the following steps:
@@ -62,7 +62,7 @@ returns one of these values:
 - If the userid *does not* exist in the system, it will
   return ``None``.
 
-For example, ``groupfinder('editor', request )`` returns ['group:editor'],
+For example, ``groupfinder('editor', request )`` returns ``['group:editor']``,
 ``groupfinder('viewer', request)`` returns [], and ``groupfinder('admin', request)``
 returns ``None``.  We will use ``groupfinder()`` as an :term:`authentication policy`
 "callback" that will provide the :term:`principal` or principals
@@ -151,10 +151,10 @@ Now add those policies to the configuration:
 
 (Only the highlighted lines need to be added.)
 
-We are enabling an ``AuthTktAuthenticationPolicy``, it is based in an
-auth ticket that may be included in the request, and an
-``ACLAuthorizationPolicy`` that uses an ACL to determine the allow or deny
-outcome for a view.
+We are enabling an ``AuthTktAuthenticationPolicy``, which is based in an
+auth ticket that may be included in the request.
+We are also enabling an ``ACLAuthorizationPolicy``, which uses an ACL to
+determine the *allow* or *deny* outcome for a view.
 
 Note that the :class:`pyramid.authentication.AuthTktAuthenticationPolicy`
 constructor accepts two arguments: ``secret`` and ``callback``.  ``secret`` is

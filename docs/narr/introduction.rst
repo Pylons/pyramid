@@ -101,7 +101,7 @@ frameworks for small and large applications is just false; a well-designed
 framework should be able to be good at both.  Pyramid strives to be that kind
 of framework.
 
-To this end, Pyramid provides a set of features, that, combined, are unique
+To this end, Pyramid provides a set of features that, combined, are unique
 amongst Python web frameworks.  Lots of other frameworks contain some
 combination of these features; Pyramid of course actually stole many of them
 from those other frameworks.  But Pyramid is the only one that has all of
