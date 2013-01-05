@@ -303,9 +303,8 @@ like this:
 
 (Only the highlighted line needs to be added.)
 
-:meth:`~pyramid.security.authenticated_userid()` will return None
-if the user is not authenticated, or some user id it the user
-is authenticated.
+The :meth:`~pyramid.security.authenticated_userid` method will return None
+if the user is not authenticated.
 
 Add a "Logout" link when logged in
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
