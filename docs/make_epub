@@ -1,0 +1,2 @@
+#!/bin/sh
+make clean epub SPHINXBUILD=../env/bin/sphinx-build

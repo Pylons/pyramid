@@ -26,6 +26,7 @@ from sphinx.writers.latex import LaTeXTranslator
 from docutils import nodes
 from docutils import utils
 
+
 def raw(*arg):
     raise nodes.SkipNode
 TextTranslator.visit_raw = raw
@@ -48,6 +49,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
     'repoze.sphinx.autointerface',
+    'sphinx.ext.viewcode',
 #    'sphinx.ext.intersphinx'
     ]
 
@@ -81,6 +83,7 @@ copyright = '%s, Agendaless Consulting' % datetime.datetime.now().year
 #
 # The short X.Y version.
 version = '1.0.2'
+
 # The full version, including alpha/beta/rc tags.
 release = version
 
@@ -95,7 +98,7 @@ today_fmt = '%B %d, %Y'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = ['_themes/README.rst',]
+exclude_patterns = ['_themes/README.rst', ]
 
 # List of directories, relative to source directories, that shouldn't be searched
 # for source files.
@@ -127,12 +130,12 @@ if book:
 # -----------------------
 
 # Add and use Pylons theme
-if 'sphinx-build' in ' '.join(sys.argv): # protect against dumb importers
+if 'sphinx-build' in ' '.join(sys.argv):  # protect against dumb importers
     from subprocess import call, Popen, PIPE
 
+    p = Popen('which git', shell=True, stdout=PIPE)
     cwd = os.getcwd()
     _themes = os.path.join(cwd, '_themes')
-    p = Popen('which git', shell=True, stdout=PIPE)
     git = p.stdout.read().strip()
     if not os.listdir(_themes):
         call([git, 'submodule', '--init'])
@@ -155,9 +158,9 @@ if 'sphinx-build' in ' '.join(sys.argv): # protect against dumb importers
 html_theme_path = ['_themes']
 html_theme = 'pyramid'
 html_theme_options = dict(
-    github_url='https://github.com/Pylons/pyramid'
+    github_url='https://github.com/Pylons/pyramid',
+#    in_progress='true',
     )
-
 # The style sheet to use for HTML and HTML Help pages. A file of that name
 # must exist either in Sphinx' static/ path, or in one of the custom paths
 # given in html_static_path.
@@ -230,6 +233,8 @@ latex_paper_size = 'letter'
 
 # The font size ('10pt', '11pt' or '12pt').
 latex_font_size = '10pt'
+
+latex_additional_files = ['_static/latex-note.png', '_static/latex-warning.png']
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, document class [howto/manual]).
@@ -367,10 +372,10 @@ _PREAMBLE = r"""
 
 latex_elements = {
     'preamble': _PREAMBLE,
-    'wrapperclass':'book',
-    'date':'',
-    'releasename':'Version',
-    'title':r'The Pyramid Web Application \newline Development Framework',
+    'wrapperclass': 'book',
+    'date': '',
+    'releasename': 'Version',
+    'title': r'The Pyramid Web Application \newline Development Framework',
 #    'pointsize':'12pt', # uncomment for 12pt version
 }
 
@@ -385,6 +390,7 @@ latex_elements = {
 #subsubsection 3
 #paragraph     4
 #subparagraph  5
+
 
 def frontmatter(name, arguments, options, content, lineno,
                 content_offset, block_text, state, state_machine):
@@ -402,6 +408,7 @@ def frontmatter(name, arguments, options, content, lineno,
 \addtocontents{toc}{\protect\thispagestyle{empty}}
 """,
         format='latex')]
+
 
 def mainmatter(name, arguments, options, content, lineno,
                content_offset, block_text, state, state_machine):
@@ -422,10 +429,12 @@ def mainmatter(name, arguments, options, content, lineno,
 """,
         format='latex')]
 
+
 def backmatter(name, arguments, options, content, lineno,
               content_offset, block_text, state, state_machine):
     return [nodes.raw('', '\\backmatter\n\\setcounter{secnumdepth}{-1}\n',
                       format='latex')]
+
 
 def app_role(role, rawtext, text, lineno, inliner, options={}, content=[]):
     """custom role for :app: marker, does nothing in particular except allow
@@ -443,6 +452,7 @@ def setup(app):
     app.add_directive('mainmatter', mainmatter, 1, (0, 0, 0))
     app.add_directive('backmatter', backmatter, 1, (0, 0, 0))
     app.connect('autodoc-process-signature', resig)
+
 
 def resig(app, what, name, obj, options, signature, return_annotation):
     """ Allow for preservation of ``@action_method`` decorated methods
@@ -470,10 +480,11 @@ def resig(app, what, name, obj, options, signature, return_annotation):
 # -- Options for Epub output ---------------------------------------------------
 
 # Bibliographic Dublin Core info.
-epub_title = 'The Pyramid Web Application Development Framework, Version 1.0.2'
+epub_title = 'The Pyramid Web Application Development Framework, Version %s' \
+             % release
 epub_author = 'Chris McDonough'
 epub_publisher = 'Agendaless Consulting'
-epub_copyright = '2008-2011'
+epub_copyright = '2008-%d' % datetime.datetime.now().year
 
 # The language of the text. It defaults to the language option
 # or en if the language is not set.
@@ -487,8 +498,8 @@ epub_scheme = 'ISBN'
 epub_identifier = '0615445675'
 
 # A unique identification for the text.
-epub_uid = 'The Pyramid Web Application Development Framework, Version 1.0.2'
-
+epub_uid = 'The Pyramid Web Application Development Framework, Version %s' \
+           % release
 # HTML files that should be inserted before the pages created by sphinx.
 # The format is a list of tuples containing the path and title.
 #epub_pre_files = []
@@ -500,7 +511,8 @@ epub_uid = 'The Pyramid Web Application Development Framework, Version 1.0.2'
 # A list of files that should not be packed into the epub file.
 epub_exclude_files = ['_static/opensearch.xml', '_static/doctools.js',
     '_static/jquery.js', '_static/searchtools.js', '_static/underscore.js',
-    '_static/basic.css', 'search.html']
+    '_static/basic.css', 'search.html', '_static/websupport.js']
+
 
 # The depth of the table of contents in toc.ncx.
 epub_tocdepth = 3
