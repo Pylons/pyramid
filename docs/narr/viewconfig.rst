@@ -834,7 +834,7 @@ decorator on the RESTView class:
 .. code-block:: python
    :linenos:
 
-   from pyramid.view import view_config
+   from pyramid.view import view_defaults
    from pyramid.response import Response
    from pyramid.config import Configurator
 
