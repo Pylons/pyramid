@@ -138,6 +138,11 @@ Design Documents
 Sample Applications
 ===================
 
+.. note::
+
+   These applications run only on Python 2.x, and so do some of their
+   dependencies.
+
 `cluegun <https://github.com/Pylons/cluegun>`_ is a simple pastebin
 application based on Rocky Burt's `ClueBin
 <http://pypi.python.org/pypi/ClueBin/0.2.3>`_.  It demonstrates form
