@@ -14,7 +14,7 @@ anyone with access to the server to view pages.
 
 We will also add a login page and a logout link on all the
 pages.  The login page will be shown when a user is denied
-access to any of the views that require a permission, instead of
+access to any of the views that require permission, instead of
 a default "403 Forbidden" page.
 
 We will implement the access control with the following steps:

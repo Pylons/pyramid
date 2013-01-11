@@ -31,7 +31,7 @@ following:
 
 (The highlighted lines are the ones that need to be changed.)
 
-The first thing we've done is to do is remove the stock ``MyModel`` class
+The first thing we've done is remove the stock ``MyModel`` class
 from the generated ``models.py`` file.  The ``MyModel`` class is only a
 sample and we're not going to use it.
 

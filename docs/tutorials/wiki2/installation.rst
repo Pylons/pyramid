@@ -159,7 +159,7 @@ On Windows:
 
 .. code-block:: text
 
-   c:\pyramidtut\tutorial> ..\Scripts\nosetests --cover-package=tutorial ^
+   c:\pyramidtut\tutorial> ..\Scripts\nosetests --cover-package=tutorial \
          --cover-erase --with-coverage
 
 If successful, you will see output something like this::
