@@ -76,7 +76,8 @@ master_doc = 'index'
 
 # General substitutions.
 project = 'The Pyramid Web Application Development Framework'
-copyright = '%s, Agendaless Consulting' % datetime.datetime.now().year
+thisyear = datetime.datetime.now().year
+copyright = '2008-%s, Agendaless Consulting' % thisyear
 
 # The default replacements for |version| and |release|, also used in various
 # other places throughout the built documents.
@@ -484,7 +485,7 @@ epub_title = 'The Pyramid Web Application Development Framework, Version %s' \
              % release
 epub_author = 'Chris McDonough'
 epub_publisher = 'Agendaless Consulting'
-epub_copyright = '2008-%d' % datetime.datetime.now().year
+epub_copyright = '2008-%d' % thisyear
 
 # The language of the text. It defaults to the language option
 # or en if the language is not set.
