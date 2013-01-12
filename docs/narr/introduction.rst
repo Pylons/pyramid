@@ -475,7 +475,7 @@ per route.  For example, you can create a route with the pattern ``/items``
 and when the route is matched, you can shuffle off the request to one view if
 the request method is GET, another view if the request method is POST, etc.
 A system known as "view predicates" allows for this.  Request method matching
-is the very most basic thing you can do with a view predicate.  You can also
+is the most basic thing you can do with a view predicate.  You can also
 associate views with other request parameters such as the elements in the
 query string, the Accept header, whether the request is an XHR request or
 not, and lots of other things.  This feature allows you to keep your
