@@ -206,7 +206,7 @@ information.
 Upgrading to the Very Latest Pyramid Release
 --------------------------------------------
 
-When you upgrade your application to the very most recent Pyramid release,
+When you upgrade your application to the most recent Pyramid release,
 it's advisable to upgrade step-wise through each most recent minor release,
 beginning with the one that you know your application currently runs under,
 and ending on the most recent release.  For example, if your application is
