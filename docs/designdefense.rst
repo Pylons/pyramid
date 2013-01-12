@@ -1536,7 +1536,7 @@ comments take into account what we've discussed in the
 .. code-block:: python
    :linenos:
 
-   from pyramid.response import Response         # explicit response, no TL
+   from pyramid.response import Response # explicit response, no thread local
    from wsgiref.simple_server import make_server # explicitly WSGI
 
    def hello_world(request):  # accepts a request; no request thread local reqd
