@@ -97,7 +97,7 @@ with the prefix ``/static`` (by virtue of the first argument to
 ``add_static_view``).  This will serve up static resources for us from within
 the ``static`` directory of our ``tutorial`` package, in this case, via
 ``http://localhost:6543/static/`` and below (by virtue of the second argument
-to add_static_view).  With this declaration, we're saying that any URL that
+to ``add_static_view``).  With this declaration, we're saying that any URL that
 starts with ``/static`` should go to the static view; any remainder of its
 path (e.g. the ``/foo`` in ``/static/foo``) will be used to compose a path to
 a static file resource, such as a CSS file.
