@@ -150,32 +150,21 @@ To set up a virtualenv in which to install :app:`Pyramid`, first ensure that
 ``import setuptools`` within the Python interpreter you'd like to run
 :app:`Pyramid` under.
 
-Here's the output you'll expect if setuptools or distribute is already
-installed:
+The following command will not display anything if setuptools or distribute is
+already installed:
 
 .. code-block:: text
 
-   [chrism@thinko docs]$ python2.7
-   Python 2.7.3 (default, Aug  1 2012, 05:14:39) 
-   [GCC 4.6.3] on linux2
-   Type "help", "copyright", "credits" or "license" for more information.
-   >>> import setuptools
-   >>> 
+   $ python2.7 -c 'import setuptools'
 
-Here's the output you can expect if setuptools or distribute is not already
-installed:
+Running the same command will yield the following output if setuptools or
+distribute is not yet installed:
 
 .. code-block:: text
 
-   [chrism@thinko docs]$ python2.7
-   Python 2.7.3 (default, Aug  1 2012, 05:14:39) 
-   [GCC 4.6.3] on linux2
-   Type "help", "copyright", "credits" or "license" for more information.
-   >>> import setuptools
    Traceback (most recent call last):
      File "<stdin>", line 1, in <module>
    ImportError: No module named setuptools
-   >>>
 
 If ``import setuptools`` raises an :exc:`ImportError` as it does above, you
 will need to install setuptools or distribute manually.  Note that above

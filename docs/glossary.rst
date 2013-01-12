@@ -921,7 +921,7 @@ Glossary
 
    PyPy
      PyPy is an "alternative implementation of the Python
-     language":http://pypy.org/
+     language": http://pypy.org/
 
    tween
      A bit of code that sits between the Pyramid router's main request

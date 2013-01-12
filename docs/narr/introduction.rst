@@ -101,7 +101,7 @@ frameworks for small and large applications is just false; a well-designed
 framework should be able to be good at both.  Pyramid strives to be that kind
 of framework.
 
-To this end, Pyramid provides a set of features, that, combined, are unique
+To this end, Pyramid provides a set of features that, combined, are unique
 amongst Python web frameworks.  Lots of other frameworks contain some
 combination of these features; Pyramid of course actually stole many of them
 from those other frameworks.  But Pyramid is the only one that has all of
@@ -475,7 +475,7 @@ per route.  For example, you can create a route with the pattern ``/items``
 and when the route is matched, you can shuffle off the request to one view if
 the request method is GET, another view if the request method is POST, etc.
 A system known as "view predicates" allows for this.  Request method matching
-is the very most basic thing you can do with a view predicate.  You can also
+is the most basic thing you can do with a view predicate.  You can also
 associate views with other request parameters such as the elements in the
 query string, the Accept header, whether the request is an XHR request or
 not, and lots of other things.  This feature allows you to keep your

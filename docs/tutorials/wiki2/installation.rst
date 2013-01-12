@@ -66,6 +66,9 @@ On Windows:
    startup problems, try putting both the virtualenv and the project
    into directories that do not contain spaces in their paths.
 
+
+.. _installing_project_in_dev_mode:
+
 Installing the Project in "Development Mode"
 ============================================
 
@@ -159,7 +162,7 @@ On Windows:
 
 .. code-block:: text
 
-   c:\pyramidtut\tutorial> ..\Scripts\nosetests --cover-package=tutorial ^
+   c:\pyramidtut\tutorial> ..\Scripts\nosetests --cover-package=tutorial \
          --cover-erase --with-coverage
 
 If successful, you will see output something like this::
@@ -180,6 +183,9 @@ If successful, you will see output something like this::
   OK
 
 Looks like our package doesn't quite have 100% test coverage.
+
+
+.. _initialize_db_wiki2:
 
 Initializing the Database
 =========================

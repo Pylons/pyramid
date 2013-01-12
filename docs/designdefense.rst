@@ -38,7 +38,7 @@ forking is also a Zope derivative.
 
 Implementations of these features were *required* to allow the :app:`Pyramid`
 authors to build the bread-and-butter CMS-type systems for customers in the
-way they were accustomed to building them.  No other system save Zope itself
+way they were accustomed to building them.  No other system, save for Zope itself,
 had such features.  And Zope itself was beginning to show signs of its age.
 We were becoming hampered by consequences of its early design mistakes.
 Zope's lack of documentation was also difficult to work around: it was hard
@@ -55,7 +55,7 @@ existing frameworks had good, and sometimes very compelling ideas.  In
 particular, :term:`URL dispatch` is a more direct mechanism to map URLs to
 code.
 
-So although we couldn't find a framework save for Zope that fit our needs,
+So, although we couldn't find a framework, save for Zope, that fit our needs,
 and while we incorporated a lot of Zope ideas into BFG, we also emulated the
 features we found compelling in other frameworks (such as :term:`url
 dispatch`).  After the initial public release of BFG, as time went on,
@@ -1536,7 +1536,7 @@ comments take into account what we've discussed in the
 .. code-block:: python
    :linenos:
 
-   from pyramid.response import Response         # explicit response, no TL
+   from pyramid.response import Response # explicit response, no thread local
    from wsgiref.simple_server import make_server # explicitly WSGI
 
    def hello_world(request):  # accepts a request; no request thread local reqd

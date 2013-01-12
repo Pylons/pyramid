@@ -31,7 +31,7 @@ following:
 
 (The highlighted lines are the ones that need to be changed.)
 
-The first thing we've done is to do is remove the stock ``MyModel`` class
+The first thing we've done is remove the stock ``MyModel`` class
 from the generated ``models.py`` file.  The ``MyModel`` class is only a
 sample and we're not going to use it.
 
@@ -77,25 +77,15 @@ following:
 
 (Only the highlighted lines need to be changed.)
 
-Reinitializing the Database
----------------------------
+Installing the Project and re-initializing the Database
+-------------------------------------------------------
+
+Redo the steps in :ref:`installing_project_in_dev_mode`.
 
 Because our model has changed, in order to reinitialize the database, we need
 to rerun the ``initialize_tutorial_db`` command to pick up the changes you've made
-to both the models.py file and to the initializedb.py file.  From the root of the
-``tutorial`` project, directory execute the following commands.
-
-On UNIX:
-
-.. code-block:: text
-
-   $ ../bin/initialize_tutorial_db development.ini
-
-On Windows:
-
-.. code-block:: text
-
-   c:\pyramidtut\tutorial> ..\Scripts\initialize_tutorial_db development.ini
+to both the models.py file and to the initializedb.py file.
+See :ref:`initialize_db_wiki2` for instructions.
 
 Success will look something like this::
 
