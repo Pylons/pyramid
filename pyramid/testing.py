@@ -476,7 +476,7 @@ def setUp(registry=None, request=None, hook_zca=True, autocommit=True,
     return config
 
 def tearDown(unhook_zca=True):
-    """Undo the effects :func:`pyramid.testing.setUp`.  Use this
+    """Undo the effects of :func:`pyramid.testing.setUp`.  Use this
     function in the ``tearDown`` method of a unit test that uses
     :func:`pyramid.testing.setUp` in its ``setUp`` method.
 
