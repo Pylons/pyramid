@@ -417,7 +417,7 @@ added in configuration execution order.
 More Information
 ----------------
 
-For more information, see the article entitled `"A Whirlwind Rour of Advanced
+For more information, see the article `"A Whirlwind Tour of Advanced
 Configuration Tactics"
 <http://docs.pylonsproject.org/projects/pyramid_cookbook/en/latest/configuration/whirlwind_tour.html>`_
 in the Pyramid Cookbook.
