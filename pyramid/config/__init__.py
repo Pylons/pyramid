@@ -631,7 +631,7 @@ class Configurator(
         self.action_state = ActionState() # old actions have been processed
 
     def include(self, callable, route_prefix=None):
-        """Include a configuration callables, to support imperative
+        """Include a configuration callable, to support imperative
         application extensibility.
 
         .. warning:: In versions of :app:`Pyramid` prior to 1.2, this
