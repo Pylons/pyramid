@@ -668,7 +668,7 @@ class Configurator(
            def includeme(config):
                config.add_view(my_view)
 
-        You might cause it be included within your Pyramid application like
+        You might cause it to be included within your Pyramid application like
         so:
 
         .. code-block:: python
