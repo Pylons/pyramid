@@ -130,7 +130,7 @@
 .. attribute:: global_registries
 
    The set of registries that have been created for :app:`Pyramid`
-   applications, one per each call to
+   applications, one for each call to
    :meth:`pyramid.config.Configurator.make_wsgi_app` in the current
    process. The object itself supports iteration and has a ``last`` property
    containing the last registry loaded.
