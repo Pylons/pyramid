@@ -640,8 +640,8 @@ class Configurator(
 
         A configuration callable should be a callable that accepts a single
         argument named ``config``, which will be an instance of a
-        :term:`Configurator`  (be warned that it will not be the same
-        configurator instance on which you call this method, however).  The
+        :term:`Configurator`.  However, be warned that it will not be the same
+        configurator instance on which you call this method.  The
         code which runs as the result of calling the callable should invoke
         methods on the configurator passed to it which add configuration
         state.  The return value of a callable will be ignored.
@@ -701,7 +701,7 @@ class Configurator(
         to :meth:`pyramid.config.Configurator.add_route` within the included
         callable will have their pattern prefixed with the value of
         ``route_prefix``. This can be used to help mount a set of routes at a
-        different location than the included callable's author intended while
+        different location than the included callable's author intended, while
         still maintaining the same route names.  For example:
 
         .. code-block:: python
