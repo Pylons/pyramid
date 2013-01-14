@@ -21,7 +21,7 @@ class URLDecodeError(UnicodeDecodeError):
     """
     This exception is raised when :app:`Pyramid` cannot
     successfully decode a URL or a URL path segment.  This exception
-    it behaves just like the Python builtin
+    behaves just like the Python builtin
     :exc:`UnicodeDecodeError`. It is a subclass of the builtin
     :exc:`UnicodeDecodeError` exception only for identity purposes,
     mostly so an exception view can be registered when a URL cannot be
