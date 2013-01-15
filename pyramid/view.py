@@ -394,7 +394,7 @@ class forbidden_view_config(object):
         from pyramid.response import Response
           
         @forbidden_view_config()
-        def notfound(request):
+        def forbidden(request):
             return Response('You are not allowed', status='401 Unauthorized')
 
     All arguments passed to this function have the same meaning as
