@@ -200,7 +200,7 @@ and various other configuration settings, have been performed).  The
 be used by any WSGI server to present an application to a requestor.
 :term:`WSGI` is a protocol that allows servers to talk to Python
 applications.  We don't discuss :term:`WSGI` in any depth within this book,
-however, you can learn more about it by visiting `wsgi.org
+but you can learn more about it by visiting `wsgi.org
 <http://wsgi.org>`_.
 
 The :app:`Pyramid` application object, in particular, is an instance of a
