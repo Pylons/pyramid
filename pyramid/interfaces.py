@@ -460,7 +460,7 @@ class IAuthorizationPolicy(Interface):
 class IMultiDict(IDict): # docs-only interface
     """
     An ordered dictionary that can have multiple values for each key. A
-    multidict adds the methods ``getall``, ``getone``, ``mixed``, ``extend``
+    multidict adds the methods ``getall``, ``getone``, ``mixed``, ``extend``,
     ``add``, and ``dict_of_lists`` to the normal dictionary interface.  A
     multidict data structure is used as ``request.POST``, ``request.GET``,
     and ``request.params`` within an :app:`Pyramid` application.
