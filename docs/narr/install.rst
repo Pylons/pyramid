@@ -68,7 +68,8 @@ Python interpreter to develop your software.  The authors of
 :app:`Pyramid` tend not to use the system Python for development
 purposes; always a self-compiled one.  Compiling Python is usually
 easy, and often the "system" Python is compiled with options that
-aren't optimal for web development.
+aren't optimal for web development. For an explanation, see
+https://github.com/Pylons/pyramid/issues/747.
 
 To compile software on your UNIX system, typically you need
 development tools.  Often these can be installed via the package
