@@ -40,13 +40,11 @@ UNIX system that has development tools.
 Package Manager Method
 ++++++++++++++++++++++
 
-You can use your system's "package manager" to install Python. Every
-system's package manager is slightly different, but the "flavor" of
+You can use your system's "package manager" to install Python.
+Each package manager is slightly different, but the "flavor" of
 them is usually the same.
 
-For example, on an Ubuntu Linux system, to use the system package
-manager to install a Python 2.7 interpreter, use the following
-command:
+For example, on a Debian or Ubuntu system, use the following command:
 
 .. code-block:: text
 
