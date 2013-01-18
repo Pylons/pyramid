@@ -88,7 +88,7 @@ Coding Style
   mandatory.
 
 - Please do not remove trailing whitespace.  Configure your editor to reduce
-  diff noise.
+  diff noise. See https://github.com/Pylons/pyramid/issues/788 for more.
 
 Running Tests
 --------------
