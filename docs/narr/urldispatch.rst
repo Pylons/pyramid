@@ -38,7 +38,7 @@ application.  A route has a *name*, which acts as an identifier to be used
 for URL generation.  The name also allows developers to associate a view
 configuration with the route.  A route also has a *pattern*, meant to match
 against the ``PATH_INFO`` portion of a URL (the portion following the scheme
-and port, e.g. ``/foo/bar`` in the URL ``http://localhost:8080/foo/bar``). It
+and port, e.g. ``/foo/bar`` in the URL `<http://localhost:8080/foo/bar>`_). It
 also optionally has a ``factory`` and a set of :term:`route predicate`
 attributes.
 
