@@ -823,8 +823,8 @@ sets an ``override_renderer`` attribute on the request itself, which is the
 .. code-block:: python
    :linenos:
 
-   from pyramid.event import subscriber
-   from pyramid.event import NewRequest
+   from pyramid.events import subscriber
+   from pyramid.events import NewRequest
 
    @subscriber(NewRequest)
    def set_xmlrpc_params(event):
