@@ -689,7 +689,7 @@ Glossary
      non-C based Python implementations.
 
    View Lookup
-     The act of finding and invoking the "best" :term:`view callable`
+     The act of finding and invoking the "best" :term:`view callable`,
      given a :term:`request` and a :term:`context` resource.
 
    Resource Location
