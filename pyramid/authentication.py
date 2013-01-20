@@ -1075,12 +1075,11 @@ class BasicAuthAuthenticationPolicy(CallbackAuthenticationPolicy):
     register a view that will send a Basic Auth challenge to the user whenever
     there is an attempt to call a view which results in a Forbidden response::
 
-        from pyramid.httpexceptions import HTTPForbidden
         from pyramid.httpexceptions import HTTPUnauthorized
         from pyramid.security import forget
-        from pyramid.view import view_config
+        from pyramid.view import forbidden_view_config
 
-        @view_config(context=HTTPForbidden)
+        @forbidden_view_config()
         def basic_challenge(request):
             response = HTTPUnauthorized()
             response.headers.update(forget(request))
