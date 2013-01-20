@@ -32,9 +32,6 @@ Then we will add the login and logout feature:
 * Add a "Logout" link to be shown when logged in and viewing or editing a page
   (``view.pt``, ``edit.pt``).
 
-The source code for this tutorial stage can be browsed at
-`http://github.com/Pylons/pyramid/tree/1.3-branch/docs/tutorials/wiki/src/authorization/
-<http://github.com/Pylons/pyramid/tree/1.3-branch/docs/tutorials/wiki/src/authorization/>`_.
 
 Access Control
 --------------

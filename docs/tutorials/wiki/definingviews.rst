@@ -28,9 +28,6 @@ assumed to return a :term:`response` object.
 We're going to define several :term:`view callable` functions, then wire them
 into :app:`Pyramid` using some :term:`view configuration`.
 
-The source code for this tutorial stage can be browsed via
-`http://github.com/Pylons/pyramid/tree/1.3-branch/docs/tutorials/wiki/src/views/
-<http://github.com/Pylons/pyramid/tree/1.3-branch/docs/tutorials/wiki/src/views/>`_.
 
 Declaring Dependencies in Our ``setup.py`` File
 ===============================================
