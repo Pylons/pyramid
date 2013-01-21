@@ -193,8 +193,7 @@ assumptions:
 
 .. note::
 
-   :app:`Pyramid` supports any persistent storage mechanism (e.g. a SQL
-   database or filesystem files, etc).  :app:`Pyramid` also supports an
-   additional mechanism to map URLs to code (:term:`URL dispatch`).  However,
-   for the purposes of this tutorial, we'll only be using traversal and ZODB.
-
+   :app:`Pyramid` supports any persistent storage mechanism (e.g., a SQL
+   database or filesystem files).  :app:`Pyramid` also supports an additional
+   mechanism to map URLs to code (:term:`URL dispatch`).  However, for the
+   purposes of this tutorial, we'll only be using traversal and ZODB.
