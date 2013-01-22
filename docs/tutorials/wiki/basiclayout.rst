@@ -165,7 +165,7 @@ opposed to the tutorial :term:`package` directory) looks like this:
 .. literalinclude:: src/basiclayout/development.ini
    :language: ini
 
-Note the existence of an ``[app:main]`` section which specifies our WSGI
+Note the existence of a ``[app:main]`` section which specifies our WSGI
 application.  Our ZODB database settings are specified as the
 ``zodbconn.uri`` setting within this section.  This value, and the other
 values within this section are passed as ``**settings`` to the ``main``
