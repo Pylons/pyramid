@@ -152,7 +152,7 @@ class Configurator(
     configured into this application (each tuple representing a set of
     positional values that should be passed to
     :meth:`pyramid.config.Configurator.add_renderer`).  If
-    it is not passed, a default set of renderer factories is used.
+    it is ``None``, a default set of renderer factories is used.
 
     If ``debug_logger`` is not passed, a default debug logger that logs to a
     logger will be used (the logger name will be the package name of the
