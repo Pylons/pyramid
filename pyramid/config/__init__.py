@@ -112,9 +112,9 @@ class Configurator(
     otherwise be done.  After its construction, the configurator may be used
     to add further configuration to the registry.
 
-    .. warning:: If a ``registry`` is passed to the Configurator
-       constructor, all other constructor arguments except ``package``
-       are ignored.
+    .. warning:: If ``registry`` is assigned the above-mentioned class
+       instance, all other constructor arguments are ignored,
+       with the exception of ``package``.
 
     If the ``package`` argument is passed, it must be a reference to a Python
     :term:`package` (e.g. ``sys.modules['thepackage']``) or a :term:`dotted
