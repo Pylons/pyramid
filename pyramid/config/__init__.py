@@ -104,13 +104,6 @@ class Configurator(
     A Configurator is used to configure a :app:`Pyramid`
     :term:`application registry`.
 
-    The Configurator accepts a number of arguments: ``registry``,
-    ``package``, ``settings``, ``root_factory``, ``authentication_policy``,
-    ``authorization_policy``, ``renderers``, ``debug_logger``,
-    ``locale_negotiator``, ``request_factory``, ``renderer_globals_factory``,
-    ``default_permission``, ``session_factory``, ``default_view_mapper``,
-    ``autocommit``, ``exceptionresponse_view`` and ``route_prefix``.
-
     If the ``registry`` argument is passed as a non-``None`` value, it must
     be an instance of the :class:`pyramid.registry.Registry` class
     representing the registry to configure.  If ``registry`` is ``None``, the
