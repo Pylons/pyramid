@@ -211,7 +211,7 @@ class Configurator(
     :meth:`pyramid.config.Configurator.commit` is called.  When
     :meth:`pyramid.config.Configurator.commit` is called, the actions implied
     by the called methods will be checked for configuration conflicts unless
-    ``autocommit`` is ``True``.  If a conflict is detected a
+    ``autocommit`` is ``True``.  If a conflict is detected, a
     ``ConfigurationConflictError`` will be raised.  Calling
     :meth:`pyramid.config.Configurator.make_wsgi_app` always implies a final
     commit.
