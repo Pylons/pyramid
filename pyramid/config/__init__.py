@@ -104,7 +104,7 @@ class Configurator(
     A Configurator is used to configure a :app:`Pyramid`
     :term:`application registry`.
 
-    If the ``registry`` argument is passed as a non-``None`` value, it must
+    If the ``registry`` argument is not ``None``, it must
     be an instance of the :class:`pyramid.registry.Registry` class
     representing the registry to configure.  If ``registry`` is ``None``, the
     configurator will create a :class:`pyramid.registry.Registry` instance
