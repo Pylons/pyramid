@@ -219,7 +219,7 @@ class Configurator(
     If ``default_view_mapper`` is passed, it will be used as the default
     :term:`view mapper` factory for view configurations that don't otherwise
     specify one (see :class:`pyramid.interfaces.IViewMapperFactory`).  If a
-    default_view_mapper is not passed, a superdefault view mapper will be
+    ``default_view_mapper`` is not passed, a superdefault view mapper will be
     used.
 
     If ``exceptionresponse_view`` is passed, it must be a :term:`view
