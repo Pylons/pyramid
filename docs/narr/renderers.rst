@@ -73,13 +73,13 @@ which renders view return values to a :term:`JSON` response serialization.
 
 Other built-in renderers include renderers which use the :term:`Chameleon`
 templating language to render a dictionary to a response.  Additional
-renderers can be added by developers to the system as necessary (see
-:ref:`adding_and_overriding_renderers`).
+renderers can be added by developers to the system as necessary.
+See :ref:`adding_and_overriding_renderers`.
 
 Views which use a renderer and return a non-Response value can vary non-body
 response attributes (such as headers and the HTTP status code) by attaching a
-property to the ``request.response`` attribute See
-:ref:`request_response_attr`.
+property to the ``request.response`` attribute.
+See :ref:`request_response_attr`.
 
 If the :term:`view callable` associated with a :term:`view configuration`
 returns a Response object directly, any renderer associated with the view
