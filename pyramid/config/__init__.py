@@ -175,10 +175,9 @@ class Configurator(
     same.  See :ref:`adding_renderer_globals`.  By default, it is ``None``,
     which means use no renderer globals factory.
 
-    .. warning::
-
-       as of Pyramid 1.1, ``renderer_globals_factory`` is deprecated.  Instead,
-       use a BeforeRender event subscriber as per :ref:`beforerender_event`.
+    .. deprecated:: 1.1
+       Use a BeforeRender event subscriber as per :ref:`beforerender_event`
+       in place of ``renderer_globals_factory``.
 
     If ``default_permission`` is passed, it should be a
     :term:`permission` string to be used as the default permission for
@@ -229,18 +228,26 @@ class Configurator(
     be registered, and all raised exception responses will be bubbled up to
     Pyramid's caller.  By
     default, the ``pyramid.httpexceptions.default_exceptionresponse_view``
-    function is used as the ``exceptionresponse_view``.  This argument is new
-    in Pyramid 1.1.
+    function is used as the ``exceptionresponse_view``.
 
     If ``route_prefix`` is passed, all routes added with
     :meth:`pyramid.config.Configurator.add_route` will have the specified path
-    prepended to their pattern. This parameter is new in Pyramid 1.2.
+    prepended to their pattern.
 
     If ``introspection`` is passed, it must be a boolean value.  If it's
     ``True``, introspection values during actions will be kept for use
     for tools like the debug toolbar.  If it's ``False``, introspection
     values provided by registrations will be ignored.  By default, it is
-    ``True``.  This parameter is new as of Pyramid 1.3.
+    ``True``.
+
+    .. versionadded:: 1.1
+       The ``exceptionresponse_view`` argument.
+
+    .. versionadded:: 1.2
+       The ``route_prefix`` argument.
+
+    .. versionadded:: 1.3
+       The ``introspection`` argument.
     """
     manager = manager # for testing injection
     venusian = venusian # for testing injection
@@ -714,7 +721,9 @@ class Configurator(
         because the ``route_prefix`` argument will be prepended to the
         pattern.
 
-        The ``route_prefix`` parameter is new as of Pyramid 1.2.
+        .. versionadded:: 1.2
+           The ``route_prefix`` parameter.
+
         """
         # """ <-- emacs
 
@@ -912,8 +921,6 @@ class Configurator(
         and scanned.  See the :term:`Venusian` documentation for more
         information about the ``ignore`` argument.
 
-        .. note:: the ``ignore`` argument is new in Pyramid 1.3.
-        
         To perform a ``scan``, Pyramid creates a Venusian ``Scanner`` object.
         The ``kw`` argument represents a set of keyword arguments to pass to
         the Venusian ``Scanner`` object's constructor.  See the
@@ -925,7 +932,12 @@ class Configurator(
         may require additional arguments.  Providing this argument is not
         often necessary; it's an advanced usage.
 
-        .. note:: the ``**kw`` argument is new in Pyramid 1.1
+        .. versionadded:: 1.1
+           The ``**kw`` argument.
+
+        .. versionadded:: 1.3
+           The ``ignore`` argument.
+
         """
         package = self.maybe_dotted(package)
         if package is None: # pragma: no cover
