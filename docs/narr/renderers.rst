@@ -291,9 +291,8 @@ with the object.
 See :class:`pyramid.renderers.JSON` and
 :ref:`adding_and_overriding_renderers` for more information.
 
-.. note::
-
-   Serializing custom objects is a feature new in Pyramid 1.4.
+.. versionadded:: 1.4
+   Serializing custom objects.
 
 .. index::
    pair: renderer; JSONP
@@ -303,9 +302,7 @@ See :class:`pyramid.renderers.JSON` and
 JSONP Renderer
 ~~~~~~~~~~~~~~
 
-.. note::
-
-   This feature is new in Pyramid 1.1.
+.. versionadded:: 1.1
 
 :class:`pyramid.renderers.JSONP` is a `JSONP
 <http://en.wikipedia.org/wiki/JSONP>`_ renderer factory helper which
