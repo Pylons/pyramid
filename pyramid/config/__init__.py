@@ -147,12 +147,12 @@ class Configurator(
        authorization policy is supplied without also supplying an
        authentication policy (authorization requires authentication).
 
-    If ``renderers`` is passed, it should be a list of tuples
-    representing a set of :term:`renderer` factories which should be
-    configured into this application (each tuple representing a set of
+    If ``renderers`` is ``None`` (the default), a default set of
+    :term:`renderer` factories is used. Else, it should be a list of
+    tuples representing a set of renderer factories which should be
+    configured into this application, and each tuple representing a set of
     positional values that should be passed to
-    :meth:`pyramid.config.Configurator.add_renderer`).  If
-    it is ``None``, a default set of renderer factories is used.
+    :meth:`pyramid.config.Configurator.add_renderer`.
 
     If ``debug_logger`` is not passed, a default debug logger that logs to a
     logger will be used (the logger name will be the package name of the
