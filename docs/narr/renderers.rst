@@ -63,7 +63,6 @@ the ``renderer`` attribute.  For example, this call to
 with a view callable:
 
 .. code-block:: python
-   :linenos:
 
    config.add_view('myproject.views.my_view', renderer='json')
 
@@ -166,7 +165,6 @@ The body of the response returned by such a view will be a string
 representing the ``str()`` serialization of the return value:
 
 .. code-block:: python
-   :linenos:
 
    {'content': 'Hello!'}
 
@@ -204,7 +202,6 @@ The body of the response returned by such a view will be a string
 representing the JSON serialization of the return value:
 
 .. code-block:: python
-   :linenos:
 
    '{"content": "Hello!"}'
 
@@ -619,7 +616,6 @@ For example, to add a renderer which renders views which have a
 ``renderer`` attribute that is a path that ends in ``.jinja2``:
 
 .. code-block:: python
-   :linenos:
 
    config.add_renderer('.jinja2', 'mypackage.MyJinja2Renderer')
 
@@ -725,10 +721,8 @@ Here's an example of the registration of a more complicated renderer
 factory, which expects to be passed a filesystem path:
 
 .. code-block:: python
-   :linenos:
 
-   config.add_renderer(name='.jinja2',
-                       factory='my.package.MyJinja2Renderer')
+   config.add_renderer(name='.jinja2', factory='my.package.MyJinja2Renderer')
 
 Adding the above code to your application startup will allow you to use the
 ``my.package.MyJinja2Renderer`` renderer factory implementation in view
@@ -769,7 +763,6 @@ extension for the same kinds of templates.  For example, to associate the
 :meth:`pyramid.config.Configurator.add_renderer` method:
 
 .. code-block:: python
-   :linenos:
 
    config.add_renderer('.zpt', 'pyramid.chameleon_zpt.renderer_factory')
 
@@ -781,7 +774,6 @@ rendered via a Chameleon ZPT page template renderer, use a variation on the
 following in your application's startup code:
 
 .. code-block:: python
-   :linenos:
 
    config.add_renderer('.pt', 'mypackage.pt_renderer')
 
@@ -794,7 +786,6 @@ ones which do not possess a ``renderer`` attribute), pass ``None`` as
 the ``name`` attribute to the renderer tag:
 
 .. code-block:: python
-   :linenos:
 
    config.add_renderer(None, 'mypackage.json_renderer_factory')
 
