@@ -683,12 +683,10 @@ There are essentially two different kinds of renderer factories:
    :term:`package`.
 
 Here's an example of the registration of a simple renderer factory via
-:meth:`~pyramid.config.Configurator.add_renderer`:
+:meth:`~pyramid.config.Configurator.add_renderer`, where ``config``
+is an instance of :meth:`pyramid.config.Configurator`:
 
 .. code-block:: python
-   :linenos:
-
-   # config is an instance of pyramid.config.Configurator
 
    config.add_renderer(name='amf', factory='my.package.MyAMFRenderer')
 
