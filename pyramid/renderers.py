@@ -70,7 +70,7 @@ def render(renderer_name, value, request=None, package=None):
     top-level system names, such as ``request``, ``context``,
     ``renderer_name``, and ``view``.  See :ref:`renderer_system_values` for
     the full list.  If :term:`renderer globals` have been specified, these
-    will also be used to agument the value.
+    will also be used to augment the value.
 
     Supply a ``request`` parameter in order to provide the renderer
     with the most correct 'system' values (``request`` and ``context``
