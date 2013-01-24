@@ -71,6 +71,13 @@ and a final view named ``edit_page`` will allow a page to be edited.
 The ``view_wiki`` view function
 -------------------------------
 
+Here is the code for the ``view_wiki`` view function and its decorator, which
+will be added to ``views.py``:
+
+.. literalinclude:: src/views/tutorial/views.py
+   :lines: 12-14
+   :language: python
+
 The ``view_wiki`` function will be configured to respond as the default view
 callable for a Wiki resource.  We'll provide it with a ``@view_config``
 decorator which names the class ``tutorial.models.Wiki`` as its context.
@@ -84,15 +91,21 @@ The ``view_wiki`` view callable always redirects to the URL of a Page
 resource named "FrontPage".  To do so, it returns an instance of the
 :class:`pyramid.httpexceptions.HTTPFound` class (instances of which implement
 the :class:`pyramid.interfaces.IResponse` interface like
-:class:`pyramid.response.Response` does).  The
-:meth:`pyramid.request.Request.resource_url` API.
+:class:`pyramid.response.Response` does).
 :meth:`pyramid.request.Request.resource_url` constructs a URL to the
-``FrontPage`` page resource (e.g. ``http://localhost:6543/FrontPage``), and
+``FrontPage`` page resource (i.e., ``http://localhost:6543/FrontPage``), and
 uses it as the "location" of the HTTPFound response, forming an HTTP
 redirect.
 
 The ``view_page`` view function
 -------------------------------
+
+Here is the code for the ``view_page`` view function and its decorator, which
+will be added to ``views.py``:
+
+.. literalinclude:: src/views/tutorial/views.py
+   :lines: 16-33
+   :language: python
 
 The ``view_page`` function will be configured to respond as the default view
 of a Page resource.  We'll provide it with a ``@view_config`` decorator which
@@ -101,7 +114,7 @@ when a Page resource is the context, and no :term:`view name` exists in the
 request, this view will be used.  We inform :app:`Pyramid` this view will use
 the ``templates/view.pt`` template file as a ``renderer``.
 
-The ``view_page`` function generates the :term:`ReStructuredText` body of a
+The ``view_page`` function generates the :term:`reStructuredText` body of a
 page (stored as the ``data`` attribute of the context passed to the view; the
 context will be a Page resource) as HTML.  Then it substitutes an HTML anchor
 for each *WikiWord* reference in the rendered HTML using a compiled regular
@@ -140,6 +153,13 @@ callable.  In the ``view_wiki`` view callable, we unconditionally return a
 The ``add_page`` view function
 ------------------------------
 
+Here is the code for the ``add_page`` view function and its decorator, which
+will be added to ``views.py``:
+
+.. literalinclude:: src/views/tutorial/views.py
+   :lines: 35-50
+   :language: python
+
 The ``add_page`` function will be configured to respond when the context
 resource is a Wiki and the :term:`view name` is ``add_page``.  We'll provide
 it with a ``@view_config`` decorator which names the string ``add_page`` as
@@ -171,7 +191,7 @@ we're trying to add.
 If the view rendering is *not* a result of a form submission (if the
 expression ``'form.submitted' in request.params`` is ``False``), the view
 renders a template.  To do so, it generates a "save url" which the template
-use as the form post URL during rendering.  We're lazy here, so we're trying
+uses as the form post URL during rendering.  We're lazy here, so we're trying
 to use the same template (``templates/edit.pt``) for the add view as well as
 the page edit view.  To do so, we create a dummy Page resource object in
 order to satisfy the edit form's desire to have *some* page object exposed as
@@ -186,6 +206,13 @@ the page body, and save it into "our context" (the Wiki) using the
 
 The ``edit_page`` view function
 -------------------------------
+
+Here is the code for the ``edit_page`` view function and its decorator, which
+will be added to ``views.py``:
+
+.. literalinclude:: src/views/tutorial/views.py
+   :lines: 52-60
+   :language: python
 
 The ``edit_page`` function will be configured to respond when the context is
 a Page resource and the :term:`view name` is ``edit_page``.  We'll provide it
