@@ -114,7 +114,7 @@ class AssetResolver(Resolver):
     """ A class used to resolve an :term:`asset specification` to an
     :term:`asset descriptor`.
 
-    .. note:: This API is new as of Pyramid 1.3.
+    .. versionadded:: 1.3
 
     The constructor accepts a single argument named ``package`` which may be
     any of:
@@ -209,7 +209,7 @@ class DottedNameResolver(Resolver):
     """ A class used to resolve a :term:`dotted Python name` to a package or
     module object.
 
-    .. note:: This API is new as of Pyramid 1.3.
+    .. versionadded:: 1.3
 
     The constructor accepts a single argument named ``package`` which may be
     any of:
