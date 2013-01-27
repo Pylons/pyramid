@@ -29,9 +29,11 @@ _marker = object()
 class static(static_view):
     """ Backwards compatibility alias for
     :class:`pyramid.static.static_view`; it overrides that class' constructor
-    to pass ``use_subpath=True`` by default.  This class is deprecated as of
-    :app:`Pyramid` 1.1.  Use :class:`pyramid.static.static_view` instead
-    (probably with a ``use_subpath=True`` argument).
+    to pass ``use_subpath=True`` by default.
+
+    .. deprecated:: 1.1
+       use :class:`pyramid.static.static_view` instead
+       (probably with a ``use_subpath=True`` argument)
     """
     def __init__(self, root_dir, cache_max_age=3600, package_name=None):
         if package_name is None:
@@ -312,6 +314,7 @@ See also :ref:`changing_the_notfound_view`.
 
 class notfound_view_config(object):
     """
+    .. versionadded:: 1.3
 
     An analogue of :class:`pyramid.view.view_config` which registers a
     :term:`not found view`.
@@ -346,9 +349,6 @@ class notfound_view_config(object):
 
     See :ref:`changing_the_notfound_view` for detailed usage information.
 
-    .. note::
-
-       This class is new as of Pyramid 1.3.
     """
 
     venusian = venusian
@@ -377,6 +377,7 @@ class notfound_view_config(object):
 
 class forbidden_view_config(object):
     """
+    .. versionadded:: 1.3
 
     An analogue of :class:`pyramid.view.view_config` which registers a
     :term:`forbidden view`.
@@ -403,9 +404,6 @@ class forbidden_view_config(object):
 
     See :ref:`changing_the_forbidden_view` for detailed usage information.
 
-    .. note::
-
-       This class is new as of Pyramid 1.3.
     """
 
     venusian = venusian
@@ -436,11 +434,8 @@ def is_response(ob):
     """ Return ``True`` if ``ob`` implements the interface implied by
     :ref:`the_response`. ``False`` if not.
 
-    .. warning::
-
-       This function is deprecated as of :app:`Pyramid` 1.1.  New
-       code should not use it.  Instead, new code should use the
-       :func:`pyramid.request.Request.is_response` method."""
+    .. deprecated:: 1.1
+       use :func:`pyramid.request.Request.is_response` instead"""
     if ( hasattr(ob, 'app_iter') and hasattr(ob, 'headerlist') and
          hasattr(ob, 'status') ):
         return True
