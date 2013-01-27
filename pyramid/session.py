@@ -163,7 +163,7 @@ def UnencryptedCookieSessionFactoryConfig(
       while rendering a view.  Default: ``True``.
 
     ``signed_serialize``
-      A callable which takes more or less arbitrary python data structure and
+      A callable which takes more or less arbitrary Python data structure and
       a secret and returns a signed serialization in bytes.
       Default: ``signed_serialize`` (using pickle).
 
