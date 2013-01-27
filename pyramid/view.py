@@ -317,7 +317,7 @@ class notfound_view_config(object):
     .. versionadded:: 1.3
 
     An analogue of :class:`pyramid.view.view_config` which registers a
-    :term:`not found view`.
+    :term:`Not Found View`.
 
     The notfound_view_config constructor accepts most of the same arguments
     as the constructor of :class:`pyramid.view.view_config`.  It can be used
