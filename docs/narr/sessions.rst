@@ -29,7 +29,7 @@ during your :app:`Pyramid` configuration.
 A very basic, insecure sample session factory implementation is
 provided in the :app:`Pyramid` core.  It uses a cookie to store
 session information.  This implementation has the following
-limitation:
+limitations:
 
 - The session information in the cookies used by this implementation
   is *not* encrypted, so it can be viewed by anyone with access to the
