@@ -257,6 +257,97 @@ already constructed a :term:`configurator` it can also be registered via the
    config.set_request_factory(MyRequest)
 
 .. index::
+   single: request method
+
+.. _adding_request_method:
+
+Adding Methods or Properties to Request Object
+----------------------------------------------
+
+Since each pyramid application can only have one :term:`request` factory,
+:ref:`changing the request factory <changing_the_request_factory>`
+is not that extensible especially if you want to build composable features
+(e.g., pyramid add-ons and plugins).
+
+A lazy property can be registered to the request object via the
+:meth:`pyramid.config.Configurator.add_request_method` API. This allows you
+to specify a callable that will be available on the request object, but will not
+actually execute the function until accessed.
+
+.. note:: This feature is new as of Pyramid 1.4.
+
+.. warning:: This will silently override methods and properties from
+   :term:`request factory` that have the same name.
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.config import Configurator
+
+   def total(request, *args):
+       return sum(args)
+
+   def prop(request):
+       print "getting the property"
+       return "the property"
+
+   config = Configurator()
+   config.add_request_method(total)
+   config.add_request_method(prop, reify=True)
+
+In the above example, ``total`` is added as a method. However, ``prop`` is added
+as a property and its result is cached per-request by setting ``reify=True``.
+This way, we eliminate the overhead of running the function multiple times.
+
+   >>> request.total(1, 2, 3)
+   6
+   >>> request.prop
+   getting the property
+   the property
+   >>> request.prop
+   the property
+
+To not cache the result of ``request.prop``, set ``property=True`` instead of
+``reify=True``.
+
+Here is an example of passing a class to ``Configurator.add_request_method``:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.config import Configurator
+   from pyramid.decorator import reify
+
+
+   class ExtraStuff(object):
+
+       def __init__(self, request):
+           self.request = request
+
+       def total(self, *args):
+           return sum(args)
+
+       # use @property if you don't want to cache the result
+       @reify
+       def prop(self):
+           print "getting the property"
+           return "the property"
+
+   config = Configurator()
+   config.add_request_method(ExtraStuff, 'extra', reify=True)
+
+We attach and cache an object named ``extra`` to the ``request`` object.
+
+   >>> request.extra.total(1, 2, 3)
+   6
+   >>> request.extra.prop
+   getting the property
+   the property
+   >>> request.extra.prop
+   the property
+
+
+.. index::
    single: before render event
    single: adding renderer globals
 
