@@ -84,7 +84,7 @@ function in your application's ``__init__.py``.  For example, rather than:
        config.add_view('myapp.views.view1', name='view1')
        config.add_view('myapp.views.view2', name='view2')
 
-You should do move the calls to ``add_view`` outside of the (non-reusable)
+You should move the calls to ``add_view`` outside of the (non-reusable)
 ``if __name__ == '__main__'`` block, and into a reusable function:
 
 .. code-block:: python
