@@ -710,7 +710,7 @@ class ViewsConfiguratorMixin(object):
 
         http_cache
 
-          .. note:: This feature is new as of Pyramid 1.1.
+          .. versionadded:: 1.1
 
           When you supply an ``http_cache`` value to a view configuration,
           the ``Expires`` and ``Cache-Control`` headers of a response
@@ -877,9 +877,9 @@ class ViewsConfiguratorMixin(object):
           supplied value.  Note that use of ``GET`` also implies that the
           view will respond to ``HEAD`` as of Pyramid 1.4.
 
-          .. note:: The ability to pass a tuple of items as
-                   ``request_method`` is new as of Pyramid 1.2.  Previous
-                   versions allowed only a string.
+          .. versionchanged:: 1.2
+             The ability to pass a tuple of items as ``request_method`` is
+             new as of Pyramid 1.2.  Previous versions allowed only a string.
 
         request_param
 
@@ -897,7 +897,7 @@ class ViewsConfiguratorMixin(object):
 
         match_param
 
-          .. note:: This feature is new as of :app:`Pyramid` 1.2.
+          .. versionadded:: 1.2
 
           This value can be a string of the format "key=value" or a tuple
           containing one or more of these strings.
@@ -1354,7 +1354,10 @@ class ViewsConfiguratorMixin(object):
     @action_method
     def add_view_predicate(self, name, factory, weighs_more_than=None,
                            weighs_less_than=None):
-        """ Adds a view predicate factory.  The associated view predicate can
+        """
+        .. versionadded:: 1.4
+
+        Adds a view predicate factory.  The associated view predicate can
         later be named as a keyword argument to
         :meth:`pyramid.config.Configurator.add_view` in the
         ``predicates`` anonyous keyword argument dictionary.
@@ -1366,10 +1369,6 @@ class ViewsConfiguratorMixin(object):
         ``factory`` should be a :term:`predicate factory`.
 
         See :ref:`view_and_route_predicates` for more information.
-
-        .. note::
-
-           This method is new as of Pyramid 1.4.
         """
         self._add_predicate(
             'view',
@@ -1557,9 +1556,7 @@ class ViewsConfiguratorMixin(object):
         ``for_``, or ``http_cache`` keyword arguments.  These argument values
         make no sense in the context of a forbidden view.
 
-        .. note::
-
-           This method is new as of Pyramid 1.3.
+        .. versionadded:: 1.3
         """
         for arg in ('name', 'permission', 'context', 'for_', 'http_cache'):
             if arg in predicates:
@@ -1646,9 +1643,7 @@ class ViewsConfiguratorMixin(object):
         Pyramid will return the result of the view callable provided as
         ``view``, as normal.
 
-        .. note::
-
-           This method is new as of Pyramid 1.3.
+        .. versionadded:: 1.3
         """
         for arg in ('name', 'permission', 'context', 'for_', 'http_cache'):
             if arg in predicates:
