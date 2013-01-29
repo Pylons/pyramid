@@ -38,9 +38,8 @@ class AdaptersConfiguratorMixin(object):
         :meth:`pyramid.config.Configurator.add_subscriber_predicate` before it
         can be used.  See :ref:`subscriber_predicates` for more information.
 
-        .. note::
-
-           THe ``**predicates`` argument is new as of Pyramid 1.4.
+        .. versionadded:: 1.4
+           The ``**predicates`` argument.
         """
         dotted = self.maybe_dotted
         subscriber, iface = dotted(subscriber), dotted(iface)
@@ -274,6 +273,8 @@ class AdaptersConfiguratorMixin(object):
     @action_method
     def add_resource_url_adapter(self, adapter, resource_iface=None):
         """
+        .. versionadded:: 1.3
+
         When you add a traverser as described in
         :ref:`changing_the_traverser`, it's convenient to continue to use the
         :meth:`pyramid.request.Request.resource_url` API.  However, since the
@@ -299,10 +300,6 @@ class AdaptersConfiguratorMixin(object):
         ``None``, the url adapter will be used for every type of resource.
 
         See :ref:`changing_resource_url` for more information.
-
-        .. note::
-
-           This API is new in Pyramid 1.3.
         """
         adapter = self.maybe_dotted(adapter)
         resource_iface = self.maybe_dotted(resource_iface)

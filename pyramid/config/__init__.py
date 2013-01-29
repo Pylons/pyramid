@@ -104,14 +104,7 @@ class Configurator(
     A Configurator is used to configure a :app:`Pyramid`
     :term:`application registry`.
 
-    The Configurator accepts a number of arguments: ``registry``,
-    ``package``, ``settings``, ``root_factory``, ``authentication_policy``,
-    ``authorization_policy``, ``renderers``, ``debug_logger``,
-    ``locale_negotiator``, ``request_factory``, ``renderer_globals_factory``,
-    ``default_permission``, ``session_factory``, ``default_view_mapper``,
-    ``autocommit``, ``exceptionresponse_view`` and ``route_prefix``.
-
-    If the ``registry`` argument is passed as a non-``None`` value, it must
+    If the ``registry`` argument is not ``None``, it must
     be an instance of the :class:`pyramid.registry.Registry` class
     representing the registry to configure.  If ``registry`` is ``None``, the
     configurator will create a :class:`pyramid.registry.Registry` instance
@@ -119,9 +112,9 @@ class Configurator(
     otherwise be done.  After its construction, the configurator may be used
     to add further configuration to the registry.
 
-    .. warning:: If a ``registry`` is passed to the Configurator
-       constructor, all other constructor arguments except ``package``
-       are ignored.
+    .. warning:: If ``registry`` is assigned the above-mentioned class
+       instance, all other constructor arguments are ignored,
+       with the exception of ``package``.
 
     If the ``package`` argument is passed, it must be a reference to a Python
     :term:`package` (e.g. ``sys.modules['thepackage']``) or a :term:`dotted
@@ -154,12 +147,12 @@ class Configurator(
        authorization policy is supplied without also supplying an
        authentication policy (authorization requires authentication).
 
-    If ``renderers`` is passed, it should be a list of tuples
-    representing a set of :term:`renderer` factories which should be
-    configured into this application (each tuple representing a set of
+    If ``renderers`` is ``None`` (the default), a default set of
+    :term:`renderer` factories is used. Else, it should be a list of
+    tuples representing a set of renderer factories which should be
+    configured into this application, and each tuple representing a set of
     positional values that should be passed to
-    :meth:`pyramid.config.Configurator.add_renderer`).  If
-    it is not passed, a default set of renderer factories is used.
+    :meth:`pyramid.config.Configurator.add_renderer`.
 
     If ``debug_logger`` is not passed, a default debug logger that logs to a
     logger will be used (the logger name will be the package name of the
@@ -182,10 +175,9 @@ class Configurator(
     same.  See :ref:`adding_renderer_globals`.  By default, it is ``None``,
     which means use no renderer globals factory.
 
-    .. warning::
-
-       as of Pyramid 1.1, ``renderer_globals_factory`` is deprecated.  Instead,
-       use a BeforeRender event subscriber as per :ref:`beforerender_event`.
+    .. deprecated:: 1.1
+       Use a BeforeRender event subscriber as per :ref:`beforerender_event`
+       in place of ``renderer_globals_factory``.
 
     If ``default_permission`` is passed, it should be a
     :term:`permission` string to be used as the default permission for
@@ -218,15 +210,15 @@ class Configurator(
     :meth:`pyramid.config.Configurator.commit` is called.  When
     :meth:`pyramid.config.Configurator.commit` is called, the actions implied
     by the called methods will be checked for configuration conflicts unless
-    ``autocommit`` is ``True``.  If a conflict is detected a
+    ``autocommit`` is ``True``.  If a conflict is detected, a
     ``ConfigurationConflictError`` will be raised.  Calling
     :meth:`pyramid.config.Configurator.make_wsgi_app` always implies a final
     commit.
 
     If ``default_view_mapper`` is passed, it will be used as the default
     :term:`view mapper` factory for view configurations that don't otherwise
-    specify one (see :class:`pyramid.interfaces.IViewMapperFactory`).  If a
-    default_view_mapper is not passed, a superdefault view mapper will be
+    specify one (see :class:`pyramid.interfaces.IViewMapperFactory`).  If
+    ``default_view_mapper`` is not passed, a superdefault view mapper will be
     used.
 
     If ``exceptionresponse_view`` is passed, it must be a :term:`view
@@ -236,18 +228,26 @@ class Configurator(
     be registered, and all raised exception responses will be bubbled up to
     Pyramid's caller.  By
     default, the ``pyramid.httpexceptions.default_exceptionresponse_view``
-    function is used as the ``exceptionresponse_view``.  This argument is new
-    in Pyramid 1.1.
+    function is used as the ``exceptionresponse_view``.
 
     If ``route_prefix`` is passed, all routes added with
     :meth:`pyramid.config.Configurator.add_route` will have the specified path
-    prepended to their pattern. This parameter is new in Pyramid 1.2.
+    prepended to their pattern.
 
     If ``introspection`` is passed, it must be a boolean value.  If it's
     ``True``, introspection values during actions will be kept for use
     for tools like the debug toolbar.  If it's ``False``, introspection
     values provided by registrations will be ignored.  By default, it is
-    ``True``.  This parameter is new as of Pyramid 1.3.
+    ``True``.
+
+    .. versionadded:: 1.1
+       The ``exceptionresponse_view`` argument.
+
+    .. versionadded:: 1.2
+       The ``route_prefix`` argument.
+
+    .. versionadded:: 1.3
+       The ``introspection`` argument.
     """
     manager = manager # for testing injection
     venusian = venusian # for testing injection
@@ -721,7 +721,9 @@ class Configurator(
         because the ``route_prefix`` argument will be prepended to the
         pattern.
 
-        The ``route_prefix`` parameter is new as of Pyramid 1.2.
+        .. versionadded:: 1.2
+           The ``route_prefix`` parameter.
+
         """
         # """ <-- emacs
 
@@ -919,8 +921,6 @@ class Configurator(
         and scanned.  See the :term:`Venusian` documentation for more
         information about the ``ignore`` argument.
 
-        .. note:: the ``ignore`` argument is new in Pyramid 1.3.
-        
         To perform a ``scan``, Pyramid creates a Venusian ``Scanner`` object.
         The ``kw`` argument represents a set of keyword arguments to pass to
         the Venusian ``Scanner`` object's constructor.  See the
@@ -932,7 +932,12 @@ class Configurator(
         may require additional arguments.  Providing this argument is not
         often necessary; it's an advanced usage.
 
-        .. note:: the ``**kw`` argument is new in Pyramid 1.1
+        .. versionadded:: 1.1
+           The ``**kw`` argument.
+
+        .. versionadded:: 1.3
+           The ``ignore`` argument.
+
         """
         package = self.maybe_dotted(package)
         if package is None: # pragma: no cover
