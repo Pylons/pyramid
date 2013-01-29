@@ -504,7 +504,8 @@ environment much like the environment produced when a particular
 using the :func:`pyramid.paster.bootstrap` command in the body of your
 script.
 
-.. note:: This feature is new as of :app:`Pyramid` 1.1.
+.. versionadded:: 1.1
+   This feature.
 
 In the simplest case, :func:`pyramid.paster.bootstrap` can be used with a
 single argument, which accepts the :term:`PasteDeploy` ``.ini`` file

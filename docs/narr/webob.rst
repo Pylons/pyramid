@@ -251,7 +251,7 @@ API documentation for a multidict exists as
 Dealing With A JSON-Encoded Request Body
 ++++++++++++++++++++++++++++++++++++++++
 
-.. note:: this feature is new as of Pyramid 1.1.
+.. versionadded:: 1.1
 
 :attr:`pyramid.request.Request.json_body` is a property that returns a
 :term:`JSON` -decoded representation of the request body.  If the request
