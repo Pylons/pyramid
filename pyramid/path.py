@@ -114,7 +114,7 @@ class AssetResolver(Resolver):
     """ A class used to resolve an :term:`asset specification` to an
     :term:`asset descriptor`.
 
-    .. note:: This API is new as of Pyramid 1.3.
+    .. versionadded:: 1.3
 
     The constructor accepts a single argument named ``package`` which may be
     any of:
@@ -133,20 +133,19 @@ class AssetResolver(Resolver):
     to the :meth:`~pyramid.path.AssetResolver.resolve` method.  An asset
     specification without a colon in it is treated as relative.
 
-    If the value ``None`` is supplied as the ``package``, the resolver will
+    If ``package`` is ``None``, the resolver will
     only be able to resolve fully qualified (not relative) asset
     specifications.  Any attempt to resolve a relative asset specification
-    when the ``package`` is ``None`` will result in an :exc:`ValueError`
-    exception.
+    will result in an :exc:`ValueError` exception.
 
-    If the value :attr:`pyramid.path.CALLER_PACKAGE` is supplied as the
-    ``package``, the resolver will treat relative asset specifications as
+    If ``package`` is :attr:`pyramid.path.CALLER_PACKAGE`,
+    the resolver will treat relative asset specifications as
     relative to the caller of the :meth:`~pyramid.path.AssetResolver.resolve`
     method.
 
-    If a *module* or *module name* (as opposed to a package or package name)
-    is supplied as ``package``, its containing package is computed and this
-    package used to derive the package name (all names are resolved relative
+    If ``package`` is a *module* or *module name* (as opposed to a package or
+    package name), its containing package is computed and this
+    package is used to derive the package name (all names are resolved relative
     to packages, never to modules).  For example, if the ``package`` argument
     to this type was passed the string ``xml.dom.expatbuilder``, and
     ``template.pt`` is supplied to the
@@ -154,8 +153,8 @@ class AssetResolver(Resolver):
     asset spec would be ``xml.minidom:template.pt``, because
     ``xml.dom.expatbuilder`` is a module object, not a package object.
 
-    If a *package* or *package name* (as opposed to a module or module name)
-    is supplied as ``package``, this package will be used to compute relative
+    If ``package`` is a *package* or *package name* (as opposed to a module or
+    module name), this package will be used to compute relative
     asset specifications.  For example, if the ``package`` argument to this
     type was passed the string ``xml.dom``, and ``template.pt`` is supplied
     to the :meth:`~pyramid.path.AssetResolver.resolve` method, the resulting
@@ -209,7 +208,7 @@ class DottedNameResolver(Resolver):
     """ A class used to resolve a :term:`dotted Python name` to a package or
     module object.
 
-    .. note:: This API is new as of Pyramid 1.3.
+    .. versionadded:: 1.3
 
     The constructor accepts a single argument named ``package`` which may be
     any of:
@@ -229,18 +228,17 @@ class DottedNameResolver(Resolver):
     which has a ``.`` (dot) or ``:`` (colon) as its first character is
     treated as relative.
 
-    If the value ``None`` is supplied as the ``package``, the resolver will
-    only be able to resolve fully qualified (not relative) names.  Any
-    attempt to resolve a relative name when the ``package`` is ``None`` will
-    result in an :exc:`ValueError` exception.
+    If ``package`` is ``None``, the resolver will only be able to resolve
+    fully qualified (not relative) names.  Any attempt to resolve a
+    relative name will result in an :exc:`ValueError` exception.
 
-    If the value :attr:`pyramid.path.CALLER_PACKAGE` is supplied as the
-    ``package``, the resolver will treat relative dotted names as relative to
+    If ``package`` is :attr:`pyramid.path.CALLER_PACKAGE`,
+    the resolver will treat relative dotted names as relative to
     the caller of the :meth:`~pyramid.path.DottedNameResolver.resolve`
     method.
 
-    If a *module* or *module name* (as opposed to a package or package name)
-    is supplied as ``package``, its containing package is computed and this
+    If ``package`` is a *module* or *module name* (as opposed to a package or
+    package name), its containing package is computed and this
     package used to derive the package name (all names are resolved relative
     to packages, never to modules).  For example, if the ``package`` argument
     to this type was passed the string ``xml.dom.expatbuilder``, and
@@ -249,8 +247,8 @@ class DottedNameResolver(Resolver):
     import would be for ``xml.minidom``, because ``xml.dom.expatbuilder`` is
     a module object, not a package object.
 
-    If a *package* or *package name* (as opposed to a module or module name)
-    is supplied as ``package``, this package will be used to relative compute
+    If ``package`` is a *package* or *package name* (as opposed to a module or
+    module name), this package will be used to relative compute
     dotted names.  For example, if the ``package`` argument to this type was
     passed the string ``xml.dom``, and ``.minidom`` is supplied to the
     :meth:`~pyramid.path.DottedNameResolver.resolve` method, the resulting
