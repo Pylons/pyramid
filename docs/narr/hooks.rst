@@ -264,17 +264,17 @@ already constructed a :term:`configurator` it can also be registered via the
 Adding Methods or Properties to Request Object
 ----------------------------------------------
 
-Since each pyramid application can only have one :term:`request` factory,
+.. versionadded:: 1.4.
+
+Since each Pyramid application can only have one :term:`request` factory,
 :ref:`changing the request factory <changing_the_request_factory>`
-is not that extensible especially if you want to build composable features
-(e.g., pyramid add-ons and plugins).
+is not that extensible, especially if you want to build composable features
+(e.g., Pyramid add-ons and plugins).
 
 A lazy property can be registered to the request object via the
 :meth:`pyramid.config.Configurator.add_request_method` API. This allows you
 to specify a callable that will be available on the request object, but will not
 actually execute the function until accessed.
-
-.. note:: This feature is new as of Pyramid 1.4.
 
 .. warning:: This will silently override methods and properties from
    :term:`request factory` that have the same name.
@@ -318,7 +318,6 @@ Here is an example of passing a class to ``Configurator.add_request_method``:
    from pyramid.config import Configurator
    from pyramid.decorator import reify
 
-
    class ExtraStuff(object):
 
        def __init__(self, request):
@@ -345,7 +344,6 @@ We attach and cache an object named ``extra`` to the ``request`` object.
    the property
    >>> request.extra.prop
    the property
-
 
 .. index::
    single: before render event
