@@ -166,9 +166,7 @@ distribute is not yet installed:
    ImportError: No module named setuptools
 
 If ``import setuptools`` raises an :exc:`ImportError` as it does above, you
-will need to install setuptools or distribute manually.  Note that above
-we're using a Python 2.7-series interpreter on Mac OS X; your output may
-differ if you're using a later Python version or a different platform.
+will need to install setuptools or distribute manually.
 
 If you are using a "system" Python (one installed by your OS distributor or a
 3rd-party packager such as Fink or MacPorts), you can usually install the
