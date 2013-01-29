@@ -203,11 +203,9 @@ class JSON(object):
     ``default``, and any extra ``kw`` keyword argments passed during
     renderer construction.
 
-    .. note::
-
-       This feature is new in Pyramid 1.4. Prior to 1.4 there was
-       no public API for supplying options to the underlying
-       serializer without defining a custom renderer.
+    .. versionadded:: 1.4
+       Prior to this version, there was no public API for supplying options
+       to the underlying serializer without defining a custom renderer.
     """
 
     def __init__(self, serializer=json.dumps, adapters=(), **kw):
@@ -302,8 +300,8 @@ class JSONP(JSON):
        config = Configurator()
        config.add_renderer('jsonp', JSONP(param_name='callback', indent=4))
     
-    .. note:: The ability of this class to accept a ``**kw`` in its
-       constructor is new as of Pyramid 1.4.
+    .. versionchanged:: 1.4
+       The ability of this class to accept a ``**kw`` in its constructor.
 
     The arguments passed to this class' constructor mean the same thing as
     the arguments passed to :class:`pyramid.renderers.JSON` (including
@@ -331,7 +329,7 @@ class JSONP(JSON):
     - If there is no callback parameter in the request's query string, the
       renderer will return a 'plain' JSON response.
 
-    .. note:: This feature is new in Pyramid 1.1.
+    .. versionadded:: 1.1
 
     See also: :ref:`jsonp_renderer`.
     """

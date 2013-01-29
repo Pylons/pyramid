@@ -227,8 +227,8 @@ equivalent to ``raise HTTPUnauthorized()``.  Documentation which maps each
 HTTP response code to its purpose and its associated HTTP exception object is
 provided within :mod:`pyramid.httpexceptions`.
 
-.. note:: The :func:`~pyramid.httpexceptions.exception_response` function is
-   new as of Pyramid 1.1.
+.. versionadded:: 1.1
+   The :func:`~pyramid.httpexceptions.exception_response` function.
 
 How Pyramid Uses HTTP Exceptions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

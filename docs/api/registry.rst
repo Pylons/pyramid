@@ -16,6 +16,8 @@
 
    .. attribute:: introspector
 
+     .. versionadded:: 1.3
+
      When a registry is set up (or created) by a :term:`Configurator`, the
      registry will be decorated with an instance named ``introspector``
      implementing the :class:`pyramid.interfaces.IIntrospector` interface.
@@ -27,28 +29,23 @@
      This attribute is often accessed as ``request.registry.introspector`` in
      a typical Pyramid application.
 
-     This attribute is new as of :app:`Pyramid` 1.3.
-
 .. class:: Introspectable
+
+   .. versionadded:: 1.3
 
    The default implementation of the interface
    :class:`pyramid.interfaces.IIntrospectable` used by framework exenders.
    An instance of this class is created when
    :attr:`pyramid.config.Configurator.introspectable` is called.
 
-   This class is new as of :app:`Pyramid` 1.3.
-
 .. autoclass:: Deferred
 
-   This class is new as of :app:`Pyramid` 1.4.
+   .. versionadded:: 1.4
 
 .. autofunction:: undefer
 
-   This function is new as of :app:`Pyramid` 1.4.
+   .. versionadded:: 1.4
 
 .. autoclass:: predvalseq
 
-   This class is new as of :app:`Pyramid` 1.4.
-
-
-
+   .. versionadded:: 1.4

@@ -822,7 +822,8 @@ class ViewsConfiguratorMixin(object):
           think about preserving function attributes such as ``__name__`` and
           ``__module__`` within decorator logic).
 
-          Passing an iterable is only supported as of :app:`Pyramid` 1.4a4.
+          .. versionchanged:: 1.4a4
+             Passing an iterable.
 
         mapper
 
@@ -878,8 +879,8 @@ class ViewsConfiguratorMixin(object):
           view will respond to ``HEAD`` as of Pyramid 1.4.
 
           .. versionchanged:: 1.2
-             The ability to pass a tuple of items as ``request_method`` is
-             new as of Pyramid 1.2.  Previous versions allowed only a string.
+             The ability to pass a tuple of items as ``request_method``.
+             Previous versions allowed only a string.
 
         request_param
 

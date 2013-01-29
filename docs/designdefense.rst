@@ -919,7 +919,7 @@ creating a more Zope3-like environment without much effort.
 Pyramid Uses its Own HTTP Exception Class Hierarchy Rather Than ``webob.exc``
 -----------------------------------------------------------------------------
 
-.. note:: This defense is new as of Pyramid 1.1.
+.. versionadded:: 1.1
 
 The HTTP exception classes defined in :mod:`pyramid.httpexceptions` are very
 much like the ones defined in ``webob.exc``

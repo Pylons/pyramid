@@ -227,9 +227,7 @@ augment Pyramid's configuration introspection system.
 Adding Configuration Introspection
 ----------------------------------
 
-.. note::
-
-   The introspection subsystem is new in Pyramid 1.3.
+.. versionadded:: 1.3
 
 Pyramid provides a configuration introspection system that can be used by
 debugging tools to provide visibility into the configuration of a running
