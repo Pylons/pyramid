@@ -24,7 +24,7 @@ from pyramid.config.util import (
 class TweensConfiguratorMixin(object):
     def add_tween(self, tween_factory, under=None, over=None):
         """
-        .. note:: This feature is new as of Pyramid 1.2.
+        .. versionadded:: 1.2
 
         Add a 'tween factory'.  A :term:`tween` (a contraction of 'between')
         is a bit of code that sits between the Pyramid router's main request

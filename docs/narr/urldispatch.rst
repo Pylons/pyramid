@@ -758,11 +758,8 @@ other non-``name`` and non-``pattern`` arguments to
 exception to this rule is use of the ``pregenerator`` argument, which is not
 ignored when ``static`` is ``True``.
 
-.. note::
-
-   the ``static`` argument to
-   :meth:`~pyramid.config.Configurator.add_route` is new as of :app:`Pyramid`
-   1.1.
+.. versionadded:: 1.1
+   the ``static`` argument to :meth:`~pyramid.config.Configurator.add_route`
 
 .. index::
    single: redirecting to slash-appended routes
@@ -906,7 +903,7 @@ routes configured in your application; for more information, see
 Using a Route Prefix to Compose Applications
 --------------------------------------------
 
-.. note:: This feature is new as of :app:`Pyramid` 1.2.
+.. versionadded:: 1.2
 
 The :meth:`pyramid.config.Configurator.include` method allows configuration
 statements to be included from separate files.  See

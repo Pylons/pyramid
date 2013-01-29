@@ -73,11 +73,9 @@ class RenderingConfiguratorMixin(object):
         dictionary, and therefore will be made available to the code
         which uses the renderer.
 
-        .. warning::
-
-           This method is deprecated as of Pyramid 1.1.  Use a BeforeRender
-           event subscriber as documented in the :ref:`hooks_chapter` chapter
-           instead.
+        .. deprecated:: 1.1
+           Use a BeforeRender event subscriber as documented in the
+           :ref:`hooks_chapter` chapter instead.
 
         .. note::
 

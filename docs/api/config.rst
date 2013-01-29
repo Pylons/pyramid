@@ -108,9 +108,7 @@
         :class:`pyramid.registry.Introspectable` class (used during
         directives to provide introspection to actions).
 
-        .. note::
-
-           This attribute is new as of :app:`Pyramid` 1.3.
+        .. versionadded:: 1.3
 
      .. attribute:: introspector
 
@@ -118,9 +116,7 @@
         instance implementing the :class:`pyramid.interfaces.IIntrospector`
         interface.
 
-        .. note::
-
-           This attribute is new as of :app:`Pyramid` 1.3.
+        .. versionadded:: 1.3
 
      .. attribute:: registry
 
