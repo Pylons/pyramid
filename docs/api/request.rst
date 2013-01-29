@@ -163,9 +163,7 @@
 
    .. method:: invoke_subrequest(request, use_tweens=False)
 
-      .. warning:: 
-
-         This API was added in Pyramid 1.4a1.
+      .. versionadded:: 1.4a1
 
       Obtain a response object from the Pyramid application based on
       information in the ``request`` object provided.  The ``request`` object
