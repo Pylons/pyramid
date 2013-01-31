@@ -5,6 +5,8 @@
 
 .. automodule:: pyramid.exceptions
 
+  .. autoclass:: PredicateMismatch
+
   .. autoclass:: Forbidden
 
   .. autoclass:: NotFound
