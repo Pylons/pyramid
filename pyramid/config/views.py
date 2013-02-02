@@ -1886,7 +1886,9 @@ class StaticURLInfo(object):
             # make sure it ends with a slash
             name = name + '/'
 
-        if url_parse(name)[0]:
+        parsed_name = url_parse(name)
+        # Check if it has a scheme, or check to see if it has a netloc
+        if parsed_name[0] or parsed_name[1]:
             # it's a URL
             # url, spec, route_name
             url = name
