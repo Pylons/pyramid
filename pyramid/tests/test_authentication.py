@@ -561,9 +561,13 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         helper.BadTicket = auth_tkt.BadTicket
         return helper
 
-    def _makeRequest(self, cookie=None):
+    def _makeRequest(self, cookie=None, ipv6=False):
         environ = {'wsgi.version': (1,0)}
-        environ['REMOTE_ADDR'] = '1.1.1.1'
+
+        if ipv6 is False:
+            environ['REMOTE_ADDR'] = '1.1.1.1'
+        else:
+            environ['REMOTE_ADDR'] = '::1'
         environ['SERVER_NAME'] = 'localhost'
         return DummyRequest(environ, cookie=cookie)
 
@@ -606,6 +610,23 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertEqual(result['timestamp'], 0)
         self.assertEqual(helper.auth_tkt.value, 'ticket')
         self.assertEqual(helper.auth_tkt.remote_addr, '1.1.1.1')
+        self.assertEqual(helper.auth_tkt.secret, 'secret')
+        environ = request.environ
+        self.assertEqual(environ['REMOTE_USER_TOKENS'], ())
+        self.assertEqual(environ['REMOTE_USER_DATA'],'')
+        self.assertEqual(environ['AUTH_TYPE'],'cookie')
+
+    def test_identify_good_cookie_include_ipv6(self):
+        helper = self._makeOne('secret', include_ip=True)
+        request = self._makeRequest('ticket', ipv6=True)
+        result = helper.identify(request)
+        self.assertEqual(len(result), 4)
+        self.assertEqual(result['tokens'], ())
+        self.assertEqual(result['userid'], 'userid')
+        self.assertEqual(result['userdata'], '')
+        self.assertEqual(result['timestamp'], 0)
+        self.assertEqual(helper.auth_tkt.value, 'ticket')
+        self.assertEqual(helper.auth_tkt.remote_addr, '::1')
         self.assertEqual(helper.auth_tkt.secret, 'secret')
         environ = request.environ
         self.assertEqual(environ['REMOTE_USER_TOKENS'], ())
