@@ -1119,6 +1119,20 @@ class TestAuthTicket(unittest.TestCase):
         self.assertEqual(result,
                          '66f9cc3e423dc57c91df696cf3d1f0d80000000auserid!a,b!')
 
+    def test_ipv4(self):
+        ticket = self._makeOne('secret', 'userid', '198.51.100.1',
+                               time=10, hashalg='sha256')
+        result = ticket.cookie_value()
+        self.assertEqual(result, 'b3e7156db4f8abde4439c4a6499a0668f9e7ffd7fa27b'\
+                                 '798400ecdade8d76c530000000auserid!')
+
+    def test_ipv6(self):
+        ticket = self._makeOne('secret', 'userid', '2001:db8::1',
+                               time=10, hashalg='sha256')
+        result = ticket.cookie_value()
+        self.assertEqual(result, 'd025b601a0f12ca6d008aa35ff3a22b7d8f3d1c1456c8'\
+                                 '5becf8760cd7a2fa4910000000auserid!')
+
 class TestBadTicket(unittest.TestCase):
     def _makeOne(self, msg, expected=None):
         from pyramid.authentication import BadTicket
@@ -1161,6 +1175,19 @@ class Test_parse_ticket(unittest.TestCase):
                  'ae56599a0000000auserid!a,b!'
         result = self._callFUT('secret', ticket, '0.0.0.0', 'sha512')
         self.assertEqual(result, (10, 'userid', ['a', 'b'], ''))
+
+    def test_ipv4(self):
+        ticket = 'b3e7156db4f8abde4439c4a6499a0668f9e7ffd7fa27b798400ecdade8d7'\
+                 '6c530000000auserid!'
+        result = self._callFUT('secret', ticket, '198.51.100.1', 'sha256')
+        self.assertEqual(result, (10, 'userid', [''], ''))
+
+    def test_ipv6(self):
+        ticket = 'd025b601a0f12ca6d008aa35ff3a22b7d8f3d1c1456c85becf8760cd7a2f'\
+                 'a4910000000auserid!'
+        result = self._callFUT('secret', ticket, '2001:db8::1', 'sha256')
+        self.assertEqual(result, (10, 'userid', [''], ''))
+        pass
 
 class TestSessionAuthenticationPolicy(unittest.TestCase):
     def _getTargetClass(self):
