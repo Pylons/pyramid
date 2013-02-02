@@ -450,6 +450,10 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
        Default: ``False``.  Make the requesting IP address part of
        the authentication data in the cookie.  Optional.
 
+       For IPv6 this option is not recommended. It ties the authentication
+       ticket to that individual's IPv6 address. Depending on the network they
+       are on, the IPv6 address that a user is using may expire quickly.
+
     ``timeout``
 
        Default: ``None``.  Maximum number of seconds which a newly
