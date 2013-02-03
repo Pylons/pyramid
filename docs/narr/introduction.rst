@@ -52,9 +52,7 @@ Documentation
 
 Speed
   :app:`Pyramid` is designed to provide noticeably fast execution for common
-  tasks such as templating and simple response generation. Although "hardware
-  is cheap", the limits of this approach become painfully evident when one
-  finds him or herself responsible for managing a great many machines.
+  tasks such as templating and simple response generation.
 
 Reliability
   :app:`Pyramid` is developed conservatively and tested exhaustively. Where
