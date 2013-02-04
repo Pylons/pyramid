@@ -297,7 +297,7 @@ For example, your system might be configured to have an external IP address
 ``192.168.1.50``.  If that's the case, if you use a browser running on the
 same system as Pyramid, it will be able to access the application via
 ``http://127.0.0.1:6543/`` as well as via
-``http://129.168.1.50:6543/``. However, *other people* on other computers on
+``http://192.168.1.50:6543/``. However, *other people* on other computers on
 the same network will also be able to visit your Pyramid application in their
 browser by visiting ``http://192.168.1.50:6543/``.
 
