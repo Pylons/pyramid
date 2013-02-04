@@ -14,8 +14,8 @@ run :app:`Pyramid`.
 
 .. sidebar:: Python Versions
 
-    As of this writing, :app:`Pyramid` has been tested under Python 2.6.8,
-    Python 2.7.3, Python 3.2.3, and Python 3.3b1.  :app:`Pyramid` does not
+    As of this writing, :app:`Pyramid` has been tested under Python 2.6,
+    Python 2.7, Python 3.2, and Python 3.3.  :app:`Pyramid` does not
     run under any version of Python before 2.6.
 
 :app:`Pyramid` is known to run on all popular UNIX-like systems such as
