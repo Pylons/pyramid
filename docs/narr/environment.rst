@@ -203,7 +203,7 @@ Using the setting is equivalent to using the
 |                                 |
 +---------------------------------+
 
-The value supplied as ``pyramid.includes`` should be a sequence.  The
+The value assigned to ``pyramid.includes`` should be a sequence.  The
 sequence can take several different forms.
 
 1) It can be a string.
@@ -323,7 +323,7 @@ the behest of an add-on author.
 |                                 |
 +---------------------------------+
 
-The value supplied as ``pyramid.tweens`` should be a sequence.  The
+The value assigned to ``pyramid.tweens`` should be a sequence.  The
 sequence can take several different forms.
 
 1) It can be a string.
