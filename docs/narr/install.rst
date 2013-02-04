@@ -88,17 +88,15 @@ using the following commands:
 
 .. code-block:: text
 
-   [chrism@vitaminf ~]$ cd ~
-   [chrism@vitaminf ~]$ mkdir tmp
-   [chrism@vitaminf ~]$ mkdir opt
-   [chrism@vitaminf ~]$ cd tmp
-   [chrism@vitaminf tmp]$ wget \
-          http://www.python.org/ftp/python/2.7.3/Python-2.7.3.tgz
-   [chrism@vitaminf tmp]$ tar xvzf Python-2.7.3.tgz
-   [chrism@vitaminf tmp]$ cd Python-2.7.3
-   [chrism@vitaminf Python-2.7.3]$ ./configure \
-           --prefix=$HOME/opt/Python-2.7.3
-   [chrism@vitaminf Python-2.7.3]$ make; make install
+   $ cd ~
+   $ mkdir tmp
+   $ mkdir opt
+   $ cd tmp
+   $ wget http://www.python.org/ftp/python/2.7.3/Python-2.7.3.tgz
+   $ tar xvzf Python-2.7.3.tgz
+   $ cd Python-2.7.3
+   $ ./configure --prefix=$HOME/opt/Python-2.7.3
+   $ make && make install
 
 Once these steps are performed, the Python interpreter will be
 invokable via ``$HOME/opt/Python-2.7.3/bin/python`` from a shell
