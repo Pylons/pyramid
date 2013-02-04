@@ -59,7 +59,7 @@ Speed
 Reliability
   :app:`Pyramid` is developed conservatively and tested exhaustively. Where
   Pyramid source code is concerned, our motto is: "If it ain’t tested, it’s
-  broke".
+  broken".
 
 Openness
   As with Python, the Pyramid software is distributed under a `permissive
