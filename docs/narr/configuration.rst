@@ -144,7 +144,6 @@ In the example above, the scanner translates the arguments to
 
 .. ignore-next-block
 .. code-block:: python
-   :linenos:
 
    config.add_view(hello)
 
