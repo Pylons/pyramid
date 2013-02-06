@@ -99,29 +99,27 @@ available for a :term:`scan` to find it later.
 A :term:`scan` of a :term:`module` or a :term:`package` and its subpackages
 for decorations happens when the :meth:`pyramid.config.Configurator.scan`
 method is invoked: scanning implies searching for configuration declarations
-in a package and its subpackages.  For example:
+in a package and its subpackages.  For example::
 
-.. topic:: Starting A Scan
+.. code-block:: python
+   :linenos:
 
-   .. code-block:: python
-      :linenos:
+   from wsgiref.simple_server import make_server
+   from pyramid.config import Configurator
+   from pyramid.response import Response
+   from pyramid.view import view_config
 
-      from wsgiref.simple_server import make_server
-      from pyramid.config import Configurator
-      from pyramid.response import Response
-      from pyramid.view import view_config
-     
-      @view_config()
-      def hello(request):
-          return Response('Hello')
+   @view_config()
+   def hello(request):
+       return Response('Hello')
 
-      if __name__ == '__main__':
-          from pyramid.config import Configurator
-          config = Configurator()
-          config.scan()
-          app = config.make_wsgi_app()
-          server = make_server('0.0.0.0', 8080, app)
-          server.serve_forever()
+   if __name__ == '__main__':
+       from pyramid.config import Configurator
+       config = Configurator()
+       config.scan()
+       app = config.make_wsgi_app()
+       server = make_server('0.0.0.0', 8080, app)
+       server.serve_forever()
 
 The scanning machinery imports each module and subpackage in a package or
 module recursively, looking for special attributes attached to objects
