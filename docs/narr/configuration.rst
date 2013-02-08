@@ -99,7 +99,7 @@ available for a :term:`scan` to find it later.
 A :term:`scan` of a :term:`module` or a :term:`package` and its subpackages
 for decorations happens when the :meth:`pyramid.config.Configurator.scan`
 method is invoked: scanning implies searching for configuration declarations
-in a package and its subpackages.  For example::
+in a package and its subpackages.  For example:
 
 .. code-block:: python
    :linenos:
