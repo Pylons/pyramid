@@ -565,9 +565,6 @@ in :ref:`request_module`.  For more information on the API of
 Deprecated Mechanism to Vary Attributes of Rendered Responses
 -------------------------------------------------------------
 
-.. deprecated:: 1.1
-   The behavior described in this entire section.
-
 In previous releases of Pyramid (1.0 and before), the ``request.response``
 attribute did not exist.  Instead, Pyramid required users to set special
 ``response_`` -prefixed attributes of the request to influence response
