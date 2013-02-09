@@ -790,7 +790,7 @@ deprecated(
     'scheduled to be removed.   Use the '
     '"pyramid.config.Configurator.add_resource_url_adapter" method to register '
     'a class that implements "pyramid.interfaces.IResourceURL" instead. '
-    'See the "What\'s new In Pyramid 1.3" document for a further description.'
+    'See the "What\'s new In Pyramid 1.3" document for more details.'
     )
 
 class IPackageOverrides(Interface):
