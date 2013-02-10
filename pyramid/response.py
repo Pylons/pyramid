@@ -35,20 +35,20 @@ class FileResponse(Response):
 
     ``path`` is a file path on disk.
 
-    ``request`` must be a Pyramid :term:`request` object if passed.  Note
+    ``request`` must be a Pyramid :term:`request` object.  Note
     that a request *must* be passed if the response is meant to attempt to
     use the ``wsgi.file_wrapper`` feature of the web server that you're using
     to serve your Pyramid application.
 
-    ``cache_max_age`` if passed, is the number of seconds that should be used
+    ``cache_max_age`` is the number of seconds that should be used
     to HTTP cache this response.
 
-    ``content_type``, if passed, is the content_type of the response.
+    ``content_type`` is the content_type of the response.
 
-    ``content_encoding``, if passed is the content_encoding of the response.
+    ``content_encoding`` is the content_encoding of the response.
     It's generally safe to leave this set to ``None`` if you're serving a
-    binary file.  This argument will be ignored if you don't also pass
-    ``content-type``.
+    binary file.  This argument will be ignored if you also leave
+    ``content-type`` as ``None``.
     """
     def __init__(self, path, request=None, cache_max_age=None,
                  content_type=None, content_encoding=None):
