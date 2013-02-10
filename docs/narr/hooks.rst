@@ -276,8 +276,10 @@ A lazy property can be registered to the request object via the
 to specify a callable that will be available on the request object, but will not
 actually execute the function until accessed.
 
-.. warning:: This will silently override methods and properties from
-   :term:`request factory` that have the same name.
+.. warning::
+
+   This will silently override methods and properties from :term:`request
+   factory` that have the same name.
 
 .. code-block:: python
    :linenos:
