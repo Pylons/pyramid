@@ -9,6 +9,7 @@ CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 requires = [
     'pyramid',
     'pyramid_zodbconn',
+    'transaction',
     'pyramid_tm',
     'pyramid_debugtoolbar',
     'ZODB3',
@@ -18,10 +19,10 @@ requires = [
 setup(name='tutorial',
       version='0.0',
       description='tutorial',
-      long_description=README + '\n\n' +  CHANGES,
+      long_description=README + '\n\n' + CHANGES,
       classifiers=[
         "Programming Language :: Python",
-        "Framework :: Pylons",
+        "Framework :: Pyramid",
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
         ],
@@ -32,12 +33,11 @@ setup(name='tutorial',
       packages=find_packages(),
       include_package_data=True,
       zip_safe=False,
-      install_requires = requires,
-      tests_require= requires,
+      install_requires=requires,
+      tests_require=requires,
       test_suite="tutorial",
-      entry_points = """\
+      entry_points="""\
       [paste.app_factory]
       main = tutorial:main
       """,
       )
-

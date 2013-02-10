@@ -28,9 +28,6 @@ assumed to return a :term:`response` object.
 We're going to define several :term:`view callable` functions, then wire them
 into :app:`Pyramid` using some :term:`view configuration`.
 
-The source code for this tutorial stage can be browsed via
-`http://github.com/Pylons/pyramid/tree/1.3-branch/docs/tutorials/wiki/src/views/
-<http://github.com/Pylons/pyramid/tree/1.3-branch/docs/tutorials/wiki/src/views/>`_.
 
 Declaring Dependencies in Our ``setup.py`` File
 ===============================================
@@ -115,7 +112,7 @@ The curried function named ``check`` is used as the first argument to
 each WikiWord match found in the content.  If the wiki (our page's
 ``__parent__``) already contains a page with the matched WikiWord name, the
 ``check`` function generates a view link to be used as the substitution value
-and returns it.  If the wiki does not already contain a page with with the
+and returns it.  If the wiki does not already contain a page with the
 matched WikiWord name, the function generates an "add" link as the
 substitution value and returns it.
 

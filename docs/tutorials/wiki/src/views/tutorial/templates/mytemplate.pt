@@ -6,9 +6,9 @@
   <meta name="keywords" content="python web application" />
   <meta name="description" content="pyramid web application" />
   <link rel="shortcut icon" href="/static/favicon.ico" />
+  <link rel="stylesheet" href="/static/pylons.css" type="text/css" media="screen" charset="utf-8" />
   <link rel="stylesheet" href="http://static.pylonsproject.org/fonts/nobile/stylesheet.css" media="screen" />
   <link rel="stylesheet" href="http://static.pylonsproject.org/fonts/neuton/stylesheet.css" media="screen" />
-  <link rel="stylesheet" href="/static/pylons.css" type="text/css" media="screen" charset="utf-8" />
   <!--[if lte IE 6]>
   <link rel="stylesheet" href="/static/ie6.css" type="text/css" media="screen" charset="utf-8" />
   <![endif]-->
@@ -41,7 +41,7 @@
           <h2>Pyramid links</h2>
           <ul class="links">
             <li>
-              <a href="http://pylonsproject.org">Pylons Website</a>
+              <a href="http://pylonsproject.org/">Pylons Website</a>
             </li>
             <li>
               <a href="http://docs.pylonsproject.org/projects/pyramid/current/#narrative-documentation">Narrative Documentation</a>
@@ -70,7 +70,7 @@
     </div>
   </div>
   <div id="footer">
-    <div class="footer">&copy; Copyright 2008-2011, Agendaless Consulting.</div>
+    <div class="footer">&copy; Copyright 2008-2012, Agendaless Consulting.</div>
   </div>
 </body>
 </html>

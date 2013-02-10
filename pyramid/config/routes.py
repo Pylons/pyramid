@@ -109,7 +109,7 @@ class RoutesConfiguratorMixin(object):
           remainder marker in its pattern (see
           :ref:`using_traverse_in_a_route_pattern`).  The ``traverse``
           argument to add_route allows you to associate route patterns
-          with an arbitrary traversal path without using a a
+          with an arbitrary traversal path without using a
           ``*traverse`` remainder marker; instead you can use other
           match information.
 
@@ -142,7 +142,7 @@ class RoutesConfiguratorMixin(object):
           request; it will only be useful for URL generation.  By default,
           ``static`` is ``False``.  See :ref:`static_route_narr`.
 
-          .. note:: New in :app:`Pyramid` 1.1.
+          .. versionadded:: 1.1
 
         Predicate Arguments
 
@@ -180,9 +180,9 @@ class RoutesConfiguratorMixin(object):
           will match if the request has *any* request method.  If this
           predicate returns ``False``, route matching continues.
 
-          .. note:: The ability to pass a tuple of items as
-                   ``request_method`` is new as of Pyramid 1.2.  Previous
-                   versions allowed only a string.
+          .. versionchanged:: 1.2
+             The ability to pass a tuple of items as ``request_method``.
+             Previous versions allowed only a string.
 
         path_info
 
@@ -276,8 +276,10 @@ class RoutesConfiguratorMixin(object):
           :meth:`pyramid.config.Configurator.add_view_predicate`.  More than
           one key/value pair can be used at the same time.  See
           :ref:`view_and_route_predicates` for more information about
-          third-party predicates.  This argument is new as of Pyramid 1.4.
-          
+          third-party predicates.
+
+          .. versionadded:: 1.4
+
         View-Related Arguments
 
         .. warning::
@@ -291,7 +293,7 @@ class RoutesConfiguratorMixin(object):
 
         view
 
-          .. warning:: Deprecated as of :app:`Pyramid` 1.1.
+          .. deprecated:: 1.1
 
           A Python object or :term:`dotted Python name` to the same
           object that will be used as a view callable when this route
@@ -299,7 +301,7 @@ class RoutesConfiguratorMixin(object):
 
         view_context
 
-          .. warning:: Deprecated as of :app:`Pyramid` 1.1.
+          .. deprecated:: 1.1
 
           A class or an :term:`interface` or :term:`dotted Python
           name` to the same object which the :term:`context` of the
@@ -315,7 +317,7 @@ class RoutesConfiguratorMixin(object):
 
         view_permission
 
-          .. warning:: Deprecated as of :app:`Pyramid` 1.1.
+          .. deprecated:: 1.1
 
           The permission name required to invoke the view associated
           with this route.  e.g. ``edit``. (see
@@ -329,7 +331,7 @@ class RoutesConfiguratorMixin(object):
 
         view_renderer
 
-          .. warning:: Deprecated as of :app:`Pyramid` 1.1.
+          .. deprecated:: 1.1
 
           This is either a single string term (e.g. ``json``) or a
           string implying a path or :term:`asset specification`
@@ -353,7 +355,7 @@ class RoutesConfiguratorMixin(object):
 
         view_attr
 
-          .. warning:: Deprecated as of :app:`Pyramid` 1.1.
+          .. deprecated:: 1.1
 
           The view machinery defaults to using the ``__call__`` method
           of the view callable (or the function itself, if the view
@@ -491,9 +493,7 @@ class RoutesConfiguratorMixin(object):
 
         See :ref:`view_and_route_predicates` for more information.
 
-        .. note::
-
-           This method is new as of Pyramid 1.4.
+        .. versionadded:: 1.4
         """
         self._add_predicate(
             'route',

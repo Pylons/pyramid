@@ -30,6 +30,7 @@ class WikiModelTests(unittest.TestCase):
         self.assertEqual(wiki.__name__, None)
 
 class AppmakerTests(unittest.TestCase):
+
     def _callFUT(self, zodb_root):
         from .models import appmaker
         return appmaker(zodb_root)
@@ -142,7 +143,7 @@ class FunctionalTests(unittest.TestCase):
                      'pyramid.includes': ['pyramid_zodbconn', 'pyramid_tm'] }
 
         app = main({}, **settings)
-        self.db = app.registry.zodb_database
+        self.db = app.registry._zodb_databases['']
         from webtest import TestApp
         self.testapp = TestApp(app)
 

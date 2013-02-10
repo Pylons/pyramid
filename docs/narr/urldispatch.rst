@@ -38,7 +38,7 @@ application.  A route has a *name*, which acts as an identifier to be used
 for URL generation.  The name also allows developers to associate a view
 configuration with the route.  A route also has a *pattern*, meant to match
 against the ``PATH_INFO`` portion of a URL (the portion following the scheme
-and port, e.g. ``/foo/bar`` in the URL ``http://localhost:8080/foo/bar``). It
+and port, e.g. ``/foo/bar`` in the URL `<http://localhost:8080/foo/bar>`_). It
 also optionally has a ``factory`` and a set of :term:`route predicate`
 attributes.
 
@@ -86,8 +86,8 @@ setup code.  However, the above :term:`scan` execution
 ``config.scan('mypackage')`` will pick up all :term:`configuration
 decoration`, including any objects decorated with the
 :class:`pyramid.view.view_config` decorator in the ``mypackage`` Python
-pakage.  For example, if you have a ``views.py`` in your package, a scan will
-pick up any of its configuration decorators, so we can add one there that
+package.  For example, if you have a ``views.py`` in your package, a scan will
+pick up any of its configuration decorators, so we can add one there
 that references ``myroute`` as a ``route_name`` parameter:
 
 .. code-block:: python
@@ -758,11 +758,8 @@ other non-``name`` and non-``pattern`` arguments to
 exception to this rule is use of the ``pregenerator`` argument, which is not
 ignored when ``static`` is ``True``.
 
-.. note::
-
-   the ``static`` argument to
-   :meth:`~pyramid.config.Configurator.add_route` is new as of :app:`Pyramid`
-   1.1.
+.. versionadded:: 1.1
+   the ``static`` argument to :meth:`~pyramid.config.Configurator.add_route`
 
 .. index::
    single: redirecting to slash-appended routes
@@ -860,7 +857,7 @@ exactly the same job:
    request into a ``GET``, losing any ``POST`` data in the original
    request.
 
-See :ref:`view_module` and :ref:`changing_the_notfound_view` for for a more
+See :ref:`view_module` and :ref:`changing_the_notfound_view` for a more
 general description of how to configure a view and/or a not found view.
 
 .. index::
@@ -906,7 +903,7 @@ routes configured in your application; for more information, see
 Using a Route Prefix to Compose Applications
 --------------------------------------------
 
-.. note:: This feature is new as of :app:`Pyramid` 1.2.
+.. versionadded:: 1.2
 
 The :meth:`pyramid.config.Configurator.include` method allows configuration
 statements to be included from separate files.  See

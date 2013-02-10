@@ -22,6 +22,12 @@ class TestPServeCommand(unittest.TestCase):
     def out(self, msg):
         self.out_.write(msg)
 
+    def _get_server(*args, **kwargs):
+        def server(app):
+            return ''
+
+        return server
+
     def _getTargetClass(self):
         from pyramid.scripts.pserve import PServeCommand
         return PServeCommand
@@ -193,16 +199,39 @@ class TestPServeCommand(unittest.TestCase):
         msg = 'PID in %s is not valid (deleting)' % fn
         self.assertEqual(self.out_.getvalue(), msg)
 
-    def test_parse_vars_good(self):
-        vars = ['a=1', 'b=2']
-        inst = self._makeOne('development.ini')
-        result = inst.parse_vars(vars)
+    def test_get_options_with_command(self):
+        inst = self._makeOne()
+        inst.args = ['foo', 'stop', 'a=1', 'b=2']
+        result = inst.get_options()
         self.assertEqual(result, {'a': '1', 'b': '2'})
 
+    def test_get_options_no_command(self):
+        inst = self._makeOne()
+        inst.args = ['foo', 'a=1', 'b=2']
+        result = inst.get_options()
+        self.assertEqual(result, {'a': '1', 'b': '2'})
+
+    def test_parse_vars_good(self):
+        from pyramid.tests.test_scripts.dummy import DummyApp
+
+        inst = self._makeOne('development.ini', 'a=1', 'b=2')
+        inst.loadserver = self._get_server
+
+
+        app = DummyApp()
+
+        def get_app(*args, **kwargs):
+            app.global_conf = kwargs.get('global_conf', None)
+
+        inst.loadapp = get_app
+        inst.run()
+
+        self.assertEqual(app.global_conf, {'a': '1', 'b': '2'})
+
     def test_parse_vars_bad(self):
-        vars = ['a']
-        inst = self._makeOne('development.ini')
-        self.assertRaises(ValueError, inst.parse_vars, vars)
+        inst = self._makeOne('development.ini', 'a')
+        inst.loadserver = self._get_server
+        self.assertRaises(ValueError, inst.run)
 
 class Test_read_pidfile(unittest.TestCase):
     def _callFUT(self, filename):

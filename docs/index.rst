@@ -14,7 +14,7 @@ Here is one of the simplest :app:`Pyramid` applications you can make:
 .. literalinclude:: narr/helloworld.py
 
 After you install :app:`Pyramid` and run this application, when you visit
-``http://localhost:8080/hello/world`` in a browser, you will see the text
+`<http://localhost:8080/hello/world>`_ in a browser, you will see the text
 ``Hello, world!``
 
 See :ref:`firstapp_chapter` for a full explanation of how this application
@@ -138,6 +138,11 @@ Design Documents
 Sample Applications
 ===================
 
+.. note::
+
+   These applications run only on Python 2.x, and so do some of their
+   dependencies.
+
 `cluegun <https://github.com/Pylons/cluegun>`_ is a simple pastebin
 application based on Rocky Burt's `ClueBin
 <http://pypi.python.org/pypi/ClueBin/0.2.3>`_.  It demonstrates form
@@ -200,7 +205,7 @@ To check out the trunk via ``git``, use this command:
 
 To find out how to become a contributor to :app:`Pyramid`, please see the
 `contributor's section of the documentation
-<http://docs.pylonsproject.org/index.html#contributing>`_.
+<http://docs.pylonsproject.org/en/latest/#contributing>`_.
 
 Index and Glossary
 ==================

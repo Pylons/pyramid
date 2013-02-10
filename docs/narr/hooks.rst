@@ -336,9 +336,9 @@ when adding renderer global values exists in :ref:`adding_renderer_globals`.
 Adding Renderer Globals (Deprecated)
 ------------------------------------
 
-.. warning:: this feature is deprecated as of Pyramid 1.1.  A non-deprecated
-   mechanism which allows event subscribers to add renderer global values
-   is documented in :ref:`beforerender_event`.
+.. deprecated:: 1.1
+   An alternative mechanism which allows event subscribers to add renderer
+   global values is documented in :ref:`beforerender_event`.
 
 Whenever :app:`Pyramid` handles a request to perform a rendering (after a
 view with a ``renderer=`` configuration attribute is invoked, or when any of
@@ -635,12 +635,12 @@ See :meth:`pyramid.config.add_resource_url_adapter` for more information.
 Changing How Pyramid Treats View Responses
 ------------------------------------------
 
+.. versionadded:: 1.1
+
 It is possible to control how Pyramid treats the result of calling a view
 callable on a per-type basis by using a hook involving
 :meth:`pyramid.config.Configurator.add_response_adapter` or the
 :class:`~pyramid.response.response_adapter` decorator.
-
-.. note:: This feature is new as of Pyramid 1.1.
 
 Pyramid, in various places, adapts the result of calling a view callable to
 the :class:`~pyramid.interfaces.IResponse` interface to ensure that the
@@ -936,8 +936,8 @@ For full details, please read the `Venusian documentation
 Registering "Tweens"
 --------------------
 
-.. note:: Tweens are a feature which were added in Pyramid 1.2.  They are
-   not available in any previous version.
+.. versionadded:: 1.2
+   Tweens
 
 A :term:`tween` (a contraction of the word "between") is a bit of code that
 sits between the Pyramid router's main request handling function and the
@@ -1082,7 +1082,7 @@ entirely by the relative ordering of calls to
 :meth:`pyramid.config.Configurator.add_tween`.  However, the caller of
 add_tween can provide an optional hint that can influence the implicit tween
 chain ordering by supplying ``under`` or ``over`` (or both) arguments to
-:meth:`~pyramid.config.Configurator.add_tween`.  These hints are only used
+:meth:`~pyramid.config.Configurator.add_tween`.  These hints are only
 used when an explicit tween ordering is not used. See
 :ref:`explicit_tween_ordering` for a description of how to set an explicit
 tween ordering.
@@ -1241,10 +1241,7 @@ implict and explicit tween chains used by an application.  See
 Adding A Third Party View, Route, or Subscriber Predicate
 ---------------------------------------------------------
 
-.. note::
-
-   Third-party view, route, and subscriber predicates are a feature new as of
-   Pyramid 1.4.
+.. versionadded:: 1.4
 
 .. _view_and_route_predicates:
 

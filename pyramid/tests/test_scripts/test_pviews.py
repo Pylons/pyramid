@@ -379,7 +379,7 @@ class TestPViewsCommand(unittest.TestCase):
         L = []
         command.out = L.append
         def predicate(): pass
-        predicate.__text__ = "predicate = x"
+        predicate.text = lambda *arg: "predicate = x"
         route = dummy.DummyRoute('a', '/a', matchdict={}, predicate=predicate)
         view = dummy.DummyView(context='context', view_name='a',
                          matched_route=route, subpath='')

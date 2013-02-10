@@ -180,7 +180,7 @@ All classes documented in the :mod:`pyramid.httpexceptions` module documented
 as inheriting from the :class:`pyramid.httpexceptions.HTTPException` are
 :term:`http exception` objects.  Instances of an HTTP exception object may
 either be *returned* or *raised* from within view code.  In either case
-(return or raise) the instance will be used as as the view's response.
+(return or raise) the instance will be used as the view's response.
 
 For example, the :class:`pyramid.httpexceptions.HTTPUnauthorized` exception
 can be raised.  This will cause a response to be generated with a ``401
@@ -227,8 +227,8 @@ equivalent to ``raise HTTPUnauthorized()``.  Documentation which maps each
 HTTP response code to its purpose and its associated HTTP exception object is
 provided within :mod:`pyramid.httpexceptions`.
 
-.. note:: The :func:`~pyramid.httpexceptions.exception_response` function is
-   new as of Pyramid 1.1.
+.. versionadded:: 1.1
+   The :func:`~pyramid.httpexceptions.exception_response` function.
 
 How Pyramid Uses HTTP Exceptions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

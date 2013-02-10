@@ -163,9 +163,7 @@
 
    .. method:: invoke_subrequest(request, use_tweens=False)
 
-      .. warning:: 
-
-         This API was added in Pyramid 1.4a1.
+      .. versionadded:: 1.4a1
 
       Obtain a response object from the Pyramid application based on
       information in the ``request`` object provided.  The ``request`` object
@@ -251,7 +249,7 @@
       Assigning to one is still supported but will cause a deprecation
       warning to be emitted, and eventually the feature will be removed.  For
       new code, instead of assigning ``response_*`` attributes to the
-      request, use API of the the :attr:`pyramid.request.Request.response`
+      request, use API of the :attr:`pyramid.request.Request.response`
       object (exposed to view code as ``request.response``) to influence
       rendered response behavior.
 

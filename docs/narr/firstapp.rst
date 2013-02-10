@@ -40,7 +40,7 @@ On Windows:
 This command will not return and nothing will be printed to the console.
 When port 8080 is visited by a browser on the URL ``/hello/world``, the
 server will simply serve up the text "Hello world!".  If your application is
-running on your local system, using ``http://localhost:8080/hello/world``
+running on your local system, using `<http://localhost:8080/hello/world>`_
 in a browser will show this result.
 
 Each time you visit a URL served by the application in a browser, a logging
@@ -194,13 +194,13 @@ WSGI Application Creation
 After configuring views and ending configuration, the script creates a WSGI
 *application* via the :meth:`pyramid.config.Configurator.make_wsgi_app`
 method.  A call to ``make_wsgi_app`` implies that all configuration is
-finished (meaning all method calls to the configurator which set up views,
-and various other configuration settings have been performed).  The
+finished (meaning all method calls to the configurator, which sets up views
+and various other configuration settings, have been performed).  The
 ``make_wsgi_app`` method returns a :term:`WSGI` application object that can
 be used by any WSGI server to present an application to a requestor.
 :term:`WSGI` is a protocol that allows servers to talk to Python
 applications.  We don't discuss :term:`WSGI` in any depth within this book,
-however, you can learn more about it by visiting `wsgi.org
+but you can learn more about it by visiting `wsgi.org
 <http://wsgi.org>`_.
 
 The :app:`Pyramid` application object, in particular, is an instance of a
@@ -228,7 +228,7 @@ listens only on the ``127.0.0.1`` interface, which is problematic if you're
 running the server on a remote system and you wish to access it with a web
 browser from a local system.  We also specify a TCP port number to listen on,
 which is 8080, passing it as the second argument.  The final argument is the
-``app`` object (a :term:`router`), which is the the application we wish to
+``app`` object (a :term:`router`), which is the application we wish to
 serve.  Finally, we call the server's ``serve_forever`` method, which starts
 the main loop in which it will wait for requests from the outside world.
 

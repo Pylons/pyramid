@@ -6,9 +6,6 @@ We will now add tests for the models and the views and a few functional
 tests in the ``tests.py``.  Tests ensure that an application works, and
 that it continues to work after some changes are made in the future.
 
-The source code for this tutorial stage can be browsed via
-`http://github.com/Pylons/pyramid/tree/1.3-branch/docs/tutorials/wiki/src/tests/
-<http://github.com/Pylons/pyramid/tree/1.3-branch/docs/tutorials/wiki/src/tests/>`_.
 
 Test the Models
 ===============
@@ -17,8 +14,8 @@ We write tests for the model classes and the appmaker.  Changing
 ``tests.py``, we'll write a separate test class for each model class, and
 we'll write a test class for the ``appmaker``.
 
-To do so, we'll retain the ``tutorial.tests.ViewTests`` class provided as a
-result of the ``zodb`` project generator.  We'll add three test
+To do so, we'll retain the ``tutorial.tests.ViewTests`` class that was
+generated as part of the ``zodb`` scaffold.  We'll add three test
 classes: one for the ``Page`` model named ``PageModelTests``, one for the
 ``Wiki`` model named ``WikiModelTests``, and one for the appmaker named
 ``AppmakerTests``.
@@ -51,8 +48,8 @@ below:
    :linenos:
    :language: python
 
-Run the Tests
-=============
+Running the Tests
+=================
 
 We can run these tests by using ``setup.py test`` in the same way we did in
 :ref:`running_tests`.  However, first we must edit our ``setup.py`` to
@@ -62,7 +59,8 @@ Change the ``requires`` list in ``setup.py`` to include ``WebTest``.
 .. literalinclude:: src/tests/setup.py
    :linenos:
    :language: python
-   :lines: 9-18
+   :lines: 9-19
+   :emphasize-lines: 10
 
 After we've added a dependency on WebTest in ``setup.py``, we need to rerun
 ``setup.py develop`` to get WebTest installed into our virtualenv.  Assuming

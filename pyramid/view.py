@@ -29,9 +29,11 @@ _marker = object()
 class static(static_view):
     """ Backwards compatibility alias for
     :class:`pyramid.static.static_view`; it overrides that class' constructor
-    to pass ``use_subpath=True`` by default.  This class is deprecated as of
-    :app:`Pyramid` 1.1.  Use :class:`pyramid.static.static_view` instead
-    (probably with a ``use_subpath=True`` argument).
+    to pass ``use_subpath=True`` by default.
+
+    .. deprecated:: 1.1
+       use :class:`pyramid.static.static_view` instead
+       (probably with a ``use_subpath=True`` argument)
     """
     def __init__(self, root_dir, cache_max_age=3600, package_name=None):
         if package_name is None:
@@ -178,14 +180,16 @@ class view_config(object):
     out, its default will be the equivalent ``add_view`` default.
 
     An additional keyword argument named ``_depth`` is provided for people who
-    wish to reuse this class from another decorator.  It will be passed in to
-    the :term:`venusian` ``attach`` function as the depth of the callstack when
-    Venusian checks if the decorator is being used in a class or module
-    context.  It's not often used, but it can be useful in this circumstance.
-    See the ``attach`` function in Venusian for more information.
+    wish to reuse this class from another decorator.  The default value is
+    ``0`` and should be specified relative to the ``view_config`` invocation.
+    It will be passed in to the :term:`venusian` ``attach`` function as the
+    depth of the callstack when Venusian checks if the decorator is being used
+    in a class or module context.  It's not often used, but it can be useful
+    in this circumstance.  See the ``attach`` function in Venusian for more
+    information.
 
     See :ref:`mapping_views_using_a_decorator_section` for details about
-    using :class:`view_config`.
+    using :class:`pyramid.view.view_config`.
 
     """
     venusian = venusian # for testing injection
@@ -197,14 +201,14 @@ class view_config(object):
 
     def __call__(self, wrapped):
         settings = self.__dict__.copy()
-        depth = settings.pop('_depth', 1)
+        depth = settings.pop('_depth', 0)
 
         def callback(context, name, ob):
             config = context.config.with_package(info.module)
             config.add_view(view=ob, **settings)
 
         info = self.venusian.attach(wrapped, callback, category='pyramid',
-                                    depth=depth)
+                                    depth=depth + 1)
 
         if info.scope == 'class':
             # if the decorator was attached to a method in a class, or
@@ -310,11 +314,12 @@ See also :ref:`changing_the_notfound_view`.
 
 class notfound_view_config(object):
     """
+    .. versionadded:: 1.3
 
     An analogue of :class:`pyramid.view.view_config` which registers a
-    :term:`not found view`.
+    :term:`Not Found View`.
 
-    The notfound_view_config constructor accepts most of the same arguments
+    The ``notfound_view_config`` constructor accepts most of the same arguments
     as the constructor of :class:`pyramid.view.view_config`.  It can be used
     in the same places, and behaves in largely the same way, except it always
     registers a not found exception view instead of a 'normal' view.
@@ -344,9 +349,6 @@ class notfound_view_config(object):
 
     See :ref:`changing_the_notfound_view` for detailed usage information.
 
-    .. note::
-
-       This class is new as of Pyramid 1.3.
     """
 
     venusian = venusian
@@ -375,6 +377,7 @@ class notfound_view_config(object):
 
 class forbidden_view_config(object):
     """
+    .. versionadded:: 1.3
 
     An analogue of :class:`pyramid.view.view_config` which registers a
     :term:`forbidden view`.
@@ -392,7 +395,7 @@ class forbidden_view_config(object):
         from pyramid.response import Response
           
         @forbidden_view_config()
-        def notfound(request):
+        def forbidden(request):
             return Response('You are not allowed', status='401 Unauthorized')
 
     All arguments passed to this function have the same meaning as
@@ -401,9 +404,6 @@ class forbidden_view_config(object):
 
     See :ref:`changing_the_forbidden_view` for detailed usage information.
 
-    .. note::
-
-       This class is new as of Pyramid 1.3.
     """
 
     venusian = venusian
@@ -434,11 +434,8 @@ def is_response(ob):
     """ Return ``True`` if ``ob`` implements the interface implied by
     :ref:`the_response`. ``False`` if not.
 
-    .. warning::
-
-       This function is deprecated as of :app:`Pyramid` 1.1.  New
-       code should not use it.  Instead, new code should use the
-       :func:`pyramid.request.Request.is_response` method."""
+    .. deprecated:: 1.1
+       use :func:`pyramid.request.Request.is_response` instead"""
     if ( hasattr(ob, 'app_iter') and hasattr(ob, 'headerlist') and
          hasattr(ob, 'status') ):
         return True

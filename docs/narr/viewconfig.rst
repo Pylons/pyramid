@@ -306,7 +306,7 @@ configured view.
   consideration of keys and values in the ``request.params`` dictionary.
 
 ``match_param``
-  .. note:: This feature is new as of :app:`Pyramid` 1.2.
+  .. versionadded:: 1.2
 
   This param may be either a single string of the format "key=value" or a
   dict of key/value pairs.
@@ -724,9 +724,7 @@ configuration to take effect.
 ``@view_defaults`` Class Decorator
 ----------------------------------
 
-.. note::
-
-   This feature is new in Pyramid 1.3.
+.. versionadded:: 1.3
 
 If you use a class as a view, you can use the
 :class:`pyramid.view.view_defaults` class decorator on the class to provide
@@ -834,7 +832,7 @@ decorator on the RESTView class:
 .. code-block:: python
    :linenos:
 
-   from pyramid.view import view_config
+   from pyramid.view import view_defaults
    from pyramid.response import Response
    from pyramid.config import Configurator
 
@@ -952,7 +950,7 @@ for more information about how, and where to set these values.
 Influencing HTTP Caching
 ------------------------
 
-.. note:: This feature is new in Pyramid 1.1.
+.. versionadded:: 1.1
 
 When a non-``None`` ``http_cache`` argument is passed to a view
 configuration, Pyramid will set ``Expires`` and ``Cache-Control`` response
@@ -986,7 +984,7 @@ there's a ``should_cache`` GET or POST variable:
 Note that the ``http_cache`` machinery will overwrite or add to caching
 headers you set within the view itself unless you use ``prevent_auto``.
 
-You can also turn of the effect of ``http_cache`` entirely for the duration
+You can also turn off the effect of ``http_cache`` entirely for the duration
 of a Pyramid application lifetime.  To do so, set the
 ``PYRAMID_PREVENT_HTTP_CACHE`` environment variable or the
 ``pyramid.prevent_http_cache`` configuration value setting to a true value.

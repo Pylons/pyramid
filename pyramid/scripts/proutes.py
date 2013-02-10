@@ -3,6 +3,7 @@ import sys
 import textwrap
 
 from pyramid.paster import bootstrap
+from pyramid.scripts.common import parse_vars
 
 def main(argv=sys.argv, quiet=False):
     command = PRoutesCommand(argv, quiet)
@@ -47,12 +48,14 @@ class PRoutesCommand(object):
         if not self.args:
             self.out('requires a config file argument')
             return 2
+
         from pyramid.interfaces import IRouteRequest
         from pyramid.interfaces import IViewClassifier
         from pyramid.interfaces import IView
         from zope.interface import Interface
         config_uri = self.args[0]
-        env = self.bootstrap[0](config_uri)
+
+        env = self.bootstrap[0](config_uri, options=parse_vars(self.args[1:]))
         registry = env['registry']
         mapper = self._get_mapper(registry)
         if mapper is not None:

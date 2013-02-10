@@ -194,7 +194,7 @@ class URLMethodsMixin(object):
         names are ignored.
 
         If the route object which matches the ``route_name`` argument has
-        a :term:`pregenerator`, the ``*elements`` and ``**kw`` arguments
+        a :term:`pregenerator`, the ``*elements`` and ``**kw``
         arguments passed to this function might be augmented or changed.
         """
         try:
@@ -390,9 +390,8 @@ class URLMethodsMixin(object):
         pass ``app_url=''`.  Passing ``app_url=''` when the resource path is
         ``/baz/bar`` will return ``/baz/bar``.
 
-        .. note::
-
-           ``app_url`` is new as of Pyramid 1.3.
+        .. versionadded:: 1.3
+           ``app_url``
 
         If ``app_url`` is passed and any of ``scheme``, ``port``, or ``host``
         are also passed, ``app_url`` will take precedence and the values

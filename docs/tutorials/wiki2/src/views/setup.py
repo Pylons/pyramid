@@ -20,10 +20,10 @@ requires = [
 setup(name='tutorial',
       version='0.0',
       description='tutorial',
-      long_description=README + '\n\n' +  CHANGES,
+      long_description=README + '\n\n' + CHANGES,
       classifiers=[
         "Programming Language :: Python",
-        "Framework :: Pylons",
+        "Framework :: Pyramid",
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
         ],
@@ -35,12 +35,11 @@ setup(name='tutorial',
       include_package_data=True,
       zip_safe=False,
       test_suite='tutorial',
-      install_requires = requires,
-      entry_points = """\
+      install_requires=requires,
+      entry_points="""\
       [paste.app_factory]
       main = tutorial:main
       [console_scripts]
       initialize_tutorial_db = tutorial.scripts.initializedb:main
       """,
       )
-

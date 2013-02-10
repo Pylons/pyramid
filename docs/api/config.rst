@@ -108,9 +108,7 @@
         :class:`pyramid.registry.Introspectable` class (used during
         directives to provide introspection to actions).
 
-        .. note::
-
-           This attribute is new as of :app:`Pyramid` 1.3.
+        .. versionadded:: 1.3
 
      .. attribute:: introspector
 
@@ -118,9 +116,7 @@
         instance implementing the :class:`pyramid.interfaces.IIntrospector`
         interface.
 
-        .. note::
-
-           This attribute is new as of :app:`Pyramid` 1.3.
+        .. versionadded:: 1.3
 
      .. attribute:: registry
 
@@ -130,7 +126,7 @@
 .. attribute:: global_registries
 
    The set of registries that have been created for :app:`Pyramid`
-   applications, one per each call to
+   applications, one for each call to
    :meth:`pyramid.config.Configurator.make_wsgi_app` in the current
    process. The object itself supports iteration and has a ``last`` property
    containing the last registry loaded.

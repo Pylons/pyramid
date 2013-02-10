@@ -14,9 +14,6 @@ constructors". Both our Page and Wiki constructors will be class objects.  A
 single instance of the "Wiki" class will serve as a container for "Page"
 objects, which will be instances of the "Page" class.
 
-The source code for this tutorial stage can be browsed via
-`http://github.com/Pylons/pyramid/tree/1.3-branch/docs/tutorials/wiki/src/models/
-<http://github.com/Pylons/pyramid/tree/1.3-branch/docs/tutorials/wiki/src/models/>`_.
 
 Delete the Database
 -------------------
@@ -36,7 +33,7 @@ Edit ``models.py``
 .. note::
 
   There is nothing automagically special about the filename ``models.py``.  A
-  project may have many models throughout its codebase in arbitrarily-named
+  project may have many models throughout its codebase in arbitrarily named
   files.  Files implementing models often have ``model`` in their filenames,
   or they may live in a Python subpackage of your application package named
   ``models``, but this is only by convention.
@@ -59,11 +56,11 @@ of the root model is also always ``None``.
 Then we'll add a ``Page`` class.  This class should inherit from the
 :class:`persistent.Persistent` class.  We'll also give it an ``__init__``
 method that accepts a single parameter named ``data``.  This parameter will
-contain the :term:`ReStructuredText` body representing the wiki page content.
+contain the :term:`reStructuredText` body representing the wiki page content.
 Note that ``Page`` objects don't have an initial ``__name__`` or
 ``__parent__`` attribute.  All objects in a traversal graph must have a
 ``__name__`` and a ``__parent__`` attribute.  We don't specify these here
-because both ``__name__`` and ``__parent__`` will be set by by a :term:`view`
+because both ``__name__`` and ``__parent__`` will be set by a :term:`view`
 function when a Page is added to our Wiki mapping.
 
 As a last step, we want to change the ``appmaker`` function in our

@@ -10,6 +10,7 @@ from pyramid.interfaces import (
 
 from pyramid.config.util import (
     action_method,
+    takes_one_arg,
     )
 
 
@@ -37,9 +38,8 @@ class AdaptersConfiguratorMixin(object):
         :meth:`pyramid.config.Configurator.add_subscriber_predicate` before it
         can be used.  See :ref:`subscriber_predicates` for more information.
 
-        .. note::
-
-           THe ``**predicates`` argument is new as of Pyramid 1.4.
+        .. versionadded:: 1.4
+           The ``**predicates`` argument.
         """
         dotted = self.maybe_dotted
         subscriber, iface = dotted(subscriber), dotted(iface)
@@ -51,8 +51,22 @@ class AdaptersConfiguratorMixin(object):
         def register():
             predlist = self.get_predlist('subscriber')
             order, preds, phash = predlist.make(self, **predicates)
-            intr.update({'phash':phash, 'order':order, 'predicates':preds})
-            derived_subscriber = self._derive_subscriber(subscriber, preds)
+
+            derived_predicates = [ self._derive_predicate(p) for p in preds ]
+            derived_subscriber = self._derive_subscriber(
+                subscriber,
+                derived_predicates,
+                )
+
+            intr.update(
+                {'phash':phash,
+                 'order':order,
+                 'predicates':preds,
+                 'derived_predicates':derived_predicates,
+                 'derived_subscriber':derived_subscriber,
+                 }
+                )
+
             self.registry.registerHandler(derived_subscriber, iface)
             
         intr = self.introspectable(
@@ -68,31 +82,62 @@ class AdaptersConfiguratorMixin(object):
         self.action(None, register, introspectables=(intr,))
         return subscriber
 
+    def _derive_predicate(self, predicate):
+        derived_predicate = predicate
+
+        if eventonly(predicate):
+            def derived_predicate(*arg):
+                return predicate(arg[0])
+            # seems pointless to try to fix __doc__, __module__, etc as
+            # predicate will invariably be an instance
+
+        return derived_predicate
+
     def _derive_subscriber(self, subscriber, predicates):
+        derived_subscriber = subscriber
+
+        if eventonly(subscriber):
+            def derived_subscriber(*arg):
+                return subscriber(arg[0])
+            if hasattr(subscriber, '__name__'):
+                update_wrapper(derived_subscriber, subscriber)
+
         if not predicates:
-            return subscriber
+            return derived_subscriber
+
         def subscriber_wrapper(*arg):
-            # We need to accept *arg and pass it along because zope
-            # subscribers are designed poorly.  Notification will always call
-            # an associated subscriber with all of the objects involved in
-            # the subscription lookup, despite the fact that the event sender
-            # always has the option to attach those objects to the event
-            # object itself (and usually does). It would be much saner if the
-            # registry just used extra args passed to notify to do the lookup
-            # but only called event subscribers with the actual event object,
-            # or if we had been smart enough early on to always wrap
-            # subscribers in something that threw away the extra args, but
-            # c'est la vie.
+            # We need to accept *arg and pass it along because zope subscribers
+            # are designed awkwardly.  Notification via
+            # registry.adapter.subscribers will always call an associated
+            # subscriber with all of the objects involved in the subscription
+            # lookup, despite the fact that the event sender always has the
+            # option to attach those objects to the event object itself, and
+            # almost always does.
+            #
+            # The "eventonly" jazz sprinkled in this function and related
+            # functions allows users to define subscribers and predicates which
+            # accept only an event argument without needing to accept the rest
+            # of the adaptation arguments.  Had I been smart enough early on to
+            # use .subscriptions to find the subscriber functions in order to
+            # call them manually with a single "event" argument instead of
+            # relying on .subscribers to both find and call them implicitly
+            # with all args, the eventonly hack would not have been required.
+            # At this point, though, using .subscriptions and manual execution
+            # is not possible without badly breaking backwards compatibility.
             if all((predicate(*arg) for predicate in predicates)):
-                return subscriber(*arg)
+                return derived_subscriber(*arg)
+
         if hasattr(subscriber, '__name__'):
             update_wrapper(subscriber_wrapper, subscriber)
+
         return subscriber_wrapper
         
     @action_method
     def add_subscriber_predicate(self, name, factory, weighs_more_than=None,
                                  weighs_less_than=None):
         """
+        .. versionadded:: 1.4
+
         Adds a subscriber predicate factory.  The associated subscriber
         predicate can later be named as a keyword argument to
         :meth:`pyramid.config.Configurator.add_subscriber` in the
@@ -106,9 +151,6 @@ class AdaptersConfiguratorMixin(object):
 
         See :ref:`subscriber_predicates` for more information.
 
-        .. note::
-
-           This method is new as of Pyramid 1.4.
         """
         self._add_predicate(
             'subscriber',
@@ -230,6 +272,8 @@ class AdaptersConfiguratorMixin(object):
     @action_method
     def add_resource_url_adapter(self, adapter, resource_iface=None):
         """
+        .. versionadded:: 1.3
+
         When you add a traverser as described in
         :ref:`changing_the_traverser`, it's convenient to continue to use the
         :meth:`pyramid.request.Request.resource_url` API.  However, since the
@@ -255,10 +299,6 @@ class AdaptersConfiguratorMixin(object):
         ``None``, the url adapter will be used for every type of resource.
 
         See :ref:`changing_resource_url` for more information.
-
-        .. note::
-
-           This API is new in Pyramid 1.3.
         """
         adapter = self.maybe_dotted(adapter)
         resource_iface = self.maybe_dotted(resource_iface)
@@ -266,7 +306,7 @@ class AdaptersConfiguratorMixin(object):
             if resource_iface is None:
                 resource_iface = Interface
             self.registry.registerAdapter(
-                adapter, 
+                adapter,
                 (resource_iface, Interface),
                 IResourceURL,
                 )
@@ -281,3 +321,5 @@ class AdaptersConfiguratorMixin(object):
         intr['resource_iface'] = resource_iface
         self.action(discriminator, register, introspectables=(intr,))
 
+def eventonly(callee):
+    return takes_one_arg(callee, argname='event')

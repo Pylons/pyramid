@@ -227,9 +227,7 @@ augment Pyramid's configuration introspection system.
 Adding Configuration Introspection
 ----------------------------------
 
-.. note::
-
-   The introspection subsystem is new in Pyramid 1.3.
+.. versionadded:: 1.3
 
 Pyramid provides a configuration introspection system that can be used by
 debugging tools to provide visibility into the configuration of a running
@@ -289,7 +287,7 @@ The ``title`` is a human-consumable string that can be used by introspection
 system frontends to show a friendly summary of this introspectable.
 
 The ``type_name`` is a value that can be used to subtype this introspectable
-within its category for for sorting and presentation purposes.  It can be any
+within its category for sorting and presentation purposes.  It can be any
 value.
 
 An introspectable is also dictionary-like.  It can contain any set of

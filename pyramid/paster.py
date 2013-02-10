@@ -9,9 +9,13 @@ from pyramid.compat import configparser
 from logging.config import fileConfig
 from pyramid.scripting import prepare
 
-def get_app(config_uri, name=None, loadapp=loadapp):
+def get_app(config_uri, name=None, options=None, loadapp=loadapp):
     """ Return the WSGI application named ``name`` in the PasteDeploy
     config file specified by ``config_uri``.
+
+    ``options``, if passed, should be a dictionary used as variable assignments
+    like ``{'http_port': 8080}``.  This is useful if e.g. ``%(http_port)s`` is
+    used in the config file.
 
     If the ``name`` is None, this will attempt to parse the name from
     the ``config_uri`` string expecting the format ``inifile#name``.
@@ -19,7 +23,13 @@ def get_app(config_uri, name=None, loadapp=loadapp):
     path, section = _getpathsec(config_uri, name)
     config_name = 'config:%s' % path
     here_dir = os.getcwd()
-    app = loadapp(config_name, name=section, relative_to=here_dir)
+    if options:
+        kw = {'global_conf': options}
+    else:
+        kw = {}
+
+    app = loadapp(config_name, name=section, relative_to=here_dir, **kw)
+
     return app
 
 def get_appsettings(config_uri, name=None, appconfig=appconfig):
@@ -63,7 +73,7 @@ def _getpathsec(config_uri, name):
         section = name
     return path, section
 
-def bootstrap(config_uri, request=None):
+def bootstrap(config_uri, request=None, options=None):
     """ Load a WSGI application from the PasteDeploy config file specified
     by ``config_uri``. The environment will be configured as if it is
     currently serving ``request``, leaving a natural environment in place
@@ -103,10 +113,14 @@ def bootstrap(config_uri, request=None):
     for you if none is provided. You can mutate the request's ``environ``
     later to setup a specific host/port/scheme/etc.
 
+    ``options`` Is passed to get_app for use as variable assignments like 
+    {'http_port': 8080} and then use %(http_port)s in the
+    config file.
+
     See :ref:`writing_a_script` for more information about how to use this
     function.
     """
-    app = get_app(config_uri)
+    app = get_app(config_uri, options=options)
     env = prepare(request)
     env['app'] = app
     return env

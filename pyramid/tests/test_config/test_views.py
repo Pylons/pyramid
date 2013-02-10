@@ -1896,192 +1896,20 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         from pyramid.tests import test_config
         self.assertEqual(result, test_config)
 
-
 class Test_requestonly(unittest.TestCase):
     def _callFUT(self, view, attr=None):
         from pyramid.config.views import requestonly
-        return requestonly(view, attr)
+        return requestonly(view, attr=attr)
 
-    def test_requestonly_newstyle_class_no_init(self):
-        class foo(object):
-            """ """
-        self.assertFalse(self._callFUT(foo))
+    def test_defaults(self):
+        def aview(request, a=1, b=2): pass
+        self.assertTrue(self._callFUT(aview))
 
-    def test_requestonly_newstyle_class_init_toomanyargs(self):
-        class foo(object):
-            def __init__(self, context, request):
-                """ """
-        self.assertFalse(self._callFUT(foo))
-
-    def test_requestonly_newstyle_class_init_onearg_named_request(self):
-        class foo(object):
-            def __init__(self, request):
-                """ """
-        self.assertTrue(self._callFUT(foo))
-
-    def test_newstyle_class_init_onearg_named_somethingelse(self):
-        class foo(object):
-            def __init__(self, req):
-                """ """
-        self.assertTrue(self._callFUT(foo))
-
-    def test_newstyle_class_init_defaultargs_firstname_not_request(self):
-        class foo(object):
-            def __init__(self, context, request=None):
-                """ """
-        self.assertFalse(self._callFUT(foo))
-
-    def test_newstyle_class_init_defaultargs_firstname_request(self):
-        class foo(object):
-            def __init__(self, request, foo=1, bar=2):
-                """ """
-        self.assertTrue(self._callFUT(foo))
-
-    def test_newstyle_class_init_firstname_request_with_secondname(self):
-        class foo(object):
-            def __init__(self, request, two):
-                """ """
-        self.assertFalse(self._callFUT(foo))
-
-    def test_newstyle_class_init_noargs(self):
-        class foo(object):
-            def __init__():
-                """ """
-        self.assertFalse(self._callFUT(foo))
-
-    def test_oldstyle_class_no_init(self):
-        class foo:
-            """ """
-        self.assertFalse(self._callFUT(foo))
-
-    def test_oldstyle_class_init_toomanyargs(self):
-        class foo:
-            def __init__(self, context, request):
-                """ """
-        self.assertFalse(self._callFUT(foo))
-
-    def test_oldstyle_class_init_onearg_named_request(self):
-        class foo:
-            def __init__(self, request):
-                """ """
-        self.assertTrue(self._callFUT(foo))
-
-    def test_oldstyle_class_init_onearg_named_somethingelse(self):
-        class foo:
-            def __init__(self, req):
-                """ """
-        self.assertTrue(self._callFUT(foo))
-
-    def test_oldstyle_class_init_defaultargs_firstname_not_request(self):
-        class foo:
-            def __init__(self, context, request=None):
-                """ """
-        self.assertFalse(self._callFUT(foo))
-
-    def test_oldstyle_class_init_defaultargs_firstname_request(self):
-        class foo:
-            def __init__(self, request, foo=1, bar=2):
-                """ """
-        self.assertTrue(self._callFUT(foo), True)
-
-    def test_oldstyle_class_init_noargs(self):
-        class foo:
-            def __init__():
-                """ """
-        self.assertFalse(self._callFUT(foo))
-
-    def test_function_toomanyargs(self):
-        def foo(context, request):
-            """ """
-        self.assertFalse(self._callFUT(foo))
-
-    def test_function_with_attr_false(self):
-        def bar(context, request):
-            """ """
-        def foo(context, request):
-            """ """
-        foo.bar = bar
-        self.assertFalse(self._callFUT(foo, 'bar'))
-
-    def test_function_with_attr_true(self):
-        def bar(context, request):
-            """ """
-        def foo(request):
-            """ """
-        foo.bar = bar
-        self.assertTrue(self._callFUT(foo, 'bar'))
-
-    def test_function_onearg_named_request(self):
-        def foo(request):
-            """ """
-        self.assertTrue(self._callFUT(foo))
-
-    def test_function_onearg_named_somethingelse(self):
-        def foo(req):
-            """ """
-        self.assertTrue(self._callFUT(foo))
-
-    def test_function_defaultargs_firstname_not_request(self):
-        def foo(context, request=None):
-            """ """
-        self.assertFalse(self._callFUT(foo))
-
-    def test_function_defaultargs_firstname_request(self):
-        def foo(request, foo=1, bar=2):
-            """ """
-        self.assertTrue(self._callFUT(foo))
-
-    def test_function_noargs(self):
-        def foo():
-            """ """
-        self.assertFalse(self._callFUT(foo))
-
-    def test_instance_toomanyargs(self):
-        class Foo:
-            def __call__(self, context, request):
-                """ """
-        foo = Foo()
-        self.assertFalse(self._callFUT(foo))
-
-    def test_instance_defaultargs_onearg_named_request(self):
-        class Foo:
-            def __call__(self, request):
-                """ """
-        foo = Foo()
-        self.assertTrue(self._callFUT(foo))
-
-    def test_instance_defaultargs_onearg_named_somethingelse(self):
-        class Foo:
-            def __call__(self, req):
-                """ """
-        foo = Foo()
-        self.assertTrue(self._callFUT(foo))
-
-    def test_instance_defaultargs_firstname_not_request(self):
-        class Foo:
-            def __call__(self, context, request=None):
-                """ """
-        foo = Foo()
-        self.assertFalse(self._callFUT(foo))
-
-    def test_instance_defaultargs_firstname_request(self):
-        class Foo:
-            def __call__(self, request, foo=1, bar=2):
-                """ """
-        foo = Foo()
-        self.assertTrue(self._callFUT(foo), True)
-
-    def test_instance_nocall(self):
-        class Foo: pass
-        foo = Foo()
-        self.assertFalse(self._callFUT(foo))
-    
-    def test_method_onearg_named_request(self):
-        class Foo:
-            def method(self, request):
-                """ """
-        foo = Foo()
-        self.assertTrue(self._callFUT(foo.method))
+    def test_otherattr(self):
+        class AView(object):
+            def __init__(self, request, a=1, b=2): pass
+            def bleh(self): pass
+        self.assertTrue(self._callFUT(AView, 'bleh'))
 
 class Test_isexception(unittest.TestCase):
     def _callFUT(self, ob):
@@ -2482,6 +2310,29 @@ class TestViewDeriver(unittest.TestCase):
                 'may have forgotten to return a value from the view callable.'))
         else: # pragma: no cover
             raise AssertionError
+
+    def test_function_returns_true_Response_no_renderer(self):
+        from pyramid.response import Response
+        r = Response('Hello')
+        def view(request):
+            return r
+        deriver = self._makeOne()
+        result = deriver(view)
+        self.assertFalse(result is view)
+        response = result(None, None)
+        self.assertEqual(response, r)
+
+    def test_function_returns_true_Response_with_renderer(self):
+        from pyramid.response import Response
+        r = Response('Hello')
+        def view(request):
+            return r
+        renderer = object()
+        deriver = self._makeOne(renderer=renderer)
+        result = deriver(view)
+        self.assertFalse(result is view)
+        response = result(None, None)
+        self.assertEqual(response, r)
 
     def test_requestonly_default_method_returns_non_adaptable(self):
         request = DummyRequest()

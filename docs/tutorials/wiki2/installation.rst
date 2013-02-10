@@ -2,30 +2,22 @@
 Installation
 ============
 
-This tutorial assumes that Python and virtualenv are already installed
-and working in your system. If you need help setting this up, you should
-refer to the chapters on :ref:`installing_chapter`.
-
 Preparation
 ===========
 
-Please take the following steps to prepare for the tutorial.  The
-steps are slightly different depending on whether you're using UNIX or
-Windows.
+Follow the steps in :ref:`installing_chapter`, but name the virtualenv
+directory ``pyramidtut``.
 
 Preparation, UNIX
 -----------------
 
 #. Install SQLite3 and its development packages if you don't already
    have them installed.  Usually this is via your system's package
-   manager.  For example, on a Debian Linux system, do ``sudo apt-get
-   install libsqlite3-dev``.
-
-#. Use your Python's virtualenv to make a workspace:
+   manager.  On a Debian system, this would be:
 
    .. code-block:: text
 
-      $ path/to/my/Python-2.6/bin/virtualenv --no-site-packages pyramidtut
+      $ sudo apt-get install libsqlite3-dev
 
 #. Switch to the ``pyramidtut`` directory:
 
@@ -33,34 +25,15 @@ Preparation, UNIX
 
       $ cd pyramidtut
 
-#. Use ``easy_install`` to get :app:`Pyramid` and its direct
-   dependencies installed:
-
-   .. code-block:: text
-
-      $ bin/easy_install pyramid
 
 Preparation, Windows
 --------------------
-
-#. Use your Python's virtualenv to make a workspace:
-
-   .. code-block:: text
-
-      c:\> c:\Python26\Scripts\virtualenv --no-site-packages pyramidtut
 
 #. Switch to the ``pyramidtut`` directory:
 
    .. code-block:: text
 
       c:\> cd pyramidtut
-
-#. Use ``easy_install`` to get :app:`Pyramid` and its direct
-   dependencies installed:
-
-   .. code-block:: text
-
-      c:\pyramidtut> Scripts\easy_install pyramid
 
 .. _sql_making_a_project:
 
@@ -93,14 +66,17 @@ On Windows:
    startup problems, try putting both the virtualenv and the project
    into directories that do not contain spaces in their paths.
 
+
+.. _installing_project_in_dev_mode:
+
 Installing the Project in "Development Mode"
 ============================================
 
 In order to do development on the project easily, you must "register"
 the project as a development egg in your workspace using the
-``setup.py develop`` command.  In order to do so, cd to the "tutorial"
+``setup.py develop`` command.  In order to do so, cd to the `tutorial`
 directory you created in :ref:`sql_making_a_project`, and run the
-"setup.py develop" command using virtualenv Python interpreter.
+``setup.py develop`` command using the virtualenv Python interpreter.
 
 On UNIX:
 
@@ -158,8 +134,8 @@ test`` does but provides additional "coverage" information, exposing
 which lines of your project are "covered" (or not covered) by the
 tests.
 
-To get this functionality working, we'll need to install a couple of
-other packages into our ``virtualenv``: ``nose`` and ``coverage``:
+To get this functionality working, we'll need to install the ``nose`` and
+``coverage`` packages into our ``virtualenv``:
 
 On UNIX:
 
@@ -186,7 +162,7 @@ On Windows:
 
 .. code-block:: text
 
-   c:\pyramidtut\tutorial> ..\Scripts\nosetests --cover-package=tutorial ^
+   c:\pyramidtut\tutorial> ..\Scripts\nosetests --cover-package=tutorial \
          --cover-erase --with-coverage
 
 If successful, you will see output something like this::
@@ -207,6 +183,9 @@ If successful, you will see output something like this::
   OK
 
 Looks like our package doesn't quite have 100% test coverage.
+
+
+.. _initialize_db_wiki2:
 
 Initializing the Database
 =========================
@@ -302,6 +281,9 @@ the following assumptions:
 - you are willing to use :term:`SQLAlchemy` as a database access tool
 
 - you are willing to use :term:`url dispatch` to map URLs to code.
+
+- you want to use ``ZopeTransactionExtension`` and ``pyramid_tm`` to scope
+  sessions to requests
 
 .. note::
 

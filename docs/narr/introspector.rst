@@ -130,6 +130,23 @@ introspectables in categories not described here.
     A sequence of interfaces (or classes) that are subscribed to (the
     resolution of the ``ifaces`` argument passed to ``add_subscriber``).
 
+  ``derived_subscriber``
+
+    A wrapper around the subscriber used internally by the system so it can
+    call it with more than one argument if your original subscriber accepts
+    only one.
+
+  ``predicates``
+
+    The predicate objects created as the result of passing predicate arguments
+    to ``add_susbcriber``
+
+  ``derived_predicates``
+
+    Wrappers around the predicate objects created as the result of passing
+    predicate arguments to ``add_susbcriber`` (to be used when predicates take
+    only one value but must be passed more than one).
+
 ``response adapters``
 
   Each introspectable in the ``response adapters`` category represents a call
@@ -479,7 +496,7 @@ introspectables in categories not described here.
 ``translation directories``
 
   Each introspectable in the ``asset overrides`` category represents an
-  individual element in a ``specs`` argument passed to to
+  individual element in a ``specs`` argument passed to
   :meth:`pyramid.config.Configurator.add_translation_dirs`; each will have
   the following data.
 

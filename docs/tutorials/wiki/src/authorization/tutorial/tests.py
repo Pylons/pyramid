@@ -30,6 +30,7 @@ class WikiModelTests(unittest.TestCase):
         self.assertEqual(wiki.__name__, None)
 
 class AppmakerTests(unittest.TestCase):
+
     def _callFUT(self, zodb_root):
         from .models import appmaker
         return appmaker(zodb_root)
@@ -63,7 +64,7 @@ class ViewPageTests(unittest.TestCase):
         info = self._callFUT(context, request)
         self.assertEqual(info['page'], context)
         self.assertEqual(
-            info['content'], 
+            info['content'],
             '<div class="document">\n'
             '<p>Hello <a href="http://example.com/add_page/CruelWorld">'
             'CruelWorld</a> '
@@ -85,9 +86,9 @@ class AddPageTests(unittest.TestCase):
         request.subpath = ['AnotherPage']
         info = self._callFUT(context, request)
         self.assertEqual(info['page'].data,'')
-        self.assertEqual(info['save_url'],
-                         request.resource_url(
-                             context, 'add_page', 'AnotherPage'))
+        self.assertEqual(
+            info['save_url'],
+            request.resource_url(context, 'add_page', 'AnotherPage'))
 
     def test_it_submitted(self):
         context = testing.DummyResource()

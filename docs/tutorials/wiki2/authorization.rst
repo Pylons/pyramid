@@ -14,7 +14,7 @@ anyone with access to the server to view pages.
 
 We will also add a login page and a logout link on all the
 pages.  The login page will be shown when a user is denied
-access to any of the views that require a permission, instead of
+access to any of the views that require permission, instead of
 a default "403 Forbidden" page.
 
 We will implement the access control with the following steps:
@@ -36,9 +36,6 @@ Then we will add the login and logout feature:
 * Add a "Logout" link to be shown when logged in and viewing or editing a page
   (``view.pt``, ``edit.pt``).
 
-The source code for this tutorial stage can be browsed at
-`http://github.com/Pylons/pyramid/tree/1.3-branch/docs/tutorials/wiki2/src/authorization/
-<http://github.com/Pylons/pyramid/tree/1.3-branch/docs/tutorials/wiki2/src/authorization/>`_.
 
 Access Control
 --------------
@@ -62,7 +59,7 @@ returns one of these values:
 - If the userid *does not* exist in the system, it will
   return ``None``.
 
-For example, ``groupfinder('editor', request )`` returns ['group:editor'],
+For example, ``groupfinder('editor', request )`` returns ``['group:editor']``,
 ``groupfinder('viewer', request)`` returns [], and ``groupfinder('admin', request)``
 returns ``None``.  We will use ``groupfinder()`` as an :term:`authentication policy`
 "callback" that will provide the :term:`principal` or principals
@@ -86,7 +83,7 @@ statement at the head:
 Add the following class definition:
 
 .. literalinclude:: src/authorization/tutorial/models.py
-   :lines: 35-39
+   :lines: 36-40
    :linenos:
    :language: python
 
@@ -112,7 +109,7 @@ parameter to our :term:`Configurator` constructor, that points to
 the class we created above:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
-   :lines: 23-24
+   :lines: 24-25
    :linenos:
    :emphasize-lines: 2
    :language: python
@@ -144,19 +141,19 @@ add these import statements:
 Now add those policies to the configuration:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
-   :lines: 20-26
+   :lines: 21-27
    :linenos:
    :emphasize-lines: 1-3,6-7
    :language: python
 
 (Only the highlighted lines need to be added.)
 
-We are enabling an ``AuthTktAuthenticationPolicy``, it is based in an
-auth ticket that may be included in the request, and an
-``ACLAuthorizationPolicy`` that uses an ACL to determine the allow or deny
-outcome for a view.
+We are enabling an ``AuthTktAuthenticationPolicy``, which is based in an
+auth ticket that may be included in the request.
+We are also enabling an ``ACLAuthorizationPolicy``, which uses an ACL to
+determine the *allow* or *deny* outcome for a view.
 
-Note that the :class:`pyramid.authentication.AuthTktAuthenticationPolicy`
+Note that the :class:`~pyramid.authentication.AuthTktAuthenticationPolicy`
 constructor accepts two arguments: ``secret`` and ``callback``.  ``secret`` is
 a string representing an encryption key used by the "authentication ticket"
 machinery represented by this policy: it is required.  The ``callback`` is the
@@ -206,7 +203,7 @@ Go back to ``tutorial/tutorial/__init__.py`` and add these two
 routes:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
-   :lines: 29-30
+   :lines: 30-31
    :linenos:
    :language: python
 
@@ -303,9 +300,8 @@ like this:
 
 (Only the highlighted line needs to be added.)
 
-:meth:`~pyramid.security.authenticated_userid()` will return None
-if the user is not authenticated, or some user id it the user
-is authenticated.
+The :meth:`~pyramid.security.authenticated_userid` method will return None
+if the user is not authenticated.
 
 Add a "Logout" link when logged in
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -333,7 +329,7 @@ when we're done:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
    :linenos:
-   :emphasize-lines: 2-3,7,23-24,20-26,29-30
+   :emphasize-lines: 2-3,7,21-23,25-27,30-31
    :language: python
 
 (Only the highlighted lines need to be added.)
@@ -343,7 +339,7 @@ when we're done:
 
 .. literalinclude:: src/authorization/tutorial/models.py
    :linenos:
-   :emphasize-lines: 1-4,35-39
+   :emphasize-lines: 1-4,36-40
    :language: python
 
 (Only the highlighted lines need to be added.)

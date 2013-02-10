@@ -203,7 +203,7 @@ Using the setting is equivalent to using the
 |                                 |
 +---------------------------------+
 
-The value supplied as ``pyramid.includes`` should be a sequence.  The
+The value assigned to ``pyramid.includes`` should be a sequence.  The
 sequence can take several different forms.
 
 1) It can be a string.
@@ -323,7 +323,7 @@ the behest of an add-on author.
 |                                 |
 +---------------------------------+
 
-The value supplied as ``pyramid.tweens`` should be a sequence.  The
+The value assigned to ``pyramid.tweens`` should be a sequence.  The
 sequence can take several different forms.
 
 1) It can be a string.
@@ -504,12 +504,13 @@ default, this is ``false``.
 Mako Preprocessor
 ~~~~~~~~~~~~~~~~~
 
+.. versionadded:: 1.1
+
 A callable (or a :term:`dotted Python name` which names a callable) which is
 called to preprocess the source before the template is called.  The callable
 will be passed the full template source before it is parsed. The return
 result of the callable will be used as the template source code.
 
-.. note:: This feature is new in Pyramid 1.1.
 
 +-----------------------------+
 | Config File Setting Name    |

@@ -37,7 +37,6 @@ from pyramid import renderers
 from pyramid.compat import (
     string_types,
     urlparse,
-    im_func,
     url_quote,
     WIN,
     is_bound_method,
@@ -59,6 +58,8 @@ from pyramid.registry import (
     Deferred,
     )
 
+from pyramid.response import Response
+
 from pyramid.security import NO_PERMISSION_REQUIRED
 from pyramid.static import static_view
 from pyramid.threadlocal import get_current_registry
@@ -79,6 +80,7 @@ import pyramid.config.predicates
 from pyramid.config.util import (
     DEFAULT_PHASH,
     MAX_ORDER,
+    takes_one_arg,
     )
 
 urljoin = urlparse.urljoin
@@ -341,25 +343,28 @@ class ViewDeriver(object):
         def rendered_view(context, request):
             renderer = view_renderer
             result = view(context, request)
-            registry = self.registry
-            # this must adapt, it can't do a simple interface check
-            # (avoid trying to render webob responses)
-            response = registry.queryAdapterOrSelf(result, IResponse)
-            if response is None:
-                attrs = getattr(request, '__dict__', {})
-                if 'override_renderer' in attrs:
-                    # renderer overridden by newrequest event or other
-                    renderer_name = attrs.pop('override_renderer')
-                    renderer = renderers.RendererHelper(
-                        name=renderer_name,
-                        package=self.kw.get('package'),
-                        registry = registry)
-                if '__view__' in attrs:
-                    view_inst = attrs.pop('__view__')
-                else:
-                    view_inst = getattr(view, '__original_view__', view)
-                response = renderer.render_view(request, result, view_inst,
-                                                context)
+            if result.__class__ is Response: # potential common case
+                response = result
+            else:
+                registry = self.registry
+                # this must adapt, it can't do a simple interface check
+                # (avoid trying to render webob responses)
+                response = registry.queryAdapterOrSelf(result, IResponse)
+                if response is None:
+                    attrs = getattr(request, '__dict__', {})
+                    if 'override_renderer' in attrs:
+                        # renderer overridden by newrequest event or other
+                        renderer_name = attrs.pop('override_renderer')
+                        renderer = renderers.RendererHelper(
+                            name=renderer_name,
+                            package=self.kw.get('package'),
+                            registry = registry)
+                    if '__view__' in attrs:
+                        view_inst = attrs.pop('__view__')
+                    else:
+                        view_inst = getattr(view, '__original_view__', view)
+                    response = renderer.render_view(request, result, view_inst,
+                                                    context)
             return response
 
         return rendered_view
@@ -368,21 +373,26 @@ class ViewDeriver(object):
         registry = self.registry
         def viewresult_to_response(context, request):
             result = view(context, request)
-            response = registry.queryAdapterOrSelf(result, IResponse)
-            if response is None:
-                if result is None:
-                    append = (' You may have forgotten to return a value from '
-                              'the view callable.')
-                elif isinstance(result, dict):
-                    append = (' You may have forgotten to define a renderer in '
-                              'the view configuration.')
-                else:
-                    append = ''
-                msg = ('Could not convert return value of the view callable %s '
-                      'into a response object. '
-                      'The value returned was %r.' + append)
-                    
-                raise ValueError(msg % (view_description(view), result))
+            if result.__class__ is Response: # common case
+                response = result
+            else:
+                response = registry.queryAdapterOrSelf(result, IResponse)
+                if response is None:
+                    if result is None:
+                        append = (' You may have forgotten to return a value '
+                                  'from the view callable.')
+                    elif isinstance(result, dict):
+                        append = (' You may have forgotten to define a '
+                                  'renderer in the view configuration.')
+                    else:
+                        append = ''
+
+                    msg = ('Could not convert return value of the view '
+                           'callable %s into a response object. '
+                           'The value returned was %r.' + append)
+
+                    raise ValueError(msg % (view_description(view), result))
+
             return response
 
         return viewresult_to_response
@@ -493,50 +503,7 @@ class DefaultViewMapper(object):
         return _attr_view
 
 def requestonly(view, attr=None):
-    ismethod = False
-    if attr is None:
-        attr = '__call__'
-    if inspect.isroutine(view):
-        fn = view
-    elif inspect.isclass(view):
-        try:
-            fn = view.__init__
-        except AttributeError:
-            return False
-        ismethod = hasattr(fn, '__call__')
-    else:
-        try:
-            fn = getattr(view, attr)
-        except AttributeError:
-            return False
-
-    try:
-        argspec = inspect.getargspec(fn)
-    except TypeError:
-        return False
-
-    args = argspec[0]
-
-    if hasattr(fn, im_func) or ismethod:
-        # it's an instance method (or unbound method on py2)
-        if not args:
-            return False
-        args = args[1:]
-    if not args:
-        return False
-
-    if len(args) == 1:
-        return True
-
-    defaults = argspec[3]
-    if defaults is None:
-        defaults = ()
-
-    if args[0] == 'request':
-        if len(args) - len(defaults) == 1:
-            return True
-
-    return False
+    return takes_one_arg(view, attr=attr, argname='request')
 
 @implementer(IMultiView)
 class MultiView(object):
@@ -743,7 +710,7 @@ class ViewsConfiguratorMixin(object):
 
         http_cache
 
-          .. note:: This feature is new as of Pyramid 1.1.
+          .. versionadded:: 1.1
 
           When you supply an ``http_cache`` value to a view configuration,
           the ``Expires`` and ``Cache-Control`` headers of a response
@@ -855,7 +822,8 @@ class ViewsConfiguratorMixin(object):
           think about preserving function attributes such as ``__name__`` and
           ``__module__`` within decorator logic).
 
-          Passing an iterable is only supported as of :app:`Pyramid` 1.4a4.
+          .. versionchanged:: 1.4a4
+             Passing an iterable.
 
         mapper
 
@@ -910,9 +878,9 @@ class ViewsConfiguratorMixin(object):
           supplied value.  Note that use of ``GET`` also implies that the
           view will respond to ``HEAD`` as of Pyramid 1.4.
 
-          .. note:: The ability to pass a tuple of items as
-                   ``request_method`` is new as of Pyramid 1.2.  Previous
-                   versions allowed only a string.
+          .. versionchanged:: 1.2
+             The ability to pass a tuple of items as ``request_method``.
+             Previous versions allowed only a string.
 
         request_param
 
@@ -930,7 +898,7 @@ class ViewsConfiguratorMixin(object):
 
         match_param
 
-          .. note:: This feature is new as of :app:`Pyramid` 1.2.
+          .. versionadded:: 1.2
 
           This value can be a string of the format "key=value" or a tuple
           containing one or more of these strings.
@@ -1057,14 +1025,16 @@ class ViewsConfiguratorMixin(object):
 
         custom_predicates
 
-          This value should be a sequence of references to custom
-          predicate callables.  Use custom predicates when no set of
-          predefined predicates do what you need.  Custom predicates
-          can be combined with predefined predicates as necessary.
-          Each custom predicate callable should accept two arguments:
-          ``context`` and ``request`` and should return either
-          ``True`` or ``False`` after doing arbitrary evaluation of
-          the context and/or the request.  
+          This value should be a sequence of references to custom predicate
+          callables.  Use custom predicates when no set of predefined
+          predicates do what you need.  Custom predicates can be combined with
+          predefined predicates as necessary.  Each custom predicate callable
+          should accept two arguments: ``context`` and ``request`` and should
+          return either ``True`` or ``False`` after doing arbitrary evaluation
+          of the context and/or the request.  The ``predicates`` argument to
+          this method and the ability to register third-party view predicates
+          via :meth:`pyramid.config.Configurator.add_view_predicate` obsoletes
+          this argument, but it is kept around for backwards compatibility.
 
         predicates
 
@@ -1385,7 +1355,10 @@ class ViewsConfiguratorMixin(object):
     @action_method
     def add_view_predicate(self, name, factory, weighs_more_than=None,
                            weighs_less_than=None):
-        """ Adds a view predicate factory.  The associated view predicate can
+        """
+        .. versionadded:: 1.4
+
+        Adds a view predicate factory.  The associated view predicate can
         later be named as a keyword argument to
         :meth:`pyramid.config.Configurator.add_view` in the
         ``predicates`` anonyous keyword argument dictionary.
@@ -1397,10 +1370,6 @@ class ViewsConfiguratorMixin(object):
         ``factory`` should be a :term:`predicate factory`.
 
         See :ref:`view_and_route_predicates` for more information.
-
-        .. note::
-
-           This method is new as of Pyramid 1.4.
         """
         self._add_predicate(
             'view',
@@ -1588,9 +1557,7 @@ class ViewsConfiguratorMixin(object):
         ``for_``, or ``http_cache`` keyword arguments.  These argument values
         make no sense in the context of a forbidden view.
 
-        .. note::
-
-           This method is new as of Pyramid 1.3.
+        .. versionadded:: 1.3
         """
         for arg in ('name', 'permission', 'context', 'for_', 'http_cache'):
             if arg in predicates:
@@ -1677,9 +1644,7 @@ class ViewsConfiguratorMixin(object):
         Pyramid will return the result of the view callable provided as
         ``view``, as normal.
 
-        .. note::
-
-           This method is new as of Pyramid 1.3.
+        .. versionadded:: 1.3
         """
         for arg in ('name', 'permission', 'context', 'for_', 'http_cache'):
             if arg in predicates:

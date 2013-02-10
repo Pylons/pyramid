@@ -2,20 +2,17 @@
 Defining the Domain Model
 =========================
 
-The first change we'll make to our stock pcreate-generated application will
+The first change we'll make to our stock ``pcreate``-generated application will
 be to define a :term:`domain model` constructor representing a wiki page.
 We'll do this inside our ``models.py`` file.
 
-The source code for this tutorial stage can be browsed at
-`http://github.com/Pylons/pyramid/tree/1.3-branch/docs/tutorials/wiki2/src/models/
-<http://github.com/Pylons/pyramid/tree/1.3-branch/docs/tutorials/wiki2/src/models/>`_.
 
 Making Edits to ``models.py``
 -----------------------------
 
 .. note::
 
-  There is nothing automagically special about the filename ``models.py``.  A
+  There is nothing special about the filename ``models.py``.  A
   project may have many models throughout its codebase in arbitrarily-named
   files.  Files implementing models often have ``model`` in their filenames
   (or they may live in a Python subpackage of your application package named
@@ -27,11 +24,11 @@ following:
 .. literalinclude:: src/models/tutorial/models.py
    :linenos:
    :language: py
-   :emphasize-lines: 19-21,24,26,28
+   :emphasize-lines: 20-22,25,27,29
 
 (The highlighted lines are the ones that need to be changed.)
 
-The first thing we've done is to do is remove the stock ``MyModel`` class
+The first thing we've done is remove the stock ``MyModel`` class
 from the generated ``models.py`` file.  The ``MyModel`` class is only a
 sample and we're not going to use it.
 
@@ -46,8 +43,8 @@ this class inherits from an instance of
 
 As you can see, our ``Page`` class has a class level attribute
 ``__tablename__`` which equals the string ``'pages'``.  This means that
-SQLAlchemy will store our wiki data in a SQL table named ``pages``.  Our Page
-class will also have class-level attributes named ``id``, ``name`` and
+SQLAlchemy will store our wiki data in a SQL table named ``pages``.  Our
+``Page`` class will also have class-level attributes named ``id``, ``name`` and
 ``data`` (all instances of :class:`sqlalchemy.Column`).  These will map to
 columns in the ``pages`` table.  The ``id`` attribute will be the primary key
 in the table.  The ``name`` attribute will be a text attribute, each value of
@@ -73,29 +70,19 @@ following:
 .. literalinclude:: src/models/tutorial/scripts/initializedb.py
    :linenos:
    :language: python
-   :emphasize-lines: 14,34
+   :emphasize-lines: 14,36
 
 (Only the highlighted lines need to be changed.)
 
-Reinitializing the Database
----------------------------
+Installing the Project and re-initializing the Database
+-------------------------------------------------------
+
+Redo the steps in :ref:`installing_project_in_dev_mode`.
 
 Because our model has changed, in order to reinitialize the database, we need
 to rerun the ``initialize_tutorial_db`` command to pick up the changes you've made
-to both the models.py file and to the initializedb.py file.  From the root of the
-``tutorial`` project, directory execute the following commands.
-
-On UNIX:
-
-.. code-block:: text
-
-   $ ../bin/initialize_tutorial_db development.ini
-
-On Windows:
-
-.. code-block:: text
-
-   c:\pyramidtut\tutorial> ..\Scripts\initialize_tutorial_db development.ini
+to both the models.py file and to the initializedb.py file.
+See :ref:`initialize_db_wiki2` for instructions.
 
 Success will look something like this::
 

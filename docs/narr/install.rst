@@ -14,8 +14,8 @@ run :app:`Pyramid`.
 
 .. sidebar:: Python Versions
 
-    As of this writing, :app:`Pyramid` has been tested under Python 2.6.8,
-    Python 2.7.3, Python 3.2.3, and Python 3.3b1.  :app:`Pyramid` does not
+    As of this writing, :app:`Pyramid` has been tested under Python 2.6,
+    Python 2.7, Python 3.2, and Python 3.3.  :app:`Pyramid` does not
     run under any version of Python before 2.6.
 
 :app:`Pyramid` is known to run on all popular UNIX-like systems such as
@@ -40,17 +40,19 @@ UNIX system that has development tools.
 Package Manager Method
 ++++++++++++++++++++++
 
-You can use your system's "package manager" to install Python. Every
-system's package manager is slightly different, but the "flavor" of
+You can use your system's "package manager" to install Python.
+Each package manager is slightly different, but the "flavor" of
 them is usually the same.
 
-For example, on an Ubuntu Linux system, to use the system package
-manager to install a Python 2.7 interpreter, use the following
-command:
+For example, on a Debian or Ubuntu system, use the following command:
 
 .. code-block:: text
 
    $ sudo apt-get install python2.7-dev
+
+This command will install both the Python interpreter and its development
+header files.  Note that the headers are required by some (optional) C
+extensions in software depended upon by Pyramid, not by Pyramid itself.
 
 Once these steps are performed, the Python interpreter will usually be
 invokable via ``python2.7`` from a shell prompt.
@@ -66,7 +68,8 @@ Python interpreter to develop your software.  The authors of
 :app:`Pyramid` tend not to use the system Python for development
 purposes; always a self-compiled one.  Compiling Python is usually
 easy, and often the "system" Python is compiled with options that
-aren't optimal for web development.
+aren't optimal for web development. For an explanation, see
+https://github.com/Pylons/pyramid/issues/747.
 
 To compile software on your UNIX system, typically you need
 development tools.  Often these can be installed via the package
@@ -85,17 +88,15 @@ using the following commands:
 
 .. code-block:: text
 
-   [chrism@vitaminf ~]$ cd ~
-   [chrism@vitaminf ~]$ mkdir tmp
-   [chrism@vitaminf ~]$ mkdir opt
-   [chrism@vitaminf ~]$ cd tmp
-   [chrism@vitaminf tmp]$ wget \
-          http://www.python.org/ftp/python/2.7.3/Python-2.7.3.tgz
-   [chrism@vitaminf tmp]$ tar xvzf Python-2.7.3.tgz
-   [chrism@vitaminf tmp]$ cd Python-2.7.3
-   [chrism@vitaminf Python-2.7.3]$ ./configure \
-           --prefix=$HOME/opt/Python-2.7.3
-   [chrism@vitaminf Python-2.7.3]$ make; make install
+   $ cd ~
+   $ mkdir tmp
+   $ mkdir opt
+   $ cd tmp
+   $ wget http://www.python.org/ftp/python/2.7.3/Python-2.7.3.tgz
+   $ tar xvzf Python-2.7.3.tgz
+   $ cd Python-2.7.3
+   $ ./configure --prefix=$HOME/opt/Python-2.7.3
+   $ make && make install
 
 Once these steps are performed, the Python interpreter will be
 invokable via ``$HOME/opt/Python-2.7.3/bin/python`` from a shell
@@ -146,37 +147,24 @@ To set up a virtualenv in which to install :app:`Pyramid`, first ensure that
 ``import setuptools`` within the Python interpreter you'd like to run
 :app:`Pyramid` under.
 
-Here's the output you'll expect if setuptools or distribute is already
-installed:
+The following command will not display anything if setuptools or distribute is
+already installed:
 
 .. code-block:: text
 
-   [chrism@thinko docs]$ python2.7
-   Python 2.7.3 (default, Aug  1 2012, 05:14:39) 
-   [GCC 4.6.3] on linux2
-   Type "help", "copyright", "credits" or "license" for more information.
-   >>> import setuptools
-   >>> 
+   $ python2.7 -c 'import setuptools'
 
-Here's the output you can expect if setuptools or distribute is not already
-installed:
+Running the same command will yield the following output if setuptools or
+distribute is not yet installed:
 
 .. code-block:: text
 
-   [chrism@thinko docs]$ python2.7
-   Python 2.7.3 (default, Aug  1 2012, 05:14:39) 
-   [GCC 4.6.3] on linux2
-   Type "help", "copyright", "credits" or "license" for more information.
-   >>> import setutptools
    Traceback (most recent call last):
      File "<stdin>", line 1, in <module>
-   ImportError: No module named setutptools
-   >>>
+   ImportError: No module named setuptools
 
 If ``import setuptools`` raises an :exc:`ImportError` as it does above, you
-will need to install setuptools or distribute manually.  Note that above
-we're using a Python 2.7-series interpreter on Mac OS X; your output may
-differ if you're using a later Python version or a different platform.
+will need to install setuptools or distribute manually.
 
 If you are using a "system" Python (one installed by your OS distributor or a
 3rd-party packager such as Fink or MacPorts), you can usually install the
@@ -242,6 +230,20 @@ Installing the ``virtualenv`` Package
 Once you've got setuptools or distribute installed, you should install the
 :term:`virtualenv` package.  To install the :term:`virtualenv` package into
 your setuptools-enabled Python interpreter, use the ``easy_install`` command.
+
+.. warning::
+
+   Python 3.3 includes ``pyvenv`` out of the box, which provides similar
+   functionality to ``virtualenv``.  We however suggest using ``virtualenv``
+   instead, which works well with Python 3.3.  This isn't a recommendation made
+   for technical reasons; it's made because it's not feasible for the authors
+   of this guide to explain setup using multiple virtual environment systems.
+   We are aiming to not need to make the installation documentation
+   Turing-complete.
+
+   If you insist on using ``pyvenv``, you'll need to understand how to install
+   software such as ``distribute`` into the virtual environment manually,
+   which this guide does not cover.
 
 .. code-block:: text
 

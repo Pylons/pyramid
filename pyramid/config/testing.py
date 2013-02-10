@@ -37,18 +37,10 @@ class TestingConfiguratorMixin(object):
         not provided (or it is provided, and is ``None``), the default value
         ``[]`` (the empty list) will be returned by ``remember``.
 
-        .. note::
-
-           ``remember_result`` is new as of Pyramid 1.4.
-
         ``forget_result``, if provided, should be the result returned by
         the ``forget`` method of the faux authentication policy.  If it is
         not provided (or it is provided, and is ``None``), the default value
         ``[]`` (the empty list) will be returned by ``forget``.
-
-        .. note::
-
-           ``forget_result`` is new as of Pyramid 1.4.
 
         The behavior of the registered :term:`authentication policy`
         depends on the values provided for the ``userid`` and
@@ -64,6 +56,12 @@ class TestingConfiguratorMixin(object):
         :func:`pyramid.security.authenticated_userid`,
         :func:`pyramid.security.effective_principals`, and
         :func:`pyramid.security.principals_allowed_by_permission`.
+
+        .. versionadded:: 1.4
+           The ``remember_result`` argument.
+
+        .. versionadded:: 1.4
+           The ``forget_result`` argument.
         """
         from pyramid.testing import DummySecurityPolicy
         policy = DummySecurityPolicy(

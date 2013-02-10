@@ -88,13 +88,13 @@ Coding Style
   mandatory.
 
 - Please do not remove trailing whitespace.  Configure your editor to reduce
-  diff noise.
+  diff noise. See https://github.com/Pylons/pyramid/issues/788 for more.
 
 Running Tests
 --------------
 
 - To run tests for Pyramid on a single Python version, run ``python setup.py
-  test`` against the using the Python interpreter from virtualenv into which
+  test`` against the Python interpreter from virtualenv into which
   you've ``setup.py develop``-ed Pyramid.
 
 - To run the full set of Pyramid tests on all platforms, install ``tox``

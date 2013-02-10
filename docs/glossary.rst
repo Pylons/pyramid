@@ -486,8 +486,8 @@ Glossary
      is in use.
 
    physical root
-     The object returned by the application :term:`root factory`.  Unlike the
-     the :term:`virtual root` of a request, it is not impacted by
+     The object returned by the application :term:`root factory`.
+     Unlike the :term:`virtual root` of a request, it is not impacted by
      :ref:`vhosting_chapter`: it will always be the actual object returned by
      the root factory, never a subobject.
 
@@ -689,7 +689,7 @@ Glossary
      non-C based Python implementations.
 
    View Lookup
-     The act of finding and invoking the "best" :term:`view callable`
+     The act of finding and invoking the "best" :term:`view callable`,
      given a :term:`request` and a :term:`context` resource.
 
    Resource Location
@@ -840,7 +840,7 @@ Glossary
       information.
 
    Mako
-     `Mako <http://www.makotemplates.org/>`_ is a template language language
+     `Mako <http://www.makotemplates.org/>`_ is a template language
      which refines the familiar ideas of componentized layout and inheritance
      using Python with Python scoping and calling semantics.
 
@@ -921,7 +921,7 @@ Glossary
 
    PyPy
      PyPy is an "alternative implementation of the Python
-     language":http://pypy.org/
+     language": http://pypy.org/
 
    tween
      A bit of code that sits between the Pyramid router's main request
@@ -1015,8 +1015,7 @@ Glossary
 
    Green Unicorn
       Aka ``gunicorn``, a fast :term:`WSGI` server that runs on UNIX under
-      Python 2.5+ (although at the time of this writing does not support
-      Python 3).  See http://gunicorn.org/ for detailed information.
+      Python 2.6+ or Python 3.1+.  See http://gunicorn.org/ for detailed information.
 
    predicate factory
       A callable which is used by a third party during the registration of a

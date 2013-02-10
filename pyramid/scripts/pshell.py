@@ -9,6 +9,8 @@ from pyramid.paster import bootstrap
 
 from pyramid.paster import setup_logging
 
+from pyramid.scripts.common import parse_vars
+
 def main(argv=sys.argv, quiet=False):
     command = PShellCommand(argv, quiet)
     return command.run()
@@ -87,7 +89,7 @@ class PShellCommand(object):
         self.pshell_file_config(config_file)
 
         # bootstrap the environ
-        env = self.bootstrap[0](config_uri)
+        env = self.bootstrap[0](config_uri, options=parse_vars(self.args[1:]))
 
         # remove the closer from the env
         closer = env.pop('closer')

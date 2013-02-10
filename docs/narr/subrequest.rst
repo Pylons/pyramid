@@ -142,7 +142,7 @@ generated.  We can change this behavior; how to do so is described below in
 our discussion of the ``use_tweens`` argument.
 
 The :meth:`pyramid.request.Request.invoke_subrequest` API accepts two
-arguments: a positional argument ``request`` that must be provided, and and
+arguments: a positional argument ``request`` that must be provided, and
 ``use_tweens`` keyword argument that is optional; it defaults to ``False``.
 
 The ``request`` object passed to the API must be an object that implements
