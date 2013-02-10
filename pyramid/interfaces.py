@@ -744,10 +744,8 @@ class IResourceURL(Interface):
 class IContextURL(IResourceURL):
     """ An adapter which deals with URLs related to a context.
 
-    ..warning::
-
-      This interface is deprecated as of Pyramid 1.3 with the introduction of
-      IResourceURL.
+    .. deprecated:: 1.3
+       use IResourceURL instead.
     """
     # this class subclasses IResourceURL because request.resource_url looks
     # for IResourceURL via queryAdapter.  queryAdapter will find a deprecated
@@ -792,7 +790,7 @@ deprecated(
     'scheduled to be removed.   Use the '
     '"pyramid.config.Configurator.add_resource_url_adapter" method to register '
     'a class that implements "pyramid.interfaces.IResourceURL" instead. '
-    'See the "What\'s new In Pyramid 1.3" document for a further description.'
+    'See the "What\'s new In Pyramid 1.3" document for more details.'
     )
 
 class IPackageOverrides(Interface):
