@@ -50,20 +50,20 @@ extensions = [
     'sphinx.ext.doctest',
     'repoze.sphinx.autointerface',
     'sphinx.ext.viewcode',
-#    'sphinx.ext.intersphinx'
+    'sphinx.ext.intersphinx'
     ]
 
-# Looks for objects in other Pyramid projects
-## intersphinx_mapping = {
-##     'cookbook':
-##     ('http://docs.pylonsproject.org/projects/pyramid_cookbook/dev/', None),
-##     'handlers':
-##     ('http://docs.pylonsproject.org/projects/pyramid_handlers/dev/', None),
-##     'zcml':
-##     ('http://docs.pylonsproject.org/projects/pyramid_zcml/dev/', None),
-##     'jinja2':
-##     ('http://docs.pylonsproject.org/projects/pyramid_jinja2/dev/', None),
-##     }
+# Looks for objects in external projects
+intersphinx_mapping = {
+     'who': ('http://docs.repoze.org/who/2.0', None),
+     'python': ('http://docs.python.org', None),
+     'python3': ('http://docs.python.org/3', None),
+     'tstring':
+        ('http://docs.pylonsproject.org/projects/translationstring/en/latest',
+          None),
+     'venusian':
+	('http://docs.pylonsproject.org/projects/venusian/en/latest', None),
+}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
