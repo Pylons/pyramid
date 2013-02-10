@@ -203,7 +203,7 @@ Installing Distribute On Python 3
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ``setuptools`` doesn't work under Python 3.  Instead, you can use
-``distribute``, which is a fork of setuptools that does work on Python 3.  To
+``distribute``, which is a fork of setuptools.  To
 install it, first download `distribute_setup.py
 <http://python-distribute.org/distribute_setup.py>`_ then invoke it using the
 Python interpreter into which you want to install setuptools.
