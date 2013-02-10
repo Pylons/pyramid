@@ -62,7 +62,7 @@ intersphinx_mapping = {
         ('http://docs.pylonsproject.org/projects/translationstring/en/latest',
           None),
      'venusian':
-	('http://docs.pylonsproject.org/projects/venusian/en/latest', None),
+        ('http://docs.pylonsproject.org/projects/venusian/en/latest', None),
 }
 
 # Add any paths that contain templates here, relative to this directory.
