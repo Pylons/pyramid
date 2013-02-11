@@ -505,7 +505,7 @@ using the :func:`pyramid.paster.bootstrap` command in the body of your
 script.
 
 .. versionadded:: 1.1
-   This feature.
+   :func:`pyramid.paster.bootstrap`
 
 In the simplest case, :func:`pyramid.paster.bootstrap` can be used with a
 single argument, which accepts the :term:`PasteDeploy` ``.ini`` file
