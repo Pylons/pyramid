@@ -169,7 +169,6 @@ hood, when ``adict`` is a dictionary-like object, Python translates
 interpreter prompt if you don't believe us:
 
 .. code-block:: text
-   :linenos:
 
    Python 2.4.6 (#2, Apr 29 2010, 00:31:48) 
    [GCC 4.4.3] on linux2

@@ -31,10 +31,7 @@ The :meth:`~pyramid.config.Configurator.add_directive` method accepts two
 positional arguments: a method name and a callable object.  The callable
 object is usually a function that takes the configurator instance as its
 first argument and accepts other arbitrary positional and keyword arguments.
-For example:
-
-.. code-block:: python
-   :linenos:
+For example::
 
    from pyramid.events import NewRequest
    from pyramid.config import Configurator
@@ -49,10 +46,7 @@ For example:
 
 Once :meth:`~pyramid.config.Configurator.add_directive` is called, a user can
 then call the added directive by its given name as if it were a built-in
-method of the Configurator:
-
-.. code-block:: python
-   :linenos:
+method of the Configurator::
 
    def mysubscriber(event):
        print event.request
@@ -63,10 +57,7 @@ A call to :meth:`~pyramid.config.Configurator.add_directive` is often
 "hidden" within an ``includeme`` function within a "frameworky" package meant
 to be included as per :ref:`including_configuration` via
 :meth:`~pyramid.config.Configurator.include`.  For example, if you put this
-code in a package named ``pyramid_subscriberhelpers``:
-
-.. code-block:: python
-   :linenos:
+code in a package named ``pyramid_subscriberhelpers``::
 
    def includeme(config):
        config.add_directive('add_newrequest_subscriber',
@@ -76,7 +67,6 @@ The user of the add-on package ``pyramid_subscriberhelpers`` would then be
 able to install it and subsequently do:
 
 .. code-block:: python
-   :linenos:
 
    def mysubscriber(event):
        print event.request
@@ -99,10 +89,7 @@ An action is simply a dictionary that includes a :term:`discriminator`,
 possibly a callback function, and possibly other metadata used by Pyramid's
 action system.
 
-Here's an example directive which uses the "action" method:
-
-.. code-block:: python
-   :linenos:
+Here's an example directive which uses the "action" method::
 
    def add_jammyjam(config, jammyjam):
        def register():
@@ -183,10 +170,7 @@ method, including ``args``, ``kw``, ``order``, and ``introspectables``.
 
 ``args`` and ``kw`` exist as values, which, if passed, will be used as
 arguments to the ``callable`` function when it is called back.  For example
-our directive might use them like so:
-
-.. code-block:: python
-   :linenos:
+our directive might use them like so::
 
    def add_jammyjam(config, jammyjam):
        def register(*arg, **kw):
@@ -248,10 +232,7 @@ to Pyramid developers.
 
 Introspection values are set when a sequence of :term:`introspectable`
 objects is passed to the :meth:`~pyramid.config.Configurator.action` method.
-Here's an example of a directive which uses introspectables:
-
-.. code-block:: python
-   :linenos:
+Here's an example of a directive which uses introspectables::
 
    def add_jammyjam(config, value):
        def register():
@@ -307,10 +288,7 @@ in their index.
 Introspectable Relationships
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Two introspectables may have relationships between each other.
-
-.. code-block:: python
-   :linenos:
+Two introspectables may have relationships between each other::
 
    def add_jammyjam(config, value, template):
        def register():

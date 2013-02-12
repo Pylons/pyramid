@@ -135,10 +135,7 @@ decorator that decorates a method of that class.
 
 For instance, if you've got a class that has methods that represent "REST
 actions", all which are mapped to the same route, but different request
-methods, instead of this:
-
-.. code-block:: python
-   :linenos:
+methods, instead of this::
 
    from pyramid.view import view_config
    from pyramid.response import Response
@@ -159,10 +156,7 @@ methods, instead of this:
        def delete(self):
            return Response('delete')
 
-You can do this:
-
-.. code-block:: python
-   :linenos:
+You can do this::
 
    from pyramid.view import view_defaults
    from pyramid.view import view_config

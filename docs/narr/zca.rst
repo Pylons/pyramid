@@ -19,11 +19,7 @@ The Zope Component Architecture is referred to colloquially as the
 The ``zope.component`` API used to access data in a traditional Zope
 application can be opaque.  For example, here is a typical "unnamed
 utility" lookup using the :func:`zope.component.getUtility` global API
-as it might appear in a traditional Zope application:
-
-.. ignore-next-block
-.. code-block:: python
-   :linenos:
+as it might appear in a traditional Zope application::
 
    from pyramid.interfaces import ISettings
    from zope.component import getUtility
@@ -111,10 +107,7 @@ component registry has a method API that offers the same
 functionality; it can be used instead.  For example, presuming the
 ``registry`` value below is a Zope Component Architecture component
 registry, the following bit of code is equivalent to
-``zope.component.getUtility(IFoo)``:
-
-.. code-block:: python
-   :linenos:
+``zope.component.getUtility(IFoo)``::
 
    registry.getUtility(IFoo)
 
@@ -147,10 +140,7 @@ See :ref:`threadlocals_chapter` for more information about
 Enabling the ZCA Global API by Using ``hook_zca``
 +++++++++++++++++++++++++++++++++++++++++++++++++
 
-Consider the following bit of idiomatic :app:`Pyramid` startup code:
-
-.. code-block:: python
-   :linenos:
+Consider the following bit of idiomatic :app:`Pyramid` startup code::
 
    from zope.component import getGlobalSiteManager
    from pyramid.config import Configurator
@@ -184,10 +174,7 @@ always return the global ZCA registry (the one in
 To "fix" this and make the ZCA global APIs use the "current"
 :app:`Pyramid` registry, you need to call
 :meth:`~pyramid.config.Configurator.hook_zca` within your setup code.
-For example:
-
-.. code-block:: python
-   :linenos:
+For example::
 
    from zope.component import getGlobalSiteManager
    from pyramid.config import Configurator
@@ -200,10 +187,7 @@ For example:
 
 We've added a line to our original startup code, line number 6, which
 calls ``config.hook_zca()``.  The effect of this line under the hood
-is that an analogue of the following code is executed:
-
-.. code-block:: python
-   :linenos:
+is that an analogue of the following code is executed::
 
    from zope.component import getSiteManager
    from pyramid.threadlocal import get_current_registry
@@ -232,10 +216,7 @@ Enabling the ZCA Global API by Using The ZCA Global Registry
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 You can tell your :app:`Pyramid` application to use the ZCA global
-registry at startup time instead of constructing a new one:
-
-.. code-block:: python
-   :linenos:
+registry at startup time instead of constructing a new one::
 
    from zope.component import getGlobalSiteManager
    from pyramid.config import Configurator

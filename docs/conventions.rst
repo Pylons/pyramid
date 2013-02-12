@@ -42,10 +42,7 @@ style:
 
   :ref:`traversal_chapter`
 
-Code and configuration file blocks are presented in the following style:
-
-  .. code-block:: python
-     :linenos:
+Code and configuration file blocks are presented in the following style::
 
      def foo(abc):
          pass

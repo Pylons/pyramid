@@ -20,10 +20,7 @@ you to run some code as the result of every new request.
 
 Events in :app:`Pyramid` are always broadcast by the framework.
 However, they only become useful when you register a *subscriber*.  A
-subscriber is a function that accepts a single argument named `event`:
-
-.. code-block:: python
-   :linenos:
+subscriber is a function that accepts a single argument named `event`::
 
    def mysubscriber(event):
        print event
@@ -44,10 +41,7 @@ Configuring an Event Listener Imperatively
 You can imperatively configure a subscriber function to be called
 for some event type via the
 :meth:`~pyramid.config.Configurator.add_subscriber`
-method (see also :term:`Configurator`):
-
-.. code-block:: python
-  :linenos:
+method (see also :term:`Configurator`)::
 
   from pyramid.events import NewRequest
 
@@ -67,10 +61,7 @@ Configuring an Event Listener Using a Decorator
 -----------------------------------------------
 
 You can configure a subscriber function to be called for some event
-type via the :func:`pyramid.events.subscriber` function.
-
-.. code-block:: python
-  :linenos:
+type via the :func:`pyramid.events.subscriber` function::
 
   from pyramid.events import NewRequest
   from pyramid.events import subscriber
@@ -107,10 +98,7 @@ An Example
 ----------
 
 If you create event listener functions in a ``subscribers.py`` file in
-your application like so:
-
-.. code-block:: python
-   :linenos:
+your application like so::
 
    def handle_new_request(event):
        print 'request', event.request   
@@ -120,10 +108,7 @@ your application like so:
 
 You may configure these functions to be called at the appropriate
 times by adding the following code to your application's
-configuration startup:
-
-.. code-block:: python
-   :linenos:
+configuration startup::
 
    # config is an instance of pyramid.config.Configurator
 

@@ -205,10 +205,7 @@ class CallbackMethodsMixin(object):
         response once one is created.
 
         A 'callback' is a callable which accepts two positional
-        parameters: ``request`` and ``response``.  For example:
-
-        .. code-block:: python
-           :linenos:
+        parameters: ``request`` and ``response``.  For example::
 
            def cache_callback(request, response):
                'Set the cache_control max_age for the response'
@@ -249,10 +246,7 @@ class CallbackMethodsMixin(object):
         request processing.
 
         ``callback`` is a callable which accepts a single positional
-        parameter: ``request``.  For example:
-
-        .. code-block:: python
-           :linenos:
+        parameter: ``request``.  For example::
 
            import transaction
 

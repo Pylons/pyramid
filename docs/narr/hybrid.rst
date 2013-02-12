@@ -34,10 +34,7 @@ URL Dispatch Only
 
 An application that uses :term:`url dispatch` exclusively to map URLs to code
 will often have statements like this within application startup
-configuration:
-
-.. code-block:: python
-   :linenos:
+configuration::
 
    # config is an instance of pyramid.config.Configurator
 
@@ -60,10 +57,7 @@ Traversal Only
 ~~~~~~~~~~~~~~
 
 An application that uses only traversal will have view configuration
-declarations that look like this:
-
-.. code-block:: python
-   :linenos:
+declarations that look like this::
 
     # config is an instance of pyramid.config.Configurator
 
@@ -190,10 +184,7 @@ Using ``*traverse`` In a Route Pattern
 
 A hybrid application most often implies the inclusion of a route
 configuration that contains the special token ``*traverse`` at the end
-of a route's pattern:
-
-.. code-block:: python
-   :linenos:
+of a route's pattern::
 
    config.add_route('home', '{foo}/{bar}/*traverse')
 
@@ -227,10 +218,7 @@ it has no useful ``__getitem__`` method.  So we'll need to associate
 this route configuration with a custom root factory in order to
 create a useful hybrid application.  To that end, let's imagine that
 we've created a root factory that looks like so in a module named
-``routes.py``:
-
-.. code-block:: python
-   :linenos:
+``routes.py``::
 
    class Resource(object):
        def __init__(self, subobjects):
@@ -248,10 +236,7 @@ we've created a root factory that looks like so in a module named
 
 Above, we've defined a (bogus) resource tree that can be traversed, and a
 ``root_factory`` function that can be used as part of a particular route
-configuration statement:
-
-.. code-block:: python
-   :linenos:
+configuration statement::
 
    config.add_route('home', '{foo}/{bar}/*traverse',
                     factory='mypackage.routes.root_factory')
@@ -298,10 +283,7 @@ At this point, a suitable view callable will be found and invoked
 using :term:`view lookup` as described in :ref:`view_configuration`,
 but with a caveat: in order for view lookup to work, we need to define
 a view configuration that will match when :term:`view lookup` is
-invoked after a route matches:
-
-.. code-block:: python
-   :linenos:
+invoked after a route matches::
 
    config.add_route('home', '{foo}/{bar}/*traverse',
                     factory='mypackage.routes.root_factory')
@@ -328,10 +310,7 @@ The above ``mypackage.views.myview`` view callable will be invoked when:
 - the :term:`context` resource is any object.
 
 It is also possible to declare alternate views that may be invoked
-when a hybrid route is matched:
-
-.. code-block:: python
-   :linenos:
+when a hybrid route is matched::
 
    config.add_route('home', '{foo}/{bar}/*traverse',
                     factory='mypackage.routes.root_factory')
@@ -373,10 +352,7 @@ matches.  However, when you use the ``traverse`` argument or
 attribute, you have more control over how to compose a traversal path.
 
 Here's a use of the ``traverse`` pattern in a call to
-:meth:`~pyramid.config.Configurator.add_route`:
-
-.. code-block:: python
-   :linenos:
+:meth:`~pyramid.config.Configurator.add_route`::
 
    config.add_route('abc', '/articles/{article}/edit',
                     traverse='/{article}')
@@ -420,10 +396,7 @@ the route definition.  For example, the ``myproject.views.bazbuz``
 view below will be found if the route named ``abc`` below is matched
 and the ``PATH_INFO`` is ``/abc/bazbuz``, even though the view
 configuration statement does not have the ``route_name="abc"``
-attribute.
-
-.. code-block:: python
-   :linenos:
+attribute::
 
    config.add_route('abc', '/abc/*traverse', use_global_views=True)
    config.add_view('myproject.views.bazbuz', name='bazbuz')
@@ -448,10 +421,7 @@ it's useful to be able to influence this value.
 When ``*subpath`` exists in a pattern, no path is actually traversed,
 but the traversal algorithm will return a :term:`subpath` list implied
 by the capture value of ``*subpath``.  You'll see this pattern most
-commonly in route declarations that look like this:
-
-.. code-block:: python
-   :linenos:
+commonly in route declarations that look like this::
 
    from pryamid.static import static_view
 
@@ -485,10 +455,7 @@ It is an error to provide *both* a ``view`` argument to a :term:`route
 configuration` *and* a :term:`view configuration` which names a
 ``route_name`` that has no ``name`` value or the empty ``name`` value.  For
 example, this pair of declarations will generate a conflict error at startup
-time.
-
-.. code-block:: python
-   :linenos:
+time::
 
    config.add_route('home', '{foo}/{bar}/*traverse',
                     view='myproject.views.home')
@@ -497,18 +464,12 @@ time.
 This is because the ``view`` argument to the
 :meth:`~pyramid.config.Configurator.add_route` above is an *implicit*
 default view when that route matches.  ``add_route`` calls don't *need* to
-supply a view attribute.  For example, this ``add_route`` call:
-
-.. code-block:: python
-   :linenos:
+supply a view attribute.  For example, this ``add_route`` call::
 
    config.add_route('home', '{foo}/{bar}/*traverse',
                     view='myproject.views.home')
 
-Can also be spelled like so:
-
-.. code-block:: python
-   :linenos:
+Can also be spelled like so::
 
    config.add_route('home', '{foo}/{bar}/*traverse')
    config.add_view('myproject.views.home', route_name='home')
@@ -519,10 +480,7 @@ syntactical shortcut for the latter.
 Binding Extra Views Against a Route Configuration that Doesn't Have a ``*traverse`` Element In Its Pattern
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Here's another corner case that just makes no sense:
-
-.. code-block:: python
-   :linenos:
+Here's another corner case that just makes no sense::
 
    config.add_route('abc', '/abc', view='myproject.views.abc')
    config.add_view('myproject.views.bazbuz', name='bazbuz',
@@ -535,10 +493,7 @@ because the default view is always invoked when a route matches and when no
 post-match traversal is performed.
 
 To make the above view declaration useful, the special ``*traverse``
-token must end the route's pattern.  For example:
-
-.. code-block:: python
-   :linenos:
+token must end the route's pattern.  For example::
 
    config.add_route('abc', '/abc/*traverse', view='myproject.views.abc')
    config.add_view('myproject.views.bazbuz', name='bazbuz',

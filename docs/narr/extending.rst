@@ -72,10 +72,7 @@ extensible :app:`Pyramid` application: as a developer, you should factor any
 overrideable :term:`imperative configuration` you've created into functions
 which can be used via :meth:`pyramid.config.Configurator.include` rather than
 inlined as calls to methods of a :term:`Configurator` within the ``main``
-function in your application's ``__init__.py``.  For example, rather than:
-
-.. code-block:: python
-   :linenos:
+function in your application's ``__init__.py``.  For example, rather than::
 
    from pyramid.config import Configurator
 
@@ -85,10 +82,7 @@ function in your application's ``__init__.py``.  For example, rather than:
        config.add_view('myapp.views.view2', name='view2')
 
 You should move the calls to ``add_view`` outside of the (non-reusable)
-``if __name__ == '__main__'`` block, and into a reusable function:
-
-.. code-block:: python
-   :linenos:
+``if __name__ == '__main__'`` block, and into a reusable function::
 
    from pyramid.config import Configurator
 
@@ -145,10 +139,7 @@ override that uses :class:`pyramid.view.view_config` decorators or other
 
 If you just want to *extend* the application, you can run a :term:`scan`
 against the application's package, then add additional configuration that
-registers more views or routes.
-
-.. code-block:: python
-   :linenos:
+registers more views or routes::
 
    if __name__ == '__main__':
        config.scan('someotherpackage')
@@ -157,10 +148,7 @@ registers more views or routes.
 If you want to *override* configuration in the application, you *may* need to
 run :meth:`pyramid.config.Configurator.commit` after performing the scan of
 the original package, then add additional configuration that registers more
-views or routes which performs overrides.
-
-.. code-block:: python
-   :linenos:
+views or routes which performs overrides::
 
    if __name__ == '__main__':
        config.scan('someotherpackage')
@@ -231,20 +219,14 @@ created.  The new view code itself will usually be cut-n-paste copies of view
 callables from the original application with slight tweaks.
 
 For example, if the original application has the following
-``configure_views`` configuration method:
-
-.. code-block:: python
-   :linenos:
+``configure_views`` configuration method::
 
     def configure_views(config):
         config.add_view('theoriginalapp.views.theview', name='theview')
 
 You can override the first view configuration statement made by
 ``configure_views`` within the override package, after loading the original
-configuration function:
-
-.. code-block:: python
-   :linenos:
+configuration function::
 
    from pyramid.config import Configurator
    from originalapp import configure_views

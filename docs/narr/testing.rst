@@ -102,10 +102,7 @@ The use of the :func:`~pyramid.testing.setUp` and
 :func:`~pyramid.testing.tearDown` functions allows you to supply each unit
 test method in a test case with an environment that has an isolated registry
 and an isolated request for the duration of a single test.  Here's an example
-of using this feature:
-
-.. code-block:: python
-   :linenos:
+of using this feature::
 
    import unittest
    from pyramid import testing
@@ -131,10 +128,7 @@ arguments supported by these functions.
 If you also want to make :func:`~pyramid.get_current_request` return something
 other than ``None`` during the course of a single test, you can pass a
 :term:`request` object into the :func:`pyramid.testing.setUp` within the
-``setUp`` method of your test:
-
-.. code-block:: python
-   :linenos:
+``setUp`` method of your test::
 
    import unittest
    from pyramid import testing
@@ -166,10 +160,7 @@ context manager. The context manager will call
 :func:`pyramid.testing.setUp` before the code under test and
 :func:`pyramid.testing.tearDown` afterwards.
 
-This style is useful for small self-contained tests. For example:
-
-.. code-block:: python
-   :linenos:
+This style is useful for small self-contained tests. For example::
 
    import unittest
 
@@ -209,10 +200,7 @@ registry`, but typically register a "stub" or "dummy" feature in place of the
 "real" feature that the code would call if it was being run normally.
 
 For example, let's imagine you want to unit test a :app:`Pyramid` view
-function.
-
-.. code-block:: python
-   :linenos:
+function::
 
    from pyramid.security import has_permission
    from pyramid.httpexceptions import HTTPForbidden
@@ -238,10 +226,7 @@ application registry registrations for use under a unit testing framework
 without needing to invoke the actual application configuration implied by its
 ``main`` function.  For example, if you wanted to test the above ``view_fn``
 (assuming it lived in the package named ``my.package``), you could write a
-:class:`unittest.TestCase` that used the testing API.
-
-.. code-block:: python
-   :linenos:
+:class:`unittest.TestCase` that used the testing API::
 
    import unittest
    from pyramid import testing
@@ -343,10 +328,7 @@ Let's demonstrate this by showing an integration test for a view.  The below
 test assumes that your application's package name is ``myapp``, and that
 there is a ``views`` module in the app with a function with the name
 ``my_view`` in it that returns the response 'Welcome to this application'
-after accessing some values that require a fully set up environment.
-
-.. code-block:: python
-   :linenos:
+after accessing some values that require a fully set up environment::
 
    import unittest
 
@@ -399,10 +381,7 @@ The below test assumes that your application's package name is ``myapp``, and
 that there is a view that returns an HTML body when the root URL is invoked.
 It further assumes that you've added a ``tests_require`` dependency on the
 ``WebTest`` package within your ``setup.py`` file.  :term:`WebTest` is a
-functional testing package written by Ian Bicking.
-
-.. code-block:: python
-   :linenos:
+functional testing package written by Ian Bicking::
 
    import unittest
 
