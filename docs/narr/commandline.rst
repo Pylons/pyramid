@@ -223,10 +223,7 @@ By defining the ``setup`` callable, we will create the module
 ``myapp.lib.pshell`` containing a callable named ``setup`` that will receive
 the global environment before it is exposed to the shell. Here we mutate the
 environment's request as well as add a new value containing a WebTest version
-of the application to which we can easily submit requests.
-
-.. code-block:: python
-    :linenos:
+of the application to which we can easily submit requests::
 
     # myapp/lib/pshell.py
     from webtest import TestApp
@@ -509,9 +506,7 @@ script.
 
 In the simplest case, :func:`pyramid.paster.bootstrap` can be used with a
 single argument, which accepts the :term:`PasteDeploy` ``.ini`` file
-representing Pyramid your application configuration as a single argument:
-
-.. code-block:: python
+representing Pyramid your application configuration as a single argument::
 
    from pyramid.paster import bootstrap
    env = bootstrap('/path/to/my/development.ini')
@@ -577,9 +572,7 @@ which is wrapped in the Paste "translogger" middleware (which logs requests
 to the console).
 
 You can also specify a particular *section* of the PasteDeploy ``.ini`` file
-to load instead of ``main``:
-
-.. code-block:: python
+to load instead of ``main``::
 
    from pyramid.paster import bootstrap
    env = bootstrap('/path/to/my/development.ini#another')
@@ -600,9 +593,7 @@ is generally not what you want.
 
 So how do we make Pyramid generate the correct URLs?
 
-Assuming that you have a route configured in your application like so:
-
-.. code-block:: python
+Assuming that you have a route configured in your application like so::
 
    config.add_route('verify', '/verify/{code}')
 
@@ -611,9 +602,7 @@ handling requests from a certain base. For example, we want to simulate
 mounting our application at `https://example.com/prefix`, to ensure that
 the generated URLs are correct for our deployment. This can be done by
 either mutating the resulting request object, or more simply by constructing
-the desired request and passing it into :func:`~pyramid.paster.bootstrap`:
-
-.. code-block:: python
+the desired request and passing it into :func:`~pyramid.paster.bootstrap`::
 
    from pyramid.paster import bootstrap
    from pyramid.request import Request
@@ -623,9 +612,7 @@ the desired request and passing it into :func:`~pyramid.paster.bootstrap`:
    print env['request'].application_url
    # will print 'https://example.com/prefix'
 
-Now you can readily use Pyramid's APIs for generating URLs:
-
-.. code-block:: python
+Now you can readily use Pyramid's APIs for generating URLs::
 
    env['request'].route_url('verify', code='1337')
    # will return 'https://example.com/prefix/verify/1337'
@@ -634,9 +621,7 @@ Cleanup
 ~~~~~~~
 
 When your scripting logic finishes, it's good manners to call the ``closer``
-callback:
-
-.. code-block:: python
+callback::
 
    from pyramid.paster import bootstrap
    env = bootstrap('/path/to/my/development.ini')
@@ -651,9 +636,7 @@ Setting Up Logging
 By default, :func:`pyramid.paster.bootstrap` does not configure logging
 parameters present in the configuration file.  If you'd like to configure
 logging based on ``[logger]`` and related sections in the configuration file,
-use the following command:
-
-.. code-block:: python
+use the following command::
 
    import pyramid.paster
    pyramid.paster.setup_logging('/path/to/my/development.ini')
@@ -706,10 +689,7 @@ As an example, let's create some code that can be invoked by a console script
 that prints the deployment settings of a Pyramid application.  To do so,
 we'll pretend you have a distribution with a package in it named
 ``myproject``.  Within this package, we'll pretend you've added a
-``scripts.py`` module which contains the following code:
-
-.. code-block:: python
-   :linenos:
+``scripts.py`` module which contains the following code::
 
    # myproject.scripts module
 
@@ -765,10 +745,7 @@ defined in that config file.
 
 After adding this script to the package, you'll need to tell your
 distribution's ``setup.py`` about its existence.  Within your distribution's
-top-level directory your ``setup.py`` file will look something like this:
-
-.. code-block:: python
-   :linenos:
+top-level directory your ``setup.py`` file will look something like this::
 
    import os
 
@@ -820,10 +797,7 @@ module, and ``settings_show`` is the function in that module which contains
 the code you'd like to run as the result of someone invoking the
 ``show_settings`` script from their command line.
 
-The result will be something like:
-
-.. code-block:: python
-   :linenos:
+The result will be something like::
 
    import os
 

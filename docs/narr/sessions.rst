@@ -196,9 +196,7 @@ Using the ``session.flash`` Method
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To add a message to a flash message queue, use a session object's ``flash()``
-method:
-
-.. code-block:: python
+method::
 
    request.session.flash('mymessage')
 
@@ -220,9 +218,7 @@ page.  You can pass any name for your queue, but it must be a string.
 Each queue is independent, and can be popped by ``pop_flash()`` or
 examined via ``peek_flash()`` separately.  ``queue`` defaults to the
 empty string.  The empty string represents the default flash message
-queue.
-
-.. code-block:: python
+queue::
 
    request.session.flash(msg, 'myappsqueue')
 
@@ -314,9 +310,7 @@ Using the ``session.get_csrf_token`` Method
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To get the current CSRF token from the session, use the
-``session.get_csrf_token()`` method.
-
-.. code-block:: python
+``session.get_csrf_token()`` method::
 
    token = request.session.get_csrf_token()
 

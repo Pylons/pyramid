@@ -912,9 +912,7 @@ of the ``response.cache_control`` object to a non-``False`` value.  For
 example, the below view callable is configured with a ``@view_config``
 decorator that indicates any response from the view should be cached for 3600
 seconds.  However, the view itself prevents caching from taking place unless
-there's a ``should_cache`` GET or POST variable:
-
-.. code-block:: python
+there's a ``should_cache`` GET or POST variable::
 
    from pyramid.view import view_config
 

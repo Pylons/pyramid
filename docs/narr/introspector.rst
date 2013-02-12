@@ -593,9 +593,7 @@ Disabling Introspection
 
 You can disable Pyramid introspection by passing the flag
 ``introspection=False`` to the :term:`Configurator` constructor in your
-application setup:
-
-.. code-block:: python
+application setup::
 
    from pyramid.config import Configurator
    config = Configurator(..., introspection=False)

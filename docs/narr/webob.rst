@@ -262,9 +262,7 @@ This attribute is useful when you invoke a Pyramid view callable via
 e.g. jQuery's ``$.ajax`` function, which has the potential to send a request
 with a JSON-encoded body.
 
-Using ``request.json_body`` is equivalent to:
-
-.. code-block:: python
+Using ``request.json_body`` is equivalent to::
 
    from json import loads
    loads(request.body, encoding=request.charset)
@@ -290,17 +288,13 @@ When such a request reaches a view in your application, the
         print request.json_body
         return 'OK'
 
-For the above view, printed to the console will be:
-
-.. code-block:: python
+For the above view, printed to the console will be::
 
     {u'a': 1}
 
 For bonus points, here's a bit of client-side code that will produce a
 request that has a body suitable for reading via ``request.json_body`` using
-Python's ``urllib2`` instead of a Javascript AJAX request:
-
-.. code-block:: python
+Python's ``urllib2`` instead of a Javascript AJAX request::
 
     import urllib2
     import json        

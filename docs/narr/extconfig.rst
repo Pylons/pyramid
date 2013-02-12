@@ -64,9 +64,7 @@ code in a package named ``pyramid_subscriberhelpers``::
                             add_newrequest_subscriber)
 
 The user of the add-on package ``pyramid_subscriberhelpers`` would then be
-able to install it and subsequently do:
-
-.. code-block:: python
+able to install it and subsequently do::
 
    def mysubscriber(event):
        print event.request
@@ -120,9 +118,7 @@ resolved, a :exc:`ConfigurationConflictError` is raised and application
 startup is prevented.
 
 In our above example, therefore, if a consumer of our ``add_jammyjam``
-directive did this:
-
-.. code-block:: python
+directive did this::
 
    config.add_jammyjam('first')
    config.add_jammyjam('second')
@@ -145,9 +141,7 @@ declaratively ensure that the user doesn't provide ambiguous configuration
 statements.*
 
 But let's imagine that a consumer of ``add_jammyjam`` used it in such a way
-that no configuration conflicts are generated.
-
-.. code-block:: python
+that no configuration conflicts are generated::
 
    config.add_jammyjam('first')
 

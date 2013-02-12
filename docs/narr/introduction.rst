@@ -131,9 +131,7 @@ Decorator-based configuration
 If you like the idea of framework configuration statements living next to the
 code it configures, so you don't have to constantly switch between files to
 refer to framework configuration when adding new code, you can use Pyramid
-decorators to localize the configuration.  For example:
-
-.. code-block:: python
+decorators to localize the configuration.  For example::
 
    from pyramid.view import view_config
    from pyramid.response import Response

@@ -14,9 +14,7 @@ processing of a request.  Invoking a subrequest allows you to obtain a
 application while you're executing a different view callable within the same
 application.
 
-Here's an example application which uses a subrequest:
-
-.. code-block:: python
+Here's an example application which uses a subrequest::
 
    from wsgiref.simple_server import make_server
    from pyramid.config import Configurator
@@ -57,9 +55,7 @@ actually returns a *literal* Response object.  Any view callable that uses a
 renderer or which returns an object that can be interpreted by a response
 adapter when found and invoked via
 :meth:`pyramid.request.Request.invoke_subrequest` will return a Response
-object:
-
-.. code-block:: python
+object::
 
    from wsgiref.simple_server import make_server
    from pyramid.config import Configurator
@@ -100,9 +96,7 @@ happens to be a view callable.
 Note that, by default, if a view callable invoked by a subrequest raises an
 exception, the exception will be raised to the caller of
 :meth:`~pyramid.request.Request.invoke_subrequest` even if you have a
-:term:`exception view` configured:
-
-.. code-block:: python
+:term:`exception view` configured::
 
    from wsgiref.simple_server import make_server
    from pyramid.config import Configurator
@@ -161,9 +155,7 @@ are called by the exception view :term:`tween` as described in
 
 We can cause the subrequest to be run through the tween stack by passing
 ``use_tweens=True`` to the call to
-:meth:`~pyramid.request.Request.invoke_subrequest`, like this:
-
-.. code-block:: python
+:meth:`~pyramid.request.Request.invoke_subrequest`, like this::
 
    from wsgiref.simple_server import make_server
    from pyramid.config import Configurator

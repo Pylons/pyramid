@@ -214,18 +214,14 @@ Backwards Incompatibilities
   statements when using an "autocommitting" :term:`Configurator`.  In the
   past, it was possible to add a view which named a route name before adding
   a route with that name when you used an autocommitting configurator.  For
-  example:
-
-  .. code-block:: python
+  example::
 
      config = Configurator(autocommit=True)
      config.add_view('my.pkg.someview', route_name='foo')
      config.add_route('foo', '/foo')
 
   The above will raise an exception when the view attempts to add itself.
-  Now you must add the route before adding the view:
-
-  .. code-block:: python
+  Now you must add the route before adding the view::
 
      config = Configurator(autocommit=True)
      config.add_route('foo', '/foo')
@@ -236,9 +232,7 @@ Backwards Incompatibilities
   configurator API (the configurator returned by
   :func:`pyramid.testing.setUp` is an autocommitting configurator).  The
   right way to get around this is to use a default non-autocommitting
-  configurator, which does not have these directive ordering requirements:
-
-  .. code-block:: python
+  configurator, which does not have these directive ordering requirements::
 
      config = Configurator()
      config.add_view('my.pkg.someview', route_name='foo')

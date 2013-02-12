@@ -626,9 +626,7 @@ Here's how:
 
   If you've done any type conversion of your custom value, reset the
   converted values into the ``settings`` dictionary *before* you pass the
-  dictionary as ``settings`` to the :term:`Configurator`.  For example:
-
-  .. code-block:: python
+  dictionary as ``settings`` to the :term:`Configurator`.  For example::
 
      def main(global_config, **settings):
          # ...
@@ -646,9 +644,7 @@ Here's how:
 -  When creating an ``includeme`` function that will be later added to your 
    application's configuration you may access the ``settings`` dictionary
    through the instance of the :term:`Configurator` that is passed into the
-   function as its only argument.  For Example:
-  
-  .. code-block:: python
+   function as its only argument.  For Example::
      
      def includeme(config):
          settings = config.registry.settings
@@ -657,9 +653,7 @@ Here's how:
 - In the runtime code that you need to access the new settings value, find
   the value in the ``registry.settings`` dictionary and use it.  In
   :term:`view` code (or any other code that has access to the request), the
-  easiest way to do this is via ``request.registry.settings``.  For example:
-
-  .. code-block:: python
+  easiest way to do this is via ``request.registry.settings``.  For example::
 
      settings = request.registry.settings
      debug_frobnosticator = settings['debug_frobnosticator']
@@ -667,9 +661,7 @@ Here's how:
   If you wish to use the value in code that does not have access to the
   request and you wish to use the value, you'll need to use the
   :func:`pyramid.threadlocal.get_current_registry` API to obtain the current
-  registry, then ask for its ``settings`` attribute.  For example:
-
-  .. code-block:: python
+  registry, then ask for its ``settings`` attribute.  For example::
 
      registry = pyramid.threadlocal.get_current_registry()
      settings = registry.settings

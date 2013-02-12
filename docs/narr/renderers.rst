@@ -57,9 +57,7 @@ object serialization techniques.
 View configuration can vary the renderer associated with a view callable via
 the ``renderer`` attribute.  For example, this call to
 :meth:`~pyramid.config.Configurator.add_view` associates the ``json`` renderer
-with a view callable:
-
-.. code-block:: python
+with a view callable::
 
    config.add_view('myproject.views.my_view', renderer='json')
 
@@ -147,9 +145,7 @@ dictionary::
        return {'content':'Hello!'}
 
 The body of the response returned by such a view will be a string
-representing the ``str()`` serialization of the return value:
-
-.. code-block:: python
+representing the ``str()`` serialization of the return value::
 
    {'content': 'Hello!'}
 
@@ -181,9 +177,7 @@ render the returned dictionary to a JSON serialization::
        return {'content':'Hello!'}
 
 The body of the response returned by such a view will be a string
-representing the JSON serialization of the return value:
-
-.. code-block:: python
+representing the JSON serialization of the return value::
 
    '{"content": "Hello!"}'
 
@@ -284,9 +278,7 @@ cross-domain AJAX requests.
 
 Unlike other renderers, a JSONP renderer needs to be configured at startup
 time "by hand".  Configure a JSONP renderer using the
-:meth:`pyramid.config.Configurator.add_renderer` method:
-
-.. code-block:: python
+:meth:`pyramid.config.Configurator.add_renderer` method::
 
    from pyramid.config import Configurator
 
@@ -296,9 +288,7 @@ time "by hand".  Configure a JSONP renderer using the
 Once this renderer is registered via
 :meth:`~pyramid.config.Configurator.add_renderer` as above, you can use
 ``jsonp`` as the ``renderer=`` parameter to ``@view_config`` or
-:meth:`pyramid.config.Configurator.add_view`:
-
-.. code-block:: python
+:meth:`pyramid.config.Configurator.add_view`::
 
    from pyramid.view import view_config
 
@@ -560,9 +550,7 @@ Renderers can be registered imperatively using the
 :meth:`pyramid.config.Configurator.add_renderer` API.
 
 For example, to add a renderer which renders views which have a
-``renderer`` attribute that is a path that ends in ``.jinja2``:
-
-.. code-block:: python
+``renderer`` attribute that is a path that ends in ``.jinja2``::
 
    config.add_renderer('.jinja2', 'mypackage.MyJinja2Renderer')
 
@@ -630,9 +618,7 @@ There are essentially two different kinds of renderer factories:
 
 Here's an example of the registration of a simple renderer factory via
 :meth:`~pyramid.config.Configurator.add_renderer`, where ``config``
-is an instance of :meth:`pyramid.config.Configurator`:
-
-.. code-block:: python
+is an instance of :meth:`pyramid.config.Configurator`::
 
    config.add_renderer(name='amf', factory='my.package.MyAMFRenderer')
 
@@ -657,9 +643,7 @@ as its renderer value.  The ``name`` passed to the ``MyAMFRenderer``
 constructor will always be ``amf``.
 
 Here's an example of the registration of a more complicated renderer
-factory, which expects to be passed a filesystem path:
-
-.. code-block:: python
+factory, which expects to be passed a filesystem path::
 
    config.add_renderer(name='.jinja2', factory='my.package.MyJinja2Renderer')
 
@@ -696,9 +680,7 @@ You can associate more than one filename extension with the same existing
 renderer implementation as necessary if you need to use a different file
 extension for the same kinds of templates.  For example, to associate the
 ``.zpt`` extension with the Chameleon ZPT renderer factory, use the
-:meth:`pyramid.config.Configurator.add_renderer` method:
-
-.. code-block:: python
+:meth:`pyramid.config.Configurator.add_renderer` method::
 
    config.add_renderer('.zpt', 'pyramid.chameleon_zpt.renderer_factory')
 
@@ -707,9 +689,7 @@ After you do this, :app:`Pyramid` will treat templates ending in both the
 
 To change the default mapping in which files with a ``.pt`` extension are
 rendered via a Chameleon ZPT page template renderer, use a variation on the
-following in your application's startup code:
-
-.. code-block:: python
+following in your application's startup code::
 
    config.add_renderer('.pt', 'mypackage.pt_renderer')
 
@@ -719,9 +699,7 @@ in ``.pt``, replacing the default Chameleon ZPT renderer.
 
 To associate a *default* renderer with *all* view configurations (even
 ones which do not possess a ``renderer`` attribute), pass ``None`` as
-the ``name`` attribute to the renderer tag:
-
-.. code-block:: python
+the ``name`` attribute to the renderer tag::
 
    config.add_renderer(None, 'mypackage.json_renderer_factory')
 
