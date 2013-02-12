@@ -235,10 +235,7 @@ initialization code as necessary.  All kinds of views are easy to understand
 and use and operate similarly.  There is no phony distinction between them;
 they can be used for the same purposes.
 
-Here's a view callable defined as a function:
-
-.. code-block:: python
-   :linenos:
+Here's a view callable defined as a function::
 
    from pyramid.response import Response
    from pyramid.view import view_config
@@ -247,10 +244,7 @@ Here's a view callable defined as a function:
    def aview(request):
        return Response('one')
 
-Here's a few views defined as methods of a class instead:
-
-.. code-block:: python
-   :linenos:
+Here's a few views defined as methods of a class instead::
 
    from pyramid.response import Response
    from pyramid.view import view_config
@@ -322,10 +316,7 @@ assertion instead that the view returns "the right stuff" in the dictionary
 it returns.  You can write "real" unit tests instead of functionally testing
 all of your views.
 
-For example, instead of:
-
-.. code-block:: python
-   :linenos:
+For example, instead of::
 
     from pyramid.renderers import render_to_response
 
@@ -333,10 +324,7 @@ For example, instead of:
         return render_to_response('myapp:templates/mytemplate.pt', {'a':1},
                                   request=request)
 
-You can do this:
-
-.. code-block:: python
-   :linenos:
+You can do this::
 
     from pyramid.view import view_config
 
@@ -548,10 +536,7 @@ application that already has a bunch of routes, you can just use the
 within your application at a URL prefix.  It's not a big deal, and requires
 little up-front engineering effort.
 
-For example:
-
-.. code-block:: python
-   :linenos:
+For example::
 
    from pyramid.config import Configurator
 
@@ -622,18 +607,12 @@ usually return a dictionary from a view callable instead of a full-on
 :term:`Response` object.  But some frameworks allow you to return strings or
 tuples from view callables.  When frameworks allow for this, code looks
 slightly prettier, because fewer imports need to be done, and there is less
-code.  For example, compare this:
-
-.. code-block:: python
-   :linenos:
+code.  For example, compare this::
 
    def aview(request):
        return "Hello world!"
 
-To this:
-
-.. code-block:: python
-   :linenos:
+To this::
 
    from pyramid.response import Response
 
@@ -649,10 +628,7 @@ cases, and by default, Pyramid wants you to return a :term:`Response` object
 from a view callable.  This is because there's usually a heck of a lot more
 to a response object than just its body.  But if you're the kind of person
 who values such aesthetics, we have an easy way to allow for this sort of
-thing:
-
-.. code-block:: python
-   :linenos:
+thing::
 
    from pyramid.config import Configurator
    from pyramid.response import Response
@@ -667,10 +643,7 @@ thing:
        config.add_response_adapter(string_response_adapter, basestring)
 
 Do that once in your Pyramid application at startup.  Now you can return
-strings from any of your view callables, e.g.:
-
-.. code-block:: python
-   :linenos:
+strings from any of your view callables, e.g.::
 
    def helloview(request):
        return "Hello world!"
@@ -679,10 +652,7 @@ strings from any of your view callables, e.g.:
        return "Goodbye world!"
 
 Oh noes!  What if you want to indicate a custom content type?  And a custom
-status code?  No fear:
-
-.. code-block:: python
-   :linenos:
+status code?  No fear::
 
    from pyramid.config import Configurator
 
@@ -704,10 +674,7 @@ status code?  No fear:
        config.add_response_adapter(string_response_adapter, basestring)
        config.add_response_adapter(tuple_response_adapter, tuple)
 
-Once this is done, both of these view callables will work:
-
-.. code-block:: python
-   :linenos:
+Once this is done, both of these view callables will work::
 
    def aview(request):
        return "Hello world!"
@@ -726,10 +693,7 @@ See also :ref:`using_iresponse`.
 
 "Constructing these response objects in my view callables is such a chore!
 And I'm way too lazy to register a response adapter, as per the prior
-section," you say.  Fine.  Be that way:
-
-.. code-block:: python
-   :linenos:
+section," you say.  Fine.  Be that way::
 
    def aview(request):
        response = request.response
@@ -749,10 +713,7 @@ that we change Pyramid?  You can extend Pyramid's :term:`Configurator` with
 your own directives.  For example, let's say you find yourself calling
 :meth:`pyramid.config.Configurator.add_view` repetitively.  Usually you can
 take the boring away by using existing shortcuts, but let's say that this is
-a case where there is no such shortcut:
-
-.. code-block:: python
-   :linenos:
+a case where there is no such shortcut::
 
    from pyramid.config import Configurator
 
@@ -766,10 +727,7 @@ a case where there is no such shortcut:
                    xhr=True, permission='view', request_method='HEAD')
 
 Pretty tedious right?  You can add a directive to the Pyramid configurator to
-automate some of the tedium away:
-
-.. code-block:: python
-   :linenos:
+automate some of the tedium away::
 
    from pyramid.config import Configurator
 
@@ -785,10 +743,7 @@ automate some of the tedium away:
    config.add_directive('add_protected_xhr_views', add_protected_xhr_views)
 
 Once that's done, you can call the directive you've just added as a method of
-the Configurator object:
-
-.. code-block:: python
-   :linenos:
+the Configurator object::
 
    config.add_route('xhr_route', '/xhr/{id}')
    config.add_protected_xhr_views('my.package')
@@ -813,10 +768,7 @@ at the top of the screen based on an enumeration of views they registered.
 This is possible using Pyramid's :term:`introspector`.
 
 Here's an example of using Pyramid's introspector from within a view
-callable:
-
-.. code-block:: python
-   :linenos:
+callable::
 
     from pyramid.view import view_config
     from pyramid.response import Response

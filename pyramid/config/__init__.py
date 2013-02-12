@@ -654,10 +654,7 @@ class Configurator(
         configuration callable.
 
         For example, if the ``includeme`` function below lives in a module
-        named ``myapp.myconfig``:
-
-        .. code-block:: python
-           :linenos:
+        named ``myapp.myconfig``::
 
            # myapp.myconfig module
 
@@ -669,10 +666,7 @@ class Configurator(
                config.add_view(my_view)
 
         You might cause it to be included within your Pyramid application like
-        so:
-
-        .. code-block:: python
-           :linenos:
+        so::
 
            from pyramid.config import Configurator
 
@@ -681,10 +675,7 @@ class Configurator(
                config.include('myapp.myconfig.includeme')
 
         Because the function is named ``includeme``, the function name can
-        also be omitted from the dotted name reference:
-
-        .. code-block:: python
-           :linenos:
+        also be omitted from the dotted name reference::
 
            from pyramid.config import Configurator
 
@@ -702,10 +693,7 @@ class Configurator(
         callable will have their pattern prefixed with the value of
         ``route_prefix``. This can be used to help mount a set of routes at a
         different location than the included callable's author intended, while
-        still maintaining the same route names.  For example:
-
-        .. code-block:: python
-           :linenos:
+        still maintaining the same route names.  For example::
 
            from pyramid.config import Configurator
 

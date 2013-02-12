@@ -80,10 +80,7 @@ tree:
 See :ref:`traversal_chapter` for more information about how traversal
 works against resource instances.
 
-Here's a sample resource tree, represented by a variable named ``root``:
-
-.. code-block:: python
-   :linenos:
+Here's a sample resource tree, represented by a variable named ``root``::
 
     class Resource(dict):
         pass
@@ -93,10 +90,7 @@ Here's a sample resource tree, represented by a variable named ``root``:
 The resource tree we've created above is represented by a dictionary-like
 root object which has a single child named ``'a'``.  ``'a'`` has a single child
 named ``'b'``, and ``'b'`` has a single child named ``'c'``, which has no
-children. It is therefore possible to access the ``'c'`` leaf resource like so:
-
-.. code-block:: python
-   :linenos:
+children. It is therefore possible to access the ``'c'`` leaf resource like so::
 
    root['a']['b']['c']
 
@@ -134,10 +128,7 @@ reference to the resource's parent resource instance in the tree.  The
 refers to the resource via ``__getitem__``.
 
 The ``__parent__`` of the root resource should be ``None`` and its
-``__name__`` should be the empty string.  For instance:
-
-.. code-block:: python
-   :linenos:
+``__name__`` should be the empty string.  For instance::
 
    class MyRootResource(object):
        __name__ = ''
@@ -226,10 +217,7 @@ and path.  You can also pass extra arguments to
 :meth:`~pyramid.request.Request.resource_url` to influence the generated URL.
 
 The simplest call to :meth:`~pyramid.request.Request.resource_url` looks like
-this:
-
-.. code-block:: python
-   :linenos:
+this::
 
    url = request.resource_url(resource)
 
@@ -250,10 +238,7 @@ HTML pages rendered as the result of the default view of a resource are more
 apt to be relative to these resources than relative to their parent.
 
 You can also pass extra elements to
-:meth:`~pyramid.request.Request.resource_url`:
-
-.. code-block:: python
-   :linenos:
+:meth:`~pyramid.request.Request.resource_url`::
 
    url = request.resource_url(resource, 'foo', 'bar')
 
@@ -265,10 +250,7 @@ Any number of extra elements can be passed to
 When extra elements are passed, they are appended to the resource's URL.  A
 slash is not appended to the final segment when elements are passed.
 
-You can also pass a query string:
-
-.. code-block:: python
-   :linenos:
+You can also pass a query string::
 
    url = request.resource_url(resource, query={'a':'1'})
 
@@ -324,10 +306,7 @@ The ``__resource_url__`` method of a resource should return a string
 representing a URL.  If it cannot override the default, it should return
 ``None``.  If it returns ``None``, the default URL will be returned.
 
-Here's an example ``__resource_url__`` method.
-
-.. code-block:: python
-   :linenos:
+Here's an example ``__resource_url__`` method::
 
    class Resource(object):
        def __resource_url__(self, request, info):
@@ -352,10 +331,7 @@ Generating the Path To a Resource
 :func:`pyramid.traversal.resource_path` returns a string object representing
 the absolute physical path of the resource object based on its position in
 the resource tree.  Each segment of the path is separated with a slash
-character.
-
-.. code-block:: python
-   :linenos:
+character::
 
    from pyramid.traversal import resource_path
    url = resource_path(resource)
@@ -364,10 +340,7 @@ If ``resource`` in the example above was accessible in the tree as
 ``root['a']['b']``, the above example would generate the string ``/a/b``.
 
 Any positional arguments passed in to :func:`~pyramid.traversal.resource_path`
-will be appended as path segments to the end of the resource path.
-
-.. code-block:: python
-   :linenos:
+will be appended as path segments to the end of the resource path::
 
    from pyramid.traversal import resource_path
    url = resource_path(resource, 'foo', 'bar')
@@ -392,19 +365,13 @@ that place in the application's resource tree using
 :func:`pyramid.traversal.find_resource`.
 
 You can resolve an absolute path by passing a string prefixed with a ``/`` as
-the ``path`` argument:
-
-.. code-block:: python
-   :linenos:
+the ``path`` argument::
 
    from pyramid.traversal import find_resource
    url = find_resource(anyresource, '/path')
 
 Or you can resolve a path relative to the resource you pass in by passing a
-string that isn't prefixed by ``/``:
-
-.. code-block:: python
-   :linenos:
+string that isn't prefixed by ``/``::
 
    from pyramid.traversal import find_resource
    url = find_resource(anyresource, 'path')
@@ -431,10 +398,7 @@ Obtaining the Lineage of a Resource
 
 The :func:`~pyramid.location.lineage` function returns the resource it is
 passed, then each parent of the resource, in order.  For example, if the
-resource tree is composed like so:
-
-.. code-block:: python
-   :linenos:
+resource tree is composed like so::
 
    class Thing(object): pass
 
@@ -443,10 +407,7 @@ resource tree is composed like so:
    thing2.__parent__ = thing1
 
 Calling ``lineage(thing2)`` will return a generator.  When we turn it into a
-list, we will get:
-
-.. code-block:: python
-   :linenos:
+list, we will get::
 
    list(lineage(thing2))
    [ <Thing object at thing2>, <Thing object at thing1> ]
@@ -468,10 +429,7 @@ Determining if a Resource is In The Lineage of Another Resource
 Use the :func:`pyramid.location.inside` function to determine if one resource
 is in the :term:`lineage` of another resource.
 
-For example, if the resource tree is:
-
-.. code-block:: python
-   :linenos:
+For example, if the resource tree is::
 
    class Thing(object): pass
 
@@ -502,10 +460,7 @@ tree`.  The API accepts a single argument: ``resource``.  This is a resource
 that is :term:`location` aware.  It can be any resource in the tree for which
 you want to find the root.
 
-For example, if the resource tree is:
-
-.. code-block:: python
-   :linenos:
+For example, if the resource tree is::
 
    class Thing(object): pass
 
@@ -543,10 +498,7 @@ no reason to want to do this, you can skip reading this section of the
 chapter.
 
 For example, here's some code which describes a blog entry which also
-declares that the blog entry implements an :term:`interface`.
-
-.. code-block:: python
-   :linenos:
+declares that the blog entry implements an :term:`interface`::
 
    import datetime
    from zope.interface import implementer
@@ -580,10 +532,7 @@ You can also specify that a particular resource *instance* provides an
 interface, as opposed to its class.  When you declare that a class implements
 an interface, all instances of that class will also provide that interface.
 However, you can also just say that a single object provides the interface.
-To do so, use the :func:`zope.interface.directlyProvides` function:
-
-.. code-block:: python
-   :linenos:
+To do so, use the :func:`zope.interface.directlyProvides` function::
 
    import datetime
    from zope.interface import directlyProvides
@@ -605,10 +554,7 @@ To do so, use the :func:`zope.interface.directlyProvides` function:
 :func:`zope.interface.directlyProvides` will replace any existing interface
 that was previously provided by an instance.  If a resource object already
 has instance-level interface declarations that you don't want to replace, use
-the :func:`zope.interface.alsoProvides` function:
-
-.. code-block:: python
-   :linenos:
+the :func:`zope.interface.alsoProvides` function::
 
    import datetime
    from zope.interface import alsoProvides
@@ -648,10 +594,7 @@ Finding a Resource With a Class or Interface in Lineage
 Use the :func:`~pyramid.traversal.find_interface` API to locate a parent that
 is of a particular Python class, or which implements some :term:`interface`.
 
-For example, if your resource tree is composed as follows:
-
-.. code-block:: python
-   :linenos:
+For example, if your resource tree is composed as follows::
 
    class Thing1(object): pass
    class Thing2(object): pass

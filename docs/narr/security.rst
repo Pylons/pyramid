@@ -83,11 +83,7 @@ upon authentication.  Use the
 :meth:`~pyramid.config.Configurator.set_authentication_policy` and method
 during application setup to specify the authentication policy.
 
-For example:
-
-.. ignore-next-block
-.. code-block:: python
-   :linenos:
+For example::
 
    from pyramid.config import Configurator
    from pyramid.authentication import AuthTktAuthenticationPolicy
@@ -136,10 +132,7 @@ permissions whatever you like.
 For example, the following view declaration protects the view named
 ``add_entry.html`` when the context resource is of type ``Blog`` with the
 ``add`` permission using the :meth:`pyramid.config.Configurator.add_view`
-API:
-
-.. code-block:: python
-   :linenos:
+API::
 
    # config is an instance of pyramid.config.Configurator
 
@@ -149,11 +142,7 @@ API:
                    permission='add')
 
 The equivalent view registration including the ``add`` permission name
-may be performed via the ``@view_config`` decorator:
-
-.. ignore-next-block
-.. code-block:: python
-   :linenos:
+may be performed via the ``@view_config`` decorator::
 
    from pyramid.view import view_config
    from resources import Blog
@@ -229,10 +218,7 @@ instance-level security, or it can be defined on the resource *class* if you
 just need type-level security.
 
 For example, an ACL might be attached to the resource for a blog via its
-class:
-
-.. code-block:: python
-   :linenos:
+class::
 
    from pyramid.security import Everyone
    from pyramid.security import Allow
@@ -245,10 +231,7 @@ class:
            ]
 
 Or, if your resources are persistent, an ACL might be specified via the
-``__acl__`` attribute of an *instance* of a resource:
-
-.. code-block:: python
-   :linenos:
+``__acl__`` attribute of an *instance* of a resource::
 
    from pyramid.security import Everyone
    from pyramid.security import Allow
@@ -277,10 +260,7 @@ an object-by-object basis.
 Elements of an ACL
 ------------------
 
-Here's an example ACL:
-
-.. code-block:: python
-   :linenos:
+Here's an example ACL::
 
    from pyramid.security import Everyone
    from pyramid.security import Allow
@@ -316,10 +296,7 @@ For example, the
 information if you configure it with a ``callback``.
 
 Each ACE in an ACL is processed by an authorization policy *in the
-order dictated by the ACL*.  So if you have an ACL like this:
-
-.. code-block:: python
-   :linenos:
+order dictated by the ACL*.  So if you have an ACL like this::
 
    from pyramid.security import Everyone
    from pyramid.security import Allow
@@ -333,10 +310,7 @@ order dictated by the ACL*.  So if you have an ACL like this:
 The default authorization policy will *allow* everyone the view
 permission, even though later in the ACL you have an ACE that denies
 everyone the view permission.  On the other hand, if you have an ACL
-like this:
-
-.. code-block:: python
-   :linenos:
+like this::
 
    from pyramid.security import Everyone
    from pyramid.security import Allow
@@ -354,10 +328,7 @@ The third argument in an ACE can also be a sequence of permission
 names instead of a single permission name.  So instead of creating
 multiple ACEs representing a number of different permission grants to
 a single ``group:editors`` group, we can collapse this into a single
-ACE, as below.
-
-.. code-block:: python
-   :linenos:
+ACE, as below::
 
    from pyramid.security import Everyone
    from pyramid.security import Allow
@@ -427,10 +398,7 @@ the *last* ACE of an ACL to explicitly cause inheriting authorization
 policies to "stop looking up the traversal tree" (effectively breaking any
 inheritance).  For example, an ACL which allows *only* ``fred`` the view
 permission for a particular resource despite what inherited ACLs may say when
-the default authorization policy is in effect might look like so:
-
-.. code-block:: python
-   :linenos:
+the default authorization policy is in effect might look like so::
 
    from pyramid.security import Allow
    from pyramid.security import DENY_ALL
@@ -438,10 +406,7 @@ the default authorization policy is in effect might look like so:
    __acl__ = [ (Allow, 'fred', 'view'), DENY_ALL ]
 
 "Under the hood", the :data:`pyramid.security.DENY_ALL` ACE equals
-the following:
-
-.. code-block:: python
-   :linenos:
+the following::
 
    from pyramid.security import ALL_PERMISSIONS
    __acl__ = [ (Deny, Everyone, ALL_PERMISSIONS) ]
@@ -462,10 +427,7 @@ parents left.
 In order to allow the security machinery to perform ACL inheritance, resource
 objects must provide *location-awareness*.  Providing *location-awareness*
 means two things: the root object in the resource tree must have a
-``__name__`` attribute and a ``__parent__`` attribute.
-
-.. code-block:: python
-   :linenos:
+``__name__`` attribute and a ``__parent__`` attribute::
 
    class Blog(object):
        __name__ = ''
@@ -519,7 +481,6 @@ by setting the ``pyramid.debug_authorization`` key to ``true`` within the
 application's configuration section, e.g.:
 
 .. code-block:: ini
-  :linenos:
 
   [app:main]
   use = egg:MyProject
@@ -559,10 +520,7 @@ security policies (see :mod:`pyramid.authentication`).  However,
 creating your own authentication policy is often necessary when you
 want to control the "horizontal and vertical" of how your users
 authenticate.  Doing so is a matter of creating an instance of something
-that implements the following interface:
-
-.. code-block:: python
-   :linenos:
+that implements the following interface::
 
    class IAuthenticationPolicy(object):
        """ An object representing a Pyramid authentication policy. """
@@ -626,10 +584,7 @@ involve :term:`ACL` objects.
 policy, so you'll need to create your own if you'd like to use a
 different one.  Creating and using your own authorization policy is a
 matter of creating an instance of an object that implements the
-following interface:
-
-.. code-block:: python
-    :linenos:
+following interface::
 
     class IAuthorizationPolicy(object):
         """ An object representing a Pyramid authorization policy. """

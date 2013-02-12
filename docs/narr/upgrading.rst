@@ -134,10 +134,7 @@ the deprecation warning from being issued.  For example:
    OK
 
 In the above case, it's line #3 in the ``myproj.views`` module (``from
-pyramid.view import static``) that is causing the problem:
-
-.. code-block:: python
-   :linenos:
+pyramid.view import static``) that is causing the problem::
 
     from pyramid.view import view_config
 
@@ -145,10 +142,7 @@ pyramid.view import static``) that is causing the problem:
     myview = static('static', 'static')
 
 The deprecation warning tells me how to fix it, so I can change the code to
-do things the newer way:
-
-.. code-block:: python
-   :linenos:
+do things the newer way::
 
     from pyramid.view. import view_config
 

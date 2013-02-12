@@ -324,11 +324,7 @@ request when a database connection is involved.
 For example, let's say you have a ``mypackage`` :app:`Pyramid` application
 package that uses SQLAlchemy, and you'd like the current SQLAlchemy database
 session to be removed after each request.  Put the following in the
-``mypackage.__init__`` module:
-
-.. ignore-next-block
-.. code-block:: python
-   :linenos:
+``mypackage.__init__`` module::
 
    from mypackage.models import DBSession
 
@@ -459,10 +455,7 @@ Instantiating the Response
 
 Of course most of the time you just want to *make* a response.  
 Generally any attribute of the response can be passed in as a keyword
-argument to the class; e.g.:
-
-.. code-block:: python
-  :linenos:
+argument to the class; e.g.::
 
   from pyramid.response import Response
   response = Response(body='hello world!', content_type='text/plain')
@@ -489,11 +482,7 @@ Each class is named ``pyramid.httpexceptions.HTTP*``, where ``*`` is the
 reason for the error.  For instance,
 :class:`pyramid.httpexceptions.HTTPNotFound` subclasses
 :class:`pyramid.Response`, so you can manipulate the instances in the same
-way.  A typical example is:
-
-.. ignore-next-block
-.. code-block:: python
-    :linenos:
+way.  A typical example is::
 
     from pyramid.httpexceptions import HTTPNotFound
     from pyramid.httpexceptions import HTTPMovedPermanently

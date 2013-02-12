@@ -597,10 +597,7 @@ def testConfig(registry=None,
     All arguments are passed directly to :func:`pyramid.testing.testSetup`.
     If the ZCA is hooked, it will always be un-hooked in tearDown.
 
-    This context manager allows you to write test code like this:
-
-    .. code-block:: python
-        :linenos:
+    This context manager allows you to write test code like this::
 
         with testConfig() as config:
             config.add_route('bar', '/bar/{id}')

@@ -56,10 +56,7 @@ Defining a View Callable as a Function
 One of the easiest way to define a view callable is to create a function that
 accepts a single argument named ``request``, and which returns a
 :term:`Response` object.  For example, this is a "hello world" view callable
-implemented as a function:
-
-.. code-block:: python
-   :linenos:
+implemented as a function::
 
    from pyramid.response import Response
 
@@ -88,10 +85,7 @@ parameters.  Views defined as classes must have the following traits:
 - a ``__call__`` (or other) method that accepts no parameters and which
   returns a response.
 
-For example:
-
-.. code-block:: python
-   :linenos:
+For example::
 
    from pyramid.response import Response
 
@@ -125,10 +119,7 @@ View Callable Responses
 A view callable may return an object that implements the :app:`Pyramid`
 :term:`Response` interface.  The easiest way to return something that
 implements the :term:`Response` interface is to return a
-:class:`pyramid.response.Response` object instance directly.  For example:
-
-.. code-block:: python
-   :linenos:
+:class:`pyramid.response.Response` object instance directly.  For example::
 
    from pyramid.response import Response
 
@@ -184,10 +175,7 @@ either be *returned* or *raised* from within view code.  In either case
 
 For example, the :class:`pyramid.httpexceptions.HTTPUnauthorized` exception
 can be raised.  This will cause a response to be generated with a ``401
-Unauthorized`` status:
-
-.. code-block:: python
-   :linenos:
+Unauthorized`` status::
 
    from pyramid.httpexceptions import HTTPUnauthorized
 
@@ -195,10 +183,7 @@ Unauthorized`` status:
        raise HTTPUnauthorized()
 
 An HTTP exception, instead of being raised, can alternately be *returned*
-(HTTP exceptions are also valid response objects):
-
-.. code-block:: python
-   :linenos:
+(HTTP exceptions are also valid response objects)::
 
    from pyramid.httpexceptions import HTTPUnauthorized
 
@@ -211,10 +196,7 @@ accepts an HTTP status code and returns the corresponding HTTP exception.
 For example, instead of importing and constructing a
 :class:`~pyramid.httpexceptions.HTTPUnauthorized` response object, you can
 use the :func:`~pyramid.httpexceptions.exception_response` function to
-construct and return the same object.
-
-.. code-block:: python
-   :linenos:
+construct and return the same object::
 
    from pyramid.httpexceptions import exception_response
 
@@ -270,10 +252,7 @@ its superclasses as the ``context`` of a view configuration which points at a
 view callable you'd like to generate a response.
 
 For example, given the following exception class in a module named
-``helloworld.exceptions``:
-
-.. code-block:: python
-   :linenos:
+``helloworld.exceptions``::
 
    class ValidationFailure(Exception):
        def __init__(self, msg):
@@ -281,10 +260,7 @@ For example, given the following exception class in a module named
 
 
 You can wire a view callable to be called whenever any of your *other* code
-raises a ``helloworld.exceptions.ValidationFailure`` exception:
-
-.. code-block:: python
-   :linenos:
+raises a ``helloworld.exceptions.ValidationFailure`` exception::
 
    from pyramid.view import view_config
    from helloworld.exceptions import ValidationFailure
@@ -302,10 +278,7 @@ view code.  The same exception raised by a custom root factory, a custom
 traverser, or a custom view or route predicate is also caught and hooked.
 
 Other normal view predicates can also be used in combination with an
-exception view registration:
-
-.. code-block:: python
-   :linenos:
+exception view registration::
 
    from pyramid.view import view_config
    from helloworld.exceptions import ValidationFailure
@@ -363,20 +336,14 @@ instance of this class will cause the client to receive a "302 Found"
 response.
 
 To do so, you can *return* a :class:`pyramid.httpexceptions.HTTPFound`
-instance.
-
-.. code-block:: python
-   :linenos:
+instance::
 
    from pyramid.httpexceptions import HTTPFound
 
    def myview(request):
        return HTTPFound(location='http://example.com')
 
-Alternately, you can *raise* an HTTPFound exception instead of returning one.
-
-.. code-block:: python
-   :linenos:
+Alternately, you can *raise* an HTTPFound exception instead of returning one::
 
    from pyramid.httpexceptions import HTTPFound
 
@@ -432,7 +399,6 @@ As an example, let's assume that the following form page is served up to a
 browser client, and its ``action`` points at some :app:`Pyramid` view code:
 
 .. code-block:: xml
-   :linenos:
 
    <html xmlns="http://www.w3.org/1999/xhtml">
      <head>
@@ -452,20 +418,14 @@ browser client, and its ``action`` points at some :app:`Pyramid` view code:
 The ``myview`` view code in the :app:`Pyramid` application *must* expect that
 the values returned by ``request.params`` will be of type ``unicode``, as
 opposed to type ``str``. The following will work to accept a form post from
-the above form:
-
-.. code-block:: python
-   :linenos:
+the above form::
 
    def myview(request):
        firstname = request.params['firstname']
        lastname = request.params['lastname']
 
 But the following ``myview`` view code *may not* work, as it tries to decode
-already-decoded (``unicode``) values obtained from ``request.params``:
-
-.. code-block:: python
-   :linenos:
+already-decoded (``unicode``) values obtained from ``request.params``::
 
    def myview(request):
        # the .decode('utf-8') will break below if there are any high-order
@@ -535,10 +495,7 @@ request
 The following types work as view callables in this style:
 
 #. Functions that accept two arguments: ``context``, and ``request``,
-   e.g.:
-
-   .. code-block:: python
-	  :linenos:
+   e.g.::
 
 	  from pyramid.response import Response
 
@@ -546,10 +503,7 @@ The following types work as view callables in this style:
 		  return Response('OK')
 
 #. Classes that have an ``__init__`` method that accepts ``context,
-   request`` and a ``__call__`` method which accepts no arguments, e.g.:
-
-   .. code-block:: python
-	  :linenos:
+   request`` and a ``__call__`` method which accepts no arguments, e.g.::
 
 	  from pyramid.response import Response
 
@@ -562,10 +516,7 @@ The following types work as view callables in this style:
 			  return Response('OK')
 
 #. Arbitrary callables that have a ``__call__`` method that accepts
-   ``context, request``, e.g.:
-
-   .. code-block:: python
-	  :linenos:
+   ``context, request``, e.g.::
 
 	  from pyramid.response import Response
 

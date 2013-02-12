@@ -439,7 +439,6 @@ You can also turn the debug toolbar off by editing ``development.ini`` and
 commenting out a line.  For example, instead of:
 
 .. code-block:: ini
-   :linenos:
 
    [app:main]
    ...
@@ -449,7 +448,6 @@ commenting out a line.  For example, instead of:
 Put a hash mark at the beginning of the ``pyramid_debugtoolbar`` line:
 
 .. code-block:: ini
-   :linenos:
 
    [app:main]
    ...
@@ -463,7 +461,6 @@ Note that if you comment out the ``pyramid_debugtoolbar`` line, the ``#``
 first column instead, for example like this:
 
 .. code-block:: ini
-   :linenos:
 
    [app:main]
    ...
@@ -561,7 +558,6 @@ The generated ``development.ini`` file looks like so:
 
 .. literalinclude:: MyProject/development.ini
    :language: ini
-   :linenos:
 
 This file contains several sections including ``[app:main]``,
 ``[server:main]`` and several other sections related to logging
@@ -716,8 +712,6 @@ testing your application, packaging, and distributing your application.
 Our generated ``setup.py`` looks like this:
 
 .. literalinclude:: MyProject/setup.py
-   :language: python
-   :linenos:
 
 The ``setup.py`` file calls the setuptools ``setup`` function, which does
 various things depending on the arguments passed to ``setup.py`` on the
@@ -775,7 +769,6 @@ Our generated ``setup.cfg`` looks like this:
 
 .. literalinclude:: MyProject/setup.cfg
    :language: guess
-   :linenos:
 
 The values in the default setup file allow various commonly-used
 internationalization commands and testing commands to work more smoothly.
@@ -820,11 +813,9 @@ when you need help.
 We need a small Python module that configures our application and which
 advertises an entry point for use by our :term:`PasteDeploy` ``.ini`` file.
 This is the file named ``__init__.py``.  The presence of an ``__init__.py``
-also informs Python that the directory which contains it is a *package*.
+also informs Python that the directory which contains it is a *package*:
 
 .. literalinclude:: MyProject/myproject/__init__.py
-   :language: python
-   :linenos:
 
 #. Line 1 imports the :term:`Configurator` class from :mod:`pyramid.config`
    that we use later.
@@ -859,11 +850,9 @@ also informs Python that the directory which contains it is a *package*.
 Much of the heavy lifting in a :app:`Pyramid` application is done by *view
 callables*.  A :term:`view callable` is the main tool of a :app:`Pyramid` web
 application developer; it is a bit of code which accepts a :term:`request`
-and which returns a :term:`response`.
+and which returns a :term:`response`:
 
 .. literalinclude:: MyProject/myproject/views.py
-   :language: python
-   :linenos:
 
 Lines 4-6 define and register a :term:`view callable` named ``my_view``.  The
 function named ``my_view`` is decorated with a ``view_config`` decorator
@@ -933,11 +922,9 @@ functions themselves.  See :ref:`templates_used_directly` and
 ``tests.py``
 ~~~~~~~~~~~~
 
-The ``tests.py`` module includes unit tests for your application.
+The ``tests.py`` module includes unit tests for your application:
 
 .. literalinclude:: MyProject/myproject/tests.py
-   :language: python
-   :linenos:
 
 This sample ``tests.py`` file has a single unit test defined within it.  This
 test is executed when you run ``python setup.py test``.  You may add more

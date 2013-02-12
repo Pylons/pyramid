@@ -19,7 +19,6 @@ Hello World
 Here's one of the very simplest :app:`Pyramid` applications:
 
 .. literalinclude:: helloworld.py
-   :linenos:
 
 When this code is inserted into a Python script named ``helloworld.py`` and
 executed by a Python interpreter which has the :app:`Pyramid` software
@@ -61,7 +60,6 @@ The above ``helloworld.py`` script uses the following set of import
 statements:
 
 .. literalinclude:: helloworld.py
-   :linenos:
    :lines: 1-3
 
 The script imports the :class:`~pyramid.config.Configurator` class from the
@@ -84,7 +82,6 @@ The above script, beneath its set of imports, defines a function
 named ``hello_world``.
 
 .. literalinclude:: helloworld.py
-   :linenos:
    :pyobject: hello_world
 
 The function accepts a single argument (``request``) and it returns an
@@ -126,7 +123,6 @@ defined imports and function definitions, placed within the confines of an
 ``if`` statement:
 
 .. literalinclude:: helloworld.py
-   :linenos:
    :lines: 9-15
 
 Let's break this down piece-by-piece.
@@ -135,7 +131,6 @@ Configurator Construction
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. literalinclude:: helloworld.py
-   :linenos:
    :lines: 9-10
 
 The ``if __name__ == '__main__':`` line in the code sample above represents a
@@ -168,7 +163,6 @@ Adding Configuration
 
 .. ignore-next-block
 .. literalinclude:: helloworld.py
-   :linenos:
    :lines: 11-12
 
 First line above calls the :meth:`pyramid.config.Configurator.add_route`
@@ -188,7 +182,6 @@ WSGI Application Creation
 
 .. ignore-next-block
 .. literalinclude:: helloworld.py
-   :linenos:
    :lines: 13
 
 After configuring views and ending configuration, the script creates a WSGI
@@ -217,7 +210,6 @@ WSGI Application Serving
 
 .. ignore-next-block
 .. literalinclude:: helloworld.py
-   :linenos:
    :lines: 14-15
 
 Finally, we actually serve the application to requestors by starting up a

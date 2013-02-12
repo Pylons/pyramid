@@ -47,7 +47,6 @@ config file again:
 
 .. literalinclude:: MyProject/development.ini
    :language: ini
-   :linenos:
 
 The line in ``[app:main]`` above that says ``use = egg:MyProject`` is
 actually shorthand for a longer spelling: ``use = egg:MyProject#main``.  The
@@ -56,11 +55,9 @@ PasteDeploy.  ``egg:MyProject#main`` is a string which has meaning to
 PasteDeploy.  It points at a :term:`setuptools` :term:`entry point` named
 ``main`` defined in the ``MyProject`` project.
 
-Take a look at the generated ``setup.py`` file for this project.
+Take a look at the generated ``setup.py`` file for this project:
 
 .. literalinclude:: MyProject/setup.py
-   :language: python
-   :linenos:
 
 Note that the ``entry_point`` line in ``setup.py`` points at a string which
 looks a lot like an ``.ini`` file.  This string representation of an ``.ini``

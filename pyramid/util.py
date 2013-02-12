@@ -116,10 +116,7 @@ class InstancePropertyMixin(object):
         ``reify`` must be ``False``.
 
         If ``name`` is None, the name of the property will be computed
-        from the name of the ``callable``.
-
-        .. code-block:: python
-           :linenos:
+        from the name of the ``callable``::
 
            class Foo(InstancePropertyMixin):
                _x = 1

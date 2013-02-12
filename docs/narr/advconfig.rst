@@ -22,10 +22,7 @@ Conflict Detection
 ------------------
 
 Here's a familiar example of one of the simplest :app:`Pyramid` applications,
-configured imperatively:
-
-.. code-block:: python
-   :linenos:
+configured imperatively::
 
    from wsgiref.simple_server import make_server
    from pyramid.config import Configurator
@@ -46,7 +43,6 @@ try to add another view to the configuration with the same set of
 :term:`predicate` arguments as one we've already added?
 
 .. code-block:: python
-   :linenos:
 
    from wsgiref.simple_server import make_server
    from pyramid.config import Configurator
@@ -75,7 +71,6 @@ we try to start it again, it won't start.  Instead, we'll receive a traceback
 that ends something like this:
 
 .. code-block:: guess
-   :linenos:
 
    Traceback (most recent call last):
      File "app.py", line 12, in <module>
@@ -139,19 +134,13 @@ modify your configuration code accordingly.
 
 If you're getting a conflict while trying to extend an existing application,
 and that application has a function which performs configuration like this
-one:
-
-.. code-block:: python
-   :linenos:
+one::
 
    def add_routes(config):
        config.add_route(...)
 
 Don't call this function directly with ``config`` as an argument.  Instead,
-use :meth:`pyramid.config.Configuration.include`:
-
-.. code-block:: python
-   :linenos:
+use :meth:`pyramid.config.Configuration.include`::
 
    config.include(add_routes)
 
@@ -168,10 +157,7 @@ You can manually commit a configuration by using the
 :meth:`~pyramid.config.Configurator.commit` method between configuration
 calls.  For example, we prevent conflicts from occurring in the application
 we examined previously as the result of adding a ``commit``.  Here's the
-application that generates conflicts:
-
-.. code-block:: python
-   :linenos:
+application that generates conflicts::
 
    from wsgiref.simple_server import make_server
    from pyramid.config import Configurator
@@ -196,10 +182,7 @@ application that generates conflicts:
        server.serve_forever()
 
 We can prevent the two ``add_view`` calls from conflicting by issuing a call
-to :meth:`~pyramid.config.Configurator.commit` between them:
-
-.. code-block:: python
-   :linenos:
+to :meth:`~pyramid.config.Configurator.commit` between them::
 
    from wsgiref.simple_server import make_server
    from pyramid.config import Configurator
@@ -244,10 +227,7 @@ Using An Autocommitting Configurator
 ++++++++++++++++++++++++++++++++++++
 
 You can also use a heavy hammer to circumvent conflict detection by using a
-configurator constructor parameter: ``autocommit=True``.  For example:
-
-.. code-block:: python
-   :linenos:
+configurator constructor parameter: ``autocommit=True``.  For example::
 
    from pyramid.config import Configurator
 
@@ -324,19 +304,13 @@ Including Configuration from External Sources
 Some application programmers will factor their configuration code in such a
 way that it is easy to reuse and override configuration statements.  For
 example, such a developer might factor out a function used to add routes to
-his application:
-
-.. code-block:: python
-   :linenos:
+his application::
 
    def add_routes(config):
        config.add_route(...)
 
 Rather than calling this function directly with ``config`` as an argument.
-Instead, use :meth:`pyramid.config.Configuration.include`:
-
-.. code-block:: python
-   :linenos:
+Instead, use :meth:`pyramid.config.Configuration.include`::
 
    config.include(add_routes)
 
@@ -344,10 +318,7 @@ Using ``include`` rather than calling the function directly will allow
 :ref:`automatic_conflict_resolution` to work.
 
 :meth:`~pyramid.config.Configuration.include` can also accept a :term:`module`
-as an argument:
-
-.. code-block:: python
-   :linenos:
+as an argument::
 
    import myapp
 
@@ -381,18 +352,12 @@ constraints, execution order of configuration method calls is not important.
 For example, the relative ordering of
 :meth:`~pyramid.config.Configurator.add_view` and
 :meth:`~pyramid.config.Configurator.add_renderer` is unimportant when a
-non-autocommitting configurator is used.  This code snippet:
-
-.. code-block:: python
-   :linenos:
+non-autocommitting configurator is used.  This code snippet::
 
    config.add_view('some.view', renderer='path_to_custom/renderer.rn')
    config.add_renderer('.rn', SomeCustomRendererFactory)
 
-Has the same result as:
-
-.. code-block:: python
-   :linenos:
+Has the same result as::
 
    config.add_renderer('.rn', SomeCustomRendererFactory)
    config.add_view('some.view', renderer='path_to_custom/renderer.rn')

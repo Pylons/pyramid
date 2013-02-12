@@ -243,10 +243,7 @@ file in your application:
    pyramid.includes = pyramid_debugtoolbar
                       pyramid_tm
 
-Is equivalent to using the following statements in your configuration code:
-
-.. code-block:: python
-   :linenos:
+Is equivalent to using the following statements in your configuration code::
 
    from pyramid.config import Configurator
 
@@ -263,10 +260,7 @@ Plain Python
 ++++++++++++
 
 Using the following ``pyramid.includes`` setting in your plain-Python Pyramid
-application: 
-
-.. code-block:: python
-   :linenos:
+application::
 
    from pyramid.config import Configurator
 
@@ -274,10 +268,7 @@ application:
        settings = {'pyramid.includes':'pyramid_debugtoolbar pyramid_tm'}
        config = Configurator(settings=settings)
 
-Is equivalent to using the following statements in your configuration code:
-
-.. code-block:: python
-   :linenos:
+Is equivalent to using the following statements in your configuration code::
 
    from pyramid.config import Configurator
 
@@ -357,10 +348,7 @@ file in your application:
                     pyramid.tweens.excview_tween_factory
                     pyramid_tm.tm_tween_factory
 
-Is equivalent to using the following statements in your configuration code:
-
-.. code-block:: python
-   :linenos:
+Is equivalent to using the following statements in your configuration code::
 
    from pyramid.config import Configurator
  
@@ -532,7 +520,6 @@ Setting Name" column would go in the ``[app:main]`` section.  Here's
 an example of such a section:
 
 .. code-block:: ini
-  :linenos:
 
   [app:main]
   use = egg:MyProject
