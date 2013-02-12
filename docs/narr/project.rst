@@ -305,7 +305,9 @@ If you want to restrict access such that only a browser running on the same
 machine as Pyramid will be able to access your Pyramid application, edit the
 ``development.ini`` file, and replace the ``host`` value in the
 ``[server:main]`` section.  Change it from ``0.0.0.0`` to ``127.0.0.1``.  For
-example::
+example:
+
+.. code-block:: ini
 
    [server:main]
    use = egg:waitress#main
