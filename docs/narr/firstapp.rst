@@ -161,7 +161,6 @@ the application.
 Adding Configuration
 ~~~~~~~~~~~~~~~~~~~~
 
-.. ignore-next-block
 .. literalinclude:: helloworld.py
    :lines: 11-12
 
@@ -180,7 +179,6 @@ sure that it will be called when the ``hello`` route is matched.
 WSGI Application Creation
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. ignore-next-block
 .. literalinclude:: helloworld.py
    :lines: 13
 
@@ -208,7 +206,6 @@ to its ``add_view`` and ``add_route`` methods.
 WSGI Application Serving
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. ignore-next-block
 .. literalinclude:: helloworld.py
    :lines: 14-15
 
