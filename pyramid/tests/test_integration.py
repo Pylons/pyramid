@@ -634,6 +634,32 @@ class RendererScanAppTest(IntegrationBase, unittest.TestCase):
         res = testapp.get('/two', status=200)
         self.assertTrue(b'Two!' in res.body)
 
+class AcceptContentTypeTest(unittest.TestCase):
+    def setUp(self):
+        def hello_view(request):
+            return {'message': 'Hello!'}
+        from pyramid.config import Configurator
+        config = Configurator()
+        config.add_route('hello', '/hello')
+        config.add_view(hello_view, route_name='hello', accept='text/plain', renderer='string')
+        config.add_view(hello_view, route_name='hello', accept='application/json', renderer='json')
+        app = config.make_wsgi_app()
+        from webtest import TestApp
+        self.testapp = TestApp(app)
+
+    def test_ordering(self):
+        res = self.testapp.get('/hello', headers={'Accept': 'application/json; q=1.0, text/plain; q=0.9'}, status=200)
+        self.assertEqual(res.content_type, 'application/json')
+        res = self.testapp.get('/hello', headers={'Accept': 'text/plain; q=0.9, application/json; q=1.0'}, status=200)
+        self.assertEqual(res.content_type, 'application/json')
+
+    def test_wildcards(self):
+        res = self.testapp.get('/hello', headers={'Accept': 'application/*'}, status=200)
+        self.assertEqual(res.content_type, 'application/json')
+        res = self.testapp.get('/hello', headers={'Accept': 'text/*'}, status=200)
+        self.assertEqual(res.content_type, 'text/plain')
+
+
 class DummyContext(object):
     pass
 
