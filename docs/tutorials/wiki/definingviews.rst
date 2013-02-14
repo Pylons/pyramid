@@ -307,7 +307,7 @@ Our templates name a single static asset named ``pylons.css``.  We don't need
 to create this file within our package's ``static`` directory because it was
 provided at the time we created the project. This file is a little too long to
 replicate within the body of this guide, however it is available `online
-<http://github.com/Pylons/pyramid/blob/master/docs/tutorials/wiki/src/views/tutorial/static/pylons.css>`_.
+<https://github.com/Pylons/pyramid/blob/master/docs/tutorials/wiki/src/views/tutorial/static/pylons.css>`_.
 
 This CSS file will be accessed via
 e.g. ``/static/pylons.css`` by virtue of the call to

@@ -274,7 +274,7 @@ Bug Fixes
 
 - ``pyramid.view.render_view`` was not functioning properly under Python 3.x
   due to a byte/unicode discrepancy. See
-  http://github.com/Pylons/pyramid/issues/721
+  https://github.com/Pylons/pyramid/issues/721
 
 Deprecations
 ------------
