@@ -1030,7 +1030,7 @@ but its intended userbase is much the same.  Many others exist.  We've
 actually even (only as a teaching tool, not as any sort of official project)
 `created one using Pyramid <http://bfg.repoze.org/videos#groundhog1>`_ (the
 videos use BFG, a precursor to Pyramid, but the resulting code is `available
-for Pyramid too <http://github.com/Pylons/groundhog>`_). Microframeworks are
+for Pyramid too <https://github.com/Pylons/groundhog>`_). Microframeworks are
 small frameworks with one common feature: each allows its users to create a
 fully functional application that lives in a single Python file.
 
