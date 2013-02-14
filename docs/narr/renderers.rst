@@ -316,6 +316,7 @@ time "by hand".  Configure a JSONP renderer using the
 .. code-block:: python
 
    from pyramid.config import Configurator
+   from pyramid.renderers import JSONP
 
    config = Configurator()
    config.add_renderer('jsonp', JSONP(param_name='callback'))
