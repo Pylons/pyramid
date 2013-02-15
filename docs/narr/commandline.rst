@@ -505,7 +505,9 @@ script.
 
 In the simplest case, :func:`pyramid.paster.bootstrap` can be used with a
 single argument, which accepts the :term:`PasteDeploy` ``.ini`` file
-representing Pyramid your application configuration as a single argument::
+representing Pyramid your application configuration as a single argument:
+
+.. code-block:: python
 
    from pyramid.paster import bootstrap
    env = bootstrap('/path/to/my/development.ini')
@@ -571,7 +573,9 @@ which is wrapped in the Paste "translogger" middleware (which logs requests
 to the console).
 
 You can also specify a particular *section* of the PasteDeploy ``.ini`` file
-to load instead of ``main``::
+to load instead of ``main``:
+
+.. code-block:: python
 
    from pyramid.paster import bootstrap
    env = bootstrap('/path/to/my/development.ini#another')
@@ -601,7 +605,9 @@ handling requests from a certain base. For example, we want to simulate
 mounting our application at `https://example.com/prefix`, to ensure that
 the generated URLs are correct for our deployment. This can be done by
 either mutating the resulting request object, or more simply by constructing
-the desired request and passing it into :func:`~pyramid.paster.bootstrap`::
+the desired request and passing it into :func:`~pyramid.paster.bootstrap`:
+
+.. code-block:: python
 
    from pyramid.paster import bootstrap
    from pyramid.request import Request
