@@ -175,7 +175,7 @@ logger.
 
 To log messages to the package-specific logger configured in your ``.ini``
 file, simply create a logger object using the ``__name__`` builtin and call
-methods on it.:
+methods on it::
 
     import logging 
     log = logging.getLogger(__name__) 
