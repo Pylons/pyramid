@@ -146,7 +146,7 @@ name ``main`` as a section name:
 
 .. code-block:: text
 
-    chrism@thinko env26]$ bin/pshell starter/development.ini#main
+    $ bin/pshell starter/development.ini#main
     Python 2.6.5 (r265:79063, Apr 29 2010, 00:31:32) 
     [GCC 4.4.3] on linux2
     Type "help" for more information.
@@ -181,7 +181,7 @@ hash after the filename:
 
 .. code-block:: text
 
-    chrism@thinko env26]$ bin/pshell starter/development.ini
+    $ bin/pshell starter/development.ini
 
 Press ``Ctrl-D`` to exit the interactive shell (or ``Ctrl-Z`` on Windows).
 
@@ -241,7 +241,7 @@ exposed, and the request is configured to generate urls from the host
 
 .. code-block:: text
 
-    chrism@thinko env26]$ bin/pshell starter/development.ini
+    $ bin/pshell starter/development.ini
     Python 2.6.5 (r265:79063, Apr 29 2010, 00:31:32) 
     [GCC 4.4.3] on linux2
     Type "help" for more information.
@@ -283,8 +283,7 @@ specifically invoke one of your choice with the ``-p choice`` or
 
 .. code-block:: text
 
-   [chrism@vitaminf shellenv]$ ../bin/pshell -p ipython | bpython | python \
-                                development.ini#MyProject
+   $ ../bin/pshell -p ipython | bpython | python development.ini#MyProject
 
 .. index::
    pair: routes; printing
@@ -309,7 +308,7 @@ For example:
 .. code-block:: text
    :linenos:
 
-   [chrism@thinko MyProject]$ ../bin/proutes development.ini
+   $ ../bin/proutes development.ini
    Name            Pattern                        View
    ----            -------                        ----                     
    home            /                              <function my_view>
@@ -352,7 +351,7 @@ configured without any explicit tweens:
 .. code-block:: text
    :linenos:
 
-   [chrism@thinko pyramid]$ myenv/bin/ptweens development.ini 
+   $ myenv/bin/ptweens development.ini
    "pyramid.tweens" config value NOT set (implicitly ordered tweens used)
 
    Implicit Tween Chain
@@ -370,7 +369,7 @@ explicit tweens defined in its ``development.ini`` file:
 .. code-block:: text
    :linenos:
 
-   [chrism@thinko pyramid]$ ptweens development.ini  
+   $ ptweens development.ini
    "pyramid.tweens" config value set (explicitly ordered tweens used)
 
    Explicit Tween Chain (used)
@@ -848,9 +847,7 @@ with ``foo``.  Running it with two "omit" options (e.g. ``--omit=foo
 --omit=bar``) will omit all settings that have keys that start with either
 ``foo`` or ``bar``::
 
-  [chrism@thinko somevenv]$ bin/show_settings development.ini \
-                            --omit=pyramid \
-                            --omit=debugtoolbar
+  $ bin/show_settings development.ini --omit=pyramid --omit=debugtoolbar
   debug_routematch                             False               
   debug_templates                              True                
   reload_templates                             True                
