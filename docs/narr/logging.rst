@@ -28,19 +28,17 @@ application.  In particular, the :term:`PasteDeploy` ``development.ini`` and
 ``production.ini`` files created when you use a scaffold include a basic
 configuration for the Python :mod:`logging` package.
 
-PasteDeploy ``.ini`` files use the Python standard library `ConfigParser
-format <http://docs.python.org/lib/module-ConfigParser.html>`_; this the same
-format used as the Python `logging module's Configuration file format
-<http://docs.python.org/lib/logging-config-fileformat.html>`_.  The
-application-related and logging-related sections in the configuration file
+PasteDeploy ``.ini`` files use the Python standard library :mod:`ConfigParser
+format <ConfigParser>`; this is the same format used as the Python
+:ref:`logging module's Configuration file format <logging-config-fileformat>`.
+The application-related and logging-related sections in the configuration file
 can coexist peacefully, and the logging-related sections in the file are used
 from when you run ``pserve``.
 
 The ``pserve`` command calls the :func:`pyramid.paster.setup_logging`
-function, a thin wrapper around the `logging.fileConfig
-<http://docs.python.org/lib/logging-config-api.html>`_ using the specified
-ini file if it contains a ``[loggers]`` section (all of the
-scaffold-generated ``.ini`` files do). ``setup_logging`` reads the
+function, a thin wrapper around the :func:`logging.config.fileConfig`
+using the specified ``.ini`` file if it contains a ``[loggers]`` section
+(all of the scaffold-generated ``.ini`` files do). ``setup_logging`` reads the
 logging configuration from the ini file upon which ``pserve`` was
 invoked.
 
