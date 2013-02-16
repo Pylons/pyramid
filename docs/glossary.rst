@@ -324,8 +324,8 @@ Glossary
      `A full-featured Python web framework <http://djangoproject.com>`_.
 
    Pylons
-     `A lightweight Python web framework <http://pylonshq.com>`_ and a
-     predecessor of Pyramid.
+     `A lightweight Python web framework <http://docs.pylonsproject.org/projects/pylons-webframework/en/latest/>`_
+     and a predecessor of Pyramid.
 
    ZODB
       `Zope Object Database <http://zodb.org>`_, a
