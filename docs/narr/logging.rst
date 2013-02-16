@@ -334,7 +334,7 @@ To this:
                mypyramidapp
 
 Using PasteDeploy this way to form and serve a pipeline is equivalent to
-wrapping your app in a TransLogger instance via the bottom the ``main``
+wrapping your app in a TransLogger instance via the bottom of the ``main``
 function of your project's ``__init__`` file:
 
 .. code-block:: python 
