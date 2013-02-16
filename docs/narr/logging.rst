@@ -22,8 +22,8 @@ Logging Configuration
 ---------------------
 
 A :app:`Pyramid` project created from a :term:`scaffold` is configured to
-allow you to send messages to `Python standard library logging package
-<http://docs.python.org/library/logging.html>`_ loggers from within your
+allow you to send messages to :mod:`Python standard library logging package
+<logging>` loggers from within your
 application.  In particular, the :term:`PasteDeploy` ``development.ini`` and
 ``production.ini`` files created when you use a scaffold include a basic
 configuration for the Python :mod:`logging` package.
