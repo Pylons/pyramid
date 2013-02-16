@@ -18,7 +18,7 @@ Glossary
 
    response
      An object returned by a :term:`view callable` that represents response
-     data returned to the requesting user agent.  It must implements the
+     data returned to the requesting user agent.  It must implement the
      :class:`pyramid.interfaces.IResponse` interface.  A response object is
      typically an instance of the :class:`pyramid.response.Response` class or
      a subclass such as :class:`pyramid.httpexceptions.HTTPFound`.  See
