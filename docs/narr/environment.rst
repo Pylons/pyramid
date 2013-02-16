@@ -666,9 +666,9 @@ Here's how:
      def includeme(config):
          settings = config.registry.settings
          debug_frobnosticator = settings['debug_frobnosticator']
-     
-- In the runtime code that you need to access the new settings value, find
-  the value in the ``registry.settings`` dictionary and use it.  In
+
+- In the runtime code from where you need to access the new settings value,
+  find the value in the ``registry.settings`` dictionary and use it.  In
   :term:`view` code (or any other code that has access to the request), the
   easiest way to do this is via ``request.registry.settings``.  For example:
 
