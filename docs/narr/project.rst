@@ -829,7 +829,7 @@ also informs Python that the directory which contains it is a *package*.
 #. Line 1 imports the :term:`Configurator` class from :mod:`pyramid.config`
    that we use later.
 
-#. Lines 4-11 define a function named ``main`` that returns a :app:`Pyramid`
+#. Lines 4-11 defines a function named ``main`` that returns a :app:`Pyramid`
    WSGI application.  This function is meant to be called by the
    :term:`PasteDeploy` framework as a result of running ``pserve``.
 
@@ -865,7 +865,7 @@ and which returns a :term:`response`.
    :language: python
    :linenos:
 
-Lines 4-6 define and register a :term:`view callable` named ``my_view``.  The
+Lines 4-6 defines and registers a :term:`view callable` named ``my_view``.  The
 function named ``my_view`` is decorated with a ``view_config`` decorator
 (which is processed by the ``config.scan()`` line in our ``__init__.py``).
 The view_config decorator asserts that this view be found when a
