@@ -691,7 +691,7 @@ work properly.
 
 The ``setup.py`` file is a :term:`setuptools` setup file.  It is meant to be
 run directly from the command line to perform a variety of functions, such as
-testing your application, packaging, and distributing your application.
+testing, packaging, and distributing your application.
 
 .. note::
 
