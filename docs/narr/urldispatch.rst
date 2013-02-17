@@ -71,8 +71,6 @@ More commonly, you will not use any ``add_view`` statements in your project's
 :term:`scan` for to associate view callables with routes.  For example, if
 this is a portion of your project's ``__init__.py``::
 
-   # in your project's __init__.py (mypackage.__init__)
-
    config.add_route('myroute', '/prefix/{one}/{two}')
    config.scan('mypackage')
 
