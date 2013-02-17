@@ -68,7 +68,7 @@ invoked when the associated route pattern matches during a request.
 
 More commonly, you will not use any ``add_view`` statements in your project's
 "setup" code, instead only using ``add_route`` statements using a
-:term:`scan` for to associate view callables with routes.  For example, if
+:term:`scan` to associate view callables with routes.  For example, if
 this is a portion of your project's ``__init__.py``::
 
    config.add_route('myroute', '/prefix/{one}/{two}')
@@ -76,7 +76,7 @@ this is a portion of your project's ``__init__.py``::
 
 Note that we don't call :meth:`~pyramid.config.Configurator.add_view` in this
 setup code.  However, the above :term:`scan` execution
-``config.scan('mypackage')`` will pick up all :term:`configuration
+``config.scan('mypackage')`` will pick up each :term:`configuration
 decoration`, including any objects decorated with the
 :class:`pyramid.view.view_config` decorator in the ``mypackage`` Python
 package.  For example, if you have a ``views.py`` in your package, a scan will
