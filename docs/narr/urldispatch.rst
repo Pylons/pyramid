@@ -76,8 +76,6 @@ this is a portion of your project's ``__init__.py``:
 
 .. code-block:: python
 
-   # in your project's __init__.py (mypackage.__init__)
-
    config.add_route('myroute', '/prefix/{one}/{two}')
    config.scan('mypackage')
 
