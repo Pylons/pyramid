@@ -67,7 +67,7 @@ via its ``route_name`` predicate, that view callable will always be found and
 invoked when the associated route pattern matches during a request.
 
 More commonly, you will not use any ``add_view`` statements in your project's
-"setup" code, instead only using ``add_route`` statements using a
+"setup" code, instead only using ``add_route`` statements and using a
 :term:`scan` to associate view callables with routes.  For example, if
 this is a portion of your project's ``__init__.py``::
 
