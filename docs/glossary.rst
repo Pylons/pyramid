@@ -654,10 +654,9 @@ Glossary
       <http://en.wikipedia.org/wiki/Thread_(computer_science)>`_ used by the
       application may have a different value for this same "global" variable.
       :app:`Pyramid` uses a small number of thread local variables, as
-      described in :ref:`threadlocals_chapter`. See also the `threading.local
-      documentation
-      <http://docs.python.org/library/threading.html#threading.local>`_ for
-      more information.
+      described in :ref:`threadlocals_chapter`.
+      See also the :class:`stdlib documentation <threading.local>`
+      for more information.
 
    multidict
      An ordered dictionary that can have multiple values for each key. Adds
