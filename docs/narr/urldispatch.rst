@@ -90,8 +90,6 @@ that references ``myroute`` as a ``route_name`` parameter:
 
 .. code-block:: python
 
-   # in your project's views.py module (mypackage.views)
-
    from pyramid.view import view_config
    from pyramid.response import Response
 
