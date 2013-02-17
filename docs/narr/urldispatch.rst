@@ -83,8 +83,6 @@ package.  For example, if you have a ``views.py`` in your package, a scan will
 pick up any of its configuration decorators, so we can add one there
 that references ``myroute`` as a ``route_name`` parameter::
 
-   # in your project's views.py module (mypackage.views)
-
    from pyramid.view import view_config
    from pyramid.response import Response
 
