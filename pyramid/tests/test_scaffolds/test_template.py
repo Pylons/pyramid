@@ -37,10 +37,20 @@ class TestTemplate(unittest.TestCase):
         result = inst.render_template('{{a}}', {'a':None})
         self.assertEqual(result, b'')
 
-    def test_render_template_with_escaped_double_quotes(self):
+    def test_render_template_with_escaped_double_braces(self):
         inst = self._makeOne()
         result = inst.render_template('{{a}} {{b}} \{\{a\}\} \{\{c\}\}', {'a':'1', 'b':'2'})
         self.assertEqual(result, bytes_('1 2 {{a}} {{c}}'))
+
+    def test_render_template_with_breaking_escaped_braces(self):
+        inst = self._makeOne()
+        result = inst.render_template('{{a}} {{b}} \{\{a\} \{b\}\}', {'a':'1', 'b':'2'})
+        self.assertEqual(result, bytes_('1 2 \{\{a\} \{b\}\}'))
+
+    def test_render_template_with_escaped_single_braces(self):
+        inst = self._makeOne()
+        result = inst.render_template('{{a}} {{b}} \{a\} \{b', {'a':'1', 'b':'2'})
+        self.assertEqual(result, bytes_('1 2 \{a\} \{b'))
 
     def test_module_dir(self):
         import sys
