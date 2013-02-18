@@ -11,7 +11,7 @@ class TestTemplate(unittest.TestCase):
         inst = self._makeOne()
         result = inst.render_template('{{a}} {{b}}', {'a':'1', 'b':'2'})
         self.assertEqual(result, bytes_('1 2'))
-        
+
     def test_render_template_expr_failure(self):
         inst = self._makeOne()
         self.assertRaises(AttributeError, inst.render_template,
@@ -36,6 +36,11 @@ class TestTemplate(unittest.TestCase):
         inst = self._makeOne()
         result = inst.render_template('{{a}}', {'a':None})
         self.assertEqual(result, b'')
+
+    def test_render_template_with_escaped_double_quotes(self):
+        inst = self._makeOne()
+        result = inst.render_template('{{a}} {{b}} \{\{a\}\} \{\{c\}\}', {'a':'1', 'b':'2'})
+        self.assertEqual(result, bytes_('1 2 {{a}} {{c}}'))
 
     def test_module_dir(self):
         import sys
@@ -90,7 +95,7 @@ class TestTemplate(unittest.TestCase):
                           'overwrite':False,
                           'interactive':False,
                           })
-        
+
     def test_write_files_path_missing(self):
         L = []
         inst = self._makeOne()
@@ -132,9 +137,9 @@ class DummyOptions(object):
     simulate = False
     overwrite = False
     interactive = False
-        
+
 class DummyCommand(object):
     options = DummyOptions()
     verbosity = 1
-    
-    
+
+
