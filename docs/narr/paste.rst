@@ -21,7 +21,7 @@ of starting, stopping, and debugging an application.
 
 This chapter is not a replacement for documentation about PasteDeploy; it
 only contextualizes the use of PasteDeploy within Pyramid.  For detailed
-documentation, see http://pythonpaste.org.
+documentation, see http://pythonpaste.org/deploy/.
 
 PasteDeploy
 -----------
