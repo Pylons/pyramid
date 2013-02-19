@@ -238,7 +238,7 @@ registry API.
 
 :app:`Pyramid` framework developers were so concerned about conceptual load
 issues of the ZCA registry API for framework developers that a `replacement
-registry implementation <http://svn.repoze.org/repoze.component/trunk>`_
+registry implementation <https://github.com/repoze/repoze.component>`_
 named :mod:`repoze.component` was actually developed.  Though this package
 has a registry implementation which is fully functional and well-tested, and
 its API is much nicer than the ZCA registry API, work on it was largely

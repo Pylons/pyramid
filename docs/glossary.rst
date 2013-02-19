@@ -684,7 +684,7 @@ Glossary
      The C implementation of the Python language.  This is the
      reference implementation that most people refer to as simply
      "Python"; :term:`Jython`, Google's App Engine, and `PyPy
-     <http://codespeak.net/pypy/dist/pypy/doc/>`_ are examples of
+     <http://doc.pypy.org/en/latest/>`_ are examples of
      non-C based Python implementations.
 
    View Lookup
