@@ -518,7 +518,7 @@ Documentation Enhancements
 
 - Removed the "Running Pyramid on Google App Engine" tutorial from the main
   docs.  It survives on in the Cookbook
-  (http://docs.pylonsproject.org/projects/pyramid_cookbook/en/latest/gae.html).
+  (http://docs.pylonsproject.org/projects/pyramid_cookbook/en/latest/deployment/gae.html).
   Rationale: it provides the correct info for the Python 2.5 version of GAE
   only, and this version of Pyramid does not support Python 2.5.
 
