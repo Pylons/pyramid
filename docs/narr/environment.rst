@@ -533,7 +533,7 @@ for settings documented as such.  For example, you might start your
 .. code-block:: text
 
   $ PYRAMID_DEBUG_AUTHORIZATION=1 PYRAMID_RELOAD_TEMPLATES=1 \
-         bin/paster serve MyProject.ini
+         bin/pserve MyProject.ini
 
 If you started your application this way, your :app:`Pyramid`
 application would behave in the same manner as if you had placed the
