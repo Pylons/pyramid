@@ -485,7 +485,6 @@ The :term:`context` and :term:`request` arguments passed to a view function
 defined in this style can be defined as follows:
 
 context
-
   The :term:`resource` object found via tree :term:`traversal` or :term:`URL
   dispatch`.
 
