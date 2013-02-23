@@ -68,7 +68,7 @@ the registered view callable will be invoked.  The fewer number of predicates
 which are supplied to a particular view configuration, the more likely it is
 that the associated view callable will be invoked.  A view with five
 predicates will always be found and evaluated before a view with two, for
-example.  All predicates must match for the associated view to be called.
+example.
 
 This does not mean however, that :app:`Pyramid` "stops looking" when it
 finds a view registration with predicates that don't match.  If one set
