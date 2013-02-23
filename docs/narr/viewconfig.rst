@@ -38,11 +38,11 @@ A view configuration statement is made about information present in the
 
 View configuration is performed in one of two ways:
 
-- by running a :term:`scan` against application source code which has a
+- By running a :term:`scan` against application source code which has a
   :class:`pyramid.view.view_config` decorator attached to a Python object as
   per :ref:`mapping_views_using_a_decorator_section`.
 
-- by using the :meth:`pyramid.config.Configurator.add_view` method as per
+- By using the :meth:`pyramid.config.Configurator.add_view` method as per
   :ref:`mapping_views_using_imperative_config_section`.
 
 .. index::
