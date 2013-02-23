@@ -327,7 +327,7 @@ Exception views can be configured with any view registration mechanism:
 
 .. _http_redirect:
 
-Using a View Callable to Do an HTTP Redirect
+Using a View Callable to do an HTTP Redirect
 --------------------------------------------
 
 You can issue an HTTP redirect by using the
