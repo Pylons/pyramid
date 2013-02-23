@@ -492,7 +492,7 @@ Known Issues
   develop`` on Python 3.2, it will quit with an installation error while
   trying to install ``Pygments``.  If this happens, please just rerun the
   ``setup.py develop`` command again, and it will complete successfully.
-  This is due to a minor bug in SQLAlchemy 0.7.5 under Python 3, and will be
+  This is due to a minor bug in SQLAlchemy 0.7.5 under Python 3, and has been
   fixed in a later SQLAlchemy release.  Keep an eye on
   http://www.sqlalchemy.org/trac/ticket/2421
 
