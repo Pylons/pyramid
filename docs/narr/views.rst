@@ -499,7 +499,7 @@ The following types work as view callables in this style:
 	  from pyramid.response import Response
 
 	  def view(context, request):
-		  return Response('OK')
+              return Response('OK')
 
 #. Classes that have an ``__init__`` method that accepts ``context,
    request`` and a ``__call__`` method which accepts no arguments, e.g.::
@@ -507,12 +507,12 @@ The following types work as view callables in this style:
 	  from pyramid.response import Response
 
 	  class view(object):
-		  def __init__(self, context, request):
-			  self.context = context
-			  self.request = request
+              def __init__(self, context, request):
+                  self.context = context
+                  self.request = request
 
-		  def __call__(self):
-			  return Response('OK')
+              def __call__(self):
+                  return Response('OK')
 
 #. Arbitrary callables that have a ``__call__`` method that accepts
    ``context, request``, e.g.::
@@ -520,8 +520,8 @@ The following types work as view callables in this style:
 	  from pyramid.response import Response
 
 	  class View(object):
-		  def __call__(self, context, request):
-			  return Response('OK')
+              def __call__(self, context, request):
+                  return Response('OK')
 	  view = View() # this is the view callable
 
 This style of calling convention is most useful for :term:`traversal` based
