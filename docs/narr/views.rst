@@ -264,9 +264,9 @@ also be used by application developers to convert arbitrary exceptions to
 responses.
 
 To register a view that should be called whenever a particular exception is
-raised from with :app:`Pyramid` view code, use the exception class or one of
-its superclasses as the ``context`` of a view configuration which points at a
-view callable you'd like to generate a response.
+raised from within :app:`Pyramid` view code, use the exception class (or one of
+its superclasses) as the :term:`context` of a view configuration which points
+at a view callable you'd like to generate a response for.
 
 For example, given the following exception class in a module named
 ``helloworld.exceptions``:
