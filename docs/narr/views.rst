@@ -176,7 +176,7 @@ exception` objects.
 HTTP Exceptions
 ~~~~~~~~~~~~~~~
 
-All classes documented in the :mod:`pyramid.httpexceptions` module documented
+All :mod:`pyramid.httpexceptions` classes which are documented
 as inheriting from the :class:`pyramid.httpexceptions.HTTPException` are
 :term:`http exception` objects.  Instances of an HTTP exception object may
 either be *returned* or *raised* from within view code.  In either case
