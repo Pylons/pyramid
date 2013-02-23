@@ -15,9 +15,8 @@ Changing the Not Found View
 ---------------------------
 
 When :app:`Pyramid` can't map a URL to view code, it invokes a :term:`not
-found view`, which is a :term:`view callable`. A default notfound view
-exists.  The default not found view can be overridden through application
-configuration.
+found view`, which is a :term:`view callable`. The default Not Found View
+can be overridden through application configuration.
 
 If your application uses :term:`imperative configuration`, you can replace
 the Not Found view by using the
