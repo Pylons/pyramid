@@ -1447,7 +1447,7 @@ view/route predicate:
   subscriber predicates will assume a certain event type.
 
 Here's an example of a subscriber predicate that can be used in conjunction
-with a subscriber that subscribes to the :class:`pyramid.events.NewReqest`
+with a subscriber that subscribes to the :class:`pyramid.events.NewRequest`
 event type.
 
 .. code-block:: python
