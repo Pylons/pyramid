@@ -362,7 +362,7 @@ For example (Javascript):
    jqhxr = $.getJSON(api_url);
 
 The string ``callback=?`` above in the ``url`` param to the JQuery
-``getAjax`` function indicates to jQuery that the query should be made as
+``getJSON`` function indicates to jQuery that the query should be made as
 a JSONP request; the ``callback`` parameter will be automatically filled
 in for you and used.
 
