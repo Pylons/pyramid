@@ -720,7 +720,7 @@ factory, which expects to be passed a filesystem path:
 
 Adding the above code to your application startup will allow you to use the
 ``my.package.MyJinja2Renderer`` renderer factory implementation in view
-configurations by referring to any ``renderer`` which *ends in* ``.jinja`` in
+configurations by referring to any ``renderer`` which *ends in* ``.jinja2`` in
 the ``renderer`` attribute of a :term:`view configuration`:
 
 .. code-block:: python
