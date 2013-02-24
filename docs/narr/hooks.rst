@@ -694,7 +694,7 @@ represents the type of interface that must be possessed by the resource for
 this resource url factory to be found.  If the ``resource_iface`` argument is
 omitted, this resource url adapter will be used for *all* resources.
 
-The API that must be implemented by your a class that provides
+The API that must be implemented by a class that provides
 :class:`~pyramid.interfaces.IResourceURL` is as follows:
 
 .. code-block:: python
