@@ -475,7 +475,7 @@ Adding View Configuration Using the ``@view_config`` Decorator
 
 .. warning::
 
-   Using this feature tends to slows down application startup slightly, as
+   Using this feature tends to slow down application startup slightly, as
    more work is performed at application startup to scan for view
    configuration declarations.  For maximum startup performance, use the view
    configuration method described in
