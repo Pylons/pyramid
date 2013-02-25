@@ -293,7 +293,7 @@ configured view.
   This value can be any string or a sequence of strings.  A view declaration 
   with this argument ensures that the view will only be called when the 
   :term:`request` has a key in the ``request.params`` dictionary (an HTTP 
-  ``GET`` or ``POST`` variable) that has a name which matches the a 
+  ``GET`` or ``POST`` variable) that has a name which matches the
   supplied value.
 
   If any value supplied has a ``=`` sign in it,
