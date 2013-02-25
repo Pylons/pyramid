@@ -1,9 +1,8 @@
 import inspect
-import platform
 import sys
 import types
 
-if platform.system() == 'Windows': # pragma: no cover
+if sys.platform.startswith('win'): # pragma: no cover
     WIN = True
 else: # pragma: no cover
     WIN = False
