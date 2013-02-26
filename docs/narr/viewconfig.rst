@@ -706,11 +706,10 @@ this method are very similar to the arguments that you provide to the
    # pyramid.config.Configurator class
    config.add_view(hello_world, route_name='hello')
 
-The first argument, ``view``, is required.  It must either be a Python object
-which is the view itself or a :term:`dotted Python name` to such an object.
-In the above example, ``view`` is the ``hello_world`` function.  All other
-arguments are optional.  See :meth:`pyramid.config.Configurator.add_view` for
-more information.
+The first argument, a :term:`view callable`, is the only required argument.
+It must either be a Python object which is the view itself or a
+:term:`dotted Python name` to such an object.
+In the above example, the ``view callable`` is the ``hello_world`` function.
 
 When you use only :meth:`~pyramid.config.Configurator.add_view` to add view
 configurations, you don't need to issue a :term:`scan` in order for the view
