@@ -146,7 +146,7 @@ name ``main`` as a section name:
 
 .. code-block:: text
 
-    chrism@thinko env26]$ bin/pshell starter/development.ini#main
+    $ bin/pshell starter/development.ini#main
     Python 2.6.5 (r265:79063, Apr 29 2010, 00:31:32) 
     [GCC 4.4.3] on linux2
     Type "help" for more information.
@@ -181,7 +181,7 @@ hash after the filename:
 
 .. code-block:: text
 
-    chrism@thinko env26]$ bin/pshell starter/development.ini
+    $ bin/pshell starter/development.ini
 
 Press ``Ctrl-D`` to exit the interactive shell (or ``Ctrl-Z`` on Windows).
 
@@ -223,10 +223,7 @@ By defining the ``setup`` callable, we will create the module
 ``myapp.lib.pshell`` containing a callable named ``setup`` that will receive
 the global environment before it is exposed to the shell. Here we mutate the
 environment's request as well as add a new value containing a WebTest version
-of the application to which we can easily submit requests.
-
-.. code-block:: python
-    :linenos:
+of the application to which we can easily submit requests::
 
     # myapp/lib/pshell.py
     from webtest import TestApp
@@ -244,7 +241,7 @@ exposed, and the request is configured to generate urls from the host
 
 .. code-block:: text
 
-    chrism@thinko env26]$ bin/pshell starter/development.ini
+    $ bin/pshell starter/development.ini
     Python 2.6.5 (r265:79063, Apr 29 2010, 00:31:32) 
     [GCC 4.4.3] on linux2
     Type "help" for more information.
@@ -286,8 +283,7 @@ specifically invoke one of your choice with the ``-p choice`` or
 
 .. code-block:: text
 
-   [chrism@vitaminf shellenv]$ ../bin/pshell -p ipython | bpython | python \
-                                development.ini#MyProject
+   $ ../bin/pshell -p ipython | bpython | python development.ini#MyProject
 
 .. index::
    pair: routes; printing
@@ -312,7 +308,7 @@ For example:
 .. code-block:: text
    :linenos:
 
-   [chrism@thinko MyProject]$ ../bin/proutes development.ini
+   $ ../bin/proutes development.ini
    Name            Pattern                        View
    ----            -------                        ----                     
    home            /                              <function my_view>
@@ -321,8 +317,8 @@ For example:
    static/         static/*subpath                <static_view object>
    catchall        /*subpath                      <function static_view>
 
-``proutes`` generates a table.  The table has three columns: a Name
-column, a Pattern column, and a View column.  The items listed in the
+``proutes`` generates a table with three columns: *Name*, *Pattern*,
+and *View*.  The items listed in the
 Name column are route names, the items listed in the Pattern column are route
 patterns, and the items listed in the View column are representations of the
 view callable that will be invoked when a request matches the associated
@@ -355,7 +351,7 @@ configured without any explicit tweens:
 .. code-block:: text
    :linenos:
 
-   [chrism@thinko pyramid]$ myenv/bin/ptweens development.ini 
+   $ myenv/bin/ptweens development.ini
    "pyramid.tweens" config value NOT set (implicitly ordered tweens used)
 
    Implicit Tween Chain
@@ -373,7 +369,7 @@ explicit tweens defined in its ``development.ini`` file:
 .. code-block:: text
    :linenos:
 
-   [chrism@thinko pyramid]$ ptweens development.ini  
+   $ ptweens development.ini
    "pyramid.tweens" config value set (explicitly ordered tweens used)
 
    Explicit Tween Chain (used)
@@ -399,7 +395,7 @@ Here's the application configuration section of the ``development.ini`` used
 by the above ``ptweens`` command which reports that the explicit tween chain
 is used:
 
-.. code-block:: text
+.. code-block:: ini
    :linenos:
 
    [app:main]
@@ -600,9 +596,7 @@ is generally not what you want.
 
 So how do we make Pyramid generate the correct URLs?
 
-Assuming that you have a route configured in your application like so:
-
-.. code-block:: python
+Assuming that you have a route configured in your application like so::
 
    config.add_route('verify', '/verify/{code}')
 
@@ -623,9 +617,7 @@ the desired request and passing it into :func:`~pyramid.paster.bootstrap`:
    print env['request'].application_url
    # will print 'https://example.com/prefix'
 
-Now you can readily use Pyramid's APIs for generating URLs:
-
-.. code-block:: python
+Now you can readily use Pyramid's APIs for generating URLs::
 
    env['request'].route_url('verify', code='1337')
    # will return 'https://example.com/prefix/verify/1337'
@@ -634,9 +626,7 @@ Cleanup
 ~~~~~~~
 
 When your scripting logic finishes, it's good manners to call the ``closer``
-callback:
-
-.. code-block:: python
+callback::
 
    from pyramid.paster import bootstrap
    env = bootstrap('/path/to/my/development.ini')
@@ -651,9 +641,7 @@ Setting Up Logging
 By default, :func:`pyramid.paster.bootstrap` does not configure logging
 parameters present in the configuration file.  If you'd like to configure
 logging based on ``[logger]`` and related sections in the configuration file,
-use the following command:
-
-.. code-block:: python
+use the following command::
 
    import pyramid.paster
    pyramid.paster.setup_logging('/path/to/my/development.ini')
@@ -706,10 +694,7 @@ As an example, let's create some code that can be invoked by a console script
 that prints the deployment settings of a Pyramid application.  To do so,
 we'll pretend you have a distribution with a package in it named
 ``myproject``.  Within this package, we'll pretend you've added a
-``scripts.py`` module which contains the following code:
-
-.. code-block:: python
-   :linenos:
+``scripts.py`` module which contains the following code::
 
    # myproject.scripts module
 
@@ -765,10 +750,7 @@ defined in that config file.
 
 After adding this script to the package, you'll need to tell your
 distribution's ``setup.py`` about its existence.  Within your distribution's
-top-level directory your ``setup.py`` file will look something like this:
-
-.. code-block:: python
-   :linenos:
+top-level directory your ``setup.py`` file will look something like this::
 
    import os
 
@@ -820,10 +802,7 @@ module, and ``settings_show`` is the function in that module which contains
 the code you'd like to run as the result of someone invoking the
 ``show_settings`` script from their command line.
 
-The result will be something like:
-
-.. code-block:: python
-   :linenos:
+The result will be something like::
 
    import os
 
@@ -874,9 +853,7 @@ with ``foo``.  Running it with two "omit" options (e.g. ``--omit=foo
 --omit=bar``) will omit all settings that have keys that start with either
 ``foo`` or ``bar``::
 
-  [chrism@thinko somevenv]$ bin/show_settings development.ini \
-                            --omit=pyramid \
-                            --omit=debugtoolbar
+  $ bin/show_settings development.ini --omit=pyramid --omit=debugtoolbar
   debug_routematch                             False               
   debug_templates                              True                
   reload_templates                             True                

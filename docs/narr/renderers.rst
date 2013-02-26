@@ -6,10 +6,7 @@ Renderers
 A view callable needn't *always* return a :term:`Response` object.  If a view
 happens to return something which does not implement the Pyramid Response
 interface, :app:`Pyramid` will attempt to use a :term:`renderer` to construct
-a response.  For example:
-
-.. code-block:: python
-   :linenos:
+a response.  For example::
 
    from pyramid.view import view_config
 
@@ -60,9 +57,7 @@ object serialization techniques.
 View configuration can vary the renderer associated with a view callable via
 the ``renderer`` attribute.  For example, this call to
 :meth:`~pyramid.config.Configurator.add_view` associates the ``json`` renderer
-with a view callable:
-
-.. code-block:: python
+with a view callable::
 
    config.add_view('myproject.views.my_view', renderer='json')
 
@@ -85,10 +80,7 @@ returns a Response object directly, any renderer associated with the view
 configuration is ignored, and the response is passed back to :app:`Pyramid`
 unchanged.  For example, if your view callable returns an instance of the
 :class:`pyramid.response.Response` class as a response, no renderer
-will be employed.
-
-.. code-block:: python
-   :linenos:
+will be employed::
 
    from pyramid.response import Response
    from pyramid.view import view_config
@@ -97,10 +89,7 @@ will be employed.
    def view(request):
        return Response('OK') # json renderer avoided
 
-Likewise for an :term:`HTTP exception` response:
-
-.. code-block:: python
-   :linenos:
+Likewise for an :term:`HTTP exception` response::
 
    from pyramid.httpexceptions import HTTPFound
    from pyramid.view import view_config
@@ -110,10 +99,7 @@ Likewise for an :term:`HTTP exception` response:
        return HTTPFound(location='http://example.com') # json renderer avoided
 
 You can of course also return the ``request.response`` attribute instead to
-avoid rendering:
-
-.. code-block:: python
-   :linenos:
+avoid rendering::
 
    from pyramid.view import view_config
 
@@ -150,10 +136,7 @@ is not ``str()`` -ified.
 Here's an example of a view that returns a dictionary.  If the ``string``
 renderer is specified in the configuration for this view, the view will
 render the returned dictionary to the ``str()`` representation of the
-dictionary:
-
-.. code-block:: python
-   :linenos:
+dictionary::
 
    from pyramid.view import view_config
 
@@ -162,9 +145,7 @@ dictionary:
        return {'content':'Hello!'}
 
 The body of the response returned by such a view will be a string
-representing the ``str()`` serialization of the return value:
-
-.. code-block:: python
+representing the ``str()`` serialization of the return value::
 
    {'content': 'Hello!'}
 
@@ -187,10 +168,7 @@ the response content-type to ``application/json``.
 
 Here's an example of a view that returns a dictionary.  Since the ``json``
 renderer is specified in the configuration for this view, the view will
-render the returned dictionary to a JSON serialization:
-
-.. code-block:: python
-   :linenos:
+render the returned dictionary to a JSON serialization::
 
    from pyramid.view import view_config
 
@@ -199,9 +177,7 @@ render the returned dictionary to a JSON serialization:
        return {'content':'Hello!'}
 
 The body of the response returned by such a view will be a string
-representing the JSON serialization of the return value:
-
-.. code-block:: python
+representing the JSON serialization of the return value::
 
    '{"content": "Hello!"}'
 
@@ -216,10 +192,7 @@ values serializable by the configured serializer (by default ``json.dumps``).
 
 You can configure a view to use the JSON renderer by naming ``json`` as the
 ``renderer`` argument of a view configuration, e.g. by using
-:meth:`~pyramid.config.Configurator.add_view`:
-
-.. code-block:: python
-   :linenos:
+:meth:`~pyramid.config.Configurator.add_view`::
 
    config.add_view('myproject.views.hello_world',
                    name='hello',
@@ -239,10 +212,7 @@ Custom objects can be made easily JSON-serializable in Pyramid by defining a
 ``__json__`` method on the object's class. This method should return values
 natively JSON-serializable (such as ints, lists, dictionaries, strings, and
 so forth).  It should accept a single additional argument, ``request``, which
-will be the active request object at render time.
-
-.. code-block:: python
-   :linenos:
+will be the active request object at render time::
 
    from pyramid.view import view_config
 
@@ -267,10 +237,7 @@ to the renderer is not a serializable type, and has no ``__json__`` method,
 usually a :exc:`TypeError` will be raised during serialization.  You can
 change this behavior by creating a custom JSON renderer and adding adapters
 to handle custom types. The renderer will attempt to adapt non-serializable
-objects using the registered adapters. A short example follows:
-
-.. code-block:: python
-   :linenos:
+objects using the registered adapters. A short example follows::
 
    from pyramid.renderers import JSON
 
@@ -311,9 +278,7 @@ cross-domain AJAX requests.
 
 Unlike other renderers, a JSONP renderer needs to be configured at startup
 time "by hand".  Configure a JSONP renderer using the
-:meth:`pyramid.config.Configurator.add_renderer` method:
-
-.. code-block:: python
+:meth:`pyramid.config.Configurator.add_renderer` method::
 
    from pyramid.config import Configurator
    from pyramid.renderers import JSONP
@@ -324,9 +289,7 @@ time "by hand".  Configure a JSONP renderer using the
 Once this renderer is registered via
 :meth:`~pyramid.config.Configurator.add_renderer` as above, you can use
 ``jsonp`` as the ``renderer=`` parameter to ``@view_config`` or
-:meth:`pyramid.config.Configurator.add_view`:
-
-.. code-block:: python
+:meth:`pyramid.config.Configurator.add_view`::
 
    from pyramid.view import view_config
 
@@ -416,10 +379,7 @@ information), ``context`` (the context resource of the view used to render
 the template), and ``request`` (the request passed to the view used to render
 the template).  ``request`` is also available as ``req`` in Pyramid 1.3+.
 
-Here's an example view configuration which uses a Chameleon ZPT renderer:
-
-.. code-block:: python
-   :linenos:
+Here's an example view configuration which uses a Chameleon ZPT renderer::
 
     # config is an instance of pyramid.config.Configurator
 
@@ -428,10 +388,7 @@ Here's an example view configuration which uses a Chameleon ZPT renderer:
                     context='myproject.resources.Hello',
                     renderer='myproject:templates/foo.pt')
 
-Here's an example view configuration which uses a Chameleon text renderer:
-
-.. code-block:: python
-   :linenos:
+Here's an example view configuration which uses a Chameleon text renderer::
 
     config.add_view('myproject.views.hello_world',
                     name='hello',
@@ -464,10 +421,7 @@ it may be a :term:`asset specification`
 internally inherit other Mako templates using a relative filename or a
 :term:`asset specification` as desired.
 
-Here's an example view configuration which uses a relative path:
-
-.. code-block:: python
-   :linenos:
+Here's an example view configuration which uses a relative path::
 
     # config is an instance of pyramid.config.Configurator
 
@@ -482,10 +436,7 @@ directory (or directories) configured for Mako via the ``mako.directories``
 configuration file setting.
 
 The renderer can also be provided in :term:`asset specification`
-format. Here's an example view configuration which uses one:
-
-.. code-block:: python
-   :linenos:
+format. Here's an example view configuration which uses one::
 
     config.add_view('myproject.views.hello_world',
                     name='hello',
@@ -520,10 +471,7 @@ behavior.
 
 For example, if you need to change the response status from within a view
 callable that uses a renderer, assign the ``status`` attribute to the
-``response`` attribute of the request before returning a result:
-
-.. code-block:: python
-   :linenos:
+``response`` attribute of the request before returning a result::
 
    from pyramid.view import view_config
 
@@ -536,10 +484,7 @@ Note that mutations of ``request.response`` in views which return a Response
 object directly will have no effect unless the response object returned *is*
 ``request.response``.  For example, the following example calls
 ``request.response.set_cookie``, but this call will have no effect, because a
-different Response object is returned.
-
-.. code-block:: python
-   :linenos:
+different Response object is returned::
 
    from pyramid.response import Response
 
@@ -548,10 +493,7 @@ different Response object is returned.
        return Response('OK') # because we're returning a different response
 
 If you mutate ``request.response`` and you'd like the mutations to have an
-effect, you must return ``request.response``:
-
-.. code-block:: python
-   :linenos:
+effect, you must return ``request.response``::
 
    def view(request):
        request.response.set_cookie('abc', '123')
@@ -609,9 +551,7 @@ Renderers can be registered imperatively using the
 :meth:`pyramid.config.Configurator.add_renderer` API.
 
 For example, to add a renderer which renders views which have a
-``renderer`` attribute that is a path that ends in ``.jinja2``:
-
-.. code-block:: python
+``renderer`` attribute that is a path that ends in ``.jinja2``::
 
    config.add_renderer('.jinja2', 'mypackage.MyJinja2Renderer')
 
@@ -631,10 +571,7 @@ You may add a new renderer by creating and registering a :term:`renderer
 factory`.
 
 A renderer factory implementation is typically a class with the
-following interface:
-
-.. code-block:: python
-   :linenos:
+following interface::
 
    class RendererFactory:
        def __init__(self, info):
@@ -682,9 +619,7 @@ There are essentially two different kinds of renderer factories:
 
 Here's an example of the registration of a simple renderer factory via
 :meth:`~pyramid.config.Configurator.add_renderer`, where ``config``
-is an instance of :meth:`pyramid.config.Configurator`:
-
-.. code-block:: python
+is an instance of :meth:`pyramid.config.Configurator`::
 
    config.add_renderer(name='amf', factory='my.package.MyAMFRenderer')
 
@@ -692,10 +627,7 @@ Adding the above code to your application startup configuration will
 allow you to use the ``my.package.MyAMFRenderer`` renderer factory
 implementation in view configurations. Your application can use this
 renderer by specifying ``amf`` in the ``renderer`` attribute of a
-:term:`view configuration`:
-
-.. code-block:: python
-   :linenos:
+:term:`view configuration`::
 
    from pyramid.view import view_config
 
@@ -712,19 +644,14 @@ as its renderer value.  The ``name`` passed to the ``MyAMFRenderer``
 constructor will always be ``amf``.
 
 Here's an example of the registration of a more complicated renderer
-factory, which expects to be passed a filesystem path:
-
-.. code-block:: python
+factory, which expects to be passed a filesystem path::
 
    config.add_renderer(name='.jinja2', factory='my.package.MyJinja2Renderer')
 
 Adding the above code to your application startup will allow you to use the
 ``my.package.MyJinja2Renderer`` renderer factory implementation in view
 configurations by referring to any ``renderer`` which *ends in* ``.jinja`` in
-the ``renderer`` attribute of a :term:`view configuration`:
-
-.. code-block:: python
-   :linenos:
+the ``renderer`` attribute of a :term:`view configuration`::
 
    from pyramid.view import view_config
 
@@ -754,9 +681,7 @@ You can associate more than one filename extension with the same existing
 renderer implementation as necessary if you need to use a different file
 extension for the same kinds of templates.  For example, to associate the
 ``.zpt`` extension with the Chameleon ZPT renderer factory, use the
-:meth:`pyramid.config.Configurator.add_renderer` method:
-
-.. code-block:: python
+:meth:`pyramid.config.Configurator.add_renderer` method::
 
    config.add_renderer('.zpt', 'pyramid.chameleon_zpt.renderer_factory')
 
@@ -765,9 +690,7 @@ After you do this, :app:`Pyramid` will treat templates ending in both the
 
 To change the default mapping in which files with a ``.pt`` extension are
 rendered via a Chameleon ZPT page template renderer, use a variation on the
-following in your application's startup code:
-
-.. code-block:: python
+following in your application's startup code::
 
    config.add_renderer('.pt', 'mypackage.pt_renderer')
 
@@ -777,9 +700,7 @@ in ``.pt``, replacing the default Chameleon ZPT renderer.
 
 To associate a *default* renderer with *all* view configurations (even
 ones which do not possess a ``renderer`` attribute), pass ``None`` as
-the ``name`` attribute to the renderer tag:
-
-.. code-block:: python
+the ``name`` attribute to the renderer tag::
 
    config.add_renderer(None, 'mypackage.json_renderer_factory')
 
@@ -803,10 +724,7 @@ the data returned by an arbitrary view callable.
 To use this feature, create a :class:`~pyramid.events.NewRequest`
 :term:`subscriber` which sniffs at the request data and which conditionally
 sets an ``override_renderer`` attribute on the request itself, which is the
-*name* of a registered renderer.  For example:
-
-.. code-block:: python
-   :linenos:
+*name* of a registered renderer.  For example::
 
    from pyramid.events import subscriber
    from pyramid.events import NewRequest

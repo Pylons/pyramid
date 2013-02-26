@@ -72,14 +72,12 @@ Here's a high-level time-ordered overview of what happens when you press
    ``__init__.py`` module:
 
    .. literalinclude:: MyProject/myproject/__init__.py
-      :language: python
-      :linenos:
 
    Note that the constructor function accepts a ``global_config`` argument,
    which is a dictionary of key/value pairs mentioned in the ``[DEFAULT]``
-   section of an ``.ini`` file (if `[DEFAULT]
-   <http://docs.pylonsproject.org/projects/pyramid/dev/narr/paste.html#defaults-section-of-a-pastedeploy-ini-file>`__
-   is present).  It also accepts a ``**settings`` argument, which collects
+   section of an ``.ini`` file
+   (if :ref:`[DEFAULT] <defaults_section_of_pastedeploy_file>` is present).
+   It also accepts a ``**settings`` argument, which collects
    another set of arbitrary key/value pairs.  The arbitrary key/value pairs
    received by this function in ``**settings`` will be composed of all the
    key/value pairs that are present in the ``[app:main]`` section (except for
@@ -90,7 +88,6 @@ Here's a high-level time-ordered overview of what happens when you press
 
    .. literalinclude:: MyProject/development.ini
       :language: ini
-      :linenos:
 
    In this case, the ``myproject.__init__:main`` function referred to by the
    entry point URI ``egg:MyProject`` (see :ref:`MyProject_ini` for more

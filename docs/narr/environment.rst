@@ -212,7 +212,7 @@ sequence can take several different forms.
 
       package1 package2 package3
 
-    The package names can also be separated by carriage returns::
+   The package names can also be separated by carriage returns::
 
        package1
        package2
@@ -243,10 +243,7 @@ file in your application:
    pyramid.includes = pyramid_debugtoolbar
                       pyramid_tm
 
-Is equivalent to using the following statements in your configuration code:
-
-.. code-block:: python
-   :linenos:
+Is equivalent to using the following statements in your configuration code::
 
    from pyramid.config import Configurator
 
@@ -263,10 +260,7 @@ Plain Python
 ++++++++++++
 
 Using the following ``pyramid.includes`` setting in your plain-Python Pyramid
-application: 
-
-.. code-block:: python
-   :linenos:
+application::
 
    from pyramid.config import Configurator
 
@@ -274,10 +268,7 @@ application:
        settings = {'pyramid.includes':'pyramid_debugtoolbar pyramid_tm'}
        config = Configurator(settings=settings)
 
-Is equivalent to using the following statements in your configuration code:
-
-.. code-block:: python
-   :linenos:
+Is equivalent to using the following statements in your configuration code::
 
    from pyramid.config import Configurator
 
@@ -357,10 +348,7 @@ file in your application:
                     pyramid.tweens.excview_tween_factory
                     pyramid_tm.tm_tween_factory
 
-Is equivalent to using the following statements in your configuration code:
-
-.. code-block:: python
-   :linenos:
+Is equivalent to using the following statements in your configuration code::
 
    from pyramid.config import Configurator
  
@@ -532,7 +520,6 @@ Setting Name" column would go in the ``[app:main]`` section.  Here's
 an example of such a section:
 
 .. code-block:: ini
-  :linenos:
 
   [app:main]
   use = egg:MyProject
@@ -639,9 +626,7 @@ Here's how:
 
   If you've done any type conversion of your custom value, reset the
   converted values into the ``settings`` dictionary *before* you pass the
-  dictionary as ``settings`` to the :term:`Configurator`.  For example:
-
-  .. code-block:: python
+  dictionary as ``settings`` to the :term:`Configurator`.  For example::
 
      def main(global_config, **settings):
          # ...
@@ -659,20 +644,16 @@ Here's how:
 -  When creating an ``includeme`` function that will be later added to your 
    application's configuration you may access the ``settings`` dictionary
    through the instance of the :term:`Configurator` that is passed into the
-   function as its only argument.  For Example:
-  
-  .. code-block:: python
+   function as its only argument.  For Example::
      
      def includeme(config):
          settings = config.registry.settings
          debug_frobnosticator = settings['debug_frobnosticator']
      
-- In the runtime code that you need to access the new settings value, find
+- In the runtime code where you need to access the new settings value, find
   the value in the ``registry.settings`` dictionary and use it.  In
   :term:`view` code (or any other code that has access to the request), the
-  easiest way to do this is via ``request.registry.settings``.  For example:
-
-  .. code-block:: python
+  easiest way to do this is via ``request.registry.settings``.  For example::
 
      settings = request.registry.settings
      debug_frobnosticator = settings['debug_frobnosticator']
@@ -680,9 +661,7 @@ Here's how:
   If you wish to use the value in code that does not have access to the
   request and you wish to use the value, you'll need to use the
   :func:`pyramid.threadlocal.get_current_registry` API to obtain the current
-  registry, then ask for its ``settings`` attribute.  For example:
-
-  .. code-block:: python
+  registry, then ask for its ``settings`` attribute.  For example::
 
      registry = pyramid.threadlocal.get_current_registry()
      settings = registry.settings

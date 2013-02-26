@@ -43,8 +43,6 @@ Create a new ``tutorial/tutorial/security.py`` module with the
 following content:
 
 .. literalinclude:: src/authorization/tutorial/security.py
-   :linenos:
-   :language: python
 
 The ``groupfinder`` function accepts a userid and a request and
 returns one of these values:
@@ -73,16 +71,12 @@ statement at the head:
 
 .. literalinclude:: src/authorization/tutorial/models.py
    :lines: 4-7
-   :linenos:
-   :language: python
 
 Add the following lines to the ``Wiki`` class:
 
 .. literalinclude:: src/authorization/tutorial/models.py
    :lines: 9-13
-   :linenos:
    :emphasize-lines: 4-5
-   :language: python
 
 We import :data:`~pyramid.security.Allow`, an action that
 means that permission is allowed:, and
@@ -118,16 +112,12 @@ add these import statements:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
    :lines: 4-5,8
-   :linenos:
-   :language: python
 
 Now add those policies to the configuration:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
    :lines: 18-23
-   :linenos:
    :emphasize-lines: 1-3,5-6
-   :language: python
 
 (Only the highlighted lines need to be added.)
 
@@ -149,7 +139,6 @@ Add a ``permission='edit'`` parameter to the ``@view_config``
 decorator for ``add_page()`` and ``edit_page()``, for example:
 
 .. code-block:: python
-   :linenos:
    :emphasize-lines: 2
 
    @view_config(route_name='add_page', renderer='templates/edit.pt',
@@ -164,7 +153,6 @@ Add a ``permission='view'`` parameter to the ``@view_config``
 decorator for ``view_wiki()`` and ``view_page()``, like this:
 
 .. code-block:: python
-   :linenos:
    :emphasize-lines: 2
 
    @view_config(route_name='view_page', renderer='templates/view.pt',
@@ -195,9 +183,7 @@ head of ``tutorial/tutorial/views.py``:
 
 .. literalinclude:: src/authorization/tutorial/views.py
    :lines: 6-13,15-17
-   :linenos:
    :emphasize-lines: 3,6-9,11
-   :language: python
 
 (Only the highlighted lines need to be added.)
 
@@ -211,8 +197,6 @@ Now add the ``login`` and ``logout`` views:
 
 .. literalinclude:: src/authorization/tutorial/views.py
    :lines: 82-120
-   :linenos:
-   :language: python
 
 ``login()`` is decorated with two decorators:
 
@@ -252,9 +236,7 @@ Add the following line to the import at the head of
 
 .. literalinclude:: src/authorization/tutorial/views.py
    :lines: 11-15
-   :linenos:
    :emphasize-lines: 4
-   :language: python
 
 (Only the highlighted line needs to be added.)
 
@@ -263,7 +245,6 @@ Add a  ``logged_in`` parameter to the return value of
 like this:
 
 .. code-block:: python
-   :linenos:
    :emphasize-lines: 4
 
    return dict(page = page,
@@ -302,9 +283,7 @@ Our ``tutorial/tutorial/__init__.py`` will look something like this
 when we're done:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
-   :linenos:
    :emphasize-lines: 4-5,8,18-20,22-23
-   :language: python
 
 (Only the highlighted lines need to be added.)
 
@@ -312,9 +291,7 @@ Our ``tutorial/tutorial/models.py`` will look something like this
 when we're done:
 
 .. literalinclude:: src/authorization/tutorial/models.py
-   :linenos:
    :emphasize-lines: 4-7,12-13
-   :language: python
 
 (Only the highlighted lines need to be added.)
 
@@ -322,9 +299,7 @@ Our ``tutorial/tutorial/views.py`` will look something like this
 when we're done:
 
 .. literalinclude:: src/authorization/tutorial/views.py
-   :linenos:
    :emphasize-lines: 8,11-15,17,24,29,48,52,68,72,80,82-120
-   :language: python
 
 (Only the highlighted lines need to be added.)
 
@@ -332,7 +307,6 @@ Our ``tutorial/tutorial/templates/edit.pt`` template will look
 something like this when we're done:
 
 .. literalinclude:: src/authorization/tutorial/templates/edit.pt
-   :linenos:
    :emphasize-lines: 41-43
    :language: xml
 
@@ -342,7 +316,6 @@ Our ``tutorial/tutorial/templates/view.pt`` template will look
 something like this when we're done:
 
 .. literalinclude:: src/authorization/tutorial/templates/view.pt
-   :linenos:
    :emphasize-lines: 41-43
    :language: xml
 

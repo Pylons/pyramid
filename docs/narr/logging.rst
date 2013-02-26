@@ -22,25 +22,23 @@ Logging Configuration
 ---------------------
 
 A :app:`Pyramid` project created from a :term:`scaffold` is configured to
-allow you to send messages to `Python standard library logging package
-<http://docs.python.org/library/logging.html>`_ loggers from within your
+allow you to send messages to :mod:`Python standard library logging package
+<logging>` loggers from within your
 application.  In particular, the :term:`PasteDeploy` ``development.ini`` and
 ``production.ini`` files created when you use a scaffold include a basic
 configuration for the Python :mod:`logging` package.
 
-PasteDeploy ``.ini`` files use the Python standard library `ConfigParser
-format <http://docs.python.org/lib/module-ConfigParser.html>`_; this the same
-format used as the Python `logging module's Configuration file format
-<http://docs.python.org/lib/logging-config-fileformat.html>`_.  The
-application-related and logging-related sections in the configuration file
+PasteDeploy ``.ini`` files use the Python standard library :mod:`ConfigParser
+format <ConfigParser>`; this is the same format used as the Python
+:ref:`logging module's Configuration file format <logging-config-fileformat>`.
+The application-related and logging-related sections in the configuration file
 can coexist peacefully, and the logging-related sections in the file are used
 from when you run ``pserve``.
 
 The ``pserve`` command calls the :func:`pyramid.paster.setup_logging`
-function, a thin wrapper around the `logging.fileConfig
-<http://docs.python.org/lib/logging-config-api.html>`_ using the specified
-ini file if it contains a ``[loggers]`` section (all of the
-scaffold-generated ``.ini`` files do). ``setup_logging`` reads the
+function, a thin wrapper around the :func:`logging.config.fileConfig`
+using the specified ``.ini`` file if it contains a ``[loggers]`` section
+(all of the scaffold-generated ``.ini`` files do). ``setup_logging`` reads the
 logging configuration from the ini file upon which ``pserve`` was
 invoked.
 
@@ -49,7 +47,6 @@ Default logging configuration is provided in both the default
 configuration in the ``development.ini`` file is as follows:
 
 .. code-block:: ini
-   :linenos:
 
    # Begin logging configuration
 
@@ -90,14 +87,12 @@ project's :term:`package`, which is derived from the name you provide to your
 project.  For instance, if you do:
 
 .. code-block:: text
-   :linenos:
 
    pcreate -s starter MyApp
 
 The logging configuration will literally be:
 
 .. code-block:: ini
-   :linenos:
 
    # Begin logging configuration
 
@@ -178,10 +173,7 @@ logger.
 
 To log messages to the package-specific logger configured in your ``.ini``
 file, simply create a logger object using the ``__name__`` builtin and call
-methods on it.
-
-.. code-block:: python 
-   :linenos:
+methods on it::
 
     import logging 
     log = logging.getLogger(__name__) 
@@ -334,10 +326,8 @@ To this:
                mypyramidapp
 
 Using PasteDeploy this way to form and serve a pipeline is equivalent to
-wrapping your app in a TransLogger instance via the bottom the ``main``
-function of your project's ``__init__`` file:
-
-.. code-block:: python 
+wrapping your app in a TransLogger instance via the bottom of the ``main``
+function of your project's ``__init__`` file::
 
     ...
     app = config.make_wsgi_app()

@@ -31,8 +31,6 @@ package's ``setup.py`` file by assigning this dependency to the ``requires`` par
 Open ``tutorial/setup.py`` and edit it to look like the following:
 
 .. literalinclude:: src/views/setup.py
-   :linenos:
-   :language: python
    :emphasize-lines: 17
 
 (Only the highlighted line needs to be added.)
@@ -72,8 +70,6 @@ Changing the ``views.py`` File
 It's time for a major change.  Open ``tutorial/tutorial/views.py`` and edit it to look like the following:
 
 .. literalinclude:: src/views/tutorial/views.py
-   :linenos:
-   :language: python
    :emphasize-lines: 1-7,12,15-70
 
 (The highlighted lines are the ones that need to be added or edited.)
@@ -110,8 +106,6 @@ a URL which represents the path to our "FrontPage".
 
 .. literalinclude:: src/views/tutorial/views.py
    :lines: 18-21
-   :linenos:
-   :language: python
 
 ``view_wiki()`` returns an instance of the
 :class:`pyramid.httpexceptions.HTTPFound` class (instances of which implement
@@ -133,8 +127,6 @@ compiled regular expression.
 
 .. literalinclude:: src/views/tutorial/views.py
    :lines: 23-43
-   :linenos:
-   :language: python
 
 The ``check()`` function is used as the first argument to
 ``wikiwords.sub``, indicating that it should be called to provide a value for
@@ -170,8 +162,6 @@ to construct URLs and find model objects.
 
 .. literalinclude:: src/views/tutorial/views.py
    :lines: 45-56
-   :linenos:
-   :language: python
 
 The ``matchdict`` will have a ``'pagename'`` key that matches the name of
 the page we'd like to add.  If our add view is invoked via,
@@ -206,8 +196,6 @@ matching the name of the page the user wants to edit.
 
 .. literalinclude:: src/views/tutorial/views.py
    :lines: 58-70
-   :linenos:
-   :language: python
 
 If the view execution *is* a result of a form submission (i.e. the expression
 ``'form.submitted' in request.params`` is ``True``), the view grabs the
@@ -236,7 +224,6 @@ Create ``tutorial/tutorial/templates/view.pt`` and add the following
 content:
 
 .. literalinclude:: src/views/tutorial/templates/view.pt
-   :linenos:
    :language: xml
 
 This template is used by ``view_page()`` for displaying a single
@@ -257,7 +244,6 @@ Create ``tutorial/tutorial/templates/edit.pt`` and add the following
 content:
 
 .. literalinclude:: src/views/tutorial/templates/edit.pt
-   :linenos:
    :language: xml
 
 This template is used by ``add_page()`` and ``edit_page()`` for adding
@@ -287,7 +273,7 @@ Our templates name a single static asset named ``pylons.css``.  We don't need
 to create this file within our package's ``static`` directory because it was
 provided at the time we created the project. This file is a little too long
 to replicate within the body of this guide, however it is available `online
-<http://github.com/Pylons/pyramid/blob/master/docs/tutorials/wiki2/src/views/tutorial/static/pylons.css>`_.
+<https://github.com/Pylons/pyramid/blob/master/docs/tutorials/wiki2/src/views/tutorial/static/pylons.css>`_.
 
 This CSS file will be accessed via
 e.g. ``http://localhost:6543/static/pylons.css`` by virtue of the call to
@@ -337,8 +323,6 @@ As a result of our edits, the ``__init__.py`` file should look
 something like:
 
 .. literalinclude:: src/views/tutorial/__init__.py
-   :linenos:
-   :language: python
    :emphasize-lines: 18-21
 
 (The highlighted lines are the ones that need to be added or edited.)

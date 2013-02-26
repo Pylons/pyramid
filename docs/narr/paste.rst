@@ -21,7 +21,7 @@ of starting, stopping, and debugging an application.
 
 This chapter is not a replacement for documentation about PasteDeploy; it
 only contextualizes the use of PasteDeploy within Pyramid.  For detailed
-documentation, see http://pythonpaste.org.
+documentation, see http://pythonpaste.org/deploy/.
 
 PasteDeploy
 -----------
@@ -47,7 +47,6 @@ config file again:
 
 .. literalinclude:: MyProject/development.ini
    :language: ini
-   :linenos:
 
 The line in ``[app:main]`` above that says ``use = egg:MyProject`` is
 actually shorthand for a longer spelling: ``use = egg:MyProject#main``.  The
@@ -56,13 +55,11 @@ PasteDeploy.  ``egg:MyProject#main`` is a string which has meaning to
 PasteDeploy.  It points at a :term:`setuptools` :term:`entry point` named
 ``main`` defined in the ``MyProject`` project.
 
-Take a look at the generated ``setup.py`` file for this project.
+Take a look at the generated ``setup.py`` file for this project:
 
 .. literalinclude:: MyProject/setup.py
-   :language: python
-   :linenos:
 
-Note that the ``entry_point`` line in ``setup.py`` points at a string which
+Note that ``entry_points`` is assigned a string which
 looks a lot like an ``.ini`` file.  This string representation of an ``.ini``
 file has a section named ``[paste.app_factory]``.  Within this section, there
 is a key named ``main`` (the entry point name) which has a value
@@ -84,6 +81,8 @@ generated within any scaffold-generated package, you'll see a ``main``
 function.  This is the function called by :term:`PasteDeploy` when the
 ``pserve`` command is invoked against our application.  It accepts a global
 configuration object and *returns* an instance of our application.
+
+.. _defaults_section_of_pastedeploy_file:
 
 ``[DEFAULTS]`` Section of a PasteDeploy ``.ini`` File
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

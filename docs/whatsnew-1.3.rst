@@ -135,10 +135,7 @@ decorator that decorates a method of that class.
 
 For instance, if you've got a class that has methods that represent "REST
 actions", all which are mapped to the same route, but different request
-methods, instead of this:
-
-.. code-block:: python
-   :linenos:
+methods, instead of this::
 
    from pyramid.view import view_config
    from pyramid.response import Response
@@ -159,10 +156,7 @@ methods, instead of this:
        def delete(self):
            return Response('delete')
 
-You can do this:
-
-.. code-block:: python
-   :linenos:
+You can do this::
 
    from pyramid.view import view_defaults
    from pyramid.view import view_config
@@ -492,7 +486,7 @@ Known Issues
   develop`` on Python 3.2, it will quit with an installation error while
   trying to install ``Pygments``.  If this happens, please just rerun the
   ``setup.py develop`` command again, and it will complete successfully.
-  This is due to a minor bug in SQLAlchemy 0.7.5 under Python 3, and will be
+  This is due to a minor bug in SQLAlchemy 0.7.5 under Python 3, and has been
   fixed in a later SQLAlchemy release.  Keep an eye on
   http://www.sqlalchemy.org/trac/ticket/2421
 
@@ -524,7 +518,7 @@ Documentation Enhancements
 
 - Removed the "Running Pyramid on Google App Engine" tutorial from the main
   docs.  It survives on in the Cookbook
-  (http://docs.pylonsproject.org/projects/pyramid_cookbook/en/latest/gae.html).
+  (http://docs.pylonsproject.org/projects/pyramid_cookbook/en/latest/deployment/gae.html).
   Rationale: it provides the correct info for the Python 2.5 version of GAE
   only, and this version of Pyramid does not support Python 2.5.
 

@@ -31,10 +31,7 @@ Imperative Configuration
 
 "Imperative configuration" just means configuration done by Python
 statements, one after the next.  Here's one of the simplest :app:`Pyramid`
-applications, configured imperatively:
-
-.. code-block:: python
-   :linenos:
+applications, configured imperatively::
 
    from wsgiref.simple_server import make_server
    from pyramid.config import Configurator
@@ -74,10 +71,7 @@ two files open at once to see the "big picture": the file that represents the
 configuration, and the file that contains the implementation objects
 referenced by the configuration.  To avoid this, :app:`Pyramid` allows you to
 insert :term:`configuration decoration` statements very close to code that is
-referred to by the declaration itself.  For example:
-
-.. code-block:: python
-   :linenos:
+referred to by the declaration itself.  For example::
 
    from pyramid.response import Response
    from pyramid.view import view_config
@@ -99,10 +93,7 @@ available for a :term:`scan` to find it later.
 A :term:`scan` of a :term:`module` or a :term:`package` and its subpackages
 for decorations happens when the :meth:`pyramid.config.Configurator.scan`
 method is invoked: scanning implies searching for configuration declarations
-in a package and its subpackages.  For example:
-
-.. code-block:: python
-   :linenos:
+in a package and its subpackages.  For example::
 
    from wsgiref.simple_server import make_server
    from pyramid.config import Configurator
@@ -138,10 +129,7 @@ The combination of :term:`configuration decoration` and the invocation of a
 
 In the example above, the scanner translates the arguments to
 :class:`~pyramid.view.view_config` into a call to the
-:meth:`pyramid.config.Configurator.add_view` method, effectively:
-
-.. ignore-next-block
-.. code-block:: python
+:meth:`pyramid.config.Configurator.add_view` method, effectively::
 
    config.add_view(hello)
 

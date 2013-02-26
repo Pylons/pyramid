@@ -262,9 +262,7 @@ This attribute is useful when you invoke a Pyramid view callable via
 e.g. jQuery's ``$.ajax`` function, which has the potential to send a request
 with a JSON-encoded body.
 
-Using ``request.json_body`` is equivalent to:
-
-.. code-block:: python
+Using ``request.json_body`` is equivalent to::
 
    from json import loads
    loads(request.body, encoding=request.charset)
@@ -290,17 +288,13 @@ When such a request reaches a view in your application, the
         print request.json_body
         return 'OK'
 
-For the above view, printed to the console will be:
-
-.. code-block:: python
+For the above view, printed to the console will be::
 
     {u'a': 1}
 
 For bonus points, here's a bit of client-side code that will produce a
 request that has a body suitable for reading via ``request.json_body`` using
-Python's ``urllib2`` instead of a Javascript AJAX request:
-
-.. code-block:: python
+Python's ``urllib2`` instead of a Javascript AJAX request::
 
     import urllib2
     import json        
@@ -324,11 +318,7 @@ request when a database connection is involved.
 For example, let's say you have a ``mypackage`` :app:`Pyramid` application
 package that uses SQLAlchemy, and you'd like the current SQLAlchemy database
 session to be removed after each request.  Put the following in the
-``mypackage.__init__`` module:
-
-.. ignore-next-block
-.. code-block:: python
-   :linenos:
+``mypackage.__init__`` module::
 
    from mypackage.models import DBSession
 
@@ -459,10 +449,7 @@ Instantiating the Response
 
 Of course most of the time you just want to *make* a response.  
 Generally any attribute of the response can be passed in as a keyword
-argument to the class; e.g.:
-
-.. code-block:: python
-  :linenos:
+argument to the class; e.g.::
 
   from pyramid.response import Response
   response = Response(body='hello world!', content_type='text/plain')
@@ -489,11 +476,7 @@ Each class is named ``pyramid.httpexceptions.HTTP*``, where ``*`` is the
 reason for the error.  For instance,
 :class:`pyramid.httpexceptions.HTTPNotFound` subclasses
 :class:`pyramid.Response`, so you can manipulate the instances in the same
-way.  A typical example is:
-
-.. ignore-next-block
-.. code-block:: python
-    :linenos:
+way.  A typical example is::
 
     from pyramid.httpexceptions import HTTPNotFound
     from pyramid.httpexceptions import HTTPMovedPermanently

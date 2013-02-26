@@ -38,11 +38,11 @@ A view configuration statement is made about information present in the
 
 View configuration is performed in one of two ways:
 
-- by running a :term:`scan` against application source code which has a
+- By running a :term:`scan` against application source code which has a
   :class:`pyramid.view.view_config` decorator attached to a Python object as
   per :ref:`mapping_views_using_a_decorator_section`.
 
-- by using the :meth:`pyramid.config.Configurator.add_view` method as per
+- By using the :meth:`pyramid.config.Configurator.add_view` method as per
   :ref:`mapping_views_using_imperative_config_section`.
 
 .. index::
@@ -62,9 +62,9 @@ particular view callable.
 
 :term:`View predicate` attributes are an important part of view configuration
 that enables the :term:`view lookup` subsystem to find and invoke the
-appropriate view.  The greater number of predicate attributes possessed by a
+appropriate view.  The greater the number of predicate attributes possessed by a
 view's configuration, the more specific the circumstances need to be before
-the registered view callable will be invoked.  The fewer number of predicates
+the registered view callable will be invoked.  The fewer the number of predicates
 which are supplied to a particular view configuration, the more likely it is
 that the associated view callable will be invoked.  A view with five
 predicates will always be found and evaluated before a view with two, for
@@ -486,11 +486,7 @@ The :class:`~pyramid.view.view_config` decorator can be used to associate
 acts as a :app:`Pyramid` view callable.
 
 Here's an example of the :class:`~pyramid.view.view_config` decorator that
-lives within a :app:`Pyramid` application module ``views.py``:
-
-.. ignore-next-block
-.. code-block:: python
-   :linenos:
+lives within a :app:`Pyramid` application module ``views.py``::
 
    from resources import MyResource
    from pyramid.view import view_config
@@ -501,19 +497,12 @@ lives within a :app:`Pyramid` application module ``views.py``:
        return Response('OK')
 
 Using this decorator as above replaces the need to add this imperative
-configuration stanza:
-
-.. ignore-next-block
-.. code-block:: python
-   :linenos:
+configuration stanza::
 
    config.add_view('mypackage.views.my_view', route_name='ok', 
                    request_method='POST', permission='read')
 
-All arguments to ``view_config`` may be omitted.  For example:
-
-.. code-block:: python
-   :linenos:
+All arguments to ``view_config`` may be omitted.  For example::
 
    from pyramid.response import Response
    from pyramid.view import view_config
@@ -533,10 +522,7 @@ view configuration.  All that the decorator does is "annotate" the function
 with your configuration declarations, it doesn't process them. To make
 :app:`Pyramid` process your :class:`pyramid.view.view_config` declarations,
 you *must* use the ``scan`` method of a
-:class:`pyramid.config.Configurator`:
-
-.. code-block:: python
-   :linenos:
+:class:`pyramid.config.Configurator`::
 
    # config is assumed to be an instance of the
    # pyramid.config.Configurator class
@@ -570,10 +556,7 @@ configuration`.  However, they both do the same thing.
 A :class:`~pyramid.view.view_config` decorator can be placed in various points
 in your application.
 
-If your view callable is a function, it may be used as a function decorator:
-
-.. code-block:: python
-   :linenos:
+If your view callable is a function, it may be used as a function decorator::
 
    from pyramid.view import view_config
    from pyramid.response import Response
@@ -585,10 +568,7 @@ If your view callable is a function, it may be used as a function decorator:
 If your view callable is a class, the decorator can also be used as a class
 decorator in Python 2.6 and better (Python 2.5 and below do not support class
 decorators).  All the arguments to the decorator are the same when applied
-against a class as when they are applied against a function.  For example:
-
-.. code-block:: python
-   :linenos:
+against a class as when they are applied against a function.  For example::
 
    from pyramid.response import Response
    from pyramid.view import view_config
@@ -603,10 +583,7 @@ against a class as when they are applied against a function.  For example:
 
 You can use the :class:`~pyramid.view.view_config` decorator as a simple
 callable to manually decorate classes in Python 2.5 and below without the
-decorator syntactic sugar, if you wish:
-
-.. code-block:: python
-   :linenos:
+decorator syntactic sugar, if you wish::
 
    from pyramid.response import Response
    from pyramid.view import view_config
@@ -622,10 +599,7 @@ decorator syntactic sugar, if you wish:
 
 More than one :class:`~pyramid.view.view_config` decorator can be stacked on
 top of any number of others.  Each decorator creates a separate view
-registration.  For example:
-
-.. code-block:: python
-   :linenos:
+registration.  For example::
 
    from pyramid.view import view_config
    from pyramid.response import Response
@@ -637,10 +611,7 @@ registration.  For example:
 
 This registers the same view under two different names.
 
-The decorator can also be used against a method of a class:
-
-.. code-block:: python
-   :linenos:
+The decorator can also be used against a method of a class::
 
    from pyramid.response import Response
    from pyramid.view import view_config
@@ -663,10 +634,7 @@ The method which is decorated must return a :term:`response`.
 Using the decorator against a particular method of a class is equivalent to
 using the ``attr`` parameter in a decorator attached to the class itself.
 For example, the above registration implied by the decorator being used
-against the ``amethod`` method could be spelled equivalently as the below:
-
-.. code-block:: python
-   :linenos:
+against the ``amethod`` method could be spelled equivalently as the below::
 
    from pyramid.response import Response
    from pyramid.view import view_config
@@ -692,10 +660,7 @@ The :meth:`pyramid.config.Configurator.add_view` method within
 :ref:`configuration_module` is used to configure a view "imperatively"
 (without a :class:`~pyramid.view.view_config` decorator).  The arguments to
 this method are very similar to the arguments that you provide to the
-:class:`~pyramid.view.view_config` decorator.  For example:
-
-.. code-block:: python
-   :linenos:
+:class:`~pyramid.view.view_config` decorator.  For example::
 
    from pyramid.response import Response
 
@@ -733,10 +698,7 @@ decorator that decorates a method of that class.
 
 For instance, if you've got a class that has methods that represent "REST
 actions", all which are mapped to the same route, but different request
-methods, instead of this:
-
-.. code-block:: python
-   :linenos:
+methods, instead of this::
 
    from pyramid.view import view_config
    from pyramid.response import Response
@@ -757,10 +719,7 @@ methods, instead of this:
        def delete(self):
            return Response('delete')
 
-You can do this:
-
-.. code-block:: python
-   :linenos:
+You can do this::
 
    from pyramid.view import view_defaults
    from pyramid.view import view_config
@@ -794,10 +753,7 @@ Arguments passed to ``@view_config`` will override any default passed to
 The ``view_defaults`` class decorator can also provide defaults to the
 :meth:`pyramid.config.Configurator.add_view` directive when a decorated class
 is passed to that directive as its ``view`` argument.  For example, instead
-of this:
-
-.. code-block:: python
-   :linenos:
+of this::
 
    from pyramid.response import Response
    from pyramid.config import Configurator
@@ -827,10 +783,7 @@ of this:
 
 To reduce the amount of repetion in the ``config.add_view`` statements, we
 can move the ``route_name='rest'`` argument to a ``@view_default`` class
-decorator on the RESTView class:
-
-.. code-block:: python
-   :linenos:
+decorator on the RESTView class::
 
    from pyramid.view import view_defaults
    from pyramid.response import Response
@@ -863,10 +816,7 @@ argument passed to ``view_defaults`` provides a default for the view
 configurations of methods of the class it's decorating.
 
 Normal Python inheritance rules apply to defaults added via
-``view_defaults``.  For example:
-
-.. code-block:: python
-   :linenos:
+``view_defaults``.  For example::
 
    @view_defaults(route_name='rest')
    class Foo(object):
@@ -878,10 +828,7 @@ Normal Python inheritance rules apply to defaults added via
 The ``Bar`` class above will inherit its view defaults from the arguments
 passed to the ``view_defaults`` decorator of the ``Foo`` class.  To prevent
 this from happening, use a ``view_defaults`` decorator without any arguments
-on the subclass:
-
-.. code-block:: python
-   :linenos:
+on the subclass::
 
    @view_defaults(route_name='rest')
    class Foo(object):
@@ -908,10 +855,7 @@ to a :term:`view configuration` found during view lookup will be verified.
 This will ensure that the currently authenticated user possesses that
 permission against the :term:`context` resource before the view function is
 actually called.  Here's an example of specifying a permission in a view
-configuration using :meth:`~pyramid.config.Configurator.add_view`:
-
-.. code-block:: python
-   :linenos:
+configuration using :meth:`~pyramid.config.Configurator.add_view`::
 
    # config is an instance of pyramid.config.Configurator
 
@@ -968,9 +912,7 @@ of the ``response.cache_control`` object to a non-``False`` value.  For
 example, the below view callable is configured with a ``@view_config``
 decorator that indicates any response from the view should be cached for 3600
 seconds.  However, the view itself prevents caching from taking place unless
-there's a ``should_cache`` GET or POST variable:
-
-.. code-block:: python
+there's a ``should_cache`` GET or POST variable::
 
    from pyramid.view import view_config
 

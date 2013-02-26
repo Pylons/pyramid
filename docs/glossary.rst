@@ -18,7 +18,7 @@ Glossary
 
    response
      An object returned by a :term:`view callable` that represents response
-     data returned to the requesting user agent.  It must implements the
+     data returned to the requesting user agent.  It must implement the
      :class:`pyramid.interfaces.IResponse` interface.  A response object is
      typically an instance of the :class:`pyramid.response.Response` class or
      a subclass such as :class:`pyramid.httpexceptions.HTTPFound`.  See
@@ -324,25 +324,19 @@ Glossary
      `A full-featured Python web framework <http://djangoproject.com>`_.
 
    Pylons
-     `A lightweight Python web framework <http://pylonshq.com>`_ and a
-     predecessor of Pyramid.
+     `A lightweight Python web framework <http://docs.pylonsproject.org/projects/pylons-webframework/en/latest/>`_
+     and a predecessor of Pyramid.
 
    ZODB
       `Zope Object Database <http://zodb.org>`_, a
       persistent Python object store.
-
-   ZEO
-      `Zope Enterprise Objects
-      <http://www.zope.org/Documentation/Books/ZopeBook/2_6Edition/ZEO.stx>`_
-      allows multiple simultaneous processes to access a single
-      :term:`ZODB` database.
 
    WebOb
      `WebOb <http://webob.org>`_ is a WSGI request/response
      library created by Ian Bicking.
 
    PasteDeploy
-     `PasteDeploy <http://pythonpaste.org>`_ is a library used by
+     `PasteDeploy <http://pythonpaste.org/deploy/>`_ is a library used by
      :app:`Pyramid` which makes it possible to configure
      :term:`WSGI` components together declaratively within an ``.ini``
      file.  It was developed by Ian Bicking.
@@ -654,10 +648,9 @@ Glossary
       <http://en.wikipedia.org/wiki/Thread_(computer_science)>`_ used by the
       application may have a different value for this same "global" variable.
       :app:`Pyramid` uses a small number of thread local variables, as
-      described in :ref:`threadlocals_chapter`. See also the `threading.local
-      documentation
-      <http://docs.python.org/library/threading.html#threading.local>`_ for
-      more information.
+      described in :ref:`threadlocals_chapter`.
+      See also the :class:`stdlib documentation <threading.local>`
+      for more information.
 
    multidict
      An ordered dictionary that can have multiple values for each key. Adds
@@ -685,7 +678,7 @@ Glossary
      The C implementation of the Python language.  This is the
      reference implementation that most people refer to as simply
      "Python"; :term:`Jython`, Google's App Engine, and `PyPy
-     <http://codespeak.net/pypy/dist/pypy/doc/>`_ are examples of
+     <http://doc.pypy.org/en/latest/>`_ are examples of
      non-C based Python implementations.
 
    View Lookup

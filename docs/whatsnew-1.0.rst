@@ -249,7 +249,7 @@ ZCML Externalized
   Pyramid core.  Loading ZCML is now a feature of the :term:`pyramid_zcml`
   package, which can be downloaded from PyPI.  Documentation for the package
   should be available via
-  http://pylonsproject.org/projects/pyramid_zcml/dev/, which describes how to
+  http://docs.pylonsproject.org/projects/pyramid_zcml/en/latest/, which describes how to
   add a configuration statement to your ``main`` block to reobtain this
   method.  You will also need to add an ``install_requires`` dependency upon
   the ``pyramid_zcml`` distribution to your ``setup.py`` file.

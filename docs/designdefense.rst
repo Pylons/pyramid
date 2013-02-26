@@ -118,11 +118,7 @@ is not particularly pretty or intuitive, and sometimes it's just plain
 obtuse.  Likewise, the conceptual load on a casual source code reader of code
 that uses the ZCA global API is somewhat high.  Consider a ZCA neophyte
 reading the code that performs a typical "unnamed utility" lookup using the
-:func:`zope.component.getUtility` global API:
-
-.. ignore-next-block
-.. code-block:: python
-   :linenos:
+:func:`zope.component.getUtility` global API::
 
    from pyramid.interfaces import ISettings
    from zope.component import getUtility
@@ -188,11 +184,7 @@ Instead, the framework hides the presence of the ZCA registry behind
 special-purpose API functions that *do* use ZCA APIs.  Take for example the
 ``pyramid.security.authenticated_userid`` function, which returns the userid
 present in the current request or ``None`` if no userid is present in the
-current request.  The application developer calls it like so:
-
-.. ignore-next-block
-.. code-block:: python
-   :linenos:
+current request.  The application developer calls it like so::
 
    from pyramid.security import authenticated_userid
    userid = authenticated_userid(request)
@@ -200,10 +192,7 @@ current request.  The application developer calls it like so:
 He now has the current user id.
 
 Under its hood however, the implementation of ``authenticated_userid``
-is this:
-
-.. code-block:: python
-   :linenos:
+is this::
 
    def authenticated_userid(request):
        """ Return the userid of the currently authenticated user or
@@ -238,7 +227,7 @@ registry API.
 
 :app:`Pyramid` framework developers were so concerned about conceptual load
 issues of the ZCA registry API for framework developers that a `replacement
-registry implementation <http://svn.repoze.org/repoze.component/trunk>`_
+registry implementation <https://github.com/repoze/repoze.component>`_
 named :mod:`repoze.component` was actually developed.  Though this package
 has a registry implementation which is fully functional and well-tested, and
 its API is much nicer than the ZCA registry API, work on it was largely
@@ -269,19 +258,13 @@ framework developers in, we've drawn some lines in the sand.
 
 In all core code, We've made use of ZCA global API functions such as
 ``zope.component.getUtility`` and ``zope.component.getAdapter`` the exception
-instead of the rule.  So instead of:
-
-.. code-block:: python
-   :linenos:
+instead of the rule.  So instead of::
 
    from pyramid.interfaces import IAuthenticationPolicy
    from zope.component import getUtility
    policy = getUtility(IAuthenticationPolicy)
 
-:app:`Pyramid` code will usually do:
-
-.. code-block:: python
-   :linenos:
+:app:`Pyramid` code will usually do::
 
    from pyramid.interfaces import IAuthenticationPolicy
    from pyramid.threadlocal import get_current_registry
@@ -489,20 +472,13 @@ arguments, which are filled in using values present in the ``request.POST``
 or ``request.GET`` dictionaries or by values present in the route match
 dictionary.  For example, a Django view will accept positional arguments
 which match information in an associated "urlconf" such as
-``r'^polls/(?P<poll_id>\d+)/$``:
-
-.. code-block:: python
-   :linenos:
+``r'^polls/(?P<poll_id>\d+)/$``::
 
    def aview(request, poll_id):
        return HttpResponse(poll_id)
 
 Zope, likewise allows you to add arbitrary keyword and positional
-arguments to any method of a resource object found via traversal:
-
-.. ignore-next-block
-.. code-block:: python
-   :linenos:
+arguments to any method of a resource object found via traversal::
 
    from persistent import Persistent
 
@@ -1030,7 +1006,7 @@ but its intended userbase is much the same.  Many others exist.  We've
 actually even (only as a teaching tool, not as any sort of official project)
 `created one using Pyramid <http://bfg.repoze.org/videos#groundhog1>`_ (the
 videos use BFG, a precursor to Pyramid, but the resulting code is `available
-for Pyramid too <http://github.com/Pylons/groundhog>`_). Microframeworks are
+for Pyramid too <https://github.com/Pylons/groundhog>`_). Microframeworks are
 small frameworks with one common feature: each allows its users to create a
 fully functional application that lives in a single Python file.
 
@@ -1060,10 +1036,7 @@ Please imagine a directory structure with a set of Python files in it:
     |-- app2.py
     `-- config.py
 
-The contents of ``app.py``:
-
-.. code-block:: python
-    :linenos:
+The contents of ``app.py``::
 
     from config import decorator
     from config import L
@@ -1077,10 +1050,7 @@ The contents of ``app.py``:
         import app2
         pprint.pprint(L)
 
-The contents of ``app2.py``:
-
-.. code-block:: python
-    :linenos:
+The contents of ``app2.py``::
 
     import app
 
@@ -1088,10 +1058,7 @@ The contents of ``app2.py``:
     def bar():
         pass
 
-The contents of ``config.py``:
-
-.. code-block:: python
-  :linenos:
+The contents of ``config.py``::
 
     L = []
 
@@ -1133,10 +1100,7 @@ is the list ``L``.
 
 Let's see what happens when we use the same pattern with the `Groundhog
 <https://github.com/Pylons/groundhog>`_ microframework.  Replace the contents
-of ``app.py`` above with this:
-
-.. code-block:: python
-    :linenos:
+of ``app.py`` above with this::
 
     from config import gh
 
@@ -1148,10 +1112,7 @@ of ``app.py`` above with this:
         import app2
         pprint.pprint(L)
 
-Replace the contents of ``app2.py`` above with this:
-
-.. code-block:: python
-    :linenos:
+Replace the contents of ``app2.py`` above with this::
 
     import app
 
@@ -1159,10 +1120,7 @@ Replace the contents of ``app2.py`` above with this:
     def bar():
         'return bar'
 
-Replace the contents of ``config.py`` above with this:
-
-.. code-block:: python
-    :linenos:
+Replace the contents of ``config.py`` above with this::
 
     from groundhog import Groundhog
     gh = Groundhog('myapp', 'seekrit')
@@ -1247,10 +1205,7 @@ if it never occured.
 
 Responsible microframeworks actually offer a back-door way around the
 problem.  They allow you to disuse decorator based configuration entirely.
-Instead of requiring you to do the following:
-
-.. code-block:: python
-    :linenos:
+Instead of requiring you to do the following::
 
     gh = Groundhog('myapp', 'seekrit')
 
@@ -1261,10 +1216,7 @@ Instead of requiring you to do the following:
     if __name__ == '__main__':
         gh.run()
 
-They allow you to disuse the decorator syntax and go almost-all-imperative:
-
-.. code-block:: python
-    :linenos:
+They allow you to disuse the decorator syntax and go almost-all-imperative::
 
     def foo():
         return 'foo'
@@ -1302,10 +1254,7 @@ Routes Need Relative Ordering
 +++++++++++++++++++++++++++++
 
 Consider the following simple `Groundhog
-<https://github.com/Pylons/groundhog>`_ application:
-
-.. code-block:: python
-    :linenos:
+<https://github.com/Pylons/groundhog>`_ application::
 
     from groundhog import Groundhog
     app = Groundhog('myapp', 'seekrit')
@@ -1330,7 +1279,6 @@ If you run this application and visit the URL ``/admin``, you will see the
 the order of the function definitions in the file?
 
 .. code-block:: python
-    :linenos:
 
     from groundhog import Groundhog
     app = Groundhog('myapp', 'seekrit')
@@ -1424,10 +1372,7 @@ applications that need to be arbitrarily extensible.
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 Some microframeworks use the ``import`` statement to get a handle to an
-object which *is not logically global*:
-
-.. code-block:: python
-    :linenos:
+object which *is not logically global*::
 
     from flask import request
 
@@ -1454,10 +1399,7 @@ never used to obtain a reference to an object that has a lifetime measured by
 the scope of the body of a function.  It would be absurd to try to import,
 for example, a variable named ``i`` representing a loop counter defined in
 the body of a function.  For example, we'd never try to import ``i`` from the
-code below:
-
-.. code-block::  python
-   :linenos:
+code below::
 
    def afunc():
        for i in range(10):
@@ -1531,10 +1473,7 @@ Wrapping Up
 
 Here's a diagrammed version of the simplest pyramid application, where
 comments take into account what we've discussed in the
-:ref:`microframeworks_smaller_hello_world` section.
-
-.. code-block:: python
-   :linenos:
+:ref:`microframeworks_smaller_hello_world` section::
 
    from pyramid.response import Response # explicit response, no thread local
    from wsgiref.simple_server import make_server # explicitly WSGI
@@ -1640,10 +1579,7 @@ Let's take this criticism point-by-point.
 Too Complex
 +++++++++++
 
-If you can understand this hello world program, you can use Pyramid:
-
-.. code-block:: python
-   :linenos:
+If you can understand this hello world program, you can use Pyramid::
 
    from wsgiref.simple_server import make_server
    from pyramid.config import Configurator

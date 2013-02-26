@@ -45,10 +45,7 @@ tampered with.
 
 You can configure this session factory in your :app:`Pyramid`
 application by using the ``session_factory`` argument to the
-:class:`~pyramid.config.Configurator` class:
-
-.. code-block:: python
-   :linenos:
+:class:`~pyramid.config.Configurator` class::
 
    from pyramid.session import UnencryptedCookieSessionFactoryConfig
    my_session_factory = UnencryptedCookieSessionFactoryConfig('itsaseekreet')
@@ -82,10 +79,7 @@ Using a Session Object
 Once a session factory has been configured for your application, you
 can access session objects provided by the session factory via
 the ``session`` attribute of any :term:`request` object.  For
-example:
-
-.. code-block:: python
-   :linenos:
+example::
 
    from pyramid.response import Response
 
@@ -202,9 +196,7 @@ Using the ``session.flash`` Method
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To add a message to a flash message queue, use a session object's ``flash()``
-method:
-
-.. code-block:: python
+method::
 
    request.session.flash('mymessage')
 
@@ -226,9 +218,7 @@ page.  You can pass any name for your queue, but it must be a string.
 Each queue is independent, and can be popped by ``pop_flash()`` or
 examined via ``peek_flash()`` separately.  ``queue`` defaults to the
 empty string.  The empty string represents the default flash message
-queue.
-
-.. code-block:: python
+queue::
 
    request.session.flash(msg, 'myappsqueue')
 
@@ -253,7 +243,6 @@ that were added to the flash queue, and empties the queue.
 .. method:: pop_flash(queue='')
 
 .. code-block:: python
-   :linenos:
 
    >>> request.session.flash('info message')
    >>> request.session.pop_flash()
@@ -261,10 +250,7 @@ that were added to the flash queue, and empties the queue.
 
 Calling ``session.pop_flash()`` again like above without a corresponding call
 to ``session.flash()`` will return an empty list, because the queue has already
-been popped.
-
-.. code-block:: python
-   :linenos:
+been popped::
 
    >>> request.session.flash('info message')
    >>> request.session.pop_flash()
@@ -286,7 +272,6 @@ popped from flash storage.
 .. method:: peek_flash(queue='')
 
 .. code-block:: python
-   :linenos:
 
    >>> request.session.flash('info message')
    >>> request.session.peek_flash()
@@ -325,9 +310,7 @@ Using the ``session.get_csrf_token`` Method
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To get the current CSRF token from the session, use the
-``session.get_csrf_token()`` method.
-
-.. code-block:: python
+``session.get_csrf_token()`` method::
 
    token = request.session.get_csrf_token()
 
@@ -344,10 +327,7 @@ form post should use ``session.get_csrf_token()`` *again* to obtain the
 current CSRF token related to the user from the session, and compare it to
 the value of the hidden form field.  For example, if your form rendering
 included the CSRF token obtained via ``session.get_csrf_token()`` as a hidden
-input field named ``csrf_token``:
-
-.. code-block:: python
-   :linenos:
+input field named ``csrf_token``::
 
    token = request.session.get_csrf_token()
    if token != request.POST['csrf_token']:
@@ -363,9 +343,7 @@ To explicitly add a new CSRF token to the session, use the
 ``session.new_csrf_token()`` method.  This differs only from
 ``session.get_csrf_token()`` inasmuch as it clears any existing CSRF token,
 creates a new CSRF token, sets the token into the session, and returns the
-token.
-
-.. code-block:: python
+token::
 
    token = request.session.new_csrf_token()
 

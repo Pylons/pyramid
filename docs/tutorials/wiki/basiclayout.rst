@@ -22,9 +22,7 @@ application, because the application's ``setup.py`` file says so, this entry
 point happens to be the ``main`` function within the file named
 ``__init__.py``:
 
-   .. literalinclude:: src/basiclayout/tutorial/__init__.py
-      :linenos:
-      :language: py
+.. literalinclude:: src/basiclayout/tutorial/__init__.py
 
 #. *Lines 1-3*.  Perform some dependency imports.
 
@@ -74,9 +72,7 @@ resource objects, each of which also happens to be a domain model object.
 
 Here is the source for ``models.py``:
 
-   .. literalinclude:: src/basiclayout/tutorial/models.py
-      :linenos:
-      :language: py
+.. literalinclude:: src/basiclayout/tutorial/models.py
 
 #. *Lines 4-5*.  The ``MyModel`` :term:`resource` class is implemented here.
    Instances of this class are capable of being persisted in :term:`ZODB`
@@ -107,9 +103,7 @@ the URL ``http://localhost:6543/``.
 
 Here is the source for ``views.py``:
 
-   .. literalinclude:: src/basiclayout/tutorial/views.py
-      :linenos:
-      :language: py
+.. literalinclude:: src/basiclayout/tutorial/views.py
 
 Let's try to understand the components in this module:
 

@@ -161,9 +161,7 @@ Easier Scripting Writing
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 A new API function :func:`pyramid.paster.bootstrap` has been added to make
-writing scripts that need to work under Pyramid environment easier, e.g.:
-
-.. code-block:: python
+writing scripts that need to work under Pyramid environment easier, e.g.::
 
     from pyramid.paster import bootstrap
     info = bootstrap('/path/to/my/development.ini')
@@ -291,9 +289,7 @@ Minor Feature Additions
 - A new api function :func:`pyramid.scripting.prepare` has been added.  It is
   a lower-level analogue of :func:`pyramid.paster.boostrap` that accepts a
   request and a registry instead of a config file argument, and is used for
-  the same purpose:
-
-  .. code-block:: python
+  the same purpose::
 
       from pyramid.scripting import prepare
       info = prepare(registry=myregistry)
@@ -304,9 +300,7 @@ Minor Feature Additions
   The resulting request will have a ``registry`` attribute.  It is meant to
   be used in conjunction with :func:`pyramid.scripting.prepare` and/or
   :func:`pyramid.paster.bootstrap` (both of which accept a request as an
-  argument):
-
-  .. code-block:: python
+  argument)::
 
       from pyramid.scripting import make_request
       request = make_request('/')

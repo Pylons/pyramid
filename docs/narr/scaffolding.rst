@@ -30,10 +30,7 @@ directory within it named ``coolextension``
 
 Once you've created the distribution put a "scaffolds" directory within your
 distribution's package directory, and create a file within that directory
-named ``__init__.py`` with something like the following:
-
-.. code-block:: python
-   :linenos:
+named ``__init__.py`` with something like the following::
 
    # CoolExtension/coolextension/scaffolds/__init__.py
 
@@ -105,10 +102,7 @@ Supporting Older Pyramid Versions
 Because different versions of Pyramid handled scaffolding differently, if you
 want to have extension scaffolds that can work across Pyramid 1.0.X, 1.1.X,
 1.2.X and 1.3.X, you'll need to use something like this bit of horror while
-defining your scaffold template:
-
-.. code-block:: python
-   :linenos:
+defining your scaffold template::
 
      try: # pyramid 1.0.X
          # "pyramid.paster.paste_script..." doesn't exist past 1.0.X
@@ -144,10 +138,7 @@ defined this way under 1.3, an error is raised instructing them to use
 ``pcreate`` instead.
 
 If you want only to support Pyramid 1.3 only, it's much cleaner, and the API
-is stable:
-
-.. code-block:: python
-   :linenos:
+is stable::
 
    from pyramid.scaffolds import PyramidTemplate
 

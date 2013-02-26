@@ -116,20 +116,14 @@ time, as the ``root_factory`` argument to the :term:`Configurator`.
 The root factory is a Python callable that accepts a :term:`request`
 object, and returns the root object of the :term:`resource tree`. A
 function, or class is typically used as an application's root factory.
-Here's an example of a simple root factory class:
-
-.. code-block:: python
-   :linenos:
+Here's an example of a simple root factory class::
 
    class Root(dict):
        def __init__(self, request):
            pass
 
 Here's an example of using this root factory within startup configuration, by
-passing it to an instance of a :term:`Configurator` named ``config``:
-
-.. code-block:: python
-   :linenos:
+passing it to an instance of a :term:`Configurator` named ``config``::
 
    config = Configurator(root_factory=Root)
 
@@ -155,10 +149,7 @@ associated with a database connection or another persistence mechanism.
 
    For purposes of understanding the default root factory better, we'll note
    that you can emulate the default root factory by using this code as an
-   explicit root factory in your application setup:
-
-   .. code-block:: python
-      :linenos:
+   explicit root factory in your application setup::
 
       class Root(object):
           def __init__(self, request):
@@ -489,10 +480,7 @@ with interface declarations that refer to this interface.
 
 To attach an interface to a resource *class*, you define the interface and
 use the :func:`zope.interface.implementer` class decorator to associate the
-interface with the class.
-
-.. code-block:: python
-   :linenos:
+interface with the class::
 
    from zope.interface import Interface
    from zope.interface import implementer
@@ -507,10 +495,7 @@ interface with the class.
 To attach an interface to a resource *instance*, you define the interface and
 use the :func:`zope.interface.alsoProvides` function to associate the
 interface with the instance.  This function mutates the instance in such a
-way that the interface is attached to it.
-
-.. code-block:: python
-   :linenos:
+way that the interface is attached to it::
 
    from zope.interface import Interface
    from zope.interface import alsoProvides
@@ -532,10 +517,7 @@ callable is the same.  Assuming the above code that defines an ``IHello``
 interface lives in the root of your application, and its module is named
 "resources.py", the interface declaration below will associate the
 ``mypackage.views.hello_world`` view with resources that implement, or
-provide, this interface.
-
-.. code-block:: python
-   :linenos:
+provide, this interface::
 
    # config is an instance of pyramid.config.Configurator
 

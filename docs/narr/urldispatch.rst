@@ -16,12 +16,12 @@ receives the :term:`request` and returns a :term:`response` object.
 High-Level Operational Overview
 -------------------------------
 
-If route configuration is present in an application, the :app:`Pyramid`
+If a route configuration is present in an application, the :app:`Pyramid`
 :term:`Router` checks every incoming request against an ordered set of URL
 matching patterns present in a *route map*.
 
 If any route pattern matches the information in the :term:`request`,
-:app:`Pyramid` will invoke :term:`view lookup` to find a matching view.
+:app:`Pyramid` will invoke a :term:`view lookup` to find a matching view.
 
 If no route pattern in the route map matches the information in the
 :term:`request` provided in your application, :app:`Pyramid` will fail over
@@ -52,10 +52,7 @@ Configuring a Route to Match a View
 
 The :meth:`pyramid.config.Configurator.add_route` method adds a single
 :term:`route configuration` to the :term:`application registry`.  Here's an
-example:
-
-.. ignore-next-block
-.. code-block:: python
+example::
 
    # "config" below is presumed to be an instance of the
    # pyramid.config.Configurator class; "myview" is assumed
@@ -70,29 +67,21 @@ via its ``route_name`` predicate, that view callable will always be found and
 invoked when the associated route pattern matches during a request.
 
 More commonly, you will not use any ``add_view`` statements in your project's
-"setup" code, instead only using ``add_route`` statements using a
-:term:`scan` for to associate view callables with routes.  For example, if
-this is a portion of your project's ``__init__.py``:
-
-.. code-block:: python
-
-   # in your project's __init__.py (mypackage.__init__)
+"setup" code, instead only using ``add_route`` statements and using a
+:term:`scan` to associate view callables with routes.  For example, if
+this is a portion of your project's ``__init__.py``::
 
    config.add_route('myroute', '/prefix/{one}/{two}')
    config.scan('mypackage')
 
 Note that we don't call :meth:`~pyramid.config.Configurator.add_view` in this
 setup code.  However, the above :term:`scan` execution
-``config.scan('mypackage')`` will pick up all :term:`configuration
+``config.scan('mypackage')`` will pick up each :term:`configuration
 decoration`, including any objects decorated with the
 :class:`pyramid.view.view_config` decorator in the ``mypackage`` Python
 package.  For example, if you have a ``views.py`` in your package, a scan will
 pick up any of its configuration decorators, so we can add one there
-that references ``myroute`` as a ``route_name`` parameter:
-
-.. code-block:: python
-
-   # in your project's views.py module (mypackage.views)
+that references ``myroute`` as a ``route_name`` parameter::
 
    from pyramid.view import view_config
    from pyramid.response import Response
@@ -495,10 +484,7 @@ Example 1
 ~~~~~~~~~
 
 The simplest route declaration which configures a route match to *directly*
-result in a particular view callable being invoked:
-
-.. code-block:: python
-   :linenos:
+result in a particular view callable being invoked::
 
     config.add_route('idea', 'site/{id}')
     config.add_view('mypackage.views.site_view', route_name='idea')
@@ -520,10 +506,7 @@ attached to the request as ``request.matchdict``.  If the specific URL
 matched is ``/site/1``, the ``matchdict`` will be a dictionary with a single
 key, ``id``; the value will be the string ``'1'``, ex.: ``{'id':'1'}``.
 
-The ``mypackage.views`` module referred to above might look like so:
-
-.. code-block:: python
-   :linenos:
+The ``mypackage.views`` module referred to above might look like so::
 
    from pyramid.response import Response
 
@@ -540,10 +523,7 @@ Example 2
 ~~~~~~~~~
 
 Below is an example of a more complicated set of route statements you might
-add to your application:
-
-.. code-block:: python
-   :linenos:
+add to your application::
 
    config.add_route('idea', 'ideas/{idea}')
    config.add_route('user', 'users/{user}')
@@ -596,20 +576,14 @@ The ``factory`` should be a callable that accepts a :term:`request` and
 returns an instance of a class that will be the context resource used by the
 view.
 
-An example of using a route with a factory:
-
-.. code-block:: python
-   :linenos:
+An example of using a route with a factory::
 
    config.add_route('idea', 'ideas/{idea}', factory='myproject.resources.Idea')
    config.add_view('myproject.views.idea_view', route_name='idea')
 
 The above route will manufacture an ``Idea`` resource as a :term:`context`,
 assuming that ``mypackage.resources.Idea`` resolves to a class that accepts a
-request in its ``__init__``.  For example:
-
-.. code-block:: python
-   :linenos:
+request in its ``__init__``.  For example::
 
    class Idea(object):
        def __init__(self, request):
@@ -630,17 +604,11 @@ Matching the Root URL
 
 It's not entirely obvious how to use a route pattern to match the root URL
 ("/").  To do so, give the empty string as a pattern in a call to
-:meth:`~pyramid.config.Configurator.add_route`:
-
-.. code-block:: python
-   :linenos:
+:meth:`~pyramid.config.Configurator.add_route`::
 
    config.add_route('root', '')
 
-Or provide the literal string ``/`` as the pattern:
-
-.. code-block:: python
-   :linenos:
+Or provide the literal string ``/`` as the pattern::
 
    config.add_route('root', '/')
 
@@ -655,10 +623,7 @@ Generating Route URLs
 
 Use the :meth:`pyramid.request.Request.route_url` method to generate URLs
 based on route patterns.  For example, if you've configured a route with the
-``name`` "foo" and the ``pattern`` "{a}/{b}/{c}", you might do this.
-
-.. code-block:: python
-   :linenos:
+``name`` "foo" and the ``pattern`` "{a}/{b}/{c}", you might do this::
 
    url = request.route_url('foo', a='1', b='2', c='3')
 
@@ -667,9 +632,7 @@ least if the current protocol and hostname implied ``http://example.com``).
 
 To generate only the *path* portion of a URL from a route, use the
 :meth:`pyramid.request.Request.route_path` API instead of
-:meth:`~pyramid.request.Request.route_url`.
-
-.. code-block:: python
+:meth:`~pyramid.request.Request.route_url`::
 
    url = request.route_path('foo', a='1', b='2', c='3')
 
@@ -683,15 +646,11 @@ UTF-8 strings.
 
 Note that URLs and paths generated by ``route_path`` and ``route_url`` are
 always URL-quoted string types (they contain no non-ASCII characters).
-Therefore, if you've added a route like so:
-
-.. code-block:: python
+Therefore, if you've added a route like so::
 
    config.add_route('la', u'/La Peña/{city}')
 
-And you later generate a URL using ``route_path`` or ``route_url`` like so:
-
-.. code-block:: python
+And you later generate a URL using ``route_path`` or ``route_url`` like so::
 
    url = request.route_path('la', city=u'Québec')
 
@@ -701,16 +660,12 @@ You will wind up with the path encoded to UTF-8 and URL quoted like so:
 
    /La%20Pe%C3%B1a/Qu%C3%A9bec
 
-If you have a ``*stararg`` remainder dynamic part of your route pattern:
-
-.. code-block:: python
+If you have a ``*stararg`` remainder dynamic part of your route pattern::
 
    config.add_route('abc', 'a/b/c/*foo')
 
 And you later generate a URL using ``route_path`` or ``route_url`` using a
-*string* as the replacement value:
-
-.. code-block:: python
+*string* as the replacement value::
 
    url = request.route_path('abc', foo=u'Québec/biz')
 
@@ -721,9 +676,7 @@ result:
 
    /a/b/c/Qu%C3%A9bec/biz
 
-You can get a similar result by passing a tuple composed of path elements:
-
-.. code-block:: python
+You can get a similar result by passing a tuple composed of path elements::
 
    url = request.route_path('abc', foo=(u'Québec', u'biz'))
 
@@ -741,10 +694,7 @@ Each value in the tuple will be url-quoted and joined by slashes in this case:
 Static Routes
 -------------
 
-Routes may be added with a ``static`` keyword argument.  For example:
-
-.. code-block:: python
-   :linenos:
+Routes may be added with a ``static`` keyword argument.  For example::
 
    config = Configurator()
    config.add_route('page', '/page/{action}', static=True)
@@ -783,10 +733,7 @@ matches any route's pattern.  In this case it does an HTTP redirect to the
 slash-appended ``PATH_INFO``.
 
 Let's use an example.  If the following routes are configured in your
-application:
-
-.. code-block:: python
-   :linenos:
+application::
 
    from pyramid.httpexceptions import HTTPNotFound
 
@@ -824,10 +771,7 @@ found by the slash-appending not found view.  An HTTP redirect to
 
 The following application uses the :class:`pyramid.view.notfound_view_config`
 and :class:`pyramid.view.view_config` decorators and a :term:`scan` to do
-exactly the same job:
-
-.. code-block:: python
-   :linenos:
+exactly the same job::
 
    from pyramid.httpexceptions import HTTPNotFound
    from pyramid.view import notfound_view_config, view_config
@@ -877,10 +821,8 @@ Details of the route matching decision for a particular request to the
 which you started the application from.  For example:
 
 .. code-block:: text
-   :linenos:
 
-    [chrism@thinko pylonsbasic]$ PYRAMID_DEBUG_ROUTEMATCH=true \
-                                 bin/pserve development.ini
+    $ PYRAMID_DEBUG_ROUTEMATCH=true bin/pserve development.ini
     Starting server in PID 13586.
     serving on 0.0.0.0:6543 view at http://127.0.0.1:6543
     2010-12-16 14:45:19,956 no route matched for url \
@@ -920,10 +862,7 @@ all route patterns added by the *included* configuration.  Any calls to
 will have their pattern prefixed with the value of ``route_prefix``. This can
 be used to help mount a set of routes at a different location than the
 included callable's author intended while still maintaining the same route
-names.  For example:
-
-.. code-block:: python
-   :linenos:
+names.  For example::
 
    from pyramid.config import Configurator
 
@@ -943,10 +882,7 @@ name ``show_users``, it will generate a URL with that same path.
 
 Route prefixes are recursive, so if a callable executed via an include itself
 turns around and includes another callable, the second-level route prefix
-will be prepended with the first:
-
-.. code-block:: python
-   :linenos:
+will be prepended with the first::
 
    from pyramid.config import Configurator
 
@@ -970,10 +906,7 @@ Route prefixes have no impact on the requirement that the set of route
 compose your URL dispatch application out of many small subapplications using
 :meth:`pyramid.config.Configurator.include`, it's wise to use a dotted name
 for your route names, so they'll be unlikely to conflict with other packages
-that may be added in the future.  For example:
-
-.. code-block:: python
-   :linenos:
+that may be added in the future.  For example::
 
    from pyramid.config import Configurator
 
@@ -1008,10 +941,7 @@ dictionary: it represents the arguments matched in the URL by the route.
 :class:`pyramid.interfaces.IRoute` for the API of such a route object).
 
 ``info['match']`` is useful when predicates need access to the route match.
-For example:
-
-.. code-block:: python
-   :linenos:
+For example::
 
    def any_of(segment_name, *allowed):
        def predicate(info, request):
@@ -1034,10 +964,7 @@ the result as a custom predicate by feeding it inside a tuple to the
 :meth:`~pyramid.config.Configurator.add_route`.
 
 A custom route predicate may also *modify* the ``match`` dictionary.  For
-instance, a predicate might do some type conversion of values:
-
-.. code-block:: python
-   :linenos:
+instance, a predicate might do some type conversion of values::
 
     def integers(*segment_names):
         def predicate(info, request):
@@ -1060,10 +987,7 @@ Note that a conversion predicate is still a predicate so it must return
 one we demonstrate above should unconditionally return ``True``.
 
 To avoid the try/except uncertainty, the route pattern can contain regular
-expressions specifying requirements for that marker. For instance:
-
-.. code-block:: python
-   :linenos:
+expressions specifying requirements for that marker. For instance::
 
     def integers(*segment_names):
         def predicate(info, request):
@@ -1102,10 +1026,7 @@ will receive the *modified* match dictionary.
 The ``route`` object in the ``info`` dict is an object that has two useful
 attributes: ``name`` and ``pattern``.  The ``name`` attribute is the route
 name.  The ``pattern`` attribute is the route pattern.  An example of using
-the route in a set of route predicates:
-
-.. code-block:: python
-   :linenos:
+the route in a set of route predicates::
 
     def twenty_ten(info, request):
         if info['route'].name in ('ymd', 'ym', 'y'):
@@ -1124,10 +1045,7 @@ You can also caption the predicates by setting the ``__text__``
 attribute. This will help you with the ``pviews`` command (see
 :ref:`displaying_application_routes`) and the ``pyramid_debugtoolbar``.
 
-If a predicate is a class just add __text__ property in a standard manner.
-
-.. code-block:: python
-   :linenos:
+If a predicate is a class just add __text__ property in a standard manner::
 
    class DummyCustomPredicate1(object):
        def __init__(self):
@@ -1137,20 +1055,14 @@ If a predicate is a class just add __text__ property in a standard manner.
        __text__ = 'my custom class predicate'
 
 If a predicate is a method you'll need to assign it after method declaration
-(see `PEP 232 <http://www.python.org/dev/peps/pep-0232/>`_)
-
-.. code-block:: python
-   :linenos:
+(see `PEP 232 <http://www.python.org/dev/peps/pep-0232/>`_)::
 
    def custom_predicate():
        pass
    custom_predicate.__text__ = 'my custom method predicate'
 
 If a predicate is a classmethod using @classmethod will not work, but you can
-still easily do it by wrapping it in classmethod call.
-
-.. code-block:: python
-   :linenos:
+still easily do it by wrapping it in classmethod call::
 
    def classmethod_predicate():
        pass
@@ -1178,10 +1090,7 @@ request, and a factory is attached to a route, the :term:`root factory`
 passed at startup time to the :term:`Configurator` is ignored; instead the
 factory associated with the route is used to generate a :term:`root` object.
 This object will usually be used as the :term:`context` resource of the view
-callable ultimately found via :term:`view lookup`.
-
-.. code-block:: python
-   :linenos:
+callable ultimately found via :term:`view lookup`::
 
    config.add_route('abc', '/abc',
                     factory='myproject.resources.root_factory')
@@ -1195,10 +1104,7 @@ supply a different :term:`context` resource object to the view related to
 each particular route.
 
 A factory must be a callable which accepts a request and returns an arbitrary
-Python object.  For example, the below class can be used as a factory:
-
-.. code-block:: python
-   :linenos:
+Python object.  For example, the below class can be used as a factory::
 
    class Mine(object):
        def __init__(self, request):
@@ -1232,10 +1138,7 @@ declarative security purposes.  You can use the ``factory`` argument that
 points at a factory which attaches a custom ``__acl__`` to an object at its
 creation time.
 
-Such a ``factory`` might look like so:
-
-.. code-block:: python
-   :linenos:
+Such a ``factory`` might look like so::
 
    class Article(object):
        def __init__(self, request):

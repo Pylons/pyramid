@@ -68,9 +68,7 @@ specific path information for commands and files.
        $ ../bin/python setup.py install
 
 #.  Within the virtualenv directory (``~/modwsgi/env``), create a
-    script named ``pyramid.wsgi``.  Give it these contents:
-
-    .. code-block:: python
+    script named ``pyramid.wsgi``.  Give it these contents::
 
        from pyramid.paster import get_app, setup_logging
        ini_path = '/Users/chrism/modwsgi/env/myapp/production.ini'

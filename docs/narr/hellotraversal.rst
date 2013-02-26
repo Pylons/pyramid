@@ -14,7 +14,6 @@ If code speaks louder than words, maybe this will help. Here is a
 single-file Pyramid application that uses traversal:
 
 .. literalinclude:: hellotraversal.py
-   :linenos:
 
 You may notice that this application is intentionally very similar to
 the "hello world" app from :doc:`firstapp`.

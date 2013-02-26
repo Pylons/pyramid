@@ -34,10 +34,7 @@ given templating engine to do so.
 directly from within a view callable.  For example, if there is a
 :term:`Chameleon` ZPT template named ``foo.pt`` in a directory  named
 ``templates`` in your application, you can render the template from
-within the body of a view callable like so:
-
-.. code-block:: python
-   :linenos:
+within the body of a view callable like so::
 
    from pyramid.renderers import render_to_response
 
@@ -74,10 +71,7 @@ prefix on Windows.
 
 The path can alternately be a :term:`asset specification` in the form
 ``some.dotted.package_name:relative/path``. This makes it possible to
-address template assets which live in another package.  For example:
-
-.. code-block:: python
-   :linenos:
+address template assets which live in another package.  For example::
 
    from pyramid.renderers import render_to_response
 
@@ -124,10 +118,7 @@ response object. For example, you might render one or more templates to
 a string that you want to use as response data.  The
 :func:`pyramid.renderers.render` API renders a template to a string. We
 can manufacture a :term:`response` object directly, and use that string
-as the body of the response:
-
-.. code-block:: python
-   :linenos:
+as the body of the response::
 
    from pyramid.renderers import render
    from pyramid.response import Response
@@ -148,11 +139,7 @@ string, then return that string as the body of a :app:`Pyramid`
 :term:`Response` object.
 
 For example, here's an example of using "raw" `Mako
-<http://www.makotemplates.org/>`_ from within a :app:`Pyramid` :term:`view`:
-
-.. ignore-next-block
-.. code-block:: python
-   :linenos:
+<http://www.makotemplates.org/>`_ from within a :app:`Pyramid` :term:`view`::
 
    from mako.template import Template
    from pyramid.response import Response
@@ -191,10 +178,7 @@ may set attributes on the response that influence these values.
 
 Here's an example of changing the content-type and status of the
 response object returned by
-:func:`~pyramid.renderers.render_to_response`:
-
-.. code-block:: python
-   :linenos:
+:func:`~pyramid.renderers.render_to_response`::
 
    from pyramid.renderers import render_to_response
 
@@ -207,10 +191,7 @@ response object returned by
        return response
 
 Here's an example of manufacturing a response object using the result
-of :func:`~pyramid.renderers.render` (a string):
-
-.. code-block:: python
-   :linenos:
+of :func:`~pyramid.renderers.render` (a string)::
 
    from pyramid.renderers import render
    from pyramid.response import Response
@@ -312,10 +293,7 @@ callable` that handles the rendering of a template.
 
 Here's an example of using a :class:`~pyramid.view.view_config`
 decorator to specify a :term:`view configuration` that names a
-template renderer:
-
-.. code-block:: python
-   :linenos:
+template renderer::
 
    from pyramid.view import view_config
 
@@ -408,10 +386,7 @@ templates is available from `the Chameleon website
 
 Given a :term:`Chameleon` ZPT template named ``foo.pt`` in a directory
 in your application named ``templates``, you can render the template as
-a :term:`renderer` like so:
-
-.. code-block:: python
-   :linenos:
+a :term:`renderer` like so::
 
    from pyramid.view import view_config
 
@@ -432,7 +407,6 @@ Here's what a simple :term:`Chameleon` ZPT template used under
 :app:`Pyramid` might look like:
 
 .. code-block:: xml
-   :linenos:
 
     <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" 
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -479,10 +453,7 @@ template.  To do this you can use the :func:`pyramid.renderers.get_renderer`
 API to retrieve the macro template, and pass it into the template being
 rendered via the dictionary returned by the view.  For example, using a
 :term:`view configuration` via a :class:`~pyramid.view.view_config` decorator
-that uses a :term:`renderer`:
-
-.. code-block:: python
-   :linenos:
+that uses a :term:`renderer`::
 
    from pyramid.renderers import get_renderer
    from pyramid.view import view_config
@@ -495,7 +466,6 @@ that uses a :term:`renderer`:
 Where ``templates/master.pt`` might look like so:
 
 .. code-block:: xml
-   :linenos:
 
     <html xmlns="http://www.w3.org/1999/xhtml" 
           xmlns:tal="http://xml.zope.org/namespaces/tal"
@@ -510,7 +480,6 @@ Where ``templates/master.pt`` might look like so:
 And ``templates/mytemplate.pt`` might look like so:
 
 .. code-block:: xml
-   :linenos:
 
     <html xmlns="http://www.w3.org/1999/xhtml" 
           xmlns:tal="http://xml.zope.org/namespaces/tal"
@@ -529,10 +498,7 @@ instead of the full Chameleon ZPT template. To render the content of a
 ``define-macro`` field inside a Chameleon ZPT template, given a Chameleon
 template file named ``foo.pt`` and a macro named ``bar`` defined within it
 (e.g. ``<div metal:define-macro="bar">...</div>``), you can configure the
-template as a :term:`renderer` like so:
-
-.. code-block:: python
-   :linenos:
+template as a :term:`renderer` like so::
 
    from pyramid.view import view_config
 
@@ -567,10 +533,7 @@ directory with the following contents:
    Hello, ${name}!
 
 Then in your project's ``views.py`` module, you can create a view
-which renders this template:
-
-.. code-block:: python
-   :linenos:
+which renders this template::
 
    from pyramid.view import view_config
 
@@ -668,10 +631,7 @@ website <http://www.makotemplates.org/>`_.
 
 To use a Mako template, given a :term:`Mako` template file named ``foo.mak``
 in the ``templates`` subdirectory in your application package named
-``mypackage``, you can configure the template as a :term:`renderer` like so:
-
-.. code-block:: python
-   :linenos:
+``mypackage``, you can configure the template as a :term:`renderer` like so::
 
    from pyramid.view import view_config
 
@@ -702,7 +662,6 @@ Here's what a simple :term:`Mako` template used under :app:`Pyramid` might
 look like:
 
 .. code-block:: xml
-   :linenos:
 
     <html>
     <head>
@@ -727,10 +686,7 @@ Using A Mako def name Within a Renderer Name
 Sommetime you'd like to render a ``def`` inside of a Mako template instead of
 the full Mako template. To render a def inside a Mako template, given a
 :term:`Mako` template file named ``foo.mak`` and a def named ``bar``, you can
-configure the template as a :term:`renderer` like so:
-
-.. code-block:: python
-   :linenos:
+configure the template as a :term:`renderer` like so::
 
    from pyramid.view import view_config
 
@@ -778,7 +734,6 @@ purpose, set the ``pyramid.reload_templates`` key to ``true`` within the
 application's configuration section, e.g.:
 
 .. code-block:: ini
-  :linenos:
 
   [app:main]
   use = egg:MyProject
