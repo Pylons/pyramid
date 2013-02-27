@@ -621,7 +621,7 @@ Debugging Templates
 -------------------
 
 A :exc:`NameError` exception resulting from rendering a template with an
-undefined variable (e.g. ``${wrong}``) might will end like this:
+undefined variable (e.g. ``${wrong}``) might end up looking like this:
 
 .. code-block:: text
 
