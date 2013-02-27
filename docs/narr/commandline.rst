@@ -276,10 +276,10 @@ exposed, and the request is configured to generate urls from the host
 IPython or bpython
 ~~~~~~~~~~~~~~~~~~
 
-If you have `IPython <http://en.wikipedia.org/wiki/IPython>`_ or 
-`bpython <http://bpython-interpreter.org/>`_ or both installed in
+If you have `IPython <http://en.wikipedia.org/wiki/IPython>`_ and/or
+`bpython <http://bpython-interpreter.org/>`_ in
 the interpreter you use to invoke the ``pshell`` command, ``pshell`` will 
-autodiscover them and use the first respectively found in this order :
+autodiscover and use the first one found, in this order:
 IPython, bpython, standard Python interpreter. However you could 
 specifically invoke one of your choice with the ``-p choice`` or 
 ``--python-shell choice`` option.
