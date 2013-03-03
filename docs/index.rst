@@ -112,12 +112,13 @@ platforms.
 API Documentation
 ==================
 
-Documentation for every :app:`Pyramid` API.
+Comprehensive reference material for every public API exposed by :app:`Pyramid`:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
+   :glob:
 
-   api
+   api/*
 
 Change History
 ==============
