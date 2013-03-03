@@ -350,7 +350,7 @@ called with no arguments, so it 'just works' in environments that don't
 configure logging. Since we've configured our own logging handlers, we need
 to disable that option via ``setup_console_handler = False``.
 
-With the filter in place, TransLogger's logger (named the 'wsgi' logger) will
+With the filter in place, TransLogger's logger (named the ``wsgi`` logger) will
 propagate its log messages to the parent logger (the root logger), sending
 its output to the console when we request a page:
 
@@ -364,14 +364,18 @@ its output to the console when we request a page:
     Firefox/2.0.0.6" 
 
 To direct TransLogger to an ``access.log`` FileHandler, we need to add that
-FileHandler to the wsgi logger's list of handlers:
+FileHandler to the list of handlers (named ``accesslog``), and ensure that the 
+``wsgi`` logger is configured and uses this handler accordingly:
 
 .. code-block:: ini 
 
     # Begin logging configuration 
 
-    [loggers] 
-    keys = root, myapp, wsgi 
+    [loggers]
+    keys = root, myapp, wsgi
+
+    [handlers]
+    keys = console, accesslog
 
     [logger_wsgi] 
     level = INFO 
@@ -387,19 +391,18 @@ FileHandler to the wsgi logger's list of handlers:
 
 As mentioned above, non-root loggers by default propagate their log records
 to the root logger's handlers (currently the console handler). Setting
-``propagate`` to 0 (false) here disables this; so the ``wsgi`` logger directs
-its records only to the ``accesslog`` handler.
+``propagate`` to ``0`` (``False``) here disables this; so the ``wsgi`` logger 
+directs its records only to the ``accesslog`` handler.
 
 Finally, there's no need to use the ``generic`` formatter with TransLogger as
 TransLogger itself provides all the information we need. We'll use a
-formatter that passes-through the log messages as is:
+formatter that passes-through the log messages as is. Add a new formatter
+called ``accesslog`` by include the following in your configuration file:
 
 .. code-block:: ini 
 
     [formatters] 
     keys = generic, accesslog 
-
-.. code-block:: ini 
 
     [formatter_accesslog] 
     format = %(message)s 
