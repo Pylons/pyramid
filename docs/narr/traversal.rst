@@ -22,10 +22,10 @@ resource found as the result of a traversal becomes the
 subsystem is used to find some view code willing to "publish" this
 resource by generating a :term:`response`.
 
-Using :term:`Traversal` to map a URL to code is optional.  It is often
-less easy to understand than :term:`URL dispatch`, so if you're a rank
-beginner, it probably makes sense to use URL dispatch to map URLs to
-code instead of traversal.  In that case, you can skip this chapter.
+.. note::
+
+   As a way of mapping URLs to code, :term:`URL dispatch` is easier to
+   understand than :term:`Traversal`, so is recommended for beginners.
 
 .. index::
    single: traversal details
