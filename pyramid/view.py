@@ -168,8 +168,8 @@ class view_config(object):
              backwards compatibility purposes, as the name
              :class:`pyramid.view.bfg_view`.
 
-    The following keyword arguments are supported to
-    :class:`pyramid.view.view_config`: ``context``, ``permission``, ``name``,
+    :class:`pyramid.view.view_config` supports the following keyword
+    arguments: ``context``, ``permission``, ``name``,
     ``request_type``, ``route_name``, ``request_method``, ``request_param``,
     ``containment``, ``xhr``, ``accept``, ``header``, ``path_info``,
     ``custom_predicates``, ``decorator``, ``mapper``, ``http_cache``,
