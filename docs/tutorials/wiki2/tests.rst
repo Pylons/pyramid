@@ -54,7 +54,7 @@ Change the ``requires`` list in ``setup.py`` to include ``WebTest``.
 .. literalinclude:: src/tests/setup.py
    :linenos:
    :language: python
-   :lines: 9-20
+   :lines: 11-21
    :emphasize-lines: 10
 
 After we've added a dependency on WebTest in ``setup.py``, we need to rerun
