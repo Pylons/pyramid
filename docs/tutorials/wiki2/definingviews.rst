@@ -33,7 +33,7 @@ Open ``tutorial/setup.py`` and edit it to look like the following:
 .. literalinclude:: src/views/setup.py
    :linenos:
    :language: python
-   :emphasize-lines: 17
+   :emphasize-lines: 19
 
 (Only the highlighted line needs to be added.)
 
