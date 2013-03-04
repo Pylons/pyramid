@@ -283,10 +283,7 @@
        will be raised if ``name`` is ``None`` or ``reify`` is ``True``.
 
        If ``name`` is None, the name of the property will be computed
-       from the name of the ``callable``.
-
-       .. code-block:: python
-          :linenos:
+       from the name of the ``callable``::
 
           def _connect(request):
               conn = request.registry.dbsession()

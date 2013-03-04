@@ -49,7 +49,6 @@ Default logging configuration is provided in both the default
 configuration in the ``development.ini`` file is as follows:
 
 .. code-block:: ini
-   :linenos:
 
    # Begin logging configuration
 
@@ -90,14 +89,12 @@ project's :term:`package`, which is derived from the name you provide to your
 project.  For instance, if you do:
 
 .. code-block:: text
-   :linenos:
 
    pcreate -s starter MyApp
 
 The logging configuration will literally be:
 
 .. code-block:: ini
-   :linenos:
 
    # Begin logging configuration
 
@@ -178,10 +175,7 @@ logger.
 
 To log messages to the package-specific logger configured in your ``.ini``
 file, simply create a logger object using the ``__name__`` builtin and call
-methods on it.
-
-.. code-block:: python 
-   :linenos:
+methods on it.:
 
     import logging 
     log = logging.getLogger(__name__) 

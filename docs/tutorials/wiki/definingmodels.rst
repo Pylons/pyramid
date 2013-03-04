@@ -77,8 +77,6 @@ The result of all of our edits to ``models.py`` will end up looking
 something like this:
 
 .. literalinclude:: src/models/tutorial/models.py
-   :linenos:
-   :language: python
 
 View the Application in a Browser
 ---------------------------------

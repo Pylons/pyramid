@@ -517,3 +517,9 @@ epub_exclude_files = ['_static/opensearch.xml', '_static/doctools.js',
 
 # The depth of the table of contents in toc.ncx.
 epub_tocdepth = 3
+
+# Avoid the need to specify linenos
+rst_prolog = '''
+.. highlight:: python
+   :linenothreshold: 5
+'''

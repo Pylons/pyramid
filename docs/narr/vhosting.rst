@@ -43,7 +43,6 @@ Here's an example of a PasteDeploy configuration snippet that includes
 a ``urlmap`` composite.
 
 .. code-block:: ini
-  :linenos:
 
   [app:mypyramidapp]
   use = egg:mypyramidapp
@@ -71,7 +70,6 @@ configuration setting in a :term:`mod_wsgi` configuration does the
 work for you:
 
 .. code-block:: apache
-   :linenos:
 
    WSGIScriptAlias /pyramidapp /Users/chrism/projects/modwsgi/env/pyramid.wsgi
 
@@ -109,7 +107,6 @@ An example of an Apache ``mod_proxy`` configuration that will host the
 is below:
 
 .. code-block:: apache
-   :linenos:
 
     NameVirtualHost *:80
 
@@ -130,7 +127,6 @@ For a :app:`Pyramid` application running under :term:`mod_wsgi`,
 the same can be achieved using ``SetEnv``:
 
 .. code-block:: apache
-   :linenos:
 
     <Location />
       SetEnv HTTP_X_VHM_ROOT /cms

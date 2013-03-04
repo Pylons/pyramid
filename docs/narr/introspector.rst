@@ -23,10 +23,7 @@ Using the Introspector
 ----------------------
 
 Here's an example of using Pyramid's introspector from within a view
-callable:
-
-.. code-block:: python
-   :linenos:
+callable::
 
     from pyramid.view import view_config
     from pyramid.response import Response
@@ -99,10 +96,7 @@ The important attributes shared by all introspectables are the following:
 Besides having the attributes described above, an introspectable is a
 dictionary-like object.  An introspectable can be queried for data values via
 its ``__getitem__``, ``get``, ``keys``, ``values``, or ``items`` methods.
-For example:
-
-.. code-block:: python
-   :linenos:
+For example::
 
     route_intr = introspector.get('routes', 'edit_user')
     pattern = route_intr['pattern']

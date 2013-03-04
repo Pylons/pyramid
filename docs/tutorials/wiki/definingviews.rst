@@ -43,8 +43,6 @@ assigning this dependency to the ``install_requires`` parameter in the
 Our resulting ``setup.py`` should look like so:
 
 .. literalinclude:: src/views/setup.py
-   :linenos:
-   :language: python
 
 .. note:: After these new dependencies are added, you will need to
    rerun ``python setup.py develop`` inside the root of the
@@ -76,7 +74,6 @@ will be added to ``views.py``:
 
 .. literalinclude:: src/views/tutorial/views.py
    :lines: 12-14
-   :language: python
 
 The ``view_wiki`` function will be configured to respond as the default view
 callable for a Wiki resource.  We'll provide it with a ``@view_config``
@@ -105,7 +102,6 @@ will be added to ``views.py``:
 
 .. literalinclude:: src/views/tutorial/views.py
    :lines: 16-33
-   :language: python
 
 The ``view_page`` function will be configured to respond as the default view
 of a Page resource.  We'll provide it with a ``@view_config`` decorator which
@@ -158,7 +154,6 @@ will be added to ``views.py``:
 
 .. literalinclude:: src/views/tutorial/views.py
    :lines: 35-50
-   :language: python
 
 The ``add_page`` function will be configured to respond when the context
 resource is a Wiki and the :term:`view name` is ``add_page``.  We'll provide
@@ -212,7 +207,6 @@ will be added to ``views.py``:
 
 .. literalinclude:: src/views/tutorial/views.py
    :lines: 52-60
-   :language: python
 
 The ``edit_page`` function will be configured to respond when the context is
 a Page resource and the :term:`view name` is ``edit_page``.  We'll provide it
@@ -247,8 +241,6 @@ The result of all of our edits to ``views.py`` will leave it looking like
 this:
 
 .. literalinclude:: src/views/tutorial/views.py
-   :linenos:
-   :language: python
 
 Adding Templates
 ================
@@ -266,7 +258,6 @@ Create ``tutorial/tutorial/templates/view.pt`` and add the following
 content:
 
 .. literalinclude:: src/views/tutorial/templates/view.pt
-   :linenos:
    :language: xml
 
 This template is used by ``view_page()`` for displaying a single
@@ -287,7 +278,6 @@ Create ``tutorial/tutorial/templates/edit.pt`` and add the following
 content:
 
 .. literalinclude:: src/views/tutorial/templates/edit.pt
-   :linenos:
    :language: xml
 
 This template is used by ``add_page()`` and ``edit_page()`` for adding

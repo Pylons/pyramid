@@ -31,8 +31,6 @@ package's ``setup.py`` file by assigning this dependency to the ``requires`` par
 Open ``tutorial/setup.py`` and edit it to look like the following:
 
 .. literalinclude:: src/views/setup.py
-   :linenos:
-   :language: python
    :emphasize-lines: 19
 
 (Only the highlighted line needs to be added.)

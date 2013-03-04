@@ -72,8 +72,6 @@ Here's a high-level time-ordered overview of what happens when you press
    ``__init__.py`` module:
 
    .. literalinclude:: MyProject/myproject/__init__.py
-      :language: python
-      :linenos:
 
    Note that the constructor function accepts a ``global_config`` argument,
    which is a dictionary of key/value pairs mentioned in the ``[DEFAULT]``
@@ -90,7 +88,6 @@ Here's a high-level time-ordered overview of what happens when you press
 
    .. literalinclude:: MyProject/development.ini
       :language: ini
-      :linenos:
 
    In this case, the ``myproject.__init__:main`` function referred to by the
    entry point URI ``egg:MyProject`` (see :ref:`MyProject_ini` for more

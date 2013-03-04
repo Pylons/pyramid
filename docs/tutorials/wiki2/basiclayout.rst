@@ -19,24 +19,18 @@ Open ``tutorial/tutorial/__init__.py``.  It should already contain
 the following:
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
-      :linenos:
-      :language: py
 
 Let's go over this piece-by-piece.  First, we need some imports to support
 later code:
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
       :end-before: main
-      :linenos:
-      :language: py
 
 ``__init__.py`` defines a function named ``main``.  Here is the entirety of
 the ``main`` function we've defined in our ``__init__.py``:
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
       :pyobject: main
-      :linenos:
-      :language: py
 
 When you invoke the ``pserve development.ini`` command, the ``main`` function
 above is executed.  It accepts some settings and returns a :term:`WSGI`
@@ -49,14 +43,12 @@ The main function first creates a :term:`SQLAlchemy` database engine using
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
       :lines: 13
-      :language: py
 
 ``main`` then initializes our SQLAlchemy session object, passing it the
 engine:
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
       :lines: 14
-      :language: py
 
 ``main`` subsequently initializes our SQLAlchemy declarative ``Base`` object,
 assigning the engine we created to the ``bind`` attribute of it's
@@ -68,13 +60,11 @@ doesn't work.
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
       :lines: 15
-      :language: py
 
 The next step of ``main`` is to construct a :term:`Configurator` object:
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
       :lines: 16
-      :language: py
 
 ``settings`` is passed to the Configurator as a keyword argument with the
 dictionary values passed as the ``**settings`` argument.  This will be a
@@ -87,7 +77,6 @@ two arguments: ``static`` (the name), and ``static`` (the path):
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
       :lines: 17
-      :language: py
 
 This registers a static resource view which will match any URL that starts
 with the prefix ``/static`` (by virtue of the first argument to
@@ -105,7 +94,6 @@ used when the URL is ``/``:
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
       :lines: 18
-      :language: py
 
 Since this route has a ``pattern`` equalling ``/`` it is the route that will
 be matched when the URL ``/`` is visited, e.g. ``http://localhost:6543/``.
@@ -119,7 +107,6 @@ application URLs to be mapped to some code.
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
       :lines: 19
-      :language: py
 
 Finally, ``main`` is finished configuring things, so it uses the
 :meth:`pyramid.config.Configurator.make_wsgi_app` method to return a
@@ -127,7 +114,6 @@ Finally, ``main`` is finished configuring things, so it uses the
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
       :lines: 20
-      :language: py
 
 View Declarations via ``views.py``
 ----------------------------------
@@ -141,8 +127,6 @@ each route, thereby mapping URL patterns to code.
 Open ``tutorial/tutorial/views.py``.  It should already contain the following:
 
    .. literalinclude:: src/basiclayout/tutorial/views.py
-      :linenos:
-      :language: py
 
 The important part here is that the ``@view_config`` decorator associates the
 function it decorates (``my_view``) with a :term:`view configuration`, 
@@ -184,21 +168,16 @@ scaffold put the classes that implement our models.
 Open ``tutorial/tutorial/models.py``.  It should already contain the following:
 
    .. literalinclude:: src/basiclayout/tutorial/models.py
-      :linenos:
-      :language: py
 
 Let's examine this in detail. First, we need some imports to support later code:
 
    .. literalinclude:: src/basiclayout/tutorial/models.py
       :end-before: DBSession
-      :linenos:
-      :language: py
 
 Next we set up a SQLAlchemy ``DBSession`` object:
 
    .. literalinclude:: src/basiclayout/tutorial/models.py
       :lines: 16
-      :language: py
 
 ``scoped_session`` and ``sessionmaker`` are standard SQLAlchemy helpers.
 ``scoped_session`` allows us to access our database connection globally.
@@ -214,7 +193,6 @@ base class for our model:
 
    .. literalinclude:: src/basiclayout/tutorial/models.py
       :lines: 17
-      :language: py
 
 Our model classes will inherit from this ``Base`` class so they can be
 associated with our particular database connection.
@@ -223,8 +201,6 @@ To give a simple example of a  model class, we define one named ``MyModel``:
 
    .. literalinclude:: src/basiclayout/tutorial/models.py
       :pyobject: MyModel
-      :linenos:
-      :language: py
 
 Our example model has an ``__init__`` method that takes a two arguments
 (``name``, and ``value``).  It stores these values as ``self.name`` and
