@@ -775,8 +775,10 @@ top-level directory your ``setup.py`` file will look something like this:
    from setuptools import setup, find_packages
 
    here = os.path.abspath(os.path.dirname(__file__))
-   README = open(os.path.join(here, 'README.txt')).read()
-   CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
+   with open(os.path.join(here, 'README.txt')) as f:
+       README = f.read()
+   with open(os.path.join(here, 'CHANGES.txt')) as f:
+       CHANGES = f.read()
 
    requires = ['pyramid', 'pyramid_debugtoolbar']
 
@@ -830,8 +832,10 @@ The result will be something like:
    from setuptools import setup, find_packages
 
    here = os.path.abspath(os.path.dirname(__file__))
-   README = open(os.path.join(here, 'README.txt')).read()
-   CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
+   with open(os.path.join(here, 'README.txt')) as f:
+       README = f.read()
+   with open(os.path.join(here, 'CHANGES.txt')) as f:
+       CHANGES = f.read()
 
    requires = ['pyramid', 'pyramid_debugtoolbar']
 
