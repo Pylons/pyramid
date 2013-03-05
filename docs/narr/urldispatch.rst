@@ -76,8 +76,6 @@ this is a portion of your project's ``__init__.py``:
 
 .. code-block:: python
 
-   # in your project's __init__.py (mypackage.__init__)
-
    config.add_route('myroute', '/prefix/{one}/{two}')
    config.scan('mypackage')
 
@@ -91,8 +89,6 @@ pick up any of its configuration decorators, so we can add one there
 that references ``myroute`` as a ``route_name`` parameter:
 
 .. code-block:: python
-
-   # in your project's views.py module (mypackage.views)
 
    from pyramid.view import view_config
    from pyramid.response import Response
