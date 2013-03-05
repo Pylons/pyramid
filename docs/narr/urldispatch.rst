@@ -16,12 +16,13 @@ receives the :term:`request` and returns a :term:`response` object.
 High-Level Operational Overview
 -------------------------------
 
-If a route configuration is present in an application, the :app:`Pyramid`
+If any route configuration is present in an application, the :app:`Pyramid`
 :term:`Router` checks every incoming request against an ordered set of URL
 matching patterns present in a *route map*.
 
 If any route pattern matches the information in the :term:`request`,
-:app:`Pyramid` will invoke a :term:`view lookup` to find a matching view.
+:app:`Pyramid` will invoke the :term:`view lookup` process to find a
+matching view.
 
 If no route pattern in the route map matches the information in the
 :term:`request` provided in your application, :app:`Pyramid` will fail over
