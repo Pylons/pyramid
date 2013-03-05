@@ -62,7 +62,7 @@ Take a look at the generated ``setup.py`` file for this project.
    :language: python
    :linenos:
 
-Note that the ``entry_point`` line in ``setup.py`` points at a string which
+Note that ``entry_points`` is assigned a string which
 looks a lot like an ``.ini`` file.  This string representation of an ``.ini``
 file has a section named ``[paste.app_factory]``.  Within this section, there
 is a key named ``main`` (the entry point name) which has a value
