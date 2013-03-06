@@ -55,8 +55,8 @@ returns one of these values:
 - If the userid *does not* exist in the system, it will
   return ``None``.
 
-For example, ``groupfinder('editor', request )`` returns ['group:editor'],
-``groupfinder('viewer', request)`` returns [], and ``groupfinder('admin', request)``
+For example, ``groupfinder('editor', request )`` returns ``['group:editor']``,
+``groupfinder('viewer', request)`` returns ``[]``, and ``groupfinder('admin', request)``
 returns ``None``.  We will use ``groupfinder()`` as an :term:`authentication policy`
 "callback" that will provide the :term:`principal` or principals
 for a user.
@@ -85,7 +85,7 @@ Add the following lines to the ``Wiki`` class:
    :language: python
 
 We import :data:`~pyramid.security.Allow`, an action that
-means that permission is allowed:, and
+means that permission is allowed, and
 :data:`~pyramid.security.Everyone`, a special :term:`principal`
 that is associated to all requests.  Both are used in the
 :term:`ACE` entries that make up the ACL.
@@ -93,8 +93,8 @@ that is associated to all requests.  Both are used in the
 The ACL is a list that needs to be named `__acl__` and be an
 attribute of a class.  We define an :term:`ACL` with two
 :term:`ACE` entries: the first entry allows any user the `view`
-permission.  The second entry allows the ``group:editors``
-principal  the `edit` permission.
+permission, and the second entry allows the ``group:editors``
+principal the `edit` permission.
 
 The ``Wiki`` class that contains the ACL is the :term:`resource`
 constructor for the :term:`root` resource, which is
@@ -104,7 +104,7 @@ the ``context`` attribute.
 
 It's only happenstance that we're assigning this ACL at class scope.  An ACL
 can be attached to an object *instance* too; this is how "row level security"
-can be achieved in :app:`Pyramid` applications.  We actually only need *one*
+can be achieved in :app:`Pyramid` applications.  We actually need only *one*
 ACL for the entire system, however, because our security requirements are
 simple, so this feature is not demonstrated.  See
 :ref:`assigning_acls` for more information about what an
@@ -144,13 +144,13 @@ machinery represented by this policy: it is required.  The ``callback`` is the
 
 Add permission declarations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Add a ``permission='edit'`` parameter to the ``@view_config``
-decorator for ``add_page()`` and ``edit_page()``, for example:
+Open ``tutorial/views.py``.  Add a ``permission='edit'`` parameter
+to the ``@view_config`` decorator for ``add_page()`` and
+``edit_page()``, for example:
 
 .. code-block:: python
    :linenos:
-   :emphasize-lines: 2
+   :emphasize-lines: 3
 
    @view_config(route_name='add_page', renderer='templates/edit.pt',
                 permission='edit')
