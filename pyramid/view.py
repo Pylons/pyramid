@@ -162,7 +162,7 @@ class view_config(object):
        import views
        from resources import MyResource
        config.add_view(views.my_view, context=MyResource, name='my_view',
-                       permission='read', 'route_name='site1')
+                       permission='read', route_name='site1')
 
     .. note: :class:`pyramid.view.view_config` is also importable, for
              backwards compatibility purposes, as the name
