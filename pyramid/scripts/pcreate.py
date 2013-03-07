@@ -48,6 +48,10 @@ class PCreateCommand(object):
                       dest='overwrite',
                       action='store_true',
                       help='Always overwrite')
+    parser.add_option('-d', '--dir',
+                      dest='output_dir',
+                      action='store',
+                      help='customized output dir')
     parser.add_option('--interactive',
                       dest='interactive',
                       action='store_true',
@@ -82,6 +86,8 @@ class PCreateCommand(object):
         pkg_name = _bad_chars_re.sub('', project_name.lower())
         safe_name = pkg_resources.safe_name(project_name)
         egg_name = pkg_resources.to_filename(safe_name)
+        if options.output_dir != None:
+            output_dir = os.path.abspath(os.getcwd()) + "/" + options.output_dir
         vars = {
             'project': project_name,
             'package': pkg_name,
