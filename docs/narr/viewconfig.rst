@@ -583,8 +583,7 @@ If your view callable is a function, it may be used as a function decorator:
        return Response('edited!')
 
 If your view callable is a class, the decorator can also be used as a class
-decorator in Python 2.6 and better (Python 2.5 and below do not support class
-decorators).  All the arguments to the decorator are the same when applied
+decorator. All the arguments to the decorator are the same when applied
 against a class as when they are applied against a function.  For example:
 
 .. code-block:: python
@@ -600,25 +599,6 @@ against a class as when they are applied against a function.  For example:
 
        def __call__(self):
            return Response('hello')
-
-You can use the :class:`~pyramid.view.view_config` decorator as a simple
-callable to manually decorate classes in Python 2.5 and below without the
-decorator syntactic sugar, if you wish:
-
-.. code-block:: python
-   :linenos:
-
-   from pyramid.response import Response
-   from pyramid.view import view_config
-
-   class MyView(object):
-       def __init__(self, request):
-           self.request = request
-
-       def __call__(self):
-           return Response('hello')
-
-   my_view = view_config(route_name='hello')(MyView)
 
 More than one :class:`~pyramid.view.view_config` decorator can be stacked on
 top of any number of others.  Each decorator creates a separate view
