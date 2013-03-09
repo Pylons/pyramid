@@ -340,7 +340,7 @@ class notfound_view_config(object):
     argument restricts the set of circumstances under which this notfound
     view will be invoked.
 
-    If ``append_slash`` is ``True``, when the notfound view is invoked, and
+    If ``append_slash`` is ``True``, when the Not Found View is invoked, and
     the current path info does not end in a slash, the notfound logic will
     attempt to find a :term:`route` that matches the request's path info
     suffixed with a slash.  If such a route exists, Pyramid will issue a

@@ -79,7 +79,7 @@ The ``notfound_get`` view will be called when a view could not be found and
 the request method was ``GET``.  The ``notfound_post`` view will be called
 when a view could not be found and the request method was ``POST``.
 
-Like any other view, the notfound view must accept at least a ``request``
+Like any other view, the Not Found View must accept at least a ``request``
 parameter, or both ``context`` and ``request``.  The ``request`` is the
 current :term:`request` representing the denied action.  The ``context`` (if
 used in the call signature) will be the instance of the
@@ -91,7 +91,8 @@ Both :meth:`pyramid.config.Configurator.add_notfound_view` and
 redirect requests to slash-appended routes. See
 :ref:`redirecting_to_slash_appended_routes` for examples.
 
-Here's some sample code that implements a minimal NotFound view callable:
+Here's some sample code that implements a minimal :term:`Not Found View`
+callable:
 
 .. code-block:: python
    :linenos:
@@ -103,7 +104,7 @@ Here's some sample code that implements a minimal NotFound view callable:
 
 .. note::
 
-   When a NotFound view callable is invoked, it is passed a
+   When a Not Found View callable is invoked, it is passed a
    :term:`request`.  The ``exception`` attribute of the request will be an
    instance of the :exc:`~pyramid.httpexceptions.HTTPNotFound` exception that
    caused the Not Found View to be called.  The value of
@@ -122,7 +123,7 @@ Here's some sample code that implements a minimal NotFound view callable:
 
 .. warning::
 
-   When a NotFound view callable accepts an argument list as
+   When a Not Found View callable accepts an argument list as
    described in :ref:`request_and_context_view_definitions`, the ``context``
    passed as the first argument to the view callable will be the
    :exc:`~pyramid.httpexceptions.HTTPNotFound` exception instance.  If

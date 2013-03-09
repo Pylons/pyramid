@@ -81,7 +81,7 @@ invoked.
 If no view can be found with predicates which allow it to be matched up with
 the request, :app:`Pyramid` will return an error to the user's browser,
 representing a "not found" (404) page.  See :ref:`changing_the_notfound_view`
-for more information about changing the default notfound view.
+for more information about changing the default :term:`Not Found View`.
 
 Other view configuration arguments are non-predicate arguments.  These tend
 to modify the response of the view callable or prevent the view callable from
