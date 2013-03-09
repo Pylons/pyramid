@@ -814,7 +814,7 @@ bro." body.
 If a request enters the application with the ``PATH_INFO`` value of
 ``/has_slash/``, the second route will match.  If a request enters the
 application with the ``PATH_INFO`` value of ``/has_slash``, a route *will* be
-found by the slash-appending not found view.  An HTTP redirect to
+found by the slash-appending :term:`Not Found View`.  An HTTP redirect to
 ``/has_slash/`` will be returned to the user's browser.  As a result, the
 ``notfound`` view will never actually be called.
 
@@ -849,12 +849,12 @@ exactly the same job:
 .. warning::
 
    You **should not** rely on this mechanism to redirect ``POST`` requests.
-   The redirect  of the slash-appending not found view will turn a ``POST``
-   request into a ``GET``, losing any ``POST`` data in the original
+   The redirect  of the slash-appending :term:`Not Found View` will turn a
+   ``POST`` request into a ``GET``, losing any ``POST`` data in the original
    request.
 
 See :ref:`view_module` and :ref:`changing_the_notfound_view` for a more
-general description of how to configure a view and/or a not found view.
+general description of how to configure a view and/or a :term:`Not Found View`.
 
 .. index::
    pair: debugging; route matching

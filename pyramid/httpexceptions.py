@@ -647,8 +647,8 @@ class HTTPNotFound(HTTPClientError):
     code: 404, title: Not Found
 
     Raise this exception within :term:`view` code to immediately
-    return the :term:`Not Found view` to the invoking user.  Usually
-    this is a basic ``404`` page, but the Not Found view can be
+    return the :term:`Not Found View` to the invoking user.  Usually
+    this is a basic ``404`` page, but the Not Found View can be
     customized as necessary.  See :ref:`changing_the_notfound_view`.
 
     This exception's constructor accepts a ``detail`` argument

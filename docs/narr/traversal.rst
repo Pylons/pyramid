@@ -389,7 +389,7 @@ Using the :term:`view name` (``baz``) and the type, view lookup asks the
 
 Let's say that view lookup finds no matching view type.  In this
 circumstance, the :app:`Pyramid` :term:`router` returns the result of the
-:term:`not found view` and the request ends.
+:term:`Not Found View` and the request ends.
 
 However, for this tree:
 

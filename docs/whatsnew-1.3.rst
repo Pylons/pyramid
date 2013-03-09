@@ -212,7 +212,7 @@ Not Found helpers:
 - New API: :meth:`pyramid.config.Configurator.add_notfound_view`.  This is a
   wrapper for :meth:`pyramid.Config.configurator.add_view` which provides
   support for an "append_slash" feature as well as doing the right thing when
-  it comes to permissions (a not found view should always be public).  It
+  it comes to permissions (a Not Found View should always be public).  It
   should be preferred over calling ``add_view`` directly with
   ``context=HTTPNotFound`` as was previously recommended.
 

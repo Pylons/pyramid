@@ -19,7 +19,7 @@ found view`, which is a :term:`view callable`. The default Not Found View
 can be overridden through application configuration.
 
 If your application uses :term:`imperative configuration`, you can replace
-the Not Found view by using the
+the Not Found View by using the
 :meth:`pyramid.config.Configurator.add_notfound_view` method:
 
 .. code-block:: python
@@ -29,7 +29,7 @@ the Not Found view by using the
    config.add_notfound_view(notfound)
 
 Replace ``helloworld.views.notfound`` with a reference to the :term:`view
-callable` you want to use to represent the Not Found view.  The :term:`not
+callable` you want to use to represent the Not Found View.  The :term:`not
 found view` callable is a view callable like any other.
 
 If your application instead uses :class:`pyramid.view.view_config` decorators
@@ -51,12 +51,12 @@ and a :term:`scan`, you can replace the Not Found view by using the
 
 This does exactly what the imperative example above showed.
 
-Your application can define *multiple* not found views if necessary.  Both
+Your application can define *multiple* Not Found Views if necessary.  Both
 :meth:`pyramid.config.Configurator.add_notfound_view` and
 :class:`pyramid.view.notfound_view_config` take most of the same arguments as
 :class:`pyramid.config.Configurator.add_view` and
-:class:`pyramid.view.view_config`, respectively.  This means that not found
-views can carry predicates limiting their applicability.  For example:
+:class:`pyramid.view.view_config`, respectively.  This means that Not Found
+Views can carry predicates limiting their applicability.  For example:
 
 .. code-block:: python
    :linenos:
@@ -106,8 +106,8 @@ Here's some sample code that implements a minimal NotFound view callable:
    When a NotFound view callable is invoked, it is passed a
    :term:`request`.  The ``exception`` attribute of the request will be an
    instance of the :exc:`~pyramid.httpexceptions.HTTPNotFound` exception that
-   caused the not found view to be called.  The value of
-   ``request.exception.message`` will be a value explaining why the not found
+   caused the Not Found View to be called.  The value of
+   ``request.exception.message`` will be a value explaining why the Not Found
    error was raised.  This message will be different when the
    ``pyramid.debug_notfound`` environment setting is true than it is when it
    is false.
