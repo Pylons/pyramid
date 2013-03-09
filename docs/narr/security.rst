@@ -80,7 +80,7 @@ policy.
 You must also enable an :term:`authentication policy` in order to enable the
 authorization policy.  This is because authorization, in general, depends
 upon authentication.  Use the
-:meth:`~pyramid.config.Configurator.set_authentication_policy` and method
+:meth:`~pyramid.config.Configurator.set_authentication_policy` method
 during application setup to specify the authentication policy.
 
 For example:
