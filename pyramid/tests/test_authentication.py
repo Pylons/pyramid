@@ -1287,6 +1287,16 @@ class TestBasicAuthAuthenticationPolicy(unittest.TestCase):
         policy = self._makeOne(check)
         self.assertEqual(policy.authenticated_userid(request), 'chrisr')
 
+    def test_authenticated_userid_utf8(self):
+        import base64
+        request = testing.DummyRequest()
+        inputs = u'm\xf6rk\xf6:m\xf6rk\xf6password'
+        request.headers['Authorization'] = 'Basic %s' % base64.b64encode(inputs.encode('utf-8'))
+        def check(username, password, request):
+            return []
+        policy = self._makeOne(check)
+        self.assertEqual(policy.authenticated_userid(request), u'm\xf6rk\xf6')
+
     def test_unauthenticated_userid_invalid_payload(self):
         import base64
         request = testing.DummyRequest()
