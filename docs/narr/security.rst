@@ -98,7 +98,7 @@ For example:
    config.set_authentication_policy(authn_policy)
    config.set_authorization_policy(authz_policy)
 
-.. note:: the ``authentication_policy`` and ``authorization_policy``
+.. note:: The ``authentication_policy`` and ``authorization_policy``
    arguments may also be passed to their respective methods mentioned above
    as :term:`dotted Python name` values, each representing the dotted name
    path to a suitable implementation global defined at Python module scope.
