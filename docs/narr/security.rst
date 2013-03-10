@@ -65,7 +65,7 @@ policies.
 Enabling an Authorization Policy
 --------------------------------
 
-By default, :app:`Pyramid` enables no authorization policy.  All
+:app:`Pyramid` does not enable any authorization policy by default.  All
 views are accessible by completely anonymous users.  In order to begin
 protecting views from execution based on security settings, you need
 to enable an authorization policy.
