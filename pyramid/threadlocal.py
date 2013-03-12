@@ -52,7 +52,7 @@ def get_current_registry(context=None): # context required by getSiteManager API
     global application registry if no request is currently active.
 
     This function should be used *extremely sparingly*, usually only
-    in unit testing code.  it's almost always usually a mistake to use
+    in unit testing code.  It's almost always usually a mistake to use
     ``get_current_registry`` outside a testing context because its
     usage makes it possible to write code that can be neither easily
     tested nor scripted.
