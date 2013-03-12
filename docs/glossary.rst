@@ -617,13 +617,13 @@ Glossary
      :term:`configuration decoration` and a :term:`scan` to configure your
      Pyramid application.
 
-   Not Found view
+   Not Found View
       An :term:`exception view` invoked by :app:`Pyramid` when the developer
       explicitly raises a :class:`pyramid.httpexceptions.HTTPNotFound`
       exception from within :term:`view` code or :term:`root factory` code,
       or when the current request doesn't match any :term:`view
       configuration`.  :app:`Pyramid` provides a default implementation of a
-      not found view; it can be overridden.  See
+      Not Found View; it can be overridden.  See
       :ref:`changing_the_notfound_view`.
 
    Forbidden view

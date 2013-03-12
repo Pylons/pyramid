@@ -511,7 +511,7 @@ Features
 
 - The static view machinery now raises (rather than returns) ``HTTPNotFound``
   and ``HTTPMovedPermanently`` exceptions, so these can be caught by the
-  NotFound view (and other exception views).
+  Not Found View (and other exception views).
 
 - The Mako renderer now supports a def name in an asset spec.  When the def
   name is present in the asset spec, the system will render the template def
