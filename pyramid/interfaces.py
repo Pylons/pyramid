@@ -57,9 +57,9 @@ class IApplicationCreated(Interface):
 IWSGIApplicationCreatedEvent = IApplicationCreated # b /c
 
 class IResponse(Interface):
-    """ Represents a WSGI response using the WebOb response interface.  Some
-    attribute and method documentation of this interface references `RFC 2616
-    <http://www.w3.org/Protocols/rfc2616/>`_.
+    """ Represents a WSGI response using the WebOb response interface.
+    Some attribute and method documentation of this interface references
+    :rfc:`2616`.
 
     This interface is most famously implemented by
     :class:`pyramid.response.Response` and the HTTP exception classes in

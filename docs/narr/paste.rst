@@ -21,7 +21,7 @@ of starting, stopping, and debugging an application.
 
 This chapter is not a replacement for documentation about PasteDeploy; it
 only contextualizes the use of PasteDeploy within Pyramid.  For detailed
-documentation, see http://pythonpaste.org.
+documentation, see http://pythonpaste.org/deploy/.
 
 PasteDeploy
 -----------
@@ -84,6 +84,8 @@ generated within any scaffold-generated package, you'll see a ``main``
 function.  This is the function called by :term:`PasteDeploy` when the
 ``pserve`` command is invoked against our application.  It accepts a global
 configuration object and *returns* an instance of our application.
+
+.. _defaults_section_of_pastedeploy_file:
 
 ``[DEFAULTS]`` Section of a PasteDeploy ``.ini`` File
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
