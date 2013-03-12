@@ -238,7 +238,7 @@ registry API.
 
 :app:`Pyramid` framework developers were so concerned about conceptual load
 issues of the ZCA registry API for framework developers that a `replacement
-registry implementation <http://svn.repoze.org/repoze.component/trunk>`_
+registry implementation <https://github.com/repoze/repoze.component>`_
 named :mod:`repoze.component` was actually developed.  Though this package
 has a registry implementation which is fully functional and well-tested, and
 its API is much nicer than the ZCA registry API, work on it was largely
@@ -1030,7 +1030,7 @@ but its intended userbase is much the same.  Many others exist.  We've
 actually even (only as a teaching tool, not as any sort of official project)
 `created one using Pyramid <http://bfg.repoze.org/videos#groundhog1>`_ (the
 videos use BFG, a precursor to Pyramid, but the resulting code is `available
-for Pyramid too <http://github.com/Pylons/groundhog>`_). Microframeworks are
+for Pyramid too <https://github.com/Pylons/groundhog>`_). Microframeworks are
 small frameworks with one common feature: each allows its users to create a
 fully functional application that lives in a single Python file.
 
