@@ -146,10 +146,9 @@ Glossary
      request before it returns a :term:`context` resource.
 
    virtualenv
-     An isolated Python environment.  Allows you to control which
-     packages are used on a particular project by cloning your main
-     Python.  `virtualenv <http://pypi.python.org/pypi/virtualenv>`_
-     was created by Ian Bicking.
+     A term referring both to an isolated Python environment,
+     or `the leading tool <http://www.virtualenv.org>`_ that allows one to
+     create such environments.
 
    resource
      An object representing a node in the :term:`resource tree` of an
@@ -958,7 +957,7 @@ Glossary
 
    console script
      A script written to the ``bin`` (on UNIX, or ``Scripts`` on Windows)
-     directory of a Python installation or virtualenv as the result of
+     directory of a Python installation or :term:`virtualenv` as the result of
      running ``setup.py install`` or ``setup.py develop``.
 
    introspector
