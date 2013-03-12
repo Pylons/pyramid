@@ -1615,7 +1615,7 @@ class ViewsConfiguratorMixin(object):
         append_slash=False,
         **predicates
         ):
-        """ Add a default notfound view to the current configuration state.
+        """ Add a default Not Found View to the current configuration state.
         The view will be called when Pyramid or application code raises an
         :exc:`pyramid.httpexceptions.HTTPForbidden` exception (e.g. when a
         view cannot be found for the request).  The simplest example is:
@@ -1634,9 +1634,9 @@ class ViewsConfiguratorMixin(object):
         :meth:`pyramid.config.Configurator.add_view`, this method will raise
         an exception if passed ``name``, ``permission``, ``context``,
         ``for_``, or ``http_cache`` keyword arguments.  These argument values
-        make no sense in the context of a notfound view.
+        make no sense in the context of a Not Found View.
 
-        If ``append_slash`` is ``True``, when this notfound view is invoked,
+        If ``append_slash`` is ``True``, when this Not Found View is invoked,
         and the current path info does not end in a slash, the notfound logic
         will attempt to find a :term:`route` that matches the request's path
         info suffixed with a slash.  If such a route exists, Pyramid will
