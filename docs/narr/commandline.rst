@@ -399,7 +399,7 @@ Here's the application configuration section of the ``development.ini`` used
 by the above ``ptweens`` command which reports that the explicit tween chain
 is used:
 
-.. code-block:: text
+.. code-block:: ini
    :linenos:
 
    [app:main]
