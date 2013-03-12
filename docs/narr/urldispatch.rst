@@ -875,8 +875,7 @@ which you started the application from.  For example:
 .. code-block:: text
    :linenos:
 
-    [chrism@thinko pylonsbasic]$ PYRAMID_DEBUG_ROUTEMATCH=true \
-                                 bin/pserve development.ini
+    $ PYRAMID_DEBUG_ROUTEMATCH=true bin/pserve development.ini
     Starting server in PID 13586.
     serving on 0.0.0.0:6543 view at http://127.0.0.1:6543
     2010-12-16 14:45:19,956 no route matched for url \
