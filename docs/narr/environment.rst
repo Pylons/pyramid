@@ -212,7 +212,7 @@ sequence can take several different forms.
 
       package1 package2 package3
 
-    The package names can also be separated by carriage returns::
+   The package names can also be separated by carriage returns::
 
        package1
        package2

@@ -264,9 +264,9 @@ also be used by application developers to convert arbitrary exceptions to
 responses.
 
 To register a view that should be called whenever a particular exception is
-raised from with :app:`Pyramid` view code, use the exception class or one of
-its superclasses as the ``context`` of a view configuration which points at a
-view callable you'd like to generate a response.
+raised from within :app:`Pyramid` view code, use the exception class (or one of
+its superclasses) as the :term:`context` of a view configuration which points
+at a view callable you'd like to generate a response for.
 
 For example, given the following exception class in a module named
 ``helloworld.exceptions``:
@@ -537,41 +537,41 @@ The following types work as view callables in this style:
    e.g.:
 
    .. code-block:: python
-	  :linenos:
+      :linenos:
 
-	  from pyramid.response import Response
+       from pyramid.response import Response
 
-	  def view(context, request):
-		  return Response('OK')
+       def view(context, request):
+           return Response('OK')
 
 #. Classes that have an ``__init__`` method that accepts ``context,
    request`` and a ``__call__`` method which accepts no arguments, e.g.:
 
    .. code-block:: python
-	  :linenos:
+      :linenos:
 
-	  from pyramid.response import Response
+      from pyramid.response import Response
 
-	  class view(object):
-		  def __init__(self, context, request):
-			  self.context = context
-			  self.request = request
+      class view(object):
+         def __init__(self, context, request):
+             self.context = context
+             self.request = request
 
-		  def __call__(self):
-			  return Response('OK')
+         def __call__(self):
+             return Response('OK')
 
 #. Arbitrary callables that have a ``__call__`` method that accepts
    ``context, request``, e.g.:
 
    .. code-block:: python
-	  :linenos:
+      :linenos:
 
-	  from pyramid.response import Response
+      from pyramid.response import Response
 
-	  class View(object):
-		  def __call__(self, context, request):
-			  return Response('OK')
-	  view = View() # this is the view callable
+      class View(object):
+          def __call__(self, context, request):
+              return Response('OK')
+      view = View() # this is the view callable
 
 This style of calling convention is most useful for :term:`traversal` based
 applications, where the context object is frequently used within the view
