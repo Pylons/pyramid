@@ -4609,8 +4609,11 @@ Bug Fixes
 
   To resolve this issue, the urldispatch module was fixed, and a fork
   of the Routes trunk was put into the "dev" index named
-  ``Routes-1.11dev-chrism-home``.  Its contents have been
-  merged into the Routes trunk (what will be Routes 1.11).
+  ``Routes-1.11dev-chrism-home``.  The source for the fork exists at
+  `http://bitbucket.org/chrism/routes-home/
+  <http://bitbucket.org/chrism/routes-home/>`_ (broken link);
+  its contents have been merged into the Routes trunk
+  (what will be Routes 1.11).
 
 0.8a5 (2009-05-08)
 ==================
