@@ -264,15 +264,20 @@ as your system's administrative user.  For example:
 Creating the Virtual Python Environment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Once the :term:`virtualenv` package is installed in your Python, you
-can then create a virtual environment.  To do so, invoke the
-following:
+Once the :term:`virtualenv` package is installed in your Python environment,
+you can then create a virtual environment.  To do so, invoke the following:
 
 .. code-block:: text
 
-   $ virtualenv --no-site-packages env
-   New python executable in env/bin/python
+   $ export $VENV=~/env
+   $ virtualenv --no-site-packages $VENV
+   New python executable in /home/foo/env/bin/python
    Installing setuptools.............done.
+
+You can either follow the use of the environment variable, ``$VENV``,
+or replace it with the root directory of the :term:`virtualenv`.
+In that case, the `export` command can be skipped.
+If you choose the former approach, ensure that it's an absolute path.
 
 .. warning::
 
@@ -289,20 +294,16 @@ following:
    ``virtualenv`` script.  It's perfectly acceptable (and desirable)
    to create a virtualenv as a normal user.
 
-You should perform any following commands that mention a "bin"
-directory from within the ``env`` virtualenv dir.
 
 Installing :app:`Pyramid` Into the Virtual Python Environment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-After you've got your ``env`` virtualenv installed, you may install
-:app:`Pyramid` itself using the following commands from within the
-virtualenv (``env``) directory you created in the last step.
+After you've got your virtualenv installed, you may install
+:app:`Pyramid` itself using the following commands:
 
 .. code-block:: text
 
-   $ cd env
-   $ bin/easy_install pyramid
+   $ $VENV/bin/easy_install pyramid
 
 The ``easy_install`` command will take longer than the previous ones to
 complete, as it downloads and installs a number of dependencies.
@@ -339,25 +340,25 @@ Windows Using Python 2
 
       c:\> c:\Python27\python ez_setup.py
 
-#. Use that Python's `bin/easy_install` to install `virtualenv`:
+#. Install `virtualenv`:
 
    .. code-block:: text
 
       c:\> c:\Python27\Scripts\easy_install virtualenv
 
-#. Use that Python's virtualenv to make a workspace:
+#. Make a :term:`virtualenv` workspace:
 
    .. code-block:: text
 
-      c:\> c:\Python27\Scripts\virtualenv --no-site-packages env
+      c:\> set VENV=c:\env
+      c:\> c:\Python27\Scripts\virtualenv --no-site-packages %VENV%
 
-#. Switch to the ``env`` directory:
+   You can either follow the use of the environment variable, ``%VENV%``,
+   or replace it with the root directory of the :term:`virtualenv`.
+   In that case, the `set` command can be skipped.
+   If you choose the former approach, ensure that it's an absolute path.
 
-   .. code-block:: text
-
-      c:\> cd env
-
-#. (Optional) Consider using ``Scripts\activate.bat`` to make your shell
+#. (Optional) Consider using ``%VENV%\Scripts\activate.bat`` to make your shell
    environment wired to use the virtualenv.
 
 #. Use ``easy_install`` to get :app:`Pyramid` and its direct dependencies
@@ -365,7 +366,7 @@ Windows Using Python 2
 
    .. code-block:: text
 
-      c:\env> Scripts\easy_install pyramid
+      c:\env> %VENV%\Scripts\easy_install pyramid
 
 Windows Using Python 3
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -388,25 +389,25 @@ Windows Using Python 3
 
       c:\> c:\Python32\python distribute_setup.py
 
-#. Use that Python's `bin/easy_install` to install `virtualenv`:
+#. Install :term:`virtualenv`:
 
    .. code-block:: text
 
       c:\> c:\Python32\Scripts\easy_install virtualenv
 
-#. Use that Python's virtualenv to make a workspace:
+#. Make a :term:`virtualenv` workspace:
 
    .. code-block:: text
 
-      c:\> c:\Python32\Scripts\virtualenv --no-site-packages env
+      c:\> set VENV=c:\env
+      c:\> c:\Python32\Scripts\virtualenv --no-site-packages %VENV%
 
-#. Switch to the ``env`` directory:
+   You can either follow the use of the environment variable, ``%VENV%``,
+   or replace it with the root directory of the :term:`virtualenv`.
+   In that case, the `set` command can be skipped.
+   If you choose the former approach, ensure that it's an absolute path.
 
-   .. code-block:: text
-
-      c:\> cd env
-
-#. (Optional) Consider using ``Scripts\activate.bat`` to make your shell
+#. (Optional) Consider using ``%VENV%\Scripts\activate.bat`` to make your shell
    environment wired to use the virtualenv.
 
 #. Use ``easy_install`` to get :app:`Pyramid` and its direct dependencies
@@ -414,7 +415,7 @@ Windows Using Python 3
 
    .. code-block:: text
 
-      c:\env> Scripts\easy_install pyramid
+      c:\env> %VENV%\Scripts\easy_install pyramid
 
 What Gets Installed
 -------------------

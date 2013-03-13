@@ -80,13 +80,13 @@ On UNIX:
 
 .. code-block:: text
 
-   $ bin/pcreate -s starter MyProject
+   $ $VENV/bin/pcreate -s starter MyProject
 
 Or on Windows:
 
 .. code-block:: text
 
-   > Scripts\pcreate -s starter MyProject
+   > %VENV%\Scripts\pcreate -s starter MyProject
 
 The above command uses the ``pcreate`` command to create a project with the
 ``starter`` scaffold.  To use a different scaffold, such as
@@ -95,20 +95,20 @@ on UNIX:
 
 .. code-block:: text
 
-   $ bin/pcreate -s alchemy MyProject
+   $ $VENV/bin/pcreate -s alchemy MyProject
 
 Or on Windows:
 
 .. code-block:: text
 
-   > Scripts\pcreate -s alchemy MyProject
+   > %VENV%\Scripts\pcreate -s alchemy MyProject
 
 Here's sample output from a run of ``pcreate`` on UNIX for a project we name
 ``MyProject``:
 
 .. code-block:: text
 
-   $ bin/pcreate -s starter MyProject
+   $ $VENV/bin/pcreate -s starter MyProject
    Creating template pyramid
    Creating directory ./MyProject
    # ... more output ...
@@ -177,21 +177,21 @@ On UNIX:
 .. code-block:: text
 
    $ cd MyProject
-   $ ../bin/python setup.py develop
+   $ $VENV/bin/python setup.py develop
 
 Or on Windows:
 
 .. code-block:: text
 
    > cd MyProject
-   > ..\Scripts\python.exe setup.py develop
+   > %VENV%\Scripts\python.exe setup.py develop
 
 Elided output from a run of this command on UNIX is shown below:
 
 .. code-block:: text
 
    $ cd MyProject
-   $ ../bin/python setup.py develop
+   $ $VENV/bin/python setup.py develop
    ...
    Finished processing dependencies for MyProject==0.0
 
@@ -216,19 +216,19 @@ On UNIX:
 
 .. code-block:: text
 
-   $ ../bin/python setup.py test -q
+   $ $VENV/bin/python setup.py test -q
 
 Or on Windows:
 
 .. code-block:: text
 
-   > ..\Scripts\python.exe setup.py test -q
+   > %VENV%\Scripts\python.exe setup.py test -q
 
 Here's sample output from a test run on UNIX:
 
 .. code-block:: text
 
-   $ ../bin/python setup.py test -q
+   $ $VENV/bin/python setup.py test -q
    running test
    running egg_info
    writing requirements to MyProject.egg-info/requires.txt
@@ -272,19 +272,19 @@ On UNIX:
 
 .. code-block:: text
 
-   $ ../bin/pserve development.ini
+   $ $VENV/bin/pserve development.ini
 
 On Windows:
 
 .. code-block:: text
 
-   > ..\Scripts\pserve development.ini
+   > %VENV%\Scripts\pserve development.ini
 
 Here's sample output from a run of ``pserve`` on UNIX:
 
 .. code-block:: text
 
-   $ ../bin/pserve development.ini
+   $ $VENV/bin/pserve development.ini
    Starting server in PID 16601.
    serving on http://0.0.0.0:6543
 
@@ -359,7 +359,7 @@ For example, on UNIX:
 
 .. code-block:: text
 
-   $ ../bin/pserve development.ini --reload
+   $ $VENV/bin/pserve development.ini --reload
    Starting subprocess with file monitor
    Starting server in PID 16601.
    serving on http://0.0.0.0:6543

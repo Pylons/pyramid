@@ -12,13 +12,13 @@ On UNIX:
 
 .. code-block:: text
 
-   $ ../bin/python setup.py sdist
+   $ $VENV/bin/python setup.py sdist
 
 On Windows:
 
 .. code-block:: text
 
-   c:\pyramidtut> ..\Scripts\python setup.py sdist
+   c:\pyramidtut> %VENV%\Scripts\python setup.py sdist
 
 The output of such a command will be something like:
 

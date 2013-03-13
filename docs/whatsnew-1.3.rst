@@ -46,12 +46,12 @@ maintain them ourselves.  As a result, we've had to make some changes.
 Previously (in Pyramid 1.0, 1.1 and 1.2), you created a Pyramid application
 using ``paster create``, like so::
 
-    $ myvenv/bin/paster create -t pyramid_starter foo
+    $ $VENV/bin/paster create -t pyramid_starter foo
 
 In 1.3, you're now instead required to create an application using
 ``pcreate`` like so::
 
-    $ myvenv/bin/pcreate -s starter foo
+    $ $VENV/bin/pcreate -s starter foo
 
 ``pcreate`` is required to be used for internal Pyramid scaffolding;
 externally distributed scaffolding may allow for both ``pcreate`` and/or
@@ -59,11 +59,11 @@ externally distributed scaffolding may allow for both ``pcreate`` and/or
 
 In previous Pyramid versions, you ran a Pyramid application like so::
 
-    $ myvenv/bin/paster serve development.ini
+    $ $VENV/bin/paster serve development.ini
 
 Instead, you now must use the ``pserve`` command in 1.3::
 
-    $ myvenv/bin/pserve development.ini
+    $ $VENV/bin/pserve development.ini
 
 The ``ini`` configuration file format supported by Pyramid has not changed.
 As a result, Python 2-only users can install PasteScript manually and use

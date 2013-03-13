@@ -771,7 +771,7 @@ variable set to ``1``, For example:
 
 .. code-block:: text
 
-  $ PYRAMID_RELOAD_TEMPLATES=1 bin/pserve myproject.ini
+  $ PYRAMID_RELOAD_TEMPLATES=1 $VENV/bin/pserve myproject.ini
 
 To use a setting in the application ``.ini`` file for the same
 purpose, set the ``pyramid.reload_templates`` key to ``true`` within the

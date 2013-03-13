@@ -183,7 +183,7 @@ server run with the ``PYTHONWARNINGS`` environment variable set to
 
 .. code-block:: bash
 
-   $ PYTHONWARNINGS=default bin/pserve development.ini
+   $ PYTHONWARNINGS=default $VENV/bin/pserve development.ini
 
 On Windows, you need to issue two commands:
 
