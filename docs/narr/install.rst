@@ -415,7 +415,7 @@ Windows Using Python 3
 
    .. code-block:: text
 
-      c:\env> %VEN%\Scripts\easy_install pyramid
+      c:\env> %VENV%\Scripts\easy_install pyramid
 
 What Gets Installed
 -------------------
