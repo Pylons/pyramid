@@ -200,8 +200,8 @@ like this:
   overridden elements, such as templates and static assets as necessary.
 
 - Install the new package into the same Python environment as the original
-  application (e.g. ``$myvenv/bin/python setup.py develop`` or
-  ``$myvenv/bin/python setup.py install``).
+  application (e.g. ``$VENV/bin/python setup.py develop`` or
+  ``$VENV/bin/python setup.py install``).
 
 - Change the ``main`` function in the new package's ``__init__.py`` to include
   the original :app:`Pyramid` application's configuration functions via

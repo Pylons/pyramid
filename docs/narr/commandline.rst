@@ -32,7 +32,7 @@ Here is an example for a simple view configuration using :term:`traversal`:
 .. code-block:: text
    :linenos:
 
-   $ ../bin/pviews development.ini#tutorial /FrontPage
+   $ $VENV/bin/pviews development.ini#tutorial /FrontPage
 
    URL = /FrontPage
 
@@ -56,7 +56,7 @@ A more complex configuration might generate something like this:
 .. code-block:: text
    :linenos:
 
-   $ ../bin/pviews development.ini#shootout /about
+   $ $VENV/bin/pviews development.ini#shootout /about
 
    URL = /about
 
@@ -146,7 +146,7 @@ name ``main`` as a section name:
 
 .. code-block:: text
 
-    $ bin/pshell starter/development.ini#main
+    $ $VENV/bin starter/development.ini#main
     Python 2.6.5 (r265:79063, Apr 29 2010, 00:31:32) 
     [GCC 4.4.3] on linux2
     Type "help" for more information.
@@ -181,7 +181,7 @@ hash after the filename:
 
 .. code-block:: text
 
-    $ bin/pshell starter/development.ini
+    $ $VENV/bin/pshell starter/development.ini
 
 Press ``Ctrl-D`` to exit the interactive shell (or ``Ctrl-Z`` on Windows).
 
@@ -244,7 +244,7 @@ exposed, and the request is configured to generate urls from the host
 
 .. code-block:: text
 
-    $ bin/pshell starter/development.ini
+    $ $VENV/bin/pshell starter/development.ini
     Python 2.6.5 (r265:79063, Apr 29 2010, 00:31:32) 
     [GCC 4.4.3] on linux2
     Type "help" for more information.
@@ -286,7 +286,7 @@ specifically invoke one of your choice with the ``-p choice`` or
 
 .. code-block:: text
 
-   $ ../bin/pshell -p ipython | bpython | python development.ini#MyProject
+   $ $VENV/bin/pshell -p ipython | bpython | python development.ini#MyProject
 
 .. index::
    pair: routes; printing
@@ -311,7 +311,7 @@ For example:
 .. code-block:: text
    :linenos:
 
-   $ ../bin/proutes development.ini
+   $ $VENV/bin/proutes development.ini
    Name            Pattern                        View
    ----            -------                        ----                     
    home            /                              <function my_view>
@@ -354,7 +354,7 @@ configured without any explicit tweens:
 .. code-block:: text
    :linenos:
 
-   $ myenv/bin/ptweens development.ini
+   $ $VENV/bin/ptweens development.ini
    "pyramid.tweens" config value NOT set (implicitly ordered tweens used)
 
    Implicit Tween Chain
@@ -441,7 +441,7 @@ There are two required arguments to ``prequest``:
 
 For example::
 
-   $ bin/prequest development.ini /
+   $ $VENV/bin/prequest development.ini /
 
 This will print the body of the response to the console on which it was
 invoked.
@@ -452,14 +452,14 @@ config file name or URL.
 ``prequest`` has a ``-d`` (aka ``--display-headers``) option which prints the
 status and headers returned by the server before the output::
 
-   $ bin/prequest -d development.ini /
+   $ $VENV/bin/prequest -d development.ini /
 
 This will print the status, then the headers, then the body of the response
 to the console.
 
 You can add request header values by using the ``--header`` option::
 
-   $ bin/prequest --header=Host:example.com development.ini /
+   $ $VENV/bin/prequest --header=Host:example.com development.ini /
 
 Headers are added to the WSGI environment by converting them to their
 CGI/WSGI equivalents (e.g. ``Host=example.com`` will insert the ``HTTP_HOST``
@@ -472,7 +472,7 @@ using the ``-m`` (aka ``--method``) option.  ``GET``, ``HEAD``, ``POST`` and
 ``DELETE`` are currently supported.  When you use ``POST``, the standard
 input of the ``prequest`` process is used as the ``POST`` body::
 
-   $ bin/prequest -mPOST development.ini / < somefile
+   $ $VENV/bin/prequest -mPOST development.ini / < somefile
 
 .. _writing_a_script:
 
@@ -866,7 +866,7 @@ The result will be something like:
          """,
          )
 
-Once you've done this, invoking ``$somevirtualenv/bin/python setup.py
+Once you've done this, invoking ``$$VENV/bin/python setup.py
 develop`` will install a file named ``show_settings`` into the
 ``$somevirtualenv/bin`` directory with a small bit of Python code that points
 to your entry point.  It will be executable.  Running it without any
@@ -877,7 +877,7 @@ with ``foo``.  Running it with two "omit" options (e.g. ``--omit=foo
 --omit=bar``) will omit all settings that have keys that start with either
 ``foo`` or ``bar``::
 
-  $ bin/show_settings development.ini --omit=pyramid --omit=debugtoolbar
+  $ $VENV/bin/show_settings development.ini --omit=pyramid --omit=debugtoolbar
   debug_routematch                             False               
   debug_templates                              True                
   reload_templates                             True                
