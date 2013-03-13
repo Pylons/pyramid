@@ -1,5 +1,5 @@
 We specifically use relative package references where possible so this demo
-works even if the user names their package (in the 'bin/pcreate -s
+works even if the user names their package (in the '$VENV/bin/pcreate -s
 zodb ...' step) something other than 'tutorial'.
 
 Specifically:

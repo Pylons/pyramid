@@ -150,6 +150,10 @@ Glossary
      or `the leading tool <http://www.virtualenv.org>`_ that allows one to
      create such environments.
 
+     Note: whenever you encounter commands prefixed with ``$VENV`` (Unix)
+     or ``%VENV`` (Windows), know that that is the environment variable whose
+     value is the root of the virtual environment in question.
+
    resource
      An object representing a node in the :term:`resource tree` of an
      application.  If :mod:`traversal` is used, a resource is an element in

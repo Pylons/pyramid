@@ -52,14 +52,14 @@ On UNIX:
 .. code-block:: text
 
    $ cd tutorial
-   $ ../bin/python setup.py develop
+   $ $VENV/bin/python setup.py develop
 
 On Windows:
 
 .. code-block:: text
 
    c:\pyramidtut> cd tutorial
-   c:\pyramidtut\tutorial> ..\Scripts\python setup.py develop
+   c:\pyramidtut\tutorial> %VENV%\Scripts\python setup.py develop
 
 Success executing this command will end with a line to the console something
 like::

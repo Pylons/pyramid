@@ -22,7 +22,7 @@ Preparation, UNIX
 
    .. code-block:: text
 
-     $ bin/easy_install docutils pyramid_tm pyramid_zodbconn \
+     $ $VENV/bin/easy_install docutils pyramid_tm pyramid_zodbconn \
                pyramid_debugtoolbar nose coverage
 
 Preparation, Windows
@@ -39,7 +39,7 @@ Preparation, Windows
 
    .. code-block:: text
 
-     c:\pyramidtut> Scripts\easy_install docutils pyramid_tm \
+     c:\pyramidtut> %VENV%\Scripts\easy_install docutils pyramid_tm \
            pyramid_zodbconn pyramid_debugtoolbar nose coverage
 
 .. _making_a_project:
@@ -59,13 +59,13 @@ On UNIX:
 
 .. code-block:: text
 
-  $ bin/pcreate -s zodb tutorial
+  $ $VENV/bin/pcreate -s zodb tutorial
 
 On Windows:
 
 .. code-block:: text
 
-   c:\pyramidtut> Scripts\pcreate -s zodb tutorial
+   c:\pyramidtut> %VENV%\Scripts\pcreate -s zodb tutorial
 
 .. note:: You don't have to call it `tutorial` -- the code uses
    relative paths for imports and finding templates and static
@@ -91,14 +91,14 @@ On UNIX:
 .. code-block:: text
 
   $ cd tutorial
-  $ ../bin/python setup.py develop
+  $ $VENV/bin/python setup.py develop
 
 On Windows:
 
 .. code-block:: text
 
   C:\pyramidtut> cd tutorial
-  C:\pyramidtut\tutorial> ..\Scripts\python setup.py develop
+  C:\pyramidtut\tutorial> %VENV%\Scripts\python setup.py develop
 
 .. _running_tests:
 
@@ -112,13 +112,13 @@ On UNIX:
 
 .. code-block:: text
 
-  $ ../bin/python setup.py test -q
+  $ $VENV/bin/python setup.py test -q
 
 On Windows:
 
 .. code-block:: text
 
-  c:\pyramidtut\tutorial> ..\Scripts\python setup.py test -q
+  c:\pyramidtut\tutorial> %VENV%\Scripts\python setup.py test -q
 
 Expose Test Coverage Information
 ================================
@@ -133,13 +133,13 @@ On UNIX:
 
 .. code-block:: text
 
-  $ ../bin/nosetests --cover-package=tutorial --cover-erase --with-coverage
+  $ $VENV/bin/nosetests --cover-package=tutorial --cover-erase --with-coverage
 
 On Windows:
 
 .. code-block:: text
 
-  c:\pyramidtut\tutorial> ..\Scripts\nosetests --cover-package=tutorial ^
+  c:\pyramidtut\tutorial> %VENV%\Scripts\nosetests --cover-package=tutorial ^
        --cover-erase --with-coverage
 
 Looks like the code in the ``zodb`` scaffold for ZODB projects is
@@ -157,13 +157,13 @@ On UNIX:
 
 .. code-block:: text
 
-  $ ../bin/pserve development.ini --reload
+  $ $VENV/bin/pserve development.ini --reload
 
 On Windows:
 
 .. code-block:: text
 
-  c:\pyramidtut\tutorial> ..\Scripts\pserve development.ini --reload
+  c:\pyramidtut\tutorial> %VENV%\Scripts\pserve development.ini --reload
 
 .. note::
 
