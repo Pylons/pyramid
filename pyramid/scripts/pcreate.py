@@ -51,7 +51,7 @@ class PCreateCommand(object):
     parser.add_option('-d', '--dir',
                       dest='output_dir',
                       action='store',
-                      help='customized output dir')
+                      help='customized output dir. If the dir starting with "~", then the corresponding home dir will be provided. If the leading character of dir is "/", the dir will be treated as absolute path. Otherwise, the dir will be the relative path from current dir (os.getcwd())')
     parser.add_option('--interactive',
                       dest='interactive',
                       action='store_true',
@@ -87,7 +87,7 @@ class PCreateCommand(object):
         safe_name = pkg_resources.safe_name(project_name)
         egg_name = pkg_resources.to_filename(safe_name)
         if options.output_dir != None:
-            output_dir = os.path.abspath(os.getcwd()) + "/" + options.output_dir
+            output_dir = self._set_output_dir(options.output_dir)
         vars = {
             'project': project_name,
             'package': pkg_name,
@@ -129,4 +129,14 @@ class PCreateCommand(object):
         if not self.quiet:
             print(msg)
 
+    def _set_output_dir(self, dir_path):
+        if dir_path[0] == '~':
+            dir_path = os.path.expanduser(dir_path)
+            if dir_path[0] == '~':
+                raise Exception('invalid user dir')
 
+        if dir_path[0] == '/':
+            output_dir = os.path.abspath(os.path.normpath(dir_path))
+        else:
+            output_dir = os.path.join(os.path.abspath(os.getcwd()), os.path.normpath(dir_path))
+        return output_dir

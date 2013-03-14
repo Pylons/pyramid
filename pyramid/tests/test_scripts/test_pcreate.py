@@ -110,6 +110,64 @@ class TestPCreateCommand(unittest.TestCase):
             scaffold2.vars,
             {'project': 'Distro', 'egg': 'Distro', 'package': 'distro'})
 
+    def test_customized_output_dir(self):
+        import os
+        path = 'dummy_customized'
+        cmd = self._makeOne('-s', 'dummy', '-d', path, 'Distro')
+        scaffold = DummyScaffold('dummy')
+        cmd.scaffolds = [scaffold]
+        result = cmd.run()
+        self.assertEqual(result, 0)
+        self.assertEqual(
+            scaffold.output_dir,
+            os.path.normpath(os.path.join(os.getcwd(), 'dummy_customized'))
+            )
+        self.assertEqual(
+            scaffold.vars,
+            {'project': 'Distro', 'egg': 'Distro', 'package': 'distro'})
+
+    def test_customized_output_dir_abspath(self):
+        import os
+        path = os.path.join(os.path.abspath(os.getcwd()), 'dummy_customized_abspath')
+        cmd = self._makeOne('-s', 'dummy', '-d', path, 'Distro')
+        scaffold = DummyScaffold('dummy')
+        cmd.scaffolds = [scaffold]
+        result = cmd.run()
+        self.assertEqual(result, 0)
+        self.assertEqual(
+            scaffold.output_dir,
+            os.path.normpath(os.path.join(os.getcwd(), 'dummy_customized_abspath'))
+            )
+        self.assertEqual(
+            scaffold.vars,
+            {'project': 'Distro', 'egg': 'Distro', 'package': 'distro'})
+
+    def test_customized_output_dir_home(self):
+        import os
+        path = "~"
+        cmd = self._makeOne('-s', 'dummy', '-d', path, 'Distro')
+        scaffold = DummyScaffold('dummy')
+        cmd.scaffolds = [scaffold]
+        result = cmd.run()
+        self.assertEqual(result, 0)
+        self.assertEqual(
+            scaffold.output_dir,
+            os.path.abspath(os.path.expanduser("~"))
+            )
+
+    def test_customized_output_dir_root(self):
+        import os
+        path = "~root"
+        cmd = self._makeOne('-s', 'dummy', '-d', path, 'Distro')
+        scaffold = DummyScaffold('dummy')
+        cmd.scaffolds = [scaffold]
+        result = cmd.run()
+        self.assertEqual(result, 0)
+        self.assertEqual(
+            scaffold.output_dir,
+            os.path.abspath(os.path.expanduser("~root"))
+            )
+
 class Test_main(unittest.TestCase):
     def _callFUT(self, argv):
         from pyramid.scripts.pcreate import main
