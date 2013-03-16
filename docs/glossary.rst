@@ -403,10 +403,9 @@ Glossary
      dispatching and other application configuration tasks.
 
    reStructuredText
-     A `plain text format <http://docutils.sourceforge.net/rst.html>`_
-     that is the defacto standard for descriptive text shipped in
-     :term:`distribution` files, and Python docstrings.  This
-     documentation is authored in ReStructuredText format.
+     A `plain text markup format <http://docutils.sourceforge.net/rst.html>`_
+     that is the defacto standard for documenting Python projects.
+     The Pyramid documentation is written in reStructuredText.
 
    root
      The object at which :term:`traversal` begins when :app:`Pyramid`
