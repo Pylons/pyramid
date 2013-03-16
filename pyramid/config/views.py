@@ -1617,7 +1617,7 @@ class ViewsConfiguratorMixin(object):
         ):
         """ Add a default Not Found View to the current configuration state.
         The view will be called when Pyramid or application code raises an
-        :exc:`pyramid.httpexceptions.HTTPForbidden` exception (e.g. when a
+        :exc:`pyramid.httpexceptions.HTTPNotFound` exception (e.g. when a
         view cannot be found for the request).  The simplest example is:
 
           .. code-block:: python
