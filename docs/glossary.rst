@@ -334,12 +334,6 @@ Glossary
       `Zope Object Database <http://zodb.org>`_, a
       persistent Python object store.
 
-   ZEO
-      `Zope Enterprise Objects
-      <http://www.zope.org/Documentation/Books/ZopeBook/2_6Edition/ZEO.stx>`_
-      allows multiple simultaneous processes to access a single
-      :term:`ZODB` database.
-
    WebOb
      `WebOb <http://webob.org>`_ is a WSGI request/response
      library created by Ian Bicking.
