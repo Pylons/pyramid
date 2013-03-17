@@ -126,7 +126,7 @@ The ``view_page`` view function
 -------------------------------
 
 ``view_page()`` is used to display a single page of our
-wiki.  It renders the :term:`ReStructuredText` body of a page (stored as
+wiki.  It renders the :term:`reStructuredText` body of a page (stored as
 the ``data`` attribute of a ``Page`` model object) as HTML.  Then it substitutes an
 HTML anchor for each *WikiWord* reference in the rendered HTML using a
 compiled regular expression.
