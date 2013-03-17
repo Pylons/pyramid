@@ -226,7 +226,7 @@ To give a simple example of a  model class, we define one named ``MyModel``:
       :linenos:
       :language: py
 
-Our example model has an ``__init__`` method that takes a two arguments
+Our example model has an ``__init__`` method that takes two arguments
 (``name``, and ``value``).  It stores these values as ``self.name`` and
 ``self.value``
 within the ``__init__`` function itself.  The ``MyModel`` class also has a
