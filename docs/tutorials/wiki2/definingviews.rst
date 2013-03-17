@@ -37,34 +37,9 @@ Open ``tutorial/setup.py`` and edit it to look like the following:
 
 (Only the highlighted line needs to be added.)
 
-Running ``setup.py develop``
-============================
-
-Since a new software dependency was added, you will need to rerun ``python
-setup.py develop`` inside the root of the ``tutorial`` package to obtain and
-register the newly added dependency distribution.
-
-Make sure your current working directory is the root of the project (the
-directory in which setup.py lives) and execute the following command.
-
-On UNIX:
-
-.. code-block:: text
-
-   $ cd tutorial
-   $ $VENV/bin/python setup.py develop
-
-On Windows:
-
-.. code-block:: text
-
-   c:\pyramidtut> cd tutorial
-   c:\pyramidtut\tutorial> %VENV%\Scripts\python setup.py develop
-
-Success executing this command will end with a line to the console something
-like::
-
-   Finished processing dependencies for tutorial==0.0
+Since a new software dependency was added, you will need to re-install the
+project to ensure that the dependency is installed and available for use.
+For instructions, see :ref:`installing_project_in_dev_mode`.
 
 Changing the ``views.py`` File
 ==============================
