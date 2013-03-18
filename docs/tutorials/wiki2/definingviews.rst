@@ -6,14 +6,13 @@ A :term:`view callable` in a :app:`Pyramid` application is typically a simple
 Python function that accepts a single parameter named :term:`request`.  A
 view callable is assumed to return a :term:`response` object.
 
-The request object passed to every view that is called as the result of a
-route match has an attribute named ``matchdict`` that contains the elements
-placed into the URL by the ``pattern`` of a ``route`` statement.  For
-instance, if a call to :meth:`pyramid.config.Configurator.add_route` in
-``__init__.py`` had the pattern ``{one}/{two}``, and the URL at
-``http://example.com/foo/bar`` was invoked, matching this pattern, the
-``matchdict`` dictionary attached to the request passed to the view would
-have a ``'one'`` key with the value ``'foo'`` and a ``'two'`` key with the
+The request object has an attribute named ``matchdict``. A ``matchdict`` maps 
+the placeholders in the matching URL ``pattern`` to the substrings of the 
+:term:`request` ed URL. For instance, if a call to 
+:meth:`pyramid.config.Configurator.add_route` in ``__init__.py`` had the pattern 
+``{one}/{two}``, and the URL at ``http://example.com/foo/bar`` was invoked, matching 
+this pattern, the ``matchdict`` dictionary attached to the request passed to the view 
+would have a ``'one'`` key with the value ``'foo'`` and a ``'two'`` key with the
 value ``'bar'``.
 
 

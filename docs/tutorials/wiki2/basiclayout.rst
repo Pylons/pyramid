@@ -228,11 +228,10 @@ To give a simple example of a  model class, we define one named ``MyModel``:
 
 Our example model has an ``__init__`` method that takes two arguments
 (``name``, and ``value``).  It stores these values as ``self.name`` and
-``self.value``
-within the ``__init__`` function itself.  The ``MyModel`` class also has a
-``__tablename__`` attribute.  This informs SQLAlchemy which table to use to
-store the data representing instances of this class.
+``self.value`` within the ``__init__`` function itself.  The ``MyModel`` class 
+also has a ``__tablename__`` attribute.  This informs SQLAlchemy which table 
+to use to store the data representing instances of this class.
 
-That's about all there is to it to models, views, and initialization code in
+That's about all there is to it with models, views, and initialization code in
 our stock application.
 
