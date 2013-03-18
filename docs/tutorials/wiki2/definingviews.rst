@@ -10,8 +10,8 @@ The request object has a dictionary as an attribute named ``matchdict``.
 A ``matchdict`` maps the placeholders in the matching URL ``pattern`` to the substrings 
 of the :term:`request` ed URL. For instance, if a call to 
 :meth:`pyramid.config.Configurator.add_route` has the pattern 
-``{one}/{two}``, and the URL at ``http://example.com/foo/bar`` is invoked, matching 
-this pattern, the ``matchdict`` attached to the request would look like: ``{'one':'foo', 'two':'bar'}``
+``{one}/{two}``, and a user visits ``http://example.com/foo/bar``, our pattern would be 
+matched and the ``matchdict`` would look like: ``{'one':'foo', 'two':'bar'}``
 
 
 Declaring Dependencies in Our ``setup.py`` File
