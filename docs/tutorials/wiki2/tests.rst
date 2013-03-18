@@ -54,7 +54,7 @@ Change the ``requires`` list in ``setup.py`` to include ``WebTest``.
 .. literalinclude:: src/tests/setup.py
    :linenos:
    :language: python
-   :lines: 9-20
+   :lines: 11-21
    :emphasize-lines: 10
 
 After we've added a dependency on WebTest in ``setup.py``, we need to rerun
@@ -66,13 +66,13 @@ On UNIX:
 
 .. code-block:: text
 
-   $ ../bin/python setup.py develop
+   $ $VENV/bin/python setup.py develop
 
 On Windows:
 
 .. code-block:: text
 
-   c:\pyramidtut\tutorial> ..\Scripts\python setup.py develop
+   c:\pyramidtut\tutorial> %VENV%\Scripts\python setup.py develop
 
 Once that command has completed successfully, we can run the tests
 themselves:
@@ -81,13 +81,13 @@ On UNIX:
 
 .. code-block:: text
 
-   $ ../bin/python setup.py test -q
+   $ $VENV/bin/python setup.py test -q
 
 On Windows:
 
 .. code-block:: text
 
-   c:\pyramidtut\tutorial> ..\Scripts\python setup.py test -q
+   c:\pyramidtut\tutorial> %VENV%\Scripts\python setup.py test -q
 
 The expected result ends something like:
 

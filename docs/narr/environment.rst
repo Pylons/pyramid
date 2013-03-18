@@ -212,7 +212,7 @@ sequence can take several different forms.
 
       package1 package2 package3
 
-    The package names can also be separated by carriage returns::
+   The package names can also be separated by carriage returns::
 
        package1
        package2
@@ -546,7 +546,7 @@ for settings documented as such.  For example, you might start your
 .. code-block:: text
 
   $ PYRAMID_DEBUG_AUTHORIZATION=1 PYRAMID_RELOAD_TEMPLATES=1 \
-         bin/paster serve MyProject.ini
+         $VENV/bin/pserve MyProject.ini
 
 If you started your application this way, your :app:`Pyramid`
 application would behave in the same manner as if you had placed the
@@ -666,9 +666,9 @@ Here's how:
      def includeme(config):
          settings = config.registry.settings
          debug_frobnosticator = settings['debug_frobnosticator']
-     
-- In the runtime code that you need to access the new settings value, find
-  the value in the ``registry.settings`` dictionary and use it.  In
+
+- In the runtime code from where you need to access the new settings value,
+  find the value in the ``registry.settings`` dictionary and use it.  In
   :term:`view` code (or any other code that has access to the request), the
   easiest way to do this is via ``request.registry.settings``.  For example:
 

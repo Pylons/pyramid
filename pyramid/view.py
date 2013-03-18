@@ -162,14 +162,14 @@ class view_config(object):
        import views
        from resources import MyResource
        config.add_view(views.my_view, context=MyResource, name='my_view',
-                       permission='read', 'route_name='site1')
+                       permission='read', route_name='site1')
 
     .. note: :class:`pyramid.view.view_config` is also importable, for
              backwards compatibility purposes, as the name
              :class:`pyramid.view.bfg_view`.
 
-    The following keyword arguments are supported to
-    :class:`pyramid.view.view_config`: ``context``, ``permission``, ``name``,
+    :class:`pyramid.view.view_config` supports the following keyword
+    arguments: ``context``, ``permission``, ``name``,
     ``request_type``, ``route_name``, ``request_method``, ``request_param``,
     ``containment``, ``xhr``, ``accept``, ``header``, ``path_info``,
     ``custom_predicates``, ``decorator``, ``mapper``, ``http_cache``,
@@ -340,7 +340,7 @@ class notfound_view_config(object):
     argument restricts the set of circumstances under which this notfound
     view will be invoked.
 
-    If ``append_slash`` is ``True``, when the notfound view is invoked, and
+    If ``append_slash`` is ``True``, when the Not Found View is invoked, and
     the current path info does not end in a slash, the notfound logic will
     attempt to find a :term:`route` that matches the request's path info
     suffixed with a slash.  If such a route exists, Pyramid will issue a

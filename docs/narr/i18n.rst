@@ -276,7 +276,7 @@ like so:
 .. code-block:: text
 
    $ cd /my/virtualenv
-   $ bin/easy_install Babel lingua
+   $ $VENV/bin/easy_install Babel lingua
 
 Installation on Windows
 +++++++++++++++++++++++
@@ -287,8 +287,7 @@ like so:
 
 .. code-block:: text
 
-   C> cd \my\virtualenv
-   C> Scripts\easy_install Babel lingua
+   C> %VENV%\Scripts\easy_install Babel lingua
 
 .. index::
    single: Babel; message extractors
@@ -347,7 +346,7 @@ extract the messages:
 
    $ cd /place/where/myapplication/setup.py/lives
    $ mkdir -p myapplication/locale
-   $ $myvenv/bin/python setup.py extract_messages
+   $ $VENV/bin/python setup.py extract_messages
 
 The message catalog ``.pot`` template will end up in:
 
@@ -439,7 +438,7 @@ init_catalog`` command:
 .. code-block:: text
 
    $ cd /place/where/myapplication/setup.py/lives
-   $ $myvenv/bin/python setup.py init_catalog -l es
+   $ $VENV/bin/python setup.py init_catalog -l es
 
 By default, the message catalog ``.po`` file will end up in:
 
@@ -471,7 +470,7 @@ Then use the ``setup.py update_catalog`` command.
 .. code-block:: text
 
    $ cd /place/where/myapplication/setup.py/lives
-   $ $myvenv/bin/python setup.py update_catalog
+   $ $VENV/bin/python setup.py update_catalog
 
 .. index::
    pair: compiling; message catalog
@@ -487,7 +486,7 @@ translations, compile ``.po`` files to ``.mo`` files:
 .. code-block:: text
 
    $ cd /place/where/myapplication/setup.py/lives
-   $ $myvenv/bin/python setup.py compile_catalog
+   $ $VENV/bin/python setup.py compile_catalog
 
 This will create a ``.mo`` file for each ``.po`` file in your
 application.  As long as the :term:`translation directory` in which
@@ -736,9 +735,7 @@ through translation before being rendered:
 
 The features represented by attributes of the ``i18n`` namespace of
 Chameleon will also consult the :app:`Pyramid` translations.
-See
-`http://chameleon.repoze.org/docs/latest/i18n.html#the-i18n-namespace
-<http://chameleon.repoze.org/docs/latest/i18n.html#the-i18n-namespace>`_.
+See http://chameleon.readthedocs.org/en/latest/reference.html#id50.
 
 .. note::
 

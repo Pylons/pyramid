@@ -29,13 +29,13 @@ On UNIX:
 
 .. code-block:: text
 
-   $ /path/to/your/virtualenv/bin/python helloworld.py
+   $ $VENV/bin/python helloworld.py
 
 On Windows:
 
 .. code-block:: text
 
-   C:\> \path\to\your\virtualenv\Scripts\python.exe helloworld.py
+   C:\> %VENV%\Scripts\python.exe helloworld.py
 
 This command will not return and nothing will be printed to the console.
 When port 8080 is visited by a browser on the URL ``/hello/world``, the
@@ -175,9 +175,9 @@ First line above calls the :meth:`pyramid.config.Configurator.add_route`
 method, which registers a :term:`route` to match any URL path that begins
 with ``/hello/`` followed by a string.
 
-The second line, ``config.add_view(hello_world, route_name='hello')``,
-registers the ``hello_world`` function as a :term:`view callable` and makes
-sure that it will be called when the ``hello`` route is matched.
+The second line registers the ``hello_world`` function as a
+:term:`view callable` and makes sure that it will be called when the
+``hello`` route is matched.
 
 .. index::
    single: make_wsgi_app

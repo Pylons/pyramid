@@ -65,7 +65,7 @@ policies.
 Enabling an Authorization Policy
 --------------------------------
 
-By default, :app:`Pyramid` enables no authorization policy.  All
+:app:`Pyramid` does not enable any authorization policy by default.  All
 views are accessible by completely anonymous users.  In order to begin
 protecting views from execution based on security settings, you need
 to enable an authorization policy.
@@ -80,7 +80,7 @@ policy.
 You must also enable an :term:`authentication policy` in order to enable the
 authorization policy.  This is because authorization, in general, depends
 upon authentication.  Use the
-:meth:`~pyramid.config.Configurator.set_authentication_policy` and method
+:meth:`~pyramid.config.Configurator.set_authentication_policy` method
 during application setup to specify the authentication policy.
 
 For example:
@@ -98,7 +98,7 @@ For example:
    config.set_authentication_policy(authn_policy)
    config.set_authorization_policy(authz_policy)
 
-.. note:: the ``authentication_policy`` and ``authorization_policy``
+.. note:: The ``authentication_policy`` and ``authorization_policy``
    arguments may also be passed to their respective methods mentioned above
    as :term:`dotted Python name` values, each representing the dotted name
    path to a suitable implementation global defined at Python module scope.
@@ -507,7 +507,7 @@ example:
 
 .. code-block:: text
 
-  $ PYRAMID_DEBUG_AUTHORIZATION=1 bin/pserve myproject.ini
+  $ PYRAMID_DEBUG_AUTHORIZATION=1 $VENV/bin/pserve myproject.ini
 
 When any authorization takes place during a top-level view rendering,
 a message will be logged to the console (to stderr) about what ACE in

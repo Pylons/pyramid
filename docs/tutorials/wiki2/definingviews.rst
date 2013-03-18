@@ -33,7 +33,7 @@ Open ``tutorial/setup.py`` and edit it to look like the following:
 .. literalinclude:: src/views/setup.py
    :linenos:
    :language: python
-   :emphasize-lines: 17
+   :emphasize-lines: 19
 
 (Only the highlighted line needs to be added.)
 
@@ -52,14 +52,14 @@ On UNIX:
 .. code-block:: text
 
    $ cd tutorial
-   $ ../bin/python setup.py develop
+   $ $VENV/bin/python setup.py develop
 
 On Windows:
 
 .. code-block:: text
 
    c:\pyramidtut> cd tutorial
-   c:\pyramidtut\tutorial> ..\Scripts\python setup.py develop
+   c:\pyramidtut\tutorial> %VENV%\Scripts\python setup.py develop
 
 Success executing this command will end with a line to the console something
 like::
@@ -126,7 +126,7 @@ The ``view_page`` view function
 -------------------------------
 
 ``view_page()`` is used to display a single page of our
-wiki.  It renders the :term:`ReStructuredText` body of a page (stored as
+wiki.  It renders the :term:`reStructuredText` body of a page (stored as
 the ``data`` attribute of a ``Page`` model object) as HTML.  Then it substitutes an
 HTML anchor for each *WikiWord* reference in the rendered HTML using a
 compiled regular expression.
@@ -287,7 +287,7 @@ Our templates name a single static asset named ``pylons.css``.  We don't need
 to create this file within our package's ``static`` directory because it was
 provided at the time we created the project. This file is a little too long
 to replicate within the body of this guide, however it is available `online
-<http://github.com/Pylons/pyramid/blob/master/docs/tutorials/wiki2/src/views/tutorial/static/pylons.css>`_.
+<https://github.com/Pylons/pyramid/blob/master/docs/tutorials/wiki2/src/views/tutorial/static/pylons.css>`_.
 
 This CSS file will be accessed via
 e.g. ``http://localhost:6543/static/pylons.css`` by virtue of the call to

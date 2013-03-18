@@ -52,9 +52,7 @@ Documentation
 
 Speed
   :app:`Pyramid` is designed to provide noticeably fast execution for common
-  tasks such as templating and simple response generation. Although "hardware
-  is cheap", the limits of this approach become painfully evident when one
-  finds him or herself responsible for managing a great many machines.
+  tasks such as templating and simple response generation.
 
 Reliability
   :app:`Pyramid` is developed conservatively and tested exhaustively. Where
@@ -219,7 +217,6 @@ that the Pyramid core doesn't.  Add-on packages already exist which let you
 easily send email, let you use the Jinja2 templating system, let you use
 XML-RPC or JSON-RPC, let you integrate with jQuery Mobile, etc.
 
-Examples: http://docs.pylonsproject.org/docs/pyramid.html#pyramid-add-on-documentation
 
 Class-based and function-based views
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

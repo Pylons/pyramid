@@ -70,7 +70,7 @@ Test Set Up and Tear Down
 --------------------------
 
 :app:`Pyramid` uses a "global" (actually :term:`thread local`) data structure
-to hold on to two items: the current :term:`request` and the current
+to hold two items: the current :term:`request` and the current
 :term:`application registry`.  These data structures are available via the
 :func:`pyramid.threadlocal.get_current_request` and
 :func:`pyramid.threadlocal.get_current_registry` functions, respectively.

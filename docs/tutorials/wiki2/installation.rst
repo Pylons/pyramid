@@ -52,13 +52,13 @@ On UNIX:
 
 .. code-block:: text
 
-   $ bin/pcreate -s alchemy tutorial
+   $ $VENV/bin/pcreate -s alchemy tutorial
 
 On Windows:
 
 .. code-block:: text
 
-   c:\pyramidtut> Scripts\pcreate -s alchemy tutorial
+   c:\pyramidtut> %VENV%\pcreate -s alchemy tutorial
 
 .. note:: If you are using Windows, the ``alchemy``
    scaffold may not deal gracefully with installation into a
@@ -83,14 +83,14 @@ On UNIX:
 .. code-block:: text
 
    $ cd tutorial
-   $ ../bin/python setup.py develop
+   $ $VENV/bin/python setup.py develop
 
 On Windows:
 
 .. code-block:: text
 
    c:\pyramidtut> cd tutorial
-   c:\pyramidtut\tutorial> ..\Scripts\python setup.py develop
+   c:\pyramidtut\tutorial> %VENV%\Scripts\python setup.py develop
 
 Success executing this command will end with a line to the console something
 like::
@@ -109,13 +109,13 @@ On UNIX:
 
 .. code-block:: text
 
-   $ ../bin/python setup.py test -q
+   $ $VENV/bin/python setup.py test -q
 
 On Windows:
 
 .. code-block:: text
 
-   c:\pyramidtut\tutorial> ..\Scripts\python setup.py test -q
+   c:\pyramidtut\tutorial> %VENV%\Scripts\python setup.py test -q
 
 For a successful test run, you should see output that ends like this::
 
@@ -141,13 +141,13 @@ On UNIX:
 
 .. code-block:: text
 
-   $ ../bin/easy_install nose coverage
+   $ $VENV/bin/easy_install nose coverage
 
 On Windows:
 
 .. code-block:: text
 
-   c:\pyramidtut\tutorial> ..\Scripts\easy_install nose coverage
+   c:\pyramidtut\tutorial> %VENV%\Scripts\easy_install nose coverage
 
 Once ``nose`` and ``coverage`` are installed, we can actually run the
 coverage tests.
@@ -156,13 +156,13 @@ On UNIX:
 
 .. code-block:: text
 
-   $ ../bin/nosetests --cover-package=tutorial --cover-erase --with-coverage
+   $ $VENV/bin/nosetests --cover-package=tutorial --cover-erase --with-coverage
 
 On Windows:
 
 .. code-block:: text
 
-   c:\pyramidtut\tutorial> ..\Scripts\nosetests --cover-package=tutorial \
+   c:\pyramidtut\tutorial> %VENV%\Scripts\nosetests --cover-package=tutorial \
          --cover-erase --with-coverage
 
 If successful, you will see output something like this::
@@ -200,13 +200,13 @@ On UNIX:
 
 .. code-block:: text
 
-   $ ../bin/initialize_tutorial_db development.ini
+   $ $VENV/bin/initialize_tutorial_db development.ini
 
 On Windows:
 
 .. code-block:: text
 
-   c:\pyramidtut\tutorial> ..\Scripts\initialize_tutorial_db development.ini
+   c:\pyramidtut\tutorial> %VENV%\Scripts\initialize_tutorial_db development.ini
 
 The output to your console should be something like this::
 
@@ -248,13 +248,13 @@ On UNIX:
 
 .. code-block:: text
 
-   $ ../bin/pserve development.ini --reload
+   $ $VENV/bin/pserve development.ini --reload
 
 On Windows:
 
 .. code-block:: text
 
-   c:\pyramidtut\tutorial> ..\Scripts\pserve development.ini --reload
+   c:\pyramidtut\tutorial> %VENV%\Scripts\pserve development.ini --reload
 
 If successful, you will see something like this on your console::
 

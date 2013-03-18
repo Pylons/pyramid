@@ -108,7 +108,7 @@ Minor Feature Additions
 - The static view machinery now raises rather than returns
   :class:`pyramid.httpexceptions.HTTPNotFound` and
   :class:`pyramid.httpexceptions.HTTPMovedPermanently` exceptions, so these can
-  be caught by the notfound view (and other exception views).
+  be caught by the Not Found View (and other exception views).
 
 - When there is a predicate mismatch exception (seen when no view matches for
   a given request due to predicates not working), the exception now contains

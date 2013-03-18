@@ -55,21 +55,25 @@ character, e.g.:
 
   .. code-block:: text
 
-     $ ../bin/nosetests
+     $ $VENV/bin/nosetests
+
+(See :term:`virtualenv` for the meaning of ``$VENV``)
 
 Example blocks representing Windows ``cmd.exe`` commands are prefixed with a
 drive letter and/or a directory name, e.g.:
 
   .. code-block:: text
 
-     c:\examples> ..\Scripts\nosetests
+     c:\examples> %VENV%\Scripts\nosetests
+
+(See :term:`virtualenv` for the meaning of ``%VENV%``)
 
 Sometimes, when it's unknown which directory is current, Windows ``cmd.exe``
 example block commands are prefixed only with a ``>`` character, e.g.:
 
   .. code-block:: text
 
-     > ..\Scripts\nosetests
+     > %VENV%\Scripts\nosetests
 
 When a command that should be typed on one line is too long to fit on a page,
 the backslash ``\`` is used to indicate that the following printed line
@@ -77,7 +81,7 @@ should actually be part of the command:
 
   .. code-block:: text
 
-     c:\bigfntut\tutorial> ..\Scripts\nosetests --cover-package=tutorial \
+     c:\bigfntut\tutorial> %VENV%\Scripts\nosetests --cover-package=tutorial \
            --cover-erase --with-coverage
 
 A sidebar, which presents a concept tangentially related to content

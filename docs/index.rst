@@ -112,12 +112,13 @@ platforms.
 API Documentation
 ==================
 
-Documentation for every :app:`Pyramid` API.
+Comprehensive reference material for every public API exposed by :app:`Pyramid`:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
+   :glob:
 
-   api
+   api/*
 
 Change History
 ==============
@@ -188,7 +189,7 @@ The `Pylons Project web site <http://pylonsproject.org/>`_ is the main online
 source of :app:`Pyramid` support and development information.
 
 To report bugs, use the `issue tracker
-<http://github.com/Pylons/pyramid/issues>`_.
+<https://github.com/Pylons/pyramid/issues>`_.
 
 If you've got questions that aren't answered by this documentation,
 contact the `Pylons-discuss maillist
@@ -196,7 +197,7 @@ contact the `Pylons-discuss maillist
 IRC channel <irc://irc.freenode.net/#pyramid>`_.
 
 Browse and check out tagged and trunk versions of :app:`Pyramid` via
-the `Pyramid GitHub repository <http://github.com/Pylons/pyramid/>`_.
+the `Pyramid GitHub repository <https://github.com/Pylons/pyramid/>`_.
 To check out the trunk via ``git``, use this command:
 
 .. code-block:: text

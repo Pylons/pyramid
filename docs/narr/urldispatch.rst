@@ -70,13 +70,11 @@ via its ``route_name`` predicate, that view callable will always be found and
 invoked when the associated route pattern matches during a request.
 
 More commonly, you will not use any ``add_view`` statements in your project's
-"setup" code, instead only using ``add_route`` statements using a
-:term:`scan` for to associate view callables with routes.  For example, if
+"setup" code. You will instead use ``add_route`` statements, and use a
+:term:`scan` to associate view callables with routes.  For example, if
 this is a portion of your project's ``__init__.py``:
 
 .. code-block:: python
-
-   # in your project's __init__.py (mypackage.__init__)
 
    config.add_route('myroute', '/prefix/{one}/{two}')
    config.scan('mypackage')
@@ -91,8 +89,6 @@ pick up any of its configuration decorators, so we can add one there
 that references ``myroute`` as a ``route_name`` parameter:
 
 .. code-block:: python
-
-   # in your project's views.py module (mypackage.views)
 
    from pyramid.view import view_config
    from pyramid.response import Response
@@ -818,7 +814,7 @@ bro." body.
 If a request enters the application with the ``PATH_INFO`` value of
 ``/has_slash/``, the second route will match.  If a request enters the
 application with the ``PATH_INFO`` value of ``/has_slash``, a route *will* be
-found by the slash-appending not found view.  An HTTP redirect to
+found by the slash-appending :term:`Not Found View`.  An HTTP redirect to
 ``/has_slash/`` will be returned to the user's browser.  As a result, the
 ``notfound`` view will never actually be called.
 
@@ -853,12 +849,12 @@ exactly the same job:
 .. warning::
 
    You **should not** rely on this mechanism to redirect ``POST`` requests.
-   The redirect  of the slash-appending not found view will turn a ``POST``
-   request into a ``GET``, losing any ``POST`` data in the original
+   The redirect  of the slash-appending :term:`Not Found View` will turn a
+   ``POST`` request into a ``GET``, losing any ``POST`` data in the original
    request.
 
 See :ref:`view_module` and :ref:`changing_the_notfound_view` for a more
-general description of how to configure a view and/or a not found view.
+general description of how to configure a view and/or a :term:`Not Found View`.
 
 .. index::
    pair: debugging; route matching
@@ -879,8 +875,7 @@ which you started the application from.  For example:
 .. code-block:: text
    :linenos:
 
-    [chrism@thinko pylonsbasic]$ PYRAMID_DEBUG_ROUTEMATCH=true \
-                                 bin/pserve development.ini
+    $ PYRAMID_DEBUG_ROUTEMATCH=true $VENV/bin/pserve development.ini
     Starting server in PID 13586.
     serving on 0.0.0.0:6543 view at http://127.0.0.1:6543
     2010-12-16 14:45:19,956 no route matched for url \
