@@ -132,11 +132,11 @@ Finally, ``main`` is finished configuring things, so it uses the
 View Declarations via ``views.py``
 ----------------------------------
 
-Mapping a :term:`route` to code that will be executed when a match for
-the route's pattern occurs is done by registering a :term:`view
-configuration`. Our application uses the
-:meth:`pyramid.view.view_config` decorator to map view callables to
-each route, thereby mapping URL patterns to code.
+Arguably, the main function of a web framework is mapping each URL
+patterns, see :term:`route`, to code, see :term:`view callable`, that is 
+executed when the requested URL matches the corresponding :term:`route`. Our 
+application uses the :meth:`pyramid.view.view_config` decorator to perform 
+this mapping.
 
 Open ``tutorial/tutorial/views.py``.  It should already contain the following:
 
