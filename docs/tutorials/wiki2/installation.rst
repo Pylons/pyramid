@@ -66,6 +66,13 @@ On Windows:
    startup problems, try putting both the virtualenv and the project
    into directories that do not contain spaces in their paths.
 
+Pcreate is a script that comes with Pyramid that helps by creating and organizing files 
+needed as part of a Pyramid project. By passing in `alchemy` was are asking the script to 
+create the files needed to use SQLAlchemy. By passing in our app name `tutorial` it goes through and 
+places that application name in all the different files required. For example, the ``initialize_tutorial_db``
+that is in the ``pyramidtut/bin`` directory that we use later in this tutorial was created by `pcreate`
+
+
 
 .. _installing_project_in_dev_mode:
 
