@@ -11,6 +11,11 @@ Features
   a dynamic property. It is recommended to define a dynamic ACL as a callable
   to avoid this ambiguity. See https://github.com/Pylons/pyramid/issues/735.
 
+- Allow a protocol-relative URL (e.g. ``//example.com/images``) to be passed to
+  ``pyramid.config.Configurator.add_static_view``. This allows
+  externally-hosted static URLs to be generated based on the current protocol.
+
+
 1.4 (2012-12-18)
 ================
 
