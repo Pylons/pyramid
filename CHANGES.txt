@@ -1,3 +1,40 @@
+Bug Fixes
+---------
+
+- Now predicate mismatches don't hide valid views. This is mostly an
+  issue with views that use request_method predicates. Here's an
+  example that now works::
+
+    class IResource(Interface):
+        ...
+
+    @view_config(context=IResource)
+    def get(context, request):
+        ...
+
+    @view_config(context=IResource, request_method='POST')
+    def post(context, request):
+        ...
+
+    @view_config(context=IResource, request_method='DELETE')
+    def delete(context, request):
+        ...
+
+    @implementor(IResource)
+    class MyResource:
+        ...
+
+    @view_config(context=MyResource, request_method='POST')
+    def override_post(context, request):
+        ...
+
+  Previously the override_post view registration would hide the get
+  and delete views in the context of MyResource -- leading to a
+  predicate mismatch error when trying to use GET or DELETE
+  methods. Now the views are found and no predicate mismatch is
+  raised.
+
+
 1.4 (2012-12-18)
 ================
 
