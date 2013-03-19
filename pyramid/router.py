@@ -1,4 +1,5 @@
 from zope.interface import (
+    Interface,
     implementer,
     providedBy,
     )
@@ -24,6 +25,7 @@ from pyramid.events import (
     NewResponse,
     )
 
+from pyramid.exceptions import PredicateMismatch
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.request import Request
 from pyramid.threadlocal import manager
@@ -158,8 +160,23 @@ class Router(object):
                 msg = request.path_info
             raise HTTPNotFound(msg)
         else:
-            response = view_callable(context, request)
-
+            try:
+                response = view_callable(context, request)
+            except PredicateMismatch:
+                # look for other views that meet the predicate
+                # criteria
+                for iface in context_iface.flattened():
+                    view_callable = adapters.lookup(
+                        (IViewClassifier, request.request_iface, iface),
+                        IView, name=view_name, default=None)
+                    if view_callable is not None:
+                        try:
+                            response = view_callable(context, request)
+                            break
+                        except PredicateMismatch:
+                            pass
+                else:
+                    raise
         return response
 
     def invoke_subrequest(self, request, use_tweens=False):
