@@ -583,6 +583,21 @@ class TestURLMethodsMixin(unittest.TestCase):
         self.assertEqual(result,
                          'http://example.com:5432/absstatic/test_url.py')
 
+    def test_static_url_noscheme_uses_scheme_from_request(self):
+        import os
+        from pyramid.interfaces import IStaticURLInfo
+        from pyramid.config.views import StaticURLInfo
+        info = StaticURLInfo()
+        here = os.path.abspath(os.path.dirname(__file__))
+        info.add(self.config, '//subdomain.example.com/static', here)
+        request = self._makeOne({'wsgi.url_scheme': 'https'})
+        registry = request.registry
+        registry.registerUtility(info, IStaticURLInfo)
+        abspath = os.path.join(here, 'test_url.py')
+        result = request.static_url(abspath)
+        self.assertEqual(result,
+                         'https://subdomain.example.com/static/test_url.py')
+
     def test_static_path_abspath(self):
         from pyramid.interfaces import IStaticURLInfo
         request = self._makeOne()
