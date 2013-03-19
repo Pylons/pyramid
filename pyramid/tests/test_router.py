@@ -1236,6 +1236,32 @@ class TestRouter(unittest.TestCase):
         app_iter = router(environ, start_response)
         self.assertEqual(app_iter, [b'abc'])
 
+    def test_call_view_predicate_mismatch_doesnt_find_unrelated_views(self):
+        from pyramid.exceptions import PredicateMismatch
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IRequest
+        from zope.interface import Interface, implementer
+        class IContext(Interface):
+            pass
+        class IOtherContext(Interface):
+            pass
+        @implementer(IContext)
+        class DummyContext:
+            pass
+        context = DummyContext()
+        self._registerTraverserFactory(context)
+        view = DummyView(DummyResponse(), raise_exception=PredicateMismatch)
+        self._registerView(view, '', IViewClassifier, IRequest,
+                           DummyContext)
+        please_dont_call_me_view = DummyView('abc')
+        self._registerView(self.config.derive_view(please_dont_call_me_view),
+                            '', IViewClassifier, IRequest, IOtherContext)
+        router = self._makeOne()
+        environ = self._makeEnviron()
+        router = self._makeOne()
+        start_response = DummyStartResponse()
+        self.assertRaises(PredicateMismatch, router, environ, start_response)
+
 class DummyPredicate(object):
     def __call__(self, info, request):
         return True
