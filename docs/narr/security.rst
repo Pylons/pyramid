@@ -270,6 +270,27 @@ resource instances with an ACL (as opposed to just decorating their class) in
 applications such as "CMS" systems where fine-grained access is required on
 an object-by-object basis.
 
+Dynamic ACLs are also possible by turning the ACL into a callable on the
+resource. This may allow the ACL to dynamically generate rules based on
+properties of the instance.
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.security import Allow
+   from pyramid.security import Everyone
+
+   class Blog(object):
+       def __acl__(self):
+           return [
+               (Allow, Everyone, 'view'),
+               (Allow, self.owner, 'edit'),
+               (Allow, 'group:editors', 'edit'),
+           ]
+
+       def __init__(self, owner):
+           self.owner = owner
+
 .. index::
    single: ACE
    single: access control entry
