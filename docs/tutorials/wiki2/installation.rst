@@ -8,6 +8,28 @@ Preparation
 Follow the steps in :ref:`installing_chapter`, but name the virtualenv
 directory ``pyramidtut``.
 
+``IMPORTANT``: To set up the environment variable VENV used throughout the this tutorial 
+you should do this:
+
+On UNIX:
+
+.. code-block:: text
+
+   $ export VENV=~/pyramidtut
+
+This assumes you created the virtualenv `pyramidtut` in your home directory. Please 
+update accordingly if you used a different directory.
+
+On Windows:
+
+.. code-block:: text
+
+   c:\> set VENV=c:\pyramidtut
+
+This assumes you created the virtualenv `pyramidtut` in the base of your C: drive. Please 
+update accordingly if you used a different directory.
+
+
 Preparation, UNIX
 -----------------
 
