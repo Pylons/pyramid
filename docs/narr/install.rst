@@ -269,7 +269,7 @@ you can then create a virtual environment.  To do so, invoke the following:
 
 .. code-block:: text
 
-   $ export $VENV=~/env
+   $ export VENV=~/env
    $ virtualenv --no-site-packages $VENV
    New python executable in /home/foo/env/bin/python
    Installing setuptools.............done.
