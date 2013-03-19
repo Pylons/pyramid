@@ -11,6 +11,16 @@ Features
   a dynamic property. It is recommended to define a dynamic ACL as a callable
   to avoid this ambiguity. See https://github.com/Pylons/pyramid/issues/735.
 
+- Allow a protocol-relative URL (e.g. ``//example.com/images``) to be passed to
+  ``pyramid.config.Configurator.add_static_view``. This allows
+  externally-hosted static URLs to be generated based on the current protocol.
+
+- The ``AuthTktAuthenticationPolicy`` now supports IPv6 addresses when using
+  the ``include_ip=True`` option. This is possibly incompatible with
+  alternative ``auth_tkt`` implementations, as the specification does not
+  define how to properly handle IPv6. See
+  https://github.com/Pylons/pyramid/issues/831.
+
 Bug Fixes
 ---------
 
