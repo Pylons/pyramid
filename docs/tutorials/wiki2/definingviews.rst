@@ -149,10 +149,9 @@ We then generate an edit URL (because it's easier to do here than in the
 template), and we return a dictionary with a number of arguments.  The fact
 that ``view_page()`` returns a dictionary (as opposed to a :term:`response`
 object) is a cue to :app:`Pyramid` that it should try to use a :term:`renderer`
-associated with the view configuration to render a template.  In our case,
-the template which will be rendered will be the ``templates/view.pt``
-template, as indicated in the ``@view_config`` decorator that is applied to
-``view_page()``.
+associated with the view configuration to render a response.  In our case,
+the renderer used will be the ``templates/view.pt`` template, as indicated in 
+the ``@view_config`` decorator that is applied to ``view_page()``.
 
 The ``add_page`` view function
 ------------------------------
