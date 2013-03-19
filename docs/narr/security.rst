@@ -234,8 +234,8 @@ class:
 .. code-block:: python
    :linenos:
 
-   from pyramid.security import Everyone
    from pyramid.security import Allow
+   from pyramid.security import Everyone
 
    class Blog(object):
        __acl__ = [
@@ -250,8 +250,8 @@ Or, if your resources are persistent, an ACL might be specified via the
 .. code-block:: python
    :linenos:
 
-   from pyramid.security import Everyone
    from pyramid.security import Allow
+   from pyramid.security import Everyone
 
    class Blog(object):
        pass
@@ -303,8 +303,8 @@ Here's an example ACL:
 .. code-block:: python
    :linenos:
 
-   from pyramid.security import Everyone
    from pyramid.security import Allow
+   from pyramid.security import Everyone
 
    __acl__ = [
            (Allow, Everyone, 'view'),
@@ -342,9 +342,9 @@ order dictated by the ACL*.  So if you have an ACL like this:
 .. code-block:: python
    :linenos:
 
-   from pyramid.security import Everyone
    from pyramid.security import Allow
    from pyramid.security import Deny
+   from pyramid.security import Everyone
 
    __acl__ = [
        (Allow, Everyone, 'view'),
@@ -380,8 +380,8 @@ ACE, as below.
 .. code-block:: python
    :linenos:
 
-   from pyramid.security import Everyone
    from pyramid.security import Allow
+   from pyramid.security import Everyone
 
    __acl__ = [
        (Allow, Everyone, 'view'),
