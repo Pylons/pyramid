@@ -36,26 +36,32 @@ Bug Fixes
   .. code-block:: python
 
      class IResource(Interface):
+
          ...
 
      @view_config(context=IResource)
      def get(context, request):
+
          ...
 
      @view_config(context=IResource, request_method='POST')
      def post(context, request):
+
          ...
 
      @view_config(context=IResource, request_method='DELETE')
      def delete(context, request):
+
          ...
 
      @implementor(IResource)
      class MyResource:
+
          ...
 
      @view_config(context=MyResource, request_method='POST')
      def override_post(context, request):
+
          ...
 
   Previously the override_post view registration would hide the get
