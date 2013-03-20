@@ -2,13 +2,23 @@
 Installation
 ============
 
-Preparation
-===========
+Before You Begin
+================
+
+Installation Requirements
+-------------------------
 
 Follow the steps in :ref:`installing_chapter`, but name the virtualenv
-directory ``pyramidtut``.
+directory ``pyramidtut``.  Following these steps will ensure you have met the
+following requirements:
 
-Preparation, UNIX
+* Python interpreter is installed on your operating system
+* :term:`setuptools` or :term:`distribute` is installed
+* :term:`virtualenv` is installed
+* a virtual Python environment named ``pyramidtut`` has been created
+* Pyramid is installed
+
+UNIX Requirements
 -----------------
 
 #. Install SQLite3 and its development packages if you don't already
@@ -25,8 +35,7 @@ Preparation, UNIX
 
       $ cd pyramidtut
 
-
-Preparation, Windows
+Windows Requirements
 --------------------
 
 #. Switch to the ``pyramidtut`` directory:
