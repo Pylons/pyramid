@@ -56,14 +56,15 @@ class Test_get_app(unittest.TestCase):
         self.assertEqual(result, app)
 
 class Test_get_appsettings(unittest.TestCase):
-    def _callFUT(self, config_file, section_name, appconfig):
+    def _callFUT(self, config_file, section_name, options=None, appconfig=None):
         from pyramid.paster import get_appsettings
-        return get_appsettings(config_file, section_name, appconfig)
+        return get_appsettings(config_file, section_name, options, appconfig)
 
     def test_it(self):
         values = {'a':1}
         appconfig = DummyLoadWSGI(values)
-        result = self._callFUT('/foo/bar/myapp.ini', 'myapp', appconfig)
+        result = self._callFUT('/foo/bar/myapp.ini', 'myapp',
+                               appconfig=appconfig)
         self.assertEqual(appconfig.config_name, 'config:/foo/bar/myapp.ini')
         self.assertEqual(appconfig.section_name, 'myapp')
         self.assertEqual(appconfig.relative_to, os.getcwd())
@@ -72,7 +73,8 @@ class Test_get_appsettings(unittest.TestCase):
     def test_it_with_hash(self):
         values = {'a':1}
         appconfig = DummyLoadWSGI(values)
-        result = self._callFUT('/foo/bar/myapp.ini#myapp', None, appconfig)
+        result = self._callFUT('/foo/bar/myapp.ini#myapp', None,
+                               appconfig=appconfig)
         self.assertEqual(appconfig.config_name, 'config:/foo/bar/myapp.ini')
         self.assertEqual(appconfig.section_name, 'myapp')
         self.assertEqual(appconfig.relative_to, os.getcwd())
@@ -81,7 +83,8 @@ class Test_get_appsettings(unittest.TestCase):
     def test_it_with_hash_and_name_override(self):
         values = {'a':1}
         appconfig = DummyLoadWSGI(values)
-        result = self._callFUT('/foo/bar/myapp.ini#myapp', 'yourapp', appconfig)
+        result = self._callFUT('/foo/bar/myapp.ini#myapp', 'yourapp',
+                               appconfig=appconfig)
         self.assertEqual(appconfig.config_name, 'config:/foo/bar/myapp.ini')
         self.assertEqual(appconfig.section_name, 'yourapp')
         self.assertEqual(appconfig.relative_to, os.getcwd())
@@ -181,6 +184,3 @@ class DummyConfigParser(object):
 
 class DummyConfigParserModule(object):
     ConfigParser = DummyConfigParser
-
-
-
