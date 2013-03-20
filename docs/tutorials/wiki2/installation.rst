@@ -2,13 +2,23 @@
 Installation
 ============
 
-Preparation
-===========
+Before You Begin
+================
+
+Installation Requirements
+-------------------------
 
 Follow the steps in :ref:`installing_chapter`, but name the virtualenv
-directory ``pyramidtut``.
+directory ``pyramidtut``.  Following these steps will ensure you have met the
+following requirements:
 
-Preparation, UNIX
+* Python interpreter is installed on your operating system
+* :term:`setuptools` or :term:`distribute` is installed
+* :term:`virtualenv` is installed
+* a virtual Python environment named ``pyramidtut`` has been created
+* Pyramid is installed
+
+UNIX Requirements
 -----------------
 
 #. Install SQLite3 and its development packages if you don't already
@@ -25,8 +35,7 @@ Preparation, UNIX
 
       $ cd pyramidtut
 
-
-Preparation, Windows
+Windows Requirements
 --------------------
 
 #. Switch to the ``pyramidtut`` directory:
@@ -66,11 +75,11 @@ On Windows:
    startup problems, try putting both the virtualenv and the project
    into directories that do not contain spaces in their paths.
 
-Pcreate is a script that comes with Pyramid that helps by creating and organizing files 
-needed as part of a Pyramid project. By passing in `alchemy` was are asking the script to 
-create the files needed to use SQLAlchemy. By passing in our app name `tutorial` it goes through and 
+`pcreate` is a script that comes with Pyramid that helps by creating and organizing files
+needed as part of a Pyramid project. By passing in `alchemy`, we are asking the script to
+create the files needed to use SQLAlchemy. By passing in our app name `tutorial`, the script
 places that application name in all the different files required. For example, the ``initialize_tutorial_db``
-that is in the ``pyramidtut/bin`` directory that we use later in this tutorial was created by `pcreate`
+that is in the ``pyramidtut/bin`` directory was created by `pcreate`.
 
 
 
