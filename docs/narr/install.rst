@@ -19,12 +19,31 @@ run :app:`Pyramid`.
     run under any version of Python before 2.6.
 
 :app:`Pyramid` is known to run on all popular UNIX-like systems such as
-Linux, MacOS X, and FreeBSD as well as on Windows platforms.  It is also
-known to run on :term:`PyPy` (1.9+).
+Linux, Mac OS X, and FreeBSD as well as on Windows platforms.  It is
+also known to run on :term:`PyPy` (1.9+).
 
 :app:`Pyramid` installation does not require the compilation of any
 C code, so you need only a Python interpreter that meets the
 requirements mentioned.
+
+For Mac OS X Users
+~~~~~~~~~~~~~~~~~~
+
+From `Python.org <http://python.org/download/mac/>`_:
+
+    Python comes pre-installed on Mac OS X, but due to Apple's release
+    cycle, it's often one or even two years old. The overwhelming
+    recommendation of the "MacPython" community is to upgrade your
+    Python by downloading and installing a newer version from
+    `the Python standard release page <http://python.org/download/releases/>`_.
+
+It is recommended to download one of the *installer* versions, unless you prefer to install your Python through a packgage manager (e.g., macports or homebrew) or to build your Python from source.
+
+Unless you have a need for a specific earlier version, it is recommended
+to install the latest 2.x or 3.x version of Python.
+
+If you use an installer for your Python, then you can skip to the
+section :ref:`installing_unix`.
 
 If You Don't Yet Have A Python Interpreter (UNIX)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
