@@ -70,7 +70,9 @@ Install Pyramid Into the Virtual Python Environment
 SQLite3
 -------
 
-If you used a package manager to install your Python, or if you compiled your Python from source, then you must install SQLite3 and its development packages.  If you downloaded your Python from python.org  On a Debian system, this would be:
+Install SQLite3 and its development packages if you don't already
+have them installed.  Usually this is via your system's package
+manager. On a Debian system, this would be:
 
    .. code-block:: text
 
