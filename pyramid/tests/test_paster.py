@@ -1,12 +1,12 @@
 import os
 import unittest
 
+here = os.path.dirname(__file__)
+
 class Test_get_app(unittest.TestCase):
-    def _callFUT(self, config_file, section_name, options=None, loadapp=None):
+    def _callFUT(self, config_file, section_name, **kw):
         from pyramid.paster import get_app
-        return get_app(
-            config_file, section_name, options=options, loadapp=loadapp
-            )
+        return get_app(config_file, section_name, **kw)
 
     def test_it(self):
         app = DummyApp()
@@ -55,10 +55,17 @@ class Test_get_app(unittest.TestCase):
         self.assertEqual(loadapp.kw, {'global_conf':options})
         self.assertEqual(result, app)
 
+    def test_it_with_dummyapp_requiring_options(self):
+        options = {'bar': 'baz'}
+        app = self._callFUT(
+            os.path.join(here, 'fixtures', 'dummy.ini'),
+            'myapp', options=options)
+        self.assertEqual(app.settings['foo'], 'baz')
+
 class Test_get_appsettings(unittest.TestCase):
-    def _callFUT(self, config_file, section_name, options=None, appconfig=None):
+    def _callFUT(self, config_file, section_name, **kw):
         from pyramid.paster import get_appsettings
-        return get_appsettings(config_file, section_name, options, appconfig)
+        return get_appsettings(config_file, section_name, **kw)
 
     def test_it(self):
         values = {'a':1}
@@ -89,6 +96,13 @@ class Test_get_appsettings(unittest.TestCase):
         self.assertEqual(appconfig.section_name, 'yourapp')
         self.assertEqual(appconfig.relative_to, os.getcwd())
         self.assertEqual(result, values)
+
+    def test_it_with_dummyapp_requiring_options(self):
+        options = {'bar': 'baz'}
+        result = self._callFUT(
+            os.path.join(here, 'fixtures', 'dummy.ini'),
+            'myapp', options=options)
+        self.assertEqual(result['foo'], 'baz')
 
 class Test_setup_logging(unittest.TestCase):
     def _callFUT(self, config_file):
@@ -167,6 +181,12 @@ class DummyLoadWSGI:
 class DummyApp:
     def __init__(self):
         self.registry = dummy_registry
+
+def make_dummyapp(global_conf, **settings):
+    app = DummyApp()
+    app.settings = settings
+    app.global_conf = global_conf
+    return app
 
 class DummyRequest:
     application_url = 'http://example.com:5432'

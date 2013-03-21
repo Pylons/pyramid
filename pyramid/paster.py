@@ -24,7 +24,11 @@ def get_app(config_uri, name=None, options=None, loadapp=loadapp):
     config_name = 'config:%s' % path
     here_dir = os.getcwd()
 
-    app = loadapp(config_name, name=section, relative_to=here_dir, global_conf=options)
+    app = loadapp(
+        config_name,
+        name=section,
+        relative_to=here_dir,
+        global_conf=options)
 
     return app
 
@@ -42,7 +46,11 @@ def get_appsettings(config_uri, name=None, options=None, appconfig=appconfig):
     path, section = _getpathsec(config_uri, name)
     config_name = 'config:%s' % path
     here_dir = os.getcwd()
-    return appconfig(config_name, name=section, relative_to=here_dir, global_conf=options)
+    return appconfig(
+        config_name,
+        name=section,
+        relative_to=here_dir,
+        global_conf=options)
 
 def setup_logging(config_uri, fileConfig=fileConfig,
                   configparser=configparser):
