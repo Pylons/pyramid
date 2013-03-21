@@ -29,7 +29,7 @@ virtual environment.
    New python executable in /home/foo/env/bin/python
    Installing setuptools.............done.
 
-**On Windows:**
+**On Windows**:
 
 Set the `VENV` environment variable.
 
@@ -61,7 +61,7 @@ Install Pyramid Into the Virtual Python Environment
 
    $ $VENV/bin/easy_install pyramid
 
-**On Windows**
+**On Windows**:
 
 .. code-block:: text
 
@@ -79,27 +79,26 @@ the next section :ref:`sql_making_a_project`..
 If you need to install the SQLite3 packages, then, for example, using
 the Debian system and apt-get, the command would be the following:
 
-   .. code-block:: text
+.. code-block:: text
 
-      $ sudo apt-get install libsqlite3-dev
+   $ sudo apt-get install libsqlite3-dev
 
 Change Directory to Your Virtual Python Environment
 ---------------------------------------------------
 
 Change directory to the ``pyramidtut`` directory.
 
-**On UNIX:**
+**On UNIX**:
 
-   .. code-block:: text
+.. code-block:: text
 
-      $ cd pyramidtut
+   $ cd pyramidtut
 
-**On Windows**
-=======
+**On Windows**:
 
-   .. code-block:: text
+.. code-block:: text
 
-      c:\> cd pyramidtut
+   c:\> cd pyramidtut
 
 .. _sql_making_a_project:
 
@@ -124,13 +123,13 @@ required files. For example, `pcreate` creates the
 The below instructions assume your current working directory is the
 "virtualenv" named "pyramidtut".
 
-On UNIX:
+**On UNIX**:
 
 .. code-block:: text
 
    $ $VENV/bin/pcreate -s alchemy tutorial
 
-On Windows:
+**On Windows**:
 
 .. code-block:: text
 
@@ -153,14 +152,14 @@ the project as a development egg in your workspace using the
 directory you created in :ref:`sql_making_a_project`, and run the
 ``setup.py develop`` command using the virtualenv Python interpreter.
 
-On UNIX:
+**On UNIX**:
 
 .. code-block:: text
 
    $ cd tutorial
    $ $VENV/bin/python setup.py develop
 
-On Windows:
+**On Windows**:
 
 .. code-block:: text
 
@@ -181,13 +180,13 @@ Running the Tests
 After you've installed the project in development mode, you may run
 the tests for the project.
 
-On UNIX:
+**On UNIX**:
 
 .. code-block:: text
 
    $ $VENV/bin/python setup.py test -q
 
-On Windows:
+**On Windows**:
 
 .. code-block:: text
 
@@ -213,13 +212,13 @@ tests.
 To get this functionality working, we'll need to install the ``nose`` and
 ``coverage`` packages into our ``virtualenv``:
 
-On UNIX:
+**On UNIX**:
 
 .. code-block:: text
 
    $ $VENV/bin/easy_install nose coverage
 
-On Windows:
+**On Windows**:
 
 .. code-block:: text
 
@@ -228,13 +227,13 @@ On Windows:
 Once ``nose`` and ``coverage`` are installed, we can actually run the
 coverage tests.
 
-On UNIX:
+**On UNIX**:
 
 .. code-block:: text
 
    $ $VENV/bin/nosetests --cover-package=tutorial --cover-erase --with-coverage
 
-On Windows:
+**On Windows**:
 
 .. code-block:: text
 
@@ -272,13 +271,13 @@ script` to initialize our database.
 Type the following command, make sure you are still in the ``tutorial``
 directory (the directory with a ``development.ini`` in it):
 
-On UNIX:
+**On UNIX**:
 
 .. code-block:: text
 
    $ $VENV/bin/initialize_tutorial_db development.ini
 
-On Windows:
+**On Windows**:
 
 .. code-block:: text
 
@@ -320,13 +319,13 @@ Starting the Application
 
 Start the application.
 
-On UNIX:
+**On UNIX**:
 
 .. code-block:: text
 
    $ $VENV/bin/pserve development.ini --reload
 
-On Windows:
+**On Windows**:
 
 .. code-block:: text
 
