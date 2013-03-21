@@ -67,28 +67,35 @@ Install Pyramid Into the Virtual Python Environment
 
    c:\env> %VENV%\Scripts\easy_install pyramid
 
-SQLite3
--------
+Install SQLite3 and Its Development Packages
+--------------------------------------------
 
-Install SQLite3 and its development packages if you don't already
-have them installed.  Usually this is via your system's package
-manager. On a Debian system, this would be:
+If you used a package manager to install your Python or if you compiled
+your Python from source, then you must install SQLite3 and its
+development packages.  If you downloaded your Python as an installer
+from python.org, then you already have it installed and can proceed to
+the next section :ref:`sql_making_a_project`..
+
+If you need to install the SQLite3 packages, then, for example, using
+the Debian system and apt-get, the command would be the following:
 
    .. code-block:: text
 
       $ sudo apt-get install libsqlite3-dev
 
-Entering the virtualenv
------------------------
+Change Directory to Your Virtual Python Environment
+---------------------------------------------------
 
-Do not forget to switch to the ``pyramidtut`` directory.
-In order to do so, run this command if you are on Unix:
+Change directory to the ``pyramidtut`` directory.
+
+**On UNIX:**
 
    .. code-block:: text
 
       $ cd pyramidtut
 
-And run this if you are on Windows:
+**On Windows**
+=======
 
    .. code-block:: text
 
@@ -361,4 +368,3 @@ the following assumptions:
    mechanism to map URLs to code (:term:`traversal`).  However, for the
    purposes of this tutorial, we'll only be using url dispatch and
    SQLAlchemy.
-
