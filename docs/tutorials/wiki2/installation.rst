@@ -78,16 +78,17 @@ manager. On a Debian system, this would be:
 
       $ sudo apt-get install libsqlite3-dev
 
-#. Switch to the ``pyramidtut`` directory:
+Entering the virtualenv
+-----------------------
+
+Do not forget to switch to the ``pyramidtut`` directory.
+In order to do so, run this command if you are on Unix:
 
    .. code-block:: text
 
       $ cd pyramidtut
 
-Windows Requirements
---------------------
-
-#. Switch to the ``pyramidtut`` directory:
+And run this if you are on Windows:
 
    .. code-block:: text
 
