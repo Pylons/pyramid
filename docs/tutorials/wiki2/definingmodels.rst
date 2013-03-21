@@ -78,8 +78,6 @@ following:
 Installing the Project and re-initializing the Database
 -------------------------------------------------------
 
-Redo the steps in :ref:`installing_project_in_dev_mode`.
-
 Because our model has changed, in order to reinitialize the database, we need
 to rerun the ``initialize_tutorial_db`` command to pick up the changes you've made
 to both the models.py file and to the initializedb.py file.
