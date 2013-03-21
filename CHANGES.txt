@@ -21,6 +21,14 @@ Features
   define how to properly handle IPv6. See
   https://github.com/Pylons/pyramid/issues/831.
 
+- Make it possible to use variable arguments via
+  ``pyramid.paster.get_appsettings``. This also allowed the generated
+  ``initialize_db`` script from the ``alchemy`` scaffold to grow support
+  for options in the form ``a=1 b=2`` so you can fill in
+  values in a parameterized ``.ini`` file, e.g.
+  ``initialize_myapp_db etc/development.ini a=1 b=2``.
+  See https://github.com/Pylons/pyramid/pull/911
+
 Bug Fixes
 ---------
 

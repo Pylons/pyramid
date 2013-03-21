@@ -43,9 +43,9 @@ above is executed.  It accepts some settings and returns a :term:`WSGI`
 application.  (See :ref:`startup_chapter` for more about ``pserve``.)
 
 The main function first creates a :term:`SQLAlchemy` database engine using
-``engine_from_config`` from the ``sqlalchemy.`` prefixed settings in the
-``development.ini`` file's ``[app:main]`` section.  This will be a URI
-(something like ``sqlite://``):
+:func:`sqlalchemy.engine_from_config` from the ``sqlalchemy.`` prefixed
+settings in the ``development.ini`` file's ``[app:main]`` section.
+This will be a URI (something like ``sqlite://``):
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
       :lines: 13

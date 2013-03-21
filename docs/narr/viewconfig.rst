@@ -62,9 +62,9 @@ particular view callable.
 
 :term:`View predicate` attributes are an important part of view configuration
 that enables the :term:`view lookup` subsystem to find and invoke the
-appropriate view.  The greater number of predicate attributes possessed by a
+appropriate view.  The greater the number of predicate attributes possessed by a
 view's configuration, the more specific the circumstances need to be before
-the registered view callable will be invoked.  The fewer number of predicates
+the registered view callable will be invoked.  The fewer the number of predicates
 which are supplied to a particular view configuration, the more likely it is
 that the associated view callable will be invoked.  A view with five
 predicates will always be found and evaluated before a view with two, for

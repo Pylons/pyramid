@@ -16,12 +16,13 @@ receives the :term:`request` and returns a :term:`response` object.
 High-Level Operational Overview
 -------------------------------
 
-If route configuration is present in an application, the :app:`Pyramid`
+If any route configuration is present in an application, the :app:`Pyramid`
 :term:`Router` checks every incoming request against an ordered set of URL
 matching patterns present in a *route map*.
 
 If any route pattern matches the information in the :term:`request`,
-:app:`Pyramid` will invoke :term:`view lookup` to find a matching view.
+:app:`Pyramid` will invoke the :term:`view lookup` process to find a
+matching view.
 
 If no route pattern in the route map matches the information in the
 :term:`request` provided in your application, :app:`Pyramid` will fail over
@@ -81,7 +82,7 @@ this is a portion of your project's ``__init__.py``:
 
 Note that we don't call :meth:`~pyramid.config.Configurator.add_view` in this
 setup code.  However, the above :term:`scan` execution
-``config.scan('mypackage')`` will pick up all :term:`configuration
+``config.scan('mypackage')`` will pick up each :term:`configuration
 decoration`, including any objects decorated with the
 :class:`pyramid.view.view_config` decorator in the ``mypackage`` Python
 package.  For example, if you have a ``views.py`` in your package, a scan will

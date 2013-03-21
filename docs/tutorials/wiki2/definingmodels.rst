@@ -34,7 +34,7 @@ sample and we're not going to use it.
 
 Then, we added a ``Page`` class.  Because this is a SQLAlchemy application,
 this class inherits from an instance of
-:class:`sqlalchemy.ext.declarative.declarative_base`.
+:func:`sqlalchemy.ext.declarative.declarative_base`.
 
 .. literalinclude:: src/models/tutorial/models.py
    :pyobject: Page
@@ -45,9 +45,10 @@ As you can see, our ``Page`` class has a class level attribute
 ``__tablename__`` which equals the string ``'pages'``.  This means that
 SQLAlchemy will store our wiki data in a SQL table named ``pages``.  Our
 ``Page`` class will also have class-level attributes named ``id``, ``name`` and
-``data`` (all instances of :class:`sqlalchemy.Column`).  These will map to
-columns in the ``pages`` table.  The ``id`` attribute will be the primary key
-in the table.  The ``name`` attribute will be a text attribute, each value of
+``data`` (all instances of :class:`sqlalchemy.schema.Column`).
+These will map to columns in the ``pages`` table.
+The ``id`` attribute will be the primary key in the table.
+The ``name`` attribute will be a text attribute, each value of
 which needs to be unique within the column.  The ``data`` attribute is a text
 attribute that will hold the body of each page.
 
@@ -76,8 +77,6 @@ following:
 
 Installing the Project and re-initializing the Database
 -------------------------------------------------------
-
-Redo the steps in :ref:`installing_project_in_dev_mode`.
 
 Because our model has changed, in order to reinitialize the database, we need
 to rerun the ``initialize_tutorial_db`` command to pick up the changes you've made

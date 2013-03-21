@@ -70,6 +70,7 @@ Install Pyramid Into the Virtual Python Environment
 Install SQLite3 and Its Development Packages
 --------------------------------------------
 
+<<<<<<< HEAD
 If you used a package manager to install your Python or if you compiled
 your Python from source, then you must install SQLite3 and its
 development packages.  If you downloaded your Python as an installer
@@ -78,23 +79,40 @@ the next section :ref:`sql_making_a_project`..
 
 If you need to install the SQLite3 packages, then, for example, using
 the Debian system and apt-get, the command would be the following:
+=======
+Install SQLite3 and its development packages if you don't already
+have them installed.  Usually this is via your system's package
+manager. On a Debian system, this would be:
+>>>>>>> upstream/master
 
    .. code-block:: text
 
       $ sudo apt-get install libsqlite3-dev
 
+<<<<<<< HEAD
 Change Directory to Your Virtual Python Environment
 ---------------------------------------------------
 
 Change directory to the ``pyramidtut`` directory.
 
 **On UNIX:**
+=======
+Entering the virtualenv
+-----------------------
+
+Do not forget to switch to the ``pyramidtut`` directory.
+In order to do so, run this command if you are on Unix:
+>>>>>>> upstream/master
 
    .. code-block:: text
 
       $ cd pyramidtut
 
+<<<<<<< HEAD
 **On Windows**
+=======
+And run this if you are on Windows:
+>>>>>>> upstream/master
 
    .. code-block:: text
 
