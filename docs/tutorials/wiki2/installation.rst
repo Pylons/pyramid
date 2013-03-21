@@ -95,7 +95,7 @@ Change directory to the ``pyramidtut`` directory.
       $ cd pyramidtut
 
 **On Windows**
-=======
+==============
 
    .. code-block:: text
 
