@@ -56,7 +56,7 @@ extensions = [
 # Looks for objects in external projects
 intersphinx_mapping = {
     'sqla': ('http://docs.sqlalchemy.org/en/latest', None),
-    'who': ('http://docs.repoze.org/who/2.0', None),
+    'who': ('http://docs.repoze.org/who/latest', None),
     'python': ('http://docs.python.org', None),
     'python3': ('http://docs.python.org/3', None),
     'tstring':
