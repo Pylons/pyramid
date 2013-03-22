@@ -140,7 +140,6 @@ In the example above, the scanner translates the arguments to
 :class:`~pyramid.view.view_config` into a call to the
 :meth:`pyramid.config.Configurator.add_view` method, effectively:
 
-.. ignore-next-block
 .. code-block:: python
 
    config.add_view(hello)

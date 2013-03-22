@@ -488,7 +488,6 @@ acts as a :app:`Pyramid` view callable.
 Here's an example of the :class:`~pyramid.view.view_config` decorator that
 lives within a :app:`Pyramid` application module ``views.py``:
 
-.. ignore-next-block
 .. code-block:: python
    :linenos:
 
@@ -503,7 +502,6 @@ lives within a :app:`Pyramid` application module ``views.py``:
 Using this decorator as above replaces the need to add this imperative
 configuration stanza:
 
-.. ignore-next-block
 .. code-block:: python
    :linenos:
 
