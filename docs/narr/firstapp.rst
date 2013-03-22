@@ -166,7 +166,6 @@ the application.
 Adding Configuration
 ~~~~~~~~~~~~~~~~~~~~
 
-.. ignore-next-block
 .. literalinclude:: helloworld.py
    :linenos:
    :lines: 11-12
@@ -186,7 +185,6 @@ The second line registers the ``hello_world`` function as a
 WSGI Application Creation
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. ignore-next-block
 .. literalinclude:: helloworld.py
    :linenos:
    :lines: 13
@@ -215,7 +213,6 @@ to its ``add_view`` and ``add_route`` methods.
 WSGI Application Serving
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. ignore-next-block
 .. literalinclude:: helloworld.py
    :linenos:
    :lines: 14-15

@@ -21,7 +21,6 @@ application can be opaque.  For example, here is a typical "unnamed
 utility" lookup using the :func:`zope.component.getUtility` global API
 as it might appear in a traditional Zope application:
 
-.. ignore-next-block
 .. code-block:: python
    :linenos:
 
