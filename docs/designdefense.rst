@@ -120,7 +120,6 @@ that uses the ZCA global API is somewhat high.  Consider a ZCA neophyte
 reading the code that performs a typical "unnamed utility" lookup using the
 :func:`zope.component.getUtility` global API:
 
-.. ignore-next-block
 .. code-block:: python
    :linenos:
 
@@ -190,7 +189,6 @@ special-purpose API functions that *do* use ZCA APIs.  Take for example the
 present in the current request or ``None`` if no userid is present in the
 current request.  The application developer calls it like so:
 
-.. ignore-next-block
 .. code-block:: python
    :linenos:
 
@@ -500,7 +498,6 @@ which match information in an associated "urlconf" such as
 Zope, likewise allows you to add arbitrary keyword and positional
 arguments to any method of a resource object found via traversal:
 
-.. ignore-next-block
 .. code-block:: python
    :linenos:
 

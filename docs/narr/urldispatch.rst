@@ -55,7 +55,6 @@ The :meth:`pyramid.config.Configurator.add_route` method adds a single
 :term:`route configuration` to the :term:`application registry`.  Here's an
 example:
 
-.. ignore-next-block
 .. code-block:: python
 
    # "config" below is presumed to be an instance of the

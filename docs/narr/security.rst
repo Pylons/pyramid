@@ -85,7 +85,6 @@ during application setup to specify the authentication policy.
 
 For example:
 
-.. ignore-next-block
 .. code-block:: python
    :linenos:
 
@@ -151,7 +150,6 @@ API:
 The equivalent view registration including the ``add`` permission name
 may be performed via the ``@view_config`` decorator:
 
-.. ignore-next-block
 .. code-block:: python
    :linenos:
 
