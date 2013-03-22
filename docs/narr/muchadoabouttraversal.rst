@@ -168,18 +168,12 @@ hood, when ``adict`` is a dictionary-like object, Python translates
 ``adict['a']`` to ``adict.__getitem__('a')``.  Try doing this in a Python
 interpreter prompt if you don't believe us:
 
-.. code-block:: text
-   :linenos:
-
-   Python 2.4.6 (#2, Apr 29 2010, 00:31:48) 
-   [GCC 4.4.3] on linux2
-   Type "help", "copyright", "credits" or "license" for more information.
-   >>> adict = {}
-   >>> adict['a'] = 1
-   >>> adict['a']
-   1
-   >>> adict.__getitem__('a')
-   1
+>>> adict = {}
+>>> adict['a'] = 1
+>>> adict['a']
+1
+>>> adict.__getitem__('a')
+1
 
 
 The dictionary-like root object stores the ids of all of its subresources as
