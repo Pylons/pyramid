@@ -6,13 +6,13 @@ A :term:`view callable` in a :app:`Pyramid` application is typically a simple
 Python function that accepts a single parameter named :term:`request`.  A
 view callable is assumed to return a :term:`response` object.
 
-The request object has a dictionary as an attribute named ``matchdict``. 
-A ``matchdict`` maps the placeholders in the matching URL ``pattern`` to the substrings 
-of the :term:`request` ed URL. For instance, if a call to 
-:meth:`pyramid.config.Configurator.add_route` has the pattern 
-``{one}/{two}``, and a user visits ``http://example.com/foo/bar``, our pattern would be 
-matched and the ``matchdict`` would look like: ``{'one':'foo', 'two':'bar'}``
-
+The request object has a dictionary as an attribute named ``matchdict``.  A
+``matchdict`` maps the placeholders in the matching URL ``pattern`` to the
+substrings of the path in the :term:`request` URL. For instance, if a call to
+:meth:`pyramid.config.Configurator.add_route` has the pattern ``/{one}/{two}``,
+and a user visits ``http://example.com/foo/bar``, our pattern would be matched
+against ``/foo/bar`` and the ``matchdict`` would look like: ``{'one':'foo',
+'two':'bar'}``
 
 Declaring Dependencies in Our ``setup.py`` File
 ===============================================
@@ -145,13 +145,13 @@ As a result, the ``content`` variable is now a fully formed bit of HTML
 containing various view and add links for WikiWords based on the content of
 our current page object.
 
-We then generate an edit URL (because it's easier to do here than in the
-template), and we return a dictionary with a number of arguments.  The fact
-that ``view_page()`` returns a dictionary (as opposed to a :term:`response`
-object) is a cue to :app:`Pyramid` that it should try to use a :term:`renderer`
-associated with the view configuration to render a response.  In our case,
-the renderer used will be the ``templates/view.pt`` template, as indicated in 
-the ``@view_config`` decorator that is applied to ``view_page()``.
+We then generate an edit URL because it's easier to do here than in the
+template, and we return a dictionary with a number of arguments.  The fact that
+``view_page()`` returns a dictionary (as opposed to a :term:`response` object)
+is a cue to :app:`Pyramid` that it should try to use a :term:`renderer`
+associated with the view configuration to render a response.  In our case, the
+renderer used will be the ``templates/view.pt`` template, as indicated in the
+``@view_config`` decorator that is applied to ``view_page()``.
 
 The ``add_page`` view function
 ------------------------------
