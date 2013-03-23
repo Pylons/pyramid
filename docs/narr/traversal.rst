@@ -22,10 +22,13 @@ resource found as the result of a traversal becomes the
 subsystem is used to find some view code willing to "publish" this
 resource by generating a :term:`response`.
 
-Using :term:`Traversal` to map a URL to code is optional.  It is often
-less easy to understand than :term:`URL dispatch`, so if you're a rank
-beginner, it probably makes sense to use URL dispatch to map URLs to
-code instead of traversal.  In that case, you can skip this chapter.
+.. note::
+
+  Using :term:`Traversal` to map a URL to code is optional.  If you're creating
+  your first Pyramid application it probably makes more sense to use :term:`URL
+  dispatch` to map URLs to code instead of traversal, as new Pyramid developers
+  tend to find URL dispatch slightly easier to understand.  If you use URL
+  dispatch, you needn't read this chapter.
 
 .. index::
    single: traversal details
