@@ -3737,6 +3737,13 @@ class TestStaticURLInfo(unittest.TestCase):
         expected = [('http://example.com/', 'anotherpackage:path/', None)]
         self._assertRegistrations(config, expected)
 
+    def test_add_url_noscheme(self):
+        inst = self._makeOne()
+        config = self._makeConfig()
+        inst.add(config, '//example.com', 'anotherpackage:path')
+        expected = [('//example.com/', 'anotherpackage:path/', None)]
+        self._assertRegistrations(config, expected)
+
     def test_add_viewname(self):
         from pyramid.security import NO_PERMISSION_REQUIRED
         from pyramid.static import static_view

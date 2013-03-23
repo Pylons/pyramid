@@ -10,8 +10,9 @@ tutorial, the developer will have created a basic Wiki application with
 authentication.
 
 For cut and paste purposes, the source code for all stages of this
-tutorial can be browsed at `https://github.com/Pylons/pyramid/tree/1.3-branch/docs/tutorials/wiki/src
-<https://github.com/Pylons/pyramid/tree/1.3-branch/docs/tutorials/wiki/src>`_.
+tutorial can be browsed on GitHub at `docs/tutorials/wiki/src
+<https://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki/src>`_,
+which corresponds to the same location if you have Pyramid sources.
 
 .. toctree::
    :maxdepth: 2

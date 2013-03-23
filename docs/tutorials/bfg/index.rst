@@ -47,7 +47,7 @@ Here's how to convert a :mod:`repoze.bfg` application to a
 
    .. code-block:: bash
 
-     $ bfgenv/bin/python setup.py test
+     $ $VENV/bin/python setup.py test
 
    ``bfgenv`` above will be the virtualenv into which you've installed
    :mod:`repoze.bfg` 1.3.
@@ -62,7 +62,7 @@ Here's how to convert a :mod:`repoze.bfg` application to a
       $ cd ~
       $ virtualenv --no-site-packages pyramidenv
       $ cd pyramidenv
-      $ bin/easy_install pyramid
+      $ $VENV/bin/easy_install pyramid
 
 #. Put a *copy* of your :mod:`repoze.bfg` application into a temporary
    location (perhaps by checking a fresh copy of the application out
@@ -186,7 +186,7 @@ Here's how to convert a :mod:`repoze.bfg` application to a
    .. code-block:: bash
 
      $ cd /tmp/bfgapp
-     $ ~/pyramidenv/bin/python setup.py test
+     $ $VENV/bin/python setup.py test
 
 #. Fix any test failures.
 

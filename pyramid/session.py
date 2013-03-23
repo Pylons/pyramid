@@ -140,30 +140,30 @@ def UnencryptedCookieSessionFactoryConfig(
       A number of seconds of inactivity before a session times out.
 
     ``cookie_name``
-      The name of the cookie used for sessioning.  Default: ``session``.
+      The name of the cookie used for sessioning.
 
     ``cookie_max_age``
       The maximum age of the cookie used for sessioning (in seconds).
       Default: ``None`` (browser scope).
 
     ``cookie_path``
-      The path used for the session cookie.  Default: ``/``.
+      The path used for the session cookie.
 
     ``cookie_domain``
       The domain used for the session cookie.  Default: ``None`` (no domain).
 
     ``cookie_secure``
-      The 'secure' flag of the session cookie.  Default: ``False``.
+      The 'secure' flag of the session cookie.
 
     ``cookie_httponly``
-      The 'httpOnly' flag of the session cookie.  Default: ``False``.
+      The 'httpOnly' flag of the session cookie.
 
     ``cookie_on_exception``
       If ``True``, set a session cookie even if an exception occurs
-      while rendering a view.  Default: ``True``.
+      while rendering a view.
 
     ``signed_serialize``
-      A callable which takes more or less arbitrary python data structure and
+      A callable which takes more or less arbitrary Python data structure and
       a secret and returns a signed serialization in bytes.
       Default: ``signed_serialize`` (using pickle).
 

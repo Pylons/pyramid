@@ -1,3 +1,83 @@
+next release
+============
+
+Features
+--------
+
+- ``ACLAuthorizationPolicy`` supports ``__acl__`` as a callable. This
+  removes the ambiguity between the potential ``AttributeError`` that would
+  be raised on the ``context`` when the property was not defined and the
+  ``AttributeError`` that could be raised from any user-defined code within
+  a dynamic property. It is recommended to define a dynamic ACL as a callable
+  to avoid this ambiguity. See https://github.com/Pylons/pyramid/issues/735.
+
+- Allow a protocol-relative URL (e.g. ``//example.com/images``) to be passed to
+  ``pyramid.config.Configurator.add_static_view``. This allows
+  externally-hosted static URLs to be generated based on the current protocol.
+
+- The ``AuthTktAuthenticationPolicy`` now supports IPv6 addresses when using
+  the ``include_ip=True`` option. This is possibly incompatible with
+  alternative ``auth_tkt`` implementations, as the specification does not
+  define how to properly handle IPv6. See
+  https://github.com/Pylons/pyramid/issues/831.
+
+- Make it possible to use variable arguments via
+  ``pyramid.paster.get_appsettings``. This also allowed the generated
+  ``initialize_db`` script from the ``alchemy`` scaffold to grow support
+  for options in the form ``a=1 b=2`` so you can fill in
+  values in a parameterized ``.ini`` file, e.g.
+  ``initialize_myapp_db etc/development.ini a=1 b=2``.
+  See https://github.com/Pylons/pyramid/pull/911
+
+Bug Fixes
+---------
+
+- View lookup will now search for valid views based on the inheritance
+  hierarchy of the context. It tries to find views based on the most
+  specific context first, and upon predicate failure, will move up the
+  inheritance chain to test views found by the super-type of the context.
+  In the past, only the most specific type containing views would be checked
+  and if no matching view could be found then a PredicateMismatch would be
+  raised. Now predicate mismatches don't hide valid views registered on
+  super-types. Here's an example that now works::
+
+  .. code-block:: python
+
+     class IResource(Interface):
+
+         ...
+
+     @view_config(context=IResource)
+     def get(context, request):
+
+         ...
+
+     @view_config(context=IResource, request_method='POST')
+     def post(context, request):
+
+         ...
+
+     @view_config(context=IResource, request_method='DELETE')
+     def delete(context, request):
+
+         ...
+
+     @implementor(IResource)
+     class MyResource:
+
+         ...
+
+     @view_config(context=MyResource, request_method='POST')
+     def override_post(context, request):
+
+         ...
+
+  Previously the override_post view registration would hide the get
+  and delete views in the context of MyResource -- leading to a
+  predicate mismatch error when trying to use GET or DELETE
+  methods. Now the views are found and no predicate mismatch is
+  raised.
+
 1.4 (2012-12-18)
 ================
 
@@ -274,7 +354,7 @@ Bug Fixes
 
 - ``pyramid.view.render_view`` was not functioning properly under Python 3.x
   due to a byte/unicode discrepancy. See
-  http://github.com/Pylons/pyramid/issues/721
+  https://github.com/Pylons/pyramid/issues/721
 
 Deprecations
 ------------
@@ -511,7 +591,7 @@ Features
 
 - The static view machinery now raises (rather than returns) ``HTTPNotFound``
   and ``HTTPMovedPermanently`` exceptions, so these can be caught by the
-  NotFound view (and other exception views).
+  Not Found View (and other exception views).
 
 - The Mako renderer now supports a def name in an asset spec.  When the def
   name is present in the asset spec, the system will render the template def

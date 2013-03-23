@@ -10,18 +10,36 @@ CR = '\n'
 
 class PredicateMismatch(HTTPNotFound):
     """
-    Internal exception (not an API) raised by multiviews when no
-    view matches.  This exception subclasses the ``NotFound``
-    exception only one reason: if it reaches the main exception
-    handler, it should be treated like a ``NotFound`` by any exception
-    view registrations.
+    This exception is raised by multiviews when no view matches
+    all given predicates.
+
+    This exception subclasses the :class:`HTTPNotFound` exception for a
+    specific reason: if it reaches the main exception handler, it should
+    be treated as :class:`HTTPNotFound`` by any exception view
+    registrations. Thus, typically, this exception will not be seen
+    publicly.
+    
+    However, this exception will be raised if the predicates of all
+    views configured to handle another exception context cannot be
+    successfully matched.  For instance, if a view is configured to
+    handle a context of ``HTTPForbidden`` and the configured with
+    additional predicates, then :class:`PredicateMismatch` will be
+    raised if:
+
+    * An original view callable has raised :class:`HTTPForbidden` (thus
+      invoking an exception view); and
+    * The given request fails to match all predicates for said
+      exception view associated with :class:`HTTPForbidden`.
+
+    The same applies to any type of exception being handled by an
+    exception view.
     """
 
 class URLDecodeError(UnicodeDecodeError):
     """
     This exception is raised when :app:`Pyramid` cannot
     successfully decode a URL or a URL path segment.  This exception
-    it behaves just like the Python builtin
+    behaves just like the Python builtin
     :exc:`UnicodeDecodeError`. It is a subclass of the builtin
     :exc:`UnicodeDecodeError` exception only for identity purposes,
     mostly so an exception view can be registered when a URL cannot be

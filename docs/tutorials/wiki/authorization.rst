@@ -32,9 +32,6 @@ Then we will add the login and logout feature:
 * Add a "Logout" link to be shown when logged in and viewing or editing a page
   (``view.pt``, ``edit.pt``).
 
-The source code for this tutorial stage can be browsed at
-`http://github.com/Pylons/pyramid/tree/1.3-branch/docs/tutorials/wiki/src/authorization/
-<http://github.com/Pylons/pyramid/tree/1.3-branch/docs/tutorials/wiki/src/authorization/>`_.
 
 Access Control
 --------------
@@ -58,8 +55,8 @@ returns one of these values:
 - If the userid *does not* exist in the system, it will
   return ``None``.
 
-For example, ``groupfinder('editor', request )`` returns ['group:editor'],
-``groupfinder('viewer', request)`` returns [], and ``groupfinder('admin', request)``
+For example, ``groupfinder('editor', request )`` returns ``['group:editor']``,
+``groupfinder('viewer', request)`` returns ``[]``, and ``groupfinder('admin', request)``
 returns ``None``.  We will use ``groupfinder()`` as an :term:`authentication policy`
 "callback" that will provide the :term:`principal` or principals
 for a user.
@@ -88,7 +85,7 @@ Add the following lines to the ``Wiki`` class:
    :language: python
 
 We import :data:`~pyramid.security.Allow`, an action that
-means that permission is allowed:, and
+means that permission is allowed, and
 :data:`~pyramid.security.Everyone`, a special :term:`principal`
 that is associated to all requests.  Both are used in the
 :term:`ACE` entries that make up the ACL.
@@ -96,8 +93,8 @@ that is associated to all requests.  Both are used in the
 The ACL is a list that needs to be named `__acl__` and be an
 attribute of a class.  We define an :term:`ACL` with two
 :term:`ACE` entries: the first entry allows any user the `view`
-permission.  The second entry allows the ``group:editors``
-principal  the `edit` permission.
+permission, and the second entry allows the ``group:editors``
+principal the `edit` permission.
 
 The ``Wiki`` class that contains the ACL is the :term:`resource`
 constructor for the :term:`root` resource, which is
@@ -107,7 +104,7 @@ the ``context`` attribute.
 
 It's only happenstance that we're assigning this ACL at class scope.  An ACL
 can be attached to an object *instance* too; this is how "row level security"
-can be achieved in :app:`Pyramid` applications.  We actually only need *one*
+can be achieved in :app:`Pyramid` applications.  We actually need only *one*
 ACL for the entire system, however, because our security requirements are
 simple, so this feature is not demonstrated.  See
 :ref:`assigning_acls` for more information about what an
@@ -147,18 +144,20 @@ machinery represented by this policy: it is required.  The ``callback`` is the
 
 Add permission declarations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Add a ``permission='edit'`` parameter to the ``@view_config``
-decorator for ``add_page()`` and ``edit_page()``, for example:
+Open ``tutorial/tutorial/views.py``.  Add a ``permission='edit'`` parameter
+to the ``@view_config`` decorator for ``add_page()`` and
+``edit_page()``, for example:
 
 .. code-block:: python
    :linenos:
-   :emphasize-lines: 2
+   :emphasize-lines: 3
 
-   @view_config(route_name='add_page', renderer='templates/edit.pt',
-                permission='edit')
+    @view_config(name='add_page', context='.models.Wiki',
+                 renderer='templates/edit.pt',
+                 permission='edit')
 
-(Only the highlighted line needs to be added.)
+(Only the highlighted line, along with its preceding comma,
+needs to be added.)
 
 The result is that only users who possess the ``edit``
 permission at the time of the request may invoke those two views.
@@ -170,10 +169,11 @@ decorator for ``view_wiki()`` and ``view_page()``, like this:
    :linenos:
    :emphasize-lines: 2
 
-   @view_config(route_name='view_page', renderer='templates/view.pt',
+   @view_config(context='.models.Page', renderer='templates/view.pt',
                 permission='view')
 
-(Only the highlighted line needs to be added.)
+(Only the highlighted line, along with its preceding comma,
+needs to be added.)
 
 This allows anyone to invoke these two views.
 
@@ -202,7 +202,8 @@ head of ``tutorial/tutorial/views.py``:
    :emphasize-lines: 3,6-9,11
    :language: python
 
-(Only the highlighted lines need to be added.)
+(Only the highlighted lines, with other necessary modifications,
+need to be added.)
 
 :meth:`~pyramid.view.forbidden_view_config` will be used
 to customize the default 403 Forbidden page.
@@ -217,16 +218,16 @@ Now add the ``login`` and ``logout`` views:
    :linenos:
    :language: python
 
-``login()`` is decorated with two decorators:
+``login()`` has two decorators:
 
 - a ``@view_config`` decorator which associates it with the
   ``login`` route and makes it visible when we visit ``/login``,
 - a ``@forbidden_view_config`` decorator which turns it into
-  an :term:`forbidden view`. ``login()`` will be invoked
-  when a users tries to execute a view callable that
-  they are not allowed to.  For example, if a user has not logged in
-  and tries to add or edit a Wiki page, he will be shown the
-  login form before being allowed to continue on.
+  a :term:`forbidden view`. ``login()`` will be invoked
+  when a user tries to execute a view callable for which they lack
+  authorization.  For example, if a user has not logged in
+  and tries to add or edit a Wiki page, they will be shown the
+  login form before being allowed to continue.
 
 The order of these two :term:`view configuration` decorators
 is unimportant.
@@ -244,8 +245,8 @@ content:
 .. literalinclude:: src/authorization/tutorial/templates/login.pt
    :language: xml
 
-The above template is referred to within the login view we just
-added to ``views.py``.
+The above template is referred in the login view that we just added
+in ``views.py``.
 
 Return a logged_in flag to the renderer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -259,7 +260,8 @@ Add the following line to the import at the head of
    :emphasize-lines: 4
    :language: python
 
-(Only the highlighted line needs to be added.)
+(Only the highlighted line and a trailing comma on the preceding
+line need to be added.)
 
 Add a  ``logged_in`` parameter to the return value of
 ``view_page()``, ``edit_page()`` and  ``add_page()``,
@@ -274,11 +276,12 @@ like this:
                edit_url = edit_url,
                logged_in = authenticated_userid(request))
 
-(Only the highlighted line needs to be added.)
+(Only the highlighted line and a trailing comma on the preceding
+line need to be added.)
 
-:meth:`~pyramid.security.authenticated_userid()` will return None
-if the user is not authenticated, or some user id it the user
-is authenticated.
+:meth:`~pyramid.security.authenticated_userid()` will return ``None``
+if the user is not authenticated, or a user id if the user is
+authenticated.
 
 Add a "Logout" link when logged in
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

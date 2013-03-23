@@ -80,13 +80,13 @@ On UNIX:
 
 .. code-block:: text
 
-   $ bin/pcreate -s starter MyProject
+   $ $VENV/bin/pcreate -s starter MyProject
 
 Or on Windows:
 
 .. code-block:: text
 
-   > Scripts\pcreate -s starter MyProject
+   > %VENV%\Scripts\pcreate -s starter MyProject
 
 The above command uses the ``pcreate`` command to create a project with the
 ``starter`` scaffold.  To use a different scaffold, such as
@@ -95,20 +95,20 @@ on UNIX:
 
 .. code-block:: text
 
-   $ bin/pcreate -s alchemy MyProject
+   $ $VENV/bin/pcreate -s alchemy MyProject
 
 Or on Windows:
 
 .. code-block:: text
 
-   > Scripts\pcreate -s alchemy MyProject
+   > %VENV%\Scripts\pcreate -s alchemy MyProject
 
 Here's sample output from a run of ``pcreate`` on UNIX for a project we name
 ``MyProject``:
 
 .. code-block:: text
 
-   $ bin/pcreate -s starter MyProject
+   $ $VENV/bin/pcreate -s starter MyProject
    Creating template pyramid
    Creating directory ./MyProject
    # ... more output ...
@@ -177,21 +177,21 @@ On UNIX:
 .. code-block:: text
 
    $ cd MyProject
-   $ ../bin/python setup.py develop
+   $ $VENV/bin/python setup.py develop
 
 Or on Windows:
 
 .. code-block:: text
 
    > cd MyProject
-   > ..\Scripts\python.exe setup.py develop
+   > %VENV%\Scripts\python.exe setup.py develop
 
 Elided output from a run of this command on UNIX is shown below:
 
 .. code-block:: text
 
    $ cd MyProject
-   $ ../bin/python setup.py develop
+   $ $VENV/bin/python setup.py develop
    ...
    Finished processing dependencies for MyProject==0.0
 
@@ -216,19 +216,19 @@ On UNIX:
 
 .. code-block:: text
 
-   $ ../bin/python setup.py test -q
+   $ $VENV/bin/python setup.py test -q
 
 Or on Windows:
 
 .. code-block:: text
 
-   > ..\Scripts\python.exe setup.py test -q
+   > %VENV%\Scripts\python.exe setup.py test -q
 
 Here's sample output from a test run on UNIX:
 
 .. code-block:: text
 
-   $ ../bin/python setup.py test -q
+   $ $VENV/bin/python setup.py test -q
    running test
    running egg_info
    writing requirements to MyProject.egg-info/requires.txt
@@ -272,19 +272,19 @@ On UNIX:
 
 .. code-block:: text
 
-   $ ../bin/pserve development.ini
+   $ $VENV/bin/pserve development.ini
 
 On Windows:
 
 .. code-block:: text
 
-   > ..\Scripts\pserve development.ini
+   > %VENV%\Scripts\pserve development.ini
 
 Here's sample output from a run of ``pserve`` on UNIX:
 
 .. code-block:: text
 
-   $ ../bin/pserve development.ini
+   $ $VENV/bin/pserve development.ini
    Starting server in PID 16601.
    serving on http://0.0.0.0:6543
 
@@ -297,7 +297,7 @@ For example, your system might be configured to have an external IP address
 ``192.168.1.50``.  If that's the case, if you use a browser running on the
 same system as Pyramid, it will be able to access the application via
 ``http://127.0.0.1:6543/`` as well as via
-``http://129.168.1.50:6543/``. However, *other people* on other computers on
+``http://192.168.1.50:6543/``. However, *other people* on other computers on
 the same network will also be able to visit your Pyramid application in their
 browser by visiting ``http://192.168.1.50:6543/``.
 
@@ -305,7 +305,9 @@ If you want to restrict access such that only a browser running on the same
 machine as Pyramid will be able to access your Pyramid application, edit the
 ``development.ini`` file, and replace the ``host`` value in the
 ``[server:main]`` section.  Change it from ``0.0.0.0`` to ``127.0.0.1``.  For
-example::
+example:
+
+.. code-block:: ini
 
    [server:main]
    use = egg:waitress#main
@@ -357,7 +359,7 @@ For example, on UNIX:
 
 .. code-block:: text
 
-   $ ../bin/pserve development.ini --reload
+   $ $VENV/bin/pserve development.ini --reload
    Starting subprocess with file monitor
    Starting server in PID 16601.
    serving on http://0.0.0.0:6543
@@ -459,20 +461,9 @@ Put a hash mark at the beginning of the ``pyramid_debugtoolbar`` line:
 Then restart the application to see that the toolbar has been turned off.
 
 Note that if you comment out the ``pyramid_debugtoolbar`` line, the ``#``
-*must* be in the first column.  If you put the hash mark anywhere except the
-first column instead, for example like this:
-
-.. code-block:: ini
-   :linenos:
-
-   [app:main]
-   ...
-   pyramid.includes =
-       #pyramid_debugtoolbar
-
-When you attempt to restart the application with a section like the above
-you'll receive an error that ends something like this, and the application
-will not start:
+*must* be in the first column.  If you put it anywhere else,
+and then attempt to restart the application,
+you'll receive an error that ends something like this:
 
 .. code-block:: text
 
@@ -703,7 +694,7 @@ work properly.
 
 The ``setup.py`` file is a :term:`setuptools` setup file.  It is meant to be
 run directly from the command line to perform a variety of functions, such as
-testing your application, packaging, and distributing your application.
+testing, packaging, and distributing your application.
 
 .. note::
 

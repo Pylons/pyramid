@@ -65,7 +65,7 @@ policies.
 Enabling an Authorization Policy
 --------------------------------
 
-By default, :app:`Pyramid` enables no authorization policy.  All
+:app:`Pyramid` does not enable any authorization policy by default.  All
 views are accessible by completely anonymous users.  In order to begin
 protecting views from execution based on security settings, you need
 to enable an authorization policy.
@@ -80,12 +80,11 @@ policy.
 You must also enable an :term:`authentication policy` in order to enable the
 authorization policy.  This is because authorization, in general, depends
 upon authentication.  Use the
-:meth:`~pyramid.config.Configurator.set_authentication_policy` and method
+:meth:`~pyramid.config.Configurator.set_authentication_policy` method
 during application setup to specify the authentication policy.
 
 For example:
 
-.. ignore-next-block
 .. code-block:: python
    :linenos:
 
@@ -98,7 +97,7 @@ For example:
    config.set_authentication_policy(authn_policy)
    config.set_authorization_policy(authz_policy)
 
-.. note:: the ``authentication_policy`` and ``authorization_policy``
+.. note:: The ``authentication_policy`` and ``authorization_policy``
    arguments may also be passed to their respective methods mentioned above
    as :term:`dotted Python name` values, each representing the dotted name
    path to a suitable implementation global defined at Python module scope.
@@ -151,7 +150,6 @@ API:
 The equivalent view registration including the ``add`` permission name
 may be performed via the ``@view_config`` decorator:
 
-.. ignore-next-block
 .. code-block:: python
    :linenos:
 
@@ -234,8 +232,8 @@ class:
 .. code-block:: python
    :linenos:
 
-   from pyramid.security import Everyone
    from pyramid.security import Allow
+   from pyramid.security import Everyone
 
    class Blog(object):
        __acl__ = [
@@ -250,8 +248,8 @@ Or, if your resources are persistent, an ACL might be specified via the
 .. code-block:: python
    :linenos:
 
-   from pyramid.security import Everyone
    from pyramid.security import Allow
+   from pyramid.security import Everyone
 
    class Blog(object):
        pass
@@ -270,6 +268,27 @@ resource instances with an ACL (as opposed to just decorating their class) in
 applications such as "CMS" systems where fine-grained access is required on
 an object-by-object basis.
 
+Dynamic ACLs are also possible by turning the ACL into a callable on the
+resource. This may allow the ACL to dynamically generate rules based on
+properties of the instance.
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.security import Allow
+   from pyramid.security import Everyone
+
+   class Blog(object):
+       def __acl__(self):
+           return [
+               (Allow, Everyone, 'view'),
+               (Allow, self.owner, 'edit'),
+               (Allow, 'group:editors', 'edit'),
+           ]
+
+       def __init__(self, owner):
+           self.owner = owner
+
 .. index::
    single: ACE
    single: access control entry
@@ -282,8 +301,8 @@ Here's an example ACL:
 .. code-block:: python
    :linenos:
 
-   from pyramid.security import Everyone
    from pyramid.security import Allow
+   from pyramid.security import Everyone
 
    __acl__ = [
            (Allow, Everyone, 'view'),
@@ -321,9 +340,9 @@ order dictated by the ACL*.  So if you have an ACL like this:
 .. code-block:: python
    :linenos:
 
-   from pyramid.security import Everyone
    from pyramid.security import Allow
    from pyramid.security import Deny
+   from pyramid.security import Everyone
 
    __acl__ = [
        (Allow, Everyone, 'view'),
@@ -359,8 +378,8 @@ ACE, as below.
 .. code-block:: python
    :linenos:
 
-   from pyramid.security import Everyone
    from pyramid.security import Allow
+   from pyramid.security import Everyone
 
    __acl__ = [
        (Allow, Everyone, 'view'),
@@ -507,7 +526,7 @@ example:
 
 .. code-block:: text
 
-  $ PYRAMID_DEBUG_AUTHORIZATION=1 bin/pserve myproject.ini
+  $ PYRAMID_DEBUG_AUTHORIZATION=1 $VENV/bin/pserve myproject.ini
 
 When any authorization takes place during a top-level view rendering,
 a message will be logged to the console (to stderr) about what ACE in

@@ -120,7 +120,6 @@ that uses the ZCA global API is somewhat high.  Consider a ZCA neophyte
 reading the code that performs a typical "unnamed utility" lookup using the
 :func:`zope.component.getUtility` global API:
 
-.. ignore-next-block
 .. code-block:: python
    :linenos:
 
@@ -190,7 +189,6 @@ special-purpose API functions that *do* use ZCA APIs.  Take for example the
 present in the current request or ``None`` if no userid is present in the
 current request.  The application developer calls it like so:
 
-.. ignore-next-block
 .. code-block:: python
    :linenos:
 
@@ -238,7 +236,7 @@ registry API.
 
 :app:`Pyramid` framework developers were so concerned about conceptual load
 issues of the ZCA registry API for framework developers that a `replacement
-registry implementation <http://svn.repoze.org/repoze.component/trunk>`_
+registry implementation <https://github.com/repoze/repoze.component>`_
 named :mod:`repoze.component` was actually developed.  Though this package
 has a registry implementation which is fully functional and well-tested, and
 its API is much nicer than the ZCA registry API, work on it was largely
@@ -500,7 +498,6 @@ which match information in an associated "urlconf" such as
 Zope, likewise allows you to add arbitrary keyword and positional
 arguments to any method of a resource object found via traversal:
 
-.. ignore-next-block
 .. code-block:: python
    :linenos:
 
@@ -919,7 +916,7 @@ creating a more Zope3-like environment without much effort.
 Pyramid Uses its Own HTTP Exception Class Hierarchy Rather Than ``webob.exc``
 -----------------------------------------------------------------------------
 
-.. note:: This defense is new as of Pyramid 1.1.
+.. versionadded:: 1.1
 
 The HTTP exception classes defined in :mod:`pyramid.httpexceptions` are very
 much like the ones defined in ``webob.exc``
@@ -1030,7 +1027,7 @@ but its intended userbase is much the same.  Many others exist.  We've
 actually even (only as a teaching tool, not as any sort of official project)
 `created one using Pyramid <http://bfg.repoze.org/videos#groundhog1>`_ (the
 videos use BFG, a precursor to Pyramid, but the resulting code is `available
-for Pyramid too <http://github.com/Pylons/groundhog>`_). Microframeworks are
+for Pyramid too <https://github.com/Pylons/groundhog>`_). Microframeworks are
 small frameworks with one common feature: each allows its users to create a
 fully functional application that lives in a single Python file.
 

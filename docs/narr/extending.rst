@@ -84,7 +84,7 @@ function in your application's ``__init__.py``.  For example, rather than:
        config.add_view('myapp.views.view1', name='view1')
        config.add_view('myapp.views.view2', name='view2')
 
-You should do move the calls to ``add_view`` outside of the (non-reusable)
+You should move the calls to ``add_view`` outside of the (non-reusable)
 ``if __name__ == '__main__'`` block, and into a reusable function:
 
 .. code-block:: python
@@ -200,8 +200,8 @@ like this:
   overridden elements, such as templates and static assets as necessary.
 
 - Install the new package into the same Python environment as the original
-  application (e.g. ``$myvenv/bin/python setup.py develop`` or
-  ``$myvenv/bin/python setup.py install``).
+  application (e.g. ``$VENV/bin/python setup.py develop`` or
+  ``$VENV/bin/python setup.py install``).
 
 - Change the ``main`` function in the new package's ``__init__.py`` to include
   the original :app:`Pyramid` application's configuration functions via

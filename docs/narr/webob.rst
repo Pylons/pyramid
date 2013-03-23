@@ -251,7 +251,7 @@ API documentation for a multidict exists as
 Dealing With A JSON-Encoded Request Body
 ++++++++++++++++++++++++++++++++++++++++
 
-.. note:: this feature is new as of Pyramid 1.1.
+.. versionadded:: 1.1
 
 :attr:`pyramid.request.Request.json_body` is a property that returns a
 :term:`JSON` -decoded representation of the request body.  If the request
@@ -326,7 +326,6 @@ package that uses SQLAlchemy, and you'd like the current SQLAlchemy database
 session to be removed after each request.  Put the following in the
 ``mypackage.__init__`` module:
 
-.. ignore-next-block
 .. code-block:: python
    :linenos:
 
@@ -491,7 +490,6 @@ reason for the error.  For instance,
 :class:`pyramid.Response`, so you can manipulate the instances in the same
 way.  A typical example is:
 
-.. ignore-next-block
 .. code-block:: python
     :linenos:
 

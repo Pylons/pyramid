@@ -150,7 +150,6 @@ string, then return that string as the body of a :app:`Pyramid`
 For example, here's an example of using "raw" `Mako
 <http://www.makotemplates.org/>`_ from within a :app:`Pyramid` :term:`view`:
 
-.. ignore-next-block
 .. code-block:: python
    :linenos:
 
@@ -524,7 +523,7 @@ And ``templates/mytemplate.pt`` might look like so:
 Using A Chameleon Macro Name Within a Renderer Name
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Sommetime you'd like to render a macro inside of a Chameleon ZPT template
+At times, you may want to render a macro inside of a Chameleon ZPT template
 instead of the full Chameleon ZPT template. To render the content of a
 ``define-macro`` field inside a Chameleon ZPT template, given a Chameleon
 template file named ``foo.pt`` and a macro named ``bar`` defined within it
@@ -543,9 +542,7 @@ template as a :term:`renderer` like so:
 The above will render only the ``bar`` macro defined within the ``foo.pt``
 template instead of the entire template.
 
-.. note::
-
-   This feature is new in Pyramid 1.4.
+.. versionadded:: 1.4
 
 .. index::
    single: Chameleon text templates
@@ -623,7 +620,7 @@ Debugging Templates
 -------------------
 
 A :exc:`NameError` exception resulting from rendering a template with an
-undefined variable (e.g. ``${wrong}``) might will end like this:
+undefined variable (e.g. ``${wrong}``) might end up looking like this:
 
 .. code-block:: text
 
@@ -743,9 +740,7 @@ configure the template as a :term:`renderer` like so:
 The above will render the ``bar`` def from within the ``foo.mak`` template
 instead of the entire template.
 
-.. note::
-
-   This feature is new in Pyramid 1.4.
+.. versionadded:: 1.4
 
 .. index::
    single: automatic reloading of templates
@@ -775,7 +770,7 @@ variable set to ``1``, For example:
 
 .. code-block:: text
 
-  $ PYRAMID_RELOAD_TEMPLATES=1 bin/pserve myproject.ini
+  $ PYRAMID_RELOAD_TEMPLATES=1 $VENV/bin/pserve myproject.ini
 
 To use a setting in the application ``.ini`` file for the same
 purpose, set the ``pyramid.reload_templates`` key to ``true`` within the

@@ -537,7 +537,7 @@ Documentation
 
 - Removed the "Running Pyramid on Google App Engine" tutorial from the main
   docs.  It survives on in the Cookbook
-  (http://docs.pylonsproject.org/projects/pyramid_cookbook/en/latest/gae.html).
+  (http://docs.pylonsproject.org/projects/pyramid_cookbook/en/latest/deployment/gae.html).
   Rationale: it provides the correct info for the Python 2.5 version of GAE
   only, and this version of Pyramid does not support Python 2.5.
 
@@ -1189,7 +1189,7 @@ Scaffolds
   package at all; configuration in the ``production.ini`` file which used to
   require its ``error_catcher`` middleware has been removed.  Configuring
   error catching / email sending is now the domain of the ``pyramid_exclog``
-  package (see http://docs.pylonsproject.org/projects/pyramid_exclog/dev/).
+  package (see http://docs.pylonsproject.org/projects/pyramid_exclog/en/latest/).
 
 Bug Fixes
 ---------
@@ -2047,7 +2047,7 @@ Documentation
 
 - Moved "Using ZODB With ZEO" and "Using repoze.catalog Within Pyramid"
   tutorials out of core documentation and into the Pyramid Tutorials site
-  (http://docs.pylonsproject.org/projects/pyramid_tutorials/dev/).
+  (http://docs.pylonsproject.org/projects/pyramid_tutorials/en/latest/).
 
 - Changed "Cleaning up After a Request" section in the URL Dispatch chapter
   to use ``request.add_finished_callback`` instead of jamming an object with
@@ -2249,7 +2249,8 @@ Backwards Incompatibilities
   Pyramid core.  Handlers are now a feature of the ``pyramid_handlers``
   package, which can be downloaded from PyPI.  Documentation for the package
   should be available via
-  http://pylonsproject.org/projects/pyramid_handlers/dev/, which describes how
+  http://docs.pylonsproject.org/projects/pyramid_handlers/en/latest/,
+  which describes how
   to add a configuration statement to your ``main`` block to reobtain this
   method.  You will also need to add an ``install_requires`` dependency upon
   ``pyramid_handlers`` to your ``setup.py`` file.
@@ -2258,7 +2259,8 @@ Backwards Incompatibilities
   Pyramid core.  Loading ZCML is now a feature of the ``pyramid_zcml``
   package, which can be downloaded from PyPI.  Documentation for the package
   should be available via
-  http://pylonsproject.org/projects/pyramid_zcml/dev/, which describes how
+  http://docs.pylonsproject.org/projects/pyramid_zcml/en/latest/,
+  which describes how
   to add a configuration statement to your ``main`` block to reobtain this
   method.  You will also need to add an ``install_requires`` dependency upon
   ``pyramid_zcml`` to your ``setup.py`` file.

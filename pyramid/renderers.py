@@ -43,23 +43,23 @@ from pyramid.threadlocal import get_current_registry
 # API
 
 def render(renderer_name, value, request=None, package=None):
-    """ Using the renderer specified as ``renderer_name`` (a template
-    or a static renderer) render the value (or set of values) present
+    """ Using the renderer ``renderer_name`` (a template
+    or a static renderer), render the value (or set of values) present
     in ``value``. Return the result of the renderer's ``__call__``
     method (usually a string or Unicode).
 
-    If the renderer name refers to a file on disk (such as when the
-    renderer is a template), it's usually best to supply the name as a
+    If the ``renderer_name`` refers to a file on disk, such as when the
+    renderer is a template, it's usually best to supply the name as an
     :term:`asset specification`
     (e.g. ``packagename:path/to/template.pt``).
 
     You may supply a relative asset spec as ``renderer_name``.  If
     the ``package`` argument is supplied, a relative renderer path
     will be converted to an absolute asset specification by
-    combining the package supplied as ``package`` with the relative
-    asset specification supplied as ``renderer_name``.  If you do
-    not supply a ``package`` (or ``package`` is ``None``) the package
-    name of the *caller* of this function will be used as the package.
+    combining the package ``package`` with the relative
+    asset specification ``renderer_name``.  If ``package``
+    is ``None`` (the default), the package name of the *caller* of
+    this function will be used as the package.
 
     The ``value`` provided will be supplied as the input to the
     renderer.  Usually, for template renderings, this should be a
@@ -70,7 +70,7 @@ def render(renderer_name, value, request=None, package=None):
     top-level system names, such as ``request``, ``context``,
     ``renderer_name``, and ``view``.  See :ref:`renderer_system_values` for
     the full list.  If :term:`renderer globals` have been specified, these
-    will also be used to agument the value.
+    will also be used to augment the value.
 
     Supply a ``request`` parameter in order to provide the renderer
     with the most correct 'system' values (``request`` and ``context``
@@ -88,8 +88,8 @@ def render(renderer_name, value, request=None, package=None):
     return helper.render(value, None, request=request)
 
 def render_to_response(renderer_name, value, request=None, package=None):
-    """ Using the renderer specified as ``renderer_name`` (a template
-    or a static renderer) render the value (or set of values) using
+    """ Using the renderer ``renderer_name`` (a template
+    or a static renderer), render the value (or set of values) using
     the result of the renderer's ``__call__`` method (usually a string
     or Unicode) as the response body.
 
@@ -100,8 +100,8 @@ def render_to_response(renderer_name, value, request=None, package=None):
     You may supply a relative asset spec as ``renderer_name``.  If
     the ``package`` argument is supplied, a relative renderer name
     will be converted to an absolute asset specification by
-    combining the package supplied as ``package`` with the relative
-    asset specification supplied as ``renderer_name``.  If you do
+    combining the package ``package`` with the relative
+    asset specification ``renderer_name``.  If you do
     not supply a ``package`` (or ``package`` is ``None``) the package
     name of the *caller* of this function will be used as the package.
 
@@ -134,16 +134,15 @@ def render_to_response(renderer_name, value, request=None, package=None):
     return helper.render_to_response(value, None, request=request)
 
 def get_renderer(renderer_name, package=None):
-    """ Return the renderer object for the renderer named as
-    ``renderer_name``.
+    """ Return the renderer object for the renderer ``renderer_name``.
 
     You may supply a relative asset spec as ``renderer_name``.  If
     the ``package`` argument is supplied, a relative renderer name
     will be converted to an absolute asset specification by
-    combining the package supplied as ``package`` with the relative
-    asset specification supplied as ``renderer_name``.  If you do
-    not supply a ``package`` (or ``package`` is ``None``) the package
-    name of the *caller* of this function will be used as the package.
+    combining the package ``package`` with the relative
+    asset specification ``renderer_name``.  If ``package`` is ``None``
+    (the default), the package name of the *caller* of this function
+    will be used as the package.
     """
     if package is None:
         package = caller_package()
@@ -204,11 +203,9 @@ class JSON(object):
     ``default``, and any extra ``kw`` keyword argments passed during
     renderer construction.
 
-    .. note::
-
-       This feature is new in Pyramid 1.4. Prior to 1.4 there was
-       no public API for supplying options to the underlying
-       serializer without defining a custom renderer.
+    .. versionadded:: 1.4
+       Prior to this version, there was no public API for supplying options
+       to the underlying serializer without defining a custom renderer.
     """
 
     def __init__(self, serializer=json.dumps, adapters=(), **kw):
@@ -303,8 +300,8 @@ class JSONP(JSON):
        config = Configurator()
        config.add_renderer('jsonp', JSONP(param_name='callback', indent=4))
     
-    .. note:: The ability of this class to accept a ``**kw`` in its
-       constructor is new as of Pyramid 1.4.
+    .. versionchanged:: 1.4
+       The ability of this class to accept a ``**kw`` in its constructor.
 
     The arguments passed to this class' constructor mean the same thing as
     the arguments passed to :class:`pyramid.renderers.JSON` (including
@@ -332,7 +329,7 @@ class JSONP(JSON):
     - If there is no callback parameter in the request's query string, the
       renderer will return a 'plain' JSON response.
 
-    .. note:: This feature is new in Pyramid 1.1.
+    .. versionadded:: 1.1
 
     See also: :ref:`jsonp_renderer`.
     """

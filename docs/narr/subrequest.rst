@@ -6,9 +6,7 @@
 Invoking a Subrequest
 =====================
 
-.. warning:: 
-
-   This feature was added in Pyramid 1.4a1.
+.. versionadded:: 1.4
 
 :app:`Pyramid` allows you to invoke a subrequest at any point during the
 processing of a request.  Invoking a subrequest allows you to obtain a

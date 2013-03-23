@@ -163,9 +163,7 @@
 
    .. method:: invoke_subrequest(request, use_tweens=False)
 
-      .. warning:: 
-
-         This API was added in Pyramid 1.4a1.
+      .. versionadded:: 1.4a1
 
       Obtain a response object from the Pyramid application based on
       information in the ``request`` object provided.  The ``request`` object
@@ -247,7 +245,7 @@
       influence response values from a view that uses a renderer (such as the
       status code, a header, the content type, etc) you would set these
       attributes.  See :ref:`response_prefixed_attrs` for further discussion.
-      As of Pyramid 1.1, assignment to ``response_*`` attrs are deprecated.
+      As of Pyramid 1.1, assignment to ``response_*`` attrs is deprecated.
       Assigning to one is still supported but will cause a deprecation
       warning to be emitted, and eventually the feature will be removed.  For
       new code, instead of assigning ``response_*`` attributes to the

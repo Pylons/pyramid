@@ -1,6 +1,6 @@
 ##############################################################################
 #
-# Copyright (c) 2008-2011 Agendaless Consulting and Contributors.
+# Copyright (c) 2008-2013 Agendaless Consulting and Contributors.
 # All Rights Reserved.
 #
 # This software is subject to the provisions of the BSD-like license at
@@ -30,8 +30,10 @@ else:
 
 here = os.path.abspath(os.path.dirname(__file__))
 try:
-    README = open(os.path.join(here, 'README.rst')).read()
-    CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
+    with open(os.path.join(here, 'README.txt')) as f:
+        README = f.read()
+    with open(os.path.join(here, 'CHANGES.txt')) as f:
+        CHANGES = f.read()
 except IOError:
     README = CHANGES = ''
 

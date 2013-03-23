@@ -29,9 +29,11 @@ _marker = object()
 class static(static_view):
     """ Backwards compatibility alias for
     :class:`pyramid.static.static_view`; it overrides that class' constructor
-    to pass ``use_subpath=True`` by default.  This class is deprecated as of
-    :app:`Pyramid` 1.1.  Use :class:`pyramid.static.static_view` instead
-    (probably with a ``use_subpath=True`` argument).
+    to pass ``use_subpath=True`` by default.
+
+    .. deprecated:: 1.1
+       use :class:`pyramid.static.static_view` instead
+       (probably with a ``use_subpath=True`` argument)
     """
     def __init__(self, root_dir, cache_max_age=3600, package_name=None):
         if package_name is None:
@@ -160,14 +162,14 @@ class view_config(object):
        import views
        from resources import MyResource
        config.add_view(views.my_view, context=MyResource, name='my_view',
-                       permission='read', 'route_name='site1')
+                       permission='read', route_name='site1')
 
     .. note: :class:`pyramid.view.view_config` is also importable, for
              backwards compatibility purposes, as the name
              :class:`pyramid.view.bfg_view`.
 
-    The following keyword arguments are supported to
-    :class:`pyramid.view.view_config`: ``context``, ``permission``, ``name``,
+    :class:`pyramid.view.view_config` supports the following keyword
+    arguments: ``context``, ``permission``, ``name``,
     ``request_type``, ``route_name``, ``request_method``, ``request_param``,
     ``containment``, ``xhr``, ``accept``, ``header``, ``path_info``,
     ``custom_predicates``, ``decorator``, ``mapper``, ``http_cache``,
@@ -312,11 +314,12 @@ See also :ref:`changing_the_notfound_view`.
 
 class notfound_view_config(object):
     """
+    .. versionadded:: 1.3
 
     An analogue of :class:`pyramid.view.view_config` which registers a
-    :term:`not found view`.
+    :term:`Not Found View`.
 
-    The notfound_view_config constructor accepts most of the same arguments
+    The ``notfound_view_config`` constructor accepts most of the same arguments
     as the constructor of :class:`pyramid.view.view_config`.  It can be used
     in the same places, and behaves in largely the same way, except it always
     registers a not found exception view instead of a 'normal' view.
@@ -337,7 +340,7 @@ class notfound_view_config(object):
     argument restricts the set of circumstances under which this notfound
     view will be invoked.
 
-    If ``append_slash`` is ``True``, when the notfound view is invoked, and
+    If ``append_slash`` is ``True``, when the Not Found View is invoked, and
     the current path info does not end in a slash, the notfound logic will
     attempt to find a :term:`route` that matches the request's path info
     suffixed with a slash.  If such a route exists, Pyramid will issue a
@@ -346,9 +349,6 @@ class notfound_view_config(object):
 
     See :ref:`changing_the_notfound_view` for detailed usage information.
 
-    .. note::
-
-       This class is new as of Pyramid 1.3.
     """
 
     venusian = venusian
@@ -377,6 +377,7 @@ class notfound_view_config(object):
 
 class forbidden_view_config(object):
     """
+    .. versionadded:: 1.3
 
     An analogue of :class:`pyramid.view.view_config` which registers a
     :term:`forbidden view`.
@@ -394,7 +395,7 @@ class forbidden_view_config(object):
         from pyramid.response import Response
           
         @forbidden_view_config()
-        def notfound(request):
+        def forbidden(request):
             return Response('You are not allowed', status='401 Unauthorized')
 
     All arguments passed to this function have the same meaning as
@@ -403,9 +404,6 @@ class forbidden_view_config(object):
 
     See :ref:`changing_the_forbidden_view` for detailed usage information.
 
-    .. note::
-
-       This class is new as of Pyramid 1.3.
     """
 
     venusian = venusian
@@ -436,11 +434,8 @@ def is_response(ob):
     """ Return ``True`` if ``ob`` implements the interface implied by
     :ref:`the_response`. ``False`` if not.
 
-    .. warning::
-
-       This function is deprecated as of :app:`Pyramid` 1.1.  New
-       code should not use it.  Instead, new code should use the
-       :func:`pyramid.request.Request.is_response` method."""
+    .. deprecated:: 1.1
+       use :func:`pyramid.request.Request.is_response` instead"""
     if ( hasattr(ob, 'app_iter') and hasattr(ob, 'headerlist') and
          hasattr(ob, 'status') ):
         return True

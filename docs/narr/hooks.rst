@@ -15,12 +15,11 @@ Changing the Not Found View
 ---------------------------
 
 When :app:`Pyramid` can't map a URL to view code, it invokes a :term:`not
-found view`, which is a :term:`view callable`. A default notfound view
-exists.  The default not found view can be overridden through application
-configuration.
+found view`, which is a :term:`view callable`. The default Not Found View
+can be overridden through application configuration.
 
 If your application uses :term:`imperative configuration`, you can replace
-the Not Found view by using the
+the Not Found View by using the
 :meth:`pyramid.config.Configurator.add_notfound_view` method:
 
 .. code-block:: python
@@ -30,7 +29,7 @@ the Not Found view by using the
    config.add_notfound_view(notfound)
 
 Replace ``helloworld.views.notfound`` with a reference to the :term:`view
-callable` you want to use to represent the Not Found view.  The :term:`not
+callable` you want to use to represent the Not Found View.  The :term:`not
 found view` callable is a view callable like any other.
 
 If your application instead uses :class:`pyramid.view.view_config` decorators
@@ -52,12 +51,12 @@ and a :term:`scan`, you can replace the Not Found view by using the
 
 This does exactly what the imperative example above showed.
 
-Your application can define *multiple* not found views if necessary.  Both
+Your application can define *multiple* Not Found Views if necessary.  Both
 :meth:`pyramid.config.Configurator.add_notfound_view` and
 :class:`pyramid.view.notfound_view_config` take most of the same arguments as
 :class:`pyramid.config.Configurator.add_view` and
-:class:`pyramid.view.view_config`, respectively.  This means that not found
-views can carry predicates limiting their applicability.  For example:
+:class:`pyramid.view.view_config`, respectively.  This means that Not Found
+Views can carry predicates limiting their applicability.  For example:
 
 .. code-block:: python
    :linenos:
@@ -80,7 +79,7 @@ The ``notfound_get`` view will be called when a view could not be found and
 the request method was ``GET``.  The ``notfound_post`` view will be called
 when a view could not be found and the request method was ``POST``.
 
-Like any other view, the notfound view must accept at least a ``request``
+Like any other view, the Not Found View must accept at least a ``request``
 parameter, or both ``context`` and ``request``.  The ``request`` is the
 current :term:`request` representing the denied action.  The ``context`` (if
 used in the call signature) will be the instance of the
@@ -92,7 +91,8 @@ Both :meth:`pyramid.config.Configurator.add_notfound_view` and
 redirect requests to slash-appended routes. See
 :ref:`redirecting_to_slash_appended_routes` for examples.
 
-Here's some sample code that implements a minimal NotFound view callable:
+Here's some sample code that implements a minimal :term:`Not Found View`
+callable:
 
 .. code-block:: python
    :linenos:
@@ -104,11 +104,11 @@ Here's some sample code that implements a minimal NotFound view callable:
 
 .. note::
 
-   When a NotFound view callable is invoked, it is passed a
+   When a Not Found View callable is invoked, it is passed a
    :term:`request`.  The ``exception`` attribute of the request will be an
    instance of the :exc:`~pyramid.httpexceptions.HTTPNotFound` exception that
-   caused the not found view to be called.  The value of
-   ``request.exception.message`` will be a value explaining why the not found
+   caused the Not Found View to be called.  The value of
+   ``request.exception.message`` will be a value explaining why the Not Found
    error was raised.  This message will be different when the
    ``pyramid.debug_notfound`` environment setting is true than it is when it
    is false.
@@ -123,7 +123,7 @@ Here's some sample code that implements a minimal NotFound view callable:
 
 .. warning::
 
-   When a NotFound view callable accepts an argument list as
+   When a Not Found View callable accepts an argument list as
    described in :ref:`request_and_context_view_definitions`, the ``context``
    passed as the first argument to the view callable will be the
    :exc:`~pyramid.httpexceptions.HTTPNotFound` exception instance.  If
@@ -257,6 +257,97 @@ already constructed a :term:`configurator` it can also be registered via the
    config.set_request_factory(MyRequest)
 
 .. index::
+   single: request method
+
+.. _adding_request_method:
+
+Adding Methods or Properties to Request Object
+----------------------------------------------
+
+.. versionadded:: 1.4.
+
+Since each Pyramid application can only have one :term:`request` factory,
+:ref:`changing the request factory <changing_the_request_factory>`
+is not that extensible, especially if you want to build composable features
+(e.g., Pyramid add-ons and plugins).
+
+A lazy property can be registered to the request object via the
+:meth:`pyramid.config.Configurator.add_request_method` API. This allows you
+to specify a callable that will be available on the request object, but will not
+actually execute the function until accessed.
+
+.. warning::
+
+   This will silently override methods and properties from :term:`request
+   factory` that have the same name.
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.config import Configurator
+
+   def total(request, *args):
+       return sum(args)
+
+   def prop(request):
+       print "getting the property"
+       return "the property"
+
+   config = Configurator()
+   config.add_request_method(total)
+   config.add_request_method(prop, reify=True)
+
+In the above example, ``total`` is added as a method. However, ``prop`` is added
+as a property and its result is cached per-request by setting ``reify=True``.
+This way, we eliminate the overhead of running the function multiple times.
+
+   >>> request.total(1, 2, 3)
+   6
+   >>> request.prop
+   getting the property
+   the property
+   >>> request.prop
+   the property
+
+To not cache the result of ``request.prop``, set ``property=True`` instead of
+``reify=True``.
+
+Here is an example of passing a class to ``Configurator.add_request_method``:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.config import Configurator
+   from pyramid.decorator import reify
+
+   class ExtraStuff(object):
+
+       def __init__(self, request):
+           self.request = request
+
+       def total(self, *args):
+           return sum(args)
+
+       # use @property if you don't want to cache the result
+       @reify
+       def prop(self):
+           print "getting the property"
+           return "the property"
+
+   config = Configurator()
+   config.add_request_method(ExtraStuff, 'extra', reify=True)
+
+We attach and cache an object named ``extra`` to the ``request`` object.
+
+   >>> request.extra.total(1, 2, 3)
+   6
+   >>> request.extra.prop
+   getting the property
+   the property
+   >>> request.extra.prop
+   the property
+
+.. index::
    single: before render event
    single: adding renderer globals
 
@@ -336,9 +427,9 @@ when adding renderer global values exists in :ref:`adding_renderer_globals`.
 Adding Renderer Globals (Deprecated)
 ------------------------------------
 
-.. warning:: this feature is deprecated as of Pyramid 1.1.  A non-deprecated
-   mechanism which allows event subscribers to add renderer global values
-   is documented in :ref:`beforerender_event`.
+.. deprecated:: 1.1
+   An alternative mechanism which allows event subscribers to add renderer
+   global values is documented in :ref:`beforerender_event`.
 
 Whenever :app:`Pyramid` handles a request to perform a rendering (after a
 view with a ``renderer=`` configuration attribute is invoked, or when any of
@@ -621,7 +712,7 @@ The API that must be implemented by your a class that provides
 
 The default context URL generator is available for perusal as the class
 :class:`pyramid.traversal.ResourceURL` in the `traversal module
-<http://github.com/Pylons/pyramid/blob/master/pyramid/traversal.py>`_ of the
+<https://github.com/Pylons/pyramid/blob/master/pyramid/traversal.py>`_ of the
 :term:`Pylons` GitHub Pyramid repository.
 
 See :meth:`pyramid.config.add_resource_url_adapter` for more information.
@@ -635,12 +726,12 @@ See :meth:`pyramid.config.add_resource_url_adapter` for more information.
 Changing How Pyramid Treats View Responses
 ------------------------------------------
 
+.. versionadded:: 1.1
+
 It is possible to control how Pyramid treats the result of calling a view
 callable on a per-type basis by using a hook involving
 :meth:`pyramid.config.Configurator.add_response_adapter` or the
 :class:`~pyramid.response.response_adapter` decorator.
-
-.. note:: This feature is new as of Pyramid 1.1.
 
 Pyramid, in various places, adapts the result of calling a view callable to
 the :class:`~pyramid.interfaces.IResponse` interface to ensure that the
@@ -936,8 +1027,8 @@ For full details, please read the `Venusian documentation
 Registering "Tweens"
 --------------------
 
-.. note:: Tweens are a feature which were added in Pyramid 1.2.  They are
-   not available in any previous version.
+.. versionadded:: 1.2
+   Tweens
 
 A :term:`tween` (a contraction of the word "between") is a bit of code that
 sits between the Pyramid router's main request handling function and the
@@ -1241,10 +1332,7 @@ implict and explicit tween chains used by an application.  See
 Adding A Third Party View, Route, or Subscriber Predicate
 ---------------------------------------------------------
 
-.. note::
-
-   Third-party view, route, and subscriber predicates are a feature new as of
-   Pyramid 1.4.
+.. versionadded:: 1.4
 
 .. _view_and_route_predicates:
 

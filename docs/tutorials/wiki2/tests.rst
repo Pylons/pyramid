@@ -6,9 +6,6 @@ We will now add tests for the models and the views and a few functional
 tests in the ``tests.py``.  Tests ensure that an application works, and
 that it continues to work after changes are made in the future.
 
-The source code for this tutorial stage can be browsed at
-`http://github.com/Pylons/pyramid/tree/1.3-branch/docs/tutorials/wiki2/src/tests/
-<http://github.com/Pylons/pyramid/tree/1.3-branch/docs/tutorials/wiki2/src/tests/>`_.
 
 
 Testing the Models
@@ -57,7 +54,7 @@ Change the ``requires`` list in ``setup.py`` to include ``WebTest``.
 .. literalinclude:: src/tests/setup.py
    :linenos:
    :language: python
-   :lines: 9-20
+   :lines: 11-21
    :emphasize-lines: 10
 
 After we've added a dependency on WebTest in ``setup.py``, we need to rerun
@@ -69,13 +66,13 @@ On UNIX:
 
 .. code-block:: text
 
-   $ ../bin/python setup.py develop
+   $ $VENV/bin/python setup.py develop
 
 On Windows:
 
 .. code-block:: text
 
-   c:\pyramidtut\tutorial> ..\Scripts\python setup.py develop
+   c:\pyramidtut\tutorial> %VENV%\Scripts\python setup.py develop
 
 Once that command has completed successfully, we can run the tests
 themselves:
@@ -84,13 +81,13 @@ On UNIX:
 
 .. code-block:: text
 
-   $ ../bin/python setup.py test -q
+   $ $VENV/bin/python setup.py test -q
 
 On Windows:
 
 .. code-block:: text
 
-   c:\pyramidtut\tutorial> ..\Scripts\python setup.py test -q
+   c:\pyramidtut\tutorial> %VENV%\Scripts\python setup.py test -q
 
 The expected result ends something like:
 

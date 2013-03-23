@@ -27,7 +27,7 @@ checkout.
 - Install ``setuptools-git`` into the virtualenv (for good measure, as we're
   using git to do version control)::
 
-  $ env/bin/easy_install setuptools-git
+  $ $VENV/bin/easy_install setuptools-git
 
 - Install Pyramid from the checkout into the virtualenv using ``setup.py
   dev``.  ``setup.py dev`` is an alias for "setup.py develop" which also
@@ -36,19 +36,19 @@ checkout.
   ``pyramid`` checkout directory::
 
   $ cd pyramid
-  $ ../env/bin/python setup.py dev
+  $ $VENV/bin/python setup.py dev
 
 - At that point, you should be able to create new Pyramid projects by using
   ``pcreate``::
 
   $ cd ../env
-  $ bin/pcreate -s starter starter
+  $ $VENV/bin/pcreate -s starter starter
 
 - And install those projects (also using ``setup.py develop``) into the
   virtualenv::
 
   $ cd starter
-  $ ../bin/python setup.py develop
+  $ $VENV/bin/python setup.py develop
 
 Adding Features
 ---------------
@@ -88,7 +88,7 @@ Coding Style
   mandatory.
 
 - Please do not remove trailing whitespace.  Configure your editor to reduce
-  diff noise.
+  diff noise. See https://github.com/Pylons/pyramid/issues/788 for more.
 
 Running Tests
 --------------
@@ -129,7 +129,7 @@ or adds the feature.
 To build and review docs (where ``$yourvenv`` refers to the virtualenv you're
 using to develop Pyramid):
 
-1. Run ``$yourvenv/bin/python setup.py dev docs``.  This will cause Sphinx
+1. Run ``$VENV/bin/python setup.py dev docs``.  This will cause Sphinx
    and all development requirements to be installed in your virtualenv.
 
 2. Update all git submodules from the top-level of your Pyramid checkout, like
@@ -139,7 +139,7 @@ using to develop Pyramid):
    HTML docs are generated.
 
 3. cd to the ``docs`` directory within your Pyramid checkout and execute
-   ``make clean html SPHINXBUILD=$yourvenv/bin/sphinx-build``.  The
+   ``make clean html SPHINXBUILD=$VENV/bin/sphinx-build``.  The
    ``SPHINXBUILD=...`` hair is there in order to tell it to use the
    virtualenv Python, which will have both Sphinx and Pyramid (for API
    documentation generation) installed.

@@ -29,18 +29,18 @@ On UNIX:
 
 .. code-block:: text
 
-   $ /path/to/your/virtualenv/bin/python helloworld.py
+   $ $VENV/bin/python helloworld.py
 
 On Windows:
 
 .. code-block:: text
 
-   C:\> \path\to\your\virtualenv\Scripts\python.exe helloworld.py
+   C:\> %VENV%\Scripts\python.exe helloworld.py
 
 This command will not return and nothing will be printed to the console.
 When port 8080 is visited by a browser on the URL ``/hello/world``, the
 server will simply serve up the text "Hello world!".  If your application is
-running on your local system, using ``http://localhost:8080/hello/world``
+running on your local system, using `<http://localhost:8080/hello/world>`_
 in a browser will show this result.
 
 Each time you visit a URL served by the application in a browser, a logging
@@ -166,7 +166,6 @@ the application.
 Adding Configuration
 ~~~~~~~~~~~~~~~~~~~~
 
-.. ignore-next-block
 .. literalinclude:: helloworld.py
    :linenos:
    :lines: 11-12
@@ -175,9 +174,9 @@ First line above calls the :meth:`pyramid.config.Configurator.add_route`
 method, which registers a :term:`route` to match any URL path that begins
 with ``/hello/`` followed by a string.
 
-The second line, ``config.add_view(hello_world, route_name='hello')``,
-registers the ``hello_world`` function as a :term:`view callable` and makes
-sure that it will be called when the ``hello`` route is matched.
+The second line registers the ``hello_world`` function as a
+:term:`view callable` and makes sure that it will be called when the
+``hello`` route is matched.
 
 .. index::
    single: make_wsgi_app
@@ -186,7 +185,6 @@ sure that it will be called when the ``hello`` route is matched.
 WSGI Application Creation
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. ignore-next-block
 .. literalinclude:: helloworld.py
    :linenos:
    :lines: 13
@@ -194,13 +192,13 @@ WSGI Application Creation
 After configuring views and ending configuration, the script creates a WSGI
 *application* via the :meth:`pyramid.config.Configurator.make_wsgi_app`
 method.  A call to ``make_wsgi_app`` implies that all configuration is
-finished (meaning all method calls to the configurator which set up views,
-and various other configuration settings have been performed).  The
+finished (meaning all method calls to the configurator, which sets up views
+and various other configuration settings, have been performed).  The
 ``make_wsgi_app`` method returns a :term:`WSGI` application object that can
 be used by any WSGI server to present an application to a requestor.
 :term:`WSGI` is a protocol that allows servers to talk to Python
 applications.  We don't discuss :term:`WSGI` in any depth within this book,
-however, you can learn more about it by visiting `wsgi.org
+but you can learn more about it by visiting `wsgi.org
 <http://wsgi.org>`_.
 
 The :app:`Pyramid` application object, in particular, is an instance of a
@@ -215,7 +213,6 @@ to its ``add_view`` and ``add_route`` methods.
 WSGI Application Serving
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. ignore-next-block
 .. literalinclude:: helloworld.py
    :linenos:
    :lines: 14-15

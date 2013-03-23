@@ -710,7 +710,7 @@ class ViewsConfiguratorMixin(object):
 
         http_cache
 
-          .. note:: This feature is new as of Pyramid 1.1.
+          .. versionadded:: 1.1
 
           When you supply an ``http_cache`` value to a view configuration,
           the ``Expires`` and ``Cache-Control`` headers of a response
@@ -822,7 +822,8 @@ class ViewsConfiguratorMixin(object):
           think about preserving function attributes such as ``__name__`` and
           ``__module__`` within decorator logic).
 
-          Passing an iterable is only supported as of :app:`Pyramid` 1.4a4.
+          .. versionchanged:: 1.4a4
+             Passing an iterable.
 
         mapper
 
@@ -877,9 +878,9 @@ class ViewsConfiguratorMixin(object):
           supplied value.  Note that use of ``GET`` also implies that the
           view will respond to ``HEAD`` as of Pyramid 1.4.
 
-          .. note:: The ability to pass a tuple of items as
-                   ``request_method`` is new as of Pyramid 1.2.  Previous
-                   versions allowed only a string.
+          .. versionchanged:: 1.2
+             The ability to pass a tuple of items as ``request_method``.
+             Previous versions allowed only a string.
 
         request_param
 
@@ -897,7 +898,7 @@ class ViewsConfiguratorMixin(object):
 
         match_param
 
-          .. note:: This feature is new as of :app:`Pyramid` 1.2.
+          .. versionadded:: 1.2
 
           This value can be a string of the format "key=value" or a tuple
           containing one or more of these strings.
@@ -1354,7 +1355,10 @@ class ViewsConfiguratorMixin(object):
     @action_method
     def add_view_predicate(self, name, factory, weighs_more_than=None,
                            weighs_less_than=None):
-        """ Adds a view predicate factory.  The associated view predicate can
+        """
+        .. versionadded:: 1.4
+
+        Adds a view predicate factory.  The associated view predicate can
         later be named as a keyword argument to
         :meth:`pyramid.config.Configurator.add_view` in the
         ``predicates`` anonyous keyword argument dictionary.
@@ -1366,10 +1370,6 @@ class ViewsConfiguratorMixin(object):
         ``factory`` should be a :term:`predicate factory`.
 
         See :ref:`view_and_route_predicates` for more information.
-
-        .. note::
-
-           This method is new as of Pyramid 1.4.
         """
         self._add_predicate(
             'view',
@@ -1557,9 +1557,7 @@ class ViewsConfiguratorMixin(object):
         ``for_``, or ``http_cache`` keyword arguments.  These argument values
         make no sense in the context of a forbidden view.
 
-        .. note::
-
-           This method is new as of Pyramid 1.3.
+        .. versionadded:: 1.3
         """
         for arg in ('name', 'permission', 'context', 'for_', 'http_cache'):
             if arg in predicates:
@@ -1617,9 +1615,9 @@ class ViewsConfiguratorMixin(object):
         append_slash=False,
         **predicates
         ):
-        """ Add a default notfound view to the current configuration state.
+        """ Add a default Not Found View to the current configuration state.
         The view will be called when Pyramid or application code raises an
-        :exc:`pyramid.httpexceptions.HTTPForbidden` exception (e.g. when a
+        :exc:`pyramid.httpexceptions.HTTPNotFound` exception (e.g. when a
         view cannot be found for the request).  The simplest example is:
 
           .. code-block:: python
@@ -1636,9 +1634,9 @@ class ViewsConfiguratorMixin(object):
         :meth:`pyramid.config.Configurator.add_view`, this method will raise
         an exception if passed ``name``, ``permission``, ``context``,
         ``for_``, or ``http_cache`` keyword arguments.  These argument values
-        make no sense in the context of a notfound view.
+        make no sense in the context of a Not Found View.
 
-        If ``append_slash`` is ``True``, when this notfound view is invoked,
+        If ``append_slash`` is ``True``, when this Not Found View is invoked,
         and the current path info does not end in a slash, the notfound logic
         will attempt to find a :term:`route` that matches the request's path
         info suffixed with a slash.  If such a route exists, Pyramid will
@@ -1646,9 +1644,7 @@ class ViewsConfiguratorMixin(object):
         Pyramid will return the result of the view callable provided as
         ``view``, as normal.
 
-        .. note::
-
-           This method is new as of Pyramid 1.3.
+        .. versionadded:: 1.3
         """
         for arg in ('name', 'permission', 'context', 'for_', 'http_cache'):
             if arg in predicates:
@@ -1797,6 +1793,10 @@ class ViewsConfiguratorMixin(object):
         qualified URL (e.g. starts with ``http://`` or similar).  In this
         mode, the ``name`` is used as the prefix of the full URL when
         generating a URL using :meth:`pyramid.request.Request.static_url`.
+        Furthermore, if a protocol-relative URL (e.g. ``//example.com/images``)
+        is used as the ``name`` argument, the generated URL will use the
+        protocol of the request (http or https, respectively).
+
         For example, if ``add_static_view`` is called like so:
 
         .. code-block:: python
@@ -1805,19 +1805,13 @@ class ViewsConfiguratorMixin(object):
 
         Subsequently, the URLs generated by
         :meth:`pyramid.request.Request.static_url` for that static view will
-        be prefixed with ``http://example.com/images``:
+        be prefixed with ``http://example.com/images`` (the external webserver
+        listening on ``example.com`` must be itself configured to respond
+        properly to such a request.):
 
         .. code-block:: python
 
            static_url('mypackage:images/logo.png', request)
-
-        When ``add_static_view`` is called with a ``name`` argument that is
-        the URL ``http://example.com/images``, subsequent calls to
-        :meth:`pyramid.request.Request.static_url` with paths that start with
-        the ``path`` argument passed to ``add_static_view`` will generate a
-        URL something like ``http://example.com/logo.png``.  The external
-        webserver listening on ``example.com`` must be itself configured to
-        respond properly to such a request.
 
         See :ref:`static_assets_section` for more information.
         """
@@ -1862,6 +1856,12 @@ class StaticURLInfo(object):
                     kw['subpath'] = subpath
                     return request.route_url(route_name, **kw)
                 else:
+                    parsed = url_parse(url)
+                    if not parsed.scheme:
+                        # parsed.scheme is readonly, so we have to parse again
+                        # to change the scheme, sigh.
+                        url = urlparse.urlunparse(url_parse(
+                            url, scheme=request.environ['wsgi.url_scheme']))
                     subpath = url_quote(subpath)
                     return urljoin(url, subpath)
 
@@ -1890,7 +1890,7 @@ class StaticURLInfo(object):
             # make sure it ends with a slash
             name = name + '/'
 
-        if url_parse(name)[0]:
+        if url_parse(name).netloc:
             # it's a URL
             # url, spec, route_name
             url = name

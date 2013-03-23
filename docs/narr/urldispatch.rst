@@ -16,12 +16,13 @@ receives the :term:`request` and returns a :term:`response` object.
 High-Level Operational Overview
 -------------------------------
 
-If route configuration is present in an application, the :app:`Pyramid`
+If any route configuration is present in an application, the :app:`Pyramid`
 :term:`Router` checks every incoming request against an ordered set of URL
 matching patterns present in a *route map*.
 
 If any route pattern matches the information in the :term:`request`,
-:app:`Pyramid` will invoke :term:`view lookup` to find a matching view.
+:app:`Pyramid` will invoke the :term:`view lookup` process to find a
+matching view.
 
 If no route pattern in the route map matches the information in the
 :term:`request` provided in your application, :app:`Pyramid` will fail over
@@ -38,7 +39,7 @@ application.  A route has a *name*, which acts as an identifier to be used
 for URL generation.  The name also allows developers to associate a view
 configuration with the route.  A route also has a *pattern*, meant to match
 against the ``PATH_INFO`` portion of a URL (the portion following the scheme
-and port, e.g. ``/foo/bar`` in the URL ``http://localhost:8080/foo/bar``). It
+and port, e.g. ``/foo/bar`` in the URL `<http://localhost:8080/foo/bar>`_). It
 also optionally has a ``factory`` and a set of :term:`route predicate`
 attributes.
 
@@ -54,7 +55,6 @@ The :meth:`pyramid.config.Configurator.add_route` method adds a single
 :term:`route configuration` to the :term:`application registry`.  Here's an
 example:
 
-.. ignore-next-block
 .. code-block:: python
 
    # "config" below is presumed to be an instance of the
@@ -70,20 +70,18 @@ via its ``route_name`` predicate, that view callable will always be found and
 invoked when the associated route pattern matches during a request.
 
 More commonly, you will not use any ``add_view`` statements in your project's
-"setup" code, instead only using ``add_route`` statements using a
-:term:`scan` for to associate view callables with routes.  For example, if
+"setup" code. You will instead use ``add_route`` statements, and use a
+:term:`scan` to associate view callables with routes.  For example, if
 this is a portion of your project's ``__init__.py``:
 
 .. code-block:: python
-
-   # in your project's __init__.py (mypackage.__init__)
 
    config.add_route('myroute', '/prefix/{one}/{two}')
    config.scan('mypackage')
 
 Note that we don't call :meth:`~pyramid.config.Configurator.add_view` in this
 setup code.  However, the above :term:`scan` execution
-``config.scan('mypackage')`` will pick up all :term:`configuration
+``config.scan('mypackage')`` will pick up each :term:`configuration
 decoration`, including any objects decorated with the
 :class:`pyramid.view.view_config` decorator in the ``mypackage`` Python
 package.  For example, if you have a ``views.py`` in your package, a scan will
@@ -91,8 +89,6 @@ pick up any of its configuration decorators, so we can add one there
 that references ``myroute`` as a ``route_name`` parameter:
 
 .. code-block:: python
-
-   # in your project's views.py module (mypackage.views)
 
    from pyramid.view import view_config
    from pyramid.response import Response
@@ -758,11 +754,8 @@ other non-``name`` and non-``pattern`` arguments to
 exception to this rule is use of the ``pregenerator`` argument, which is not
 ignored when ``static`` is ``True``.
 
-.. note::
-
-   the ``static`` argument to
-   :meth:`~pyramid.config.Configurator.add_route` is new as of :app:`Pyramid`
-   1.1.
+.. versionadded:: 1.1
+   the ``static`` argument to :meth:`~pyramid.config.Configurator.add_route`
 
 .. index::
    single: redirecting to slash-appended routes
@@ -821,7 +814,7 @@ bro." body.
 If a request enters the application with the ``PATH_INFO`` value of
 ``/has_slash/``, the second route will match.  If a request enters the
 application with the ``PATH_INFO`` value of ``/has_slash``, a route *will* be
-found by the slash-appending not found view.  An HTTP redirect to
+found by the slash-appending :term:`Not Found View`.  An HTTP redirect to
 ``/has_slash/`` will be returned to the user's browser.  As a result, the
 ``notfound`` view will never actually be called.
 
@@ -856,12 +849,12 @@ exactly the same job:
 .. warning::
 
    You **should not** rely on this mechanism to redirect ``POST`` requests.
-   The redirect  of the slash-appending not found view will turn a ``POST``
-   request into a ``GET``, losing any ``POST`` data in the original
+   The redirect  of the slash-appending :term:`Not Found View` will turn a
+   ``POST`` request into a ``GET``, losing any ``POST`` data in the original
    request.
 
 See :ref:`view_module` and :ref:`changing_the_notfound_view` for a more
-general description of how to configure a view and/or a not found view.
+general description of how to configure a view and/or a :term:`Not Found View`.
 
 .. index::
    pair: debugging; route matching
@@ -882,8 +875,7 @@ which you started the application from.  For example:
 .. code-block:: text
    :linenos:
 
-    [chrism@thinko pylonsbasic]$ PYRAMID_DEBUG_ROUTEMATCH=true \
-                                 bin/pserve development.ini
+    $ PYRAMID_DEBUG_ROUTEMATCH=true $VENV/bin/pserve development.ini
     Starting server in PID 13586.
     serving on 0.0.0.0:6543 view at http://127.0.0.1:6543
     2010-12-16 14:45:19,956 no route matched for url \
@@ -906,7 +898,7 @@ routes configured in your application; for more information, see
 Using a Route Prefix to Compose Applications
 --------------------------------------------
 
-.. note:: This feature is new as of :app:`Pyramid` 1.2.
+.. versionadded:: 1.2
 
 The :meth:`pyramid.config.Configurator.include` method allows configuration
 statements to be included from separate files.  See

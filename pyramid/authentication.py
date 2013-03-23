@@ -450,6 +450,12 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
        Default: ``False``.  Make the requesting IP address part of
        the authentication data in the cookie.  Optional.
 
+       For IPv6 this option is not recommended. The ``mod_auth_tkt``
+       specification does not specify how to handle IPv6 addresses, so using
+       this option in combination with IPv6 addresses may cause an
+       incompatible cookie. It ties the authentication ticket to that
+       individual's IPv6 address.
+
     ``timeout``
 
        Default: ``None``.  Maximum number of seconds which a newly
@@ -736,9 +742,17 @@ def calculate_digest(ip, timestamp, secret, userid, tokens, user_data,
     tokens = bytes_(tokens, 'utf-8')
     user_data = bytes_(user_data, 'utf-8')
     hash_obj = hashlib.new(hashalg)
-    hash_obj.update(
-        encode_ip_timestamp(ip, timestamp) + secret + userid + b'\0'
-        + tokens + b'\0' + user_data)
+
+    # Check to see if this is an IPv6 address
+    if ':' in ip:
+        ip_timestamp = ip + str(int(timestamp))
+        ip_timestamp = bytes_(ip_timestamp)
+    else:
+        # encode_ip_timestamp not required, left in for backwards compatibility
+        ip_timestamp = encode_ip_timestamp(ip, timestamp)
+
+    hash_obj.update(ip_timestamp + secret + userid + b'\0' +
+            tokens + b'\0' + user_data)
     digest = hash_obj.hexdigest()
     hash_obj2 = hashlib.new(hashalg)
     hash_obj2.update(bytes_(digest) + secret)
@@ -1075,12 +1089,11 @@ class BasicAuthAuthenticationPolicy(CallbackAuthenticationPolicy):
     register a view that will send a Basic Auth challenge to the user whenever
     there is an attempt to call a view which results in a Forbidden response::
 
-        from pyramid.httpexceptions import HTTPForbidden
         from pyramid.httpexceptions import HTTPUnauthorized
         from pyramid.security import forget
-        from pyramid.view import view_config
+        from pyramid.view import forbidden_view_config
 
-        @view_config(context=HTTPForbidden)
+        @forbidden_view_config()
         def basic_challenge(request):
             response = HTTPUnauthorized()
             response.headers.update(forget(request))

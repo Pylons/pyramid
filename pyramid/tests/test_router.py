@@ -1164,6 +1164,104 @@ class TestRouter(unittest.TestCase):
         start_response = DummyStartResponse()
         self.assertRaises(RuntimeError, router, environ, start_response)
 
+    def test_call_view_raises_predicate_mismatch(self):
+        from pyramid.exceptions import PredicateMismatch
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IRequest
+        view = DummyView(DummyResponse(), raise_exception=PredicateMismatch)
+        self._registerView(view, '', IViewClassifier, IRequest, None)
+        environ = self._makeEnviron()
+        router = self._makeOne()
+        start_response = DummyStartResponse()
+        self.assertRaises(PredicateMismatch, router, environ, start_response)
+
+    def test_call_view_predicate_mismatch_doesnt_hide_views(self):
+        from pyramid.exceptions import PredicateMismatch
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IRequest, IResponse
+        from pyramid.response import Response
+        from zope.interface import Interface, implementer
+        class IContext(Interface):
+            pass
+        @implementer(IContext)
+        class DummyContext:
+            pass
+        context = DummyContext()
+        self._registerTraverserFactory(context)
+        view = DummyView(DummyResponse(), raise_exception=PredicateMismatch)
+        self._registerView(view, '', IViewClassifier, IRequest,
+                           DummyContext)
+        good_view = DummyView('abc')
+        self._registerView(self.config.derive_view(good_view),
+                            '', IViewClassifier, IRequest, IContext)
+        router = self._makeOne()
+        def make_response(s):
+            return Response(s)
+        router.registry.registerAdapter(make_response, (str,), IResponse)
+        environ = self._makeEnviron()
+        start_response = DummyStartResponse()
+        app_iter = router(environ, start_response)
+        self.assertEqual(app_iter, [b'abc'])
+
+    def test_call_view_multiple_predicate_mismatches_dont_hide_views(self):
+        from pyramid.exceptions import PredicateMismatch
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IRequest, IResponse
+        from pyramid.response import Response
+        from zope.interface import Interface, implementer
+        class IBaseContext(Interface):
+            pass
+        class IContext(IBaseContext):
+            pass
+        @implementer(IContext)
+        class DummyContext:
+            pass
+        context = DummyContext()
+        self._registerTraverserFactory(context)
+        view1 = DummyView(DummyResponse(), raise_exception=PredicateMismatch)
+        self._registerView(view1, '', IViewClassifier, IRequest,
+                           DummyContext)
+        view2 = DummyView(DummyResponse(), raise_exception=PredicateMismatch)
+        self._registerView(view2, '', IViewClassifier, IRequest,
+                           IContext)
+        good_view = DummyView('abc')
+        self._registerView(self.config.derive_view(good_view),
+                            '', IViewClassifier, IRequest, IBaseContext)
+        router = self._makeOne()
+        def make_response(s):
+            return Response(s)
+        router.registry.registerAdapter(make_response, (str,), IResponse)
+        environ = self._makeEnviron()
+        start_response = DummyStartResponse()
+        app_iter = router(environ, start_response)
+        self.assertEqual(app_iter, [b'abc'])
+
+    def test_call_view_predicate_mismatch_doesnt_find_unrelated_views(self):
+        from pyramid.exceptions import PredicateMismatch
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IRequest
+        from zope.interface import Interface, implementer
+        class IContext(Interface):
+            pass
+        class IOtherContext(Interface):
+            pass
+        @implementer(IContext)
+        class DummyContext:
+            pass
+        context = DummyContext()
+        self._registerTraverserFactory(context)
+        view = DummyView(DummyResponse(), raise_exception=PredicateMismatch)
+        self._registerView(view, '', IViewClassifier, IRequest,
+                           DummyContext)
+        please_dont_call_me_view = DummyView('abc')
+        self._registerView(self.config.derive_view(please_dont_call_me_view),
+                            '', IViewClassifier, IRequest, IOtherContext)
+        router = self._makeOne()
+        environ = self._makeEnviron()
+        router = self._makeOne()
+        start_response = DummyStartResponse()
+        self.assertRaises(PredicateMismatch, router, environ, start_response)
+
 class DummyPredicate(object):
     def __call__(self, info, request):
         return True

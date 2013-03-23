@@ -3,7 +3,6 @@
 import datetime
 import locale
 import os
-import platform
 import unittest
 
 from pyramid.wsgi import wsgiapp
@@ -82,27 +81,40 @@ class TestStaticAppBase(IntegrationBase):
         res = self.testapp.get('/static/.hiddenfile', status=200)
         _assertBody(res.body, os.path.join(here, 'fixtures/static/.hiddenfile'))
 
-    if defaultlocale is not None and platform.system() == 'Linux':
+    if defaultlocale is not None:
         # These tests are expected to fail on LANG=C systems due to decode
         # errors and on non-Linux systems due to git highchar handling
         # vagaries
         def test_highchars_in_pathelement(self):
-            url = url_quote('/static/héhé/index.html')
-            res = self.testapp.get(url, status=200)
-            _assertBody(
-                res.body,
-                os.path.join(here,
-                             text_('fixtures/static/héhé/index.html', 'utf-8'))
-                )
+            path = os.path.join(
+                here,
+                text_('fixtures/static/héhé/index.html', 'utf-8'))
+            pathdir = os.path.dirname(path)
+            body = b'<html>hehe</html>\n'
+            try:
+                os.makedirs(pathdir)
+                with open(path, 'wb') as fp:
+                    fp.write(body)
+                url = url_quote('/static/héhé/index.html')
+                res = self.testapp.get(url, status=200)
+                self.assertEqual(res.body, body)
+            finally:
+                os.unlink(path)
+                os.rmdir(pathdir)
 
         def test_highchars_in_filename(self):
-            url = url_quote('/static/héhé.html')
-            res = self.testapp.get(url, status=200)
-            _assertBody(
-                res.body,
-                os.path.join(here,
-                             text_('fixtures/static/héhé.html', 'utf-8'))
-                )
+            path = os.path.join(
+                here,
+                text_('fixtures/static/héhé.html', 'utf-8'))
+            body = b'<html>hehe file</html>\n'
+            with open(path, 'wb') as fp:
+                fp.write(body)
+            try:
+                url = url_quote('/static/héhé.html')
+                res = self.testapp.get(url, status=200)
+                self.assertEqual(res.body, body)
+            finally:
+                os.unlink(path)
 
     def test_not_modified(self):
         self.testapp.extra_environ = {
@@ -634,6 +646,32 @@ class RendererScanAppTest(IntegrationBase, unittest.TestCase):
         res = testapp.get('/two', status=200)
         self.assertTrue(b'Two!' in res.body)
 
+class AcceptContentTypeTest(unittest.TestCase):
+    def setUp(self):
+        def hello_view(request):
+            return {'message': 'Hello!'}
+        from pyramid.config import Configurator
+        config = Configurator()
+        config.add_route('hello', '/hello')
+        config.add_view(hello_view, route_name='hello', accept='text/plain', renderer='string')
+        config.add_view(hello_view, route_name='hello', accept='application/json', renderer='json')
+        app = config.make_wsgi_app()
+        from webtest import TestApp
+        self.testapp = TestApp(app)
+
+    def test_ordering(self):
+        res = self.testapp.get('/hello', headers={'Accept': 'application/json; q=1.0, text/plain; q=0.9'}, status=200)
+        self.assertEqual(res.content_type, 'application/json')
+        res = self.testapp.get('/hello', headers={'Accept': 'text/plain; q=0.9, application/json; q=1.0'}, status=200)
+        self.assertEqual(res.content_type, 'application/json')
+
+    def test_wildcards(self):
+        res = self.testapp.get('/hello', headers={'Accept': 'application/*'}, status=200)
+        self.assertEqual(res.content_type, 'application/json')
+        res = self.testapp.get('/hello', headers={'Accept': 'text/*'}, status=200)
+        self.assertEqual(res.content_type, 'text/plain')
+
+
 class DummyContext(object):
     pass
 
@@ -663,4 +701,3 @@ def _assertBody(body, filename):
     data = data.replace(b'\r', b'')
     data = data.replace(b'\n', b'')
     assert(body == data)
-

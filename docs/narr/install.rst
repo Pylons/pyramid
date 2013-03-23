@@ -14,17 +14,36 @@ run :app:`Pyramid`.
 
 .. sidebar:: Python Versions
 
-    As of this writing, :app:`Pyramid` has been tested under Python 2.6.8,
-    Python 2.7.3, Python 3.2.3, and Python 3.3b1.  :app:`Pyramid` does not
+    As of this writing, :app:`Pyramid` has been tested under Python 2.6,
+    Python 2.7, Python 3.2, and Python 3.3.  :app:`Pyramid` does not
     run under any version of Python before 2.6.
 
 :app:`Pyramid` is known to run on all popular UNIX-like systems such as
-Linux, MacOS X, and FreeBSD as well as on Windows platforms.  It is also
-known to run on :term:`PyPy` (1.9+).
+Linux, Mac OS X, and FreeBSD as well as on Windows platforms.  It is
+also known to run on :term:`PyPy` (1.9+).
 
 :app:`Pyramid` installation does not require the compilation of any
 C code, so you need only a Python interpreter that meets the
 requirements mentioned.
+
+For Mac OS X Users
+~~~~~~~~~~~~~~~~~~
+
+From `Python.org <http://python.org/download/mac/>`_:
+
+    Python comes pre-installed on Mac OS X, but due to Apple's release
+    cycle, it's often one or even two years old. The overwhelming
+    recommendation of the "MacPython" community is to upgrade your
+    Python by downloading and installing a newer version from
+    `the Python standard release page <http://python.org/download/releases/>`_.
+
+It is recommended to download one of the *installer* versions, unless you prefer to install your Python through a packgage manager (e.g., macports or homebrew) or to build your Python from source.
+
+Unless you have a need for a specific earlier version, it is recommended
+to install the latest 2.x or 3.x version of Python.
+
+If you use an installer for your Python, then you can skip to the
+section :ref:`installing_unix`.
 
 If You Don't Yet Have A Python Interpreter (UNIX)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -40,13 +59,11 @@ UNIX system that has development tools.
 Package Manager Method
 ++++++++++++++++++++++
 
-You can use your system's "package manager" to install Python. Every
-system's package manager is slightly different, but the "flavor" of
+You can use your system's "package manager" to install Python.
+Each package manager is slightly different, but the "flavor" of
 them is usually the same.
 
-For example, on an Ubuntu Linux system, to use the system package
-manager to install a Python 2.7 interpreter, use the following
-command:
+For example, on a Debian or Ubuntu system, use the following command:
 
 .. code-block:: text
 
@@ -70,7 +87,8 @@ Python interpreter to develop your software.  The authors of
 :app:`Pyramid` tend not to use the system Python for development
 purposes; always a self-compiled one.  Compiling Python is usually
 easy, and often the "system" Python is compiled with options that
-aren't optimal for web development.
+aren't optimal for web development. For an explanation, see
+https://github.com/Pylons/pyramid/issues/747.
 
 To compile software on your UNIX system, typically you need
 development tools.  Often these can be installed via the package
@@ -89,17 +107,15 @@ using the following commands:
 
 .. code-block:: text
 
-   [chrism@vitaminf ~]$ cd ~
-   [chrism@vitaminf ~]$ mkdir tmp
-   [chrism@vitaminf ~]$ mkdir opt
-   [chrism@vitaminf ~]$ cd tmp
-   [chrism@vitaminf tmp]$ wget \
-          http://www.python.org/ftp/python/2.7.3/Python-2.7.3.tgz
-   [chrism@vitaminf tmp]$ tar xvzf Python-2.7.3.tgz
-   [chrism@vitaminf tmp]$ cd Python-2.7.3
-   [chrism@vitaminf Python-2.7.3]$ ./configure \
-           --prefix=$HOME/opt/Python-2.7.3
-   [chrism@vitaminf Python-2.7.3]$ make; make install
+   $ cd ~
+   $ mkdir tmp
+   $ mkdir opt
+   $ cd tmp
+   $ wget http://www.python.org/ftp/python/2.7.3/Python-2.7.3.tgz
+   $ tar xvzf Python-2.7.3.tgz
+   $ cd Python-2.7.3
+   $ ./configure --prefix=$HOME/opt/Python-2.7.3
+   $ make && make install
 
 Once these steps are performed, the Python interpreter will be
 invokable via ``$HOME/opt/Python-2.7.3/bin/python`` from a shell
@@ -167,9 +183,7 @@ distribute is not yet installed:
    ImportError: No module named setuptools
 
 If ``import setuptools`` raises an :exc:`ImportError` as it does above, you
-will need to install setuptools or distribute manually.  Note that above
-we're using a Python 2.7-series interpreter on Mac OS X; your output may
-differ if you're using a later Python version or a different platform.
+will need to install setuptools or distribute manually.
 
 If you are using a "system" Python (one installed by your OS distributor or a
 3rd-party packager such as Fink or MacPorts), you can usually install the
@@ -208,7 +222,7 @@ Installing Distribute On Python 3
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ``setuptools`` doesn't work under Python 3.  Instead, you can use
-``distribute``, which is a fork of setuptools that does work on Python 3.  To
+``distribute``, which is a fork of setuptools.  To
 install it, first download `distribute_setup.py
 <http://python-distribute.org/distribute_setup.py>`_ then invoke it using the
 Python interpreter into which you want to install setuptools.
@@ -269,15 +283,20 @@ as your system's administrative user.  For example:
 Creating the Virtual Python Environment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Once the :term:`virtualenv` package is installed in your Python, you
-can then create a virtual environment.  To do so, invoke the
-following:
+Once the :term:`virtualenv` package is installed in your Python environment,
+you can then create a virtual environment.  To do so, invoke the following:
 
 .. code-block:: text
 
-   $ virtualenv --no-site-packages env
-   New python executable in env/bin/python
+   $ export VENV=~/env
+   $ virtualenv --no-site-packages $VENV
+   New python executable in /home/foo/env/bin/python
    Installing setuptools.............done.
+
+You can either follow the use of the environment variable, ``$VENV``,
+or replace it with the root directory of the :term:`virtualenv`.
+In that case, the `export` command can be skipped.
+If you choose the former approach, ensure that it's an absolute path.
 
 .. warning::
 
@@ -294,20 +313,16 @@ following:
    ``virtualenv`` script.  It's perfectly acceptable (and desirable)
    to create a virtualenv as a normal user.
 
-You should perform any following commands that mention a "bin"
-directory from within the ``env`` virtualenv dir.
 
 Installing :app:`Pyramid` Into the Virtual Python Environment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-After you've got your ``env`` virtualenv installed, you may install
-:app:`Pyramid` itself using the following commands from within the
-virtualenv (``env``) directory you created in the last step.
+After you've got your virtualenv installed, you may install
+:app:`Pyramid` itself using the following commands:
 
 .. code-block:: text
 
-   $ cd env
-   $ bin/easy_install pyramid
+   $ $VENV/bin/easy_install pyramid
 
 The ``easy_install`` command will take longer than the previous ones to
 complete, as it downloads and installs a number of dependencies.
@@ -326,8 +341,8 @@ for both versions are included below.
 Windows Using Python 2
 ~~~~~~~~~~~~~~~~~~~~~~
 
-#. Install, or find `Python 2.7
-   <http://www.python.org/download/releases/2.7.3/>`_ for your system.
+#. Install, or find the most recent `Python 2.7.x version
+   <http://www.python.org/download/>`_ for your system.
 
 #. Install the `Python for Windows extensions
    <http://sourceforge.net/projects/pywin32/files/>`_.  Make sure to
@@ -344,25 +359,25 @@ Windows Using Python 2
 
       c:\> c:\Python27\python ez_setup.py
 
-#. Use that Python's `bin/easy_install` to install `virtualenv`:
+#. Install `virtualenv`:
 
    .. code-block:: text
 
       c:\> c:\Python27\Scripts\easy_install virtualenv
 
-#. Use that Python's virtualenv to make a workspace:
+#. Make a :term:`virtualenv` workspace:
 
    .. code-block:: text
 
-      c:\> c:\Python27\Scripts\virtualenv --no-site-packages env
+      c:\> set VENV=c:\env
+      c:\> c:\Python27\Scripts\virtualenv --no-site-packages %VENV%
 
-#. Switch to the ``env`` directory:
+   You can either follow the use of the environment variable, ``%VENV%``,
+   or replace it with the root directory of the :term:`virtualenv`.
+   In that case, the `set` command can be skipped.
+   If you choose the former approach, ensure that it's an absolute path.
 
-   .. code-block:: text
-
-      c:\> cd env
-
-#. (Optional) Consider using ``Scripts\activate.bat`` to make your shell
+#. (Optional) Consider using ``%VENV%\Scripts\activate.bat`` to make your shell
    environment wired to use the virtualenv.
 
 #. Use ``easy_install`` to get :app:`Pyramid` and its direct dependencies
@@ -370,48 +385,59 @@ Windows Using Python 2
 
    .. code-block:: text
 
-      c:\env> Scripts\easy_install pyramid
+      c:\env> %VENV%\Scripts\easy_install pyramid
 
 Windows Using Python 3
 ~~~~~~~~~~~~~~~~~~~~~~
 
-#. Install, or find `Python 3.2
-   <http://www.python.org/download/releases/3.2.3/>`_ for your system.
+#. Install, or find the latest version of `Python 3.x
+   <http://www.python.org/download/>`_ for your system and which is
+   supported by Pyramid.
 
 #. Install the `Python for Windows extensions
    <http://sourceforge.net/projects/pywin32/files/>`_.  Make sure to
-   pick the right download for Python 3.2 and install it using the
+   pick the right download for Python 3.x and install it using the
    same Python installation from the previous step.
 
 #. Install latest :term:`distribute` distribution into the Python you
    obtained/installed/found in the step above: download `distribute_setup.py
    <http://python-distribute.org/distribute_setup.py>`_ and run it using the
-   ``python`` interpreter of your Python 3.2 installation using a command
+   ``python`` interpreter of your Python 3.x installation using a command
    prompt:
 
    .. code-block:: text
 
+      # modify the command according to the python version, e.g.:
+      # for Python 3.2.x:
       c:\> c:\Python32\python distribute_setup.py
+      # for Python 3.3.x:
+      c:\> c:\Python33\python distribute_setup.py
 
-#. Use that Python's `bin/easy_install` to install `virtualenv`:
+#. Install :term:`virtualenv`:
 
    .. code-block:: text
 
+      # for Python 3.2.x:
       c:\> c:\Python32\Scripts\easy_install virtualenv
+      # for Python 3.3.x:
+      c:\> c:\Python33\Scripts\easy_install virtualenv
 
-#. Use that Python's virtualenv to make a workspace:
-
-   .. code-block:: text
-
-      c:\> c:\Python32\Scripts\virtualenv --no-site-packages env
-
-#. Switch to the ``env`` directory:
+#. Make a :term:`virtualenv` workspace:
 
    .. code-block:: text
 
-      c:\> cd env
+      c:\> set VENV=c:\env
+      # for Python 3.2.x:
+      c:\> c:\Python32\Scripts\virtualenv --no-site-packages %VENV%
+      # for Python 3.3.x:
+      c:\> c:\Python33\Scripts\virtualenv --no-site-packages %VENV%
 
-#. (Optional) Consider using ``Scripts\activate.bat`` to make your shell
+   You can either follow the use of the environment variable, ``%VENV%``,
+   or replace it with the root directory of the :term:`virtualenv`.
+   In that case, the `set` command can be skipped.
+   If you choose the former approach, ensure that it's an absolute path.
+
+#. (Optional) Consider using ``%VENV%\Scripts\activate.bat`` to make your shell
    environment wired to use the virtualenv.
 
 #. Use ``easy_install`` to get :app:`Pyramid` and its direct dependencies
@@ -419,7 +445,7 @@ Windows Using Python 3
 
    .. code-block:: text
 
-      c:\env> Scripts\easy_install pyramid
+      c:\env> %VENV%\Scripts\easy_install pyramid
 
 What Gets Installed
 -------------------

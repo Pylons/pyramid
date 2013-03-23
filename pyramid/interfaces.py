@@ -57,9 +57,9 @@ class IApplicationCreated(Interface):
 IWSGIApplicationCreatedEvent = IApplicationCreated # b /c
 
 class IResponse(Interface):
-    """ Represents a WSGI response using the WebOb response interface.  Some
-    attribute and method documentation of this interface references `RFC 2616
-    <http://www.w3.org/Protocols/rfc2616/>`_.
+    """ Represents a WSGI response using the WebOb response interface.
+    Some attribute and method documentation of this interface references
+    :rfc:`2616`.
 
     This interface is most famously implemented by
     :class:`pyramid.response.Response` and the HTTP exception classes in
@@ -460,7 +460,7 @@ class IAuthorizationPolicy(Interface):
 class IMultiDict(IDict): # docs-only interface
     """
     An ordered dictionary that can have multiple values for each key. A
-    multidict adds the methods ``getall``, ``getone``, ``mixed``, ``extend``
+    multidict adds the methods ``getall``, ``getone``, ``mixed``, ``extend``,
     ``add``, and ``dict_of_lists`` to the normal dictionary interface.  A
     multidict data structure is used as ``request.POST``, ``request.GET``,
     and ``request.params`` within an :app:`Pyramid` application.
@@ -744,10 +744,8 @@ class IResourceURL(Interface):
 class IContextURL(IResourceURL):
     """ An adapter which deals with URLs related to a context.
 
-    ..warning::
-
-      This interface is deprecated as of Pyramid 1.3 with the introduction of
-      IResourceURL.
+    .. deprecated:: 1.3
+       use IResourceURL instead.
     """
     # this class subclasses IResourceURL because request.resource_url looks
     # for IResourceURL via queryAdapter.  queryAdapter will find a deprecated
@@ -792,7 +790,7 @@ deprecated(
     'scheduled to be removed.   Use the '
     '"pyramid.config.Configurator.add_resource_url_adapter" method to register '
     'a class that implements "pyramid.interfaces.IResourceURL" instead. '
-    'See the "What\'s new In Pyramid 1.3" document for a further description.'
+    'See the "What\'s new In Pyramid 1.3" document for more details.'
     )
 
 class IPackageOverrides(Interface):

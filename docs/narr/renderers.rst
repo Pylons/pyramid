@@ -63,7 +63,6 @@ the ``renderer`` attribute.  For example, this call to
 with a view callable:
 
 .. code-block:: python
-   :linenos:
 
    config.add_view('myproject.views.my_view', renderer='json')
 
@@ -73,13 +72,13 @@ which renders view return values to a :term:`JSON` response serialization.
 
 Other built-in renderers include renderers which use the :term:`Chameleon`
 templating language to render a dictionary to a response.  Additional
-renderers can be added by developers to the system as necessary (see
-:ref:`adding_and_overriding_renderers`).
+renderers can be added by developers to the system as necessary.
+See :ref:`adding_and_overriding_renderers`.
 
 Views which use a renderer and return a non-Response value can vary non-body
 response attributes (such as headers and the HTTP status code) by attaching a
-property to the ``request.response`` attribute See
-:ref:`request_response_attr`.
+property to the ``request.response`` attribute.
+See :ref:`request_response_attr`.
 
 If the :term:`view callable` associated with a :term:`view configuration`
 returns a Response object directly, any renderer associated with the view
@@ -166,7 +165,6 @@ The body of the response returned by such a view will be a string
 representing the ``str()`` serialization of the return value:
 
 .. code-block:: python
-   :linenos:
 
    {'content': 'Hello!'}
 
@@ -204,7 +202,6 @@ The body of the response returned by such a view will be a string
 representing the JSON serialization of the return value:
 
 .. code-block:: python
-   :linenos:
 
    '{"content": "Hello!"}'
 
@@ -294,9 +291,8 @@ with the object.
 See :class:`pyramid.renderers.JSON` and
 :ref:`adding_and_overriding_renderers` for more information.
 
-.. note::
-
-   Serializing custom objects is a feature new in Pyramid 1.4.
+.. versionadded:: 1.4
+   Serializing custom objects.
 
 .. index::
    pair: renderer; JSONP
@@ -306,9 +302,7 @@ See :class:`pyramid.renderers.JSON` and
 JSONP Renderer
 ~~~~~~~~~~~~~~
 
-.. note::
-
-   This feature is new in Pyramid 1.1.
+.. versionadded:: 1.1
 
 :class:`pyramid.renderers.JSONP` is a `JSONP
 <http://en.wikipedia.org/wiki/JSONP>`_ renderer factory helper which
@@ -322,6 +316,7 @@ time "by hand".  Configure a JSONP renderer using the
 .. code-block:: python
 
    from pyramid.config import Configurator
+   from pyramid.renderers import JSONP
 
    config = Configurator()
    config.add_renderer('jsonp', JSONP(param_name='callback'))
@@ -571,8 +566,6 @@ in :ref:`request_module`.  For more information on the API of
 Deprecated Mechanism to Vary Attributes of Rendered Responses
 -------------------------------------------------------------
 
-.. warning:: This section describes behavior deprecated in Pyramid 1.1.
-
 In previous releases of Pyramid (1.0 and before), the ``request.response``
 attribute did not exist.  Instead, Pyramid required users to set special
 ``response_`` -prefixed attributes of the request to influence response
@@ -619,7 +612,6 @@ For example, to add a renderer which renders views which have a
 ``renderer`` attribute that is a path that ends in ``.jinja2``:
 
 .. code-block:: python
-   :linenos:
 
    config.add_renderer('.jinja2', 'mypackage.MyJinja2Renderer')
 
@@ -689,12 +681,10 @@ There are essentially two different kinds of renderer factories:
    :term:`package`.
 
 Here's an example of the registration of a simple renderer factory via
-:meth:`~pyramid.config.Configurator.add_renderer`:
+:meth:`~pyramid.config.Configurator.add_renderer`, where ``config``
+is an instance of :meth:`pyramid.config.Configurator`:
 
 .. code-block:: python
-   :linenos:
-
-   # config is an instance of pyramid.config.Configurator
 
    config.add_renderer(name='amf', factory='my.package.MyAMFRenderer')
 
@@ -725,10 +715,8 @@ Here's an example of the registration of a more complicated renderer
 factory, which expects to be passed a filesystem path:
 
 .. code-block:: python
-   :linenos:
 
-   config.add_renderer(name='.jinja2',
-                       factory='my.package.MyJinja2Renderer')
+   config.add_renderer(name='.jinja2', factory='my.package.MyJinja2Renderer')
 
 Adding the above code to your application startup will allow you to use the
 ``my.package.MyJinja2Renderer`` renderer factory implementation in view
@@ -769,7 +757,6 @@ extension for the same kinds of templates.  For example, to associate the
 :meth:`pyramid.config.Configurator.add_renderer` method:
 
 .. code-block:: python
-   :linenos:
 
    config.add_renderer('.zpt', 'pyramid.chameleon_zpt.renderer_factory')
 
@@ -781,7 +768,6 @@ rendered via a Chameleon ZPT page template renderer, use a variation on the
 following in your application's startup code:
 
 .. code-block:: python
-   :linenos:
 
    config.add_renderer('.pt', 'mypackage.pt_renderer')
 
@@ -794,7 +780,6 @@ ones which do not possess a ``renderer`` attribute), pass ``None`` as
 the ``name`` attribute to the renderer tag:
 
 .. code-block:: python
-   :linenos:
 
    config.add_renderer(None, 'mypackage.json_renderer_factory')
 
@@ -823,8 +808,8 @@ sets an ``override_renderer`` attribute on the request itself, which is the
 .. code-block:: python
    :linenos:
 
-   from pyramid.event import subscriber
-   from pyramid.event import NewRequest
+   from pyramid.events import subscriber
+   from pyramid.events import NewRequest
 
    @subscriber(NewRequest)
    def set_xmlrpc_params(event):

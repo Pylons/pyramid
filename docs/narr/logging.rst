@@ -22,25 +22,23 @@ Logging Configuration
 ---------------------
 
 A :app:`Pyramid` project created from a :term:`scaffold` is configured to
-allow you to send messages to `Python standard library logging package
-<http://docs.python.org/library/logging.html>`_ loggers from within your
+allow you to send messages to :mod:`Python standard library logging package
+<logging>` loggers from within your
 application.  In particular, the :term:`PasteDeploy` ``development.ini`` and
 ``production.ini`` files created when you use a scaffold include a basic
 configuration for the Python :mod:`logging` package.
 
-PasteDeploy ``.ini`` files use the Python standard library `ConfigParser
-format <http://docs.python.org/lib/module-ConfigParser.html>`_; this the same
-format used as the Python `logging module's Configuration file format
-<http://docs.python.org/lib/logging-config-fileformat.html>`_.  The
-application-related and logging-related sections in the configuration file
+PasteDeploy ``.ini`` files use the Python standard library :mod:`ConfigParser
+format <ConfigParser>`; this is the same format used as the Python
+:ref:`logging module's Configuration file format <logging-config-fileformat>`.
+The application-related and logging-related sections in the configuration file
 can coexist peacefully, and the logging-related sections in the file are used
 from when you run ``pserve``.
 
 The ``pserve`` command calls the :func:`pyramid.paster.setup_logging`
-function, a thin wrapper around the `logging.fileConfig
-<http://docs.python.org/lib/logging-config-api.html>`_ using the specified
-ini file if it contains a ``[loggers]`` section (all of the
-scaffold-generated ``.ini`` files do). ``setup_logging`` reads the
+function, a thin wrapper around the :func:`logging.config.fileConfig`
+using the specified ``.ini`` file if it contains a ``[loggers]`` section
+(all of the scaffold-generated ``.ini`` files do). ``setup_logging`` reads the
 logging configuration from the ini file upon which ``pserve`` was
 invoked.
 
@@ -334,7 +332,7 @@ To this:
                mypyramidapp
 
 Using PasteDeploy this way to form and serve a pipeline is equivalent to
-wrapping your app in a TransLogger instance via the bottom the ``main``
+wrapping your app in a TransLogger instance via the bottom of the ``main``
 function of your project's ``__init__`` file:
 
 .. code-block:: python 
@@ -350,7 +348,7 @@ called with no arguments, so it 'just works' in environments that don't
 configure logging. Since we've configured our own logging handlers, we need
 to disable that option via ``setup_console_handler = False``.
 
-With the filter in place, TransLogger's logger (named the 'wsgi' logger) will
+With the filter in place, TransLogger's logger (named the ``wsgi`` logger) will
 propagate its log messages to the parent logger (the root logger), sending
 its output to the console when we request a page:
 
@@ -364,14 +362,18 @@ its output to the console when we request a page:
     Firefox/2.0.0.6" 
 
 To direct TransLogger to an ``access.log`` FileHandler, we need to add that
-FileHandler to the wsgi logger's list of handlers:
+FileHandler to the list of handlers (named ``accesslog``), and ensure that the 
+``wsgi`` logger is configured and uses this handler accordingly:
 
 .. code-block:: ini 
 
     # Begin logging configuration 
 
-    [loggers] 
-    keys = root, myapp, wsgi 
+    [loggers]
+    keys = root, myapp, wsgi
+
+    [handlers]
+    keys = console, accesslog
 
     [logger_wsgi] 
     level = INFO 
@@ -387,19 +389,18 @@ FileHandler to the wsgi logger's list of handlers:
 
 As mentioned above, non-root loggers by default propagate their log records
 to the root logger's handlers (currently the console handler). Setting
-``propagate`` to 0 (false) here disables this; so the ``wsgi`` logger directs
-its records only to the ``accesslog`` handler.
+``propagate`` to ``0`` (``False``) here disables this; so the ``wsgi`` logger 
+directs its records only to the ``accesslog`` handler.
 
 Finally, there's no need to use the ``generic`` formatter with TransLogger as
 TransLogger itself provides all the information we need. We'll use a
-formatter that passes-through the log messages as is:
+formatter that passes-through the log messages as is. Add a new formatter
+called ``accesslog`` by include the following in your configuration file:
 
 .. code-block:: ini 
 
     [formatters] 
     keys = generic, accesslog 
-
-.. code-block:: ini 
 
     [formatter_accesslog] 
     format = %(message)s 

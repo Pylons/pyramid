@@ -46,12 +46,12 @@ maintain them ourselves.  As a result, we've had to make some changes.
 Previously (in Pyramid 1.0, 1.1 and 1.2), you created a Pyramid application
 using ``paster create``, like so::
 
-    $ myvenv/bin/paster create -t pyramid_starter foo
+    $ $VENV/bin/paster create -t pyramid_starter foo
 
 In 1.3, you're now instead required to create an application using
 ``pcreate`` like so::
 
-    $ myvenv/bin/pcreate -s starter foo
+    $ $VENV/bin/pcreate -s starter foo
 
 ``pcreate`` is required to be used for internal Pyramid scaffolding;
 externally distributed scaffolding may allow for both ``pcreate`` and/or
@@ -59,11 +59,11 @@ externally distributed scaffolding may allow for both ``pcreate`` and/or
 
 In previous Pyramid versions, you ran a Pyramid application like so::
 
-    $ myvenv/bin/paster serve development.ini
+    $ $VENV/bin/paster serve development.ini
 
 Instead, you now must use the ``pserve`` command in 1.3::
 
-    $ myvenv/bin/pserve development.ini
+    $ $VENV/bin/pserve development.ini
 
 The ``ini`` configuration file format supported by Pyramid has not changed.
 As a result, Python 2-only users can install PasteScript manually and use
@@ -212,7 +212,7 @@ Not Found helpers:
 - New API: :meth:`pyramid.config.Configurator.add_notfound_view`.  This is a
   wrapper for :meth:`pyramid.Config.configurator.add_view` which provides
   support for an "append_slash" feature as well as doing the right thing when
-  it comes to permissions (a not found view should always be public).  It
+  it comes to permissions (a Not Found View should always be public).  It
   should be preferred over calling ``add_view`` directly with
   ``context=HTTPNotFound`` as was previously recommended.
 
@@ -492,7 +492,7 @@ Known Issues
   develop`` on Python 3.2, it will quit with an installation error while
   trying to install ``Pygments``.  If this happens, please just rerun the
   ``setup.py develop`` command again, and it will complete successfully.
-  This is due to a minor bug in SQLAlchemy 0.7.5 under Python 3, and will be
+  This is due to a minor bug in SQLAlchemy 0.7.5 under Python 3, and has been
   fixed in a later SQLAlchemy release.  Keep an eye on
   http://www.sqlalchemy.org/trac/ticket/2421
 
@@ -524,7 +524,7 @@ Documentation Enhancements
 
 - Removed the "Running Pyramid on Google App Engine" tutorial from the main
   docs.  It survives on in the Cookbook
-  (http://docs.pylonsproject.org/projects/pyramid_cookbook/en/latest/gae.html).
+  (http://docs.pylonsproject.org/projects/pyramid_cookbook/en/latest/deployment/gae.html).
   Rationale: it provides the correct info for the Python 2.5 version of GAE
   only, and this version of Pyramid does not support Python 2.5.
 
