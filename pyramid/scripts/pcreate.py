@@ -84,6 +84,7 @@ class PCreateCommand(object):
         project_name = os.path.basename(args[0])
         output_dir = os.path.abspath(os.path.normpath(args[0]))
         pkg_name = _bad_chars_re.sub('', project_name.lower())
+        pkg_full_name = args[0]
         safe_name = pkg_resources.safe_name(project_name)
         egg_name = pkg_resources.to_filename(safe_name)
         if options.output_dir != None:
@@ -91,6 +92,7 @@ class PCreateCommand(object):
         vars = {
             'project': project_name,
             'package': pkg_name,
+            'package_full_name': pkg_full_name,
             'egg': egg_name,
             }
         for scaffold_name in options.scaffold_name:
