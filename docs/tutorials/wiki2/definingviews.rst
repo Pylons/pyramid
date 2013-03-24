@@ -346,20 +346,20 @@ We can finally examine our application in a browser (See
 :ref:`wiki2-start-the-application`).  Launch a browser and visit
 each of the following URLs, check that the result is as expected:
 
-- ``http://localhost:6543`` in a browser invokes the
+- http://localhost:6543 in a browser invokes the
   ``view_wiki`` view.  This always redirects to the ``view_page`` view
   of the FrontPage page object.
 
-- ``http://localhost:6543/FrontPage`` in a browser invokes
+- http://localhost:6543/FrontPage in a browser invokes
   the ``view_page`` view of the front page object.
 
-- ``http://localhost:6543/FrontPage/edit_page`` in a browser
+- http://localhost:6543/FrontPage/edit_page in a browser
   invokes the edit view for the front page object.
 
-- ``http://localhost:6543/add_page/SomePageName`` in a
+- http://localhost:6543/add_page/SomePageName in a
   browser invokes the add view for a page.
 
-- To generate an error, visit ``http://localhost:6543/foobars/edit_page`` which
+- To generate an error, visit http://localhost:6543/foobars/edit_page which
   will generate a ``NoResultFound: No row was found for one()`` error.
   You'll see an interactive traceback facility provided 
   by :term:`pyramid_debugtoolbar`.
