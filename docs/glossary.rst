@@ -901,9 +901,9 @@ Glossary
      The scaffold has been retired but the demo plays a similar role. 
 
    Pyramid Cookbook
-     An additional documentation resource for Pyramid which presents topical,
-     practical usages of Pyramid available via
-     http://docs.pylonsproject.org/ .
+     Additional documentation for Pyramid which presents topical,
+     practical uses of Pyramid:
+     http://docs.pylonsproject.org/projects/pyramid_cookbook/en/latest.
 
    distutils
      The standard system for packaging and distributing Python packages.  See
