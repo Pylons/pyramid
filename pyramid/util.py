@@ -234,18 +234,15 @@ def object_description(object):
     """ Produce a human-consumable text description of ``object``,
     usually involving a Python dotted name. For example:
 
-    .. code-block:: python
-
-       >>> object_description(None)
-       u'None'
-       >>> from xml.dom import minidom
-       >>> object_description(minidom)
-       u'module xml.dom.minidom'
-       >>> object_description(minidom.Attr)
-       u'class xml.dom.minidom.Attr'
-       >>> object_description(minidom.Attr.appendChild)
-       u'method appendChild of class xml.dom.minidom.Attr'
-       >>> 
+    >>> object_description(None)
+    u'None'
+    >>> from xml.dom import minidom
+    >>> object_description(minidom)
+    u'module xml.dom.minidom'
+    >>> object_description(minidom.Attr)
+    u'class xml.dom.minidom.Attr'
+    >>> object_description(minidom.Attr.appendChild)
+    u'method appendChild of class xml.dom.minidom.Attr'
 
     If this method cannot identify the type of the object, a generic
     description ala ``object <object.__name__>`` will be returned.

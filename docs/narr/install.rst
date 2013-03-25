@@ -341,7 +341,7 @@ for both versions are included below.
 Windows Using Python 2
 ~~~~~~~~~~~~~~~~~~~~~~
 
-#. Install, or find the most recent `Python 2.7.x version
+#. Install the most recent `Python 2.7.x version
    <http://www.python.org/download/>`_ for your system.
 
 #. Install the `Python for Windows extensions
