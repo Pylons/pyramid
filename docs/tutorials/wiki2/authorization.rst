@@ -381,21 +381,21 @@ We can finally examine our application in a browser (See
 :ref:`wiki2-start-the-application`).  Launch a browser and visit
 each of the following URLs, check that the result is as expected:
 
-- ``http://localhost:6543/`` invokes the
+- http://localhost:6543/ invokes the
   ``view_wiki`` view.  This always redirects to the ``view_page`` view
   of the FrontPage page object.  It is executable by any user.
 
-- ``http://localhost:6543/FrontPage`` invokes
+- http://localhost:6543/FrontPage invokes
   the ``view_page`` view of the FrontPage page object.
 
-- ``http://localhost:6543/FrontPage/edit_page``
+- http://localhost:6543/FrontPage/edit_page
   invokes the edit view for the FrontPage object.  It is executable by
   only the ``editor`` user.  If a different user (or the anonymous
   user) invokes it, a login form will be displayed.  Supplying the
   credentials with the username ``editor``, password ``editor`` will
   display the edit page form.
 
-- ``http://localhost:6543/add_page/SomePageName``
+- http://localhost:6543/add_page/SomePageName
   invokes the add view for a page.  It is executable by only
   the ``editor`` user.  If a different user (or the anonymous user)
   invokes it, a login form will be displayed.  Supplying the
