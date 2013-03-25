@@ -100,7 +100,7 @@ listed in the following table:
 |                      |  with existing        |             |            |            |
 |                      |  content.             |             |            |            |
 |                      |                       |             |            |            |
-|                      |  If the form was      |             |            |            |
+|                      |  If the form is       |             |            |            |
 |                      |  submitted, redirect  |             |            |            |
 |                      |  to /PageName         |             |            |            |
 +----------------------+-----------------------+-------------+------------+------------+
@@ -110,15 +110,15 @@ listed in the following table:
 |                      |  the edit form        |             |            |            |
 |                      |  without content.     |             |            |            |
 |                      |                       |             |            |            |
-|                      |  If the form was      |             |            |            |
+|                      |  If the form is       |             |            |            |
 |                      |  submitted,           |             |            |            |
 |                      |  redirect to          |             |            |            |
 |                      |  /PageName            |             |            |            |
 +----------------------+-----------------------+-------------+------------+------------+
 | /login               |  Display login form,  |  login      |  login.pt  |            |
-|                      |   Forbidden [3]_      |             |            |            |
+|                      |  Forbidden [3]_       |             |            |            |
 |                      |                       |             |            |            |
-|                      |  If the form was      |             |            |            |
+|                      |  If the form is       |             |            |            |
 |                      |  submitted,           |             |            |            |
 |                      |  authenticate.        |             |            |            |
 |                      |                       |             |            |            |
