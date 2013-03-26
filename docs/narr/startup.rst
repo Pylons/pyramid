@@ -8,12 +8,12 @@ you'll see something much like this show up on the console:
 
 .. code-block:: text
 
-  $ pserve myproject/MyProject.ini
+  $ pserve development.ini
   Starting server in PID 16601.
   serving on 0.0.0.0:6543 view at http://127.0.0.1:6543
 
 This chapter explains what happens between the time you press the "Return"
-key on your keyboard after typing ``pserve myproject/MyProject.ini``
+key on your keyboard after typing ``pserve development.ini``
 and the time the line ``serving on 0.0.0.0:6543 ...`` is output to your
 console.
 
