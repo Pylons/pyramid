@@ -932,12 +932,12 @@ Glossary
      :ref:`registering_tweens`.
 
    pyramid_debugtoolbar
-     A Pyramid add on which displays a helpful debug toolbar "on top of" HTML
+     A Pyramid add-on which displays a helpful debug toolbar "on top of" HTML
      pages rendered by your application, displaying request, routing, and
      database information.  :mod:`pyramid_debugtoolbar` is configured into
      the ``development.ini`` of all applications which use a Pyramid
      :term:`scaffold`.  For more information, see
-     http://docs.pylonsproject.org/projects/pyramid_debugtoolbar/dev/ .
+     http://docs.pylonsproject.org/projects/pyramid_debugtoolbar/en/latest/.
 
    scaffold
      A project template that generates some of the major parts of a Pyramid
