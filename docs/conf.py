@@ -65,6 +65,9 @@ intersphinx_mapping = {
           None),
     'venusian':
         ('http://docs.pylonsproject.org/projects/venusian/en/latest', None),
+    'toolbar':
+        ('http://docs.pylonsproject.org/projects/pyramid_debugtoolbar/en/latest',
+         None),
 }
 
 # Add any paths that contain templates here, relative to this directory.
