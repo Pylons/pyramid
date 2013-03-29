@@ -864,14 +864,14 @@ class Configurator(
         This pushes a dictionary containing the :term:`application
         registry` implied by ``registry`` attribute of this
         configurator and the :term:`request` implied by the
-        ``request`` argument on to the :term:`thread local` stack
+        ``request`` argument onto the :term:`thread local` stack
         consulted by various :mod:`pyramid.threadlocal` API
         functions."""
         self.manager.push({'registry':self.registry, 'request':request})
 
     def end(self):
         """ Indicate that application or test configuration has ended.
-        This pops the last value pushed on to the :term:`thread local`
+        This pops the last value pushed onto the :term:`thread local`
         stack (usually by the ``begin`` method) and returns that
         value.
         """
@@ -963,7 +963,7 @@ class Configurator(
         # registry configured.
         global_registries.add(self.registry)
 
-        # Push the registry on to the stack in case any code that depends on
+        # Push the registry onto the stack in case any code that depends on
         # the registry threadlocal APIs used in listeners subscribed to the
         # IApplicationCreated event.
         self.manager.push({'registry':self.registry, 'request':None})
