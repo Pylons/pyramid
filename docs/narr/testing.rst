@@ -128,7 +128,7 @@ functions accepts various arguments that influence the environment of the
 test.  See the :ref:`testing_module` chapter for information about the extra
 arguments supported by these functions.
 
-If you also want to make :func:`~pyramid.get_current_request` return something
+If you also want to make :func:`~pyramid.threadlocal.get_current_request` return something
 other than ``None`` during the course of a single test, you can pass a
 :term:`request` object into the :func:`pyramid.testing.setUp` within the
 ``setUp`` method of your test:
@@ -231,7 +231,7 @@ application registry is not created and populated (e.g. by initializing the
 configurator with an authorization policy), like when you invoke application
 code via a unit test, :app:`Pyramid` API functions will tend to either fail
 or return default results.  So how do you test the branch of the code in this
-view function that raises :exc:`HTTPForbidden`?
+view function that raises :exc:`~pyramid.httpexceptions.HTTPForbidden`?
 
 The testing API provided by :app:`Pyramid` allows you to simulate various
 application registry registrations for use under a unit testing framework
@@ -272,7 +272,7 @@ without needing to invoke the actual application configuration implied by its
            self.assertEqual(response, {'greeting':'hello'})
            
 In the above example, we create a ``MyTest`` test case that inherits from
-:mod:`unittest.TestCase`.  If it's in our :app:`Pyramid` application, it will
+:class:`unittest.TestCase`.  If it's in our :app:`Pyramid` application, it will
 be found when ``setup.py test`` is run.  It has two test methods.
 
 The first test method, ``test_view_fn_forbidden`` tests the ``view_fn`` when
@@ -287,8 +287,9 @@ request object that requires less setup than a "real" :app:`Pyramid` request.
 We call the function being tested with the manufactured request.  When the
 function is called, :func:`pyramid.security.has_permission` will call the
 "dummy" authentication policy we've registered through
-:meth:`~pyramid.config.Configuration.testing_securitypolicy`, which denies
-access.  We check that the view function raises a :exc:`HTTPForbidden` error.
+:meth:`~pyramid.config.Configurator.testing_securitypolicy`, which denies
+access.  We check that the view function raises a
+:exc:`~pyramid.httpexceptions.HTTPForbidden` error.
 
 The second test method, named ``test_view_fn_allowed`` tests the alternate
 case, where the authentication policy allows access.  Notice that we pass
@@ -425,4 +426,4 @@ invoke the root URL.  We then assert that the returned HTML has the string
 ``Pyramid`` in it.
 
 See the :term:`WebTest` documentation for further information about the
-methods available to a :class:`webtest.TestApp` instance.
+methods available to a :class:`webtest.app.TestApp` instance.
