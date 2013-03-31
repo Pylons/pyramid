@@ -209,7 +209,7 @@ like this:
 
 - Wire the new views and assets created in the new package up using
   imperative registrations within the ``main`` function of the
-  ``__init__.py`` file of the new application.  These wiring should happen
+  ``__init__.py`` file of the new application.  This wiring should happen
   *after* including the configuration functions of the old application.
   These registrations will extend or override any registrations performed by
   the original application.  See :ref:`overriding_views`,
