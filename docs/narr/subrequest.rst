@@ -250,7 +250,7 @@ It's a poor idea to use the original ``request`` object as an argument to
 :meth:`~pyramid.request.Request.invoke_subrequest`.  You should construct a
 new request instead as demonstrated in the above example, using
 :meth:`pyramid.request.Request.blank`.  Once you've constructed a request
-object, you'll need to massage the it to match the view callable you'd like
+object, you'll need to massage it to match the view callable you'd like
 to be executed during the subrequest.  This can be done by adjusting the
 subrequest's URL, its headers, its request method, and other attributes.  The
 documentation for :class:`pyramid.request.Request` exposes the methods you
