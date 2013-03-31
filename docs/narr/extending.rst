@@ -50,7 +50,7 @@ layers are apt to provide the necessary "opinions" (such as mandating a
 storage layer, a templating system, and a structured, well-documented pattern
 of registering that certain URLs map to certain bits of code) which makes the
 concept of a "pluggable application" possible.  "Pluggable applications",
-thus, should not plug in to Pyramid itself but should instead plug into a
+thus, should not plug into Pyramid itself but should instead plug into a
 system written atop Pyramid.
 
 Although it does not provide for "pluggable applications", Pyramid *does*
