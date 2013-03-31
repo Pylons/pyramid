@@ -31,11 +31,11 @@ Tweens
 ~~~~~~
 
 A :term:`tween` is used to wrap the Pyramid router's primary request handling
-function.  This is a feature that can be used by Pyramid framework
-extensions, to provide, for example, view timing support and can provide a
-convenient place to hang bookkeeping code.  Tweens are is a little like
-:term:`WSGI` middleware, but have access to Pyramid functionality such as
-renderers and a full-featured request object.
+function.  This is a feature that can be used by Pyramid framework extensions,
+to provide, for example, view timing support and can provide a convenient
+place to hang bookkeeping code.  Tweens are is a little like :term:`WSGI`
+:term:`middleware`, but have access to Pyramid functionality such as renderers
+and a full-featured request object.
 
 To support this feature, a new configurator directive exists named
 :meth:`pyramid.config.Configurator.add_tween`.  This directive adds a
@@ -51,7 +51,7 @@ Scaffolding Changes
 ~~~~~~~~~~~~~~~~~~~
 
 - All scaffolds now use the ``pyramid_tm`` package rather than the
-  ``repoze.tm2`` middleware to manage transaction management.
+  ``repoze.tm2`` :term:`middleware` to manage transaction management.
 
 - The ZODB scaffold now uses the ``pyramid_zodbconn`` package rather than the
   ``repoze.zodbconn`` package to provide ZODB integration.
@@ -59,9 +59,9 @@ Scaffolding Changes
 - All scaffolds now use the ``pyramid_debugtoolbar`` package rather than the
   ``WebError`` package to provide interactive debugging features.
 
-- Projects created via a scaffold no longer depend on the ``WebError``
-  package at all; configuration in the ``production.ini`` file which used to
-  require its ``error_catcher`` middleware has been removed.  Configuring
+- Projects created via a scaffold no longer depend on the ``WebError`` package
+  at all; configuration in the ``production.ini`` file which used to require
+  its ``error_catcher`` :term:`middleware` has been removed.  Configuring
   error catching / email sending is now the domain of the ``pyramid_exclog``
   package (see http://docs.pylonsproject.org/projects/pyramid_exclog/dev/).
 

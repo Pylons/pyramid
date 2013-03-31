@@ -95,7 +95,7 @@ Default HTTP Exception View
   is passed for this value, an exception view for HTTP exceptions will not be
   registered.  Passing ``None`` returns the behavior of raising an HTTP
   exception to that of Pyramid 1.0 (the exception will propagate to
-  middleware and to the WSGI server).
+  :term:`middleware` and to the WSGI server).
 
 ``http_cache``
 ~~~~~~~~~~~~~~

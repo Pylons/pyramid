@@ -298,14 +298,14 @@ Request Logging with Paste's TransLogger
 ----------------------------------------
 
 Paste provides the `TransLogger 
-<http://pythonpaste.org/modules/translogger.html>`_ middleware for logging 
-requests using the `Apache Combined Log Format 
+<http://pythonpaste.org/modules/translogger.html>`_ :term:`middleware` for
+logging requests using the `Apache Combined Log Format
 <http://httpd.apache.org/docs/2.2/logs.html#combined>`_. TransLogger combined 
 with a FileHandler can be used to create an ``access.log`` file similar to 
 Apache's. 
 
-Like any standard middleware with a Paste entry point, TransLogger can be
-configured to wrap your application using ``.ini`` file syntax.  First,
+Like any standard :term:`middleware` with a Paste entry point, TransLogger can
+be configured to wrap your application using ``.ini`` file syntax.  First,
 rename your Pyramid ``.ini`` file's ``[app:main]`` section to
 ``[app:mypyramidapp]``, then add a ``[filter:translogger]`` section, then use
 a ``[pipeline:main]`` section file to form a WSGI pipeline with both the
