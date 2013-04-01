@@ -155,7 +155,7 @@ In the example above, the call to
 exception.  This is because it's using the default value for ``use_tweens``,
 which is ``False``.  You can pass ``use_tweens=True`` instead to ensure that
 it will convert an exception to a Response if an :term:`exception view` is
-configured instead of raising the exception.  This because exception views
+configured instead of raising the exception.  This is because exception views
 are called by the exception view :term:`tween` as described in
 :ref:`exception_views` when any view raises an exception.
 
