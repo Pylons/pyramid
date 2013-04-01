@@ -1110,8 +1110,8 @@ Once you've created a tween factory, you can register it into the implicit
 tween chain using the :meth:`pyramid.config.Configurator.add_tween` method
 using its :term:`dotted Python name`.
 
-Here's an example of registering the a tween factory as an "implicit"
-tween in a Pyramid application:
+Here's an example of registering a tween factory as an "implicit" tween in a
+Pyramid application:
 
 .. code-block:: python
    :linenos:
