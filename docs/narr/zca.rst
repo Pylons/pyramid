@@ -44,7 +44,7 @@ framework implementation detail.
 
 However, developers who are already used to writing :term:`Zope`
 applications often still wish to use the ZCA while building a
-:app:`Pyramid` application; :mod:`pyramid` makes this possible.
+:app:`Pyramid` application; :app:`Pyramid` makes this possible.
 
 .. index::
    single: get_current_registry

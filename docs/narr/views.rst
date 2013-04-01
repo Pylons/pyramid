@@ -39,7 +39,7 @@ object.  A request object represents a :term:`WSGI` environment provided to
 object contains everything your application needs to know about the specific
 HTTP request being made.
 
-A view callable's ultimate responsibility is to create a :mod:`Pyramid`
+A view callable's ultimate responsibility is to create a :app:`Pyramid`
 :term:`Response` object. This can be done by creating a :term:`Response`
 object in the view callable code and returning it directly or by raising
 special kinds of exceptions from within the body of a view callable.
