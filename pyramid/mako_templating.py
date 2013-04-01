@@ -82,7 +82,6 @@ class PkgResourceTemplateLookup(TemplateLookup):
                     "Can not locate template for uri %r" % uri)
         return TemplateLookup.get_template(self, uri)
 
-
 registry_lock = threading.Lock()
 
 class MakoRendererFactoryHelper(object):
@@ -90,14 +89,11 @@ class MakoRendererFactoryHelper(object):
         self.settings_prefix = settings_prefix
 
     def __call__(self, info):
-        p = re.compile(
-                r'(?P<asset>[\w_.:/-]+)'
-                r'(?:\#(?P<defname>[\w_]+))?'
-                r'(\.(?P<ext>.*))'
-                )
-        asset, defname, ext = p.match(info.name).group(
-            'asset', 'defname', 'ext'
-            )
+        defname = None
+        asset, ext = info.name.rsplit('.', 1)
+        if '#' in asset:
+            asset, defname = asset.rsplit('#', 1)
+
         path = '%s.%s' % (asset, ext)
         registry = info.registry
         settings = info.settings
