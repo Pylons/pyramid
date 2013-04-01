@@ -33,7 +33,7 @@ Tweens
 A :term:`tween` is used to wrap the Pyramid router's primary request handling
 function.  This is a feature that can be used by Pyramid framework extensions,
 to provide, for example, view timing support and can provide a convenient
-place to hang bookkeeping code.  Tweens are is a little like :term:`WSGI`
+place to hang bookkeeping code.  Tweens are a little like :term:`WSGI`
 :term:`middleware`, but have access to Pyramid functionality such as renderers
 and a full-featured request object.
 
