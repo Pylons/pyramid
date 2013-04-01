@@ -78,6 +78,10 @@ Bug Fixes
   methods. Now the views are found and no predicate mismatch is
   raised.
 
+- Spaces and dots may now be in mako renderer template paths. This was
+  broken when support for the new makodef syntax was added in 1.4a1.
+  See https://github.com/Pylons/pyramid/issues/950
+
 1.4 (2012-12-18)
 ================
 
