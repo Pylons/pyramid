@@ -109,9 +109,8 @@ callable:
    instance of the :exc:`~pyramid.httpexceptions.HTTPNotFound` exception that
    caused the Not Found View to be called.  The value of
    ``request.exception.message`` will be a value explaining why the Not Found
-   error was raised.  This message will be different when the
-   ``pyramid.debug_notfound`` environment setting is true than it is when it
-   is false.
+   error was raised.  This message has different values depending whether the
+   ``pyramid.debug_notfound`` environment setting is true or false.
 
 .. note::
 
@@ -208,9 +207,9 @@ Here's some sample code that implements a minimal forbidden view:
    that caused the forbidden view to be called.  The value of
    ``request.exception.message`` will be a value explaining why the forbidden
    was raised and ``request.exception.result`` will be extended information
-   about the forbidden exception.  These messages will be different when the
-   ``pyramid.debug_authorization`` environment setting is true than it is when
-   it is false.
+   about the forbidden exception.  These messages have different values
+   depending whether the ``pyramid.debug_authorization`` environment setting
+   is true or false.
 
 .. index::
    single: request factory
