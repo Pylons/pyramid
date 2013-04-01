@@ -160,7 +160,7 @@ Minor Feature Additions
   a value of ``edit``.
 
 - Support an ``onerror`` keyword argument to
-  :meth:`pyramid.config.Configurator.scan``.  This argument is passed to
+  :meth:`pyramid.config.Configurator.scan`.  This argument is passed to
   :meth:`venusian.Scanner.scan` to influence error behavior when an exception
   is raised during scanning.
 
