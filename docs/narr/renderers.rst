@@ -362,7 +362,7 @@ For example (Javascript):
    jqhxr = $.getJSON(api_url);
 
 The string ``callback=?`` above in the ``url`` param to the JQuery
-``getAjax`` function indicates to jQuery that the query should be made as
+``getJSON`` function indicates to jQuery that the query should be made as
 a JSONP request; the ``callback`` parameter will be automatically filled
 in for you and used.
 
@@ -720,7 +720,7 @@ factory, which expects to be passed a filesystem path:
 
 Adding the above code to your application startup will allow you to use the
 ``my.package.MyJinja2Renderer`` renderer factory implementation in view
-configurations by referring to any ``renderer`` which *ends in* ``.jinja`` in
+configurations by referring to any ``renderer`` which *ends in* ``.jinja2`` in
 the ``renderer`` attribute of a :term:`view configuration`:
 
 .. code-block:: python

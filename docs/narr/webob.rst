@@ -354,7 +354,7 @@ initialization.
    cause ``DBSession.remove`` to be called in an application generated from
    any :app:`Pyramid` scaffold, because these all use the ``pyramid_tm``
    package.  The cleanup done by ``DBSession.remove`` is unnecessary when
-   ``pyramid_tm`` middleware is configured into the application.
+   ``pyramid_tm`` :term:`middleware` is configured into the application.
 
 More Details
 ++++++++++++

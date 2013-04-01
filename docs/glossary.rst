@@ -314,7 +314,7 @@ Glossary
 
    pipeline
      The :term:`PasteDeploy` term for a single configuration of a WSGI
-     server, a WSGI application, with a set of middleware in-between.
+     server, a WSGI application, with a set of :term:`middleware` in-between.
 
    Zope
      `The Z Object Publishing Framework <http://zope.org>`_, a
@@ -926,7 +926,7 @@ Glossary
      provide, for example, Pyramid-specific view timing support, bookkeeping
      code that examines exceptions before they are returned to the upstream
      WSGI application, or a variety of other features.  Tweens behave a bit
-     like :term:`WSGI` 'middleware' but they have the benefit of running in a
+     like :term:`WSGI` :term:`middleware` but they have the benefit of running in a
      context in which they have access to the Pyramid :term:`application
      registry` as well as the Pyramid rendering machinery.  See
      :ref:`registering_tweens`.

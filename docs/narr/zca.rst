@@ -151,7 +151,6 @@ Consider the following bit of idiomatic :app:`Pyramid` startup code:
 .. code-block:: python
    :linenos:
 
-   from zope.component import getGlobalSiteManager
    from pyramid.config import Configurator
 
    def app(global_settings, **settings):
@@ -188,7 +187,6 @@ For example:
 .. code-block:: python
    :linenos:
 
-   from zope.component import getGlobalSiteManager
    from pyramid.config import Configurator
 
    def app(global_settings, **settings):
