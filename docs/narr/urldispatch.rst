@@ -1263,7 +1263,7 @@ invoked with the request that caused the invocation.
 
 For most usage, you needn't understand more than this; how it works is an
 implementation detail.  In the interest of completeness, however, we'll
-explain how it *does* work in the this section.  You can skip it if you're
+explain how it *does* work in this section.  You can skip it if you're
 uninterested.
 
 When a view is associated with a route configuration, :app:`Pyramid` ensures
