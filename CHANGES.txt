@@ -82,6 +82,11 @@ Bug Fixes
   broken when support for the new makodef syntax was added in 1.4a1.
   See https://github.com/Pylons/pyramid/issues/950
 
+- ``pyramid.debug_authorization=true`` will now correctly print out
+  ``Allowed`` for views registered with ``NO_PERMISSION_REQUIRED`` instead
+  of invoking the ``permits`` method of the authorization policy.
+  See https://github.com/Pylons/pyramid/issues/954
+
 1.4 (2012-12-18)
 ================
 
