@@ -257,7 +257,9 @@ class ViewDeriver(object):
                 view_name = getattr(request, 'view_name', None)
 
                 if self.authn_policy and self.authz_policy:
-                    if permission is None:
+                    if permission is NO_PERMISSION_REQUIRED:
+                        msg = 'Allowed (NO_PERMISSION_REQUIRED)'
+                    elif permission is None:
                         msg = 'Allowed (no permission registered)'
                     else:
                         principals = self.authn_policy.effective_principals(
