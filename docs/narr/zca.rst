@@ -83,7 +83,7 @@ While this services a reasonable goal, it causes some issues when
 trying to use patterns which you might use to build a typical
 :term:`Zope` application to build a :app:`Pyramid` application.
 Without special help, ZCA "global" APIs such as
-``zope.component.getUtility`` and ``zope.component.getSiteManager``
+:func:`zope.component.getUtility` and :func:`zope.component.getSiteManager`
 will use the ZCA "global" registry.  Therefore, these APIs
 will appear to fail when used in a :app:`Pyramid` application,
 because they'll be consulting the ZCA global registry rather than the
@@ -104,8 +104,8 @@ Disusing the Global ZCA API
 +++++++++++++++++++++++++++
 
 ZCA "global" API functions such as ``zope.component.getSiteManager``,
-``zope.component.getUtility``, ``zope.component.getAdapter``, and
-``zope.component.getMultiAdapter`` aren't strictly necessary.  Every
+``zope.component.getUtility``, :func:`zope.component.getAdapter`, and
+:func:`zope.component.getMultiAdapter` aren't strictly necessary.  Every
 component registry has a method API that offers the same
 functionality; it can be used instead.  For example, presuming the
 ``registry`` value below is a Zope Component Architecture component
@@ -113,7 +113,6 @@ registry, the following bit of code is equivalent to
 ``zope.component.getUtility(IFoo)``:
 
 .. code-block:: python
-   :linenos:
 
    registry.getUtility(IFoo)
 
