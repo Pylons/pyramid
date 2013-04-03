@@ -326,7 +326,6 @@ package that uses SQLAlchemy, and you'd like the current SQLAlchemy database
 session to be removed after each request.  Put the following in the
 ``mypackage.__init__`` module:
 
-.. ignore-next-block
 .. code-block:: python
    :linenos:
 
@@ -355,7 +354,7 @@ initialization.
    cause ``DBSession.remove`` to be called in an application generated from
    any :app:`Pyramid` scaffold, because these all use the ``pyramid_tm``
    package.  The cleanup done by ``DBSession.remove`` is unnecessary when
-   ``pyramid_tm`` middleware is configured into the application.
+   ``pyramid_tm`` :term:`middleware` is configured into the application.
 
 More Details
 ++++++++++++
@@ -491,7 +490,6 @@ reason for the error.  For instance,
 :class:`pyramid.Response`, so you can manipulate the instances in the same
 way.  A typical example is:
 
-.. ignore-next-block
 .. code-block:: python
     :linenos:
 

@@ -55,14 +55,21 @@ extensions = [
 
 # Looks for objects in external projects
 intersphinx_mapping = {
-     'who': ('http://docs.repoze.org/who/2.0', None),
-     'python': ('http://docs.python.org', None),
-     'python3': ('http://docs.python.org/3', None),
-     'tstring':
+    'zcomponent': ('http://docs.zope.org/zope.component', None),
+    'webtest': ('http://webtest.pythonpaste.org/en/latest', None),
+    'webob': ('http://docs.webob.org/en/latest', None),
+    'sqla': ('http://docs.sqlalchemy.org/en/latest', None),
+    'who': ('http://docs.repoze.org/who/latest', None),
+    'python': ('http://docs.python.org', None),
+    'python3': ('http://docs.python.org/3', None),
+    'tstring':
         ('http://docs.pylonsproject.org/projects/translationstring/en/latest',
           None),
-     'venusian':
+    'venusian':
         ('http://docs.pylonsproject.org/projects/venusian/en/latest', None),
+    'toolbar':
+        ('http://docs.pylonsproject.org/projects/pyramid_debugtoolbar/en/latest',
+         None),
 }
 
 # Add any paths that contain templates here, relative to this directory.

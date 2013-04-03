@@ -150,7 +150,6 @@ string, then return that string as the body of a :app:`Pyramid`
 For example, here's an example of using "raw" `Mako
 <http://www.makotemplates.org/>`_ from within a :app:`Pyramid` :term:`view`:
 
-.. ignore-next-block
 .. code-block:: python
    :linenos:
 

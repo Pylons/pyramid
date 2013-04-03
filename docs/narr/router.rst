@@ -46,7 +46,7 @@ request enters a :app:`Pyramid` application through to the point that
    :class:`~pyramid.interfaces.IRoute` object representing the route which
    matched.  The root object associated with the route found is also
    generated: if the :term:`route configuration` which matched has an
-   associated a ``factory`` argument, this factory is used to generate the
+   associated ``factory`` argument, this factory is used to generate the
    root object, otherwise a default :term:`root factory` is used.
 
 #. If a route match was *not* found, and a ``root_factory`` argument was

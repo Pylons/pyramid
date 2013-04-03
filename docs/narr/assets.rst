@@ -50,7 +50,6 @@ application might address the asset using the :term:`asset specification`
 ``myapp:templates/some_template.pt`` using that API within a ``views.py``
 file inside a ``myapp`` package:
 
-.. ignore-next-block
 .. code-block:: python
    :linenos:
 
@@ -120,7 +119,7 @@ from the ``/var/www/static`` directory of the computer which runs the
    # config is an instance of pyramid.config.Configurator
    config.add_static_view(name='static', path='/var/www/static')
 
-The ``name`` prepresents a URL *prefix*.  In order for files that live in the
+The ``name`` represents a URL *prefix*.  In order for files that live in the
 ``path`` directory to be served, a URL that requests one of them must begin
 with that prefix.  In the example above, ``name`` is ``static``, and ``path``
 is ``/var/www/static``.  In English, this means that you wish to serve the
@@ -331,7 +330,6 @@ root that exists at the end of your routing table, create an instance of the
 :class:`~pyramid.static.static_view` class inside a ``static.py`` file in
 your application root as below.
 
-.. ignore-next-block
 .. code-block:: python
    :linenos:
 
@@ -458,7 +456,6 @@ The ``override_asset`` API
 An individual call to :meth:`~pyramid.config.Configurator.override_asset`
 can override a single asset.  For example:
 
-.. ignore-next-block
 .. code-block:: python
    :linenos:
 
@@ -473,7 +470,6 @@ colon separator in a specification separates the *package name* from the
 are not specified, the override attempts to resolve every lookup into a
 package from the directory of another package.  For example:
 
-.. ignore-next-block
 .. code-block:: python
    :linenos:
 
@@ -482,7 +478,6 @@ package from the directory of another package.  For example:
 
 Individual subdirectories within a package can also be overridden:
 
-.. ignore-next-block
 .. code-block:: python
    :linenos:
 
@@ -511,7 +506,6 @@ construction file resides (or the ``package`` argument to the
 :class:`~pyramid.config.Configurator` class construction).
 For example:
 
-.. ignore-next-block
 .. code-block:: python
    :linenos:
 

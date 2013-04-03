@@ -43,9 +43,9 @@ above is executed.  It accepts some settings and returns a :term:`WSGI`
 application.  (See :ref:`startup_chapter` for more about ``pserve``.)
 
 The main function first creates a :term:`SQLAlchemy` database engine using
-``engine_from_config`` from the ``sqlalchemy.`` prefixed settings in the
-``development.ini`` file's ``[app:main]`` section.  This will be a URI
-(something like ``sqlite://``):
+:func:`sqlalchemy.engine_from_config` from the ``sqlalchemy.`` prefixed
+settings in the ``development.ini`` file's ``[app:main]`` section.
+This will be a URI (something like ``sqlite://``):
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
       :lines: 13
@@ -132,11 +132,10 @@ Finally, ``main`` is finished configuring things, so it uses the
 View Declarations via ``views.py``
 ----------------------------------
 
-Mapping a :term:`route` to code that will be executed when a match for
-the route's pattern occurs is done by registering a :term:`view
-configuration`. Our application uses the
-:meth:`pyramid.view.view_config` decorator to map view callables to
-each route, thereby mapping URL patterns to code.
+The main function of a web framework is mapping each URL pattern to code (a
+:term:`view callable`) that is executed when the requested URL matches the
+corresponding :term:`route`. Our application uses the
+:meth:`pyramid.view.view_config` decorator to perform this mapping.
 
 Open ``tutorial/tutorial/views.py``.  It should already contain the following:
 
@@ -228,11 +227,10 @@ To give a simple example of a  model class, we define one named ``MyModel``:
 
 Our example model has an ``__init__`` method that takes two arguments
 (``name``, and ``value``).  It stores these values as ``self.name`` and
-``self.value``
-within the ``__init__`` function itself.  The ``MyModel`` class also has a
-``__tablename__`` attribute.  This informs SQLAlchemy which table to use to
-store the data representing instances of this class.
+``self.value`` on the instance created by the ``__init__`` function itself.
+The ``MyModel`` class also has a ``__tablename__`` attribute.  This informs
+SQLAlchemy which table to use to store the data representing instances of this
+class.
 
-That's about all there is to it to models, views, and initialization code in
-our stock application.
-
+That's about all there is to it regarding models, views, and initialization
+code in our stock application.

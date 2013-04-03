@@ -252,25 +252,19 @@ that were added to the flash queue, and empties the queue.
 
 .. method:: pop_flash(queue='')
 
-.. code-block:: python
-   :linenos:
-
-   >>> request.session.flash('info message')
-   >>> request.session.pop_flash()
-   ['info message']
+>>> request.session.flash('info message')
+>>> request.session.pop_flash()
+['info message']
 
 Calling ``session.pop_flash()`` again like above without a corresponding call
 to ``session.flash()`` will return an empty list, because the queue has already
 been popped.
 
-.. code-block:: python
-   :linenos:
-
-   >>> request.session.flash('info message')
-   >>> request.session.pop_flash()
-   ['info message']
-   >>> request.session.pop_flash()
-   []
+>>> request.session.flash('info message')
+>>> request.session.pop_flash()
+['info message']
+>>> request.session.pop_flash()
+[]
 
 .. index::
    single: session.peek_flash
@@ -285,18 +279,15 @@ popped from flash storage.
 
 .. method:: peek_flash(queue='')
 
-.. code-block:: python
-   :linenos:
-
-   >>> request.session.flash('info message')
-   >>> request.session.peek_flash()
-   ['info message']
-   >>> request.session.peek_flash()
-   ['info message']
-   >>> request.session.pop_flash()
-   ['info message']
-   >>> request.session.peek_flash()
-   []
+>>> request.session.flash('info message')
+>>> request.session.peek_flash()
+['info message']
+>>> request.session.peek_flash()
+['info message']
+>>> request.session.pop_flash()
+['info message']
+>>> request.session.peek_flash()
+[]
 
 .. index::
    single: preventing cross-site request forgery attacks

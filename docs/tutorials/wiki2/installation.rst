@@ -5,65 +5,139 @@ Installation
 Before You Begin
 ================
 
-Installation Requirements
--------------------------
-
-Follow the steps in :ref:`installing_chapter`, but name the virtualenv
-directory ``pyramidtut``.  Following these steps will ensure you have met the
-following requirements:
+This tutorial assumes that you have already followed the steps in
+:ref:`installing_chapter`, thereby satisfying the following
+requirements.
 
 * Python interpreter is installed on your operating system
 * :term:`setuptools` or :term:`distribute` is installed
 * :term:`virtualenv` is installed
-* a virtual Python environment named ``pyramidtut`` has been created
-* Pyramid is installed
 
-UNIX Requirements
------------------
+Create and Use a Virtual Python Environment
+-------------------------------------------
 
-#. Install SQLite3 and its development packages if you don't already
-   have them installed.  Usually this is via your system's package
-   manager.  On a Debian system, this would be:
+Next let's create a `virtualenv` workspace for our project.  We will
+use the `VENV` environment variable instead of absolute path of the
+virtual environment.
 
-   .. code-block:: text
+On UNIX
+^^^^^^^
 
-      $ sudo apt-get install libsqlite3-dev
+.. code-block:: text
 
-#. Switch to the ``pyramidtut`` directory:
+   $ export VENV=~/pyramidtut
+   $ virtualenv --no-site-packages $VENV
+   New python executable in /home/foo/env/bin/python
+   Installing setuptools.............done.
 
-   .. code-block:: text
+On Windows
+^^^^^^^^^^
 
-      $ cd pyramidtut
+Set the `VENV` environment variable.
 
-Windows Requirements
---------------------
+.. code-block:: text
 
-#. Switch to the ``pyramidtut`` directory:
+   c:\> set VENV=c:\pyramidtut
 
-   .. code-block:: text
+Versions of Python use different paths, so you will need to adjust the
+path to the command for your Python version.
 
-      c:\> cd pyramidtut
+Python 2.7:
+
+.. code-block:: text
+
+   c:\> c:\Python27\Scripts\virtualenv --no-site-packages %VENV%
+
+Python 3.2:
+
+.. code-block:: text
+
+   c:\> c:\Python32\Scripts\virtualenv --no-site-packages %VENV%
+
+Install Pyramid Into the Virtual Python Environment
+---------------------------------------------------
+
+On UNIX
+^^^^^^^
+
+.. code-block:: text
+
+   $ $VENV/bin/easy_install pyramid
+
+On Windows
+^^^^^^^^^^
+
+.. code-block:: text
+
+   c:\env> %VENV%\Scripts\easy_install pyramid
+
+Install SQLite3 and Its Development Packages
+--------------------------------------------
+
+If you used a package manager to install your Python or if you compiled
+your Python from source, then you must install SQLite3 and its
+development packages.  If you downloaded your Python as an installer
+from python.org, then you already have it installed and can proceed to
+the next section :ref:`sql_making_a_project`..
+
+If you need to install the SQLite3 packages, then, for example, using
+the Debian system and apt-get, the command would be the following:
+
+.. code-block:: text
+
+   $ sudo apt-get install libsqlite3-dev
+
+Change Directory to Your Virtual Python Environment
+---------------------------------------------------
+
+Change directory to the ``pyramidtut`` directory.
+
+On UNIX
+^^^^^^^
+
+.. code-block:: text
+
+   $ cd pyramidtut
+
+On Windows
+^^^^^^^^^^
+
+.. code-block:: text
+
+   c:\> cd pyramidtut
 
 .. _sql_making_a_project:
 
 Making a Project
 ================
 
-Your next step is to create a project.  For this tutorial, we will use the
-:term:`scaffold` named ``alchemy``, which generates an application
-that uses :term:`SQLAlchemy` and :term:`URL dispatch`.  :app:`Pyramid`
-supplies a variety of scaffolds to generate sample projects.
+Your next step is to create a project.  For this tutorial we will use
+the :term:`scaffold` named ``alchemy`` which generates an application
+that uses :term:`SQLAlchemy` and :term:`URL dispatch`.
+
+:app:`Pyramid` supplies a variety of scaffolds to generate sample
+projects. We will use `pcreate`—a script that comes with Pyramid to
+quickly and easily generate scaffolds usually with a single command—to
+create the scaffold for our project.
+
+By passing in `alchemy` into the `pcreate` command, the script creates
+the files needed to use SQLAlchemy. By passing in our application name
+`tutorial`, the script inserts that application name into all the
+required files. For example, `pcreate` creates the
+``initialize_tutorial_db`` in the ``pyramidtut/bin`` directory.
 
 The below instructions assume your current working directory is the
 "virtualenv" named "pyramidtut".
 
-On UNIX:
+On UNIX
+-------
 
 .. code-block:: text
 
    $ $VENV/bin/pcreate -s alchemy tutorial
 
-On Windows:
+On Windows
+----------
 
 .. code-block:: text
 
@@ -75,18 +149,10 @@ On Windows:
    startup problems, try putting both the virtualenv and the project
    into directories that do not contain spaces in their paths.
 
-`pcreate` is a script that comes with Pyramid that helps by creating and organizing files
-needed as part of a Pyramid project. By passing in `alchemy`, we are asking the script to
-create the files needed to use SQLAlchemy. By passing in our app name `tutorial`, the script
-places that application name in all the different files required. For example, the ``initialize_tutorial_db``
-that is in the ``pyramidtut/bin`` directory was created by `pcreate`.
-
-
-
 .. _installing_project_in_dev_mode:
 
-Installing the Project in "Development Mode"
-============================================
+Installing the Project in Development Mode
+==========================================
 
 In order to do development on the project easily, you must "register"
 the project as a development egg in your workspace using the
@@ -94,22 +160,25 @@ the project as a development egg in your workspace using the
 directory you created in :ref:`sql_making_a_project`, and run the
 ``setup.py develop`` command using the virtualenv Python interpreter.
 
-On UNIX:
+On UNIX
+-------
 
 .. code-block:: text
 
    $ cd tutorial
    $ $VENV/bin/python setup.py develop
 
-On Windows:
+On Windows
+----------
 
 .. code-block:: text
 
    c:\pyramidtut> cd tutorial
    c:\pyramidtut\tutorial> %VENV%\Scripts\python setup.py develop
 
-Success executing this command will end with a line to the console something
-like::
+The console will show `setup.py` checking for packages and installing
+missing packages. Success executing this command will show a line like
+the following::
 
    Finished processing dependencies for tutorial==0.0
 
@@ -121,13 +190,15 @@ Running the Tests
 After you've installed the project in development mode, you may run
 the tests for the project.
 
-On UNIX:
+On UNIX
+-------
 
 .. code-block:: text
 
    $ $VENV/bin/python setup.py test -q
 
-On Windows:
+On Windows
+----------
 
 .. code-block:: text
 
@@ -153,13 +224,15 @@ tests.
 To get this functionality working, we'll need to install the ``nose`` and
 ``coverage`` packages into our ``virtualenv``:
 
-On UNIX:
+On UNIX
+-------
 
 .. code-block:: text
 
    $ $VENV/bin/easy_install nose coverage
 
-On Windows:
+On Windows
+----------
 
 .. code-block:: text
 
@@ -168,13 +241,15 @@ On Windows:
 Once ``nose`` and ``coverage`` are installed, we can actually run the
 coverage tests.
 
-On UNIX:
+On UNIX
+-------
 
 .. code-block:: text
 
    $ $VENV/bin/nosetests --cover-package=tutorial --cover-erase --with-coverage
 
-On Windows:
+On Windows
+----------
 
 .. code-block:: text
 
@@ -212,13 +287,15 @@ script` to initialize our database.
 Type the following command, make sure you are still in the ``tutorial``
 directory (the directory with a ``development.ini`` in it):
 
-On UNIX:
+On UNIX
+-------
 
 .. code-block:: text
 
    $ $VENV/bin/initialize_tutorial_db development.ini
 
-On Windows:
+On Windows
+----------
 
 .. code-block:: text
 
@@ -260,13 +337,15 @@ Starting the Application
 
 Start the application.
 
-On UNIX:
+On UNIX
+-------
 
 .. code-block:: text
 
    $ $VENV/bin/pserve development.ini --reload
 
-On Windows:
+On Windows
+----------
 
 .. code-block:: text
 
@@ -308,4 +387,3 @@ the following assumptions:
    mechanism to map URLs to code (:term:`traversal`).  However, for the
    purposes of this tutorial, we'll only be using url dispatch and
    SQLAlchemy.
-

@@ -23,18 +23,22 @@ def get_app(config_uri, name=None, options=None, loadapp=loadapp):
     path, section = _getpathsec(config_uri, name)
     config_name = 'config:%s' % path
     here_dir = os.getcwd()
-    if options:
-        kw = {'global_conf': options}
-    else:
-        kw = {}
 
-    app = loadapp(config_name, name=section, relative_to=here_dir, **kw)
+    app = loadapp(
+        config_name,
+        name=section,
+        relative_to=here_dir,
+        global_conf=options)
 
     return app
 
-def get_appsettings(config_uri, name=None, appconfig=appconfig):
+def get_appsettings(config_uri, name=None, options=None, appconfig=appconfig):
     """ Return a dictionary representing the key/value pairs in an ``app``
     section within the file represented by ``config_uri``.
+
+    ``options``, if passed, should be a dictionary used as variable assignments
+    like ``{'http_port': 8080}``.  This is useful if e.g. ``%(http_port)s`` is
+    used in the config file.
 
     If the ``name`` is None, this will attempt to parse the name from
     the ``config_uri`` string expecting the format ``inifile#name``.
@@ -42,7 +46,11 @@ def get_appsettings(config_uri, name=None, appconfig=appconfig):
     path, section = _getpathsec(config_uri, name)
     config_name = 'config:%s' % path
     here_dir = os.getcwd()
-    return appconfig(config_name, name=section, relative_to=here_dir)
+    return appconfig(
+        config_name,
+        name=section,
+        relative_to=here_dir,
+        global_conf=options)
 
 def setup_logging(config_uri, fileConfig=fileConfig,
                   configparser=configparser):

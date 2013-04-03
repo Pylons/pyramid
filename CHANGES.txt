@@ -21,6 +21,14 @@ Features
   define how to properly handle IPv6. See
   https://github.com/Pylons/pyramid/issues/831.
 
+- Make it possible to use variable arguments via
+  ``pyramid.paster.get_appsettings``. This also allowed the generated
+  ``initialize_db`` script from the ``alchemy`` scaffold to grow support
+  for options in the form ``a=1 b=2`` so you can fill in
+  values in a parameterized ``.ini`` file, e.g.
+  ``initialize_myapp_db etc/development.ini a=1 b=2``.
+  See https://github.com/Pylons/pyramid/pull/911
+
 Bug Fixes
 ---------
 
@@ -69,6 +77,15 @@ Bug Fixes
   predicate mismatch error when trying to use GET or DELETE
   methods. Now the views are found and no predicate mismatch is
   raised.
+
+- Spaces and dots may now be in mako renderer template paths. This was
+  broken when support for the new makodef syntax was added in 1.4a1.
+  See https://github.com/Pylons/pyramid/issues/950
+
+- ``pyramid.debug_authorization=true`` will now correctly print out
+  ``Allowed`` for views registered with ``NO_PERMISSION_REQUIRED`` instead
+  of invoking the ``permits`` method of the authorization policy.
+  See https://github.com/Pylons/pyramid/issues/954
 
 1.4 (2012-12-18)
 ================

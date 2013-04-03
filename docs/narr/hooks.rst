@@ -109,9 +109,8 @@ callable:
    instance of the :exc:`~pyramid.httpexceptions.HTTPNotFound` exception that
    caused the Not Found View to be called.  The value of
    ``request.exception.message`` will be a value explaining why the Not Found
-   error was raised.  This message will be different when the
-   ``pyramid.debug_notfound`` environment setting is true than it is when it
-   is false.
+   error was raised.  This message has different values depending whether the
+   ``pyramid.debug_notfound`` environment setting is true or false.
 
 .. note::
 
@@ -208,9 +207,9 @@ Here's some sample code that implements a minimal forbidden view:
    that caused the forbidden view to be called.  The value of
    ``request.exception.message`` will be a value explaining why the forbidden
    was raised and ``request.exception.result`` will be extended information
-   about the forbidden exception.  These messages will be different when the
-   ``pyramid.debug_authorization`` environment setting is true than it is when
-   it is false.
+   about the forbidden exception.  These messages have different values
+   depending whether the ``pyramid.debug_authorization`` environment setting
+   is true or false.
 
 .. index::
    single: request factory
@@ -694,7 +693,7 @@ represents the type of interface that must be possessed by the resource for
 this resource url factory to be found.  If the ``resource_iface`` argument is
 omitted, this resource url adapter will be used for *all* resources.
 
-The API that must be implemented by your a class that provides
+The API that must be implemented by a class that provides
 :class:`~pyramid.interfaces.IResourceURL` is as follows:
 
 .. code-block:: python
@@ -1036,7 +1035,7 @@ upstream WSGI component that uses :app:`Pyramid` as its "app".  This is a
 feature that may be used by Pyramid framework extensions, to provide, for
 example, Pyramid-specific view timing support bookkeeping code that examines
 exceptions before they are returned to the upstream WSGI application.  Tweens
-behave a bit like :term:`WSGI` middleware but they have the benefit of
+behave a bit like :term:`WSGI` :term:`middleware` but they have the benefit of
 running in a context in which they have access to the Pyramid
 :term:`application registry` as well as the Pyramid rendering machinery.
 
@@ -1110,8 +1109,8 @@ Once you've created a tween factory, you can register it into the implicit
 tween chain using the :meth:`pyramid.config.Configurator.add_tween` method
 using its :term:`dotted Python name`.
 
-Here's an example of registering the a tween factory as an "implicit"
-tween in a Pyramid application:
+Here's an example of registering a tween factory as an "implicit" tween in a
+Pyramid application:
 
 .. code-block:: python
    :linenos:
@@ -1447,7 +1446,7 @@ view/route predicate:
   subscriber predicates will assume a certain event type.
 
 Here's an example of a subscriber predicate that can be used in conjunction
-with a subscriber that subscribes to the :class:`pyramid.events.NewReqest`
+with a subscriber that subscribes to the :class:`pyramid.events.NewRequest`
 event type.
 
 .. code-block:: python

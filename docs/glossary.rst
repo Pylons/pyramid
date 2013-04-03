@@ -314,7 +314,7 @@ Glossary
 
    pipeline
      The :term:`PasteDeploy` term for a single configuration of a WSGI
-     server, a WSGI application, with a set of middleware in-between.
+     server, a WSGI application, with a set of :term:`middleware` in-between.
 
    Zope
      `The Z Object Publishing Framework <http://zope.org>`_, a
@@ -333,12 +333,6 @@ Glossary
    ZODB
       `Zope Object Database <http://zodb.org>`_, a
       persistent Python object store.
-
-   ZEO
-      `Zope Enterprise Objects
-      <http://www.zope.org/Documentation/Books/ZopeBook/2_6Edition/ZEO.stx>`_
-      allows multiple simultaneous processes to access a single
-      :term:`ZODB` database.
 
    WebOb
      `WebOb <http://webob.org>`_ is a WSGI request/response
@@ -907,9 +901,9 @@ Glossary
      The scaffold has been retired but the demo plays a similar role. 
 
    Pyramid Cookbook
-     An additional documentation resource for Pyramid which presents topical,
-     practical usages of Pyramid available via
-     http://docs.pylonsproject.org/ .
+     Additional documentation for Pyramid which presents topical,
+     practical uses of Pyramid:
+     http://docs.pylonsproject.org/projects/pyramid_cookbook/en/latest.
 
    distutils
      The standard system for packaging and distributing Python packages.  See
@@ -932,18 +926,18 @@ Glossary
      provide, for example, Pyramid-specific view timing support, bookkeeping
      code that examines exceptions before they are returned to the upstream
      WSGI application, or a variety of other features.  Tweens behave a bit
-     like :term:`WSGI` 'middleware' but they have the benefit of running in a
+     like :term:`WSGI` :term:`middleware` but they have the benefit of running in a
      context in which they have access to the Pyramid :term:`application
      registry` as well as the Pyramid rendering machinery.  See
      :ref:`registering_tweens`.
 
    pyramid_debugtoolbar
-     A Pyramid add on which displays a helpful debug toolbar "on top of" HTML
+     A Pyramid add-on which displays a helpful debug toolbar "on top of" HTML
      pages rendered by your application, displaying request, routing, and
      database information.  :mod:`pyramid_debugtoolbar` is configured into
      the ``development.ini`` of all applications which use a Pyramid
      :term:`scaffold`.  For more information, see
-     http://docs.pylonsproject.org/projects/pyramid_debugtoolbar/dev/ .
+     http://docs.pylonsproject.org/projects/pyramid_debugtoolbar/en/latest/.
 
    scaffold
      A project template that generates some of the major parts of a Pyramid

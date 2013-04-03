@@ -22,10 +22,13 @@ resource found as the result of a traversal becomes the
 subsystem is used to find some view code willing to "publish" this
 resource by generating a :term:`response`.
 
-Using :term:`Traversal` to map a URL to code is optional.  It is often
-less easy to understand than :term:`URL dispatch`, so if you're a rank
-beginner, it probably makes sense to use URL dispatch to map URLs to
-code instead of traversal.  In that case, you can skip this chapter.
+.. note::
+
+  Using :term:`Traversal` to map a URL to code is optional.  If you're creating
+  your first Pyramid application it probably makes more sense to use :term:`URL
+  dispatch` to map URLs to code instead of traversal, as new Pyramid developers
+  tend to find URL dispatch slightly easier to understand.  If you use URL
+  dispatch, you needn't read this chapter.
 
 .. index::
    single: traversal details
@@ -356,13 +359,13 @@ when this request comes in that we're traversing the following resource tree:
 
 Here's what happens:
 
-- :mod:`traversal` traverses the root, and attempts to find "foo", which it
+- :term:`traversal` traverses the root, and attempts to find "foo", which it
   finds.
 
-- :mod:`traversal` traverses "foo", and attempts to find "bar", which it
+- :term:`traversal` traverses "foo", and attempts to find "bar", which it
   finds.
 
-- :mod:`traversal` traverses "bar", and attempts to find "baz", which it does
+- :term:`traversal` traverses "bar", and attempts to find "baz", which it does
   not find (the "bar" resource raises a :exc:`KeyError` when asked for
   "baz").
 
@@ -407,16 +410,16 @@ However, for this tree:
 
 The user asks for ``http://example.com/foo/bar/baz/biz/buz.txt``
 
-- :mod:`traversal` traverses "foo", and attempts to find "bar", which it
+- :term:`traversal` traverses "foo", and attempts to find "bar", which it
   finds.
 
-- :mod:`traversal` traverses "bar", and attempts to find "baz", which it
+- :term:`traversal` traverses "bar", and attempts to find "baz", which it
   finds.
 
-- :mod:`traversal` traverses "baz", and attempts to find "biz", which it
+- :term:`traversal` traverses "baz", and attempts to find "biz", which it
   finds.
 
-- :mod:`traversal` traverses "biz", and attempts to find "buz.txt" which it
+- :term:`traversal` traverses "biz", and attempts to find "buz.txt" which it
   does not find.
 
 The fact that it does not find a resource related to "buz.txt" at this point

@@ -19,12 +19,31 @@ run :app:`Pyramid`.
     run under any version of Python before 2.6.
 
 :app:`Pyramid` is known to run on all popular UNIX-like systems such as
-Linux, MacOS X, and FreeBSD as well as on Windows platforms.  It is also
-known to run on :term:`PyPy` (1.9+).
+Linux, Mac OS X, and FreeBSD as well as on Windows platforms.  It is
+also known to run on :term:`PyPy` (1.9+).
 
 :app:`Pyramid` installation does not require the compilation of any
 C code, so you need only a Python interpreter that meets the
 requirements mentioned.
+
+For Mac OS X Users
+~~~~~~~~~~~~~~~~~~
+
+From `Python.org <http://python.org/download/mac/>`_:
+
+    Python comes pre-installed on Mac OS X, but due to Apple's release
+    cycle, it's often one or even two years old. The overwhelming
+    recommendation of the "MacPython" community is to upgrade your
+    Python by downloading and installing a newer version from
+    `the Python standard release page <http://python.org/download/releases/>`_.
+
+It is recommended to download one of the *installer* versions, unless you prefer to install your Python through a packgage manager (e.g., macports or homebrew) or to build your Python from source.
+
+Unless you have a need for a specific earlier version, it is recommended
+to install the latest 2.x or 3.x version of Python.
+
+If you use an installer for your Python, then you can skip to the
+section :ref:`installing_unix`.
 
 If You Don't Yet Have A Python Interpreter (UNIX)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -322,8 +341,8 @@ for both versions are included below.
 Windows Using Python 2
 ~~~~~~~~~~~~~~~~~~~~~~
 
-#. Install, or find `Python 2.7
-   <http://www.python.org/download/releases/2.7.3/>`_ for your system.
+#. Install the most recent `Python 2.7.x version
+   <http://www.python.org/download/>`_ for your system.
 
 #. Install the `Python for Windows extensions
    <http://sourceforge.net/projects/pywin32/files/>`_.  Make sure to
@@ -371,36 +390,47 @@ Windows Using Python 2
 Windows Using Python 3
 ~~~~~~~~~~~~~~~~~~~~~~
 
-#. Install, or find `Python 3.2
-   <http://www.python.org/download/releases/3.2.3/>`_ for your system.
+#. Install, or find the latest version of `Python 3.x
+   <http://www.python.org/download/>`_ for your system and which is
+   supported by Pyramid.
 
 #. Install the `Python for Windows extensions
    <http://sourceforge.net/projects/pywin32/files/>`_.  Make sure to
-   pick the right download for Python 3.2 and install it using the
+   pick the right download for Python 3.x and install it using the
    same Python installation from the previous step.
 
 #. Install latest :term:`distribute` distribution into the Python you
    obtained/installed/found in the step above: download `distribute_setup.py
    <http://python-distribute.org/distribute_setup.py>`_ and run it using the
-   ``python`` interpreter of your Python 3.2 installation using a command
+   ``python`` interpreter of your Python 3.x installation using a command
    prompt:
 
    .. code-block:: text
 
+      # modify the command according to the python version, e.g.:
+      # for Python 3.2.x:
       c:\> c:\Python32\python distribute_setup.py
+      # for Python 3.3.x:
+      c:\> c:\Python33\python distribute_setup.py
 
 #. Install :term:`virtualenv`:
 
    .. code-block:: text
 
+      # for Python 3.2.x:
       c:\> c:\Python32\Scripts\easy_install virtualenv
+      # for Python 3.3.x:
+      c:\> c:\Python33\Scripts\easy_install virtualenv
 
 #. Make a :term:`virtualenv` workspace:
 
    .. code-block:: text
 
       c:\> set VENV=c:\env
+      # for Python 3.2.x:
       c:\> c:\Python32\Scripts\virtualenv --no-site-packages %VENV%
+      # for Python 3.3.x:
+      c:\> c:\Python33\Scripts\virtualenv --no-site-packages %VENV%
 
    You can either follow the use of the environment variable, ``%VENV%``,
    or replace it with the root directory of the :term:`virtualenv`.

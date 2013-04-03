@@ -62,9 +62,9 @@ particular view callable.
 
 :term:`View predicate` attributes are an important part of view configuration
 that enables the :term:`view lookup` subsystem to find and invoke the
-appropriate view.  The greater number of predicate attributes possessed by a
+appropriate view.  The greater the number of predicate attributes possessed by a
 view's configuration, the more specific the circumstances need to be before
-the registered view callable will be invoked.  The fewer number of predicates
+the registered view callable will be invoked.  The fewer the number of predicates
 which are supplied to a particular view configuration, the more likely it is
 that the associated view callable will be invoked.  A view with five
 predicates will always be found and evaluated before a view with two, for
@@ -313,9 +313,9 @@ configured view.
 
   This argument ensures that the view will only be called when the
   :term:`request` has key/value pairs in its :term:`matchdict` that equal
-  those supplied in the predicate.  e.g. ``match_param="action=edit" would
+  those supplied in the predicate.  e.g. ``match_param="action=edit"`` would
   require the ``action`` parameter in the :term:`matchdict` match the right
-  hande side of the expression (``edit``) for the view to "match" the current
+  hand side of the expression (``edit``) for the view to "match" the current
   request.
 
   If the ``match_param`` is a dict, every key/value pair must match for the
@@ -488,7 +488,6 @@ acts as a :app:`Pyramid` view callable.
 Here's an example of the :class:`~pyramid.view.view_config` decorator that
 lives within a :app:`Pyramid` application module ``views.py``:
 
-.. ignore-next-block
 .. code-block:: python
    :linenos:
 
@@ -503,7 +502,6 @@ lives within a :app:`Pyramid` application module ``views.py``:
 Using this decorator as above replaces the need to add this imperative
 configuration stanza:
 
-.. ignore-next-block
 .. code-block:: python
    :linenos:
 
