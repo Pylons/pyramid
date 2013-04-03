@@ -55,6 +55,7 @@ extensions = [
 
 # Looks for objects in external projects
 intersphinx_mapping = {
+    'webtest': ('http://webtest.pythonpaste.org/en/latest', None),
     'webob': ('http://docs.webob.org/en/latest', None),
     'sqla': ('http://docs.sqlalchemy.org/en/latest', None),
     'who': ('http://docs.repoze.org/who/latest', None),
@@ -65,6 +66,9 @@ intersphinx_mapping = {
           None),
     'venusian':
         ('http://docs.pylonsproject.org/projects/venusian/en/latest', None),
+    'toolbar':
+        ('http://docs.pylonsproject.org/projects/pyramid_debugtoolbar/en/latest',
+         None),
 }
 
 # Add any paths that contain templates here, relative to this directory.

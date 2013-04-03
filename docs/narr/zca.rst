@@ -44,7 +44,7 @@ framework implementation detail.
 
 However, developers who are already used to writing :term:`Zope`
 applications often still wish to use the ZCA while building a
-:app:`Pyramid` application; :mod:`pyramid` makes this possible.
+:app:`Pyramid` application; :app:`Pyramid` makes this possible.
 
 .. index::
    single: get_current_registry
@@ -151,7 +151,6 @@ Consider the following bit of idiomatic :app:`Pyramid` startup code:
 .. code-block:: python
    :linenos:
 
-   from zope.component import getGlobalSiteManager
    from pyramid.config import Configurator
 
    def app(global_settings, **settings):
@@ -188,7 +187,6 @@ For example:
 .. code-block:: python
    :linenos:
 
-   from zope.component import getGlobalSiteManager
    from pyramid.config import Configurator
 
    def app(global_settings, **settings):

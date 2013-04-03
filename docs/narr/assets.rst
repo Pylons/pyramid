@@ -119,7 +119,7 @@ from the ``/var/www/static`` directory of the computer which runs the
    # config is an instance of pyramid.config.Configurator
    config.add_static_view(name='static', path='/var/www/static')
 
-The ``name`` prepresents a URL *prefix*.  In order for files that live in the
+The ``name`` represents a URL *prefix*.  In order for files that live in the
 ``path`` directory to be served, a URL that requests one of them must begin
 with that prefix.  In the example above, ``name`` is ``static``, and ``path``
 is ``/var/www/static``.  In English, this means that you wish to serve the

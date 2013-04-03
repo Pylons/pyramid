@@ -416,7 +416,7 @@ If you don't see the debug toolbar image on the right hand top of the page,
 it means you're browsing from a system that does not have debugging access.
 By default, for security reasons, only a browser originating from
 ``localhost`` (``127.0.0.1``) can see the debug toolbar.  To allow your
-browser on a remote system to access the server, add the a line within the
+browser on a remote system to access the server, add a line within the
 ``[app:main]`` section of the ``development.ini`` file in the form
 ``debugtoolbar.hosts = X.X.X.X``.  For example, if your Pyramid application
 is running on a remote system, and you're browsing from a host with the IP

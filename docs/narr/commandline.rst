@@ -172,8 +172,8 @@ name ``main`` as a section name:
 
 The WSGI application that is loaded will be available in the shell as the
 ``app`` global. Also, if the application that is loaded is the :app:`Pyramid`
-app with no surrounding middleware, the ``root`` object returned by the
-default :term:`root factory`, ``registry``, and ``request`` will be
+app with no surrounding :term:`middleware`, the ``root`` object returned by
+the default :term:`root factory`, ``registry``, and ``request`` will be
 available.
 
 You can also simply rely on the ``main`` default section name by omitting any
@@ -572,8 +572,8 @@ configuration implied by the ``[pipeline:main]`` section of your
 configuration file by default.  Specifying ``/path/to/my/development.ini`` is
 logically equivalent to specifying ``/path/to/my/development.ini#main``.  In
 this case, we'll be using a configuration that includes an ``app`` object
-which is wrapped in the Paste "translogger" middleware (which logs requests
-to the console).
+which is wrapped in the Paste "translogger" :term:`middleware` (which logs
+requests to the console).
 
 You can also specify a particular *section* of the PasteDeploy ``.ini`` file
 to load instead of ``main``:

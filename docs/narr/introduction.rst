@@ -600,10 +600,10 @@ Examples: :ref:`hello_traversal_chapter` and
 Tweens
 ~~~~~~
 
-Pyramid has a sort of internal WSGI-middleware-ish pipeline that can be
-hooked by arbitrary add-ons named "tweens".  The debug toolbar is a "tween",
-and the ``pyramid_tm`` transaction manager is also.  Tweens are more useful
-than WSGI middleware in some circumstances because they run in the context of
+Pyramid has a sort of internal WSGI-middleware-ish pipeline that can be hooked
+by arbitrary add-ons named "tweens".  The debug toolbar is a "tween", and the
+``pyramid_tm`` transaction manager is also.  Tweens are more useful than WSGI
+:term:`middleware` in some circumstances because they run in the context of
 Pyramid itself, meaning you have access to templates and other renderers, a
 "real" request object, and other niceties.
 

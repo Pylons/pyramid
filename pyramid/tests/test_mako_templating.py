@@ -270,6 +270,34 @@ class Test_renderer_factory(Base, unittest.TestCase):
         self.assertEqual(renderer.lookup, lookup)
         self.assertEqual(renderer.path, 'helloworld.mak')
 
+    def test_space_dot_name(self):
+        from pyramid.mako_templating import renderer_factory
+
+        info = DummyRendererInfo({
+            'name':'hello .world.mako',
+            'package':None,
+            'registry':self.config.registry,
+            'settings':{},
+        })
+
+        result = renderer_factory(info)
+        self.assertEqual(result.path, 'hello .world.mako')
+        self.assertTrue(result.defname is None)
+
+    def test_space_dot_name_def(self):
+        from pyramid.mako_templating import renderer_factory
+
+        info = DummyRendererInfo({
+            'name':'hello .world#comp.mako',
+            'package':None,
+            'registry':self.config.registry,
+            'settings':{},
+            })
+
+        result = renderer_factory(info)
+        self.assertEqual(result.path, 'hello .world.mako')
+        self.assertEqual(result.defname, 'comp')
+
 class MakoRendererFactoryHelperTests(Base, unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.mako_templating import MakoRendererFactoryHelper
