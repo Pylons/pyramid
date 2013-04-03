@@ -2791,7 +2791,8 @@ class TestViewDeriver(unittest.TestCase):
         self.assertEqual(len(logger.messages), 1)
         self.assertEqual(logger.messages[0],
                          "debug_authorization of url url (view name "
-                         "'view_name' against context None): False")
+                         "'view_name' against context None): "
+                         "Allowed (NO_PERMISSION_REQUIRED)")
 
     def test_secured_view_authn_policy_no_authz_policy(self):
         response = DummyResponse()
