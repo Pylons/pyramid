@@ -95,7 +95,7 @@ because that's the name we gave it in the entry point setup.  Running
 output directory named ``MyStuff``.
 
 See the module documentation for :mod:`pyramid.scaffolds` for information
-about the API of the :class:`pyramid.scaffolds.PyramidScaffold` class and
+about the API of the :class:`pyramid.scaffolds.Template` class and
 related classes.  You can override methods of this class to get special
 behavior.
 

@@ -129,7 +129,7 @@ follows:
   ever be called within application-specific forks of third-party
   library code.  The library you've forked almost certainly has
   nothing to do with :app:`Pyramid`, and making it dependent on
-  :app:`Pyramid` (rather than making your :mod:`pyramid`
+  :app:`Pyramid` (rather than making your :app:`pyramid`
   application depend upon it) means you're forming a dependency in the
   wrong direction.
 
