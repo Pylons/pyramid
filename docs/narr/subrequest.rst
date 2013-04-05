@@ -223,16 +223,16 @@ unconditionally:
   :meth:`~pyramid.config.Configurator.set_request_property`) on the subrequest
   object passed as ``request``
 
-- causes a :class:`~pyramid.event.NewRequest` event to be sent at the
+- causes a :class:`~pyramid.events.NewRequest` event to be sent at the
   beginning of request processing.
 
-- causes a :class:`~pyramid.event.ContextFound` event to be sent when a
+- causes a :class:`~pyramid.events.ContextFound` event to be sent when a
   context resource is found.
-  
+
 - Ensures that the user implied by the request passed has the necessary
   authorization to invoke view callable before calling it.
 
-- causes a :class:`~pyramid.event.NewResponse` event to be sent when the
+- causes a :class:`~pyramid.events.NewResponse` event to be sent when the
   Pyramid application returns a response.
 
 - Calls any :term:`response callback` functions defined within the subrequest's

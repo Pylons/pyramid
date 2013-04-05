@@ -487,7 +487,7 @@ module.
 Each class is named ``pyramid.httpexceptions.HTTP*``, where ``*`` is the
 reason for the error.  For instance,
 :class:`pyramid.httpexceptions.HTTPNotFound` subclasses
-:class:`pyramid.Response`, so you can manipulate the instances in the same
+:class:`pyramid.response.Response`, so you can manipulate the instances in the same
 way.  A typical example is:
 
 .. code-block:: python
