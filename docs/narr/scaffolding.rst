@@ -74,10 +74,14 @@ concrete examples of scaffold directories (``zodb``, ``alchemy``, and
 After you've created the template directory, add the following to the
 ``entry_points`` value of your distribution's ``setup.py``:
 
-      [pyramid.scaffold]
-      coolextension=coolextension.scaffolds:CoolExtensionTemplate
+.. code-block:: ini
+
+   [pyramid.scaffold]
+   coolextension=coolextension.scaffolds:CoolExtensionTemplate
 
 For example::
+
+.. code-block:: python
 
     def setup(
           ...,
