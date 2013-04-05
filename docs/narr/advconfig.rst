@@ -148,14 +148,14 @@ one:
        config.add_route(...)
 
 Don't call this function directly with ``config`` as an argument.  Instead,
-use :meth:`pyramid.config.Configuration.include`:
+use :meth:`pyramid.config.Configurator.include`:
 
 .. code-block:: python
    :linenos:
 
    config.include(add_routes)
 
-Using :meth:`~pyramid.config.Configuration.include` instead of calling the
+Using :meth:`~pyramid.config.Configurator.include` instead of calling the
 function directly provides a modicum of automated conflict resolution, with
 the configuration statements you define in the calling code overriding those
 of the included function.  See also :ref:`automatic_conflict_resolution` and
@@ -333,7 +333,7 @@ his application:
        config.add_route(...)
 
 Rather than calling this function directly with ``config`` as an argument.
-Instead, use :meth:`pyramid.config.Configuration.include`:
+Instead, use :meth:`pyramid.config.Configurator.include`:
 
 .. code-block:: python
    :linenos:
@@ -343,7 +343,7 @@ Instead, use :meth:`pyramid.config.Configuration.include`:
 Using ``include`` rather than calling the function directly will allow
 :ref:`automatic_conflict_resolution` to work.
 
-:meth:`~pyramid.config.Configuration.include` can also accept a :term:`module`
+:meth:`~pyramid.config.Configurator.include` can also accept a :term:`module`
 as an argument:
 
 .. code-block:: python
@@ -357,7 +357,7 @@ For this to work properly, the ``myapp`` module must contain a callable with
 the special name ``includeme``, which should perform configuration (like the
 ``add_routes`` callable we showed above as an example).
 
-:meth:`~pyramid.config.Configuration.include` can also accept a :term:`dotted
+:meth:`~pyramid.config.Configurator.include` can also accept a :term:`dotted
 Python name` to a function or a module.
 
 .. note: See :ref:`the_include_tag` for a declarative alternative to
