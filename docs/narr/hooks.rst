@@ -929,7 +929,7 @@ set a *default* view mapper (overriding the superdefault view mapper used by
 Pyramid itself).
 
 A *single* view registration can use a view mapper by passing the mapper as
-the ``mapper`` argument to :meth:`~pyramid.config.Configuration.add_view`.
+the ``mapper`` argument to :meth:`~pyramid.config.Configurator.add_view`.
 
 .. index::
    single: configuration decorator

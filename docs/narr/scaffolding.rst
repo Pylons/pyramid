@@ -79,7 +79,7 @@ After you've created the template directory, add the following to the
    [pyramid.scaffold]
    coolextension=coolextension.scaffolds:CoolExtensionTemplate
 
-For example::
+For example:
 
 .. code-block:: python
 
