@@ -171,7 +171,7 @@ you will reach the filesystem root directory.
    URL generated (as opposed to a single leading slash or empty tuple
    element).
 
-.. sidebar::  Using :mod:`pyramid_traversalwrapper`
+.. sidebar:: For your convenience
 
   If you'd rather not manage the ``__name__`` and ``__parent__`` attributes
   of your resources "by hand", an add-on package named
