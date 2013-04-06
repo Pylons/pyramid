@@ -38,8 +38,8 @@ forking is also a Zope derivative.
 
 Implementations of these features were *required* to allow the :app:`Pyramid`
 authors to build the bread-and-butter CMS-type systems for customers in the
-way they were accustomed to building them.  No other system, save for Zope itself,
-had such features.  And Zope itself was beginning to show signs of its age.
+way they were accustomed to.  No other system, save for Zope itself,
+had such features, and Zope itself was beginning to show signs of its age.
 We were becoming hampered by consequences of its early design mistakes.
 Zope's lack of documentation was also difficult to work around: it was hard
 to hire smart people to work on Zope applications, because there was no
