@@ -44,7 +44,7 @@ We were becoming hampered by consequences of its early design mistakes.
 Zope's lack of documentation was also difficult to work around: it was hard
 to hire smart people to work on Zope applications, because there was no
 comprehensive documentation set to point them at which explained "it all" in
-one consumble place, and it was too large and self-inconsistent to document
+one consumable place, and it was too large and self-inconsistent to document
 properly.  Before :mod:`repoze.bfg` went under development, its authors
 obviously looked around for other frameworks that fit the bill.  But no
 non-Zope framework did.  So we embarked on building :mod:`repoze.bfg`.
