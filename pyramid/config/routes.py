@@ -235,7 +235,8 @@ class RoutesConfiguratorMixin(object):
           wildcard mimetype match token in the form ``text/*`` or a
           match-all wildcard mimetype match token in the form ``*/*``.
           If any of the forms matches the ``Accept`` header of the
-          request, this predicate will be true.  If this predicate
+          request, or if the ``Accept`` header isn't set at all in the
+          request, this predicate will be true. If this predicate
           returns ``False``, route matching continues.
 
         effective_principals
@@ -517,7 +518,7 @@ class RoutesConfiguratorMixin(object):
             ('traverse', p.TraversePredicate),
             ):
             self.add_route_predicate(name, factory)
-    
+
     def get_routes_mapper(self):
         """ Return the :term:`routes mapper` object associated with
         this configurator's :term:`registry`."""
