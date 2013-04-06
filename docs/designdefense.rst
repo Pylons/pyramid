@@ -514,7 +514,7 @@ the method is called (if possible) with its argument list filled with values
 mentioned therein.  TurboGears and Pylons 1.X operate similarly.
 
 Out of the box, :app:`Pyramid` is configured to have none of these features.
-By default, :mod:`pyramid` view callables always accept only ``request`` and
+By default, :app:`Pyramid` view callables always accept only ``request`` and
 no other arguments.  The rationale: this argument specification matching done
 aggressively can be costly, and :app:`Pyramid` has performance as one of its
 main goals, so we've decided to make people, by default, obtain information
@@ -1678,7 +1678,7 @@ was written to address these issues.
 If it's Zope3-the-web-framework, Pyramid is *definitely* not that.  Making
 use of lots of Zope 3 technologies is territory already staked out by the
 :term:`Grok` project.  Save for the obvious fact that they're both web
-frameworks, :mod:`Pyramid` is very, very different than Grok.  Grok exposes
+frameworks, :app:`Pyramid` is very, very different than Grok.  Grok exposes
 lots of Zope technologies to end users.  On the other hand, if you need to
 understand a Zope-only concept while using Pyramid, then we've failed on some
 very basic axis.
