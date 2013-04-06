@@ -673,7 +673,7 @@ traverser.
 If you've added a traverser, you can change how
 :meth:`~pyramid.request.Request.resource_url` generates a URL for a specific
 type of resource by adding a call to
-:meth:`pyramid.config.add_resource_url_adapter`.
+:meth:`pyramid.config.Configurator.add_resource_url_adapter`.
 
 For example:
 

@@ -70,6 +70,9 @@ intersphinx_mapping = {
     'toolbar':
         ('http://docs.pylonsproject.org/projects/pyramid_debugtoolbar/en/latest',
          None),
+    'zcml':
+        ('http://docs.pylonsproject.org/projects/pyramid_zcml/en/latest',
+         None),
 }
 
 # Add any paths that contain templates here, relative to this directory.
