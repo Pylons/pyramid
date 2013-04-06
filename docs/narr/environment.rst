@@ -302,7 +302,7 @@ Ideally, you won't need to use the ``pyramid.tweens`` setting at all.  Tweens
 are generally ordered and included "implicitly" when an add-on package which
 registers a tween is "included".  Packages are included when you name a
 ``pyramid.includes`` setting in your configuration or when you call
-:meth:`pyramid.config.Configuration.include`.
+:meth:`pyramid.config.Configurator.include`.
 
 Authors of included add-ons provide "implicit" tween configuration ordering
 hints to Pyramid when their packages are included.  However, the implicit
