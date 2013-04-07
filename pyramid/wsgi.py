@@ -25,7 +25,7 @@ def wsgiapp(wrapped):
 
     The ``wsgiapp`` decorator will convert the result of the WSGI
     application to a :term:`Response` and return it to
-    :app:`Pyramid` as if the WSGI app were a :mod:`pyramid`
+    :app:`Pyramid` as if the WSGI app were a :app:`Pyramid`
     view.
 
     """
