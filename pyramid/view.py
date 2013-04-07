@@ -226,7 +226,7 @@ class view_defaults(view_config):
     """ A class :term:`decorator` which, when applied to a class, will
     provide defaults for all view configurations that use the class.  This
     decorator accepts all the arguments accepted by
-    :class:`pyramid.config.view_config`, and each has the same meaning.
+    :meth:`pyramid.view.view_config`, and each has the same meaning.
 
     See :ref:`view_defaults` for more information.
     """
