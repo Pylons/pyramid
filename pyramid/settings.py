@@ -2,8 +2,8 @@
 from pyramid.compat import string_types
 from pyramid.compat import text_
 
-checkmark = '\xe2\x9c\x93'.decode('utf-8')
-bold_check = '\xe2\x9c\x94'.decode('utf-8')
+checkmark = b'\xe2\x9c\x93'.decode('utf-8')
+bold_check = b'\xe2\x9c\x94'.decode('utf-8')
 
 truthy = frozenset(('t', 'true', 'y', 'yes', 'on', '1', checkmark, bold_check))
 
