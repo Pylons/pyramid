@@ -1,5 +1,6 @@
 next release
 ============
+- ``asbool`` now supports ``✔`` as a truthy value
 
 Features
 --------
