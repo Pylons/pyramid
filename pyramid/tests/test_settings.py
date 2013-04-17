@@ -38,10 +38,10 @@ class Test_asbool(unittest.TestCase):
         self.assertEqual(result, True)
 
     def test_s_is_check(self):
-        result = self._callFUT(u'\u2713')
+        result = self._callFUT(b'\u2713'.decode('utf-8'))
         self.assertEqual(result, True)
 
-        result = self._callFUT(u'\u2714')
+        result = self._callFUT(b'\u2714'.decode('utf-8'))
         self.assertEqual(result, True)
 
 
