@@ -2,8 +2,10 @@
 from pyramid.compat import string_types
 from pyramid.compat import text_
 
-truthy = frozenset(('t', 'true', 'y', 'yes', 'on', '1', 
-    b'\u2713'.decode('utf-8'), b'\u2714'.decode('utf-8')))
+checkmark = '\xe2\x9c\x93'.decode('utf-8')
+bold_check = '\xe2\x9c\x94'.decode('utf-8')
+
+truthy = frozenset(('t', 'true', 'y', 'yes', 'on', '1', checkmark, bold_check))
 
 def asbool(s):
     """ Return the boolean value ``True`` if the case-lowered value of string
