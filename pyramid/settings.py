@@ -1,18 +1,28 @@
+# -*- coding: utf-8 -*-
 from pyramid.compat import string_types
+from pyramid.compat import text_
 
-truthy = frozenset(('t', 'true', 'y', 'yes', 'on', '1'))
+checkmark = b'\xe2\x9c\x93'.decode('utf-8')
+bold_check = b'\xe2\x9c\x94'.decode('utf-8')
+
+truthy = frozenset(('t', 'true', 'y', 'yes', 'on', '1', checkmark, bold_check))
 
 def asbool(s):
     """ Return the boolean value ``True`` if the case-lowered value of string
-    input ``s`` is any of ``t``, ``true``, ``y``, ``on``, or ``1``, otherwise
-    return the boolean value ``False``.  If ``s`` is the value ``None``,
-    return ``False``.  If ``s`` is already one of the boolean values ``True``
-    or ``False``, return it."""
+    input ``s`` is any of ``t``, ``true``, ``y``, ``on``, ``1``, or '✔'
+    otherwise return the boolean value ``False``.  If ``s`` is the value
+    ``None``, return ``False``.  If ``s`` is already one of the boolean values
+    ``True`` or ``False``, return it."""
     if s is None:
         return False
     if isinstance(s, bool):
         return s
-    s = str(s).strip()
+
+    if isinstance(s, string_types):
+        s = text_(s).strip()
+    else:
+        s = str(s).strip()
+
     return s.lower() in truthy
 
 def aslist_cronly(value):

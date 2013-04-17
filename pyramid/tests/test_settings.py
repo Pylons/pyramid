@@ -37,6 +37,17 @@ class Test_asbool(unittest.TestCase):
         result = self._callFUT(1)
         self.assertEqual(result, True)
 
+    def test_s_is_check(self):
+        checkmark = b'\xe2\x9c\x93'.decode('utf-8')
+        bold_check = b'\xe2\x9c\x94'.decode('utf-8')
+
+        result = self._callFUT(checkmark)
+        self.assertEqual(result, True)
+
+        result = self._callFUT(bold_check)
+        self.assertEqual(result, True)
+
+
 class Test_aslist_cronly(unittest.TestCase):
     def _callFUT(self, val):
         from pyramid.settings import aslist_cronly
