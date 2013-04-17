@@ -41,6 +41,9 @@ class Test_asbool(unittest.TestCase):
         result = self._callFUT(u'\u2713')
         self.assertEqual(result, True)
 
+        result = self._callFUT(u'\u2714')
+        self.assertEqual(result, True)
+
 
 class Test_aslist_cronly(unittest.TestCase):
     def _callFUT(self, val):
