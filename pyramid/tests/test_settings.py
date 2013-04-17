@@ -38,8 +38,8 @@ class Test_asbool(unittest.TestCase):
         self.assertEqual(result, True)
 
     def test_s_is_check(self):
-        checkmark = '\xe2\x9c\x93'.decode('utf-8')
-        bold_check = '\xe2\x9c\x94'.decode('utf-8')
+        checkmark = b'\xe2\x9c\x93'.decode('utf-8')
+        bold_check = b'\xe2\x9c\x94'.decode('utf-8')
 
         result = self._callFUT(checkmark)
         self.assertEqual(result, True)
