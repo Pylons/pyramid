@@ -1,6 +1,8 @@
 from pyramid.compat import string_types
+from pyramid.compat import text_type
+from pyramid.compat import text_
 
-truthy = frozenset(('t', 'true', 'y', 'yes', 'on', '1'))
+truthy = frozenset(('t', 'true', 'y', 'yes', 'on', '1', u'\u2713'))
 
 def asbool(s):
     """ Return the boolean value ``True`` if the case-lowered value of string
@@ -12,7 +14,12 @@ def asbool(s):
         return False
     if isinstance(s, bool):
         return s
-    s = str(s).strip()
+
+    if isinstance(s, string_types):
+        s = text_(s).strip()
+    else:
+        s = str(s).strip()
+
     return s.lower() in truthy
 
 def aslist_cronly(value):
