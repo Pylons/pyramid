@@ -13,6 +13,11 @@ Bug Fixes
   of invoking the ``permits`` method of the authorization policy.
   See https://github.com/Pylons/pyramid/issues/954
 
+- Pyramid failed to install on some systems due to being packaged with
+  some test files containing higher order characters in their names. These
+  files have now been removed. See
+  https://github.com/Pylons/pyramid/issues/981
+
 1.4 (2012-12-18)
 ================
 
