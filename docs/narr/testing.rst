@@ -125,7 +125,7 @@ method attached to ``MyTest`` will use an isolated registry.
 
 The :func:`~pyramid.testing.setUp` and :func:`~pyramid.testing.tearDown`
 functions accepts various arguments that influence the environment of the
-test.  See the :ref:`testing_module` chapter for information about the extra
+test.  See the :ref:`testing_module` API for information about the extra
 arguments supported by these functions.
 
 If you also want to make :func:`~pyramid.threadlocal.get_current_request` return something
