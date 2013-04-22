@@ -77,12 +77,10 @@ response attributes (such as headers and the HTTP status code) by attaching a
 property to the ``request.response`` attribute.
 See :ref:`request_response_attr`.
 
-If the :term:`view callable` associated with a :term:`view configuration`
-returns a Response object directly, any renderer associated with the view
-configuration is ignored, and the response is passed back to :app:`Pyramid`
-unchanged.  For example, if your view callable returns an instance of the
-:class:`pyramid.response.Response` class as a response, no renderer
-will be employed.
+As already mentioned, if the :term:`view callable` associated with a
+:term:`view configuration` returns a Response object (or its instance),
+any renderer associated with the view configuration is ignored,
+and the response is passed back to :app:`Pyramid` unchanged.  For example:
 
 .. code-block:: python
    :linenos:
