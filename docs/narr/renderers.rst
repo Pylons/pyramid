@@ -140,7 +140,7 @@ used in the ``renderer`` attribute of view configurations.
 ``string``: String Renderer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The ``string`` renderer is a renderer which renders a view callable result to
+The ``string`` renderer renders a view callable result to
 a string.  If a view callable returns a non-Response object, and the
 ``string`` renderer is associated in that view's configuration, the result
 will be to run the object through the Python ``str`` function to generate a
