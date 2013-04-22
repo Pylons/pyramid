@@ -508,8 +508,7 @@ def tearDown(unhook_zca=True):
                 pass
 
 def cleanUp(*arg, **kw):
-    """ :func:`pyramid.testing.cleanUp` is an alias for
-    :func:`pyramid.testing.setUp`. """
+    """ An alias for :func:`pyramid.testing.setUp`. """
     return setUp(*arg, **kw)
 
 class DummyRendererFactory(object):
