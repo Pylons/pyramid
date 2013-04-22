@@ -202,7 +202,7 @@ any ``get_current*`` function.
 Using the ``Configurator`` and ``pyramid.testing`` APIs in Unit Tests
 ---------------------------------------------------------------------
 
-The ``Configurator`` API and the ``pyramid.testing`` module provide a number
+The ``Configurator`` API and the :mod:`pyramid.testing` module provide a number
 of functions which can be used during unit testing.  These functions make
 :term:`configuration declaration` calls to the current :term:`application
 registry`, but typically register a "stub" or "dummy" feature in place of the
