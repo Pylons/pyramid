@@ -51,8 +51,8 @@ and renderers which use templating systems.  See also
 Writing View Callables Which Use a Renderer
 -------------------------------------------
 
-As we've seen, view callables needn't always return a Response object.
-Instead, they may return an arbitrary Python object, with the expectation
+As we've seen, a view callable needn't always return a Response object.
+Instead, it may return an arbitrary Python object, with the expectation
 that a :term:`renderer` will convert that object into a response instance on
 your behalf.  Some renderers use a templating system; other renderers use
 object serialization techniques.
