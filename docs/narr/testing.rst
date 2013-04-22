@@ -373,7 +373,7 @@ after accessing some values that require a fully set up environment.
            result = my_view(request)
            self.assertEqual(result.status, '200 OK')
            body = result.app_iter[0]
-           self.failUnless('Welcome to' in body)
+           self.assertTrue('Welcome to' in body)
            self.assertEqual(len(result.headerlist), 2)
            self.assertEqual(result.headerlist[0],
                             ('Content-Type', 'text/html; charset=UTF-8'))
