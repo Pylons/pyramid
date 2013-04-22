@@ -416,7 +416,7 @@ functional testing package written by Ian Bicking.
 
        def test_root(self):
            res = self.testapp.get('/', status=200)
-           self.failUnless('Pyramid' in res.body)
+           self.assertTrue('Pyramid' in res.body)
 
 When this test is run, each test creates a "real" WSGI application using the
 ``main`` function in your ``myapp.__init__`` module and uses :term:`WebTest`
