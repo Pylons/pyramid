@@ -38,9 +38,7 @@ object from a view that is configured with a renderer, the renderer is
 bypassed entirely.
 
 Various types of renderers exist, including serialization renderers
-and renderers which use templating systems.  See also
-:ref:`views_which_use_a_renderer`.
-
+and renderers which use templating systems.
 
 .. index::
    single: renderer
