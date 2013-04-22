@@ -33,14 +33,11 @@ by the view must be compatible with the particular kind of renderer used, or
 an error may occur during view invocation.
 
 One exception exists: it is *always* OK to return a Response object, even
-when a ``renderer`` is configured.  If a view callable returns a response
-object from a view that is configured with a renderer, the renderer is
+when a ``renderer`` is configured.  In such cases, the renderer is
 bypassed entirely.
 
 Various types of renderers exist, including serialization renderers
-and renderers which use templating systems.  See also
-:ref:`views_which_use_a_renderer`.
-
+and renderers which use templating systems.
 
 .. index::
    single: renderer
