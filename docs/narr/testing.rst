@@ -125,7 +125,7 @@ method attached to ``MyTest`` will use an isolated registry.
 
 The :func:`~pyramid.testing.setUp` and :func:`~pyramid.testing.tearDown`
 functions accepts various arguments that influence the environment of the
-test.  See the :ref:`testing_module` chapter for information about the extra
+test.  See the :ref:`testing_module` API for information about the extra
 arguments supported by these functions.
 
 If you also want to make :func:`~pyramid.threadlocal.get_current_request` return something
@@ -202,7 +202,7 @@ any ``get_current*`` function.
 Using the ``Configurator`` and ``pyramid.testing`` APIs in Unit Tests
 ---------------------------------------------------------------------
 
-The ``Configurator`` API and the ``pyramid.testing`` module provide a number
+The ``Configurator`` API and the :mod:`pyramid.testing` module provide a number
 of functions which can be used during unit testing.  These functions make
 :term:`configuration declaration` calls to the current :term:`application
 registry`, but typically register a "stub" or "dummy" feature in place of the
@@ -291,7 +291,7 @@ function is called, :func:`pyramid.security.has_permission` will call the
 access.  We check that the view function raises a
 :exc:`~pyramid.httpexceptions.HTTPForbidden` error.
 
-The second test method, named ``test_view_fn_allowed`` tests the alternate
+The second test method, named ``test_view_fn_allowed``, tests the alternate
 case, where the authentication policy allows access.  Notice that we pass
 different values to
 :meth:`~pyramid.config.Configurator.testing_securitypolicy` to obtain this
@@ -373,7 +373,7 @@ after accessing some values that require a fully set up environment.
            result = my_view(request)
            self.assertEqual(result.status, '200 OK')
            body = result.app_iter[0]
-           self.failUnless('Welcome to' in body)
+           self.assertTrue('Welcome to' in body)
            self.assertEqual(len(result.headerlist), 2)
            self.assertEqual(result.headerlist[0],
                             ('Content-Type', 'text/html; charset=UTF-8'))
@@ -416,7 +416,7 @@ functional testing package written by Ian Bicking.
 
        def test_root(self):
            res = self.testapp.get('/', status=200)
-           self.failUnless('Pyramid' in res.body)
+           self.assertTrue('Pyramid' in res.body)
 
 When this test is run, each test creates a "real" WSGI application using the
 ``main`` function in your ``myapp.__init__`` module and uses :term:`WebTest`

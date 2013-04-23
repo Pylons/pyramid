@@ -33,7 +33,7 @@ class AdaptersConfiguratorMixin(object):
 
         Any number of predicate keyword arguments may be passed in
         ``**predicates``.  Each predicate named will narrow the set of
-        circumstances that the subscriber will be invoked.  Each named
+        circumstances in which the subscriber will be invoked.  Each named
         predicate must have been registered via
         :meth:`pyramid.config.Configurator.add_subscriber_predicate` before it
         can be used.  See :ref:`subscriber_predicates` for more information.

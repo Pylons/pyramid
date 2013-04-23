@@ -908,10 +908,11 @@ per :ref:`protecting_views`.
 
 .. _debug_notfound_section:
 
-:exc:`NotFound` Errors
-~~~~~~~~~~~~~~~~~~~~~~
+:exc:`~pyramid.exceptions.NotFound` Errors
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-It's useful to be able to debug :exc:`NotFound` error responses when they
+It's useful to be able to debug :exc:`~pyramid.exceptions.NotFound`
+error responses when they
 occur unexpectedly due to an application registry misconfiguration.  To debug
 these errors, use the ``PYRAMID_DEBUG_NOTFOUND`` environment variable or the
 ``pyramid.debug_notfound`` configuration file setting.  Details of why a view

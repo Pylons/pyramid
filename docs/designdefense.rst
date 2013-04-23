@@ -38,13 +38,13 @@ forking is also a Zope derivative.
 
 Implementations of these features were *required* to allow the :app:`Pyramid`
 authors to build the bread-and-butter CMS-type systems for customers in the
-way they were accustomed to building them.  No other system, save for Zope itself,
-had such features.  And Zope itself was beginning to show signs of its age.
+way in which they were accustomed.  No other system, save for Zope itself,
+had such features, and Zope itself was beginning to show signs of its age.
 We were becoming hampered by consequences of its early design mistakes.
 Zope's lack of documentation was also difficult to work around: it was hard
 to hire smart people to work on Zope applications, because there was no
 comprehensive documentation set to point them at which explained "it all" in
-one consumble place, and it was too large and self-inconsistent to document
+one consumable place, and it was too large and self-inconsistent to document
 properly.  Before :mod:`repoze.bfg` went under development, its authors
 obviously looked around for other frameworks that fit the bill.  But no
 non-Zope framework did.  So we embarked on building :mod:`repoze.bfg`.
@@ -514,7 +514,7 @@ the method is called (if possible) with its argument list filled with values
 mentioned therein.  TurboGears and Pylons 1.X operate similarly.
 
 Out of the box, :app:`Pyramid` is configured to have none of these features.
-By default, :mod:`pyramid` view callables always accept only ``request`` and
+By default, :app:`Pyramid` view callables always accept only ``request`` and
 no other arguments.  The rationale: this argument specification matching done
 aggressively can be costly, and :app:`Pyramid` has performance as one of its
 main goals, so we've decided to make people, by default, obtain information
@@ -1678,7 +1678,7 @@ was written to address these issues.
 If it's Zope3-the-web-framework, Pyramid is *definitely* not that.  Making
 use of lots of Zope 3 technologies is territory already staked out by the
 :term:`Grok` project.  Save for the obvious fact that they're both web
-frameworks, :mod:`Pyramid` is very, very different than Grok.  Grok exposes
+frameworks, :app:`Pyramid` is very, very different than Grok.  Grok exposes
 lots of Zope technologies to end users.  On the other hand, if you need to
 understand a Zope-only concept while using Pyramid, then we've failed on some
 very basic axis.

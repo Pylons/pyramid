@@ -271,7 +271,7 @@ assets which begin with ``mypackage:images`` will be prefixed with
    # -> http://example.com/images/logo.png
 
 Using :meth:`~pyramid.request.Request.static_url` in conjunction with a
-:meth:`~pyramid.configuration.Configurator.add_static_view` makes it possible
+:meth:`~pyramid.config.Configurator.add_static_view` makes it possible
 to put static media on a separate webserver during production (if the
 ``name`` argument to :meth:`~pyramid.config.Configurator.add_static_view` is
 a URL), while keeping static media package-internal and served by the

@@ -642,7 +642,7 @@ class Configurator(
         argument named ``config``, which will be an instance of a
         :term:`Configurator`.  However, be warned that it will not be the same
         configurator instance on which you call this method.  The
-        code which runs as the result of calling the callable should invoke
+        code which runs as a result of calling the callable should invoke
         methods on the configurator passed to it which add configuration
         state.  The return value of a callable will be ignored.
 

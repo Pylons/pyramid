@@ -55,6 +55,7 @@ extensions = [
 
 # Looks for objects in external projects
 intersphinx_mapping = {
+    'zcomponent': ('http://docs.zope.org/zope.component', None),
     'webtest': ('http://webtest.pythonpaste.org/en/latest', None),
     'webob': ('http://docs.webob.org/en/latest', None),
     'sqla': ('http://docs.sqlalchemy.org/en/latest', None),
@@ -68,6 +69,9 @@ intersphinx_mapping = {
         ('http://docs.pylonsproject.org/projects/venusian/en/latest', None),
     'toolbar':
         ('http://docs.pylonsproject.org/projects/pyramid_debugtoolbar/en/latest',
+         None),
+    'zcml':
+        ('http://docs.pylonsproject.org/projects/pyramid_zcml/en/latest',
          None),
 }
 
