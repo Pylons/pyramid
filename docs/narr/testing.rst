@@ -291,7 +291,7 @@ function is called, :func:`pyramid.security.has_permission` will call the
 access.  We check that the view function raises a
 :exc:`~pyramid.httpexceptions.HTTPForbidden` error.
 
-The second test method, named ``test_view_fn_allowed`` tests the alternate
+The second test method, named ``test_view_fn_allowed``, tests the alternate
 case, where the authentication policy allows access.  Notice that we pass
 different values to
 :meth:`~pyramid.config.Configurator.testing_securitypolicy` to obtain this
