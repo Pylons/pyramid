@@ -45,7 +45,7 @@ class AppmakerTests(unittest.TestCase):
         app_root = object()
         root = {'app_root': app_root}
         self._callFUT(root)
-        self.failUnless(root['app_root'] is app_root)
+        self.assertTrue(root['app_root'] is app_root)
 
 class ViewTests(unittest.TestCase):
     def setUp(self):
