@@ -222,6 +222,12 @@ function.
            raise HTTPForbidden
        return {'greeting':'hello'}
 
+.. note::
+
+   This code implies that you have defined a renderer imperatively in a
+   relevant :class:`pyramid.config.Configurator` instance,
+   otherwise it would fail when run normally.
+
 Without doing anything special during a unit test, the call to
 :func:`~pyramid.security.has_permission` in this view function will always
 return a ``True`` value.  When a :app:`Pyramid` application starts normally,
