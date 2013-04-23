@@ -217,7 +217,7 @@ function.
    from pyramid.security import has_permission
    from pyramid.httpexceptions import HTTPForbidden
 
-   def view_fn(request):
+   def view_fn(request, renderer='json'):
        if not has_permission('edit', request.context, request):
            raise HTTPForbidden
        return {'greeting':'hello'}
