@@ -698,7 +698,7 @@ Glossary
      :app:`Pyramid` runs on GAE.
 
    Venusian
-     `Venusian <http://docs.repoze.org/venusian>`_ is a library which
+     :ref:`Venusian` is a library which
      allows framework authors to defer decorator actions.  Instead of
      taking actions when a function (or class) decorator is executed
      at import time, the action usually taken by the decorator is
