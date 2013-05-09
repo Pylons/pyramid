@@ -9,7 +9,7 @@
 .coverage
 .tox/
 nosetests.xml
-pyramid/coverage.xml
+coverage.xml
 tutorial.db
 build/
 dist/
