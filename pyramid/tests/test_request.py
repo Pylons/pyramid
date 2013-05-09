@@ -271,6 +271,18 @@ class TestRequest(unittest.TestCase):
         request.body = b'{"a":1}'
         self.assertEqual(request.json_body, {'a':1})
 
+    def test_json_body_reify(self):
+        request = self._makeOne({'REQUEST_METHOD':'POST'})
+
+        request.body = b'{"a":1}'
+
+        self.assertEqual(request.json_body, {'a':1})
+
+        request.body = b''
+
+        self.assertEqual(request.json_body, {'a':1})
+
+
     def test_json_body_alternate_charset(self):
         import json
         request = self._makeOne({'REQUEST_METHOD':'POST'})
