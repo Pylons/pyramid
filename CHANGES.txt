@@ -7,6 +7,13 @@ Next 1.4 release
   Python 3.2 (although the combination of MarkupSafe 0.17 and Python 3.3 or any
   supported Python 2 version will work OK).
 
+- Make the ``pyramid.config.assets.PackageOverrides`` object implement the API
+  for ``__loader__`` objects specified in PEP 302.  Proxies to the
+  ``__loader__`` set by the importer, if present; otherwise, raises
+  ``NotImplementedError``.  This makes Pyramid static view overrides work
+  properly under Python 3.3 (previously they would not).  See
+  https://github.com/Pylons/pyramid/pull/1015 for more information.
+
 1.4.1 (2013-04-23)
 ==================
 
