@@ -47,7 +47,7 @@ class PyramidTemplate(Template):
 
             Welcome to Pyramid.  Sorry for the convenience.
             %(separator)s
-		""" % {'separator': separator})
+        """ % {'separator': separator})
 
         self.out(msg)
         return Template.post(self, command, output_dir, vars)
