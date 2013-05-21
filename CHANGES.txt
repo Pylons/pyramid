@@ -4,11 +4,6 @@ next release
 Features
 --------
 
-- Make the ``pyramid.config.assets.PackageOverrides`` object implement the
-  API for ``__loader__`` objects specified in PEP 302.  Proxies to the
-  ``__loader__`` set by the importer, if present;  otherwise, raises
-  ``NotImplementedError``.
-
 - ``ACLAuthorizationPolicy`` supports ``__acl__`` as a callable. This
   removes the ambiguity between the potential ``AttributeError`` that would
   be raised on the ``context`` when the property was not defined and the
@@ -36,6 +31,13 @@ Features
 
 Bug Fixes
 ---------
+
+- Make the ``pyramid.config.assets.PackageOverrides`` object implement the API
+  for ``__loader__`` objects specified in PEP 302.  Proxies to the
+  ``__loader__`` set by the importer, if present; otherwise, raises
+  ``NotImplementedError``.  This makes Pyramid static view overrides work
+  properly under Python 3.3 (previously they would not).  See
+  https://github.com/Pylons/pyramid/pull/1015 for more information.
 
 - ``mako_templating``: added defensive workaround for non-importability of
   ``mako`` due to upstream ``markupsafe`` dropping Python 3.2 support.  Mako
