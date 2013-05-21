@@ -1,6 +1,5 @@
 import os
 import posixpath
-import re
 import sys
 import threading
 

@@ -369,22 +369,12 @@ class TestForbiddenAppHasResult(IntegrationBase, unittest.TestCase):
 
 class TestViewDecoratorApp(IntegrationBase, unittest.TestCase):
     package = 'pyramid.tests.pkgs.viewdecoratorapp'
-    def _configure_mako(self):
-        tmpldir = os.path.join(os.path.dirname(__file__),
-                               'pkgs',
-                               'viewdecoratorapp',
-                               'views')
-        self.config.registry.settings['mako.directories'] = tmpldir
 
     def test_first(self):
-        # we use mako here instead of chameleon because it works on Jython
-        self._configure_mako()
         res = self.testapp.get('/first', status=200)
         self.assertTrue(b'OK' in res.body)
 
     def test_second(self):
-        # we use mako here instead of chameleon because it works on Jython
-        self._configure_mako()
         res = self.testapp.get('/second', status=200)
         self.assertTrue(b'OK2' in res.body)
 
