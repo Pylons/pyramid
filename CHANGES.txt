@@ -32,6 +32,9 @@ Features
 Bug Fixes
 ---------
 
+- ``mako_templating``:  added defensive workaround for non-importability
+  of ``mako`` (due to upstream ``markupsafe`` dropping Python 3.2 support).
+
 - View lookup will now search for valid views based on the inheritance
   hierarchy of the context. It tries to find views based on the most
   specific context first, and upon predicate failure, will move up the

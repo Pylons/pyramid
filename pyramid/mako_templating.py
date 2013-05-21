@@ -23,8 +23,29 @@ from pyramid.interfaces import ITemplateRenderer
 from pyramid.settings import asbool
 from pyramid.util import DottedNameResolver
 
-from mako.lookup import TemplateLookup
-from mako import exceptions
+try:
+    from mako.lookup import TemplateLookup
+except (ImportError, SyntaxError, AttributeError): #pragma NO COVER
+    class TemplateLookup(object):
+        def __init__(self, **kw):
+            pass
+        def no_mako(self, *args, **kw):
+            raise NotImplementedError("'mako' not importable")
+        adjust_uri = get_template = filename_to_uri = no_mako
+        put_string = put_template = no_mako
+
+try:
+    from mako.exceptions import TopLevelLookupException
+except (ImportError, SyntaxError, AttributeError): #pragma NO COVER
+    class TopLevelLookupException(Exception):
+        pass
+
+try:
+    from mako.exceptions import text_error_template
+except (ImportError, SyntaxError, AttributeError): #pragma NO COVER
+    def text_error_template(lookup=None):
+        raise NotImplementedError("'mako' not importable")
+
 
 class IMakoLookup(Interface):
     pass
@@ -78,7 +99,7 @@ class PkgResourceTemplateLookup(TemplateLookup):
                 srcfile = abspath_from_asset_spec(path, pname)
                 if os.path.isfile(srcfile):
                     return self._load(srcfile, adjusted)
-                raise exceptions.TopLevelLookupException(
+                raise TopLevelLookupException(
                     "Can not locate template for uri %r" % uri)
         return TemplateLookup.get_template(self, uri)
 
@@ -208,7 +229,7 @@ class MakoLookupTemplateRenderer(object):
         except:
             try:
                 exc_info = sys.exc_info()
-                errtext = exceptions.text_error_template().render(
+                errtext = text_error_template().render(
                     error=exc_info[1],
                     traceback=exc_info[2]
                     )
