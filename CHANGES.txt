@@ -4,6 +4,11 @@ next release
 Features
 --------
 
+- Make the ``pyramid.config.assets.PackageOverrides`` object implement the
+  API for ``__loader__`` objects specified in PEP 302.  Proxies to the
+  ``__loader__`` set by the importer, if present;  otherwise, raises
+  ``NotImplementedError``.
+
 - ``ACLAuthorizationPolicy`` supports ``__acl__`` as a callable. This
   removes the ambiguity between the potential ``AttributeError`` that would
   be raised on the ``context`` when the property was not defined and the

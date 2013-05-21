@@ -793,7 +793,49 @@ deprecated(
     'See the "What\'s new In Pyramid 1.3" document for more details.'
     )
 
-class IPackageOverrides(Interface):
+class IPEP302Loader(Interface):
+    """ See http://www.python.org/dev/peps/pep-0302/#id30.
+    """
+    def get_data(path):
+        """ Retrieve data for and arbitrary "files" from storage backend.
+
+        Raise IOError for not found.
+
+        Data is returned as bytes.
+        """
+
+    def is_package(fullname):
+        """ Return True if the module specified by 'fullname' is a package.
+        """
+
+    def get_code(fullname):
+        """ Return the code object for the module identified by 'fullname'.
+        
+        Return 'None' if it's a built-in or extension module.
+        
+        If the loader doesn't have the code object but it does have the source
+        code, return the compiled source code.
+
+        Raise ImportError if the module can't be found by the importer at all.
+        """
+
+    def get_source(fullname):
+        """ Return the source code for the module identified by 'fullname'.
+        
+        Return a string, using newline characters for line endings, or None
+        if the source is not available.
+            
+        Raise ImportError if the module can't be found by the importer at all.
+        """
+
+    def get_filename(fullname):
+        """ Return the value of '__file__' if the named module was loaded.
+        
+        If the module is not found, raise ImportError.
+        """
+
+
+class IPackageOverrides(IPEP302Loader):
     """ Utility for pkg_resources overrides """
 
 # VH_ROOT_KEY is an interface; its imported from other packages (e.g.

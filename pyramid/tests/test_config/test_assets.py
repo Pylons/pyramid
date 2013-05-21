@@ -314,16 +314,40 @@ class TestPackageOverrides(unittest.TestCase):
         from pyramid.config.assets import PackageOverrides
         return PackageOverrides
 
-    def _makeOne(self, package, pkg_resources=None):
+    def _makeOne(self, package=None, pkg_resources=None):
+        if package is None:
+            package = DummyPackage('package')
         klass = self._getTargetClass()
         if pkg_resources is None:
             pkg_resources = DummyPkgResources()
         return klass(package, pkg_resources=pkg_resources)
 
+    def test_class_conforms_to_IPackageOverrides(self):
+        from zope.interface.verify import verifyClass
+        from pyramid.interfaces import IPackageOverrides
+        verifyClass(IPackageOverrides, self._getTargetClass())
+
+    def test_instance_conforms_to_IPackageOverrides(self):
+        from zope.interface.verify import verifyObject
+        from pyramid.interfaces import IPackageOverrides
+        verifyObject(IPackageOverrides, self._makeOne())
+
+    def test_class_conforms_to_IPEP302Loader(self):
+        from zope.interface.verify import verifyClass
+        from pyramid.interfaces import IPEP302Loader
+        verifyClass(IPEP302Loader, self._getTargetClass())
+
+    def test_instance_conforms_to_IPEP302Loader(self):
+        from zope.interface.verify import verifyObject
+        from pyramid.interfaces import IPEP302Loader
+        verifyObject(IPEP302Loader, self._makeOne())
+
     def test_ctor_package_already_has_loader_of_different_type(self):
         package = DummyPackage('package')
-        package.__loader__ = True
-        self.assertRaises(TypeError, self._makeOne, package)
+        loader = package.__loader__ = DummyLoader()
+        po = self._makeOne(package)
+        self.assertTrue(package.__loader__ is po)
+        self.assertTrue(po.real_loader is loader)
 
     def test_ctor_package_already_has_loader_of_same_type(self):
         package = DummyPackage('package')
@@ -502,6 +526,55 @@ class TestPackageOverrides(unittest.TestCase):
         po.overrides= overrides
         self.assertEqual(po.listdir('whatever'), None)
 
+    # PEP 302 __loader__ extensions:  use the "real" __loader__, if present.
+    def test_get_data_pkg_has_no___loader__(self):
+        package = DummyPackage('package')
+        po = self._makeOne(package)
+        self.assertRaises(NotImplementedError, po.get_data, 'whatever')
+
+    def test_get_data_pkg_has___loader__(self):
+        package = DummyPackage('package')
+        loader = package.__loader__  = DummyLoader()
+        po = self._makeOne(package)
+        self.assertEqual(po.get_data('whatever'), b'DEADBEEF')
+        self.assertEqual(loader._got_data, 'whatever')
+
+    def test_is_package_pkg_has_no___loader__(self):
+        package = DummyPackage('package')
+        po = self._makeOne(package)
+        self.assertRaises(NotImplementedError, po.is_package, 'whatever')
+
+    def test_is_package_pkg_has___loader__(self):
+        package = DummyPackage('package')
+        loader = package.__loader__  = DummyLoader()
+        po = self._makeOne(package)
+        self.assertTrue(po.is_package('whatever'))
+        self.assertEqual(loader._is_package, 'whatever')
+
+    def test_get_code_pkg_has_no___loader__(self):
+        package = DummyPackage('package')
+        po = self._makeOne(package)
+        self.assertRaises(NotImplementedError, po.get_code, 'whatever')
+
+    def test_get_code_pkg_has___loader__(self):
+        package = DummyPackage('package')
+        loader = package.__loader__  = DummyLoader()
+        po = self._makeOne(package)
+        self.assertEqual(po.get_code('whatever'), b'DEADBEEF')
+        self.assertEqual(loader._got_code, 'whatever')
+
+    def test_get_source_pkg_has_no___loader__(self):
+        package = DummyPackage('package')
+        po = self._makeOne(package)
+        self.assertRaises(NotImplementedError, po.get_source, 'whatever')
+
+    def test_get_source_pkg_has___loader__(self):
+        package = DummyPackage('package')
+        loader = package.__loader__  = DummyLoader()
+        po = self._makeOne(package)
+        self.assertEqual(po.get_source('whatever'), 'def foo():\n    pass')
+        self.assertEqual(loader._got_source, 'whatever')
+
 class TestDirectoryOverride(unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.config.assets import DirectoryOverride
@@ -570,10 +643,25 @@ class DummyPkgResources:
 
     def register_loader_type(self, typ, inst):
         self.registered.append((typ, inst))
-        
+
 class DummyPackage:
     def __init__(self, name):
         self.__name__ = name
+ 
+class DummyLoader:
+    _got_data = _is_package = None
+    def get_data(self, path):
+        self._got_data = path
+        return b'DEADBEEF'
+    def is_package(self, fullname):
+        self._is_package = fullname
+        return True
+    def get_code(self, fullname):
+        self._got_code = fullname
+        return b'DEADBEEF'
+    def get_source(self, fullname):
+        self._got_source = fullname
+        return 'def foo():\n    pass'
 
 class DummyUnderOverride:
     def __call__(self, package, path, override_package, override_prefix,
