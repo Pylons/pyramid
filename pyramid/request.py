@@ -354,8 +354,7 @@ class Request(BaseRequest, DeprecatedRequestMethodsMixin, URLMethodsMixin,
         """This attribute is actually a "reified" property which returns an
         instance of the :class:`pyramid.response.Response`. class.  The
         response object returned does not exist until this attribute is
-        accessed.  Once it is accessed, subsequent accesses will return the
-        same Response object.
+        accessed.  Subsequent accesses will return the same Response object.
 
         The ``request.response`` API is used by renderers.  A render obtains
         the response object it will return from a view that uses that renderer

@@ -156,9 +156,9 @@ Glossary
 
    resource
      An object representing a node in the :term:`resource tree` of an
-     application.  If :mod:`traversal` is used, a resource is an element in
+     application.  If :term:`traversal` is used, a resource is an element in
      the resource tree traversed by the system.  When traversal is used, a
-     resource becomes the :term:`context` of a :term:`view`.  If :mod:`url
+     resource becomes the :term:`context` of a :term:`view`.  If :term:`url
      dispatch` is used, a single resource is generated for each request and
      is used as the context resource of a view.
 
@@ -698,7 +698,7 @@ Glossary
      :app:`Pyramid` runs on GAE.
 
    Venusian
-     `Venusian <http://docs.repoze.org/venusian>`_ is a library which
+     :ref:`Venusian` is a library which
      allows framework authors to defer decorator actions.  Instead of
      taking actions when a function (or class) decorator is executed
      at import time, the action usually taken by the decorator is

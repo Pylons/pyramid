@@ -33,14 +33,11 @@ by the view must be compatible with the particular kind of renderer used, or
 an error may occur during view invocation.
 
 One exception exists: it is *always* OK to return a Response object, even
-when a ``renderer`` is configured.  If a view callable returns a response
-object from a view that is configured with a renderer, the renderer is
+when a ``renderer`` is configured.  In such cases, the renderer is
 bypassed entirely.
 
 Various types of renderers exist, including serialization renderers
-and renderers which use templating systems.  See also
-:ref:`views_which_use_a_renderer`.
-
+and renderers which use templating systems.
 
 .. index::
    single: renderer
@@ -51,8 +48,8 @@ and renderers which use templating systems.  See also
 Writing View Callables Which Use a Renderer
 -------------------------------------------
 
-As we've seen, view callables needn't always return a Response object.
-Instead, they may return an arbitrary Python object, with the expectation
+As we've seen, a view callable needn't always return a Response object.
+Instead, it may return an arbitrary Python object, with the expectation
 that a :term:`renderer` will convert that object into a response instance on
 your behalf.  Some renderers use a templating system; other renderers use
 object serialization techniques.
@@ -80,12 +77,10 @@ response attributes (such as headers and the HTTP status code) by attaching a
 property to the ``request.response`` attribute.
 See :ref:`request_response_attr`.
 
-If the :term:`view callable` associated with a :term:`view configuration`
-returns a Response object directly, any renderer associated with the view
-configuration is ignored, and the response is passed back to :app:`Pyramid`
-unchanged.  For example, if your view callable returns an instance of the
-:class:`pyramid.response.Response` class as a response, no renderer
-will be employed.
+As already mentioned, if the :term:`view callable` associated with a
+:term:`view configuration` returns a Response object (or its instance),
+any renderer associated with the view configuration is ignored,
+and the response is passed back to :app:`Pyramid` unchanged.  For example:
 
 .. code-block:: python
    :linenos:
@@ -140,7 +135,7 @@ used in the ``renderer`` attribute of view configurations.
 ``string``: String Renderer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The ``string`` renderer is a renderer which renders a view callable result to
+The ``string`` renderer renders a view callable result to
 a string.  If a view callable returns a non-Response object, and the
 ``string`` renderer is associated in that view's configuration, the result
 will be to run the object through the Python ``str`` function to generate a

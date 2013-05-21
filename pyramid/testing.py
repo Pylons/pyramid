@@ -137,7 +137,7 @@ class DummyTemplateRenderer(object):
     def assert_(self, **kw):
         """ Accept an arbitrary set of assertion key/value pairs.  For
         each assertion key/value pair assert that the renderer
-        (eg. :func:`pyramid.renderer.render_to_response`)
+        (eg. :func:`pyramid.renderers.render_to_response`)
         received the key with a value that equals the asserted
         value. If the renderer did not receive the key at all, or the
         value received by the renderer doesn't match the assertion
@@ -482,9 +482,9 @@ def tearDown(unhook_zca=True):
 
     If the ``unhook_zca`` argument is ``True`` (the default), call
     :func:`zope.component.getSiteManager.reset`.  This undoes the
-    action of :func:`pyramid.testing.setUp` called with the
+    action of :func:`pyramid.testing.setUp` when called with the
     argument ``hook_zca=True``.  If :mod:`zope.component` cannot be
-    imported, ignore the argument.
+    imported, ``unhook_zca`` is set to ``False``.
     """
     global have_zca
     if unhook_zca and have_zca:
@@ -508,8 +508,7 @@ def tearDown(unhook_zca=True):
                 pass
 
 def cleanUp(*arg, **kw):
-    """ :func:`pyramid.testing.cleanUp` is an alias for
-    :func:`pyramid.testing.setUp`. """
+    """ An alias for :func:`pyramid.testing.setUp`. """
     return setUp(*arg, **kw)
 
 class DummyRendererFactory(object):
@@ -591,10 +590,10 @@ def testConfig(registry=None,
         settings=None):
     """Returns a context manager for test set up.
 
-    This context manager calls :func:`pyramid.testing.testSetup` when
+    This context manager calls :func:`pyramid.testing.setUp` when
     entering and :func:`pyramid.testing.tearDown` when exiting.
 
-    All arguments are passed directly to :func:`pyramid.testing.testSetup`.
+    All arguments are passed directly to :func:`pyramid.testing.setUp`.
     If the ZCA is hooked, it will always be un-hooked in tearDown.
 
     This context manager allows you to write test code like this:

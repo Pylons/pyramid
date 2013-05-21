@@ -14,8 +14,8 @@ in various ways.
 Changing the Not Found View
 ---------------------------
 
-When :app:`Pyramid` can't map a URL to view code, it invokes a :term:`not
-found view`, which is a :term:`view callable`. The default Not Found View
+When :app:`Pyramid` can't map a URL to view code, it invokes a :term:`Not
+Found View`, which is a :term:`view callable`. The default Not Found View
 can be overridden through application configuration.
 
 If your application uses :term:`imperative configuration`, you can replace
@@ -25,15 +25,17 @@ the Not Found View by using the
 .. code-block:: python
    :linenos:
 
-   from helloworld.views import notfound
-   config.add_notfound_view(notfound)
+   def notfound(request):
+       return Response('Not Found, dude', status='404 Not Found')
 
-Replace ``helloworld.views.notfound`` with a reference to the :term:`view
-callable` you want to use to represent the Not Found View.  The :term:`not
-found view` callable is a view callable like any other.
+   def main(globals, **settings):
+       config = Configurator()
+       config.add_notfound_view(notfound)
+
+The :term:`Not Found View` callable is a view callable like any other.
 
 If your application instead uses :class:`pyramid.view.view_config` decorators
-and a :term:`scan`, you can replace the Not Found view by using the
+and a :term:`scan`, you can replace the Not Found View by using the
 :class:`pyramid.view.notfound_view_config` decorator:
 
 .. code-block:: python
@@ -46,8 +48,8 @@ and a :term:`scan`, you can replace the Not Found view by using the
        return Response('Not Found, dude', status='404 Not Found')
 
    def main(globals, **settings):
-      config = Configurator()
-      config.scan()
+       config = Configurator()
+       config.scan()
 
 This does exactly what the imperative example above showed.
 
@@ -154,12 +156,12 @@ forbidden view:
 .. code-block:: python
    :linenos:
 
-   from helloworld.views import forbidden_view
-   from pyramid.httpexceptions import HTTPForbidden
-   config.add_forbidden_view(forbidden_view)
+   def forbidden(request):
+       return Response('forbidden')
 
-Replace ``helloworld.views.forbidden_view`` with a reference to the Python
-:term:`view callable` you want to use to represent the Forbidden view.
+   def main(globals, **settings):
+       config = Configurator()
+       config.add_forbidden_view(forbidden_view)
 
 If instead you prefer to use decorators and a :term:`scan`, you can use the
 :class:`pyramid.view.forbidden_view_config` decorator to mark a view callable
@@ -673,7 +675,7 @@ traverser.
 If you've added a traverser, you can change how
 :meth:`~pyramid.request.Request.resource_url` generates a URL for a specific
 type of resource by adding a call to
-:meth:`pyramid.config.add_resource_url_adapter`.
+:meth:`pyramid.config.Configurator.add_resource_url_adapter`.
 
 For example:
 
@@ -929,7 +931,7 @@ set a *default* view mapper (overriding the superdefault view mapper used by
 Pyramid itself).
 
 A *single* view registration can use a view mapper by passing the mapper as
-the ``mapper`` argument to :meth:`~pyramid.config.Configuration.add_view`.
+the ``mapper`` argument to :meth:`~pyramid.config.Configurator.add_view`.
 
 .. index::
    single: configuration decorator
