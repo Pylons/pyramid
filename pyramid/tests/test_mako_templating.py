@@ -30,7 +30,7 @@ def maybe_unittest():
     # so these tests should not be skipped on those platforms.
     try:
         import mako.lookup
-    except (ImportError, SyntaxError, AttributeError):
+    except (ImportError, SyntaxError, AttributeError): # pragma: no cover
         return object
     else:
         return unittest.TestCase
