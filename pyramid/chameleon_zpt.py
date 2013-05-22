@@ -1,7 +1,5 @@
 from zope.interface import implementer
 
-from chameleon.zpt.template import PageTemplateFile
-
 from pyramid.interfaces import ITemplateRenderer
 from pyramid.decorator import reify
 from pyramid import renderers
@@ -18,6 +16,7 @@ class ZPTTemplateRenderer(object):
 
     @reify # avoid looking up reload_templates before manager pushed
     def template(self):
+        from chameleon.zpt.template import PageTemplateFile
         tf = PageTemplateFile(
             self.path,
             auto_reload=self.lookup.auto_reload,
