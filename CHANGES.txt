@@ -1,5 +1,8 @@
-Next 1.4 release
-================
+1.4.2 (2013-05-21)
+==================
+
+Bug Fixes
+---------
 
 - ``mako_templating``: added defensive workaround for non-importability of
   ``mako`` due to upstream ``markupsafe`` dropping Python 3.2 support.  Mako
