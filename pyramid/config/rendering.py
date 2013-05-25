@@ -23,6 +23,7 @@ DEFAULT_RENDERERS = (
     ('.mako', mako_renderer_factory),
     ('json', renderers.json_renderer_factory),
     ('string', renderers.string_renderer_factory),
+    ('html', renderers.html_renderer_factory),
     )
 
 class RenderingConfiguratorMixin(object):

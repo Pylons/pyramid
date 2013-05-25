@@ -151,7 +151,7 @@ def get_renderer(renderer_name, package=None):
 
 # concrete renderer factory implementations (also API)
 
-def string_renderer_factory(info):
+def abstract_renderer_factory(info,default_content_type='text/plain'):
     def _render(value, system):
         if not isinstance(value, string_types):
             value = str(value)
@@ -160,9 +160,15 @@ def string_renderer_factory(info):
             response = request.response
             ct = response.content_type
             if ct == response.default_content_type:
-                response.content_type = 'text/plain'
+                response.content_type = default_content_type
         return value
     return _render
+    
+def string_renderer_factory(info):
+    return abstract_renderer_factory(info,default_content_type='text/plain')
+
+def html_renderer_factory(info):
+    return abstract_renderer_factory(info,default_content_type='text/html')
 
 _marker = object()
 
