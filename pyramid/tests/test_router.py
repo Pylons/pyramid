@@ -1180,11 +1180,9 @@ class TestRouter(unittest.TestCase):
         from pyramid.interfaces import IViewClassifier
         from pyramid.interfaces import IRequest, IResponse
         from pyramid.response import Response
-        from zope.interface import Interface, implementer
-        class IContext(Interface):
+        class BaseContext:
             pass
-        @implementer(IContext)
-        class DummyContext:
+        class DummyContext(BaseContext):
             pass
         context = DummyContext()
         self._registerTraverserFactory(context)
@@ -1193,7 +1191,7 @@ class TestRouter(unittest.TestCase):
                            DummyContext)
         good_view = DummyView('abc')
         self._registerView(self.config.derive_view(good_view),
-                            '', IViewClassifier, IRequest, IContext)
+                            '', IViewClassifier, IRequest, BaseContext)
         router = self._makeOne()
         def make_response(s):
             return Response(s)
