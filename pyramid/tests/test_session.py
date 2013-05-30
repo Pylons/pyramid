@@ -356,20 +356,29 @@ class Test_signed_deserialize(unittest.TestCase):
         self.assertRaises(ValueError, self._callFUT, serialized, 'secret')
         
 class Test_check_csrf_token(unittest.TestCase):
-    def _callFUT(self, request, token, raises=True):
+    def _callFUT(self, *args, **kwargs):
         from ..session import check_csrf_token
-        return check_csrf_token(request, token, raises=raises)
+        return check_csrf_token(*args, **kwargs)
 
-    def test_success(self):
+    def test_success_token(self):
         request = testing.DummyRequest()
         request.params['csrf_token'] = request.session.get_csrf_token()
-        self.assertEqual(self._callFUT(request, 'csrf_token'), True)
+        self.assertEqual(self._callFUT(request, token='csrf_token'), True)
+
+    def test_success_header(self):
+        request = testing.DummyRequest()
+        request.headers['X-CSRFToken'] = request.session.get_csrf_token()
+        self.assertEqual(self._callFUT(request, header='X-CSRFToken'), True)
 
     def test_success_default_token(self):
-        from ..session import check_csrf_token
         request = testing.DummyRequest()
         request.params['csrf_token'] = request.session.get_csrf_token()
-        self.assertEqual(check_csrf_token(request), True)
+        self.assertEqual(self._callFUT(request), True)
+
+    def test_success_default_header(self):
+        request = testing.DummyRequest()
+        request.headers['X-CSRFToken'] = request.session.get_csrf_token()
+        self.assertEqual(self._callFUT(request), True)
 
     def test_failure_raises(self):
         from pyramid.httpexceptions import HTTPBadRequest
