@@ -298,14 +298,15 @@ Preventing Cross-Site Request Forgery Attacks
 
 `Cross-site request forgery
 <http://en.wikipedia.org/wiki/Cross-site_request_forgery>`_ attacks are a
-phenomenon whereby a user with an identity on your website might click on a
-URL or button on another website which secretly redirects the user to your
-application to perform some command that requires elevated privileges.
+phenomenon whereby a user who is logged in to your website might inadvertantly
+load a URL because it is linked from, or embedded in, an attacker's website.
+If the URL is one that may modify or delete data, the consequences can be dire.
 
-You can avoid most of these attacks by making sure that the correct *CSRF
-token* has been set in an :app:`Pyramid` session object before performing any
-actions in code which requires elevated privileges that is invoked via a form
-post.  To use CSRF token support, you must enable a :term:`session factory`
+You can avoid most of these attacks by issuing a unique token to the browser
+and then requiring that it be present in all potentially unsafe requests.
+:app:`Pyramid` sessions provide facilities to create and check CSRF tokens.
+
+To use CSRF tokens, you must first enable a :term:`session factory`
 as described in :ref:`using_the_default_session_factory` or
 :ref:`using_alternate_session_factories`.
 
@@ -324,33 +325,41 @@ To get the current CSRF token from the session, use the
 
 The ``session.get_csrf_token()`` method accepts no arguments.  It returns a
 CSRF *token* string. If ``session.get_csrf_token()`` or
-``session.new_csrf_token()`` was invoked previously for this session, the
+``session.new_csrf_token()`` was invoked previously for this session, then the
 existing token will be returned.  If no CSRF token previously existed for
-this session, a new token will be will be set into the session and returned.
+this session, then a new token will be will be set into the session and returned.
 The newly created token will be opaque and randomized.
 
 You can use the returned token as the value of a hidden field in a form that
-posts to a method that requires elevated privileges.  The handler for the
-form post should use ``session.get_csrf_token()`` *again* to obtain the
-current CSRF token related to the user from the session, and compare it to
-the value of the hidden form field.  For example, if your form rendering
-included the CSRF token obtained via ``session.get_csrf_token()`` as a hidden
-input field named ``csrf_token``:
+posts to a method that requires elevated privileges, or supply it as a request
+header in AJAX requests.  The handler for the URL that receives the request
+should then require that the correct CSRF token is supplied.
 
-.. code-block:: python
-   :linenos:
+Using the ``session.check_csrf_token`` Method
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-   token = request.session.get_csrf_token()
-   if token != request.POST['csrf_token']:
-       raise ValueError('CSRF token did not match')
+In request handling code, you can check the presence and validity of a CSRF
+token with ``session.check_csrf_token(request)``. If the token is valid,
+it will return True, otherwise it will raise ``HTTPBadRequest``.
+
+By default, it checks for a GET or POST parameter named ``csrf_token`` or a
+header named ``X-CSRF-Token``.
 
 .. index::
    single: session.new_csrf_token
 
+Checking CSRF Tokens With A View Predicate
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A convenient way to require a valid CSRF Token for a particular view is to
+include ``check_csrf=True`` as a view predicate.
+See :meth:`pyramid.config.Configurator.add_route`.
+
+
 Using the ``session.new_csrf_token`` Method
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To explicitly add a new CSRF token to the session, use the
+To explicitly create a new CSRF token, use the
 ``session.new_csrf_token()`` method.  This differs only from
 ``session.get_csrf_token()`` inasmuch as it clears any existing CSRF token,
 creates a new CSRF token, sets the token into the session, and returns the
