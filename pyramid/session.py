@@ -83,14 +83,14 @@ def signed_deserialize(serialized, secret, hmac=hmac):
 
 def check_csrf_token(request,
                      token='csrf_token',
-                     header='X-CSRFToken',
+                     header='X-CSRF-Token',
                      raises=True):
     """ Check the CSRF token in the request's session against the value in
     ``request.params.get(token)`` or ``request.headers.get(header)``.
     If a ``token`` keyword is not supplied to this function, the string
     ``csrf_token`` will be used to look up the token in ``request.params``.
     If a ``header`` keyword is not supplied to this function, the string
-    ``X-CSRFToken`` will be used to look up the token in ``request.headers``.
+    ``X-CSRF-Token`` will be used to look up the token in ``request.headers``.
 
     If the value supplied by param or by header doesn't match the value
     supplied by ``request.session.get_csrf_token()``, and ``raises`` is
