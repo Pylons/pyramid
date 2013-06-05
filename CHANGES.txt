@@ -29,6 +29,11 @@ Features
   ``initialize_myapp_db etc/development.ini a=1 b=2``.
   See https://github.com/Pylons/pyramid/pull/911
 
+- The ``request.session.check_csrf_token()`` method and the ``check_csrf`` view
+  predicate now take into account the value of the HTTP header named
+  ``X-CSRF-Token`` (as well as the ``csrf_token`` form parameter, which they
+  always did).  The header is tried when the form parameter does not exist.
+
 Bug Fixes
 ---------
 
