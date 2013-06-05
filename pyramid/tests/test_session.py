@@ -367,8 +367,8 @@ class Test_check_csrf_token(unittest.TestCase):
 
     def test_success_header(self):
         request = testing.DummyRequest()
-        request.headers['X-CSRFToken'] = request.session.get_csrf_token()
-        self.assertEqual(self._callFUT(request, header='X-CSRFToken'), True)
+        request.headers['X-CSRF-Token'] = request.session.get_csrf_token()
+        self.assertEqual(self._callFUT(request, header='X-CSRF-Token'), True)
 
     def test_success_default_token(self):
         request = testing.DummyRequest()
@@ -377,7 +377,7 @@ class Test_check_csrf_token(unittest.TestCase):
 
     def test_success_default_header(self):
         request = testing.DummyRequest()
-        request.headers['X-CSRFToken'] = request.session.get_csrf_token()
+        request.headers['X-CSRF-Token'] = request.session.get_csrf_token()
         self.assertEqual(self._callFUT(request), True)
 
     def test_failure_raises(self):
