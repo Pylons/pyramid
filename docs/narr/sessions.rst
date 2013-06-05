@@ -332,7 +332,32 @@ The newly created token will be opaque and randomized.
 
 You can use the returned token as the value of a hidden field in a form that
 posts to a method that requires elevated privileges, or supply it as a request
-header in AJAX requests.  The handler for the URL that receives the request
+header in AJAX requests.
+
+For example, include the CSRF token as a hidden field:
+
+.. code-block:: html
+
+    <form method="post" action="/myview">
+      <input type="hidden" name="csrf_token" value="${request.session.get_csrf_token()}">
+      <input type="submit" value="Delete Everything">
+    </form>
+
+Or, include it as a header in a jQuery AJAX request:
+
+.. code-block:: javascript
+
+    var csrfToken = ${request.session.get_csrf_token()};
+    $.ajax({
+      type: "POST",
+      url: "/myview",
+      headers: { 'X-CSRF-Token': csrfToken }
+    }).done(function() {
+      alert("Deleted");
+    });
+
+
+The handler for the URL that receives the request
 should then require that the correct CSRF token is supplied.
 
 Using the ``session.check_csrf_token`` Method
@@ -345,6 +370,16 @@ it will return True, otherwise it will raise ``HTTPBadRequest``.
 By default, it checks for a GET or POST parameter named ``csrf_token`` or a
 header named ``X-CSRF-Token``.
 
+.. code-block:: python
+
+    def myview(request):
+        session = request.session
+
+        # Require CSRF Token
+        session.check_csrf_token(request):
+
+        ...
+
 .. index::
    single: session.new_csrf_token
 
@@ -354,6 +389,12 @@ Checking CSRF Tokens With A View Predicate
 A convenient way to require a valid CSRF Token for a particular view is to
 include ``check_csrf=True`` as a view predicate.
 See :meth:`pyramid.config.Configurator.add_route`.
+
+.. code-block:: python
+
+    @view_config(request_method='POST', check_csrf=True, ...)
+    def myview(request):
+        ...
 
 
 Using the ``session.new_csrf_token`` Method
