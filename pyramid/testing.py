@@ -219,6 +219,9 @@ class DummyResource:
 
     __iter__ = keys
 
+    def __bool__(self):
+        return True
+
     def __nonzero__(self):
         return True
 
