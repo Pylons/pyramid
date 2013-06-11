@@ -111,6 +111,11 @@ Bug Fixes
   files have now been removed. See
   https://github.com/Pylons/pyramid/issues/981
 
+- ``pyramid.testing.DummyResource`` didn't define ``__bool__``, so code under
+   Python 3 would use ``__len__`` to find truthiness; this usually caused an
+   instance of DummyResource to be "falsy" instead of "truthy".  See
+   https://github.com/Pylons/pyramid/pull/1032
+
 1.4 (2012-12-18)
 ================
 
