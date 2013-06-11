@@ -43,6 +43,16 @@ What's New
    whatsnew-1.1
    whatsnew-1.0
 
+.. _html_getting_started:
+
+Getting Started
+===============
+
+.. toctree::
+   :maxdepth: 2
+
+   getting_started/index
+
 .. _html_narrative_documentation:
 
 Narrative documentation
