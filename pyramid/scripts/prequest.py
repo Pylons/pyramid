@@ -18,9 +18,16 @@ class PRequestCommand(object):
     This command makes an artifical request to a web application that uses a
     PasteDeploy (.ini) configuration file for the server and application.
 
-    Use "prequest config.ini /path" to request "/path".  Use "prequest
-    --method=POST config.ini /path < data" to do a POST with the given
-    request body.
+    Use "prequest config.ini /path" to request "/path".
+
+    Use "prequest --method=POST config.ini /path < data" to do a POST with
+    the given request body.
+
+    Use "prequest --method=PUT config.ini /path < data" to do a
+    PUT with the given request body.
+
+    Use "prequest --method=PATCH config.ini /path < data" to do a
+    PATCH with the given request body.
 
     If the path is relative (doesn't begin with "/") it is interpreted as
     relative to "/".  The path passed to this script should be URL-quoted.
