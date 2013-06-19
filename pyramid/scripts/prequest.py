@@ -59,9 +59,9 @@ class PRequestCommand(object):
     parser.add_option(
         '-m', '--method',
         dest='method',
-        choices=['GET', 'HEAD', 'POST', 'DELETE'],
+        choices=['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE'],
         type='choice',
-        help='Request method type (GET, POST, DELETE)',
+        help='Request method type',
         )
 
     get_app = staticmethod(get_app)
@@ -127,7 +127,7 @@ class PRequestCommand(object):
             'paste.command_request': True,
             }
 
-        if request_method == 'POST':
+        if request_method in ('POST', 'PUT', 'PATCH'):
             environ['wsgi.input'] = self.stdin
             environ['CONTENT_LENGTH'] = '-1'
 
