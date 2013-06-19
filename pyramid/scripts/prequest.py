@@ -110,9 +110,9 @@ class PRequestCommand(object):
         environ = {
             'REQUEST_METHOD': request_method,
             'SCRIPT_NAME': '',           # may be empty if app is at the root
-            'PATH_INFO': path,           
+            'PATH_INFO': path,
             'SERVER_NAME': 'localhost',  # always mandatory
-            'SERVER_PORT': '80',         # always mandatory 
+            'SERVER_PORT': '80',         # always mandatory
             'SERVER_PROTOCOL': 'HTTP/1.0',
             'CONTENT_TYPE': 'text/plain',
             'REMOTE_ADDR':'127.0.0.1',
