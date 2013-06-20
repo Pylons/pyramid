@@ -222,6 +222,8 @@ class DummyResource:
     def __nonzero__(self):
         return True
 
+    __bool__ = __nonzero__
+
     def __len__(self):
         return len(self.subs)
 

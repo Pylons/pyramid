@@ -81,14 +81,12 @@ class OverrideProvider(pkg_resources.DefaultProvider):
             self, resource_name)
         
 @implementer(IPackageOverrides)
-class PackageOverrides:
+class PackageOverrides(object):
     # pkg_resources arg in kw args below for testing
     def __init__(self, package, pkg_resources=pkg_resources):
-        if hasattr(package, '__loader__') and not isinstance(package.__loader__,
-                                                             self.__class__):
-            raise TypeError('Package %s already has a non-%s __loader__ '
-                            '(probably a module in a zipped egg)' %
-                            (package, self.__class__))
+        loader = self._real_loader = getattr(package, '__loader__', None)
+        if isinstance(loader, self.__class__):
+            self._real_loader = None
         # We register ourselves as a __loader__ *only* to support the
         # setuptools _find_adapter adapter lookup; this class doesn't
         # actually support the PEP 302 loader "API".  This is
@@ -150,7 +148,33 @@ class PackageOverrides:
         for package, rname in self.search_path(resource_name):
             if pkg_resources.resource_exists(package, rname):
                 return pkg_resources.resource_listdir(package, rname)
-    
+
+    @property
+    def real_loader(self):
+        if self._real_loader is None:
+            raise NotImplementedError()
+        return self._real_loader
+
+    def get_data(self, path):
+        """ See IPEP302Loader.
+        """
+        return self.real_loader.get_data(path)
+
+    def is_package(self, fullname):
+        """ See IPEP302Loader.
+        """
+        return self.real_loader.is_package(fullname)
+
+    def get_code(self, fullname):
+        """ See IPEP302Loader.
+        """
+        return self.real_loader.get_code(fullname)
+
+    def get_source(self, fullname):
+        """ See IPEP302Loader.
+        """
+        return self.real_loader.get_source(fullname)
+ 
 
 class DirectoryOverride:
     def __init__(self, path, package, prefix):

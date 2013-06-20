@@ -1,5 +1,4 @@
 from zope.interface import (
-    Interface,
     implementer,
     providedBy,
     )

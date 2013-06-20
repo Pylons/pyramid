@@ -22,16 +22,21 @@ from pyramid.interfaces import ITemplateRenderer
 from pyramid.settings import asbool
 from pyramid.util import DottedNameResolver
 
+def _no_mako(*arg, **kw): # pragma: no cover
+    raise NotImplementedError(
+        "'mako' package is not importable (maybe downgrade MarkupSafe to "
+        "0.16 or below if you're using Python 3.2)"
+        )
+
 try:
     from mako.lookup import TemplateLookup
 except (ImportError, SyntaxError, AttributeError): #pragma NO COVER
     class TemplateLookup(object):
         def __init__(self, **kw):
-            pass
-        def no_mako(self, *args, **kw):
-            raise NotImplementedError("'mako' not importable")
-        adjust_uri = get_template = filename_to_uri = no_mako
-        put_string = put_template = no_mako
+            for name in ('adjust_uri', 'get_template', 'filename_to_uri',
+                         'put_string', 'put_template'):
+                setattr(self, name, _no_mako)
+            self.filesystem_checks = False
 
 try:
     from mako.exceptions import TopLevelLookupException
@@ -43,7 +48,7 @@ try:
     from mako.exceptions import text_error_template
 except (ImportError, SyntaxError, AttributeError): #pragma NO COVER
     def text_error_template(lookup=None):
-        raise NotImplementedError("'mako' not importable")
+        _no_mako()
 
 
 class IMakoLookup(Interface):

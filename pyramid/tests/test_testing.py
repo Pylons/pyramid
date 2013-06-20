@@ -114,6 +114,10 @@ class TestDummyResource(unittest.TestCase):
         resource = self._makeOne()
         self.assertEqual(resource.__nonzero__(), True)
 
+    def test_bool(self):
+        resource = self._makeOne()
+        self.assertEqual(resource.__bool__(), True)
+        
     def test_ctor_with__provides__(self):
         resource = self._makeOne(__provides__=IDummy)
         self.assertTrue(IDummy.providedBy(resource))

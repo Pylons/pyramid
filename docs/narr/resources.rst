@@ -300,7 +300,7 @@ the resource by :meth:`~pyramid.request.Request.resource_url`.
 The ``__resource_url__`` hook is passed two arguments: ``request`` and
 ``info``.  ``request`` is the :term:`request` object passed to
 :meth:`~pyramid.request.Request.resource_url`.  ``info`` is a dictionary with
-two keys:
+the following keys:
 
 ``physical_path``
    A string representing the "physical path" computed for the resource, as
