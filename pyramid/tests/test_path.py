@@ -4,6 +4,7 @@ from pyramid.compat import PY3
 
 here = os.path.abspath(os.path.dirname(__file__))
 
+
 class TestCallerPath(unittest.TestCase):
     def tearDown(self):
         from pyramid.tests import test_path
@@ -37,6 +38,7 @@ class TestCallerPath(unittest.TestCase):
         self.assertEqual(result, os.path.join(here, 'a/b/c'))
         self.assertEqual(test_path.__abspath__, here)
 
+
 class TestCallerModule(unittest.TestCase):
     def _callFUT(self, *arg, **kw):
         from pyramid.path import caller_module
@@ -60,10 +62,11 @@ class TestCallerModule(unittest.TestCase):
     def test_it_no___name__(self):
         class DummyFrame(object):
             f_globals = {}
+
         class DummySys(object):
             def _getframe(self, level):
                 return DummyFrame()
-            modules = {'__main__':'main'}
+            modules = {'__main__': 'main'}
         dummy_sys = DummySys()
         result = self._callFUT(3, sys=dummy_sys)
         self.assertEqual(result, 'main')
@@ -91,11 +94,13 @@ class TestCallerPackage(unittest.TestCase):
 
     def test_it_package(self):
         import pyramid.tests
+
         def dummy_caller_module(*arg):
             return pyramid.tests
         result = self._callFUT(1, caller_module=dummy_caller_module)
         self.assertEqual(result, pyramid.tests)
-        
+
+
 class TestPackagePath(unittest.TestCase):
     def _callFUT(self, package):
         from pyramid.path import package_path
@@ -106,7 +111,7 @@ class TestPackagePath(unittest.TestCase):
         package = DummyPackageOrModule(tests)
         result = self._callFUT(package)
         self.assertEqual(result, package.package_path)
-        
+
     def test_it_module(self):
         from pyramid.tests import test_path
         module = DummyPackageOrModule(test_path)
@@ -118,13 +123,14 @@ class TestPackagePath(unittest.TestCase):
         module = DummyPackageOrModule(test_path)
         self._callFUT(module)
         self.assertEqual(module.__abspath__, module.package_path)
-        
+
     def test_memoization_fail(self):
         from pyramid.tests import test_path
         module = DummyPackageOrModule(test_path, raise_exc=TypeError)
         result = self._callFUT(module)
         self.assertFalse(hasattr(module, '__abspath__'))
         self.assertEqual(result, module.package_path)
+
 
 class TestPackageOf(unittest.TestCase):
     def _callFUT(self, package):
@@ -144,6 +150,7 @@ class TestPackageOf(unittest.TestCase):
         result = self._callFUT(package)
         self.assertEqual(result, tests)
 
+
 class TestPackageName(unittest.TestCase):
     def _callFUT(self, package):
         from pyramid.path import package_name
@@ -154,7 +161,7 @@ class TestPackageName(unittest.TestCase):
         package = DummyPackageOrModule(tests)
         result = self._callFUT(package)
         self.assertEqual(result, 'pyramid.tests')
-        
+
     def test_it_module(self):
         from pyramid.tests import test_path
         module = DummyPackageOrModule(test_path)
@@ -169,6 +176,7 @@ class TestPackageName(unittest.TestCase):
         import __main__
         result = self._callFUT(__main__)
         self.assertEqual(result, '__main__')
+
 
 class TestResolver(unittest.TestCase):
     def _getTargetClass(self):
@@ -197,6 +205,7 @@ class TestResolver(unittest.TestCase):
     def test_get_package_name_string(self):
         self.assertEqual(self._makeOne('pyramid.tests').get_package_name(),
                          'pyramid.tests')
+
 
 class TestAssetResolver(unittest.TestCase):
     def _getTargetClass(self):
@@ -250,7 +259,8 @@ class TestAssetResolver(unittest.TestCase):
         r = inst.resolve('test_asset.py')
         self.assertEqual(r.__class__, PkgResourcesAssetDescriptor)
         self.assertTrue(r.exists())
-        
+
+
 class TestPkgResourcesAssetDescriptor(unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.path import PkgResourcesAssetDescriptor
@@ -263,7 +273,7 @@ class TestPkgResourcesAssetDescriptor(unittest.TestCase):
         from pyramid.interfaces import IAssetDescriptor
         from zope.interface.verify import verifyClass
         verifyClass(IAssetDescriptor, self._getTargetClass())
-        
+
     def test_instance_conforms_to_IAssetDescriptor(self):
         from pyramid.interfaces import IAssetDescriptor
         from zope.interface.verify import verifyObject
@@ -306,6 +316,7 @@ class TestPkgResourcesAssetDescriptor(unittest.TestCase):
         self.assertEqual(inst.exists(),
                          '%s:%s' % ('pyramid.tests', 'test_asset.py'))
 
+
 class TestFSAssetDescriptor(unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.path import FSAssetDescriptor
@@ -318,7 +329,7 @@ class TestFSAssetDescriptor(unittest.TestCase):
         from pyramid.interfaces import IAssetDescriptor
         from zope.interface.verify import verifyClass
         verifyClass(IAssetDescriptor, self._getTargetClass())
-        
+
     def test_instance_conforms_to_IAssetDescriptor(self):
         from pyramid.interfaces import IAssetDescriptor
         from zope.interface.verify import verifyObject
@@ -355,6 +366,7 @@ class TestFSAssetDescriptor(unittest.TestCase):
         inst = self._makeOne()
         self.assertTrue(inst.exists())
 
+
 class TestDottedNameResolver(unittest.TestCase):
     def _makeOne(self, package=None):
         from pyramid.path import DottedNameResolver
@@ -366,11 +378,11 @@ class TestDottedNameResolver(unittest.TestCase):
         except ValueError as e:
             return e
         else:
-            raise AssertionError('Invalid not raised') # pragma: no cover
+            raise AssertionError('Invalid not raised')  # pragma: no cover
 
     def test_zope_dottedname_style_resolve_builtin(self):
         typ = self._makeOne()
-        if PY3: # pragma: no cover
+        if PY3:  # pragma: no cover
             result = typ._zope_dottedname_style('builtins.str', None)
         else:
             result = typ._zope_dottedname_style('__builtin__.str', None)
@@ -385,7 +397,7 @@ class TestDottedNameResolver(unittest.TestCase):
     def test_zope_dottedname_style_irrresolveable_absolute(self):
         typ = self._makeOne()
         self.assertRaises(ImportError, typ._zope_dottedname_style,
-            'pyramid.test_path.nonexisting_name', None)
+                          'pyramid.test_path.nonexisting_name', None)
 
     def test__zope_dottedname_style_resolve_relative(self):
         import pyramid.tests
@@ -455,7 +467,7 @@ class TestDottedNameResolver(unittest.TestCase):
     def test__pkg_resources_style_irrresolveable_absolute(self):
         typ = self._makeOne()
         self.assertRaises(ImportError, typ._pkg_resources_style,
-            'pyramid.tests:nonexisting', None)
+                          'pyramid.tests:nonexisting', None)
 
     def test__pkg_resources_style_resolve_relative(self):
         import pyramid.tests
@@ -511,8 +523,9 @@ class TestDottedNameResolver(unittest.TestCase):
     def test_maybe_resolve_caller_package(self):
         from pyramid.path import CALLER_PACKAGE
         typ = self._makeOne(CALLER_PACKAGE)
-        self.assertEqual(typ.maybe_resolve('.test_path.TestDottedNameResolver'),
-                         self.__class__)
+        self.assertEqual(typ.maybe_resolve(
+            '.test_path.TestDottedNameResolver'),
+            self.__class__)
 
     def test_ctor_string_module_resolveable(self):
         import pyramid.tests
@@ -542,8 +555,10 @@ class TestDottedNameResolver(unittest.TestCase):
         typ = self._makeOne(None)
         self.assertEqual(typ.package, None)
 
+
 class DummyPkgResource(object):
     pass
+
 
 class DummyPackageOrModule:
     def __init__(self, real_package_or_module, raise_exc=None):
