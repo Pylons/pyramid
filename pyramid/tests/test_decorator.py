@@ -1,4 +1,8 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import unittest
+
 
 class TestReify(unittest.TestCase):
     def _makeOne(self, wrapped):
@@ -24,6 +28,7 @@ class TestReify(unittest.TestCase):
             """My doc"""
         decorator = self._makeOne(wrapped)
         self.assertEqual(decorator.__doc__, "My doc")
-        
+
+
 class Dummy(object):
     pass
