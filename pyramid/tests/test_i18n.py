@@ -8,6 +8,7 @@ localedir = os.path.join(here, 'pkgs', 'localeapp', 'locale')
 import unittest
 from pyramid.testing import cleanUp
 
+
 class TestTranslationString(unittest.TestCase):
     def _makeOne(self, *arg, **kw):
         from pyramid.i18n import TranslationString
@@ -19,6 +20,7 @@ class TestTranslationString(unittest.TestCase):
         ts = self._makeOne('a')
         self.assertEqual(ts, 'a')
 
+
 class TestTranslationStringFactory(unittest.TestCase):
     def _makeOne(self, *arg, **kw):
         from pyramid.i18n import TranslationStringFactory
@@ -29,6 +31,7 @@ class TestTranslationStringFactory(unittest.TestCase):
         # than that it's importable
         factory = self._makeOne('a')
         self.assertEqual(factory('').domain, 'a')
+
 
 class TestLocalizer(unittest.TestCase):
     def _makeOne(self, *arg, **kw):
@@ -58,15 +61,15 @@ class TestLocalizer(unittest.TestCase):
     def test_pluralize_pluralizer_already_added(self):
         translations = DummyTranslations()
         localizer = self._makeOne(None, translations)
+
         def pluralizer(*arg, **kw):
             return arg, kw
         localizer.pluralizer = pluralizer
         result = localizer.pluralize('singular', 'plural', 1, domain='1',
                                      mapping={})
-        self.assertEqual(
-            result,
-            (('singular', 'plural', 1), {'domain': '1', 'mapping': {}})
-            )
+        self.assertEqual(result,
+                         (('singular', 'plural', 1),
+                          {'domain': '1', 'mapping': {}}))
         self.assertTrue(localizer.pluralizer is pluralizer)
 
     def test_pluralize_default_translations(self):
@@ -81,6 +84,7 @@ class TestLocalizer(unittest.TestCase):
         result = localizer.pluralize('singular', 'plural', 2, domain='1',
                                      mapping={})
         self.assertEqual(result, 'plural')
+
 
 class Test_negotiate_locale_name(unittest.TestCase):
     def setUp(self):
@@ -117,7 +121,7 @@ class Test_negotiate_locale_name(unittest.TestCase):
     def test_default_from_settings(self):
         from pyramid.threadlocal import get_current_registry
         registry = get_current_registry()
-        settings = {'default_locale_name':'settings'}
+        settings = {'default_locale_name': 'settings'}
         registry.settings = settings
         request = DummyRequest()
         request.registry = registry
@@ -137,6 +141,7 @@ class Test_negotiate_locale_name(unittest.TestCase):
         request = DummyRequest()
         result = self._callFUT(request)
         self.assertEqual(result, 'en')
+
 
 class Test_get_locale_name(unittest.TestCase):
     def setUp(self):
@@ -167,6 +172,7 @@ class Test_get_locale_name(unittest.TestCase):
         result = self._callFUT(request)
         self.assertEqual(result, 'bogus')
         self.assertEqual(request.locale_name, 'bogus')
+
 
 class Test_make_localizer(unittest.TestCase):
     def setUp(self):
@@ -215,9 +221,10 @@ class Test_make_localizer(unittest.TestCase):
         result = self._callFUT(locale_name, localedirs)
         self.assertEqual(result.__class__, Localizer)
         self.assertEqual(result.translate('Submit', 'deformsite'),
-                         'different') # prefer translations from de_DE locale
+                         'different')  # prefer translations from de_DE locale
         self.assertEqual(result.translate('Approve', 'deformsite'),
-                         'Genehmigen') # missing from de_DE locale, but in de
+                         'Genehmigen')  # missing from de_DE locale, but in de
+
 
 class Test_get_localizer(unittest.TestCase):
     def setUp(self):
@@ -292,6 +299,7 @@ class Test_get_localizer(unittest.TestCase):
         self.assertEqual(result.translate('Approve', 'deformsite'),
                          'Approve')
 
+
 class Test_default_locale_negotiator(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -326,11 +334,12 @@ class Test_default_locale_negotiator(unittest.TestCase):
         result = self._callFUT(request)
         self.assertEqual(result, 'foo')
 
+
 class TestTranslations(unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.i18n import Translations
         return Translations
-        
+
     def _makeOne(self):
         messages1 = [
             ('foo', 'Voh'),
@@ -342,7 +351,7 @@ class TestTranslations(unittest.TestCase):
         ]
 
         klass = self._getTargetClass()
-        
+
         translations1 = klass(None, domain='messages')
         translations1._catalog = dict(messages1)
         translations1.plural = lambda *arg: 1
@@ -396,7 +405,7 @@ class TestTranslations(unittest.TestCase):
     def test_merge_gnutranslations_not_translations(self):
         import gettext
         t = gettext.GNUTranslations()
-        t._catalog = {'a':'b'}
+        t._catalog = {'a': 'b'}
         inst = self._makeOne()
         inst.merge(t)
         self.assertEqual(inst._catalog['a'], 'b')
@@ -446,16 +455,18 @@ class TestTranslations(unittest.TestCase):
         t = self._makeOne()
         self.assertEqual(t.dngettext('messages', 'foo1', 'foos1', 1), 'Voh1')
         self.assertEqual(t.dngettext('messages1', 'foo1', 'foos1', 1), 'VohD1')
-        
+
     def test_ldngettext(self):
         t = self._makeOne()
         self.assertEqual(t.ldngettext('messages', 'foo1', 'foos1', 1), b'Voh1')
-        self.assertEqual(t.ldngettext('messages1', 'foo1', 'foos1', 1),b'VohD1')
+        self.assertEqual(t.ldngettext('messages1', 'foo1', 'foos1', 1),
+                         b'VohD1')
 
     def test_dungettext(self):
         t = self._makeOne()
         self.assertEqual(t.dungettext('messages', 'foo1', 'foos1', 1), 'Voh1')
-        self.assertEqual(t.dungettext('messages1', 'foo1', 'foos1', 1), 'VohD1')
+        self.assertEqual(t.dungettext('messages1', 'foo1', 'foos1', 1),
+                         'VohD1')
 
     def test_default_germanic_pluralization(self):
         t = self._getTargetClass()()
@@ -469,8 +480,10 @@ class DummyRequest(object):
         self.params = {}
         self.cookies = {}
 
+
 def dummy_negotiator(request):
     return 'bogus'
+
 
 class DummyTranslations(object):
     def ugettext(self, text):

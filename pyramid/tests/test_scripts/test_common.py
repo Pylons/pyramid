@@ -1,5 +1,9 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import os
 import unittest
+
 
 class Test_logging_file_config(unittest.TestCase):
     def _callFUT(self, config_file):
@@ -16,6 +20,7 @@ class Test_logging_file_config(unittest.TestCase):
 
     def fileConfig(self, config_file, dict):
         return config_file, dict
+
 
 class TestParseVars(unittest.TestCase):
     def test_parse_vars_good(self):
@@ -36,6 +41,7 @@ class DummyConfigParser(object):
 
     def has_section(self, name):
         return True
+
 
 class DummyConfigParserModule(object):
     ConfigParser = DummyConfigParser
