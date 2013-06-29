@@ -6,10 +6,11 @@ from pyramid.interfaces import (
     IRequestExtensions,
     IRequestFactory,
     IRootFactory,
-    )
+)
 
 from pyramid.threadlocal import manager as threadlocal_manager
 from pyramid.traversal import DefaultRootFactory
+
 
 def get_root(app, request=None):
     """ Return a tuple composed of ``(root, closer)`` when provided a
@@ -26,12 +27,14 @@ def get_root(app, request=None):
     registry = app.registry
     if request is None:
         request = _make_request('/', registry)
-    threadlocals = {'registry':registry, 'request':request}
+    threadlocals = {'registry': registry, 'request': request}
     app.threadlocal_manager.push(threadlocals)
-    def closer(request=request): # keep request alive via this function default
+
+    def closer(request=request):  # keep request alive via this function default
         app.threadlocal_manager.pop()
     root = app.root_factory(request)
     return root, closer
+
 
 def prepare(request=None, registry=None):
     """ This function pushes data onto the Pyramid threadlocal stack
@@ -74,12 +77,13 @@ def prepare(request=None, registry=None):
     # NB: even though _make_request might have already set registry on
     # request, we reset it in case someone has passed in their own
     # request.
-    request.registry = registry 
-    threadlocals = {'registry':registry, 'request':request}
+    request.registry = registry
+    threadlocals = {'registry': registry, 'request': request}
     threadlocal_manager.push(threadlocals)
     extensions = registry.queryUtility(IRequestExtensions)
     if extensions is not None:
         request._set_extensions(extensions)
+
     def closer():
         threadlocal_manager.pop()
     root_factory = registry.queryUtility(IRootFactory,
@@ -87,8 +91,9 @@ def prepare(request=None, registry=None):
     root = root_factory(request)
     if getattr(request, 'context', None) is None:
         request.context = root
-    return {'root':root, 'closer':closer, 'registry':registry,
-            'request':request, 'root_factory':root_factory}
+    return {'root': root, 'closer': closer, 'registry': registry,
+            'request': request, 'root_factory': root_factory}
+
 
 def _make_request(path, registry=None):
     """ Return a :meth:`pyramid.request.Request` object anchored at a
