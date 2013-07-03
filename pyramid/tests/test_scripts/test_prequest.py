@@ -114,6 +114,32 @@ class TestPRequestCommand(unittest.TestCase):
         self.assertEqual(self._app_name, None)
         self.assertEqual(self._out, ['abc'])
 
+    def test_command_method_put(self):
+        from pyramid.compat import NativeIO
+        command = self._makeOne(['', '--method=PUT', 'development.ini', '/'])
+        stdin = NativeIO()
+        command.stdin = stdin
+        command.run()
+        self.assertEqual(self._environ['CONTENT_LENGTH'], '-1')
+        self.assertEqual(self._environ['wsgi.input'], stdin)
+        self.assertEqual(self._path_info, '/')
+        self.assertEqual(self._spec, 'development.ini')
+        self.assertEqual(self._app_name, None)
+        self.assertEqual(self._out, ['abc'])
+
+    def test_command_method_patch(self):
+        from pyramid.compat import NativeIO
+        command = self._makeOne(['', '--method=PATCH', 'development.ini', '/'])
+        stdin = NativeIO()
+        command.stdin = stdin
+        command.run()
+        self.assertEqual(self._environ['CONTENT_LENGTH'], '-1')
+        self.assertEqual(self._environ['wsgi.input'], stdin)
+        self.assertEqual(self._path_info, '/')
+        self.assertEqual(self._spec, 'development.ini')
+        self.assertEqual(self._app_name, None)
+        self.assertEqual(self._out, ['abc'])
+
     def test_command_with_query_string(self):
         command = self._makeOne(['', 'development.ini', '/abc?a=1&b=2&c'])
         command.run()
