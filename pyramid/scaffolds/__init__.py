@@ -1,5 +1,6 @@
 import binascii
 import os
+from textwrap import dedent
 
 from pyramid.compat import native_
 
@@ -33,7 +34,22 @@ class PyramidTemplate(Template):
         """ Overrides :meth:`pyramid.scaffolds.template.Template.post`, to
         print "Welcome to Pyramid.  Sorry for the convenience." after a
         successful scaffolding rendering."""
-        self.out('Welcome to Pyramid.  Sorry for the convenience.')
+
+        separator = "=" * 79
+        msg = dedent(
+            """
+            %(separator)s
+            Tutorials: http://docs.pylonsproject.org/projects/pyramid_tutorials
+            Documentation: http://docs.pylonsproject.org/projects/pyramid
+
+            Twitter (tips & updates): http://twitter.com/pylons
+            Mailing List: http://groups.google.com/group/pylons-discuss
+
+            Welcome to Pyramid.  Sorry for the convenience.
+            %(separator)s
+        """ % {'separator': separator})
+
+        self.out(msg)
         return Template.post(self, command, output_dir, vars)
 
     def out(self, msg): # pragma: no cover (replaceable testing hook)

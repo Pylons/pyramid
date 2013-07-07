@@ -4,6 +4,9 @@ next release
 Features
 --------
 
+- ``scripts/prequest.py``:  add support for submitting ``PUT`` and ``PATCH``
+  requests.  See https://github.com/Pylons/pyramid/pull/1033.
+
 - ``ACLAuthorizationPolicy`` supports ``__acl__`` as a callable. This
   removes the ambiguity between the potential ``AttributeError`` that would
   be raised on the ``context`` when the property was not defined and the
@@ -29,8 +32,26 @@ Features
   ``initialize_myapp_db etc/development.ini a=1 b=2``.
   See https://github.com/Pylons/pyramid/pull/911
 
+- The ``request.session.check_csrf_token()`` method and the ``check_csrf`` view
+  predicate now take into account the value of the HTTP header named
+  ``X-CSRF-Token`` (as well as the ``csrf_token`` form parameter, which they
+  always did).  The header is tried when the form parameter does not exist.
+
 Bug Fixes
 ---------
+
+- Make the ``pyramid.config.assets.PackageOverrides`` object implement the API
+  for ``__loader__`` objects specified in PEP 302.  Proxies to the
+  ``__loader__`` set by the importer, if present; otherwise, raises
+  ``NotImplementedError``.  This makes Pyramid static view overrides work
+  properly under Python 3.3 (previously they would not).  See
+  https://github.com/Pylons/pyramid/pull/1015 for more information.
+
+- ``mako_templating``: added defensive workaround for non-importability of
+  ``mako`` due to upstream ``markupsafe`` dropping Python 3.2 support.  Mako
+  templating will no longer work under the combination of MarkupSafe 0.17 and
+  Python 3.2 (although the combination of MarkupSafe 0.17 and Python 3.3 or any
+  supported Python 2 version will work OK).
 
 - View lookup will now search for valid views based on the inheritance
   hierarchy of the context. It tries to find views based on the most
@@ -92,6 +113,11 @@ Bug Fixes
   some test files containing higher order characters in their names. These
   files have now been removed. See
   https://github.com/Pylons/pyramid/issues/981
+
+- ``pyramid.testing.DummyResource`` didn't define ``__bool__``, so code under
+   Python 3 would use ``__len__`` to find truthiness; this usually caused an
+   instance of DummyResource to be "falsy" instead of "truthy".  See
+   https://github.com/Pylons/pyramid/pull/1032
 
 1.4 (2012-12-18)
 ================

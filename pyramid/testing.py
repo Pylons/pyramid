@@ -222,6 +222,8 @@ class DummyResource:
     def __nonzero__(self):
         return True
 
+    __bool__ = __nonzero__
+
     def __len__(self):
         return len(self.subs)
 
@@ -482,9 +484,9 @@ def tearDown(unhook_zca=True):
 
     If the ``unhook_zca`` argument is ``True`` (the default), call
     :func:`zope.component.getSiteManager.reset`.  This undoes the
-    action of :func:`pyramid.testing.setUp` called with the
+    action of :func:`pyramid.testing.setUp` when called with the
     argument ``hook_zca=True``.  If :mod:`zope.component` cannot be
-    imported, ignore the argument.
+    imported, ``unhook_zca`` is set to ``False``.
     """
     global have_zca
     if unhook_zca and have_zca:

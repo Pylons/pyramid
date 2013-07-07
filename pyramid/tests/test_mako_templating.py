@@ -22,7 +22,20 @@ class Base(object):
     def tearDown(self):
         self.config.end()
 
-class Test_renderer_factory(Base, unittest.TestCase):
+def maybe_unittest():
+    # The latest release of MarkupSafe (0.17) which is used by Mako is
+    # incompatible with Python 3.2, so we skip these tests if we cannot
+    # import a Mako module which ends up importing MarkupSafe.  Note that
+    # this version of MarkupSafe *is* compatible with Python 2.6, 2.7, and 3.3,
+    # so these tests should not be skipped on those platforms.
+    try:
+        import mako.lookup
+    except (ImportError, SyntaxError, AttributeError): # pragma: no cover
+        return object
+    else:
+        return unittest.TestCase
+
+class Test_renderer_factory(Base, maybe_unittest()):
     def _callFUT(self, info):
         from pyramid.mako_templating import renderer_factory
         return renderer_factory(info)
@@ -298,7 +311,7 @@ class Test_renderer_factory(Base, unittest.TestCase):
         self.assertEqual(result.path, 'hello .world.mako')
         self.assertEqual(result.defname, 'comp')
 
-class MakoRendererFactoryHelperTests(Base, unittest.TestCase):
+class MakoRendererFactoryHelperTests(Base, maybe_unittest()):
     def _getTargetClass(self):
         from pyramid.mako_templating import MakoRendererFactoryHelper
         return MakoRendererFactoryHelper
@@ -345,7 +358,7 @@ class MakoRendererFactoryHelperTests(Base, unittest.TestCase):
         self.assertEqual(renderer.path, 'helloworld.mak')
         self.assertEqual(renderer.lookup, lookup)
 
-class MakoLookupTemplateRendererTests(Base, unittest.TestCase):
+class MakoLookupTemplateRendererTests(Base, maybe_unittest()):
     def _getTargetClass(self):
         from pyramid.mako_templating import MakoLookupTemplateRenderer
         return MakoLookupTemplateRenderer
@@ -426,7 +439,7 @@ class MakoLookupTemplateRendererTests(Base, unittest.TestCase):
         self.assertTrue(isinstance(result, text_type))
         self.assertEqual(result, text_('result'))
 
-class TestIntegration(unittest.TestCase):
+class TestIntegration(maybe_unittest()):
     def setUp(self):
         import pyramid.mako_templating
         self.config = testing.setUp()
@@ -501,7 +514,7 @@ class TestIntegration(unittest.TestCase):
                         {'name':'<b>fred</b>'}).replace('\r','')
         self.assertEqual(result, text_('Hello, &lt;b&gt;fred&lt;/b&gt;!\n'))
 
-class TestPkgResourceTemplateLookup(unittest.TestCase):
+class TestPkgResourceTemplateLookup(maybe_unittest()):
     def _makeOne(self, **kw):
         from pyramid.mako_templating import PkgResourceTemplateLookup
         return PkgResourceTemplateLookup(**kw)

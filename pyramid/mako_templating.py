@@ -1,6 +1,5 @@
 import os
 import posixpath
-import re
 import sys
 import threading
 
@@ -23,8 +22,34 @@ from pyramid.interfaces import ITemplateRenderer
 from pyramid.settings import asbool
 from pyramid.util import DottedNameResolver
 
-from mako.lookup import TemplateLookup
-from mako import exceptions
+def _no_mako(*arg, **kw): # pragma: no cover
+    raise NotImplementedError(
+        "'mako' package is not importable (maybe downgrade MarkupSafe to "
+        "0.16 or below if you're using Python 3.2)"
+        )
+
+try:
+    from mako.lookup import TemplateLookup
+except (ImportError, SyntaxError, AttributeError): #pragma NO COVER
+    class TemplateLookup(object):
+        def __init__(self, **kw):
+            for name in ('adjust_uri', 'get_template', 'filename_to_uri',
+                         'put_string', 'put_template'):
+                setattr(self, name, _no_mako)
+            self.filesystem_checks = False
+
+try:
+    from mako.exceptions import TopLevelLookupException
+except (ImportError, SyntaxError, AttributeError): #pragma NO COVER
+    class TopLevelLookupException(Exception):
+        pass
+
+try:
+    from mako.exceptions import text_error_template
+except (ImportError, SyntaxError, AttributeError): #pragma NO COVER
+    def text_error_template(lookup=None):
+        _no_mako()
+
 
 class IMakoLookup(Interface):
     pass
@@ -78,7 +103,7 @@ class PkgResourceTemplateLookup(TemplateLookup):
                 srcfile = abspath_from_asset_spec(path, pname)
                 if os.path.isfile(srcfile):
                     return self._load(srcfile, adjusted)
-                raise exceptions.TopLevelLookupException(
+                raise TopLevelLookupException(
                     "Can not locate template for uri %r" % uri)
         return TemplateLookup.get_template(self, uri)
 
@@ -208,7 +233,7 @@ class MakoLookupTemplateRenderer(object):
         except:
             try:
                 exc_info = sys.exc_info()
-                errtext = exceptions.text_error_template().render(
+                errtext = text_error_template().render(
                     error=exc_info[1],
                     traceback=exc_info[2]
                     )
