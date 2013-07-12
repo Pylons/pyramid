@@ -68,6 +68,19 @@ class TestPRequestCommand(unittest.TestCase):
         self.assertEqual(self._app_name, None)
         self.assertEqual(self._out, ['abc'])
 
+    def test_command_w_basic_auth(self):
+        command = self._makeOne(
+            ['', '--login=user:password',
+                 '--header=name:value','development.ini', '/'])
+        command.run()
+        self.assertEqual(self._environ['HTTP_NAME'], 'value')
+        self.assertEqual(self._environ['HTTP_AUTHORIZATION'],
+                        'Basic dXNlcjpwYXNzd29yZA==')
+        self.assertEqual(self._path_info, '/')
+        self.assertEqual(self._spec, 'development.ini')
+        self.assertEqual(self._app_name, None)
+        self.assertEqual(self._out, ['abc'])
+
     def test_command_has_content_type_header_var(self):
         command = self._makeOne(
             ['', '--header=content-type:app/foo','development.ini', '/'])
