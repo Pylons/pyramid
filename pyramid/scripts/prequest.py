@@ -1,3 +1,4 @@
+import base64
 import optparse
 import sys
 import textwrap
@@ -28,6 +29,12 @@ class PRequestCommand(object):
 
     Use "prequest --method=PATCH config.ini /path < data" to do a
     PATCH with the given request body.
+
+    Use "prequest --method=OPTIONS config.ini /path" to do an
+    OPTIONS request.
+
+    Use "prequest --method=PROPFIND config.ini /path" to do a
+    PROPFIND request.
 
     If the path is relative (doesn't begin with "/") it is interpreted as
     relative to "/".  The path passed to this script should be URL-quoted.
@@ -66,9 +73,17 @@ class PRequestCommand(object):
     parser.add_option(
         '-m', '--method',
         dest='method',
-        choices=['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE'],
+        choices=['GET', 'HEAD', 'POST', 'PUT', 'PATCH','DELETE',
+                 'PROPFIND', 'OPTIONS'],
         type='choice',
-        help='Request method type',
+        help='Request method type (GET, POST, PUT, PATCH, DELETE, '
+             'PROPFIND, OPTIONS)',
+        )
+    parser.add_option(
+        '-l', '--login',
+        dest='login',
+        type='string',
+        help='HTTP basic auth username:password pair',
         )
 
     get_app = staticmethod(get_app)
@@ -99,6 +114,10 @@ class PRequestCommand(object):
         path = url_unquote(path)
 
         headers = {}
+        if self.options.login:
+            enc = base64.b64encode(self.options.login.encode('ascii'))
+            headers['Authorization'] = 'Basic ' + enc.decode('ascii')
+
         if self.options.headers:
             for item in self.options.headers:
                 if ':' not in item:
