@@ -4,8 +4,11 @@ next release
 Features
 --------
 
-- ``scripts/prequest.py``:  add support for submitting ``PUT`` and ``PATCH``
-  requests.  See https://github.com/Pylons/pyramid/pull/1033.
+- ``scripts/prequest.py``: add support for submitting ``PUT`` and ``PATCH``
+  requests.  See https://github.com/Pylons/pyramid/pull/1033.  add support for
+  submitting ``OPTIONS`` and ``PROPFIND`` requests, and allow users to specify
+  basic authentication credentials in the request via a ``--login`` argument to
+  the script.  See https://github.com/Pylons/pyramid/pull/1039.
 
 - ``ACLAuthorizationPolicy`` supports ``__acl__`` as a callable. This
   removes the ambiguity between the potential ``AttributeError`` that would
