@@ -33,7 +33,7 @@ class PRequestCommand(object):
     Use "prequest --method=OPTIONS config.ini /path" to do an
     OPTIONS request.
 
-    Use "prequest --method=PROPFIND config.ini /path" to do an
+    Use "prequest --method=PROPFIND config.ini /path" to do a
     PROPFIND request.
 
     If the path is relative (doesn't begin with "/") it is interpreted as
