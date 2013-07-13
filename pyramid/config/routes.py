@@ -90,10 +90,10 @@ class RoutesConfiguratorMixin(object):
           ``traverse`` argument provided to ``add_route`` is
           ``/{article}``, when a request comes in that causes the route
           to match in such a way that the ``article`` match value is
-          '1' (when the request URI is ``/articles/1/edit``), the
+          ``'1'`` (when the request URI is ``/articles/1/edit``), the
           traversal path will be generated as ``/1``.  This means that
           the root object's ``__getitem__`` will be called with the
-          name ``1`` during the traversal phase.  If the ``1`` object
+          name ``'1'`` during the traversal phase.  If the ``'1'`` object
           exists, it will become the :term:`context` of the request.
           :ref:`traversal_chapter` has more information about
           traversal.
