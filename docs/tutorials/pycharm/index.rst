@@ -151,10 +151,9 @@ project.
 In PyCharm, select *VCS > Enable Version Control Integration...*, then select
 Git as your VCS and click the OK button.
 
-See `Cloning a Repository from GitHub
-<http://www.jetbrains.com/pycharm/webhelp/cloning-a-repository-from-github.html
->`_ in the PyCharm documentation for more information on using GitHub and git
-in PyCharm.
+See `Cloning a Repository from GitHub <http://www.jetbrains.com/pycharm/webhelp/cloning-a-repository-from-github.html>`_
+in the PyCharm documentation for more information on using GitHub and git in
+PyCharm.
 
 We will refer to the cloned repository of Pyramid on your computer as your
 "local Pyramid repository".
