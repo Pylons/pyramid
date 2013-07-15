@@ -164,7 +164,7 @@ class Router(object):
             except PredicateMismatch:
                 # look for other views that meet the predicate
                 # criteria
-                for iface in context_iface.flattened():
+                for iface in context_iface.__sro__[1:]:
                     view_callable = adapters.lookup(
                         (IViewClassifier, request.request_iface, iface),
                         IView, name=view_name, default=None)
