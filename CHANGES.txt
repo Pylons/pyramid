@@ -101,7 +101,8 @@ Bug Fixes
   predicate mismatch error when trying to use GET or DELETE
   methods. Now the views are found and no predicate mismatch is
   raised.
-  See https://github.com/Pylons/pyramid/pull/786
+  See https://github.com/Pylons/pyramid/pull/786 and
+  https://github.com/Pylons/pyramid/pull/1004
 
 - Spaces and dots may now be in mako renderer template paths. This was
   broken when support for the new makodef syntax was added in 1.4a1.
