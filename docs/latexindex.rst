@@ -1,8 +1,8 @@
 .. _latexindex:
 
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-The :app:`Pyramid` Web Application Framework
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+The :app:`Pyramid` Web Application Development Framework
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 .. frontmatter::
 
@@ -28,8 +28,8 @@ Narrative Documentation
 
    narr/introduction
    narr/install
-   narr/configuration
    narr/firstapp
+   narr/configuration
    narr/project
    narr/startup
    narr/router
@@ -50,6 +50,7 @@ Narrative Documentation
    narr/vhosting
    narr/testing
    narr/resources
+   narr/hellotraversal
    narr/muchadoabouttraversal
    narr/traversal
    narr/security
@@ -60,6 +61,8 @@ Narrative Documentation
    narr/extending
    narr/advconfig
    narr/extconfig
+   narr/scaffolding
+   narr/upgrading
    narr/threadlocals
    narr/zca
 
@@ -71,10 +74,11 @@ Tutorials
 .. toctree::
    :maxdepth: 1
 
-   tutorials/wiki/index.rst
    tutorials/wiki2/index.rst
+   tutorials/wiki/index.rst
    tutorials/bfg/index.rst
    tutorials/modwsgi/index.rst
+   tutorials/pycharm/index.rst
 
 .. _api_reference:
 
