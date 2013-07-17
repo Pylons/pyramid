@@ -511,8 +511,22 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
     ``wild_domain``
 
        Default: ``True``. An auth_tkt cookie will be generated for the
-       wildcard domain.
+       wildcard domain. If your site is hosted as ``example.com`` this
+       will make the cookie available for sites underneath ``example.com``
+       such as ``www.example.com``.
        Optional.
+
+    ``parent_domain``
+
+       Default: ``False``. An auth_tkt cookie will be generated for the
+       parent domain of the current site. For example if your site is
+       hosted under ``www.example.com`` a cookie will be generated for
+       ``.example.com``. This can be useful if you have multiple sites
+       sharing the same domain. This option supercedes the ``wild_domain``
+       option.
+       Optional.
+
+       This option is available as of :app:`Pyramid` 1.5.
 
     ``hashalg``
 
@@ -565,7 +579,8 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
                  http_only=False,
                  wild_domain=True,
                  debug=False,
-                 hashalg=_marker
+                 hashalg=_marker,
+                 parent_domain=False,
                  ):
         if hashalg is _marker:
             hashalg = 'md5'
@@ -603,6 +618,7 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
             path=path,
             wild_domain=wild_domain,
             hashalg=hashalg,
+            parent_domain=parent_domain,
             )
         self.callback = callback
         self.debug = debug
@@ -800,7 +816,7 @@ class AuthTktCookieHelper(object):
     def __init__(self, secret, cookie_name='auth_tkt', secure=False,
                  include_ip=False, timeout=None, reissue_time=None,
                  max_age=None, http_only=False, path="/", wild_domain=True,
-                 hashalg='md5'):
+                 hashalg='md5', parent_domain=False):
         self.secret = secret
         self.cookie_name = cookie_name
         self.include_ip = include_ip
@@ -811,6 +827,7 @@ class AuthTktCookieHelper(object):
         self.http_only = http_only
         self.path = path
         self.wild_domain = wild_domain
+        self.parent_domain = parent_domain
         self.hashalg = hashalg
 
         static_flags = []
@@ -850,16 +867,19 @@ class AuthTktCookieHelper(object):
 
         cookies = [
             ('Set-Cookie', '%s="%s"; Path=%s%s%s' % (
-            self.cookie_name, value, self.path, max_age, self.static_flags)),
-            ('Set-Cookie', '%s="%s"; Path=%s; Domain=%s%s%s' % (
-            self.cookie_name, value, self.path, cur_domain, max_age,
-                self.static_flags)),
+            self.cookie_name, value, self.path, max_age, self.static_flags))
             ]
 
-        if self.wild_domain:
-            wild_domain = '.' + cur_domain
+        domains = []
+        if self.parent_domain and cur_domain.count('.') > 1:
+            domains.append('.' + cur_domain.split('.', 1)[1])
+        else:
+            domains.append(cur_domain)
+            if self.wild_domain:
+                domains.append('.' + cur_domain)
+        for domain in domains:
             cookies.append(('Set-Cookie', '%s="%s"; Path=%s; Domain=%s%s%s' % (
-                self.cookie_name, value, self.path, wild_domain, max_age,
+                self.cookie_name, value, self.path, domain, max_age,
                 self.static_flags)))
 
         return cookies
