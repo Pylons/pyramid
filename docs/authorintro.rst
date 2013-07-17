@@ -73,7 +73,7 @@ This book is divided into three major parts:
   concepts in terms of the sample.  You should read the tutorials if
   you want a guided tour of :app:`Pyramid`.
 
-:ref:`api_reference`
+:ref:`api_documentation`
 
   Comprehensive reference material for every public API exposed by
   :app:`Pyramid`.  The API documentation is organized

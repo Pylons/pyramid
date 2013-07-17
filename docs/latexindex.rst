@@ -1,13 +1,13 @@
 .. _latexindex:
 
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-The :app:`Pyramid` Web Application Development Framework
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+=================================================
+The Pyramid Web Application Development Framework
+=================================================
 
 .. frontmatter::
 
 Front Matter
-@@@@@@@@@@@@
+============
 
 .. toctree::
    :maxdepth: 1
@@ -21,7 +21,7 @@ Front Matter
 .. _narrative_documentation:
 
 Narrative Documentation
-@@@@@@@@@@@@@@@@@@@@@@@
+=======================
 
 .. toctree::
    :maxdepth: 1
@@ -69,7 +69,7 @@ Narrative Documentation
 .. _tutorials:
 
 Tutorials
-@@@@@@@@@
+=========
 
 .. toctree::
    :maxdepth: 1
@@ -80,10 +80,10 @@ Tutorials
    tutorials/modwsgi/index.rst
    tutorials/pycharm/index.rst
 
-.. _api_reference:
+.. _api_documentation:
 
-API Reference
-@@@@@@@@@@@@@
+API Documentation
+=================
 
 .. toctree::
    :maxdepth: 1

@@ -45,7 +45,7 @@ What's New
 
 .. _html_narrative_documentation:
 
-Narrative documentation
+Narrative Documentation
 =======================
 
 Narrative documentation in chapter form explaining how to use
@@ -111,7 +111,7 @@ platforms.
    tutorials/pycharm/index.rst
 
 API Documentation
-==================
+=================
 
 Comprehensive reference material for every public API exposed by :app:`Pyramid`:
 
