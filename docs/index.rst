@@ -37,6 +37,7 @@ What's New
 .. toctree::
    :maxdepth: 1
 
+   whatsnew-1.5
    whatsnew-1.4
    whatsnew-1.3
    whatsnew-1.2
