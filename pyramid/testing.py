@@ -411,7 +411,7 @@ def setUp(registry=None, request=None, hook_zca=True, autocommit=True,
     suitable testing analogue.
 
     After ``setUp`` is finished, the registry returned by the
-    :func:`pyramid.threadlocal.get_current_request` function will
+    :func:`pyramid.threadlocal.get_current_registry` function will
     be the passed (or constructed) registry until
     :func:`pyramid.testing.tearDown` is called (or
     :func:`pyramid.testing.setUp` is called again) .
