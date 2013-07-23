@@ -109,7 +109,6 @@ platforms.
    tutorials/wiki/index.rst
    tutorials/bfg/index.rst
    tutorials/modwsgi/index.rst
-   tutorials/pycharm/index.rst
 
 API Documentation
 =================

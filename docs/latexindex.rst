@@ -78,7 +78,6 @@ Tutorials
    tutorials/wiki/index.rst
    tutorials/bfg/index.rst
    tutorials/modwsgi/index.rst
-   tutorials/pycharm/index.rst
 
 .. _api_documentation:
 
@@ -115,7 +114,7 @@ API Documentation
 .. backmatter::
 
 Glossary and Index
-@@@@@@@@@@@@@@@@@@
+==================
 
 .. toctree::
   :maxdepth: 1
