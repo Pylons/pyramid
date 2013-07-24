@@ -93,7 +93,7 @@ copyright = '2008-%s, Agendaless Consulting' % thisyear
 # other places throughout the built documents.
 #
 # The short X.Y version.
-version = '1.4'
+version = '1.5dev'
 
 # The full version, including alpha/beta/rc tags.
 release = version

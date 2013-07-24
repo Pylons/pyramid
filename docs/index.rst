@@ -37,6 +37,7 @@ What's New
 .. toctree::
    :maxdepth: 1
 
+   whatsnew-1.5
    whatsnew-1.4
    whatsnew-1.3
    whatsnew-1.2
@@ -45,7 +46,7 @@ What's New
 
 .. _html_narrative_documentation:
 
-Narrative documentation
+Narrative Documentation
 =======================
 
 Narrative documentation in chapter form explaining how to use
@@ -110,7 +111,7 @@ platforms.
    tutorials/modwsgi/index.rst
 
 API Documentation
-==================
+=================
 
 Comprehensive reference material for every public API exposed by :app:`Pyramid`:
 

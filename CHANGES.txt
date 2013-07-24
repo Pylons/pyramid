@@ -1,4 +1,4 @@
-next release
+Next Release
 ============
 
 Features
@@ -6,7 +6,7 @@ Features
 
 - ``scripts/prequest.py``: add support for submitting ``PUT`` and ``PATCH``
   requests.  See https://github.com/Pylons/pyramid/pull/1033.  add support for
-  submitting ``OPTIONS`` and ``PROPFIND`` requests, and allow users to specify
+  submitting ``OPTIONS`` and ``PROPFIND`` requests, and  allow users to specify
   basic authentication credentials in the request via a ``--login`` argument to
   the script.  See https://github.com/Pylons/pyramid/pull/1039.
 
@@ -20,6 +20,10 @@ Features
 - Allow a protocol-relative URL (e.g. ``//example.com/images``) to be passed to
   ``pyramid.config.Configurator.add_static_view``. This allows
   externally-hosted static URLs to be generated based on the current protocol.
+
+- The ``AuthTktAuthenticationPolicy`` has a new ``parent_domain`` option to
+  set the authentication cookie as a wildcard cookie on the parent domain. This
+  is useful if you have multiple sites sharing the same domain.
 
 - The ``AuthTktAuthenticationPolicy`` now supports IPv6 addresses when using
   the ``include_ip=True`` option. This is possibly incompatible with
@@ -40,22 +44,6 @@ Features
   ``X-CSRF-Token`` (as well as the ``csrf_token`` form parameter, which they
   always did).  The header is tried when the form parameter does not exist.
 
-Bug Fixes
----------
-
-- Make the ``pyramid.config.assets.PackageOverrides`` object implement the API
-  for ``__loader__`` objects specified in PEP 302.  Proxies to the
-  ``__loader__`` set by the importer, if present; otherwise, raises
-  ``NotImplementedError``.  This makes Pyramid static view overrides work
-  properly under Python 3.3 (previously they would not).  See
-  https://github.com/Pylons/pyramid/pull/1015 for more information.
-
-- ``mako_templating``: added defensive workaround for non-importability of
-  ``mako`` due to upstream ``markupsafe`` dropping Python 3.2 support.  Mako
-  templating will no longer work under the combination of MarkupSafe 0.17 and
-  Python 3.2 (although the combination of MarkupSafe 0.17 and Python 3.3 or any
-  supported Python 2 version will work OK).
-
 - View lookup will now search for valid views based on the inheritance
   hierarchy of the context. It tries to find views based on the most
   specific context first, and upon predicate failure, will move up the
@@ -63,7 +51,7 @@ Bug Fixes
   In the past, only the most specific type containing views would be checked
   and if no matching view could be found then a PredicateMismatch would be
   raised. Now predicate mismatches don't hide valid views registered on
-  super-types. Here's an example that now works::
+  super-types. Here's an example that now works:
 
   .. code-block:: python
 
@@ -101,7 +89,25 @@ Bug Fixes
   predicate mismatch error when trying to use GET or DELETE
   methods. Now the views are found and no predicate mismatch is
   raised.
-  See https://github.com/Pylons/pyramid/pull/786
+  See https://github.com/Pylons/pyramid/pull/786 and
+  https://github.com/Pylons/pyramid/pull/1004 and
+  https://github.com/Pylons/pyramid/pull/1046
+
+Bug Fixes
+---------
+
+- Make the ``pyramid.config.assets.PackageOverrides`` object implement the API
+  for ``__loader__`` objects specified in PEP 302.  Proxies to the
+  ``__loader__`` set by the importer, if present; otherwise, raises
+  ``NotImplementedError``.  This makes Pyramid static view overrides work
+  properly under Python 3.3 (previously they would not).  See
+  https://github.com/Pylons/pyramid/pull/1015 for more information.
+
+- ``mako_templating``: added defensive workaround for non-importability of
+  ``mako`` due to upstream ``markupsafe`` dropping Python 3.2 support.  Mako
+  templating will no longer work under the combination of MarkupSafe 0.17 and
+  Python 3.2 (although the combination of MarkupSafe 0.17 and Python 3.3 or any
+  supported Python 2 version will work OK).
 
 - Spaces and dots may now be in mako renderer template paths. This was
   broken when support for the new makodef syntax was added in 1.4a1.
@@ -118,9 +124,9 @@ Bug Fixes
   https://github.com/Pylons/pyramid/issues/981
 
 - ``pyramid.testing.DummyResource`` didn't define ``__bool__``, so code under
-   Python 3 would use ``__len__`` to find truthiness; this usually caused an
-   instance of DummyResource to be "falsy" instead of "truthy".  See
-   https://github.com/Pylons/pyramid/pull/1032
+  Python 3 would use ``__len__`` to find truthiness; this usually caused an
+  instance of DummyResource to be "falsy" instead of "truthy".  See
+  https://github.com/Pylons/pyramid/pull/1032
 
 1.4 (2012-12-18)
 ================
