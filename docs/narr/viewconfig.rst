@@ -584,6 +584,8 @@ predicate values are accepted:
 
 - :meth:`pyramid.view.view_config`
 
+.. versionadded:: 1.5
+
 .. index::
    single: view_config placement
 
