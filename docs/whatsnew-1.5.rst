@@ -12,6 +12,32 @@ Feature Additions
 
 The feature additions in Pyramid 1.5 follow.
 
+- Add the ability to invert the result of any view, route, or subscriber
+  predicate value using the ``not_`` class.  For example:
+
+  .. code-block:: python
+
+     from pyramid.config import not_
+
+     @view_config(route_name='myroute', request_method=not_('POST'))
+     def myview(request): ...
+
+  The above example will ensure that the view is called if the request method
+  is not POST, at least if no other view is more specific.
+
+  The :class:`pyramid.config.not_` class can be used against any value that is
+  a predicate value passed in any of these contexts:
+
+  - :meth:`pyramid.config.Configurator.add_view`
+
+  - :meth:`pyramid.config.Configurator.add_route`
+
+  - :meth:`pyramid.config.Configurator.add_subscriber`
+
+  - :meth:`pyramid.view.view_config`
+
+  - :meth:`pyramid.events.subscriber`
+
 - View lookup will now search for valid views based on the inheritance
   hierarchy of the context. It tries to find views based on the most specific
   context first, and upon predicate failure, will move up the inheritance chain

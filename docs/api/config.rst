@@ -135,3 +135,4 @@
    will only exist for the lifetime of the actual applications for which they
    are being used.
 
+.. autoclass:: not_

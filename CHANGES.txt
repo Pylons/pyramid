@@ -4,6 +4,30 @@ Next Release
 Features
 --------
 
+- Add the ability to invert the result of any view, route, or subscriber
+  predicate using the ``not_`` class.  For example::
+
+     from pyramid.config import not_
+
+     @view_config(route_name='myroute', request_method=not_('POST'))
+     def myview(request): ...
+
+  The above example will ensure that the view is called if the request method
+  is not POST (at least if no other view is more specific).
+
+  The :class:`pyramid.config.not_` class can be used against any value that is
+  a predicate value passed in any of these contexts:
+
+  - ``pyramid.config.Configurator.add_view``
+
+  - ``pyramid.config.Configurator.add_route``
+
+  - ``pyramid.config.Configurator.add_subscriber``
+
+  - ``pyramid.view.view_config``
+
+  - ``pyramid.events.subscriber``
+
 - ``scripts/prequest.py``: add support for submitting ``PUT`` and ``PATCH``
   requests.  See https://github.com/Pylons/pyramid/pull/1033.  add support for
   submitting ``OPTIONS`` and ``PROPFIND`` requests, and  allow users to specify

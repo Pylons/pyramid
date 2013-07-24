@@ -557,6 +557,33 @@ form of :term:`declarative configuration`, while
 :meth:`pyramid.config.Configurator.add_view` is a form of :term:`imperative
 configuration`.  However, they both do the same thing.
 
+Inverting Predicate Values
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You can invert the meaning of any predicate value by wrapping it in a call to
+:class:`pyramid.config.not_`.
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.config import not_
+
+   config.add_view(
+       'mypackage.views.my_view',
+       route_name='ok', 
+       request_method=not_('POST')
+       )
+
+The above example will ensure that the view is called if the request method
+is *not* ``POST``, at least if no other view is more specific.
+
+This technique of wrapping a predicate value in ``not_`` can be used anywhere
+predicate values are accepted:
+
+- :meth:`pyramid.config.Configurator.add_view`
+
+- :meth:`pyramid.view.view_config`
+
 .. index::
    single: view_config placement
 
