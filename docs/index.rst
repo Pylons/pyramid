@@ -223,6 +223,5 @@ Index and Glossary
    :hidden:
 
    glossary
-   foreword.rst
    latexindex.rst
 
