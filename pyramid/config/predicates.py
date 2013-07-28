@@ -294,3 +294,4 @@ class EffectivePrincipalsPredicate(object):
             if self.val.issubset(rpset):
                 return True
         return False
+

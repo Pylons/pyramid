@@ -290,9 +290,9 @@ configured view.
   of the ``REQUEST_METHOD`` of the :term:`WSGI` environment.
 
 ``request_param``
-  This value can be any string or a sequence of strings.  A view declaration 
-  with this argument ensures that the view will only be called when the 
-  :term:`request` has a key in the ``request.params`` dictionary (an HTTP 
+  This value can be any string or a sequence of strings.  A view declaration
+  with this argument ensures that the view will only be called when the
+  :term:`request` has a key in the ``request.params`` dictionary (an HTTP
   ``GET`` or ``POST`` variable) that has a name which matches the
   supplied value.
 
@@ -306,8 +306,6 @@ configured view.
   consideration of keys and values in the ``request.params`` dictionary.
 
 ``match_param``
-  .. versionadded:: 1.2
-
   This param may be either a single string of the format "key=value" or a
   dict of key/value pairs.
 
@@ -323,6 +321,8 @@ configured view.
 
   If ``match_param`` is not supplied, the view will be invoked without
   consideration of the keys and values in ``request.matchdict``.
+
+  .. versionadded:: 1.2
 
 ``containment``
   This value should be a reference to a Python class or :term:`interface`
@@ -505,7 +505,7 @@ configuration stanza:
 .. code-block:: python
    :linenos:
 
-   config.add_view('mypackage.views.my_view', route_name='ok', 
+   config.add_view('mypackage.views.my_view', route_name='ok',
                    request_method='POST', permission='read')
 
 All arguments to ``view_config`` may be omitted.  For example:
@@ -556,6 +556,35 @@ argument.  Usage of the :class:`~pyramid.view.view_config` decorator is a
 form of :term:`declarative configuration`, while
 :meth:`pyramid.config.Configurator.add_view` is a form of :term:`imperative
 configuration`.  However, they both do the same thing.
+
+Inverting Predicate Values
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You can invert the meaning of any predicate value by wrapping it in a call to
+:class:`pyramid.config.not_`.
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.config import not_
+
+   config.add_view(
+       'mypackage.views.my_view',
+       route_name='ok',
+       request_method=not_('POST')
+       )
+
+The above example will ensure that the view is called if the request method
+is *not* ``POST``, at least if no other view is more specific.
+
+This technique of wrapping a predicate value in ``not_`` can be used anywhere
+predicate values are accepted:
+
+- :meth:`pyramid.config.Configurator.add_view`
+
+- :meth:`pyramid.view.view_config`
+
+.. versionadded:: 1.5
 
 .. index::
    single: view_config placement
