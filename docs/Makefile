@@ -63,8 +63,13 @@ latex:
 	cp _static/latex-note.png _build/latex
 	@echo
 	@echo "Build finished; the LaTeX files are in _build/latex."
-	@echo "Run \`make all-pdf' or \`make all-ps' in that directory to" \
-	      "run these through (pdf)latex."
+	@echo "Run \`make latexpdf' to build a PDF file from them."
+
+latexpdf:
+	$(SPHINXBUILD) -b latex $(ALLSPHINXOPTS) _build/latex
+	@echo "Running LaTeX files through pdflatex..."
+	$(MAKE) -C _build/latex all-pdf
+	@echo "pdflatex finished; the PDF file is in _build/latex."
 
 changes:
 	mkdir -p _build/changes _build/doctrees
