@@ -216,12 +216,8 @@ Index and Glossary
 * :ref:`genindex`
 * :ref:`search`
 
-
-.. add glossary, foreword, and latexindex in a hidden toc to avoid warnings
-
 .. toctree::
    :hidden:
 
    glossary
-   latexindex.rst
 
