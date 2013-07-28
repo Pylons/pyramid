@@ -224,5 +224,4 @@ Index and Glossary
 
    glossary
    foreword.rst
-   latexindex.rst
 
