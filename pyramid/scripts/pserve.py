@@ -45,8 +45,8 @@ if WIN and not hasattr(os, 'kill'): # pragma: no cover
 else:
     kill = os.kill
 
-def main(argv=sys.argv, quiet=False):
-    command = PServeCommand(argv, quiet=quiet)
+def main(argv=sys.argv):
+    command = PServeCommand(argv)
     return command.run()
 
 class DaemonizeException(Exception):
@@ -129,8 +129,14 @@ class PServeCommand(object):
         '-v', '--verbose',
         default=default_verbosity,
         dest='verbose',
-        type=int,
+        action='count',
         help="Set verbose level (default "+str(default_verbosity)+")")
+    parser.add_option(
+        '-q', '--quiet',
+        action='store_const',
+        const=0,
+        dest='verbose',
+        help="Suppress verbose output")
 
     if hasattr(os, 'setuid'):
         # I don't think these are available on Windows
@@ -159,13 +165,11 @@ class PServeCommand(object):
 
     possible_subcommands = ('start', 'stop', 'restart', 'status')
 
-    def __init__(self, argv, quiet=False):
-        self.quiet = quiet
+    def __init__(self, argv):
         self.options, self.args = self.parser.parse_args(argv[1:])
 
     def out(self, msg): # pragma: no cover
-        if not self.quiet:
-            print(msg)
+        print(msg)
 
     def get_options(self):
         if (len(self.args) > 1

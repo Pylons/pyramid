@@ -259,7 +259,7 @@ class Test_read_pidfile(unittest.TestCase):
 class Test_main(unittest.TestCase):
     def _callFUT(self, argv):
         from pyramid.scripts.pserve import main
-        return main(argv, quiet=True)
+        return main(argv)
 
     def test_it(self):
         result = self._callFUT(['pserve'])
