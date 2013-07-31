@@ -65,7 +65,7 @@ class PServeCommand(object):
     You can also include variable assignments like 'http_port=8080'
     and then use %(http_port)s in your config files.
     """
-    verbose = 1
+    default_verbosity = 1
 
     parser = optparse.OptionParser(
         usage,
@@ -125,6 +125,12 @@ class PServeCommand(object):
         action='store_true',
         dest='show_status',
         help="Show the status of the (presumably daemonized) server")
+    parser.add_option(
+        '-v', '--verbose',
+        default=default_verbosity,
+        dest='verbose',
+        type=int,
+        help="Set verbose level (default ["+str(default_verbosity)+"])")
 
     if hasattr(os, 'setuid'):
         # I don't think these are available on Windows
@@ -148,8 +154,6 @@ class PServeCommand(object):
 
     _scheme_re = re.compile(r'^[a-z][a-z]+:', re.I)
 
-    default_verbosity = 1
-
     _reloader_environ_key = 'PYTHON_RELOADER_SHOULD_RUN'
     _monitor_environ_key = 'PASTE_MONITOR_SHOULD_RUN'
 
@@ -158,6 +162,7 @@ class PServeCommand(object):
     def __init__(self, argv, quiet=False):
         self.quiet = quiet
         self.options, self.args = self.parser.parse_args(argv[1:])
+        self.verbose = self.options.verbose
 
     def out(self, msg): # pragma: no cover
         if not self.quiet:
