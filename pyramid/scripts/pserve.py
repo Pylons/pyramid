@@ -130,7 +130,7 @@ class PServeCommand(object):
         default=default_verbosity,
         dest='verbose',
         type=int,
-        help="Set verbose level (default ["+str(default_verbosity)+"])")
+        help="Set verbose level (default "+str(default_verbosity)+")")
 
     if hasattr(os, 'setuid'):
         # I don't think these are available on Windows
