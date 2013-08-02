@@ -1,3 +1,5 @@
+:orphan:
+
 .. _latexindex:
 
 =================================================
@@ -86,30 +88,9 @@ API Documentation
 
 .. toctree::
    :maxdepth: 1
+   :glob:
 
-   api/authorization
-   api/authentication
-   api/config
-   api/events
-   api/exceptions
-   api/httpexceptions
-   api/i18n
-   api/interfaces
-   api/location
-   api/paster
-   api/registry
-   api/renderers
-   api/request
-   api/response
-   api/scripting
-   api/security
-   api/settings
-   api/testing
-   api/threadlocal
-   api/traversal
-   api/url
-   api/view
-   api/wsgi
+   api/*
 
 .. backmatter::
 
