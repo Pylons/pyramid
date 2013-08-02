@@ -118,6 +118,7 @@ setup(name='pyramid',
         pviews = pyramid.scripts.pviews:main
         ptweens = pyramid.scripts.ptweens:main
         prequest = pyramid.scripts.prequest:main
+        pdistreport = pyramid.scripts.pdistreport:main
         [paste.server_runner]
         wsgiref = pyramid.scripts.pserve:wsgiref_server_runner
         cherrypy = pyramid.scripts.pserve:cherrypy_server_runner
