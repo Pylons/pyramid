@@ -45,8 +45,8 @@ if WIN and not hasattr(os, 'kill'): # pragma: no cover
 else:
     kill = os.kill
 
-def main(argv=sys.argv):
-    command = PServeCommand(argv)
+def main(argv=sys.argv, quiet=False):
+    command = PServeCommand(argv, quiet=quiet)
     return command.run()
 
 class DaemonizeException(Exception):
@@ -165,11 +165,14 @@ class PServeCommand(object):
 
     possible_subcommands = ('start', 'stop', 'restart', 'status')
 
-    def __init__(self, argv):
+    def __init__(self, argv, quiet=False):
         self.options, self.args = self.parser.parse_args(argv[1:])
+        if quiet:
+            self.options.verbose = 0
 
     def out(self, msg): # pragma: no cover
-        print(msg)
+        if self.options.verbose > 0:
+            print(msg)
 
     def get_options(self):
         if (len(self.args) > 1
