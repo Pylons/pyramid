@@ -2,7 +2,7 @@
  Author Introduction
 =====================
 
-Welcome to "The :app:`Pyramid` Web Application Framework".  In this
+Welcome to "The :app:`Pyramid` Web Framework".  In this
 introduction, I'll describe the audience for this book, I'll describe
 the book content, I'll provide some context regarding the genesis of
 :app:`Pyramid`, and I'll thank some important people.

@@ -1,7 +1,7 @@
 .. _latexindex:
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-The :app:`Pyramid` Web Application Framework
+The :app:`Pyramid` Web Framework
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 .. frontmatter::
