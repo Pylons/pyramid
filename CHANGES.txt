@@ -4,6 +4,10 @@ Next Release
 Features
 --------
 
+- Add ``pdistreport`` script, which prints the Python version in use, the
+  Pyramid version in use, and the version number and location of all Python
+  distributions currently installed.
+
 - Add the ability to invert the result of any view, route, or subscriber
   predicate using the ``not_`` class.  For example::
 

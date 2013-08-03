@@ -12,6 +12,10 @@ Feature Additions
 
 The feature additions in Pyramid 1.5 follow.
 
+- Add ``pdistreport`` script, which prints the Python version in use, the
+  Pyramid version in use, and the version number and location of all Python
+  distributions currently installed.
+
 - Add the ability to invert the result of any view, route, or subscriber
   predicate value using the ``not_`` class.  For example:
 
