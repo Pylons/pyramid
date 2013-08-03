@@ -1,7 +1,7 @@
 Copyright, Trademarks, and Attributions
 =======================================
 
-*The Pyramid Web Application Development Framework, Version 1.1*
+*The Pyramid Web Framework, Version 1.1*
 
 by Chris McDonough
 

@@ -2,19 +2,47 @@
 Quick Glance
 ============
 
-Pyramid lets you start small and finish big. The
-:doc:`index` guide
+Pyramid lets you start small and finish big. This :doc:`index` guide
 walks you through many of the key features. Let's put the emphasis on
 *start* by doing a quick tour through Pyramid.
 
-This *Quick Glance* is shorthand, snippet-oriented. It is not intended
-as full example. Instead, the other chapters will provide complete
-examples.
+This *Quick Glance* is provides snippets instead of full examples. For
+working code, see the *Getting Started* chapters on each topic.
 
 .. note::
 
     Like the rest of Getting Started, we're using Python 3 in
     our samples. You can too, or you can use Python 2.7.
+
+Setup
+=====
+
+This is just a "quick glance", so we won't kill ourselves showing
+installation details. The guides fully cover each topic,
+including setup. In a nutshell:
+
+.. code-block:: bash
+
+  $ pyvenv-3.3 env33
+  $ source env33/bin/activate
+  $ curl -O http://python-distribute.org/distribute_setup.py
+  $ python3.3 ./distribute_setup.py
+  $ rm distribute*
+  $ easy_install-3.3 pip
+  $ pip-3.3 install pyramid
+
+We use Python 3.3's builtin virtual environment tool ``pyvenv`` to make
+an isolated Python. It is so isolated, we don't have package
+installation tools! After setting those up and cleaning up,
+we install Pyramid into our virtual environment.
+
+.. note::
+
+  Note the use of ``3.3`` on many of the commands, as a way to emphasize
+  in this document which versions of the commands we are using. This is
+  optional.
+
+
 
 The Smallest
 ============
@@ -506,14 +534,183 @@ Pyramid supplies helpers for test writing, which we use in the
 test setup and teardown. Our one test imports the view,
 makes a dummy request, and sees if the view returns what we expected.
 
+Logging
+=======
+
+It's important to know what is going on inside our web application.
+In development we might need to collect some output. In production,
+we might need to detect situations when other people use the site. We
+need *logging*.
+
+Fortunately Pyramid uses the normal Python approach to logging. The
+scaffold generated, in your ``development.ini``, a number of lines that
+configure the logging for you to some reasonable defaults. You then see
+messages sent by Pyramid (for example, when a new request comes in.)
+
+Maybe you would like to log messages in your code? In your Python
+module, import and setup the logging:
+
+.. code-block:: python
+
+  import logging
+  log = logging.getLogger(__name__)
+
+You can now, in your code, log messages:
+
+.. code-block:: python
+
+    log.debug('Some Message')
+
+This will log ``Some Message`` at a ``debug`` log level,
+to the application-configured logger in your ``development.ini``. What
+controls that? These sections in the configuration file:
+
+.. code-block:: ini
+
+  [loggers]
+  keys = root, hello_world
+
+  [logger_hello_world]
+  level = DEBUG
+  handlers =
+  qualname = hello_world
+
+Our application, a package named ``hello_world``, is setup as a logger
+and configured to log messages at a ``DEBUG`` or higher level.
+
+Sessions
+========
+
+When people use your web application, they frequently perform a task
+that requires semi-permanent data to be saved. For example,a shopping
+cart. These are frequently called *sessions*.
+
+Pyramid has basic built-in support for sessions, with add-ons such as
+*Beaker* (or your own custom sessioning engine) that provide richer
+session support. For the built-in session support, you first import
+the "factory" which provides the sessioning:
+
+.. code-block:: python
+
+    from pyramid.session import UnencryptedCookieSessionFactoryConfig
+    my_session_factory = UnencryptedCookieSessionFactoryConfig('itsaseekreet')
+
+We tell the configuration system that this is the source of our
+sessioning support when setting up the ``Configurator``:
+
+.. code-block:: python
+
+  config = Configurator(session_factory = my_session_factory)
+
+This now lets us use the session in our application code:
+
+.. code-block:: python
+
+    session = request.session
+    if 'abc' in session:
+        session['fred'] = 'yes'
+
+Databases
+=========
+
+Web applications mean data. Data means databases. Frequently SQL
+databases. SQL Databases frequently mean an "ORM"
+(object-relational mapper.) In Python, ORM usually leads to the
+mega-quality *SQLAlchemy*, a Python package that greatly eases working
+with databases.
+
+Pyramid and SQLAlchemy are great friends. That friendship includes a
+scaffold!
+
+.. code-block:: bash
+
+  $ pcreate --scaffold alchemy hello_sqlalchemy
+  $ cd hello_sqlalchemy
+  $ python3.3 setup.py develop
+
+We now have a working sample SQLAlchemy application with all
+dependencies installed. The sample project provides a console script to
+initialize a SQLite database with tables. Let's run it and then start
+the application:
+
+.. code-block:: bash
+
+  $ initialize_hello_sqlalchemy_db development.ini
+  $ pserve development.ini
+
+We can now visit our sample at
+`http://localhost:6543/ <http://localhost:6543/>`_. Some choices that
+the scaffold helped us with:
+
+- A ``setup.py`` with appropriate dependencies
+
+- Connection strings and integration in our ``development.ini`` file
+
+- A console script which we ran above to initialize the database
+
+- The SQLAlchemy engine integrated into the ``Configurator`` on
+  application startup
+
+- Python modules for the SQLAlchemy models and the Pyramid views that
+  go with them
+
+- Some unit tests...yummy!
+
+As mentioned above, an ORM is software that eases the mapping of
+database structures into a programming language. SQLAlchemy uses models
+for this, and its scaffold generated a sample model:
+
+.. code-block:: python
+
+    class MyModel(Base):
+        __tablename__ = 'models'
+        id = Column(Integer, primary_key=True)
+        name = Column(Text, unique=True)
+        value = Column(Integer)
+
+        def __init__(self, name, value):
+            self.name = name
+            self.value = value
+
+The Python module also includes this:
+
+.. code-block:: python
+
+  from zope.sqlalchemy import ZopeTransactionExtension
+
+The generated application includes the optional support for
+``pyramid_tm``, a unique transaction monitor that integrates your
+database transactions with your code for transparent rollback and commit.
+
+View code, which mediates the logic between web requests and the rest
+of the system, can then easily get at the data:
+
+.. code-block:: python
+
+  one = DBSession.query(MyModel).filter(MyModel.name == 'one').first()
 
 
-  - logging
+Forms
+=====
 
-  - resources, asset specs, tests,
+Developers have lots of opinions about forms, and thus there are many
+form libraries for Python. Pyramid doesn't directly bundle a form
+library, but *Deform* is a popular choice. Let's see it in action.
+First we install it:
 
-sessions, logging, special views
-databases, forms, security
+.. code-block:: bash
+
+  $ pip-3.3 install deform
+
+
+
+Authentication
+==============
+
+
+Authorization
+=============
+
 
 Notes
 
@@ -534,6 +731,6 @@ Notes
 
 - Debugging
 
-- Template reloading
-
 - Explain and link to WSGI, Python Packages
+
+- Richer routing

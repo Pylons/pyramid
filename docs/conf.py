@@ -85,7 +85,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General substitutions.
-project = 'The Pyramid Web Application Development Framework'
+project = 'The Pyramid Web Framework'
 thisyear = datetime.datetime.now().year
 copyright = '2008-%s, Agendaless Consulting' % thisyear
 
@@ -179,7 +179,7 @@ html_theme_options = dict(
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
-html_title = 'The Pyramid Web Application Development Framework v%s' % release
+html_title = 'The Pyramid Web Framework v%s' % release
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 #html_short_title = 'Home'
@@ -251,7 +251,7 @@ latex_additional_files = ['_static/latex-note.png', '_static/latex-warning.png']
 # (source start file, target name, title, author, document class [howto/manual]).
 latex_documents = [
   ('latexindex', 'pyramid.tex',
-   'The Pyramid Web Application Development Framework',
+   'The Pyramid Web Framework',
    'Chris McDonough', 'manual'),
     ]
 
@@ -491,7 +491,7 @@ def resig(app, what, name, obj, options, signature, return_annotation):
 # -- Options for Epub output ---------------------------------------------------
 
 # Bibliographic Dublin Core info.
-epub_title = 'The Pyramid Web Application Development Framework, Version %s' \
+epub_title = 'The Pyramid Web Framework, Version %s' \
              % release
 epub_author = 'Chris McDonough'
 epub_publisher = 'Agendaless Consulting'
@@ -509,7 +509,7 @@ epub_scheme = 'ISBN'
 epub_identifier = '0615445675'
 
 # A unique identification for the text.
-epub_uid = 'The Pyramid Web Application Development Framework, Version %s' \
+epub_uid = 'The Pyramid Web Framework, Version %s' \
            % release
 # HTML files that should be inserted before the pages created by sphinx.
 # The format is a list of tuples containing the path and title.

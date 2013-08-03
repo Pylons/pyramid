@@ -1,7 +1,7 @@
 .. _index:
 
 =================================================
-The Pyramid Web Application Development Framework
+The Pyramid Web Framework
 =================================================
 
 :app:`Pyramid` is a small, fast, down-to-earth Python web application
