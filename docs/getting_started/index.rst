@@ -4,80 +4,25 @@ Getting Started With Pyramid
 
 Welcome to Pyramid, the Python web framework that lets you start small
 and finish big. Whether you are new to Python web development or you're
-an experienced developer that wants a quick look at the major
+an experienced developer wanting a quick look at the major
 features, this guide provides a convenient entry point with independent
 chapters for each topic.
 
-:doc:`quick_glance`
-===================
-
-Python web development is a very big topic. Wouldn't it be great to
-have a quick overview, end-to-end, just to get oriented? This chapter
-shows "a little about a lot", full of short code snippets and links to
-deeper treatment of topics. Additionally, we showcase some facilities
-that make Pyramid unique for "applications with ambition."
-
-:doc:`about_guide`
-==================
-
-Now that we have set the scene, we explain the purpose of this guide
-(and non-purpose), showing how it is organized.
-
-
-:doc:`scaffolds`
+About This Guide
 ================
 
-Pyramid projects are organized using normal Python facilities for
-projects. Normal, though, is in the eye of the beholder. This chapter
-shows how to use scaffolds to automate the boilerplate and quickly
-start development of a new project.
+Evaluators want to jump right into a particular topic. This *Getting
+Started* guide is structured with chapter titles that focuses on a
+particular aspect of web development. Each chapter is autonomous and
+you don't have to follow from beginning to end.
 
-Topics: scaffolds, packaging, virtual environments
+By definition, each topic is covered at a high level. To make it easy
+to get to in-depth treatment, the chapters provide interlinking with
+the full treatment in the :ref:`html_narrative_documentation`.
 
-:doc:`configuration`
-====================
-
-
-:doc:`routes`
-=============
-
-:doc:`views`
-============
-
-:doc:`templates`
-================
-
-:doc:`static_assets`
-====================
-
-:doc:`testing`
-==============
-
-:doc:`forms`
-============
-
-:doc:`databases`
-================
-
-:doc:`security`
-===============
-
-:doc:`json`
-===========
-
-
-:doc:`sessions`
-===============
-
-:doc:`internationalization`
-===========================
-
-
-:doc:`special_views`
-====================
-
-:doc:`top_ten`
-==============
+This guide is part of the official documentation. If you find a bug,
+you can report it using the same facilities as the described in the
+software's :ref:`support-and-development`.
 
 Contents
 ========
@@ -86,7 +31,6 @@ Contents
    :maxdepth: 2
 
    quick_glance
-   about_guide
    scaffolds
    configuration
    routes

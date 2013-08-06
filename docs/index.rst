@@ -48,10 +48,30 @@ What's New
 Getting Started
 ===============
 
+Quick tour of major facilities in Pyramid, including a
+:doc:`getting_started/quick_glance` high-level
+overview.
+
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    getting_started/index
+   getting_started/quick_glance
+   getting_started/scaffolds
+   getting_started/configuration
+   getting_started/routes
+   getting_started/views
+   getting_started/templates
+   getting_started/static_assets
+   getting_started/testing
+   getting_started/forms
+   getting_started/databases
+   getting_started/security
+   getting_started/json
+   getting_started/sessions
+   getting_started/internationalization
+   getting_started/special_views
+   getting_started/top_ten
 
 .. _html_narrative_documentation:
 
@@ -191,6 +211,8 @@ source web system for collaboration, organizational intranets, and knowledge
 management. It provides facilities for wikis, calendars, manuals, searching,
 tagging, commenting, and file uploads.  See the `KARL site
 <http://karlproject.org>`_ for download and installation details.
+
+.. _support-and-development:
 
 Support and Development
 =======================

@@ -3,92 +3,141 @@ Quick Glance
 ============
 
 Pyramid lets you start small and finish big. This :doc:`index` guide
-walks you through many of the key features. Let's put the emphasis on
-*start* by doing a quick tour through Pyramid.
-
-This *Quick Glance* is provides snippets instead of full examples. For
-working code, see the *Getting Started* chapters on each topic.
+walks you through many of Pyramid's key features. Let's put the
+emphasis on *start* by doing a quick tour through Pyramid, with
+snippets of code to illustrate major concepts.
 
 .. note::
 
     Like the rest of Getting Started, we're using Python 3 in
-    our samples. You can too, or you can use Python 2.7.
+    our samples. Pyramid was one of the first (October 2011) web
+    frameworks to fully support Python 3. You can use Python 3
+    as well for this guide, but you can also use Python 2.7.
 
-Setup
-=====
+Python Setup
+============
 
-This is just a "quick glance", so we won't kill ourselves showing
-installation details. The guides fully cover each topic,
-including setup. In a nutshell:
+First things first: we need our Python environment in ship-shape.
+Pyramid encourages standard Python development practices (virtual
+environments, packaging tools, etc.) so let's get our working area in
+place. For Python 3.3:
 
 .. code-block:: bash
 
   $ pyvenv-3.3 env33
   $ source env33/bin/activate
-  $ curl -O http://python-distribute.org/distribute_setup.py
-  $ python3.3 ./distribute_setup.py
-  $ rm distribute*
+  $ wget https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py -O - | python
   $ easy_install-3.3 pip
-  $ pip-3.3 install pyramid
 
-We use Python 3.3's builtin virtual environment tool ``pyvenv`` to make
-an isolated Python. It is so isolated, we don't have package
-installation tools! After setting those up and cleaning up,
-we install Pyramid into our virtual environment.
+We make a :term:`virtualenv` then activate it. We then get Python
+packaging tools installed so we can use the popular ``pip`` tool for
+installing packages. Normal first steps for any Python project.
 
-.. note::
+Pyramid Installation
+====================
 
-  Note the use of ``3.3`` on many of the commands, as a way to emphasize
-  in this document which versions of the commands we are using. This is
-  optional.
+We now have a standard starting point for Python. Getting Pyramid
+installed is easy:
 
+.. code-block:: bash
 
+  $ pip install pyramid
 
-The Smallest
-============
+Our virtual environment now has the Pyramid software available to its
+Python.
+
+Hello World
+===========
 
 Microframeworks have shown that learning starts best from a very small
 first step. Here's a tiny application in Pyramid:
 
-.. literalinclude:: quick_glance/app1.py
+.. literalinclude:: quick_glance/hello_world/app.py
+    :linenos:
 
 This simple example is easy to run. Save this as ``app.py`` and run it:
 
 .. code-block:: bash
 
- $ python3 ./app.py
+    $ python ./app.py
 
-Finally, open `http://localhost:8081/ <http://localhost:8081/>`_ in a
+Next, open `http://localhost:6543/ <http://localhost:6543/>`_ in a
 browser and you will see the ``Hello World!`` message.
 
-At a high level, we wrote a Python module, which when executed,
-started an HTTP server. This HTTP server ran a WSGI application with
-one "view". This view handled the ``http://localhost:8081/`` URL.
+New to Python web programming? If so, some lines in module merit
+explanation:
 
-More specifically:
+#. *Line 10*. ``if __name__ == '__main__':`` is Python's way of
+   saying "Start here when running from the command line".
 
-#. We imported an HTTP server (``make_server``), a configuration system
-   (``Configurator``), and a way to send HTTP responses (``Response``).
+#. *Lines 11-13*. Use Pyramid's :term:`configurator` to connect
+   :term:`view` code to particular URL :term:`route`.
 
-#. We made a ``hello_world`` function that returned a ``Response``.
+#. *Lines 6-7*. Implement the view code that generates the
+   :term:`response`.
 
-#. Our ``main`` function started the configuration, added a "route",
-   and then mapped that route to a "view".
+#. *Lines 14-16*. Publish a :term:`WSGI` app using an HTTP server.
 
-#. To finish, we then made a WSGI app and served it.
-   ``if __name__ == '__main__':`` is a standard Python technique to
-   execute code when it is run from the command line instead of
-   imported into another module.
+Handling Web Requests With webob
+================================
 
-.. note::
+Developing for the web means processing web requests. As this is a
+critical part of a web application, web developers need a robust,
+mature set of software for web requests.
 
-  The configuration of the route and the view are split. Other systems
-  let you bundle those together. Pyramid makes you do the extra step,
-  but for a reason: this lets you control the ordering. More on this
-  later.
+Pyramid has always fit nicely into the existing world of Python web
+development (virtual environments, packaging, scaffolding,
+first to embrace Python 3, etc.) For request handling, Pyramid turned
+to the well-regarded :term:`WebOb` Python library for request and
+response handling. In our example
+above, Pyramid hands ``hello_world`` a ``request`` that is
+:ref:`based on WebOb <webob_chapter>`.
 
-Using Decorators and Matchdicts
-===============================
+Let's see some features of requests and responses in action:
+
+.. literalinclude:: quick_glance/requests/app.py
+    :pyobject: hello_world
+
+
+
+Views
+=====
+
+In the example above, the ``hello_world`` function is a "view" (or more
+specifically, a :term:`view callable`. Views are the primary way to
+accept web requests and return responses.
+
+So far the view, its registration with the configuration, and the route
+to map it to a URL are all in the same Python module as the WSGI
+application launching. Let's move the views out to their own ``views
+.py`` module and change the ``app.py`` to scan that module looking for
+decorators that setup the views. First, our revised ``app.py``:
+
+.. literalinclude:: quick_glance/views/app.py
+    :linenos:
+
+We added some more routes, but we also removed the view code.
+Our views, and their registrations (via decorators) are now in a module
+``views.py`` which is scanned via:
+
+.. code-block:: python
+
+    config.scan('views')
+
+Our ``views.py`` is now more self-contained:
+
+.. literalinclude:: quick_glance/views/views.py
+    :linenos:
+
+
+
+- Raise exception, redirect
+- Change header
+- request object
+- "callable"
+
+Routing With Decorators and Matchdicts
+======================================
 
 Let's repeat the smallest step, but make it a little more functional
 and elegant by adding:
@@ -101,20 +150,27 @@ and elegant by adding:
 
 Let's make update our ``app.py`` module:
 
-.. literalinclude:: quick_glance/app2.py
+.. literalinclude:: quick_glance/routing/app.py
     :linenos:
 
-When you run ``python3 ./app.py`` and visit a URL such as
-``http://localhost:8081/hello/amy``, the response includes ``amy`` in
+When you run ``python ./app.py`` and visit a URL such as
+``http://localhost:6543/hello/amy``, the response includes ``amy`` in
 the HTML.
 
 This module, while small, starts to show how many Pyramid applications
 are composed:
 
-#. We use a decorator around the view, to put the configuration closer
-   to the code.
+#. *Line 7*. Pyramid's configuration supports
+   :term:`imperative configuration`, such as the ``config.add_view`` in
+   the previous example. You can also use
+   :term:`declarative configuration`, in which a Python
+   :term:`decorator` is placed on the line above the view.
 
-#. We tell the ``Configurator`` to go look for decorators.
+#. *Line 14*. When setting up the route, mark off a section of the URL
+   to be data available to the view's :term:`matchdict`.
+
+#. *Line 15*. Tell the configurator to go look for decorators.
+
 
 Templates
 =========
@@ -139,7 +195,7 @@ argument tell Pyramid to pass the response through Jinja2:
 
 .. code-block:: python
 
-    @view_config(route_name='hello', renderer="app3.jinja2")
+    @view_config(route_name='hello', renderer="hello_world.jinja2")
     def hello_world(request):
         return dict(name=request.matchdict['name'])
 
@@ -170,7 +226,7 @@ Pyramid will serve some static assets. First, another call to the
     config.add_static_view(name='static', path='static')
 
 This tells our WSGI application to map requests under
-``http://localhost:8081/static/`` to files and directories inside a
+``http://localhost:6543/static/`` to files and directories inside a
 ``static`` directory alongside our Python module.
 
 Next, make a directory ``static`` and place ``app.css`` inside:
@@ -309,7 +365,7 @@ instructions*, we need to install this as a development package:
 .. code-block:: bash
 
     $ cd hello_world
-    $ python3.3 ./setup.py develop
+    $ python ./setup.py develop
 
 What did we get? A top-level directory ``hello_world`` that includes
 some packaging files and a subdirectory ``hello_world`` that has
@@ -444,7 +500,7 @@ First, change your ``setup.py`` to say:
 
 .. code-block:: bash
 
-    $ python3.3 ./setup.py develop
+    $ python ./setup.py develop
 
 The Python package was now installed into our environment but we
 haven't told our web app to use it. We can do so imperatively in code:
@@ -489,7 +545,7 @@ the ``coverage`` tool which yells at us for code that isn't tested:
     )
 
 We changed ``setup.py`` which means we need to re-run
-``python3.3 ./setup.py develop``. We can now run all our tests:
+``python ./setup.py develop``. We can now run all our tests:
 
 .. code-block:: bash
 
@@ -626,7 +682,7 @@ scaffold!
 
   $ pcreate --scaffold alchemy hello_sqlalchemy
   $ cd hello_sqlalchemy
-  $ python3.3 setup.py develop
+  $ python setup.py develop
 
 We now have a working sample SQLAlchemy application with all
 dependencies installed. The sample project provides a console script to
@@ -713,8 +769,6 @@ Authorization
 
 
 Notes
-
-- Change 8081 -> 6543
 
 - See also, interlinking, teasers or "3 Extras" at the end of each
   section, links to a downloadable version of the Python module

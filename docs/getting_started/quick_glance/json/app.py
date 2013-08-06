@@ -22,5 +22,5 @@ if __name__ == '__main__':
     config.include('pyramid_jinja2')
     config.scan()
     app = config.make_wsgi_app()
-    server = make_server('0.0.0.0', 8081, app)
+    server = make_server('0.0.0.0', 6543, app)
     server.serve_forever()
