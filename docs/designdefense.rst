@@ -1295,6 +1295,9 @@ predictability.
   a registry in another module.  This has the effect that
   double-registrations will never be performed.
 
+
+.. _routes_need_ordering:
+
 Routes Need Relative Ordering
 +++++++++++++++++++++++++++++
 

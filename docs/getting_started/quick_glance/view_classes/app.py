@@ -20,7 +20,7 @@ class HelloWorldViews:
 
 if __name__ == '__main__':
     config = Configurator()
-    config.add_route('hello', '/hello/{name}')
+    config.add_route('hello', '/howdy/{name}')
     config.add_route('hello_json', 'hello.json')
     config.add_static_view(name='static', path='static')
     config.include('pyramid_jinja2')

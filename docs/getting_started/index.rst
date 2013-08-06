@@ -24,6 +24,11 @@ This guide is part of the official documentation. If you find a bug,
 you can report it using the same facilities as the described in the
 software's :ref:`support-and-development`.
 
+Notes
+=====
+
+- Cover static urls and asset specifications, resolving, replacing
+
 Contents
 ========
 
