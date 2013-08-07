@@ -19,8 +19,8 @@ Python Setup
 
 First things first: we need our Python environment in ship-shape.
 Pyramid encourages standard Python development practices (virtual
-environments, packaging tools, etc.) so let's get our working area in
-place. For Python 3.3:
+environments, packaging tools, logging, etc.) so let's get our working
+area in place. For Python 3.3:
 
 .. code-block:: bash
 
@@ -150,6 +150,14 @@ We have 4 views, each leading to the other. If you start at
 view. The ``hello_view`` (available at the URL ``/howdy``) has a link
 to the ``redirect_view``, which shows issuing a redirect to the final
 view.
+
+Earlier we saw ``config.add_view`` as one way to configure a view. This
+section introduces ``@view_config``. Pyramid's configuration supports
+:term:`imperative configuration`, such as the ``config.add_view`` in
+the previous example. You can also use :term:`declarative
+configuration`, in which a Python :term:`decorator` is placed on the
+line above the view. Both approaches result in the same final
+configuration, thus usually, it is simply a matter of taste.
 
 .. note::
 
@@ -337,50 +345,43 @@ into JSON and set the appropriate HTTP headers.
 View Classes
 ============
 
-Free-standing functions are the regular way to do views. Many times,
-though, you have several views that are closely related. For example,
-a document might have many different ways to look at it.
+So far our views have been simple, free-standing functions. Many times
+your views are related: different ways to look at or work on the same
+data or a REST API that handles multiple operations. Grouping these
+together as a
+:ref:`view class <class_as_view>` makes sense:
 
-For some people, grouping these together makes logical sense. A view
-class lets you group views, sharing some state assignments, and
-using helper functions as class methods.
+- Group views
 
-Let's re-organize our two views into methods on a view class:
+- Centralize some repetitive defaults
 
-.. code-block:: python
+- Share some state and helpers
 
-    class HelloWorldViews:
-        def __init__(self, request):
-            self.request = request
+The following shows a "Hello World" example with three operations: view
+a form, save a change, or press the delete button:
 
-        @view_config(route_name='hello', renderer='app4.jinja2')
-        def hello_world(self):
-            return dict(name=self.request.matchdict['name'])
+.. literalinclude:: quick_glance/view_classes/views.py
+    :start-after: Start View 1
+    :end-before: End View 1
 
+As you can see, the three views are logically grouped together.
+Specifically:
 
-        @view_config(route_name='hello_json', renderer='json')
-        def hello_json(self):
-            return [1, 2, 3]
+- The first view is returned when you go to ``/howdy/amy``. This URL is
+  mapped to the ``hello`` route that we centrally set using the optional
+  ``@view_defaults``.
 
-Everything else remains the same.
+- The second view is returned when the form data contains a field with
+  ``form.edit``, such as clicking on
+  ``<input type="submit" name="form.edit" value="Save"/>``. This rule
+  is specified in the ``@view_config`` for that view.
 
+- The third view is returned when clicking on a button such
+  as ``<input type="submit" name="form.delete" value="Delete"/>``.
 
-Configuration
-=============
-
-
-#. *Line 7*. Pyramid's configuration supports
-   :term:`imperative configuration`, such as the ``config.add_view`` in
-   the previous example. You can also use
-   :term:`declarative configuration`, in which a Python
-   :term:`decorator` is placed on the line above the view.
-
-#. *Line 15*. Tell the configurator to go look for decorators.
-
-- Move route declarations into views, with prefix thingy
-
-Packages
-========
+Only one route needed, stated in one place atop the view class. Also,
+the assignment of the ``name`` is done in the ``__init__``. Our
+templates can then use ``{{ view.name }}``.
 
 Quick Project Startup with Scaffolds
 ====================================
@@ -390,37 +391,8 @@ No Python packages, no structure. Most Pyramid projects, though,
 aren't developed this way.
 
 To ease the process of getting started, Pyramid provides *scaffolds*
-that generate sample projects. Not just Pyramid itself: add-ons such as
-``pyramid_jinja2`` (or your own projects) can register there own
-scaffolds.
-
-We use Pyramid's ``pcreate`` command to generate our starting point
-from a scaffold. What does this command look like?
-
-.. code-block:: bash
-
-    $ pcreate --help
-    Usage: pcreate [options] output_directory
-
-    Render Pyramid scaffolding to an output directory
-
-    Options:
-      -h, --help            show this help message and exit
-      -s SCAFFOLD_NAME, --scaffold=SCAFFOLD_NAME
-                            Add a scaffold to the create process (multiple -s args
-                            accepted)
-      -t SCAFFOLD_NAME, --template=SCAFFOLD_NAME
-                            A backwards compatibility alias for -s/--scaffold.
-                            Add a scaffold to the create process (multiple -t args
-                            accepted)
-      -l, --list            List all available scaffold names
-      --list-templates      A backwards compatibility alias for -l/--list.  List
-                            all available scaffold names.
-      --simulate            Simulate but do no work
-      --overwrite           Always overwrite
-      --interactive         When a file would be overwritten, interrogate
-
-Let's see what our Pyramid install supports as starting-point scaffolds:
+that generate sample projects from templates in Pyramid and Pyramid
+add-ons. Pyramid's ``pcreate`` command can list the available scaffolds:
 
 .. code-block:: bash
 
@@ -431,37 +403,21 @@ Let's see what our Pyramid install supports as starting-point scaffolds:
       starter:                 Pyramid starter project
       zodb:                    Pyramid ZODB project using traversal
 
-The ``pyramid_jinja2_starter`` looks interesting. From the parent
-directory of where we want our Python package to be generated,
+The ``pyramid_jinja2`` add-on gave us a scaffold that we can use. From
+the parent directory of where we want our Python package to be generated,
 let's use that scaffold to make our project:
 
 .. code-block:: bash
 
     $ pcreate --scaffold pyramid_jinja2_starter hello_world
 
-After printing a bunch of lines about the files being generated,
-we now have a Python package. As described in the *official
-instructions*, we need to install this as a development package:
+We next use the normal Python development to setup our package for
+development:
 
 .. code-block:: bash
 
     $ cd hello_world
     $ python ./setup.py develop
-
-What did we get? A top-level directory ``hello_world`` that includes
-some packaging files and a subdirectory ``hello_world`` that has
-sample files for our application:
-
-.. code-block:: bash
-
-    $ ls
-    CHANGES.txt		development.ini		hello_world.egg-info
-    MANIFEST.in		message-extraction.ini	setup.cfg
-    README.txt		hello_world		setup.py
-
-    $ ls hello_world
-    __init__.py	locale		static		tests.py
-    __pycache__	models.py	templates	views.py
 
 We are moving in the direction of a full-featured Pyramid project,
 with a proper setup for Python standards (packaging) and Pyramid
@@ -470,15 +426,6 @@ configuration. This includes a new way of running your application:
 .. code-block:: bash
 
     $ pserve development.ini
-
-With ``pserve``, your application isn't responsible for finding a WSGI
-server and launching your WSGI app. Also, much of the wiring of your
-application can be moved to a declarative ``.ini`` configuration file.
-
-In your browser, visit
-`http://localhost:6543/ <http://localhost:6543/>`_ and you'll see that
-things look very different. In the next few sections we'll cover some
-decisions made by this scaffold.
 
 Let's look at ``pserve`` and configuration in more depth.
 
