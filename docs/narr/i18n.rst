@@ -808,7 +808,7 @@ If this setting is supplied within the :app:`Pyramid` application
    default_locale_name = settings['pyramid.default_locale_name']
 
 .. index::
-   single: detecting langauges
+   single: detecting languages
 
 "Detecting" Available Languages
 -------------------------------
