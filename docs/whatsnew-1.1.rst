@@ -13,7 +13,7 @@ Terminology Changes
 The term "template" used by the Pyramid documentation used to refer to both
 "paster templates" and "rendered templates" (templates created by a rendering
 engine.  i.e. Mako, Chameleon, Jinja, etc.).  "Paster templates" will now be
-refered to as "scaffolds", whereas the name for "rendered templates" will
+referred to as "scaffolds", whereas the name for "rendered templates" will
 remain as "templates."
 
 Major Feature Additions
