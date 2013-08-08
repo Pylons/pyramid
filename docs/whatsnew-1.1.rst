@@ -397,7 +397,7 @@ Deprecations and Behavior Differences
    shell you use to invoke ``paster serve`` to see these warnings, e.g. on
    UNIX, ``PYTHONWARNINGS=all $VENV/bin/paster serve development.ini``.
    Python 2.5 and 2.6 show deprecation warnings by default,
-   so this is unecessary there.
+   so this is unnecessary there.
    All deprecation warnings are emitted to the console.
 
 - The :class:`pyramid.view.static` class has been deprecated in favor of the
