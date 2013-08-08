@@ -156,7 +156,7 @@
    .. attribute:: matched_route
 
       If a :term:`route` has matched during this request, this attribute will
-      be an obect representing the route matched by the URL pattern
+      be an object representing the route matched by the URL pattern
       associated with the route.  If a route has not matched during this
       request, the value of this attribute will be ``None``. See
       :ref:`matched_route`.
