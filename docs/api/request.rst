@@ -238,7 +238,7 @@
    .. attribute::  response_*
 
       In Pyramid 1.0, you could set attributes on a
-      :class:`pyramid.request.Request` which influenced the behavor of
+      :class:`pyramid.request.Request` which influenced the behavior of
       *rendered* responses (views which use a :term:`renderer` and which
       don't directly return a response).  These attributes began with
       ``response_``, such as ``response_headerlist``. If you needed to
