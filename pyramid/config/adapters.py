@@ -216,7 +216,7 @@ class AdaptersConfiguratorMixin(object):
            config.add_traverser(MyCustomTraverser)
 
         This would cause the Pyramid superdefault traverser to never be used;
-        intead all traversal would be done using your ``MyCustomTraverser``
+        instead all traversal would be done using your ``MyCustomTraverser``
         class, no matter which object was returned by the :term:`root
         factory` of this application.  Note that we passed no arguments to
         the ``iface`` keyword parameter.  The default value of ``iface``,
@@ -228,7 +228,7 @@ class AdaptersConfiguratorMixin(object):
         time.  The traverser used can depend on the result of the :term:`root
         factory`.  For instance, if your root factory returns more than one
         type of object conditionally, you could claim that an alternate
-        traverser adapter should be used agsinst one particular class or
+        traverser adapter should be used against one particular class or
         interface returned by that root factory.  When the root factory
         returned an object that implemented that class or interface, a custom
         traverser would be used.  Otherwise, the default traverser would be
