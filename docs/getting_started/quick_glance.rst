@@ -270,7 +270,7 @@ The only change in our view...point the renderer at the ``.jinja2`` file:
 Our Jinja2 template is very similar to our previous template:
 
 .. literalinclude:: quick_glance/jinja2/hello_world.jinja2
-    :language: html
+    :language: jinja
 
 Pyramid's templating add-ons register a new kind of renderer into your
 application. The renderer registration maps to different kinds of
@@ -432,9 +432,15 @@ Let's look at ``pserve`` and configuration in more depth.
 Application Running with ``pserve``
 ===================================
 
-When you install Pyramid, a small command program called ``pserve`` is
-written to your ``bin`` directory. This program is an executable Python
-module. It's very small, getting most of its brains via import.
+Prior to scaffolds, our project mixed a number of operations details
+into our code. Why should my main code care with HTTP server I want and
+what port number to run on?
+
+``pserve`` is Pyramid's application runner, separating operational
+details from your code. When you install Pyramid, a small command
+program called ``pserve`` is written to your ``bin`` directory. This
+program is an executable Python module. It's very small, getting most
+of its brains via import.
 
 You can run ``pserve`` with ``--help`` to see some of its options.
 Doing so reveals that you can ask ``pserve`` to watch your development
@@ -444,35 +450,22 @@ files and reload the server when they change:
 
     $ pserve development.ini --reload
 
-By design, ``pserve`` itself isn't all that interesting. Instead,
-its brains from your project's wiring, as expressed in the
-configuration file you supply it.
-
-.. seealso:: See Also: :ref:`what_is_this_pserve_thing`
-
-Three Cool Things About ``pserve``
-----------------------------------
-
-1. *Multiple .ini files*. You might have some settings in
-   development mode or some in production mode. Maybe you are writing an
-   add-on that needs to be wired-up by other people.
-
-2. *Choice of WSGI server*. ``pserve`` itself isn't a WSGI server.
-   Instead, it loads the server you want from the configuration file.
-
-3. *Friends of pserve*. With the ``pserve``/``.ini`` approach you
-   also get other commands that help during development: ``pshell``,
-   ``proutes``, ``pviews``, ``prequest``, etc.
+The ``pserve`` command has a number of other options and operations.
+Most of the work, though, comes from your project's wiring, as
+expressed in the configuration file you supply to ``pserve``. Let's
+take a look at this configuration file.
 
 Configuration with ``.ini`` Files
 =================================
 
 Earlier in *Quick Glance* we first met Pyramid's configuration system.
-At that point we did all configuration in Python code,
-aka *imperatively*. For example, the port number chosen for our HTTP
-server was right there in Python code. Our scaffold has moved this
-decision, and more, into *declarative* configuration in the
-``development.ini`` file.
+At that point we did all configuration in Python code. For example,
+the port number chosen for our HTTP server was right there in Python
+code. Our scaffold has moved this decision, and more, into the
+``development.ini`` file:
+
+.. literalinclude:: quick_glance/package/development.ini
+    :language: ini
 
 Let's take a quick high-level look. First, the ``.ini`` file is divided
 into sections:
@@ -485,7 +478,7 @@ into sections:
 
 - Various sections afterwards configure our Python logging system
 
-Let's look at a few decisions made in this configuration:
+We have a few decisions made for us in this configuration:
 
 #. *Choice of web server*. The ``use = egg:pyramid#wsgiref`` tell
    ``pserve`` to the ``wsgiref`` server that is wrapped in the Pyramid
@@ -520,9 +513,9 @@ illustrates several points about configuration.
 
 First, change your ``setup.py`` to say:
 
-.. code-block:: python
-
-    requires=['pyramid>=1.0.2', 'pyramid_jinja2']
+.. literalinclude:: quick_glance/package/setup.py
+    :start-after: Start Requires
+    :end-before: End Requires
 
 ...and re-run your setup:
 
@@ -530,26 +523,31 @@ First, change your ``setup.py`` to say:
 
     $ python ./setup.py develop
 
-The Python package was now installed into our environment but we
-haven't told our web app to use it. We can do so imperatively in code:
+The Python package was now installed into our environment. The package
+is a Pyramid add-on, which means we need to include its configuration
+into our web application. We could do this with imperative
+configuration, as we did above for the ``pyramid_jinja2`` add-on:
 
-.. code-block:: python
+.. literalinclude:: quick_glance/package/hello_world/__init__.py
+    :start-after: Start Include
+    :end-before: End Include
 
-  config.include('pyramid_debugtoolbar')
-
-Instead, let's do it in configuration by modifying our
+Now that we have a configuration file, we can use the
+``pyramid.includes`` facility and place this in our
 ``development.ini`` instead:
 
-.. code-block:: ini
+.. literalinclude:: quick_glance/package/development.ini
+    :language: ini
+    :start-after: Start Includes
+    :end-before: End Includes
 
-    [app:hello_world]
-    pyramid.includes = pyramid_debugtoolbar
-
-That is, add ``pyramid.includes = pyramid_debugtoolbar`` anywhere in the
-``[app:hello_world]`` section. You'll now see an attractive (and
-collapsible) menu in the right of your browser giving you introspective
+You'll now see an attractive (and
+collapsible) menu in the right of your browser, providing introspective
 access to debugging information. Even better, if your web application
-generates an error, you will see a nice traceback on the screen.
+generates an error, you will see a nice traceback on the screen. When
+you want to disable this toolbar, no need to change code: you can
+remove it from ``pyramid.includes`` in the relevant ``.ini``
+configuration file.
 
 Unit Tests and ``nose``
 =======================
@@ -577,7 +575,8 @@ We changed ``setup.py`` which means we need to re-run
 
 .. code-block:: bash
 
-    $ nosetests
+    $ cd hello_world
+    $ nosetests .
     .
     Name                  Stmts   Miss  Cover   Missing
     ---------------------------------------------------
@@ -594,25 +593,7 @@ We changed ``setup.py`` which means we need to re-run
 
 Our unit test passed. What did our test look like?
 
-.. code-block:: python
-
-    import unittest
-    from pyramid import testing
-
-
-    class ViewTests(unittest.TestCase):
-        def setUp(self):
-            testing.setUp()
-
-        def tearDown(self):
-            testing.tearDown()
-
-        def test_my_view(self):
-            from hello_world.views import my_view
-
-            request = testing.DummyRequest()
-            response = my_view(request)
-            self.assertEqual(response['project'], 'hello_world')
+.. literalinclude:: quick_glance/package/hello_world/tests.py
 
 Pyramid supplies helpers for test writing, which we use in the
 test setup and teardown. Our one test imports the view,
@@ -634,65 +615,75 @@ messages sent by Pyramid (for example, when a new request comes in.)
 Maybe you would like to log messages in your code? In your Python
 module, import and setup the logging:
 
-.. code-block:: python
-
-  import logging
-  log = logging.getLogger(__name__)
+.. literalinclude:: quick_glance/package/hello_world/views.py
+    :start-after: Start Logging 1
+    :end-before: End Logging 1
 
 You can now, in your code, log messages:
 
-.. code-block:: python
-
-    log.debug('Some Message')
+.. literalinclude:: quick_glance/package/hello_world/views.py
+    :start-after: Start Logging 2
+    :end-before: End Logging 2
 
 This will log ``Some Message`` at a ``debug`` log level,
 to the application-configured logger in your ``development.ini``. What
 controls that? These sections in the configuration file:
 
-.. code-block:: ini
-
-  [loggers]
-  keys = root, hello_world
-
-  [logger_hello_world]
-  level = DEBUG
-  handlers =
-  qualname = hello_world
+.. literalinclude:: quick_glance/package/development.ini
+    :language: ini
+    :start-after: Start Sphinx Include
+    :end-before: End Sphinx Include
 
 Our application, a package named ``hello_world``, is setup as a logger
-and configured to log messages at a ``DEBUG`` or higher level.
+and configured to log messages at a ``DEBUG`` or higher level. When you
+visit ``http://localhost:6543`` your console will now show::
+
+ 2013-08-09 10:42:42,968 DEBUG [hello_world.views][MainThread] Some Message
 
 Sessions
 ========
 
 When people use your web application, they frequently perform a task
-that requires semi-permanent data to be saved. For example,a shopping
-cart. These are frequently called *sessions*.
+that requires semi-permanent data to be saved. For example, a shopping
+cart. This is called a :term:`session`.
 
 Pyramid has basic built-in support for sessions, with add-ons such as
 *Beaker* (or your own custom sessioning engine) that provide richer
-session support. For the built-in session support, you first import
-the "factory" which provides the sessioning:
+session support. Let's take a look at the
+:doc:`built-in sessioning support <../narr/sessions>`. In our
+``__init__.py`` we first import the kind of sessioning we want:
 
-.. code-block:: python
+.. literalinclude:: quick_glance/package/hello_world/__init__.py
+    :start-after: Start Sphinx Include 1
+    :end-before: End Sphinx Include 1
 
-    from pyramid.session import UnencryptedCookieSessionFactoryConfig
-    my_session_factory = UnencryptedCookieSessionFactoryConfig('itsaseekreet')
+.. warning::
 
-We tell the configuration system that this is the source of our
-sessioning support when setting up the ``Configurator``:
+    As noted in the session docs, this example implementation is
+    not intended for use in settings with security implications.
 
-.. code-block:: python
+Now make a "factory" and pass it to the :term:`configurator`'s
+``session_factory`` argument:
 
-  config = Configurator(session_factory = my_session_factory)
+.. literalinclude:: quick_glance/package/hello_world/__init__.py
+    :start-after: Start Sphinx Include 2
+    :end-before: End Sphinx Include 2
 
-This now lets us use the session in our application code:
+Pyramid's :term:`request` object now has a ``session`` attribute
+that we can use in our view code:
 
-.. code-block:: python
+.. literalinclude:: quick_glance/package/hello_world/views.py
+    :start-after: Start Sphinx Include 1
+    :end-before: End Sphinx Include 1
 
-    session = request.session
-    if 'abc' in session:
-        session['fred'] = 'yes'
+With this, each reload will increase the counter displayed in our
+Jinja2 template:
+
+.. literalinclude:: quick_glance/package/hello_world/templates/mytemplate.jinja2
+    :language: jinja
+    :start-after: Start Sphinx Include 1
+    :end-before: End Sphinx Include 1
+
 
 Databases
 =========
@@ -708,8 +699,8 @@ scaffold!
 
 .. code-block:: bash
 
-  $ pcreate --scaffold alchemy hello_sqlalchemy
-  $ cd hello_sqlalchemy
+  $ pcreate --scaffold alchemy sqla_demo
+  $ cd sqla_demo
   $ python setup.py develop
 
 We now have a working sample SQLAlchemy application with all
@@ -719,80 +710,97 @@ the application:
 
 .. code-block:: bash
 
-  $ initialize_hello_sqlalchemy_db development.ini
+  $ initialize_sqla_demo_db development.ini
   $ pserve development.ini
 
-We can now visit our sample at
-`http://localhost:6543/ <http://localhost:6543/>`_. Some choices that
-the scaffold helped us with:
+The ORM eases the mapping of database structures into a programming
+language. SQLAlchemy uses "models" for this mapping. The scaffold
+generated a sample model:
 
-- A ``setup.py`` with appropriate dependencies
-
-- Connection strings and integration in our ``development.ini`` file
-
-- A console script which we ran above to initialize the database
-
-- The SQLAlchemy engine integrated into the ``Configurator`` on
-  application startup
-
-- Python modules for the SQLAlchemy models and the Pyramid views that
-  go with them
-
-- Some unit tests...yummy!
-
-As mentioned above, an ORM is software that eases the mapping of
-database structures into a programming language. SQLAlchemy uses models
-for this, and its scaffold generated a sample model:
-
-.. code-block:: python
-
-    class MyModel(Base):
-        __tablename__ = 'models'
-        id = Column(Integer, primary_key=True)
-        name = Column(Text, unique=True)
-        value = Column(Integer)
-
-        def __init__(self, name, value):
-            self.name = name
-            self.value = value
-
-The Python module also includes this:
-
-.. code-block:: python
-
-  from zope.sqlalchemy import ZopeTransactionExtension
-
-The generated application includes the optional support for
-``pyramid_tm``, a unique transaction monitor that integrates your
-database transactions with your code for transparent rollback and commit.
+.. literalinclude:: quick_glance/sqla_demo/sqla_demo/models.py
+    :start-after: Start Sphinx Include
+    :end-before: End Sphinx Include
 
 View code, which mediates the logic between web requests and the rest
-of the system, can then easily get at the data:
+of the system, can then easily get at the data thanks to SQLAlchemy:
 
-.. code-block:: python
-
-  one = DBSession.query(MyModel).filter(MyModel.name == 'one').first()
-
+.. literalinclude:: quick_glance/sqla_demo/sqla_demo/views.py
+    :start-after: Start Sphinx Include
+    :end-before: End Sphinx Include
 
 Forms
 =====
 
-Developers have lots of opinions about forms, and thus there are many
+Developers have lots of opinions about web forms, and thus there are many
 form libraries for Python. Pyramid doesn't directly bundle a form
-library, but *Deform* is a popular choice. Let's see it in action.
-First we install it:
+library, but *Deform* is a popular choice for forms,
+along with its related *Colander* schema system.
 
-.. code-block:: bash
+As an example, imagine we want a form that edits a wiki page. The form
+should have two fields on it, one of them a required title and the
+other a rich text editor for the body. With Deform we can express this
+as a Colander schema:
 
-  $ pip-3.3 install deform
+.. code-block:: python
+
+    class WikiPage(colander.MappingSchema):
+        title = colander.SchemaNode(colander.String())
+        body = colander.SchemaNode(
+            colander.String(),
+            widget=deform.widget.RichTextWidget()
+        )
+
+With this in place, we can render the HTML for a form,
+perhaps with form data from an existing page:
+
+.. code-block:: python
+
+    form = self.wiki_form.render()
+
+We'd like to handle form submission, validation, and saving:
+
+.. code-block:: python
+
+    # Get the form data that was posted
+    controls = self.request.POST.items()
+    try:
+        # Validate and either raise a validation error
+        # or return deserialized data from widgets
+        appstruct = wiki_form.validate(controls)
+    except deform.ValidationFailure as e:
+        # Bail out and render form with errors
+        return dict(title=title, page=page, form=e.render())
+
+    # Change the content and redirect to the view
+    page['title'] = appstruct['title']
+    page['body'] = appstruct['body']
+
+Deform and Colander provide a very flexible combination for forms,
+widgets, schemas, and validation. Recent versions of Deform also
+include a
+`retail mode <http://docs.pylonsproject
+.org/projects/deform/en/latest/retail.html>`_
+for gaining Deform
+features on custom forms.
+
+Also, the ``deform_bootstrap`` Pyramid add-on restyles the stock Deform
+widgets using attractive CSS from Bootstrap and more powerful widgets
+from Chosen.
+
+Awesome Pyramid Features
+========================
+
+For the most part this *Quick Glance* has covered concepts that are
+common in Python web frameworks. Pyramid has a unique niche,
+though. It helps you start with a small project that grows into a
+larger project. Let's look at some of the unique facilities that help.
 
 
 
-Authentication
-==============
 
+Conclusion
+==========
 
-Authorization
-=============
-
-
+This *Quick Glance* was a little about a lot. We introduced a long list
+of concepts in Pyramid, many of which are expanded on more fully later
+in *Getting Started* and certainly in the Pyramid developer docs.

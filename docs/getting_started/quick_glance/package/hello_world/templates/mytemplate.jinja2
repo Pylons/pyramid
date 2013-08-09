@@ -35,7 +35,10 @@
 		<div id="bottom">
           <div class="locale">
             <h2>{% trans %}Hello!{% endtrans %}</h2>
-            <p>Request performed with <span class="locale-name">{{ request.locale_name }}</span> locale.</p> 
+          <!-- Start Sphinx Include 1 -->
+          <p>Counter: {{ request.session.counter }}</p>
+          <!-- End Sphinx Include 1 -->
+            <p>Request performed with <span class="locale-name">{{ request.locale_name }}</span> locale.</p>
           </div>
 			<div class="bottom">
 				<div id="left" class="align-right">

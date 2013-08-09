@@ -6,7 +6,9 @@ here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.txt')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
+# Start Requires
 requires = ['pyramid>=1.0.2', 'pyramid_jinja2', 'pyramid_debugtoolbar']
+# End Requires
 
 setup(name='hello_world',
       version='0.0',

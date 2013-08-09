@@ -1,4 +1,4 @@
-hello_sqlalchemy README
+sqla_demo README
 ==================
 
 Getting Started
@@ -8,7 +8,7 @@ Getting Started
 
 - $venv/bin/python setup.py develop
 
-- $venv/bin/initialize_hello_sqlalchemy_db development.ini
+- $venv/bin/initialize_sqla_demo_db development.ini
 
 - $venv/bin/pserve development.ini
 

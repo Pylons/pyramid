@@ -29,6 +29,12 @@ Notes
 
 - Cover static urls and asset specifications, resolving, replacing
 
+.. toctree::
+   :maxdepth: 1
+
+   gettingstarted
+
+
 Contents
 ========
 
@@ -42,6 +48,7 @@ Contents
    views
    templates
    static_assets
+   pserve
    testing
    forms
    databases

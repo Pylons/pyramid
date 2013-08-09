@@ -18,4 +18,3 @@ class ViewTests(unittest.TestCase):
         request = testing.DummyRequest()
         response = my_view(request)
         self.assertEqual(response['project'], 'hello_world')
-

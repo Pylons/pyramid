@@ -2,31 +2,40 @@
 Top Killer Features In Pyramid
 ==============================
 
-"Making your own framework"
-
-- Transactions
+As a regular developer
 
 - Configuration
 
-  - config.include
+- Route factories and contexts
 
-- Advanced views and view predicates
+- Advanced view configuration
 
-Custom views
-============
+- Route prefixes
 
-- Corneice does this
+- Asset specifications
 
 - Events
-
-- Ordered routes
 
 - Custom renderers
 
 - Tweens
 
-- Asset specifications
+- Transactions
 
 - Traversal
 
-- Transactions
+- Custom directives
+
+- config.include
+
+- Extensible applications
+
+  - Overridable views, routes, and assets
+
+  - config.include
+
+  - Events
+
+  - Distributing an add-on
+
+  - "Making your own framework", Extensibility

@@ -16,9 +16,9 @@ requires = [
     'waitress',
     ]
 
-setup(name='hello_sqlalchemy',
+setup(name='sqla_demo',
       version='0.0',
-      description='hello_sqlalchemy',
+      description='sqla_demo',
       long_description=README + '\n\n' + CHANGES,
       classifiers=[
         "Programming Language :: Python",
@@ -33,12 +33,12 @@ setup(name='hello_sqlalchemy',
       packages=find_packages(),
       include_package_data=True,
       zip_safe=False,
-      test_suite='hello_sqlalchemy',
+      test_suite='sqla_demo',
       install_requires=requires,
       entry_points="""\
       [paste.app_factory]
-      main = hello_sqlalchemy:main
+      main = sqla_demo:main
       [console_scripts]
-      initialize_hello_sqlalchemy_db = hello_sqlalchemy.scripts.initializedb:main
+      initialize_sqla_demo_db = sqla_demo.scripts.initializedb:main
       """,
       )
