@@ -216,7 +216,7 @@ class AdaptersConfiguratorMixin(object):
            config.add_traverser(MyCustomTraverser)
 
         This would cause the Pyramid superdefault traverser to never be used;
-        intead all traversal would be done using your ``MyCustomTraverser``
+        instead all traversal would be done using your ``MyCustomTraverser``
         class, no matter which object was returned by the :term:`root
         factory` of this application.  Note that we passed no arguments to
         the ``iface`` keyword parameter.  The default value of ``iface``,
