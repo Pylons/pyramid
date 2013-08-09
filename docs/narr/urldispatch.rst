@@ -865,7 +865,7 @@ Debugging Route Matching
 ------------------------
 
 It's useful to be able to take a peek under the hood when requests that enter
-your application arent matching your routes as you expect them to.  To debug
+your application aren't matching your routes as you expect them to.  To debug
 route matching, use the ``PYRAMID_DEBUG_ROUTEMATCH`` environment variable or the
 ``pyramid.debug_routematch`` configuration file setting (set either to ``true``).
 Details of the route matching decision for a particular request to the
