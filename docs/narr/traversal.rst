@@ -289,7 +289,7 @@ system uses this algorithm to find a :term:`context` resource and a
     return resource "C".
 
 #.  Traversal ends when a) the entire path is exhausted or b) when any
-    resouce raises a :exc:`KeyError` from its ``__getitem__`` or c) when any
+    resource raises a :exc:`KeyError` from its ``__getitem__`` or c) when any
     non-final path element traversal does not have a ``__getitem__`` method
     (resulting in a :exc:`AttributeError`) or d) when any path element is
     prefixed with the set of characters ``@@`` (indicating that the characters

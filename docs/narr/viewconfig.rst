@@ -831,7 +831,7 @@ of this:
        config.add_view(
            RESTView, route_name='rest', attr='delete', request_method='DELETE')
 
-To reduce the amount of repetion in the ``config.add_view`` statements, we
+To reduce the amount of repetition in the ``config.add_view`` statements, we
 can move the ``route_name='rest'`` argument to a ``@view_default`` class
 decorator on the RESTView class:
 

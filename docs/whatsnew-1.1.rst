@@ -13,7 +13,7 @@ Terminology Changes
 The term "template" used by the Pyramid documentation used to refer to both
 "paster templates" and "rendered templates" (templates created by a rendering
 engine.  i.e. Mako, Chameleon, Jinja, etc.).  "Paster templates" will now be
-refered to as "scaffolds", whereas the name for "rendered templates" will
+referred to as "scaffolds", whereas the name for "rendered templates" will
 remain as "templates."
 
 Major Feature Additions
@@ -397,7 +397,7 @@ Deprecations and Behavior Differences
    shell you use to invoke ``paster serve`` to see these warnings, e.g. on
    UNIX, ``PYTHONWARNINGS=all $VENV/bin/paster serve development.ini``.
    Python 2.5 and 2.6 show deprecation warnings by default,
-   so this is unecessary there.
+   so this is unnecessary there.
    All deprecation warnings are emitted to the console.
 
 - The :class:`pyramid.view.static` class has been deprecated in favor of the
