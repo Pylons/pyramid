@@ -121,6 +121,12 @@ Features
   https://github.com/Pylons/pyramid/pull/1004 and
   https://github.com/Pylons/pyramid/pull/1046
 
+- The ``pserve`` command now takes a ``-v`` (or ``--verbose``) flag and a
+  ``-q`` (or ``--quiet``) flag.  Output from running ``pserve`` can be
+  controlled using these flags.  ``-v`` can be specified multiple times to
+  increase verbosity.  ``-q`` sets verbosity to ``0`` unconditionally.  The
+  default verbosity level is ``1``.
+
 Bug Fixes
 ---------
 
