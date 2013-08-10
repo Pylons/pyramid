@@ -156,7 +156,7 @@ class TestPServeCommand(unittest.TestCase):
         self.pid_file = tempfile.mktemp()
         pid = os.getpid()
         inst = self._makeOne()
-        inst.verbose = verbosity
+        inst.options.verbose = verbosity
 
         try:
             atexit.register = fake_atexit
