@@ -127,6 +127,9 @@ Features
   increase verbosity.  ``-q`` sets verbosity to ``0`` unconditionally.  The
   default verbosity level is ``1``.
 
+- The ``alchemy`` scaffold tests now provide better coverage.  See
+  https://github.com/Pylons/pyramid/pull/1029
+
 Bug Fixes
 ---------
 
