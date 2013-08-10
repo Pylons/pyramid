@@ -52,8 +52,6 @@ install_requires=[
 
 tests_require = [
     'WebTest >= 1.3.1', # py3 compat
-    'webtest',
-    'zope.component',
     ]
 
 if not PY3:
