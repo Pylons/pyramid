@@ -48,30 +48,30 @@ What's New
 Getting Started
 ===============
 
-Quick tour of major facilities in Pyramid, including a
-:doc:`getting_started/quick_glance` high-level
-overview.
+If you are new to Pyramid, we have a few resources that can help you get
+up to speed right away. Our *Quick Tour* shows a little about a lot:
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
-   getting_started/index
-   getting_started/quick_glance
-   getting_started/scaffolds
-   getting_started/configuration
-   getting_started/routes
-   getting_started/views
-   getting_started/templates
-   getting_started/static_assets
-   getting_started/testing
-   getting_started/forms
-   getting_started/databases
-   getting_started/security
-   getting_started/json
-   getting_started/sessions
-   getting_started/internationalization
-   getting_started/special_views
-   getting_started/top_ten
+   quick_tour
+
+Also:
+
+* To see a minimal Pyramid web application, check out `creating your first
+  Pyramid application <../narr/firstapp>`_.
+
+* For help getting Pyramid set up, try the `install guide
+  <../narr/install>`_.
+
+* To get the feel of how a Pyramid web application is created, go to the
+  `single file tasks tutorial </projects/pyramid_tutorials/en/latest/single_file_tasks/single_file_tasks.html>`_ page.
+
+* Like learning by example? Check out to the `wiki tutorial
+  <../tutorials/wiki2/index.html>`_.
+
+* Need help?  See `Support </en/latest/index.html#support-desc>`_.
+
 
 .. _html_narrative_documentation:
 

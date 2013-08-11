@@ -1,18 +1,17 @@
-============
-Quick Glance
-============
+=====================
+Quick Tour of Pyramid
+=====================
 
-Pyramid lets you start small and finish big. This :doc:`index` guide
+Pyramid lets you start small and finish big. This *Quick Tour* guide
 walks you through many of Pyramid's key features. Let's put the
 emphasis on *start* by doing a quick tour through Pyramid, with
 snippets of code to illustrate major concepts.
 
 .. note::
 
-    Like the rest of Getting Started, we're using Python 3 in
-    our samples. Pyramid was one of the first (October 2011) web
-    frameworks to fully support Python 3. You can use Python 3
-    as well for this guide, but you can also use Python 2.7.
+    We use Python 3 in our samples. Pyramid was one of the first
+    (October 2011) web frameworks to fully support Python 3. You can
+    use Python 3 as well for this guide, but you can also use Python 2.7.
 
 Python Setup
 ============
@@ -52,7 +51,7 @@ Hello World
 Microframeworks have shown that learning starts best from a very small
 first step. Here's a tiny application in Pyramid:
 
-.. literalinclude:: quick_glance/hello_world/app.py
+.. literalinclude:: quick_tour/hello_world/app.py
     :linenos:
 
 This simple example is easy to run. Save this as ``app.py`` and run it:
@@ -81,7 +80,7 @@ explanation:
 As shown in this example, the :term:`configurator` plays a central role
 in Pyramid development. Building an application from loosely-coupled
 parts via :doc:`../narr/configuration` is a central idea in Pyramid,
-one that we will revisit regurlarly in this *Getting Started* document.
+one that we will revisit regurlarly in this *Quick Tour*.
 
 Handling Web Requests and Responses
 ===================================
@@ -100,7 +99,7 @@ above, Pyramid hands ``hello_world`` a ``request`` that is
 
 Let's see some features of requests and responses in action:
 
-.. literalinclude:: quick_glance/requests/app.py
+.. literalinclude:: quick_tour/requests/app.py
     :pyobject: hello_world
 
 In this Pyramid view, we get the URL being visited from ``request.url``.
@@ -132,7 +131,7 @@ Let's move the views out to their own ``views.py`` module and change
 the ``app.py`` to scan that module, looking for decorators that setup
 the views. First, our revised ``app.py``:
 
-.. literalinclude:: quick_glance/views/app.py
+.. literalinclude:: quick_tour/views/app.py
     :linenos:
 
 We added some more routes, but we also removed the view code.
@@ -142,7 +141,7 @@ Our views, and their registrations (via decorators) are now in a module
 We now have a ``views.py`` module that is focused on handling requests
 and responses:
 
-.. literalinclude:: quick_glance/views/views.py
+.. literalinclude:: quick_tour/views/views.py
     :linenos:
 
 We have 4 views, each leading to the other. If you start at
@@ -158,12 +157,6 @@ the previous example. You can also use :term:`declarative
 configuration`, in which a Python :term:`decorator` is placed on the
 line above the view. Both approaches result in the same final
 configuration, thus usually, it is simply a matter of taste.
-
-.. note::
-
-    We're focusing on one topic at a time, thus we are leaving out
-    handling errors, logging, restarting, etc. These will be covered in
-    sections of the *Getting Started* guide.
 
 
 Routing
@@ -191,7 +184,7 @@ Above we saw the basics of routing URLs to views in Pyramid:
 What if we want part of the URL to be available as data in my view? This
 route declaration:
 
-.. literalinclude:: quick_glance/routing/app.py
+.. literalinclude:: quick_tour/routing/app.py
     :start-after: Start Route 1
     :end-before: End Route 1
 
@@ -199,7 +192,7 @@ With this, URLs such as ``/howdy/amy/smith`` will assign ``amy`` to
 ``first`` and ``smith`` to ``last``. We can then use this data in our
 view:
 
-.. literalinclude:: quick_glance/routing/views.py
+.. literalinclude:: quick_tour/routing/views.py
     :start-after: Start Route 1
     :end-before: End Route 1
 
@@ -225,7 +218,7 @@ which is fortunate: developers have strong views about template
 languages. That said, Pyramid bundles Chameleon and Mako,
 so in this step, let's use Chameleon as an example:
 
-.. literalinclude:: quick_glance/templating/views.py
+.. literalinclude:: quick_tour/templating/views.py
     :start-after: Start View 1
     :end-before: End View 1
 
@@ -234,7 +227,7 @@ Our ``@view_config`` decorator specifies a :term:`renderer` that points
 our template file. Our view then simply returns data which is then
 supplied to our template:
 
-.. literalinclude:: quick_glance/templating/hello_world.pt
+.. literalinclude:: quick_tour/templating/hello_world.pt
     :language: html
 
 Since our view returned ``dict(name=request.matchdict['name'])``,
@@ -263,13 +256,13 @@ our configuration:
 
 The only change in our view...point the renderer at the ``.jinja2`` file:
 
-.. literalinclude:: quick_glance/jinja2/views.py
+.. literalinclude:: quick_tour/jinja2/views.py
     :start-after: Start View 1
     :end-before: End View 1
 
 Our Jinja2 template is very similar to our previous template:
 
-.. literalinclude:: quick_glance/jinja2/hello_world.jinja2
+.. literalinclude:: quick_tour/jinja2/hello_world.jinja2
     :language: jinja
 
 Pyramid's templating add-ons register a new kind of renderer into your
@@ -292,7 +285,7 @@ CSS, JS, and images. Let's point our web app at a directory where
 Pyramid will serve some static assets. First, another call to the
 :term:`configurator`:
 
-.. literalinclude:: quick_glance/static_assets/app.py
+.. literalinclude:: quick_tour/static_assets/app.py
     :start-after: Start Static 1
     :end-before: End Static 1
 
@@ -302,13 +295,13 @@ This tells our WSGI application to map requests under
 
 Next, make a directory ``static`` and place ``app.css`` inside:
 
-.. literalinclude:: quick_glance/static_assets/static/app.css
+.. literalinclude:: quick_tour/static_assets/static/app.css
     :language: css
 
 All we need to do now is point to it in the ``<head>`` of our Jinja2
 template:
 
-.. literalinclude:: quick_glance/static_assets/hello_world.pt
+.. literalinclude:: quick_tour/static_assets/hello_world.pt
     :language: html
     :start-after: Start Link 1
     :end-before: End Link 1
@@ -318,7 +311,7 @@ What if the site is later moved under ``/somesite/static/``? Or perhaps
 web developer changes the arrangement on disk? Pyramid gives a helper
 that provides flexibility on URL generation:
 
-.. literalinclude:: quick_glance/static_assets/hello_world.pt
+.. literalinclude:: quick_tour/static_assets/hello_world.pt
     :language: html
     :start-after: Start Link 2
     :end-before: End Link 2
@@ -334,7 +327,7 @@ Modern web apps are more than rendered HTML. Dynamic pages now use
 JavaScript to update the UI in the browser by requesting server data as
 JSON. Pyramid supports this with a JSON renderer:
 
-.. literalinclude:: quick_glance/json/views.py
+.. literalinclude:: quick_tour/json/views.py
     :start-after: Start View 1
     :end-before: End View 2
 
@@ -360,7 +353,7 @@ together as a
 The following shows a "Hello World" example with three operations: view
 a form, save a change, or press the delete button:
 
-.. literalinclude:: quick_glance/view_classes/views.py
+.. literalinclude:: quick_tour/view_classes/views.py
     :start-after: Start View 1
     :end-before: End View 1
 
@@ -464,7 +457,7 @@ the port number chosen for our HTTP server was right there in Python
 code. Our scaffold has moved this decision, and more, into the
 ``development.ini`` file:
 
-.. literalinclude:: quick_glance/package/development.ini
+.. literalinclude:: quick_tour/package/development.ini
     :language: ini
 
 Let's take a quick high-level look. First, the ``.ini`` file is divided
@@ -513,7 +506,7 @@ illustrates several points about configuration.
 
 First, change your ``setup.py`` to say:
 
-.. literalinclude:: quick_glance/package/setup.py
+.. literalinclude:: quick_tour/package/setup.py
     :start-after: Start Requires
     :end-before: End Requires
 
@@ -528,7 +521,7 @@ is a Pyramid add-on, which means we need to include its configuration
 into our web application. We could do this with imperative
 configuration, as we did above for the ``pyramid_jinja2`` add-on:
 
-.. literalinclude:: quick_glance/package/hello_world/__init__.py
+.. literalinclude:: quick_tour/package/hello_world/__init__.py
     :start-after: Start Include
     :end-before: End Include
 
@@ -536,7 +529,7 @@ Now that we have a configuration file, we can use the
 ``pyramid.includes`` facility and place this in our
 ``development.ini`` instead:
 
-.. literalinclude:: quick_glance/package/development.ini
+.. literalinclude:: quick_tour/package/development.ini
     :language: ini
     :start-after: Start Includes
     :end-before: End Includes
@@ -593,7 +586,7 @@ We changed ``setup.py`` which means we need to re-run
 
 Our unit test passed. What did our test look like?
 
-.. literalinclude:: quick_glance/package/hello_world/tests.py
+.. literalinclude:: quick_tour/package/hello_world/tests.py
 
 Pyramid supplies helpers for test writing, which we use in the
 test setup and teardown. Our one test imports the view,
@@ -615,13 +608,13 @@ messages sent by Pyramid (for example, when a new request comes in.)
 Maybe you would like to log messages in your code? In your Python
 module, import and setup the logging:
 
-.. literalinclude:: quick_glance/package/hello_world/views.py
+.. literalinclude:: quick_tour/package/hello_world/views.py
     :start-after: Start Logging 1
     :end-before: End Logging 1
 
 You can now, in your code, log messages:
 
-.. literalinclude:: quick_glance/package/hello_world/views.py
+.. literalinclude:: quick_tour/package/hello_world/views.py
     :start-after: Start Logging 2
     :end-before: End Logging 2
 
@@ -629,7 +622,7 @@ This will log ``Some Message`` at a ``debug`` log level,
 to the application-configured logger in your ``development.ini``. What
 controls that? These sections in the configuration file:
 
-.. literalinclude:: quick_glance/package/development.ini
+.. literalinclude:: quick_tour/package/development.ini
     :language: ini
     :start-after: Start Sphinx Include
     :end-before: End Sphinx Include
@@ -653,7 +646,7 @@ session support. Let's take a look at the
 :doc:`built-in sessioning support <../narr/sessions>`. In our
 ``__init__.py`` we first import the kind of sessioning we want:
 
-.. literalinclude:: quick_glance/package/hello_world/__init__.py
+.. literalinclude:: quick_tour/package/hello_world/__init__.py
     :start-after: Start Sphinx Include 1
     :end-before: End Sphinx Include 1
 
@@ -665,21 +658,21 @@ session support. Let's take a look at the
 Now make a "factory" and pass it to the :term:`configurator`'s
 ``session_factory`` argument:
 
-.. literalinclude:: quick_glance/package/hello_world/__init__.py
+.. literalinclude:: quick_tour/package/hello_world/__init__.py
     :start-after: Start Sphinx Include 2
     :end-before: End Sphinx Include 2
 
 Pyramid's :term:`request` object now has a ``session`` attribute
 that we can use in our view code:
 
-.. literalinclude:: quick_glance/package/hello_world/views.py
+.. literalinclude:: quick_tour/package/hello_world/views.py
     :start-after: Start Sphinx Include 1
     :end-before: End Sphinx Include 1
 
 With this, each reload will increase the counter displayed in our
 Jinja2 template:
 
-.. literalinclude:: quick_glance/package/hello_world/templates/mytemplate.jinja2
+.. literalinclude:: quick_tour/package/hello_world/templates/mytemplate.jinja2
     :language: jinja
     :start-after: Start Sphinx Include 1
     :end-before: End Sphinx Include 1
@@ -717,14 +710,14 @@ The ORM eases the mapping of database structures into a programming
 language. SQLAlchemy uses "models" for this mapping. The scaffold
 generated a sample model:
 
-.. literalinclude:: quick_glance/sqla_demo/sqla_demo/models.py
+.. literalinclude:: quick_tour/sqla_demo/sqla_demo/models.py
     :start-after: Start Sphinx Include
     :end-before: End Sphinx Include
 
 View code, which mediates the logic between web requests and the rest
 of the system, can then easily get at the data thanks to SQLAlchemy:
 
-.. literalinclude:: quick_glance/sqla_demo/sqla_demo/views.py
+.. literalinclude:: quick_tour/sqla_demo/sqla_demo/views.py
     :start-after: Start Sphinx Include
     :end-before: End Sphinx Include
 
@@ -787,20 +780,10 @@ Also, the ``deform_bootstrap`` Pyramid add-on restyles the stock Deform
 widgets using attractive CSS from Bootstrap and more powerful widgets
 from Chosen.
 
-Awesome Pyramid Features
-========================
-
-For the most part this *Quick Glance* has covered concepts that are
-common in Python web frameworks. Pyramid has a unique niche,
-though. It helps you start with a small project that grows into a
-larger project. Let's look at some of the unique facilities that help.
-
-
-
 
 Conclusion
 ==========
 
-This *Quick Glance* was a little about a lot. We introduced a long list
-of concepts in Pyramid, many of which are expanded on more fully later
-in *Getting Started* and certainly in the Pyramid developer docs.
+This *Quick Tour* covered a little about a lot. We introduced a long list
+of concepts in Pyramid, many of which are expanded on more fully in the
+Pyramid developer docs.
