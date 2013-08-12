@@ -229,5 +229,7 @@ This example view will notify all subscribers to the custom
 ``DocCreated`` event.
 
 Note that when you fire an event, all subscribers are run
-synchronously on the current thread. So it's generally not a good idea
-to create event handlers that may take a long time to run.
+synchronously so it's generally not a good idea
+to create event handlers that may take a long time to run. Although
+event handlers could be used as a central place to spawn tasks on your
+own message queues.
