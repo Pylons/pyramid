@@ -723,7 +723,7 @@ This template doesn't use any advanced features of Mako, only the
 Using A Mako def name Within a Renderer Name
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Sommetime you'd like to render a ``def`` inside of a Mako template instead of
+Sometime you'd like to render a ``def`` inside of a Mako template instead of
 the full Mako template. To render a def inside a Mako template, given a
 :term:`Mako` template file named ``foo.mak`` and a def named ``bar``, you can
 configure the template as a :term:`renderer` like so:
