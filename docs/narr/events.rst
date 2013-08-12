@@ -177,7 +177,7 @@ example custom event classes:
     class DocCreated(object):
         def __init__(self, doc, request):
             self.doc = doc
-	    self.request = request
+            self.request = request
 
     class UserEvent(object):
         def __init__(self, user):
@@ -219,9 +219,9 @@ accessed as ``request.registry.notify``. For example:
 
     def new_doc_view(request):
         doc = MyDoc()
-	event = DocCreated(doc, request)
-	request.registry.notify(event)
-	return {'document': doc}
+        event = DocCreated(doc, request)
+        request.registry.notify(event)
+        return {'document': doc}
 
 This example view will notify all subscribers to the custom
 ``DocCreated`` event.
