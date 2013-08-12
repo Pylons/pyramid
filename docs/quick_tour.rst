@@ -1,10 +1,8 @@
+.. _quick_tour:
+
 =====================
 Quick Tour of Pyramid
 =====================
-
-TODO:
-
-- Convert all the See Also below into Intersphinx links
 
 Pyramid lets you start small and finish big. This *Quick Tour* guide
 walks you through many of Pyramid's key features. Let's put the
@@ -36,9 +34,12 @@ We make a :term:`virtualenv` then activate it. We then get Python
 packaging tools installed so we can use the popular ``pip`` tool for
 installing packages. Normal first steps for any Python project.
 
-See Also: http://docs.python.org/dev/library/venv.html,
-https://pypi.python.org/pypi/setuptools/0.9.8#installation-instructions,
-http://www.pip-installer.org/en/latest/, narr/install.html#before-you-install
+.. seealso:: See Also: Python 3's :mod:`venv module <python3:venv>`,
+   the ``setuptools`` `installation
+   instructions <https://pypi.python.org/pypi/setuptools/0.9.8#installation-instructions>`_,
+   documentation for `pip <http://www.pip-installer.org/en/latest/>`_,
+   and
+   Pyramid's :ref:`Before You Install <installing_chapter>`
 
 Pyramid Installation
 ====================
@@ -53,7 +54,7 @@ installed is easy:
 Our virtual environment now has the Pyramid software available to its
 Python.
 
-See Also: narr/install.html#installing-pyramid-on-a-unix-system,
+.. seealso:: See Also: :ref:`installing_unix`
 
 Hello World
 ===========
@@ -92,8 +93,8 @@ in Pyramid development. Building an application from loosely-coupled
 parts via :doc:`../narr/configuration` is a central idea in Pyramid,
 one that we will revisit regurlarly in this *Quick Tour*.
 
-See Also: narr/firstapp,
-http://docs.pylonsproject.org/projects/pyramid_tutorials/en/latest/single_file_tasks/single_file_tasks.html
+.. seealso:: See Also: :ref:`firstapp_chapter` and
+   :ref:`Single File Tasks tutorial <tutorials:single-file-tutorial>`
 
 Handling Web Requests and Responses
 ===================================
@@ -123,9 +124,7 @@ the name is included in the body of the response::
 
 Finally, we set the response's content type and return the Response.
 
-See Also: http://localhost:8080/projects/pyramid/docs
-.gettingstarted/docs/_build/narr/webob.html#webob-chapter,
-
+.. seealso:: See Also: :ref:`webob_chapter`
 
 Views
 =====
@@ -175,8 +174,9 @@ configuration`, in which a Python :term:`decorator` is placed on the
 line above the view. Both approaches result in the same final
 configuration, thus usually, it is simply a matter of taste.
 
-See Also: narr/views.html, narr/viewconfig,
-narr/viewconfig.html#debugging-view-configuration
+.. seealso:: See Also: :doc:`../narr/views`,
+   :doc:`../narr/viewconfig`, and
+   :ref:`debugging_view_configuration`
 
 Routing
 =======
@@ -219,8 +219,9 @@ view:
 "replacement patterns" (the curly braces) in the route declaration.
 This information can then be used in your view.
 
-See Also: narr/urldispatch, narr/urldispatch
-.html#debugging-route-matching, narr/router
+.. seealso:: See Also: :doc:`../narr/urldispatch`,
+   :ref:`debug_routematch_section`, and
+   :doc:`../narr/router`
 
 Templating
 ==========
@@ -251,8 +252,9 @@ Since our view returned ``dict(name=request.matchdict['name'])``,
 we can use ``name`` as a variable in our template via
 ``${name}``.
 
-See Also: narr/templates, narr/templates.html#debugging-templates,
-templates.html#templating-with-mako-templates,
+.. seealso:: See Also: :doc:`../narr/templates`,
+   :ref:`debugging_templates`, and
+   :ref:`mako_templates`
 
 Templating With ``jinja2``
 ==========================
@@ -291,12 +293,9 @@ filename extensions. In this case, changing the extension from ``.pt``
 to ``.jinja2`` passed the view response through the ``pyramid_jinja2``
 renderer.
 
-.. note::
-
-    At the time of this writing, Jinja2 had not released a version
-    compatible with Python 3.3.
-
-See Also: Jinja2, pyramid_jinja2,
+.. seealso:: See Also: `Jinja2 homepage <http://jinja.pocoo.org/>`_,
+   and
+   :ref:`pyramid_jinja2 Overview <jinja2:overview>`
 
 Static Assets
 =============
@@ -341,8 +340,9 @@ By using ``request.static_url`` to generate the full URL to the static
 assets, you both ensure you stay in sync with the configuration and
 gain refactoring flexibility later.
 
-See Also: narr/assets, narr/environment.html#preventing-http-caching,
-narr/viewconfig.html#influencing-http-caching,
+.. seealso:: See Also: :doc:`../narr/assets`,
+   :ref:`preventing_http_caching`, and
+   :ref:`influencing_http_caching`
 
 Returning JSON
 ==============
@@ -359,8 +359,9 @@ This wires up a view that returns some data through the JSON
 :term:`renderer`, which calls Python's JSON support to serialize the data
 into JSON and set the appropriate HTTP headers.
 
-See Also: narr/renderers.html#json-renderer,
-narr/renderers.html#adding-and-overriding-renderers
+.. seealso:: See Also: :ref:`views_which_use_a_renderer`,
+   :ref:`json_renderer`, and
+   :ref:`adding_and_overriding_renderers`
 
 View Classes
 ============
@@ -403,7 +404,7 @@ Only one route needed, stated in one place atop the view class. Also,
 the assignment of the ``name`` is done in the ``__init__``. Our
 templates can then use ``{{ view.name }}``.
 
-See Also: narr/views.html#defining-a-view-callable-as-a-class
+.. seealso:: See Also: :ref:`class_as_view`
 
 Quick Project Startup with Scaffolds
 ====================================
@@ -451,7 +452,8 @@ configuration. This includes a new way of running your application:
 
 Let's look at ``pserve`` and configuration in more depth.
 
-See Also: narr/project.html#creating-a-pyramid-project, narr/scaffolding.html
+.. seealso:: See Also: :ref:`project_narr` and
+   :doc:`../narr/scaffolding`
 
 Application Running with ``pserve``
 ===================================
@@ -478,6 +480,8 @@ The ``pserve`` command has a number of other options and operations.
 Most of the work, though, comes from your project's wiring, as
 expressed in the configuration file you supply to ``pserve``. Let's
 take a look at this configuration file.
+
+.. seealso:: See Also: :ref:`what_is_this_pserve_thing`
 
 Configuration with ``.ini`` Files
 =================================
@@ -524,8 +528,9 @@ Additionally, the ``development.ini`` generated by this scaffold wired
 up Python's standard logging. We'll now see in the console, for example,
 a log on every request that comes in, as well traceback information.
 
-See Also: narr/environment.html#environment-variables-and-ini-file
--settings, narr/paste.html
+.. seealso:: See Also: :ref:`environment_chapter` and
+   :doc:`../narr/paste`
+
 
 Easier Development with ``debugtoolbar``
 ========================================
@@ -576,7 +581,8 @@ you want to disable this toolbar, no need to change code: you can
 remove it from ``pyramid.includes`` in the relevant ``.ini``
 configuration file.
 
-See Also: pyramid_debugtoolbar
+.. seealso:: See Also: `pyramid_debugtoolbar
+   <http://docs.pylonsproject.org/projects/pyramid_debugtoolbar/en/latest/index.html>`_
 
 Unit Tests and ``nose``
 =======================
@@ -604,8 +610,7 @@ We changed ``setup.py`` which means we need to re-run
 
 .. code-block:: bash
 
-    $ cd hello_world
-    $ nosetests .
+    $ nosetests hello_world/tests.py
     .
     Name                  Stmts   Miss  Cover   Missing
     ---------------------------------------------------
@@ -628,8 +633,7 @@ Pyramid supplies helpers for test writing, which we use in the
 test setup and teardown. Our one test imports the view,
 makes a dummy request, and sees if the view returns what we expected.
 
-See Also: nose, narr/testing
-.html#unit-integration-and-functional-testing,
+.. seealso:: See Also: :ref:`testing_chapter`
 
 Logging
 =======
@@ -672,7 +676,7 @@ visit ``http://localhost:6543`` your console will now show::
 
  2013-08-09 10:42:42,968 DEBUG [hello_world.views][MainThread] Some Message
 
-See Also: narr/sessions.html, narr/sessions.html#flash-messages,
+.. seealso:: See Also: :ref:`logging_chapter`
 
 Sessions
 ========
@@ -718,7 +722,11 @@ Jinja2 template:
     :start-after: Start Sphinx Include 1
     :end-before: End Sphinx Include 1
 
-See Also: narr/sessions.html#sessions,  api/session.html
+.. seealso:: See Also:
+   :ref:`sessions_chapter`, :ref:`flash_messages`,
+   :ref:`session_module`, and
+   `Beaker sessioning middleware
+   <http://docs.pylonsproject.org/projects/pyramid_beaker/en/latest/>`_
 
 Databases
 =========
@@ -763,8 +771,11 @@ of the system, can then easily get at the data thanks to SQLAlchemy:
     :start-after: Start Sphinx Include
     :end-before: End Sphinx Include
 
-See Also: sqlalchemy, narr/commandline
-    .html#making-your-script-into-a-console-script, pyramid_tm,
+.. seealso:: See Also: `SQLAlchemy <http://www.sqlalchemy.org/>`_,
+   :ref:`making_a_console_script`,
+   :ref:`bfg_sql_wiki_tutorial`, and
+   `Application Transactions With pyramid_tm
+   <http://docs.pylonsproject.org/projects/pyramid_tm/en/latest/>`_
 
 Forms
 =====
@@ -825,7 +836,10 @@ Also, the ``deform_bootstrap`` Pyramid add-on restyles the stock Deform
 widgets using attractive CSS from Bootstrap and more powerful widgets
 from Chosen.
 
-See Also: Deform, Colander
+.. seealso:: See Also:
+   `Deform <http://docs.pylonsproject.org/projects/deform/en/latest/>`_,
+   `Colander <http://docs.pylonsproject.org/projects/colander/en/latest/>`_, and
+   `deform_bootstrap <https://pypi.python.org/pypi/deform_bootstrap>`_
 
 Conclusion
 ==========

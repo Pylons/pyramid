@@ -31,18 +31,6 @@ Front Matter
    copyright.rst
    conventions.rst
 
-What's New
-==========
-
-.. toctree::
-   :maxdepth: 1
-
-   whatsnew-1.4
-   whatsnew-1.3
-   whatsnew-1.2
-   whatsnew-1.1
-   whatsnew-1.0
-
 .. _html_getting_started:
 
 Getting Started
@@ -59,17 +47,17 @@ up to speed right away.
 * :doc:`quick_tour` goes through the major features in Pyramid, covering
   a little about a lot.
 
-* To see a minimal Pyramid web application, check out `creating your first
-  Pyramid application <../narr/firstapp>`_.
-
 * For help getting Pyramid set up, try the `install guide
   <../narr/install>`_.
 
-* To get the feel of how a Pyramid web application is created, go to the
-  `single file tasks tutorial </projects/pyramid_tutorials/en/latest/single_file_tasks/single_file_tasks.html>`_ page.
+* To see a minimal Pyramid web application, check out `creating your first
+  Pyramid application <../narr/firstapp>`_.
 
-* Like learning by example? Check out to the :doc:`wiki tutorial
-  <../tutorials/wiki2/index>`.
+* Like learning by example? Visit the official
+  :doc:`wiki tutorial <../tutorials/wiki2/index>` as well as the
+  community-contributed
+  :ref:`Pyramid tutorials <tutorials:pyramid-tutorials>`, which include
+  a :ref:`single file tasks tutorial <tutorials:single-file-tutorial>`.
 
 * Need help?  See :ref:`Support and
   Development <support-and-development>`.
@@ -158,6 +146,11 @@ Change History
 .. toctree::
    :maxdepth: 1
 
+   whatsnew-1.4
+   whatsnew-1.3
+   whatsnew-1.2
+   whatsnew-1.1
+   whatsnew-1.0
    changes
 
 Design Documents
@@ -167,52 +160,6 @@ Design Documents
    :maxdepth: 1
 
    designdefense
-
-Sample Applications
-===================
-
-.. note::
-
-   These applications run only on Python 2.x, and so do some of their
-   dependencies.
-
-`cluegun <https://github.com/Pylons/cluegun>`_ is a simple pastebin
-application based on Rocky Burt's `ClueBin
-<http://pypi.python.org/pypi/ClueBin/0.2.3>`_.  It demonstrates form
-processing, security, and the use of :term:`ZODB` within a :app:`Pyramid`
-application.  Check this application out via:
-
-.. code-block:: text
-
-  git clone git://github.com/Pylons/cluegun.git
-
-`virginia <https://github.com/Pylons/virginia>`_ is a very simple dynamic
-file rendering application.  It is willing to render structured text
-documents, HTML documents, and images from a filesystem directory.
-It's also a good example of :term:`traversal`. An
-earlier version of this application runs the `repoze.org
-<http://repoze.org>`_ website.  Check this application out via:
-
-.. code-block:: text
-
-  git clone git://github.com/Pylons/virginia.git
-
-`shootout <https://github.com/Pylons/shootout>`_ is an example "idea
-competition" application by Carlos de la Guardia and Lukasz Fidosz.  It
-demonstrates :term:`URL dispatch`, simple authentication, integration
-with `SQLAlchemy <http://www.sqlalchemy.org/>`_ and ``pyramid_simpleform``.
-Check this application out of version control via:
-
-.. code-block:: text
-
-  git clone git://github.com/Pylons/shootout.git
-
-`KARL <http://karlproject.org>`_ is a moderately-sized application (roughly
-80K lines of Python code) built on top of :app:`Pyramid`.  It is an open
-source web system for collaboration, organizational intranets, and knowledge
-management. It provides facilities for wikis, calendars, manuals, searching,
-tagging, commenting, and file uploads.  See the `KARL site
-<http://karlproject.org>`_ for download and installation details.
 
 .. _support-and-development:
 

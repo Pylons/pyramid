@@ -616,6 +616,8 @@ extension so that these ``svn:ignore`` patterns work.
 .. index::
    pair: debugging; templates
 
+.. _debugging_templates:
+
 Debugging Templates
 -------------------
 

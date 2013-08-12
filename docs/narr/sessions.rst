@@ -181,6 +181,8 @@ implementation in the :mod:`pyramid.session` module as inspiration.
 .. index::
    single: flash messages
 
+.. _flash_messages:
+
 Flash Messages
 --------------
 

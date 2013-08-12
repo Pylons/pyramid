@@ -56,9 +56,22 @@ extensions = [
 # Looks for objects in external projects
 intersphinx_mapping = {
     'tutorials': ('http://docs.pylonsproject.org/projects/pyramid_tutorials/en/latest/', None),
+    'jinja2': ('http://docs.pylonsproject.org/projects/pyramid_jinja2/en/latest/', None),
+    'tm': (
+        'http://docs.pylonsproject.org/projects/pyramid_tm/en/latest/',
+        None,
+    ),
+    'debugtoolbar': (
+        'http://docs.pylonsproject.org/projects/pyramid_debugtoolbar/en/latest/', None),
     'zcomponent': ('http://docs.zope.org/zope.component', None),
     'webtest': ('http://webtest.pythonpaste.org/en/latest', None),
     'webob': ('http://docs.webob.org/en/latest', None),
+    'colander': (
+        'http://docs.pylonsproject.org/projects/colander/en/latest',
+    None),
+    'deform': (
+        'http://docs.pylonsproject.org/projects/deform/en/latest',
+    None),
     'sqla': ('http://docs.sqlalchemy.org/en/latest', None),
     'who': ('http://docs.repoze.org/who/latest', None),
     'python': ('http://docs.python.org', None),
