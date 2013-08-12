@@ -29,6 +29,14 @@
      This attribute is often accessed as ``request.registry.introspector`` in
      a typical Pyramid application.
 
+   .. method:: notify(*events)
+
+     Fire one or more event. All event subscribers to the event(s)
+     will be notified. This method is often accessed as
+     ``request.registry.notify`` in Pyramid applications to fire
+     custom events. See :ref:`custom_events` for more information.
+
+
 .. class:: Introspectable
 
    .. versionadded:: 1.3

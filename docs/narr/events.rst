@@ -53,7 +53,7 @@ method (see also :term:`Configurator`):
 
   from subscribers import mysubscriber
 
-  # "config" below is assumed to be an instance of a 
+  # "config" below is assumed to be an instance of a
   # pyramid.config.Configurator object
 
   config.add_subscriber(mysubscriber, NewRequest)
@@ -113,7 +113,7 @@ your application like so:
    :linenos:
 
    def handle_new_request(event):
-       print 'request', event.request   
+       print 'request', event.request
 
    def handle_new_response(event):
        print 'response', event.response
@@ -150,3 +150,78 @@ application, because the interface defined at
 :class:`pyramid.interfaces.INewResponse` says it must
 (:class:`pyramid.events.NewResponse` objects also have a ``request``).
 
+.. _custom_events:
+
+Creating Your Own Events
+------------------------
+
+In addition to using the events that the Pyramid framework creates,
+you can create your own events for use in your application. This can
+be useful to decouple parts of your application.
+
+For example, suppose your application has to do many things when a new
+document is created. Rather than putting all this logic in the view
+that creates the document, you can create the document in your view
+and then fire a custom event. Subscribers to the custom event can take
+other actions, such as indexing the document, sending email, or
+sending a message to a remote system.
+
+An event is simply an object. There are no required attributes or
+method for your custom events. In general, your events should keep
+track of the information that subscribers will need. Here are some
+example custom event classes:
+
+.. code-block:: python
+   :linenos:
+
+    class DocCreated(object):
+        def __init__(self, doc, request):
+            self.doc = doc
+	    self.request = request
+
+    class UserEvent(object):
+        def __init__(self, user):
+            self.user = user
+
+    class UserLoggedIn(UserEvent):
+        pass
+
+Some Pyramid applications choose to define custom events classes in an
+``events`` module.
+
+You can subscribe to custom events in the same way what you subscribe
+to Pyramid events -- either imperatively or with a decorator. Here's
+an example of subscribing to a custom event with a decorator:
+
+.. code-block:: python
+   :linenos:
+
+    from pyramid.events import subscriber
+    from .events import DocCreated
+    from .index import index_doc
+
+    @subscriber(DocCreated)
+    def index_doc(event):
+        # index the document using our application's index_doc function
+        index_doc(event.doc, event.request)
+
+The above example assumes that the application defines a
+``DocCreated`` event class and an ``index_doc`` function.
+
+To fire your custom events use the
+:meth:`pyramid.registry.Registry.notify` method, which is most often
+accessed as ``request.registry.notify``. For example:
+
+.. code-block:: python
+   :linenos:
+
+    from .events import DocCreated
+
+    def new_doc_view(request):
+        doc = MyDoc()
+	event = DocCreated(doc, request)
+	request.registry.notify(event)
+	return {'document': doc}
+
+This example view will notify all subscribers to the custom
+``DocCreated`` event.
