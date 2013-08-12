@@ -49,9 +49,13 @@ Features
   ``pyramid.config.Configurator.add_static_view``. This allows
   externally-hosted static URLs to be generated based on the current protocol.
 
-- The ``AuthTktAuthenticationPolicy`` has a new ``parent_domain`` option to
-  set the authentication cookie as a wildcard cookie on the parent domain. This
-  is useful if you have multiple sites sharing the same domain.
+- The ``AuthTktAuthenticationPolicy`` has two new options to configure its
+  domain usage: 
+  * ``parent_domain``: if set the authentication cookie is set on
+    the parent domain. This is useful if you have multiple sites sharing the
+    same domain.
+  * ``domain``: if provided the cookie is always set for this domain, bypassing
+     all usual logic.
 
 - The ``AuthTktAuthenticationPolicy`` now supports IPv6 addresses when using
   the ``include_ip=True`` option. This is possibly incompatible with
