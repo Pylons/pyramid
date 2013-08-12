@@ -77,7 +77,7 @@ type via the :func:`pyramid.events.subscriber` function.
 
   @subscriber(NewRequest)
   def mysubscriber(event):
-	  event.request.foo = 1
+      event.request.foo = 1
 
 When the :func:`~pyramid.events.subscriber` decorator is used a
 :term:`scan` must be performed against the package containing the
@@ -189,7 +189,7 @@ example custom event classes:
 Some Pyramid applications choose to define custom events classes in an
 ``events`` module.
 
-You can subscribe to custom events in the same way what you subscribe
+You can subscribe to custom events in the same way that you subscribe
 to Pyramid events -- either imperatively or with a decorator. Here's
 an example of subscribing to a custom event with a decorator:
 
@@ -225,3 +225,7 @@ accessed as ``request.registry.notify``. For example:
 
 This example view will notify all subscribers to the custom
 ``DocCreated`` event.
+
+Note that when you fire an event, all subscribers are run
+synchronously on the current thread. So it's generally not a good idea
+to create event handlers that may take a long time to run.

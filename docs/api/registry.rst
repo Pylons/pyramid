@@ -31,8 +31,9 @@
 
    .. method:: notify(*events)
 
-     Fire one or more event. All event subscribers to the event(s)
-     will be notified. This method is often accessed as
+     Fire one or more events. All event subscribers to the event(s)
+     will be notified. The subscribers will be called synchronously on
+     the current thread. This method is often accessed as
      ``request.registry.notify`` in Pyramid applications to fire
      custom events. See :ref:`custom_events` for more information.
 
