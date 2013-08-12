@@ -49,14 +49,15 @@ Getting Started
 ===============
 
 If you are new to Pyramid, we have a few resources that can help you get
-up to speed right away. Our *Quick Tour* shows a little about a lot:
+up to speed right away.
 
 .. toctree::
-   :maxdepth: 2
+   :hidden:
 
    quick_tour
 
-Also:
+* :doc:`quick_tour` goes through the major features in Pyramid, covering
+  a little about a lot.
 
 * To see a minimal Pyramid web application, check out `creating your first
   Pyramid application <../narr/firstapp>`_.
@@ -67,10 +68,11 @@ Also:
 * To get the feel of how a Pyramid web application is created, go to the
   `single file tasks tutorial </projects/pyramid_tutorials/en/latest/single_file_tasks/single_file_tasks.html>`_ page.
 
-* Like learning by example? Check out to the `wiki tutorial
-  <../tutorials/wiki2/index.html>`_.
+* Like learning by example? Check out to the :doc:`wiki tutorial
+  <../tutorials/wiki2/index>`.
 
-* Need help?  See `Support </en/latest/index.html#support-desc>`_.
+* Need help?  See :ref:`Support and
+  Development <support-and-development>`.
 
 
 .. _html_narrative_documentation:
