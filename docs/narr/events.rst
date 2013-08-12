@@ -190,8 +190,10 @@ Some Pyramid applications choose to define custom events classes in an
 ``events`` module.
 
 You can subscribe to custom events in the same way that you subscribe
-to Pyramid events -- either imperatively or with a decorator. Here's
-an example of subscribing to a custom event with a decorator:
+to Pyramid events -- either imperatively or with a decorator. You can
+also use custom events with :ref:`subscriber predicates
+<subscriber_predicates>`. Here's an example of subscribing to a custom
+event with a decorator:
 
 .. code-block:: python
    :linenos:
