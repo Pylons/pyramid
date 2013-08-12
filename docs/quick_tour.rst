@@ -581,8 +581,7 @@ you want to disable this toolbar, no need to change code: you can
 remove it from ``pyramid.includes`` in the relevant ``.ini``
 configuration file.
 
-.. seealso:: See Also: `pyramid_debugtoolbar
-   <http://docs.pylonsproject.org/projects/pyramid_debugtoolbar/en/latest/index.html>`_
+.. seealso:: See Also: :ref:`pyramid_debugtoolbar <toolbar:overview>`
 
 Unit Tests and ``nose``
 =======================

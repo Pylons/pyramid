@@ -61,8 +61,6 @@ intersphinx_mapping = {
         'http://docs.pylonsproject.org/projects/pyramid_tm/en/latest/',
         None,
     ),
-    'debugtoolbar': (
-        'http://docs.pylonsproject.org/projects/pyramid_debugtoolbar/en/latest/', None),
     'zcomponent': ('http://docs.zope.org/zope.component', None),
     'webtest': ('http://webtest.pythonpaste.org/en/latest', None),
     'webob': ('http://docs.webob.org/en/latest', None),
