@@ -124,15 +124,18 @@ class URLMethodsMixin(object):
         ``*remainder`` replacement value, it is tacked on to the URL
         after being URL-quoted-except-for-embedded-slashes.
 
-        If a keyword argument ``_query`` is present, it will be used to
-        compose a query string that will be tacked on to the end of the
-        URL.  The value of ``_query`` must be a sequence of two-tuples
-        *or* a data structure with an ``.items()`` method that returns a
+        If no ``_query`` keyword argument is provided, the request
+        query string will be returned in the URL. If it is present, it
+        will be used to compose a query string that will be tacked on
+        to the end of the URL, replacing any request query string.
+        The value of ``_query`` must be a sequence of two-tuples *or*
+        a data structure with an ``.items()`` method that returns a
         sequence of two-tuples (presumably a dictionary).  This data
-        structure will be turned into a query string per the documentation
-        of :func:`pyramid.encode.urlencode` function.  After the query
-        data is turned into a query string, a leading ``?`` is prepended,
-        and the resulting string is appended to the generated URL.
+        structure will be turned into a query string per the
+        documentation of :func:`pyramid.encode.urlencode` function.
+        After the query data is turned into a query string, a leading
+        ``?`` is prepended, and the resulting string is appended to
+        the generated URL.
 
         .. note::
 
