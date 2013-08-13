@@ -19,6 +19,8 @@ import warnings
 
 warnings.simplefilter('ignore', DeprecationWarning)
 
+import pkg_resources
+
 # skip raw nodes
 from sphinx.writers.text import TextTranslator
 from sphinx.writers.latex import LaTeXTranslator
@@ -108,7 +110,7 @@ copyright = '2008-%s, Agendaless Consulting' % thisyear
 # other places throughout the built documents.
 #
 # The short X.Y version.
-version = '1.4'
+version = pkg_resources.get_distribution('pyramid').version
 
 # The full version, including alpha/beta/rc tags.
 release = version

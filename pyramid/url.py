@@ -387,7 +387,7 @@ class URLMethodsMixin(object):
         resulting url of a resource that has a path of ``/baz/bar`` will be
         ``http://foo/baz/bar``.  If you want to generate completely relative
         URLs with no leading scheme, host, port, or initial path, you can
-        pass ``app_url=''`.  Passing ``app_url=''` when the resource path is
+        pass ``app_url=''``.  Passing ``app_url=''`` when the resource path is
         ``/baz/bar`` will return ``/baz/bar``.
 
         .. versionadded:: 1.3

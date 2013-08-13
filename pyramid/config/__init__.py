@@ -70,7 +70,7 @@ from pyramid.config.security import SecurityConfiguratorMixin
 from pyramid.config.settings import SettingsConfiguratorMixin
 from pyramid.config.testing import TestingConfiguratorMixin
 from pyramid.config.tweens import TweensConfiguratorMixin
-from pyramid.config.util import PredicateList
+from pyramid.config.util import PredicateList, not_
 from pyramid.config.views import ViewsConfiguratorMixin
 from pyramid.config.zca import ZCAConfiguratorMixin
 
@@ -85,6 +85,9 @@ empty = text_('')
 _marker = object()
 
 ConfigurationError = ConfigurationError # pyflakes
+
+not_ = not_ # pyflakes, this is an API
+
 
 class Configurator(
     TestingConfiguratorMixin,

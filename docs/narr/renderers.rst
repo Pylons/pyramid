@@ -198,7 +198,7 @@ representing the JSON serialization of the return value:
 
 .. code-block:: python
 
-   '{"content": "Hello!"}'
+   {"content": "Hello!"}
 
 The return value needn't be a dictionary, but the return value must contain
 values serializable by the configured serializer (by default ``json.dumps``).

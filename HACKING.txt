@@ -126,7 +126,7 @@ documentation in this package which references that API or behavior must
 change to reflect the bug fix, ideally in the same commit that fixes the bug
 or adds the feature.
 
-To build and review docs (where ``$yourvenv`` refers to the virtualenv you're
+To build and review docs (where ``$VENV`` refers to the virtualenv you're
 using to develop Pyramid):
 
 1. Run ``$VENV/bin/python setup.py dev docs``.  This will cause Sphinx

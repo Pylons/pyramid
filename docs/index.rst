@@ -1,8 +1,8 @@
 .. _index:
 
-=================================================
+=========================
 The Pyramid Web Framework
-=================================================
+=========================
 
 :app:`Pyramid` is a small, fast, down-to-earth Python web framework.  It
 is developed as part of the `Pylons Project
@@ -65,7 +65,7 @@ up to speed right away.
 
 .. _html_narrative_documentation:
 
-Narrative documentation
+Narrative Documentation
 =======================
 
 Narrative documentation in chapter form explaining how to use
@@ -130,7 +130,7 @@ platforms.
    tutorials/modwsgi/index.rst
 
 API Documentation
-==================
+=================
 
 Comprehensive reference material for every public API exposed by :app:`Pyramid`:
 
@@ -146,6 +146,7 @@ Change History
 .. toctree::
    :maxdepth: 1
 
+   whatsnew-1.5
    whatsnew-1.4
    whatsnew-1.3
    whatsnew-1.2
@@ -197,12 +198,8 @@ Index and Glossary
 * :ref:`search`
 
 
-.. add glossary, foreword, and latexindex in a hidden toc to avoid warnings
-
 .. toctree::
    :hidden:
 
    glossary
-   foreword.rst
-   latexindex.rst
 

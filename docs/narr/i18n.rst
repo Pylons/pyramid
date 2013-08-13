@@ -808,7 +808,7 @@ If this setting is supplied within the :app:`Pyramid` application
    default_locale_name = settings['pyramid.default_locale_name']
 
 .. index::
-   single: detecting langauges
+   single: detecting languages
 
 "Detecting" Available Languages
 -------------------------------
@@ -984,7 +984,7 @@ requires no additional coding or configuration.
 
 The default locale negotiator implementation named
 :class:`~pyramid.i18n.default_locale_negotiator` uses the following
-set of steps to dermine the locale name.
+set of steps to determine the locale name.
 
 - First, the negotiator looks for the ``_LOCALE_`` attribute of the
   request object (possibly set directly by view code or by a listener

@@ -217,6 +217,8 @@ that the Pyramid core doesn't.  Add-on packages already exist which let you
 easily send email, let you use the Jinja2 templating system, let you use
 XML-RPC or JSON-RPC, let you integrate with jQuery Mobile, etc.
 
+Examples: http://docs.pylonsproject.org/en/latest/docs/pyramid.html#pyramid-add-on-documentation
+
 
 Class-based and function-based views
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -857,7 +859,7 @@ It's our goal that no Pyramid question go unanswered.  Whether you ask a
 question on IRC, on the Pylons-discuss maillist, or on StackOverflow, you're
 likely to get a reasonably prompt response.  We don't tolerate "support
 trolls" or other people who seem to get their rocks off by berating fellow
-users in our various offical support channels.  We try to keep it well-lit
+users in our various official support channels.  We try to keep it well-lit
 and new-user-friendly.
 
 Example: Visit irc\://freenode.net#pyramid (the ``#pyramid`` channel on
