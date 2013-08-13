@@ -123,8 +123,8 @@ The feature additions in Pyramid 1.5 follow.
   :func:`pyramid.paster.get_appsettings`. This also allowed the generated
   ``initialize_db`` script from the ``alchemy`` scaffold to grow support for
   options in the form ``a=1 b=2`` so you can fill in values in a parameterized
-  ``.ini`` file, e.g.  ``initialize_myapp_db etc/development.ini a=1 b=2``.  See
-  https://github.com/Pylons/pyramid/pull/911
+  ``.ini`` file, e.g.  ``initialize_myapp_db etc/development.ini a=1 b=2``.
+  See https://github.com/Pylons/pyramid/pull/911
 
 - The ``request.session.check_csrf_token()`` method and the ``check_csrf`` view
   predicate now take into account the value of the HTTP header named
@@ -134,7 +134,10 @@ The feature additions in Pyramid 1.5 follow.
 Backwards Incompatibilities
 ---------------------------
 
-This release has no known backwards incompatibilities with Pyramid 1.4.X.
+- Modified the ``current_route_url`` method in pyramid.Request. The method
+  previously returned the URL without the query string by default, it now does
+  attach the query string unless it is overriden.
+
 
 Deprecations
 ------------
