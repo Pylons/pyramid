@@ -915,7 +915,7 @@ class ISession(IDict):
         by ``queue``.  An alternate flash message queue can used by passing
         an optional ``queue``, which must be a string.  If
         ``allow_duplicate`` is false, if the ``msg`` already exists in the
-        queue, it will not be readded."""
+        queue, it will not be re-added."""
 
     def pop_flash(queue=''):
         """ Pop a queue from the flash storage.  The queue is removed from

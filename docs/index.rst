@@ -37,6 +37,7 @@ What's New
 .. toctree::
    :maxdepth: 1
 
+   whatsnew-1.5
    whatsnew-1.4
    whatsnew-1.3
    whatsnew-1.2
@@ -55,7 +56,7 @@ Getting Started
 
 .. _html_narrative_documentation:
 
-Narrative documentation
+Narrative Documentation
 =======================
 
 Narrative documentation in chapter form explaining how to use
@@ -120,7 +121,7 @@ platforms.
    tutorials/modwsgi/index.rst
 
 API Documentation
-==================
+=================
 
 Comprehensive reference material for every public API exposed by :app:`Pyramid`:
 
@@ -225,13 +226,8 @@ Index and Glossary
 * :ref:`genindex`
 * :ref:`search`
 
-
-.. add glossary, foreword, and latexindex in a hidden toc to avoid warnings
-
 .. toctree::
    :hidden:
 
    glossary
-   foreword.rst
-   latexindex.rst
 

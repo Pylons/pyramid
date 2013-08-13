@@ -947,6 +947,30 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertTrue(result[1][1].endswith('; Path=/; Domain=localhost'))
         self.assertTrue(result[1][1].startswith('auth_tkt='))
 
+    def test_remember_parent_domain(self):
+        helper = self._makeOne('secret', parent_domain=True)
+        request = self._makeRequest()
+        request.environ['HTTP_HOST'] = 'www.example.com'
+        result = helper.remember(request, 'other')
+        self.assertEqual(len(result), 2)
+
+        self.assertEqual(result[0][0], 'Set-Cookie')
+        self.assertTrue(result[0][1].endswith('; Path=/'))
+        self.assertTrue(result[0][1].startswith('auth_tkt='))
+
+        self.assertEqual(result[1][0], 'Set-Cookie')
+        self.assertTrue(result[1][1].endswith('; Path=/; Domain=.example.com'))
+        self.assertTrue(result[1][1].startswith('auth_tkt='))
+
+    def test_remember_parent_domain_supercedes_wild_domain(self):
+        helper = self._makeOne('secret', parent_domain=True, wild_domain=True)
+        request = self._makeRequest()
+        request.environ['HTTP_HOST'] = 'www.example.com'
+        result = helper.remember(request, 'other')
+        self.assertEqual(len(result), 2)
+        self.assertTrue(result[0][1].endswith('; Path=/'))
+        self.assertTrue(result[1][1].endswith('; Path=/; Domain=.example.com'))
+
     def test_remember_domain_has_port(self):
         helper = self._makeOne('secret', wild_domain=False)
         request = self._makeRequest()

@@ -474,6 +474,30 @@ input of the ``prequest`` process is used as the ``POST`` body::
 
    $ $VENV/bin/prequest -mPOST development.ini / < somefile
 
+Showing All Installed Distributions and their Versions
+------------------------------------------------------
+
+.. versionadded:: 1.5
+
+You can use the ``pdistreport`` command to show the Pyramid version in use, the
+Python version in use, and all installed versions of Python distributions in
+your Python environment::
+
+   $ $VENV/bin/pdistreport
+   Pyramid version: 1.5dev 
+   Platform Linux-3.2.0-51-generic-x86_64-with-debian-wheezy-sid 
+   Packages: 
+     authapp 0.0 
+       /home/chrism/projects/foo/src/authapp 
+     beautifulsoup4 4.1.3 
+       /home/chrism/projects/foo/lib/python2.7/site-packages/beautifulsoup4-4.1.3-py2.7.egg
+   ... more output ...
+
+``pdistreport`` takes no options.  Its output is useful to paste into a
+pastebin when you are having problems and need someone with more familiarity
+with Python packaging and distribution than you have to look at your
+environment.
+
 .. _writing_a_script:
 
 Writing a Script

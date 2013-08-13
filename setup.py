@@ -70,7 +70,7 @@ testing_extras = tests_require + [
     ]
 
 setup(name='pyramid',
-      version='1.4',
+      version='1.5dev',
       description=('The Pyramid web application development framework, a '
                    'Pylons project'),
       long_description=README + '\n\n' +  CHANGES,
@@ -118,6 +118,7 @@ setup(name='pyramid',
         pviews = pyramid.scripts.pviews:main
         ptweens = pyramid.scripts.ptweens:main
         prequest = pyramid.scripts.prequest:main
+        pdistreport = pyramid.scripts.pdistreport:main
         [paste.server_runner]
         wsgiref = pyramid.scripts.pserve:wsgiref_server_runner
         cherrypy = pyramid.scripts.pserve:cherrypy_server_runner
