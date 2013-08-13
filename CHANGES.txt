@@ -168,8 +168,13 @@ Bug Fixes
 - The ``alchemy`` scaffold would break when the database was MySQL during
   tables creation.  See https://github.com/Pylons/pyramid/pull/1049
 
-- The route ``current_route_url`` method now attaches the query string to the URL by default. See
+- The ``current_route_url`` method now attaches the query string to the URL by default. See
   https://github.com/Pylons/pyramid/issues/1040
+
+Backwards Incompatibilities
+---------------------------
+
+- Modified the ``current_route_url`` method in pyramid.Request. The method previously returned the URL without the query string by default, it now does attach the query string unless it is overriden.
 
 1.4 (2012-12-18)
 ================
@@ -207,8 +212,6 @@ Backwards Incompatibilities
 - Modified the ``_backframes`` argument to ``pyramid.util.action_method`` in a
   similar way to the changes described to ``_depth`` above.  This argument
   remains undocumented, but might be used in the wild by some insane person.
-
-- Modified the ``current_route_url`` method in pyramid.Request. The method previously returned the URL without the query string by default, it now does attach the query string unless it is overriden.
 
 1.4b1 (2012-11-21)
 ==================
