@@ -224,8 +224,6 @@ class URLMethodsMixin(object):
             query = kw.pop('_query')
             if query:
                 qs = '?' + urlencode(query, doseq=True)
-        elif getattr(self, 'GET', None):
-            qs = '?' + urlencode(self.GET, doseq=True)
 
         if '_anchor' in kw:
             anchor = kw.pop('_anchor')
@@ -683,6 +681,9 @@ class URLMethodsMixin(object):
             route_name = getattr(route, 'name', None)
             if route_name is None:
                 raise ValueError('Current request matches no route')
+
+        if '_query' not in kw:
+            kw['_query'] = self.GET
 
         newkw = {}
         newkw.update(self.matchdict)
