@@ -499,6 +499,20 @@ class TestURLMethodsMixin(unittest.TestCase):
         self.assertEqual(result,
                          'http://example.com:5432/1/2/3?q=123')
 
+    def test_current_route_url_with_request_query_duplicate_entries(self):
+        from pyramid.interfaces import IRoutesMapper
+        from webob.multidict import GetDict
+        request = self._makeOne()
+        request.GET = GetDict([('q', '123'), ('b', '2'), ('b', '2'), ('q', '456')], {})
+        route = DummyRoute('/1/2/3')
+        mapper = DummyRoutesMapper(route=route)
+        request.matched_route = route
+        request.matchdict = {}
+        request.registry.registerUtility(mapper, IRoutesMapper)
+        result = request.current_route_url()
+        self.assertEqual(result,
+                         'http://example.com:5432/1/2/3?q=123&b=2&b=2&q=456')
+
     def test_current_route_url_with_query_override(self):
         from pyramid.interfaces import IRoutesMapper
         from webob.multidict import GetDict
@@ -525,7 +539,7 @@ class TestURLMethodsMixin(unittest.TestCase):
         result = request.current_route_path('extra1', 'extra2', _query={'a':1},
                                             _anchor=text_(b"foo"))
         self.assertEqual(result, '/script_name/1/2/3/extra1/extra2?a=1#foo')
-        
+
     def test_route_path_with_elements(self):
         from pyramid.interfaces import IRoutesMapper
         request = self._makeOne()
