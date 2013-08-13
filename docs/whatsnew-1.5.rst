@@ -134,7 +134,8 @@ The feature additions in Pyramid 1.5 follow.
 Backwards Incompatibilities
 ---------------------------
 
-This release has no known backwards incompatibilities with Pyramid 1.4.X.
+- Modified the ``current_route_url`` method in pyramid.Request. The method previously returned the URL without the query string by default, it now does attach the query string unless it is overriden.
+
 
 Deprecations
 ------------
