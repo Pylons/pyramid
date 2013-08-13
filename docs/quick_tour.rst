@@ -28,11 +28,9 @@ area in place. For Python 3.3:
   $ pyvenv-3.3 env33
   $ source env33/bin/activate
   $ wget https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py -O - | python
-  $ easy_install-3.3 pip
 
 We make a :term:`virtualenv` then activate it. We then get Python
-packaging tools installed so we can use the popular ``pip`` tool for
-installing packages. Normal first steps for any Python project.
+packaging tools installed.
 
 .. seealso:: See Also: Python 3's :mod:`venv module <python3:venv>`,
    the ``setuptools`` `installation
@@ -49,7 +47,7 @@ installed is easy:
 
 .. code-block:: bash
 
-  $ pip install pyramid
+  $ easy_install pyramid
 
 Our virtual environment now has the Pyramid software available to its
 Python.
@@ -267,7 +265,7 @@ our Pyramid applications:
 
 .. code-block:: bash
 
-    $ pip install pyramid_jinja2
+    $ easy_install pyramid_jinja2
 
 With the package installed, we can include the template bindings into
 our configuration:
