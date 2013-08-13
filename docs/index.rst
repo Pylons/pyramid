@@ -47,11 +47,11 @@ up to speed right away.
 * :doc:`quick_tour` goes through the major features in Pyramid, covering
   a little about a lot.
 
-* For help getting Pyramid set up, try the `install guide
-  <../narr/install>`_.
+* To see a minimal Pyramid web application, check out
+  :ref:`firstapp_chapter`.
 
-* To see a minimal Pyramid web application, check out `creating your first
-  Pyramid application <../narr/firstapp>`_.
+* For help getting Pyramid set up, try
+  :ref:`installing_chapter`.
 
 * Like learning by example? Visit the official
   :doc:`wiki tutorial <../tutorials/wiki2/index>` as well as the

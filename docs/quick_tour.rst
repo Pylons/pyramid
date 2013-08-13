@@ -29,15 +29,25 @@ area in place. For Python 3.3:
   $ source env33/bin/activate
   $ wget https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py -O - | python
 
-We make a :term:`virtualenv` then activate it. We then get Python
-packaging tools installed.
+We make a :term:`virtualenv` then activate it. Next we download
+Python's packaging support and install it, giving us the
+``easy_install`` command-line script for adding new packages. Python
+2.7 users will need to use ``virtualenv`` instead of ``pyvenv`` to make
+their virtual environment.
+
+.. note::
+
+   Why ``easy_install`` and not ``pip``? Pyramid encourages use of
+   namespace packages which, until recently, ``pip`` didn't permit.
+   Also, Pyramid has some optional C extensions for performance. With
+   ``easy_install``, Windows users can get these extensions without
+   needing a C compiler.
 
 .. seealso:: See Also: Python 3's :mod:`venv module <python3:venv>`,
    the ``setuptools`` `installation
    instructions <https://pypi.python.org/pypi/setuptools/0.9.8#installation-instructions>`_,
-   documentation for `pip <http://www.pip-installer.org/en/latest/>`_,
-   and
-   Pyramid's :ref:`Before You Install <installing_chapter>`
+   `easy_install help <https://pypi.python.org/pypi/setuptools/0.9.8#using-setuptools-and-easyinstall>`_,
+   and Pyramid's :ref:`Before You Install <installing_chapter>`.
 
 Pyramid Installation
 ====================
@@ -722,8 +732,7 @@ Jinja2 template:
 .. seealso:: See Also:
    :ref:`sessions_chapter`, :ref:`flash_messages`,
    :ref:`session_module`, and
-   `Beaker sessioning middleware
-   <http://docs.pylonsproject.org/projects/pyramid_beaker/en/latest/>`_
+   :ref:`Beaker sessioning middleware <beaker:overview>`
 
 Databases
 =========
@@ -771,8 +780,7 @@ of the system, can then easily get at the data thanks to SQLAlchemy:
 .. seealso:: See Also: `SQLAlchemy <http://www.sqlalchemy.org/>`_,
    :ref:`making_a_console_script`,
    :ref:`bfg_sql_wiki_tutorial`, and
-   `Application Transactions With pyramid_tm
-   <http://docs.pylonsproject.org/projects/pyramid_tm/en/latest/>`_
+   :ref:`Application Transactions With pyramid_tm <tm:overview>`
 
 Forms
 =====
@@ -823,10 +831,7 @@ We'd like to handle form submission, validation, and saving:
 
 Deform and Colander provide a very flexible combination for forms,
 widgets, schemas, and validation. Recent versions of Deform also
-include a
-`retail mode <http://docs.pylonsproject
-.org/projects/deform/en/latest/retail.html>`_
-for gaining Deform
+include a :ref:`retail mode <deform:retail>` for gaining Deform
 features on custom forms.
 
 Also, the ``deform_bootstrap`` Pyramid add-on restyles the stock Deform
@@ -834,8 +839,8 @@ widgets using attractive CSS from Bootstrap and more powerful widgets
 from Chosen.
 
 .. seealso:: See Also:
-   `Deform <http://docs.pylonsproject.org/projects/deform/en/latest/>`_,
-   `Colander <http://docs.pylonsproject.org/projects/colander/en/latest/>`_, and
+   :ref:`Deform <deform:overview>`,
+   :ref:`Colander <colander:overview>`, and
    `deform_bootstrap <https://pypi.python.org/pypi/deform_bootstrap>`_
 
 Conclusion
