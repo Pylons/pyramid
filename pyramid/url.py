@@ -221,6 +221,8 @@ class URLMethodsMixin(object):
             query = kw.pop('_query')
             if query:
                 qs = '?' + urlencode(query, doseq=True)
+        elif getattr(self, 'GET', None):
+            qs = '?' + urlencode(self.GET, doseq=True)
 
         if '_anchor' in kw:
             anchor = kw.pop('_anchor')
