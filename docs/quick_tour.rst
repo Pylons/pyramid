@@ -29,8 +29,16 @@ area in place. For Python 3.3:
   $ source env33/bin/activate
   $ wget https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py -O - | python
 
-We make a :term:`virtualenv` then activate it. Next we download
-Python's packaging support and install it, giving us the
+If ``wget`` complains with a certificate error, run it with:
+
+.. code-block:: bash
+
+  $ wget --no-check-certificate
+
+In these steps above we first made a :term:`virtualenv` and then
+"activated"  it, which adjusted our path to look first in
+``env33/bin`` for commands (such as ``python``.) We next downloaded
+Python's packaging support and installed it, giving us the
 ``easy_install`` command-line script for adding new packages. Python
 2.7 users will need to use ``virtualenv`` instead of ``pyvenv`` to make
 their virtual environment.
@@ -202,7 +210,8 @@ Above we saw the basics of routing URLs to views in Pyramid:
 
 .. note::
 
-    Why do this twice? Other systems don't make us repeat this! As
+    Why do this twice? Other Python web frameworks let you create a
+    route and associate it with a view in one step. As
     illustrated in :ref:`routes_need_ordering`, multiple routes might
     match the same URL pattern. Rather than provide ways to help guess,
     Pyramid lets you be explicit in ordering. Pyramid also gives
