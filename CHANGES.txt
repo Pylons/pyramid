@@ -134,8 +134,8 @@ Bug Fixes
 ---------
 
 - Fixed a Mako renderer bug returning a tuple with a previous defname value
-in some circumstances. See https://github.com/Pylons/pyramid/issues/1037 for
-more information.
+  in some circumstances. See https://github.com/Pylons/pyramid/issues/1037
+  for more information.
 
 - Make the ``pyramid.config.assets.PackageOverrides`` object implement the API
   for ``__loader__`` objects specified in PEP 302.  Proxies to the
