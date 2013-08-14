@@ -416,6 +416,21 @@ class MakoLookupTemplateRendererTests(Base, maybe_unittest()):
         self.assertEqual(result, text_('result'))
         self.assertEqual(lookup.values, {'_context':1})
 
+    def test_call_with_defname_with_tuple_value_twice(self):
+        lookup = DummyLookup()
+        instance1 = self._makeOne('path', 'defname', lookup)
+        result1 = instance1(('defname1', {}), {'context':1})
+        self.assertEqual(lookup.deffed, 'defname1')
+        self.assertEqual(result1, text_('result'))
+        self.assertEqual(lookup.values, {'_context':1})
+        instance2 = self._makeOne('path', 'defname', lookup)
+        result2 = instance2(('defname2', {}), {'context':2})
+        self.assertNotEqual(lookup.deffed, 'defname1')
+        self.assertEqual(lookup.deffed, 'defname2')
+        self.assertEqual(result2, text_('result'))
+        self.assertEqual(lookup.values, {'_context':2})
+
+
     def test_call_with_nondict_value(self):
         lookup = DummyLookup()
         instance = self._makeOne('path', None, lookup)
