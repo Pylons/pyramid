@@ -215,12 +215,9 @@ class MakoLookupTemplateRenderer(object):
         context = system.pop('context', None)
         if context is not None:
             system['_context'] = context
-        if self.defname is None:
-            if isinstance(value, tuple):
-                self.defname, value = value
-        else:
-            if isinstance(value, tuple):
-                _, value = value
+        # tuple returned to be deprecated
+        if isinstance(value, tuple):
+            self.defname, value = value
         try:
             system.update(value)
         except (TypeError, ValueError):
