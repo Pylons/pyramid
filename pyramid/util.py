@@ -77,9 +77,10 @@ class InstancePropertyMixin(object):
         """
         attrs = dict(properties)
 
-        parent = self.__class__
-        cls = type(parent.__name__, (parent, object), attrs)
-        self.__class__ = cls
+        if attrs:
+            parent = self.__class__
+            cls = type(parent.__name__, (parent, object), attrs)
+            self.__class__ = cls
 
     def _set_extensions(self, extensions):
         for name, fn in iteritems_(extensions.methods):
