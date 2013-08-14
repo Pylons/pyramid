@@ -2,6 +2,7 @@ import os
 import posixpath
 import sys
 import threading
+import warnings
 
 from zope.interface import (
     implementer,
@@ -215,12 +216,17 @@ class MakoLookupTemplateRenderer(object):
         context = system.pop('context', None)
         if context is not None:
             system['_context'] = context
-        if self.defname is None:
-            if isinstance(value, tuple):
-                self.defname, value = value
-        else:
-            if isinstance(value, tuple):
-                _, value = value
+        # tuple returned to be deprecated
+        if isinstance(value, tuple):
+            warnings.warn(
+                'Using a tuple in the form (\'defname\', {}) to render a '
+                'Mako partial will be deprecated in the future. Use a '
+                'Mako template renderer as documented in the "Using A '
+                'Mako def name Within a Renderer Name" chapter of the '
+                'Pyramid narrative documentation instead',
+                DeprecationWarning,
+                3)
+            self.defname, value = value
         try:
             system.update(value)
         except (TypeError, ValueError):
