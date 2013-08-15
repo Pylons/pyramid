@@ -25,6 +25,9 @@ Bug Fixes
   in some circumstances. See https://github.com/Pylons/pyramid/issues/1037 for
   more information.  Backport from master.
 
+- Make ``pserve.cherrypy_server_runner`` Python 3 compatible. See
+  https://github.com/Pylons/pyramid/issues/718.  Backport from master.
+
 1.4.4 (2013-08-27)
 ==================
 
