@@ -344,11 +344,8 @@ Windows Using Python 2
 #. Download and install the most recent `Python 2.7.x version
    <http://www.python.org/download/>`_ for your system.
 
-#. Download and install the `Python for Windows extensions
-   <http://sourceforge.net/projects/pywin32/files/pywin32/>`_.  Carefully read
-   the README.txt file at the end of the list of builds, and follow its
-   directions.  Make sure you get the proper bittedness of build and Python
-   2.7 version.
+#. Download and install the `Python for Windows extensions (for Python 2.7)    <http://sourceforge.net/projects/pywin32/files/pywin32/>`_.
+   Carefully read the README.txt file at the end of the list of builds, and follow its directions.  Make sure you get the proper bittedness of build and Python 2.7 version.
 
 #. Install latest :term:`setuptools` distribution into the Python you
    obtained/installed/found in the step above: download `ez_setup.py
@@ -395,11 +392,8 @@ Windows Using Python 3
    <http://www.python.org/download/>`_ for your system and which is
    supported by Pyramid.
 
-#. Download and install the `Python for Windows extensions
-   <http://sourceforge.net/projects/pywin32/files/pywin32/>`_.  Carefully read
-   the README.txt file at the end of the list of builds, and follow its
-   directions.  Make sure you get the proper bittedness of build and Python
-   3.x version.
+#. Download and install the `Python for Windows extensions (for Python 3.x)    <http://sourceforge.net/projects/pywin32/files/pywin32/>`_.
+   Carefully read the README.txt file at the end of the list of builds, and follow its directions.  Make sure you get the proper bittedness of build and Python 3.x version.
 
 #. Install latest :term:`distribute` distribution into the Python you
    obtained/installed/found in the step above: download `distribute_setup.py
