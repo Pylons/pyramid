@@ -649,6 +649,10 @@ class AcceptContentTypeTest(unittest.TestCase):
         from webtest import TestApp
         self.testapp = TestApp(app)
 
+    def tearDown(self):
+        import pyramid.config
+        pyramid.config.global_registries.empty()
+
     def test_ordering(self):
         res = self.testapp.get('/hello', headers={'Accept': 'application/json; q=1.0, text/plain; q=0.9'}, status=200)
         self.assertEqual(res.content_type, 'application/json')
