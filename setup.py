@@ -67,6 +67,7 @@ testing_extras = tests_require + [
     'nose',
     'coverage',
     'virtualenv', # for scaffolding tests
+    'pytest',
     ]
 
 setup(name='pyramid',

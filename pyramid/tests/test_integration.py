@@ -72,7 +72,7 @@ class IntegrationBase(object):
 
 here = os.path.dirname(__file__)
 
-class TestStaticAppBase(IntegrationBase):
+class StaticAppBase(IntegrationBase):
     def test_basic(self):
         res = self.testapp.get('/minimal.pt', status=200)
         _assertBody(res.body, os.path.join(here, 'fixtures/minimal.pt'))
@@ -198,10 +198,10 @@ class TestEventOnlySubscribers(IntegrationBase, unittest.TestCase):
         self.assertEqual(sorted(res.body.split()),
                          [b'foobar', b'foobar2', b'foobaryup', b'foobaryup2'])
 
-class TestStaticAppUsingAbsPath(TestStaticAppBase, unittest.TestCase):
+class TestStaticAppUsingAbsPath(StaticAppBase, unittest.TestCase):
     package = 'pyramid.tests.pkgs.static_abspath'
 
-class TestStaticAppUsingAssetSpec(TestStaticAppBase, unittest.TestCase):
+class TestStaticAppUsingAssetSpec(StaticAppBase, unittest.TestCase):
     package = 'pyramid.tests.pkgs.static_assetspec'
 
 class TestStaticAppNoSubpath(unittest.TestCase):
