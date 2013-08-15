@@ -538,7 +538,7 @@ representing Pyramid your application configuration as a single argument:
 
    from pyramid.paster import bootstrap
    env = bootstrap('/path/to/my/development.ini')
-   print env['request'].route_url('home')
+   print(env['request'].route_url('home'))
 
 :func:`pyramid.paster.bootstrap` returns a dictionary containing
 framework-related information.  This dictionary will always contain a
@@ -606,7 +606,7 @@ to load instead of ``main``:
 
    from pyramid.paster import bootstrap
    env = bootstrap('/path/to/my/development.ini#another')
-   print env['request'].route_url('home')
+   print(env['request'].route_url('home'))
 
 The above example specifies the ``another`` ``app``, ``pipeline``, or
 ``composite`` section of your PasteDeploy configuration file. The ``app``
@@ -643,7 +643,7 @@ the desired request and passing it into :func:`~pyramid.paster.bootstrap`:
 
    request = Request.blank('/', base_url='https://example.com/prefix')
    env = bootstrap('/path/to/my/development.ini#another', request=request)
-   print env['request'].application_url
+   print(env['request'].application_url)
    # will print 'https://example.com/prefix'
 
 Now you can readily use Pyramid's APIs for generating URLs:

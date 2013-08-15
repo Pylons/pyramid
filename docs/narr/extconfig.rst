@@ -55,7 +55,7 @@ method of the Configurator:
    :linenos:
 
    def mysubscriber(event):
-       print event.request
+       print(event.request)
 
    config.add_newrequest_subscriber(mysubscriber)
 
@@ -79,7 +79,7 @@ able to install it and subsequently do:
    :linenos:
 
    def mysubscriber(event):
-       print event.request
+       print(event.request)
 
    from pyramid.config import Configurator
    config = Configurator()

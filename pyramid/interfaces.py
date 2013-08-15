@@ -760,15 +760,15 @@ class IContextURL(IResourceURL):
     #
     # class Fudge(object):
     #     def __init__(self, one, two):
-    #         print one, two
+    #         print(one, two)
     # class Another(object):
     #     def __init__(self, one, two):
-    #         print one, two
+    #         print(one, two)
     # ob = object()
     # r.registerAdapter(Fudge, (Interface, Interface), IContextURL)
-    # print r.queryMultiAdapter((ob, ob), IResourceURL)
+    # print(r.queryMultiAdapter((ob, ob), IResourceURL))
     # r.registerAdapter(Another, (Interface, Interface), IResourceURL)
-    # print r.queryMultiAdapter((ob, ob), IResourceURL)
+    # print(r.queryMultiAdapter((ob, ob), IResourceURL))
     #
     # prints
     #

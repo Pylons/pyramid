@@ -1461,7 +1461,7 @@ code below:
 
    def afunc():
        for i in range(10):
-           print i
+           print(i)
 
 By its nature, the *request* object created as the result of a WSGI server's
 call into a long-lived web framework cannot be global, because the lifetime

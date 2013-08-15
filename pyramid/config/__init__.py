@@ -1055,7 +1055,7 @@ class ActionState(object):
         ...    v = context.execute_actions()
         ... except ConfigurationExecutionError, v:
         ...    pass
-        >>> print v
+        >>> print(v)
         exceptions.AttributeError: 'function' object has no attribute 'xxx'
           in:
           oops

@@ -181,7 +181,7 @@ class AssetResolver(Resolver):
 
            a = AssetResolver('myproject')
            resolver = a.resolve('templates/foo.pt')
-           print resolver.abspath()
+           print(resolver.abspath())
            # -> /path/to/myproject/templates/foo.pt
 
         If the AssetResolver is constructed without a ``package`` argument of
