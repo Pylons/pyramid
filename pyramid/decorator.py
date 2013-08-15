@@ -7,11 +7,11 @@ class reify(object):
 
     .. code-block:: python
 
-       class Foo(object):
-           @reify
-           def jammy(self):
-               print 'jammy called'
-               return 1
+    >>> class Foo(object):
+    ...     @reify
+    ...     def jammy(self):
+    ...         print 'jammy called'
+    ...         return 1
 
     And usage of Foo:
 

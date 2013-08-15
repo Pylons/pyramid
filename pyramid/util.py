@@ -117,19 +117,18 @@ class InstancePropertyMixin(object):
         .. code-block:: python
            :linenos:
 
-           class Foo(InstancePropertyMixin):
-               _x = 1
-
-           def _get_x(self):
-               return _x
-
-           def _set_x(self, value):
-               self._x = value
-
-           foo = Foo()
-           foo.set_property(property(_get_x, _set_x), name='x')
-           foo.set_property(_get_x, name='y', reify=True)
-
+           >>> class Foo(InstancePropertyMixin):
+           ...     _x = 1
+           ...
+           >>> def _get_x(self):
+           ...     return self._x
+           ...
+           >>> def _set_x(self, value):
+           ...     self._x = value
+           ...
+           >>> foo = Foo()
+           >>> foo.set_property(property(_get_x, _set_x), name='x')
+           >>> foo.set_property(_get_x, name='y', reify=True)
            >>> foo.x
            1
            >>> foo.y

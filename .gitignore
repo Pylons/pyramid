@@ -6,6 +6,7 @@
 *.txt.py
 *~
 .*.swp
+.cache/
 .coverage
 .tox/
 nosetests.xml

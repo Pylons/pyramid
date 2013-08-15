@@ -68,6 +68,7 @@ testing_extras = tests_require + [
     'coverage',
     'virtualenv', # for scaffolding tests
     'pytest',
+    'pytest_flakes',
     'pytest_pep8',
     ]
 
