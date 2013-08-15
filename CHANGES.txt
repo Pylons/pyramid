@@ -56,6 +56,9 @@ Features
     same domain.
   * ``domain``: if provided the cookie is always set for this domain, bypassing
      all usual logic.
+  See https://github.com/Pylons/pyramid/pull/1028,
+  https://github.com/Pylons/pyramid/pull/1072 and
+  https://github.com/Pylons/pyramid/pull/1078.
 
 - The ``AuthTktAuthenticationPolicy`` now supports IPv6 addresses when using
   the ``include_ip=True`` option. This is possibly incompatible with
