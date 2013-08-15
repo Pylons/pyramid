@@ -51,11 +51,13 @@ Features
 
 - The ``AuthTktAuthenticationPolicy`` has two new options to configure its
   domain usage: 
+
   * ``parent_domain``: if set the authentication cookie is set on
     the parent domain. This is useful if you have multiple sites sharing the
     same domain.
   * ``domain``: if provided the cookie is always set for this domain, bypassing
-     all usual logic.
+    all usual logic.
+
   See https://github.com/Pylons/pyramid/pull/1028,
   https://github.com/Pylons/pyramid/pull/1072 and
   https://github.com/Pylons/pyramid/pull/1078.

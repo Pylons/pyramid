@@ -336,6 +336,7 @@ You can use Pyramid on Windows under Python 2 or under Python 3.
 #. Install `virtualenv`:
 
    .. code-block:: text
+
       # modify the command according to the python version, e.g.:
       # for Python 2.7:
       c:\> c:\Python27\Scripts\easy_install virtualenv
