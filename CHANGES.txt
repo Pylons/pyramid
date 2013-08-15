@@ -183,6 +183,9 @@ Bug Fixes
   default. See
   https://github.com/Pylons/pyramid/issues/1040
 
+- Make ``pserve.cherrypy_server_runner`` Python 3 compatible. See
+  https://github.com/Pylons/pyramid/issues/718
+
 Backwards Incompatibilities
 ---------------------------
 
