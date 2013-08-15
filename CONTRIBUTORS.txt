@@ -214,3 +214,5 @@ Contributors
 - Charlie Clark, 2013/08/15
 
 - Tom Lazar, 2013/08/15
+
+- Andreas Zeidler, 2013/08/15
