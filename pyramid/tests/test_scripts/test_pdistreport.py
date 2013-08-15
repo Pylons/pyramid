@@ -1,5 +1,5 @@
 import unittest
-from pyramid.tests.test_scripts import dummy
+
 
 class TestPDistReportCommand(unittest.TestCase):
     def _callFUT(self, **kw):

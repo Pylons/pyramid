@@ -1955,12 +1955,6 @@ class DummyRequest:
         self.params = {}
         self.cookies = {}
 
-class DummyResponse:
-    status = '200 OK'
-    headerlist = ()
-    app_iter = ()
-    body = ''
-
 class DummyThreadLocalManager(object):
     pushed = None
     popped = False
