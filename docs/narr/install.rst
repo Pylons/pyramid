@@ -162,19 +162,19 @@ also prevent :app:`Pyramid` from globally installing versions of
 packages that are not compatible with your system Python.
 
 To set up a virtualenv in which to install :app:`Pyramid`, first ensure that
-:term:`setuptools` or :term:`distribute` is installed.  To do so, invoke
+:term:`setuptools` is installed.  To do so, invoke
 ``import setuptools`` within the Python interpreter you'd like to run
 :app:`Pyramid` under.
 
-The following command will not display anything if setuptools or distribute is
+The following command will not display anything if setuptools is
 already installed:
 
 .. code-block:: text
 
    $ python2.7 -c 'import setuptools'
 
-Running the same command will yield the following output if setuptools or
-distribute is not yet installed:
+Running the same command will yield the following output if setuptools is not
+yet installed:
 
 .. code-block:: text
 
@@ -183,27 +183,23 @@ distribute is not yet installed:
    ImportError: No module named setuptools
 
 If ``import setuptools`` raises an :exc:`ImportError` as it does above, you
-will need to install setuptools or distribute manually.
+will need to install setuptools manually.
 
 If you are using a "system" Python (one installed by your OS distributor or a
 3rd-party packager such as Fink or MacPorts), you can usually install the
-setuptools or distribute package by using your system's package manager.  If
+setuptools package by using your system's package manager.  If
 you cannot do this, or if you're using a self-installed version of Python,
-you will need to install setuptools or distribute "by hand".  Installing
-setuptools or distribute "by hand" is always a reasonable thing to do, even
+you will need to install setuptools "by hand".  Installing
+setuptools "by hand" is always a reasonable thing to do, even
 if your package manager already has a pre-chewed version of setuptools for
 installation.
 
-If you're using Python 2, you'll want to install ``setuptools``.  If you're
-using Python 3, you'll want to install ``distribute``.  Below we tell you how
-to do both.
-
-Installing Setuptools On Python 2
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Installing Setuptools
+~~~~~~~~~~~~~~~~~~~~~
 
 To install setuptools by hand under Python 2, first download `ez_setup.py
-<http://peak.telecommunity.com/dist/ez_setup.py>`_ then invoke it using the
-Python interpreter into which you want to install setuptools.
+<https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py>`_ then
+invoke it using the Python interpreter into which you want to install setuptools.
 
 .. code-block:: text
 
@@ -218,35 +214,13 @@ the script.  To remediate this, you may need to do:
 
    $ sudo python ez_setup.py
 
-Installing Distribute On Python 3
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-``setuptools`` doesn't work under Python 3.  Instead, you can use
-``distribute``, which is a fork of setuptools.  To
-install it, first download `distribute_setup.py
-<http://python-distribute.org/distribute_setup.py>`_ then invoke it using the
-Python interpreter into which you want to install setuptools.
-
-.. code-block:: text
-
-   $ python3 distribute_setup.py
-
-Once this command is invoked, distribute should be installed on your system.
-If the command fails due to permission errors, you may need to be the
-administrative user on your system to successfully invoke the script.  To
-remediate this, you may need to do:
-
-.. code-block:: text
-
-   $ sudo python3 distribute_setup.py
-
 .. index::
    pair: install; virtualenv
 
 Installing the ``virtualenv`` Package
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Once you've got setuptools or distribute installed, you should install the
+Once you've got setuptools installed, you should install the
 :term:`virtualenv` package.  To install the :term:`virtualenv` package into
 your setuptools-enabled Python interpreter, use the ``easy_install`` command.
 
@@ -261,7 +235,7 @@ your setuptools-enabled Python interpreter, use the ``easy_install`` command.
    Turing-complete.
 
    If you insist on using ``pyvenv``, you'll need to understand how to install
-   software such as ``distribute`` into the virtual environment manually,
+   software such as ``setuptools`` into the virtual environment manually,
    which this guide does not cover.
 
 .. code-block:: text
@@ -335,91 +309,37 @@ complete, as it downloads and installs a number of dependencies.
 Installing :app:`Pyramid` on a Windows System
 -------------------------------------------------
 
-You can use Pyramid on Windows under Python 2 or under Python 3.  Directions
-for both versions are included below.
+You can use Pyramid on Windows under Python 2 or under Python 3.
 
-Windows Using Python 2
-~~~~~~~~~~~~~~~~~~~~~~
-
-#. Install the most recent `Python 2.7.x version
+#. Install the most recent `Python 2.7.x or 3.3.x version
    <http://www.python.org/download/>`_ for your system.
 
 #. Install the `Python for Windows extensions
    <http://sourceforge.net/projects/pywin32/files/>`_.  Make sure to
-   pick the right download for Python 2.7 and install it using the
-   same Python installation from the previous step.
+   pick the right download for Python 2.7 or Python 3.3 and install it
+   using the same Python installation from the previous step.
 
 #. Install latest :term:`setuptools` distribution into the Python you
    obtained/installed/found in the step above: download `ez_setup.py
-   <http://peak.telecommunity.com/dist/ez_setup.py>`_ and run it using
-   the ``python`` interpreter of your Python 2.7 installation using a
-   command prompt:
-
-   .. code-block:: text
-
-      c:\> c:\Python27\python ez_setup.py
-
-#. Install `virtualenv`:
-
-   .. code-block:: text
-
-      c:\> c:\Python27\Scripts\easy_install virtualenv
-
-#. Make a :term:`virtualenv` workspace:
-
-   .. code-block:: text
-
-      c:\> set VENV=c:\env
-      c:\> c:\Python27\Scripts\virtualenv --no-site-packages %VENV%
-
-   You can either follow the use of the environment variable, ``%VENV%``,
-   or replace it with the root directory of the :term:`virtualenv`.
-   In that case, the `set` command can be skipped.
-   If you choose the former approach, ensure that it's an absolute path.
-
-#. (Optional) Consider using ``%VENV%\Scripts\activate.bat`` to make your shell
-   environment wired to use the virtualenv.
-
-#. Use ``easy_install`` to get :app:`Pyramid` and its direct dependencies
-   installed:
-
-   .. code-block:: text
-
-      c:\env> %VENV%\Scripts\easy_install pyramid
-
-Windows Using Python 3
-~~~~~~~~~~~~~~~~~~~~~~
-
-#. Install, or find the latest version of `Python 3.x
-   <http://www.python.org/download/>`_ for your system and which is
-   supported by Pyramid.
-
-#. Install the `Python for Windows extensions
-   <http://sourceforge.net/projects/pywin32/files/>`_.  Make sure to
-   pick the right download for Python 3.x and install it using the
-   same Python installation from the previous step.
-
-#. Install latest :term:`distribute` distribution into the Python you
-   obtained/installed/found in the step above: download `distribute_setup.py
-   <http://python-distribute.org/distribute_setup.py>`_ and run it using the
-   ``python`` interpreter of your Python 3.x installation using a command
-   prompt:
+   <https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py>`_
+   and run it using the ``python`` interpreter of your Python 2.7 or 3.3
+   installation using a command prompt:
 
    .. code-block:: text
 
       # modify the command according to the python version, e.g.:
-      # for Python 3.2.x:
-      c:\> c:\Python32\python distribute_setup.py
-      # for Python 3.3.x:
-      c:\> c:\Python33\python distribute_setup.py
+      # for Python 2.7:
+      c:\> c:\Python27\python ez_setup.py
+      # for Python 3.3:
+      c:\> c:\Python33\python ez_setup.py
 
-#. Install :term:`virtualenv`:
+#. Install `virtualenv`:
 
    .. code-block:: text
-
-      # for Python 3.2.x:
-      c:\> c:\Python32\Scripts\easy_install virtualenv
-      # for Python 3.3.x:
+      # modify the command according to the python version, e.g.:
+      # for Python 2.7:
+      c:\> c:\Python27\Scripts\easy_install virtualenv
+      # for Python 3.3:
       c:\> c:\Python33\Scripts\easy_install virtualenv
 
 #. Make a :term:`virtualenv` workspace:
@@ -427,9 +347,11 @@ Windows Using Python 3
    .. code-block:: text
 
       c:\> set VENV=c:\env
-      # for Python 3.2.x:
-      c:\> c:\Python32\Scripts\virtualenv --no-site-packages %VENV%
-      # for Python 3.3.x:
+      
+      # modify the command according to the python version, e.g.:
+      # for Python 2.7:
+      c:\> c:\Python27\Scripts\virtualenv --no-site-packages %VENV%
+      # for Python 3.3:
       c:\> c:\Python33\Scripts\virtualenv --no-site-packages %VENV%
 
    You can either follow the use of the environment variable, ``%VENV%``,

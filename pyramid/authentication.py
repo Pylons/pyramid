@@ -528,6 +528,15 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
 
        This option is available as of :app:`Pyramid` 1.5.
 
+    ``domain``
+
+       Default: ``None``. If provided the auth_tkt cookie will only be
+       set for this domain. This option is not compatible with ``wild_domain``
+       and ``parent_domain``.
+       Optional.
+
+       This option is available as of :app:`Pyramid` 1.5.
+
     ``hashalg``
 
        Default: ``md5`` (the literal string).
@@ -581,6 +590,7 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
                  debug=False,
                  hashalg=_marker,
                  parent_domain=False,
+                 domain=None,
                  ):
         if hashalg is _marker:
             hashalg = 'md5'
@@ -619,6 +629,7 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
             wild_domain=wild_domain,
             hashalg=hashalg,
             parent_domain=parent_domain,
+            domain=domain,
             )
         self.callback = callback
         self.debug = debug
@@ -816,7 +827,7 @@ class AuthTktCookieHelper(object):
     def __init__(self, secret, cookie_name='auth_tkt', secure=False,
                  include_ip=False, timeout=None, reissue_time=None,
                  max_age=None, http_only=False, path="/", wild_domain=True,
-                 hashalg='md5', parent_domain=False):
+                 hashalg='md5', parent_domain=False, domain=None):
         self.secret = secret
         self.cookie_name = cookie_name
         self.include_ip = include_ip
@@ -828,6 +839,7 @@ class AuthTktCookieHelper(object):
         self.path = path
         self.wild_domain = wild_domain
         self.parent_domain = parent_domain
+        self.domain = domain
         self.hashalg = hashalg
 
         static_flags = []
@@ -865,22 +877,25 @@ class AuthTktCookieHelper(object):
         if ':' in cur_domain:
             cur_domain = cur_domain.split(':', 1)[0]
 
-        cookies = [
-            ('Set-Cookie', '%s="%s"; Path=%s%s%s' % (
-            self.cookie_name, value, self.path, max_age, self.static_flags))
-            ]
 
         domains = []
-        if self.parent_domain and cur_domain.count('.') > 1:
-            domains.append('.' + cur_domain.split('.', 1)[1])
+        if self.domain:
+            domains.append(self.domain)
         else:
-            domains.append(cur_domain)
-            if self.wild_domain:
-                domains.append('.' + cur_domain)
+            if self.parent_domain and cur_domain.count('.') > 1:
+                domains.append('.' + cur_domain.split('.', 1)[1])
+            else:
+                domains.append(None)
+                domains.append(cur_domain)
+                if self.wild_domain:
+                    domains.append('.' + cur_domain)
+
+        cookies = []
+        base_cookie = '%s="%s"; Path=%s%s%s' % (self.cookie_name, value,
+                self.path, max_age, self.static_flags)
         for domain in domains:
-            cookies.append(('Set-Cookie', '%s="%s"; Path=%s; Domain=%s%s%s' % (
-                self.cookie_name, value, self.path, domain, max_age,
-                self.static_flags)))
+            domain = '; Domain=%s' % domain if domain is not None else ''
+            cookies.append(('Set-Cookie', '%s%s' % (base_cookie, domain)))
 
         return cookies
 

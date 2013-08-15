@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Quick Glance</title>
+    <!-- Start Link 1 -->
+    <link rel="stylesheet" href="/static/app.css" />
+    <!-- End Link 1 -->
+    <!-- Start Link 2 -->
+    <link rel="stylesheet"
+          href="${request.static_url('static/app.css')}"
+     />
+    <!-- End Link 2 -->
+</head>
+<body>
+<h1>Hello ${name}!</h1>
+</body>
+</html>

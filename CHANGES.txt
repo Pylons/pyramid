@@ -49,9 +49,16 @@ Features
   ``pyramid.config.Configurator.add_static_view``. This allows
   externally-hosted static URLs to be generated based on the current protocol.
 
-- The ``AuthTktAuthenticationPolicy`` has a new ``parent_domain`` option to
-  set the authentication cookie as a wildcard cookie on the parent domain. This
-  is useful if you have multiple sites sharing the same domain.
+- The ``AuthTktAuthenticationPolicy`` has two new options to configure its
+  domain usage: 
+  * ``parent_domain``: if set the authentication cookie is set on
+    the parent domain. This is useful if you have multiple sites sharing the
+    same domain.
+  * ``domain``: if provided the cookie is always set for this domain, bypassing
+     all usual logic.
+  See https://github.com/Pylons/pyramid/pull/1028,
+  https://github.com/Pylons/pyramid/pull/1072 and
+  https://github.com/Pylons/pyramid/pull/1078.
 
 - The ``AuthTktAuthenticationPolicy`` now supports IPv6 addresses when using
   the ``include_ip=True`` option. This is possibly incompatible with
@@ -121,8 +128,21 @@ Features
   https://github.com/Pylons/pyramid/pull/1004 and
   https://github.com/Pylons/pyramid/pull/1046
 
+- The ``pserve`` command now takes a ``-v`` (or ``--verbose``) flag and a
+  ``-q`` (or ``--quiet``) flag.  Output from running ``pserve`` can be
+  controlled using these flags.  ``-v`` can be specified multiple times to
+  increase verbosity.  ``-q`` sets verbosity to ``0`` unconditionally.  The
+  default verbosity level is ``1``.
+
+- The ``alchemy`` scaffold tests now provide better coverage.  See
+  https://github.com/Pylons/pyramid/pull/1029
+
 Bug Fixes
 ---------
+
+- Fixed a Mako renderer bug returning a tuple with a previous defname value
+  in some circumstances. See https://github.com/Pylons/pyramid/issues/1037
+  for more information.
 
 - Make the ``pyramid.config.assets.PackageOverrides`` object implement the API
   for ``__loader__`` objects specified in PEP 302.  Proxies to the
@@ -155,6 +175,23 @@ Bug Fixes
   Python 3 would use ``__len__`` to find truthiness; this usually caused an
   instance of DummyResource to be "falsy" instead of "truthy".  See
   https://github.com/Pylons/pyramid/pull/1032
+
+- The ``alchemy`` scaffold would break when the database was MySQL during
+  tables creation.  See https://github.com/Pylons/pyramid/pull/1049
+
+- The ``current_route_url`` method now attaches the query string to the URL by
+  default. See
+  https://github.com/Pylons/pyramid/issues/1040
+
+- Make ``pserve.cherrypy_server_runner`` Python 3 compatible. See
+  https://github.com/Pylons/pyramid/issues/718
+
+Backwards Incompatibilities
+---------------------------
+
+- Modified the ``current_route_url`` method in pyramid.Request. The method
+  previously returned the URL without the query string by default, it now does
+  attach the query string unless it is overriden.
 
 1.4 (2012-12-18)
 ================
@@ -247,7 +284,7 @@ Features
      @subscriber(SomeOtherEvent)
      def asubscriber(event):
          pass
- 
+
   And you wanted to use a subscriber predicate::
 
      @subscriber([SomeEvent, SomeContextType], mypredicate=True)
@@ -321,7 +358,7 @@ Features
 
      @subscriber([SomeContextType, SomeEvent])
      def asubscriber(event):
-         # bzzt! you'll be getting the context here as ``event``, and it'll 
+         # bzzt! you'll be getting the context here as ``event``, and it'll
          # be useless
 
   Existing multiple-argument subscribers continue to work without issue, so you
@@ -591,7 +628,7 @@ Bug Fixes
   https://github.com/Pylons/pyramid/issues/606
   https://github.com/Pylons/pyramid/issues/607
 
-- In Mako Templates lookup, check for absolute uri (using mako directories) 
+- In Mako Templates lookup, check for absolute uri (using mako directories)
   when mixing up inheritance with asset specs.
   https://github.com/Pylons/pyramid/issues/662
 
@@ -810,13 +847,13 @@ Backwards Incompatibilities
   * ``registerAdapter``, use
     ``pyramid.config.Configurator.registry.registerAdapter`` instead.
 
-  * ``registerSubscriber``, use 
+  * ``registerSubscriber``, use
     ``pyramid.config.Configurator.add_subscriber`` instead.
 
-  * ``registerRoute``, use 
+  * ``registerRoute``, use
     ``pyramid.config.Configurator.add_route`` instead.
 
-  * ``registerSettings``, use 
+  * ``registerSettings``, use
     ``pyramid.config.Configurator.add_settings`` instead.
 
 - In Pyramid 1.3 and previous, the ``__call__`` method of a Response object

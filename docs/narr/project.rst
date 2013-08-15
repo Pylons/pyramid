@@ -992,6 +992,8 @@ prompt with a similar configuration as would be loaded if you were running
 your Pyramid application via ``pserve``.  This can be a useful debugging tool.
 See :ref:`interactive_shell` for more details.
 
+.. _what_is_this_pserve_thing:
+
 What Is This ``pserve`` Thing
 -----------------------------
 
@@ -1005,12 +1007,12 @@ Pyramid application based on the data in the file.
 application.  As we saw in :ref:`firstapp_chapter`, ``pserve`` needn't be
 invoked at all to run a :app:`Pyramid` application.  The use of ``pserve`` to
 run a :app:`Pyramid` application is purely conventional based on the output
-of its scaffolding.  But we strongly recommend using while developing your
-application, because many other convenience introspection commands (such as
-``pviews``, ``prequest``, ``proutes`` and others) are also implemented in
-terms of configuration availability of this ``.ini`` file format.  It also
-configures Pyramid logging and provides the ``--reload`` switch for
-convenient restarting of the server when code changes.
+of its scaffolding.  But we strongly recommend using ``pserve`` while
+developing your application, because many other convenience introspection
+commands (such as ``pviews``, ``prequest``, ``proutes`` and others) are also
+implemented in terms of configuration availability of this ``.ini`` file
+format.  It also configures Pyramid logging and provides the ``--reload``
+switch for convenient restarting of the server when code changes.
 
 .. _alternate_wsgi_server:
 

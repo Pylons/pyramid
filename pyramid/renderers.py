@@ -114,7 +114,7 @@ def render_to_response(renderer_name, value, request=None, package=None):
     top-level system names, such as ``request``, ``context``,
     ``renderer_name``, and ``view``.  See :ref:`renderer_system_values` for
     the full list.  If :term:`renderer globals` have been specified, these
-    will also be used to agument the value.
+    will also be used to argument the value.
 
     Supply a ``request`` parameter in order to provide the renderer
     with the most correct 'system' values (``request`` and ``context``
@@ -200,7 +200,7 @@ class JSON(object):
     The default serializer uses ``json.JSONEncoder``. A different
     serializer can be specified via the ``serializer`` argument.
     Custom serializers should accept the object, a callback
-    ``default``, and any extra ``kw`` keyword argments passed during
+    ``default``, and any extra ``kw`` keyword arguments passed during
     renderer construction.
 
     .. versionadded:: 1.4

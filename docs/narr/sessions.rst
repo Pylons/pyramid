@@ -148,6 +148,7 @@ Some gotchas:
 .. index::
    single: pyramid_beaker
    single: Beaker
+   single: pyramid_redis_sessions
    single: session factory (alternates)
 
 .. _using_alternate_session_factories:
@@ -155,11 +156,17 @@ Some gotchas:
 Using Alternate Session Factories
 ---------------------------------
 
-At the time of this writing, exactly one alternate session factory
-implementation exists, named ``pyramid_beaker``. This is a session factory
-that uses the `Beaker <http://beaker.groovie.org/>`_ library as a backend.
-Beaker has support for file-based sessions, database based sessions, and
-encrypted cookie-based sessions.  See `the pyramid_beaker documentation
+At the time of this writing, exactly two alternate session factories
+exist.
+
+The first is named ``pyramid_redis_sessions``.  It can be downloaded from PyPI.
+It uses Redis as a backend.  It is the recommended persistent session solution
+at the time of this writing.
+
+The second is named ``pyramid_beaker``. This is a session factory that uses the
+`Beaker <http://beaker.groovie.org/>`_ library as a backend.  Beaker has
+support for file-based sessions, database based sessions, and encrypted
+cookie-based sessions.  See `the pyramid_beaker documentation
 <http://docs.pylonsproject.org/projects/pyramid_beaker/en/latest/>`_ for more
 information about ``pyramid_beaker``.
 
@@ -180,6 +187,8 @@ implementation in the :mod:`pyramid.session` module as inspiration.
 
 .. index::
    single: flash messages
+
+.. _flash_messages:
 
 Flash Messages
 --------------
