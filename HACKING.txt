@@ -40,7 +40,7 @@ you an achieve the same manually by following these steps:
 
 - Create a virtualenv in which to install Pyramid::
 
-  $ virtualenv --no-site-packages env
+  $ virtualenv env
 
 - Install ``setuptools-git`` into the virtualenv (for good measure, as we're
   using git to do version control)::
@@ -132,7 +132,7 @@ Running Tests
   intended as a convenience for people who are more used or fond of ``pytest``.
   Run the tests like so::
 
-   $ pip install pytest
+   $ $VENV/bin/easy_install pytest
    $ py.test --strict pyramid/
 
 Test Coverage
