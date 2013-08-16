@@ -611,7 +611,6 @@ class TestURLMethodsMixin(unittest.TestCase):
                          ('pyramid.tests:static/foo.css', request, {}) )
 
     def test_static_url_abspath_integration_with_staticurlinfo(self):
-        import os
         from pyramid.interfaces import IStaticURLInfo
         from pyramid.config.views import StaticURLInfo
         info = StaticURLInfo()
@@ -626,7 +625,6 @@ class TestURLMethodsMixin(unittest.TestCase):
                          'http://example.com:5432/absstatic/test_url.py')
 
     def test_static_url_noscheme_uses_scheme_from_request(self):
-        import os
         from pyramid.interfaces import IStaticURLInfo
         from pyramid.config.views import StaticURLInfo
         info = StaticURLInfo()
