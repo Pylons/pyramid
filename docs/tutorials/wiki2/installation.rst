@@ -26,7 +26,7 @@ On UNIX
 .. code-block:: text
 
    $ export VENV=~/pyramidtut
-   $ virtualenv --no-site-packages $VENV
+   $ virtualenv $VENV
    New python executable in /home/foo/env/bin/python
    Installing setuptools.............done.
 
@@ -46,13 +46,13 @@ Python 2.7:
 
 .. code-block:: text
 
-   c:\> c:\Python27\Scripts\virtualenv --no-site-packages %VENV%
+   c:\> c:\Python27\Scripts\virtualenv %VENV%
 
 Python 3.2:
 
 .. code-block:: text
 
-   c:\> c:\Python32\Scripts\virtualenv --no-site-packages %VENV%
+   c:\> c:\Python32\Scripts\virtualenv %VENV%
 
 Install Pyramid Into the Virtual Python Environment
 ---------------------------------------------------

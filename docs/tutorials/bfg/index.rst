@@ -60,7 +60,7 @@ Here's how to convert a :mod:`repoze.bfg` application to a
    .. code-block:: bash
 
       $ cd ~
-      $ virtualenv --no-site-packages pyramidenv
+      $ virtualenv pyramidenv
       $ cd pyramidenv
       $ $VENV/bin/easy_install pyramid
 
