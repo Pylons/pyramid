@@ -1955,12 +1955,6 @@ class DummyRequest:
         self.params = {}
         self.cookies = {}
 
-class DummyResponse:
-    status = '200 OK'
-    headerlist = ()
-    app_iter = ()
-    body = ''
-
 class DummyThreadLocalManager(object):
     pushed = None
     popped = False
@@ -1992,11 +1986,6 @@ class DummyRegistry(object):
     def queryUtility(self, *arg, **kw):
         return self.util
 
-from pyramid.interfaces import IResponse
-@implementer(IResponse)
-class DummyResponse(object):
-    pass
-    
 from zope.interface import Interface
 class IOther(Interface):
     pass
