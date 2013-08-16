@@ -41,19 +41,20 @@ install_requires=[
     'translationstring',
     ]
 
+
 if platform.system() == 'Java':
-    tests_require = install_requires + [
-        'WebTest',
-        'virtualenv',
-        ]
+    docs_require = ['Sphinx']
+    tests_require = ['WebTest']
 else:
-    tests_require= install_requires + [
-        'Sphinx',
-        'docutils',
-        'repoze.sphinx.autointerface',
-        'WebTest', 
-        'virtualenv',
-        ]
+    docs_require = ['Sphinx',
+                    'repoze.sphinx.autointerface',
+                   ]
+    tests_require = ['Sphinx',
+                     'docutils',
+                     'WebTest < 2.0dev',
+                     'nose',
+                     'coverage'
+                    ]
 
 if sys.version_info[:2] < (2, 6):
     install_requires.append('simplejson')
@@ -80,8 +81,11 @@ setup(name='pyramid',
       include_package_data=True,
       zip_safe=False,
       install_requires = install_requires,
-      tests_require = tests_require,
       test_suite="pyramid.tests",
+      extras_require = {
+        'testing': tests_require,
+        'docs': docs_require,
+      },
       entry_points = """\
         [paste.paster_create_template]
         pyramid_starter=pyramid.scaffolds:StarterProjectTemplate
