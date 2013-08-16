@@ -64,7 +64,7 @@ if not PY3:
         'zope.component>=3.11.0',
         ])
 
-tests_require += ['nose', 'coverage']
+test_extras = tests_require + ['nose', 'coverage']
 
 setup(name='pyramid',
       version='1.3.4',
@@ -94,8 +94,9 @@ setup(name='pyramid',
       include_package_data=True,
       zip_safe=False,
       install_requires = install_requires,
+      tests_require = tests_require,
       extras_require = {
-          'testing': tests_require,
+          'testing': test_extras,
           'docs': docs_require,
           },
       test_suite="pyramid.tests",
