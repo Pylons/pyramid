@@ -82,6 +82,7 @@ setup(name='pyramid',
       zip_safe=False,
       install_requires = install_requires,
       test_suite="pyramid.tests",
+      tests_require=install_requires + tests_require,
       extras_require = {
         'testing': tests_require,
         'docs': docs_require,
