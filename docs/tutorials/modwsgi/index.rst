@@ -46,7 +46,7 @@ specific path information for commands and files.
        $ cd ~
        $ mkdir modwsgi
        $ cd modwsgi
-       $ /usr/local/bin/virtualenv --no-site-packages env
+       $ /usr/local/bin/virtualenv env
 
 #.  Install :app:`Pyramid` into the newly created virtualenv:
 
