@@ -291,7 +291,7 @@ actually execute the function until accessed.
        return sum(args)
 
    def prop(request):
-       print "getting the property"
+       print("getting the property")
        return "the property"
 
    config = Configurator()
@@ -332,7 +332,7 @@ Here is an example of passing a class to ``Configurator.add_request_method``:
        # use @property if you don't want to cache the result
        @reify
        def prop(self):
-           print "getting the property"
+           print("getting the property")
            return "the property"
 
    config = Configurator()

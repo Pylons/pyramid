@@ -40,7 +40,7 @@ class subscriber(object):
 
        @subscriber(NewRequest, NewResponse)
        def mysubscriber(event):
-           print event
+           print(event)
 
     When the ``subscriber`` decorator is used without passing an arguments,
     the function it decorates is called for every event sent:
@@ -51,7 +51,7 @@ class subscriber(object):
 
        @subscriber()
        def mysubscriber(event):
-           print event
+           print(event)
 
     This method will have no effect until a :term:`scan` is performed
     against the package or module which contains it, ala:

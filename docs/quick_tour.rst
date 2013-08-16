@@ -37,7 +37,7 @@ If ``wget`` complains with a certificate error, run it with:
 
 In these steps above we first made a :term:`virtualenv` and then
 "activated"  it, which adjusted our path to look first in
-``env33/bin`` for commands (such as ``python``.) We next downloaded
+``env33/bin`` for commands (such as ``python``). We next downloaded
 Python's packaging support and installed it, giving us the
 ``easy_install`` command-line script for adding new packages. Python
 2.7 users will need to use ``virtualenv`` instead of ``pyvenv`` to make

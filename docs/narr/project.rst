@@ -49,9 +49,7 @@ The included scaffolds are these:
   URL mapping via :term:`URL dispatch` and no persistence mechanism.
 
 ``zodb``
-  URL mapping via :term:`traversal` and persistence via :term:`ZODB`.  *Note
-  that, as of this writing, this scaffold will not run under Python 3, only
-  under Python 2.*
+  URL mapping via :term:`traversal` and persistence via :term:`ZODB`.
 
 ``alchemy``
   URL mapping via :term:`URL dispatch` and persistence via
