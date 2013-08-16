@@ -31,23 +31,31 @@ install_requires=[
     'Paste > 1.7', # temp version pin to prevent PyPi install failure :-(
     'PasteDeploy',
     'PasteScript',
-    'WebOb >= 1.0.2', # no "default_charset"; request.script_name doesnt error
+    'WebOb >= 1.0.2, < 1.2dev', # no "default_charset"; Py3k unicode breakage
     'repoze.lru',
     'setuptools',
     'zope.component >= 3.6.0', # independent of zope.hookable
-    'zope.configuration',
+    'zope.configuration < 3.8dev', # actions-as-dicts
     'zope.deprecation',
     'zope.interface >= 3.5.1',  # 3.5.0 comment: "allow to bootstrap on jython"
     'venusian >= 0.5', # ``codeinfo``
     'translationstring',
     ]
 
+
 if platform.system() == 'Java':
-    tests_require = install_requires + ['WebTest', 'virtualenv']
+    docs_require = ['Sphinx']
+    tests_require = ['WebTest']
 else:
-    tests_require= install_requires + ['Sphinx', 'docutils', 
-                                       'WebTest', 'repoze.sphinx.autointerface',
-                                       'virtualenv']
+    docs_require = ['Sphinx',
+                    'repoze.sphinx.autointerface',
+                   ]
+    tests_require = ['Sphinx',
+                     'docutils',
+                     'WebTest < 2.0dev',
+                     'nose',
+                     'coverage'
+                    ]
 
 if sys.version_info[:2] < (2, 6):
     install_requires.append('simplejson')
@@ -74,8 +82,11 @@ setup(name='pyramid',
       include_package_data=True,
       zip_safe=False,
       install_requires = install_requires,
-      tests_require = tests_require,
       test_suite="pyramid.tests",
+      extras_require = {
+        'testing': tests_require,
+        'docs': docs_require,
+      },
       entry_points = """\
         [paste.paster_create_template]
         pyramid_starter=pyramid.scaffolds:StarterProjectTemplate
