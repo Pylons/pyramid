@@ -51,12 +51,15 @@ class TestSettings(unittest.TestCase):
     def setUp(self):
         self.warnings = []
         import warnings
+        self.old_filters = warnings.filters[:]
         warnings.old_showwarning = warnings.showwarning
         warnings.showwarning = self._showwarning
+        warnings.resetwarnings()
 
     def tearDown(self):
         del self.warnings
         import warnings
+        warnings.filters[:] = self.old_filters
         warnings.showwarning = warnings.old_showwarning
 
     def _showwarning(self, message, category, filename, lineno, file=None,
