@@ -256,7 +256,7 @@ you can then create a virtual environment.  To do so, invoke the following:
 .. code-block:: text
 
    $ export VENV=~/env
-   $ virtualenv --no-site-packages $VENV
+   $ virtualenv $VENV
    New python executable in /home/foo/env/bin/python
    Installing setuptools.............done.
 
@@ -267,17 +267,16 @@ it's an absolute path.
 
 .. warning::
 
-   Using ``--no-site-packages`` when generating your virtualenv is *very
-   important*. This flag provides the necessary isolation for running the set
-   of packages required by :app:`Pyramid`.  If you do not specify
-   ``--no-site-packages``, it's possible that :app:`Pyramid` will not install
-   properly into the virtualenv, or, even if it does, may not run properly,
-   depending on the packages you've already got installed into your Python's
-   "main" site-packages dir.
+   Avoid using the ``--system-site-packages`` option when creating the
+   virtualenv unless you know what you are doing. For versions of virtualenv
+   prior to 1.7, make sure to use the ``--no-site-packages`` option, because
+   this option was formerly not the default and may produce undesirable
+   results.
 
-.. warning:: *do not* use ``sudo`` to run the
-   ``virtualenv`` script.  It's perfectly acceptable (and desirable) to create
-   a virtualenv as a normal user.
+.. warning::
+
+    *do not* use ``sudo`` to run the ``virtualenv`` script.  It's perfectly
+    acceptable (and desirable) to create a virtualenv as a normal user.
 
 
 Installing :app:`Pyramid` Into the Virtual Python Environment
@@ -343,9 +342,9 @@ You can use Pyramid on Windows under Python 2 or 3.
       c:\> set VENV=c:\env
       # modify the command according to the python version, e.g.:
       # for Python 2.7:
-      c:\> c:\Python27\Scripts\virtualenv --no-site-packages %VENV%
+      c:\> c:\Python27\Scripts\virtualenv %VENV%
       # for Python 3.3:
-      c:\> c:\Python33\Scripts\virtualenv --no-site-packages %VENV%
+      c:\> c:\Python33\Scripts\virtualenv %VENV%
 
    You can either follow the use of the environment variable, ``%VENV%``, or
    replace it with the root directory of the :term:`virtualenv`. In that case,
