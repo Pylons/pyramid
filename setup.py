@@ -43,6 +43,7 @@ install_requires=[
     ]
 
 
+
 if platform.system() == 'Java':
     docs_require = ['Sphinx']
     tests_require = ['WebTest']
@@ -50,9 +51,7 @@ else:
     docs_require = ['Sphinx',
                     'repoze.sphinx.autointerface',
                    ]
-    tests_require = ['Sphinx',
-                     'docutils',
-                     'WebTest < 2.0dev',
+    tests_require = ['WebTest',
                      'nose',
                      'coverage'
                     ]
@@ -83,6 +82,7 @@ setup(name='pyramid',
       zip_safe=False,
       install_requires = install_requires,
       test_suite="pyramid.tests",
+      tests_require=install_requires + tests_require,
       extras_require = {
         'testing': tests_require,
         'docs': docs_require,
