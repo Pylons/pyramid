@@ -128,6 +128,13 @@ Running Tests
    $ cd ~/hack-on-pyramid/pyramid
    $ /usr/bin/tox
 
+- The tests can also be run usign ``pytest`` (http://pytest.org/).  This is
+  intended as a convenience for people who are more used or fond of ``pytest``.
+  Run the tests like so::
+
+   $ pip install pytest
+   $ py.test --strict pyramid/
+
 Test Coverage
 -------------
 
