@@ -129,7 +129,7 @@ platforms.
    tutorials/bfg/index.rst
    tutorials/modwsgi/index.rst
 
-.. _api_documentation:
+.. _html_api_documentation:
 
 API Documentation
 =================
@@ -204,5 +204,4 @@ Index and Glossary
    :hidden:
 
    glossary
-   latexindex
 
