@@ -267,9 +267,11 @@ it's an absolute path.
 
 .. warning::
 
-   ``--no-site-packages`` is now the default for virtualenv and can be
-   omitted. Do not override the default and use ``--system-site-packages``
-   unless you know what you are doing.
+   Avoid using the ``--system-site-packages`` option when creating the
+   virtualenv unless you know what you are doing. For versions of virtualenv
+   prior to 1.7, make sure to use the ``--no-site-packages`` option, because
+   this option was formerly not the default and may produce undesirable
+   results.
 
 .. warning::
 
