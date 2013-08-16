@@ -403,7 +403,7 @@ latex_elements = {
     'wrapperclass': 'book',
     'date': '',
     'releasename': 'Version',
-    'title': r'The Pyramid Web Application \newline Development Framework',
+    'title': r'The Pyramid Web Framework',
 #    'pointsize':'12pt', # uncomment for 12pt version
 }
 
