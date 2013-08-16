@@ -16,13 +16,31 @@ checkout.
 
 - Check out a read-only copy of the Pyramid source::
 
-  $ git clone git://github.com/Pylons/pyramid.git
+  $ git clone git://github.com/Pylons/pyramid.git .
 
   (alternately, create a writeable fork on GitHub and check that out).
 
+Since pyramid is a framework and not an application, it can be
+convenient to work against a sample application, preferably in its
+own virtualenv. A quick way to achieve this is to (ab-)use ``tox``
+with a custom configuration file that's part of the checkout::
+
+  tox -c hacking-tox.ini
+
+This will create a python-2.7 based virtualenv named ``env27`` (pyramid's
+``.gitconfig` ignores all top-level folders that start with ``env`` specifically
+for this use case) and inside that a simple pyramid application named
+``hacking`` that you can then fire up like so::
+
+  cd env27/hacking
+  ../bin/pserve development.ini
+
+Alternatively, if you don't want to install ``tox`` at this point,
+you an achieve the same manually by following these steps:
+
 - Create a virtualenv in which to install Pyramid::
 
-  $ virtualenv2.6 --no-site-packages env
+  $ virtualenv --no-site-packages env
 
 - Install ``setuptools-git`` into the virtualenv (for good measure, as we're
   using git to do version control)::
