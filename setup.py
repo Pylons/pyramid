@@ -26,16 +26,16 @@ except IOError:
     README = CHANGES = ''
 
 install_requires=[
-    'Chameleon >= 1.2.3',
+    'Chameleon >= 1.2.3, < 2.0dev', # breaks expeted output
     'Mako >= 0.3.6', # strict_undefined
     'Paste > 1.7', # temp version pin to prevent PyPi install failure :-(
     'PasteDeploy',
     'PasteScript',
-    'WebOb >= 1.0', # no "default_charset"
+    'WebOb >= 1.0, < 1.2dev', # no "default_charset"; Py3k unicode breakage
     'repoze.lru',
     'setuptools',
     'zope.component >= 3.6.0', # independent of zope.hookable
-    'zope.configuration',
+    'zope.configuration < 3.8dev', # actions-as-dicts
     'zope.deprecation',
     'zope.interface >= 3.5.1',  # 3.5.0 comment: "allow to bootstrap on jython"
     'venusian >= 0.5', # ``codeinfo``
