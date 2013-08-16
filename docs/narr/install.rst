@@ -309,7 +309,7 @@ You can use Pyramid on Windows under Python 2 or 3.
 #. Download and install the `Python for Windows extensions
    <http://sourceforge.net/projects/pywin32/files/pywin32/>`_. Carefully read
    the README.txt file at the end of the list of builds, and follow its
-   directions. Make sure you get the proper "bittedness" of build and Python
+   directions. Make sure you get the proper 32- or 64-bit build and Python
    version.
 
 #. Install latest :term:`setuptools` distribution into the Python from step 1
