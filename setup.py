@@ -52,6 +52,8 @@ else:
     tests_require = ['Sphinx',
                      'docutils',
                      'WebTest < 2.0dev',
+                     'nose',
+                     'coverage'
                     ]
 
 if sys.version_info[:2] < (2, 6):
