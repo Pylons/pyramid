@@ -65,7 +65,7 @@ manager is slightly different, but the "flavor" of them is usually the same.
 
 For example, on a Debian or Ubuntu system, use the following command:
 
-.. code-block:: bash
+.. code-block:: text
 
    $ sudo apt-get install python2.7-dev
 
@@ -93,7 +93,7 @@ To compile software on your UNIX system, typically you need development tools.
 Often these can be installed via the package manager.  For example, this works
 to do so on an Ubuntu Linux system:
 
-.. code-block:: bash
+.. code-block:: text
 
    $ sudo apt-get install build-essential
 
@@ -104,7 +104,7 @@ Once you've got development tools installed on your system, you can install a
 Python 2.7 interpreter from *source*, on the same system, using the following
 commands:
 
-.. code-block:: bash
+.. code-block:: text
 
    $ cd ~
    $ mkdir tmp
@@ -163,14 +163,14 @@ the Python interpreter you'd like to run :app:`Pyramid` under.
 The following command will not display anything if setuptools is already
 installed:
 
-.. code-block:: bash
+.. code-block:: text
 
    $ python2.7 -c 'import setuptools'
 
 Running the same command will yield the following output if setuptools is not
 yet installed:
 
-.. code-block:: bash
+.. code-block:: text
 
    Traceback (most recent call last):
      File "<stdin>", line 1, in <module>
@@ -194,7 +194,7 @@ To install setuptools by hand under Python 2, first download `ez_setup.py
 <https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py>`_ then invoke
 it using the Python interpreter into which you want to install setuptools.
 
-.. code-block:: bash
+.. code-block:: text
 
    $ python ez_setup.py
 
@@ -203,7 +203,7 @@ If the command fails due to permission errors, you may need to be the
 administrative user on your system to successfully invoke the script.  To
 remediate this, you may need to do:
 
-.. code-block:: bash
+.. code-block:: text
 
    $ sudo python ez_setup.py
 
@@ -231,7 +231,7 @@ setuptools-enabled Python interpreter, use the ``easy_install`` command.
    software such as ``setuptools`` into the virtual environment manually, which
    this guide does not cover.
 
-.. code-block:: bash
+.. code-block:: text
 
    $ easy_install virtualenv
 
@@ -239,7 +239,7 @@ This command should succeed, and tell you that the virtualenv package is now
 installed.  If it fails due to permission errors, you may need to install it as
 your system's administrative user.  For example:
 
-.. code-block:: bash
+.. code-block:: text
 
    $ sudo easy_install virtualenv
 
@@ -253,7 +253,7 @@ Creating the Virtual Python Environment
 Once the :term:`virtualenv` package is installed in your Python environment,
 you can then create a virtual environment.  To do so, invoke the following:
 
-.. code-block:: bash
+.. code-block:: text
 
    $ export VENV=~/env
    $ virtualenv --no-site-packages $VENV
@@ -286,7 +286,7 @@ Installing :app:`Pyramid` Into the Virtual Python Environment
 After you've got your virtualenv installed, you may install :app:`Pyramid`
 itself using the following commands:
 
-.. code-block:: bash
+.. code-block:: text
 
    $ $VENV/bin/easy_install pyramid
 
@@ -318,7 +318,7 @@ You can use Pyramid on Windows under Python 2 or 3.
    it using the ``python`` interpreter of your Python 2.7 or 3.3 installation
    using a command prompt:
 
-   .. code-block:: bash
+   .. code-block:: text
 
       # modify the command according to the python version, e.g.:
       # for Python 2.7:
@@ -328,7 +328,7 @@ You can use Pyramid on Windows under Python 2 or 3.
 
 #. Install `virtualenv`:
 
-   .. code-block:: bash
+   .. code-block:: text
 
       # modify the command according to the python version, e.g.:
       # for Python 2.7:
@@ -338,7 +338,7 @@ You can use Pyramid on Windows under Python 2 or 3.
 
 #. Make a :term:`virtualenv` workspace:
 
-   .. code-block:: bash
+   .. code-block:: text
 
       c:\> set VENV=c:\env
       # modify the command according to the python version, e.g.:
@@ -358,7 +358,7 @@ You can use Pyramid on Windows under Python 2 or 3.
 #. Use ``easy_install`` to get :app:`Pyramid` and its direct dependencies
    installed:
 
-   .. code-block:: bash
+   .. code-block:: text
 
       c:\env> %VENV%\Scripts\easy_install pyramid
 
