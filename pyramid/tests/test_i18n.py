@@ -238,11 +238,15 @@ class Test_get_localizer(unittest.TestCase):
         self.assertEqual(result.__class__, Localizer)
         self.assertEqual(result.locale_name, 'en')
 
-    def test_no_registry_on_request(self):
+    def test_custom_localizer(self):
+        from pyramid.threadlocal import get_current_registry
+        from pyramid.interfaces import ILocalizer
+        registry = get_current_registry()
+        dummy = object()
+        registry.registerUtility(dummy, ILocalizer, name='en')
         request = DummyRequest()
-        request.localizer = '123'
         result = self._callFUT(request)
-        self.assertEqual(result, '123')
+        self.assertEqual(result, dummy)
 
     def test_with_registry_on_request(self):
         from pyramid.threadlocal import get_current_registry
