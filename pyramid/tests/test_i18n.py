@@ -238,7 +238,7 @@ class Test_get_localizer(unittest.TestCase):
         self.assertEqual(result.__class__, Localizer)
         self.assertEqual(result.locale_name, 'en')
 
-    def test_custom_localizer(self):
+    def test_custom_localizer_for_default_locale(self):
         from pyramid.threadlocal import get_current_registry
         from pyramid.interfaces import ILocalizer
         registry = get_current_registry()
@@ -248,7 +248,7 @@ class Test_get_localizer(unittest.TestCase):
         result = self._callFUT(request)
         self.assertEqual(result, dummy)
 
-    def test_locale_from_registry(self):
+    def test_custom_localizer_for_custom_locale(self):
         from pyramid.threadlocal import get_current_registry
         from pyramid.interfaces import ILocalizer
         registry = get_current_registry()
@@ -259,7 +259,7 @@ class Test_get_localizer(unittest.TestCase):
         result = self._callFUT(request)
         self.assertEqual(result, dummy)
 
-    def test_locale_from_mo(self):
+    def test_localizer_from_mo(self):
         from pyramid.threadlocal import get_current_registry
         from pyramid.interfaces import ITranslationDirectories
         from pyramid.i18n import Localizer
@@ -275,7 +275,7 @@ class Test_get_localizer(unittest.TestCase):
         self.assertEqual(result.translate('Approve'), 'Approve')
         self.assertTrue(hasattr(result, 'pluralize'))
 
-    def test_locale_from_mo_bad_mo(self):
+    def test_localizer_from_mo_bad_mo(self):
         from pyramid.threadlocal import get_current_registry
         from pyramid.interfaces import ITranslationDirectories
         from pyramid.i18n import Localizer
