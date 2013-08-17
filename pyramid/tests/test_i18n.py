@@ -252,12 +252,12 @@ class Test_get_localizer(unittest.TestCase):
         from pyramid.threadlocal import get_current_registry
         from pyramid.interfaces import ILocalizer
         registry = get_current_registry()
-        locale = 'abc'
-        registry.registerUtility(locale, ILocalizer, name='en')
+        dummy = object()
+        registry.registerUtility(dummy, ILocalizer, name='ie')
         request = DummyRequest()
-        request.locale_name = 'en'
+        request.locale_name = 'ie'
         result = self._callFUT(request)
-        self.assertEqual(result, 'abc')
+        self.assertEqual(result, dummy)
 
     def test_locale_from_mo(self):
         from pyramid.threadlocal import get_current_registry
