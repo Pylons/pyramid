@@ -404,7 +404,7 @@ class RoutesConfiguratorMixin(object):
                 kw['_app_url'] = '{0}://{1}'.format(scheme, parsed.netloc)
               return elements, kw
 
-          pregenerator = external_url_pregenerator
+            pregenerator = external_url_pregenerator
 
         mapper = self.get_routes_mapper()
 
