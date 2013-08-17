@@ -755,7 +755,7 @@ other non-``name`` and non-``pattern`` arguments to
 exception to this rule is use of the ``pregenerator`` argument, which is not
 ignored when ``static`` is ``True``.
 
-:ref:`External routes <external_route_narr>` are implicitely static.
+:ref:`External routes <external_route_narr>` are implicitly static.
 
 .. versionadded:: 1.1
    the ``static`` argument to :meth:`~pyramid.config.Configurator.add_route`
