@@ -230,39 +230,36 @@ class Test_get_localizer(unittest.TestCase):
         from pyramid.i18n import get_localizer
         return get_localizer(request)
 
-    def test_no_registry_on_request(self):
+    def test_default_localizer(self):
+        # `get_localizer` returns a default localizer for `en`
+        from pyramid.i18n import Localizer
         request = DummyRequest()
-        request.localizer = '123'
         result = self._callFUT(request)
-        self.assertEqual(result, '123')
+        self.assertEqual(result.__class__, Localizer)
+        self.assertEqual(result.locale_name, 'en')
 
-    def test_with_registry_on_request(self):
-        from pyramid.threadlocal import get_current_registry
-        registry = get_current_registry()
-        request = DummyRequest()
-        request.localizer = '123'
-        request.registry = registry
-        result = self._callFUT(request)
-        self.assertEqual(result, '123')
-
-    def test_locale_on_request(self):
-        request = DummyRequest()
-        request.localizer = 'abc'
-        result = self._callFUT(request)
-        self.assertEqual(result, 'abc')
-
-    def test_locale_from_registry(self):
+    def test_custom_localizer_for_default_locale(self):
         from pyramid.threadlocal import get_current_registry
         from pyramid.interfaces import ILocalizer
         registry = get_current_registry()
-        locale = 'abc'
-        registry.registerUtility(locale, ILocalizer, name='en')
+        dummy = object()
+        registry.registerUtility(dummy, ILocalizer, name='en')
         request = DummyRequest()
-        request.locale_name = 'en'
         result = self._callFUT(request)
-        self.assertEqual(result, 'abc')
+        self.assertEqual(result, dummy)
 
-    def test_locale_from_mo(self):
+    def test_custom_localizer_for_custom_locale(self):
+        from pyramid.threadlocal import get_current_registry
+        from pyramid.interfaces import ILocalizer
+        registry = get_current_registry()
+        dummy = object()
+        registry.registerUtility(dummy, ILocalizer, name='ie')
+        request = DummyRequest()
+        request.locale_name = 'ie'
+        result = self._callFUT(request)
+        self.assertEqual(result, dummy)
+
+    def test_localizer_from_mo(self):
         from pyramid.threadlocal import get_current_registry
         from pyramid.interfaces import ITranslationDirectories
         from pyramid.i18n import Localizer
@@ -278,7 +275,7 @@ class Test_get_localizer(unittest.TestCase):
         self.assertEqual(result.translate('Approve'), 'Approve')
         self.assertTrue(hasattr(result, 'pluralize'))
 
-    def test_locale_from_mo_bad_mo(self):
+    def test_localizer_from_mo_bad_mo(self):
         from pyramid.threadlocal import get_current_registry
         from pyramid.interfaces import ITranslationDirectories
         from pyramid.i18n import Localizer
@@ -291,6 +288,23 @@ class Test_get_localizer(unittest.TestCase):
         self.assertEqual(result.__class__, Localizer)
         self.assertEqual(result.translate('Approve', 'deformsite'),
                          'Approve')
+
+    def test_request_has_localizer(self):
+        from pyramid.threadlocal import get_current_registry
+        from pyramid.interfaces import ILocalizer
+        from pyramid.request import Request
+        # register mock localizer
+        dummy = object()
+        registry = get_current_registry()
+        registry.registerUtility(dummy, ILocalizer, name='en')
+        request = Request(environ={})
+        self.assertEqual(request.localizer, dummy)
+        # `get_localizer` is only called once...
+        other = object()
+        registry.registerUtility(other, ILocalizer, name='en')
+        self.assertNotEqual(request.localizer, other)
+        self.assertEqual(request.localizer, dummy)
+
 
 class Test_default_locale_negotiator(unittest.TestCase):
     def setUp(self):
