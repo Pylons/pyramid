@@ -112,9 +112,13 @@ Coding Style
 Running Tests
 --------------
 
-- To run tests for Pyramid on a single Python version, run ``python setup.py
-  test`` against the Python interpreter from virtualenv into which
-  you've ``setup.py develop``-ed Pyramid.
+- To run all tests for Pyramid on a single Python version, run ``nosetests`` from
+  your development virtualenv (See *Using a Development Checkout* above).
+
+- To run individual tests (i.e. during development) you can use a regular
+  expression with the ``-t`` parameter courtesy of the `nose-selecttests
+  <https://pypi.python.org/pypi/nose-selecttests/>`_ plugin that's been installed (along with nose itself) via ``python setup.py dev``. The easiest usage is to
+  simply provide the verbatim name of the test you're working on.
 
 - To run the full set of Pyramid tests on all platforms, install ``tox``
   (http://codespeak.net/~hpk/tox/) into a system Python.  The ``tox`` console
