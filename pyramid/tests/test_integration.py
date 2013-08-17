@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import datetime
+import locale
 import os
+import platform
 import unittest
 
 from pyramid.wsgi import wsgiapp
@@ -12,6 +14,8 @@ from zope.interface import Interface
 
 # 5 years from now (more or less)
 fiveyrsfuture = datetime.datetime.utcnow() + datetime.timedelta(5*365)
+
+defaultlocale = locale.getdefaultlocale()[1]
 
 class INothing(Interface):
     pass
@@ -83,17 +87,21 @@ class TestStaticAppBase(IntegrationBase):
             os.path.join(here, 'fixtures/static/.hiddenfile')
             )
 
-    def test_highchars_in_pathelement(self):
-        res = self.testapp.get('/static/héhé/index.html', status=200)
-        self._assertBody(
-            res.body, os.path.join(here, u'fixtures/static/héhé/index.html')
-            )
+    if defaultlocale is not None and platform.system() == 'Linux':
+        # These tests are expected to fail on LANG=C systems due to decode
+        # errors, and on non-Linux systesm due to git highchar handling
+        # vagaries.
+        def test_highchars_in_pathelement(self):
+            res = self.testapp.get('/static/héhé/index.html', status=200)
+            self._assertBody(
+                res.body, os.path.join(here, u'fixtures/static/héhé/index.html')
+                )
 
-    def test_highchars_in_filename(self):
-        res = self.testapp.get('/static/héhé.html', status=200)
-        self._assertBody(
-            res.body, os.path.join(here, u'fixtures/static/héhé.html')
-            )
+        def test_highchars_in_filename(self):
+            res = self.testapp.get('/static/héhé.html', status=200)
+            self._assertBody(
+                res.body, os.path.join(here, u'fixtures/static/héhé.html')
+                )
 
     def test_not_modified(self):
         self.testapp.extra_environ = {
