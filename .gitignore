@@ -21,3 +21,4 @@ bookenv/
 jyenv/
 pypyenv/
 env*/
+coverage.xml
