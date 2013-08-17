@@ -23,7 +23,8 @@ checkout.
 Since pyramid is a framework and not an application, it can be
 convenient to work against a sample application, preferably in its
 own virtualenv. A quick way to achieve this is to (ab-)use ``tox``
-with a custom configuration file that's part of the checkout::
+(http://codespeak.net/~hpk/tox/) with a custom configuration file that's part of
+the checkout::
 
   tox -c hacking-tox.ini
 
