@@ -230,6 +230,14 @@ class Test_get_localizer(unittest.TestCase):
         from pyramid.i18n import get_localizer
         return get_localizer(request)
 
+    def test_default_localizer(self):
+        # `get_localizer` returns a default localizer for `en`
+        from pyramid.i18n import Localizer
+        request = DummyRequest()
+        result = self._callFUT(request)
+        self.assertEqual(result.__class__, Localizer)
+        self.assertEqual(result.locale_name, 'en')
+
     def test_no_registry_on_request(self):
         request = DummyRequest()
         request.localizer = '123'
