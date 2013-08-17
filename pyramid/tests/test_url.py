@@ -1027,6 +1027,41 @@ class Test_current_route_path(unittest.TestCase):
         self.assertEqual(request.elements, ('abc',))
         self.assertEqual(request.kw, {'_anchor':'abc'})
 
+class Test_external_static_url_integration(unittest.TestCase):
+
+    def setUp(self):
+        self.config = testing.setUp()
+
+    def tearDown(self):
+        testing.tearDown()
+
+    def _makeRequest(self):
+        from pyramid.request  import Request
+        return Request.blank('/')
+
+    def test_generate_external_url(self):
+        self.config.add_route('acme', 'https://acme.org/path/{foo}')
+        request = self._makeRequest()
+        request.registry = self.config.registry
+        self.assertEqual(request.route_url('acme', foo='bar'),
+            'https://acme.org/path/bar')
+
+    def test_generate_external_url_without_scheme(self):
+        self.config.add_route('acme', '//acme.org/path/{foo}')
+        request = self._makeRequest()
+        request.registry = self.config.registry
+        self.assertEqual(request.route_url('acme', foo='bar'),
+            'http://acme.org/path/bar')
+
+
+    def test_generate_external_url_with_explicit_scheme(self):
+        self.config.add_route('acme', '//acme.org/path/{foo}')
+        request = self._makeRequest()
+        request.registry = self.config.registry
+        self.assertEqual(request.route_url('acme', foo='bar', _scheme='https'),
+            'https://acme.org/path/bar')
+
+
 class DummyContext(object):
     def __init__(self, next=None):
         self.next = next

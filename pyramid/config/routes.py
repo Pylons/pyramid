@@ -1,4 +1,5 @@
 import warnings
+from urlparse import urlparse
 
 from pyramid.interfaces import (
     IRequest,
@@ -386,6 +387,23 @@ class RoutesConfiguratorMixin(object):
 
         if self.route_prefix:
             pattern = self.route_prefix.rstrip('/') + '/' + pattern.lstrip('/')
+
+        if pregenerator is None:
+          parsed = urlparse(pattern)
+          if parsed.hostname:
+            pattern = parsed.path
+
+            def external_url_pregenerator(request, elements, kw):
+              if '_scheme' in kw and parsed.scheme != kw['_scheme']:
+                scheme = kw['_scheme']
+              elif parsed.scheme:
+                scheme = parsed.scheme
+              else:
+                scheme = request.scheme
+              kw['_app_url'] = '{0}://{1}'.format(scheme, parsed.netloc)
+              return elements, kw
+
+          pregenerator = external_url_pregenerator
 
         mapper = self.get_routes_mapper()
 
