@@ -126,7 +126,7 @@ Running Tests
   example::
 
    $ /usr/bin/easy_install tox
-   $ cd ~/hack-on-pyramid/pyramid
+   $ cd ~/hack-on-pyramid/
    $ /usr/bin/tox
 
 Test Coverage
