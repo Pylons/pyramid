@@ -245,12 +245,6 @@ class Test_get_localizer(unittest.TestCase):
         result = self._callFUT(request)
         self.assertEqual(result, '123')
 
-    def test_locale_on_request(self):
-        request = DummyRequest()
-        request.localizer = 'abc'
-        result = self._callFUT(request)
-        self.assertEqual(result, 'abc')
-
     def test_locale_from_registry(self):
         from pyramid.threadlocal import get_current_registry
         from pyramid.interfaces import ILocalizer
