@@ -292,6 +292,23 @@ class Test_get_localizer(unittest.TestCase):
         self.assertEqual(result.translate('Approve', 'deformsite'),
                          'Approve')
 
+    def test_request_has_localizer(self):
+        from pyramid.threadlocal import get_current_registry
+        from pyramid.interfaces import ILocalizer
+        from pyramid.request import Request
+        # register mock localizer
+        dummy = object()
+        registry = get_current_registry()
+        registry.registerUtility(dummy, ILocalizer, name='en')
+        request = Request(environ={})
+        self.assertEqual(request.localizer, dummy)
+        # `get_localizer` is only called once...
+        other = object()
+        registry.registerUtility(other, ILocalizer, name='en')
+        self.assertNotEqual(request.localizer, other)
+        self.assertEqual(request.localizer, dummy)
+
+
 class Test_default_locale_negotiator(unittest.TestCase):
     def setUp(self):
         cleanUp()
