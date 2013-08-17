@@ -90,16 +90,16 @@ def copy_dir(source, dest, vars, verbosity, simulate, indent=0,
             if verbosity:
                 out('%sRecursing into %s' % (pad, os.path.basename(full)))
             copy_dir((source[0], full), dest_full, vars, verbosity, simulate,
-                     indent=indent+1,
-                     sub_vars=sub_vars, interactive=interactive,
+                     indent=indent+1, sub_vars=sub_vars, 
+                     interactive=interactive, overwrite=overwrite,
                      template_renderer=template_renderer, out_=out_)
             continue
         elif not use_pkg_resources and os.path.isdir(full):
             if verbosity:
                 out('%sRecursing into %s' % (pad, os.path.basename(full)))
             copy_dir(full, dest_full, vars, verbosity, simulate,
-                     indent=indent+1,
-                     sub_vars=sub_vars, interactive=interactive,
+                     indent=indent+1, sub_vars=sub_vars, 
+                     interactive=interactive, overwrite=overwrite,
                      template_renderer=template_renderer, out_=out_)
             continue
         elif use_pkg_resources:
