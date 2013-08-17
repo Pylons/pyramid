@@ -65,6 +65,7 @@ docs_extras = [
 
 testing_extras = tests_require + [
     'nose',
+    'nose-selecttests',
     'coverage',
     'virtualenv', # for scaffolding tests
     ]
