@@ -394,13 +394,14 @@ class RoutesConfiguratorMixin(object):
             pattern = parsed.path
 
             def external_url_pregenerator(request, elements, kw):
-              if '_scheme' in kw and parsed.scheme != kw['_scheme']:
-                scheme = kw['_scheme']
-              elif parsed.scheme:
-                scheme = parsed.scheme
-              else:
-                scheme = request.scheme
-              kw['_app_url'] = '{0}://{1}'.format(scheme, parsed.netloc)
+              if not '_app_url' in kw:
+                if '_scheme' in kw and parsed.scheme != kw['_scheme']:
+                  scheme = kw['_scheme']
+                elif parsed.scheme:
+                  scheme = parsed.scheme
+                else:
+                  scheme = request.scheme
+                kw['_app_url'] = '{0}://{1}'.format(scheme, parsed.netloc)
               return elements, kw
 
           pregenerator = external_url_pregenerator

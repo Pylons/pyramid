@@ -1062,6 +1062,14 @@ class Test_external_static_url_integration(unittest.TestCase):
             'https://acme.org/path/bar')
 
 
+    def test_generate_external_url_with_explicit_app_url(self):
+        self.config.add_route('acme', 'http://acme.org/path/{foo}')
+        request = self._makeRequest()
+        request.registry = self.config.registry
+        self.assertEqual(request.route_url('acme', foo='bar', _app_url='http://fakeme.com'),
+            'http://fakeme.com/path/bar')
+
+
 class DummyContext(object):
     def __init__(self, next=None):
         self.next = next
