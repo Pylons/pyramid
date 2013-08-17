@@ -105,6 +105,7 @@ to using the previous combination of ``add_route`` and ``add_view``.
 
 .. _route_pattern_syntax:
 
+
 Route Pattern Syntax
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -754,8 +755,42 @@ other non-``name`` and non-``pattern`` arguments to
 exception to this rule is use of the ``pregenerator`` argument, which is not
 ignored when ``static`` is ``True``.
 
+:ref:`External routes <external_route_narr>` are implicitely static.
+
 .. versionadded:: 1.1
    the ``static`` argument to :meth:`~pyramid.config.Configurator.add_route`
+
+.. _external_route_narr:
+
+
+External Routes
+---------------
+
+.. versionadded:: 1.5
+
+Route patterns that are valid URLs, are treated as external routes. Like
+:ref:`static routes <static_route_narr>` they are useful for URL generation
+purposes only and are never considered for matching at request time.
+
+.. code-block:: python
+   :linenos:
+
+   >>> config = Configurator()
+   >>> config.add_route('youtube', 'https://youtube.com/watch/{video_id}')
+   ...
+   >>> request.route_url('youtube', video_id='oHg5SJYRHA0')
+   >>> "https://youtube.com/watch/oHg5SJYRHA0"
+
+All pattern replacements and calls to
+:meth:`pyramid.request.Request.route_url` will work as expected. Note that
+:meth:`pyramid.request.Request.route_path` will also just return the external
+URLs path part.
+
+.. note::
+
+   The external URL feature is implemented with a :term:`pregenerator` so you
+   cannot use both with the same route.
+
 
 .. index::
    single: redirecting to slash-appended routes
