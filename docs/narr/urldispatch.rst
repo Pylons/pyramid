@@ -128,6 +128,10 @@ and:
 
    /{foo}/bar/baz
 
+If a pattern is a valid URL it won't be ever matched against an incoming
+request. Instead it can be useful for generating external URLs. See
+:ref:`External routes <external_route_narr>` for details.
+
 A pattern segment (an individual item between ``/`` characters in the
 pattern) may either be a literal string (e.g. ``foo``) *or* it may be a
 replacement marker (e.g. ``{foo}``) or a certain combination of both. A
