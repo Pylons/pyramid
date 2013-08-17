@@ -23,7 +23,8 @@ checkout.
 Since pyramid is a framework and not an application, it can be
 convenient to work against a sample application, preferably in its
 own virtualenv. A quick way to achieve this is to (ab-)use ``tox``
-with a custom configuration file that's part of the checkout::
+(http://codespeak.net/~hpk/tox/) with a custom configuration file that's part of
+the checkout::
 
   tox -c hacking-tox.ini
 
@@ -111,9 +112,13 @@ Coding Style
 Running Tests
 --------------
 
-- To run tests for Pyramid on a single Python version, run ``python setup.py
-  test`` against the Python interpreter from virtualenv into which
-  you've ``setup.py develop``-ed Pyramid.
+- To run all tests for Pyramid on a single Python version, run ``nosetests`` from
+  your development virtualenv (See *Using a Development Checkout* above).
+
+- To run individual tests (i.e. during development) you can use a regular
+  expression with the ``-t`` parameter courtesy of the `nose-selecttests
+  <https://pypi.python.org/pypi/nose-selecttests/>`_ plugin that's been installed (along with nose itself) via ``python setup.py dev``. The easiest usage is to
+  simply provide the verbatim name of the test you're working on.
 
 - To run the full set of Pyramid tests on all platforms, install ``tox``
   (http://codespeak.net/~hpk/tox/) into a system Python.  The ``tox`` console
@@ -125,7 +130,7 @@ Running Tests
   example::
 
    $ /usr/bin/easy_install tox
-   $ cd ~/hack-on-pyramid/pyramid
+   $ cd ~/hack-on-pyramid/
    $ /usr/bin/tox
 
 - The tests can also be run usign ``pytest`` (http://pytest.org/).  This is
