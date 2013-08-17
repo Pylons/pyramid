@@ -197,17 +197,15 @@ def make_localizer(current_locale_name, translation_directories):
 def get_localizer(request):
     """ Retrieve a :class:`pyramid.i18n.Localizer` object
     corresponding to the current request's locale name. """
-    localizer =  getattr(request, 'localizer', None)
 
-    if localizer is None:
-        # no locale object cached on request
-        try:
-            registry = request.registry
-        except AttributeError:
-            registry = get_current_registry()
+    # no locale object cached on request
+    try:
+        registry = request.registry
+    except AttributeError:
+        registry = get_current_registry()
 
-        current_locale_name = get_locale_name(request)
-        localizer = registry.queryUtility(ILocalizer, name=current_locale_name)
+    current_locale_name = get_locale_name(request)
+    localizer = registry.queryUtility(ILocalizer, name=current_locale_name)
 
     if localizer is None:
         # no localizer utility registered yet
@@ -216,7 +214,6 @@ def get_localizer(request):
         
         registry.registerUtility(localizer, ILocalizer,
                                  name=current_locale_name)
-        request.localizer = localizer
 
     return localizer
                 

@@ -24,6 +24,7 @@ from pyramid.compat import (
     )
 
 from pyramid.decorator import reify
+from pyramid.i18n import get_localizer
 from pyramid.response import Response
 from pyramid.url import URLMethodsMixin
 from pyramid.util import InstancePropertyMixin
@@ -382,6 +383,13 @@ class Request(BaseRequest, DeprecatedRequestMethodsMixin, URLMethodsMixin,
     @property
     def json_body(self):
         return json.loads(text_(self.body, self.charset))
+
+    @reify
+    def localizer(self):
+        """ Convenience property to return a localizer by calling
+            :func:`pyramid.i18n.get_localizer`. """
+        return get_localizer(self)
+
 
 def route_request_iface(name, bases=()):
     # zope.interface treats the __name__ as the __doc__ and changes __name__
