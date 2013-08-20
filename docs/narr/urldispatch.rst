@@ -790,11 +790,6 @@ All pattern replacements and calls to
 :meth:`pyramid.request.Request.route_path` will also just return the external
 URLs path part.
 
-.. note::
-
-   The external URL feature is implemented with a :term:`pregenerator` so you
-   cannot use both with the same route.
-
 
 .. index::
    single: redirecting to slash-appended routes

@@ -1,6 +1,6 @@
 import warnings
-from urlparse import urlparse
 
+from pyramid.compat import urlparse
 from pyramid.interfaces import (
     IRequest,
     IRouteRequest,
@@ -385,27 +385,32 @@ class RoutesConfiguratorMixin(object):
         if pattern is None:
             raise ConfigurationError('"pattern" argument may not be None')
 
-        if self.route_prefix:
+        # check for an external route
+        parsed = urlparse.urlparse(pattern)
+        if parsed.hostname:
+            pattern = parsed.path
+
+            original_pregenerator = pregenerator
+            def external_url_pregenerator(request, elements, kw):
+                if '_app_url' not in kw:
+                    if '_scheme' in kw:
+                        scheme = kw['_scheme']
+                    elif parsed.scheme:
+                        scheme = parsed.scheme
+                    else:
+                        scheme = request.scheme
+                    kw['_app_url'] = '{0}://{1}'.format(scheme, parsed.netloc)
+
+                if original_pregenerator:
+                    elements, kw = original_pregenerator(
+                        request, elements, kw)
+                return elements, kw
+
+            pregenerator = external_url_pregenerator
+            static = True
+
+        elif self.route_prefix:
             pattern = self.route_prefix.rstrip('/') + '/' + pattern.lstrip('/')
-
-        if pregenerator is None:
-            parsed = urlparse(pattern)
-            if parsed.hostname:
-                pattern = parsed.path
-
-                def external_url_pregenerator(request, elements, kw):
-                    if not '_app_url' in kw:
-                        if '_scheme' in kw and parsed.scheme != kw['_scheme']:
-                            scheme = kw['_scheme']
-                        elif parsed.scheme:
-                            scheme = parsed.scheme
-                        else:
-                            scheme = request.scheme
-                        kw['_app_url'] = '{0}://{1}'.format(
-                            scheme, parsed.netloc)
-                    return elements, kw
-
-                pregenerator = external_url_pregenerator
 
         mapper = self.get_routes_mapper()
 
