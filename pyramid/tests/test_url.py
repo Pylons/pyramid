@@ -1067,15 +1067,14 @@ class Test_external_static_url_integration(unittest.TestCase):
         self.config.add_route('acme', 'http://acme.org/path/{foo}')
         request = self._makeRequest()
         request.registry = self.config.registry
-        self.assertEqual(
-            request.route_url('acme', foo='bar', _app_url='http://fakeme.com'),
-            'http://fakeme.com/path/bar')
+        self.assertRaises(ValueError,
+            request.route_url, 'acme', foo='bar', _app_url='http://fakeme.com')
 
     def test_generate_external_url_route_path(self):
         self.config.add_route('acme', 'https://acme.org/path/{foo}')
         request = self._makeRequest()
         request.registry = self.config.registry
-        self.assertEqual(request.route_path('acme', foo='bar'), '/path/bar')
+        self.assertRaises(ValueError, request.route_path, 'acme', foo='bar')
 
     def test_generate_external_url_with_pregenerator(self):
         def pregenerator(request, elements, kw):

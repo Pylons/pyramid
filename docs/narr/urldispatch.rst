@@ -785,11 +785,12 @@ purposes only and are never considered for matching at request time.
    >>> request.route_url('youtube', video_id='oHg5SJYRHA0')
    >>> "https://youtube.com/watch/oHg5SJYRHA0"
 
-All pattern replacements and calls to
-:meth:`pyramid.request.Request.route_url` will work as expected. Note that
-:meth:`pyramid.request.Request.route_path` will also just return the external
-URLs path part.
-
+Most pattern replacements and calls to
+:meth:`pyramid.request.Request.route_url` will work as expected. However, calls
+to :meth:`pyramid.request.Request.route_path` against external patterns will
+raise an exception, and passing ``_app_url`` to
+:meth:`~pyramid.request.Request.route_url` to generate a URL against a route
+that has an external pattern will also raise an exception.
 
 .. index::
    single: redirecting to slash-appended routes

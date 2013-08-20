@@ -385,21 +385,29 @@ class RoutesConfiguratorMixin(object):
         if pattern is None:
             raise ConfigurationError('"pattern" argument may not be None')
 
-        # check for an external route
+        # check for an external route; an external route is one which is
+        # is a full url (e.g. 'http://example.com/{id}')
         parsed = urlparse.urlparse(pattern)
         if parsed.hostname:
             pattern = parsed.path
 
             original_pregenerator = pregenerator
             def external_url_pregenerator(request, elements, kw):
-                if '_app_url' not in kw:
-                    if '_scheme' in kw:
-                        scheme = kw['_scheme']
-                    elif parsed.scheme:
-                        scheme = parsed.scheme
-                    else:
-                        scheme = request.scheme
-                    kw['_app_url'] = '{0}://{1}'.format(scheme, parsed.netloc)
+                if '_app_url' in kw:
+                    raise ValueError(
+                        'You cannot generate a path to an external route '
+                        'pattern via request.route_path nor pass an _app_url '
+                        'to request.route_url when generating a URL for an '
+                        'external route pattern (pattern was "%s") ' %
+                        (pattern,)
+                        )
+                if '_scheme' in kw:
+                    scheme = kw['_scheme']
+                elif parsed.scheme:
+                    scheme = parsed.scheme
+                else:
+                    scheme = request.scheme
+                kw['_app_url'] = '{0}://{1}'.format(scheme, parsed.netloc)
 
                 if original_pregenerator:
                     elements, kw = original_pregenerator(
