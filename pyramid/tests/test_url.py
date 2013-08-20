@@ -1027,6 +1027,77 @@ class Test_current_route_path(unittest.TestCase):
         self.assertEqual(request.elements, ('abc',))
         self.assertEqual(request.kw, {'_anchor':'abc'})
 
+class Test_external_static_url_integration(unittest.TestCase):
+
+    def setUp(self):
+        self.config = testing.setUp()
+
+    def tearDown(self):
+        testing.tearDown()
+
+    def _makeRequest(self):
+        from pyramid.request import Request
+        return Request.blank('/')
+
+    def test_generate_external_url(self):
+        self.config.add_route('acme', 'https://acme.org/path/{foo}')
+        request = self._makeRequest()
+        request.registry = self.config.registry
+        self.assertEqual(
+            request.route_url('acme', foo='bar'),
+            'https://acme.org/path/bar')
+
+    def test_generate_external_url_without_scheme(self):
+        self.config.add_route('acme', '//acme.org/path/{foo}')
+        request = self._makeRequest()
+        request.registry = self.config.registry
+        self.assertEqual(
+            request.route_url('acme', foo='bar'),
+            'http://acme.org/path/bar')
+
+    def test_generate_external_url_with_explicit_scheme(self):
+        self.config.add_route('acme', '//acme.org/path/{foo}')
+        request = self._makeRequest()
+        request.registry = self.config.registry
+        self.assertEqual(
+            request.route_url('acme', foo='bar', _scheme='https'),
+            'https://acme.org/path/bar')
+
+    def test_generate_external_url_with_explicit_app_url(self):
+        self.config.add_route('acme', 'http://acme.org/path/{foo}')
+        request = self._makeRequest()
+        request.registry = self.config.registry
+        self.assertRaises(ValueError,
+            request.route_url, 'acme', foo='bar', _app_url='http://fakeme.com')
+
+    def test_generate_external_url_route_path(self):
+        self.config.add_route('acme', 'https://acme.org/path/{foo}')
+        request = self._makeRequest()
+        request.registry = self.config.registry
+        self.assertRaises(ValueError, request.route_path, 'acme', foo='bar')
+
+    def test_generate_external_url_with_pregenerator(self):
+        def pregenerator(request, elements, kw):
+            kw['_query'] = {'q': 'foo'}
+            return elements, kw
+        self.config.add_route('acme', 'https://acme.org/path/{foo}',
+                              pregenerator=pregenerator)
+        request = self._makeRequest()
+        request.registry = self.config.registry
+        self.assertEqual(
+            request.route_url('acme', foo='bar'),
+            'https://acme.org/path/bar?q=foo')
+
+    def test_external_url_with_route_prefix(self):
+        def includeme(config):
+            config.add_route('acme', '//acme.org/{foo}')
+        self.config.include(includeme, route_prefix='some_prefix')
+        request = self._makeRequest()
+        request.registry = self.config.registry
+        self.assertEqual(
+            request.route_url('acme', foo='bar'),
+            'http://acme.org/bar')
+
 class DummyContext(object):
     def __init__(self, next=None):
         self.next = next

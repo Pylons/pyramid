@@ -142,6 +142,10 @@ Features
 - The ``alchemy`` scaffold tests now provide better coverage.  See
   https://github.com/Pylons/pyramid/pull/1029
 
+- The ``pyramid.config.Configurator.add_route`` method now supports being
+  called with an external URL as pattern. See
+  https://github.com/Pylons/pyramid/issues/611 for more information.
+
 Bug Fixes
 ---------
 

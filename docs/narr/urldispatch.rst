@@ -105,6 +105,7 @@ to using the previous combination of ``add_route`` and ``add_view``.
 
 .. _route_pattern_syntax:
 
+
 Route Pattern Syntax
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -126,6 +127,10 @@ and:
 .. code-block:: text
 
    /{foo}/bar/baz
+
+If a pattern is a valid URL it won't be ever matched against an incoming
+request. Instead it can be useful for generating external URLs. See
+:ref:`External routes <external_route_narr>` for details.
 
 A pattern segment (an individual item between ``/`` characters in the
 pattern) may either be a literal string (e.g. ``foo``) *or* it may be a
@@ -754,8 +759,38 @@ other non-``name`` and non-``pattern`` arguments to
 exception to this rule is use of the ``pregenerator`` argument, which is not
 ignored when ``static`` is ``True``.
 
+:ref:`External routes <external_route_narr>` are implicitly static.
+
 .. versionadded:: 1.1
    the ``static`` argument to :meth:`~pyramid.config.Configurator.add_route`
+
+.. _external_route_narr:
+
+
+External Routes
+---------------
+
+.. versionadded:: 1.5
+
+Route patterns that are valid URLs, are treated as external routes. Like
+:ref:`static routes <static_route_narr>` they are useful for URL generation
+purposes only and are never considered for matching at request time.
+
+.. code-block:: python
+   :linenos:
+
+   >>> config = Configurator()
+   >>> config.add_route('youtube', 'https://youtube.com/watch/{video_id}')
+   ...
+   >>> request.route_url('youtube', video_id='oHg5SJYRHA0')
+   >>> "https://youtube.com/watch/oHg5SJYRHA0"
+
+Most pattern replacements and calls to
+:meth:`pyramid.request.Request.route_url` will work as expected. However, calls
+to :meth:`pyramid.request.Request.route_path` against external patterns will
+raise an exception, and passing ``_app_url`` to
+:meth:`~pyramid.request.Request.route_url` to generate a URL against a route
+that has an external pattern will also raise an exception.
 
 .. index::
    single: redirecting to slash-appended routes
