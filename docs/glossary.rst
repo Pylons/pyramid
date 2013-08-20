@@ -1018,3 +1018,7 @@ Glossary
       system.  See :ref:`registering_thirdparty_predicates` for more
       information.
 
+   add-on
+      A Python :term:`distribution` that uses Pyramid's extensibility
+      to plug into a Pyramid application and provide extra,
+      configurable services.

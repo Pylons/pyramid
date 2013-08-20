@@ -10,7 +10,7 @@ class reify(object):
        class Foo(object):
            @reify
            def jammy(self):
-               print 'jammy called'
+               print('jammy called')
                return 1
 
     And usage of Foo:
@@ -18,7 +18,7 @@ class reify(object):
     >>> f = Foo()
     >>> v = f.jammy
     'jammy called'
-    >>> print v
+    >>> print(v)
     1
     >>> f.jammy
     1

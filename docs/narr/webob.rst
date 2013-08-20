@@ -287,7 +287,7 @@ When such a request reaches a view in your application, the
 
     @view_config(renderer='string')
     def aview(request):
-        print request.json_body
+        print(request.json_body)
         return 'OK'
 
 For the above view, printed to the console will be:

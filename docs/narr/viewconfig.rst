@@ -1005,6 +1005,8 @@ invoked as the result of the ``http_cache`` argument to view configuration.
 .. index::
    pair: view configuration; debugging
 
+.. _debugging_view_configuration:
+
 Debugging View Configuration
 ----------------------------
 

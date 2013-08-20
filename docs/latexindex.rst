@@ -2,14 +2,14 @@
 
 .. _latexindex:
 
-=================================================
-The Pyramid Web Application Development Framework
-=================================================
+=========================
+The Pyramid Web Framework
+=========================
 
 .. frontmatter::
 
 Front Matter
-============
+@@@@@@@@@@@@
 
 .. toctree::
    :maxdepth: 1
@@ -23,7 +23,7 @@ Front Matter
 .. _narrative_documentation:
 
 Narrative Documentation
-=======================
+@@@@@@@@@@@@@@@@@@@@@@@
 
 .. toctree::
    :maxdepth: 1
@@ -71,7 +71,7 @@ Narrative Documentation
 .. _tutorials:
 
 Tutorials
-=========
+@@@@@@@@@
 
 .. toctree::
    :maxdepth: 1
@@ -84,7 +84,7 @@ Tutorials
 .. _api_documentation:
 
 API Documentation
-=================
+@@@@@@@@@@@@@@@@@
 
 .. toctree::
    :maxdepth: 1
@@ -95,7 +95,7 @@ API Documentation
 .. backmatter::
 
 Glossary and Index
-==================
+@@@@@@@@@@@@@@@@@@
 
 .. toctree::
   :maxdepth: 1

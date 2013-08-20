@@ -26,7 +26,7 @@ subscriber is a function that accepts a single argument named `event`:
    :linenos:
 
    def mysubscriber(event):
-       print event
+       print(event)
 
 The above is a subscriber that simply prints the event to the console
 when it's called.
@@ -113,10 +113,10 @@ your application like so:
    :linenos:
 
    def handle_new_request(event):
-       print 'request', event.request
+       print('request', event.request)
 
    def handle_new_response(event):
-       print 'response', event.response
+       print('response', event.response)
 
 You may configure these functions to be called at the appropriate
 times by adding the following code to your application's

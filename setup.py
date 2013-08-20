@@ -65,13 +65,14 @@ docs_extras = [
 
 testing_extras = tests_require + [
     'nose',
+    'nose-selecttests',
     'coverage',
     'virtualenv', # for scaffolding tests
     ]
 
 setup(name='pyramid',
       version='1.5dev',
-      description=('The Pyramid web application development framework, a '
+      description=('The Pyramid Web Framework, a '
                    'Pylons project'),
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[

@@ -103,16 +103,57 @@ class Test_copy_dir(unittest.TestCase):
                       1, False,
                       overwrite=False,
                       template_renderer=dummy_template_renderer)
-        target = os.path.join(self.dirname, 'mypackage', '__init__.py')
-        with open(target, 'w') as f:
-            f.write('These are not the words you are looking for.')
+        # toplevel file
+        toplevel = os.path.join(self.dirname, 'mypackage', '__init__.py')
+        with open(toplevel, 'w') as f:
+            f.write('These are the words you are looking for.')
+        # sub directory file
+        sub = os.path.join(self.dirname, 'mypackage', 'templates', 'mytemplate.pt')
+        with open(sub, 'w') as f:
+            f.write('These are the words you are looking for.')
         self._callFUT(source,
                       self.dirname,
                       vars,
                       1, False,
                       overwrite=False,
                       template_renderer=dummy_template_renderer)
+        with open(toplevel, 'r') as f:
+            tcontent = f.read()
+        self.assertEqual('These are the words you are looking for.', tcontent)
+        with open(sub, 'r') as f:
+            tcontent = f.read()
+        self.assertEqual('These are the words you are looking for.', tcontent)
 
+    def test_overwrite_true(self):
+        vars = {'package':'mypackage'}
+        source = pkg_resources.resource_filename(*self.fixturetuple)
+        self._callFUT(source,
+                      self.dirname,
+                      vars,
+                      1, False,
+                      overwrite=True,
+                      template_renderer=dummy_template_renderer)
+        # toplevel file
+        toplevel = os.path.join(self.dirname, 'mypackage', '__init__.py')
+        with open(toplevel, 'w') as f:
+            f.write('These are not the words you are looking for.')
+        # sub directory file
+        sub = os.path.join(self.dirname, 'mypackage', 'templates', 'mytemplate.pt')
+        with open(sub, 'w') as f:
+            f.write('These are not the words you are looking for.')
+        self._callFUT(source,
+                      self.dirname,
+                      vars,
+                      1, False,
+                      overwrite=True,
+                      template_renderer=dummy_template_renderer)
+        with open(toplevel, 'r') as f:
+            tcontent = f.read()
+        self.assertNotEqual('These are not the words you are looking for.', tcontent)
+        with open(sub, 'r') as f:
+            tcontent = f.read()
+        self.assertNotEqual('These are not the words you are looking for.', tcontent)
+    
     def test_detect_SkipTemplate(self):
         vars = {'package':'mypackage'}
         source = pkg_resources.resource_filename(*self.fixturetuple)

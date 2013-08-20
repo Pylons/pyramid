@@ -69,22 +69,18 @@ class InstancePropertyMixin(object):
         can accept multiple ``(name, property)`` pairs generated via
         :meth:`pyramid.util.InstancePropertyMixin._make_property`.
 
-        ``attrs`` is a sequence of 2-tuples *or* a data structure with
-        an ``.items()`` method which returns a sequence of 2-tuples
+        ``properties`` is a sequence of two-tuples *or* a data structure
+        with an ``.items()`` method which returns a sequence of two-tuples
         (presumably a dictionary). It will be used to add several
         properties to the instance in a manner that is more efficient
         than simply calling ``set_property`` repeatedly.
         """
-
-        if hasattr(properties, 'items'):
-            attrs = properties.items()
-        else:
-            attrs = properties
         attrs = dict(properties)
 
-        parent = self.__class__
-        cls = type(parent.__name__, (parent, object), attrs)
-        self.__class__ = cls
+        if attrs:
+            parent = self.__class__
+            cls = type(parent.__name__, (parent, object), attrs)
+            self.__class__ = cls
 
     def _set_extensions(self, extensions):
         for name, fn in iteritems_(extensions.methods):

@@ -49,9 +49,7 @@ The included scaffolds are these:
   URL mapping via :term:`URL dispatch` and no persistence mechanism.
 
 ``zodb``
-  URL mapping via :term:`traversal` and persistence via :term:`ZODB`.  *Note
-  that, as of this writing, this scaffold will not run under Python 3, only
-  under Python 2.*
+  URL mapping via :term:`traversal` and persistence via :term:`ZODB`.
 
 ``alchemy``
   URL mapping via :term:`URL dispatch` and persistence via
@@ -991,6 +989,8 @@ It is possible to use the ``pshell`` command to load a Python interpreter
 prompt with a similar configuration as would be loaded if you were running
 your Pyramid application via ``pserve``.  This can be a useful debugging tool.
 See :ref:`interactive_shell` for more details.
+
+.. _what_is_this_pserve_thing:
 
 What Is This ``pserve`` Thing
 -----------------------------

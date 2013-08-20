@@ -57,10 +57,25 @@ extensions = [
 
 # Looks for objects in external projects
 intersphinx_mapping = {
+    'tutorials': ('http://docs.pylonsproject.org/projects/pyramid_tutorials/en/latest/', None),
+    'jinja2': ('http://docs.pylonsproject.org/projects/pyramid_jinja2/en/latest/', None),
+    'tm': (
+        'http://docs.pylonsproject.org/projects/pyramid_tm/en/latest/',
+        None,
+    ),
     'zcomponent': ('http://docs.zope.org/zope.component', None),
     'webtest': ('http://webtest.pythonpaste.org/en/latest', None),
     'webob': ('http://docs.webob.org/en/latest', None),
+    'colander': (
+        'http://docs.pylonsproject.org/projects/colander/en/latest',
+    None),
+    'deform': (
+        'http://docs.pylonsproject.org/projects/deform/en/latest',
+    None),
     'sqla': ('http://docs.sqlalchemy.org/en/latest', None),
+    'beaker': (
+        'http://docs.pylonsproject.org/projects/pyramid_beaker/en/latest',
+        None),
     'who': ('http://docs.repoze.org/who/latest', None),
     'python': ('http://docs.python.org', None),
     'python3': ('http://docs.python.org/3', None),
@@ -87,7 +102,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General substitutions.
-project = 'The Pyramid Web Application Development Framework'
+project = 'The Pyramid Web Framework'
 thisyear = datetime.datetime.now().year
 copyright = '2008-%s, Agendaless Consulting' % thisyear
 
@@ -181,7 +196,7 @@ html_theme_options = dict(
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
-html_title = 'The Pyramid Web Application Development Framework v%s' % release
+html_title = 'The Pyramid Web Framework v%s' % release
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 #html_short_title = 'Home'
@@ -206,7 +221,7 @@ html_last_updated_fmt = '%b %d, %Y'
 
 # If true, SmartyPants will be used to convert quotes and dashes to
 # typographically correct entities.
-#html_use_smartypants = True
+html_use_smartypants = False # people use cutnpaste in some places
 
 # Custom sidebar templates, maps document names to template names.
 #html_sidebars = {}
@@ -253,7 +268,7 @@ latex_additional_files = ['_static/latex-note.png', '_static/latex-warning.png']
 # (source start file, target name, title, author, document class [howto/manual]).
 latex_documents = [
   ('latexindex', 'pyramid.tex',
-   'The Pyramid Web Application Development Framework',
+   'The Pyramid Web Framework',
    'Chris McDonough', 'manual'),
     ]
 
@@ -388,7 +403,7 @@ latex_elements = {
     'wrapperclass': 'book',
     'date': '',
     'releasename': 'Version',
-    'title': r'The Pyramid Web Application \newline Development Framework',
+    'title': r'The Pyramid Web Framework',
 #    'pointsize':'12pt', # uncomment for 12pt version
 }
 
@@ -493,7 +508,7 @@ def resig(app, what, name, obj, options, signature, return_annotation):
 # -- Options for Epub output ---------------------------------------------------
 
 # Bibliographic Dublin Core info.
-epub_title = 'The Pyramid Web Application Development Framework, Version %s' \
+epub_title = 'The Pyramid Web Framework, Version %s' \
              % release
 epub_author = 'Chris McDonough'
 epub_publisher = 'Agendaless Consulting'
@@ -511,7 +526,7 @@ epub_scheme = 'ISBN'
 epub_identifier = '0615445675'
 
 # A unique identification for the text.
-epub_uid = 'The Pyramid Web Application Development Framework, Version %s' \
+epub_uid = 'The Pyramid Web Framework, Version %s' \
            % release
 # HTML files that should be inserted before the pages created by sphinx.
 # The format is a list of tuples containing the path and title.

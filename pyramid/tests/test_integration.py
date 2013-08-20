@@ -72,7 +72,7 @@ class IntegrationBase(object):
 
 here = os.path.dirname(__file__)
 
-class TestStaticAppBase(IntegrationBase):
+class StaticAppBase(IntegrationBase):
     def test_basic(self):
         res = self.testapp.get('/minimal.pt', status=200)
         _assertBody(res.body, os.path.join(here, 'fixtures/minimal.pt'))
@@ -198,10 +198,10 @@ class TestEventOnlySubscribers(IntegrationBase, unittest.TestCase):
         self.assertEqual(sorted(res.body.split()),
                          [b'foobar', b'foobar2', b'foobaryup', b'foobaryup2'])
 
-class TestStaticAppUsingAbsPath(TestStaticAppBase, unittest.TestCase):
+class TestStaticAppUsingAbsPath(StaticAppBase, unittest.TestCase):
     package = 'pyramid.tests.pkgs.static_abspath'
 
-class TestStaticAppUsingAssetSpec(TestStaticAppBase, unittest.TestCase):
+class TestStaticAppUsingAssetSpec(StaticAppBase, unittest.TestCase):
     package = 'pyramid.tests.pkgs.static_assetspec'
 
 class TestStaticAppNoSubpath(unittest.TestCase):
@@ -648,6 +648,10 @@ class AcceptContentTypeTest(unittest.TestCase):
         app = config.make_wsgi_app()
         from webtest import TestApp
         self.testapp = TestApp(app)
+
+    def tearDown(self):
+        import pyramid.config
+        pyramid.config.global_registries.empty()        
 
     def test_ordering(self):
         res = self.testapp.get('/hello', headers={'Accept': 'application/json; q=1.0, text/plain; q=0.9'}, status=200)
