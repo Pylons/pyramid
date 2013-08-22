@@ -1,11 +1,11 @@
 .. _index:
 
-=================================================
-The Pyramid Web Application Development Framework
-=================================================
+=========================
+The Pyramid Web Framework
+=========================
 
-:app:`Pyramid` is a small, fast, down-to-earth Python web application
-development framework.  It is developed as part of the `Pylons Project
+:app:`Pyramid` is a small, fast, down-to-earth Python web framework.  It
+is developed as part of the `Pylons Project
 <http://docs.pylonsproject.org/>`_.  It is licensed under a `BSD-like license
 <http://repoze.org/license.html>`_.
 
@@ -31,21 +31,41 @@ Front Matter
    copyright.rst
    conventions.rst
 
-What's New
-==========
+.. _html_getting_started:
+
+Getting Started
+===============
+
+If you are new to Pyramid, we have a few resources that can help you get
+up to speed right away.
 
 .. toctree::
-   :maxdepth: 1
+   :hidden:
 
-   whatsnew-1.4
-   whatsnew-1.3
-   whatsnew-1.2
-   whatsnew-1.1
-   whatsnew-1.0
+   quick_tour
+
+* :doc:`quick_tour` goes through the major features in Pyramid, covering
+  a little about a lot.
+
+* To see a minimal Pyramid web application, check out
+  :ref:`firstapp_chapter`.
+
+* For help getting Pyramid set up, try
+  :ref:`installing_chapter`.
+
+* Like learning by example? Visit the official
+  :doc:`wiki tutorial <../tutorials/wiki2/index>` as well as the
+  community-contributed
+  :ref:`Pyramid tutorials <tutorials:pyramid-tutorials>`, which include
+  a :ref:`single file tasks tutorial <tutorials:single-file-tutorial>`.
+
+* Need help?  See :ref:`Support and
+  Development <support-and-development>`.
+
 
 .. _html_narrative_documentation:
 
-Narrative documentation
+Narrative Documentation
 =======================
 
 Narrative documentation in chapter form explaining how to use
@@ -109,8 +129,10 @@ platforms.
    tutorials/bfg/index.rst
    tutorials/modwsgi/index.rst
 
+.. _html_api_documentation:
+
 API Documentation
-==================
+=================
 
 Comprehensive reference material for every public API exposed by :app:`Pyramid`:
 
@@ -126,6 +148,12 @@ Change History
 .. toctree::
    :maxdepth: 1
 
+   whatsnew-1.5
+   whatsnew-1.4
+   whatsnew-1.3
+   whatsnew-1.2
+   whatsnew-1.1
+   whatsnew-1.0
    changes
 
 Design Documents
@@ -136,51 +164,7 @@ Design Documents
 
    designdefense
 
-Sample Applications
-===================
-
-.. note::
-
-   These applications run only on Python 2.x, and so do some of their
-   dependencies.
-
-`cluegun <https://github.com/Pylons/cluegun>`_ is a simple pastebin
-application based on Rocky Burt's `ClueBin
-<http://pypi.python.org/pypi/ClueBin/0.2.3>`_.  It demonstrates form
-processing, security, and the use of :term:`ZODB` within a :app:`Pyramid`
-application.  Check this application out via:
-
-.. code-block:: text
-
-  git clone git://github.com/Pylons/cluegun.git
-
-`virginia <https://github.com/Pylons/virginia>`_ is a very simple dynamic
-file rendering application.  It is willing to render structured text
-documents, HTML documents, and images from a filesystem directory.
-It's also a good example of :term:`traversal`. An
-earlier version of this application runs the `repoze.org
-<http://repoze.org>`_ website.  Check this application out via:
-
-.. code-block:: text
-
-  git clone git://github.com/Pylons/virginia.git
-
-`shootout <https://github.com/Pylons/shootout>`_ is an example "idea
-competition" application by Carlos de la Guardia and Lukasz Fidosz.  It
-demonstrates :term:`URL dispatch`, simple authentication, integration
-with `SQLAlchemy <http://www.sqlalchemy.org/>`_ and ``pyramid_simpleform``.
-Check this application out of version control via:
-
-.. code-block:: text
-
-  git clone git://github.com/Pylons/shootout.git
-
-`KARL <http://karlproject.org>`_ is a moderately-sized application (roughly
-80K lines of Python code) built on top of :app:`Pyramid`.  It is an open
-source web system for collaboration, organizational intranets, and knowledge
-management. It provides facilities for wikis, calendars, manuals, searching,
-tagging, commenting, and file uploads.  See the `KARL site
-<http://karlproject.org>`_ for download and installation details.
+.. _support-and-development:
 
 Support and Development
 =======================
@@ -189,7 +173,7 @@ The `Pylons Project web site <http://pylonsproject.org/>`_ is the main online
 source of :app:`Pyramid` support and development information.
 
 To report bugs, use the `issue tracker
-<http://github.com/Pylons/pyramid/issues>`_.
+<https://github.com/Pylons/pyramid/issues>`_.
 
 If you've got questions that aren't answered by this documentation,
 contact the `Pylons-discuss maillist
@@ -197,7 +181,7 @@ contact the `Pylons-discuss maillist
 IRC channel <irc://irc.freenode.net/#pyramid>`_.
 
 Browse and check out tagged and trunk versions of :app:`Pyramid` via
-the `Pyramid GitHub repository <http://github.com/Pylons/pyramid/>`_.
+the `Pyramid GitHub repository <https://github.com/Pylons/pyramid/>`_.
 To check out the trunk via ``git``, use this command:
 
 .. code-block:: text
@@ -216,12 +200,8 @@ Index and Glossary
 * :ref:`search`
 
 
-.. add glossary, foreword, and latexindex in a hidden toc to avoid warnings
-
 .. toctree::
    :hidden:
 
    glossary
-   foreword.rst
-   latexindex.rst
 

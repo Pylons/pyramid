@@ -485,6 +485,48 @@ class TestURLMethodsMixin(unittest.TestCase):
         self.assertEqual(result,
                          'http://example.com:5432/1/2/3/extra1/extra2?a=1#foo')
 
+    def test_current_route_url_with_request_query(self):
+        from pyramid.interfaces import IRoutesMapper
+        from webob.multidict import GetDict
+        request = self._makeOne()
+        request.GET = GetDict([('q', '123')], {})
+        route = DummyRoute('/1/2/3')
+        mapper = DummyRoutesMapper(route=route)
+        request.matched_route = route
+        request.matchdict = {}
+        request.registry.registerUtility(mapper, IRoutesMapper)
+        result = request.current_route_url()
+        self.assertEqual(result,
+                         'http://example.com:5432/1/2/3?q=123')
+
+    def test_current_route_url_with_request_query_duplicate_entries(self):
+        from pyramid.interfaces import IRoutesMapper
+        from webob.multidict import GetDict
+        request = self._makeOne()
+        request.GET = GetDict([('q', '123'), ('b', '2'), ('b', '2'), ('q', '456')], {})
+        route = DummyRoute('/1/2/3')
+        mapper = DummyRoutesMapper(route=route)
+        request.matched_route = route
+        request.matchdict = {}
+        request.registry.registerUtility(mapper, IRoutesMapper)
+        result = request.current_route_url()
+        self.assertEqual(result,
+                         'http://example.com:5432/1/2/3?q=123&b=2&b=2&q=456')
+
+    def test_current_route_url_with_query_override(self):
+        from pyramid.interfaces import IRoutesMapper
+        from webob.multidict import GetDict
+        request = self._makeOne()
+        request.GET = GetDict([('q', '123')], {})
+        route = DummyRoute('/1/2/3')
+        mapper = DummyRoutesMapper(route=route)
+        request.matched_route = route
+        request.matchdict = {}
+        request.registry.registerUtility(mapper, IRoutesMapper)
+        result = request.current_route_url(_query={'a':1})
+        self.assertEqual(result,
+                         'http://example.com:5432/1/2/3?a=1')
+
     def test_current_route_path(self):
         from pyramid.interfaces import IRoutesMapper
         request = self._makeOne()
@@ -497,7 +539,7 @@ class TestURLMethodsMixin(unittest.TestCase):
         result = request.current_route_path('extra1', 'extra2', _query={'a':1},
                                             _anchor=text_(b"foo"))
         self.assertEqual(result, '/script_name/1/2/3/extra1/extra2?a=1#foo')
-        
+
     def test_route_path_with_elements(self):
         from pyramid.interfaces import IRoutesMapper
         request = self._makeOne()
@@ -569,7 +611,6 @@ class TestURLMethodsMixin(unittest.TestCase):
                          ('pyramid.tests:static/foo.css', request, {}) )
 
     def test_static_url_abspath_integration_with_staticurlinfo(self):
-        import os
         from pyramid.interfaces import IStaticURLInfo
         from pyramid.config.views import StaticURLInfo
         info = StaticURLInfo()
@@ -582,6 +623,20 @@ class TestURLMethodsMixin(unittest.TestCase):
         result = request.static_url(abspath)
         self.assertEqual(result,
                          'http://example.com:5432/absstatic/test_url.py')
+
+    def test_static_url_noscheme_uses_scheme_from_request(self):
+        from pyramid.interfaces import IStaticURLInfo
+        from pyramid.config.views import StaticURLInfo
+        info = StaticURLInfo()
+        here = os.path.abspath(os.path.dirname(__file__))
+        info.add(self.config, '//subdomain.example.com/static', here)
+        request = self._makeOne({'wsgi.url_scheme': 'https'})
+        registry = request.registry
+        registry.registerUtility(info, IStaticURLInfo)
+        abspath = os.path.join(here, 'test_url.py')
+        result = request.static_url(abspath)
+        self.assertEqual(result,
+                         'https://subdomain.example.com/static/test_url.py')
 
     def test_static_path_abspath(self):
         from pyramid.interfaces import IStaticURLInfo
@@ -971,6 +1026,77 @@ class Test_current_route_path(unittest.TestCase):
         self.assertEqual(result, 'current route path')
         self.assertEqual(request.elements, ('abc',))
         self.assertEqual(request.kw, {'_anchor':'abc'})
+
+class Test_external_static_url_integration(unittest.TestCase):
+
+    def setUp(self):
+        self.config = testing.setUp()
+
+    def tearDown(self):
+        testing.tearDown()
+
+    def _makeRequest(self):
+        from pyramid.request import Request
+        return Request.blank('/')
+
+    def test_generate_external_url(self):
+        self.config.add_route('acme', 'https://acme.org/path/{foo}')
+        request = self._makeRequest()
+        request.registry = self.config.registry
+        self.assertEqual(
+            request.route_url('acme', foo='bar'),
+            'https://acme.org/path/bar')
+
+    def test_generate_external_url_without_scheme(self):
+        self.config.add_route('acme', '//acme.org/path/{foo}')
+        request = self._makeRequest()
+        request.registry = self.config.registry
+        self.assertEqual(
+            request.route_url('acme', foo='bar'),
+            'http://acme.org/path/bar')
+
+    def test_generate_external_url_with_explicit_scheme(self):
+        self.config.add_route('acme', '//acme.org/path/{foo}')
+        request = self._makeRequest()
+        request.registry = self.config.registry
+        self.assertEqual(
+            request.route_url('acme', foo='bar', _scheme='https'),
+            'https://acme.org/path/bar')
+
+    def test_generate_external_url_with_explicit_app_url(self):
+        self.config.add_route('acme', 'http://acme.org/path/{foo}')
+        request = self._makeRequest()
+        request.registry = self.config.registry
+        self.assertRaises(ValueError,
+            request.route_url, 'acme', foo='bar', _app_url='http://fakeme.com')
+
+    def test_generate_external_url_route_path(self):
+        self.config.add_route('acme', 'https://acme.org/path/{foo}')
+        request = self._makeRequest()
+        request.registry = self.config.registry
+        self.assertRaises(ValueError, request.route_path, 'acme', foo='bar')
+
+    def test_generate_external_url_with_pregenerator(self):
+        def pregenerator(request, elements, kw):
+            kw['_query'] = {'q': 'foo'}
+            return elements, kw
+        self.config.add_route('acme', 'https://acme.org/path/{foo}',
+                              pregenerator=pregenerator)
+        request = self._makeRequest()
+        request.registry = self.config.registry
+        self.assertEqual(
+            request.route_url('acme', foo='bar'),
+            'https://acme.org/path/bar?q=foo')
+
+    def test_external_url_with_route_prefix(self):
+        def includeme(config):
+            config.add_route('acme', '//acme.org/{foo}')
+        self.config.include(includeme, route_prefix='some_prefix')
+        request = self._makeRequest()
+        request.registry = self.config.registry
+        self.assertEqual(
+            request.route_url('acme', foo='bar'),
+            'http://acme.org/bar')
 
 class DummyContext(object):
     def __init__(self, next=None):

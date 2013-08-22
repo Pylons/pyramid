@@ -29,13 +29,13 @@ On UNIX:
 
 .. code-block:: text
 
-   $ /path/to/your/virtualenv/bin/python helloworld.py
+   $ $VENV/bin/python helloworld.py
 
 On Windows:
 
 .. code-block:: text
 
-   C:\> \path\to\your\virtualenv\Scripts\python.exe helloworld.py
+   C:\> %VENV%\Scripts\python.exe helloworld.py
 
 This command will not return and nothing will be printed to the console.
 When port 8080 is visited by a browser on the URL ``/hello/world``, the
@@ -166,7 +166,6 @@ the application.
 Adding Configuration
 ~~~~~~~~~~~~~~~~~~~~
 
-.. ignore-next-block
 .. literalinclude:: helloworld.py
    :linenos:
    :lines: 11-12
@@ -186,7 +185,6 @@ The second line registers the ``hello_world`` function as a
 WSGI Application Creation
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. ignore-next-block
 .. literalinclude:: helloworld.py
    :linenos:
    :lines: 13
@@ -215,7 +213,6 @@ to its ``add_view`` and ``add_route`` methods.
 WSGI Application Serving
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. ignore-next-block
 .. literalinclude:: helloworld.py
    :linenos:
    :lines: 14-15

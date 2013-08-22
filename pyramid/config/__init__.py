@@ -70,7 +70,7 @@ from pyramid.config.security import SecurityConfiguratorMixin
 from pyramid.config.settings import SettingsConfiguratorMixin
 from pyramid.config.testing import TestingConfiguratorMixin
 from pyramid.config.tweens import TweensConfiguratorMixin
-from pyramid.config.util import PredicateList
+from pyramid.config.util import PredicateList, not_
 from pyramid.config.views import ViewsConfiguratorMixin
 from pyramid.config.zca import ZCAConfiguratorMixin
 
@@ -85,6 +85,9 @@ empty = text_('')
 _marker = object()
 
 ConfigurationError = ConfigurationError # pyflakes
+
+not_ = not_ # pyflakes, this is an API
+
 
 class Configurator(
     TestingConfiguratorMixin,
@@ -642,7 +645,7 @@ class Configurator(
         argument named ``config``, which will be an instance of a
         :term:`Configurator`.  However, be warned that it will not be the same
         configurator instance on which you call this method.  The
-        code which runs as the result of calling the callable should invoke
+        code which runs as a result of calling the callable should invoke
         methods on the configurator passed to it which add configuration
         state.  The return value of a callable will be ignored.
 
@@ -864,14 +867,14 @@ class Configurator(
         This pushes a dictionary containing the :term:`application
         registry` implied by ``registry`` attribute of this
         configurator and the :term:`request` implied by the
-        ``request`` argument on to the :term:`thread local` stack
+        ``request`` argument onto the :term:`thread local` stack
         consulted by various :mod:`pyramid.threadlocal` API
         functions."""
         self.manager.push({'registry':self.registry, 'request':request})
 
     def end(self):
         """ Indicate that application or test configuration has ended.
-        This pops the last value pushed on to the :term:`thread local`
+        This pops the last value pushed onto the :term:`thread local`
         stack (usually by the ``begin`` method) and returns that
         value.
         """
@@ -963,7 +966,7 @@ class Configurator(
         # registry configured.
         global_registries.add(self.registry)
 
-        # Push the registry on to the stack in case any code that depends on
+        # Push the registry onto the stack in case any code that depends on
         # the registry threadlocal APIs used in listeners subscribed to the
         # IApplicationCreated event.
         self.manager.push({'registry':self.registry, 'request':None})
@@ -1052,7 +1055,7 @@ class ActionState(object):
         ...    v = context.execute_actions()
         ... except ConfigurationExecutionError, v:
         ...    pass
-        >>> print v
+        >>> print(v)
         exceptions.AttributeError: 'function' object has no attribute 'xxx'
           in:
           oops

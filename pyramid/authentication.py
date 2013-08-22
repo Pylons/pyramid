@@ -450,6 +450,12 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
        Default: ``False``.  Make the requesting IP address part of
        the authentication data in the cookie.  Optional.
 
+       For IPv6 this option is not recommended. The ``mod_auth_tkt``
+       specification does not specify how to handle IPv6 addresses, so using
+       this option in combination with IPv6 addresses may cause an
+       incompatible cookie. It ties the authentication ticket to that
+       individual's IPv6 address.
+
     ``timeout``
 
        Default: ``None``.  Maximum number of seconds which a newly
@@ -505,8 +511,31 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
     ``wild_domain``
 
        Default: ``True``. An auth_tkt cookie will be generated for the
-       wildcard domain.
+       wildcard domain. If your site is hosted as ``example.com`` this
+       will make the cookie available for sites underneath ``example.com``
+       such as ``www.example.com``.
        Optional.
+
+    ``parent_domain``
+
+       Default: ``False``. An auth_tkt cookie will be generated for the
+       parent domain of the current site. For example if your site is
+       hosted under ``www.example.com`` a cookie will be generated for
+       ``.example.com``. This can be useful if you have multiple sites
+       sharing the same domain. This option supercedes the ``wild_domain``
+       option.
+       Optional.
+
+       This option is available as of :app:`Pyramid` 1.5.
+
+    ``domain``
+
+       Default: ``None``. If provided the auth_tkt cookie will only be
+       set for this domain. This option is not compatible with ``wild_domain``
+       and ``parent_domain``.
+       Optional.
+
+       This option is available as of :app:`Pyramid` 1.5.
 
     ``hashalg``
 
@@ -559,7 +588,9 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
                  http_only=False,
                  wild_domain=True,
                  debug=False,
-                 hashalg=_marker
+                 hashalg=_marker,
+                 parent_domain=False,
+                 domain=None,
                  ):
         if hashalg is _marker:
             hashalg = 'md5'
@@ -597,6 +628,8 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
             path=path,
             wild_domain=wild_domain,
             hashalg=hashalg,
+            parent_domain=parent_domain,
+            domain=domain,
             )
         self.callback = callback
         self.debug = debug
@@ -736,9 +769,17 @@ def calculate_digest(ip, timestamp, secret, userid, tokens, user_data,
     tokens = bytes_(tokens, 'utf-8')
     user_data = bytes_(user_data, 'utf-8')
     hash_obj = hashlib.new(hashalg)
-    hash_obj.update(
-        encode_ip_timestamp(ip, timestamp) + secret + userid + b'\0'
-        + tokens + b'\0' + user_data)
+
+    # Check to see if this is an IPv6 address
+    if ':' in ip:
+        ip_timestamp = ip + str(int(timestamp))
+        ip_timestamp = bytes_(ip_timestamp)
+    else:
+        # encode_ip_timestamp not required, left in for backwards compatibility
+        ip_timestamp = encode_ip_timestamp(ip, timestamp)
+
+    hash_obj.update(ip_timestamp + secret + userid + b'\0' +
+            tokens + b'\0' + user_data)
     digest = hash_obj.hexdigest()
     hash_obj2 = hashlib.new(hashalg)
     hash_obj2.update(bytes_(digest) + secret)
@@ -786,7 +827,7 @@ class AuthTktCookieHelper(object):
     def __init__(self, secret, cookie_name='auth_tkt', secure=False,
                  include_ip=False, timeout=None, reissue_time=None,
                  max_age=None, http_only=False, path="/", wild_domain=True,
-                 hashalg='md5'):
+                 hashalg='md5', parent_domain=False, domain=None):
         self.secret = secret
         self.cookie_name = cookie_name
         self.include_ip = include_ip
@@ -797,6 +838,8 @@ class AuthTktCookieHelper(object):
         self.http_only = http_only
         self.path = path
         self.wild_domain = wild_domain
+        self.parent_domain = parent_domain
+        self.domain = domain
         self.hashalg = hashalg
 
         static_flags = []
@@ -834,19 +877,25 @@ class AuthTktCookieHelper(object):
         if ':' in cur_domain:
             cur_domain = cur_domain.split(':', 1)[0]
 
-        cookies = [
-            ('Set-Cookie', '%s="%s"; Path=%s%s%s' % (
-            self.cookie_name, value, self.path, max_age, self.static_flags)),
-            ('Set-Cookie', '%s="%s"; Path=%s; Domain=%s%s%s' % (
-            self.cookie_name, value, self.path, cur_domain, max_age,
-                self.static_flags)),
-            ]
 
-        if self.wild_domain:
-            wild_domain = '.' + cur_domain
-            cookies.append(('Set-Cookie', '%s="%s"; Path=%s; Domain=%s%s%s' % (
-                self.cookie_name, value, self.path, wild_domain, max_age,
-                self.static_flags)))
+        domains = []
+        if self.domain:
+            domains.append(self.domain)
+        else:
+            if self.parent_domain and cur_domain.count('.') > 1:
+                domains.append('.' + cur_domain.split('.', 1)[1])
+            else:
+                domains.append(None)
+                domains.append(cur_domain)
+                if self.wild_domain:
+                    domains.append('.' + cur_domain)
+
+        cookies = []
+        base_cookie = '%s="%s"; Path=%s%s%s' % (self.cookie_name, value,
+                self.path, max_age, self.static_flags)
+        for domain in domains:
+            domain = '; Domain=%s' % domain if domain is not None else ''
+            cookies.append(('Set-Cookie', '%s%s' % (base_cookie, domain)))
 
         return cookies
 

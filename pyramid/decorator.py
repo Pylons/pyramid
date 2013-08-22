@@ -10,21 +10,19 @@ class reify(object):
        class Foo(object):
            @reify
            def jammy(self):
-               print 'jammy called'
+               print('jammy called')
                return 1
 
     And usage of Foo:
 
-    .. code-block:: text
-
-       >>> f = Foo()
-       >>> v = f.jammy
-       'jammy called'
-       >>> print v
-       1
-       >>> f.jammy
-       1
-       >>> # jammy func not called the second time; it replaced itself with 1
+    >>> f = Foo()
+    >>> v = f.jammy
+    'jammy called'
+    >>> print(v)
+    1
+    >>> f.jammy
+    1
+    >>> # jammy func not called the second time; it replaced itself with 1
     """
     def __init__(self, wrapped):
         self.wrapped = wrapped

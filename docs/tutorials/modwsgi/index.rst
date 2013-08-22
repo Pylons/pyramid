@@ -46,14 +46,14 @@ specific path information for commands and files.
        $ cd ~
        $ mkdir modwsgi
        $ cd modwsgi
-       $ /usr/local/bin/virtualenv --no-site-packages env
+       $ /usr/local/bin/virtualenv env
 
 #.  Install :app:`Pyramid` into the newly created virtualenv:
 
     .. code-block:: text
 
        $ cd ~/modwsgi/env
-       $ bin/easy_install pyramid
+       $ $VENV/bin/easy_install pyramid
     
 #.  Create and install your :app:`Pyramid` application.  For the purposes of
     this tutorial, we'll just be using the ``pyramid_starter`` application as
@@ -63,9 +63,9 @@ specific path information for commands and files.
     .. code-block:: text
 
        $ cd ~/modwsgi/env
-       $ bin/pcreate -s starter myapp
+       $ $VENV/bin/pcreate -s starter myapp
        $ cd myapp
-       $ ../bin/python setup.py install
+       $ $VENV/bin/python setup.py install
 
 #.  Within the virtualenv directory (``~/modwsgi/env``), create a
     script named ``pyramid.wsgi``.  Give it these contents:

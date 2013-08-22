@@ -55,7 +55,7 @@ method of the Configurator:
    :linenos:
 
    def mysubscriber(event):
-       print event.request
+       print(event.request)
 
    config.add_newrequest_subscriber(mysubscriber)
 
@@ -79,7 +79,7 @@ able to install it and subsequently do:
    :linenos:
 
    def mysubscriber(event):
-       print event.request
+       print(event.request)
 
    from pyramid.config import Configurator
    config = Configurator()
@@ -129,8 +129,8 @@ called (either explicitly or as the result of calling
 :meth:`~pyramid.config.Configurator.make_wsgi_app`), conflicting actions are
 potentially automatically resolved as per
 :ref:`automatic_conflict_resolution`.  If a conflict cannot be automatically
-resolved, a :exc:`ConfigurationConflictError` is raised and application
-startup is prevented.
+resolved, a :exc:`pyramid.exceptions.ConfigurationConflictError` is raised
+and application startup is prevented.
 
 In our above example, therefore, if a consumer of our ``add_jammyjam``
 directive did this:

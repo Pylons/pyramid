@@ -69,22 +69,18 @@ class InstancePropertyMixin(object):
         can accept multiple ``(name, property)`` pairs generated via
         :meth:`pyramid.util.InstancePropertyMixin._make_property`.
 
-        ``attrs`` is a sequence of 2-tuples *or* a data structure with
-        an ``.items()`` method which returns a sequence of 2-tuples
+        ``properties`` is a sequence of two-tuples *or* a data structure
+        with an ``.items()`` method which returns a sequence of two-tuples
         (presumably a dictionary). It will be used to add several
         properties to the instance in a manner that is more efficient
         than simply calling ``set_property`` repeatedly.
         """
-
-        if hasattr(properties, 'items'):
-            attrs = properties.items()
-        else:
-            attrs = properties
         attrs = dict(properties)
 
-        parent = self.__class__
-        cls = type(parent.__name__, (parent, object), attrs)
-        self.__class__ = cls
+        if attrs:
+            parent = self.__class__
+            cls = type(parent.__name__, (parent, object), attrs)
+            self.__class__ = cls
 
     def _set_extensions(self, extensions):
         for name, fn in iteritems_(extensions.methods):
@@ -234,18 +230,15 @@ def object_description(object):
     """ Produce a human-consumable text description of ``object``,
     usually involving a Python dotted name. For example:
 
-    .. code-block:: python
-
-       >>> object_description(None)
-       u'None'
-       >>> from xml.dom import minidom
-       >>> object_description(minidom)
-       u'module xml.dom.minidom'
-       >>> object_description(minidom.Attr)
-       u'class xml.dom.minidom.Attr'
-       >>> object_description(minidom.Attr.appendChild)
-       u'method appendChild of class xml.dom.minidom.Attr'
-       >>> 
+    >>> object_description(None)
+    u'None'
+    >>> from xml.dom import minidom
+    >>> object_description(minidom)
+    u'module xml.dom.minidom'
+    >>> object_description(minidom.Attr)
+    u'class xml.dom.minidom.Attr'
+    >>> object_description(minidom.Attr.appendChild)
+    u'method appendChild of class xml.dom.minidom.Attr'
 
     If this method cannot identify the type of the object, a generic
     description ala ``object <object.__name__>`` will be returned.

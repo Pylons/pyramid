@@ -49,9 +49,7 @@ The included scaffolds are these:
   URL mapping via :term:`URL dispatch` and no persistence mechanism.
 
 ``zodb``
-  URL mapping via :term:`traversal` and persistence via :term:`ZODB`.  *Note
-  that, as of this writing, this scaffold will not run under Python 3, only
-  under Python 2.*
+  URL mapping via :term:`traversal` and persistence via :term:`ZODB`.
 
 ``alchemy``
   URL mapping via :term:`URL dispatch` and persistence via
@@ -80,13 +78,13 @@ On UNIX:
 
 .. code-block:: text
 
-   $ bin/pcreate -s starter MyProject
+   $ $VENV/bin/pcreate -s starter MyProject
 
 Or on Windows:
 
 .. code-block:: text
 
-   > Scripts\pcreate -s starter MyProject
+   > %VENV%\Scripts\pcreate -s starter MyProject
 
 The above command uses the ``pcreate`` command to create a project with the
 ``starter`` scaffold.  To use a different scaffold, such as
@@ -95,20 +93,20 @@ on UNIX:
 
 .. code-block:: text
 
-   $ bin/pcreate -s alchemy MyProject
+   $ $VENV/bin/pcreate -s alchemy MyProject
 
 Or on Windows:
 
 .. code-block:: text
 
-   > Scripts\pcreate -s alchemy MyProject
+   > %VENV%\Scripts\pcreate -s alchemy MyProject
 
 Here's sample output from a run of ``pcreate`` on UNIX for a project we name
 ``MyProject``:
 
 .. code-block:: text
 
-   $ bin/pcreate -s starter MyProject
+   $ $VENV/bin/pcreate -s starter MyProject
    Creating template pyramid
    Creating directory ./MyProject
    # ... more output ...
@@ -177,21 +175,21 @@ On UNIX:
 .. code-block:: text
 
    $ cd MyProject
-   $ ../bin/python setup.py develop
+   $ $VENV/bin/python setup.py develop
 
 Or on Windows:
 
 .. code-block:: text
 
    > cd MyProject
-   > ..\Scripts\python.exe setup.py develop
+   > %VENV%\Scripts\python.exe setup.py develop
 
 Elided output from a run of this command on UNIX is shown below:
 
 .. code-block:: text
 
    $ cd MyProject
-   $ ../bin/python setup.py develop
+   $ $VENV/bin/python setup.py develop
    ...
    Finished processing dependencies for MyProject==0.0
 
@@ -216,19 +214,19 @@ On UNIX:
 
 .. code-block:: text
 
-   $ ../bin/python setup.py test -q
+   $ $VENV/bin/python setup.py test -q
 
 Or on Windows:
 
 .. code-block:: text
 
-   > ..\Scripts\python.exe setup.py test -q
+   > %VENV%\Scripts\python.exe setup.py test -q
 
 Here's sample output from a test run on UNIX:
 
 .. code-block:: text
 
-   $ ../bin/python setup.py test -q
+   $ $VENV/bin/python setup.py test -q
    running test
    running egg_info
    writing requirements to MyProject.egg-info/requires.txt
@@ -272,19 +270,19 @@ On UNIX:
 
 .. code-block:: text
 
-   $ ../bin/pserve development.ini
+   $ $VENV/bin/pserve development.ini
 
 On Windows:
 
 .. code-block:: text
 
-   > ..\Scripts\pserve development.ini
+   > %VENV%\Scripts\pserve development.ini
 
 Here's sample output from a run of ``pserve`` on UNIX:
 
 .. code-block:: text
 
-   $ ../bin/pserve development.ini
+   $ $VENV/bin/pserve development.ini
    Starting server in PID 16601.
    serving on http://0.0.0.0:6543
 
@@ -305,7 +303,9 @@ If you want to restrict access such that only a browser running on the same
 machine as Pyramid will be able to access your Pyramid application, edit the
 ``development.ini`` file, and replace the ``host`` value in the
 ``[server:main]`` section.  Change it from ``0.0.0.0`` to ``127.0.0.1``.  For
-example::
+example:
+
+.. code-block:: ini
 
    [server:main]
    use = egg:waitress#main
@@ -357,7 +357,7 @@ For example, on UNIX:
 
 .. code-block:: text
 
-   $ ../bin/pserve development.ini --reload
+   $ $VENV/bin/pserve development.ini --reload
    Starting subprocess with file monitor
    Starting server in PID 16601.
    serving on http://0.0.0.0:6543
@@ -414,7 +414,7 @@ If you don't see the debug toolbar image on the right hand top of the page,
 it means you're browsing from a system that does not have debugging access.
 By default, for security reasons, only a browser originating from
 ``localhost`` (``127.0.0.1``) can see the debug toolbar.  To allow your
-browser on a remote system to access the server, add the a line within the
+browser on a remote system to access the server, add a line within the
 ``[app:main]`` section of the ``development.ini`` file in the form
 ``debugtoolbar.hosts = X.X.X.X``.  For example, if your Pyramid application
 is running on a remote system, and you're browsing from a host with the IP
@@ -990,6 +990,8 @@ prompt with a similar configuration as would be loaded if you were running
 your Pyramid application via ``pserve``.  This can be a useful debugging tool.
 See :ref:`interactive_shell` for more details.
 
+.. _what_is_this_pserve_thing:
+
 What Is This ``pserve`` Thing
 -----------------------------
 
@@ -1003,12 +1005,12 @@ Pyramid application based on the data in the file.
 application.  As we saw in :ref:`firstapp_chapter`, ``pserve`` needn't be
 invoked at all to run a :app:`Pyramid` application.  The use of ``pserve`` to
 run a :app:`Pyramid` application is purely conventional based on the output
-of its scaffolding.  But we strongly recommend using while developing your
-application, because many other convenience introspection commands (such as
-``pviews``, ``prequest``, ``proutes`` and others) are also implemented in
-terms of configuration availability of this ``.ini`` file format.  It also
-configures Pyramid logging and provides the ``--reload`` switch for
-convenient restarting of the server when code changes.
+of its scaffolding.  But we strongly recommend using ``pserve`` while
+developing your application, because many other convenience introspection
+commands (such as ``pviews``, ``prequest``, ``proutes`` and others) are also
+implemented in terms of configuration availability of this ``.ini`` file
+format.  It also configures Pyramid logging and provides the ``--reload``
+switch for convenient restarting of the server when code changes.
 
 .. _alternate_wsgi_server:
 

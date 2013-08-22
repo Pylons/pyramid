@@ -1,5 +1,6 @@
 import binascii
 import os
+from textwrap import dedent
 
 from pyramid.compat import native_
 
@@ -11,7 +12,7 @@ class PyramidTemplate(Template):
      templates.
     """
     def pre(self, command, output_dir, vars):
-        """ Overrides :meth:`pyramid.scaffold.template.Template.pre`, adding
+        """ Overrides :meth:`pyramid.scaffolds.template.Template.pre`, adding
         several variables to the default variables list (including
         ``random_string``, and ``package_logger``).  It also prevents common
         misnamings (such as naming a package "site" or naming a package
@@ -30,10 +31,25 @@ class PyramidTemplate(Template):
         return Template.pre(self, command, output_dir, vars)
 
     def post(self, command, output_dir, vars): # pragma: no cover
-        """ Overrides :meth:`pyramid.scaffold.template.Template.post`, to
+        """ Overrides :meth:`pyramid.scaffolds.template.Template.post`, to
         print "Welcome to Pyramid.  Sorry for the convenience." after a
         successful scaffolding rendering."""
-        self.out('Welcome to Pyramid.  Sorry for the convenience.')
+
+        separator = "=" * 79
+        msg = dedent(
+            """
+            %(separator)s
+            Tutorials: http://docs.pylonsproject.org/projects/pyramid_tutorials
+            Documentation: http://docs.pylonsproject.org/projects/pyramid
+
+            Twitter (tips & updates): http://twitter.com/pylons
+            Mailing List: http://groups.google.com/group/pylons-discuss
+
+            Welcome to Pyramid.  Sorry for the convenience.
+            %(separator)s
+        """ % {'separator': separator})
+
+        self.out(msg)
         return Template.post(self, command, output_dir, vars)
 
     def out(self, msg): # pragma: no cover (replaceable testing hook)

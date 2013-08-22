@@ -2791,7 +2791,8 @@ class TestViewDeriver(unittest.TestCase):
         self.assertEqual(len(logger.messages), 1)
         self.assertEqual(logger.messages[0],
                          "debug_authorization of url url (view name "
-                         "'view_name' against context None): False")
+                         "'view_name' against context None): "
+                         "Allowed (NO_PERMISSION_REQUIRED)")
 
     def test_secured_view_authn_policy_no_authz_policy(self):
         response = DummyResponse()
@@ -3735,6 +3736,13 @@ class TestStaticURLInfo(unittest.TestCase):
         config = self._makeConfig()
         inst.add(config, 'http://example.com', 'anotherpackage:path')
         expected = [('http://example.com/', 'anotherpackage:path/', None)]
+        self._assertRegistrations(config, expected)
+
+    def test_add_url_noscheme(self):
+        inst = self._makeOne()
+        config = self._makeConfig()
+        inst.add(config, '//example.com', 'anotherpackage:path')
+        expected = [('//example.com/', 'anotherpackage:path/', None)]
         self._assertRegistrations(config, expected)
 
     def test_add_viewname(self):

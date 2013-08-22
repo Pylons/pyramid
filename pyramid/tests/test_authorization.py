@@ -215,6 +215,15 @@ class TestACLAuthorizationPolicy(unittest.TestCase):
         result = sorted(
             policy.principals_allowed_by_permission(context, 'read'))
         self.assertEqual(result, [])
+
+    def test_callable_acl(self):
+        from pyramid.security import Allow
+        context = DummyContext()
+        fn = lambda self: [(Allow, 'bob', 'read')]
+        context.__acl__ = fn.__get__(context, context.__class__)
+        policy = self._makeOne()
+        result = policy.permits(context, ['bob'], 'read')
+        self.assertTrue(result)
         
 
 class DummyContext:

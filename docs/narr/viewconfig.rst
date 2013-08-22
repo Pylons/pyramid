@@ -38,11 +38,11 @@ A view configuration statement is made about information present in the
 
 View configuration is performed in one of two ways:
 
-- by running a :term:`scan` against application source code which has a
+- By running a :term:`scan` against application source code which has a
   :class:`pyramid.view.view_config` decorator attached to a Python object as
   per :ref:`mapping_views_using_a_decorator_section`.
 
-- by using the :meth:`pyramid.config.Configurator.add_view` method as per
+- By using the :meth:`pyramid.config.Configurator.add_view` method as per
   :ref:`mapping_views_using_imperative_config_section`.
 
 .. index::
@@ -62,13 +62,13 @@ particular view callable.
 
 :term:`View predicate` attributes are an important part of view configuration
 that enables the :term:`view lookup` subsystem to find and invoke the
-appropriate view.  The greater number of predicate attributes possessed by a
+appropriate view.  The greater the number of predicate attributes possessed by a
 view's configuration, the more specific the circumstances need to be before
-the registered view callable will be invoked.  The fewer number of predicates
+the registered view callable will be invoked.  The fewer the number of predicates
 which are supplied to a particular view configuration, the more likely it is
 that the associated view callable will be invoked.  A view with five
 predicates will always be found and evaluated before a view with two, for
-example.  All predicates must match for the associated view to be called.
+example.
 
 This does not mean however, that :app:`Pyramid` "stops looking" when it
 finds a view registration with predicates that don't match.  If one set
@@ -81,7 +81,7 @@ invoked.
 If no view can be found with predicates which allow it to be matched up with
 the request, :app:`Pyramid` will return an error to the user's browser,
 representing a "not found" (404) page.  See :ref:`changing_the_notfound_view`
-for more information about changing the default notfound view.
+for more information about changing the default :term:`Not Found View`.
 
 Other view configuration arguments are non-predicate arguments.  These tend
 to modify the response of the view callable or prevent the view callable from
@@ -290,9 +290,9 @@ configured view.
   of the ``REQUEST_METHOD`` of the :term:`WSGI` environment.
 
 ``request_param``
-  This value can be any string or a sequence of strings.  A view declaration 
-  with this argument ensures that the view will only be called when the 
-  :term:`request` has a key in the ``request.params`` dictionary (an HTTP 
+  This value can be any string or a sequence of strings.  A view declaration
+  with this argument ensures that the view will only be called when the
+  :term:`request` has a key in the ``request.params`` dictionary (an HTTP
   ``GET`` or ``POST`` variable) that has a name which matches the
   supplied value.
 
@@ -306,16 +306,14 @@ configured view.
   consideration of keys and values in the ``request.params`` dictionary.
 
 ``match_param``
-  .. versionadded:: 1.2
-
   This param may be either a single string of the format "key=value" or a
   dict of key/value pairs.
 
   This argument ensures that the view will only be called when the
   :term:`request` has key/value pairs in its :term:`matchdict` that equal
-  those supplied in the predicate.  e.g. ``match_param="action=edit" would
+  those supplied in the predicate.  e.g. ``match_param="action=edit"`` would
   require the ``action`` parameter in the :term:`matchdict` match the right
-  hande side of the expression (``edit``) for the view to "match" the current
+  hand side of the expression (``edit``) for the view to "match" the current
   request.
 
   If the ``match_param`` is a dict, every key/value pair must match for the
@@ -323,6 +321,8 @@ configured view.
 
   If ``match_param`` is not supplied, the view will be invoked without
   consideration of the keys and values in ``request.matchdict``.
+
+  .. versionadded:: 1.2
 
 ``containment``
   This value should be a reference to a Python class or :term:`interface`
@@ -488,7 +488,6 @@ acts as a :app:`Pyramid` view callable.
 Here's an example of the :class:`~pyramid.view.view_config` decorator that
 lives within a :app:`Pyramid` application module ``views.py``:
 
-.. ignore-next-block
 .. code-block:: python
    :linenos:
 
@@ -503,11 +502,10 @@ lives within a :app:`Pyramid` application module ``views.py``:
 Using this decorator as above replaces the need to add this imperative
 configuration stanza:
 
-.. ignore-next-block
 .. code-block:: python
    :linenos:
 
-   config.add_view('mypackage.views.my_view', route_name='ok', 
+   config.add_view('mypackage.views.my_view', route_name='ok',
                    request_method='POST', permission='read')
 
 All arguments to ``view_config`` may be omitted.  For example:
@@ -559,6 +557,35 @@ form of :term:`declarative configuration`, while
 :meth:`pyramid.config.Configurator.add_view` is a form of :term:`imperative
 configuration`.  However, they both do the same thing.
 
+Inverting Predicate Values
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You can invert the meaning of any predicate value by wrapping it in a call to
+:class:`pyramid.config.not_`.
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.config import not_
+
+   config.add_view(
+       'mypackage.views.my_view',
+       route_name='ok',
+       request_method=not_('POST')
+       )
+
+The above example will ensure that the view is called if the request method
+is *not* ``POST``, at least if no other view is more specific.
+
+This technique of wrapping a predicate value in ``not_`` can be used anywhere
+predicate values are accepted:
+
+- :meth:`pyramid.config.Configurator.add_view`
+
+- :meth:`pyramid.view.view_config`
+
+.. versionadded:: 1.5
+
 .. index::
    single: view_config placement
 
@@ -583,8 +610,7 @@ If your view callable is a function, it may be used as a function decorator:
        return Response('edited!')
 
 If your view callable is a class, the decorator can also be used as a class
-decorator in Python 2.6 and better (Python 2.5 and below do not support class
-decorators).  All the arguments to the decorator are the same when applied
+decorator. All the arguments to the decorator are the same when applied
 against a class as when they are applied against a function.  For example:
 
 .. code-block:: python
@@ -600,25 +626,6 @@ against a class as when they are applied against a function.  For example:
 
        def __call__(self):
            return Response('hello')
-
-You can use the :class:`~pyramid.view.view_config` decorator as a simple
-callable to manually decorate classes in Python 2.5 and below without the
-decorator syntactic sugar, if you wish:
-
-.. code-block:: python
-   :linenos:
-
-   from pyramid.response import Response
-   from pyramid.view import view_config
-
-   class MyView(object):
-       def __init__(self, request):
-           self.request = request
-
-       def __call__(self):
-           return Response('hello')
-
-   my_view = view_config(route_name='hello')(MyView)
 
 More than one :class:`~pyramid.view.view_config` decorator can be stacked on
 top of any number of others.  Each decorator creates a separate view
@@ -706,11 +713,10 @@ this method are very similar to the arguments that you provide to the
    # pyramid.config.Configurator class
    config.add_view(hello_world, route_name='hello')
 
-The first argument, ``view``, is required.  It must either be a Python object
-which is the view itself or a :term:`dotted Python name` to such an object.
-In the above example, ``view`` is the ``hello_world`` function.  All other
-arguments are optional.  See :meth:`pyramid.config.Configurator.add_view` for
-more information.
+The first argument, a :term:`view callable`, is the only required argument.
+It must either be a Python object which is the view itself or a
+:term:`dotted Python name` to such an object.
+In the above example, the ``view callable`` is the ``hello_world`` function.
 
 When you use only :meth:`~pyramid.config.Configurator.add_view` to add view
 configurations, you don't need to issue a :term:`scan` in order for the view
@@ -825,7 +831,7 @@ of this:
        config.add_view(
            RESTView, route_name='rest', attr='delete', request_method='DELETE')
 
-To reduce the amount of repetion in the ``config.add_view`` statements, we
+To reduce the amount of repetition in the ``config.add_view`` statements, we
 can move the ``route_name='rest'`` argument to a ``@view_default`` class
 decorator on the RESTView class:
 
@@ -931,10 +937,11 @@ per :ref:`protecting_views`.
 
 .. _debug_notfound_section:
 
-:exc:`NotFound` Errors
-~~~~~~~~~~~~~~~~~~~~~~
+:exc:`~pyramid.exceptions.NotFound` Errors
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-It's useful to be able to debug :exc:`NotFound` error responses when they
+It's useful to be able to debug :exc:`~pyramid.exceptions.NotFound`
+error responses when they
 occur unexpectedly due to an application registry misconfiguration.  To debug
 these errors, use the ``PYRAMID_DEBUG_NOTFOUND`` environment variable or the
 ``pyramid.debug_notfound`` configuration file setting.  Details of why a view
@@ -997,6 +1004,8 @@ invoked as the result of the ``http_cache`` argument to view configuration.
 
 .. index::
    pair: view configuration; debugging
+
+.. _debugging_view_configuration:
 
 Debugging View Configuration
 ----------------------------

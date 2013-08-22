@@ -13,7 +13,7 @@ Terminology Changes
 The term "template" used by the Pyramid documentation used to refer to both
 "paster templates" and "rendered templates" (templates created by a rendering
 engine.  i.e. Mako, Chameleon, Jinja, etc.).  "Paster templates" will now be
-refered to as "scaffolds", whereas the name for "rendered templates" will
+referred to as "scaffolds", whereas the name for "rendered templates" will
 remain as "templates."
 
 Major Feature Additions
@@ -43,7 +43,7 @@ The major feature additions in Pyramid 1.1 are:
 
   The object passed to a view callable as ``request`` is an instance of
   :class:`pyramid.request.Request`. ``request.response`` is an instance of
-  the class :class:`pyramid.request.Response`.  View callables that are
+  the class :class:`pyramid.response.Response`.  View callables that are
   configured with a :term:`renderer` will return this response object to the
   Pyramid router.  Therefore, code in a renderer-using view callable can set
   response attributes such as ``request.response.content_type`` (before they
@@ -95,7 +95,7 @@ Default HTTP Exception View
   is passed for this value, an exception view for HTTP exceptions will not be
   registered.  Passing ``None`` returns the behavior of raising an HTTP
   exception to that of Pyramid 1.0 (the exception will propagate to
-  middleware and to the WSGI server).
+  :term:`middleware` and to the WSGI server).
 
 ``http_cache``
 ~~~~~~~~~~~~~~
@@ -289,7 +289,7 @@ Minor Feature Additions
   when you want the static view to behave like the older deprecated version.
 
 - A new api function :func:`pyramid.scripting.prepare` has been added.  It is
-  a lower-level analogue of :func:`pyramid.paster.boostrap` that accepts a
+  a lower-level analogue of :func:`pyramid.paster.bootstrap` that accepts a
   request and a registry instead of a config file argument, and is used for
   the same purpose:
 
@@ -313,7 +313,7 @@ Minor Feature Additions
 
 - New API attribute :attr:`pyramid.config.global_registries` is an iterable
   object that contains references to every Pyramid registry loaded into the
-  current process via :meth:`pyramid.config.Configurator.make_app`.  It also
+  current process via :meth:`pyramid.config.Configurator.make_wsgi_app`.  It also
   has a ``last`` attribute containing the last registry loaded.  This is used
   by the scripting machinery, and is available for introspection.
 
@@ -395,8 +395,9 @@ Deprecations and Behavior Differences
    when porting your application from an older version of Pyramid.  Use the
    ``PYTHONWARNINGS`` environment variable with the value ``all`` in the
    shell you use to invoke ``paster serve`` to see these warnings, e.g. on
-   UNIX, ``PYTHONWARNINGS=all bin/paster serve development.ini``.  Python 2.5
-   and 2.6 show deprecation warnings by default, so this is unecessary there.
+   UNIX, ``PYTHONWARNINGS=all $VENV/bin/paster serve development.ini``.
+   Python 2.5 and 2.6 show deprecation warnings by default,
+   so this is unnecessary there.
    All deprecation warnings are emitted to the console.
 
 - The :class:`pyramid.view.static` class has been deprecated in favor of the

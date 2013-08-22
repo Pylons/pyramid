@@ -1,6 +1,6 @@
 ##############################################################################
 #
-# Copyright (c) 2008-2011 Agendaless Consulting and Contributors.
+# Copyright (c) 2008-2013 Agendaless Consulting and Contributors.
 # All Rights Reserved.
 #
 # This software is subject to the provisions of the BSD-like license at
@@ -65,13 +65,14 @@ docs_extras = [
 
 testing_extras = tests_require + [
     'nose',
+    'nose-selecttests',
     'coverage',
     'virtualenv', # for scaffolding tests
     ]
 
 setup(name='pyramid',
-      version='1.4',
-      description=('The Pyramid web application development framework, a '
+      version='1.5dev',
+      description=('The Pyramid Web Framework, a '
                    'Pylons project'),
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
@@ -118,6 +119,7 @@ setup(name='pyramid',
         pviews = pyramid.scripts.pviews:main
         ptweens = pyramid.scripts.ptweens:main
         prequest = pyramid.scripts.prequest:main
+        pdistreport = pyramid.scripts.pdistreport:main
         [paste.server_runner]
         wsgiref = pyramid.scripts.pserve:wsgiref_server_runner
         cherrypy = pyramid.scripts.pserve:cherrypy_server_runner

@@ -7,6 +7,8 @@
 Pyramid Configuration Introspection
 ===================================
 
+.. versionadded:: 1.3
+
 When Pyramid starts up, each call to a :term:`configuration directive` causes
 one or more :term:`introspectable` objects to be registered with an
 :term:`introspector`.  The introspector can be queried by application code to
@@ -14,10 +16,6 @@ obtain information about the configuration of the running application.  This
 feature is useful for debug toolbars, command-line scripts which show some
 aspect of configuration, and for runtime reporting of startup-time
 configuration settings.
-
-.. warning::
-
-   Introspection is new in Pyramid 1.3.
 
 Using the Introspector
 ----------------------

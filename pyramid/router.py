@@ -24,6 +24,7 @@ from pyramid.events import (
     NewResponse,
     )
 
+from pyramid.exceptions import PredicateMismatch
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.request import Request
 from pyramid.threadlocal import manager
@@ -158,8 +159,27 @@ class Router(object):
                 msg = request.path_info
             raise HTTPNotFound(msg)
         else:
-            response = view_callable(context, request)
-
+            try:
+                response = view_callable(context, request)
+            except PredicateMismatch:
+                # look for other views that meet the predicate
+                # criteria
+                for iface in context_iface.__sro__[1:]:
+                    previous_view_callable = view_callable
+                    view_callable = adapters.lookup(
+                        (IViewClassifier, request.request_iface, iface),
+                        IView, name=view_name, default=None)
+                    # intermediate bases may lookup same view_callable
+                    if view_callable is previous_view_callable:
+                        continue
+                    if view_callable is not None:
+                        try:
+                            response = view_callable(context, request)
+                            break
+                        except PredicateMismatch:
+                            pass
+                else:
+                    raise
         return response
 
     def invoke_subrequest(self, request, use_tweens=False):

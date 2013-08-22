@@ -287,7 +287,7 @@ When such a request reaches a view in your application, the
 
     @view_config(renderer='string')
     def aview(request):
-        print request.json_body
+        print(request.json_body)
         return 'OK'
 
 For the above view, printed to the console will be:
@@ -326,7 +326,6 @@ package that uses SQLAlchemy, and you'd like the current SQLAlchemy database
 session to be removed after each request.  Put the following in the
 ``mypackage.__init__`` module:
 
-.. ignore-next-block
 .. code-block:: python
    :linenos:
 
@@ -355,7 +354,7 @@ initialization.
    cause ``DBSession.remove`` to be called in an application generated from
    any :app:`Pyramid` scaffold, because these all use the ``pyramid_tm``
    package.  The cleanup done by ``DBSession.remove`` is unnecessary when
-   ``pyramid_tm`` middleware is configured into the application.
+   ``pyramid_tm`` :term:`middleware` is configured into the application.
 
 More Details
 ++++++++++++
@@ -488,10 +487,9 @@ module.
 Each class is named ``pyramid.httpexceptions.HTTP*``, where ``*`` is the
 reason for the error.  For instance,
 :class:`pyramid.httpexceptions.HTTPNotFound` subclasses
-:class:`pyramid.Response`, so you can manipulate the instances in the same
+:class:`pyramid.response.Response`, so you can manipulate the instances in the same
 way.  A typical example is:
 
-.. ignore-next-block
 .. code-block:: python
     :linenos:
 

@@ -1,3 +1,4 @@
+import base64
 import optparse
 import sys
 import textwrap
@@ -18,9 +19,22 @@ class PRequestCommand(object):
     This command makes an artifical request to a web application that uses a
     PasteDeploy (.ini) configuration file for the server and application.
 
-    Use "prequest config.ini /path" to request "/path".  Use "prequest
-    --method=POST config.ini /path < data" to do a POST with the given
-    request body.
+    Use "prequest config.ini /path" to request "/path".
+
+    Use "prequest --method=POST config.ini /path < data" to do a POST with
+    the given request body.
+
+    Use "prequest --method=PUT config.ini /path < data" to do a
+    PUT with the given request body.
+
+    Use "prequest --method=PATCH config.ini /path < data" to do a
+    PATCH with the given request body.
+
+    Use "prequest --method=OPTIONS config.ini /path" to do an
+    OPTIONS request.
+
+    Use "prequest --method=PROPFIND config.ini /path" to do a
+    PROPFIND request.
 
     If the path is relative (doesn't begin with "/") it is interpreted as
     relative to "/".  The path passed to this script should be URL-quoted.
@@ -59,9 +73,17 @@ class PRequestCommand(object):
     parser.add_option(
         '-m', '--method',
         dest='method',
-        choices=['GET', 'HEAD', 'POST', 'DELETE'],
+        choices=['GET', 'HEAD', 'POST', 'PUT', 'PATCH','DELETE',
+                 'PROPFIND', 'OPTIONS'],
         type='choice',
-        help='Request method type (GET, POST, DELETE)',
+        help='Request method type (GET, POST, PUT, PATCH, DELETE, '
+             'PROPFIND, OPTIONS)',
+        )
+    parser.add_option(
+        '-l', '--login',
+        dest='login',
+        type='string',
+        help='HTTP basic auth username:password pair',
         )
 
     get_app = staticmethod(get_app)
@@ -92,6 +114,10 @@ class PRequestCommand(object):
         path = url_unquote(path)
 
         headers = {}
+        if self.options.login:
+            enc = base64.b64encode(self.options.login.encode('ascii'))
+            headers['Authorization'] = 'Basic ' + enc.decode('ascii')
+
         if self.options.headers:
             for item in self.options.headers:
                 if ':' not in item:
@@ -110,9 +136,9 @@ class PRequestCommand(object):
         environ = {
             'REQUEST_METHOD': request_method,
             'SCRIPT_NAME': '',           # may be empty if app is at the root
-            'PATH_INFO': path,           
+            'PATH_INFO': path,
             'SERVER_NAME': 'localhost',  # always mandatory
-            'SERVER_PORT': '80',         # always mandatory 
+            'SERVER_PORT': '80',         # always mandatory
             'SERVER_PROTOCOL': 'HTTP/1.0',
             'CONTENT_TYPE': 'text/plain',
             'REMOTE_ADDR':'127.0.0.1',
@@ -127,7 +153,7 @@ class PRequestCommand(object):
             'paste.command_request': True,
             }
 
-        if request_method == 'POST':
+        if request_method in ('POST', 'PUT', 'PATCH'):
             environ['wsgi.input'] = self.stdin
             environ['CONTENT_LENGTH'] = '-1'
 

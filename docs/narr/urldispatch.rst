@@ -16,12 +16,13 @@ receives the :term:`request` and returns a :term:`response` object.
 High-Level Operational Overview
 -------------------------------
 
-If route configuration is present in an application, the :app:`Pyramid`
+If any route configuration is present in an application, the :app:`Pyramid`
 :term:`Router` checks every incoming request against an ordered set of URL
 matching patterns present in a *route map*.
 
 If any route pattern matches the information in the :term:`request`,
-:app:`Pyramid` will invoke :term:`view lookup` to find a matching view.
+:app:`Pyramid` will invoke the :term:`view lookup` process to find a
+matching view.
 
 If no route pattern in the route map matches the information in the
 :term:`request` provided in your application, :app:`Pyramid` will fail over
@@ -54,7 +55,6 @@ The :meth:`pyramid.config.Configurator.add_route` method adds a single
 :term:`route configuration` to the :term:`application registry`.  Here's an
 example:
 
-.. ignore-next-block
 .. code-block:: python
 
    # "config" below is presumed to be an instance of the
@@ -70,8 +70,8 @@ via its ``route_name`` predicate, that view callable will always be found and
 invoked when the associated route pattern matches during a request.
 
 More commonly, you will not use any ``add_view`` statements in your project's
-"setup" code, instead only using ``add_route`` statements using a
-:term:`scan` for to associate view callables with routes.  For example, if
+"setup" code. You will instead use ``add_route`` statements, and use a
+:term:`scan` to associate view callables with routes.  For example, if
 this is a portion of your project's ``__init__.py``:
 
 .. code-block:: python
@@ -81,7 +81,7 @@ this is a portion of your project's ``__init__.py``:
 
 Note that we don't call :meth:`~pyramid.config.Configurator.add_view` in this
 setup code.  However, the above :term:`scan` execution
-``config.scan('mypackage')`` will pick up all :term:`configuration
+``config.scan('mypackage')`` will pick up each :term:`configuration
 decoration`, including any objects decorated with the
 :class:`pyramid.view.view_config` decorator in the ``mypackage`` Python
 package.  For example, if you have a ``views.py`` in your package, a scan will
@@ -105,6 +105,7 @@ to using the previous combination of ``add_route`` and ``add_view``.
 
 .. _route_pattern_syntax:
 
+
 Route Pattern Syntax
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -126,6 +127,10 @@ and:
 .. code-block:: text
 
    /{foo}/bar/baz
+
+If a pattern is a valid URL it won't be ever matched against an incoming
+request. Instead it can be useful for generating external URLs. See
+:ref:`External routes <external_route_narr>` for details.
 
 A pattern segment (an individual item between ``/`` characters in the
 pattern) may either be a literal string (e.g. ``foo``) *or* it may be a
@@ -754,8 +759,38 @@ other non-``name`` and non-``pattern`` arguments to
 exception to this rule is use of the ``pregenerator`` argument, which is not
 ignored when ``static`` is ``True``.
 
+:ref:`External routes <external_route_narr>` are implicitly static.
+
 .. versionadded:: 1.1
    the ``static`` argument to :meth:`~pyramid.config.Configurator.add_route`
+
+.. _external_route_narr:
+
+
+External Routes
+---------------
+
+.. versionadded:: 1.5
+
+Route patterns that are valid URLs, are treated as external routes. Like
+:ref:`static routes <static_route_narr>` they are useful for URL generation
+purposes only and are never considered for matching at request time.
+
+.. code-block:: python
+   :linenos:
+
+   >>> config = Configurator()
+   >>> config.add_route('youtube', 'https://youtube.com/watch/{video_id}')
+   ...
+   >>> request.route_url('youtube', video_id='oHg5SJYRHA0')
+   >>> "https://youtube.com/watch/oHg5SJYRHA0"
+
+Most pattern replacements and calls to
+:meth:`pyramid.request.Request.route_url` will work as expected. However, calls
+to :meth:`pyramid.request.Request.route_path` against external patterns will
+raise an exception, and passing ``_app_url`` to
+:meth:`~pyramid.request.Request.route_url` to generate a URL against a route
+that has an external pattern will also raise an exception.
 
 .. index::
    single: redirecting to slash-appended routes
@@ -814,7 +849,7 @@ bro." body.
 If a request enters the application with the ``PATH_INFO`` value of
 ``/has_slash/``, the second route will match.  If a request enters the
 application with the ``PATH_INFO`` value of ``/has_slash``, a route *will* be
-found by the slash-appending not found view.  An HTTP redirect to
+found by the slash-appending :term:`Not Found View`.  An HTTP redirect to
 ``/has_slash/`` will be returned to the user's browser.  As a result, the
 ``notfound`` view will never actually be called.
 
@@ -849,12 +884,12 @@ exactly the same job:
 .. warning::
 
    You **should not** rely on this mechanism to redirect ``POST`` requests.
-   The redirect  of the slash-appending not found view will turn a ``POST``
-   request into a ``GET``, losing any ``POST`` data in the original
+   The redirect  of the slash-appending :term:`Not Found View` will turn a
+   ``POST`` request into a ``GET``, losing any ``POST`` data in the original
    request.
 
 See :ref:`view_module` and :ref:`changing_the_notfound_view` for a more
-general description of how to configure a view and/or a not found view.
+general description of how to configure a view and/or a :term:`Not Found View`.
 
 .. index::
    pair: debugging; route matching
@@ -865,7 +900,7 @@ Debugging Route Matching
 ------------------------
 
 It's useful to be able to take a peek under the hood when requests that enter
-your application arent matching your routes as you expect them to.  To debug
+your application aren't matching your routes as you expect them to.  To debug
 route matching, use the ``PYRAMID_DEBUG_ROUTEMATCH`` environment variable or the
 ``pyramid.debug_routematch`` configuration file setting (set either to ``true``).
 Details of the route matching decision for a particular request to the
@@ -875,8 +910,7 @@ which you started the application from.  For example:
 .. code-block:: text
    :linenos:
 
-    [chrism@thinko pylonsbasic]$ PYRAMID_DEBUG_ROUTEMATCH=true \
-                                 bin/pserve development.ini
+    $ PYRAMID_DEBUG_ROUTEMATCH=true $VENV/bin/pserve development.ini
     Starting server in PID 13586.
     serving on 0.0.0.0:6543 view at http://127.0.0.1:6543
     2010-12-16 14:45:19,956 no route matched for url \
@@ -1264,7 +1298,7 @@ invoked with the request that caused the invocation.
 
 For most usage, you needn't understand more than this; how it works is an
 implementation detail.  In the interest of completeness, however, we'll
-explain how it *does* work in the this section.  You can skip it if you're
+explain how it *does* work in this section.  You can skip it if you're
 uninterested.
 
 When a view is associated with a route configuration, :app:`Pyramid` ensures

@@ -56,9 +56,6 @@ Nice-to-Have
   app1" and "domain app1.localhost = app1"), ProxyPreserveHost and the nginx
   equivalent, preserving HTTPS URLs.
 
-- Make "localizer" a property of request (instead of requiring
-  "get_localizer(request)"?
-
 - Alias the stupid long default session factory name.
 
 - Debug option to print view matching decision (e.g. debug_viewlookup or so).

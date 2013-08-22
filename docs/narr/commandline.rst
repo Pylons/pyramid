@@ -32,7 +32,7 @@ Here is an example for a simple view configuration using :term:`traversal`:
 .. code-block:: text
    :linenos:
 
-   $ ../bin/pviews development.ini#tutorial /FrontPage
+   $ $VENV/bin/pviews development.ini#tutorial /FrontPage
 
    URL = /FrontPage
 
@@ -56,7 +56,7 @@ A more complex configuration might generate something like this:
 .. code-block:: text
    :linenos:
 
-   $ ../bin/pviews development.ini#shootout /about
+   $ $VENV/bin/pviews development.ini#shootout /about
 
    URL = /about
 
@@ -146,7 +146,7 @@ name ``main`` as a section name:
 
 .. code-block:: text
 
-    chrism@thinko env26]$ bin/pshell starter/development.ini#main
+    $ $VENV/bin starter/development.ini#main
     Python 2.6.5 (r265:79063, Apr 29 2010, 00:31:32) 
     [GCC 4.4.3] on linux2
     Type "help" for more information.
@@ -172,8 +172,8 @@ name ``main`` as a section name:
 
 The WSGI application that is loaded will be available in the shell as the
 ``app`` global. Also, if the application that is loaded is the :app:`Pyramid`
-app with no surrounding middleware, the ``root`` object returned by the
-default :term:`root factory`, ``registry``, and ``request`` will be
+app with no surrounding :term:`middleware`, the ``root`` object returned by
+the default :term:`root factory`, ``registry``, and ``request`` will be
 available.
 
 You can also simply rely on the ``main`` default section name by omitting any
@@ -181,7 +181,7 @@ hash after the filename:
 
 .. code-block:: text
 
-    chrism@thinko env26]$ bin/pshell starter/development.ini
+    $ $VENV/bin/pshell starter/development.ini
 
 Press ``Ctrl-D`` to exit the interactive shell (or ``Ctrl-Z`` on Windows).
 
@@ -244,7 +244,7 @@ exposed, and the request is configured to generate urls from the host
 
 .. code-block:: text
 
-    chrism@thinko env26]$ bin/pshell starter/development.ini
+    $ $VENV/bin/pshell starter/development.ini
     Python 2.6.5 (r265:79063, Apr 29 2010, 00:31:32) 
     [GCC 4.4.3] on linux2
     Type "help" for more information.
@@ -286,8 +286,7 @@ specifically invoke one of your choice with the ``-p choice`` or
 
 .. code-block:: text
 
-   [chrism@vitaminf shellenv]$ ../bin/pshell -p ipython | bpython | python \
-                                development.ini#MyProject
+   $ $VENV/bin/pshell -p ipython | bpython | python development.ini#MyProject
 
 .. index::
    pair: routes; printing
@@ -312,7 +311,7 @@ For example:
 .. code-block:: text
    :linenos:
 
-   [chrism@thinko MyProject]$ ../bin/proutes development.ini
+   $ $VENV/bin/proutes development.ini
    Name            Pattern                        View
    ----            -------                        ----                     
    home            /                              <function my_view>
@@ -321,8 +320,8 @@ For example:
    static/         static/*subpath                <static_view object>
    catchall        /*subpath                      <function static_view>
 
-``proutes`` generates a table.  The table has three columns: a Name
-column, a Pattern column, and a View column.  The items listed in the
+``proutes`` generates a table with three columns: *Name*, *Pattern*,
+and *View*.  The items listed in the
 Name column are route names, the items listed in the Pattern column are route
 patterns, and the items listed in the View column are representations of the
 view callable that will be invoked when a request matches the associated
@@ -355,7 +354,7 @@ configured without any explicit tweens:
 .. code-block:: text
    :linenos:
 
-   [chrism@thinko pyramid]$ myenv/bin/ptweens development.ini 
+   $ $VENV/bin/ptweens development.ini
    "pyramid.tweens" config value NOT set (implicitly ordered tweens used)
 
    Implicit Tween Chain
@@ -373,7 +372,7 @@ explicit tweens defined in its ``development.ini`` file:
 .. code-block:: text
    :linenos:
 
-   [chrism@thinko pyramid]$ ptweens development.ini  
+   $ ptweens development.ini
    "pyramid.tweens" config value set (explicitly ordered tweens used)
 
    Explicit Tween Chain (used)
@@ -399,7 +398,7 @@ Here's the application configuration section of the ``development.ini`` used
 by the above ``ptweens`` command which reports that the explicit tween chain
 is used:
 
-.. code-block:: text
+.. code-block:: ini
    :linenos:
 
    [app:main]
@@ -442,7 +441,7 @@ There are two required arguments to ``prequest``:
 
 For example::
 
-   $ bin/prequest development.ini /
+   $ $VENV/bin/prequest development.ini /
 
 This will print the body of the response to the console on which it was
 invoked.
@@ -453,14 +452,14 @@ config file name or URL.
 ``prequest`` has a ``-d`` (aka ``--display-headers``) option which prints the
 status and headers returned by the server before the output::
 
-   $ bin/prequest -d development.ini /
+   $ $VENV/bin/prequest -d development.ini /
 
 This will print the status, then the headers, then the body of the response
 to the console.
 
 You can add request header values by using the ``--header`` option::
 
-   $ bin/prequest --header=Host:example.com development.ini /
+   $ $VENV/bin/prequest --header=Host:example.com development.ini /
 
 Headers are added to the WSGI environment by converting them to their
 CGI/WSGI equivalents (e.g. ``Host=example.com`` will insert the ``HTTP_HOST``
@@ -473,7 +472,31 @@ using the ``-m`` (aka ``--method``) option.  ``GET``, ``HEAD``, ``POST`` and
 ``DELETE`` are currently supported.  When you use ``POST``, the standard
 input of the ``prequest`` process is used as the ``POST`` body::
 
-   $ bin/prequest -mPOST development.ini / < somefile
+   $ $VENV/bin/prequest -mPOST development.ini / < somefile
+
+Showing All Installed Distributions and their Versions
+------------------------------------------------------
+
+.. versionadded:: 1.5
+
+You can use the ``pdistreport`` command to show the Pyramid version in use, the
+Python version in use, and all installed versions of Python distributions in
+your Python environment::
+
+   $ $VENV/bin/pdistreport
+   Pyramid version: 1.5dev 
+   Platform Linux-3.2.0-51-generic-x86_64-with-debian-wheezy-sid 
+   Packages: 
+     authapp 0.0 
+       /home/chrism/projects/foo/src/authapp 
+     beautifulsoup4 4.1.3 
+       /home/chrism/projects/foo/lib/python2.7/site-packages/beautifulsoup4-4.1.3-py2.7.egg
+   ... more output ...
+
+``pdistreport`` takes no options.  Its output is useful to paste into a
+pastebin when you are having problems and need someone with more familiarity
+with Python packaging and distribution than you have to look at your
+environment.
 
 .. _writing_a_script:
 
@@ -515,7 +538,7 @@ representing Pyramid your application configuration as a single argument:
 
    from pyramid.paster import bootstrap
    env = bootstrap('/path/to/my/development.ini')
-   print env['request'].route_url('home')
+   print(env['request'].route_url('home'))
 
 :func:`pyramid.paster.bootstrap` returns a dictionary containing
 framework-related information.  This dictionary will always contain a
@@ -573,8 +596,8 @@ configuration implied by the ``[pipeline:main]`` section of your
 configuration file by default.  Specifying ``/path/to/my/development.ini`` is
 logically equivalent to specifying ``/path/to/my/development.ini#main``.  In
 this case, we'll be using a configuration that includes an ``app`` object
-which is wrapped in the Paste "translogger" middleware (which logs requests
-to the console).
+which is wrapped in the Paste "translogger" :term:`middleware` (which logs
+requests to the console).
 
 You can also specify a particular *section* of the PasteDeploy ``.ini`` file
 to load instead of ``main``:
@@ -583,7 +606,7 @@ to load instead of ``main``:
 
    from pyramid.paster import bootstrap
    env = bootstrap('/path/to/my/development.ini#another')
-   print env['request'].route_url('home')
+   print(env['request'].route_url('home'))
 
 The above example specifies the ``another`` ``app``, ``pipeline``, or
 ``composite`` section of your PasteDeploy configuration file. The ``app``
@@ -620,7 +643,7 @@ the desired request and passing it into :func:`~pyramid.paster.bootstrap`:
 
    request = Request.blank('/', base_url='https://example.com/prefix')
    env = bootstrap('/path/to/my/development.ini#another', request=request)
-   print env['request'].application_url
+   print(env['request'].application_url)
    # will print 'https://example.com/prefix'
 
 Now you can readily use Pyramid's APIs for generating URLs:
@@ -867,7 +890,7 @@ The result will be something like:
          """,
          )
 
-Once you've done this, invoking ``$somevirtualenv/bin/python setup.py
+Once you've done this, invoking ``$$VENV/bin/python setup.py
 develop`` will install a file named ``show_settings`` into the
 ``$somevirtualenv/bin`` directory with a small bit of Python code that points
 to your entry point.  It will be executable.  Running it without any
@@ -878,9 +901,7 @@ with ``foo``.  Running it with two "omit" options (e.g. ``--omit=foo
 --omit=bar``) will omit all settings that have keys that start with either
 ``foo`` or ``bar``::
 
-  [chrism@thinko somevenv]$ bin/show_settings development.ini \
-                            --omit=pyramid \
-                            --omit=debugtoolbar
+  $ $VENV/bin/show_settings development.ini --omit=pyramid --omit=debugtoolbar
   debug_routematch                             False               
   debug_templates                              True                
   reload_templates                             True                

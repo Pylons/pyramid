@@ -18,7 +18,7 @@ Glossary
 
    response
      An object returned by a :term:`view callable` that represents response
-     data returned to the requesting user agent.  It must implements the
+     data returned to the requesting user agent.  It must implement the
      :class:`pyramid.interfaces.IResponse` interface.  A response object is
      typically an instance of the :class:`pyramid.response.Response` class or
      a subclass such as :class:`pyramid.httpexceptions.HTTPFound`.  See
@@ -146,16 +146,19 @@ Glossary
      request before it returns a :term:`context` resource.
 
    virtualenv
-     An isolated Python environment.  Allows you to control which
-     packages are used on a particular project by cloning your main
-     Python.  `virtualenv <http://pypi.python.org/pypi/virtualenv>`_
-     was created by Ian Bicking.
+     A term referring both to an isolated Python environment,
+     or `the leading tool <http://www.virtualenv.org>`_ that allows one to
+     create such environments.
+
+     Note: whenever you encounter commands prefixed with ``$VENV`` (Unix)
+     or ``%VENV`` (Windows), know that that is the environment variable whose
+     value is the root of the virtual environment in question.
 
    resource
      An object representing a node in the :term:`resource tree` of an
-     application.  If :mod:`traversal` is used, a resource is an element in
+     application.  If :term:`traversal` is used, a resource is an element in
      the resource tree traversed by the system.  When traversal is used, a
-     resource becomes the :term:`context` of a :term:`view`.  If :mod:`url
+     resource becomes the :term:`context` of a :term:`view`.  If :term:`url
      dispatch` is used, a single resource is generated for each request and
      is used as the context resource of a view.
 
@@ -311,7 +314,7 @@ Glossary
 
    pipeline
      The :term:`PasteDeploy` term for a single configuration of a WSGI
-     server, a WSGI application, with a set of middleware in-between.
+     server, a WSGI application, with a set of :term:`middleware` in-between.
 
    Zope
      `The Z Object Publishing Framework <http://zope.org>`_, a
@@ -324,25 +327,19 @@ Glossary
      `A full-featured Python web framework <http://djangoproject.com>`_.
 
    Pylons
-     `A lightweight Python web framework <http://pylonshq.com>`_ and a
-     predecessor of Pyramid.
+     `A lightweight Python web framework <http://docs.pylonsproject.org/projects/pylons-webframework/en/latest/>`_
+     and a predecessor of Pyramid.
 
    ZODB
       `Zope Object Database <http://zodb.org>`_, a
       persistent Python object store.
-
-   ZEO
-      `Zope Enterprise Objects
-      <http://www.zope.org/Documentation/Books/ZopeBook/2_6Edition/ZEO.stx>`_
-      allows multiple simultaneous processes to access a single
-      :term:`ZODB` database.
 
    WebOb
      `WebOb <http://webob.org>`_ is a WSGI request/response
      library created by Ian Bicking.
 
    PasteDeploy
-     `PasteDeploy <http://pythonpaste.org>`_ is a library used by
+     `PasteDeploy <http://pythonpaste.org/deploy/>`_ is a library used by
      :app:`Pyramid` which makes it possible to configure
      :term:`WSGI` components together declaratively within an ``.ini``
      file.  It was developed by Ian Bicking.
@@ -400,10 +397,9 @@ Glossary
      dispatching and other application configuration tasks.
 
    reStructuredText
-     A `plain text format <http://docutils.sourceforge.net/rst.html>`_
-     that is the defacto standard for descriptive text shipped in
-     :term:`distribution` files, and Python docstrings.  This
-     documentation is authored in ReStructuredText format.
+     A `plain text markup format <http://docutils.sourceforge.net/rst.html>`_
+     that is the defacto standard for documenting Python projects.
+     The Pyramid documentation is written in reStructuredText.
 
    root
      The object at which :term:`traversal` begins when :app:`Pyramid`
@@ -618,13 +614,13 @@ Glossary
      :term:`configuration decoration` and a :term:`scan` to configure your
      Pyramid application.
 
-   Not Found view
+   Not Found View
       An :term:`exception view` invoked by :app:`Pyramid` when the developer
       explicitly raises a :class:`pyramid.httpexceptions.HTTPNotFound`
       exception from within :term:`view` code or :term:`root factory` code,
       or when the current request doesn't match any :term:`view
       configuration`.  :app:`Pyramid` provides a default implementation of a
-      not found view; it can be overridden.  See
+      Not Found View; it can be overridden.  See
       :ref:`changing_the_notfound_view`.
 
    Forbidden view
@@ -654,10 +650,9 @@ Glossary
       <http://en.wikipedia.org/wiki/Thread_(computer_science)>`_ used by the
       application may have a different value for this same "global" variable.
       :app:`Pyramid` uses a small number of thread local variables, as
-      described in :ref:`threadlocals_chapter`. See also the `threading.local
-      documentation
-      <http://docs.python.org/library/threading.html#threading.local>`_ for
-      more information.
+      described in :ref:`threadlocals_chapter`.
+      See also the :class:`stdlib documentation <threading.local>`
+      for more information.
 
    multidict
      An ordered dictionary that can have multiple values for each key. Adds
@@ -685,7 +680,7 @@ Glossary
      The C implementation of the Python language.  This is the
      reference implementation that most people refer to as simply
      "Python"; :term:`Jython`, Google's App Engine, and `PyPy
-     <http://codespeak.net/pypy/dist/pypy/doc/>`_ are examples of
+     <http://doc.pypy.org/en/latest/>`_ are examples of
      non-C based Python implementations.
 
    View Lookup
@@ -703,7 +698,7 @@ Glossary
      :app:`Pyramid` runs on GAE.
 
    Venusian
-     `Venusian <http://docs.repoze.org/venusian>`_ is a library which
+     :ref:`Venusian` is a library which
      allows framework authors to defer decorator actions.  Instead of
      taking actions when a function (or class) decorator is executed
      at import time, the action usually taken by the decorator is
@@ -906,9 +901,9 @@ Glossary
      The scaffold has been retired but the demo plays a similar role. 
 
    Pyramid Cookbook
-     An additional documentation resource for Pyramid which presents topical,
-     practical usages of Pyramid available via
-     http://docs.pylonsproject.org/ .
+     Additional documentation for Pyramid which presents topical,
+     practical uses of Pyramid:
+     http://docs.pylonsproject.org/projects/pyramid_cookbook/en/latest.
 
    distutils
      The standard system for packaging and distributing Python packages.  See
@@ -931,18 +926,18 @@ Glossary
      provide, for example, Pyramid-specific view timing support, bookkeeping
      code that examines exceptions before they are returned to the upstream
      WSGI application, or a variety of other features.  Tweens behave a bit
-     like :term:`WSGI` 'middleware' but they have the benefit of running in a
+     like :term:`WSGI` :term:`middleware` but they have the benefit of running in a
      context in which they have access to the Pyramid :term:`application
      registry` as well as the Pyramid rendering machinery.  See
      :ref:`registering_tweens`.
 
    pyramid_debugtoolbar
-     A Pyramid add on which displays a helpful debug toolbar "on top of" HTML
+     A Pyramid add-on which displays a helpful debug toolbar "on top of" HTML
      pages rendered by your application, displaying request, routing, and
      database information.  :mod:`pyramid_debugtoolbar` is configured into
      the ``development.ini`` of all applications which use a Pyramid
      :term:`scaffold`.  For more information, see
-     http://docs.pylonsproject.org/projects/pyramid_debugtoolbar/dev/ .
+     http://docs.pylonsproject.org/projects/pyramid_debugtoolbar/en/latest/.
 
    scaffold
      A project template that generates some of the major parts of a Pyramid
@@ -959,7 +954,7 @@ Glossary
 
    console script
      A script written to the ``bin`` (on UNIX, or ``Scripts`` on Windows)
-     directory of a Python installation or virtualenv as the result of
+     directory of a Python installation or :term:`virtualenv` as the result of
      running ``setup.py install`` or ``setup.py develop``.
 
    introspector
@@ -1023,3 +1018,7 @@ Glossary
       system.  See :ref:`registering_thirdparty_predicates` for more
       information.
 
+   add-on
+      A Python :term:`distribution` that uses Pyramid's extensibility
+      to plug into a Pyramid application and provide extra,
+      configurable services.

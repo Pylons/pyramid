@@ -108,7 +108,7 @@ Minor Feature Additions
 - The static view machinery now raises rather than returns
   :class:`pyramid.httpexceptions.HTTPNotFound` and
   :class:`pyramid.httpexceptions.HTTPMovedPermanently` exceptions, so these can
-  be caught by the notfound view (and other exception views).
+  be caught by the Not Found View (and other exception views).
 
 - When there is a predicate mismatch exception (seen when no view matches for
   a given request due to predicates not working), the exception now contains
@@ -184,11 +184,12 @@ Minor Feature Additions
   returns the policy object it creates.
 
 - The DummySecurityPolicy created by
-  :meth:`pyramid.config.testing_securitypolicy` now sets a ``forgotten`` value 
-  on the policy (the value ``True``) when its ``forget`` method is called.
+  :meth:`pyramid.config.Configurator.testing_securitypolicy` now sets a
+  ``forgotten`` value  on the policy (the value ``True``) when its ``forget``
+  method is called.
 
 - The DummySecurityPolicy created by
-  :meth:`pyramid.config.testing_securitypolicy` now sets a
+  :meth:`pyramid.config.Configurator.testing_securitypolicy` now sets a
   ``remembered`` value on the policy, which is the value of the ``principal``
   argument it's called with when its ``remember`` method is called.
 
@@ -301,7 +302,7 @@ Backwards Incompatibilities
     :meth:`pyramid.config.Configurator.testing_add_subscriber` instead.
 
   * ``registerTemplateRenderer`` (aka ``registerDummyRenderer``), use
-    :meth:`pyramid.config.Configurator.testing_add_template` instead.
+    :meth:`pyramid.config.Configurator.testing_add_renderer` instead.
 
   * ``registerView``, use :meth:`pyramid.config.Configurator.add_view` instead.
 

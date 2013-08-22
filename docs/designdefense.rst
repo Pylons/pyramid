@@ -38,13 +38,13 @@ forking is also a Zope derivative.
 
 Implementations of these features were *required* to allow the :app:`Pyramid`
 authors to build the bread-and-butter CMS-type systems for customers in the
-way they were accustomed to building them.  No other system, save for Zope itself,
-had such features.  And Zope itself was beginning to show signs of its age.
+way in which they were accustomed.  No other system, save for Zope itself,
+had such features, and Zope itself was beginning to show signs of its age.
 We were becoming hampered by consequences of its early design mistakes.
 Zope's lack of documentation was also difficult to work around: it was hard
 to hire smart people to work on Zope applications, because there was no
 comprehensive documentation set to point them at which explained "it all" in
-one consumble place, and it was too large and self-inconsistent to document
+one consumable place, and it was too large and self-inconsistent to document
 properly.  Before :mod:`repoze.bfg` went under development, its authors
 obviously looked around for other frameworks that fit the bill.  But no
 non-Zope framework did.  So we embarked on building :mod:`repoze.bfg`.
@@ -120,7 +120,6 @@ that uses the ZCA global API is somewhat high.  Consider a ZCA neophyte
 reading the code that performs a typical "unnamed utility" lookup using the
 :func:`zope.component.getUtility` global API:
 
-.. ignore-next-block
 .. code-block:: python
    :linenos:
 
@@ -190,7 +189,6 @@ special-purpose API functions that *do* use ZCA APIs.  Take for example the
 present in the current request or ``None`` if no userid is present in the
 current request.  The application developer calls it like so:
 
-.. ignore-next-block
 .. code-block:: python
    :linenos:
 
@@ -238,7 +236,7 @@ registry API.
 
 :app:`Pyramid` framework developers were so concerned about conceptual load
 issues of the ZCA registry API for framework developers that a `replacement
-registry implementation <http://svn.repoze.org/repoze.component/trunk>`_
+registry implementation <https://github.com/repoze/repoze.component>`_
 named :mod:`repoze.component` was actually developed.  Though this package
 has a registry implementation which is fully functional and well-tested, and
 its API is much nicer than the ZCA registry API, work on it was largely
@@ -500,7 +498,6 @@ which match information in an associated "urlconf" such as
 Zope, likewise allows you to add arbitrary keyword and positional
 arguments to any method of a resource object found via traversal:
 
-.. ignore-next-block
 .. code-block:: python
    :linenos:
 
@@ -517,7 +514,7 @@ the method is called (if possible) with its argument list filled with values
 mentioned therein.  TurboGears and Pylons 1.X operate similarly.
 
 Out of the box, :app:`Pyramid` is configured to have none of these features.
-By default, :mod:`pyramid` view callables always accept only ``request`` and
+By default, :app:`Pyramid` view callables always accept only ``request`` and
 no other arguments.  The rationale: this argument specification matching done
 aggressively can be costly, and :app:`Pyramid` has performance as one of its
 main goals, so we've decided to make people, by default, obtain information
@@ -1030,7 +1027,7 @@ but its intended userbase is much the same.  Many others exist.  We've
 actually even (only as a teaching tool, not as any sort of official project)
 `created one using Pyramid <http://bfg.repoze.org/videos#groundhog1>`_ (the
 videos use BFG, a precursor to Pyramid, but the resulting code is `available
-for Pyramid too <http://github.com/Pylons/groundhog>`_). Microframeworks are
+for Pyramid too <https://github.com/Pylons/groundhog>`_). Microframeworks are
 small frameworks with one common feature: each allows its users to create a
 fully functional application that lives in a single Python file.
 
@@ -1298,6 +1295,9 @@ predictability.
   a registry in another module.  This has the effect that
   double-registrations will never be performed.
 
+
+.. _routes_need_ordering:
+
 Routes Need Relative Ordering
 +++++++++++++++++++++++++++++
 
@@ -1461,7 +1461,7 @@ code below:
 
    def afunc():
        for i in range(10):
-           print i
+           print(i)
 
 By its nature, the *request* object created as the result of a WSGI server's
 call into a long-lived web framework cannot be global, because the lifetime
@@ -1681,7 +1681,7 @@ was written to address these issues.
 If it's Zope3-the-web-framework, Pyramid is *definitely* not that.  Making
 use of lots of Zope 3 technologies is territory already staked out by the
 :term:`Grok` project.  Save for the obvious fact that they're both web
-frameworks, :mod:`Pyramid` is very, very different than Grok.  Grok exposes
+frameworks, :app:`Pyramid` is very, very different than Grok.  Grok exposes
 lots of Zope technologies to end users.  On the other hand, if you need to
 understand a Zope-only concept while using Pyramid, then we've failed on some
 very basic axis.
@@ -1694,7 +1694,7 @@ some sort of monolithic thing, and a lot of its software is usable
 externally.  And while it's not really the job of this document to defend it,
 Zope has been around for over 10 years and has an incredibly large, active
 community.  If you don't believe this,
-http://taichino.appspot.com/pypi_ranking/authors is an eye-opening reality
+http://pypi-ranking.info/author is an eye-opening reality
 check.
 
 Love Simplicity

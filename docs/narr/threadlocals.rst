@@ -62,8 +62,7 @@ Because one :app:`Pyramid` application is permitted to call
 (perhaps as a :term:`WSGI` app with help from the
 :func:`pyramid.wsgi.wsgiapp2` decorator), these variables are
 managed in a *stack* during normal system operations.  The stack
-instance itself is a `threading.local
-<http://docs.python.org/library/threading.html#threading.local>`_.
+instance itself is a :class:`threading.local`.
 
 During normal operations, the thread locals stack is managed by a
 :term:`Router` object.  At the beginning of a request, the Router
@@ -130,7 +129,7 @@ follows:
   ever be called within application-specific forks of third-party
   library code.  The library you've forked almost certainly has
   nothing to do with :app:`Pyramid`, and making it dependent on
-  :app:`Pyramid` (rather than making your :mod:`pyramid`
+  :app:`Pyramid` (rather than making your :app:`pyramid`
   application depend upon it) means you're forming a dependency in the
   wrong direction.
 

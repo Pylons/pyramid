@@ -156,7 +156,7 @@
    .. attribute:: matched_route
 
       If a :term:`route` has matched during this request, this attribute will
-      be an obect representing the route matched by the URL pattern
+      be an object representing the route matched by the URL pattern
       associated with the route.  If a route has not matched during this
       request, the value of this attribute will be ``None``. See
       :ref:`matched_route`.
@@ -190,16 +190,16 @@
         :meth:`~pyramid.config.Configurator.set_request_property`) on the
         request it's passed.
 
-      - causes a :class:`~pyramid.event.NewRequest` event to be sent at the
+      - causes a :class:`~pyramid.events.NewRequest` event to be sent at the
         beginning of request processing.
 
-      - causes a :class:`~pyramid.event.ContextFound` event to be sent
+      - causes a :class:`~pyramid.events.ContextFound` event to be sent
         when a context resource is found.
-          
+
       - Ensures that the user implied by the request passed has the necessary
         authorization to invoke view callable before calling it.
 
-      - causes a :class:`~pyramid.event.NewResponse` event to be sent when
+      - causes a :class:`~pyramid.events.NewResponse` event to be sent when
         the Pyramid application returns a response.
 
       - Calls any :term:`response callback` functions defined within the
@@ -238,7 +238,7 @@
    .. attribute::  response_*
 
       In Pyramid 1.0, you could set attributes on a
-      :class:`pyramid.request.Request` which influenced the behavor of
+      :class:`pyramid.request.Request` which influenced the behavior of
       *rendered* responses (views which use a :term:`renderer` and which
       don't directly return a response).  These attributes began with
       ``response_``, such as ``response_headerlist``. If you needed to

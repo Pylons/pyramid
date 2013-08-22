@@ -22,25 +22,23 @@ Logging Configuration
 ---------------------
 
 A :app:`Pyramid` project created from a :term:`scaffold` is configured to
-allow you to send messages to `Python standard library logging package
-<http://docs.python.org/library/logging.html>`_ loggers from within your
+allow you to send messages to :mod:`Python standard library logging package
+<logging>` loggers from within your
 application.  In particular, the :term:`PasteDeploy` ``development.ini`` and
 ``production.ini`` files created when you use a scaffold include a basic
 configuration for the Python :mod:`logging` package.
 
-PasteDeploy ``.ini`` files use the Python standard library `ConfigParser
-format <http://docs.python.org/lib/module-ConfigParser.html>`_; this the same
-format used as the Python `logging module's Configuration file format
-<http://docs.python.org/lib/logging-config-fileformat.html>`_.  The
-application-related and logging-related sections in the configuration file
+PasteDeploy ``.ini`` files use the Python standard library :mod:`ConfigParser
+format <ConfigParser>`; this is the same format used as the Python
+:ref:`logging module's Configuration file format <logging-config-fileformat>`.
+The application-related and logging-related sections in the configuration file
 can coexist peacefully, and the logging-related sections in the file are used
 from when you run ``pserve``.
 
 The ``pserve`` command calls the :func:`pyramid.paster.setup_logging`
-function, a thin wrapper around the `logging.fileConfig
-<http://docs.python.org/lib/logging-config-api.html>`_ using the specified
-ini file if it contains a ``[loggers]`` section (all of the
-scaffold-generated ``.ini`` files do). ``setup_logging`` reads the
+function, a thin wrapper around the :func:`logging.config.fileConfig`
+using the specified ``.ini`` file if it contains a ``[loggers]`` section
+(all of the scaffold-generated ``.ini`` files do). ``setup_logging`` reads the
 logging configuration from the ini file upon which ``pserve`` was
 invoked.
 
@@ -300,14 +298,14 @@ Request Logging with Paste's TransLogger
 ----------------------------------------
 
 Paste provides the `TransLogger 
-<http://pythonpaste.org/modules/translogger.html>`_ middleware for logging 
-requests using the `Apache Combined Log Format 
+<http://pythonpaste.org/modules/translogger.html>`_ :term:`middleware` for
+logging requests using the `Apache Combined Log Format
 <http://httpd.apache.org/docs/2.2/logs.html#combined>`_. TransLogger combined 
 with a FileHandler can be used to create an ``access.log`` file similar to 
 Apache's. 
 
-Like any standard middleware with a Paste entry point, TransLogger can be
-configured to wrap your application using ``.ini`` file syntax.  First,
+Like any standard :term:`middleware` with a Paste entry point, TransLogger can
+be configured to wrap your application using ``.ini`` file syntax.  First,
 rename your Pyramid ``.ini`` file's ``[app:main]`` section to
 ``[app:mypyramidapp]``, then add a ``[filter:translogger]`` section, then use
 a ``[pipeline:main]`` section file to form a WSGI pipeline with both the
@@ -334,7 +332,7 @@ To this:
                mypyramidapp
 
 Using PasteDeploy this way to form and serve a pipeline is equivalent to
-wrapping your app in a TransLogger instance via the bottom the ``main``
+wrapping your app in a TransLogger instance via the bottom of the ``main``
 function of your project's ``__init__`` file:
 
 .. code-block:: python 

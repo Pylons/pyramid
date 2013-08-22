@@ -155,7 +155,7 @@ In the example above, the call to
 exception.  This is because it's using the default value for ``use_tweens``,
 which is ``False``.  You can pass ``use_tweens=True`` instead to ensure that
 it will convert an exception to a Response if an :term:`exception view` is
-configured instead of raising the exception.  This because exception views
+configured instead of raising the exception.  This is because exception views
 are called by the exception view :term:`tween` as described in
 :ref:`exception_views` when any view raises an exception.
 
@@ -223,16 +223,16 @@ unconditionally:
   :meth:`~pyramid.config.Configurator.set_request_property`) on the subrequest
   object passed as ``request``
 
-- causes a :class:`~pyramid.event.NewRequest` event to be sent at the
+- causes a :class:`~pyramid.events.NewRequest` event to be sent at the
   beginning of request processing.
 
-- causes a :class:`~pyramid.event.ContextFound` event to be sent when a
+- causes a :class:`~pyramid.events.ContextFound` event to be sent when a
   context resource is found.
-  
+
 - Ensures that the user implied by the request passed has the necessary
   authorization to invoke view callable before calling it.
 
-- causes a :class:`~pyramid.event.NewResponse` event to be sent when the
+- causes a :class:`~pyramid.events.NewResponse` event to be sent when the
   Pyramid application returns a response.
 
 - Calls any :term:`response callback` functions defined within the subrequest's
@@ -250,7 +250,7 @@ It's a poor idea to use the original ``request`` object as an argument to
 :meth:`~pyramid.request.Request.invoke_subrequest`.  You should construct a
 new request instead as demonstrated in the above example, using
 :meth:`pyramid.request.Request.blank`.  Once you've constructed a request
-object, you'll need to massage the it to match the view callable you'd like
+object, you'll need to massage it to match the view callable you'd like
 to be executed during the subrequest.  This can be done by adjusting the
 subrequest's URL, its headers, its request method, and other attributes.  The
 documentation for :class:`pyramid.request.Request` exposes the methods you

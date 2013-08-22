@@ -193,4 +193,28 @@ Contributors
 
 - John Anderson, 2012/11/14
 
+- Bert JW Regeer, 2013/02/01
+
+- Georges Dubus, 2013/03/21
+
+- Jason McKellar, 2013/03/28
+
+- Luke Cyca, 2013/05/30
+
+- Laurence Rowe, 2013/04/24
+
+- Julian P. Glass, 2013/08/10
+
+- Junaid Ali, 2013/08/10
+
+- Chris Davies, 2013/08/11
+
+- Jonathan Villemaire-Krajden, 2013/08/13
+
+- Charlie Clark, 2013/08/15
+
+- Tom Lazar, 2013/08/15
+
+- Andreas Zeidler, 2013/08/15
+
 - Chuan-Heng Hsiao, 2013/08/21

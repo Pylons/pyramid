@@ -81,15 +81,22 @@ def signed_deserialize(serialized, secret, hmac=hmac):
 
     return pickle.loads(pickled)
 
-def check_csrf_token(request, token='csrf_token', raises=True):
+def check_csrf_token(request,
+                     token='csrf_token',
+                     header='X-CSRF-Token',
+                     raises=True):
     """ Check the CSRF token in the request's session against the value in
-    ``request.params.get(token)``.  If a ``token`` keyword is not supplied
-    to this function, the string ``csrf_token`` will be used to look up
-    the token within ``request.params``.  If the value in
-    ``request.params.get(token)`` doesn't match the value supplied by
-    ``request.session.get_csrf_token()``, and ``raises`` is ``True``, this
-    function will raise an :exc:`pyramid.httpexceptions.HTTPBadRequest`
-    exception.  If the check does succeed and ``raises`` is ``False``, this
+    ``request.params.get(token)`` or ``request.headers.get(header)``.
+    If a ``token`` keyword is not supplied to this function, the string
+    ``csrf_token`` will be used to look up the token in ``request.params``.
+    If a ``header`` keyword is not supplied to this function, the string
+    ``X-CSRF-Token`` will be used to look up the token in ``request.headers``.
+
+    If the value supplied by param or by header doesn't match the value
+    supplied by ``request.session.get_csrf_token()``, and ``raises`` is
+    ``True``, this function will raise an
+    :exc:`pyramid.httpexceptions.HTTPBadRequest` exception.
+    If the check does succeed and ``raises`` is ``False``, this
     function will return ``False``.  If the CSRF check is successful, this
     function will return ``True`` unconditionally.
 
@@ -98,7 +105,8 @@ def check_csrf_token(request, token='csrf_token', raises=True):
 
     .. versionadded:: 1.4a2
     """
-    if request.params.get(token) != request.session.get_csrf_token():
+    supplied_token = request.params.get(token, request.headers.get(header))
+    if supplied_token != request.session.get_csrf_token():
         if raises:
             raise HTTPBadRequest('incorrect CSRF token')
         return False

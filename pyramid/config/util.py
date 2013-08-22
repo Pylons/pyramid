@@ -28,6 +28,69 @@ def as_sorted_tuple(val):
     val = tuple(sorted(val))
     return val
 
+class not_(object):
+    """
+
+    You can invert the meaning of any predicate value by wrapping it in a call
+    to :class:`pyramid.config.not_`.
+
+    .. code-block:: python
+       :linenos:
+
+       from pyramid.config import not_
+
+       config.add_view(
+           'mypackage.views.my_view',
+           route_name='ok', 
+           request_method=not_('POST')
+           )
+
+    The above example will ensure that the view is called if the request method
+    is *not* ``POST``, at least if no other view is more specific.
+
+    This technique of wrapping a predicate value in ``not_`` can be used
+    anywhere predicate values are accepted:
+
+    - :meth:`pyramid.config.Configurator.add_view`
+
+    - :meth:`pyramid.config.Configurator.add_route`
+
+    - :meth:`pyramid.config.Configurator.add_subscriber`
+
+    - :meth:`pyramid.view.view_config`
+
+    - :meth:`pyramid.events.subscriber`
+
+    .. versionadded:: 1.5
+    """
+    def __init__(self, value):
+        self.value = value
+
+class Notted(object):
+    def __init__(self, predicate):
+        self.predicate = predicate
+
+    def _notted_text(self, val):
+        # if the underlying predicate doesnt return a value, it's not really
+        # a predicate, it's just something pretending to be a predicate,
+        # so dont update the hash
+        if val: 
+            val = '!' + val
+        return val
+
+    def text(self):
+        return self._notted_text(self.predicate.text())
+
+    def phash(self):
+        return self._notted_text(self.predicate.phash())
+
+    def __call__(self, context, request):
+        result = self.predicate(context, request)
+        phash = self.phash()
+        if phash:
+            result = not result
+        return result
+
 # under = after
 # over = before
 
@@ -74,7 +137,14 @@ class PredicateList(object):
             if not isinstance(vals, predvalseq):
                 vals = (vals,)
             for val in vals:
-                pred = predicate_factory(val, config)
+                realval = val
+                notted = False
+                if isinstance(val, not_):
+                    realval = val.value
+                    notted = True
+                pred = predicate_factory(realval, config)
+                if notted:
+                    pred = Notted(pred)
                 hashes = pred.phash()
                 if not is_nonstr_iter(hashes):
                     hashes = [hashes]

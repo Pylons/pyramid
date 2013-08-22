@@ -52,9 +52,7 @@ Documentation
 
 Speed
   :app:`Pyramid` is designed to provide noticeably fast execution for common
-  tasks such as templating and simple response generation. Although "hardware
-  is cheap", the limits of this approach become painfully evident when one
-  finds him or herself responsible for managing a great many machines.
+  tasks such as templating and simple response generation.
 
 Reliability
   :app:`Pyramid` is developed conservatively and tested exhaustively. Where
@@ -219,7 +217,8 @@ that the Pyramid core doesn't.  Add-on packages already exist which let you
 easily send email, let you use the Jinja2 templating system, let you use
 XML-RPC or JSON-RPC, let you integrate with jQuery Mobile, etc.
 
-Examples: http://docs.pylonsproject.org/docs/pyramid.html#pyramid-add-on-documentation
+Examples: http://docs.pylonsproject.org/en/latest/docs/pyramid.html#pyramid-add-on-documentation
+
 
 Class-based and function-based views
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -603,10 +602,10 @@ Examples: :ref:`hello_traversal_chapter` and
 Tweens
 ~~~~~~
 
-Pyramid has a sort of internal WSGI-middleware-ish pipeline that can be
-hooked by arbitrary add-ons named "tweens".  The debug toolbar is a "tween",
-and the ``pyramid_tm`` transaction manager is also.  Tweens are more useful
-than WSGI middleware in some circumstances because they run in the context of
+Pyramid has a sort of internal WSGI-middleware-ish pipeline that can be hooked
+by arbitrary add-ons named "tweens".  The debug toolbar is a "tween", and the
+``pyramid_tm`` transaction manager is also.  Tweens are more useful than WSGI
+:term:`middleware` in some circumstances because they run in the context of
 Pyramid itself, meaning you have access to templates and other renderers, a
 "real" request object, and other niceties.
 
@@ -860,7 +859,7 @@ It's our goal that no Pyramid question go unanswered.  Whether you ask a
 question on IRC, on the Pylons-discuss maillist, or on StackOverflow, you're
 likely to get a reasonably prompt response.  We don't tolerate "support
 trolls" or other people who seem to get their rocks off by berating fellow
-users in our various offical support channels.  We try to keep it well-lit
+users in our various official support channels.  We try to keep it well-lit
 and new-user-friendly.
 
 Example: Visit irc\://freenode.net#pyramid (the ``#pyramid`` channel on

@@ -16,18 +16,37 @@ checkout.
 
 - Check out a read-only copy of the Pyramid source::
 
-  $ git clone git://github.com/Pylons/pyramid.git
+  $ git clone git://github.com/Pylons/pyramid.git .
 
   (alternately, create a writeable fork on GitHub and check that out).
 
+Since pyramid is a framework and not an application, it can be
+convenient to work against a sample application, preferably in its
+own virtualenv. A quick way to achieve this is to (ab-)use ``tox``
+(http://codespeak.net/~hpk/tox/) with a custom configuration file that's part of
+the checkout::
+
+  tox -c hacking-tox.ini
+
+This will create a python-2.7 based virtualenv named ``env27`` (pyramid's
+``.gitconfig` ignores all top-level folders that start with ``env`` specifically
+for this use case) and inside that a simple pyramid application named
+``hacking`` that you can then fire up like so::
+
+  cd env27/hacking
+  ../bin/pserve development.ini
+
+Alternatively, if you don't want to install ``tox`` at this point,
+you an achieve the same manually by following these steps:
+
 - Create a virtualenv in which to install Pyramid::
 
-  $ virtualenv2.6 --no-site-packages env
+  $ virtualenv env
 
 - Install ``setuptools-git`` into the virtualenv (for good measure, as we're
   using git to do version control)::
 
-  $ env/bin/easy_install setuptools-git
+  $ $VENV/bin/easy_install setuptools-git
 
 - Install Pyramid from the checkout into the virtualenv using ``setup.py
   dev``.  ``setup.py dev`` is an alias for "setup.py develop" which also
@@ -36,19 +55,19 @@ checkout.
   ``pyramid`` checkout directory::
 
   $ cd pyramid
-  $ ../env/bin/python setup.py dev
+  $ $VENV/bin/python setup.py dev
 
 - At that point, you should be able to create new Pyramid projects by using
   ``pcreate``::
 
   $ cd ../env
-  $ bin/pcreate -s starter starter
+  $ $VENV/bin/pcreate -s starter starter
 
 - And install those projects (also using ``setup.py develop``) into the
   virtualenv::
 
   $ cd starter
-  $ ../bin/python setup.py develop
+  $ $VENV/bin/python setup.py develop
 
 Adding Features
 ---------------
@@ -93,9 +112,13 @@ Coding Style
 Running Tests
 --------------
 
-- To run tests for Pyramid on a single Python version, run ``python setup.py
-  test`` against the Python interpreter from virtualenv into which
-  you've ``setup.py develop``-ed Pyramid.
+- To run all tests for Pyramid on a single Python version, run ``nosetests`` from
+  your development virtualenv (See *Using a Development Checkout* above).
+
+- To run individual tests (i.e. during development) you can use a regular
+  expression with the ``-t`` parameter courtesy of the `nose-selecttests
+  <https://pypi.python.org/pypi/nose-selecttests/>`_ plugin that's been installed (along with nose itself) via ``python setup.py dev``. The easiest usage is to
+  simply provide the verbatim name of the test you're working on.
 
 - To run the full set of Pyramid tests on all platforms, install ``tox``
   (http://codespeak.net/~hpk/tox/) into a system Python.  The ``tox`` console
@@ -107,8 +130,15 @@ Running Tests
   example::
 
    $ /usr/bin/easy_install tox
-   $ cd ~/hack-on-pyramid/pyramid
+   $ cd ~/hack-on-pyramid/
    $ /usr/bin/tox
+
+- The tests can also be run usign ``pytest`` (http://pytest.org/).  This is
+  intended as a convenience for people who are more used or fond of ``pytest``.
+  Run the tests like so::
+
+   $ $VENV/bin/easy_install pytest
+   $ py.test --strict pyramid/
 
 Test Coverage
 -------------
@@ -126,10 +156,10 @@ documentation in this package which references that API or behavior must
 change to reflect the bug fix, ideally in the same commit that fixes the bug
 or adds the feature.
 
-To build and review docs (where ``$yourvenv`` refers to the virtualenv you're
+To build and review docs (where ``$VENV`` refers to the virtualenv you're
 using to develop Pyramid):
 
-1. Run ``$yourvenv/bin/python setup.py dev docs``.  This will cause Sphinx
+1. Run ``$VENV/bin/python setup.py dev docs``.  This will cause Sphinx
    and all development requirements to be installed in your virtualenv.
 
 2. Update all git submodules from the top-level of your Pyramid checkout, like
@@ -139,7 +169,7 @@ using to develop Pyramid):
    HTML docs are generated.
 
 3. cd to the ``docs`` directory within your Pyramid checkout and execute
-   ``make clean html SPHINXBUILD=$yourvenv/bin/sphinx-build``.  The
+   ``make clean html SPHINXBUILD=$VENV/bin/sphinx-build``.  The
    ``SPHINXBUILD=...`` hair is there in order to tell it to use the
    virtualenv Python, which will have both Sphinx and Pyramid (for API
    documentation generation) installed.

@@ -57,9 +57,9 @@ class IApplicationCreated(Interface):
 IWSGIApplicationCreatedEvent = IApplicationCreated # b /c
 
 class IResponse(Interface):
-    """ Represents a WSGI response using the WebOb response interface.  Some
-    attribute and method documentation of this interface references `RFC 2616
-    <http://www.w3.org/Protocols/rfc2616/>`_.
+    """ Represents a WSGI response using the WebOb response interface.
+    Some attribute and method documentation of this interface references
+    :rfc:`2616`.
 
     This interface is most famously implemented by
     :class:`pyramid.response.Response` and the HTTP exception classes in
@@ -760,15 +760,15 @@ class IContextURL(IResourceURL):
     #
     # class Fudge(object):
     #     def __init__(self, one, two):
-    #         print one, two
+    #         print(one, two)
     # class Another(object):
     #     def __init__(self, one, two):
-    #         print one, two
+    #         print(one, two)
     # ob = object()
     # r.registerAdapter(Fudge, (Interface, Interface), IContextURL)
-    # print r.queryMultiAdapter((ob, ob), IResourceURL)
+    # print(r.queryMultiAdapter((ob, ob), IResourceURL))
     # r.registerAdapter(Another, (Interface, Interface), IResourceURL)
-    # print r.queryMultiAdapter((ob, ob), IResourceURL)
+    # print(r.queryMultiAdapter((ob, ob), IResourceURL))
     #
     # prints
     #
@@ -793,7 +793,49 @@ deprecated(
     'See the "What\'s new In Pyramid 1.3" document for more details.'
     )
 
-class IPackageOverrides(Interface):
+class IPEP302Loader(Interface):
+    """ See http://www.python.org/dev/peps/pep-0302/#id30.
+    """
+    def get_data(path):
+        """ Retrieve data for and arbitrary "files" from storage backend.
+
+        Raise IOError for not found.
+
+        Data is returned as bytes.
+        """
+
+    def is_package(fullname):
+        """ Return True if the module specified by 'fullname' is a package.
+        """
+
+    def get_code(fullname):
+        """ Return the code object for the module identified by 'fullname'.
+        
+        Return 'None' if it's a built-in or extension module.
+        
+        If the loader doesn't have the code object but it does have the source
+        code, return the compiled source code.
+
+        Raise ImportError if the module can't be found by the importer at all.
+        """
+
+    def get_source(fullname):
+        """ Return the source code for the module identified by 'fullname'.
+        
+        Return a string, using newline characters for line endings, or None
+        if the source is not available.
+            
+        Raise ImportError if the module can't be found by the importer at all.
+        """
+
+    def get_filename(fullname):
+        """ Return the value of '__file__' if the named module was loaded.
+        
+        If the module is not found, raise ImportError.
+        """
+
+
+class IPackageOverrides(IPEP302Loader):
     """ Utility for pkg_resources overrides """
 
 # VH_ROOT_KEY is an interface; its imported from other packages (e.g.
@@ -873,7 +915,7 @@ class ISession(IDict):
         by ``queue``.  An alternate flash message queue can used by passing
         an optional ``queue``, which must be a string.  If
         ``allow_duplicate`` is false, if the ``msg`` already exists in the
-        queue, it will not be readded."""
+        queue, it will not be re-added."""
 
     def pop_flash(queue=''):
         """ Pop a queue from the flash storage.  The queue is removed from

@@ -1,8 +1,8 @@
 import os
 import posixpath
-import re
 import sys
 import threading
+import warnings
 
 from zope.interface import (
     implementer,
@@ -23,8 +23,34 @@ from pyramid.interfaces import ITemplateRenderer
 from pyramid.settings import asbool
 from pyramid.util import DottedNameResolver
 
-from mako.lookup import TemplateLookup
-from mako import exceptions
+def _no_mako(*arg, **kw): # pragma: no cover
+    raise NotImplementedError(
+        "'mako' package is not importable (maybe downgrade MarkupSafe to "
+        "0.16 or below if you're using Python 3.2)"
+        )
+
+try:
+    from mako.lookup import TemplateLookup
+except (ImportError, SyntaxError, AttributeError): #pragma NO COVER
+    class TemplateLookup(object):
+        def __init__(self, **kw):
+            for name in ('adjust_uri', 'get_template', 'filename_to_uri',
+                         'put_string', 'put_template'):
+                setattr(self, name, _no_mako)
+            self.filesystem_checks = False
+
+try:
+    from mako.exceptions import TopLevelLookupException
+except (ImportError, SyntaxError, AttributeError): #pragma NO COVER
+    class TopLevelLookupException(Exception):
+        pass
+
+try:
+    from mako.exceptions import text_error_template
+except (ImportError, SyntaxError, AttributeError): #pragma NO COVER
+    def text_error_template(lookup=None):
+        _no_mako()
+
 
 class IMakoLookup(Interface):
     pass
@@ -78,10 +104,9 @@ class PkgResourceTemplateLookup(TemplateLookup):
                 srcfile = abspath_from_asset_spec(path, pname)
                 if os.path.isfile(srcfile):
                     return self._load(srcfile, adjusted)
-                raise exceptions.TopLevelLookupException(
+                raise TopLevelLookupException(
                     "Can not locate template for uri %r" % uri)
         return TemplateLookup.get_template(self, uri)
-
 
 registry_lock = threading.Lock()
 
@@ -90,14 +115,11 @@ class MakoRendererFactoryHelper(object):
         self.settings_prefix = settings_prefix
 
     def __call__(self, info):
-        p = re.compile(
-                r'(?P<asset>[\w_.:/-]+)'
-                r'(?:\#(?P<defname>[\w_]+))?'
-                r'(\.(?P<ext>.*))'
-                )
-        asset, defname, ext = p.match(info.name).group(
-            'asset', 'defname', 'ext'
-            )
+        defname = None
+        asset, ext = info.name.rsplit('.', 1)
+        if '#' in asset:
+            asset, defname = asset.rsplit('#', 1)
+
         path = '%s.%s' % (asset, ext)
         registry = info.registry
         settings = info.settings
@@ -194,12 +216,17 @@ class MakoLookupTemplateRenderer(object):
         context = system.pop('context', None)
         if context is not None:
             system['_context'] = context
-        if self.defname is None:
-            if isinstance(value, tuple):
-                self.defname, value = value
-        else:
-            if isinstance(value, tuple):
-                _, value = value
+        # tuple returned to be deprecated
+        if isinstance(value, tuple):
+            warnings.warn(
+                'Using a tuple in the form (\'defname\', {}) to render a '
+                'Mako partial will be deprecated in the future. Use a '
+                'Mako template renderer as documented in the "Using A '
+                'Mako def name Within a Renderer Name" chapter of the '
+                'Pyramid narrative documentation instead',
+                DeprecationWarning,
+                3)
+            self.defname, value = value
         try:
             system.update(value)
         except (TypeError, ValueError):
@@ -212,7 +239,7 @@ class MakoLookupTemplateRenderer(object):
         except:
             try:
                 exc_info = sys.exc_info()
-                errtext = exceptions.text_error_template().render(
+                errtext = text_error_template().render(
                     error=exc_info[1],
                     traceback=exc_info[2]
                     )

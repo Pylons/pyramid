@@ -2,7 +2,7 @@
  Author Introduction
 =====================
 
-Welcome to "The :app:`Pyramid` Web Application Framework".  In this
+Welcome to "The :app:`Pyramid` Web Framework".  In this
 introduction, I'll describe the audience for this book, I'll describe
 the book content, I'll provide some context regarding the genesis of
 :app:`Pyramid`, and I'll thank some important people.
@@ -73,7 +73,7 @@ This book is divided into three major parts:
   concepts in terms of the sample.  You should read the tutorials if
   you want a guided tour of :app:`Pyramid`.
 
-:ref:`api_reference`
+:ref:`api_documentation`
 
   Comprehensive reference material for every public API exposed by
   :app:`Pyramid`.  The API documentation is organized

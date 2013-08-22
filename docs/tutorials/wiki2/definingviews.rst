@@ -6,16 +6,13 @@ A :term:`view callable` in a :app:`Pyramid` application is typically a simple
 Python function that accepts a single parameter named :term:`request`.  A
 view callable is assumed to return a :term:`response` object.
 
-The request object passed to every view that is called as the result of a
-route match has an attribute named ``matchdict`` that contains the elements
-placed into the URL by the ``pattern`` of a ``route`` statement.  For
-instance, if a call to :meth:`pyramid.config.Configurator.add_route` in
-``__init__.py`` had the pattern ``{one}/{two}``, and the URL at
-``http://example.com/foo/bar`` was invoked, matching this pattern, the
-``matchdict`` dictionary attached to the request passed to the view would
-have a ``'one'`` key with the value ``'foo'`` and a ``'two'`` key with the
-value ``'bar'``.
-
+The request object has a dictionary as an attribute named ``matchdict``.  A
+``matchdict`` maps the placeholders in the matching URL ``pattern`` to the
+substrings of the path in the :term:`request` URL. For instance, if a call to
+:meth:`pyramid.config.Configurator.add_route` has the pattern ``/{one}/{two}``,
+and a user visits ``http://example.com/foo/bar``, our pattern would be matched
+against ``/foo/bar`` and the ``matchdict`` would look like: ``{'one':'foo',
+'two':'bar'}``
 
 Declaring Dependencies in Our ``setup.py`` File
 ===============================================
@@ -52,14 +49,14 @@ On UNIX:
 .. code-block:: text
 
    $ cd tutorial
-   $ ../bin/python setup.py develop
+   $ $VENV/bin/python setup.py develop
 
 On Windows:
 
 .. code-block:: text
 
    c:\pyramidtut> cd tutorial
-   c:\pyramidtut\tutorial> ..\Scripts\python setup.py develop
+   c:\pyramidtut\tutorial> %VENV%\Scripts\python setup.py develop
 
 Success executing this command will end with a line to the console something
 like::
@@ -126,7 +123,7 @@ The ``view_page`` view function
 -------------------------------
 
 ``view_page()`` is used to display a single page of our
-wiki.  It renders the :term:`ReStructuredText` body of a page (stored as
+wiki.  It renders the :term:`reStructuredText` body of a page (stored as
 the ``data`` attribute of a ``Page`` model object) as HTML.  Then it substitutes an
 HTML anchor for each *WikiWord* reference in the rendered HTML using a
 compiled regular expression.
@@ -148,14 +145,13 @@ As a result, the ``content`` variable is now a fully formed bit of HTML
 containing various view and add links for WikiWords based on the content of
 our current page object.
 
-We then generate an edit URL (because it's easier to do here than in the
-template), and we return a dictionary with a number of arguments.  The fact
-that ``view_page()`` returns a dictionary (as opposed to a :term:`response`
-object) is a cue to :app:`Pyramid` that it should try to use a :term:`renderer`
-associated with the view configuration to render a template.  In our case,
-the template which will be rendered will be the ``templates/view.pt``
-template, as indicated in the ``@view_config`` decorator that is applied to
-``view_page()``.
+We then generate an edit URL because it's easier to do here than in the
+template, and we return a dictionary with a number of arguments.  The fact that
+``view_page()`` returns a dictionary (as opposed to a :term:`response` object)
+is a cue to :app:`Pyramid` that it should try to use a :term:`renderer`
+associated with the view configuration to render a response.  In our case, the
+renderer used will be the ``templates/view.pt`` template, as indicated in the
+``@view_config`` decorator that is applied to ``view_page()``.
 
 The ``add_page`` view function
 ------------------------------
@@ -287,7 +283,7 @@ Our templates name a single static asset named ``pylons.css``.  We don't need
 to create this file within our package's ``static`` directory because it was
 provided at the time we created the project. This file is a little too long
 to replicate within the body of this guide, however it is available `online
-<http://github.com/Pylons/pyramid/blob/master/docs/tutorials/wiki2/src/views/tutorial/static/pylons.css>`_.
+<https://github.com/Pylons/pyramid/blob/master/docs/tutorials/wiki2/src/views/tutorial/static/pylons.css>`_.
 
 This CSS file will be accessed via
 e.g. ``http://localhost:6543/static/pylons.css`` by virtue of the call to
@@ -350,20 +346,20 @@ We can finally examine our application in a browser (See
 :ref:`wiki2-start-the-application`).  Launch a browser and visit
 each of the following URLs, check that the result is as expected:
 
-- ``http://localhost:6543`` in a browser invokes the
+- http://localhost:6543 in a browser invokes the
   ``view_wiki`` view.  This always redirects to the ``view_page`` view
   of the FrontPage page object.
 
-- ``http://localhost:6543/FrontPage`` in a browser invokes
+- http://localhost:6543/FrontPage in a browser invokes
   the ``view_page`` view of the front page object.
 
-- ``http://localhost:6543/FrontPage/edit_page`` in a browser
+- http://localhost:6543/FrontPage/edit_page in a browser
   invokes the edit view for the front page object.
 
-- ``http://localhost:6543/add_page/SomePageName`` in a
+- http://localhost:6543/add_page/SomePageName in a
   browser invokes the add view for a page.
 
-- To generate an error, visit ``http://localhost:6543/foobars/edit_page`` which
+- To generate an error, visit http://localhost:6543/foobars/edit_page which
   will generate a ``NoResultFound: No row was found for one()`` error.
   You'll see an interactive traceback facility provided 
   by :term:`pyramid_debugtoolbar`.

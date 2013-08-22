@@ -125,10 +125,10 @@ method attached to ``MyTest`` will use an isolated registry.
 
 The :func:`~pyramid.testing.setUp` and :func:`~pyramid.testing.tearDown`
 functions accepts various arguments that influence the environment of the
-test.  See the :ref:`testing_module` chapter for information about the extra
+test.  See the :ref:`testing_module` API for information about the extra
 arguments supported by these functions.
 
-If you also want to make :func:`~pyramid.get_current_request` return something
+If you also want to make :func:`~pyramid.threadlocal.get_current_request` return something
 other than ``None`` during the course of a single test, you can pass a
 :term:`request` object into the :func:`pyramid.testing.setUp` within the
 ``setUp`` method of your test:
@@ -202,7 +202,7 @@ any ``get_current*`` function.
 Using the ``Configurator`` and ``pyramid.testing`` APIs in Unit Tests
 ---------------------------------------------------------------------
 
-The ``Configurator`` API and the ``pyramid.testing`` module provide a number
+The ``Configurator`` API and the :mod:`pyramid.testing` module provide a number
 of functions which can be used during unit testing.  These functions make
 :term:`configuration declaration` calls to the current :term:`application
 registry`, but typically register a "stub" or "dummy" feature in place of the
@@ -222,6 +222,12 @@ function.
            raise HTTPForbidden
        return {'greeting':'hello'}
 
+.. note::
+
+   This code implies that you have defined a renderer imperatively in a
+   relevant :class:`pyramid.config.Configurator` instance,
+   otherwise it would fail when run normally.
+
 Without doing anything special during a unit test, the call to
 :func:`~pyramid.security.has_permission` in this view function will always
 return a ``True`` value.  When a :app:`Pyramid` application starts normally,
@@ -231,7 +237,7 @@ application registry is not created and populated (e.g. by initializing the
 configurator with an authorization policy), like when you invoke application
 code via a unit test, :app:`Pyramid` API functions will tend to either fail
 or return default results.  So how do you test the branch of the code in this
-view function that raises :exc:`HTTPForbidden`?
+view function that raises :exc:`~pyramid.httpexceptions.HTTPForbidden`?
 
 The testing API provided by :app:`Pyramid` allows you to simulate various
 application registry registrations for use under a unit testing framework
@@ -272,7 +278,7 @@ without needing to invoke the actual application configuration implied by its
            self.assertEqual(response, {'greeting':'hello'})
            
 In the above example, we create a ``MyTest`` test case that inherits from
-:mod:`unittest.TestCase`.  If it's in our :app:`Pyramid` application, it will
+:class:`unittest.TestCase`.  If it's in our :app:`Pyramid` application, it will
 be found when ``setup.py test`` is run.  It has two test methods.
 
 The first test method, ``test_view_fn_forbidden`` tests the ``view_fn`` when
@@ -287,10 +293,11 @@ request object that requires less setup than a "real" :app:`Pyramid` request.
 We call the function being tested with the manufactured request.  When the
 function is called, :func:`pyramid.security.has_permission` will call the
 "dummy" authentication policy we've registered through
-:meth:`~pyramid.config.Configuration.testing_securitypolicy`, which denies
-access.  We check that the view function raises a :exc:`HTTPForbidden` error.
+:meth:`~pyramid.config.Configurator.testing_securitypolicy`, which denies
+access.  We check that the view function raises a
+:exc:`~pyramid.httpexceptions.HTTPForbidden` error.
 
-The second test method, named ``test_view_fn_allowed`` tests the alternate
+The second test method, named ``test_view_fn_allowed``, tests the alternate
 case, where the authentication policy allows access.  Notice that we pass
 different values to
 :meth:`~pyramid.config.Configurator.testing_securitypolicy` to obtain this
@@ -372,7 +379,7 @@ after accessing some values that require a fully set up environment.
            result = my_view(request)
            self.assertEqual(result.status, '200 OK')
            body = result.app_iter[0]
-           self.failUnless('Welcome to' in body)
+           self.assertTrue('Welcome to' in body)
            self.assertEqual(len(result.headerlist), 2)
            self.assertEqual(result.headerlist[0],
                             ('Content-Type', 'text/html; charset=UTF-8'))
@@ -415,7 +422,7 @@ functional testing package written by Ian Bicking.
 
        def test_root(self):
            res = self.testapp.get('/', status=200)
-           self.failUnless('Pyramid' in res.body)
+           self.assertTrue('Pyramid' in res.body)
 
 When this test is run, each test creates a "real" WSGI application using the
 ``main`` function in your ``myapp.__init__`` module and uses :term:`WebTest`
@@ -425,4 +432,4 @@ invoke the root URL.  We then assert that the returned HTML has the string
 ``Pyramid`` in it.
 
 See the :term:`WebTest` documentation for further information about the
-methods available to a :class:`webtest.TestApp` instance.
+methods available to a :class:`webtest.app.TestApp` instance.

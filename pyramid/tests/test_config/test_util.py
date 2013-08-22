@@ -364,6 +364,23 @@ class TestPredicateList(unittest.TestCase):
     def test_unknown_predicate(self):
         from pyramid.exceptions import ConfigurationError
         self.assertRaises(ConfigurationError, self._callFUT, unknown=1)
+
+    def test_notted(self):
+        from pyramid.config import not_
+        from pyramid.testing import DummyRequest
+        request = DummyRequest()
+        _, predicates, _ = self._callFUT(
+            xhr='xhr',
+            request_method=not_('POST'),
+            header=not_('header'),
+            )
+        self.assertEqual(predicates[0].text(), 'xhr = True')
+        self.assertEqual(predicates[1].text(),
+                         "!request_method = POST")
+        self.assertEqual(predicates[2].text(), '!header header')
+        self.assertEqual(predicates[1](None, request), True)
+        self.assertEqual(predicates[2](None, request), True)
+        
         
 class Test_takes_one_arg(unittest.TestCase):
     def _callFUT(self, view, attr=None, argname=None):
@@ -551,7 +568,37 @@ class Test_takes_one_arg(unittest.TestCase):
         foo = Foo()
         self.assertTrue(self._callFUT(foo.method))
 
+class TestNotted(unittest.TestCase):
+    def _makeOne(self, predicate):
+        from pyramid.config.util import Notted
+        return Notted(predicate)
 
+    def test_it_with_phash_val(self):
+        pred = DummyPredicate('val')
+        inst = self._makeOne(pred)
+        self.assertEqual(inst.text(), '!val')
+        self.assertEqual(inst.phash(), '!val')
+        self.assertEqual(inst(None, None), False)
+
+    def test_it_without_phash_val(self):
+        pred = DummyPredicate('')
+        inst = self._makeOne(pred)
+        self.assertEqual(inst.text(), '')
+        self.assertEqual(inst.phash(), '')
+        self.assertEqual(inst(None, None), True)
+        
+class DummyPredicate(object):
+    def __init__(self, result):
+        self.result = result
+        
+    def text(self):
+        return self.result
+
+    phash = text
+
+    def __call__(self, context, request):
+        return True
+    
 class DummyCustomPredicate(object):
     def __init__(self):
         self.__text__ = 'custom predicate'

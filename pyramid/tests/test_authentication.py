@@ -561,9 +561,13 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         helper.BadTicket = auth_tkt.BadTicket
         return helper
 
-    def _makeRequest(self, cookie=None):
+    def _makeRequest(self, cookie=None, ipv6=False):
         environ = {'wsgi.version': (1,0)}
-        environ['REMOTE_ADDR'] = '1.1.1.1'
+
+        if ipv6 is False:
+            environ['REMOTE_ADDR'] = '1.1.1.1'
+        else:
+            environ['REMOTE_ADDR'] = '::1'
         environ['SERVER_NAME'] = 'localhost'
         return DummyRequest(environ, cookie=cookie)
 
@@ -606,6 +610,23 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertEqual(result['timestamp'], 0)
         self.assertEqual(helper.auth_tkt.value, 'ticket')
         self.assertEqual(helper.auth_tkt.remote_addr, '1.1.1.1')
+        self.assertEqual(helper.auth_tkt.secret, 'secret')
+        environ = request.environ
+        self.assertEqual(environ['REMOTE_USER_TOKENS'], ())
+        self.assertEqual(environ['REMOTE_USER_DATA'],'')
+        self.assertEqual(environ['AUTH_TYPE'],'cookie')
+
+    def test_identify_good_cookie_include_ipv6(self):
+        helper = self._makeOne('secret', include_ip=True)
+        request = self._makeRequest('ticket', ipv6=True)
+        result = helper.identify(request)
+        self.assertEqual(len(result), 4)
+        self.assertEqual(result['tokens'], ())
+        self.assertEqual(result['userid'], 'userid')
+        self.assertEqual(result['userdata'], '')
+        self.assertEqual(result['timestamp'], 0)
+        self.assertEqual(helper.auth_tkt.value, 'ticket')
+        self.assertEqual(helper.auth_tkt.remote_addr, '::1')
         self.assertEqual(helper.auth_tkt.secret, 'secret')
         environ = request.environ
         self.assertEqual(environ['REMOTE_USER_TOKENS'], ())
@@ -887,11 +908,11 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertTrue(result[0][1].startswith('auth_tkt='))
 
         self.assertEqual(result[1][0], 'Set-Cookie')
-        self.assertTrue(result[1][1].endswith('; HttpOnly'))
+        self.assertTrue('; HttpOnly' in result[1][1])
         self.assertTrue(result[1][1].startswith('auth_tkt='))
 
         self.assertEqual(result[2][0], 'Set-Cookie')
-        self.assertTrue(result[2][1].endswith('; HttpOnly'))
+        self.assertTrue('; HttpOnly' in result[2][1])
         self.assertTrue(result[2][1].startswith('auth_tkt='))
 
     def test_remember_secure(self):
@@ -925,6 +946,45 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertEqual(result[1][0], 'Set-Cookie')
         self.assertTrue(result[1][1].endswith('; Path=/; Domain=localhost'))
         self.assertTrue(result[1][1].startswith('auth_tkt='))
+
+    def test_remember_parent_domain(self):
+        helper = self._makeOne('secret', parent_domain=True)
+        request = self._makeRequest()
+        request.environ['HTTP_HOST'] = 'www.example.com'
+        result = helper.remember(request, 'other')
+        self.assertEqual(len(result), 1)
+
+        self.assertEqual(result[0][0], 'Set-Cookie')
+        self.assertTrue(result[0][1].endswith('; Path=/; Domain=.example.com'))
+        self.assertTrue(result[0][1].startswith('auth_tkt='))
+
+    def test_remember_parent_domain_supercedes_wild_domain(self):
+        helper = self._makeOne('secret', parent_domain=True, wild_domain=True)
+        request = self._makeRequest()
+        request.environ['HTTP_HOST'] = 'www.example.com'
+        result = helper.remember(request, 'other')
+        self.assertEqual(len(result), 1)
+        self.assertTrue(result[0][1].endswith('; Domain=.example.com'))
+
+    def test_remember_explicit_domain(self):
+        helper = self._makeOne('secret', domain='pyramid.bazinga')
+        request = self._makeRequest()
+        request.environ['HTTP_HOST'] = 'www.example.com'
+        result = helper.remember(request, 'other')
+        self.assertEqual(len(result), 1)
+
+        self.assertEqual(result[0][0], 'Set-Cookie')
+        self.assertTrue(result[0][1].endswith('; Path=/; Domain=pyramid.bazinga'))
+        self.assertTrue(result[0][1].startswith('auth_tkt='))
+
+    def test_remember_domain_supercedes_parent_and_wild_domain(self):
+        helper = self._makeOne('secret', domain='pyramid.bazinga',
+                parent_domain=True, wild_domain=True)
+        request = self._makeRequest()
+        request.environ['HTTP_HOST'] = 'www.example.com'
+        result = helper.remember(request, 'other')
+        self.assertEqual(len(result), 1)
+        self.assertTrue(result[0][1].endswith('; Path=/; Domain=pyramid.bazinga'))
 
     def test_remember_domain_has_port(self):
         helper = self._makeOne('secret', wild_domain=False)
@@ -1057,13 +1117,13 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         name, value = headers[1]
         self.assertEqual(name, 'Set-Cookie')
         self.assertEqual(value,
-                         'auth_tkt=""; Path=/; Domain=localhost; Max-Age=0; '
-                         'Expires=Wed, 31-Dec-97 23:59:59 GMT')
+                         'auth_tkt=""; Path=/; Max-Age=0; '
+                         'Expires=Wed, 31-Dec-97 23:59:59 GMT; Domain=localhost')
         name, value = headers[2]
         self.assertEqual(name, 'Set-Cookie')
         self.assertEqual(value,
-                         'auth_tkt=""; Path=/; Domain=.localhost; Max-Age=0; '
-                         'Expires=Wed, 31-Dec-97 23:59:59 GMT')
+                         'auth_tkt=""; Path=/; Max-Age=0; '
+                         'Expires=Wed, 31-Dec-97 23:59:59 GMT; Domain=.localhost')
 
 class TestAuthTicket(unittest.TestCase):
     def _makeOne(self, *arg, **kw):
@@ -1097,6 +1157,20 @@ class TestAuthTicket(unittest.TestCase):
         result = ticket.cookie_value()
         self.assertEqual(result,
                          '66f9cc3e423dc57c91df696cf3d1f0d80000000auserid!a,b!')
+
+    def test_ipv4(self):
+        ticket = self._makeOne('secret', 'userid', '198.51.100.1',
+                               time=10, hashalg='sha256')
+        result = ticket.cookie_value()
+        self.assertEqual(result, 'b3e7156db4f8abde4439c4a6499a0668f9e7ffd7fa27b'\
+                                 '798400ecdade8d76c530000000auserid!')
+
+    def test_ipv6(self):
+        ticket = self._makeOne('secret', 'userid', '2001:db8::1',
+                               time=10, hashalg='sha256')
+        result = ticket.cookie_value()
+        self.assertEqual(result, 'd025b601a0f12ca6d008aa35ff3a22b7d8f3d1c1456c8'\
+                                 '5becf8760cd7a2fa4910000000auserid!')
 
 class TestBadTicket(unittest.TestCase):
     def _makeOne(self, msg, expected=None):
@@ -1140,6 +1214,19 @@ class Test_parse_ticket(unittest.TestCase):
                  'ae56599a0000000auserid!a,b!'
         result = self._callFUT('secret', ticket, '0.0.0.0', 'sha512')
         self.assertEqual(result, (10, 'userid', ['a', 'b'], ''))
+
+    def test_ipv4(self):
+        ticket = 'b3e7156db4f8abde4439c4a6499a0668f9e7ffd7fa27b798400ecdade8d7'\
+                 '6c530000000auserid!'
+        result = self._callFUT('secret', ticket, '198.51.100.1', 'sha256')
+        self.assertEqual(result, (10, 'userid', [''], ''))
+
+    def test_ipv6(self):
+        ticket = 'd025b601a0f12ca6d008aa35ff3a22b7d8f3d1c1456c85becf8760cd7a2f'\
+                 'a4910000000auserid!'
+        result = self._callFUT('secret', ticket, '2001:db8::1', 'sha256')
+        self.assertEqual(result, (10, 'userid', [''], ''))
+        pass
 
 class TestSessionAuthenticationPolicy(unittest.TestCase):
     def _getTargetClass(self):

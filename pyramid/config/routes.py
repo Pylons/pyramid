@@ -1,5 +1,6 @@
 import warnings
 
+from pyramid.compat import urlparse
 from pyramid.interfaces import (
     IRequest,
     IRouteRequest,
@@ -90,10 +91,10 @@ class RoutesConfiguratorMixin(object):
           ``traverse`` argument provided to ``add_route`` is
           ``/{article}``, when a request comes in that causes the route
           to match in such a way that the ``article`` match value is
-          '1' (when the request URI is ``/articles/1/edit``), the
+          ``'1'`` (when the request URI is ``/articles/1/edit``), the
           traversal path will be generated as ``/1``.  This means that
           the root object's ``__getitem__`` will be called with the
-          name ``1`` during the traversal phase.  If the ``1`` object
+          name ``'1'`` during the traversal phase.  If the ``'1'`` object
           exists, it will become the :term:`context` of the request.
           :ref:`traversal_chapter` has more information about
           traversal.
@@ -235,7 +236,8 @@ class RoutesConfiguratorMixin(object):
           wildcard mimetype match token in the form ``text/*`` or a
           match-all wildcard mimetype match token in the form ``*/*``.
           If any of the forms matches the ``Accept`` header of the
-          request, this predicate will be true.  If this predicate
+          request, or if the ``Accept`` header isn't set at all in the
+          request, this predicate will be true. If this predicate
           returns ``False``, route matching continues.
 
         effective_principals
@@ -383,7 +385,39 @@ class RoutesConfiguratorMixin(object):
         if pattern is None:
             raise ConfigurationError('"pattern" argument may not be None')
 
-        if self.route_prefix:
+        # check for an external route; an external route is one which is
+        # is a full url (e.g. 'http://example.com/{id}')
+        parsed = urlparse.urlparse(pattern)
+        if parsed.hostname:
+            pattern = parsed.path
+
+            original_pregenerator = pregenerator
+            def external_url_pregenerator(request, elements, kw):
+                if '_app_url' in kw:
+                    raise ValueError(
+                        'You cannot generate a path to an external route '
+                        'pattern via request.route_path nor pass an _app_url '
+                        'to request.route_url when generating a URL for an '
+                        'external route pattern (pattern was "%s") ' %
+                        (pattern,)
+                        )
+                if '_scheme' in kw:
+                    scheme = kw['_scheme']
+                elif parsed.scheme:
+                    scheme = parsed.scheme
+                else:
+                    scheme = request.scheme
+                kw['_app_url'] = '{0}://{1}'.format(scheme, parsed.netloc)
+
+                if original_pregenerator:
+                    elements, kw = original_pregenerator(
+                        request, elements, kw)
+                return elements, kw
+
+            pregenerator = external_url_pregenerator
+            static = True
+
+        elif self.route_prefix:
             pattern = self.route_prefix.rstrip('/') + '/' + pattern.lstrip('/')
 
         mapper = self.get_routes_mapper()
@@ -517,7 +551,7 @@ class RoutesConfiguratorMixin(object):
             ('traverse', p.TraversePredicate),
             ):
             self.add_route_predicate(name, factory)
-    
+
     def get_routes_mapper(self):
         """ Return the :term:`routes mapper` object associated with
         this configurator's :term:`registry`."""
