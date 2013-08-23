@@ -579,18 +579,9 @@ signature:
    def pluralize(singular, plural, n, domain=None, mapping=None):
        ...
 
-The ``singular`` and ``plural`` arguments should each be a Unicode
-value representing a :term:`message identifier`.  ``n`` should be an
-integer.  ``domain`` should be a :term:`translation domain`, and
-``mapping`` should be a dictionary that is used for *replacement
-value* interpolation of the translated string.  If ``n`` is plural
-for the current locale, ``pluralize`` will return a Unicode
-translation for the message id ``plural``, otherwise it will return a
-Unicode translation for the message id ``singular``.
-
-The arguments provided as ``singular`` and/or ``plural`` may also be
-:term:`translation string` objects, but the domain and mapping
-information attached to those objects is ignored.
+The simplest case is the ``singular`` and ``plural`` arguments being passed as
+unicode literals. This returns the appropriate literal according to the locale
+pluralization rules for the number ``n``, and interpolates ``mapping``.
 
 .. code-block:: python
    :linenos:
@@ -601,6 +592,49 @@ information attached to those objects is ignored.
        localizer = get_localizer(request)
        translated = localizer.pluralize('Item', 'Items', 1, 'mydomain')
        # ... use translated ...
+
+However, for support of other languages, the ``singular`` argument should
+be a Unicode value representing a :term:`message identifier`.  In this
+case the ``plural`` value is ignored.
+``domain`` should be a :term:`translation domain`, and
+``mapping`` should be a dictionary that is used for *replacement
+value* interpolation of the translated string.  
+
+The value of ``n`` will be used to find the appropriate plural form for the
+current language and ``pluralize`` will return a Unicode translation for the
+message id ``singular``. The message file must have defined ``singular`` as a
+translation with plural forms.
+
+The argument provided as ``singular`` may be a :term:`translation string`
+object, but the domain and mapping information attached is ignored.
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.i18n import get_localizer
+
+   def aview(request):
+       localizer = get_localizer(request)
+       num = 1
+       translated = localizer.pluralize(_('item_plural', default="${number} items"), 
+           None, num, 'mydomain', mapping={'number':num})
+
+The corresponding message catalog must have language plural definitions and
+plural alternatives set.
+
+.. code-block:: text
+    :linenos:
+    
+    "Plural-Forms: nplurals=3; plural=n==0 ? 0 : n==1 ? 1 : 2;"
+    
+    msgid "item_plural"
+    msgid_plural ""
+    msgstr[0] "No items"
+    msgstr[1] "${number} item"
+    msgstr[2] "${number} items"
+
+More information on complex plurals can be found in the `gettext documentation
+<https://www.gnu.org/savannah-checkouts/gnu/gettext/manual/html_node/Plural-forms.html>`_.
 
 .. index::
    single: locale name
