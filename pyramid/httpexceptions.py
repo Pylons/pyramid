@@ -28,7 +28,6 @@ Exception
       * 303 - HTTPSeeOther
       * 304 - HTTPNotModified
       * 305 - HTTPUseProxy
-      * 306 - Unused (not implemented, obviously)
       * 307 - HTTPTemporaryRedirect
     HTTPError
       HTTPClientError
