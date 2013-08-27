@@ -1,3 +1,14 @@
+Next release
+============
+
+Bug Fixes
+---------
+
+- Fix an obscure problem when combining a virtual root with a route with a 
+  ``*traverse`` in its pattern.  Now the traversal path generated in
+  such a configuration will be correct, instead of an element missing
+  a leading slash.
+
 1.4.3 (2013-07-18)
 ==================
 

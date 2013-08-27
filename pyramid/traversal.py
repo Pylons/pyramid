@@ -640,7 +640,7 @@ class ResourceTreeTraverser(object):
                 # this is a *traverse stararg (not a {traverse})
                 # routing has already decoded these elements, so we just
                 # need to join them
-                path = slash.join(path) or slash
+                path = '/' + slash.join(path) or slash
 
             subpath = matchdict.get('subpath', ())
             if not is_nonstr_iter(subpath):
