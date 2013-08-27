@@ -149,6 +149,11 @@ Features
 Bug Fixes
 ---------
 
+- Fix an obscure problem when combining a virtual root with a route with a 
+  ``*traverse`` in its pattern.  Now the traversal path generated in
+  such a configuration will be correct, instead of an element missing
+  a leading slash.
+
 - Fixed a Mako renderer bug returning a tuple with a previous defname value
   in some circumstances. See https://github.com/Pylons/pyramid/issues/1037
   for more information.
