@@ -324,7 +324,7 @@ class DottedNameResolver(Resolver):
 
     def _pkg_resources_style(self, value, package):
         """ package.module:attr style """
-        if value.startswith('.') or value.startswith(':'):
+        if value.startswith(('.', ':')):
             if not package:
                 raise ValueError(
                     'relative name %r irresolveable without package' % (value,)
