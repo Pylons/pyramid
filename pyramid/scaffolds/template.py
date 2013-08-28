@@ -35,7 +35,8 @@ class Template(object):
         content = native_(content, fsenc)
         try:
             return bytes_(
-                substitute_double_braces(content, TypeMapper(vars)), fsenc)
+                substitute_escaped_double_braces(
+                    substitute_double_braces(content, TypeMapper(vars))), fsenc)
         except Exception as e:
             _add_except(e, ' in file %s' % filename)
             raise
@@ -148,7 +149,15 @@ def substitute_double_braces(content, values):
         value = match.group('braced').strip()
         return values[value]
     return double_brace_pattern.sub(double_bracerepl, content)
-    
+
+escaped_double_brace_pattern = re.compile(r'\\{\\{(?P<escape_braced>[^\\]*?)\\}\\}')
+
+def substitute_escaped_double_braces(content):
+    def escaped_double_bracerepl(match):
+        value = match.group('escape_braced').strip()
+        return "{{%(value)s}}" % locals()
+    return escaped_double_brace_pattern.sub(escaped_double_bracerepl, content)
+
 def _add_except(exc, info): # pragma: no cover
     if not hasattr(exc, 'args') or exc.args is None:
         return
