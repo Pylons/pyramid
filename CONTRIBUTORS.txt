@@ -218,3 +218,5 @@ Contributors
 - Andreas Zeidler, 2013/08/15
 
 - Matthew Wilkes, 2013/08/23
+
+- Takahiro Fujiwara, 2013/08/28

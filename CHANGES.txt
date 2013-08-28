@@ -4,6 +4,11 @@ Next Release
 Features
 --------
 
+- It is now possible to escape double braces in Pyramid scaffolds (unescaped, 
+  these represent replacement values).  You can use ``\{\{a\}\}`` to
+  represent a "bare" ``{{a}}``.  See 
+  https://github.com/Pylons/pyramid/pull/862
+
 - Add ``localizer`` property (reified) to the request.
   See https://github.com/Pylons/pyramid/issues/508.
 
@@ -149,6 +154,11 @@ Features
 Bug Fixes
 ---------
 
+- Fix an obscure problem when combining a virtual root with a route with a 
+  ``*traverse`` in its pattern.  Now the traversal path generated in
+  such a configuration will be correct, instead of an element missing
+  a leading slash.
+
 - Fixed a Mako renderer bug returning a tuple with a previous defname value
   in some circumstances. See https://github.com/Pylons/pyramid/issues/1037
   for more information.
@@ -201,6 +211,11 @@ Backwards Incompatibilities
 - Modified the ``current_route_url`` method in pyramid.Request. The method
   previously returned the URL without the query string by default, it now does
   attach the query string unless it is overriden.
+
+- The ``route_url`` and ``route_path`` APIs no longer quote ``/`` 
+  to ``%2F`` when a replacement value contains a ``/``.  This was pointless,
+  as WSGI servers always unquote the slash anyway, and Pyramid never sees the 
+  quoted value.
 
 1.4 (2012-12-18)
 ================

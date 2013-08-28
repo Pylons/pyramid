@@ -456,6 +456,23 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         self.assertEqual(result['virtual_root'], resource)
         self.assertEqual(result['virtual_root_path'], ())
 
+    def test_withroute_and_traverse_and_vroot(self):
+        abc = DummyContext()
+        resource = DummyContext(next=abc)
+        environ = self._getEnviron(HTTP_X_VHM_ROOT='/abc')
+        request = DummyRequest(environ)
+        traverser = self._makeOne(resource)
+        matchdict =  {'traverse':text_('/foo/bar')}
+        request.matchdict = matchdict
+        result = traverser(request)
+        self.assertEqual(result['context'], abc)
+        self.assertEqual(result['view_name'], 'foo')
+        self.assertEqual(result['subpath'], ('bar',))
+        self.assertEqual(result['traversed'], ('abc', 'foo'))
+        self.assertEqual(result['root'], resource)
+        self.assertEqual(result['virtual_root'], abc)
+        self.assertEqual(result['virtual_root_path'], ('abc',))
+        
 class FindInterfaceTests(unittest.TestCase):
     def _callFUT(self, context, iface):
         from pyramid.traversal import find_interface

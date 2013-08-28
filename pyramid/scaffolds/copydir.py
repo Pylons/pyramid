@@ -156,9 +156,9 @@ def should_skip_file(name):
     """
     if name.startswith('.'):
         return 'Skipping hidden file %(filename)s'
-    if name.endswith('~') or name.endswith('.bak'):
+    if name.endswith(('~', '.bak')):
         return 'Skipping backup file %(filename)s'
-    if name.endswith('.pyc') or name.endswith('.pyo'):
+    if name.endswith(('.pyc', '.pyo')):
         return 'Skipping %s file ' % os.path.splitext(name)[1] + '%(filename)s'
     if name.endswith('$py.class'):
         return 'Skipping $py.class file %(filename)s'
