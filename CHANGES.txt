@@ -4,6 +4,11 @@ Next Release
 Features
 --------
 
+- It is now possible to escape double braces in Pyramid scaffolds (unescaped, 
+  these represent replacement values).  You can use ``\{\{a\}\}`` to
+  represent a "bare" ``{{a}}``.  See 
+  https://github.com/Pylons/pyramid/pull/862
+
 - Add ``localizer`` property (reified) to the request.
   See https://github.com/Pylons/pyramid/issues/508.
 
