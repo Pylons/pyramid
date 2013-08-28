@@ -207,6 +207,11 @@ Backwards Incompatibilities
   previously returned the URL without the query string by default, it now does
   attach the query string unless it is overriden.
 
+- The ``route_url`` and ``route_path`` APIs no longer quote ``/`` 
+  to ``%2F`` when a replacement value contains a ``/``.  This was pointless,
+  as WSGI servers always unquote the slash anyway, and Pyramid never sees the 
+  quoted value.
+
 1.4 (2012-12-18)
 ================
 
