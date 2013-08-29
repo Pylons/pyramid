@@ -86,8 +86,10 @@ class TestI18NConfiguratorMixin(unittest.TestCase):
     def test_add_translation_dirs_registers_chameleon_translate(self):
         from pyramid.interfaces import IChameleonTranslate
         from pyramid.threadlocal import manager
-        request = DummyRequest()
+        from pyramid.request import Request
         config = self._makeOne(autocommit=True)
+        request = Request.blank('/')
+        request.registry = config.registry
         manager.push({'request':request, 'registry':config.registry})
         try:
             config.add_translation_dirs('pyramid.tests.pkgs.localeapp:locale')
@@ -103,12 +105,3 @@ class TestI18NConfiguratorMixin(unittest.TestCase):
         self.assertEqual(config.registry.getUtility(ITranslationDirectories),
                          [locale])
 
-class DummyRequest:
-    subpath = ()
-    matchdict = None
-    def __init__(self, environ=None):
-        if environ is None:
-            environ = {}
-        self.environ = environ
-        self.params = {}
-        self.cookies = {}
