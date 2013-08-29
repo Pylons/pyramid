@@ -1,3 +1,13 @@
+Next release
+============
+
+- When the ``pyramid.reload_templates`` setting was true, and a Chameleon 
+  template was reloaded, and the renderer specification named a macro 
+  (e.g. ``foo#macroname.pt``), renderings of the template after the template
+  was reloaded due to a file change would produce the entire template body 
+  instead of just a rendering of the macro.  See 
+  https://github.com/Pylons/pyramid/issues/1013.
+
 1.4.4 (2013-08-27)
 ==================
 
@@ -16,7 +26,7 @@ Bug Fixes
 ---------
 
 - ``pyramid.testing.DummyResource`` didn't define ``__bool__``, so code under
-   Python 3 would use ``__len__`` to find truthiness; this usually caused an
+  Python 3 would use ``__len__`` to find truthiness; this usually caused an
    instance of DummyResource to be "falsy" instead of "truthy".  See
    https://github.com/Pylons/pyramid/pull/1032
 
