@@ -154,6 +154,13 @@ Features
 Bug Fixes
 ---------
 
+- When the ``pyramid.reload_templates`` setting was true, and a Chameleon 
+  template was reloaded, and the renderer specification named a macro 
+  (e.g. ``foo#macroname.pt``), renderings of the template after the template
+  was reloaded due to a file change would produce the entire template body 
+  instead of just a rendering of the macro.  See 
+  https://github.com/Pylons/pyramid/issues/1013.
+
 - Fix an obscure problem when combining a virtual root with a route with a 
   ``*traverse`` in its pattern.  Now the traversal path generated in
   such a configuration will be correct, instead of an element missing
