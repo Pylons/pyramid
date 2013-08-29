@@ -692,6 +692,16 @@ class IRoute(Interface):
     pregenerator = Attribute('This attribute should either be ``None`` or '
                              'a callable object implementing the '
                              '``IRoutePregenerator`` interface')
+    remainder_name = Attribute(
+        'The name of any stararg remainder that is present at the end of '
+        'the pattern. For example, if the pattern is ``/foo*bar``, the '
+        '``remainder_name`` will be ``bar``; if the pattern is ` '
+        '`/foo*traverse``, the ``remainder_name`` will be ``traverse``. '
+        'If the route does not have a stararg remainder name in its pattern, '
+        'the value of ``remainder_name`` will be ``None``.  This attribute '
+        'is new as of Pyramid 1.5.'
+        )
+        
     def match(path):
         """
         If the ``path`` passed to this function can be matched by the
@@ -738,8 +748,18 @@ class IRoutesMapper(Interface):
         matched.  Static routes will not be considered for matching.  """
 
 class IResourceURL(Interface):
-    virtual_path = Attribute('The virtual url path of the resource.')
-    physical_path = Attribute('The physical url path of the resource.')
+    virtual_path = Attribute(
+        'The virtual url path of the resource as a string.'
+        )
+    physical_path = Attribute(
+        'The physical url path of the resource as a string.'
+        )
+    virtual_path_tuple = Attribute(
+        'The virtual url path of the resource as a tuple.  (New in 1.5)'
+        )
+    physical_path = Attribute(
+        'The physical url path of the resource as a tuple. (New in 1.5)'
+        )
 
 class IContextURL(IResourceURL):
     """ An adapter which deals with URLs related to a context.

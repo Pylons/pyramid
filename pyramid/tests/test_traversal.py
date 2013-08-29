@@ -1063,7 +1063,28 @@ class ResourceURLTests(unittest.TestCase):
         context_url = self._makeOne(two, request)
         self.assertEqual(context_url.physical_path, '/one/two/')
         self.assertEqual(context_url.virtual_path, '/two/')
-
+        self.assertEqual(context_url.physical_path_tuple, ('', 'one', 'two',''))
+        self.assertEqual(context_url.virtual_path_tuple, ('', 'two', ''))
+        
+    def test_IResourceURL_attributes_vroot_ends_with_slash(self):
+        from pyramid.interfaces import VH_ROOT_KEY
+        root = DummyContext()
+        root.__parent__ = None
+        root.__name__ = None
+        one = DummyContext()
+        one.__parent__ = root
+        one.__name__ = 'one'
+        two = DummyContext()
+        two.__parent__ = one
+        two.__name__ = 'two'
+        environ = {VH_ROOT_KEY:'/one/'}
+        request = DummyRequest(environ)
+        context_url = self._makeOne(two, request)
+        self.assertEqual(context_url.physical_path, '/one/two/')
+        self.assertEqual(context_url.virtual_path, '/two/')
+        self.assertEqual(context_url.physical_path_tuple, ('', 'one', 'two',''))
+        self.assertEqual(context_url.virtual_path_tuple, ('', 'two', ''))
+        
     def test_IResourceURL_attributes_no_vroot(self):
         root = DummyContext()
         root.__parent__ = None
@@ -1079,7 +1100,9 @@ class ResourceURLTests(unittest.TestCase):
         context_url = self._makeOne(two, request)
         self.assertEqual(context_url.physical_path, '/one/two/')
         self.assertEqual(context_url.virtual_path, '/one/two/')
-        
+        self.assertEqual(context_url.physical_path_tuple, ('', 'one', 'two',''))
+        self.assertEqual(context_url.virtual_path_tuple, ('', 'one', 'two', ''))
+
 class TestVirtualRoot(unittest.TestCase):
     def setUp(self):
         cleanUp()

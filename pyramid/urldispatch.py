@@ -33,6 +33,7 @@ class Route(object):
         self.pattern = pattern
         self.path = pattern # indefinite b/w compat, not in interface
         self.match, self.generate = _compile_route(pattern)
+        self.remainder_name = get_remainder_name(pattern)
         self.name = name
         self.factory = factory
         self.predicates = predicates
@@ -91,7 +92,7 @@ class RoutesMapper(object):
 
 # stolen from bobo and modified
 old_route_re = re.compile(r'(\:[_a-zA-Z]\w*)')
-star_at_end = re.compile(r'\*\w*$')
+star_at_end = re.compile(r'(\*\w*)$')
 
 # The tortuous nature of the regex named ``route_re`` below is due to the
 # fact that we need to support at least one level of "inner" squigglies
@@ -233,3 +234,9 @@ def _compile_route(route):
         return result
 
     return matcher, generator
+
+def get_remainder_name(pattern):
+    match = star_at_end.search(pattern)
+    if match:
+        return match.groups()[0]
+    

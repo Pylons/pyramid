@@ -232,6 +232,16 @@ Backwards Incompatibilities
   respectively using the machinery described in the "Internationalization"
   chapter of the documentation.
 
+- If you send an ``X-Vhm-Root`` header with a value that ends with a slash (or
+  any number of slashes), the trailing slash(es) will be removed before a URL
+  is generated when you use use ``request.resource_url`` or
+  ``request.resource_path``.  Previously the virtual root path would not have
+  trailing slashes stripped, which would influence URL generation.
+
+- The ``pyramid.interfaces.IResourceURL`` interface has now grown two new
+  attributes: ``virtual_path_tuple`` and ``physical_path_tuple``.  These should
+  be the tuple form of the resource's path (physical and virtual).
+
 1.4 (2012-12-18)
 ================
 

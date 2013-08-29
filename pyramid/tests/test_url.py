@@ -441,6 +441,31 @@ class TestURLMethodsMixin(unittest.TestCase):
         self.assertEqual(result,
                          'http://example2.com/1/2/3/element1?q=1#anchor')
 
+    def test_route_url_with_remainder(self):
+        from pyramid.interfaces import IRoutesMapper
+        request = self._makeOne()
+        route = DummyRoute('/1/2/3/')
+        route.remainder_name = 'fred'
+        mapper = DummyRoutesMapper(route=route)
+        request.registry.registerUtility(mapper, IRoutesMapper)
+        result = request.route_url('flub', _remainder='abc')
+        self.assertEqual(result,
+                         'http://example.com:5432/1/2/3/')
+        self.assertEqual(route.kw['fred'], 'abc')
+        self.assertFalse('_remainder' in route.kw)
+
+    def test_route_url_with_remainder_name_already_in_kw(self):
+        from pyramid.interfaces import IRoutesMapper
+        request = self._makeOne()
+        route = DummyRoute('/1/2/3/')
+        route.remainder_name = 'fred'
+        mapper = DummyRoutesMapper(route=route)
+        request.registry.registerUtility(mapper, IRoutesMapper)
+        self.assertRaises(
+            ValueError,
+            request.route_url, 'flub', _remainder='abc', fred='foo'
+            )
+
     def test_route_url_integration_with_real_request(self):
         # to try to replicate https://github.com/Pylons/pyramid/issues/213
         from pyramid.interfaces import IRoutesMapper
@@ -503,7 +528,8 @@ class TestURLMethodsMixin(unittest.TestCase):
         from pyramid.interfaces import IRoutesMapper
         from webob.multidict import GetDict
         request = self._makeOne()
-        request.GET = GetDict([('q', '123'), ('b', '2'), ('b', '2'), ('q', '456')], {})
+        request.GET = GetDict(
+            [('q', '123'), ('b', '2'), ('b', '2'), ('q', '456')], {})
         route = DummyRoute('/1/2/3')
         mapper = DummyRoutesMapper(route=route)
         request.matched_route = route
@@ -1113,6 +1139,7 @@ class DummyRoutesMapper:
 class DummyRoute:
     pregenerator = None
     name = 'route'
+    remainder_name = None
     def __init__(self, result='/1/2/3'):
         self.result = result
 
