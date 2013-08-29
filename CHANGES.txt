@@ -9,8 +9,10 @@ Features
   represent a "bare" ``{{a}}``.  See 
   https://github.com/Pylons/pyramid/pull/862
 
-- Add ``localizer`` property (reified) to the request.
-  See https://github.com/Pylons/pyramid/issues/508.
+- Add ``localizer`` and ``locale_name`` properties (reified) to the request.
+  See https://github.com/Pylons/pyramid/issues/508.  Note that the 
+  ``pyramid.i18n.get_localizer`` and ``pyramid.i18n.get_locale_name`` functions
+  now simply look up these properties on the request.
 
 - Add ``pdistreport`` script, which prints the Python version in use, the
   Pyramid version in use, and the version number and location of all Python
@@ -223,6 +225,12 @@ Backwards Incompatibilities
   to ``%2F`` when a replacement value contains a ``/``.  This was pointless,
   as WSGI servers always unquote the slash anyway, and Pyramid never sees the 
   quoted value.
+
+- It is no longer possible to set a ``locale_name`` attribute of the request, 
+  nor is it possible to set a ``localizer`` attribute of the request.  These
+  are now "reified" properties that look up a locale name and localizer
+  respectively using the machinery described in the "Internationalization"
+  chapter of the documentation.
 
 1.4 (2012-12-18)
 ================
