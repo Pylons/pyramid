@@ -4,6 +4,10 @@ Next release
 Bug Fixes
 ---------
 
+- The ``alchemy`` scaffold would break when the database was MySQL during
+  tables creation.  See https://github.com/Pylons/pyramid/pull/1049.  Backport 
+  from master.
+
 - It was not possible to use ``pyramid.httpexceptions.HTTPException`` as
   the ``context`` of an exception view as very general catchall for
   http-related exceptions when you wanted that exception view to override the 
