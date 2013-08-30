@@ -328,7 +328,7 @@ class HTTPOk(HTTPSuccessful):
 
 class HTTPCreated(HTTPSuccessful):
     """
-    subclass of :class:`~HTTPOk`
+    subclass of :class:`~HTTPSuccessful`
 
     This indicates that request has been fulfilled and resulted in a new
     resource being created.
@@ -340,7 +340,7 @@ class HTTPCreated(HTTPSuccessful):
 
 class HTTPAccepted(HTTPSuccessful):
     """
-    subclass of :class:`~HTTPOk`
+    subclass of :class:`~HTTPSuccessful`
 
     This indicates that the request has been accepted for processing, but the
     processing has not been completed.
@@ -353,7 +353,7 @@ class HTTPAccepted(HTTPSuccessful):
 
 class HTTPNonAuthoritativeInformation(HTTPSuccessful):
     """
-    subclass of :class:`~HTTPOk`
+    subclass of :class:`~HTTPSuccessful`
 
     This indicates that the returned metainformation in the entity-header is
     not the definitive set as available from the origin server, but is
@@ -366,7 +366,7 @@ class HTTPNonAuthoritativeInformation(HTTPSuccessful):
 
 class HTTPNoContent(HTTPSuccessful):
     """
-    subclass of :class:`~HTTPOk`
+    subclass of :class:`~HTTPSuccessful`
 
     This indicates that the server has fulfilled the request but does
     not need to return an entity-body, and might want to return updated
@@ -380,7 +380,7 @@ class HTTPNoContent(HTTPSuccessful):
 
 class HTTPResetContent(HTTPSuccessful):
     """
-    subclass of :class:`~HTTPOk`
+    subclass of :class:`~HTTPSuccessful`
 
     This indicates that the server has fulfilled the request and
     the user agent SHOULD reset the document view which caused the
@@ -394,7 +394,7 @@ class HTTPResetContent(HTTPSuccessful):
 
 class HTTPPartialContent(HTTPSuccessful):
     """
-    subclass of :class:`~HTTPOk`
+    subclass of :class:`~HTTPSuccessful`
 
     This indicates that the server has fulfilled the partial GET
     request for the resource.
