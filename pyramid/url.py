@@ -420,6 +420,14 @@ class URLMethodsMixin(object):
         are also passed, ``app_url`` will take precedence and the values
         passed for ``scheme``, ``host``, and/or ``port`` will be ignored.
 
+        If the ``resource`` passed in has a ``__resource_url__`` method, it
+        will be used to generate the URL (scheme, host, port, path) for the
+        base resource which is operated upon by this function.  See also
+        :ref:`overriding_resource_url_generation`.
+
+        .. versionadded:: 1.5
+           ``route_name`` and ``route_kw``
+           
         If ``route_name`` is passed, this function will delegate its URL
         production to the ``route_url`` function.  Calling
         ``resource_url(someresource, 'element1', 'element2', query={'a':1},
@@ -436,7 +444,7 @@ class URLMethodsMixin(object):
 
         It is only sensible to pass ``route_name`` if the route being named has
         a ``*remainder`` stararg value such as ``*traverse``.  The remainder
-        will be ignored in the output otherwise.
+        value will be ignored in the output otherwise.
 
         If ``route_name`` is passed, it is also permissible to pass
         ``route_kw``, which will passed as additional keyword arguments to
@@ -458,14 +466,6 @@ class URLMethodsMixin(object):
         ``__resource_url__`` method of the resource passed is ignored
         unconditionally.
         
-        The ``route_name`` and ``route_kw`` arguments were added in Pyramid
-        1.5.
-
-        If the ``resource`` passed in has a ``__resource_url__`` method, it
-        will be used to generate the URL (scheme, host, port, path) for the
-        base resource which is operated upon by this function.  See also
-        :ref:`overriding_resource_url_generation`.
-
         .. note::
 
            If the :term:`resource` used is the result of a :term:`traversal`, it
