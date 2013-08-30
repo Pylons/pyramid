@@ -46,11 +46,12 @@ class TestURLMethodsMixin(unittest.TestCase):
         from pyramid.interfaces import IResourceURL
         from zope.interface import Interface
         class DummyResourceURL(object):
-            def __init__(self, context, request):
-                self.physical_path = '/context/'
-                self.virtual_path = '/context/'
+            physical_path = '/context/'
+            virtual_path = '/context/'
+            def __init__(self, context, request): pass
         reg.registerAdapter(DummyResourceURL, (Interface, Interface),
                             IResourceURL)
+        return DummyResourceURL
 
     def test_resource_url_root_default(self):
         request = self._makeOne()
@@ -255,6 +256,134 @@ class TestURLMethodsMixin(unittest.TestCase):
         root.__resource_url__ = resource_url
         result = request.resource_url(root)
         self.assertEqual(result, 'http://example.com/contextabc/')
+
+    def test_resource_url_with_route_name_no_remainder_on_adapter(self):
+        from pyramid.interfaces import IRoutesMapper
+        environ = {
+            'wsgi.url_scheme':'http',
+            'SERVER_PORT':'8080',
+            'SERVER_NAME':'example.com',
+            }
+        request = self._makeOne(environ)
+        adapter = self._registerResourceURL(request.registry)
+        # no virtual_path_tuple on adapter
+        adapter.virtual_path = '/a/b/c/'
+        route = DummyRoute('/1/2/3')
+        route.remainder_name = 'fred'
+        mapper = DummyRoutesMapper(route)
+        request.registry.registerUtility(mapper, IRoutesMapper)
+        root = DummyContext()
+        result = request.resource_url(root, route_name='foo')
+        self.assertEqual(result, 'http://example.com:5432/1/2/3')
+        self.assertEqual(route.kw, {'fred': ('', 'a', 'b', 'c', '')})
+
+    def test_resource_url_with_route_name_remainder_on_adapter(self):
+        from pyramid.interfaces import IRoutesMapper
+        environ = {
+            'wsgi.url_scheme':'http',
+            'SERVER_PORT':'8080',
+            'SERVER_NAME':'example.com',
+            }
+        request = self._makeOne(environ)
+        adapter = self._registerResourceURL(request.registry)
+        # virtual_path_tuple on adapter
+        adapter.virtual_path_tuple = ('', 'a', 'b', 'c', '')
+        route = DummyRoute('/1/2/3')
+        route.remainder_name = 'fred'
+        mapper = DummyRoutesMapper(route)
+        request.registry.registerUtility(mapper, IRoutesMapper)
+        root = DummyContext()
+        result = request.resource_url(root, route_name='foo')
+        self.assertEqual(result, 'http://example.com:5432/1/2/3')
+        self.assertEqual(route.kw, {'fred': ('', 'a', 'b', 'c', '')})
+
+    def test_resource_url_with_route_name_and_app_url(self):
+        from pyramid.interfaces import IRoutesMapper
+        environ = {
+            'wsgi.url_scheme':'http',
+            'SERVER_PORT':'8080',
+            'SERVER_NAME':'example.com',
+            }
+        request = self._makeOne(environ)
+        adapter = self._registerResourceURL(request.registry)
+        # virtual_path_tuple on adapter
+        adapter.virtual_path_tuple = ('', 'a', 'b', 'c', '')
+        route = DummyRoute('/1/2/3')
+        route.remainder_name = 'fred'
+        mapper = DummyRoutesMapper(route)
+        request.registry.registerUtility(mapper, IRoutesMapper)
+        root = DummyContext()
+        result = request.resource_url(root, route_name='foo', app_url='app_url')
+        self.assertEqual(result, 'app_url/1/2/3')
+        self.assertEqual(route.kw, {'fred': ('', 'a', 'b', 'c', '')})
+
+    def test_resource_url_with_route_name_and_scheme_host_port_etc(self):
+        from pyramid.interfaces import IRoutesMapper
+        environ = {
+            'wsgi.url_scheme':'http',
+            'SERVER_PORT':'8080',
+            'SERVER_NAME':'example.com',
+            }
+        request = self._makeOne(environ)
+        adapter = self._registerResourceURL(request.registry)
+        # virtual_path_tuple on adapter
+        adapter.virtual_path_tuple = ('', 'a', 'b', 'c', '')
+        route = DummyRoute('/1/2/3')
+        route.remainder_name = 'fred'
+        mapper = DummyRoutesMapper(route)
+        request.registry.registerUtility(mapper, IRoutesMapper)
+        root = DummyContext()
+        result = request.resource_url(root, route_name='foo', scheme='scheme',
+                                      host='host', port='port', query={'a':'1'},
+                                      anchor='anchor')
+        self.assertEqual(result, 'scheme://host:port/1/2/3?a=1#anchor')
+        self.assertEqual(route.kw, {'fred': ('', 'a', 'b', 'c', '')})
+
+    def test_resource_url_with_route_name_and_route_kwargs(self):
+        from pyramid.interfaces import IRoutesMapper
+        environ = {
+            'wsgi.url_scheme':'http',
+            'SERVER_PORT':'8080',
+            'SERVER_NAME':'example.com',
+            }
+        request = self._makeOne(environ)
+        adapter = self._registerResourceURL(request.registry)
+        # virtual_path_tuple on adapter
+        adapter.virtual_path_tuple = ('', 'a', 'b', 'c', '')
+        route = DummyRoute('/1/2/3')
+        route.remainder_name = 'fred'
+        mapper = DummyRoutesMapper(route)
+        request.registry.registerUtility(mapper, IRoutesMapper)
+        root = DummyContext()
+        result = request.resource_url(
+            root, route_name='foo', route_kw={'a':'1', 'b':'2'})
+        self.assertEqual(result, 'http://example.com:5432/1/2/3')
+        self.assertEqual(
+            route.kw,
+            {'fred': ('', 'a', 'b', 'c', ''),
+             'a':'1',
+             'b':'2'}
+            )
+
+    def test_resource_url_with_route_name_and_elements(self):
+        from pyramid.interfaces import IRoutesMapper
+        environ = {
+            'wsgi.url_scheme':'http',
+            'SERVER_PORT':'8080',
+            'SERVER_NAME':'example.com',
+            }
+        request = self._makeOne(environ)
+        adapter = self._registerResourceURL(request.registry)
+        # virtual_path_tuple on adapter
+        adapter.virtual_path_tuple = ('', 'a', 'b', 'c', '')
+        route = DummyRoute('/1/2/3')
+        route.remainder_name = 'fred'
+        mapper = DummyRoutesMapper(route)
+        request.registry.registerUtility(mapper, IRoutesMapper)
+        root = DummyContext()
+        result = request.resource_url(root, 'e1', 'e2', route_name='foo')
+        self.assertEqual(result,  'http://example.com:5432/1/2/3/e1/e2')
+        self.assertEqual(route.kw, {'fred': ('', 'a', 'b', 'c', '')})
         
     def test_resource_path(self):
         request = self._makeOne()

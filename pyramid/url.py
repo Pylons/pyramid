@@ -453,8 +453,10 @@ class URLMethodsMixin(object):
                      **kw,
                      )
 
-        If route_kw is passed, but route_name is not passed, a
-        :exc:`ValueError` will be raised.
+        If ``route_kw`` is passed, but ``route_name`` is not passed,
+        ``route_kw`` will be ignored.  If ``route_name`` is passed, the
+        ``__resource_url__`` method of the resource passed is ignored
+        unconditionally.
         
         The ``route_name`` and ``route_kw`` arguments were added in Pyramid
         1.5.
@@ -511,7 +513,7 @@ class URLMethodsMixin(object):
             resource_url = url_adapter()
 
         else:
-            # newer-style IResourceURL adapter (Pyramid 1.3 and after)
+            # IResourceURL adapter (Pyramid 1.3 and after)
             app_url = None
             scheme = None
             host = None
@@ -520,14 +522,16 @@ class URLMethodsMixin(object):
             if 'route_name' in kw:
                 newkw = {}
                 route_name = kw['route_name']
-                remainder = getattr(resource_url, 'virtual_path_tuple', None)
+                remainder = getattr(url_adapter, 'virtual_path_tuple', None)
                 if remainder is None:
                     # older user-supplied IResourceURL adapter without 1.5
                     # virtual_path_tuple
-                    remainder = tuple(resource_url.virtual_path.split('/'))
+                    remainder = tuple(url_adapter.virtual_path.split('/'))
                 newkw['_remainder'] = remainder
 
-                for name in ('app_url', 'scheme', 'host', 'port'):
+                for name in (
+                    'app_url', 'scheme', 'host', 'port', 'query', 'anchor'
+                    ):
                     val = kw.get(name, None)
                     if val is not None:
                         newkw['_' + name] = val
@@ -536,7 +540,6 @@ class URLMethodsMixin(object):
                     route_kw = kw.get('route_kw')
                     if route_kw is not None:
                         newkw.update(route_kw)
-                    
                 return self.route_url(route_name, *elements, **newkw)
 
             if 'app_url' in kw:
