@@ -320,7 +320,7 @@ class HTTPOk(HTTPSuccessful):
     """
     subclass of :class:`~HTTPSuccessful`
 
-    Indicates that the request has suceeded.
+    Indicates that the request has succeeded.
     
     code: 200, title: OK
     """
