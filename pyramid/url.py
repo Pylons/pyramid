@@ -192,15 +192,6 @@ class URLMethodsMixin(object):
         are passed, ``_app_url`` takes precedence and any values passed for
         ``_scheme``, ``_host``, and ``_port`` will be ignored.
 
-        If a ``_remainder`` keyword argument is supplied, it will be used to
-        replace *any* ``*remainder`` stararg at the end of the route pattern.
-        For example, if the route pattern is ``/foo/*traverse``, and you pass
-        ``_remainder=('a', 'b', 'c')``, it is entirely equivalent to passing
-        ``traverse=('a', 'b', 'c')``, and in either case the generated path
-        will be ``/foo/a/b/c``.  It is an error to pass both ``*remainder`` and
-        the explicit value for a remainder name; a :exc:`ValueError` will be
-        raised.  This feature was added in Pyramid 1.5.
-
         This function raises a :exc:`KeyError` if the URL cannot be
         generated due to missing replacement names.  Extra replacement
         names are ignored.
@@ -222,7 +213,6 @@ class URLMethodsMixin(object):
         if route.pregenerator is not None:
             elements, kw = route.pregenerator(self, elements, kw)
 
-        remainder_name = route.remainder_name
         anchor = ''
         qs = ''
         app_url = None
@@ -257,16 +247,6 @@ class URLMethodsMixin(object):
                 app_url = self._partial_application_url(scheme, host, port)
             else:
                 app_url = self.application_url
-
-        remainder = kw.pop('_remainder', None)
-
-        if remainder and remainder_name:
-            if remainder_name in kw:
-                raise ValueError(
-                    'Cannot pass both "%s" and "_remainder", '
-                    'these conflict for this route' % remainder_name
-                    )
-            kw[remainder_name] = remainder
 
         path = route.generate(kw) # raises KeyError if generate fails
 
@@ -426,7 +406,7 @@ class URLMethodsMixin(object):
         :ref:`overriding_resource_url_generation`.
 
         .. versionadded:: 1.5
-           ``route_name`` and ``route_kw``
+           ``route_name``, ``route_kw``, and ``route_remainder_name``
            
         If ``route_name`` is passed, this function will delegate its URL
         production to the ``route_url`` function.  Calling
@@ -439,21 +419,34 @@ class URLMethodsMixin(object):
                      'element1',
                      'element2',
                      _query={'a':'1'},
-                     _remainder=remainder_path,
+                     traverse=traversal_path,
                      )
 
         It is only sensible to pass ``route_name`` if the route being named has
         a ``*remainder`` stararg value such as ``*traverse``.  The remainder
         value will be ignored in the output otherwise.
 
+        By default, the resource path value will be passed as the name
+        ``traverse`` when ``route_url`` is called.  You can influence this by
+        passing a different ``route_remainder_name`` value if the route has a
+        different ``*stararg`` value at its end.  For example if the route
+        pattern you want to replace has a ``*subpath`` stararg ala
+        ``/foo*subpath``::
+
+           request.resource_url(
+                          resource,
+                          route_name='myroute',
+                          route_remainder_name='subpath'
+                          )
+
         If ``route_name`` is passed, it is also permissible to pass
         ``route_kw``, which will passed as additional keyword arguments to
         ``route_url``.  Saying ``resource_url(someresource, 'element1',
         'element2', route_name='blogentry', route_kw={'id':'4'},
-        _query={'a':'1'})`` is equivalent to::
+        _query={'a':'1'})`` is roughly equivalent to::
 
            remainder_path = request.resource_path_tuple(someobject)
-           kw = {'id':'4', '_query':{'a':'1'}, '_remainder':remainder_path}
+           kw = {'id':'4', '_query':{'a':'1'}, 'traverse':traversal_path}
            url = request.route_url(
                      'blogentry',
                      'element1',
@@ -461,10 +454,12 @@ class URLMethodsMixin(object):
                      **kw,
                      )
 
-        If ``route_kw`` is passed, but ``route_name`` is not passed,
-        ``route_kw`` will be ignored.  If ``route_name`` is passed, the
-        ``__resource_url__`` method of the resource passed is ignored
-        unconditionally.
+        If ``route_kw`` or ``route_remainder_name`` is passed, but
+        ``route_name`` is not passed, both ``route_kw`` and
+        ``route_remainder_name`` will be ignored.  If ``route_name``
+        is passed, the ``__resource_url__`` method of the resource passed is
+        ignored unconditionally.  This feature is incompatible with
+        resources which generate their own URLs.
         
         .. note::
 
@@ -527,7 +522,8 @@ class URLMethodsMixin(object):
                     # older user-supplied IResourceURL adapter without 1.5
                     # virtual_path_tuple
                     remainder = tuple(url_adapter.virtual_path.split('/'))
-                newkw['_remainder'] = remainder
+                remainder_name = kw.get('route_remainder_name', 'traverse')
+                newkw[remainder_name] = remainder
 
                 for name in (
                     'app_url', 'scheme', 'host', 'port', 'query', 'anchor'
@@ -540,6 +536,7 @@ class URLMethodsMixin(object):
                     route_kw = kw.get('route_kw')
                     if route_kw is not None:
                         newkw.update(route_kw)
+
                 return self.route_url(route_name, *elements, **newkw)
 
             if 'app_url' in kw:

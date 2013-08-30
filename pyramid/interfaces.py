@@ -692,15 +692,6 @@ class IRoute(Interface):
     pregenerator = Attribute('This attribute should either be ``None`` or '
                              'a callable object implementing the '
                              '``IRoutePregenerator`` interface')
-    remainder_name = Attribute(
-        'The name of any stararg remainder that is present at the end of '
-        'the pattern. For example, if the pattern is ``/foo*bar``, the '
-        '``remainder_name`` will be ``bar``; if the pattern is ` '
-        '`/foo*traverse``, the ``remainder_name`` will be ``traverse``. '
-        'If the route does not have a stararg remainder name in its pattern, '
-        'the value of ``remainder_name`` will be ``None``.  This attribute '
-        'is new as of Pyramid 1.5.'
-        )
         
     def match(path):
         """

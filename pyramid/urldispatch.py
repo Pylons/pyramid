@@ -33,7 +33,6 @@ class Route(object):
         self.pattern = pattern
         self.path = pattern # indefinite b/w compat, not in interface
         self.match, self.generate = _compile_route(pattern)
-        self.remainder_name = get_remainder_name(pattern)
         self.name = name
         self.factory = factory
         self.predicates = predicates
@@ -234,9 +233,3 @@ def _compile_route(route):
         return result
 
     return matcher, generator
-
-def get_remainder_name(pattern):
-    match = star_at_end.search(pattern)
-    if match:
-        return match.groups()[0]
-    

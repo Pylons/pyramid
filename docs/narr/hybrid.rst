@@ -563,7 +563,8 @@ Generating Hybrid URLs
 The :meth:`pyramid.request.Request.resource_url` method and the 
 :meth:`pyramid.request.Request.resource_path` method both accept optional 
 keyword arguments that make it easier to generate route-prefixed URLs that
-contain paths to traversal resources:``route_name`` and ``route_kw``.
+contain paths to traversal resources:``route_name``, ``route_kw``, and 
+``route_remainder_name``.
 
 Any route that has a pattern that contains a ``*remainder`` pattern (any
 stararg remainder pattern, such as ``*traverse`` or ``*subpath`` or ``*fred``) 
@@ -615,14 +616,35 @@ You can pass ``route_kw`` in to fill in ``{id}`` above:
 If you pass ``route_kw`` but do not pass ``route_name``, ``route_kw`` will
 be ignored.
 
-All other values that are normally passable to ``resource_path`` and 
-``resource_url`` (such as ``query``, ``anchor``, ``host``, ``port``, etc) work 
-as you might expect in this configuration too.
+By default this feature works by calling ``route_url`` under the hood,
+and passing the value of the resource path to that function as ``traverse``.
+If your route has a different ``*stararg`` remainder name (such as 
+``*subpath``), you can tell ``resource_url`` or ``resource_path`` to use that
+instead of  ``traverse`` by passing ``route_remainder_name``.  For example,
+if you have the following route:
+
+.. code-block:: python
+
+   config.add_route('mysection', '/mysection*subpath')
+
+You can fill in the ``*subpath`` value using ``resource_url`` by doing:
+
+.. code-block:: python
+
+   request.resource_path(a, route_name='mysection', 
+                         route_remainder_name='subpath')
+
+If you pass ``route_remainder_name`` but do not pass ``route_name``, 
+``route_remainder_name`` will be ignored.
 
 If you try to use ``resource_path`` or ``resource_url`` when the ``route_name``
 argument points at a route that does not have a remainder stararg, an error
 will not be raised, but the generated URL will not contain any remainder
 information either.
+
+All other values that are normally passable to ``resource_path`` and 
+``resource_url`` (such as ``query``, ``anchor``, ``host``, ``port``, and 
+positional elements) work as you might expect in this configuration.
 
 Note that this feature is incompatible with the ``__resource_url__`` feature
 (see :ref:`overriding_resource_url_generation`) implemented on resource

@@ -5,10 +5,10 @@ Features
 --------
 
 - You can now generate "hybrid" urldispatch/traversal URLs more easily
-  by using the new ``route_name`` and ``route_kw`` arguments to 
-  ``request.resource_url`` and ``request.resource_path``.  See the new section 
-  of the "Combining Traversal and URL Dispatch" documentation chapter entitled 
-  "Hybrid URL Generation".
+  by using the new ``route_name``, ``route_kw`` and ``route_remainder_name`` 
+  arguments to  ``request.resource_url`` and ``request.resource_path``.  See
+  the new section of the "Combining Traversal and URL Dispatch" documentation 
+  chapter entitled  "Hybrid URL Generation".
 
 - It is now possible to escape double braces in Pyramid scaffolds (unescaped, 
   these represent replacement values).  You can use ``\{\{a\}\}`` to

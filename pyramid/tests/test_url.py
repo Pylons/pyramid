@@ -269,13 +269,12 @@ class TestURLMethodsMixin(unittest.TestCase):
         # no virtual_path_tuple on adapter
         adapter.virtual_path = '/a/b/c/'
         route = DummyRoute('/1/2/3')
-        route.remainder_name = 'fred'
         mapper = DummyRoutesMapper(route)
         request.registry.registerUtility(mapper, IRoutesMapper)
         root = DummyContext()
         result = request.resource_url(root, route_name='foo')
         self.assertEqual(result, 'http://example.com:5432/1/2/3')
-        self.assertEqual(route.kw, {'fred': ('', 'a', 'b', 'c', '')})
+        self.assertEqual(route.kw, {'traverse': ('', 'a', 'b', 'c', '')})
 
     def test_resource_url_with_route_name_remainder_on_adapter(self):
         from pyramid.interfaces import IRoutesMapper
@@ -289,13 +288,12 @@ class TestURLMethodsMixin(unittest.TestCase):
         # virtual_path_tuple on adapter
         adapter.virtual_path_tuple = ('', 'a', 'b', 'c', '')
         route = DummyRoute('/1/2/3')
-        route.remainder_name = 'fred'
         mapper = DummyRoutesMapper(route)
         request.registry.registerUtility(mapper, IRoutesMapper)
         root = DummyContext()
         result = request.resource_url(root, route_name='foo')
         self.assertEqual(result, 'http://example.com:5432/1/2/3')
-        self.assertEqual(route.kw, {'fred': ('', 'a', 'b', 'c', '')})
+        self.assertEqual(route.kw, {'traverse': ('', 'a', 'b', 'c', '')})
 
     def test_resource_url_with_route_name_and_app_url(self):
         from pyramid.interfaces import IRoutesMapper
@@ -309,13 +307,12 @@ class TestURLMethodsMixin(unittest.TestCase):
         # virtual_path_tuple on adapter
         adapter.virtual_path_tuple = ('', 'a', 'b', 'c', '')
         route = DummyRoute('/1/2/3')
-        route.remainder_name = 'fred'
         mapper = DummyRoutesMapper(route)
         request.registry.registerUtility(mapper, IRoutesMapper)
         root = DummyContext()
         result = request.resource_url(root, route_name='foo', app_url='app_url')
         self.assertEqual(result, 'app_url/1/2/3')
-        self.assertEqual(route.kw, {'fred': ('', 'a', 'b', 'c', '')})
+        self.assertEqual(route.kw, {'traverse': ('', 'a', 'b', 'c', '')})
 
     def test_resource_url_with_route_name_and_scheme_host_port_etc(self):
         from pyramid.interfaces import IRoutesMapper
@@ -329,7 +326,6 @@ class TestURLMethodsMixin(unittest.TestCase):
         # virtual_path_tuple on adapter
         adapter.virtual_path_tuple = ('', 'a', 'b', 'c', '')
         route = DummyRoute('/1/2/3')
-        route.remainder_name = 'fred'
         mapper = DummyRoutesMapper(route)
         request.registry.registerUtility(mapper, IRoutesMapper)
         root = DummyContext()
@@ -337,7 +333,7 @@ class TestURLMethodsMixin(unittest.TestCase):
                                       host='host', port='port', query={'a':'1'},
                                       anchor='anchor')
         self.assertEqual(result, 'scheme://host:port/1/2/3?a=1#anchor')
-        self.assertEqual(route.kw, {'fred': ('', 'a', 'b', 'c', '')})
+        self.assertEqual(route.kw, {'traverse': ('', 'a', 'b', 'c', '')})
 
     def test_resource_url_with_route_name_and_route_kwargs(self):
         from pyramid.interfaces import IRoutesMapper
@@ -351,7 +347,6 @@ class TestURLMethodsMixin(unittest.TestCase):
         # virtual_path_tuple on adapter
         adapter.virtual_path_tuple = ('', 'a', 'b', 'c', '')
         route = DummyRoute('/1/2/3')
-        route.remainder_name = 'fred'
         mapper = DummyRoutesMapper(route)
         request.registry.registerUtility(mapper, IRoutesMapper)
         root = DummyContext()
@@ -360,7 +355,7 @@ class TestURLMethodsMixin(unittest.TestCase):
         self.assertEqual(result, 'http://example.com:5432/1/2/3')
         self.assertEqual(
             route.kw,
-            {'fred': ('', 'a', 'b', 'c', ''),
+            {'traverse': ('', 'a', 'b', 'c', ''),
              'a':'1',
              'b':'2'}
             )
@@ -377,12 +372,31 @@ class TestURLMethodsMixin(unittest.TestCase):
         # virtual_path_tuple on adapter
         adapter.virtual_path_tuple = ('', 'a', 'b', 'c', '')
         route = DummyRoute('/1/2/3')
-        route.remainder_name = 'fred'
         mapper = DummyRoutesMapper(route)
         request.registry.registerUtility(mapper, IRoutesMapper)
         root = DummyContext()
         result = request.resource_url(root, 'e1', 'e2', route_name='foo')
         self.assertEqual(result,  'http://example.com:5432/1/2/3/e1/e2')
+        self.assertEqual(route.kw, {'traverse': ('', 'a', 'b', 'c', '')})
+        
+    def test_resource_url_with_route_name_and_remainder_name(self):
+        from pyramid.interfaces import IRoutesMapper
+        environ = {
+            'wsgi.url_scheme':'http',
+            'SERVER_PORT':'8080',
+            'SERVER_NAME':'example.com',
+            }
+        request = self._makeOne(environ)
+        adapter = self._registerResourceURL(request.registry)
+        # virtual_path_tuple on adapter
+        adapter.virtual_path_tuple = ('', 'a', 'b', 'c', '')
+        route = DummyRoute('/1/2/3')
+        mapper = DummyRoutesMapper(route)
+        request.registry.registerUtility(mapper, IRoutesMapper)
+        root = DummyContext()
+        result = request.resource_url(root, route_name='foo',
+                                      route_remainder_name='fred')
+        self.assertEqual(result, 'http://example.com:5432/1/2/3')
         self.assertEqual(route.kw, {'fred': ('', 'a', 'b', 'c', '')})
         
     def test_resource_path(self):
@@ -569,31 +583,6 @@ class TestURLMethodsMixin(unittest.TestCase):
                                    _anchor='anchor', _query={'q':'1'})
         self.assertEqual(result,
                          'http://example2.com/1/2/3/element1?q=1#anchor')
-
-    def test_route_url_with_remainder(self):
-        from pyramid.interfaces import IRoutesMapper
-        request = self._makeOne()
-        route = DummyRoute('/1/2/3/')
-        route.remainder_name = 'fred'
-        mapper = DummyRoutesMapper(route=route)
-        request.registry.registerUtility(mapper, IRoutesMapper)
-        result = request.route_url('flub', _remainder='abc')
-        self.assertEqual(result,
-                         'http://example.com:5432/1/2/3/')
-        self.assertEqual(route.kw['fred'], 'abc')
-        self.assertFalse('_remainder' in route.kw)
-
-    def test_route_url_with_remainder_name_already_in_kw(self):
-        from pyramid.interfaces import IRoutesMapper
-        request = self._makeOne()
-        route = DummyRoute('/1/2/3/')
-        route.remainder_name = 'fred'
-        mapper = DummyRoutesMapper(route=route)
-        request.registry.registerUtility(mapper, IRoutesMapper)
-        self.assertRaises(
-            ValueError,
-            request.route_url, 'flub', _remainder='abc', fred='foo'
-            )
 
     def test_route_url_integration_with_real_request(self):
         # to try to replicate https://github.com/Pylons/pyramid/issues/213
@@ -1268,7 +1257,6 @@ class DummyRoutesMapper:
 class DummyRoute:
     pregenerator = None
     name = 'route'
-    remainder_name = None
     def __init__(self, result='/1/2/3'):
         self.result = result
 
