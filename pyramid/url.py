@@ -401,10 +401,66 @@ class URLMethodsMixin(object):
         passed for ``scheme``, ``host``, and/or ``port`` will be ignored.
 
         If the ``resource`` passed in has a ``__resource_url__`` method, it
-        will be used to generate the URL (scheme, host, port, path) that for
-        the base resource which is operated upon by this function.  See also
+        will be used to generate the URL (scheme, host, port, path) for the
+        base resource which is operated upon by this function.  See also
         :ref:`overriding_resource_url_generation`.
 
+        .. versionadded:: 1.5
+           ``route_name``, ``route_kw``, and ``route_remainder_name``
+           
+        If ``route_name`` is passed, this function will delegate its URL
+        production to the ``route_url`` function.  Calling
+        ``resource_url(someresource, 'element1', 'element2', query={'a':1},
+        route_name='blogentry')`` is roughly equivalent to doing::
+
+           remainder_path = request.resource_path(someobject)
+           url = request.route_url(
+                     'blogentry',
+                     'element1',
+                     'element2',
+                     _query={'a':'1'},
+                     traverse=traversal_path,
+                     )
+
+        It is only sensible to pass ``route_name`` if the route being named has
+        a ``*remainder`` stararg value such as ``*traverse``.  The remainder
+        value will be ignored in the output otherwise.
+
+        By default, the resource path value will be passed as the name
+        ``traverse`` when ``route_url`` is called.  You can influence this by
+        passing a different ``route_remainder_name`` value if the route has a
+        different ``*stararg`` value at its end.  For example if the route
+        pattern you want to replace has a ``*subpath`` stararg ala
+        ``/foo*subpath``::
+
+           request.resource_url(
+                          resource,
+                          route_name='myroute',
+                          route_remainder_name='subpath'
+                          )
+
+        If ``route_name`` is passed, it is also permissible to pass
+        ``route_kw``, which will passed as additional keyword arguments to
+        ``route_url``.  Saying ``resource_url(someresource, 'element1',
+        'element2', route_name='blogentry', route_kw={'id':'4'},
+        _query={'a':'1'})`` is roughly equivalent to::
+
+           remainder_path = request.resource_path_tuple(someobject)
+           kw = {'id':'4', '_query':{'a':'1'}, 'traverse':traversal_path}
+           url = request.route_url(
+                     'blogentry',
+                     'element1',
+                     'element2',
+                     **kw,
+                     )
+
+        If ``route_kw`` or ``route_remainder_name`` is passed, but
+        ``route_name`` is not passed, both ``route_kw`` and
+        ``route_remainder_name`` will be ignored.  If ``route_name``
+        is passed, the ``__resource_url__`` method of the resource passed is
+        ignored unconditionally.  This feature is incompatible with
+        resources which generate their own URLs.
+        
         .. note::
 
            If the :term:`resource` used is the result of a :term:`traversal`, it
@@ -452,11 +508,36 @@ class URLMethodsMixin(object):
             resource_url = url_adapter()
 
         else:
-            # newer-style IResourceURL adapter (Pyramid 1.3 and after)
+            # IResourceURL adapter (Pyramid 1.3 and after)
             app_url = None
             scheme = None
             host = None
             port = None
+
+            if 'route_name' in kw:
+                newkw = {}
+                route_name = kw['route_name']
+                remainder = getattr(url_adapter, 'virtual_path_tuple', None)
+                if remainder is None:
+                    # older user-supplied IResourceURL adapter without 1.5
+                    # virtual_path_tuple
+                    remainder = tuple(url_adapter.virtual_path.split('/'))
+                remainder_name = kw.get('route_remainder_name', 'traverse')
+                newkw[remainder_name] = remainder
+
+                for name in (
+                    'app_url', 'scheme', 'host', 'port', 'query', 'anchor'
+                    ):
+                    val = kw.get(name, None)
+                    if val is not None:
+                        newkw['_' + name] = val
+                    
+                if 'route_kw' in kw:
+                    route_kw = kw.get('route_kw')
+                    if route_kw is not None:
+                        newkw.update(route_kw)
+
+                return self.route_url(route_name, *elements, **newkw)
 
             if 'app_url' in kw:
                 app_url = kw['app_url']

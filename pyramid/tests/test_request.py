@@ -594,6 +594,7 @@ class DummyRoutesMapper:
 
 class DummyRoute:
     pregenerator = None
+    remainder_name = None
     def __init__(self, result='/1/2/3'):
         self.result = result
 

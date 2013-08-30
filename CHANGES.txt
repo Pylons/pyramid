@@ -4,6 +4,12 @@ Next Release
 Features
 --------
 
+- You can now generate "hybrid" urldispatch/traversal URLs more easily
+  by using the new ``route_name``, ``route_kw`` and ``route_remainder_name`` 
+  arguments to  ``request.resource_url`` and ``request.resource_path``.  See
+  the new section of the "Combining Traversal and URL Dispatch" documentation 
+  chapter entitled  "Hybrid URL Generation".
+
 - It is now possible to escape double braces in Pyramid scaffolds (unescaped, 
   these represent replacement values).  You can use ``\{\{a\}\}`` to
   represent a "bare" ``{{a}}``.  See 
@@ -151,7 +157,8 @@ Features
 
 - The ``pyramid.config.Configurator.add_route`` method now supports being
   called with an external URL as pattern. See
-  https://github.com/Pylons/pyramid/issues/611 for more information.
+  https://github.com/Pylons/pyramid/issues/611 and the documentation section 
+  in the "URL Dispatch" chapter entitled "External Routes" for more information.
 
 Bug Fixes
 ---------
@@ -231,6 +238,16 @@ Backwards Incompatibilities
   are now "reified" properties that look up a locale name and localizer
   respectively using the machinery described in the "Internationalization"
   chapter of the documentation.
+
+- If you send an ``X-Vhm-Root`` header with a value that ends with a slash (or
+  any number of slashes), the trailing slash(es) will be removed before a URL
+  is generated when you use use ``request.resource_url`` or
+  ``request.resource_path``.  Previously the virtual root path would not have
+  trailing slashes stripped, which would influence URL generation.
+
+- The ``pyramid.interfaces.IResourceURL`` interface has now grown two new
+  attributes: ``virtual_path_tuple`` and ``physical_path_tuple``.  These should
+  be the tuple form of the resource's path (physical and virtual).
 
 1.4 (2012-12-18)
 ================
