@@ -465,6 +465,10 @@ class TestExceptionViewsApp(IntegrationBase, unittest.TestCase):
         res = self.testapp.get('/route_raise_exception4', status=200)
         self.assertTrue(b'whoa' in res.body)
 
+    def test_raise_httpexception(self):
+        res = self.testapp.get('/route_raise_httpexception', status=200)
+        self.assertTrue(b'caught' in res.body)
+        
 class TestConflictApp(unittest.TestCase):
     package = 'pyramid.tests.pkgs.conflictapp'
     def _makeConfig(self):

@@ -1,12 +1,21 @@
 Next release
 ============
 
+Bug Fixes
+---------
+
+- It was not possible to use ``pyramid.httpexceptions.HTTPException`` as
+  the ``context`` of an exception view as very general catchall for
+  http-related exceptions when you wanted that exception view to override the 
+  default exception view. See https://github.com/Pylons/pyramid/issues/985.
+  Backport from master.
+
 - When the ``pyramid.reload_templates`` setting was true, and a Chameleon 
   template was reloaded, and the renderer specification named a macro 
   (e.g. ``foo#macroname.pt``), renderings of the template after the template
   was reloaded due to a file change would produce the entire template body 
   instead of just a rendering of the macro.  See 
-  https://github.com/Pylons/pyramid/issues/1013.
+  https://github.com/Pylons/pyramid/issues/1013.  Backport from master.
 
 1.4.4 (2013-08-27)
 ==================
