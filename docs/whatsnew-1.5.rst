@@ -222,8 +222,11 @@ Deprecations
 Documentation Enhancements
 --------------------------
 
-Many documentation enhancements have been added, but there were too many
-changes for us to keep track of.  The docs are greatly enhanced.
+- A new documentation chapter named :ref:`quick_tour` was added.  It describes
+  starting out with Pyramid from a high level.
+
+- Many other enhancements.
+
 
 Dependency Changes
 ------------------
