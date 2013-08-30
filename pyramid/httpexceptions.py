@@ -318,8 +318,9 @@ class HTTPSuccessful(HTTPException):
 
 class HTTPOk(HTTPSuccessful):
     """
-    Base class for exceptions with status codes in the 200s (successful
-    responses)
+    subclass of :class:`~HTTPSuccessful`
+
+    Indicates that the request has suceeded.
     
     code: 200, title: OK
     """
