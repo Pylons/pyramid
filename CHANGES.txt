@@ -134,7 +134,7 @@ Features
 
          ...
 
-     @implementor(IResource)
+     @implementer(IResource)
      class MyResource:
 
          ...

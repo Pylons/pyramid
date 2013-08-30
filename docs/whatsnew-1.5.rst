@@ -72,7 +72,7 @@ The feature additions in Pyramid 1.5 follow.
 
          ...
 
-     @implementor(IResource)
+     @implementer(IResource)
      class MyResource:
 
          ...
@@ -98,6 +98,11 @@ The feature additions in Pyramid 1.5 follow.
   authentication credentials in the request via a ``--login`` argument to the
   script.  See https://github.com/Pylons/pyramid/pull/1039.
 
+- The :meth:`pyramid.config.Configurator.add_route` method now supports being
+  called with an external URL as pattern. See
+  https://github.com/Pylons/pyramid/issues/611 and the documentation section
+  :ref:`external_route_narr`.
+
 - :class:`pyramid.authorization.ACLAuthorizationPolicy` supports ``__acl__`` as
   a callable. This removes the ambiguity between the potential
   ``AttributeError`` that would be raised on the ``context`` when the property
@@ -110,13 +115,24 @@ The feature additions in Pyramid 1.5 follow.
   :meth:`pyramid.config.Configurator.add_static_view`. This allows
   externally-hosted static URLs to be generated based on the current protocol.
 
-- The :class:`pyramid.authentication.AuthTktAuthenticationPolicy` has a new
-  ``parent_domain`` option to set the authentication cookie as a wildcard
-  cookie on the parent domain. This is useful if you have multiple sites
-  sharing the same domain.  It also now supports IPv6 addresses when using
-  the ``include_ip=True`` option. This is possibly incompatible with
-  alternative ``auth_tkt`` implementations, as the specification does not
-  define how to properly handle IPv6. See
+- The :class:`pyramid.authentication.AuthTktAuthenticationPolicy` class has two
+  new options to configure its domain usage:
+
+  * ``parent_domain``: if set the authentication cookie is set on
+    the parent domain. This is useful if you have multiple sites sharing the
+    same domain.
+
+  * ``domain``: if provided the cookie is always set for this domain, bypassing
+    all usual logic.
+
+  See https://github.com/Pylons/pyramid/pull/1028,
+  https://github.com/Pylons/pyramid/pull/1072 and
+  https://github.com/Pylons/pyramid/pull/1078.
+
+- The :class:`pyramid.authentication.AuthTktPolicy` now supports IPv6
+  addresses when using the ``include_ip=True`` option. This is possibly
+  incompatible with alternative ``auth_tkt`` implementations, as the
+  specification does not define how to properly handle IPv6. See
   https://github.com/Pylons/pyramid/issues/831.
 
 - Make it possible to use variable arguments via
@@ -131,25 +147,83 @@ The feature additions in Pyramid 1.5 follow.
   ``X-CSRF-Token`` (as well as the ``csrf_token`` form parameter, which they
   always did).  The header is tried when the form parameter does not exist.
 
+- You can now generate "hybrid" urldispatch/traversal URLs more easily by using
+  the new ``route_name``, ``route_kw`` and ``route_remainder_name`` arguments
+  to :meth:`~pyramid.request.Request.resource_url` and
+  :meth:`~pyuramid.request.Request.resource_path`.  See
+  :ref:`generating_hybrid_urls`.
+
+- A new http exception superclass named
+  :class:`~pyramid.httpexceptions.HTTPSuccessful` was added.  You can use this
+  class as the ``context`` of an exception view to catch all 200-series
+  "exceptions" (e.g. "raise HTTPOk").  This also allows you to catch *only* the
+  :class:`~pyramid.httpexceptions.HTTPOk` exception itself; previously this was
+  impossible because a number of other exceptions (such as ``HTTPNoContent``)
+  inherited from ``HTTPOk``, but now they do not.
+
+- It is now possible to escape double braces in Pyramid scaffolds (unescaped, 
+  these represent replacement values).  You can use ``\{\{a\}\}`` to
+  represent a "bare" ``{{a}}``.  See 
+  https://github.com/Pylons/pyramid/pull/862
+
+- Add ``localizer`` and ``locale_name`` properties (reified) to
+  :class:`pyramid.request.Request`.  See
+  https://github.com/Pylons/pyramid/issues/508.  Note that the
+  :func:`pyramid.i18n.get_localizer` and :func:`pyramid.i18n.get_locale_name`
+  functions now simply look up these properties on the request.
+
+- The ``pserve`` command now takes a ``-v`` (or ``--verbose``) flag and a
+  ``-q`` (or ``--quiet``) flag.  Output from running ``pserve`` can be
+  controlled using these flags.  ``-v`` can be specified multiple times to
+  increase verbosity.  ``-q`` sets verbosity to ``0`` unconditionally.  The
+  default verbosity level is ``1``.
+
+- The ``alchemy`` scaffold tests now provide better coverage.  See
+  https://github.com/Pylons/pyramid/pull/1029
+
 Backwards Incompatibilities
 ---------------------------
 
-- Modified the ``current_route_url`` method in pyramid.Request. The method
-  previously returned the URL without the query string by default, it now does
-  attach the query string unless it is overriden.
+- Modified the :meth:`~pyramid.request.Reuqest.current_route_url` method. The
+  method previously returned the URL without the query string by default, it
+  now does attach the query string unless it is overriden.
+
+- The :meth:`~pyramid.request.Request.route_url` and
+  :meth:`~pyramid.request.Request.route_path` APIs no longer quote ``/`` to
+  ``%2F`` when a replacement value contains a ``/``.  This was pointless, as
+  WSGI servers always unquote the slash anyway, and Pyramid never sees the
+  quoted value.
+
+- It is no longer possible to set a ``locale_name`` attribute of the request, 
+  nor is it possible to set a ``localizer`` attribute of the request.  These
+  are now "reified" properties that look up a locale name and localizer
+  respectively using the machinery described in :ref:`i18n_chapter`.
+
+- If you send an ``X-Vhm-Root`` header with a value that ends with a slash (or
+  any number of slashes), the trailing slash(es) will be removed before a URL
+  is generated when you use use :meth:`~pyramid.request.Request.resource_url`
+  or :meth:`~pyramid.request.Request.resource_path`.  Previously the virtual
+  root path would not have trailing slashes stripped, which would influence URL
+  generation.
+
+- The :class:`pyramid.interfaces.IResourceURL` interface has now grown two new
+  attributes: ``virtual_path_tuple`` and ``physical_path_tuple``.  These should
+  be the tuple form of the resource's path (physical and virtual).
 
 
 Deprecations
 ------------
 
-This release has no new deprecations as compared to Pyramid 1.4.X.
-
+- Returning a ``("defname", dict)`` tuple from a view which has a Mako renderer
+  is now deprecated.  Instead you should use the renderer spelling
+  ``foo#defname.mak`` in the view configuration definition and return a dict
+  only.
 
 Documentation Enhancements
 --------------------------
 
-Many documentation enhancements have been added, but we did not track them as
-they were added.
+Many documentation enhancements have been added, but there were too many
+changes for us to keep track of.  The docs are greatly enhanced.
 
 Dependency Changes
 ------------------
