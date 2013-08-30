@@ -522,6 +522,17 @@ class TestCompileRouteFunctional(unittest.TestCase):
         self.generates('/foo/:_abc', {'_abc':'20'}, '/foo/20')
         self.generates('/foo/:abc_def', {'abc_def':'20'}, '/foo/20')
 
+class Test_get_remainder_name(unittest.TestCase):
+    def _callFUT(self, pattern):
+        from pyramid.urldispatch import get_remainder_name
+        return get_remainder_name(pattern)
+    
+    def test_it_nostararg(self):
+        self.assertEqual(self._callFUT('/bob'), None)
+
+    def test_it_withstararg(self):
+        self.assertEqual(self._callFUT('/bob*dean'), 'dean')
+        
 class DummyContext(object):
     """ """
         
