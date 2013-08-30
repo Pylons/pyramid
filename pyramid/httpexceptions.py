@@ -149,11 +149,8 @@ def _no_escape(value):
             value = text_type(value)
     return value
 
-class HTTPException(Exception): # bw compat
-    """ Base class for all :term:`exception response` objects."""
-
 @implementer(IExceptionResponse)
-class WSGIHTTPException(Response, HTTPException):
+class HTTPException(Response, Exception):
 
     ## You should set in subclasses:
     # code = 200
@@ -253,7 +250,7 @@ ${body}''')
                 'html_comment':html_comment,
                 }
             body_tmpl = self.body_template_obj
-            if WSGIHTTPException.body_template_obj is not body_tmpl:
+            if HTTPException.body_template_obj is not body_tmpl:
                 # Custom template; add headers to args
                 for k, v in environ.items():
                     if (not k.startswith('wsgi.')) and ('.' in k):
@@ -289,7 +286,9 @@ ${body}''')
         self.prepare(environ)
         return Response.__call__(self, environ, start_response)
 
-class HTTPError(WSGIHTTPException):
+WSGIHTTPException = HTTPException # b/c post 1.5
+
+class HTTPError(HTTPException):
     """
     base class for exceptions with status codes in the 400s and 500s
 
@@ -297,7 +296,7 @@ class HTTPError(WSGIHTTPException):
     and that any work in progress should not be committed.  
     """
 
-class HTTPRedirection(WSGIHTTPException):
+class HTTPRedirection(HTTPException):
     """
     base class for exceptions with status codes in the 300s (redirections)
 
@@ -307,7 +306,7 @@ class HTTPRedirection(WSGIHTTPException):
     condition.
     """
 
-class HTTPOk(WSGIHTTPException):
+class HTTPOk(HTTPException):
     """
     Base class for exceptions with status codes in the 200s (successful
     responses)

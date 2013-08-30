@@ -1,5 +1,6 @@
 from webob import Response
 from .models import AnException
+from pyramid.httpexceptions import HTTPBadRequest
 
 def no(request):
     return Response('no')
@@ -15,3 +16,9 @@ def whoa(request):
 
 def raise_exception(request):
     raise AnException()
+
+def raise_httpexception(request):
+    raise HTTPBadRequest
+
+def catch_httpexception(request):
+    return Response('caught')
