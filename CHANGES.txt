@@ -4,6 +4,19 @@ Next Release
 Features
 --------
 
+- A new http exception subclass named ``pyramid.httpexceptions.HTTPSuccessful``
+  was added.  You can use this class as the ``context`` of an exception
+  view to catch all 200-series "exceptions" (e.g. "raise HTTPOk").  This 
+  also allows you to catch *only* the ``HTTPOk`` exception itself; previously
+  this was impossible because a number of other exceptions 
+  (such as ``HTTPNoContent``) inherited from ``HTTPOk``, but now they do not.
+
+- You can now generate "hybrid" urldispatch/traversal URLs more easily
+  by using the new ``route_name``, ``route_kw`` and ``route_remainder_name`` 
+  arguments to  ``request.resource_url`` and ``request.resource_path``.  See
+  the new section of the "Combining Traversal and URL Dispatch" documentation 
+  chapter entitled  "Hybrid URL Generation".
+
 - It is now possible to escape double braces in Pyramid scaffolds (unescaped, 
   these represent replacement values).  You can use ``\{\{a\}\}`` to
   represent a "bare" ``{{a}}``.  See 
@@ -151,10 +164,16 @@ Features
 
 - The ``pyramid.config.Configurator.add_route`` method now supports being
   called with an external URL as pattern. See
-  https://github.com/Pylons/pyramid/issues/611 for more information.
+  https://github.com/Pylons/pyramid/issues/611 and the documentation section 
+  in the "URL Dispatch" chapter entitled "External Routes" for more information.
 
 Bug Fixes
 ---------
+
+- It was not possible to use ``pyramid.httpexceptions.HTTPException`` as
+  the ``context`` of an exception view as very general catchall for
+  http-related exceptions when you wanted that exception view to override the 
+  default exception view.  See https://github.com/Pylons/pyramid/issues/985
 
 - When the ``pyramid.reload_templates`` setting was true, and a Chameleon 
   template was reloaded, and the renderer specification named a macro 
@@ -231,6 +250,16 @@ Backwards Incompatibilities
   are now "reified" properties that look up a locale name and localizer
   respectively using the machinery described in the "Internationalization"
   chapter of the documentation.
+
+- If you send an ``X-Vhm-Root`` header with a value that ends with a slash (or
+  any number of slashes), the trailing slash(es) will be removed before a URL
+  is generated when you use use ``request.resource_url`` or
+  ``request.resource_path``.  Previously the virtual root path would not have
+  trailing slashes stripped, which would influence URL generation.
+
+- The ``pyramid.interfaces.IResourceURL`` interface has now grown two new
+  attributes: ``virtual_path_tuple`` and ``physical_path_tuple``.  These should
+  be the tuple form of the resource's path (physical and virtual).
 
 1.4 (2012-12-18)
 ================
@@ -900,6 +929,14 @@ Backwards Incompatibilities
   release, the ``__call__`` method of a Response object is invoked *after*
   finished callbacks are executed.  This is in support of the
   ``request.invoke_subrequest`` feature.
+
+- The 200-series exception responses named ``HTTPCreated``, ``HTTPAccepted``, 
+  ``HTTPNonAuthoritativeInformation``, ``HTTPNoContent``, ``HTTPResetContent``,
+  and ``HTTPPartialContent`` in ``pyramid.httpexceptions`` no longer inherit
+  from ``HTTPOk``.  Instead they inherit from a new base class named 
+  ``HTTPSuccessful``.  This will have no effect on you unless you've registered
+  an exception view for ``HTTPOk`` and expect that exception view to
+  catch all the aforementioned exceptions.
 
 Documentation
 -------------

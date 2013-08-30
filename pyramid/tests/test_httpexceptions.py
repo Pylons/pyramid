@@ -57,10 +57,10 @@ class Test__no_escape(unittest.TestCase):
         duo = DummyUnicodeObject()
         self.assertEqual(self._callFUT(duo), text_('42'))
 
-class TestWSGIHTTPException(unittest.TestCase):
+class TestHTTPException(unittest.TestCase):
     def _getTargetClass(self):
-        from pyramid.httpexceptions import WSGIHTTPException
-        return WSGIHTTPException
+        from pyramid.httpexceptions import HTTPException
+        return HTTPException
 
     def _getTargetSubclass(self, code='200', title='OK',
                            explanation='explanation', empty_body=False):

@@ -692,6 +692,7 @@ class IRoute(Interface):
     pregenerator = Attribute('This attribute should either be ``None`` or '
                              'a callable object implementing the '
                              '``IRoutePregenerator`` interface')
+        
     def match(path):
         """
         If the ``path`` passed to this function can be matched by the
@@ -738,8 +739,18 @@ class IRoutesMapper(Interface):
         matched.  Static routes will not be considered for matching.  """
 
 class IResourceURL(Interface):
-    virtual_path = Attribute('The virtual url path of the resource.')
-    physical_path = Attribute('The physical url path of the resource.')
+    virtual_path = Attribute(
+        'The virtual url path of the resource as a string.'
+        )
+    physical_path = Attribute(
+        'The physical url path of the resource as a string.'
+        )
+    virtual_path_tuple = Attribute(
+        'The virtual url path of the resource as a tuple.  (New in 1.5)'
+        )
+    physical_path_tuple = Attribute(
+        'The physical url path of the resource as a tuple. (New in 1.5)'
+        )
 
 class IContextURL(IResourceURL):
     """ An adapter which deals with URLs related to a context.
