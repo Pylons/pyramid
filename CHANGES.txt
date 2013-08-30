@@ -157,7 +157,8 @@ Features
 
 - The ``pyramid.config.Configurator.add_route`` method now supports being
   called with an external URL as pattern. See
-  https://github.com/Pylons/pyramid/issues/611 for more information.
+  https://github.com/Pylons/pyramid/issues/611 and the documentation section 
+  in the "URL Dispatch" chapter entitled "External Routes" for more information.
 
 Bug Fixes
 ---------
