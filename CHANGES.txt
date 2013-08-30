@@ -4,6 +4,13 @@ Next Release
 Features
 --------
 
+- A new http exception subclass named ``pyramid.httpexceptions.HTTPSuccessful``
+  was added.  You can use this class as the ``context`` of an exception
+  view to catch all 200-series "exceptions" (e.g. "raise HTTPOk").  This 
+  also allows you to catch *only* the ``HTTPOk`` exception itself; previously
+  this was impossible because a number of other exceptions 
+  (such as ``HTTPNoContent``) inherited from ``HTTPOk``, but now they do not.
+
 - You can now generate "hybrid" urldispatch/traversal URLs more easily
   by using the new ``route_name``, ``route_kw`` and ``route_remainder_name`` 
   arguments to  ``request.resource_url`` and ``request.resource_path``.  See
@@ -922,6 +929,14 @@ Backwards Incompatibilities
   release, the ``__call__`` method of a Response object is invoked *after*
   finished callbacks are executed.  This is in support of the
   ``request.invoke_subrequest`` feature.
+
+- The 200-series exception responses named ``HTTPCreated``, ``HTTPAccepted``, 
+  ``HTTPNonAuthoritativeInformation``, ``HTTPNoContent``, ``HTTPResetContent``,
+  and ``HTTPPartialContent`` in ``pyramid.httpexceptions`` no longer inherit
+  from ``HTTPOk``.  Instead they inherit from a new base class named 
+  ``HTTPSuccessful``.  This will have no effect on you unless you've registered
+  an exception view for ``HTTPOk`` and expect that exception view to
+  catch all the aforementioned exceptions.
 
 Documentation
 -------------

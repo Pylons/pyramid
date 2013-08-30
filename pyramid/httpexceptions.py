@@ -13,7 +13,7 @@ and 500s are server errors.
 
 Exception
   HTTPException
-    HTTPOk
+    HTTPSuccessful
       * 200 - HTTPOk
       * 201 - HTTPCreated
       * 202 - HTTPAccepted
@@ -306,7 +306,17 @@ class HTTPRedirection(HTTPException):
     condition.
     """
 
-class HTTPOk(HTTPException):
+class HTTPSuccessful(HTTPException):
+    """
+    Base class for exceptions with status codes in the 200s (successful
+    responses)
+    """
+
+############################################################
+## 2xx success
+############################################################
+
+class HTTPOk(HTTPSuccessful):
     """
     Base class for exceptions with status codes in the 200s (successful
     responses)
@@ -316,11 +326,7 @@ class HTTPOk(HTTPException):
     code = 200
     title = 'OK'
 
-############################################################
-## 2xx success
-############################################################
-
-class HTTPCreated(HTTPOk):
+class HTTPCreated(HTTPSuccessful):
     """
     subclass of :class:`~HTTPOk`
 
@@ -332,7 +338,7 @@ class HTTPCreated(HTTPOk):
     code = 201
     title = 'Created'
 
-class HTTPAccepted(HTTPOk):
+class HTTPAccepted(HTTPSuccessful):
     """
     subclass of :class:`~HTTPOk`
 
@@ -345,7 +351,7 @@ class HTTPAccepted(HTTPOk):
     title = 'Accepted'
     explanation = 'The request is accepted for processing.'
 
-class HTTPNonAuthoritativeInformation(HTTPOk):
+class HTTPNonAuthoritativeInformation(HTTPSuccessful):
     """
     subclass of :class:`~HTTPOk`
 
@@ -358,7 +364,7 @@ class HTTPNonAuthoritativeInformation(HTTPOk):
     code = 203
     title = 'Non-Authoritative Information'
 
-class HTTPNoContent(HTTPOk):
+class HTTPNoContent(HTTPSuccessful):
     """
     subclass of :class:`~HTTPOk`
 
@@ -372,7 +378,7 @@ class HTTPNoContent(HTTPOk):
     title = 'No Content'
     empty_body = True
 
-class HTTPResetContent(HTTPOk):
+class HTTPResetContent(HTTPSuccessful):
     """
     subclass of :class:`~HTTPOk`
 
@@ -386,7 +392,7 @@ class HTTPResetContent(HTTPOk):
     title = 'Reset Content'
     empty_body = True
 
-class HTTPPartialContent(HTTPOk):
+class HTTPPartialContent(HTTPSuccessful):
     """
     subclass of :class:`~HTTPOk`
 
