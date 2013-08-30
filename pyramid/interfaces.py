@@ -757,7 +757,7 @@ class IResourceURL(Interface):
     virtual_path_tuple = Attribute(
         'The virtual url path of the resource as a tuple.  (New in 1.5)'
         )
-    physical_path = Attribute(
+    physical_path_tuple = Attribute(
         'The physical url path of the resource as a tuple. (New in 1.5)'
         )
 
