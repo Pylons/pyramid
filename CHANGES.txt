@@ -167,6 +167,13 @@ Features
   https://github.com/Pylons/pyramid/issues/611 and the documentation section 
   in the "URL Dispatch" chapter entitled "External Routes" for more information.
 
+- The ``pcreate`` command now takes ``-d``  (or ``--dir``) flag to specify customized dir.
+  For example::
+
+  pcreate -s dummy -d a/b/c/Distro Distro
+
+  will create Distro with dummy template in path a/b/c/Distro
+
 Bug Fixes
 ---------
 
