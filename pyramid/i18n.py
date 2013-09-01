@@ -12,6 +12,7 @@ TranslationString = TranslationString # PyFlakes
 TranslationStringFactory = TranslationStringFactory # PyFlakes
 
 from pyramid.compat import PY3
+from pyramid.decorator import reify
 
 from pyramid.interfaces import (
     ILocalizer,
@@ -127,7 +128,7 @@ def default_locale_negotiator(request):
 
 def negotiate_locale_name(request):
     """ Negotiate and return the :term:`locale name` associated with
-    the current request (never cached)."""
+    the current request."""
     try:
         registry = request.registry
     except AttributeError:
@@ -144,12 +145,9 @@ def negotiate_locale_name(request):
 
 def get_locale_name(request):
     """ Return the :term:`locale name` associated with the current
-    request (possibly cached)."""
-    locale_name = getattr(request, 'locale_name', None)
-    if locale_name is None:
-        locale_name = negotiate_locale_name(request)
-        request.locale_name = locale_name
-    return locale_name
+    request.  Deprecated in favor of using request.locale_name directly as of
+    Pyramid 1.5."""
+    return request.locale_name
 
 def make_localizer(current_locale_name, translation_directories):
     """ Create a :class:`pyramid.i18n.Localizer` object
@@ -196,27 +194,10 @@ def make_localizer(current_locale_name, translation_directories):
 
 def get_localizer(request):
     """ Retrieve a :class:`pyramid.i18n.Localizer` object
-    corresponding to the current request's locale name. """
+    corresponding to the current request's locale name.  Deprecated in favor
+    of using the ``request.localizer`` attribute directly as of Pyramid 1.5"""
+    return request.localizer
 
-    # no locale object cached on request
-    try:
-        registry = request.registry
-    except AttributeError:
-        registry = get_current_registry()
-
-    current_locale_name = get_locale_name(request)
-    localizer = registry.queryUtility(ILocalizer, name=current_locale_name)
-
-    if localizer is None:
-        # no localizer utility registered yet
-        tdirs = registry.queryUtility(ITranslationDirectories, default=[])
-        localizer = make_localizer(current_locale_name, tdirs)
-        
-        registry.registerUtility(localizer, ILocalizer,
-                                 name=current_locale_name)
-
-    return localizer
-                
 class Translations(gettext.GNUTranslations, object):
     """An extended translation catalog class (ripped off from Babel) """
 
@@ -359,3 +340,28 @@ class Translations(gettext.GNUTranslations, object):
             return self._domains.get(domain, self).ungettext(
                 singular, plural, num)
 
+class LocalizerRequestMixin(object):
+    @reify
+    def localizer(self):
+        """ Convenience property to return a localizer """
+        registry = self.registry
+
+        current_locale_name = self.locale_name
+        localizer = registry.queryUtility(ILocalizer, name=current_locale_name)
+
+        if localizer is None:
+            # no localizer utility registered yet
+            tdirs = registry.queryUtility(ITranslationDirectories, default=[])
+            localizer = make_localizer(current_locale_name, tdirs)
+
+            registry.registerUtility(localizer, ILocalizer,
+                                     name=current_locale_name)
+
+        return localizer
+
+    @reify
+    def locale_name(self):
+        locale_name = negotiate_locale_name(self)
+        return locale_name
+        
+    

@@ -640,7 +640,7 @@ class ResourceTreeTraverser(object):
                 # this is a *traverse stararg (not a {traverse})
                 # routing has already decoded these elements, so we just
                 # need to join them
-                path = slash.join(path) or slash
+                path = '/' + slash.join(path) or slash
 
             subpath = matchdict.get('subpath', ())
             if not is_nonstr_iter(subpath):
@@ -733,11 +733,15 @@ class ResourceURL(object):
     vroot_varname = VH_ROOT_KEY
 
     def __init__(self, resource, request):
-        physical_path = resource_path(resource)
-        if physical_path != '/':
+        physical_path_tuple = resource_path_tuple(resource)
+        physical_path = _join_path_tuple(physical_path_tuple)
+
+        if physical_path_tuple != ('',):
+            physical_path_tuple = physical_path_tuple + ('',)
             physical_path = physical_path + '/'
 
         virtual_path = physical_path
+        virtual_path_tuple = physical_path_tuple
 
         environ = request.environ
         vroot_path = environ.get(self.vroot_varname)
@@ -745,11 +749,17 @@ class ResourceURL(object):
         # if the physical path starts with the virtual root path, trim it out
         # of the virtual path
         if vroot_path is not None:
-            if physical_path.startswith(vroot_path):
+            vroot_path = vroot_path.rstrip('/')
+            if vroot_path and physical_path.startswith(vroot_path):
+                vroot_path_tuple = tuple(vroot_path.split('/'))
+                numels = len(vroot_path_tuple)
+                virtual_path_tuple = ('',) + physical_path_tuple[numels:]
                 virtual_path = physical_path[len(vroot_path):]
 
         self.virtual_path = virtual_path    # IResourceURL attr
         self.physical_path = physical_path  # IResourceURL attr
+        self.virtual_path_tuple = virtual_path_tuple # IResourceURL attr (1.5)
+        self.physical_path_tuple = physical_path_tuple # IResourceURL attr (1.5)
 
         # bw compat for IContextURL methods
         self.resource = resource

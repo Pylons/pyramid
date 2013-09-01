@@ -69,7 +69,7 @@ class TestPCreateCommand(unittest.TestCase):
             )
         self.assertEqual(
             scaffold.vars,
-            {'project': 'Distro', 'egg': 'Distro', 'package': 'distro'})
+            {'project': 'Distro', 'egg': 'Distro', 'package': 'distro', 'package_full_name': 'Distro'})
 
     def test_known_scaffold_absolute_path(self):
         import os
@@ -85,7 +85,7 @@ class TestPCreateCommand(unittest.TestCase):
             )
         self.assertEqual(
             scaffold.vars,
-            {'project': 'Distro', 'egg': 'Distro', 'package': 'distro'})
+            {'project': 'Distro', 'egg': 'Distro', 'package': 'distro', 'package_full_name': 'Distro'})
 
     def test_known_scaffold_multiple_rendered(self):
         import os
@@ -101,14 +101,14 @@ class TestPCreateCommand(unittest.TestCase):
             )
         self.assertEqual(
             scaffold1.vars,
-            {'project': 'Distro', 'egg': 'Distro', 'package': 'distro'})
+            {'project': 'Distro', 'egg': 'Distro', 'package': 'distro', 'package_full_name': 'Distro'})
         self.assertEqual(
             scaffold2.output_dir,
             os.path.normpath(os.path.join(os.getcwd(), 'Distro'))
             )
         self.assertEqual(
             scaffold2.vars,
-            {'project': 'Distro', 'egg': 'Distro', 'package': 'distro'})
+            {'project': 'Distro', 'egg': 'Distro', 'package': 'distro', 'package_full_name': 'Distro'})
 
     def test_customized_output_dir(self):
         import os
@@ -117,6 +117,7 @@ class TestPCreateCommand(unittest.TestCase):
         scaffold = DummyScaffold('dummy')
         cmd.scaffolds = [scaffold]
         result = cmd.run()
+
         self.assertEqual(result, 0)
         self.assertEqual(
             scaffold.output_dir,
@@ -124,7 +125,41 @@ class TestPCreateCommand(unittest.TestCase):
             )
         self.assertEqual(
             scaffold.vars,
-            {'project': 'Distro', 'egg': 'Distro', 'package': 'distro'})
+            {'project': 'Distro', 'egg': 'Distro', 'package': 'distro', 'package_full_name': 'Distro'})
+
+    def test_customized_output_dir_module(self):
+        import os
+        path = 'dummy_customized2'
+        cmd = self._makeOne('-s', 'dummy', '-d', path, 'Distro.Distro2')
+        scaffold = DummyScaffold('dummy')
+        cmd.scaffolds = [scaffold]
+        result = cmd.run()
+
+        self.assertEqual(result, 0)
+        self.assertEqual(
+            scaffold.output_dir,
+            os.path.normpath(os.path.join(os.getcwd(), 'dummy_customized2'))
+            )
+        self.assertEqual(
+            scaffold.vars,
+            {'project': 'Distro.Distro2', 'egg': 'Distro.Distro2', 'package': 'distrodistro2', 'package_full_name': 'Distro.Distro2'})
+
+    def test_customized_output_dir_module_dir_based(self):
+        import os
+        path = 'dummy_customized'
+        cmd = self._makeOne('-s', 'dummy', '-d', path, 'Distro/Test2')
+        scaffold = DummyScaffold('dummy')
+        cmd.scaffolds = [scaffold]
+        result = cmd.run()
+
+        self.assertEqual(result, 0)
+        self.assertEqual(
+            scaffold.output_dir,
+            os.path.normpath(os.path.join(os.getcwd(), 'dummy_customized'))
+            )
+        self.assertEqual(
+            scaffold.vars,
+            {'project': 'Test2', 'egg': 'Test2', 'package': 'test2', 'package_full_name': 'Distro.Test2'})
 
     def test_customized_output_dir_abspath(self):
         import os
@@ -140,7 +175,7 @@ class TestPCreateCommand(unittest.TestCase):
             )
         self.assertEqual(
             scaffold.vars,
-            {'project': 'Distro', 'egg': 'Distro', 'package': 'distro'})
+            {'project': 'Distro', 'egg': 'Distro', 'package': 'distro', 'package_full_name': 'Distro'})
 
     def test_customized_output_dir_home(self):
         import os
@@ -158,7 +193,7 @@ class TestPCreateCommand(unittest.TestCase):
     def test_customized_output_dir_root(self):
         import os
         path = "~root"
-        cmd = self._makeOne('-s', 'dummy', '-d', path, 'Distro')
+        cmd = self._makeOne('-s', 'dummy', '-d', path, 'Distro/Test2')
         scaffold = DummyScaffold('dummy')
         cmd.scaffolds = [scaffold]
         result = cmd.run()
@@ -167,6 +202,26 @@ class TestPCreateCommand(unittest.TestCase):
             scaffold.output_dir,
             os.path.abspath(os.path.expanduser("~root"))
             )
+        self.assertEqual(
+            scaffold.vars,
+            {'project': 'Test2', 'egg': 'Test2', 'package': 'test2', 'package_full_name': 'Distro.Test2'})
+
+    def test_customized_output_dir_non_exist_user(self):
+        path = "~__pcreate_test_non_exist_user__"
+        cmd = self._makeOne('-s', 'dummy', '-d', path, 'Distro')
+        scaffold = DummyScaffold('dummy')
+        cmd.scaffolds = [scaffold]
+        try:
+            cmd.run()
+        except Exception as e:
+            self.assertTrue(str(e) == 'invalid user dir')
+
+    def test__set_pkg_full_name(self):
+        cmd = self._makeOne('-s', 'dummy', '-d', 'a/b/c/d', 'Distro')
+        scaffold = DummyScaffold('dummy')
+        cmd.scaffolds = [scaffold]
+        result = cmd.run()
+        self.assertEqual(result, 0)
 
 class Test_main(unittest.TestCase):
     def _callFUT(self, argv):

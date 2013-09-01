@@ -140,6 +140,18 @@ class ZPTTemplateRendererTests(Base, unittest.TestCase):
         self.assertEqual(result,
                          '<html>\nOutside macro\n\n  Hello!\n\n</html>\n\n')
 
+    def test_macro_template_reload(self):
+        minimal = self._getTemplatePath('withmacro.pt')
+        lookup = DummyLookup()
+        instance = self._makeOne(minimal, lookup, macro='foo')
+        result = instance.implementation()()
+        self.assertEqual(result, '\n  Hello!\n')
+        instance.template.cook(
+            '<html>\nOutside macro\n\n  Hello!\n\n</html>\n\n'
+            )
+        result = instance.implementation()()
+        self.assertEqual(result, '\n  Hello!\n')
+        
 class DummyLookup(object):
     auto_reload=True
     debug = True

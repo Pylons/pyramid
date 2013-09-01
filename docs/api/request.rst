@@ -311,6 +311,20 @@
 
        .. versionadded:: 1.3
 
+   .. attribute::  localizer
+
+       A :term:`localizer` which will use the current locale name to
+       translate values.
+
+       .. versionadded:: 1.5
+
+   .. attribute::  locale_name
+
+       The locale name of the current request as computed by the 
+       :term:`locale negotiator`.
+
+       .. versionadded:: 1.5
+
 .. note::
 
    For information about the API of a :term:`multidict` structure (such as

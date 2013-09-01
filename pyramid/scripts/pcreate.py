@@ -84,7 +84,7 @@ class PCreateCommand(object):
         project_name = os.path.basename(args[0])
         output_dir = os.path.abspath(os.path.normpath(args[0]))
         pkg_name = _bad_chars_re.sub('', project_name.lower())
-        pkg_full_name = args[0]
+        pkg_full_name = self._set_pkg_full_name(args[0])
         safe_name = pkg_resources.safe_name(project_name)
         egg_name = pkg_resources.to_filename(safe_name)
         if options.output_dir != None:
@@ -130,6 +130,17 @@ class PCreateCommand(object):
     def out(self, msg): # pragma: no cover
         if not self.quiet:
             print(msg)
+
+    def _set_pkg_full_name(self, pkg_path):
+        '''assuming pwd as root of package name'''
+        abs_pwd_path = os.path.abspath(os.getcwd())
+        abs_pkg_path = os.path.abspath(pkg_path)
+        pkg_full_path = abs_pkg_path[len(abs_pwd_path):]
+        if pkg_full_path[0] == '/':
+            pkg_full_path = pkg_full_path[1:]
+
+        pkg_full_name = re.sub('\/', '.', pkg_full_path)
+        return pkg_full_name
 
     def _set_output_dir(self, dir_path):
         if dir_path[0] == '~':

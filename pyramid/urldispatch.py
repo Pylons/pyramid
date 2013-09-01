@@ -91,7 +91,7 @@ class RoutesMapper(object):
 
 # stolen from bobo and modified
 old_route_re = re.compile(r'(\:[_a-zA-Z]\w*)')
-star_at_end = re.compile(r'\*\w*$')
+star_at_end = re.compile(r'\*(\w*)$')
 
 # The tortuous nature of the regex named ``route_re`` below is due to the
 # fact that we need to support at least one level of "inner" squigglies
@@ -213,7 +213,9 @@ def _compile_route(route):
             if k == remainder:
                 # a stararg argument
                 if is_nonstr_iter(v):
-                    v = '/'.join([quote_path_segment(x) for x in v]) # native
+                    v = '/'.join(
+                        [quote_path_segment(x, safe='/') for x in v]
+                        ) # native
                 else:
                     if v.__class__ not in string_types:
                         v = str(v)
@@ -222,7 +224,7 @@ def _compile_route(route):
                 if v.__class__ not in string_types:
                     v = str(v)
                 # v may be bytes (py2) or native string (py3)
-                v = quote_path_segment(v)
+                v = quote_path_segment(v, safe='/')
 
             # at this point, the value will be a native string
             newdict[k] = v

@@ -495,7 +495,6 @@ translations will be available to :app:`Pyramid`.
 
 .. index::
    single: localizer
-   single: get_localizer
    single: translation
    single: pluralization
 
@@ -503,19 +502,17 @@ Using a Localizer
 -----------------
 
 A :term:`localizer` is an object that allows you to perform translation or
-pluralization "by hand" in an application.  You may use the
-:func:`pyramid.i18n.get_localizer` function to obtain a :term:`localizer`.
-This function will return either the localizer object implied by the active
-:term:`locale negotiator` or a default localizer object if no explicit locale
-negotiator is registered.
+pluralization "by hand" in an application.  You may use the 
+:attr:`pyramid.request.Request.localizer` attribute to obtain a 
+:term:`localizer`.  The localizer object will be configured to produce 
+translations implied by the active :term:`locale negotiator` or a default
+localizer object if no explicit locale negotiator is registered.
 
 .. code-block:: python
    :linenos:
 
-   from pyramid.i18n import get_localizer
-
    def aview(request):
-       locale = get_localizer(request)
+       localizer = request.localizer
 
 .. note::
 
@@ -538,22 +535,20 @@ translation in a view component of an application might look like so:
 .. code-block:: python
    :linenos:
 
-   from pyramid.i18n import get_localizer
    from pyramid.i18n import TranslationString
 
    ts = TranslationString('Add ${number}', mapping={'number':1},
                           domain='pyramid')
 
    def aview(request):
-       localizer = get_localizer(request)
+       localizer = request.localizer
        translated = localizer.translate(ts) # translation string
        # ... use translated ...
 
-The :func:`~pyramid.i18n.get_localizer` function will return a
-:class:`pyramid.i18n.Localizer` object bound to the locale name
-represented by the request.  The translation returned from its
-:meth:`pyramid.i18n.Localizer.translate` method will depend on the
-``domain`` attribute of the provided translation string as well as the
+The ``request.localizer`` attribute will be a :class:`pyramid.i18n.Localizer`
+object bound to the locale name represented by the request.  The translation
+returned from its :meth:`pyramid.i18n.Localizer.translate` method will depend
+on the ``domain`` attribute of the provided translation string as well as the
 locale of the localizer.
 
 .. note::
@@ -579,32 +574,63 @@ signature:
    def pluralize(singular, plural, n, domain=None, mapping=None):
        ...
 
-The ``singular`` and ``plural`` arguments should each be a Unicode
-value representing a :term:`message identifier`.  ``n`` should be an
-integer.  ``domain`` should be a :term:`translation domain`, and
-``mapping`` should be a dictionary that is used for *replacement
-value* interpolation of the translated string.  If ``n`` is plural
-for the current locale, ``pluralize`` will return a Unicode
-translation for the message id ``plural``, otherwise it will return a
-Unicode translation for the message id ``singular``.
-
-The arguments provided as ``singular`` and/or ``plural`` may also be
-:term:`translation string` objects, but the domain and mapping
-information attached to those objects is ignored.
+The simplest case is the ``singular`` and ``plural`` arguments being passed as
+unicode literals. This returns the appropriate literal according to the locale
+pluralization rules for the number ``n``, and interpolates ``mapping``.
 
 .. code-block:: python
    :linenos:
 
-   from pyramid.i18n import get_localizer
-
    def aview(request):
-       localizer = get_localizer(request)
+       localizer = request.localizer
        translated = localizer.pluralize('Item', 'Items', 1, 'mydomain')
        # ... use translated ...
 
+However, for support of other languages, the ``singular`` argument should
+be a Unicode value representing a :term:`message identifier`.  In this
+case the ``plural`` value is ignored.
+``domain`` should be a :term:`translation domain`, and
+``mapping`` should be a dictionary that is used for *replacement
+value* interpolation of the translated string.  
+
+The value of ``n`` will be used to find the appropriate plural form for the
+current language and ``pluralize`` will return a Unicode translation for the
+message id ``singular``. The message file must have defined ``singular`` as a
+translation with plural forms.
+
+The argument provided as ``singular`` may be a :term:`translation string`
+object, but the domain and mapping information attached is ignored.
+
+.. code-block:: python
+   :linenos:
+
+   def aview(request):
+       localizer = request.localizer
+       num = 1
+       translated = localizer.pluralize(
+                          _('item_plural', default="${number} items"), 
+                          None, num, 'mydomain', mapping={'number':num}
+                          )
+
+The corresponding message catalog must have language plural definitions and
+plural alternatives set.
+
+.. code-block:: text
+    :linenos:
+    
+    "Plural-Forms: nplurals=3; plural=n==0 ? 0 : n==1 ? 1 : 2;"
+    
+    msgid "item_plural"
+    msgid_plural ""
+    msgstr[0] "No items"
+    msgstr[1] "${number} item"
+    msgstr[2] "${number} items"
+
+More information on complex plurals can be found in the `gettext documentation
+<https://www.gnu.org/savannah-checkouts/gnu/gettext/manual/html_node/Plural-forms.html>`_.
+
 .. index::
    single: locale name
-   single: get_locale_name
    single: negotiate_locale_name
 
 .. _obtaining_the_locale_name:
@@ -613,25 +639,23 @@ Obtaining the Locale Name for a Request
 ---------------------------------------
 
 You can obtain the locale name related to a request by using the
-:func:`pyramid.i18n.get_locale_name` function.
+:func:`pyramid.request.Request.locale_name` attribute of the request.
 
 .. code-block:: python
    :linenos:
 
-   from pyramid.i18n import get_locale_name
-
    def aview(request):
-       locale_name = get_locale_name(request)
+       locale_name = request.locale_name
 
-This returns the locale name negotiated by the currently active
-:term:`locale negotiator` or the :term:`default locale name` if the
-locale negotiator returns ``None``.  You can change the default locale
-name by changing the ``pyramid.default_locale_name`` setting; see
-:ref:`default_locale_name_setting`.
+The locale name of a request is dynamically computed; it will be the locale 
+name negotiated by the currently active :term:`locale negotiator` or 
+the :term:`default locale name` if the locale negotiator returns ``None``. 
+You can change the default locale name by changing the 
+``pyramid.default_locale_name`` setting; see :ref:`default_locale_name_setting`.
 
-Once :func:`~pyramid.i18n.get_locale_name` is first run, the locale
+Once :func:`~pyramid.request.Request.locale_name` is first run, the locale
 name is stored on the request object.  Subsequent calls to
-:func:`~pyramid.i18n.get_locale_name` will return the stored locale
+:func:`~pyramid.request.Request.locale_name` will return the stored locale
 name without invoking the :term:`locale negotiator`.  To avoid this
 caching, you can use the :func:`pyramid.i18n.negotiate_locale_name`
 function:
@@ -650,15 +674,13 @@ You can also obtain the locale name related to a request using the
 .. code-block:: python
    :linenos:
 
-   from pyramid.i18n import get_localizer
-
    def aview(request):
-       localizer = get_localizer(request)
+       localizer = request.localizer
        locale_name = localizer.locale_name
 
 Obtaining the locale name as an attribute of a localizer is equivalent
-to obtaining a locale name by calling the
-:func:`~pyramid.i18n.get_locale_name` function.
+to obtaining a locale name by asking for the 
+:func:`~pyramid.request.Request.locale_name` attribute.
 
 .. index::
    single: date and currency formatting (i18n)
@@ -686,10 +708,9 @@ obtain the locale name for a request to pass to the
    :linenos:
 
    from babel.core import Locale
-   from pyramid.i18n import get_locale_name
 
    def aview(request):
-       locale_name = get_locale_name(request)
+       locale_name = request.locale_name
        locale = Locale(locale_name)
 
 .. index::
@@ -971,8 +992,8 @@ a particular request.  A locale negotiator is a bit of code which
 accepts a request and which returns a :term:`locale name`.  It is
 consulted when :meth:`pyramid.i18n.Localizer.translate` or
 :meth:`pyramid.i18n.Localizer.pluralize` is invoked.  It is also
-consulted when :func:`~pyramid.i18n.get_locale_name` or
-:func:`~pyramid.i18n.negotiate_locale_name` is invoked.
+consulted when :func:`~pyramid.request.Request.locale_name` is accessed or
+when :func:`~pyramid.i18n.negotiate_locale_name` is invoked.
 
 .. _default_locale_negotiator:
 

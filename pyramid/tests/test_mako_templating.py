@@ -396,10 +396,13 @@ class MakoLookupTemplateRendererTests(Base, maybe_unittest()):
     def test_call_with_tuple_value(self):
         lookup = DummyLookup()
         instance = self._makeOne('path', None, lookup)
+        warnings = DummyWarnings()
+        instance.warnings = warnings
         result = instance(('fub', {}), {'context':1})
         self.assertEqual(lookup.deffed, 'fub')
         self.assertEqual(result, text_('result'))
         self.assertEqual(lookup.values, {'_context':1})
+        self.assertEqual(len(warnings.msgs), 1)
 
     def test_call_with_defname(self):
         lookup = DummyLookup()
@@ -411,25 +414,31 @@ class MakoLookupTemplateRendererTests(Base, maybe_unittest()):
     def test_call_with_defname_with_tuple_value(self):
         lookup = DummyLookup()
         instance = self._makeOne('path', 'defname', lookup)
+        warnings = DummyWarnings()
+        instance.warnings = warnings
         result = instance(('defname', {}), {'context':1})
         self.assertEqual(lookup.deffed, 'defname')
         self.assertEqual(result, text_('result'))
         self.assertEqual(lookup.values, {'_context':1})
+        self.assertEqual(len(warnings.msgs), 1)
 
     def test_call_with_defname_with_tuple_value_twice(self):
         lookup = DummyLookup()
         instance1 = self._makeOne('path', 'defname', lookup)
+        warnings = DummyWarnings()
+        instance1.warnings = warnings
         result1 = instance1(('defname1', {}), {'context':1})
         self.assertEqual(lookup.deffed, 'defname1')
         self.assertEqual(result1, text_('result'))
         self.assertEqual(lookup.values, {'_context':1})
         instance2 = self._makeOne('path', 'defname', lookup)
+        warnings = DummyWarnings()
+        instance2.warnings = warnings
         result2 = instance2(('defname2', {}), {'context':2})
         self.assertNotEqual(lookup.deffed, 'defname1')
         self.assertEqual(lookup.deffed, 'defname2')
         self.assertEqual(result2, text_('result'))
         self.assertEqual(lookup.values, {'_context':2})
-
 
     def test_call_with_nondict_value(self):
         lookup = DummyLookup()
@@ -638,3 +647,9 @@ class DummyRendererInfo(object):
     def __init__(self, kw):
         self.__dict__.update(kw)
 
+
+class DummyWarnings(object):
+    def __init__(self):
+        self.msgs = []
+    def warn(self, msg, typ, level):
+        self.msgs.append(msg)

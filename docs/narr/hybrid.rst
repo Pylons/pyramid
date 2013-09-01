@@ -549,3 +549,105 @@ be invoked when the request URI is ``/abc/bazbuz``, assuming there is
 no object contained by the root object with the key ``bazbuz``. A
 different request URI, such as ``/abc/foo/bar``, would invoke the
 default ``myproject.views.abc`` view.
+
+.. index::
+   pair: hybrid urls; generating
+
+.. _generating_hybrid_urls:
+
+Generating Hybrid URLs
+----------------------
+
+.. versionadded:: 1.5
+
+The :meth:`pyramid.request.Request.resource_url` method and the 
+:meth:`pyramid.request.Request.resource_path` method both accept optional 
+keyword arguments that make it easier to generate route-prefixed URLs that
+contain paths to traversal resources:``route_name``, ``route_kw``, and 
+``route_remainder_name``.
+
+Any route that has a pattern that contains a ``*remainder`` pattern (any
+stararg remainder pattern, such as ``*traverse`` or ``*subpath`` or ``*fred``) 
+can be used as the target name for ``request.resource_url(..., route_name=)`` 
+and ``request.resource_path(..., route_name=)``. 
+
+For example, let's imagine you have a route defined in your Pyramid application
+like so:
+
+.. code-block:: python
+
+   config.add_route('mysection', '/mysection*traverse')
+
+If you'd like to generate the URL ``http://example.com/mysection/a/``, you can 
+use the following incantation, assuming that the variable ``a`` below points to
+a resource that is a child of the root with a ``__name__`` of ``a``:
+
+.. code-block:: python
+
+   request.resource_url(a, route_name='mysection')
+
+You can generate only the path portion ``/mysection/a/`` assuming the same:
+
+.. code-block:: python
+
+   request.resource_path(a, route_name='mysection')
+
+The path is virtual host aware, so if the ``X-Vhm-Root`` environ variable is 
+present in the request, and it's set to ``/a``, the above call to 
+``request.resource_url`` would generate ``http://example.com/mysection/`` 
+and the above call to ``request.resource_path`` would generate ``/mysection/``.
+See :ref:`virtual_root_support` for more information.
+
+If the route you're trying to use needs simple dynamic part values to be filled
+in to succesfully generate the URL, you can pass these as the ``route_kw`` 
+argument to ``resource_url`` and ``resource_path``.  For example, assuming that
+the route definition is like so:
+
+.. code-block:: python
+
+   config.add_route('mysection', '/{id}/mysection*traverse')
+
+You can pass ``route_kw`` in to fill in ``{id}`` above:
+
+.. code-block:: python
+
+   request.resource_url(a, route_name='mysection', route_kw={'id':'1'})
+
+If you pass ``route_kw`` but do not pass ``route_name``, ``route_kw`` will
+be ignored.
+
+By default this feature works by calling ``route_url`` under the hood,
+and passing the value of the resource path to that function as ``traverse``.
+If your route has a different ``*stararg`` remainder name (such as 
+``*subpath``), you can tell ``resource_url`` or ``resource_path`` to use that
+instead of  ``traverse`` by passing ``route_remainder_name``.  For example,
+if you have the following route:
+
+.. code-block:: python
+
+   config.add_route('mysection', '/mysection*subpath')
+
+You can fill in the ``*subpath`` value using ``resource_url`` by doing:
+
+.. code-block:: python
+
+   request.resource_path(a, route_name='mysection', 
+                         route_remainder_name='subpath')
+
+If you pass ``route_remainder_name`` but do not pass ``route_name``, 
+``route_remainder_name`` will be ignored.
+
+If you try to use ``resource_path`` or ``resource_url`` when the ``route_name``
+argument points at a route that does not have a remainder stararg, an error
+will not be raised, but the generated URL will not contain any remainder
+information either.
+
+All other values that are normally passable to ``resource_path`` and 
+``resource_url`` (such as ``query``, ``anchor``, ``host``, ``port``, and 
+positional elements) work as you might expect in this configuration.
+
+Note that this feature is incompatible with the ``__resource_url__`` feature
+(see :ref:`overriding_resource_url_generation`) implemented on resource
+objects.  Any  ``__resource_url__`` supplied by your resource will be ignored
+when you pass ``route_name``.
+

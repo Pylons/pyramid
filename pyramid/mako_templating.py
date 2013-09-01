@@ -204,6 +204,8 @@ class MakoLookupTemplateRenderer(object):
     package:path/to/template#defname.mako, a function named ``defname``
     inside the template will then be rendered.
     """
+    warnings = warnings # for testing
+
     def __init__(self, path, defname, lookup):
         self.path = path
         self.defname = defname
@@ -218,7 +220,7 @@ class MakoLookupTemplateRenderer(object):
             system['_context'] = context
         # tuple returned to be deprecated
         if isinstance(value, tuple):
-            warnings.warn(
+            self.warnings.warn(
                 'Using a tuple in the form (\'defname\', {}) to render a '
                 'Mako partial will be deprecated in the future. Use a '
                 'Mako template renderer as documented in the "Using A '

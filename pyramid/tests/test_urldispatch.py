@@ -295,7 +295,7 @@ class TestCompileRoute(unittest.TestCase):
                           'remainder':'/everything/else/here'})
         self.assertEqual(matcher('foo/baz/biz/buz/bar'), None)
         self.assertEqual(generator(
-            {'baz':1, 'buz':2, 'remainder':'/a/b'}), '/foo/1/biz/2/bar%2Fa%2Fb')
+            {'baz':1, 'buz':2, 'remainder':'/a/b'}), '/foo/1/biz/2/bar/a/b')
 
     def test_no_beginning_slash(self):
         matcher, generator = self._callFUT('foo/:baz/biz/:buz/bar')
@@ -491,10 +491,10 @@ class TestCompileRouteFunctional(unittest.TestCase):
         self.generates('zzz/{x}*traverse', {'x':'abc', 'traverse':'/def/g'},
                        '/zzz/abc/def/g')
         self.generates('/{x}', {'x':text_(b'/La Pe\xc3\xb1a', 'utf-8')},
-                       '/%2FLa%20Pe%C3%B1a')
+                       '//La%20Pe%C3%B1a')
         self.generates('/{x}*y', {'x':text_(b'/La Pe\xc3\xb1a', 'utf-8'),
                                  'y':'/rest/of/path'},
-                       '/%2FLa%20Pe%C3%B1a/rest/of/path')
+                       '//La%20Pe%C3%B1a/rest/of/path')
         self.generates('*traverse', {'traverse':('a', text_(b'La Pe\xf1a'))},
                        '/a/La%20Pe%C3%B1a')
         self.generates('/foo/{id}.html', {'id':'bar'}, '/foo/bar.html')
@@ -511,10 +511,10 @@ class TestCompileRouteFunctional(unittest.TestCase):
         self.generates('zzz/:x*traverse', {'x':'abc', 'traverse':'/def/g'},
                        '/zzz/abc/def/g')
         self.generates('/:x', {'x':text_(b'/La Pe\xc3\xb1a', 'utf-8')},
-                       '/%2FLa%20Pe%C3%B1a')
+                       '//La%20Pe%C3%B1a')
         self.generates('/:x*y', {'x':text_(b'/La Pe\xc3\xb1a', 'utf-8'),
                                  'y':'/rest/of/path'},
-                       '/%2FLa%20Pe%C3%B1a/rest/of/path')
+                       '//La%20Pe%C3%B1a/rest/of/path')
         self.generates('*traverse', {'traverse':('a', text_(b'La Pe\xf1a'))},
                        '/a/La%20Pe%C3%B1a')
         self.generates('/foo/:id.html', {'id':'bar'}, '/foo/bar.html')
