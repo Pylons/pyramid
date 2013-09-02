@@ -476,7 +476,7 @@ Application Running with ``pserve``
 ===================================
 
 Prior to scaffolds, our project mixed a number of operations details
-into our code. Why should my main code care with HTTP server I want and
+into our code. Why should my main code care which HTTP server I want and
 what port number to run on?
 
 ``pserve`` is Pyramid's application runner, separating operational
