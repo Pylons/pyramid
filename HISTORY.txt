@@ -1,3 +1,698 @@
+1.4 (2012-12-18)
+================
+
+Docs
+----
+
+- Fix functional tests in the ZODB tutorial
+
+1.4b3 (2012-12-10)
+==================
+
+- Packaging release only, no code changes.  1.4b2 was a brownbag release due to
+  missing directories in the tarball.
+
+1.4b2 (2012-12-10)
+==================
+
+Docs
+----
+
+- Scaffolding is now PEP-8 compliant (at least for a brief shining moment).
+
+- Tutorial improvements.
+
+Backwards Incompatibilities
+---------------------------
+
+- Modified the ``_depth`` argument to ``pyramid.view.view_config`` to accept
+  a value relative to the invocation of ``view_config`` itself. Thus, when it
+  was previously expecting a value of ``1`` or greater, to reflect that
+  the caller of ``view_config`` is 1 stack frame away from ``venusian.attach``,
+  this implementation detail is now hidden.
+
+- Modified the ``_backframes`` argument to ``pyramid.util.action_method`` in a
+  similar way to the changes described to ``_depth`` above.  This argument
+  remains undocumented, but might be used in the wild by some insane person.
+
+1.4b1 (2012-11-21)
+==================
+
+Features
+--------
+
+- Small microspeed enhancement which anticipates that a
+  ``pyramid.response.Response`` object is likely to be returned from a view.
+  Some code is shortcut if the class of the object returned by a view is this
+  class.  A similar microoptimization was done to
+  ``pyramid.request.Request.is_response``.
+
+- Make it possible to use variable arguments on ``p*`` commands (``pserve``,
+  ``pshell``, ``pviews``, etc) in the form ``a=1 b=2`` so you can fill in
+  values in parameterized ``.ini`` file, e.g. ``pshell etc/development.ini
+  http_port=8080``.  See https://github.com/Pylons/pyramid/pull/714
+
+- A somewhat advanced and obscure feature of Pyramid event handlers is their
+  ability to handle "multi-interface" notifications.  These notifications have
+  traditionally presented multiple objects to the subscriber callable.  For
+  instance, if an event was sent by code like this::
+
+     registry.notify(event, context)
+
+  In the past, in order to catch such an event, you were obligated to write and
+  register an event subscriber that mentioned both the event and the context in
+  its argument list::
+
+     @subscriber([SomeEvent, SomeContextType])
+     def asubscriber(event, context):
+         pass
+
+  In many subscriber callables registered this way, it was common for the logic
+  in the subscriber callable to completely ignore the second and following
+  arguments (e.g. ``context`` in the above example might be ignored), because
+  they usually existed as attributes of the event anyway.  You could usually
+  get the same value by doing ``event.context`` or similar.
+
+  The fact that you needed to put an extra argument which you usually ignored
+  in the subscriber callable body was only a minor annoyance until we added
+  "subscriber predicates", used to narrow the set of circumstances under which
+  a subscriber will be executed, in a prior 1.4 alpha release.  Once those were
+  added, the annoyance was escalated, because subscriber predicates needed to
+  accept the same argument list and arity as the subscriber callables that they
+  were configured against.  So, for example, if you had these two subscriber
+  registrations in your code::
+
+     @subscriber([SomeEvent, SomeContextType])
+     def asubscriber(event, context):
+         pass
+
+     @subscriber(SomeOtherEvent)
+     def asubscriber(event):
+         pass
+
+  And you wanted to use a subscriber predicate::
+
+     @subscriber([SomeEvent, SomeContextType], mypredicate=True)
+     def asubscriber1(event, context):
+         pass
+
+     @subscriber(SomeOtherEvent, mypredicate=True)
+     def asubscriber2(event):
+         pass
+
+  If an existing ``mypredicate`` subscriber predicate had been written in such
+  a way that it accepted only one argument in its ``__call__``, you could not
+  use it against a subscription which named more than one interface in its
+  subscriber interface list.  Similarly, if you had written a subscriber
+  predicate that accepted two arguments, you couldn't use it against a
+  registration that named only a single interface type.
+
+  For example, if you created this predicate::
+
+    class MyPredicate(object):
+        # portions elided...
+        def __call__(self, event):
+            return self.val == event.context.foo
+
+  It would not work against a multi-interface-registered subscription, so in
+  the above example, when you attempted to use it against ``asubscriber1``, it
+  would fail at runtime with a TypeError, claiming something was attempting to
+  call it with too many arguments.
+
+  To hack around this limitation, you were obligated to design the
+  ``mypredicate`` predicate to expect to receive in its ``__call__`` either a
+  single ``event`` argument (a SomeOtherEvent object) *or* a pair of arguments
+  (a SomeEvent object and a SomeContextType object), presumably by doing
+  something like this::
+
+    class MyPredicate(object):
+        # portions elided...
+        def __call__(self, event, context=None):
+            return self.val == event.context.foo
+
+  This was confusing and bad.
+
+  In order to allow people to ignore unused arguments to subscriber callables
+  and to normalize the relationship between event subscribers and subscriber
+  predicates, we now allow both subscribers and subscriber predicates to accept
+  only a single ``event`` argument even if they've been subscribed for
+  notifications that involve multiple interfaces.  Subscribers and subscriber
+  predicates that accept only one argument will receive the first object passed
+  to ``notify``; this is typically (but not always) the event object.  The
+  other objects involved in the subscription lookup will be discarded.  You can
+  now write an event subscriber that accepts only ``event`` even if it
+  subscribes to multiple interfaces::
+
+     @subscriber([SomeEvent, SomeContextType])
+     def asubscriber(event):
+         # this will work!
+
+  This prevents you from needing to match the subscriber callable parameters to
+  the subscription type unnecessarily, especially when you don't make use of
+  any argument in your subscribers except for the event object itself.
+
+  Note, however, that if the event object is not the first
+  object in the call to ``notify``, you'll run into trouble.  For example, if
+  notify is called with the context argument first::
+
+     registry.notify(context, event)
+
+  You won't be able to take advantage of the event-only feature.  It will
+  "work", but the object received by your event handler won't be the event
+  object, it will be the context object, which won't be very useful::
+
+     @subscriber([SomeContextType, SomeEvent])
+     def asubscriber(event):
+         # bzzt! you'll be getting the context here as ``event``, and it'll
+         # be useless
+
+  Existing multiple-argument subscribers continue to work without issue, so you
+  should continue use those if your system notifies using multiple interfaces
+  and the first interface is not the event interface.  For example::
+
+     @subscriber([SomeContextType, SomeEvent])
+     def asubscriber(context, event):
+         # this will still work!
+
+  The event-only feature makes it possible to use a subscriber predicate that
+  accepts only a request argument within both multiple-interface subscriber
+  registrations and single-interface subscriber registrations.  You needn't
+  make slightly different variations of predicates depending on the
+  subscription type arguments.  Instead, just write all your subscriber
+  predicates so they only accept ``event`` in their ``__call__`` and they'll be
+  useful across all registrations for subscriptions that use an event as their
+  first argument, even ones which accept more than just ``event``.
+
+  However, the same caveat applies to predicates as to subscriber callables: if
+  you're subscribing to a multi-interface event, and the first interface is not
+  the event interface, the predicate won't work properly.  In such a case,
+  you'll need to match the predicate ``__call__`` argument ordering and
+  composition to the ordering of the interfaces.  For example, if the
+  registration for the subscription uses ``[SomeContext, SomeEvent]``, you'll
+  need to reflect that in the ordering of the parameters of the predicate's
+  ``__call__`` method::
+
+        def __call__(self, context, event):
+            return event.request.path.startswith(self.val)
+
+  tl;dr: 1) When using multi-interface subscriptions, always use the event type
+  as the first subscription registration argument and 2) When 1 is true, use
+  only ``event`` in your subscriber and subscriber predicate parameter lists,
+  no matter how many interfaces the subscriber is notified with.  This
+  combination will result in the maximum amount of reusability of subscriber
+  predicates and the least amount of thought on your part.  Drink responsibly.
+
+Bug Fixes
+---------
+
+- A failure when trying to locate the attribute ``__text__`` on route and view
+  predicates existed when the ``debug_routematch`` setting was true or when the
+  ``pviews`` command was used. See https://github.com/Pylons/pyramid/pull/727
+
+Documentation
+-------------
+
+- Sync up tutorial source files with the files that are rendered by the
+  scaffold that each uses.
+
+1.4a4 (2012-11-14)
+==================
+
+Features
+--------
+
+- ``pyramid.authentication.AuthTktAuthenticationPolicy`` has been updated to
+  support newer hashing algorithms such as ``sha512``. Existing applications
+  should consider updating if possible for improved security over the default
+  md5 hashing.
+
+- Added an ``effective_principals`` route and view predicate.
+
+- Do not allow the userid returned from the ``authenticated_userid`` or the
+  userid that is one of the list of principals returned by
+  ``effective_principals`` to be either of the strings ``system.Everyone`` or
+  ``system.Authenticated`` when any of the built-in authorization policies that
+  live in ``pyramid.authentication`` are in use.  These two strings are
+  reserved for internal usage by Pyramid and they will not be accepted as valid
+  userids.
+
+- Slightly better debug logging from
+  ``pyramid.authentication.RepozeWho1AuthenticationPolicy``.
+
+- ``pyramid.security.view_execution_permitted`` used to return ``True`` if no
+  view could be found. It now raises a ``TypeError`` exception in that case, as
+  it doesn't make sense to assert that a nonexistent view is
+  execution-permitted. See https://github.com/Pylons/pyramid/issues/299.
+
+- Allow a ``_depth`` argument to ``pyramid.view.view_config``, which will
+  permit limited composition reuse of the decorator by other software that
+  wants to provide custom decorators that are much like view_config.
+
+- Allow an iterable of decorators to be passed to
+  ``pyramid.config.Configurator.add_view``. This allows views to be wrapped
+  by more than one decorator without requiring combining the decorators
+  yourself.
+
+Bug Fixes
+---------
+
+- In the past if a renderer returned ``None``, the body of the resulting
+  response would be set explicitly to the empty string.  Instead, now, the body
+  is left unchanged, which allows the renderer to set a body itself by using
+  e.g. ``request.response.body = b'foo'``.  The body set by the renderer will
+  be unmolested on the way out.  See
+  https://github.com/Pylons/pyramid/issues/709
+
+- In uncommon cases, the ``pyramid_excview_tween_factory`` might have
+  inadvertently raised a ``KeyError`` looking for ``request_iface`` as an
+  attribute of the request.  It no longer fails in this case.  See
+  https://github.com/Pylons/pyramid/issues/700
+
+- Be more tolerant of potential error conditions in ``match_param`` and
+  ``physical_path`` predicate implementations; instead of raising an exception,
+  return False.
+
+- ``pyramid.view.render_view`` was not functioning properly under Python 3.x
+  due to a byte/unicode discrepancy. See
+  https://github.com/Pylons/pyramid/issues/721
+
+Deprecations
+------------
+
+- ``pyramid.authentication.AuthTktAuthenticationPolicy`` will emit a warning if
+  an application is using the policy without explicitly passing a ``hashalg``
+  argument. This is because the default is "md5" which is considered
+  theoretically subject to collision attacks. If you really want "md5" then you
+  must specify it explicitly to get rid of the warning.
+
+Documentation
+-------------
+
+- All of the tutorials that use
+  ``pyramid.authentication.AuthTktAuthenticationPolicy`` now explicitly pass
+  ``sha512`` as a ``hashalg`` argument.
+
+
+Internals
+---------
+
+- Move ``TopologicalSorter`` from ``pyramid.config.util`` to ``pyramid.util``,
+  move ``CyclicDependencyError`` from ``pyramid.config.util`` to
+  ``pyramid.exceptions``, rename ``Singleton`` to ``Sentinel`` and move from
+  ``pyramid.config.util`` to ``pyramid.util``; this is in an effort to
+  move that stuff that may be an API one day out of ``pyramid.config.util``,
+  because that package should never be imported from non-Pyramid code.
+  TopologicalSorter is still not an API, but may become one.
+
+- Get rid of shady monkeypatching of ``pyramid.request.Request`` and
+  ``pyramid.response.Response`` done within the ``__init__.py`` of Pyramid.
+  Webob no longer relies on this being done.  Instead, the ResponseClass
+  attribute of the Pyramid Request class is assigned to the Pyramid response
+  class; that's enough to satisfy WebOb and behave as it did before with the
+  monkeypatching.
+
+1.4a3 (2012-10-26)
+==================
+
+Bug Fixes
+---------
+
+- The match_param predicate's text method was fixed to sort its values.
+  Part of https://github.com/Pylons/pyramid/pull/705
+
+- 1.4a ``pyramid.scripting.prepare`` behaved differently than 1.3 series
+  function of same name.  In particular, if passed a request, it would not
+  set the ``registry`` attribute of the request like 1.3 did.  A symptom
+  would be that passing a request to ``pyramid.paster.bootstrap`` (which uses
+  the function) that did not have a ``registry`` attribute could assume that
+  the registry would be attached to the request by Pyramid.  This assumption
+  could be made in 1.3, but not in 1.4.  The assumption can now be made in
+  1.4 too (a registry is attached to a request passed to bootstrap or
+  prepare).
+
+- When registering a view configuration that named a Chameleon ZPT renderer
+  with a macro name in it (e.g. ``renderer='some/template#somemacro.pt``) as
+  well as a view configuration without a macro name in it that pointed to the
+  same template (e.g. ``renderer='some/template.pt'``), internal caching could
+  confuse the two, and your code might have rendered one instead of the
+  other.
+
+Features
+--------
+
+- Allow multiple values to be specified to the ``request_param`` view/route
+  predicate as a sequence.  Previously only a single string value was allowed.
+  See https://github.com/Pylons/pyramid/pull/705
+
+- Comments with references to documentation sections placed in scaffold
+  ``.ini`` files.
+
+- Added an HTTP Basic authentication policy
+  at ``pyramid.authentication.BasicAuthAuthenticationPolicy``.
+
+- The Configurator ``testing_securitypolicy`` method now returns the policy
+  object it creates.
+
+- The Configurator ``testing_securitypolicy`` method accepts two new
+  arguments: ``remember_result`` and ``forget_result``.  If supplied, these
+  values influence the result of the policy's ``remember`` and ``forget``
+  methods, respectively.
+
+- The DummySecurityPolicy created by ``testing_securitypolicy`` now sets a
+  ``forgotten`` value on the policy (the value ``True``) when its ``forget``
+  method is called.
+
+- The DummySecurityPolicy created by ``testing_securitypolicy`` now sets a
+  ``remembered`` value on the policy, which is the value of the ``principal``
+  argument it's called with when its ``remember`` method is called.
+
+- New ``physical_path`` view predicate.  If specified, this value should be a
+  string or a tuple representing the physical traversal path of the context
+  found via traversal for this predicate to match as true.  For example:
+  ``physical_path='/'`` or ``physical_path='/a/b/c'`` or ``physical_path=('',
+  'a', 'b', 'c')``.  This is not a path prefix match or a regex, it's a
+  whole-path match.  It's useful when you want to always potentially show a
+  view when some object is traversed to, but you can't be sure about what kind
+  of object it will be, so you can't use the ``context`` predicate.  The
+  individual path elements inbetween slash characters or in tuple elements
+  should be the Unicode representation of the name of the resource and should
+  not be encoded in any way.
+
+1.4a2 (2012-09-27)
+==================
+
+Bug Fixes
+---------
+
+- When trying to determine Mako defnames and Chameleon macro names in asset
+  specifications, take into account that the filename may have a hyphen in
+  it.  See https://github.com/Pylons/pyramid/pull/692
+
+Features
+--------
+
+- A new ``pyramid.session.check_csrf_token`` convenience function was added.
+
+- A ``check_csrf`` view predicate was added.  For example, you can now do
+  ``config.add_view(someview, check_csrf=True)``.  When the predicate is
+  checked, if the ``csrf_token`` value in ``request.params`` matches the CSRF
+  token in the request's session, the view will be permitted to execute.
+  Otherwise, it will not be permitted to execute.
+
+- Add ``Base.metadata.bind = engine`` to alchemy template, so that tables
+  defined imperatively will work.
+
+Documentation
+-------------
+
+- update wiki2 SQLA tutorial with the changes required after inserting
+  ``Base.metadata.bind = engine`` into the alchemy scaffold.
+
+1.4a1 (2012-09-16)
+==================
+
+Bug Fixes
+---------
+
+- Forward port from 1.3 branch: When no authentication policy was configured,
+  a call to ``pyramid.security.effective_principals`` would unconditionally
+  return the empty list.  This was incorrect, it should have unconditionally
+  returned ``[Everyone]``, and now does.
+
+- Explicit url dispatch regexes can now contain colons.
+  https://github.com/Pylons/pyramid/issues/629
+
+- On at least one 64-bit Ubuntu system under Python 3.2, using the
+  ``view_config`` decorator caused a ``RuntimeError: dictionary changed size
+  during iteration`` exception.  It no longer does.  See
+  https://github.com/Pylons/pyramid/issues/635 for more information.
+
+- In Mako Templates lookup, check if the uri is already adjusted and bring
+  it back to an asset spec. Normally occurs with inherited templates or
+  included components.
+  https://github.com/Pylons/pyramid/issues/606
+  https://github.com/Pylons/pyramid/issues/607
+
+- In Mako Templates lookup, check for absolute uri (using mako directories)
+  when mixing up inheritance with asset specs.
+  https://github.com/Pylons/pyramid/issues/662
+
+- HTTP Accept headers were not being normalized causing potentially
+  conflicting view registrations to go unnoticed. Two views that only
+  differ in the case ('text/html' vs. 'text/HTML') will now raise an error.
+  https://github.com/Pylons/pyramid/pull/620
+
+- Forward-port from 1.3 branch: when registering multiple views with an
+  ``accept`` predicate in a Pyramid application runing under Python 3, you
+  might have received a ``TypeError: unorderable types: function() <
+  function()`` exception.
+
+Features
+--------
+
+- Configurator.add_directive now accepts arbitrary callables like partials or
+  objects implementing ``__call__`` which dont have ``__name__`` and
+  ``__doc__`` attributes.  See https://github.com/Pylons/pyramid/issues/621
+  and https://github.com/Pylons/pyramid/pull/647.
+
+- Third-party custom view, route, and subscriber predicates can now be added
+  for use by view authors via
+  ``pyramid.config.Configurator.add_view_predicate``,
+  ``pyramid.config.Configurator.add_route_predicate`` and
+  ``pyramid.config.Configurator.add_subscriber_predicate``.  So, for example,
+  doing this::
+
+     config.add_view_predicate('abc', my.package.ABCPredicate)
+
+  Might allow a view author to do this in an application that configured that
+  predicate::
+
+     @view_config(abc=1)
+
+  Similar features exist for ``add_route``, and ``add_subscriber``.  See
+  "Adding A Third Party View, Route, or Subscriber Predicate" in the Hooks
+  chapter for more information.
+
+  Note that changes made to support the above feature now means that only
+  actions registered using the same "order" can conflict with one another.
+  It used to be the case that actions registered at different orders could
+  potentially conflict, but to my knowledge nothing ever depended on this
+  behavior (it was a bit silly).
+
+- Custom objects can be made easily JSON-serializable in Pyramid by defining
+  a ``__json__`` method on the object's class. This method should return
+  values natively serializable by ``json.dumps`` (such as ints, lists,
+  dictionaries, strings, and so forth).
+
+- The JSON renderer now allows for the definition of custom type adapters to
+  convert unknown objects to JSON serializations.
+
+- As of this release, the ``request_method`` predicate, when used, will also
+  imply that ``HEAD`` is implied when you use ``GET``.  For example, using
+  ``@view_config(request_method='GET')`` is equivalent to using
+  ``@view_config(request_method=('GET', 'HEAD'))``.  Using
+  ``@view_config(request_method=('GET', 'POST')`` is equivalent to using
+  ``@view_config(request_method=('GET', 'HEAD', 'POST')``.  This is because
+  HEAD is a variant of GET that omits the body, and WebOb has special support
+  to return an empty body when a HEAD is used.
+
+- ``config.add_request_method`` has been introduced to support extending
+  request objects with arbitrary callables. This method expands on the
+  previous ``config.set_request_property`` by supporting methods as well as
+  properties. This method now causes less code to be executed at
+  request construction time than ``config.set_request_property`` in
+  version 1.3.
+
+- Don't add a ``?`` to URLs generated by ``request.resource_url`` if the
+  ``query`` argument is provided but empty.
+
+- Don't add a ``?`` to URLs generated by ``request.route_url`` if the
+  ``_query`` argument is provided but empty.
+
+- The static view machinery now raises (rather than returns) ``HTTPNotFound``
+  and ``HTTPMovedPermanently`` exceptions, so these can be caught by the
+  Not Found View (and other exception views).
+
+- The Mako renderer now supports a def name in an asset spec.  When the def
+  name is present in the asset spec, the system will render the template def
+  within the template and will return the result. An example asset spec is
+  ``package:path/to/template#defname.mako``. This will render the def named
+  ``defname`` inside the ``template.mako`` template instead of rendering the
+  entire template.  The old way of returning a tuple in the form
+  ``('defname', {})`` from the view is supported for backward compatibility,
+
+- The Chameleon ZPT renderer now accepts a macro name in an asset spec.  When
+  the macro name is present in the asset spec, the system will render the
+  macro listed as a ``define-macro`` and return the result instead of
+  rendering the entire template.  An example asset spec:
+  ``package:path/to/template#macroname.pt``.  This will render the macro
+  defined as ``macroname`` within the ``template.pt`` template instead of the
+  entire templae.
+
+- When there is a predicate mismatch exception (seen when no view matches for
+  a given request due to predicates not working), the exception now contains
+  a textual description of the predicate which didn't match.
+
+- An ``add_permission`` directive method was added to the Configurator.  This
+  directive registers a free-standing permission introspectable into the
+  Pyramid introspection system.  Frameworks built atop Pyramid can thus use
+  the ``permissions`` introspectable category data to build a
+  comprehensive list of permissions supported by a running system.  Before
+  this method was added, permissions were already registered in this
+  introspectable category as a side effect of naming them in an ``add_view``
+  call, this method just makes it possible to arrange for a permission to be
+  put into the ``permissions`` introspectable category without naming it
+  along with an associated view.  Here's an example of usage of
+  ``add_permission``::
+
+      config = Configurator()
+      config.add_permission('view')
+
+- The ``UnencryptedCookieSessionFactoryConfig`` now accepts
+  ``signed_serialize`` and ``signed_deserialize`` hooks which may be used
+  to influence how the sessions are marshalled (by default this is done
+  with HMAC+pickle).
+
+- ``pyramid.testing.DummyRequest`` now supports methods supplied by the
+  ``pyramid.util.InstancePropertyMixin`` class such as ``set_property``.
+
+- Request properties and methods added via ``config.set_request_property`` or
+  ``config.add_request_method`` are now available to tweens.
+
+- Request properties and methods added via ``config.set_request_property`` or
+  ``config.add_request_method`` are now available in the request object
+  returned from ``pyramid.paster.bootstrap``.
+
+- ``request.context`` of environment request during ``bootstrap`` is now the
+  root object if a context isn't already set on a provided request.
+
+- The ``pyramid.decorator.reify`` function is now an API, and was added to
+  the API documentation.
+
+- Added the ``pyramid.testing.testConfig`` context manager, which can be used
+  to generate a configurator in a test, e.g. ``with testing.testConfig(...):``.
+
+- Users can now invoke a subrequest from within view code using a new
+  ``request.invoke_subrequest`` API.
+
+Deprecations
+------------
+
+- The ``pyramid.config.Configurator.set_request_property`` has been
+  documentation-deprecated.  The method remains usable but the more
+  featureful ``pyramid.config.Configurator.add_request_method`` should be
+  used in its place (it has all of the same capabilities but can also extend
+  the request object with methods).
+
+Backwards Incompatibilities
+---------------------------
+
+- The Pyramid router no longer adds the values ``bfg.routes.route`` or
+  ``bfg.routes.matchdict`` to the request's WSGI environment dictionary.
+  These values were docs-deprecated in ``repoze.bfg`` 1.0 (effectively seven
+  minor releases ago).  If your code depended on these values, use
+  request.matched_route and request.matchdict instead.
+
+- It is no longer possible to pass an environ dictionary directly to
+  ``pyramid.traversal.ResourceTreeTraverser.__call__`` (aka
+  ``ModelGraphTraverser.__call__``).  Instead, you must pass a request
+  object.  Passing an environment instead of a request has generated a
+  deprecation warning since Pyramid 1.1.
+
+- Pyramid will no longer work properly if you use the
+  ``webob.request.LegacyRequest`` as a request factory.  Instances of the
+  LegacyRequest class have a ``request.path_info`` which return a string.
+  This Pyramid release assumes that ``request.path_info`` will
+  unconditionally be Unicode.
+
+- The functions from ``pyramid.chameleon_zpt`` and ``pyramid.chameleon_text``
+  named ``get_renderer``, ``get_template``, ``render_template``, and
+  ``render_template_to_response`` have been removed.  These have issued a
+  deprecation warning upon import since Pyramid 1.0.  Use
+  ``pyramid.renderers.get_renderer()``,
+  ``pyramid.renderers.get_renderer().implementation()``,
+  ``pyramid.renderers.render()`` or ``pyramid.renderers.render_to_response``
+  respectively instead of these functions.
+
+- The ``pyramid.configuration`` module was removed.  It had been deprecated
+  since Pyramid 1.0 and printed a deprecation warning upon its use.  Use
+  ``pyramid.config`` instead.
+
+- The ``pyramid.paster.PyramidTemplate`` API was removed.  It had been
+  deprecated since Pyramid 1.1 and issued a warning on import.  If your code
+  depended on this, adjust your code to import
+  ``pyramid.scaffolds.PyramidTemplate`` instead.
+
+- The ``pyramid.settings.get_settings()`` API was removed.  It had been
+  printing a deprecation warning since Pyramid 1.0.  If your code depended on
+  this API, use ``pyramid.threadlocal.get_current_registry().settings``
+  instead or use the ``settings`` attribute of the registry available from
+  the request (``request.registry.settings``).
+
+- These APIs from the ``pyramid.testing`` module were removed.  They have
+  been printing deprecation warnings since Pyramid 1.0:
+
+  * ``registerDummySecurityPolicy``, use
+    ``pyramid.config.Configurator.testing_securitypolicy`` instead.
+
+  * ``registerResources`` (aka ``registerModels``, use
+    ``pyramid.config.Configurator.testing_resources`` instead.
+
+  * ``registerEventListener``, use
+    ``pyramid.config.Configurator.testing_add_subscriber`` instead.
+
+  * ``registerTemplateRenderer`` (aka `registerDummyRenderer``), use
+    ``pyramid.config.Configurator.testing_add_template`` instead.
+
+  * ``registerView``, use ``pyramid.config.Configurator.add_view`` instead.
+
+  * ``registerUtility``, use
+    ``pyramid.config.Configurator.registry.registerUtility`` instead.
+
+  * ``registerAdapter``, use
+    ``pyramid.config.Configurator.registry.registerAdapter`` instead.
+
+  * ``registerSubscriber``, use
+    ``pyramid.config.Configurator.add_subscriber`` instead.
+
+  * ``registerRoute``, use
+    ``pyramid.config.Configurator.add_route`` instead.
+
+  * ``registerSettings``, use
+    ``pyramid.config.Configurator.add_settings`` instead.
+
+- In Pyramid 1.3 and previous, the ``__call__`` method of a Response object
+  was invoked before any finished callbacks were executed.  As of this
+  release, the ``__call__`` method of a Response object is invoked *after*
+  finished callbacks are executed.  This is in support of the
+  ``request.invoke_subrequest`` feature.
+
+- The 200-series exception responses named ``HTTPCreated``, ``HTTPAccepted``, 
+  ``HTTPNonAuthoritativeInformation``, ``HTTPNoContent``, ``HTTPResetContent``,
+  and ``HTTPPartialContent`` in ``pyramid.httpexceptions`` no longer inherit
+  from ``HTTPOk``.  Instead they inherit from a new base class named 
+  ``HTTPSuccessful``.  This will have no effect on you unless you've registered
+  an exception view for ``HTTPOk`` and expect that exception view to
+  catch all the aforementioned exceptions.
+
+Documentation
+-------------
+
+- Added an "Upgrading Pyramid" chapter to the narrative documentation.  It
+  describes how to cope with deprecations and removals of Pyramid APIs and
+  how to show Pyramid-generated deprecation warnings while running tests and
+  while running a server.
+
+- Added a "Invoking a Subrequest" chapter to the documentation.  It describes
+  how to use the new ``request.invoke_subrequest`` API.
+
+Dependencies
+------------
+
+- Pyramid now requires WebOb 1.2b3+ (the prior Pyramid release only relied on
+  1.2dev+).  This is to ensure that we obtain a version of WebOb that returns
+  ``request.path_info`` as text.
+
 1.3 (2012-03-21)
 ================
 

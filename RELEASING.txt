@@ -35,8 +35,6 @@ Releasing Pyramid
 
 - Change setup.py version to the new version number.
 
-- Change docs/conf.py version to the new version number.
-
 - Change CHANGES.txt heading to reflect the new version number.
 
 - Make sure PyPI long description renders (requires ``collective.dist``
