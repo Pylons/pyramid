@@ -47,6 +47,7 @@ install_requires=[
     'venusian >= 1.0a3', # ``ignore``
     'translationstring >= 0.4', # py3 compat
     'PasteDeploy >= 1.5.0', # py3 compat
+    'pyramid_mako', # Backwards compat ...
     ]
 
 tests_require = [
