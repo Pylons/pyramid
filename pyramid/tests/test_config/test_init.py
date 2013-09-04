@@ -72,8 +72,6 @@ class ConfiguratorTests(unittest.TestCase):
         if not PYPY:
             self.assertTrue(config.registry.getUtility(IRendererFactory, '.pt'))
             self.assertTrue(config.registry.getUtility(IRendererFactory,'.txt'))
-        self.assertTrue(config.registry.getUtility(IRendererFactory, '.mak'))
-        self.assertTrue(config.registry.getUtility(IRendererFactory, '.mako'))
 
     def test_begin(self):
         from pyramid.config import Configurator
