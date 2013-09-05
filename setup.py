@@ -39,7 +39,6 @@ except IOError:
 
 install_requires=[
     'setuptools',
-    'Chameleon >= 1.2.3',
     'WebOb >= 1.2b3', # request.path_info is unicode
     'repoze.lru >= 0.4', # py3 compat
     'zope.interface >= 3.8.0',  # has zope.interface.registry
