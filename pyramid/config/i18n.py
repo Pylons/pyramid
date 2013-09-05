@@ -1,10 +1,7 @@
 import os
 import sys
 
-from translationstring import ChameleonTranslate
-
 from pyramid.interfaces import (
-    IChameleonTranslate,
     ILocaleNegotiator,
     ITranslationDirectories,
     )
@@ -107,14 +104,6 @@ class I18NConfiguratorMixin(object):
                                                   ITranslationDirectories)
 
                 tdirs.insert(0, directory)
-
-            if directories:
-                # We actually only need an IChameleonTranslate function
-                # utility to be registered zero or one times.  We register the
-                # same function once for each added translation directory,
-                # which does too much work, but has the same effect.
-                ctranslate = ChameleonTranslate(translator)
-                self.registry.registerUtility(ctranslate, IChameleonTranslate)
 
         self.action(None, register, introspectables=introspectables)
 
