@@ -364,6 +364,14 @@ The same custom-object serialization scheme defined used for a "normal" JSON
 renderer in :ref:`json_serializing_custom_objects` can be used when passing
 values to a JSONP renderer too.
 
+.. index::
+   single: template system bindings
+   single: Chameleon
+   single: Jinja2
+   single: Mako
+
+.. _available_template_system_bindings:
+
 Available Add-On Template System Bindings
 -----------------------------------------
 
