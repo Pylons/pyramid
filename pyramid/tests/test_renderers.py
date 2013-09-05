@@ -4,51 +4,6 @@ from pyramid.testing import cleanUp
 from pyramid import testing
 from pyramid.compat import text_
 
-class TestTemplateRendererFactory(unittest.TestCase):
-    def setUp(self):
-        self.config = cleanUp()
-
-    def tearDown(self):
-        cleanUp()
-
-    def _callFUT(self, info, impl):
-        from pyramid.renderers import template_renderer_factory
-        return template_renderer_factory(info, impl)
-
-    def test_lookup_found(self):
-        from pyramid.interfaces import IJSONAdapter
-        L = []
-        def dummy(info):
-            L.append(info)
-            return True
-        self.config.registry.registerUtility(dummy, IJSONAdapter,
-                                             name='abc')
-        class DummyInfo(object):
-            pass
-        info = DummyInfo()
-        info.registry = self.config.registry
-        info.type = 'abc'
-        result = self._callFUT(info, None)
-        self.assertEqual(result, True)
-        self.assertEqual(L, [info])
-
-    def test_lookup_miss(self):
-        from pyramid.interfaces import ITemplateRenderer
-        import os
-        abspath = os.path.abspath(__file__)
-        renderer = {}
-        self.config.registry.registerUtility(
-            renderer, ITemplateRenderer, name=abspath)
-        info = DummyRendererInfo({
-            'name':abspath,
-            'package':None,
-            'registry':self.config.registry,
-            'settings':{},
-            'type':'type',
-            })
-        result = self._callFUT(info, None)
-        self.assertTrue(result is renderer)
-
 class TestJSON(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp()
