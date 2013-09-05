@@ -1840,45 +1840,45 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         result = view(None, request)
         self.assertEqual(result.location, '/scriptname/foo/?a=1&b=2')
         
-    def test_add_notfound_view_with_renderer(self):
-        from zope.interface import implementedBy
-        from pyramid.interfaces import IRequest
-        from pyramid.httpexceptions import HTTPNotFound
-        config = self._makeOne(autocommit=True)
-        view = lambda *arg: {}
-        config.add_notfound_view(
-            view,
-            renderer='pyramid.tests.test_config:files/minimal.pt')
-        config.begin()
-        try: # chameleon depends on being able to find a threadlocal registry
-            request = self._makeRequest(config)
-            view = self._getViewCallable(config,
-                                         ctx_iface=implementedBy(HTTPNotFound),
-                                         request_iface=IRequest)
-            result = view(None, request)
-        finally:
-            config.end()
-        self.assertTrue(b'div' in result.body)
-
-    def test_add_forbidden_view_with_renderer(self):
-        from zope.interface import implementedBy
-        from pyramid.interfaces import IRequest
-        from pyramid.httpexceptions import HTTPForbidden
-        config = self._makeOne(autocommit=True)
-        view = lambda *arg: {}
-        config.add_forbidden_view(
-            view,
-            renderer='pyramid.tests.test_config:files/minimal.pt')
-        config.begin()
-        try: # chameleon requires a threadlocal registry
-            request = self._makeRequest(config)
-            view = self._getViewCallable(config,
-                                         ctx_iface=implementedBy(HTTPForbidden),
-                                         request_iface=IRequest)
-            result = view(None, request)
-        finally:
-            config.end()
-        self.assertTrue(b'div' in result.body)
+#    def test_add_notfound_view_with_renderer(self):
+#        from zope.interface import implementedBy
+#        from pyramid.interfaces import IRequest
+#        from pyramid.httpexceptions import HTTPNotFound
+#        config = self._makeOne(autocommit=True)
+#        view = lambda *arg: {}
+#        config.add_notfound_view(
+#            view,
+#            renderer='pyramid.tests.test_config:files/minimal.pt')
+#        config.begin()
+#        try: # chameleon depends on being able to find a threadlocal registry
+#            request = self._makeRequest(config)
+#            view = self._getViewCallable(config,
+#                                         ctx_iface=implementedBy(HTTPNotFound),
+#                                         request_iface=IRequest)
+#            result = view(None, request)
+#        finally:
+#            config.end()
+#        self.assertTrue(b'div' in result.body)
+#
+#    def test_add_forbidden_view_with_renderer(self):
+#        from zope.interface import implementedBy
+#        from pyramid.interfaces import IRequest
+#        from pyramid.httpexceptions import HTTPForbidden
+#        config = self._makeOne(autocommit=True)
+#        view = lambda *arg: {}
+#        config.add_forbidden_view(
+#            view,
+#            renderer='pyramid.tests.test_config:files/minimal.pt')
+#        config.begin()
+#        try: # chameleon requires a threadlocal registry
+#            request = self._makeRequest(config)
+#            view = self._getViewCallable(config,
+#                                         ctx_iface=implementedBy(HTTPForbidden),
+#                                         request_iface=IRequest)
+#            result = view(None, request)
+#        finally:
+#            config.end()
+#        self.assertTrue(b'div' in result.body)
 
     def test_set_view_mapper(self):
         from pyramid.interfaces import IViewMapperFactory
