@@ -67,9 +67,8 @@ When this configuration is added to an application, the
 ``myproject.views.my_view`` view callable will now use a ``json`` renderer,
 which renders view return values to a :term:`JSON` response serialization.
 
-Other built-in renderers include renderers which use the :term:`Chameleon`
-templating language to render a dictionary to a response.  Additional
-renderers can be added by developers to the system as necessary.
+Pyramid defines several :ref:`built_in_renderers`, and additional renderers
+can be added by developers to the system as necessary.
 See :ref:`adding_and_overriding_renderers`.
 
 Views which use a renderer and return a non-Response value can vary non-body
