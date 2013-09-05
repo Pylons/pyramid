@@ -576,26 +576,6 @@ class RendererHelper(object):
             else:
                 response.body = result
 
-        if request is not None:
-            # deprecated mechanism to set up request.response_* attrs, see
-            # pyramid.request.Request
-            attrs = request.__dict__
-            content_type = attrs.get('_response_content_type', None)
-            if content_type is not None:
-                response.content_type = content_type
-            headerlist = attrs.get('_response_headerlist', None)
-            if headerlist is not None:
-                for k, v in headerlist:
-                    response.headers.add(k, v)
-            status = attrs.get('_response_status', None)
-            if status is not None:
-                response.status = status
-            charset = attrs.get('_response_charset', None)
-            if charset is not None:
-                response.charset = charset
-            cache_for = attrs.get('_response_cache_for', None)
-            if cache_for is not None:
-                response.cache_expires = cache_for
         return response
 
     def clone(self, name=None, package=None, registry=None):
