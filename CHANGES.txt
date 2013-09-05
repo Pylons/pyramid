@@ -17,9 +17,15 @@ Major Backward Incompatibilities
         config.include('pyramid_mako')
 
   - If any unit tests are invoking either ``pyramid.renderers.render()`` or
-    ``pyramid.renderers.render_to_response()``, then the
-    ``pyramid.config.Configurator`` instance at the root of the unit test
-    should be also be updated to include the addons, as shown above.
+    ``pyramid.renderers.render_to_response()`` with either Mako or Chameleon
+    templates then the ``pyramid.config.Configurator`` instance at the root of
+    the unit test should be also be updated to include the addons, as shown
+    above. For example:
+
+        config = pyramid.testing.setUp()
+        config.include('pyramid_mako')
+
+        result = pyramid.renderers.render('mypkg:templates/home.mako', {})
 
 1.5a1 (2013-08-30)
 ==================
