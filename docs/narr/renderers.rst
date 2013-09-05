@@ -364,6 +364,31 @@ The same custom-object serialization scheme defined used for a "normal" JSON
 renderer in :ref:`json_serializing_custom_objects` can be used when passing
 values to a JSONP renderer too.
 
+Available Add-On Template System Bindings
+-----------------------------------------
+
+The Pylons Project maintains several packages providing bindings to different
+templating languages including the following:
+
++------------------------------+------------------------------+
+| Template Language            | Pyramid Bindings             |
++==============================+==============================+
+| Chameleon_                   | pyramid_chameleon_           |
++------------------------------+------------------------------+
+| Jinja2_                      | pyramid_jinja2_              |
++------------------------------+------------------------------+
+| Mako_                        | pyramid_mako_                |
++------------------------------+------------------------------+
+
+.. _Chameleon: http://chameleon.readthedocs.org/en/latest/
+.. _pyramid_chameleon: https://pypi.python.org/pypi/pyramid_chameleon
+
+.. _Jinja2: http://jinja.pocoo.org/docs/
+.. _pyramid_jinja2: https://pypi.python.org/pypi/pyramid_jinja2
+
+.. _Mako: http://www.makotemplates.org/
+.. _pyramid_mako: https://pypi.python.org/pypi/pyramid_mako
+
 .. index::
    single: response headers (from a renderer)
    single: renderer response headers
