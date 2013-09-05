@@ -897,6 +897,14 @@ class Test_render(unittest.TestCase):
         renderer.assert_(a=1)
         renderer.assert_(request=request)
 
+    def test_it_preserves_response(self):
+        request = testing.DummyRequest()
+        response = object() # should error if mutated
+        request.response = response
+        result = self._callFUT('json', dict(a=1), request=request)
+        self.assertEqual(result, '{"a": 1}')
+        self.assertEqual(request.response, response)
+
 class Test_render_to_response(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp()
