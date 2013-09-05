@@ -1,7 +1,0 @@
-<html>
-Outside macro
-<metal:m define-macro="foo">
-  Hello!
-</metal:m>
-</html>
-
