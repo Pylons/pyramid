@@ -8,10 +8,20 @@ Major Backward Incompatibilities
   re-add support for these renderers into existing projects there are 3 steps:
 
   - Add `pyramid_mako` and/or `pyramid_chameleon` as dependencies by
-    adding them to the `install_requires` section of the package's `setup.py`.
+    adding them to the `install_requires` section of the package's `setup.py`::
+
+        setup(
+            #...
+            install_requires=[
+                'pyramid_mako',         # new dependency
+                'pyramid_chameleon',    # new dependency
+                'pyramid',
+                #...
+            ],
+        )
 
   - Update instances of the ``pyramid.config.Configurator`` to include the
-    required addons:
+    required addons::
 
         config.include('pyramid_chameleon')
         config.include('pyramid_mako')
@@ -20,7 +30,7 @@ Major Backward Incompatibilities
     ``pyramid.renderers.render_to_response()`` with either Mako or Chameleon
     templates then the ``pyramid.config.Configurator`` instance at the root of
     the unit test should be also be updated to include the addons, as shown
-    above. For example:
+    above. For example::
 
         config = pyramid.testing.setUp()
         config.include('pyramid_mako')
