@@ -109,7 +109,6 @@ setup(name='pyramid',
         zodb=pyramid.scaffolds:ZODBProjectTemplate
         alchemy=pyramid.scaffolds:AlchemyProjectTemplate
         [console_scripts]
-        bfg2pyramid = pyramid.fixers.fix_bfg_imports:main
         pcreate = pyramid.scripts.pcreate:main
         pserve = pyramid.scripts.pserve:main
         pshell = pyramid.scripts.pshell:main
