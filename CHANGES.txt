@@ -1,3 +1,15 @@
+Next Release
+============
+
+Backwards Incompatibilities
+---------------------------
+
+- Almost all renderers affect properties on the ``request.response`` response
+  object. For example, setting the content-type in the JSON renderer to
+  'application/json'. These mutations will no longer affect
+  ``request.response`` when using the ``pyramid.renderers.render()`` API as
+  its only expected output is a rendered string object.
+
 1.5a1 (2013-08-30)
 ==================
 
