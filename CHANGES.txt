@@ -1,3 +1,13 @@
+Next Release
+============
+
+Backwards Incompatibilities
+---------------------------
+
+- Removed the ``request.response_*`` varying attributes. These attributes
+  have been deprecated since Pyramid 1.1, and as per the deprecation policy,
+  have now been removed.
+
 1.5a1 (2013-08-30)
 ==================
 

@@ -235,24 +235,6 @@
 
    .. automethod:: resource_path
 
-   .. attribute::  response_*
-
-      In Pyramid 1.0, you could set attributes on a
-      :class:`pyramid.request.Request` which influenced the behavior of
-      *rendered* responses (views which use a :term:`renderer` and which
-      don't directly return a response).  These attributes began with
-      ``response_``, such as ``response_headerlist``. If you needed to
-      influence response values from a view that uses a renderer (such as the
-      status code, a header, the content type, etc) you would set these
-      attributes.  See :ref:`response_prefixed_attrs` for further discussion.
-      As of Pyramid 1.1, assignment to ``response_*`` attrs is deprecated.
-      Assigning to one is still supported but will cause a deprecation
-      warning to be emitted, and eventually the feature will be removed.  For
-      new code, instead of assigning ``response_*`` attributes to the
-      request, use API of the :attr:`pyramid.request.Request.response`
-      object (exposed to view code as ``request.response``) to influence
-      rendered response behavior.
-
    .. attribute:: json_body
 
        This property will return the JSON-decoded variant of the request

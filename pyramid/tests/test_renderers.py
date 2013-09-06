@@ -680,63 +680,6 @@ class TestRendererHelper(unittest.TestCase):
         helper = self._makeOne('loo.foo')
         response = helper._make_response(None, request)
         self.assertEqual(response.body, b'abc')
-        
-    def test__make_response_with_content_type(self):
-        from pyramid.response import Response
-        request = testing.DummyRequest()
-        request.response = Response()
-        attrs = {'_response_content_type':'text/nonsense'}
-        request.__dict__.update(attrs)
-        helper = self._makeOne('loo.foo')
-        response = helper._make_response('abc', request)
-        self.assertEqual(response.content_type, 'text/nonsense')
-        self.assertEqual(response.body, b'abc')
-
-    def test__make_response_with_headerlist(self):
-        from pyramid.response import Response
-        request = testing.DummyRequest()
-        request.response = Response()
-        attrs = {'_response_headerlist':[('a', '1'), ('b', '2')]}
-        request.__dict__.update(attrs)
-        helper = self._makeOne('loo.foo')
-        response = helper._make_response('abc', request)
-        self.assertEqual(response.headerlist,
-                         [('Content-Type', 'text/html; charset=UTF-8'),
-                          ('Content-Length', '3'),
-                          ('a', '1'),
-                          ('b', '2')])
-        self.assertEqual(response.body, b'abc')
-
-    def test__make_response_with_status(self):
-        from pyramid.response import Response
-        request = testing.DummyRequest()
-        request.response = Response()
-        attrs = {'_response_status':'406 You Lose'}
-        request.__dict__.update(attrs)
-        helper = self._makeOne('loo.foo')
-        response = helper._make_response('abc', request)
-        self.assertEqual(response.status, '406 You Lose')
-        self.assertEqual(response.body, b'abc')
-
-    def test__make_response_with_charset(self):
-        from pyramid.response import Response
-        request = testing.DummyRequest()
-        request.response = Response()
-        attrs = {'_response_charset':'UTF-16'}
-        request.__dict__.update(attrs)
-        helper = self._makeOne('loo.foo')
-        response = helper._make_response('abc', request)
-        self.assertEqual(response.charset, 'UTF-16')
-
-    def test__make_response_with_cache_for(self):
-        from pyramid.response import Response
-        request = testing.DummyRequest()
-        request.response = Response()
-        attrs = {'_response_cache_for':100}
-        request.__dict__.update(attrs)
-        helper = self._makeOne('loo.foo')
-        response = helper._make_response('abc', request)
-        self.assertEqual(response.cache_control.max_age, 100)
 
     def test_with_alternate_response_factory(self):
         from pyramid.interfaces import IResponseFactory
