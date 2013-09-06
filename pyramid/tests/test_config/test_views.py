@@ -1029,6 +1029,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         config = self._makeOne(autocommit=True)
         renderer = self._registerRenderer(config)
         fixture = 'pyramid.tests.test_config:files/minimal.txt'
+        config.introspection = False
         config.add_view(view=view, renderer=fixture)
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
@@ -1069,6 +1070,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         config = self._makeOne(autocommit=True)
         renderer = self._registerRenderer(config)
         fixture = 'pyramid.tests.test_config:files/minimal.txt'
+        config.introspection = False
         config.add_view(view=None, renderer=fixture)
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
@@ -1687,8 +1689,8 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         wrapped = config.registry.adapters.lookup(
             (IViewClassifier, request_type, Interface), IView, name='')
         from pyramid.request import Request
-        request = Request.blank('/static/minimal.pt')
-        request.subpath = ('minimal.pt', )
+        request = Request.blank('/static/minimal.txt')
+        request.subpath = ('minimal.txt', )
         result = wrapped(None, request)
         self.assertEqual(result.status, '200 OK')
         self.assertTrue(result.body.startswith(b'<div'))
