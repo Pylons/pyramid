@@ -69,9 +69,6 @@ class ConfiguratorTests(unittest.TestCase):
         config.commit()
         self.assertTrue(config.registry.getUtility(IRendererFactory, 'json'))
         self.assertTrue(config.registry.getUtility(IRendererFactory, 'string'))
-        if not PYPY:
-            self.assertTrue(config.registry.getUtility(IRendererFactory, '.pt'))
-            self.assertTrue(config.registry.getUtility(IRendererFactory,'.txt'))
 
     def test_begin(self):
         from pyramid.config import Configurator
@@ -1324,11 +1321,11 @@ class TestConfiguratorDeprecatedFeatures(unittest.TestCase):
         self._registerRenderer(config)
         view = lambda *arg: 'OK'
         config.add_route('name', 'path', view=view,
-                         view_renderer='files/minimal.txt')
+                         view_renderer='json')
         request_type = self._getRouteRequestIface(config, 'name')
         wrapper = self._getViewCallable(config, None, request_type)
         self._assertRoute(config, 'name', 'path')
-        self.assertEqual(wrapper(None, None).body, b'Hello!')
+        self.assertEqual(wrapper(None, None).body, b'"OK"')
 
     def test_add_route_with_view_attr(self):
         from pyramid.renderers import null_renderer
@@ -1352,11 +1349,11 @@ class TestConfiguratorDeprecatedFeatures(unittest.TestCase):
         self._registerRenderer(config)
         view = lambda *arg: 'OK'
         config.add_route('name', 'path', view=view,
-                         renderer='files/minimal.txt')
+                         renderer='json')
         request_type = self._getRouteRequestIface(config, 'name')
         wrapper = self._getViewCallable(config, None, request_type)
         self._assertRoute(config, 'name', 'path')
-        self.assertEqual(wrapper(None, None).body, b'Hello!')
+        self.assertEqual(wrapper(None, None).body, b'"OK"')
 
     def test_add_route_with_view_permission(self):
         from pyramid.interfaces import IAuthenticationPolicy
