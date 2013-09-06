@@ -306,9 +306,9 @@ by the view (row 45).  The view will use the ``body`` and
    none of our tutorial views return in their dictionary.
    ``request`` is one of several
    names that are available "by default" in a template when a template
-   renderer is used.  See :ref:`chameleon_template_renderers` for
+   renderer is used.  See :ref:`renderer_system_values` for
    information about other names that are available by default
-   when a Chameleon template is used as a renderer.
+   when a template is used as a renderer.
 
 Static Assets
 -------------
