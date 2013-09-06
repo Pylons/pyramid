@@ -34,7 +34,10 @@ point happens to be the ``main`` function within the file named
    factory` and the settings keywords parsed by :term:`PasteDeploy`.  The root
    factory is named ``root_factory``.
 
-#. *Line 15*.  Register a "static view" which answers requests whose URL path
+#. *Line 15*.  Include support for the :term:`Chameleon` template rendering
+   bindings, allowing us to use the ``.pt`` templates.
+
+#. *Line 16*.  Register a "static view" which answers requests whose URL path
    start with ``/static`` using the
    :meth:`pyramid.config.Configurator.add_static_view` method.  This
    statement registers a view that will serve up static assets, such as CSS
@@ -47,7 +50,7 @@ point happens to be the ``main`` function within the file named
    package.  Alternatively the scaffold could have used an *absolute* asset
    specification as the path (``tutorial:static``).
 
-#. *Line 16*.  Perform a :term:`scan`.  A scan will find :term:`configuration
+#. *Line 17*.  Perform a :term:`scan`.  A scan will find :term:`configuration
    decoration`, such as view configuration decorators (e.g., ``@view_config``)
    in the source code of the ``tutorial`` package and will take actions based
    on these decorators.  We don't pass any arguments to
@@ -56,7 +59,7 @@ point happens to be the ``main`` function within the file named
    The scaffold could have equivalently said ``config.scan('tutorial')``, but
    it chose to omit the package name argument.
 
-#. *Line 17*.  Use the
+#. *Line 18*.  Use the
    :meth:`pyramid.config.Configurator.make_wsgi_app` method
    to return a :term:`WSGI` application.
 

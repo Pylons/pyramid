@@ -23,6 +23,7 @@ def main(global_config, **settings):
     authz_policy = ACLAuthorizationPolicy()
     config = Configurator(settings=settings,
                           root_factory='tutorial.models.RootFactory')
+    config.include('pyramid_chameleon')
     config.set_authentication_policy(authn_policy)
     config.set_authorization_policy(authz_policy)
     config.add_static_view('static', 'static', cache_max_age=3600)

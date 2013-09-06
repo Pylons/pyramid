@@ -82,11 +82,18 @@ dictionary of settings parsed from the ``.ini`` file, which contains
 deployment-related values such as ``pyramid.reload_templates``,
 ``db_string``, etc.
 
+Next, include :term:`Chameleon` templating bindings so that we can use
+renderers with the ``.pt`` extension within our project.
+
+   .. literalinclude:: src/basiclayout/tutorial/__init__.py
+      :lines: 17
+      :language: py
+
 ``main`` now calls :meth:`pyramid.config.Configurator.add_static_view` with
 two arguments: ``static`` (the name), and ``static`` (the path):
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
-      :lines: 17
+      :lines: 18
       :language: py
 
 This registers a static resource view which will match any URL that starts
@@ -104,7 +111,7 @@ via the :meth:`pyramid.config.Configurator.add_route` method that will be
 used when the URL is ``/``:
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
-      :lines: 18
+      :lines: 19
       :language: py
 
 Since this route has a ``pattern`` equalling ``/`` it is the route that will
@@ -118,7 +125,7 @@ view configuration will be registered, which will allow one of our
 application URLs to be mapped to some code.
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
-      :lines: 19
+      :lines: 20
       :language: py
 
 Finally, ``main`` is finished configuring things, so it uses the
@@ -126,7 +133,7 @@ Finally, ``main`` is finished configuring things, so it uses the
 :term:`WSGI` application:
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
-      :lines: 20
+      :lines: 21
       :language: py
 
 View Declarations via ``views.py``
