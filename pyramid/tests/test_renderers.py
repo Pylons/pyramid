@@ -482,6 +482,16 @@ class Test_render(unittest.TestCase):
         self.assertEqual(result, '{"a": 1}')
         self.assertEqual(request.response, response)
 
+    def test_it_deletes_response(self):
+        request = testing.DummyRequest()
+        try:
+            delattr(request, 'response')
+        except AttributeError:
+            pass
+        result = self._callFUT('json', dict(a=1), request=request)
+        self.assertEqual(result, '{"a": 1}')
+        self.assertFalse(hasattr(request, 'request'))
+
 class Test_render_to_response(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp()
