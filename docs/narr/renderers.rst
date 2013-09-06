@@ -556,40 +556,6 @@ For more information on attributes of the request, see the API documentation
 in :ref:`request_module`.  For more information on the API of
 ``request.response``, see :attr:`pyramid.request.Request.response`.
 
-.. _response_prefixed_attrs:
-
-Deprecated Mechanism to Vary Attributes of Rendered Responses
--------------------------------------------------------------
-
-In previous releases of Pyramid (1.0 and before), the ``request.response``
-attribute did not exist.  Instead, Pyramid required users to set special
-``response_`` -prefixed attributes of the request to influence response
-behavior.  As of Pyramid 1.1, those request attributes are deprecated and
-their use will cause a deprecation warning to be issued when used.  Until
-their existence is removed completely, we document them below, for benefit of
-people with older code bases.
-
-``response_content_type``
-  Defines the content-type of the resulting response,
-  e.g. ``text/xml``.
-
-``response_headerlist``
-  A sequence of tuples describing header values that should be set in the
-  response, e.g. ``[('Set-Cookie', 'abc=123'), ('X-My-Header', 'foo')]``.
-
-``response_status``
-  A WSGI-style status code (e.g. ``200 OK``) describing the status of the
-  response.
-
-``response_charset``
-  The character set (e.g. ``UTF-8``) of the response.
-
-``response_cache_for``
-  A value in seconds which will influence ``Cache-Control`` and ``Expires``
-  headers in the returned response.  The same can also be achieved by
-  returning various values in the ``response_headerlist``, this is purely a
-  convenience.
-
 .. _adding_and_overriding_renderers:
 
 Adding and Changing Renderers
