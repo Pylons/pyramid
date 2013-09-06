@@ -456,16 +456,33 @@ application's configuration section, e.g.:
 
 .. index::
    single: template system bindings
+   single: Chameleon
    single: Jinja2
+   single: Mako
 
 .. _available_template_system_bindings:
 
 Available Add-On Template System Bindings
 -----------------------------------------
 
-Jinja2 template bindings are available for :app:`Pyramid` in the
-``pyramid_jinja2`` package. You can get the latest release of
-this package from the 
-`Python package index <http://pypi.python.org/pypi/pyramid_jinja2>`_
-(pypi).
+The Pylons Project maintains several packages providing bindings to different
+templating languages including the following:
 
++------------------------------+------------------------------+
+| Template Language            | Pyramid Bindings             |
++==============================+==============================+
+| Chameleon_                   | pyramid_chameleon_           |
++------------------------------+------------------------------+
+| Jinja2_                      | pyramid_jinja2_              |
++------------------------------+------------------------------+
+| Mako_                        | pyramid_mako_                |
++------------------------------+------------------------------+
+
+.. _Chameleon: http://chameleon.readthedocs.org/en/latest/
+.. _pyramid_chameleon: https://pypi.python.org/pypi/pyramid_chameleon
+
+.. _Jinja2: http://jinja.pocoo.org/docs/
+.. _pyramid_jinja2: https://pypi.python.org/pypi/pyramid_jinja2
+
+.. _Mako: http://www.makotemplates.org/
+.. _pyramid_mako: https://pypi.python.org/pypi/pyramid_mako

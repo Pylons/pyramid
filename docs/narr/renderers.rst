@@ -128,6 +128,11 @@ Built-In Renderers
 Several built-in renderers exist in :app:`Pyramid`.  These renderers can be
 used in the ``renderer`` attribute of view configurations.
 
+.. note::
+
+   Bindings for officially supported templating languages can be found
+   at :ref:`available_template_system_bindings`.
+
 .. index::
    pair: renderer; string
 
@@ -363,39 +368,6 @@ in for you and used.
 The same custom-object serialization scheme defined used for a "normal" JSON
 renderer in :ref:`json_serializing_custom_objects` can be used when passing
 values to a JSONP renderer too.
-
-.. index::
-   single: template system bindings
-   single: Chameleon
-   single: Jinja2
-   single: Mako
-
-.. _available_template_system_bindings:
-
-Available Add-On Template System Bindings
------------------------------------------
-
-The Pylons Project maintains several packages providing bindings to different
-templating languages including the following:
-
-+------------------------------+------------------------------+
-| Template Language            | Pyramid Bindings             |
-+==============================+==============================+
-| Chameleon_                   | pyramid_chameleon_           |
-+------------------------------+------------------------------+
-| Jinja2_                      | pyramid_jinja2_              |
-+------------------------------+------------------------------+
-| Mako_                        | pyramid_mako_                |
-+------------------------------+------------------------------+
-
-.. _Chameleon: http://chameleon.readthedocs.org/en/latest/
-.. _pyramid_chameleon: https://pypi.python.org/pypi/pyramid_chameleon
-
-.. _Jinja2: http://jinja.pocoo.org/docs/
-.. _pyramid_jinja2: https://pypi.python.org/pypi/pyramid_jinja2
-
-.. _Mako: http://www.makotemplates.org/
-.. _pyramid_mako: https://pypi.python.org/pypi/pyramid_mako
 
 .. index::
    single: response headers (from a renderer)
