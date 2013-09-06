@@ -3852,7 +3852,6 @@ class DummyResponse(object):
 class DummyRequest:
     subpath = ()
     matchdict = None
-    response = DummyResponse()
 
     def __init__(self, environ=None):
         if environ is None:
@@ -3860,6 +3859,7 @@ class DummyRequest:
         self.environ = environ
         self.params = {}
         self.cookies = {}
+        self.response = DummyResponse()
 
 class DummyContext:
     pass
