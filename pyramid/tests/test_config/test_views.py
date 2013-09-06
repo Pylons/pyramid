@@ -1853,14 +1853,11 @@ class TestViewsConfigurationMixin(unittest.TestCase):
             view,
             renderer='json')
         config.begin()
-        try: # chameleon depends on being able to find a threadlocal registry
-            request = self._makeRequest(config)
-            view = self._getViewCallable(config,
-                                         ctx_iface=implementedBy(HTTPNotFound),
-                                         request_iface=IRequest)
-            result = view(None, request)
-        finally:
-            config.end()
+        request = self._makeRequest(config)
+        view = self._getViewCallable(config,
+                                     ctx_iface=implementedBy(HTTPNotFound),
+                                     request_iface=IRequest)
+        result = view(None, request)
         self.assertEqual("{}", result.body)
 
     def test_add_forbidden_view_with_renderer(self):
@@ -1873,15 +1870,11 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         config.add_forbidden_view(
             view,
             renderer='json')
-        config.begin()
-        try: # chameleon requires a threadlocal registry
-            request = self._makeRequest(config)
-            view = self._getViewCallable(config,
-                                         ctx_iface=implementedBy(HTTPForbidden),
-                                         request_iface=IRequest)
-            result = view(None, request)
-        finally:
-            config.end()
+        request = self._makeRequest(config)
+        view = self._getViewCallable(config,
+                                     ctx_iface=implementedBy(HTTPForbidden),
+                                     request_iface=IRequest)
+        result = view(None, request)
         self.assertEqual("{}", result.body)
 
     def test_set_view_mapper(self):
