@@ -318,7 +318,9 @@ template renderer:
    def my_view(request):
        return {'foo':1, 'bar':2}
 
-.. note:: You do not need to supply the ``request`` value as a key
+.. note::
+
+   You do not need to supply the ``request`` value as a key
    in the dictionary result returned from a renderer-configured view
    callable. :app:`Pyramid` automatically supplies this value for
    you so that the "most correct" system values are provided to
@@ -424,9 +426,11 @@ appear immediately without needing to restart the application process.
 environment so that a change to a template will be automatically
 detected, and the template will be reloaded on the next rendering.
 
-.. warning:: Auto-template-reload behavior is not recommended for
-             production sites as it slows rendering slightly; it's
-             usually only desirable during development.
+.. warning::
+
+   Auto-template-reload behavior is not recommended for
+   production sites as it slows rendering slightly; it's
+   usually only desirable during development.
 
 In order to turn on automatic reloading of templates, you can use an
 environment variable, or a configuration file setting.
@@ -437,18 +441,18 @@ variable set to ``1``, For example:
 
 .. code-block:: text
 
-  $ PYRAMID_RELOAD_TEMPLATES=1 $VENV/bin/pserve myproject.ini
+   $ PYRAMID_RELOAD_TEMPLATES=1 $VENV/bin/pserve myproject.ini
 
 To use a setting in the application ``.ini`` file for the same
 purpose, set the ``pyramid.reload_templates`` key to ``true`` within the
 application's configuration section, e.g.:
 
 .. code-block:: ini
-  :linenos:
+   :linenos:
 
-  [app:main]
-  use = egg:MyProject
-  pyramid.reload_templates = true
+   [app:main]
+   use = egg:MyProject
+   pyramid.reload_templates = true
 
 .. index::
    single: template system bindings
