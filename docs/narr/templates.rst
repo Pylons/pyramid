@@ -56,19 +56,8 @@ In this case, this is the directory containing the file that
 defines the ``sample_view`` function.  Although a renderer path is
 usually just a simple relative pathname, a path named as a renderer
 can be absolute, starting with a slash on UNIX or a drive letter
-prefix on Windows.
-
-.. warning::
-
-   Only :term:`Chameleon` templates support defining a renderer for a
-   template relative to the location of the module where the view callable is
-   defined.  Mako templates, and other templating system bindings work
-   differently.  In particular, Mako templates use a "lookup path" as defined
-   by the ``mako.directories`` configuration file instead of treating
-   relative paths as relative to the current view module.  See
-   :ref:`mako_templates`.
-
-The path can alternately be a :term:`asset specification` in the form
+prefix on Windows. The path can alternately be a
+:term:`asset specification` in the form
 ``some.dotted.package_name:relative/path``. This makes it possible to
 address template assets which live in another package.  For example:
 
@@ -86,16 +75,9 @@ An asset specification points at a file within a Python *package*.
 In this case, it points at a file named ``foo.pt`` within the
 ``templates`` directory of the ``mypackage`` package.  Using a
 asset specification instead of a relative template name is usually
-a good idea, because calls to ``render_to_response`` using asset
-specifications will continue to work properly if you move the code
-containing them around.
-
-.. note::
-
-   Mako templating system bindings also respect absolute asset
-   specifications as an argument to any of the ``render*`` commands.  If a
-   template name defines a ``:`` (colon) character and is not an absolute
-   path, it is treated as an absolute asset specification.
+a good idea, because calls to :func:`~pyramid.renderers.render_to_response`
+using asset specifications will continue to work properly if you move the
+code containing them around.
 
 In the examples above we pass in a keyword argument named ``request``
 representing the current :app:`Pyramid` request. Passing a request
@@ -143,8 +125,8 @@ import its API functions into your views module, use those APIs to generate a
 string, then return that string as the body of a :app:`Pyramid`
 :term:`Response` object.
 
-For example, here's an example of using "raw" `Mako
-<http://www.makotemplates.org/>`_ from within a :app:`Pyramid` :term:`view`:
+For example, here's an example of using "raw" Mako_ from within a
+:app:`Pyramid` :term:`view`:
 
 .. code-block:: python
    :linenos:
@@ -159,10 +141,10 @@ For example, here's an example of using "raw" `Mako
        return response
 
 You probably wouldn't use this particular snippet in a project, because it's
-easier to use the Mako renderer bindings which already exist in
-:app:`Pyramid`. But if your favorite templating system is not supported as a
-renderer extension for :app:`Pyramid`, you can create your own simple
-combination as shown above.
+easier to use the supported
+:ref:`Mako bindings <available_template_system_bindings>`. But if your
+favorite templating system is not supported as a renderer extension for
+:app:`Pyramid`, you can create your own simple combination as shown above.
 
 .. note::
 
@@ -277,8 +259,8 @@ You can define more values which will be passed to every template executed as
 a result of rendering by defining :term:`renderer globals`.
 
 What any particular renderer does with these system values is up to the
-renderer itself, but most template renderers, including Chameleon and Mako
-renderers, make these names available as top-level template variables.
+renderer itself, but most template renderers make these names available as
+top-level template variables.
 
 .. index::
    pair: renderer; templates
@@ -348,11 +330,7 @@ it possible to address template assets which live in another package.
 
 Not just any template from any arbitrary templating system may be used as a
 renderer.  Bindings must exist specifically for :app:`Pyramid` to use a
-templating language template as a renderer.  Currently, :app:`Pyramid` has
-built-in support for two Chameleon templating languages: ZPT and text, and
-the Mako templating system.  See :ref:`built_in_renderers` for a discussion
-of their details.  :app:`Pyramid` also supports the use of :term:`Jinja2`
-templates as renderers.  See :ref:`available_template_system_bindings`.
+templating language template as a renderer.
 
 .. sidebar:: Why Use A Renderer via View Configuration
 
