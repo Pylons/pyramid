@@ -85,7 +85,23 @@ def render(renderer_name, value, request=None, package=None):
         package = caller_package()
     helper = RendererHelper(name=renderer_name, package=package,
                             registry=registry)
-    return helper.render(value, None, request=request)
+
+    saved_response = None
+    # save the current response, preventing the renderer from affecting it
+    attrs = request.__dict__ if request is not None else {}
+    if 'response' in attrs:
+        saved_response = attrs['response']
+        del attrs['response']
+
+    result = helper.render(value, None, request=request)
+
+    # restore the original response, overwriting any changes
+    if saved_response is not None:
+        attrs['response'] = saved_response
+    elif 'response' in attrs:
+        del attrs['response']
+
+    return result
 
 def render_to_response(renderer_name, value, request=None, package=None):
     """ Using the renderer ``renderer_name`` (a template

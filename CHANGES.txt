@@ -8,6 +8,14 @@ Backwards Incompatibilities
   have been deprecated since Pyramid 1.1, and as per the deprecation policy,
   have now been removed.
 
+- ``request.response`` will no longer be mutated when using the 
+  ``pyramid.renderers.render()`` API.  Almost all renderers mutate the 
+   ``request.response`` response object (for 
+   example, the JSON renderer sets ``request.response.content_type`` to
+  ``application/json``), but this is only necessary when the renderer
+  is called by the view execution machinery; it was a bug when it was
+  done as a side effect of calling ``pyramid.renderers.render()``.
+
 1.5a1 (2013-08-30)
 ==================
 
