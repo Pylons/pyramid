@@ -18,7 +18,7 @@ snippets of code to illustrate major concepts.
 Python Setup
 ============
 
-First things first: we need our Python environment in ship-shape.
+First thing's first: we need our Python environment in ship-shape.
 Pyramid encourages standard Python development practices (virtual
 environments, packaging tools, logging, etc.) so let's get our working
 area in place. For Python 3.3:
