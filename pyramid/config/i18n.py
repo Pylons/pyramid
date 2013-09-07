@@ -118,8 +118,14 @@ class I18NConfiguratorMixin(object):
 
         self.action(None, register, introspectables=introspectables)
 
-def translator(msg):
-    request = get_current_request()
+def translator(msg, context = None):
+    request = None
+    if context:
+        try:
+            request = context['request']
+        except Exception:
+            pass
+    if not request:
+        request = get_current_request()
     localizer = get_localizer(request)
     return localizer.translate(msg)
-
