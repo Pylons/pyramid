@@ -1845,9 +1845,9 @@ class TestViewsConfigurationMixin(unittest.TestCase):
     # Since Python 3 has to be all cool and fancy and different...
     def _assertBody(self, response, value):
         from pyramid.compat import text_type
-        if isinstance(value, text_type):
+        if isinstance(value, text_type): # pragma: nocover
             self.assertEqual(response.text, value)
-        else:
+        else: # pragma: nocover
             self.assertEqual(response.body, value)
 
     def test_add_notfound_view_with_renderer(self):
