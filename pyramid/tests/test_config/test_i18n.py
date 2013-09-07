@@ -42,12 +42,9 @@ class TestI18NConfiguratorMixin(unittest.TestCase):
 
     def test_add_translation_dirs_no_specs(self):
         from pyramid.interfaces import ITranslationDirectories
-        from pyramid.interfaces import IChameleonTranslate
         config = self._makeOne()
         config.add_translation_dirs()
         self.assertEqual(config.registry.queryUtility(ITranslationDirectories),
-                         None)
-        self.assertEqual(config.registry.queryUtility(IChameleonTranslate),
                          None)
 
     def test_add_translation_dirs_asset_spec(self):
@@ -82,21 +79,6 @@ class TestI18NConfiguratorMixin(unittest.TestCase):
         config.add_translation_dirs('pyramid.tests.pkgs.localeapp:locale3')
         self.assertEqual(config.registry.getUtility(ITranslationDirectories),
                          [locale3, locale, locale2])
-
-    def test_add_translation_dirs_registers_chameleon_translate(self):
-        from pyramid.interfaces import IChameleonTranslate
-        from pyramid.threadlocal import manager
-        from pyramid.request import Request
-        config = self._makeOne(autocommit=True)
-        request = Request.blank('/')
-        request.registry = config.registry
-        manager.push({'request':request, 'registry':config.registry})
-        try:
-            config.add_translation_dirs('pyramid.tests.pkgs.localeapp:locale')
-            translate = config.registry.getUtility(IChameleonTranslate)
-            self.assertEqual(translate('Approve'), 'Approve')
-        finally:
-            manager.pop()
 
     def test_add_translation_dirs_abspath(self):
         from pyramid.interfaces import ITranslationDirectories
