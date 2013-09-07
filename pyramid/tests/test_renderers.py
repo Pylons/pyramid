@@ -442,19 +442,21 @@ class Test_render(unittest.TestCase):
         from pyramid.renderers import render
         return render(renderer_name, value, request=request, package=package)
 
-    def test_it_no_request(self):
+    def _registerRenderer(self):
         renderer = self.config.testing_add_renderer(
             'pyramid.tests:abc/def.pt')
         renderer.string_response = 'abc'
+        return renderer
+
+    def test_it_no_request(self):
+        renderer = self._registerRenderer()
         result = self._callFUT('abc/def.pt', dict(a=1))
         self.assertEqual(result, 'abc')
         renderer.assert_(a=1)
         renderer.assert_(request=None)
 
     def test_it_with_request(self):
-        renderer = self.config.testing_add_renderer(
-            'pyramid.tests:abc/def.pt')
-        renderer.string_response = 'abc'
+        renderer = self._registerRenderer()
         request = testing.DummyRequest()
         result = self._callFUT('abc/def.pt',
                                dict(a=1), request=request)
@@ -464,9 +466,7 @@ class Test_render(unittest.TestCase):
 
     def test_it_with_package(self):
         import pyramid.tests
-        renderer = self.config.testing_add_renderer(
-            'pyramid.tests:abc/def.pt')
-        renderer.string_response = 'abc'
+        renderer = self._registerRenderer()
         request = testing.DummyRequest()
         result = self._callFUT('abc/def.pt', dict(a=1), request=request,
                                package=pyramid.tests)
@@ -474,23 +474,29 @@ class Test_render(unittest.TestCase):
         renderer.assert_(a=1)
         renderer.assert_(request=request)
 
-    def test_it_preserves_response(self):
+    def test_response_preserved(self):
         request = testing.DummyRequest()
         response = object() # should error if mutated
         request.response = response
+        # use a json renderer, which will mutate the response
         result = self._callFUT('json', dict(a=1), request=request)
         self.assertEqual(result, '{"a": 1}')
         self.assertEqual(request.response, response)
 
-    def test_it_deletes_response(self):
-        request = testing.DummyRequest()
-        try:
-            delattr(request, 'response')
-        except AttributeError:
-            pass
+    def test_no_response_to_preserve(self):
+        from pyramid.decorator import reify
+        class DummyRequestWithClassResponse(object):
+            _response = DummyResponse()
+            _response.content_type = None
+            _response.default_content_type = None
+            @reify
+            def response(self):
+                return self._response
+        request = DummyRequestWithClassResponse()
+        # use a json renderer, which will mutate the response
         result = self._callFUT('json', dict(a=1), request=request)
         self.assertEqual(result, '{"a": 1}')
-        self.assertFalse(hasattr(request, 'request'))
+        self.assertFalse('response' in request.__dict__)
 
 class Test_render_to_response(unittest.TestCase):
     def setUp(self):
