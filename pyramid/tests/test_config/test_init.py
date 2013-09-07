@@ -1220,19 +1220,6 @@ class TestConfiguratorDeprecatedFeatures(unittest.TestCase):
             (classifier, request_iface, ctx_iface), IView, name=name,
             default=None)
 
-    def _registerRenderer(self, config, name='.txt'):
-        from pyramid.interfaces import IRendererFactory
-        from pyramid.interfaces import ITemplateRenderer
-        from zope.interface import implementer
-        @implementer(ITemplateRenderer)
-        class Renderer:
-            def __init__(self, info):
-                self.__class__.info = info
-            def __call__(self, *arg):
-                return 'Hello!'
-        config.registry.registerUtility(Renderer, IRendererFactory, name=name)
-        return Renderer
-
     def _assertRoute(self, config, name, path, num_predicates=0):
         from pyramid.interfaces import IRoutesMapper
         mapper = config.registry.getUtility(IRoutesMapper)
@@ -1318,7 +1305,6 @@ class TestConfiguratorDeprecatedFeatures(unittest.TestCase):
 
     def test_add_route_with_view_renderer(self):
         config = self._makeOne(autocommit=True)
-        self._registerRenderer(config)
         view = lambda *arg: 'OK'
         config.add_route('name', 'path', view=view,
                          view_renderer='json')
@@ -1330,7 +1316,6 @@ class TestConfiguratorDeprecatedFeatures(unittest.TestCase):
     def test_add_route_with_view_attr(self):
         from pyramid.renderers import null_renderer
         config = self._makeOne(autocommit=True)
-        self._registerRenderer(config)
         class View(object):
             def __init__(self, context, request):
                 pass
@@ -1346,7 +1331,6 @@ class TestConfiguratorDeprecatedFeatures(unittest.TestCase):
 
     def test_add_route_with_view_renderer_alias(self):
         config = self._makeOne(autocommit=True)
-        self._registerRenderer(config)
         view = lambda *arg: 'OK'
         config.add_route('name', 'path', view=view,
                          renderer='json')
