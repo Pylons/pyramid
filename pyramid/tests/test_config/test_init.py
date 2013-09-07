@@ -69,11 +69,6 @@ class ConfiguratorTests(unittest.TestCase):
         config.commit()
         self.assertTrue(config.registry.getUtility(IRendererFactory, 'json'))
         self.assertTrue(config.registry.getUtility(IRendererFactory, 'string'))
-        if not PYPY:
-            self.assertTrue(config.registry.getUtility(IRendererFactory, '.pt'))
-            self.assertTrue(config.registry.getUtility(IRendererFactory,'.txt'))
-        self.assertTrue(config.registry.getUtility(IRendererFactory, '.mak'))
-        self.assertTrue(config.registry.getUtility(IRendererFactory, '.mako'))
 
     def test_begin(self):
         from pyramid.config import Configurator
@@ -1225,19 +1220,6 @@ class TestConfiguratorDeprecatedFeatures(unittest.TestCase):
             (classifier, request_iface, ctx_iface), IView, name=name,
             default=None)
 
-    def _registerRenderer(self, config, name='.txt'):
-        from pyramid.interfaces import IRendererFactory
-        from pyramid.interfaces import ITemplateRenderer
-        from zope.interface import implementer
-        @implementer(ITemplateRenderer)
-        class Renderer:
-            def __init__(self, info):
-                self.__class__.info = info
-            def __call__(self, *arg):
-                return 'Hello!'
-        config.registry.registerUtility(Renderer, IRendererFactory, name=name)
-        return Renderer
-
     def _assertRoute(self, config, name, path, num_predicates=0):
         from pyramid.interfaces import IRoutesMapper
         mapper = config.registry.getUtility(IRoutesMapper)
@@ -1323,19 +1305,17 @@ class TestConfiguratorDeprecatedFeatures(unittest.TestCase):
 
     def test_add_route_with_view_renderer(self):
         config = self._makeOne(autocommit=True)
-        self._registerRenderer(config)
         view = lambda *arg: 'OK'
         config.add_route('name', 'path', view=view,
-                         view_renderer='files/minimal.txt')
+                         view_renderer='json')
         request_type = self._getRouteRequestIface(config, 'name')
         wrapper = self._getViewCallable(config, None, request_type)
         self._assertRoute(config, 'name', 'path')
-        self.assertEqual(wrapper(None, None).body, b'Hello!')
+        self.assertEqual(wrapper(None, None).body, b'"OK"')
 
     def test_add_route_with_view_attr(self):
         from pyramid.renderers import null_renderer
         config = self._makeOne(autocommit=True)
-        self._registerRenderer(config)
         class View(object):
             def __init__(self, context, request):
                 pass
@@ -1351,14 +1331,13 @@ class TestConfiguratorDeprecatedFeatures(unittest.TestCase):
 
     def test_add_route_with_view_renderer_alias(self):
         config = self._makeOne(autocommit=True)
-        self._registerRenderer(config)
         view = lambda *arg: 'OK'
         config.add_route('name', 'path', view=view,
-                         renderer='files/minimal.txt')
+                         renderer='json')
         request_type = self._getRouteRequestIface(config, 'name')
         wrapper = self._getViewCallable(config, None, request_type)
         self._assertRoute(config, 'name', 'path')
-        self.assertEqual(wrapper(None, None).body, b'Hello!')
+        self.assertEqual(wrapper(None, None).body, b'"OK"')
 
     def test_add_route_with_view_permission(self):
         from pyramid.interfaces import IAuthenticationPolicy
