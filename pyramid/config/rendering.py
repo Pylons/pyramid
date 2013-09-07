@@ -14,13 +14,9 @@ from pyramid import (
     chameleon_zpt,
     )
 
-from pyramid.mako_templating import renderer_factory as mako_renderer_factory
-
 DEFAULT_RENDERERS = (
     ('.txt', chameleon_text.renderer_factory),
     ('.pt', chameleon_zpt.renderer_factory),
-    ('.mak', mako_renderer_factory),
-    ('.mako', mako_renderer_factory),
     ('json', renderers.json_renderer_factory),
     ('string', renderers.string_renderer_factory),
     )
