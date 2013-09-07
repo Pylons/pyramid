@@ -594,17 +594,3 @@ class DummyResponse:
     app_iter = ()
     body = ''
 
-class DummyFactory:
-    def __init__(self, renderer):
-        self.renderer = renderer
-
-    def __call__(self, path, lookup, **kw):
-        self.path = path
-        self.kw = kw
-        return self.renderer
-
-
-class DummyRendererInfo(object):
-    def __init__(self, kw):
-        self.__dict__.update(kw)
-
