@@ -1,8 +1,5 @@
 import json
 import os
-import re
-import pkg_resources
-import threading
 
 from zope.interface import (
     implementer,
@@ -15,11 +12,8 @@ from pyramid.interfaces import (
     IRendererGlobalsFactory,
     IRendererFactory,
     IResponseFactory,
-    ITemplateRenderer,
     IRendererInfo,
     )
-
-from pyramid.asset import asset_spec_from_abspath
 
 from pyramid.compat import (
     string_types,
@@ -30,10 +24,7 @@ from pyramid.decorator import reify
 
 from pyramid.events import BeforeRender
 
-from pyramid.path import (
-    caller_package,
-    package_path,
-    )
+from pyramid.path import caller_package
 
 from pyramid.response import Response
 from pyramid.threadlocal import get_current_registry
