@@ -9,7 +9,6 @@ from pyramid.interfaces import (
 from pyramid.exceptions import ConfigurationError
 from pyramid.i18n import get_localizer
 from pyramid.path import package_path
-from pyramid.threadlocal import get_current_request
 from pyramid.util import action_method
 
 class I18NConfiguratorMixin(object):
@@ -106,9 +105,4 @@ class I18NConfiguratorMixin(object):
                 tdirs.insert(0, directory)
 
         self.action(None, register, introspectables=introspectables)
-
-def translator(msg):
-    request = get_current_request()
-    localizer = get_localizer(request)
-    return localizer.translate(msg)
 
