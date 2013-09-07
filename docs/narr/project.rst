@@ -1001,6 +1001,8 @@ prompt with a similar configuration as would be loaded if you were running
 your Pyramid application via ``pserve``.  This can be a useful debugging tool.
 See :ref:`interactive_shell` for more details.
 
+.. _what_is_this_pserve_thing:
+
 What Is This ``pserve`` Thing
 -----------------------------
 
