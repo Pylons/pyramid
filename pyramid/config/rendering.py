@@ -7,10 +7,7 @@ from pyramid.interfaces import (
     )
 
 from pyramid.util import action_method
-
-from pyramid import (
-    renderers,
-    )
+from pyramid import renderers
 
 DEFAULT_RENDERERS = (
     ('json', renderers.json_renderer_factory),
