@@ -1,6 +1,12 @@
 Next Release
 ============
 
+Bug Fixes
+---------
+
+- Fix an exception in ``package_name()`` when resolving the package
+  name for namespace packages.
+
 Backwards Incompatibilities
 ---------------------------
 
