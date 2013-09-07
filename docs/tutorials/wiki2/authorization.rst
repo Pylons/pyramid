@@ -83,7 +83,7 @@ statement at the head:
 Add the following class definition:
 
 .. literalinclude:: src/authorization/tutorial/models.py
-   :lines: 36-40
+   :lines: 33-37
    :linenos:
    :language: python
 
@@ -339,7 +339,7 @@ when we're done:
 
 .. literalinclude:: src/authorization/tutorial/models.py
    :linenos:
-   :emphasize-lines: 1-4,36-40
+   :emphasize-lines: 1-4,33-37
    :language: python
 
 (Only the highlighted lines need to be added.)
