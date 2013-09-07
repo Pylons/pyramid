@@ -229,6 +229,12 @@ Our example model does not require an ``__init__`` method because SQLAlchemy
 supplies for us a default constructor if one is not already present, 
 which accepts keyword arguments of the same name as that of the mapped attributes.
 
+.. note:: Example usage of MyModel:
+
+   .. code-block:: python
+
+       johnny = MyModel(name="John Doe", value=10)
+
 The ``MyModel`` class has a ``__tablename__`` attribute.  This informs
 SQLAlchemy which table to use to store the data representing instances of this
 class.
