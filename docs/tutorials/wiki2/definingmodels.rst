@@ -24,7 +24,7 @@ following:
 .. literalinclude:: src/models/tutorial/models.py
    :linenos:
    :language: py
-   :emphasize-lines: 20-22,25,27,29
+   :emphasize-lines: 20-22,25
 
 (The highlighted lines are the ones that need to be changed.)
 
