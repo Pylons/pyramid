@@ -39,8 +39,6 @@ except IOError:
 
 install_requires=[
     'setuptools',
-    'Chameleon >= 1.2.3',
-    'Mako >= 0.3.6', # strict_undefined
     'WebOb >= 1.2b3', # request.path_info is unicode
     'repoze.lru >= 0.4', # py3 compat
     'zope.interface >= 3.8.0',  # has zope.interface.registry
@@ -111,7 +109,6 @@ setup(name='pyramid',
         zodb=pyramid.scaffolds:ZODBProjectTemplate
         alchemy=pyramid.scaffolds:AlchemyProjectTemplate
         [console_scripts]
-        bfg2pyramid = pyramid.fixers.fix_bfg_imports:main
         pcreate = pyramid.scripts.pcreate:main
         pserve = pyramid.scripts.pserve:main
         pshell = pyramid.scripts.pshell:main
