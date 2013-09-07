@@ -4,8 +4,8 @@ Next Release
 Bug Fixes
 ---------
 
-- Fix an exception in ``package_name()`` when resolving the package
-  name for namespace packages.
+- Fix an exception in ``pyramid.path.package_name`` when resolving the package
+  name for namespace packages that had no ``__file__`` attribute.
 
 Backwards Incompatibilities
 ---------------------------
@@ -20,6 +20,12 @@ Backwards Incompatibilities
   ``request.response.content_type`` to ``application/json``), but this is
   only necessary when the renderer is generating a response; it was a bug
   when it was done as a side effect of calling ``pyramid.renderers.render()``.
+
+- The Mako and Chameleon renderers have been removed from Pyramid.  Their 
+  functionality has been moved to  the ``pyramid_mako`` and 
+  ``pyramid_chameleon`` distributions respectively.
+
+- Removed the ``bfg2pyramid`` fixer script.
 
 1.5a1 (2013-08-30)
 ==================
