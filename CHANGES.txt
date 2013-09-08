@@ -27,6 +27,11 @@ Backwards Incompatibilities
 
 - Removed the ``bfg2pyramid`` fixer script.
 
+- The ``pyramid.events.NewResponse`` event is now sent **after** response 
+  callbacks are executed.  It previously executed before response callbacks
+  were executed.  Rationale: it's more useful to be able to inspect the response
+  after response callbacks have done their jobs instead of before.
+
 1.5a1 (2013-08-30)
 ==================
 

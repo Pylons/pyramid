@@ -232,11 +232,11 @@ unconditionally:
 - Ensures that the user implied by the request passed has the necessary
   authorization to invoke view callable before calling it.
 
-- causes a :class:`~pyramid.events.NewResponse` event to be sent when the
-  Pyramid application returns a response.
-
 - Calls any :term:`response callback` functions defined within the subrequest's
   lifetime if a response is obtained from the Pyramid application.
+
+- causes a :class:`~pyramid.events.NewResponse` event to be sent if a response
+  is obtained.
 
 - Calls any :term:`finished callback` functions defined within the subrequest's
   lifetime.

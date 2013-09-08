@@ -514,7 +514,7 @@ callback will be an exception object instead of its default value of
 ``None``.
 
 Response callbacks are called in the order they're added
-(first-to-most-recently-added).  All response callbacks are called *after*
+(first-to-most-recently-added).  All response callbacks are called *before*
 the :class:`~pyramid.events.NewResponse` event is sent.  Errors raised by
 response callbacks are not handled specially.  They will be propagated to the
 caller of the :app:`Pyramid` router application.
