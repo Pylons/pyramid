@@ -126,7 +126,6 @@ platforms.
 
    tutorials/wiki2/index.rst
    tutorials/wiki/index.rst
-   tutorials/bfg/index.rst
    tutorials/modwsgi/index.rst
 
 .. _html_api_documentation:
