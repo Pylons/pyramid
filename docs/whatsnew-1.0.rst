@@ -92,7 +92,7 @@ BFG Conversion Script
 
 The ``bfg2pyramid`` conversion script performs a mostly automated conversion
 of an existing :mod:`repoze.bfg` application to Pyramid.  The process is
-described in :ref:`converting_a_bfg_app`.
+described in "Converting a BFG Application to Pyramid".
 
 Scaffold Improvements
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
