@@ -512,7 +512,7 @@ class Configurator(
             '%s predicate named %s' % (type, name),
             '%s predicate' % type)
         intr['name'] = name
-        intr['factory'] = factory
+        intr['factory'] = self.maybe_dotted(factory)
         intr['weighs_more_than'] = weighs_more_than
         intr['weighs_less_than'] = weighs_less_than
         def register():
