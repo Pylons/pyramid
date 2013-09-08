@@ -570,8 +570,8 @@ adding more settings to this section.
 
 The ``pyramid.reload_templates`` setting in the ``[app:main]`` section is a
 :app:`Pyramid` -specific setting which is passed into the framework.  If it
-exists, and its value is ``true``, :term:`Chameleon` and :term:`Mako`
-template changes will not require an application restart to be detected.  See
+exists, and its value is ``true``, supported template changes will not
+require an application restart to be detected.  See
 :ref:`reload_templates_section` for more information.
 
 .. warning:: The ``pyramid.reload_templates`` option should be turned off for
@@ -818,7 +818,7 @@ also informs Python that the directory which contains it is a *package*.
 #. Line 1 imports the :term:`Configurator` class from :mod:`pyramid.config`
    that we use later.
 
-#. Lines 4-11 define a function named ``main`` that returns a :app:`Pyramid`
+#. Lines 4-12 define a function named ``main`` that returns a :app:`Pyramid`
    WSGI application.  This function is meant to be called by the
    :term:`PasteDeploy` framework as a result of running ``pserve``.
 
@@ -826,17 +826,20 @@ also informs Python that the directory which contains it is a *package*.
 
    Line 7 creates an instance of a :term:`Configurator`.
 
-   Line 8 registers a static view, which will serve up the files from the
+   Line 8 adds support for Chameleon templating bindings, allowing us to
+   specify renderers with the ``.pt`` extension.
+
+   Line 9 registers a static view, which will serve up the files from the
    ``myproject:static`` :term:`asset specification` (the ``static``
    directory of the ``myproject`` package).
 
-   Line 9 adds a :term:`route` to the configuration.  This route is later
+   Line 10 adds a :term:`route` to the configuration.  This route is later
    used by a view in the ``views`` module.
 
-   Line 10 calls ``config.scan()``, which picks up view registrations declared
+   Line 11 calls ``config.scan()``, which picks up view registrations declared
    elsewhere in the package (in this case, in the ``views.py`` module).
 
-   Line 11 returns a :term:`WSGI` application to the caller of the function
+   Line 12 returns a :term:`WSGI` application to the caller of the function
    (Pyramid's pserve).
 
 .. index::

@@ -10,6 +10,39 @@ Bug Fixes
 Backwards Incompatibilities
 ---------------------------
 
+- Pyramid has dropped native support for the Mako and Chameleon renderers. To
+  re-add support for these renderers into existing projects there are 3 steps:
+
+  - Add `pyramid_mako` and/or `pyramid_chameleon` as dependencies by
+    adding them to the `install_requires` section of the package's `setup.py`::
+
+        setup(
+            #...
+            install_requires=[
+                'pyramid_mako',         # new dependency
+                'pyramid_chameleon',    # new dependency
+                'pyramid',
+                #...
+            ],
+        )
+
+  - Update instances of the ``pyramid.config.Configurator`` to include the
+    required addons::
+
+        config.include('pyramid_chameleon')
+        config.include('pyramid_mako')
+
+  - If any unit tests are invoking either ``pyramid.renderers.render()`` or
+    ``pyramid.renderers.render_to_response()`` with either Mako or Chameleon
+    templates then the ``pyramid.config.Configurator`` instance at the root of
+    the unit test should be also be updated to include the addons, as shown
+    above. For example::
+
+        config = pyramid.testing.setUp()
+        config.include('pyramid_mako')
+
+        result = pyramid.renderers.render('mypkg:templates/home.mako', {})
+
 - Removed the ``request.response_*`` varying attributes. These attributes
   have been deprecated since Pyramid 1.1, and as per the deprecation policy,
   have now been removed.
