@@ -1027,6 +1027,8 @@ class ViewsConfiguratorMixin(object):
 
         custom_predicates
 
+          .. deprecated:: 1.5
+
           This value should be a sequence of references to custom predicate
           callables.  Use custom predicates when no set of predefined
           predicates do what you need.  Custom predicates can be combined with
@@ -1369,7 +1371,8 @@ class ViewsConfiguratorMixin(object):
         Python identifier (it will be used as a keyword argument to
         ``add_view`` by others).
 
-        ``factory`` should be a :term:`predicate factory`.
+        ``factory`` should be a :term:`predicate factory` or :term:`dotted
+        Python name` which refers to a predicate factory.
 
         See :ref:`view_and_route_predicates` for more information.
         """

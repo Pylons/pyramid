@@ -1,6 +1,13 @@
 Next Release
 ============
 
+Features
+--------
+
+- Users can now provide dotted Python names to
+  ``add_{view,route,subscriber}_predicates`` instead of the predicate factory
+  directly. 
+
 Bug Fixes
 ---------
 
