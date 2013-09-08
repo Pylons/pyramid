@@ -588,8 +588,6 @@ class TestNotted(unittest.TestCase):
         self.assertEqual(inst(None, None), True)
 
 class TestDotted(unittest.TestCase):
-
-
     def _makeOne(self, *arg, **kw):
         self.action_called = False
         from pyramid.config import Configurator
