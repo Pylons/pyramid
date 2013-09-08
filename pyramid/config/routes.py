@@ -255,6 +255,8 @@ class RoutesConfiguratorMixin(object):
 
         custom_predicates
 
+          .. deprecated:: 1.5
+
           This value should be a sequence of references to custom
           predicate callables.  Use custom predicates when no set of
           predefined predicates does what you need.  Custom predicates
@@ -523,7 +525,8 @@ class RoutesConfiguratorMixin(object):
         Python identifier (it will be used as a keyword argument to
         ``add_view``).
 
-        ``factory`` should be a :term:`predicate factory`.
+        ``factory`` should be a :term:`predicate factory` or :term:`dotted
+        Python name` which refers to a predicate factory.
 
         See :ref:`view_and_route_predicates` for more information.
 

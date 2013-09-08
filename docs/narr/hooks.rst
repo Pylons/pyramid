@@ -1384,9 +1384,11 @@ The first argument to :meth:`pyramid.config.Configurator.add_view_predicate`,
 the name, is a string representing the name that is expected to be passed to
 ``view_config`` (or its imperative analogue ``add_view``).
 
-The second argument is a view or route predicate factory.  A view or route
-predicate factory is most often a class with a constructor (``__init__``), a
-``text`` method, a ``phash`` method and a ``__call__`` method.  For example:
+The second argument is a view or route predicate factory, or a :term:`dotted
+Python name` which refers to a view or route predicate factory.  A view or
+route predicate factory is most often a class with a constructor
+(``__init__``), a ``text`` method, a ``phash`` method and a ``__call__``
+method. For example:
 
 .. code-block:: python
    :linenos:
