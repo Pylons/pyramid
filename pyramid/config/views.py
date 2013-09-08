@@ -1027,6 +1027,8 @@ class ViewsConfiguratorMixin(object):
 
         custom_predicates
 
+          .. deprecated:: 1.5
+
           This value should be a sequence of references to custom predicate
           callables.  Use custom predicates when no set of predefined
           predicates do what you need.  Custom predicates can be combined with
