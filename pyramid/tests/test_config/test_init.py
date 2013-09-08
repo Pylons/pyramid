@@ -3,7 +3,6 @@ import warnings
 
 import os
 
-from pyramid.compat import PYPY
 from pyramid.compat import im_func
 from pyramid.testing import skip_on
 
@@ -1475,6 +1474,39 @@ class TestConfigurator_add_directive(unittest.TestCase):
         self.assertEqual(action['callable'], None)
         self.assertEqual(action['args'], config2.package)
 
+class TestConfigurator__add_predicate(unittest.TestCase):
+    def _makeOne(self):
+        from pyramid.config import Configurator
+        return Configurator()
+
+    def test_factory_as_object(self):
+        config = self._makeOne()
+
+        def _fakeAction(discriminator, callable=None, args=(), kw=None,
+                        order=0, introspectables=(), **extra):
+            self.assertEqual(len(introspectables), 1)
+            self.assertEqual(introspectables[0]['name'], 'testing')
+            self.assertEqual(introspectables[0]['factory'], DummyPredicate)
+
+        config.action = _fakeAction
+        config._add_predicate('route', 'testing', DummyPredicate)
+
+    def test_factory_as_dotted_name(self):
+        config = self._makeOne()
+
+        def _fakeAction(discriminator, callable=None, args=(),
+                        kw=None, order=0, introspectables=(), **extra):
+            self.assertEqual(len(introspectables), 1)
+            self.assertEqual(introspectables[0]['name'], 'testing')
+            self.assertEqual(introspectables[0]['factory'], DummyPredicate)
+
+        config.action = _fakeAction
+        config._add_predicate(
+            'route',
+            'testing',
+            'pyramid.tests.test_config.test_init.DummyPredicate'
+            )
+        
 class TestActionState(unittest.TestCase):
     def _makeOne(self):
         from pyramid.config import ActionState
@@ -1989,3 +2021,5 @@ class DummyIntrospectable(object):
     def register(self, introspector, action_info):
         self.registered.append((introspector, action_info))
         
+class DummyPredicate(object):
+    pass

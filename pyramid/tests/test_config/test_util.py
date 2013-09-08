@@ -587,36 +587,6 @@ class TestNotted(unittest.TestCase):
         self.assertEqual(inst.phash(), '')
         self.assertEqual(inst(None, None), True)
 
-class TestDotted(unittest.TestCase):
-    def _makeOne(self, *arg, **kw):
-        self.action_called = False
-        from pyramid.config import Configurator
-        config = Configurator(*arg, **kw)
-        return config
-
-    def test_it_without_dots(self):
-        config = self._makeOne()
-
-        def _fakeAction(discriminator, callable=None, args=(), kw=None, order=0, introspectables=(), **extra):
-            self.assertEqual(len(introspectables), 1)
-            self.assertEqual(introspectables[0]['name'], 'testing')
-            self.assertEqual(introspectables[0]['factory'], DummyPredicate)
-
-        config.action = _fakeAction
-        config._add_predicate('route', 'testing', DummyPredicate)
-
-    def test_it_with_dots(self):
-        config = self._makeOne()
-
-        def _fakeAction(discriminator, callable=None, args=(), kw=None, order=0, introspectables=(), **extra):
-            self.assertEqual(len(introspectables), 1)
-            self.assertEqual(introspectables[0]['name'], 'testing')
-            self.assertEqual(introspectables[0]['factory'], DummyPredicate)
-
-        config.action = _fakeAction
-        config._add_predicate('route', 'testing', 'pyramid.tests.test_config.test_util.DummyPredicate')
-
-
 class DummyPredicate(object):
     def __init__(self, result):
         self.result = result
