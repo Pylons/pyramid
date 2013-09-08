@@ -523,7 +523,8 @@ class RoutesConfiguratorMixin(object):
         Python identifier (it will be used as a keyword argument to
         ``add_view``).
 
-        ``factory`` should be a :term:`predicate factory`.
+        ``factory`` should be a :term:`predicate factory` or :term:`dotted
+        Python name` which refers to a predicate factory.
 
         See :ref:`view_and_route_predicates` for more information.
 
