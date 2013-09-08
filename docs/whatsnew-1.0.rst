@@ -203,8 +203,8 @@ Mako
 ~~~~
 
 In addition to Chameleon templating, Pyramid now also provides built-in
-support for :term:`Mako` templating.  See :ref:`mako_templates` for more
-information.
+support for :term:`Mako` templating.  See
+:ref:`available_template_system_bindings` for more information.
 
 URL Dispatch
 ~~~~~~~~~~~~
