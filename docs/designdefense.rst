@@ -618,8 +618,8 @@ pyramid/ (except for ``pyramd/tests`` and ``pyramid/scaffolds``)
 
 Of the approximately 34K lines of Python code in the package, the code
 that actually has a chance of executing during normal operation, excluding
-tests and scaffolding Python files, accounts for approximately 10K lines
-of Python code.
+tests and scaffolding Python files, accounts for approximately 10K lines.
+
 
 Pyramid Has Too Many Dependencies
 ---------------------------------
