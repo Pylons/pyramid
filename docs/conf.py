@@ -50,8 +50,10 @@ extensions = [
     'sphinx.ext.doctest',
     'repoze.sphinx.autointerface',
     'sphinx.ext.viewcode',
+    'pylons_sphinx_latesturl',
 #    'sphinx.ext.intersphinx'
     ]
+
 
 # Looks for objects in other Pyramid projects
 ## intersphinx_mapping = {
@@ -155,6 +157,16 @@ if 'sphinx-build' in ' '.join(sys.argv):  # protect against dumb importers
         if item.endswith('.egg'):
             sys.path.append(os.path.join(parent, item))
 
+pylons_sphinx_latesturl_base = (
+    'http://docs.pylonsproject.org/projects/pyramid/en/latest/')
+pylons_sphinx_latesturl_pagename_overrides = {
+    # map old pagename -> new pagename
+    'whatsnew-1.0': 'index',
+    'whatsnew-1.1': 'index',
+    'tutorials/gae/index': 'index',
+    'api/chameleon_text': 'api',
+    'api/chameleon_zpt': 'api',
+}
 html_theme_path = ['_themes']
 html_theme = 'pyramid'
 html_theme_options = dict(
