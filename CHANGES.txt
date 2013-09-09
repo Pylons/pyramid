@@ -98,6 +98,10 @@ Backwards Incompatibilities
   since Pyramid 1.1.  Use methods of ``request.environ`` (a real dictionary)
   instead.
 
+- Removed ancient backwards compatibily hack in
+  ``pyramid.traversal.DefaultRootFactory`` which populated the ``__dict__`` of
+  the factory with the matchdict values for compatibility with BFG 0.9.
+
 1.5a1 (2013-08-30)
 ==================
 

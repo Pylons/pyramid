@@ -822,9 +822,4 @@ class DefaultRootFactory:
     __parent__ = None
     __name__ = None
     def __init__(self, request):
-        matchdict = request.matchdict
-        # provide backwards compatibility for applications which
-        # used routes (at least apps without any custom "context
-        # factory") in BFG 0.9.X and before
-        if matchdict is not None:
-            self.__dict__.update(matchdict)
+        pass
