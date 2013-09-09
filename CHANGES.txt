@@ -91,6 +91,13 @@ Backwards Incompatibilities
   ``pyramid.config.Configurator.add_static_view`` function too, because it
   delegates to ``add_route``.
 
+- Removed the ability to influence and query a ``pyramid.request.Request``
+  object as if it were a dictionary.  Previously it was possible to use methods
+  like ``__getitem__``, ``get``, ``items``, and other dictlike methods to
+  access values in the WSGI environment.  This behavior had been deprecated
+  since Pyramid 1.1.  Use methods of ``request.environ`` (a real dictionary)
+  instead.
+
 1.5a1 (2013-08-30)
 ==================
 

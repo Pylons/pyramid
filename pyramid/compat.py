@@ -160,7 +160,7 @@ if PY3: # pragma: no cover
         return d.values()
     def iterkeys_(d):
         return d.keys()
-else:
+else: # pragma: no cover
     def iteritems_(d):
         return d.iteritems()
     def itervalues_(d):
