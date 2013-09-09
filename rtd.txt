@@ -1,3 +1,4 @@
 repoze.sphinx.autointerface
 repoze.lru
+pylons_sphinx_latesturl
 

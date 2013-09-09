@@ -594,55 +594,45 @@ requires extensibility because it must be deployed in multiple locations.
 Pyramid Is Too Big
 ------------------
 
-"The :app:`Pyramid` compressed tarball is almost 2MB.  It must be
+"The :app:`Pyramid` compressed tarball is larger than 2MB.  It must be
 enormous!"
 
-No.  We just ship it with test code and helper templates.  Here's a
+No.  We just ship it with docs, test code, and scaffolding.  Here's a
 breakdown of what's included in subdirectories of the package tree:
 
 docs/
 
-  3.0MB
+  4.9MB
 
 pyramid/tests/
 
-  1.1MB
+  2.0MB
 
-pyramid/paster_templates/
+pyramid/scaffolds/
 
-  804KB
+  460KB
 
-pyramid/ (except for ``pyramd/tests and pyramid/paster_templates``)
+pyramid/ (except for ``pyramd/tests`` and ``pyramid/scaffolds``)
 
-  539K
+  844KB
 
-The actual :app:`Pyramid` runtime code is about 10% of the total size of the
-tarball omitting docs, helper templates used for package generation, and test
-code.  Of the approximately 19K lines of Python code in the package, the code
+Of the approximately 34K lines of Python code in the package, the code
 that actually has a chance of executing during normal operation, excluding
-tests and paster template Python files, accounts for approximately 5K lines
-of Python code.  This is comparable to Pylons 1.X, which ships with a little
-over 2K lines of Python code, excluding tests.
+tests and scaffolding Python files, accounts for approximately 10K lines.
+
 
 Pyramid Has Too Many Dependencies
 ---------------------------------
 
-This is true.  At the time of this writing (Pyramid 1.3), the total number of
-Python package distributions that :app:`Pyramid` depends upon transitively is
-if you use Python 3.2 or Python 2.7 is 10.  If you use Python 2.6, Pyramid
-will pull in 12 package distributions.  This is a lot more than zero package
-distribution dependencies: a metric which various Python microframeworks and
-Django boast.
+Over time, we've made lots of progress on reducing the number of packaging
+dependencies Pyramid has had.  Pyramid 1.2 had 15 of them.  Pyramid 1.3 and 1.4
+had 12 of them.  The current release as of this writing, Pyramid 1.5, has
+only 7.  This number is unlikely to become any smaller.
 
-However, Pyramid 1.2 relied on 15 packages under Python 2.7 and 17 packages
-under Python 2.6, so we've made progress here.  A port to Python 3 completed
-in Pyramid 1.3 helped us shed a good number of dependencies by forcing us to
-make better packaging decisions.
-
-In the future, we may also move templating system dependencies out of the
-core and place them in add-on packages, to be included by developers instead
-of by the framework.  This would reduce the number of core dependencies by
-about five, leaving us with only five remaining core dependencies.
+A port to Python 3 completed in Pyramid 1.3 helped us shed a good number of
+dependencies by forcing us to make better packaging decisions.  Removing
+Chameleon and Mako templating system dependencies in the Pyramid core in 1.5
+let us shed most of the remainder of them.
 
 Pyramid "Cheats" To Obtain Speed
 --------------------------------
@@ -1659,7 +1649,7 @@ If you can understand this hello world program, you can use Pyramid:
        server = make_server('0.0.0.0', 8080, app)
        server.serve_forever()
 
-Pyramid has ~ 650 pages of documentation (printed), covering topics from the
+Pyramid has ~ 700 pages of documentation (printed), covering topics from the
 very basic to the most advanced.  *Nothing* is left undocumented, quite
 literally.  It also has an *awesome*, very helpful community.  Visit the
 #pyramid IRC channel on freenode.net (irc://freenode.net#pyramid) and see.
