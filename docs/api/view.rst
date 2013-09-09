@@ -25,8 +25,4 @@
   .. autoclass:: forbidden_view_config
      :members:
 
-  .. autoclass:: static
-     :members:
-     :inherited-members:
-
 

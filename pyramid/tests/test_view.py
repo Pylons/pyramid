@@ -673,24 +673,6 @@ class Test_default_exceptionresponse_view(unittest.TestCase):
         result = self._callFUT(context, request)
         self.assertEqual(result, 'abc')
 
-class Test_static(unittest.TestCase):
-    def setUp(self):
-        from zope.deprecation import __show__
-        __show__.off()
-
-    def tearDown(self):
-        from zope.deprecation import __show__
-        __show__.on()
-
-    def _makeOne(self, path, package_name):
-        from pyramid.view import static
-        return static(path, package_name)
-        
-    def test_it(self):
-        path = 'fixtures'
-        view = self._makeOne(path, None)
-        self.assertEqual(view.docroot, 'fixtures')
-
 class Test_view_defaults(unittest.TestCase):
     def test_it(self):
         from pyramid.view import view_defaults

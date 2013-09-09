@@ -73,6 +73,10 @@ Backwards Incompatibilities
   were executed.  Rationale: it's more useful to be able to inspect the response
   after response callbacks have done their jobs instead of before.
 
+- Removed the class named ``pyramid.view.static`` that had been deprecated
+  since Pyramid 1.1.  Instead use ``pyramid.static.static_view`` with
+  ``use_subpath=True`` argument.
+
 1.5a1 (2013-08-30)
 ==================
 

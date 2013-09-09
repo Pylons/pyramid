@@ -20,32 +20,9 @@ from pyramid.httpexceptions import (
     default_exceptionresponse_view,
     )
 
-from pyramid.path import caller_package
-from pyramid.static import static_view
 from pyramid.threadlocal import get_current_registry
 
 _marker = object()
-
-class static(static_view):
-    """ Backwards compatibility alias for
-    :class:`pyramid.static.static_view`; it overrides that class' constructor
-    to pass ``use_subpath=True`` by default.
-
-    .. deprecated:: 1.1
-       use :class:`pyramid.static.static_view` instead
-       (probably with a ``use_subpath=True`` argument)
-    """
-    def __init__(self, root_dir, cache_max_age=3600, package_name=None):
-        if package_name is None:
-            package_name = caller_package().__name__
-        static_view.__init__(self, root_dir, cache_max_age=cache_max_age,
-                             package_name=package_name, use_subpath=True)
-
-deprecated(
-    'static',
-    'The "pyramid.view.static" class is deprecated as of Pyramid 1.1; '
-    'use the "pyramid.static.static_view" class instead with the '
-    '"use_subpath" argument set to True.')
 
 def render_view_to_response(context, request, name='', secure=True):
     """ Call the :term:`view callable` configured with a :term:`view
