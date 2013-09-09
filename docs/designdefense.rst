@@ -594,35 +594,32 @@ requires extensibility because it must be deployed in multiple locations.
 Pyramid Is Too Big
 ------------------
 
-"The :app:`Pyramid` compressed tarball is almost 2MB.  It must be
+"The :app:`Pyramid` compressed tarball is larger than 2MB.  It must be
 enormous!"
 
-No.  We just ship it with test code and helper templates.  Here's a
+No.  We just ship it with docs, test code, and scaffolding.  Here's a
 breakdown of what's included in subdirectories of the package tree:
 
 docs/
 
-  3.0MB
+  4.9MB
 
 pyramid/tests/
 
-  1.1MB
+  2.0MB
 
-pyramid/paster_templates/
+pyramid/scaffolds/
 
-  804KB
+  460KB
 
-pyramid/ (except for ``pyramd/tests and pyramid/paster_templates``)
+pyramid/ (except for ``pyramd/tests`` and ``pyramid/scaffolds``)
 
-  539K
+  844KB
 
-The actual :app:`Pyramid` runtime code is about 10% of the total size of the
-tarball omitting docs, helper templates used for package generation, and test
-code.  Of the approximately 19K lines of Python code in the package, the code
+Of the approximately 34K lines of Python code in the package, the code
 that actually has a chance of executing during normal operation, excluding
-tests and paster template Python files, accounts for approximately 5K lines
-of Python code.  This is comparable to Pylons 1.X, which ships with a little
-over 2K lines of Python code, excluding tests.
+tests and scaffolding Python files, accounts for approximately 10K lines
+of Python code.
 
 Pyramid Has Too Many Dependencies
 ---------------------------------
