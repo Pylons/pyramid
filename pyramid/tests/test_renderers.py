@@ -255,16 +255,6 @@ class TestRendererHelper(unittest.TestCase):
         self.assertEqual(result[0], 'values')
         self.assertEqual(result[1], system)
 
-    def test_render_renderer_globals_factory_active(self):
-        self._registerRendererFactory()
-        from pyramid.interfaces import IRendererGlobalsFactory
-        def rg(system):
-            return {'a':1}
-        self.config.registry.registerUtility(rg, IRendererGlobalsFactory)
-        helper = self._makeOne('loo.foo')
-        result = helper.render('values', None)
-        self.assertEqual(result[1]['a'], 1)
-
     def test__make_response_request_is_None(self):
         request = None
         helper = self._makeOne('loo.foo')

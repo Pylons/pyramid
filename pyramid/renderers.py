@@ -9,7 +9,6 @@ from zope.interface.registry import Components
 
 from pyramid.interfaces import (
     IJSONAdapter,
-    IRendererGlobalsFactory,
     IRendererFactory,
     IResponseFactory,
     IRendererInfo,
@@ -425,13 +424,6 @@ class RendererHelper(object):
         system_values = BeforeRender(system_values, value)
 
         registry = self.registry
-        globals_factory = registry.queryUtility(IRendererGlobalsFactory)
-
-        if globals_factory is not None:
-            renderer_globals = globals_factory(system_values)
-            if renderer_globals:
-                system_values.update(renderer_globals)
-
         registry.notify(system_values)
 
         result = renderer(value, system_values)

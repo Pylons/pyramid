@@ -192,10 +192,7 @@ class BeforeRender(dict):
           event['mykey'] = 'foo'
 
     An object of this type is sent as an event just before a :term:`renderer`
-    is invoked (but *after* the -- deprecated -- application-level renderer
-    globals factory added via
-    :class:`pyramid.config.Configurator.set_renderer_globals_factory`, if
-    any, has injected its own keys into the renderer globals dictionary).
+    is invoked.
 
     If a subscriber adds a key via ``__setitem__`` that already exists in
     the renderer globals dictionary, it will overwrite the older value there.

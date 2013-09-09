@@ -550,35 +550,6 @@ class ConfiguratorTests(unittest.TestCase):
         utility = reg.getUtility(IRequestFactory)
         self.assertEqual(utility, pyramid.tests.test_config)
 
-    def test_setup_registry_renderer_globals_factory(self):
-        from pyramid.registry import Registry
-        from pyramid.interfaces import IRendererGlobalsFactory
-        reg = Registry()
-        config = self._makeOne(reg)
-        factory = object()
-        with warnings.catch_warnings():
-            warnings.filterwarnings('ignore')
-            config.setup_registry(renderer_globals_factory=factory)
-        self.assertEqual(reg.queryUtility(IRendererGlobalsFactory), None)
-        config.commit()
-        utility = reg.getUtility(IRendererGlobalsFactory)
-        self.assertEqual(utility, factory)
-
-    def test_setup_registry_renderer_globals_factory_dottedname(self):
-        from pyramid.registry import Registry
-        from pyramid.interfaces import IRendererGlobalsFactory
-        reg = Registry()
-        config = self._makeOne(reg)
-        import pyramid.tests.test_config
-        with warnings.catch_warnings():
-            warnings.filterwarnings('ignore')
-            config.setup_registry(
-                renderer_globals_factory='pyramid.tests.test_config')
-        self.assertEqual(reg.queryUtility(IRendererGlobalsFactory), None)
-        config.commit()
-        utility = reg.getUtility(IRendererGlobalsFactory)
-        self.assertEqual(utility, pyramid.tests.test_config)
-
     def test_setup_registry_alternate_renderers(self):
         from pyramid.registry import Registry
         from pyramid.interfaces import IRendererFactory

@@ -52,10 +52,6 @@
 
      .. automethod:: override_asset(to_override, override_with)
 
-   :methodcategory:`Setting Renderer Globals`
-
-     .. automethod:: set_renderer_globals_factory(factory)
-
    :methodcategory:`Getting and Adding Settings`
 
      .. automethod:: add_settings

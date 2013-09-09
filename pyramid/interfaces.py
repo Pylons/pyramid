@@ -616,15 +616,6 @@ class IRendererFactory(Interface):
         """ Return an object that implements ``IRenderer``.  ``info`` is an
         object that implement ``IRendererInfo``.  """
 
-class IRendererGlobalsFactory(Interface):
-    def __call__(system_values):
-        """ Return a dictionary of global renderer values (aka
-        top-level template names).  The ``system_values`` value passed
-        in will be a dictionary that includes at least a ``request``
-        key, indicating the current request, and the value
-        ``renderer_name``, which will be the name of the renderer in
-        use."""
-
 class IViewPermission(Interface):
     def __call__(context, request):
         """ Return True if the permission allows, return False if it denies. """

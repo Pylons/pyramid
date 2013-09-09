@@ -102,6 +102,16 @@ Backwards Incompatibilities
   ``pyramid.traversal.DefaultRootFactory`` which populated the ``__dict__`` of
   the factory with the matchdict values for compatibility with BFG 0.9.
 
+- The ``renderer_globals_factory`` argument to the
+  ``pyramid.config.Configurator` constructor and its ``setup_registry`` method
+  has been removed.  The ``set_renderer_globals_factory`` method of
+  ``pyramid.config.Configurator`` has also been removed.  The (internal)
+  ``pyramid.interfaces.IRendererGlobals`` interface was also removed.  These
+  arguments, methods and interfaces had been deprecated since 1.1.  Use a
+  ``BeforeRender`` event subscriber as documented in the "Hooks" chapter of the
+  Pyramid narrative documentation instead of providing renderer globals values
+  to the configurator.
+
 1.5a1 (2013-08-30)
 ==================
 
