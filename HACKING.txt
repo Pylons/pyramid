@@ -78,7 +78,7 @@ In order to add a feature to Pyramid:
   documentation (in ``docs/``).
 
 - The feature must work fully on the following CPython versions: 2.6,
-  2.7, and 3.2 on both UNIX and Windows.
+  2.7, 3.2, and 3.3 on both UNIX and Windows.
 
 - The feature must work on the latest version of PyPy.
 
@@ -104,7 +104,9 @@ Coding Style
 
 - PEP8 compliance.  Whitespace rules are relaxed: not necessary to put
   2 newlines between classes.  But 80-column lines, in particular, are
-  mandatory.
+  mandatory.  See 
+  http://docs.pylonsproject.org/en/latest/community/codestyle.html for more
+  information.
 
 - Please do not remove trailing whitespace.  Configure your editor to reduce
   diff noise. See https://github.com/Pylons/pyramid/issues/788 for more.
@@ -112,13 +114,15 @@ Coding Style
 Running Tests
 --------------
 
-- To run all tests for Pyramid on a single Python version, run ``nosetests`` from
-  your development virtualenv (See *Using a Development Checkout* above).
+- To run all tests for Pyramid on a single Python version, run ``nosetests`` 
+  from your development virtualenv (See *Using a Development Checkout* above).
 
 - To run individual tests (i.e. during development) you can use a regular
   expression with the ``-t`` parameter courtesy of the `nose-selecttests
-  <https://pypi.python.org/pypi/nose-selecttests/>`_ plugin that's been installed (along with nose itself) via ``python setup.py dev``. The easiest usage is to
-  simply provide the verbatim name of the test you're working on.
+  <https://pypi.python.org/pypi/nose-selecttests/>`_ plugin that's been 
+  installed (along with nose itself) via ``python setup.py dev``. The 
+  easiest usage is to simply provide the verbatim name of the test you're 
+  working on.
 
 - To run the full set of Pyramid tests on all platforms, install ``tox``
   (http://codespeak.net/~hpk/tox/) into a system Python.  The ``tox`` console

@@ -1,3 +1,117 @@
+Next Release
+============
+
+Features
+--------
+
+- Users can now provide dotted Python names to as the ``factory`` argument
+  the Configurator methods named ``add_{view,route,subscriber}_predicate`` 
+  (instead of passing the predicate factory directly, you can pass a 
+  dotted name which refers to the factory).
+
+Bug Fixes
+---------
+
+- Fix an exception in ``pyramid.path.package_name`` when resolving the package
+  name for namespace packages that had no ``__file__`` attribute.
+
+Backwards Incompatibilities
+---------------------------
+
+- Pyramid has dropped native support for the Mako and Chameleon renderers. To
+  re-add support for these renderers into existing projects there are 3 steps:
+
+  - Add `pyramid_mako` and/or `pyramid_chameleon` as dependencies by
+    adding them to the `install_requires` section of the package's `setup.py`::
+
+        setup(
+            #...
+            install_requires=[
+                'pyramid_mako',         # new dependency
+                'pyramid_chameleon',    # new dependency
+                'pyramid',
+                #...
+            ],
+        )
+
+  - Update instances of the ``pyramid.config.Configurator`` to include the
+    required addons::
+
+        config.include('pyramid_chameleon')
+        config.include('pyramid_mako')
+
+  - If any unit tests are invoking either ``pyramid.renderers.render()`` or
+    ``pyramid.renderers.render_to_response()`` with either Mako or Chameleon
+    templates then the ``pyramid.config.Configurator`` instance at the root of
+    the unit test should be also be updated to include the addons, as shown
+    above. For example::
+
+        config = pyramid.testing.setUp()
+        config.include('pyramid_mako')
+
+        result = pyramid.renderers.render('mypkg:templates/home.mako', {})
+
+- Removed the ``request.response_*`` varying attributes. These attributes
+  have been deprecated since Pyramid 1.1, and as per the deprecation policy,
+  have now been removed.
+
+- ``request.response`` will no longer be mutated when using the 
+  ``pyramid.renderers.render()`` API.  Almost all renderers mutate the 
+  ``request.response`` response object (for example, the JSON renderer sets
+  ``request.response.content_type`` to ``application/json``), but this is
+  only necessary when the renderer is generating a response; it was a bug
+  when it was done as a side effect of calling ``pyramid.renderers.render()``.
+
+- The Mako and Chameleon renderers have been removed from Pyramid.  Their 
+  functionality has been moved to  the ``pyramid_mako`` and 
+  ``pyramid_chameleon`` distributions respectively.
+
+- Removed the ``bfg2pyramid`` fixer script.
+
+- The ``pyramid.events.NewResponse`` event is now sent **after** response 
+  callbacks are executed.  It previously executed before response callbacks
+  were executed.  Rationale: it's more useful to be able to inspect the response
+  after response callbacks have done their jobs instead of before.
+
+- Removed the class named ``pyramid.view.static`` that had been deprecated
+  since Pyramid 1.1.  Instead use ``pyramid.static.static_view`` with
+  ``use_subpath=True`` argument.
+
+- Removed the ``pyramid.view.is_response`` function that had been deprecated
+  since Pyramid 1.1.  Use the ``pyramid.request.Request.is_response`` method
+  instead.
+
+- Removed the ability to pass the following arguments to
+  ``pyramid.config.Configurator.add_route``: `view``, ``view_context``.
+  ``view_for``, ``view_permission``, ``view_renderer``, and ``view_attr``.
+  Using these arguments had been deprecated since Pyramid 1.1.  Instead of
+  passing view-related arguments to ``add_route``, use a separate call to
+  ``pyramid.config.Configurator.add_view`` to associate a view with a route
+  using its ``route_name`` argument.  Note that this impacts the
+  ``pyramid.config.Configurator.add_static_view`` function too, because it
+  delegates to ``add_route``.
+
+- Removed the ability to influence and query a ``pyramid.request.Request``
+  object as if it were a dictionary.  Previously it was possible to use methods
+  like ``__getitem__``, ``get``, ``items``, and other dictlike methods to
+  access values in the WSGI environment.  This behavior had been deprecated
+  since Pyramid 1.1.  Use methods of ``request.environ`` (a real dictionary)
+  instead.
+
+- Removed ancient backwards compatibily hack in
+  ``pyramid.traversal.DefaultRootFactory`` which populated the ``__dict__`` of
+  the factory with the matchdict values for compatibility with BFG 0.9.
+
+- The ``renderer_globals_factory`` argument to the
+  ``pyramid.config.Configurator` constructor and its ``setup_registry`` method
+  has been removed.  The ``set_renderer_globals_factory`` method of
+  ``pyramid.config.Configurator`` has also been removed.  The (internal)
+  ``pyramid.interfaces.IRendererGlobals`` interface was also removed.  These
+  arguments, methods and interfaces had been deprecated since 1.1.  Use a
+  ``BeforeRender`` event subscriber as documented in the "Hooks" chapter of the
+  Pyramid narrative documentation instead of providing renderer globals values
+  to the configurator.
+
 1.5a1 (2013-08-30)
 ==================
 

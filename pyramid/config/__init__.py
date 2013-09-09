@@ -173,15 +173,6 @@ class Configurator(
     See :ref:`changing_the_request_factory`.  By default it is ``None``,
     which means use the default request factory.
 
-    If ``renderer_globals_factory`` is passed, it should be a :term:`renderer
-    globals` factory implementation or a :term:`dotted Python name` to the
-    same.  See :ref:`adding_renderer_globals`.  By default, it is ``None``,
-    which means use no renderer globals factory.
-
-    .. deprecated:: 1.1
-       Use a BeforeRender event subscriber as per :ref:`beforerender_event`
-       in place of ``renderer_globals_factory``.
-
     If ``default_permission`` is passed, it should be a
     :term:`permission` string to be used as the default permission for
     all view configuration registrations performed against this
@@ -273,7 +264,6 @@ class Configurator(
                  debug_logger=None,
                  locale_negotiator=None,
                  request_factory=None,
-                 renderer_globals_factory=None,
                  default_permission=None,
                  session_factory=None,
                  default_view_mapper=None,
@@ -304,7 +294,6 @@ class Configurator(
                 debug_logger=debug_logger,
                 locale_negotiator=locale_negotiator,
                 request_factory=request_factory,
-                renderer_globals_factory=renderer_globals_factory,
                 default_permission=default_permission,
                 session_factory=session_factory,
                 default_view_mapper=default_view_mapper,
@@ -320,7 +309,6 @@ class Configurator(
                        debug_logger=None,
                        locale_negotiator=None,
                        request_factory=None,
-                       renderer_globals_factory=None,
                        default_permission=None,
                        session_factory=None,
                        default_view_mapper=None,
@@ -410,17 +398,6 @@ class Configurator(
         if request_factory:
             self.set_request_factory(request_factory)
 
-        if renderer_globals_factory:
-            warnings.warn(
-                'Passing ``renderer_globals_factory`` as a Configurator '
-                'constructor parameter is deprecated as of Pyramid 1.1. '
-                'Use a BeforeRender event subscriber as documented in the '
-                '"Hooks" chapter of the Pyramid narrative documentation '
-                'instead',
-                DeprecationWarning,
-                2)
-            self.set_renderer_globals_factory(renderer_globals_factory,
-                                              warn=False)
         if default_permission:
             self.set_default_permission(default_permission)
 
@@ -512,7 +489,7 @@ class Configurator(
             '%s predicate named %s' % (type, name),
             '%s predicate' % type)
         intr['name'] = name
-        intr['factory'] = factory
+        intr['factory'] = self.maybe_dotted(factory)
         intr['weighs_more_than'] = weighs_more_than
         intr['weighs_less_than'] = weighs_less_than
         def register():

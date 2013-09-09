@@ -798,9 +798,8 @@ Glossary
      :term:`Internationalization`.
 
    renderer globals
-      Values injected as names into a renderer based on application
-      policy.  See :ref:`adding_renderer_globals` for more
-      information.
+      Values injected as names into a renderer by a
+      :class:`pyramid.event.BeforeRender` event.
 
    response callback
       A user-defined callback executed by the :term:`router` at a

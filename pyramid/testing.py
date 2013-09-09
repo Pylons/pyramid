@@ -34,12 +34,8 @@ from pyramid.threadlocal import (
     manager,
     )
 
-from pyramid.request import (
-    DeprecatedRequestMethodsMixin,
-    CallbackMethodsMixin,
-    )
-
 from pyramid.i18n import LocalizerRequestMixin
+from pyramid.request import CallbackMethodsMixin
 from pyramid.url import URLMethodsMixin
 from pyramid.util import InstancePropertyMixin
 
@@ -286,8 +282,7 @@ class DummySession(dict):
 
         
 @implementer(IRequest)
-class DummyRequest(DeprecatedRequestMethodsMixin, URLMethodsMixin,
-                   CallbackMethodsMixin, InstancePropertyMixin,
+class DummyRequest(URLMethodsMixin, CallbackMethodsMixin, InstancePropertyMixin,
                    LocalizerRequestMixin):
     """ A DummyRequest object (incompletely) imitates a :term:`request` object.
 

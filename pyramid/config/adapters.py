@@ -147,7 +147,8 @@ class AdaptersConfiguratorMixin(object):
         Python identifier (it will be used as a ``**predicates`` keyword
         argument to :meth:`~pyramid.config.Configurator.add_subscriber`).
 
-        ``factory`` should be a :term:`predicate factory`.
+        ``factory`` should be a :term:`predicate factory` or :term:`dotted
+        Python name` which refers to a predicate factory.
 
         See :ref:`subscriber_predicates` for more information.
 

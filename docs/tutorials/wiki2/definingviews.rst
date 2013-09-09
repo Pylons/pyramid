@@ -30,7 +30,7 @@ Open ``tutorial/setup.py`` and edit it to look like the following:
 .. literalinclude:: src/views/setup.py
    :linenos:
    :language: python
-   :emphasize-lines: 19
+   :emphasize-lines: 20
 
 (Only the highlighted line needs to be added.)
 
@@ -272,9 +272,9 @@ by the view (row 45).  The view will use the ``body`` and
    none of our tutorial views return in their dictionary.
    ``request`` is one of several
    names that are available "by default" in a template when a template
-   renderer is used.  See :ref:`chameleon_template_renderers` for
+   renderer is used.  See :ref:`renderer_system_values` for
    information about other names that are available by default
-   when a Chameleon template is used as a renderer.
+   when a template is used as a renderer.
 
 Static Assets
 -------------
@@ -335,7 +335,7 @@ something like:
 .. literalinclude:: src/views/tutorial/__init__.py
    :linenos:
    :language: python
-   :emphasize-lines: 18-21
+   :emphasize-lines: 19-22
 
 (The highlighted lines are the ones that need to be added or edited.)
 

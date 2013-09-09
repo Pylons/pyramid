@@ -29,9 +29,6 @@ class Page(Base):
     name = Column(Text, unique=True)
     data = Column(Text)
 
-    def __init__(self, name, data):
-        self.name = name
-        self.data = data
 
 class RootFactory(object):
     __acl__ = [ (Allow, Everyone, 'view'),

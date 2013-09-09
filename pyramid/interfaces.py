@@ -616,15 +616,6 @@ class IRendererFactory(Interface):
         """ Return an object that implements ``IRenderer``.  ``info`` is an
         object that implement ``IRendererInfo``.  """
 
-class IRendererGlobalsFactory(Interface):
-    def __call__(system_values):
-        """ Return a dictionary of global renderer values (aka
-        top-level template names).  The ``system_values`` value passed
-        in will be a dictionary that includes at least a ``request``
-        key, indicating the current request, and the value
-        ``renderer_name``, which will be the name of the renderer in
-        use."""
-
 class IViewPermission(Interface):
     def __call__(context, request):
         """ Return True if the permission allows, return False if it denies. """
@@ -852,19 +843,6 @@ class IPackageOverrides(IPEP302Loader):
 # VH_ROOT_KEY is an interface; its imported from other packages (e.g.
 # traversalwrapper)
 VH_ROOT_KEY = 'HTTP_X_VHM_ROOT'
-
-class IChameleonLookup(Interface):
-    translate = Attribute('IChameleonTranslate object')
-    debug = Attribute('The ``debug_templates`` setting for this application')
-    auto_reload = Attribute('The ``reload_templates`` setting for this app')
-    def __call__(self, info):
-        """ Return an ITemplateRenderer based on IRendererInfo ``info`` """
-
-class IChameleonTranslate(Interface):
-    """ Internal interface representing a chameleon translate function """
-    def __call__(msgid, domain=None, mapping=None, context=None,
-                 target_language=None, default=None):
-        """ Translate a mess of arguments to a Unicode object """
 
 class ILocalizer(Interface):
     """ Localizer for a specific language """

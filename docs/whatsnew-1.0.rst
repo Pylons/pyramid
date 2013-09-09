@@ -92,7 +92,7 @@ BFG Conversion Script
 
 The ``bfg2pyramid`` conversion script performs a mostly automated conversion
 of an existing :mod:`repoze.bfg` application to Pyramid.  The process is
-described in :ref:`converting_a_bfg_app`.
+described in "Converting a BFG Application to Pyramid".
 
 Scaffold Improvements
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -203,8 +203,8 @@ Mako
 ~~~~
 
 In addition to Chameleon templating, Pyramid now also provides built-in
-support for :term:`Mako` templating.  See :ref:`mako_templates` for more
-information.
+support for :term:`Mako` templating.  See
+:ref:`available_template_system_bindings` for more information.
 
 URL Dispatch
 ~~~~~~~~~~~~

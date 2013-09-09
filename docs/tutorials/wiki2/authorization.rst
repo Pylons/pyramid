@@ -83,7 +83,7 @@ statement at the head:
 Add the following class definition:
 
 .. literalinclude:: src/authorization/tutorial/models.py
-   :lines: 36-40
+   :lines: 33-37
    :linenos:
    :language: python
 
@@ -203,7 +203,7 @@ Go back to ``tutorial/tutorial/__init__.py`` and add these two
 routes:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
-   :lines: 30-31
+   :lines: 31-32
    :linenos:
    :language: python
 
@@ -329,7 +329,7 @@ when we're done:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
    :linenos:
-   :emphasize-lines: 2-3,7,21-23,25-27,30-31
+   :emphasize-lines: 2-3,7,21-23,25-27,31-32
    :language: python
 
 (Only the highlighted lines need to be added.)
@@ -339,7 +339,7 @@ when we're done:
 
 .. literalinclude:: src/authorization/tutorial/models.py
    :linenos:
-   :emphasize-lines: 1-4,36-40
+   :emphasize-lines: 1-4,33-37
    :language: python
 
 (Only the highlighted lines need to be added.)

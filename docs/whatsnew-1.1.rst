@@ -540,11 +540,10 @@ Deprecations and Behavior Differences
   within a static view returns the index.html properly.  See also
   https://github.com/Pylons/pyramid/issues/67.
 
-- Deprecated the
-  :meth:`pyramid.config.Configurator.set_renderer_globals_factory` method and
-  the ``renderer_globals`` Configurator constructor parameter.  Users should
-  convert code using this feature to use a BeforeRender event. See the section
-  :ref:`beforerender_event` in the Hooks chapter.
+- Deprecated the ``pyramid.config.Configurator.set_renderer_globals_factory``
+  method and the ``renderer_globals`` Configurator constructor parameter.
+  Users should convert code using this feature to use a BeforeRender event. See
+  the section :ref:`beforerender_event` in the Hooks chapter.
 
 - In Pyramid 1.0, the :class:`pyramid.events.subscriber` directive behaved
   contrary to the documentation when passed more than one interface object to

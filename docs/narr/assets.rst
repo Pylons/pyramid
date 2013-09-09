@@ -227,14 +227,14 @@ API to generate them for you.  For example:
 .. code-block:: python
    :linenos:
 
-   from pyramid.chameleon_zpt import render_template_to_response
+   from pyramid.renderers import render_to_response
 
    def my_view(request):
        css_url = request.static_url('mypackage:assets/1/foo.css')
        js_url = request.static_url('mypackage:assets/2/foo.js')
-       return render_template_to_response('templates/my_template.pt',
-                                          css_url = css_url,
-                                          js_url = js_url)
+       return render_to_response('templates/my_template.pt',
+                                 dict(css_url=css_url, js_url=js_url),
+                                 request=request)
 
 If the request "application URL" of the running system is
 ``http://example.com``, the ``css_url`` generated above would be:
@@ -336,7 +336,9 @@ your application root as below.
    from pyramid.static import static_view
    static_view = static_view('/path/to/static/dir', use_subpath=True)
 
-.. note:: For better cross-system flexibility, use an :term:`asset
+.. note::
+
+   For better cross-system flexibility, use an :term:`asset
    specification` as the argument to :class:`~pyramid.static.static_view`
    instead of a physical absolute filesystem path, e.g. ``mypackage:static``
    instead of ``/path/to/mypackage/static``.
@@ -432,9 +434,9 @@ feature, a :term:`Configurator` API exists named
 :meth:`pyramid.config.Configurator.override_asset`.  This API allows you to
 *override* the following kinds of assets defined in any Python package:
 
-- Individual :term:`Chameleon` templates.
+- Individual template files.
 
-- A directory containing multiple Chameleon templates.
+- A directory containing multiple template files.
 
 - Individual static files served up by an instance of the
   ``pyramid.static.static_view`` helper class.
@@ -460,8 +462,8 @@ can override a single asset.  For example:
    :linenos:
 
    config.override_asset(
-            to_override='some.package:templates/mytemplate.pt',
-            override_with='another.package:othertemplates/anothertemplate.pt')
+       to_override='some.package:templates/mytemplate.pt',
+       override_with='another.package:othertemplates/anothertemplate.pt')
 
 The string value passed to both ``to_override`` and ``override_with`` sent to
 the ``override_asset`` API is called an :term:`asset specification`.  The

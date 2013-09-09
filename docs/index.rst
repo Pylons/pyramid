@@ -20,7 +20,8 @@ After you install :app:`Pyramid` and run this application, when you visit
 See :ref:`firstapp_chapter` for a full explanation of how this application
 works. Read the :ref:`html_narrative_documentation` to understand how
 :app:`Pyramid` is designed to scale from simple applications like this to
-very large web applications.
+very large web applications.  To just dive in headfirst, read the 
+:doc:`quick_tour`.
 
 Front Matter
 ============
@@ -126,7 +127,6 @@ platforms.
 
    tutorials/wiki2/index.rst
    tutorials/wiki/index.rst
-   tutorials/bfg/index.rst
    tutorials/modwsgi/index.rst
 
 .. _html_api_documentation:

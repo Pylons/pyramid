@@ -74,8 +74,8 @@ here = os.path.dirname(__file__)
 
 class StaticAppBase(IntegrationBase):
     def test_basic(self):
-        res = self.testapp.get('/minimal.pt', status=200)
-        _assertBody(res.body, os.path.join(here, 'fixtures/minimal.pt'))
+        res = self.testapp.get('/minimal.txt', status=200)
+        _assertBody(res.body, os.path.join(here, 'fixtures/minimal.txt'))
 
     def test_hidden(self):
         res = self.testapp.get('/static/.hiddenfile', status=200)
@@ -119,7 +119,7 @@ class StaticAppBase(IntegrationBase):
     def test_not_modified(self):
         self.testapp.extra_environ = {
             'HTTP_IF_MODIFIED_SINCE':httpdate(fiveyrsfuture)}
-        res = self.testapp.get('/minimal.pt', status=304)
+        res = self.testapp.get('/minimal.txt', status=304)
         self.assertEqual(res.body, b'')
 
     def test_file_in_subdir(self):
@@ -222,19 +222,19 @@ class TestStaticAppNoSubpath(unittest.TestCase):
         return request
 
     def test_basic(self):
-        request = self._makeRequest({'PATH_INFO':'/minimal.pt'})
+        request = self._makeRequest({'PATH_INFO':'/minimal.txt'})
         context = DummyContext()
         result = self.staticapp(context, request)
         self.assertEqual(result.status, '200 OK')
-        _assertBody(result.body, os.path.join(here, 'fixtures/minimal.pt'))
+        _assertBody(result.body, os.path.join(here, 'fixtures/minimal.txt'))
 
 class TestStaticAppWithRoutePrefix(IntegrationBase, unittest.TestCase):
     package = 'pyramid.tests.pkgs.static_routeprefix'
 
     def test_includelevel1(self):
-        res = self.testapp.get('/static/minimal.pt', status=200)
+        res = self.testapp.get('/static/minimal.txt', status=200)
         _assertBody(res.body,
-                    os.path.join(here, 'fixtures/minimal.pt'))
+                    os.path.join(here, 'fixtures/minimal.txt'))
 
     def test_includelevel2(self):
         res = self.testapp.get('/prefix/static/index.html', status=200)
