@@ -3777,41 +3777,19 @@ class TestStaticURLInfo(unittest.TestCase):
                  permission='abc')
         self.assertEqual(config.view_kw['permission'], 'abc')
 
-    def test_add_viewname_with_view_permission(self):
+    def test_add_viewname_with_context(self):
         config = self._makeConfig()
         inst = self._makeOne()
         inst.add(config, 'view', 'anotherpackage:path', cache_max_age=1,
-                 view_permission='abc')
-        self.assertEqual(config.view_kw['permission'], 'abc')
-
-    def test_add_viewname_with_view_context(self):
-        config = self._makeConfig()
-        inst = self._makeOne()
-        inst.add(config, 'view', 'anotherpackage:path', cache_max_age=1,
-                 view_context=DummyContext)
+                 context=DummyContext)
         self.assertEqual(config.view_kw['context'], DummyContext)
-
-    def test_add_viewname_with_view_for(self):
-        config = self._makeConfig()
-        inst = self._makeOne()
-        inst.add(config, 'view', 'anotherpackage:path', cache_max_age=1,
-                 view_for=DummyContext)
-        self.assertEqual(config.view_kw['context'], DummyContext)
-
+        
     def test_add_viewname_with_for_(self):
         config = self._makeConfig()
         inst = self._makeOne()
         inst.add(config, 'view', 'anotherpackage:path', cache_max_age=1,
                  for_=DummyContext)
         self.assertEqual(config.view_kw['context'], DummyContext)
-
-    def test_add_viewname_with_view_renderer(self):
-        config = self._makeConfig()
-        inst = self._makeOne()
-        inst.add(config, 'view', 'anotherpackage:path', cache_max_age=1,
-                 view_renderer='mypackage:templates/index.pt')
-        self.assertEqual(config.view_kw['renderer'],
-                         'mypackage:templates/index.pt')
 
     def test_add_viewname_with_renderer(self):
         config = self._makeConfig()
@@ -3820,13 +3798,6 @@ class TestStaticURLInfo(unittest.TestCase):
                  renderer='mypackage:templates/index.pt')
         self.assertEqual(config.view_kw['renderer'],
                          'mypackage:templates/index.pt')
-
-    def test_add_viewname_with_view_attr(self):
-        config = self._makeConfig()
-        inst = self._makeOne()
-        inst.add(config, 'view', 'anotherpackage:path', cache_max_age=1,
-                 view_attr='attr')
-        self.assertEqual(config.view_kw['attr'], 'attr')
 
 class Test_view_description(unittest.TestCase):
     def _callFUT(self, view):

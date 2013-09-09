@@ -81,6 +81,16 @@ Backwards Incompatibilities
   since Pyramid 1.1.  Use the ``pyramid.request.Request.is_response`` method
   instead.
 
+- Removed the ability to pass the following arguments to
+  ``pyramid.config.Configurator.add_route``: `view``, ``view_context``.
+  ``view_for``, ``view_permission``, ``view_renderer``, and ``view_attr``.
+  Using these arguments had been deprecated since Pyramid 1.1.  Instead of
+  passing view-related arguments to ``add_route``, use a separate call to
+  ``pyramid.config.Configurator.add_view`` to associate a view with a route
+  using its ``route_name`` argument.  Note that this impacts the
+  ``pyramid.config.Configurator.add_static_view`` function too, because it
+  delegates to ``add_route``.
+
 1.5a1 (2013-08-30)
 ==================
 

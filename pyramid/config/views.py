@@ -1910,27 +1910,16 @@ class StaticURLInfo(object):
 
             # Mutate extra to allow factory, etc to be passed through here.
             # Treat permission specially because we'd like to default to
-            # permissiveness (see docs of config.add_static_view).  We need
-            # to deal with both ``view_permission`` and ``permission``
-            # because ``permission`` is used in the docs for add_static_view,
-            # but ``add_route`` prefers ``view_permission``
-            permission = extra.pop('view_permission', None)
-            if permission is None:
-                permission = extra.pop('permission', None)
+            # permissiveness (see docs of config.add_static_view).
+            permission = extra.pop('permission', None)
             if permission is None:
                 permission = NO_PERMISSION_REQUIRED
 
-            context = extra.pop('view_context', None)
-            if context is None:
-                context = extra.pop('view_for', None)
+            context = extra.pop('context', None)
             if context is None:
                 context = extra.pop('for_', None)
 
-            renderer = extra.pop('view_renderer', None)
-            if renderer is None:
-                renderer = extra.pop('renderer', None)
-
-            attr = extra.pop('view_attr', None)
+            renderer = extra.pop('renderer', None)
 
             # register a route using the computed view, permission, and
             # pattern, plus any extras passed to us via add_static_view
@@ -1946,7 +1935,6 @@ class StaticURLInfo(object):
                 permission=permission,
                 context=context,
                 renderer=renderer,
-                attr=attr
                 )
 
         def register():

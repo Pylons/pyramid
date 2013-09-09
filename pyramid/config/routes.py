@@ -1,5 +1,3 @@
-import warnings
-
 from pyramid.compat import urlparse
 from pyramid.interfaces import (
     IRequest,
@@ -25,8 +23,6 @@ class RoutesConfiguratorMixin(object):
     def add_route(self,
                   name,
                   pattern=None,
-                  view=None,
-                  view_for=None,
                   permission=None,
                   factory=None,
                   for_=None,
@@ -38,11 +34,7 @@ class RoutesConfiguratorMixin(object):
                   request_param=None,
                   traverse=None,
                   custom_predicates=(),
-                  view_permission=None,
                   renderer=None,
-                  view_renderer=None,
-                  view_context=None,
-                  view_attr=None,
                   use_global_views=False,
                   path=None,
                   pregenerator=None,
@@ -284,97 +276,6 @@ class RoutesConfiguratorMixin(object):
 
           .. versionadded:: 1.4
 
-        View-Related Arguments
-
-        .. warning::
-
-           The arguments described below have been deprecated as of
-           :app:`Pyramid` 1.1. *Do not use these for new development; they
-           should only be used to support older code bases which depend upon
-           them.* Use a separate call to
-           :meth:`pyramid.config.Configurator.add_view` to associate a view
-           with a route using the ``route_name`` argument.
-
-        view
-
-          .. deprecated:: 1.1
-
-          A Python object or :term:`dotted Python name` to the same
-          object that will be used as a view callable when this route
-          matches. e.g. ``mypackage.views.my_view``.
-
-        view_context
-
-          .. deprecated:: 1.1
-
-          A class or an :term:`interface` or :term:`dotted Python
-          name` to the same object which the :term:`context` of the
-          view should match for the view named by the route to be
-          used.  This argument is only useful if the ``view``
-          attribute is used.  If this attribute is not specified, the
-          default (``None``) will be used.
-
-          If the ``view`` argument is not provided, this argument has
-          no effect.
-
-          This attribute can also be spelled as ``for_`` or ``view_for``.
-
-        view_permission
-
-          .. deprecated:: 1.1
-
-          The permission name required to invoke the view associated
-          with this route.  e.g. ``edit``. (see
-          :ref:`using_security_with_urldispatch` for more information
-          about permissions).
-
-          If the ``view`` attribute is not provided, this argument has
-          no effect.
-
-          This argument can also be spelled as ``permission``.
-
-        view_renderer
-
-          .. deprecated:: 1.1
-
-          This is either a single string term (e.g. ``json``) or a
-          string implying a path or :term:`asset specification`
-          (e.g. ``templates/views.pt``).  If the renderer value is a
-          single term (does not contain a dot ``.``), the specified
-          term will be used to look up a renderer implementation, and
-          that renderer implementation will be used to construct a
-          response from the view return value.  If the renderer term
-          contains a dot (``.``), the specified term will be treated
-          as a path, and the filename extension of the last element in
-          the path will be used to look up the renderer
-          implementation, which will be passed the full path.  The
-          renderer implementation will be used to construct a response
-          from the view return value.  See
-          :ref:`views_which_use_a_renderer` for more information.
-
-          If the ``view`` argument is not provided, this argument has
-          no effect.
-
-          This argument can also be spelled as ``renderer``.
-
-        view_attr
-
-          .. deprecated:: 1.1
-
-          The view machinery defaults to using the ``__call__`` method
-          of the view callable (or the function itself, if the view
-          callable is a function) to obtain a response dictionary.
-          The ``attr`` value allows you to vary the method attribute
-          used to obtain the response.  For example, if your view was
-          a class, and the class has a method named ``index`` and you
-          wanted to use this method instead of the class' ``__call__``
-          method to return the response, you'd say ``attr="index"`` in
-          the view configuration for the view.  This is
-          most useful when the view definition is a class.
-
-          If the ``view`` argument is not provided, this argument has no
-          effect.
-
         """
         # these are route predicates; if they do not match, the next route
         # in the routelist will be tried
@@ -501,19 +402,6 @@ class RoutesConfiguratorMixin(object):
         self.action(('route', name), register_route_request_iface,
                     order=PHASE2_CONFIG, introspectables=introspectables)
 
-        # deprecated adding views from add_route; must come after
-        # route registration for purposes of autocommit ordering
-        if any([view, view_context, view_permission, view_renderer,
-                view_for, for_, permission, renderer, view_attr]):
-            self._add_view_from_route(
-                route_name=name,
-                view=view,
-                permission=view_permission or permission,
-                context=view_context or view_for or for_,
-                renderer=view_renderer or renderer,
-                attr=view_attr,
-            )
-
     @action_method
     def add_route_predicate(self, name, factory, weighs_more_than=None,
                            weighs_less_than=None):
@@ -563,50 +451,4 @@ class RoutesConfiguratorMixin(object):
             mapper = RoutesMapper()
             self.registry.registerUtility(mapper, IRoutesMapper)
         return mapper
-
-    def _add_view_from_route(self,
-                             route_name,
-                             view,
-                             context,
-                             permission,
-                             renderer,
-                             attr,
-                             ):
-        if view:
-            self.add_view(
-                permission=permission,
-                context=context,
-                view=view,
-                name='',
-                route_name=route_name,
-                renderer=renderer,
-                attr=attr,
-                )
-        else:
-            # prevent mistakes due to misunderstanding of how hybrid calls to
-            # add_route and add_view interact
-            if attr:
-                raise ConfigurationError(
-                    'view_attr argument not permitted without view '
-                    'argument')
-            if context:
-                raise ConfigurationError(
-                    'view_context argument not permitted without view '
-                    'argument')
-            if permission:
-                raise ConfigurationError(
-                    'view_permission argument not permitted without view '
-                    'argument')
-            if renderer:
-                raise ConfigurationError(
-                    'view_renderer argument not permitted without '
-                    'view argument')
-
-        warnings.warn(
-            'Passing view-related arguments to add_route() is deprecated as of '
-            'Pyramid 1.1.  Use add_view() to associate a view with a route '
-            'instead.  See "Deprecations" in "What\'s New in Pyramid 1.1" '
-            'within the general Pyramid documentation for further details.',
-            DeprecationWarning,
-            4)
 

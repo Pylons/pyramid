@@ -399,13 +399,6 @@ process.  Examples of route predicate arguments are ``pattern``, ``xhr``, and
 Other arguments are ``name`` and ``factory``.  These arguments represent
 neither predicates nor view configuration information.
 
-.. warning::
-
-   Some arguments are view-configuration related arguments, such as
-   ``view_renderer``.  These only have an effect when the route configuration
-   names a ``view`` and these arguments have been deprecated as of
-   :app:`Pyramid` 1.1.
-
 .. index::
    single: route matching
 
