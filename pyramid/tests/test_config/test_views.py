@@ -1391,6 +1391,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         self._assertNotFound(wrapper, None, request)
 
     def test_add_view_with_custom_predicates_match(self):
+        import warnings
         from pyramid.renderers import null_renderer
         view = lambda *arg: 'OK'
         config = self._makeOne(autocommit=True)
@@ -1399,13 +1400,17 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         def pred2(context, request):
             return True
         predicates = (pred1, pred2)
-        config.add_view(view=view, custom_predicates=predicates,
-                        renderer=null_renderer)
+        with warnings.catch_warnings(record=True) as w:
+            warnings.filterwarnings('always')
+            config.add_view(view=view, custom_predicates=predicates,
+                            renderer=null_renderer)
+            self.assertEqual(len(w), 1)
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         self.assertEqual(wrapper(None, request), 'OK')
 
     def test_add_view_with_custom_predicates_nomatch(self):
+        import warnings
         view = lambda *arg: 'OK'
         config = self._makeOne(autocommit=True)
         def pred1(context, request):
@@ -1413,22 +1418,29 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         def pred2(context, request):
             return False
         predicates = (pred1, pred2)
-        config.add_view(view=view, custom_predicates=predicates)
+        with warnings.catch_warnings(record=True) as w:
+            warnings.filterwarnings('always')
+            config.add_view(view=view, custom_predicates=predicates)
+            self.assertEqual(len(w), 1)
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         self._assertNotFound(wrapper, None, request)
 
     def test_add_view_custom_predicate_bests_standard_predicate(self):
+        import warnings
         from pyramid.renderers import null_renderer
         view = lambda *arg: 'OK'
         view2 = lambda *arg: 'NOT OK'
         config = self._makeOne(autocommit=True)
         def pred1(context, request):
             return True
-        config.add_view(view=view, custom_predicates=(pred1,),
+        with warnings.catch_warnings(record=True) as w:
+            warnings.filterwarnings('always')
+            config.add_view(view=view, custom_predicates=(pred1,),
                         renderer=null_renderer)
-        config.add_view(view=view2, request_method='GET',
-                        renderer=null_renderer)
+            config.add_view(view=view2, request_method='GET',
+                            renderer=null_renderer)
+            self.assertEqual(len(w), 1)
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         request.method = 'GET'

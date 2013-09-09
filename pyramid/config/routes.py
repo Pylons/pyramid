@@ -1,3 +1,5 @@
+import warnings
+
 from pyramid.compat import urlparse
 from pyramid.interfaces import (
     IRequest,
@@ -277,6 +279,18 @@ class RoutesConfiguratorMixin(object):
           .. versionadded:: 1.4
 
         """
+        if custom_predicates:
+            warnings.warn(
+                ('The "custom_predicates" argument to Configurator.add_route '
+                 'is deprecated as of Pyramid 1.5.  Use '
+                 '"config.add_route_predicate" and use the registered '
+                 'route predicate as a predicate argument to add_route '
+                 'instead. See "Adding A Third Party View, Route, or '
+                 'Subscriber Predicate" in the "Hooks" chapter of the '
+                 'documentation for more information.'),
+                DeprecationWarning,
+                stacklevel=3
+                )
         # these are route predicates; if they do not match, the next route
         # in the routelist will be tried
         if request_method is not None:

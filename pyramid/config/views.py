@@ -1,6 +1,7 @@
 import inspect
 import operator
 import os
+import warnings
 
 from zope.interface import (
     Interface,
@@ -1052,6 +1053,19 @@ class ViewsConfiguratorMixin(object):
           .. versionadded: 1.4a1
 
         """
+        if custom_predicates:
+            warnings.warn(
+                ('The "custom_predicates" argument to Configurator.add_view '
+                 'is deprecated as of Pyramid 1.5.  Use '
+                 '"config.add_view_predicate" and use the registered '
+                 'view predicate as a predicate argument to add_view instead. '
+                 'See "Adding A Third Party View, Route, or Subscriber '
+                 'Predicate" in the "Hooks" chapter of the documentation '
+                 'for more information.'),
+                DeprecationWarning,
+                stacklevel=4
+                )
+        
         view = self.maybe_dotted(view)
         context = self.maybe_dotted(context)
         for_ = self.maybe_dotted(for_)
