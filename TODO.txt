@@ -12,9 +12,6 @@ Nice-to-Have
 
 - Have action methods return their discriminators.
 
-- Fix renderers chapter to better document system values passed to template
-  renderers.
-
 - Modify view mapper narrative docs to not use pyramid_handlers.
 
 - Modify the urldispatch chapter examples to assume a scan rather than
