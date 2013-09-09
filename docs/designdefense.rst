@@ -627,22 +627,15 @@ over 2K lines of Python code, excluding tests.
 Pyramid Has Too Many Dependencies
 ---------------------------------
 
-This is true.  At the time of this writing (Pyramid 1.3), the total number of
-Python package distributions that :app:`Pyramid` depends upon transitively is
-if you use Python 3.2 or Python 2.7 is 10.  If you use Python 2.6, Pyramid
-will pull in 12 package distributions.  This is a lot more than zero package
-distribution dependencies: a metric which various Python microframeworks and
-Django boast.
+Over time, we've made lots of progress on reducing the number of packaging
+dependencies Pyramid has had.  Pyramid 1.2 had 15 of them.  Pyramid 1.3 and 1.4
+had 12 of them.  The current release as of this writing, Pyramid 1.5, has
+only 7.  This number is unlikely to become any smaller.
 
-However, Pyramid 1.2 relied on 15 packages under Python 2.7 and 17 packages
-under Python 2.6, so we've made progress here.  A port to Python 3 completed
-in Pyramid 1.3 helped us shed a good number of dependencies by forcing us to
-make better packaging decisions.
-
-In the future, we may also move templating system dependencies out of the
-core and place them in add-on packages, to be included by developers instead
-of by the framework.  This would reduce the number of core dependencies by
-about five, leaving us with only five remaining core dependencies.
+A port to Python 3 completed in Pyramid 1.3 helped us shed a good number of
+dependencies by forcing us to make better packaging decisions.  Removing
+Chameleon and Mako templating system dependencies in the Pyramid core in 1.5
+let us shed most of the remainder of them.
 
 Pyramid "Cheats" To Obtain Speed
 --------------------------------
