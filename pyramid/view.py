@@ -1,8 +1,6 @@
 import venusian
 
 from zope.interface import providedBy
-from zope.deprecation import deprecated
-
 
 from pyramid.interfaces import (
     IRoutesMapper,
@@ -407,18 +405,3 @@ class forbidden_view_config(object):
         settings['_info'] = info.codeinfo # fbo "action_method"
         return wrapped
     
-def is_response(ob):
-    """ Return ``True`` if ``ob`` implements the interface implied by
-    :ref:`the_response`. ``False`` if not.
-
-    .. deprecated:: 1.1
-       use :func:`pyramid.request.Request.is_response` instead"""
-    if ( hasattr(ob, 'app_iter') and hasattr(ob, 'headerlist') and
-         hasattr(ob, 'status') ):
-        return True
-    return False
-
-deprecated(
-    'is_response',
-    'pyramid.view.is_response is deprecated as of Pyramid 1.1.  Use '
-    'pyramid.request.Request.is_response instead.')

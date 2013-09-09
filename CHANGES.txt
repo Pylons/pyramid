@@ -77,6 +77,10 @@ Backwards Incompatibilities
   since Pyramid 1.1.  Instead use ``pyramid.static.static_view`` with
   ``use_subpath=True`` argument.
 
+- Removed the ``pyramid.view.is_response`` function that had been deprecated
+  since Pyramid 1.1.  Use the ``pyramid.request.Request.is_response`` method
+  instead.
+
 1.5a1 (2013-08-30)
 ==================
 

@@ -11,8 +11,6 @@
 
   .. autofunction:: render_view
 
-  .. autofunction:: is_response
-
   .. autoclass:: view_config
      :members:
 
