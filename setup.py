@@ -48,6 +48,7 @@ if platform.system() == 'Java':
 else:
     docs_require = ['Sphinx',
                     'repoze.sphinx.autointerface',
+                    'pylons_sphinx_latesturl',
                    ]
     tests_require = ['Sphinx',
                      'docutils',
