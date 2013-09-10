@@ -32,6 +32,7 @@ install_requires=[
     'PasteDeploy',
     'PasteScript',
     'WebOb >= 1.0.2, < 1.2dev', # no "default_charset"; Py3k unicode breakage
+    'WebTest < 2.0dev',
     'repoze.lru',
     'setuptools',
     'zope.component >= 3.6.0', # independent of zope.hookable
