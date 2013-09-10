@@ -7,7 +7,6 @@ from pyramid.interfaces import (
     )
 
 from pyramid.exceptions import ConfigurationError
-from pyramid.i18n import get_localizer
 from pyramid.path import package_path
 from pyramid.util import action_method
 
