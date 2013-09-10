@@ -54,7 +54,7 @@ Backwards Incompatibilities
   Note that if you're using the Pyramid debug toolbar, when you upgrade 
   Pyramid, you'll also need to upgrade the ``pyramid_debugtoolbar`` package to
   at least version 1.0.8, as older versions are not compatible with Pyramid
-  1.5a2+.
+  1.5a2+ due to this change.
 
 - Removed the ``request.response_*`` varying attributes. These attributes
   have been deprecated since Pyramid 1.1, and as per the deprecation policy,
