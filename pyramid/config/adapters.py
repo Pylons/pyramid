@@ -1,3 +1,5 @@
+from webob import Response as WebobResponse
+
 from functools import update_wrapper
 
 from zope.interface import Interface
@@ -193,10 +195,9 @@ class AdaptersConfiguratorMixin(object):
         intr['type'] = type_or_iface
         self.action(discriminator, register, introspectables=(intr,))
 
-    def _register_response_adapters(self):
+    def add_default_response_adapters(self):
         # cope with WebOb response objects that aren't decorated with IResponse
-        from webob import Response as WebobResponse
-        self.registry.registerSelfAdapter((WebobResponse,), IResponse)
+        self.add_response_adapter(None, WebobResponse)
 
     @action_method
     def add_traverser(self, adapter, iface=None):

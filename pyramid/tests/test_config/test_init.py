@@ -227,6 +227,14 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne(introspection=False)
         self.assertEqual(config.introspection, False)
 
+    def test_ctor_default_webob_response_adapter_registered(self):
+        from webob import Response as WebobResponse
+        response = WebobResponse()
+        from pyramid.interfaces import IResponse
+        config = self._makeOne(autocommit=True)
+        result = config.registry.queryAdapter(response, IResponse)
+        self.assertEqual(result, response)
+        
     def test_with_package_module(self):
         from pyramid.tests.test_config import test_init
         import pyramid.tests
