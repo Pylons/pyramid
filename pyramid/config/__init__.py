@@ -62,7 +62,6 @@ from pyramid.config.adapters import AdaptersConfiguratorMixin
 from pyramid.config.assets import AssetsConfiguratorMixin
 from pyramid.config.factories import FactoriesConfiguratorMixin
 from pyramid.config.i18n import I18NConfiguratorMixin
-from pyramid.config.rendering import DEFAULT_RENDERERS
 from pyramid.config.rendering import RenderingConfiguratorMixin
 from pyramid.config.routes import RoutesConfiguratorMixin
 from pyramid.config.security import SecurityConfiguratorMixin
@@ -344,9 +343,7 @@ class Configurator(
 
         registry.registerUtility(debug_logger, IDebugLogger)
 
-        for name, renderer in DEFAULT_RENDERERS:
-            self.add_renderer(name, renderer)
-
+        self.add_default_renderers()
         self.add_default_view_predicates()
         self.add_default_route_predicates()
 
