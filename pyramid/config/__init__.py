@@ -4,7 +4,6 @@ import logging
 import operator
 import os
 import sys
-import warnings
 import venusian
 
 from webob.exc import WSGIHTTPException as WebobWSGIHTTPException
