@@ -118,9 +118,6 @@ Nice-to-Have
 Future
 ------
 
-- 1.5: Maybe? deprecate set_request_property in favor of pointing people at
-  add_request_method, schedule removal for 1.8?
-
 - 1.6: turn ``pyramid.settings.Settings`` into a function that returns the
   original dict (after ``__getattr__`` deprecation period, it was deprecated
   in 1.2).
@@ -129,6 +126,8 @@ Future
 
 - 1.7: Change ``pyramid.authentication.AuthTktAuthenticationPolicy`` default
   ``hashalg`` to ``sha512``.
+
+- 1.8 Remove set_request_property.
 
 Probably Bad Ideas
 ------------------
