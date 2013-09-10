@@ -117,6 +117,13 @@ Backwards Incompatibilities
   Pyramid narrative documentation instead of providing renderer globals values
   to the configurator.
 
+Deprecations
+------------
+
+- The ``pyramid.config.Configurator.set_request_property`` method now issues
+  a deprecation warning when used.  It had been docs-deprecated in 1.4
+  but did not issue a deprecation warning when used.
+
 1.5a1 (2013-08-30)
 ==================
 
