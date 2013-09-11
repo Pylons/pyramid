@@ -201,11 +201,17 @@ class JSON(object):
     adapters with the renderer.  See
     :ref:`json_serializing_custom_objects` for more information.
 
-    The default serializer uses ``json.JSONEncoder``. A different
-    serializer can be specified via the ``serializer`` argument.
-    Custom serializers should accept the object, a callback
-    ``default``, and any extra ``kw`` keyword arguments passed during
-    renderer construction.
+    .. note::
+
+        The default serializer uses ``json.JSONEncoder``. A different
+        serializer can be specified via the ``serializer`` argument.  Custom
+        serializers should accept the object, a callback ``default``, and any
+        extra ``kw`` keyword arguments passed during renderer construction.
+        This feature isn't widely used but it can be used to replace the
+        stock JSON serializer with, say, simplejson.  If all you want to
+        do, however, is serialize custom objects, you should use the method
+        explained in :ref:`json_serializing_custom_objects` instead
+        of replacing the serializer.
 
     .. versionadded:: 1.4
        Prior to this version, there was no public API for supplying options
