@@ -18,11 +18,12 @@ Bug Fixes
 Backwards Incompatibilities
 ---------------------------
 
-- Pyramid has dropped native support for the Mako and Chameleon renderers. To
-  re-add support for these renderers into existing projects there are 3 steps:
+- Pyramid has dropped native support for the Mako and Chameleon templating 
+  system renderers. To re-add support for these renderers into your existing 
+  projects, there are 3 steps:
 
-  - Add `pyramid_mako` and/or `pyramid_chameleon` as dependencies by
-    adding them to the `install_requires` section of the package's `setup.py`::
+  - Add ``pyramid_mako`` and/or ``pyramid_chameleon`` as dependencies by
+    adding them to the `install_requires` section of your package's `setup.py`::
 
         setup(
             #...
@@ -34,8 +35,8 @@ Backwards Incompatibilities
             ],
         )
 
-  - Update instances of the ``pyramid.config.Configurator`` to include the
-    required addons::
+  - Update instances of the ``pyramid.config.Configurator`` to ``include`` the
+    one or the other (or both) required addons::
 
         config.include('pyramid_chameleon')
         config.include('pyramid_mako')
@@ -66,10 +67,6 @@ Backwards Incompatibilities
   ``request.response.content_type`` to ``application/json``), but this is
   only necessary when the renderer is generating a response; it was a bug
   when it was done as a side effect of calling ``pyramid.renderers.render()``.
-
-- The Mako and Chameleon renderers have been removed from Pyramid.  Their 
-  functionality has been moved to  the ``pyramid_mako`` and 
-  ``pyramid_chameleon`` distributions respectively.
 
 - Removed the ``bfg2pyramid`` fixer script.
 
