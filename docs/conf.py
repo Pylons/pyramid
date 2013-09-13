@@ -90,7 +90,38 @@ intersphinx_mapping = {
     'zcml':
         ('http://docs.pylonsproject.org/projects/pyramid_zcml/en/latest',
          None),
+    'pyramid': (
+        'http://docs.pylonsproject.org/projects/pyramid/en/latest/',
+        None)
 }
+
+
+#intersphinx_mapping = {
+#    'python': (
+#        'http://docs.python.org/2',
+#        None),
+#    'sqla': (
+#        'http://docs.sqlalchemy.org/en/latest',
+#        None),
+#    'pyramid': (
+#        'http://docs.pylonsproject.org/projects/pyramid/en/latest/',
+#        None),
+#    'jinja2': (
+#        'http://docs.pylonsproject.org/projects/pyramid_jinja2/en/latest/',
+#        None),
+#    'toolbar': (
+#        'http://docs.pylonsproject.org/projects/pyramid_debugtoolbar/en/latest',
+#        None),
+#    'deform': (
+#        'http://docs.pylonsproject.org/projects/deform/en/latest',
+#        None),
+#    'colander': (
+#        'http://docs.pylonsproject.org/projects/colander/en/latest',
+#        None),
+#    'tutorials': (
+#        'http://docs.pylonsproject.org/projects/pyramid_tutorials/en/latest/',
+#        None),
+#}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
