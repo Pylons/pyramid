@@ -37,8 +37,8 @@ Steps
 
    .. code-block:: bash
 
-    (env27)$ cd ..; cp -r authentication authorization; cd authorization
-    (env27)$ python setup.py develop
+    (env)$ cd ..; cp -r authentication authorization; cd authorization
+    (env)$ python setup.py develop
 
 #. Start by changing ``authorization/tutorial/__init__.py`` to
    specify a root factory to the :term:`configurator`:
@@ -62,7 +62,7 @@ Steps
 
    .. code-block:: bash
 
-    (env27)$ pserve development.ini --reload
+    (env)$ pserve development.ini --reload
 
 #. Open ``http://localhost:6543/`` in a browser.
 

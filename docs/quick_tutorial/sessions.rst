@@ -31,8 +31,8 @@ Steps
 
    .. code-block:: bash
 
-    (env27)$ cd ..; cp -r view_classes sessions; cd sessions
-    (env27)$ python setup.py develop
+    (env)$ cd ..; cp -r view_classes sessions; cd sessions
+    (env)$ python setup.py develop
 
 #. Our ``sessions/tutorial/__init__.py`` needs a choice of session
    factory to get registered with the :term:`configurator`:
@@ -56,13 +56,13 @@ Steps
 
    .. code-block:: bash
 
-    (env27)$ nosetests tutorial
+    (env)$ nosetests tutorial
 
 #. Run your Pyramid application with:
 
    .. code-block:: bash
 
-    (env27)$ pserve development.ini --reload
+    (env)$ pserve development.ini --reload
 
 #. Open ``http://localhost:6543/`` and ``http://localhost:6543/howdy``
    in your browser. As you reload and switch between those URLs, note

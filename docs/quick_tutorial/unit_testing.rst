@@ -45,9 +45,9 @@ Steps
 
    .. code-block:: bash
 
-    (env27)$ cd ..; cp -r debugtoolbar unit_testing; cd unit_testing
-    (env27)$ python setup.py develop
-    (env27)$ easy_install nose
+    (env)$ cd ..; cp -r debugtoolbar unit_testing; cd unit_testing
+    (env)$ python setup.py develop
+    (env)$ easy_install nose
 
 #. Now we write a simple unit test in ``unit_testing/tutorial/tests.py``:
 
@@ -59,7 +59,7 @@ Steps
    .. code-block:: bash
 
 
-    (env27)$ nosetests tutorial
+    (env)$ nosetests tutorial
     .
     ----------------------------------------------------------------------
     Ran 1 test in 0.141s

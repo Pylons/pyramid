@@ -36,7 +36,7 @@ Steps
 
    .. code-block:: bash
 
-    (env27)$ cd ..; cp -r view_classes forms; cd forms
+    (env)$ cd ..; cp -r view_classes forms; cd forms
 
 #. Let's edit ``forms/setup.py`` to declare a dependency on Deform
    (which then pulls in Colander as a dependency:
@@ -48,7 +48,7 @@ Steps
 
    .. code-block:: bash
 
-      (env27)$ python setup.py develop
+      (env)$ python setup.py develop
 
 #. Register a static view in ``forms/tutorial/__init__.py`` for
    Deform's CSS/JS etc. as well as our demo wikipage scenario's
@@ -88,7 +88,7 @@ Steps
 
    .. code-block:: bash
 
-    (env27)$ pserve development.ini --reload
+    (env)$ pserve development.ini --reload
 
 #. Open ``http://localhost:6543/`` in a browser.
 

@@ -45,8 +45,8 @@ Steps
 
    .. code-block:: bash
 
-    (env27)$ cd ..; cp -r view_classes routing; cd routing
-    (env27)$ python setup.py develop
+    (env)$ cd ..; cp -r view_classes routing; cd routing
+    (env)$ python setup.py develop
 
 #. Our ``routing/tutorial/__init__.py`` needs a route with a replacement
    pattern:
@@ -74,13 +74,13 @@ Steps
 
    .. code-block:: bash
 
-    (env27)$ nosetests tutorial
+    (env)$ nosetests tutorial
 
 #. Run your Pyramid application with:
 
    .. code-block:: bash
 
-    (env27)$ pserve development.ini --reload
+    (env)$ pserve development.ini --reload
 
 #. Open ``http://localhost:6543/howdy/amy/smith`` in your browser.
 

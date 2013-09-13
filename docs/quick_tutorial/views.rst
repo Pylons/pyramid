@@ -40,8 +40,8 @@ Steps
 
    .. code-block:: bash
 
-    (env27)$ cd ..; cp -r function_testing views; cd views
-    (env27)$ python setup.py develop
+    (env)$ cd ..; cp -r function_testing views; cd views
+    (env)$ python setup.py develop
 
 #. Our ``views/tutorial/__init__.py`` gets a lot shorter:
 
@@ -64,7 +64,7 @@ Steps
    .. code-block:: bash
 
 
-    (env27)$ nosetests tutorial
+    (env)$ nosetests tutorial
     .
     ----------------------------------------------------------------------
     Ran 4 tests in 0.141s
@@ -75,7 +75,7 @@ Steps
 
    .. code-block:: bash
 
-    (env27)$ pserve development.ini --reload
+    (env)$ pserve development.ini --reload
 
 #. Open ``http://localhost:6543/`` and ``http://localhost:6543/howdy``
    in your browser.

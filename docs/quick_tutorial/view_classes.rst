@@ -39,8 +39,8 @@ Steps
 
    .. code-block:: bash
 
-    (env27)$ cd ..; cp -r templating view_classes; cd view_classes
-    (env27)$ python setup.py develop
+    (env)$ cd ..; cp -r templating view_classes; cd view_classes
+    (env)$ python setup.py develop
 
 #. Our ``view_classes/tutorial/views.py`` now has a view class with
    our two views:
@@ -60,7 +60,7 @@ Steps
    .. code-block:: bash
 
 
-    (env27)$ nosetests tutorial
+    (env)$ nosetests tutorial
     .
     ----------------------------------------------------------------------
     Ran 4 tests in 0.141s
@@ -71,7 +71,7 @@ Steps
 
    .. code-block:: bash
 
-    (env27)$ pserve development.ini --reload
+    (env)$ pserve development.ini --reload
 
 #. Open ``http://localhost:6543/`` and ``http://localhost:6543/howdy``
    in your browser.

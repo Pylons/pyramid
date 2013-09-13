@@ -38,8 +38,8 @@ Steps
 
    .. code-block:: bash
 
-    (env27)$ cd ..; cp -r view_classes request_response; cd request_response
-    (env27)$ python setup.py develop
+    (env)$ cd ..; cp -r view_classes request_response; cd request_response
+    (env)$ python setup.py develop
 
 #. Simplify the routes in ``request_response/tutorial/__init__.py``:
 
@@ -57,13 +57,13 @@ Steps
 
    .. code-block:: bash
 
-    (env27)$ nosetests tutorial
+    (env)$ nosetests tutorial
 
 #. Run your Pyramid application with:
 
    .. code-block:: bash
 
-    (env27)$ pserve development.ini --reload
+    (env)$ pserve development.ini --reload
 
 #. Open ``http://localhost:6543/`` in your browser. You will be
    redirected to ``http://localhost:6543/plain``

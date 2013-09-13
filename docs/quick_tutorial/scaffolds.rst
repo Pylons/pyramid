@@ -33,7 +33,7 @@ Steps
 
     .. code-block:: bash
 
-        (env27)$ pcreate --list
+        (env)$ pcreate --list
         Available scaffolds:
           alchemy:                 Pyramid SQLAlchemy project using url dispatch
           starter:                 Pyramid starter project
@@ -43,21 +43,21 @@ Steps
 
     .. code-block:: bash
 
-        (env27)$ pcreate --scaffold starter scaffolds
+        (env)$ pcreate --scaffold starter scaffolds
 
 #. Use normal Python development to setup our project for development:
 
     .. code-block:: bash
 
-        (env27)$ cd scaffolds
-        (env27)$ python setup.py develop
+        (env)$ cd scaffolds
+        (env)$ python setup.py develop
 
 #. Startup the application by pointing Pyramid's ``pserve`` command at
    the project's (generated) configuration file:
 
     .. code-block:: bash
 
-        (env27)$ pserve development.ini --reload
+        (env)$ pserve development.ini --reload
 
    On startup, ``pserve`` logs some output:
 

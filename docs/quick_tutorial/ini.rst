@@ -35,7 +35,7 @@ Steps
 
    .. code-block:: bash
 
-    (env27)$ cd ..; cp -r package ini; cd ini
+    (env)$ cd ..; cp -r package ini; cd ini
 
 #. Our ``ini/setup.py`` needs a setuptools "entry point" in the
    ``setup()`` function:
@@ -48,7 +48,7 @@ Steps
 
    .. code-block:: bash
 
-    (env27)$ python setup.py develop
+    (env)$ python setup.py develop
 
 #. Let's make a file ``ini/development.ini`` for our configuration:
 
@@ -66,13 +66,13 @@ Steps
 
    .. code-block:: bash
 
-    (env27)$ rm tutorial/app.py
+    (env)$ rm tutorial/app.py
 
 #. Run your Pyramid application with:
 
    .. code-block:: bash
 
-    (env27)$ pserve development.ini --reload
+    (env)$ pserve development.ini --reload
 
 #. Open ``http://localhost:6543/``.
 

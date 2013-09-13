@@ -20,8 +20,8 @@ Steps
 
    .. code-block:: bash
 
-    (env27)$ cd ..; cp -r view_classes static_assets; cd static_assets
-    (env27)$ python setup.py develop
+    (env)$ cd ..; cp -r view_classes static_assets; cd static_assets
+    (env)$ python setup.py develop
 
 #. We add a call ``config.add_static_view in
    ``static_assets/tutorial/__init__.py``:
@@ -45,13 +45,13 @@ Steps
 
    .. code-block:: bash
 
-    (env27)$ nosetests tutorial
+    (env)$ nosetests tutorial
 
 #. Run your Pyramid application with:
 
    .. code-block:: bash
 
-    (env27)$ pserve development.ini --reload
+    (env)$ pserve development.ini --reload
 
 #. Open ``http://localhost:6543/`` in your browser.
 

@@ -31,9 +31,9 @@ Steps
 
    .. code-block:: bash
 
-    (env27)$ cd ..; cp -r unit_testing functional_testing; cd functional_testing
-    (env27)$ python setup.py develop
-    (env27)$ easy_install webtest
+    (env)$ cd ..; cp -r unit_testing functional_testing; cd functional_testing
+    (env)$ python setup.py develop
+    (env)$ easy_install webtest
 
 #. Let's extend ``unit_testing/tutorial/tests.py`` to include a
    functional test:
@@ -46,7 +46,7 @@ Steps
    .. code-block:: bash
 
 
-    (env27)$ nosetests tutorial
+    (env)$ nosetests tutorial
     .
     ----------------------------------------------------------------------
     Ran 2 tests in 0.141s
