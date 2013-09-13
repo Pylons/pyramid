@@ -20,7 +20,7 @@ So far our views have been simple, free-standing functions. Many times
 your views are related: different ways to look at or work on the same
 data or a REST API that handles multiple operations. Grouping these
 together as a
-:ref:`view class <pyramid:class_as_view>` makes sense:
+:ref:`view class <class_as_view>` makes sense:
 
 - Group views
 
@@ -29,7 +29,7 @@ together as a
 - Share some state and helpers
 
 Pyramid views have
-:ref:`view predicates <pyramid:view_configuration_parameters>` that
+:ref:`view predicates <view_configuration_parameters>` that
 help determine which view is matched to a request. These predicates
 provide many axes of flexibility.
 
@@ -176,5 +176,5 @@ Extra Credit
 #. There is also a ``request.route_path`` API.  How does this differ from 
    ``request.route_url``?
 
-.. seealso:: :ref:`pyramid:class_as_view`, `Weird Stuff You Can Do With
+.. seealso:: :ref:`class_as_view`, `Weird Stuff You Can Do With
    URL Dispatch <http://www.plope.com/weird_pyramid_urldispatch>`_

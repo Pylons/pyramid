@@ -75,7 +75,7 @@ Analysis
 
 In this view class we have two routes and two views, with the first
 leading to the second by an HTTP redirect. Pyramid can
-:ref:`generate redirects <pyramid:http_redirect>` by returning a
+:ref:`generate redirects <http_redirect>` by returning a
 special object from a view or raising a special exception.
 
 In this Pyramid view, we get the URL being visited from ``request.url``.
@@ -97,5 +97,5 @@ Extra Credit
 #. Could we also ``raise HTTPFound(location='/plain')`` instead of
    returning it?  If so, what's the difference?
 
-.. seealso:: :ref:`pyramid:webob_chapter`,
-   :ref:`generate redirects <pyramid:http_redirect>`
+.. seealso:: :ref:`webob_chapter`,
+   :ref:`generate redirects <http_redirect>`

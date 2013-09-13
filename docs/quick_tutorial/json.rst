@@ -96,6 +96,6 @@ Python can't natively JSON encode DateTime objects. There are a number
 of solutions for this in Pyramid, including extending the JSON renderer
 with a custom renderer.
 
-.. seealso:: :ref:`pyramid:views_which_use_a_renderer`,
-   :ref:`pyramid:json_renderer`, and
-   :ref:`pyramid:adding_and_overriding_renderers`
+.. seealso:: :ref:`views_which_use_a_renderer`,
+   :ref:`json_renderer`, and
+   :ref:`adding_and_overriding_renderers`

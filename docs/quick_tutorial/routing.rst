@@ -12,7 +12,7 @@ Writing web applications usually means sophisticated URL design. We
 just saw some Pyramid machinery for requests and views. Let's look at
 features that help in routing.
 
-Previously we saw the basics of routing URLs to views in Pyramid:
+Previously we saw the basics of routing URLs to views in
 
 - Your project's "setup" code registers a route name to be used when
   matching part of the URL
@@ -93,7 +93,7 @@ In ``__init__.py`` we see an important change in our route declaration:
 
     config.add_route('hello', '/howdy/{first}/{last}')
 
-With this we tell the :term:`pyramid:configurator` that our URL has
+With this we tell the :term:`configurator` that our URL has
 a "replacement pattern".  With this, URLs such as ``/howdy/amy/smith``
 will assign ``amy`` to ``first`` and ``smith`` to ``last``. We can then
 use this data in our view:

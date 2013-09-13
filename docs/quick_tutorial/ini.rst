@@ -9,7 +9,7 @@ Background
 ==========
 
 Pyramid has a first-class concept of
-:ref:`configuration <pyramid:configuration_narr>` distinct from code.
+:ref:`configuration <configuration_narr>` distinct from code.
 This approach is optional, but its presence makes it distinct from
 other Python web frameworks. It taps into Python's ``setuptools``
 library, which establishes conventions for how Python projects can be
@@ -82,7 +82,7 @@ Analysis
 Our ``development.ini`` file is read by ``pserve`` and serves to
 bootstrap our application. Processing then proceeds as described in
 the Pyramid chapter on
-:ref:`application startup <pyramid:startup_chapter>`:
+:ref:`application startup <startup_chapter>`:
 
 - ``pserve`` looks for ``[app:main]`` and finds ``use = egg:tutorial``
 
@@ -132,11 +132,11 @@ Extra Credit
    it the ``main`` function. Why not?
 
 .. seealso::
-   :ref:`pyramid:project_narr`,
-   :ref:`pyramid:scaffolding_chapter`,
-   :ref:`pyramid:what_is_this_pserve_thing`,
-   :ref:`pyramid:environment_chapter`,
-   :ref:`pyramid:paste_chapter`
+   :ref:`project_narr`,
+   :ref:`scaffolding_chapter`,
+   :ref:`what_is_this_pserve_thing`,
+   :ref:`environment_chapter`,
+   :ref:`paste_chapter`
 
 Extra Credit
 ============

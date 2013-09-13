@@ -12,7 +12,7 @@ So far our views have been simple, free-standing functions. Many times
 your views are related: different ways to look at or work on the same
 data or a REST API that handles multiple operations. Grouping these
 together as a
-:ref:`view class <pyramid:class_as_view>` makes sense:
+:ref:`view class <class_as_view>` makes sense:
 
 - Group views
 
@@ -93,4 +93,4 @@ class. But you can also see the pattern in the tests of instantiating
 the view class with the dummy request first, then calling the view
 method being tested.
 
-.. seealso:: :ref:`pyramid:class_as_view`
+.. seealso:: :ref:`class_as_view`

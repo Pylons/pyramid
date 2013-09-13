@@ -41,7 +41,7 @@ Steps
     (env27)$ python setup.py develop
 
 #. Start by changing ``authorization/tutorial/__init__.py`` to
-   specify a root factory to the :term:`pyramid:configurator`:
+   specify a root factory to the :term:`configurator`:
 
    .. literalinclude:: authorization/tutorial/__init__.py
     :linenos:

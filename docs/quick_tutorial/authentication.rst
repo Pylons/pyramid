@@ -102,7 +102,7 @@ one step at a time, we provide a system that identifies users and lets
 them log out.
 
 In this example we chose to use the bundled
-:ref:`AuthTktAuthenticationPolicy <pyramid:authentication_module>`
+:ref:`AuthTktAuthenticationPolicy <authentication_module>`
 policy. We enabled it in our configuration and provided a
 ticket-signing secret in our INI file.
 
@@ -130,5 +130,5 @@ Extra Credit
    onto each request? Use ``import pdb; pdb.set_trace()`` to answer
    this.
 
-.. seealso:: :ref:`pyramid:security_chapter`,
-   :ref:`AuthTktAuthenticationPolicy <pyramid:authentication_module>`
+.. seealso:: :ref:`security_chapter`,
+   :ref:`AuthTktAuthenticationPolicy <authentication_module>`

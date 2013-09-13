@@ -87,7 +87,7 @@ Analysis
 
 Ahh, that looks better. We have a view that is focused on Python code.
 Our ``@view_config`` decorator specifies a
-:term:`pyramid:renderer` that points
+:term:`renderer` that points
 our template file. Our view then simply returns data which is then
 supplied to our template. Note that we used the same template for both
 views.
@@ -95,6 +95,6 @@ views.
 Note the effect on testing. We can focus on having a data-oriented
 contract with our view code.
 
-.. seealso:: :ref:`pyramid:templates_chapter`,
-   :ref:`pyramid:debugging_templates`, and
-   :ref:`pyramid:mako_templates`
+.. seealso:: :ref:`templates_chapter`,
+   :ref:`debugging_templates`, and
+   :ref:`mako_templates`

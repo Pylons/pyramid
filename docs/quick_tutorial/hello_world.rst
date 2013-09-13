@@ -70,19 +70,19 @@ explanation:
 #. *Line 11*. The ``if __name__ == '__main__':`` is Python's way of
    saying "Start here when running from the command line".
 
-#. *Lines 12-14*. Use Pyramid's :term:`pyramid:configurator` to connect
-   :term:`pyramid:view` code to a particular URL
-   :term:`pyramid:route`.
+#. *Lines 12-14*. Use Pyramid's :term:`configurator` to connect
+   :term:`view` code to a particular URL
+   :term:`route`.
 
 #. *Lines 6-7*. Implement the view code that generates the
-   :term:`pyramid:response`.
+   :term:`response`.
 
-#. *Lines 15-17*. Publish a :term:`pyramid:WSGI` app using an HTTP
+#. *Lines 15-17*. Publish a :term:`WSGI` app using an HTTP
    server.
 
-As shown in this example, the :term:`pyramid:configurator` plays a
+As shown in this example, the :term:`configurator` plays a
 central role in Pyramid development. Building an application from
-loosely-coupled parts via :ref:`pyramid:configuration_narr` is a
+loosely-coupled parts via :ref:`configuration_narr` is a
 central idea in Pyramid, one that we will revisit regularly in this
 *Quick Tour*.
 

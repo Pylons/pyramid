@@ -2,87 +2,46 @@
 Python Setup
 ============
 
-First things first: we need our Python environment in ship-shape.
+.. note::
+
+    This tutorial is aimed at Python 3.3. It also works with
+    Python 2.7.
+
+First thing's first: we need our Python environment in ship-shape.
 Pyramid encourages standard Python development practices (virtual
 environments, packaging tools, logging, etc.) so let's get our working
-area in place.
-
-.. note::
-
-    This tutorial is aimed at Python 2.7. It also works with
-    Python 3.3.
-
-*This step has most likely been performed already on the CCDC computers.*
-
-Prequisites
-===========
-
-Modern Python development means two tools to add to the standard
-Python installation: packaging and virtual environments.
-
-Python's tools for installing packages is undergoing rapid change. For
-this tutorial, we will install the latest version of
-`setuptools <https://pypi.python.org/pypi/setuptools/>`_. This gives us
-the ``easy_install`` command-line tool for installing Python packages.
-Presuming you have Python on your ``PATH``:
+area in place. For Python 3.3:
 
 .. code-block:: bash
 
+  $ pyvenv-3.3 env33
+  $ source env33/bin/activate
   $ wget https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py -O - | python
 
-We now have an ``easy_install`` command that we can use to install
-``virtualenv``:
+If ``wget`` complains with a certificate error, run it with:
 
 .. code-block:: bash
 
-  $ easy_install virtualenv
+  $ wget --no-check-certificate
 
-Making a Virtual Environment
-============================
-
-Developing in isolation helps us ensure what we are learning doesn't
-conflict with any packages installed from other work on the machine.
-*Virtual environments* let us do just this.
-
-Presuming you have made a tutorial area at some location (referenced as
-``your/tutorial/directory`` below):
-
-.. code-block:: bash
-
-  $ cd your/tutorial/directory
-  $ virtualenv env27
-  $ source env27/bin/activate
-  (env27)$ which python2.7
-
-Once you do this, your path will be setup to point at the ``bin`` of
-your virtual environment. Your prompt will also change, as noted above.
+In these steps above we first made a :term:`virtualenv` and then
+"activated"  it, which adjusted our path to look first in
+``env33/bin`` for commands (such as ``python``). We next downloaded
+Python's packaging support and installed it, giving us the
+``easy_install`` command-line script for adding new packages. Python
+2.7 users will need to use ``virtualenv`` instead of ``pyvenv`` to make
+their virtual environment.
 
 .. note::
 
-    This tutorial presumes you are working in a command-line shell
-    which has performed the ``source env27/bin/activate``. If you
-    close that shell, or open a new one, you will need to re-perform
-    that command.
+   Why ``easy_install`` and not ``pip``? Pyramid encourages use of
+   namespace packages which, until recently, ``pip`` didn't permit.
+   Also, Pyramid has some optional C extensions for performance. With
+   ``easy_install``, Windows users can get these extensions without
+   needing a C compiler.
 
-Discussion
-==========
-
-The modern world of Python packaging eschews ``easy_install`` in favor
-of ``pip``, a more-recent and maintained packaging tool. Why doesn't
-this tutorial use it?
-
-- ``pip`` is only gradually getting the ability to install Windows
-  binaries. ``easy_install`` has been able to do this for years.
-
-- Until recently, ``pip`` has not been able to use "namespace
-  packages." As the ``pip`` support for this stabilizes,
-  we can switch to using ``pip``.
-
-- You have to use ``easy_install`` to get ``pip`` installed, so why not
-  just stick with ``easy_install``.
-
-Python 3.3 has a `built-in story for virtual
-environments <http://docs.python.org/dev/library/venv.html>`_. This
-eliminates the requirement for installing ``virtualenv``. Instead,
-Python 3.3 provides the ``pyvenv`` command for creating virtual
-environments.
+.. seealso:: See Also: Python 3's :mod:`venv module <python3:venv>`,
+   the ``setuptools`` `installation
+   instructions <https://pypi.python.org/pypi/setuptools/0.9.8#installation-instructions>`_,
+   `easy_install help <https://pypi.python.org/pypi/setuptools/0.9.8#using-setuptools-and-easyinstall>`_,
+   and Pyramid's :ref:`Before You Install <installing_chapter>`.

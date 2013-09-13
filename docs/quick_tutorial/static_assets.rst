@@ -84,6 +84,6 @@ Extra Credit
 #. There is also a ``request.static_path`` API.  How does this differ from 
    ``request.static_url``?
 
-.. seealso:: :ref:`pyramid:assets_chapter`,
-   :ref:`pyramid:preventing_http_caching`, and
-   :ref:`pyramid:influencing_http_caching`
+.. seealso:: :ref:`assets_chapter`,
+   :ref:`preventing_http_caching`, and
+   :ref:`influencing_http_caching`

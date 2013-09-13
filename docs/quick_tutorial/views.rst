@@ -99,9 +99,9 @@ and the name of the view, can all be different. More on routes later.
 
 Earlier we saw ``config.add_view`` as one way to configure a view. This
 section introduces ``@view_config``. Pyramid's configuration supports
-:term:`pyramid:imperative configuration`, such as the
+:term:`imperative configuration`, such as the
 ``config.add_view`` in the previous example. You can also use
-:term:`pyramid:declarative configuration`, in which a Python
+:term:`declarative configuration`, in which a Python
 :term:`python:decorator`
 is placed on the line above the view. Both approaches result in the
 same final configuration, thus usually, it is simply a matter of taste.
@@ -114,7 +114,7 @@ Extra Credit
 #. Why might ``assertIn`` be a better choice in testing the text in
    responses than ``assertEqual``?
 
-.. seealso:: :ref:`pyramid:views_chapter`,
-   :ref:`pyramid:view_config_chapter`, and
-   :ref:`pyramid:debugging_view_configuration`
+.. seealso:: :ref:`views_chapter`,
+   :ref:`view_config_chapter`, and
+   :ref:`debugging_view_configuration`
 

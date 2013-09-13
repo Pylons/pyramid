@@ -14,7 +14,7 @@ cart. This is called a :term:`session`.
 Pyramid has basic built-in support for sessions, with add-ons such as
 *dogpile.cache* (or your own custom sessioning engine) that provide
 richer session support. Let's take a look at the
-:ref:`built-in sessioning support <pyramid:sessions_chapter>`.
+:ref:`built-in sessioning support <sessions_chapter>`.
 
 Objectives
 ==========
@@ -93,6 +93,6 @@ Flash messages are a technique where messages can be stored between
 requests, using sessions, then removed when they finally get displayed.
 
 .. seealso::
-   :ref:`pyramid:sessions_chapter`,
-   :ref:`pyramid:flash_messages`, and
-   :ref:`pyramid:session_module`.
+   :ref:`sessions_chapter`,
+   :ref:`flash_messages`, and
+   :ref:`session_module`.
