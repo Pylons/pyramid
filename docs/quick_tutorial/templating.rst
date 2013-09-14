@@ -95,6 +95,5 @@ views.
 Note the effect on testing. We can focus on having a data-oriented
 contract with our view code.
 
-.. seealso:: :ref:`templates_chapter`,
-   :ref:`debugging_templates`, and
-   :ref:`mako_templates`
+.. seealso:: :ref:`templates_chapter`, :ref:`debugging_templates`, and
+   :ref:`available_template_system_bindings`.
