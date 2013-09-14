@@ -166,6 +166,9 @@ class view_config(object):
     See :ref:`mapping_views_using_a_decorator_section` for details about
     using :class:`pyramid.view.view_config`.
 
+    ATTENTION: ``view_config`` will work ONLY on module top level members
+    because of the limitation of ``venusian.Scanner.scan``.
+
     """
     venusian = venusian # for testing injection
     def __init__(self, **settings):
@@ -205,7 +208,7 @@ class view_defaults(view_config):
 
     See :ref:`view_defaults` for more information.
     """
-    
+
     def __call__(self, wrapped):
         wrapped.__view_defaults__ = self.__dict__.copy()
         return wrapped
@@ -305,7 +308,7 @@ class notfound_view_config(object):
 
         from pyramid.view import notfound_view_config
         from pyramid.response import Response
-          
+
         @notfound_view_config()
         def notfound(request):
             return Response('Not found, dude!', status='404 Not Found')
@@ -368,7 +371,7 @@ class forbidden_view_config(object):
 
         from pyramid.view import forbidden_view_config
         from pyramid.response import Response
-          
+
         @forbidden_view_config()
         def forbidden(request):
             return Response('You are not allowed', status='401 Unauthorized')
@@ -404,4 +407,4 @@ class forbidden_view_config(object):
 
         settings['_info'] = info.codeinfo # fbo "action_method"
         return wrapped
-    
+
