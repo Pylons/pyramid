@@ -764,7 +764,7 @@ content management system (CMS) may have basic functionality that needs to be
 extended for a particular deployment.  That CMS system may be deployed for
 many organizations at many places.  Some number of deployments of this CMS
 may be deployed centrally by a third party and managed as a group.  It's
-useful to be able to extend such a system for each deployment via preordained
+easier to be able to extend such a system for each deployment via preordained
 plugpoints than it is to continually keep each software branch of the system
 in sync with some upstream source: the upstream developers may change code in
 such a way that your changes to the same codebase conflict with theirs in
