@@ -792,8 +792,8 @@ such a feature.
   main template and the CSS in a separate Python package which defines
   overrides.
 
-- If a deployment needs an application page to do something differently needs
-  it to expose more or different information, the deployer may override the
+- If a deployment needs an application page to do something differently, or
+  to expose more or different information, the deployer may override the
   view that renders the page within a separate Python package.
 
 - If a deployment needs an additional feature, the deployer may add a view to
