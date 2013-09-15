@@ -810,7 +810,7 @@ won't regularly need to deal wth meaningless textual merge conflicts that
 trivial changes to upstream packages often entail when it comes time to
 update the upstream package, because if you extend an application externally,
 there just is no textual merge done.  Your modifications will also, for
-whatever its worth, be contained in one, canonical, well-defined place.
+whatever it's worth, be contained in one, canonical, well-defined place.
 
 Branching an application and continually merging in order to get new features
 and bugfixes is clearly useful.  You can do that with a :app:`Pyramid`
