@@ -822,7 +822,7 @@ dismiss this feature in favor of branching and merging because applications
 written in their framework of choice aren't extensible out of the box in a
 comparably fundamental way.
 
-While :app:`Pyramid` application are fundamentally extensible even if you
+While :app:`Pyramid` applications are fundamentally extensible even if you
 don't write them with specific extensibility in mind, if you're moderately
 adventurous, you can also take it a step further.  If you learn more about
 the :term:`Zope Component Architecture`, you can optionally use it to expose
