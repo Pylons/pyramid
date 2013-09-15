@@ -842,7 +842,7 @@ applications by :app:`Pyramid` are good or bad is mostly pointless. You
 needn't take advantage of the extensibility features provided by a particular
 :app:`Pyramid` application in order to affect a modification for a particular
 set of its deployments.  You can ignore the application's extensibility
-plugpoints entirely, and instead use version control branching and merging to
+plugpoints entirely, and use version control branching and merging to
 manage application deployment modifications instead, as if you were deploying
 an application written using any other web framework.
 
