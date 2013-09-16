@@ -53,13 +53,13 @@ Steps
 
     (venv)$ pserve development.ini --reload
 
-#. Open ``http://localhost:6543/`` in your browser.
+#. Open http://localhost:6543/ in your browser.
 
 Analysis
 ========
 
 We changed our WSGI application to map requests under
-``http://localhost:6543/static/`` to files and directories inside a
+http://localhost:6543/static/ to files and directories inside a
 ``static`` directory inside our ``tutorial`` package. This directory
 contained ``app.css``.
 

@@ -79,7 +79,7 @@ Steps
 
     (venv)$ pserve development.ini --reload
 
-#. Open ``http://localhost:6543/`` in a browser.
+#. Open http://localhost:6543/ in a browser.
 
 #. Click the "Log In" link.
 

@@ -61,7 +61,7 @@ Steps
 
     (venv)$ pserve development.ini --reload
 
-#. Open ``http://localhost:6543/howdy.json`` in your browser and you
+#. Open http://localhost:6543/howdy.json in your browser and you
    will see the resulting JSON response.
 
 Analysis

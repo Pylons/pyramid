@@ -74,7 +74,7 @@ Steps
 
     (venv)$ pserve development.ini --reload
 
-#. Open ``http://localhost:6543/``.
+#. Open http://localhost:6543/.
 
 Analysis
 ========

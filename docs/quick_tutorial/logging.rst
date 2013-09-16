@@ -52,7 +52,7 @@ Steps
 
     (venv)$ pserve development.ini --reload
 
-#. Open ``http://localhost:6543/`` and ``http://localhost:6543/howdy``
+#. Open http://localhost:6543/ and http://localhost:6543/howdy
    in your browser. Note, both in the console and in the debug
    toolbar, the message that you logged.
 
@@ -67,7 +67,7 @@ logging for our Pyramid application:
 
 In this, our ``tutorial`` Python package is setup as a logger
 and configured to log messages at a ``DEBUG`` or higher level. When you
-visit ``http://localhost:6543`` your console will now show::
+visit http://localhost:6543 your console will now show::
 
  2013-08-09 10:42:42,968 DEBUG [tutorial.views][MainThread] In home view
 

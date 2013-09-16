@@ -65,10 +65,10 @@ Steps
 
     (venv)$ pserve development.ini --reload
 
-#. Open ``http://localhost:6543/`` in your browser. You will be
-   redirected to ``http://localhost:6543/plain``
+#. Open http://localhost:6543/ in your browser. You will be
+   redirected to http://localhost:6543/plain
 
-#. Open ``http://localhost:6543/plain?name=alice`` in your browser.
+#. Open http://localhost:6543/plain?name=alice in your browser.
 
 Analysis
 ========
@@ -79,7 +79,7 @@ leading to the second by an HTTP redirect. Pyramid can
 special object from a view or raising a special exception.
 
 In this Pyramid view, we get the URL being visited from ``request.url``.
-Also, if you visited ``http://localhost:6543/plain?name=alice``,
+Also, if you visited http://localhost:6543/plain?name=alice,
 the name is included in the body of the response::
 
   URL http://localhost:6543/plain?name=alice with name: alice

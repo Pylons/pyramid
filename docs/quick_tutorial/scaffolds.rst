@@ -67,7 +67,7 @@ Steps
      Starting server in PID 72213.
      Starting HTTP server on http://0.0.0.0:6543
 
-#. Open ``http://localhost:6543/`` in your browser.
+#. Open http://localhost:6543/ in your browser.
 
 Analysis
 ========

@@ -100,7 +100,7 @@ Steps
 
     (venv)$ pserve development.ini --reload
 
-#. Open ``http://localhost:6543/howdy/jane/doe`` in your browser. Click
+#. Open http://localhost:6543/howdy/jane/doe in your browser. Click
    the ``Save`` and ``Delete`` buttons and watch the output in the
    console window.
 
@@ -110,7 +110,7 @@ Analysis
 As you can see, the four views are logically grouped together.
 Specifically:
 
-- We have a ``home`` view available at ``http://localhost:6543/`` with
+- We have a ``home`` view available at http://localhost:6543/ with
   a clickable link to the ``hello`` view.
 
 - The second view is returned when you go to ``/howdy/jane/doe``. This

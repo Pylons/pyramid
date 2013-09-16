@@ -59,7 +59,7 @@ Steps
 
     (venv)$ python app.py
 
-#. Open ``http://localhost:6543/`` in your browser.
+#. Open http://localhost:6543/ in your browser.
 
 Analysis
 ========

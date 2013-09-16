@@ -64,11 +64,11 @@ Steps
 
     (venv)$ pserve development.ini --reload
 
-#. Open ``http://localhost:6543/`` in a browser.
+#. Open http://localhost:6543/ in a browser.
 
 #. If you are still logged in, click the "Log Out" link.
 
-#. Visit ``http://localhost:6543/howdy`` in a browser. You should be
+#. Visit http://localhost:6543/howdy in a browser. You should be
    asked to login.
 
 Analysis

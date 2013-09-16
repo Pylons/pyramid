@@ -64,7 +64,7 @@ Steps
 
     (venv)$ pserve development.ini --reload
 
-#. Open ``http://localhost:6543/`` and ``http://localhost:6543/howdy``
+#. Open http://localhost:6543/ and http://localhost:6543/howdy
    in your browser. As you reload and switch between those URLs, note
    that the counter increases and is *not* specific to the URL.
 

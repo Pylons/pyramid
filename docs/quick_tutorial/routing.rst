@@ -82,7 +82,7 @@ Steps
 
     (venv)$ pserve development.ini --reload
 
-#. Open ``http://localhost:6543/howdy/amy/smith`` in your browser.
+#. Open http://localhost:6543/howdy/amy/smith in your browser.
 
 Analysis
 ========
@@ -112,7 +112,7 @@ Extra Credit
 ============
 
 #. What happens if you to go the URL
-   ``http://localhost:6543/howdy``? Is this the result that you
+   http://localhost:6543/howdy? Is this the result that you
    expected?
 
 .. seealso:: `Weird Stuff You Can Do With URL

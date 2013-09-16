@@ -73,7 +73,7 @@ Steps
 
     (venv)$ pserve development.ini --reload
 
-#. Open ``http://localhost:6543/`` and ``http://localhost:6543/howdy``
+#. Open http://localhost:6543/ and http://localhost:6543/howdy
    in your browser.
 
 Analysis
