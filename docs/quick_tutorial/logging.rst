@@ -32,8 +32,8 @@ Steps
 
    .. code-block:: bash
 
-    (env)$ cd ..; cp -r view_classes logging; cd logging
-    (env)$ python setup.py develop
+    (venv)$ cd ..; cp -r view_classes logging; cd logging
+    (venv)$ python setup.py develop
 
 #. Extend ``logging/tutorial/views.py`` to log a message:
 
@@ -44,13 +44,13 @@ Steps
 
    .. code-block:: bash
 
-    (env)$ nosetests tutorial
+    (venv)$ nosetests tutorial
 
 #. Run your Pyramid application with:
 
    .. code-block:: bash
 
-    (env)$ pserve development.ini --reload
+    (venv)$ pserve development.ini --reload
 
 #. Open ``http://localhost:6543/`` and ``http://localhost:6543/howdy``
    in your browser. Note, both in the console and in the debug

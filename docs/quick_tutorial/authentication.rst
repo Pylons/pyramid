@@ -32,8 +32,8 @@ Steps
 
    .. code-block:: bash
 
-    (env)$ cd ..; cp -r view_classes authentication; cd authentication
-    (env)$ python setup.py develop
+    (venv)$ cd ..; cp -r view_classes authentication; cd authentication
+    (venv)$ python setup.py develop
 
 #. Put the security hash in the ``authentication/development.ini``
    configuration file as ``tutorial.secret`` instead of putting it in
@@ -77,7 +77,7 @@ Steps
 
    .. code-block:: bash
 
-    (env)$ pserve development.ini --reload
+    (venv)$ pserve development.ini --reload
 
 #. Open ``http://localhost:6543/`` in a browser.
 
