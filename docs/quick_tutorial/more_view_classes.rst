@@ -55,8 +55,8 @@ Steps
 
    .. code-block:: bash
 
-    (env)$ cd ..; cp -r templating more_view_classes; cd more_view_classes
-    (env)$ python setup.py develop
+    (venv)$ cd ..; cp -r templating more_view_classes; cd more_view_classes
+    (venv)$ python setup.py develop
 
 #. Our route in ``more_view_classes/tutorial/__init__.py`` needs some
    replacement patterns:
@@ -98,9 +98,9 @@ Steps
 
    .. code-block:: bash
 
-    (env)$ pserve development.ini --reload
+    (venv)$ pserve development.ini --reload
 
-#. Open ``http://localhost:6543/howdy/jane/doe`` in your browser. Click
+#. Open http://localhost:6543/howdy/jane/doe in your browser. Click
    the ``Save`` and ``Delete`` buttons and watch the output in the
    console window.
 
@@ -110,7 +110,7 @@ Analysis
 As you can see, the four views are logically grouped together.
 Specifically:
 
-- We have a ``home`` view available at ``http://localhost:6543/`` with
+- We have a ``home`` view available at http://localhost:6543/ with
   a clickable link to the ``hello`` view.
 
 - The second view is returned when you go to ``/howdy/jane/doe``. This

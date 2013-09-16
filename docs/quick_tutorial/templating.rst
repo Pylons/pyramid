@@ -36,8 +36,8 @@ Steps
 
    .. code-block:: bash
 
-    (env)$ cd ..; cp -r views templating; cd templating
-    (env)$ python setup.py develop
+    (venv)$ cd ..; cp -r views templating; cd templating
+    (venv)$ python setup.py develop
 
 #. Our ``templating/tutorial/views.py`` no longer has HTML in it:
 
@@ -66,7 +66,7 @@ Steps
    .. code-block:: bash
 
 
-    (env)$ nosetests tutorial
+    (venv)$ nosetests tutorial
     .
     ----------------------------------------------------------------------
     Ran 4 tests in 0.141s
@@ -77,9 +77,9 @@ Steps
 
    .. code-block:: bash
 
-    (env)$ pserve development.ini --reload
+    (venv)$ pserve development.ini --reload
 
-#. Open ``http://localhost:6543/`` and ``http://localhost:6543/howdy``
+#. Open http://localhost:6543/ and http://localhost:6543/howdy
    in your browser.
 
 Analysis

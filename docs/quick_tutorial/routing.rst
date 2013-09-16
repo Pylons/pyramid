@@ -45,8 +45,8 @@ Steps
 
    .. code-block:: bash
 
-    (env)$ cd ..; cp -r view_classes routing; cd routing
-    (env)$ python setup.py develop
+    (venv)$ cd ..; cp -r view_classes routing; cd routing
+    (venv)$ python setup.py develop
 
 #. Our ``routing/tutorial/__init__.py`` needs a route with a replacement
    pattern:
@@ -74,15 +74,15 @@ Steps
 
    .. code-block:: bash
 
-    (env)$ nosetests tutorial
+    (venv)$ nosetests tutorial
 
 #. Run your Pyramid application with:
 
    .. code-block:: bash
 
-    (env)$ pserve development.ini --reload
+    (venv)$ pserve development.ini --reload
 
-#. Open ``http://localhost:6543/howdy/amy/smith`` in your browser.
+#. Open http://localhost:6543/howdy/amy/smith in your browser.
 
 Analysis
 ========
@@ -112,7 +112,7 @@ Extra Credit
 ============
 
 #. What happens if you to go the URL
-   ``http://localhost:6543/howdy``? Is this the result that you
+   http://localhost:6543/howdy? Is this the result that you
    expected?
 
 .. seealso:: `Weird Stuff You Can Do With URL

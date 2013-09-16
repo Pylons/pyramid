@@ -28,8 +28,8 @@ Steps
 
    .. code-block:: bash
 
-    (env)$ cd ..; cp -r view_classes json; cd json
-    (env)$ python setup.py develop
+    (venv)$ cd ..; cp -r view_classes json; cd json
+    (venv)$ python setup.py develop
 
 #. We add a new route for ``hello_json`` in
    ``json/tutorial/__init__.py``:
@@ -53,15 +53,15 @@ Steps
 
    .. code-block:: bash
 
-    (env)$ nosetests tutorial
+    (venv)$ nosetests tutorial
 
 #. Run your Pyramid application with:
 
    .. code-block:: bash
 
-    (env)$ pserve development.ini --reload
+    (venv)$ pserve development.ini --reload
 
-#. Open ``http://localhost:6543/howdy.json`` in your browser and you
+#. Open http://localhost:6543/howdy.json in your browser and you
    will see the resulting JSON response.
 
 Analysis

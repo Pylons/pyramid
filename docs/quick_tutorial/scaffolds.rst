@@ -33,7 +33,7 @@ Steps
 
     .. code-block:: bash
 
-        (env)$ pcreate --list
+        (venv)$ pcreate --list
         Available scaffolds:
           alchemy:                 Pyramid SQLAlchemy project using url dispatch
           starter:                 Pyramid starter project
@@ -43,21 +43,21 @@ Steps
 
     .. code-block:: bash
 
-        (env)$ pcreate --scaffold starter scaffolds
+        (venv)$ pcreate --scaffold starter scaffolds
 
 #. Use normal Python development to setup our project for development:
 
     .. code-block:: bash
 
-        (env)$ cd scaffolds
-        (env)$ python setup.py develop
+        (venv)$ cd scaffolds
+        (venv)$ python setup.py develop
 
 #. Startup the application by pointing Pyramid's ``pserve`` command at
    the project's (generated) configuration file:
 
     .. code-block:: bash
 
-        (env)$ pserve development.ini --reload
+        (venv)$ pserve development.ini --reload
 
    On startup, ``pserve`` logs some output:
 
@@ -67,7 +67,7 @@ Steps
      Starting server in PID 72213.
      Starting HTTP server on http://0.0.0.0:6543
 
-#. Open ``http://localhost:6543/`` in your browser.
+#. Open http://localhost:6543/ in your browser.
 
 Analysis
 ========

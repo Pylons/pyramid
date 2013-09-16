@@ -20,8 +20,8 @@ Steps
 
    .. code-block:: bash
 
-    (env)$ cd ..; cp -r view_classes static_assets; cd static_assets
-    (env)$ python setup.py develop
+    (venv)$ cd ..; cp -r view_classes static_assets; cd static_assets
+    (venv)$ python setup.py develop
 
 #. We add a call ``config.add_static_view in
    ``static_assets/tutorial/__init__.py``:
@@ -45,21 +45,21 @@ Steps
 
    .. code-block:: bash
 
-    (env)$ nosetests tutorial
+    (venv)$ nosetests tutorial
 
 #. Run your Pyramid application with:
 
    .. code-block:: bash
 
-    (env)$ pserve development.ini --reload
+    (venv)$ pserve development.ini --reload
 
-#. Open ``http://localhost:6543/`` in your browser.
+#. Open http://localhost:6543/ in your browser.
 
 Analysis
 ========
 
 We changed our WSGI application to map requests under
-``http://localhost:6543/static/`` to files and directories inside a
+http://localhost:6543/static/ to files and directories inside a
 ``static`` directory inside our ``tutorial`` package. This directory
 contained ``app.css``.
 
