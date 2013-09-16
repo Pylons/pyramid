@@ -46,7 +46,7 @@ Steps
 
    .. code-block:: bash
 
-    (env)$ mkdir hello_world; cd hello_world
+    (venv)$ mkdir hello_world; cd hello_world
 
 #. Copy the following into ``hello_world/app.py``:
 
@@ -57,9 +57,9 @@ Steps
 
    .. code-block:: bash
 
-    (env)$ python app.py
+    (venv)$ python app.py
 
-#. Open ``http://localhost:6543/`` in your browser.
+#. Open http://localhost:6543/ in your browser.
 
 Analysis
 ========
