@@ -24,8 +24,4 @@ class MyModel(Base):
     name = Column(Text)
     value = Column(Integer)
 
-    def __init__(self, name, value):
-        self.name = name
-        self.value = value
-
 Index('my_index', MyModel.name, unique=True, mysql_length=255)

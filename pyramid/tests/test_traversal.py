@@ -1278,21 +1278,12 @@ class TestDefaultRootFactory(unittest.TestCase):
     def _makeOne(self, environ):
         return self._getTargetClass()(environ)
 
-    def test_no_matchdict(self):
-        class DummyRequest:
-            matchdict = None
+    def test_it(self):
+        class DummyRequest(object):
+            pass
         root = self._makeOne(DummyRequest())
         self.assertEqual(root.__parent__, None)
         self.assertEqual(root.__name__, None)
-
-    def test_matchdict(self):
-        class DummyRequest:
-            pass
-        request = DummyRequest()
-        request.matchdict = {'a':1, 'b':2}
-        root = self._makeOne(request)
-        self.assertEqual(root.a, 1)
-        self.assertEqual(root.b, 2)
 
 class Test__join_path_tuple(unittest.TestCase):
     def _callFUT(self, tup):

@@ -199,12 +199,12 @@
       - Ensures that the user implied by the request passed has the necessary
         authorization to invoke view callable before calling it.
 
-      - causes a :class:`~pyramid.events.NewResponse` event to be sent when
-        the Pyramid application returns a response.
-
       - Calls any :term:`response callback` functions defined within the
         request's lifetime if a response is obtained from the Pyramid
         application.
+
+      - causes a :class:`~pyramid.events.NewResponse` event to be sent if a
+        response is obtained.
 
       - Calls any :term:`finished callback` functions defined within the
         request's lifetime.
@@ -234,24 +234,6 @@
    .. automethod:: resource_url
 
    .. automethod:: resource_path
-
-   .. attribute::  response_*
-
-      In Pyramid 1.0, you could set attributes on a
-      :class:`pyramid.request.Request` which influenced the behavior of
-      *rendered* responses (views which use a :term:`renderer` and which
-      don't directly return a response).  These attributes began with
-      ``response_``, such as ``response_headerlist``. If you needed to
-      influence response values from a view that uses a renderer (such as the
-      status code, a header, the content type, etc) you would set these
-      attributes.  See :ref:`response_prefixed_attrs` for further discussion.
-      As of Pyramid 1.1, assignment to ``response_*`` attrs is deprecated.
-      Assigning to one is still supported but will cause a deprecation
-      warning to be emitted, and eventually the feature will be removed.  For
-      new code, instead of assigning ``response_*`` attributes to the
-      request, use API of the :attr:`pyramid.request.Request.response`
-      object (exposed to view code as ``request.response``) to influence
-      rendered response behavior.
 
    .. attribute:: json_body
 

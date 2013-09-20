@@ -25,6 +25,7 @@ def main(global_config, **settings):
                           root_factory='tutorial.models.RootFactory')
     config.set_authentication_policy(authn_policy)
     config.set_authorization_policy(authz_policy)
+    config.include('pyramid_chameleon')
     config.add_static_view('static', 'static', cache_max_age=3600)
     config.add_route('view_wiki', '/')
     config.add_route('login', '/login')

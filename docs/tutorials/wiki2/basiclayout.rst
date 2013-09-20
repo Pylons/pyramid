@@ -82,11 +82,18 @@ dictionary of settings parsed from the ``.ini`` file, which contains
 deployment-related values such as ``pyramid.reload_templates``,
 ``db_string``, etc.
 
+Next, include :term:`Chameleon` templating bindings so that we can use
+renderers with the ``.pt`` extension within our project.
+
+   .. literalinclude:: src/basiclayout/tutorial/__init__.py
+      :lines: 17
+      :language: py
+
 ``main`` now calls :meth:`pyramid.config.Configurator.add_static_view` with
 two arguments: ``static`` (the name), and ``static`` (the path):
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
-      :lines: 17
+      :lines: 18
       :language: py
 
 This registers a static resource view which will match any URL that starts
@@ -104,7 +111,7 @@ via the :meth:`pyramid.config.Configurator.add_route` method that will be
 used when the URL is ``/``:
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
-      :lines: 18
+      :lines: 19
       :language: py
 
 Since this route has a ``pattern`` equalling ``/`` it is the route that will
@@ -118,7 +125,7 @@ view configuration will be registered, which will allow one of our
 application URLs to be mapped to some code.
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
-      :lines: 19
+      :lines: 20
       :language: py
 
 Finally, ``main`` is finished configuring things, so it uses the
@@ -126,7 +133,7 @@ Finally, ``main`` is finished configuring things, so it uses the
 :term:`WSGI` application:
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
-      :lines: 20
+      :lines: 21
       :language: py
 
 View Declarations via ``views.py``
@@ -225,10 +232,17 @@ To give a simple example of a  model class, we define one named ``MyModel``:
       :linenos:
       :language: py
 
-Our example model has an ``__init__`` method that takes two arguments
-(``name``, and ``value``).  It stores these values as ``self.name`` and
-``self.value`` on the instance created by the ``__init__`` function itself.
-The ``MyModel`` class also has a ``__tablename__`` attribute.  This informs
+Our example model does not require an ``__init__`` method because SQLAlchemy
+supplies for us a default constructor if one is not already present, 
+which accepts keyword arguments of the same name as that of the mapped attributes.
+
+.. note:: Example usage of MyModel:
+
+   .. code-block:: python
+
+       johnny = MyModel(name="John Doe", value=10)
+
+The ``MyModel`` class has a ``__tablename__`` attribute.  This informs
 SQLAlchemy which table to use to store the data representing instances of this
 class.
 

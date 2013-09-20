@@ -1,8 +1,6 @@
 import venusian
 
 from zope.interface import providedBy
-from zope.deprecation import deprecated
-
 
 from pyramid.interfaces import (
     IRoutesMapper,
@@ -20,32 +18,9 @@ from pyramid.httpexceptions import (
     default_exceptionresponse_view,
     )
 
-from pyramid.path import caller_package
-from pyramid.static import static_view
 from pyramid.threadlocal import get_current_registry
 
 _marker = object()
-
-class static(static_view):
-    """ Backwards compatibility alias for
-    :class:`pyramid.static.static_view`; it overrides that class' constructor
-    to pass ``use_subpath=True`` by default.
-
-    .. deprecated:: 1.1
-       use :class:`pyramid.static.static_view` instead
-       (probably with a ``use_subpath=True`` argument)
-    """
-    def __init__(self, root_dir, cache_max_age=3600, package_name=None):
-        if package_name is None:
-            package_name = caller_package().__name__
-        static_view.__init__(self, root_dir, cache_max_age=cache_max_age,
-                             package_name=package_name, use_subpath=True)
-
-deprecated(
-    'static',
-    'The "pyramid.view.static" class is deprecated as of Pyramid 1.1; '
-    'use the "pyramid.static.static_view" class instead with the '
-    '"use_subpath" argument set to True.')
 
 def render_view_to_response(context, request, name='', secure=True):
     """ Call the :term:`view callable` configured with a :term:`view
@@ -191,6 +166,9 @@ class view_config(object):
     See :ref:`mapping_views_using_a_decorator_section` for details about
     using :class:`pyramid.view.view_config`.
 
+    ATTENTION: ``view_config`` will work ONLY on module top level members
+    because of the limitation of ``venusian.Scanner.scan``.
+
     """
     venusian = venusian # for testing injection
     def __init__(self, **settings):
@@ -230,7 +208,7 @@ class view_defaults(view_config):
 
     See :ref:`view_defaults` for more information.
     """
-    
+
     def __call__(self, wrapped):
         wrapped.__view_defaults__ = self.__dict__.copy()
         return wrapped
@@ -330,7 +308,7 @@ class notfound_view_config(object):
 
         from pyramid.view import notfound_view_config
         from pyramid.response import Response
-          
+
         @notfound_view_config()
         def notfound(request):
             return Response('Not found, dude!', status='404 Not Found')
@@ -393,7 +371,7 @@ class forbidden_view_config(object):
 
         from pyramid.view import forbidden_view_config
         from pyramid.response import Response
-          
+
         @forbidden_view_config()
         def forbidden(request):
             return Response('You are not allowed', status='401 Unauthorized')
@@ -429,19 +407,4 @@ class forbidden_view_config(object):
 
         settings['_info'] = info.codeinfo # fbo "action_method"
         return wrapped
-    
-def is_response(ob):
-    """ Return ``True`` if ``ob`` implements the interface implied by
-    :ref:`the_response`. ``False`` if not.
 
-    .. deprecated:: 1.1
-       use :func:`pyramid.request.Request.is_response` instead"""
-    if ( hasattr(ob, 'app_iter') and hasattr(ob, 'headerlist') and
-         hasattr(ob, 'status') ):
-        return True
-    return False
-
-deprecated(
-    'is_response',
-    'pyramid.view.is_response is deprecated as of Pyramid 1.1.  Use '
-    'pyramid.request.Request.is_response instead.')

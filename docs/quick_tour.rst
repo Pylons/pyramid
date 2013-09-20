@@ -18,7 +18,7 @@ snippets of code to illustrate major concepts.
 Python Setup
 ============
 
-First things first: we need our Python environment in ship-shape.
+First thing's first: we need our Python environment in ship-shape.
 Pyramid encourages standard Python development practices (virtual
 environments, packaging tools, logging, etc.) so let's get our working
 area in place. For Python 3.3:
@@ -250,8 +250,9 @@ Python, but instead, will use a templating language.
 Pyramid doesn't mandate a particular database system, form library,
 etc. It encourages replaceability. This applies equally to templating,
 which is fortunate: developers have strong views about template
-languages. That said, Pyramid bundles Chameleon and Mako,
-so in this step, let's use Chameleon as an example:
+languages. That said, the Pylons Project officially supports bindings for
+Chameleon, Jinja2 and Mako, so in this step, let's use Chameleon as an
+example:
 
 .. literalinclude:: quick_tour/templating/views.py
     :start-after: Start View 1
@@ -271,7 +272,7 @@ we can use ``name`` as a variable in our template via
 
 .. seealso:: See Also: :doc:`../narr/templates`,
    :ref:`debugging_templates`, and
-   :ref:`mako_templates`
+   :ref:`available_template_system_bindings`
 
 Templating With ``jinja2``
 ==========================

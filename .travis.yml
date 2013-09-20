@@ -7,7 +7,7 @@ python:
   - pypy
   - 3.2
 
-script: python setup.py test
+script: python setup.py test -q
 
 notifications:
   email:

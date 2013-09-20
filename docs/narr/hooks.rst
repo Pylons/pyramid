@@ -372,10 +372,8 @@ that can be used for this purpose.  For example:
     def add_global(event):
         event['mykey'] = 'foo'
 
-An object of this type is sent as an event just before a :term:`renderer` is
-invoked (but *after* the application-level renderer globals factory added via
-:class:`~pyramid.config.Configurator.set_renderer_globals_factory`, if any,
-has injected its own keys into the renderer globals dictionary).
+An object of this type is sent as an event just before a :term:`renderer`
+is invoked.
 
 If a subscriber attempts to add a key that already exist in the renderer
 globals dictionary, a :exc:`KeyError` is raised.  This limitation is enforced
@@ -417,66 +415,6 @@ your view callable, like so:
 See the API documentation for the :class:`~pyramid.events.BeforeRender` event
 interface at :class:`pyramid.interfaces.IBeforeRender`.
 
-Another (deprecated) mechanism which allows event subscribers more control
-when adding renderer global values exists in :ref:`adding_renderer_globals`.
-
-.. index::
-   single: adding renderer globals
-
-.. _adding_renderer_globals:
-
-Adding Renderer Globals (Deprecated)
-------------------------------------
-
-.. deprecated:: 1.1
-   An alternative mechanism which allows event subscribers to add renderer
-   global values is documented in :ref:`beforerender_event`.
-
-Whenever :app:`Pyramid` handles a request to perform a rendering (after a
-view with a ``renderer=`` configuration attribute is invoked, or when any of
-the methods beginning with ``render`` within the :mod:`pyramid.renderers`
-module are called), *renderer globals* can be injected into the *system*
-values sent to the renderer.  By default, no renderer globals are injected,
-and the "bare" system values (such as ``request``, ``context``, ``view``, and
-``renderer_name``) are the only values present in the system dictionary
-passed to every renderer.
-
-A callback that :app:`Pyramid` will call every time a renderer is invoked can
-be added by passing a ``renderer_globals_factory`` argument to the
-constructor of the :term:`configurator`.  This callback can either be a
-callable object or a :term:`dotted Python name` representing such a callable.
-
-.. code-block:: python
-   :linenos:
-
-   def renderer_globals_factory(system):
-       return {'a': 1}
-
-   config = Configurator(
-            renderer_globals_factory=renderer_globals_factory)
-
-Such a callback must accept a single positional argument (notionally named
-``system``) which will contain the original system values.  It must return a
-dictionary of values that will be merged into the system dictionary.  See
-:ref:`renderer_system_values` for description of the values present in the
-system dictionary.
-
-If you're doing imperative configuration, and you'd rather do it after you've
-already constructed a :term:`configurator` it can also be registered via the
-:meth:`pyramid.config.Configurator.set_renderer_globals_factory` method:
-
-.. code-block:: python
-   :linenos:
-
-   from pyramid.config import Configurator
-
-   def renderer_globals_factory(system):
-       return {'a': 1}
-
-   config = Configurator()
-   config.set_renderer_globals_factory(renderer_globals_factory)
-
-
 .. index::
    single: response callback
 
@@ -514,7 +452,7 @@ callback will be an exception object instead of its default value of
 ``None``.
 
 Response callbacks are called in the order they're added
-(first-to-most-recently-added).  All response callbacks are called *after*
+(first-to-most-recently-added).  All response callbacks are called *before*
 the :class:`~pyramid.events.NewResponse` event is sent.  Errors raised by
 response callbacks are not handled specially.  They will be propagated to the
 caller of the :app:`Pyramid` router application.
@@ -1384,9 +1322,11 @@ The first argument to :meth:`pyramid.config.Configurator.add_view_predicate`,
 the name, is a string representing the name that is expected to be passed to
 ``view_config`` (or its imperative analogue ``add_view``).
 
-The second argument is a view or route predicate factory.  A view or route
-predicate factory is most often a class with a constructor (``__init__``), a
-``text`` method, a ``phash`` method and a ``__call__`` method.  For example:
+The second argument is a view or route predicate factory, or a :term:`dotted
+Python name` which refers to a view or route predicate factory.  A view or
+route predicate factory is most often a class with a constructor
+(``__init__``), a ``text`` method, a ``phash`` method and a ``__call__``
+method. For example:
 
 .. code-block:: python
    :linenos:

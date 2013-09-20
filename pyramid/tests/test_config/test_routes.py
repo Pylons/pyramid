@@ -153,10 +153,14 @@ class RoutesConfiguratorMixinTests(unittest.TestCase):
         self.assertEqual(predicate(None, request), False)
 
     def test_add_route_with_custom_predicates(self):
+        import warnings
         config = self._makeOne(autocommit=True)
         def pred1(context, request): pass
         def pred2(context, request): pass
-        config.add_route('name', 'path', custom_predicates=(pred1, pred2))
+        with warnings.catch_warnings(record=True) as w:
+            warnings.filterwarnings('always')
+            config.add_route('name', 'path', custom_predicates=(pred1, pred2))
+            self.assertEqual(len(w), 1)
         route = self._assertRoute(config, 'name', 'path', 2)
         self.assertEqual(len(route.predicates), 2)
 

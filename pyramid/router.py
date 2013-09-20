@@ -212,12 +212,12 @@ class Router(object):
         - causes a :class:`~pyramid.event.ContextFound` event to be sent
           when a context resource is found.
           
-        - causes a :class:`~pyramid.event.NewResponse` event to be sent when
-          the Pyramid application returns a response.
-
         - Calls any :term:`response callback` functions defined within the
           request's lifetime if a response is obtained from the Pyramid
           application.
+
+        - causes a :class:`~pyramid.event.NewResponse` event to be sent if a
+          response is obtained.
 
         - Calls any :term:`finished callback` functions defined within the
           request's lifetime.
@@ -245,11 +245,12 @@ class Router(object):
                 if extensions is not None:
                     request._set_extensions(extensions)
                 response = handle_request(request)
-                has_listeners and notify(NewResponse(request, response))
 
                 if request.response_callbacks:
                     request._process_response_callbacks(response)
 
+                has_listeners and notify(NewResponse(request, response))
+                
                 return response
 
             finally:
