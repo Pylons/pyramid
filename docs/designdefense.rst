@@ -764,7 +764,7 @@ content management system (CMS) may have basic functionality that needs to be
 extended for a particular deployment.  That CMS system may be deployed for
 many organizations at many places.  Some number of deployments of this CMS
 may be deployed centrally by a third party and managed as a group.  It's
-useful to be able to extend such a system for each deployment via preordained
+easier to be able to extend such a system for each deployment via preordained
 plugpoints than it is to continually keep each software branch of the system
 in sync with some upstream source: the upstream developers may change code in
 such a way that your changes to the same codebase conflict with theirs in
@@ -792,8 +792,8 @@ such a feature.
   main template and the CSS in a separate Python package which defines
   overrides.
 
-- If a deployment needs an application page to do something differently needs
-  it to expose more or different information, the deployer may override the
+- If a deployment needs an application page to do something differently, or
+  to expose more or different information, the deployer may override the
   view that renders the page within a separate Python package.
 
 - If a deployment needs an additional feature, the deployer may add a view to
@@ -810,7 +810,7 @@ won't regularly need to deal wth meaningless textual merge conflicts that
 trivial changes to upstream packages often entail when it comes time to
 update the upstream package, because if you extend an application externally,
 there just is no textual merge done.  Your modifications will also, for
-whatever its worth, be contained in one, canonical, well-defined place.
+whatever it's worth, be contained in one, canonical, well-defined place.
 
 Branching an application and continually merging in order to get new features
 and bugfixes is clearly useful.  You can do that with a :app:`Pyramid`
@@ -822,7 +822,7 @@ dismiss this feature in favor of branching and merging because applications
 written in their framework of choice aren't extensible out of the box in a
 comparably fundamental way.
 
-While :app:`Pyramid` application are fundamentally extensible even if you
+While :app:`Pyramid` applications are fundamentally extensible even if you
 don't write them with specific extensibility in mind, if you're moderately
 adventurous, you can also take it a step further.  If you learn more about
 the :term:`Zope Component Architecture`, you can optionally use it to expose
@@ -842,7 +842,7 @@ applications by :app:`Pyramid` are good or bad is mostly pointless. You
 needn't take advantage of the extensibility features provided by a particular
 :app:`Pyramid` application in order to affect a modification for a particular
 set of its deployments.  You can ignore the application's extensibility
-plugpoints entirely, and instead use version control branching and merging to
+plugpoints entirely, and use version control branching and merging to
 manage application deployment modifications instead, as if you were deploying
 an application written using any other web framework.
 
