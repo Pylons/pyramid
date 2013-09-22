@@ -84,7 +84,7 @@ Backwards Incompatibilities
   instead.
 
 - Removed the ability to pass the following arguments to
-  ``pyramid.config.Configurator.add_route``: `view``, ``view_context``.
+  ``pyramid.config.Configurator.add_route``: ``view``, ``view_context``.
   ``view_for``, ``view_permission``, ``view_renderer``, and ``view_attr``.
   Using these arguments had been deprecated since Pyramid 1.1.  Instead of
   passing view-related arguments to ``add_route``, use a separate call to
