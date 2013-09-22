@@ -18,44 +18,126 @@ Bug Fixes
 Backwards Incompatibilities
 ---------------------------
 
-- Pyramid has dropped native support for the Mako and Chameleon templating 
-  system renderers. To re-add support for these renderers into your existing 
-  projects, there are 3 steps:
+- Pyramid no longer depends on or configures the Mako and Chameleon templating
+  system renderers by default.  Disincluding these templating systems by
+  default means that the Pyramid core has fewer dependencies and can run on
+  future platforms without immediate concern for the compatibility of its
+  templating add-ons.  It also makes maintenance slightly more effective, as
+  different people can maintain the templating system add-ons that they
+  understand and care about without needing commit access to the Pyramid core,
+  and it allows users who just don't want to see any packages they don't use
+  come along for the ride when they install Pyramid.
 
-  - Add ``pyramid_mako`` and/or ``pyramid_chameleon`` as dependencies by
-    adding them to the `install_requires` section of your package's `setup.py`::
+  This means that upon upgrading to Pyramid 1.5a2+, projects that use either
+  of these templating systems will see a traceback that ends something like
+  this when their application attempts to render a Chameleon or Mako template::
+
+     ValueError: No such renderer factory .pt
+
+  Or::
+
+     ValueError: No such renderer factory .mako
+
+  Or::
+
+     ValueError: No such renderer factory .mak
+
+  Support for Mako templating has been moved into an add-on package named 
+  ``pyramid_mako``, and support for Chameleon templating has been moved into 
+  an add-on package named ``pyramid_chameleon``.  These packages are drop-in 
+  replacements for the old built-in support for these templating langauges. 
+  All you have to do is install them and make them active in your configuration
+  to register renderer factories for ``.pt`` and/or ``.mako`` (or ``.mak``) to
+  make your application work again.
+
+  To re-add support for Chameleon and/or Mako template renderers into your
+  existing projects, follow the below steps.
+
+  If you depend on Mako templates:
+
+  * Make sure the ``pyramid_mako`` package is installed.  One way to do this
+    is by adding ``pyramid_mako`` to the ``install_requires`` section of your
+    package's ``setup.py`` file and afterwards rerunning ``setup.py develop``::
 
         setup(
             #...
             install_requires=[
                 'pyramid_mako',         # new dependency
-                'pyramid_chameleon',    # new dependency
                 'pyramid',
                 #...
             ],
         )
 
-  - Update instances of the ``pyramid.config.Configurator`` to ``include`` the
-    one or the other (or both) required addons::
+  * Within the portion of your application which instantiates a Pyramid 
+    ``pyramid.config.Configurator`` (often the ``main()`` function in 
+    your project's ``__init__.py`` file), tell Pyramid to include the 
+    ``pyramid_mako`` includeme::
 
+        config = Configurator(.....)
+        config.include('pyramid_mako')
+
+  If you depend on Chameleon templates:
+
+  * Make sure the ``pyramid_chameleon`` package is installed.  One way to do
+    this is by adding ``pyramid_chameleon`` to the ``install_requires`` section
+    of your package's ``setup.py`` file and afterwards rerunning 
+    ``setup.py develop``::
+
+        setup(
+            #...
+            install_requires=[
+                'pyramid_chameleon',         # new dependency
+                'pyramid',
+                #...
+            ],
+        )
+
+  * Within the portion of your application which instantiates a Pyramid 
+    ``~pyramid.config.Configurator`` (often the ``main()`` function in 
+    your project's ``__init__.py`` file), tell Pyramid to include the 
+    ``pyramid_chameleon`` includeme::
+
+        config = Configurator(.....)
         config.include('pyramid_chameleon')
-        config.include('pyramid_mako')
 
-  - If any unit tests are invoking either ``pyramid.renderers.render()`` or
-    ``pyramid.renderers.render_to_response()`` with either Mako or Chameleon
-    templates then the ``pyramid.config.Configurator`` instance at the root of
-    the unit test should be also be updated to include the addons, as shown
-    above. For example::
+  Note that it's also fine to install these packages into *older* Pyramids for
+  forward compatibility purposes.  Even if you don't upgrade to Pyramid 1.5
+  immediately, performing the above steps in a Pyramid 1.4 installation is
+  perfectly fine, won't cause any difference, and will give you forward
+  compatibility when you eventually do upgrade to Pyramid 1.5.
 
-        config = pyramid.testing.setUp()
-        config.include('pyramid_mako')
+  With the removal of Mako and Chameleon support from the core, some
+  unit tests that use the ``pyramid.renderers.render*`` methods may begin to 
+  fail.  If any of your unit tests are invoking either 
+  ``pyramid.renderers.render()``  or ``pyramid.renderers.render_to_response()``
+  with either Mako or Chameleon templates then the 
+  ``pyramid.config.Configurator`` instance in effect during
+  the unit test should be also be updated to include the addons, as shown
+  above. For example::
 
-        result = pyramid.renderers.render('mypkg:templates/home.mako', {})
+        class ATest(unittest.TestCase):
+            def setUp(self):
+                self.config = pyramid.testing.setUp()
+                self.config.include('pyramid_mako')
 
-  Note that if you're using the Pyramid debug toolbar, when you upgrade 
-  Pyramid, you'll also need to upgrade the ``pyramid_debugtoolbar`` package to
-  at least version 1.0.8, as older versions are not compatible with Pyramid
-  1.5a2+ due to this change.
+            def test_it(self):
+                result = pyramid.renderers.render('mypkg:templates/home.mako', {})
+
+  Or::
+
+        class ATest(unittest.TestCase):
+            def setUp(self):
+                self.config = pyramid.testing.setUp()
+                self.config.include('pyramid_chameleon')
+
+            def test_it(self):
+                result = pyramid.renderers.render('mypkg:templates/home.pt', {})
+
+- If you're using the Pyramid debug toolbar, when you upgrade Pyramid to
+  1.5a2+, you'll also need to upgrade the ``pyramid_debugtoolbar`` package to 
+  at least version 1.0.8, as older toolbar versions are not compatible with 
+  Pyramid 1.5a2+ due to the removal of Mako support from the core.  It's 
+  fine to use this newer version of the toolbar code with older Pyramids too.
 
 - Removed the ``request.response_*`` varying attributes. These attributes
   have been deprecated since Pyramid 1.1, and as per the deprecation policy,
