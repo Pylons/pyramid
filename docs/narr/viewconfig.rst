@@ -822,7 +822,7 @@ of this:
        def delete(self):
            return Response('delete')
 
-   if __name__ == '__main__':
+   def main(global_config, **settings):
        config = Configurator()
        config.add_route('rest', '/rest')
        config.add_view(
@@ -831,6 +831,7 @@ of this:
            RESTView, route_name='rest', attr='post', request_method='POST')
        config.add_view(
            RESTView, route_name='rest', attr='delete', request_method='DELETE')
+       return config.make_wsgi_app()
 
 To reduce the amount of repetition in the ``config.add_view`` statements, we
 can move the ``route_name='rest'`` argument to a ``@view_defaults`` class
@@ -857,12 +858,13 @@ decorator on the RESTView class:
        def delete(self):
            return Response('delete')
 
-   if __name__ == '__main__':
+   def main(global_config, **settings):
        config = Configurator()
        config.add_route('rest', '/rest')
        config.add_view(RESTView, attr='get', request_method='GET')
        config.add_view(RESTView, attr='post', request_method='POST')
        config.add_view(RESTView, attr='delete', request_method='DELETE')
+       return config.make_wsgi_app()
 
 :class:`pyramid.view.view_defaults` accepts the same set of arguments that
 :class:`pyramid.view.view_config` does, and they have the same meaning.  Each
