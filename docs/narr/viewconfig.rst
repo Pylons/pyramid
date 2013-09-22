@@ -833,7 +833,7 @@ of this:
            RESTView, route_name='rest', attr='delete', request_method='DELETE')
 
 To reduce the amount of repetition in the ``config.add_view`` statements, we
-can move the ``route_name='rest'`` argument to a ``@view_default`` class
+can move the ``route_name='rest'`` argument to a ``@view_defaults`` class
 decorator on the RESTView class:
 
 .. code-block:: python
