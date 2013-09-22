@@ -9,22 +9,18 @@ import time
 try:
     import httplib
 except ImportError: # pragma: no cover
-    import http.client as httplib
-
-from pyramid.compat import PY3
+    import http.client as httplib #py3
 
 class TemplateTest(object):
     def make_venv(self, directory): # pragma: no cover
         import virtualenv
-        import sys
         from virtualenv import Logger
         logger = Logger([(Logger.level_for_integer(2), sys.stdout)])
         virtualenv.logger = logger
         virtualenv.create_environment(directory,
                                       site_packages=False,
                                       clear=False,
-                                      unzip_setuptools=True,
-                                      use_distribute=PY3)
+                                      unzip_setuptools=True)
     def install(self, tmpl_name): # pragma: no cover
         try:
             self.old_cwd = os.getcwd()
@@ -70,10 +66,7 @@ class TemplateTest(object):
             os.chdir(self.old_cwd)
 
 if __name__ == '__main__':     # pragma: no cover
-    templates = ['starter', 'alchemy',]
-
-    if sys.version_info >= (2, 6) and sys.version_info < (3, 0):
-        templates.append('zodb')
+    templates = ['starter', 'alchemy', 'zodb']
 
     for name in templates:
         test = TemplateTest()
