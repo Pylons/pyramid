@@ -50,9 +50,11 @@ Requirements
 
 .. warning:: The current state of isolated Python environments using
     ``pyvenv`` on Windows is suboptimal in comparison to Mac and Linux.  See
-    http://stackoverflow.com/q/15981111/95735 for a discussion of the issue.
-    When it is resolved, or if any Windows user would like to step forward,
-    we would gratefully accept a pull request to update our documentation.
+    http://stackoverflow.com/q/15981111/95735 for a discussion of the issue
+    and `PEP 453 <http://www.python.org/dev/peps/pep-0453/>`_ for a proposed
+    resolution. When it is resolved, or if any Windows user would like to step
+    forward, we would gratefully accept a pull request to update our
+    documentation.
     
     Until then, we recommend that Windows users follow the procedure
     :ref:`Installing Pyramid on a Windows System <installing_windows>`
