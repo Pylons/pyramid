@@ -4,73 +4,244 @@
 Quick Tour of Pyramid
 =====================
 
-Pyramid lets you start small and finish big. This *Quick Tour* guide
-walks you through many of Pyramid's key features. Let's put the
-emphasis on *start* by doing a quick tour through Pyramid, with
-snippets of code to illustrate major concepts.
+Pyramid lets you start small and finish big.  This *Quick Tour* of Pyramid is
+for those who want to evaluate Pyramid and are not yet familiar with it.
+
+
+Conventions
+===========
+This guide uses conventions to keep the introduction focused and concise.
+Details, references, and deeper discussions are mentioned in "See Also"
+notes.
+
+.. seealso:: This is an example "See Also" note.
+
+Pyramid encourages standard Python development practices with packaging tools,
+virtual environments, logging, and so on.  There are many variations,
+implementations, and opinions across the Python community, each of which may
+have its proper usage.  For the sake of consistency, ease of documentation
+maintenance, and to minimize confusion, the Pyramid documentation has adopted
+specific conventions:
+
+* Pyramid fully supports Python 3.2 or greater as well as Python 2.6 and 2.7.
+  This guide uses Python 3.
+* We use ``pyvenv`` for isolating Python environments.
+* We use ``setuptools`` for package management.
+* We organize our file system where our home directory contains all of our
+  projects, which contains our workspaces, which contain both Python virtual
+  environments and projects.
+* Commands in this guide use UNIX syntax and paths.  Windows users should
+  adjust commands accordingly.
 
 .. note::
 
-    We use Python 3 in our samples. Pyramid was one of the first
-    (October 2011) web frameworks to fully support Python 3. You can
-    use Python 3 as well for this guide, but you can also use Python 2.7.
+    Pyramid was one of the first web frameworks to fully support Python 3 in
+    October 2011.
 
-Python Setup
+Requirements
 ============
 
-First thing's first: we need our Python environment in ship-shape.
-Pyramid encourages standard Python development practices (virtual
-environments, packaging tools, logging, etc.) so let's get our working
-area in place. For Python 3.3:
+* :ref:`install-python-3.3-or-greater`
+* :ref:`create-a-project-directory-structure`
+* :ref:`set-an-environment-variable`
+* :ref:`create-a-virtual-environment`
+* :ref:`install-setuptools-(python-packaging-tools)`
+* :ref:`install-pyramid`
+
+.. warning:: The current state of isolated Python environments using
+    ``pyvenv`` on Windows is suboptimal in comparison to Mac and Linux.  See
+    http://stackoverflow.com/q/15981111/95735 for a discussion of the issue
+    and `PEP 453 <http://www.python.org/dev/peps/pep-0453/>`_ for a proposed
+    resolution. When it is resolved, or if any Windows user would like to step
+    forward, we would gratefully accept a pull request to update our
+    documentation.
+    
+    Until then, we recommend that Windows users follow the procedure
+    :ref:`Installing Pyramid on a Windows System <installing_windows>`
+
+.. _install-python-3.3-or-greater:
+
+Install Python 3.3 or greater
+-----------------------------
+
+Download the latest standard Python 3 release (not development release) from
+`python.org <http://www.python.org/download/releases/>`_.  On that page, you
+must click the latest version, then scroll down to the "Downloads" section
+for your operating system.
+
+Windows and Mac OS X users can download and run an installer.
+
+Windows users should also install the `Python for Windows extensions
+<http://sourceforge.net/projects/pywin32/files/pywin32/>`_. Carefully read the
+``README.txt`` file at the end of the list of builds, and follow its
+directions. Make sure you get the proper 32- or 64-bit build and Python
+version.
+
+Linux users can either use their package manager to install Python 3 or may
+`build Python 3 from source
+<http://pyramid.readthedocs.org/en/master/narr/install.html#package-manager-
+method>`_.
+
+
+.. _create-a-project-directory-structure:
+
+Create a project directory structure
+------------------------------------
+
+From your user home directory, create the following initial directory structure
+as indicated in the figure below.
+
+.. figure:: _static/directory_structure_initial.png
+   :alt: initial directory structure
+
+   An initial directory structure.
+
+The commands to do so are as follows:
+
+.. code-block:: bash
+    
+    # Mac and Linux
+    $ cd ~
+    $ mkdir projects
+    $ cd projects
+    $ mkdir pyramid
+    
+    # Windows
+    c:\> cd \
+    c:\> mkdir projects
+    c:\> cd projects
+    c:\> mkdir pyramid
+    
+In the above figure, your user home directory is represented by ``~``.  In
+your home directory, all of your projects are in the ``projects`` directory. 
+This is a general convention not specific to Pyramid that many developers use.
+Windows users will do well to use ``c:\`` as the location for ``projects`` in
+order to avoid spaces in any of the path names.
+
+Next within ``projects`` is your workspace directory, here named ``pyramid``. 
+A workspace is a common term used by integrated development environments (IDE)
+like PyCharm and PyDev that stores isolated Python environments (virtualenvs)
+and specific project files and repositories.
+
+
+.. _set-an-environment-variable:
+
+Set an Environment Variable
+---------------------------
+
+We set an environment variable to save typing later.
+
+.. code-block:: bash
+    
+    # Mac and Linux
+    $ export VENV=~/projects/pyramid/env33/bin/
+    
+    # Windows
+    # TODO: This command does not work
+    c:\> set VENV=c:\projects\pyramid\env33
+
+
+.. _create-a-virtual-environment:
+
+Create a Virtual Environment
+----------------------------
+``pyvenv`` is a tool to create isolated Python environments.  Create one.
 
 .. code-block:: bash
 
-  $ pyvenv-3.3 venv
-  $ source venv/bin/activate
-  (venv)$ wget https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py -O - | python
+    # Mac and Linux
+    $ pyvenv $VENV
+    
+    # Windows
+    # TODO: This command does work, but we should improve it with %VENV%
+    c:\> .\Python33\python -m venv c:\projects\pyramid\env33
 
-If ``wget`` complains with a certificate error, run it with:
+.. note:: ``pyvenv`` is a tool to create isolated Python environments. The
+    venv module provides support for creating lightweight "virtual
+    environments" with their own site directories, optionally isolated from
+    system site directories. Each virtual environment has its own Python binary
+    (allowing creation of environments with various Python versions) and can
+    have its own independent set of installed Python packages in its site
+    directories.
+
+.. seealso:: See also Python 3's :mod:`venv module <python3:venv>` and Python
+    2's `virtualenv <http://www.virtualenv.org/en/latest/>`_ package.
+
+
+.. _install-setuptools-(python-packaging-tools):
+
+Install ``setuptools`` (Python packaging tools)
+-----------------------------------------------
+
+The following command will download a script to install ``setuptools``, then
+pipe it to your environment's version of Python.
 
 .. code-block:: bash
 
-  $ wget --no-check-certificate
+    # Mac and Linux
+    $ wget https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py -O - | $VENV/python
+    
+    # Windows
+    # TODO Something goes here
 
-In these steps above we first made a :term:`virtualenv` and then
-"activated"  it, which adjusted our path to look first in
-``venv/bin`` for commands (such as ``python``). We next downloaded
-Python's packaging support and installed it, giving us the
-``easy_install`` command-line script for adding new packages. Python
-2.7 users will need to use ``virtualenv`` instead of ``pyvenv`` to make
-their virtual environment.
+If ``wget`` complains with a certificate error, then run this command instead:
+
+.. code-block:: bash
+
+    # Mac and Linux
+    $ wget --no-check-certificate https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py -O - | $VENV/python
+
+    # Windows
+    # TODO Something goes here
+
+
+.. _install-pyramid:
+
+Install Pyramid
+---------------
+
+.. code-block:: bash
+    
+    # Mac and Linux
+    $ easy_install pyramid
+    
+    # Windows
+    # TODO Something goes here
+
+Our Python environment now has the Pyramid software available.  Your directory structure should now look like the following image.
+
+.. figure:: _static/directory_structure_pyramid.png
+   :alt: Pyramid directory structure
+
+   A Pyramid directory structure.
+
 
 .. note::
 
-   Why ``easy_install`` and not ``pip``? Pyramid encourages use of
-   namespace packages which, until recently, ``pip`` didn't permit.
-   Also, Pyramid has some optional C extensions for performance. With
-   ``easy_install``, Windows users can get these extensions without
-   needing a C compiler.
+    Why ``easy_install`` and not ``pip``? Pyramid encourages use of namespace
+    packages which, until recently, ``pip`` didn't permit. Also, Pyramid has
+    some optional C extensions for performance. With ``easy_install``, Windows
+    users can get these extensions without needing a C compiler.
 
-.. seealso:: See Also: Python 3's :mod:`venv module <python3:venv>`,
-   the ``setuptools`` `installation
-   instructions <https://pypi.python.org/pypi/setuptools/0.9.8#installation-instructions>`_,
-   `easy_install help <https://pypi.python.org/pypi/setuptools/0.9.8#using-setuptools-and-easyinstall>`_,
-   and Pyramid's :ref:`Before You Install <installing_chapter>`.
+.. seealso:: See Also: :ref:`installing_unix`. For instructions to set up your
+    Python environment for development using Windows or Python 2, see Pyramid's
+    :ref:`Before You Install <installing_chapter>`.
+    
+    See also Python 3's :mod:`venv module <python3:venv>`, the `setuptools` `installation instructions
+    <https://pypi.python.org/pypi/setuptools/0.9.8#installation-instructions>`_,
+    and `easy_install help <https://pypi.python.org/pypi/setuptools/0.9.8#using-setuptools-and-easyinstall>`_.
 
-Pyramid Installation
-====================
+.. note::  A generic representation of project directory structure is shown in
+    the following figure.  We could create multiple isolated Python
+    environments for multiple versions of Python.  We could also add more
+    projects within our workspace directory, which is a common practice in the
+    Pyramid tutorials.
 
-We now have a standard starting point for Python. Getting Pyramid
-installed is easy:
+.. figure:: _static/directory_structure_generic.png
+   :alt: generic directory structure
 
-.. code-block:: bash
+   A generic directory structure.
 
-  $ easy_install pyramid
-
-Our virtual environment now has the Pyramid software available to its
-Python.
-
-.. seealso:: See Also: :ref:`installing_unix`
 
 Hello World
 ===========
