@@ -1149,6 +1149,8 @@ class ViewsConfiguratorMixin(object):
                 attr, self.object_description(view))
         else:
             view_desc = self.object_description(view)
+
+        tmpl_intr = None
             
         view_intr = self.introspectable('views',
                                         discriminator,
@@ -1199,7 +1201,8 @@ class ViewsConfiguratorMixin(object):
                     renderer = renderers.RendererHelper(
                         name=None,
                         package=self.package,
-                        registry=self.registry)
+                        registry=self.registry
+                        )
 
             if permission is None:
                 # intent: will be None if no default permission is registered
@@ -1330,6 +1333,22 @@ class ViewsConfiguratorMixin(object):
                         multiview,
                         (IExceptionViewClassifier, request_iface, context),
                         IMultiView, name=name)
+            renderer_type = getattr(renderer, 'type', None) # gard against None
+            intrspc = self.introspector
+            if (
+                renderer_type is not None and
+                tmpl_intr is not None and
+                intrspc is not None and
+                intrspc.get('renderer factories', renderer_type) is not None
+                ):
+                # allow failure of registered template factories to be deferred
+                # until view execution, like other bad renderer factories; if
+                # we tried to relate this to an existing renderer factory
+                # without checking if it the factory actually existed, we'd end
+                # up with a KeyError at startup time, which is inconsistent
+                # with how other bad renderer registrations behave (they throw
+                # a ValueError at view execution time)
+                tmpl_intr.relate('renderer factories', renderer.type)
 
         if mapper:
             mapper_intr = self.introspectable(
@@ -1355,7 +1374,6 @@ class ViewsConfiguratorMixin(object):
             tmpl_intr['name'] = renderer.name
             tmpl_intr['type'] = renderer.type
             tmpl_intr['renderer'] = renderer
-            tmpl_intr.relate('renderer factories', renderer.type)
             introspectables.append(tmpl_intr)
         if permission is not None:
             # if a permission exists, register a permission introspectable
