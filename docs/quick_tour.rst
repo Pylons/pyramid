@@ -41,7 +41,7 @@ specific conventions:
 Requirements
 ============
 
-* :ref:`install-python-3.2-or-greater`
+* :ref:`install-python-3.3-or-greater`
 * :ref:`create-a-project-directory-structure`
 * :ref:`set-an-environment-variable`
 * :ref:`create-a-virtual-environment`
@@ -57,9 +57,9 @@ Requirements
     Until then, we recommend that Windows users follow the procedure
     :ref:`Installing Pyramid on a Windows System <installing_windows>`
 
-.. _install-python-3.2-or-greater:
+.. _install-python-3.3-or-greater:
 
-Install Python 3.2 or greater
+Install Python 3.3 or greater
 -----------------------------
 
 Download the latest standard Python 3 release (not development release) from
