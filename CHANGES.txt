@@ -1,3 +1,11 @@
+Unreleased
+==========
+
+Documentation
+-------------
+
+- Added a "Quick Tutorial" to go with the Quick Tour
+
 1.5a2 (2013-09-22)
 ==================
 
