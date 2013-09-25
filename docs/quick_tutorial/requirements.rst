@@ -222,10 +222,11 @@ during this tutorial:
 .. code-block:: bash
 
     # Mac and Linux
-    $ easy_install nose webtest deform sqlalchemy
+    $ $VENV/bin/easy_install nose webtest deform sqlalchemy \
+       pyramid_chameleon pyramid_debugtoolbar waitress
 
     # Windows
-    c:\> %VENV%\Scripts\easy_install nose webtest deform sqlalchemy
+    c:\> %VENV%\Scripts\easy_install nose webtest deform sqlalchemy pyramid_chameleon
 
 
 
