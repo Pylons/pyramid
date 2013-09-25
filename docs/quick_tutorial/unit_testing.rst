@@ -45,9 +45,9 @@ Steps
 
    .. code-block:: bash
 
-    (venv)$ cd ..; cp -r debugtoolbar unit_testing; cd unit_testing
-    (venv)$ python setup.py develop
-    (venv)$ easy_install nose
+    $ cd ..; cp -r debugtoolbar unit_testing; cd unit_testing
+    $ $VENV/bin/python setup.py develop
+    $ $VENV/bin/easy_install nose
 
 #. Now we write a simple unit test in ``unit_testing/tutorial/tests.py``:
 
@@ -59,7 +59,7 @@ Steps
    .. code-block:: bash
 
 
-    (venv)$ nosetests tutorial
+    $ $VENV/bin/nosetests tutorial
     .
     ----------------------------------------------------------------------
     Ran 1 test in 0.141s

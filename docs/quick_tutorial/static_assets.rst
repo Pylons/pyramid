@@ -20,8 +20,8 @@ Steps
 
    .. code-block:: bash
 
-    (venv)$ cd ..; cp -r view_classes static_assets; cd static_assets
-    (venv)$ python setup.py develop
+    $ cd ..; cp -r view_classes static_assets; cd static_assets
+    $ $VENV/bin/python setup.py develop
 
 #. We add a call ``config.add_static_view in
    ``static_assets/tutorial/__init__.py``:
@@ -45,13 +45,13 @@ Steps
 
    .. code-block:: bash
 
-    (venv)$ nosetests tutorial
+    $ $VENV/bin/nosetests tutorial
 
 #. Run your Pyramid application with:
 
    .. code-block:: bash
 
-    (venv)$ pserve development.ini --reload
+    $ $VENV/bin/pserve development.ini --reload
 
 #. Open http://localhost:6543/ in your browser.
 

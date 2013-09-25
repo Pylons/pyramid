@@ -37,8 +37,8 @@ Steps
 
    .. code-block:: bash
 
-    (venv)$ cd ..; cp -r authentication authorization; cd authorization
-    (venv)$ python setup.py develop
+    $ cd ..; cp -r authentication authorization; cd authorization
+    $ $VENV/bin/python setup.py develop
 
 #. Start by changing ``authorization/tutorial/__init__.py`` to
    specify a root factory to the :term:`configurator`:
@@ -62,7 +62,7 @@ Steps
 
    .. code-block:: bash
 
-    (venv)$ pserve development.ini --reload
+    $ $VENV/bin/pserve development.ini --reload
 
 #. Open http://localhost:6543/ in a browser.
 

@@ -40,8 +40,8 @@ Steps
 
    .. code-block:: bash
 
-    (venv)$ cd ..; cp -r function_testing views; cd views
-    (venv)$ python setup.py develop
+    $ cd ..; cp -r function_testing views; cd views
+    $ $VENV/bin/python setup.py develop
 
 #. Our ``views/tutorial/__init__.py`` gets a lot shorter:
 
@@ -64,7 +64,7 @@ Steps
    .. code-block:: bash
 
 
-    (venv)$ nosetests tutorial
+    $ $VENV/bin/nosetests tutorial
     .
     ----------------------------------------------------------------------
     Ran 4 tests in 0.141s
@@ -75,7 +75,7 @@ Steps
 
    .. code-block:: bash
 
-    (venv)$ pserve development.ini --reload
+    $ $VENV/bin/pserve development.ini --reload
 
 #. Open http://localhost:6543/ and http://localhost:6543/howdy
    in your browser.

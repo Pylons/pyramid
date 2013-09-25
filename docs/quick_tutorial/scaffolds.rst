@@ -33,7 +33,7 @@ Steps
 
     .. code-block:: bash
 
-        (venv)$ pcreate --list
+        $ $VENV/bin/pcreate --list
         Available scaffolds:
           alchemy:                 Pyramid SQLAlchemy project using url dispatch
           starter:                 Pyramid starter project
@@ -43,21 +43,21 @@ Steps
 
     .. code-block:: bash
 
-        (venv)$ pcreate --scaffold starter scaffolds
+        $ $VENV/bin/pcreate --scaffold starter scaffolds
 
 #. Use normal Python development to setup our project for development:
 
     .. code-block:: bash
 
-        (venv)$ cd scaffolds
-        (venv)$ python setup.py develop
+        $ cd scaffolds
+        $ $VENV/bin/python setup.py develop
 
 #. Startup the application by pointing Pyramid's ``pserve`` command at
    the project's (generated) configuration file:
 
     .. code-block:: bash
 
-        (venv)$ pserve development.ini --reload
+        $ $VENV/bin/pserve development.ini --reload
 
    On startup, ``pserve`` logs some output:
 

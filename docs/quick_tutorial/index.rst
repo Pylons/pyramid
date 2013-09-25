@@ -17,8 +17,7 @@ Contents
 .. toctree::
     :maxdepth: 1
 
-    python_setup
-    pyramid_setup
+    requirements
     tutorial_approach
     scaffolds
     hello_world

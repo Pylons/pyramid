@@ -23,9 +23,9 @@ Steps
 
    .. code-block:: bash
 
-    (venv)$ cd ..; cp -r view_classes jinja2; cd jinja2
-    (venv)$ python setup.py develop
-    (venv)$ easy_install pyramid_jinja2
+    $ cd ..; cp -r view_classes jinja2; cd jinja2
+    $ $VENV/bin/python setup.py develop
+    $ $VENV/bin/easy_install pyramid_jinja2
 
 #. We need to add an item to ``pyramid.includes`` in
    ``jinja2/development.ini``:
@@ -54,13 +54,13 @@ Steps
 
    .. code-block:: bash
 
-    (venv)$ nosetests tutorial
+    $ $VENV/bin/nosetests tutorial
 
 #. Run your Pyramid application with:
 
    .. code-block:: bash
 
-    (venv)$ pserve development.ini --reload
+    $ $VENV/bin/pserve development.ini --reload
 
 #. Open http://localhost:6543/ in your browser.
 

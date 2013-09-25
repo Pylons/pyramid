@@ -36,7 +36,7 @@ Steps
 
    .. code-block:: bash
 
-    (venv)$ cd ..; cp -r view_classes forms; cd forms
+    $ cd ..; cp -r view_classes forms; cd forms
 
 #. Let's edit ``forms/setup.py`` to declare a dependency on Deform
    (which then pulls in Colander as a dependency:
@@ -48,7 +48,7 @@ Steps
 
    .. code-block:: bash
 
-      (venv)$ python setup.py develop
+      $ $VENV/bin/python setup.py develop
 
 #. Register a static view in ``forms/tutorial/__init__.py`` for
    Deform's CSS/JS etc. as well as our demo wikipage scenario's
@@ -88,7 +88,7 @@ Steps
 
    .. code-block:: bash
 
-    (venv)$ pserve development.ini --reload
+    $ $VENV/bin/pserve development.ini --reload
 
 #. Open http://localhost:6543/ in a browser.
 

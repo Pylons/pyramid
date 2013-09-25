@@ -55,8 +55,8 @@ Steps
 
    .. code-block:: bash
 
-    (venv)$ cd ..; cp -r templating more_view_classes; cd more_view_classes
-    (venv)$ python setup.py develop
+    $ cd ..; cp -r templating more_view_classes; cd more_view_classes
+    $ $VENV/bin/python setup.py develop
 
 #. Our route in ``more_view_classes/tutorial/__init__.py`` needs some
    replacement patterns:
@@ -98,7 +98,7 @@ Steps
 
    .. code-block:: bash
 
-    (venv)$ pserve development.ini --reload
+    $ $VENV/bin/pserve development.ini --reload
 
 #. Open http://localhost:6543/howdy/jane/doe in your browser. Click
    the ``Save`` and ``Delete`` buttons and watch the output in the

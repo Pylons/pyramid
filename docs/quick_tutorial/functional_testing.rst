@@ -31,9 +31,9 @@ Steps
 
    .. code-block:: bash
 
-    (venv)$ cd ..; cp -r unit_testing functional_testing; cd functional_testing
-    (venv)$ python setup.py develop
-    (venv)$ easy_install webtest
+    $ cd ..; cp -r unit_testing functional_testing; cd functional_testing
+    $ $VENV/bin/python setup.py develop
+    $ $VENV/bin/easy_install webtest
 
 #. Let's extend ``unit_testing/tutorial/tests.py`` to include a
    functional test:
@@ -46,7 +46,7 @@ Steps
    .. code-block:: bash
 
 
-    (venv)$ nosetests tutorial
+    $ $VENV/bin/nosetests tutorial
     .
     ----------------------------------------------------------------------
     Ran 2 tests in 0.141s

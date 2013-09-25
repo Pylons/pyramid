@@ -31,8 +31,8 @@ Steps
 
    .. code-block:: bash
 
-    (venv)$ cd ..; cp -r view_classes sessions; cd sessions
-    (venv)$ python setup.py develop
+    $ cd ..; cp -r view_classes sessions; cd sessions
+    $ $VENV/bin/python setup.py develop
 
 #. Our ``sessions/tutorial/__init__.py`` needs a choice of session
    factory to get registered with the :term:`configurator`:
@@ -56,13 +56,13 @@ Steps
 
    .. code-block:: bash
 
-    (venv)$ nosetests tutorial
+    $ $VENV/bin/nosetests tutorial
 
 #. Run your Pyramid application with:
 
    .. code-block:: bash
 
-    (venv)$ pserve development.ini --reload
+    $ $VENV/bin/pserve development.ini --reload
 
 #. Open http://localhost:6543/ and http://localhost:6543/howdy
    in your browser. As you reload and switch between those URLs, note

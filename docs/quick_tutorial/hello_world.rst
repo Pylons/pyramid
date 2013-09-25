@@ -40,13 +40,13 @@ Objectives
 Steps
 =====
 
-#. Make sure you have followed the steps in :doc:`python_setup`.
+#. Make sure you have followed the steps in :doc:`requirements`.
 
 #. Create a directory for this step:
 
    .. code-block:: bash
 
-    (venv)$ mkdir hello_world; cd hello_world
+    $ mkdir hello_world; cd hello_world
 
 #. Copy the following into ``hello_world/app.py``:
 
@@ -57,7 +57,7 @@ Steps
 
    .. code-block:: bash
 
-    (venv)$ python app.py
+    $ $VENV/bin/python app.py
 
 #. Open http://localhost:6543/ in your browser.
 

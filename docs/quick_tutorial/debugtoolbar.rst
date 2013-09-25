@@ -33,9 +33,9 @@ Steps
 
    .. code-block:: bash
 
-    (venv)$ cd ..; cp -r ini debugtoolbar; cd debugtoolbar
-    (venv)$ python setup.py develop
-    (venv)$ easy_install pyramid_debugtoolbar
+    $ cd ..; cp -r ini debugtoolbar; cd debugtoolbar
+    $ $VENV/bin/python setup.py develop
+    $ $VENV/bin/easy_install pyramid_debugtoolbar
 
 
 #. Our ``debugtoolbar/development.ini`` gets a configuration entry for
@@ -49,7 +49,7 @@ Steps
 
    .. code-block:: bash
 
-    (venv)$ pserve development.ini --reload
+    $ $VENV/bin/pserve development.ini --reload
 
 #. Open http://localhost:6543/ in your browser. See the handy
    toolbar on the right.

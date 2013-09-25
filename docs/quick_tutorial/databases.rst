@@ -41,7 +41,7 @@ Steps
 
    .. code-block:: bash
 
-    (venv)$ cd ..; cp -r forms databases; cd databases
+    $ cd ..; cp -r forms databases; cd databases
 
 #. We need to add some dependencies in ``databases/setup.py`` as well
    as an "entry point" for the command-line script:
@@ -75,7 +75,7 @@ Steps
 
    .. code-block:: bash
 
-    (venv)$ python setup.py develop
+    $ $VENV/bin/python setup.py develop
 
 #. The script references some models in ``databases/tutorial/models.py``:
 
@@ -86,7 +86,7 @@ Steps
 
    .. code-block:: bash
 
-    (venv)$ initialize_tutorial_db development.ini
+    $ initialize_tutorial_db development.ini
     2013-09-06 15:54:08,050 INFO  [sqlalchemy.engine.base.Engine][MainThread] PRAGMA table_info("wikipages")
     2013-09-06 15:54:08,050 INFO  [sqlalchemy.engine.base.Engine][MainThread] ()
     2013-09-06 15:54:08,051 INFO  [sqlalchemy.engine.base.Engine][MainThread]
@@ -113,7 +113,7 @@ Steps
 
     .. code-block:: bash
 
-        (venv)$ nosetests .
+        $ $VENV/bin/nosetests .
         ..
         -----------------------------------------------------------------
         Ran 2 tests in 1.141s
@@ -124,7 +124,7 @@ Steps
 
    .. code-block:: bash
 
-    (venv)$ pserve development.ini --reload
+    $ $VENV/bin/pserve development.ini --reload
 
 #. Open http://localhost:6543/ in a browser.
 

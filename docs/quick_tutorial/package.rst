@@ -56,7 +56,7 @@ Steps
 
    .. code-block:: bash
 
-    (venv)$ cd ..; mkdir package; cd package
+    $ cd ..; mkdir package; cd package
 
 #. In ``package/setup.py``, enter the following:
 
@@ -67,8 +67,8 @@ Steps
 
    .. code-block:: bash
 
-    (venv)$ python setup.py develop
-    (venv)$ mkdir tutorial
+    $ $VENV/bin/python setup.py develop
+    $ $VENV/bin/mkdir tutorial
 
 #. Enter the following into ``package/tutorial/__init__.py``:
 
@@ -82,7 +82,7 @@ Steps
 
    .. code-block:: bash
 
-    (venv)$ python tutorial/app.py
+    $ $VENV/bin/python tutorial/app.py
 
 #. Open http://localhost:6543/ in your browser.
 
