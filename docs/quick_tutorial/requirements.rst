@@ -209,7 +209,7 @@ part is pretty easy:
 .. code-block:: bash
 
     # Mac and Linux
-    $ easy_install pyramid
+    $ $VENV/bin/easy_install pyramid
 
     # Windows
     c:\> %VENV%\Scripts\easy_install pyramid
