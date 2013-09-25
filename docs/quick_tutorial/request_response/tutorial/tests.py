@@ -24,7 +24,7 @@ class TutorialViewTests(unittest.TestCase):
         request = testing.DummyRequest()
         inst = TutorialViews(request)
         response = inst.plain()
-        self.assertIn('No Name Provided', response.body)
+        self.assertIn(b'No Name Provided', response.body)
 
     def test_plain_with_name(self):
         from .views import TutorialViews
@@ -33,7 +33,7 @@ class TutorialViewTests(unittest.TestCase):
         request.GET['name'] = 'Jane Doe'
         inst = TutorialViews(request)
         response = inst.plain()
-        self.assertIn('Jane Doe', response.body)
+        self.assertIn(b'Jane Doe', response.body)
 
 
 class TutorialFunctionalTests(unittest.TestCase):

@@ -42,7 +42,8 @@ Steps
 
 #. Make sure you have followed the steps in :doc:`requirements`.
 
-#. Create a directory for this step:
+#. Starting from your workspace directory
+   (``~/projects/quick_tutorial``), create a directory for this step:
 
    .. code-block:: bash
 

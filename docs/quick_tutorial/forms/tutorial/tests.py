@@ -11,25 +11,18 @@ class TutorialViewTests(unittest.TestCase):
         testing.tearDown()
 
     def test_home(self):
-        from .views import TutorialViews
+        from .views import WikiViews
 
         request = testing.DummyRequest()
-        inst = TutorialViews(request)
-        response = inst.home()
-        self.assertEqual('Home View', response['name'])
-
-    def test_hello(self):
-        from .views import TutorialViews
-
-        request = testing.DummyRequest()
-        inst = TutorialViews(request)
-        response = inst.hello()
-        self.assertEqual('Hello View', response['name'])
+        inst = WikiViews(request)
+        response = inst.wiki_view()
+        self.assertEqual(len(response['pages']), 3)
 
 
 class TutorialFunctionalTests(unittest.TestCase):
     def setUp(self):
         from tutorial import main
+
         app = main({})
         from webtest import TestApp
 
@@ -40,8 +33,4 @@ class TutorialFunctionalTests(unittest.TestCase):
 
     def test_home(self):
         res = self.testapp.get('/', status=200)
-        self.assertIn(b'<h1>Hi Home View', res.body)
-
-    def test_hello(self):
-        res = self.testapp.get('/howdy', status=200)
-        self.assertIn(b'<h1>Hi Hello View', res.body)
+        self.assertIn(b'<title>Wiki: View</title>', res.body)

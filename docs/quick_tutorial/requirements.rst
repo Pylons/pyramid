@@ -223,7 +223,8 @@ during this tutorial:
 
     # Mac and Linux
     $ $VENV/bin/easy_install nose webtest deform sqlalchemy \
-       pyramid_chameleon pyramid_debugtoolbar waitress
+       pyramid_chameleon pyramid_debugtoolbar waitress \
+       pyramid_jinja2 pyramid_tm zope.sqlalchemy pysqlite
 
     # Windows
     c:\> %VENV%\Scripts\easy_install nose webtest deform sqlalchemy pyramid_chameleon

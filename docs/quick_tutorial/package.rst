@@ -68,7 +68,7 @@ Steps
    .. code-block:: bash
 
     $ $VENV/bin/python setup.py develop
-    $ $VENV/bin/mkdir tutorial
+    $ mkdir tutorial
 
 #. Enter the following into ``package/tutorial/__init__.py``:
 

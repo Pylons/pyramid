@@ -2,11 +2,11 @@ from setuptools import setup
 
 requires = [
     'pyramid',
+    'pyramid_chameleon',
     'deform',
     'sqlalchemy',
     'pyramid_tm',
-    'zope.sqlalchemy',
-    'pysqlite'
+    'zope.sqlalchemy'
 ]
 
 setup(name='tutorial',

@@ -16,11 +16,17 @@ Python, but instead, will use a templating language.
 Pyramid doesn't mandate a particular database system, form library,
 etc. It encourages replaceability. This applies equally to templating,
 which is fortunate: developers have strong views about template
-languages. That said, Pyramid bundles Chameleon and Mako,
-so in this step, let's use Chameleon as an example.
+languages. As of Pyramid 1.5a2, Pyramid doesn't even bundle a template
+language!
+
+It does, however, have strong ties to Jinja2, Mako, and Chameleon. In
+this step we see how to add ``pyramid_chameleon`` to your project,
+then change your views to use templating.
 
 Objectives
 ==========
+
+- Enable the ``pyramid_chameleon`` Pyramid add-on
 
 - Generate HTML from template files
 
@@ -31,13 +37,30 @@ Objectives
 Steps
 =====
 
-#. Let's begin by using the previous package as a starting point for a new
-   distribution, then making it active:
+#. Let's begin by using the previous package as a starting point for a
+   new project:
 
    .. code-block:: bash
 
     $ cd ..; cp -r views templating; cd templating
+
+#. This step depends on ``pyramid_chameleon``, so add it as a dependency
+   in ``templating/setup.py``:
+
+   .. literalinclude:: templating/setup.py
+    :linenos:
+
+#. Now we can activate the development-mode distribution:
+
+   .. code-block:: bash
+
     $ $VENV/bin/python setup.py develop
+
+#. We need to connect ``pyramid_chameleon`` as a renderer by making a
+   call in the setup of ``templating/tutorial/__init__.py``:
+
+   .. literalinclude:: templating/tutorial/__init__.py
+    :linenos:
 
 #. Our ``templating/tutorial/views.py`` no longer has HTML in it:
 
@@ -86,8 +109,7 @@ Analysis
 ========
 
 Ahh, that looks better. We have a view that is focused on Python code.
-Our ``@view_config`` decorator specifies a
-:term:`renderer` that points
+Our ``@view_config`` decorator specifies a :term:`renderer` that points
 our template file. Our view then simply returns data which is then
 supplied to our template. Note that we used the same template for both
 views.

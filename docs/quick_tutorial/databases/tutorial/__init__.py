@@ -11,6 +11,7 @@ def main(global_config, **settings):
 
     config = Configurator(settings=settings,
                           root_factory='tutorial.models.Root')
+    config.include('pyramid_chameleon')
     config.add_route('wiki_view', '/')
     config.add_route('wikipage_add', '/add')
     config.add_route('wikipage_view', '/{uid}')

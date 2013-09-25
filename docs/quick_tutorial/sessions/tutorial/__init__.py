@@ -7,6 +7,7 @@ def main(global_config, **settings):
         'itsaseekreet')
     config = Configurator(settings=settings,
                           session_factory=my_session_factory)
+    config.include('pyramid_chameleon')
     config.add_route('home', '/')
     config.add_route('hello', '/howdy')
     config.scan('.views')

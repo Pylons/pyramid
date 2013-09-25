@@ -16,7 +16,7 @@ class TutorialViewTests(unittest.TestCase):
         request = testing.DummyRequest()
         response = home(request)
         self.assertEqual(response.status_code, 200)
-        self.assertIn('Visit', response.body)
+        self.assertIn(b'Visit', response.body)
 
     def test_hello(self):
         from .views import hello
@@ -24,7 +24,7 @@ class TutorialViewTests(unittest.TestCase):
         request = testing.DummyRequest()
         response = hello(request)
         self.assertEqual(response.status_code, 200)
-        self.assertIn('Go back', response.body)
+        self.assertIn(b'Go back', response.body)
 
 
 class TutorialFunctionalTests(unittest.TestCase):

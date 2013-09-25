@@ -53,7 +53,7 @@ Steps
 
     $ $VENV/bin/pserve development.ini --reload
 
-#. Open http://localhost:6543/ in your browser.
+#. Open http://localhost:6543/ in your browser and note the new font.
 
 Analysis
 ========

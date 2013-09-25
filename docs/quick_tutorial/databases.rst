@@ -37,6 +37,15 @@ Objectives
 Steps
 =====
 
+.. warning::
+
+  Your Python might not have SQLite bundled. If not, install it into
+  your virtual environment with:
+
+   .. code-block:: bash
+
+    $ $VENV/bin/easy_install sphinx pysqlite
+
 #. We are going to use the forms step as our starting point:
 
    .. code-block:: bash
