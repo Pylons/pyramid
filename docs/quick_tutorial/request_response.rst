@@ -1,3 +1,5 @@
+.. _qtut_request_response:
+
 =======================================
 10: Handling Web Requests and Responses
 =======================================

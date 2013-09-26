@@ -1,3 +1,5 @@
+.. _qtut_templating:
+
 ===================================
 08: HTML Generation With Templating
 ===================================

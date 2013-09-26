@@ -1,3 +1,5 @@
+.. _qtut_hello_world:
+
 ================================
 01: Single-File Web Applications
 ================================

@@ -1,3 +1,5 @@
+.. _qtut_requirements:
+
 ============
 Requirements
 ============

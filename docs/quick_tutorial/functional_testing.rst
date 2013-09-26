@@ -1,3 +1,5 @@
+.. _qtut_functional_testing:
+
 ===================================
 06: Functional Testing with WebTest
 ===================================

@@ -1,3 +1,5 @@
+.. _qtut_view_classes:
+
 ======================================
 09: Organizing Views With View Classes
 ======================================

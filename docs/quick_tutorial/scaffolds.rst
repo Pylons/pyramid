@@ -1,3 +1,5 @@
+.. _qtut_scaffolds:
+
 =============================================
 Prelude: Quick Project Startup with Scaffolds
 =============================================

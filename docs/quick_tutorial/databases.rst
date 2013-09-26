@@ -1,3 +1,5 @@
+.. _qtut_databases:
+
 ==============================
 19: Databases Using SQLAlchemy
 ==============================

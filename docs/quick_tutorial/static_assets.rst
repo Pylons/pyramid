@@ -1,3 +1,5 @@
+.. _qtut_static_assets:
+
 ==========================================
 13: CSS/JS/Images Files With Static Assets
 ==========================================

@@ -1,3 +1,5 @@
+.. _qtut_more_view_classes:
+
 ==========================
 15: More With View Classes
 ==========================
