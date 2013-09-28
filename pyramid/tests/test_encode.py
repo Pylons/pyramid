@@ -41,6 +41,14 @@ class UrlEncodeTests(unittest.TestCase):
         result = self._callFUT({'a':1})
         self.assertEqual(result, 'a=1')
 
+    def test_None_value(self):
+        result = self._callFUT([('a', None)])
+        self.assertEqual(result, 'a')
+
+    def test_None_value_with_prefix(self):
+        result = self._callFUT([('a', '1'), ('b', None)])
+        self.assertEqual(result, 'a=1&b')
+
 class URLQuoteTests(unittest.TestCase):
     def _callFUT(self, val, safe=''):
         from pyramid.encode import url_quote
