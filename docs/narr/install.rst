@@ -10,7 +10,9 @@ Before You Install
 ------------------
 
 You will need `Python <http://python.org>`_ version 2.6 or better to run
-:app:`Pyramid`.
+:app:`Pyramid`.  The Python source code headers, while not required to run a
+:app:`Pyramid' application, are required when following the steps presented
+here to develop :app:`Pyramid' applications.
 
 .. sidebar:: Python Versions
 
