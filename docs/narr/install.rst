@@ -355,7 +355,7 @@ You can use Pyramid on Windows under Python 2 or 3.
    environment wired to use the virtualenv.
 
 #. Use ``easy_install`` to get :app:`Pyramid` and its direct dependencies
-   installed, choosing the :app:`Pyramid' version you wish to install:
+   installed, choosing the :app:`Pyramid` version you wish to install:
 
    .. code-block:: text
 
