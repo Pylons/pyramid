@@ -63,6 +63,7 @@ class PViewsCommand(object):
         from pyramid.interfaces import IRequest
         from pyramid.interfaces import IRootFactory
         from pyramid.interfaces import IRouteRequest
+        from pyramid.interfaces import IRequestExtensions
         from pyramid.interfaces import IRequestFactory
         from pyramid.interfaces import IRoutesMapper
         from pyramid.interfaces import IView
@@ -121,6 +122,11 @@ class PViewsCommand(object):
             'PATH_INFO':url,
             }
         request = request_factory(environ)
+
+        extensions = registry.queryUtility(IRequestExtensions)
+        if extensions is not None:
+            request._set_extensions(extensions)
+
         context = None
         routes_multiview = None
         attrs = request.__dict__

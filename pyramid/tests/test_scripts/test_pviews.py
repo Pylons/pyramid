@@ -465,6 +465,39 @@ class TestPViewsCommand(unittest.TestCase):
                          '    pyramid.tests.test_scripts.dummy.view.call')
         self.assertEqual(L[9], '    view predicates (predicate = x)')
 
+    def test_find_views_with_request_extensions(self):
+        from zope.interface import providedBy
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IRequestExtensions
+        from pyramid.interfaces import IRootFactory
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IView
+        from pyramid.registry import Registry
+
+        class DummyExtensions(object):
+            descriptors = {}
+            methods = {'foo': lambda r: 'bar'}
+
+        registry = Registry()
+        registry.registerUtility(DummyExtensions(), IRequestExtensions)
+
+        called = []
+        def factory(request):
+            called.append(request.foo())
+
+        def view1(): pass
+        request = dummy.DummyRequest({'PATH_INFO':'/a'})
+        root_iface = providedBy(None)
+        registry.registerUtility(factory, IRootFactory)
+        registry.registerAdapter(view1,
+                                 (IViewClassifier, IRequest, root_iface),
+                                 IView, name='a')
+        self._register_mapper(registry, [])
+        command = self._makeOne(registry=registry)
+        result = command._find_view('/a', registry)
+        self.assertEqual(result, view1)
+        self.assertEqual(called, ['bar'])
+
 class Test_main(unittest.TestCase):
     def _callFUT(self, argv):
         from pyramid.scripts.pviews import main
