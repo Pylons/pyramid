@@ -282,12 +282,12 @@ it's an absolute path.
 Installing :app:`Pyramid` Into the Virtual Python Environment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-After you've got your virtualenv installed, you may install :app:`Pyramid`
-itself using the following commands:
+After you've got your virtualenv installed, you may install the
+desired version of :app:`Pyramid` itself using the following commands:
 
 .. code-block:: text
 
-   $ $VENV/bin/easy_install pyramid
+   $ $VENV/bin/easy_install 'pyramid==PYRAMID_VERSION'
 
 The ``easy_install`` command will take longer than the previous ones to
 complete, as it downloads and installs a number of dependencies.
@@ -355,11 +355,11 @@ You can use Pyramid on Windows under Python 2 or 3.
    environment wired to use the virtualenv.
 
 #. Use ``easy_install`` to get :app:`Pyramid` and its direct dependencies
-   installed:
+   installed, choosing the :app:`Pyramid' version you wish to install:
 
    .. code-block:: text
 
-      c:\env> %VENV%\Scripts\easy_install pyramid
+      c:\env> %VENV%\Scripts\easy_install 'pyramid==PYRAMID_VERSION'
 
 What Gets Installed
 -------------------
