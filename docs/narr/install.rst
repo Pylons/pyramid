@@ -315,10 +315,10 @@ After you've got your ``env`` virtualenv installed, you may install
 :app:`Pyramid` itself using the following commands from within the
 virtualenv (``env``) directory you created in the last step.
 
-.. code-block:: text
-
+.. parsed-literal::
+      
    $ cd env
-   $ bin/easy_install pyramid
+   $ bin/easy_install "pyramid==\ |release|\ "
 
 The ``easy_install`` command will take longer than the previous ones to
 complete, as it downloads and installs a number of dependencies.
@@ -379,9 +379,9 @@ Windows Using Python 2
 #. Use ``easy_install`` to get :app:`Pyramid` and its direct dependencies
    installed:
 
-   .. code-block:: text
-
-      c:\env> Scripts\easy_install pyramid
+   .. parsed-literal::
+      
+      c:\\env> Scripts\\easy_install "pyramid==\ |release|\ "
 
 Windows Using Python 3
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -428,9 +428,9 @@ Windows Using Python 3
 #. Use ``easy_install`` to get :app:`Pyramid` and its direct dependencies
    installed:
 
-   .. code-block:: text
-
-      c:\env> Scripts\easy_install pyramid
+   .. parsed-literal::
+      
+      c:\\env> Scripts\\easy_install "pyramid==\ |release|\ "
 
 What Gets Installed
 -------------------
