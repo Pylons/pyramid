@@ -25,6 +25,10 @@ on :term:`PyPy` (1.9+).
 :app:`Pyramid` installation does not require the compilation of any C code, so
 you need only a Python interpreter that meets the requirements mentioned.
 
+Some :app:`Pyramid` dependencies may attempt to build C extensions for
+performance speedups. If a compiler or Python headers are unavailable the
+dependency will fall back to using pure Python instead.
+
 For Mac OS X Users
 ~~~~~~~~~~~~~~~~~~
 
@@ -291,6 +295,13 @@ itself using the following commands:
 
 The ``easy_install`` command will take longer than the previous ones to
 complete, as it downloads and installs a number of dependencies.
+
+.. note::
+
+   If you see any warnings and/or errors related to failing to compile the C
+   extensions, in most cases you may safely ignore those errors. If you wish
+   to use the C extensions, please verify that you have a functioning compiler
+   and the Python header files installed.
 
 .. index::
    single: installing on Windows
