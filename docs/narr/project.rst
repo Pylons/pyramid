@@ -193,10 +193,10 @@ Elided output from a run of this command on UNIX is shown below:
    ...
    Finished processing dependencies for MyProject==0.0
 
-This will install a :term:`distribution` representing your project into the
-interpreter's library set so it can be found by ``import`` statements and by
-other console scripts such as ``pserve``, ``pshell``, ``proutes`` and
-``pviews``.
+This will install a :term:`distribution` representing your project
+into the virtual environment interpreter's library set so it can be
+found by ``import`` statements and by other console scripts such as
+``pserve``, ``pshell``, ``proutes`` and ``pviews``.
 
 .. index::
    single: running tests
