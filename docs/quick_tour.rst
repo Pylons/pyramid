@@ -4,73 +4,56 @@
 Quick Tour of Pyramid
 =====================
 
-Pyramid lets you start small and finish big. This *Quick Tour* guide
-walks you through many of Pyramid's key features. Let's put the
-emphasis on *start* by doing a quick tour through Pyramid, with
-snippets of code to illustrate major concepts.
+Pyramid lets you start small and finish big.  This *Quick Tour* of Pyramid is
+for those who want to evaluate Pyramid, whether you are new to Python
+web frameworks, or a pro in a hurry. For more detailed treatment of
+each topic, give the :ref:`quick_tutorial` a try.
 
-.. note::
-
-    We use Python 3 in our samples. Pyramid was one of the first
-    (October 2011) web frameworks to fully support Python 3. You can
-    use Python 3 as well for this guide, but you can also use Python 2.7.
-
-Python Setup
+Installation
 ============
 
-First thing's first: we need our Python environment in ship-shape.
-Pyramid encourages standard Python development practices (virtual
-environments, packaging tools, logging, etc.) so let's get our working
-area in place. For Python 3.3:
+Once you have a standard Python environment setup, getting started with
+Pyramid is a breeze. Unfortunately "standard" is not so simple in Python.
+For this Quick Tour, it means:
+`Python <http://www.python.org/download/releases/>`_, a
+`virtual environment <http://docs.python.org/dev/library/venv.html>`_
+(or `virtualenv for Python 2.7 <https://pypi.python.org/pypi/virtualenv>`_),
+and `setuptools <https://pypi.python.org/pypi/setuptools/>`_.
 
-.. code-block:: bash
+As an example, for Python 3.3+ on Linux:
 
-  $ pyvenv-3.3 env33
-  $ source env33/bin/activate
-  $ wget https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py -O - | python
+.. parsed-literal::
 
-If ``wget`` complains with a certificate error, run it with:
+  $ pyvenv env33
+  $ wget https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py -O - | env33/bin/python
+  $ env33/bin/easy_install "pyramid==\ |release|\ "
 
-.. code-block:: bash
+For Windows:
 
-  $ wget --no-check-certificate
+.. parsed-literal::
 
-In these steps above we first made a :term:`virtualenv` and then
-"activated"  it, which adjusted our path to look first in
-``env33/bin`` for commands (such as ``python``). We next downloaded
-Python's packaging support and installed it, giving us the
-``easy_install`` command-line script for adding new packages. Python
-2.7 users will need to use ``virtualenv`` instead of ``pyvenv`` to make
-their virtual environment.
+    # Use your browser to download:
+    #   https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py
+    c:\\> c:\\Python33\\python -m venv env33
+    c:\\> env33\\Scripts\\python ez_setup.py
+    c:\\> env33\\Scripts\\easy_install "pyramid==\ |release|\ "
+
+Of course Pyramid runs fine on Python 2.6+, as do the examples in this
+*Quick Tour*. We're just showing Python 3 a little love (Pyramid had
+production support in October 2011.)
 
 .. note::
 
-   Why ``easy_install`` and not ``pip``? Pyramid encourages use of
-   namespace packages which, until recently, ``pip`` didn't permit.
-   Also, Pyramid has some optional C extensions for performance. With
-   ``easy_install``, Windows users can get these extensions without
-   needing a C compiler.
+    Why ``easy_install`` and not ``pip``? Pyramid encourages use of namespace
+    packages which, until recently, ``pip`` didn't permit. Also, Pyramid has
+    some optional C extensions for performance. With ``easy_install``, Windows
+    users can get these extensions without needing a C compiler.
 
-.. seealso:: See Also: Python 3's :mod:`venv module <python3:venv>`,
-   the ``setuptools`` `installation
-   instructions <https://pypi.python.org/pypi/setuptools/0.9.8#installation-instructions>`_,
-   `easy_install help <https://pypi.python.org/pypi/setuptools/0.9.8#using-setuptools-and-easyinstall>`_,
-   and Pyramid's :ref:`Before You Install <installing_chapter>`.
-
-Pyramid Installation
-====================
-
-We now have a standard starting point for Python. Getting Pyramid
-installed is easy:
-
-.. code-block:: bash
-
-  $ easy_install pyramid
-
-Our virtual environment now has the Pyramid software available to its
-Python.
-
-.. seealso:: See Also: :ref:`installing_unix`
+.. seealso:: See Also:
+    :ref:`Quick Tutorial section on Requirements <qtut_requirements>`,
+    :ref:`installing_unix`,
+    :ref:`Before You Install <installing_chapter>`, and
+    :ref:`Installing Pyramid on a Windows System <installing_windows>`
 
 Hello World
 ===========
@@ -109,7 +92,9 @@ in Pyramid development. Building an application from loosely-coupled
 parts via :doc:`../narr/configuration` is a central idea in Pyramid,
 one that we will revisit regurlarly in this *Quick Tour*.
 
-.. seealso:: See Also: :ref:`firstapp_chapter` and
+.. seealso:: See Also:
+   :ref:`Quick Tutorial Hello World <qtut_hello_world>`,
+   :ref:`firstapp_chapter`, and
    :ref:`Single File Tasks tutorial <tutorials:single-file-tutorial>`
 
 Handling Web Requests and Responses
@@ -140,7 +125,10 @@ the name is included in the body of the response::
 
 Finally, we set the response's content type and return the Response.
 
-.. seealso:: See Also: :ref:`webob_chapter`
+.. seealso:: See Also:
+    :ref:`Quick Tutorial Request and Response <qtut_request_response>`
+    and
+    :ref:`webob_chapter`
 
 Views
 =====
@@ -190,7 +178,9 @@ configuration`, in which a Python :term:`decorator` is placed on the
 line above the view. Both approaches result in the same final
 configuration, thus usually, it is simply a matter of taste.
 
-.. seealso:: See Also: :doc:`../narr/views`,
+.. seealso:: See Also:
+   :ref:`Quick Tutorial Views <qtut_views>`,
+   :doc:`../narr/views`,
    :doc:`../narr/viewconfig`, and
    :ref:`debugging_view_configuration`
 
@@ -236,7 +226,9 @@ view:
 "replacement patterns" (the curly braces) in the route declaration.
 This information can then be used in your view.
 
-.. seealso:: See Also: :doc:`../narr/urldispatch`,
+.. seealso:: See Also:
+   :ref:`Quick Tutorial Routing <qtut_routing>`,
+   :doc:`../narr/urldispatch`,
    :ref:`debug_routematch_section`, and
    :doc:`../narr/router`
 
@@ -270,9 +262,11 @@ Since our view returned ``dict(name=request.matchdict['name'])``,
 we can use ``name`` as a variable in our template via
 ``${name}``.
 
-.. seealso:: See Also: :doc:`../narr/templates`,
-   :ref:`debugging_templates`, and
-   :ref:`available_template_system_bindings`
+.. seealso:: See Also:
+    :ref:`Quick Tutorial Templating <qtut_templating>`,
+    :doc:`../narr/templates`,
+    :ref:`debugging_templates`, and
+    :ref:`available_template_system_bindings`
 
 Templating With ``jinja2``
 ==========================
@@ -303,7 +297,7 @@ The only change in our view...point the renderer at the ``.jinja2`` file:
 Our Jinja2 template is very similar to our previous template:
 
 .. literalinclude:: quick_tour/jinja2/hello_world.jinja2
-    :language: jinja
+    :language: html
 
 Pyramid's templating add-ons register a new kind of renderer into your
 application. The renderer registration maps to different kinds of
@@ -311,9 +305,10 @@ filename extensions. In this case, changing the extension from ``.pt``
 to ``.jinja2`` passed the view response through the ``pyramid_jinja2``
 renderer.
 
-.. seealso:: See Also: `Jinja2 homepage <http://jinja.pocoo.org/>`_,
-   and
-   :ref:`pyramid_jinja2 Overview <jinja2:overview>`
+.. seealso:: See Also:
+    :ref:`Quick Tutorial Jinja2 <qtut_jinja2>`,
+    `Jinja2 homepage <http://jinja.pocoo.org/>`_, and
+    :ref:`pyramid_jinja2 Overview <jinja2:overview>`
 
 Static Assets
 =============
@@ -358,9 +353,11 @@ By using ``request.static_url`` to generate the full URL to the static
 assets, you both ensure you stay in sync with the configuration and
 gain refactoring flexibility later.
 
-.. seealso:: See Also: :doc:`../narr/assets`,
-   :ref:`preventing_http_caching`, and
-   :ref:`influencing_http_caching`
+.. seealso:: See Also:
+    :ref:`Quick Tutorial Static Assets <qtut_static_assets>`,
+    :doc:`../narr/assets`,
+    :ref:`preventing_http_caching`, and
+    :ref:`influencing_http_caching`
 
 Returning JSON
 ==============
@@ -377,9 +374,11 @@ This wires up a view that returns some data through the JSON
 :term:`renderer`, which calls Python's JSON support to serialize the data
 into JSON and set the appropriate HTTP headers.
 
-.. seealso:: See Also: :ref:`views_which_use_a_renderer`,
-   :ref:`json_renderer`, and
-   :ref:`adding_and_overriding_renderers`
+.. seealso:: See Also:
+    :ref:`Quick Tutorial JSON <qtut_json>`,
+    :ref:`views_which_use_a_renderer`,
+    :ref:`json_renderer`, and
+    :ref:`adding_and_overriding_renderers`
 
 View Classes
 ============
@@ -422,7 +421,20 @@ Only one route needed, stated in one place atop the view class. Also,
 the assignment of the ``name`` is done in the ``__init__``. Our
 templates can then use ``{{ view.name }}``.
 
-.. seealso:: See Also: :ref:`class_as_view`
+Pyramid view classes, combined with built-in and custom predicates,
+have much more to offer:
+
+- All the same view configuration parameters as function views
+
+- One route leading to multiple views, based on information in the
+  request or data such as ``request_param``, ``request_method``,
+  ``accept``, ``header``, ``xhr``, ``containment``, and
+  ``custom_predicates``
+
+.. seealso:: See Also:
+    :ref:`Quick Tutorial View Classes <qtut_view_classes>`,
+    :ref:`Quick Tutorial More View Classes <qtut_more_view_classes>`, and
+    :ref:`class_as_view`
 
 Quick Project Startup with Scaffolds
 ====================================
@@ -470,8 +482,10 @@ configuration. This includes a new way of running your application:
 
 Let's look at ``pserve`` and configuration in more depth.
 
-.. seealso:: See Also: :ref:`project_narr` and
-   :doc:`../narr/scaffolding`
+.. seealso:: See Also:
+    :ref:`Quick Tutorial Scaffolds <qtut_scaffolds>`,
+    :ref:`project_narr`, and
+    :doc:`../narr/scaffolding`
 
 Application Running with ``pserve``
 ===================================
@@ -499,7 +513,8 @@ Most of the work, though, comes from your project's wiring, as
 expressed in the configuration file you supply to ``pserve``. Let's
 take a look at this configuration file.
 
-.. seealso:: See Also: :ref:`what_is_this_pserve_thing`
+.. seealso:: See Also:
+    :ref:`what_is_this_pserve_thing`
 
 Configuration with ``.ini`` Files
 =================================
@@ -546,8 +561,10 @@ Additionally, the ``development.ini`` generated by this scaffold wired
 up Python's standard logging. We'll now see in the console, for example,
 a log on every request that comes in, as well traceback information.
 
-.. seealso:: See Also: :ref:`environment_chapter` and
-   :doc:`../narr/paste`
+.. seealso:: See Also:
+    :ref:`Quick Tutorial Application Configuration <qtut_ini>`,
+    :ref:`environment_chapter` and
+    :doc:`../narr/paste`
 
 
 Easier Development with ``debugtoolbar``
@@ -599,7 +616,10 @@ you want to disable this toolbar, no need to change code: you can
 remove it from ``pyramid.includes`` in the relevant ``.ini``
 configuration file.
 
-.. seealso:: See Also: :ref:`pyramid_debugtoolbar <toolbar:overview>`
+.. seealso:: See Also:
+    :ref:`Quick Tutorial
+    pyramid_debugtoolbar <qtut_debugtoolbar>` and
+    :ref:`pyramid_debugtoolbar <toolbar:overview>`
 
 Unit Tests and ``nose``
 =======================
@@ -650,7 +670,11 @@ Pyramid supplies helpers for test writing, which we use in the
 test setup and teardown. Our one test imports the view,
 makes a dummy request, and sees if the view returns what we expected.
 
-.. seealso:: See Also: :ref:`testing_chapter`
+.. seealso:: See Also:
+    :ref:`Quick Tutorial Unit Testing <qtut_unit_testing>`,
+    :ref:`Quick Tutorial Functional Testing <qtut_functional_testing>`,
+    and
+    :ref:`testing_chapter`
 
 Logging
 =======
@@ -693,7 +717,9 @@ visit ``http://localhost:6543`` your console will now show::
 
  2013-08-09 10:42:42,968 DEBUG [hello_world.views][MainThread] Some Message
 
-.. seealso:: See Also: :ref:`logging_chapter`
+.. seealso:: See Also:
+    :ref:`Quick Tutorial Logging <qtut_logging>` and
+    :ref:`logging_chapter`
 
 Sessions
 ========
@@ -740,9 +766,10 @@ Jinja2 template:
     :end-before: End Sphinx Include 1
 
 .. seealso:: See Also:
-   :ref:`sessions_chapter`, :ref:`flash_messages`,
-   :ref:`session_module`, and
-   :ref:`Beaker sessioning middleware <beaker:overview>`
+    :ref:`Quick Tutorial Sessions <qtut_sessions>`,
+    :ref:`sessions_chapter`, :ref:`flash_messages`,
+    :ref:`session_module`, and
+    :ref:`Beaker sessioning middleware <beaker:overview>`
 
 Databases
 =========
@@ -787,10 +814,12 @@ of the system, can then easily get at the data thanks to SQLAlchemy:
     :start-after: Start Sphinx Include
     :end-before: End Sphinx Include
 
-.. seealso:: See Also: `SQLAlchemy <http://www.sqlalchemy.org/>`_,
-   :ref:`making_a_console_script`,
-   :ref:`bfg_sql_wiki_tutorial`, and
-   :ref:`Application Transactions With pyramid_tm <tm:overview>`
+.. seealso:: See Also:
+    :ref:`Quick Tutorial Databases <qtut_databases>`,
+    `SQLAlchemy <http://www.sqlalchemy.org/>`_,
+    :ref:`making_a_console_script`,
+    :ref:`bfg_sql_wiki_tutorial`, and
+    :ref:`Application Transactions With pyramid_tm <tm:overview>`
 
 Forms
 =====
@@ -849,9 +878,10 @@ widgets using attractive CSS from Bootstrap and more powerful widgets
 from Chosen.
 
 .. seealso:: See Also:
-   :ref:`Deform <deform:overview>`,
-   :ref:`Colander <colander:overview>`, and
-   `deform_bootstrap <https://pypi.python.org/pypi/deform_bootstrap>`_
+    :ref:`Quick Tutorial Forms <qtut_forms>`,
+    :ref:`Deform <deform:overview>`,
+    :ref:`Colander <colander:overview>`, and
+    `deform_bootstrap <https://pypi.python.org/pypi/deform_bootstrap>`_
 
 Conclusion
 ==========

@@ -44,9 +44,13 @@ up to speed right away.
    :hidden:
 
    quick_tour
+   quick_tutorial/index
 
 * :doc:`quick_tour` goes through the major features in Pyramid, covering
   a little about a lot.
+
+* :doc:`quick_tutorial/index` does the same, but in a tutorial format:
+  deeper treatment of each topic and with working code.
 
 * To see a minimal Pyramid web application, check out
   :ref:`firstapp_chapter`.

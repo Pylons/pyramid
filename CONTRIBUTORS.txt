@@ -222,3 +222,5 @@ Contributors
 - Takahiro Fujiwara, 2013/08/28
 
 - Doug Hellmann, 2013/09/06
+
+- Karl O. Pinc, 2013/09/27
