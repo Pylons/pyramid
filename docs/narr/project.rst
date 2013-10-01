@@ -976,10 +976,10 @@ named ``views`` instead of within a single ``views.py`` file, you might:
   *package*.)
 
 - *Move* the existing ``views.py`` file to a file inside the new ``views``
-  directory named, say, ``blog.py``.  The template :term:`asset
+  directory named, say, ``blog.py``.  Because the ``templates`` directory
+  remains in the ``myproject`` package the template :term:`asset
   specification`s in ``blog.py`` must now be fully qualified with the
-  project's package name (``myproject:templates/blog.pt``) since the
-  ``templates`` directory remains in the ``myproject`` package.
+  project's package name (``myproject:templates/blog.pt``).
 
 You can then continue to add view callable functions to the ``blog.py``
 module, but you can also add other ``.py`` files which contain view callable
