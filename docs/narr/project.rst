@@ -974,9 +974,9 @@ named ``views`` instead of within a single ``views.py`` file, you might:
 - *Move* the existing ``views.py`` file to a file inside the new ``views``
   directory named, say, ``blog.py``.
 
-- Create a file within the new ``views`` directory named ``__init__.py`` (it
-  can be empty, this just tells Python that the ``views`` directory is a
-  *package*.
+- Create a file within the new ``views`` directory named ``__init__.py``.  (It
+  can be empty.  This just tells Python that the ``views`` directory is a
+  *package*.)
 
 You can then continue to add view callable functions to the ``blog.py``
 module, but you can also add other ``.py`` files which contain view callable
