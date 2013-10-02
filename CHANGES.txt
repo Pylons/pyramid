@@ -1,6 +1,15 @@
 Unreleased
 ==========
 
+Bug Fixes
+---------
+
+- Fix the ``pcreate`` script so that when the target directory name ends with a 
+  slash it does not produce a non-working project directory structure.  
+  Previously saying ``pcreate -s starter /foo/bar/`` produced different output 
+  than  saying ``pcreate -s starter /foo/bar``.  The former did not work
+  properly.
+
 Documentation
 -------------
 
