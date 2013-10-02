@@ -159,10 +159,10 @@ Some gotchas:
 Using Alternate Session Factories
 ---------------------------------
 
-At the time of this writing, exactly one project-endorsed alternate session 
-factory exists named``pyramid_redis_sessions``.  It can be downloaded from PyPI.
-It uses Redis as a backend.  It is the recommended persistent session solution
-at the time of this writing.
+At the time of this writing, exactly one project-endorsed alternate session
+factory exists named :term:`pyramid_redis_sessions`.  It can be downloaded from
+PyPI.  It uses the Redis database as a backend.  It is the recommended 
+persistent session solution at the time of this writing.
 
 .. index::
    single: session factory (custom)

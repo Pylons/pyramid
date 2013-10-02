@@ -977,7 +977,7 @@ named ``views`` instead of within a single ``views.py`` file, you might:
 - *Move* the existing ``views.py`` file to a file inside the new ``views``
   directory named, say, ``blog.py``.  Because the ``templates`` directory
   remains in the ``myproject`` package, the template :term:`asset
-  specification`s in ``blog.py`` must now be fully qualified with the
+  specification` values in ``blog.py`` must now be fully qualified with the
   project's package name (``myproject:templates/blog.pt``).
 
 You can then continue to add view callable functions to the ``blog.py``

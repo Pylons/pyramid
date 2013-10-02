@@ -1009,7 +1009,8 @@ Glossary
 
    Green Unicorn
       Aka ``gunicorn``, a fast :term:`WSGI` server that runs on UNIX under
-      Python 2.6+ or Python 3.1+.  See http://gunicorn.org/ for detailed information.
+      Python 2.6+ or Python 3.1+.  See http://gunicorn.org/ for detailed 
+      information.
 
    predicate factory
       A callable which is used by a third party during the registration of a
@@ -1021,3 +1022,9 @@ Glossary
       A Python :term:`distribution` that uses Pyramid's extensibility
       to plug into a Pyramid application and provide extra,
       configurable services.
+
+   pyramid_redis_sessions
+      A package by Eric Rasmussen which allows you to store Pyramid session 
+      data in a Redis database.  See 
+      https://pypi.python.org/pypi/pyramid_redis_sessions for more information.
+

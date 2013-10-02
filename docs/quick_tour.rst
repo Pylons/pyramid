@@ -729,8 +729,8 @@ that requires semi-permanent data to be saved. For example, a shopping
 cart. This is called a :term:`session`.
 
 Pyramid has basic built-in support for sessions, with add-ons such as
-*Beaker* (or your own custom sessioning engine) that provide richer
-session support. Let's take a look at the
+``pyramid_redis_sessions`` (or your own custom sessioning engine) that provide 
+richer session support. Let's take a look at the
 :doc:`built-in sessioning support <../narr/sessions>`. In our
 ``__init__.py`` we first import the kind of sessioning we want:
 
@@ -768,8 +768,7 @@ Jinja2 template:
 .. seealso:: See Also:
     :ref:`Quick Tutorial Sessions <qtut_sessions>`,
     :ref:`sessions_chapter`, :ref:`flash_messages`,
-    :ref:`session_module`, and
-    :ref:`Beaker sessioning middleware <beaker:overview>`
+    :ref:`session_module`, and :term:`pyramid_redis_sessions`.
 
 Databases
 =========
