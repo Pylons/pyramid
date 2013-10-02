@@ -871,18 +871,17 @@ specification` that specifies the ``mytemplate.pt`` file within the
 ``templates`` directory of the ``myproject`` package.  The asset
 specification could have also been specified as
 ``myproject:templates/mytemplate.pt``; the leading package name and colon is
-optional.  The template file it actually points to is a :term:`Chameleon` ZPT
-template file.
+optional.  The template file pointed to is a :term:`Chameleon` ZPT
+template file (``templates/my_template.pt``).
 
 This view callable function is handed a single piece of information: the
 :term:`request`.  The *request* is an instance of the :term:`WebOb`
 ``Request`` class representing the browser's request to our server.
 
-This view returns a dictionary.  When this view is invoked, a
-:term:`renderer` converts the dictionary returned by the view into HTML, and
-returns the result as the :term:`response`.  This view is configured to
-invoke a renderer which uses a :term:`Chameleon` ZPT template
-(``templates/my_template.pt``).
+This view is configured to invoke a :term;`renderer` on a template.  The
+dictionary the view returns (on line 6) provides the value the renderer
+substitutes into the template when generating HTML.  The renderer then
+returns the HTML in a :term:`response`.
 
 See :ref:`views_which_use_a_renderer` for more information about how views,
 renderers, and templates relate and cooperate.
