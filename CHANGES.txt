@@ -36,7 +36,7 @@ Backwards Incompatibilities
   ``query`` parameter of ``request.resource_url`` (and their variants), used
   to encode a value of ``None`` as the string ``'None'``, leaving the resulting
   query string to be ``a=b&key=None``. The value is now dropped in this
-  situation, leaving a query string of ``a=b&key``.
+  situation, leaving a query string of ``a=b&key=``.
   See https://github.com/Pylons/pyramid/issues/1119
 
 1.5a2 (2013-09-22)
