@@ -55,7 +55,7 @@ def urlencode(query, doseq=True):
                 result += '%s%s=%s' % (prefix, k, x)
                 prefix = '&'
         elif v is None:
-            result += '%s%s' % (prefix, k)
+            result += '%s%s=' % (prefix, k)
         else:
             v = _enc(v)
             result += '%s%s=%s' % (prefix, k, v)

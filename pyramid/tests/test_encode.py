@@ -43,11 +43,15 @@ class UrlEncodeTests(unittest.TestCase):
 
     def test_None_value(self):
         result = self._callFUT([('a', None)])
-        self.assertEqual(result, 'a')
+        self.assertEqual(result, 'a=')
 
     def test_None_value_with_prefix(self):
         result = self._callFUT([('a', '1'), ('b', None)])
-        self.assertEqual(result, 'a=1&b')
+        self.assertEqual(result, 'a=1&b=')
+
+    def test_None_value_with_prefix_values(self):
+        result = self._callFUT([('a', '1'), ('b', None), ('c', None)])
+        self.assertEqual(result, 'a=1&b=&c=')
 
 class URLQuoteTests(unittest.TestCase):
     def _callFUT(self, val, safe=''):
