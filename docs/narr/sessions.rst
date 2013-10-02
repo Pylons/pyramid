@@ -99,6 +99,10 @@ example:
        else:
            return Response('Fred was not in the session')
 
+The first time this view is invoked produces ``Fred was not in the
+session``.  Subsequent invocations produce ``Fred was in the
+session``.
+
 You can use a session much like a Python dictionary.  It supports all
 dictionary methods, along with some extra attributes, and methods.
 
