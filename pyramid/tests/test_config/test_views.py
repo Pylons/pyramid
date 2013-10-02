@@ -109,6 +109,37 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         view = self._getViewCallable(config)
         self.assertTrue(b'Hello!' in view(None, None).body)
 
+    def test_add_view_with_tmpl_renderer_factory_introspector_missing(self):
+        config = self._makeOne(autocommit=True)
+        config.introspection = False
+        config.introspector = None
+        config.add_view(renderer='dummy.pt')
+        view = self._getViewCallable(config)
+        self.assertRaises(ValueError, view, None, None)
+        
+    def test_add_view_with_tmpl_renderer_factory_no_renderer_factory(self):
+        config = self._makeOne(autocommit=True)
+        introspector = DummyIntrospector()
+        config.introspector = introspector
+        config.add_view(renderer='dummy.pt')
+        self.assertFalse(('renderer factories', '.pt') in
+                         introspector.related[-1])
+        view = self._getViewCallable(config)
+        self.assertRaises(ValueError, view, None, None)
+
+    def test_add_view_with_tmpl_renderer_factory_with_renderer_factory(self):
+        config = self._makeOne(autocommit=True)
+        introspector = DummyIntrospector(True)
+        config.introspector = introspector
+        def dummy_factory(helper):
+            return lambda val, system_vals: 'Hello!'
+        config.add_renderer('.pt', dummy_factory)
+        config.add_view(renderer='dummy.pt')
+        self.assertTrue(
+            ('renderer factories', '.pt') in introspector.related[-1])
+        view = self._getViewCallable(config)
+        self.assertTrue(b'Hello!' in view(None, None).body)
+        
     def test_add_view_wrapped_view_is_decorated(self):
         def view(request): # request-only wrapper
             """ """
@@ -3954,3 +3985,14 @@ class DummyPredicate(object):
 
     phash = text
 
+class DummyIntrospector(object):
+    def __init__(self, getval=None):
+        self.related = []
+        self.introspectables = []
+        self.getval = getval
+    def add(self, introspectable):
+        self.introspectables.append(introspectable)
+    def get(self, name, discrim):
+        return self.getval
+    def relate(self, a, b):
+        self.related.append((a, b))

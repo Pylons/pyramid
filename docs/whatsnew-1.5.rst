@@ -7,6 +7,130 @@ incompatibilities between the two versions and deprecations added to
 :app:`Pyramid` 1.5, as well as software dependency changes and notable
 documentation additions.
 
+Major Backwards Incompatibilities
+---------------------------------
+
+- Pyramid no longer depends on or configures the Mako and Chameleon templating
+  system renderers by default.  Disincluding these templating systems by
+  default means that the Pyramid core has fewer dependencies and can run on
+  future platforms without immediate concern for the compatibility of its
+  templating add-ons.  It also makes maintenance slightly more effective, as
+  different people can maintain the templating system add-ons that they
+  understand and care about without needing commit access to the Pyramid core,
+  and it allows users who just don't want to see any packages they don't use
+  come along for the ride when they install Pyramid.
+
+  This means that upon upgrading to Pyramid 1.5a2+, projects that use either
+  of these templating systems will see a traceback that ends something like
+  this when their application attempts to render a Chameleon or Mako template::
+
+     ValueError: No such renderer factory .pt
+
+  Or::
+
+     ValueError: No such renderer factory .mako
+
+  Or::
+
+     ValueError: No such renderer factory .mak
+
+  Support for Mako templating has been moved into an add-on package named 
+  ``pyramid_mako``, and support for Chameleon templating has been moved into 
+  an add-on package named ``pyramid_chameleon``.  These packages are drop-in 
+  replacements for the old built-in support for these templating langauges. 
+  All you have to do is install them and make them active in your configuration
+  to register renderer factories for ``.pt`` and/or ``.mako`` (or ``.mak``) to
+  make your application work again.
+
+  To re-add support for Chameleon and/or Mako template renderers into your
+  existing projects, follow the below steps.
+
+  If you depend on Mako templates:
+
+  * Make sure the ``pyramid_mako`` package is installed.  One way to do this
+    is by adding ``pyramid_mako`` to the ``install_requires`` section of your
+    package's ``setup.py`` file and afterwards rerunning ``setup.py develop``::
+
+        setup(
+            #...
+            install_requires=[
+                'pyramid_mako',         # new dependency
+                'pyramid',
+                #...
+            ],
+        )
+
+  * Within the portion of your application which instantiates a Pyramid 
+    :class:`~pyramid.config.Configurator` (often the ``main()`` function in 
+    your project's ``__init__.py`` file), tell Pyramid to include the 
+    ``pyramid_mako`` includeme::
+
+        config = Configurator(.....)
+        config.include('pyramid_mako')
+
+  If you depend on Chameleon templates:
+
+  * Make sure the ``pyramid_chameleon`` package is installed.  One way to do
+    this is by adding ``pyramid_chameleon`` to the ``install_requires`` section
+    of your package's ``setup.py`` file and afterwards rerunning 
+    ``setup.py develop``::
+
+        setup(
+            #...
+            install_requires=[
+                'pyramid_chameleon',         # new dependency
+                'pyramid',
+                #...
+            ],
+        )
+
+  * Within the portion of your application which instantiates a Pyramid 
+    :class:`~pyramid.config.Configurator` (often the ``main()`` function in 
+    your project's ``__init__.py`` file), tell Pyramid to include the 
+    ``pyramid_chameleon`` includeme::
+
+        config = Configurator(.....)
+        config.include('pyramid_chameleon')
+
+  Note that it's also fine to install these packages into *older* Pyramids for
+  forward compatibility purposes.  Even if you don't upgrade to Pyramid 1.5
+  immediately, performing the above steps in a Pyramid 1.4 installation is
+  perfectly fine, won't cause any difference, and will give you forward
+  compatibility when you eventually do upgrade to Pyramid 1.5.
+
+  With the removal of Mako and Chameleon support from the core, some
+  unit tests that use the ``pyramid.renderers.render*`` methods may begin to 
+  fail.  If any of your unit tests are invoking either 
+  ``pyramid.renderers.render()``  or ``pyramid.renderers.render_to_response()``
+  with either Mako or Chameleon templates then the 
+  ``pyramid.config.Configurator`` instance in effect during
+  the unit test should be also be updated to include the addons, as shown
+  above. For example::
+
+        class ATest(unittest.TestCase):
+            def setUp(self):
+                self.config = pyramid.testing.setUp()
+                self.config.include('pyramid_mako')
+
+            def test_it(self):
+                result = pyramid.renderers.render('mypkg:templates/home.mako', {})
+
+  Or::
+
+        class ATest(unittest.TestCase):
+            def setUp(self):
+                self.config = pyramid.testing.setUp()
+                self.config.include('pyramid_chameleon')
+
+            def test_it(self):
+                result = pyramid.renderers.render('mypkg:templates/home.pt', {})
+
+- If you're using the Pyramid debug toolbar, when you upgrade Pyramid to
+  1.5a2+, you'll also need to upgrade the ``pyramid_debugtoolbar`` package to 
+  at least version 1.0.8, as older toolbar versions are not compatible with 
+  Pyramid 1.5a2+ due to the removal of Mako support from the core.  It's 
+  fine to use this newer version of the toolbar code with older Pyramids too.
+
 Feature Additions
 -----------------
 
@@ -181,8 +305,19 @@ The feature additions in Pyramid 1.5 follow.
 - The ``alchemy`` scaffold tests now provide better coverage.  See
   https://github.com/Pylons/pyramid/pull/1029
 
-Backwards Incompatibilities
----------------------------
+- Users can now provide dotted Python names to as the ``factory`` argument
+  the Configurator methods named 
+  :meth:`~pyramid.config.Configurator.add_view_predicate`, 
+  :meth:`~pyramid.config.Configurator.add_route_predicate` and 
+  :meth:`~pyramid.config.Configurator.add_subscriber_predicate`.  Instead of 
+  passing the predicate factory directly, you can pass a dotted name which 
+  refers to the factory.
+
+- :func:`pyramid.path.package_name` no longer thows an exception when resolving 
+  the package name for namespace packages that have no ``__file__`` attribute.
+
+Other Backwards Incompatibilities
+---------------------------------
 
 - Modified the :meth:`~pyramid.request.Reuqest.current_route_url` method. The
   method previously returned the URL without the query string by default, it
@@ -210,6 +345,65 @@ Backwards Incompatibilities
   attributes: ``virtual_path_tuple`` and ``physical_path_tuple``.  These should
   be the tuple form of the resource's path (physical and virtual).
 
+- Removed the ``request.response_*`` varying attributes (such
+  as``request.response_headers``) . These attributes had been deprecated
+  since Pyramid 1.1, and as per the deprecation policy, have now been removed.
+
+- ``request.response`` will no longer be mutated when using the 
+  :func:`pyramid.renderers.render` API.  Almost all renderers mutate the 
+  ``request.response`` response object (for example, the JSON renderer sets
+  ``request.response.content_type`` to ``application/json``), but this is
+  only necessary when the renderer is generating a response; it was a bug
+  when it was done as a side effect of calling 
+  :func:`pyramid.renderers.render`.
+
+- Removed the ``bfg2pyramid`` fixer script.
+
+- The :class:`pyramid.events.NewResponse` event is now sent **after** response 
+  callbacks are executed.  It previously executed before response callbacks
+  were executed.  Rationale: it's more useful to be able to inspect the response
+  after response callbacks have done their jobs instead of before.
+
+- Removed the class named ``pyramid.view.static`` that had been deprecated
+  since Pyramid 1.1.  Instead use :class:`pyramid.static.static_view` with the
+  ``use_subpath=True`` argument.
+
+- Removed the ``pyramid.view.is_response`` function that had been deprecated
+  since Pyramid 1.1.  Use the :meth:`pyramid.request.Request.is_response`
+  method instead.
+
+- Removed the ability to pass the following arguments to
+  :meth:`pyramid.config.Configurator.add_route`: ``view``, ``view_context``.
+  ``view_for``, ``view_permission``, ``view_renderer``, and ``view_attr``.
+  Using these arguments had been deprecated since Pyramid 1.1.  Instead of
+  passing view-related arguments to ``add_route``, use a separate call to
+  :meth:`pyramid.config.Configurator.add_view` to associate a view with a route
+  using its ``route_name`` argument.  Note that this impacts the
+  :meth:`pyramid.config.Configurator.add_static_view` function too, because
+  it delegates to``add_route``.
+
+- Removed the ability to influence and query a :class:`pyramid.request.Request`
+  object as if it were a dictionary.  Previously it was possible to use methods
+  like ``__getitem__``, ``get``, ``items``, and other dictlike methods to
+  access values in the WSGI environment.  This behavior had been deprecated
+  since Pyramid 1.1.  Use methods of ``request.environ`` (a real dictionary)
+  instead.
+
+- Removed ancient backwards compatibily hack in
+  ``pyramid.traversal.DefaultRootFactory`` which populated the ``__dict__`` of
+  the factory with the matchdict values for compatibility with BFG 0.9.
+
+- The ``renderer_globals_factory`` argument to the 
+  :class:`pyramid.config.Configurator` constructor and the 
+  coresponding argument to :meth:`~pyramid.config.Configurator.setup_registry` 
+  has been removed.  The ``set_renderer_globals_factory`` method of
+  :class:`~pyramid.config.Configurator` has also been removed.  The (internal)
+  ``pyramid.interfaces.IRendererGlobals`` interface was also removed.  These
+  arguments, methods and interfaces had been deprecated since 1.1.  Use a
+  ``BeforeRender`` event subscriber as documented in the "Hooks" chapter of the
+  Pyramid narrative documentation instead of providing renderer globals values
+  to the configurator.
+
 
 Deprecations
 ------------
@@ -218,6 +412,10 @@ Deprecations
   is now deprecated.  Instead you should use the renderer spelling
   ``foo#defname.mak`` in the view configuration definition and return a dict
   only.
+
+- The :meth:`pyramid.config.Configurator.set_request_property` method now issues
+  a deprecation warning when used.  It had been docs-deprecated in 1.4
+  but did not issue a deprecation warning when used.
 
 Documentation Enhancements
 --------------------------
@@ -231,5 +429,5 @@ Documentation Enhancements
 Dependency Changes
 ------------------
 
-No dependency changes from Pyramid 1.4.X were made in Pyramid 1.5.
+- Pyramid no longer depends upon ``Mako`` or ``Chameleon``.
 

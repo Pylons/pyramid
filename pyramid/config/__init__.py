@@ -4,7 +4,6 @@ import logging
 import operator
 import os
 import sys
-import warnings
 import venusian
 
 from webob.exc import WSGIHTTPException as WebobWSGIHTTPException
@@ -63,7 +62,6 @@ from pyramid.config.adapters import AdaptersConfiguratorMixin
 from pyramid.config.assets import AssetsConfiguratorMixin
 from pyramid.config.factories import FactoriesConfiguratorMixin
 from pyramid.config.i18n import I18NConfiguratorMixin
-from pyramid.config.rendering import DEFAULT_RENDERERS
 from pyramid.config.rendering import RenderingConfiguratorMixin
 from pyramid.config.routes import RoutesConfiguratorMixin
 from pyramid.config.security import SecurityConfiguratorMixin
@@ -335,7 +333,6 @@ class Configurator(
         self._fix_registry()
 
         self._set_settings(settings)
-        self._register_response_adapters()
 
         if isinstance(debug_logger, string_types):
             debug_logger = logging.getLogger(debug_logger)
@@ -345,9 +342,8 @@ class Configurator(
 
         registry.registerUtility(debug_logger, IDebugLogger)
 
-        for name, renderer in DEFAULT_RENDERERS:
-            self.add_renderer(name, renderer)
-
+        self.add_default_response_adapters()
+        self.add_default_renderers()
         self.add_default_view_predicates()
         self.add_default_route_predicates()
 
@@ -366,12 +362,12 @@ class Configurator(
 
         self.commit()
 
-        # self.commit() should not be called after this point because the
-        # following registrations should be treated as analogues of methods
-        # called by the user after configurator construction.  Rationale:
-        # user-supplied implementations should be preferred rather than
-        # add-on author implementations with the help of automatic conflict
-        # resolution.
+        # self.commit() should not be called within this method after this
+        # point because the following registrations should be treated as
+        # analogues of methods called by the user after configurator
+        # construction.  Rationale: user-supplied implementations should be
+        # preferred rather than add-on author implementations with the help of
+        # automatic conflict resolution.
 
         if authentication_policy and not authorization_policy:
             authorization_policy = ACLAuthorizationPolicy() # default

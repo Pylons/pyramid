@@ -207,13 +207,7 @@ representing the JSON serialization of the return value:
 The return value needn't be a dictionary, but the return value must contain
 values serializable by the configured serializer (by default ``json.dumps``).
 
-.. note::
-
-   Extra arguments can be passed to the serializer by overriding the default
-   ``json`` renderer. See :class:`pyramid.renderers.JSON` and
-   :ref:`adding_and_overriding_renderers` for more information.
-
-You can configure a view to use the JSON renderer by naming ``json`` as the
+You can configure a view to use the JSON renderer by naming``json`` as the
 ``renderer`` argument of a view configuration, e.g. by using
 :meth:`~pyramid.config.Configurator.add_view`:
 
@@ -233,6 +227,18 @@ using the api of the ``request.response`` attribute.  See
 
 Serializing Custom Objects
 ++++++++++++++++++++++++++
+
+Some objects are not, by default, JSON-serializable (such as datetimes and 
+other arbitrary Python objects).  You can, however, register code that makes 
+non-serializable objects serializable in two ways:
+
+- By defining a ``__json__`` method on objects in your application.
+
+- For objects you don't "own", you can register JSON renderer that knows about 
+  an *adapter* for that kind of object.
+
+Using a Custom ``__json__`` Method
+**********************************
 
 Custom objects can be made easily JSON-serializable in Pyramid by defining a
 ``__json__`` method on the object's class. This method should return values
@@ -259,6 +265,9 @@ will be the active request object at render time.
    # the JSON value returned by ``objects`` will be:
    #    [{"x": 1}, {"x": 2}]
 
+Using the ``add_adapter`` Method of a Custom JSON Renderer
+**********************************************************
+
 If you aren't the author of the objects being serialized, it won't be
 possible (or at least not reasonable) to add a custom ``__json__`` method
 to their classes in order to influence serialization.  If the object passed
@@ -273,19 +282,21 @@ objects using the registered adapters. A short example follows:
 
    from pyramid.renderers import JSON
 
-   json_renderer = JSON()
-   def datetime_adapter(obj, request):
-       return obj.isoformat()
-   json_renderer.add_adapter(datetime.datetime, datetime_adapter)
+   if __name__ == '__main__':
+       config = Configurator()
+       json_renderer = JSON()
+       def datetime_adapter(obj, request):
+           return obj.isoformat()
+       json_renderer.add_adapter(datetime.datetime, datetime_adapter)
+       config.add_renderer('json', json_renderer)
 
-   # then during configuration ....
-   config = Configurator()
-   config.add_renderer('json', json_renderer)
+The ``add_adapter`` method should accept two arguments: the *class* of the object that you want this adapter to run for (in the example above, 
+``datetime.datetime``), and the adapter itself.
 
-The adapter should accept two arguments: the object needing to be serialized
-and ``request``, which will be the current request object at render time.
-The adapter should raise a :exc:`TypeError` if it can't determine what to do
-with the object.
+The adapter should be a callable.  It should accept two arguments: the object 
+needing to be serialized and ``request``, which will be the current request 
+object at render time. The adapter should raise a :exc:`TypeError` 
+if it can't determine what  to do with the object.
 
 See :class:`pyramid.renderers.JSON` and
 :ref:`adding_and_overriding_renderers` for more information.
