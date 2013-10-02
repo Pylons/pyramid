@@ -878,6 +878,8 @@ This view callable function is handed a single piece of information: the
 :term:`request`.  The *request* is an instance of the :term:`WebOb`
 ``Request`` class representing the browser's request to our server.
 
+.. note:: Dictionaries (typically) provide values to :term:`template`s.
+
 This view is configured to invoke a :term;`renderer` on a template.  The
 dictionary the view returns (on line 6) provides the value the renderer
 substitutes into the template when generating HTML.  The renderer then
