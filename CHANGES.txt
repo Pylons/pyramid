@@ -20,6 +20,16 @@ Documentation
 
 - Added a "Quick Tutorial" to go with the Quick Tour
 
+Bug Fixes
+---------
+
+- The ``pviews`` script did not work when a url required custom request
+  methods in order to perform traversal. Custom methods and descriptors added
+  via ``pyramid.config.Configurator.add_request_method`` will now be present,
+  allowing traversal to continue.
+  See https://github.com/Pylons/pyramid/issues/1104
+
+
 1.5a2 (2013-09-22)
 ==================
 

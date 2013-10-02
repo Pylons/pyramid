@@ -12,6 +12,12 @@ class TestPViewsCommand(unittest.TestCase):
         cmd.args = ('/foo/bar/myapp.ini#myapp',)
         return cmd
 
+    def _makeRequest(self, url, registry):
+        from pyramid.request import Request
+        request = Request.blank('/a')
+        request.registry = registry
+        return request
+
     def _register_mapper(self, registry, routes):
         from pyramid.interfaces import IRoutesMapper
         mapper = dummy.DummyMapper(*routes)
@@ -22,7 +28,8 @@ class TestPViewsCommand(unittest.TestCase):
         registry = Registry()
         self._register_mapper(registry, [])
         command = self._makeOne(registry)
-        result = command._find_view('/a', registry)
+        request = self._makeRequest('/a', registry)
+        result = command._find_view(request)
         self.assertEqual(result, None)
 
     def test__find_view_no_match_multiview_registered(self):
@@ -45,7 +52,8 @@ class TestPViewsCommand(unittest.TestCase):
                                  IMultiView)
         self._register_mapper(registry, [])
         command = self._makeOne(registry=registry)
-        result = command._find_view('/x', registry)
+        request = self._makeRequest('/x', registry)
+        result = command._find_view(request)
         self.assertEqual(result, None)
 
     def test__find_view_traversal(self):
@@ -65,7 +73,8 @@ class TestPViewsCommand(unittest.TestCase):
                                  IView, name='a')
         self._register_mapper(registry, [])
         command = self._makeOne(registry=registry)
-        result = command._find_view('/a', registry)
+        request = self._makeRequest('/a', registry)
+        result = command._find_view(request)
         self.assertEqual(result, view1)
 
     def test__find_view_traversal_multiview(self):
@@ -89,7 +98,8 @@ class TestPViewsCommand(unittest.TestCase):
                                  IMultiView, name='a')
         self._register_mapper(registry, [])
         command = self._makeOne(registry=registry)
-        result = command._find_view('/a', registry)
+        request = self._makeRequest('/a', registry)
+        result = command._find_view(request)
         self.assertEqual(result, view)
 
     def test__find_view_route_no_multiview(self):
@@ -117,7 +127,8 @@ class TestPViewsCommand(unittest.TestCase):
                   dummy.DummyRoute('b', '/b', factory=Factory)]
         self._register_mapper(registry, routes)
         command = self._makeOne(registry=registry)
-        result = command._find_view('/a', registry)
+        request = self._makeRequest('/a', registry)
+        result = command._find_view(request)
         self.assertEqual(result, view)
 
     def test__find_view_route_multiview_no_view_registered(self):
@@ -147,7 +158,8 @@ class TestPViewsCommand(unittest.TestCase):
                   dummy.DummyRoute('b', '/a', matchdict={})]
         self._register_mapper(registry, routes)
         command = self._makeOne(registry=registry)
-        result = command._find_view('/a', registry)
+        request = self._makeRequest('/a', registry)
+        result = command._find_view(request)
         self.assertTrue(IMultiView.providedBy(result))
 
     def test__find_view_route_multiview(self):
@@ -185,7 +197,8 @@ class TestPViewsCommand(unittest.TestCase):
                   dummy.DummyRoute('b', '/a', matchdict={})]
         self._register_mapper(registry, routes)
         command = self._makeOne(registry=registry)
-        result = command._find_view('/a', registry)
+        request = self._makeRequest('/a', registry)
+        result = command._find_view(request)
         self.assertTrue(IMultiView.providedBy(result))
         self.assertEqual(len(result.views), 2)
         self.assertTrue((None, view1, None) in result.views)
@@ -228,7 +241,7 @@ class TestPViewsCommand(unittest.TestCase):
         command = self._makeOne(registry=registry)
         L = []
         command.out = L.append
-        command._find_view = lambda arg1, arg2: None
+        command._find_view = lambda arg1: None
         command.args = ('/foo/bar/myapp.ini#myapp', '/a')
         result = command.run()
         self.assertEqual(result, 0)
@@ -241,7 +254,7 @@ class TestPViewsCommand(unittest.TestCase):
         command = self._makeOne(registry=registry)
         L = []
         command.out = L.append
-        command._find_view = lambda arg1, arg2: None
+        command._find_view = lambda arg1: None
         command.args = ('/foo/bar/myapp.ini#myapp', 'a')
         result = command.run()
         self.assertEqual(result, 0)
@@ -255,7 +268,7 @@ class TestPViewsCommand(unittest.TestCase):
         L = []
         command.out = L.append
         view = dummy.DummyView(context='context', view_name='a')
-        command._find_view = lambda arg1, arg2: view
+        command._find_view = lambda arg1: view
         command.args = ('/foo/bar/myapp.ini#myapp', '/a')
         result = command.run()
         self.assertEqual(result, 0)
@@ -273,7 +286,7 @@ class TestPViewsCommand(unittest.TestCase):
         command.out = L.append
         def view(): pass
         view.__request_attrs__ = {'context': 'context', 'view_name': 'a'}
-        command._find_view = lambda arg1, arg2: view
+        command._find_view = lambda arg1: view
         command.args = ('/foo/bar/myapp.ini#myapp', '/a')
         result = command.run()
         self.assertEqual(result, 0)
@@ -291,7 +304,7 @@ class TestPViewsCommand(unittest.TestCase):
         command.out = L.append
         view = dummy.DummyView(context='context', view_name='a')
         view.__permission__ = 'test'
-        command._find_view = lambda arg1, arg2: view
+        command._find_view = lambda arg1: view
         command.args = ('/foo/bar/myapp.ini#myapp', '/a')
         result = command.run()
         self.assertEqual(result, 0)
@@ -312,7 +325,7 @@ class TestPViewsCommand(unittest.TestCase):
         predicate.text = lambda *arg: "predicate = x"
         view = dummy.DummyView(context='context', view_name='a')
         view.__predicates__ = [predicate]
-        command._find_view = lambda arg1, arg2: view
+        command._find_view = lambda arg1: view
         command.args = ('/foo/bar/myapp.ini#myapp', '/a')
         result = command.run()
         self.assertEqual(result, 0)
@@ -332,7 +345,7 @@ class TestPViewsCommand(unittest.TestCase):
         route = dummy.DummyRoute('a', '/a', matchdict={})
         view = dummy.DummyView(context='context', view_name='a',
                          matched_route=route, subpath='')
-        command._find_view = lambda arg1, arg2: view
+        command._find_view = lambda arg1: view
         command.args = ('/foo/bar/myapp.ini#myapp', '/a')
         result = command.run()
         self.assertEqual(result, 0)
@@ -360,7 +373,7 @@ class TestPViewsCommand(unittest.TestCase):
                                           view_name='a1')
         multiview2 = dummy.DummyMultiView(multiview1, context='context',
                                     view_name='a')
-        command._find_view = lambda arg1, arg2: multiview2
+        command._find_view = lambda arg1: multiview2
         command.args = ('/foo/bar/myapp.ini#myapp', '/a')
         result = command.run()
         self.assertEqual(result, 0)
@@ -383,7 +396,7 @@ class TestPViewsCommand(unittest.TestCase):
         route = dummy.DummyRoute('a', '/a', matchdict={}, predicate=predicate)
         view = dummy.DummyView(context='context', view_name='a',
                          matched_route=route, subpath='')
-        command._find_view = lambda arg1, arg2: view
+        command._find_view = lambda arg1: view
         command.args = ('/foo/bar/myapp.ini#myapp', '/a')
         result = command.run()
         self.assertEqual(result, 0)
@@ -409,7 +422,7 @@ class TestPViewsCommand(unittest.TestCase):
         view.__name__ = 'view'
         view.__view_attr__ = 'call'
         multiview = dummy.DummyMultiView(view, context='context', view_name='a')
-        command._find_view = lambda arg1, arg2: multiview
+        command._find_view = lambda arg1: multiview
         command.args = ('/foo/bar/myapp.ini#myapp', '/a')
         result = command.run()
         self.assertEqual(result, 0)
@@ -430,7 +443,7 @@ class TestPViewsCommand(unittest.TestCase):
         view.__view_attr__ = 'call'
         view.__permission__ = 'test'
         multiview = dummy.DummyMultiView(view, context='context', view_name='a')
-        command._find_view = lambda arg1, arg2: multiview
+        command._find_view = lambda arg1: multiview
         command.args = ('/foo/bar/myapp.ini#myapp', '/a')
         result = command.run()
         self.assertEqual(result, 0)
@@ -454,7 +467,7 @@ class TestPViewsCommand(unittest.TestCase):
         view.__view_attr__ = 'call'
         view.__predicates__ = [predicate]
         multiview = dummy.DummyMultiView(view, context='context', view_name='a')
-        command._find_view = lambda arg1, arg2: multiview
+        command._find_view = lambda arg1: multiview
         command.args = ('/foo/bar/myapp.ini#myapp', '/a')
         result = command.run()
         self.assertEqual(result, 0)
