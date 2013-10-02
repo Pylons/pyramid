@@ -23,6 +23,16 @@ Documentation
 - Removed mention of ``pyramid_beaker`` from docs.  Beaker is no longer 
   maintained.  Point people at ``pyramid_redis_sessions`` instead.
 
+Backwards Incompatibilities
+---------------------------
+
+- The key/values in the ``_query`` parameter of ``request.route_url`` and the
+  ``query`` parameter of ``request.resource_url`` (and their variants), used
+  to encode a value of ``None`` as the string ``'None'``, leaving the resulting
+  query string to be ``a=b&key=None``. The value is now dropped in this
+  situation, leaving a query string of ``a=b&key``.
+  See https://github.com/Pylons/pyramid/issues/1119
+
 1.5a2 (2013-09-22)
 ==================
 
