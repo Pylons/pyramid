@@ -49,10 +49,14 @@ Writing View Callables Which Use a Renderer
 -------------------------------------------
 
 As we've seen, a view callable needn't always return a Response object.
-Instead, it may return an arbitrary Python object, with the expectation
-that a :term:`renderer` will convert that object into a response instance on
-your behalf.  Some renderers use a templating system; other renderers use
-object serialization techniques.
+Instead, it may return an arbitrary Python object, with the expectation that
+a :term:`renderer` will convert that object into a response instance on your
+behalf.  Some renderers use a templating system; other renderers use object
+serialization techniques.  Because renderers inject variable data into some
+output (otherwise a static Response object could be returned) the renderer
+must have some means of identifying the data and mapping its transformation
+into the desired output.  Often, as the means of providing this mapping, the
+object supplied to the renderer is a Python dictionary.
 
 View configuration can vary the renderer associated with a view callable via
 the ``renderer`` attribute.  For example, this call to
