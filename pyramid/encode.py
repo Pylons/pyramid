@@ -32,6 +32,10 @@ def urlencode(query, doseq=True):
 
     See the Python stdlib documentation for ``urllib.urlencode`` for
     more information.
+
+    .. versionchanged:: 1.5
+       In a key/value pair, if the value is ``None`` then it will be
+       dropped from the resulting output.
     """
     try:
         # presumed to be a dictionary
@@ -50,6 +54,8 @@ def urlencode(query, doseq=True):
                 x = _enc(x)
                 result += '%s%s=%s' % (prefix, k, x)
                 prefix = '&'
+        elif v is None:
+            result += '%s%s=' % (prefix, k)
         else:
             v = _enc(v)
             result += '%s%s=%s' % (prefix, k, v)

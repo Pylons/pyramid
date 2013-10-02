@@ -505,15 +505,20 @@ Glossary
      available as its ``__parent__`` attribute.
 
    root factory
-     The "root factory" of a :app:`Pyramid` application is called
-     on every request sent to the application.  The root factory
-     returns the traversal root of an application.  It is
-     conventionally named ``get_root``.  An application may supply a
-     root factory to :app:`Pyramid` during the construction of a
-     :term:`Configurator`.  If a root factory is not supplied, the
-     application uses a default root object.  Use of the default root
-     object is useful in application which use :term:`URL dispatch` for
-     all URL-to-view code mappings.
+     The "root factory" of a :app:`Pyramid` application is called on every
+     request sent to the application.  The root factory returns the traversal
+     root of an application.  It is conventionally named ``get_root``.  An
+     application may supply a root factory to :app:`Pyramid` during the
+     construction of a :term:`Configurator`.  If a root factory is not
+     supplied, the application creates a default root object using the
+     :term:`default root factory`.  
+
+   default root factory
+     If an application does not register a :term:`root factory` at Pyramid
+     configuration time, a *default* root factory is used to created the
+     default root object.  Use of the default root object is useful in
+     application which use :term:`URL dispatch` for all URL-to-view code
+     mappings, and does not (knowingly) use traversal otherwise.
 
    SQLAlchemy
      `SQLAlchemy <http://www.sqlalchemy.org/>`_ is an object
@@ -1009,7 +1014,8 @@ Glossary
 
    Green Unicorn
       Aka ``gunicorn``, a fast :term:`WSGI` server that runs on UNIX under
-      Python 2.6+ or Python 3.1+.  See http://gunicorn.org/ for detailed information.
+      Python 2.6+ or Python 3.1+.  See http://gunicorn.org/ for detailed 
+      information.
 
    predicate factory
       A callable which is used by a third party during the registration of a
@@ -1021,3 +1027,9 @@ Glossary
       A Python :term:`distribution` that uses Pyramid's extensibility
       to plug into a Pyramid application and provide extra,
       configurable services.
+
+   pyramid_redis_sessions
+      A package by Eric Rasmussen which allows you to store Pyramid session 
+      data in a Redis database.  See 
+      https://pypi.python.org/pypi/pyramid_redis_sessions for more information.
+
