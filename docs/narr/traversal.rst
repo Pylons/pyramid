@@ -128,12 +128,6 @@ Here's an example of a simple root factory class:
        def __init__(self, request):
            pass
 
-..note::
-   For the purpose of understanding traversal, and the contents within
-   this document, the above Root is an analogue to the default root
-   factory present in Pyramid. The default root factory is very simple and
-   not very useful unless using :term:`URL dispatch`.
-
 Here's an example of using this root factory within startup configuration, by
 passing it to an instance of a :term:`Configurator` named ``config``:
 
@@ -152,13 +146,15 @@ refer to a root factory defined in a different module.
 
 If no :term:`root factory` is passed to the :app:`Pyramid`
 :term:`Configurator` constructor, or if the ``root_factory`` value
-specified is ``None``, a *default* root factory is used.  The default
+specified is ``None``, a :term:`default root factory` is used.  The default
 root factory always returns a resource that has no child resources; it
 is effectively empty.
 
 Usually a root factory for a traversal-based application will be more
-complicated than the above ``Root`` class; in particular it may be
-associated with a database connection or another persistence mechanism.
+complicated than the above ``Root`` class; in particular it may be associated
+with a database connection or another persistence mechanism.  The above
+``Root`` class is analogous to the default root factory present in Pyramid. The
+default root factory is very simple and not very useful.
 
 .. note::
 
