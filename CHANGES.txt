@@ -20,6 +20,9 @@ Documentation
 
 - Added a "Quick Tutorial" to go with the Quick Tour
 
+- Removed mention of ``pyramid_beaker`` from docs.  Beaker is no longer 
+  maintained.  Point people at ``pyramid_redis_sessions`` instead.
+
 1.5a2 (2013-09-22)
 ==================
 

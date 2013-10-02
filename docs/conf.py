@@ -73,9 +73,6 @@ intersphinx_mapping = {
         'http://docs.pylonsproject.org/projects/deform/en/latest',
     None),
     'sqla': ('http://docs.sqlalchemy.org/en/latest', None),
-    'beaker': (
-        'http://docs.pylonsproject.org/projects/pyramid_beaker/en/latest',
-        None),
     'who': ('http://docs.repoze.org/who/latest', None),
     'python': ('http://docs.python.org', None),
     'python3': ('http://docs.python.org/3', None),
