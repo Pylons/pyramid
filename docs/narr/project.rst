@@ -144,7 +144,7 @@ contains no space characters, so it's wise to *avoid* a path that contains
 i.e. ``My Documents``.  As a result, the author, when he uses Windows, just
 puts his projects in ``C:\projects``.
 
-.. warning:: 
+.. warning::
 
    You’ll need to avoid using ``pcreate`` to create a project with the same
    name as a Python standard library component. In particular, this means you
@@ -972,12 +972,15 @@ named ``views`` instead of within a single ``views.py`` file, you might:
 - Create a ``views`` directory inside your ``myproject`` package directory
   (the same directory which holds ``views.py``).
 
-- *Move* the existing ``views.py`` file to a file inside the new ``views``
-  directory named, say, ``blog.py``.
+- Create a file within the new ``views`` directory named ``__init__.py``.  (It
+  can be empty.  This just tells Python that the ``views`` directory is a
+  *package*.)
 
-- Create a file within the new ``views`` directory named ``__init__.py`` (it
-  can be empty, this just tells Python that the ``views`` directory is a
-  *package*.
+- *Move* the existing ``views.py`` file to a file inside the new ``views``
+  directory named, say, ``blog.py``.  Because the ``templates`` directory
+  remains in the ``myproject`` package, the template :term:`asset
+  specification`s in ``blog.py`` must now be fully qualified with the
+  project's package name (``myproject:templates/blog.pt``).
 
 You can then continue to add view callable functions to the ``blog.py``
 module, but you can also add other ``.py`` files which contain view callable
@@ -1026,7 +1029,7 @@ server.  Waitress is a server that is suited for development and light
 production usage.  It's not the fastest nor the most featureful WSGI server.
 Instead, its main feature is that it works on all platforms that Pyramid
 needs to run on, making it a good choice as a default server from the
-perspective of Pyramid's developers.  
+perspective of Pyramid's developers.
 
 Any WSGI server is capable of running a :app:`Pyramid` application.  But we
 suggest you stick with the default server for development, and that you wait

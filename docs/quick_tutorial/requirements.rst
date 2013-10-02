@@ -94,23 +94,23 @@ and where our virtual environment will reside:
 
    Final directory structure.
 
-The commands to do so are as follows:
+For Linux, the commands to do so are as follows:
 
 .. code-block:: bash
 
     # Mac and Linux
     $ cd ~
-    $ mkdir projects
-    $ cd projects
-    $ mkdir quick_tutorial
-    $ cd quick_tutorial
+    $ mkdir -p projects/quick_tutorial
+    $ cd projects/quick_tutorial
+
+For Windows:
+
+.. code-block:: posh
 
     # Windows
     c:\> cd \
-    c:\> mkdir projects
-    c:\> cd projects
-    c:\> mkdir quick_tutorial
-    c:\> cd quick_tutorial
+    c:\> mkdir projects\quick_tutorial
+    c:\> cd projects\quick_tutorial
 
 In the above figure, your user home directory is represented by ``~``.  In
 your home directory, all of your projects are in the ``projects`` directory.
@@ -208,13 +208,13 @@ Install Pyramid
 We have our Python standard prerequisites out of the way. The Pyramid
 part is pretty easy:
 
-.. code-block:: bash
+.. parsed-literal::
 
     # Mac and Linux
-    $ $VENV/bin/easy_install pyramid
+    $ $VENV/bin/easy_install "pyramid==\ |release|\ "
 
     # Windows
-    c:\> %VENV%\Scripts\easy_install pyramid
+    c:\\> %VENV%\\Scripts\\easy_install "pyramid==\ |release|\ "
 
 Our Python virtual environment now has the Pyramid software available.
 
