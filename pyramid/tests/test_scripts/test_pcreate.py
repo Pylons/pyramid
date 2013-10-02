@@ -110,6 +110,21 @@ class TestPCreateCommand(unittest.TestCase):
             scaffold2.vars,
             {'project': 'Distro', 'egg': 'Distro', 'package': 'distro'})
 
+    def test_known_scaffold_with_path_as_project_target_rendered(self):
+        import os
+        cmd = self._makeOne('-s', 'dummy', '/tmp/foo/Distro/')
+        scaffold = DummyScaffold('dummy')
+        cmd.scaffolds = [scaffold]
+        result = cmd.run()
+        self.assertEqual(result, 0)
+        self.assertEqual(
+            scaffold.output_dir,
+            os.path.normpath(os.path.join(os.getcwd(), '/tmp/foo/Distro'))
+            )
+        self.assertEqual(
+            scaffold.vars,
+            {'project': 'Distro', 'egg': 'Distro', 'package': 'distro'})
+        
 class Test_main(unittest.TestCase):
     def _callFUT(self, argv):
         from pyramid.scripts.pcreate import main
