@@ -880,7 +880,7 @@ This view callable function is handed a single piece of information: the
 
 .. note:: Dictionaries provide values to :term:`template`s.
 
-This view is configured to invoke a :term;`renderer` on a template.  The
+This view is configured to invoke a :term:`renderer` on a template.  The
 dictionary the view returns (on line 6) provides the value the renderer
 substitutes into the template when generating HTML.  The renderer then
 returns the HTML in a :term:`response`.
