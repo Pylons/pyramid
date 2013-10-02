@@ -10,6 +10,11 @@ Bug Fixes
   than  saying ``pcreate -s starter /foo/bar``.  The former did not work
   properly.
 
+- Fix the ``principals_allowed_by_permission`` method of 
+  ``ACLAuthorizationPolicy`` so it anticipates a callable ``__acl__`` 
+  on resources.  Previously it did not try to call the ``__acl__``
+  if it was callable.
+
 Documentation
 -------------
 
