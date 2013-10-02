@@ -101,7 +101,8 @@ example:
 
 The first time this view is invoked produces ``Fred was not in the
 session``.  Subsequent invocations produce ``Fred was in the
-session``.
+session``, assuming of course that the client side maintains the
+session's identity across multiple requests.
 
 You can use a session much like a Python dictionary.  It supports all
 dictionary methods, along with some extra attributes, and methods.
