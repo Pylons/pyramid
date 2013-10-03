@@ -1,3 +1,4 @@
+import hashlib
 from hashlib import sha1
 import base64
 import binascii
@@ -119,7 +120,7 @@ def UnencryptedCookieSessionFactoryConfig(
     cookie_max_age=None,
     cookie_path='/',
     cookie_domain=None,
-    cookie_secure=False, 
+    cookie_secure=False,
     cookie_httponly=False,
     cookie_on_exception=True,
     signed_serialize=signed_serialize,
@@ -182,7 +183,7 @@ def UnencryptedCookieSessionFactoryConfig(
     """
 
     @implementer(ISession)
-    class UnencryptedCookieSessionFactory(dict):
+    class SignedCookieSession(dict):
         """ Dictionary-like session object """
 
         # configuration parameters
@@ -306,12 +307,146 @@ def UnencryptedCookieSessionFactoryConfig(
             response.set_cookie(
                 self._cookie_name,
                 value=cookieval,
-                max_age = self._cookie_max_age,
-                path = self._cookie_path,
-                domain = self._cookie_domain,
-                secure = self._cookie_secure,
-                httponly = self._cookie_httponly,
+                max_age=self._cookie_max_age,
+                path=self._cookie_path,
+                domain=self._cookie_domain,
+                secure=self._cookie_secure,
+                httponly=self._cookie_httponly,
                 )
             return True
 
-    return UnencryptedCookieSessionFactory
+    return SignedCookieSession
+
+def SignedCookieSessionFactory(
+    secret,
+    hashalg='sha512',
+    timeout=1200,
+    cookie_name='session',
+    cookie_max_age=None,
+    cookie_path='/',
+    cookie_domain=None,
+    cookie_secure=False,
+    cookie_httponly=False,
+    cookie_on_exception=True,
+    serializer=None,
+    ):
+    """
+    Configure a :term:`session factory` which will provide signed
+    cookie-based sessions.  The return value of this
+    function is a :term:`session factory`, which may be provided as
+    the ``session_factory`` argument of a
+    :class:`pyramid.config.Configurator` constructor, or used
+    as the ``session_factory`` argument of the
+    :meth:`pyramid.config.Configurator.set_session_factory`
+    method.
+
+    The session factory returned by this function will create sessions
+    which are limited to storing fewer than 4000 bytes of data (as the
+    payload must fit into a single cookie).
+
+    Parameters:
+
+    ``secret``
+      A string which is used to sign the cookie.
+
+    ``hashalg``
+      The HMAC digest algorithm to use for signing. The algorithm must be
+      supported by the :mod:`hashlib` library. Default: ``'sha512'``.
+
+    ``timeout``
+      A number of seconds of inactivity before a session times out.
+      Default: 1200.
+
+    ``cookie_name``
+      The name of the cookie used for sessioning. Default: ``'session'``.
+
+    ``cookie_max_age``
+      The maximum age of the cookie used for sessioning (in seconds).
+      Default: ``None`` (browser scope).
+
+    ``cookie_path``
+      The path used for the session cookie. Default: ``'/'``.
+
+    ``cookie_domain``
+      The domain used for the session cookie.  Default: ``None`` (no domain).
+
+    ``cookie_secure``
+      The 'secure' flag of the session cookie. Default: ``False``.
+
+    ``cookie_httponly``
+      The 'httpOnly' flag of the session cookie. Default: ``False``.
+
+    ``cookie_on_exception``
+      If ``True``, set a session cookie even if an exception occurs
+      while rendering a view. Default: ``True``.
+
+    ``serializer``
+      An object which can convert data between Python objects and bytestrings.
+      - ``loads`` should accept a bytestring and return a Python object.
+      - ``dumps`` should accept a Python object and return a bytestring.
+      The default implementation uses Python's pickle module.
+    """
+
+    if serializer is None:
+        serializer = _PickleSerializer()
+
+    signer = _SignedSerializer(hashalg, serializer)
+
+    return UnencryptedCookieSessionFactoryConfig(
+        secret,
+        timeout=timeout,
+        cookie_name=cookie_name,
+        cookie_max_age=cookie_max_age,
+        cookie_path=cookie_path,
+        cookie_domain=cookie_domain,
+        cookie_secure=cookie_secure,
+        cookie_httponly=cookie_httponly,
+        cookie_on_exception=cookie_on_exception,
+        signed_serialize=signer.dumps,
+        signed_deserialize=signer.loads,
+    )
+
+class _PickleSerializer(object):
+    def dumps(self, value):
+        return pickle.dumps(value, pickle.HIGHEST_PROTOCOL)
+
+    def loads(self, value):
+        return pickle.loads(value)
+
+class _SignedSerializer(object):
+    def __init__(self, hashalg, serializer):
+        self.digestmod = lambda: hashlib.new(hashalg)
+        self.digest_size = self.digestmod().digest_size
+        self.salt_size = 8
+        self.serializer = serializer
+
+    def derive_key(self, secret, salt):
+        return hmac.new(secret, salt, self.digestmod).digest()
+
+    def dumps(self, appstruct, secret):
+        salt = os.urandom(self.salt_size)
+        derived_secret = self.derive_key(secret, salt)
+        cstruct = self.serializer.dumps(appstruct)
+        sig = hmac.new(derived_secret, cstruct, self.digestmod).digest()
+        return native_(base64.b64encode(cstruct + salt + sig))
+
+    def loads(self, bstruct, secret):
+        try:
+            fstruct = base64.b64decode(bytes_(bstruct))
+        except (binascii.Error, TypeError) as e:
+            raise ValueError('Badly formed base64 data: %s' % e)
+
+        cstruct_size = len(fstruct) - self.salt_size - self.digest_size
+        if cstruct_size < 0:
+            raise ValueError('Input is too short.')
+
+        cstruct = fstruct[:cstruct_size]
+        salt = fstruct[cstruct_size:self.salt_size]
+        expected_sig = fstruct[:-self.digest_size]
+
+        derived_secret = self.derive_key(secret, salt)
+        sig = hmac.new(derived_secret, cstruct, self.digestmod).digest()
+        if strings_differ(sig, expected_sig):
+            raise ValueError('Invalid signature')
+
+        return self.serializer.loads(cstruct)
