@@ -321,7 +321,14 @@ assertion instead that the view returns "the right stuff" in the dictionary
 it returns.  You can write "real" unit tests instead of functionally testing
 all of your views.
 
-For example, instead of:
+.. index::
+   pair: renderer; explicitly calling
+   pair: view renderer; explictly calling
+
+.. _example_render_to_response_call:
+
+For example, instead of returning a ``Response`` object from a
+``render_to_response`` call:
 
 .. code-block:: python
    :linenos:
@@ -332,7 +339,7 @@ For example, instead of:
         return render_to_response('myapp:templates/mytemplate.pt', {'a':1},
                                   request=request)
 
-You can do this:
+You can return a Python dictionary:
 
 .. code-block:: python
    :linenos:
