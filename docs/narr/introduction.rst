@@ -309,6 +309,12 @@ can use multiple templating systems, even in the same project.
 
 Example: :ref:`templates_used_directly`.
 
+.. index::
+   single: renderer
+   single: view renderer
+
+.. _rendered_views_can_return_dictionaries:
+
 Rendered views can return dictionaries
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
