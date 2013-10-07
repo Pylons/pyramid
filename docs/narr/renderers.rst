@@ -56,13 +56,11 @@ serialization techniques.  In practice, renderers obtain application data
 values from Python dictionaries so, in practice, view callables which use
 renderers return Python dictionaries.
 
-View callables can :ref:`explicitly call
-<example_render_to_response_call>` renderers, but they typically
-don't.  Instead view configuration declares the renderer used to
-render a view callable's results.  This is done with the ``renderer``
-attribute.  For example, this call to
-:meth:`~pyramid.config.Configurator.add_view` associates the ``json``
-renderer with a view callable:
+View callables can :ref:`explicitly call <example_render_to_response_call>`
+renderers. Typically view configuration declares the renderer used to render
+a view callable's results.  This is done with the ``renderer`` attribute.
+For example, this call to :meth:`~pyramid.config.Configurator.add_view`
+associates the ``json`` renderer with a view callable:
 
 .. code-block:: python
 
