@@ -259,6 +259,8 @@ single sample test exists.
    single: reload
    single: startup
 
+.. _running_the_project_application:
+
 Running The Project Application
 -------------------------------
 
@@ -600,6 +602,8 @@ server which listens on TCP port 6543.  It is configured to listen on all
 interfaces (``0.0.0.0``).  This means that any remote system which has TCP
 access to your system can see your Pyramid application.
 
+.. _MyProject_ini_logging:
+
 The sections that live between the markers ``# Begin logging configuration``
 and ``# End logging configuration`` represent Python's standard library
 :mod:`logging` module configuration for your application.  The sections
@@ -884,6 +888,14 @@ substitutes into the template when generating HTML.  The renderer then
 returns the HTML in a :term:`response`.
 
 .. note:: Dictionaries provide values to :term:`template`\s.
+
+.. note:: When the application is run with the scaffold's :ref:`default
+   development.ini <MyProject_ini>` configuration :ref:`logging is setup
+   <MyProject_ini_logging>` to aid debugging.  Should an exception be raised,
+   uncaught tracebacks are displayed, after the startup messages, on :ref:`the
+   console running the server <running_the_project_application>`.
+   Conveniently, ``print()``\s inserted into the application for debugging
+   also send output to this console.
 
 .. note:: ``development.ini`` has a setting that controls how templates are
    reloaded, ``pyramid.reload_templates``.
