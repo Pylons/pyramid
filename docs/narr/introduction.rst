@@ -180,10 +180,9 @@ Fully Interactive Development
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When developing a Pyramid application, several interactive features are
-available.  Pyramid can automatically utilize changed templates when rendering
+available. Pyramid can automatically utilize changed templates when rendering
 pages and automatically restart the application to incorporate changed python
-code.  Plain old ``printf()`` calls used for debugging can display to a
-console.
+code. Plain old ``print()`` calls used for debugging can display to a console.
 
 Pyramid's debug toolbar comes activated when you use a Pyramid scaffold to
 render a project.  This toolbar overlays your application in the browser, and
