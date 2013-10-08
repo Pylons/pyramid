@@ -886,15 +886,16 @@ returns the HTML in a :term:`response`.
 See :ref:`views_which_use_a_renderer` for more information about how views,
 renderers, and templates relate and cooperate.
 
-.. note:: Because our ``development.ini`` has a ``pyramid.reload_templates =
-   true`` directive indicating that templates should be reloaded when
-   they change, you won't need to restart the application server to
-   see changes you make to templates.  During development, this is
-   handy.  If this directive had been ``false`` (or if the directive
-   did not exist), you would need to restart the application server
-   for each template change.  For production applications, you should
-   set your project's ``pyramid.reload_templates`` to ``false`` to increase
-   the speed at which templates may be rendered.
+.. note:: ``development.ini`` has a setting that controls how templates are
+   reloaded: ``pyramid.reload_templates``.
+    
+   - A setting of ``True`` (as in the scaffold ``development.ini``)
+     automatically reloads changed templates without a server restart.  This
+     is convenient while developing but slows template rendering speed.
+
+   - A setting of ``False`` (the default) requires a server restart to
+     integrate template changes.  Production applications should set
+     ``pyramid.reload_templates = False``.
 
 .. index::
    single: static directory
