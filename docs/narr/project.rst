@@ -894,7 +894,7 @@ returns the HTML in a :term:`response`.
    <MyProject_ini_logging>` to aid debugging.  Should an exception be raised,
    uncaught tracebacks are displayed, after the startup messages, on :ref:`the
    console running the server <running_the_project_application>`.
-   Conveniently, ``printf()``\s inserted into the application for debugging
+   Conveniently, ``print()``\s inserted into the application for debugging
    also send output to this console.
 
 .. note:: ``development.ini`` has a setting that controls how templates are
