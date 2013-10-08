@@ -77,7 +77,7 @@ some ``pyramid.testing`` helpers which we use in the test setup and
 teardown. Our one test imports the view, makes a dummy request, and sees
 if the view returns what we expected.
 
-The ``tests.HelloWorldViewTests.test_hello_world`` test is a small
+The ``tests.TutorialViewTests.test_hello_world`` test is a small
 example of a unit test. First, we import the view inside each test. Why
 not import at the top, like in normal Python code? Because imports can
 cause effects that break a test. We'd like our tests to be in *units*,
