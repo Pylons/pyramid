@@ -2,10 +2,13 @@
 HTTP Exceptions
 ---------------
 
-This module contains Pyramid HTTP exception classes.  Each class relates to a
-single HTTP status code.  Each class is a subclass of the
-:class:`~HTTPException`.  Each exception class is also a :term:`response`
-object.
+This module contains Pyramid HTTP exception classes.  Each class is a subclass
+of the :class:`~HTTPException`.  Each class relates to a single HTTP status
+code, although the reverse is not true.   There are
+:ref:`pyramid_specific_http_exceptions` which are sub-classes of the
+:rfc:`2608` HTTP status codes.  Each of these Pyramid-specific exceptions have
+the status code of it's parent.  Each exception class is also a
+:term:`response` object.
 
 Each exception class has a status code according to :rfc:`2068`:
 codes with 100-300 are not really errors; 400s are client errors,
@@ -32,6 +35,9 @@ Exception
     HTTPError
       HTTPClientError
         * 400 - HTTPBadRequest
+
+          * 400 - HTTPBadCSRFToken
+
         * 401 - HTTPUnauthorized
         * 402 - HTTPPaymentRequired
         * 403 - HTTPForbidden
@@ -565,7 +571,33 @@ class HTTPClientError(HTTPError):
                    'it is either malformed or otherwise incorrect.')
 
 class HTTPBadRequest(HTTPClientError):
+    """
+    subclass of :class:`~HTTPClientError`
+
+    base class for Pyramid-specific validity checks of the client's request
+
+    This class and it's sub-classes result in a '400 Bad Request' HTTP status,
+    although it's sub-classes specialize the 'Bad Request' text.
+    """
     pass
+
+class HTTPBadCSRFToken(HTTPClientError):
+    """
+    subclass of :class:`~HTTPBadRequest`
+
+    This indicates the request has failed cross-site request forgery token
+    validation.
+
+    title: Bad CSRF Token
+    """
+    title = 'Bad CSRF Token'
+    explanation = (
+        'Access is denied.  This server can not verify that your cross-site '
+        'request forgery token belongs to your login session.  Either you '
+        'supplied the wrong cross-site request forgery token or your session '
+        'no longer exists.  This may be due to session timeout or because '
+        'browser is not supplying the credentials required, as can happen '
+        'when the browser has cookies turned off.')
 
 class HTTPUnauthorized(HTTPClientError):
     """
