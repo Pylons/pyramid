@@ -176,8 +176,14 @@ static file server in production without changing any code.
 
 Example: :ref:`static_assets_section`.
 
-Debug Toolbar
-~~~~~~~~~~~~~
+Fully Interactive Development
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When developing a Pyramid application, several interactive features are
+available.  Pyramid can automatically utilize changed templates when rendering
+pages and automatically restart the application to incorporate changed python
+code.  Plain old ``printf()`` calls used for debugging can display to a
+console.
 
 Pyramid's debug toolbar comes activated when you use a Pyramid scaffold to
 render a project.  This toolbar overlays your application in the browser, and
@@ -784,7 +790,7 @@ automate some of the tedium away:
        for method in ('GET', 'POST', 'HEAD'):
            view = getattr(module, 'xhr_%s_view' % method, None)
            if view is not None:
-               config.add_view(view, route_name='xhr_route', xhr=True, 
+               config.add_view(view, route_name='xhr_route', xhr=True,
                               permission='view', request_method=method)
 
    config = Configurator()
