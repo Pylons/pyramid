@@ -150,7 +150,7 @@ do things the newer way:
 .. code-block:: python
    :linenos:
 
-    from pyramid.view. import view_config
+    from pyramid.view import view_config
 
     from pyramid.static import static_view
     myview = static_view('static', 'static', use_subpath=True)
