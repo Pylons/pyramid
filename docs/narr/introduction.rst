@@ -176,8 +176,13 @@ static file server in production without changing any code.
 
 Example: :ref:`static_assets_section`.
 
-Debug Toolbar
-~~~~~~~~~~~~~
+Fully Interactive Development
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When developing a Pyramid application a variety of interactive
+features are available.  Pyramid can automatically utilize changed
+templates when rendering pages and automatically restart the
+application to incorporate changed python code.
 
 Pyramid's debug toolbar comes activated when you use a Pyramid scaffold to
 render a project.  This toolbar overlays your application in the browser, and
