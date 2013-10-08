@@ -21,6 +21,8 @@ Bug Fixes
   allowing traversal to continue.
   See https://github.com/Pylons/pyramid/issues/1104
 
+- Remove unused ``renderer`` argument from ``Configurator.add_route``.
+
 Documentation
 -------------
 
