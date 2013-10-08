@@ -36,7 +36,6 @@ class RoutesConfiguratorMixin(object):
                   request_param=None,
                   traverse=None,
                   custom_predicates=(),
-                  renderer=None,
                   use_global_views=False,
                   path=None,
                   pregenerator=None,
