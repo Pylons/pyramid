@@ -984,9 +984,9 @@ named ``views`` instead of within a single ``views.py`` file, you might:
   can be empty.  This just tells Python that the ``views`` directory is a
   *package*.)
 
-- *Move* the existing ``views.py`` file to a file inside the new ``views``
-  directory named, say, ``blog.py``.  Because the ``templates`` directory
-  remains in the ``myproject`` package, the template :term:`asset
+- *Move* the content from the existing ``views.py`` file to a file inside the
+  new ``views`` directory named, say, ``blog.py``.  Because the ``templates``
+  directory remains in the ``myproject`` package, the template :term:`asset
   specification` values in ``blog.py`` must now be fully qualified with the
   project's package name (``myproject:templates/blog.pt``).
 
