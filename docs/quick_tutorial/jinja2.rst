@@ -29,11 +29,10 @@ Steps
     $ $VENV/bin/python setup.py develop
     $ $VENV/bin/easy_install pyramid_jinja2
 
-#. We need to add an item to ``pyramid.includes`` in
-   ``jinja2/development.ini``:
+#. We need to include ``pyramid_jinja2`` in
+   ``jinja2/tutorial/__init__.py``:
 
-   .. literalinclude:: jinja2/development.ini
-    :language: ini
+   .. literalinclude:: jinja2/tutorial/__init__.py
     :linenos:
 
 #. Our ``jinja2/tutorial/views.py`` simply changes its ``renderer``:

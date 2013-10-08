@@ -46,7 +46,7 @@ Steps
     :linenos:
 
 #. We can now install our project, thus generating (or re-generating) an
-    "egg" at ``ini/tutorial.egg-info``:
+   "egg" at ``ini/tutorial.egg-info``:
 
    .. code-block:: bash
 
