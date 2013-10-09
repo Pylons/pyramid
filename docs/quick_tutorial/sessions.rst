@@ -13,8 +13,8 @@ When people use your web application, they frequently perform a task
 that requires semi-permanent data to be saved. For example, a shopping
 cart. This is called a :term:`session`.
 
-Pyramid has basic built-in support for sessions, with add-ons such as
-*dogpile.cache* (or your own custom sessioning engine) that provide
+Pyramid has basic built-in support for sessions, with add-ons
+or your own custom sessioning engine) that can provide
 richer session support. Let's take a look at the
 :ref:`built-in sessioning support <sessions_chapter>`.
 
