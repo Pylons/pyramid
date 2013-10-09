@@ -123,4 +123,5 @@ class PCreateCommand(object):
         if not self.quiet:
             print(msg)
 
-
+if __name__ == '__main__': # pragma: no cover
+    sys.exit(main() or 0)

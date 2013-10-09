@@ -87,3 +87,6 @@ class PTweensCommand(object):
                 self.out('')
                 self.show_chain(tweens.implicit())
         return 0
+
+if __name__ == '__main__': # pragma: no cover
+    sys.exit(main() or 0)
