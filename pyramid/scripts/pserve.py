@@ -984,3 +984,6 @@ def cherrypy_server_runner(
         server.stop()
 
     return server
+
+if __name__ == '__main__': # pragma: no cover
+    sys.exit(main() or 0)
