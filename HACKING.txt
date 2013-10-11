@@ -27,8 +27,7 @@ By Hand
 
   Note that very old versions of virtualenv (virtualenv versions below, say, 
   1.10 or thereabouts) require you to pass a ``--no-site-packages`` flag to
-  get a completely isolated environment.  If you're on an old system, use
-  ``virtualenv --no-site-packages`` instead of ``virtualenv`` above.
+  get a completely isolated environment.
 
   You can choose which Python version you want to use by passing a ``-p`` 
   flag to ``virtualenv``.  For example, ``virtualenv -ppython2.7``
@@ -82,7 +81,7 @@ way to get going.
 
   (alternately, create a writeable fork on GitHub and check that out).
 
-Since pyramid is a framework and not an application, it can be
+Since Pyramid is a framework and not an application, it can be
 convenient to work against a sample application, preferably in its own
 virtualenv. A quick way to achieve this is to (ab-)use ``tox``
 (http://tox.readthedocs.org/en/latest/) with a custom configuration
@@ -90,7 +89,7 @@ file that's part of the checkout::
 
   tox -c hacking-tox.ini
 
-This will create a python-2.7 based virtualenv named ``env27`` (pyramid's
+This will create a python-2.7 based virtualenv named ``env27`` (Pyramid's
 ``.gitconfig` ignores all top-level folders that start with ``env`` specifically
 for this use case) and inside that a simple pyramid application named
 ``hacking`` that you can then fire up like so::
@@ -166,7 +165,7 @@ Running Tests
    $ cd ~/hack-on-pyramid/
    $ /usr/bin/tox
 
-- The tests can also be run usign ``pytest`` (http://pytest.org/).  This is
+- The tests can also be run using ``pytest`` (http://pytest.org/).  This is
   intended as a convenience for people who are more used or fond of ``pytest``.
   Run the tests like so::
 
@@ -192,7 +191,7 @@ or adds the feature.
 To build and review docs (where ``$VENV`` refers to the virtualenv you're
 using to develop Pyramid):
 
-1. After follwing the steps above in "Using a Development Checkout", cause 
+1. After following the steps above in "Using a Development Checkout", cause 
    Sphinx and all development requirements to be installed in your 
    virtualenv::
 
