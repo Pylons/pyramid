@@ -165,7 +165,7 @@ Running Tests
    $ cd ~/hack-on-pyramid/
    $ /usr/bin/tox
 
-- The tests can also be run usign ``pytest`` (http://pytest.org/).  This is
+- The tests can also be run using ``pytest`` (http://pytest.org/).  This is
   intended as a convenience for people who are more used or fond of ``pytest``.
   Run the tests like so::
 
@@ -191,7 +191,7 @@ or adds the feature.
 To build and review docs (where ``$VENV`` refers to the virtualenv you're
 using to develop Pyramid):
 
-1. After follwing the steps above in "Using a Development Checkout", cause 
+1. After following the steps above in "Using a Development Checkout", cause 
    Sphinx and all development requirements to be installed in your 
    virtualenv::
 
