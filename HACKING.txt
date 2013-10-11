@@ -27,8 +27,7 @@ By Hand
 
   Note that very old versions of virtualenv (virtualenv versions below, say, 
   1.10 or thereabouts) require you to pass a ``--no-site-packages`` flag to
-  get a completely isolated environment.  If you're on an old system, use
-  ``virtualenv --no-site-packages`` instead of ``virtualenv`` above.
+  get a completely isolated environment.
 
   You can choose which Python version you want to use by passing a ``-p`` 
   flag to ``virtualenv``.  For example, ``virtualenv -ppython2.7``
