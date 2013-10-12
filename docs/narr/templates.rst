@@ -524,7 +524,7 @@ And ``templates/mytemplate.pt`` might look like so:
 Using A Chameleon Macro Name Within a Renderer Name
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Sommetime you'd like to render a macro inside of a Chameleon ZPT template
+Sometime you'd like to render a macro inside of a Chameleon ZPT template
 instead of the full Chameleon ZPT template. To render the content of a
 ``define-macro`` field inside a Chameleon ZPT template, given a Chameleon
 template file named ``foo.pt`` and a macro named ``bar`` defined within it
@@ -726,7 +726,7 @@ This template doesn't use any advanced features of Mako, only the
 Using A Mako def name Within a Renderer Name
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Sommetime you'd like to render a ``def`` inside of a Mako template instead of
+Sometime you'd like to render a ``def`` inside of a Mako template instead of
 the full Mako template. To render a def inside a Mako template, given a
 :term:`Mako` template file named ``foo.mak`` and a def named ``bar``, you can
 configure the template as a :term:`renderer` like so:
