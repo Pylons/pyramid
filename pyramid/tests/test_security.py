@@ -310,8 +310,8 @@ class TestAuthorizationAPIMethodsMixin(unittest.TestCase):
     def test_has_permission_with_no_authorization_policy(self):
         request = self._makeOne()
         _registerAuthenticationPolicy(request.registry, None)
-        with self.assertRaises(ValueError):
-            request.has_permission('view', context=None)
+        self.assertRaises(ValueError,
+                          request.has_permission, 'view', context=None)
 
     def test_has_permsision_with_authn_and_authz_policies_registered(self):
         request = self._makeOne()
@@ -389,8 +389,10 @@ class TestAuthorizationAPIMethodsMixin(unittest.TestCase):
         reg.registerUtility(settings, ISettings)
         context = DummyContext()
         request = self._makeOne()
-        with self.assertRaises(TypeError):
-            request.view_execution_permitted(context=context, name='')
+        self.assertRaises(TypeError,
+                          request.view_execution_permitted,
+                          context=context,
+                          name='')
 
     def test_view_exection_permitted_with_permission(self):
         from zope.interface import Interface
