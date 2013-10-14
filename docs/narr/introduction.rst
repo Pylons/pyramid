@@ -180,10 +180,9 @@ Fully Interactive Development
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When developing a Pyramid application, several interactive features are
-available.  Pyramid can automatically utilize changed templates when rendering
+available. Pyramid can automatically utilize changed templates when rendering
 pages and automatically restart the application to incorporate changed python
-code.  Plain old ``printf()`` calls used for debugging can display to a
-console.
+code. Plain old ``print()`` calls used for debugging can display to a console.
 
 Pyramid's debug toolbar comes activated when you use a Pyramid scaffold to
 render a project.  This toolbar overlays your application in the browser, and
@@ -418,12 +417,12 @@ Sessions
 
 Pyramid has built-in HTTP sessioning.  This allows you to associate data with
 otherwise anonymous users between requests.  Lots of systems do this.  But
-Pyramid also allows you to plug in your own sessioning system by creating
-some code that adheres to a documented interface.  Currently there is a
-binding package for the third-party Beaker sessioning system that does exactly
-this.  But if you have a specialized need (perhaps you want to store your
-session data in MongoDB), you can.  You can even switch between
-implementations without changing your application code.
+Pyramid also allows you to plug in your own sessioning system by creating some
+code that adheres to a documented interface.  Currently there is a binding
+package for the third-party Redis sessioning system that does exactly this.
+But if you have a specialized need (perhaps you want to store your session data
+in MongoDB), you can.  You can even switch between implementations without
+changing your application code.
 
 Example: :ref:`sessions_chapter`.
 

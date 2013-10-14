@@ -14,7 +14,7 @@ def _initTestingDB():
     Base.metadata.create_all(engine)
     DBSession.configure(bind=engine)
     with transaction.manager:
-        model = Page('FrontPage', 'This is the front page')
+        model = Page(name='FrontPage', data='This is the front page')
         DBSession.add(model)
     return DBSession
 
@@ -59,7 +59,7 @@ class ViewPageTests(unittest.TestCase):
         from tutorial.models import Page
         request = testing.DummyRequest()
         request.matchdict['pagename'] = 'IDoExist'
-        page = Page('IDoExist', 'Hello CruelWorld IDoExist')
+        page = Page(name='IDoExist', data='Hello CruelWorld IDoExist')
         self.session.add(page)
         _registerRoutes(self.config)
         info = self._callFUT(request)
@@ -126,7 +126,7 @@ class EditPageTests(unittest.TestCase):
         _registerRoutes(self.config)
         request = testing.DummyRequest()
         request.matchdict = {'pagename':'abc'}
-        page = Page('abc', 'hello')
+        page = Page(name='abc', data='hello')
         self.session.add(page)
         info = self._callFUT(request)
         self.assertEqual(info['page'], page)
@@ -139,7 +139,7 @@ class EditPageTests(unittest.TestCase):
         request = testing.DummyRequest({'form.submitted':True,
                                         'body':'Hello yo!'})
         request.matchdict = {'pagename':'abc'}
-        page = Page('abc', 'hello')
+        page = Page(name='abc', data='hello')
         self.session.add(page)
         response = self._callFUT(request)
         self.assertEqual(response.location, 'http://example.com/abc')
