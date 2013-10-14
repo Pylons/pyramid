@@ -387,12 +387,12 @@ explicit tweens defined in its ``development.ini`` file:
 
    Implicit Tween Chain (not used)
 
-   Position    Name                                                Alias
-   --------    ----                                                -----
-   -           -                                                   INGRESS
-   0           pyramid_debugtoolbar.toolbar.toolbar_tween_factory  pdbt
-   1           pyramid.tweens.excview_tween_factory                excview
-   -           -                                                   MAIN
+   Position    Name
+   --------    ----
+   -           INGRESS
+   0           pyramid_debugtoolbar.toolbar.toolbar_tween_factory
+   1           pyramid.tweens.excview_tween_factory
+   -           MAIN
 
 Here's the application configuration section of the ``development.ini`` used
 by the above ``ptweens`` command which reports that the explicit tween chain
