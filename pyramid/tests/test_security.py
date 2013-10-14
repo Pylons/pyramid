@@ -31,7 +31,7 @@ class TestAllowed(unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.security import Allowed
         return Allowed
-    
+
     def _makeOne(self, *arg, **kw):
         klass = self._getTargetClass()
         return klass(*arg, **kw)
@@ -49,7 +49,7 @@ class TestDenied(unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.security import Denied
         return Denied
-    
+
     def _makeOne(self, *arg, **kw):
         klass = self._getTargetClass()
         return klass(*arg, **kw)
@@ -67,7 +67,7 @@ class TestACLAllowed(unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.security import ACLAllowed
         return ACLAllowed
-    
+
     def _makeOne(self, *arg, **kw):
         klass = self._getTargetClass()
         return klass(*arg, **kw)
@@ -87,7 +87,7 @@ class TestACLDenied(unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.security import ACLDenied
         return ACLDenied
-    
+
     def _makeOne(self, *arg, **kw):
         klass = self._getTargetClass()
         return klass(*arg, **kw)
@@ -103,119 +103,10 @@ class TestACLDenied(unittest.TestCase):
         self.assertTrue('<ACLDenied instance at ' in repr(denied))
         self.assertTrue("with msg %r>" % msg in repr(denied))
 
-class TestViewExecutionPermitted(unittest.TestCase):
-    def setUp(self):
-        cleanUp()
-
-    def tearDown(self):
-        cleanUp()
-
-    def _callFUT(self, *arg, **kw):
-        from pyramid.security import view_execution_permitted
-        return view_execution_permitted(*arg, **kw)
-
-    def _registerSecuredView(self, view_name, allow=True):
-        from pyramid.threadlocal import get_current_registry
-        from zope.interface import Interface
-        from pyramid.interfaces import ISecuredView
-        from pyramid.interfaces import IViewClassifier
-        class Checker(object):
-            def __permitted__(self, context, request):
-                self.context = context
-                self.request = request
-                return allow
-        checker = Checker()
-        reg = get_current_registry()
-        reg.registerAdapter(checker, (IViewClassifier, Interface, Interface),
-                            ISecuredView, view_name)
-        return checker
-
-    def test_no_permission(self):
-        from zope.interface import Interface
-        from pyramid.threadlocal import get_current_registry
-        from pyramid.interfaces import ISettings
-        from pyramid.interfaces import IView
-        from pyramid.interfaces import IViewClassifier
-        settings = dict(debug_authorization=True)
-        reg = get_current_registry()
-        reg.registerUtility(settings, ISettings)
-        context = DummyContext()
-        request = DummyRequest({})
-        class DummyView(object):
-            pass
-        view = DummyView()
-        reg.registerAdapter(view, (IViewClassifier, Interface, Interface),
-                            IView, '')
-        result = self._callFUT(context, request, '')
-        msg = result.msg
-        self.assertTrue("Allowed: view name '' in context" in msg)
-        self.assertTrue('(no permission defined)' in msg)
-        self.assertEqual(result, True)
-
-    def test_no_view_registered(self):
-        from pyramid.threadlocal import get_current_registry
-        from pyramid.interfaces import ISettings
-        settings = dict(debug_authorization=True)
-        reg = get_current_registry()
-        reg.registerUtility(settings, ISettings)
-        context = DummyContext()
-        request = DummyRequest({})
-        self.assertRaises(TypeError, self._callFUT, context, request, '')
-
-    def test_with_permission(self):
-        from zope.interface import Interface
-        from zope.interface import directlyProvides
-        from pyramid.interfaces import IRequest
-        class IContext(Interface):
-            pass
-        context = DummyContext()
-        directlyProvides(context, IContext)
-        self._registerSecuredView('', True)
-        request = DummyRequest({})
-        directlyProvides(request, IRequest)
-        result = self._callFUT(context, request, '')
-        self.assertTrue(result is True)
-
-class TestHasPermission(unittest.TestCase):
-    def setUp(self):
-        cleanUp()
-        
-    def tearDown(self):
-        cleanUp()
-
-    def _callFUT(self, *arg):
-        from pyramid.security import has_permission
-        return has_permission(*arg)
-
-    def test_no_authentication_policy(self):
-        request = _makeRequest()
-        result = self._callFUT('view', None, request)
-        self.assertEqual(result, True)
-        self.assertEqual(result.msg, 'No authentication policy in use.')
-        
-    def test_authentication_policy_no_authorization_policy(self):
-        request = _makeRequest()
-        _registerAuthenticationPolicy(request.registry, None)
-        self.assertRaises(ValueError, self._callFUT, 'view', None, request)
-
-    def test_authn_and_authz_policies_registered(self):
-        request = _makeRequest()
-        _registerAuthenticationPolicy(request.registry, None)
-        _registerAuthorizationPolicy(request.registry, 'yo')
-        self.assertEqual(self._callFUT('view', None, request), 'yo')
-
-    def test_no_registry_on_request(self):
-        from pyramid.threadlocal import get_current_registry
-        request = DummyRequest({})
-        registry = get_current_registry()
-        _registerAuthenticationPolicy(registry, None)
-        _registerAuthorizationPolicy(registry, 'yo')
-        self.assertEqual(self._callFUT('view', None, request), 'yo')
-
 class TestAuthenticatedUserId(unittest.TestCase):
     def setUp(self):
         cleanUp()
-        
+
     def tearDown(self):
         cleanUp()
 
@@ -245,7 +136,7 @@ class TestAuthenticatedUserId(unittest.TestCase):
 class TestUnauthenticatedUserId(unittest.TestCase):
     def setUp(self):
         cleanUp()
-        
+
     def tearDown(self):
         cleanUp()
 
@@ -275,7 +166,7 @@ class TestUnauthenticatedUserId(unittest.TestCase):
 class TestEffectivePrincipals(unittest.TestCase):
     def setUp(self):
         cleanUp()
-        
+
     def tearDown(self):
         cleanUp()
 
@@ -306,7 +197,7 @@ class TestEffectivePrincipals(unittest.TestCase):
 class TestPrincipalsAllowedByPermission(unittest.TestCase):
     def setUp(self):
         cleanUp()
-        
+
     def tearDown(self):
         cleanUp()
 
@@ -331,7 +222,7 @@ class TestPrincipalsAllowedByPermission(unittest.TestCase):
 class TestRemember(unittest.TestCase):
     def setUp(self):
         cleanUp()
-        
+
     def tearDown(self):
         cleanUp()
 
@@ -362,7 +253,7 @@ class TestRemember(unittest.TestCase):
 class TestForget(unittest.TestCase):
     def setUp(self):
         cleanUp()
-        
+
     def tearDown(self):
         cleanUp()
 
@@ -388,6 +279,133 @@ class TestForget(unittest.TestCase):
         _registerAuthenticationPolicy(registry, 'yo')
         result = self._callFUT(request)
         self.assertEqual(result, 'yo')
+
+
+class TestAuthorizationAPIMethodsMixin(unittest.TestCase):
+
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _makeOne(self, registry=None):
+        from pyramid.registry import Registry
+        from pyramid.security import AuthorizationAPIMixin
+        mixin = AuthorizationAPIMixin()
+        if registry is None:
+            mixin.registry = Registry()
+        return mixin
+
+    def test_has_permsision(self):
+        mixin = self._makeOne()
+        self.assertTrue(mixin.has_permission('view', context=None))
+
+    def test_no_authentication_policy(self):
+        request = self._makeOne()
+        result = request.has_permission('view', context=None)
+        self.assertTrue(result)
+        self.assertEqual(result.msg, 'No authentication policy in use.')
+
+    def test_has_permission_with_no_authorization_policy(self):
+        request = self._makeOne()
+        _registerAuthenticationPolicy(request.registry, None)
+        with self.assertRaises(ValueError):
+            request.has_permission('view', context=None)
+
+    def test_has_permsision_with_authn_and_authz_policies_registered(self):
+        request = self._makeOne()
+        _registerAuthenticationPolicy(request.registry, None)
+        _registerAuthorizationPolicy(request.registry, 'yo')
+        self.assertEqual(request.has_permission('view', context=None), 'yo')
+
+    def test_has_permsision_with_no_registry_on_request(self):
+        from pyramid.threadlocal import get_current_registry
+        request = self._makeOne(registry=False)
+        registry = get_current_registry()
+        _registerAuthenticationPolicy(registry, None)
+        _registerAuthorizationPolicy(registry, 'yo')
+        self.assertEqual(request.has_permission('view', context=None), 'yo')
+
+    def test_principals_allowed_by_permission_with_no_authorization_policy(self):
+        from pyramid.security import Everyone
+        context = DummyContext()
+        request = self._makeOne()
+        result = request.principals_allowed_by_permission(context, 'view')
+        self.assertEqual(result, [Everyone])
+
+    def test_principals_allowed_by_permission_with_authorization_policy(self):
+        from pyramid.threadlocal import get_current_registry
+        registry = get_current_registry()
+        request = self._makeOne()
+        _registerAuthorizationPolicy(registry, 'yo')
+        context = DummyContext()
+        result = request.principals_allowed_by_permission(context, 'view')
+        self.assertEqual(result, 'yo')
+
+    def _registerSecuredView(self, view_name, allow=True):
+        from pyramid.threadlocal import get_current_registry
+        from zope.interface import Interface
+        from pyramid.interfaces import ISecuredView
+        from pyramid.interfaces import IViewClassifier
+        class Checker(object):
+            def __permitted__(self, context, request):
+                self.context = context
+                self.request = request
+                return allow
+        checker = Checker()
+        reg = get_current_registry()
+        reg.registerAdapter(checker, (IViewClassifier, Interface, Interface),
+                            ISecuredView, view_name)
+        return checker
+
+    def test_view_execution_permitted_with_no_permission(self):
+        from zope.interface import Interface
+        from pyramid.threadlocal import get_current_registry
+        from pyramid.interfaces import ISettings
+        from pyramid.interfaces import IView
+        from pyramid.interfaces import IViewClassifier
+        settings = dict(debug_authorization=True)
+        reg = get_current_registry()
+        reg.registerUtility(settings, ISettings)
+        request = self._makeOne(registry=False)
+        context = DummyContext()
+        class DummyView(object):
+            pass
+        view = DummyView()
+        reg.registerAdapter(view, (IViewClassifier, Interface, Interface),
+                            IView, '')
+        result = request.view_execution_permitted(context=context, name='')
+        msg = result.msg
+        self.assertTrue("Allowed: view name '' in context" in msg)
+        self.assertTrue('(no permission defined)' in msg)
+        self.assertEqual(result, True)
+
+    def test_view_execution_permitted_no_view_registered(self):
+        from pyramid.threadlocal import get_current_registry
+        from pyramid.interfaces import ISettings
+        settings = dict(debug_authorization=True)
+        reg = get_current_registry()
+        reg.registerUtility(settings, ISettings)
+        context = DummyContext()
+        request = self._makeOne()
+        with self.assertRaises(TypeError):
+            request.view_execution_permitted(context=context, name='')
+
+    def test_view_exection_permitted_with_permission(self):
+        from zope.interface import Interface
+        from zope.interface import directlyProvides
+        from pyramid.interfaces import IRequest
+        class IContext(Interface):
+            pass
+        context = DummyContext()
+        directlyProvides(context, IContext)
+        self._registerSecuredView('', True)
+        request = self._makeOne(registry=False)
+        directlyProvides(request, IRequest)
+        result = request.view_execution_permitted(context=context,  name='')
+        self.assertTrue(result)
+
 
 class DummyContext:
     def __init__(self, *arg, **kw):
@@ -443,5 +461,3 @@ def _makeRequest():
     request = DummyRequest({})
     request.registry = Registry()
     return request
-
-
