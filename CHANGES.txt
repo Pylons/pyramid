@@ -1,3 +1,12 @@
+Next Release
+============
+
+Bug Fixes
+---------
+
+- Fix an exception in ``package_name()`` when resolving the package
+  name for namespace packages.
+
 1.4.5 (2013-08-30)
 ==================
 

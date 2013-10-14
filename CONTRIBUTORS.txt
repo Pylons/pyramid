@@ -194,3 +194,5 @@ Contributors
 - John Anderson, 2012/11/14
 
 - Jason McKellar, 2013/03/28
+
+- Doug Hellmann, 2013/09/06

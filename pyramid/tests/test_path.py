@@ -154,6 +154,12 @@ class TestPackageName(unittest.TestCase):
         package = DummyPackageOrModule(tests)
         result = self._callFUT(package)
         self.assertEqual(result, 'pyramid.tests')
+
+    def test_it_namespace_package(self):
+        from pyramid import tests
+        package = DummyNamespacePackage(tests)
+        result = self._callFUT(package)
+        self.assertEqual(result, 'pyramid.tests')
         
     def test_it_module(self):
         from pyramid.tests import test_path
@@ -558,3 +564,13 @@ class DummyPackageOrModule:
         if self.raise_exc is not None:
             raise self.raise_exc
         self.__dict__[key] = val
+
+class DummyNamespacePackage:
+    """Has no __file__ attribute.
+    """
+    
+    def __init__(self, real_package_or_module):
+        self.__name__ = real_package_or_module.__name__
+        import os
+        self.package_path = os.path.dirname(
+            os.path.abspath(real_package_or_module.__file__))
