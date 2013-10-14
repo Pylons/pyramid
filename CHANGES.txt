@@ -4,6 +4,11 @@ Unreleased
 Features
 --------
 
+- The ``pyramid.security`` Authentication API functions are now available as
+properties (unauthenticated_userid, authenticated_userid, effective_principals)
+and methods (remember, forget) on ``pyramid.request.Request``.  Tests have been
+adjusted such there is now only one usage of get_current_registry.
+
 - The ``pyramid.security`` Authorization API is now available directly on the
   request. If you don't pass a ``term:context`` to
   ``pyramid.request.Request.has_permission`` or

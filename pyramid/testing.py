@@ -27,6 +27,7 @@ from pyramid.registry import Registry
 from pyramid.security import (
     Authenticated,
     Everyone,
+    AuthenticationAPIMixin,
     AuthorizationAPIMixin
     )
 
@@ -283,7 +284,8 @@ class DummySession(dict):
 
 
 @implementer(IRequest)
-class DummyRequest(AuthorizationAPIMixin,
+class DummyRequest(AuthenticationAPIMixin,
+                   AuthorizationAPIMixin,
                    URLMethodsMixin,
                    CallbackMethodsMixin,
                    InstancePropertyMixin,

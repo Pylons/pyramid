@@ -2,6 +2,7 @@ import unittest
 
 from pyramid.compat import text_
 from pyramid.tests.test_config import IDummy
+from pyramid.security import AuthenticationAPIMixin
 
 class TestingConfiguratorMixinTests(unittest.TestCase):
     def _makeOne(self, *arg, **kw):
@@ -196,7 +197,7 @@ from zope.interface import implementer
 class DummyEvent:
     pass
 
-class DummyRequest:
+class DummyRequest(AuthenticationAPIMixin):
     subpath = ()
     matchdict = None
     def __init__(self, environ=None):
@@ -205,4 +206,3 @@ class DummyRequest:
         self.environ = environ
         self.params = {}
         self.cookies = {}
-
