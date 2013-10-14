@@ -150,16 +150,16 @@ if 'sphinx-build' in ' '.join(sys.argv):  # protect against dumb importers
 
     sys.path.append(os.path.abspath('_themes'))
 
-    parent = os.path.dirname(os.path.dirname(__file__))
-    sys.path.append(os.path.abspath(parent))
-    wd = os.getcwd()
-    os.chdir(parent)
-    os.system('%s setup.py test -q' % sys.executable)
-    os.chdir(wd)
+    # parent = os.path.dirname(os.path.dirname(__file__))
+    # sys.path.append(os.path.abspath(parent))
+    # wd = os.getcwd()
+    # os.chdir(parent)
+    # os.system('%s setup.py test -q' % sys.executable)
+    # os.chdir(wd)
 
-    for item in os.listdir(parent):
-        if item.endswith('.egg'):
-            sys.path.append(os.path.join(parent, item))
+    # for item in os.listdir(parent):
+    #     if item.endswith('.egg'):
+    #         sys.path.append(os.path.join(parent, item))
 
 html_theme_path = ['_themes']
 html_theme = 'pyramid'
