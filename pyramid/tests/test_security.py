@@ -289,21 +289,32 @@ class TestAuthorizationAPIMethodsMixin(unittest.TestCase):
     def tearDown(self):
         cleanUp()
 
-    def _makeOne(self, registry=None):
-        from pyramid.registry import Registry
+    def _makeOne(self, set_registry=True, set_context=True):
         from pyramid.security import AuthorizationAPIMixin
         mixin = AuthorizationAPIMixin()
-        if registry is None:
+        if set_registry:
+            from pyramid.registry import Registry
             mixin.registry = Registry()
+        if set_context:
+            mixin.context = object()
         return mixin
 
-    def test_has_permsision(self):
+    def test_has_permsision_api_calls_has_permission_on_mixin(self):
         mixin = self._makeOne()
-        self.assertTrue(mixin.has_permission('view', context=None))
+        from pyramid.security import has_permission
+        self.called_has_permission = False
+
+        def mocked_has_permission(*args, **kw):
+            self.called_has_permission = True
+
+        mixin.has_permission = mocked_has_permission
+        has_permission('view', object(), mixin)
+        self.assertTrue(self.called_has_permission)
 
     def test_no_authentication_policy(self):
         request = self._makeOne()
-        result = request.has_permission('view', context=None)
+        assert request.context
+        result = request.has_permission('view')
         self.assertTrue(result)
         self.assertEqual(result.msg, 'No authentication policy in use.')
 
@@ -321,27 +332,19 @@ class TestAuthorizationAPIMethodsMixin(unittest.TestCase):
 
     def test_has_permsision_with_no_registry_on_request(self):
         from pyramid.threadlocal import get_current_registry
-        request = self._makeOne(registry=False)
+        request = self._makeOne(set_registry=False)
         registry = get_current_registry()
         _registerAuthenticationPolicy(registry, None)
         _registerAuthorizationPolicy(registry, 'yo')
-        self.assertEqual(request.has_permission('view', context=None), 'yo')
+        self.assertEqual(request.has_permission('view'), 'yo')
 
-    def test_principals_allowed_by_permission_with_no_authorization_policy(self):
-        from pyramid.security import Everyone
-        context = DummyContext()
+    def test_has_permission_with_no_context(self):
         request = self._makeOne()
-        result = request.principals_allowed_by_permission(context, 'view')
-        self.assertEqual(result, [Everyone])
+        self.assertTrue(request.has_permission('view'))
 
-    def test_principals_allowed_by_permission_with_authorization_policy(self):
-        from pyramid.threadlocal import get_current_registry
-        registry = get_current_registry()
-        request = self._makeOne()
-        _registerAuthorizationPolicy(registry, 'yo')
-        context = DummyContext()
-        result = request.principals_allowed_by_permission(context, 'view')
-        self.assertEqual(result, 'yo')
+    def test_has_permission_with_no_context_and_no_context_on_request(self):
+        request = self._makeOne(set_context=False)
+        self.assertRaises(AttributeError, request.has_permission, 'view')
 
     def _registerSecuredView(self, view_name, allow=True):
         from pyramid.threadlocal import get_current_registry
@@ -368,7 +371,7 @@ class TestAuthorizationAPIMethodsMixin(unittest.TestCase):
         settings = dict(debug_authorization=True)
         reg = get_current_registry()
         reg.registerUtility(settings, ISettings)
-        request = self._makeOne(registry=False)
+        request = self._makeOne(set_registry=False)
         context = DummyContext()
         class DummyView(object):
             pass
@@ -403,11 +406,14 @@ class TestAuthorizationAPIMethodsMixin(unittest.TestCase):
         context = DummyContext()
         directlyProvides(context, IContext)
         self._registerSecuredView('', True)
-        request = self._makeOne(registry=False)
+        request = self._makeOne(set_registry=False)
         directlyProvides(request, IRequest)
         result = request.view_execution_permitted(context=context,  name='')
         self.assertTrue(result)
 
+    def test_view_execution_permitted_with_no_context_passed_or_set(self):
+        request = self._makeOne(set_context=False)
+        self.assertRaises(AttributeError, request.view_execution_permitted)
 
 class DummyContext:
     def __init__(self, *arg, **kw):

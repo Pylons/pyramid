@@ -32,7 +32,41 @@ NO_PERMISSION_REQUIRED = '__no_permission_required__'
 
 # b/c
 def has_permission(permission, context, request):
+    """Backwards compatability function wrapper function for
+    ``pyramid.request.Request.view_execution_permitted``."""
     return request.has_permission(permission, context)
+
+# b/c
+def view_execution_permitted(context, request, name=''):
+    """Backwards compatability wrapper function for
+    ``pyramid.request.Request.view_execution_permitted``.
+
+    .. versionchanged:: 1.4.a4
+       An exception is raised if no view is found."""
+    return request.view_execution_permitted(context=context, name=name)
+
+def principals_allowed_by_permission(context, permission):
+    """ Provided a ``context`` (a resource object), and a ``permission``
+    (a string or unicode object), if a :term:`authorization policy` is
+    in effect, return a sequence of :term:`principal` ids that possess
+    the permission in the ``context``.  If no authorization policy is
+    in effect, this will return a sequence with the single value
+    :mod:`pyramid.security.Everyone` (the special principal
+    identifier representing all principals).
+
+    .. note::
+
+       even if an :term:`authorization policy` is in effect,
+       some (exotic) authorization policies may not implement the
+       required machinery for this function; those will cause a
+       :exc:`NotImplementedError` exception to be raised when this
+       function is invoked.
+    """
+    reg = get_current_registry()
+    policy = reg.queryUtility(IAuthorizationPolicy)
+    if policy is None:
+        return [Everyone]
+    return policy.principals_allowed_by_permission(context, permission)
 
 def authenticated_userid(request):
     """ Return the userid of the currently authenticated user or
@@ -81,15 +115,6 @@ def effective_principals(request):
     if policy is None:
         return [Everyone]
     return policy.effective_principals(request)
-
-# b/c
-def principals_allowed_by_permission(context, permission):
-    return AuthorizationAPIMixin.principals_allowed_by_permission(context,
-                                                                  permission)
-
-# b/c
-def view_execution_permitted(context, request, name=''):
-    return request.view_execution_permitted(context=context, name=name)
 
 def remember(request, principal, **kw):
     """ Return a sequence of header tuples (e.g. ``[('Set-Cookie',
@@ -231,43 +256,23 @@ class ACLAllowed(ACLPermitsResult):
 
 class AuthorizationAPIMixin(object):
 
-    @staticmethod
-    def principals_allowed_by_permission(context, permission):
-        """ Provided a ``context`` (a resource object), and a ``permission``
-        (a string or unicode object), if a :term:`authorization policy` is
-        in effect, return a sequence of :term:`principal` ids that possess
-        the permission in the ``context``.  If no authorization policy is
-        in effect, this will return a sequence with the single value
-        :mod:`pyramid.security.Everyone` (the special principal
-        identifier representing all principals).
-
-        .. note::
-
-           even if an :term:`authorization policy` is in effect,
-           some (exotic) authorization policies may not implement the
-           required machinery for this function; those will cause a
-           :exc:`NotImplementedError` exception to be raised when this
-           function is invoked.
-        """
-        reg = get_current_registry()
-        policy = reg.queryUtility(IAuthorizationPolicy)
-        if policy is None:
-            return [Everyone]
-        return policy.principals_allowed_by_permission(context, permission)
-
-    def view_execution_permitted(self, context, name=''):
+    def view_execution_permitted(self, context=None, name=''):
         """ If the view specified by ``context`` and ``name`` is protected
         by a :term:`permission`, check the permission associated with the
         view using the effective authentication/authorization policies and
-        the ``request``.  Return a boolean result.  If no
-        :term:`authorization policy` is in effect, or if the view is not
+        the ``request``.  Return a boolean result.
+         :term:`authorization policy` is in effect, or if the view is not
         protected by a permission, return ``True``. If no view can view found,
         an exception will be raised.
 
-        .. versionchanged:: 1.4a4
-           An exception is raised if no view is found.
+        .. versionchanged:: 1.5a3
+           If context is None and self has no attribute context,
+           then the attribute error is propergated.
 
         """
+
+        if context is None:
+            context = self.context
         try:
             reg = self.registry
         except AttributeError:
@@ -285,7 +290,7 @@ class AuthorizationAPIMixin(object):
                 (name, context))
         return view.__permitted__(context, self)
 
-    def has_permission(self, permission, context):
+    def has_permission(self, permission, context=None):
         """ Provided a permission (a string or unicode object), a context
         (a :term:`resource` instance) and a request object, return an
         instance of :data:`pyramid.security.Allowed` if the permission
@@ -295,7 +300,15 @@ class AuthorizationAPIMixin(object):
         This function delegates to the current authentication and
         authorization policies.  Return
         :data:`pyramid.security.Allowed` unconditionally if no
-        authentication policy has been configured in this application."""
+        authentication policy has been configured in this application.
+
+        .. versionchanged:: 1.5a3
+           If context is None and self has no attribute context,
+           then the attribute error is propergated.
+
+        """
+        if context is None:
+            context = self.context
         try:
             reg = self.registry
         except AttributeError:
@@ -303,7 +316,6 @@ class AuthorizationAPIMixin(object):
         authn_policy = reg.queryUtility(IAuthenticationPolicy)
         if authn_policy is None:
             return Allowed('No authentication policy in use.')
-
         authz_policy = reg.queryUtility(IAuthorizationPolicy)
         if authz_policy is None:
             raise ValueError('Authentication policy registered without '

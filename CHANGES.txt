@@ -5,7 +5,10 @@ Features
 --------
 
 - The ``pyramid.security`` Authorization API is now available directly on the
-  request.
+  request. If you don't pass a ``term:context`` to
+  ``pyramid.request.Request.has_permission`` or
+  ``pyramid.request.Request.view_execution_permitted``, then the request's
+  context will be used, else an AttributeError raised if no context is set.
 
 - Pyramid's console scripts (``pserve``, ``pviews``, etc) can now be run
   directly, allowing custom arguments to be sent to the python interpreter
