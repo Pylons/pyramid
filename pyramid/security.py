@@ -7,7 +7,6 @@ from pyramid.interfaces import (
     IView,
     IViewClassifier,
     )
-
 from pyramid.compat import map_
 from pyramid.threadlocal import get_current_registry
 
@@ -20,30 +19,57 @@ class AllPermissionsList(object):
     """ Stand in 'permission list' to represent all permissions """
     def __iter__(self):
         return ()
+
     def __contains__(self, other):
         return True
+
     def __eq__(self, other):
         return isinstance(other, self.__class__)
 
 ALL_PERMISSIONS = AllPermissionsList()
 DENY_ALL = (Deny, Everyone, ALL_PERMISSIONS)
-
 NO_PERMISSION_REQUIRED = '__no_permission_required__'
+
+# b/c Get the request from the global registry if not present on the request.
+def _get_registry(request):
+    try:
+        registry = request.registry
+    except AttributeError:
+        # b/c
+        registry = get_current_registry()
+    return registry
 
 # b/c
 def has_permission(permission, context, request):
     """Backwards compatability function wrapper function for
-    ``pyramid.request.Request.view_execution_permitted``."""
+    ``pyramid.request.Request.has_permission``."""
     return request.has_permission(permission, context)
 
-# b/c
 def view_execution_permitted(context, request, name=''):
-    """Backwards compatability wrapper function for
-    ``pyramid.request.Request.view_execution_permitted``.
+    """ If the view specified by ``context`` and ``name`` is protected
+    by a :term:`permission`, check the permission associated with the
+    view using the effective authentication/authorization policies and
+    the ``request``.  Return a boolean result.
+     :term:`authorization policy` is in effect, or if the view is not
+    protected by a permission, return ``True``. If no view can view found,
+    an exception will be raised.
 
-    .. versionchanged:: 1.4.a4
-       An exception is raised if no view is found."""
-    return request.view_execution_permitted(context=context, name=name)
+    This function only works with traversal.
+
+    """
+    reg = _get_registry(request)
+    provides = [IViewClassifier] + map_(providedBy, (request, context))
+    view = reg.adapters.lookup(provides, ISecuredView, name=name)
+    if view is None:
+        view = reg.adapters.lookup(provides, IView, name=name)
+        if view is None:
+            raise TypeError('No registered view satisfies the constraints. '
+                            'It would not make sense to claim that this view '
+                            '"is" or "is not" permitted.')
+        return Allowed(
+            'Allowed: view name %r in context %r (no permission defined)' %
+            (name, context))
+    return view.__permitted__(context, request)
 
 def principals_allowed_by_permission(context, permission):
     """ Provided a ``context`` (a resource object), and a ``permission``
@@ -177,19 +203,11 @@ class ACLAllowed(ACLPermitsResult):
     summary is available as the ``msg`` attribute."""
     boolval = 1
 
-
 class AuthenticationAPIMixin(object):
-
-    def _get_registry(self):
-        try:
-            reg = self.registry
-        except AttributeError:
-            reg = get_current_registry() # b/c
-        return reg
 
     @property
     def policy(self):
-        reg = self._get_registry()
+        reg = _get_registry(self)
         return reg.queryUtility(IAuthenticationPolicy)
 
     @property
@@ -268,40 +286,6 @@ class AuthenticationAPIMixin(object):
 
 class AuthorizationAPIMixin(object):
 
-    def view_execution_permitted(self, context=None, name=''):
-        """ If the view specified by ``context`` and ``name`` is protected
-        by a :term:`permission`, check the permission associated with the
-        view using the effective authentication/authorization policies and
-        the ``request``.  Return a boolean result.
-         :term:`authorization policy` is in effect, or if the view is not
-        protected by a permission, return ``True``. If no view can view found,
-        an exception will be raised.
-
-        .. versionchanged:: 1.5a3
-           If context is None and self has no attribute context,
-           then the attribute error is propergated.
-
-        """
-
-        if context is None:
-            context = self.context
-        try:
-            reg = self.registry
-        except AttributeError:
-            reg = get_current_registry() # b/c
-        provides = [IViewClassifier] + map_(providedBy, (self, context))
-        view = reg.adapters.lookup(provides, ISecuredView, name=name)
-        if view is None:
-            view = reg.adapters.lookup(provides, IView, name=name)
-            if view is None:
-                raise TypeError('No registered view satisfies the constraints. '
-                                'It would not make sense to claim that this view '
-                                '"is" or "is not" permitted.')
-            return Allowed(
-                'Allowed: view name %r in context %r (no permission defined)' %
-                (name, context))
-        return view.__permitted__(context, self)
-
     def has_permission(self, permission, context=None):
         """ Provided a permission (a string or unicode object), a context
         (a :term:`resource` instance) and a request object, return an
@@ -321,10 +305,7 @@ class AuthorizationAPIMixin(object):
         """
         if context is None:
             context = self.context
-        try:
-            reg = self.registry
-        except AttributeError:
-            reg = get_current_registry() # b/c
+        reg = _get_registry(self)
         authn_policy = reg.queryUtility(IAuthenticationPolicy)
         if authn_policy is None:
             return Allowed('No authentication policy in use.')
