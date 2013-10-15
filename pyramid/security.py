@@ -112,12 +112,12 @@ def effective_principals(request):
 # b/c
 def remember(request, principal, **kw):
     """ Backwards compatible wrapper function. """
-    return request.remember(principal, **kw)
+    return request.remember_userid(principal, **kw)
 
 # b/c
 def forget(request):
     """ Backwards compatible wrapper function. """
-    return request.forget()
+    return request.forget_userid()
 
 class PermitsResult(int):
     def __new__(cls, s, *args):
@@ -205,8 +205,7 @@ class ACLAllowed(ACLPermitsResult):
 
 class AuthenticationAPIMixin(object):
 
-    @property
-    def policy(self):
+    def _get_authentication_policy(self):
         reg = _get_registry(self)
         return reg.queryUtility(IAuthenticationPolicy)
 
@@ -215,9 +214,10 @@ class AuthenticationAPIMixin(object):
         """ Return the userid of the currently authenticated user or
         ``None`` if there is no :term:`authentication policy` in effect or
         there is no currently authenticated user."""
-        if self.policy is None:
+        policy = self._get_authentication_policy()
+        if policy is None:
             return None
-        return self.policy.authenticated_userid(self)
+        return policy.authenticated_userid(self)
 
     @property
     def unauthenticated_userid(self):
@@ -228,9 +228,10 @@ class AuthenticationAPIMixin(object):
         :func:`~pyramid.security.authenticated_userid`, because the effective
         authentication policy will not ensure that a record associated with the
         userid exists in persistent storage."""
-        if self.policy is None:
+        policy = self._get_authentication_policy()
+        if policy is None:
             return None
-        return self.policy.unauthenticated_userid(self)
+        return policy.unauthenticated_userid(self)
 
     @property
     def effective_principals(self):
@@ -239,11 +240,12 @@ class AuthenticationAPIMixin(object):
         currently authenticated user if a user is currently
         authenticated. If no :term:`authentication policy` is in effect,
         this will return an empty sequence."""
-        if self.policy is None:
+        policy = self._get_authentication_policy()
+        if policy is None:
             return [Everyone]
-        return self.policy.effective_principals(self)
+        return policy.effective_principals(self)
 
-    def remember(self, principal, **kw):
+    def remember_userid(self, principal, **kw):
         """ Return a sequence of header tuples (e.g. ``[('Set-Cookie',
         'foo=abc')]``) suitable for 'remembering' a set of credentials
         implied by the data passed as ``principal`` and ``*kw`` using the
@@ -252,8 +254,9 @@ class AuthenticationAPIMixin(object):
         assumed to be a :term:`WebOb` -style :term:`response` object
         computed previously by the view code)::
 
-          from pyramid.security import remember
-          headers = remember(request, 'chrism', password='123', max_age='86400')
+          headers = request.remember_userid('chrism',
+                                            password='123',
+                                            max_age='86400')
           response.headerlist.extend(headers)
           return response
 
@@ -261,11 +264,12 @@ class AuthenticationAPIMixin(object):
         always return an empty sequence.  If used, the composition and
         meaning of ``**kw`` must be agreed upon by the calling code and
         the effective authentication policy."""
-        if self.policy is None:
+        policy = self._get_authentication_policy()
+        if policy is None:
             return []
-        return self.policy.remember(self, principal, **kw)
+        return policy.remember(self, principal, **kw)
 
-    def forget(self):
+    def forget_userid(self):
         """ Return a sequence of header tuples (e.g. ``[('Set-Cookie',
         'foo=abc')]``) suitable for 'forgetting' the set of credentials
         possessed by the currently authenticated user.  A common usage
@@ -273,16 +277,16 @@ class AuthenticationAPIMixin(object):
         (``response`` is assumed to be an :term:`WebOb` -style
         :term:`response` object computed previously by the view code)::
 
-          from pyramid.security import forget
-          headers = forget(request)
+          headers = request.forget_userid()
           response.headerlist.extend(headers)
           return response
 
         If no :term:`authentication policy` is in use, this function will
         always return an empty sequence."""
-        if self.policy is None:
+        policy = self._get_authentication_policy()
+        if policy is None:
             return []
-        return self.policy.forget(self)
+        return policy.forget(self)
 
 class AuthorizationAPIMixin(object):
 

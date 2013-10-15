@@ -281,32 +281,32 @@ class TestAuthenticationAPIMethodsMixin(unittest.TestCase):
 
     def test_remember_with_no_authentication_policy(self):
         request = self._makeOne()
-        self.assertEqual(request.remember('me'), [])
+        self.assertEqual(request.remember_userid('me'), [])
 
     def test_remember_with_authentication_policy(self):
         request = self._makeOne()
         registry = request.registry
         _registerAuthenticationPolicy(registry, 'yo')
-        self.assertEqual(request.remember('me'), 'yo')
+        self.assertEqual(request.remember_userid('me'), 'yo')
 
     def test_remember_with_authentication_policy_no_reg_on_request(self):
         request = self._makeOne()
         _registerAuthenticationPolicy(request.registry, 'yo')
-        self.assertEqual(request.remember('me'), 'yo')
+        self.assertEqual(request.remember_userid('me'), 'yo')
 
     def test_forget_with_no_authentication_policy(self):
         request = self._makeOne()
-        self.assertEqual(request.forget(), [])
+        self.assertEqual(request.forget_userid(), [])
 
     def test_forget_with_authentication_policy(self):
         request = self._makeOne()
         _registerAuthenticationPolicy(request.registry, 'yo')
-        self.assertEqual(request.forget(), 'yo')
+        self.assertEqual(request.forget_userid(), 'yo')
 
     def test_forget_with_authentication_policy_no_reg_on_request(self):
         request = self._makeOne()
         _registerAuthenticationPolicy(request.registry, 'yo')
-        self.assertEqual(request.forget(), 'yo')
+        self.assertEqual(request.forget_userid(), 'yo')
 
 class TestAuthorizationAPIMethodsMixin(unittest.TestCase):
     def setUp(self):
