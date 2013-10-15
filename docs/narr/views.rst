@@ -238,9 +238,9 @@ developers.  However, Pyramid itself will raise two HTTP exceptions at
 various points during normal operations:
 :exc:`pyramid.httpexceptions.HTTPNotFound` and
 :exc:`pyramid.httpexceptions.HTTPForbidden`.  Pyramid will raise the
-:exc:`~pyramid.httpexceptions.HTTPNotFound` exception are raised when it
+:exc:`~pyramid.httpexceptions.HTTPNotFound` exception when it
 cannot find a view to service a request.  Pyramid will raise the
-:exc:`~pyramid.httpexceptions.Forbidden` exception or when authorization was
+:exc:`~pyramid.httpexceptions.HTTPForbidden` exception when authorization was
 forbidden by a security policy.
 
 If :exc:`~pyramid.httpexceptions.HTTPNotFound` is raised by Pyramid itself or
