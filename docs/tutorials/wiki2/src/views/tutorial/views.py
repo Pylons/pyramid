@@ -1,3 +1,4 @@
+import cgi
 import re
 from docutils.core import publish_parts
 
@@ -32,10 +33,10 @@ def view_page(request):
         exists = DBSession.query(Page).filter_by(name=word).all()
         if exists:
             view_url = request.route_url('view_page', pagename=word)
-            return '<a href="%s">%s</a>' % (view_url, word)
+            return '<a href="%s">%s</a>' % (view_url, cgi.escape(word))
         else:
             add_url = request.route_url('add_page', pagename=word)
-            return '<a href="%s">%s</a>' % (add_url, word)
+            return '<a href="%s">%s</a>' % (add_url, cgi.escape(word))
 
     content = publish_parts(page.data, writer_name='html')['html_body']
     content = wikiwords.sub(check, content)
