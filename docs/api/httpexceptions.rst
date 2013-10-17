@@ -7,9 +7,12 @@
 
   .. attribute:: status_map
 
-     A mapping of integer status code to exception class (eg. the
-     integer "401" maps to
-     :class:`pyramid.httpexceptions.HTTPUnauthorized`).
+     A mapping of integer status code to HTTP exception class (eg. the integer
+     "401" maps to :class:`pyramid.httpexceptions.HTTPUnauthorized`).  All
+     mapped exception classes are children of :class:`pyramid.httpexceptions`,
+     i.e. the :ref:`pyramid_specific_http_exceptions` such as
+     :class:`pyramid.httpexceptions.HTTPBadRequest.BadCSRFToken` are not
+     mapped.
 
   .. autofunction:: exception_response
 
@@ -106,3 +109,13 @@
   .. autoclass:: HTTPVersionNotSupported
 
   .. autoclass:: HTTPInsufficientStorage
+
+
+.. _pyramid_specific_http_exceptions:
+
+Pyramid-specific HTTP Exceptions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Each Pyramid-specific HTTP exception has the status code of it's parent.
+
+  .. autoclass:: HTTPBadCSRFToken
