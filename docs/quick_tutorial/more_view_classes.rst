@@ -166,7 +166,7 @@ Extra Credit
 
 #. The ``edit`` and ``delete`` views are both submitted to with
    ``POST``. Why does the ``edit`` view configuration not catch the
-   the ``POST`` used by ``delete``?
+   ``POST`` used by ``delete``?
 
 #. We used Python ``@property`` on ``full_name``. If we reference this
    many times in a template or view code, it would re-compute this

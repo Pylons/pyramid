@@ -35,3 +35,6 @@ def main(argv=sys.argv, pkg_resources=pkg_resources, platform=platform.platform,
     for package in packages:
         out(' ', package['name'], package['version'])
         out('   ', package['location'])
+
+if __name__ == '__main__': # pragma: no cover
+    sys.exit(main() or 0)

@@ -3,7 +3,7 @@ from pyramid.response import Response
 
 
 def hello_world(request):
-    return Response('<body><h1>Hello World!</h1></body>')
+    return xResponse('<body><h1>Hello World!</h1></body>')
 
 
 def main(global_config, **settings):

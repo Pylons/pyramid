@@ -39,15 +39,6 @@ Objectives
 Steps
 =====
 
-.. warning::
-
-  Your Python might not have SQLite bundled. If not, install it into
-  your virtual environment with:
-
-   .. code-block:: bash
-
-    $ $VENV/bin/easy_install sphinx pysqlite
-
 #. We are going to use the forms step as our starting point:
 
    .. code-block:: bash
@@ -97,7 +88,7 @@ Steps
 
    .. code-block:: bash
 
-    $ initialize_tutorial_db development.ini
+    $ $VENV/bin/initialize_tutorial_db development.ini
     2013-09-06 15:54:08,050 INFO  [sqlalchemy.engine.base.Engine][MainThread] PRAGMA table_info("wikipages")
     2013-09-06 15:54:08,050 INFO  [sqlalchemy.engine.base.Engine][MainThread] ()
     2013-09-06 15:54:08,051 INFO  [sqlalchemy.engine.base.Engine][MainThread]

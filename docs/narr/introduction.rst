@@ -176,8 +176,13 @@ static file server in production without changing any code.
 
 Example: :ref:`static_assets_section`.
 
-Debug Toolbar
-~~~~~~~~~~~~~
+Fully Interactive Development
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When developing a Pyramid application, several interactive features are
+available. Pyramid can automatically utilize changed templates when rendering
+pages and automatically restart the application to incorporate changed python
+code. Plain old ``print()`` calls used for debugging can display to a console.
 
 Pyramid's debug toolbar comes activated when you use a Pyramid scaffold to
 render a project.  This toolbar overlays your application in the browser, and
@@ -321,7 +326,14 @@ assertion instead that the view returns "the right stuff" in the dictionary
 it returns.  You can write "real" unit tests instead of functionally testing
 all of your views.
 
-For example, instead of:
+.. index::
+   pair: renderer; explicitly calling
+   pair: view renderer; explictly calling
+
+.. _example_render_to_response_call:
+
+For example, instead of returning a ``Response`` object from a
+``render_to_response`` call:
 
 .. code-block:: python
    :linenos:
@@ -332,7 +344,7 @@ For example, instead of:
         return render_to_response('myapp:templates/mytemplate.pt', {'a':1},
                                   request=request)
 
-You can do this:
+You can return a Python dictionary:
 
 .. code-block:: python
    :linenos:
@@ -405,12 +417,12 @@ Sessions
 
 Pyramid has built-in HTTP sessioning.  This allows you to associate data with
 otherwise anonymous users between requests.  Lots of systems do this.  But
-Pyramid also allows you to plug in your own sessioning system by creating
-some code that adheres to a documented interface.  Currently there is a
-binding package for the third-party Beaker sessioning system that does exactly
-this.  But if you have a specialized need (perhaps you want to store your
-session data in MongoDB), you can.  You can even switch between
-implementations without changing your application code.
+Pyramid also allows you to plug in your own sessioning system by creating some
+code that adheres to a documented interface.  Currently there is a binding
+package for the third-party Redis sessioning system that does exactly this.
+But if you have a specialized need (perhaps you want to store your session data
+in MongoDB), you can.  You can even switch between implementations without
+changing your application code.
 
 Example: :ref:`sessions_chapter`.
 
@@ -777,7 +789,7 @@ automate some of the tedium away:
        for method in ('GET', 'POST', 'HEAD'):
            view = getattr(module, 'xhr_%s_view' % method, None)
            if view is not None:
-               config.add_view(view, route_name='xhr_route', xhr=True, 
+               config.add_view(view, route_name='xhr_route', xhr=True,
                               permission='view', request_method=method)
 
    config = Configurator()

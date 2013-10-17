@@ -363,25 +363,27 @@ Or, include it as a header in a jQuery AJAX request:
 The handler for the URL that receives the request
 should then require that the correct CSRF token is supplied.
 
-Using the ``session.check_csrf_token`` Method
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Checking CSRF Tokens Manually
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In request handling code, you can check the presence and validity of a CSRF
-token with ``session.check_csrf_token(request)``. If the token is valid,
-it will return True, otherwise it will raise ``HTTPBadRequest``.
+token with :func:`pyramid.session.check_csrf_token(request)``. If the token is
+valid, it will return ``True``, otherwise it will raise ``HTTPBadRequest``.
+Optionally, you can specify ``raises=False`` to have the check return ``False``
+instead of raising an exception.
 
 By default, it checks for a GET or POST parameter named ``csrf_token`` or a
 header named ``X-CSRF-Token``.
 
 .. code-block:: python
 
+    from pyramid.session import check_csrf_token
+
     def myview(request):
-        session = request.session
-
         # Require CSRF Token
-        session.check_csrf_token(request):
+        check_csrf_token(request)
 
-        ...
+        # ...
 
 .. index::
    single: session.new_csrf_token

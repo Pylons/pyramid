@@ -1,6 +1,15 @@
 Unreleased
 ==========
 
+Features
+--------
+
+- Pyramid's console scripts (``pserve``, ``pviews``, etc) can now be run
+  directly, allowing custom arguments to be sent to the python interpreter
+  at runtime. For example::
+
+      python -3 -m pyramid.scripts.pserve development.ini
+
 Bug Fixes
 ---------
 
@@ -20,6 +29,8 @@ Bug Fixes
   via ``pyramid.config.Configurator.add_request_method`` will now be present,
   allowing traversal to continue.
   See https://github.com/Pylons/pyramid/issues/1104
+
+- Remove unused ``renderer`` argument from ``Configurator.add_route``.
 
 Documentation
 -------------
