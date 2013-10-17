@@ -6,10 +6,8 @@ from pyramid.compat import (
     text_,
     bytes_,
     native_,
-    iteritems_,
-    iterkeys_,
-    itervalues_,
     )
+
 
 class TestRequest(unittest.TestCase):
     def setUp(self):
@@ -248,7 +246,7 @@ class TestRequest(unittest.TestCase):
         foo = Foo()
         request.registry.registerAdapter(adapter, (Foo,), IResponse)
         self.assertEqual(request.is_response(foo), False)
-        
+
     def test_is_response_adapter_true(self):
         from pyramid.interfaces import IResponse
         request = self._makeOne()
@@ -265,7 +263,7 @@ class TestRequest(unittest.TestCase):
         request = self._makeOne({'REQUEST_METHOD':'POST'})
         request.body = b'{'
         self.assertRaises(ValueError, getattr, request, 'json_body')
-        
+
     def test_json_body_valid_json(self):
         request = self._makeOne({'REQUEST_METHOD':'POST'})
         request.body = b'{"a":1}'
@@ -308,6 +306,7 @@ class TestRequest(unittest.TestCase):
         self.assertEqual(1, request.db)
         self.assertEqual(1, request.db)
 
+
 class Test_route_request_iface(unittest.TestCase):
     def _callFUT(self, name):
         from pyramid.request import route_request_iface
@@ -326,7 +325,7 @@ class Test_route_request_iface(unittest.TestCase):
         self.assertTrue(hasattr(iface, 'combined'))
         self.assertEqual(iface.combined.__name__,
                          'routename with spaces_combined_IRequest')
-        
+
 
 class Test_add_global_response_headers(unittest.TestCase):
     def _callFUT(self, request, headerlist):

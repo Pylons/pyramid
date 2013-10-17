@@ -27,6 +27,7 @@ from pyramid.registry import Registry
 from pyramid.security import (
     Authenticated,
     Everyone,
+    AuthorizationAPIMixin
     )
 
 from pyramid.threadlocal import (
@@ -280,9 +281,12 @@ class DummySession(dict):
             token = self.new_csrf_token()
         return token
 
-        
+
 @implementer(IRequest)
-class DummyRequest(URLMethodsMixin, CallbackMethodsMixin, InstancePropertyMixin,
+class DummyRequest(AuthorizationAPIMixin,
+                   URLMethodsMixin,
+                   CallbackMethodsMixin,
+                   InstancePropertyMixin,
                    LocalizerRequestMixin):
     """ A DummyRequest object (incompletely) imitates a :term:`request` object.
 

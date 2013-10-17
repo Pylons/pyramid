@@ -4,6 +4,12 @@ Unreleased
 Features
 --------
 
+- The ``pyramid.security`` Authorization API is now available directly on the
+  request. If you don't pass a ``term:context`` to
+  ``pyramid.request.Request.has_permission`` or
+  ``pyramid.request.Request.view_execution_permitted``, then the request's
+  context will be used, else an AttributeError raised if no context is set.
+
 - Pyramid's console scripts (``pserve``, ``pviews``, etc) can now be run
   directly, allowing custom arguments to be sent to the python interpreter
   at runtime. For example::
@@ -13,14 +19,14 @@ Features
 Bug Fixes
 ---------
 
-- Fix the ``pcreate`` script so that when the target directory name ends with a 
-  slash it does not produce a non-working project directory structure.  
-  Previously saying ``pcreate -s starter /foo/bar/`` produced different output 
+- Fix the ``pcreate`` script so that when the target directory name ends with a
+  slash it does not produce a non-working project directory structure.
+  Previously saying ``pcreate -s starter /foo/bar/`` produced different output
   than  saying ``pcreate -s starter /foo/bar``.  The former did not work
   properly.
 
-- Fix the ``principals_allowed_by_permission`` method of 
-  ``ACLAuthorizationPolicy`` so it anticipates a callable ``__acl__`` 
+- Fix the ``principals_allowed_by_permission`` method of
+  ``ACLAuthorizationPolicy`` so it anticipates a callable ``__acl__``
   on resources.  Previously it did not try to call the ``__acl__``
   if it was callable.
 
@@ -37,7 +43,7 @@ Documentation
 
 - Added a "Quick Tutorial" to go with the Quick Tour
 
-- Removed mention of ``pyramid_beaker`` from docs.  Beaker is no longer 
+- Removed mention of ``pyramid_beaker`` from docs.  Beaker is no longer
   maintained.  Point people at ``pyramid_redis_sessions`` instead.
 
 Backwards Incompatibilities
@@ -57,8 +63,8 @@ Features
 --------
 
 - Users can now provide dotted Python names to as the ``factory`` argument
-  the Configurator methods named ``add_{view,route,subscriber}_predicate`` 
-  (instead of passing the predicate factory directly, you can pass a 
+  the Configurator methods named ``add_{view,route,subscriber}_predicate``
+  (instead of passing the predicate factory directly, you can pass a
   dotted name which refers to the factory).
 
 Bug Fixes
@@ -94,10 +100,10 @@ Backwards Incompatibilities
 
      ValueError: No such renderer factory .mak
 
-  Support for Mako templating has been moved into an add-on package named 
-  ``pyramid_mako``, and support for Chameleon templating has been moved into 
-  an add-on package named ``pyramid_chameleon``.  These packages are drop-in 
-  replacements for the old built-in support for these templating langauges. 
+  Support for Mako templating has been moved into an add-on package named
+  ``pyramid_mako``, and support for Chameleon templating has been moved into
+  an add-on package named ``pyramid_chameleon``.  These packages are drop-in
+  replacements for the old built-in support for these templating langauges.
   All you have to do is install them and make them active in your configuration
   to register renderer factories for ``.pt`` and/or ``.mako`` (or ``.mak``) to
   make your application work again.
@@ -120,9 +126,9 @@ Backwards Incompatibilities
             ],
         )
 
-  * Within the portion of your application which instantiates a Pyramid 
-    ``pyramid.config.Configurator`` (often the ``main()`` function in 
-    your project's ``__init__.py`` file), tell Pyramid to include the 
+  * Within the portion of your application which instantiates a Pyramid
+    ``pyramid.config.Configurator`` (often the ``main()`` function in
+    your project's ``__init__.py`` file), tell Pyramid to include the
     ``pyramid_mako`` includeme::
 
         config = Configurator(.....)
@@ -132,7 +138,7 @@ Backwards Incompatibilities
 
   * Make sure the ``pyramid_chameleon`` package is installed.  One way to do
     this is by adding ``pyramid_chameleon`` to the ``install_requires`` section
-    of your package's ``setup.py`` file and afterwards rerunning 
+    of your package's ``setup.py`` file and afterwards rerunning
     ``setup.py develop``::
 
         setup(
@@ -144,9 +150,9 @@ Backwards Incompatibilities
             ],
         )
 
-  * Within the portion of your application which instantiates a Pyramid 
-    ``~pyramid.config.Configurator`` (often the ``main()`` function in 
-    your project's ``__init__.py`` file), tell Pyramid to include the 
+  * Within the portion of your application which instantiates a Pyramid
+    ``~pyramid.config.Configurator`` (often the ``main()`` function in
+    your project's ``__init__.py`` file), tell Pyramid to include the
     ``pyramid_chameleon`` includeme::
 
         config = Configurator(.....)
@@ -159,10 +165,10 @@ Backwards Incompatibilities
   compatibility when you eventually do upgrade to Pyramid 1.5.
 
   With the removal of Mako and Chameleon support from the core, some
-  unit tests that use the ``pyramid.renderers.render*`` methods may begin to 
-  fail.  If any of your unit tests are invoking either 
+  unit tests that use the ``pyramid.renderers.render*`` methods may begin to
+  fail.  If any of your unit tests are invoking either
   ``pyramid.renderers.render()``  or ``pyramid.renderers.render_to_response()``
-  with either Mako or Chameleon templates then the 
+  with either Mako or Chameleon templates then the
   ``pyramid.config.Configurator`` instance in effect during
   the unit test should be also be updated to include the addons, as shown
   above. For example::
@@ -186,17 +192,17 @@ Backwards Incompatibilities
                 result = pyramid.renderers.render('mypkg:templates/home.pt', {})
 
 - If you're using the Pyramid debug toolbar, when you upgrade Pyramid to
-  1.5a2+, you'll also need to upgrade the ``pyramid_debugtoolbar`` package to 
-  at least version 1.0.8, as older toolbar versions are not compatible with 
-  Pyramid 1.5a2+ due to the removal of Mako support from the core.  It's 
+  1.5a2+, you'll also need to upgrade the ``pyramid_debugtoolbar`` package to
+  at least version 1.0.8, as older toolbar versions are not compatible with
+  Pyramid 1.5a2+ due to the removal of Mako support from the core.  It's
   fine to use this newer version of the toolbar code with older Pyramids too.
 
 - Removed the ``request.response_*`` varying attributes. These attributes
   have been deprecated since Pyramid 1.1, and as per the deprecation policy,
   have now been removed.
 
-- ``request.response`` will no longer be mutated when using the 
-  ``pyramid.renderers.render()`` API.  Almost all renderers mutate the 
+- ``request.response`` will no longer be mutated when using the
+  ``pyramid.renderers.render()`` API.  Almost all renderers mutate the
   ``request.response`` response object (for example, the JSON renderer sets
   ``request.response.content_type`` to ``application/json``), but this is
   only necessary when the renderer is generating a response; it was a bug
@@ -204,7 +210,7 @@ Backwards Incompatibilities
 
 - Removed the ``bfg2pyramid`` fixer script.
 
-- The ``pyramid.events.NewResponse`` event is now sent **after** response 
+- The ``pyramid.events.NewResponse`` event is now sent **after** response
   callbacks are executed.  It previously executed before response callbacks
   were executed.  Rationale: it's more useful to be able to inspect the response
   after response callbacks have done their jobs instead of before.
@@ -263,24 +269,24 @@ Features
 
 - A new http exception subclass named ``pyramid.httpexceptions.HTTPSuccessful``
   was added.  You can use this class as the ``context`` of an exception
-  view to catch all 200-series "exceptions" (e.g. "raise HTTPOk").  This 
+  view to catch all 200-series "exceptions" (e.g. "raise HTTPOk").  This
   also allows you to catch *only* the ``HTTPOk`` exception itself; previously
-  this was impossible because a number of other exceptions 
+  this was impossible because a number of other exceptions
   (such as ``HTTPNoContent``) inherited from ``HTTPOk``, but now they do not.
 
 - You can now generate "hybrid" urldispatch/traversal URLs more easily
-  by using the new ``route_name``, ``route_kw`` and ``route_remainder_name`` 
+  by using the new ``route_name``, ``route_kw`` and ``route_remainder_name``
   arguments to  ``request.resource_url`` and ``request.resource_path``.  See
-  the new section of the "Combining Traversal and URL Dispatch" documentation 
+  the new section of the "Combining Traversal and URL Dispatch" documentation
   chapter entitled  "Hybrid URL Generation".
 
-- It is now possible to escape double braces in Pyramid scaffolds (unescaped, 
+- It is now possible to escape double braces in Pyramid scaffolds (unescaped,
   these represent replacement values).  You can use ``\{\{a\}\}`` to
-  represent a "bare" ``{{a}}``.  See 
+  represent a "bare" ``{{a}}``.  See
   https://github.com/Pylons/pyramid/pull/862
 
 - Add ``localizer`` and ``locale_name`` properties (reified) to the request.
-  See https://github.com/Pylons/pyramid/issues/508.  Note that the 
+  See https://github.com/Pylons/pyramid/issues/508.  Note that the
   ``pyramid.i18n.get_localizer`` and ``pyramid.i18n.get_locale_name`` functions
   now simply look up these properties on the request.
 
@@ -330,7 +336,7 @@ Features
   externally-hosted static URLs to be generated based on the current protocol.
 
 - The ``AuthTktAuthenticationPolicy`` has two new options to configure its
-  domain usage: 
+  domain usage:
 
   * ``parent_domain``: if set the authentication cookie is set on
     the parent domain. This is useful if you have multiple sites sharing the
@@ -419,7 +425,7 @@ Features
 
 - The ``pyramid.config.Configurator.add_route`` method now supports being
   called with an external URL as pattern. See
-  https://github.com/Pylons/pyramid/issues/611 and the documentation section 
+  https://github.com/Pylons/pyramid/issues/611 and the documentation section
   in the "URL Dispatch" chapter entitled "External Routes" for more information.
 
 Bug Fixes
@@ -427,17 +433,17 @@ Bug Fixes
 
 - It was not possible to use ``pyramid.httpexceptions.HTTPException`` as
   the ``context`` of an exception view as very general catchall for
-  http-related exceptions when you wanted that exception view to override the 
+  http-related exceptions when you wanted that exception view to override the
   default exception view.  See https://github.com/Pylons/pyramid/issues/985
 
-- When the ``pyramid.reload_templates`` setting was true, and a Chameleon 
-  template was reloaded, and the renderer specification named a macro 
+- When the ``pyramid.reload_templates`` setting was true, and a Chameleon
+  template was reloaded, and the renderer specification named a macro
   (e.g. ``foo#macroname.pt``), renderings of the template after the template
-  was reloaded due to a file change would produce the entire template body 
-  instead of just a rendering of the macro.  See 
+  was reloaded due to a file change would produce the entire template body
+  instead of just a rendering of the macro.  See
   https://github.com/Pylons/pyramid/issues/1013.
 
-- Fix an obscure problem when combining a virtual root with a route with a 
+- Fix an obscure problem when combining a virtual root with a route with a
   ``*traverse`` in its pattern.  Now the traversal path generated in
   such a configuration will be correct, instead of an element missing
   a leading slash.
@@ -495,12 +501,12 @@ Backwards Incompatibilities
   previously returned the URL without the query string by default, it now does
   attach the query string unless it is overriden.
 
-- The ``route_url`` and ``route_path`` APIs no longer quote ``/`` 
+- The ``route_url`` and ``route_path`` APIs no longer quote ``/``
   to ``%2F`` when a replacement value contains a ``/``.  This was pointless,
-  as WSGI servers always unquote the slash anyway, and Pyramid never sees the 
+  as WSGI servers always unquote the slash anyway, and Pyramid never sees the
   quoted value.
 
-- It is no longer possible to set a ``locale_name`` attribute of the request, 
+- It is no longer possible to set a ``locale_name`` attribute of the request,
   nor is it possible to set a ``localizer`` attribute of the request.  These
   are now "reified" properties that look up a locale name and localizer
   respectively using the machinery described in the "Internationalization"
@@ -515,4 +521,3 @@ Backwards Incompatibilities
 - The ``pyramid.interfaces.IResourceURL`` interface has now grown two new
   attributes: ``virtual_path_tuple`` and ``physical_path_tuple``.  These should
   be the tuple form of the resource's path (physical and virtual).
-

@@ -23,6 +23,7 @@ from pyramid.i18n import LocalizerRequestMixin
 from pyramid.response import Response
 from pyramid.url import URLMethodsMixin
 from pyramid.util import InstancePropertyMixin
+from pyramid.security import AuthorizationAPIMixin
 
 class TemplateContext(object):
     pass
@@ -137,7 +138,8 @@ class CallbackMethodsMixin(object):
 
 @implementer(IRequest)
 class Request(BaseRequest, URLMethodsMixin, CallbackMethodsMixin,
-              InstancePropertyMixin, LocalizerRequestMixin):
+              InstancePropertyMixin, LocalizerRequestMixin,
+              AuthorizationAPIMixin):
     """
     A subclass of the :term:`WebOb` Request class.  An instance of
     this class is created by the :term:`router` and is provided to a
@@ -218,7 +220,7 @@ class Request(BaseRequest, URLMethodsMixin, CallbackMethodsMixin,
     def json_body(self):
         return json.loads(text_(self.body, self.charset))
 
-    
+
 def route_request_iface(name, bases=()):
     # zope.interface treats the __name__ as the __doc__ and changes __name__
     # to None for interfaces that contain spaces if you do not pass a
