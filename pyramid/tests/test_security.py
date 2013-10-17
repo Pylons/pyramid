@@ -1,6 +1,6 @@
 import unittest
 
-from pyramid.testing import cleanUp
+from pyramid.testing import cleanUp, DummyRequest
 
 
 class TestAllPermissionsList(unittest.TestCase):
@@ -103,25 +103,6 @@ class TestACLDenied(unittest.TestCase):
         self.assertTrue('<ACLDenied instance at ' in repr(denied))
         self.assertTrue("with msg %r>" % msg in repr(denied))
 
-class TestAuthMixin(object):
-
-    mixin_type = NotImplemented
-
-    def setUp(self):
-        cleanUp()
-
-    def tearDown(self):
-        cleanUp()
-
-    def _makeOne(self, set_context=True):
-        from pyramid.registry import Registry
-        from pyramid.security import AuthenticationAPIMixin
-        mixin = AuthenticationAPIMixin()
-        mixin.registry = Registry()
-        if set_context:
-            mixin.context = object()
-        return mixin
-
 class TestPrincipalsAllowedByPermission(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -220,111 +201,188 @@ class TestViewExecutionPermitted(unittest.TestCase):
         result = self._callFUT(context, request, '')
         self.assertTrue(result)
 
-class TestAuthenticationAPIMethodsMixin(unittest.TestCase):
+class AuthenticationAPIMixinTest(object):
+
     def setUp(self):
         cleanUp()
 
     def tearDown(self):
         cleanUp()
 
-    def _makeOne(self, set_context=True):
+    def _makeOne(self):
         from pyramid.registry import Registry
         from pyramid.security import AuthenticationAPIMixin
         mixin = AuthenticationAPIMixin()
         mixin.registry = Registry()
-        if set_context:
-            mixin.context = object()
+        mixin.context = object()
         return mixin
 
-    def test_authenicated_userid_with_no_authentication_policy(self):
+    def _makeFakeOne(self):
+        def fake_proxied_method(method):
+            def proxy(*args, **kw):
+                return method.__name__
+            return proxy
+
+        def fake_proxied_property(method):
+            return property(fget=lambda req: method.__name__)
+
+        class FakeRequest(DummyRequest):
+            @fake_proxied_property
+            def authenticated_userid(req):
+                pass
+
+            @fake_proxied_property
+            def unauthenticated_userid(req):
+                pass
+
+            @fake_proxied_property
+            def effective_principals(req):
+                pass
+
+            @fake_proxied_method
+            def forget_userid(req):
+                pass
+
+            @fake_proxied_method
+            def remember_userid(req, principal, **kw):
+                pass
+
+        return FakeRequest({})
+
+class TestAuthenticatedUserId(AuthenticationAPIMixinTest, unittest.TestCase):
+    def test_backward_compat_proxies_to_mixin(self):
+        request = self._makeFakeOne()
+        from pyramid.security import authenticated_userid
+        self.assertEqual(authenticated_userid(request), 'authenticated_userid')
+
+    def test_no_authentication_policy(self):
         request = self._makeOne()
         self.assertEqual(request.authenticated_userid, None)
 
-    def test_authenticated_userid_with_authentication_policy(self):
+    def test_with_authentication_policy(self):
         request = self._makeOne()
         _registerAuthenticationPolicy(request.registry, 'yo')
         self.assertEqual(request.authenticated_userid, 'yo')
 
-    def test_authenticated_userid_authentication_policy_no_reg_on_req(self):
+    def test_with_authentication_policy_no_reg_on_request(self):
+        from pyramid.threadlocal import get_current_registry
+        registry = get_current_registry()
         request = self._makeOne()
-        _registerAuthenticationPolicy(request.registry, 'yo')
+        del request.registry
+        _registerAuthenticationPolicy(registry, 'yo')
         self.assertEqual(request.authenticated_userid, 'yo')
 
-    def test_unauthenticated_userid_no_authentication_policy(self):
+class TestUnAuthenticatedUserId(AuthenticationAPIMixinTest, unittest.TestCase):
+    def test_backward_compat_proxies_to_mixin(self):
+        request = self._makeFakeOne()
+        from pyramid.security import unauthenticated_userid
+        self.assertEqual(unauthenticated_userid(request),
+                         'unauthenticated_userid')
+
+    def test_no_authentication_policy(self):
         request = self._makeOne()
         self.assertEqual(request.unauthenticated_userid, None)
 
-    def test_unauthenticated_userid_with_authentication_policy(self):
+    def test_with_authentication_policy(self):
         request = self._makeOne()
         _registerAuthenticationPolicy(request.registry, 'yo')
         self.assertEqual(request.unauthenticated_userid, 'yo')
 
-    def test_unauthenticated_userid_authentication_policy_no_reg_on_req(self):
+    def test_with_authentication_policy_no_reg_on_request(self):
+        from pyramid.threadlocal import get_current_registry
+        registry = get_current_registry()
         request = self._makeOne()
-        _registerAuthenticationPolicy(request.registry, 'yo')
+        del request.registry
+        _registerAuthenticationPolicy(registry, 'yo')
         self.assertEqual(request.unauthenticated_userid, 'yo')
 
-    def test_effective_prinicipals_no_authentication_policy(self):
+class TestEffectivePrincipals(AuthenticationAPIMixinTest, unittest.TestCase):
+    def test_backward_compat_proxies_to_mixin(self):
+        request = self._makeFakeOne()
+        from pyramid.security import effective_principals
+        self.assertEqual(effective_principals(request), 'effective_principals')
+
+    def test_no_authentication_policy(self):
         from pyramid.security import Everyone
         request = self._makeOne()
         self.assertEqual(request.effective_principals, [Everyone])
 
-    def test_effective_prinicipals_with_authentication_policy(self):
+    def test_with_authentication_policy(self):
         request = self._makeOne()
         _registerAuthenticationPolicy(request.registry, 'yo')
         self.assertEqual(request.effective_principals, 'yo')
 
-    def test_effective_prinicipals_authentication_policy_no_reg_on_req(self):
+    def test_with_authentication_policy_no_reg_on_request(self):
+        from pyramid.threadlocal import get_current_registry
+        registry = get_current_registry()
         request = self._makeOne()
-        _registerAuthenticationPolicy(request.registry, 'yo')
+        del request.registry
+        _registerAuthenticationPolicy(registry, 'yo')
         self.assertEqual(request.effective_principals, 'yo')
 
-    def test_remember_with_no_authentication_policy(self):
+class TestRememberUserId(AuthenticationAPIMixinTest, unittest.TestCase):
+    def test_backward_compat_proxies_to_mixin(self):
+        request = self._makeFakeOne()
+        from pyramid.security import remember
+        self.assertEqual(remember(request, 'joe'), 'remember_userid')
+
+    def test_with_no_authentication_policy(self):
         request = self._makeOne()
         self.assertEqual(request.remember_userid('me'), [])
 
-    def test_remember_with_authentication_policy(self):
+    def test_with_authentication_policy(self):
         request = self._makeOne()
         registry = request.registry
         _registerAuthenticationPolicy(registry, 'yo')
         self.assertEqual(request.remember_userid('me'), 'yo')
 
-    def test_remember_with_authentication_policy_no_reg_on_request(self):
+    def test_with_authentication_policy_no_reg_on_request(self):
+        from pyramid.threadlocal import get_current_registry
+        registry = get_current_registry()
         request = self._makeOne()
-        _registerAuthenticationPolicy(request.registry, 'yo')
+        del request.registry
+        _registerAuthenticationPolicy(registry, 'yo')
         self.assertEqual(request.remember_userid('me'), 'yo')
 
-    def test_forget_with_no_authentication_policy(self):
+class TestForgetUserId(AuthenticationAPIMixinTest, unittest.TestCase):
+    def test_backward_compat_proxies_to_mixin(self):
+        request = self._makeFakeOne()
+        from pyramid.security import forget
+        self.assertEqual(forget(request), 'forget_userid')
+
+    def test_with_no_authentication_policy(self):
         request = self._makeOne()
         self.assertEqual(request.forget_userid(), [])
 
-    def test_forget_with_authentication_policy(self):
+    def test_with_authentication_policy(self):
         request = self._makeOne()
         _registerAuthenticationPolicy(request.registry, 'yo')
         self.assertEqual(request.forget_userid(), 'yo')
 
-    def test_forget_with_authentication_policy_no_reg_on_request(self):
+    def test_with_authentication_policy_no_reg_on_request(self):
+        from pyramid.threadlocal import get_current_registry
+        registry = get_current_registry()
         request = self._makeOne()
-        _registerAuthenticationPolicy(request.registry, 'yo')
+        del request.registry
+        _registerAuthenticationPolicy(registry, 'yo')
         self.assertEqual(request.forget_userid(), 'yo')
 
-class TestAuthorizationAPIMethodsMixin(unittest.TestCase):
+class TestHasPermission(unittest.TestCase):
     def setUp(self):
         cleanUp()
 
     def tearDown(self):
         cleanUp()
 
-    def _makeOne(self, set_context=True):
-        from pyramid.registry import Registry
+    def _makeOne(self):
         from pyramid.security import AuthorizationAPIMixin
+        from pyramid.registry import Registry
         mixin = AuthorizationAPIMixin()
         mixin.registry = Registry()
-        if set_context:
-            mixin.context = object()
+        mixin.context = object()
         return mixin
 
-    def test_has_permsision_api_calls_has_permission_on_mixin(self):
+    def test_delegates_to_mixin(self):
         mixin = self._makeOne()
         from pyramid.security import has_permission
         self.called_has_permission = False
@@ -338,35 +396,38 @@ class TestAuthorizationAPIMethodsMixin(unittest.TestCase):
 
     def test_no_authentication_policy(self):
         request = self._makeOne()
-        assert request.context
         result = request.has_permission('view')
         self.assertTrue(result)
         self.assertEqual(result.msg, 'No authentication policy in use.')
 
-    def test_has_permission_with_no_authorization_policy(self):
+    def test_with_no_authorization_policy(self):
         request = self._makeOne()
         _registerAuthenticationPolicy(request.registry, None)
         self.assertRaises(ValueError,
                           request.has_permission, 'view', context=None)
 
-    def test_has_permsision_with_authn_and_authz_policies_registered(self):
+    def test_with_authn_and_authz_policies_registered(self):
         request = self._makeOne()
         _registerAuthenticationPolicy(request.registry, None)
         _registerAuthorizationPolicy(request.registry, 'yo')
         self.assertEqual(request.has_permission('view', context=None), 'yo')
 
-    def test_has_permsision_with_no_registry_on_request(self):
+    def test_with_no_reg_on_request(self):
+        from pyramid.threadlocal import get_current_registry
+        registry = get_current_registry()
         request = self._makeOne()
-        _registerAuthenticationPolicy(request.registry, None)
-        _registerAuthorizationPolicy(request.registry, 'yo')
+        del request.registry
+        _registerAuthenticationPolicy(registry, None)
+        _registerAuthorizationPolicy(registry, 'yo')
         self.assertEqual(request.has_permission('view'), 'yo')
 
-    def test_has_permission_with_no_context(self):
+    def test_with_no_context_passed(self):
         request = self._makeOne()
         self.assertTrue(request.has_permission('view'))
 
-    def test_has_permission_with_no_context_and_no_context_on_request(self):
-        request = self._makeOne(set_context=False)
+    def test_with_no_context_passed_or_on_request(self):
+        request = self._makeOne()
+        del request.context
         self.assertRaises(AttributeError, request.has_permission, 'view')
 
 class DummyContext:
@@ -417,9 +478,3 @@ def _registerAuthorizationPolicy(reg, result):
     policy = DummyAuthorizationPolicy(result)
     reg.registerUtility(policy, IAuthorizationPolicy)
     return policy
-
-def _makeRequest():
-    from pyramid.registry import Registry
-    request = DummyRequest({})
-    request.registry = Registry()
-    return request
