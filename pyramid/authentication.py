@@ -1176,10 +1176,17 @@ class BasicAuthAuthenticationPolicy(CallbackAuthenticationPolicy):
             return None
         if authmeth.lower() != 'basic':
             return None
+
         try:
-            auth = b64decode(auth.strip()).decode('ascii')
+            authbytes = b64decode(auth.strip())
         except (TypeError, binascii.Error): # can't decode
             return None
+
+        try:
+            auth = authbytes.decode('utf-8')
+        except UnicodeDecodeError:
+            auth = authbytes.decode('latin-1')
+
         try:
             username, password = auth.split(':', 1)
         except ValueError: # not enough values to unpack
