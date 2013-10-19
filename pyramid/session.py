@@ -581,11 +581,7 @@ def SignedCookieSessionFactory(
         except (binascii.Error, TypeError) as e:
             raise ValueError('Badly formed base64 data: %s' % e)
 
-        cstruct_size = len(fstruct) - digest_size
-        if cstruct_size < 0:
-            raise ValueError('Input is too short.')
-
-        cstruct = fstruct[:cstruct_size]
+        cstruct = fstruct[:-digest_size]
         expected_sig = fstruct[-digest_size:]
 
         sig = hmac.new(salted_secret, cstruct, digestmod).digest()
