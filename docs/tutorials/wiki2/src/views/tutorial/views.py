@@ -47,12 +47,12 @@ def add_page(request):
     pagename = request.matchdict['pagename']
     if 'form.submitted' in request.params:
         body = request.params['body']
-        page = Page(pagename, body)
+        page = Page(name=pagename, data=body)
         DBSession.add(page)
         return HTTPFound(location = request.route_url('view_page',
                                                       pagename=pagename))
     save_url = request.route_url('add_page', pagename=pagename)
-    page = Page('', '')
+    page = Page(name='', data='')
     return dict(page=page, save_url=save_url)
 
 @view_config(route_name='edit_page', renderer='templates/edit.pt')

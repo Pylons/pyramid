@@ -98,6 +98,11 @@ example:
        else:
            return Response('Fred was not in the session')
 
+The first time this view is invoked produces ``Fred was not in the
+session``.  Subsequent invocations produce ``Fred was in the
+session``, assuming of course that the client side maintains the
+session's identity across multiple requests.
+
 You can use a session much like a Python dictionary.  It supports all
 dictionary methods, along with some extra attributes, and methods.
 
@@ -145,8 +150,6 @@ Some gotchas:
   you've changed sessioning data.
 
 .. index::
-   single: pyramid_beaker
-   single: Beaker
    single: pyramid_redis_sessions
    single: session factory (alternates)
 
@@ -155,19 +158,10 @@ Some gotchas:
 Using Alternate Session Factories
 ---------------------------------
 
-At the time of this writing, exactly two alternate session factories
-exist.
-
-The first is named ``pyramid_redis_sessions``.  It can be downloaded from PyPI.
-It uses Redis as a backend.  It is the recommended persistent session solution
-at the time of this writing.
-
-The second is named ``pyramid_beaker``. This is a session factory that uses the
-`Beaker <http://beaker.groovie.org/>`_ library as a backend.  Beaker has
-support for file-based sessions, database based sessions, and encrypted
-cookie-based sessions.  See `the pyramid_beaker documentation
-<http://docs.pylonsproject.org/projects/pyramid_beaker/en/latest/>`_ for more
-information about ``pyramid_beaker``.
+At the time of this writing, exactly one project-endorsed alternate session
+factory exists named :term:`pyramid_redis_sessions`.  It can be downloaded from
+PyPI.  It uses the Redis database as a backend.  It is the recommended 
+persistent session solution at the time of this writing.
 
 .. index::
    single: session factory (custom)
@@ -368,25 +362,27 @@ Or, include it as a header in a jQuery AJAX request:
 The handler for the URL that receives the request
 should then require that the correct CSRF token is supplied.
 
-Using the ``session.check_csrf_token`` Method
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Checking CSRF Tokens Manually
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In request handling code, you can check the presence and validity of a CSRF
-token with ``session.check_csrf_token(request)``. If the token is valid,
-it will return True, otherwise it will raise ``HTTPBadRequest``.
+token with :func:`pyramid.session.check_csrf_token(request)``. If the token is
+valid, it will return ``True``, otherwise it will raise ``HTTPBadRequest``.
+Optionally, you can specify ``raises=False`` to have the check return ``False``
+instead of raising an exception.
 
 By default, it checks for a GET or POST parameter named ``csrf_token`` or a
 header named ``X-CSRF-Token``.
 
 .. code-block:: python
 
+    from pyramid.session import check_csrf_token
+
     def myview(request):
-        session = request.session
-
         # Require CSRF Token
-        session.check_csrf_token(request):
+        check_csrf_token(request)
 
-        ...
+        # ...
 
 .. index::
    single: session.new_csrf_token

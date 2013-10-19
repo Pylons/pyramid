@@ -49,15 +49,19 @@ Writing View Callables Which Use a Renderer
 -------------------------------------------
 
 As we've seen, a view callable needn't always return a Response object.
-Instead, it may return an arbitrary Python object, with the expectation
-that a :term:`renderer` will convert that object into a response instance on
-your behalf.  Some renderers use a templating system; other renderers use
-object serialization techniques.
+Instead, it may return an arbitrary Python object, with the expectation that
+a :term:`renderer` will convert that object into a response instance on your
+behalf.  Some renderers use a templating system; other renderers use object
+serialization techniques.  In practice, renderers obtain application data
+values from Python dictionaries so, in practice, view callables which use
+renderers return Python dictionaries.
 
-View configuration can vary the renderer associated with a view callable via
-the ``renderer`` attribute.  For example, this call to
-:meth:`~pyramid.config.Configurator.add_view` associates the ``json`` renderer
-with a view callable:
+View callables can :ref:`explicitly call <example_render_to_response_call>`
+renderers, but typically don't.  Instead view configuration declares the
+renderer used to render a view callable's results.  This is done with the
+``renderer`` attribute.  For example, this call to
+:meth:`~pyramid.config.Configurator.add_view` associates the ``json``
+renderer with a view callable:
 
 .. code-block:: python
 

@@ -17,26 +17,26 @@ Pyramid is a breeze. Unfortunately "standard" is not so simple in Python.
 For this Quick Tour, it means:
 `Python <http://www.python.org/download/releases/>`_, a
 `virtual environment <http://docs.python.org/dev/library/venv.html>`_
-(or `virtualenv for Python 2.7 <https://pypi.python.org/pypi/virtualenv>`_,
+(or `virtualenv for Python 2.7 <https://pypi.python.org/pypi/virtualenv>`_),
 and `setuptools <https://pypi.python.org/pypi/setuptools/>`_.
 
 As an example, for Python 3.3+ on Linux:
 
-.. code-block:: bash
+.. parsed-literal::
 
   $ pyvenv env33
   $ wget https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py -O - | env33/bin/python
-  $ env33/bin/easy_install pyramid
+  $ env33/bin/easy_install "pyramid==\ |release|\ "
 
 For Windows:
 
-.. code-block:: posh
+.. parsed-literal::
 
     # Use your browser to download:
     #   https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py
-    c:\> c:\Python33\python -m venv env33
-    c:\> env33\Scripts\python ez_setup.py
-    c:\> env33\Scripts\easy_install pyramid
+    c:\\> c:\\Python33\\python -m venv env33
+    c:\\> env33\\Scripts\\python ez_setup.py
+    c:\\> env33\\Scripts\\easy_install "pyramid==\ |release|\ "
 
 Of course Pyramid runs fine on Python 2.6+, as do the examples in this
 *Quick Tour*. We're just showing Python 3 a little love (Pyramid had
@@ -297,7 +297,7 @@ The only change in our view...point the renderer at the ``.jinja2`` file:
 Our Jinja2 template is very similar to our previous template:
 
 .. literalinclude:: quick_tour/jinja2/hello_world.jinja2
-    :language: jinja
+    :language: html
 
 Pyramid's templating add-ons register a new kind of renderer into your
 application. The renderer registration maps to different kinds of
@@ -729,8 +729,8 @@ that requires semi-permanent data to be saved. For example, a shopping
 cart. This is called a :term:`session`.
 
 Pyramid has basic built-in support for sessions, with add-ons such as
-*Beaker* (or your own custom sessioning engine) that provide richer
-session support. Let's take a look at the
+``pyramid_redis_sessions`` (or your own custom sessioning engine) that provide 
+richer session support. Let's take a look at the
 :doc:`built-in sessioning support <../narr/sessions>`. In our
 ``__init__.py`` we first import the kind of sessioning we want:
 
@@ -768,8 +768,7 @@ Jinja2 template:
 .. seealso:: See Also:
     :ref:`Quick Tutorial Sessions <qtut_sessions>`,
     :ref:`sessions_chapter`, :ref:`flash_messages`,
-    :ref:`session_module`, and
-    :ref:`Beaker sessioning middleware <beaker:overview>`
+    :ref:`session_module`, and :term:`pyramid_redis_sessions`.
 
 Databases
 =========

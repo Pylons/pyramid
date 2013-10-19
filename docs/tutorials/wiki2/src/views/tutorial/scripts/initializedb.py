@@ -33,5 +33,5 @@ def main(argv=sys.argv):
     DBSession.configure(bind=engine)
     Base.metadata.create_all(engine)
     with transaction.manager:
-        model = Page('FrontPage', 'This is the front page')
+        model = Page(name='FrontPage', data='This is the front page')
         DBSession.add(model)

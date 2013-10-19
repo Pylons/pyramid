@@ -474,6 +474,17 @@ input of the ``prequest`` process is used as the ``POST`` body::
 
    $ $VENV/bin/prequest -mPOST development.ini / < somefile
 
+Using Custom Arguments to Python when Running ``p*`` Scripts
+------------------------------------------------------------
+
+.. versionadded:: 1.5
+
+Each of Pyramid's console scripts (``pserve``, ``pviews``, etc) can be run
+directly using ``python -m``, allowing custom arguments to be sent to the
+python interpreter at runtime. For example::
+
+      python -3 -m pyramid.scripts.pserve development.ini
+
 Showing All Installed Distributions and their Versions
 ------------------------------------------------------
 
