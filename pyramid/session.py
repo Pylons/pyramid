@@ -487,7 +487,9 @@ def SignedCookieSessionFactory(
     ``secret``
       A string which is used to sign the cookie. The secret should be at
       least as long as the block size of the selected hash algorithm. For
-      ``sha512`` this would mean a 128 bit (64 character) secret.
+      ``sha512`` this would mean a 128 bit (64 character) secret.  It should
+      be unique within the set of secret values provided to Pyramid for
+      its various subsystems (see :ref:`admonishment_against_secret_sharing`).
 
     ``hashalg``
       The HMAC digest algorithm to use for signing. The algorithm must be
@@ -496,7 +498,9 @@ def SignedCookieSessionFactory(
     ``salt``
       A namespace to avoid collisions between different uses of a shared
       secret. Reusing a secret for different parts of an application is
-      strongly discouraged. Default: ``'pyramid.session.'``.
+      strongly discouraged, see (see
+      :ref:`admonishment_against_secret_sharing`). Default:
+      ``'pyramid.session.'``.
 
     ``cookie_name``
       The name of the cookie used for sessioning. Default: ``'session'``.
