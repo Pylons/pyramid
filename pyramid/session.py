@@ -4,8 +4,8 @@ import hashlib
 import hmac
 import os
 import time
-import warnings
 
+from zope.deprecation import deprecated
 from zope.interface import implementer
 
 from pyramid.compat import (
@@ -133,11 +133,13 @@ def BaseCookieSessionFactory(
     set_on_exception=True,
     ):
     """
+    .. versionadded:: 1.5
+    
     Configure a :term:`session factory` which will provide cookie-based
-    sessions.  The return value of this function is a
-    :term:`session factory`, which may be provided as the ``session_factory``
-    argument of a :class:`pyramid.config.Configurator` constructor, or used
-    as the ``session_factory`` argument of the
+    sessions.  The return value of this function is a :term:`session factory`,
+    which may be provided as the ``session_factory`` argument of a
+    :class:`pyramid.config.Configurator` constructor, or used as the
+    ``session_factory`` argument of the
     :meth:`pyramid.config.Configurator.set_session_factory` method.
 
     The session factory returned by this function will create sessions
@@ -355,6 +357,7 @@ def BaseCookieSessionFactory(
 
     return CookieSession
 
+
 def UnencryptedCookieSessionFactoryConfig(
     secret,
     timeout=1200,
@@ -369,6 +372,9 @@ def UnencryptedCookieSessionFactoryConfig(
     signed_deserialize=signed_deserialize,
     ):
     """
+    .. deprecated:: 1.5
+       Use :func:`pyramid.session.SignedCookieSessionFactory` instead.
+    
     Configure a :term:`session factory` which will provide unencrypted
     (but signed) cookie-based sessions.  The return value of this
     function is a :term:`session factory`, which may be provided as
@@ -424,14 +430,6 @@ def UnencryptedCookieSessionFactoryConfig(
       is valid. Default: ``signed_deserialize`` (using pickle).
     """
 
-    warnings.warn(
-        ('The UnencryptedCookieSessionFactoryConfig is deprecated as of '
-         'Pyramid 1.5, and will be replaced by the '
-         'SignedCookieSessionFactory in future versions.'),
-        DeprecationWarning,
-        stacklevel=2
-        )
-
     return BaseCookieSessionFactory(
         lambda v: signed_serialize(v, secret),
         lambda v: signed_deserialize(v, secret),
@@ -444,6 +442,12 @@ def UnencryptedCookieSessionFactoryConfig(
         timeout=timeout,
         reissue_time=0, # to keep session.accessed == session.renewed
         set_on_exception=cookie_on_exception,
+    )
+
+deprecated(
+    'UnencryptedCookieSessionFactoryConfig',
+    'The UnencryptedCookieSessionFactoryConfig callable is deprecated as of '
+    'Pyramid 1.5.  Use ``pyramid.session.SignedCookieSessionFactory`` instead.'
     )
 
 def SignedCookieSessionFactory(
@@ -463,6 +467,8 @@ def SignedCookieSessionFactory(
     deserialize=None,
     ):
     """
+    .. versionadded:: 1.5
+    
     Configure a :term:`session factory` which will provide signed
     cookie-based sessions.  The return value of this
     function is a :term:`session factory`, which may be provided as

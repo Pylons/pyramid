@@ -371,6 +371,16 @@ class TestSignedCookieSession(SharedCookieSessionTests, unittest.TestCase):
         self.assertEqual(session, {})
 
 class TestUnencryptedCookieSession(SharedCookieSessionTests, unittest.TestCase):
+    def setUp(self):
+        super(TestUnencryptedCookieSession, self).setUp()
+        from zope.deprecation import __show__
+        __show__.off()
+
+    def tearDown(self):
+        super(TestUnencryptedCookieSession, self).tearDown()
+        from zope.deprecation import __show__
+        __show__.on()
+        
     def _makeOne(self, request, **kw):
         from pyramid.session import UnencryptedCookieSessionFactoryConfig
         self._rename_cookie_var(kw, 'path', 'cookie_path')
