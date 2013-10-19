@@ -672,7 +672,7 @@ configuration time to use it.
 
 .. _admonishment_against_secret_sharing:
 
-Admomishment Against Secret-Sharing
+Admonishment Against Secret-Sharing
 -----------------------------------
 
 A "secret" is required by various components of Pyramid.  For example, the
