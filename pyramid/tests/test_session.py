@@ -264,7 +264,8 @@ class SharedCookieSessionTests(object):
 class TestBaseCookieSession(SharedCookieSessionTests, unittest.TestCase):
     def _makeOne(self, request, **kw):
         from pyramid.session import BaseCookieSessionFactory
-        return BaseCookieSessionFactory(DummySerializer(), **kw)(request)
+        return BaseCookieSessionFactory(
+            dummy_serialize, dummy_deserialize, **kw)(request)
 
     def _serialize(self, value):
         return json.dumps(value)
@@ -281,13 +282,19 @@ class TestBaseCookieSession(SharedCookieSessionTests, unittest.TestCase):
 class TestSignedCookieSession(SharedCookieSessionTests, unittest.TestCase):
     def _makeOne(self, request, **kw):
         from pyramid.session import SignedCookieSessionFactory
-        return SignedCookieSessionFactory('secret', **kw)(request)
+        kw.setdefault('secret', 'secret')
+        return SignedCookieSessionFactory(**kw)(request)
 
-    def _serialize(self, value):
-        from pyramid.session import _SignedSerializer, _PickleSerializer
-        serializer = _PickleSerializer()
-        serializer = _SignedSerializer('secret', 'sha512', serializer)
-        return serializer.dumps(value)
+    def _serialize(self, value, salt='pyramid.session.', hashalg='sha512'):
+        import base64
+        import hashlib
+        import hmac
+        import pickle
+
+        digestmod = lambda: hashlib.new(hashalg)
+        cstruct = pickle.dumps(value, pickle.HIGHEST_PROTOCOL)
+        sig = hmac.new(salt + 'secret', cstruct, digestmod).digest()
+        return base64.b64encode(cstruct + sig)
 
     def test_reissue_not_triggered(self):
         import time
@@ -298,16 +305,70 @@ class TestSignedCookieSession(SharedCookieSessionTests, unittest.TestCase):
         self.assertEqual(session['state'], 1)
         self.assertFalse(session._dirty)
 
-    def test_custom_serializer(self):
+    def test_custom_salt(self):
         import time
-        from pyramid.session import _SignedSerializer
-        serializer = DummySerializer()
-        signer = _SignedSerializer('secret', 'sha512', serializer=serializer)
-        cookieval = signer.dumps((time.time(), 0, {'state': 1}))
         request = testing.DummyRequest()
+        cookieval = self._serialize((time.time(), 0, {'state': 1}), salt='f.')
         request.cookies['session'] = cookieval
-        session = self._makeOne(request, serializer=serializer)
+        session = self._makeOne(request, salt='f.')
         self.assertEqual(session['state'], 1)
+
+    def test_salt_mismatch(self):
+        import time
+        request = testing.DummyRequest()
+        cookieval = self._serialize((time.time(), 0, {'state': 1}), salt='f.')
+        request.cookies['session'] = cookieval
+        session = self._makeOne(request, salt='g.')
+        self.assertEqual(session, {})
+
+    def test_custom_hashalg(self):
+        import time
+        request = testing.DummyRequest()
+        cookieval = self._serialize((time.time(), 0, {'state': 1}),
+                                    hashalg='sha1')
+        request.cookies['session'] = cookieval
+        session = self._makeOne(request, hashalg='sha1')
+        self.assertEqual(session['state'], 1)
+
+    def test_hashalg_mismatch(self):
+        import time
+        request = testing.DummyRequest()
+        cookieval = self._serialize((time.time(), 0, {'state': 1}),
+                                    hashalg='sha1')
+        request.cookies['session'] = cookieval
+        session = self._makeOne(request, hashalg='sha256')
+        self.assertEqual(session, {})
+
+    def test_secret_mismatch(self):
+        import time
+        request = testing.DummyRequest()
+        cookieval = self._serialize((time.time(), 0, {'state': 1}))
+        request.cookies['session'] = cookieval
+        session = self._makeOne(request, secret='evilsecret')
+        self.assertEqual(session, {})
+
+    def test_custom_serializer(self):
+        import base64
+        from hashlib import sha512
+        import hmac
+        import time
+        request = testing.DummyRequest()
+        cstruct = dummy_serialize((time.time(), 0, {'state': 1}))
+        sig = hmac.new('pyramid.session.secret', cstruct, sha512).digest()
+        cookieval = base64.b64encode(cstruct + sig)
+        request.cookies['session'] = cookieval
+        session = self._makeOne(request, deserialize=dummy_deserialize)
+        self.assertEqual(session['state'], 1)
+
+    def test_invalid_data_size(self):
+        from hashlib import sha512
+        import base64
+        request = testing.DummyRequest()
+        num_bytes = sha512().digest_size - 1
+        cookieval = base64.b64encode(b' ' * num_bytes)
+        request.cookies['session'] = cookieval
+        session = self._makeOne(request)
+        self.assertEqual(session, {})
 
 class TestUnencryptedCookieSession(SharedCookieSessionTests, unittest.TestCase):
     def _makeOne(self, request, **kw):
@@ -471,66 +532,6 @@ class Test_signed_deserialize(unittest.TestCase):
         serialized = 'bad' + serialize('123', 'secret')
         self.assertRaises(ValueError, self._callFUT, serialized, 'secret')
 
-class TestSignedSerializer(unittest.TestCase):
-    def _makeOne(self, secret='secret', hashalg='sha512'):
-        from pyramid.session import _SignedSerializer
-        serializer = DummySerializer()
-        return _SignedSerializer(secret, hashalg, serializer)
-
-    def test_it_same_serializer(self):
-        serializer = self._makeOne()
-        appstruct = {'state': 1}
-        cstruct = serializer.dumps(appstruct)
-        result = serializer.loads(cstruct)
-        self.assertEqual(result, appstruct)
-
-    def test_it_different_serializers(self):
-        serializer1 = self._makeOne()
-        appstruct = {'state': 1}
-        cstruct = serializer1.dumps(appstruct)
-
-        serializer2 = self._makeOne()
-        result = serializer2.loads(cstruct)
-        self.assertEqual(result, appstruct)
-
-    def test_invalid_signature_with_different_secret(self):
-        serializer1 = self._makeOne('secret1')
-        appstruct = {'state': 1}
-        cstruct = serializer1.dumps(appstruct)
-
-        serializer2 = self._makeOne('secret2')
-        try:
-            serializer2.loads(cstruct)
-        except ValueError as exc:
-            self.assertTrue('Invalid signature' in exc.args[0])
-        else: # pragma: no cover
-            self.fail()
-
-    def test_invalid_signature_after_tamper(self):
-        import base64
-        serializer = self._makeOne()
-        appstruct = {'state': 1}
-        cstruct = serializer.dumps(appstruct)
-        actual_val = base64.b64decode(cstruct)
-        test_val = base64.b64encode(actual_val[1:])
-        try:
-            serializer.loads(test_val)
-        except ValueError as exc:
-            self.assertTrue('Invalid signature' in exc.args[0])
-        else: # pragma: no cover
-            self.fail()
-
-    def test_invalid_data_size(self):
-        import base64
-        serializer = self._makeOne()
-        num_bytes = serializer.digest_size + serializer.salt_size - 1
-        try:
-            serializer.loads(base64.b64encode(b' ' * num_bytes))
-        except ValueError as exc:
-            self.assertTrue('Input is too short' in exc.args[0])
-        else: # pragma: no cover
-            self.fail()
-
 class Test_check_csrf_token(unittest.TestCase):
     def _callFUT(self, *args, **kwargs):
         from ..session import check_csrf_token
@@ -566,12 +567,11 @@ class Test_check_csrf_token(unittest.TestCase):
         result = self._callFUT(request, 'csrf_token', raises=False)
         self.assertEqual(result, False)
 
-class DummySerializer(object):
-    def dumps(self, value):
-        return json.dumps(value).encode('utf-8')
+def dummy_serialize(value):
+    return json.dumps(value).encode('utf-8')
 
-    def loads(self, value):
-        return json.loads(value.decode('utf-8'))
+def dummy_deserialize(value):
+    return json.loads(value.decode('utf-8'))
 
 class DummySessionFactory(dict):
     _dirty = False
