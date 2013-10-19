@@ -498,7 +498,7 @@ def SignedCookieSessionFactory(
     ``salt``
       A namespace to avoid collisions between different uses of a shared
       secret. Reusing a secret for different parts of an application is
-      strongly discouraged, (see :ref:`admonishment_against_secret_sharing`).
+      strongly discouraged (see :ref:`admonishment_against_secret_sharing`).
       Default: ``'pyramid.session.'``.
 
     ``cookie_name``
