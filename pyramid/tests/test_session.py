@@ -381,9 +381,9 @@ class Test_check_csrf_token(unittest.TestCase):
         self.assertEqual(self._callFUT(request), True)
 
     def test_failure_raises(self):
-        from pyramid.httpexceptions import HTTPBadCSRFToken
+        from pyramid.exceptions import BadCSRFToken
         request = testing.DummyRequest()
-        self.assertRaises(HTTPBadCSRFToken, self._callFUT, request,
+        self.assertRaises(BadCSRFToken, self._callFUT, request,
                           'csrf_token')
 
     def test_failure_no_raises(self):

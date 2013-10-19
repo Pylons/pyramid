@@ -35,9 +35,6 @@ Exception
     HTTPError
       HTTPClientError
         * 400 - HTTPBadRequest
-
-          * 400 - HTTPBadCSRFToken
-
         * 401 - HTTPUnauthorized
         * 402 - HTTPPaymentRequired
         * 403 - HTTPForbidden
@@ -580,24 +577,6 @@ class HTTPBadRequest(HTTPClientError):
     although it's sub-classes specialize the 'Bad Request' text.
     """
     pass
-
-class HTTPBadCSRFToken(HTTPClientError):
-    """
-    subclass of :class:`~HTTPBadRequest`
-
-    This indicates the request has failed cross-site request forgery token
-    validation.
-
-    title: Bad CSRF Token
-    """
-    title = 'Bad CSRF Token'
-    explanation = (
-        'Access is denied.  This server can not verify that your cross-site '
-        'request forgery token belongs to your login session.  Either you '
-        'supplied the wrong cross-site request forgery token or your session '
-        'no longer exists.  This may be due to session timeout or because '
-        'browser is not supplying the credentials required, as can happen '
-        'when the browser has cookies turned off.')
 
 class HTTPUnauthorized(HTTPClientError):
     """
