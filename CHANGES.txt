@@ -15,6 +15,12 @@ Bug Fixes
   allowing traversal to continue.
   See https://github.com/Pylons/pyramid/issues/1104
 
+Deprecations
+------------
+
+- The ``UnencryptedCookieSessionFactoryConfig`` has been deprecated and will
+  be replaced by the ``SignedCookieSessionFactory``.
+
 
 1.5a2 (2013-09-22)
 ==================

@@ -1,10 +1,10 @@
-import hashlib
-from hashlib import sha1
 import base64
 import binascii
+import hashlib
 import hmac
-import time
 import os
+import time
+import warnings
 
 from zope.interface import implementer
 
@@ -55,7 +55,7 @@ def signed_serialize(data, secret):
        response.set_cookie('signed_cookie', cookieval)
     """
     pickled = pickle.dumps(data, pickle.HIGHEST_PROTOCOL)
-    sig = hmac.new(bytes_(secret), pickled, sha1).hexdigest()
+    sig = hmac.new(bytes_(secret), pickled, hashlib.sha1).hexdigest()
     return sig + native_(base64.b64encode(pickled))
 
 def signed_deserialize(serialized, secret, hmac=hmac):
@@ -79,7 +79,7 @@ def signed_deserialize(serialized, secret, hmac=hmac):
         # Badly formed data can make base64 die
         raise ValueError('Badly formed base64 data: %s' % e)
 
-    sig = bytes_(hmac.new(bytes_(secret), pickled, sha1).hexdigest())
+    sig = bytes_(hmac.new(bytes_(secret), pickled, hashlib.sha1).hexdigest())
 
     # Avoid timing attacks (see
     # http://seb.dbzteam.org/crypto/python-oauth-timing-hmac.pdf)
@@ -423,6 +423,14 @@ def UnencryptedCookieSessionFactoryConfig(
       and a secret and returns the original data structure if the signature
       is valid. Default: ``signed_deserialize`` (using pickle).
     """
+
+    warnings.warn(
+        ('The UnencryptedCookieSessionFactoryConfig is deprecated as of '
+         'Pyramid 1.5, and will be replaced by the '
+         'SignedCookieSessionFactory in future versions.'),
+        DeprecationWarning,
+        stacklevel=2
+        )
 
     return BaseCookieSessionFactory(
         lambda v: signed_serialize(v, secret),
