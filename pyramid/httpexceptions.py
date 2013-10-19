@@ -2,13 +2,10 @@
 HTTP Exceptions
 ---------------
 
-This module contains Pyramid HTTP exception classes.  Each class is a subclass
-of the :class:`~HTTPException`.  Each class relates to a single HTTP status
-code, although the reverse is not true.   There are
-:ref:`pyramid_specific_http_exceptions` which are sub-classes of the
-:rfc:`2608` HTTP status codes.  Each of these Pyramid-specific exceptions have
-the status code of it's parent.  Each exception class is also a
-:term:`response` object.
+This module contains Pyramid HTTP exception classes.  Each class relates to a
+single HTTP status code.  Each class is a subclass of the
+:class:`~HTTPException`.  Each exception class is also a :term:`response`
+object.
 
 Each exception class has a status code according to :rfc:`2068`:
 codes with 100-300 are not really errors; 400s are client errors,
@@ -571,10 +568,10 @@ class HTTPBadRequest(HTTPClientError):
     """
     subclass of :class:`~HTTPClientError`
 
-    base class for Pyramid-specific validity checks of the client's request
+    This indicates that the body or headers failed validity checks,
+    preventing the server from being able to continue processing.
 
-    This class and it's sub-classes result in a '400 Bad Request' HTTP status,
-    although it's sub-classes specialize the 'Bad Request' text.
+    code: 400, title: Bad Request
     """
     pass
 
