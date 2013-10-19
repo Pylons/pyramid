@@ -285,7 +285,7 @@ class TestSignedCookieSession(SharedCookieSessionTests, unittest.TestCase):
         kw.setdefault('secret', 'secret')
         return SignedCookieSessionFactory(**kw)(request)
 
-    def _serialize(self, value, salt='pyramid.session.', hashalg='sha512'):
+    def _serialize(self, value, salt=b'pyramid.session.', hashalg='sha512'):
         import base64
         import hashlib
         import hmac
@@ -293,7 +293,7 @@ class TestSignedCookieSession(SharedCookieSessionTests, unittest.TestCase):
 
         digestmod = lambda: hashlib.new(hashalg)
         cstruct = pickle.dumps(value, pickle.HIGHEST_PROTOCOL)
-        sig = hmac.new(salt + 'secret', cstruct, digestmod).digest()
+        sig = hmac.new(salt + b'secret', cstruct, digestmod).digest()
         return base64.b64encode(cstruct + sig)
 
     def test_reissue_not_triggered(self):
@@ -308,17 +308,17 @@ class TestSignedCookieSession(SharedCookieSessionTests, unittest.TestCase):
     def test_custom_salt(self):
         import time
         request = testing.DummyRequest()
-        cookieval = self._serialize((time.time(), 0, {'state': 1}), salt='f.')
+        cookieval = self._serialize((time.time(), 0, {'state': 1}), salt=b'f.')
         request.cookies['session'] = cookieval
-        session = self._makeOne(request, salt='f.')
+        session = self._makeOne(request, salt=b'f.')
         self.assertEqual(session['state'], 1)
 
     def test_salt_mismatch(self):
         import time
         request = testing.DummyRequest()
-        cookieval = self._serialize((time.time(), 0, {'state': 1}), salt='f.')
+        cookieval = self._serialize((time.time(), 0, {'state': 1}), salt=b'f.')
         request.cookies['session'] = cookieval
-        session = self._makeOne(request, salt='g.')
+        session = self._makeOne(request, salt=b'g.')
         self.assertEqual(session, {})
 
     def test_custom_hashalg(self):
@@ -354,7 +354,7 @@ class TestSignedCookieSession(SharedCookieSessionTests, unittest.TestCase):
         import time
         request = testing.DummyRequest()
         cstruct = dummy_serialize((time.time(), 0, {'state': 1}))
-        sig = hmac.new('pyramid.session.secret', cstruct, sha512).digest()
+        sig = hmac.new(b'pyramid.session.secret', cstruct, sha512).digest()
         cookieval = base64.b64encode(cstruct + sig)
         request.cookies['session'] = cookieval
         session = self._makeOne(request, deserialize=dummy_deserialize)
