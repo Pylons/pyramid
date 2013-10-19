@@ -7,9 +7,9 @@
 
   .. attribute:: status_map
 
-     A mapping of integer status code to exception class (eg. the
-     integer "401" maps to
-     :class:`pyramid.httpexceptions.HTTPUnauthorized`).
+     A mapping of integer status code to HTTP exception class (eg. the integer
+     "401" maps to :class:`pyramid.httpexceptions.HTTPUnauthorized`).  All
+     mapped exception classes are children of :class:`pyramid.httpexceptions`,
 
   .. autofunction:: exception_response
 
