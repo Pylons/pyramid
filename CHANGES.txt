@@ -40,6 +40,9 @@ Documentation
 - Removed mention of ``pyramid_beaker`` from docs.  Beaker is no longer 
   maintained.  Point people at ``pyramid_redis_sessions`` instead.
 
+- Add documentation for ``pyramid.interfaces.IRendererFactory`` and
+  ``pyramid.interfaces.IRenderer``.
+
 Backwards Incompatibilities
 ---------------------------
 
@@ -49,6 +52,12 @@ Backwards Incompatibilities
   query string to be ``a=b&key=None``. The value is now dropped in this
   situation, leaving a query string of ``a=b&key=``.
   See https://github.com/Pylons/pyramid/issues/1119
+
+Deprecations
+------------
+
+- Deprecate the ``pyraid.interfaces.ITemplateRenderer`` interface. It is no
+  longer used since Mako and Chameleon have been split into their own packages.
 
 1.5a2 (2013-09-22)
 ==================

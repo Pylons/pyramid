@@ -367,9 +367,29 @@ class IBeforeRender(IDict):
                               '``render`` method for this rendering. '
                               'This feature is new in Pyramid 1.2.')
 
+class IRendererInfo(Interface):
+    """ An object implementing this interface is passed to every
+    :term:`renderer factory` constructor as its only argument (conventionally
+    named ``info``)"""
+    name = Attribute('The value passed by the user as the renderer name')
+    package = Attribute('The "current package" when the renderer '
+                        'configuration statement was found')
+    type = Attribute('The renderer type name')
+    registry = Attribute('The "current" application registry when the '
+                         'renderer was created')
+    settings = Attribute('The deployment settings dictionary related '
+                         'to the current application')
+
+class IRendererFactory(Interface):
+    def __call__(info):
+        """ Return an object that implements
+        :class:`pyramid.interfaces.IRenderer`. ``info`` is an
+        object that implements :class:`pyramid.interfaces.IRendererInfo`.
+        """
+
 class IRenderer(Interface):
     def __call__(value, system):
-        """ Call a the renderer implementation with the result of the
+        """ Call the renderer with the result of the
         view (``value``) passed in and return a result (a string or
         unicode object useful as a response body).  Values computed by
         the system are passed by the system in the ``system``
@@ -386,6 +406,13 @@ class ITemplateRenderer(IRenderer):
         uses to render the template; it is typically a callable that
         accepts arbitrary keyword arguments and returns a string or
         unicode object """
+
+deprecated(
+    'ITemplateRenderer',
+    'As of Pyramid 1.5 the, "pyramid.interfaces.ITemplateRenderer" interface '
+    'is scheduled to be removed. It was used by the Mako and Chameleon '
+    'renderers which have been split into their own packages.'
+    )
 
 class IViewMapper(Interface):
     def __call__(self, object):
@@ -611,17 +638,13 @@ class ITraverser(Interface):
 
 ITraverserFactory = ITraverser # b / c for 1.0 code
 
-class IRendererFactory(Interface):
-    def __call__(info):
-        """ Return an object that implements ``IRenderer``.  ``info`` is an
-        object that implement ``IRendererInfo``.  """
-
 class IViewPermission(Interface):
     def __call__(context, request):
-        """ Return True if the permission allows, return False if it denies. """
+        """ Return True if the permission allows, return False if it denies.
+        """
 
 class IRouter(Interface):
-    """WSGI application which routes requests to 'view' code based on
+    """ WSGI application which routes requests to 'view' code based on
     a view registry."""
     registry = Attribute(
         """Component architecture registry local to this application.""")
@@ -931,20 +954,6 @@ class ISession(IDict):
         called, which will create and set a token, and this token will be
         returned.
         """
-
-class IRendererInfo(Interface):
-    """ An object implementing this interface is passed to every
-    :term:`renderer factory` constructor as its only argument (conventionally
-    named ``info``)"""
-    name = Attribute('The value passed by the user as the renderer name')
-    package = Attribute('The "current package" when the renderer '
-                        'configuration statement was found')
-    type = Attribute('The renderer type name')
-    registry = Attribute('The "current" application registry when the '
-                         'renderer was created')
-    settings = Attribute('The deployment settings dictionary related '
-                         'to the current application')
-
 
 class IIntrospector(Interface):
     def get(category_name, discriminator, default=None):

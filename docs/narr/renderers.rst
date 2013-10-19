@@ -480,8 +480,11 @@ Adding a New Renderer
 You may add a new renderer by creating and registering a :term:`renderer
 factory`.
 
-A renderer factory implementation is typically a class with the
-following interface:
+A renderer factory implementation should conform to the
+:class:`pyramid.interfaces.IRendererFactory` interface. It should be capable
+of creating an object that conforms to the
+:class:`pyramid.interfaces.IRenderer` interface. A typical class that follows
+this setup is as follows:
 
 .. code-block:: python
    :linenos:
