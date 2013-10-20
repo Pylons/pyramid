@@ -1184,6 +1184,8 @@ class BasicAuthAuthenticationPolicy(CallbackAuthenticationPolicy):
         except (TypeError, binascii.Error): # can't decode
             return None
 
+        # try utf-8 first, then latin-1; see discussion in
+        # https://github.com/Pylons/pyramid/issues/898
         try:
             auth = authbytes.decode('utf-8')
         except UnicodeDecodeError:
