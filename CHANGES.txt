@@ -10,6 +10,11 @@ Features
 
       python -3 -m pyramid.scripts.pserve development.ini
 
+- Added a specific subclass of ``HTTPBadRequest`` named
+  ``pyramid.exceptions.BadCSRFToken`` which will now be raised in response
+  to failures in ``check_csrf_token``.
+  See https://github.com/Pylons/pyramid/pull/1149
+
 - Added a new ``SignedCookieSessionFactory`` which is very similar to the
   ``UnencryptedCookieSessionFactoryConfig`` but with a clearer focus on
   signing content. The custom serializer arguments to this function should

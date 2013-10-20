@@ -16,7 +16,7 @@ from pyramid.compat import (
     native_,
     )
 
-from pyramid.httpexceptions import HTTPBadRequest
+from pyramid.exceptions import BadCSRFToken
 from pyramid.interfaces import ISession
 from pyramid.util import strings_differ
 
@@ -102,7 +102,7 @@ def check_csrf_token(request,
     If the value supplied by param or by header doesn't match the value
     supplied by ``request.session.get_csrf_token()``, and ``raises`` is
     ``True``, this function will raise an
-    :exc:`pyramid.httpexceptions.HTTPBadRequest` exception.
+    :exc:`pyramid.exceptions.BadCSRFToken` exception.
     If the check does succeed and ``raises`` is ``False``, this
     function will return ``False``.  If the CSRF check is successful, this
     function will return ``True`` unconditionally.
@@ -115,7 +115,7 @@ def check_csrf_token(request,
     supplied_token = request.params.get(token, request.headers.get(header))
     if supplied_token != request.session.get_csrf_token():
         if raises:
-            raise HTTPBadRequest('incorrect CSRF token')
+            raise BadCSRFToken('check_csrf_token(): Invalid token')
         return False
     return True
 
