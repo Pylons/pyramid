@@ -5,12 +5,16 @@
 
 .. automodule:: pyramid.session
 
-  .. autofunction:: UnencryptedCookieSessionFactoryConfig
-
   .. autofunction:: signed_serialize
 
   .. autofunction:: signed_deserialize
 
   .. autofunction:: check_csrf_token
+
+  .. autofunction:: SignedCookieSessionFactory
+
+  .. autofunction:: UnencryptedCookieSessionFactoryConfig
+
+  .. autofunction:: BaseCookieSessionFactory
 
 
