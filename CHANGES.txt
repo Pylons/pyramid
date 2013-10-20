@@ -65,6 +65,9 @@ Documentation
 - Removed mention of ``pyramid_beaker`` from docs.  Beaker is no longer 
   maintained.  Point people at ``pyramid_redis_sessions`` instead.
 
+- Add documentation for ``pyramid.interfaces.IRendererFactory`` and
+  ``pyramid.interfaces.IRenderer``.
+
 Backwards Incompatibilities
 ---------------------------
 
@@ -77,6 +80,10 @@ Backwards Incompatibilities
 
 Deprecations
 ------------
+
+- Deprecate the ``pyramid.interfaces.ITemplateRenderer`` interface. It was
+  ill-defined and became unused when Mako and Chameleon template bindings were
+  split into their own packages.
 
 - The ``pyramid.session.UnencryptedCookieSessionFactoryConfig`` API has been 
   deprecated and is superseded by the 

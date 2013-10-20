@@ -40,9 +40,6 @@ class TestViewsConfigurationMixin(unittest.TestCase):
 
     def _registerRenderer(self, config, name='.txt'):
         from pyramid.interfaces import IRendererFactory
-        from pyramid.interfaces import ITemplateRenderer
-        from zope.interface import implementer
-        @implementer(ITemplateRenderer)
         class Renderer:
             def __init__(self, info):
                 self.__class__.info = info
