@@ -1,10 +1,11 @@
-from hashlib import sha1
 import base64
 import binascii
+import hashlib
 import hmac
-import time
 import os
+import time
 
+from zope.deprecation import deprecated
 from zope.interface import implementer
 
 from pyramid.compat import (
@@ -20,19 +21,25 @@ from pyramid.interfaces import ISession
 from pyramid.util import strings_differ
 
 def manage_accessed(wrapped):
-    """ Decorator which causes a cookie to be set when a wrapped
-    method is called"""
+    """ Decorator which causes a cookie to be renewed when an accessor
+    method is called."""
     def accessed(session, *arg, **kw):
-        session.accessed = int(time.time())
-        if not session._dirty:
-            session._dirty = True
-            def set_cookie_callback(request, response):
-                session._set_cookie(response)
-                session.request = None # explicitly break cycle for gc
-            session.request.add_response_callback(set_cookie_callback)
+        session.accessed = now = int(time.time())
+        if now - session.renewed > session._reissue_time:
+            session.changed()
         return wrapped(session, *arg, **kw)
     accessed.__doc__ = wrapped.__doc__
     return accessed
+
+def manage_changed(wrapped):
+    """ Decorator which causes a cookie to be set when a setter method
+    is called."""
+    def changed(session, *arg, **kw):
+        session.accessed = int(time.time())
+        session.changed()
+        return wrapped(session, *arg, **kw)
+    changed.__doc__ = wrapped.__doc__
+    return changed
 
 def signed_serialize(data, secret):
     """ Serialize any pickleable structure (``data``) and sign it
@@ -48,7 +55,7 @@ def signed_serialize(data, secret):
        response.set_cookie('signed_cookie', cookieval)
     """
     pickled = pickle.dumps(data, pickle.HIGHEST_PROTOCOL)
-    sig = hmac.new(bytes_(secret), pickled, sha1).hexdigest()
+    sig = hmac.new(bytes_(secret), pickled, hashlib.sha1).hexdigest()
     return sig + native_(base64.b64encode(pickled))
 
 def signed_deserialize(serialized, secret, hmac=hmac):
@@ -66,13 +73,13 @@ def signed_deserialize(serialized, secret, hmac=hmac):
     """
     # hmac parameterized only for unit tests
     try:
-        input_sig, pickled = (serialized[:40],
+        input_sig, pickled = (bytes_(serialized[:40]),
                               base64.b64decode(bytes_(serialized[40:])))
     except (binascii.Error, TypeError) as e:
         # Badly formed data can make base64 die
         raise ValueError('Badly formed base64 data: %s' % e)
 
-    sig = hmac.new(bytes_(secret), pickled, sha1).hexdigest()
+    sig = bytes_(hmac.new(bytes_(secret), pickled, hashlib.sha1).hexdigest())
 
     # Avoid timing attacks (see
     # http://seb.dbzteam.org/crypto/python-oauth-timing-hmac.pdf)
@@ -112,6 +119,245 @@ def check_csrf_token(request,
         return False
     return True
 
+def BaseCookieSessionFactory(
+    serialize,
+    deserialize,
+    cookie_name='session',
+    max_age=None,
+    path='/',
+    domain=None,
+    secure=False,
+    httponly=False,
+    timeout=1200,
+    reissue_time=0,
+    set_on_exception=True,
+    ):
+    """
+    .. versionadded:: 1.5
+    
+    Configure a :term:`session factory` which will provide cookie-based
+    sessions.  The return value of this function is a :term:`session factory`,
+    which may be provided as the ``session_factory`` argument of a
+    :class:`pyramid.config.Configurator` constructor, or used as the
+    ``session_factory`` argument of the
+    :meth:`pyramid.config.Configurator.set_session_factory` method.
+
+    The session factory returned by this function will create sessions
+    which are limited to storing fewer than 4000 bytes of data (as the
+    payload must fit into a single cookie).
+
+    .. warning:
+
+       This class provides no protection from tampering and is only intended
+       to be used by framework authors to create their own cookie-based
+       session factories.
+
+    Parameters:
+
+    ``serialize``
+      A callable accepting a Python object and returning a bytestring. A
+      ``ValueError`` should be raised for malformed inputs.
+
+    ``deserialize``
+      A callable accepting a bytestring and returning a Python object. A
+      ``ValueError`` should be raised for malformed inputs.
+
+    ``cookie_name``
+      The name of the cookie used for sessioning. Default: ``'session'``.
+
+    ``max_age``
+      The maximum age of the cookie used for sessioning (in seconds).
+      Default: ``None`` (browser scope).
+
+    ``path``
+      The path used for the session cookie. Default: ``'/'``.
+
+    ``domain``
+      The domain used for the session cookie.  Default: ``None`` (no domain).
+
+    ``secure``
+      The 'secure' flag of the session cookie. Default: ``False``.
+
+    ``httponly``
+      Hide the cookie from Javascript by setting the 'HttpOnly' flag of the
+      session cookie. Default: ``False``.
+
+    ``timeout``
+      A number of seconds of inactivity before a session times out. If
+      ``None`` then the cookie never expires. Default: 1200.
+
+    ``reissue_time``
+      The number of seconds that must pass before the cookie is automatically
+      reissued as the result of a request which accesses the session. The
+      duration is measured as the number of seconds since the last session
+      cookie was issued and 'now'.  If this value is ``0``, a new cookie
+      will be reissued on every request accesses the session. If ``None``
+      then the cookie's lifetime will never be extended.
+
+      A good rule of thumb: if you want auto-expired cookies based on
+      inactivity: set the ``timeout`` value to 1200 (20 mins) and set the
+      ``reissue_time`` value to perhaps a tenth of the ``timeout`` value
+      (120 or 2 mins).  It's nonsensical to set the ``timeout`` value lower
+      than the ``reissue_time`` value, as the ticket will never be reissued.
+      However, such a configuration is not explicitly prevented.
+
+      Default: ``0``.
+
+    ``set_on_exception``
+      If ``True``, set a session cookie even if an exception occurs
+      while rendering a view. Default: ``True``.
+
+    .. versionadded: 1.5a3
+    """
+
+    @implementer(ISession)
+    class CookieSession(dict):
+        """ Dictionary-like session object """
+
+        # configuration parameters
+        _cookie_name = cookie_name
+        _cookie_max_age = max_age
+        _cookie_path = path
+        _cookie_domain = domain
+        _cookie_secure = secure
+        _cookie_httponly = httponly
+        _cookie_on_exception = set_on_exception
+        _timeout = timeout
+        _reissue_time = reissue_time
+
+        # dirty flag
+        _dirty = False
+
+        def __init__(self, request):
+            self.request = request
+            now = time.time()
+            created = renewed = now
+            new = True
+            value = None
+            state = {}
+            cookieval = request.cookies.get(self._cookie_name)
+            if cookieval is not None:
+                try:
+                    value = deserialize(bytes_(cookieval))
+                except ValueError:
+                    # the cookie failed to deserialize, dropped
+                    value = None
+
+            if value is not None:
+                try:
+                    renewed, created, state = value
+                    new = False
+                    if now - renewed > self._timeout:
+                        # expire the session because it was not renewed
+                        # before the timeout threshold
+                        state = {}
+                except TypeError:
+                    # value failed to unpack properly or renewed was not
+                    # a numeric type so we'll fail deserialization here
+                    state = {}
+
+            self.created = created
+            self.accessed = renewed
+            self.renewed = renewed
+            self.new = new
+            dict.__init__(self, state)
+
+        # ISession methods
+        def changed(self):
+            if not self._dirty:
+                self._dirty = True
+                def set_cookie_callback(request, response):
+                    self._set_cookie(response)
+                    self.request = None # explicitly break cycle for gc
+                self.request.add_response_callback(set_cookie_callback)
+
+        def invalidate(self):
+            self.clear() # XXX probably needs to unset cookie
+
+        # non-modifying dictionary methods
+        get = manage_accessed(dict.get)
+        __getitem__ = manage_accessed(dict.__getitem__)
+        items = manage_accessed(dict.items)
+        values = manage_accessed(dict.values)
+        keys = manage_accessed(dict.keys)
+        __contains__ = manage_accessed(dict.__contains__)
+        __len__ = manage_accessed(dict.__len__)
+        __iter__ = manage_accessed(dict.__iter__)
+
+        if not PY3:
+            iteritems = manage_accessed(dict.iteritems)
+            itervalues = manage_accessed(dict.itervalues)
+            iterkeys = manage_accessed(dict.iterkeys)
+            has_key = manage_accessed(dict.has_key)
+
+        # modifying dictionary methods
+        clear = manage_changed(dict.clear)
+        update = manage_changed(dict.update)
+        setdefault = manage_changed(dict.setdefault)
+        pop = manage_changed(dict.pop)
+        popitem = manage_changed(dict.popitem)
+        __setitem__ = manage_changed(dict.__setitem__)
+        __delitem__ = manage_changed(dict.__delitem__)
+
+        # flash API methods
+        @manage_changed
+        def flash(self, msg, queue='', allow_duplicate=True):
+            storage = self.setdefault('_f_' + queue, [])
+            if allow_duplicate or (msg not in storage):
+                storage.append(msg)
+
+        @manage_changed
+        def pop_flash(self, queue=''):
+            storage = self.pop('_f_' + queue, [])
+            return storage
+
+        @manage_accessed
+        def peek_flash(self, queue=''):
+            storage = self.get('_f_' + queue, [])
+            return storage
+
+        # CSRF API methods
+        @manage_changed
+        def new_csrf_token(self):
+            token = text_(binascii.hexlify(os.urandom(20)))
+            self['_csrft_'] = token
+            return token
+
+        @manage_accessed
+        def get_csrf_token(self):
+            token = self.get('_csrft_', None)
+            if token is None:
+                token = self.new_csrf_token()
+            return token
+
+        # non-API methods
+        def _set_cookie(self, response):
+            if not self._cookie_on_exception:
+                exception = getattr(self.request, 'exception', None)
+                if exception is not None: # dont set a cookie during exceptions
+                    return False
+            cookieval = native_(serialize(
+                (self.accessed, self.created, dict(self))
+                ))
+            if len(cookieval) > 4064:
+                raise ValueError(
+                    'Cookie value is too long to store (%s bytes)' %
+                    len(cookieval)
+                    )
+            response.set_cookie(
+                self._cookie_name,
+                value=cookieval,
+                max_age=self._cookie_max_age,
+                path=self._cookie_path,
+                domain=self._cookie_domain,
+                secure=self._cookie_secure,
+                httponly=self._cookie_httponly,
+                )
+            return True
+
+    return CookieSession
+
+
 def UnencryptedCookieSessionFactoryConfig(
     secret,
     timeout=1200,
@@ -119,13 +365,16 @@ def UnencryptedCookieSessionFactoryConfig(
     cookie_max_age=None,
     cookie_path='/',
     cookie_domain=None,
-    cookie_secure=False, 
+    cookie_secure=False,
     cookie_httponly=False,
     cookie_on_exception=True,
     signed_serialize=signed_serialize,
     signed_deserialize=signed_deserialize,
     ):
     """
+    .. deprecated:: 1.5
+       Use :func:`pyramid.session.SignedCookieSessionFactory` instead.
+    
     Configure a :term:`session factory` which will provide unencrypted
     (but signed) cookie-based sessions.  The return value of this
     function is a :term:`session factory`, which may be provided as
@@ -181,137 +430,176 @@ def UnencryptedCookieSessionFactoryConfig(
       is valid. Default: ``signed_deserialize`` (using pickle).
     """
 
-    @implementer(ISession)
-    class UnencryptedCookieSessionFactory(dict):
-        """ Dictionary-like session object """
+    return BaseCookieSessionFactory(
+        lambda v: signed_serialize(v, secret),
+        lambda v: signed_deserialize(v, secret),
+        cookie_name=cookie_name,
+        max_age=cookie_max_age,
+        path=cookie_path,
+        domain=cookie_domain,
+        secure=cookie_secure,
+        httponly=cookie_httponly,
+        timeout=timeout,
+        reissue_time=0, # to keep session.accessed == session.renewed
+        set_on_exception=cookie_on_exception,
+    )
 
-        # configuration parameters
-        _cookie_name = cookie_name
-        _cookie_max_age = cookie_max_age
-        _cookie_path = cookie_path
-        _cookie_domain = cookie_domain
-        _cookie_secure = cookie_secure
-        _cookie_httponly = cookie_httponly
-        _cookie_on_exception = cookie_on_exception
-        _secret = secret
-        _timeout = timeout
+deprecated(
+    'UnencryptedCookieSessionFactoryConfig',
+    'The UnencryptedCookieSessionFactoryConfig callable is deprecated as of '
+    'Pyramid 1.5.  Use ``pyramid.session.SignedCookieSessionFactory`` instead.'
+    )
 
-        # dirty flag
-        _dirty = False
+def SignedCookieSessionFactory(
+    secret,
+    cookie_name='session',
+    max_age=None,
+    path='/',
+    domain=None,
+    secure=False,
+    httponly=False,
+    set_on_exception=True,
+    timeout=1200,
+    reissue_time=0,
+    hashalg='sha512',
+    salt='pyramid.session.',
+    serialize=None,
+    deserialize=None,
+    ):
+    """
+    .. versionadded:: 1.5
+    
+    Configure a :term:`session factory` which will provide signed
+    cookie-based sessions.  The return value of this
+    function is a :term:`session factory`, which may be provided as
+    the ``session_factory`` argument of a
+    :class:`pyramid.config.Configurator` constructor, or used
+    as the ``session_factory`` argument of the
+    :meth:`pyramid.config.Configurator.set_session_factory`
+    method.
 
-        def __init__(self, request):
-            self.request = request
-            now = time.time()
-            created = accessed = now
-            new = True
-            value = None
-            state = {}
-            cookieval = request.cookies.get(self._cookie_name)
-            if cookieval is not None:
-                try:
-                    value = signed_deserialize(cookieval, self._secret)
-                except ValueError:
-                    value = None
+    The session factory returned by this function will create sessions
+    which are limited to storing fewer than 4000 bytes of data (as the
+    payload must fit into a single cookie).
 
-            if value is not None:
-                accessed, created, state = value
-                new = False
-                if now - accessed > self._timeout:
-                    state = {}
+    Parameters:
 
-            self.created = created
-            self.accessed = accessed
-            self.new = new
-            dict.__init__(self, state)
+    ``secret``
+      A string which is used to sign the cookie. The secret should be at
+      least as long as the block size of the selected hash algorithm. For
+      ``sha512`` this would mean a 128 bit (64 character) secret.  It should
+      be unique within the set of secret values provided to Pyramid for
+      its various subsystems (see :ref:`admonishment_against_secret_sharing`).
 
-        # ISession methods
-        def changed(self):
-            """ This is intentionally a noop; the session is
-            serialized on every access, so unnecessary"""
-            pass
+    ``hashalg``
+      The HMAC digest algorithm to use for signing. The algorithm must be
+      supported by the :mod:`hashlib` library. Default: ``'sha512'``.
 
-        def invalidate(self):
-            self.clear() # XXX probably needs to unset cookie
+    ``salt``
+      A namespace to avoid collisions between different uses of a shared
+      secret. Reusing a secret for different parts of an application is
+      strongly discouraged (see :ref:`admonishment_against_secret_sharing`).
+      Default: ``'pyramid.session.'``.
 
-        # non-modifying dictionary methods
-        get = manage_accessed(dict.get)
-        __getitem__ = manage_accessed(dict.__getitem__)
-        items = manage_accessed(dict.items)
-        values = manage_accessed(dict.values)
-        keys = manage_accessed(dict.keys)
-        __contains__ = manage_accessed(dict.__contains__)
-        __len__ = manage_accessed(dict.__len__)
-        __iter__ = manage_accessed(dict.__iter__)
+    ``cookie_name``
+      The name of the cookie used for sessioning. Default: ``'session'``.
 
-        if not PY3:
-            iteritems = manage_accessed(dict.iteritems)
-            itervalues = manage_accessed(dict.itervalues)
-            iterkeys = manage_accessed(dict.iterkeys)
-            has_key = manage_accessed(dict.has_key)
+    ``max_age``
+      The maximum age of the cookie used for sessioning (in seconds).
+      Default: ``None`` (browser scope).
 
-        # modifying dictionary methods
-        clear = manage_accessed(dict.clear)
-        update = manage_accessed(dict.update)
-        setdefault = manage_accessed(dict.setdefault)
-        pop = manage_accessed(dict.pop)
-        popitem = manage_accessed(dict.popitem)
-        __setitem__ = manage_accessed(dict.__setitem__)
-        __delitem__ = manage_accessed(dict.__delitem__)
+    ``path``
+      The path used for the session cookie. Default: ``'/'``.
 
-        # flash API methods
-        @manage_accessed
-        def flash(self, msg, queue='', allow_duplicate=True):
-            storage = self.setdefault('_f_' + queue, [])
-            if allow_duplicate or (msg not in storage):
-                storage.append(msg)
+    ``domain``
+      The domain used for the session cookie.  Default: ``None`` (no domain).
 
-        @manage_accessed
-        def pop_flash(self, queue=''):
-            storage = self.pop('_f_' + queue, [])
-            return storage
+    ``secure``
+      The 'secure' flag of the session cookie. Default: ``False``.
 
-        @manage_accessed
-        def peek_flash(self, queue=''):
-            storage = self.get('_f_' + queue, [])
-            return storage
+    ``httponly``
+      Hide the cookie from Javascript by setting the 'HttpOnly' flag of the
+      session cookie. Default: ``False``.
 
-        # CSRF API methods
-        @manage_accessed
-        def new_csrf_token(self):
-            token = text_(binascii.hexlify(os.urandom(20)))
-            self['_csrft_'] = token
-            return token
+    ``timeout``
+      A number of seconds of inactivity before a session times out. If
+      ``None`` then the cookie never expires. Default: 1200.
 
-        @manage_accessed
-        def get_csrf_token(self):
-            token = self.get('_csrft_', None)
-            if token is None:
-                token = self.new_csrf_token()
-            return token
+    ``reissue_time``
+      The number of seconds that must pass before the cookie is automatically
+      reissued as the result of a request which accesses the session. The
+      duration is measured as the number of seconds since the last session
+      cookie was issued and 'now'.  If this value is ``0``, a new cookie
+      will be reissued on every request accesses the session. If ``None``
+      then the cookie's lifetime will never be extended.
 
-        # non-API methods
-        def _set_cookie(self, response):
-            if not self._cookie_on_exception:
-                exception = getattr(self.request, 'exception', None)
-                if exception is not None: # dont set a cookie during exceptions
-                    return False
-            cookieval = signed_serialize(
-                (self.accessed, self.created, dict(self)), self._secret
-                )
-            if len(cookieval) > 4064:
-                raise ValueError(
-                    'Cookie value is too long to store (%s bytes)' %
-                    len(cookieval)
-                    )
-            response.set_cookie(
-                self._cookie_name,
-                value=cookieval,
-                max_age = self._cookie_max_age,
-                path = self._cookie_path,
-                domain = self._cookie_domain,
-                secure = self._cookie_secure,
-                httponly = self._cookie_httponly,
-                )
-            return True
+      A good rule of thumb: if you want auto-expired cookies based on
+      inactivity: set the ``timeout`` value to 1200 (20 mins) and set the
+      ``reissue_time`` value to perhaps a tenth of the ``timeout`` value
+      (120 or 2 mins).  It's nonsensical to set the ``timeout`` value lower
+      than the ``reissue_time`` value, as the ticket will never be reissued.
+      However, such a configuration is not explicitly prevented.
 
-    return UnencryptedCookieSessionFactory
+      Default: ``0``.
+
+    ``set_on_exception``
+      If ``True``, set a session cookie even if an exception occurs
+      while rendering a view. Default: ``True``.
+
+    ``serialize``
+      A callable accepting a Python object and returning a bytestring. A
+      ``ValueError`` should be raised for malformed inputs.
+      Default: :func:`pickle.dumps`.
+
+    ``deserialize``
+      A callable accepting a bytestring and returning a Python object. A
+      ``ValueError`` should be raised for malformed inputs.
+      Default: :func:`pickle.loads`.
+
+    .. versionadded: 1.5a3
+    """
+
+    if serialize is None:
+        serialize = lambda v: pickle.dumps(v, pickle.HIGHEST_PROTOCOL)
+
+    if deserialize is None:
+        deserialize = pickle.loads
+
+    digestmod = lambda: hashlib.new(hashalg)
+    digest_size = digestmod().digest_size
+
+    salted_secret = bytes_(salt or '') + bytes_(secret)
+
+    def signed_serialize(appstruct):
+        cstruct = serialize(appstruct)
+        sig = hmac.new(salted_secret, cstruct, digestmod).digest()
+        return base64.b64encode(cstruct + sig)
+
+    def signed_deserialize(bstruct):
+        try:
+            fstruct = base64.b64decode(bstruct)
+        except (binascii.Error, TypeError) as e:
+            raise ValueError('Badly formed base64 data: %s' % e)
+
+        cstruct = fstruct[:-digest_size]
+        expected_sig = fstruct[-digest_size:]
+
+        sig = hmac.new(salted_secret, cstruct, digestmod).digest()
+        if strings_differ(sig, expected_sig):
+            raise ValueError('Invalid signature')
+
+        return deserialize(cstruct)
+
+    return BaseCookieSessionFactory(
+        signed_serialize,
+        signed_deserialize,
+        cookie_name=cookie_name,
+        max_age=max_age,
+        path=path,
+        domain=domain,
+        secure=secure,
+        httponly=httponly,
+        timeout=timeout,
+        reissue_time=reissue_time,
+        set_on_exception=set_on_exception,
+    )
