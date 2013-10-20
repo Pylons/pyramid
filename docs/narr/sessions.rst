@@ -43,24 +43,23 @@ limitations:
 It is digitally signed, however, and thus its data cannot easily be
 tampered with.
 
-You can configure this session factory in your :app:`Pyramid`
-application by using the ``session_factory`` argument to the
-:class:`~pyramid.config.Configurator` class:
+You can configure this session factory in your :app:`Pyramid` application
+by using the :meth:`pyramid.config.Configurator.set_session_factory`` method.
 
 .. code-block:: python
    :linenos:
 
-   from pyramid.session import UnencryptedCookieSessionFactoryConfig
-   my_session_factory = UnencryptedCookieSessionFactoryConfig('itsaseekreet')
-   
+   from pyramid.session import SignedCookieSessionFactory
+   my_session_factory = SignedCookieSessionFactory('itsaseekreet')
+
    from pyramid.config import Configurator
-   config = Configurator(session_factory = my_session_factory)
+   config = Configurator()
+   config.set_session_factory(my_session_factory)
 
 .. warning:: 
 
-   Note the very long, very explicit name for
-   ``UnencryptedCookieSessionFactoryConfig``.  It's trying to tell you that
-   this implementation is, by default, *unencrypted*.  You should not use it
+   By default the :func:`~pyramid.session.SignedCookieSessionFactory`
+   implementation is *unencrypted*.  You should not use it
    when you keep sensitive information in the session object, as the
    information can be easily read by both users of your application and third
    parties who have access to your users' network traffic.  And if you use this
