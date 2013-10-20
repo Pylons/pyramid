@@ -1,7 +1,7 @@
 from pyramid.config import Configurator
 from pyramid_jinja2 import renderer_factory
 # Start Sphinx Include 1
-from pyramid.session import UnencryptedCookieSessionFactoryConfig
+from pyramid.session import SignedCookieSessionFactory
 # End Sphinx Include 1
 
 from hello_world.models import get_root
@@ -16,7 +16,7 @@ def main(global_config, **settings):
     settings.setdefault('jinja2.i18n.domain', 'hello_world')
 
     # Start Sphinx Include 2
-    my_session_factory = UnencryptedCookieSessionFactoryConfig('itsaseekreet')
+    my_session_factory = SignedCookieSessionFactory('itsaseekreet')
     config = Configurator(root_factory=get_root, settings=settings,
                           session_factory=my_session_factory)
     # End Sphinx Include 2

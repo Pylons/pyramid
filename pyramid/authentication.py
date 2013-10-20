@@ -424,7 +424,9 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
 
     ``secret``
 
-       The secret (a string) used for auth_tkt cookie signing.
+       The secret (a string) used for auth_tkt cookie signing.  This value
+       should be unique across all values provided to Pyramid for various
+       subsystem secrets (see :ref:`admonishment_against_secret_sharing`).
        Required.
 
     ``callback``
