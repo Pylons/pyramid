@@ -1550,6 +1550,7 @@ class ViewsConfiguratorMixin(object):
 
         return deriver(view)
 
+    @viewdefaults
     @action_method
     def add_forbidden_view(
         self,
@@ -1629,6 +1630,7 @@ class ViewsConfiguratorMixin(object):
 
     set_forbidden_view = add_forbidden_view # deprecated sorta-bw-compat alias
     
+    @viewdefaults
     @action_method
     def add_notfound_view(
         self,
