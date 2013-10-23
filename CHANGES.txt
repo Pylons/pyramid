@@ -57,6 +57,10 @@ Bug Fixes
   to decode with UTF-8 first, and will fallback to Latin-1.
   See https://github.com/Pylons/pyramid/pull/1170
 
+- The ``@view_defaults`` now apply to notfound and forbidden views
+  that are defined as methods of a decorated class.
+  See https://github.com/Pylons/pyramid/issues/1173
+
 Documentation
 -------------
 
