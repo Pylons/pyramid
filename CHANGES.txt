@@ -4,6 +4,14 @@ Unreleased
 Features
 --------
 
+- The :mod:``pyramid.security`` authentication API methods should now be 
+  accessed via the request. The ``pyramid.security`` authoriztion API function 
+  :meth:`has_permission` should now be accessed via the request.
+  The methods :meth:``pyramid.request.Request.forget_userid``, 
+  meth:``pyramid.request.Request.remember_userid`` now automatically 
+  set the headers on the response, as returned by the corrosponding 
+  method of the current request's :term:``authentication policy``.
+
 - Pyramid's console scripts (``pserve``, ``pviews``, etc) can now be run
   directly, allowing custom arguments to be sent to the python interpreter
   at runtime. For example::

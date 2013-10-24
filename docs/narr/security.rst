@@ -550,7 +550,7 @@ also contain security debugging information in its body.
 Debugging Imperative Authorization Failures
 -------------------------------------------
 
-The :func:`pyramid.security.has_permission` API is used to check
+The :meth:`pyramid.request.Request.has_permission` API is used to check
 security within view functions imperatively.  It returns instances of
 objects that are effectively booleans.  But these objects are not raw
 ``True`` or ``False`` objects, and have information attached to them
@@ -563,7 +563,7 @@ one of :data:`pyramid.security.ACLAllowed`,
 ``msg`` attribute, which is a string indicating why the permission was
 denied or allowed.  Introspecting this information in the debugger or
 via print statements when a call to
-:func:`~pyramid.security.has_permission` fails is often useful.
+:meth:`~pyramid.request.Request.has_permission` fails is often useful.
 
 .. index::
    single: authentication policy (creating)
