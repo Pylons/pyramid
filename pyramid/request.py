@@ -218,7 +218,6 @@ class Request(BaseRequest, URLMethodsMixin, CallbackMethodsMixin,
     def json_body(self):
         return json.loads(text_(self.body, self.charset))
 
-    
 def route_request_iface(name, bases=()):
     # zope.interface treats the __name__ as the __doc__ and changes __name__
     # to None for interfaces that contain spaces if you do not pass a

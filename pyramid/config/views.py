@@ -1017,7 +1017,7 @@ class ViewsConfiguratorMixin(object):
 
           If specified, this value should be a :term:`principal` identifier or
           a sequence of principal identifiers.  If the
-          :func:`pyramid.security.effective_principals` method indicates that
+          :meth:`pyramid.request.Request.effective_principals` method indicates that
           every principal named in the argument list is present in the current
           request, this predicate will return True; otherwise it will return
           False.  For example:

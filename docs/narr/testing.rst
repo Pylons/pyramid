@@ -229,7 +229,7 @@ function.
    otherwise it would fail when run normally.
 
 Without doing anything special during a unit test, the call to
-:func:`~pyramid.security.has_permission` in this view function will always
+:meth:`~pyramid.request.Request.has_permission` in this view function will always
 return a ``True`` value.  When a :app:`Pyramid` application starts normally,
 it will populate a :term:`application registry` using :term:`configuration
 declaration` calls made against a :term:`Configurator`.  But if this
