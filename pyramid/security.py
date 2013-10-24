@@ -7,7 +7,6 @@ from pyramid.interfaces import (
     IView,
     IViewClassifier,
     )
-
 from pyramid.compat import map_
 from pyramid.threadlocal import get_current_registry
 
@@ -20,89 +19,57 @@ class AllPermissionsList(object):
     """ Stand in 'permission list' to represent all permissions """
     def __iter__(self):
         return ()
+
     def __contains__(self, other):
         return True
+
     def __eq__(self, other):
         return isinstance(other, self.__class__)
 
 ALL_PERMISSIONS = AllPermissionsList()
 DENY_ALL = (Deny, Everyone, ALL_PERMISSIONS)
-
 NO_PERMISSION_REQUIRED = '__no_permission_required__'
 
+# b/c Get the request from the global registry if not present on the request.
+def _get_registry(request):
+    try:
+        registry = request.registry
+    except AttributeError:
+        # b/c
+        registry = get_current_registry()
+    return registry
+
+# b/c
 def has_permission(permission, context, request):
-    """ Provided a permission (a string or unicode object), a context
-    (a :term:`resource` instance) and a request object, return an
-    instance of :data:`pyramid.security.Allowed` if the permission
-    is granted in this context to the user implied by the
-    request. Return an instance of :mod:`pyramid.security.Denied`
-    if this permission is not granted in this context to this user.
-    This function delegates to the current authentication and
-    authorization policies.  Return
-    :data:`pyramid.security.Allowed` unconditionally if no
-    authentication policy has been configured in this application."""
-    try:
-        reg = request.registry
-    except AttributeError:
-        reg = get_current_registry() # b/c
-    authn_policy = reg.queryUtility(IAuthenticationPolicy)
-    if authn_policy is None:
-        return Allowed('No authentication policy in use.')
+    """Backwards compatability function wrapper function for
+    ``pyramid.request.Request.has_permission``."""
+    return request.has_permission(permission, context)
 
-    authz_policy = reg.queryUtility(IAuthorizationPolicy)
-    if authz_policy is None:
-        raise ValueError('Authentication policy registered without '
-                         'authorization policy') # should never happen
-    principals = authn_policy.effective_principals(request)
-    return authz_policy.permits(context, principals, permission)
+def view_execution_permitted(context, request, name=''):
+    """ If the view specified by ``context`` and ``name`` is protected
+    by a :term:`permission`, check the permission associated with the
+    view using the effective authentication/authorization policies and
+    the ``request``.  Return a boolean result.
+     :term:`authorization policy` is in effect, or if the view is not
+    protected by a permission, return ``True``. If no view can view found,
+    an exception will be raised.
 
-def authenticated_userid(request):
-    """ Return the userid of the currently authenticated user or
-    ``None`` if there is no :term:`authentication policy` in effect or
-    there is no currently authenticated user."""
-    try:
-        reg = request.registry
-    except AttributeError:
-        reg = get_current_registry() # b/c
+    This function only works with traversal.
 
-    policy = reg.queryUtility(IAuthenticationPolicy)
-    if policy is None:
-        return None
-    return policy.authenticated_userid(request)
-
-def unauthenticated_userid(request):
-    """ Return an object which represents the *claimed* (not verified) user
-    id of the credentials present in the request. ``None`` if there is no
-    :term:`authentication policy` in effect or there is no user data
-    associated with the current request.  This differs from
-    :func:`~pyramid.security.authenticated_userid`, because the effective
-    authentication policy will not ensure that a record associated with the
-    userid exists in persistent storage."""
-    try:
-        reg = request.registry
-    except AttributeError:
-        reg = get_current_registry() # b/c
-
-    policy = reg.queryUtility(IAuthenticationPolicy)
-    if policy is None:
-        return None
-    return policy.unauthenticated_userid(request)
-
-def effective_principals(request):
-    """ Return the list of 'effective' :term:`principal` identifiers
-    for the ``request``.  This will include the userid of the
-    currently authenticated user if a user is currently
-    authenticated. If no :term:`authentication policy` is in effect,
-    this will return an empty sequence."""
-    try:
-        reg = request.registry
-    except AttributeError:
-        reg = get_current_registry() # b/c
-
-    policy = reg.queryUtility(IAuthenticationPolicy)
-    if policy is None:
-        return [Everyone]
-    return policy.effective_principals(request)
+    """
+    reg = _get_registry(request)
+    provides = [IViewClassifier] + map_(providedBy, (request, context))
+    view = reg.adapters.lookup(provides, ISecuredView, name=name)
+    if view is None:
+        view = reg.adapters.lookup(provides, IView, name=name)
+        if view is None:
+            raise TypeError('No registered view satisfies the constraints. '
+                            'It would not make sense to claim that this view '
+                            '"is" or "is not" permitted.')
+        return Allowed(
+            'Allowed: view name %r in context %r (no permission defined)' %
+            (name, context))
+    return view.__permitted__(context, request)
 
 def principals_allowed_by_permission(context, permission):
     """ Provided a ``context`` (a resource object), and a ``permission``
@@ -127,88 +94,30 @@ def principals_allowed_by_permission(context, permission):
         return [Everyone]
     return policy.principals_allowed_by_permission(context, permission)
 
-def view_execution_permitted(context, request, name=''):
-    """ If the view specified by ``context`` and ``name`` is protected
-    by a :term:`permission`, check the permission associated with the
-    view using the effective authentication/authorization policies and
-    the ``request``.  Return a boolean result.  If no
-    :term:`authorization policy` is in effect, or if the view is not
-    protected by a permission, return ``True``. If no view can view found,
-    an exception will be raised.
+# b/c
+def authenticated_userid(request):
+    """ Backwards compatible wrapper function. """
+    return request.authenticated_userid
 
-    .. versionchanged:: 1.4a4
-       An exception is raised if no view is found.
+# b/c
+def unauthenticated_userid(request):
+    """ Backwards compatible wrapper function. """
+    return request.unauthenticated_userid
 
-    """
-    try:
-        reg = request.registry
-    except AttributeError:
-        reg = get_current_registry() # b/c
-    provides = [IViewClassifier] + map_(providedBy, (request, context))
-    view = reg.adapters.lookup(provides, ISecuredView, name=name)
-    if view is None:
-        view = reg.adapters.lookup(provides, IView, name=name)
-        if view is None:
-            raise TypeError('No registered view satisfies the constraints. '
-                            'It would not make sense to claim that this view '
-                            '"is" or "is not" permitted.')
-        return Allowed(
-            'Allowed: view name %r in context %r (no permission defined)' %
-            (name, context))
-    return view.__permitted__(context, request)
+# b/c
+def effective_principals(request):
+    """ Backwards compatible wrapper function. """
+    return request.effective_principals
 
+# b/c
 def remember(request, principal, **kw):
-    """ Return a sequence of header tuples (e.g. ``[('Set-Cookie',
-    'foo=abc')]``) suitable for 'remembering' a set of credentials
-    implied by the data passed as ``principal`` and ``*kw`` using the
-    current :term:`authentication policy`.  Common usage might look
-    like so within the body of a view function (``response`` is
-    assumed to be a :term:`WebOb` -style :term:`response` object
-    computed previously by the view code)::
+    """ Backwards compatible wrapper function. """
+    return request.remember_userid(principal, **kw)
 
-      from pyramid.security import remember
-      headers = remember(request, 'chrism', password='123', max_age='86400')
-      response.headerlist.extend(headers)
-      return response
-
-    If no :term:`authentication policy` is in use, this function will
-    always return an empty sequence.  If used, the composition and
-    meaning of ``**kw`` must be agreed upon by the calling code and
-    the effective authentication policy."""
-    try:
-        reg = request.registry
-    except AttributeError:
-        reg = get_current_registry() # b/c
-    policy = reg.queryUtility(IAuthenticationPolicy)
-    if policy is None:
-        return []
-    else:
-        return policy.remember(request, principal, **kw)
-
+# b/c
 def forget(request):
-    """ Return a sequence of header tuples (e.g. ``[('Set-Cookie',
-    'foo=abc')]``) suitable for 'forgetting' the set of credentials
-    possessed by the currently authenticated user.  A common usage
-    might look like so within the body of a view function
-    (``response`` is assumed to be an :term:`WebOb` -style
-    :term:`response` object computed previously by the view code)::
-
-      from pyramid.security import forget
-      headers = forget(request)
-      response.headerlist.extend(headers)
-      return response
-
-    If no :term:`authentication policy` is in use, this function will
-    always return an empty sequence."""
-    try:
-        reg = request.registry
-    except AttributeError:
-        reg = get_current_registry() # b/c
-    policy = reg.queryUtility(IAuthenticationPolicy)
-    if policy is None:
-        return []
-    else:
-        return policy.forget(request)
+    """ Backwards compatible wrapper function. """
+    return request.forget_userid()
 
 class PermitsResult(int):
     def __new__(cls, s, *args):
@@ -294,3 +203,119 @@ class ACLAllowed(ACLPermitsResult):
     summary is available as the ``msg`` attribute."""
     boolval = 1
 
+class AuthenticationAPIMixin(object):
+
+    def _get_authentication_policy(self):
+        reg = _get_registry(self)
+        return reg.queryUtility(IAuthenticationPolicy)
+
+    @property
+    def authenticated_userid(self):
+        """ Return the userid of the currently authenticated user or
+        ``None`` if there is no :term:`authentication policy` in effect or
+        there is no currently authenticated user."""
+        policy = self._get_authentication_policy()
+        if policy is None:
+            return None
+        return policy.authenticated_userid(self)
+
+    @property
+    def unauthenticated_userid(self):
+        """ Return an object which represents the *claimed* (not verified) user
+        id of the credentials present in the request. ``None`` if there is no
+        :term:`authentication policy` in effect or there is no user data
+        associated with the current request.  This differs from
+        :func:`~pyramid.security.authenticated_userid`, because the effective
+        authentication policy will not ensure that a record associated with the
+        userid exists in persistent storage."""
+        policy = self._get_authentication_policy()
+        if policy is None:
+            return None
+        return policy.unauthenticated_userid(self)
+
+    @property
+    def effective_principals(self):
+        """ Return the list of 'effective' :term:`principal` identifiers
+        for the ``request``.  This will include the userid of the
+        currently authenticated user if a user is currently
+        authenticated. If no :term:`authentication policy` is in effect,
+        this will return an empty sequence."""
+        policy = self._get_authentication_policy()
+        if policy is None:
+            return [Everyone]
+        return policy.effective_principals(self)
+
+    def remember_userid(self, principal, **kw):
+        """ Return a sequence of header tuples (e.g. ``[('Set-Cookie',
+        'foo=abc')]``) suitable for 'remembering' a set of credentials
+        implied by the data passed as ``principal`` and ``*kw`` using the
+        current :term:`authentication policy`.  Common usage might look
+        like so within the body of a view function (``response`` is
+        assumed to be a :term:`WebOb` -style :term:`response` object
+        computed previously by the view code)::
+
+          headers = request.remember_userid('chrism',
+                                            password='123',
+                                            max_age='86400')
+          response.headerlist.extend(headers)
+          return response
+
+        If no :term:`authentication policy` is in use, this function will
+        always return an empty sequence.  If used, the composition and
+        meaning of ``**kw`` must be agreed upon by the calling code and
+        the effective authentication policy."""
+        policy = self._get_authentication_policy()
+        if policy is None:
+            return []
+        return policy.remember(self, principal, **kw)
+
+    def forget_userid(self):
+        """ Return a sequence of header tuples (e.g. ``[('Set-Cookie',
+        'foo=abc')]``) suitable for 'forgetting' the set of credentials
+        possessed by the currently authenticated user.  A common usage
+        might look like so within the body of a view function
+        (``response`` is assumed to be an :term:`WebOb` -style
+        :term:`response` object computed previously by the view code)::
+
+          headers = request.forget_userid()
+          response.headerlist.extend(headers)
+          return response
+
+        If no :term:`authentication policy` is in use, this function will
+        always return an empty sequence."""
+        policy = self._get_authentication_policy()
+        if policy is None:
+            return []
+        return policy.forget(self)
+
+class AuthorizationAPIMixin(object):
+
+    def has_permission(self, permission, context=None):
+        """ Provided a permission (a string or unicode object), a context
+        (a :term:`resource` instance) and a request object, return an
+        instance of :data:`pyramid.security.Allowed` if the permission
+        is granted in this context to the user implied by the
+        request. Return an instance of :mod:`pyramid.security.Denied`
+        if this permission is not granted in this context to this user.
+        This function delegates to the current authentication and
+        authorization policies.  Return
+        :data:`pyramid.security.Allowed` unconditionally if no
+        authentication policy has been configured in this application.
+
+        .. versionchanged:: 1.5a3
+           If context is None and self has no attribute context,
+           then the attribute error is propergated.
+
+        """
+        if context is None:
+            context = self.context
+        reg = _get_registry(self)
+        authn_policy = reg.queryUtility(IAuthenticationPolicy)
+        if authn_policy is None:
+            return Allowed('No authentication policy in use.')
+        authz_policy = reg.queryUtility(IAuthorizationPolicy)
+        if authz_policy is None:
+            raise ValueError('Authentication policy registered without '
+                             'authorization policy') # should never happen
+        principals = authn_policy.effective_principals(self)
+        return authz_policy.permits(context, principals, permission)
