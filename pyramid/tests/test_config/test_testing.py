@@ -34,7 +34,7 @@ class TestingConfiguratorMixinTests(unittest.TestCase):
         request.registry = config.registry
         request.remember_userid('fred')
         self.assertEqual(pol.remembered, 'fred')
-        val = dict(request.response.headerlist).get('X-Pyramid-Test')        
+        val = dict(request.response.headerlist).get('X-Pyramid-Test')
         self.assertEqual(val, True)
 
     def test_testing_securitypolicy_forget_result(self):
@@ -45,7 +45,6 @@ class TestingConfiguratorMixinTests(unittest.TestCase):
             forget_result=[('X-Pyramid-Test', True)])
         request = DummyRequest()
         request.registry = config.registry
-        request.response = DummyResponse()
         request.forget_userid()
         self.assertEqual(pol.forgotten, True)
         val = dict(request.response.headerlist).get('X-Pyramid-Test')
@@ -74,7 +73,9 @@ class TestingConfiguratorMixinTests(unittest.TestCase):
         self.assertEqual(result['traversed'], (text_('ob2'),))
         self.assertEqual(result['virtual_root'], ob2)
         self.assertEqual(result['virtual_root_path'], ())
-        self.assertRaises(KeyError, adapter, DummyRequest({'PATH_INFO':'/ob3'}))
+        self.assertRaises(KeyError,
+                          adapter,
+                          DummyRequest({'PATH_INFO':'/ob3'}))
         try:
             config.begin()
             self.assertEqual(find_resource(None, '/ob1'), ob1)
@@ -201,15 +202,12 @@ class DummyEvent:
     pass
 
 class DummyResponse(object):
-    def __init__(self, headers=None):
-        if headers is None:
-            self.headers = []
-        else:
-            self.headers = headers
+    def __init__(self):
+        self.headers = []
     @property
     def headerlist(self):
         return self.headers
-        
+
 class DummyRequest(AuthenticationAPIMixin, AuthorizationAPIMixin):
     subpath = ()
     matchdict = None
@@ -219,9 +217,6 @@ class DummyRequest(AuthenticationAPIMixin, AuthorizationAPIMixin):
         self.environ = environ
         self.params = {}
         self.cookies = {}
-        self.response = DummyResponse()        
+        self.response = DummyResponse()
     def add_response_callback(self, callback):
         callback(self, self.response)
-        
-            
-        

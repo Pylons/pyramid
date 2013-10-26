@@ -21,6 +21,7 @@ from pyramid.compat import (
 from pyramid.decorator import reify
 from pyramid.i18n import LocalizerRequestMixin
 from pyramid.response import Response
+from pyramid.security import AuthenticationAPIMixin, AuthorizationAPIMixin
 from pyramid.url import URLMethodsMixin
 from pyramid.util import InstancePropertyMixin
 
@@ -137,7 +138,8 @@ class CallbackMethodsMixin(object):
 
 @implementer(IRequest)
 class Request(BaseRequest, URLMethodsMixin, CallbackMethodsMixin,
-              InstancePropertyMixin, LocalizerRequestMixin):
+              InstancePropertyMixin, LocalizerRequestMixin,
+              AuthenticationAPIMixin, AuthorizationAPIMixin):
     """
     A subclass of the :term:`WebOb` Request class.  An instance of
     this class is created by the :term:`router` and is provided to a

@@ -322,10 +322,10 @@ class DummyRequest(URLMethodsMixin,
     query_string = ''
     charset = 'UTF-8'
     script_name = ''
-    _registry = None
 
     def __init__(self, params=None, environ=None, headers=None, path='/',
                  cookies=None, post=None, **kw):
+        self._registry = None        
         if environ is None:
             environ = {}
         if params is None:

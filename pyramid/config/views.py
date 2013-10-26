@@ -152,7 +152,7 @@ class ViewDeriver(object):
                                 self.decorated_view(
                                     self.rendered_view(
                                         self.mapped_view(
-                                                view)))))))))
+                                            view)))))))))
 
     @wraps_view
     def mapped_view(self, view):
@@ -227,7 +227,8 @@ class ViewDeriver(object):
             permission = None
 
         wrapped_view = view
-        if self.authn_policy and self.authz_policy and (permission is not None):
+        if self.authn_policy and self.authz_policy and (
+                permission is not None):
             def _permitted(context, request):
                 principals = self.authn_policy.effective_principals(request)
                 return self.authz_policy.permits(context, principals,
@@ -263,9 +264,10 @@ class ViewDeriver(object):
                     elif permission is None:
                         msg = 'Allowed (no permission registered)'
                     else:
-                        principals = self.authn_policy.effective_principals(
-                            request)
-                        msg = str(self.authz_policy.permits(context, principals,
+                        principals = self.authn_policy.\
+                            effective_principals(request)
+                        msg = str(self.authz_policy.permits(context,
+                                                            principals,
                                                             permission))
                 else:
                     msg = 'Allowed (no authorization policy in use)'
@@ -293,9 +295,9 @@ class ViewDeriver(object):
                 if not predicate(context, request):
                     view_name = getattr(view, '__name__', view)
                     raise PredicateMismatch(
-                         'predicate mismatch for view %s (%s)' % (
-                         view_name, predicate.text()))
-            return view(context, request)        
+                        'predicate mismatch for view %s (%s)' % (
+                        view_name, predicate.text()))
+            return view(context, request)
         def checker(context, request):
             return all((predicate(context, request) for predicate in
                         preds))
@@ -887,8 +889,8 @@ class ViewsConfiguratorMixin(object):
 
         request_param
 
-          This value can be any string or any sequence of strings.  A view 
-          declaration with this argument ensures that the view will only be 
+          This value can be any string or any sequence of strings.  A view
+          declaration with this argument ensures that the view will only be
           called when the :term:`request` has a key in the ``request.params``
           dictionary (an HTTP ``GET`` or ``POST`` variable) that has a
           name which matches the supplied value (if the value is a string)
@@ -994,7 +996,7 @@ class ViewsConfiguratorMixin(object):
 
           Note that using this feature requires a :term:`session factory` to
           have been configured.
-         
+
           .. versionadded:: 1.4a2
 
         physical_path
@@ -1017,10 +1019,10 @@ class ViewsConfiguratorMixin(object):
 
           If specified, this value should be a :term:`principal` identifier or
           a sequence of principal identifiers.  If the
-          :meth:`pyramid.request.Request.effective_principals` method indicates that
-          every principal named in the argument list is present in the current
-          request, this predicate will return True; otherwise it will return
-          False.  For example:
+          :meth:`pyramid.request.Request.effective_principals` method
+          indicates that every principal named in the argument list is
+          present in the current request, this predicate will return
+          True; otherwise it will return False. For example:
           ``effective_principals=pyramid.security.Authenticated`` or
           ``effective_principals=('fred', 'group:admins')``.
 
@@ -1065,7 +1067,7 @@ class ViewsConfiguratorMixin(object):
                 DeprecationWarning,
                 stacklevel=4
                 )
-        
+
         view = self.maybe_dotted(view)
         context = self.maybe_dotted(context)
         for_ = self.maybe_dotted(for_)
@@ -1139,7 +1141,9 @@ class ViewsConfiguratorMixin(object):
             # is.  It can't be computed any sooner because thirdparty
             # predicates may not yet exist when add_view is called.
             order, preds, phash = predlist.make(self, **pvals)
-            view_intr.update({'phash':phash, 'order':order, 'predicates':preds})
+            view_intr.update({'phash':phash,
+                              'order':order,
+                              'predicates':preds})
             return ('view', context, name, route_name, phash)
 
         discriminator = Deferred(discrim_func)
@@ -1151,7 +1155,7 @@ class ViewsConfiguratorMixin(object):
             view_desc = self.object_description(view)
 
         tmpl_intr = None
-            
+
         view_intr = self.introspectable('views',
                                         discriminator,
                                         view_desc,
@@ -1560,7 +1564,7 @@ class ViewsConfiguratorMixin(object):
         wrapper=None,
         route_name=None,
         request_type=None,
-        request_method=None, 
+        request_method=None,
         request_param=None,
         containment=None,
         xhr=None,
@@ -1603,7 +1607,7 @@ class ViewsConfiguratorMixin(object):
                     '%s may not be used as an argument to add_forbidden_view'
                     % arg
                     )
-        
+
         settings = dict(
             view=view,
             context=HTTPForbidden,
@@ -1614,7 +1618,7 @@ class ViewsConfiguratorMixin(object):
             containment=containment,
             xhr=xhr,
             accept=accept,
-            header=header, 
+            header=header,
             path_info=path_info,
             custom_predicates=custom_predicates,
             decorator=decorator,
@@ -1629,7 +1633,7 @@ class ViewsConfiguratorMixin(object):
         return self.add_view(**settings)
 
     set_forbidden_view = add_forbidden_view # deprecated sorta-bw-compat alias
-    
+
     @viewdefaults
     @action_method
     def add_notfound_view(
@@ -1640,7 +1644,7 @@ class ViewsConfiguratorMixin(object):
         wrapper=None,
         route_name=None,
         request_type=None,
-        request_method=None, 
+        request_method=None,
         request_param=None,
         containment=None,
         xhr=None,
@@ -1691,7 +1695,7 @@ class ViewsConfiguratorMixin(object):
                     '%s may not be used as an argument to add_notfound_view'
                     % arg
                     )
-                    
+
         settings = dict(
             view=view,
             context=HTTPNotFound,
@@ -1702,7 +1706,7 @@ class ViewsConfiguratorMixin(object):
             containment=containment,
             xhr=xhr,
             accept=accept,
-            header=header, 
+            header=header,
             path_info=path_info,
             custom_predicates=custom_predicates,
             decorator=decorator,
@@ -1974,7 +1978,7 @@ class StaticURLInfo(object):
         def register():
             registrations = self._get_registrations(config.registry)
 
-            names = [ t[0] for t in  registrations ]
+            names = [ t[0] for t in registrations ]
 
             if name in names:
                 idx = names.index(name)
@@ -1991,5 +1995,3 @@ class StaticURLInfo(object):
         intr['spec'] = spec
 
         config.action(None, callable=register, introspectables=(intr,))
-
-

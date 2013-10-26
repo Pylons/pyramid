@@ -150,7 +150,8 @@ class TestingConfiguratorMixin(object):
         """
         from pyramid.testing import DummyRendererFactory
         helper = RendererHelper(name=path, registry=self.registry)
-        factory = self.registry.queryUtility(IRendererFactory, name=helper.type)
+        factory = self.registry.queryUtility(IRendererFactory,
+                                             name=helper.type)
         if not isinstance(factory, DummyRendererFactory):
             factory = DummyRendererFactory(helper.type, factory)
             self.registry.registerUtility(factory, IRendererFactory,
@@ -163,5 +164,3 @@ class TestingConfiguratorMixin(object):
         return renderer
 
     testing_add_template = testing_add_renderer
-
-

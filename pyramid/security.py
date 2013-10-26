@@ -256,9 +256,6 @@ class AuthenticationAPIMixin(object):
             return [Everyone]
         return policy.effective_principals(self)
 
-    def _set_response_headers(self, response, headers):
-        response.headerlist.extend(headers)
-
     def remember_userid(self, principal, **kw):
         """ Sets a sequence of header tuples (e.g. ``[('Set-Cookie',
         'foo=abc')]``) on this request's response.
@@ -269,7 +266,9 @@ class AuthenticationAPIMixin(object):
         assumed to be a :term:`WebOb` -style :term:`response` object
         computed previously by the view code)::
 
-          request.remember_userid('chrism', password='123', max_age='86400')
+        .. code-block:: python
+        
+           request.remember_userid('chrism', password='123', max_age='86400')
 
         If no :term:`authentication policy` is in use, this function will
         do nothing. If used, the composition and
@@ -279,7 +278,7 @@ class AuthenticationAPIMixin(object):
         if policy is None:
             return
         headers = policy.remember(self, principal, **kw)
-        callback = lambda req, resp: self._set_response_headers(resp, headers)
+        callback = lambda req, response: response.headerlist.extend(headers)
         self.add_response_callback(callback)
 
     def forget_userid(self):
@@ -287,18 +286,20 @@ class AuthenticationAPIMixin(object):
         'foo=abc')]``) suitable for 'forgetting' the set of credentials
         possessed by the currently authenticated user on the response.
         A common usage might look like so within the body of a view function
-        (``response`` is assumed to be an :term:`WebOb` -style
+        (``response`` is assumed to be an :term:`WebOb`-style
         :term:`response` object computed previously by the view code)::
 
-          request.forget_userid()
-
+        .. code-block:: python
+        
+           request.forget_userid()
+           
         If no :term:`authentication policy` is in use, this function will
         be a noop."""
         policy = self._get_authentication_policy()
         if policy is None:
             return
         headers = policy.forget(self)
-        callback = lambda req, resp: self._set_response_headers(resp, headers)
+        callback = lambda req, response: response.headerlist.extend(headers)        
         self.add_response_callback(callback)
 
 class AuthorizationAPIMixin(object):
