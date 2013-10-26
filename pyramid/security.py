@@ -38,41 +38,48 @@ def _get_registry(request):
     return reg
 
 # b/c
-def backwards_compat_request_proxier(proxy_func):
-    proxy_func.__doc__ = """ Backwards compatible wrapper.
-
-    Proxies to ``pyramid.request.Request`` object.
-    """
-    return proxy_func
-
-# b/c
-@backwards_compat_request_proxier
 def has_permission(permission, context, request):
+    """ Backwards compatibility wrapper.
+
+    Delegates to the :meth:``pyramid.request.Request.has_permission`` method. """
     return request.has_permission(permission, context)
 
 # b/c
-@backwards_compat_request_proxier
 def authenticated_userid(request):
+    """ Backwards compatibility wrapper.
+
+    Delegates to the :meth:``pyramid.request.Request.authenticated_userid``
+    property. """
     return request.authenticated_userid
 
 # b/c
-@backwards_compat_request_proxier
 def unauthenticated_userid(request):
+    """ Backwards compatibility wrapper.
+
+    Delegates to the :meth:``pyramid.request.Request.unauthenticated_userid``
+    property. """    
     return request.unauthenticated_userid
 
 # b/c
-@backwards_compat_request_proxier
 def effective_principals(request):
+    """ Backwards compatibility wrapper.
+
+    Delegates to the :meth:``pyramid.request.Request.effective_principals``
+    property. """
     return request.effective_principals
 
 # b/c
-@backwards_compat_request_proxier
 def remember(request, principal, **kw):
+    """ Backwards compatibility wrapper.
+
+    Delegates to the :meth:``pyramid.request.Request.remember_userid`` method. """    
     return request.remember_userid(principal, **kw)
 
 # b/c
-@backwards_compat_request_proxier
 def forget(request):
+    """ Backwards compatibility wrapper.
+
+    Delegates to the :meth:``pyramid.request.Request.forget_userid`` method. """    
     return request.forget_userid()
 
 
