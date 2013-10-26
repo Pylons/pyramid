@@ -112,10 +112,7 @@ def view_execution_permitted(context, request, name=''):
        An exception is raised if no view is found.
 
     """
-    try:
-        reg = request.registry
-    except AttributeError:
-        reg = get_current_registry() # b/c
+    reg = _get_registry(request)
     provides = [IViewClassifier] + map_(providedBy, (request, context))
     view = reg.adapters.lookup(provides, ISecuredView, name=name)
     if view is None:
