@@ -382,7 +382,7 @@ class TestSignedCookieSession(SharedCookieSessionTests, unittest.TestCase):
 
         try:
             result = callbacks[0](request, response)
-        except TypeError as e:
+        except TypeError as e: # pragma: no cover
             self.fail('HMAC failed to initialize due to key length.')
 
         self.assertEqual(result, None)
