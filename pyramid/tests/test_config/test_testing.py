@@ -1,6 +1,7 @@
 import unittest
 
 from pyramid.compat import text_
+from pyramid.security import AuthenticationAPIMixin, AuthorizationAPIMixin
 from pyramid.tests.test_config import IDummy
 
 class TestingConfiguratorMixinTests(unittest.TestCase):
@@ -24,28 +25,30 @@ class TestingConfiguratorMixinTests(unittest.TestCase):
         self.assertEqual(ut.permissive, False)
 
     def test_testing_securitypolicy_remember_result(self):
-        from pyramid.security import remember
         config = self._makeOne(autocommit=True)
         pol = config.testing_securitypolicy(
             'user', ('group1', 'group2'),
-            permissive=False, remember_result=True)
+            permissive=False,
+            remember_result=[('X-Pyramid-Test', True)])
         request = DummyRequest()
         request.registry = config.registry
-        val = remember(request, 'fred')
+        request.remember_userid('fred')
         self.assertEqual(pol.remembered, 'fred')
+        val = dict(request.response.headerlist).get('X-Pyramid-Test')
         self.assertEqual(val, True)
 
     def test_testing_securitypolicy_forget_result(self):
-        from pyramid.security import forget
         config = self._makeOne(autocommit=True)
         pol = config.testing_securitypolicy(
             'user', ('group1', 'group2'),
-            permissive=False, forget_result=True)
+            permissive=False,
+            forget_result=[('X-Pyramid-Test', True)])
         request = DummyRequest()
         request.registry = config.registry
-        val = forget(request)
+        request.forget_userid()
         self.assertEqual(pol.forgotten, True)
-        self.assertEqual(val, True)
+        val = dict(request.response.headerlist).get('X-Pyramid-Test')
+        self.assertTrue(val)
 
     def test_testing_resources(self):
         from pyramid.traversal import find_resource
@@ -70,7 +73,9 @@ class TestingConfiguratorMixinTests(unittest.TestCase):
         self.assertEqual(result['traversed'], (text_('ob2'),))
         self.assertEqual(result['virtual_root'], ob2)
         self.assertEqual(result['virtual_root_path'], ())
-        self.assertRaises(KeyError, adapter, DummyRequest({'PATH_INFO':'/ob3'}))
+        self.assertRaises(KeyError,
+                          adapter,
+                          DummyRequest({'PATH_INFO':'/ob3'}))
         try:
             config.begin()
             self.assertEqual(find_resource(None, '/ob1'), ob1)
@@ -196,7 +201,14 @@ from zope.interface import implementer
 class DummyEvent:
     pass
 
-class DummyRequest:
+class DummyResponse(object):
+    def __init__(self):
+        self.headers = []
+    @property
+    def headerlist(self):
+        return self.headers
+
+class DummyRequest(AuthenticationAPIMixin, AuthorizationAPIMixin):
     subpath = ()
     matchdict = None
     def __init__(self, environ=None):
@@ -205,4 +217,6 @@ class DummyRequest:
         self.environ = environ
         self.params = {}
         self.cookies = {}
-
+        self.response = DummyResponse()
+    def add_response_callback(self, callback):
+        callback(self, self.response)

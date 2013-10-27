@@ -47,14 +47,14 @@ class TestingConfiguratorMixin(object):
         ``groupids`` argument.  The authentication policy will return
         the userid identifier implied by the ``userid`` argument and
         the group ids implied by the ``groupids`` argument when the
-        :func:`pyramid.security.authenticated_userid` or
-        :func:`pyramid.security.effective_principals` APIs are
+        :meth:`pyramid.request.Request.authenticated_userid` or
+        :meth:`pyramid.request.Request.effective_principals` APIs are
         used.
 
         This function is most useful when testing code that uses
-        the APIs named :func:`pyramid.security.has_permission`,
-        :func:`pyramid.security.authenticated_userid`,
-        :func:`pyramid.security.effective_principals`, and
+        the APIs named :meth:`pyramid.request.Request.has_permission`,
+        :meth:`pyramid.request.Request.authenticated_userid`,
+        :meth:`pyramid.request.Request.effective_principals`, and
         :func:`pyramid.security.principals_allowed_by_permission`.
 
         .. versionadded:: 1.4
@@ -150,7 +150,8 @@ class TestingConfiguratorMixin(object):
         """
         from pyramid.testing import DummyRendererFactory
         helper = RendererHelper(name=path, registry=self.registry)
-        factory = self.registry.queryUtility(IRendererFactory, name=helper.type)
+        factory = self.registry.queryUtility(IRendererFactory,
+                                             name=helper.type)
         if not isinstance(factory, DummyRendererFactory):
             factory = DummyRendererFactory(helper.type, factory)
             self.registry.registerUtility(factory, IRendererFactory,
@@ -163,5 +164,3 @@ class TestingConfiguratorMixin(object):
         return renderer
 
     testing_add_template = testing_add_renderer
-
-

@@ -207,8 +207,8 @@ need to be added.)
 
 :meth:`~pyramid.view.forbidden_view_config` will be used
 to customize the default 403 Forbidden page.
-:meth:`~pyramid.security.remember` and
-:meth:`~pyramid.security.forget` help to create and
+:meth:`~pyramid.request.Request.remember_userid` and
+:meth:`~pyramid.request.Request.forget_userid` help to create and
 expire an auth ticket cookie.
 
 Now add the ``login`` and ``logout`` views:
