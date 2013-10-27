@@ -78,7 +78,7 @@ def remember(request, principal, **kw):
 
     Delegates to the :meth:``pyramid.request.Request.remember_userid`` method.
     """            
-    return request.remember_userid(principal, **kw)
+    return request._remember_userid(principal, **kw)
 
 # b/c
 def forget(request):
@@ -86,7 +86,7 @@ def forget(request):
 
     Delegates to the :meth:``pyramid.request.Request.forget_userid`` method.
     """            
-    return request.forget_userid()
+    return request._forget_userid()
 
 
 def principals_allowed_by_permission(context, permission):
@@ -265,10 +265,16 @@ class AuthenticationAPIMixin(object):
         if policy is None:
             return [Everyone]
         return policy.effective_principals(self)
+    # b/c
+    def _remember_userid(self, principal, **kw):
+        policy = self._get_authentication_policy()
+        if policy is None:
+            return
+        return policy.remember(self, principal, **kw)
 
     def remember_userid(self, principal, **kw):
         """ Sets a sequence of header tuples (e.g. ``[('Set-Cookie',
-        'foo=abc')]``) on this request's response.
+        'foo=abc')]``) o)n this request's response.
         These headers are suitable for 'remembering' a set of credentials
         implied by the data passed as ``principal`` and ``*kw`` using the
         current :term:`authentication policy`.  Common usage might look
@@ -284,12 +290,16 @@ class AuthenticationAPIMixin(object):
         do nothing. If used, the composition and
         meaning of ``**kw`` must be agreed upon by the calling code and
         the effective authentication policy."""
+        headers = self._remember_userid(principal, **kw)
+        callback = lambda req, response: response.headerlist.extend(headers)
+        self.add_response_callback(callback)
+
+    # b/c
+    def _forget_userid(self):
         policy = self._get_authentication_policy()
         if policy is None:
             return
-        headers = policy.remember(self, principal, **kw)
-        callback = lambda req, response: response.headerlist.extend(headers)
-        self.add_response_callback(callback)
+        return policy.forget(self)
 
     def forget_userid(self):
         """ Sets a sequence of header tuples (e.g. ``[('Set-Cookie',
@@ -305,10 +315,7 @@ class AuthenticationAPIMixin(object):
 
         If no :term:`authentication policy` is in use, this function will
         be a noop."""
-        policy = self._get_authentication_policy()
-        if policy is None:
-            return
-        headers = policy.forget(self)
+        headers = self._forget_userid()
         callback = lambda req, response: response.headerlist.extend(headers)        
         self.add_response_callback(callback)
 

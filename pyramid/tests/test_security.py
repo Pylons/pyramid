@@ -232,11 +232,11 @@ class AuthenticationAPIMixinTest(object):
             def effective_principals(req):
                 return 'effective_principals'
 
-            def forget_userid(req):
-                return 'forget_userid'
+            def _forget_userid(req):
+                return [('X-Pyramid-Test', 'forget_userid')]
 
-            def remember_userid(req, principal, **kw):
-                return 'remember_userid'
+            def _remember_userid(req, principal, **kw):
+                return [('X-Pyramid-Test', 'remember_userid')]    
 
         return FakeRequest({})
 
@@ -324,7 +324,8 @@ class TestRememberUserId(ResponseCallbackTestMixin, unittest.TestCase):
     def test_backward_compat_delegates_to_mixin(self):
         request = self._makeFakeOne()
         from pyramid.security import remember
-        self.assertEqual(remember(request, 'matt'), 'remember_userid')
+        self.assertEqual(remember(request, 'matt'),
+                         [('X-Pyramid-Test', 'remember_userid')])
 
     def test_with_no_authentication_policy(self):
         request = self._makeOne()
@@ -358,7 +359,8 @@ class TestForgetUserId(ResponseCallbackTestMixin, unittest.TestCase):
     def test_backward_compat_delegates_to_mixin(self):
         request = self._makeFakeOne()
         from pyramid.security import forget
-        self.assertEqual(forget(request), 'forget_userid')
+        self.assertEqual(forget(request),
+                         [('X-Pyramid-Test', 'forget_userid')])                         
 
     def test_with_no_authentication_policy(self):
         request = self._makeOne()
