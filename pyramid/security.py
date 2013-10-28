@@ -1,3 +1,4 @@
+from zope.deprecation import deprecated
 from zope.interface import providedBy
 
 from pyramid.interfaces import (
@@ -37,57 +38,152 @@ def _get_registry(request):
         reg = get_current_registry() # b/c
     return reg
 
-# b/c
 def has_permission(permission, context, request):
-    """ Backwards compatible wrapper.
+    """
+    A function that calls
+    :meth:`pyramid.request.Request.has_permission` and returns its result.
+    
+    .. deprecated:: 1.5
+       Use :meth:`pyramid.request.Request.has_permission` instead.
 
-    Delegates to the :meth:``pyramid.request.Request.has_permission`` method.
+    .. versionchanged:: 1.5a3
+       If context is None, then attempt to use the context attribute
+       of self, if not set then the  AttributeError is propergated.
     """    
     return request.has_permission(permission, context)
 
-# b/c
-def authenticated_userid(request):
-    """ Backwards compatible wrapper.
+deprecated(
+    'has_permission',
+    'As of Pyramid 1.5 the "pyramid.security.has_permission" API is now '
+    'deprecated.  It will be removed in Pyramd 1.8.  Use the '
+    '"has_permission" method of the Pyramid request instead.'
+    )
 
-    Delegates to the
-    :meth:``pyramid.request.Request.authenticated_userid`` method.
+
+def authenticated_userid(request):
+    """
+    A function that returns the value of the property
+    :attr:`pyramid.request.Request.authenticated_userid`.
+    
+    .. deprecated:: 1.5
+       Use :attr:`pyramid.request.Request.authenticated_userid` instead.
     """        
     return request.authenticated_userid
 
-# b/c
-def unauthenticated_userid(request):
-    """ Backwards compatible wrapper.
+deprecated(
+    'authenticated_userid',
+    'As of Pyramid 1.5 the "pyramid.security.authenticated_userid" API is now '
+    'deprecated.  It will be removed in Pyramd 1.8.  Use the '
+    '"authenticated_userid" attribute of the Pyramid request instead.'
+    )
 
-    Delegates to the
-    :meth:``pyramid.request.Request.unauthenticated_userid`` method.
+def unauthenticated_userid(request):
+    """ 
+    A function that returns the value of the property
+    :attr:`pyramid.request.Request.unauthenticated_userid`.
+    
+    .. deprecated:: 1.5
+       Use :attr:`pyramid.request.Request.unauthenticated_userid` instead.
     """        
     return request.unauthenticated_userid
 
-# b/c
-def effective_principals(request):
-    """ Backwards compatible wrapper.
+deprecated(
+    'unauthenticated_userid',
+    'As of Pyramid 1.5 the "pyramid.security.unauthenticated_userid" API is '
+    'now deprecated.  It will be removed in Pyramd 1.8.  Use the '
+    '"unauthenticated_userid" attribute of the Pyramid request instead.'
+    )
 
-    Delegates to the
-    :meth:``pyramid.request.Request.effective_principals`` method.
+def effective_principals(request):
+    """
+    A function that returns the value of the property
+    :attr:`pyramid.request.Request.effective_principals`.
+    
+    .. deprecated:: 1.5
+       Use :attr:`pyramid.request.Request.effective_principals` instead.
     """            
     return request.effective_principals
 
-# b/c
-def remember(request, principal, **kw):
-    """ Backwards compatible wrapper.
+deprecated(
+    'effective_principals',
+    'As of Pyramid 1.5 the "pyramid.security.effective_principals" API is '
+    'now deprecated.  It will be removed in Pyramd 1.8.  Use the '
+    '"effective_principals" attribute of the Pyramid request instead.'
+    )
 
-    Delegates to the :meth:``pyramid.request.Request.remember_userid`` method.
-    """            
+def remember(request, principal, **kw):
+    """
+    Returns a sequence of header tuples (e.g. ``[('Set-Cookie',
+    'foo=abc')]``) on this request's response.
+    These headers are suitable for 'remembering' a set of credentials
+    implied by the data passed as ``principal`` and ``*kw`` using the
+    current :term:`authentication policy`.  Common usage might look
+    like so within the body of a view function (``response`` is
+    assumed to be a :term:`WebOb` -style :term:`response` object
+    computed previously by the view code)::
+
+    .. code-block:: python
+
+       from pyramid.security import remember
+       headers = remember(request, 'chrism', password='123', max_age='86400')
+       response.headerlist.extend(headers)
+       return response
+
+    If no :term:`authentication policy` is in use, this function will
+    do nothing. If used, the composition and
+    meaning of ``**kw`` must be agreed upon by the calling code and
+    the effective authentication policy.
+
+    .. deprecated:: 1.5
+       Use :meth:`pyramid.request.Request.remember_userid` instead.
+       but be sure to read its docs first; the remember_userid method is not an
+       exact analog of the remember function, because it sets headers instead
+       of returning them.
+    """
     return request._remember_userid(principal, **kw)
 
-# b/c
-def forget(request):
-    """ Backwards compatible wrapper.
+deprecated(
+    'remember',
+    'As of Pyramid 1.5 the "pyramid.security.remember" API is '
+    'now deprecated.  It will be removed in Pyramd 1.8.  Use the '
+    '"remember_userid" method of the Pyramid request instead, but be sure to '
+    'read the docs first; the remember_userid method is not an exact analog of '
+    'the remember function, because it sets headers instead of returning them.'
+    )
 
-    Delegates to the :meth:``pyramid.request.Request.forget_userid`` method.
+def forget(request):
+    """
+    Return a sequence of header tuples (e.g. ``[('Set-Cookie',
+    'foo=abc')]``) suitable for 'forgetting' the set of credentials
+    possessed by the currently authenticated user.  A common usage
+    might look like so within the body of a view function
+    (``response`` is assumed to be an :term:`WebOb` -style
+    :term:`response` object computed previously by the view code)::
+
+      from pyramid.security import forget
+      headers = forget(request)
+      response.headerlist.extend(headers)
+      return response
+
+    If no :term:`authentication policy` is in use, this function will
+    always return an empty sequence.
+
+    .. deprecated:: 1.5
+       Use :meth:`pyramid.request.Request.forget_userid` instead.
+       but be sure to read its docs first; the forget_userid method is not an
+       exact analog of the forget function, because it sets headers instead
+       of returning them.
     """            
     return request._forget_userid()
 
+deprecated(
+    'forget',
+    'As of Pyramid 1.5 the "pyramid.security.forget" API is '
+    'now deprecated.  It will be removed in Pyramd 1.8.  Use the '
+    '"forget_user" method of the Pyramid request instead, but be sure to '
+    'read the docs first; the forget_userid method is not an exact analog of '
+    'the forget function, because it sets headers instead of returning them.'
+    )
 
 def principals_allowed_by_permission(context, permission):
     """ Provided a ``context`` (a resource object), and a ``permission``
@@ -234,7 +330,10 @@ class AuthenticationAPIMixin(object):
     def authenticated_userid(self):
         """ Return the userid of the currently authenticated user or
         ``None`` if there is no :term:`authentication policy` in effect or
-        there is no currently authenticated user."""
+        there is no currently authenticated user.
+
+        .. versionadded:: 1.5
+        """
         policy = self._get_authentication_policy()
         if policy is None:
             return None
@@ -248,7 +347,10 @@ class AuthenticationAPIMixin(object):
         associated with the current request.  This differs from
         :func:`~pyramid.security.authenticated_userid`, because the effective
         authentication policy will not ensure that a record associated with the
-        userid exists in persistent storage."""
+        userid exists in persistent storage.
+
+        .. versionadded:: 1.5
+        """
         policy = self._get_authentication_policy()
         if policy is None:
             return None
@@ -260,7 +362,10 @@ class AuthenticationAPIMixin(object):
         for the ``request``.  This will include the userid of the
         currently authenticated user if a user is currently
         authenticated. If no :term:`authentication policy` is in effect,
-        this will return an empty sequence."""
+        this will return an empty sequence.
+
+        .. versionadded:: 1.5
+        """
         policy = self._get_authentication_policy()
         if policy is None:
             return [Everyone]
@@ -290,7 +395,11 @@ class AuthenticationAPIMixin(object):
         If no :term:`authentication policy` is in use, this function will
         do nothing. If used, the composition and
         meaning of ``**kw`` must be agreed upon by the calling code and
-        the effective authentication policy."""
+        the effective authentication policy.
+
+        .. versionadded:: 1.5
+
+        """
         headers = self._remember_userid(principal, **kw)
         callback = lambda req, response: response.headerlist.extend(headers)
         self.add_response_callback(callback)
@@ -315,9 +424,12 @@ class AuthenticationAPIMixin(object):
            request.forget_userid()
 
         If no :term:`authentication policy` is in use, this function will
-        be a noop."""
+        be a noop.
+
+        .. versionadded:: 1.5
+        """
         headers = self._forget_userid()
-        callback = lambda req, response: response.headerlist.extend(headers)        
+        callback = lambda req, response: response.headerlist.extend(headers)
         self.add_response_callback(callback)
 
 class AuthorizationAPIMixin(object):
@@ -333,15 +445,14 @@ class AuthorizationAPIMixin(object):
         unconditionally if no authentication policy has been registered
         for this request.
 
-        .. versionchanged:: 1.5a3
-           If context is None, then attempt to use the context attribute
-           of self, if not set then the  AttributeError is propergated.
-
         :param permission: Does this request have the given permission?
         :type permission: unicode, str
         :param context: Typically a resource of a regsitered type.
         :type context: object
         :returns: `pyramid.security.PermitsResult`
+
+        .. versionadded:: 1.5
+
         """
         if context is None:
             context = self.context

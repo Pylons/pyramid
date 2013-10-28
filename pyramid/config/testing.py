@@ -47,14 +47,14 @@ class TestingConfiguratorMixin(object):
         ``groupids`` argument.  The authentication policy will return
         the userid identifier implied by the ``userid`` argument and
         the group ids implied by the ``groupids`` argument when the
-        :meth:`pyramid.request.Request.authenticated_userid` or
-        :meth:`pyramid.request.Request.effective_principals` APIs are
+        :attr:`pyramid.request.Request.authenticated_userid` or
+        :attr:`pyramid.request.Request.effective_principals` APIs are
         used.
 
         This function is most useful when testing code that uses
         the APIs named :meth:`pyramid.request.Request.has_permission`,
-        :meth:`pyramid.request.Request.authenticated_userid`,
-        :meth:`pyramid.request.Request.effective_principals`, and
+        :attr:`pyramid.request.Request.authenticated_userid`,
+        :attr:`pyramid.request.Request.effective_principals`, and
         :func:`pyramid.security.principals_allowed_by_permission`.
 
         .. versionadded:: 1.4
