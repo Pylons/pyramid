@@ -380,17 +380,18 @@ class AuthenticationAPIMixin(object):
 
     def remember_userid(self, principal, on_exception=False, **kw):
         """ Sets a sequence of header tuples (e.g. ``[('Set-Cookie',
-        'foo=abc')]``) on this request's response.
-        These headers are suitable for 'remembering' a set of credentials
-        implied by the data passed as ``principal`` and ``*kw`` using the
-        current :term:`authentication policy`.  Common usage might look
-        like so within the body of a view function (``response`` is
-        assumed to be a :term:`WebOb` -style :term:`response` object
-        computed previously by the view code)::
+        'foo=abc')]``) on the response eventually returned using a response
+        callback.  These headers are used for 'remembering' a set of
+        credentials implied by the data passed as ``principal`` and ``*kw``
+        using the current :term:`authentication policy`.  Common usage might
+        look like so within the body of a view function::
 
         .. code-block:: python
 
            request.remember_userid('chrism', password='123', max_age='86400')
+
+        This method always returns ``None``; it is called only for its side
+        effects.
 
         If no :term:`authentication policy` is in use, this function will
         do nothing. If used, the composition and
@@ -431,17 +432,14 @@ class AuthenticationAPIMixin(object):
     def forget_userid(self, on_exception=False):
         """ Sets a sequence of header tuples (e.g. ``[('Set-Cookie',
         'foo=abc')]``) suitable for 'forgetting' the set of credentials
-        possessed by the currently authenticated user on the response.
-        A common usage might look like so within the body of a view function
-        (``response`` is assumed to be an :term:`WebOb` -style
-        :term:`response` object computed previously by the view code)::
-
-        .. code-block:: python
-
-           request.forget_userid()
+        possessed by the currently authenticated user on the response based on
+        the current :term:`authentication policy`, using a response callback.
 
         If no :term:`authentication policy` is in use, this function will
         be a noop.
+
+        This method always returns ``None``; it is called only for its side
+        effects.
 
         One special keyword value is understood by this method:
         ``on_exception``.  Usually if an exception occurs within the same
