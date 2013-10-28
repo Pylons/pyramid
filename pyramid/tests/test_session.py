@@ -370,6 +370,24 @@ class TestSignedCookieSession(SharedCookieSessionTests, unittest.TestCase):
         session = self._makeOne(request)
         self.assertEqual(session, {})
 
+    def test_very_long_key(self):
+        verylongkey = b'a' * 1024
+        import webob
+        request = testing.DummyRequest()
+        session = self._makeOne(request, secret=verylongkey)
+        session['a'] = 1
+        callbacks = request.response_callbacks
+        self.assertEqual(len(callbacks), 1)
+        response = webob.Response()
+
+        try:
+            result = callbacks[0](request, response)
+        except TypeError as e: # pragma: no cover
+            self.fail('HMAC failed to initialize due to key length.')
+
+        self.assertEqual(result, None)
+        self.assertTrue('Set-Cookie' in dict(response.headerlist))
+
 class TestUnencryptedCookieSession(SharedCookieSessionTests, unittest.TestCase):
     def setUp(self):
         super(TestUnencryptedCookieSession, self).setUp()

@@ -565,7 +565,7 @@ def SignedCookieSessionFactory(
     if deserialize is None:
         deserialize = pickle.loads
 
-    digestmod = lambda: hashlib.new(hashalg)
+    digestmod = lambda string=b'': hashlib.new(hashalg, string)
     digest_size = digestmod().digest_size
 
     salted_secret = bytes_(salt or '') + bytes_(secret)
