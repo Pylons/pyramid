@@ -408,12 +408,12 @@ class AuthenticationAPIMixin(object):
         .. versionadded:: 1.5
 
         """
-        headers = self._remember_userid(principal, **kw)
         def callback(req, response):
             # do not set the headers on an exception unless explicitly
             # instructed
             exc = getattr(req, 'exception', None)
             if exc is None or on_exception:
+                headers = self._remember_userid(principal, **kw)
                 response.headerlist.extend(headers)
         self.add_response_callback(callback)
 
@@ -449,10 +449,10 @@ class AuthenticationAPIMixin(object):
 
         .. versionadded:: 1.5
         """
-        headers = self._forget_userid()
         def callback(req, response):
             exc = getattr(req, 'exception', None)
             if exc is None or on_exception:
+                headers = self._forget_userid()
                 response.headerlist.extend(headers)
         self.add_response_callback(callback)
 
