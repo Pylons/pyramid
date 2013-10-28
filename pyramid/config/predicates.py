@@ -13,7 +13,6 @@ from pyramid.traversal import (
 from pyramid.urldispatch import _compile_route
 from pyramid.util import object_description
 from pyramid.session import check_csrf_token
-from pyramid.security import effective_principals
 
 from .util import as_sorted_tuple
 
@@ -288,7 +287,7 @@ class EffectivePrincipalsPredicate(object):
     phash = text
 
     def __call__(self, context, request):
-        req_principals = effective_principals(request)
+        req_principals = request.effective_principals
         if is_nonstr_iter(req_principals):
             rpset = set(req_principals)
             if self.val.issubset(rpset):
