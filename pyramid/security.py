@@ -413,7 +413,11 @@ class AuthenticationAPIMixin(object):
             # instructed
             exc = getattr(req, 'exception', None)
             if exc is None or on_exception:
-                headers = self._remember_userid(principal, **kw)
+                # NB: this call to _remember_userid should be exactly here
+                # because some policies actually add another response callback
+                # when their remember method is called, and we dont want them
+                # to do that if there's an exception in the default case.
+                headers = req._remember_userid(principal, **kw)
                 response.headerlist.extend(headers)
         self.add_response_callback(callback)
 
@@ -452,7 +456,11 @@ class AuthenticationAPIMixin(object):
         def callback(req, response):
             exc = getattr(req, 'exception', None)
             if exc is None or on_exception:
-                headers = self._forget_userid()
+                # NB: this call to _forget_userid should be exactly here
+                # because some policies actually add another response callback
+                # when their forget method is called, and we dont want them
+                # to do that if there's an exception in the default case.
+                headers = req._forget_userid()
                 response.headerlist.extend(headers)
         self.add_response_callback(callback)
 
