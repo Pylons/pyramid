@@ -130,7 +130,7 @@ def remember(request, principal, **kw):
        return response
 
     If no :term:`authentication policy` is in use, this function will
-    do nothing. If used, the composition and
+    always return an empty sequence. If used, the composition and
     meaning of ``**kw`` must be agreed upon by the calling code and
     the effective authentication policy.
 
@@ -375,10 +375,10 @@ class AuthenticationAPIMixin(object):
     def _remember_userid(self, principal, **kw):
         policy = self._get_authentication_policy()
         if policy is None:
-            return
+            return []
         return policy.remember(self, principal, **kw)
 
-    def remember_userid(self, principal, **kw):
+    def remember_userid(self, principal, on_exception=False, **kw):
         """ Sets a sequence of header tuples (e.g. ``[('Set-Cookie',
         'foo=abc')]``) on this request's response.
         These headers are suitable for 'remembering' a set of credentials
@@ -397,21 +397,34 @@ class AuthenticationAPIMixin(object):
         meaning of ``**kw`` must be agreed upon by the calling code and
         the effective authentication policy.
 
+        One special keyword value is understood by this method:
+        ``on_exception``.  Usually if an exception occurs within the same
+        request after this method is called, the headers provided by the
+        authentication policy will not be set on the response.  If
+        ``on_exception`` is passed, and as ``True``, then the headers will be
+        set on the response even if an exception is later raised.  By default
+        this value is ``False``.
+
         .. versionadded:: 1.5
 
         """
         headers = self._remember_userid(principal, **kw)
-        callback = lambda req, response: response.headerlist.extend(headers)
+        def callback(req, response):
+            # do not set the headers on an exception unless explicitly
+            # instructed
+            exc = getattr(req, 'exception', None)
+            if exc is None or on_exception:
+                response.headerlist.extend(headers)
         self.add_response_callback(callback)
 
     # b/c
     def _forget_userid(self):
         policy = self._get_authentication_policy()
         if policy is None:
-            return
+            return []
         return policy.forget(self)
 
-    def forget_userid(self):
+    def forget_userid(self, on_exception=False):
         """ Sets a sequence of header tuples (e.g. ``[('Set-Cookie',
         'foo=abc')]``) suitable for 'forgetting' the set of credentials
         possessed by the currently authenticated user on the response.
@@ -426,10 +439,21 @@ class AuthenticationAPIMixin(object):
         If no :term:`authentication policy` is in use, this function will
         be a noop.
 
+        One special keyword value is understood by this method:
+        ``on_exception``.  Usually if an exception occurs within the same
+        request after this method is called, the headers provided by the
+        authentication policy will not be set on the response.  If
+        ``on_exception`` is passed, and as ``True``, then the headers will be
+        set on the response even if an exception is later raised.  By default
+        this value is ``False``.
+
         .. versionadded:: 1.5
         """
         headers = self._forget_userid()
-        callback = lambda req, response: response.headerlist.extend(headers)
+        def callback(req, response):
+            exc = getattr(req, 'exception', None)
+            if exc is None or on_exception:
+                response.headerlist.extend(headers)
         self.add_response_callback(callback)
 
 class AuthorizationAPIMixin(object):
