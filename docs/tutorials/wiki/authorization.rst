@@ -56,10 +56,10 @@ returns one of these values:
   return ``None``.
 
 For example, ``groupfinder('editor', request )`` returns ``['group:editor']``,
-``groupfinder('viewer', request)`` returns ``[]``, and ``groupfinder('admin', request)``
-returns ``None``.  We will use ``groupfinder()`` as an :term:`authentication policy`
-"callback" that will provide the :term:`principal` or principals
-for a user.
+``groupfinder('viewer', request)`` returns ``[]``, and ``groupfinder('admin',
+request)`` returns ``None``.  We will use ``groupfinder()`` as an
+:term:`authentication policy` "callback" that will provide the
+:term:`principal` or principals for a user.
 
 In a production system, user and group
 data will most often come from a database, but here we use "dummy"
@@ -197,15 +197,15 @@ Add the following import statements to the
 head of ``tutorial/tutorial/views.py``:
 
 .. literalinclude:: src/authorization/tutorial/views.py
-   :lines: 6-13,15-17
+   :lines: 6-11
    :linenos:
-   :emphasize-lines: 3,6-9,11
+   :emphasize-lines: 3,6
    :language: python
 
 (Only the highlighted lines, with other necessary modifications,
 need to be added.)
 
-:meth:`~pyramid.view.forbidden_view_config` will be used
+:func:`~pyramid.view.forbidden_view_config` will be used
 to customize the default 403 Forbidden page.
 :meth:`~pyramid.request.Request.remember_userid` and
 :meth:`~pyramid.request.Request.forget_userid` help to create and
@@ -214,7 +214,7 @@ expire an auth ticket cookie.
 Now add the ``login`` and ``logout`` views:
 
 .. literalinclude:: src/authorization/tutorial/views.py
-   :lines: 82-120
+   :lines: 76-102
    :linenos:
    :language: python
 
@@ -251,18 +251,6 @@ in ``views.py``.
 Return a logged_in flag to the renderer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Add the following line to the import at the head of
-``tutorial/tutorial/views.py``:
-
-.. literalinclude:: src/authorization/tutorial/views.py
-   :lines: 11-15
-   :linenos:
-   :emphasize-lines: 4
-   :language: python
-
-(Only the highlighted line and a trailing comma on the preceding
-line need to be added.)
-
 Add a  ``logged_in`` parameter to the return value of
 ``view_page()``, ``edit_page()`` and  ``add_page()``,
 like this:
@@ -274,12 +262,12 @@ like this:
    return dict(page = page,
                content = content,
                edit_url = edit_url,
-               logged_in = authenticated_userid(request))
+               logged_in = request.authenticated_userid)
 
 (Only the highlighted line and a trailing comma on the preceding
 line need to be added.)
 
-:meth:`~pyramid.security.authenticated_userid()` will return ``None``
+:attr:`~pyramid.request.Request.authenticated_userid` will return ``None``
 if the user is not authenticated, or a user id if the user is
 authenticated.
 
@@ -329,7 +317,7 @@ when we're done:
 
 .. literalinclude:: src/authorization/tutorial/views.py
    :linenos:
-   :emphasize-lines: 8,11-15,17,24,29,48,52,68,72,80,82-120
+   :emphasize-lines: 8,11,18,23,42,46,62,66,74,80,76-107
    :language: python
 
 (Only the highlighted lines need to be added.)

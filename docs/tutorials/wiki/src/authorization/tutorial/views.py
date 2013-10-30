@@ -8,12 +8,6 @@ from pyramid.view import (
     forbidden_view_config,
     )
 
-from pyramid.security import (
-    remember,
-    forget,
-    authenticated_userid,
-    )
-
 from .security import USERS
 from .models import Page
 
@@ -45,7 +39,7 @@ def view_page(context, request):
     edit_url = request.resource_url(context, 'edit_page')
 
     return dict(page = context, content = content, edit_url = edit_url,
-                logged_in = authenticated_userid(request))
+                logged_in = request.authenticated_userid)
 
 @view_config(name='add_page', context='.models.Wiki',
              renderer='templates/edit.pt',
@@ -65,7 +59,7 @@ def add_page(context, request):
     page.__parent__ = context
 
     return dict(page=page, save_url=save_url,
-                logged_in=authenticated_userid(request))
+                logged_in=request.authenticated_userid)
 
 @view_config(name='edit_page', context='.models.Page',
              renderer='templates/edit.pt',
@@ -77,7 +71,7 @@ def edit_page(context, request):
 
     return dict(page=context,
                 save_url=request.resource_url(context, 'edit_page'),
-                logged_in=authenticated_userid(request))
+                logged_in=request.authenticated_userid)
 
 @view_config(context='.models.Wiki', name='login',
              renderer='templates/login.pt')
@@ -95,9 +89,8 @@ def login(request):
         login = request.params['login']
         password = request.params['password']
         if USERS.get(login) == password:
-            headers = remember(request, login)
-            return HTTPFound(location = came_from,
-                             headers = headers)
+            request.remember_userid(login)
+            return HTTPFound(location=came_from)
         message = 'Failed login'
 
     return dict(
@@ -110,6 +103,5 @@ def login(request):
 
 @view_config(context='.models.Wiki', name='logout')
 def logout(request):
-    headers = forget(request)
-    return HTTPFound(location = request.resource_url(request.context),
-                     headers = headers)
+    request.forget_userid()
+    return HTTPFound(location=request.resource_url(request.context))
