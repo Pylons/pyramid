@@ -465,15 +465,16 @@ class AuthenticationAPIMixin(object):
 class AuthorizationAPIMixin(object):
 
     def has_permission(self, permission, context=None):
-        """ Given a permission and an optional context,
-        returns an instance of :data:`pyramid.security.Allowed` if the
-        permission is granted to this request with the provided context,
-        or the context already associated with the request. Otherwise,
-        returns an instance of :data:`pyramid.security.Denied`.
-        This method delegates to the current authentication and
-        authorization policies. Returns :data:`pyramid.security.Allowed`
-        unconditionally if no authentication policy has been registered
-        for this request.
+        """ Given a permission and an optional context, returns an instance of
+        :data:`pyramid.security.Allowed` if the permission is granted to this
+        request with the provided context, or the context already associated
+        with the request.  Otherwise, returns an instance of
+        :data:`pyramid.security.Denied`.  This method delegates to the current
+        authentication and authorization policies.  Returns
+        :data:`pyramid.security.Allowed` unconditionally if no authentication
+        policy has been registered for this request.  If ``context`` is not
+        supplied or is supplied as ``None``, the context used is the
+        ``request.context`` attribute.
 
         :param permission: Does this request have the given permission?
         :type permission: unicode, str
