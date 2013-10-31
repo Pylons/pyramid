@@ -379,12 +379,13 @@ class AuthenticationAPIMixin(object):
         return policy.remember(self, principal, **kw)
 
     def remember_userid(self, principal, on_exception=False, **kw):
-        """ Sets a sequence of header tuples (e.g. ``[('Set-Cookie',
-        'foo=abc')]``) on the response eventually returned using a response
-        callback.  These headers are used for 'remembering' a set of
-        credentials implied by the data passed as ``principal`` and ``*kw``
-        using the current :term:`authentication policy`.  Common usage might
-        look like so within the body of a view function:
+        """ Using a response callback, sets authentication headers on the
+        response eventually returned by the view executed by this request
+        suitable for loggin a user in.  These headers are used for
+        'remembering' a set of credentials implied by the data passed as
+        ``principal`` and ``*kw`` using the current :term:`authentication
+        policy`.  Common usage might look like so within the body of a view
+        function:
 
         .. code-block:: python
 
@@ -430,10 +431,9 @@ class AuthenticationAPIMixin(object):
         return policy.forget(self)
 
     def forget_userid(self, on_exception=False):
-        """ Sets a sequence of header tuples (e.g. ``[('Set-Cookie',
-        'foo=abc')]``) suitable for 'forgetting' the set of credentials
-        possessed by the currently authenticated user on the response based on
-        the current :term:`authentication policy`, using a response callback.
+        """ Using a response callback, sets authentication headers suitable for
+        logging a user out on the response returned by the view executed during
+        this request based on the current :term:`authentication policy`.
 
         If no :term:`authentication policy` is in use, this function will
         be a noop.
