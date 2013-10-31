@@ -345,9 +345,9 @@ class AuthenticationAPIMixin(object):
         id of the credentials present in the request. ``None`` if there is no
         :term:`authentication policy` in effect or there is no user data
         associated with the current request.  This differs from
-        :func:`~pyramid.security.authenticated_userid`, because the effective
-        authentication policy will not ensure that a record associated with the
-        userid exists in persistent storage.
+        :attr:`~pyramid.request.Request.authenticated_userid`, because the
+        effective authentication policy will not ensure that a record
+        associated with the userid exists in persistent storage.
 
         .. versionadded:: 1.5
         """

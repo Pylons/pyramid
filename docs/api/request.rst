@@ -171,7 +171,7 @@
       A property which returns the userid of the currently authenticated user
       or ``None`` if there is no :term:`authentication policy` in effect or
       there is no currently authenticated user.  This differs from
-      :meth:`~pyramid.request.Request.unauthenticated_userid`, because the
+      :attr:`~pyramid.request.Request.unauthenticated_userid`, because the
       effective authentication policy will have ensured that a record
       associated with the userid exists in persistent storage; if it has
       not, this value will be ``None``.
@@ -184,7 +184,7 @@
       verified) user id of the credentials present in the request. ``None`` if
       there is no :term:`authentication policy` in effect or there is no user
       data associated with the current request.  This differs from
-      :meth:`~pyramid.request.Request.authenticated_userid`, because the
+      :attr:`~pyramid.request.Request.authenticated_userid`, because the
       effective authentication policy will not ensure that a record associated
       with the userid exists in persistent storage.  Even if the userid
       does not exist in persistent storage, this value will be the value
