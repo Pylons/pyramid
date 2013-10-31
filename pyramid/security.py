@@ -466,7 +466,7 @@ class AuthorizationAPIMixin(object):
 
     def has_permission(self, permission, context=None):
         """ Given a permission and an optional context,
-        returns an instance of :data:`pyramid.security.Allowed if the
+        returns an instance of :data:`pyramid.security.Allowed` if the
         permission is granted to this request with the provided context,
         or the context already associated with the request. Otherwise,
         returns an instance of :data:`pyramid.security.Denied`.
