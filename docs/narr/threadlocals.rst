@@ -29,17 +29,16 @@ of a thread local or a global is usually just a way to avoid passing
 some value around between functions, which is itself usually a very
 bad idea, at least if code readability counts as an important concern.
 
-For historical reasons, however, thread local variables are indeed
-consulted by various :app:`Pyramid` API functions.  For example,
-the implementation of the :mod:`pyramid.security` function named
-:func:`~pyramid.security.authenticated_userid` retrieves the thread
-local :term:`application registry` as a matter of course to find an
+For historical reasons, however, thread local variables are indeed consulted by
+various :app:`Pyramid` API functions.  For example, the implementation of the
+:mod:`pyramid.security` function named
+:func:`~pyramid.security.authenticated_userid` (deprecated as of 1.5) retrieves
+the thread local :term:`application registry` as a matter of course to find an
 :term:`authentication policy`.  It uses the
-:func:`pyramid.threadlocal.get_current_registry` function to
-retrieve the application registry, from which it looks up the
-authentication policy; it then uses the authentication policy to
-retrieve the authenticated user id.  This is how :app:`Pyramid`
-allows arbitrary authentication policies to be "plugged in".
+:func:`pyramid.threadlocal.get_current_registry` function to retrieve the
+application registry, from which it looks up the authentication policy; it then
+uses the authentication policy to retrieve the authenticated user id.  This is
+how :app:`Pyramid` allows arbitrary authentication policies to be "plugged in".
 
 When they need to do so, :app:`Pyramid` internals use two API
 functions to retrieve the :term:`request` and :term:`application
