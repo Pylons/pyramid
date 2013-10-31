@@ -384,7 +384,7 @@ class AuthenticationAPIMixin(object):
         callback.  These headers are used for 'remembering' a set of
         credentials implied by the data passed as ``principal`` and ``*kw``
         using the current :term:`authentication policy`.  Common usage might
-        look like so within the body of a view function::
+        look like so within the body of a view function:
 
         .. code-block:: python
 
