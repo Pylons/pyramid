@@ -11,12 +11,6 @@ from pyramid.view import (
     forbidden_view_config,
     )
 
-from pyramid.security import (
-    remember,
-    forget,
-    authenticated_userid,
-    )
-
 from .models import (
     DBSession,
     Page,
@@ -55,7 +49,7 @@ def view_page(request):
     content = wikiwords.sub(check, content)
     edit_url = request.route_url('edit_page', pagename=pagename)
     return dict(page=page, content=content, edit_url=edit_url,
-                logged_in=authenticated_userid(request))
+                logged_in=request.authenticated_userid)
 
 @view_config(route_name='add_page', renderer='templates/edit.pt',
              permission='edit')
@@ -70,7 +64,7 @@ def add_page(request):
     save_url = request.route_url('add_page', pagename=pagename)
     page = Page(name='', data='')
     return dict(page=page, save_url=save_url,
-                logged_in=authenticated_userid(request))
+                logged_in=request.authenticated_userid)
 
 @view_config(route_name='edit_page', renderer='templates/edit.pt',
              permission='edit')
@@ -85,7 +79,7 @@ def edit_page(request):
     return dict(
         page=page,
         save_url = request.route_url('edit_page', pagename=pagename),
-        logged_in=authenticated_userid(request),
+        logged_in=request.authenticated_userid,
         )
 
 @view_config(route_name='login', renderer='templates/login.pt')
@@ -103,9 +97,8 @@ def login(request):
         login = request.params['login']
         password = request.params['password']
         if USERS.get(login) == password:
-            headers = remember(request, login)
-            return HTTPFound(location = came_from,
-                             headers = headers)
+            request.remember_userid(login)
+            return HTTPFound(location = came_from)
         message = 'Failed login'
 
     return dict(
@@ -118,7 +111,6 @@ def login(request):
 
 @view_config(route_name='logout')
 def logout(request):
-    headers = forget(request)
-    return HTTPFound(location = request.route_url('view_wiki'),
-                     headers = headers)
+    request.forget_userid()
+    return HTTPFound(location = request.route_url('view_wiki'))
     

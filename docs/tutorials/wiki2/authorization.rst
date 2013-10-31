@@ -221,14 +221,14 @@ Add the following import statements to the
 head of ``tutorial/tutorial/views.py``:
 
 .. literalinclude:: src/authorization/tutorial/views.py
-   :lines: 9-16,18,24-25
+   :lines: 9-12,19
    :linenos:
-   :emphasize-lines: 3,6-9,11
+   :emphasize-lines: 3,5
    :language: python
 
 (Only the highlighted lines need to be added.)
 
-:meth:`~pyramid.view.forbidden_view_config` will be used
+:func:`~pyramid.view.forbidden_view_config` will be used
 to customize the default 403 Forbidden page.
 :meth:`~pyramid.request.Request.remember_userid` and
 :meth:`~pyramid.request.Request.forget_userid` help to create and
@@ -237,7 +237,7 @@ expire an auth ticket cookie.
 Now add the ``login`` and ``logout`` views:
 
 .. literalinclude:: src/authorization/tutorial/views.py
-   :lines: 91-123
+   :lines: 85-115
    :linenos:
    :language: python
 
@@ -274,17 +274,6 @@ added to ``views.py``.
 Return a logged_in flag to the renderer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Add the following line to the import at the head of
-``tutorial/tutorial/views.py``:
-
-.. literalinclude:: src/authorization/tutorial/views.py
-   :lines: 14-18
-   :linenos:
-   :emphasize-lines: 4
-   :language: python
-
-(Only the highlighted line needs to be added.)
-
 Add a  ``logged_in`` parameter to the return value of
 ``view_page()``, ``edit_page()`` and  ``add_page()``,
 like this:
@@ -296,12 +285,12 @@ like this:
    return dict(page = page,
                content = content,
                edit_url = edit_url,
-               logged_in = authenticated_userid(request))
+               logged_in = request.authenticated_userid)
 
 (Only the highlighted line needs to be added.)
 
-The :meth:`~pyramid.security.authenticated_userid` method will return None
-if the user is not authenticated.
+The :attr:`~pyramid.request.Request.authenticated_userid` property will return
+``None`` if the user is not authenticated.
 
 Add a "Logout" link when logged in
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -349,7 +338,7 @@ when we're done:
 
 .. literalinclude:: src/authorization/tutorial/views.py
    :linenos:
-   :emphasize-lines: 11,14-18,25,31,37,58,61,73,76,88,91-117,119-123
+   :emphasize-lines: 11,19,25,31,52,55,67,70,82,85-115
    :language: python
 
 (Only the highlighted lines need to be added.)
