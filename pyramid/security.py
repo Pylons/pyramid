@@ -478,7 +478,7 @@ class AuthorizationAPIMixin(object):
 
         :param permission: Does this request have the given permission?
         :type permission: unicode, str
-        :param context: Typically a resource of a regsitered type.
+        :param context: A resource object or ``None``
         :type context: object
         :returns: `pyramid.security.PermitsResult`
 
