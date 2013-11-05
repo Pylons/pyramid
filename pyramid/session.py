@@ -9,13 +9,16 @@ from zope.deprecation import deprecated
 from zope.interface import implementer
 
 from pyramid.compat import (
-    pickle,
     PY3,
     text_,
     bytes_,
     native_,
-    )
-
+    pickle,
+)
+from pyramid.cookies import (
+    CookieHelper,
+    SignedSerializer,
+)
 from pyramid.exceptions import BadCSRFToken
 from pyramid.interfaces import ISession
 from pyramid.util import strings_differ
@@ -124,10 +127,12 @@ def BaseCookieSessionFactory(
     deserialize,
     cookie_name='session',
     max_age=None,
-    path='/',
-    domain=None,
     secure=False,
     httponly=False,
+    path='/',
+    domain=None,
+    wild_domain=False,
+    parent_domain=False,
     timeout=1200,
     reissue_time=0,
     set_on_exception=True,
@@ -169,18 +174,31 @@ def BaseCookieSessionFactory(
       The maximum age of the cookie used for sessioning (in seconds).
       Default: ``None`` (browser scope).
 
-    ``path``
-      The path used for the session cookie. Default: ``'/'``.
-
-    ``domain``
-      The domain used for the session cookie.  Default: ``None`` (no domain).
-
     ``secure``
       The 'secure' flag of the session cookie. Default: ``False``.
 
     ``httponly``
       Hide the cookie from Javascript by setting the 'HttpOnly' flag of the
       session cookie. Default: ``False``.
+
+    ``path``
+      The path used for the session cookie. Default: ``'/'``.
+
+    ``domain``
+      The domain used for the session cookie.  Default: ``None`` (no domain).
+
+    ``wild_domain``
+      A cookie will be generated for the wildcard domain. If your site is
+      hosted as ``example.com`` this will make the cookie available for
+      sites underneath ``example.com`` such as ``www.example.com``.
+      Default: ``False``.
+
+    ``parent_domain``
+      A cookie will be generated for the parent domain of the current site.
+      For example if your site is hosted under ``www.example.com`` a cookie
+      will be generated for ``.example.com``. This can be useful if you have
+      multiple sites sharing the same domain. This option supercedes
+      the ``wild_domain`` option. Default: ``False``.
 
     ``timeout``
       A number of seconds of inactivity before a session times out. If
@@ -210,6 +228,19 @@ def BaseCookieSessionFactory(
     .. versionadded: 1.5a3
     """
 
+    cookie_helper = CookieHelper(
+        cookie_name,
+        secure=secure,
+        max_age=max_age,
+        httponly=httponly,
+        path=path,
+        domain=None,
+        wild_domain=wild_domain,
+        parent_domain=parent_domain,
+        serialize=serialize,
+        deserialize=deserialize,
+    )
+
     @implementer(ISession)
     class CookieSession(dict):
         """ Dictionary-like session object """
@@ -235,13 +266,11 @@ def BaseCookieSessionFactory(
             new = True
             value = None
             state = {}
-            cookieval = request.cookies.get(self._cookie_name)
-            if cookieval is not None:
-                try:
-                    value = deserialize(bytes_(cookieval))
-                except ValueError:
-                    # the cookie failed to deserialize, dropped
-                    value = None
+            try:
+                value = cookie_helper.get_value(request)
+            except ValueError:
+                # the cookie failed to deserialize, dropped
+                value = None
 
             if value is not None:
                 try:
@@ -336,23 +365,11 @@ def BaseCookieSessionFactory(
                 exception = getattr(self.request, 'exception', None)
                 if exception is not None: # dont set a cookie during exceptions
                     return False
-            cookieval = native_(serialize(
-                (self.accessed, self.created, dict(self))
-                ))
-            if len(cookieval) > 4064:
-                raise ValueError(
-                    'Cookie value is too long to store (%s bytes)' %
-                    len(cookieval)
-                    )
-            response.set_cookie(
-                self._cookie_name,
-                value=cookieval,
-                max_age=self._cookie_max_age,
-                path=self._cookie_path,
-                domain=self._cookie_domain,
-                secure=self._cookie_secure,
-                httponly=self._cookie_httponly,
-                )
+            cookie_helper.set_cookies(
+                (self.accessed, self.created, dict(self)),
+                response,
+                request,
+            )
             return True
 
     return CookieSession
@@ -452,17 +469,19 @@ deprecated(
 
 def SignedCookieSessionFactory(
     secret,
+    salt='pyramid.session.',
+    hashalg='sha512',
     cookie_name='session',
     max_age=None,
-    path='/',
-    domain=None,
     secure=False,
     httponly=False,
-    set_on_exception=True,
+    path='/',
+    domain=None,
+    wild_domain=False,
+    parent_domain=False,
     timeout=1200,
     reissue_time=0,
-    hashalg='sha512',
-    salt='pyramid.session.',
+    set_on_exception=True,
     serialize=None,
     deserialize=None,
     ):
@@ -491,15 +510,15 @@ def SignedCookieSessionFactory(
       be unique within the set of secret values provided to Pyramid for
       its various subsystems (see :ref:`admonishment_against_secret_sharing`).
 
-    ``hashalg``
-      The HMAC digest algorithm to use for signing. The algorithm must be
-      supported by the :mod:`hashlib` library. Default: ``'sha512'``.
-
     ``salt``
       A namespace to avoid collisions between different uses of a shared
       secret. Reusing a secret for different parts of an application is
       strongly discouraged (see :ref:`admonishment_against_secret_sharing`).
       Default: ``'pyramid.session.'``.
+
+    ``hashalg``
+      The HMAC digest algorithm to use for signing. The algorithm must be
+      supported by the :mod:`hashlib` library. Default: ``'sha512'``.
 
     ``cookie_name``
       The name of the cookie used for sessioning. Default: ``'session'``.
@@ -508,18 +527,31 @@ def SignedCookieSessionFactory(
       The maximum age of the cookie used for sessioning (in seconds).
       Default: ``None`` (browser scope).
 
-    ``path``
-      The path used for the session cookie. Default: ``'/'``.
-
-    ``domain``
-      The domain used for the session cookie.  Default: ``None`` (no domain).
-
     ``secure``
       The 'secure' flag of the session cookie. Default: ``False``.
 
     ``httponly``
       Hide the cookie from Javascript by setting the 'HttpOnly' flag of the
       session cookie. Default: ``False``.
+
+    ``path``
+      The path used for the session cookie. Default: ``'/'``.
+
+    ``domain``
+      The domain used for the session cookie.  Default: ``None`` (no domain).
+
+    ``wild_domain``
+      A cookie will be generated for the wildcard domain. If your site is
+      hosted as ``example.com`` this will make the cookie available for
+      sites underneath ``example.com`` such as ``www.example.com``.
+      Default: ``False``.
+
+    ``parent_domain``
+      A cookie will be generated for the parent domain of the current site.
+      For example if your site is hosted under ``www.example.com`` a cookie
+      will be generated for ``.example.com``. This can be useful if you have
+      multiple sites sharing the same domain. This option supercedes
+      the ``wild_domain`` option. Default: ``False``.
 
     ``timeout``
       A number of seconds of inactivity before a session times out. If
@@ -558,47 +590,25 @@ def SignedCookieSessionFactory(
 
     .. versionadded: 1.5a3
     """
-
-    if serialize is None:
-        serialize = lambda v: pickle.dumps(v, pickle.HIGHEST_PROTOCOL)
-
-    if deserialize is None:
-        deserialize = pickle.loads
-
-    digestmod = lambda string=b'': hashlib.new(hashalg, string)
-    digest_size = digestmod().digest_size
-
-    salted_secret = bytes_(salt or '') + bytes_(secret)
-
-    def signed_serialize(appstruct):
-        cstruct = serialize(appstruct)
-        sig = hmac.new(salted_secret, cstruct, digestmod).digest()
-        return base64.b64encode(cstruct + sig)
-
-    def signed_deserialize(bstruct):
-        try:
-            fstruct = base64.b64decode(bstruct)
-        except (binascii.Error, TypeError) as e:
-            raise ValueError('Badly formed base64 data: %s' % e)
-
-        cstruct = fstruct[:-digest_size]
-        expected_sig = fstruct[-digest_size:]
-
-        sig = hmac.new(salted_secret, cstruct, digestmod).digest()
-        if strings_differ(sig, expected_sig):
-            raise ValueError('Invalid signature')
-
-        return deserialize(cstruct)
+    serializer = SignedSerializer(
+        secret,
+        salt,
+        hashalg,
+        serialize,
+        deserialize,
+    )
 
     return BaseCookieSessionFactory(
-        signed_serialize,
-        signed_deserialize,
+        serializer.dumps,
+        serializer.loads,
         cookie_name=cookie_name,
         max_age=max_age,
-        path=path,
-        domain=domain,
         secure=secure,
         httponly=httponly,
+        path=path,
+        domain=domain,
+        wild_domain=wild_domain,
+        parent_domain=parent_domain,
         timeout=timeout,
         reissue_time=reissue_time,
         set_on_exception=set_on_exception,
