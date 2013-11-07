@@ -36,6 +36,8 @@ from pyramid.interfaces import (
 from pyramid import renderers
 
 from pyramid.compat import (
+    native_,
+    text_type,
     string_types,
     urlparse,
     url_quote,
@@ -43,6 +45,8 @@ from pyramid.compat import (
     is_bound_method,
     is_nonstr_iter
     )
+
+from pyramid.encode import urlencode
 
 from pyramid.exceptions import (
     ConfigurationError,
@@ -1902,7 +1906,18 @@ class StaticURLInfo(object):
                         url = urlparse.urlunparse(url_parse(
                             url, scheme=request.environ['wsgi.url_scheme']))
                     subpath = url_quote(subpath)
-                    return urljoin(url, subpath)
+                    result = urljoin(url, subpath)
+                    if '_query' in kw:
+                        query = kw.pop('_query')
+                        if isinstance(query, text_type):
+                            result += '?' + native_(query)
+                        elif query:
+                            result += '?' + urlencode(query, doseq=True)
+                    if '_anchor' in kw:
+                        anchor = kw.pop('_anchor')
+                        anchor = native_(anchor, 'utf-8')
+                        result += '#' + anchor
+                    return result
 
         raise ValueError('No static URL definition matching %s' % path)
 
