@@ -19,7 +19,7 @@ class PickleSerializer(object):
 
 class SignedSerializer(object):
     """
-    A helper to contain the signing algorithm.
+    A helper to cryptographically sign arbitrary content using HMAC.
 
     The serializer accepts arbitrary functions for performing the actual
     serialization and deserialization.
@@ -93,8 +93,8 @@ class SignedSerializer(object):
         A ``ValueError` will be raised if the signature fails to validate.
         """
         try:
-            padding = b'=' * (-len(bstruct) % 4)
-            fstruct = base64.urlsafe_b64decode(bstruct + padding)
+            b64padding = b'=' * (-len(bstruct) % 4)
+            fstruct = base64.urlsafe_b64decode(bytes_(bstruct) + b64padding)
         except (binascii.Error, TypeError) as e:
             raise ValueError('Badly formed base64 data: %s' % e)
 
@@ -305,9 +305,10 @@ class SignedCookieHelper(CookieHelper):
     """
     A helper for generating cookies that are signed to prevent tampering.
 
-    By default this will create a single cookie, given a value it will base64
-    encode it, then using HMAC to cryptograpphically sign the data. This way
-    a remote user can not tamper with the value.
+    By default this will create a single cookie, given a value it will
+    serialize it, then use HMAC to cryptographically sign the data. Finally
+    the result is base64-encoded for transport. This way a remote user can
+    not tamper with the value without uncovering the secret/salt used.
 
     ``secret``
       A string which is used to sign the cookie. The secret should be at
@@ -320,7 +321,6 @@ class SignedCookieHelper(CookieHelper):
       A namespace to avoid collisions between different uses of a shared
       secret. Reusing a secret for different parts of an application is
       strongly discouraged (see :ref:`admonishment_against_secret_sharing`).
-      Default: ``'pyramid.session.'``.
 
     ``hashalg``
       The HMAC digest algorithm to use for signing. The algorithm must be
