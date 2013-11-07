@@ -93,6 +93,14 @@ class TestURLMethodsMixin(unittest.TestCase):
         result = request.resource_url(context, 'a b c')
         self.assertEqual(result, 'http://example.com:5432/context/a%20b%20c')
 
+    def test_resource_url_with_query_str(self):
+        request = self._makeOne()
+        self._registerResourceURL(request.registry)
+        context = DummyContext()
+        result = request.resource_url(context, 'a', query='(openlayers)')
+        self.assertEqual(result,
+            'http://example.com:5432/context/a?%28openlayers%29')
+
     def test_resource_url_with_query_dict(self):
         request = self._makeOne()
         self._registerResourceURL(request.registry)
@@ -482,6 +490,15 @@ class TestURLMethodsMixin(unittest.TestCase):
         result = request.route_url('flub', _query={'q':'1'})
         self.assertEqual(result,
                          'http://example.com:5432/1/2/3?q=1')
+
+    def test_route_url_with_query_str(self):
+        from pyramid.interfaces import IRoutesMapper
+        request = self._makeOne()
+        mapper = DummyRoutesMapper(route=DummyRoute('/1/2/3'))
+        request.registry.registerUtility(mapper, IRoutesMapper)
+        result = request.route_url('flub', _query='(openlayers)')
+        self.assertEqual(result,
+                         'http://example.com:5432/1/2/3?%28openlayers%29')
 
     def test_route_url_with_empty_query(self):
         from pyramid.interfaces import IRoutesMapper

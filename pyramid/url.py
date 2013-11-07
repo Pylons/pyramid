@@ -14,10 +14,14 @@ from pyramid.interfaces import (
 from pyramid.compat import (
     native_,
     bytes_,
+    string_types,
     text_type,
     url_quote,
     )
-from pyramid.encode import urlencode
+from pyramid.encode import (
+    quote_plus,
+    urlencode,
+)
 from pyramid.path import caller_package
 from pyramid.threadlocal import get_current_registry
 
@@ -222,8 +226,8 @@ class URLMethodsMixin(object):
 
         if '_query' in kw:
             query = kw.pop('_query')
-            if isinstance(query, text_type):
-                qs = '?' + native_(query)
+            if isinstance(query, string_types):
+                qs = '?' + quote_plus(query)
             elif query:
                 qs = '?' + urlencode(query, doseq=True)
 
@@ -582,8 +586,8 @@ class URLMethodsMixin(object):
 
         if 'query' in kw:
             query = kw['query']
-            if isinstance(query, text_type):
-                qs = '?' + native_(query)
+            if isinstance(query, string_types):
+                qs = '?' + quote_plus(query)
             elif query:
                 qs = '?' + urlencode(query, doseq=True)
 
