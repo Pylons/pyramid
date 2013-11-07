@@ -1,6 +1,5 @@
 import base64
 import binascii
-import datetime
 import hashlib
 import hmac
 
@@ -225,7 +224,7 @@ class CookieHelper(object):
         cookie = request.cookies.get(self.cookie_name)
 
         if cookie:
-            return self.deserialize(cookie)
+            return self.deserialize(bytes_(cookie))
 
     def _get_cookies(self, environ, value, max_age):
         """Internal function
@@ -275,9 +274,9 @@ class CookieHelper(object):
 
         cookies = []
         for domain in domains:
-            morsel = Morsel(self.cookie_name, value)
-            morsel.path = self.path
-            morsel.domain = domain
+            morsel = Morsel(bytes_(self.cookie_name), bytes_(value))
+            morsel.path = bytes_(self.path)
+            morsel.domain = bytes_(domain)
             morsel.max_age = max_age
             morsel.httponly = self.httponly
             morsel.secure = self.secure
