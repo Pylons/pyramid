@@ -222,7 +222,9 @@ class URLMethodsMixin(object):
 
         if '_query' in kw:
             query = kw.pop('_query')
-            if query:
+            if isinstance(query, text_type):
+                qs = '?' + native_(query)
+            elif query:
                 qs = '?' + urlencode(query, doseq=True)
 
         if '_anchor' in kw:
@@ -580,7 +582,9 @@ class URLMethodsMixin(object):
 
         if 'query' in kw:
             query = kw['query']
-            if query:
+            if isinstance(query, text_type):
+                qs = '?' + native_(query)
+            elif query:
                 qs = '?' + urlencode(query, doseq=True)
 
         if 'anchor' in kw:
