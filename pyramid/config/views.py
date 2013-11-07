@@ -1913,7 +1913,7 @@ class StaticURLInfo(object):
                     if '_query' in kw:
                         query = kw.pop('_query')
                         if isinstance(query, text_type):
-                            result += '?' + native_(query)
+                            result += '?' + quote_plus(query)
                         elif query:
                             result += '?' + urlencode(query, doseq=True)
                     if '_anchor' in kw:
