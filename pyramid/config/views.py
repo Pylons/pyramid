@@ -46,7 +46,10 @@ from pyramid.compat import (
     is_nonstr_iter
     )
 
-from pyramid.encode import urlencode
+from pyramid.encode import (
+    quote_plus,
+    urlencode,
+)
 
 from pyramid.exceptions import (
     ConfigurationError,
@@ -1915,7 +1918,7 @@ class StaticURLInfo(object):
                             result += '?' + urlencode(query, doseq=True)
                     if '_anchor' in kw:
                         anchor = kw.pop('_anchor')
-                        anchor = native_(anchor, 'utf-8')
+                        anchor = quote_plus(anchor)
                         result += '#' + anchor
                     return result
 
