@@ -139,7 +139,7 @@ def BaseCookieSessionFactory(
     ):
     """
     .. versionadded:: 1.5
-    
+
     Configure a :term:`session factory` which will provide cookie-based
     sessions.  The return value of this function is a :term:`session factory`,
     which may be provided as the ``session_factory`` argument of a
@@ -223,7 +223,8 @@ def BaseCookieSessionFactory(
 
     ``set_on_exception``
       If ``True``, set a session cookie even if an exception occurs
-      while rendering a view. Default: ``True``.
+      while rendering a view. It's recommended to keep this ``True`` otherwise
+      error-based flash messages would not be saved. Default: ``True``.
 
     .. versionadded: 1.5a3
     """
@@ -234,7 +235,7 @@ def BaseCookieSessionFactory(
         max_age=max_age,
         httponly=httponly,
         path=path,
-        domain=None,
+        domain=domain,
         wild_domain=wild_domain,
         parent_domain=parent_domain,
         serialize=serialize,
@@ -366,9 +367,9 @@ def BaseCookieSessionFactory(
                 if exception is not None: # dont set a cookie during exceptions
                     return False
             cookie_helper.set_cookies(
-                (self.accessed, self.created, dict(self)),
+                self.request,
                 response,
-                request,
+                (self.accessed, self.created, dict(self)),
             )
             return True
 
@@ -576,7 +577,8 @@ def SignedCookieSessionFactory(
 
     ``set_on_exception``
       If ``True``, set a session cookie even if an exception occurs
-      while rendering a view. Default: ``True``.
+      while rendering a view. It's recommended to keep this ``True`` otherwise
+      error-based flash messages would not be saved. Default: ``True``.
 
     ``serialize``
       A callable accepting a Python object and returning a bytestring. A

@@ -10,6 +10,8 @@ from pyramid.compat import (
 )
 from pyramid.util import strings_differ
 
+from webob.cookies import Morsel
+
 class PickleSerializer(object):
     def dumps(self, appstruct):
         return pickle.dumps(appstruct, pickle.HIGHEST_PROTOCOL)
@@ -107,6 +109,8 @@ class SignedSerializer(object):
 
         return self.deserialize(cstruct)
 
+_default = object()
+
 class CookieHelper(object):
     """
     A helper class that helps bring some sanity to the insanity that is cookie
@@ -191,14 +195,7 @@ class CookieHelper(object):
         self.serialize = serialize
         self.deserialize = deserialize
 
-        static_flags = []
-        if self.secure:
-            static_flags.append('; Secure')
-        if self.httponly:
-            static_flags.append('; HttpOnly')
-        self.static_flags = "".join(static_flags)
-
-    def raw_headers(self, request, value, max_age=None):
+    def raw_headers(self, request, value, max_age=_default):
         """ Retrieve raw headers for setting cookies
 
         Returns a list of headers that should be set for the cookies to
@@ -208,7 +205,7 @@ class CookieHelper(object):
 
         return self._get_cookies(request.environ, bstruct, max_age=max_age)
 
-    def set_cookies(self, value, response, request, max_age=None):
+    def set_cookies(self, request, response, value, max_age=_default):
         """ Set the cookie on a response
 
         If response is ``None``, this will use the default response object
@@ -230,7 +227,7 @@ class CookieHelper(object):
         if cookie:
             return self.deserialize(cookie)
 
-    def _get_cookies(self, environ, value, max_age=None):
+    def _get_cookies(self, environ, value, max_age):
         """Internal function
 
         This returns a list of cookies that are valid HTTP Headers.
@@ -240,7 +237,7 @@ class CookieHelper(object):
         """
 
         # If the user doesn't provide max_age, grab it from self
-        if max_age is None:
+        if max_age is _default:
             max_age = self.max_age
 
         # Length selected based upon http://browsercookielimits.x64.me
@@ -250,23 +247,7 @@ class CookieHelper(object):
                 len(value)
             )
 
-        if max_age is None:
-            # Cookie has the lifetime of a browser session
-            max_age = ''
-        elif max_age <= 0:
-            # Expire ze cookie =)
-            max_age = "; Max-Age=0; Expires=Wed, 31-Dec-97 23:59:59 GMT"
-            value = ''
-        else:
-            later = datetime.datetime.utcnow() + datetime.timedelta(
-                seconds=int(max_age))
-            # Wdy, DD-Mon-YY HH:MM:SS GMT
-            expires = later.strftime('%a, %d %b %Y %H:%M:%S GMT')
-            # the Expires header is *required* at least for IE7 (IE7 does
-            # not respect Max-Age)
-            max_age = "; Max-Age=%s; Expires=%s" % (max_age, expires)
-
-        cur_domain = environ.get('HTTP_HOST', environ.get('SERVER_NAME'))
+        cur_domain = environ.get('HTTP_HOST', environ.get('SERVER_NAME', ''))
 
         # While Chrome, IE, and Firefox can cope, Opera (at least) cannot
         # cope with a port number in the cookie domain when the URL it
@@ -293,11 +274,14 @@ class CookieHelper(object):
                     domains.append('.' + cur_domain)
 
         cookies = []
-        base_cookie = '%s="%s"; Path=%s%s%s' % (
-            self.cookie_name, value, self.path, max_age, self.static_flags)
         for domain in domains:
-            domain = '; Domain=%s' % domain if domain is not None else ''
-            cookies.append(('Set-Cookie', '%s%s' % (base_cookie, domain)))
+            morsel = Morsel(self.cookie_name, value)
+            morsel.path = self.path
+            morsel.domain = domain
+            morsel.max_age = max_age
+            morsel.httponly = self.httponly
+            morsel.secure = self.secure
+            cookies.append(('Set-Cookie', morsel.serialize()))
 
         return cookies
 
