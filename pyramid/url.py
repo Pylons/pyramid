@@ -12,10 +12,8 @@ from pyramid.interfaces import (
     )
 
 from pyramid.compat import (
-    native_,
     bytes_,
     string_types,
-    text_type,
     url_quote,
     )
 from pyramid.encode import (
@@ -593,8 +591,7 @@ class URLMethodsMixin(object):
 
         if 'anchor' in kw:
             anchor = kw['anchor']
-            if isinstance(anchor, text_type):
-                anchor = quote_plus(anchor)
+            anchor = quote_plus(anchor)
             anchor = '#' + anchor
 
         if elements:

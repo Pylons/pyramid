@@ -162,7 +162,7 @@ class TestURLMethodsMixin(unittest.TestCase):
         self.assertEqual(result,
                          'http://example.com:5432/context/#La+Pe%C3%B1a')
 
-    def test_resource_url_anchor_is_not_urlencoded(self):
+    def test_resource_url_anchor_is_urlencoded(self):
         request = self._makeOne()
         self._registerResourceURL(request.registry)
         context = DummyContext()

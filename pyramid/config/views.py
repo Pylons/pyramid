@@ -36,8 +36,6 @@ from pyramid.interfaces import (
 from pyramid import renderers
 
 from pyramid.compat import (
-    native_,
-    text_type,
     string_types,
     urlparse,
     url_quote,
@@ -1912,7 +1910,7 @@ class StaticURLInfo(object):
                     result = urljoin(url, subpath)
                     if '_query' in kw:
                         query = kw.pop('_query')
-                        if isinstance(query, text_type):
+                        if isinstance(query, string_types):
                             result += '?' + quote_plus(query)
                         elif query:
                             result += '?' + urlencode(query, doseq=True)
