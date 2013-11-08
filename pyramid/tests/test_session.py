@@ -294,7 +294,7 @@ class TestSignedCookieSession(SharedCookieSessionTests, unittest.TestCase):
         digestmod = lambda: hashlib.new(hashalg)
         cstruct = pickle.dumps(value, pickle.HIGHEST_PROTOCOL)
         sig = hmac.new(salt + b'secret', cstruct, digestmod).digest()
-        return base64.urlsafe_b64encode(sig + cstruct).strip(b'=')
+        return base64.urlsafe_b64encode(cstruct + sig).strip(b'=')
 
     def test_reissue_not_triggered(self):
         import time
@@ -355,7 +355,7 @@ class TestSignedCookieSession(SharedCookieSessionTests, unittest.TestCase):
         request = testing.DummyRequest()
         cstruct = dummy_serialize((time.time(), 0, {'state': 1}))
         sig = hmac.new(b'pyramid.session.secret', cstruct, sha512).digest()
-        cookieval = base64.urlsafe_b64encode(sig + cstruct)
+        cookieval = base64.urlsafe_b64encode(cstruct + sig)
         request.cookies['session'] = cookieval
         session = self._makeOne(request, deserialize=dummy_deserialize)
         self.assertEqual(session['state'], 1)

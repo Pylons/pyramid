@@ -118,8 +118,8 @@ class SignedSerializer(object):
         except (binascii.Error, TypeError) as e:
             raise ValueError('Badly formed base64 data: %s' % e)
 
-        cstruct = fstruct[self.digest_size:]
-        expected_sig = fstruct[:self.digest_size]
+        cstruct = fstruct[:-self.digest_size]
+        expected_sig = fstruct[-self.digest_size:]
 
         sig = hmac.new(self.salted_secret, cstruct, self.digestmod).digest()
         if strings_differ(sig, expected_sig):
@@ -396,9 +396,9 @@ class SignedCookieHelper(CookieHelper):
         self.hashalg = hashalg
 
         if serialize is None:
-            serialize = self.default_serializer.dumps
+            serialize = self._default_serializer.dumps
         if deserialize is None:
-            deserialize = self.default_serializer.loads
+            deserialize = self._default_serializer.loads
 
         serializer = SignedSerializer(secret,
                                       salt,
