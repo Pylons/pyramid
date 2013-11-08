@@ -9,7 +9,20 @@ from pyramid.compat import (
 )
 from pyramid.util import strings_differ
 
-from webob.cookies import Morsel
+try:
+    from webob.cookies import make_cookie
+except ImportError: # pragma: no cover
+    # compat with webob <= 1.2.3
+    from webob.cookies import Morsel
+
+    def make_cookie(name, value, **kw):
+        morsel = Morsel(bytes_(name), bytes_(value))
+        morsel.path = bytes_(kw['path'])
+        morsel.domain = bytes_(kw['domain'])
+        morsel.max_age = kw['max_age']
+        morsel.httponly = kw['httponly']
+        morsel.secure = kw['secure']
+        return morsel.serialize()
 
 class PickleSerializer(object):
     def dumps(self, appstruct):
@@ -274,13 +287,16 @@ class CookieHelper(object):
 
         cookies = []
         for domain in domains:
-            morsel = Morsel(bytes_(self.cookie_name), bytes_(value))
-            morsel.path = bytes_(self.path)
-            morsel.domain = bytes_(domain)
-            morsel.max_age = max_age
-            morsel.httponly = self.httponly
-            morsel.secure = self.secure
-            cookies.append(('Set-Cookie', morsel.serialize()))
+            cookievalue = make_cookie(
+                self.cookie_name,
+                value,
+                path=self.path,
+                domain=domain,
+                max_age=max_age,
+                httponly=self.httponly,
+                secure=self.secure,
+            )
+            cookies.append(('Set-Cookie', cookievalue))
 
         return cookies
 
