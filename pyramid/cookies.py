@@ -14,14 +14,20 @@ try:
 except ImportError: # pragma: no cover
     # compat with webob <= 1.2.3
     from webob.cookies import Morsel
+    from datetime import timedelta
 
     def make_cookie(name, value, **kw):
+        if value is None:
+            value = ''
+            kw['max_age'] = 0
+            kw['expires'] = timedelta(days=-5)
         morsel = Morsel(bytes_(name), bytes_(value))
         morsel.path = bytes_(kw['path'])
         morsel.domain = bytes_(kw['domain'])
         morsel.max_age = kw['max_age']
         morsel.httponly = kw['httponly']
         morsel.secure = kw['secure']
+        morsel.expires = kw.get('expires')
         return morsel.serialize()
 
 class PickleSerializer(object):
@@ -208,21 +214,21 @@ class CookieHelper(object):
         self.deserialize = deserialize
 
     def raw_headers(self, request, value, max_age=_default):
-        """ Retrieve raw headers for setting cookies
+        """ Retrieve raw headers for setting cookies.
 
         Returns a list of headers that should be set for the cookies to
         be correctly tracked.
         """
-        bstruct = self.serialize(value)
+        if value is None:
+            max_age = 0
+            bstruct = None
+        else:
+            bstruct = self.serialize(value)
 
         return self._get_cookies(request.environ, bstruct, max_age=max_age)
 
     def set_cookies(self, request, response, value, max_age=_default):
-        """ Set the cookie on a response
-
-        If response is ``None``, this will use the default response object
-        available from :attr:`pyramid.request.Request.response`.
-        """
+        """ Set the cookies on a response."""
         cookies = self.raw_headers(request, value, max_age=max_age)
         response.headerlist.extend(cookies)
         return response
