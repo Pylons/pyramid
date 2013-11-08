@@ -104,7 +104,7 @@ class SignedSerializer(object):
         """
         cstruct = self.serialize(appstruct)
         sig = hmac.new(self.salted_secret, cstruct, self.digestmod).digest()
-        return base64.urlsafe_b64encode(cstruct + sig).rstrip(b'=')
+        return base64.urlsafe_b64encode(sig + cstruct).rstrip(b'=')
 
     def loads(self, bstruct):
         """
