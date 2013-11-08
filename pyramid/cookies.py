@@ -259,7 +259,7 @@ class CookieHelper(object):
             max_age = self.max_age
 
         # Length selected based upon http://browsercookielimits.x64.me
-        if len(value) > 4093:
+        if value is not None and len(value) > 4093:
             raise ValueError(
                 'Cookie value is too long to store (%s bytes)' %
                 len(value)
