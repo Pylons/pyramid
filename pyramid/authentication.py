@@ -3,7 +3,6 @@ from codecs import utf_8_decode
 from codecs import utf_8_encode
 import hashlib
 import base64
-import datetime
 import re
 import time as time_mod
 import warnings
@@ -19,6 +18,8 @@ from pyramid.compat import (
     bytes_,
     ascii_native_,
     )
+
+from pyramid.cookies import CookieHelper
 
 from pyramid.interfaces import (
     IAuthenticationPolicy,
@@ -798,8 +799,6 @@ def encode_ip_timestamp(ip, timestamp):
     ts_chars = ''.join(map(chr, ts))
     return bytes_(ip_chars + ts_chars)
 
-EXPIRE = object()
-
 class AuthTktCookieHelper(object):
     """
     A helper class for use in third-party authentication policy
@@ -844,68 +843,24 @@ class AuthTktCookieHelper(object):
         self.domain = domain
         self.hashalg = hashalg
 
-        static_flags = []
-        if self.secure:
-            static_flags.append('; Secure')
-        if self.http_only:
-            static_flags.append('; HttpOnly')
-        self.static_flags = "".join(static_flags)
-
-    def _get_cookies(self, environ, value, max_age=None):
-        if max_age is EXPIRE:
-            max_age = "; Max-Age=0; Expires=Wed, 31-Dec-97 23:59:59 GMT"
-        elif max_age is not None:
-            later = datetime.datetime.utcnow() + datetime.timedelta(
-                seconds=int(max_age))
-            # Wdy, DD-Mon-YY HH:MM:SS GMT
-            expires = later.strftime('%a, %d %b %Y %H:%M:%S GMT')
-            # the Expires header is *required* at least for IE7 (IE7 does
-            # not respect Max-Age)
-            max_age = "; Max-Age=%s; Expires=%s" % (max_age, expires)
-        else:
-            max_age = ''
-
-        cur_domain = environ.get('HTTP_HOST', environ.get('SERVER_NAME'))
-
-        # While Chrome, IE, and Firefox can cope, Opera (at least) cannot
-        # cope with a port number in the cookie domain when the URL it
-        # receives the cookie from does not also have that port number in it
-        # (e.g via a proxy).  In the meantime, HTTP_HOST is sent with port
-        # number, and neither Firefox nor Chrome do anything with the
-        # information when it's provided in a cookie domain except strip it
-        # out.  So we strip out any port number from the cookie domain
-        # aggressively to avoid problems.  See also
-        # https://github.com/Pylons/pyramid/issues/131
-        if ':' in cur_domain:
-            cur_domain = cur_domain.split(':', 1)[0]
-
-
-        domains = []
-        if self.domain:
-            domains.append(self.domain)
-        else:
-            if self.parent_domain and cur_domain.count('.') > 1:
-                domains.append('.' + cur_domain.split('.', 1)[1])
-            else:
-                domains.append(None)
-                domains.append(cur_domain)
-                if self.wild_domain:
-                    domains.append('.' + cur_domain)
-
-        cookies = []
-        base_cookie = '%s="%s"; Path=%s%s%s' % (self.cookie_name, value,
-                self.path, max_age, self.static_flags)
-        for domain in domains:
-            domain = '; Domain=%s' % domain if domain is not None else ''
-            cookies.append(('Set-Cookie', '%s%s' % (base_cookie, domain)))
-
-        return cookies
+        self.cookie_helper = CookieHelper(
+            cookie_name,
+            secure=secure,
+            max_age=max_age,
+            httponly=http_only,
+            path=path,
+            domain=domain,
+            wild_domain=wild_domain,
+            parent_domain=parent_domain,
+            serialize=lambda v: bytes_(v),
+            deserialize=lambda v: v,
+        )
 
     def identify(self, request):
         """ Return a dictionary with authentication information, or ``None``
         if no valid auth_tkt is attached to ``request``"""
         environ = request.environ
-        cookie = request.cookies.get(self.cookie_name)
+        cookie = self.cookie_helper.get_value(request)
 
         if cookie is None:
             return None
@@ -968,9 +923,8 @@ class AuthTktCookieHelper(object):
     def forget(self, request):
         """ Return a set of expires Set-Cookie headers, which will destroy
         any existing auth_tkt cookie when attached to a response"""
-        environ = request.environ
         request._authtkt_reissue_revoked = True
-        return self._get_cookies(environ, '', max_age=EXPIRE)
+        return self.cookie_helper.raw_headers(request, None)
 
     def remember(self, request, userid, max_age=None, tokens=()):
         """ Return a set of Set-Cookie headers; when set into a response,
@@ -1037,7 +991,8 @@ class AuthTktCookieHelper(object):
             )
 
         cookie_value = ticket.cookie_value()
-        return self._get_cookies(environ, cookie_value, max_age)
+        return self.cookie_helper.raw_headers(request, cookie_value,
+                                              max_age=max_age)
 
 @implementer(IAuthenticationPolicy)
 class SessionAuthenticationPolicy(CallbackAuthenticationPolicy):
