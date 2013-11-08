@@ -396,9 +396,9 @@ class SignedCookieHelper(CookieHelper):
         self.hashalg = hashalg
 
         if serialize is None:
-            serialize = self.default_serializer.dumps
+            serialize = self._default_serializer.dumps
         if deserialize is None:
-            deserialize = self.default_serializer.loads
+            deserialize = self._default_serializer.loads
 
         serializer = SignedSerializer(secret,
                                       salt,
