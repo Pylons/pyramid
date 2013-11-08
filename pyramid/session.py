@@ -56,6 +56,11 @@ def signed_serialize(data, secret):
 
        cookieval = signed_serialize({'a':1}, 'secret')
        response.set_cookie('signed_cookie', cookieval)
+
+    .. deprecated:: 1.5
+       Use :class:`pyramid.cookies.SignedSerializer` instead. It encourages
+       the use of a salt and provides the ability to swap out pickle and
+       the SHA-1 digest.
     """
     pickled = pickle.dumps(data, pickle.HIGHEST_PROTOCOL)
     sig = hmac.new(bytes_(secret), pickled, hashlib.sha1).hexdigest()
@@ -73,6 +78,9 @@ def signed_deserialize(serialized, secret, hmac=hmac):
 
        cookieval = request.cookies['signed_cookie']
        data = signed_deserialize(cookieval, 'secret')
+
+    .. deprecated:: 1.5
+       Use :class:`pyramid.cookies.SignedSerializer` instead.
     """
     # hmac parameterized only for unit tests
     try:

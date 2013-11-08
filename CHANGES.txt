@@ -35,8 +35,8 @@ Features
 
 - Added a new ``pyramid.cookies.SignedSerializer`` class which can be used
   to cryptographically sign arbitrary content. The signed values are urlsafe.
-  The signer can be configured to be backward compatible with content
-  signed using the deprecated ``pyramid.session.signed_serialize`` function.
+  This API supercedes ``pyramid.session.signed_serialize`` and
+  ``pyramid.session.signed_deserialize``.
 
 Bug Fixes
 ---------
