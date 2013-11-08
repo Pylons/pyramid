@@ -583,12 +583,12 @@ def SignedCookieSessionFactory(
     ``serialize``
       A callable accepting a Python object and returning a bytestring. A
       ``ValueError`` should be raised for malformed inputs.
-      Default: :func:`pickle.dumps`.
+      Default: ``None`, which will use :func:`pickle.dumps`.
 
     ``deserialize``
       A callable accepting a bytestring and returning a Python object. A
       ``ValueError`` should be raised for malformed inputs.
-      Default: :func:`pickle.loads`.
+      Default: ``None`, which will use :func:`pickle.loads`.
 
     .. versionadded: 1.5a3
     """

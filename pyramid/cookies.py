@@ -44,14 +44,14 @@ class SignedSerializer(object):
     ``serialize``
       A callable accepting a Python object and returning a bytestring. A
       ``ValueError`` should be raised for malformed inputs.
-      Default: :func:`pickle.dumps`.
+      Default: ``None`, which will use :func:`pickle.dumps`.
 
     ``deserialize``
       A callable accepting a bytestring and returning a Python object. A
       ``ValueError`` should be raised for malformed inputs.
-      Default: :func:`pickle.loads`.
+      Default: ``None`, which will use :func:`pickle.loads`.
     """
-    default_serializer = PickleSerializer()
+    _default_serializer = PickleSerializer()
 
     def __init__(self,
                  secret,
@@ -70,9 +70,9 @@ class SignedSerializer(object):
         self.digest_size = self.digestmod().digest_size
 
         if serialize is None:
-            serialize = self.default_serializer.dumps
+            serialize = self._default_serializer.dumps
         if deserialize is None:
-            deserialize = self.default_serializer.loads
+            deserialize = self._default_serializer.loads
 
         self.serialize = serialize
         self.deserialize = deserialize
@@ -154,16 +154,16 @@ class CookieHelper(object):
     ``serialize``
       A callable accepting a Python object and returning a bytestring. A
       ``ValueError`` should be raised for malformed inputs.
-      Default: :func:`pickle.dumps`.
+      Default: ``None`, which will use :func:`pickle.dumps`.
 
     ``deserialize``
       A callable accepting a bytestring and returning a Python object. A
       ``ValueError`` should be raised for malformed inputs.
-      Default: :func:`pickle.loads`.
+      Default: ``None`, which will use :func:`pickle.loads`.
 
     .. versionadded: 1.5a3
     """
-    default_serializer = PickleSerializer()
+    _default_serializer = PickleSerializer()
 
     def __init__(self,
                  cookie_name,
@@ -187,9 +187,9 @@ class CookieHelper(object):
         self.parent_domain = parent_domain
 
         if serialize is None:
-            serialize = self.default_serializer.dumps
+            serialize = self._default_serializer.dumps
         if deserialize is None:
-            deserialize = self.default_serializer.loads
+            deserialize = self._default_serializer.loads
 
         self.serialize = serialize
         self.deserialize = deserialize
@@ -345,12 +345,12 @@ class SignedCookieHelper(CookieHelper):
     ``serialize``
       A callable accepting a Python object and returning a bytestring. A
       ``ValueError`` should be raised for malformed inputs.
-      Default: :func:`pickle.dumps`.
+      Default: ``None`, which will use :func:`pickle.dumps`.
 
     ``deserialize``
       A callable accepting a bytestring and returning a Python object. A
       ``ValueError`` should be raised for malformed inputs.
-      Default: :func:`pickle.loads`.
+      Default: ``None`, which will use :func:`pickle.loads`.
 
     .. versionadded: 1.5a3
     """
