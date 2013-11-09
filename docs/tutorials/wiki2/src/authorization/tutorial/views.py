@@ -11,12 +11,18 @@ from pyramid.view import (
     forbidden_view_config,
     )
 
+from pyramid.security import (
+    remember,
+    forget,
+    )
+
+from .security import USERS
+
 from .models import (
     DBSession,
     Page,
     )
 
-from .security import USERS
 
 # regular expression used to find WikiWords
 wikiwords = re.compile(r"\b([A-Z]\w+[A-Z]+\w+)")
@@ -78,8 +84,8 @@ def edit_page(request):
                                                       pagename=pagename))
     return dict(
         page=page,
-        save_url = request.route_url('edit_page', pagename=pagename),
-        logged_in=request.authenticated_userid,
+        save_url=request.route_url('edit_page', pagename=pagename),
+        logged_in=request.authenticated_userid
         )
 
 @view_config(route_name='login', renderer='templates/login.pt')
@@ -97,8 +103,9 @@ def login(request):
         login = request.params['login']
         password = request.params['password']
         if USERS.get(login) == password:
-            request.remember_userid(login)
-            return HTTPFound(location = came_from)
+            headers = remember(request, login)
+            return HTTPFound(location = came_from,
+                             headers = headers)
         message = 'Failed login'
 
     return dict(
@@ -111,6 +118,7 @@ def login(request):
 
 @view_config(route_name='logout')
 def logout(request):
-    request.forget_userid()
-    return HTTPFound(location = request.route_url('view_wiki'))
+    headers = forget(request)
+    return HTTPFound(location = request.route_url('view_wiki'),
+                     headers = headers)
     

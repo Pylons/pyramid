@@ -127,6 +127,69 @@ class TestPrincipalsAllowedByPermission(unittest.TestCase):
         result = self._callFUT(context, 'view')
         self.assertEqual(result, 'yo')
 
+class TestRemember(unittest.TestCase):
+    def setUp(self):
+        testing.setUp()
+        
+    def tearDown(self):
+        testing.tearDown()
+
+    def _callFUT(self, *arg):
+        from pyramid.security import remember
+        return remember(*arg)
+
+    def test_no_authentication_policy(self):
+        request = _makeRequest()
+        result = self._callFUT(request, 'me')
+        self.assertEqual(result, [])
+
+    def test_with_authentication_policy(self):
+        request = _makeRequest()
+        registry = request.registry
+        _registerAuthenticationPolicy(registry, 'yo')
+        result = self._callFUT(request, 'me')
+        self.assertEqual(result, [('X-Pyramid-Test', 'me')])
+
+    def test_with_authentication_policy_no_reg_on_request(self):
+        from pyramid.threadlocal import get_current_registry
+        registry = get_current_registry()
+        request = _makeRequest()
+        del request.registry
+        _registerAuthenticationPolicy(registry, 'yo')
+        result = self._callFUT(request, 'me')
+        self.assertEqual(result, [('X-Pyramid-Test', 'me')])
+
+class TestForget(unittest.TestCase):
+    def setUp(self):
+        testing.setUp()
+        
+    def tearDown(self):
+        testing.tearDown()
+
+    def _callFUT(self, *arg):
+        from pyramid.security import forget
+        return forget(*arg)
+
+    def test_no_authentication_policy(self):
+        request = _makeRequest()
+        result = self._callFUT(request)
+        self.assertEqual(result, [])
+
+    def test_with_authentication_policy(self):
+        request = _makeRequest()
+        _registerAuthenticationPolicy(request.registry, 'yo')
+        result = self._callFUT(request)
+        self.assertEqual(result, [('X-Pyramid-Test', 'logout')])
+
+    def test_with_authentication_policy_no_reg_on_request(self):
+        from pyramid.threadlocal import get_current_registry
+        registry = get_current_registry()
+        request = _makeRequest()
+        del request.registry
+        _registerAuthenticationPolicy(registry, 'yo')
+        result = self._callFUT(request)
+        self.assertEqual(result, [('X-Pyramid-Test', 'logout')])
+        
 class TestViewExecutionPermitted(unittest.TestCase):
     def setUp(self):
         testing.setUp()
@@ -312,149 +375,6 @@ class TestEffectivePrincipals(unittest.TestCase):
         _registerAuthenticationPolicy(registry, 'yo')
         self.assertEqual(request.effective_principals, 'yo')
 
-class TestRememberUserId(unittest.TestCase):
-    principal = 'the4th'
-
-    def setUp(self):
-        testing.setUp()
-
-    def tearDown(self):
-        testing.tearDown()
-        
-    def assert_response_headers(self, request, expected_headers):
-        request._process_response_callbacks(request.response)
-        headers = request.response.headerlist
-        self.assertEqual(list(expected_headers), list(headers))
-
-    def test_backward_compat_delegates_to_mixin(self):
-        from zope.deprecation import __show__
-        try:
-            __show__.off()
-            request = _makeFakeRequest()
-            from pyramid.security import remember
-            self.assertEqual(
-                remember(request, 'matt'),
-                [('X-Pyramid-Test', 'remember_userid')]
-                )
-        finally:
-            __show__.on()
-
-    def test_with_no_authentication_policy(self):
-        request = _makeRequest()
-        headers_before = request.response.headerlist
-        request.remember_userid(self.principal)
-        self.assert_response_headers(request, headers_before)
-
-    def test_with_authentication_policy(self):
-        request = _makeRequest()
-        headers_before = request.response.headerlist
-        expected_headers = headers_before[:] + [(_TEST_HEADER, self.principal)]
-        _registerAuthenticationPolicy(request.registry, self.principal)
-        request.remember_userid(self.principal)
-        self.assert_response_headers(request, expected_headers)
-
-    def test_with_authentication_policy_no_reg_on_request(self):
-        from pyramid.threadlocal import get_current_registry
-        registry = get_current_registry()
-        request = _makeRequest()
-        del request.registry
-        _registerAuthenticationPolicy(registry, self.principal)
-        headers_before = request.response.headerlist
-        request.remember_userid(self.principal)
-        expected_headers = headers_before[:] + [(_TEST_HEADER, self.principal)]
-        self.assert_response_headers(request, expected_headers)
-
-    def test_request_has_exception_attr_no_on_exception_flag(self):
-        request = _makeRequest()
-        headers_before = request.response.headerlist
-        _registerAuthenticationPolicy(request.registry, self.principal)
-        request.exception = True
-        request.remember_userid(self.principal)
-        self.assert_response_headers(request, headers_before)
-
-    def test_request_has_exception_attr_with_on_exception_flag(self):
-        request = _makeRequest()
-        headers_before = request.response.headerlist
-        _registerAuthenticationPolicy(request.registry, self.principal)
-        request.exception = True
-        request.remember_userid(self.principal, on_exception=True)
-        expected_headers = headers_before[:] + [(_TEST_HEADER, self.principal)]
-        self.assert_response_headers(request, expected_headers)
-        
-class TestForgetUserId(unittest.TestCase):
-    principal = 'me-not'
-
-    def setUp(self):
-        testing.setUp()
-
-    def tearDown(self):
-        testing.tearDown()
-        
-    def assert_response_headers(self, request, expected_headers):
-        request._process_response_callbacks(request.response)
-        headers = request.response.headerlist
-        self.assertEqual(list(expected_headers), list(headers))
-
-    def _makeOne(self):
-        request = _makeRequest()
-        request.response.headers.add(_TEST_HEADER, self.principal)
-        return request
-
-    def test_backward_compat_delegates_to_mixin(self):
-        from zope.deprecation import __show__
-        try:
-            __show__.off()
-            request = _makeFakeRequest()
-            from pyramid.security import forget
-            self.assertEqual(
-                forget(request),
-                [('X-Pyramid-Test', 'forget_userid')],
-                )
-        finally:
-            __show__.on()
-
-    def test_with_no_authentication_policy(self):
-        request = self._makeOne()
-        headers_before = request.response.headerlist
-        request.forget_userid()
-        self.assert_response_headers(request, headers_before)
-
-    def test_with_authentication_policy(self):
-        request = self._makeOne()
-        headers_before = request.response.headerlist
-        expected_headers = headers_before[:] + [(_TEST_HEADER, 'forget_userid')]
-        _registerAuthenticationPolicy(request.registry, self.principal)
-        request.forget_userid()
-        self.assert_response_headers(request, expected_headers)
-        
-    def test_with_authentication_policy_no_reg_on_request(self):
-        from pyramid.threadlocal import get_current_registry
-        registry = get_current_registry()
-        request = self._makeOne()
-        del request.registry
-        _registerAuthenticationPolicy(registry, self.principal)
-        headers_before = request.response.headerlist
-        request.forget_userid()
-        expected_headers = headers_before[:] + [(_TEST_HEADER, 'forget_userid')]
-        self.assert_response_headers(request, expected_headers)
-
-    def test_request_has_exception_attr_no_on_exception_flag(self):
-        request = self._makeOne()
-        headers_before = request.response.headerlist
-        _registerAuthenticationPolicy(request.registry, self.principal)
-        request.exception = True
-        request.forget_userid()
-        self.assert_response_headers(request, headers_before)
-
-    def test_request_has_exception_attr_with_on_exception_flag(self):
-        request = self._makeOne()
-        headers_before = request.response.headerlist
-        _registerAuthenticationPolicy(request.registry, self.principal)
-        request.exception = True
-        request.forget_userid(on_exception=True)
-        expected_headers = headers_before[:] + [(_TEST_HEADER, 'forget_userid')]
-        self.assert_response_headers(request, expected_headers)
-        
 class TestHasPermission(unittest.TestCase):
     def setUp(self):
         testing.setUp()
@@ -548,7 +468,7 @@ class DummyAuthenticationPolicy:
         return headers
 
     def forget(self, request):
-        headers = [(_TEST_HEADER, 'forget_userid')]
+        headers = [(_TEST_HEADER, 'logout')]
         self._header_forgotten = headers[0]
         return headers
 
@@ -594,12 +514,6 @@ def _makeFakeRequest():
         @property
         def effective_principals(req):
             return 'effective_principals'
-
-        def _forget_userid(req):
-            return [('X-Pyramid-Test', 'forget_userid')]
-
-        def _remember_userid(req, principal, **kw):
-            return [('X-Pyramid-Test', 'remember_userid')]    
 
     return FakeRequest({})
 

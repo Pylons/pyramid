@@ -197,24 +197,24 @@ Add the following import statements to the
 head of ``tutorial/tutorial/views.py``:
 
 .. literalinclude:: src/authorization/tutorial/views.py
-   :lines: 6-11
+   :lines: 6-13,15-17
    :linenos:
-   :emphasize-lines: 3,6
+   :emphasize-lines: 3,6-9,11
    :language: python
 
 (Only the highlighted lines, with other necessary modifications,
 need to be added.)
 
-:func:`~pyramid.view.forbidden_view_config` will be used
+:meth:`~pyramid.view.forbidden_view_config` will be used
 to customize the default 403 Forbidden page.
-:meth:`~pyramid.request.Request.remember_userid` and
-:meth:`~pyramid.request.Request.forget_userid` help to create and
+:meth:`~pyramid.security.remember` and
+:meth:`~pyramid.security.forget` help to create and
 expire an auth ticket cookie.
 
 Now add the ``login`` and ``logout`` views:
 
 .. literalinclude:: src/authorization/tutorial/views.py
-   :lines: 76-102
+   :lines: 82-120
    :linenos:
    :language: python
 
@@ -267,9 +267,8 @@ like this:
 (Only the highlighted line and a trailing comma on the preceding
 line need to be added.)
 
-:attr:`~pyramid.request.Request.authenticated_userid` will return ``None``
-if the user is not authenticated, or a user id if the user is
-authenticated.
+The :meth:`pyramid.request.Request.authenticated_userid` will be ``None`` if
+the user is not authenticated, or a user id if the user is authenticated.
 
 Add a "Logout" link when logged in
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -317,7 +316,7 @@ when we're done:
 
 .. literalinclude:: src/authorization/tutorial/views.py
    :linenos:
-   :emphasize-lines: 8,11,18,23,42,46,62,66,74,80,76-107
+   :emphasize-lines: 8,11-15,17,24,29,48,52,68,72,80,82-120
    :language: python
 
 (Only the highlighted lines need to be added.)

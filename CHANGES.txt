@@ -4,22 +4,12 @@ Unreleased
 Features
 --------
 
-- Authentication and authorization APIs have been added as as methods of the
-  request: ``request.has_permission``, ``request.forget_userid``, and
-  ``request.remember_userid``.
+- An authorization API has been added as a method of the
+  request: ``request.has_permission``.
 
   ``request.has_permission`` is a method-based alternative to the
   ``pyramid.security.has_permission`` API and works exactly the same.  The
   older API is now deprecated.
-
-  ``request.forget_userid`` and ``request.remember_userid`` are method-based
-  alternatives to ``pyramid.security.forget`` and
-  ``pyramid.security.remember``.  These do not work exacly the same as their
-  function counterparts, however.  These methods automatically set the headers
-  returned by the authentication policy on the response, whereas the older
-  function-based APIs returned a sequence of headers and required the caller to
-  set those headers.  The older function-based API still works but is now
-  deprecated.
 
 - Property API attributes have been added to the request for easier access to
   authentication data: ``request.authenticated_userid``,

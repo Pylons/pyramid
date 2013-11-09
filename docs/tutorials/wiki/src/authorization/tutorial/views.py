@@ -8,6 +8,12 @@ from pyramid.view import (
     forbidden_view_config,
     )
 
+from pyramid.security import (
+    remember,
+    forget,
+    )
+
+
 from .security import USERS
 from .models import Page
 
@@ -89,8 +95,9 @@ def login(request):
         login = request.params['login']
         password = request.params['password']
         if USERS.get(login) == password:
-            request.remember_userid(login)
-            return HTTPFound(location=came_from)
+            headers = remember(request, login)
+            return HTTPFound(location = came_from,
+                             headers = headers)
         message = 'Failed login'
 
     return dict(
@@ -103,5 +110,6 @@ def login(request):
 
 @view_config(context='.models.Wiki', name='logout')
 def logout(request):
-    request.forget_userid()
-    return HTTPFound(location=request.resource_url(request.context))
+    headers = forget(request)
+    return HTTPFound(location = request.resource_url(request.context),
+                     headers = headers)

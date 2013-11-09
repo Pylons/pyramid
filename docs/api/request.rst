@@ -13,8 +13,7 @@
                      current_route_path, static_url, static_path,
                      model_url, resource_url, set_property, 
                      effective_principals, authenticated_userid,
-                     unauthenticated_userid, has_permission, forget_userid,
-                     remember_userid
+                     unauthenticated_userid, has_permission
 
    .. attribute:: context
 
@@ -253,10 +252,6 @@
       subrequest is invoked.  This means that it's not available for use on a
       request provided by e.g. the ``pshell`` environment.  For more
       information, see :ref:`subrequest_chapter`.
-
-   .. automethod:: remember_userid
-
-   .. automethod:: forget_userid
 
    .. automethod:: has_permission
 

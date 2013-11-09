@@ -1,4 +1,9 @@
 from pyramid.httpexceptions import HTTPFound
+from pyramid.security import (
+    remember,
+    forget,
+    )
+
 from pyramid.view import (
     view_config,
     view_defaults,
@@ -38,8 +43,9 @@ class TutorialViews:
             login = request.params['login']
             password = request.params['password']
             if USERS.get(login) == password:
-                request.remember_userid(login)
-                return HTTPFound(location=came_from)
+                headers = remember(request, login)
+                return HTTPFound(location=came_from,
+                                 headers=headers)
             message = 'Failed login'
 
         return dict(
@@ -54,6 +60,7 @@ class TutorialViews:
     @view_config(route_name='logout')
     def logout(self):
         request = self.request
-        request.forget_userid()
+        headers = forget(request)
         url = request.route_url('home')
-        return HTTPFound(location=url)
+        return HTTPFound(location=url,
+                         headers=headers)

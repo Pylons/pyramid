@@ -38,6 +38,10 @@ def _get_registry(request):
         reg = get_current_registry() # b/c
     return reg
 
+def _get_authentication_policy(request):
+    registry = _get_registry(request)
+    return registry.queryUtility(IAuthenticationPolicy)
+
 def has_permission(permission, context, request):
     """
     A function that calls
@@ -113,8 +117,8 @@ deprecated(
 
 def remember(request, principal, **kw):
     """
-    Returns a sequence of header tuples (e.g. ``[('Set-Cookie',
-    'foo=abc')]``) on this request's response.
+    Returns a sequence of header tuples (e.g. ``[('Set-Cookie', 'foo=abc')]``)
+    on this request's response.
     These headers are suitable for 'remembering' a set of credentials
     implied by the data passed as ``principal`` and ``*kw`` using the
     current :term:`authentication policy`.  Common usage might look
@@ -126,6 +130,7 @@ def remember(request, principal, **kw):
 
        from pyramid.security import remember
        headers = remember(request, 'chrism', password='123', max_age='86400')
+       response = request.response
        response.headerlist.extend(headers)
        return response
 
@@ -133,23 +138,11 @@ def remember(request, principal, **kw):
     always return an empty sequence. If used, the composition and
     meaning of ``**kw`` must be agreed upon by the calling code and
     the effective authentication policy.
-
-    .. deprecated:: 1.5
-       Use :meth:`pyramid.request.Request.remember_userid` instead.
-       but be sure to read its docs first; the remember_userid method is not an
-       exact analog of the remember function, because it sets headers instead
-       of returning them.
     """
-    return request._remember_userid(principal, **kw)
-
-deprecated(
-    'remember',
-    'As of Pyramid 1.5 the "pyramid.security.remember" API is '
-    'now deprecated.  It will be removed in Pyramd 1.8.  Use the '
-    '"remember_userid" method of the Pyramid request instead, but be sure to '
-    'read the docs first; the remember_userid method is not an exact analog of '
-    'the remember function, because it sets headers instead of returning them.'
-    )
+    policy = _get_authentication_policy(request)
+    if policy is None:
+        return []
+    return policy.remember(request, principal, **kw)
 
 def forget(request):
     """
@@ -169,21 +162,12 @@ def forget(request):
     always return an empty sequence.
 
     .. deprecated:: 1.5
-       Use :meth:`pyramid.request.Request.forget_userid` instead.
-       but be sure to read its docs first; the forget_userid method is not an
-       exact analog of the forget function, because it sets headers instead
-       of returning them.
+       Use :meth:`pyramid.request.Request.get_logout_headers` instead.
     """            
-    return request._forget_userid()
-
-deprecated(
-    'forget',
-    'As of Pyramid 1.5 the "pyramid.security.forget" API is '
-    'now deprecated.  It will be removed in Pyramd 1.8.  Use the '
-    '"forget_user" method of the Pyramid request instead, but be sure to '
-    'read the docs first; the forget_userid method is not an exact analog of '
-    'the forget function, because it sets headers instead of returning them.'
-    )
+    policy = _get_authentication_policy(request)
+    if policy is None:
+        return []
+    return policy.forget(request)
 
 def principals_allowed_by_permission(context, permission):
     """ Provided a ``context`` (a resource object), and a ``permission``
@@ -371,97 +355,6 @@ class AuthenticationAPIMixin(object):
             return [Everyone]
         return policy.effective_principals(self)
     
-    # b/c
-    def _remember_userid(self, principal, **kw):
-        policy = self._get_authentication_policy()
-        if policy is None:
-            return []
-        return policy.remember(self, principal, **kw)
-
-    def remember_userid(self, principal, on_exception=False, **kw):
-        """ Using a response callback, sets authentication headers on the
-        response eventually returned by the view executed by this request
-        suitable for loggin a user in.  These headers are used for
-        'remembering' a set of credentials implied by the data passed as
-        ``principal`` and ``*kw`` using the current :term:`authentication
-        policy`.  Common usage might look like so within the body of a view
-        function:
-
-        .. code-block:: python
-
-           request.remember_userid('chrism', password='123', max_age='86400')
-
-        This method always returns ``None``; it is called only for its side
-        effects.
-
-        If no :term:`authentication policy` is in use, this function will
-        do nothing. If used, the composition and
-        meaning of ``**kw`` must be agreed upon by the calling code and
-        the effective authentication policy.
-
-        One special keyword value is understood by this method:
-        ``on_exception``.  Usually if an exception occurs within the same
-        request after this method is called, the headers provided by the
-        authentication policy will not be set on the response.  If
-        ``on_exception`` is passed, and as ``True``, then the headers will be
-        set on the response even if an exception is later raised.  By default
-        this value is ``False``.
-
-        .. versionadded:: 1.5
-
-        """
-        def callback(req, response):
-            # do not set the headers on an exception unless explicitly
-            # instructed
-            exc = getattr(req, 'exception', None)
-            if exc is None or on_exception:
-                # NB: this call to _remember_userid should be exactly here
-                # because some policies actually add another response callback
-                # when their remember method is called, and we dont want them
-                # to do that if there's an exception in the default case.
-                headers = req._remember_userid(principal, **kw)
-                response.headerlist.extend(headers)
-        self.add_response_callback(callback)
-
-    # b/c
-    def _forget_userid(self):
-        policy = self._get_authentication_policy()
-        if policy is None:
-            return []
-        return policy.forget(self)
-
-    def forget_userid(self, on_exception=False):
-        """ Using a response callback, sets authentication headers suitable for
-        logging a user out on the response returned by the view executed during
-        this request based on the current :term:`authentication policy`.
-
-        If no :term:`authentication policy` is in use, this function will
-        be a noop.
-
-        This method always returns ``None``; it is called only for its side
-        effects.
-
-        One special keyword value is understood by this method:
-        ``on_exception``.  Usually if an exception occurs within the same
-        request after this method is called, the headers provided by the
-        authentication policy will not be set on the response.  If
-        ``on_exception`` is passed, and as ``True``, then the headers will be
-        set on the response even if an exception is later raised.  By default
-        this value is ``False``.
-
-        .. versionadded:: 1.5
-        """
-        def callback(req, response):
-            exc = getattr(req, 'exception', None)
-            if exc is None or on_exception:
-                # NB: this call to _forget_userid should be exactly here
-                # because some policies actually add another response callback
-                # when their forget method is called, and we dont want them
-                # to do that if there's an exception in the default case.
-                headers = req._forget_userid()
-                response.headerlist.extend(headers)
-        self.add_response_callback(callback)
-
 class AuthorizationAPIMixin(object):
 
     def has_permission(self, permission, context=None):
