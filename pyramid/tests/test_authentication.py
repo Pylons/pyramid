@@ -1110,18 +1110,17 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertEqual(len(headers), 3)
         name, value = headers[0]
         self.assertEqual(name, 'Set-Cookie')
-        self.assertEqual(value,
-          'auth_tkt=""; Path=/; Max-Age=0; expires=Wed, 31-Dec-97 23:59:59 GMT')
+        self.assertTrue(value.startswith('auth_tkt=; Max-Age=0; Path=/;'))
         name, value = headers[1]
         self.assertEqual(name, 'Set-Cookie')
-        self.assertEqual(value,
-                         'auth_tkt=""; Domain=localhost; Path=/; Max-Age=0; '
-                         'expires=Wed, 31-Dec-97 23:59:59 GMT')
+        self.assertTrue(value.startswith('auth_tkt=; Domain=localhost; '
+                                          'Max-Age=0; Path=/;'
+                                          ))
         name, value = headers[2]
         self.assertEqual(name, 'Set-Cookie')
-        self.assertEqual(value,
-                         'auth_tkt=""; Domain=.localhost; Path=/; Max-Age=0; '
-                         'expires=Wed, 31-Dec-97 23:59:59 GMT')
+        self.assertTrue(value.startswith('auth_tkt=; Domain=.localhost; '
+                                          'Max-Age=0; Path=/;'
+                                          ))
 
 class TestAuthTicket(unittest.TestCase):
     def _makeOne(self, *arg, **kw):
