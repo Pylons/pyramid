@@ -2,6 +2,10 @@ import base64
 import binascii
 import hashlib
 import hmac
+from datetime import (
+        datetime,
+        timedelta,
+        )
 
 from pyramid.compat import (
     bytes_,
@@ -16,18 +20,38 @@ except ImportError: # pragma: no cover
     from webob.cookies import Morsel
     from datetime import timedelta
 
-    def make_cookie(name, value, **kw):
+    def make_cookie(name, value, max_age=None, expires=None, path='/',
+                domain=None, secure=False, httponly=False, comment=None):
         if value is None:
             value = ''
-            kw['max_age'] = 0
-            kw['expires'] = timedelta(days=-5)
+            max_age = 0
+            expires = timedelta(days=-5)
+
+        # We need to set the expiration based upon max_age
+        elif expires is None and max_age is not None:
+            try:
+                max_age = timedelta(seconds=int(max_age))
+            except:
+                max_age = None
+
+            if isinstance(max_age, timedelta):
+                expires = datetime.utcnow() + max_age
+
+        # We need to set the max age based upon the expiration
+        elif max_age is None and expires is not None:
+            if isinstance(expires, datetime):
+                max_age = expires - datetime.utcnow()
+
         morsel = Morsel(bytes_(name), bytes_(value))
-        morsel.path = bytes_(kw['path'])
-        morsel.domain = bytes_(kw['domain'])
-        morsel.max_age = kw['max_age']
-        morsel.httponly = kw['httponly']
-        morsel.secure = kw['secure']
-        morsel.expires = kw.get('expires')
+        if domain:
+            morsel.domain = bytes_(domain)
+        morsel.path = bytes_(path)
+        morsel.httponly = httponly
+        morsel.secure = secure
+        morsel.max_age = max_age
+        morsel.expires = expires
+        if comment:
+            morsel.comment = bytes_(comment)
         return morsel.serialize()
 
 class PickleSerializer(object):
