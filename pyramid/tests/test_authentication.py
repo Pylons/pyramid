@@ -608,7 +608,7 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertEqual(result['userid'], 'userid')
         self.assertEqual(result['userdata'], '')
         self.assertEqual(result['timestamp'], 0)
-        self.assertEqual(helper.auth_tkt.value, 'ticket')
+        self.assertEqual(helper.auth_tkt.value, b'ticket')
         self.assertEqual(helper.auth_tkt.remote_addr, '1.1.1.1')
         self.assertEqual(helper.auth_tkt.secret, 'secret')
         environ = request.environ
@@ -625,7 +625,7 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertEqual(result['userid'], 'userid')
         self.assertEqual(result['userdata'], '')
         self.assertEqual(result['timestamp'], 0)
-        self.assertEqual(helper.auth_tkt.value, 'ticket')
+        self.assertEqual(helper.auth_tkt.value, b'ticket')
         self.assertEqual(helper.auth_tkt.remote_addr, '::1')
         self.assertEqual(helper.auth_tkt.secret, 'secret')
         environ = request.environ
@@ -642,7 +642,7 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertEqual(result['userid'], 'userid')
         self.assertEqual(result['userdata'], '')
         self.assertEqual(result['timestamp'], 0)
-        self.assertEqual(helper.auth_tkt.value, 'ticket')
+        self.assertEqual(helper.auth_tkt.value, b'ticket')
         self.assertEqual(helper.auth_tkt.remote_addr, '0.0.0.0')
         self.assertEqual(helper.auth_tkt.secret, 'secret')
         environ = request.environ
