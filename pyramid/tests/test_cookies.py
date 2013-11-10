@@ -1,6 +1,28 @@
 import unittest
 from pyramid import testing
 
+class CookieMakeCookie(unittest.TestCase):
+    def makeOne(self, name, value, **kw):
+        from pyramid.cookies import make_cookie
+        return make_cookie(name, value, **kw)
+
+    def test_make_cookie_max_age(self):
+        cookie = self.makeOne('test_cookie', 'value', max_age=500)
+
+        self.assertTrue('test_cookie=value' in cookie)
+        self.assertTrue('Max-Age=500;' in cookie)
+        self.assertTrue('expires' in cookie)
+
+    def test_make_cookie_expires(self):
+        from datetime import (datetime, timedelta)
+
+        cookie = self.makeOne('test_cookie', 'value', expires=datetime.utcnow()
+                + timedelta(seconds=600))
+
+        self.assertTrue('test_cookie=value' in cookie)
+        self.assertTrue('expires' in cookie)
+        self.assertTrue('Max-Age=' in cookie)
+
 class CookieHelperTest(unittest.TestCase):
     def makeOne(self, name='uns', **kw):
         from pyramid.cookies import CookieHelper
@@ -56,6 +78,7 @@ class SignedCookieHelperTest(unittest.TestCase):
 
         for cookie in cookie_list:
             self.assertTrue('Max-Age=60;' in cookie[1])
+            self.assertTrue('expires=' in cookie[1])
 
     def test_cookie_raw(self):
         cookie = self.makeOne()
