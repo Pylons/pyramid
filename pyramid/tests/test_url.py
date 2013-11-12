@@ -160,7 +160,7 @@ class TestURLMethodsMixin(unittest.TestCase):
         uc = text_(b'La Pe\xc3\xb1a', 'utf-8')
         result = request.resource_url(context, anchor=uc)
         self.assertEqual(result,
-                         'http://example.com:5432/context/#La+Pe%C3%B1a')
+                         'http://example.com:5432/context/#La%20Pe%C3%B1a')
 
     def test_resource_url_anchor_is_urlencoded_safe(self):
         request = self._makeOne()
@@ -168,7 +168,7 @@ class TestURLMethodsMixin(unittest.TestCase):
         context = DummyContext()
         result = request.resource_url(context, anchor=' /#?&+')
         self.assertEqual(result,
-                         'http://example.com:5432/context/#+/%23?&+')
+                         'http://example.com:5432/context/#%20/%23?&+')
 
     def test_resource_url_no_IResourceURL_registered(self):
         # falls back to ResourceURL
@@ -452,7 +452,7 @@ class TestURLMethodsMixin(unittest.TestCase):
         result = request.route_url('flub', _anchor=b"La Pe\xc3\xb1a")
 
         self.assertEqual(result,
-                         'http://example.com:5432/1/2/3#La+Pe%C3%B1a')
+                         'http://example.com:5432/1/2/3#La%20Pe%C3%B1a')
 
     def test_route_url_with_anchor_unicode(self):
         from pyramid.interfaces import IRoutesMapper
@@ -463,7 +463,7 @@ class TestURLMethodsMixin(unittest.TestCase):
         result = request.route_url('flub', _anchor=anchor)
 
         self.assertEqual(result,
-                         'http://example.com:5432/1/2/3#La+Pe%C3%B1a')
+                         'http://example.com:5432/1/2/3#La%20Pe%C3%B1a')
 
     def test_route_url_with_query(self):
         from pyramid.interfaces import IRoutesMapper

@@ -14,10 +14,9 @@ from pyramid.interfaces import (
 from pyramid.compat import (
     bytes_,
     string_types,
-    url_quote,
     )
 from pyramid.encode import (
-    quote_plus,
+    url_quote,
     urlencode,
 )
 from pyramid.path import caller_package
@@ -49,13 +48,13 @@ def parse_url_overrides(kw):
     if '_query' in kw:
         query = kw.pop('_query')
         if isinstance(query, string_types):
-            qs = '?' + quote_plus(query, safe=QUERY_SAFE)
+            qs = '?' + url_quote(query, QUERY_SAFE)
         elif query:
             qs = '?' + urlencode(query, doseq=True)
 
     if '_anchor' in kw:
         anchor = kw.pop('_anchor')
-        anchor = quote_plus(anchor, safe=ANCHOR_SAFE)
+        anchor = url_quote(anchor, ANCHOR_SAFE)
         anchor = '#' + anchor
 
     if '_app_url' in kw:
@@ -598,13 +597,13 @@ class URLMethodsMixin(object):
         if 'query' in kw:
             query = kw['query']
             if isinstance(query, string_types):
-                qs = '?' + quote_plus(query, safe=QUERY_SAFE)
+                qs = '?' + url_quote(query, QUERY_SAFE)
             elif query:
                 qs = '?' + urlencode(query, doseq=True)
 
         if 'anchor' in kw:
             anchor = kw['anchor']
-            anchor = quote_plus(anchor, safe=ANCHOR_SAFE)
+            anchor = url_quote(anchor, ANCHOR_SAFE)
             anchor = '#' + anchor
 
         if elements:

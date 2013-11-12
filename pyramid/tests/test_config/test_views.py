@@ -3839,7 +3839,7 @@ class TestStaticURLInfo(unittest.TestCase):
         result = inst.generate('package:path/abc def', request, a=1,
                                _anchor=uc)
         self.assertEqual(result,
-                         'http://example.com/abc%20def#La+Pe%C3%B1a')
+                         'http://example.com/abc%20def#La%20Pe%C3%B1a')
 
     def test_add_already_exists(self):
         inst = self._makeOne()
