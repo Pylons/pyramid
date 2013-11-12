@@ -1902,10 +1902,8 @@ class StaticURLInfo(object):
                 else:
                     parsed = url_parse(url)
                     if not parsed.scheme:
-                        # parsed.scheme is readonly, so we have to parse again
-                        # to change the scheme, sigh.
-                        url = urlparse.urlunparse(url_parse(
-                            url, scheme=request.environ['wsgi.url_scheme']))
+                        url = urlparse.urlunparse(parsed._replace(
+                            scheme=request.environ['wsgi.url_scheme']))
                     subpath = url_quote(subpath)
                     result = urljoin(url, subpath)
                     if '_query' in kw:
