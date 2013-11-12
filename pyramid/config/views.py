@@ -70,6 +70,8 @@ from pyramid.security import NO_PERMISSION_REQUIRED
 from pyramid.static import static_view
 from pyramid.threadlocal import get_current_registry
 
+from pyramid.url import parse_url_overrides
+
 from pyramid.view import (
     render_view_to_response,
     AppendSlashNotFoundViewFactory,
@@ -1900,23 +1902,15 @@ class StaticURLInfo(object):
                     kw['subpath'] = subpath
                     return request.route_url(route_name, **kw)
                 else:
+                    app_url, scheme, host, port, qs, anchor = \
+                        parse_url_overrides(kw)
                     parsed = url_parse(url)
                     if not parsed.scheme:
                         url = urlparse.urlunparse(parsed._replace(
                             scheme=request.environ['wsgi.url_scheme']))
                     subpath = url_quote(subpath)
                     result = urljoin(url, subpath)
-                    if '_query' in kw:
-                        query = kw.pop('_query')
-                        if isinstance(query, string_types):
-                            result += '?' + quote_plus(query)
-                        elif query:
-                            result += '?' + urlencode(query, doseq=True)
-                    if '_anchor' in kw:
-                        anchor = kw.pop('_anchor')
-                        anchor = quote_plus(anchor)
-                        result += '#' + anchor
-                    return result
+                    return result + qs + anchor
 
         raise ValueError('No static URL definition matching %s' % path)
 

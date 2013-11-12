@@ -29,6 +29,48 @@ from pyramid.traversal import (
     )
 
 PATH_SAFE = '/:@&+$,' # from webob
+QUERY_SAFE = '/?:@!$&\'()*+,;=' # RFC 3986
+ANCHOR_SAFE = QUERY_SAFE
+
+def parse_url_overrides(kw):
+    """Parse special arguments passed when generating urls.
+
+    The supplied dictionary is mutated, popping arguments as necessary.
+    Returns a 6-tuple of the format ``(app_url, scheme, host, port,
+    qs, anchor)``.
+    """
+    anchor = ''
+    qs = ''
+    app_url = None
+    host = None
+    scheme = None
+    port = None
+
+    if '_query' in kw:
+        query = kw.pop('_query')
+        if isinstance(query, string_types):
+            qs = '?' + quote_plus(query, safe=QUERY_SAFE)
+        elif query:
+            qs = '?' + urlencode(query, doseq=True)
+
+    if '_anchor' in kw:
+        anchor = kw.pop('_anchor')
+        anchor = quote_plus(anchor, safe=ANCHOR_SAFE)
+        anchor = '#' + anchor
+
+    if '_app_url' in kw:
+        app_url = kw.pop('_app_url')
+
+    if '_host' in kw:
+        host = kw.pop('_host')
+
+    if '_scheme' in kw:
+        scheme = kw.pop('_scheme')
+
+    if '_port' in kw:
+        port = kw.pop('_port')
+
+    return app_url, scheme, host, port, qs, anchor
 
 class URLMethodsMixin(object):
     """ Request methods mixin for BaseRequest having to do with URL
@@ -215,36 +257,7 @@ class URLMethodsMixin(object):
         if route.pregenerator is not None:
             elements, kw = route.pregenerator(self, elements, kw)
 
-        anchor = ''
-        qs = ''
-        app_url = None
-        host = None
-        scheme = None
-        port = None
-
-        if '_query' in kw:
-            query = kw.pop('_query')
-            if isinstance(query, string_types):
-                qs = '?' + quote_plus(query)
-            elif query:
-                qs = '?' + urlencode(query, doseq=True)
-
-        if '_anchor' in kw:
-            anchor = kw.pop('_anchor')
-            anchor = quote_plus(anchor)
-            anchor = '#' + anchor
-
-        if '_app_url' in kw:
-            app_url = kw.pop('_app_url')
-
-        if '_host' in kw:
-            host = kw.pop('_host')
-
-        if '_scheme' in kw:
-            scheme = kw.pop('_scheme')
-
-        if '_port' in kw:
-            port = kw.pop('_port')
+        app_url, scheme, host, port, qs, anchor = parse_url_overrides(kw)
 
         if app_url is None:
             if (scheme is not None or host is not None or port is not None):
@@ -585,13 +598,13 @@ class URLMethodsMixin(object):
         if 'query' in kw:
             query = kw['query']
             if isinstance(query, string_types):
-                qs = '?' + quote_plus(query)
+                qs = '?' + quote_plus(query, safe=QUERY_SAFE)
             elif query:
                 qs = '?' + urlencode(query, doseq=True)
 
         if 'anchor' in kw:
             anchor = kw['anchor']
-            anchor = quote_plus(anchor)
+            anchor = quote_plus(anchor, safe=ANCHOR_SAFE)
             anchor = '#' + anchor
 
         if elements:

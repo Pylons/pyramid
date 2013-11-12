@@ -3828,7 +3828,7 @@ class TestStaticURLInfo(unittest.TestCase):
         result = inst.generate('package:path/abc def', request, a=1,
                                _query='(openlayers)')
         self.assertEqual(result,
-                         'http://example.com/abc%20def?%28openlayers%29')
+                         'http://example.com/abc%20def?(openlayers)')
 
     def test_generate_url_with_custom_anchor(self):
         inst = self._makeOne()

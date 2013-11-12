@@ -65,11 +65,11 @@ def urlencode(query, doseq=True):
     return result
 
 # bw compat api (dnr)
-def quote_plus(val):
+def quote_plus(val, safe=''):
     cls = val.__class__
     if cls is text_type:
         val = val.encode('utf-8')
     elif cls is not binary_type:
         val = str(val).encode('utf-8')
-    return _quote_plus(val)
+    return _quote_plus(val, safe=safe)
 

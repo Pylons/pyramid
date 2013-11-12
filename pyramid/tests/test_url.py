@@ -99,7 +99,7 @@ class TestURLMethodsMixin(unittest.TestCase):
         context = DummyContext()
         result = request.resource_url(context, 'a', query='(openlayers)')
         self.assertEqual(result,
-            'http://example.com:5432/context/a?%28openlayers%29')
+            'http://example.com:5432/context/a?(openlayers)')
 
     def test_resource_url_with_query_dict(self):
         request = self._makeOne()
@@ -162,13 +162,13 @@ class TestURLMethodsMixin(unittest.TestCase):
         self.assertEqual(result,
                          'http://example.com:5432/context/#La+Pe%C3%B1a')
 
-    def test_resource_url_anchor_is_urlencoded(self):
+    def test_resource_url_anchor_is_urlencoded_safe(self):
         request = self._makeOne()
         self._registerResourceURL(request.registry)
         context = DummyContext()
-        result = request.resource_url(context, anchor=' /#')
+        result = request.resource_url(context, anchor=' /#?&+')
         self.assertEqual(result,
-                         'http://example.com:5432/context/#+%2F%23')
+                         'http://example.com:5432/context/#+/%23?&+')
 
     def test_resource_url_no_IResourceURL_registered(self):
         # falls back to ResourceURL
@@ -481,7 +481,7 @@ class TestURLMethodsMixin(unittest.TestCase):
         request.registry.registerUtility(mapper, IRoutesMapper)
         result = request.route_url('flub', _query='(openlayers)')
         self.assertEqual(result,
-                         'http://example.com:5432/1/2/3?%28openlayers%29')
+                         'http://example.com:5432/1/2/3?(openlayers)')
 
     def test_route_url_with_empty_query(self):
         from pyramid.interfaces import IRoutesMapper
