@@ -6,9 +6,10 @@ from pyramid.compat import (
     text_,
     bytes_,
     native_,
-    iteritems_,
-    iterkeys_,
-    itervalues_,
+    )
+from pyramid.security import (
+    AuthenticationAPIMixin,
+    AuthorizationAPIMixin,
     )
 
 class TestRequest(unittest.TestCase):
@@ -52,6 +53,11 @@ class TestRequest(unittest.TestCase):
         from pyramid.response import Response
         cls = self._getTargetClass()
         self.assertEqual(cls.ResponseClass, Response)
+
+    def test_implements_security_apis(self):
+        apis = (AuthenticationAPIMixin, AuthorizationAPIMixin)
+        r = self._makeOne()
+        self.assertTrue(isinstance(r, apis))
 
     def test_charset_defaults_to_utf8(self):
         r = self._makeOne({'PATH_INFO':'/'})

@@ -26,27 +26,6 @@ def _registerRoutes(config):
     config.add_route('add_page', 'add_page/{pagename}')
 
 
-class PageModelTests(unittest.TestCase):
-
-    def setUp(self):
-        self.session = _initTestingDB()
-
-    def tearDown(self):
-        self.session.remove()
-
-    def _getTargetClass(self):
-        from tutorial.models import Page
-        return Page
-
-    def _makeOne(self, name='SomeName', data='some data'):
-        return self._getTargetClass()(name, data)
-
-    def test_constructor(self):
-        instance = self._makeOne()
-        self.assertEqual(instance.name, 'SomeName')
-        self.assertEqual(instance.data, 'some data')
-
-
 class ViewWikiTests(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp()

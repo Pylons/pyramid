@@ -214,11 +214,10 @@ function.
 .. code-block:: python
    :linenos:
 
-   from pyramid.security import has_permission
    from pyramid.httpexceptions import HTTPForbidden
 
    def view_fn(request):
-       if not has_permission('edit', request.context, request):
+       if request.has_permission('edit'):
            raise HTTPForbidden
        return {'greeting':'hello'}
 
@@ -229,15 +228,16 @@ function.
    otherwise it would fail when run normally.
 
 Without doing anything special during a unit test, the call to
-:func:`~pyramid.security.has_permission` in this view function will always
-return a ``True`` value.  When a :app:`Pyramid` application starts normally,
-it will populate a :term:`application registry` using :term:`configuration
-declaration` calls made against a :term:`Configurator`.  But if this
-application registry is not created and populated (e.g. by initializing the
-configurator with an authorization policy), like when you invoke application
-code via a unit test, :app:`Pyramid` API functions will tend to either fail
-or return default results.  So how do you test the branch of the code in this
-view function that raises :exc:`~pyramid.httpexceptions.HTTPForbidden`?
+:meth:`~pyramid.request.Request.has_permission` in this view function will
+always return a ``True`` value.  When a :app:`Pyramid` application starts
+normally, it will populate a :term:`application registry` using
+:term:`configuration declaration` calls made against a :term:`Configurator`.
+But if this application registry is not created and populated (e.g. by
+initializing the configurator with an authorization policy), like when you
+invoke application code via a unit test, :app:`Pyramid` API functions will tend
+to either fail or return default results.  So how do you test the branch of the
+code in this view function that raises
+:exc:`~pyramid.httpexceptions.HTTPForbidden`?
 
 The testing API provided by :app:`Pyramid` allows you to simulate various
 application registry registrations for use under a unit testing framework
@@ -287,12 +287,12 @@ Its third line registers a "dummy" "non-permissive" authorization policy
 using the :meth:`~pyramid.config.Configurator.testing_securitypolicy` method,
 which is a special helper method for unit testing.
 
-We then create a :class:`pyramid.testing.DummyRequest` object which simulates
-a WebOb request object API.  A :class:`pyramid.testing.DummyRequest` is a
-request object that requires less setup than a "real" :app:`Pyramid` request.
-We call the function being tested with the manufactured request.  When the
-function is called, :func:`pyramid.security.has_permission` will call the
-"dummy" authentication policy we've registered through
+We then create a :class:`pyramid.testing.DummyRequest` object which simulates a
+WebOb request object API.  A :class:`pyramid.testing.DummyRequest` is a request
+object that requires less setup than a "real" :app:`Pyramid` request.  We call
+the function being tested with the manufactured request.  When the function is
+called, :meth:`pyramid.request.Request.has_permission` will call the "dummy"
+authentication policy we've registered through
 :meth:`~pyramid.config.Configurator.testing_securitypolicy`, which denies
 access.  We check that the view function raises a
 :exc:`~pyramid.httpexceptions.HTTPForbidden` error.
