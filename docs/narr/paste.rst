@@ -85,7 +85,7 @@ function.  This is the function called by :term:`PasteDeploy` when the
 ``pserve`` command is invoked against our application.  It accepts a global
 configuration object and *returns* an instance of our application.
 
-``[DEFAULTS]`` Section of a PasteDeploy ``.ini`` File
+``[DEFAULT]`` Section of a PasteDeploy ``.ini`` File
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You can add a ``[DEFAULT]`` section to your PasteDeploy ``.ini`` file.  Such
