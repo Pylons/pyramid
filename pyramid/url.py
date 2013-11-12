@@ -171,11 +171,15 @@ class URLMethodsMixin(object):
         query string will be returned in the URL. If it is present, it
         will be used to compose a query string that will be tacked on
         to the end of the URL, replacing any request query string.
-        The value of ``_query`` must be a sequence of two-tuples *or*
+        The value of ``_query`` may be a sequence of two-tuples *or*
         a data structure with an ``.items()`` method that returns a
         sequence of two-tuples (presumably a dictionary).  This data
         structure will be turned into a query string per the
-        documentation of :func:`pyramid.encode.urlencode` function.
+        documentation of :func:`pyramid.url.urlencode` function.
+        Alternative encodings may be used by passing a string for ``_query``
+        in which case it will be quoted as per :rfc:`3986#section-3.4` but
+        no other assumptions will be made about the data format. For example,
+        spaces will be escaped as ``%20`` instead of ``+``.
         After the query data is turned into a query string, a leading
         ``?`` is prepended, and the resulting string is appended to
         the generated URL.
@@ -189,8 +193,13 @@ class URLMethodsMixin(object):
            as values, and a k=v pair will be placed into the query string for
            each value.
 
+        .. versionchanged:: 1.5
+           Allow the ``_query`` option to be a string to enable alternative
+           encodings.
+
         If a keyword argument ``_anchor`` is present, its string
-        representation will be used as a named anchor in the generated URL
+        representation will be quoted per :rfc:`3986#section-3.5` and used as
+        a named anchor in the generated URL
         (e.g. if ``_anchor`` is passed as ``foo`` and the route URL is
         ``http://example.com/route/url``, the resulting generated URL will
         be ``http://example.com/route/url#foo``).
@@ -199,8 +208,11 @@ class URLMethodsMixin(object):
 
            If ``_anchor`` is passed as a string, it should be UTF-8 encoded. If
            ``_anchor`` is passed as a Unicode object, it will be converted to
-           UTF-8 before being appended to the URL.  The anchor value is not
-           quoted in any way before being appended to the generated URL.
+           UTF-8 before being appended to the URL.
+
+        .. versionchanged:: 1.5
+           The ``_anchor`` option will be escaped instead of using
+           its raw string representation.
 
         If both ``_anchor`` and ``_query`` are specified, the anchor
         element will always follow the query element,
@@ -351,13 +363,17 @@ class URLMethodsMixin(object):
 
         If a keyword argument ``query`` is present, it will be used to
         compose a query string that will be tacked on to the end of the URL.
-        The value of ``query`` must be a sequence of two-tuples *or* a data
+        The value of ``query`` may be a sequence of two-tuples *or* a data
         structure with an ``.items()`` method that returns a sequence of
         two-tuples (presumably a dictionary).  This data structure will be
         turned into a query string per the documentation of
-        ``pyramid.url.urlencode`` function.  After the query data is turned
-        into a query string, a leading ``?`` is prepended, and the resulting
-        string is appended to the generated URL.
+        :func:``pyramid.url.urlencode`` function.
+        Alternative encodings may be used by passing a string for ``query``
+        in which case it will be quoted as per :rfc:`3986#section-3.4` but
+        no other assumptions will be made about the data format. For example,
+        spaces will be escaped as ``%20`` instead of ``+``.
+        After the query data is turned into a query string, a leading ``?`` is
+        prepended, and the resulting string is appended to the generated URL.
 
         .. note::
 
@@ -367,6 +383,10 @@ class URLMethodsMixin(object):
            argument equal to ``True``.  This means that sequences can be passed
            as values, and a k=v pair will be placed into the query string for
            each value.
+
+        .. versionchanged:: 1.5
+           Allow the ``query`` option to be a string to enable alternative
+           encodings.
 
         If a keyword argument ``anchor`` is present, its string
         representation will be used as a named anchor in the generated URL
@@ -378,8 +398,11 @@ class URLMethodsMixin(object):
 
            If ``anchor`` is passed as a string, it should be UTF-8 encoded. If
            ``anchor`` is passed as a Unicode object, it will be converted to
-           UTF-8 before being appended to the URL.  The anchor value is not
-           quoted in any way before being appended to the generated URL.
+           UTF-8 before being appended to the URL.
+
+        .. versionchanged:: 1.5
+           The ``anchor`` option will be escaped instead of using
+           its raw string representation.
 
         If both ``anchor`` and ``query`` are specified, the anchor element
         will always follow the query element,
