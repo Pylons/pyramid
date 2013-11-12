@@ -3,9 +3,9 @@ import binascii
 import hashlib
 import hmac
 from datetime import (
-        datetime,
-        timedelta,
-        )
+    datetime,
+    timedelta,
+    )
 
 from pyramid.compat import (
     bytes_,
@@ -18,10 +18,9 @@ try:
 except ImportError: # pragma: no cover
     # compat with webob <= 1.2.3
     from webob.cookies import Morsel
-    from datetime import timedelta
 
     def make_cookie(name, value, max_age=None, expires=None, path='/',
-                domain=None, secure=False, httponly=False, comment=None):
+                    domain=None, secure=False, httponly=False, comment=None):
         if value is None:
             value = ''
             max_age = 0
@@ -43,15 +42,13 @@ except ImportError: # pragma: no cover
                 max_age = expires - datetime.utcnow()
 
         morsel = Morsel(bytes_(name), bytes_(value))
-        if domain:
-            morsel.domain = bytes_(domain)
+        morsel.domain = bytes_(domain)
         morsel.path = bytes_(path)
         morsel.httponly = httponly
         morsel.secure = secure
         morsel.max_age = max_age
         morsel.expires = expires
-        if comment:
-            morsel.comment = bytes_(comment)
+        morsel.comment = bytes_(comment)
         return morsel.serialize()
 
 class PickleSerializer(object):
