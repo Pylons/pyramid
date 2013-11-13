@@ -346,45 +346,25 @@ your application was running "for real".  This is a heavy-hammer way of
 making sure that your tests have enough context to run properly, and it tests
 your code's integration with the rest of :app:`Pyramid`.
 
-Let's demonstrate this by showing an integration test for a view.  The below
-test assumes that your application's package name is ``myapp``, and that
-there is a ``views`` module in the app with a function with the name
-``my_view`` in it that returns the response 'Welcome to this application'
-after accessing some values that require a fully set up environment.
+Let's demonstrate this by showing an integration test for a view.  
 
-.. code-block:: python
-   :linenos:
+Given the following view definition, which assumes that your application's 
+:term:`package` name is ``myapp``, and within that :term:`package` there 
+exists a module ``views``, which in turn contains a :term:`view` 
+function named ``my_view``:
 
-   import unittest
+   .. literalinclude:: src/myapp/myapp/views.py
+      :linenos:
+      :lines: 1-6
+      :language: python
 
-   from pyramid import testing
+You'd then create a ``tests`` module within your ``myapp`` package, containing
+the following test code:
 
-   class ViewIntegrationTests(unittest.TestCase):
-       def setUp(self):
-           """ This sets up the application registry with the
-           registrations your application declares in its ``includeme`` 
-           function.
-           """
-           import myapp
-           self.config = testing.setUp()
-           self.config.include('myapp')
-
-       def tearDown(self):
-           """ Clear out the application registry """
-           testing.tearDown()
-
-       def test_my_view(self):
-           from myapp.views import my_view
-           request = testing.DummyRequest()
-           result = my_view(request)
-           self.assertEqual(result.status, '200 OK')
-           body = result.app_iter[0]
-           self.assertTrue('Welcome to' in body)
-           self.assertEqual(len(result.headerlist), 2)
-           self.assertEqual(result.headerlist[0],
-                            ('Content-Type', 'text/html; charset=UTF-8'))
-           self.assertEqual(result.headerlist[1], ('Content-Length',
-                                                   str(len(body))))
+   .. literalinclude:: src/myapp/myapp/tests.py
+      :linenos:
+      :pyobject: ViewIntegrationTests
+      :language: python
 
 Unless you cannot avoid it, you should prefer writing unit tests that use the
 :class:`~pyramid.config.Configurator` API to set up the right "mock"
@@ -402,27 +382,34 @@ Creating Functional Tests
 
 Functional tests test your literal application.
 
-The below test assumes that your application's package name is ``myapp``, and
-that there is a view that returns an HTML body when the root URL is invoked.
-It further assumes that you've added a ``tests_require`` dependency on the
-``WebTest`` package within your ``setup.py`` file.  :term:`WebTest` is a
-functional testing package written by Ian Bicking.
+In Pyramid, functional tests are typically written using the :term:`WebTest` 
+package.
 
-.. code-block:: python
-   :linenos:
+Regardless of which testing :term:`package` you use, ensure to add 
+a ``tests_require`` dependancy on that package to to your application's 
+``setup.py`` file:
 
-   import unittest
+   .. literalinclude:: src/myapp/setup.py
+      :linenos:
+      :emphasize-lines: 36
+      :language: python
 
-   class FunctionalTests(unittest.TestCase):
-       def setUp(self):
-           from myapp import main
-           app = main({})
-           from webtest import TestApp
-           self.testapp = TestApp(app)
+Assuming your :term:`package` is named ``myapp``, which 
+contains a ``views`` module, which in turn contains a :term:`view` 
+function ``home_view`` that returns a HTML body when the root URL is invoked:
 
-       def test_root(self):
-           res = self.testapp.get('/', status=200)
-           self.assertTrue('Pyramid' in res.body)
+   .. literalinclude:: src/myapp/myapp/views.py
+      :linenos:
+      :lines: 1, 7-10
+      :language: python
+
+Then the following example functional test (shown below) demonstrates invoking 
+the :term:`view` shown above:
+
+   .. literalinclude:: src/myapp/myapp/tests.py
+      :linenos:
+      :pyobject: FunctionalTests
+      :language: python
 
 When this test is run, each test creates a "real" WSGI application using the
 ``main`` function in your ``myapp.__init__`` module and uses :term:`WebTest`
