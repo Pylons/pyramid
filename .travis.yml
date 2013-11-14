@@ -8,7 +8,13 @@ python:
   - 3.2
   - 3.3
 
-script: python setup.py test -q
+before_script: pip install coverage coveralls nosexcover
+
+script:
+  - python setup.py dev
+  - python setup.py nosetests --with-xunit --with-xcoverage --cover-package pyramid --cover-erase
+
+after_success: coveralls
 
 notifications:
   email:
