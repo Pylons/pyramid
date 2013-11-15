@@ -42,6 +42,15 @@ class TestPShellCommand(unittest.TestCase):
         self.assertEqual(bpython.locals_, {'foo': 'bar'})
         self.assertTrue('a help message' in bpython.banner)
 
+    def test_make_ipython_v1_1_shell(self):
+        command = self._makeOne()
+        ipshell_factory = dummy.DummyIPShellFactory()
+        shell = command.make_ipython_v1_1_shell(ipshell_factory)
+        shell({'foo': 'bar'}, 'a help message')
+        self.assertEqual(ipshell_factory.kw['user_ns'], {'foo': 'bar'})
+        self.assertTrue('a help message' in ipshell_factory.kw['banner2'])
+        self.assertTrue(ipshell_factory.shell.called)
+
     def test_make_ipython_v0_11_shell(self):
         command = self._makeOne()
         ipshell_factory = dummy.DummyIPShellFactory()
@@ -64,8 +73,7 @@ class TestPShellCommand(unittest.TestCase):
     def test_command_loads_default_shell(self):
         command = self._makeOne()
         shell = dummy.DummyShell()
-        command.make_ipython_v0_11_shell = lambda: None
-        command.make_ipython_v0_10_shell = lambda: None
+        command.make_ipython_shell = lambda: None
         command.make_bpython_shell = lambda: None
         command.make_default_shell = lambda: shell
         command.run()
@@ -86,8 +94,7 @@ class TestPShellCommand(unittest.TestCase):
         command = self._makeOne()
         shell = dummy.DummyShell()
         bad_shell = dummy.DummyShell()
-        command.make_ipython_v0_11_shell = lambda: bad_shell
-        command.make_ipython_v0_10_shell = lambda: bad_shell
+        command.make_ipython_shell = lambda: bad_shell
         command.make_bpython_shell = lambda: bad_shell
         command.make_default_shell = lambda: shell
         command.options.python_shell = 'unknow_python_shell'
@@ -106,9 +113,33 @@ class TestPShellCommand(unittest.TestCase):
         self.assertTrue(self.bootstrap.closer.called)
         self.assertTrue(shell.help)
 
+    def test_command_loads_ipython_v1_1(self):
+        command = self._makeOne()
+        shell = dummy.DummyShell()
+        command.make_ipython_v1_1_shell = lambda: shell
+        command.make_ipython_v0_11_shell = lambda: None
+        command.make_ipython_v0_10_shell = lambda: None
+        command.make_bpython_shell = lambda: None
+        command.make_default_shell = lambda: None
+        command.options.python_shell = 'ipython'
+        command.run()
+        self.assertTrue(self.config_factory.parser)
+        self.assertEqual(self.config_factory.parser.filename,
+                         '/foo/bar/myapp.ini')
+        self.assertEqual(self.bootstrap.a[0], '/foo/bar/myapp.ini#myapp')
+        self.assertEqual(shell.env, {
+            'app':self.bootstrap.app, 'root':self.bootstrap.root,
+            'registry':self.bootstrap.registry,
+            'request':self.bootstrap.request,
+            'root_factory':self.bootstrap.root_factory,
+        })
+        self.assertTrue(self.bootstrap.closer.called)
+        self.assertTrue(shell.help)
+
     def test_command_loads_ipython_v0_11(self):
         command = self._makeOne()
         shell = dummy.DummyShell()
+        command.make_ipython_v1_1_shell = lambda: None
         command.make_ipython_v0_11_shell = lambda: shell
         command.make_ipython_v0_10_shell = lambda: None
         command.make_bpython_shell = lambda: None
@@ -131,6 +162,7 @@ class TestPShellCommand(unittest.TestCase):
     def test_command_loads_ipython_v0_10(self):
         command = self._makeOne()
         shell = dummy.DummyShell()
+        command.make_ipython_v1_1_shell = lambda: None
         command.make_ipython_v0_11_shell = lambda: None
         command.make_ipython_v0_10_shell = lambda: shell
         command.make_bpython_shell = lambda: None
@@ -153,8 +185,7 @@ class TestPShellCommand(unittest.TestCase):
     def test_command_loads_bpython_shell(self):
         command = self._makeOne()
         shell = dummy.DummyBPythonShell()
-        command.make_ipython_v0_11_shell = lambda: None
-        command.make_ipython_v0_10_shell = lambda: None
+        command.make_ipython_shell = lambda: None
         command.make_bpython_shell = lambda: shell
         command.options.python_shell = 'bpython'
         command.run()
@@ -173,25 +204,34 @@ class TestPShellCommand(unittest.TestCase):
 
     def test_shell_ipython_ordering(self):
         command = self._makeOne()
+        shell1_1 = dummy.DummyShell()
         shell0_11 = dummy.DummyShell()
         shell0_10 = dummy.DummyShell()
+        command.make_ipython_v1_1_shell = lambda: shell1_1
+        shell = command.make_shell()
+        self.assertEqual(shell, shell1_1)
+
+        command.make_ipython_v1_1_shell = lambda: None
         command.make_ipython_v0_11_shell = lambda: shell0_11
-        command.make_ipython_v0_10_shell = lambda: shell0_10
-        command.make_bpython_shell = lambda: None
         shell = command.make_shell()
         self.assertEqual(shell, shell0_11)
 
-        command.options.python_shell = 'ipython'
+        command.make_ipython_v0_11_shell = lambda: None
+        command.make_ipython_v0_10_shell = lambda: shell0_10
         shell = command.make_shell()
-        self.assertEqual(shell, shell0_11)
+        self.assertEqual(shell, shell0_10)
+
+        command.options.python_shell = 'ipython'
+        command.make_ipython_v1_1_shell = lambda: shell1_1
+        shell = command.make_shell()
+        self.assertEqual(shell, shell1_1)
 
     def test_shell_ordering(self):
         command = self._makeOne()
         ipshell = dummy.DummyShell()
         bpshell = dummy.DummyShell()
         dshell = dummy.DummyShell()
-        command.make_ipython_v0_11_shell = lambda: None
-        command.make_ipython_v0_10_shell = lambda: None
+        command.make_ipython_shell = lambda: None
         command.make_bpython_shell = lambda: None
         command.make_default_shell = lambda: dshell
 
@@ -206,7 +246,7 @@ class TestPShellCommand(unittest.TestCase):
         shell = command.make_shell()
         self.assertEqual(shell, dshell)
 
-        command.make_ipython_v0_11_shell = lambda: ipshell
+        command.make_ipython_shell = lambda: ipshell
         command.make_bpython_shell = lambda: bpshell
         command.options.python_shell = 'ipython'
         shell = command.make_shell()
