@@ -1016,7 +1016,8 @@ You can write the tween factory as a simple closure-returning function:
 
         return handler
 
-Alternatively, the tween factory can be a class with the ``__call__`` magic method:
+Alternatively, the tween factory can be a class with the ``__call__`` magic
+method:
 
 .. code-block:: python
    :linenos:
