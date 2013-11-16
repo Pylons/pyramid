@@ -179,7 +179,7 @@ file, simply create a logger object using the ``__name__`` builtin and call
 methods on it.
 
 .. code-block:: python 
-   :linenos:
+    :linenos:
 
     import logging 
     log = logging.getLogger(__name__) 

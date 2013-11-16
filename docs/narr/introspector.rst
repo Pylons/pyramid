@@ -24,7 +24,7 @@ Here's an example of using Pyramid's introspector from within a view
 callable:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
     from pyramid.view import view_config
     from pyramid.response import Response
@@ -100,7 +100,7 @@ its ``__getitem__``, ``get``, ``keys``, ``values``, or ``items`` methods.
 For example:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
     route_intr = introspector.get('routes', 'edit_user')
     pattern = route_intr['pattern']

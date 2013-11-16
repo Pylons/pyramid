@@ -112,7 +112,7 @@ want to have extension scaffolds that can work across Pyramid 1.0.X, 1.1.X,
 defining your scaffold template:
 
 .. code-block:: python
-   :linenos:
+     :linenos:
 
      try: # pyramid 1.0.X
          # "pyramid.paster.paste_script..." doesn't exist past 1.0.X
