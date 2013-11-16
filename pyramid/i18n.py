@@ -107,7 +107,8 @@ def default_locale_negotiator(request):
 
     - First, the negotiator looks for the ``_LOCALE_`` attribute of
       the request object (possibly set by a view or a listener for an
-      :term:`event`).
+      :term:`event`). If the attribute exists and it is not ``None``,
+      its value will be used.
   
     - Then it looks for the ``request.params['_LOCALE_']`` value.
 
