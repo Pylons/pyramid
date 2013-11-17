@@ -1014,7 +1014,7 @@ You can write the tween factory as a simple closure-returning function:
 
             return response
 
-        return handler
+        return simple_tween
 
 Alternatively, the tween factory can be a class with the ``__call__`` magic
 method:
