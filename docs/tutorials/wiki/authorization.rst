@@ -149,8 +149,8 @@ to the ``@view_config`` decorator for ``add_page()`` and
 ``edit_page()``, for example:
 
 .. code-block:: python
-   :linenos:
-   :emphasize-lines: 3
+    :linenos:
+    :emphasize-lines: 3
 
     @view_config(name='add_page', context='.models.Wiki',
                  renderer='templates/edit.pt',
