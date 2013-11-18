@@ -119,12 +119,6 @@ Deprecations
 - The ``pyramid.security.has_permission`` API is now deprecated.  Instead, use
   the newly-added ``has_permission`` method of the request object.
 
-- The ``pyramid.security.forget`` API is now deprecated.  Instead, use
-  the newly-added ``forget_userid`` method of the request object.
-
-- The ``pyramid.security.remember`` API is now deprecated.  Instead, use
-  the newly-added ``remember_userid`` method of the request object.
-
 - The ``pyramid.security.effective_principals`` API is now deprecated.
   Instead, use the newly-added ``effective_principals`` attribute of the
   request object.
