@@ -336,7 +336,7 @@ For example, instead of returning a ``Response`` object from a
 ``render_to_response`` call:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
     from pyramid.renderers import render_to_response
 
@@ -347,7 +347,7 @@ For example, instead of returning a ``Response`` object from a
 You can return a Python dictionary:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
     from pyramid.view import view_config
 
@@ -827,7 +827,7 @@ Here's an example of using Pyramid's introspector from within a view
 callable:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
     from pyramid.view import view_config
     from pyramid.response import Response

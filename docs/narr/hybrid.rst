@@ -63,7 +63,7 @@ An application that uses only traversal will have view configuration
 declarations that look like this:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
     # config is an instance of pyramid.config.Configurator
 
