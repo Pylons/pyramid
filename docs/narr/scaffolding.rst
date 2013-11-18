@@ -39,9 +39,9 @@ named ``__init__.py`` with something like the following:
 
    from pyramid.scaffolds import PyramidTemplate
 
-     class CoolExtensionTemplate(PyramidTemplate):
-         _template_dir = 'coolextension_scaffold'
-         summary = 'My cool extension'
+   class CoolExtensionTemplate(PyramidTemplate):
+       _template_dir = 'coolextension_scaffold'
+       summary = 'My cool extension'
 
 Once this is done, within the ``scaffolds`` directory, create a template
 directory.  Our example used a template directory named
@@ -89,7 +89,7 @@ For example:
             [pyramid.scaffold]
             coolextension=coolextension.scaffolds:CoolExtensionTemplate
           """
-         )
+        )
 
 Run your distribution's ``setup.py develop`` or ``setup.py install``
 command. After that, you should be able to see your scaffolding template
@@ -112,7 +112,7 @@ want to have extension scaffolds that can work across Pyramid 1.0.X, 1.1.X,
 defining your scaffold template:
 
 .. code-block:: python
-   :linenos:
+     :linenos:
 
      try: # pyramid 1.0.X
          # "pyramid.paster.paste_script..." doesn't exist past 1.0.X

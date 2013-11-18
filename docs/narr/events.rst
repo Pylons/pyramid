@@ -172,7 +172,7 @@ track of the information that subscribers will need. Here are some
 example custom event classes:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
     class DocCreated(object):
         def __init__(self, doc, request):
@@ -196,7 +196,7 @@ also use custom events with :ref:`subscriber predicates
 event with a decorator:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
     from pyramid.events import subscriber
     from .events import DocCreated
@@ -215,7 +215,7 @@ To fire your custom events use the
 accessed as ``request.registry.notify``. For example:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
     from .events import DocCreated
 

@@ -83,7 +83,7 @@ works against resource instances.
 Here's a sample resource tree, represented by a variable named ``root``:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
     class Resource(dict):
         pass

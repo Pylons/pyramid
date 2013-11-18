@@ -1078,7 +1078,7 @@ The contents of ``app2.py``:
 The contents of ``config.py``:
 
 .. code-block:: python
-  :linenos:
+    :linenos:
 
     L = []
 
