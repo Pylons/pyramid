@@ -112,7 +112,9 @@ class SignedCookieHelperTest(unittest.TestCase):
     def test_with_cookies(self):
         cookie = self.makeOne()
         request = self.makeOneRequest()
-        request.cookies['uns'] = "gAJVBHRlc3RxAS4KjKfwGmCkliC4ba99rWUdpy_riHzK7MQFPsb-SgYTgALHaSHrRkd3l-yE8c4w5ruxAKOyj2h5oF69Ix7ERZv_"
+        request.cookies['uns'] = (
+            "gAJVBHRlc3RxAS4KjKfwGmCkliC4ba99rWUdpy_riHzK7MQFPsb-SgYTgALHa"
+            "SHrRkd3l-yE8c4w5ruxAKOyj2h5oF69Ix7ERZv_")
 
         ret = cookie.get_value(request)
 
@@ -121,14 +123,18 @@ class SignedCookieHelperTest(unittest.TestCase):
     def test_with_bad_cookie_invalid_base64(self):
         cookie = self.makeOne()
         request = self.makeOneRequest()
-        request.cookies['uns'] = "gAJVBHRlc3RxAS4KjKfwGmCkliC4ba99rWUdpy_{}riHzK7MQFPsbSgYTgALHaSHrRkd3lyE8c4w5ruxAKOyj2h5oF69Ix7ERZv_"
+        request.cookies['uns'] = (
+            "gAJVBHRlc3RxAS4KjKfwGmCkliC4ba99rWUdpy_{}riHzK7MQFPsbSgYTgALHa"
+            "SHrRkd3lyE8c4w5ruxAKOyj2h5oF69Ix7ERZv_")
 
         self.assertRaises(ValueError, cookie.get_value, request)
 
     def test_with_bad_cookie_invalid_signature(self):
         cookie = self.makeOne(secret='sekrit!')
         request = self.makeOneRequest()
-        request.cookies['uns'] = "InRlc3QiFLIoEwZcKG6ITQSqbYcUNnPljwOcGNs25JRVCSoZcx/uX+OA1AhssA+CNeVKpWksQa0ktMhuQDdjzmDwgzbptg=="
+        request.cookies['uns'] = (
+            "InRlc3QiFLIoEwZcKG6ITQSqbYcUNnPljwOcGNs25JRVCSoZcx/uX+OA1AhssA"
+            "+CNeVKpWksQa0ktMhuQDdjzmDwgzbptg==")
 
         self.assertRaises(ValueError, cookie.get_value, request)
 
