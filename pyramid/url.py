@@ -48,7 +48,7 @@ def parse_url_overrides(kw):
     if '_query' in kw:
         query = kw.pop('_query')
         if isinstance(query, string_types):
-            qs = '?' + query
+            qs = '?' + url_quote(query, QUERY_SAFE)
         elif query:
             qs = '?' + urlencode(query, doseq=True)
 
@@ -176,12 +176,13 @@ class URLMethodsMixin(object):
         This data structure will be turned into a query string per the
         documentation of :func:`pyramid.url.urlencode` function.  This will
         produce a query string in the ``x-www-form-urlencoded`` format.  A
-        non-``x-www-form-urlencoded`` encoding may be used by passing a
-        *string* value as ``_query`` in which case it will be used without
-        quoting or encoding; it is left up to the caller to do both and if he
-        does not, an invalid URL may be generated.  After the query data is
-        turned into a query string, a leading ``?`` is prepended, and the
-        resulting string is appended to the generated URL.
+        non-``x-www-form-urlencoded`` query string may be used by passing a
+        *string* value as ``_query`` in which case it will be URL-quoted
+        (e.g. query="foo bar" will become "foo%20bar").  However, the result
+        will not need to be in ``k=v`` form as required by
+        ``x-www-form-urlencoded``.  After the query data is turned into a query
+        string, a leading ``?`` is prepended, and the resulting string is
+        appended to the generated URL.
 
         .. note::
 
@@ -369,10 +370,11 @@ class URLMethodsMixin(object):
         function.  This will produce a query string in the
         ``x-www-form-urlencoded`` encoding.  A non-``x-www-form-urlencoded``
         query string may be used by passing a *string* value as ``query`` in
-        which case it will be used without quoting or encoding; it is up to the
-        caller to do both and if he does not an invalid URL may be generated.
-        After the query data is turned into a query string, a leading ``?`` is
-        prepended, and the resulting string is appended to the generated URL.
+        which case it will be URL-quoted (e.g. query="foo bar" will become
+        "foo%20bar").  However, the result will not need to be in ``k=v`` form
+        as required by ``x-www-form-urlencoded``.  After the query data is
+        turned into a query string, a leading ``?`` is prepended, and the
+        resulting string is appended to the generated URL.
 
         .. note::
 
@@ -619,7 +621,7 @@ class URLMethodsMixin(object):
         if 'query' in kw:
             query = kw['query']
             if isinstance(query, string_types):
-                qs = '?' + query
+                qs = '?' + url_quote(query, QUERY_SAFE)
             elif query:
                 qs = '?' + urlencode(query, doseq=True)
 
