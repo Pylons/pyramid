@@ -1,0 +1,8 @@
+[run]
+source = pyramid
+
+[report]
+omit =
+    */pyramid/tests/*
+    */python?.?/*
+    */site-packages/nose/*
