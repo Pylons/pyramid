@@ -8,6 +8,8 @@ python:
   - 3.2
   - 3.3
 
+install: python setup.py dev
+
 script: python setup.py test -q
 
 notifications:
