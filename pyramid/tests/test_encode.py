@@ -72,3 +72,8 @@ class URLQuoteTests(unittest.TestCase):
         la = b'La/Pe\xc3\xb1a'
         result = self._callFUT(la, '/')
         self.assertEqual(result, 'La/Pe%C3%B1a')
+
+    def test_it_with_nonstr_nonbinary(self):
+        la = None
+        result = self._callFUT(la, '/')
+        self.assertEqual(result, 'None')
