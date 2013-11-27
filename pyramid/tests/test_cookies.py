@@ -13,15 +13,20 @@ class CookieMakeCookie(unittest.TestCase):
         self.assertTrue('Max-Age=500;' in cookie)
         self.assertTrue('expires' in cookie)
 
-    def test_make_cookie_expires(self):
-        from datetime import (datetime, timedelta)
-
-        cookie = self.makeOne('test_cookie', 'value', expires=datetime.utcnow()
-                + timedelta(seconds=600))
+    def test_make_cookie_max_age_timedelta(self):
+        from datetime import timedelta
+        cookie = self.makeOne('test_cookie', 'value',
+                              max_age=timedelta(seconds=500))
 
         self.assertTrue('test_cookie=value' in cookie)
+        self.assertTrue('Max-Age=500;' in cookie)
         self.assertTrue('expires' in cookie)
-        self.assertTrue('Max-Age=' in cookie)
+
+    def test_make_cookie_comment(self):
+        cookie = self.makeOne('test_cookie', 'value', comment='lolwhy')
+
+        self.assertTrue('test_cookie=value' in cookie)
+        self.assertTrue('Comment=lolwhy' in cookie)
 
 class CookieHelperTest(unittest.TestCase):
     def makeOne(self, name='uns', **kw):
@@ -188,7 +193,7 @@ class SignedCookieHelperTest(unittest.TestCase):
         ret = cookie.raw_headers(request, "test")
 
         for cookie in ret:
-            self.assertTrue('; HttpOnly' in cookie[1])
+            self.assertTrue('; httponly' in cookie[1])
 
     def test_http_host_port(self):
         cookie = self.makeOne()

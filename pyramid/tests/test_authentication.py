@@ -905,15 +905,15 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertEqual(len(result), 3)
 
         self.assertEqual(result[0][0], 'Set-Cookie')
-        self.assertTrue(result[0][1].endswith('; HttpOnly'))
+        self.assertTrue('; httponly' in result[0][1])
         self.assertTrue(result[0][1].startswith('auth_tkt='))
 
         self.assertEqual(result[1][0], 'Set-Cookie')
-        self.assertTrue('; HttpOnly' in result[1][1])
+        self.assertTrue('; httponly' in result[1][1])
         self.assertTrue(result[1][1].startswith('auth_tkt='))
 
         self.assertEqual(result[2][0], 'Set-Cookie')
-        self.assertTrue('; HttpOnly' in result[2][1])
+        self.assertTrue('; httponly' in result[2][1])
         self.assertTrue(result[2][1].startswith('auth_tkt='))
 
     def test_remember_secure(self):
@@ -1107,20 +1107,25 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         helper = self._makeOne('secret')
         request = self._makeRequest()
         headers = helper.forget(request)
-        self.assertEqual(len(headers), 3)
-        name, value = headers[0]
-        self.assertEqual(name, 'Set-Cookie')
-        self.assertTrue(value.startswith('auth_tkt=; Max-Age=0; Path=/;'))
-        name, value = headers[1]
-        self.assertEqual(name, 'Set-Cookie')
-        self.assertTrue(value.startswith('auth_tkt=; Domain=localhost; '
-                                          'Max-Age=0; Path=/;'
-                                          ))
-        name, value = headers[2]
-        self.assertEqual(name, 'Set-Cookie')
-        self.assertTrue(value.startswith('auth_tkt=; Domain=.localhost; '
-                                          'Max-Age=0; Path=/;'
-                                          ))
+        values = self._parseHeaders(headers)
+        self.assertEqual(len(values), 3)
+        self.assertEqual(values[0].key, 'auth_tkt')
+        self.assertEqual(values[0].value, '')
+        self.assertEqual(values[0]['max-age'], '0')
+        self.assertEqual(values[0]['path'], '/')
+        self.assertEqual(values[0]['domain'], '')
+
+        self.assertEqual(values[1].key, 'auth_tkt')
+        self.assertEqual(values[1].value, '')
+        self.assertEqual(values[1]['max-age'], '0')
+        self.assertEqual(values[1]['path'], '/')
+        self.assertEqual(values[1]['domain'], 'localhost')
+
+        self.assertEqual(values[2].key, 'auth_tkt')
+        self.assertEqual(values[2].value, '')
+        self.assertEqual(values[2]['max-age'], '0')
+        self.assertEqual(values[2]['path'], '/')
+        self.assertEqual(values[2]['domain'], '.localhost')
 
 class TestAuthTicket(unittest.TestCase):
     def _makeOne(self, *arg, **kw):

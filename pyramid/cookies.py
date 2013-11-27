@@ -9,47 +9,52 @@ from datetime import (
 
 from pyramid.compat import (
     bytes_,
+    native_,
     pickle,
+    SimpleCookie,
 )
 from pyramid.util import strings_differ
 
-try:
-    from webob.cookies import make_cookie
-except ImportError: # pragma: no cover
-    # compat with webob <= 1.2.3
-    from webob.cookies import Morsel
+def make_cookie(name, value, max_age=None, path='/', domain=None,
+                secure=False, httponly=False, comment=None):
+    # We are deleting the cookie, override max_age and expires
+    if value is None:
+        value = b''
+        max_age = 0
+        expires = -5 * 60 * 60 * 24
 
-    def make_cookie(name, value, max_age=None, expires=None, path='/',
-                    domain=None, secure=False, httponly=False, comment=None):
-        if value is None:
-            value = ''
-            max_age = 0
-            expires = timedelta(days=-5)
+    # Convert max_age to seconds
+    elif isinstance(max_age, timedelta):
+        max_age = (max_age.days * 60 * 60 * 24) + max_age.seconds
+        expires = max_age
 
-        # We need to set the expiration based upon max_age
-        elif expires is None and max_age is not None:
-            try:
-                max_age = timedelta(seconds=int(max_age))
-            except:
-                max_age = None
+    # The hilarious python stdlib expects expires to be a relative value
+    # in seconds, so we can just copy max_age
+    else:
+        expires = max_age
 
-            if isinstance(max_age, timedelta):
-                expires = datetime.utcnow() + max_age
+    name = native_(name)
 
-        # We need to set the max age based upon the expiration
-        elif max_age is None and expires is not None:
-            if isinstance(expires, datetime):
-                max_age = expires - datetime.utcnow()
+    # use the SimpleCookie to quote the value then grab the morsel
+    c = SimpleCookie()
+    c[name] = native_(value)
+    morsel = c[name]
 
-        morsel = Morsel(bytes_(name), bytes_(value))
-        morsel.domain = bytes_(domain)
-        morsel.path = bytes_(path)
-        morsel.httponly = httponly
-        morsel.secure = secure
-        morsel.max_age = max_age
-        morsel.expires = expires
-        morsel.comment = bytes_(comment)
-        return morsel.serialize()
+    if domain is not None:
+        morsel['domain'] = native_(domain)
+    if path is not None:
+        morsel['path'] = native_(path)
+    if httponly:
+        morsel['httponly'] = True
+    if secure:
+        morsel['secure'] = True
+    if max_age is not None:
+        morsel['max-age'] = max_age
+    if expires is not None:
+        morsel['expires'] = expires
+    if comment is not None:
+        morsel['comment'] = native_(comment)
+    return morsel.OutputString()
 
 class PickleSerializer(object):
     def dumps(self, appstruct):

@@ -123,13 +123,12 @@ class SharedCookieSessionTests(object):
         response = Response()
         self.assertEqual(session._set_cookie(response), True)
         cookieval = response.headerlist[-1][1]
-        val, domain, path, secure, httponly = [x.strip() for x in
-                                               cookieval.split(';')]
-        self.assertTrue(val.startswith('abc='))
-        self.assertEqual(domain, 'Domain=localhost')
-        self.assertEqual(path, 'Path=/foo')
-        self.assertEqual(secure, 'secure')
-        self.assertEqual(httponly, 'HttpOnly')
+        parts = [x.strip() for x in cookieval.split(';')]
+        self.assertTrue(parts[0].startswith('abc='))
+        self.assertEqual(parts[1], 'Domain=localhost')
+        self.assertEqual(parts[2], 'httponly')
+        self.assertEqual(parts[3], 'Path=/foo')
+        self.assertEqual(parts[4], 'secure')
 
     def test_flash_default(self):
         request = testing.DummyRequest()
@@ -449,14 +448,16 @@ def dummy_signed_serialize(data, secret):
     import base64
     from pyramid.compat import pickle, bytes_
     pickled = pickle.dumps(data)
-    return base64.b64encode(bytes_(secret)) + base64.b64encode(pickled)
+    serialized_data = base64.urlsafe_b64encode(pickled).rstrip(b'=')
+    return bytes_(secret) + b'!!' + serialized_data
 
 def dummy_signed_deserialize(serialized, secret):
     import base64
     from pyramid.compat import pickle, bytes_
-    serialized_data = base64.b64decode(
-        serialized[len(base64.b64encode(bytes_(secret))):])
-    return pickle.loads(serialized_data)
+    secret, serialized_data = serialized.split(b'!!')
+    b64padding = b'=' * (-len(serialized_data) % 4)
+    pickled_data = base64.urlsafe_b64decode(serialized_data + b64padding)
+    return pickle.loads(pickled_data)
 
 class Test_manage_accessed(unittest.TestCase):
     def _makeOne(self, wrapped):
