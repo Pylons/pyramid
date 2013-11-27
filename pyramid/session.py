@@ -66,6 +66,12 @@ def signed_serialize(data, secret):
     sig = hmac.new(bytes_(secret), pickled, hashlib.sha1).hexdigest()
     return sig + native_(base64.b64encode(pickled))
 
+deprecated(
+    'signed_serialize',
+    'The signed_serialize function is deprecated as of '
+    'Pyramid 1.5.  Use ``pyramid.cookies.SignedSerializer`` instead.'
+    )
+
 def signed_deserialize(serialized, secret, hmac=hmac):
     """ Deserialize the value returned from ``signed_serialize``.  If
     the value cannot be deserialized for any reason, a
@@ -98,6 +104,12 @@ def signed_deserialize(serialized, secret, hmac=hmac):
         raise ValueError('Invalid signature')
 
     return pickle.loads(pickled)
+
+deprecated(
+    'signed_deserialize',
+    'The signed_deserialize function is deprecated as of '
+    'Pyramid 1.5.  Use ``pyramid.cookies.SignedSerializer`` instead.'
+    )
 
 def check_csrf_token(request,
                      token='csrf_token',
