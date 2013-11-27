@@ -48,6 +48,17 @@ Features
   timeouts, and conformance with the ``ISession`` API.
   See https://github.com/Pylons/pyramid/pull/1142
 
+- Allow ``pyramid.request.Request.route_url`` and
+  ``pyramid.request.Request.resource_url`` to accept strings for their
+  query string to enable alternative encodings. Also the anchor argument
+  will now be escaped to ensure minimal conformance.
+  See https://github.com/Pylons/pyramid/pull/1183
+
+- Allow sending of ``_query`` and ``_anchor`` options to
+  ``pyramid.request.Request.static_url`` when an external URL is being
+  generated.
+  See https://github.com/Pylons/pyramid/pull/1183
+
 Bug Fixes
 ---------
 

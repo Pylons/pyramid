@@ -3820,6 +3820,27 @@ class TestStaticURLInfo(unittest.TestCase):
         result = inst.generate('package:path/abc def', request, a=1)
         self.assertEqual(result, 'http://example.com/abc%20def')
 
+    def test_generate_url_with_custom_query(self):
+        inst = self._makeOne()
+        registrations = [('http://example.com/', 'package:path/', None)]
+        inst._get_registrations = lambda *x: registrations
+        request = self._makeRequest()
+        result = inst.generate('package:path/abc def', request, a=1,
+                               _query='(openlayers)')
+        self.assertEqual(result,
+                         'http://example.com/abc%20def?(openlayers)')
+
+    def test_generate_url_with_custom_anchor(self):
+        inst = self._makeOne()
+        registrations = [('http://example.com/', 'package:path/', None)]
+        inst._get_registrations = lambda *x: registrations
+        request = self._makeRequest()
+        uc = text_(b'La Pe\xc3\xb1a', 'utf-8')
+        result = inst.generate('package:path/abc def', request, a=1,
+                               _anchor=uc)
+        self.assertEqual(result,
+                         'http://example.com/abc%20def#La%20Pe%C3%B1a')
+
     def test_add_already_exists(self):
         inst = self._makeOne()
         config = self._makeConfig(
