@@ -48,16 +48,23 @@ Features
   timeouts, and conformance with the ``ISession`` API.
   See https://github.com/Pylons/pyramid/pull/1142
 
-- Allow ``pyramid.request.Request.route_url`` and
-  ``pyramid.request.Request.resource_url`` to accept strings for their
-  query string to enable alternative encodings. Also the anchor argument
-  will now be escaped to ensure minimal conformance.
-  See https://github.com/Pylons/pyramid/pull/1183
+- The anchor argument to ``pyramid.request.Request.route_url`` and
+  ``pyramid.request.Request.resource_url`` and their derivatives will now be
+  escaped to ensure minimal conformance.  See
+  https://github.com/Pylons/pyramid/pull/1183
 
 - Allow sending of ``_query`` and ``_anchor`` options to
   ``pyramid.request.Request.static_url`` when an external URL is being
   generated.
   See https://github.com/Pylons/pyramid/pull/1183
+
+- You can now send a string as the ``_query`` argument to
+  ``pyramid.request.Request.route_url`` and
+  ``pyramid.request.Request.resource_url`` and their derivatives.  When a
+  string is sent instead of a list or dictionary. it is not URL-encoded or
+  quoted; the caller must perform this job before passing it in.  This is
+  useful if you want to be able to use a different query string format than
+  ``x-www-form-urlencoded``.  See https://github.com/Pylons/pyramid/pull/1183
 
 Bug Fixes
 ---------

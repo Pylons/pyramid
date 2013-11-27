@@ -6,7 +6,6 @@ from pyramid import testing
 
 from pyramid.compat import (
     text_,
-    native_,
     WIN,
     )
 
