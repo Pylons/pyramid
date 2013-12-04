@@ -2,6 +2,7 @@ from code import interact
 import optparse
 import sys
 import textwrap
+from distutils.version import LooseVersion
 
 from pyramid.compat import configparser
 from pyramid.util import DottedNameResolver
@@ -152,18 +153,13 @@ class PShellCommand(object):
     def make_shell(self):
         shell = None
         user_shell = self.options.python_shell.lower()
-        if not user_shell:
+        if not user_shell or (user_shell == 'ipython'):
             shell = self.make_ipython_shell()
             if shell is None:
                 shell = self.make_bpython_shell()
-
-        elif user_shell == 'ipython':
-            shell = self.make_ipython_shell()
-
         elif user_shell == 'bpython':
             shell = self.make_bpython_shell()
-
-        if shell is None:
+        else:
             shell = self.make_default_shell()
 
         return shell
@@ -188,51 +184,33 @@ class PShellCommand(object):
         return shell
 
     def make_ipython_shell(self):
-        shell = self.make_ipython_v1_1_shell()
-        if shell is None:
-            shell = self.make_ipython_v0_11_shell()
-        if shell is None:
-            shell = self.make_ipython_v0_10_shell()
-        return shell
-
-    def make_ipython_v1_1_shell(self, IPShellFactory=None):
-        if IPShellFactory is None: # pragma: no cover
-            try:
-                from IPython.terminal.embed import (
-                    InteractiveShellEmbed)
-                IPShellFactory = InteractiveShellEmbed
-            except ImportError:
-                return None
-        def shell(env, help):
-            IPShell = IPShellFactory(banner2=help + '\n', user_ns=env)
-            IPShell()
-        return shell
-
-    def make_ipython_v0_11_shell(self, IPShellFactory=None):
-        if IPShellFactory is None: # pragma: no cover
-            try:
-                from IPython.frontend.terminal.embed import (
-                    InteractiveShellEmbed)
-                IPShellFactory = InteractiveShellEmbed
-            except ImportError:
-                return None
-        def shell(env, help):
-            IPShell = IPShellFactory(banner2=help + '\n', user_ns=env)
-            IPShell()
-        return shell
-
-    def make_ipython_v0_10_shell(self, IPShellFactory=None):
-        if IPShellFactory is None: # pragma: no cover
-            try:
-                from IPython.Shell import IPShellEmbed
-                IPShellFactory = IPShellEmbed
-            except ImportError:
-                return None
-        def shell(env, help):
-            IPShell = IPShellFactory(argv=[], user_ns=env)
-            IPShell.set_banner(IPShell.IP.BANNER + '\n' + help + '\n')
-            IPShell()
-        return shell
-
-if __name__ == '__main__': # pragma: no cover
-    sys.exit(main() or 0)
+        try:
+            import IPython
+        except ImportError:
+            print >>sys.stderr,'Error: Cannot find IPython'
+            return None
+        
+        ipy_version = LooseVersion(IPython.__version__)
+        
+        if ipy_version >= '1.0.0':
+            from IPython import embed
+            def shell(env, help):
+                embed(banner2=help + '\n', user_ns=env)
+            return shell
+        elif ipy_version >= '0.11':
+            from IPython.frontend.terminal.embed import InteractiveShellEmbed
+            def shell(env, help):
+                IPShell = InteractiveShellEmbed(banner2=help + '\n', user_ns=env)
+                IPShell()
+            return shell
+        elif ipy_version >= '0.10':
+            from IPython.Shell import IPShellEmbed
+            IPShellFactory = IPShellEmbed
+            def shell(env, help):
+                IPShell = IPShellEmbe(argv=[], user_ns=env)
+                IPShell.set_banner(IPShell.IP.BANNER + '\n' + help + '\n')
+                IPShell()
+            return shell
+        else:
+            print >>sys.stderr,'Error: Cannot find recent IPython. Falling back.. (Found: %s)' % ipy_version
+            return None
