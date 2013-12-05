@@ -87,7 +87,7 @@ configuration object and *returns* an instance of our application.
 
 .. _defaults_section_of_pastedeploy_file:
 
-``[DEFAULTS]`` Section of a PasteDeploy ``.ini`` File
+``[DEFAULT]`` Section of a PasteDeploy ``.ini`` File
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You can add a ``[DEFAULT]`` section to your PasteDeploy ``.ini`` file.  Such

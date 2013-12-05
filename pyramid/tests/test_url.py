@@ -6,7 +6,6 @@ from pyramid import testing
 
 from pyramid.compat import (
     text_,
-    native_,
     WIN,
     )
 
@@ -93,6 +92,14 @@ class TestURLMethodsMixin(unittest.TestCase):
         result = request.resource_url(context, 'a b c')
         self.assertEqual(result, 'http://example.com:5432/context/a%20b%20c')
 
+    def test_resource_url_with_query_str(self):
+        request = self._makeOne()
+        self._registerResourceURL(request.registry)
+        context = DummyContext()
+        result = request.resource_url(context, 'a', query='(openlayers)')
+        self.assertEqual(result,
+            'http://example.com:5432/context/a?(openlayers)')
+
     def test_resource_url_with_query_dict(self):
         request = self._makeOne()
         self._registerResourceURL(request.registry)
@@ -149,23 +156,18 @@ class TestURLMethodsMixin(unittest.TestCase):
         request = self._makeOne()
         self._registerResourceURL(request.registry)
         context = DummyContext()
-        uc = text_(b'La Pe\xc3\xb1a', 'utf-8') 
+        uc = text_(b'La Pe\xc3\xb1a', 'utf-8')
         result = request.resource_url(context, anchor=uc)
-        self.assertEqual(
-            result,
-            native_(
-                text_(b'http://example.com:5432/context/#La Pe\xc3\xb1a',
-                      'utf-8'),
-                'utf-8')
-            )
+        self.assertEqual(result,
+                         'http://example.com:5432/context/#La%20Pe%C3%B1a')
 
-    def test_resource_url_anchor_is_not_urlencoded(self):
+    def test_resource_url_anchor_is_urlencoded_safe(self):
         request = self._makeOne()
         self._registerResourceURL(request.registry)
         context = DummyContext()
-        result = request.resource_url(context, anchor=' /#')
+        result = request.resource_url(context, anchor=' /#?&+')
         self.assertEqual(result,
-                         'http://example.com:5432/context/# /#')
+                         'http://example.com:5432/context/#%20/%23?&+')
 
     def test_resource_url_no_IResourceURL_registered(self):
         # falls back to ResourceURL
@@ -448,14 +450,8 @@ class TestURLMethodsMixin(unittest.TestCase):
         request.registry.registerUtility(mapper, IRoutesMapper)
         result = request.route_url('flub', _anchor=b"La Pe\xc3\xb1a")
 
-        self.assertEqual(
-            result,
-            native_(
-                text_(
-                    b'http://example.com:5432/1/2/3#La Pe\xc3\xb1a',
-                    'utf-8'),
-                'utf-8')
-            )
+        self.assertEqual(result,
+                         'http://example.com:5432/1/2/3#La%20Pe%C3%B1a')
 
     def test_route_url_with_anchor_unicode(self):
         from pyramid.interfaces import IRoutesMapper
@@ -465,14 +461,8 @@ class TestURLMethodsMixin(unittest.TestCase):
         anchor = text_(b'La Pe\xc3\xb1a', 'utf-8')
         result = request.route_url('flub', _anchor=anchor)
 
-        self.assertEqual(
-            result,
-            native_(
-                text_(
-                    b'http://example.com:5432/1/2/3#La Pe\xc3\xb1a',
-                    'utf-8'),
-                'utf-8')
-            )
+        self.assertEqual(result,
+                         'http://example.com:5432/1/2/3#La%20Pe%C3%B1a')
 
     def test_route_url_with_query(self):
         from pyramid.interfaces import IRoutesMapper
@@ -482,6 +472,15 @@ class TestURLMethodsMixin(unittest.TestCase):
         result = request.route_url('flub', _query={'q':'1'})
         self.assertEqual(result,
                          'http://example.com:5432/1/2/3?q=1')
+
+    def test_route_url_with_query_str(self):
+        from pyramid.interfaces import IRoutesMapper
+        request = self._makeOne()
+        mapper = DummyRoutesMapper(route=DummyRoute('/1/2/3'))
+        request.registry.registerUtility(mapper, IRoutesMapper)
+        result = request.route_url('flub', _query='(openlayers)')
+        self.assertEqual(result,
+                         'http://example.com:5432/1/2/3?(openlayers)')
 
     def test_route_url_with_empty_query(self):
         from pyramid.interfaces import IRoutesMapper

@@ -550,7 +550,7 @@ also contain security debugging information in its body.
 Debugging Imperative Authorization Failures
 -------------------------------------------
 
-The :func:`pyramid.security.has_permission` API is used to check
+The :meth:`pyramid.request.Request.has_permission` API is used to check
 security within view functions imperatively.  It returns instances of
 objects that are effectively booleans.  But these objects are not raw
 ``True`` or ``False`` objects, and have information attached to them
@@ -563,7 +563,7 @@ one of :data:`pyramid.security.ACLAllowed`,
 ``msg`` attribute, which is a string indicating why the permission was
 denied or allowed.  Introspecting this information in the debugger or
 via print statements when a call to
-:func:`~pyramid.security.has_permission` fails is often useful.
+:meth:`~pyramid.request.Request.has_permission` fails is often useful.
 
 .. index::
    single: authentication policy (creating)
@@ -669,3 +669,31 @@ following interface:
 After you do so, you can pass an instance of such a class into the
 :class:`~pyramid.config.Configurator.set_authorization_policy` method at
 configuration time to use it.
+
+.. _admonishment_against_secret_sharing:
+
+Admonishment Against Secret-Sharing
+-----------------------------------
+
+A "secret" is required by various components of Pyramid.  For example, the
+:term:`authentication policy` below uses a secret value ``seekrit``::
+
+  authn_policy = AuthTktAuthenticationPolicy('seekrit', hashalg='sha512')
+
+A :term:`session factory` also requires a secret::
+
+  my_session_factory = SignedCookieSessionFactory('itsaseekreet')
+
+It is tempting to use the same secret for multiple Pyramid subsystems.  For
+example, you might be tempted to use the value ``seekrit`` as the secret for
+both the authentication policy and the session factory defined above.  This is
+a bad idea, because in both cases, these secrets are used to sign the payload
+of the data.
+
+If you use the same secret for two different parts of your application for
+signing purposes, it may allow an attacker to get his chosen plaintext signed,
+which would allow the attacker to control the content of the payload.  Re-using
+a secret across two different subsystems might drop the security of signing to
+zero. Keys should not be re-used across different contexts where an attacker
+has the possibility of providing a chosen plaintext.
+

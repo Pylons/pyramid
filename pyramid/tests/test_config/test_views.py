@@ -40,9 +40,6 @@ class TestViewsConfigurationMixin(unittest.TestCase):
 
     def _registerRenderer(self, config, name='.txt'):
         from pyramid.interfaces import IRendererFactory
-        from pyramid.interfaces import ITemplateRenderer
-        from zope.interface import implementer
-        @implementer(ITemplateRenderer)
         class Renderer:
             def __init__(self, info):
                 self.__class__.info = info
@@ -1818,6 +1815,36 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         self.assertRaises(ConfigurationError,
                           config.add_forbidden_view, http_cache='foo')
 
+    def test_add_forbidden_view_with_view_defaults(self):
+        from pyramid.interfaces import IRequest
+        from pyramid.renderers import null_renderer
+        from pyramid.exceptions import PredicateMismatch
+        from pyramid.httpexceptions import HTTPForbidden
+        from zope.interface import directlyProvides
+        from zope.interface import implementedBy
+        class view(object):
+            __view_defaults__ = {
+                'containment':'pyramid.tests.test_config.IDummy'
+                }
+            def __init__(self, request):
+                pass
+            def __call__(self):
+                return 'OK'
+        config = self._makeOne(autocommit=True)
+        config.add_forbidden_view(
+            view=view,
+            renderer=null_renderer)
+        wrapper = self._getViewCallable(
+            config, ctx_iface=implementedBy(HTTPForbidden),
+            request_iface=IRequest)
+        context = DummyContext()
+        directlyProvides(context, IDummy)
+        request = self._makeRequest(config)
+        self.assertEqual(wrapper(context, request), 'OK')
+        context = DummyContext()
+        request = self._makeRequest(config)
+        self.assertRaises(PredicateMismatch, wrapper, context, request)
+
     def test_add_notfound_view(self):
         from pyramid.renderers import null_renderer
         from zope.interface import implementedBy
@@ -1884,6 +1911,36 @@ class TestViewsConfigurationMixin(unittest.TestCase):
                                      request_iface=IRequest)
         result = view(None, request)
         self.assertEqual(result.location, '/scriptname/foo/?a=1&b=2')
+
+    def test_add_notfound_view_with_view_defaults(self):
+        from pyramid.interfaces import IRequest
+        from pyramid.renderers import null_renderer
+        from pyramid.exceptions import PredicateMismatch
+        from pyramid.httpexceptions import HTTPNotFound
+        from zope.interface import directlyProvides
+        from zope.interface import implementedBy
+        class view(object):
+            __view_defaults__ = {
+                'containment':'pyramid.tests.test_config.IDummy'
+                }
+            def __init__(self, request):
+                pass
+            def __call__(self):
+                return 'OK'
+        config = self._makeOne(autocommit=True)
+        config.add_notfound_view(
+            view=view,
+            renderer=null_renderer)
+        wrapper = self._getViewCallable(
+            config, ctx_iface=implementedBy(HTTPNotFound),
+            request_iface=IRequest)
+        context = DummyContext()
+        directlyProvides(context, IDummy)
+        request = self._makeRequest(config)
+        self.assertEqual(wrapper(context, request), 'OK')
+        context = DummyContext()
+        request = self._makeRequest(config)
+        self.assertRaises(PredicateMismatch, wrapper, context, request)
 
     # Since Python 3 has to be all cool and fancy and different...
     def _assertBody(self, response, value):
@@ -3762,6 +3819,27 @@ class TestStaticURLInfo(unittest.TestCase):
         request = self._makeRequest()
         result = inst.generate('package:path/abc def', request, a=1)
         self.assertEqual(result, 'http://example.com/abc%20def')
+
+    def test_generate_url_with_custom_query(self):
+        inst = self._makeOne()
+        registrations = [('http://example.com/', 'package:path/', None)]
+        inst._get_registrations = lambda *x: registrations
+        request = self._makeRequest()
+        result = inst.generate('package:path/abc def', request, a=1,
+                               _query='(openlayers)')
+        self.assertEqual(result,
+                         'http://example.com/abc%20def?(openlayers)')
+
+    def test_generate_url_with_custom_anchor(self):
+        inst = self._makeOne()
+        registrations = [('http://example.com/', 'package:path/', None)]
+        inst._get_registrations = lambda *x: registrations
+        request = self._makeRequest()
+        uc = text_(b'La Pe\xc3\xb1a', 'utf-8')
+        result = inst.generate('package:path/abc def', request, a=1,
+                               _anchor=uc)
+        self.assertEqual(result,
+                         'http://example.com/abc%20def#La%20Pe%C3%B1a')
 
     def test_add_already_exists(self):
         inst = self._makeOne()

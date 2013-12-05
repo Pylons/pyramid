@@ -109,7 +109,7 @@ An example of an Apache ``mod_proxy`` configuration that will host the
 is below:
 
 .. code-block:: apache
-   :linenos:
+    :linenos:
 
     NameVirtualHost *:80
 
@@ -130,7 +130,7 @@ For a :app:`Pyramid` application running under :term:`mod_wsgi`,
 the same can be achieved using ``SetEnv``:
 
 .. code-block:: apache
-   :linenos:
+    :linenos:
 
     <Location />
       SetEnv HTTP_X_VHM_ROOT /cms

@@ -536,7 +536,7 @@ The following types work as view callables in this style:
    e.g.:
 
    .. code-block:: python
-      :linenos:
+       :linenos:
 
        from pyramid.response import Response
 

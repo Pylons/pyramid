@@ -50,7 +50,10 @@ Other Interfaces
   .. autointerface:: IRendererInfo
      :members:
 
-  .. autointerface:: ITemplateRenderer
+  .. autointerface:: IRendererFactory
+     :members:
+
+  .. autointerface:: IRenderer
      :members:
 
   .. autointerface:: IViewMapperFactory

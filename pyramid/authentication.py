@@ -424,7 +424,9 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
 
     ``secret``
 
-       The secret (a string) used for auth_tkt cookie signing.
+       The secret (a string) used for auth_tkt cookie signing.  This value
+       should be unique across all values provided to Pyramid for various
+       subsystem secrets (see :ref:`admonishment_against_secret_sharing`).
        Required.
 
     ``callback``
@@ -1176,10 +1178,19 @@ class BasicAuthAuthenticationPolicy(CallbackAuthenticationPolicy):
             return None
         if authmeth.lower() != 'basic':
             return None
+
         try:
-            auth = b64decode(auth.strip()).decode('ascii')
+            authbytes = b64decode(auth.strip())
         except (TypeError, binascii.Error): # can't decode
             return None
+
+        # try utf-8 first, then latin-1; see discussion in
+        # https://github.com/Pylons/pyramid/issues/898
+        try:
+            auth = authbytes.decode('utf-8')
+        except UnicodeDecodeError:
+            auth = authbytes.decode('latin-1')
+
         try:
             username, password = auth.split(':', 1)
         except ValueError: # not enough values to unpack

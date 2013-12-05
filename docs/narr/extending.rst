@@ -234,7 +234,7 @@ For example, if the original application has the following
 ``configure_views`` configuration method:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
     def configure_views(config):
         config.add_view('theoriginalapp.views.theview', name='theview')

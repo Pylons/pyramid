@@ -44,6 +44,11 @@ from pyramid.compat import (
     is_nonstr_iter
     )
 
+from pyramid.encode import (
+    quote_plus,
+    urlencode,
+)
+
 from pyramid.exceptions import (
     ConfigurationError,
     PredicateMismatch,
@@ -64,6 +69,8 @@ from pyramid.response import Response
 from pyramid.security import NO_PERMISSION_REQUIRED
 from pyramid.static import static_view
 from pyramid.threadlocal import get_current_registry
+
+from pyramid.url import parse_url_overrides
 
 from pyramid.view import (
     render_view_to_response,
@@ -1017,10 +1024,10 @@ class ViewsConfiguratorMixin(object):
 
           If specified, this value should be a :term:`principal` identifier or
           a sequence of principal identifiers.  If the
-          :func:`pyramid.security.effective_principals` method indicates that
-          every principal named in the argument list is present in the current
-          request, this predicate will return True; otherwise it will return
-          False.  For example:
+          :attr:`pyramid.request.Request.effective_principals` property
+          indicates that every principal named in the argument list is present
+          in the current request, this predicate will return True; otherwise it
+          will return False.  For example:
           ``effective_principals=pyramid.security.Authenticated`` or
           ``effective_principals=('fred', 'group:admins')``.
 
@@ -1550,6 +1557,7 @@ class ViewsConfiguratorMixin(object):
 
         return deriver(view)
 
+    @viewdefaults
     @action_method
     def add_forbidden_view(
         self,
@@ -1629,6 +1637,7 @@ class ViewsConfiguratorMixin(object):
 
     set_forbidden_view = add_forbidden_view # deprecated sorta-bw-compat alias
     
+    @viewdefaults
     @action_method
     def add_notfound_view(
         self,
@@ -1893,14 +1902,15 @@ class StaticURLInfo(object):
                     kw['subpath'] = subpath
                     return request.route_url(route_name, **kw)
                 else:
+                    app_url, scheme, host, port, qs, anchor = \
+                        parse_url_overrides(kw)
                     parsed = url_parse(url)
                     if not parsed.scheme:
-                        # parsed.scheme is readonly, so we have to parse again
-                        # to change the scheme, sigh.
-                        url = urlparse.urlunparse(url_parse(
-                            url, scheme=request.environ['wsgi.url_scheme']))
+                        url = urlparse.urlunparse(parsed._replace(
+                            scheme=request.environ['wsgi.url_scheme']))
                     subpath = url_quote(subpath)
-                    return urljoin(url, subpath)
+                    result = urljoin(url, subpath)
+                    return result + qs + anchor
 
         raise ValueError('No static URL definition matching %s' % path)
 

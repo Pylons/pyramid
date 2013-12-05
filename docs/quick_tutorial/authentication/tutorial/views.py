@@ -2,8 +2,8 @@ from pyramid.httpexceptions import HTTPFound
 from pyramid.security import (
     remember,
     forget,
-    authenticated_userid
     )
+
 from pyramid.view import (
     view_config,
     view_defaults
@@ -16,7 +16,7 @@ from .security import USERS
 class TutorialViews:
     def __init__(self, request):
         self.request = request
-        self.logged_in = authenticated_userid(request)
+        self.logged_in = request.authenticated_userid
 
     @view_config(route_name='home')
     def home(self):
