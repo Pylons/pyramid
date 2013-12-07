@@ -8,6 +8,8 @@ import time
 from zope.deprecation import deprecated
 from zope.interface import implementer
 
+from webob.cookies import SignedSerializer
+
 from pyramid.compat import (
     pickle,
     PY3,
@@ -119,9 +121,17 @@ def check_csrf_token(request,
         return False
     return True
 
+class PickleSerializer(object):
+    """ A Webob cookie serializer that uses the pickle protocol to dump Python
+    data to bytes."""
+    def loads(self, bstruct):
+        return pickle.loads(bstruct)
+
+    def dumps(self, appstruct):
+        return pickle.dumps(appstruct, pickle.HIGHEST_PROTOCOL)
+
 def BaseCookieSessionFactory(
-    serialize,
-    deserialize,
+    serializer,
     cookie_name='session',
     max_age=None,
     path='/',
@@ -154,13 +164,11 @@ def BaseCookieSessionFactory(
 
     Parameters:
 
-    ``serialize``
-      A callable accepting a Python object and returning a bytestring. A
-      ``ValueError`` should be raised for malformed inputs.
-
-    ``deserialize``
-      A callable accepting a bytestring and returning a Python object. A
-      ``ValueError`` should be raised for malformed inputs.
+    ``serializer``
+      An object with two methods: `loads`` and ``dumps``.  The ``loads`` method
+      should accept bytes and return a Python object.  The ``dumps`` method
+      should accept a Python object and return bytes.  A ``ValueError`` should
+      be raised for malformed inputs.
 
     ``cookie_name``
       The name of the cookie used for sessioning. Default: ``'session'``.
@@ -238,7 +246,7 @@ def BaseCookieSessionFactory(
             cookieval = request.cookies.get(self._cookie_name)
             if cookieval is not None:
                 try:
-                    value = deserialize(bytes_(cookieval))
+                    value = serializer.loads(bytes_(cookieval))
                 except ValueError:
                     # the cookie failed to deserialize, dropped
                     value = None
@@ -336,7 +344,7 @@ def BaseCookieSessionFactory(
                 exception = getattr(self.request, 'exception', None)
                 if exception is not None: # dont set a cookie during exceptions
                     return False
-            cookieval = native_(serialize(
+            cookieval = native_(serializer.dumps(
                 (self.accessed, self.created, dict(self))
                 ))
             if len(cookieval) > 4064:
@@ -430,9 +438,20 @@ def UnencryptedCookieSessionFactoryConfig(
       is valid. Default: ``signed_deserialize`` (using pickle).
     """
 
+    class SerializerWrapper(object):
+        def __init__(self, secret):
+            self.secret = secret
+            
+        def loads(self, bstruct):
+            return signed_deserialize(bstruct, secret)
+
+        def dumps(self, appstruct):
+            return signed_serialize(appstruct, secret)
+
+    serializer = SerializerWrapper(secret)
+
     return BaseCookieSessionFactory(
-        lambda v: signed_serialize(v, secret),
-        lambda v: signed_deserialize(v, secret),
+        serializer,
         cookie_name=cookie_name,
         max_age=cookie_max_age,
         path=cookie_path,
@@ -463,8 +482,7 @@ def SignedCookieSessionFactory(
     reissue_time=0,
     hashalg='sha512',
     salt='pyramid.session.',
-    serialize=None,
-    deserialize=None,
+    serializer=None,
     ):
     """
     .. versionadded:: 1.5
@@ -546,53 +564,27 @@ def SignedCookieSessionFactory(
       If ``True``, set a session cookie even if an exception occurs
       while rendering a view. Default: ``True``.
 
-    ``serialize``
-      A callable accepting a Python object and returning a bytestring. A
-      ``ValueError`` should be raised for malformed inputs.
-      Default: :func:`pickle.dumps`.
-
-    ``deserialize``
-      A callable accepting a bytestring and returning a Python object. A
-      ``ValueError`` should be raised for malformed inputs.
-      Default: :func:`pickle.loads`.
+    ``serializer``
+      An object with two methods: `loads`` and ``dumps``.  The ``loads`` method
+      should accept bytes and return a Python object.  The ``dumps`` method
+      should accept a Python object and return bytes.  A ``ValueError`` should
+      be raised for malformed inputs.  If a serializer is not passed, the
+      :class:`pyramid.session.PickleSerializer` serializer will be used.
 
     .. versionadded: 1.5a3
     """
+    if serializer is None:
+        serializer = PickleSerializer()
 
-    if serialize is None:
-        serialize = lambda v: pickle.dumps(v, pickle.HIGHEST_PROTOCOL)
-
-    if deserialize is None:
-        deserialize = pickle.loads
-
-    digestmod = lambda string=b'': hashlib.new(hashalg, string)
-    digest_size = digestmod().digest_size
-
-    salted_secret = bytes_(salt or '') + bytes_(secret)
-
-    def signed_serialize(appstruct):
-        cstruct = serialize(appstruct)
-        sig = hmac.new(salted_secret, cstruct, digestmod).digest()
-        return base64.b64encode(cstruct + sig)
-
-    def signed_deserialize(bstruct):
-        try:
-            fstruct = base64.b64decode(bstruct)
-        except (binascii.Error, TypeError) as e:
-            raise ValueError('Badly formed base64 data: %s' % e)
-
-        cstruct = fstruct[:-digest_size]
-        expected_sig = fstruct[-digest_size:]
-
-        sig = hmac.new(salted_secret, cstruct, digestmod).digest()
-        if strings_differ(sig, expected_sig):
-            raise ValueError('Invalid signature')
-
-        return deserialize(cstruct)
+    signed_serializer = SignedSerializer(
+        secret,
+        salt, 
+        hashalg,
+        serializer=serializer,
+        )
 
     return BaseCookieSessionFactory(
-        signed_serialize,
-        signed_deserialize,
+        signed_serializer,
         cookie_name=cookie_name,
         max_age=max_age,
         path=path,
