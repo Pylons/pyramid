@@ -504,3 +504,5 @@ Dependency Changes
 
 - Pyramid no longer depends upon ``Mako`` or ``Chameleon``.
 
+- Pyramid now depends on WebOb>=1.3 (it uses ``webob.cookies.CookieProfile``
+  from 1.3+).

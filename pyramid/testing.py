@@ -320,6 +320,7 @@ class DummyRequest(
     method = 'GET'
     application_url = 'http://example.com'
     host = 'example.com:80'
+    domain = 'example.com'
     content_length = 0
     query_string = ''
     charset = 'UTF-8'

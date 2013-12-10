@@ -66,6 +66,9 @@ Features
   to use a different query string format than ``x-www-form-urlencoded``.  See
   https://github.com/Pylons/pyramid/pull/1183
 
+- ``pyramid.testing.DummyRequest`` now has a ``domain`` attribute to match the
+  new WebOb 1.3 API.  Its value is ``example.com``.
+
 Bug Fixes
 ---------
 
@@ -148,6 +151,12 @@ Deprecations
 - The ``pyramid.security.unauthenticated_userid`` API is now deprecated.
   Instead, use the newly-added ``unauthenticated_userid`` attribute of the
   request object.
+
+Dependencies
+------------
+
+- Pyramid now depends on WebOb>=1.3 (it uses ``webob.cookies.CookieProfile``
+  from 1.3+).
 
 1.5a2 (2013-09-22)
 ==================
