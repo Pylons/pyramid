@@ -348,7 +348,10 @@ The feature additions in Pyramid 1.5 follow.
   signing content. The custom serializer arguments to this function should
   only focus on serializing, unlike its predecessor which required the
   serializer to also perform signing.
-  See https://github.com/Pylons/pyramid/pull/1142
+  See https://github.com/Pylons/pyramid/pull/1142 . Note
+  that cookies generated using ``SignedCookieSessionFactory`` are not
+  compatible with cookies generated using ``UnencryptedCookieSessionFactory``,
+  so existing user session data will be destroyed if you switch to it.
 
 - Added a new ``BaseCookieSessionFactory`` which acts as a generic cookie
   factory that can be used by framework implementors to create their own
