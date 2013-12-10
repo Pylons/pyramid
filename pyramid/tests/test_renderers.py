@@ -567,7 +567,7 @@ class TestJSONP(unittest.TestCase):
         request = testing.DummyRequest()
         request.GET['callback'] = 'callback'
         result = renderer({'a':'1'}, {'request':request})
-        self.assertEqual(result, 'callback({"a": "1"})')
+        self.assertEqual(result, 'callback({"a": "1"});')
         self.assertEqual(request.response.content_type,
                          'application/javascript')
 
