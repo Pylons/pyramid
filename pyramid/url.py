@@ -359,7 +359,7 @@ class URLMethodsMixin(object):
         .. warning:: if no ``elements`` arguments are specified, the resource
                      URL will end with a trailing slash.  If any
                      ``elements`` are used, the generated URL will *not*
-                     end in trailing a slash.
+                     end in a trailing slash.
 
         If a keyword argument ``query`` is present, it will be used to compose
         a query string that will be tacked on to the end of the URL.  The value
