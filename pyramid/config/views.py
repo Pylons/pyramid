@@ -52,6 +52,7 @@ from pyramid.exceptions import (
 from pyramid.httpexceptions import (
     HTTPForbidden,
     HTTPNotFound,
+    default_exceptionresponse_view,
     )
 
 from pyramid.registry import (
@@ -1666,6 +1667,9 @@ class ViewsConfiguratorMixin(object):
 
             config.add_notfound_view(notfound)
 
+        If ``view`` argument is not provided, the view callable defaults to
+        :func:`~pyramid.httpexceptions.default_exceptionresponse_view`.
+
         All arguments except ``append_slash`` have the same meaning as
         :meth:`pyramid.config.Configurator.add_view` and each predicate
         argument restricts the set of circumstances under which this notfound
@@ -1691,7 +1695,10 @@ class ViewsConfiguratorMixin(object):
                     '%s may not be used as an argument to add_notfound_view'
                     % arg
                     )
-                    
+
+        if not view:
+            view = default_exceptionresponse_view
+
         settings = dict(
             view=view,
             context=HTTPNotFound,
