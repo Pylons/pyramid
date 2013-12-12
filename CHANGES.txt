@@ -1,3 +1,12 @@
+Next release
+============
+
+Bug Fixes
+---------
+
+- Add a trailing semicolon to the JSONP response. This fixes JavaScript syntax
+  errors for old IE versions. See https://github.com/Pylons/pyramid/pull/1205
+
 1.5a3 (2013-12-10)
 ==================
 
@@ -73,9 +82,6 @@ Features
 
 Bug Fixes
 ---------
-
-- Add a trailing semicolon to the JSONP response. This fixes JavaScript syntax
-  errors for old IE versions. See https://github.com/Pylons/pyramid/pull/1205
 
 - Fix the ``pcreate`` script so that when the target directory name ends with a 
   slash it does not produce a non-working project directory structure.  
