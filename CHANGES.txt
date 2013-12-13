@@ -4,6 +4,9 @@ Next release
 Bug Fixes
 ---------
 
+- Depend on a newer version of WebOb so that we pull in some crucial bug-fixes
+  that were showstoppers for functionality in Pyramid.
+
 - Add a trailing semicolon to the JSONP response. This fixes JavaScript syntax
   errors for old IE versions. See https://github.com/Pylons/pyramid/pull/1205
 
