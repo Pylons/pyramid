@@ -207,7 +207,7 @@ class PShellCommand(object):
             from IPython.Shell import IPShellEmbed
             IPShellFactory = IPShellEmbed
             def shell(env, help):
-                IPShell = IPShellEmbe(argv=[], user_ns=env)
+                IPShell = IPShellEmbed(argv=[], user_ns=env)
                 IPShell.set_banner(IPShell.IP.BANNER + '\n' + help + '\n')
                 IPShell()
             return shell
