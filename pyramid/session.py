@@ -165,7 +165,7 @@ def BaseCookieSessionFactory(
     Parameters:
 
     ``serializer``
-      An object with two methods: `loads`` and ``dumps``.  The ``loads`` method
+      An object with two methods: ``loads`` and ``dumps``.  The ``loads`` method
       should accept bytes and return a Python object.  The ``dumps`` method
       should accept a Python object and return bytes.  A ``ValueError`` should
       be raised for malformed inputs.
@@ -572,7 +572,7 @@ def SignedCookieSessionFactory(
       while rendering a view. Default: ``True``.
 
     ``serializer``
-      An object with two methods: `loads`` and ``dumps``.  The ``loads`` method
+      An object with two methods: ``loads`` and ``dumps``.  The ``loads`` method
       should accept bytes and return a Python object.  The ``dumps`` method
       should accept a Python object and return bytes.  A ``ValueError`` should
       be raised for malformed inputs.  If a serializer is not passed, the
