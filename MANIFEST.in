@@ -1,0 +1,3 @@
+recursive-include pyramid/scaffolds/alchemy *
+recursive-include pyramid/scaffolds/starter *
+recursive-include pyramid/scaffolds/zodb *
