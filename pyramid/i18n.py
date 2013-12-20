@@ -75,21 +75,34 @@ class Localizer(object):
         :term:`message identifier` objects as a singular/plural pair
         and an ``n`` value representing the number that appears in the
         message using gettext plural forms support.  The ``singular``
-        and ``plural`` objects passed may be translation strings or
-        unicode strings.  ``n`` represents the number of elements.
-        ``domain`` is the translation domain to use to do the
-        pluralization, and ``mapping`` is the interpolation mapping
-        that should be used on the result.  Note that if the objects
-        passed are translation strings, their domains and mappings are
-        ignored.  The domain and mapping arguments must be used
-        instead.  If the ``domain`` is not supplied, a default domain
-        is used (usually ``messages``).
-
+        and ``plural`` objects should be unicode strings. There is no
+        reason to use translation string objects as arguments as all
+        metadata is ignored.
+        
+        ``n`` represents the number of elements. ``domain`` is the
+        translation domain to use to do the pluralization, and ``mapping``
+        is the interpolation mapping that should be used on the result. If
+        the ``domain`` is not supplied, a default domain is used (usually
+        ``messages``).
+        
         Example::
 
            num = 1
            translated = localizer.pluralize('Add ${num} item',
                                             'Add ${num} items',
+                                            num,
+                                            mapping={'num':num})
+
+        If using the gettext plural support, which is required for
+        languages that have pluralisation rules other than n != 1, the
+        ``singular`` argument must be the message_id defined in the
+        translation file. The plural argument is not used in this case.
+
+        Example::
+
+           num = 1
+           translated = localizer.pluralize('item_plural',
+                                            '',
                                             num,
                                             mapping={'num':num})
 

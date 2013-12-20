@@ -10,6 +10,8 @@ import warnings
 
 from zope.interface import implementer
 
+from webob.cookies import CookieProfile
+
 from pyramid.compat import (
     long,
     text_type,
@@ -18,6 +20,7 @@ from pyramid.compat import (
     url_quote,
     bytes_,
     ascii_native_,
+    native_,
     )
 
 from pyramid.interfaces import (
@@ -798,8 +801,6 @@ def encode_ip_timestamp(ip, timestamp):
     ts_chars = ''.join(map(chr, ts))
     return bytes_(ip_chars + ts_chars)
 
-EXPIRE = object()
-
 class AuthTktCookieHelper(object):
     """
     A helper class for use in third-party authentication policy
@@ -830,55 +831,32 @@ class AuthTktCookieHelper(object):
                  include_ip=False, timeout=None, reissue_time=None,
                  max_age=None, http_only=False, path="/", wild_domain=True,
                  hashalg='md5', parent_domain=False, domain=None):
+
+        serializer = _SimpleSerializer()
+            
+        self.cookie_profile = CookieProfile(
+            cookie_name = cookie_name,
+            secure = secure,
+            max_age = max_age,
+            httponly = http_only,
+            path = path,
+            serializer=serializer
+            )
+
         self.secret = secret
         self.cookie_name = cookie_name
-        self.include_ip = include_ip
         self.secure = secure
+        self.include_ip = include_ip
         self.timeout = timeout
         self.reissue_time = reissue_time
         self.max_age = max_age
-        self.http_only = http_only
-        self.path = path
         self.wild_domain = wild_domain
         self.parent_domain = parent_domain
         self.domain = domain
         self.hashalg = hashalg
 
-        static_flags = []
-        if self.secure:
-            static_flags.append('; Secure')
-        if self.http_only:
-            static_flags.append('; HttpOnly')
-        self.static_flags = "".join(static_flags)
-
-    def _get_cookies(self, environ, value, max_age=None):
-        if max_age is EXPIRE:
-            max_age = "; Max-Age=0; Expires=Wed, 31-Dec-97 23:59:59 GMT"
-        elif max_age is not None:
-            later = datetime.datetime.utcnow() + datetime.timedelta(
-                seconds=int(max_age))
-            # Wdy, DD-Mon-YY HH:MM:SS GMT
-            expires = later.strftime('%a, %d %b %Y %H:%M:%S GMT')
-            # the Expires header is *required* at least for IE7 (IE7 does
-            # not respect Max-Age)
-            max_age = "; Max-Age=%s; Expires=%s" % (max_age, expires)
-        else:
-            max_age = ''
-
-        cur_domain = environ.get('HTTP_HOST', environ.get('SERVER_NAME'))
-
-        # While Chrome, IE, and Firefox can cope, Opera (at least) cannot
-        # cope with a port number in the cookie domain when the URL it
-        # receives the cookie from does not also have that port number in it
-        # (e.g via a proxy).  In the meantime, HTTP_HOST is sent with port
-        # number, and neither Firefox nor Chrome do anything with the
-        # information when it's provided in a cookie domain except strip it
-        # out.  So we strip out any port number from the cookie domain
-        # aggressively to avoid problems.  See also
-        # https://github.com/Pylons/pyramid/issues/131
-        if ':' in cur_domain:
-            cur_domain = cur_domain.split(':', 1)[0]
-
+    def _get_cookies(self, request, value, max_age=None):
+        cur_domain = request.domain
 
         domains = []
         if self.domain:
@@ -892,14 +870,15 @@ class AuthTktCookieHelper(object):
                 if self.wild_domain:
                     domains.append('.' + cur_domain)
 
-        cookies = []
-        base_cookie = '%s="%s"; Path=%s%s%s' % (self.cookie_name, value,
-                self.path, max_age, self.static_flags)
-        for domain in domains:
-            domain = '; Domain=%s' % domain if domain is not None else ''
-            cookies.append(('Set-Cookie', '%s%s' % (base_cookie, domain)))
+        profile = self.cookie_profile(request)
 
-        return cookies
+        kw = {}
+        kw['domains'] = domains
+        if max_age is not None:
+            kw['max_age'] = max_age
+            
+        headers = profile.get_headers(value, **kw)
+        return headers
 
     def identify(self, request):
         """ Return a dictionary with authentication information, or ``None``
@@ -968,9 +947,8 @@ class AuthTktCookieHelper(object):
     def forget(self, request):
         """ Return a set of expires Set-Cookie headers, which will destroy
         any existing auth_tkt cookie when attached to a response"""
-        environ = request.environ
         request._authtkt_reissue_revoked = True
-        return self._get_cookies(environ, '', max_age=EXPIRE)
+        return self._get_cookies(request, None)
 
     def remember(self, request, userid, max_age=None, tokens=()):
         """ Return a set of Set-Cookie headers; when set into a response,
@@ -1037,7 +1015,7 @@ class AuthTktCookieHelper(object):
             )
 
         cookie_value = ticket.cookie_value()
-        return self._get_cookies(environ, cookie_value, max_age)
+        return self._get_cookies(request, cookie_value, max_age)
 
 @implementer(IAuthenticationPolicy)
 class SessionAuthenticationPolicy(CallbackAuthenticationPolicy):
@@ -1196,3 +1174,11 @@ class BasicAuthAuthenticationPolicy(CallbackAuthenticationPolicy):
         except ValueError: # not enough values to unpack
             return None
         return username, password
+
+class _SimpleSerializer(object):
+    def loads(self, bstruct):
+        return native_(bstruct)
+
+    def dumps(self, appstruct):
+        return bytes_(appstruct)
+

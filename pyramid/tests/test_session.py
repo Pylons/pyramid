@@ -264,8 +264,8 @@ class SharedCookieSessionTests(object):
 class TestBaseCookieSession(SharedCookieSessionTests, unittest.TestCase):
     def _makeOne(self, request, **kw):
         from pyramid.session import BaseCookieSessionFactory
-        return BaseCookieSessionFactory(
-            dummy_serialize, dummy_deserialize, **kw)(request)
+        serializer = DummySerializer()
+        return BaseCookieSessionFactory(serializer, **kw)(request)
 
     def _serialize(self, value):
         return json.dumps(value)
@@ -294,7 +294,7 @@ class TestSignedCookieSession(SharedCookieSessionTests, unittest.TestCase):
         digestmod = lambda: hashlib.new(hashalg)
         cstruct = pickle.dumps(value, pickle.HIGHEST_PROTOCOL)
         sig = hmac.new(salt + b'secret', cstruct, digestmod).digest()
-        return base64.b64encode(cstruct + sig)
+        return base64.urlsafe_b64encode(sig + cstruct).rstrip(b'=')
 
     def test_reissue_not_triggered(self):
         import time
@@ -353,11 +353,12 @@ class TestSignedCookieSession(SharedCookieSessionTests, unittest.TestCase):
         import hmac
         import time
         request = testing.DummyRequest()
-        cstruct = dummy_serialize((time.time(), 0, {'state': 1}))
+        serializer = DummySerializer()
+        cstruct = serializer.dumps((time.time(), 0, {'state': 1}))
         sig = hmac.new(b'pyramid.session.secret', cstruct, sha512).digest()
-        cookieval = base64.b64encode(cstruct + sig)
+        cookieval = base64.urlsafe_b64encode(sig + cstruct).rstrip(b'=')
         request.cookies['session'] = cookieval
-        session = self._makeOne(request, deserialize=dummy_deserialize)
+        session = self._makeOne(request, serializer=serializer)
         self.assertEqual(session['state'], 1)
 
     def test_invalid_data_size(self):
@@ -382,7 +383,7 @@ class TestSignedCookieSession(SharedCookieSessionTests, unittest.TestCase):
 
         try:
             result = callbacks[0](request, response)
-        except TypeError as e: # pragma: no cover
+        except TypeError: # pragma: no cover
             self.fail('HMAC failed to initialize due to key length.')
 
         self.assertEqual(result, None)
@@ -413,8 +414,9 @@ class TestUnencryptedCookieSession(SharedCookieSessionTests, unittest.TestCase):
             kw.setdefault(dest, kw.pop(src))
 
     def _serialize(self, value):
+        from pyramid.compat import bytes_
         from pyramid.session import signed_serialize
-        return signed_serialize(value, 'secret')
+        return bytes_(signed_serialize(value, 'secret'))
 
     def test_serialize_option(self):
         from pyramid.response import Response
@@ -596,11 +598,12 @@ class Test_check_csrf_token(unittest.TestCase):
         result = self._callFUT(request, 'csrf_token', raises=False)
         self.assertEqual(result, False)
 
-def dummy_serialize(value):
-    return json.dumps(value).encode('utf-8')
+class DummySerializer(object):
+    def dumps(self, value):
+        return json.dumps(value).encode('utf-8')
 
-def dummy_deserialize(value):
-    return json.loads(value.decode('utf-8'))
+    def loads(self, value):
+        return json.loads(value.decode('utf-8'))
 
 class DummySessionFactory(dict):
     _dirty = False

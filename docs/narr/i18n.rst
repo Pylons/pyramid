@@ -607,10 +607,8 @@ object, but the domain and mapping information attached is ignored.
    def aview(request):
        localizer = request.localizer
        num = 1
-       translated = localizer.pluralize(
-                          _('item_plural', default="${number} items"), 
-                          None, num, 'mydomain', mapping={'number':num}
-                          )
+       translated = localizer.pluralize('item_plural', '${number} items',
+           num, 'mydomain', mapping={'number':num})
 
 The corresponding message catalog must have language plural definitions and
 plural alternatives set.

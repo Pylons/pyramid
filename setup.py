@@ -39,7 +39,7 @@ except IOError:
 
 install_requires=[
     'setuptools',
-    'WebOb >= 1.2b3', # request.path_info is unicode
+    'WebOb >= 1.3', # request.domain and CookieProfile
     'repoze.lru >= 0.4', # py3 compat
     'zope.interface >= 3.8.0',  # has zope.interface.registry
     'zope.deprecation >= 3.5.0', # py3 compat
@@ -69,7 +69,7 @@ testing_extras = tests_require + [
     ]
 
 setup(name='pyramid',
-      version='1.5a2',
+      version='1.5a3',
       description='The Pyramid Web Framework, a Pylons project',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[

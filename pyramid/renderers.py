@@ -363,7 +363,7 @@ class JSONP(JSON):
                 body = val
             else:
                 ct = 'application/javascript'
-                body = '%s(%s)' % (callback, val)
+                body = '%s(%s);' % (callback, val)
             response = request.response
             if response.content_type == response.default_content_type:
                 response.content_type = ct
