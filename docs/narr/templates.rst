@@ -38,8 +38,8 @@ within the body of a view callable like so:
    from pyramid.renderers import render_to_response
 
    def sample_view(request):
-       return render_to_response('templates/foo.pt', 
-                                 {'foo':1, 'bar':2}, 
+       return render_to_response('templates/foo.pt',
+                                 {'foo':1, 'bar':2},
                                  request=request)
 
 The ``sample_view`` :term:`view callable` function above returns a
@@ -56,7 +56,7 @@ In this case, this is the directory containing the file that
 defines the ``sample_view`` function.  Although a renderer path is
 usually just a simple relative pathname, a path named as a renderer
 can be absolute, starting with a slash on UNIX or a drive letter
-prefix on Windows. The path can alternately be a
+prefix on Windows. The path can alternately be an
 :term:`asset specification` in the form
 ``some.dotted.package_name:relative/path``. This makes it possible to
 address template assets which live in another package.  For example:
@@ -73,11 +73,11 @@ address template assets which live in another package.  For example:
 
 An asset specification points at a file within a Python *package*.
 In this case, it points at a file named ``foo.pt`` within the
-``templates`` directory of the ``mypackage`` package.  Using a
+``templates`` directory of the ``mypackage`` package.  Using an
 asset specification instead of a relative template name is usually
 a good idea, because calls to :func:`~pyramid.renderers.render_to_response`
 using asset specifications will continue to work properly if you move the
-code containing them around.
+code containing them to another location.
 
 In the examples above we pass in a keyword argument named ``request``
 representing the current :app:`Pyramid` request. Passing a request
@@ -94,8 +94,8 @@ Every view must return a :term:`response` object, except for views
 which use a :term:`renderer` named via view configuration (which we'll
 see shortly).  The :func:`pyramid.renderers.render_to_response`
 function is a shortcut function that actually returns a response
-object. This allows the example view above to simply return the result 
-of its call to ``render_to_response()`` directly. 
+object. This allows the example view above to simply return the result
+of its call to ``render_to_response()`` directly.
 
 Obviously not all APIs you might call to get response data will return a
 response object. For example, you might render one or more templates to
@@ -111,8 +111,8 @@ as the body of the response:
    from pyramid.response import Response
 
    def sample_view(request):
-       result = render('mypackage:templates/foo.pt', 
-                       {'foo':1, 'bar':2}, 
+       result = render('mypackage:templates/foo.pt',
+                       {'foo':1, 'bar':2},
                        request=request)
        response = Response(result)
        return response
@@ -194,7 +194,7 @@ of :func:`~pyramid.renderers.render` (a string):
 
    def sample_view(request):
        result = render('mypackage:templates/foo.pt',
-                       {'foo':1, 'bar':2}, 
+                       {'foo':1, 'bar':2},
                        request=request)
        response = Response(result)
        response.content_type = 'text/plain'
@@ -241,7 +241,7 @@ These values are provided to the template:
   The renderer name used to perform the rendering,
   e.g. ``mypackage:templates/foo.pt``.
 
-``renderer_info`` 
+``renderer_info``
   An object implementing the :class:`pyramid.interfaces.IRendererInfo`
   interface.  Basically, an object with the following attributes: ``name``,
   ``package`` and ``type``.
@@ -273,7 +273,7 @@ Templates Used as Renderers via Configuration
 An alternative to using :func:`~pyramid.renderers.render_to_response`
 to render templates manually in your view callable code, is
 to specify the template as a :term:`renderer` in your
-*view configuration*. This can be done with any of the 
+*view configuration*. This can be done with any of the
 templating languages supported by :app:`Pyramid`.
 
 To use a renderer via view configuration, specify a template
