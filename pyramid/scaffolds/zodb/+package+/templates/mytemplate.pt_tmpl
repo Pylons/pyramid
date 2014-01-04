@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="pyramid web application">
     <meta name="author" content="Pylons Project">
-    <link rel="shortcut icon" href="${request.static_url('pst:static/pyramid-16x16.png')}">
+    <link rel="shortcut icon" href="${request.static_url('{{package}}:static/pyramid-16x16.png')}">
 
     <title>Starter Template for The Pyramid Web Framework</title>
 
@@ -14,7 +14,7 @@
     <link href="//oss.maxcdn.com/libs/twitter-bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Custom styles for this template -->
-    <link href="${request.static_url('pst:static/theme.css')}" rel="stylesheet">
+    <link href="${request.static_url('{{package}}:static/theme.css')}" rel="stylesheet">
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -29,7 +29,7 @@
       <div class="container">
         <div class="row">
           <div class="col-md-2">
-            <img class="logo img-responsive" src="${request.static_url('pst:static/pyramid.png')}" alt="pyramid web framework">
+            <img class="logo img-responsive" src="${request.static_url('{{package}}:static/pyramid.png')}" alt="pyramid web framework">
           </div>
           <div class="col-md-10">
             <div class="content">
