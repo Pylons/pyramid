@@ -212,6 +212,10 @@ part is pretty easy:
 
     # Mac and Linux
     $ $VENV/bin/easy_install "pyramid==\ |release|\ "
+    # TODO: This command does not work, cause easy_install is in %VENV/local/bin... subfolder.
+    # Try this:
+    $ $VENV/local/bin/easy_install "pyramid==\ |release|\ "
+    
 
     # Windows
     c:\\> %VENV%\\Scripts\\easy_install "pyramid==\ |release|\ "
