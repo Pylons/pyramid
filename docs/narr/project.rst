@@ -487,23 +487,24 @@ structure:
 .. code-block:: text
 
   MyProject/
-  |-- CHANGES.txt
-  |-- development.ini
-  |-- MANIFEST.in
-  |-- myproject
-  |   |-- __init__.py
-  |   |-- static
-  |   |   |-- favicon.ico
-  |   |   |-- logo.png
-  |   |   `-- pylons.css
-  |   |-- templates
-  |   |   `-- mytemplate.pt
-  |   |-- tests.py
-  |   `-- views.py
-  |-- production.ini
-  |-- README.txt
-  |-- setup.cfg
-  `-- setup.py
+  ├── CHANGES.txt
+  ├── MANIFEST.in
+  ├── README.txt
+  ├── development.ini
+  ├── myproject
+  │   ├── __init__.py
+  │   ├── static
+  │   │   ├── pyramid-16x16.png
+  │   │   ├── pyramid.png
+  │   │   ├── theme.css
+  │   │   └── theme.min.css
+  │   ├── templates
+  │   │   └── mytemplate.pt
+  │   ├── tests.py
+  │   └── views.py
+  ├── production.ini
+  ├── setup.cfg
+  └── setup.py
 
 The ``MyProject`` :term:`Project`
 ---------------------------------

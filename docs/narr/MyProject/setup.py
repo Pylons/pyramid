@@ -40,4 +40,3 @@ setup(name='MyProject',
       main = myproject:main
       """,
       )
-
