@@ -15,6 +15,11 @@ Bug Fixes
 - Add a trailing semicolon to the JSONP response. This fixes JavaScript syntax
   errors for old IE versions. See https://github.com/Pylons/pyramid/pull/1205
 
+- Fix a memory leak when the configurator's ``set_request_property`` method was
+  used or when the configurator's ``add_request_method`` method was used with
+  the ``property=True`` attribute.  See
+  https://github.com/Pylons/pyramid/issues/1212 .
+
 1.5a3 (2013-12-10)
 ==================
 
