@@ -172,11 +172,18 @@ we just specified in the environment variable.
    package,
    :ref:`Installing Pyramid on a Windows System <installing_windows>`
 
-
 .. _install-setuptools-(python-packaging-tools):
 
 Install ``setuptools`` (Python packaging tools)
 -----------------------------------------------
+
+.. note::
+
+    For all debian & Ubuntu users: 
+    There is a bug (see http://bugs.python.org/issue16480) that will install the setuptools in
+    $VENV/local/bin instead of $VENV/bin. A possible workaround is to activate this new environment 
+    with the following command:
+    source $VENV/bin/activate
 
 The following command will download a script to install ``setuptools``, then
 pipe it to your environment's version of Python.
