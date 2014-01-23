@@ -74,10 +74,8 @@ In :ref:`installing_chapter` we called the virtualenv directory ``env``; the
 following commands assume that our current working directory is the ``env``
 directory.
 
-The below command uses the ``pcreate`` command to create a project with the
+The below example uses the ``pcreate`` command to create a project with the
 ``starter`` scaffold.
-
-For example,
 
 On UNIX:
 
