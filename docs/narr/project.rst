@@ -74,6 +74,9 @@ In :ref:`installing_chapter` we called the virtualenv directory ``env``; the
 following commands assume that our current working directory is the ``env``
 directory.
 
+The below example uses the ``pcreate`` command to create a project with the
+``starter`` scaffold.
+
 On UNIX:
 
 .. code-block:: text
@@ -85,21 +88,7 @@ Or on Windows:
 .. code-block:: text
 
    > %VENV%\Scripts\pcreate -s starter MyProject
-
-The above command uses the ``pcreate`` command to create a project with the
-``starter`` scaffold.  To use a different scaffold, such as
-``alchemy``, you'd just change the ``-s`` argument value.  For example,
-on UNIX:
-
-.. code-block:: text
-
-   $ $VENV/bin/pcreate -s alchemy MyProject
-
-Or on Windows:
-
-.. code-block:: text
-
-   > %VENV%\Scripts\pcreate -s alchemy MyProject
+   
 
 Here's sample output from a run of ``pcreate`` on UNIX for a project we name
 ``MyProject``:
