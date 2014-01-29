@@ -501,6 +501,11 @@ Documentation Enhancements
 
 - Many other enhancements.
 
+Scaffolding Enhancements
+------------------------
+
+- All scaffolds have a new HTML + CSS theme.
+
 
 Dependency Changes
 ------------------
