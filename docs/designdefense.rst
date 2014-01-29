@@ -419,7 +419,7 @@ hierarchical: sections within sections within sections, ad infinitum.  If you
 want your URLs to indicate this structure, and the structure is indefinite
 (the number of nested sections can be "N" instead of some fixed number), a
 resource tree is an excellent way to model this, even if the backend is a
-relational database.  In this situation, the resource tree a just a site
+relational database.  In this situation, the resource tree is just a site
 structure.
 
 Traversal also offers better composability of applications than URL dispatch,
