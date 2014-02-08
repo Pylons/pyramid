@@ -1,3 +1,14 @@
+Next release
+============
+
+Features
+--------
+
+- We no longer eagerly clear ``request.exception`` and ``request.exc_info`` in
+  the exception view tween.  This makes it possible to inspect exception
+  information within a finished callback.  See
+  https://github.com/Pylons/pyramid/issues/1223.
+
 1.5a4 (2014-01-28)
 ==================
 
