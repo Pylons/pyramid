@@ -916,7 +916,7 @@ class ViewsConfiguratorMixin(object):
           A view declaration with this argument ensures that the view will
           only be called when the :term:`request` has key/value pairs in its
           :term:`matchdict` that equal those supplied in the predicate.
-          e.g. ``match_param="action=edit" would require the ``action``
+          e.g. ``match_param="action=edit"`` would require the ``action``
           parameter in the :term:`matchdict` match the right hand side of
           the expression (``edit``) for the view to "match" the current
           request.
