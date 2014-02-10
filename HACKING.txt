@@ -1,26 +1,45 @@
 Hacking on Pyramid
 ==================
 
-Here are some guidelines about hacking on Pyramid.
+Here are some guidelines for hacking on Pyramid.
 
 Using a Development Checkout
 ----------------------------
 
 You'll have to create a development environment to hack on Pyramid, using a
-Pyramid checkout.   You can either do this by hand or, if you have ``tox``
-installed (it's on PyPI), you can (ab)use tox to get a working development
+Pyramid checkout.  You can either do this by hand, or if you have ``tox``
+installed (it's on PyPI), you can use tox to set up a working development
 environment.  Each installation method is described below.
 
 By Hand
 +++++++
 
-- Check out Pyramid from source::
+- While logged into your GitHub account, navigate to the Pyramid repo on
+  GitHub.
+  
+  https://github.com/Pylons/pyramid
+
+- Fork and clone the Pyramid repository to your GitHub account by clicking
+  the "Fork" button.
+
+- Clone your fork of Pyramid from your GitHub account to your local computer,
+  substituting your account username and specifying the destination as
+  "hack-on-pyramid".
 
    $ cd ~
-   $ git clone git://github.com/Pylons/pyramid.git hack-on-pyramid
+   $ git clone git@github.com:USERNAME/pyramid.git hack-on-pyramid
    $ cd hack-on-pyramid
+   # Configure remotes such that you can pull changes from the Pyramid
+   # repository into your local repository.
+   $ git remote add upstream git@github.com:Pylons/pyramid.git
+   # fetch and merge changes from upstream into master
+   $ git fetch upstream
+   $ git merge upstream/master
 
-- Create a virtualenv in which to install Pyramid::
+Now your local repo is set up such that you will push changes to your GitHub
+repo, from which you can submit a pull request.
+
+- Create a virtualenv in which to install Pyramid:
 
    $ cd ~/hack-on-pyramid
    $ virtualenv -ppython2.7 env
@@ -39,7 +58,7 @@ By Hand
   ``export VENV=~/hack-on-pyramid/env`` command.
 
 - Install ``setuptools-git`` into the virtualenv (for good measure, as we're
-  using git to do version control)::
+  using git to do version control):
 
    $ $VENV/bin/easy_install setuptools-git
 
@@ -47,19 +66,18 @@ By Hand
   dev``.  ``setup.py dev`` is an alias for "setup.py develop" which also
   installs testing requirements such as nose and coverage.  Running
   ``setup.py dev`` *must* be done while the current working directory is the
-  ``pyramid`` checkout directory::
+  ``pyramid`` checkout directory:
 
    $ cd ~/hack-on-pyramid
    $ $VENV/bin/python setup.py dev
 
-- At that point, you should be able to create new Pyramid projects by using
-  ``pcreate``::
+- Optionally create a new Pyramid project using ``pcreate``:
 
   $ cd $VENV
   $ bin/pcreate -s starter starter
 
-- And install those projects (also using ``setup.py develop``) into the
-  virtualenv::
+- ...and install the new project (also using ``setup.py develop``) into the
+  virtualenv:
 
   $ cd $VENV/starter
   $ $VENV/bin/python setup.py develop
@@ -70,12 +88,12 @@ Using Tox
 Alternatively, if you already have ``tox`` installed, there is an easier
 way to get going.
 
-- Create a new directory somewhere and ``cd`` to it::
+- Create a new directory somewhere and ``cd`` to it:
 
    $ mkdir ~/hack-on-pyramid
    $ cd ~/hack-on-pyramid
 
-- Check out a read-only copy of the Pyramid source::
+- Check out a read-only copy of the Pyramid source:
 
    $ git clone git://github.com/Pylons/pyramid.git .
 
@@ -85,14 +103,14 @@ Since Pyramid is a framework and not an application, it can be
 convenient to work against a sample application, preferably in its own
 virtualenv. A quick way to achieve this is to (ab-)use ``tox``
 (http://tox.readthedocs.org/en/latest/) with a custom configuration
-file that's part of the checkout::
+file that's part of the checkout:
 
   tox -c hacking-tox.ini
 
 This will create a python-2.7 based virtualenv named ``env27`` (Pyramid's
 ``.gitconfig` ignores all top-level folders that start with ``env`` specifically
 for this use case) and inside that a simple pyramid application named
-``hacking`` that you can then fire up like so::
+``hacking`` that you can then fire up like so:
 
   cd env27/hacking
   ../bin/pserve development.ini
@@ -159,7 +177,7 @@ Running Tests
   invoke the ``tox`` console script.  This will read the ``tox.ini`` file and
   execute the tests on multiple Python versions and platforms; while it runs,
   it creates a virtualenv for each version/platform combination.  For
-  example::
+  example:
 
    $ sudo /usr/bin/easy_install tox
    $ cd ~/hack-on-pyramid/
@@ -167,7 +185,7 @@ Running Tests
 
 - The tests can also be run using ``pytest`` (http://pytest.org/).  This is
   intended as a convenience for people who are more used or fond of ``pytest``.
-  Run the tests like so::
+  Run the tests like so:
 
    $ $VENV/bin/easy_install pytest
    $ py.test --strict pyramid/
@@ -184,30 +202,38 @@ Documentation Coverage and Building HTML Documentation
 ------------------------------------------------------
 
 If you fix a bug, and the bug requires an API or behavior modification, all
-documentation in this package which references that API or behavior must
-change to reflect the bug fix, ideally in the same commit that fixes the bug
+documentation in this package which references that API or behavior must be
+changed to reflect the bug fix, ideally in the same commit that fixes the bug
 or adds the feature.
 
 To build and review docs (where ``$VENV`` refers to the virtualenv you're
 using to develop Pyramid):
 
-1. After following the steps above in "Using a Development Checkout", cause
-   Sphinx and all development requirements to be installed in your
-   virtualenv::
+1. After following the steps above in "Using a Development Checkout", install
+   Sphinx and all development requirements in your virtualenv:
 
      $ cd ~/hack-on-pyramid
      $ $VENV/bin/python setup.py docs
 
 2. Update all git submodules from the top-level of your Pyramid checkout, like
-   so::
+   so:
 
      $ git submodule update --init --recursive
 
    This will checkout theme subrepositories and prevent error conditions when
    HTML docs are generated.
 
-3. cd to the ``docs`` directory within your Pyramid checkout and execute
-   the ``make`` command with some flags::
+3. Next change into the submodule's directory and switch to a branch so that
+   the submodule repositories are no longer "headless".  Then update the
+   repository to ensure that we have the latest updates.
+   See http://chrisjean.com/2009/04/20/git-submodules-adding-using-removing-and-updating/
+
+    $ cd docs/_themes
+    $ git checkout master
+    $ git pull
+
+4. Change into the ``docs`` directory within your Pyramid checkout and execute
+   the ``make`` command with some flags:
 
      $ cd ~/hack-on-pyramid/pyramid/docs
      $ make clean html SPHINXBUILD=$VENV/bin/sphinx-build
@@ -216,7 +242,7 @@ using to develop Pyramid):
    which will have both Sphinx and Pyramid (for API documentation generation)
    installed.
 
-4. Open the ``docs/_build/html/index.html`` file to see the resulting HTML
+5. Open the ``docs/_build/html/index.html`` file to see the resulting HTML
    rendering.
 
 Change Log
@@ -226,5 +252,4 @@ Change Log
   file in the prevailing style.  Changelog entries should be long and
   descriptive, not cryptic.  Other developers should be able to know
   what your changelog entry means.
-
 
