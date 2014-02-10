@@ -76,4 +76,4 @@ visit http://localhost:6543 your console will now show::
 Also, if you have configured your Pyramid application to use the
 ``pyramid_debugtoolbar``, logging statements appear in one of its menus.
 
-.. seealso:: See Also: :ref:`logging_chapter`
+.. seealso:: See also :ref:`logging_chapter`.

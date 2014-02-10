@@ -381,11 +381,11 @@ def UnencryptedCookieSessionFactoryConfig(
     ):
     """
     .. deprecated:: 1.5
-       Use :func:`pyramid.session.SignedCookieSessionFactory` instead.
-       Caveat: Cookies generated using ``SignedCookieSessionFactory`` are not
-       compatible with cookies generated using
-       ``UnencryptedCookieSessionFactory``, so existing user session data will
-       be destroyed if you switch to it.
+        Use :func:`pyramid.session.SignedCookieSessionFactory` instead.
+        Caveat: Cookies generated using ``SignedCookieSessionFactory`` are not
+        compatible with cookies generated using
+        ``UnencryptedCookieSessionFactory``, so existing user session data
+        will be destroyed if you switch to it.
     
     Configure a :term:`session factory` which will provide unencrypted
     (but signed) cookie-based sessions.  The return value of this

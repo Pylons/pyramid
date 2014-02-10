@@ -320,7 +320,11 @@ template renderer:
    in Chameleon, not in Mako templates.
 
 Similar renderer configuration can be done imperatively.  See
-:ref:`views_which_use_a_renderer`.  See also :ref:`built_in_renderers`.
+:ref:`views_which_use_a_renderer`.
+
+.. seealso::
+
+    See also :ref:`built_in_renderers`.
 
 Although a renderer path is usually just a simple relative pathname, a path
 named as a renderer can be absolute, starting with a slash on UNIX or a drive

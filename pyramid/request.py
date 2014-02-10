@@ -66,7 +66,9 @@ class CallbackMethodsMixin(object):
         will be propagated to the caller of the :app:`Pyramid`
         router application.
 
-        See also: :ref:`using_response_callbacks`.
+        .. seealso::
+
+            See also :ref:`using_response_callbacks`.
         """
 
         callbacks = self.response_callbacks
@@ -124,7 +126,9 @@ class CallbackMethodsMixin(object):
         They will be propagated to the caller of the :app:`Pyramid`
         router application.
 
-        See also: :ref:`using_finished_callbacks`.
+        .. seealso::
+
+            See also :ref:`using_finished_callbacks`.
         """
 
         callbacks = self.finished_callbacks

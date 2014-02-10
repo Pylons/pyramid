@@ -162,12 +162,16 @@ class view_config(object):
     in a class or module context.  It's not often used, but it can be useful
     in this circumstance.  See the ``attach`` function in Venusian for more
     information.
+    
+    .. seealso::
+    
+        See also :ref:`mapping_views_using_a_decorator_section` for
+        details about using :class:`pyramid.view.view_config`.
 
-    See :ref:`mapping_views_using_a_decorator_section` for details about
-    using :class:`pyramid.view.view_config`.
-
-    ATTENTION: ``view_config`` will work ONLY on module top level members
-    because of the limitation of ``venusian.Scanner.scan``.
+    .. warning::
+    
+        ``view_config`` will work ONLY on module top level members
+        because of the limitation of ``venusian.Scanner.scan``.
 
     """
     venusian = venusian # for testing injection
@@ -245,6 +249,8 @@ class AppendSlashNotFoundViewFactory(object):
     view callable calling convention of ``(context, request)``
     (``context`` will be the exception object).
 
+    .. deprecated:: 1.3
+
     """
     def __init__(self, notfound_view=None):
         if notfound_view is None:
@@ -286,7 +292,7 @@ view as the Not Found view::
   from pyramid.view import append_slash_notfound_view
   config.add_view(append_slash_notfound_view, context=HTTPNotFound)
 
-See also :ref:`changing_the_notfound_view`.
+.. deprecated:: 1.3
 
 """
 

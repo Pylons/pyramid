@@ -116,4 +116,4 @@ Extra Credit
 #. Why do we import the ``hello_world`` view function *inside* the
    ``test_hello_world`` method instead of at the top of the module?
 
-.. seealso:: See Also: :ref:`testing_chapter`
+.. seealso:: See also :ref:`testing_chapter`

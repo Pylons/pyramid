@@ -181,8 +181,11 @@ class Configurator(
     By default, ``default_permission`` is ``None``, meaning that view
     configurations which do not explicitly declare a permission will
     always be executable by entirely anonymous users (any
-    authorization policy in effect is ignored).  See also
-    :ref:`setting_a_default_permission`.
+    authorization policy in effect is ignored).
+    
+    .. seealso::
+
+        See also :ref:`setting_a_default_permission`.
 
     If ``session_factory`` is passed, it should be an object which
     implements the :term:`session factory` interface.  If a nondefault
