@@ -123,7 +123,7 @@ Here's a high-level time-ordered overview of what happens when you press
    populated by other methods run against the Configurator.  The router is a
    WSGI application.
 
-#. A :class:`~pyramid.events.ApplicationCreated` event is emitted (see
+#. An :class:`~pyramid.events.ApplicationCreated` event is emitted (see
    :ref:`events_chapter` for more information about events).
 
 #. Assuming there were no errors, the ``main`` function in ``myproject``
