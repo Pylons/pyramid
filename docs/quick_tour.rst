@@ -243,8 +243,23 @@ Pyramid doesn't mandate a particular database system, form library,
 etc. It encourages replaceability. This applies equally to templating,
 which is fortunate: developers have strong views about template
 languages. That said, the Pylons Project officially supports bindings for
-Chameleon, Jinja2 and Mako, so in this step, let's use Chameleon as an
-example:
+Chameleon, Jinja2, and Mako, so in this step, let's use Chameleon.
+
+Let's add ``pyramid_chameleon``, a Pyramid :term:`add-on` which enables
+Chameleon as a :term:`renderer` in our Pyramid applications:
+
+.. code-block:: bash
+
+    $ easy_install pyramid_chameleon
+
+With the package installed, we can include the template bindings into
+our configuration:
+
+.. code-block:: python
+
+    config.include('pyramid_chameleon')
+    
+Now lets change our views.py file:
 
 .. literalinclude:: quick_tour/templating/views.py
     :start-after: Start View 1
