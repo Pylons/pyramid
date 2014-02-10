@@ -743,9 +743,9 @@ When people use your web application, they frequently perform a task
 that requires semi-permanent data to be saved. For example, a shopping
 cart. This is called a :term:`session`.
 
-Pyramid has basic built-in support for sessions, with add-ons such as
-``pyramid_redis_sessions`` (or your own custom sessioning engine) that provide 
-richer session support. Let's take a look at the
+Pyramid has basic built-in support for sessions.  Third party packages such as
+``pyramid_redis_sessions`` provide richer session support.  Or you can create
+your own custom sessioning engine.  Let's take a look at the
 :doc:`built-in sessioning support <../narr/sessions>`. In our
 ``__init__.py`` we first import the kind of sessioning we want:
 
