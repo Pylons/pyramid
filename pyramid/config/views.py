@@ -1696,7 +1696,7 @@ class ViewsConfiguratorMixin(object):
                     % arg
                     )
 
-        if not view:
+        if view is None:
             view = default_exceptionresponse_view
 
         settings = dict(
