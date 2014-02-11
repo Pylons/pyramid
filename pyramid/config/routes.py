@@ -249,22 +249,21 @@ class RoutesConfiguratorMixin(object):
         custom_predicates
 
           .. deprecated:: 1.5
-
-          This value should be a sequence of references to custom
-          predicate callables.  Use custom predicates when no set of
-          predefined predicates does what you need.  Custom predicates
-          can be combined with predefined predicates as necessary.
-          Each custom predicate callable should accept two arguments:
-          ``info`` and ``request`` and should return either ``True``
-          or ``False`` after doing arbitrary evaluation of the info
-          and/or the request.  If all custom and non-custom predicate
-          callables return ``True`` the associated route will be
-          considered viable for a given request.  If any predicate
-          callable returns ``False``, route matching continues.  Note
-          that the value ``info`` passed to a custom route predicate
-          is a dictionary containing matching information; see
-          :ref:`custom_route_predicates` for more information about
-          ``info``.
+              This value should be a sequence of references to custom
+              predicate callables.  Use custom predicates when no set of
+              predefined predicates does what you need.  Custom predicates
+              can be combined with predefined predicates as necessary.
+              Each custom predicate callable should accept two arguments:
+              ``info`` and ``request`` and should return either ``True``
+              or ``False`` after doing arbitrary evaluation of the info
+              and/or the request.  If all custom and non-custom predicate
+              callables return ``True`` the associated route will be
+              considered viable for a given request.  If any predicate
+              callable returns ``False``, route matching continues.  Note
+              that the value ``info`` passed to a custom route predicate
+              is a dictionary containing matching information; see
+              :ref:`custom_route_predicates` for more information about
+              ``info``.
 
         predicates
 

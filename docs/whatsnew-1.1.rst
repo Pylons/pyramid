@@ -454,10 +454,13 @@ Deprecations and Behavior Differences
                      renderer='some/renderer.pt')
 
   This deprecation was done to reduce confusion observed in IRC, as well as
-  to (eventually) reduce documentation burden (see also
-  https://github.com/Pylons/pyramid/issues/164).  A deprecation warning is
-  now issued when any view-related parameter is passed to
-  ``add_route``.
+  to (eventually) reduce documentation burden.  A deprecation warning is
+  now issued when any view-related parameter is passed to ``add_route``.
+  
+  .. seealso::
+  
+     See also `issue #164 on GitHub
+     <https://github.com/Pylons/pyramid/issues/164>`_.
 
 - Passing an ``environ`` dictionary to the ``__call__`` method of a
   "traverser" (e.g. an object that implements
@@ -537,8 +540,12 @@ Deprecations and Behavior Differences
   subdirectory, the ``index.html`` of that subdirectory would not be served
   properly.  Instead, a redirect to ``/subdir`` would be issued.  This has
   been fixed, and now visiting a subdirectory that contains an ``index.html``
-  within a static view returns the index.html properly.  See also
-  https://github.com/Pylons/pyramid/issues/67.
+  within a static view returns the index.html properly.
+  
+  .. seealso::
+  
+     See also `issue #67 on GitHub
+     <https://github.com/Pylons/pyramid/issues/67>`_.
 
 - Deprecated the ``pyramid.config.Configurator.set_renderer_globals_factory``
   method and the ``renderer_globals`` Configurator constructor parameter.

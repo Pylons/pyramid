@@ -114,8 +114,11 @@ Scaffold Improvements
   scaffolds now use a default "commit veto" hook when configuring the
   ``repoze.tm2`` transaction manager in ``development.ini``.  This prevents a
   transaction from being committed when the response status code is within
-  the 400 or 500 ranges.  See also
-  http://docs.repoze.org/tm2/#using-a-commit-veto.
+  the 400 or 500 ranges.
+  
+  .. seealso::
+     
+     See also http://docs.repoze.org/tm2/#using-a-commit-veto.
 
 Terminology Changes
 ~~~~~~~~~~~~~~~~~~~

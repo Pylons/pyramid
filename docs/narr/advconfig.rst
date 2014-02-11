@@ -158,8 +158,12 @@ use :meth:`pyramid.config.Configurator.include`:
 Using :meth:`~pyramid.config.Configurator.include` instead of calling the
 function directly provides a modicum of automated conflict resolution, with
 the configuration statements you define in the calling code overriding those
-of the included function.  See also :ref:`automatic_conflict_resolution` and
-:ref:`including_configuration`.
+of the included function.
+
+.. seealso::
+
+    See also :ref:`automatic_conflict_resolution` and
+    :ref:`including_configuration`.
 
 Using ``config.commit()``
 +++++++++++++++++++++++++

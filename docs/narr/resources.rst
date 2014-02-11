@@ -673,8 +673,11 @@ Calling ``find_interface(b, Thing2)`` will return the ``b`` resource.
 The second argument to find_interface may also be a :term:`interface` instead
 of a class.  If it is an interface, each resource in the lineage is checked
 to see if the resource implements the specificed interface (instead of seeing
-if the resource is of a class).  See also
-:ref:`resources_which_implement_interfaces`.
+if the resource is of a class).
+
+.. seealso::
+
+    See also :ref:`resources_which_implement_interfaces`.
 
 .. index::
    single: resource API functions

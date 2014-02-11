@@ -4,9 +4,9 @@ Tutorial Approach
 
 This tutorial uses conventions to keep the introduction focused and
 concise. Details, references, and deeper discussions are mentioned in
-"See Also" notes.
+"See also" notes.
 
-.. seealso:: This is an example "See Also" note.
+.. seealso:: This is an example "See also" note.
 
 This "Getting Started" tutorial is broken into independent steps,
 starting with the smallest possible "single file WSGI app" example.

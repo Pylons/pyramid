@@ -240,7 +240,7 @@ during this tutorial:
     some optional C extensions for performance. With ``easy_install``, Windows
     users can get these extensions without needing a C compiler.
 
-.. seealso:: See Also: :ref:`installing_unix`. For instructions to set up your
+.. seealso:: See also :ref:`installing_unix`. For instructions to set up your
     Python environment for development using Windows or Python 2, see Pyramid's
     :ref:`Before You Install <installing_chapter>`.
 

@@ -537,7 +537,11 @@ text indexing.  It does not dictate how you arrange your code.
 
 Such opinionated functionality exists in applications and frameworks built
 *on top* of :app:`Pyramid`.  It's intended that higher-level systems emerge
-built using :app:`Pyramid` as a base.  See also :ref:`apps_are_extensible`.
+built using :app:`Pyramid` as a base.
+
+.. seealso::
+
+    See also :ref:`apps_are_extensible`.
 
 Pyramid Provides Too Many "Rails"
 ---------------------------------

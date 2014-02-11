@@ -59,8 +59,11 @@ third-party template rendering extensions.
 Reloading Assets
 ----------------
 
-Don't cache any asset file data when this value is true.  See
-also :ref:`overriding_assets_section`.
+Don't cache any asset file data when this value is true.
+
+.. seealso::
+
+    See also :ref:`overriding_assets_section`.
 
 +---------------------------------+-----------------------------+
 | Environment Variable Name       | Config File Setting Name    |
@@ -79,7 +82,11 @@ Debugging Authorization
 -----------------------
 
 Print view authorization failure and success information to stderr
-when this value is true.  See also :ref:`debug_authorization_section`.
+when this value is true.
+
+.. seealso::
+
+    See also :ref:`debug_authorization_section`.
 
 +---------------------------------+-----------------------------------+
 | Environment Variable Name       | Config File Setting Name          |
@@ -94,7 +101,11 @@ Debugging Not Found Errors
 --------------------------
 
 Print view-related ``NotFound`` debug messages to stderr
-when this value is true.  See also :ref:`debug_notfound_section`.
+when this value is true.
+
+.. seealso::
+
+    See also :ref:`debug_notfound_section`.
 
 +---------------------------------+------------------------------+
 | Environment Variable Name       | Config File Setting Name     |
@@ -109,7 +120,11 @@ Debugging Route Matching
 ------------------------
 
 Print debugging messages related to :term:`url dispatch` route matching when
-this value is true.  See also :ref:`debug_routematch_section`.
+this value is true.
+
+.. seealso::
+
+    See also :ref:`debug_routematch_section`.
 
 +---------------------------------+--------------------------------+
 | Environment Variable Name       | Config File Setting Name       |
@@ -128,7 +143,11 @@ Preventing HTTP Caching
 Prevent the ``http_cache`` view configuration argument from having any effect
 globally in this process when this value is true.  No http caching-related
 response headers will be set by the Pyramid ``http_cache`` view configuration
-feature when this is true.  See also :ref:`influencing_http_caching`.
+feature when this is true.
+
+.. seealso::
+
+    See also :ref:`influencing_http_caching`.
 
 +---------------------------------+----------------------------------+
 | Environment Variable Name       | Config File Setting Name         |
@@ -173,8 +192,11 @@ Default Locale Name
 --------------------
 
 The value supplied here is used as the default locale name when a
-:term:`locale negotiator` is not registered.  See also
-:ref:`localization_deployment_settings`.
+:term:`locale negotiator` is not registered.
+
+.. seealso::
+
+    See also :ref:`localization_deployment_settings`.
 
 +---------------------------------+-----------------------------------+
 | Environment Variable Name       | Config File Setting Name          |

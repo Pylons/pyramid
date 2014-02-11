@@ -898,15 +898,22 @@ returns the HTML in a :term:`response`.
      a server restart to reload them.  Production applications should use
      ``pyramid.reload_templates = False``.
 
-.. seealso:: See also :ref:`views_which_use_a_renderer` for more information
+.. seealso::
+
+    See also :ref:`views_which_use_a_renderer` for more information
     about how views, renderers, and templates relate and cooperate.
 
-.. seealso:: Pyramid can also dynamically reload changed Python files.  For
-    more on this see :ref:`reloading_code`.
+.. seealso::
 
-.. seealso:: The :ref:`debug_toolbar` provides interactive access to your
-   application's internals and, should an exception occur, allows interactive
-   access to traceback execution stack frames from the Python interpreter.
+    Pyramid can also dynamically reload changed Python files.  See also
+    :ref:`reloading_code`.
+
+.. seealso::
+
+    See also the :ref:`debug_toolbar`, which provides interactive access to
+    your application's internals and, should an exception occur, allows
+    interactive access to traceback execution stack frames from the Python
+    interpreter.
 
 .. index::
    single: static directory

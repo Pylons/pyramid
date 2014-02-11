@@ -186,9 +186,9 @@ class FactoriesConfiguratorMixin(object):
         """ Add a property to the request object.
 
         .. deprecated:: 1.5
-           :meth:`pyramid.config.Configurator.add_request_method` should be
-           used instead.  (This method was docs-deprecated in 1.4 and
-           issues a real deprecation warning in 1.5).
+            :meth:`pyramid.config.Configurator.add_request_method` should be
+            used instead.  (This method was docs-deprecated in 1.4 and
+            issues a real deprecation warning in 1.5).
 
         .. versionadded:: 1.3
         """

@@ -361,7 +361,9 @@ class IBeforeRender(IDict):
       def add_global(event):
           event['mykey'] = 'foo'
 
-    See also :ref:`beforerender_event`.
+    .. seealso::
+
+        See also :ref:`beforerender_event`.
     """
     rendering_val = Attribute('The value returned by a view or passed to a '
                               '``render`` method for this rendering. '
@@ -767,10 +769,10 @@ class IResourceURL(Interface):
         )
 
 class IContextURL(IResourceURL):
-    """ An adapter which deals with URLs related to a context.
-
+    """
     .. deprecated:: 1.3
-       use IResourceURL instead.
+        An adapter which deals with URLs related to a context.  Use
+        :class:`pyramid.interfaces.IResourceURL` instead.
     """
     # this class subclasses IResourceURL because request.resource_url looks
     # for IResourceURL via queryAdapter.  queryAdapter will find a deprecated

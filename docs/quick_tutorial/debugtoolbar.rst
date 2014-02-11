@@ -86,4 +86,4 @@ start to experience otherwise inexplicable client-side weirdness, you can shut
 it off by commenting out the ``pyramid_debugtoolbar`` line in
 ``pyramid.includes`` temporarily.
 
-.. seealso:: See Also: :ref:`pyramid_debugtoolbar <toolbar:overview>`
+.. seealso:: See also :ref:`pyramid_debugtoolbar <toolbar:overview>`.

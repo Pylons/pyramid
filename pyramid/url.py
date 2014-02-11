@@ -442,8 +442,11 @@ class URLMethodsMixin(object):
 
         If the ``resource`` passed in has a ``__resource_url__`` method, it
         will be used to generate the URL (scheme, host, port, path) for the
-        base resource which is operated upon by this function.  See also
-        :ref:`overriding_resource_url_generation`.
+        base resource which is operated upon by this function.
+        
+        .. seealso::
+
+            See also :ref:`overriding_resource_url_generation`.
 
         .. versionadded:: 1.5
            ``route_name``, ``route_kw``, and ``route_remainder_name``

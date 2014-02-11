@@ -130,5 +130,5 @@ Extra Credit
    onto each request? Use ``import pdb; pdb.set_trace()`` to answer
    this.
 
-.. seealso:: :ref:`security_chapter`,
-   :ref:`AuthTktAuthenticationPolicy <authentication_module>`
+.. seealso:: See also :ref:`security_chapter`,
+   :ref:`AuthTktAuthenticationPolicy <authentication_module>`.

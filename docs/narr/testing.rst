@@ -319,8 +319,10 @@ registering resources at paths, registering event listeners, registering
 views and view permissions, and classes representing "dummy" implementations
 of a request and a resource.
 
-See also the various methods of the :term:`Configurator` documented in
-:ref:`configuration_module` that begin with the ``testing_`` prefix.
+.. seealso::
+
+    See also the various methods of the :term:`Configurator` documented in
+    :ref:`configuration_module` that begin with the ``testing_`` prefix.
 
 .. index::
    single: integration tests
