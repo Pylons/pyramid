@@ -811,7 +811,12 @@ class Monitor(object): # pragma: no cover
                 print(
                     "Error calling reloader callback %r:" % file_callback)
                 traceback.print_exc()
-        for module in sys.modules.values():
+        
+        modules = sys.modules.values()
+        if PY3:
+            modules = list(modules)
+            
+        for module in modules:
             try:
                 filename = module.__file__
             except (AttributeError, ImportError):
