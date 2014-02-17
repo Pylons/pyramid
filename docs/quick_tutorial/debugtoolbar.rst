@@ -39,7 +39,6 @@ Steps
     $ $VENV/bin/python setup.py develop
     $ $VENV/bin/easy_install pyramid_debugtoolbar
 
-
 #. Our ``debugtoolbar/development.ini`` gets a configuration entry for
    ``pyramid.includes``:
 
@@ -87,3 +86,9 @@ it off by commenting out the ``pyramid_debugtoolbar`` line in
 ``pyramid.includes`` temporarily.
 
 .. seealso:: See also :ref:`pyramid_debugtoolbar <toolbar:overview>`.
+
+Extra Credit
+============
+
+# Why don't we add ``pyramid_debugtoolbar`` to the list of
+  ``install_requires`` dependencies in ``debugtoolbar/setup.py``?
