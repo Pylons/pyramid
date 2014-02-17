@@ -229,7 +229,8 @@ during this tutorial:
        pyramid_tm zope.sqlalchemy
 
     # Windows
-    c:\> %VENV%\Scripts\easy_install nose webtest deform sqlalchemy pyramid_chameleon
+    c:\> %VENV%\Scripts\easy_install nose webtest deform sqlalchemy pyramid_chameleon pyramid_debugtoolbar waitress pyramid_tm zope.sqlalchemy
+
 
 .. note::
 
