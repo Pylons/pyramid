@@ -4,6 +4,9 @@ Unreleased
 - Avoid crash in ``pserve --reload`` under Py3k, when iterating over posiibly
   mutated ``sys.modules``.
 
+- ``UnencryptedCookieSessionFactoryConfig`` failed if the secret contained
+  higher order characters. See https://github.com/Pylons/pyramid/issues/1246
+
 1.5b1 (2014-02-08)
 ==================
 
