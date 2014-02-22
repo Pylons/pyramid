@@ -57,7 +57,12 @@ def signed_serialize(data, secret):
        response.set_cookie('signed_cookie', cookieval)
     """
     pickled = pickle.dumps(data, pickle.HIGHEST_PROTOCOL)
-    sig = hmac.new(bytes_(secret, 'utf-8'), pickled, hashlib.sha1).hexdigest()
+    try:
+        # bw-compat with pyramid <= 1.5b1 where latin1 is the default
+        secret = bytes_(secret)
+    except UnicodeEncodeError:
+        secret = bytes_(secret, 'utf-8')
+    sig = hmac.new(secret, pickled, hashlib.sha1).hexdigest()
     return sig + native_(base64.b64encode(pickled))
 
 def signed_deserialize(serialized, secret, hmac=hmac):
@@ -81,9 +86,12 @@ def signed_deserialize(serialized, secret, hmac=hmac):
         # Badly formed data can make base64 die
         raise ValueError('Badly formed base64 data: %s' % e)
 
-    sig = bytes_(hmac.new(
-        bytes_(secret, 'utf-8'), pickled, hashlib.sha1,
-    ).hexdigest())
+    try:
+        # bw-compat with pyramid <= 1.5b1 where latin1 is the default
+        secret = bytes_(secret)
+    except UnicodeEncodeError:
+        secret = bytes_(secret, 'utf-8')
+    sig = bytes_(hmac.new(secret, pickled, hashlib.sha1).hexdigest())
 
     # Avoid timing attacks (see
     # http://seb.dbzteam.org/crypto/python-oauth-timing-hmac.pdf)

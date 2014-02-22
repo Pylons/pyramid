@@ -533,9 +533,15 @@ class Test_signed_serialize(unittest.TestCase):
         self.assertEqual(result, expected)
 
     def test_it_with_highorder_secret(self):
-        secret = b'La Pe\xc3\xb1a'.decode('utf-8')
+        secret = b'\xce\xb1\xce\xb2\xce\xb3\xce\xb4'.decode('utf-8')
         expected = serialize('123', secret)
         result = self._callFUT('123', secret)
+        self.assertEqual(result, expected)
+
+    def test_it_with_latin1_secret(self):
+        secret = b'La Pe\xc3\xb1a'
+        expected = serialize('123', secret)
+        result = self._callFUT('123', secret.decode('latin-1'))
         self.assertEqual(result, expected)
         
 class Test_signed_deserialize(unittest.TestCase):
@@ -569,9 +575,16 @@ class Test_signed_deserialize(unittest.TestCase):
         self.assertRaises(ValueError, self._callFUT, serialized, 'secret')
 
     def test_it_with_highorder_secret(self):
-        secret = b'La Pe\xc3\xb1a'.decode('utf-8')
+        secret = b'\xce\xb1\xce\xb2\xce\xb3\xce\xb4'.decode('utf-8')
         serialized = serialize('123', secret)
         result = self._callFUT(serialized, secret)
+        self.assertEqual(result, '123')
+
+    # bwcompat with pyramid <= 1.5b1 where latin1 is the default
+    def test_it_with_latin1_secret(self):
+        secret = b'La Pe\xc3\xb1a'
+        serialized = serialize('123', secret)
+        result = self._callFUT(serialized, secret.decode('latin-1'))
         self.assertEqual(result, '123')
 
 class Test_check_csrf_token(unittest.TestCase):
