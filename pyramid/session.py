@@ -27,8 +27,9 @@ def manage_accessed(wrapped):
     method is called."""
     def accessed(session, *arg, **kw):
         session.accessed = now = int(time.time())
-        if now - session.renewed > session._reissue_time:
-            session.changed()
+        if session._reissue_time is not None:
+            if now - session.renewed > session._reissue_time:
+                session.changed()
         return wrapped(session, *arg, **kw)
     accessed.__doc__ = wrapped.__doc__
     return accessed
@@ -165,10 +166,10 @@ def BaseCookieSessionFactory(
     Parameters:
 
     ``serializer``
-      An object with two methods: ``loads`` and ``dumps``.  The ``loads`` method
-      should accept bytes and return a Python object.  The ``dumps`` method
-      should accept a Python object and return bytes.  A ``ValueError`` should
-      be raised for malformed inputs.
+      An object with two methods: ``loads`` and ``dumps``.  The ``loads``
+      method should accept bytes and return a Python object.  The ``dumps``
+      method should accept a Python object and return bytes.  A ``ValueError``
+      should be raised for malformed inputs.
 
     ``cookie_name``
       The name of the cookie used for sessioning. Default: ``'session'``.
@@ -256,15 +257,22 @@ def BaseCookieSessionFactory(
 
             if value is not None:
                 try:
-                    renewed, created, state = value
+                    # since the value is not necessarily signed, we have
+                    # to unpack it a little carefully
+                    rval, cval, sval = value
+                    renewed = float(rval)
+                    created = float(cval)
+                    state = sval
                     new = False
-                    if now - renewed > self._timeout:
-                        # expire the session because it was not renewed
-                        # before the timeout threshold
-                        state = {}
-                except TypeError:
+                except (TypeError, ValueError):
                     # value failed to unpack properly or renewed was not
                     # a numeric type so we'll fail deserialization here
+                    state = {}
+
+            if self._timeout is not None:
+                if now - renewed > self._timeout:
+                    # expire the session because it was not renewed
+                    # before the timeout threshold
                     state = {}
 
             self.created = created
@@ -473,8 +481,8 @@ def UnencryptedCookieSessionFactoryConfig(
 deprecated(
     'UnencryptedCookieSessionFactoryConfig',
     'The UnencryptedCookieSessionFactoryConfig callable is deprecated as of '
-    'Pyramid 1.5.  Use ``pyramid.session.SignedCookieSessionFactory`` instead. '
-    'Caveat: Cookies generated using SignedCookieSessionFactory are not '
+    'Pyramid 1.5.  Use ``pyramid.session.SignedCookieSessionFactory`` instead.'
+    ' Caveat: Cookies generated using SignedCookieSessionFactory are not '
     'compatible with cookies generated using UnencryptedCookieSessionFactory, '
     'so existing user session data will be destroyed if you switch to it.'
     )
@@ -578,11 +586,11 @@ def SignedCookieSessionFactory(
       while rendering a view. Default: ``True``.
 
     ``serializer``
-      An object with two methods: ``loads`` and ``dumps``.  The ``loads`` method
-      should accept bytes and return a Python object.  The ``dumps`` method
-      should accept a Python object and return bytes.  A ``ValueError`` should
-      be raised for malformed inputs.  If a serializer is not passed, the
-      :class:`pyramid.session.PickleSerializer` serializer will be used.
+      An object with two methods: ``loads`` and ``dumps``.  The ``loads``
+      method should accept bytes and return a Python object.  The ``dumps``
+      method should accept a Python object and return bytes.  A ``ValueError``
+      should be raised for malformed inputs.  If a serializer is not passed,
+      the :class:`pyramid.session.PickleSerializer` serializer will be used.
 
     .. versionadded: 1.5a3
     """
@@ -591,7 +599,7 @@ def SignedCookieSessionFactory(
 
     signed_serializer = SignedSerializer(
         secret,
-        salt, 
+        salt,
         hashalg,
         serializer=serializer,
         )
