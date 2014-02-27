@@ -192,14 +192,17 @@ def BaseCookieSessionFactory(
 
     ``timeout``
       A number of seconds of inactivity before a session times out. If
-      ``None`` then the cookie never expires. Default: 1200.
+      ``None`` then the cookie never expires. This lifetime only applies
+      to the *value* within the cookie. Meaning that if the cookie expires
+      due to a lower ``max_age``, then this setting has no effect.
+      Default: ``1200``.
 
     ``reissue_time``
       The number of seconds that must pass before the cookie is automatically
       reissued as the result of a request which accesses the session. The
       duration is measured as the number of seconds since the last session
       cookie was issued and 'now'.  If this value is ``0``, a new cookie
-      will be reissued on every request accesses the session. If ``None``
+      will be reissued on every request accessing the session. If ``None``
       then the cookie's lifetime will never be extended.
 
       A good rule of thumb: if you want auto-expired cookies based on
@@ -548,14 +551,17 @@ def SignedCookieSessionFactory(
 
     ``timeout``
       A number of seconds of inactivity before a session times out. If
-      ``None`` then the cookie never expires. Default: 1200.
+      ``None`` then the cookie never expires. This lifetime only applies
+      to the *value* within the cookie. Meaning that if the cookie expires
+      due to a lower ``max_age``, then this setting has no effect.
+      Default: ``1200``.
 
     ``reissue_time``
       The number of seconds that must pass before the cookie is automatically
-      reissued as the result of a request which accesses the session. The
+      reissued as the result of accessing the session. The
       duration is measured as the number of seconds since the last session
       cookie was issued and 'now'.  If this value is ``0``, a new cookie
-      will be reissued on every request accesses the session. If ``None``
+      will be reissued on every request accessing the session. If ``None``
       then the cookie's lifetime will never be extended.
 
       A good rule of thumb: if you want auto-expired cookies based on
