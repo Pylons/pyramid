@@ -27,8 +27,9 @@ def manage_accessed(wrapped):
     method is called."""
     def accessed(session, *arg, **kw):
         session.accessed = now = int(time.time())
-        if now - session.renewed > session._reissue_time:
-            session.changed()
+        if session._reissue_time is not None:
+            if now - session.renewed > session._reissue_time:
+                session.changed()
         return wrapped(session, *arg, **kw)
     accessed.__doc__ = wrapped.__doc__
     return accessed
