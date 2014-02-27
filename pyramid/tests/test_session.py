@@ -288,6 +288,14 @@ class TestBaseCookieSession(SharedCookieSessionTests, unittest.TestCase):
         self.assertEqual(session['state'], 1)
         self.assertFalse(session._dirty)
 
+    def test_reissue_never(self):
+        request = testing.DummyRequest()
+        cookieval = self._serialize((0, 0, {'state': 1}))
+        request.cookies['session'] = cookieval
+        session = self._makeOne(request, reissue_time=None, timeout=None)
+        self.assertEqual(session['state'], 1)
+        self.assertFalse(session._dirty)
+
 class TestSignedCookieSession(SharedCookieSessionTests, unittest.TestCase):
     def _makeOne(self, request, **kw):
         from pyramid.session import SignedCookieSessionFactory
@@ -311,6 +319,14 @@ class TestSignedCookieSession(SharedCookieSessionTests, unittest.TestCase):
         cookieval = self._serialize((time.time(), 0, {'state': 1}))
         request.cookies['session'] = cookieval
         session = self._makeOne(request, reissue_time=1)
+        self.assertEqual(session['state'], 1)
+        self.assertFalse(session._dirty)
+
+    def test_reissue_never(self):
+        request = testing.DummyRequest()
+        cookieval = self._serialize((0, 0, {'state': 1}))
+        request.cookies['session'] = cookieval
+        session = self._makeOne(request, reissue_time=None, timeout=None)
         self.assertEqual(session['state'], 1)
         self.assertFalse(session._dirty)
 
