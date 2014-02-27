@@ -256,15 +256,22 @@ def BaseCookieSessionFactory(
 
             if value is not None:
                 try:
-                    renewed, created, state = value
+                    # since the value is not necessarily signed, we have
+                    # to unpack it a little carefully
+                    rval, cval, sval = value
+                    renewed = float(rval)
+                    created = float(cval)
+                    state = sval
                     new = False
-                    if now - renewed > self._timeout:
-                        # expire the session because it was not renewed
-                        # before the timeout threshold
-                        state = {}
-                except TypeError:
+                except (TypeError, ValueError):
                     # value failed to unpack properly or renewed was not
                     # a numeric type so we'll fail deserialization here
+                    state = {}
+
+            if self._timeout is not None:
+                if now - renewed > self._timeout:
+                    # expire the session because it was not renewed
+                    # before the timeout threshold
                     state = {}
 
             self.created = created
