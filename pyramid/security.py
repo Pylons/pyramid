@@ -160,9 +160,6 @@ def forget(request):
 
     If no :term:`authentication policy` is in use, this function will
     always return an empty sequence.
-
-    .. deprecated:: 1.5
-        Use :meth:`pyramid.request.Request.get_logout_headers` instead.
     """            
     policy = _get_authentication_policy(request)
     if policy is None:
@@ -354,26 +351,7 @@ class AuthenticationAPIMixin(object):
         if policy is None:
             return [Everyone]
         return policy.effective_principals(self)
-    
-    def get_logout_headers(self):
-        """
-        Return a sequence of header tuples (e.g. ``[('Set-Cookie',
-        'foo=abc')]``) suitable for 'forgetting' the set of credentials
-        possessed by the currently authenticated user.  A common usage
-        might look like so within the body of a view function
-        (``response`` is assumed to be an :term:`WebOb` -style
-        :term:`response` object computed previously by the view code)::
-    
-          request.response.headerlist.extend(request.get_logout_headers())
 
-        If no :term:`authentication policy` is in use, this function will
-        always return an empty sequence.
-        """            
-        policy = self._get_authentication_policy()
-        if policy is None:
-            return []
-        return policy.forget(request)
-    
 class AuthorizationAPIMixin(object):
 
     def has_permission(self, permission, context=None):
