@@ -165,10 +165,10 @@ def BaseCookieSessionFactory(
     Parameters:
 
     ``serializer``
-      An object with two methods: ``loads`` and ``dumps``.  The ``loads`` method
-      should accept bytes and return a Python object.  The ``dumps`` method
-      should accept a Python object and return bytes.  A ``ValueError`` should
-      be raised for malformed inputs.
+      An object with two methods: ``loads`` and ``dumps``.  The ``loads``
+      method should accept bytes and return a Python object.  The ``dumps``
+      method should accept a Python object and return bytes.  A ``ValueError``
+      should be raised for malformed inputs.
 
     ``cookie_name``
       The name of the cookie used for sessioning. Default: ``'session'``.
@@ -473,8 +473,8 @@ def UnencryptedCookieSessionFactoryConfig(
 deprecated(
     'UnencryptedCookieSessionFactoryConfig',
     'The UnencryptedCookieSessionFactoryConfig callable is deprecated as of '
-    'Pyramid 1.5.  Use ``pyramid.session.SignedCookieSessionFactory`` instead. '
-    'Caveat: Cookies generated using SignedCookieSessionFactory are not '
+    'Pyramid 1.5.  Use ``pyramid.session.SignedCookieSessionFactory`` instead.'
+    ' Caveat: Cookies generated using SignedCookieSessionFactory are not '
     'compatible with cookies generated using UnencryptedCookieSessionFactory, '
     'so existing user session data will be destroyed if you switch to it.'
     )
@@ -578,11 +578,11 @@ def SignedCookieSessionFactory(
       while rendering a view. Default: ``True``.
 
     ``serializer``
-      An object with two methods: ``loads`` and ``dumps``.  The ``loads`` method
-      should accept bytes and return a Python object.  The ``dumps`` method
-      should accept a Python object and return bytes.  A ``ValueError`` should
-      be raised for malformed inputs.  If a serializer is not passed, the
-      :class:`pyramid.session.PickleSerializer` serializer will be used.
+      An object with two methods: ``loads`` and ``dumps``.  The ``loads``
+      method should accept bytes and return a Python object.  The ``dumps``
+      method should accept a Python object and return bytes.  A ``ValueError``
+      should be raised for malformed inputs.  If a serializer is not passed,
+      the :class:`pyramid.session.PickleSerializer` serializer will be used.
 
     .. versionadded: 1.5a3
     """
@@ -591,7 +591,7 @@ def SignedCookieSessionFactory(
 
     signed_serializer = SignedSerializer(
         secret,
-        salt, 
+        salt,
         hashalg,
         serializer=serializer,
         )
