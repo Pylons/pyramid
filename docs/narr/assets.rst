@@ -526,3 +526,6 @@ files.  Any software which uses the
 :func:`pkg_resources.get_resource_string` APIs will obtain an overridden file
 when an override is used.
 
+As of Pyramid 1.6, it is also possible to override an asset by supplying an
+absolute path to a file or directory. This may be useful if the assets are
+not distributed as part of a Python package.
