@@ -336,12 +336,19 @@ class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
         return effective_principals
 
     def remember(self, request, principal, **kw):
-        """ Store the ``principal`` as ``repoze.who.userid``."""
+        """ Store the ``principal`` as ``repoze.who.userid``.
+        
+        The identity to authenticated to :mod:`repoze.who`
+        will contain the given principal as ``userid``, and
+        provide all keyword arguments as additional identity
+        keys. Useful keys could be ``max_age`` or ``userdata``.
+        """
         identifier = self._get_identifier(request)
         if identifier is None:
             return []
         environ = request.environ
-        identity = {'repoze.who.userid':principal}
+        identity = kw
+        identity['repoze.who.userid'] = principal
         return identifier.remember(environ, identity)
 
     def forget(self, request):
