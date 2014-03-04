@@ -340,10 +340,9 @@ class AuthenticationAPIMixin(object):
     @property
     def effective_principals(self):
         """ Return the list of 'effective' :term:`principal` identifiers
-        for the ``request``.  This will include the userid of the
-        currently authenticated user if a user is currently
-        authenticated. If no :term:`authentication policy` is in effect,
-        this will return an empty sequence.
+        for the ``request``. If no :term:`authentication policy` is in effect,
+        this will return a one-element list containing the
+        :data:`pyramid.security.Everyone` principal.
 
         .. versionadded:: 1.5
         """
