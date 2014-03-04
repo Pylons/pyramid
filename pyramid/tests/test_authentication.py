@@ -350,6 +350,14 @@ class TestRepozeWho1AuthenticationPolicy(unittest.TestCase):
         self.assertEqual(result[0], request.environ)
         self.assertEqual(result[1], {'repoze.who.userid':'fred'})
 
+    def test_remember_kwargs(self):
+        authtkt = DummyWhoPlugin()
+        request = DummyRequest(
+            {'repoze.who.plugins':{'auth_tkt':authtkt}})
+        policy = self._makeOne()
+        result = policy.remember(request, 'fred', max_age=23)
+        self.assertEqual(result[1], {'repoze.who.userid':'fred', 'max_age': 23})
+
     def test_forget_no_plugins(self):
         request = DummyRequest({})
         policy = self._makeOne()
