@@ -14,6 +14,7 @@ pyramid.default_locale_name = en
 pyramid.includes =
     pyramid_debugtoolbar
     pyramid_tm
+    pyramid_mako
 
 sqlalchemy.url = sqlite:///%(here)s/{{project}}.sqlite
 
