@@ -552,9 +552,8 @@ class MultiView(object):
             else:
                 subset.append((order, view, phash))
                 subset.sort(key=operator.itemgetter(0))
-            accepts = set(self.accepts)
-            accepts.add(accept)
-            self.accepts = list(accepts) # dedupe
+            if accept not in self.accepts:
+                self.accepts.append(accept)
 
     def get_views(self, request):
         if self.accepts and hasattr(request, 'accept'):
