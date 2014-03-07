@@ -27,15 +27,25 @@ class TestFileResponse(unittest.TestCase):
         here = os.path.dirname(__file__)
         return os.path.join(here, 'fixtures', 'minimal.%s'%(suffix,))
 
-    def test_with_content_type(self):
-        path = self._getPath()
+    def test_with_image_content_type(self):
+        path = self._getPath('jpg')
         r = self._makeOne(path, content_type='image/jpeg')
         self.assertEqual(r.content_type, 'image/jpeg')
-        self.assertEqual(r.headers.get('content-type'), 'image/jpeg')
+        self.assertEqual(r.headers['content-type'], 'image/jpeg')
         path = self._getPath()
+
+    def test_with_xml_content_type(self):
+        path = self._getPath('xml')
         r = self._makeOne(path, content_type='application/xml')
         self.assertEqual(r.content_type, 'application/xml')
         self.assertEqual(r.headers['content-type'], 'application/xml; charset=UTF-8')
+        r.app_iter.close()
+
+    def test_with_pdf_content_type(self):
+        path = self._getPath('xml')
+        r = self._makeOne(path, content_type='application/pdf')
+        self.assertEqual(r.content_type, 'application/pdf')
+        self.assertEqual(r.headers['content-type'], 'application/pdf')
         r.app_iter.close()
 
     def test_without_content_type(self):
