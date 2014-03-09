@@ -42,7 +42,7 @@ class PyramidTemplate(Template):
             package_logger = 'app'
         vars['package_logger'] = package_logger
 
-        vars['package_full_path'] = vars['package_full_name'].replace(os.path.sep, '.')
+        vars['package_full_path'] = vars['package_full_name'].replace('.', os.path.sep)
         vars['package_parent_path'] = os.path.dirname(vars['package_full_path'])
         vars['package_parent_name'] = vars['package_parent_path'].replace(os.path.sep, '.')
         vars['package_root_name'] = vars['package_full_name'].split('.')[0]
