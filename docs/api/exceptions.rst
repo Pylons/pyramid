@@ -5,6 +5,8 @@
 
 .. automodule:: pyramid.exceptions
 
+  .. autoclass:: BadCSRFToken
+
   .. autoclass:: PredicateMismatch
 
   .. autoclass:: Forbidden

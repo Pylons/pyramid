@@ -6,9 +6,10 @@ from pyramid.compat import (
     text_,
     bytes_,
     native_,
-    iteritems_,
-    iterkeys_,
-    itervalues_,
+    )
+from pyramid.security import (
+    AuthenticationAPIMixin,
+    AuthorizationAPIMixin,
     )
 
 class TestRequest(unittest.TestCase):
@@ -52,6 +53,11 @@ class TestRequest(unittest.TestCase):
         from pyramid.response import Response
         cls = self._getTargetClass()
         self.assertEqual(cls.ResponseClass, Response)
+
+    def test_implements_security_apis(self):
+        apis = (AuthenticationAPIMixin, AuthorizationAPIMixin)
+        r = self._makeOne()
+        self.assertTrue(isinstance(r, apis))
 
     def test_charset_defaults_to_utf8(self):
         r = self._makeOne({'PATH_INFO':'/'})
@@ -307,163 +313,6 @@ class TestRequest(unittest.TestCase):
         request.set_property(connect, name='db', reify=True)
         self.assertEqual(1, request.db)
         self.assertEqual(1, request.db)
-
-class TestRequestDeprecatedMethods(unittest.TestCase):
-    def setUp(self):
-        self.config = testing.setUp()
-        from zope.deprecation import __show__
-        __show__.off()
-
-    def tearDown(self):
-        testing.tearDown()
-        from zope.deprecation import __show__
-        __show__.on()
-
-    def _getTargetClass(self):
-        from pyramid.request import Request
-        return Request
-
-    def _makeOne(self, environ=None):
-        if environ is None:
-            environ = {}
-        return self._getTargetClass()(environ)
-
-    def test___contains__(self):
-        environ ={'zooma':1}
-        inst = self._makeOne(environ)
-        self.assertTrue('zooma' in inst)
-
-    def test___delitem__(self):
-        environ = {'zooma':1}
-        inst = self._makeOne(environ)
-        del inst['zooma']
-        self.assertFalse('zooma' in environ)
-
-    def test___getitem__(self):
-        environ = {'zooma':1}
-        inst = self._makeOne(environ)
-        self.assertEqual(inst['zooma'], 1)
-
-    def test___iter__(self):
-        environ = {'zooma':1}
-        inst = self._makeOne(environ)
-        iterator = iter(inst)
-        self.assertEqual(list(iterator), list(iter(environ)))
-
-    def test___setitem__(self):
-        environ = {}
-        inst = self._makeOne(environ)
-        inst['zooma'] = 1
-        self.assertEqual(environ, {'zooma':1})
-
-    def test_get(self):
-        environ = {'zooma':1}
-        inst = self._makeOne(environ)
-        self.assertEqual(inst.get('zooma'), 1)
-
-    def test_has_key(self):
-        environ = {'zooma':1}
-        inst = self._makeOne(environ)
-        self.assertEqual(inst.has_key('zooma'), True)
-
-    def test_items(self):
-        environ = {'zooma':1}
-        inst = self._makeOne(environ)
-        self.assertEqual(inst.items(), environ.items())
-
-    def test_iteritems(self):
-        environ = {'zooma':1}
-        inst = self._makeOne(environ)
-        self.assertEqual(list(inst.iteritems()), list(iteritems_(environ)))
-
-    def test_iterkeys(self):
-        environ = {'zooma':1}
-        inst = self._makeOne(environ)
-        self.assertEqual(list(inst.iterkeys()), list(iterkeys_(environ)))
-
-    def test_itervalues(self):
-        environ = {'zooma':1}
-        inst = self._makeOne(environ)
-        self.assertEqual(list(inst.itervalues()), list(itervalues_(environ)))
-
-    def test_keys(self):
-        environ = {'zooma':1}
-        inst = self._makeOne(environ)
-        self.assertEqual(inst.keys(), environ.keys())
-
-    def test_pop(self):
-        environ = {'zooma':1}
-        inst = self._makeOne(environ)
-        popped = inst.pop('zooma')
-        self.assertEqual(environ, {})
-        self.assertEqual(popped, 1)
-
-    def test_popitem(self):
-        environ = {'zooma':1}
-        inst = self._makeOne(environ)
-        popped = inst.popitem()
-        self.assertEqual(environ, {})
-        self.assertEqual(popped, ('zooma', 1))
-
-    def test_setdefault(self):
-        environ = {}
-        inst = self._makeOne(environ)
-        marker = []
-        result = inst.setdefault('a', marker)
-        self.assertEqual(environ, {'a':marker})
-        self.assertEqual(result, marker)
-
-    def test_update(self):
-        environ = {}
-        inst = self._makeOne(environ)
-        inst.update({'a':1}, b=2)
-        self.assertEqual(environ, {'a':1, 'b':2})
-
-    def test_values(self):
-        environ = {'zooma':1}
-        inst = self._makeOne(environ)
-        result = list(inst.values())
-        self.assertEqual(result, list(environ.values()))
-
-    def test_response_content_type(self):
-        inst = self._makeOne()
-        self.assertFalse(hasattr(inst, 'response_content_type'))
-        inst.response_content_type = 'abc'
-        self.assertEqual(inst.response_content_type, 'abc')
-        del inst.response_content_type
-        self.assertFalse(hasattr(inst, 'response_content_type'))
-
-    def test_response_headerlist(self):
-        inst = self._makeOne()
-        self.assertFalse(hasattr(inst, 'response_headerlist'))
-        inst.response_headerlist = 'abc'
-        self.assertEqual(inst.response_headerlist, 'abc')
-        del inst.response_headerlist
-        self.assertFalse(hasattr(inst, 'response_headerlist'))
-
-    def test_response_status(self):
-        inst = self._makeOne()
-        self.assertFalse(hasattr(inst, 'response_status'))
-        inst.response_status = 'abc'
-        self.assertEqual(inst.response_status, 'abc')
-        del inst.response_status
-        self.assertFalse(hasattr(inst, 'response_status'))
-
-    def test_response_charset(self):
-        inst = self._makeOne()
-        self.assertFalse(hasattr(inst, 'response_charset'))
-        inst.response_charset = 'abc'
-        self.assertEqual(inst.response_charset, 'abc')
-        del inst.response_charset
-        self.assertFalse(hasattr(inst, 'response_charset'))
-
-    def test_response_cache_for(self):
-        inst = self._makeOne()
-        self.assertFalse(hasattr(inst, 'response_cache_for'))
-        inst.response_cache_for = 'abc'
-        self.assertEqual(inst.response_cache_for, 'abc')
-        del inst.response_cache_for
-        self.assertFalse(hasattr(inst, 'response_cache_for'))
 
 class Test_route_request_iface(unittest.TestCase):
     def _callFUT(self, name):

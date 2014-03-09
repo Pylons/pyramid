@@ -301,51 +301,6 @@ class RenderViewTests(BaseTest, unittest.TestCase):
         s = self._callFUT(context, request, name='registered', secure=False)
         self.assertEqual(s, b'anotherview')
 
-class TestIsResponse(unittest.TestCase):
-    def setUp(self):
-        from zope.deprecation import __show__
-        __show__.off()
-
-    def tearDown(self):
-        from zope.deprecation import __show__
-        __show__.on()
-        
-    def _callFUT(self, *arg, **kw):
-        from pyramid.view import is_response
-        return is_response(*arg, **kw)
-
-    def test_is(self):
-        response = DummyResponse()
-        self.assertEqual(self._callFUT(response), True)
-
-    def test_isnt(self):
-        response = None
-        self.assertEqual(self._callFUT(response), False)
-
-    def test_isnt_no_headerlist(self):
-        class Response(object):
-            pass
-        resp = Response
-        resp.status = '200 OK'
-        resp.app_iter = []
-        self.assertEqual(self._callFUT(resp), False)
-
-    def test_isnt_no_status(self):
-        class Response(object):
-            pass
-        resp = Response
-        resp.app_iter = []
-        resp.headerlist = ()
-        self.assertEqual(self._callFUT(resp), False)
-
-    def test_isnt_no_app_iter(self):
-        class Response(object):
-            pass
-        resp = Response
-        resp.status = '200 OK'
-        resp.headerlist = ()
-        self.assertEqual(self._callFUT(resp), False)
-
 class TestViewConfigDecorator(unittest.TestCase):
     def setUp(self):
         testing.setUp()
@@ -672,24 +627,6 @@ class Test_default_exceptionresponse_view(unittest.TestCase):
         request.exception = 'abc'
         result = self._callFUT(context, request)
         self.assertEqual(result, 'abc')
-
-class Test_static(unittest.TestCase):
-    def setUp(self):
-        from zope.deprecation import __show__
-        __show__.off()
-
-    def tearDown(self):
-        from zope.deprecation import __show__
-        __show__.on()
-
-    def _makeOne(self, path, package_name):
-        from pyramid.view import static
-        return static(path, package_name)
-        
-    def test_it(self):
-        path = 'fixtures'
-        view = self._makeOne(path, None)
-        self.assertEqual(view.docroot, 'fixtures')
 
 class Test_view_defaults(unittest.TestCase):
     def test_it(self):

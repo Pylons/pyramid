@@ -83,7 +83,7 @@ works against resource instances.
 Here's a sample resource tree, represented by a variable named ``root``:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
     class Resource(dict):
         pass
@@ -201,7 +201,7 @@ location-aware resources.  These APIs include (but are not limited to)
 :func:`~pyramid.traversal.resource_path`,
 :func:`~pyramid.traversal.resource_path_tuple`, or
 :func:`~pyramid.traversal.traverse`, :func:`~pyramid.traversal.virtual_root`,
-and (usually) :func:`~pyramid.security.has_permission` and
+and (usually) :meth:`~pyramid.request.Request.has_permission` and
 :func:`~pyramid.security.principals_allowed_by_permission`.
 
 In general, since so much :app:`Pyramid` infrastructure depends on
@@ -673,8 +673,11 @@ Calling ``find_interface(b, Thing2)`` will return the ``b`` resource.
 The second argument to find_interface may also be a :term:`interface` instead
 of a class.  If it is an interface, each resource in the lineage is checked
 to see if the resource implements the specificed interface (instead of seeing
-if the resource is of a class).  See also
-:ref:`resources_which_implement_interfaces`.
+if the resource is of a class).
+
+.. seealso::
+
+    See also :ref:`resources_which_implement_interfaces`.
 
 .. index::
    single: resource API functions
@@ -695,10 +698,10 @@ The APIs provided by :ref:`location_module` are used against resources.
 These can be used to walk down a resource tree, or conveniently locate one
 resource "inside" another.
 
-Some APIs in :ref:`security_module` accept a resource object as a parameter.
-For example, the :func:`~pyramid.security.has_permission` API accepts a
+Some APIs on the :class:`pyramid.request.Request` accept a resource object as a parameter.
+For example, the :meth:`~pyramid.request.Request.has_permission` API accepts a
 resource object as one of its arguments; the ACL is obtained from this
-resource or one of its ancestors.  Other APIs in the :mod:`pyramid.security`
-module also accept :term:`context` as an argument, and a context is always a
-resource.
+resource or one of its ancestors.  Other security related APIs on the 
+:class:`pyramid.request.Request` class also accept :term:`context` as an argument, 
+and a context is always a resource.
 

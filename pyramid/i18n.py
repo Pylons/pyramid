@@ -25,10 +25,10 @@ from pyramid.threadlocal import get_current_registry
 class Localizer(object):
     """
     An object providing translation and pluralizations related to
-     the current request's locale name.  A
-     :class:`pyramid.i18n.Localizer` object is created using the
-     :func:`pyramid.i18n.get_localizer` function.
-     """
+    the current request's locale name.  A
+    :class:`pyramid.i18n.Localizer` object is created using the
+    :func:`pyramid.i18n.get_localizer` function.
+    """
     def __init__(self, locale_name, translations):
         self.locale_name = locale_name
         self.translations = translations
@@ -75,21 +75,34 @@ class Localizer(object):
         :term:`message identifier` objects as a singular/plural pair
         and an ``n`` value representing the number that appears in the
         message using gettext plural forms support.  The ``singular``
-        and ``plural`` objects passed may be translation strings or
-        unicode strings.  ``n`` represents the number of elements.
-        ``domain`` is the translation domain to use to do the
-        pluralization, and ``mapping`` is the interpolation mapping
-        that should be used on the result.  Note that if the objects
-        passed are translation strings, their domains and mappings are
-        ignored.  The domain and mapping arguments must be used
-        instead.  If the ``domain`` is not supplied, a default domain
-        is used (usually ``messages``).
-
+        and ``plural`` objects should be unicode strings. There is no
+        reason to use translation string objects as arguments as all
+        metadata is ignored.
+        
+        ``n`` represents the number of elements. ``domain`` is the
+        translation domain to use to do the pluralization, and ``mapping``
+        is the interpolation mapping that should be used on the result. If
+        the ``domain`` is not supplied, a default domain is used (usually
+        ``messages``).
+        
         Example::
 
            num = 1
            translated = localizer.pluralize('Add ${num} item',
                                             'Add ${num} items',
+                                            num,
+                                            mapping={'num':num})
+
+        If using the gettext plural support, which is required for
+        languages that have pluralisation rules other than n != 1, the
+        ``singular`` argument must be the message_id defined in the
+        translation file. The plural argument is not used in this case.
+
+        Example::
+
+           num = 1
+           translated = localizer.pluralize('item_plural',
+                                            '',
                                             num,
                                             mapping={'num':num})
 
@@ -107,7 +120,8 @@ def default_locale_negotiator(request):
 
     - First, the negotiator looks for the ``_LOCALE_`` attribute of
       the request object (possibly set by a view or a listener for an
-      :term:`event`).
+      :term:`event`). If the attribute exists and it is not ``None``,
+      its value will be used.
   
     - Then it looks for the ``request.params['_LOCALE_']`` value.
 
@@ -144,9 +158,11 @@ def negotiate_locale_name(request):
     return locale_name
 
 def get_locale_name(request):
-    """ Return the :term:`locale name` associated with the current
-    request.  Deprecated in favor of using request.locale_name directly as of
-    Pyramid 1.5."""
+    """
+    .. deprecated:: 1.5
+        Use :attr:`pyramid.request.Request.locale_name` directly instead.
+        Return the :term:`locale name` associated with the current request.
+    """
     return request.locale_name
 
 def make_localizer(current_locale_name, translation_directories):
@@ -193,9 +209,12 @@ def make_localizer(current_locale_name, translation_directories):
                           translations=translations)
 
 def get_localizer(request):
-    """ Retrieve a :class:`pyramid.i18n.Localizer` object
-    corresponding to the current request's locale name.  Deprecated in favor
-    of using the ``request.localizer`` attribute directly as of Pyramid 1.5"""
+    """
+    .. deprecated:: 1.5
+        Use the :attr:`pyramid.request.Request.localizer` attribute directly
+        instead.  Retrieve a :class:`pyramid.i18n.Localizer` object
+        corresponding to the current request's locale name.
+    """
     return request.localizer
 
 class Translations(gettext.GNUTranslations, object):

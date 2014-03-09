@@ -153,16 +153,12 @@ class PShellCommand(object):
         shell = None
         user_shell = self.options.python_shell.lower()
         if not user_shell:
-            shell = self.make_ipython_v0_11_shell()
-            if shell is None:
-                shell = self.make_ipython_v0_10_shell()
+            shell = self.make_ipython_shell()
             if shell is None:
                 shell = self.make_bpython_shell()
 
         elif user_shell == 'ipython':
-            shell = self.make_ipython_v0_11_shell()
-            if shell is None:
-                shell = self.make_ipython_v0_10_shell()
+            shell = self.make_ipython_shell()
 
         elif user_shell == 'bpython':
             shell = self.make_bpython_shell()
@@ -191,6 +187,27 @@ class PShellCommand(object):
             BPShell(locals_=env, banner=help + '\n')
         return shell
 
+    def make_ipython_shell(self):
+        shell = self.make_ipython_v1_1_shell()
+        if shell is None:
+            shell = self.make_ipython_v0_11_shell()
+        if shell is None:
+            shell = self.make_ipython_v0_10_shell()
+        return shell
+
+    def make_ipython_v1_1_shell(self, IPShellFactory=None):
+        if IPShellFactory is None: # pragma: no cover
+            try:
+                from IPython.terminal.embed import (
+                    InteractiveShellEmbed)
+                IPShellFactory = InteractiveShellEmbed
+            except ImportError:
+                return None
+        def shell(env, help):
+            IPShell = IPShellFactory(banner2=help + '\n', user_ns=env)
+            IPShell()
+        return shell
+
     def make_ipython_v0_11_shell(self, IPShellFactory=None):
         if IPShellFactory is None: # pragma: no cover
             try:
@@ -217,3 +234,5 @@ class PShellCommand(object):
             IPShell()
         return shell
 
+if __name__ == '__main__': # pragma: no cover
+    sys.exit(main() or 0)

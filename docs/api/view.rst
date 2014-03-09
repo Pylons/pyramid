@@ -11,8 +11,6 @@
 
   .. autofunction:: render_view
 
-  .. autofunction:: is_response
-
   .. autoclass:: view_config
      :members:
 
@@ -24,9 +22,5 @@
 
   .. autoclass:: forbidden_view_config
      :members:
-
-  .. autoclass:: static
-     :members:
-     :inherited-members:
 
 

@@ -49,15 +49,19 @@ Writing View Callables Which Use a Renderer
 -------------------------------------------
 
 As we've seen, a view callable needn't always return a Response object.
-Instead, it may return an arbitrary Python object, with the expectation
-that a :term:`renderer` will convert that object into a response instance on
-your behalf.  Some renderers use a templating system; other renderers use
-object serialization techniques.
+Instead, it may return an arbitrary Python object, with the expectation that
+a :term:`renderer` will convert that object into a response instance on your
+behalf.  Some renderers use a templating system; other renderers use object
+serialization techniques.  In practice, renderers obtain application data
+values from Python dictionaries so, in practice, view callables which use
+renderers return Python dictionaries.
 
-View configuration can vary the renderer associated with a view callable via
-the ``renderer`` attribute.  For example, this call to
-:meth:`~pyramid.config.Configurator.add_view` associates the ``json`` renderer
-with a view callable:
+View callables can :ref:`explicitly call <example_render_to_response_call>`
+renderers, but typically don't.  Instead view configuration declares the
+renderer used to render a view callable's results.  This is done with the
+``renderer`` attribute.  For example, this call to
+:meth:`~pyramid.config.Configurator.add_view` associates the ``json``
+renderer with a view callable:
 
 .. code-block:: python
 
@@ -67,9 +71,8 @@ When this configuration is added to an application, the
 ``myproject.views.my_view`` view callable will now use a ``json`` renderer,
 which renders view return values to a :term:`JSON` response serialization.
 
-Other built-in renderers include renderers which use the :term:`Chameleon`
-templating language to render a dictionary to a response.  Additional
-renderers can be added by developers to the system as necessary.
+Pyramid defines several :ref:`built_in_renderers`, and additional renderers
+can be added by developers to the system as necessary.
 See :ref:`adding_and_overriding_renderers`.
 
 Views which use a renderer and return a non-Response value can vary non-body
@@ -128,6 +131,11 @@ Built-In Renderers
 
 Several built-in renderers exist in :app:`Pyramid`.  These renderers can be
 used in the ``renderer`` attribute of view configurations.
+
+.. note::
+
+   Bindings for officially supported templating languages can be found
+   at :ref:`available_template_system_bindings`.
 
 .. index::
    pair: renderer; string
@@ -203,13 +211,7 @@ representing the JSON serialization of the return value:
 The return value needn't be a dictionary, but the return value must contain
 values serializable by the configured serializer (by default ``json.dumps``).
 
-.. note::
-
-   Extra arguments can be passed to the serializer by overriding the default
-   ``json`` renderer. See :class:`pyramid.renderers.JSON` and
-   :ref:`adding_and_overriding_renderers` for more information.
-
-You can configure a view to use the JSON renderer by naming ``json`` as the
+You can configure a view to use the JSON renderer by naming``json`` as the
 ``renderer`` argument of a view configuration, e.g. by using
 :meth:`~pyramid.config.Configurator.add_view`:
 
@@ -229,6 +231,18 @@ using the api of the ``request.response`` attribute.  See
 
 Serializing Custom Objects
 ++++++++++++++++++++++++++
+
+Some objects are not, by default, JSON-serializable (such as datetimes and 
+other arbitrary Python objects).  You can, however, register code that makes 
+non-serializable objects serializable in two ways:
+
+- By defining a ``__json__`` method on objects in your application.
+
+- For objects you don't "own", you can register JSON renderer that knows about 
+  an *adapter* for that kind of object.
+
+Using a Custom ``__json__`` Method
+**********************************
 
 Custom objects can be made easily JSON-serializable in Pyramid by defining a
 ``__json__`` method on the object's class. This method should return values
@@ -255,6 +269,9 @@ will be the active request object at render time.
    # the JSON value returned by ``objects`` will be:
    #    [{"x": 1}, {"x": 2}]
 
+Using the ``add_adapter`` Method of a Custom JSON Renderer
+**********************************************************
+
 If you aren't the author of the objects being serialized, it won't be
 possible (or at least not reasonable) to add a custom ``__json__`` method
 to their classes in order to influence serialization.  If the object passed
@@ -269,19 +286,21 @@ objects using the registered adapters. A short example follows:
 
    from pyramid.renderers import JSON
 
-   json_renderer = JSON()
-   def datetime_adapter(obj, request):
-       return obj.isoformat()
-   json_renderer.add_adapter(datetime.datetime, datetime_adapter)
+   if __name__ == '__main__':
+       config = Configurator()
+       json_renderer = JSON()
+       def datetime_adapter(obj, request):
+           return obj.isoformat()
+       json_renderer.add_adapter(datetime.datetime, datetime_adapter)
+       config.add_renderer('json', json_renderer)
 
-   # then during configuration ....
-   config = Configurator()
-   config.add_renderer('json', json_renderer)
+The ``add_adapter`` method should accept two arguments: the *class* of the object that you want this adapter to run for (in the example above, 
+``datetime.datetime``), and the adapter itself.
 
-The adapter should accept two arguments: the object needing to be serialized
-and ``request``, which will be the current request object at render time.
-The adapter should raise a :exc:`TypeError` if it can't determine what to do
-with the object.
+The adapter should be a callable.  It should accept two arguments: the object 
+needing to be serialized and ``request``, which will be the current request 
+object at render time. The adapter should raise a :exc:`TypeError` 
+if it can't determine what  to do with the object.
 
 See :class:`pyramid.renderers.JSON` and
 :ref:`adding_and_overriding_renderers` for more information.
@@ -366,136 +385,6 @@ renderer in :ref:`json_serializing_custom_objects` can be used when passing
 values to a JSONP renderer too.
 
 .. index::
-   pair: renderer; chameleon
-
-.. _chameleon_template_renderers:
-
-``*.pt`` or ``*.txt``: Chameleon Template Renderers
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Two built-in renderers exist for :term:`Chameleon` templates.
-
-If the ``renderer`` attribute of a view configuration is an absolute path, a
-relative path or :term:`asset specification` which has a final path element
-with a filename extension of ``.pt``, the Chameleon ZPT renderer is used.
-See :ref:`chameleon_zpt_templates` for more information about ZPT templates.
-
-If the ``renderer`` attribute of a view configuration is an absolute path or
-a :term:`asset specification` which has a final path element with a filename
-extension of ``.txt``, the :term:`Chameleon` text renderer is used.  See
-:ref:`chameleon_text_templates` for more information about Chameleon text
-templates.
-
-The behavior of these renderers is the same, except for the engine
-used to render the template.
-
-When a ``renderer`` attribute that names a template path or :term:`asset
-specification` (e.g. ``myproject:templates/foo.pt`` or
-``myproject:templates/foo.txt``) is used, the view must return a
-:term:`Response` object or a Python *dictionary*.  If the view callable with
-an associated template returns a Python dictionary, the named template will
-be passed the dictionary as its keyword arguments, and the template renderer
-implementation will return the resulting rendered template in a response to
-the user.  If the view callable returns anything but a Response object or a
-dictionary, an error will be raised.
-
-Before passing keywords to the template, the keyword arguments derived from
-the dictionary returned by the view are augmented.  The callable object --
-whatever object was used to define the view -- will be automatically inserted
-into the set of keyword arguments passed to the template as the ``view``
-keyword.  If the view callable was a class, the ``view`` keyword will be an
-instance of that class.  Also inserted into the keywords passed to the
-template are ``renderer_name`` (the string used in the ``renderer`` attribute
-of the directive), ``renderer_info`` (an object containing renderer-related
-information), ``context`` (the context resource of the view used to render
-the template), and ``request`` (the request passed to the view used to render
-the template).  ``request`` is also available as ``req`` in Pyramid 1.3+.
-
-Here's an example view configuration which uses a Chameleon ZPT renderer:
-
-.. code-block:: python
-   :linenos:
-
-    # config is an instance of pyramid.config.Configurator
-
-    config.add_view('myproject.views.hello_world',
-                    name='hello',
-                    context='myproject.resources.Hello',
-                    renderer='myproject:templates/foo.pt')
-
-Here's an example view configuration which uses a Chameleon text renderer:
-
-.. code-block:: python
-   :linenos:
-
-    config.add_view('myproject.views.hello_world',
-                    name='hello',
-                    context='myproject.resources.Hello',
-                    renderer='myproject:templates/foo.txt')
-
-Views which use a Chameleon renderer can vary response attributes by using
-the API of the ``request.response`` attribute.  See
-:ref:`request_response_attr`.
-
-.. index::
-   pair: renderer; mako
-
-.. _mako_template_renderers:
-
-``*.mak`` or ``*.mako``: Mako Template Renderer
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The ``Mako`` template renderer renders views using a Mako template.  When
-used, the view must return a Response object or a Python *dictionary*.  The
-dictionary items will then be used in the global template space. If the view
-callable returns anything but a Response object or a dictionary, an error
-will be raised.
-
-When using a ``renderer`` argument to a :term:`view configuration` to specify
-a Mako template, the value of the ``renderer`` may be a path relative to the
-``mako.directories`` setting (e.g.  ``some/template.mak``) or, alternately,
-it may be a :term:`asset specification`
-(e.g. ``apackage:templates/sometemplate.mak``).  Mako templates may
-internally inherit other Mako templates using a relative filename or a
-:term:`asset specification` as desired.
-
-Here's an example view configuration which uses a relative path:
-
-.. code-block:: python
-   :linenos:
-
-    # config is an instance of pyramid.config.Configurator
-
-    config.add_view('myproject.views.hello_world',
-                    name='hello',
-                    context='myproject.resources.Hello',
-                    renderer='foo.mak')
-
-It's important to note that in Mako's case, the 'relative' path name
-``foo.mak`` above is not relative to the package, but is relative to the
-directory (or directories) configured for Mako via the ``mako.directories``
-configuration file setting.
-
-The renderer can also be provided in :term:`asset specification`
-format. Here's an example view configuration which uses one:
-
-.. code-block:: python
-   :linenos:
-
-    config.add_view('myproject.views.hello_world',
-                    name='hello',
-                    context='myproject.resources.Hello',
-                    renderer='mypackage:templates/foo.mak')
-
-The above configuration will use the file named ``foo.mak`` in the
-``templates`` directory of the ``mypackage`` package.
-
-The ``Mako`` template renderer can take additional arguments beyond the
-standard ``pyramid.reload_templates`` setting, see the
-:ref:`environment_chapter` for additional
-:ref:`mako_template_renderer_settings`.
-
-.. index::
    single: response headers (from a renderer)
    single: renderer response headers
 
@@ -556,40 +445,6 @@ For more information on attributes of the request, see the API documentation
 in :ref:`request_module`.  For more information on the API of
 ``request.response``, see :attr:`pyramid.request.Request.response`.
 
-.. _response_prefixed_attrs:
-
-Deprecated Mechanism to Vary Attributes of Rendered Responses
--------------------------------------------------------------
-
-In previous releases of Pyramid (1.0 and before), the ``request.response``
-attribute did not exist.  Instead, Pyramid required users to set special
-``response_`` -prefixed attributes of the request to influence response
-behavior.  As of Pyramid 1.1, those request attributes are deprecated and
-their use will cause a deprecation warning to be issued when used.  Until
-their existence is removed completely, we document them below, for benefit of
-people with older code bases.
-
-``response_content_type``
-  Defines the content-type of the resulting response,
-  e.g. ``text/xml``.
-
-``response_headerlist``
-  A sequence of tuples describing header values that should be set in the
-  response, e.g. ``[('Set-Cookie', 'abc=123'), ('X-My-Header', 'foo')]``.
-
-``response_status``
-  A WSGI-style status code (e.g. ``200 OK``) describing the status of the
-  response.
-
-``response_charset``
-  The character set (e.g. ``UTF-8``) of the response.
-
-``response_cache_for``
-  A value in seconds which will influence ``Cache-Control`` and ``Expires``
-  headers in the returned response.  The same can also be achieved by
-  returning various values in the ``response_headerlist``, this is purely a
-  convenience.
-
 .. _adding_and_overriding_renderers:
 
 Adding and Changing Renderers
@@ -625,8 +480,11 @@ Adding a New Renderer
 You may add a new renderer by creating and registering a :term:`renderer
 factory`.
 
-A renderer factory implementation is typically a class with the
-following interface:
+A renderer factory implementation should conform to the
+:class:`pyramid.interfaces.IRendererFactory` interface. It should be capable
+of creating an object that conforms to the
+:class:`pyramid.interfaces.IRenderer` interface. A typical class that follows
+this setup is as follows:
 
 .. code-block:: python
    :linenos:
@@ -739,36 +597,8 @@ ending with ``.jinja2`` in its ``renderer`` value.  The ``name`` passed
 to the ``MyJinja2Renderer`` constructor will be the full value that was
 set as ``renderer=`` in the view configuration.
 
-.. index::
-   pair: renderer; changing
-
-Changing an Existing Renderer
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-You can associate more than one filename extension with the same existing
-renderer implementation as necessary if you need to use a different file
-extension for the same kinds of templates.  For example, to associate the
-``.zpt`` extension with the Chameleon ZPT renderer factory, use the
-:meth:`pyramid.config.Configurator.add_renderer` method:
-
-.. code-block:: python
-
-   config.add_renderer('.zpt', 'pyramid.chameleon_zpt.renderer_factory')
-
-After you do this, :app:`Pyramid` will treat templates ending in both the
-``.pt`` and ``.zpt`` filename extensions as Chameleon ZPT templates.
-
-To change the default mapping in which files with a ``.pt`` extension are
-rendered via a Chameleon ZPT page template renderer, use a variation on the
-following in your application's startup code:
-
-.. code-block:: python
-
-   config.add_renderer('.pt', 'mypackage.pt_renderer')
-
-After you do this, the :term:`renderer factory` in
-``mypackage.pt_renderer`` will be used to render templates which end
-in ``.pt``, replacing the default Chameleon ZPT renderer.
+Adding a Default Renderer
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To associate a *default* renderer with *all* view configurations (even
 ones which do not possess a ``renderer`` attribute), pass ``None`` as
@@ -777,6 +607,27 @@ the ``name`` attribute to the renderer tag:
 .. code-block:: python
 
    config.add_renderer(None, 'mypackage.json_renderer_factory')
+
+.. index::
+   pair: renderer; changing
+
+Changing an Existing Renderer
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Pyramid supports overriding almost every aspect of its setup through its
+:ref:`Conflict Resolution <automatic_conflict_resolution>` mechanism. This
+means that in most cases overriding a renderer is as simple as using the
+:meth:`pyramid.config.Configurator.add_renderer` method to re-define the
+template extension. For example, if you would like to override the ``.txt``
+extension to specify a new renderer you could do the following:
+
+.. code-block:: python
+
+   json_renderer = pyramid.renderers.JSON()
+   config.add_renderer('json', json_renderer)
+
+After doing this, any views registered with the ``json`` renderer will use
+the new renderer.
 
 .. index::
    pair: renderer; overriding at runtime

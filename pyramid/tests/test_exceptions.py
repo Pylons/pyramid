@@ -11,6 +11,12 @@ class TestBWCompat(unittest.TestCase):
         from pyramid.httpexceptions import HTTPForbidden as two
         self.assertTrue(one is two)
 
+class TestBadCSRFToken(unittest.TestCase):
+    def test_response_equivalence(self):
+        from pyramid.exceptions import BadCSRFToken
+        from pyramid.httpexceptions import HTTPBadRequest
+        self.assertTrue(isinstance(BadCSRFToken(), HTTPBadRequest))
+
 class TestNotFound(unittest.TestCase):
     def _makeOne(self, message):
         from pyramid.exceptions import NotFound

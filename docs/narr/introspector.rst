@@ -24,7 +24,7 @@ Here's an example of using Pyramid's introspector from within a view
 callable:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
     from pyramid.view import view_config
     from pyramid.response import Response
@@ -100,7 +100,7 @@ its ``__getitem__``, ``get``, ``keys``, ``values``, or ``items`` methods.
 For example:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
     route_intr = introspector.get('routes', 'edit_user')
     pattern = route_intr['pattern']
@@ -231,18 +231,6 @@ introspectables in categories not described here.
 
     The factory object (the resolved ``factory`` argument to
     ``add_renderer``).
-
-``renderer globals factory``
-
-  There will be one and only one introspectable in the ``renderer globals
-  factory`` category.  It represents a call to
-  :meth:`pyramid.config.Configurator.set_renderer_globals_factory`; it will
-  have the following data.
-
-  ``factory``
-
-    The factory object (the resolved ``factory`` argument to
-    ``set_renderer_globals_factory``).
 
 ``routes``
 

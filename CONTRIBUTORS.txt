@@ -221,4 +221,14 @@ Contributors
 
 - Takahiro Fujiwara, 2013/08/28
 
-- Chuan-Heng Hsiao, 2013/09/01
+- Doug Hellmann, 2013/09/06
+
+- Karl O. Pinc, 2013/09/27
+
+- Matthew Russell, 2013/10/14
+
+- Antti Haapala, 2013/11/15
+
+- Amit Mane, 2014/01/23
+
+- Chuan-Heng Hsiao, 2014/03/08

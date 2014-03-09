@@ -146,10 +146,13 @@ class DummyBootstrap(object):
     def __call__(self, *a, **kw):
         self.a = a
         self.kw = kw
+        registry = kw.get('registry', self.registry)
+        request = kw.get('request', self.request)
+        request.registry = registry
         return {
             'app': self.app,
-            'registry': self.registry,
-            'request': self.request,
+            'registry': registry,
+            'request': request,
             'root': self.root,
             'root_factory': self.root_factory,
             'closer': self.closer,

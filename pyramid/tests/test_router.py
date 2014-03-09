@@ -830,7 +830,8 @@ class TestRouter(unittest.TestCase):
         self._registerTraverserFactory(context, subpath=[''])
         response = DummyResponse()
         response.app_iter = ['OK']
-        view = DummyView(response, raise_exception=RuntimeError)
+        error = RuntimeError()
+        view = DummyView(response, raise_exception=error)
         environ = self._makeEnviron()
         def exception_view(context, request):
             self.assertEqual(request.exc_info[0], RuntimeError)
@@ -842,9 +843,11 @@ class TestRouter(unittest.TestCase):
         start_response = DummyStartResponse()
         result = router(environ, start_response)
         self.assertEqual(result, ['OK'])
-        # we clean up the exc_info and exception after the request
-        self.assertEqual(request.exception, None)
-        self.assertEqual(request.exc_info, None)
+        # exc_info and exception should still be around on the request after
+        # the excview tween has run (see
+        # https://github.com/Pylons/pyramid/issues/1223)
+        self.assertEqual(request.exception, error)
+        self.assertEqual(request.exc_info[:2], (RuntimeError, error,))
         
     def test_call_view_raises_exception_view(self):
         from pyramid.interfaces import IViewClassifier

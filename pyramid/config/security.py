@@ -112,7 +112,9 @@ class SecurityConfiguratorMixin(object):
           permission is ignored, and the view is registered, making it
           available to all callers regardless of their credentials.
 
-        See also :ref:`setting_a_default_permission`.
+        .. seealso::
+
+            See also :ref:`setting_a_default_permission`.
 
         .. note::
 

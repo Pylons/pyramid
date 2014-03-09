@@ -158,8 +158,12 @@ use :meth:`pyramid.config.Configurator.include`:
 Using :meth:`~pyramid.config.Configurator.include` instead of calling the
 function directly provides a modicum of automated conflict resolution, with
 the configuration statements you define in the calling code overriding those
-of the included function.  See also :ref:`automatic_conflict_resolution` and
-:ref:`including_configuration`.
+of the included function.
+
+.. seealso::
+
+    See also :ref:`automatic_conflict_resolution` and
+    :ref:`including_configuration`.
 
 Using ``config.commit()``
 +++++++++++++++++++++++++
@@ -302,7 +306,6 @@ These are the methods of the configurator which provide conflict detection:
 :meth:`~pyramid.config.Configurator.set_view_mapper`,
 :meth:`~pyramid.config.Configurator.set_authentication_policy`,
 :meth:`~pyramid.config.Configurator.set_authorization_policy`,
-:meth:`~pyramid.config.Configurator.set_renderer_globals_factory`,
 :meth:`~pyramid.config.Configurator.set_locale_negotiator`,
 :meth:`~pyramid.config.Configurator.set_default_permission`,
 :meth:`~pyramid.config.Configurator.add_traverser`,

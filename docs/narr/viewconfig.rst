@@ -118,8 +118,9 @@ Non-Predicate Arguments
 
 ``renderer``
   Denotes the :term:`renderer` implementation which will be used to construct
-  a :term:`response` from the associated view callable's return value. (see
-  also :ref:`renderers_chapter`).
+  a :term:`response` from the associated view callable's return value.
+  
+  .. seealso:: See also :ref:`renderers_chapter`.
 
   This is either a single string term (e.g. ``json``) or a string implying a
   path or :term:`asset specification` (e.g. ``templates/views.pt``) naming a
@@ -217,7 +218,21 @@ Non-Predicate Arguments
   decorator function will be called with the view callable as a single
   argument.  The view callable it is passed will accept ``(context,
   request)``.  The decorator must return a replacement view callable which
-  also accepts ``(context, request)``.
+  also accepts ``(context, request)``. The ``decorator`` may also be an
+  iterable of decorators, in which case they will be applied one after the
+  other to the view, in reverse order. For example::
+
+    @view_config(..., decorator=(decorator2, decorator1))
+    def myview(request):
+      ...
+
+  Is similar to doing::
+
+    @view_config(...)
+    @decorator2
+    @decorator1
+    def myview(request):
+      ...
 
 ``mapper``
   A Python object or :term:`dotted Python name` which refers to a :term:`view
@@ -435,7 +450,7 @@ configured view.
 
   If specified, this value should be a :term:`principal` identifier or a
   sequence of principal identifiers.  If the
-  :func:`pyramid.security.effective_principals` method indicates that every
+  :meth:`pyramid.request.Request.effective_principals` method indicates that every
   principal named in the argument list is present in the current request, this
   predicate will return True; otherwise it will return False.  For example:
   ``effective_principals=pyramid.security.Authenticated`` or
@@ -464,6 +479,36 @@ configured view.
   predicates.
 
   .. versionadded:: 1.4a1
+
+Inverting Predicate Values
+++++++++++++++++++++++++++
+
+You can invert the meaning of any predicate value by wrapping it in a call to
+:class:`pyramid.config.not_`.
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.config import not_
+
+   config.add_view(
+       'mypackage.views.my_view',
+       route_name='ok',
+       request_method=not_('POST')
+       )
+
+The above example will ensure that the view is called if the request method
+is *not* ``POST``, at least if no other view is more specific.
+
+This technique of wrapping a predicate value in ``not_`` can be used anywhere
+predicate values are accepted:
+
+- :meth:`pyramid.config.Configurator.add_view`
+
+- :meth:`pyramid.view.view_config`
+
+.. versionadded:: 1.5
+
 
 .. index::
    single: view_config decorator
@@ -556,35 +601,6 @@ argument.  Usage of the :class:`~pyramid.view.view_config` decorator is a
 form of :term:`declarative configuration`, while
 :meth:`pyramid.config.Configurator.add_view` is a form of :term:`imperative
 configuration`.  However, they both do the same thing.
-
-Inverting Predicate Values
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-You can invert the meaning of any predicate value by wrapping it in a call to
-:class:`pyramid.config.not_`.
-
-.. code-block:: python
-   :linenos:
-
-   from pyramid.config import not_
-
-   config.add_view(
-       'mypackage.views.my_view',
-       route_name='ok',
-       request_method=not_('POST')
-       )
-
-The above example will ensure that the view is called if the request method
-is *not* ``POST``, at least if no other view is more specific.
-
-This technique of wrapping a predicate value in ``not_`` can be used anywhere
-predicate values are accepted:
-
-- :meth:`pyramid.config.Configurator.add_view`
-
-- :meth:`pyramid.view.view_config`
-
-.. versionadded:: 1.5
 
 .. index::
    single: view_config placement
@@ -821,7 +837,7 @@ of this:
        def delete(self):
            return Response('delete')
 
-   if __name__ == '__main__':
+   def main(global_config, **settings):
        config = Configurator()
        config.add_route('rest', '/rest')
        config.add_view(
@@ -830,9 +846,10 @@ of this:
            RESTView, route_name='rest', attr='post', request_method='POST')
        config.add_view(
            RESTView, route_name='rest', attr='delete', request_method='DELETE')
+       return config.make_wsgi_app()
 
 To reduce the amount of repetition in the ``config.add_view`` statements, we
-can move the ``route_name='rest'`` argument to a ``@view_default`` class
+can move the ``route_name='rest'`` argument to a ``@view_defaults`` class
 decorator on the RESTView class:
 
 .. code-block:: python
@@ -856,12 +873,13 @@ decorator on the RESTView class:
        def delete(self):
            return Response('delete')
 
-   if __name__ == '__main__':
+   def main(global_config, **settings):
        config = Configurator()
        config.add_route('rest', '/rest')
        config.add_view(RESTView, attr='get', request_method='GET')
        config.add_view(RESTView, attr='post', request_method='POST')
        config.add_view(RESTView, attr='delete', request_method='DELETE')
+       return config.make_wsgi_app()
 
 :class:`pyramid.view.view_defaults` accepts the same set of arguments that
 :class:`pyramid.view.view_config` does, and they have the same meaning.  Each

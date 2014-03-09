@@ -26,6 +26,8 @@ class DottedNameResolver(_DottedNameResolver):
     def __init__(self, package=None): # default to package = None for bw compat
         return _DottedNameResolver.__init__(self, package)
 
+_marker = object()
+
 class InstancePropertyMixin(object):
     """ Mixin that will allow an instance to add properties at
     run-time as if they had been defined via @property or @reify
@@ -80,6 +82,25 @@ class InstancePropertyMixin(object):
         if attrs:
             parent = self.__class__
             cls = type(parent.__name__, (parent, object), attrs)
+            # We assign __provides__, __implemented__ and __providedBy__ below
+            # to prevent a memory leak that results from from the usage of this
+            # instance's eventual use in an adapter lookup.  Adapter lookup
+            # results in ``zope.interface.implementedBy`` being called with the
+            # newly-created class as an argument.  Because the newly-created
+            # class has no interface specification data of its own, lookup
+            # causes new ClassProvides and Implements instances related to our
+            # just-generated class to be created and set into the newly-created
+            # class' __dict__.  We don't want these instances to be created; we
+            # want this new class to behave exactly like it is the parent class
+            # instead.  See https://github.com/Pylons/pyramid/issues/1212 for
+            # more information.
+            for name in ('__implemented__', '__providedBy__', '__provides__'):
+                # we assign these attributes conditionally to make it possible
+                # to test this class in isolation without having any interfaces
+                # attached to it
+                val = getattr(parent, name, _marker)
+                if val is not _marker:
+                    setattr(cls, name, val)
             self.__class__ = cls
 
     def _set_extensions(self, extensions):

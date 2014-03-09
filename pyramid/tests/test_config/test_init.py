@@ -3,7 +3,6 @@ import warnings
 
 import os
 
-from pyramid.compat import PYPY
 from pyramid.compat import im_func
 from pyramid.testing import skip_on
 
@@ -69,11 +68,6 @@ class ConfiguratorTests(unittest.TestCase):
         config.commit()
         self.assertTrue(config.registry.getUtility(IRendererFactory, 'json'))
         self.assertTrue(config.registry.getUtility(IRendererFactory, 'string'))
-        if not PYPY:
-            self.assertTrue(config.registry.getUtility(IRendererFactory, '.pt'))
-            self.assertTrue(config.registry.getUtility(IRendererFactory,'.txt'))
-        self.assertTrue(config.registry.getUtility(IRendererFactory, '.mak'))
-        self.assertTrue(config.registry.getUtility(IRendererFactory, '.mako'))
 
     def test_begin(self):
         from pyramid.config import Configurator
@@ -233,6 +227,14 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne(introspection=False)
         self.assertEqual(config.introspection, False)
 
+    def test_ctor_default_webob_response_adapter_registered(self):
+        from webob import Response as WebobResponse
+        response = WebobResponse()
+        from pyramid.interfaces import IResponse
+        config = self._makeOne(autocommit=True)
+        result = config.registry.queryAdapter(response, IResponse)
+        self.assertEqual(result, response)
+        
     def test_with_package_module(self):
         from pyramid.tests.test_config import test_init
         import pyramid.tests
@@ -554,35 +556,6 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(reg.queryUtility(IRequestFactory), None)
         config.commit()
         utility = reg.getUtility(IRequestFactory)
-        self.assertEqual(utility, pyramid.tests.test_config)
-
-    def test_setup_registry_renderer_globals_factory(self):
-        from pyramid.registry import Registry
-        from pyramid.interfaces import IRendererGlobalsFactory
-        reg = Registry()
-        config = self._makeOne(reg)
-        factory = object()
-        with warnings.catch_warnings():
-            warnings.filterwarnings('ignore')
-            config.setup_registry(renderer_globals_factory=factory)
-        self.assertEqual(reg.queryUtility(IRendererGlobalsFactory), None)
-        config.commit()
-        utility = reg.getUtility(IRendererGlobalsFactory)
-        self.assertEqual(utility, factory)
-
-    def test_setup_registry_renderer_globals_factory_dottedname(self):
-        from pyramid.registry import Registry
-        from pyramid.interfaces import IRendererGlobalsFactory
-        reg = Registry()
-        config = self._makeOne(reg)
-        import pyramid.tests.test_config
-        with warnings.catch_warnings():
-            warnings.filterwarnings('ignore')
-            config.setup_registry(
-                renderer_globals_factory='pyramid.tests.test_config')
-        self.assertEqual(reg.queryUtility(IRendererGlobalsFactory), None)
-        config.commit()
-        utility = reg.getUtility(IRendererGlobalsFactory)
         self.assertEqual(utility, pyramid.tests.test_config)
 
     def test_setup_registry_alternate_renderers(self):
@@ -1188,221 +1161,6 @@ pyramid.tests.test_config.dummy_include2""",
         foo_meth = config.foo
         self.assertTrue(getattr(foo_meth, im_func) is foo)
 
-class TestConfiguratorDeprecatedFeatures(unittest.TestCase):
-
-    def setUp(self):
-        self.warnings = warnings.catch_warnings()
-        self.warnings.__enter__()
-        warnings.filterwarnings('ignore')
-
-    def tearDown(self):
-        self.warnings.__exit__(None, None, None)
-
-    def _makeOne(self, *arg, **kw):
-        from pyramid.config import Configurator
-        config = Configurator(*arg, **kw)
-        config.registry._dont_resolve_responses = True
-        return config
-    
-    def _getRouteRequestIface(self, config, name):
-        from pyramid.interfaces import IRouteRequest
-        iface = config.registry.getUtility(IRouteRequest, name)
-        return iface
-
-    def _getViewCallable(self, config, ctx_iface=None, request_iface=None,
-                         name='', exception_view=False):
-        from zope.interface import Interface
-        from pyramid.interfaces import IView
-        from pyramid.interfaces import IViewClassifier
-        from pyramid.interfaces import IExceptionViewClassifier
-        if exception_view:
-            classifier = IExceptionViewClassifier
-        else:
-            classifier = IViewClassifier
-        if ctx_iface is None:
-            ctx_iface = Interface
-        return config.registry.adapters.lookup(
-            (classifier, request_iface, ctx_iface), IView, name=name,
-            default=None)
-
-    def _registerRenderer(self, config, name='.txt'):
-        from pyramid.interfaces import IRendererFactory
-        from pyramid.interfaces import ITemplateRenderer
-        from zope.interface import implementer
-        @implementer(ITemplateRenderer)
-        class Renderer:
-            def __init__(self, info):
-                self.__class__.info = info
-            def __call__(self, *arg):
-                return 'Hello!'
-        config.registry.registerUtility(Renderer, IRendererFactory, name=name)
-        return Renderer
-
-    def _assertRoute(self, config, name, path, num_predicates=0):
-        from pyramid.interfaces import IRoutesMapper
-        mapper = config.registry.getUtility(IRoutesMapper)
-        routes = mapper.get_routes()
-        route = routes[0]
-        self.assertEqual(len(routes), 1)
-        self.assertEqual(route.name, name)
-        self.assertEqual(route.path, path)
-        self.assertEqual(len(routes[0].predicates), num_predicates)
-        return route
-
-    def _makeRequest(self, config):
-        request = DummyRequest()
-        request.registry = config.registry
-        return request
-
-    def test_add_route_with_view(self):
-        from pyramid.renderers import null_renderer
-        config = self._makeOne(autocommit=True)
-        view = lambda *arg: 'OK'
-        config.add_route('name', 'path', view=view, view_renderer=null_renderer)
-        request_type = self._getRouteRequestIface(config, 'name')
-        wrapper = self._getViewCallable(config, None, request_type)
-        self.assertEqual(wrapper(None, None), 'OK')
-        self._assertRoute(config, 'name', 'path')
-
-    def test_add_route_with_view_context(self):
-        from pyramid.renderers import null_renderer
-        config = self._makeOne(autocommit=True)
-        view = lambda *arg: 'OK'
-        config.add_route('name', 'path', view=view, view_context=IDummy,
-                         view_renderer=null_renderer)
-        request_type = self._getRouteRequestIface(config, 'name')
-        wrapper = self._getViewCallable(config, IDummy, request_type)
-        self.assertEqual(wrapper(None, None), 'OK')
-        self._assertRoute(config, 'name', 'path')
-        wrapper = self._getViewCallable(config, IOther, request_type)
-        self.assertEqual(wrapper, None)
-
-    def test_add_route_with_view_exception(self):
-        from pyramid.renderers import null_renderer
-        from zope.interface import implementedBy
-        config = self._makeOne(autocommit=True)
-        view = lambda *arg: 'OK'
-        config.add_route('name', 'path', view=view, view_context=RuntimeError,
-                         view_renderer=null_renderer)
-        request_type = self._getRouteRequestIface(config, 'name')
-        wrapper = self._getViewCallable(
-            config, ctx_iface=implementedBy(RuntimeError),
-            request_iface=request_type, exception_view=True)
-        self.assertEqual(wrapper(None, None), 'OK')
-        self._assertRoute(config, 'name', 'path')
-        wrapper = self._getViewCallable(
-            config, ctx_iface=IOther,
-            request_iface=request_type, exception_view=True)
-        self.assertEqual(wrapper, None)
-
-    def test_add_route_with_view_for(self):
-        from pyramid.renderers import null_renderer
-        config = self._makeOne(autocommit=True)
-        view = lambda *arg: 'OK'
-        config.add_route('name', 'path', view=view, view_for=IDummy,
-                         view_renderer=null_renderer)
-        request_type = self._getRouteRequestIface(config, 'name')
-        wrapper = self._getViewCallable(config, IDummy, request_type)
-        self.assertEqual(wrapper(None, None), 'OK')
-        self._assertRoute(config, 'name', 'path')
-        wrapper = self._getViewCallable(config, IOther, request_type)
-        self.assertEqual(wrapper, None)
-
-    def test_add_route_with_for_(self):
-        from pyramid.renderers import null_renderer
-        config = self._makeOne(autocommit=True)
-        view = lambda *arg: 'OK'
-        config.add_route('name', 'path', view=view, for_=IDummy,
-                         view_renderer=null_renderer)
-        request_type = self._getRouteRequestIface(config, 'name')
-        wrapper = self._getViewCallable(config, IDummy, request_type)
-        self.assertEqual(wrapper(None, None), 'OK')
-        self._assertRoute(config, 'name', 'path')
-        wrapper = self._getViewCallable(config, IOther, request_type)
-        self.assertEqual(wrapper, None)
-
-    def test_add_route_with_view_renderer(self):
-        config = self._makeOne(autocommit=True)
-        self._registerRenderer(config)
-        view = lambda *arg: 'OK'
-        config.add_route('name', 'path', view=view,
-                         view_renderer='files/minimal.txt')
-        request_type = self._getRouteRequestIface(config, 'name')
-        wrapper = self._getViewCallable(config, None, request_type)
-        self._assertRoute(config, 'name', 'path')
-        self.assertEqual(wrapper(None, None).body, b'Hello!')
-
-    def test_add_route_with_view_attr(self):
-        from pyramid.renderers import null_renderer
-        config = self._makeOne(autocommit=True)
-        self._registerRenderer(config)
-        class View(object):
-            def __init__(self, context, request):
-                pass
-            def alt(self):
-                return 'OK'
-        config.add_route('name', 'path', view=View, view_attr='alt',
-                         view_renderer=null_renderer)
-        request_type = self._getRouteRequestIface(config, 'name')
-        wrapper = self._getViewCallable(config, None, request_type)
-        self._assertRoute(config, 'name', 'path')
-        request = self._makeRequest(config)
-        self.assertEqual(wrapper(None, request), 'OK')
-
-    def test_add_route_with_view_renderer_alias(self):
-        config = self._makeOne(autocommit=True)
-        self._registerRenderer(config)
-        view = lambda *arg: 'OK'
-        config.add_route('name', 'path', view=view,
-                         renderer='files/minimal.txt')
-        request_type = self._getRouteRequestIface(config, 'name')
-        wrapper = self._getViewCallable(config, None, request_type)
-        self._assertRoute(config, 'name', 'path')
-        self.assertEqual(wrapper(None, None).body, b'Hello!')
-
-    def test_add_route_with_view_permission(self):
-        from pyramid.interfaces import IAuthenticationPolicy
-        from pyramid.interfaces import IAuthorizationPolicy
-        config = self._makeOne(autocommit=True)
-        policy = lambda *arg: None
-        config.registry.registerUtility(policy, IAuthenticationPolicy)
-        config.registry.registerUtility(policy, IAuthorizationPolicy)
-        view = lambda *arg: 'OK'
-        config.add_route('name', 'path', view=view, view_permission='edit')
-        request_type = self._getRouteRequestIface(config, 'name')
-        wrapper = self._getViewCallable(config, None, request_type)
-        self._assertRoute(config, 'name', 'path')
-        self.assertTrue(hasattr(wrapper, '__call_permissive__'))
-
-    def test_add_route_with_view_permission_alias(self):
-        from pyramid.interfaces import IAuthenticationPolicy
-        from pyramid.interfaces import IAuthorizationPolicy
-        config = self._makeOne(autocommit=True)
-        policy = lambda *arg: None
-        config.registry.registerUtility(policy, IAuthenticationPolicy)
-        config.registry.registerUtility(policy, IAuthorizationPolicy)
-        view = lambda *arg: 'OK'
-        config.add_route('name', 'path', view=view, permission='edit')
-        request_type = self._getRouteRequestIface(config, 'name')
-        wrapper = self._getViewCallable(config, None, request_type)
-        self._assertRoute(config, 'name', 'path')
-        self.assertTrue(hasattr(wrapper, '__call_permissive__'))
-
-    def test_conflict_route_with_view(self):
-        config = self._makeOne()
-        def view1(request): pass
-        def view2(request): pass
-        config.add_route('a', '/a', view=view1)
-        config.add_route('a', '/a', view=view2)
-        try:
-            config.commit()
-        except ConfigurationConflictError as why:
-            c1, c2 = _conflictFunctions(why)
-            self.assertEqual(c1, 'test_conflict_route_with_view')
-            self.assertEqual(c2, 'test_conflict_route_with_view')
-        else: # pragma: no cover
-            raise AssertionError
-
 class TestConfigurator_add_directive(unittest.TestCase):
 
     def setUp(self):
@@ -1496,6 +1254,39 @@ class TestConfigurator_add_directive(unittest.TestCase):
         self.assertEqual(action['callable'], None)
         self.assertEqual(action['args'], config2.package)
 
+class TestConfigurator__add_predicate(unittest.TestCase):
+    def _makeOne(self):
+        from pyramid.config import Configurator
+        return Configurator()
+
+    def test_factory_as_object(self):
+        config = self._makeOne()
+
+        def _fakeAction(discriminator, callable=None, args=(), kw=None,
+                        order=0, introspectables=(), **extra):
+            self.assertEqual(len(introspectables), 1)
+            self.assertEqual(introspectables[0]['name'], 'testing')
+            self.assertEqual(introspectables[0]['factory'], DummyPredicate)
+
+        config.action = _fakeAction
+        config._add_predicate('route', 'testing', DummyPredicate)
+
+    def test_factory_as_dotted_name(self):
+        config = self._makeOne()
+
+        def _fakeAction(discriminator, callable=None, args=(),
+                        kw=None, order=0, introspectables=(), **extra):
+            self.assertEqual(len(introspectables), 1)
+            self.assertEqual(introspectables[0]['name'], 'testing')
+            self.assertEqual(introspectables[0]['factory'], DummyPredicate)
+
+        config.action = _fakeAction
+        config._add_predicate(
+            'route',
+            'testing',
+            'pyramid.tests.test_config.test_init.DummyPredicate'
+            )
+        
 class TestActionState(unittest.TestCase):
     def _makeOne(self):
         from pyramid.config import ActionState
@@ -2010,3 +1801,5 @@ class DummyIntrospectable(object):
     def register(self, introspector, action_info):
         self.registered.append((introspector, action_info))
         
+class DummyPredicate(object):
+    pass

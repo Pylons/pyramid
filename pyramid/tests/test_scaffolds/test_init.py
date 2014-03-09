@@ -7,19 +7,19 @@ class TestPyramidTemplate(unittest.TestCase):
 
     def test_pre(self):
         inst = self._makeOne()
-        vars = {'package':'one'}
+        vars = {'package':'one', 'package_full_name': 'b.one'}
         inst.pre('command', 'output dir', vars)
         self.assertTrue(vars['random_string'])
         self.assertEqual(vars['package_logger'], 'one')
 
     def test_pre_site(self):
         inst = self._makeOne()
-        vars = {'package':'site'}
+        vars = {'package':'site', 'package_full_name': 'c.site'}
         self.assertRaises(ValueError, inst.pre, 'command', 'output dir', vars)
         
     def test_pre_root(self):
         inst = self._makeOne()
-        vars = {'package':'root'}
+        vars = {'package':'root', 'package_full_name': 'd.root'}
         inst.pre('command', 'output dir', vars)
         self.assertTrue(vars['random_string'])
         self.assertEqual(vars['package_logger'], 'app')

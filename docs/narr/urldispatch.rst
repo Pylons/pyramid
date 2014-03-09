@@ -399,13 +399,6 @@ process.  Examples of route predicate arguments are ``pattern``, ``xhr``, and
 Other arguments are ``name`` and ``factory``.  These arguments represent
 neither predicates nor view configuration information.
 
-.. warning::
-
-   Some arguments are view-configuration related arguments, such as
-   ``view_renderer``.  These only have an effect when the route configuration
-   names a ``view`` and these arguments have been deprecated as of
-   :app:`Pyramid` 1.1.
-
 .. index::
    single: route matching
 
@@ -499,7 +492,7 @@ The simplest route declaration which configures a route match to *directly*
 result in a particular view callable being invoked:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
     config.add_route('idea', 'site/{id}')
     config.add_view('mypackage.views.site_view', route_name='idea')
@@ -908,7 +901,7 @@ Details of the route matching decision for a particular request to the
 which you started the application from.  For example:
 
 .. code-block:: text
-   :linenos:
+    :linenos:
 
     $ PYRAMID_DEBUG_ROUTEMATCH=true $VENV/bin/pserve development.ini
     Starting server in PID 13586.
@@ -1067,7 +1060,7 @@ A custom route predicate may also *modify* the ``match`` dictionary.  For
 instance, a predicate might do some type conversion of values:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
     def integers(*segment_names):
         def predicate(info, request):
@@ -1093,7 +1086,7 @@ To avoid the try/except uncertainty, the route pattern can contain regular
 expressions specifying requirements for that marker. For instance:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
     def integers(*segment_names):
         def predicate(info, request):
@@ -1135,7 +1128,7 @@ name.  The ``pattern`` attribute is the route pattern.  An example of using
 the route in a set of route predicates:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
     def twenty_ten(info, request):
         if info['route'].name in ('ymd', 'ym', 'y'):
@@ -1190,9 +1183,10 @@ still easily do it by wrapping it in classmethod call.
 Same will work with staticmethod, just use ``staticmethod`` instead of
 ``classmethod``.
 
+.. seealso::
 
-See also :class:`pyramid.interfaces.IRoute` for more API documentation about
-route objects.
+    See also :class:`pyramid.interfaces.IRoute` for more API documentation
+    about route objects.
 
 .. index::
    single: route factory

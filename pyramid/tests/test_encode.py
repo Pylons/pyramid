@@ -41,6 +41,18 @@ class UrlEncodeTests(unittest.TestCase):
         result = self._callFUT({'a':1})
         self.assertEqual(result, 'a=1')
 
+    def test_None_value(self):
+        result = self._callFUT([('a', None)])
+        self.assertEqual(result, 'a=')
+
+    def test_None_value_with_prefix(self):
+        result = self._callFUT([('a', '1'), ('b', None)])
+        self.assertEqual(result, 'a=1&b=')
+
+    def test_None_value_with_prefix_values(self):
+        result = self._callFUT([('a', '1'), ('b', None), ('c', None)])
+        self.assertEqual(result, 'a=1&b=&c=')
+
 class URLQuoteTests(unittest.TestCase):
     def _callFUT(self, val, safe=''):
         from pyramid.encode import url_quote
@@ -60,3 +72,8 @@ class URLQuoteTests(unittest.TestCase):
         la = b'La/Pe\xc3\xb1a'
         result = self._callFUT(la, '/')
         self.assertEqual(result, 'La/Pe%C3%B1a')
+
+    def test_it_with_nonstr_nonbinary(self):
+        la = None
+        result = self._callFUT(la, '/')
+        self.assertEqual(result, 'None')

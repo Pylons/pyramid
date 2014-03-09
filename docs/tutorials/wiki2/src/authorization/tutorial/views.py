@@ -14,15 +14,15 @@ from pyramid.view import (
 from pyramid.security import (
     remember,
     forget,
-    authenticated_userid,
     )
+
+from .security import USERS
 
 from .models import (
     DBSession,
     Page,
     )
 
-from .security import USERS
 
 # regular expression used to find WikiWords
 wikiwords = re.compile(r"\b([A-Z]\w+[A-Z]+\w+)")
@@ -55,7 +55,7 @@ def view_page(request):
     content = wikiwords.sub(check, content)
     edit_url = request.route_url('edit_page', pagename=pagename)
     return dict(page=page, content=content, edit_url=edit_url,
-                logged_in=authenticated_userid(request))
+                logged_in=request.authenticated_userid)
 
 @view_config(route_name='add_page', renderer='templates/edit.pt',
              permission='edit')
@@ -63,14 +63,14 @@ def add_page(request):
     pagename = request.matchdict['pagename']
     if 'form.submitted' in request.params:
         body = request.params['body']
-        page = Page(pagename, body)
+        page = Page(name=pagename, data=body)
         DBSession.add(page)
         return HTTPFound(location = request.route_url('view_page',
                                                       pagename=pagename))
     save_url = request.route_url('add_page', pagename=pagename)
-    page = Page('', '')
+    page = Page(name='', data='')
     return dict(page=page, save_url=save_url,
-                logged_in=authenticated_userid(request))
+                logged_in=request.authenticated_userid)
 
 @view_config(route_name='edit_page', renderer='templates/edit.pt',
              permission='edit')
@@ -84,8 +84,8 @@ def edit_page(request):
                                                       pagename=pagename))
     return dict(
         page=page,
-        save_url = request.route_url('edit_page', pagename=pagename),
-        logged_in=authenticated_userid(request),
+        save_url=request.route_url('edit_page', pagename=pagename),
+        logged_in=request.authenticated_userid
         )
 
 @view_config(route_name='login', renderer='templates/login.pt')

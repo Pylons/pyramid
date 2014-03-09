@@ -13,7 +13,11 @@
 
 .. autoclass:: JSON
 
+   .. automethod:: add_adapter
+
 .. autoclass:: JSONP
+
+   .. automethod:: add_adapter
 
 .. attribute:: null_renderer
 

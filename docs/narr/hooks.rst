@@ -363,7 +363,7 @@ and modify the set of :term:`renderer globals` before they are passed to a
 that can be used for this purpose.  For example:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
     from pyramid.events import subscriber
     from pyramid.events import BeforeRender
@@ -372,10 +372,8 @@ that can be used for this purpose.  For example:
     def add_global(event):
         event['mykey'] = 'foo'
 
-An object of this type is sent as an event just before a :term:`renderer` is
-invoked (but *after* the application-level renderer globals factory added via
-:class:`~pyramid.config.Configurator.set_renderer_globals_factory`, if any,
-has injected its own keys into the renderer globals dictionary).
+An object of this type is sent as an event just before a :term:`renderer`
+is invoked.
 
 If a subscriber attempts to add a key that already exist in the renderer
 globals dictionary, a :exc:`KeyError` is raised.  This limitation is enforced
@@ -417,66 +415,6 @@ your view callable, like so:
 See the API documentation for the :class:`~pyramid.events.BeforeRender` event
 interface at :class:`pyramid.interfaces.IBeforeRender`.
 
-Another (deprecated) mechanism which allows event subscribers more control
-when adding renderer global values exists in :ref:`adding_renderer_globals`.
-
-.. index::
-   single: adding renderer globals
-
-.. _adding_renderer_globals:
-
-Adding Renderer Globals (Deprecated)
-------------------------------------
-
-.. deprecated:: 1.1
-   An alternative mechanism which allows event subscribers to add renderer
-   global values is documented in :ref:`beforerender_event`.
-
-Whenever :app:`Pyramid` handles a request to perform a rendering (after a
-view with a ``renderer=`` configuration attribute is invoked, or when any of
-the methods beginning with ``render`` within the :mod:`pyramid.renderers`
-module are called), *renderer globals* can be injected into the *system*
-values sent to the renderer.  By default, no renderer globals are injected,
-and the "bare" system values (such as ``request``, ``context``, ``view``, and
-``renderer_name``) are the only values present in the system dictionary
-passed to every renderer.
-
-A callback that :app:`Pyramid` will call every time a renderer is invoked can
-be added by passing a ``renderer_globals_factory`` argument to the
-constructor of the :term:`configurator`.  This callback can either be a
-callable object or a :term:`dotted Python name` representing such a callable.
-
-.. code-block:: python
-   :linenos:
-
-   def renderer_globals_factory(system):
-       return {'a': 1}
-
-   config = Configurator(
-            renderer_globals_factory=renderer_globals_factory)
-
-Such a callback must accept a single positional argument (notionally named
-``system``) which will contain the original system values.  It must return a
-dictionary of values that will be merged into the system dictionary.  See
-:ref:`renderer_system_values` for description of the values present in the
-system dictionary.
-
-If you're doing imperative configuration, and you'd rather do it after you've
-already constructed a :term:`configurator` it can also be registered via the
-:meth:`pyramid.config.Configurator.set_renderer_globals_factory` method:
-
-.. code-block:: python
-   :linenos:
-
-   from pyramid.config import Configurator
-
-   def renderer_globals_factory(system):
-       return {'a': 1}
-
-   config = Configurator()
-   config.set_renderer_globals_factory(renderer_globals_factory)
-
-
 .. index::
    single: response callback
 
@@ -514,7 +452,7 @@ callback will be an exception object instead of its default value of
 ``None``.
 
 Response callbacks are called in the order they're added
-(first-to-most-recently-added).  All response callbacks are called *after*
+(first-to-most-recently-added).  All response callbacks are called *before*
 the :class:`~pyramid.events.NewResponse` event is sent.  Errors raised by
 response callbacks are not handled specially.  They will be propagated to the
 caller of the :app:`Pyramid` router application.
@@ -1025,8 +963,8 @@ For full details, please read the `Venusian documentation
 
 .. _registering_tweens:
 
-Registering "Tweens"
---------------------
+Registering Tweens
+------------------
 
 .. versionadded:: 1.2
    Tweens
@@ -1038,26 +976,80 @@ feature that may be used by Pyramid framework extensions, to provide, for
 example, Pyramid-specific view timing support bookkeeping code that examines
 exceptions before they are returned to the upstream WSGI application.  Tweens
 behave a bit like :term:`WSGI` :term:`middleware` but they have the benefit of
-running in a context in which they have access to the Pyramid
-:term:`application registry` as well as the Pyramid rendering machinery.
+running in a context in which they have access to the Pyramid :term:`request`,
+:term:`response` and :term:`application registry` as well as the Pyramid
+rendering machinery.
 
-Creating a Tween Factory
-~~~~~~~~~~~~~~~~~~~~~~~~
+Creating a Tween
+~~~~~~~~~~~~~~~~
 
-To make use of tweens, you must construct a "tween factory".  A tween factory
+To create a tween, you must write a "tween factory".  A tween factory
 must be a globally importable callable which accepts two arguments:
 ``handler`` and ``registry``.  ``handler`` will be the either the main
 Pyramid request handling function or another tween.  ``registry`` will be the
 Pyramid :term:`application registry` represented by this Configurator.  A
-tween factory must return a tween when it is called.
+tween factory must return the tween (a callable object) when it is called.
 
-A tween is a callable which accepts a :term:`request` object and returns
-a :term:`response` object.
+A tween is called with a single argument, ``request``, which is the
+:term:`request` created by Pyramid's router when it receives a WSGI request.
+A tween should return a :term:`response`, usually the one generated by the
+downstream Pyramid application.
 
-Here's an example of a tween factory:
+You can write the tween factory as a simple closure-returning function:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
+
+    def simple_tween_factory(handler, registry):
+        # one-time configuration code goes here
+
+        def simple_tween(request):
+            # code to be executed for each request before
+            # the actual application code goes here
+
+            response = handler(request)
+
+            # code to be executed for each request after
+            # the actual application code goes here
+
+            return response
+
+        return simple_tween
+
+Alternatively, the tween factory can be a class with the ``__call__`` magic
+method:
+
+.. code-block:: python
+    :linenos:
+
+    class simple_tween_factory(object):
+        def __init__(handler, registry):
+            self.handler = handler
+            self.registry = registry
+
+            # one-time configuration code goes here
+
+        def __call__(self, request):
+            # code to be executed for each request before
+            # the actual application code goes here
+
+            response = self.handler(request)
+
+            # code to be executed for each request after
+            # the actual application code goes here
+
+            return response
+
+The closure style performs slightly better and enables you to conditionally
+omit the tween from the request processing pipeline (see the following timing
+tween example), whereas the class style makes it easier to have shared mutable
+state, and it allows subclassing.
+
+Here's a complete example of a tween that logs the time spent processing each
+request:
+
+.. code-block:: python
+    :linenos:
 
     # in a module named myapp.tweens
 
@@ -1084,12 +1076,6 @@ Here's an example of a tween factory:
         # handler
         return handler
 
-If you remember, a tween is an object which accepts a :term:`request` object
-and which returns a :term:`response` argument.  The ``request`` argument to a
-tween will be the request created by Pyramid's router when it receives a WSGI
-request.  The response object will be generated by the downstream Pyramid
-application and it should be returned by the tween.
-
 In the above example, the tween factory defines a ``timing_tween`` tween and
 returns it if ``asbool(registry.settings.get('do_timing'))`` is true.  It
 otherwise simply returns the handler it was given.  The ``registry.settings``
@@ -1115,7 +1101,7 @@ Here's an example of registering a tween factory as an "implicit" tween in a
 Pyramid application:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
     from pyramid.config import Configurator
     config = Configurator()
@@ -1149,7 +1135,7 @@ chain (the tween generated by the very last tween factory added) as its
 request handler function.  For example:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
     from pyramid.config import Configurator
 
@@ -1194,8 +1180,10 @@ Allowable values for ``under`` or ``over`` (or both) are:
   fallbacks if the desired tween is not included, as well as compatibility
   with multiple other tweens.
 
-Effectively, ``under`` means "closer to the main Pyramid application than",
-``over`` means "closer to the request ingress than".
+Effectively, ``over`` means "closer to the request ingress than" and
+``under`` means "closer to the main Pyramid application than".
+You can think of an onion with outer layers over the inner layers,
+the application being under all the layers at the center.
 
 For example, the following call to
 :meth:`~pyramid.config.Configurator.add_tween` will attempt to place the
@@ -1384,12 +1372,14 @@ The first argument to :meth:`pyramid.config.Configurator.add_view_predicate`,
 the name, is a string representing the name that is expected to be passed to
 ``view_config`` (or its imperative analogue ``add_view``).
 
-The second argument is a view or route predicate factory.  A view or route
-predicate factory is most often a class with a constructor (``__init__``), a
-``text`` method, a ``phash`` method and a ``__call__`` method.  For example:
+The second argument is a view or route predicate factory, or a :term:`dotted
+Python name` which refers to a view or route predicate factory.  A view or
+route predicate factory is most often a class with a constructor
+(``__init__``), a ``text`` method, a ``phash`` method and a ``__call__``
+method. For example:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
     class ContentTypePredicate(object):
         def __init__(self, val, config):
@@ -1452,7 +1442,7 @@ with a subscriber that subscribes to the :class:`pyramid.events.NewRequest`
 event type.
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
     class RequestPathStartsWith(object):
         def __init__(self, val, config):
@@ -1481,7 +1471,7 @@ previously registered ``request_path_startswith`` predicate in a call to
 :meth:`~pyramid.config.Configurator.add_subscriber`:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
     # define a subscriber in your code
 
@@ -1497,7 +1487,7 @@ Here's the same subscriber/predicate/event-type combination used via
 :class:`~pyramid.events.subscriber`.
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
     from pyramid.events import subscriber
 

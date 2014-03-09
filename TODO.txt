@@ -12,9 +12,6 @@ Nice-to-Have
 
 - Have action methods return their discriminators.
 
-- Fix renderers chapter to better document system values passed to template
-  renderers.
-
 - Modify view mapper narrative docs to not use pyramid_handlers.
 
 - Modify the urldispatch chapter examples to assume a scan rather than
@@ -40,8 +37,6 @@ Nice-to-Have
   view (but didn't try exhaustively).
 
 - Add narrative docs for wsgiapp and wsgiapp2.
-
-- Flesh out "Paste" narrative docs chapter.
 
 - Basic WSGI documentation (pipeline / app / server).
 
@@ -121,26 +116,16 @@ Nice-to-Have
 Future
 ------
 
-- 1.5: remove ``pyramid.view.static`` and ``pyramid.view.is_response``.
-
-- 1.5: turn ``pyramid.settings.Settings`` into a function that returns the
+- 1.6: turn ``pyramid.settings.Settings`` into a function that returns the
   original dict (after ``__getattr__`` deprecation period, it was deprecated
   in 1.2).
-
-- 1.5: Remove ``pyramid.requests.DeprecatedRequestMethodsMixin`` and code in
-  renderers module that looks for _response_content_type, et. al.
-
-- 1.5: Maybe? deprecate set_request_property in favor of pointing people at
-  add_request_method, schedule removal for 1.8?
-
-- 1.5: Remove pyramid.config.rendering set_renderer_globals_factory maybe.
-
-- 1.5: remove pyramid.config.route _add_view_from_route function.
 
 - 1.6: Remove IContextURL and TraversalContextURL.
 
 - 1.7: Change ``pyramid.authentication.AuthTktAuthenticationPolicy`` default
   ``hashalg`` to ``sha512``.
+
+- 1.8 Remove set_request_property.
 
 Probably Bad Ideas
 ------------------

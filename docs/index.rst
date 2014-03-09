@@ -20,7 +20,8 @@ After you install :app:`Pyramid` and run this application, when you visit
 See :ref:`firstapp_chapter` for a full explanation of how this application
 works. Read the :ref:`html_narrative_documentation` to understand how
 :app:`Pyramid` is designed to scale from simple applications like this to
-very large web applications.
+very large web applications.  To just dive in headfirst, read the 
+:doc:`quick_tour`.
 
 Front Matter
 ============
@@ -43,9 +44,13 @@ up to speed right away.
    :hidden:
 
    quick_tour
+   quick_tutorial/index
 
 * :doc:`quick_tour` goes through the major features in Pyramid, covering
   a little about a lot.
+
+* :doc:`quick_tutorial/index` does the same, but in a tutorial format:
+  deeper treatment of each topic and with working code.
 
 * To see a minimal Pyramid web application, check out
   :ref:`firstapp_chapter`.
@@ -126,7 +131,6 @@ platforms.
 
    tutorials/wiki2/index.rst
    tutorials/wiki/index.rst
-   tutorials/bfg/index.rst
    tutorials/modwsgi/index.rst
 
 .. _html_api_documentation:

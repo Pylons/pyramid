@@ -6,8 +6,11 @@ python:
   - 2.7
   - pypy
   - 3.2
+  - 3.3
 
-script: python setup.py test
+install: python setup.py dev
+
+script: python setup.py test -q
 
 notifications:
   email:

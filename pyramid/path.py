@@ -33,8 +33,12 @@ def package_name(pkg_or_module):
     name of the package itself."""
     if pkg_or_module is None or pkg_or_module.__name__ == '__main__':
         return '__main__'
-    pkg_filename = pkg_or_module.__file__
     pkg_name = pkg_or_module.__name__
+    pkg_filename = getattr(pkg_or_module, '__file__', None)
+    if pkg_filename is None:
+        # Namespace packages do not have __init__.py* files,
+        # and so have no __file__ attribute
+        return pkg_name
     splitted = os.path.split(pkg_filename)
     if splitted[-1] in init_names:
         # it's a package

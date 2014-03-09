@@ -387,12 +387,12 @@ explicit tweens defined in its ``development.ini`` file:
 
    Implicit Tween Chain (not used)
 
-   Position    Name                                                Alias
-   --------    ----                                                -----
-   -           -                                                   INGRESS
-   0           pyramid_debugtoolbar.toolbar.toolbar_tween_factory  pdbt
-   1           pyramid.tweens.excview_tween_factory                excview
-   -           -                                                   MAIN
+   Position    Name
+   --------    ----
+   -           INGRESS
+   0           pyramid_debugtoolbar.toolbar.toolbar_tween_factory
+   1           pyramid.tweens.excview_tween_factory
+   -           MAIN
 
 Here's the application configuration section of the ``development.ini`` used
 by the above ``ptweens`` command which reports that the explicit tween chain
@@ -473,6 +473,17 @@ using the ``-m`` (aka ``--method``) option.  ``GET``, ``HEAD``, ``POST`` and
 input of the ``prequest`` process is used as the ``POST`` body::
 
    $ $VENV/bin/prequest -mPOST development.ini / < somefile
+
+Using Custom Arguments to Python when Running ``p*`` Scripts
+------------------------------------------------------------
+
+.. versionadded:: 1.5
+
+Each of Pyramid's console scripts (``pserve``, ``pviews``, etc) can be run
+directly using ``python -m``, allowing custom arguments to be sent to the
+python interpreter at runtime. For example::
+
+      python -3 -m pyramid.scripts.pserve development.ini
 
 Showing All Installed Distributions and their Versions
 ------------------------------------------------------

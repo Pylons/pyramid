@@ -121,7 +121,9 @@ ways.
 
 .. literalinclude:: helloworld.py
 
-See also :ref:`firstapp_chapter`.
+.. seealso::
+
+    See also :ref:`firstapp_chapter`.
 
 Decorator-based configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -176,8 +178,13 @@ static file server in production without changing any code.
 
 Example: :ref:`static_assets_section`.
 
-Debug Toolbar
-~~~~~~~~~~~~~
+Fully Interactive Development
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When developing a Pyramid application, several interactive features are
+available. Pyramid can automatically utilize changed templates when rendering
+pages and automatically restart the application to incorporate changed python
+code. Plain old ``print()`` calls used for debugging can display to a console.
 
 Pyramid's debug toolbar comes activated when you use a Pyramid scaffold to
 render a project.  This toolbar overlays your application in the browser, and
@@ -266,7 +273,9 @@ Here's a few views defined as methods of a class instead:
        def view_two(self):
            return Response('two')
 
-See also :ref:`view_config_placement`.
+.. seealso::
+
+    See also :ref:`view_config_placement`.
 
 .. _intro_asset_specs:
 
@@ -321,10 +330,17 @@ assertion instead that the view returns "the right stuff" in the dictionary
 it returns.  You can write "real" unit tests instead of functionally testing
 all of your views.
 
-For example, instead of:
+.. index::
+   pair: renderer; explicitly calling
+   pair: view renderer; explictly calling
+
+.. _example_render_to_response_call:
+
+For example, instead of returning a ``Response`` object from a
+``render_to_response`` call:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
     from pyramid.renderers import render_to_response
 
@@ -332,10 +348,10 @@ For example, instead of:
         return render_to_response('myapp:templates/mytemplate.pt', {'a':1},
                                   request=request)
 
-You can do this:
+You can return a Python dictionary:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
     from pyramid.view import view_config
 
@@ -405,12 +421,12 @@ Sessions
 
 Pyramid has built-in HTTP sessioning.  This allows you to associate data with
 otherwise anonymous users between requests.  Lots of systems do this.  But
-Pyramid also allows you to plug in your own sessioning system by creating
-some code that adheres to a documented interface.  Currently there is a
-binding package for the third-party Beaker sessioning system that does exactly
-this.  But if you have a specialized need (perhaps you want to store your
-session data in MongoDB), you can.  You can even switch between
-implementations without changing your application code.
+Pyramid also allows you to plug in your own sessioning system by creating some
+code that adheres to a documented interface.  Currently there is a binding
+package for the third-party Redis sessioning system that does exactly this.
+But if you have a specialized need (perhaps you want to store your session data
+in MongoDB), you can.  You can even switch between implementations without
+changing your application code.
 
 Example: :ref:`sessions_chapter`.
 
@@ -560,7 +576,10 @@ For example:
       config.include('pyramid_exclog')
       config.include('some.other.guys.package', route_prefix='/someotherguy')
 
-See also :ref:`including_configuration` and :ref:`building_an_extensible_app`
+.. seealso::
+
+    See also :ref:`including_configuration` and
+    :ref:`building_an_extensible_app`.
 
 Flexible authentication and authorization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -718,7 +737,9 @@ Pyramid defaults to explicit behavior, because it's the most generally
 useful, but provides hooks that allow you to adapt the framework to localized
 aesthetic desires.
 
-See also :ref:`using_iresponse`.
+.. seealso::
+
+    See also :ref:`using_iresponse`.
 
 "Global" response object
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -736,7 +757,9 @@ section," you say.  Fine.  Be that way:
        response.content_type = 'text/plain'
        return response
 
-See also :ref:`request_response_attr`.
+.. seealso::
+
+    See also :ref:`request_response_attr`.
 
 Automating repetitive configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -777,7 +800,7 @@ automate some of the tedium away:
        for method in ('GET', 'POST', 'HEAD'):
            view = getattr(module, 'xhr_%s_view' % method, None)
            if view is not None:
-               config.add_view(view, route_name='xhr_route', xhr=True, 
+               config.add_view(view, route_name='xhr_route', xhr=True,
                               permission='view', request_method=method)
 
    config = Configurator()
@@ -799,7 +822,9 @@ it up and calling :meth:`~pyramid.config.Configurator.add_directive` from
 within a function called when another user uses the
 :meth:`~pyramid.config.Configurator.include` method against your code.
 
-See also :ref:`add_directive`.
+.. seealso::
+
+    See also :ref:`add_directive`.
 
 Programmatic Introspection
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -815,7 +840,7 @@ Here's an example of using Pyramid's introspector from within a view
 callable:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
     from pyramid.view import view_config
     from pyramid.response import Response
@@ -827,7 +852,9 @@ callable:
         route_intr = introspector.get('routes', route_name)
         return Response(str(route_intr['pattern']))
 
-See also :ref:`using_introspection`.
+.. seealso::
+
+    See also :ref:`using_introspection`.
 
 Python 3 Compatibility
 ~~~~~~~~~~~~~~~~~~~~~~

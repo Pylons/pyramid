@@ -78,7 +78,6 @@ Tutorials
 
    tutorials/wiki2/index.rst
    tutorials/wiki/index.rst
-   tutorials/bfg/index.rst
    tutorials/modwsgi/index.rst
 
 .. _api_documentation:

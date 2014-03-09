@@ -1,4 +1,5 @@
 from pyramid.httpexceptions import (
+    HTTPBadRequest,
     HTTPNotFound,
     HTTPForbidden,
     )
@@ -7,6 +8,20 @@ NotFound = HTTPNotFound # bw compat
 Forbidden = HTTPForbidden # bw compat
 
 CR = '\n'
+
+class BadCSRFToken(HTTPBadRequest):
+    """
+    This exception indicates the request has failed cross-site request
+    forgery token validation.
+    """
+    title = 'Bad CSRF Token'
+    explanation = (
+        'Access is denied.  This server can not verify that your cross-site '
+        'request forgery token belongs to your login session.  Either you '
+        'supplied the wrong cross-site request forgery token or your session '
+        'no longer exists.  This may be due to session timeout or because '
+        'browser is not supplying the credentials required, as can happen '
+        'when the browser has cookies turned off.')
 
 class PredicateMismatch(HTTPNotFound):
     """

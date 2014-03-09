@@ -419,7 +419,7 @@ hierarchical: sections within sections within sections, ad infinitum.  If you
 want your URLs to indicate this structure, and the structure is indefinite
 (the number of nested sections can be "N" instead of some fixed number), a
 resource tree is an excellent way to model this, even if the backend is a
-relational database.  In this situation, the resource tree a just a site
+relational database.  In this situation, the resource tree is just a site
 structure.
 
 Traversal also offers better composability of applications than URL dispatch,
@@ -537,7 +537,11 @@ text indexing.  It does not dictate how you arrange your code.
 
 Such opinionated functionality exists in applications and frameworks built
 *on top* of :app:`Pyramid`.  It's intended that higher-level systems emerge
-built using :app:`Pyramid` as a base.  See also :ref:`apps_are_extensible`.
+built using :app:`Pyramid` as a base.
+
+.. seealso::
+
+    See also :ref:`apps_are_extensible`.
 
 Pyramid Provides Too Many "Rails"
 ---------------------------------
@@ -594,55 +598,45 @@ requires extensibility because it must be deployed in multiple locations.
 Pyramid Is Too Big
 ------------------
 
-"The :app:`Pyramid` compressed tarball is almost 2MB.  It must be
+"The :app:`Pyramid` compressed tarball is larger than 2MB.  It must be
 enormous!"
 
-No.  We just ship it with test code and helper templates.  Here's a
+No.  We just ship it with docs, test code, and scaffolding.  Here's a
 breakdown of what's included in subdirectories of the package tree:
 
 docs/
 
-  3.0MB
+  4.9MB
 
 pyramid/tests/
 
-  1.1MB
+  2.0MB
 
-pyramid/paster_templates/
+pyramid/scaffolds/
 
-  804KB
+  460KB
 
-pyramid/ (except for ``pyramd/tests and pyramid/paster_templates``)
+pyramid/ (except for ``pyramd/tests`` and ``pyramid/scaffolds``)
 
-  539K
+  844KB
 
-The actual :app:`Pyramid` runtime code is about 10% of the total size of the
-tarball omitting docs, helper templates used for package generation, and test
-code.  Of the approximately 19K lines of Python code in the package, the code
+Of the approximately 34K lines of Python code in the package, the code
 that actually has a chance of executing during normal operation, excluding
-tests and paster template Python files, accounts for approximately 5K lines
-of Python code.  This is comparable to Pylons 1.X, which ships with a little
-over 2K lines of Python code, excluding tests.
+tests and scaffolding Python files, accounts for approximately 10K lines.
+
 
 Pyramid Has Too Many Dependencies
 ---------------------------------
 
-This is true.  At the time of this writing (Pyramid 1.3), the total number of
-Python package distributions that :app:`Pyramid` depends upon transitively is
-if you use Python 3.2 or Python 2.7 is 10.  If you use Python 2.6, Pyramid
-will pull in 12 package distributions.  This is a lot more than zero package
-distribution dependencies: a metric which various Python microframeworks and
-Django boast.
+Over time, we've made lots of progress on reducing the number of packaging
+dependencies Pyramid has had.  Pyramid 1.2 had 15 of them.  Pyramid 1.3 and 1.4
+had 12 of them.  The current release as of this writing, Pyramid 1.5, has
+only 7.  This number is unlikely to become any smaller.
 
-However, Pyramid 1.2 relied on 15 packages under Python 2.7 and 17 packages
-under Python 2.6, so we've made progress here.  A port to Python 3 completed
-in Pyramid 1.3 helped us shed a good number of dependencies by forcing us to
-make better packaging decisions.
-
-In the future, we may also move templating system dependencies out of the
-core and place them in add-on packages, to be included by developers instead
-of by the framework.  This would reduce the number of core dependencies by
-about five, leaving us with only five remaining core dependencies.
+A port to Python 3 completed in Pyramid 1.3 helped us shed a good number of
+dependencies by forcing us to make better packaging decisions.  Removing
+Chameleon and Mako templating system dependencies in the Pyramid core in 1.5
+let us shed most of the remainder of them.
 
 Pyramid "Cheats" To Obtain Speed
 --------------------------------
@@ -774,7 +768,7 @@ content management system (CMS) may have basic functionality that needs to be
 extended for a particular deployment.  That CMS system may be deployed for
 many organizations at many places.  Some number of deployments of this CMS
 may be deployed centrally by a third party and managed as a group.  It's
-useful to be able to extend such a system for each deployment via preordained
+easier to be able to extend such a system for each deployment via preordained
 plugpoints than it is to continually keep each software branch of the system
 in sync with some upstream source: the upstream developers may change code in
 such a way that your changes to the same codebase conflict with theirs in
@@ -802,8 +796,8 @@ such a feature.
   main template and the CSS in a separate Python package which defines
   overrides.
 
-- If a deployment needs an application page to do something differently needs
-  it to expose more or different information, the deployer may override the
+- If a deployment needs an application page to do something differently, or
+  to expose more or different information, the deployer may override the
   view that renders the page within a separate Python package.
 
 - If a deployment needs an additional feature, the deployer may add a view to
@@ -820,7 +814,7 @@ won't regularly need to deal wth meaningless textual merge conflicts that
 trivial changes to upstream packages often entail when it comes time to
 update the upstream package, because if you extend an application externally,
 there just is no textual merge done.  Your modifications will also, for
-whatever its worth, be contained in one, canonical, well-defined place.
+whatever it's worth, be contained in one, canonical, well-defined place.
 
 Branching an application and continually merging in order to get new features
 and bugfixes is clearly useful.  You can do that with a :app:`Pyramid`
@@ -832,7 +826,7 @@ dismiss this feature in favor of branching and merging because applications
 written in their framework of choice aren't extensible out of the box in a
 comparably fundamental way.
 
-While :app:`Pyramid` application are fundamentally extensible even if you
+While :app:`Pyramid` applications are fundamentally extensible even if you
 don't write them with specific extensibility in mind, if you're moderately
 adventurous, you can also take it a step further.  If you learn more about
 the :term:`Zope Component Architecture`, you can optionally use it to expose
@@ -852,7 +846,7 @@ applications by :app:`Pyramid` are good or bad is mostly pointless. You
 needn't take advantage of the extensibility features provided by a particular
 :app:`Pyramid` application in order to affect a modification for a particular
 set of its deployments.  You can ignore the application's extensibility
-plugpoints entirely, and instead use version control branching and merging to
+plugpoints entirely, and use version control branching and merging to
 manage application deployment modifications instead, as if you were deploying
 an application written using any other web framework.
 
@@ -1088,7 +1082,7 @@ The contents of ``app2.py``:
 The contents of ``config.py``:
 
 .. code-block:: python
-  :linenos:
+    :linenos:
 
     L = []
 
@@ -1659,7 +1653,7 @@ If you can understand this hello world program, you can use Pyramid:
        server = make_server('0.0.0.0', 8080, app)
        server.serve_forever()
 
-Pyramid has ~ 650 pages of documentation (printed), covering topics from the
+Pyramid has ~ 700 pages of documentation (printed), covering topics from the
 very basic to the most advanced.  *Nothing* is left undocumented, quite
 literally.  It also has an *awesome*, very helpful community.  Visit the
 #pyramid IRC channel on freenode.net (irc://freenode.net#pyramid) and see.

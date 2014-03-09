@@ -137,7 +137,7 @@ In the above case, it's line #3 in the ``myproj.views`` module (``from
 pyramid.view import static``) that is causing the problem:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
     from pyramid.view import view_config
 
@@ -148,9 +148,9 @@ The deprecation warning tells me how to fix it, so I can change the code to
 do things the newer way:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-    from pyramid.view. import view_config
+    from pyramid.view import view_config
 
     from pyramid.static import static_view
     myview = static_view('static', 'static', use_subpath=True)

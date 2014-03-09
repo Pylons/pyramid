@@ -27,6 +27,8 @@ from pyramid.registry import Registry
 from pyramid.security import (
     Authenticated,
     Everyone,
+    AuthenticationAPIMixin,
+    AuthorizationAPIMixin,
     )
 
 from pyramid.threadlocal import (
@@ -34,12 +36,8 @@ from pyramid.threadlocal import (
     manager,
     )
 
-from pyramid.request import (
-    DeprecatedRequestMethodsMixin,
-    CallbackMethodsMixin,
-    )
-
 from pyramid.i18n import LocalizerRequestMixin
+from pyramid.request import CallbackMethodsMixin
 from pyramid.url import URLMethodsMixin
 from pyramid.util import InstancePropertyMixin
 
@@ -284,11 +282,15 @@ class DummySession(dict):
             token = self.new_csrf_token()
         return token
 
-        
 @implementer(IRequest)
-class DummyRequest(DeprecatedRequestMethodsMixin, URLMethodsMixin,
-                   CallbackMethodsMixin, InstancePropertyMixin,
-                   LocalizerRequestMixin):
+class DummyRequest(
+    URLMethodsMixin,
+    CallbackMethodsMixin,
+    InstancePropertyMixin,
+    LocalizerRequestMixin,
+    AuthenticationAPIMixin,
+    AuthorizationAPIMixin,
+    ):
     """ A DummyRequest object (incompletely) imitates a :term:`request` object.
 
     The ``params``, ``environ``, ``headers``, ``path``, and
@@ -318,6 +320,7 @@ class DummyRequest(DeprecatedRequestMethodsMixin, URLMethodsMixin,
     method = 'GET'
     application_url = 'http://example.com'
     host = 'example.com:80'
+    domain = 'example.com'
     content_length = 0
     query_string = ''
     charset = 'UTF-8'
@@ -455,18 +458,7 @@ def setUp(registry=None, request=None, hook_zca=True, autocommit=True,
         # someone may be passing us an esoteric "dummy" registry, and
         # the below won't succeed if it doesn't have a registerUtility
         # method.
-        from pyramid.config import DEFAULT_RENDERERS
-        for name, renderer in DEFAULT_RENDERERS:
-            # Cause the default renderers to be registered because
-            # in-the-wild test code relies on being able to call
-            # e.g. ``pyramid.chameleon_zpt.render_template``
-            # without registering a .pt renderer, expecting the "real"
-            # template to be rendered.  This is a holdover from when
-            # individual template system renderers weren't indirected
-            # by the ``pyramid.renderers`` machinery, and
-            # ``render_template`` and friends went behind the back of
-            # any existing renderer factory lookup system.
-            config.add_renderer(name, renderer)
+        config.add_default_renderers()
         config.add_default_view_predicates()
         config.add_default_route_predicates()
     config.commit()

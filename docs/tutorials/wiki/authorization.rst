@@ -56,10 +56,10 @@ returns one of these values:
   return ``None``.
 
 For example, ``groupfinder('editor', request )`` returns ``['group:editor']``,
-``groupfinder('viewer', request)`` returns ``[]``, and ``groupfinder('admin', request)``
-returns ``None``.  We will use ``groupfinder()`` as an :term:`authentication policy`
-"callback" that will provide the :term:`principal` or principals
-for a user.
+``groupfinder('viewer', request)`` returns ``[]``, and ``groupfinder('admin',
+request)`` returns ``None``.  We will use ``groupfinder()`` as an
+:term:`authentication policy` "callback" that will provide the
+:term:`principal` or principals for a user.
 
 In a production system, user and group
 data will most often come from a database, but here we use "dummy"
@@ -149,8 +149,8 @@ to the ``@view_config`` decorator for ``add_page()`` and
 ``edit_page()``, for example:
 
 .. code-block:: python
-   :linenos:
-   :emphasize-lines: 3
+    :linenos:
+    :emphasize-lines: 3
 
     @view_config(name='add_page', context='.models.Wiki',
                  renderer='templates/edit.pt',
@@ -251,18 +251,6 @@ in ``views.py``.
 Return a logged_in flag to the renderer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Add the following line to the import at the head of
-``tutorial/tutorial/views.py``:
-
-.. literalinclude:: src/authorization/tutorial/views.py
-   :lines: 11-15
-   :linenos:
-   :emphasize-lines: 4
-   :language: python
-
-(Only the highlighted line and a trailing comma on the preceding
-line need to be added.)
-
 Add a  ``logged_in`` parameter to the return value of
 ``view_page()``, ``edit_page()`` and  ``add_page()``,
 like this:
@@ -274,14 +262,13 @@ like this:
    return dict(page = page,
                content = content,
                edit_url = edit_url,
-               logged_in = authenticated_userid(request))
+               logged_in = request.authenticated_userid)
 
 (Only the highlighted line and a trailing comma on the preceding
 line need to be added.)
 
-:meth:`~pyramid.security.authenticated_userid()` will return ``None``
-if the user is not authenticated, or a user id if the user is
-authenticated.
+The :meth:`pyramid.request.Request.authenticated_userid` will be ``None`` if
+the user is not authenticated, or a user id if the user is authenticated.
 
 Add a "Logout" link when logged in
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -43,24 +43,23 @@ limitations:
 It is digitally signed, however, and thus its data cannot easily be
 tampered with.
 
-You can configure this session factory in your :app:`Pyramid`
-application by using the ``session_factory`` argument to the
-:class:`~pyramid.config.Configurator` class:
+You can configure this session factory in your :app:`Pyramid` application
+by using the :meth:`pyramid.config.Configurator.set_session_factory`` method.
 
 .. code-block:: python
    :linenos:
 
-   from pyramid.session import UnencryptedCookieSessionFactoryConfig
-   my_session_factory = UnencryptedCookieSessionFactoryConfig('itsaseekreet')
-   
+   from pyramid.session import SignedCookieSessionFactory
+   my_session_factory = SignedCookieSessionFactory('itsaseekreet')
+
    from pyramid.config import Configurator
-   config = Configurator(session_factory = my_session_factory)
+   config = Configurator()
+   config.set_session_factory(my_session_factory)
 
 .. warning:: 
 
-   Note the very long, very explicit name for
-   ``UnencryptedCookieSessionFactoryConfig``.  It's trying to tell you that
-   this implementation is, by default, *unencrypted*.  You should not use it
+   By default the :func:`~pyramid.session.SignedCookieSessionFactory`
+   implementation is *unencrypted*.  You should not use it
    when you keep sensitive information in the session object, as the
    information can be easily read by both users of your application and third
    parties who have access to your users' network traffic.  And if you use this
@@ -98,6 +97,11 @@ example:
            return Response('Fred was in the session')
        else:
            return Response('Fred was not in the session')
+
+The first time this view is invoked produces ``Fred was not in the
+session``.  Subsequent invocations produce ``Fred was in the
+session``, assuming of course that the client side maintains the
+session's identity across multiple requests.
 
 You can use a session much like a Python dictionary.  It supports all
 dictionary methods, along with some extra attributes, and methods.
@@ -146,8 +150,6 @@ Some gotchas:
   you've changed sessioning data.
 
 .. index::
-   single: pyramid_beaker
-   single: Beaker
    single: pyramid_redis_sessions
    single: session factory (alternates)
 
@@ -156,19 +158,24 @@ Some gotchas:
 Using Alternate Session Factories
 ---------------------------------
 
-At the time of this writing, exactly two alternate session factories
-exist.
+The following session factories exist at the time of this writing.
 
-The first is named ``pyramid_redis_sessions``.  It can be downloaded from PyPI.
-It uses Redis as a backend.  It is the recommended persistent session solution
-at the time of this writing.
+======================= ======= =============================
+Session Factory         Backend   Description
+======================= ======= =============================
+pyramid_redis_sessions_ Redis_  Server-side session library
+                                for Pyramid, using Redis for
+                                storage.
+pyramid_beaker_         Beaker_ Session factory for Pyramid
+                                backed by the Beaker
+                                sessioning system.
+======================= ======= =============================
 
-The second is named ``pyramid_beaker``. This is a session factory that uses the
-`Beaker <http://beaker.groovie.org/>`_ library as a backend.  Beaker has
-support for file-based sessions, database based sessions, and encrypted
-cookie-based sessions.  See `the pyramid_beaker documentation
-<http://docs.pylonsproject.org/projects/pyramid_beaker/en/latest/>`_ for more
-information about ``pyramid_beaker``.
+.. _pyramid_redis_sessions: https://pypi.python.org/pypi/pyramid_redis_sessions
+.. _Redis: http://redis.io/
+
+.. _pyramid_beaker: https://pypi.python.org/pypi/pyramid_beaker
+.. _Beaker: http://beaker.readthedocs.org/en/latest/
 
 .. index::
    single: session factory (custom)
@@ -369,25 +376,27 @@ Or, include it as a header in a jQuery AJAX request:
 The handler for the URL that receives the request
 should then require that the correct CSRF token is supplied.
 
-Using the ``session.check_csrf_token`` Method
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Checking CSRF Tokens Manually
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In request handling code, you can check the presence and validity of a CSRF
-token with ``session.check_csrf_token(request)``. If the token is valid,
-it will return True, otherwise it will raise ``HTTPBadRequest``.
+token with :func:`pyramid.session.check_csrf_token(request)``. If the token is
+valid, it will return ``True``, otherwise it will raise ``HTTPBadRequest``.
+Optionally, you can specify ``raises=False`` to have the check return ``False``
+instead of raising an exception.
 
 By default, it checks for a GET or POST parameter named ``csrf_token`` or a
 header named ``X-CSRF-Token``.
 
 .. code-block:: python
 
+    from pyramid.session import check_csrf_token
+
     def myview(request):
-        session = request.session
-
         # Require CSRF Token
-        session.check_csrf_token(request):
+        check_csrf_token(request)
 
-        ...
+        # ...
 
 .. index::
    single: session.new_csrf_token

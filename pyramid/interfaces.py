@@ -361,15 +361,37 @@ class IBeforeRender(IDict):
       def add_global(event):
           event['mykey'] = 'foo'
 
-    See also :ref:`beforerender_event`.
+    .. seealso::
+
+        See also :ref:`beforerender_event`.
     """
     rendering_val = Attribute('The value returned by a view or passed to a '
                               '``render`` method for this rendering. '
                               'This feature is new in Pyramid 1.2.')
 
+class IRendererInfo(Interface):
+    """ An object implementing this interface is passed to every
+    :term:`renderer factory` constructor as its only argument (conventionally
+    named ``info``)"""
+    name = Attribute('The value passed by the user as the renderer name')
+    package = Attribute('The "current package" when the renderer '
+                        'configuration statement was found')
+    type = Attribute('The renderer type name')
+    registry = Attribute('The "current" application registry when the '
+                         'renderer was created')
+    settings = Attribute('The deployment settings dictionary related '
+                         'to the current application')
+
+class IRendererFactory(Interface):
+    def __call__(info):
+        """ Return an object that implements
+        :class:`pyramid.interfaces.IRenderer`. ``info`` is an
+        object that implements :class:`pyramid.interfaces.IRendererInfo`.
+        """
+
 class IRenderer(Interface):
     def __call__(value, system):
-        """ Call a the renderer implementation with the result of the
+        """ Call the renderer with the result of the
         view (``value``) passed in and return a result (a string or
         unicode object useful as a response body).  Values computed by
         the system are passed by the system in the ``system``
@@ -386,6 +408,13 @@ class ITemplateRenderer(IRenderer):
         uses to render the template; it is typically a callable that
         accepts arbitrary keyword arguments and returns a string or
         unicode object """
+
+deprecated(
+    'ITemplateRenderer',
+    'As of Pyramid 1.5 the, "pyramid.interfaces.ITemplateRenderer" interface '
+    'is scheduled to be removed. It was used by the Mako and Chameleon '
+    'renderers which have been split into their own packages.'
+    )
 
 class IViewMapper(Interface):
     def __call__(self, object):
@@ -611,26 +640,13 @@ class ITraverser(Interface):
 
 ITraverserFactory = ITraverser # b / c for 1.0 code
 
-class IRendererFactory(Interface):
-    def __call__(info):
-        """ Return an object that implements ``IRenderer``.  ``info`` is an
-        object that implement ``IRendererInfo``.  """
-
-class IRendererGlobalsFactory(Interface):
-    def __call__(system_values):
-        """ Return a dictionary of global renderer values (aka
-        top-level template names).  The ``system_values`` value passed
-        in will be a dictionary that includes at least a ``request``
-        key, indicating the current request, and the value
-        ``renderer_name``, which will be the name of the renderer in
-        use."""
-
 class IViewPermission(Interface):
     def __call__(context, request):
-        """ Return True if the permission allows, return False if it denies. """
+        """ Return True if the permission allows, return False if it denies.
+        """
 
 class IRouter(Interface):
-    """WSGI application which routes requests to 'view' code based on
+    """ WSGI application which routes requests to 'view' code based on
     a view registry."""
     registry = Attribute(
         """Component architecture registry local to this application.""")
@@ -753,10 +769,10 @@ class IResourceURL(Interface):
         )
 
 class IContextURL(IResourceURL):
-    """ An adapter which deals with URLs related to a context.
-
+    """
     .. deprecated:: 1.3
-       use IResourceURL instead.
+        An adapter which deals with URLs related to a context.  Use
+        :class:`pyramid.interfaces.IResourceURL` instead.
     """
     # this class subclasses IResourceURL because request.resource_url looks
     # for IResourceURL via queryAdapter.  queryAdapter will find a deprecated
@@ -853,19 +869,6 @@ class IPackageOverrides(IPEP302Loader):
 # traversalwrapper)
 VH_ROOT_KEY = 'HTTP_X_VHM_ROOT'
 
-class IChameleonLookup(Interface):
-    translate = Attribute('IChameleonTranslate object')
-    debug = Attribute('The ``debug_templates`` setting for this application')
-    auto_reload = Attribute('The ``reload_templates`` setting for this app')
-    def __call__(self, info):
-        """ Return an ITemplateRenderer based on IRendererInfo ``info`` """
-
-class IChameleonTranslate(Interface):
-    """ Internal interface representing a chameleon translate function """
-    def __call__(msgid, domain=None, mapping=None, context=None,
-                 target_language=None, default=None):
-        """ Translate a mess of arguments to a Unicode object """
-
 class ILocalizer(Interface):
     """ Localizer for a specific language """
 
@@ -953,20 +956,6 @@ class ISession(IDict):
         called, which will create and set a token, and this token will be
         returned.
         """
-
-class IRendererInfo(Interface):
-    """ An object implementing this interface is passed to every
-    :term:`renderer factory` constructor as its only argument (conventionally
-    named ``info``)"""
-    name = Attribute('The value passed by the user as the renderer name')
-    package = Attribute('The "current package" when the renderer '
-                        'configuration statement was found')
-    type = Attribute('The renderer type name')
-    registry = Attribute('The "current" application registry when the '
-                         'renderer was created')
-    settings = Attribute('The deployment settings dictionary related '
-                         'to the current application')
-
 
 class IIntrospector(Interface):
     def get(category_name, discriminator, default=None):

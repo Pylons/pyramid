@@ -44,7 +44,7 @@ Configuring an Event Listener Imperatively
 You can imperatively configure a subscriber function to be called
 for some event type via the
 :meth:`~pyramid.config.Configurator.add_subscriber`
-method (see also :term:`Configurator`):
+method:
 
 .. code-block:: python
   :linenos:
@@ -62,6 +62,10 @@ The first argument to
 :meth:`~pyramid.config.Configurator.add_subscriber` is the
 subscriber function (or a :term:`dotted Python name` which refers
 to a subscriber callable); the second argument is the event type.
+
+.. seealso::
+
+    See also :term:`Configurator`.
 
 Configuring an Event Listener Using a Decorator
 -----------------------------------------------
@@ -172,7 +176,7 @@ track of the information that subscribers will need. Here are some
 example custom event classes:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
     class DocCreated(object):
         def __init__(self, doc, request):
@@ -196,7 +200,7 @@ also use custom events with :ref:`subscriber predicates
 event with a decorator:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
     from pyramid.events import subscriber
     from .events import DocCreated
@@ -215,7 +219,7 @@ To fire your custom events use the
 accessed as ``request.registry.notify``. For example:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
     from .events import DocCreated
 

@@ -811,7 +811,7 @@ class Monitor(object): # pragma: no cover
                 print(
                     "Error calling reloader callback %r:" % file_callback)
                 traceback.print_exc()
-        for module in sys.modules.values():
+        for module in list(sys.modules.values()):
             try:
                 filename = module.__file__
             except (AttributeError, ImportError):
@@ -984,3 +984,6 @@ def cherrypy_server_runner(
         server.stop()
 
     return server
+
+if __name__ == '__main__': # pragma: no cover
+    sys.exit(main() or 0)

@@ -380,8 +380,8 @@ class TestPredicateList(unittest.TestCase):
         self.assertEqual(predicates[2].text(), '!header header')
         self.assertEqual(predicates[1](None, request), True)
         self.assertEqual(predicates[2](None, request), True)
-        
-        
+
+
 class Test_takes_one_arg(unittest.TestCase):
     def _callFUT(self, view, attr=None, argname=None):
         from pyramid.config.util import takes_one_arg
@@ -560,7 +560,7 @@ class Test_takes_one_arg(unittest.TestCase):
         class Foo: pass
         foo = Foo()
         self.assertFalse(self._callFUT(foo))
-    
+
     def test_method_onearg_named_request(self):
         class Foo:
             def method(self, request):
@@ -586,11 +586,11 @@ class TestNotted(unittest.TestCase):
         self.assertEqual(inst.text(), '')
         self.assertEqual(inst.phash(), '')
         self.assertEqual(inst(None, None), True)
-        
+
 class DummyPredicate(object):
     def __init__(self, result):
         self.result = result
-        
+
     def text(self):
         return self.result
 
@@ -598,7 +598,7 @@ class DummyPredicate(object):
 
     def __call__(self, context, request):
         return True
-    
+
 class DummyCustomPredicate(object):
     def __init__(self):
         self.__text__ = 'custom predicate'
@@ -626,4 +626,4 @@ class DummyRequest:
 class DummyConfigurator(object):
     def maybe_dotted(self, thing):
         return thing
-    
+

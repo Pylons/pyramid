@@ -15,7 +15,7 @@ def _initTestingDB():
     Base.metadata.create_all(engine)
     DBSession.configure(bind=engine)
     with transaction.manager:
-        model = Page('FrontPage', 'This is the front page')
+        model = Page(name='FrontPage', data='This is the front page')
         DBSession.add(model)
     return DBSession
 
@@ -24,27 +24,6 @@ def _registerRoutes(config):
     config.add_route('view_page', '{pagename}')
     config.add_route('edit_page', '{pagename}/edit_page')
     config.add_route('add_page', 'add_page/{pagename}')
-
-
-class PageModelTests(unittest.TestCase):
-
-    def setUp(self):
-        self.session = _initTestingDB()
-
-    def tearDown(self):
-        self.session.remove()
-
-    def _getTargetClass(self):
-        from tutorial.models import Page
-        return Page
-
-    def _makeOne(self, name='SomeName', data='some data'):
-        return self._getTargetClass()(name, data)
-
-    def test_constructor(self):
-        instance = self._makeOne()
-        self.assertEqual(instance.name, 'SomeName')
-        self.assertEqual(instance.data, 'some data')
 
 
 class ViewWikiTests(unittest.TestCase):
@@ -82,7 +61,7 @@ class ViewPageTests(unittest.TestCase):
         from tutorial.models import Page
         request = testing.DummyRequest()
         request.matchdict['pagename'] = 'IDoExist'
-        page = Page('IDoExist', 'Hello CruelWorld IDoExist')
+        page = Page(name='IDoExist', data='Hello CruelWorld IDoExist')
         self.session.add(page)
         _registerRoutes(self.config)
         info = self._callFUT(request)
@@ -150,7 +129,7 @@ class EditPageTests(unittest.TestCase):
         _registerRoutes(self.config)
         request = testing.DummyRequest()
         request.matchdict = {'pagename':'abc'}
-        page = Page('abc', 'hello')
+        page = Page(name='abc', data='hello')
         self.session.add(page)
         info = self._callFUT(request)
         self.assertEqual(info['page'], page)
@@ -163,7 +142,7 @@ class EditPageTests(unittest.TestCase):
         request = testing.DummyRequest({'form.submitted':True,
             'body':'Hello yo!'})
         request.matchdict = {'pagename':'abc'}
-        page = Page('abc', 'hello')
+        page = Page(name='abc', data='hello')
         self.session.add(page)
         response = self._callFUT(request)
         self.assertEqual(response.location, 'http://example.com/abc')

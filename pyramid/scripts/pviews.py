@@ -4,6 +4,7 @@ import textwrap
 
 from pyramid.interfaces import IMultiView
 from pyramid.paster import bootstrap
+from pyramid.request import Request
 from pyramid.scripts.common import parse_vars
 
 def main(argv=sys.argv, quiet=False):
@@ -52,7 +53,7 @@ class PViewsCommand(object):
                 infos.append(info)
         return infos
 
-    def _find_view(self, url, registry):
+    def _find_view(self, request):
         """
         Accept ``url`` and ``registry``; create a :term:`request` and
         find a :app:`Pyramid` view based on introspection of :term:`view
@@ -63,22 +64,19 @@ class PViewsCommand(object):
         from pyramid.interfaces import IRequest
         from pyramid.interfaces import IRootFactory
         from pyramid.interfaces import IRouteRequest
-        from pyramid.interfaces import IRequestFactory
         from pyramid.interfaces import IRoutesMapper
         from pyramid.interfaces import IView
         from pyramid.interfaces import IViewClassifier
         from pyramid.interfaces import ITraverser
-        from pyramid.request import Request
         from pyramid.traversal import DefaultRootFactory
         from pyramid.traversal import ResourceTreeTraverser
 
+        registry = request.registry
         q = registry.queryUtility
         root_factory = q(IRootFactory, default=DefaultRootFactory)
         routes_mapper = q(IRoutesMapper)
-        request_factory = q(IRequestFactory, default=Request)
 
         adapters = registry.adapters
-        request = None
 
         @implementer(IMultiView)
         class RoutesMultiView(object):
@@ -111,20 +109,9 @@ class PViewsCommand(object):
                             view.__view_attr__ = ''
                         self.views.append((None, view, None))
 
-
-        # create the request
-        environ = {
-            'wsgi.url_scheme':'http',
-            'SERVER_NAME':'localhost',
-            'SERVER_PORT':'8080',
-            'REQUEST_METHOD':'GET',
-            'PATH_INFO':url,
-            }
-        request = request_factory(environ)
         context = None
         routes_multiview = None
         attrs = request.__dict__
-        attrs['registry'] = registry
         request_iface = IRequest
 
         # find the root object
@@ -236,9 +223,10 @@ class PViewsCommand(object):
 
         if not url.startswith('/'):
             url = '/%s' % url
-        env = self.bootstrap[0](config_uri, options=parse_vars(self.args[2:]))
-        registry = env['registry']
-        view = self._find_view(url, registry)
+        request = Request.blank(url)
+        env = self.bootstrap[0](config_uri, options=parse_vars(self.args[2:]),
+                                request=request)
+        view = self._find_view(request)
         self.out('')
         self.out("URL = %s" % url)
         self.out('')
@@ -257,5 +245,8 @@ class PViewsCommand(object):
             else:
                 self.out("    Not found.")
         self.out('')
+        env['closer']()
         return 0
 
+if __name__ == '__main__': # pragma: no cover
+    sys.exit(main() or 0)

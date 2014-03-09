@@ -1,6 +1,7 @@
 import inspect
 import operator
 import os
+import warnings
 
 from zope.interface import (
     Interface,
@@ -43,6 +44,11 @@ from pyramid.compat import (
     is_nonstr_iter
     )
 
+from pyramid.encode import (
+    quote_plus,
+    urlencode,
+)
+
 from pyramid.exceptions import (
     ConfigurationError,
     PredicateMismatch,
@@ -63,6 +69,8 @@ from pyramid.response import Response
 from pyramid.security import NO_PERMISSION_REQUIRED
 from pyramid.static import static_view
 from pyramid.threadlocal import get_current_registry
+
+from pyramid.url import parse_url_overrides
 
 from pyramid.view import (
     render_view_to_response,
@@ -871,13 +879,13 @@ class ViewsConfiguratorMixin(object):
 
         request_method
 
-          This value can be one of the strings ``GET``, ``POST``, ``PUT``,
-          ``DELETE``, or ``HEAD`` representing an HTTP ``REQUEST_METHOD``, or
-          a tuple containing one or more of these strings.  A view
-          declaration with this argument ensures that the view will only be
-          called when the request's ``method`` attribute (aka the
-          ``REQUEST_METHOD`` of the WSGI environment) string matches a
-          supplied value.  Note that use of ``GET`` also implies that the
+          This value can be either a strings (such as ``GET``, ``POST``,
+          ``PUT``, ``DELETE``, or ``HEAD``) representing an HTTP
+          ``REQUEST_METHOD``, or a tuple containing one or more of these
+          strings.  A view declaration with this argument ensures that the
+          view will only be called when the ``method`` attribute of the
+          request (aka the ``REQUEST_METHOD`` of the WSGI environment) matches
+          a supplied value.  Note that use of ``GET`` also implies that the
           view will respond to ``HEAD`` as of Pyramid 1.4.
 
           .. versionchanged:: 1.2
@@ -908,7 +916,7 @@ class ViewsConfiguratorMixin(object):
           A view declaration with this argument ensures that the view will
           only be called when the :term:`request` has key/value pairs in its
           :term:`matchdict` that equal those supplied in the predicate.
-          e.g. ``match_param="action=edit" would require the ``action``
+          e.g. ``match_param="action=edit"`` would require the ``action``
           parameter in the :term:`matchdict` match the right hand side of
           the expression (``edit``) for the view to "match" the current
           request.
@@ -1016,10 +1024,10 @@ class ViewsConfiguratorMixin(object):
 
           If specified, this value should be a :term:`principal` identifier or
           a sequence of principal identifiers.  If the
-          :func:`pyramid.security.effective_principals` method indicates that
-          every principal named in the argument list is present in the current
-          request, this predicate will return True; otherwise it will return
-          False.  For example:
+          :attr:`pyramid.request.Request.effective_principals` property
+          indicates that every principal named in the argument list is present
+          in the current request, this predicate will return True; otherwise it
+          will return False.  For example:
           ``effective_principals=pyramid.security.Authenticated`` or
           ``effective_principals=('fred', 'group:admins')``.
 
@@ -1027,16 +1035,20 @@ class ViewsConfiguratorMixin(object):
 
         custom_predicates
 
-          This value should be a sequence of references to custom predicate
-          callables.  Use custom predicates when no set of predefined
-          predicates do what you need.  Custom predicates can be combined with
-          predefined predicates as necessary.  Each custom predicate callable
-          should accept two arguments: ``context`` and ``request`` and should
-          return either ``True`` or ``False`` after doing arbitrary evaluation
-          of the context and/or the request.  The ``predicates`` argument to
-          this method and the ability to register third-party view predicates
-          via :meth:`pyramid.config.Configurator.add_view_predicate` obsoletes
-          this argument, but it is kept around for backwards compatibility.
+            .. deprecated:: 1.5
+                This value should be a sequence of references to custom
+                predicate callables.  Use custom predicates when no set of
+                predefined predicates do what you need.  Custom predicates
+                can be combined with predefined predicates as necessary. 
+                Each custom predicate callable should accept two arguments:
+                ``context`` and ``request`` and should return either
+                ``True`` or ``False`` after doing arbitrary evaluation of
+                the context and/or the request.  The ``predicates`` argument
+                to this method and the ability to register third-party view
+                predicates via
+                :meth:`pyramid.config.Configurator.add_view_predicate`
+                obsoletes this argument, but it is kept around for backwards
+                compatibility.
 
         predicates
 
@@ -1050,6 +1062,19 @@ class ViewsConfiguratorMixin(object):
           .. versionadded: 1.4a1
 
         """
+        if custom_predicates:
+            warnings.warn(
+                ('The "custom_predicates" argument to Configurator.add_view '
+                 'is deprecated as of Pyramid 1.5.  Use '
+                 '"config.add_view_predicate" and use the registered '
+                 'view predicate as a predicate argument to add_view instead. '
+                 'See "Adding A Third Party View, Route, or Subscriber '
+                 'Predicate" in the "Hooks" chapter of the documentation '
+                 'for more information.'),
+                DeprecationWarning,
+                stacklevel=4
+                )
+        
         view = self.maybe_dotted(view)
         context = self.maybe_dotted(context)
         for_ = self.maybe_dotted(for_)
@@ -1133,6 +1158,8 @@ class ViewsConfiguratorMixin(object):
                 attr, self.object_description(view))
         else:
             view_desc = self.object_description(view)
+
+        tmpl_intr = None
             
         view_intr = self.introspectable('views',
                                         discriminator,
@@ -1183,7 +1210,8 @@ class ViewsConfiguratorMixin(object):
                     renderer = renderers.RendererHelper(
                         name=None,
                         package=self.package,
-                        registry=self.registry)
+                        registry=self.registry
+                        )
 
             if permission is None:
                 # intent: will be None if no default permission is registered
@@ -1314,6 +1342,22 @@ class ViewsConfiguratorMixin(object):
                         multiview,
                         (IExceptionViewClassifier, request_iface, context),
                         IMultiView, name=name)
+            renderer_type = getattr(renderer, 'type', None) # gard against None
+            intrspc = self.introspector
+            if (
+                renderer_type is not None and
+                tmpl_intr is not None and
+                intrspc is not None and
+                intrspc.get('renderer factories', renderer_type) is not None
+                ):
+                # allow failure of registered template factories to be deferred
+                # until view execution, like other bad renderer factories; if
+                # we tried to relate this to an existing renderer factory
+                # without checking if it the factory actually existed, we'd end
+                # up with a KeyError at startup time, which is inconsistent
+                # with how other bad renderer registrations behave (they throw
+                # a ValueError at view execution time)
+                tmpl_intr.relate('renderer factories', renderer.type)
 
         if mapper:
             mapper_intr = self.introspectable(
@@ -1339,7 +1383,6 @@ class ViewsConfiguratorMixin(object):
             tmpl_intr['name'] = renderer.name
             tmpl_intr['type'] = renderer.type
             tmpl_intr['renderer'] = renderer
-            tmpl_intr.relate('renderer factories', renderer.type)
             introspectables.append(tmpl_intr)
         if permission is not None:
             # if a permission exists, register a permission introspectable
@@ -1369,7 +1412,8 @@ class ViewsConfiguratorMixin(object):
         Python identifier (it will be used as a keyword argument to
         ``add_view`` by others).
 
-        ``factory`` should be a :term:`predicate factory`.
+        ``factory`` should be a :term:`predicate factory` or :term:`dotted
+        Python name` which refers to a predicate factory.
 
         See :ref:`view_and_route_predicates` for more information.
         """
@@ -1515,6 +1559,7 @@ class ViewsConfiguratorMixin(object):
 
         return deriver(view)
 
+    @viewdefaults
     @action_method
     def add_forbidden_view(
         self,
@@ -1594,6 +1639,7 @@ class ViewsConfiguratorMixin(object):
 
     set_forbidden_view = add_forbidden_view # deprecated sorta-bw-compat alias
     
+    @viewdefaults
     @action_method
     def add_notfound_view(
         self,
@@ -1700,7 +1746,9 @@ class ViewsConfiguratorMixin(object):
         the default view mapper to be used by all subsequent :term:`view
         configuration` registrations.
 
-        See also :ref:`using_a_view_mapper`.
+        .. seealso::
+
+            See also :ref:`using_a_view_mapper`.
 
         .. note::
 
@@ -1858,14 +1906,15 @@ class StaticURLInfo(object):
                     kw['subpath'] = subpath
                     return request.route_url(route_name, **kw)
                 else:
+                    app_url, scheme, host, port, qs, anchor = \
+                        parse_url_overrides(kw)
                     parsed = url_parse(url)
                     if not parsed.scheme:
-                        # parsed.scheme is readonly, so we have to parse again
-                        # to change the scheme, sigh.
-                        url = urlparse.urlunparse(url_parse(
-                            url, scheme=request.environ['wsgi.url_scheme']))
+                        url = urlparse.urlunparse(parsed._replace(
+                            scheme=request.environ['wsgi.url_scheme']))
                     subpath = url_quote(subpath)
-                    return urljoin(url, subpath)
+                    result = urljoin(url, subpath)
+                    return result + qs + anchor
 
         raise ValueError('No static URL definition matching %s' % path)
 
@@ -1907,27 +1956,16 @@ class StaticURLInfo(object):
 
             # Mutate extra to allow factory, etc to be passed through here.
             # Treat permission specially because we'd like to default to
-            # permissiveness (see docs of config.add_static_view).  We need
-            # to deal with both ``view_permission`` and ``permission``
-            # because ``permission`` is used in the docs for add_static_view,
-            # but ``add_route`` prefers ``view_permission``
-            permission = extra.pop('view_permission', None)
-            if permission is None:
-                permission = extra.pop('permission', None)
+            # permissiveness (see docs of config.add_static_view).
+            permission = extra.pop('permission', None)
             if permission is None:
                 permission = NO_PERMISSION_REQUIRED
 
-            context = extra.pop('view_context', None)
-            if context is None:
-                context = extra.pop('view_for', None)
+            context = extra.pop('context', None)
             if context is None:
                 context = extra.pop('for_', None)
 
-            renderer = extra.pop('view_renderer', None)
-            if renderer is None:
-                renderer = extra.pop('renderer', None)
-
-            attr = extra.pop('view_attr', None)
+            renderer = extra.pop('renderer', None)
 
             # register a route using the computed view, permission, and
             # pattern, plus any extras passed to us via add_static_view
@@ -1943,7 +1981,6 @@ class StaticURLInfo(object):
                 permission=permission,
                 context=context,
                 renderer=renderer,
-                attr=attr
                 )
 
         def register():

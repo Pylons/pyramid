@@ -122,6 +122,9 @@ class ACLAuthorizationPolicy(object):
             allowed_here = set()
             denied_here = set()
             
+            if acl and callable(acl):
+                acl = acl()
+
             for ace_action, ace_principal, ace_permissions in acl:
                 if not is_nonstr_iter(ace_permissions):
                     ace_permissions = [ace_permissions]

@@ -565,6 +565,14 @@ class HTTPClientError(HTTPError):
                    'it is either malformed or otherwise incorrect.')
 
 class HTTPBadRequest(HTTPClientError):
+    """
+    subclass of :class:`~HTTPClientError`
+
+    This indicates that the body or headers failed validity checks,
+    preventing the server from being able to continue processing.
+
+    code: 400, title: Bad Request
+    """
     pass
 
 class HTTPUnauthorized(HTTPClientError):

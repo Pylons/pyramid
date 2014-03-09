@@ -1,7 +1,7 @@
 from pyramid.config import Configurator
 from pyramid_jinja2 import renderer_factory
 # Start Sphinx 1
-from pyramid.session import UnencryptedCookieSessionFactoryConfig
+from pyramid.session import SignedCookieSessionFactory
 # End Sphinx 1
 
 from hello_world.models import get_root
@@ -22,7 +22,7 @@ def main(global_config, **settings):
     # End Include
 
     # Start Sphinx Include 2
-    my_session_factory = UnencryptedCookieSessionFactoryConfig('itsaseekreet')
+    my_session_factory = SignedCookieSessionFactory('itsaseekreet')
     config = Configurator(session_factory=my_session_factory)
     # End Sphinx Include 2
 

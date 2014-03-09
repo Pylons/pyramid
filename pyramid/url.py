@@ -12,12 +12,13 @@ from pyramid.interfaces import (
     )
 
 from pyramid.compat import (
-    native_,
     bytes_,
-    text_type,
-    url_quote,
+    string_types,
     )
-from pyramid.encode import urlencode
+from pyramid.encode import (
+    url_quote,
+    urlencode,
+)
 from pyramid.path import caller_package
 from pyramid.threadlocal import get_current_registry
 
@@ -27,6 +28,48 @@ from pyramid.traversal import (
     )
 
 PATH_SAFE = '/:@&+$,' # from webob
+QUERY_SAFE = '/?:@!$&\'()*+,;=' # RFC 3986
+ANCHOR_SAFE = QUERY_SAFE
+
+def parse_url_overrides(kw):
+    """Parse special arguments passed when generating urls.
+
+    The supplied dictionary is mutated, popping arguments as necessary.
+    Returns a 6-tuple of the format ``(app_url, scheme, host, port,
+    qs, anchor)``.
+    """
+    anchor = ''
+    qs = ''
+    app_url = None
+    host = None
+    scheme = None
+    port = None
+
+    if '_query' in kw:
+        query = kw.pop('_query')
+        if isinstance(query, string_types):
+            qs = '?' + url_quote(query, QUERY_SAFE)
+        elif query:
+            qs = '?' + urlencode(query, doseq=True)
+
+    if '_anchor' in kw:
+        anchor = kw.pop('_anchor')
+        anchor = url_quote(anchor, ANCHOR_SAFE)
+        anchor = '#' + anchor
+
+    if '_app_url' in kw:
+        app_url = kw.pop('_app_url')
+
+    if '_host' in kw:
+        host = kw.pop('_host')
+
+    if '_scheme' in kw:
+        scheme = kw.pop('_scheme')
+
+    if '_port' in kw:
+        port = kw.pop('_port')
+
+    return app_url, scheme, host, port, qs, anchor
 
 class URLMethodsMixin(object):
     """ Request methods mixin for BaseRequest having to do with URL
@@ -124,18 +167,22 @@ class URLMethodsMixin(object):
         ``*remainder`` replacement value, it is tacked on to the URL
         after being URL-quoted-except-for-embedded-slashes.
 
-        If no ``_query`` keyword argument is provided, the request
-        query string will be returned in the URL. If it is present, it
-        will be used to compose a query string that will be tacked on
-        to the end of the URL, replacing any request query string.
-        The value of ``_query`` must be a sequence of two-tuples *or*
-        a data structure with an ``.items()`` method that returns a
-        sequence of two-tuples (presumably a dictionary).  This data
-        structure will be turned into a query string per the
-        documentation of :func:`pyramid.encode.urlencode` function.
-        After the query data is turned into a query string, a leading
-        ``?`` is prepended, and the resulting string is appended to
-        the generated URL.
+        If no ``_query`` keyword argument is provided, the request query string
+        will be returned in the URL. If it is present, it will be used to
+        compose a query string that will be tacked on to the end of the URL,
+        replacing any request query string.  The value of ``_query`` may be a
+        sequence of two-tuples *or* a data structure with an ``.items()``
+        method that returns a sequence of two-tuples (presumably a dictionary).
+        This data structure will be turned into a query string per the
+        documentation of :func:`pyramid.url.urlencode` function.  This will
+        produce a query string in the ``x-www-form-urlencoded`` format.  A
+        non-``x-www-form-urlencoded`` query string may be used by passing a
+        *string* value as ``_query`` in which case it will be URL-quoted
+        (e.g. query="foo bar" will become "foo%20bar").  However, the result
+        will not need to be in ``k=v`` form as required by
+        ``x-www-form-urlencoded``.  After the query data is turned into a query
+        string, a leading ``?`` is prepended, and the resulting string is
+        appended to the generated URL.
 
         .. note::
 
@@ -146,8 +193,13 @@ class URLMethodsMixin(object):
            as values, and a k=v pair will be placed into the query string for
            each value.
 
+        .. versionchanged:: 1.5
+           Allow the ``_query`` option to be a string to enable alternative
+           encodings.
+
         If a keyword argument ``_anchor`` is present, its string
-        representation will be used as a named anchor in the generated URL
+        representation will be quoted per :rfc:`3986#section-3.5` and used as
+        a named anchor in the generated URL
         (e.g. if ``_anchor`` is passed as ``foo`` and the route URL is
         ``http://example.com/route/url``, the resulting generated URL will
         be ``http://example.com/route/url#foo``).
@@ -156,8 +208,11 @@ class URLMethodsMixin(object):
 
            If ``_anchor`` is passed as a string, it should be UTF-8 encoded. If
            ``_anchor`` is passed as a Unicode object, it will be converted to
-           UTF-8 before being appended to the URL.  The anchor value is not
-           quoted in any way before being appended to the generated URL.
+           UTF-8 before being appended to the URL.
+
+        .. versionchanged:: 1.5
+           The ``_anchor`` option will be escaped instead of using
+           its raw string representation.
 
         If both ``_anchor`` and ``_query`` are specified, the anchor
         element will always follow the query element,
@@ -213,34 +268,7 @@ class URLMethodsMixin(object):
         if route.pregenerator is not None:
             elements, kw = route.pregenerator(self, elements, kw)
 
-        anchor = ''
-        qs = ''
-        app_url = None
-        host = None
-        scheme = None
-        port = None
-
-        if '_query' in kw:
-            query = kw.pop('_query')
-            if query:
-                qs = '?' + urlencode(query, doseq=True)
-
-        if '_anchor' in kw:
-            anchor = kw.pop('_anchor')
-            anchor = native_(anchor, 'utf-8')
-            anchor = '#' + anchor
-
-        if '_app_url' in kw:
-            app_url = kw.pop('_app_url')
-
-        if '_host' in kw:
-            host = kw.pop('_host')
-
-        if '_scheme' in kw:
-            scheme = kw.pop('_scheme')
-
-        if '_port' in kw:
-            port = kw.pop('_port')
+        app_url, scheme, host, port, qs, anchor = parse_url_overrides(kw)
 
         if app_url is None:
             if (scheme is not None or host is not None or port is not None):
@@ -331,17 +359,22 @@ class URLMethodsMixin(object):
         .. warning:: if no ``elements`` arguments are specified, the resource
                      URL will end with a trailing slash.  If any
                      ``elements`` are used, the generated URL will *not*
-                     end in trailing a slash.
+                     end in a trailing slash.
 
-        If a keyword argument ``query`` is present, it will be used to
-        compose a query string that will be tacked on to the end of the URL.
-        The value of ``query`` must be a sequence of two-tuples *or* a data
-        structure with an ``.items()`` method that returns a sequence of
-        two-tuples (presumably a dictionary).  This data structure will be
-        turned into a query string per the documentation of
-        ``pyramid.url.urlencode`` function.  After the query data is turned
-        into a query string, a leading ``?`` is prepended, and the resulting
-        string is appended to the generated URL.
+        If a keyword argument ``query`` is present, it will be used to compose
+        a query string that will be tacked on to the end of the URL.  The value
+        of ``query`` may be a sequence of two-tuples *or* a data structure with
+        an ``.items()`` method that returns a sequence of two-tuples
+        (presumably a dictionary).  This data structure will be turned into a
+        query string per the documentation of :func:``pyramid.url.urlencode``
+        function.  This will produce a query string in the
+        ``x-www-form-urlencoded`` encoding.  A non-``x-www-form-urlencoded``
+        query string may be used by passing a *string* value as ``query`` in
+        which case it will be URL-quoted (e.g. query="foo bar" will become
+        "foo%20bar").  However, the result will not need to be in ``k=v`` form
+        as required by ``x-www-form-urlencoded``.  After the query data is
+        turned into a query string, a leading ``?`` is prepended, and the
+        resulting string is appended to the generated URL.
 
         .. note::
 
@@ -351,6 +384,10 @@ class URLMethodsMixin(object):
            argument equal to ``True``.  This means that sequences can be passed
            as values, and a k=v pair will be placed into the query string for
            each value.
+
+        .. versionchanged:: 1.5
+           Allow the ``query`` option to be a string to enable alternative
+           encodings.
 
         If a keyword argument ``anchor`` is present, its string
         representation will be used as a named anchor in the generated URL
@@ -362,8 +399,11 @@ class URLMethodsMixin(object):
 
            If ``anchor`` is passed as a string, it should be UTF-8 encoded. If
            ``anchor`` is passed as a Unicode object, it will be converted to
-           UTF-8 before being appended to the URL.  The anchor value is not
-           quoted in any way before being appended to the generated URL.
+           UTF-8 before being appended to the URL.
+
+        .. versionchanged:: 1.5
+           The ``anchor`` option will be escaped instead of using
+           its raw string representation.
 
         If both ``anchor`` and ``query`` are specified, the anchor element
         will always follow the query element,
@@ -402,8 +442,11 @@ class URLMethodsMixin(object):
 
         If the ``resource`` passed in has a ``__resource_url__`` method, it
         will be used to generate the URL (scheme, host, port, path) for the
-        base resource which is operated upon by this function.  See also
-        :ref:`overriding_resource_url_generation`.
+        base resource which is operated upon by this function.
+        
+        .. seealso::
+
+            See also :ref:`overriding_resource_url_generation`.
 
         .. versionadded:: 1.5
            ``route_name``, ``route_kw``, and ``route_remainder_name``
@@ -580,13 +623,14 @@ class URLMethodsMixin(object):
 
         if 'query' in kw:
             query = kw['query']
-            if query:
+            if isinstance(query, string_types):
+                qs = '?' + url_quote(query, QUERY_SAFE)
+            elif query:
                 qs = '?' + urlencode(query, doseq=True)
 
         if 'anchor' in kw:
             anchor = kw['anchor']
-            if isinstance(anchor, text_type):
-                anchor = native_(anchor, 'utf-8')
+            anchor = url_quote(anchor, ANCHOR_SAFE)
             anchor = '#' + anchor
 
         if elements:

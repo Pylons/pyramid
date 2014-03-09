@@ -309,7 +309,7 @@ In particular, add the ``Babel`` and ``lingua`` distributions to the
 application's ``setup.py`` file:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
     setup(name="mypackage",
           # ...
@@ -370,7 +370,7 @@ file of a ``pcreate`` -generated :app:`Pyramid` application has stanzas in it
 that look something like the following:
 
 .. code-block:: ini
-   :linenos:
+    :linenos:
 
     [compile_catalog]
     directory = myproject/locale
@@ -398,7 +398,7 @@ that you'd like the domain of your translations to be ``mydomain``
 instead, change the ``setup.cfg`` file stanzas to look like so:
 
 .. code-block:: ini
-   :linenos:
+    :linenos:
 
     [compile_catalog]
     directory = myproject/locale
@@ -607,10 +607,8 @@ object, but the domain and mapping information attached is ignored.
    def aview(request):
        localizer = request.localizer
        num = 1
-       translated = localizer.pluralize(
-                          _('item_plural', default="${number} items"), 
-                          None, num, 'mydomain', mapping={'number':num}
-                          )
+       translated = localizer.pluralize('item_plural', '${number} items',
+           num, 'mydomain', mapping={'number':num})
 
 The corresponding message catalog must have language plural definitions and
 plural alternatives set.
@@ -1041,7 +1039,7 @@ if no locale can be determined.
 Here's an implementation of a simple locale negotiator:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
     def my_locale_negotiator(request):
         locale_name = request.params.get('my_locale')
