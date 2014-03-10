@@ -640,6 +640,44 @@ class RendererScanAppTest(IntegrationBase, unittest.TestCase):
         res = testapp.get('/two', status=200)
         self.assertTrue(b'Two!' in res.body)
 
+class UnicodeInURLTest(unittest.TestCase):
+    def _makeConfig(self):
+        from pyramid.config import Configurator
+        config = Configurator()
+        return config
+
+    def _makeTestApp(self, config):
+        from webtest import TestApp
+        app = config.make_wsgi_app()
+        return TestApp(app)
+
+    def test_unicode_in_url_404(self):
+        request_path = b'/avalia%C3%A7%C3%A3o_participante/'
+        request_path_unicode = u'/avalia\xe7\xe3o_participante/'
+
+        config = self._makeConfig()
+        testapp = self._makeTestApp(config)
+
+        res = testapp.get(request_path, status=404)
+        self.assertTrue(request_path_unicode in res.text)
+
+    def test_unicode_in_url_200(self):
+        request_path = b'/avalia%C3%A7%C3%A3o_participante'
+        request_path_unicode = u'/avalia\xe7\xe3o_participante'
+
+        def myview(request):
+            return 'XXX'
+
+        config = self._makeConfig()
+        config.add_route('myroute', request_path_unicode)
+        config.add_view(myview, route_name='myroute', renderer='json')
+        testapp = self._makeTestApp(config)
+
+        res = testapp.get(request_path, status=200)
+
+        self.assertEqual(res.text, '"XXX"')
+
+
 class AcceptContentTypeTest(unittest.TestCase):
     def setUp(self):
         def hello_view(request):
