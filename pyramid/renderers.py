@@ -396,7 +396,7 @@ class RendererHelper(object):
             settings = {}
         return settings
 
-    @reify
+    @property
     def renderer(self):
         factory = self.registry.queryUtility(IRendererFactory, name=self.type)
         if factory is None:
