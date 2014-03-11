@@ -62,7 +62,7 @@ returns one of these values:
 - If the userid *does not* exist in the system, it will
   return ``None``.
 
-For example, ``groupfinder('editor', request )`` returns ['group:editor'],
+For example, ``groupfinder('editor', request )`` returns ['group:editors'],
 ``groupfinder('viewer', request)`` returns [], and ``groupfinder('admin', request)``
 returns ``None``.  We will use ``groupfinder()`` as an :term:`authentication policy`
 "callback" that will provide the :term:`principal` or principals
