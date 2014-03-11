@@ -652,7 +652,7 @@ class UnicodeInURLTest(unittest.TestCase):
         return TestApp(app)
 
     def test_unicode_in_url_404(self):
-        request_path = b'/avalia%C3%A7%C3%A3o_participante/'
+        request_path = '/avalia%C3%A7%C3%A3o_participante/'
         request_path_unicode = u'/avalia\xe7\xe3o_participante/'
 
         config = self._makeConfig()
@@ -662,7 +662,7 @@ class UnicodeInURLTest(unittest.TestCase):
         self.assertTrue(request_path_unicode in res.text)
 
     def test_unicode_in_url_200(self):
-        request_path = b'/avalia%C3%A7%C3%A3o_participante'
+        request_path = '/avalia%C3%A7%C3%A3o_participante'
         request_path_unicode = u'/avalia\xe7\xe3o_participante'
 
         def myview(request):
