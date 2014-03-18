@@ -207,7 +207,7 @@ routes:
    :linenos:
    :language: python
 
-.. note:: These lines must be added `before` this ``view_page`` route
+.. note:: These lines must be added *before* this ``view_page`` route
    definition:
    .. literalinclude:: src/authorization/tutorial/__init__.py
       :lines: 32
