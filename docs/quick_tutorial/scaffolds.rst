@@ -63,11 +63,11 @@ Steps
 
    On startup, ``pserve`` logs some output:
 
-   .. code-block:: bash
+    .. code-block:: bash
 
-     Starting subprocess with file monitor
-     Starting server in PID 72213.
-     Starting HTTP server on http://0.0.0.0:6543
+        Starting subprocess with file monitor
+        Starting server in PID 72213.
+        Starting HTTP server on http://0.0.0.0:6543
 
 #. Open http://localhost:6543/ in your browser.
 
