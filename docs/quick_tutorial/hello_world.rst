@@ -96,13 +96,13 @@ Extra Credit
 
    .. code-block:: python
 
-      print ('Starting up server on http://localhost:6547')
+      print('Incoming request')
 
    ...instead of:
 
    .. code-block:: python
 
-      print 'Starting up server on http://localhost:6547'
+      print 'Incoming request'
 
 #. What happens if you return a string of HTML? A sequence of integers?
 
