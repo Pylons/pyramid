@@ -1,5 +1,6 @@
 import binascii
 import os
+import re
 from textwrap import dedent
 
 from pyramid.compat import native_
@@ -17,6 +18,18 @@ class PyramidTemplate(Template):
         ``random_string``, and ``package_logger``).  It also prevents common
         misnamings (such as naming a package "site" or naming a package
         logger "root".
+
+        package_full_path as the full path of the package/module
+        package_parent_path as the parent dir path of the package/module
+
+        If we do pcreate -s {template} -d a/b c/d/e:
+            package: e
+            package_full_name: c.d.e
+            package_logger: e
+            package_full_path: c/d/e
+            package_parent_path: c/d (dirname of package_full_path)
+            package_parent_name: c.d
+            package_root_name: c (first in the list of package_full_name separated by .)
         """
         if vars['package'] == 'site':
             raise ValueError('Sorry, you may not name your package "site". '
@@ -28,6 +41,12 @@ class PyramidTemplate(Template):
             # Rename the app logger in the rare case a project is named 'root'
             package_logger = 'app'
         vars['package_logger'] = package_logger
+
+        vars['package_full_path'] = vars['package_full_name'].replace('.', os.path.sep)
+        vars['package_parent_path'] = os.path.dirname(vars['package_full_path'])
+        vars['package_parent_name'] = vars['package_parent_path'].replace(os.path.sep, '.')
+        vars['package_root_name'] = vars['package_full_name'].split('.')[0]
+
         return Template.pre(self, command, output_dir, vars)
 
     def post(self, command, output_dir, vars): # pragma: no cover
@@ -66,3 +85,11 @@ class ZODBProjectTemplate(PyramidTemplate):
 class AlchemyProjectTemplate(PyramidTemplate):
     _template_dir = 'alchemy'
     summary = 'Pyramid SQLAlchemy project using url dispatch'
+
+class SimpleModuleTemplate(PyramidTemplate):
+    _template_dir = 'simple_module'
+    summary = 'Pyramid simple module'
+
+class SimplePkgTemplate(PyramidTemplate):
+    _template_dir = 'simple_pkg'
+    summary = 'Pyramid simple pkg'

@@ -10,6 +10,13 @@ Unreleased
   ``reissue_time=None`` would cause an exception when modifying the session.
   See https://github.com/Pylons/pyramid/issues/1247
 
+- The ``pcreate`` command now takes ``-d``  (or ``--dir``) flag to specify customized dir.
+  For example::
+
+  pcreate -s simple_module -d a/b/c d/e
+
+  will create d.e with simple_module template in path a/b/c/d/e.py
+
 1.5b1 (2014-02-08)
 ==================
 

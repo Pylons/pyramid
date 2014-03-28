@@ -16,6 +16,13 @@ def main(argv=sys.argv, quiet=False):
     return command.run()
 
 class PCreateCommand(object):
+    '''
+    1. pcreate -s starter a/b
+       initialize project/package b with starter template in directory a/b
+
+    2. pcreate -s simple_module -d c/d e/f
+       initialize module e.f in c/d/e/f.py with simple_module template
+    '''
     verbosity = 1 # required
     description = "Render Pyramid scaffolding to an output directory"
     usage = "usage: %prog [options] output_directory"
@@ -48,6 +55,10 @@ class PCreateCommand(object):
                       dest='overwrite',
                       action='store_true',
                       help='Always overwrite')
+    parser.add_option('-d', '--dir',
+                      dest='output_dir',
+                      action='store',
+                      help='customized output dir. ')
     parser.add_option('--interactive',
                       dest='interactive',
                       action='store_true',
@@ -75,18 +86,36 @@ class PCreateCommand(object):
         return self.render_scaffolds()
 
     def render_scaffolds(self):
+        '''
+        output_dir:    the dir to render the templates
+        project_name:  the name of the project to render, 
+                       as the basename of args[0]
+        pkg_name:      the package to render, as the basename of args[0]
+        pkg_full_name: the full package name, 
+                       as args[0] with path separators replaced as dots.
+        safe_name:     safe name of project_name for pkg_resources.
+        egg_name:      egg name for pkg_resources.
+        '''
         options = self.options
         args = self.args
+        args[0] = self._set_args0(args[0])
         output_dir = os.path.abspath(os.path.normpath(args[0]))
         project_name = os.path.basename(os.path.split(output_dir)[1])
         pkg_name = _bad_chars_re.sub('', project_name.lower())
+        pkg_full_name = self._set_pkg_full_name(args[0])
         safe_name = pkg_resources.safe_name(project_name)
         egg_name = pkg_resources.to_filename(safe_name)
+
+        if options.output_dir != None:
+            output_dir = self._set_output_dir(options.output_dir, args[0])
+
         vars = {
             'project': project_name,
             'package': pkg_name,
+            'package_full_name': pkg_full_name,
             'egg': egg_name,
             }
+
         for scaffold_name in options.scaffold_name:
             for scaffold in self.scaffolds:
                 if scaffold.name == scaffold_name:
@@ -122,6 +151,30 @@ class PCreateCommand(object):
     def out(self, msg): # pragma: no cover
         if not self.quiet:
             print(msg)
+
+    def _set_args0(self, args0):
+        return args0.replace('.', os.path.sep)
+
+    def _set_pkg_full_name(self, pkg_path):
+        '''
+        1. replace os.path.sep to dot.
+        2. check there is no heading/trailing dot.
+        '''
+
+        pkg_full_name = pkg_path.replace(os.path.sep, '.')
+        pkg_full_name = pkg_full_name.strip('.')
+        return pkg_full_name
+
+    def _set_output_dir(self, dir_path, pkg_path):
+        dir_path = os.path.expanduser(dir_path)
+        if dir_path[0] == '~':
+            raise Exception('invalid user dir')
+
+        pkg_path = pkg_path.strip(os.path.sep)
+        full_path = os.path.join(dir_path, pkg_path)
+        output_path = os.path.abspath(os.path.normpath(full_path))
+        output_dir = os.path.dirname(output_path)
+        return output_dir
 
 if __name__ == '__main__': # pragma: no cover
     sys.exit(main() or 0)
