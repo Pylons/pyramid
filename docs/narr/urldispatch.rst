@@ -610,7 +610,7 @@ request in its ``__init__``.  For example:
            pass
 
 In a more complicated application, this root factory might be a class
-representing a :term:`SQLAlchemy` model.
+representing an :term:`SQLAlchemy` model.
 
 See :ref:`route_factories` for more details about how to use route factories.
 
