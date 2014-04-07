@@ -1183,9 +1183,10 @@ still easily do it by wrapping it in classmethod call.
 Same will work with staticmethod, just use ``staticmethod`` instead of
 ``classmethod``.
 
+.. seealso::
 
-See also :class:`pyramid.interfaces.IRoute` for more API documentation about
-route objects.
+    See also :class:`pyramid.interfaces.IRoute` for more API documentation
+    about route objects.
 
 .. index::
    single: route factory

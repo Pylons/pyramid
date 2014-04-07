@@ -121,7 +121,9 @@ ways.
 
 .. literalinclude:: helloworld.py
 
-See also :ref:`firstapp_chapter`.
+.. seealso::
+
+    See also :ref:`firstapp_chapter`.
 
 Decorator-based configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -271,7 +273,9 @@ Here's a few views defined as methods of a class instead:
        def view_two(self):
            return Response('two')
 
-See also :ref:`view_config_placement`.
+.. seealso::
+
+    See also :ref:`view_config_placement`.
 
 .. _intro_asset_specs:
 
@@ -572,7 +576,10 @@ For example:
       config.include('pyramid_exclog')
       config.include('some.other.guys.package', route_prefix='/someotherguy')
 
-See also :ref:`including_configuration` and :ref:`building_an_extensible_app`
+.. seealso::
+
+    See also :ref:`including_configuration` and
+    :ref:`building_an_extensible_app`.
 
 Flexible authentication and authorization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -730,7 +737,9 @@ Pyramid defaults to explicit behavior, because it's the most generally
 useful, but provides hooks that allow you to adapt the framework to localized
 aesthetic desires.
 
-See also :ref:`using_iresponse`.
+.. seealso::
+
+    See also :ref:`using_iresponse`.
 
 "Global" response object
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -748,7 +757,9 @@ section," you say.  Fine.  Be that way:
        response.content_type = 'text/plain'
        return response
 
-See also :ref:`request_response_attr`.
+.. seealso::
+
+    See also :ref:`request_response_attr`.
 
 Automating repetitive configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -811,7 +822,9 @@ it up and calling :meth:`~pyramid.config.Configurator.add_directive` from
 within a function called when another user uses the
 :meth:`~pyramid.config.Configurator.include` method against your code.
 
-See also :ref:`add_directive`.
+.. seealso::
+
+    See also :ref:`add_directive`.
 
 Programmatic Introspection
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -839,7 +852,9 @@ callable:
         route_intr = introspector.get('routes', route_name)
         return Response(str(route_intr['pattern']))
 
-See also :ref:`using_introspection`.
+.. seealso::
+
+    See also :ref:`using_introspection`.
 
 Python 3 Compatibility
 ~~~~~~~~~~~~~~~~~~~~~~

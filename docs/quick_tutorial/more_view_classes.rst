@@ -18,11 +18,10 @@ or a Python class. In this last case, methods on the class can be
 decorated with ``@view_config`` to register the class methods with the
 :term:`configurator` as a view.
 
-So far our views have been simple, free-standing functions. Many times
+At first, our views were simple, free-standing functions. Many times
 your views are related: different ways to look at or work on the same
 data or a REST API that handles multiple operations. Grouping these
-together as a
-:ref:`view class <class_as_view>` makes sense:
+together as a :ref:`view class <class_as_view>` makes sense:
 
 - Group views
 
@@ -30,9 +29,9 @@ together as a
 
 - Share some state and helpers
 
-Pyramid views have
-:ref:`view predicates <view_configuration_parameters>` that
-help determine which view is matched to a request. These predicates
+Pyramid views have :ref:`view predicates <view_configuration_parameters>`
+that determine which view is matched to a request, based on factors
+such as the request method, the form parameters, etc. These predicates
 provide many axes of flexibility.
 
 The following shows a simple example with four operations operations:

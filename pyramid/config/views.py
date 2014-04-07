@@ -879,13 +879,13 @@ class ViewsConfiguratorMixin(object):
 
         request_method
 
-          This value can be one of the strings ``GET``, ``POST``, ``PUT``,
-          ``DELETE``, or ``HEAD`` representing an HTTP ``REQUEST_METHOD``, or
-          a tuple containing one or more of these strings.  A view
-          declaration with this argument ensures that the view will only be
-          called when the request's ``method`` attribute (aka the
-          ``REQUEST_METHOD`` of the WSGI environment) string matches a
-          supplied value.  Note that use of ``GET`` also implies that the
+          This value can be either a strings (such as ``GET``, ``POST``,
+          ``PUT``, ``DELETE``, or ``HEAD``) representing an HTTP
+          ``REQUEST_METHOD``, or a tuple containing one or more of these
+          strings.  A view declaration with this argument ensures that the
+          view will only be called when the ``method`` attribute of the
+          request (aka the ``REQUEST_METHOD`` of the WSGI environment) matches
+          a supplied value.  Note that use of ``GET`` also implies that the
           view will respond to ``HEAD`` as of Pyramid 1.4.
 
           .. versionchanged:: 1.2
@@ -1035,18 +1035,20 @@ class ViewsConfiguratorMixin(object):
 
         custom_predicates
 
-          .. deprecated:: 1.5
-
-          This value should be a sequence of references to custom predicate
-          callables.  Use custom predicates when no set of predefined
-          predicates do what you need.  Custom predicates can be combined with
-          predefined predicates as necessary.  Each custom predicate callable
-          should accept two arguments: ``context`` and ``request`` and should
-          return either ``True`` or ``False`` after doing arbitrary evaluation
-          of the context and/or the request.  The ``predicates`` argument to
-          this method and the ability to register third-party view predicates
-          via :meth:`pyramid.config.Configurator.add_view_predicate` obsoletes
-          this argument, but it is kept around for backwards compatibility.
+            .. deprecated:: 1.5
+                This value should be a sequence of references to custom
+                predicate callables.  Use custom predicates when no set of
+                predefined predicates do what you need.  Custom predicates
+                can be combined with predefined predicates as necessary. 
+                Each custom predicate callable should accept two arguments:
+                ``context`` and ``request`` and should return either
+                ``True`` or ``False`` after doing arbitrary evaluation of
+                the context and/or the request.  The ``predicates`` argument
+                to this method and the ability to register third-party view
+                predicates via
+                :meth:`pyramid.config.Configurator.add_view_predicate`
+                obsoletes this argument, but it is kept around for backwards
+                compatibility.
 
         predicates
 
@@ -1744,7 +1746,9 @@ class ViewsConfiguratorMixin(object):
         the default view mapper to be used by all subsequent :term:`view
         configuration` registrations.
 
-        See also :ref:`using_a_view_mapper`.
+        .. seealso::
+
+            See also :ref:`using_a_view_mapper`.
 
         .. note::
 

@@ -235,7 +235,9 @@ class BeforeRender(dict):
     For a description of the values present in the renderer globals dictionary,
     see :ref:`renderer_system_values`.
 
-    See also :class:`pyramid.interfaces.IBeforeRender`.
+    .. seealso::
+
+        See also :class:`pyramid.interfaces.IBeforeRender`.
     """
     def __init__(self, system, rendering_val=None):
         dict.__init__(self, system)

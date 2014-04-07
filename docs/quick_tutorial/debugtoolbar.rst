@@ -39,7 +39,6 @@ Steps
     $ $VENV/bin/python setup.py develop
     $ $VENV/bin/easy_install pyramid_debugtoolbar
 
-
 #. Our ``debugtoolbar/development.ini`` gets a configuration entry for
    ``pyramid.includes``:
 
@@ -86,4 +85,29 @@ start to experience otherwise inexplicable client-side weirdness, you can shut
 it off by commenting out the ``pyramid_debugtoolbar`` line in
 ``pyramid.includes`` temporarily.
 
-.. seealso:: See Also: :ref:`pyramid_debugtoolbar <toolbar:overview>`
+.. seealso:: See also :ref:`pyramid_debugtoolbar <toolbar:overview>`.
+
+Extra Credit
+============
+
+# Why don't we add ``pyramid_debugtoolbar`` to the list of
+  ``install_requires`` dependencies in ``debugtoolbar/setup.py``?
+
+# Introduce a bug into your application:  Change:
+
+  .. code-block:: python
+
+    def hello_world(request):
+        return Response('<body><h1>Hello World!</h1></body>')
+
+  to:
+
+  .. code-block:: python
+
+    def hello_world(request):
+        return xResponse('<body><h1>Hello World!</h1></body>')
+
+  Save, and visit http://localhost:6543/ again.  Notice the nice
+  traceback display.  On the lowest line, click the "screen" icon to the
+  right, and try typing the variable names ``request`` and ``Response``.
+  What else can you discover?

@@ -25,10 +25,10 @@ from pyramid.threadlocal import get_current_registry
 class Localizer(object):
     """
     An object providing translation and pluralizations related to
-     the current request's locale name.  A
-     :class:`pyramid.i18n.Localizer` object is created using the
-     :func:`pyramid.i18n.get_localizer` function.
-     """
+    the current request's locale name.  A
+    :class:`pyramid.i18n.Localizer` object is created using the
+    :func:`pyramid.i18n.get_localizer` function.
+    """
     def __init__(self, locale_name, translations):
         self.locale_name = locale_name
         self.translations = translations
@@ -158,9 +158,11 @@ def negotiate_locale_name(request):
     return locale_name
 
 def get_locale_name(request):
-    """ Return the :term:`locale name` associated with the current
-    request.  Deprecated in favor of using request.locale_name directly as of
-    Pyramid 1.5."""
+    """
+    .. deprecated:: 1.5
+        Use :attr:`pyramid.request.Request.locale_name` directly instead.
+        Return the :term:`locale name` associated with the current request.
+    """
     return request.locale_name
 
 def make_localizer(current_locale_name, translation_directories):
@@ -207,9 +209,12 @@ def make_localizer(current_locale_name, translation_directories):
                           translations=translations)
 
 def get_localizer(request):
-    """ Retrieve a :class:`pyramid.i18n.Localizer` object
-    corresponding to the current request's locale name.  Deprecated in favor
-    of using the ``request.localizer`` attribute directly as of Pyramid 1.5"""
+    """
+    .. deprecated:: 1.5
+        Use the :attr:`pyramid.request.Request.localizer` attribute directly
+        instead.  Retrieve a :class:`pyramid.i18n.Localizer` object
+        corresponding to the current request's locale name.
+    """
     return request.localizer
 
 class Translations(gettext.GNUTranslations, object):

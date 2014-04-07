@@ -226,25 +226,28 @@ during this tutorial:
     # Mac and Linux
     $ $VENV/bin/easy_install nose webtest deform sqlalchemy \
        pyramid_chameleon pyramid_debugtoolbar waitress \
-       pyramid_jinja2 pyramid_tm zope.sqlalchemy
+       pyramid_tm zope.sqlalchemy
 
     # Windows
-    c:\> %VENV%\Scripts\easy_install nose webtest deform sqlalchemy pyramid_chameleon
-
+    c:\> %VENV%\Scripts\easy_install nose webtest deform sqlalchemy pyramid_chameleon pyramid_debugtoolbar waitress pyramid_tm zope.sqlalchemy
 
 
 .. note::
 
     Why ``easy_install`` and not ``pip``? Pyramid encourages use of namespace
-    packages which, until recently, ``pip`` didn't permit. Also, Pyramid has
-    some optional C extensions for performance. With ``easy_install``, Windows
-    users can get these extensions without needing a C compiler.
+    packages, for which ``pip``'s support is less-than-optimal. Also, Pyramid's
+    dependencies use some optional C extensions for performance:   with
+    ``easy_install``, Windows users can get these extensions without needing
+    a C compiler (``pip`` does not support installing binary Windows
+    distributions, except for ``wheels``, which are not yet available for
+    all dependencies).
 
-.. seealso:: See Also: :ref:`installing_unix`. For instructions to set up your
+.. seealso:: See also :ref:`installing_unix`. For instructions to set up your
     Python environment for development using Windows or Python 2, see Pyramid's
     :ref:`Before You Install <installing_chapter>`.
 
-    See also Python 3's :mod:`venv module <python3:venv>`, the `setuptools` `installation instructions
+    See also Python 3's :mod:`venv module <python3:venv>`, the `setuptools
+    installation instructions
     <https://pypi.python.org/pypi/setuptools/0.9.8#installation-instructions>`_,
     and `easy_install help <https://pypi.python.org/pypi/setuptools/0.9.8#using-setuptools-and-easyinstall>`_.
 

@@ -118,8 +118,9 @@ Non-Predicate Arguments
 
 ``renderer``
   Denotes the :term:`renderer` implementation which will be used to construct
-  a :term:`response` from the associated view callable's return value. (see
-  also :ref:`renderers_chapter`).
+  a :term:`response` from the associated view callable's return value.
+  
+  .. seealso:: See also :ref:`renderers_chapter`.
 
   This is either a single string term (e.g. ``json``) or a string implying a
   path or :term:`asset specification` (e.g. ``templates/views.pt``) naming a

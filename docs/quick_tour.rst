@@ -49,7 +49,7 @@ production support in October 2011.)
     some optional C extensions for performance. With ``easy_install``, Windows
     users can get these extensions without needing a C compiler.
 
-.. seealso:: See Also:
+.. seealso:: See also:
     :ref:`Quick Tutorial section on Requirements <qtut_requirements>`,
     :ref:`installing_unix`,
     :ref:`Before You Install <installing_chapter>`, and
@@ -73,14 +73,14 @@ This simple example is easy to run. Save this as ``app.py`` and run it:
 Next, open `http://localhost:6543/ <http://localhost:6543/>`_ in a
 browser and you will see the ``Hello World!`` message.
 
-New to Python web programming? If so, some lines in module merit
+New to Python web programming? If so, some lines in the module merit
 explanation:
 
 #. *Line 10*. The ``if __name__ == '__main__':`` is Python's way of
    saying "Start here when running from the command line".
 
 #. *Lines 11-13*. Use Pyramid's :term:`configurator` to connect
-   :term:`view` code to particular URL :term:`route`.
+   :term:`view` code to a particular URL :term:`route`.
 
 #. *Lines 6-7*. Implement the view code that generates the
    :term:`response`.
@@ -92,7 +92,7 @@ in Pyramid development. Building an application from loosely-coupled
 parts via :doc:`../narr/configuration` is a central idea in Pyramid,
 one that we will revisit regurlarly in this *Quick Tour*.
 
-.. seealso:: See Also:
+.. seealso:: See also:
    :ref:`Quick Tutorial Hello World <qtut_hello_world>`,
    :ref:`firstapp_chapter`, and
    :ref:`Single File Tasks tutorial <tutorials:single-file-tutorial>`
@@ -125,7 +125,7 @@ the name is included in the body of the response::
 
 Finally, we set the response's content type and return the Response.
 
-.. seealso:: See Also:
+.. seealso:: See also:
     :ref:`Quick Tutorial Request and Response <qtut_request_response>`
     and
     :ref:`webob_chapter`
@@ -148,15 +148,15 @@ So far our examples place everything in one file:
 - the WSGI application launcher
 
 Let's move the views out to their own ``views.py`` module and change
-the ``app.py`` to scan that module, looking for decorators that setup
+the ``app.py`` to scan that module, looking for decorators that set up
 the views. First, our revised ``app.py``:
 
 .. literalinclude:: quick_tour/views/app.py
     :linenos:
 
 We added some more routes, but we also removed the view code.
-Our views, and their registrations (via decorators) are now in a module
-``views.py`` which is scanned via ``config.scan('views')``.
+Our views and their registrations (via decorators) are now in a module
+``views.py``, which is scanned via ``config.scan('views')``.
 
 We now have a ``views.py`` module that is focused on handling requests
 and responses:
@@ -167,7 +167,7 @@ and responses:
 We have 4 views, each leading to the other. If you start at
 ``http://localhost:6543/``, you get a response with a link to the next
 view. The ``hello_view`` (available at the URL ``/howdy``) has a link
-to the ``redirect_view``, which shows issuing a redirect to the final
+to the ``redirect_view``, which issues a redirect to the final
 view.
 
 Earlier we saw ``config.add_view`` as one way to configure a view. This
@@ -178,7 +178,7 @@ configuration`, in which a Python :term:`decorator` is placed on the
 line above the view. Both approaches result in the same final
 configuration, thus usually, it is simply a matter of taste.
 
-.. seealso:: See Also:
+.. seealso:: See also:
    :ref:`Quick Tutorial Views <qtut_views>`,
    :doc:`../narr/views`,
    :doc:`../narr/viewconfig`, and
@@ -226,7 +226,7 @@ view:
 "replacement patterns" (the curly braces) in the route declaration.
 This information can then be used in your view.
 
-.. seealso:: See Also:
+.. seealso:: See also:
    :ref:`Quick Tutorial Routing <qtut_routing>`,
    :doc:`../narr/urldispatch`,
    :ref:`debug_routematch_section`, and
@@ -243,8 +243,23 @@ Pyramid doesn't mandate a particular database system, form library,
 etc. It encourages replaceability. This applies equally to templating,
 which is fortunate: developers have strong views about template
 languages. That said, the Pylons Project officially supports bindings for
-Chameleon, Jinja2 and Mako, so in this step, let's use Chameleon as an
-example:
+Chameleon, Jinja2, and Mako, so in this step, let's use Chameleon.
+
+Let's add ``pyramid_chameleon``, a Pyramid :term:`add-on` which enables
+Chameleon as a :term:`renderer` in our Pyramid applications:
+
+.. code-block:: bash
+
+    $ easy_install pyramid_chameleon
+
+With the package installed, we can include the template bindings into
+our configuration:
+
+.. code-block:: python
+
+    config.include('pyramid_chameleon')
+    
+Now lets change our views.py file:
 
 .. literalinclude:: quick_tour/templating/views.py
     :start-after: Start View 1
@@ -252,7 +267,7 @@ example:
 
 Ahh, that looks better. We have a view that is focused on Python code.
 Our ``@view_config`` decorator specifies a :term:`renderer` that points
-our template file. Our view then simply returns data which is then
+to our template file. Our view then simply returns data which is then
 supplied to our template:
 
 .. literalinclude:: quick_tour/templating/hello_world.pt
@@ -262,7 +277,7 @@ Since our view returned ``dict(name=request.matchdict['name'])``,
 we can use ``name`` as a variable in our template via
 ``${name}``.
 
-.. seealso:: See Also:
+.. seealso:: See also:
     :ref:`Quick Tutorial Templating <qtut_templating>`,
     :doc:`../narr/templates`,
     :ref:`debugging_templates`, and
@@ -288,7 +303,7 @@ our configuration:
 
     config.include('pyramid_jinja2')
 
-The only change in our view...point the renderer at the ``.jinja2`` file:
+The only change in our view is to point the renderer at the ``.jinja2`` file:
 
 .. literalinclude:: quick_tour/jinja2/views.py
     :start-after: Start View 1
@@ -305,7 +320,7 @@ filename extensions. In this case, changing the extension from ``.pt``
 to ``.jinja2`` passed the view response through the ``pyramid_jinja2``
 renderer.
 
-.. seealso:: See Also:
+.. seealso:: See also:
     :ref:`Quick Tutorial Jinja2 <qtut_jinja2>`,
     `Jinja2 homepage <http://jinja.pocoo.org/>`_, and
     :ref:`pyramid_jinja2 Overview <jinja2:overview>`
@@ -341,8 +356,8 @@ template:
 
 This link presumes that our CSS is at a URL starting with ``/static/``.
 What if the site is later moved under ``/somesite/static/``? Or perhaps
-web developer changes the arrangement on disk? Pyramid gives a helper
-that provides flexibility on URL generation:
+a web developer changes the arrangement on disk? Pyramid provides a helper
+to allow flexibility on URL generation:
 
 .. literalinclude:: quick_tour/static_assets/hello_world.pt
     :language: html
@@ -353,7 +368,7 @@ By using ``request.static_url`` to generate the full URL to the static
 assets, you both ensure you stay in sync with the configuration and
 gain refactoring flexibility later.
 
-.. seealso:: See Also:
+.. seealso:: See also:
     :ref:`Quick Tutorial Static Assets <qtut_static_assets>`,
     :doc:`../narr/assets`,
     :ref:`preventing_http_caching`, and
@@ -374,7 +389,7 @@ This wires up a view that returns some data through the JSON
 :term:`renderer`, which calls Python's JSON support to serialize the data
 into JSON and set the appropriate HTTP headers.
 
-.. seealso:: See Also:
+.. seealso:: See also:
     :ref:`Quick Tutorial JSON <qtut_json>`,
     :ref:`views_which_use_a_renderer`,
     :ref:`json_renderer`, and
@@ -431,7 +446,7 @@ have much more to offer:
   ``accept``, ``header``, ``xhr``, ``containment``, and
   ``custom_predicates``
 
-.. seealso:: See Also:
+.. seealso:: See also:
     :ref:`Quick Tutorial View Classes <qtut_view_classes>`,
     :ref:`Quick Tutorial More View Classes <qtut_more_view_classes>`, and
     :ref:`class_as_view`
@@ -439,7 +454,7 @@ have much more to offer:
 Quick Project Startup with Scaffolds
 ====================================
 
-So far we have done all of our *Quick Glance* as a single Python file.
+So far we have done all of our *Quick Tour* as a single Python file.
 No Python packages, no structure. Most Pyramid projects, though,
 aren't developed this way.
 
@@ -464,7 +479,7 @@ let's use that scaffold to make our project:
 
     $ pcreate --scaffold pyramid_jinja2_starter hello_world
 
-We next use the normal Python development to setup our package for
+We next use the normal Python command to set up our package for
 development:
 
 .. code-block:: bash
@@ -482,7 +497,7 @@ configuration. This includes a new way of running your application:
 
 Let's look at ``pserve`` and configuration in more depth.
 
-.. seealso:: See Also:
+.. seealso:: See also:
     :ref:`Quick Tutorial Scaffolds <qtut_scaffolds>`,
     :ref:`project_narr`, and
     :doc:`../narr/scaffolding`
@@ -513,13 +528,13 @@ Most of the work, though, comes from your project's wiring, as
 expressed in the configuration file you supply to ``pserve``. Let's
 take a look at this configuration file.
 
-.. seealso:: See Also:
+.. seealso:: See also:
     :ref:`what_is_this_pserve_thing`
 
 Configuration with ``.ini`` Files
 =================================
 
-Earlier in *Quick Glance* we first met Pyramid's configuration system.
+Earlier in *Quick Tour* we first met Pyramid's configuration system.
 At that point we did all configuration in Python code. For example,
 the port number chosen for our HTTP server was right there in Python
 code. Our scaffold has moved this decision, and more, into the
@@ -541,8 +556,8 @@ into sections:
 
 We have a few decisions made for us in this configuration:
 
-#. *Choice of web server*. The ``use = egg:pyramid#wsgiref`` tell
-   ``pserve`` to the ``wsgiref`` server that is wrapped in the Pyramid
+#. *Choice of web server*. The ``use = egg:pyramid#wsgiref`` tells
+   ``pserve`` to use the ``wsgiref`` server that is wrapped in the Pyramid
    package.
 
 #. *Port number*. ``port = 6543`` tells ``wsgiref`` to listen on port
@@ -559,9 +574,9 @@ We have a few decisions made for us in this configuration:
 
 Additionally, the ``development.ini`` generated by this scaffold wired
 up Python's standard logging. We'll now see in the console, for example,
-a log on every request that comes in, as well traceback information.
+a log on every request that comes in, as well as traceback information.
 
-.. seealso:: See Also:
+.. seealso:: See also:
     :ref:`Quick Tutorial Application Configuration <qtut_ini>`,
     :ref:`environment_chapter` and
     :doc:`../narr/paste`
@@ -570,7 +585,7 @@ a log on every request that comes in, as well traceback information.
 Easier Development with ``debugtoolbar``
 ========================================
 
-As we introduce the basics we also want to show how to be productive in
+As we introduce the basics, we also want to show how to be productive in
 development and debugging. For example, we just discussed template
 reloading and earlier we showed ``--reload`` for application reloading.
 
@@ -616,7 +631,7 @@ you want to disable this toolbar, no need to change code: you can
 remove it from ``pyramid.includes`` in the relevant ``.ini``
 configuration file.
 
-.. seealso:: See Also:
+.. seealso:: See also:
     :ref:`Quick Tutorial
     pyramid_debugtoolbar <qtut_debugtoolbar>` and
     :ref:`pyramid_debugtoolbar <toolbar:overview>`
@@ -670,7 +685,7 @@ Pyramid supplies helpers for test writing, which we use in the
 test setup and teardown. Our one test imports the view,
 makes a dummy request, and sees if the view returns what we expected.
 
-.. seealso:: See Also:
+.. seealso:: See also:
     :ref:`Quick Tutorial Unit Testing <qtut_unit_testing>`,
     :ref:`Quick Tutorial Functional Testing <qtut_functional_testing>`,
     and
@@ -685,12 +700,12 @@ we might need to detect situations when other people use the site. We
 need *logging*.
 
 Fortunately Pyramid uses the normal Python approach to logging. The
-scaffold generated, in your ``development.ini``, a number of lines that
+scaffold generated in your ``development.ini`` a number of lines that
 configure the logging for you to some reasonable defaults. You then see
-messages sent by Pyramid (for example, when a new request comes in.)
+messages sent by Pyramid (for example, when a new request comes in).
 
 Maybe you would like to log messages in your code? In your Python
-module, import and setup the logging:
+module, import and set up the logging:
 
 .. literalinclude:: quick_tour/package/hello_world/views.py
     :start-after: Start Logging 1
@@ -711,13 +726,13 @@ controls that? These sections in the configuration file:
     :start-after: Start Sphinx Include
     :end-before: End Sphinx Include
 
-Our application, a package named ``hello_world``, is setup as a logger
+Our application, a package named ``hello_world``, is set up as a logger
 and configured to log messages at a ``DEBUG`` or higher level. When you
 visit ``http://localhost:6543`` your console will now show::
 
  2013-08-09 10:42:42,968 DEBUG [hello_world.views][MainThread] Some Message
 
-.. seealso:: See Also:
+.. seealso:: See also:
     :ref:`Quick Tutorial Logging <qtut_logging>` and
     :ref:`logging_chapter`
 
@@ -728,9 +743,9 @@ When people use your web application, they frequently perform a task
 that requires semi-permanent data to be saved. For example, a shopping
 cart. This is called a :term:`session`.
 
-Pyramid has basic built-in support for sessions, with add-ons such as
-``pyramid_redis_sessions`` (or your own custom sessioning engine) that provide 
-richer session support. Let's take a look at the
+Pyramid has basic built-in support for sessions.  Third party packages such as
+``pyramid_redis_sessions`` provide richer session support.  Or you can create
+your own custom sessioning engine.  Let's take a look at the
 :doc:`built-in sessioning support <../narr/sessions>`. In our
 ``__init__.py`` we first import the kind of sessioning we want:
 
@@ -765,7 +780,7 @@ Jinja2 template:
     :start-after: Start Sphinx Include 1
     :end-before: End Sphinx Include 1
 
-.. seealso:: See Also:
+.. seealso:: See also:
     :ref:`Quick Tutorial Sessions <qtut_sessions>`,
     :ref:`sessions_chapter`, :ref:`flash_messages`,
     :ref:`session_module`, and :term:`pyramid_redis_sessions`.
@@ -774,7 +789,7 @@ Databases
 =========
 
 Web applications mean data. Data means databases. Frequently SQL
-databases. SQL Databases frequently mean an "ORM"
+databases. SQL databases frequently mean an "ORM"
 (object-relational mapper.) In Python, ORM usually leads to the
 mega-quality *SQLAlchemy*, a Python package that greatly eases working
 with databases.
@@ -813,7 +828,7 @@ of the system, can then easily get at the data thanks to SQLAlchemy:
     :start-after: Start Sphinx Include
     :end-before: End Sphinx Include
 
-.. seealso:: See Also:
+.. seealso:: See also:
     :ref:`Quick Tutorial Databases <qtut_databases>`,
     `SQLAlchemy <http://www.sqlalchemy.org/>`_,
     :ref:`making_a_console_script`,
@@ -876,7 +891,7 @@ Also, the ``deform_bootstrap`` Pyramid add-on restyles the stock Deform
 widgets using attractive CSS from Bootstrap and more powerful widgets
 from Chosen.
 
-.. seealso:: See Also:
+.. seealso:: See also:
     :ref:`Quick Tutorial Forms <qtut_forms>`,
     :ref:`Deform <deform:overview>`,
     :ref:`Colander <colander:overview>`, and

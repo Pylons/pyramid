@@ -52,6 +52,15 @@ class SharedCookieSessionTests(object):
         session = self._makeOne(request, timeout=1)
         self.assertEqual(dict(session), {})
 
+    def test_timeout_never(self):
+        import time
+        request = testing.DummyRequest()
+        LONG_TIME = 31536000
+        cookieval = self._serialize((time.time() + LONG_TIME, 0, {'state': 1}))
+        request.cookies['session'] = cookieval
+        session = self._makeOne(request, timeout=None)
+        self.assertEqual(dict(session), {'state': 1})
+
     def test_changed(self):
         request = testing.DummyRequest()
         session = self._makeOne(request)
@@ -279,6 +288,14 @@ class TestBaseCookieSession(SharedCookieSessionTests, unittest.TestCase):
         self.assertEqual(session['state'], 1)
         self.assertFalse(session._dirty)
 
+    def test_reissue_never(self):
+        request = testing.DummyRequest()
+        cookieval = self._serialize((0, 0, {'state': 1}))
+        request.cookies['session'] = cookieval
+        session = self._makeOne(request, reissue_time=None, timeout=None)
+        self.assertEqual(session['state'], 1)
+        self.assertFalse(session._dirty)
+
 class TestSignedCookieSession(SharedCookieSessionTests, unittest.TestCase):
     def _makeOne(self, request, **kw):
         from pyramid.session import SignedCookieSessionFactory
@@ -302,6 +319,14 @@ class TestSignedCookieSession(SharedCookieSessionTests, unittest.TestCase):
         cookieval = self._serialize((time.time(), 0, {'state': 1}))
         request.cookies['session'] = cookieval
         session = self._makeOne(request, reissue_time=1)
+        self.assertEqual(session['state'], 1)
+        self.assertFalse(session._dirty)
+
+    def test_reissue_never(self):
+        request = testing.DummyRequest()
+        cookieval = self._serialize((0, 0, {'state': 1}))
+        request.cookies['session'] = cookieval
+        session = self._makeOne(request, reissue_time=None, timeout=None)
         self.assertEqual(session['state'], 1)
         self.assertFalse(session._dirty)
 

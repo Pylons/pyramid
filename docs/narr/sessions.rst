@@ -158,10 +158,24 @@ Some gotchas:
 Using Alternate Session Factories
 ---------------------------------
 
-At the time of this writing, exactly one project-endorsed alternate session
-factory exists named :term:`pyramid_redis_sessions`.  It can be downloaded from
-PyPI.  It uses the Redis database as a backend.  It is the recommended 
-persistent session solution at the time of this writing.
+The following session factories exist at the time of this writing.
+
+======================= ======= =============================
+Session Factory         Backend   Description
+======================= ======= =============================
+pyramid_redis_sessions_ Redis_  Server-side session library
+                                for Pyramid, using Redis for
+                                storage.
+pyramid_beaker_         Beaker_ Session factory for Pyramid
+                                backed by the Beaker
+                                sessioning system.
+======================= ======= =============================
+
+.. _pyramid_redis_sessions: https://pypi.python.org/pypi/pyramid_redis_sessions
+.. _Redis: http://redis.io/
+
+.. _pyramid_beaker: https://pypi.python.org/pypi/pyramid_beaker
+.. _Beaker: http://beaker.readthedocs.org/en/latest/
 
 .. index::
    single: session factory (custom)

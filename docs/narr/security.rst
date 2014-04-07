@@ -113,9 +113,11 @@ authorization policies, it is an error to configure a Pyramid application
 with an authentication policy but without the authorization policy or vice
 versa.  If you do this, you'll receive an error at application startup time.
 
-See also the :mod:`pyramid.authorization` and
-:mod:`pyramid.authentication` modules for alternate implementations
-of authorization and authentication policies.  
+.. seealso::
+
+    See also the :mod:`pyramid.authorization` and
+    :mod:`pyramid.authentication` modules for alternate implementations of
+    authorization and authentication policies.
 
 .. index::
    single: permissions
@@ -495,8 +497,14 @@ is said to be *location-aware*.  Location-aware objects define an
 ``__parent__`` attribute which points at their parent object.  The
 root object's ``__parent__`` is ``None``.
 
-See :ref:`location_module` for documentations of functions which use
-location-awareness.  See also :ref:`location_aware`.
+.. seealso::
+
+    See also :ref:`location_module` for documentations of functions which use
+    location-awareness.
+
+.. seealso::
+
+    See also :ref:`location_aware`.
 
 .. index::
    single: forbidden view

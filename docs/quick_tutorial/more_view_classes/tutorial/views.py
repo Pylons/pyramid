@@ -20,7 +20,6 @@ class TutorialViews:
     def home(self):
         return {'page_title': 'Home View'}
 
-
     # Retrieving /howdy/first/last the first time
     @view_config(renderer='hello.pt')
     def hello(self):
@@ -33,7 +32,8 @@ class TutorialViews:
         return {'page_title': 'Edit View', 'new_name': new_name}
 
     # Posting to /home via the "Delete" submit button
-    @view_config(request_param='form.delete', renderer='delete.pt')
+    @view_config(request_method='POST', request_param='form.delete',
+                 renderer='delete.pt')
     def delete(self):
         print ('Deleted')
         return {'page_title': 'Delete View'}
