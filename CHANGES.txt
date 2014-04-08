@@ -14,7 +14,8 @@ Unreleased
   See https://github.com/Pylons/pyramid/issues/1247
 
 - Updated docs and scaffolds to keep in step with new 2.0 release of
-  ``Lingua``.
+  ``Lingua``.  This included removing all ``setup.cfg`` files from scaffolds
+  and documentation environments.
 
 1.5b1 (2014-02-08)
 ==================
