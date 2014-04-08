@@ -1,5 +1,5 @@
-Unreleased
-==========
+1.5 (2014-04-08)
+================
 
 - Avoid crash in ``pserve --reload`` under Py3k, when iterating over possibly
   mutated ``sys.modules``.
