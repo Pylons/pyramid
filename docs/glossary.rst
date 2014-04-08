@@ -801,8 +801,9 @@ Glossary
      application.
 
    Lingua
-     A package by Wichert Akkerman which provides :term:`Babel` message
-     extractors for Python source files and Chameleon ZPT template files.
+     A package by Wichert Akkerman which provides the ``pot-create``
+     command to extract translateable messages from Python sources
+     and Chameleon ZPT template files.
 
    Message Identifier
      A string used as a translation lookup key during localization.
