@@ -1,7 +1,7 @@
 Unreleased
 ==========
 
-- Avoid crash in ``pserve --reload`` under Py3k, when iterating over posiibly
+- Avoid crash in ``pserve --reload`` under Py3k, when iterating over possibly
   mutated ``sys.modules``.
 
 - ``UnencryptedCookieSessionFactoryConfig`` failed if the secret contained

@@ -511,6 +511,9 @@ Scaffolding Enhancements
 
 - All scaffolds have a new HTML + CSS theme.
 
+- Updated docs and scaffolds to keep in step with new 2.0 release of
+  ``Lingua``.  This included removing all ``setup.cfg`` files from scaffolds
+  and documentation environments.
 
 Dependency Changes
 ------------------
