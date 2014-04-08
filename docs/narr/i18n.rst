@@ -288,7 +288,7 @@ like so:
 .. code-block:: text
 
    $ cd /my/virtualenv
-   $ $VENV/bin/pip install lingua
+   $ $VENV/bin/easy_install lingua
 
 Installation on Windows
 +++++++++++++++++++++++
@@ -306,7 +306,7 @@ lives in ``C:\my\virtualenv``, you can install Lingua like so:
 
 .. code-block:: text
 
-   C> %VENV%\Scripts\pip install lingua
+   C> %VENV%\Scripts\easy_install lingua
 
 
 .. index::
