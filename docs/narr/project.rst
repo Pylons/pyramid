@@ -492,7 +492,6 @@ structure:
   │   ├── tests.py
   │   └── views.py
   ├── production.ini
-  ├── setup.cfg
   └── setup.py
 
 The ``MyProject`` :term:`Project`
@@ -514,9 +513,6 @@ describe, run, and test your application.
 
 #. ``production.ini`` is a :term:`PasteDeploy` configuration file that can
    be used to execute your application in a production configuration.
-
-#. ``setup.cfg`` is a :term:`setuptools` configuration file used by
-   ``setup.py``.
 
 #. ``MANIFEST.in`` is a :term:`distutils` "manifest" file, naming which files
    should be included in a source distribution of the package when ``python
@@ -744,24 +740,6 @@ For fun, you can try this command now:
 This will create a tarball of your application in a ``dist`` subdirectory
 named ``MyProject-0.1.tar.gz``.  You can send this tarball to other people
 who want to install and use your application.
-
-.. index::
-   single: setup.cfg
-
-``setup.cfg``
-~~~~~~~~~~~~~
-
-The ``setup.cfg`` file is a :term:`setuptools` configuration file.  It
-contains various settings related to testing and internationalization:
-
-Our generated ``setup.cfg`` looks like this:
-
-.. literalinclude:: MyProject/setup.cfg
-   :language: guess
-   :linenos:
-
-The values in the default setup file make the testing commands to work more
-smoothly.
 
 .. index::
    single: package
