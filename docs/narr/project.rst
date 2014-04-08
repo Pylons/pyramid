@@ -760,8 +760,8 @@ Our generated ``setup.cfg`` looks like this:
    :language: guess
    :linenos:
 
-The values in the default setup file allow various commonly-used
-internationalization commands and testing commands to work more smoothly.
+The values in the default setup file make the testing commands to work more
+smoothly.
 
 .. index::
    single: package
