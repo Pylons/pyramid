@@ -250,8 +250,9 @@ GNU gettext uses three types of files in the translation framework,
 The tools for working with :term:`gettext` translation files related to a
 :app:`Pyramid` application are :term:`Lingua` and :term:`Gettext`. Lingua
 can scrape i18n references out of Python and Chameleon files and create
-the ``.pot`` file. Gettext includes tools to update a ``.po`` file from
-an updated ``.pot`` file and to compile ``.po`` files to ``.mo`` files.
+the ``.pot`` file. Gettext includes ``msgmerge`` tool to update a ``.po`` file
+from an updated ``.pot`` file and ``msgfmt`` to compile ``.po`` files to
+``.mo`` files.
 
 .. index::
    single: Gettext
@@ -344,7 +345,7 @@ in the ``.pot`` file, you need to generate at least one ``.po`` file.
 A ``.po`` file represents translations of a particular set of messages
 to a particular locale.  Initialize a ``.po`` file for a specific
 locale from a pre-generated ``.pot`` template by using the ``msginit``
-command:
+command from Gettext:
 
 .. code-block:: text
 
@@ -378,7 +379,7 @@ files based on changes to the ``.pot`` file, so that the new and
 changed messages can also be translated or re-translated.
 
 First, regenerate the ``.pot`` file as per :ref:`extracting_messages`.
-Then use the ``msgmerge`` command.
+Then use the ``msgmerge`` command from Gettext.
 
 .. code-block:: text
 
@@ -395,7 +396,8 @@ Compiling a Message Catalog File
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Finally, to prepare an application for performing actual runtime
-translations, compile ``.po`` files to ``.mo`` files use the ``msgfmt``:
+translations, compile ``.po`` files to ``.mo`` files use the ``msgfmt``
+command from Gettext:
 
 .. code-block:: text
 
