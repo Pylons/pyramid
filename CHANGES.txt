@@ -13,6 +13,9 @@ Unreleased
   ``reissue_time=None`` would cause an exception when modifying the session.
   See https://github.com/Pylons/pyramid/issues/1247
 
+- Updated docs and scaffolds to keep in step with new 2.0 release of
+  ``Lingua``.
+
 1.5b1 (2014-02-08)
 ==================
 
