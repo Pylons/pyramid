@@ -160,9 +160,6 @@ def forget(request):
 
     If no :term:`authentication policy` is in use, this function will
     always return an empty sequence.
-
-    .. deprecated:: 1.5
-        Use :meth:`pyramid.request.Request.get_logout_headers` instead.
     """            
     policy = _get_authentication_policy(request)
     if policy is None:
@@ -343,10 +340,9 @@ class AuthenticationAPIMixin(object):
     @property
     def effective_principals(self):
         """ Return the list of 'effective' :term:`principal` identifiers
-        for the ``request``.  This will include the userid of the
-        currently authenticated user if a user is currently
-        authenticated. If no :term:`authentication policy` is in effect,
-        this will return an empty sequence.
+        for the ``request``. If no :term:`authentication policy` is in effect,
+        this will return a one-element list containing the
+        :data:`pyramid.security.Everyone` principal.
 
         .. versionadded:: 1.5
         """
@@ -354,7 +350,7 @@ class AuthenticationAPIMixin(object):
         if policy is None:
             return [Everyone]
         return policy.effective_principals(self)
-    
+
 class AuthorizationAPIMixin(object):
 
     def has_permission(self, permission, context=None):

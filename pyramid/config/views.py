@@ -879,13 +879,13 @@ class ViewsConfiguratorMixin(object):
 
         request_method
 
-          This value can be one of the strings ``GET``, ``POST``, ``PUT``,
-          ``DELETE``, or ``HEAD`` representing an HTTP ``REQUEST_METHOD``, or
-          a tuple containing one or more of these strings.  A view
-          declaration with this argument ensures that the view will only be
-          called when the request's ``method`` attribute (aka the
-          ``REQUEST_METHOD`` of the WSGI environment) string matches a
-          supplied value.  Note that use of ``GET`` also implies that the
+          This value can be either a strings (such as ``GET``, ``POST``,
+          ``PUT``, ``DELETE``, or ``HEAD``) representing an HTTP
+          ``REQUEST_METHOD``, or a tuple containing one or more of these
+          strings.  A view declaration with this argument ensures that the
+          view will only be called when the ``method`` attribute of the
+          request (aka the ``REQUEST_METHOD`` of the WSGI environment) matches
+          a supplied value.  Note that use of ``GET`` also implies that the
           view will respond to ``HEAD`` as of Pyramid 1.4.
 
           .. versionchanged:: 1.2

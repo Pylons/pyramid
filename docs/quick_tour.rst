@@ -73,14 +73,14 @@ This simple example is easy to run. Save this as ``app.py`` and run it:
 Next, open `http://localhost:6543/ <http://localhost:6543/>`_ in a
 browser and you will see the ``Hello World!`` message.
 
-New to Python web programming? If so, some lines in module merit
+New to Python web programming? If so, some lines in the module merit
 explanation:
 
 #. *Line 10*. The ``if __name__ == '__main__':`` is Python's way of
    saying "Start here when running from the command line".
 
 #. *Lines 11-13*. Use Pyramid's :term:`configurator` to connect
-   :term:`view` code to particular URL :term:`route`.
+   :term:`view` code to a particular URL :term:`route`.
 
 #. *Lines 6-7*. Implement the view code that generates the
    :term:`response`.
@@ -148,15 +148,15 @@ So far our examples place everything in one file:
 - the WSGI application launcher
 
 Let's move the views out to their own ``views.py`` module and change
-the ``app.py`` to scan that module, looking for decorators that setup
+the ``app.py`` to scan that module, looking for decorators that set up
 the views. First, our revised ``app.py``:
 
 .. literalinclude:: quick_tour/views/app.py
     :linenos:
 
 We added some more routes, but we also removed the view code.
-Our views, and their registrations (via decorators) are now in a module
-``views.py`` which is scanned via ``config.scan('views')``.
+Our views and their registrations (via decorators) are now in a module
+``views.py``, which is scanned via ``config.scan('views')``.
 
 We now have a ``views.py`` module that is focused on handling requests
 and responses:
@@ -167,7 +167,7 @@ and responses:
 We have 4 views, each leading to the other. If you start at
 ``http://localhost:6543/``, you get a response with a link to the next
 view. The ``hello_view`` (available at the URL ``/howdy``) has a link
-to the ``redirect_view``, which shows issuing a redirect to the final
+to the ``redirect_view``, which issues a redirect to the final
 view.
 
 Earlier we saw ``config.add_view`` as one way to configure a view. This
@@ -267,7 +267,7 @@ Now lets change our views.py file:
 
 Ahh, that looks better. We have a view that is focused on Python code.
 Our ``@view_config`` decorator specifies a :term:`renderer` that points
-our template file. Our view then simply returns data which is then
+to our template file. Our view then simply returns data which is then
 supplied to our template:
 
 .. literalinclude:: quick_tour/templating/hello_world.pt
@@ -303,7 +303,7 @@ our configuration:
 
     config.include('pyramid_jinja2')
 
-The only change in our view...point the renderer at the ``.jinja2`` file:
+The only change in our view is to point the renderer at the ``.jinja2`` file:
 
 .. literalinclude:: quick_tour/jinja2/views.py
     :start-after: Start View 1
@@ -356,8 +356,8 @@ template:
 
 This link presumes that our CSS is at a URL starting with ``/static/``.
 What if the site is later moved under ``/somesite/static/``? Or perhaps
-web developer changes the arrangement on disk? Pyramid gives a helper
-that provides flexibility on URL generation:
+a web developer changes the arrangement on disk? Pyramid provides a helper
+to allow flexibility on URL generation:
 
 .. literalinclude:: quick_tour/static_assets/hello_world.pt
     :language: html
@@ -454,7 +454,7 @@ have much more to offer:
 Quick Project Startup with Scaffolds
 ====================================
 
-So far we have done all of our *Quick Glance* as a single Python file.
+So far we have done all of our *Quick Tour* as a single Python file.
 No Python packages, no structure. Most Pyramid projects, though,
 aren't developed this way.
 
@@ -479,7 +479,7 @@ let's use that scaffold to make our project:
 
     $ pcreate --scaffold pyramid_jinja2_starter hello_world
 
-We next use the normal Python development to setup our package for
+We next use the normal Python command to set up our package for
 development:
 
 .. code-block:: bash
@@ -534,7 +534,7 @@ take a look at this configuration file.
 Configuration with ``.ini`` Files
 =================================
 
-Earlier in *Quick Glance* we first met Pyramid's configuration system.
+Earlier in *Quick Tour* we first met Pyramid's configuration system.
 At that point we did all configuration in Python code. For example,
 the port number chosen for our HTTP server was right there in Python
 code. Our scaffold has moved this decision, and more, into the
@@ -556,8 +556,8 @@ into sections:
 
 We have a few decisions made for us in this configuration:
 
-#. *Choice of web server*. The ``use = egg:pyramid#wsgiref`` tell
-   ``pserve`` to the ``wsgiref`` server that is wrapped in the Pyramid
+#. *Choice of web server*. The ``use = egg:pyramid#wsgiref`` tells
+   ``pserve`` to use the ``wsgiref`` server that is wrapped in the Pyramid
    package.
 
 #. *Port number*. ``port = 6543`` tells ``wsgiref`` to listen on port
@@ -574,7 +574,7 @@ We have a few decisions made for us in this configuration:
 
 Additionally, the ``development.ini`` generated by this scaffold wired
 up Python's standard logging. We'll now see in the console, for example,
-a log on every request that comes in, as well traceback information.
+a log on every request that comes in, as well as traceback information.
 
 .. seealso:: See also:
     :ref:`Quick Tutorial Application Configuration <qtut_ini>`,
@@ -585,7 +585,7 @@ a log on every request that comes in, as well traceback information.
 Easier Development with ``debugtoolbar``
 ========================================
 
-As we introduce the basics we also want to show how to be productive in
+As we introduce the basics, we also want to show how to be productive in
 development and debugging. For example, we just discussed template
 reloading and earlier we showed ``--reload`` for application reloading.
 
@@ -700,12 +700,12 @@ we might need to detect situations when other people use the site. We
 need *logging*.
 
 Fortunately Pyramid uses the normal Python approach to logging. The
-scaffold generated, in your ``development.ini``, a number of lines that
+scaffold generated in your ``development.ini`` a number of lines that
 configure the logging for you to some reasonable defaults. You then see
-messages sent by Pyramid (for example, when a new request comes in.)
+messages sent by Pyramid (for example, when a new request comes in).
 
 Maybe you would like to log messages in your code? In your Python
-module, import and setup the logging:
+module, import and set up the logging:
 
 .. literalinclude:: quick_tour/package/hello_world/views.py
     :start-after: Start Logging 1
@@ -726,7 +726,7 @@ controls that? These sections in the configuration file:
     :start-after: Start Sphinx Include
     :end-before: End Sphinx Include
 
-Our application, a package named ``hello_world``, is setup as a logger
+Our application, a package named ``hello_world``, is set up as a logger
 and configured to log messages at a ``DEBUG`` or higher level. When you
 visit ``http://localhost:6543`` your console will now show::
 
@@ -789,7 +789,7 @@ Databases
 =========
 
 Web applications mean data. Data means databases. Frequently SQL
-databases. SQL Databases frequently mean an "ORM"
+databases. SQL databases frequently mean an "ORM"
 (object-relational mapper.) In Python, ORM usually leads to the
 mega-quality *SQLAlchemy*, a Python package that greatly eases working
 with databases.

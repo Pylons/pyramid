@@ -207,6 +207,21 @@ routes:
    :linenos:
    :language: python
 
+.. note:: The preceding lines must be added *before* the following
+   ``view_page`` route definition:
+
+   .. literalinclude:: src/authorization/tutorial/__init__.py
+      :lines: 32
+      :linenos:
+      :language: python
+
+   This is because ``view_page``'s route definition uses a catch-all
+   "replacement marker" ``/{pagename}`` (see :ref:`route_pattern_syntax`)
+   which will catch any route that was not already caught by any
+   route listed above it in ``__init__.py``. Hence, for ``login`` and
+   ``logout`` views to have the opportunity of being matched
+   (or "caught"), they must be above ``/{pagename}``.
+
 Add Login and Logout Views
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
