@@ -189,7 +189,7 @@ pipe it to your environment's version of Python.
     # Windows
     #
     # Use your web browser to download this file:
-    #   https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setupy
+    #   https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py
     #
     # ...and save it to:
     # c:\projects\quick_tutorial\ez_setup.py
