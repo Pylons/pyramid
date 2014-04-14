@@ -33,31 +33,18 @@ For Mac OS X Users
 ~~~~~~~~~~~~~~~~~~
 
 Python comes pre-installed on Mac OS X, but due to Apple's release cycle,
-it is often out of date. Unless you have a need for a specific earlier version, it is recommended to
-install the latest 2.x or 3.x version of Python.
+it is often out of date. Unless you have a need for a specific earlier version,
+it is recommended to install the latest 2.x or 3.x version of Python.
 
-You can install the latest version of Python for Mac using the `homebrew <http://brew.sh/>`_ package manager.
+You can install the latest verion of Python for OSX from the binaries on
+`python.org <https://www.python.org/download/mac/>`_.
 
-To install homebrew:
-
-.. code-block:: text
-
-   $ ruby -e "$(curl -fsSL https://raw.github.com/Homebrew/homebrew/go/install)"
-
-Then update the homebrew package index.
-
-.. code-block:: text
-
-   $ brew update & brew doctor
-
-If the message says you're ready to brew, install the latest python2 or python3 using:
+Alternatively, you can use the `homebrew <http://brew.sh/>`_ package manager.
 
 .. code-block:: text
 
    $ brew install python
    $ brew install python3
-
-Alternatively, you can install it via the binaries on the `python.org <https://www.python.org/download/mac/>`_ site.
 
 If you use an installer for your Python, then you can skip to the section
 :ref:`installing_unix`.
