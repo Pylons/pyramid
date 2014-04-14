@@ -15,8 +15,8 @@ You will need `Python <http://python.org>`_ version 2.6 or better to run
 .. sidebar:: Python Versions
 
     As of this writing, :app:`Pyramid` has been tested under Python 2.6, Python
-    2.7, Python 3.2, and Python 3.3.  :app:`Pyramid` does not run under any
-    version of Python before 2.6.
+    2.7, Python 3.2, Python 3.3, Python 3.4 and PyPy 2.2. :app:`Pyramid` does
+    not run under any version of Python before 2.6.
 
 :app:`Pyramid` is known to run on all popular UNIX-like systems such as Linux,
 Mac OS X, and FreeBSD as well as on Windows platforms.  It is also known to run
