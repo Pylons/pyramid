@@ -43,7 +43,10 @@ Alternatively, you can use the `homebrew <http://brew.sh/>`_ package manager.
 
 .. code-block:: text
 
+   # for python 2.7
    $ brew install python
+
+   # for python 3.4
    $ brew install python3
 
 If you use an installer for your Python, then you can skip to the section
