@@ -2,6 +2,7 @@ from pyramid.httpexceptions import HTTPFound
 from pyramid.response import Response
 from pyramid.view import view_config
 
+import cgi
 
 # First view, available at http://localhost:6543/
 @view_config(route_name='home')
@@ -14,7 +15,7 @@ def home_view(request):
 def hello_view(request):
     name = request.params.get('name', 'No Name')
     body = '<p>Hi %s, this <a href="/goto">redirects</a></p>'
-    return Response(body % name)
+    return Response(body % cgi.escape(name))
 
 
 # /goto which issues HTTP redirect to the last view
