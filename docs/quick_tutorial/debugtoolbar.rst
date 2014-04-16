@@ -71,7 +71,7 @@ supports wiring in add-on configuration via our ``development.ini``
 using ``pyramid.includes``. We use this to load the configuration for
 the debugtoolbar.
 
-You'll now see an attractive button in the right of
+You'll now see an attractive button on the right side of
 your browser, which you may click to provide introspective access to debugging 
 information in a new browser tab. Even better, if your web application generates an error,
 you will see a nice traceback on the screen. When you want to disable
