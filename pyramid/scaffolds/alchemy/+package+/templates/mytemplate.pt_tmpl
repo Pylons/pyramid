@@ -41,8 +41,8 @@
         <div class="row">
           <div class="links">
             <ul>
-              <li class="current-version">Currently v1.5</li>
-              <li><i class="glyphicon glyphicon-bookmark icon-muted"></i><a href="http://docs.pylonsproject.org">Docs</a></li>
+              <li class="current-version">Currently v${pyramid_version}</li>
+              <li><i class="glyphicon glyphicon-bookmark icon-muted"></i><a href="http://docs.pylonsproject.org/projects/pyramid/en/${pyramid_docs_branch}/">Docs</a></li>
               <li><i class="glyphicon glyphicon-cog icon-muted"></i><a href="https://github.com/Pylons/pyramid">Github Project</a></li>
               <li><i class="glyphicon glyphicon-globe icon-muted"></i><a href="irc://irc.freenode.net#pyramid">IRC Channel</a></li>
               <li><i class="glyphicon glyphicon-home icon-muted"></i><a href="http://pylonsproject.org">Pylons Project</a></li>
