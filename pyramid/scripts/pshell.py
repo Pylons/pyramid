@@ -2,6 +2,7 @@ from code import interact
 import optparse
 import sys
 import textwrap
+import os
 
 from pyramid.compat import configparser
 from pyramid.util import DottedNameResolver
@@ -173,6 +174,9 @@ class PShellCommand(object):
             cprt = 'Type "help" for more information.'
             banner = "Python %s on %s\n%s" % (sys.version, sys.platform, cprt)
             banner += '\n\n' + help + '\n'
+            pystartup = os.environ.get('PYTHONSTARTUP')
+            if pystartup and os.path.isfile(pystartup):
+                execfile(pystartup, env)
             interact(banner, local=env)
         return shell
 
