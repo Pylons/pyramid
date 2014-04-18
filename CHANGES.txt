@@ -3,10 +3,9 @@ Next Release
 
 Bug Fixes
 ---------
-- Fix an issue whereby predicates would be resolved as maybe_dotted in the
-  introspectable but not when passed for registration. This would mean that
-  add_route_predicate for example can not take a string and turn it into the
-  actual callable function.
+- Allow ``config.add_route_predicate`` and ``config.add_view_predicate`` to
+  accept an importable dotted-string for the ``factory`` argument.
+
 - Fix an exception in ``package_name()`` when resolving the package
   name for namespace packages.
 
