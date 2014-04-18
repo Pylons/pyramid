@@ -320,7 +320,7 @@
           def _connect(request):
               conn = request.registry.dbsession()
               def cleanup(request):
-                  # since version 1.5 request.exception is not more
+                  # since version 1.5, request.exception is no more
                   # eagerly cleared
                   if request.exception is not None:
                       conn.rollback()
