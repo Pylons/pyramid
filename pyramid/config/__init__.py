@@ -502,6 +502,7 @@ class Configurator(
 
     def _add_predicate(self, type, name, factory, weighs_more_than=None,
                        weighs_less_than=None):
+        factory = self.maybe_dotted(factory)
         discriminator = ('%s predicate' % type, name)
         intr = self.introspectable(
             '%s predicates' % type,
