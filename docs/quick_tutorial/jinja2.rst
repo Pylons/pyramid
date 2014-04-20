@@ -88,7 +88,7 @@ Extra Credit
    dependency manually. What is another way we could have made the
    association?
 
-#. We used ``development.ini`` to get the :term:`configurator` to
+#. We used ``config.include`` that is a imperative configuration to get the :term:`configurator` to
    load ``pyramid_jinja2``'s configuration. What is another way could
    include it into the config?
 
