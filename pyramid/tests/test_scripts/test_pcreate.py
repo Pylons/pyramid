@@ -176,25 +176,27 @@ class TestPCreateCommand(unittest.TestCase):
         cmd = self._makeOne('-s', 'dummy', 'Distro')
         scaffold = DummyScaffold('dummy')
         cmd.scaffolds = [scaffold]
-        cmd.pyramid_dist = DummyDist("0.2dev")
+        cmd.pyramid_dist = DummyDist("0.12dev")
         result = cmd.run()
         self.assertEqual(result, 0)
         self.assertEqual(
             scaffold.vars,
             {'project': 'Distro', 'egg': 'Distro', 'package': 'distro',
-             'pyramid_version': '0.2dev', 'pyramid_docs_branch':'latest'})
+             'pyramid_version': '0.12dev',
+             'pyramid_docs_branch': '0.12-branch'})
 
     def test_scaffold_with_dev_pyramid_long_version(self):
         cmd = self._makeOne('-s', 'dummy', 'Distro')
         scaffold = DummyScaffold('dummy')
         cmd.scaffolds = [scaffold]
-        cmd.pyramid_dist = DummyDist("0.2.1dev")
+        cmd.pyramid_dist = DummyDist("0.10.1dev")
         result = cmd.run()
         self.assertEqual(result, 0)
         self.assertEqual(
             scaffold.vars,
             {'project': 'Distro', 'egg': 'Distro', 'package': 'distro',
-             'pyramid_version': '0.2.1dev', 'pyramid_docs_branch':'latest'})
+             'pyramid_version': '0.10.1dev',
+             'pyramid_docs_branch': '0.10-branch'})
 
 
 class Test_main(unittest.TestCase):
