@@ -1,7 +1,10 @@
 Next release
 ============
 
-- ...
+- Fix an issue whereby predicates would be resolved as maybe_dotted in the
+  introspectable but not when passed for registration. This would mean that
+  add_route_predicate for example can not take a string and turn it into the
+  actual callable function.
 
 1.5 (2014-04-08)
 ================
