@@ -1,6 +1,11 @@
 Next release
 ============
 
+- Update scaffold generating machinery to return the version of pyramid and
+  pyramid docs for use in scaffolds. Updated starter, alchemy and zodb
+  templates to have links to correctly versioned documentation and reflect
+  which pyramid was used to generate the scaffold.
+
 - Fix an issue whereby predicates would be resolved as maybe_dotted in the
   introspectable but not when passed for registration. This would mean that
   add_route_predicate for example can not take a string and turn it into the

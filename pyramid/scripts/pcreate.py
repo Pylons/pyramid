@@ -53,6 +53,8 @@ class PCreateCommand(object):
                       action='store_true',
                       help='When a file would be overwritten, interrogate')
 
+    pyramid_dist = pkg_resources.get_distribution("pyramid")
+
     def __init__(self, argv, quiet=False):
         self.quiet = quiet
         self.options, self.args = self.parser.parse_args(argv[1:])
@@ -82,10 +84,30 @@ class PCreateCommand(object):
         pkg_name = _bad_chars_re.sub('', project_name.lower())
         safe_name = pkg_resources.safe_name(project_name)
         egg_name = pkg_resources.to_filename(safe_name)
+
+        # get pyramid package version
+        pyramid_version = self.pyramid_dist.version
+
+        # map pyramid package version of the documentation branch
+        # if version ends with 'dev' then docs version is latest'
+        if self.pyramid_dist.version[-3:] == 'dev':
+            pyramid_docs_branch = 'latest'
+        else:
+            # find the version.major version
+            major_version = re.match(r'(\d+\.\d+)', self.pyramid_dist.version)
+            # if can not find the version then default docs version to 'latest'
+            # otherwise the docs version is 'version.major_version-branch'
+            if major_version is None:
+                pyramid_docs_branch = 'latest'
+            else:
+              pyramid_docs_branch = "%s-branch" % major_version.group()
+
         vars = {
             'project': project_name,
             'package': pkg_name,
             'egg': egg_name,
+            'pyramid_version': pyramid_version,
+            'pyramid_docs_branch': pyramid_docs_branch,
             }
         for scaffold_name in options.scaffold_name:
             for scaffold in self.scaffolds:
