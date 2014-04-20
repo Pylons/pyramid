@@ -148,6 +148,30 @@ class TestPCreateCommand(unittest.TestCase):
             {'project': 'Distro', 'egg': 'Distro', 'package': 'distro',
              'pyramid_version': '0.2', 'pyramid_docs_branch':'0.2-branch'})
 
+    def test_scaffold_with_prod_pyramid_long_version(self):
+        cmd = self._makeOne('-s', 'dummy', 'Distro')
+        scaffold = DummyScaffold('dummy')
+        cmd.scaffolds = [scaffold]
+        cmd.pyramid_dist = DummyDist("0.2.1")
+        result = cmd.run()
+        self.assertEqual(result, 0)
+        self.assertEqual(
+            scaffold.vars,
+            {'project': 'Distro', 'egg': 'Distro', 'package': 'distro',
+             'pyramid_version': '0.2.1', 'pyramid_docs_branch':'0.2-branch'})
+
+    def test_scaffold_with_prod_pyramid_unparsable_version(self):
+        cmd = self._makeOne('-s', 'dummy', 'Distro')
+        scaffold = DummyScaffold('dummy')
+        cmd.scaffolds = [scaffold]
+        cmd.pyramid_dist = DummyDist("abc")
+        result = cmd.run()
+        self.assertEqual(result, 0)
+        self.assertEqual(
+            scaffold.vars,
+            {'project': 'Distro', 'egg': 'Distro', 'package': 'distro',
+             'pyramid_version': 'abc', 'pyramid_docs_branch':'latest'})
+
     def test_scaffold_with_dev_pyramid_version(self):
         cmd = self._makeOne('-s', 'dummy', 'Distro')
         scaffold = DummyScaffold('dummy')
@@ -159,6 +183,19 @@ class TestPCreateCommand(unittest.TestCase):
             scaffold.vars,
             {'project': 'Distro', 'egg': 'Distro', 'package': 'distro',
              'pyramid_version': '0.2dev', 'pyramid_docs_branch':'latest'})
+
+    def test_scaffold_with_dev_pyramid_long_version(self):
+        cmd = self._makeOne('-s', 'dummy', 'Distro')
+        scaffold = DummyScaffold('dummy')
+        cmd.scaffolds = [scaffold]
+        cmd.pyramid_dist = DummyDist("0.2.1dev")
+        result = cmd.run()
+        self.assertEqual(result, 0)
+        self.assertEqual(
+            scaffold.vars,
+            {'project': 'Distro', 'egg': 'Distro', 'package': 'distro',
+             'pyramid_version': '0.2.1dev', 'pyramid_docs_branch':'latest'})
+
 
 class Test_main(unittest.TestCase):
     def _callFUT(self, argv):
