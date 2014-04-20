@@ -88,9 +88,9 @@ Extra Credit
    dependency manually. What is another way we could have made the
    association?
 
-#. We used ``config.include`` that is a imperative configuration to get the :term:`configurator` to
-   load ``pyramid_jinja2``'s configuration. What is another way could
-   include it into the config?
+#. We used ``config.include`` which is an imperative configuration to get the
+   :term:`Configurator` to load ``pyramid_jinja2``'s configuration. 
+   What is another way could include it into the config?
 
 .. seealso:: `Jinja2 homepage <http://jinja.pocoo.org/>`_,
    and
