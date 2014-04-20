@@ -8,12 +8,12 @@
     <meta name="author" content="Pylons Project">
     <link rel="shortcut icon" href="${request.static_url('{{package}}:static/pyramid-16x16.png')}">
 
-    <title>Alchemy Template for The Pyramid Web Framework</title>
+    <title>Alchemy Scaffold for The Pyramid Web Framework</title>
 
     <!-- Bootstrap core CSS -->
     <link href="//oss.maxcdn.com/libs/twitter-bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Custom styles for this template -->
+    <!-- Custom styles for this scaffold -->
     <link href="${request.static_url('{{package}}:static/theme.css')}" rel="stylesheet">
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -33,7 +33,7 @@
           </div>
           <div class="col-md-10">
             <div class="content">
-              <h1><span class="font-semi-bold">Pyramid</span> <span class="smaller">starter Alchemy template</span></h1>
+              <h1><span class="font-semi-bold">Pyramid</span> <span class="smaller">Alchemy scaffold</span></h1>
               <p class="lead">Welcome to <span class="font-normal">${project}</span>, an&nbsp;application generated&nbsp;by<br>the <span class="font-normal">Pyramid Web Framework {{pyramid_version}}</span>.</p>
             </div>
           </div>
