@@ -183,7 +183,7 @@ class TestPCreateCommand(unittest.TestCase):
             scaffold.vars,
             {'project': 'Distro', 'egg': 'Distro', 'package': 'distro',
              'pyramid_version': '0.12dev',
-             'pyramid_docs_branch': '0.12-branch'})
+             'pyramid_docs_branch': 'master'})
 
     def test_scaffold_with_dev_pyramid_long_version(self):
         cmd = self._makeOne('-s', 'dummy', 'Distro')
@@ -196,7 +196,7 @@ class TestPCreateCommand(unittest.TestCase):
             scaffold.vars,
             {'project': 'Distro', 'egg': 'Distro', 'package': 'distro',
              'pyramid_version': '0.10.1dev',
-             'pyramid_docs_branch': '0.10-branch'})
+             'pyramid_docs_branch': 'master'})
 
 
 class Test_main(unittest.TestCase):

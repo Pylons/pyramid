@@ -88,13 +88,19 @@ class PCreateCommand(object):
         # get pyramid package version
         pyramid_version = self.pyramid_dist.version
 
-        # map pyramid package version of the documentation branch
-        # by finding the version.major version
-        vmatch = re.match(r'(\d+\.\d+)', self.pyramid_dist.version)
-        if vmatch is not None:
-            pyramid_docs_branch = "%s-branch" % vmatch.group()
+        ## map pyramid package version of the documentation branch ##
+        # if version ends with 'dev' then docs version is 'master'
+        if self.pyramid_dist.version[-3:] == 'dev':
+            pyramid_docs_branch = 'master'
         else:
-            pyramid_docs_branch = 'latest'
+            # if not version is not 'dev' find the version.major_version string
+            # and combine it with '-branch'
+            version_match = re.match(r'(\d+\.\d+)', self.pyramid_dist.version)
+            if version_match is not None:
+                pyramid_docs_branch = "%s-branch" % version_match.group()
+            # if can not parse the version then default to 'latest'
+            else:
+                pyramid_docs_branch = 'latest'
 
         vars = {
             'project': project_name,
