@@ -49,6 +49,22 @@ class TestPCreateCommand(unittest.TestCase):
         out = self.out_.getvalue()
         self.assertTrue(out.startswith('You must provide a project name'))
 
+    def test_duplicate_project_name(self):
+        import tempfile
+        import os
+        project_path = os.path.normpath(
+            os.path.join(tempfile.gettempdir(), 'Distro'))
+        os.rmdir(project_path)
+        os.mkdir(project_path)
+        scaffold = DummyScaffold('dummy')
+        cmd = self._makeOne('-s', 'dummy', project_path)
+        cmd.scaffolds = [scaffold]
+        result = cmd.run()
+        self.assertEqual(result, 2)
+        out = self.out_.getvalue()
+        self.assertTrue(out.startswith(
+            'Project directory already exists. Please choose another project name'))
+
     def test_unknown_scaffold_name(self):
         cmd = self._makeOne('-s', 'dummyXX', 'distro')
         result = cmd.run()
