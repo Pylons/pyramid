@@ -29,6 +29,10 @@ def wsgiapp(wrapped):
     view.
 
     """
+
+    if wrapped is None:
+        raise ValueError('wrapped can not be None')
+
     def decorator(context, request):
         return request.get_response(wrapped)
 
@@ -68,6 +72,9 @@ def wsgiapp2(wrapped):
     is used as the new request's ``PATH_INFO`` and everything preceding the
     subpath is used as the ``SCRIPT_NAME``.  The new environment is passed to
     the downstream WSGI application."""
+
+    if wrapped is None:
+        raise ValueError('wrapped can not be None')
 
     def decorator(context, request):
         return call_app_with_subpath_as_path_info(request, wrapped)
