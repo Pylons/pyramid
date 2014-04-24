@@ -10,8 +10,9 @@ Next release
   introspectable but not when passed for registration. This would mean that
   add_route_predicate for example can not take a string and turn it into the
   actual callable function.
-- p.wsgi.wsgiapp and p.wsgi.wsgiapp2 now raise ValueError when accidentally
-  passed None.
+
+- ``pyramid.wsgi.wsgiapp`` and ``pyramid.wsgi.wsgiapp2`` now raise
+  ``ValueError`` when accidentally passed ``None``.
 
 1.5 (2014-04-08)
 ================
