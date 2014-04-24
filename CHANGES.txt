@@ -11,6 +11,11 @@ Next release
   add_route_predicate for example can not take a string and turn it into the
   actual callable function.
 
+- Fix ``pyramid.testing.setUp`` to return a ``Configurator`` with a proper
+  package. Previously it was not possible to do package-relative includes
+  using the returned ``Configurator`` during testing. There is now a
+  ``package`` argument that can override this behavior as well.
+
 1.5 (2014-04-08)
 ================
 
