@@ -16,6 +16,9 @@ Next release
   using the returned ``Configurator`` during testing. There is now a
   ``package`` argument that can override this behavior as well.
 
+- Removed non-ascii copyright symbol from templates, as this was
+  causing the scaffolds to fail for project generation.
+
 1.5 (2014-04-08)
 ================
 
