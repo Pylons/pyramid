@@ -8,14 +8,6 @@ class WSGIAppTests(unittest.TestCase):
     def test_wsgiapp_none(self):
         self.assertRaises(ValueError, self._callFUT, None)
 
-    def test_wsgiapp_none_func(self):
-        from pyramid.wsgi import wsgiapp
-
-        def some_func():
-            pass
-
-        self.assertRaises(ValueError, wsgiapp, some_func())
-
     def test_decorator(self):
         context = DummyContext()
         request = DummyRequest()
@@ -38,14 +30,6 @@ class WSGIApp2Tests(unittest.TestCase):
 
     def test_wsgiapp2_none(self):
         self.assertRaises(ValueError, self._callFUT, None)
-
-    def test_wsgiapp2_none_func(self):
-        from pyramid.wsgi import wsgiapp2
-
-        def some_func():
-            pass
-
-        self.assertRaises(ValueError, wsgiapp2, some_func())
 
     def test_decorator_with_subpath_and_view_name(self):
         context = DummyContext()
