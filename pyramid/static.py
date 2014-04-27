@@ -11,7 +11,7 @@ from os.path import (
 
 from pkg_resources import (
     resource_exists,
-    resource_filename,
+    resource_filename,
     resource_isdir,
     )
 
