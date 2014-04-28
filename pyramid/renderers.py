@@ -501,4 +501,21 @@ class NullRendererHelper(RendererHelper):
     def clone(self, name=None, package=None, registry=None):
         return self
     
+class CSVRenderer(object):
+    def __init__(self, info):
+        pass
+
+    def __call__(self, value, system):
+        fout = StringIO.StringIO()
+        writer = csv.writer(fout, delimiter=',',quotechar =',',quoting=csv.QUOTE_MINIMAL)
+
+        writer.writerow(value['header'])
+        writer.writerows(value['rows'])
+        filename = value['filename']
+
+        resp = system['request'].response
+        resp.content_type = 'text/csv'
+        resp.content_disposition = 'attachment;filename='+filename+'.csv'
+        return fout.getvalue()
+    
 null_renderer = NullRendererHelper()
