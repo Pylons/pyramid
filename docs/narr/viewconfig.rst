@@ -295,14 +295,17 @@ configured view.
   *This is an advanced feature, not often used by "civilians"*.
 
 ``request_method``
-  This value can be a string (typically ``"GET"``, ``"POST"``, ``"PUT"``,
-  ``"DELETE"``, or ``"HEAD"``) representing an HTTP ``REQUEST_METHOD``.  A view
-  declaration with this argument ensures that the view will only be called
-  when the request's ``method`` attribute (aka the ``REQUEST_METHOD`` of the
-  WSGI environment) string matches the supplied value.
+  This value can be one of the strings ``GET``, ``POST``, ``PUT``, ``DELETE``,
+  or ``HEAD`` representing an HTTP ``REQUEST_METHOD``, or a tuple containing
+  one or more of these strings.  A view declaration with this argument ensures
+  that the view will only be called when the request's ``method`` attribute
+  (aka the ``REQUEST_METHOD`` of the WSGI environment) string matches a
+  supplied value.  Note that use of ``GET`` also implies that the view will
+  respond to ``HEAD`` as of Pyramid 1.4.
 
-  If ``request_method`` is not supplied, the view will be invoked regardless
-  of the ``REQUEST_METHOD`` of the :term:`WSGI` environment.
+  .. versionchanged:: 1.2
+     The ability to pass a tuple of items as ``request_method``.  Previous
+     versions allowed only a string.
 
 ``request_param``
   This value can be any string or a sequence of strings.  A view declaration
