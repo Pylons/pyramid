@@ -936,7 +936,7 @@ Glossary
      `Akhet <http://docs.pylonsproject.org/projects/akhet/en/latest/>`_ is a 
      Pyramid library and demo application with a Pylons-like feel.
      It's most known for its former application scaffold, which helped 
-     users transition from Pylons and those prefering a more Pylons-like API.
+     users transition from Pylons and those preferring a more Pylons-like API.
      The scaffold has been retired but the demo plays a similar role. 
 
    Pyramid Cookbook
