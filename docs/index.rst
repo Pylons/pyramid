@@ -119,6 +119,8 @@ Narrative documentation in chapter form explaining how to use
    narr/threadlocals
    narr/zca
 
+.. _html_tutorials:
+
 Tutorials
 =========
 

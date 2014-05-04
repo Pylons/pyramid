@@ -11,7 +11,7 @@ from os.path import (
 
 from pkg_resources import (
     resource_exists,
-    resource_filename,
+    resource_filename,
     resource_isdir,
     )
 
@@ -58,7 +58,7 @@ class static_view(object):
 
     ``cache_max_age`` influences the ``Expires`` and ``Max-Age``
     response headers returned by the view (default is 3600 seconds or
-    five minutes).
+    one hour).
 
     ``use_subpath`` influences whether ``request.subpath`` will be used as
     ``PATH_INFO`` when calling the underlying WSGI application which actually
