@@ -58,6 +58,7 @@ extensions = [
 # Looks for objects in external projects
 intersphinx_mapping = {
     'tutorials': ('http://docs.pylonsproject.org/projects/pyramid_tutorials/en/latest/', None),
+    'cookbook': ('http://docs.pylonsproject.org/projects/pyramid_cookbook/en/latest/', None),
     'jinja2': ('http://docs.pylonsproject.org/projects/pyramid_jinja2/en/latest/', None),
     'tm': (
         'http://docs.pylonsproject.org/projects/pyramid_tm/en/latest/',
