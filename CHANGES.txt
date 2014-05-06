@@ -1,14 +1,26 @@
-Unreleased
-==========
+Next release
+============
 
-- Avoid crash in ``pserve --reload`` under Py3k, when iterating over posiibly
+- ...
+
+1.5 (2014-04-08)
+================
+
+- Avoid crash in ``pserve --reload`` under Py3k, when iterating over possibly
   mutated ``sys.modules``.
+
+- ``UnencryptedCookieSessionFactoryConfig`` failed if the secret contained
+  higher order characters. See https://github.com/Pylons/pyramid/issues/1246
 
 - Fixed a bug in ``UnencryptedCookieSessionFactoryConfig`` and
   ``SignedCookieSessionFactory`` where ``timeout=None`` would cause a new
   session to always be created. Also in ``SignedCookieSessionFactory`` a
   ``reissue_time=None`` would cause an exception when modifying the session.
   See https://github.com/Pylons/pyramid/issues/1247
+
+- Updated docs and scaffolds to keep in step with new 2.0 release of
+  ``Lingua``.  This included removing all ``setup.cfg`` files from scaffolds
+  and documentation environments.
 
 1.5b1 (2014-02-08)
 ==================

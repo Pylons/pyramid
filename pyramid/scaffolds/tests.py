@@ -1,6 +1,5 @@
 import sys
 import os
-import pkg_resources
 import shutil
 import subprocess
 import tempfile
@@ -26,7 +25,8 @@ class TemplateTest(object):
             self.old_cwd = os.getcwd()
             self.directory = tempfile.mkdtemp()
             self.make_venv(self.directory)
-            os.chdir(pkg_resources.get_distribution('pyramid').location)
+            here = os.path.abspath(os.path.dirname(__file__))
+            os.chdir(os.path.dirname(os.path.dirname(here)))
             subprocess.check_call(
                 [os.path.join(self.directory, 'bin', 'python'),
                  'setup.py', 'develop'])
