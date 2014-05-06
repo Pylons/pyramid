@@ -58,7 +58,7 @@ class static_view(object):
 
     ``cache_max_age`` influences the ``Expires`` and ``Max-Age``
     response headers returned by the view (default is 3600 seconds or
-    five minutes).
+    one hour).
 
     ``use_subpath`` influences whether ``request.subpath`` will be used as
     ``PATH_INFO`` when calling the underlying WSGI application which actually

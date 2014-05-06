@@ -1,12 +1,34 @@
 Next release
 ============
 
+Bug Fixes
+---------
+
+- ``pyramid.wsgi.wsgiapp`` and ``pyramid.wsgi.wsgiapp2`` now raise
+  ``ValueError`` when accidentally passed ``None``.
+
+- Fix an issue whereby predicates would be resolved as maybe_dotted in the
+  introspectable but not when passed for registration. This would mean that
+  add_route_predicate for example can not take a string and turn it into the
+  actual callable function.
+
 Docs
 ----
 
 - Removed logging configuration from Quick Tutorial ini files except for
   scaffolding- and logging-related chapters to avoid needing to explain it too
   early.
+
+- Clarify a previously-implied detail of the ``ISession.invalidate`` API
+  documentation.
+
+Scaffolds
+---------
+
+- Update scaffold generating machinery to return the version of pyramid and
+  pyramid docs for use in scaffolds. Updated starter, alchemy and zodb
+  templates to have links to correctly versioned documentation and reflect
+  which pyramid was used to generate the scaffold.
 
 1.5 (2014-04-08)
 ================

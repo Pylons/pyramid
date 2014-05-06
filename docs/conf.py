@@ -57,8 +57,9 @@ extensions = [
 
 # Looks for objects in external projects
 intersphinx_mapping = {
-    'tutorials': ('http://docs.pylonsproject.org/projects/pyramid_tutorials/en/latest/', None),
-    'jinja2': ('http://docs.pylonsproject.org/projects/pyramid_jinja2/en/latest/', None),
+    'tutorials': ('http://docs.pylonsproject.org/projects/pyramid-tutorials/en/latest/', None),
+    'cookbook': ('http://docs.pylonsproject.org/projects/pyramid-cookbook/en/latest/', None),
+    'jinja2': ('http://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/', None),
     'tm': (
         'http://docs.pylonsproject.org/projects/pyramid_tm/en/latest/',
         None,
@@ -82,10 +83,10 @@ intersphinx_mapping = {
     'venusian':
         ('http://docs.pylonsproject.org/projects/venusian/en/latest', None),
     'toolbar':
-        ('http://docs.pylonsproject.org/projects/pyramid_debugtoolbar/en/latest',
+        ('http://docs.pylonsproject.org/projects/pyramid-debugtoolbar/en/latest',
          None),
     'zcml':
-        ('http://docs.pylonsproject.org/projects/pyramid_zcml/en/latest',
+        ('http://docs.pylonsproject.org/projects/pyramid-zcml/en/latest',
          None),
 }
 

@@ -15,8 +15,8 @@ You will need `Python <http://python.org>`_ version 2.6 or better to run
 .. sidebar:: Python Versions
 
     As of this writing, :app:`Pyramid` has been tested under Python 2.6, Python
-    2.7, Python 3.2, and Python 3.3.  :app:`Pyramid` does not run under any
-    version of Python before 2.6.
+    2.7, Python 3.2, Python 3.3, Python 3.4 and PyPy 2.2. :app:`Pyramid` does
+    not run under any version of Python before 2.6.
 
 :app:`Pyramid` is known to run on all popular UNIX-like systems such as Linux,
 Mac OS X, and FreeBSD as well as on Windows platforms.  It is also known to run
@@ -32,20 +32,22 @@ dependency will fall back to using pure Python instead.
 For Mac OS X Users
 ~~~~~~~~~~~~~~~~~~
 
-From `Python.org <http://python.org/download/mac/>`_:
+Python comes pre-installed on Mac OS X, but due to Apple's release cycle,
+it is often out of date. Unless you have a need for a specific earlier version,
+it is recommended to install the latest 2.x or 3.x version of Python.
 
-    Python comes pre-installed on Mac OS X, but due to Apple's release cycle,
-    it's often one or even two years old. The overwhelming recommendation of
-    the "MacPython" community is to upgrade your Python by downloading and
-    installing a newer version from `the Python standard release page
-    <http://python.org/download/releases/>`_.
+You can install the latest verion of Python for Mac OS X from the binaries on
+`python.org <https://www.python.org/download/mac/>`_.
 
-It is recommended to download one of the *installer* versions, unless you
-prefer to install your Python through a packgage manager (e.g., macports or
-homebrew) or to build your Python from source.
+Alternatively, you can use the `homebrew <http://brew.sh/>`_ package manager.
 
-Unless you have a need for a specific earlier version, it is recommended to
-install the latest 2.x or 3.x version of Python.
+.. code-block:: text
+
+   # for python 2.7
+   $ brew install python
+
+   # for python 3.4
+   $ brew install python3
 
 If you use an installer for your Python, then you can skip to the section
 :ref:`installing_unix`.

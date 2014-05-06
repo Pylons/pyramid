@@ -384,9 +384,9 @@ Other Backwards Incompatibilities
   are now "reified" properties that look up a locale name and localizer
   respectively using the machinery described in :ref:`i18n_chapter`.
 
-- If you send an ``X-Vhm-Root`` header with a value that ends with a slash (or
-  any number of slashes), the trailing slash(es) will be removed before a URL
-  is generated when you use use :meth:`~pyramid.request.Request.resource_url`
+- If you send an ``X-Vhm-Root`` header with a value that ends with any number
+  of slashes, the trailing slashes will be removed before the URL
+  is generated when you use :meth:`~pyramid.request.Request.resource_url`
   or :meth:`~pyramid.request.Request.resource_path`.  Previously the virtual
   root path would not have trailing slashes stripped, which would influence URL
   generation.
