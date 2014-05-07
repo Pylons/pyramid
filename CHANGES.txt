@@ -14,6 +14,9 @@ Next release
 - ``pyramid.wsgi.wsgiapp`` and ``pyramid.wsgi.wsgiapp2`` now raise
   ``ValueError`` when accidentally passed ``None``.
 
+- Removed non-ascii copyright symbol from templates, as this was
+  causing the scaffolds to fail for project generation.
+
 1.5 (2014-04-08)
 ================
 
