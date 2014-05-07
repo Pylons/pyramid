@@ -35,6 +35,9 @@ Scaffolds
   templates to have links to correctly versioned documentation and reflect
   which pyramid was used to generate the scaffold.
 
+- Removed non-ascii copyright symbol from templates, as this was
+  causing the scaffolds to fail for project generation.
+
 1.5 (2014-04-08)
 ================
 
