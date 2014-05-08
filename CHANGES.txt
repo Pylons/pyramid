@@ -1,6 +1,13 @@
 Next release
 ============
 
+Features
+--------
+
+- Add ``pyramid.config.Configurator.root_package`` attribute and init
+  parameter to assist with includeable packages that wish to resolve
+  resources relative to the package in which the ``Configurator`` was created.
+
 Bug Fixes
 ---------
 
