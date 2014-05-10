@@ -14,6 +14,7 @@ from pyramid.security import (
     Everyone,
     )
 
+
 @implementer(IAuthorizationPolicy)
 class ACLAuthorizationPolicy(object):
     """ An :term:`authorization policy` which consults an :term:`ACL`
@@ -73,7 +74,7 @@ class ACLAuthorizationPolicy(object):
         :class:`pyramid.security.ACLDenied` if not."""
 
         acl = '<No ACL found on any object in resource lineage>'
-        
+
         for location in lineage(context):
             try:
                 acl = location.__acl__
@@ -121,7 +122,7 @@ class ACLAuthorizationPolicy(object):
 
             allowed_here = set()
             denied_here = set()
-            
+
             if acl and callable(acl):
                 acl = acl()
 
@@ -132,14 +133,14 @@ class ACLAuthorizationPolicy(object):
                     if not ace_principal in denied_here:
                         allowed_here.add(ace_principal)
                 if (ace_action == Deny) and (permission in ace_permissions):
-                        denied_here.add(ace_principal)
-                        if ace_principal == Everyone:
-                            # clear the entire allowed set, as we've hit a
-                            # deny of Everyone ala (Deny, Everyone, ALL)
-                            allowed = set()
-                            break
-                        elif ace_principal in allowed:
-                            allowed.remove(ace_principal)
+                    denied_here.add(ace_principal)
+                    if ace_principal == Everyone:
+                        # clear the entire allowed set, as we've hit a
+                        # deny of Everyone ala (Deny, Everyone, ALL)
+                        allowed = set()
+                        break
+                    elif ace_principal in allowed:
+                        allowed.remove(ace_principal)
 
             allowed.update(allowed_here)
 
