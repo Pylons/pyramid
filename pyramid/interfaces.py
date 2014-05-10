@@ -9,6 +9,7 @@ from pyramid.compat import PY3
 
 # public API interfaces
 
+
 class IContextFound(Interface):
     """ An event type that is emitted after :app:`Pyramid` finds a
     :term:`context` object but before it calls any view code.  See the
@@ -25,11 +26,13 @@ class IContextFound(Interface):
 
 IAfterTraversal = IContextFound
 
+
 class INewRequest(Interface):
     """ An event type that is emitted whenever :app:`Pyramid`
     begins to process a new request.  See the documentation attached
     to :class:`pyramid.events.NewRequest` for more information."""
     request = Attribute('The request object')
+
 
 class INewResponse(Interface):
     """ An event type that is emitted whenever any :app:`Pyramid`
@@ -38,6 +41,7 @@ class INewResponse(Interface):
     for more information."""
     request = Attribute('The request object')
     response = Attribute('The response object')
+
 
 class IApplicationCreated(Interface):
     """ Event issued when the
@@ -54,7 +58,8 @@ class IApplicationCreated(Interface):
     """
     app = Attribute("Created application")
 
-IWSGIApplicationCreatedEvent = IApplicationCreated # b /c
+IWSGIApplicationCreatedEvent = IApplicationCreated  # b /c
+
 
 class IResponse(Interface):
     """ Represents a WSGI response using the WebOb response interface.
@@ -100,7 +105,9 @@ class IResponse(Interface):
 
     body_file = Attribute(
         """A file-like object that can be used to write to the body. If you
-        passed in a list app_iter, that app_iter will be modified by writes.""")
+        passed in a list app_iter, that app_iter will be modified by writes.
+        """
+    )
 
     cache_control = Attribute(
         """Get/set/modify the Cache-Control header (RFC 2616 section 14.9)""")
@@ -149,7 +156,7 @@ class IResponse(Interface):
         """Gets and sets and deletes the Content-MD5 header. For more
         information on Content-MD5 see RFC 2616 section 14.14.""")
 
-    content_range  = Attribute(
+    content_range = Attribute(
         """Gets and sets and deletes the Content-Range header. For more
         information on Content-Range see section 14.16. Converts using
         ContentRange object.""")
@@ -264,8 +271,10 @@ class IResponse(Interface):
         information on WWW-Authenticate see RFC 2616 section 14.47. Converts
         using 'parse_auth' and 'serialize_auth'. """)
 
-class IException(Interface): # not an API
+
+class IException(Interface):  # not an API
     """ An interface representing a generic exception """
+
 
 class IExceptionResponse(IException, IResponse):
     """ An interface representing a WSGI response which is also an exception
@@ -277,6 +286,7 @@ class IExceptionResponse(IException, IResponse):
     :class:`pyramid.httpexceptions.HTTPForbidden`)."""
     def prepare(environ):
         """ Prepares the response for being called as a WSGI application """
+
 
 class IDict(Interface):
     # Documentation-only interface
@@ -346,6 +356,7 @@ class IDict(Interface):
     def clear():
         """ Clear all values from the dictionary """
 
+
 class IBeforeRender(IDict):
     """
     Subscribers to this event may introspect and modify the set of
@@ -369,6 +380,7 @@ class IBeforeRender(IDict):
                               '``render`` method for this rendering. '
                               'This feature is new in Pyramid 1.2.')
 
+
 class IRendererInfo(Interface):
     """ An object implementing this interface is passed to every
     :term:`renderer factory` constructor as its only argument (conventionally
@@ -382,12 +394,14 @@ class IRendererInfo(Interface):
     settings = Attribute('The deployment settings dictionary related '
                          'to the current application')
 
+
 class IRendererFactory(Interface):
     def __call__(info):
         """ Return an object that implements
         :class:`pyramid.interfaces.IRenderer`. ``info`` is an
         object that implements :class:`pyramid.interfaces.IRendererInfo`.
         """
+
 
 class IRenderer(Interface):
     def __call__(value, system):
@@ -401,6 +415,7 @@ class IRenderer(Interface):
         renderer), ``context`` (the context object passed to the
         view), and ``request`` (the request object passed to the
         view)."""
+
 
 class ITemplateRenderer(IRenderer):
     def implementation():
@@ -416,6 +431,7 @@ deprecated(
     'renderers which have been split into their own packages.'
     )
 
+
 class IViewMapper(Interface):
     def __call__(self, object):
         """ Provided with an arbitrary object (a function, class, or
@@ -423,6 +439,7 @@ class IViewMapper(Interface):
         request)``.  The callable returned should itself return a Response
         object.  An IViewMapper is returned by
         :class:`pyramid.interfaces.IViewMapperFactory`."""
+
 
 class IViewMapperFactory(Interface):
     def __call__(self, **kw):
@@ -436,6 +453,7 @@ class IViewMapperFactory(Interface):
         to extension developers who want to modify potential view callable
         invocation signatures and response values.
         """
+
 
 class IAuthenticationPolicy(Interface):
     """ An object representing a Pyramid authentication policy. """
@@ -470,6 +488,7 @@ class IAuthenticationPolicy(Interface):
         """ Return a set of headers suitable for 'forgetting' the
         current user on subsequent requests. """
 
+
 class IAuthorizationPolicy(Interface):
     """ An object representing a Pyramid authorization policy. """
     def permits(context, principals, permission):
@@ -486,7 +505,8 @@ class IAuthorizationPolicy(Interface):
         ``pyramid.security.principals_allowed_by_permission`` API is
         used."""
 
-class IMultiDict(IDict): # docs-only interface
+
+class IMultiDict(IDict):  # docs-only interface
     """
     An ordered dictionary that can have multiple values for each key. A
     multidict adds the methods ``getall``, ``getone``, ``mixed``, ``extend``,
@@ -526,12 +546,15 @@ class IMultiDict(IDict): # docs-only interface
 
 # internal interfaces
 
+
 class IRequest(Interface):
     """ Request type interface attached to all request objects """
+
 
 class ITweens(Interface):
     """ Marker interface for utility registration representing the ordered
     set of a configuration's tween factories"""
+
 
 class IRequestHandler(Interface):
     """ """
@@ -540,7 +563,8 @@ class IRequestHandler(Interface):
         The ``request`` argument will be an instance of an object that
         provides IRequest."""
 
-IRequest.combined = IRequest # for exception view lookups
+IRequest.combined = IRequest  # for exception view lookups
+
 
 class IRequestExtensions(Interface):
     """ Marker interface for storing request extensions (properties and
@@ -550,9 +574,11 @@ class IRequestExtensions(Interface):
     methods = Attribute(
         """A list of methods to be added to each request.""")
 
+
 class IRouteRequest(Interface):
     """ *internal only* interface used as in a utility lookup to find
     route-specific interfaces.  Not an API."""
+
 
 class IStaticURLInfo(Interface):
     """ A policy for generating URLs to static assets """
@@ -562,6 +588,7 @@ class IStaticURLInfo(Interface):
     def generate(path, request, **kw):
         """ Generate a URL for the given path """
 
+
 class IResponseFactory(Interface):
     """ A utility which generates a response factory """
     def __call__():
@@ -569,6 +596,7 @@ class IResponseFactory(Interface):
         implementing IResponse, e.g. :class:`pyramid.response.Response`). It
         should accept all the arguments that the Pyramid Response class
         accepts."""
+
 
 class IRequestFactory(Interface):
     """ A utility which generates a request """
@@ -580,15 +608,19 @@ class IRequestFactory(Interface):
         """ Return an empty request object (see
         :meth:`pyramid.request.Request.blank`)"""
 
+
 class IViewClassifier(Interface):
     """ *Internal only* marker interface for views."""
+
 
 class IExceptionViewClassifier(Interface):
     """ *Internal only* marker interface for exception views."""
 
+
 class IView(Interface):
     def __call__(context, request):
         """ Must return an object that implements IResponse. """
+
 
 class ISecuredView(IView):
     """ *Internal only* interface.  Not an API. """
@@ -599,6 +631,7 @@ class ISecuredView(IView):
         """ Return True if view execution will be permitted using the
         context and request, False otherwise"""
 
+
 class IMultiView(ISecuredView):
     """ *internal only*.  A multiview is a secured view that is a
     collection of other views.  Each of the views is associated with
@@ -606,13 +639,16 @@ class IMultiView(ISecuredView):
     def add(view, predicates, order, accept=None, phash=None):
         """ Add a view to the multiview. """
 
+
 class IRootFactory(Interface):
     def __call__(request):
         """ Return a root object based on the request """
 
+
 class IDefaultRootFactory(Interface):
     def __call__(request):
         """ Return the *default* root object for an application """
+
 
 class ITraverser(Interface):
     def __call__(request):
@@ -638,18 +674,21 @@ class ITraverser(Interface):
         as attributes of the ``request`` object by the :term:`router`.
         """
 
-ITraverserFactory = ITraverser # b / c for 1.0 code
+ITraverserFactory = ITraverser  # b / c for 1.0 code
+
 
 class IViewPermission(Interface):
     def __call__(context, request):
         """ Return True if the permission allows, return False if it denies.
         """
 
+
 class IRouter(Interface):
     """ WSGI application which routes requests to 'view' code based on
     a view registry."""
     registry = Attribute(
         """Component architecture registry local to this application.""")
+
 
 class ISettings(Interface):
     """ Runtime settings utility for pyramid; represents the
@@ -658,15 +697,19 @@ class ISettings(Interface):
 
 # this interface, even if it becomes unused within Pyramid, is
 # imported by other packages (such as traversalwrapper)
+
+
 class ILocation(Interface):
     """Objects that have a structural location"""
     __parent__ = Attribute("The parent in the location hierarchy")
     __name__ = Attribute("The name within the parent")
 
+
 class IDebugLogger(Interface):
     """ Interface representing a PEP 282 logger """
 
-ILogger = IDebugLogger # b/c
+ILogger = IDebugLogger  # b/c
+
 
 class IRoutePregenerator(Interface):
     def __call__(request, elements, kw):
@@ -693,6 +736,7 @@ class IRoutePregenerator(Interface):
 
         """
 
+
 class IRoute(Interface):
     """ Interface representing the type of object returned from
     ``IRoutesMapper.get_route``"""
@@ -708,7 +752,7 @@ class IRoute(Interface):
     pregenerator = Attribute('This attribute should either be ``None`` or '
                              'a callable object implementing the '
                              '``IRoutePregenerator`` interface')
-        
+
     def match(path):
         """
         If the ``path`` passed to this function can be matched by the
@@ -725,6 +769,7 @@ class IRoute(Interface):
         Generate a URL based on filling in the dynamic segment markers
         in the pattern using the ``kw`` dictionary provided.
         """
+
 
 class IRoutesMapper(Interface):
     """ Interface representing a Routes ``Mapper`` object """
@@ -754,6 +799,7 @@ class IRoutesMapper(Interface):
         ``match`` key will be the matchdict or ``None`` if no route
         matched.  Static routes will not be considered for matching.  """
 
+
 class IResourceURL(Interface):
     virtual_path = Attribute(
         'The virtual url path of the resource as a string.'
@@ -767,6 +813,7 @@ class IResourceURL(Interface):
     physical_path_tuple = Attribute(
         'The physical url path of the resource as a tuple. (New in 1.5)'
         )
+
 
 class IContextURL(IResourceURL):
     """
@@ -803,7 +850,7 @@ class IContextURL(IResourceURL):
     # <__main__.Fudge object at 0x1cda890>
     # <object object at 0x7fa678f3e2a0> <object object at 0x7fa678f3e2a0>
     # <__main__.Another object at 0x1cda850>
-    
+
     def virtual_root():
         """ Return the virtual root related to a request and the
         current context"""
@@ -815,10 +862,11 @@ deprecated(
     'IContextURL',
     'As of Pyramid 1.3 the, "pyramid.interfaces.IContextURL" interface is '
     'scheduled to be removed.   Use the '
-    '"pyramid.config.Configurator.add_resource_url_adapter" method to register '
-    'a class that implements "pyramid.interfaces.IResourceURL" instead. '
+    '"pyramid.config.Configurator.add_resource_url_adapter" method to register'
+    ' a class that implements "pyramid.interfaces.IResourceURL" instead. '
     'See the "What\'s new In Pyramid 1.3" document for more details.'
     )
+
 
 class IPEP302Loader(Interface):
     """ See http://www.python.org/dev/peps/pep-0302/#id30.
@@ -837,9 +885,9 @@ class IPEP302Loader(Interface):
 
     def get_code(fullname):
         """ Return the code object for the module identified by 'fullname'.
-        
+
         Return 'None' if it's a built-in or extension module.
-        
+
         If the loader doesn't have the code object but it does have the source
         code, return the compiled source code.
 
@@ -848,16 +896,16 @@ class IPEP302Loader(Interface):
 
     def get_source(fullname):
         """ Return the source code for the module identified by 'fullname'.
-        
+
         Return a string, using newline characters for line endings, or None
         if the source is not available.
-            
+
         Raise ImportError if the module can't be found by the importer at all.
         """
 
     def get_filename(fullname):
         """ Return the value of '__file__' if the named module was loaded.
-        
+
         If the module is not found, raise ImportError.
         """
 
@@ -869,27 +917,33 @@ class IPackageOverrides(IPEP302Loader):
 # traversalwrapper)
 VH_ROOT_KEY = 'HTTP_X_VHM_ROOT'
 
+
 class ILocalizer(Interface):
     """ Localizer for a specific language """
+
 
 class ILocaleNegotiator(Interface):
     def __call__(request):
         """ Return a locale name """
 
+
 class ITranslationDirectories(Interface):
     """ A list object representing all known translation directories
     for an application"""
+
 
 class IDefaultPermission(Interface):
     """ A string object representing the default permission to be used
     for all view configurations which do not explicitly declare their
     own."""
 
+
 class ISessionFactory(Interface):
     """ An interface representing a factory which accepts a request object and
     returns an ISession object """
     def __call__(request):
         """ Return an ISession object """
+
 
 class ISession(IDict):
     """ An interface representing a session (a web session object,
@@ -962,6 +1016,7 @@ class ISession(IDict):
         called, which will create and set a token, and this token will be
         returned.
         """
+
 
 class IIntrospector(Interface):
     def get(category_name, discriminator, default=None):
@@ -1090,8 +1145,8 @@ class IIntrospectable(Interface):
             def register(self, introspector, action_info):
                 self.action_info = action_info
                 introspector.add(self)
-                for methodname, category_name, discriminator in self._relations:
-                    method = getattr(introspector, methodname)
+                for methname, category_name, discriminator in self._relations:
+                    method = getattr(introspector, methname)
                     method((i.category_name, i.discriminator),
                            (category_name, discriminator))
         """
@@ -1104,9 +1159,11 @@ class IIntrospectable(Interface):
           return hash((self.category_name,) + (self.discriminator,))
         """
 
+
 class IActionInfo(Interface):
     """ Class which provides code introspection capability associated with an
-    action.  The ParserInfo class used by ZCML implements the same interface."""
+    action.  The ParserInfo class used by ZCML implements the same interface.
+    """
     file = Attribute(
         'Filename of action-invoking code as a string')
     line = Attribute(
@@ -1116,6 +1173,7 @@ class IActionInfo(Interface):
     def __str__():
         """ Return a representation of the action information (including
         source code from file, if possible) """
+
 
 class IAssetDescriptor(Interface):
     """
@@ -1155,11 +1213,13 @@ class IAssetDescriptor(Interface):
         Returns True if asset exists, otherwise returns False.
         """
 
+
 class IJSONAdapter(Interface):
     """
     Marker interface for objects that can convert an arbitrary object
     into a JSON-serializable primitive.
     """
+
 
 class IPredicateList(Interface):
     """ Interface representing a predicate list """
@@ -1170,4 +1230,3 @@ class IPredicateList(Interface):
 
 PHASE1_CONFIG = -20
 PHASE2_CONFIG = -10
-
