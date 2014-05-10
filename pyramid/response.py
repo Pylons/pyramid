@@ -3,12 +3,12 @@ from os.path import (
     getmtime,
     getsize,
     )
-
 import venusian
 
 from webob import Response as _Response
 from zope.interface import implementer
 from pyramid.interfaces import IResponse
+
 
 def init_mimetypes(mimetypes):
     # this is a function so it can be unittested
@@ -22,11 +22,13 @@ def init_mimetypes(mimetypes):
 # has been applied on the Python 2 trunk).
 init_mimetypes(mimetypes)
 
-_BLOCK_SIZE = 4096 * 64 # 256K
+_BLOCK_SIZE = 4096 * 64  # 256K
+
 
 @implementer(IResponse)
 class Response(_Response):
     pass
+
 
 class FileResponse(Response):
     """
@@ -76,6 +78,7 @@ class FileResponse(Response):
         if cache_max_age is not None:
             self.cache_expires = cache_max_age
 
+
 class FileIter(object):
     """ A fixed-block-size iterator for use as a WSGI app_iter.
 
@@ -97,7 +100,7 @@ class FileIter(object):
             raise StopIteration
         return val
 
-    __next__ = next # py3
+    __next__ = next  # py3
 
     def close(self):
         self.file.close()
@@ -135,7 +138,7 @@ class response_adapter(object):
         @response_adapter(dict, list)
         def myadapter(ob):
             return Response(json.dumps(ob))
-        
+
     This method will have no effect until a :term:`scan` is performed
     agains the package or module which contains it, ala:
 
@@ -146,7 +149,7 @@ class response_adapter(object):
         config.scan('somepackage_containing_adapters')
 
     """
-    venusian = venusian # for unit testing
+    venusian = venusian  # for unit testing
 
     def __init__(self, *types_or_ifaces):
         self.types_or_ifaces = types_or_ifaces
