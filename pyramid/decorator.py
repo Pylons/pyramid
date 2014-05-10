@@ -1,3 +1,4 @@
+"""File of decorator `reify`"""
 class reify(object):
     """ Use as a class method decorator.  It operates almost exactly like the
     Python ``@property`` decorator, but it puts the result of the method it
@@ -28,7 +29,7 @@ class reify(object):
         self.wrapped = wrapped
         try:
             self.__doc__ = wrapped.__doc__
-        except: # pragma: no cover
+        except:  # pragma: no cover
             pass
 
     def __get__(self, inst, objtype=None):
