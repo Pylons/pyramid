@@ -36,6 +36,7 @@ from pyramid.traversal import (
 
 from pyramid.tweens import excview_tween_factory
 
+
 @implementer(IRouter)
 class Router(object):
 
@@ -56,7 +57,7 @@ class Router(object):
             tweens = excview_tween_factory
         self.orig_handle_request = self.handle_request
         self.handle_request = tweens(self.handle_request, registry)
-        self.root_policy = self.root_factory # b/w compat
+        self.root_policy = self.root_factory  # b/w compat
         self.registry = registry
         settings = registry.settings
         if settings is not None:
@@ -191,18 +192,18 @@ class Router(object):
         :term:`tween` in the tween stack closest to the request ingress.  If
         ``use_tweens`` is ``False``, the request will be sent to the main
         router handler, and no tweens will be invoked.
-        
+
         See the API for pyramid.request for complete documentation.
         """
         registry = self.registry
         has_listeners = self.registry.has_listeners
         notify = self.registry.notify
-        threadlocals = {'registry':registry, 'request':request}
+        threadlocals = {'registry': registry, 'request': request}
         manager = self.threadlocal_manager
         manager.push(threadlocals)
         request.registry = registry
         request.invoke_subrequest = self.invoke_subrequest
-        
+
         if use_tweens:
             handle_request = self.handle_request
         else:
@@ -220,7 +221,7 @@ class Router(object):
                     request._process_response_callbacks(response)
 
                 has_listeners and notify(NewResponse(request, response))
-                
+
                 return response
 
             finally:
@@ -241,4 +242,3 @@ class Router(object):
         request = self.request_factory(environ)
         response = self.invoke_subrequest(request, use_tweens=True)
         return response(request.environ, start_response)
-
