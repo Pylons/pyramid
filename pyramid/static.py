@@ -32,6 +32,7 @@ from pyramid.traversal import traversal_path_info
 
 slash = text_('/')
 
+
 class static_view(object):
     """ An instance of this class is a callable which can act as a
     :app:`Pyramid` :term:`view callable`; this view will serve
@@ -103,18 +104,19 @@ class static_view(object):
         if path is None:
             raise HTTPNotFound('Out of bounds: %s' % request.url)
 
-        if self.package_name: # package resource
+        if self.package_name:  # package resource
 
-            resource_path ='%s/%s' % (self.docroot.rstrip('/'), path)
+            resource_path = '%s/%s' % (self.docroot.rstrip('/'), path)
             if resource_isdir(self.package_name, resource_path):
                 if not request.path_url.endswith('/'):
                     self.add_slash_redirect(request)
-                resource_path = '%s/%s' % (resource_path.rstrip('/'),self.index)
+                resource_path = '%s/%s'\
+                    % (resource_path.rstrip('/'), self.index)
             if not resource_exists(self.package_name, resource_path):
                 raise HTTPNotFound(request.url)
             filepath = resource_filename(self.package_name, resource_path)
 
-        else: # filesystem file
+        else:  # filesystem file
 
             # os.path.normpath converts / to \ on windows
             filepath = normcase(normpath(join(self.norm_docroot, path)))
@@ -135,12 +137,15 @@ class static_view(object):
         raise HTTPMovedPermanently(url)
 
 _seps = set(['/', os.sep])
+
+
 def _contains_slash(item):
     for sep in _seps:
         if sep in item:
             return True
 
 _has_insecure_pathelement = set(['..', '.', '']).intersection
+
 
 @lru_cache(1000)
 def _secure_path(path_tuple):
@@ -151,6 +156,5 @@ def _secure_path(path_tuple):
         return None
     if any([_contains_slash(item) for item in path_tuple]):
         return None
-    encoded = slash.join(path_tuple) # will be unicode
+    encoded = slash.join(path_tuple)  # will be unicode
     return encoded
-
