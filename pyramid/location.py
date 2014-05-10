@@ -12,6 +12,7 @@
 #
 ##############################################################################
 
+
 def inside(resource1, resource2):
     """Is ``resource1`` 'inside' ``resource2``?  Return ``True`` if so, else
     ``False``.
@@ -27,6 +28,7 @@ def inside(resource1, resource2):
         resource1 = resource1.__parent__
 
     return False
+
 
 def lineage(resource):
     """
@@ -46,7 +48,7 @@ def lineage(resource):
 
     Calling ``lineage(thing2)`` will return a generator.  When we turn
     it into a list, we will get::
-    
+
       list(lineage(thing2))
       [ <Thing object at thing2>, <Thing object at thing1> ]
     """
@@ -63,4 +65,3 @@ def lineage(resource):
             resource = resource.__parent__
         except AttributeError:
             resource = None
-
