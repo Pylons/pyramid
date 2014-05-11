@@ -13,6 +13,7 @@ from pyramid.interfaces import (
     IBeforeRender,
     )
 
+
 class subscriber(object):
     """ Decorator activated via a :term:`scan` which treats the function
     being decorated as an event subscriber for the set of interfaces passed
@@ -68,7 +69,7 @@ class subscriber(object):
     narrow the set of circumstances in which a subscriber will be called.
 
     """
-    venusian = venusian # for unit testing
+    venusian = venusian  # for unit testing
 
     def __init__(self, *ifaces, **predicates):
         self.ifaces = ifaces
@@ -83,6 +84,7 @@ class subscriber(object):
         self.venusian.attach(wrapped, self.register, category='pyramid')
         return wrapped
 
+
 @implementer(INewRequest)
 class NewRequest(object):
     """ An instance of this class is emitted as an :term:`event`
@@ -92,6 +94,7 @@ class NewRequest(object):
     :class:`pyramid.interfaces.INewRequest` interface."""
     def __init__(self, request):
         self.request = request
+
 
 @implementer(INewResponse)
 class NewResponse(object):
@@ -129,6 +132,7 @@ class NewResponse(object):
         self.request = request
         self.response = response
 
+
 @implementer(IContextFound)
 class ContextFound(object):
     """ An instance of this class is emitted as an :term:`event` after
@@ -153,10 +157,11 @@ class ContextFound(object):
     def __init__(self, request):
         self.request = request
 
-AfterTraversal = ContextFound # b/c as of 1.0
+AfterTraversal = ContextFound  # b/c as of 1.0
+
 
 @implementer(IApplicationCreated)
-class ApplicationCreated(object):    
+class ApplicationCreated(object):
     """ An instance of this class is emitted as an :term:`event` when
     the :meth:`pyramid.config.Configurator.make_wsgi_app` is
     called.  The instance has an attribute, ``app``, which is an
@@ -174,7 +179,8 @@ class ApplicationCreated(object):
         self.app = app
         self.object = app
 
-WSGIApplicationCreatedEvent = ApplicationCreated # b/c (as of 1.0)
+WSGIApplicationCreatedEvent = ApplicationCreated  # b/c (as of 1.0)
+
 
 @implementer(IBeforeRender)
 class BeforeRender(dict):
@@ -242,5 +248,3 @@ class BeforeRender(dict):
     def __init__(self, system, rendering_val=None):
         dict.__init__(self, system)
         self.rendering_val = rendering_val
-
-

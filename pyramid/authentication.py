@@ -3,7 +3,6 @@ from codecs import utf_8_decode
 from codecs import utf_8_encode
 import hashlib
 import base64
-import datetime
 import re
 import time as time_mod
 import warnings
@@ -37,6 +36,7 @@ from pyramid.util import strings_differ
 
 VALID_TOKEN = re.compile(r"^[A-Za-z][A-Za-z0-9+_-]*$")
 
+
 class CallbackAuthenticationPolicy(object):
     """ Abstract class """
 
@@ -44,6 +44,7 @@ class CallbackAuthenticationPolicy(object):
     callback = None
 
     def _log(self, msg, methodname, request):
+        """Make log debug to this class"""
         logger = request.registry.queryUtility(IDebugLogger)
         if logger:
             cls = self.__class__
@@ -52,6 +53,7 @@ class CallbackAuthenticationPolicy(object):
             logger.debug(methodname + ': ' + msg)
 
     def _clean_principal(self, princid):
+        """Clean principal if is Authenticated or Everyone"""
         if princid in (Authenticated, Everyone):
             princid = None
         return princid
@@ -78,10 +80,10 @@ class CallbackAuthenticationPolicy(object):
             debug and self._log(
                 ('use of userid %r is disallowed by any built-in Pyramid '
                  'security policy, returning None' % userid),
-                'authenticated_userid' ,
+                'authenticated_userid',
                 request)
             return None
-            
+
         if self.callback is None:
             debug and self._log(
                 'there was no groupfinder callback; returning %r' % (userid,),
@@ -89,7 +91,7 @@ class CallbackAuthenticationPolicy(object):
                 request)
             return userid
         callback_ok = self.callback(userid, request)
-        if callback_ok is not None: # is not None!
+        if callback_ok is not None:  # is not None!
             debug and self._log(
                 'groupfinder callback returned %r; returning %r' % (
                     callback_ok, userid),
@@ -147,7 +149,7 @@ class CallbackAuthenticationPolicy(object):
                 request
                 )
             return effective_principals
-            
+
         if self.callback is None:
             debug and self._log(
                 'groupfinder callback is None, so groups is []',
@@ -161,7 +163,7 @@ class CallbackAuthenticationPolicy(object):
                 'effective_principals',
                 request)
 
-        if groups is None: # is None!
+        if groups is None:  # is None!
             debug and self._log(
                 'returning effective principals: %r' % (
                     effective_principals,),
@@ -176,11 +178,12 @@ class CallbackAuthenticationPolicy(object):
 
         debug and self._log(
             'returning effective principals: %r' % (
-                effective_principals,),
+                effective_principals,
+            ),
             'effective_principals',
-            request
-             )
+            request)
         return effective_principals
+
 
 @implementer(IAuthenticationPolicy)
 class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
@@ -249,7 +252,7 @@ class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
                 'authenticated_userid',
                 request)
             return None
-            
+
         if self._clean_principal(userid) is None:
             self.debug and self._log(
                 ('use of userid %r is disallowed by any built-in Pyramid '
@@ -261,7 +264,7 @@ class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
         if self.callback is None:
             return userid
 
-        if self.callback(identity, request) is not None: # is not None!
+        if self.callback(identity, request) is not None:  # is not None!
             return userid
 
     def unauthenticated_userid(self, request):
@@ -301,10 +304,10 @@ class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
         else:
             groups = self.callback(identity, request)
 
-        if groups is None: # is None!
+        if groups is None:  # is None!
             self.debug and self._log(
-                ('security policy groups callback returned None; returning %r' %
-                 effective_principals),
+                ('security policy groups callback returned None; returning %r'
+                 % effective_principals),
                 'effective_principals',
                 request
                 )
@@ -337,7 +340,7 @@ class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
 
     def remember(self, request, principal, **kw):
         """ Store the ``principal`` as ``repoze.who.userid``.
-        
+
         The identity to authenticated to :mod:`repoze.who`
         will contain the given principal as ``userid``, and
         provide all keyword arguments as additional identity
@@ -363,6 +366,7 @@ class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
             return []
         identity = self._get_identity(request)
         return identifier.forget(request.environ, identity)
+
 
 @implementer(IAuthenticationPolicy)
 class RemoteUserAuthenticationPolicy(CallbackAuthenticationPolicy):
@@ -417,6 +421,7 @@ class RemoteUserAuthenticationPolicy(CallbackAuthenticationPolicy):
         return []
 
 _marker = object()
+
 
 @implementer(IAuthenticationPolicy)
 class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
@@ -614,14 +619,14 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
                 'you use the SHA512 algorithm instead for improved security.  '
                 'Pass ``hashalg=\'sha512\'`` to the '
                 'AuthTktAuthenticationPolicy constructor to do so.\n\nNote '
-                'that a change to the hash algorithms will invalidate existing '
-                'auth tkt cookies set by your application.  If backwards '
+                'that a change to the hash algorithms will invalidate existing'
+                ' auth tkt cookies set by your application.  If backwards '
                 'compatibility of existing auth tkt cookies is of greater '
                 'concern than the risk posed by the potential for a hash '
                 'collision, you\'ll want to continue using MD5 explicitly.  '
                 'To do so, pass ``hashalg=\'md5\'`` in your application to '
-                'the AuthTktAuthenticationPolicy constructor.   When you do so '
-                'this warning will not be emitted again.  The default '
+                'the AuthTktAuthenticationPolicy constructor.   When you do so'
+                ' this warning will not be emitted again.  The default '
                 'algorithm used in this policy will change in the future, so '
                 'setting an explicit hashalg will futureproof your '
                 'application.',
@@ -666,11 +671,14 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
         """ A list of headers which will delete appropriate cookies."""
         return self.cookie.forget(request)
 
+
 def b64encode(v):
     return base64.b64encode(bytes_(v)).strip().replace(b'\n', b'')
 
+
 def b64decode(v):
     return base64.b64decode(bytes_(v))
+
 
 # this class licensed under the MIT license (stolen from Paste)
 class AuthTicket(object):
@@ -722,6 +730,7 @@ class AuthTicket(object):
         v += self.user_data
         return v
 
+
 # this class licensed under the MIT license (stolen from Paste)
 class BadTicket(Exception):
     """
@@ -732,6 +741,7 @@ class BadTicket(Exception):
     def __init__(self, msg, expected=None):
         self.expected = expected
         Exception.__init__(self, msg)
+
 
 # this function licensed under the MIT license (stolen from Paste)
 def parse_ticket(secret, ticket, ip, hashalg='md5'):
@@ -755,7 +765,7 @@ def parse_ticket(secret, ticket, ip, hashalg='md5'):
     userid = url_unquote(userid)
     if '!' in data:
         tokens, user_data = data.split('!', 1)
-    else: # pragma: no cover (never generated)
+    else:  # pragma: no cover (never generated)
         # @@: Is this the right order?
         tokens = ''
         user_data = data
@@ -772,6 +782,7 @@ def parse_ticket(secret, ticket, ip, hashalg='md5'):
     tokens = tokens.split(',')
 
     return (timestamp, userid, tokens, user_data)
+
 
 # this function licensed under the MIT license (stolen from Paste)
 def calculate_digest(ip, timestamp, secret, userid, tokens, user_data,
@@ -791,11 +802,12 @@ def calculate_digest(ip, timestamp, secret, userid, tokens, user_data,
         ip_timestamp = encode_ip_timestamp(ip, timestamp)
 
     hash_obj.update(ip_timestamp + secret + userid + b'\0' +
-            tokens + b'\0' + user_data)
+                    tokens + b'\0' + user_data)
     digest = hash_obj.hexdigest()
     hash_obj2 = hashlib.new(hashalg)
     hash_obj2.update(bytes_(digest) + secret)
     return hash_obj2.hexdigest()
+
 
 # this function licensed under the MIT license (stolen from Paste)
 def encode_ip_timestamp(ip, timestamp):
@@ -808,6 +820,7 @@ def encode_ip_timestamp(ip, timestamp):
     ts_chars = ''.join(map(chr, ts))
     return bytes_(ip_chars + ts_chars)
 
+
 class AuthTktCookieHelper(object):
     """
     A helper class for use in third-party authentication policy
@@ -815,14 +828,14 @@ class AuthTktCookieHelper(object):
     :class:`pyramid.authentication.AuthTktAuthenticationPolicy` for the
     meanings of the constructor arguments.
     """
-    parse_ticket = staticmethod(parse_ticket) # for tests
-    AuthTicket = AuthTicket # for tests
-    BadTicket = BadTicket # for tests
-    now = None # for tests
+    parse_ticket = staticmethod(parse_ticket)  # for tests
+    AuthTicket = AuthTicket  # for tests
+    BadTicket = BadTicket  # for tests
+    now = None  # for tests
 
     userid_type_decoders = {
-        'int':int,
-        'unicode':lambda x: utf_8_decode(x)[0], # bw compat for old cookies
+        'int': int,
+        'unicode': lambda x: utf_8_decode(x)[0],  # bw compat for old cookies
         'b64unicode': lambda x: utf_8_decode(b64decode(x))[0],
         'b64str': lambda x: b64decode(x),
         }
@@ -840,15 +853,14 @@ class AuthTktCookieHelper(object):
                  hashalg='md5', parent_domain=False, domain=None):
 
         serializer = _SimpleSerializer()
-            
+
         self.cookie_profile = CookieProfile(
-            cookie_name = cookie_name,
-            secure = secure,
-            max_age = max_age,
-            httponly = http_only,
-            path = path,
-            serializer=serializer
-            )
+            cookie_name=cookie_name,
+            secure=secure,
+            max_age=max_age,
+            httponly=http_only,
+            path=path,
+            serializer=serializer)
 
         self.secret = secret
         self.cookie_name = cookie_name
@@ -883,7 +895,7 @@ class AuthTktCookieHelper(object):
         kw['domains'] = domains
         if max_age is not None:
             kw['max_age'] = max_age
-            
+
         headers = profile.get_headers(value, **kw)
         return headers
 
@@ -907,12 +919,12 @@ class AuthTktCookieHelper(object):
         except self.BadTicket:
             return None
 
-        now = self.now # service tests
+        now = self.now  # service tests
 
         if now is None:
             now = time_mod.time()
 
-        if self.timeout and ( (timestamp + self.timeout) < now ):
+        if self.timeout and ((timestamp + self.timeout) < now):
             # the auth_tkt data has expired
             return None
 
@@ -928,11 +940,12 @@ class AuthTktCookieHelper(object):
         reissue = self.reissue_time is not None
 
         if reissue and not hasattr(request, '_authtkt_reissued'):
-            if ( (now - timestamp) > self.reissue_time ):
-                # work around https://github.com/Pylons/pyramid/issues#issue/108
+            if (now - timestamp) > self.reissue_time:
+                #work around https://github.com/Pylons/pyramid/issues#issue/108
                 tokens = list(filter(None, tokens))
                 headers = self.remember(request, userid, max_age=self.max_age,
                                         tokens=tokens)
+
                 def reissue_authtkt(request, response):
                     if not hasattr(request, '_authtkt_reissue_revoked'):
                         for k, v in headers:
@@ -1024,6 +1037,7 @@ class AuthTktCookieHelper(object):
         cookie_value = ticket.cookie_value()
         return self._get_cookies(request, cookie_value, max_age)
 
+
 @implementer(IAuthenticationPolicy)
 class SessionAuthenticationPolicy(CallbackAuthenticationPolicy):
     """ A :app:`Pyramid` authentication policy which gets its data from the
@@ -1094,8 +1108,8 @@ class BasicAuthAuthenticationPolicy(CallbackAuthenticationPolicy):
 
     ``realm``
 
-       Default: ``"Realm"``.  The Basic Auth Realm string.  Usually displayed to
-       the user by the browser in the login dialog.
+       Default: ``"Realm"``.  The Basic Auth Realm string.  Usually displayed \
+           to the user by the browser in the login dialog.
 
     ``debug``
 
@@ -1159,14 +1173,14 @@ class BasicAuthAuthenticationPolicy(CallbackAuthenticationPolicy):
             return None
         try:
             authmeth, auth = authorization.split(' ', 1)
-        except ValueError: # not enough values to unpack
+        except ValueError:  # not enough values to unpack
             return None
         if authmeth.lower() != 'basic':
             return None
 
         try:
             authbytes = b64decode(auth.strip())
-        except (TypeError, binascii.Error): # can't decode
+        except (TypeError, binascii.Error):  # can't decode
             return None
 
         # try utf-8 first, then latin-1; see discussion in
@@ -1178,9 +1192,10 @@ class BasicAuthAuthenticationPolicy(CallbackAuthenticationPolicy):
 
         try:
             username, password = auth.split(':', 1)
-        except ValueError: # not enough values to unpack
+        except ValueError:  # not enough values to unpack
             return None
         return username, password
+
 
 class _SimpleSerializer(object):
     def loads(self, bstruct):
@@ -1188,4 +1203,3 @@ class _SimpleSerializer(object):
 
     def dumps(self, appstruct):
         return bytes_(appstruct)
-

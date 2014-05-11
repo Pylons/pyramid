@@ -1,3 +1,4 @@
+""" File with methods of pyramid.asset """
 import os
 import pkg_resources
 
@@ -8,9 +9,12 @@ from pyramid.path import (
     package_name,
     )
 
+
 def resolve_asset_spec(spec, pname='__main__'):
+    """Try resolve asset spec and return an package name and filename
+    """
     if pname and not isinstance(pname, string_types):
-        pname = pname.__name__ # as package
+        pname = pname.__name__  # as package
     if os.path.isabs(spec):
         return None, spec
     filename = spec
@@ -19,6 +23,7 @@ def resolve_asset_spec(spec, pname='__main__'):
     elif pname is None:
         pname, filename = None, spec
     return pname, filename
+
 
 def asset_spec_from_abspath(abspath, package):
     """ Try to convert an absolute path to a resource in a package to
@@ -33,12 +38,14 @@ def asset_spec_from_abspath(abspath, package):
                           relpath.replace(os.path.sep, '/'))
     return abspath
 
-# bw compat only; use pyramid.path.AssetDescriptor.abspath() instead
+
 def abspath_from_asset_spec(spec, pname='__main__'):
+    """Return a package name from spec
+    bw compat only; use pyramid.path.AssetDescriptor.abspath() instead.
+    """
     if pname is None:
         return spec
     pname, filename = resolve_asset_spec(spec, pname)
     if pname is None:
         return filename
     return pkg_resources.resource_filename(pname, filename)
-

@@ -28,12 +28,15 @@ from pyramid.security import (
 from pyramid.url import URLMethodsMixin
 from pyramid.util import InstancePropertyMixin
 
+
 class TemplateContext(object):
     pass
+
 
 class CallbackMethodsMixin(object):
     response_callbacks = ()
     finished_callbacks = ()
+
     def add_response_callback(self, callback):
         """
         Add a callback to the set of callbacks to be called by the
@@ -59,8 +62,8 @@ class CallbackMethodsMixin(object):
         called if an exception happens in application code, or if the
         response object returned by :term:`view` code is invalid.
 
-        All response callbacks are called *after* the tweens and 
-        *before* the :class:`pyramid.events.NewResponse` event is sent.
+        All response callbacks are called *after* the tweens and
+         *before* the :class:`pyramid.events.NewResponse` event is sent.
 
         Errors raised by callbacks are not handled specially.  They
         will be propagated to the caller of the :app:`Pyramid`
@@ -143,6 +146,7 @@ class CallbackMethodsMixin(object):
             callback = callbacks.pop(0)
             callback(self)
 
+
 @implementer(IRequest)
 class Request(
     BaseRequest,
@@ -152,7 +156,7 @@ class Request(
     LocalizerRequestMixin,
     AuthenticationAPIMixin,
     AuthorizationAPIMixin,
-    ):
+):
     """
     A subclass of the :term:`WebOb` Request class.  An instance of
     this class is created by the :term:`router` and is provided to a
@@ -233,7 +237,7 @@ class Request(
     def json_body(self):
         return json.loads(text_(self.body, self.charset))
 
-    
+
 def route_request_iface(name, bases=()):
     # zope.interface treats the __name__ as the __doc__ and changes __name__
     # to None for interfaces that contain spaces if you do not pass a
@@ -250,11 +254,13 @@ def route_request_iface(name, bases=()):
         __doc__ = 'route_request_iface-generated combined interface')
     return iface
 
+
 def add_global_response_headers(request, headerlist):
     def add_headers(request, response):
         for k, v in headerlist:
             response.headerlist.append((k, v))
     request.add_response_callback(add_headers)
+
 
 def call_app_with_subpath_as_path_info(request, app):
     # Copy the request.  Use the source request's subpath (if it exists) as
@@ -279,8 +285,8 @@ def call_app_with_subpath_as_path_info(request, app):
     new_path_info = '/' + '/'.join([native_(x.encode('utf-8'), 'latin-1')
                                     for x in subpath])
 
-    if new_path_info != '/': # don't want a sole double-slash
-        if path_info != '/': # if orig path_info is '/', we're already done
+    if new_path_info != '/':  # don't want a sole double-slash
+        if path_info != '/':  # if orig path_info is '/', we're already done
             if path_info.endswith('/'):
                 # readd trailing slash stripped by subpath (traversal)
                 # conversion

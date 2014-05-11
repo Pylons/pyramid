@@ -30,6 +30,7 @@ from pyramid.threadlocal import get_current_registry
 
 # API
 
+
 def render(renderer_name, value, request=None, package=None):
     """ Using the renderer ``renderer_name`` (a template
     or a static renderer), render the value (or set of values) present
@@ -91,6 +92,7 @@ def render(renderer_name, value, request=None, package=None):
 
     return result
 
+
 def render_to_response(renderer_name, value, request=None, package=None):
     """ Using the renderer ``renderer_name`` (a template
     or a static renderer), render the value (or set of values) using
@@ -137,6 +139,7 @@ def render_to_response(renderer_name, value, request=None, package=None):
                             registry=registry)
     return helper.render_to_response(value, None, request=request)
 
+
 def get_renderer(renderer_name, package=None):
     """ Return the renderer object for the renderer ``renderer_name``.
 
@@ -155,6 +158,7 @@ def get_renderer(renderer_name, package=None):
 
 # concrete renderer factory implementations (also API)
 
+
 def string_renderer_factory(info):
     def _render(value, system):
         if not isinstance(value, string_types):
@@ -169,6 +173,7 @@ def string_renderer_factory(info):
     return _render
 
 _marker = object()
+
 
 class JSON(object):
     """ Renderer that returns a JSON-encoded string.
@@ -248,7 +253,7 @@ class JSON(object):
         When you've done this, the JSON renderer will be able to serialize
         instances of the ``Foo`` class when they're encountered in your view
         results."""
-        
+
         self.components.registerAdapter(adapter, (type_or_iface,),
                                         IJSONAdapter)
 
@@ -265,7 +270,7 @@ class JSON(object):
                     response.content_type = 'application/json'
             default = self._make_default(request)
             return self.serializer(value, default=default, **self.kw)
-        
+
         return _render
 
     def _make_default(self, request):
@@ -281,12 +286,13 @@ class JSON(object):
             return result(obj, request)
         return default
 
-json_renderer_factory = JSON() # bw compat
+json_renderer_factory = JSON()  # bw compat
+
 
 class JSONP(JSON):
     """ `JSONP <http://en.wikipedia.org/wiki/JSONP>`_ renderer factory helper
     which implements a hybrid json/jsonp renderer.  JSONP is useful for
-    making cross-domain AJAX requests.  
+    making cross-domain AJAX requests.
 
     Configure a JSONP renderer using the
     :meth:`pyramid.config.Configurator.add_renderer` API at application
@@ -309,7 +315,7 @@ class JSONP(JSON):
 
        config = Configurator()
        config.add_renderer('jsonp', JSONP(param_name='callback', indent=4))
-    
+
     .. versionchanged:: 1.4
        The ability of this class to accept a ``**kw`` in its constructor.
 
@@ -372,6 +378,7 @@ class JSONP(JSON):
             return body
         return _render
 
+
 @implementer(IRendererInfo)
 class RendererHelper(object):
     def __init__(self, name=None, package=None, registry=None):
@@ -408,12 +415,12 @@ class RendererHelper(object):
         return self.renderer
 
     def render_view(self, request, response, view, context):
-        system = {'view':view,
-                  'renderer_name':self.name, # b/c
-                  'renderer_info':self,
-                  'context':context,
-                  'request':request,
-                  'req':request,
+        system = {'view': view,
+                  'renderer_name': self.name,  # b/c
+                  'renderer_info': self,
+                  'context': context,
+                  'request': request,
+                  'req': request,
                   }
         return self.render_to_response(response, system, request=request)
 
@@ -421,12 +428,12 @@ class RendererHelper(object):
         renderer = self.renderer
         if system_values is None:
             system_values = {
-                'view':None,
-                'renderer_name':self.name, # b/c
-                'renderer_info':self,
-                'context':getattr(request, 'context', None),
-                'request':request,
-                'req':request,
+                'view': None,
+                'renderer_name': self.name,  # b/c
+                'renderer_info': self,
+                'context': getattr(request, 'context', None),
+                'request': request,
+                'req': request,
                 }
 
         system_values = BeforeRender(system_values, value)
@@ -470,6 +477,7 @@ class RendererHelper(object):
             registry = self.registry
         return self.__class__(name=name, package=package, registry=registry)
 
+
 class NullRendererHelper(RendererHelper):
     """ Special renderer helper that has render_* methods which simply return
     the value they are fed rather than converting them to response objects;
@@ -494,11 +502,11 @@ class NullRendererHelper(RendererHelper):
 
     def render(self, value, system_values, request=None):
         return value
-    
+
     def render_to_response(self, value, system_values, request=None):
         return value
 
     def clone(self, name=None, package=None, registry=None):
         return self
-    
+
 null_renderer = NullRendererHelper()

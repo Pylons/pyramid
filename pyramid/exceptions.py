@@ -4,10 +4,11 @@ from pyramid.httpexceptions import (
     HTTPForbidden,
     )
 
-NotFound = HTTPNotFound # bw compat
-Forbidden = HTTPForbidden # bw compat
+NotFound = HTTPNotFound  # bw compat
+Forbidden = HTTPForbidden  # bw compat
 
 CR = '\n'
+
 
 class BadCSRFToken(HTTPBadRequest):
     """
@@ -23,6 +24,7 @@ class BadCSRFToken(HTTPBadRequest):
         'browser is not supplying the credentials required, as can happen '
         'when the browser has cookies turned off.')
 
+
 class PredicateMismatch(HTTPNotFound):
     """
     This exception is raised by multiviews when no view matches
@@ -33,7 +35,7 @@ class PredicateMismatch(HTTPNotFound):
     be treated as :class:`HTTPNotFound`` by any exception view
     registrations. Thus, typically, this exception will not be seen
     publicly.
-    
+
     However, this exception will be raised if the predicates of all
     views configured to handle another exception context cannot be
     successfully matched.  For instance, if a view is configured to
@@ -50,6 +52,7 @@ class PredicateMismatch(HTTPNotFound):
     exception view.
     """
 
+
 class URLDecodeError(UnicodeDecodeError):
     """
     This exception is raised when :app:`Pyramid` cannot
@@ -61,9 +64,11 @@ class URLDecodeError(UnicodeDecodeError):
     decoded.
     """
 
+
 class ConfigurationError(Exception):
     """ Raised when inappropriate input values are supplied to an API
     method of a :term:`Configurator`"""
+
 
 class ConfigurationConflictError(ConfigurationError):
     """ Raised when a configuration conflict is detected during action
@@ -94,6 +99,7 @@ class ConfigurationExecutionError(ConfigurationError):
     def __str__(self):
         return "%s: %s\n  in:\n  %s" % (self.etype, self.evalue, self.info)
 
+
 class CyclicDependencyError(Exception):
     """ The exception raised when the Pyramid topological sorter detects a
     cyclic dependency."""
@@ -109,5 +115,3 @@ class CyclicDependencyError(Exception):
             L.append('%r sorts before %r' % (dependent, dependees))
         msg = 'Implicit ordering cycle:' + '; '.join(L)
         return msg
-
-

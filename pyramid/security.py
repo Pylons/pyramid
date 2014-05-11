@@ -17,12 +17,15 @@ Authenticated = 'system.Authenticated'
 Allow = 'Allow'
 Deny = 'Deny'
 
+
 class AllPermissionsList(object):
     """ Stand in 'permission list' to represent all permissions """
     def __iter__(self):
         return ()
+
     def __contains__(self, other):
         return True
+
     def __eq__(self, other):
         return isinstance(other, self.__class__)
 
@@ -31,29 +34,32 @@ DENY_ALL = (Deny, Everyone, ALL_PERMISSIONS)
 
 NO_PERMISSION_REQUIRED = '__no_permission_required__'
 
+
 def _get_registry(request):
     try:
         reg = request.registry
     except AttributeError:
-        reg = get_current_registry() # b/c
+        reg = get_current_registry()  # b/c
     return reg
+
 
 def _get_authentication_policy(request):
     registry = _get_registry(request)
     return registry.queryUtility(IAuthenticationPolicy)
 
+
 def has_permission(permission, context, request):
     """
     A function that calls :meth:`pyramid.request.Request.has_permission`
     and returns its result.
-    
+
     .. deprecated:: 1.5
         Use :meth:`pyramid.request.Request.has_permission` instead.
 
     .. versionchanged:: 1.5a3
         If context is None, then attempt to use the context attribute of self;
         if not set, then the AttributeError is propagated.
-    """    
+    """
     return request.has_permission(permission, context)
 
 deprecated(
@@ -68,10 +74,10 @@ def authenticated_userid(request):
     """
     A function that returns the value of the property
     :attr:`pyramid.request.Request.authenticated_userid`.
-    
+
     .. deprecated:: 1.5
        Use :attr:`pyramid.request.Request.authenticated_userid` instead.
-    """        
+    """
     return request.authenticated_userid
 
 deprecated(
@@ -81,14 +87,15 @@ deprecated(
     '"authenticated_userid" attribute of the Pyramid request instead.'
     )
 
+
 def unauthenticated_userid(request):
-    """ 
+    """
     A function that returns the value of the property
     :attr:`pyramid.request.Request.unauthenticated_userid`.
-    
+
     .. deprecated:: 1.5
         Use :attr:`pyramid.request.Request.unauthenticated_userid` instead.
-    """        
+    """
     return request.unauthenticated_userid
 
 deprecated(
@@ -98,14 +105,15 @@ deprecated(
     '"unauthenticated_userid" attribute of the Pyramid request instead.'
     )
 
+
 def effective_principals(request):
     """
     A function that returns the value of the property
     :attr:`pyramid.request.Request.effective_principals`.
-    
+
     .. deprecated:: 1.5
         Use :attr:`pyramid.request.Request.effective_principals` instead.
-    """            
+    """
     return request.effective_principals
 
 deprecated(
@@ -114,6 +122,7 @@ deprecated(
     'now deprecated.  It will be removed in Pyramd 1.8.  Use the '
     '"effective_principals" attribute of the Pyramid request instead.'
     )
+
 
 def remember(request, principal, **kw):
     """
@@ -144,6 +153,7 @@ def remember(request, principal, **kw):
         return []
     return policy.remember(request, principal, **kw)
 
+
 def forget(request):
     """
     Return a sequence of header tuples (e.g. ``[('Set-Cookie',
@@ -160,11 +170,12 @@ def forget(request):
 
     If no :term:`authentication policy` is in use, this function will
     always return an empty sequence.
-    """            
+    """
     policy = _get_authentication_policy(request)
     if policy is None:
         return []
     return policy.forget(request)
+
 
 def principals_allowed_by_permission(context, permission):
     """ Provided a ``context`` (a resource object), and a ``permission``
@@ -188,6 +199,7 @@ def principals_allowed_by_permission(context, permission):
     if policy is None:
         return [Everyone]
     return policy.principals_allowed_by_permission(context, permission)
+
 
 def view_execution_permitted(context, request, name=''):
     """ If the view specified by ``context`` and ``name`` is protected
@@ -236,6 +248,7 @@ class PermitsResult(int):
                                                     id(self),
                                                     self.msg)
 
+
 class Denied(PermitsResult):
     """ An instance of ``Denied`` is returned when a security-related
     API or other :app:`Pyramid` code denies an action unrelated to
@@ -244,6 +257,7 @@ class Denied(PermitsResult):
     the deny."""
     boolval = 0
 
+
 class Allowed(PermitsResult):
     """ An instance of ``Allowed`` is returned when a security-related
     API or other :app:`Pyramid` code allows an action unrelated to
@@ -251,6 +265,7 @@ class Allowed(PermitsResult):
     has an attribute named ``msg`` describing the circumstances for
     the allow."""
     boolval = 1
+
 
 class ACLPermitsResult(int):
     def __new__(cls, ace, acl, permission, principals, context):
@@ -281,6 +296,7 @@ class ACLPermitsResult(int):
                                                     id(self),
                                                     self.msg)
 
+
 class ACLDenied(ACLPermitsResult):
     """ An instance of ``ACLDenied`` represents that a security check made
     explicitly against ACL was denied.  It evaluates equal to all boolean
@@ -291,6 +307,7 @@ class ACLDenied(ACLPermitsResult):
     summary is available as the ``msg`` attribute."""
     boolval = 0
 
+
 class ACLAllowed(ACLPermitsResult):
     """ An instance of ``ACLAllowed`` represents that a security check made
     explicitly against ACL was allowed.  It evaluates equal to all boolean
@@ -300,6 +317,7 @@ class ACLAllowed(ACLPermitsResult):
     prints a summary of these attributes for debugging purposes.  The same
     summary is available as the ``msg`` attribute."""
     boolval = 1
+
 
 class AuthenticationAPIMixin(object):
 
@@ -351,6 +369,7 @@ class AuthenticationAPIMixin(object):
             return [Everyone]
         return policy.effective_principals(self)
 
+
 class AuthorizationAPIMixin(object):
 
     def has_permission(self, permission, context=None):
@@ -383,6 +402,6 @@ class AuthorizationAPIMixin(object):
         authz_policy = reg.queryUtility(IAuthorizationPolicy)
         if authz_policy is None:
             raise ValueError('Authentication policy registered without '
-                             'authorization policy') # should never happen
+                             'authorization policy')  # should never happen
         principals = authn_policy.effective_principals(self)
         return authz_policy.permits(context, principals, permission)

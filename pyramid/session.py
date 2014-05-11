@@ -22,6 +22,7 @@ from pyramid.exceptions import BadCSRFToken
 from pyramid.interfaces import ISession
 from pyramid.util import strings_differ
 
+
 def manage_accessed(wrapped):
     """ Decorator which causes a cookie to be renewed when an accessor
     method is called."""
@@ -34,6 +35,7 @@ def manage_accessed(wrapped):
     accessed.__doc__ = wrapped.__doc__
     return accessed
 
+
 def manage_changed(wrapped):
     """ Decorator which causes a cookie to be set when a setter method
     is called."""
@@ -43,6 +45,7 @@ def manage_changed(wrapped):
         return wrapped(session, *arg, **kw)
     changed.__doc__ = wrapped.__doc__
     return changed
+
 
 def signed_serialize(data, secret):
     """ Serialize any pickleable structure (``data``) and sign it
@@ -65,6 +68,7 @@ def signed_serialize(data, secret):
         secret = bytes_(secret, 'utf-8')
     sig = hmac.new(secret, pickled, hashlib.sha1).hexdigest()
     return sig + native_(base64.b64encode(pickled))
+
 
 def signed_deserialize(serialized, secret, hmac=hmac):
     """ Deserialize the value returned from ``signed_serialize``.  If
@@ -101,6 +105,7 @@ def signed_deserialize(serialized, secret, hmac=hmac):
 
     return pickle.loads(pickled)
 
+
 def check_csrf_token(request,
                      token='csrf_token',
                      header='X-CSRF-Token',
@@ -132,6 +137,7 @@ def check_csrf_token(request,
         return False
     return True
 
+
 class PickleSerializer(object):
     """ A Webob cookie serializer that uses the pickle protocol to dump Python
     data to bytes."""
@@ -140,6 +146,7 @@ class PickleSerializer(object):
 
     def dumps(self, appstruct):
         return pickle.dumps(appstruct, pickle.HIGHEST_PROTOCOL)
+
 
 def BaseCookieSessionFactory(
     serializer,
@@ -152,10 +159,10 @@ def BaseCookieSessionFactory(
     timeout=1200,
     reissue_time=0,
     set_on_exception=True,
-    ):
+):
     """
     .. versionadded:: 1.5
-    
+
     Configure a :term:`session factory` which will provide cookie-based
     sessions.  The return value of this function is a :term:`session factory`,
     which may be provided as the ``session_factory`` argument of a
@@ -295,13 +302,14 @@ def BaseCookieSessionFactory(
         def changed(self):
             if not self._dirty:
                 self._dirty = True
+
                 def set_cookie_callback(request, response):
                     self._set_cookie(response)
-                    self.request = None # explicitly break cycle for gc
+                    self.request = None  # explicitly break cycle for gc
                 self.request.add_response_callback(set_cookie_callback)
 
         def invalidate(self):
-            self.clear() # XXX probably needs to unset cookie
+            self.clear()  # XXX probably needs to unset cookie
 
         # non-modifying dictionary methods
         get = manage_accessed(dict.get)
@@ -363,7 +371,7 @@ def BaseCookieSessionFactory(
         def _set_cookie(self, response):
             if not self._cookie_on_exception:
                 exception = getattr(self.request, 'exception', None)
-                if exception is not None: # dont set a cookie during exceptions
+                if exception is not None:  # dont set a cookie during exception
                     return False
             cookieval = native_(serializer.dumps(
                 (self.accessed, self.created, dict(self))
@@ -399,7 +407,7 @@ def UnencryptedCookieSessionFactoryConfig(
     cookie_on_exception=True,
     signed_serialize=signed_serialize,
     signed_deserialize=signed_deserialize,
-    ):
+):
     """
     .. deprecated:: 1.5
         Use :func:`pyramid.session.SignedCookieSessionFactory` instead.
@@ -407,7 +415,7 @@ def UnencryptedCookieSessionFactoryConfig(
         compatible with cookies generated using
         ``UnencryptedCookieSessionFactory``, so existing user session data
         will be destroyed if you switch to it.
-    
+
     Configure a :term:`session factory` which will provide unencrypted
     (but signed) cookie-based sessions.  The return value of this
     function is a :term:`session factory`, which may be provided as
@@ -466,7 +474,7 @@ def UnencryptedCookieSessionFactoryConfig(
     class SerializerWrapper(object):
         def __init__(self, secret):
             self.secret = secret
-            
+
         def loads(self, bstruct):
             return signed_deserialize(bstruct, secret)
 
@@ -484,7 +492,7 @@ def UnencryptedCookieSessionFactoryConfig(
         secure=cookie_secure,
         httponly=cookie_httponly,
         timeout=timeout,
-        reissue_time=0, # to keep session.accessed == session.renewed
+        reissue_time=0,  # to keep session.accessed == session.renewed
         set_on_exception=cookie_on_exception,
     )
 
@@ -496,6 +504,7 @@ deprecated(
     'compatible with cookies generated using UnencryptedCookieSessionFactory, '
     'so existing user session data will be destroyed if you switch to it.'
     )
+
 
 def SignedCookieSessionFactory(
     secret,
@@ -511,10 +520,10 @@ def SignedCookieSessionFactory(
     hashalg='sha512',
     salt='pyramid.session.',
     serializer=None,
-    ):
+):
     """
     .. versionadded:: 1.5
-    
+
     Configure a :term:`session factory` which will provide signed
     cookie-based sessions.  The return value of this
     function is a :term:`session factory`, which may be provided as

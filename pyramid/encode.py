@@ -6,13 +6,15 @@ from pyramid.compat import (
     url_quote_plus as _quote_plus,
     )
 
-def url_quote(val, safe=''): # bw compat api
+
+def url_quote(val, safe=''):  # bw compat api
     cls = val.__class__
     if cls is text_type:
         val = val.encode('utf-8')
     elif cls is not binary_type:
         val = str(val).encode('utf-8')
     return _url_quote(val, safe=safe)
+
 
 def urlencode(query, doseq=True):
     """
@@ -69,8 +71,8 @@ def urlencode(query, doseq=True):
 
     return result
 
-# bw compat api (dnr)
-def quote_plus(val, safe=''):
+
+def quote_plus(val, safe=''):  # bw compat api (dnr)
     cls = val.__class__
     if cls is text_type:
         val = val.encode('utf-8')

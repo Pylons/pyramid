@@ -9,9 +9,10 @@ from pyramid.interfaces import IAssetDescriptor
 
 from pyramid.compat import string_types
 
-ignore_types = [ imp.C_EXTENSION, imp.C_BUILTIN ]
-init_names = [ '__init__%s' % x[0] for x in imp.get_suffixes() if
-               x[0] and x[2] not in ignore_types ]
+ignore_types = [imp.C_EXTENSION, imp.C_BUILTIN]
+init_names = ['__init__%s' % x[0] for x in imp.get_suffixes() if x[0] and
+              x[2] not in ignore_types]
+
 
 def caller_path(path, level=2):
     if not os.path.isabs(path):
@@ -20,11 +21,13 @@ def caller_path(path, level=2):
         path = os.path.join(prefix, path)
     return path
 
+
 def caller_module(level=2, sys=sys):
     module_globals = sys._getframe(level).f_globals
     module_name = module_globals.get('__name__') or '__main__'
     module = sys.modules[module_name]
     return module
+
 
 def package_name(pkg_or_module):
     """ If this function is passed a module, return the dotted Python
@@ -45,26 +48,29 @@ def package_name(pkg_or_module):
         return pkg_name
     return pkg_name.rsplit('.', 1)[0]
 
+
 def package_of(pkg_or_module):
     """ Return the package of a module or return the package itself """
     pkg_name = package_name(pkg_or_module)
     __import__(pkg_name)
     return sys.modules[pkg_name]
 
+
 def caller_package(level=2, caller_module=caller_module):
-    # caller_module in arglist for tests
+    """caller_module in arglist for tests"""
     module = caller_module(level+1)
     f = getattr(module, '__file__', '')
-    if (('__init__.py' in f) or ('__init__$py' in f)): # empty at >>>
+    if ('__init__.py' in f) or ('__init__$py' in f):  # empty at >>>
         # Module is a package
         return module
     # Go up one level to get package
     package_name = module.__name__.rsplit('.', 1)[0]
     return sys.modules[package_name]
 
+
 def package_path(package):
-    # computing the abspath is actually kinda expensive so we memoize
-    # the result
+    """computing the abspath is actually kinda expensive so we memoize
+    the result"""
     prefix = getattr(package, '__abspath__', None)
     if prefix is None:
         prefix = pkg_resources.resource_filename(package.__name__, '')
@@ -78,11 +84,13 @@ def package_path(package):
             pass
     return prefix
 
+
 class _CALLER_PACKAGE(object):
-    def __repr__(self): # pragma: no cover (for docs)
+    def __repr__(self):  # pragma: no cover (for docs)
         return 'pyramid.path.CALLER_PACKAGE'
 
 CALLER_PACKAGE = _CALLER_PACKAGE()
+
 
 class Resolver(object):
     def __init__(self, package=CALLER_PACKAGE):
@@ -207,6 +215,7 @@ class AssetResolver(Resolver):
                     'relative spec %r irresolveable without package' % (spec,)
                 )
         return PkgResourcesAssetDescriptor(package_name, path)
+
 
 class DottedNameResolver(Resolver):
     """ A class used to resolve a :term:`dotted Python name` to a package or
@@ -342,7 +351,7 @@ class DottedNameResolver(Resolver):
 
     def _zope_dottedname_style(self, value, package):
         """ package.module.attr style """
-        module = getattr(package, '__name__', None) # package may be None
+        module = getattr(package, '__name__', None)  # package may be None
         if not module:
             module = None
         if value == '.':
@@ -374,9 +383,10 @@ class DottedNameResolver(Resolver):
                 found = getattr(found, n)
             except AttributeError:
                 __import__(used)
-                found = getattr(found, n) # pragma: no cover
+                found = getattr(found, n)  # pragma: no cover
 
         return found
+
 
 @implementer(IAssetDescriptor)
 class PkgResourcesAssetDescriptor(object):
@@ -403,6 +413,7 @@ class PkgResourcesAssetDescriptor(object):
 
     def exists(self):
         return self.pkg_resources.resource_exists(self.pkg_name, self.path)
+
 
 @implementer(IAssetDescriptor)
 class FSAssetDescriptor(object):
