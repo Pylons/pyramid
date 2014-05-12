@@ -163,7 +163,8 @@ class TweensConfiguratorMixin(object):
             if explicit:
                 tweens.add_explicit(name, tween_factory)
             else:
-                tweens.add_implicit(name, tween_factory, under=under, over=over)
+                tweens.add_implicit(name, tween_factory,
+                                    under=under, over=over)
 
         discriminator = ('tween', name, explicit)
         tween_type = explicit and 'explicit' or 'implicit'
