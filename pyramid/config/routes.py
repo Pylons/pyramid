@@ -153,8 +153,8 @@ class RoutesConfiguratorMixin(object):
              For backwards compatibility purposes (as of :app:`Pyramid` 1.0), a
              ``path`` keyword argument passed to this function will be used to
              represent the pattern value if the ``pattern`` argument is
-             ``None``.  If both ``path`` and ``pattern`` are passed, ``pattern``
-             wins.
+             ``None``.  If both ``path`` and ``pattern`` are passed, 
+             ``pattern`` wins.
 
         xhr
 
@@ -360,17 +360,17 @@ class RoutesConfiguratorMixin(object):
         introspectables.append(intr)
 
         if factory:
-            factory_intr = self.introspectable('root factories',
-                                               name,
-                                               self.object_description(factory),
-                                               'root factory')
+            factory_intr = self.introspectable('root factories', name,
+                                               self.object_description(
+                                                   factory), 'root factory')
             factory_intr['factory'] = factory
             factory_intr['route_name'] = name
             factory_intr.relate('routes', name)
             introspectables.append(factory_intr)
 
         def register_route_request_iface():
-            request_iface = self.registry.queryUtility(IRouteRequest, name=name)
+            request_iface = self.registry.queryUtility(IRouteRequest,
+                                                       name=name)
             if request_iface is None:
                 if use_global_views:
                     bases = (IRequest,)
