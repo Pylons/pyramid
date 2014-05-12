@@ -179,7 +179,7 @@ class CallbackAuthenticationPolicy(object):
                 effective_principals,),
             'effective_principals',
             request
-             )
+        )
         return effective_principals
 
 @implementer(IAuthenticationPolicy)
@@ -303,11 +303,11 @@ class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
 
         if groups is None: # is None!
             self.debug and self._log(
-                ('security policy groups callback returned None; returning %r' %
-                 effective_principals),
+                ('security policy groups callback returned None; returning %r'
+                 % effective_principals),
                 'effective_principals',
                 request
-                )
+            )
             return effective_principals
 
         userid = identity['repoze.who.userid']
@@ -614,14 +614,14 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
                 'you use the SHA512 algorithm instead for improved security.  '
                 'Pass ``hashalg=\'sha512\'`` to the '
                 'AuthTktAuthenticationPolicy constructor to do so.\n\nNote '
-                'that a change to the hash algorithms will invalidate existing '
-                'auth tkt cookies set by your application.  If backwards '
+                'that a change to the hash algorithms will invalidate existing'
+                ' auth tkt cookies set by your application.  If backwards '
                 'compatibility of existing auth tkt cookies is of greater '
                 'concern than the risk posed by the potential for a hash '
                 'collision, you\'ll want to continue using MD5 explicitly.  '
                 'To do so, pass ``hashalg=\'md5\'`` in your application to '
-                'the AuthTktAuthenticationPolicy constructor.   When you do so '
-                'this warning will not be emitted again.  The default '
+                'the AuthTktAuthenticationPolicy constructor.   When you do so'
+                ' this warning will not be emitted again.  The default '
                 'algorithm used in this policy will change in the future, so '
                 'setting an explicit hashalg will futureproof your '
                 'application.',
@@ -929,7 +929,8 @@ class AuthTktCookieHelper(object):
 
         if reissue and not hasattr(request, '_authtkt_reissued'):
             if ( (now - timestamp) > self.reissue_time ):
-                # work around https://github.com/Pylons/pyramid/issues#issue/108
+                # work around ->
+                # https://github.com/Pylons/pyramid/issues#issue/108
                 tokens = list(filter(None, tokens))
                 headers = self.remember(request, userid, max_age=self.max_age,
                                         tokens=tokens)
@@ -1094,8 +1095,8 @@ class BasicAuthAuthenticationPolicy(CallbackAuthenticationPolicy):
 
     ``realm``
 
-       Default: ``"Realm"``.  The Basic Auth Realm string.  Usually displayed to
-       the user by the browser in the login dialog.
+       Default: ``"Realm"``.  The Basic Auth Realm string.  Usually displayed
+       to the user by the browser in the login dialog.
 
     ``debug``
 
