@@ -21,6 +21,7 @@ from pyramid.compat import (
 
 from pyramid.config import Configurator
 from pyramid.decorator import reify
+from pyramid.path import caller_package
 from pyramid.response import Response
 from pyramid.registry import Registry
 
@@ -388,7 +389,7 @@ class DummyRequest(
 have_zca = True
 
 def setUp(registry=None, request=None, hook_zca=True, autocommit=True,
-          settings=None):
+          settings=None, package=None):
     """
     Set :app:`Pyramid` registry and request thread locals for the
     duration of a single unit test.
@@ -432,8 +433,14 @@ def setUp(registry=None, request=None, hook_zca=True, autocommit=True,
     :mod:`zope.component` package cannot be imported, or if
     ``hook_zca`` is ``False``, the hook will not be set.
 
-    If ``settings`` is not None, it must be a dictionary representing the
+    If ``settings`` is not ``None``, it must be a dictionary representing the
     values passed to a Configurator as its ``settings=`` argument.
+
+    If ``package`` is ``None`` it will be set to the caller's package. The
+    ``package`` setting in the :class:`pyramid.config.Configurator` will
+    affect any relative imports made via
+    :meth:`pyramid.config.Configurator.include` or
+    :meth:`pyramid.config.Configurator.maybe_dotted`.
 
     This function returns an instance of the
     :class:`pyramid.config.Configurator` class, which can be
@@ -447,7 +454,10 @@ def setUp(registry=None, request=None, hook_zca=True, autocommit=True,
     manager.clear()
     if registry is None:
         registry = Registry('testing')
-    config = Configurator(registry=registry, autocommit=autocommit)
+    if package is None:
+        package = caller_package()
+    config = Configurator(registry=registry, autocommit=autocommit,
+                          package=package)
     if settings is None:
         settings = {}
     if getattr(registry, 'settings', None) is None:
@@ -505,6 +515,10 @@ def tearDown(unhook_zca=True):
 
 def cleanUp(*arg, **kw):
     """ An alias for :func:`pyramid.testing.setUp`. """
+    package = kw.get('package', None)
+    if package is None:
+        package = caller_package()
+        kw['package'] = package
     return setUp(*arg, **kw)
 
 class DummyRendererFactory(object):
