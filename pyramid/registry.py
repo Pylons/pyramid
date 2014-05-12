@@ -112,10 +112,9 @@ class Introspector(object):
         values = category.values()
         values = sorted(set(values), key=sort_key)
         return [
-            {'introspectable':intr,
-             'related':self.related(intr)}
-             for intr in values
-             ]
+            {'introspectable':intr, 'related':self.related(intr)}
+            for intr in values
+        ]
 
     def categorized(self, sort_key=None):
         L = []
