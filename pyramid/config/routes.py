@@ -360,9 +360,10 @@ class RoutesConfiguratorMixin(object):
         introspectables.append(intr)
 
         if factory:
-            factory_intr = self.introspectable('root factories', name,
-                                               self.object_description(
-                                                   factory), 'root factory')
+            factory_intr = self.introspectable(
+                'root factories', name, self.object_description(factory),
+                'root factory'
+            )
             factory_intr['factory'] = factory
             factory_intr['route_name'] = name
             factory_intr.relate('routes', name)
