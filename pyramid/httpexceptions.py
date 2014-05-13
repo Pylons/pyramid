@@ -173,7 +173,8 @@ class HTTPException(Response, Exception):
     #   implies that this class' ``exception`` property always returns
     #   ``self`` (it exists only for bw compat at this point).
     #
-    # - documentation improvements(Pyramid-specific docstrings where necessary)
+    # - documentation improvements:
+    # - (Pyramid-specific docstrings where necessary)
     #
     code = None
     title = None
