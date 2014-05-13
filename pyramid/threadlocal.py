@@ -3,14 +3,12 @@ import threading
 from pyramid.registry import global_registry
 
 class ThreadLocalManager(threading.local):
-    """
-    http://code.google.com/p/google-app-engine-django/issues/detail?id=119
-    we *must* use a keyword argument for ``default`` here instead
-    of a positional argument to work around a bug in the
-    implementation of _threading_local.local in Python, which is
-    used by GAE instead of _thread.local
-    """
     def __init__(self, default=None):
+        #http://code.google.com/p/google-app-engine-django/issues/detail?id=119
+        # we *must* use a keyword argument for ``default`` here instead
+        # of a positional argument to work around a bug in the
+        # implementation of _threading_local.local in Python, which is
+        # used by GAE instead of _thread.local
         self.stack = []
         self.default = default
 
