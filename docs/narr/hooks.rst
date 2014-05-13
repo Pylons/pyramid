@@ -1023,7 +1023,7 @@ method:
     :linenos:
 
     class simple_tween_factory(object):
-        def __init__(handler, registry):
+        def __init__(self, handler, registry):
             self.handler = handler
             self.registry = registry
 
