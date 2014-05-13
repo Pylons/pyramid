@@ -509,15 +509,15 @@ class URLMethodsMixin(object):
            If the :term:`resource` used is the result of a :term:`traversal`,
            it must be :term:`location`-aware.  The resource can also be the
            context of a :term:`URL dispatch`; contexts found this way do not
-            need to be location-aware.
+           need to be location-aware.
 
         .. note::
 
            If a 'virtual root path' is present in the request environment (the
            value of the WSGI environ key ``HTTP_X_VHM_ROOT``), and the resource
            was obtained via :term:`traversal`, the URL path will not include
-            the virtual root prefix (it will be stripped off the left hand side
-            of the generated URL).
+           the virtual root prefix (it will be stripped off the left hand side
+           of the generated URL).
 
         .. note::
 
