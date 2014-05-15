@@ -364,3 +364,7 @@ each of the following URLs, check that the result is as expected:
   You'll see an interactive traceback facility provided 
   by :term:`pyramid_debugtoolbar`.
 
+In order to get this to run it may be necessary to install docutils in the virtual environment with:
+
+$VENV/bin/pip install docutils
+
