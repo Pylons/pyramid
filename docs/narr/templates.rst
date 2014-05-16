@@ -450,15 +450,15 @@ Available Add-On Template System Bindings
 The Pylons Project maintains several packages providing bindings to different
 templating languages including the following:
 
-+------------------------------+------------------------------+
-| Template Language            | Pyramid Bindings             |
-+==============================+==============================+
-| Chameleon_                   | pyramid_chameleon_           |
-+------------------------------+------------------------------+
-| Jinja2_                      | pyramid_jinja2_              |
-+------------------------------+------------------------------+
-| Mako_                        | pyramid_mako_                |
-+------------------------------+------------------------------+
++---------------------------+----------------------------+--------------------+
+| Template Language         | Pyramid Bindings           | Default Extensions |
++===========================+============================+====================+
+| Chameleon_                | pyramid_chameleon_         | .pt, .txt          |
++---------------------------+----------------------------+--------------------+
+| Jinja2_                   | pyramid_jinja2_            | .jinja2            |
++---------------------------+----------------------------+--------------------+
+| Mako_                     | pyramid_mako_              | .mak, .mako        |
++---------------------------+----------------------------+--------------------+
 
 .. _Chameleon: http://chameleon.readthedocs.org/en/latest/
 .. _pyramid_chameleon: https://pypi.python.org/pypi/pyramid_chameleon
