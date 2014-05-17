@@ -53,7 +53,8 @@ class FileResponse(Response):
     def __init__(self, path, request=None, cache_max_age=None,
                  content_type=None, content_encoding=None):
         if content_type is None:
-            content_type, content_encoding = mimetypes.guess_type(path, strict=False)
+            content_type, content_encoding = (
+                mimetypes.guess_type(path, strict=False))
             if content_type is None:
                 content_type = 'application/octet-stream'
         super(FileResponse, self).__init__(
