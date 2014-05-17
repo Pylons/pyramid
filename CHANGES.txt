@@ -17,6 +17,9 @@ Bug Fixes
   using the returned ``Configurator`` during testing. There is now a
   ``package`` argument that can override this behavior as well.
 
+- Fix an issue where a ``pyramid.response.FileResponse`` may apply a charset
+  where it does not belong. See https://github.com/Pylons/pyramid/pull/1251
+
 Docs
 ----
 
