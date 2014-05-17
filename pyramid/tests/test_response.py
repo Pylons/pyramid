@@ -25,7 +25,7 @@ class TestFileResponse(unittest.TestCase):
 
     def _getPath(self, suffix='txt'):
         here = os.path.dirname(__file__)
-        return os.path.join(here, 'fixtures', 'minimal.%s'%(suffix,))
+        return os.path.join(here, 'fixtures', 'minimal.%s' % (suffix,))
 
     def test_with_image_content_type(self):
         path = self._getPath('jpg')
@@ -33,12 +33,14 @@ class TestFileResponse(unittest.TestCase):
         self.assertEqual(r.content_type, 'image/jpeg')
         self.assertEqual(r.headers['content-type'], 'image/jpeg')
         path = self._getPath()
+        r.app_iter.close()
 
     def test_with_xml_content_type(self):
         path = self._getPath('xml')
         r = self._makeOne(path, content_type='application/xml')
         self.assertEqual(r.content_type, 'application/xml')
-        self.assertEqual(r.headers['content-type'], 'application/xml; charset=UTF-8')
+        self.assertEqual(r.headers['content-type'],
+                         'application/xml; charset=UTF-8')
         r.app_iter.close()
 
     def test_with_pdf_content_type(self):
