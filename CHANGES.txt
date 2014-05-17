@@ -19,6 +19,9 @@ Next release
 - Removed non-ascii copyright symbol from templates, as this was
   causing the scaffolds to fail for project generation.
 
+- Fix an issue where a ``pyramid.response.FileResponse`` may apply a charset
+  where it does not belong. See https://github.com/Pylons/pyramid/pull/1251
+
 1.5 (2014-04-08)
 ================
 
