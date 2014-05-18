@@ -575,6 +575,42 @@ class TestActionInfo(unittest.TestCase):
         self.assertEqual(str(inst),
                          "Line 0 of file filename:\n       linerepr  ")
 
+class test_add_vary_to_headerlist(unittest.TestCase):
+    def _callFUT(self, *args, **kwargs):
+        from pyramid.util import add_vary_to_headerlist
+        return add_vary_to_headerlist(*args, **kwargs)
+
+    def test_add_vary(self):
+        headerlist = []
+        self._callFUT('Cookie', headerlist)
+        self.assertEqual(headerlist, [('Vary', 'Cookie')])
+
+    def test_add_multiple_vary(self):
+        headerlist = []
+        self._callFUT('Cookie,Accept', headerlist)
+        self.assertEqual(headerlist, [('Vary', 'Cookie,Accept')])
+
+    def test_add_multiple_vary_iterable(self):
+        headerlist = []
+        self._callFUT(('Cookie', 'Accept'), headerlist)
+        self.assertEqual(headerlist, [('Vary', 'Cookie,Accept')])
+
+    def test_add_multiple_vary_iterable2(self):
+        headerlist = []
+        self._callFUT(('Cookie,Accept-Language', 'Accept'), headerlist)
+        self.assertEqual(headerlist,
+                         [('Vary', 'Cookie,Accept-Language,Accept')])
+
+    def test_add_vary_dup(self):
+        headerlist = [('Vary', 'Cookie')]
+        self._callFUT('Cookie', headerlist)
+        self.assertEqual(headerlist, [('Vary', 'Cookie')])
+
+    def test_add_vary_to_existing(self):
+        headerlist = [('Set-Cookie', ''), ('Vary', 'Cookie')]
+        self._callFUT('Accept', headerlist)
+        self.assertEqual(headerlist,
+                         [('Set-Cookie', ''), ('Vary', 'Cookie,Accept')])
 
 def dummyfunc(): pass
 
