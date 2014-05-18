@@ -534,35 +534,3 @@ def action_method(wrapped):
         functools.update_wrapper(wrapper, wrapped)
     wrapper.__docobj__ = wrapped
     return wrapper
-
-def add_vary_to_headerlist(value, headerlist):
-    """Add a value to the ``Vary`` header in ``headerlist``.
-
-    If the ``Vary`` header does not exist, one will be added.
-
-    :param value: may be a single item, a comma-separated string, or an
-                  iterable of such.
-
-    :param headerlist: a mutable list of 2-tuples containing
-                       ``(header, value)``.
-    """
-    if is_nonstr_iter(value):
-        value = ','.join(v for item in value for v in item.split(','))
-    values = [v.strip() for v in value.split(',')]
-
-    for item in headerlist:
-        if item[0].lower() == 'vary':
-            new_values = [v.strip() for v in item[1].split(',')]
-            dups = set(v.lower() for v in new_values)
-            added_values = False
-            for value in values:
-                if value.lower() not in dups:
-                    new_values.append(value)
-                    added_values = True
-            if added_values:
-                # safe mutate while iterating because we break right after
-                headerlist.remove(item)
-                headerlist.append(('Vary', ', '.join(new_values)))
-            break
-    else:
-        headerlist.append(('Vary', ', '.join(values)))

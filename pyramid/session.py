@@ -20,10 +20,8 @@ from pyramid.compat import (
 
 from pyramid.exceptions import BadCSRFToken
 from pyramid.interfaces import ISession
-from pyramid.util import (
-    strings_differ,
-    add_vary_to_headerlist,
-    )
+from pyramid.response import add_vary_to_headerlist
+from pyramid.util import strings_differ
 
 def manage_accessed(wrapped):
     """ Decorator which causes a cookie to be renewed when an accessor

@@ -9,6 +9,7 @@ import venusian
 from webob import Response as _Response
 from zope.interface import implementer
 from pyramid.interfaces import IResponse
+from pyramid.compat import is_nonstr_iter
 
 def init_mimetypes(mimetypes):
     # this is a function so it can be unittested
@@ -159,3 +160,34 @@ class response_adapter(object):
     def __call__(self, wrapped):
         self.venusian.attach(wrapped, self.register, category='pyramid')
         return wrapped
+
+def add_vary_to_headerlist(value, headerlist):
+    """Add a value to the ``Vary`` header in ``headerlist``.
+
+    If the ``Vary`` header does not exist, one will be appended.
+
+    :param value: may be a single item, a comma-separated string, or an
+                  iterable of such.
+
+    :param headerlist: a mutable list of ``(header, value)`` pairs.
+    """
+    if is_nonstr_iter(value):
+        value = ','.join(v for item in value for v in item.split(','))
+    values = [v.strip() for v in value.split(',')]
+
+    for item in headerlist:
+        if item[0].lower() == 'vary':
+            new_values = [v.strip() for v in item[1].split(',')]
+            dups = set(v.lower() for v in new_values)
+            added_values = False
+            for value in values:
+                if value.lower() not in dups:
+                    new_values.append(value)
+                    added_values = True
+            if added_values:
+                # safe mutate while iterating because we break right after
+                headerlist.remove(item)
+                headerlist.append(('Vary', ', '.join(new_values)))
+            break
+    else:
+        headerlist.append(('Vary', ', '.join(values)))

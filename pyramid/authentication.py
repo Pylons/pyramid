@@ -3,7 +3,6 @@ from codecs import utf_8_decode
 from codecs import utf_8_encode
 import hashlib
 import base64
-import datetime
 import re
 import time as time_mod
 import warnings
@@ -28,15 +27,14 @@ from pyramid.interfaces import (
     IDebugLogger,
     )
 
+from pyramid.response import add_vary_to_headerlist
+
 from pyramid.security import (
     Authenticated,
     Everyone,
     )
 
-from pyramid.util import (
-    strings_differ,
-    add_vary_to_headerlist,
-    )
+from pyramid.util import strings_differ
 
 VALID_TOKEN = re.compile(r"^[A-Za-z][A-Za-z0-9+_-]*$")
 
