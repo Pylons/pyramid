@@ -20,7 +20,10 @@ from pyramid.compat import (
 
 from pyramid.exceptions import BadCSRFToken
 from pyramid.interfaces import ISession
-from pyramid.util import strings_differ
+from pyramid.util import (
+    strings_differ,
+    add_vary_to_headerlist,
+    )
 
 def manage_accessed(wrapped):
     """ Decorator which causes a cookie to be renewed when an accessor
@@ -373,10 +376,7 @@ def BaseCookieSessionFactory(
                     'Cookie value is too long to store (%s bytes)' %
                     len(cookieval)
                     )
-            if response.vary is None:
-                response.vary = ['Cookie']
-            elif 'cookie' not in set(v.lower() for v in response.vary):
-                response.vary = list(response.vary) + ['Cookie']
+            add_vary_to_headerlist('Cookie', response.headerlist)
             response.set_cookie(
                 self._cookie_name,
                 value=cookieval,
