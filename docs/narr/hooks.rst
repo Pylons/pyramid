@@ -1017,7 +1017,8 @@ You can write the tween factory as a simple closure-returning function:
         return simple_tween
 
 Alternatively, the tween factory can be a class with the ``__call__`` magic
-method:
+method (the instance will be unique, be aware that it will be shared 
+between threads):
 
 .. code-block:: python
     :linenos:
