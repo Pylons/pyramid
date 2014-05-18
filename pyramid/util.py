@@ -548,11 +548,11 @@ def add_vary_to_headerlist(value, headerlist):
     """
     if is_nonstr_iter(value):
         value = ','.join(v for item in value for v in item.split(','))
-    values = value.split(',')
+    values = [v.strip() for v in value.split(',')]
 
     for item in headerlist:
         if item[0].lower() == 'vary':
-            new_values = item[1].split(',')
+            new_values = [v.strip() for v in item[1].split(',')]
             dups = set(v.lower() for v in new_values)
             added_values = False
             for value in values:
@@ -562,7 +562,7 @@ def add_vary_to_headerlist(value, headerlist):
             if added_values:
                 # safe mutate while iterating because we break right after
                 headerlist.remove(item)
-                headerlist.append(('Vary', ','.join(new_values)))
+                headerlist.append(('Vary', ', '.join(new_values)))
             break
     else:
-        headerlist.append(('Vary', ','.join(values)))
+        headerlist.append(('Vary', ', '.join(values)))

@@ -588,18 +588,18 @@ class test_add_vary_to_headerlist(unittest.TestCase):
     def test_add_multiple_vary(self):
         headerlist = []
         self._callFUT('Cookie,Accept', headerlist)
-        self.assertEqual(headerlist, [('Vary', 'Cookie,Accept')])
+        self.assertEqual(headerlist, [('Vary', 'Cookie, Accept')])
 
     def test_add_multiple_vary_iterable(self):
         headerlist = []
         self._callFUT(('Cookie', 'Accept'), headerlist)
-        self.assertEqual(headerlist, [('Vary', 'Cookie,Accept')])
+        self.assertEqual(headerlist, [('Vary', 'Cookie, Accept')])
 
     def test_add_multiple_vary_iterable2(self):
         headerlist = []
         self._callFUT(('Cookie,Accept-Language', 'Accept'), headerlist)
         self.assertEqual(headerlist,
-                         [('Vary', 'Cookie,Accept-Language,Accept')])
+                         [('Vary', 'Cookie, Accept-Language, Accept')])
 
     def test_add_vary_dup(self):
         headerlist = [('Vary', 'Cookie')]
@@ -610,7 +610,7 @@ class test_add_vary_to_headerlist(unittest.TestCase):
         headerlist = [('Set-Cookie', ''), ('Vary', 'Cookie')]
         self._callFUT('Accept', headerlist)
         self.assertEqual(headerlist,
-                         [('Set-Cookie', ''), ('Vary', 'Cookie,Accept')])
+                         [('Set-Cookie', ''), ('Vary', 'Cookie, Accept')])
 
 def dummyfunc(): pass
 
