@@ -11,6 +11,9 @@ Security Fixes
   where caches might store the response and serve it for requests attached
   to different sessions.
 
+- Similarly, the "Vary" header is now set part of the cookies returned by
+  the ``AuthTktAuthenticationPolicy``.
+
 Bug Fixes
 ---------
 

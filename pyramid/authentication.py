@@ -33,7 +33,10 @@ from pyramid.security import (
     Everyone,
     )
 
-from pyramid.util import strings_differ
+from pyramid.util import (
+    strings_differ,
+    add_vary_to_headerlist,
+    )
 
 VALID_TOKEN = re.compile(r"^[A-Za-z][A-Za-z0-9+_-]*$")
 
@@ -883,8 +886,9 @@ class AuthTktCookieHelper(object):
         kw['domains'] = domains
         if max_age is not None:
             kw['max_age'] = max_age
-            
+
         headers = profile.get_headers(value, **kw)
+        add_vary_to_headerlist('Cookie', headers)
         return headers
 
     def identify(self, request):

@@ -771,8 +771,9 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertEqual(len(request.callbacks), 1)
         response = DummyResponse()
         request.callbacks[0](request, response)
-        self.assertEqual(len(response.headerlist), 3)
+        self.assertEqual(len(response.headerlist), 4)
         self.assertEqual(response.headerlist[0][0], 'Set-Cookie')
+        self.assertEqual(response.headerlist[3], ('Vary', 'Cookie'))
 
     def test_identify_cookie_reissue_already_reissued_this_request(self):
         import time
@@ -849,15 +850,16 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertEqual(len(request.callbacks), 1)
         response = DummyResponse()
         request.callbacks[0](None, response)
-        self.assertEqual(len(response.headerlist), 3)
+        self.assertEqual(len(response.headerlist), 4)
         self.assertEqual(response.headerlist[0][0], 'Set-Cookie')
         self.assertTrue("/tokens=/" in response.headerlist[0][1])
+        self.assertEqual(response.headerlist[3], ('Vary', 'Cookie'))
 
     def test_remember(self):
         helper = self._makeOne('secret')
         request = self._makeRequest()
         result = helper.remember(request, 'userid')
-        self.assertEqual(len(result), 3)
+        self.assertEqual(len(result), 4)
 
         self.assertEqual(result[0][0], 'Set-Cookie')
         self.assertTrue(result[0][1].endswith('; Path=/'))
@@ -870,12 +872,14 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertEqual(result[2][0], 'Set-Cookie')
         self.assertTrue(result[2][1].endswith('; Domain=.localhost; Path=/'))
         self.assertTrue(result[2][1].startswith('auth_tkt='))
+
+        self.assertEqual(result[3], ('Vary', 'Cookie'))
 
     def test_remember_include_ip(self):
         helper = self._makeOne('secret', include_ip=True)
         request = self._makeRequest()
         result = helper.remember(request, 'other')
-        self.assertEqual(len(result), 3)
+        self.assertEqual(len(result), 4)
 
         self.assertEqual(result[0][0], 'Set-Cookie')
         self.assertTrue(result[0][1].endswith('; Path=/'))
@@ -888,13 +892,15 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertEqual(result[2][0], 'Set-Cookie')
         self.assertTrue(result[2][1].endswith('; Domain=.localhost; Path=/'))
         self.assertTrue(result[2][1].startswith('auth_tkt='))
+
+        self.assertEqual(result[3], ('Vary', 'Cookie'))
 
     def test_remember_path(self):
         helper = self._makeOne('secret', include_ip=True,
                                path="/cgi-bin/app.cgi/")
         request = self._makeRequest()
         result = helper.remember(request, 'other')
-        self.assertEqual(len(result), 3)
+        self.assertEqual(len(result), 4)
 
         self.assertEqual(result[0][0], 'Set-Cookie')
         self.assertTrue(result[0][1].endswith('; Path=/cgi-bin/app.cgi/'))
@@ -910,11 +916,13 @@ class TestAuthTktCookieHelper(unittest.TestCase):
             '; Domain=.localhost; Path=/cgi-bin/app.cgi/'))
         self.assertTrue(result[2][1].startswith('auth_tkt='))
 
+        self.assertEqual(result[3], ('Vary', 'Cookie'))
+
     def test_remember_http_only(self):
         helper = self._makeOne('secret', include_ip=True, http_only=True)
         request = self._makeRequest()
         result = helper.remember(request, 'other')
-        self.assertEqual(len(result), 3)
+        self.assertEqual(len(result), 4)
 
         self.assertEqual(result[0][0], 'Set-Cookie')
         self.assertTrue(result[0][1].endswith('; HttpOnly'))
@@ -928,11 +936,13 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertTrue('; HttpOnly' in result[2][1])
         self.assertTrue(result[2][1].startswith('auth_tkt='))
 
+        self.assertEqual(result[3], ('Vary', 'Cookie'))
+
     def test_remember_secure(self):
         helper = self._makeOne('secret', include_ip=True, secure=True)
         request = self._makeRequest()
         result = helper.remember(request, 'other')
-        self.assertEqual(len(result), 3)
+        self.assertEqual(len(result), 4)
 
         self.assertEqual(result[0][0], 'Set-Cookie')
         self.assertTrue('; secure' in result[0][1])
@@ -946,11 +956,13 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertTrue('; secure' in result[2][1])
         self.assertTrue(result[2][1].startswith('auth_tkt='))
 
+        self.assertEqual(result[3], ('Vary', 'Cookie'))
+
     def test_remember_wild_domain_disabled(self):
         helper = self._makeOne('secret', wild_domain=False)
         request = self._makeRequest()
         result = helper.remember(request, 'other')
-        self.assertEqual(len(result), 2)
+        self.assertEqual(len(result), 3)
 
         self.assertEqual(result[0][0], 'Set-Cookie')
         self.assertTrue(result[0][1].endswith('; Path=/'))
@@ -960,36 +972,44 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertTrue(result[1][1].endswith('; Domain=localhost; Path=/'))
         self.assertTrue(result[1][1].startswith('auth_tkt='))
 
+        self.assertEqual(result[2], ('Vary', 'Cookie'))
+
     def test_remember_parent_domain(self):
         helper = self._makeOne('secret', parent_domain=True)
         request = self._makeRequest()
         request.domain = 'www.example.com'
         result = helper.remember(request, 'other')
-        self.assertEqual(len(result), 1)
+        self.assertEqual(len(result), 2)
 
         self.assertEqual(result[0][0], 'Set-Cookie')
         self.assertTrue(result[0][1].endswith('; Domain=.example.com; Path=/'))
         self.assertTrue(result[0][1].startswith('auth_tkt='))
+
+        self.assertEqual(result[1], ('Vary', 'Cookie'))
 
     def test_remember_parent_domain_supercedes_wild_domain(self):
         helper = self._makeOne('secret', parent_domain=True, wild_domain=True)
         request = self._makeRequest()
         request.domain = 'www.example.com'
         result = helper.remember(request, 'other')
-        self.assertEqual(len(result), 1)
+        self.assertEqual(len(result), 2)
         self.assertTrue(result[0][1].endswith('; Domain=.example.com; Path=/'))
+
+        self.assertEqual(result[1], ('Vary', 'Cookie'))
 
     def test_remember_explicit_domain(self):
         helper = self._makeOne('secret', domain='pyramid.bazinga')
         request = self._makeRequest()
         request.domain = 'www.example.com'
         result = helper.remember(request, 'other')
-        self.assertEqual(len(result), 1)
+        self.assertEqual(len(result), 2)
 
         self.assertEqual(result[0][0], 'Set-Cookie')
         self.assertTrue(result[0][1].endswith(
                 '; Domain=pyramid.bazinga; Path=/'))
         self.assertTrue(result[0][1].startswith('auth_tkt='))
+
+        self.assertEqual(result[1], ('Vary', 'Cookie'))
 
     def test_remember_domain_supercedes_parent_and_wild_domain(self):
         helper = self._makeOne('secret', domain='pyramid.bazinga',
@@ -997,9 +1017,11 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         request = self._makeRequest()
         request.domain = 'www.example.com'
         result = helper.remember(request, 'other')
-        self.assertEqual(len(result), 1)
+        self.assertEqual(len(result), 2)
         self.assertTrue(result[0][1].endswith(
                 '; Domain=pyramid.bazinga; Path=/'))
+
+        self.assertEqual(result[1], ('Vary', 'Cookie'))
 
     def test_remember_binary_userid(self):
         import base64
@@ -1007,7 +1029,7 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         request = self._makeRequest()
         result = helper.remember(request, b'userid')
         values = self._parseHeaders(result)
-        self.assertEqual(len(result), 3)
+        self.assertEqual(len(result), 4)
         val = self._cookieValue(values[0])
         self.assertEqual(val['userid'],
                          text_(base64.b64encode(b'userid').strip()))
@@ -1018,7 +1040,7 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         request = self._makeRequest()
         result = helper.remember(request, 1)
         values = self._parseHeaders(result)
-        self.assertEqual(len(result), 3)
+        self.assertEqual(len(result), 4)
         val = self._cookieValue(values[0])
         self.assertEqual(val['userid'], '1')
         self.assertEqual(val['user_data'], 'userid_type:int')
@@ -1029,7 +1051,7 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         request = self._makeRequest()
         result = helper.remember(request, long(1))
         values = self._parseHeaders(result)
-        self.assertEqual(len(result), 3)
+        self.assertEqual(len(result), 4)
         val = self._cookieValue(values[0])
         self.assertEqual(val['userid'], '1')
         self.assertEqual(val['user_data'], 'userid_type:int')
@@ -1041,7 +1063,7 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         userid = text_(b'\xc2\xa9', 'utf-8')
         result = helper.remember(request, userid)
         values = self._parseHeaders(result)
-        self.assertEqual(len(result), 3)
+        self.assertEqual(len(result), 4)
         val = self._cookieValue(values[0])
         self.assertEqual(val['userid'],
                          text_(base64.b64encode(userid.encode('utf-8'))))
@@ -1053,7 +1075,7 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         userid = object()
         result = helper.remember(request, userid)
         values = self._parseHeaders(result)
-        self.assertEqual(len(result), 3)
+        self.assertEqual(len(result), 4)
         value = values[0]
         self.assertTrue('userid' in value.value)
 
@@ -1062,7 +1084,7 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         request = self._makeRequest()
         result = helper.remember(request, 'userid', max_age='500')
         values = self._parseHeaders(result)
-        self.assertEqual(len(result), 3)
+        self.assertEqual(len(result), 4)
 
         self.assertEqual(values[0]['max-age'], '500')
         self.assertTrue(values[0]['expires'])
@@ -1071,7 +1093,7 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         helper = self._makeOne('secret')
         request = self._makeRequest()
         result = helper.remember(request, 'other', tokens=('foo', 'bar'))
-        self.assertEqual(len(result), 3)
+        self.assertEqual(len(result), 4)
 
         self.assertEqual(result[0][0], 'Set-Cookie')
         self.assertTrue("/tokens=foo|bar/" in result[0][1])
@@ -1109,7 +1131,7 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         helper = self._makeOne('secret')
         request = self._makeRequest()
         headers = helper.forget(request)
-        self.assertEqual(len(headers), 3)
+        self.assertEqual(len(headers), 4)
         name, value = headers[0]
         self.assertEqual(name, 'Set-Cookie')
         self.assertEqual(
@@ -1131,6 +1153,8 @@ class TestAuthTktCookieHelper(unittest.TestCase):
             'auth_tkt=; Domain=.localhost; Max-Age=0; Path=/; '
             'expires=Wed, 31-Dec-97 23:59:59 GMT'
             )
+
+        self.assertEqual(headers[3], ('Vary', 'Cookie'))
 
 class TestAuthTicket(unittest.TestCase):
     def _makeOne(self, *arg, **kw):
