@@ -181,8 +181,11 @@ class Configurator(
     By default, ``default_permission`` is ``None``, meaning that view
     configurations which do not explicitly declare a permission will
     always be executable by entirely anonymous users (any
-    authorization policy in effect is ignored).  See also
-    :ref:`setting_a_default_permission`.
+    authorization policy in effect is ignored).
+    
+    .. seealso::
+
+        See also :ref:`setting_a_default_permission`.
 
     If ``session_factory`` is passed, it should be an object which
     implements the :term:`session factory` interface.  If a nondefault
@@ -478,6 +481,7 @@ class Configurator(
 
     def _add_predicate(self, type, name, factory, weighs_more_than=None,
                        weighs_less_than=None):
+        factory = self.maybe_dotted(factory)
         discriminator = ('%s predicate' % type, name)
         intr = self.introspectable(
             '%s predicates' % type,
@@ -485,7 +489,7 @@ class Configurator(
             '%s predicate named %s' % (type, name),
             '%s predicate' % type)
         intr['name'] = name
-        intr['factory'] = self.maybe_dotted(factory)
+        intr['factory'] = factory
         intr['weighs_more_than'] = weighs_more_than
         intr['weighs_less_than'] = weighs_less_than
         def register():

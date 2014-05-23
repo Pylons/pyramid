@@ -54,8 +54,12 @@ Glossary
      provides an API for addressing "asset files" within a Python
      :term:`package`.  Asset files are static files, template files, etc;
      basically anything non-Python-source that lives in a Python package can
-     be considered a asset file.  See also `PkgResources
-     <http://peak.telecommunity.com/DevCenter/PkgResources>`_
+     be considered a asset file.
+     
+     .. seealso::
+         
+         See also `PkgResources
+         <http://peak.telecommunity.com/DevCenter/PkgResources>`_.
 
    asset
      Any file contained within a Python :term:`package` which is *not*
@@ -242,7 +246,11 @@ Glossary
      be effectively amended with a ``permission`` argument that will
      require that the executing user possess the default permission in
      order to successfully execute the associated :term:`view
-     callable` See also :ref:`setting_a_default_permission`.
+     callable`.
+
+     .. seealso::
+        
+        See also :ref:`setting_a_default_permission`.
 
    ACE
      An *access control entry*.  An access control entry is one element
@@ -380,7 +388,11 @@ Glossary
    route
      A single pattern matched by the :term:`url dispatch` subsystem,
      which generally resolves to a :term:`root factory` (and then
-     ultimately a :term:`view`).  See also :term:`url dispatch`.
+     ultimately a :term:`view`).
+
+     .. seealso::
+
+        See also :term:`url dispatch`.
 
    route configuration
      Route configuration is the act of associating request parameters with a
@@ -580,8 +592,11 @@ Glossary
      A wrapper around a Python function or class which accepts the
      function or class as its first argument and which returns an
      arbitrary object.  :app:`Pyramid` provides several decorators,
-     used for configuration and return value modification purposes.  See
-     also `PEP 318 <http://www.python.org/dev/peps/pep-0318/>`_.
+     used for configuration and return value modification purposes.
+
+     .. seealso::
+     
+        See also `PEP 318 <http://www.python.org/dev/peps/pep-0318/>`_.
 
    configuration declaration
      An individual method call made to a :term:`configuration directive`,
@@ -646,8 +661,11 @@ Glossary
    HTTP Exception
       The set of exception classes defined in :mod:`pyramid.httpexceptions`.
       These can be used to generate responses with various status codes when
-      raised or returned from a :term:`view callable`.  See also
-      :ref:`http_exceptions`.
+      raised or returned from a :term:`view callable`.
+
+      .. seealso::
+
+          See also :ref:`http_exceptions`.
 
    thread local
       A thread-local variable is one which is essentially a global variable
@@ -656,8 +674,11 @@ Glossary
       application may have a different value for this same "global" variable.
       :app:`Pyramid` uses a small number of thread local variables, as
       described in :ref:`threadlocals_chapter`.
-      See also the :class:`stdlib documentation <threading.local>`
-      for more information.
+
+      .. seealso::
+
+          See also the :class:`stdlib documentation <threading.local>`
+          for more information.
 
    multidict
      An ordered dictionary that can have multiple values for each key. Adds
@@ -671,7 +692,11 @@ Glossary
 
    Agendaless Consulting
      A consulting organization formed by Paul Everitt, Tres Seaver,
-     and Chris McDonough.  See also http://agendaless.com .
+     and Chris McDonough.
+
+     .. seealso::
+
+         See also `Agendaless Consulting <http://agendaless.com>`_.
 
    Jython
      A `Python implementation <http://www.jython.org/>`_ written for
@@ -776,8 +801,9 @@ Glossary
      application.
 
    Lingua
-     A package by Wichert Akkerman which provides :term:`Babel` message
-     extractors for Python source files and Chameleon ZPT template files.
+     A package by Wichert Akkerman which provides the ``pot-create``
+     command to extract translateable messages from Python sources
+     and Chameleon ZPT template files.
 
    Message Identifier
      A string used as a translation lookup key during localization.
@@ -792,15 +818,21 @@ Glossary
      The act of creating software with a user interface that can
      potentially be displayed in more than one language or cultural
      context.  Often shortened to "i18n" (because the word
-     "internationalization" is I, 18 letters, then N).  See also:
-     :term:`Localization`.
+     "internationalization" is I, 18 letters, then N).
+
+     .. seealso::
+
+         See also :term:`Localization`.
 
    Localization
      The process of displaying the user interface of an
      internationalized application in a particular language or
      cultural context.  Often shortened to "l10" (because the word
-     "localization" is L, 10 letters, then N).  See also:
-     :term:`Internationalization`.
+     "localization" is L, 10 letters, then N).
+
+     .. seealso::
+     
+         See also :term:`Internationalization`.
 
    renderer globals
       Values injected as names into a renderer by a
@@ -809,7 +841,10 @@ Glossary
    response callback
       A user-defined callback executed by the :term:`router` at a
       point after a :term:`response` object is successfully created.
-      See :ref:`using_response_callbacks`.
+
+      .. seealso::
+
+          See also :ref:`using_response_callbacks`.
 
    finished callback
       A user-defined callback executed by the :term:`router`
@@ -901,7 +936,7 @@ Glossary
      `Akhet <http://docs.pylonsproject.org/projects/akhet/en/latest/>`_ is a 
      Pyramid library and demo application with a Pylons-like feel.
      It's most known for its former application scaffold, which helped 
-     users transition from Pylons and those prefering a more Pylons-like API.
+     users transition from Pylons and those preferring a more Pylons-like API.
      The scaffold has been retired but the demo plays a similar role. 
 
    Pyramid Cookbook

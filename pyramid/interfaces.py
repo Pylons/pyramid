@@ -361,7 +361,9 @@ class IBeforeRender(IDict):
       def add_global(event):
           event['mykey'] = 'foo'
 
-    See also :ref:`beforerender_event`.
+    .. seealso::
+
+        See also :ref:`beforerender_event`.
     """
     rendering_val = Attribute('The value returned by a view or passed to a '
                               '``render`` method for this rendering. '
@@ -767,10 +769,10 @@ class IResourceURL(Interface):
         )
 
 class IContextURL(IResourceURL):
-    """ An adapter which deals with URLs related to a context.
-
+    """
     .. deprecated:: 1.3
-       use IResourceURL instead.
+        An adapter which deals with URLs related to a context.  Use
+        :class:`pyramid.interfaces.IResourceURL` instead.
     """
     # this class subclasses IResourceURL because request.resource_url looks
     # for IResourceURL via queryAdapter.  queryAdapter will find a deprecated
@@ -908,7 +910,13 @@ class ISession(IDict):
         ``invalidate`` is implementation-dependent, but it should have
         the effect of completely dissociating any data stored in the
         session with the current request.  It might set response
-        values (such as one which clears a cookie), or it might not."""
+        values (such as one which clears a cookie), or it might not.
+
+        An invalidated session may be used after the call to ``invalidate``
+        with the effect that a new session is created to store the data. This
+        enables workflows requiring an entirely new session, such as in the
+        case of changing privilege levels or preventing fixation attacks.
+        """
 
     def changed():
         """ Mark the session as changed. A user of a session should

@@ -183,46 +183,16 @@ class Router(object):
         return response
 
     def invoke_subrequest(self, request, use_tweens=False):
-        """
-        Obtain a response object from the Pyramid application based on
+        """Obtain a response object from the Pyramid application based on
         information in the ``request`` object provided.  The ``request``
         object must be an object that implements the Pyramid request
         interface (such as a :class:`pyramid.request.Request` instance).  If
         ``use_tweens`` is ``True``, the request will be sent to the
         :term:`tween` in the tween stack closest to the request ingress.  If
         ``use_tweens`` is ``False``, the request will be sent to the main
-        router handler, and no tweens will be invoked.  This function also:
+        router handler, and no tweens will be invoked.
         
-        - manages the threadlocal stack (so that
-          :func:`~pyramid.threadlocal.get_current_request` and
-          :func:`~pyramid.threadlocal.get_current_registry` work during a
-          request)
-
-        - Adds a ``registry`` attribute and a ``invoke_subrequest`` attribute
-          (a callable) to the request object it's handed.
-
-        - sets request extensions (such as those added via
-          :meth:`~pyramid.config.Configurator.add_request_method` or
-          :meth:`~pyramid.config.Configurator.set_request_property`) on the
-          request it's passed.
-
-        - causes a :class:`~pyramid.event.NewRequest` event to be sent at the
-          beginning of request processing.
-
-        - causes a :class:`~pyramid.event.ContextFound` event to be sent
-          when a context resource is found.
-          
-        - Calls any :term:`response callback` functions defined within the
-          request's lifetime if a response is obtained from the Pyramid
-          application.
-
-        - causes a :class:`~pyramid.event.NewResponse` event to be sent if a
-          response is obtained.
-
-        - Calls any :term:`finished callback` functions defined within the
-          request's lifetime.
-
-        See also :ref:`subrequest_chapter`.
+        See the API for pyramid.request for complete documentation.
         """
         registry = self.registry
         has_listeners = self.registry.has_listeners

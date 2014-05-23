@@ -320,7 +320,11 @@ template renderer:
    in Chameleon, not in Mako templates.
 
 Similar renderer configuration can be done imperatively.  See
-:ref:`views_which_use_a_renderer`.  See also :ref:`built_in_renderers`.
+:ref:`views_which_use_a_renderer`.
+
+.. seealso::
+
+    See also :ref:`built_in_renderers`.
 
 Although a renderer path is usually just a simple relative pathname, a path
 named as a renderer can be absolute, starting with a slash on UNIX or a drive
@@ -446,21 +450,24 @@ Available Add-On Template System Bindings
 The Pylons Project maintains several packages providing bindings to different
 templating languages including the following:
 
-+------------------------------+------------------------------+
-| Template Language            | Pyramid Bindings             |
-+==============================+==============================+
-| Chameleon_                   | pyramid_chameleon_           |
-+------------------------------+------------------------------+
-| Jinja2_                      | pyramid_jinja2_              |
-+------------------------------+------------------------------+
-| Mako_                        | pyramid_mako_                |
-+------------------------------+------------------------------+
++---------------------------+----------------------------+--------------------+
+| Template Language         | Pyramid Bindings           | Default Extensions |
++===========================+============================+====================+
+| Chameleon_                | pyramid_chameleon_         | .pt, .txt          |
++---------------------------+----------------------------+--------------------+
+| Jinja2_                   | pyramid_jinja2_            | .jinja2            |
++---------------------------+----------------------------+--------------------+
+| Mako_                     | pyramid_mako_              | .mak, .mako        |
++---------------------------+----------------------------+--------------------+
 
 .. _Chameleon: http://chameleon.readthedocs.org/en/latest/
-.. _pyramid_chameleon: https://pypi.python.org/pypi/pyramid_chameleon
+.. _pyramid_chameleon:
+   http://docs.pylonsproject.org/projects/pyramid-chameleon/en/latest/
 
 .. _Jinja2: http://jinja.pocoo.org/docs/
-.. _pyramid_jinja2: https://pypi.python.org/pypi/pyramid_jinja2
+.. _pyramid_jinja2:
+   http://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/
 
 .. _Mako: http://www.makotemplates.org/
-.. _pyramid_mako: https://pypi.python.org/pypi/pyramid_mako
+.. _pyramid_mako:
+   http://docs.pylonsproject.org/projects/pyramid-mako/en/latest/

@@ -341,7 +341,9 @@ class JSONP(JSON):
 
     .. versionadded:: 1.1
 
-    See also: :ref:`jsonp_renderer`.
+    .. seealso::
+
+        See also :ref:`jsonp_renderer`.
     """
 
     def __init__(self, param_name='callback', **kw):

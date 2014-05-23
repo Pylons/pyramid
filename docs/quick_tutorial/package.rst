@@ -22,8 +22,7 @@ Explaining it all in this
 tutorial will induce madness. For this tutorial, this is all you need to
 know:
 
-- We will have a directory for each tutorial step as a
-  setuptools *project*
+- We will have a directory for each tutorial step as a setuptools *project*
 
 - This project will contain a ``setup.py`` which injects the features
   of the setuptool's project machinery into the directory
@@ -97,8 +96,8 @@ In this step we have a Python package called ``tutorial``. We use the
 same name in each step of the tutorial, to avoid unnecessary re-typing.
 
 Above this ``tutorial`` directory we have the files that handle the
-packaging of this, well, package. At the moment, all we need is a
-bare-bones ``ini/setup.py``.
+packaging of this project. At the moment, all we need is a
+bare-bones ``setup.py``.
 
 Everything else is the same about our application. We simply made a
 Python package with a ``setup.py`` and installed it in development mode.

@@ -63,16 +63,16 @@ docs_extras = [
 
 testing_extras = tests_require + [
     'nose',
-    'nose-selecttests',
     'coverage',
     'virtualenv', # for scaffolding tests
     ]
 
 setup(name='pyramid',
-      version='1.5a3',
+      version='1.6dev',
       description='The Pyramid Web Framework, a Pylons project',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
+        "Development Status :: 6 - Mature",
         "Intended Audience :: Developers",
         "Programming Language :: Python",
         "Programming Language :: Python :: 2.6",
@@ -80,6 +80,7 @@ setup(name='pyramid',
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.2",
         "Programming Language :: Python :: 3.3",
+        "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
         "Framework :: Pyramid",
@@ -90,7 +91,7 @@ setup(name='pyramid',
       keywords='web wsgi pylons pyramid',
       author="Chris McDonough, Agendaless Consulting",
       author_email="pylons-discuss@googlegroups.com",
-      url="http://pylonsproject.org",
+      url="http://docs.pylonsproject.org/en/latest/docs/pyramid.html",
       license="BSD-derived (http://www.repoze.org/LICENSE.txt)",
       packages=find_packages(),
       include_package_data=True,

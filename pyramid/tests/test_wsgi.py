@@ -5,6 +5,9 @@ class WSGIAppTests(unittest.TestCase):
         from pyramid.wsgi import wsgiapp
         return wsgiapp(app)
 
+    def test_wsgiapp_none(self):
+        self.assertRaises(ValueError, self._callFUT, None)
+
     def test_decorator(self):
         context = DummyContext()
         request = DummyRequest()
@@ -24,6 +27,9 @@ class WSGIApp2Tests(unittest.TestCase):
     def _callFUT(self, app):
         from pyramid.wsgi import wsgiapp2
         return wsgiapp2(app)
+
+    def test_wsgiapp2_none(self):
+        self.assertRaises(ValueError, self._callFUT, None)
 
     def test_decorator_with_subpath_and_view_name(self):
         context = DummyContext()

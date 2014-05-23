@@ -20,8 +20,14 @@ def excview_tween_factory(handler, registry):
         try:
             response = handler(request)
         except Exception as exc:
-            # WARNING: do not assign the result of sys.exc_info() to a
-            # local var here, doing so will cause a leak
+            # WARNING: do not assign the result of sys.exc_info() to a local
+            # var here, doing so will cause a leak.  We used to actually
+            # explicitly delete both "exception" and "exc_info" from ``attrs``
+            # in a ``finally:`` clause below, but now we do not because these
+            # attributes are useful to upstream tweens.  This actually still
+            # apparently causes a reference cycle, but it is broken
+            # successfully by the garbage collector (see
+            # https://github.com/Pylons/pyramid/issues/1223).
             attrs['exc_info'] = sys.exc_info()
             attrs['exception'] = exc
             # clear old generated request.response, if any; it may
@@ -38,12 +44,6 @@ def excview_tween_factory(handler, registry):
             if view_callable is None:
                 raise
             response = view_callable(exc, request)
-        finally:
-            # prevent leakage (wrt exc_info)
-            if 'exc_info' in attrs:
-                del attrs['exc_info']
-            if 'exception' in attrs:
-                del attrs['exception']
 
         return response
 

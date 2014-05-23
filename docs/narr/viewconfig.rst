@@ -118,8 +118,9 @@ Non-Predicate Arguments
 
 ``renderer``
   Denotes the :term:`renderer` implementation which will be used to construct
-  a :term:`response` from the associated view callable's return value. (see
-  also :ref:`renderers_chapter`).
+  a :term:`response` from the associated view callable's return value.
+  
+  .. seealso:: See also :ref:`renderers_chapter`.
 
   This is either a single string term (e.g. ``json``) or a string implying a
   path or :term:`asset specification` (e.g. ``templates/views.pt``) naming a
@@ -217,7 +218,21 @@ Non-Predicate Arguments
   decorator function will be called with the view callable as a single
   argument.  The view callable it is passed will accept ``(context,
   request)``.  The decorator must return a replacement view callable which
-  also accepts ``(context, request)``.
+  also accepts ``(context, request)``. The ``decorator`` may also be an
+  iterable of decorators, in which case they will be applied one after the
+  other to the view, in reverse order. For example::
+
+    @view_config(..., decorator=(decorator2, decorator1))
+    def myview(request):
+      ...
+
+  Is similar to doing::
+
+    @view_config(...)
+    @decorator2
+    @decorator1
+    def myview(request):
+      ...
 
 ``mapper``
   A Python object or :term:`dotted Python name` which refers to a :term:`view
@@ -280,11 +295,14 @@ configured view.
   *This is an advanced feature, not often used by "civilians"*.
 
 ``request_method``
-  This value can be a string (typically ``"GET"``, ``"POST"``, ``"PUT"``,
-  ``"DELETE"``, or ``"HEAD"``) representing an HTTP ``REQUEST_METHOD``.  A view
-  declaration with this argument ensures that the view will only be called
-  when the request's ``method`` attribute (aka the ``REQUEST_METHOD`` of the
-  WSGI environment) string matches the supplied value.
+  This value can be either a string (such as ``"GET"``, ``"POST"``,
+  ``"PUT"``, ``"DELETE"``, ``"HEAD"`` or ``"OPTIONS"``) representing an
+  HTTP ``REQUEST_METHOD``, or a tuple containing one or more of these
+  strings.  A view declaration with this argument ensures that the
+  view will only be called when the ``method`` attribute of the
+  request (aka the ``REQUEST_METHOD`` of the WSGI environment) matches
+  a supplied value.  Note that use of ``"GET"`` also implies that the
+  view will respond to ``"HEAD"`` as of Pyramid 1.4.
 
   If ``request_method`` is not supplied, the view will be invoked regardless
   of the ``REQUEST_METHOD`` of the :term:`WSGI` environment.

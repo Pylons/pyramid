@@ -23,21 +23,44 @@ class TestFileResponse(unittest.TestCase):
         from pyramid.response import FileResponse
         return FileResponse(file, **kw)
 
-    def _getPath(self):
+    def _getPath(self, suffix='txt'):
         here = os.path.dirname(__file__)
-        return os.path.join(here, 'fixtures', 'minimal.txt')
+        return os.path.join(here, 'fixtures', 'minimal.%s' % (suffix,))
 
-    def test_with_content_type(self):
-        path = self._getPath()
+    def test_with_image_content_type(self):
+        path = self._getPath('jpg')
         r = self._makeOne(path, content_type='image/jpeg')
         self.assertEqual(r.content_type, 'image/jpeg')
+        self.assertEqual(r.headers['content-type'], 'image/jpeg')
+        path = self._getPath()
+        r.app_iter.close()
+
+    def test_with_xml_content_type(self):
+        path = self._getPath('xml')
+        r = self._makeOne(path, content_type='application/xml')
+        self.assertEqual(r.content_type, 'application/xml')
+        self.assertEqual(r.headers['content-type'],
+                         'application/xml; charset=UTF-8')
+        r.app_iter.close()
+
+    def test_with_pdf_content_type(self):
+        path = self._getPath('xml')
+        r = self._makeOne(path, content_type='application/pdf')
+        self.assertEqual(r.content_type, 'application/pdf')
+        self.assertEqual(r.headers['content-type'], 'application/pdf')
         r.app_iter.close()
 
     def test_without_content_type(self):
-        path = self._getPath()
-        r = self._makeOne(path)
-        self.assertEqual(r.content_type, 'text/plain')
-        r.app_iter.close()
+        for suffix, content_type in (
+            ('txt', 'text/plain; charset=UTF-8'),
+            ('xml', 'application/xml; charset=UTF-8'),
+            ('pdf', 'application/pdf')
+        ):
+            path = self._getPath(suffix)
+            r = self._makeOne(path)
+            self.assertEqual(r.content_type, content_type.split(';')[0])
+            self.assertEqual(r.headers['content-type'], content_type)
+            r.app_iter.close()
 
 class TestFileIter(unittest.TestCase):
     def _makeOne(self, file, block_size):

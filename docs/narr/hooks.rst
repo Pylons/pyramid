@@ -985,7 +985,7 @@ Creating a Tween
 
 To create a tween, you must write a "tween factory".  A tween factory
 must be a globally importable callable which accepts two arguments:
-``handler`` and ``registry``.  ``handler`` will be the either the main
+``handler`` and ``registry``.  ``handler`` will be either the main
 Pyramid request handling function or another tween.  ``registry`` will be the
 Pyramid :term:`application registry` represented by this Configurator.  A
 tween factory must return the tween (a callable object) when it is called.
@@ -1023,7 +1023,7 @@ method:
     :linenos:
 
     class simple_tween_factory(object):
-        def __init__(handler, registry):
+        def __init__(self, handler, registry):
             self.handler = handler
             self.registry = registry
 
@@ -1039,6 +1039,10 @@ method:
             # the actual application code goes here
 
             return response
+
+You should avoid mutating any state on the tween instance. The tween is
+invoked once per request and any shared mutable state needs to be carefully
+handled to avoid any race conditions.
 
 The closure style performs slightly better and enables you to conditionally
 omit the tween from the request processing pipeline (see the following timing

@@ -74,6 +74,9 @@ In :ref:`installing_chapter` we called the virtualenv directory ``env``; the
 following commands assume that our current working directory is the ``env``
 directory.
 
+The below example uses the ``pcreate`` command to create a project with the
+``starter`` scaffold.
+
 On UNIX:
 
 .. code-block:: text
@@ -85,21 +88,7 @@ Or on Windows:
 .. code-block:: text
 
    > %VENV%\Scripts\pcreate -s starter MyProject
-
-The above command uses the ``pcreate`` command to create a project with the
-``starter`` scaffold.  To use a different scaffold, such as
-``alchemy``, you'd just change the ``-s`` argument value.  For example,
-on UNIX:
-
-.. code-block:: text
-
-   $ $VENV/bin/pcreate -s alchemy MyProject
-
-Or on Windows:
-
-.. code-block:: text
-
-   > %VENV%\Scripts\pcreate -s alchemy MyProject
+   
 
 Here's sample output from a run of ``pcreate`` on UNIX for a project we name
 ``MyProject``:
@@ -493,16 +482,16 @@ structure:
   |-- myproject
   |   |-- __init__.py
   |   |-- static
-  |   |   |-- favicon.ico
-  |   |   |-- logo.png
-  |   |   `-- pylons.css
+  |   |   |-- pyramid-16x16.png
+  |   |   |-- pyramid.png
+  |   |   |-- theme.css
+  |   |   `-- theme.min.css
   |   |-- templates
   |   |   `-- mytemplate.pt
   |   |-- tests.py
   |   `-- views.py
   |-- production.ini
   |-- README.txt
-  |-- setup.cfg
   `-- setup.py
 
 The ``MyProject`` :term:`Project`
@@ -524,9 +513,6 @@ describe, run, and test your application.
 
 #. ``production.ini`` is a :term:`PasteDeploy` configuration file that can
    be used to execute your application in a production configuration.
-
-#. ``setup.cfg`` is a :term:`setuptools` configuration file used by
-   ``setup.py``.
 
 #. ``MANIFEST.in`` is a :term:`distutils` "manifest" file, naming which files
    should be included in a source distribution of the package when ``python
@@ -756,24 +742,6 @@ named ``MyProject-0.1.tar.gz``.  You can send this tarball to other people
 who want to install and use your application.
 
 .. index::
-   single: setup.cfg
-
-``setup.cfg``
-~~~~~~~~~~~~~
-
-The ``setup.cfg`` file is a :term:`setuptools` configuration file.  It
-contains various settings related to testing and internationalization:
-
-Our generated ``setup.cfg`` looks like this:
-
-.. literalinclude:: MyProject/setup.cfg
-   :language: guess
-   :linenos:
-
-The values in the default setup file allow various commonly-used
-internationalization commands and testing commands to work more smoothly.
-
-.. index::
    single: package
 
 The ``myproject`` :term:`Package`
@@ -908,15 +876,22 @@ returns the HTML in a :term:`response`.
      a server restart to reload them.  Production applications should use
      ``pyramid.reload_templates = False``.
 
-.. seealso:: See also :ref:`views_which_use_a_renderer` for more information
+.. seealso::
+
+    See also :ref:`views_which_use_a_renderer` for more information
     about how views, renderers, and templates relate and cooperate.
 
-.. seealso:: Pyramid can also dynamically reload changed Python files.  For
-    more on this see :ref:`reloading_code`.
+.. seealso::
 
-.. seealso:: The :ref:`debug_toolbar` provides interactive access to your
-   application's internals and, should an exception occur, allows interactive
-   access to traceback execution stack frames from the Python interpreter.
+    Pyramid can also dynamically reload changed Python files.  See also
+    :ref:`reloading_code`.
+
+.. seealso::
+
+    See also the :ref:`debug_toolbar`, which provides interactive access to
+    your application's internals and, should an exception occur, allows
+    interactive access to traceback execution stack frames from the Python
+    interpreter.
 
 .. index::
    single: static directory

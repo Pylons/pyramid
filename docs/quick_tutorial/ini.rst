@@ -98,17 +98,15 @@ the Pyramid chapter on
 
 The ``.ini`` file is also used for two other functions:
 
-- *Choice of WSGI server*. ``[server:main]`` wires up the choice of WSGI
-  *server* for your WSGI *application*. In this case, we are using
-  ``wsgiref`` bundled in the Python library.
+- *Configuring the WSGI server*. ``[server:main]`` wires up the choice of
+  which WSGI *server* for your WSGI *application*. In this case, we are using
+  ``wsgiref`` bundled in the Python library.  It also wires up the *port
+  number*:   ``port = 6543`` tells ``wsgiref`` to listen on port 6543.
 
-- *Python logging*. Pyramid uses Python standard logging, which needs a
-  number of configuration values. The ``.ini`` serves this function.
+- *Configuring Python logging*. Pyramid uses Python standard logging, which
+  needs a number of configuration values. The ``.ini`` serves this function.
   This provides the console log output that you see on startup and each
   request.
-
-- *Port number*. ``port = 6543`` tells ``wsgiref`` to listen on port
-  6543.
 
 We moved our startup code from ``app.py`` to the package's
 ``tutorial/__init__.py``. This isn't necessary,
@@ -131,7 +129,7 @@ Extra Credit
    might you want to do that?
 
 #. The entry point in ``setup.py`` didn't mention ``__init__.py`` when
-   it the ``main`` function. Why not?
+   it declared ``tutorial:main`` function. Why not?
 
 .. seealso::
    :ref:`project_narr`,

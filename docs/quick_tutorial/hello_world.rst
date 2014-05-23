@@ -71,11 +71,11 @@ New to Python web programming? If so, some lines in module merit
 explanation:
 
 #. *Line 11*. The ``if __name__ == '__main__':`` is Python's way of
-   saying "Start here when running from the command line".
+   saying "Start here when running from the command line", rather than
+   when this module is imported.
 
 #. *Lines 12-14*. Use Pyramid's :term:`configurator` to connect
-   :term:`view` code to a particular URL
-   :term:`route`.
+   :term:`view` code to a particular URL :term:`route`.
 
 #. *Lines 6-7*. Implement the view code that generates the
    :term:`response`.
@@ -96,13 +96,13 @@ Extra Credit
 
    .. code-block:: python
 
-      print ('Starting up server on http://localhost:6547')
+      print('Incoming request')
 
    ...instead of:
 
    .. code-block:: python
 
-      print 'Starting up server on http://localhost:6547'
+      print 'Incoming request'
 
 #. What happens if you return a string of HTML? A sequence of integers?
 

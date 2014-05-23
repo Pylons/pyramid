@@ -250,8 +250,11 @@
       ``invoke_subrequest`` isn't *actually* a method of the Request object;
       it's a callable added when the Pyramid router is invoked, or when a
       subrequest is invoked.  This means that it's not available for use on a
-      request provided by e.g. the ``pshell`` environment.  For more
-      information, see :ref:`subrequest_chapter`.
+      request provided by e.g. the ``pshell`` environment.
+
+      .. seealso::
+
+          See also :ref:`subrequest_chapter`.
 
    .. automethod:: has_permission
 
@@ -280,7 +283,11 @@
        This property will return the JSON-decoded variant of the request
        body.  If the request body is not well-formed JSON, or there is no
        body associated with this request, this property will raise an
-       exception.  See also :ref:`request_json_body`.
+       exception.
+       
+       .. seealso::
+       
+           See also :ref:`request_json_body`.
 
    .. method:: set_property(callable, name=None, reify=False)
 
@@ -312,7 +319,13 @@
 
           def _connect(request):
               conn = request.registry.dbsession()
-              def cleanup(_):
+              def cleanup(request):
+                  # since version 1.5, request.exception is no
+                  # longer eagerly cleared
+                  if request.exception is not None:
+                      conn.rollback()
+                  else:
+                      conn.commit()
                   conn.close()
               request.add_finished_callback(cleanup)
               return conn

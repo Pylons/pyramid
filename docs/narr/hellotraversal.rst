@@ -60,10 +60,10 @@ A more complicated application could have many types of resources,
 with different view callables defined for each type, and even multiple
 views for each type.
 
-See Also
----------
+.. seealso::
 
-Full technical details may be found in :doc:`traversal`.
-
-For more about *why* you might use traversal, see :doc:`muchadoabouttraversal`.
+    Full technical details may be found in :doc:`traversal`.
+    
+    For more about *why* you might use traversal, see
+    :doc:`muchadoabouttraversal`.
 

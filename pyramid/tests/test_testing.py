@@ -347,6 +347,7 @@ class Test_setUp(unittest.TestCase):
         self.assertEqual(config.registry, current['registry'])
         self.assertEqual(current['registry'].__class__, Registry)
         self.assertEqual(current['request'], None)
+        self.assertEqual(config.package.__name__, 'pyramid.tests')
         self._assertSMHook(get_current_registry)
 
     def test_it_with_registry(self):
@@ -363,6 +364,10 @@ class Test_setUp(unittest.TestCase):
         self._callFUT(request=request)
         current = manager.get()
         self.assertEqual(current['request'], request)
+
+    def test_it_with_package(self):
+        config = self._callFUT(package='pyramid')
+        self.assertEqual(config.package.__name__, 'pyramid')
 
     def test_it_with_hook_zca_false(self):
         from pyramid.registry import Registry
