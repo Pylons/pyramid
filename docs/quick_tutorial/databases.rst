@@ -115,7 +115,7 @@ Steps
 
     .. code-block:: bash
 
-        $ $VENV/bin/nosetests .
+        $ $VENV/bin/nosetests tutorial
         ..
         -----------------------------------------------------------------
         Ran 2 tests in 1.141s
