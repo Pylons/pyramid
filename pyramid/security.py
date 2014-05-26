@@ -59,7 +59,7 @@ def has_permission(permission, context, request):
 deprecated(
     'has_permission',
     'As of Pyramid 1.5 the "pyramid.security.has_permission" API is now '
-    'deprecated.  It will be removed in Pyramd 1.8.  Use the '
+    'deprecated.  It will be removed in Pyramid 1.8.  Use the '
     '"has_permission" method of the Pyramid request instead.'
     )
 
@@ -77,7 +77,7 @@ def authenticated_userid(request):
 deprecated(
     'authenticated_userid',
     'As of Pyramid 1.5 the "pyramid.security.authenticated_userid" API is now '
-    'deprecated.  It will be removed in Pyramd 1.8.  Use the '
+    'deprecated.  It will be removed in Pyramid 1.8.  Use the '
     '"authenticated_userid" attribute of the Pyramid request instead.'
     )
 
@@ -94,7 +94,7 @@ def unauthenticated_userid(request):
 deprecated(
     'unauthenticated_userid',
     'As of Pyramid 1.5 the "pyramid.security.unauthenticated_userid" API is '
-    'now deprecated.  It will be removed in Pyramd 1.8.  Use the '
+    'now deprecated.  It will be removed in Pyramid 1.8.  Use the '
     '"unauthenticated_userid" attribute of the Pyramid request instead.'
     )
 
@@ -111,7 +111,7 @@ def effective_principals(request):
 deprecated(
     'effective_principals',
     'As of Pyramid 1.5 the "pyramid.security.effective_principals" API is '
-    'now deprecated.  It will be removed in Pyramd 1.8.  Use the '
+    'now deprecated.  It will be removed in Pyramid 1.8.  Use the '
     '"effective_principals" attribute of the Pyramid request instead.'
     )
 
