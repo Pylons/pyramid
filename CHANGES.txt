@@ -1,8 +1,9 @@
-Next Release
-============
+1.4.6 (2014-05-31)
+==================
 
 Bug Fixes
 ---------
+
 - Allow ``config.add_route_predicate`` and ``config.add_view_predicate`` to
   accept an importable dotted-string for the ``factory`` argument.
 

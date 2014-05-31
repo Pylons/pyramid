@@ -242,6 +242,12 @@ Minor Feature Additions
   only a single ``event`` argument even if they've been subscribed for
   notifications that involve multiple interfaces.
 
+- Allow ``config.add_route_predicate`` and ``config.add_view_predicate`` to
+  accept an importable dotted-string for the ``factory`` argument.
+
+- Fix an exception in ``package_name()`` when resolving the package
+  name for namespace packages.
+
 Backwards Incompatibilities
 ---------------------------
 
