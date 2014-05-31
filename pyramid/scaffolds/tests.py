@@ -11,8 +11,6 @@ try:
 except ImportError: # pragma: no cover
     import http.client as httplib
 
-from pyramid.compat import PY3
-
 class TemplateTest(object):
     def make_venv(self, directory): # pragma: no cover
         import virtualenv
@@ -23,8 +21,7 @@ class TemplateTest(object):
         virtualenv.create_environment(directory,
                                       site_packages=False,
                                       clear=False,
-                                      unzip_setuptools=True,
-                                      use_distribute=PY3)
+                                      unzip_setuptools=True)
     def install(self, tmpl_name): # pragma: no cover
         try:
             self.old_cwd = os.getcwd()
