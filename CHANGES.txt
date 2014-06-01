@@ -1,5 +1,5 @@
-Next release
-============
+1.5.1 (2014-05-31)
+==================
 
 - Update scaffold generating machinery to return the version of pyramid and
   pyramid docs for use in scaffolds. Updated starter, alchemy and zodb
@@ -17,7 +17,7 @@ Next release
   ``package`` argument that can override this behavior as well.
 
 - Removed non-ascii copyright symbol from templates, as this was
-  causing the scaffolds to fail for project generation.
+  causing the scaffolds to fail for project generation on some systems.
 
 - Fix an issue where a ``pyramid.response.FileResponse`` may apply a charset
   where it does not belong. See https://github.com/Pylons/pyramid/pull/1251
