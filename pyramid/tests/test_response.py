@@ -62,6 +62,27 @@ class TestFileResponse(unittest.TestCase):
             self.assertEqual(r.headers['content-type'], content_type)
             r.app_iter.close()
 
+    def test_python_277_bug_15207(self):
+        # python 2.7.7 on windows has a bug where its mimetypes.guess_type
+        # function returns Unicode for the content_type, unlike any previous
+        # version of Python.  See https://github.com/Pylons/pyramid/issues/1360
+        # for more information.
+        from pyramid.compat import text_
+        import mimetypes as old_mimetypes
+        from pyramid import response
+        class FakeMimetypesModule(object):
+            def guess_type(self,  *arg, **kw):
+                return text_('foo/bar'), None
+        fake_mimetypes = FakeMimetypesModule()
+        try:
+            response.mimetypes = fake_mimetypes
+            path = self._getPath('xml')
+            r = self._makeOne(path)
+            self.assertEqual(r.content_type, 'foo/bar')
+            self.assertEqual(type(r.content_type), str)
+        finally:
+            response.mimetypes = old_mimetypes
+
 class TestFileIter(unittest.TestCase):
     def _makeOne(self, file, block_size):
         from pyramid.response import FileIter
