@@ -20,6 +20,11 @@ Bug Fixes
 - Fix an issue where a ``pyramid.response.FileResponse`` may apply a charset
   where it does not belong. See https://github.com/Pylons/pyramid/pull/1251
 
+- Work around a bug introduced in Python 2.7.7 on Windows where
+  ``mimetypes.guess_type`` returns Unicode rather than str for the content
+  type, unlike any previous version of Python.  See
+  https://github.com/Pylons/pyramid/issues/1360 for more information.
+
 Docs
 ----
 
