@@ -352,7 +352,7 @@ command from Gettext:
    $ cd /place/where/myapplication/setup.py/lives
    $ cd myapplication/locale
    $ mkdir -p es/LC_MESSAGES
-   $ msginit -l es es/LC_MESSAGES/myapplication.po
+   $ msginit -l es -o es/LC_MESSAGES/myapplication.po
 
 This will create a new the message catalog ``.po`` file will in:
 
