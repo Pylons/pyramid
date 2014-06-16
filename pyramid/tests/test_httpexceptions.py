@@ -188,9 +188,8 @@ class TestHTTPException(unittest.TestCase):
         self.assertEqual(start_response.status, '200 OK')
 
     def test_call_with_accept_json_returns_json(self):
-        # optimization
         cls = self._getTargetSubclass()
-        exc = cls(detail={'test': 'test2'})
+        exc = cls(detail={'test': 'test'})
         environ = _makeEnviron()
         environ['HTTP_ACCEPT'] = 'application/json'
         start_response = DummyStartResponse()
@@ -199,7 +198,6 @@ class TestHTTPException(unittest.TestCase):
         self.assertEqual(app_iter[0], exc.body)
 
     def test_call_with_accept_html_returns_html(self):
-        # optimization
         cls = self._getTargetSubclass()
         exc = cls()
         environ = _makeEnviron()
