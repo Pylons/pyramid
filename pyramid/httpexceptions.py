@@ -130,9 +130,9 @@ from webob import html_escape as _html_escape
 from pyramid.compat import (
     class_types,
     text_type,
+    string_types,
     binary_type,
-    string_type,
-    stext_,
+    text_,
     )
 
 from pyramid.interfaces import IExceptionResponse
