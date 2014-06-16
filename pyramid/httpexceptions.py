@@ -126,6 +126,9 @@ from string import Template
 from zope.interface import implementer
 
 from webob import html_escape as _html_escape
+from webob.acceptparse import MIMEAccept
+
+import json
 
 from pyramid.compat import (
     class_types,
@@ -137,8 +140,6 @@ from pyramid.compat import (
 
 from pyramid.interfaces import IExceptionResponse
 from pyramid.response import Response
-
-import json
 
 def _no_escape(value):
     if value is None:
@@ -206,6 +207,9 @@ ${body}''')
     ## Set this to True for responses that should have no request body
     empty_body = False
 
+    html_types = set([('text/html',2)]) # add more here?
+    json_types = set([('application/json',1)]) # add more here?
+
     def __init__(self, detail=None, headers=None, comment=None,
                  body_template=None, **kw):
         status = '%s %s' % (self.code, self.title)
@@ -232,21 +236,22 @@ ${body}''')
             comment = self.comment or ''
             accept = environ.get('HTTP_ACCEPT', '')
 
-            if accept and 'json' in accept:
-                # return json errors
+            match = MIMEAccept(accept).best_match(self.html_types.union(self.json_types), 'text/html')
+
+            if match in [json_type[0] for json_type in self.json_types]:
                 self.content_type = 'application/json'
 
                 import json
                 from compat import string_types
 
                 if isinstance(self.detail, string_types):
-                    self.body = self.detail
+                    self.body  = self.detail.encode(self.charset)
                 else:
-                    self.body= json.dumps(self.detail)
+                    self.body = json.dumps(self.detail).encode(self.charset)
 
                 return
-            
-            if accept and 'html' in accept or '*/*' in accept:
+
+            if accept and match in [html_type[0] for html_type in self.html_types]:
                 self.content_type = 'text/html'
                 escape = _html_escape
                 page_template = self.html_template_obj
@@ -260,13 +265,15 @@ ${body}''')
                 br = '\n'
                 if comment:
                     html_comment = escape(comment)
+
             args = {
                 'br':br,
                 'explanation': escape(self.explanation),
                 'detail': escape(self.detail or ''),
                 'comment': escape(comment),
                 'html_comment':html_comment,
-                }
+            }
+
             body_tmpl = self.body_template_obj
             if HTTPException.body_template_obj is not body_tmpl:
                 # Custom template; add headers to args
@@ -279,6 +286,7 @@ ${body}''')
                     args[k] = escape(v)
                 for k, v in self.headers.items():
                     args[k.lower()] = escape(v)
+
             body = body_tmpl.substitute(args)
             page = page_template.substitute(status=self.status, body=body)
             if isinstance(page, text_type):
