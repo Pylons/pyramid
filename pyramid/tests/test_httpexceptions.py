@@ -205,7 +205,6 @@ class TestHTTPException(unittest.TestCase):
         environ['HTTP_ACCEPT'] = 'application/json'
         start_response = DummyStartResponse()
         app_iter = exc(environ, start_response)
-        print ("REMCO",  start_response.headerlist)
         self.assertTrue(('Content-Type', 'application/json; charset=UTF-8' ) in start_response.headerlist)
         self.assertEqual(app_iter[0], exc.body)
 
@@ -260,7 +259,6 @@ class TestHTTPException(unittest.TestCase):
         environ['HTTP_ACCEPT'] = '*/*'
         start_response = DummyStartResponse()
         body = list(exc(environ, start_response))[0]
-        print ("REMCO", body)
         self.assertTrue(b'<!-- comment &amp; comment -->' in body)
 
     def test__default_app_iter_with_comment_html2(self):
