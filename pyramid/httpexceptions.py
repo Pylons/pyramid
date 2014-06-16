@@ -131,11 +131,14 @@ from pyramid.compat import (
     class_types,
     text_type,
     binary_type,
-    text_,
+    string_type,
+    stext_,
     )
 
 from pyramid.interfaces import IExceptionResponse
 from pyramid.response import Response
+
+import json
 
 def _no_escape(value):
     if value is None:
@@ -232,9 +235,6 @@ ${body}''')
             if accept and 'json' in accept:
                 # return json errors
                 self.content_type = 'application/json'
-
-                import json
-                from compat import string_types
 
                 if isinstance(self.detail, string_types):
                     self.body = self.detail
