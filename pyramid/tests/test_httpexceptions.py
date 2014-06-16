@@ -198,6 +198,16 @@ class TestHTTPException(unittest.TestCase):
         self.assertTrue(('Content-Type', 'application/json; charset=UTF-8' ) in start_response.headerlist)
         self.assertEqual(app_iter[0], exc.body)
 
+    def test_call_with_accept_json_returns_string(self):
+        cls = self._getTargetSubclass()
+        exc = cls(detail='test')
+        environ = _makeEnviron()
+        environ['HTTP_ACCEPT'] = 'application/json'
+        start_response = DummyStartResponse()
+        app_iter = exc(environ, start_response)
+        self.assertTrue(('Content-Type', 'application/json; charset=UTF-8' ) in start_response.headerlist)
+        self.assertEqual(app_iter[0], exc.body)
+
     def test_call_with_accept_html_returns_html(self):
         # optimization
         cls = self._getTargetSubclass()
