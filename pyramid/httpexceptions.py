@@ -228,6 +228,19 @@ ${body}''')
             html_comment = ''
             comment = self.comment or ''
             accept = environ.get('HTTP_ACCEPT', '')
+
+            if accept and 'json' in accept:
+                # return json errors
+                self.content_type = 'application/json'
+
+                import json
+                if isinstance(self.detail, basestring):
+                    self.body = self.detail
+                else:
+                    self.body= json.dumps(self.detail)
+
+                return
+            
             if accept and 'html' in accept or '*/*' in accept:
                 self.content_type = 'text/html'
                 escape = _html_escape
