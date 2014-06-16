@@ -234,7 +234,9 @@ ${body}''')
                 self.content_type = 'application/json'
 
                 import json
-                if isinstance(self.detail, basestring):
+                from compat import string_types
+
+                if isinstance(self.detail, string_types):
                     self.body = self.detail
                 else:
                     self.body= json.dumps(self.detail)
