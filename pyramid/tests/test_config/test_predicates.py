@@ -144,6 +144,10 @@ class TestRequestParamPredicate(unittest.TestCase):
         inst = self._makeOne('abc')
         self.assertEqual(inst.text(), 'request_param abc')
 
+    def test_text_exists_equal_sign(self):
+        inst = self._makeOne('=abc')
+        self.assertEqual(inst.text(), 'request_param =abc')
+
     def test_text_withval(self):
         inst = self._makeOne('abc=  1')
         self.assertEqual(inst.text(), 'request_param abc=1')
@@ -152,9 +156,17 @@ class TestRequestParamPredicate(unittest.TestCase):
         inst = self._makeOne(('abc=  1', 'def'))
         self.assertEqual(inst.text(), 'request_param abc=1,def')
 
+    def test_text_multi_equal_sign(self):
+        inst = self._makeOne(('abc=  1', '=def'))
+        self.assertEqual(inst.text(), 'request_param =def,abc=1')
+
     def test_phash_exists(self):
         inst = self._makeOne('abc')
         self.assertEqual(inst.phash(), 'request_param abc')
+
+    def test_phash_exists_equal_sign(self):
+        inst = self._makeOne('=abc')
+        self.assertEqual(inst.phash(), 'request_param =abc')
 
     def test_phash_withval(self):
         inst = self._makeOne('abc=   1')
