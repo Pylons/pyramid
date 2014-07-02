@@ -45,12 +45,6 @@ Steps
    .. literalinclude:: jinja2/tutorial/home.jinja2
     :language: html
 
-#. Get the ``pyramid.includes`` into the functional test setup in
-   ``jinja2/tutorial/tests.py``:
-
-   .. literalinclude:: jinja2/tutorial/tests.py
-    :linenos:
-
 #. Now run the tests:
 
    .. code-block:: bash

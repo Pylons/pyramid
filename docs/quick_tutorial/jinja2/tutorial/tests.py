@@ -30,13 +30,7 @@ class TutorialViewTests(unittest.TestCase):
 class TutorialFunctionalTests(unittest.TestCase):
     def setUp(self):
         from tutorial import main
-
-        settings = {
-            'pyramid.includes': [
-                'pyramid_jinja2'
-            ]
-        }
-        app = main({}, **settings)
+        app = main({})
         from webtest import TestApp
 
         self.testapp = TestApp(app)
