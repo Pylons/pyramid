@@ -146,7 +146,7 @@ name ``main`` as a section name:
 
 .. code-block:: text
 
-    $ $VENV/bin starter/development.ini#main
+    $ $VENV/bin/pshell starter/development.ini#main
     Python 2.6.5 (r265:79063, Apr 29 2010, 00:31:32) 
     [GCC 4.4.3] on linux2
     Type "help" for more information.

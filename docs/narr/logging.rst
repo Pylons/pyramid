@@ -377,7 +377,7 @@ FileHandler to the list of handlers (named ``accesslog``), and ensure that the
 
     [logger_wsgi] 
     level = INFO 
-    handlers = handler_accesslog
+    handlers = accesslog
     qualname = wsgi 
     propagate = 0 
 
