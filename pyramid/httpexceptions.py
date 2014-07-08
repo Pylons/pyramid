@@ -52,6 +52,9 @@ Exception
         * 422 - HTTPUnprocessableEntity
         * 423 - HTTPLocked
         * 424 - HTTPFailedDependency
+        * 428 - HTTPPreconditionRequired
+        * 429 - HTTPTooManyRequests
+        * 431 - HTTPRequestHeaderFieldsTooLarge
       HTTPServerError
         * 500 - HTTPInternalServerError
         * 501 - HTTPNotImplemented
@@ -60,6 +63,7 @@ Exception
         * 504 - HTTPGatewayTimeout
         * 505 - HTTPVersionNotSupported
         * 507 - HTTPInsufficientStorage
+        * 511 - HTTPNetworkAuthenticationRequired
 
 HTTP exceptions are also :term:`response` objects, thus they accept most of
 the same parameters that can be passed to a regular
@@ -906,6 +910,62 @@ class HTTPFailedDependency(HTTPClientError):
     explanation = (
         'The method could not be performed because the requested '
         'action dependended on another action and that action failed')
+
+class HTTPPreconditionRequired(HTTPClientError):
+    """
+    subclass of :class:`~HTTPClientError`
+
+    This indicates that the origin server requires the
+    request to be conditional.
+
+    Its typical use is to avoid the "lost update" problem, where a client
+    GETs a resource's state, modifies it, and PUTs it back to the server,
+    when meanwhile a third party has modified the state on the server,
+    leading to a conflict.  By requiring requests to be conditional, the
+    server can assure that clients are working with the correct copies.
+
+    RFC 6585.3
+
+    code: 428, title: Precondition Required
+    """
+    code = 428
+    title = 'Precondition Required'
+    explanation = (
+        'The origin server requires the request to be conditional.')
+
+class HTTPTooManyRequests(HTTPClientError):
+    """
+    subclass of :class:`~HTTPClientError`
+
+    This indicates that the user has sent too many
+    requests in a given amount of time ("rate limiting").
+
+    RFC 6585.4
+
+    code: 429, title: Too Many Requests
+    """
+    code = 429
+    title = 'Too Many Requests'
+    explanation = (
+        'The action could not be performed because there were too '
+        'many requests by the client.')
+
+class HTTPRequestHeaderFieldsTooLarge(HTTPClientError):
+    """
+    subclass of :class:`~HTTPClientError`
+
+    This indicates that the server is unwilling to process
+    the request because its header fields are too large.  The request MAY
+    be resubmitted after reducing the size of the request header fields.
+
+    RFC 6585.5
+
+    code: 431, title: Request Header Fields Too Large
+    """
+    code = 431
+    title = 'Request Header Fields Too Large'
+    explanation = (
+        'The requests header fields were too large.')
 
 ############################################################
 ## 5xx Server Error
