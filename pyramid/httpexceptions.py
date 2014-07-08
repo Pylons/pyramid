@@ -63,7 +63,6 @@ Exception
         * 504 - HTTPGatewayTimeout
         * 505 - HTTPVersionNotSupported
         * 507 - HTTPInsufficientStorage
-        * 511 - HTTPNetworkAuthenticationRequired
 
 HTTP exceptions are also :term:`response` objects, thus they accept most of
 the same parameters that can be passed to a regular
