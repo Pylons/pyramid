@@ -72,7 +72,7 @@ class CallbackMethodsMixin(object):
         """
 
         callbacks = self.response_callbacks
-        if not callbacks:
+        if callbacks == ():
             callbacks = []
         callbacks.append(callback)
         self.response_callbacks = callbacks
@@ -132,7 +132,7 @@ class CallbackMethodsMixin(object):
         """
 
         callbacks = self.finished_callbacks
-        if not callbacks:
+        if callbacks == ():
             callbacks = []
         callbacks.append(callback)
         self.finished_callbacks = callbacks
