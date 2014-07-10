@@ -1955,7 +1955,7 @@ class StaticURLInfo(object):
             sep = os.sep
         else:
             sep = '/'
-        if not spec.endswith(sep):
+        if not spec.endswith(sep) and not spec.endswith(':'):
             spec = spec + sep
 
         # we also make sure the name ends with a slash, purely as a

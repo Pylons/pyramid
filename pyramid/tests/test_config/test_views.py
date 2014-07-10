@@ -3902,7 +3902,7 @@ class TestStaticURLInfo(unittest.TestCase):
         inst = self._makeOne()
         config = self._makeConfig()
         inst.add(config, 'http://example.com', 'package:')
-        expected = [('http://example.com/',  'package:', None)]
+        expected = [('http://example.com/',  'package:', None, None)]
         self._assertRegistrations(config, expected)
 
     def test_add_url_withendslash(self):
