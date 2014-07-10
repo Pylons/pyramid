@@ -3898,6 +3898,13 @@ class TestStaticURLInfo(unittest.TestCase):
             ('http://example.com/',  'anotherpackage:path/', None, None)]
         self._assertRegistrations(config, expected)
 
+    def test_add_package_root(self):
+        inst = self._makeOne()
+        config = self._makeConfig()
+        inst.add(config, 'http://example.com', 'package:')
+        expected = [('http://example.com/',  'package:', None)]
+        self._assertRegistrations(config, expected)
+
     def test_add_url_withendslash(self):
         inst = self._makeOne()
         config = self._makeConfig()
