@@ -236,10 +236,13 @@ ${body}''')
             comment = self.comment or ''
             accept = environ.get('HTTP_ACCEPT', '')
 
-            match = MIMEAccept(accept).best_match(self.html_types + self.json_types, 'text/html')
+            match = MIMEAccept(accept).best_match(self.json_types + self.html_types, 'text/html')
 
             if match in [json_type[0] for json_type in self.json_types]:
                 self.content_type = 'application/json'
+
+                import json
+                from compat import string_types
 
                 if isinstance(self.detail, string_types):
                     self.body  = self.detail.encode(self.charset)
