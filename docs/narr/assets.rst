@@ -286,6 +286,71 @@ the application is being run in development or in production (use a different
 suggestion for a pattern; any setting name other than ``media_location``
 could be used.
 
+.. _cache_busting:
+
+Cache Busting
+-------------
+
+In order to maximize performance of a web application, you generally want to 
+limit the number of times a particular client requests the same static asset.
+Ideally a client would cache a particular static asset "forever", requiring 
+it to be sent to the client a single time.  The HTTP protocol allows you to 
+send headers with an HTTP response that can instruct a client to cache a 
+particular asset for an amount of time.  As long as the client has a copy of 
+the asset in its cache and that cache hasn't expired, the client will use the
+cached copy rather than request a new copy from the server.  The drawback to 
+sending cache headers to the client for a static asset is that at some point
+the static asset may change, and then you'll want the client to load a new copy
+of the asset.  Under normal circumstances you'd just need to wait for the 
+client's cached copy to expire before they get the new version of the static 
+resource.
+
+A commonly used workaround to this problem is a technique known as "cache 
+busting".  Cache busting schemes generally involve generating a URL for a 
+static asset that changes when the static asset changes.  This way headers can
+be sent along with the static asset instructing the client to cache the asset
+for a very long time.  When a static asset is changed, the URL used to refer to
+it in a web page also changes, so the client sees it as a new resource and 
+requests a copy, regardless of any caching policy set for the resource's old 
+URL.
+
+:app:`Pyramid` can be configured to produce cache busting URLs for static 
+assets by passing the optional argument, `cache_bust` to 
+:meth:`~pyramid.config.Configurator.add_static_view`:
+
+.. code-block:: python
+   :linenos:
+
+   # config is an instance of pyramid.config.Configurator
+   config.add_static_view(name='static', path='mypackage:folder/static',
+                           cache_bust='md5')
+
+Supplying the `cache_bust` argument instructs :app:`Pyramid` to add a query
+string to URLs generated for this static view which includes the md5 checksum
+of the static file being served:
+
+.. code-block:: python
+   :linenos:
+
+   js_url = request.static_url('mypackage:folder/static/js/myapp.js')
+   # Returns: 'http://www.example.com/static/js/myapp.js?md5=c9658b3c0a314a1ca21e5988e662a09e`
+
+When the asset changes, so will its md5 checksum, and therefore so will its
+URL.  Supplying the `cache_bust` argument also causes the static view to set
+headers instructing clients to cache the asset for ten years, unless the
+`max_cache_age` argument is also passed, in which case that value is used.
+
+.. note::
+
+   `md5` is currently the only possible value for the `cache_bust` argument to
+   :meth:`~pyramid.config.Configurator.add_static_view`.
+
+.. note:: 
+
+   md5 checksums are cached in RAM so if you change a static resource without
+   restarting your application, you may still generate URLs with a stale md5
+   checksum. 
+
 .. index::
    single: static assets view
 
