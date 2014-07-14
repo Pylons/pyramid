@@ -708,7 +708,7 @@ class IRoute(Interface):
     pregenerator = Attribute('This attribute should either be ``None`` or '
                              'a callable object implementing the '
                              '``IRoutePregenerator`` interface')
-        
+
     def match(path):
         """
         If the ``path`` passed to this function can be matched by the
@@ -803,7 +803,7 @@ class IContextURL(IResourceURL):
     # <__main__.Fudge object at 0x1cda890>
     # <object object at 0x7fa678f3e2a0> <object object at 0x7fa678f3e2a0>
     # <__main__.Another object at 0x1cda850>
-    
+
     def virtual_root():
         """ Return the virtual root related to a request and the
         current context"""
@@ -837,9 +837,9 @@ class IPEP302Loader(Interface):
 
     def get_code(fullname):
         """ Return the code object for the module identified by 'fullname'.
-        
+
         Return 'None' if it's a built-in or extension module.
-        
+
         If the loader doesn't have the code object but it does have the source
         code, return the compiled source code.
 
@@ -848,16 +848,16 @@ class IPEP302Loader(Interface):
 
     def get_source(fullname):
         """ Return the source code for the module identified by 'fullname'.
-        
+
         Return a string, using newline characters for line endings, or None
         if the source is not available.
-            
+
         Raise ImportError if the module can't be found by the importer at all.
         """
 
     def get_filename(fullname):
         """ Return the value of '__file__' if the named module was loaded.
-        
+
         If the module is not found, raise ImportError.
         """
 
@@ -1163,6 +1163,49 @@ class IJSONAdapter(Interface):
 
 class IPredicateList(Interface):
     """ Interface representing a predicate list """
+
+class ICacheBuster(Interface):
+    """
+    An instance of a class which implements this interface may be passed as the
+    ``cachebust`` argument to
+    :meth:`pyramid.config.Configurator.add_static_view` to add cache busting
+    capability to a static view.
+    """
+    def generate_token(request, pathspec):
+        """
+        Return a token string for a static asset to be used to rewrite a
+        static asset URL for cache busting.
+
+        The ``pathspec`` argument is the path specification for the asset we're
+        generating a token for.
+        """
+
+    def pregenerate_url(request, token, subpath, kw):
+        """
+        Modifies the elements and/or keywords used to generate the URL for a
+        given static asset.
+
+        The ``token`` argument is the result of calling
+        :meth:`~pyramid.interfaces.ICacheBuster.generate_token` for a static
+        asset.
+
+        The ``subpath`` argument is the subpath in the static asset URL that
+        would normally be generated without cache busting.  The ``kw``
+        argument is the keywords dict that would be passed to
+        :meth:`~pyramid.request.Request.route_url`.
+        The return value should be a two-tuple of elements ``(subpath, kw)``
+        which are modified from the incoming arguments.
+        """
+
+    def match_url(request, path_elements):
+        """
+        Undo any modification to the subpath which may have been done by
+        :meth:`~pyramid.interfaces.ICacheBuster.pregenerate_url`.  The
+        ``path_elements`` argument is a tuple of path elements that represent
+        the subpath of the asset request URL.  The return value should be
+        a modified (or not) version of ``path_elements``, which will be used
+        ultimately to find the asset.
+        """
 
 # configuration phases: a lower phase number means the actions associated
 # with this phase will be executed earlier than those with later phase

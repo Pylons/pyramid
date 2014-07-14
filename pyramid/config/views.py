@@ -34,6 +34,7 @@ from pyramid.interfaces import (
     )
 
 from pyramid import renderers
+from pyramid.cachebust import DefaultCacheBuster
 
 from pyramid.compat import (
     string_types,
@@ -1905,11 +1906,16 @@ class StaticURLInfo(object):
             registry = request.registry
         except AttributeError: # bw compat (for tests)
             registry = get_current_registry()
-        for (url, spec, route_name) in self._get_registrations(registry):
+        registrations = self._get_registrations(registry)
+        for (url, spec, route_name, cachebust) in registrations:
             if path.startswith(spec):
                 subpath = path[len(spec):]
                 if WIN: # pragma: no cover
                     subpath = subpath.replace('\\', '/') # windows
+                if cachebust:
+                    token = cachebust.generate_token(request, spec + subpath)
+                    subpath, kw = cachebust.pregenerate_url(
+                        request, token, subpath, kw)
                 if url is None:
                     kw['subpath'] = subpath
                     return request.route_url(route_name, **kw)
@@ -1949,6 +1955,10 @@ class StaticURLInfo(object):
             # make sure it ends with a slash
             name = name + '/'
 
+        cachebust = extra.pop('cachebust', None)
+        if cachebust is True:
+            cachebust = DefaultCacheBuster()
+
         if url_parse(name).netloc:
             # it's a URL
             # url, spec, route_name
@@ -1958,9 +1968,12 @@ class StaticURLInfo(object):
             # it's a view name
             url = None
             cache_max_age = extra.pop('cache_max_age', None)
+            if cache_max_age is None and cachebust:
+                cache_max_age = 10 * 365 * 24 * 60 * 60  # Ten(ish) years
+
             # create a view
             view = static_view(spec, cache_max_age=cache_max_age,
-                               use_subpath=True)
+                               use_subpath=True, cachebust=cachebust)
 
             # Mutate extra to allow factory, etc to be passed through here.
             # Treat permission specially because we'd like to default to
@@ -2001,7 +2014,7 @@ class StaticURLInfo(object):
                 registrations.pop(idx)
 
             # url, spec, route_name
-            registrations.append((url, spec, route_name))
+            registrations.append((url, spec, route_name, cachebust))
 
         intr = config.introspectable('static views',
                                      name,
