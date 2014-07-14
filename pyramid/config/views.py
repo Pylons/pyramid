@@ -302,7 +302,7 @@ class ViewDeriver(object):
                     raise PredicateMismatch(
                          'predicate mismatch for view %s (%s)' % (
                          view_name, predicate.text()))
-            return view(context, request)        
+            return view(context, request)
         def checker(context, request):
             return all((predicate(context, request) for predicate in
                         preds))
@@ -894,8 +894,8 @@ class ViewsConfiguratorMixin(object):
 
         request_param
 
-          This value can be any string or any sequence of strings.  A view 
-          declaration with this argument ensures that the view will only be 
+          This value can be any string or any sequence of strings.  A view
+          declaration with this argument ensures that the view will only be
           called when the :term:`request` has a key in the ``request.params``
           dictionary (an HTTP ``GET`` or ``POST`` variable) that has a
           name which matches the supplied value (if the value is a string)
@@ -1001,7 +1001,7 @@ class ViewsConfiguratorMixin(object):
 
           Note that using this feature requires a :term:`session factory` to
           have been configured.
-         
+
           .. versionadded:: 1.4a2
 
         physical_path
@@ -1039,7 +1039,7 @@ class ViewsConfiguratorMixin(object):
                 This value should be a sequence of references to custom
                 predicate callables.  Use custom predicates when no set of
                 predefined predicates do what you need.  Custom predicates
-                can be combined with predefined predicates as necessary. 
+                can be combined with predefined predicates as necessary.
                 Each custom predicate callable should accept two arguments:
                 ``context`` and ``request`` and should return either
                 ``True`` or ``False`` after doing arbitrary evaluation of
@@ -1074,7 +1074,7 @@ class ViewsConfiguratorMixin(object):
                 DeprecationWarning,
                 stacklevel=4
                 )
-        
+
         view = self.maybe_dotted(view)
         context = self.maybe_dotted(context)
         for_ = self.maybe_dotted(for_)
@@ -1160,7 +1160,7 @@ class ViewsConfiguratorMixin(object):
             view_desc = self.object_description(view)
 
         tmpl_intr = None
-            
+
         view_intr = self.introspectable('views',
                                         discriminator,
                                         view_desc,
@@ -1569,7 +1569,7 @@ class ViewsConfiguratorMixin(object):
         wrapper=None,
         route_name=None,
         request_type=None,
-        request_method=None, 
+        request_method=None,
         request_param=None,
         containment=None,
         xhr=None,
@@ -1612,7 +1612,7 @@ class ViewsConfiguratorMixin(object):
                     '%s may not be used as an argument to add_forbidden_view'
                     % arg
                     )
-        
+
         settings = dict(
             view=view,
             context=HTTPForbidden,
@@ -1623,7 +1623,7 @@ class ViewsConfiguratorMixin(object):
             containment=containment,
             xhr=xhr,
             accept=accept,
-            header=header, 
+            header=header,
             path_info=path_info,
             custom_predicates=custom_predicates,
             decorator=decorator,
@@ -1638,7 +1638,7 @@ class ViewsConfiguratorMixin(object):
         return self.add_view(**settings)
 
     set_forbidden_view = add_forbidden_view # deprecated sorta-bw-compat alias
-    
+
     @viewdefaults
     @action_method
     def add_notfound_view(
@@ -1649,7 +1649,7 @@ class ViewsConfiguratorMixin(object):
         wrapper=None,
         route_name=None,
         request_type=None,
-        request_method=None, 
+        request_method=None,
         request_param=None,
         containment=None,
         xhr=None,
@@ -1700,7 +1700,7 @@ class ViewsConfiguratorMixin(object):
                     '%s may not be used as an argument to add_notfound_view'
                     % arg
                     )
-                    
+
         settings = dict(
             view=view,
             context=HTTPNotFound,
@@ -1711,7 +1711,7 @@ class ViewsConfiguratorMixin(object):
             containment=containment,
             xhr=xhr,
             accept=accept,
-            header=header, 
+            header=header,
             path_info=path_info,
             custom_predicates=custom_predicates,
             decorator=decorator,
@@ -1786,7 +1786,15 @@ class ViewsConfiguratorMixin(object):
         ``Expires`` and ``Cache-Control`` headers for static assets served.
         Note that this argument has no effect when the ``name`` is a *url
         prefix*.  By default, this argument is ``None``, meaning that no
-        particular Expires or Cache-Control headers are set in the response.
+        particular Expires or Cache-Control headers are set in the response,
+        unless ``cache_bust`` is specified.
+
+        The ``cache_bust`` keyword argument may be set to ``"md5"`` to cause
+        :meth:`~pyramid.request.Request.static_url` to generate URLs with an
+        additional query string which includes the md5 checksum for the static
+        asset.  This argument modifies the default for ``cache_max_age``,
+        making it ten years.  ``cache_max_age`` may still be explicitly
+        provided to override this default.
 
         The ``permission`` keyword argument is used to specify the
         :term:`permission` required by a user to execute the static view.  By
