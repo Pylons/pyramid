@@ -187,6 +187,37 @@ class TestHTTPException(unittest.TestCase):
         self.assertTrue(start_response.headerlist)
         self.assertEqual(start_response.status, '200 OK')
 
+    def test_call_with_accept_json_returns_json(self):
+        # optimization
+        cls = self._getTargetSubclass()
+        exc = cls(detail={'test': 'test2'})
+        environ = _makeEnviron()
+        environ['HTTP_ACCEPT'] = 'application/json'
+        start_response = DummyStartResponse()
+        app_iter = exc(environ, start_response)
+        self.assertTrue(('Content-Type', 'application/json; charset=UTF-8' ) in start_response.headerlist)
+        self.assertEqual(app_iter[0], exc.body)
+
+    def test_call_with_accept_json_returns_string(self):
+        cls = self._getTargetSubclass()
+        exc = cls(detail='test')
+        environ = _makeEnviron()
+        environ['HTTP_ACCEPT'] = 'application/json'
+        start_response = DummyStartResponse()
+        app_iter = exc(environ, start_response)
+        self.assertTrue(('Content-Type', 'application/json; charset=UTF-8' ) in start_response.headerlist)
+        self.assertEqual(app_iter[0], exc.body)
+
+    def test_call_with_accept_html_returns_html(self):
+        # optimization
+        cls = self._getTargetSubclass()
+        exc = cls()
+        environ = _makeEnviron()
+        environ['HTTP_ACCEPT'] = 'text/html'
+        start_response = DummyStartResponse()
+        app_iter = exc(environ, start_response)
+        self.assertTrue(('Content-Type', 'text/html; charset=UTF-8' ) in start_response.headerlist)
+
     def test_call_returns_same_body_called_twice(self):
         # optimization
         cls = self._getTargetSubclass()
@@ -366,4 +397,5 @@ def _makeEnviron(**kw):
                'SERVER_PORT':'80'}
     environ.update(kw)
     return environ
+
 
