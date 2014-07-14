@@ -326,7 +326,7 @@ application.  You run a ``pot-create`` command to extract the messages:
 
    $ cd /place/where/myapplication/setup.py/lives
    $ mkdir -p myapplication/locale
-   $ $VENV/bin/pot-create src > myapplication/locale/myapplication.pot
+   $ $VENV/bin/pot-create -o myapplication/locale/myapplication.pot src
 
 The message catalog ``.pot`` template will end up in:
 
