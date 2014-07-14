@@ -207,8 +207,8 @@ ${body}''')
     ## Set this to True for responses that should have no request body
     empty_body = False
 
-    html_types = set([('text/html',2)]) # add more here?
-    json_types = set([('application/json',1)]) # add more here?
+    html_types = [('text/html', 2)] # add more here?
+    json_types = [('application/json',1)] # add more here?
 
     def __init__(self, detail=None, headers=None, comment=None,
                  body_template=None, **kw):
@@ -236,7 +236,7 @@ ${body}''')
             comment = self.comment or ''
             accept = environ.get('HTTP_ACCEPT', '')
 
-            match = MIMEAccept(accept).best_match(self.html_types.union(self.json_types), 'text/html')
+            match = MIMEAccept(accept).best_match(self.html_types + self.json_types, 'text/html')
 
             if match in [json_type[0] for json_type in self.json_types]:
                 self.content_type = 'application/json'
