@@ -316,8 +316,7 @@ template renderer:
    we're using a Chameleon renderer, it means "relative to the directory in
    which the file which defines the view configuration lives".  In this case,
    this is the directory containing the file that defines the ``my_view``
-   function.  View-configuration-relative asset specifications work only
-   in Chameleon, not in Mako templates.
+   function.
 
 Similar renderer configuration can be done imperatively.  See
 :ref:`views_which_use_a_renderer`.
