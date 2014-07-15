@@ -1,6 +1,8 @@
+import hashlib
 import inspect
 import operator
 import os
+import pkg_resources
 import warnings
 
 from zope.interface import (
@@ -34,7 +36,7 @@ from pyramid.interfaces import (
     )
 
 from pyramid import renderers
-from pyramid.cachebust import DefaultCacheBuster
+from pyramid.asset import resolve_asset_spec
 
 from pyramid.compat import (
     string_types,
@@ -44,11 +46,6 @@ from pyramid.compat import (
     is_bound_method,
     is_nonstr_iter
     )
-
-from pyramid.encode import (
-    quote_plus,
-    urlencode,
-)
 
 from pyramid.exceptions import (
     ConfigurationError,
@@ -1907,15 +1904,13 @@ class StaticURLInfo(object):
         except AttributeError: # bw compat (for tests)
             registry = get_current_registry()
         registrations = self._get_registrations(registry)
-        for (url, spec, route_name, cachebust) in registrations:
+        for (url, spec, route_name, cachebuster) in registrations:
             if path.startswith(spec):
                 subpath = path[len(spec):]
                 if WIN: # pragma: no cover
                     subpath = subpath.replace('\\', '/') # windows
-                if cachebust:
-                    token = cachebust.generate_token(request, spec + subpath)
-                    subpath, kw = cachebust.pregenerate_url(
-                        request, token, subpath, kw)
+                if cachebuster:
+                    subpath, kw = cachebuster(subpath, kw)
                 if url is None:
                     kw['subpath'] = subpath
                     return request.route_url(route_name, **kw)
@@ -1955,9 +1950,22 @@ class StaticURLInfo(object):
             # make sure it ends with a slash
             name = name + '/'
 
-        cachebust = extra.pop('cachebust', None)
-        if cachebust is True:
-            cachebust = DefaultCacheBuster()
+        cb = extra.pop('cachebust', None)
+        if cb is True:
+            cb_token, cb_pregen, cb_match = DefaultCacheBuster()
+        elif cb:
+            cb_token, cb_pregen, cb_match = cb
+        else:
+            cb_token = cb_pregen = cb_match = None
+
+        if cb_token and cb_pregen:
+            def cachebuster(subpath, kw):
+                token = cb_token(spec + subpath)
+                subpath_tuple = tuple(subpath.split('/'))
+                subpath_tuple, kw = cb_pregen(token, subpath_tuple, kw)
+                return '/'.join(subpath_tuple), kw
+        else:
+            cachebuster = None
 
         if url_parse(name).netloc:
             # it's a URL
@@ -1968,12 +1976,12 @@ class StaticURLInfo(object):
             # it's a view name
             url = None
             cache_max_age = extra.pop('cache_max_age', None)
-            if cache_max_age is None and cachebust:
+            if cache_max_age is None and cb:
                 cache_max_age = 10 * 365 * 24 * 60 * 60  # Ten(ish) years
 
             # create a view
             view = static_view(spec, cache_max_age=cache_max_age,
-                               use_subpath=True, cachebust=cachebust)
+                               use_subpath=True, cachebust_match=cb_match)
 
             # Mutate extra to allow factory, etc to be passed through here.
             # Treat permission specially because we'd like to default to
@@ -2014,7 +2022,7 @@ class StaticURLInfo(object):
                 registrations.pop(idx)
 
             # url, spec, route_name
-            registrations.append((url, spec, route_name, cachebust))
+            registrations.append((url, spec, route_name, cachebuster))
 
         intr = config.introspectable('static views',
                                      name,
@@ -2026,3 +2034,40 @@ class StaticURLInfo(object):
         config.action(None, callable=register, introspectables=(intr,))
 
 
+def _generate_md5(spec):
+    package, filename = resolve_asset_spec(spec)
+    md5 = hashlib.md5()
+    with pkg_resources.resource_stream(package, filename) as stream:
+        for block in iter(lambda: stream.read(4096), ''):
+            md5.update(block)
+    return md5.hexdigest()
+
+
+def DefaultCacheBuster():
+    token_cache = {}
+
+    def generate_token(pathspec):
+        # An astute observer will notice that this use of token_cache doesn't
+        # look particular thread safe.  Basic read/write operations on Python
+        # dicts, however, are atomic, so simply accessing and writing values
+        # to the dict shouldn't cause a segfault or other catastrophic failure.
+        # (See: http://effbot.org/pyfaq/what-kinds-of-global-value-mutation-are-thread-safe.htm)
+        #
+        # We do have a race condition that could result in the same md5
+        # checksum getting computed twice or more times in parallel.  Since
+        # the program would still function just fine if this were to occur,
+        # the extra overhead of using locks to serialize access to the dict
+        # seems an unnecessary burden.
+        #
+        token = token_cache.get(pathspec)
+        if not token:
+            token_cache[pathspec] = token = _generate_md5(pathspec)
+        return token
+
+    def pregenerate_url(token, subpath, kw):
+        return (token,) + subpath, kw
+
+    def match_url(subpath):
+        return subpath[1:]
+
+    return (generate_token, pregenerate_url, match_url)

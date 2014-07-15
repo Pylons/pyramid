@@ -78,7 +78,7 @@ class static_view(object):
     """
 
     def __init__(self, root_dir, cache_max_age=3600, package_name=None,
-                 use_subpath=False, index='index.html', cachebust=None):
+                 use_subpath=False, index='index.html', cachebust_match=None):
         # package_name is for bw compat; it is preferred to pass in a
         # package-relative path as root_dir
         # (e.g. ``anotherpackage:foo/static``).
@@ -91,15 +91,15 @@ class static_view(object):
         self.docroot = docroot
         self.norm_docroot = normcase(normpath(docroot))
         self.index = index
-        self.cachebust = cachebust
+        self.cachebust_match = cachebust_match
 
     def __call__(self, context, request):
         if self.use_subpath:
             path_tuple = request.subpath
         else:
             path_tuple = traversal_path_info(request.environ['PATH_INFO'])
-        if self.cachebust:
-            path_tuple = self.cachebust.match_url(request, path_tuple)
+        if self.cachebust_match:
+            path_tuple = self.cachebust_match(path_tuple)
         path = _secure_path(path_tuple)
 
         if path is None:
