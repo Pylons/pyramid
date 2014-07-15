@@ -3845,6 +3845,20 @@ class TestStaticURLInfo(unittest.TestCase):
         self.assertEqual(result,
                          'http://example.com/abc%20def#La%20Pe%C3%B1a')
 
+    def test_generate_url_cachebuster(self):
+        def cachebuster(subpath, kw):
+            kw['foo'] = 'bar'
+            return 'foo' + '/' + subpath, kw
+        inst = self._makeOne()
+        registrations = [(None, 'package:path/', '__viewname', cachebuster)]
+        inst._get_registrations = lambda *x: registrations
+        request = self._makeRequest()
+        def route_url(n, **kw):
+            self.assertEqual(n, '__viewname')
+            self.assertEqual(kw, {'subpath':'foo/abc', 'foo':'bar'})
+        request.route_url = route_url
+        inst.generate('package:path/abc', request)
+
     def test_add_already_exists(self):
         inst = self._makeOne()
         config = self._makeConfig(
@@ -3926,6 +3940,31 @@ class TestStaticURLInfo(unittest.TestCase):
                  renderer='mypackage:templates/index.pt')
         self.assertEqual(config.view_kw['renderer'],
                          'mypackage:templates/index.pt')
+
+    def test_add_cachebust_default(self):
+        config = self._makeConfig()
+        inst = self._makeOne()
+        inst._default_asset_token_generator = lambda: lambda pathspec: 'foo'
+        inst.add(config, 'view', 'mypackage:path', cachebuster=True)
+        cachebuster = config.registry._static_url_registrations[0][3]
+        subpath, _ = cachebuster('some/path', None)
+        self.assertEqual(subpath, 'foo/some/path')
+
+    def test_add_cachebust_custom(self):
+        class DummyCacheBuster(object):
+            def token(self, pathspec):
+                return 'foo'
+            def pregenerate(self, token, subpath, kw):
+                kw['x'] = token
+                return subpath, kw
+        config = self._makeConfig()
+        inst = self._makeOne()
+        inst.add(config, 'view', 'mypackage:path',
+                 cachebuster=DummyCacheBuster())
+        cachebuster = config.registry._static_url_registrations[0][3]
+        subpath, kw = cachebuster('some/path', {})
+        self.assertEqual(subpath, 'some/path')
+        self.assertEqual(kw['x'], 'foo')
 
 class Test_view_description(unittest.TestCase):
     def _callFUT(self, view):

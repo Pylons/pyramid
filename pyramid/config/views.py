@@ -1891,6 +1891,12 @@ def isexception(o):
 
 @implementer(IStaticURLInfo)
 class StaticURLInfo(object):
+    # Indirection for testing
+    _default_cachebuster = staticmethod(PathSegmentCacheBuster)
+    _default_asset_token_generator = staticmethod(Md5AssetTokenGenerator)
+
+    def _make_default_cachebuster(self):
+        return self._default_cachebuster(self._default_asset_token_generator())
 
     def _get_registrations(self, registry):
         try:
@@ -1953,7 +1959,7 @@ class StaticURLInfo(object):
 
         cb = extra.pop('cachebuster', None)
         if cb is True:
-            cb = DefaultCacheBuster()
+            cb = self._make_default_cachebuster()
         if cb:
             def cachebuster(subpath, kw):
                 token = cb.token(spec + subpath)
@@ -2029,7 +2035,4 @@ class StaticURLInfo(object):
         intr['spec'] = spec
 
         config.action(None, callable=register, introspectables=(intr,))
-
-def DefaultCacheBuster():
-    return PathSegmentCacheBuster(Md5AssetTokenGenerator())
 
