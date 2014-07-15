@@ -1202,6 +1202,15 @@ class ICachebustURLPregenerator(Interface):
         generation.  The return value of this function should be two-tuple of
         ``(subpath, kw)`` which are versions of the same arguments modified to
         include the cachebust token in the generated URL.
+
+        Here is an example which places the token in a query string:
+
+        .. code-block:: python
+           :linenos:
+
+           def cb_pregen(token, subpath kw):
+               kw.setdefault('_query', {})['cb'] = token
+               return subpath, kw
         """
 
 class ICachebustURLMatcher(Interface):
