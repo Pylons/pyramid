@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
+import hashlib
 import os
+import pkg_resources
 
 from os.path import (
     normcase,
@@ -155,3 +157,57 @@ def _secure_path(path_tuple):
         return None
     encoded = slash.join(path_tuple) # will be unicode
     return encoded
+
+def _generate_md5(spec):
+    package, filename = resolve_asset_spec(spec)
+    md5 = hashlib.md5()
+    with pkg_resources.resource_stream(package, filename) as stream:
+        for block in iter(lambda: stream.read(4096), ''):
+            md5.update(block)
+    return md5.hexdigest()
+
+def Md5AssetTokenGenerator():
+    token_cache = {}
+
+    def generate_token(pathspec):
+        # An astute observer will notice that this use of token_cache doesn't
+        # look particularly thread safe.  Basic read/write operations on Python
+        # dicts, however, are atomic, so simply accessing and writing values
+        # to the dict shouldn't cause a segfault or other catastrophic failure.
+        # (See: http://effbot.org/pyfaq/what-kinds-of-global-value-mutation-are-thread-safe.htm)
+        #
+        # We do have a race condition that could result in the same md5
+        # checksum getting computed twice or more times in parallel.  Since
+        # the program would still function just fine if this were to occur,
+        # the extra overhead of using locks to serialize access to the dict
+        # seems an unnecessary burden.
+        #
+        token = token_cache.get(pathspec)
+        if not token:
+            token_cache[pathspec] = token = _generate_md5(pathspec)
+        return token
+
+    return generate_token
+
+class PathSegmentCacheBuster(object):
+
+    def __init__(self, token):
+        self.token = token
+
+    def pregenerate(self, token, subpath, kw):
+        return (token,) + subpath, kw
+
+    def match(self, subpath):
+        return subpath[1:]
+
+class QueryStringCacheBuster(object):
+
+    def __init__(self, token, param='x'):
+        self.param = param
+        self.token = token
+
+    def pregenerate(self, token, subpath, kw):
+        kw.setdefault('_query', {})[self.param] = token
+        return subpath, kw
+
+

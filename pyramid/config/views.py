@@ -1,8 +1,6 @@
-import hashlib
 import inspect
 import operator
 import os
-import pkg_resources
 import warnings
 
 from zope.interface import (
@@ -36,7 +34,10 @@ from pyramid.interfaces import (
     )
 
 from pyramid import renderers
-from pyramid.asset import resolve_asset_spec
+from pyramid.static import (
+    Md5AssetTokenGenerator,
+    PathSegmentCacheBuster,
+)
 
 from pyramid.compat import (
     string_types,
@@ -1950,19 +1951,14 @@ class StaticURLInfo(object):
             # make sure it ends with a slash
             name = name + '/'
 
-        cb = extra.pop('cachebust', None)
+        cb = extra.pop('cachebuster', None)
         if cb is True:
-            cb_token, cb_pregen, cb_match = DefaultCacheBuster()
-        elif cb:
-            cb_token, cb_pregen, cb_match = cb
-        else:
-            cb_token = cb_pregen = cb_match = None
-
-        if cb_token and cb_pregen:
+            cb = DefaultCacheBuster()
+        if cb:
             def cachebuster(subpath, kw):
-                token = cb_token(spec + subpath)
+                token = cb.token(spec + subpath)
                 subpath_tuple = tuple(subpath.split('/'))
-                subpath_tuple, kw = cb_pregen(token, subpath_tuple, kw)
+                subpath_tuple, kw = cb.pregenerate(token, subpath_tuple, kw)
                 return '/'.join(subpath_tuple), kw
         else:
             cachebuster = None
@@ -1980,6 +1976,7 @@ class StaticURLInfo(object):
             cache_max_age = extra.pop('cache_max_age', default)
 
             # create a view
+            cb_match = getattr(cb, 'match', None)
             view = static_view(spec, cache_max_age=cache_max_age,
                                use_subpath=True, cachebust_match=cb_match)
 
@@ -2033,41 +2030,6 @@ class StaticURLInfo(object):
 
         config.action(None, callable=register, introspectables=(intr,))
 
-
-def _generate_md5(spec):
-    package, filename = resolve_asset_spec(spec)
-    md5 = hashlib.md5()
-    with pkg_resources.resource_stream(package, filename) as stream:
-        for block in iter(lambda: stream.read(4096), ''):
-            md5.update(block)
-    return md5.hexdigest()
-
-
 def DefaultCacheBuster():
-    token_cache = {}
+    return PathSegmentCacheBuster(Md5AssetTokenGenerator())
 
-    def generate_token(pathspec):
-        # An astute observer will notice that this use of token_cache doesn't
-        # look particular thread safe.  Basic read/write operations on Python
-        # dicts, however, are atomic, so simply accessing and writing values
-        # to the dict shouldn't cause a segfault or other catastrophic failure.
-        # (See: http://effbot.org/pyfaq/what-kinds-of-global-value-mutation-are-thread-safe.htm)
-        #
-        # We do have a race condition that could result in the same md5
-        # checksum getting computed twice or more times in parallel.  Since
-        # the program would still function just fine if this were to occur,
-        # the extra overhead of using locks to serialize access to the dict
-        # seems an unnecessary burden.
-        #
-        token = token_cache.get(pathspec)
-        if not token:
-            token_cache[pathspec] = token = _generate_md5(pathspec)
-        return token
-
-    def pregenerate_url(token, subpath, kw):
-        return (token,) + subpath, kw
-
-    def match_url(subpath):
-        return subpath[1:]
-
-    return (generate_token, pregenerate_url, match_url)
