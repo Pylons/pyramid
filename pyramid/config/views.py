@@ -1975,9 +1975,9 @@ class StaticURLInfo(object):
         else:
             # it's a view name
             url = None
-            cache_max_age = extra.pop('cache_max_age', None)
-            if cache_max_age is None and cb:
-                cache_max_age = 10 * 365 * 24 * 60 * 60  # Ten(ish) years
+            ten_years = 10 * 365 * 24 * 60 * 60  # more or less
+            default = ten_years if cb else None
+            cache_max_age = extra.pop('cache_max_age', default)
 
             # create a view
             view = static_view(spec, cache_max_age=cache_max_age,
