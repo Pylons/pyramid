@@ -206,7 +206,11 @@ class QueryStringCacheBuster(object):
         self.token = token
 
     def pregenerate(self, token, subpath, kw):
-        kw.setdefault('_query', {})[self.param] = token
+        query = kw.setdefault('_query', {})
+        if isinstance(query, dict):
+            query[self.param] = token
+        else:
+            kw['_query'] = query + [(self.param, token)]
         return subpath, kw
 
 

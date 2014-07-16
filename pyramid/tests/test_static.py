@@ -453,6 +453,12 @@ class TestQueryStringCacheBuster(unittest.TestCase):
             fut('foo', ('bar',), {}),
             (('bar',), {'_query': {'y': 'foo'}}))
 
+    def test_pregenerate_query_is_already_tuples(self):
+        fut = self._makeOne().pregenerate
+        self.assertEqual(
+            fut('foo', ('bar',), {'_query': [('a', 'b')]}),
+            (('bar',), {'_query': [('a', 'b'), ('x', 'foo')]}))
+
 class DummyContext:
     pass
 
