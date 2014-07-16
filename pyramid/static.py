@@ -160,8 +160,12 @@ def _secure_path(path_tuple):
 
 def _generate_md5(spec):
     package, filename = resolve_asset_spec(spec)
+    if package:
+        stream = pkg_resources.resource_stream(package, filename)
+    else:
+        stream = open(filename, 'rb')
     md5 = hashlib.md5()
-    with pkg_resources.resource_stream(package, filename) as stream:
+    with stream:
         for block in iter(lambda: stream.read(4096), ''):
             md5.update(block)
     return md5.hexdigest()
