@@ -28,7 +28,7 @@ from pyramid.httpexceptions import (
     HTTPMovedPermanently,
     )
 
-from pyramid.path import caller_package
+from pyramid.path import AssetResolver, caller_package
 from pyramid.response import FileResponse
 from pyramid.traversal import traversal_path_info
 
@@ -159,13 +159,9 @@ def _secure_path(path_tuple):
     return encoded
 
 def _generate_md5(spec):
-    package, filename = resolve_asset_spec(spec)
-    if package:
-        stream = pkg_resources.resource_stream(package, filename)
-    else:
-        stream = open(filename, 'rb')
+    asset = AssetResolver(None).resolve(spec)
     md5 = hashlib.md5()
-    with stream:
+    with asset.stream() as stream:
         for block in iter(lambda: stream.read(4096), ''):
             md5.update(block)
     return md5.hexdigest()
