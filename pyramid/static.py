@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import hashlib
 import os
-import pkg_resources
 
 from os.path import (
     normcase,
