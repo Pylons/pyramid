@@ -26,7 +26,7 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
         if kw is not None:
             environ.update(kw)
         return Request(environ=environ)
-    
+
     def test_ctor_defaultargs(self):
         inst = self._makeOne('package:resource_name')
         self.assertEqual(inst.package_name, 'package')
@@ -106,6 +106,14 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
     def test_resource_is_file(self):
         inst = self._makeOne('pyramid.tests:fixtures/static')
         request = self._makeRequest({'PATH_INFO':'/index.html'})
+        context = DummyContext()
+        response = inst(context, request)
+        self.assertTrue(b'<html>static</html>' in response.body)
+
+    def test_cachebust_match(self):
+        inst = self._makeOne('pyramid.tests:fixtures/static')
+        inst.cachebust_match = lambda subpath: subpath[1:]
+        request = self._makeRequest({'PATH_INFO':'/foo/index.html'})
         context = DummyContext()
         response = inst(context, request)
         self.assertTrue(b'<html>static</html>' in response.body)
@@ -218,7 +226,7 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
         if kw is not None:
             environ.update(kw)
         return Request(environ=environ)
-    
+
     def test_ctor_defaultargs(self):
         inst = self._makeOne('package:resource_name')
         self.assertEqual(inst.package_name, 'package')
@@ -273,7 +281,7 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
         context = DummyContext()
         from pyramid.httpexceptions import HTTPNotFound
         self.assertRaises(HTTPNotFound, inst, context, request)
-        
+
     def test_oob_os_sep(self):
         import os
         inst = self._makeOne('pyramid.tests:fixtures/static')
@@ -359,6 +367,91 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
         context = DummyContext()
         from pyramid.httpexceptions import HTTPNotFound
         self.assertRaises(HTTPNotFound, inst, context, request)
+
+class TestMd5AssetTokenGenerator(unittest.TestCase):
+
+    def setUp(self):
+        import os
+        import tempfile
+        self.tmp = tempfile.mkdtemp()
+        self.fspath = os.path.join(self.tmp, 'test.txt')
+
+    def tearDown(self):
+        import shutil
+        shutil.rmtree(self.tmp)
+
+    def _makeOne(self):
+        from pyramid.static import Md5AssetTokenGenerator as unit
+        return unit()
+
+    def test_package_resource(self):
+        fut = self._makeOne()
+        expected = '76d653a3a044e2f4b38bb001d283e3d9'
+        token = fut('pyramid.tests:fixtures/static/index.html')
+        self.assertEqual(token, expected)
+
+    def test_filesystem_resource(self):
+        fut = self._makeOne()
+        expected = 'd5155f250bef0e9923e894dbc713c5dd'
+        with open(self.fspath, 'w') as f:
+            f.write("Are we rich yet?")
+        token = fut(self.fspath)
+        self.assertEqual(token, expected)
+
+    def test_cache(self):
+        fut = self._makeOne()
+        expected = 'd5155f250bef0e9923e894dbc713c5dd'
+        with open(self.fspath, 'w') as f:
+            f.write("Are we rich yet?")
+        token = fut(self.fspath)
+        self.assertEqual(token, expected)
+
+        # md5 shouldn't change because we've cached it
+        with open(self.fspath, 'w') as f:
+            f.write("Sorry for the convenience.")
+        token = fut(self.fspath)
+        self.assertEqual(token, expected)
+
+class TestPathSegmentCacheBuster(unittest.TestCase):
+
+    def _makeOne(self):
+        from pyramid.static import PathSegmentCacheBuster as unit
+        return unit(lambda pathspec: 'foo')
+
+    def test_token(self):
+        fut = self._makeOne().token
+        self.assertEqual(fut('whatever'), 'foo')
+
+    def test_pregenerate(self):
+        fut = self._makeOne().pregenerate
+        self.assertEqual(fut('foo', ('bar',), 'kw'), (('foo', 'bar'), 'kw'))
+
+    def test_match(self):
+        fut = self._makeOne().match
+        self.assertEqual(fut(('foo', 'bar')), ('bar',))
+
+class TestQueryStringCacheBuster(unittest.TestCase):
+
+    def _makeOne(self):
+        from pyramid.static import QueryStringCacheBuster as unit
+        return unit(lambda pathspec: 'foo')
+
+    def test_token(self):
+        fut = self._makeOne().token
+        self.assertEqual(fut('whatever'), 'foo')
+
+    def test_pregenerate(self):
+        fut = self._makeOne().pregenerate
+        self.assertEqual(
+            fut('foo', ('bar',), {}),
+            (('bar',), {'_query': {'x': 'foo'}}))
+
+    def test_pregenerate_change_param(self):
+        from pyramid.static import QueryStringCacheBuster as unit
+        fut = unit(lambda pathspec: 'foo', 'y').pregenerate
+        self.assertEqual(
+            fut('foo', ('bar',), {}),
+            (('bar',), {'_query': {'y': 'foo'}}))
 
 class DummyContext:
     pass
