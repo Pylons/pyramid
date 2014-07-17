@@ -1788,11 +1788,16 @@ class ViewsConfiguratorMixin(object):
         particular Expires or Cache-Control headers are set in the response,
         unless ``cache_bust`` is specified.
 
-        The ``cache_bust`` keyword argument may be set to ``"md5"`` to cause
-        :meth:`~pyramid.request.Request.static_url` to generate URLs with an
-        additional query string which includes the md5 checksum for the static
-        asset.  This argument modifies the default for ``cache_max_age``,
-        making it ten years.  ``cache_max_age`` may still be explicitly
+        The ``cachebuster`` keyword argument may be set to cause
+        :meth:`~pyramid.request.Request.static_url` to use cache busting when
+        generating URLs. See :ref:`cache_busting` for general information
+        about cache busting.  The value of the ``cachebuster`` argument may be
+        ``True``, in which case a default cache busting implementation is used.
+        The value of the ``cachebuster`` argument may also be an object which
+        implements :class:`~pyramid.interfaces.ICacheBuster`.  See the
+        :mod:`~pyramid.static` module for some implementations.  If the
+        ``cachebuster`` argument is provided, the default for ``cache_max_age``
+        is modified to be ten years.  ``cache_max_age`` may still be explicitly
         provided to override this default.
 
         The ``permission`` keyword argument is used to specify the

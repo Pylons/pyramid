@@ -1168,6 +1168,12 @@ class ICacheBuster(Interface):
     """
     A container for functions which implement a cache busting policy for
     serving static assets.
+
+    The implementations provided by :app:`Pyramid` use standard instance
+    methods for ``pregenerate`` and ``match``, while accepting an
+    implementation of ``token`` as an argument to their constructor.  This
+    pattern allows for the decoupling of how a token is generated and how it is
+    inserted into a URL.  For examples see the :mod:`~pyramid.static` module.
     """
     def token(pathspec):
         """
@@ -1197,7 +1203,7 @@ class ICacheBuster(Interface):
         A function which modifies a subpath and/or keyword arguments from which
         a static asset URL will be computed during URL generation.  The
         ``token`` argument is a token string computed by an instance of
-        :method:`~pyramid.interfaces.ICacheBuster.token` for a particular
+        :meth:`~pyramid.interfaces.ICacheBuster.token` for a particular
         asset.  The ``subpath`` argument is a tuple of path elements that
         represent the portion of the asset URL which is used to find the asset.
         The ``kw`` argument is a dict of keywords that are to be passed
@@ -1218,9 +1224,9 @@ class ICacheBuster(Interface):
 
     def match(subpath):
         """
-        A function which performs the logical inverse of an
-        :method:`~pyramid.interfaces.ICacheBuster.pregenerate`, by taking a
-        subpath from a cache busted URL and removing the cachebust token, so
+        A function which performs the logical inverse of
+        :meth:`~pyramid.interfaces.ICacheBuster.pregenerate` by taking a
+        subpath from a cache busted URL and removing the cache bust token, so
         that :app:`Pyramid` can find the underlying asset.
 
         ``subpath`` is the subpath portion of the URL for an incoming request

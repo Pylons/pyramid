@@ -9,3 +9,10 @@
      :members:
      :inherited-members:
 
+  .. autoclass:: PathSegmentCacheBuster
+     :members:
+
+  .. autoclass:: QueryStringCacheBuster
+     :members:
+
+  .. autofunction:: Md5AssetTokenGenerator

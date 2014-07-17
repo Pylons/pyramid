@@ -315,7 +315,7 @@ requests a copy, regardless of any caching policy set for the resource's old
 URL.
 
 :app:`Pyramid` can be configured to produce cache busting URLs for static 
-assets by passing the optional argument, `cache_bust` to 
+assets by passing the optional argument, ``cachebuster`` to 
 :meth:`~pyramid.config.Configurator.add_static_view`:
 
 .. code-block:: python
@@ -323,33 +323,79 @@ assets by passing the optional argument, `cache_bust` to
 
    # config is an instance of pyramid.config.Configurator
    config.add_static_view(name='static', path='mypackage:folder/static',
-                           cache_bust='md5')
+                          cachebuster=True)
 
-Supplying the `cache_bust` argument instructs :app:`Pyramid` to add a query
-string to URLs generated for this static view which includes the md5 checksum
-of the static file being served:
+Setting the ``cachebuster`` argument instructs :app:`Pyramid` to use a cache 
+busting scheme which adds the md5 checksum for a static asset as a path segment
+in the asset's URL:
 
 .. code-block:: python
    :linenos:
 
    js_url = request.static_url('mypackage:folder/static/js/myapp.js')
-   # Returns: 'http://www.example.com/static/js/myapp.js?md5=c9658b3c0a314a1ca21e5988e662a09e`
+   # Returns: 'http://www.example.com/static/c9658b3c0a314a1ca21e5988e662a09e/js/myapp.js`
 
 When the asset changes, so will its md5 checksum, and therefore so will its
-URL.  Supplying the `cache_bust` argument also causes the static view to set
+URL.  Supplying the ``cachebuster`` argument also causes the static view to set
 headers instructing clients to cache the asset for ten years, unless the
-`max_cache_age` argument is also passed, in which case that value is used.
-
-.. note::
-
-   `md5` is currently the only possible value for the `cache_bust` argument to
-   :meth:`~pyramid.config.Configurator.add_static_view`.
+``max_cache_age`` argument is also passed, in which case that value is used.
 
 .. note:: 
 
    md5 checksums are cached in RAM so if you change a static resource without
    restarting your application, you may still generate URLs with a stale md5
    checksum. 
+
+Customizing the Cache Buster
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Revisiting from the previous section:
+
+.. code-block:: python
+   :linenos:
+
+   # config is an instance of pyramid.config.Configurator
+   config.add_static_view(name='static', path='mypackage:folder/static',
+                          cachebuster=True)
+
+Setting ``cachebuster`` to ``True`` instructs :app:`Pyramid` to use a default
+cache busting implementation that should work for many situations.  The 
+``cachebuster`` may be set to any object that implements the interface,
+:class:`~pyramid.interfaces.ICacheBuster`.  The above configuration is exactly
+equivalent to:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.static import (
+       Md5AssetTokenGenerator,
+       PathSegmentCacheBuster)
+
+   # config is an instance of pyramid.config.Configurator
+   cachebuster = PathSegmentCacheBuster(Md5AssetTokenGenerator())
+   config.add_static_view(name='static', path='mypackage:folder/static',
+                          cachebuster=cachebuster)
+
+:app:`Pyramid` includes two ready to use cache buster implementations: 
+:class:`~pyramid.static.PathSegmentCacheBuster`, which inserts an asset token
+in the path portion of the asset's URL, and 
+:class:`~pyramid.static.QueryStringCacheBuster`, which adds an asset token to
+the query string of the asset's URL.  Both of these classes have constructors
+which accept a token generator function as an argument, allowing for the way a
+token is generated to be decoupled from the way it is inserted into a URL.  
+:app:`Pyramid` provides a single asset token generator, 
+:meth:`~pyramid.static.Md5AssetTokenGenerator`.
+
+In order to implement your own cache buster, see the
+:class:`~pyramid.interfaces.ICacheBuster` interface and the existing 
+implementations in the :mod:`~pyramid.static` module.
+
+.. note::
+
+   Many HTTP caching proxy implementations will fail to cache any URL which
+   has a query string. For this reason, you should probably prefer 
+   :class:`~pyramid.static.PathSegementCacheBuster` to 
+   :class:`~pyramid.static.QueryStringCacheBuster`.
 
 .. index::
    single: static assets view

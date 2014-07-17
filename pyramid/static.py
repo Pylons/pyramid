@@ -166,6 +166,12 @@ def _generate_md5(spec):
     return md5.hexdigest()
 
 def Md5AssetTokenGenerator():
+    """
+    A factory method which returns a function that implements
+    :meth:`~pyramid.interfaces.ICacheBuster.token`.  The function computes and
+    returns md5 checksums for static assets, caching them in memory for speedy
+    retrieval on subsequent calls.
+    """
     token_cache = {}
 
     def generate_token(pathspec):
@@ -189,7 +195,23 @@ def Md5AssetTokenGenerator():
     return generate_token
 
 class PathSegmentCacheBuster(object):
+    """
+    An implementation of :class:`~pyramid.interfaces.ICacheBuster` which
+    inserts a token for cache busting in the path portion of an asset URL.
 
+    The ``token`` argument should be an implementation of
+    :meth:`~pyramid.interfaces.ICacheBuster.token`.  For example, to use
+    this cache buster with an md5 token generator:
+
+    .. code-block:: python
+       :linenos:
+
+       from pyramid.static import (
+           Md5AssetTokenGenerator,
+           PathSegmentCacheBuster)
+
+       cachebuster = PathSegmentCacheBuster(Md5AssetTokenGenerator())
+    """
     def __init__(self, token):
         self.token = token
 
@@ -200,7 +222,26 @@ class PathSegmentCacheBuster(object):
         return subpath[1:]
 
 class QueryStringCacheBuster(object):
+    """
+    An implementation of :class:`~pyramid.interfaces.ICacheBuster` which
+    adds a token for cache busting in the query string of an asset URL.
 
+    The ``token`` argument should be an implementation of
+    :meth:`~pyramid.interfaces.ICacheBuster.token`.  For example, to use
+    this cache buster with an md5 token generator:
+
+    .. code-block:: python
+       :linenos:
+
+       from pyramid.static import (
+           Md5AssetTokenGenerator,
+           PathSegmentCacheBuster)
+
+       cachebuster = QueryStringCacheBuster(Md5AssetTokenGenerator())
+
+    The optional ``param`` argument determines the name of the parameter added
+    to the query string and defaults to ``'x'``.
+    """
     def __init__(self, token, param='x'):
         self.param = param
         self.token = token
