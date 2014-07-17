@@ -161,7 +161,7 @@ def _generate_md5(spec):
     asset = AssetResolver(None).resolve(spec)
     md5 = hashlib.md5()
     with asset.stream() as stream:
-        for block in iter(lambda: stream.read(4096), ''):
+        for block in iter(lambda: stream.read(4096), b''):
             md5.update(block)
     return md5.hexdigest()
 
