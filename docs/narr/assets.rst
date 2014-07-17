@@ -286,6 +286,9 @@ the application is being run in development or in production (use a different
 suggestion for a pattern; any setting name other than ``media_location``
 could be used.
 
+.. index::
+   single: Cache Busting
+
 .. _cache_busting:
 
 Cache Busting
