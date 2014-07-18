@@ -3944,19 +3944,14 @@ class TestStaticURLInfo(unittest.TestCase):
     def test_add_cachebust_default(self):
         config = self._makeConfig()
         inst = self._makeOne()
-        inst._default_asset_token_generator = lambda: lambda pathspec: 'foo'
+        inst._default_cachebuster = DummyCacheBuster
         inst.add(config, 'view', 'mypackage:path', cachebuster=True)
         cachebuster = config.registry._static_url_registrations[0][3]
-        subpath, _ = cachebuster('some/path', None)
-        self.assertEqual(subpath, 'foo/some/path')
+        subpath, kw = cachebuster('some/path', {})
+        self.assertEqual(subpath, 'some/path')
+        self.assertEqual(kw['x'], 'foo')
 
     def test_add_cachebust_custom(self):
-        class DummyCacheBuster(object):
-            def token(self, pathspec):
-                return 'foo'
-            def pregenerate(self, token, subpath, kw):
-                kw['x'] = token
-                return subpath, kw
         config = self._makeConfig()
         inst = self._makeOne()
         inst.add(config, 'view', 'mypackage:path',
@@ -4070,6 +4065,13 @@ class DummyMultiView:
         return 'OK1'
     def __permitted__(self, context, request):
         """ """
+
+class DummyCacheBuster(object):
+    def token(self, pathspec):
+        return 'foo'
+    def pregenerate(self, token, subpath, kw):
+        kw['x'] = token
+        return subpath, kw
 
 def parse_httpdate(s):
     import datetime

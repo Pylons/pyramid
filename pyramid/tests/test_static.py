@@ -369,29 +369,33 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
         self.assertRaises(HTTPNotFound, inst, context, request)
 
 class TestMd5AssetTokenGenerator(unittest.TestCase):
+    _fspath = None
 
-    def setUp(self):
+    @property
+    def fspath(self):
+        if self._fspath:
+            return self._fspath
+
         import os
         import tempfile
-        self.tmp = tempfile.mkdtemp()
-        self.fspath = os.path.join(self.tmp, 'test.txt')
-
-    def tearDown(self):
         import shutil
-        shutil.rmtree(self.tmp)
+        tmp = tempfile.mkdtemp()
+        self.addCleanup(lambda: shutil.rmtree(tmp))
+        self._fspath = os.path.join(tmp, 'test.txt')
+        return self._fspath
 
     def _makeOne(self):
-        from pyramid.static import Md5AssetTokenGenerator as unit
-        return unit()
+        from pyramid.static import Md5AssetTokenGenerator as cls
+        return cls()
 
     def test_package_resource(self):
-        fut = self._makeOne()
+        fut = self._makeOne().token
         expected = '76d653a3a044e2f4b38bb001d283e3d9'
         token = fut('pyramid.tests:fixtures/static/index.html')
         self.assertEqual(token, expected)
 
     def test_filesystem_resource(self):
-        fut = self._makeOne()
+        fut = self._makeOne().token
         expected = 'd5155f250bef0e9923e894dbc713c5dd'
         with open(self.fspath, 'w') as f:
             f.write("Are we rich yet?")
@@ -399,7 +403,7 @@ class TestMd5AssetTokenGenerator(unittest.TestCase):
         self.assertEqual(token, expected)
 
     def test_cache(self):
-        fut = self._makeOne()
+        fut = self._makeOne().token
         expected = 'd5155f250bef0e9923e894dbc713c5dd'
         with open(self.fspath, 'w') as f:
             f.write("Are we rich yet?")
@@ -415,8 +419,10 @@ class TestMd5AssetTokenGenerator(unittest.TestCase):
 class TestPathSegmentCacheBuster(unittest.TestCase):
 
     def _makeOne(self):
-        from pyramid.static import PathSegmentCacheBuster as unit
-        return unit(lambda pathspec: 'foo')
+        from pyramid.static import PathSegmentCacheBuster as cls
+        inst = cls()
+        inst.token = lambda pathspec: 'foo'
+        return inst
 
     def test_token(self):
         fut = self._makeOne().token
@@ -432,9 +438,14 @@ class TestPathSegmentCacheBuster(unittest.TestCase):
 
 class TestQueryStringCacheBuster(unittest.TestCase):
 
-    def _makeOne(self):
-        from pyramid.static import QueryStringCacheBuster as unit
-        return unit(lambda pathspec: 'foo')
+    def _makeOne(self, param=None):
+        from pyramid.static import QueryStringCacheBuster as cls
+        if param:
+            inst = cls(param)
+        else:
+            inst = cls()
+        inst.token = lambda pathspec: 'foo'
+        return inst
 
     def test_token(self):
         fut = self._makeOne().token
@@ -447,8 +458,7 @@ class TestQueryStringCacheBuster(unittest.TestCase):
             (('bar',), {'_query': {'x': 'foo'}}))
 
     def test_pregenerate_change_param(self):
-        from pyramid.static import QueryStringCacheBuster as unit
-        fut = unit(lambda pathspec: 'foo', 'y').pregenerate
+        fut = self._makeOne('y').pregenerate
         self.assertEqual(
             fut('foo', ('bar',), {}),
             (('bar',), {'_query': {'y': 'foo'}}))

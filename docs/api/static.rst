@@ -14,5 +14,3 @@
 
   .. autoclass:: QueryStringCacheBuster
      :members:
-
-  .. autofunction:: Md5AssetTokenGenerator

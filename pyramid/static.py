@@ -165,16 +165,16 @@ def _generate_md5(spec):
             md5.update(block)
     return md5.hexdigest()
 
-def Md5AssetTokenGenerator():
+class Md5AssetTokenGenerator(object):
     """
-    A factory method which returns a function that implements
-    :meth:`~pyramid.interfaces.ICacheBuster.token`.  The function computes and
-    returns md5 checksums for static assets, caching them in memory for speedy
-    retrieval on subsequent calls.
+    A mixin class which provides an implementation of
+    :meth:`~pyramid.interfaces.ICacheBuster.target` which generates an md5
+    checksum token for an asset, caching it for subsequent calls.
     """
-    token_cache = {}
+    def __init__(self):
+        self.token_cache = {}
 
-    def generate_token(pathspec):
+    def token(self, pathspec):
         # An astute observer will notice that this use of token_cache doesn't
         # look particularly thread safe.  Basic read/write operations on Python
         # dicts, however, are atomic, so simply accessing and writing values
@@ -187,64 +187,36 @@ def Md5AssetTokenGenerator():
         # the extra overhead of using locks to serialize access to the dict
         # seems an unnecessary burden.
         #
-        token = token_cache.get(pathspec)
+        token = self.token_cache.get(pathspec)
         if not token:
-            token_cache[pathspec] = token = _generate_md5(pathspec)
+            self.token_cache[pathspec] = token = _generate_md5(pathspec)
         return token
 
-    return generate_token
-
-class PathSegmentCacheBuster(object):
+class PathSegmentCacheBuster(Md5AssetTokenGenerator):
     """
     An implementation of :class:`~pyramid.interfaces.ICacheBuster` which
-    inserts a token for cache busting in the path portion of an asset URL.
-
-    The ``token`` argument should be an implementation of
-    :meth:`~pyramid.interfaces.ICacheBuster.token`.  For example, to use
-    this cache buster with an md5 token generator:
-
-    .. code-block:: python
-       :linenos:
-
-       from pyramid.static import (
-           Md5AssetTokenGenerator,
-           PathSegmentCacheBuster)
-
-       cachebuster = PathSegmentCacheBuster(Md5AssetTokenGenerator())
+    inserts an md5 checksum token for cache busting in the path portion of an
+    asset URL.  Generated md5 checksums are cached in order to speed up
+    subsequent calls.
     """
-    def __init__(self, token):
-        self.token = token
-
     def pregenerate(self, token, subpath, kw):
         return (token,) + subpath, kw
 
     def match(self, subpath):
         return subpath[1:]
 
-class QueryStringCacheBuster(object):
+class QueryStringCacheBuster(Md5AssetTokenGenerator):
     """
-    An implementation of :class:`~pyramid.interfaces.ICacheBuster` which
-    adds a token for cache busting in the query string of an asset URL.
-
-    The ``token`` argument should be an implementation of
-    :meth:`~pyramid.interfaces.ICacheBuster.token`.  For example, to use
-    this cache buster with an md5 token generator:
-
-    .. code-block:: python
-       :linenos:
-
-       from pyramid.static import (
-           Md5AssetTokenGenerator,
-           PathSegmentCacheBuster)
-
-       cachebuster = QueryStringCacheBuster(Md5AssetTokenGenerator())
+    An implementation of :class:`~pyramid.interfaces.ICacheBuster` which adds a
+    token for cache busting in the query string of an asset URL.  Generated md5
+    checksums are cached in order to speed up subsequent calls.
 
     The optional ``param`` argument determines the name of the parameter added
     to the query string and defaults to ``'x'``.
     """
-    def __init__(self, token, param='x'):
+    def __init__(self, param='x'):
+        super(QueryStringCacheBuster, self).__init__()
         self.param = param
-        self.token = token
 
     def pregenerate(self, token, subpath, kw):
         query = kw.setdefault('_query', {})

@@ -370,28 +370,18 @@ equivalent to:
 .. code-block:: python
    :linenos:
 
-   from pyramid.static import (
-       Md5AssetTokenGenerator,
-       PathSegmentCacheBuster)
+   from pyramid.static import PathSegmentCacheBuster
 
    # config is an instance of pyramid.config.Configurator
-   cachebuster = PathSegmentCacheBuster(Md5AssetTokenGenerator())
    config.add_static_view(name='static', path='mypackage:folder/static',
-                          cachebuster=cachebuster)
+                          cachebuster=PathSegmentCacheBuster())
 
 :app:`Pyramid` includes two ready to use cache buster implementations: 
 :class:`~pyramid.static.PathSegmentCacheBuster`, which inserts an asset token
 in the path portion of the asset's URL, and 
 :class:`~pyramid.static.QueryStringCacheBuster`, which adds an asset token to
-the query string of the asset's URL.  Both of these classes have constructors
-which accept a token generator function as an argument, allowing for the way a
-token is generated to be decoupled from the way it is inserted into a URL.  
-:app:`Pyramid` provides a single asset token generator, 
-:meth:`~pyramid.static.Md5AssetTokenGenerator`.
-
-In order to implement your own cache buster, see the
-:class:`~pyramid.interfaces.ICacheBuster` interface and the existing 
-implementations in the :mod:`~pyramid.static` module.
+the query string of the asset's URL.  Both of these classes generate md5 
+checksums as asset tokens.
 
 .. note::
 
@@ -399,6 +389,29 @@ implementations in the :mod:`~pyramid.static` module.
    has a query string. For this reason, you should probably prefer 
    :class:`~pyramid.static.PathSegementCacheBuster` to 
    :class:`~pyramid.static.QueryStringCacheBuster`.
+
+In order to implement your own cache buster, you can write your own class from
+scratch which implements the :class:`~pyramid.interfaces.ICacheBuster`
+interface.  Alternatively you may choose to subclass one of the existing
+implementations.  One of the most likely scenarios is you'd want to change the
+way the asset token is generated.  To do this just subclass an existing
+implementation and replace the :meth:`~pyramid.interfaces.ICacheBuster.token`
+method.  Here is an example which just uses a global setting for the asset
+token:
+
+.. code-block:: python
+   :linenos:
+    
+   from pyramid.static import PathSegmentCacheBuster
+
+   class MyCacheBuster(PathSegmentCacheBuster):
+
+       def __init__(self, config):
+           # config is an instance of pyramid.config.Configurator
+           self._token = config.registry.settings['myapp.cachebust_token']
+
+       def token(self, pathspec):
+           return self._token
 
 .. index::
    single: static assets view
