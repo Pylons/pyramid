@@ -370,6 +370,7 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
 
 class TestMd5AssetTokenGenerator(unittest.TestCase):
     _fspath = None
+    _tmp = None
 
     @property
     def fspath(self):
@@ -378,11 +379,14 @@ class TestMd5AssetTokenGenerator(unittest.TestCase):
 
         import os
         import tempfile
-        import shutil
-        tmp = tempfile.mkdtemp()
-        self.addCleanup(lambda: shutil.rmtree(tmp))
+        self._tmp = tmp = tempfile.mkdtemp()
         self._fspath = os.path.join(tmp, 'test.txt')
         return self._fspath
+
+    def tearDown(self):
+        import shutil
+        if self._tmp:
+            shutil.rmtree(self._tmp)
 
     def _makeOne(self):
         from pyramid.static import Md5AssetTokenGenerator as cls
