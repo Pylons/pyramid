@@ -349,6 +349,15 @@ headers instructing clients to cache the asset for ten years, unless the
    restarting your application, you may still generate URLs with a stale md5
    checksum. 
 
+Disabling the Cache Buster
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It can be useful in some situations (e.g. development) to globally disable all
+configured cache busters without changing calls to
+:meth:`~pyramid.config.Configurator.add_static_view`.  To do this set the 
+``PYRAMID_PREVENT_CACHEBUSTER`` environment variable or the 
+``pyramid.prevent_cachebuster`` configuration value to a true value.
+
 Customizing the Cache Buster
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -387,7 +396,7 @@ checksums as asset tokens.
 
    Many HTTP caching proxy implementations will fail to cache any URL which
    has a query string. For this reason, you should probably prefer 
-   :class:`~pyramid.static.PathSegementCacheBuster` to 
+   :class:`~pyramid.static.PathSegmentCacheBuster` to 
    :class:`~pyramid.static.QueryStringCacheBuster`.
 
 In order to implement your own cache buster, you can write your own class from

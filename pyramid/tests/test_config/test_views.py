@@ -3951,6 +3951,14 @@ class TestStaticURLInfo(unittest.TestCase):
         self.assertEqual(subpath, 'some/path')
         self.assertEqual(kw['x'], 'foo')
 
+    def test_add_cachebust_prevented(self):
+        config = self._makeConfig()
+        config.registry.settings['pyramid.prevent_cachebuster'] = True
+        inst = self._makeOne()
+        inst.add(config, 'view', 'mypackage:path', cachebuster=True)
+        cachebuster = config.registry._static_url_registrations[0][3]
+        self.assertEqual(cachebuster, None)
+
     def test_add_cachebust_custom(self):
         config = self._makeConfig()
         inst = self._makeOne()
@@ -3980,7 +3988,8 @@ class Test_view_description(unittest.TestCase):
 
 
 class DummyRegistry:
-    pass
+    def __init__(self):
+        self.settings = {}
 
 from zope.interface import implementer
 from pyramid.interfaces import IResponse

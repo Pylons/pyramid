@@ -34,10 +34,7 @@ from pyramid.interfaces import (
     )
 
 from pyramid import renderers
-from pyramid.static import (
-    Md5AssetTokenGenerator,
-    PathSegmentCacheBuster,
-)
+from pyramid.static import PathSegmentCacheBuster
 
 from pyramid.compat import (
     string_types,
@@ -1786,7 +1783,7 @@ class ViewsConfiguratorMixin(object):
         Note that this argument has no effect when the ``name`` is a *url
         prefix*.  By default, this argument is ``None``, meaning that no
         particular Expires or Cache-Control headers are set in the response,
-        unless ``cache_bust`` is specified.
+        unless ``cachebuster`` is specified.
 
         The ``cachebuster`` keyword argument may be set to cause
         :meth:`~pyramid.request.Request.static_url` to use cache busting when
@@ -1958,7 +1955,10 @@ class StaticURLInfo(object):
             # make sure it ends with a slash
             name = name + '/'
 
-        cb = extra.pop('cachebuster', None)
+        if config.registry.settings.get('pyramid.prevent_cachebuster'):
+            cb = None
+        else:
+            cb = extra.pop('cachebuster', None)
         if cb is True:
             cb = self._default_cachebuster()
         if cb:
