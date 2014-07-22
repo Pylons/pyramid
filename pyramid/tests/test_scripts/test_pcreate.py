@@ -20,6 +20,22 @@ class TestPCreateCommand(unittest.TestCase):
         cmd.out = self.out
         return cmd
 
+    def _get_underscore_to_upper_camel_case(self):
+        from pyramid.scripts.pcreate import _underscore_to_upper_camel_case
+        return _underscore_to_upper_camel_case
+
+    def test__underscore_to_upper_camel_case(self):
+        func = self._get_underscore_to_upper_camel_case()
+        result = func('ab_cd')
+
+        assert result == 'AbCd'
+
+    def test__underscore_to_upper_camel_case_single(self):
+        func = self._get_underscore_to_upper_camel_case()
+        result = func('ab')
+
+        assert result == 'Ab'
+
     def test_run_show_scaffolds_exist(self):
         cmd = self._makeOne('-l')
         result = cmd.run()
@@ -74,7 +90,7 @@ class TestPCreateCommand(unittest.TestCase):
             {'project': 'Distro', 'egg': 'Distro', 'package': 'distro',
              'pyramid_version': '0.1', 'pyramid_docs_branch':'0.1-branch',
              'module_name': '', 'pkg_name': '', 'pkg_dir': '',
-             'test_dir': '', 'test_name': ''})
+             'class_name': '', 'test_dir': '', 'test_name': ''})
 
     def test_known_scaffold_absolute_path(self):
         import os
@@ -95,7 +111,7 @@ class TestPCreateCommand(unittest.TestCase):
             {'project': 'Distro', 'egg': 'Distro', 'package': 'distro',
              'pyramid_version': '0.1', 'pyramid_docs_branch':'0.1-branch',
              'module_name': '', 'pkg_name': '', 'pkg_dir': '',
-             'test_dir': '', 'test_name': ''})
+             'class_name': '', 'test_dir': '', 'test_name': ''})
 
     def test_known_scaffold_multiple_rendered(self):
         import os
@@ -115,7 +131,7 @@ class TestPCreateCommand(unittest.TestCase):
             {'project': 'Distro', 'egg': 'Distro', 'package': 'distro',
              'pyramid_version': '0.1', 'pyramid_docs_branch':'0.1-branch',
              'module_name': '', 'pkg_name': '', 'pkg_dir': '',
-             'test_dir': '', 'test_name': ''})
+             'class_name': '', 'test_dir': '', 'test_name': ''})
         self.assertEqual(
             scaffold2.output_dir,
             os.path.normpath(os.path.join(os.getcwd(), 'Distro'))
@@ -125,7 +141,7 @@ class TestPCreateCommand(unittest.TestCase):
             {'project': 'Distro', 'egg': 'Distro', 'package': 'distro',
              'pyramid_version': '0.1', 'pyramid_docs_branch':'0.1-branch',
              'module_name': '', 'pkg_name': '', 'pkg_dir': '',
-             'test_dir': '', 'test_name': ''})
+             'class_name': '', 'test_dir': '', 'test_name': ''})
 
     def test_known_scaffold_with_path_as_project_target_rendered(self):
         import os
@@ -144,7 +160,7 @@ class TestPCreateCommand(unittest.TestCase):
             {'project': 'Distro', 'egg': 'Distro', 'package': 'distro',
              'pyramid_version': '0.1', 'pyramid_docs_branch':'0.1-branch',
              'module_name': '', 'pkg_name': '', 'pkg_dir': '',
-             'test_dir': '', 'test_name': ''})
+             'class_name': '', 'test_dir': '', 'test_name': ''})
 
     def test_known_scaffold_with_module(self):
         import os
@@ -163,11 +179,13 @@ class TestPCreateCommand(unittest.TestCase):
             {'project': 'e', 'egg': 'e', 'package': 'e',
              'pyramid_version': '0.1', 'pyramid_docs_branch':'0.1-branch',
              'module_name': 'h', 'pkg_name': 'f.g', 'pkg_dir': 'f/g',
-             'test_dir': 'test_f/test_g', 'test_name': 'test_h'})
+             'class_name': 'H', 'test_dir': 'test_f/test_g',
+             'test_name': 'test_h'})
 
     def test_known_scaffold_with_module_uppercase(self):
         import os
-        cmd = self._makeOne('-s', 'dummy', 'Ab/Cd/Ef/Gh/Ij', '-m', 'kl_mn.op_qr.st_uv')
+        cmd = self._makeOne('-s', 'dummy', 'Ab/Cd/Ef/Gh/Ij',
+                            '-m', 'kl_mn.op_qr.st_uv')
         scaffold = DummyScaffold('dummy')
         cmd.scaffolds = [scaffold]
         cmd.pyramid_dist = DummyDist("0.1")
@@ -181,12 +199,14 @@ class TestPCreateCommand(unittest.TestCase):
             scaffold.vars,
             {'project': 'Ij', 'egg': 'Ij', 'package': 'ij',
              'pyramid_version': '0.1', 'pyramid_docs_branch':'0.1-branch',
-             'module_name': 'st_uv', 'pkg_name': 'kl_mn.op_qr', 'pkg_dir': 'kl_mn/op_qr',
+             'module_name': 'st_uv', 'pkg_name': 'kl_mn.op_qr',
+             'pkg_dir': 'kl_mn/op_qr', 'class_name': 'StUv',
              'test_dir': 'test_kl_mn/test_op_qr', 'test_name': 'test_st_uv'})
 
     def test_known_scaffold_with_module_dir(self):
         import os
-        cmd = self._makeOne('-s', 'dummy', 'Ab/Cd/Ef/Gh/Ij', '-m', 'kl_mn/op_qr/st_uv')
+        cmd = self._makeOne('-s', 'dummy', 'Ab/Cd/Ef/Gh/Ij',
+                            '-m', 'kl_mn/op_qr/st_uv')
         scaffold = DummyScaffold('dummy')
         cmd.scaffolds = [scaffold]
         cmd.pyramid_dist = DummyDist("0.1")
@@ -200,7 +220,8 @@ class TestPCreateCommand(unittest.TestCase):
             scaffold.vars,
             {'project': 'Ij', 'egg': 'Ij', 'package': 'ij',
              'pyramid_version': '0.1', 'pyramid_docs_branch':'0.1-branch',
-             'module_name': 'st_uv', 'pkg_name': 'kl_mn.op_qr', 'pkg_dir': 'kl_mn/op_qr',
+             'module_name': 'st_uv', 'pkg_name': 'kl_mn.op_qr',
+             'pkg_dir': 'kl_mn/op_qr', 'class_name': 'StUv',
              'test_dir': 'test_kl_mn/test_op_qr', 'test_name': 'test_st_uv'})
 
     def test_known_scaffold_with_no_package(self):
@@ -220,7 +241,7 @@ class TestPCreateCommand(unittest.TestCase):
             {'project': 'e', 'egg': 'e', 'package': 'e',
              'pyramid_version': '0.1', 'pyramid_docs_branch':'0.1-branch',
              'module_name': 'f', 'pkg_name': '', 'pkg_dir': '',
-             'test_dir': '', 'test_name': 'test_f'})
+             'class_name': 'F', 'test_dir': '', 'test_name': 'test_f'})
 
     def test_scaffold_with_prod_pyramid_version(self):
         cmd = self._makeOne('-s', 'dummy', 'Distro')
@@ -234,7 +255,7 @@ class TestPCreateCommand(unittest.TestCase):
             {'project': 'Distro', 'egg': 'Distro', 'package': 'distro',
              'pyramid_version': '0.2', 'pyramid_docs_branch':'0.2-branch',
              'module_name': '', 'pkg_name': '', 'pkg_dir': '',
-             'test_dir': '', 'test_name': ''})
+             'class_name': '', 'test_dir': '', 'test_name': ''})
 
     def test_scaffold_with_prod_pyramid_long_version(self):
         cmd = self._makeOne('-s', 'dummy', 'Distro')
@@ -248,7 +269,7 @@ class TestPCreateCommand(unittest.TestCase):
             {'project': 'Distro', 'egg': 'Distro', 'package': 'distro',
              'pyramid_version': '0.2.1', 'pyramid_docs_branch':'0.2-branch',
              'module_name': '', 'pkg_name': '', 'pkg_dir': '',
-             'test_dir': '', 'test_name': ''})
+             'class_name': '', 'test_dir': '', 'test_name': ''})
 
     def test_scaffold_with_prod_pyramid_unparsable_version(self):
         cmd = self._makeOne('-s', 'dummy', 'Distro')
@@ -262,7 +283,7 @@ class TestPCreateCommand(unittest.TestCase):
             {'project': 'Distro', 'egg': 'Distro', 'package': 'distro',
              'pyramid_version': 'abc', 'pyramid_docs_branch':'latest',
              'module_name': '', 'pkg_name': '', 'pkg_dir': '',
-             'test_dir': '', 'test_name': ''})
+             'class_name': '', 'test_dir': '', 'test_name': ''})
 
     def test_scaffold_with_dev_pyramid_version(self):
         cmd = self._makeOne('-s', 'dummy', 'Distro')
@@ -277,7 +298,7 @@ class TestPCreateCommand(unittest.TestCase):
              'pyramid_version': '0.12dev',
              'pyramid_docs_branch': 'master',
              'module_name': '', 'pkg_name': '', 'pkg_dir': '',
-             'test_dir': '', 'test_name': ''})
+             'class_name': '', 'test_dir': '', 'test_name': ''})
 
     def test_scaffold_with_dev_pyramid_long_version(self):
         cmd = self._makeOne('-s', 'dummy', 'Distro')
@@ -292,7 +313,7 @@ class TestPCreateCommand(unittest.TestCase):
              'pyramid_version': '0.10.1dev',
              'pyramid_docs_branch': 'master',
              'module_name': '', 'pkg_name': '', 'pkg_dir': '',
-             'test_dir': '', 'test_name': ''})
+             'class_name': '', 'test_dir': '', 'test_name': ''})
 
 
 class Test_main(unittest.TestCase):

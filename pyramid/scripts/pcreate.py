@@ -12,6 +12,10 @@ import logging
 
 _bad_chars_re = re.compile('[^a-zA-Z0-9_]')
 
+def _underscore_to_upper_camel_case(the_str):
+    return ''.join([w.capitalize() for (idx, w) in
+                    enumerate(re.split(ur'[_]', the_str)) if w])
+
 def main(argv=sys.argv, quiet=False):
     command = PCreateCommand(argv, quiet)
     return command.run()
@@ -99,6 +103,7 @@ class PCreateCommand(object):
         module_name = os.path.basename(full_module_path)
         pkg_dir = os.path.dirname(full_module_path)
         pkg_name = pkg_dir.replace(os.path.sep, '.')
+        class_name = _underscore_to_upper_camel_case(module_name)
 
         test_name = '' if not module_name else 'test_' + module_name
         pkg_dir_list = [] if not pkg_dir else pkg_dir.split(os.path.sep)
@@ -127,6 +132,7 @@ class PCreateCommand(object):
             'package': package_name,
             'pkg_name': pkg_name,
             'module_name': module_name,
+            'class_name': class_name,
             'pkg_dir': pkg_dir,
             'egg': egg_name,
             'test_name': test_name,
