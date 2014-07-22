@@ -223,7 +223,7 @@ class QueryStringCacheBuster(Md5AssetTokenGenerator):
         if isinstance(query, dict):
             query[self.param] = token
         else:
-            kw['_query'] = query + [(self.param, token)]
+            kw['_query'] = tuple(query) + ((self.param, token),)
         return subpath, kw
 
 
