@@ -1166,65 +1166,37 @@ class IPredicateList(Interface):
 
 class ICacheBuster(Interface):
     """
-    A container for functions which implement a cache busting policy for
-    serving static assets.
-
-    The implementations provided by :app:`Pyramid` use standard instance
-    methods for ``pregenerate`` and ``match``, while accepting an
-    implementation of ``token`` as an argument to their constructor.  This
-    pattern allows for the decoupling of how a token is generated and how it is
-    inserted into a URL.  For examples see the :mod:`~pyramid.static` module.
+    Instances of ``ICacheBuster`` may be provided as arguments to
+    :meth:`~pyramid.config.Configurator.add_static_view`.  Instances of
+    ``ICacheBuster`` provide mechanisms for generating a cache bust token for
+    a static asset, modifying a static asset URL to include a cache bust token,
+    and, optionally, unmodifying a static asset URL in order to look up an
+    asset.  See :ref:`cache_busting`.
     """
     def token(pathspec):
         """
-        A function which computes and returns a token string used for cache
-        busting.  ``pathspec`` is the path specification for the resource to be
-        cache busted.  Often a cachebust token might be computed for a specific
-        asset (e.g. an md5 checksum), but probably just as often people use
-        schemes where a single cachebust token is used globally.  It could be a
-        git commit sha1, a timestamp, or something configured manually. A
-        pattern that can be useful is to use to a factory function and a
-        closure to return a function that depends on some configuration.  For
-        example:
-
-        .. code-block:: python
-           :linenos:
-
-           def use_configured_cachebust_token(config):
-               # config is an instance of pyramid.config.Configurator
-               token = config.registry.settings['myapp.cachebust_token']
-               def cachebust_token(pathspec):
-                   return token
-               return cachebust_token
-        """
+        Computes and returns a token string used for cache busting.
+        ``pathspec`` is the path specification for the resource to be cache
+        busted.  """
 
     def pregenerate(token, subpath, kw):
         """
-        A function which modifies a subpath and/or keyword arguments from which
-        a static asset URL will be computed during URL generation.  The
-        ``token`` argument is a token string computed by an instance of
-        :meth:`~pyramid.interfaces.ICacheBuster.token` for a particular
-        asset.  The ``subpath`` argument is a tuple of path elements that
-        represent the portion of the asset URL which is used to find the asset.
-        The ``kw`` argument is a dict of keywords that are to be passed
-        eventually to :meth:`~pyramid.request.Request.route_url` for URL
-        generation.  The return value of this function should be two-tuple of
-        ``(subpath, kw)`` which are versions of the same arguments modified to
-        include the cachebust token in the generated URL.
-
-        Here is an example which places the token in a query string:
-
-        .. code-block:: python
-           :linenos:
-
-           def cb_pregen(token, subpath kw):
-               kw.setdefault('_query', {})['cb'] = token
-               return subpath, kw
+        Modifies a subpath and/or keyword arguments from which a static asset
+        URL will be computed during URL generation.  The ``token`` argument is
+        a token string computed by
+        :meth:`~pyramid.interfaces.ICacheBuster.token` for a particular asset.
+        The ``subpath`` argument is a tuple of path elements that represent the
+        portion of the asset URL which is used to find the asset.  The ``kw``
+        argument is a dict of keywords that are to be passed eventually to
+        :meth:`~pyramid.request.Request.route_url` for URL generation.  The
+        return value should be a two-tuple of ``(subpath, kw)`` which are
+        versions of the same arguments modified to include the cachebust token
+        in the generated URL.
         """
 
     def match(subpath):
         """
-        A function which performs the logical inverse of
+        Performs the logical inverse of
         :meth:`~pyramid.interfaces.ICacheBuster.pregenerate` by taking a
         subpath from a cache busted URL and removing the cache bust token, so
         that :app:`Pyramid` can find the underlying asset.
@@ -1234,10 +1206,10 @@ class ICacheBuster(Interface):
         cache busting token elided.
 
         If the cache busting scheme in use doesn't specifically modify the path
-        portion of the generated URL (e.g. it adds a query string), a function
+        portion of the generated URL (e.g. it adds a query string), a method
         which implements this interface may not be necessary.  It is
         permissible for an instance of
-        :class:`~pyramid.interfaces.ICacheBuster` to omit this function.
+        :class:`~pyramid.interfaces.ICacheBuster` to omit this method.
         """
 
 # configuration phases: a lower phase number means the actions associated
