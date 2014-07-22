@@ -223,7 +223,7 @@ class URLMethodsMixin(object):
         named portion in the generated URL.  For example, if you pass
         ``_host='foo.com'``, and the URL that would have been generated
         without the host replacement is ``http://example.com/a``, the result
-        will be ``https://foo.com/a``.
+        will be ``http://foo.com/a``.
         
         Note that if ``_scheme`` is passed as ``https``, and ``_port`` is not
         passed, the ``_port`` value is assumed to have been passed as
@@ -414,7 +414,7 @@ class URLMethodsMixin(object):
         portion in the generated URL.  For example, if you pass
         ``host='foo.com'``, and the URL that would have been generated
         without the host replacement is ``http://example.com/a``, the result
-        will be ``https://foo.com/a``.
+        will be ``http://foo.com/a``.
         
         If ``scheme`` is passed as ``https``, and an explicit ``port`` is not
         passed, the ``port`` value is assumed to have been passed as ``443``.
