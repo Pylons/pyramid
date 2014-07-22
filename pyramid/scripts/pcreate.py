@@ -8,6 +8,7 @@ import os.path
 import pkg_resources
 import re
 import sys
+import logging
 
 _bad_chars_re = re.compile('[^a-zA-Z0-9_]')
 
@@ -33,7 +34,7 @@ class PCreateCommand(object):
                             'create process (multiple -t args accepted)'))
     parser.add_option('-m', '--module',
                       dest='module_name',
-                      action='append',
+                      action='store',
                       help='specifying the module to be created.')
     parser.add_option('-l', '--list',
                       dest='list',

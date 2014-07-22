@@ -146,13 +146,88 @@ class TestPCreateCommand(unittest.TestCase):
              'module_name': '', 'pkg_name': '', 'pkg_dir': '',
              'test_dir': '', 'test_name': ''})
 
+    def test_known_scaffold_with_module(self):
+        import os
+        cmd = self._makeOne('-s', 'dummy', 'a/b/c/d/e', '-m', 'f.g.h')
+        scaffold = DummyScaffold('dummy')
+        cmd.scaffolds = [scaffold]
+        cmd.pyramid_dist = DummyDist("0.1")
+        result = cmd.run()
+        self.assertEqual(result, 0)
+        self.assertEqual(
+            scaffold.output_dir,
+            os.path.normpath(os.path.join(os.getcwd(), 'a/b/c/d/e'))
+            )
+        self.assertEqual(
+            scaffold.vars,
+            {'project': 'e', 'egg': 'e', 'package': 'e',
+             'pyramid_version': '0.1', 'pyramid_docs_branch':'0.1-branch',
+             'module_name': 'h', 'pkg_name': 'f.g', 'pkg_dir': 'f/g',
+             'test_dir': 'test_f/test_g', 'test_name': 'test_h'})
+
+    def test_known_scaffold_with_module_uppercase(self):
+        import os
+        cmd = self._makeOne('-s', 'dummy', 'Ab/Cd/Ef/Gh/Ij', '-m', 'kl_mn.op_qr.st_uv')
+        scaffold = DummyScaffold('dummy')
+        cmd.scaffolds = [scaffold]
+        cmd.pyramid_dist = DummyDist("0.1")
+        result = cmd.run()
+        self.assertEqual(result, 0)
+        self.assertEqual(
+            scaffold.output_dir,
+            os.path.normpath(os.path.join(os.getcwd(), 'Ab/Cd/Ef/Gh/Ij'))
+            )
+        self.assertEqual(
+            scaffold.vars,
+            {'project': 'Ij', 'egg': 'Ij', 'package': 'ij',
+             'pyramid_version': '0.1', 'pyramid_docs_branch':'0.1-branch',
+             'module_name': 'st_uv', 'pkg_name': 'kl_mn.op_qr', 'pkg_dir': 'kl_mn/op_qr',
+             'test_dir': 'test_kl_mn/test_op_qr', 'test_name': 'test_st_uv'})
+
+    def test_known_scaffold_with_module_dir(self):
+        import os
+        cmd = self._makeOne('-s', 'dummy', 'Ab/Cd/Ef/Gh/Ij', '-m', 'kl_mn/op_qr/st_uv')
+        scaffold = DummyScaffold('dummy')
+        cmd.scaffolds = [scaffold]
+        cmd.pyramid_dist = DummyDist("0.1")
+        result = cmd.run()
+        self.assertEqual(result, 0)
+        self.assertEqual(
+            scaffold.output_dir,
+            os.path.normpath(os.path.join(os.getcwd(), 'Ab/Cd/Ef/Gh/Ij'))
+            )
+        self.assertEqual(
+            scaffold.vars,
+            {'project': 'Ij', 'egg': 'Ij', 'package': 'ij',
+             'pyramid_version': '0.1', 'pyramid_docs_branch':'0.1-branch',
+             'module_name': 'st_uv', 'pkg_name': 'kl_mn.op_qr', 'pkg_dir': 'kl_mn/op_qr',
+             'test_dir': 'test_kl_mn/test_op_qr', 'test_name': 'test_st_uv'})
+
+    def test_known_scaffold_with_no_package(self):
+        import os
+        cmd = self._makeOne('-s', 'dummy', 'a/b/c/d/e', '-m', 'f')
+        scaffold = DummyScaffold('dummy')
+        cmd.scaffolds = [scaffold]
+        cmd.pyramid_dist = DummyDist("0.1")
+        result = cmd.run()
+        self.assertEqual(result, 0)
+        self.assertEqual(
+            scaffold.output_dir,
+            os.path.normpath(os.path.join(os.getcwd(), 'a/b/c/d/e'))
+            )
+        self.assertEqual(
+            scaffold.vars,
+            {'project': 'e', 'egg': 'e', 'package': 'e',
+             'pyramid_version': '0.1', 'pyramid_docs_branch':'0.1-branch',
+             'module_name': 'f', 'pkg_name': '', 'pkg_dir': '',
+             'test_dir': '', 'test_name': 'test_f'})
+
     def test_scaffold_with_prod_pyramid_version(self):
         cmd = self._makeOne('-s', 'dummy', 'Distro')
         scaffold = DummyScaffold('dummy')
         cmd.scaffolds = [scaffold]
         cmd.pyramid_dist = DummyDist("0.2")
         result = cmd.run()
-        logging.debug('scaffold.vars: %s', scaffold.vars)
         self.assertEqual(result, 0)
         self.assertEqual(
             scaffold.vars,
