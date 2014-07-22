@@ -1,4 +1,5 @@
 import unittest
+import logging
 
 class TestPCreateCommand(unittest.TestCase):
     def setUp(self):
@@ -71,7 +72,9 @@ class TestPCreateCommand(unittest.TestCase):
         self.assertEqual(
             scaffold.vars,
             {'project': 'Distro', 'egg': 'Distro', 'package': 'distro',
-             'pyramid_version': '0.1', 'pyramid_docs_branch':'0.1-branch'})
+             'pyramid_version': '0.1', 'pyramid_docs_branch':'0.1-branch',
+             'module_name': '', 'pkg_name': '', 'pkg_dir': '',
+             'test_dir': '', 'test_name': ''})
 
     def test_known_scaffold_absolute_path(self):
         import os
@@ -90,7 +93,9 @@ class TestPCreateCommand(unittest.TestCase):
         self.assertEqual(
             scaffold.vars,
             {'project': 'Distro', 'egg': 'Distro', 'package': 'distro',
-             'pyramid_version': '0.1', 'pyramid_docs_branch':'0.1-branch'})
+             'pyramid_version': '0.1', 'pyramid_docs_branch':'0.1-branch',
+             'module_name': '', 'pkg_name': '', 'pkg_dir': '',
+             'test_dir': '', 'test_name': ''})
 
     def test_known_scaffold_multiple_rendered(self):
         import os
@@ -108,7 +113,9 @@ class TestPCreateCommand(unittest.TestCase):
         self.assertEqual(
             scaffold1.vars,
             {'project': 'Distro', 'egg': 'Distro', 'package': 'distro',
-             'pyramid_version': '0.1', 'pyramid_docs_branch':'0.1-branch'})
+             'pyramid_version': '0.1', 'pyramid_docs_branch':'0.1-branch',
+             'module_name': '', 'pkg_name': '', 'pkg_dir': '',
+             'test_dir': '', 'test_name': ''})
         self.assertEqual(
             scaffold2.output_dir,
             os.path.normpath(os.path.join(os.getcwd(), 'Distro'))
@@ -116,7 +123,9 @@ class TestPCreateCommand(unittest.TestCase):
         self.assertEqual(
             scaffold2.vars,
             {'project': 'Distro', 'egg': 'Distro', 'package': 'distro',
-             'pyramid_version': '0.1', 'pyramid_docs_branch':'0.1-branch'})
+             'pyramid_version': '0.1', 'pyramid_docs_branch':'0.1-branch',
+             'module_name': '', 'pkg_name': '', 'pkg_dir': '',
+             'test_dir': '', 'test_name': ''})
 
     def test_known_scaffold_with_path_as_project_target_rendered(self):
         import os
@@ -133,8 +142,9 @@ class TestPCreateCommand(unittest.TestCase):
         self.assertEqual(
             scaffold.vars,
             {'project': 'Distro', 'egg': 'Distro', 'package': 'distro',
-             'pyramid_version': '0.1', 'pyramid_docs_branch':'0.1-branch'})
-
+             'pyramid_version': '0.1', 'pyramid_docs_branch':'0.1-branch',
+             'module_name': '', 'pkg_name': '', 'pkg_dir': '',
+             'test_dir': '', 'test_name': ''})
 
     def test_scaffold_with_prod_pyramid_version(self):
         cmd = self._makeOne('-s', 'dummy', 'Distro')
@@ -142,11 +152,14 @@ class TestPCreateCommand(unittest.TestCase):
         cmd.scaffolds = [scaffold]
         cmd.pyramid_dist = DummyDist("0.2")
         result = cmd.run()
+        logging.debug('scaffold.vars: %s', scaffold.vars)
         self.assertEqual(result, 0)
         self.assertEqual(
             scaffold.vars,
             {'project': 'Distro', 'egg': 'Distro', 'package': 'distro',
-             'pyramid_version': '0.2', 'pyramid_docs_branch':'0.2-branch'})
+             'pyramid_version': '0.2', 'pyramid_docs_branch':'0.2-branch',
+             'module_name': '', 'pkg_name': '', 'pkg_dir': '',
+             'test_dir': '', 'test_name': ''})
 
     def test_scaffold_with_prod_pyramid_long_version(self):
         cmd = self._makeOne('-s', 'dummy', 'Distro')
@@ -158,7 +171,9 @@ class TestPCreateCommand(unittest.TestCase):
         self.assertEqual(
             scaffold.vars,
             {'project': 'Distro', 'egg': 'Distro', 'package': 'distro',
-             'pyramid_version': '0.2.1', 'pyramid_docs_branch':'0.2-branch'})
+             'pyramid_version': '0.2.1', 'pyramid_docs_branch':'0.2-branch',
+             'module_name': '', 'pkg_name': '', 'pkg_dir': '',
+             'test_dir': '', 'test_name': ''})
 
     def test_scaffold_with_prod_pyramid_unparsable_version(self):
         cmd = self._makeOne('-s', 'dummy', 'Distro')
@@ -170,7 +185,9 @@ class TestPCreateCommand(unittest.TestCase):
         self.assertEqual(
             scaffold.vars,
             {'project': 'Distro', 'egg': 'Distro', 'package': 'distro',
-             'pyramid_version': 'abc', 'pyramid_docs_branch':'latest'})
+             'pyramid_version': 'abc', 'pyramid_docs_branch':'latest',
+             'module_name': '', 'pkg_name': '', 'pkg_dir': '',
+             'test_dir': '', 'test_name': ''})
 
     def test_scaffold_with_dev_pyramid_version(self):
         cmd = self._makeOne('-s', 'dummy', 'Distro')
@@ -183,7 +200,9 @@ class TestPCreateCommand(unittest.TestCase):
             scaffold.vars,
             {'project': 'Distro', 'egg': 'Distro', 'package': 'distro',
              'pyramid_version': '0.12dev',
-             'pyramid_docs_branch': 'master'})
+             'pyramid_docs_branch': 'master',
+             'module_name': '', 'pkg_name': '', 'pkg_dir': '',
+             'test_dir': '', 'test_name': ''})
 
     def test_scaffold_with_dev_pyramid_long_version(self):
         cmd = self._makeOne('-s', 'dummy', 'Distro')
@@ -196,7 +215,9 @@ class TestPCreateCommand(unittest.TestCase):
             scaffold.vars,
             {'project': 'Distro', 'egg': 'Distro', 'package': 'distro',
              'pyramid_version': '0.10.1dev',
-             'pyramid_docs_branch': 'master'})
+             'pyramid_docs_branch': 'master',
+             'module_name': '', 'pkg_name': '', 'pkg_dir': '',
+             'test_dir': '', 'test_name': ''})
 
 
 class Test_main(unittest.TestCase):

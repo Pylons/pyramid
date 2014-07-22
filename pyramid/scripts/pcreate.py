@@ -31,6 +31,10 @@ class PCreateCommand(object):
                       help=('A backwards compatibility alias for '
                             '-s/--scaffold.  Add a scaffold to the '
                             'create process (multiple -t args accepted)'))
+    parser.add_option('-m', '--module',
+                      dest='module_name',
+                      action='append',
+                      help='specifying the module to be created.')
     parser.add_option('-l', '--list',
                       dest='list',
                       action='store_true',
@@ -79,11 +83,26 @@ class PCreateCommand(object):
     def render_scaffolds(self):
         options = self.options
         args = self.args
-        output_dir = os.path.abspath(os.path.normpath(args[0]))
+        args0 = re.sub(ur'\.', os.path.sep, args[0])
+
+        output_dir = os.path.abspath(os.path.normpath(args0))
         project_name = os.path.basename(os.path.split(output_dir)[1])
-        pkg_name = _bad_chars_re.sub('', project_name.lower())
+        package_name = _bad_chars_re.sub('', project_name.lower())
         safe_name = pkg_resources.safe_name(project_name)
         egg_name = pkg_resources.to_filename(safe_name)
+
+        full_module_name = '' if not options.module_name else options.module_name
+        full_module_name = full_module_name.replace(os.path.sep, '.')
+        full_module_path = full_module_name.replace('.', os.path.sep)
+
+        module_name = os.path.basename(full_module_path)
+        pkg_dir = os.path.dirname(full_module_path)
+        pkg_name = pkg_dir.replace(os.path.sep, '.')
+
+        test_name = '' if not module_name else 'test_' + module_name
+        pkg_dir_list = [] if not pkg_dir else pkg_dir.split(os.path.sep)
+        test_dir_list = ['test_' + each_pkg for each_pkg in pkg_dir_list]
+        test_dir = os.path.sep.join(test_dir_list)
 
         # get pyramid package version
         pyramid_version = self.pyramid_dist.version
@@ -104,8 +123,13 @@ class PCreateCommand(object):
 
         vars = {
             'project': project_name,
-            'package': pkg_name,
+            'package': package_name,
+            'pkg_name': pkg_name,
+            'module_name': module_name,
+            'pkg_dir': pkg_dir,
             'egg': egg_name,
+            'test_name': test_name,
+            'test_dir': test_dir,
             'pyramid_version': pyramid_version,
             'pyramid_docs_branch': pyramid_docs_branch,
             }
