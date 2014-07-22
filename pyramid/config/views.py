@@ -159,7 +159,7 @@ class ViewDeriver(object):
                                 self.decorated_view(
                                     self.rendered_view(
                                         self.mapped_view(
-                                                view)))))))))
+                                            view)))))))))
 
     @wraps_view
     def mapped_view(self, view):
@@ -234,7 +234,7 @@ class ViewDeriver(object):
             permission = None
 
         wrapped_view = view
-        if self.authn_policy and self.authz_policy and (permission is not None):
+        if self.authn_policy and self.authz_policy and permission is not None:
             def _permitted(context, request):
                 principals = self.authn_policy.effective_principals(request)
                 return self.authz_policy.permits(context, principals,
@@ -272,7 +272,8 @@ class ViewDeriver(object):
                     else:
                         principals = self.authn_policy.effective_principals(
                             request)
-                        msg = str(self.authz_policy.permits(context, principals,
+                        msg = str(self.authz_policy.permits(context,
+                                                            principals,
                                                             permission))
                 else:
                     msg = 'Allowed (no authorization policy in use)'
@@ -300,8 +301,8 @@ class ViewDeriver(object):
                 if not predicate(context, request):
                     view_name = getattr(view, '__name__', view)
                     raise PredicateMismatch(
-                         'predicate mismatch for view %s (%s)' % (
-                         view_name, predicate.text()))
+                        'predicate mismatch for view %s (%s)' % (
+                            view_name, predicate.text()))
             return view(context, request)        
         def checker(context, request):
             return all((predicate(context, request) for predicate in
@@ -1148,7 +1149,8 @@ class ViewsConfiguratorMixin(object):
             # is.  It can't be computed any sooner because thirdparty
             # predicates may not yet exist when add_view is called.
             order, preds, phash = predlist.make(self, **pvals)
-            view_intr.update({'phash':phash, 'order':order, 'predicates':preds})
+            view_intr.update({'phash':phash, 'order':order,
+                              'predicates':preds})
             return ('view', context, name, route_name, phash)
 
         discriminator = Deferred(discrim_func)
@@ -1986,7 +1988,7 @@ class StaticURLInfo(object):
         def register():
             registrations = self._get_registrations(config.registry)
 
-            names = [ t[0] for t in  registrations ]
+            names = [ t[0] for t in registrations ]
 
             if name in names:
                 idx = names.index(name)

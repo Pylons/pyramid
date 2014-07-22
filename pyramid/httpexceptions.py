@@ -173,7 +173,8 @@ class HTTPException(Response, Exception):
     #   implies that this class' ``exception`` property always returns
     #   ``self`` (it exists only for bw compat at this point).
     #
-    # - documentation improvements (Pyramid-specific docstrings where necessary)
+    # - documentation improvements:
+    # - (Pyramid-specific docstrings where necessary)
     #
     code = None
     title = None
@@ -928,8 +929,8 @@ class HTTPServerError(HTTPError):
     code = 500
     title = 'Internal Server Error'
     explanation = (
-      'The server has either erred or is incapable of performing '
-      'the requested operation.')
+        'The server has either erred or is incapable of performing '
+        'the requested operation.')
 
 class HTTPInternalServerError(HTTPServerError):
     pass

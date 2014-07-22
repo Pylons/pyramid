@@ -353,12 +353,14 @@ class Configurator(
         if exceptionresponse_view is not None:
             exceptionresponse_view = self.maybe_dotted(exceptionresponse_view)
             self.add_view(exceptionresponse_view, context=IExceptionResponse)
-            self.add_view(exceptionresponse_view,context=WebobWSGIHTTPException)
+            self.add_view(exceptionresponse_view,
+                          context=WebobWSGIHTTPException)
 
         # commit below because:
         #
         # - the default exceptionresponse_view requires the superdefault view
-        #   mapper, so we need to configure it before adding default_view_mapper
+        #   mapper, so we need to configure it before adding
+        #   default_view_mapper
         #
         # - superdefault renderers should be overrideable without requiring
         #   the user to commit before calling config.add_renderer
@@ -403,7 +405,7 @@ class Configurator(
         if session_factory is not None:
             self.set_session_factory(session_factory)
 
-        tweens   = aslist(registry.settings.get('pyramid.tweens', []))
+        tweens = aslist(registry.settings.get('pyramid.tweens', []))
         for factory in tweens:
             self._add_tween(factory, explicit=True)
 
@@ -731,7 +733,8 @@ class Configurator(
                 c = getattr(module, 'includeme')
             except AttributeError:
                 raise ConfigurationError(
-                    "module %r has no attribute 'includeme'" % (module.__name__)
+                    "module %r has no attribute 'includeme'" % (
+                        module.__name__)
                     )
                                                        
         spec = module.__name__ + ':' + c.__name__
@@ -1066,7 +1069,7 @@ class ActionState(object):
                                 ConfigurationExecutionError(t, v, info),
                                 tb)
                     finally:
-                       del t, v, tb
+                        del t, v, tb
 
                 if introspector is not None:
                     for introspectable in introspectables:
@@ -1175,7 +1178,7 @@ def resolveConflicts(actions):
         if conflicts:
             raise ConfigurationConflictError(conflicts)
 
-        # sort conflict-resolved actions by (order, i) and yield them one by one
+        #sort conflict-resolved actions by (order, i) and yield them one by one
         for a in [x[2] for x in sorted(output, key=operator.itemgetter(0, 1))]:
             yield a
                 

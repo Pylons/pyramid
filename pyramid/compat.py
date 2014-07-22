@@ -112,10 +112,12 @@ else:
     from urllib import unquote as url_unquote
     from urllib import urlencode as url_encode
     from urllib2 import urlopen as url_open
-    def url_unquote_text(v, encoding='utf-8', errors='replace'): # pragma: no cover
+    # pragma: no cover
+    def url_unquote_text(v, encoding='utf-8', errors='replace'):
         v = url_unquote(v)
         return v.decode(encoding, errors)
-    def url_unquote_native(v, encoding='utf-8', errors='replace'): # pragma: no cover
+    # pragma: no cover
+    def url_unquote_native(v, encoding='utf-8', errors='replace'):
         return native_(url_unquote_text(v, encoding, errors))
         
 

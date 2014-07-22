@@ -225,7 +225,8 @@ class AssetsConfiguratorMixin(object):
         See :ref:`assets_chapter` for more
         information about asset overrides."""
         if to_override == override_with:
-            raise ConfigurationError('You cannot override an asset with itself')
+            raise ConfigurationError(
+                'You cannot override an asset with itself')
 
         package = to_override
         path = ''

@@ -76,7 +76,8 @@ class RoutesMapper(object):
         except KeyError:
             path = '/'
         except UnicodeDecodeError as e:
-            raise URLDecodeError(e.encoding, e.object, e.start, e.end, e.reason)
+            raise URLDecodeError(
+                e.encoding, e.object, e.start, e.end, e.reason)
 
         for route in self.routelist:
             match = route.match(path)
@@ -141,7 +142,9 @@ def _compile_route(route):
     # careful not to quote any embedded slashes.  We have to replace '%' with
     # '%%' afterwards, as the strings that go into "gen" are used as string
     # replacement targets.
-    gen.append(quote_path_segment(prefix, safe='/').replace('%', '%%')) # native
+
+    # native
+    gen.append(quote_path_segment(prefix, safe='/').replace('%', '%%'))
     rpat.append(re.escape(prefix)) # unicode
 
     while pat:

@@ -206,7 +206,7 @@ def make_localizer(current_locale_name, translation_directories):
                         translations.add(dtrans)
 
     return Localizer(locale_name=current_locale_name,
-                          translations=translations)
+                     translations=translations)
 
 def get_localizer(request):
     """

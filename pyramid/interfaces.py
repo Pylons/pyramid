@@ -100,7 +100,8 @@ class IResponse(Interface):
 
     body_file = Attribute(
         """A file-like object that can be used to write to the body. If you
-        passed in a list app_iter, that app_iter will be modified by writes.""")
+        passed in a list app_iter, that app_iter will be modified by writes.
+        """)
 
     cache_control = Attribute(
         """Get/set/modify the Cache-Control header (RFC 2616 section 14.9)""")
@@ -149,7 +150,7 @@ class IResponse(Interface):
         """Gets and sets and deletes the Content-MD5 header. For more
         information on Content-MD5 see RFC 2616 section 14.14.""")
 
-    content_range  = Attribute(
+    content_range = Attribute(
         """Gets and sets and deletes the Content-Range header. For more
         information on Content-Range see section 14.16. Converts using
         ContentRange object.""")
@@ -815,8 +816,8 @@ deprecated(
     'IContextURL',
     'As of Pyramid 1.3 the, "pyramid.interfaces.IContextURL" interface is '
     'scheduled to be removed.   Use the '
-    '"pyramid.config.Configurator.add_resource_url_adapter" method to register '
-    'a class that implements "pyramid.interfaces.IResourceURL" instead. '
+    '"pyramid.config.Configurator.add_resource_url_adapter" method to register'
+    ' a class that implements "pyramid.interfaces.IResourceURL" instead. '
     'See the "What\'s new In Pyramid 1.3" document for more details.'
     )
 
@@ -1090,8 +1091,8 @@ class IIntrospectable(Interface):
             def register(self, introspector, action_info):
                 self.action_info = action_info
                 introspector.add(self)
-                for methodname, category_name, discriminator in self._relations:
-                    method = getattr(introspector, methodname)
+                for methname, category_name, discriminator in self._relations:
+                    method = getattr(introspector, methname)
                     method((i.category_name, i.discriminator),
                            (category_name, discriminator))
         """
@@ -1106,7 +1107,8 @@ class IIntrospectable(Interface):
 
 class IActionInfo(Interface):
     """ Class which provides code introspection capability associated with an
-    action.  The ParserInfo class used by ZCML implements the same interface."""
+    action.  The ParserInfo class used by ZCML implements the same interface.
+    """
     file = Attribute(
         'Filename of action-invoking code as a string')
     line = Attribute(
