@@ -106,17 +106,19 @@ behavior.
 Using Module and Pkg
 ---------------------------------
 
-These two templates are meant to the most basic templates,
-to be easily customized for all kinds of template-building.
+These two templates are meant to be the most basic templates,
+to be easily customized for all kinds of templates.
 
 Because of the nature of python and the design of scaffolding,
 if we want to initialize a module named a.b.c.d from current directory,
-We need to do the following:
+We need to do the following steps:
 
-* pcreate -s pkg . -m a
-* pcreate -s pkg . -m a.b
-* pcreate -s pkg . -m a.b.c
-* pcreate -s module . -m a.b.c.d
+.. code-block:: text
+
+   pcreate -s pkg -m a .
+   pcreate -s pkg -m a.b .
+   pcreate -s pkg -m a.b.c .
+   pcreate -s module -m a.b.c.d .
 
 Pre-defined Scaffolding Variables
 ---------------------------------
@@ -125,37 +127,48 @@ The followings are the pre-defined variables when constructing customized
 scaffolding templates
 (using pcreate -s module -m d.e.fg_hi a/b-c as the example):
 
-* project:
-  The basename of the output directory (b-c)
+  project
+    The basename of the output directory.
+    ex.: b-c
+
+  package
+    project with only valid python-module characters.
+    ex.: bc
+
+  egg
+    The egg name based on project.
+    ex.: b_c
+
+  module_name
+    The basename of the module.
+    ex.: fg_hi
+
+  class_name
+    module_name with CamelCase.
+    ex.: FgHi
+
+  pkg_name
+    parent packge of the module_name.
+    ex.: d.e
+
+  pkg_dir
+    The corresponding directory of pkg_name.
+    ex.: d/e
+
+  test_name
+    The test module name.
+    ex.: test_fg_hi
+
+  test_dir
+    The test directory.
+    ex.: test_d/test_e
+
+  pyramid_version
+    pyramid version
+
+.. warning::
+
   project is '' if the output directory is the same as os.getcwd()
-
-* package:
-  project with only valid python-module characters (bc)
-
-* egg:
-  The egg name based on project (b_c)
-
-* module_name:
-  The basename of the module (fg_hi)
-
-* class_name:
-  module_name with CamelCase (FgHi)
-
-* pkg_name:
-  parent packge of the module_name (d.e)
-
-* pkg_dir:
-  The corresponding directory of pkg_name (d/e)
-
-* test_name:
-  The test module name (test_fg_hi)
-
-* test_dir:
-  The test directory (test_d/test_e)
-
-* pyramid_version:
-  pyramid version
-
 
 Supporting Older Pyramid Versions
 ---------------------------------
