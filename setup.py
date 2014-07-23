@@ -108,6 +108,8 @@ setup(name='pyramid',
         starter=pyramid.scaffolds:StarterProjectTemplate
         zodb=pyramid.scaffolds:ZODBProjectTemplate
         alchemy=pyramid.scaffolds:AlchemyProjectTemplate
+        pkg=pyramid.scaffolds:PkgTemplate
+        module=pyramid.scaffolds:ModuleTemplate
         [console_scripts]
         pcreate = pyramid.scripts.pcreate:main
         pserve = pyramid.scripts.pserve:main

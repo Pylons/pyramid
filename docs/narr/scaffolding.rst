@@ -68,8 +68,8 @@ the user), ``random_string`` (a long random string), and ``package_logger``
 
 See Pyramid's "scaffolds" package
 (https://github.com/Pylons/pyramid/tree/master/pyramid/scaffolds) for
-concrete examples of scaffold directories (``zodb``, ``alchemy``, and
-``starter``, for example).
+concrete examples of scaffold directories (``module``, ``pkg``, ``zodb``,
+``alchemy``, and ``starter``, for example).
 
 After you've created the template directory, add the following to the
 ``entry_points`` value of your distribution's ``setup.py``:
@@ -102,6 +102,69 @@ See the module documentation for :mod:`pyramid.scaffolds` for information
 about the API of the :class:`pyramid.scaffolds.Template` class and
 related classes.  You can override methods of this class to get special
 behavior.
+
+Using Module and Pkg
+---------------------------------
+
+These two templates are meant to be the most basic templates,
+to be easily customized for all kinds of templates.
+
+Because of the nature of python and the design of scaffolding,
+if we want to initialize a module named a.b.c.d from current directory,
+We need to do the following steps:
+
+.. code-block:: text
+
+   pcreate -s pkg -m a .
+   pcreate -s pkg -m a.b .
+   pcreate -s pkg -m a.b.c .
+   pcreate -s module -m a.b.c.d .
+
+Pre-defined Scaffolding Variables
+---------------------------------
+
+The followings are the pre-defined variables when constructing customized
+scaffolding templates
+(using pcreate -s module -m d.e.fg_hi a/b-c as the example):
+
+  project
+    The basename of the output directory.
+    ex.: b-c
+
+  package
+    project with only valid python-module characters.
+    ex.: bc
+
+  egg
+    The egg name based on project.
+    ex.: b_c
+
+  module_name
+    The basename of the module.
+    ex.: fg_hi
+
+  class_name
+    module_name with CamelCase.
+    ex.: FgHi
+
+  sub_pkg_name
+    parent packge of the module_name.
+    ex.: d.e
+
+  sub_pkg_dir
+    The corresponding directory of pkg_name.
+    ex.: d/e
+
+  test_name
+    The test module name.
+    ex.: test_fg_hi
+
+  test_dir
+    The test directory.
+    ex.: test_d/test_e
+
+  pyramid_version
+    pyramid version
 
 Supporting Older Pyramid Versions
 ---------------------------------

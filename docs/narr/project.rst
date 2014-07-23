@@ -28,6 +28,8 @@ as part of Pyramid.
    single: starter scaffold
    single: zodb scaffold
    single: alchemy scaffold
+   single: module scaffold
+   single: pkg scaffold
 
 .. _additional_paster_scaffolds:
 
@@ -54,6 +56,12 @@ The included scaffolds are these:
 ``alchemy``
   URL mapping via :term:`URL dispatch` and persistence via
   :term:`SQLAlchemy`
+
+``module``
+  The most basic scaffolding for modules
+
+``pkg``
+  The most basic scaffolding for packages and sub-packages
 
 .. index::
    single: creating a project

@@ -8,8 +8,12 @@ import os.path
 import pkg_resources
 import re
 import sys
+import logging
 
 _bad_chars_re = re.compile('[^a-zA-Z0-9_]')
+
+def _underscore_to_upper_camel_case(the_str):
+    return ''.join([w.capitalize() for w in the_str.split('_')])
 
 def main(argv=sys.argv, quiet=False):
     command = PCreateCommand(argv, quiet)
@@ -31,6 +35,12 @@ class PCreateCommand(object):
                       help=('A backwards compatibility alias for '
                             '-s/--scaffold.  Add a scaffold to the '
                             'create process (multiple -t args accepted)'))
+    parser.add_option('-m', '--module',
+                      dest='module_name',
+                      action='store',
+                      type="str",
+                      default='',
+                      help='specifying the module to be created.')
     parser.add_option('-l', '--list',
                       dest='list',
                       action='store_true',
@@ -77,13 +87,34 @@ class PCreateCommand(object):
         return self.render_scaffolds()
 
     def render_scaffolds(self):
+        '''
+        args0: replace '.' to os.path.sep except the starting '.'
+        project: if output_dir == os.getcwd():
+                     treated as not-want-to starting a new project
+        '''
         options = self.options
         args = self.args
-        output_dir = os.path.abspath(os.path.normpath(args[0]))
+
+        args0 = args[0]
+        args0 = args0[0:1] + args0[1:].replace('.', os.path.sep)
+
+        output_dir = os.path.abspath(os.path.normpath(args0))
         project_name = os.path.basename(os.path.split(output_dir)[1])
         pkg_name = _bad_chars_re.sub('', project_name.lower())
         safe_name = pkg_resources.safe_name(project_name)
         egg_name = pkg_resources.to_filename(safe_name)
+
+        full_module_path = options.module_name.replace('.', os.path.sep)
+
+        module_name = os.path.basename(full_module_path)
+        sub_pkg_dir = os.path.dirname(full_module_path)
+        sub_pkg_name = sub_pkg_dir.replace(os.path.sep, '.')
+        class_name = _underscore_to_upper_camel_case(module_name)
+
+        test_name = '' if not module_name else 'test_' + module_name
+        sub_pkg_dir_list = [] if not sub_pkg_dir else sub_pkg_dir.split(os.path.sep)
+        test_dir_list = ['test_' + each_pkg for each_pkg in sub_pkg_dir_list]
+        test_dir = os.path.sep.join(test_dir_list)
 
         # get pyramid package version
         pyramid_version = self.pyramid_dist.version
@@ -106,6 +137,12 @@ class PCreateCommand(object):
             'project': project_name,
             'package': pkg_name,
             'egg': egg_name,
+            'module_name': module_name,
+            'class_name': class_name,
+            'sub_pkg_name': sub_pkg_name,
+            'sub_pkg_dir': sub_pkg_dir,
+            'test_name': test_name,
+            'test_dir': test_dir,
             'pyramid_version': pyramid_version,
             'pyramid_docs_branch': pyramid_docs_branch,
             }
