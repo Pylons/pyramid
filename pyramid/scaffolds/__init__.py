@@ -70,3 +70,7 @@ class AlchemyProjectTemplate(PyramidTemplate):
 class PkgTemplate(PyramidTemplate):
     _template_dir = 'pkg'
     summary = 'Pyramid simple package template'
+
+class ModuleTemplate(PyramidTemplate):
+    _template_dir = 'module'
+    summary = 'Pyramid simple module template'
