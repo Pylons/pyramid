@@ -20,21 +20,27 @@ class TestPCreateCommand(unittest.TestCase):
         cmd.out = self.out
         return cmd
 
-    def _get_underscore_to_upper_camel_case(self):
+    def _underscore_to_upper_camel_case(self):
         from pyramid.scripts.pcreate import _underscore_to_upper_camel_case
         return _underscore_to_upper_camel_case
 
     def test__underscore_to_upper_camel_case(self):
-        func = self._get_underscore_to_upper_camel_case()
+        func = self._underscore_to_upper_camel_case()
         result = func('ab_cd')
 
         assert result == 'AbCd'
 
     def test__underscore_to_upper_camel_case_single(self):
-        func = self._get_underscore_to_upper_camel_case()
+        func = self._underscore_to_upper_camel_case()
         result = func('ab')
 
         assert result == 'Ab'
+
+    def test__underscore_to_upper_camel_case_single(self):
+        func = self._underscore_to_upper_camel_case()
+        result = func('ab_cd_ef')
+
+        assert result == 'AbCdEf'
 
     def test_run_show_scaffolds_exist(self):
         cmd = self._makeOne('-l')

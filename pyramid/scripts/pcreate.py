@@ -13,8 +13,7 @@ import logging
 _bad_chars_re = re.compile('[^a-zA-Z0-9_]')
 
 def _underscore_to_upper_camel_case(the_str):
-    return ''.join([w.capitalize() for (idx, w) in
-                    enumerate(re.split(ur'[_]', the_str)) if w])
+    return ''.join([w.capitalize() for w in re.split(ur'[_]', the_str)])
 
 def main(argv=sys.argv, quiet=False):
     command = PCreateCommand(argv, quiet)
