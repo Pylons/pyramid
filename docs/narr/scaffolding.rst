@@ -68,8 +68,8 @@ the user), ``random_string`` (a long random string), and ``package_logger``
 
 See Pyramid's "scaffolds" package
 (https://github.com/Pylons/pyramid/tree/master/pyramid/scaffolds) for
-concrete examples of scaffold directories (``zodb``, ``alchemy``, and
-``starter``, for example).
+concrete examples of scaffold directories (``module``, ``pkg``, ``zodb``,
+``alchemy``, and ``starter``, for example).
 
 After you've created the template directory, add the following to the
 ``entry_points`` value of your distribution's ``setup.py``:
@@ -102,6 +102,42 @@ See the module documentation for :mod:`pyramid.scaffolds` for information
 about the API of the :class:`pyramid.scaffolds.Template` class and
 related classes.  You can override methods of this class to get special
 behavior.
+
+Pre-defined Scaffolding Variables
+---------------------------------
+The followings are the pre-defined variables when constructing customized
+scaffolding templates (using pcreate -s module -m d.e.fg_hi a/b-c as the example):
+
+* project:
+  The basename of the output directory (b-c)
+
+* package:
+  project with only valid python-module characters (bc)
+
+* module_name:
+  The basename of the module (fg_hi)
+
+* class_name:
+  module_name with CamelCase (FgHi)
+
+* pkg_name:
+  parent packge of the module_name (d.e)
+
+* pkg_dir:
+  The corresponding directory of pkg_name (d/e)
+
+* egg:
+  The egg name based on project (b_c)
+
+* test_name:
+  The test module name (test_fg_hi)
+
+* test_dir:
+  The test directory (test_d/test_e)
+
+* pyramid_version:
+  pyramid version
+
 
 Supporting Older Pyramid Versions
 ---------------------------------
