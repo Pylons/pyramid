@@ -85,25 +85,26 @@ class PCreateCommand(object):
         return self.render_scaffolds()
 
     def render_scaffolds(self):
+        '''
+        project: if output_dir == os.getcwd():
+                     treated as not-want-to starting a new project
+        '''
         options = self.options
         args = self.args
 
-        if args[0] == '.':
-            args0 = args[0]
+        args0 = args[0]
+        args0 = args0[0:1] + args0[1:].replace('.', os.path.sep)
 
-            output_dir = os.path.abspath(os.path.normpath(args0))
+        output_dir = os.path.abspath(os.path.normpath(args0))
+        project_name = os.path.basename(os.path.split(output_dir)[1])
+        package_name = _bad_chars_re.sub('', project_name.lower())
+        safe_name = pkg_resources.safe_name(project_name)
+        egg_name = pkg_resources.to_filename(safe_name)
+
+        if output_dir == os.getcwd():
             project_name = ''
             package_name = ''
-            safe_name = ''
             egg_name = ''
-        else:
-            args0 = re.sub(ur'\.', os.path.sep, args[0])
-
-            output_dir = os.path.abspath(os.path.normpath(args0))
-            project_name = os.path.basename(os.path.split(output_dir)[1])
-            package_name = _bad_chars_re.sub('', project_name.lower())
-            safe_name = pkg_resources.safe_name(project_name)
-            egg_name = pkg_resources.to_filename(safe_name)
 
         full_module_name = '' if not options.module_name \
                            else options.module_name
@@ -140,11 +141,11 @@ class PCreateCommand(object):
         vars = {
             'project': project_name,
             'package': package_name,
-            'pkg_name': pkg_name,
+            'egg': egg_name,
             'module_name': module_name,
             'class_name': class_name,
+            'pkg_name': pkg_name,
             'pkg_dir': pkg_dir,
-            'egg': egg_name,
             'test_name': test_name,
             'test_dir': test_dir,
             'pyramid_version': pyramid_version,

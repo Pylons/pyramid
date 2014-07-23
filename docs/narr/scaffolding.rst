@@ -103,16 +103,37 @@ about the API of the :class:`pyramid.scaffolds.Template` class and
 related classes.  You can override methods of this class to get special
 behavior.
 
+Using Module and Pkg
+---------------------------------
+
+These two templates are meant to the most basic templates,
+to be easily customized for all kinds of template-building.
+
+Because of the nature of python and the design of scaffolding,
+if we want to initialize a module named a.b.c.d from current directory,
+We need to do the following:
+
+* pcreate -s pkg . -m a
+* pcreate -s pkg . -m a.b
+* pcreate -s pkg . -m a.b.c
+* pcreate -s module . -m a.b.c.d
+
 Pre-defined Scaffolding Variables
 ---------------------------------
+
 The followings are the pre-defined variables when constructing customized
-scaffolding templates (using pcreate -s module -m d.e.fg_hi a/b-c as the example):
+scaffolding templates
+(using pcreate -s module -m d.e.fg_hi a/b-c as the example):
 
 * project:
   The basename of the output directory (b-c)
+  project is '' if the output directory is the same as os.getcwd()
 
 * package:
   project with only valid python-module characters (bc)
+
+* egg:
+  The egg name based on project (b_c)
 
 * module_name:
   The basename of the module (fg_hi)
@@ -125,9 +146,6 @@ scaffolding templates (using pcreate -s module -m d.e.fg_hi a/b-c as the example
 
 * pkg_dir:
   The corresponding directory of pkg_name (d/e)
-
-* egg:
-  The egg name based on project (b_c)
 
 * test_name:
   The test module name (test_fg_hi)
