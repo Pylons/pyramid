@@ -230,7 +230,7 @@ class TestPCreateCommand(unittest.TestCase):
              'pkg_dir': 'kl_mn/op_qr', 'class_name': 'StUv',
              'test_dir': 'test_kl_mn/test_op_qr', 'test_name': 'test_st_uv'})
 
-    def test_known_scaffold_with_no_package(self):
+    def test_known_scaffold_with_no_pkg_name(self):
         import os
         cmd = self._makeOne('-s', 'dummy', 'a/b/c/d/e', '-m', 'f')
         scaffold = DummyScaffold('dummy')
@@ -245,6 +245,25 @@ class TestPCreateCommand(unittest.TestCase):
         self.assertEqual(
             scaffold.vars,
             {'project': 'e', 'egg': 'e', 'package': 'e',
+             'pyramid_version': '0.1', 'pyramid_docs_branch':'0.1-branch',
+             'module_name': 'f', 'pkg_name': '', 'pkg_dir': '',
+             'class_name': 'F', 'test_dir': '', 'test_name': 'test_f'})
+
+    def test_known_scaffold_with_no_package_name(self):
+        import os
+        cmd = self._makeOne('-s', 'dummy', '.', '-m', 'f')
+        scaffold = DummyScaffold('dummy')
+        cmd.scaffolds = [scaffold]
+        cmd.pyramid_dist = DummyDist("0.1")
+        result = cmd.run()
+        self.assertEqual(result, 0)
+        self.assertEqual(
+            scaffold.output_dir,
+            os.path.normpath(os.path.join(os.getcwd()))
+            )
+        self.assertEqual(
+            scaffold.vars,
+            {'project': '', 'egg': '', 'package': '',
              'pyramid_version': '0.1', 'pyramid_docs_branch':'0.1-branch',
              'module_name': 'f', 'pkg_name': '', 'pkg_dir': '',
              'class_name': 'F', 'test_dir': '', 'test_name': 'test_f'})

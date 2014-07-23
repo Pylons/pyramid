@@ -87,15 +87,26 @@ class PCreateCommand(object):
     def render_scaffolds(self):
         options = self.options
         args = self.args
-        args0 = re.sub(ur'\.', os.path.sep, args[0])
 
-        output_dir = os.path.abspath(os.path.normpath(args0))
-        project_name = os.path.basename(os.path.split(output_dir)[1])
-        package_name = _bad_chars_re.sub('', project_name.lower())
-        safe_name = pkg_resources.safe_name(project_name)
-        egg_name = pkg_resources.to_filename(safe_name)
+        if args[0] == '.':
+            args0 = args[0]
 
-        full_module_name = '' if not options.module_name else options.module_name
+            output_dir = os.path.abspath(os.path.normpath(args0))
+            project_name = ''
+            package_name = ''
+            safe_name = ''
+            egg_name = ''
+        else:
+            args0 = re.sub(ur'\.', os.path.sep, args[0])
+
+            output_dir = os.path.abspath(os.path.normpath(args0))
+            project_name = os.path.basename(os.path.split(output_dir)[1])
+            package_name = _bad_chars_re.sub('', project_name.lower())
+            safe_name = pkg_resources.safe_name(project_name)
+            egg_name = pkg_resources.to_filename(safe_name)
+
+        full_module_name = '' if not options.module_name \
+                           else options.module_name
         full_module_name = full_module_name.replace(os.path.sep, '.')
         full_module_path = full_module_name.replace('.', os.path.sep)
 

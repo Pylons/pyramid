@@ -66,3 +66,7 @@ class ZODBProjectTemplate(PyramidTemplate):
 class AlchemyProjectTemplate(PyramidTemplate):
     _template_dir = 'alchemy'
     summary = 'Pyramid SQLAlchemy project using url dispatch'
+
+class PkgTemplate(PyramidTemplate):
+    _template_dir = 'pkg'
+    summary = 'Pyramid simple package template'
