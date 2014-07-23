@@ -1,0 +1,8 @@
+import unittest
+
+class Test{{class_name}}(unittest.TestCase):
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass

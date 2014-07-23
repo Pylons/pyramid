@@ -1,5 +1,4 @@
 import unittest
-import logging
 
 class TestPCreateCommand(unittest.TestCase):
     def setUp(self):
