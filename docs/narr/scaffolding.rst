@@ -147,11 +147,11 @@ scaffolding templates
     module_name with CamelCase.
     ex.: FgHi
 
-  pkg_name
+  sub_pkg_name
     parent packge of the module_name.
     ex.: d.e
 
-  pkg_dir
+  sub_pkg_dir
     The corresponding directory of pkg_name.
     ex.: d/e
 

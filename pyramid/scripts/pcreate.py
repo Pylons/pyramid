@@ -98,7 +98,7 @@ class PCreateCommand(object):
 
         output_dir = os.path.abspath(os.path.normpath(args0))
         project_name = os.path.basename(os.path.split(output_dir)[1])
-        package_name = _bad_chars_re.sub('', project_name.lower())
+        pkg_name = _bad_chars_re.sub('', project_name.lower())
         safe_name = pkg_resources.safe_name(project_name)
         egg_name = pkg_resources.to_filename(safe_name)
 
@@ -108,13 +108,13 @@ class PCreateCommand(object):
         full_module_path = full_module_name.replace('.', os.path.sep)
 
         module_name = os.path.basename(full_module_path)
-        pkg_dir = os.path.dirname(full_module_path)
-        pkg_name = pkg_dir.replace(os.path.sep, '.')
+        sub_pkg_dir = os.path.dirname(full_module_path)
+        sub_pkg_name = sub_pkg_dir.replace(os.path.sep, '.')
         class_name = _underscore_to_upper_camel_case(module_name)
 
         test_name = '' if not module_name else 'test_' + module_name
-        pkg_dir_list = [] if not pkg_dir else pkg_dir.split(os.path.sep)
-        test_dir_list = ['test_' + each_pkg for each_pkg in pkg_dir_list]
+        sub_pkg_dir_list = [] if not sub_pkg_dir else sub_pkg_dir.split(os.path.sep)
+        test_dir_list = ['test_' + each_pkg for each_pkg in sub_pkg_dir_list]
         test_dir = os.path.sep.join(test_dir_list)
 
         # get pyramid package version
@@ -136,12 +136,12 @@ class PCreateCommand(object):
 
         vars = {
             'project': project_name,
-            'package': package_name,
+            'package': pkg_name,
             'egg': egg_name,
             'module_name': module_name,
             'class_name': class_name,
-            'pkg_name': pkg_name,
-            'pkg_dir': pkg_dir,
+            'sub_pkg_name': sub_pkg_name,
+            'sub_pkg_dir': sub_pkg_dir,
             'test_name': test_name,
             'test_dir': test_dir,
             'pyramid_version': pyramid_version,
