@@ -38,6 +38,8 @@ class PCreateCommand(object):
     parser.add_option('-m', '--module',
                       dest='module_name',
                       action='store',
+                      type="str",
+                      default='',
                       help='specifying the module to be created.')
     parser.add_option('-l', '--list',
                       dest='list',
@@ -102,10 +104,7 @@ class PCreateCommand(object):
         safe_name = pkg_resources.safe_name(project_name)
         egg_name = pkg_resources.to_filename(safe_name)
 
-        full_module_name = '' if not options.module_name \
-                           else options.module_name
-        full_module_name = full_module_name.replace(os.path.sep, '.')
-        full_module_path = full_module_name.replace('.', os.path.sep)
+        full_module_path = options.module_name.replace('.', os.path.sep)
 
         module_name = os.path.basename(full_module_path)
         sub_pkg_dir = os.path.dirname(full_module_path)
