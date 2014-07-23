@@ -166,10 +166,6 @@ scaffolding templates
   pyramid_version
     pyramid version
 
-.. warning::
-
-  project is '' if the output directory is the same as os.getcwd()
-
 Supporting Older Pyramid Versions
 ---------------------------------
 

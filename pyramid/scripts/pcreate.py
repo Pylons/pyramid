@@ -102,11 +102,6 @@ class PCreateCommand(object):
         safe_name = pkg_resources.safe_name(project_name)
         egg_name = pkg_resources.to_filename(safe_name)
 
-        if output_dir == os.getcwd():
-            project_name = ''
-            package_name = ''
-            egg_name = ''
-
         full_module_name = '' if not options.module_name \
                            else options.module_name
         full_module_name = full_module_name.replace(os.path.sep, '.')

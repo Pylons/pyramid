@@ -262,7 +262,7 @@ class TestPCreateCommand(unittest.TestCase):
             )
         self.assertEqual(
             scaffold.vars,
-            {'project': '', 'egg': '', 'package': '',
+            {'project': 'pyramid', 'egg': 'pyramid', 'package': 'pyramid',
              'pyramid_version': '0.1', 'pyramid_docs_branch':'0.1-branch',
              'module_name': 'f', 'pkg_name': '', 'pkg_dir': '',
              'class_name': 'F', 'test_dir': '', 'test_name': 'test_f'})
