@@ -86,6 +86,7 @@ class PCreateCommand(object):
 
     def render_scaffolds(self):
         '''
+        args0: replace '.' to os.path.sep except the starting '.'
         project: if output_dir == os.getcwd():
                      treated as not-want-to starting a new project
         '''
