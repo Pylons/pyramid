@@ -575,7 +575,6 @@ class TestActionInfo(unittest.TestCase):
         self.assertEqual(str(inst),
                          "Line 0 of file filename:\n       linerepr  ")
 
-
 def dummyfunc(): pass
 
 class Dummy(object):

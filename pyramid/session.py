@@ -20,6 +20,7 @@ from pyramid.compat import (
 
 from pyramid.exceptions import BadCSRFToken
 from pyramid.interfaces import ISession
+from pyramid.response import add_vary_to_headerlist
 from pyramid.util import strings_differ
 
 def manage_accessed(wrapped):
@@ -373,6 +374,7 @@ def BaseCookieSessionFactory(
                     'Cookie value is too long to store (%s bytes)' %
                     len(cookieval)
                     )
+            add_vary_to_headerlist('Cookie', response.headerlist)
             response.set_cookie(
                 self._cookie_name,
                 value=cookieval,

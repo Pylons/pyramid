@@ -3,7 +3,6 @@ from codecs import utf_8_decode
 from codecs import utf_8_encode
 import hashlib
 import base64
-import datetime
 import re
 import time as time_mod
 import warnings
@@ -27,6 +26,8 @@ from pyramid.interfaces import (
     IAuthenticationPolicy,
     IDebugLogger,
     )
+
+from pyramid.response import add_vary_to_headerlist
 
 from pyramid.security import (
     Authenticated,
@@ -883,8 +884,9 @@ class AuthTktCookieHelper(object):
         kw['domains'] = domains
         if max_age is not None:
             kw['max_age'] = max_age
-            
+
         headers = profile.get_headers(value, **kw)
+        add_vary_to_headerlist('Cookie', headers)
         return headers
 
     def identify(self, request):
