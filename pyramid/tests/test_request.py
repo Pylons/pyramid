@@ -144,6 +144,29 @@ class TestRequest(unittest.TestCase):
         self.assertEqual(response.called2, True)
         self.assertEqual(inst.response_callbacks, [])
 
+    def test__process_response_callback_adding_response_callback(self):
+        """
+        When a response callback adds another callback, that new callback should still be called.
+
+        See https://github.com/Pylons/pyramid/pull/1373
+        """
+        inst = self._makeOne()
+        def callback1(request, response):
+            request.called1 = True
+            response.called1 = True
+            request.add_response_callback(callback2)
+        def callback2(request, response):
+            request.called2  = True
+            response.called2 = True
+        inst.add_response_callback(callback1)
+        response = DummyResponse()
+        inst._process_response_callbacks(response)
+        self.assertEqual(inst.called1, True)
+        self.assertEqual(inst.called2, True)
+        self.assertEqual(response.called1, True)
+        self.assertEqual(response.called2, True)
+        self.assertEqual(inst.response_callbacks, [])
+
     def test_add_finished_callback(self):
         inst = self._makeOne()
         self.assertEqual(inst.finished_callbacks, ())
