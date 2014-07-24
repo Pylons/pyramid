@@ -373,6 +373,10 @@ def BaseCookieSessionFactory(
                     'Cookie value is too long to store (%s bytes)' %
                     len(cookieval)
                     )
+            if response.vary is None:
+                response.vary = ['Cookie']
+            elif 'cookie' not in set(v.lower() for v in response.vary):
+                response.vary = list(response.vary) + ['Cookie']
             response.set_cookie(
                 self._cookie_name,
                 value=cookieval,

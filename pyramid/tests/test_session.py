@@ -117,6 +117,38 @@ class SharedCookieSessionTests(object):
         self.assertEqual(session._set_cookie(response), True)
         self.assertEqual(response.headerlist[-1][0], 'Set-Cookie')
 
+    def test__set_cookie_sets_vary_header(self):
+        import webob
+        request = testing.DummyRequest()
+        session = self._makeOne(request)
+        session['abc'] = 'x'
+        response = webob.Response()
+        self.assertEqual(session._set_cookie(response), True)
+        self.assertEqual(response.headerlist[-1][0], 'Set-Cookie')
+        self.assertEqual(response.headerlist[-2], ('Vary', 'Cookie'))
+
+    def test__set_cookie_extends_vary_header(self):
+        import webob
+        request = testing.DummyRequest()
+        session = self._makeOne(request)
+        session['abc'] = 'x'
+        response = webob.Response()
+        response.vary = ['Accept']
+        self.assertEqual(session._set_cookie(response), True)
+        self.assertEqual(response.headerlist[-1][0], 'Set-Cookie')
+        self.assertEqual(response.headerlist[-2], ('Vary', 'Accept, Cookie'))
+
+    def test__set_cookie_keeps_vary_header(self):
+        import webob
+        request = testing.DummyRequest()
+        session = self._makeOne(request)
+        session['abc'] = 'x'
+        response = webob.Response()
+        response.vary = ['Cookie', 'Accept']
+        self.assertEqual(session._set_cookie(response), True)
+        self.assertEqual(response.headerlist[-1][0], 'Set-Cookie')
+        self.assertEqual(response.headerlist[-2], ('Vary', 'Cookie, Accept'))
+
     def test__set_cookie_options(self):
         from pyramid.response import Response
         request = testing.DummyRequest()
@@ -674,5 +706,6 @@ class DummySessionFactory(dict):
         self._dirty = True
 
 class DummyResponse(object):
+    vary = None
     def __init__(self):
         self.headerlist = []

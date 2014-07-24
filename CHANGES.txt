@@ -1,6 +1,16 @@
 Next release
 ============
 
+Security Fixes
+--------------
+
+- When using the ``SignedCookieSessionFactory`` or the
+  ``UnencryptedCookieSessionFactoryConfig`` session factories, the "Vary"
+  header was not being set on the response. This could lead to information
+  disclosure and could be a vector for cache poisoning in certain situations
+  where caches might store the response and serve it for requests attached
+  to different sessions.
+
 Bug Fixes
 ---------
 
