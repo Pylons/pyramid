@@ -318,7 +318,7 @@ requests a copy, regardless of any caching policy set for the resource's old
 URL.
 
 :app:`Pyramid` can be configured to produce cache busting URLs for static 
-assets by passing the optional argument, ``cachebuster`` to 
+assets by passing the optional argument, ``cachebust`` to 
 :meth:`~pyramid.config.Configurator.add_static_view`:
 
 .. code-block:: python
@@ -326,9 +326,9 @@ assets by passing the optional argument, ``cachebuster`` to
 
    # config is an instance of pyramid.config.Configurator
    config.add_static_view(name='static', path='mypackage:folder/static',
-                          cachebuster=True)
+                          cachebust=True)
 
-Setting the ``cachebuster`` argument instructs :app:`Pyramid` to use a cache 
+Setting the ``cachebust`` argument instructs :app:`Pyramid` to use a cache 
 busting scheme which adds the md5 checksum for a static asset as a path segment
 in the asset's URL:
 
@@ -339,7 +339,7 @@ in the asset's URL:
    # Returns: 'http://www.example.com/static/c9658b3c0a314a1ca21e5988e662a09e/js/myapp.js`
 
 When the asset changes, so will its md5 checksum, and therefore so will its
-URL.  Supplying the ``cachebuster`` argument also causes the static view to set
+URL.  Supplying the ``cachebust`` argument also causes the static view to set
 headers instructing clients to cache the asset for ten years, unless the
 ``max_cache_age`` argument is also passed, in which case that value is used.
 
@@ -355,8 +355,8 @@ Disabling the Cache Buster
 It can be useful in some situations (e.g. development) to globally disable all
 configured cache busters without changing calls to
 :meth:`~pyramid.config.Configurator.add_static_view`.  To do this set the 
-``PYRAMID_PREVENT_CACHEBUSTER`` environment variable or the 
-``pyramid.prevent_cachebuster`` configuration value to a true value.
+``PYRAMID_PREVENT_CACHEBUST`` environment variable or the 
+``pyramid.prevent_cachebust`` configuration value to a true value.
 
 Customizing the Cache Buster
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -368,11 +368,11 @@ Revisiting from the previous section:
 
    # config is an instance of pyramid.config.Configurator
    config.add_static_view(name='static', path='mypackage:folder/static',
-                          cachebuster=True)
+                          cachebust=True)
 
-Setting ``cachebuster`` to ``True`` instructs :app:`Pyramid` to use a default
+Setting ``cachebust`` to ``True`` instructs :app:`Pyramid` to use a default
 cache busting implementation that should work for many situations.  The 
-``cachebuster`` may be set to any object that implements the interface,
+``cachebust`` may be set to any object that implements the interface,
 :class:`~pyramid.interfaces.ICacheBuster`.  The above configuration is exactly
 equivalent to:
 
@@ -383,7 +383,7 @@ equivalent to:
 
    # config is an instance of pyramid.config.Configurator
    config.add_static_view(name='static', path='mypackage:folder/static',
-                          cachebuster=PathSegmentCacheBuster())
+                          cachebust=PathSegmentCacheBuster())
 
 :app:`Pyramid` includes two ready to use cache buster implementations: 
 :class:`~pyramid.static.PathSegmentCacheBuster`, which inserts an asset token

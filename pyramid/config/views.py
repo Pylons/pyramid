@@ -1783,17 +1783,17 @@ class ViewsConfiguratorMixin(object):
         Note that this argument has no effect when the ``name`` is a *url
         prefix*.  By default, this argument is ``None``, meaning that no
         particular Expires or Cache-Control headers are set in the response,
-        unless ``cachebuster`` is specified.
+        unless ``cachebust`` is specified.
 
-        The ``cachebuster`` keyword argument may be set to cause
+        The ``cachebust`` keyword argument may be set to cause
         :meth:`~pyramid.request.Request.static_url` to use cache busting when
         generating URLs. See :ref:`cache_busting` for general information
-        about cache busting.  The value of the ``cachebuster`` argument may be
+        about cache busting.  The value of the ``cachebust`` argument may be
         ``True``, in which case a default cache busting implementation is used.
-        The value of the ``cachebuster`` argument may also be an object which
+        The value of the ``cachebust`` argument may also be an object which
         implements :class:`~pyramid.interfaces.ICacheBuster`.  See the
         :mod:`~pyramid.static` module for some implementations.  If the
-        ``cachebuster`` argument is provided, the default for ``cache_max_age``
+        ``cachebust`` argument is provided, the default for ``cache_max_age``
         is modified to be ten years.  ``cache_max_age`` may still be explicitly
         provided to override this default.
 
@@ -1894,7 +1894,7 @@ def isexception(o):
 @implementer(IStaticURLInfo)
 class StaticURLInfo(object):
     # Indirection for testing
-    _default_cachebuster = PathSegmentCacheBuster
+    _default_cachebust = PathSegmentCacheBuster
 
     def _get_registrations(self, registry):
         try:
@@ -1909,13 +1909,13 @@ class StaticURLInfo(object):
         except AttributeError: # bw compat (for tests)
             registry = get_current_registry()
         registrations = self._get_registrations(registry)
-        for (url, spec, route_name, cachebuster) in registrations:
+        for (url, spec, route_name, cachebust) in registrations:
             if path.startswith(spec):
                 subpath = path[len(spec):]
                 if WIN: # pragma: no cover
                     subpath = subpath.replace('\\', '/') # windows
-                if cachebuster:
-                    subpath, kw = cachebuster(subpath, kw)
+                if cachebust:
+                    subpath, kw = cachebust(subpath, kw)
                 if url is None:
                     kw['subpath'] = subpath
                     return request.route_url(route_name, **kw)
@@ -1955,20 +1955,20 @@ class StaticURLInfo(object):
             # make sure it ends with a slash
             name = name + '/'
 
-        if config.registry.settings.get('pyramid.prevent_cachebuster'):
+        if config.registry.settings.get('pyramid.prevent_cachebust'):
             cb = None
         else:
-            cb = extra.pop('cachebuster', None)
+            cb = extra.pop('cachebust', None)
         if cb is True:
-            cb = self._default_cachebuster()
+            cb = self._default_cachebust()
         if cb:
-            def cachebuster(subpath, kw):
+            def cachebust(subpath, kw):
                 token = cb.token(spec + subpath)
                 subpath_tuple = tuple(subpath.split('/'))
                 subpath_tuple, kw = cb.pregenerate(token, subpath_tuple, kw)
                 return '/'.join(subpath_tuple), kw
         else:
-            cachebuster = None
+            cachebust = None
 
         if url_parse(name).netloc:
             # it's a URL
@@ -2026,7 +2026,7 @@ class StaticURLInfo(object):
                 registrations.pop(idx)
 
             # url, spec, route_name
-            registrations.append((url, spec, route_name, cachebuster))
+            registrations.append((url, spec, route_name, cachebust))
 
         intr = config.introspectable('static views',
                                      name,

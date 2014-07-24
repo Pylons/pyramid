@@ -5,7 +5,7 @@ Features
 --------
 
 - Cache busting for static resources has been added and is available via a new
-  argument to ``pyramid.config.Configurator.add_static_view``: ``cachebuster``.
+  argument to ``pyramid.config.Configurator.add_static_view``: ``cachebust``.
 
 Bug Fixes
 ---------

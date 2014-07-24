@@ -3845,12 +3845,12 @@ class TestStaticURLInfo(unittest.TestCase):
         self.assertEqual(result,
                          'http://example.com/abc%20def#La%20Pe%C3%B1a')
 
-    def test_generate_url_cachebuster(self):
-        def cachebuster(subpath, kw):
+    def test_generate_url_cachebust(self):
+        def cachebust(subpath, kw):
             kw['foo'] = 'bar'
             return 'foo' + '/' + subpath, kw
         inst = self._makeOne()
-        registrations = [(None, 'package:path/', '__viewname', cachebuster)]
+        registrations = [(None, 'package:path/', '__viewname', cachebust)]
         inst._get_registrations = lambda *x: registrations
         request = self._makeRequest()
         def route_url(n, **kw):
@@ -3944,28 +3944,28 @@ class TestStaticURLInfo(unittest.TestCase):
     def test_add_cachebust_default(self):
         config = self._makeConfig()
         inst = self._makeOne()
-        inst._default_cachebuster = DummyCacheBuster
-        inst.add(config, 'view', 'mypackage:path', cachebuster=True)
-        cachebuster = config.registry._static_url_registrations[0][3]
-        subpath, kw = cachebuster('some/path', {})
+        inst._default_cachebust = DummyCacheBuster
+        inst.add(config, 'view', 'mypackage:path', cachebust=True)
+        cachebust = config.registry._static_url_registrations[0][3]
+        subpath, kw = cachebust('some/path', {})
         self.assertEqual(subpath, 'some/path')
         self.assertEqual(kw['x'], 'foo')
 
     def test_add_cachebust_prevented(self):
         config = self._makeConfig()
-        config.registry.settings['pyramid.prevent_cachebuster'] = True
+        config.registry.settings['pyramid.prevent_cachebust'] = True
         inst = self._makeOne()
-        inst.add(config, 'view', 'mypackage:path', cachebuster=True)
-        cachebuster = config.registry._static_url_registrations[0][3]
-        self.assertEqual(cachebuster, None)
+        inst.add(config, 'view', 'mypackage:path', cachebust=True)
+        cachebust = config.registry._static_url_registrations[0][3]
+        self.assertEqual(cachebust, None)
 
     def test_add_cachebust_custom(self):
         config = self._makeConfig()
         inst = self._makeOne()
         inst.add(config, 'view', 'mypackage:path',
-                 cachebuster=DummyCacheBuster())
-        cachebuster = config.registry._static_url_registrations[0][3]
-        subpath, kw = cachebuster('some/path', {})
+                 cachebust=DummyCacheBuster())
+        cachebust = config.registry._static_url_registrations[0][3]
+        subpath, kw = cachebust('some/path', {})
         self.assertEqual(subpath, 'some/path')
         self.assertEqual(kw['x'], 'foo')
 

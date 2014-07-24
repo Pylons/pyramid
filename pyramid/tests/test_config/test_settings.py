@@ -131,34 +131,34 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(result['prevent_http_cache'], True)
         self.assertEqual(result['pyramid.prevent_http_cache'], True)
 
-    def test_prevent_cachebuster(self):
+    def test_prevent_cachebust(self):
         settings = self._makeOne({})
-        self.assertEqual(settings['prevent_cachebuster'], False)
-        self.assertEqual(settings['pyramid.prevent_cachebuster'], False)
-        result = self._makeOne({'prevent_cachebuster':'false'})
-        self.assertEqual(result['prevent_cachebuster'], False)
-        self.assertEqual(result['pyramid.prevent_cachebuster'], False)
-        result = self._makeOne({'prevent_cachebuster':'t'})
-        self.assertEqual(result['prevent_cachebuster'], True)
-        self.assertEqual(result['pyramid.prevent_cachebuster'], True)
-        result = self._makeOne({'prevent_cachebuster':'1'})
-        self.assertEqual(result['prevent_cachebuster'], True)
-        self.assertEqual(result['pyramid.prevent_cachebuster'], True)
-        result = self._makeOne({'pyramid.prevent_cachebuster':'t'})
-        self.assertEqual(result['prevent_cachebuster'], True)
-        self.assertEqual(result['pyramid.prevent_cachebuster'], True)
-        result = self._makeOne({}, {'PYRAMID_PREVENT_CACHEBUSTER':'1'})
-        self.assertEqual(result['prevent_cachebuster'], True)
-        self.assertEqual(result['pyramid.prevent_cachebuster'], True)
-        result = self._makeOne({'prevent_cachebuster':'false',
-                                'pyramid.prevent_cachebuster':'1'})
-        self.assertEqual(result['prevent_cachebuster'], True)
-        self.assertEqual(result['pyramid.prevent_cachebuster'], True)
-        result = self._makeOne({'prevent_cachebuster':'false',
-                                'pyramid.prevent_cachebuster':'f'},
-                               {'PYRAMID_PREVENT_CACHEBUSTER':'1'})
-        self.assertEqual(result['prevent_cachebuster'], True)
-        self.assertEqual(result['pyramid.prevent_cachebuster'], True)
+        self.assertEqual(settings['prevent_cachebust'], False)
+        self.assertEqual(settings['pyramid.prevent_cachebust'], False)
+        result = self._makeOne({'prevent_cachebust':'false'})
+        self.assertEqual(result['prevent_cachebust'], False)
+        self.assertEqual(result['pyramid.prevent_cachebust'], False)
+        result = self._makeOne({'prevent_cachebust':'t'})
+        self.assertEqual(result['prevent_cachebust'], True)
+        self.assertEqual(result['pyramid.prevent_cachebust'], True)
+        result = self._makeOne({'prevent_cachebust':'1'})
+        self.assertEqual(result['prevent_cachebust'], True)
+        self.assertEqual(result['pyramid.prevent_cachebust'], True)
+        result = self._makeOne({'pyramid.prevent_cachebust':'t'})
+        self.assertEqual(result['prevent_cachebust'], True)
+        self.assertEqual(result['pyramid.prevent_cachebust'], True)
+        result = self._makeOne({}, {'PYRAMID_PREVENT_CACHEBUST':'1'})
+        self.assertEqual(result['prevent_cachebust'], True)
+        self.assertEqual(result['pyramid.prevent_cachebust'], True)
+        result = self._makeOne({'prevent_cachebust':'false',
+                                'pyramid.prevent_cachebust':'1'})
+        self.assertEqual(result['prevent_cachebust'], True)
+        self.assertEqual(result['pyramid.prevent_cachebust'], True)
+        result = self._makeOne({'prevent_cachebust':'false',
+                                'pyramid.prevent_cachebust':'f'},
+                               {'PYRAMID_PREVENT_CACHEBUST':'1'})
+        self.assertEqual(result['prevent_cachebust'], True)
+        self.assertEqual(result['pyramid.prevent_cachebust'], True)
 
     def test_reload_templates(self):
         settings = self._makeOne({})
