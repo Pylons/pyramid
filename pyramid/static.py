@@ -192,7 +192,7 @@ class Md5AssetTokenGenerator(object):
             self.token_cache[pathspec] = token = _generate_md5(pathspec)
         return token
 
-class PathSegmentCacheBuster(Md5AssetTokenGenerator):
+class PathSegmentMd5CacheBuster(Md5AssetTokenGenerator):
     """
     An implementation of :class:`~pyramid.interfaces.ICacheBuster` which
     inserts an md5 checksum token for cache busting in the path portion of an
@@ -205,17 +205,18 @@ class PathSegmentCacheBuster(Md5AssetTokenGenerator):
     def match(self, subpath):
         return subpath[1:]
 
-class QueryStringCacheBuster(Md5AssetTokenGenerator):
+class QueryStringMd5CacheBuster(Md5AssetTokenGenerator):
     """
-    An implementation of :class:`~pyramid.interfaces.ICacheBuster` which adds a
-    token for cache busting in the query string of an asset URL.  Generated md5
-    checksums are cached in order to speed up subsequent calls.
+    An implementation of :class:`~pyramid.interfaces.ICacheBuster` which adds
+    an md5 checksum token for cache busting in the query string of an asset
+    URL.  Generated md5 checksums are cached in order to speed up subsequent
+    calls.
 
     The optional ``param`` argument determines the name of the parameter added
     to the query string and defaults to ``'x'``.
     """
     def __init__(self, param='x'):
-        super(QueryStringCacheBuster, self).__init__()
+        super(QueryStringMd5CacheBuster, self).__init__()
         self.param = param
 
     def pregenerate(self, token, subpath, kw):
@@ -226,4 +227,21 @@ class QueryStringCacheBuster(Md5AssetTokenGenerator):
             kw['_query'] = tuple(query) + ((self.param, token),)
         return subpath, kw
 
+class QueryStringConstantCacheBuster(QueryStringMd5CacheBuster):
+    """
+    An implementation of :class:`~pyramid.interfaces.ICacheBuster` which adds
+    an arbitrary token for cache busting in the query string of an asset URL.
+
+    The ``token`` parameter is the token string to use for cache busting and
+    will be the same for every request.
+
+    The optional ``param`` argument determines the name of the parameter added
+    to the query string and defaults to ``'x'``.
+    """
+    def __init__(self, token, param='x'):
+        self._token = token
+        self.param = param
+
+    def token(self, pathspec):
+        return self._token
 

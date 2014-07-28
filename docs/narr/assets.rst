@@ -379,25 +379,19 @@ equivalent to:
 .. code-block:: python
    :linenos:
 
-   from pyramid.static import PathSegmentCacheBuster
+   from pyramid.static import PathSegmentMd5CacheBuster
 
    # config is an instance of pyramid.config.Configurator
    config.add_static_view(name='static', path='mypackage:folder/static',
-                          cachebust=PathSegmentCacheBuster())
+                          cachebust=PathSegmentMd5CacheBuster())
 
-:app:`Pyramid` includes two ready to use cache buster implementations: 
-:class:`~pyramid.static.PathSegmentCacheBuster`, which inserts an asset token
-in the path portion of the asset's URL, and 
-:class:`~pyramid.static.QueryStringCacheBuster`, which adds an asset token to
-the query string of the asset's URL.  Both of these classes generate md5 
-checksums as asset tokens.
-
-.. note::
-
-   Many HTTP caching proxy implementations will fail to cache any URL which
-   has a query string. For this reason, you should probably prefer 
-   :class:`~pyramid.static.PathSegmentCacheBuster` to 
-   :class:`~pyramid.static.QueryStringCacheBuster`.
+:app:`Pyramid` includes a handful of ready to use cache buster implementations:
+:class:`~pyramid.static.PathSegmentMd5CacheBuster`, which inserts an md5
+checksum token in the path portion of the asset's URL,
+:class:`~pyramid.static.QueryStringMd5CacheBuster`, which adds an md5 checksum
+token to the query string of the asset's URL, and
+:class:`~pyramid.static.QueryStringConstantCacheBuster`, which adds an
+arbitrary token you provide to the query string of the asset's URL.  
 
 In order to implement your own cache buster, you can write your own class from
 scratch which implements the :class:`~pyramid.interfaces.ICacheBuster`
@@ -405,22 +399,65 @@ interface.  Alternatively you may choose to subclass one of the existing
 implementations.  One of the most likely scenarios is you'd want to change the
 way the asset token is generated.  To do this just subclass an existing
 implementation and replace the :meth:`~pyramid.interfaces.ICacheBuster.token`
-method.  Here is an example which just uses a global setting for the asset
-token:
+method.  Here is an example which just uses Git to get the hash of the 
+currently checked out code:
 
 .. code-block:: python
    :linenos:
-    
-   from pyramid.static import PathSegmentCacheBuster
 
-   class MyCacheBuster(PathSegmentCacheBuster):
+   import os
+   import subprocess
+   from pyramid.static import PathSegmentMd5CacheBuster
 
-       def __init__(self, config):
-           # config is an instance of pyramid.config.Configurator
-           self._token = config.registry.settings['myapp.cachebust_token']
+   class GitCacheBuster(PathSegmentMd5CacheBuster):
+       """
+       Assuming your code is installed as a Git checkout, as opposed to as an
+       egg from an egg repository like PYPI, you can use this cachebuster to
+       get the current commit's SHA1 to use as the cache bust token.
+       """
+       def __init__(self):
+           here = os.path.dirname(os.path.abspath(__file__))
+           self.sha1 = subprocess.check_output(
+               ['git', 'rev-parse', 'HEAD'],
+               cwd=here).strip()
 
        def token(self, pathspec):
-           return self._token
+           return self.sha1
+   
+Choosing a Cache Buster
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The default cache buster implementation, 
+:class:`~pyramid.static.PathSegmentMd5CacheBuster`, works very well assuming 
+that you're using :app:`Pyramid` to serve your static assets.  The md5 checksum
+is fine grained enough that browsers should only request new versions of 
+specific assets that have changed.  Many caching HTTP proxies will fail to 
+cache a resource if the URL contains a query string.  In general, therefore, 
+you should prefer a cache busting strategy which modifies the path segment to
+a strategy which adds a query string.  
+
+It is possible, however, that your static assets are being served by another
+web server or externally on a CDN.  In these cases modifying the path segment
+for a static asset URL would cause the external service to fail to find the
+asset, causing your customer to get a 404.  In these cases you would need to 
+fall back to a cache buster which adds a query string.  It is even possible 
+that there isn't a copy of your static assets available to the :app:`Pyramid`
+application, so a cache busting implementation that generates md5 checksums
+would fail since it can't access the assets.  In such a case, 
+:class:`~pyramid.static.QueryStringConstantCacheBuster` is a reasonable 
+fallback.  The following code would set up a cachebuster that just uses the 
+time at start up as a cachebust token:
+
+.. code-block:: python
+   :linenos:
+
+   import time
+   from pyramid.static import QueryStringConstantCacheBuster
+
+   config.add_static_view(
+       name='http://mycdn.example.com/', 
+       path='mypackage:static',
+       cachebust=QueryStringConstantCacheBuster(str(time.time())))
 
 .. index::
    single: static assets view

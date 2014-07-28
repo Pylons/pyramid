@@ -420,10 +420,10 @@ class TestMd5AssetTokenGenerator(unittest.TestCase):
         token = fut(self.fspath)
         self.assertEqual(token, expected)
 
-class TestPathSegmentCacheBuster(unittest.TestCase):
+class TestPathSegmentMd5CacheBuster(unittest.TestCase):
 
     def _makeOne(self):
-        from pyramid.static import PathSegmentCacheBuster as cls
+        from pyramid.static import PathSegmentMd5CacheBuster as cls
         inst = cls()
         inst.token = lambda pathspec: 'foo'
         return inst
@@ -440,15 +440,53 @@ class TestPathSegmentCacheBuster(unittest.TestCase):
         fut = self._makeOne().match
         self.assertEqual(fut(('foo', 'bar')), ('bar',))
 
-class TestQueryStringCacheBuster(unittest.TestCase):
+class TestQueryStringMd5CacheBuster(unittest.TestCase):
 
     def _makeOne(self, param=None):
-        from pyramid.static import QueryStringCacheBuster as cls
+        from pyramid.static import QueryStringMd5CacheBuster as cls
         if param:
             inst = cls(param)
         else:
             inst = cls()
         inst.token = lambda pathspec: 'foo'
+        return inst
+
+    def test_token(self):
+        fut = self._makeOne().token
+        self.assertEqual(fut('whatever'), 'foo')
+
+    def test_pregenerate(self):
+        fut = self._makeOne().pregenerate
+        self.assertEqual(
+            fut('foo', ('bar',), {}),
+            (('bar',), {'_query': {'x': 'foo'}}))
+
+    def test_pregenerate_change_param(self):
+        fut = self._makeOne('y').pregenerate
+        self.assertEqual(
+            fut('foo', ('bar',), {}),
+            (('bar',), {'_query': {'y': 'foo'}}))
+
+    def test_pregenerate_query_is_already_tuples(self):
+        fut = self._makeOne().pregenerate
+        self.assertEqual(
+            fut('foo', ('bar',), {'_query': [('a', 'b')]}),
+            (('bar',), {'_query': (('a', 'b'), ('x', 'foo'))}))
+
+    def test_pregenerate_query_is_tuple_of_tuples(self):
+        fut = self._makeOne().pregenerate
+        self.assertEqual(
+            fut('foo', ('bar',), {'_query': (('a', 'b'),)}),
+            (('bar',), {'_query': (('a', 'b'), ('x', 'foo'))}))
+
+class TestQueryStringConstantCacheBuster(TestQueryStringMd5CacheBuster):
+
+    def _makeOne(self, param=None):
+        from pyramid.static import QueryStringConstantCacheBuster as cls
+        if param:
+            inst = cls('foo', param)
+        else:
+            inst = cls('foo')
         return inst
 
     def test_token(self):

@@ -34,7 +34,7 @@ from pyramid.interfaces import (
     )
 
 from pyramid import renderers
-from pyramid.static import PathSegmentCacheBuster
+from pyramid.static import PathSegmentMd5CacheBuster
 
 from pyramid.compat import (
     string_types,
@@ -1894,7 +1894,7 @@ def isexception(o):
 @implementer(IStaticURLInfo)
 class StaticURLInfo(object):
     # Indirection for testing
-    _default_cachebust = PathSegmentCacheBuster
+    _default_cachebust = PathSegmentMd5CacheBuster
 
     def _get_registrations(self, registry):
         try:
