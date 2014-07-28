@@ -53,7 +53,7 @@ class TestFileResponse(unittest.TestCase):
     def test_without_content_type(self):
         for suffix, content_type in (
             ('txt', 'text/plain; charset=UTF-8'),
-            ('xml', 'application/xml; charset=UTF-8'),
+            ('xml', 'text/xml; charset=UTF-8'),
             ('pdf', 'application/pdf')
         ):
             path = self._getPath(suffix)
