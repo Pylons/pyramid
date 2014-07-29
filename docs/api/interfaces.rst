@@ -86,3 +86,5 @@ Other Interfaces
   .. autointerface:: IResourceURL
      :members:
 
+  .. autointerface:: ICacheBuster
+     :members:
