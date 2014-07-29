@@ -1172,6 +1172,8 @@ class ICacheBuster(Interface):
     a static asset, modifying a static asset URL to include a cache bust token,
     and, optionally, unmodifying a static asset URL in order to look up an
     asset.  See :ref:`cache_busting`.
+
+    .. versionadded:: 1.6
     """
     def token(pathspec):
         """

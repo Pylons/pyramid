@@ -294,6 +294,8 @@ could be used.
 Cache Busting
 -------------
 
+.. versionadded:: 1.6
+
 In order to maximize performance of a web application, you generally want to 
 limit the number of times a particular client requests the same static asset.
 Ideally a client would cache a particular static asset "forever", requiring 

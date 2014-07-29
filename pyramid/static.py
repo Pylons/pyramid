@@ -198,6 +198,8 @@ class PathSegmentMd5CacheBuster(Md5AssetTokenGenerator):
     inserts an md5 checksum token for cache busting in the path portion of an
     asset URL.  Generated md5 checksums are cached in order to speed up
     subsequent calls.
+
+    .. versionadded:: 1.6
     """
     def pregenerate(self, token, subpath, kw):
         return (token,) + subpath, kw
@@ -214,6 +216,8 @@ class QueryStringMd5CacheBuster(Md5AssetTokenGenerator):
 
     The optional ``param`` argument determines the name of the parameter added
     to the query string and defaults to ``'x'``.
+
+    .. versionadded:: 1.6
     """
     def __init__(self, param='x'):
         super(QueryStringMd5CacheBuster, self).__init__()
@@ -237,6 +241,8 @@ class QueryStringConstantCacheBuster(QueryStringMd5CacheBuster):
 
     The optional ``param`` argument determines the name of the parameter added
     to the query string and defaults to ``'x'``.
+
+    .. versionadded:: 1.6
     """
     def __init__(self, token, param='x'):
         self._token = token

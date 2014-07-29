@@ -165,6 +165,8 @@ Prevent the ``cachebust`` static view configuration argument from having any
 effect globally in this process when this value is true.  No cache buster will
 be configured or used when this is true.  
 
+.. versionadded:: 1.6
+
 .. seealso::
 
     See also :ref:`cache_busting`.
