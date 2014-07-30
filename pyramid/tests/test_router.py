@@ -522,7 +522,7 @@ class TestRouter(unittest.TestCase):
         def view(context, request):
             def callback(request, response):
                 response.called_back = True
-            request.response_callbacks = [callback]
+            request.add_response_callback(callback)
             return response
         environ = self._makeEnviron()
         self._registerView(view, '', IViewClassifier, IRequest, IContext)
@@ -545,7 +545,7 @@ class TestRouter(unittest.TestCase):
         def view(context, request):
             def callback(request):
                 request.environ['called_back'] = True
-            request.finished_callbacks = [callback]
+            request.add_finished_callback(callback)
             return response
         environ = self._makeEnviron()
         self._registerView(view, '', IViewClassifier, IRequest, IContext)
@@ -567,7 +567,7 @@ class TestRouter(unittest.TestCase):
         def view(context, request):
             def callback(request):
                 request.environ['called_back'] = True
-            request.finished_callbacks = [callback]
+            request.add_finished_callback(callback)
             raise NotImplementedError
         environ = self._makeEnviron()
         self._registerView(view, '', IViewClassifier, IRequest, IContext)
