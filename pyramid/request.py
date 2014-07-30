@@ -32,8 +32,8 @@ class TemplateContext(object):
     pass
 
 class CallbackMethodsMixin(object):
-    response_callbacks = ()
-    finished_callbacks = ()
+    response_callbacks = None
+    finished_callbacks = None
     def add_response_callback(self, callback):
         """
         Add a callback to the set of callbacks to be called by the
@@ -72,7 +72,7 @@ class CallbackMethodsMixin(object):
         """
 
         callbacks = self.response_callbacks
-        if callbacks == ():
+        if callbacks is None:
             callbacks = []
         callbacks.append(callback)
         self.response_callbacks = callbacks
@@ -132,7 +132,7 @@ class CallbackMethodsMixin(object):
         """
 
         callbacks = self.finished_callbacks
-        if callbacks == ():
+        if callbacks is None:
             callbacks = []
         callbacks.append(callback)
         self.finished_callbacks = callbacks
