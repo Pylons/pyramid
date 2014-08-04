@@ -1186,10 +1186,6 @@ class ViewsConfiguratorMixin(object):
         predlist = self.get_predlist('view')
 
         def register(permission=permission, renderer=renderer):
-            # the discrim_func above is guaranteed to have been called already
-            order = view_intr['order']
-            preds = view_intr['predicates']
-            phash = view_intr['phash']
             request_iface = IRequest
             if route_name is not None:
                 request_iface = self.registry.queryUtility(IRouteRequest,
