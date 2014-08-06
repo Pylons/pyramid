@@ -59,8 +59,8 @@ class CallbackMethodsMixin(object):
         called if an exception happens in application code, or if the
         response object returned by :term:`view` code is invalid.
 
-        All response callbacks are called *after* the
-        :class:`pyramid.events.NewResponse` event is sent.
+        All response callbacks are called *after* the tweens and 
+        *before* the :class:`pyramid.events.NewResponse` event is sent.
 
         Errors raised by callbacks are not handled specially.  They
         will be propagated to the caller of the :app:`Pyramid`

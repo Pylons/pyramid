@@ -801,8 +801,9 @@ Glossary
      application.
 
    Lingua
-     A package by Wichert Akkerman which provides :term:`Babel` message
-     extractors for Python source files and Chameleon ZPT template files.
+     A package by Wichert Akkerman which provides the ``pot-create``
+     command to extract translateable messages from Python sources
+     and Chameleon ZPT template files.
 
    Message Identifier
      A string used as a translation lookup key during localization.
@@ -935,7 +936,7 @@ Glossary
      `Akhet <http://docs.pylonsproject.org/projects/akhet/en/latest/>`_ is a 
      Pyramid library and demo application with a Pylons-like feel.
      It's most known for its former application scaffold, which helped 
-     users transition from Pylons and those prefering a more Pylons-like API.
+     users transition from Pylons and those preferring a more Pylons-like API.
      The scaffold has been retired but the demo plays a similar role. 
 
    Pyramid Cookbook

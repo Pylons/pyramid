@@ -245,88 +245,70 @@ GNU gettext uses three types of files in the translation framework,
 
   A ``.po`` file is turned into a machine-readable binary file, which
   is the ``.mo`` file. Compiling the translations to machine code
-  makes the localized program run faster.
+  makes the localized program start faster.
 
 The tools for working with :term:`gettext` translation files related to a
-:app:`Pyramid` application is :term:`Babel` and :term:`Lingua`.  Lingua is a
-Babel extension that provides support for scraping i18n references out of
-Python and Chameleon files.
+:app:`Pyramid` application are :term:`Lingua` and :term:`Gettext`. Lingua
+can scrape i18n references out of Python and Chameleon files and create
+the ``.pot`` file. Gettext includes ``msgmerge`` tool to update a ``.po`` file
+from an updated ``.pot`` file and ``msgfmt`` to compile ``.po`` files to
+``.mo`` files.
 
 .. index::
-   single: Babel
+   single: Gettext
    single: Lingua
 
 .. _installing_babel:
 
-Installing Babel and Lingua
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Installing Lingua and Gettext
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In order for the commands related to working with ``gettext`` translation
-files to work properly, you will need to have :term:`Babel` and
-:term:`Lingua` installed into the same environment in which :app:`Pyramid` is
+files to work properly, you will need to have :term:`Lingua` and
+:term:`Gettext` installed into the same environment in which :app:`Pyramid` is
 installed.
 
 Installation on UNIX
 ++++++++++++++++++++
 
-If the :term:`virtualenv` into which you've installed your :app:`Pyramid`
-application lives in ``/my/virtualenv``, you can install Babel and Lingua
+Gettext is often already installed on UNIX systems. You can check if it is
+installed by testing if the ``msgfmt`` command is available. If it is not
+available you can install it through the packaging system from your OS;
+the package name is almost always ``gettext``. For example on a Debian or
+Ubuntu system run this command:
+
+.. code-block:: text
+
+   $ sudo apt-get install gettext
+
+Installing Lingua is done with the Python packaging tools. If the
+:term:`virtualenv` into which you've installed your :app:`Pyramid` application
+lives in ``/my/virtualenv``, you can install Lingua
 like so:
 
 .. code-block:: text
 
    $ cd /my/virtualenv
-   $ $VENV/bin/easy_install Babel lingua
+   $ $VENV/bin/easy_install lingua
 
 Installation on Windows
 +++++++++++++++++++++++
 
-If the :term:`virtualenv` into which you've installed your :app:`Pyramid`
-application lives in ``C:\my\virtualenv``, you can install Babel and Lingua
-like so:
+There are several ways to install Gettext on Windows: it is included in the
+`Cygwin <http://www.cygwin.com/>`_ collection, or you can use the `installer
+from the GnuWin32 <http://gnuwin32.sourceforge.net/packages/gettext.htm>`_
+or compile it yourself. Make sure the installation path is added to your
+``$PATH``.
+
+
+Installing Lingua is done with the Python packaging tools. If the
+:term:`virtualenv` into which you've installed your :app:`Pyramid` application
+lives in ``C:\my\virtualenv``, you can install Lingua like so:
 
 .. code-block:: text
 
-   C> %VENV%\Scripts\easy_install Babel lingua
+   C> %VENV%\Scripts\easy_install lingua
 
-.. index::
-   single: Babel; message extractors
-   single: Lingua
-
-Changing the ``setup.py``
-+++++++++++++++++++++++++
-
-You need to add a few boilerplate lines to your application's ``setup.py``
-file in order to properly generate :term:`gettext` files from your
-application.
-
-.. note:: See :ref:`project_narr` to learn about the
-  composition of an application's ``setup.py`` file.
-
-In particular, add the ``Babel`` and ``lingua`` distributions to the
-``install_requires`` list and insert a set of references to :term:`Babel`
-*message extractors* within the call to :func:`setuptools.setup` inside your
-application's ``setup.py`` file:
-
-.. code-block:: python
-    :linenos:
-
-    setup(name="mypackage",
-          # ...
-          install_requires = [
-                # ...
-                'Babel',
-                'lingua',
-                ],
-          message_extractors = { '.': [
-                ('**.py',   'lingua_python', None ),
-                ('**.pt',   'lingua_xml', None ),
-                ]},
-          )
-
-The ``message_extractors`` stanza placed into the ``setup.py`` file causes
-the :term:`Babel` message catalog extraction machinery to also consider
-``*.pt`` files when doing message id extraction.
 
 .. index::
    pair: extracting; messages
@@ -336,90 +318,20 @@ the :term:`Babel` message catalog extraction machinery to also consider
 Extracting Messages from Code and Templates
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Once Babel and Lingua are installed and your application's ``setup.py`` file
-has the correct message extractor references, you may extract a message
-catalog template from the code and :term:`Chameleon` templates which reside
-in your :app:`Pyramid` application.  You run a ``setup.py`` command to
-extract the messages:
+Once Lingua is installed you may extract a message catalog template from the
+code and :term:`Chameleon` templates which reside in your :app:`Pyramid`
+application.  You run a ``pot-create`` command to extract the messages:
 
 .. code-block:: text
 
    $ cd /place/where/myapplication/setup.py/lives
    $ mkdir -p myapplication/locale
-   $ $VENV/bin/python setup.py extract_messages
+   $ $VENV/bin/pot-create -o myapplication/locale/myapplication.pot src
 
 The message catalog ``.pot`` template will end up in:
 
 ``myapplication/locale/myapplication.pot``.
 
-.. index::
-   single: translation domains
-
-Translation Domains
-+++++++++++++++++++
-
-The name ``myapplication`` above in the filename ``myapplication.pot``
-denotes the :term:`translation domain` of the translations that must
-be performed to localize your application.  By default, the
-translation domain is the :term:`project` name of your
-:app:`Pyramid` application.
-
-To change the translation domain of the extracted messages in your project,
-edit the ``setup.cfg`` file of your application, The default ``setup.cfg``
-file of a ``pcreate`` -generated :app:`Pyramid` application has stanzas in it
-that look something like the following:
-
-.. code-block:: ini
-    :linenos:
-
-    [compile_catalog]
-    directory = myproject/locale
-    domain = MyProject
-    statistics = true
-
-    [extract_messages]
-    add_comments = TRANSLATORS:
-    output_file = myproject/locale/MyProject.pot
-    width = 80
-
-    [init_catalog]
-    domain = MyProject
-    input_file = myproject/locale/MyProject.pot
-    output_dir = myproject/locale
-
-    [update_catalog]
-    domain = MyProject
-    input_file = myproject/locale/MyProject.pot
-    output_dir = myproject/locale
-    previous = true
-
-In the above example, the project name is ``MyProject``.  To indicate
-that you'd like the domain of your translations to be ``mydomain``
-instead, change the ``setup.cfg`` file stanzas to look like so:
-
-.. code-block:: ini
-    :linenos:
-
-    [compile_catalog]
-    directory = myproject/locale
-    domain = mydomain
-    statistics = true
-
-    [extract_messages]
-    add_comments = TRANSLATORS:
-    output_file = myproject/locale/mydomain.pot
-    width = 80
-
-    [init_catalog]
-    domain = mydomain
-    input_file = myproject/locale/mydomain.pot
-    output_dir = myproject/locale
-
-    [update_catalog]
-    domain = mydomain
-    input_file = myproject/locale/mydomain.pot
-    output_dir = myproject/locale
-    previous = true
 
 .. index::
    pair: initializing; message catalog
@@ -432,15 +344,17 @@ Once you've extracted messages into a ``.pot`` file (see
 in the ``.pot`` file, you need to generate at least one ``.po`` file.
 A ``.po`` file represents translations of a particular set of messages
 to a particular locale.  Initialize a ``.po`` file for a specific
-locale from a pre-generated ``.pot`` template by using the ``setup.py
-init_catalog`` command:
+locale from a pre-generated ``.pot`` template by using the ``msginit``
+command from Gettext:
 
 .. code-block:: text
 
    $ cd /place/where/myapplication/setup.py/lives
-   $ $VENV/bin/python setup.py init_catalog -l es
+   $ cd myapplication/locale
+   $ mkdir -p es/LC_MESSAGES
+   $ msginit -l es -o es/LC_MESSAGES/myapplication.po
 
-By default, the message catalog ``.po`` file will end up in:
+This will create a new the message catalog ``.po`` file will in:
 
 ``myapplication/locale/es/LC_MESSAGES/myapplication.po``.
 
@@ -465,12 +379,13 @@ files based on changes to the ``.pot`` file, so that the new and
 changed messages can also be translated or re-translated.
 
 First, regenerate the ``.pot`` file as per :ref:`extracting_messages`.
-Then use the ``setup.py update_catalog`` command.
+Then use the ``msgmerge`` command from Gettext.
 
 .. code-block:: text
 
    $ cd /place/where/myapplication/setup.py/lives
-   $ $VENV/bin/python setup.py update_catalog
+   $ cd myapplication/locale
+   $ msgmerge --update es/LC_MESSAGES/myapplication.po myapplication.pot
 
 .. index::
    pair: compiling; message catalog
@@ -481,16 +396,17 @@ Compiling a Message Catalog File
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Finally, to prepare an application for performing actual runtime
-translations, compile ``.po`` files to ``.mo`` files:
+translations, compile ``.po`` files to ``.mo`` files use the ``msgfmt``
+command from Gettext:
 
 .. code-block:: text
 
    $ cd /place/where/myapplication/setup.py/lives
-   $ $VENV/bin/python setup.py compile_catalog
+   $ msgfmt -o myapplication/locale/es/LC_MESSAGES/myapplication.mo myapplication/locale/es/LC_MESSAGES/myapplication.po
 
 This will create a ``.mo`` file for each ``.po`` file in your
 application.  As long as the :term:`translation directory` in which
-the ``.mo`` file ends up in is configured into your application, these
+the ``.mo`` file ends up in is configured into your application (see :ref:`adding_a_translation_directory`), these
 translations will be available to :app:`Pyramid`.
 
 .. index::

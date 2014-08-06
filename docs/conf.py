@@ -57,8 +57,9 @@ extensions = [
 
 # Looks for objects in external projects
 intersphinx_mapping = {
-    'tutorials': ('http://docs.pylonsproject.org/projects/pyramid_tutorials/en/latest/', None),
-    'jinja2': ('http://docs.pylonsproject.org/projects/pyramid_jinja2/en/latest/', None),
+    'tutorials': ('http://docs.pylonsproject.org/projects/pyramid-tutorials/en/latest/', None),
+    'cookbook': ('http://docs.pylonsproject.org/projects/pyramid-cookbook/en/latest/', None),
+    'jinja2': ('http://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/', None),
     'tm': (
         'http://docs.pylonsproject.org/projects/pyramid_tm/en/latest/',
         None,
@@ -82,10 +83,10 @@ intersphinx_mapping = {
     'venusian':
         ('http://docs.pylonsproject.org/projects/venusian/en/latest', None),
     'toolbar':
-        ('http://docs.pylonsproject.org/projects/pyramid_debugtoolbar/en/latest',
+        ('http://docs.pylonsproject.org/projects/pyramid-debugtoolbar/en/latest',
          None),
     'zcml':
-        ('http://docs.pylonsproject.org/projects/pyramid_zcml/en/latest',
+        ('http://docs.pylonsproject.org/projects/pyramid-zcml/en/latest',
          None),
 }
 
@@ -138,17 +139,21 @@ if book:
 # Add and use Pylons theme
 if 'sphinx-build' in ' '.join(sys.argv):  # protect against dumb importers
     from subprocess import call, Popen, PIPE
-
-    p = Popen('which git', shell=True, stdout=PIPE)
     cwd = os.getcwd()
-    _themes = os.path.join(cwd, '_themes')
+    p = Popen('which git', shell=True, stdout=PIPE)
+    here = os.path.abspath(os.path.dirname(__file__))
+    parent = os.path.abspath(os.path.dirname(here))
+    _themes = os.path.join(here, '_themes')
     git = p.stdout.read().strip()
-    if not os.listdir(_themes):
-        call([git, 'submodule', '--init'])
-    else:
-        call([git, 'submodule', 'update'])
-
-    sys.path.append(os.path.abspath('_themes'))
+    try:
+        os.chdir(parent)
+        if not os.listdir(_themes):
+            call([git, 'submodule', '--init'])
+        else:
+            call([git, 'submodule', 'update'])
+        sys.path.append(_themes)
+    finally:
+        os.chdir(cwd)
 
 html_theme_path = ['_themes']
 html_theme = 'pyramid'

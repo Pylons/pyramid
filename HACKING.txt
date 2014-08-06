@@ -31,7 +31,7 @@ By Hand
    $ cd hack-on-pyramid
    # Configure remotes such that you can pull changes from the Pyramid
    # repository into your local repository.
-   $ git remote add upstream git@github.com:Pylons/pyramid.git
+   $ git remote add upstream https://github.com:Pylons/pyramid.git
    # fetch and merge changes from upstream into master
    $ git fetch upstream
    $ git merge upstream/master
@@ -149,7 +149,7 @@ Coding Style
 ------------
 
 - PEP8 compliance.  Whitespace rules are relaxed: not necessary to put
-  2 newlines between classes.  But 80-column lines, in particular, are
+  2 newlines between classes.  But 79-column lines, in particular, are
   mandatory.  See
   http://docs.pylonsproject.org/en/latest/community/codestyle.html for more
   information.

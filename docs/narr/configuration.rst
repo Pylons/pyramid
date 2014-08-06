@@ -114,7 +114,6 @@ in a package and its subpackages.  For example:
        return Response('Hello')
 
    if __name__ == '__main__':
-       from pyramid.config import Configurator
        config = Configurator()
        config.scan()
        app = config.make_wsgi_app()

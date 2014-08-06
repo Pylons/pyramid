@@ -45,12 +45,6 @@ Steps
    .. literalinclude:: jinja2/tutorial/home.jinja2
     :language: html
 
-#. Get the ``pyramid.includes`` into the functional test setup in
-   ``jinja2/tutorial/tests.py``:
-
-   .. literalinclude:: jinja2/tutorial/tests.py
-    :linenos:
-
 #. Now run the tests:
 
    .. code-block:: bash
@@ -88,9 +82,9 @@ Extra Credit
    dependency manually. What is another way we could have made the
    association?
 
-#. We used ``development.ini`` to get the :term:`configurator` to
-   load ``pyramid_jinja2``'s configuration. What is another way could
-   include it into the config?
+#. We used ``config.include`` which is an imperative configuration to get the
+   :term:`Configurator` to load ``pyramid_jinja2``'s configuration. 
+   What is another way could include it into the config?
 
 .. seealso:: `Jinja2 homepage <http://jinja.pocoo.org/>`_,
    and

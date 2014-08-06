@@ -408,6 +408,8 @@ Here are some highlights:
     The content type *not* including the ``charset`` parameter.
     Typical use: ``response.content_type = 'text/html'``.
 
+    Default value: ``response.content_type = 'text/html'``.
+
 ``response.charset``:
     The ``charset`` parameter of the content-type, it also informs
     encoding in ``response.unicode_body``.
@@ -466,9 +468,12 @@ argument to the class; e.g.:
   from pyramid.response import Response
   response = Response(body='hello world!', content_type='text/plain')
 
-The status defaults to ``'200 OK'``.  The content_type does not default to
-anything, though if you subclass :class:`pyramid.response.Response` and set
-``default_content_type`` you can override this behavior.
+The status defaults to ``'200 OK'``.
+
+The value of content_type defaults to
+``webob.response.Response.default_content_type``; which is `text/html`.
+You can subclass :class:`pyramid.response.Response` and set
+``default_content_type`` to override this behavior.
 
 .. index::
    single: exception responses

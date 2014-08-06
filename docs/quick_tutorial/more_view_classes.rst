@@ -34,7 +34,7 @@ that determine which view is matched to a request, based on factors
 such as the request method, the form parameters, etc. These predicates
 provide many axes of flexibility.
 
-The following shows a simple example with four operations operations:
+The following shows a simple example with four operations:
 view a home page which leads to a form, save a change,
 and press the delete button.
 

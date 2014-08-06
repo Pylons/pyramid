@@ -26,7 +26,7 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
         if kw is not None:
             environ.update(kw)
         return Request(environ=environ)
-    
+
     def test_ctor_defaultargs(self):
         inst = self._makeOne('package:resource_name')
         self.assertEqual(inst.package_name, 'package')
@@ -106,6 +106,14 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
     def test_resource_is_file(self):
         inst = self._makeOne('pyramid.tests:fixtures/static')
         request = self._makeRequest({'PATH_INFO':'/index.html'})
+        context = DummyContext()
+        response = inst(context, request)
+        self.assertTrue(b'<html>static</html>' in response.body)
+
+    def test_cachebust_match(self):
+        inst = self._makeOne('pyramid.tests:fixtures/static')
+        inst.cachebust_match = lambda subpath: subpath[1:]
+        request = self._makeRequest({'PATH_INFO':'/foo/index.html'})
         context = DummyContext()
         response = inst(context, request)
         self.assertTrue(b'<html>static</html>' in response.body)
@@ -218,7 +226,7 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
         if kw is not None:
             environ.update(kw)
         return Request(environ=environ)
-    
+
     def test_ctor_defaultargs(self):
         inst = self._makeOne('package:resource_name')
         self.assertEqual(inst.package_name, 'package')
@@ -273,7 +281,7 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
         context = DummyContext()
         from pyramid.httpexceptions import HTTPNotFound
         self.assertRaises(HTTPNotFound, inst, context, request)
-        
+
     def test_oob_os_sep(self):
         import os
         inst = self._makeOne('pyramid.tests:fixtures/static')
@@ -359,6 +367,155 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
         context = DummyContext()
         from pyramid.httpexceptions import HTTPNotFound
         self.assertRaises(HTTPNotFound, inst, context, request)
+
+class TestMd5AssetTokenGenerator(unittest.TestCase):
+    _fspath = None
+    _tmp = None
+
+    @property
+    def fspath(self):
+        if self._fspath:
+            return self._fspath
+
+        import os
+        import tempfile
+        self._tmp = tmp = tempfile.mkdtemp()
+        self._fspath = os.path.join(tmp, 'test.txt')
+        return self._fspath
+
+    def tearDown(self):
+        import shutil
+        if self._tmp:
+            shutil.rmtree(self._tmp)
+
+    def _makeOne(self):
+        from pyramid.static import Md5AssetTokenGenerator as cls
+        return cls()
+
+    def test_package_resource(self):
+        fut = self._makeOne().token
+        expected = '76d653a3a044e2f4b38bb001d283e3d9'
+        token = fut('pyramid.tests:fixtures/static/index.html')
+        self.assertEqual(token, expected)
+
+    def test_filesystem_resource(self):
+        fut = self._makeOne().token
+        expected = 'd5155f250bef0e9923e894dbc713c5dd'
+        with open(self.fspath, 'w') as f:
+            f.write("Are we rich yet?")
+        token = fut(self.fspath)
+        self.assertEqual(token, expected)
+
+    def test_cache(self):
+        fut = self._makeOne().token
+        expected = 'd5155f250bef0e9923e894dbc713c5dd'
+        with open(self.fspath, 'w') as f:
+            f.write("Are we rich yet?")
+        token = fut(self.fspath)
+        self.assertEqual(token, expected)
+
+        # md5 shouldn't change because we've cached it
+        with open(self.fspath, 'w') as f:
+            f.write("Sorry for the convenience.")
+        token = fut(self.fspath)
+        self.assertEqual(token, expected)
+
+class TestPathSegmentMd5CacheBuster(unittest.TestCase):
+
+    def _makeOne(self):
+        from pyramid.static import PathSegmentMd5CacheBuster as cls
+        inst = cls()
+        inst.token = lambda pathspec: 'foo'
+        return inst
+
+    def test_token(self):
+        fut = self._makeOne().token
+        self.assertEqual(fut('whatever'), 'foo')
+
+    def test_pregenerate(self):
+        fut = self._makeOne().pregenerate
+        self.assertEqual(fut('foo', ('bar',), 'kw'), (('foo', 'bar'), 'kw'))
+
+    def test_match(self):
+        fut = self._makeOne().match
+        self.assertEqual(fut(('foo', 'bar')), ('bar',))
+
+class TestQueryStringMd5CacheBuster(unittest.TestCase):
+
+    def _makeOne(self, param=None):
+        from pyramid.static import QueryStringMd5CacheBuster as cls
+        if param:
+            inst = cls(param)
+        else:
+            inst = cls()
+        inst.token = lambda pathspec: 'foo'
+        return inst
+
+    def test_token(self):
+        fut = self._makeOne().token
+        self.assertEqual(fut('whatever'), 'foo')
+
+    def test_pregenerate(self):
+        fut = self._makeOne().pregenerate
+        self.assertEqual(
+            fut('foo', ('bar',), {}),
+            (('bar',), {'_query': {'x': 'foo'}}))
+
+    def test_pregenerate_change_param(self):
+        fut = self._makeOne('y').pregenerate
+        self.assertEqual(
+            fut('foo', ('bar',), {}),
+            (('bar',), {'_query': {'y': 'foo'}}))
+
+    def test_pregenerate_query_is_already_tuples(self):
+        fut = self._makeOne().pregenerate
+        self.assertEqual(
+            fut('foo', ('bar',), {'_query': [('a', 'b')]}),
+            (('bar',), {'_query': (('a', 'b'), ('x', 'foo'))}))
+
+    def test_pregenerate_query_is_tuple_of_tuples(self):
+        fut = self._makeOne().pregenerate
+        self.assertEqual(
+            fut('foo', ('bar',), {'_query': (('a', 'b'),)}),
+            (('bar',), {'_query': (('a', 'b'), ('x', 'foo'))}))
+
+class TestQueryStringConstantCacheBuster(TestQueryStringMd5CacheBuster):
+
+    def _makeOne(self, param=None):
+        from pyramid.static import QueryStringConstantCacheBuster as cls
+        if param:
+            inst = cls('foo', param)
+        else:
+            inst = cls('foo')
+        return inst
+
+    def test_token(self):
+        fut = self._makeOne().token
+        self.assertEqual(fut('whatever'), 'foo')
+
+    def test_pregenerate(self):
+        fut = self._makeOne().pregenerate
+        self.assertEqual(
+            fut('foo', ('bar',), {}),
+            (('bar',), {'_query': {'x': 'foo'}}))
+
+    def test_pregenerate_change_param(self):
+        fut = self._makeOne('y').pregenerate
+        self.assertEqual(
+            fut('foo', ('bar',), {}),
+            (('bar',), {'_query': {'y': 'foo'}}))
+
+    def test_pregenerate_query_is_already_tuples(self):
+        fut = self._makeOne().pregenerate
+        self.assertEqual(
+            fut('foo', ('bar',), {'_query': [('a', 'b')]}),
+            (('bar',), {'_query': (('a', 'b'), ('x', 'foo'))}))
+
+    def test_pregenerate_query_is_tuple_of_tuples(self):
+        fut = self._makeOne().pregenerate
+        self.assertEqual(
+            fut('foo', ('bar',), {'_query': (('a', 'b'),)}),
+            (('bar',), {'_query': (('a', 'b'), ('x', 'foo'))}))
 
 class DummyContext:
     pass

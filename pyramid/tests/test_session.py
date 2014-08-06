@@ -544,7 +544,7 @@ def serialize(data, secret):
     from pyramid.compat import native_
     from pyramid.compat import pickle
     pickled = pickle.dumps(data, pickle.HIGHEST_PROTOCOL)
-    sig = hmac.new(bytes_(secret), pickled, sha1).hexdigest()
+    sig = hmac.new(bytes_(secret, 'utf-8'), pickled, sha1).hexdigest()
     return sig + native_(base64.b64encode(pickled))
 
 class Test_signed_serialize(unittest.TestCase):
@@ -555,6 +555,18 @@ class Test_signed_serialize(unittest.TestCase):
     def test_it(self):
         expected = serialize('123', 'secret')
         result = self._callFUT('123', 'secret')
+        self.assertEqual(result, expected)
+
+    def test_it_with_highorder_secret(self):
+        secret = b'\xce\xb1\xce\xb2\xce\xb3\xce\xb4'.decode('utf-8')
+        expected = serialize('123', secret)
+        result = self._callFUT('123', secret)
+        self.assertEqual(result, expected)
+
+    def test_it_with_latin1_secret(self):
+        secret = b'La Pe\xc3\xb1a'
+        expected = serialize('123', secret)
+        result = self._callFUT('123', secret.decode('latin-1'))
         self.assertEqual(result, expected)
         
 class Test_signed_deserialize(unittest.TestCase):
@@ -586,6 +598,19 @@ class Test_signed_deserialize(unittest.TestCase):
     def test_it_bad_encoding(self):
         serialized = 'bad' + serialize('123', 'secret')
         self.assertRaises(ValueError, self._callFUT, serialized, 'secret')
+
+    def test_it_with_highorder_secret(self):
+        secret = b'\xce\xb1\xce\xb2\xce\xb3\xce\xb4'.decode('utf-8')
+        serialized = serialize('123', secret)
+        result = self._callFUT(serialized, secret)
+        self.assertEqual(result, '123')
+
+    # bwcompat with pyramid <= 1.5b1 where latin1 is the default
+    def test_it_with_latin1_secret(self):
+        secret = b'La Pe\xc3\xb1a'
+        serialized = serialize('123', secret)
+        result = self._callFUT(serialized, secret.decode('latin-1'))
+        self.assertEqual(result, '123')
 
 class Test_check_csrf_token(unittest.TestCase):
     def _callFUT(self, *args, **kwargs):
