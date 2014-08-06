@@ -74,6 +74,11 @@ class PCreateCommand(object):
         if diff:
             self.out('Unavailable scaffolds: %s' % list(diff))
             return 2
+        output_dir = os.path.abspath(os.path.normpath(self.args[0]))
+        if 'pyramid' == os.path.basename(output_dir):
+            self.out("You must change output_dir. Base dir name 'pyramid' is forbidden.")
+            return 2
+
         return self.render_scaffolds()
 
     def render_scaffolds(self):

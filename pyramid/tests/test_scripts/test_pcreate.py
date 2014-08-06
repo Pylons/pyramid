@@ -56,6 +56,18 @@ class TestPCreateCommand(unittest.TestCase):
         out = self.out_.getvalue()
         self.assertTrue(out.startswith('Unavailable scaffolds'))
 
+    def test_output_base_dir_name_pyramid_is_forbidden(self):
+        import os
+        path = os.path.abspath('pyramid')
+        cmd = self._makeOne('-s', 'dummy', path)
+        scaffold = DummyScaffold('dummy')
+        cmd.scaffolds = [scaffold]
+        cmd.pyramid_dist = DummyDist("0.1")
+        result = cmd.run()
+        self.assertEqual(result, 2)
+        out = self.out_.getvalue()
+        self.assertEquals(out, "You must change output_dir. Base dir name 'pyramid' is forbidden.")
+
     def test_known_scaffold_single_rendered(self):
         import os
         cmd = self._makeOne('-s', 'dummy', 'Distro')
