@@ -19,6 +19,7 @@ console.
 
 .. index::
    single: startup process
+   pair: settings; .ini
 
 The Startup Process
 -------------------
