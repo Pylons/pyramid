@@ -294,6 +294,15 @@ use the :term:`pyramid_exclog` package.  Details about its configuration are
 in its `documentation
 <http://docs.pylonsproject.org/projects/pyramid_exclog/dev/>`_.
 
+.. index::
+   single: TransLogger
+   single: middleware; TransLogger
+   pair: configuration; middleware
+   single: settings; middleware
+   pair: .ini; middleware
+
+.. _request_logging_with_pastes_translogger:
+
 Request Logging with Paste's TransLogger 
 ----------------------------------------
 
