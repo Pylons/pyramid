@@ -167,27 +167,28 @@
 
       .. versionadded:: 1.5
 
-      A property which returns the userid of the currently authenticated user
-      or ``None`` if there is no :term:`authentication policy` in effect or
-      there is no currently authenticated user.  This differs from
-      :attr:`~pyramid.request.Request.unauthenticated_userid`, because the
-      effective authentication policy will have ensured that a record
-      associated with the userid exists in persistent storage; if it has
-      not, this value will be ``None``.
+      A property which returns the :term:`userid` of the currently
+      authenticated user or ``None`` if there is no :term:`authentication
+      policy` in effect or there is no currently authenticated user.  This
+      differs from :attr:`~pyramid.request.Request.unauthenticated_userid`,
+      because the effective authentication policy will have ensured that a
+      record associated with the :term:`userid` exists in persistent storage; if it
+      has not, this value will be ``None``.
 
    .. attribute:: unauthenticated_userid
 
       .. versionadded:: 1.5
 
       A property which returns a value which represents the *claimed* (not
-      verified) user id of the credentials present in the request. ``None`` if
-      there is no :term:`authentication policy` in effect or there is no user
-      data associated with the current request.  This differs from
-      :attr:`~pyramid.request.Request.authenticated_userid`, because the
-      effective authentication policy will not ensure that a record associated
-      with the userid exists in persistent storage.  Even if the userid
-      does not exist in persistent storage, this value will be the value
-      of the userid *claimed* by the request data.
+      verified) :term:`userid` of the credentials present in the
+      request. ``None`` if there is no :term:`authentication policy` in effect
+      or there is no user data associated with the current request.  This
+      differs from :attr:`~pyramid.request.Request.authenticated_userid`,
+      because the effective authentication policy will not ensure that a
+      record associated with the :term:`userid` exists in persistent storage.
+      Even if the :term:`userid` does not exist in persistent storage, this
+      value will be the value of the :term:`userid` *claimed* by the request
+      data.
 
    .. attribute:: effective_principals
 
