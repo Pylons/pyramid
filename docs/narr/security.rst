@@ -13,6 +13,11 @@ authorization system can use the credentials in the :term:`request`
 along with the :term:`context` resource to determine if access will be
 allowed.  Here's how it works at a high level:
 
+- A user may or may not have previously visited the application and
+  supplied authentication credentials, including a :term:`userid`.  If
+  so, the application may have called
+  :func:`pyramid.security.remember` to remember these.
+
 - A :term:`request` is generated when a user visits the application.
 
 - Based on the request, a :term:`context` resource is located through
@@ -25,7 +30,9 @@ allowed.  Here's how it works at a high level:
   context as well as other attributes of the request.
 
 - If an :term:`authentication policy` is in effect, it is passed the
-  request; it returns some number of :term:`principal` identifiers.
+  request. Based on the request and the remembered (or lack of)
+  :term:`userid` and related credentials it returns some number of
+  :term:`principal` identifiers.
 
 - If an :term:`authorization policy` is in effect and the :term:`view
   configuration` associated with the view callable that was found has
