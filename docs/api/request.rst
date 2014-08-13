@@ -194,10 +194,12 @@
       .. versionadded:: 1.5
 
       A property which returns the list of 'effective' :term:`principal`
-      identifiers for this request.  This will include the userid of the
-      currently authenticated user if a user is currently authenticated. If no
-      :term:`authentication policy` is in effect, this will return a sequence
-      containing only the :attr:`pyramid.security.Everyone` principal.
+      identifiers for this request.  This list typically includes the
+      :term:`userid` of the currently authenticated user if a user is
+      currently authenticated, but this depends on the
+      :term:`authentication policy` in effect.  If no :term:`authentication
+      policy` is in effect, this will return a sequence containing only the
+      :attr:`pyramid.security.Everyone` principal.
 
    .. method:: invoke_subrequest(request, use_tweens=False)
 

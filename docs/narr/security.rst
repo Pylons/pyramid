@@ -611,9 +611,9 @@ that implements the following interface:
 
        def effective_principals(self, request):
            """ Return a sequence representing the effective principals
-           including the userid and any groups belonged to by the current
-           user, including 'system' groups such as
-           ``pyramid.security.Everyone`` and
+           typically including the userid and any groups belonged to
+           by the current user, always including 'system' groups such
+           as ``pyramid.security.Everyone`` and
            ``pyramid.security.Authenticated``. """
 
        def remember(self, request, principal, **kw):
