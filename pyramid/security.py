@@ -115,12 +115,12 @@ deprecated(
     '"effective_principals" attribute of the Pyramid request instead.'
     )
 
-def remember(request, principal, **kw):
+def remember(request, userid, **kw):
     """
     Returns a sequence of header tuples (e.g. ``[('Set-Cookie', 'foo=abc')]``)
     on this request's response.
     These headers are suitable for 'remembering' a set of credentials
-    implied by the data passed as ``principal`` and ``*kw`` using the
+    implied by the data passed as ``userid`` and ``*kw`` using the
     current :term:`authentication policy`.  Common usage might look
     like so within the body of a view function (``response`` is
     assumed to be a :term:`WebOb` -style :term:`response` object
@@ -142,7 +142,7 @@ def remember(request, principal, **kw):
     policy = _get_authentication_policy(request)
     if policy is None:
         return []
-    return policy.remember(request, principal, **kw)
+    return policy.remember(request, userid, **kw)
 
 def forget(request):
     """

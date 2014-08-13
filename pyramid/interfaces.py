@@ -460,9 +460,9 @@ class IAuthenticationPolicy(Interface):
         user, including 'system' groups such as Everyone and
         Authenticated. """
 
-    def remember(request, principal, **kw):
+    def remember(request, userid, **kw):
         """ Return a set of headers suitable for 'remembering' the
-        principal named ``principal`` when set in a response.  An
+        userid named ``userid`` when set in a response.  An
         individual authentication policy and its consumers can decide
         on the composition and meaning of ``**kw.`` """
 

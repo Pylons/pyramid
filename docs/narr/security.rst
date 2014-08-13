@@ -6,14 +6,35 @@
 Security
 ========
 
-:app:`Pyramid` provides an optional declarative authorization system
-that can prevent a :term:`view` from being invoked based on an
+:app:`Pyramid` provides an optional, declarative, security system.
+Security in :app:`Pyramid`, unlike many systems, cleanly and explicitly
+separates authentication and authorization. Authentication is merely the
+mechanism by which credentials provided in the :term:`request` are
+resolved to one or more :term:`principal` identifiers. These identifiers
+represent the users and groups in effect during the request.
+Authorization then determines access based on the :term:`principal`
+identifiers, the :term:`view callable` being invoked, and the
+:term:`context` resource.
+
+The :app:`Pyramid` authorization system
+can prevent a :term:`view` from being invoked based on an
 :term:`authorization policy`. Before a view is invoked, the
 authorization system can use the credentials in the :term:`request`
 along with the :term:`context` resource to determine if access will be
 allowed.  Here's how it works at a high level:
 
+- A user may or may not have previously visited the application and
+  supplied authentication credentials, including a :term:`userid`.  If
+  so, the application may have called
+  :func:`pyramid.security.remember` to remember these.
+
 - A :term:`request` is generated when a user visits the application.
+
+- If an :term:`authorization policy` is in effect the application uses
+  the request and it's :term:`root factory` to create a :ref:`resource tree
+  <the_resource_tree>` of :term:`contexts <context>`.  The resource
+  tree maps contexts to URLs and within the contexts the application
+  puts declarations which authorize access.
 
 - Based on the request, a :term:`context` resource is located through
   :term:`resource location`.  A context is located differently depending on
@@ -25,7 +46,9 @@ allowed.  Here's how it works at a high level:
   context as well as other attributes of the request.
 
 - If an :term:`authentication policy` is in effect, it is passed the
-  request; it returns some number of :term:`principal` identifiers.
+  request. Based on the request and the remembered (or lack of)
+  :term:`userid` and related credentials it returns some number of
+  :term:`principal` identifiers.
 
 - If an :term:`authorization policy` is in effect and the :term:`view
   configuration` associated with the view callable that was found has
@@ -41,14 +64,6 @@ allowed.  Here's how it works at a high level:
 - If the authorization policy denies access, the view callable is not
   invoked; instead the :term:`forbidden view` is invoked.
 
-Security in :app:`Pyramid`, unlike many systems, cleanly and explicitly
-separates authentication and authorization. Authentication is merely the
-mechanism by which credentials provided in the :term:`request` are
-resolved to one or more :term:`principal` identifiers. These identifiers
-represent the users and groups in effect during the request.
-Authorization then determines access based on the :term:`principal`
-identifiers, the :term:`view callable` being invoked, and the
-:term:`context` resource.
 
 Authorization is enabled by modifying your application to include an
 :term:`authentication policy` and :term:`authorization policy`.
@@ -104,9 +119,9 @@ For example:
 
 The above configuration enables a policy which compares the value of an "auth
 ticket" cookie passed in the request's environment which contains a reference
-to a single :term:`principal` against the principals present in any
-:term:`ACL` found in the resource tree when attempting to call some
-:term:`view`.
+to a single :term:`userid` and matches that userid's principals against the
+principals present in any :term:`ACL` found in the resource tree when
+attempting to call some :term:`view`.
 
 While it is possible to mix and match different authentication and
 authorization policies, it is an error to configure a Pyramid application
@@ -595,32 +610,34 @@ that implements the following interface:
        """ An object representing a Pyramid authentication policy. """
 
        def authenticated_userid(self, request):
-           """ Return the authenticated userid or ``None`` if no
-           authenticated userid can be found. This method of the policy 
-           should ensure that a record exists in whatever persistent store is 
-           used related to the user (the user should not have been deleted); 
-           if a record associated with the current id does not exist in a 
-           persistent store, it should return ``None``."""
+           """ Return the authenticated :term:`userid` or ``None`` if
+           no authenticated userid can be found. This method of the
+           policy should ensure that a record exists in whatever
+           persistent store is used related to the user (the user
+           should not have been deleted); if a record associated with
+           the current id does not exist in a persistent store, it
+           should return ``None``."""
 
        def unauthenticated_userid(self, request):
-           """ Return the *unauthenticated* userid.  This method performs the
-           same duty as ``authenticated_userid`` but is permitted to return the
-           userid based only on data present in the request; it needn't (and
-           shouldn't) check any persistent store to ensure that the user record
-           related to the request userid exists."""
+           """ Return the *unauthenticated* userid.  This method
+           performs the same duty as ``authenticated_userid`` but is
+           permitted to return the userid based only on data present
+           in the request; it needn't (and shouldn't) check any
+           persistent store to ensure that the user record related to
+           the request userid exists."""
 
        def effective_principals(self, request):
            """ Return a sequence representing the effective principals
-           including the userid and any groups belonged to by the current
-           user, including 'system' groups such as
-           ``pyramid.security.Everyone`` and
+           typically including the userid and any groups belonged to
+           by the current user, always including 'system' groups such
+           as ``pyramid.security.Everyone`` and
            ``pyramid.security.Authenticated``. """
 
-       def remember(self, request, principal, **kw):
+       def remember(self, request, userid, **kw):
            """ Return a set of headers suitable for 'remembering' the
-           principal named ``principal`` when set in a response.  An
-           individual authentication policy and its consumers can decide
-           on the composition and meaning of **kw. """
+           userid named ``userid`` when set in a response.  An
+           individual authentication policy and its consumers can
+           decide on the composition and meaning of **kw. """
        
        def forget(self, request):
            """ Return a set of headers suitable for 'forgetting' the
