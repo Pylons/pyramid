@@ -6,8 +6,18 @@
 Security
 ========
 
-:app:`Pyramid` provides an optional declarative authorization system
-that can prevent a :term:`view` from being invoked based on an
+:app:`Pyramid` provides an optional, declarative, security system.
+Security in :app:`Pyramid`, unlike many systems, cleanly and explicitly
+separates authentication and authorization. Authentication is merely the
+mechanism by which credentials provided in the :term:`request` are
+resolved to one or more :term:`principal` identifiers. These identifiers
+represent the users and groups in effect during the request.
+Authorization then determines access based on the :term:`principal`
+identifiers, the :term:`view callable` being invoked, and the
+:term:`context` resource.
+
+The :app:`Pyramid` authorization system
+can prevent a :term:`view` from being invoked based on an
 :term:`authorization policy`. Before a view is invoked, the
 authorization system can use the credentials in the :term:`request`
 along with the :term:`context` resource to determine if access will be
@@ -54,14 +64,6 @@ allowed.  Here's how it works at a high level:
 - If the authorization policy denies access, the view callable is not
   invoked; instead the :term:`forbidden view` is invoked.
 
-Security in :app:`Pyramid`, unlike many systems, cleanly and explicitly
-separates authentication and authorization. Authentication is merely the
-mechanism by which credentials provided in the :term:`request` are
-resolved to one or more :term:`principal` identifiers. These identifiers
-represent the users and groups in effect during the request.
-Authorization then determines access based on the :term:`principal`
-identifiers, the :term:`view callable` being invoked, and the
-:term:`context` resource.
 
 Authorization is enabled by modifying your application to include an
 :term:`authentication policy` and :term:`authorization policy`.
