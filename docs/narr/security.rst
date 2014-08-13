@@ -20,6 +20,12 @@ allowed.  Here's how it works at a high level:
 
 - A :term:`request` is generated when a user visits the application.
 
+- If an :term:`authorization policy` is in effect the application uses
+  the request and it's :term:`root factory` to create a :ref:`resource tree
+  <the_resource_tree>` of :term:`contexts <context>`.  The resource
+  tree maps contexts to URLs and within the contexts the application
+  puts declarations which authorize access.
+
 - Based on the request, a :term:`context` resource is located through
   :term:`resource location`.  A context is located differently depending on
   whether the application uses :term:`traversal` or :term:`URL dispatch`, but
