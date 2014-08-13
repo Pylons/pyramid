@@ -437,38 +437,57 @@ class IViewMapperFactory(Interface):
         invocation signatures and response values.
         """
 
-class IAuthenticationPolicy(Interface):
+class IAuthenticationPolicy(object):
     """ An object representing a Pyramid authentication policy. """
+
     def authenticated_userid(request):
-        """ Return the authenticated userid or ``None`` if no authenticated
-        userid can be found. This method of the policy should ensure that a
-        record exists in whatever persistent store is used related to the
-        user (the user should not have been deleted); if a record associated
-        with the current id does not exist in a persistent store, it should
-        return ``None``."""
+        """ Return the authenticated :term:`userid` or ``None`` if
+        no authenticated userid can be found. This method of the
+        policy should ensure that a record exists in whatever
+        persistent store is used related to the user (the user
+        should not have been deleted); if a record associated with
+        the current id does not exist in a persistent store, it
+        should return ``None``.
+
+        """
 
     def unauthenticated_userid(request):
-        """ Return the *unauthenticated* userid.  This method performs the
-        same duty as ``authenticated_userid`` but is permitted to return the
-        userid based only on data present in the request; it needn't (and
-        shouldn't) check any persistent store to ensure that the user record
-        related to the request userid exists."""
+        """ Return the *unauthenticated* userid.  This method
+        performs the same duty as ``authenticated_userid`` but is
+        permitted to return the userid based only on data present
+        in the request; it needn't (and shouldn't) check any
+        persistent store to ensure that the user record related to
+        the request userid exists.
+
+        This method is intended primarily a helper to assist the
+        ``authenticated_userid`` method in pulling credentials out
+        of the request data, abstracting away the specific headers,
+        query strings, etc that are used to authenticate the request.
+
+        """
 
     def effective_principals(request):
         """ Return a sequence representing the effective principals
-        including the userid and any groups belonged to by the current
-        user, including 'system' groups such as Everyone and
-        Authenticated. """
+        typically including the :term:`userid` and any groups belonged
+        to by the current user, always including 'system' groups such
+        as ``pyramid.security.Everyone`` and
+        ``pyramid.security.Authenticated``.
+
+        """
 
     def remember(request, userid, **kw):
         """ Return a set of headers suitable for 'remembering' the
-        userid named ``userid`` when set in a response.  An
-        individual authentication policy and its consumers can decide
-        on the composition and meaning of ``**kw.`` """
+        :term:`userid` named ``userid`` when set in a response.  An
+        individual authentication policy and its consumers can
+        decide on the composition and meaning of **kw.
+
+        """
 
     def forget(request):
         """ Return a set of headers suitable for 'forgetting' the
-        current user on subsequent requests. """
+        current user on subsequent requests.
+
+        """
 
 class IAuthorizationPolicy(Interface):
     """ An object representing a Pyramid authorization policy. """

@@ -172,8 +172,8 @@
       policy` in effect or there is no currently authenticated user.  This
       differs from :attr:`~pyramid.request.Request.unauthenticated_userid`,
       because the effective authentication policy will have ensured that a
-      record associated with the :term:`userid` exists in persistent storage; if it
-      has not, this value will be ``None``.
+      record associated with the :term:`userid` exists in persistent storage;
+      if it has not, this value will be ``None``.
 
    .. attribute:: unauthenticated_userid
 

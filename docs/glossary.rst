@@ -287,22 +287,21 @@ Glossary
 
    principal
      A *principal* is a string or unicode object representing an
-     entity, typically a user or group, having zero or more
-     :term:`permissions <permission>`.  Principals are provided by an
+     entity, typically a user or group.  Principals are provided by an
      :term:`authentication policy`.  For example, if a user had the
-     user id "bob", and Bob was part of two groups named "group foo"
+     :term:`userid` `"bob"`, and was part of two groups named `"group foo"`
      and "group bar", the request might have information attached to
      it that would indicate that Bob was represented by three
-     principals: "bob", "group foo" and "group bar".
+     principals: `"bob"`, `"group foo"` and `"group bar"`.
 
    userid
-     A *userid* is a a string or unicode object used to identify and
-     authenticate a real-world user, often a person.  A userid is
+     A *userid* is a string or unicode object used to identify and
+     authenticate a real-world user (or client).  A userid is
      supplied to an :term:`authentication policy` in order to discover
      the user's :term:`principals <principal>`.  The default behavior
      of the authentication policies :app:`Pyramid` provides is to
-     return the user's userid as one of the user's principals, but a
-     userid need not be a principal.
+     return the user's userid as a principal, but this is not strictly
+     necessary in custom policies that define their principals differently.
 
    authorization policy
      An authorization policy in :app:`Pyramid` terms is a bit of
