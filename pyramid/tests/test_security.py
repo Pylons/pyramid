@@ -462,8 +462,8 @@ class DummyAuthenticationPolicy:
     def authenticated_userid(self, request):
         return self.result
 
-    def remember(self, request, principal, **kw):
-        headers = [(_TEST_HEADER, principal)]
+    def remember(self, request, userid, **kw):
+        headers = [(_TEST_HEADER, userid)]
         self._header_remembered = headers[0]
         return headers
 

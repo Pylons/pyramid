@@ -335,11 +335,11 @@ class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
         effective_principals.extend(groups)
         return effective_principals
 
-    def remember(self, request, principal, **kw):
-        """ Store the ``principal`` as ``repoze.who.userid``.
+    def remember(self, request, userid, **kw):
+        """ Store the ``userid`` as ``repoze.who.userid``.
         
         The identity to authenticated to :mod:`repoze.who`
-        will contain the given principal as ``userid``, and
+        will contain the given userid as ``userid``, and
         provide all keyword arguments as additional identity
         keys. Useful keys could be ``max_age`` or ``userdata``.
         """
@@ -348,7 +348,7 @@ class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
             return []
         environ = request.environ
         identity = kw
-        identity['repoze.who.userid'] = principal
+        identity['repoze.who.userid'] = userid
         return identifier.remember(environ, identity)
 
     def forget(self, request):
@@ -404,7 +404,7 @@ class RemoteUserAuthenticationPolicy(CallbackAuthenticationPolicy):
         """ The ``REMOTE_USER`` value found within the ``environ``."""
         return request.environ.get(self.environ_key)
 
-    def remember(self, request, principal, **kw):
+    def remember(self, request, userid, **kw):
         """ A no-op. The ``REMOTE_USER`` does not provide a protocol for
         remembering the user. This will be application-specific and can
         be done somewhere else or in a subclass."""
@@ -652,7 +652,7 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
         if result:
             return result['userid']
 
-    def remember(self, request, principal, **kw):
+    def remember(self, request, userid, **kw):
         """ Accepts the following kw args: ``max_age=<int-seconds>,
         ``tokens=<sequence-of-ascii-strings>``.
 
@@ -660,7 +660,7 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
         the response.
 
         """
-        return self.cookie.remember(request, principal, **kw)
+        return self.cookie.remember(request, userid, **kw)
 
     def forget(self, request):
         """ A list of headers which will delete appropriate cookies."""
@@ -1061,13 +1061,13 @@ class SessionAuthenticationPolicy(CallbackAuthenticationPolicy):
         self.userid_key = prefix + 'userid'
         self.debug = debug
 
-    def remember(self, request, principal, **kw):
-        """ Store a principal in the session."""
-        request.session[self.userid_key] = principal
+    def remember(self, request, userid, **kw):
+        """ Store a userid in the session."""
+        request.session[self.userid_key] = userid
         return []
 
     def forget(self, request):
-        """ Remove the stored principal from the session."""
+        """ Remove the stored userid from the session."""
         if self.userid_key in request.session:
             del request.session[self.userid_key]
         return []
@@ -1132,7 +1132,7 @@ class BasicAuthAuthenticationPolicy(CallbackAuthenticationPolicy):
         if credentials:
             return credentials[0]
 
-    def remember(self, request, principal, **kw):
+    def remember(self, request, userid, **kw):
         """ A no-op. Basic authentication does not provide a protocol for
         remembering the user. Credentials are sent on every request.
 

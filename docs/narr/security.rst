@@ -104,9 +104,9 @@ For example:
 
 The above configuration enables a policy which compares the value of an "auth
 ticket" cookie passed in the request's environment which contains a reference
-to a single :term:`principal` against the principals present in any
-:term:`ACL` found in the resource tree when attempting to call some
-:term:`view`.
+to a single :term:`userid` and matches that userid's principals against the
+principals present in any :term:`ACL` found in the resource tree when
+attempting to call some :term:`view`.
 
 While it is possible to mix and match different authentication and
 authorization policies, it is an error to configure a Pyramid application
@@ -616,11 +616,11 @@ that implements the following interface:
            as ``pyramid.security.Everyone`` and
            ``pyramid.security.Authenticated``. """
 
-       def remember(self, request, principal, **kw):
+       def remember(self, request, userid, **kw):
            """ Return a set of headers suitable for 'remembering' the
-           principal named ``principal`` when set in a response.  An
-           individual authentication policy and its consumers can decide
-           on the composition and meaning of **kw. """
+           userid named ``userid`` when set in a response.  An
+           individual authentication policy and its consumers can
+           decide on the composition and meaning of **kw. """
        
        def forget(self, request):
            """ Return a set of headers suitable for 'forgetting' the
