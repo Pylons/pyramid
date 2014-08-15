@@ -93,6 +93,12 @@
 
   .. autoclass:: HTTPFailedDependency
 
+  .. autoclass:: HTTPPreconditionRequired
+
+  .. autoclass:: HTTPTooManyRequests
+
+  .. autoclass:: HTTPRequestHeaderFieldsTooLarge
+
   .. autoclass:: HTTPInternalServerError
 
   .. autoclass:: HTTPNotImplemented
@@ -106,3 +112,5 @@
   .. autoclass:: HTTPVersionNotSupported
 
   .. autoclass:: HTTPInsufficientStorage
+
+  .. autoclass:: HTTPNetworkAuthenticationRequired
