@@ -55,6 +55,7 @@ Exception
         * 428 - HTTPPreconditionRequired
         * 429 - HTTPTooManyRequests
         * 431 - HTTPRequestHeaderFieldsTooLarge
+        * 451 - HTTPUnavailableForLegalReasons
       HTTPServerError
         * 500 - HTTPInternalServerError
         * 501 - HTTPNotImplemented
@@ -956,6 +957,25 @@ class HTTPRequestHeaderFieldsTooLarge(HTTPClientError):
     title = 'Request Header Fields Too Large'
     explanation = (
         'The request header fields were too large')
+
+class HTTPUnavailableForLegalReasons(HTTPClientError):
+    """
+    subclass of :class:`~HTTPClientError`
+
+    This indicates that the server is unable to process the request
+    because of legal reasons, e.g. censorship or government-mandated
+    blocked access.
+
+    From the draft "A New HTTP Status Code for Legally-restricted Resources"
+    by Tim Bray:
+
+    http://tools.ietf.org/html/draft-tbray-http-legally-restricted-status-00
+
+    code: 451, title: Unavailable For Legal Reasons
+    """
+    code = 451
+    title = 'Unavailable For Legal Reasons'
+    explanation = ('The resource is not available due to legal reasons.')
 
 ############################################################
 ## 5xx Server Error

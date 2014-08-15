@@ -99,6 +99,8 @@
 
   .. autoclass:: HTTPRequestHeaderFieldsTooLarge
 
+  .. autoclass:: HTTPUnavailableForLegalReasons
+
   .. autoclass:: HTTPInternalServerError
 
   .. autoclass:: HTTPNotImplemented
