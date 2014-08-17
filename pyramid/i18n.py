@@ -141,7 +141,8 @@ def default_locale_negotiator(request):
             i.split(None, maxsplit=1)
             for i in aslist(
                 request.registry.settings.get(
-                    'pyramid.available_languages'
+                    'pyramid.available_languages',
+                    []
                 ),
                 flatten=False
             )
