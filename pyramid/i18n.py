@@ -21,6 +21,7 @@ from pyramid.interfaces import (
     )
 
 from pyramid.threadlocal import get_current_registry
+from pyramid.settings import aslist
 
 class Localizer(object):
     """
