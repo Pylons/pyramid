@@ -136,11 +136,16 @@ def default_locale_negotiator(request):
     name = '_LOCALE_'
 
     # TODO: this needs to be moved to Configurator
+    try:
+        registry = request.registry
+    except AttributeError:
+        registry = get_current_registry()
+        
     available_languages = dict(
         [
             i.split(None, maxsplit=1)
             for i in aslist(
-                request.registry.settings.get(
+                registry.settings.get(
                     'pyramid.available_languages',
                     []
                 ),
@@ -160,9 +165,12 @@ def default_locale_negotiator(request):
 
     # try matching HTTP Accept-Language request header
     if locale_name is None:
-        locale_name = request.accept_language.best_match(
-            available_languages
-        )
+        try:
+            locale_name = request.accept_language.best_match(
+                available_languages
+            )
+        except AttributeError:
+            pass
 
     return locale_name
 
