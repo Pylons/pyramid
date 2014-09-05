@@ -248,7 +248,7 @@ class JSON(object):
         When you've done this, the JSON renderer will be able to serialize
         instances of the ``Foo`` class when they're encountered in your view
         results."""
-        
+
         self.components.registerAdapter(adapter, (type_or_iface,),
                                         IJSONAdapter)
 
@@ -265,7 +265,7 @@ class JSON(object):
                     response.content_type = 'application/json'
             default = self._make_default(request)
             return self.serializer(value, default=default, **self.kw)
-        
+
         return _render
 
     def _make_default(self, request):
@@ -286,7 +286,7 @@ json_renderer_factory = JSON() # bw compat
 class JSONP(JSON):
     """ `JSONP <http://en.wikipedia.org/wiki/JSONP>`_ renderer factory helper
     which implements a hybrid json/jsonp renderer.  JSONP is useful for
-    making cross-domain AJAX requests.  
+    making cross-domain AJAX requests.
 
     Configure a JSONP renderer using the
     :meth:`pyramid.config.Configurator.add_renderer` API at application
@@ -309,7 +309,7 @@ class JSONP(JSON):
 
        config = Configurator()
        config.add_renderer('jsonp', JSONP(param_name='callback', indent=4))
-    
+
     .. versionchanged:: 1.4
        The ability of this class to accept a ``**kw`` in its constructor.
 
@@ -487,18 +487,18 @@ class NullRendererHelper(RendererHelper):
 
     @property
     def settings(self):
-        return get_current_registry().settings or {}
+        return {}
 
     def render_view(self, request, value, view, context):
         return value
 
     def render(self, value, system_values, request=None):
         return value
-    
+
     def render_to_response(self, value, system_values, request=None):
         return value
 
     def clone(self, name=None, package=None, registry=None):
         return self
-    
+
 null_renderer = NullRendererHelper()
