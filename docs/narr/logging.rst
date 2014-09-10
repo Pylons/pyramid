@@ -242,7 +242,7 @@ level is set to ``INFO``, whereas the application's log level is set to
     [logger_myapp] 
     level = DEBUG 
     handlers = 
-    qualname = helloworld 
+    qualname = myapp 
 
 All of the child loggers of the ``myapp`` logger will inherit the ``DEBUG``
 level unless they're explicitly set differently. Meaning the ``myapp.views``,
