@@ -15,7 +15,7 @@ Pyramid has a first-class concept of
 This approach is optional, but its presence makes it distinct from
 other Python web frameworks. It taps into Python's ``setuptools``
 library, which establishes conventions for how Python projects can be
-installed and provide "entry points". Pyramid uses an entry point to
+installed and provides "entry points". Pyramid uses an entry point to
 let a Pyramid application know where to find the WSGI app.
 
 Objectives
