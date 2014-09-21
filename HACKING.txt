@@ -113,6 +113,7 @@ for this use case) and inside that a simple pyramid application named
 ``hacking`` that you can then fire up like so:
 
   cd env27/hacking
+  ../bin/python setup.py develop
   ../bin/pserve development.ini
 
 Adding Features
