@@ -700,7 +700,7 @@ we might need to detect situations when other people use the site. We
 need *logging*.
 
 Fortunately Pyramid uses the normal Python approach to logging. The
-scaffold generated in your ``development.ini`` a number of lines that
+scaffold generated in your ``development.ini`` has a number of lines that
 configure the logging for you to some reasonable defaults. You then see
 messages sent by Pyramid (for example, when a new request comes in).
 
