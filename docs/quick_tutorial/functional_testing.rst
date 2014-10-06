@@ -43,7 +43,8 @@ Steps
    .. literalinclude:: functional_testing/tutorial/tests.py
     :linenos:
 
-   Be sure this file is not executable, or ``nosetests`` may not include your tests.
+   Be sure this file is not executable, or ``nosetests`` may not 
+   include your tests.
    
 #. Now run the tests:
 
