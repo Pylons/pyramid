@@ -37,12 +37,14 @@ Steps
     $ $VENV/bin/python setup.py develop
     $ $VENV/bin/easy_install webtest
 
-#. Let's extend ``unit_testing/tutorial/tests.py`` to include a
+#. Let's extend ``functional_testing/tutorial/tests.py`` to include a
    functional test:
 
    .. literalinclude:: functional_testing/tutorial/tests.py
     :linenos:
 
+   Be sure this file is not executable, or ``nosetests`` may not include your tests.
+   
 #. Now run the tests:
 
    .. code-block:: bash
