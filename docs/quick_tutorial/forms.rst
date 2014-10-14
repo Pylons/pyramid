@@ -104,7 +104,7 @@ assets which need to be published. We don't have to know where on disk
 it is located. We point at the package, then the path inside the package.
 
 We just need to include a call to ``add_static_view`` to make that
-directory available at a URL. For Pyramid-specific pages,
+directory available at a URL. For Pyramid-specific packages,
 Pyramid provides a facility (``config.include()``) which even makes
 that unnecessary for consumers of a package. (Deform is not specific to
 Pyramid.)
