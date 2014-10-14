@@ -25,13 +25,13 @@ class TutorialViews:
     def hello(self):
         return {'page_title': 'Hello View'}
 
-    # Posting to /home via the "Edit" submit button
+    # Posting to /hello via the "Edit" submit button
     @view_config(request_method='POST', renderer='edit.pt')
     def edit(self):
         new_name = self.request.params['new_name']
         return {'page_title': 'Edit View', 'new_name': new_name}
 
-    # Posting to /home via the "Delete" submit button
+    # Posting to /hello via the "Delete" submit button
     @view_config(request_method='POST', request_param='form.delete',
                  renderer='delete.pt')
     def delete(self):
