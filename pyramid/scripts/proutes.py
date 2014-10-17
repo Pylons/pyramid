@@ -139,7 +139,7 @@ class PRoutesCommand(object):
                         for view_func in view_callables:
                             view_callable = '%s.%s' % (
                                 view_func.__module__,
-                                view_func.func_name,
+                                view_func.__name__,
                             )
                     else:
                         view_callable = str(None)
