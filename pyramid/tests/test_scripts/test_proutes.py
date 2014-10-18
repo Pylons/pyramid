@@ -4,24 +4,31 @@ from pyramid.tests.test_scripts import dummy
 
 class DummyIntrospector(object):
     def __init__(self):
-        self.intrs = []
-        self.relations = []
-        self.unrelations = []
-            
-    def add(self, intr):
-        self.intrs.append(intr)
+        self.relations = {}
+        self.introspectables = {}
 
-    def relate(self, *pairs):
-        self.relations.append(pairs)
+    def add(self, introspectable):
+        cat = introspectable.category_name
+        if cat not in self.introspectables:
+            self.introspectables[cat] = []
 
-    def unrelate(self, *pairs):
-        self.unrelations.append(pairs)
+        self.introspectables[cat].append(introspectable)
 
-    def get(self, group, name):
-        return None
+    def get(self, name, discrim):
+        intrs = self.introspectables[name]
 
-    def related(self, intr):
-        return []
+        for intr in intrs:
+            if intr.discriminator == discrim:
+                return intr
+
+    def relate(self, a, b):
+        if a not in self.relations:
+            self.retlations[a] = []
+
+        self.relations[a].append(b)
+
+    def related(self, a):
+        return self.relations.get(a, [])
 
 
 class TestPRoutesCommand(unittest.TestCase):
@@ -41,6 +48,14 @@ class TestPRoutesCommand(unittest.TestCase):
         registry.introspector = DummyIntrospector()
         
         return registry
+
+    def _makeIntrospectable(self, category, discrim, request_methods=None):
+        from pyramid.registry import Introspectable
+        intr = Introspectable(category, discrim, 'title', 'type')
+
+        intr['request_methods'] = request_methods
+
+        return intr
 
     def test_good_args(self):
         cmd = self._getTargetClass()([])
@@ -116,6 +131,8 @@ class TestPRoutesCommand(unittest.TestCase):
         from zope.interface import Interface
         from pyramid.interfaces import IRouteRequest
         registry = self._makeRegistry()
+        registry.introspector.add(self._makeIntrospectable('routes', 'a'))
+
         def view():pass
         class IMyRoute(Interface):
             pass
@@ -147,6 +164,7 @@ class TestPRoutesCommand(unittest.TestCase):
                                  (IViewClassifier, IMyRoute, Interface),
                                  IView, '')
         registry.registerUtility(IMyRoute, IRouteRequest, name='a')
+        registry.introspector.add(self._makeIntrospectable('routes', 'a'))
         command = self._makeOne()
         route = dummy.DummyRoute('a', '/a')
         mapper = dummy.DummyMapper(route)

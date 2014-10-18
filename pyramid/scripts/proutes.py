@@ -86,8 +86,7 @@ class PRoutesCommand(object):
             ))
 
             for route in routes:
-                request_methods = []
-
+                request_methods = None
                 request_iface = registry.queryUtility(
                     IRouteRequest,
                     name=route.name
@@ -109,18 +108,23 @@ class PRoutesCommand(object):
                     route_intr = registry.introspector.get(
                         'routes', route.name
                     )
+                    request_methods = route_intr['request_methods']
 
-                    view_intr = registry.introspector.related(route_intr)
 
-                    for view in view_intr:
-                        request_method = view['request_methods']
-                        if request_method is None:
-                            request_method = 'ALL'
+                    if request_methods is None:
+                        request_methods = []
+                        view_intr = registry.introspector.related(route_intr)
 
-                        if len(request_method) > max_method:
-                            max_method = len(request_method)
+                        for view in view_intr:
+                            request_method = view['request_methods']
 
-                        request_methods.append(request_method)
+                            if request_method is None:
+                                request_method = 'ALL'
+
+                            if len(request_method) > max_method:
+                                max_method = len(request_method)
+
+                            request_methods.append(request_method)
                     view_callable = registry.adapters.lookup(
                         (IViewClassifier, request_iface, Interface),
                         IView,
