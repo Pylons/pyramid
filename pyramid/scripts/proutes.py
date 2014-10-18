@@ -7,7 +7,7 @@ from pyramid.scripts.common import parse_vars
 from pyramid.config.views import MultiView
 
 UNKNOWN_KEY = '<unknown>'
-
+PAD = 3
 
 def main(argv=sys.argv, quiet=False):
     command = PRoutesCommand(argv, quiet)
@@ -162,7 +162,6 @@ class PRoutesCommand(object):
                     (route.name, pattern, view_callable, request_methods)
                 )
 
-            PAD = 5
             fmt = '%-{0}s %-{1}s %-{2}s %-{3}s'.format(
                 max_name + PAD,
                 max_pattern + PAD,
