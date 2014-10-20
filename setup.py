@@ -30,7 +30,7 @@ else:
 
 here = os.path.abspath(os.path.dirname(__file__))
 try:
-    with open(os.path.join(here, 'README.txt')) as f:
+    with open(os.path.join(here, 'README.rst')) as f:
         README = f.read()
     with open(os.path.join(here, 'CHANGES.txt')) as f:
         CHANGES = f.read()
@@ -91,7 +91,7 @@ setup(name='pyramid',
       keywords='web wsgi pylons pyramid',
       author="Chris McDonough, Agendaless Consulting",
       author_email="pylons-discuss@googlegroups.com",
-      url="http://pylonsproject.org",
+      url="http://docs.pylonsproject.org/en/latest/docs/pyramid.html",
       license="BSD-derived (http://www.repoze.org/LICENSE.txt)",
       packages=find_packages(),
       include_package_data=True,

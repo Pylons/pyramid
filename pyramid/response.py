@@ -52,15 +52,23 @@ class FileResponse(Response):
     """
     def __init__(self, path, request=None, cache_max_age=None,
                  content_type=None, content_encoding=None):
-        super(FileResponse, self).__init__(conditional_response=True)
+        if content_type is None:
+            content_type, content_encoding = mimetypes.guess_type(
+                path,
+                strict=False
+                )
+            if content_type is None:
+                content_type = 'application/octet-stream'
+            # str-ifying content_type is a workaround for a bug in Python 2.7.7
+            # on Windows where mimetypes.guess_type returns unicode for the
+            # content_type.
+            content_type = str(content_type)
+        super(FileResponse, self).__init__(
+            conditional_response=True,
+            content_type=content_type,
+            content_encoding=content_encoding
+        )
         self.last_modified = getmtime(path)
-        if content_type is None:
-            content_type, content_encoding = mimetypes.guess_type(path,
-                                                                  strict=False)
-        if content_type is None:
-            content_type = 'application/octet-stream'
-        self.content_type = content_type
-        self.content_encoding = content_encoding
         content_length = getsize(path)
         f = open(path, 'rb')
         app_iter = None

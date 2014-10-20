@@ -7,6 +7,8 @@ python:
   - pypy
   - 3.2
   - 3.3
+  - 3.4
+  - pypy3
 
 install: python setup.py dev
 

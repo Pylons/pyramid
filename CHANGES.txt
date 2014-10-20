@@ -4,6 +4,9 @@ Next release
 Features
 --------
 
+- Cache busting for static resources has been added and is available via a new
+  argument to ``pyramid.config.Configurator.add_static_view``: ``cachebust``.
+
 - Add ``pyramid.config.Configurator.root_package`` attribute and init
   parameter to assist with includeable packages that wish to resolve
   resources relative to the package in which the ``Configurator`` was created.
@@ -23,6 +26,14 @@ Bug Fixes
   package. Previously it was not possible to do package-relative includes
   using the returned ``Configurator`` during testing. There is now a
   ``package`` argument that can override this behavior as well.
+
+- Fix an issue where a ``pyramid.response.FileResponse`` may apply a charset
+  where it does not belong. See https://github.com/Pylons/pyramid/pull/1251
+
+- Work around a bug introduced in Python 2.7.7 on Windows where
+  ``mimetypes.guess_type`` returns Unicode rather than str for the content
+  type, unlike any previous version of Python.  See
+  https://github.com/Pylons/pyramid/issues/1360 for more information.
 
 Docs
 ----
