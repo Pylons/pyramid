@@ -8,6 +8,11 @@ Features
   argument to ``pyramid.config.Configurator.add_static_view``: ``cachebust``.
   See https://github.com/Pylons/pyramid/pull/1380
 
+- Add ``pyramid.config.Configurator.root_package`` attribute and init
+  parameter to assist with includeable packages that wish to resolve
+  resources relative to the package in which the ``Configurator`` was created.
+  See https://github.com/Pylons/pyramid/pull/1337
+
 Bug Fixes
 ---------
 
