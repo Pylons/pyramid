@@ -6,22 +6,26 @@ Features
 
 - Cache busting for static resources has been added and is available via a new
   argument to ``pyramid.config.Configurator.add_static_view``: ``cachebust``.
+  See https://github.com/Pylons/pyramid/pull/1380
 
 Bug Fixes
 ---------
 
 - ``pyramid.wsgi.wsgiapp`` and ``pyramid.wsgi.wsgiapp2`` now raise
   ``ValueError`` when accidentally passed ``None``.
+  See https://github.com/Pylons/pyramid/pull/1320
 
 - Fix an issue whereby predicates would be resolved as maybe_dotted in the
   introspectable but not when passed for registration. This would mean that
-  add_route_predicate for example can not take a string and turn it into the
-  actual callable function.
+  ``add_route_predicate`` for example can not take a string and turn it into
+  the actual callable function.
+  See https://github.com/Pylons/pyramid/pull/1306
 
 - Fix ``pyramid.testing.setUp`` to return a ``Configurator`` with a proper
   package. Previously it was not possible to do package-relative includes
   using the returned ``Configurator`` during testing. There is now a
   ``package`` argument that can override this behavior as well.
+  See https://github.com/Pylons/pyramid/pull/1322
 
 - Fix an issue where a ``pyramid.response.FileResponse`` may apply a charset
   where it does not belong. See https://github.com/Pylons/pyramid/pull/1251
