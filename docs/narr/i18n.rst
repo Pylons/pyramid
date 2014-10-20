@@ -326,7 +326,7 @@ application.  You run a ``pot-create`` command to extract the messages:
 
    $ cd /place/where/myapplication/setup.py/lives
    $ mkdir -p myapplication/locale
-   $ $VENV/bin/pot-create src > myapplication/locale/myapplication.pot
+   $ $VENV/bin/pot-create -o myapplication/locale/myapplication.pot src
 
 The message catalog ``.pot`` template will end up in:
 
@@ -352,7 +352,7 @@ command from Gettext:
    $ cd /place/where/myapplication/setup.py/lives
    $ cd myapplication/locale
    $ mkdir -p es/LC_MESSAGES
-   $ msginit -l es es/LC_MESSAGES/myapplication.po
+   $ msginit -l es -o es/LC_MESSAGES/myapplication.po
 
 This will create a new the message catalog ``.po`` file will in:
 
@@ -402,11 +402,11 @@ command from Gettext:
 .. code-block:: text
 
    $ cd /place/where/myapplication/setup.py/lives
-   $ msgfmt myapplication/locale/*/LC_MESSAGES/*.po
+   $ msgfmt -o myapplication/locale/es/LC_MESSAGES/myapplication.mo myapplication/locale/es/LC_MESSAGES/myapplication.po
 
 This will create a ``.mo`` file for each ``.po`` file in your
 application.  As long as the :term:`translation directory` in which
-the ``.mo`` file ends up in is configured into your application, these
+the ``.mo`` file ends up in is configured into your application (see :ref:`adding_a_translation_directory`), these
 translations will be available to :app:`Pyramid`.
 
 .. index::
@@ -792,9 +792,11 @@ Then as a part of the code of a custom :term:`locale negotiator`:
 .. code-block:: python
    :linenos:
 
-   from pyramid.threadlocal import get_current_registry
-   settings = get_current_registry().settings
-   languages = settings['available_languages'].split()
+   from pyramid.settings import aslist
+
+   def my_locale_negotiator(request):
+       languages = aslist(request.registry.settings['available_languages'])
+       # ...
 
 This is only a suggestion.  You can create your own "available
 languages" configuration scheme as necessary.

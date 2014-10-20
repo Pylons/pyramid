@@ -113,7 +113,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         config.add_view(renderer='dummy.pt')
         view = self._getViewCallable(config)
         self.assertRaises(ValueError, view, None, None)
-        
+
     def test_add_view_with_tmpl_renderer_factory_no_renderer_factory(self):
         config = self._makeOne(autocommit=True)
         introspector = DummyIntrospector()
@@ -136,7 +136,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
             ('renderer factories', '.pt') in introspector.related[-1])
         view = self._getViewCallable(config)
         self.assertTrue(b'Hello!' in view(None, None).body)
-        
+
     def test_add_view_wrapped_view_is_decorated(self):
         def view(request): # request-only wrapper
             """ """
@@ -3742,8 +3742,9 @@ class TestStaticURLInfo(unittest.TestCase):
 
     def test_generate_registration_miss(self):
         inst = self._makeOne()
-        registrations = [(None, 'spec', 'route_name'),
-                         ('http://example.com/foo/', 'package:path/', None)]
+        registrations = [
+            (None, 'spec', 'route_name', None),
+            ('http://example.com/foo/', 'package:path/', None, None)]
         inst._get_registrations = lambda *x: registrations
         request = self._makeRequest()
         result = inst.generate('package:path/abc', request)
@@ -3751,7 +3752,8 @@ class TestStaticURLInfo(unittest.TestCase):
 
     def test_generate_registration_no_registry_on_request(self):
         inst = self._makeOne()
-        registrations = [('http://example.com/foo/', 'package:path/', None)]
+        registrations = [
+            ('http://example.com/foo/', 'package:path/', None, None)]
         inst._get_registrations = lambda *x: registrations
         request = self._makeRequest()
         del request.registry
@@ -3760,7 +3762,8 @@ class TestStaticURLInfo(unittest.TestCase):
 
     def test_generate_slash_in_name1(self):
         inst = self._makeOne()
-        registrations = [('http://example.com/foo/', 'package:path/', None)]
+        registrations = [
+            ('http://example.com/foo/', 'package:path/', None, None)]
         inst._get_registrations = lambda *x: registrations
         request = self._makeRequest()
         result = inst.generate('package:path/abc', request)
@@ -3768,7 +3771,8 @@ class TestStaticURLInfo(unittest.TestCase):
 
     def test_generate_slash_in_name2(self):
         inst = self._makeOne()
-        registrations = [('http://example.com/foo/', 'package:path/', None)]
+        registrations = [
+            ('http://example.com/foo/', 'package:path/', None, None)]
         inst._get_registrations = lambda *x: registrations
         request = self._makeRequest()
         result = inst.generate('package:path/', request)
@@ -3788,7 +3792,7 @@ class TestStaticURLInfo(unittest.TestCase):
 
     def test_generate_route_url(self):
         inst = self._makeOne()
-        registrations = [(None, 'package:path/', '__viewname/')]
+        registrations = [(None, 'package:path/', '__viewname/', None)]
         inst._get_registrations = lambda *x: registrations
         def route_url(n, **kw):
             self.assertEqual(n, '__viewname/')
@@ -3801,7 +3805,7 @@ class TestStaticURLInfo(unittest.TestCase):
 
     def test_generate_url_unquoted_local(self):
         inst = self._makeOne()
-        registrations = [(None, 'package:path/', '__viewname/')]
+        registrations = [(None, 'package:path/', '__viewname/', None)]
         inst._get_registrations = lambda *x: registrations
         def route_url(n, **kw):
             self.assertEqual(n, '__viewname/')
@@ -3814,7 +3818,7 @@ class TestStaticURLInfo(unittest.TestCase):
 
     def test_generate_url_quoted_remote(self):
         inst = self._makeOne()
-        registrations = [('http://example.com/', 'package:path/', None)]
+        registrations = [('http://example.com/', 'package:path/', None, None)]
         inst._get_registrations = lambda *x: registrations
         request = self._makeRequest()
         result = inst.generate('package:path/abc def', request, a=1)
@@ -3822,7 +3826,7 @@ class TestStaticURLInfo(unittest.TestCase):
 
     def test_generate_url_with_custom_query(self):
         inst = self._makeOne()
-        registrations = [('http://example.com/', 'package:path/', None)]
+        registrations = [('http://example.com/', 'package:path/', None, None)]
         inst._get_registrations = lambda *x: registrations
         request = self._makeRequest()
         result = inst.generate('package:path/abc def', request, a=1,
@@ -3832,7 +3836,7 @@ class TestStaticURLInfo(unittest.TestCase):
 
     def test_generate_url_with_custom_anchor(self):
         inst = self._makeOne()
-        registrations = [('http://example.com/', 'package:path/', None)]
+        registrations = [('http://example.com/', 'package:path/', None, None)]
         inst._get_registrations = lambda *x: registrations
         request = self._makeRequest()
         uc = text_(b'La Pe\xc3\xb1a', 'utf-8')
@@ -3841,33 +3845,50 @@ class TestStaticURLInfo(unittest.TestCase):
         self.assertEqual(result,
                          'http://example.com/abc%20def#La%20Pe%C3%B1a')
 
+    def test_generate_url_cachebust(self):
+        def cachebust(subpath, kw):
+            kw['foo'] = 'bar'
+            return 'foo' + '/' + subpath, kw
+        inst = self._makeOne()
+        registrations = [(None, 'package:path/', '__viewname', cachebust)]
+        inst._get_registrations = lambda *x: registrations
+        request = self._makeRequest()
+        def route_url(n, **kw):
+            self.assertEqual(n, '__viewname')
+            self.assertEqual(kw, {'subpath':'foo/abc', 'foo':'bar'})
+        request.route_url = route_url
+        inst.generate('package:path/abc', request)
+
     def test_add_already_exists(self):
         inst = self._makeOne()
         config = self._makeConfig(
             [('http://example.com/', 'package:path/', None)])
         inst.add(config, 'http://example.com', 'anotherpackage:path')
-        expected = [('http://example.com/',  'anotherpackage:path/', None)]
+        expected = [
+            ('http://example.com/',  'anotherpackage:path/', None, None)]
         self._assertRegistrations(config, expected)
 
     def test_add_url_withendslash(self):
         inst = self._makeOne()
         config = self._makeConfig()
         inst.add(config, 'http://example.com/', 'anotherpackage:path')
-        expected = [('http://example.com/', 'anotherpackage:path/', None)]
+        expected = [
+            ('http://example.com/', 'anotherpackage:path/', None, None)]
         self._assertRegistrations(config, expected)
 
     def test_add_url_noendslash(self):
         inst = self._makeOne()
         config = self._makeConfig()
         inst.add(config, 'http://example.com', 'anotherpackage:path')
-        expected = [('http://example.com/', 'anotherpackage:path/', None)]
+        expected = [
+            ('http://example.com/', 'anotherpackage:path/', None, None)]
         self._assertRegistrations(config, expected)
 
     def test_add_url_noscheme(self):
         inst = self._makeOne()
         config = self._makeConfig()
         inst.add(config, '//example.com', 'anotherpackage:path')
-        expected = [('//example.com/', 'anotherpackage:path/', None)]
+        expected = [('//example.com/', 'anotherpackage:path/', None, None)]
         self._assertRegistrations(config, expected)
 
     def test_add_viewname(self):
@@ -3876,7 +3897,7 @@ class TestStaticURLInfo(unittest.TestCase):
         config = self._makeConfig()
         inst = self._makeOne()
         inst.add(config, 'view', 'anotherpackage:path', cache_max_age=1)
-        expected = [(None, 'anotherpackage:path/', '__view/')]
+        expected = [(None, 'anotherpackage:path/', '__view/', None)]
         self._assertRegistrations(config, expected)
         self.assertEqual(config.route_args, ('__view/', 'view/*subpath'))
         self.assertEqual(config.view_kw['permission'], NO_PERMISSION_REQUIRED)
@@ -3887,7 +3908,7 @@ class TestStaticURLInfo(unittest.TestCase):
         config.route_prefix = '/abc'
         inst = self._makeOne()
         inst.add(config, 'view', 'anotherpackage:path',)
-        expected = [(None, 'anotherpackage:path/', '__/abc/view/')]
+        expected = [(None, 'anotherpackage:path/', '__/abc/view/', None)]
         self._assertRegistrations(config, expected)
         self.assertEqual(config.route_args, ('__/abc/view/', 'view/*subpath'))
 
@@ -3904,7 +3925,7 @@ class TestStaticURLInfo(unittest.TestCase):
         inst.add(config, 'view', 'anotherpackage:path', cache_max_age=1,
                  context=DummyContext)
         self.assertEqual(config.view_kw['context'], DummyContext)
-        
+
     def test_add_viewname_with_for_(self):
         config = self._makeConfig()
         inst = self._makeOne()
@@ -3919,6 +3940,34 @@ class TestStaticURLInfo(unittest.TestCase):
                  renderer='mypackage:templates/index.pt')
         self.assertEqual(config.view_kw['renderer'],
                          'mypackage:templates/index.pt')
+
+    def test_add_cachebust_default(self):
+        config = self._makeConfig()
+        inst = self._makeOne()
+        inst._default_cachebust = DummyCacheBuster
+        inst.add(config, 'view', 'mypackage:path', cachebust=True)
+        cachebust = config.registry._static_url_registrations[0][3]
+        subpath, kw = cachebust('some/path', {})
+        self.assertEqual(subpath, 'some/path')
+        self.assertEqual(kw['x'], 'foo')
+
+    def test_add_cachebust_prevented(self):
+        config = self._makeConfig()
+        config.registry.settings['pyramid.prevent_cachebust'] = True
+        inst = self._makeOne()
+        inst.add(config, 'view', 'mypackage:path', cachebust=True)
+        cachebust = config.registry._static_url_registrations[0][3]
+        self.assertEqual(cachebust, None)
+
+    def test_add_cachebust_custom(self):
+        config = self._makeConfig()
+        inst = self._makeOne()
+        inst.add(config, 'view', 'mypackage:path',
+                 cachebust=DummyCacheBuster())
+        cachebust = config.registry._static_url_registrations[0][3]
+        subpath, kw = cachebust('some/path', {})
+        self.assertEqual(subpath, 'some/path')
+        self.assertEqual(kw['x'], 'foo')
 
 class Test_view_description(unittest.TestCase):
     def _callFUT(self, view):
@@ -3939,7 +3988,8 @@ class Test_view_description(unittest.TestCase):
 
 
 class DummyRegistry:
-    pass
+    def __init__(self):
+        self.settings = {}
 
 from zope.interface import implementer
 from pyramid.interfaces import IResponse
@@ -4024,6 +4074,13 @@ class DummyMultiView:
         return 'OK1'
     def __permitted__(self, context, request):
         """ """
+
+class DummyCacheBuster(object):
+    def token(self, pathspec):
+        return 'foo'
+    def pregenerate(self, token, subpath, kw):
+        kw['x'] = token
+        return subpath, kw
 
 def parse_httpdate(s):
     import datetime
