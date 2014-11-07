@@ -868,7 +868,12 @@ class HTTPUnprocessableEntity(HTTPClientError):
     subclass of :class:`~HTTPClientError`
 
     This indicates that the server is unable to process the contained
-    instructions. Only for WebDAV.
+    instructions. 
+
+    May be used to notify the client that their JSON/XML is well formed, but
+    not correct for the current request.
+
+    See RFC4918 section 11 for more information.
     
     code: 422, title: Unprocessable Entity
     """
@@ -881,7 +886,7 @@ class HTTPLocked(HTTPClientError):
     """
     subclass of :class:`~HTTPClientError`
 
-    This indicates that the resource is locked. Only for WebDAV
+    This indicates that the resource is locked.
     
     code: 423, title: Locked
     """
@@ -896,7 +901,6 @@ class HTTPFailedDependency(HTTPClientError):
 
     This indicates that the method could not be performed because the
     requested action depended on another action and that action failed.
-    Only for WebDAV.
     
     code: 424, title: Failed Dependency
     """
