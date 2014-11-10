@@ -55,6 +55,13 @@ Bug Fixes
   add another callback to the list. See
   https://github.com/Pylons/pyramid/pull/1373
 
+Deprecations
+------------
+
+- Renamed the ``principal`` argument to ``pyramid.security.remember()`` to
+  ``userid`` in order to clarify its intended purpose.
+  See https://github.com/Pylons/pyramid/pull/1399
+
 Docs
 ----
 
@@ -64,6 +71,10 @@ Docs
 
 - Clarify a previously-implied detail of the ``ISession.invalidate`` API
   documentation.
+
+- Improve and clarify the documentation on what Pyramid defines as a
+  ``principal`` and a ``userid`` in its security APIs.
+  See https://github.com/Pylons/pyramid/pull/1399
 
 Scaffolds
 ---------
