@@ -1,6 +1,19 @@
 Next release
 ============
 
+Docs
+----
+
+- Removed logging configuration from Quick Tutorial ini files except for
+  scaffolding- and logging-related chapters to avoid needing to explain it too
+  early.
+
+- Clarify a previously-implied detail of the ``ISession.invalidate`` API
+  documentation.
+
+Bug Fixes
+---------
+
 - Work around a bug introduced in Python 2.7.7 on Windows where
   ``mimetypes.guess_type`` returns Unicode rather than str for the content
   type, unlike any previous version of Python.  See
@@ -16,13 +29,15 @@ Next release
 
 - Fix an issue whereby predicates would be resolved as maybe_dotted in the
   introspectable but not when passed for registration. This would mean that
-  add_route_predicate for example can not take a string and turn it into the
-  actual callable function.
+  ``add_route_predicate`` for example can not take a string and turn it into
+  the actual callable function.
+  See https://github.com/Pylons/pyramid/pull/1306
 
 - Fix ``pyramid.testing.setUp`` to return a ``Configurator`` with a proper
   package. Previously it was not possible to do package-relative includes
   using the returned ``Configurator`` during testing. There is now a
   ``package`` argument that can override this behavior as well.
+  See https://github.com/Pylons/pyramid/pull/1322
 
 - Removed non-ascii copyright symbol from templates, as this was
   causing the scaffolds to fail for project generation on some systems.
