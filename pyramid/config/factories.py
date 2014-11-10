@@ -1,4 +1,4 @@
-from zope.deprecation import deprecate
+from zope.deprecation import deprecated
 from zope.interface import implementer
 
 from pyramid.interfaces import (
@@ -180,8 +180,6 @@ class FactoriesConfiguratorMixin(object):
                         introspectables=(intr,))
 
     @action_method
-    @deprecate('set_request_propery() is deprecated as of Pyramid 1.5; use '
-               'add_request_method() with the property=True argument instead')
     def set_request_property(self, callable, name=None, reify=False):
         """ Add a property to the request object.
 
@@ -194,6 +192,11 @@ class FactoriesConfiguratorMixin(object):
         """
         self.add_request_method(
             callable, name=name, property=not reify, reify=reify)
+
+    deprecated(
+        set_request_property,
+        'set_request_propery() is deprecated as of Pyramid 1.5; use '
+        'add_request_method() with the property=True argument instead')
 
 @implementer(IRequestExtensions)
 class _RequestExtensions(object):

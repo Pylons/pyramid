@@ -17,6 +17,10 @@ plugging application code that you've written into :app:`Pyramid` is also
 referred to within this documentation as "configuration"; you are configuring
 :app:`Pyramid` to call the code that makes up your application.
 
+.. seealso::
+   For information on ``.ini`` files for Pyramid applications see the
+   :ref:`startup_chapter` chapter.
+
 There are two ways to configure a :app:`Pyramid` application:
 :term:`imperative configuration` and :term:`declarative configuration`.  Both
 are described below.
