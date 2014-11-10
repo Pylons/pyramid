@@ -437,7 +437,7 @@ class IViewMapperFactory(Interface):
         invocation signatures and response values.
         """
 
-class IAuthenticationPolicy(object):
+class IAuthenticationPolicy(Interface):
     """ An object representing a Pyramid authentication policy. """
 
     def authenticated_userid(request):
