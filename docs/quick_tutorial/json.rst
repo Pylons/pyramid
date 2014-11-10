@@ -40,7 +40,7 @@ Steps
     :linenos:
 
 #. Rather than implement a new view, we will "stack" another decorator
-   on the ``hello`` view:
+   on the ``hello`` view in ``views.py``:
 
    .. literalinclude:: json/tutorial/views.py
     :linenos:

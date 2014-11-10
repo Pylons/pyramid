@@ -187,9 +187,15 @@ pipe it to your environment's version of Python.
     $ wget https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py -O - | $VENV/bin/python
 
     # Windows
-    # Use your browser to download:
-    #   https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.p
-    # ...into c:\projects\quick_tutorial\ez_setup.py
+    #
+    # Use your web browser to download this file:
+    #   https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py
+    #
+    # ...and save it to:
+    # c:\projects\quick_tutorial\ez_setup.py
+    #
+    # Then run the following command:
+
     c:\> %VENV%\Scripts\python ez_setup.py
 
 If ``wget`` complains with a certificate error, then run this command instead:
