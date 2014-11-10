@@ -1,6 +1,16 @@
 Next release
 ============
 
+Features
+--------
+
+- Cache busting for static resources has been added and is available via a new
+  argument to ``pyramid.config.Configurator.add_static_view``: ``cachebust``.
+
+- Assets can now be overidden by an absolute path on the filesystem when using
+  the ``config.override_asset`` API.
+  See https://github.com/Pylons/pyramid/issues/1229
+
 Bug Fixes
 ---------
 

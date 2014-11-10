@@ -157,6 +157,28 @@ feature when this is true.
 |                                 |                                  |
 +---------------------------------+----------------------------------+
 
+Preventing Cache Busting
+------------------------
+
+Prevent the ``cachebust`` static view configuration argument from having any
+effect globally in this process when this value is true.  No cache buster will
+be configured or used when this is true.  
+
+.. versionadded:: 1.6
+
+.. seealso::
+
+    See also :ref:`cache_busting`.
+
++---------------------------------+----------------------------------+
+| Environment Variable Name       | Config File Setting Name         |
++=================================+==================================+
+| ``PYRAMID_PREVENT_CACHEBUST``   |  ``pyramid.prevent_cachebust``   |
+|                                 |  or ``prevent_cachebust``        |
+|                                 |                                  |
+|                                 |                                  |
++---------------------------------+----------------------------------+
+
 Debugging All
 -------------
 
