@@ -7,8 +7,8 @@ single HTTP status code.  Each class is a subclass of the
 :class:`~HTTPException`.  Each exception class is also a :term:`response`
 object.
 
-Each exception class has a status code according to :rfc:`2068`:
-codes with 100-300 are not really errors; 400s are client errors,
+Each exception class has a status code according to :rfc:`2068` and
+:rfc:`6585`: codes with 100-300 are not really errors; 400s are client errors,
 and 500s are server errors.
 
 Exception
@@ -52,6 +52,10 @@ Exception
         * 422 - HTTPUnprocessableEntity
         * 423 - HTTPLocked
         * 424 - HTTPFailedDependency
+        * 428 - HTTPPreconditionRequired
+        * 429 - HTTPTooManyRequests
+        * 431 - HTTPRequestHeaderFieldsTooLarge
+        * 451 - HTTPUnavailableForLegalReasons
       HTTPServerError
         * 500 - HTTPInternalServerError
         * 501 - HTTPNotImplemented
@@ -60,6 +64,7 @@ Exception
         * 504 - HTTPGatewayTimeout
         * 505 - HTTPVersionNotSupported
         * 507 - HTTPInsufficientStorage
+        * 511 - HTTPNetworkAuthenticationRequired
 
 HTTP exceptions are also :term:`response` objects, thus they accept most of
 the same parameters that can be passed to a regular
@@ -911,6 +916,71 @@ class HTTPFailedDependency(HTTPClientError):
         'The method could not be performed because the requested '
         'action dependended on another action and that action failed')
 
+class HTTPPreconditionRequired(HTTPClientError):
+    """
+    subclass of :class:`~HTTPClientError`
+
+    This indicates that the origin server requires the request to be
+    conditional.  From RFC 6585, "Additional HTTP Status Codes".
+
+    code: 428, title: Precondition Required
+    """
+    code = 428
+    title = 'Precondition Required'
+    explanation = ('This request is required to be conditional')
+
+class HTTPTooManyRequests(HTTPClientError):
+    """
+    subclass of :class:`~HTTPClientError`
+
+    This indicates that the client has sent too many requests in a
+    given amount of time.  Useful for rate limiting.
+
+    From RFC 6585, "Additional HTTP Status Codes".
+
+    code: 429, title: Too Many Requests
+    """
+    code = 429
+    title = 'Too Many Requests'
+    explanation = (
+        'The client has sent too many requests in a given amount of time')
+
+class HTTPRequestHeaderFieldsTooLarge(HTTPClientError):
+    """
+    subclass of :class:`~HTTPClientError`
+
+    This indicates that the server is unwilling to process the request
+    because its header fields are too large. The request may be resubmitted
+    after reducing the size of the request header fields.
+
+    From RFC 6585, "Additional HTTP Status Codes".
+
+    code: 431, title: Request Header Fields Too Large
+    """
+    code = 431
+    title = 'Request Header Fields Too Large'
+    explanation = (
+        'The request header fields were too large')
+
+class HTTPUnavailableForLegalReasons(HTTPClientError):
+    """
+    subclass of :class:`~HTTPClientError`
+
+    This indicates that the server is unable to process the request
+    because of legal reasons, e.g. censorship or government-mandated
+    blocked access.
+
+    From the draft "A New HTTP Status Code for Legally-restricted Resources"
+    by Tim Bray:
+
+    http://tools.ietf.org/html/draft-tbray-http-legally-restricted-status-00
+
+    code: 451, title: Unavailable For Legal Reasons
+    """
+    code = 451
+    title = 'Unavailable For Legal Reasons'
+    explanation = ('The resource is not available due to legal reasons.')
+
 ############################################################
 ## 5xx Server Error
 ############################################################
@@ -1022,6 +1092,19 @@ class HTTPInsufficientStorage(HTTPServerError):
     code = 507
     title = 'Insufficient Storage'
     explanation = ('There was not enough space to save the resource')
+
+class HTTPNetworkAuthenticationRequired(HTTPServerError):
+    """
+    subclass of :class:`~HTTPServerError`
+
+    This indicates that the client needs to authenticate to gain
+    network access.  From RFC 6585, "Additional HTTP Status Codes".
+
+    code: 511, title: Network Authentication Required
+    """
+    code = 511
+    title = 'Network Authentication Required'
+    explanation = ('Network authentication is required')
 
 def exception_response(status_code, **kw):
     """Creates an HTTP exception based on a status code. Example::
