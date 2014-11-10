@@ -14,6 +14,10 @@ Docs
 Bug Fixes
 ---------
 
+- ``pyramid.wsgi.wsgiapp`` and ``pyramid.wsgi.wsgiapp2`` now raise
+  ``ValueError`` when accidentally passed ``None``.
+  See https://github.com/Pylons/pyramid/pull/1320
+
 - Work around a bug introduced in Python 2.7.7 on Windows where
   ``mimetypes.guess_type`` returns Unicode rather than str for the content
   type, unlike any previous version of Python.  See
