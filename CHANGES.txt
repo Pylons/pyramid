@@ -16,6 +16,11 @@ Features
 - Added line numbers to the log formatters in the scaffolds to assist with
   debugging. See https://github.com/Pylons/pyramid/pull/1326
 
+- Add new HTTP exception objects for status codes
+  ``428 Precondition Required``, ``429 Too Many Requests`` and
+  ``431 Request Header Fields Too Large`` in ``pyramid.httpexceptions``.
+  See https://github.com/Pylons/pyramid/pull/1372/files
+
 Bug Fixes
 ---------
 
