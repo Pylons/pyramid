@@ -13,6 +13,9 @@ Features
   resources relative to the package in which the ``Configurator`` was created.
   See https://github.com/Pylons/pyramid/pull/1337
 
+- Added line numbers to the log formatters in the scaffolds to assist with
+  debugging. See https://github.com/Pylons/pyramid/pull/1326
+
 Bug Fixes
 ---------
 
