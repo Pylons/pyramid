@@ -43,6 +43,10 @@ Bug Fixes
 - ``pcreate`` now normalizes the package name by converting hyphens to
   underscores. See https://github.com/Pylons/pyramid/pull/1376
 
+- Fix an issue with the final response/finished callback being unable to
+  add another callback to the list. See
+  https://github.com/Pylons/pyramid/pull/1373
+
 Docs
 ----
 
