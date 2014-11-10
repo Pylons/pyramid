@@ -1,5 +1,5 @@
-Next release
-============
+1.5.2 (2014-11-09)
+==================
 
 Bug Fixes
 ---------
@@ -15,6 +15,8 @@ Bug Fixes
 
 Docs
 ----
+
+- Many various improvements to usage and syntax.
 
 - Removed logging configuration from Quick Tutorial ini files except for
   scaffolding- and logging-related chapters to avoid needing to explain it too
