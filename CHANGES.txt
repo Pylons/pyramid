@@ -40,6 +40,9 @@ Bug Fixes
   type, unlike any previous version of Python.  See
   https://github.com/Pylons/pyramid/issues/1360 for more information.
 
+- ``pcreate`` now normalizes the package name by converting hyphens to
+  underscores. See https://github.com/Pylons/pyramid/pull/1376
+
 Docs
 ----
 
