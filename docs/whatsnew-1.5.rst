@@ -7,6 +7,18 @@ incompatibilities between the two versions and deprecations added to
 :app:`Pyramid` 1.5, as well as software dependency changes and notable
 documentation additions.
 
+
+Bug Fix Releases
+----------------
+Pyramid 1.5 was released on 2014-04-08.
+
+The following bug fix releases were made since then. Bug fix releases also
+include documentation improvements and other minor feature changes.
+
+- :ref:`changes_1.5.1`
+- :ref:`changes_1.5.2`
+
+
 Major Backwards Incompatibilities
 ---------------------------------
 
@@ -34,9 +46,9 @@ Major Backwards Incompatibilities
 
      ValueError: No such renderer factory .mak
 
-  Support for Mako templating has been moved into an add-on package named 
-  ``pyramid_mako``, and support for Chameleon templating has been moved into 
-  an add-on package named ``pyramid_chameleon``.  These packages are drop-in 
+  Support for Mako templating has been moved into an add-on package named
+  ``pyramid_mako``, and support for Chameleon templating has been moved into
+  an add-on package named ``pyramid_chameleon``.  These packages are drop-in
   replacements for the old built-in support for these templating langauges. 
   All you have to do is install them and make them active in your configuration
   to register renderer factories for ``.pt`` and/or ``.mako`` (or ``.mak``) to
@@ -133,8 +145,6 @@ Major Backwards Incompatibilities
 
 Feature Additions
 -----------------
-
-The feature additions in Pyramid 1.5 follow.
 
 - Add ``pdistreport`` script, which prints the Python version in use, the
   Pyramid version in use, and the version number and location of all Python
@@ -379,7 +389,7 @@ Other Backwards Incompatibilities
   WSGI servers always unquote the slash anyway, and Pyramid never sees the
   quoted value.
 
-- It is no longer possible to set a ``locale_name`` attribute of the request, 
+- It is no longer possible to set a ``locale_name`` attribute of the request,
   nor is it possible to set a ``localizer`` attribute of the request.  These
   are now "reified" properties that look up a locale name and localizer
   respectively using the machinery described in :ref:`i18n_chapter`.
@@ -396,7 +406,7 @@ Other Backwards Incompatibilities
   be the tuple form of the resource's path (physical and virtual).
 
 - Removed the ``request.response_*`` varying attributes (such
-  as``request.response_headers``) . These attributes had been deprecated
+  as ``request.response_headers``). These attributes had been deprecated
   since Pyramid 1.1, and as per the deprecation policy, have now been removed.
 
 - ``request.response`` will no longer be mutated when using the 
