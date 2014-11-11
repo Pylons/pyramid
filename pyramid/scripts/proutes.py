@@ -130,10 +130,6 @@ class PRoutesCommand(object):
                     name='',
                     default=None
                 )
-                if route.name == 'shared-view-json':
-                    import pdb; pdb.set_trace()
-
-
 
                 if view_callable is not None:
                     if isinstance(view_callable, MultiView):
