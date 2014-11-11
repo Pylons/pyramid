@@ -13,96 +13,96 @@
 
   .. autofunction:: exception_response
 
-  .. autoclass:: HTTPException
+  .. autoexception:: HTTPException
 
-  .. autoclass:: HTTPOk
+  .. autoexception:: HTTPOk
 
-  .. autoclass:: HTTPRedirection
+  .. autoexception:: HTTPRedirection
 
-  .. autoclass:: HTTPError
+  .. autoexception:: HTTPError
 
-  .. autoclass:: HTTPClientError
+  .. autoexception:: HTTPClientError
 
-  .. autoclass:: HTTPServerError
+  .. autoexception:: HTTPServerError
 
-  .. autoclass:: HTTPCreated
+  .. autoexception:: HTTPCreated
 
-  .. autoclass:: HTTPAccepted
+  .. autoexception:: HTTPAccepted
 
-  .. autoclass:: HTTPNonAuthoritativeInformation
+  .. autoexception:: HTTPNonAuthoritativeInformation
 
-  .. autoclass:: HTTPNoContent
+  .. autoexception:: HTTPNoContent
 
-  .. autoclass:: HTTPResetContent
+  .. autoexception:: HTTPResetContent
 
-  .. autoclass:: HTTPPartialContent
+  .. autoexception:: HTTPPartialContent
 
-  .. autoclass:: HTTPMultipleChoices
+  .. autoexception:: HTTPMultipleChoices
 
-  .. autoclass:: HTTPMovedPermanently
+  .. autoexception:: HTTPMovedPermanently
 
-  .. autoclass:: HTTPFound
+  .. autoexception:: HTTPFound
 
-  .. autoclass:: HTTPSeeOther
+  .. autoexception:: HTTPSeeOther
 
-  .. autoclass:: HTTPNotModified
+  .. autoexception:: HTTPNotModified
 
-  .. autoclass:: HTTPUseProxy
+  .. autoexception:: HTTPUseProxy
 
-  .. autoclass:: HTTPTemporaryRedirect
+  .. autoexception:: HTTPTemporaryRedirect
 
-  .. autoclass:: HTTPBadRequest
+  .. autoexception:: HTTPBadRequest
 
-  .. autoclass:: HTTPUnauthorized
+  .. autoexception:: HTTPUnauthorized
 
-  .. autoclass:: HTTPPaymentRequired
+  .. autoexception:: HTTPPaymentRequired
 
-  .. autoclass:: HTTPForbidden
+  .. autoexception:: HTTPForbidden
 
-  .. autoclass:: HTTPNotFound
+  .. autoexception:: HTTPNotFound
 
-  .. autoclass:: HTTPMethodNotAllowed
+  .. autoexception:: HTTPMethodNotAllowed
 
-  .. autoclass:: HTTPNotAcceptable
+  .. autoexception:: HTTPNotAcceptable
 
-  .. autoclass:: HTTPProxyAuthenticationRequired
+  .. autoexception:: HTTPProxyAuthenticationRequired
 
-  .. autoclass:: HTTPRequestTimeout
+  .. autoexception:: HTTPRequestTimeout
 
-  .. autoclass:: HTTPConflict
+  .. autoexception:: HTTPConflict
 
-  .. autoclass:: HTTPGone
+  .. autoexception:: HTTPGone
 
-  .. autoclass:: HTTPLengthRequired
+  .. autoexception:: HTTPLengthRequired
 
-  .. autoclass:: HTTPPreconditionFailed
+  .. autoexception:: HTTPPreconditionFailed
 
-  .. autoclass:: HTTPRequestEntityTooLarge
+  .. autoexception:: HTTPRequestEntityTooLarge
 
-  .. autoclass:: HTTPRequestURITooLong
+  .. autoexception:: HTTPRequestURITooLong
 
-  .. autoclass:: HTTPUnsupportedMediaType
+  .. autoexception:: HTTPUnsupportedMediaType
 
-  .. autoclass:: HTTPRequestRangeNotSatisfiable
+  .. autoexception:: HTTPRequestRangeNotSatisfiable
 
-  .. autoclass:: HTTPExpectationFailed
+  .. autoexception:: HTTPExpectationFailed
 
-  .. autoclass:: HTTPUnprocessableEntity
+  .. autoexception:: HTTPUnprocessableEntity
 
-  .. autoclass:: HTTPLocked
+  .. autoexception:: HTTPLocked
 
-  .. autoclass:: HTTPFailedDependency
+  .. autoexception:: HTTPFailedDependency
 
-  .. autoclass:: HTTPInternalServerError
+  .. autoexception:: HTTPInternalServerError
 
-  .. autoclass:: HTTPNotImplemented
+  .. autoexception:: HTTPNotImplemented
 
-  .. autoclass:: HTTPBadGateway
+  .. autoexception:: HTTPBadGateway
 
-  .. autoclass:: HTTPServiceUnavailable
+  .. autoexception:: HTTPServiceUnavailable
 
-  .. autoclass:: HTTPGatewayTimeout
+  .. autoexception:: HTTPGatewayTimeout
 
-  .. autoclass:: HTTPVersionNotSupported
+  .. autoexception:: HTTPVersionNotSupported
 
-  .. autoclass:: HTTPInsufficientStorage
+  .. autoexception:: HTTPInsufficientStorage
