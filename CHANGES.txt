@@ -58,6 +58,9 @@ Bug Fixes
   add another callback to the list. See
   https://github.com/Pylons/pyramid/pull/1373
 
+- Fix a failing unittest caused by differing mimetypes across various OSs.
+  See https://github.com/Pylons/pyramid/issues/1405
+
 Docs
 ----
 
