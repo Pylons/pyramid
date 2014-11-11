@@ -24,6 +24,12 @@ Features
   ``431 Request Header Fields Too Large`` in ``pyramid.httpexceptions``.
   See https://github.com/Pylons/pyramid/pull/1372/files
 
+- Make it simple to define notfound and forbidden views that wish to use
+  the default exception-response view but with altered predicates and other
+  configuration options. The ``view`` argument is now optional in
+  ``config.add_notfound_view`` and ``config.add_forbidden_view``..
+  See https://github.com/Pylons/pyramid/issues/494
+
 Bug Fixes
 ---------
 
