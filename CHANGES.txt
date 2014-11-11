@@ -1,3 +1,9 @@
+Next release
+============
+
+- Fixed a failing unittest caused by differing mimetypes on various
+  OS platforms. See https://github.com/Pylons/pyramid/issues/1405
+
 1.5.2 (2014-11-09)
 ==================
 
