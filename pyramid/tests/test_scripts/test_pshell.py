@@ -1,3 +1,4 @@
+import os
 import unittest
 from pyramid.tests.test_scripts import dummy
 
@@ -24,6 +25,9 @@ class TestPShellCommand(unittest.TestCase):
             self.options.python_shell = ''
             self.options.setup = None
             cmd.options = self.options
+        # default to None to prevent side-effects from running tests in
+        # unknown environments
+        cmd.pystartup = None
         return cmd
 
     def test_make_default_shell(self):
@@ -370,33 +374,24 @@ class TestPShellCommand(unittest.TestCase):
         self.assertTrue(shell.help)
 
     def test_command_loads_pythonstartup(self):
-        import os
-        marker = object()
-        old_pystartup = os.environ.get('PYTHONSTARTUP', marker)
-        os.environ['PYTHONSTARTUP'] = (
+        command = self._makeOne()
+        command.pystartup = (
             os.path.abspath(
                 os.path.join(
                     os.path.dirname(__file__),
                     'pystartup.py')))
-        try:
-            command = self._makeOne()
-            shell = dummy.DummyShell()
-            command.run(shell)
-            self.assertEqual(self.bootstrap.a[0], '/foo/bar/myapp.ini#myapp')
-            self.assertEqual(shell.env, {
-                'app':self.bootstrap.app, 'root':self.bootstrap.root,
-                'registry':self.bootstrap.registry,
-                'request':self.bootstrap.request,
-                'root_factory':self.bootstrap.root_factory,
-                'foo':1,
-            })
-            self.assertTrue(self.bootstrap.closer.called)
-            self.assertTrue(shell.help)
-        finally: # pragma: no cover
-            if old_pystartup is not marker:
-                os.environ['PYTHONSTARTUP'] = old_pystartup
-            else:
-                del os.environ['PYTHONSTARTUP']
+        shell = dummy.DummyShell()
+        command.run(shell)
+        self.assertEqual(self.bootstrap.a[0], '/foo/bar/myapp.ini#myapp')
+        self.assertEqual(shell.env, {
+            'app':self.bootstrap.app, 'root':self.bootstrap.root,
+            'registry':self.bootstrap.registry,
+            'request':self.bootstrap.request,
+            'root_factory':self.bootstrap.root_factory,
+            'foo':1,
+        })
+        self.assertTrue(self.bootstrap.closer.called)
+        self.assertTrue(shell.help)
 
 class Test_main(unittest.TestCase):
     def _callFUT(self, argv):

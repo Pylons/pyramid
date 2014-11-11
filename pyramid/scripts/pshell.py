@@ -53,12 +53,11 @@ class PShellCommand(object):
     loaded_objects = {}
     object_help = {}
     setup = None
-    pystartup = None
+    pystartup = os.environ.get('PYTHONSTARTUP')
 
     def __init__(self, argv, quiet=False):
         self.quiet = quiet
         self.options, self.args = self.parser.parse_args(argv[1:])
-        self.pystartup = os.environ.get('PYTHONSTARTUP')
 
     def pshell_file_config(self, filename):
         config = self.ConfigParser()

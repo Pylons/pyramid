@@ -26,7 +26,7 @@ Features
 
 - The ``pshell`` script will now load a ``PYTHONSTARTUP`` file if one is
   defined in the environment prior to launching the interpreter.
-  See https://github.com/Pylons/pyramid/pull/1299
+  See https://github.com/Pylons/pyramid/pull/1448
 
 Bug Fixes
 ---------
