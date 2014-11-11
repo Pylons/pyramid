@@ -1,4 +1,5 @@
 import io
+import mimetypes
 import os
 import unittest
 from pyramid import testing
@@ -51,15 +52,11 @@ class TestFileResponse(unittest.TestCase):
         r.app_iter.close()
 
     def test_without_content_type(self):
-        for suffix, content_type in (
-            ('txt', 'text/plain; charset=UTF-8'),
-            ('xml', 'application/xml; charset=UTF-8'),
-            ('pdf', 'application/pdf')
-        ):
+        for suffix in ('txt', 'xml', 'pdf'):
             path = self._getPath(suffix)
             r = self._makeOne(path)
-            self.assertEqual(r.content_type, content_type.split(';')[0])
-            self.assertEqual(r.headers['content-type'], content_type)
+            self.assertEqual(r.headers['content-type'].split(';')[0],
+                             mimetypes.guess_type(path, strict=False)[0])
             r.app_iter.close()
 
     def test_python_277_bug_15207(self):
