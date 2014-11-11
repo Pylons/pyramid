@@ -354,7 +354,7 @@ command from Gettext:
    $ mkdir -p es/LC_MESSAGES
    $ msginit -l es -o es/LC_MESSAGES/myapplication.po
 
-This will create a new the message catalog ``.po`` file will in:
+This will create a new message catalog ``.po`` file will in:
 
 ``myapplication/locale/es/LC_MESSAGES/myapplication.po``.
 
