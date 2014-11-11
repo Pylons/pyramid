@@ -7,6 +7,7 @@ from pyramid.scripts.common import parse_vars
 from pyramid.config.views import MultiView
 
 UNKNOWN_KEY = '<unknown>'
+ANY_KEY = '<ANY>'
 PAD = 3
 
 def main(argv=sys.argv, quiet=False):
@@ -86,14 +87,15 @@ class PRoutesCommand(object):
             ))
 
             for route in routes:
-                request_methods = None
+                route_request_methods = []
+                view_request_methods = []
+
                 request_iface = registry.queryUtility(
                     IRouteRequest,
                     name=route.name
                 )
 
                 view_callable = None
-
                 pattern = route.pattern
 
                 if not pattern.startswith('/'):
@@ -102,51 +104,52 @@ class PRoutesCommand(object):
                 if len(pattern) > max_pattern:
                     max_pattern = len(pattern)
 
-                if (request_iface is None) or (route.factory is not None):
-                    view_callable = UNKNOWN_KEY
-                else:
-                    route_intr = registry.introspector.get(
-                        'routes', route.name
-                    )
-                    request_methods = route_intr['request_methods']
+#                if (request_iface is None) or (route.factory is not None):
+#                    view_callable = UNKNOWN_KEY
+#                else:
+                route_intr = registry.introspector.get(
+                    'routes', route.name
+                )
 
+                if route_intr is not None:
+                    route_request_methods = route_intr['request_methods']
+                    view_intr = registry.introspector.related(route_intr)
 
-                    if request_methods is None:
-                        request_methods = []
-                        view_intr = registry.introspector.related(route_intr)
+                    for view in view_intr:
+                        request_method = view.get('request_methods')
 
-                        for view in view_intr:
-                            request_method = view['request_methods']
-
-                            if request_method is None:
-                                request_method = 'ALL'
-
+                        if request_method is not None:
                             if len(request_method) > max_method:
                                 max_method = len(request_method)
 
-                            request_methods.append(request_method)
-                    view_callable = registry.adapters.lookup(
-                        (IViewClassifier, request_iface, Interface),
-                        IView,
-                        name='',
-                        default=None
-                    )
+                            view_request_methods.append(request_method)
 
-                    if view_callable is not None:
-                        if isinstance(view_callable, MultiView):
-                            view_callables = [
-                                x[1] for x in view_callable.views
-                            ]
-                        else:
-                            view_callables = [view_callable]
+                view_callable = registry.adapters.lookup(
+                    (IViewClassifier, request_iface, Interface),
+                    IView,
+                    name='',
+                    default=None
+                )
+                if route.name == 'shared-view-json':
+                    import pdb; pdb.set_trace()
 
-                        for view_func in view_callables:
-                            view_callable = '%s.%s' % (
-                                view_func.__module__,
-                                view_func.__name__,
-                            )
+
+
+                if view_callable is not None:
+                    if isinstance(view_callable, MultiView):
+                        view_callables = [
+                            x[1] for x in view_callable.views
+                        ]
                     else:
-                        view_callable = str(None)
+                        view_callables = [view_callable]
+
+                    for view_func in view_callables:
+                        view_callable = '%s.%s' % (
+                            view_func.__module__,
+                            view_func.__name__,
+                        )
+                else:
+                    view_callable = str(None)
 
                 if len(route.name) > max_name:
                     max_name = len(route.name)
@@ -154,10 +157,28 @@ class PRoutesCommand(object):
                 if len(view_callable) > max_view:
                     max_view = len(view_callable)
 
-                if request_methods:
-                    request_methods = ','.join(set(request_methods))
+                has_route_methods = route_request_methods is not None
+                has_view_methods = len(view_request_methods) > 0
+                has_methods = has_route_methods or has_view_methods
+
+                if has_route_methods is False and has_view_methods is False:
+                    request_methods = [ANY_KEY]
+                elif has_route_methods is False and has_view_methods is True:
+                    request_methods = view_request_methods
+                elif has_route_methods is True and has_view_methods is False:
+                    request_methods = route_request_methods
+                else:
+                    request_methods = set(route_request_methods).intersection(
+                        view_request_methods
+                    )
+
+                if has_methods and not request_methods:
+                    request_methods = '<route mismatch>'
+                elif request_methods:
+                    request_methods = ','.join(request_methods)
                 else:
                     request_methods = UNKNOWN_KEY
+
                 mapped_routes.append(
                     (route.name, pattern, view_callable, request_methods)
                 )
