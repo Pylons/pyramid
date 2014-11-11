@@ -69,6 +69,9 @@ class PCreateCommand(object):
         if not self.args:
             self.out('You must provide a project name')
             return 2
+        if os.path.exists(os.path.abspath(os.path.normpath(self.args[0]))):
+            self.out('Project directory already exists. Please choose another project name')
+            return 2
         available = [x.name for x in self.scaffolds]
         diff = set(self.options.scaffold_name).difference(available)
         if diff:
