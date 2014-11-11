@@ -1,6 +1,36 @@
 import unittest
 from pyramid.tests.test_scripts import dummy
 
+
+class DummyIntrospector(object):
+    def __init__(self):
+        self.relations = {}
+        self.introspectables = {}
+
+    def add(self, introspectable):
+        cat = introspectable.category_name
+        if cat not in self.introspectables:
+            self.introspectables[cat] = []
+
+        self.introspectables[cat].append(introspectable)
+
+    def get(self, name, discrim):
+        intrs = self.introspectables[name]
+
+        for intr in intrs:
+            if intr.discriminator == discrim:
+                return intr
+
+    def relate(self, a, b):
+        if a not in self.relations:
+            self.retlations[a] = []
+
+        self.relations[a].append(b)
+
+    def related(self, a):
+        return self.relations.get(a, [])
+
+
 class TestPRoutesCommand(unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.scripts.proutes import PRoutesCommand
@@ -11,6 +41,21 @@ class TestPRoutesCommand(unittest.TestCase):
         cmd.bootstrap = (dummy.DummyBootstrap(),)
         cmd.args = ('/foo/bar/myapp.ini#myapp',)
         return cmd
+
+    def _makeRegistry(self):
+        from pyramid.registry import Registry
+        registry = Registry()
+        registry.introspector = DummyIntrospector()
+        
+        return registry
+
+    def _makeIntrospectable(self, category, discrim, request_methods=None):
+        from pyramid.registry import Introspectable
+        intr = Introspectable(category, discrim, 'title', 'type')
+
+        intr['request_methods'] = request_methods
+
+        return intr
 
     def test_good_args(self):
         cmd = self._getTargetClass()([])
@@ -60,28 +105,34 @@ class TestPRoutesCommand(unittest.TestCase):
         command._get_mapper = lambda *arg: mapper
         L = []
         command.out = L.append
+        registry = self._makeRegistry()
+        command.bootstrap = (dummy.DummyBootstrap(registry=registry),)
         result = command.run()
         self.assertEqual(result, 0)
         self.assertEqual(len(L), 3)
-        self.assertEqual(L[-1].split(), ['a', '/a', '<unknown>'])
+        self.assertEqual(L[-1].split(), ['a', '/a', '<unknown>', '<unknown>'])
 
     def test_route_with_no_slash_prefix(self):
         command = self._makeOne()
         route = dummy.DummyRoute('a', 'a')
         mapper = dummy.DummyMapper(route)
+        registry = self._makeRegistry()
         command._get_mapper = lambda *arg: mapper
         L = []
         command.out = L.append
+        command.bootstrap = (dummy.DummyBootstrap(registry=registry),)
         result = command.run()
         self.assertEqual(result, 0)
         self.assertEqual(len(L), 3)
-        self.assertEqual(L[-1].split(), ['a', '/a', '<unknown>'])
+        self.assertEqual(L[-1].split(), ['a', '/a', '<unknown>', '<unknown>'])
+
 
     def test_single_route_no_views_registered(self):
         from zope.interface import Interface
-        from pyramid.registry import Registry
         from pyramid.interfaces import IRouteRequest
-        registry = Registry()
+        registry = self._makeRegistry()
+        registry.introspector.add(self._makeIntrospectable('routes', 'a'))
+
         def view():pass
         class IMyRoute(Interface):
             pass
@@ -97,14 +148,15 @@ class TestPRoutesCommand(unittest.TestCase):
         self.assertEqual(result, 0)
         self.assertEqual(len(L), 3)
         self.assertEqual(L[-1].split()[:3], ['a', '/a', 'None'])
+                                                                                
 
     def test_single_route_one_view_registered(self):
         from zope.interface import Interface
-        from pyramid.registry import Registry
         from pyramid.interfaces import IRouteRequest
         from pyramid.interfaces import IViewClassifier
         from pyramid.interfaces import IView
-        registry = Registry()
+
+        registry = self._makeRegistry()
         def view():pass
         class IMyRoute(Interface):
             pass
@@ -112,6 +164,7 @@ class TestPRoutesCommand(unittest.TestCase):
                                  (IViewClassifier, IMyRoute, Interface),
                                  IView, '')
         registry.registerUtility(IMyRoute, IRouteRequest, name='a')
+        registry.introspector.add(self._makeIntrospectable('routes', 'a'))
         command = self._makeOne()
         route = dummy.DummyRoute('a', '/a')
         mapper = dummy.DummyMapper(route)
@@ -123,15 +176,16 @@ class TestPRoutesCommand(unittest.TestCase):
         self.assertEqual(result, 0)
         self.assertEqual(len(L), 3)
         compare_to = L[-1].split()[:3]
-        self.assertEqual(compare_to, ['a', '/a', '<function'])
+        self.assertEqual(compare_to, ['a', '/a', 'pyramid.tests.test_scripts.test_proutes.view'])
         
     def test_single_route_one_view_registered_with_factory(self):
         from zope.interface import Interface
-        from pyramid.registry import Registry
         from pyramid.interfaces import IRouteRequest
         from pyramid.interfaces import IViewClassifier
         from pyramid.interfaces import IView
-        registry = Registry()
+
+        registry = self._makeRegistry()
+
         def view():pass
         class IMyRoot(Interface):
             pass
