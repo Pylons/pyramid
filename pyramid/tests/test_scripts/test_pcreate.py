@@ -73,6 +73,23 @@ class TestPCreateCommand(unittest.TestCase):
             {'project': 'Distro', 'egg': 'Distro', 'package': 'distro',
              'pyramid_version': '0.1', 'pyramid_docs_branch':'0.1-branch'})
 
+    def test_scaffold_with_hyphen_in_project_name(self):
+        import os
+        cmd = self._makeOne('-s', 'dummy', 'Distro-')
+        scaffold = DummyScaffold('dummy')
+        cmd.scaffolds = [scaffold]
+        cmd.pyramid_dist = DummyDist("0.1")
+        result = cmd.run()
+        self.assertEqual(result, 0)
+        self.assertEqual(
+            scaffold.output_dir,
+            os.path.normpath(os.path.join(os.getcwd(), 'Distro-'))
+            )
+        self.assertEqual(
+            scaffold.vars,
+            {'project': 'Distro-', 'egg': 'Distro_', 'package': 'distro_',
+             'pyramid_version': '0.1', 'pyramid_docs_branch':'0.1-branch'})
+
     def test_known_scaffold_absolute_path(self):
         import os
         path = os.path.abspath('Distro')

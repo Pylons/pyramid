@@ -1,3 +1,4 @@
+from collections import deque
 import json
 
 from zope.interface import implementer
@@ -32,8 +33,8 @@ class TemplateContext(object):
     pass
 
 class CallbackMethodsMixin(object):
-    response_callbacks = ()
-    finished_callbacks = ()
+    response_callbacks = None
+    finished_callbacks = None
     def add_response_callback(self, callback):
         """
         Add a callback to the set of callbacks to be called by the
@@ -72,15 +73,15 @@ class CallbackMethodsMixin(object):
         """
 
         callbacks = self.response_callbacks
-        if not callbacks:
-            callbacks = []
+        if callbacks is None:
+            callbacks = deque()
         callbacks.append(callback)
         self.response_callbacks = callbacks
 
     def _process_response_callbacks(self, response):
         callbacks = self.response_callbacks
         while callbacks:
-            callback = callbacks.pop(0)
+            callback = callbacks.popleft()
             callback(self, response)
 
     def add_finished_callback(self, callback):
@@ -132,15 +133,15 @@ class CallbackMethodsMixin(object):
         """
 
         callbacks = self.finished_callbacks
-        if not callbacks:
-            callbacks = []
+        if callbacks is None:
+            callbacks = deque()
         callbacks.append(callback)
         self.finished_callbacks = callbacks
 
     def _process_finished_callbacks(self):
         callbacks = self.finished_callbacks
         while callbacks:
-            callback = callbacks.pop(0)
+            callback = callbacks.popleft()
             callback(self)
 
 @implementer(IRequest)

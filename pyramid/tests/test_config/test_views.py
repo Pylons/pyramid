@@ -1783,6 +1783,21 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         result = view(None, request)
         self.assertEqual(result, 'OK')
 
+    def test_add_forbidden_view_no_view_argument(self):
+        from zope.interface import implementedBy
+        from pyramid.interfaces import IRequest
+        from pyramid.httpexceptions import HTTPForbidden
+        config = self._makeOne(autocommit=True)
+        config.setup_registry()
+        config.add_forbidden_view()
+        request = self._makeRequest(config)
+        view = self._getViewCallable(config,
+                                     ctx_iface=implementedBy(HTTPForbidden),
+                                     request_iface=IRequest)
+        context = HTTPForbidden()
+        result = view(context, request)
+        self.assertEqual(result, context)
+
     def test_add_forbidden_view_allows_other_predicates(self):
         from pyramid.renderers import null_renderer
         config = self._makeOne(autocommit=True)
@@ -1859,6 +1874,21 @@ class TestViewsConfigurationMixin(unittest.TestCase):
                                      request_iface=IRequest)
         result = view(None, request)
         self.assertEqual(result, (None, request))
+
+    def test_add_notfound_view_no_view_argument(self):
+        from zope.interface import implementedBy
+        from pyramid.interfaces import IRequest
+        from pyramid.httpexceptions import HTTPNotFound
+        config = self._makeOne(autocommit=True)
+        config.setup_registry()
+        config.add_notfound_view()
+        request = self._makeRequest(config)
+        view = self._getViewCallable(config,
+                                     ctx_iface=implementedBy(HTTPNotFound),
+                                     request_iface=IRequest)
+        context = HTTPNotFound()
+        result = view(context, request)
+        self.assertEqual(result, context)
 
     def test_add_notfound_view_allows_other_predicates(self):
         from pyramid.renderers import null_renderer
