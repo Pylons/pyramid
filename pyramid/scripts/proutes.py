@@ -4,10 +4,16 @@ import textwrap
 
 from pyramid.paster import bootstrap
 from pyramid.scripts.common import parse_vars
+from pyramid.config.views import MultiView
+
+
+PAD = 3
+
 
 def main(argv=sys.argv, quiet=False):
     command = PRoutesCommand(argv, quiet)
     return command.run()
+
 
 class PRoutesCommand(object):
     description = """\
@@ -43,7 +49,7 @@ class PRoutesCommand(object):
     def out(self, msg): # pragma: no cover
         if not self.quiet:
             print(msg)
-    
+
     def run(self, quiet=False):
         if not self.args:
             self.out('requires a config file argument')
@@ -59,13 +65,22 @@ class PRoutesCommand(object):
         registry = env['registry']
         mapper = self._get_mapper(registry)
         if mapper is not None:
+            mapped_routes = [('Name', 'Pattern', 'View')]
+
+            max_name = len('Name')
+            max_pattern = len('Pattern')
+            max_view = len('View')
+
             routes = mapper.get_routes()
-            fmt = '%-15s %-30s %-25s'
             if not routes:
                 return 0
-            self.out(fmt % ('Name', 'Pattern', 'View'))
-            self.out(
-                fmt % ('-'*len('Name'), '-'*len('Pattern'), '-'*len('View')))
+
+            mapped_routes.append((
+                '-' * max_name,
+                '-' * max_pattern,
+                '-' * max_view,
+            ))
+
             for route in routes:
                 pattern = route.pattern
                 if not pattern.startswith('/'):
@@ -73,13 +88,50 @@ class PRoutesCommand(object):
                 request_iface = registry.queryUtility(IRouteRequest,
                                                       name=route.name)
                 view_callable = None
+
                 if (request_iface is None) or (route.factory is not None):
-                    self.out(fmt % (route.name, pattern, '<unknown>'))
+                    view_callable = '<unknown>'
                 else:
                     view_callable = registry.adapters.lookup(
                         (IViewClassifier, request_iface, Interface),
                         IView, name='', default=None)
-                    self.out(fmt % (route.name, pattern, view_callable))
+
+                    if view_callable is not None:
+                        if isinstance(view_callable, MultiView):
+                            view_callables = [
+                                x[1] for x in view_callable.views
+                            ]
+                        else:
+                            view_callables = [view_callable]
+
+                        for view_func in view_callables:
+                            view_callable = '%s.%s' % (
+                                view_func.__module__,
+                                view_func.__name__,
+                            )
+                    else:
+                        view_callable = str(None)
+
+                if len(route.name) > max_name:
+                    max_name = len(route.name)
+
+                if len(pattern) > max_pattern:
+                    max_pattern = len(pattern)
+
+                if len(view_callable) > max_view:
+                    max_view = len(view_callable)
+
+                mapped_routes.append((route.name, pattern, view_callable))
+
+            fmt = '%-{0}s %-{1}s %-{2}s'.format(
+                max_name + PAD,
+                max_pattern + PAD,
+                max_view + PAD,
+            )
+
+            for route_data in mapped_routes:
+                self.out(fmt % route_data)
+
         return 0
 
 if __name__ == '__main__': # pragma: no cover

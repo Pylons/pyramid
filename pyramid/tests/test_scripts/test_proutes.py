@@ -123,8 +123,11 @@ class TestPRoutesCommand(unittest.TestCase):
         self.assertEqual(result, 0)
         self.assertEqual(len(L), 3)
         compare_to = L[-1].split()[:3]
-        self.assertEqual(compare_to, ['a', '/a', '<function'])
-        
+        self.assertEqual(
+            compare_to,
+            ['a', '/a', 'pyramid.tests.test_scripts.test_proutes.view']
+        )
+
     def test_single_route_one_view_registered_with_factory(self):
         from zope.interface import Interface
         from pyramid.registry import Registry
@@ -161,7 +164,7 @@ class TestPRoutesCommand(unittest.TestCase):
         registry = Registry()
         result = command._get_mapper(registry)
         self.assertEqual(result.__class__, RoutesMapper)
-        
+
 class Test_main(unittest.TestCase):
     def _callFUT(self, argv):
         from pyramid.scripts.proutes import main
@@ -170,4 +173,3 @@ class Test_main(unittest.TestCase):
     def test_it(self):
         result = self._callFUT(['proutes'])
         self.assertEqual(result, 2)
-
