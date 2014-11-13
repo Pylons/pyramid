@@ -70,6 +70,9 @@ Bug Fixes
 - Fix a failing unittest caused by differing mimetypes across various OSs.
   See https://github.com/Pylons/pyramid/issues/1405
 
+- Fix route generation for static view asset specifications having no path.
+  See https://github.com/Pylons/pyramid/pull/1377
+
 Docs
 ----
 
