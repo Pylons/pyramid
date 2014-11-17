@@ -12,8 +12,8 @@ Features
   parameter to assist with includeable packages that wish to resolve
   resources relative to the package in which the ``Configurator`` was created.
   This is especially useful for addons that need to load asset specs from
-  settings, in which case it is natural for a user to define things relative
-  to their own packages.
+  settings, in which case it is may be natural for a developer to define
+  imports or assets relative to the top-level package.
   See https://github.com/Pylons/pyramid/pull/1337
 
 - Added line numbers to the log formatters in the scaffolds to assist with
@@ -27,6 +27,20 @@ Features
 - The ``pshell`` script will now load a ``PYTHONSTARTUP`` file if one is
   defined in the environment prior to launching the interpreter.
   See https://github.com/Pylons/pyramid/pull/1448
+
+- Make it simple to define notfound and forbidden views that wish to use
+  the default exception-response view but with altered predicates and other
+  configuration options. The ``view`` argument is now optional in
+  ``config.add_notfound_view`` and ``config.add_forbidden_view``..
+  See https://github.com/Pylons/pyramid/issues/494
+
+- Greatly improve the readability of the ``pcreate`` shell script output.
+  See https://github.com/Pylons/pyramid/pull/1453
+
+- Improve robustness to timing attacks in the ``AuthTktCookieHelper`` and
+  the ``SignedCookieSessionFactory`` classes by using the stdlib's
+  ``hmac.compare_digest`` if it is available (such as Python 2.7.7+ and 3.3+).
+  See https://github.com/Pylons/pyramid/pull/1457
 
 Bug Fixes
 ---------
@@ -61,6 +75,12 @@ Bug Fixes
 - Fix an issue with the final response/finished callback being unable to
   add another callback to the list. See
   https://github.com/Pylons/pyramid/pull/1373
+
+- Fix a failing unittest caused by differing mimetypes across various OSs.
+  See https://github.com/Pylons/pyramid/issues/1405
+
+- Fix route generation for static view asset specifications having no path.
+  See https://github.com/Pylons/pyramid/pull/1377
 
 Docs
 ----
