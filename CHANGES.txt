@@ -33,6 +33,11 @@ Features
 - Greatly improve the readability of the ``pcreate`` shell script output.
   See https://github.com/Pylons/pyramid/pull/1453
 
+- Improve robustness to timing attacks in the ``AuthTktCookieHelper`` and
+  the ``SignedCookieSessionFactory`` classes by using the stdlib's
+  ``hmac.compare_digest`` if it is available (such as Python 2.7.7+ and 3.3+).
+  See https://github.com/Pylons/pyramid/pull/1457
+
 Bug Fixes
 ---------
 
