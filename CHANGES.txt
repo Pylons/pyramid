@@ -19,7 +19,7 @@ Features
   override_with='/abs/path/')``. The ``myapp:static`` asset spec is completely
   made up and does not need to exist - it is used for generating urls
   via ``request.static_url('myapp:static/foo.png')``.
-  See https://github.com/Pylons/pyramid/issues/1229
+  See https://github.com/Pylons/pyramid/issues/1252
 
 Bug Fixes
 ---------
