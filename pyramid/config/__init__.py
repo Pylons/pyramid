@@ -125,6 +125,14 @@ class Configurator(
     is passed (the default), the package is assumed to be the Python package
     in which the *caller* of the ``Configurator`` constructor lives.
 
+    If the ``root_package`` is passed, it will propagate through the
+    configuration hierarchy as a way for included packages to locate
+    resources relative to the package in which the main ``Configurator`` was
+    created. If ``None`` is passed (the default), the ``root_package`` will
+    be derived from the ``package`` argument. The ``package`` attribute is
+    always pointing at the package being included when using :meth:`.include`,
+    whereas the ``root_package`` does not change.
+
     If the ``settings`` argument is passed, it should be a Python dictionary
     representing the :term:`deployment settings` for this application.  These
     are later retrievable using the
@@ -243,6 +251,9 @@ class Configurator(
 
     .. versionadded:: 1.3
        The ``introspection`` argument.
+
+    .. versionadded:: 1.6
+       The ``root_package`` argument.
     """
     manager = manager # for testing injection
     venusian = venusian # for testing injection
@@ -272,13 +283,17 @@ class Configurator(
                  exceptionresponse_view=default_exceptionresponse_view,
                  route_prefix=None,
                  introspection=True,
+                 root_package=None,
                  ):
         if package is None:
             package = caller_package()
+        if root_package is None:
+            root_package = package
         name_resolver = DottedNameResolver(package)
         self.name_resolver = name_resolver
         self.package_name = name_resolver.get_package_name()
         self.package = name_resolver.get_package()
+        self.root_package = root_package
         self.registry = registry
         self.autocommit = autocommit
         self.route_prefix = route_prefix
@@ -747,6 +762,7 @@ class Configurator(
             configurator = self.__class__(
                 registry=self.registry,
                 package=package_of(module),
+                root_package=self.root_package,
                 autocommit=self.autocommit,
                 route_prefix=route_prefix,
                 )
@@ -806,6 +822,7 @@ class Configurator(
         configurator = self.__class__(
             registry=self.registry,
             package=package,
+            root_package=self.root_package,
             autocommit=self.autocommit,
             route_prefix=self.route_prefix,
             introspection=self.introspection,

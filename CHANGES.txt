@@ -6,6 +6,37 @@ Features
 
 - Cache busting for static resources has been added and is available via a new
   argument to ``pyramid.config.Configurator.add_static_view``: ``cachebust``.
+  See https://github.com/Pylons/pyramid/pull/1380
+
+- Add ``pyramid.config.Configurator.root_package`` attribute and init
+  parameter to assist with includeable packages that wish to resolve
+  resources relative to the package in which the ``Configurator`` was created.
+  This is especially useful for addons that need to load asset specs from
+  settings, in which case it is may be natural for a developer to define
+  imports or assets relative to the top-level package.
+  See https://github.com/Pylons/pyramid/pull/1337
+
+- Added line numbers to the log formatters in the scaffolds to assist with
+  debugging. See https://github.com/Pylons/pyramid/pull/1326
+
+- Add new HTTP exception objects for status codes
+  ``428 Precondition Required``, ``429 Too Many Requests`` and
+  ``431 Request Header Fields Too Large`` in ``pyramid.httpexceptions``.
+  See https://github.com/Pylons/pyramid/pull/1372/files
+
+- Make it simple to define notfound and forbidden views that wish to use
+  the default exception-response view but with altered predicates and other
+  configuration options. The ``view`` argument is now optional in
+  ``config.add_notfound_view`` and ``config.add_forbidden_view``..
+  See https://github.com/Pylons/pyramid/issues/494
+
+- Greatly improve the readability of the ``pcreate`` shell script output.
+  See https://github.com/Pylons/pyramid/pull/1453
+
+- Improve robustness to timing attacks in the ``AuthTktCookieHelper`` and
+  the ``SignedCookieSessionFactory`` classes by using the stdlib's
+  ``hmac.compare_digest`` if it is available (such as Python 2.7.7+ and 3.3+).
+  See https://github.com/Pylons/pyramid/pull/1457
 
 - Assets can now be overidden by an absolute path on the filesystem when using
   the ``config.override_asset`` API. This makes it possible to fully support
@@ -26,16 +57,19 @@ Bug Fixes
 
 - ``pyramid.wsgi.wsgiapp`` and ``pyramid.wsgi.wsgiapp2`` now raise
   ``ValueError`` when accidentally passed ``None``.
+  See https://github.com/Pylons/pyramid/pull/1320
 
 - Fix an issue whereby predicates would be resolved as maybe_dotted in the
   introspectable but not when passed for registration. This would mean that
-  add_route_predicate for example can not take a string and turn it into the
-  actual callable function.
+  ``add_route_predicate`` for example can not take a string and turn it into
+  the actual callable function.
+  See https://github.com/Pylons/pyramid/pull/1306
 
 - Fix ``pyramid.testing.setUp`` to return a ``Configurator`` with a proper
   package. Previously it was not possible to do package-relative includes
   using the returned ``Configurator`` during testing. There is now a
   ``package`` argument that can override this behavior as well.
+  See https://github.com/Pylons/pyramid/pull/1322
 
 - Fix an issue where a ``pyramid.response.FileResponse`` may apply a charset
   where it does not belong. See https://github.com/Pylons/pyramid/pull/1251
@@ -44,6 +78,19 @@ Bug Fixes
   ``mimetypes.guess_type`` returns Unicode rather than str for the content
   type, unlike any previous version of Python.  See
   https://github.com/Pylons/pyramid/issues/1360 for more information.
+
+- ``pcreate`` now normalizes the package name by converting hyphens to
+  underscores. See https://github.com/Pylons/pyramid/pull/1376
+
+- Fix an issue with the final response/finished callback being unable to
+  add another callback to the list. See
+  https://github.com/Pylons/pyramid/pull/1373
+
+- Fix a failing unittest caused by differing mimetypes across various OSs.
+  See https://github.com/Pylons/pyramid/issues/1405
+
+- Fix route generation for static view asset specifications having no path.
+  See https://github.com/Pylons/pyramid/pull/1377
 
 Docs
 ----

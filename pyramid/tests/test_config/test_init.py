@@ -736,6 +736,18 @@ pyramid.tests.test_config.dummy_include2""",
         else: # pragma: no cover
             raise AssertionError
 
+    def test_include_constant_root_package(self):
+        from pyramid import tests
+        from pyramid.tests import test_config
+        config = self._makeOne(root_package=tests)
+        results = {}
+        def include(config):
+            results['package'] = config.package
+            results['root_package'] = config.root_package
+        config.include(include)
+        self.assertEqual(results['root_package'], tests)
+        self.assertEqual(results['package'], test_config)
+
     def test_action_branching_kw_is_None(self):
         config = self._makeOne(autocommit=True)
         self.assertEqual(config.action('discrim'), None)

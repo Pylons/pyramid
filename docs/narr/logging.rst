@@ -16,6 +16,11 @@ how to send log messages to loggers that you've configured.
    a third-party scaffold which does not create these files, the
    configuration information in this chapter may not be applicable.
 
+.. index:
+   pair: settings; logging
+   pair: .ini; logging
+   pair: logging; configuration
+
 .. _logging_config:
 
 Logging Configuration
@@ -242,7 +247,7 @@ level is set to ``INFO``, whereas the application's log level is set to
     [logger_myapp] 
     level = DEBUG 
     handlers = 
-    qualname = helloworld 
+    qualname = myapp 
 
 All of the child loggers of the ``myapp`` logger will inherit the ``DEBUG``
 level unless they're explicitly set differently. Meaning the ``myapp.views``,
@@ -294,15 +299,26 @@ use the :term:`pyramid_exclog` package.  Details about its configuration are
 in its `documentation
 <http://docs.pylonsproject.org/projects/pyramid_exclog/dev/>`_.
 
+.. index::
+   single: TransLogger
+   single: middleware; TransLogger
+   pair: configuration; middleware
+   single: settings; middleware
+   pair: .ini; middleware
+
+.. _request_logging_with_pastes_translogger:
+
 Request Logging with Paste's TransLogger 
 ----------------------------------------
 
-Paste provides the `TransLogger 
-<http://pythonpaste.org/modules/translogger.html>`_ :term:`middleware` for
-logging requests using the `Apache Combined Log Format
-<http://httpd.apache.org/docs/2.2/logs.html#combined>`_. TransLogger combined 
-with a FileHandler can be used to create an ``access.log`` file similar to 
-Apache's. 
+The term:`WSGI` design is modular.  Waitress logs error conditions, debugging
+output, etc., but not web traffic.  For web traffic logging Paste provides the
+`TransLogger <http://pythonpaste.org/modules/translogger.html>`_
+:term:`middleware`.  TransLogger produces logs in the `Apache Combined Log
+Format <http://httpd.apache.org/docs/2.2/logs.html#combined>`_.  But
+TransLogger does not write to files, the Python logging system must be
+configured to do this.  The Python FileHandler_ logging handler can be used
+alongside TransLogger to create an ``access.log`` file similar to Apache's.
 
 Like any standard :term:`middleware` with a Paste entry point, TransLogger can
 be configured to wrap your application using ``.ini`` file syntax.  First,
@@ -343,10 +359,12 @@ function of your project's ``__init__`` file:
     app = TransLogger(app, setup_console_handler=False) 
     return app 
 
-TransLogger will automatically setup a logging handler to the console when
-called with no arguments, so it 'just works' in environments that don't
-configure logging. Since we've configured our own logging handlers, we need
-to disable that option via ``setup_console_handler = False``.
+
+.. note::
+    TransLogger will automatically setup a logging handler to the console when
+    called with no arguments, so it 'just works' in environments that don't
+    configure logging. Since our logging handlers are configured we disable
+    the automation via ``setup_console_handler = False``.
 
 With the filter in place, TransLogger's logger (named the ``wsgi`` logger) will
 propagate its log messages to the parent logger (the root logger), sending
@@ -361,9 +379,9 @@ its output to the console when we request a page:
     "Mozilla/5.0 (Macintosh; U; Intel Mac OS X; en-US; rv:1.8.1.6) Gecko/20070725
     Firefox/2.0.0.6" 
 
-To direct TransLogger to an ``access.log`` FileHandler, we need to add that
-FileHandler to the list of handlers (named ``accesslog``), and ensure that the 
-``wsgi`` logger is configured and uses this handler accordingly:
+To direct TransLogger to an ``access.log`` FileHandler, we need the following
+to add a FileHandler (named ``accesslog``) to the list of handlers, and ensure
+that the ``wsgi`` logger is configured and uses this handler accordingly:
 
 .. code-block:: ini 
 
@@ -395,7 +413,7 @@ directs its records only to the ``accesslog`` handler.
 Finally, there's no need to use the ``generic`` formatter with TransLogger as
 TransLogger itself provides all the information we need. We'll use a
 formatter that passes-through the log messages as is. Add a new formatter
-called ``accesslog`` by include the following in your configuration file:
+called ``accesslog`` by including the following in your configuration file:
 
 .. code-block:: ini 
 
@@ -405,7 +423,9 @@ called ``accesslog`` by include the following in your configuration file:
     [formatter_accesslog] 
     format = %(message)s 
 
-Then wire this new ``accesslog`` formatter into the FileHandler: 
+
+Finally alter the existing configuration to wire this new
+``accesslog`` formatter into the FileHandler:
 
 .. code-block:: ini 
 

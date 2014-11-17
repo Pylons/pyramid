@@ -521,7 +521,7 @@ class Test_manage_accessed(unittest.TestCase):
         result = wrapper(session, 'a')
         self.assertEqual(result, 1)
         callbacks = request.response_callbacks
-        self.assertEqual(len(callbacks), 0)
+        if callbacks is not None: self.assertEqual(len(callbacks), 0)
 
 class Test_manage_changed(unittest.TestCase):
     def _makeOne(self, wrapped):

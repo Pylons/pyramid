@@ -1,3 +1,4 @@
+from collections import deque
 import unittest
 from pyramid import testing
 
@@ -119,13 +120,13 @@ class TestRequest(unittest.TestCase):
 
     def test_add_response_callback(self):
         inst = self._makeOne()
-        self.assertEqual(inst.response_callbacks, ())
+        self.assertEqual(inst.response_callbacks, None)
         def callback(request, response):
             """ """
         inst.add_response_callback(callback)
-        self.assertEqual(inst.response_callbacks, [callback])
+        self.assertEqual(list(inst.response_callbacks), [callback])
         inst.add_response_callback(callback)
-        self.assertEqual(inst.response_callbacks, [callback, callback])
+        self.assertEqual(list(inst.response_callbacks), [callback, callback])
 
     def test__process_response_callbacks(self):
         inst = self._makeOne()
@@ -135,24 +136,48 @@ class TestRequest(unittest.TestCase):
         def callback2(request, response):
             request.called2  = True
             response.called2 = True
-        inst.response_callbacks = [callback1, callback2]
+        inst.add_response_callback(callback1)
+        inst.add_response_callback(callback2)
         response = DummyResponse()
         inst._process_response_callbacks(response)
         self.assertEqual(inst.called1, True)
         self.assertEqual(inst.called2, True)
         self.assertEqual(response.called1, True)
         self.assertEqual(response.called2, True)
-        self.assertEqual(inst.response_callbacks, [])
+        self.assertEqual(len(inst.response_callbacks), 0)
+
+    def test__process_response_callback_adding_response_callback(self):
+        """
+        When a response callback adds another callback, that new callback should still be called.
+
+        See https://github.com/Pylons/pyramid/pull/1373
+        """
+        inst = self._makeOne()
+        def callback1(request, response):
+            request.called1 = True
+            response.called1 = True
+            request.add_response_callback(callback2)
+        def callback2(request, response):
+            request.called2  = True
+            response.called2 = True
+        inst.add_response_callback(callback1)
+        response = DummyResponse()
+        inst._process_response_callbacks(response)
+        self.assertEqual(inst.called1, True)
+        self.assertEqual(inst.called2, True)
+        self.assertEqual(response.called1, True)
+        self.assertEqual(response.called2, True)
+        self.assertEqual(len(inst.response_callbacks), 0)
 
     def test_add_finished_callback(self):
         inst = self._makeOne()
-        self.assertEqual(inst.finished_callbacks, ())
+        self.assertEqual(inst.finished_callbacks, None)
         def callback(request):
             """ """
         inst.add_finished_callback(callback)
-        self.assertEqual(inst.finished_callbacks, [callback])
+        self.assertEqual(list(inst.finished_callbacks), [callback])
         inst.add_finished_callback(callback)
-        self.assertEqual(inst.finished_callbacks, [callback, callback])
+        self.assertEqual(list(inst.finished_callbacks), [callback, callback])
 
     def test__process_finished_callbacks(self):
         inst = self._makeOne()
@@ -160,11 +185,12 @@ class TestRequest(unittest.TestCase):
             request.called1 = True
         def callback2(request):
             request.called2  = True
-        inst.finished_callbacks = [callback1, callback2]
+        inst.add_finished_callback(callback1)
+        inst.add_finished_callback(callback2)
         inst._process_finished_callbacks()
         self.assertEqual(inst.called1, True)
         self.assertEqual(inst.called2, True)
-        self.assertEqual(inst.finished_callbacks, [])
+        self.assertEqual(len(inst.finished_callbacks), 0)
 
     def test_resource_url(self):
         self._registerResourceURL()

@@ -53,6 +53,7 @@ from pyramid.exceptions import (
 from pyramid.httpexceptions import (
     HTTPForbidden,
     HTTPNotFound,
+    default_exceptionresponse_view,
     )
 
 from pyramid.registry import (
@@ -1185,10 +1186,6 @@ class ViewsConfiguratorMixin(object):
         predlist = self.get_predlist('view')
 
         def register(permission=permission, renderer=renderer):
-            # the discrim_func above is guaranteed to have been called already
-            order = view_intr['order']
-            preds = view_intr['predicates']
-            phash = view_intr['phash']
             request_iface = IRequest
             if route_name is not None:
                 request_iface = self.registry.queryUtility(IRouteRequest,
@@ -1591,9 +1588,12 @@ class ViewsConfiguratorMixin(object):
 
             config.add_forbidden_view(forbidden)
 
+        If ``view`` argument is not provided, the view callable defaults to
+        :func:`~pyramid.httpexceptions.default_exceptionresponse_view`.
+
         All arguments have the same meaning as
         :meth:`pyramid.config.Configurator.add_view` and each predicate
-        argument restricts the set of circumstances under which this notfound
+        argument restricts the set of circumstances under which this forbidden
         view will be invoked.  Unlike
         :meth:`pyramid.config.Configurator.add_view`, this method will raise
         an exception if passed ``name``, ``permission``, ``context``,
@@ -1608,6 +1608,9 @@ class ViewsConfiguratorMixin(object):
                     '%s may not be used as an argument to add_forbidden_view'
                     % arg
                     )
+
+        if view is None:
+            view = default_exceptionresponse_view
 
         settings = dict(
             view=view,
@@ -1671,6 +1674,9 @@ class ViewsConfiguratorMixin(object):
 
             config.add_notfound_view(notfound)
 
+        If ``view`` argument is not provided, the view callable defaults to
+        :func:`~pyramid.httpexceptions.default_exceptionresponse_view`.
+
         All arguments except ``append_slash`` have the same meaning as
         :meth:`pyramid.config.Configurator.add_view` and each predicate
         argument restricts the set of circumstances under which this notfound
@@ -1696,6 +1702,9 @@ class ViewsConfiguratorMixin(object):
                     '%s may not be used as an argument to add_notfound_view'
                     % arg
                     )
+
+        if view is None:
+            view = default_exceptionresponse_view
 
         settings = dict(
             view=view,
@@ -1942,7 +1951,7 @@ class StaticURLInfo(object):
             sep = os.sep
         else:
             sep = '/'
-        if not spec.endswith(sep):
+        if not spec.endswith(sep) and not spec.endswith(':'):
             spec = spec + sep
 
         # we also make sure the name ends with a slash, purely as a

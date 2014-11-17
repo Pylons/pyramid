@@ -354,7 +354,7 @@ command from Gettext:
    $ mkdir -p es/LC_MESSAGES
    $ msginit -l es -o es/LC_MESSAGES/myapplication.po
 
-This will create a new the message catalog ``.po`` file will in:
+This will create a new message catalog ``.po`` file in:
 
 ``myapplication/locale/es/LC_MESSAGES/myapplication.po``.
 
@@ -792,9 +792,11 @@ Then as a part of the code of a custom :term:`locale negotiator`:
 .. code-block:: python
    :linenos:
 
-   from pyramid.threadlocal import get_current_registry
-   settings = get_current_registry().settings
-   languages = settings['available_languages'].split()
+   from pyramid.settings import aslist
+
+   def my_locale_negotiator(request):
+       languages = aslist(request.registry.settings['available_languages'])
+       # ...
 
 This is only a suggestion.  You can create your own "available
 languages" configuration scheme as necessary.
