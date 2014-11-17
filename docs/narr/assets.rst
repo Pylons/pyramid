@@ -276,15 +276,62 @@ to put static media on a separate webserver during production (if the
 ``name`` argument to :meth:`~pyramid.config.Configurator.add_static_view` is
 a URL), while keeping static media package-internal and served by the
 development webserver during development (if the ``name`` argument to
-:meth:`~pyramid.config.Configurator.add_static_view` is a URL prefix).  To
-create such a circumstance, we suggest using the
-:attr:`pyramid.registry.Registry.settings` API in conjunction with a setting
-in the application ``.ini`` file named ``media_location``.  Then set the
-value of ``media_location`` to either a prefix or a URL depending on whether
-the application is being run in development or in production (use a different
-``.ini`` file for production than you do for development).  This is just a
-suggestion for a pattern; any setting name other than ``media_location``
-could be used.
+:meth:`~pyramid.config.Configurator.add_static_view` is a URL prefix).
+
+For example, we may define a :ref:`custom setting <adding_a_custom_setting>`
+named ``media_location`` which we can set to an external URL in production
+when our assets are hosted on a CDN.
+
+.. code-block:: python
+   :linenos:
+
+   media_location = settings.get('media_location', 'static')
+
+   config = Configurator(settings=settings)
+   config.add_static_view(path='myapp:static', name=media_location)
+
+Now we can optionally define the setting in our ini file:
+
+.. code-block:: ini
+   :linenos:
+
+   # production.ini
+   [app:main]
+   use = egg:myapp#main
+
+   media_location = http://static.example.com/
+
+It is also possible to serve assets that live outside of the source by
+referring to an absolute path on the filesystem. There are two ways to
+accomplish this.
+
+First, :meth:`~pyramid.config.Configurator.add_static_view`
+supports taking an absolute path directly instead of an asset spec. This works
+as expected, looking in the file or folder of files and serving them up at
+some URL within your application or externally. Unfortunately, this technique
+has a drawback that it is not possible to use the
+:meth:`~pyramid.request.Request.static_url` method to generate URLs, since it
+works based on an asset spec.
+
+The second approach, available in Pyramid 1.6+, uses the asset overriding
+APIs described in the :ref:`overriding_assets_section` section. It is then
+possible to configure a "dummy" package which then serves its file or folder
+from an absolute path.
+
+.. code-block:: python
+
+   config.add_static_view(path='myapp:static_images', name='static')
+   config.override_asset(to_override='myapp:static_images/',
+                         override_with='/abs/path/to/images/')
+
+From this configuration it is now possible to use
+:meth:`~pyramid.request.Request.static_url` to generate URLs to the data
+in the folder by doing something like
+``request.static_url('myapp:static_images/foo.png')``. While it is not
+necessary that the ``static_images`` file or folder actually exist in the
+``myapp`` package, it is important that the ``myapp`` portion points to a
+valid package. If the folder does exist then the overriden folder is given
+priority if the file's name exists in both locations.
 
 .. index::
    single: Cache Busting
