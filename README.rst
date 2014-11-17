@@ -5,7 +5,7 @@ Pyramid
         :target: https://travis-ci.org/Pylons/pyramid
 
 .. image:: https://readthedocs.org/projects/pyramid/badge/?version=latest
-        :target: https://readthedocs.org/projects/pyramid/?badge=latest
+        :target: http://pyramid.readthedocs.org/en/latest/
         :alt: Documentation Status
 
 Pyramid is a small, fast, down-to-earth, open source Python web framework.
