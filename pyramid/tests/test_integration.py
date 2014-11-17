@@ -81,7 +81,7 @@ class StaticAppBase(IntegrationBase):
         res = self.testapp.get('/static/.hiddenfile', status=200)
         _assertBody(res.body, os.path.join(here, 'fixtures/static/.hiddenfile'))
 
-    if defaultlocale is not None:
+    if defaultlocale is not None: # pragma: no cover
         # These tests are expected to fail on LANG=C systems due to decode
         # errors and on non-Linux systems due to git highchar handling
         # vagaries
