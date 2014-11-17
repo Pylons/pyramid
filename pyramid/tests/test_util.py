@@ -217,6 +217,49 @@ class Test_WeakOrderedSet(unittest.TestCase):
         self.assertEqual(list(wos), [])
         self.assertEqual(wos.last, None)
 
+class Test_strings_differ(unittest.TestCase):
+    def _callFUT(self, *args, **kw):
+        from pyramid.util import strings_differ
+        return strings_differ(*args, **kw)
+
+    def test_it(self):
+        self.assertFalse(self._callFUT(b'foo', b'foo'))
+        self.assertTrue(self._callFUT(b'123', b'345'))
+        self.assertTrue(self._callFUT(b'1234', b'123'))
+        self.assertTrue(self._callFUT(b'123', b'1234'))
+
+    def test_it_with_internal_comparator(self):
+        result = self._callFUT(b'foo', b'foo', compare_digest=None)
+        self.assertFalse(result)
+
+        result = self._callFUT(b'123', b'abc', compare_digest=None)
+        self.assertTrue(result)
+
+    def test_it_with_external_comparator(self):
+        class DummyComparator(object):
+            called = False
+            def __init__(self, ret_val):
+                self.ret_val = ret_val
+
+            def __call__(self, a, b):
+                self.called = True
+                return self.ret_val
+
+        dummy_compare = DummyComparator(True)
+        result = self._callFUT(b'foo', b'foo', compare_digest=dummy_compare)
+        self.assertTrue(dummy_compare.called)
+        self.assertFalse(result)
+
+        dummy_compare = DummyComparator(False)
+        result = self._callFUT(b'123', b'345', compare_digest=dummy_compare)
+        self.assertTrue(dummy_compare.called)
+        self.assertTrue(result)
+
+        dummy_compare = DummyComparator(False)
+        result = self._callFUT(b'abc', b'abc', compare_digest=dummy_compare)
+        self.assertTrue(dummy_compare.called)
+        self.assertTrue(result)
+
 class Test_object_description(unittest.TestCase):
     def _callFUT(self, object):
         from pyramid.util import object_description
