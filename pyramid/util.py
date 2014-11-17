@@ -1,4 +1,9 @@
 import functools
+try:
+    # py2.7.7+ and py3.3+ have native comparison support
+    from hmac import compare_digest
+except ImportError: # pragma: nocover
+    compare_digest = None
 import inspect
 import traceback
 import weakref
@@ -227,7 +232,7 @@ class WeakOrderedSet(object):
             oid = self._order[-1]
             return self._items[oid]()
 
-def strings_differ(string1, string2):
+def strings_differ(string1, string2, compare_digest=compare_digest):
     """Check whether two strings differ while avoiding timing attacks.
 
     This function returns True if the given strings differ and False
@@ -237,14 +242,25 @@ def strings_differ(string1, string2):
 
         http://seb.dbzteam.org/crypto/python-oauth-timing-hmac.pdf
 
+    .. versionchanged:: 1.6
+       Support :func:`hmac.compare_digest` if it is available (Python 2.7.7+
+       and Python 3.3+).
+
     """
-    if len(string1) != len(string2):
-        return True
+    len_eq = len(string1) == len(string2)
+    if len_eq:
+        invalid_bits = 0
+        left = string1
+    else:
+        invalid_bits = 1
+        left = string2
+    right = string2
 
-    invalid_bits = 0
-    for a, b in zip(string1, string2):
-        invalid_bits += a != b
-
+    if compare_digest is not None:
+        invalid_bits += not compare_digest(left, right)
+    else:
+        for a, b in zip(left, right):
+            invalid_bits += a != b
     return invalid_bits != 0
 
 def object_description(object):
