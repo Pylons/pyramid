@@ -4,7 +4,6 @@ import textwrap
 
 from pyramid.paster import bootstrap
 from pyramid.scripts.common import parse_vars
-from pyramid.config.views import MultiView
 
 
 PAD = 3
@@ -58,6 +57,8 @@ class PRoutesCommand(object):
         from pyramid.interfaces import IRouteRequest
         from pyramid.interfaces import IViewClassifier
         from pyramid.interfaces import IView
+        from pyramid.interfaces import IMultiView
+
         from zope.interface import Interface
         config_uri = self.args[0]
 
@@ -72,6 +73,7 @@ class PRoutesCommand(object):
             max_view = len('View')
 
             routes = mapper.get_routes()
+
             if not routes:
                 return 0
 
@@ -97,7 +99,7 @@ class PRoutesCommand(object):
                         IView, name='', default=None)
 
                     if view_callable is not None:
-                        if isinstance(view_callable, MultiView):
+                        if IMultiView.providedBy(view_callable):
                             view_callables = [
                                 x[1] for x in view_callable.views
                             ]
