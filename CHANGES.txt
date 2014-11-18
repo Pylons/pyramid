@@ -38,6 +38,20 @@ Features
   ``hmac.compare_digest`` if it is available (such as Python 2.7.7+ and 3.3+).
   See https://github.com/Pylons/pyramid/pull/1457
 
+- Assets can now be overidden by an absolute path on the filesystem when using
+  the ``config.override_asset`` API. This makes it possible to fully support
+  serving up static content from a mutable directory while still being able
+  to use the ``request.static_url`` API and ``config.add_static_view``.
+  Previously it was not possible to use ``config.add_static_view`` with an
+  absolute path **and** generate urls to the content. This change replaces
+  the call, ``config.add_static_view('/abs/path', 'static')``, with
+  ``config.add_static_view('myapp:static', 'static')`` and
+  ``config.override_asset(to_override='myapp:static/',
+  override_with='/abs/path/')``. The ``myapp:static`` asset spec is completely
+  made up and does not need to exist - it is used for generating urls
+  via ``request.static_url('myapp:static/foo.png')``.
+  See https://github.com/Pylons/pyramid/issues/1252
+
 Bug Fixes
 ---------
 
