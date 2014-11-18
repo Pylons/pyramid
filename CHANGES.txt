@@ -24,6 +24,10 @@ Features
   ``431 Request Header Fields Too Large`` in ``pyramid.httpexceptions``.
   See https://github.com/Pylons/pyramid/pull/1372/files
 
+- The ``pshell`` script will now load a ``PYTHONSTARTUP`` file if one is
+  defined in the environment prior to launching the interpreter.
+  See https://github.com/Pylons/pyramid/pull/1448
+
 - Make it simple to define notfound and forbidden views that wish to use
   the default exception-response view but with altered predicates and other
   configuration options. The ``view`` argument is now optional in
