@@ -96,6 +96,13 @@ Bug Fixes
 - Fix route generation for static view asset specifications having no path.
   See https://github.com/Pylons/pyramid/pull/1377
 
+Deprecations
+------------
+
+- Renamed the ``principal`` argument to ``pyramid.security.remember()`` to
+  ``userid`` in order to clarify its intended purpose.
+  See https://github.com/Pylons/pyramid/pull/1399
+
 Docs
 ----
 
@@ -105,6 +112,10 @@ Docs
 
 - Clarify a previously-implied detail of the ``ISession.invalidate`` API
   documentation.
+
+- Improve and clarify the documentation on what Pyramid defines as a
+  ``principal`` and a ``userid`` in its security APIs.
+  See https://github.com/Pylons/pyramid/pull/1399
 
 Scaffolds
 ---------
