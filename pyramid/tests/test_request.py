@@ -192,6 +192,11 @@ class TestRequest(unittest.TestCase):
         self.assertEqual(inst.called2, True)
         self.assertEqual(len(inst.finished_callbacks), 0)
 
+    def test_package_name(self):
+        request = self._makeOne()
+        request.registry = self.config.registry
+        self.assertEqual(request.package_name, self.config.package_name)
+
     def test_resource_url(self):
         self._registerResourceURL()
         environ = {
