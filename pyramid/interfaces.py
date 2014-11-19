@@ -479,7 +479,7 @@ class IAuthenticationPolicy(Interface):
         """ Return a set of headers suitable for 'remembering' the
         :term:`userid` named ``userid`` when set in a response.  An
         individual authentication policy and its consumers can
-        decide on the composition and meaning of **kw.
+        decide on the composition and meaning of ``**kw``.
 
         """
 
