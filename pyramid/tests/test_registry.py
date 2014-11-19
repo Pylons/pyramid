@@ -2,12 +2,6 @@ import unittest
 from pyramid import testing
 
 class TestRegistry(unittest.TestCase):
-    def setUp(self):
-        self.config = testing.setUp()
-
-    def tearDown(self):
-        testing.tearDown()
-
     def _getTargetClass(self):
         from pyramid.registry import Registry
         return Registry
@@ -21,7 +15,8 @@ class TestRegistry(unittest.TestCase):
 
     def test_package_name(self):
         registry = self._makeOne()
-        self.assertEqual(registry.package_name, self.config.package_name)
+        config = testing.setUp(registry=registry)
+        self.assertEqual(registry.package_name, config.package_name)
 
     def test_registerHandler_and_notify(self):
         registry = self._makeOne()
