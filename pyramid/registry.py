@@ -42,6 +42,10 @@ class Registry(Components, dict):
         # defeat bool determination via dict.__len__
         return True
 
+    @property
+    def package_name(self):
+        return self.__name__
+
     def registerSubscriptionAdapter(self, *arg, **kw):
         result = Components.registerSubscriptionAdapter(self, *arg, **kw)
         self.has_listeners = True
