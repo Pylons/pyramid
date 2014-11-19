@@ -911,7 +911,8 @@ Glossary
 
    WebTest
      `WebTest <http://pythonpaste.org/webtest/>`_ is a package which can help
-     you write functional tests for your WSGI application.
+     you write functional tests for your WSGI application, developed 
+     by Ian Bicking.
 
    view mapper
     A view mapper is a class which implements the
