@@ -5,6 +5,7 @@ from zope.interface import implementer
 from zope.interface.registry import Components
 
 from pyramid.compat import text_
+from pyramid.decorator import reify
 
 from pyramid.interfaces import (
     ISettings,
@@ -42,7 +43,7 @@ class Registry(Components, dict):
         # defeat bool determination via dict.__len__
         return True
 
-    @property
+    @reify
     def package_name(self):
         return self.__name__
 
