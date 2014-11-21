@@ -975,7 +975,7 @@ class Configurator(
 class ActionState(object):
     def __init__(self):
         # NB "actions" is an API, dep'd upon by pyramid_zcml's load_zcml func
-        self.actions = [] 
+        self.actions = []
         self._seen_files = set()
 
     def processSpec(self, spec):
@@ -1059,10 +1059,54 @@ class ActionState(object):
         >>> output
         [('f', (1,), {}), ('f', (2,), {})]
 
-        """
+        The execution is re-entrant such that actions may be added by other
+        actions with the one caveat that the order of any added actions must
+        be equal to or larger than the current action.
 
+        >>> output = []
+        >>> def f(*a, **k):
+        ...   output.append(('f', a, k))
+        ...   context.actions.append((3, g, (8,), {}))
+        >>> def g(*a, **k):
+        ...    output.append(('g', a, k))
+        >>> context.actions = [
+        ...   (1, f, (1,)),
+        ...   (2, f, (2,)),
+        ...   ]
+        >>> context.execute_actions()
+        >>> output
+        [('f', (1,), {}), ('f', (2,), {}), ('g', (8,), {})]
+
+        """
         try:
-            for action in resolveConflicts(self.actions):
+            all_actions = self.actions
+            self.actions = []
+            executed_actions = []
+
+            # resolve the new action list against what we have already
+            # executed -- if a new action appears intertwined in the list
+            # of already-executed actions then someone wrote a broken
+            # re-entrant action because it scheduled the action *after* it
+            # should have been executed (as defined by the action order)
+            def resume(actions):
+                for a, b in itertools.izip_longest(actions, executed_actions):
+                    if b is None and a is not None:
+                        # common case is that we are executing every action
+                        yield a
+                    elif b is not None and a != b:
+                        raise RuntimeError('Re-entrant failure - attempted '
+                                           'to resolve actions in a different '
+                                           'order from the active execution '
+                                           'path.')
+                    else:
+                        # resolved action is in the same location as before,
+                        # so we are in good shape, but the action is already
+                        # executed so we skip it
+                        assert b is not None and a == b
+
+            pending_actions = resume(resolveConflicts(all_actions))
+            action = next(pending_actions, None)
+            while action is not None:
                 callable = action['callable']
                 args = action['args']
                 kw = action['kw']
@@ -1088,10 +1132,25 @@ class ActionState(object):
                 if introspector is not None:
                     for introspectable in introspectables:
                         introspectable.register(introspector, info)
-                
+
+                executed_actions.append(action)
+
+                # We cleared the actions list prior to execution so if there
+                # are some new actions then we add them to the mix and resolve
+                # conflicts again. This orders the new actions as well as
+                # ensures that the previously executed actions have no new
+                # conflicts.
+                if self.actions:
+                    all_actions.extend(self.actions)
+                    self.actions = []
+                    pending_actions = resume(resolveConflicts(all_actions))
+                action = next(pending_actions, None)
+
         finally:
             if clear:
                 del self.actions[:]
+            else:
+                self.actions = all_actions
 
 # this function is licensed under the ZPL (stolen from Zope)
 def resolveConflicts(actions):
