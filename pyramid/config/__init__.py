@@ -1080,9 +1080,9 @@ class ActionState(object):
 
         """
         try:
-            all_actions = self.actions
-            self.actions = []
+            all_actions = []
             executed_actions = []
+            pending_actions = iter([])
 
             # resolve the new action list against what we have already
             # executed -- if a new action appears intertwined in the list
@@ -1095,19 +1095,32 @@ class ActionState(object):
                         # common case is that we are executing every action
                         yield a
                     elif b is not None and a != b:
-                        raise RuntimeError('Re-entrant failure - attempted '
-                                           'to resolve actions in a different '
-                                           'order from the active execution '
-                                           'path.')
+                        raise ConfigurationError(
+                            'Re-entrant failure - attempted to resolve '
+                            'actions in a different order from the active '
+                            'execution path.')
                     else:
                         # resolved action is in the same location as before,
                         # so we are in good shape, but the action is already
                         # executed so we skip it
                         assert b is not None and a == b
 
-            pending_actions = resume(resolveConflicts(all_actions))
-            action = next(pending_actions, None)
-            while action is not None:
+            while True:
+                # We clear the actions list prior to execution so if there
+                # are some new actions then we add them to the mix and resolve
+                # conflicts again. This orders the new actions as well as
+                # ensures that the previously executed actions have no new
+                # conflicts.
+                if self.actions:
+                    all_actions.extend(self.actions)
+                    self.actions = []
+                    pending_actions = resume(resolveConflicts(all_actions))
+
+                action = next(pending_actions, None)
+                if action is None:
+                    # we are done!
+                    break
+
                 callable = action['callable']
                 args = action['args']
                 kw = action['kw']
@@ -1128,24 +1141,13 @@ class ActionState(object):
                                 ConfigurationExecutionError(t, v, info),
                                 tb)
                     finally:
-                       del t, v, tb
+                        del t, v, tb
 
                 if introspector is not None:
                     for introspectable in introspectables:
                         introspectable.register(introspector, info)
 
                 executed_actions.append(action)
-
-                # We cleared the actions list prior to execution so if there
-                # are some new actions then we add them to the mix and resolve
-                # conflicts again. This orders the new actions as well as
-                # ensures that the previously executed actions have no new
-                # conflicts.
-                if self.actions:
-                    all_actions.extend(self.actions)
-                    self.actions = []
-                    pending_actions = resume(resolveConflicts(all_actions))
-                action = next(pending_actions, None)
 
         finally:
             if clear:
