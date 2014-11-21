@@ -1112,9 +1112,20 @@ class ActionState(object):
                 # ensures that the previously executed actions have no new
                 # conflicts.
                 if self.actions:
+                    # Only resolve the new actions against executed_actions
+                    # instead of everything to avoid redundant checks.
+                    # Assume ``actions = resolveConflicts([A, B, C])`` which
+                    # after conflict checks, resulted in ``actions == [A]``
+                    # then we know action A won out or a conflict would have
+                    # been raised. Thus, when action D is added later, we only
+                    # need to check the new action against A.
+                    # ``actions = resolveConflicts([A, D]) should drop the
+                    # number of redundant checks down from O(n^2) closer to
+                    # O(n lg n).
+                    pending_actions = resume(resolveConflicts(
+                        executed_actions + self.actions))
                     all_actions.extend(self.actions)
                     self.actions = []
-                    pending_actions = resume(resolveConflicts(all_actions))
 
                 action = next(pending_actions, None)
                 if action is None:
