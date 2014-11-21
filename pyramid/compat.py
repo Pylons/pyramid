@@ -244,3 +244,7 @@ else:
 def is_bound_method(ob):
     return inspect.ismethod(ob) and getattr(ob, im_self, None) is not None
 
+if PY3: # pragma: no cover
+    from itertools import zip_longest
+else:
+    from itertools import izip_longest as zip_longest

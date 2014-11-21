@@ -23,6 +23,7 @@ from pyramid.compat import (
     text_,
     reraise,
     string_types,
+    zip_longest,
     )
 
 from pyramid.events import ApplicationCreated
@@ -1089,7 +1090,7 @@ class ActionState(object):
             # re-entrant action because it scheduled the action *after* it
             # should have been executed (as defined by the action order)
             def resume(actions):
-                for a, b in itertools.izip_longest(actions, executed_actions):
+                for a, b in zip_longest(actions, executed_actions):
                     if b is None and a is not None:
                         # common case is that we are executing every action
                         yield a
