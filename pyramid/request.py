@@ -188,10 +188,6 @@ class Request(
         return TemplateContext()
 
     @reify
-    def package_name(self):
-        return self.registry.package_name
-
-    @reify
     def session(self):
         """ Obtain the :term:`session` object associated with this
         request.  If a :term:`session factory` has not been registered
