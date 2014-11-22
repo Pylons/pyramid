@@ -5,6 +5,7 @@ Features
 --------
 
 - Added support / testing for 'pypy3' under Tox and Travis.
+  See https://github.com/Pylons/pyramid/pull/1469
 
 - Cache busting for static resources has been added and is available via a new
   argument to ``pyramid.config.Configurator.add_static_view``: ``cachebust``.
