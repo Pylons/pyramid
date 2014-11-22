@@ -2,6 +2,7 @@
 language: python
 
 env:
+  - TOXENV=clean
   - TOXENV=py26
   - TOXENV=py27
   - TOXENV=py32
@@ -9,7 +10,7 @@ env:
   - TOXENV=py34
   - TOXENV=pypy
   - TOXENV=pypy3
-  - TOXENV=cover
+  - TOXENV=report
 
 install:
   - travis_retry pip install tox

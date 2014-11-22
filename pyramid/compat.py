@@ -23,7 +23,7 @@ except ImportError: # pragma: no cover
 # True if we are running on Python 3.
 PY3 = sys.version_info[0] == 3
 
-if PY3: # pragma: no cover
+if PY3:
     string_types = str,
     integer_types = int,
     class_types = type,
@@ -43,16 +43,16 @@ def text_(s, encoding='latin-1', errors='strict'):
     ``s.decode(encoding, errors)``, otherwise return ``s``"""
     if isinstance(s, binary_type):
         return s.decode(encoding, errors)
-    return s # pragma: no cover
+    return s
 
 def bytes_(s, encoding='latin-1', errors='strict'):
     """ If ``s`` is an instance of ``text_type``, return
     ``s.encode(encoding, errors)``, otherwise return ``s``"""
-    if isinstance(s, text_type): # pragma: no cover
+    if isinstance(s, text_type):
         return s.encode(encoding, errors)
     return s
 
-if PY3: # pragma: no cover
+if PY3:
     def ascii_native_(s):
         if isinstance(s, text_type):
             s = s.encode('ascii')
@@ -72,7 +72,7 @@ Python 2: If ``s`` is an instance of ``text_type``, return
 """
 
 
-if PY3: # pragma: no cover
+if PY3:
     def native_(s, encoding='latin-1', errors='strict'):
         """ If ``s`` is an instance of ``text_type``, return
         ``s``, otherwise return ``str(s, encoding, errors)``"""
@@ -95,7 +95,7 @@ Python 2: If ``s`` is an instance of ``text_type``, return
 ``s.encode(encoding, errors)``, otherwise return ``str(s)``
 """
 
-if PY3: # pragma: no cover
+if PY3:
     from urllib import parse
     urlparse = parse
     from urllib.parse import quote as url_quote
@@ -169,13 +169,13 @@ else: # pragma: no cover
         return d.iterkeys()
 
 
-if PY3: # pragma: no cover
+if PY3:
     def map_(*arg):
         return list(map(*arg))
 else:
     map_ = map
     
-if PY3: # pragma: no cover
+if PY3:
     def is_nonstr_iter(v):
         if isinstance(v, str):
             return False
@@ -184,45 +184,44 @@ else:
     def is_nonstr_iter(v):
         return hasattr(v, '__iter__')
     
-if PY3: # pragma: no cover
+if PY3:
     im_func = '__func__'
     im_self = '__self__'
 else:
     im_func = 'im_func'
     im_self = 'im_self'
 
-try: # pragma: no cover
+try:
     import configparser
-except ImportError: # pragma: no cover
+except ImportError:
     import ConfigParser as configparser
 
 try:
-    from Cookie import SimpleCookie
-except ImportError: # pragma: no cover
     from http.cookies import SimpleCookie
+except ImportError:
+    from Cookie import SimpleCookie
 
-if PY3: # pragma: no cover
+if PY3:
     from html import escape
 else:
     from cgi import escape
 
-try: # pragma: no cover
-    input_ = raw_input
-except NameError: # pragma: no cover
+if PY3:
     input_ = input
+else:
+    input_ = raw_input
 
-
-try: 
-    from StringIO import StringIO as NativeIO
-except ImportError: # pragma: no cover
+if PY3:
     from io import StringIO as NativeIO
+else:
+    from io import BytesIO as NativeIO
 
 # "json" is not an API; it's here to support older pyramid_debugtoolbar
 # versions which attempt to import it
 import json
 
     
-if PY3: # pragma: no cover
+if PY3:
     # see PEP 3333 for why we encode WSGI PATH_INFO to latin-1 before
     # decoding it to utf-8
     def decode_path_info(path):
@@ -231,7 +230,7 @@ else:
     def decode_path_info(path):
         return path.decode('utf-8')
 
-if PY3: # pragma: no cover
+if PY3:
     # see PEP 3333 for why we decode the path to latin-1 
     from urllib.parse import unquote_to_bytes
     def unquote_bytes_to_wsgi(bytestring):

@@ -335,7 +335,7 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         foo = DummyContext(bar, path)
         root = DummyContext(foo, 'root')
         policy = self._makeOne(root)
-        if PY3: # pragma: no cover
+        if PY3:
             vhm_root = b'/Qu\xc3\xa9bec'.decode('latin-1')
         else:
             vhm_root = b'/Qu\xc3\xa9bec'

@@ -201,7 +201,7 @@ def _compile_route(route):
     def generator(dict):
         newdict = {}
         for k, v in dict.items():
-            if PY3: # pragma: no cover
+            if PY3:
                 if v.__class__ is binary_type:
                     # url_quote below needs a native string, not bytes on Py3
                     v = v.decode('utf-8')
