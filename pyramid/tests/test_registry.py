@@ -1,4 +1,5 @@
 import unittest
+from pyramid import testing
 
 class TestRegistry(unittest.TestCase):
     def _getTargetClass(self):
@@ -11,6 +12,11 @@ class TestRegistry(unittest.TestCase):
     def test___nonzero__(self):
         registry = self._makeOne()
         self.assertEqual(registry.__nonzero__(), True)
+
+    def test_package_name(self):
+        registry = self._makeOne()
+        config = testing.setUp(registry=registry)
+        self.assertEqual(registry.package_name, config.package_name)
 
     def test_registerHandler_and_notify(self):
         registry = self._makeOne()
