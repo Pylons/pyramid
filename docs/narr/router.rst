@@ -9,6 +9,9 @@
 Request Processing
 ==================
 
+.. image:: ../_static/pyramid_request_processing.svg
+   :alt: Request Processing
+
 Once a :app:`Pyramid` application is up and running, it is ready to accept
 requests and return responses.  What happens from the time a :term:`WSGI`
 request enters a :app:`Pyramid` application through to the point that
