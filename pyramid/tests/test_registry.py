@@ -12,6 +12,11 @@ class TestRegistry(unittest.TestCase):
         registry = self._makeOne()
         self.assertEqual(registry.__nonzero__(), True)
 
+    def test_package_name(self):
+        package_name = 'testing'
+        registry = self._getTargetClass()(package_name)
+        self.assertEqual(registry.package_name, package_name)
+
     def test_registerHandler_and_notify(self):
         registry = self._makeOne()
         self.assertEqual(registry.has_listeners, False)
