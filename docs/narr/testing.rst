@@ -351,7 +351,7 @@ code's integration with the rest of :app:`Pyramid`.
 
 .. seealso::
 
-   See more  information about :app:`Pyramid`'s ``includme`` function.
+   See also :ref:`including_configuration`
 
 Let's demonstrate this by showing an integration test for a view.
 
