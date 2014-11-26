@@ -3,7 +3,6 @@ from codecs import utf_8_decode
 from codecs import utf_8_encode
 import hashlib
 import base64
-import datetime
 import re
 import time as time_mod
 import warnings
