@@ -928,7 +928,7 @@ class AuthTktCookieHelper(object):
 
         if reissue and not hasattr(request, '_authtkt_reissued'):
             if ( (now - timestamp) > self.reissue_time ):
-                # work around https://github.com/Pylons/pyramid/issues#issue/108
+                # See https://github.com/Pylons/pyramid/issues#issue/108
                 tokens = list(filter(None, tokens))
                 headers = self.remember(request, userid, max_age=self.max_age,
                                         tokens=tokens)
