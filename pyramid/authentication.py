@@ -740,7 +740,7 @@ def parse_ticket(secret, ticket, ip, hashalg='md5'):
     If the ticket cannot be parsed, a ``BadTicket`` exception will be raised
     with an explanation.
     """
-    ticket = ticket.strip('"')
+    ticket = native_(ticket).strip('"')
     digest_size = hashlib.new(hashalg).digest_size * 2
     digest = ticket[:digest_size]
     try:
