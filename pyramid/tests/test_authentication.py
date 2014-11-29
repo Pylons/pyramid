@@ -1211,26 +1211,26 @@ class Test_parse_ticket(unittest.TestCase):
         self._assertRaisesBadTicket('secret', ticket, '0.0.0.0')
 
     def test_correct_with_user_data(self):
-        ticket = u'66f9cc3e423dc57c91df696cf3d1f0d80000000auserid!a,b!'
+        ticket = text_('66f9cc3e423dc57c91df696cf3d1f0d80000000auserid!a,b!')
         result = self._callFUT('secret', ticket, '0.0.0.0')
         self.assertEqual(result, (10, 'userid', ['a', 'b'], ''))
 
     def test_correct_with_user_data_sha512(self):
-        ticket = u'7d947cdef99bad55f8e3382a8bd089bb9dd0547f7925b7d189adc1160ca'\
-                 'b0ec0e6888faa41eba641a18522b26f19109f3ffafb769767ba8a26d02aa'\
-                 'eae56599a0000000auserid!a,b!'
+        ticket = text_('7d947cdef99bad55f8e3382a8bd089bb9dd0547f7925b7d189adc1'
+                       '160cab0ec0e6888faa41eba641a18522b26f19109f3ffafb769767'
+                       'ba8a26d02aaeae56599a0000000auserid!a,b!')
         result = self._callFUT('secret', ticket, '0.0.0.0', 'sha512')
         self.assertEqual(result, (10, 'userid', ['a', 'b'], ''))
 
     def test_ipv4(self):
-        ticket = u'b3e7156db4f8abde4439c4a6499a0668f9e7ffd7fa27b798400ecdade8d'\
-                 '76c530000000auserid!'
+        ticket = text_('b3e7156db4f8abde4439c4a6499a0668f9e7ffd7fa27b798400ecd'
+                       'ade8d76c530000000auserid!')
         result = self._callFUT('secret', ticket, '198.51.100.1', 'sha256')
         self.assertEqual(result, (10, 'userid', [''], ''))
 
     def test_ipv6(self):
-        ticket = u'd025b601a0f12ca6d008aa35ff3a22b7d8f3d1c1456c85becf8760cd7a2'\
-                 'fa4910000000auserid!'
+        ticket = text_('d025b601a0f12ca6d008aa35ff3a22b7d8f3d1c1456c85becf8760'
+                       'cd7a2fa4910000000auserid!')
         result = self._callFUT('secret', ticket, '2001:db8::1', 'sha256')
         self.assertEqual(result, (10, 'userid', [''], ''))
         pass
