@@ -9,7 +9,7 @@
 Request Processing
 ==================
 
-.. image:: ../_static/pyramid_router.svg
+.. image:: ../_static/pyramid_request_processing.svg
    :alt: Request Processing
 
 Once a :app:`Pyramid` application is up and running, it is ready to accept
