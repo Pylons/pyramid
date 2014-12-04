@@ -350,8 +350,12 @@ class TestPredicateList(unittest.TestCase):
         self.assertTrue(predicates[0](Dummy(), request))
         request.method = 'GET'
         self.assertTrue(predicates[0](Dummy(), request))
+
         request.method = 'POST'
-        self.assertFalse(predicates[0](Dummy(), request))
+        from pyramid.exceptions import PredicateMismatchMethodNotAllowed
+        self.assertRaises(
+            PredicateMismatchMethodNotAllowed,
+            predicates[0], Dummy(), request)
 
     def test_request_method_ordering_hashes_same(self):
         hash1, _, __= self._callFUT(request_method=('GET', 'HEAD'))
@@ -378,7 +382,12 @@ class TestPredicateList(unittest.TestCase):
         self.assertEqual(predicates[1].text(),
                          "!request_method = POST")
         self.assertEqual(predicates[2].text(), '!header header')
-        self.assertEqual(predicates[1](None, request), True)
+
+        from pyramid.exceptions import PredicateMismatchMethodNotAllowed
+        self.assertRaises(
+            PredicateMismatchMethodNotAllowed,
+            predicates[1], Dummy(), request)
+
         self.assertEqual(predicates[2](None, request), True)
 
 

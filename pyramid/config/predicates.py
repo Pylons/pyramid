@@ -1,6 +1,9 @@
 import re
 
-from pyramid.exceptions import ConfigurationError
+from pyramid.exceptions import (
+    ConfigurationError,
+    PredicateMismatchMethodNotAllowed
+    )
 
 from pyramid.compat import is_nonstr_iter
 
@@ -17,6 +20,7 @@ from pyramid.session import check_csrf_token
 from .util import as_sorted_tuple
 
 _marker = object()
+
 
 class XHRPredicate(object):
     def __init__(self, val, config):
@@ -44,7 +48,10 @@ class RequestMethodPredicate(object):
     phash = text
 
     def __call__(self, context, request):
-        return request.method in self.val
+        if request.method in self.val:
+            return True
+        else:
+            raise PredicateMismatchMethodNotAllowed()
 
 class PathInfoPredicate(object):
     def __init__(self, val, config):

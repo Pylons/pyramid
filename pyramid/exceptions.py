@@ -1,5 +1,6 @@
 from pyramid.httpexceptions import (
     HTTPBadRequest,
+    HTTPMethodNotAllowed,
     HTTPNotFound,
     HTTPForbidden,
     )
@@ -49,6 +50,11 @@ class PredicateMismatch(HTTPNotFound):
     The same applies to any type of exception being handled by an
     exception view.
     """
+
+class PredicateMismatchMethodNotAllowed(
+        HTTPMethodNotAllowed,
+        PredicateMismatch):
+    pass
 
 class URLDecodeError(UnicodeDecodeError):
     """
