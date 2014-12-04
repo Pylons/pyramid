@@ -614,7 +614,9 @@ class MultiView(object):
                 continue
 
         if errors:
-            errors.sort(key=lambda e: e.__predicates_passed__, reverse=True)
+            errors.sort(
+                key=lambda e: getattr(e, '__predicates_passed__', 0),
+                reverse=True)
             raise errors[0]
         else:
             raise PredicateMismatch(self.name)
