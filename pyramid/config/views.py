@@ -299,7 +299,8 @@ class ViewDeriver(object):
             for predicate in preds:
                 try:
                     predicate_result = predicate(context, request)
-                except PredicateMismatch as error:
+                except PredicateMismatch as predicate_error:
+                    error = predicate_error  # python 3.4
                     break
                 else:
                     if not predicate_result:
