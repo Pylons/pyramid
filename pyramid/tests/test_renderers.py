@@ -191,8 +191,8 @@ class TestRendererHelper(unittest.TestCase):
         helper = self._makeOne('loo.foo')
         response = helper.render_to_response('values', {},
                                              request=request)
-        self.assertEqual(response.body[0], 'values')
-        self.assertEqual(response.body[1], {})
+        self.assertEqual(response.app_iter[0], 'values')
+        self.assertEqual(response.app_iter[1], {})
 
     def test_get_renderer(self):
         factory = self._registerRendererFactory()
@@ -209,8 +209,8 @@ class TestRendererHelper(unittest.TestCase):
         request = testing.DummyRequest()
         response = 'response'
         response = helper.render_view(request, response, view, context)
-        self.assertEqual(response.body[0], 'response')
-        self.assertEqual(response.body[1],
+        self.assertEqual(response.app_iter[0], 'response')
+        self.assertEqual(response.app_iter[1],
                           {'renderer_info': helper,
                            'renderer_name': 'loo.foo',
                            'request': request,
@@ -286,6 +286,23 @@ class TestRendererHelper(unittest.TestCase):
         la = text_('/La Pe\xc3\xb1a', 'utf-8')
         response = helper._make_response(la.encode('utf-8'), request)
         self.assertEqual(response.body, la.encode('utf-8'))
+
+    def test__make_response_result_is_iterable(self):
+        from pyramid.response import Response
+        request = testing.DummyRequest()
+        request.response = Response()
+        helper = self._makeOne('loo.foo')
+        la = text_('/La Pe\xc3\xb1a', 'utf-8')
+        response = helper._make_response([la.encode('utf-8')], request)
+        self.assertEqual(response.body, la.encode('utf-8'))
+
+    def test__make_response_result_is_other(self):
+        self._registerResponseFactory()
+        request = None
+        helper = self._makeOne('loo.foo')
+        result = object()
+        response = helper._make_response(result, request)
+        self.assertEqual(response.body, result)
 
     def test__make_response_result_is_None_no_body(self):
         from pyramid.response import Response
