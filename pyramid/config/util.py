@@ -66,6 +66,23 @@ class not_(object):
     def __init__(self, value):
         self.value = value
 
+    """ Proxy to the underlying object """
+    def __getattr__(self, name):
+        if hasattr(self.value, name):
+            attribute = getattr(self.value, name)
+
+            if callable(attribute):
+                def wrap_fun(*args, **kw):
+                    self.value = attribute(*args, **kw)
+                    return self
+
+                return wrap_fun
+            else:
+                return attribute
+        else:
+            raise AttributeError
+
+
 class Notted(object):
     def __init__(self, predicate):
         self.predicate = predicate
