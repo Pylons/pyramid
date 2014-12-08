@@ -381,6 +381,31 @@ class TestPredicateList(unittest.TestCase):
         self.assertEqual(predicates[1](None, request), True)
         self.assertEqual(predicates[2](None, request), True)
 
+    def test_notted_getattr(self):
+        from pyramid.config import not_
+
+        val = not_('TEST')
+        self.assertEqual(val.value, 'TEST')
+        self.assertEqual(type(val), not_)
+        val = val.lower()
+        self.assertEqual(val.value, 'test')
+        self.assertEqual(type(val), not_)
+
+    def test_notted_getattr_invalid_attr(self):
+        from pyramid.config import not_
+
+        val = not_('TEST')
+        self.assertRaises(AttributeError, getattr, val, 'sanity')
+
+    def test_notted_gettatr_non_callable_attr(self):
+        from pyramid.config import not_
+
+        class test_object(object):
+            non_callable = True
+
+        val = not_(test_object())
+        self.assertEqual(val.non_callable, True)
+
 
 class Test_takes_one_arg(unittest.TestCase):
     def _callFUT(self, view, attr=None, argname=None):
