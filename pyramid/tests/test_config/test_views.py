@@ -2030,6 +2030,15 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         from pyramid.tests import test_config
         self.assertEqual(result, test_config)
 
+    def test_add_view_using_not_(self):
+        from pyramid.config.util import not_
+        view = lambda *arg: 'this is a view'
+        config = self._makeOne()
+        # This test is to verify that issue 1391 has been solved. See:
+        # https://github.com/Pylons/pyramid/issues/1391 for more info.
+        config.add_view(view=view, accept=not_('application/json'))
+
+
 class Test_requestonly(unittest.TestCase):
     def _callFUT(self, view, attr=None):
         from pyramid.config.views import requestonly
