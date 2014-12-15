@@ -471,6 +471,66 @@ class TestPRoutesCommand(unittest.TestCase):
         ]
         self.assertEqual(compare_to, expected)
 
+    def test_route_is_get_view_request_method_not_post(self):
+        from pyramid.renderers import null_renderer as nr
+        from pyramid.config import not_
+
+        def view1(context, request): return 'view1'
+
+        config = self._makeConfig(autocommit=True)
+        config.add_route('foo', '/a/b', request_method='GET')
+        config.add_view(
+            route_name='foo',
+            view=view1,
+            renderer=nr,
+            request_method=not_('POST')
+        )
+
+        command = self._makeOne()
+        L = []
+        command.out = L.append
+        command.bootstrap = (dummy.DummyBootstrap(registry=config.registry),)
+        result = command.run()
+        self.assertEqual(result, 0)
+        self.assertEqual(len(L), 3)
+        compare_to = L[-1].split()
+        expected = [
+            'foo', '/a/b',
+            'pyramid.tests.test_scripts.test_proutes.view1',
+            'GET'
+        ]
+        self.assertEqual(compare_to, expected)
+
+    def test_view_request_method_not_post(self):
+        from pyramid.renderers import null_renderer as nr
+        from pyramid.config import not_
+
+        def view1(context, request): return 'view1'
+
+        config = self._makeConfig(autocommit=True)
+        config.add_route('foo', '/a/b')
+        config.add_view(
+            route_name='foo',
+            view=view1,
+            renderer=nr,
+            request_method=not_('POST')
+        )
+
+        command = self._makeOne()
+        L = []
+        command.out = L.append
+        command.bootstrap = (dummy.DummyBootstrap(registry=config.registry),)
+        result = command.run()
+        self.assertEqual(result, 0)
+        self.assertEqual(len(L), 3)
+        compare_to = L[-1].split()
+        expected = [
+            'foo', '/a/b',
+            'pyramid.tests.test_scripts.test_proutes.view1',
+            '!POST,*'
+        ]
+        self.assertEqual(compare_to, expected)
+
 class Test_main(unittest.TestCase):
     def _callFUT(self, argv):
         from pyramid.scripts.proutes import main

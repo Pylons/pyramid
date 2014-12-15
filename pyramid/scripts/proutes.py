@@ -9,6 +9,7 @@ from pyramid.interfaces import (
     IViewClassifier,
     IView,
 )
+from pyramid.config import not_
 
 from pyramid.scripts.common import parse_vars
 from pyramid.static import static_view
@@ -44,6 +45,19 @@ def _get_print_format(max_name, max_pattern, max_view, max_method):
 
 
 def _get_request_methods(route_request_methods, view_request_methods):
+    excludes = set()
+
+    if route_request_methods:
+        route_request_methods = set(route_request_methods)
+
+    if view_request_methods:
+        view_request_methods = set(view_request_methods)
+
+        for method in view_request_methods.copy():
+            if method.startswith('!'):
+                view_request_methods.remove(method)
+                excludes.add(method[1:])
+
     has_route_methods = route_request_methods is not None
     has_view_methods = len(view_request_methods) > 0
     has_methods = has_route_methods or has_view_methods
@@ -55,14 +69,20 @@ def _get_request_methods(route_request_methods, view_request_methods):
     elif has_route_methods is True and has_view_methods is False:
         request_methods = route_request_methods
     else:
-        request_methods = set(route_request_methods).intersection(
-            set(view_request_methods)
+        request_methods = route_request_methods.intersection(
+            view_request_methods
         )
+
+    request_methods = set(request_methods).difference(excludes)
 
     if has_methods and not request_methods:
         request_methods = '<route mismatch>'
     elif request_methods:
-        request_methods = ','.join(request_methods)
+        if excludes and request_methods == set([ANY_KEY]):
+            for exclude in excludes:
+                request_methods.add('!%s' % exclude)
+
+        request_methods = ','.join(sorted(request_methods))
 
     return request_methods
 
@@ -161,6 +181,8 @@ def get_route_data(route, registry):
 
                     if isinstance(request_method, string_types):
                         request_method = (request_method,)
+                    elif isinstance(request_method, not_):
+                        request_method = ('!%s' % request_method.value,)
 
                     view_request_methods[view_module].extend(request_method)
                 else:
