@@ -841,6 +841,17 @@ class ViewsConfiguratorMixin(object):
           very useful for 'civilians' who are just developing stock Pyramid
           applications. Pay no attention to the man behind the curtain.
 
+        accept
+
+          The value of this argument represents a match query for one
+          or more mimetypes in the ``Accept`` HTTP request header.  If
+          this value is specified, it must be in one of the following
+          forms: a mimetype match token in the form ``text/plain``, a
+          wildcard mimetype match token in the form ``text/*`` or a
+          match-all wildcard mimetype match token in the form ``*/*``.
+          If any of the forms matches the ``Accept`` header of the
+          request, this predicate will be true.
+
         Predicate Arguments
 
         name
@@ -940,17 +951,6 @@ class ViewsConfiguratorMixin(object):
           ``XMLHttpRequest`` for this view to be found and called.
           This is useful for detecting AJAX requests issued from
           jQuery, Prototype and other Javascript libraries.
-
-        accept
-
-          The value of this argument represents a match query for one
-          or more mimetypes in the ``Accept`` HTTP request header.  If
-          this value is specified, it must be in one of the following
-          forms: a mimetype match token in the form ``text/plain``, a
-          wildcard mimetype match token in the form ``text/*`` or a
-          match-all wildcard mimetype match token in the form ``*/*``.
-          If any of the forms matches the ``Accept`` header of the
-          request, this predicate will be true.
 
         header
 
