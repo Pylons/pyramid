@@ -131,7 +131,7 @@ Docs
 ----
 
 - Moved the documentation for ``accept`` on ``Configurator.add_view`` to no
-  longer be part of the decorator list. See
+  longer be part of the predicate list. See
   https://github.com/Pylons/pyramid/issues/1391 for a bug report stating
   ``not_`` was failing on ``accept``. Discussion with @mcdonc led to the
   conclusion that it should not be documented as a predicate.
