@@ -1,6 +1,16 @@
 import unittest
 from pyramid.tests.test_scripts import dummy
 
+
+class DummyIntrospector(object):
+    def __init__(self):
+        self.relations = {}
+        self.introspectables = {}
+
+    def get(self, name, discrim):
+        pass
+
+
 class TestPRoutesCommand(unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.scripts.proutes import PRoutesCommand
@@ -12,6 +22,17 @@ class TestPRoutesCommand(unittest.TestCase):
         cmd.args = ('/foo/bar/myapp.ini#myapp',)
         return cmd
 
+    def _makeRegistry(self):
+        from pyramid.registry import Registry
+        registry = Registry()
+        registry.introspector = DummyIntrospector()
+        return registry
+
+    def _makeConfig(self, *arg, **kw):
+        from pyramid.config import Configurator
+        config = Configurator(*arg, **kw)
+        return config
+
     def test_good_args(self):
         cmd = self._getTargetClass()([])
         cmd.bootstrap = (dummy.DummyBootstrap(),)
@@ -19,6 +40,8 @@ class TestPRoutesCommand(unittest.TestCase):
         route = dummy.DummyRoute('a', '/a')
         mapper = dummy.DummyMapper(route)
         cmd._get_mapper = lambda *arg: mapper
+        registry = self._makeRegistry()
+        cmd.bootstrap = (dummy.DummyBootstrap(registry=registry),)
         L = []
         cmd.out = lambda msg: L.append(msg)
         cmd.run()
@@ -58,12 +81,15 @@ class TestPRoutesCommand(unittest.TestCase):
         route = dummy.DummyRoute('a', '/a')
         mapper = dummy.DummyMapper(route)
         command._get_mapper = lambda *arg: mapper
+        registry = self._makeRegistry()
+        command.bootstrap = (dummy.DummyBootstrap(registry=registry),)
+
         L = []
         command.out = L.append
         result = command.run()
         self.assertEqual(result, 0)
         self.assertEqual(len(L), 3)
-        self.assertEqual(L[-1].split(), ['a', '/a', '<unknown>'])
+        self.assertEqual(L[-1].split(), ['a', '/a', '<unknown>', '*'])
 
     def test_route_with_no_slash_prefix(self):
         command = self._makeOne()
@@ -72,16 +98,18 @@ class TestPRoutesCommand(unittest.TestCase):
         command._get_mapper = lambda *arg: mapper
         L = []
         command.out = L.append
+        registry = self._makeRegistry()
+        command.bootstrap = (dummy.DummyBootstrap(registry=registry),)
         result = command.run()
         self.assertEqual(result, 0)
         self.assertEqual(len(L), 3)
-        self.assertEqual(L[-1].split(), ['a', '/a', '<unknown>'])
+        self.assertEqual(L[-1].split(), ['a', '/a', '<unknown>', '*'])
 
     def test_single_route_no_views_registered(self):
         from zope.interface import Interface
-        from pyramid.registry import Registry
         from pyramid.interfaces import IRouteRequest
-        registry = Registry()
+        registry = self._makeRegistry()
+
         def view():pass
         class IMyRoute(Interface):
             pass
@@ -96,15 +124,15 @@ class TestPRoutesCommand(unittest.TestCase):
         result = command.run()
         self.assertEqual(result, 0)
         self.assertEqual(len(L), 3)
-        self.assertEqual(L[-1].split()[:3], ['a', '/a', 'None'])
+        self.assertEqual(L[-1].split()[:3], ['a', '/a', '<unknown>'])
 
     def test_single_route_one_view_registered(self):
         from zope.interface import Interface
-        from pyramid.registry import Registry
         from pyramid.interfaces import IRouteRequest
         from pyramid.interfaces import IViewClassifier
         from pyramid.interfaces import IView
-        registry = Registry()
+        registry = self._makeRegistry()
+
         def view():pass
         class IMyRoute(Interface):
             pass
@@ -130,11 +158,11 @@ class TestPRoutesCommand(unittest.TestCase):
 
     def test_one_route_with_long_name_one_view_registered(self):
         from zope.interface import Interface
-        from pyramid.registry import Registry
         from pyramid.interfaces import IRouteRequest
         from pyramid.interfaces import IViewClassifier
         from pyramid.interfaces import IView
-        registry = Registry()
+        registry = self._makeRegistry()
+
         def view():pass
 
         class IMyRoute(Interface):
@@ -172,11 +200,11 @@ class TestPRoutesCommand(unittest.TestCase):
 
     def test_single_route_one_view_registered_with_factory(self):
         from zope.interface import Interface
-        from pyramid.registry import Registry
         from pyramid.interfaces import IRouteRequest
         from pyramid.interfaces import IViewClassifier
         from pyramid.interfaces import IView
-        registry = Registry()
+        registry = self._makeRegistry()
+
         def view():pass
         class IMyRoot(Interface):
             pass
@@ -201,12 +229,11 @@ class TestPRoutesCommand(unittest.TestCase):
 
     def test_single_route_multiview_registered(self):
         from zope.interface import Interface
-        from pyramid.registry import Registry
         from pyramid.interfaces import IRouteRequest
         from pyramid.interfaces import IViewClassifier
         from pyramid.interfaces import IMultiView
 
-        registry = Registry()
+        registry = self._makeRegistry()
 
         def view(): pass
 
@@ -235,18 +262,214 @@ class TestPRoutesCommand(unittest.TestCase):
         self.assertEqual(result, 0)
         self.assertEqual(len(L), 3)
         compare_to = L[-1].split()[:3]
+        view_module = 'pyramid.tests.test_scripts.dummy'
+        view_str = '<pyramid.tests.test_scripts.dummy.DummyMultiView'
+        final = '%s.%s' % (view_module, view_str)
+
         self.assertEqual(
             compare_to,
-            ['a', '/a', 'pyramid.tests.test_scripts.test_proutes.view']
+            ['a', '/a', final]
         )
 
     def test__get_mapper(self):
-        from pyramid.registry import Registry
         from pyramid.urldispatch import RoutesMapper
         command = self._makeOne()
-        registry = Registry()
+        registry = self._makeRegistry()
+
         result = command._get_mapper(registry)
         self.assertEqual(result.__class__, RoutesMapper)
+
+    def test_one_route_all_methods_view_only_post(self):
+        from pyramid.renderers import null_renderer as nr
+
+        def view1(context, request): return 'view1'
+
+        config = self._makeConfig(autocommit=True)
+        config.add_route('foo', '/a/b')
+        config.add_view(
+            route_name='foo',
+            view=view1,
+            renderer=nr,
+            request_method='POST'
+        )
+
+        command = self._makeOne()
+        L = []
+        command.out = L.append
+        command.bootstrap = (dummy.DummyBootstrap(registry=config.registry),)
+        result = command.run()
+        self.assertEqual(result, 0)
+        self.assertEqual(len(L), 3)
+        compare_to = L[-1].split()
+        expected = [
+            'foo', '/a/b',
+            'pyramid.tests.test_scripts.test_proutes.view1', 'POST'
+        ]
+        self.assertEqual(compare_to, expected)
+
+    def test_one_route_only_post_view_all_methods(self):
+        from pyramid.renderers import null_renderer as nr
+
+        def view1(context, request): return 'view1'
+
+        config = self._makeConfig(autocommit=True)
+        config.add_route('foo', '/a/b', request_method='POST')
+        config.add_view(
+            route_name='foo',
+            view=view1,
+            renderer=nr,
+        )
+
+        command = self._makeOne()
+        L = []
+        command.out = L.append
+        command.bootstrap = (dummy.DummyBootstrap(registry=config.registry),)
+        result = command.run()
+        self.assertEqual(result, 0)
+        self.assertEqual(len(L), 3)
+        compare_to = L[-1].split()
+        expected = [
+            'foo', '/a/b',
+            'pyramid.tests.test_scripts.test_proutes.view1', 'POST'
+        ]
+        self.assertEqual(compare_to, expected)
+
+    def test_one_route_only_post_view_post_and_get(self):
+        from pyramid.renderers import null_renderer as nr
+
+        def view1(context, request): return 'view1'
+
+        config = self._makeConfig(autocommit=True)
+        config.add_route('foo', '/a/b', request_method='POST')
+        config.add_view(
+            route_name='foo',
+            view=view1,
+            renderer=nr,
+            request_method=('POST', 'GET')
+        )
+
+        command = self._makeOne()
+        L = []
+        command.out = L.append
+        command.bootstrap = (dummy.DummyBootstrap(registry=config.registry),)
+        result = command.run()
+        self.assertEqual(result, 0)
+        self.assertEqual(len(L), 3)
+        compare_to = L[-1].split()
+        expected = [
+            'foo', '/a/b',
+            'pyramid.tests.test_scripts.test_proutes.view1', 'POST'
+        ]
+        self.assertEqual(compare_to, expected)
+
+    def test_route_request_method_mismatch(self):
+        from pyramid.renderers import null_renderer as nr
+
+        def view1(context, request): return 'view1'
+
+        config = self._makeConfig(autocommit=True)
+        config.add_route('foo', '/a/b', request_method='POST')
+        config.add_view(
+            route_name='foo',
+            view=view1,
+            renderer=nr,
+            request_method='GET'
+        )
+
+        command = self._makeOne()
+        L = []
+        command.out = L.append
+        command.bootstrap = (dummy.DummyBootstrap(registry=config.registry),)
+        result = command.run()
+        self.assertEqual(result, 0)
+        self.assertEqual(len(L), 3)
+        compare_to = L[-1].split()
+        expected = [
+            'foo', '/a/b',
+            'pyramid.tests.test_scripts.test_proutes.view1',
+            '<route', 'mismatch>'
+        ]
+        self.assertEqual(compare_to, expected)
+
+    def test_route_static_views(self):
+        from pyramid.renderers import null_renderer as nr
+        config = self._makeConfig(autocommit=True)
+        config.add_static_view('static', 'static', cache_max_age=3600)
+        config.add_static_view(name='static2', path='/var/www/static')
+        config.add_static_view(
+            name='pyramid_scaffold',
+            path='pyramid:scaffolds/starter/+package+/static'
+        )
+
+        command = self._makeOne()
+        L = []
+        command.out = L.append
+        command.bootstrap = (dummy.DummyBootstrap(registry=config.registry),)
+        result = command.run()
+        self.assertEqual(result, 0)
+        self.assertEqual(len(L), 5)
+
+        expected = [
+            ['__static/', '/static/*subpath',
+             'pyramid.tests.test_scripts:static/', '*'],
+            ['__static2/', '/static2/*subpath', '/var/www/static/', '*'],
+            ['__pyramid_scaffold/', '/pyramid_scaffold/*subpath',
+             'pyramid:scaffolds/starter/+package+/static/',  '*'],
+        ]
+
+        for index, line in enumerate(L[2:]):
+            data = line.split()
+            self.assertEqual(data, expected[index])
+
+    def test_route_no_view(self):
+        from pyramid.renderers import null_renderer as nr
+        config = self._makeConfig(autocommit=True)
+        config.add_route('foo', '/a/b', request_method='POST')
+
+        command = self._makeOne()
+        L = []
+        command.out = L.append
+        command.bootstrap = (dummy.DummyBootstrap(registry=config.registry),)
+        result = command.run()
+        self.assertEqual(result, 0)
+        self.assertEqual(len(L), 3)
+        compare_to = L[-1].split()
+        expected = [
+            'foo', '/a/b',
+            '<unknown>',
+            'POST',
+        ]
+        self.assertEqual(compare_to, expected)
+
+    def test_route_as_wsgiapp(self):
+        from pyramid.wsgi import wsgiapp2
+
+        config1 = self._makeConfig(autocommit=True)
+        def view1(context, request): return 'view1'
+        config1.add_route('foo', '/a/b', request_method='POST')
+        config1.add_view(view=view1, route_name='foo')
+
+        config2 = self._makeConfig(autocommit=True)
+        config2.add_route('foo', '/a/b', request_method='POST')
+        config2.add_view(
+            wsgiapp2(config1.make_wsgi_app()),
+            route_name='foo',
+        )
+
+        command = self._makeOne()
+        L = []
+        command.out = L.append
+        command.bootstrap = (dummy.DummyBootstrap(registry=config2.registry),)
+        result = command.run()
+        self.assertEqual(result, 0)
+        self.assertEqual(len(L), 3)
+        compare_to = L[-1].split()
+        expected = [
+            'foo', '/a/b',
+            '<wsgiapp>',
+            'POST',
+        ]
+        self.assertEqual(compare_to, expected)
 
 class Test_main(unittest.TestCase):
     def _callFUT(self, argv):
