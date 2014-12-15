@@ -13,7 +13,6 @@ from pyramid.interfaces import (
 from pyramid.scripts.common import parse_vars
 from pyramid.static import static_view
 from zope.interface import Interface
-from collections import OrderedDict
 
 
 PAD = 3
@@ -117,14 +116,15 @@ def get_route_data(route, registry):
     )
 
     route_request_methods = None
-    view_request_methods = OrderedDict()
+    view_request_methods_order = []
+    view_request_methods = {}
     view_callable = None
 
     route_intr = registry.introspector.get(
         'routes', route.name
     )
 
-    if (request_iface is None) or (route.factory is not None):
+    if request_iface is None:
         return [
             (route.name, _get_pattern(route), UNKNOWN_KEY, ANY_KEY)
         ]
@@ -136,10 +136,12 @@ def get_route_data(route, registry):
         default=None
     )
     view_module = _get_view_module(view_callable)
+
     # Introspectables can be turned off, so there could be a chance
     # that we have no `route_intr` but we do have a route + callable
     if route_intr is None:
         view_request_methods[view_module] = []
+        view_request_methods_order.append(view_module)
     else:
         route_request_methods = route_intr['request_methods']
 
@@ -155,6 +157,7 @@ def get_route_data(route, registry):
 
                     if view_module not in view_request_methods:
                         view_request_methods[view_module] = []
+                        view_request_methods_order.append(view_module)
 
                     if isinstance(request_method, string_types):
                         request_method = (request_method,)
@@ -163,13 +166,16 @@ def get_route_data(route, registry):
                 else:
                     if view_module not in view_request_methods:
                         view_request_methods[view_module] = []
+                        view_request_methods_order.append(view_module)
 
         else:
             view_request_methods[view_module] = []
+            view_request_methods_order.append(view_module)
 
     final_routes = []
 
-    for view_module, methods in view_request_methods.items():
+    for view_module in view_request_methods_order:
+        methods = view_request_methods[view_module]
         request_methods = _get_request_methods(
             route_request_methods,
             methods
