@@ -310,6 +310,10 @@ Python's ``urllib2`` instead of a Javascript AJAX request:
     req = urllib2.Request('http://localhost:6543/', json_payload, headers)
     resp = urllib2.urlopen(req)
 
+If you are doing Cross-origin resource sharing (CORS), then the standard requires the browser to do a pre-flight HTTP OPTIONS request. The easiest way to handling this is adding an extra ``view_config`` for the same route, with ``request_method`` set to ``OPTIONS``, and setting the desired response header before returning. You can find examples of response headers here_.
+
+.. _here: https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS#Preflighted_requests
+
 .. index::
    single: cleaning up after request
 
