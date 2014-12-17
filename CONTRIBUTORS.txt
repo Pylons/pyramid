@@ -236,3 +236,5 @@ Contributors
 - Randall Leeds, 2014/11/11
 
 - Hugo Branquinho, 2014/11/25
+
+- Adrian Teng, 2014/12/17
