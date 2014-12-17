@@ -17,6 +17,8 @@ Authenticated = 'system.Authenticated'
 Allow = 'Allow'
 Deny = 'Deny'
 
+_marker = object()
+
 class AllPermissionsList(object):
     """ Stand in 'permission list' to represent all permissions """
     def __iter__(self):
@@ -115,12 +117,12 @@ deprecated(
     '"effective_principals" attribute of the Pyramid request instead.'
     )
 
-def remember(request, principal, **kw):
+def remember(request, userid=_marker, **kw):
     """
     Returns a sequence of header tuples (e.g. ``[('Set-Cookie', 'foo=abc')]``)
     on this request's response.
     These headers are suitable for 'remembering' a set of credentials
-    implied by the data passed as ``principal`` and ``*kw`` using the
+    implied by the data passed as ``userid`` and ``*kw`` using the
     current :term:`authentication policy`.  Common usage might look
     like so within the body of a view function (``response`` is
     assumed to be a :term:`WebOb` -style :term:`response` object
@@ -138,11 +140,28 @@ def remember(request, principal, **kw):
     always return an empty sequence. If used, the composition and
     meaning of ``**kw`` must be agreed upon by the calling code and
     the effective authentication policy.
+    
+    .. deprecated:: 1.6
+        Renamed the ``principal`` argument to ``userid`` to clarify its
+        purpose.
     """
+    if userid is _marker:
+        principal = kw.pop('principal', _marker)
+        if principal is _marker:
+            raise TypeError(
+                'remember() missing 1 required positional argument: '
+                '\'userid\'')
+        else:
+            deprecated(
+                'principal',
+                'The "principal" argument was deprecated in Pyramid 1.6. '
+                'It will be removed in Pyramid 1.9. Use the "userid" '
+                'argument instead.')
+            userid = principal
     policy = _get_authentication_policy(request)
     if policy is None:
         return []
-    return policy.remember(request, principal, **kw)
+    return policy.remember(request, userid, **kw)
 
 def forget(request):
     """

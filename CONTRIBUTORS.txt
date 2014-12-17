@@ -232,3 +232,7 @@ Contributors
 - Amit Mane, 2014/01/23
 
 - Fenton Travers, 2014/05/06
+
+- Randall Leeds, 2014/11/11
+
+- Hugo Branquinho, 2014/11/25

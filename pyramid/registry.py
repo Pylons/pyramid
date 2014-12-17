@@ -5,6 +5,7 @@ from zope.interface import implementer
 from zope.interface.registry import Components
 
 from pyramid.compat import text_
+from pyramid.decorator import reify
 
 from pyramid.interfaces import (
     ISettings,
@@ -41,6 +42,10 @@ class Registry(Components, dict):
     def __nonzero__(self):
         # defeat bool determination via dict.__len__
         return True
+
+    @reify
+    def package_name(self):
+        return self.__name__
 
     def registerSubscriptionAdapter(self, *arg, **kw):
         result = Components.registerSubscriptionAdapter(self, *arg, **kw)

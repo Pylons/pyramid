@@ -79,8 +79,8 @@ class DummySecurityPolicy(object):
             effective_principals.extend(self.groupids)
         return effective_principals
 
-    def remember(self, request, principal, **kw):
-        self.remembered = principal
+    def remember(self, request, userid, **kw):
+        self.remembered = userid
         return self.remember_result
 
     def forget(self, request):

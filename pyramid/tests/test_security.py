@@ -134,9 +134,9 @@ class TestRemember(unittest.TestCase):
     def tearDown(self):
         testing.tearDown()
 
-    def _callFUT(self, *arg):
+    def _callFUT(self, *arg, **kwarg):
         from pyramid.security import remember
-        return remember(*arg)
+        return remember(*arg, **kwarg)
 
     def test_no_authentication_policy(self):
         request = _makeRequest()
@@ -158,6 +158,19 @@ class TestRemember(unittest.TestCase):
         _registerAuthenticationPolicy(registry, 'yo')
         result = self._callFUT(request, 'me')
         self.assertEqual(result, [('X-Pyramid-Test', 'me')])
+
+    def test_with_deprecated_principal_arg(self):
+        request = _makeRequest()
+        registry = request.registry
+        _registerAuthenticationPolicy(registry, 'yo')
+        result = self._callFUT(request, principal='me')
+        self.assertEqual(result, [('X-Pyramid-Test', 'me')])
+
+    def test_with_missing_arg(self):
+        request = _makeRequest()
+        registry = request.registry
+        _registerAuthenticationPolicy(registry, 'yo')
+        self.assertRaises(TypeError, lambda: self._callFUT(request))
 
 class TestForget(unittest.TestCase):
     def setUp(self):
@@ -462,8 +475,8 @@ class DummyAuthenticationPolicy:
     def authenticated_userid(self, request):
         return self.result
 
-    def remember(self, request, principal, **kw):
-        headers = [(_TEST_HEADER, principal)]
+    def remember(self, request, userid, **kw):
+        headers = [(_TEST_HEADER, userid)]
         self._header_remembered = headers[0]
         return headers
 

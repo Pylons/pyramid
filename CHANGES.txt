@@ -4,6 +4,9 @@ Next release
 Features
 --------
 
+- Added support / testing for 'pypy3' under Tox and Travis.
+  See https://github.com/Pylons/pyramid/pull/1469
+
 - Cache busting for static resources has been added and is available via a new
   argument to ``pyramid.config.Configurator.add_static_view``: ``cachebust``.
   See https://github.com/Pylons/pyramid/pull/1380
@@ -12,8 +15,8 @@ Features
   parameter to assist with includeable packages that wish to resolve
   resources relative to the package in which the ``Configurator`` was created.
   This is especially useful for addons that need to load asset specs from
-  settings, in which case it is natural for a user to define things relative
-  to their own packages.
+  settings, in which case it is may be natural for a developer to define
+  imports or assets relative to the top-level package.
   See https://github.com/Pylons/pyramid/pull/1337
 
 - Added line numbers to the log formatters in the scaffolds to assist with
@@ -24,11 +27,37 @@ Features
   ``431 Request Header Fields Too Large`` in ``pyramid.httpexceptions``.
   See https://github.com/Pylons/pyramid/pull/1372/files
 
+- The ``pshell`` script will now load a ``PYTHONSTARTUP`` file if one is
+  defined in the environment prior to launching the interpreter.
+  See https://github.com/Pylons/pyramid/pull/1448
+
 - Make it simple to define notfound and forbidden views that wish to use
   the default exception-response view but with altered predicates and other
   configuration options. The ``view`` argument is now optional in
   ``config.add_notfound_view`` and ``config.add_forbidden_view``..
   See https://github.com/Pylons/pyramid/issues/494
+
+- Greatly improve the readability of the ``pcreate`` shell script output.
+  See https://github.com/Pylons/pyramid/pull/1453
+
+- Improve robustness to timing attacks in the ``AuthTktCookieHelper`` and
+  the ``SignedCookieSessionFactory`` classes by using the stdlib's
+  ``hmac.compare_digest`` if it is available (such as Python 2.7.7+ and 3.3+).
+  See https://github.com/Pylons/pyramid/pull/1457
+
+- Assets can now be overidden by an absolute path on the filesystem when using
+  the ``config.override_asset`` API. This makes it possible to fully support
+  serving up static content from a mutable directory while still being able
+  to use the ``request.static_url`` API and ``config.add_static_view``.
+  Previously it was not possible to use ``config.add_static_view`` with an
+  absolute path **and** generate urls to the content. This change replaces
+  the call, ``config.add_static_view('/abs/path', 'static')``, with
+  ``config.add_static_view('myapp:static', 'static')`` and
+  ``config.override_asset(to_override='myapp:static/',
+  override_with='/abs/path/')``. The ``myapp:static`` asset spec is completely
+  made up and does not need to exist - it is used for generating urls
+  via ``request.static_url('myapp:static/foo.png')``.
+  See https://github.com/Pylons/pyramid/issues/1252
 
 Bug Fixes
 ---------
@@ -67,6 +96,16 @@ Bug Fixes
 - Fix a failing unittest caused by differing mimetypes across various OSs.
   See https://github.com/Pylons/pyramid/issues/1405
 
+- Fix route generation for static view asset specifications having no path.
+  See https://github.com/Pylons/pyramid/pull/1377
+
+Deprecations
+------------
+
+- Renamed the ``principal`` argument to ``pyramid.security.remember()`` to
+  ``userid`` in order to clarify its intended purpose.
+  See https://github.com/Pylons/pyramid/pull/1399
+
 Docs
 ----
 
@@ -76,6 +115,10 @@ Docs
 
 - Clarify a previously-implied detail of the ``ISession.invalidate`` API
   documentation.
+
+- Improve and clarify the documentation on what Pyramid defines as a
+  ``principal`` and a ``userid`` in its security APIs.
+  See https://github.com/Pylons/pyramid/pull/1399
 
 Scaffolds
 ---------
