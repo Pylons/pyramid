@@ -1,3 +1,4 @@
+import fnmatch
 import optparse
 import sys
 import textwrap
@@ -234,6 +235,9 @@ class PRoutesCommand(object):
         usage,
         description=textwrap.dedent(description)
     )
+    parser.add_option('-g', '--glob',
+                      action='store', type='string', dest='glob',
+                      default='', help='Display routes matching glob pattern')
 
     def __init__(self, argv, quiet=False):
         self.options, self.args = self.parser.parse_args(argv[1:])
@@ -280,6 +284,12 @@ class PRoutesCommand(object):
             route_data = get_route_data(route, registry)
 
             for name, pattern, view, method in route_data:
+                if self.options.glob:
+                    match = (fnmatch.fnmatch(name, self.options.glob) or
+                             fnmatch.fnmatch(pattern, self.options.glob))
+                    if not match:
+                        continue
+
                 if len(name) > max_name:
                     max_name = len(name)
 
