@@ -116,7 +116,8 @@ request enters a :app:`Pyramid` application through to the point that
 
 #. The :term:`thread local` stack is popped.
 
-.. image:: router.png
+.. image:: ../_static/pyramid_router.svg
+   :alt: Pyramid Router
 
 This is a very high-level overview that leaves out various details.  For more
 detail about subsystems invoked by the :app:`Pyramid` router such as
