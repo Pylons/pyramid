@@ -54,7 +54,7 @@ tests_require = [
     ]
 
 docs_require = [
-    'Sphinx',
+    'Sphinx >= 1.2.3',
     'repoze.sphinx.autointerface',
     'pylons_sphinx_latesturl',
     'docutils',
