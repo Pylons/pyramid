@@ -642,7 +642,7 @@ class TestGetResponseFactory(unittest.TestCase):
             registry = Registry()
 
         request = MyRequest({})
-        factory = _get_response_factory(registry, request)
+        factory = _get_response_factory(request.registry, request)
         self.assertEqual(factory, MyResponse)
 
 
