@@ -42,7 +42,8 @@ from pyramid.compat import (
     url_quote,
     WIN,
     is_bound_method,
-    is_nonstr_iter
+    is_nonstr_iter,
+    im_self,
     )
 
 from pyramid.exceptions import (
@@ -418,6 +419,16 @@ class DefaultViewMapper(object):
         self.attr = kw.get('attr')
 
     def __call__(self, view):
+        # Map the attr directly if the passed in view is method and a
+        # constructor is defined and must be unbound (for backwards
+        # compatibility)
+        if inspect.ismethod(view):
+            is_bound = getattr(view, im_self, None) is not None
+
+            if not is_bound:
+                self.attr = view.__name__
+                view = view.im_class
+
         if inspect.isclass(view):
             view = self.map_class(view)
         else:

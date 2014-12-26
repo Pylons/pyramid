@@ -1666,6 +1666,27 @@ class TestViewsConfigurationMixin(unittest.TestCase):
             renderer=null_renderer)
         self.assertRaises(ConfigurationConflictError, config.commit)
 
+    def test_add_view_class_method_no_attr(self):
+        from pyramid.renderers import null_renderer
+        from zope.interface import directlyProvides
+
+        class ViewClass(object):
+            def __init__(self, request):
+                self.request = request
+
+            def run(self):
+                return 'OK'
+
+        config = self._makeOne(autocommit=True)
+        config.add_view(view=ViewClass.run, renderer=null_renderer)
+
+        wrapper = self._getViewCallable(config)
+        context = DummyContext()
+        directlyProvides(context, IDummy)
+        request = self._makeRequest(config)
+        result = wrapper(context, request)
+        self.assertEqual(result, 'OK')
+
     def test_derive_view_function(self):
         from pyramid.renderers import null_renderer
         def view(request):
