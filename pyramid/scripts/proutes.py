@@ -4,7 +4,7 @@ import sys
 import textwrap
 
 from pyramid.paster import bootstrap
-from pyramid.compat import string_types
+from pyramid.compat import (string_types, configparser)
 from pyramid.interfaces import (
     IRouteRequest,
     IViewClassifier,
@@ -35,14 +35,22 @@ def _get_pattern(route):
     return pattern
 
 
-def _get_print_format(max_name, max_pattern, max_view, max_method):
-    fmt = '%-{0}s %-{1}s %-{2}s %-{3}s'.format(
-        max_name + PAD,
-        max_pattern + PAD,
-        max_view + PAD,
-        max_method + PAD,
-    )
-    return fmt
+def _get_print_format(fmt, max_name, max_pattern, max_view, max_method):
+    print_fmt = ''
+    max_map = {
+        'name': max_name,
+        'pattern': max_pattern,
+        'view': max_view,
+        'method': max_method,
+    }
+    sizes = []
+
+    for index, col in enumerate(fmt):
+        size = max_map[col] + PAD
+        print_fmt += '{{%s: <{%s}}} ' % (col, index)
+        sizes.append(size)
+
+    return print_fmt.format(*sizes)
 
 
 def _get_request_methods(route_request_methods, view_request_methods):
@@ -230,7 +238,7 @@ class PRoutesCommand(object):
     bootstrap = (bootstrap,)
     stdout = sys.stdout
     usage = '%prog config_uri'
-
+    ConfigParser = configparser.ConfigParser # testing
     parser = optparse.OptionParser(
         usage,
         description=textwrap.dedent(description)
@@ -239,9 +247,49 @@ class PRoutesCommand(object):
                       action='store', type='string', dest='glob',
                       default='', help='Display routes matching glob pattern')
 
+    parser.add_option('-f', '--format',
+                      action='store', type='string', dest='format',
+                      default='', help=('Choose which columns to display, this '
+                                        'will override the format key in the '
+                                        '[proutes] ini section'))
+
     def __init__(self, argv, quiet=False):
         self.options, self.args = self.parser.parse_args(argv[1:])
         self.quiet = quiet
+        self.available_formats = [
+            'name', 'pattern', 'view', 'method'
+        ]
+        self.column_format = self.available_formats
+
+    def validate_formats(self, formats):
+        invalid_formats = []
+        for fmt in formats:
+            if fmt not in self.available_formats:
+                invalid_formats.append(fmt)
+
+        msg = (
+            'You provided invalid formats %s, '
+            'Available formats are %s'
+        )
+
+        if invalid_formats:
+            msg = msg % (invalid_formats, self.available_formats)
+            self.out(msg)
+            return False
+
+        return True
+
+    def proutes_file_config(self, filename):
+        config = self.ConfigParser()
+        config.read(filename)
+        try:
+            items = config.items('proutes')
+            for k, v in items:
+                if 'format' == k:
+                    self.column_format = [x.strip() for x in v.split('\n')]
+
+        except configparser.NoSectionError:
+            return
 
     def out(self, msg):  # pragma: no cover
         if not self.quiet:
@@ -261,6 +309,16 @@ class PRoutesCommand(object):
         env = self.bootstrap[0](config_uri, options=parse_vars(self.args[1:]))
         registry = env['registry']
         mapper = self._get_mapper(registry)
+        self.proutes_file_config(config_uri)
+
+        if self.options.format:
+            columns = self.options.format.split(',')
+            self.column_format = [x.strip() for x in columns]
+
+        is_valid = self.validate_formats(self.column_format)
+
+        if is_valid is False:
+            return 2
 
         if mapper is None:
             return 0
@@ -275,10 +333,17 @@ class PRoutesCommand(object):
         if len(routes) == 0:
             return 0
 
-        mapped_routes = [
-            ('Name', 'Pattern', 'View', 'Method'),
-            ('----', '-------', '----', '------')
-        ]
+        mapped_routes = [{
+            'name': 'Name',
+            'pattern': 'Pattern',
+            'view': 'View',
+            'method': 'Method'
+        },{
+            'name': '----',
+            'pattern': '-------',
+            'view': '----',
+            'method': '------'
+        }]
 
         for route in routes:
             route_data = get_route_data(route, registry)
@@ -302,12 +367,19 @@ class PRoutesCommand(object):
                 if len(method) > max_method:
                     max_method = len(method)
 
-                mapped_routes.append((name, pattern, view, method))
+                mapped_routes.append({
+                    'name': name,
+                    'pattern': pattern,
+                    'view': view,
+                    'method': method
+                })
 
-        fmt = _get_print_format(max_name, max_pattern, max_view, max_method)
+        fmt = _get_print_format(
+            self.column_format, max_name, max_pattern, max_view, max_method
+        )
 
         for route in mapped_routes:
-            self.out(fmt % route)
+            self.out(fmt.format(**route))
 
         return 0
 

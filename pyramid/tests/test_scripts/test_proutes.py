@@ -20,6 +20,7 @@ class TestPRoutesCommand(unittest.TestCase):
         cmd = self._getTargetClass()([])
         cmd.bootstrap = (dummy.DummyBootstrap(),)
         cmd.args = ('/foo/bar/myapp.ini#myapp',)
+
         return cmd
 
     def _makeRegistry(self):
@@ -571,6 +572,99 @@ class TestPRoutesCommand(unittest.TestCase):
             '!POST,*'
         ]
         self.assertEqual(compare_to, expected)
+
+    def test_good_format(self):
+        from pyramid.renderers import null_renderer as nr
+        from pyramid.config import not_
+
+        def view1(context, request): return 'view1'
+
+        config = self._makeConfig(autocommit=True)
+        config.add_route('foo', '/a/b')
+        config.add_view(
+            route_name='foo',
+            view=view1,
+            renderer=nr,
+            request_method=not_('POST')
+        )
+
+        command = self._makeOne()
+        command.options.glob = '*foo*'
+        command.options.format = 'method,name'
+        L = []
+        command.out = L.append
+        command.bootstrap = (dummy.DummyBootstrap(registry=config.registry),)
+        result = command.run()
+        self.assertEqual(result, 0)
+        self.assertEqual(len(L), 3)
+        compare_to = L[-1].split()
+        expected = ['!POST,*', 'foo']
+
+        self.assertEqual(compare_to, expected)
+        self.assertEqual(L[0].split(), ['Method', 'Name'])
+
+    def test_bad_format(self):
+        from pyramid.renderers import null_renderer as nr
+        from pyramid.config import not_
+
+        def view1(context, request): return 'view1'
+
+        config = self._makeConfig(autocommit=True)
+        config.add_route('foo', '/a/b')
+        config.add_view(
+            route_name='foo',
+            view=view1,
+            renderer=nr,
+            request_method=not_('POST')
+        )
+
+        command = self._makeOne()
+        command.options.glob = '*foo*'
+        command.options.format = 'predicates,name,pattern'
+        L = []
+        command.out = L.append
+        command.bootstrap = (dummy.DummyBootstrap(registry=config.registry),)
+        expected = (
+            "You provided invalid formats ['predicates'], "
+            "Available formats are ['name', 'pattern', 'view', 'method']"
+        )
+        result = command.run()
+        self.assertEqual(result, 2)
+        self.assertEqual(L[0], expected)
+
+    def test_config_format_ini(self):
+        from pyramid.renderers import null_renderer as nr
+        from pyramid.config import not_
+
+        def view1(context, request): return 'view1'
+
+        config = self._makeConfig(autocommit=True)
+        config.add_route('foo', '/a/b')
+        config.add_view(
+            route_name='foo',
+            view=view1,
+            renderer=nr,
+            request_method=not_('POST')
+        )
+
+        command = self._makeOne()
+        command.options.glob = '*foo*'
+        command.options.format = 'method,name'
+        L = []
+        command.out = L.append
+        command.bootstrap = (dummy.DummyBootstrap(registry=config.registry),)
+        config_factory = dummy.DummyConfigParserFactory()
+        command.ConfigParser = config_factory
+        config_factory.items = [('format', 'method\name')]
+
+        result = command.run()
+        self.assertEqual(result, 0)
+        self.assertEqual(len(L), 3)
+        compare_to = L[-1].split()
+        expected = ['!POST,*', 'foo']
+
+        self.assertEqual(compare_to, expected)
+        self.assertEqual(L[0].split(), ['Method', 'Name'])
 
 class Test_main(unittest.TestCase):
     def _callFUT(self, argv):
