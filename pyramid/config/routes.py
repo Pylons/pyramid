@@ -303,6 +303,8 @@ class RoutesConfiguratorMixin(object):
         # check for an external route; an external route is one which is
         # is a full url (e.g. 'http://example.com/{id}')
         parsed = urlparse.urlparse(pattern)
+        external_url = pattern
+
         if parsed.hostname:
             pattern = parsed.path
 
@@ -357,6 +359,10 @@ class RoutesConfiguratorMixin(object):
         intr['pregenerator'] = pregenerator
         intr['static'] = static
         intr['use_global_views'] = use_global_views
+
+        if static is True:
+            intr['external_url'] = external_url
+
         introspectables.append(intr)
 
         if factory:

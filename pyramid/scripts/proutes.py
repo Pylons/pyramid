@@ -172,8 +172,13 @@ def get_route_data(route, registry):
         view_request_methods[view_module] = []
         view_request_methods_order.append(view_module)
     else:
-        route_request_methods = route_intr['request_methods']
+        if route_intr.get('static', False) is True:
+            return [
+                (route.name, route_intr['external_url'], UNKNOWN_KEY, ANY_KEY)
+            ]
 
+
+        route_request_methods = route_intr['request_methods']
         view_intr = registry.introspector.related(route_intr)
 
         if view_intr:
@@ -328,7 +333,7 @@ class PRoutesCommand(object):
         max_view = len('View')
         max_method = len('Method')
 
-        routes = mapper.get_routes()
+        routes = mapper.get_routes(include_static=True)
 
         if len(routes) == 0:
             return 0
