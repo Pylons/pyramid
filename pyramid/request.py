@@ -10,7 +10,6 @@ from pyramid.interfaces import (
     IRequest,
     IResponse,
     ISessionFactory,
-    IResponseFactory,
     )
 
 from pyramid.compat import (
@@ -27,7 +26,10 @@ from pyramid.security import (
     AuthorizationAPIMixin,
     )
 from pyramid.url import URLMethodsMixin
-from pyramid.util import InstancePropertyMixin
+from pyramid.util import (
+    InstancePropertyMixin,
+    _get_response_factory,
+)
 
 class TemplateContext(object):
     pass
@@ -214,9 +216,7 @@ class Request(
         right" attributes (e.g. by calling ``request.response.set_cookie()``)
         within a view that uses a renderer.  Mutations to this response object
         will be preserved in the response sent to the client."""
-        registry = self.registry
-        response_factory = registry.queryUtility(IResponseFactory,
-                                                 default=Response)
+        response_factory = _get_response_factory(self.registry, self)
         return response_factory()
 
     def is_response(self, ob):

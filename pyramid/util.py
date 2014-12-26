@@ -15,6 +15,10 @@ from pyramid.exceptions import (
     CyclicDependencyError,
     )
 
+from pyramid.interfaces import (
+    IResponseFactory,
+    )
+
 from pyramid.compat import (
     iteritems_,
     is_nonstr_iter,
@@ -25,6 +29,7 @@ from pyramid.compat import (
     )
 
 from pyramid.interfaces import IActionInfo
+from pyramid.response import Response
 from pyramid.path import DottedNameResolver as _DottedNameResolver
 
 class DottedNameResolver(_DottedNameResolver):
@@ -551,3 +556,19 @@ def action_method(wrapped):
     wrapper.__docobj__ = wrapped
     return wrapper
 
+def _get_response_factory(registry, request=None):
+    """ Obtain a :class: `pyramid.response.Response` using the
+    ``request.ResponseClass`` property if available.
+    """
+    # Request is `None` or does not have a `ResponseClass`
+    if hasattr(request, 'ResponseClass'):
+        response_class = request.ResponseClass
+    else:
+        response_class = Response
+
+    response_factory = registry.queryUtility(
+        IResponseFactory,
+        default=response_class
+    )
+
+    return response_factory

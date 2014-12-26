@@ -10,7 +10,6 @@ from zope.interface.registry import Components
 from pyramid.interfaces import (
     IJSONAdapter,
     IRendererFactory,
-    IResponseFactory,
     IRendererInfo,
     )
 
@@ -18,6 +17,8 @@ from pyramid.compat import (
     string_types,
     text_type,
     )
+
+from pyramid.util import _get_response_factory
 
 from pyramid.decorator import reify
 
@@ -448,9 +449,7 @@ class RendererHelper(object):
         if response is None:
             # request is None or request is not a pyramid.response.Response
             registry = self.registry
-            response_factory = registry.queryUtility(IResponseFactory,
-                                                     default=Response)
-
+            response_factory = _get_response_factory(registry, request)
             response = response_factory()
 
         if result is not None:
