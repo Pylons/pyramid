@@ -1075,7 +1075,7 @@ class ActionState(object):
         ...   ]
         >>> context.execute_actions()
         >>> output
-        [('f', (1,), {}), ('f', (2,), {}), ('g', (8,), {})]
+        [('f', (1,), {}), ('g', (8,), {})]
 
         """
         try:
