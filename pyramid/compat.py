@@ -244,3 +244,20 @@ else:
 def is_bound_method(ob):
     return inspect.ismethod(ob) and getattr(ob, im_self, None) is not None
 
+def is_unbound_method(fn):
+    """
+    This consistently verifies that the callable is bound to a
+    class.
+    """
+    is_bound = is_bound_method(fn)
+
+    if not is_bound and inspect.isroutine(fn):
+        spec = inspect.getargspec(fn)
+        has_self = len(spec.args) > 0 and spec.args[0] == 'self'
+
+        if PY3 and inspect.isfunction(fn) and has_self:  # pragma: no cover
+            return True
+        elif inspect.ismethod(fn):
+            return True
+
+    return False

@@ -1669,23 +1669,16 @@ class TestViewsConfigurationMixin(unittest.TestCase):
     def test_add_view_class_method_no_attr(self):
         from pyramid.renderers import null_renderer
         from zope.interface import directlyProvides
-
-        class ViewClass(object):
-            def __init__(self, request):
-                self.request = request
-
-            def run(self):
-                return 'OK'
+        from pyramid.exceptions import ConfigurationError
 
         config = self._makeOne(autocommit=True)
-        config.add_view(view=ViewClass.run, renderer=null_renderer)
+        class DummyViewClass(object):
+            def run(self): pass
 
-        wrapper = self._getViewCallable(config)
-        context = DummyContext()
-        directlyProvides(context, IDummy)
-        request = self._makeRequest(config)
-        result = wrapper(context, request)
-        self.assertEqual(result, 'OK')
+        def configure_view():
+            config.add_view(view=DummyViewClass.run, renderer=null_renderer)
+
+        self.assertRaises(ConfigurationError, configure_view)
 
     def test_derive_view_function(self):
         from pyramid.renderers import null_renderer
