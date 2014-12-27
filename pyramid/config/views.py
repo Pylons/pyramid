@@ -44,7 +44,6 @@ from pyramid.compat import (
     is_bound_method,
     is_unbound_method,
     is_nonstr_iter,
-    im_self,
     )
 
 from pyramid.exceptions import (
