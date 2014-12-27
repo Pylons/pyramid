@@ -362,6 +362,8 @@ We attach and cache an object named ``extra`` to the ``request`` object.
 Changing the Response Factory
 -------------------------------
 
+.. versionadded:: 1.6
+
 Whenever :app:`Pyramid` returns a response from a view it creates a
 :term:`response` object.  By default, an instance of the
 :class:`pyramid.response.Response` class is created to represent the response
