@@ -1099,7 +1099,7 @@ class ActionState(object):
                             'During execution a re-entrant action was added '
                             'that modified the planned execution order in a '
                             'way that is incompatible with what has already '
-                            'been done.')
+                            'been executed.')
                     else:
                         # resolved action is in the same location as before,
                         # so we are in good shape, but the action is already
