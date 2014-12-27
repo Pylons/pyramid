@@ -256,6 +256,9 @@ virtualenv (``env``) directory you created in the last step.
 .. code-block:: text
 
    $ cd env
+
+.. parsed-literal::
+
    $ bin/easy_install "pyramid==\ |release|\ "
 
 The ``easy_install`` command will take longer than the previous ones to
@@ -311,7 +314,7 @@ Installing :app:`Pyramid` on a Windows System
 #. Use ``easy_install`` pointed at the "current" index to get
    :app:`Pyramid` and its direct dependencies installed:
 
-   .. code-block:: text
+   .. parsed-literal::
 
       c:\env> Scripts\easy_install "pyramid==\ |release|\ "
 
