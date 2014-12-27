@@ -245,9 +245,9 @@ After you've got your ``env`` virtualenv installed, you may install
 :app:`Pyramid` itself using the following commands from within the
 virtualenv (``env``) directory:
 
-.. code-block:: text
+   .. parsed-literal::
 
-   $ bin/easy_install pyramid
+   $ bin/easy_install "pyramid==\ |release|\ "
 
 This command will take longer than the previous ones to complete, as it
 downloads and installs a number of dependencies.
@@ -302,9 +302,9 @@ Installing :app:`Pyramid` on a Windows System
 #. Use ``easy_install`` pointed at the "current" index to get
    :app:`Pyramid` and its direct dependencies installed:
 
-   .. code-block:: text
-
-      c:\env> Scripts\easy_install pyramid
+   .. parsed-literal::
+      
+      c:\\env> Scripts\\easy_install "pyramid==\ |release|\ "
 
 .. index::
    single: installing on Google App Engine
