@@ -46,10 +46,10 @@ install_requires=[
 
 
 if platform.system() == 'Java':
-    docs_require = ['Sphinx']
+    docs_require = ['Sphinx >= 1.2.3']
     tests_require = ['WebTest']
 else:
-    docs_require = ['Sphinx',
+    docs_require = ['Sphinx >= 1.2.3',
                     'repoze.sphinx.autointerface',
                     'pylons_sphinx_latesturl',
                    ]
