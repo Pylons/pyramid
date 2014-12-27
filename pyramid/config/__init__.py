@@ -1072,7 +1072,6 @@ class ActionState(object):
         ...    output.append(('g', a, k))
         >>> context.actions = [
         ...   (1, f, (1,)),
-        ...   (2, f, (2,)),
         ...   ]
         >>> context.execute_actions()
         >>> output
@@ -1114,7 +1113,8 @@ class ActionState(object):
                 # conflicts.
                 if self.actions:
                     # Only resolve the new actions against executed_actions
-                    # instead of everything to avoid redundant checks.
+                    # and pending_actions instead of everything to avoid
+                    # redundant checks.
                     # Assume ``actions = resolveConflicts([A, B, C])`` which
                     # after conflict checks, resulted in ``actions == [A]``
                     # then we know action A won out or a conflict would have
@@ -1123,9 +1123,12 @@ class ActionState(object):
                     # ``actions = resolveConflicts([A, D]) should drop the
                     # number of redundant checks down from O(n^2) closer to
                     # O(n lg n).
-                    pending_actions = resume(resolveConflicts(
-                        executed_actions + self.actions))
                     all_actions.extend(self.actions)
+                    pending_actions = resume(resolveConflicts(
+                        executed_actions
+                        + list(pending_actions)
+                        + self.actions
+                    ))
                     self.actions = []
 
                 action = next(pending_actions, None)

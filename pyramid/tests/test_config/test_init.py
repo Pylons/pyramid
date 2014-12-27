@@ -1503,6 +1503,45 @@ class TestActionState(unittest.TestCase):
         self.assertRaises(ConfigurationExecutionError, c.execute_actions)
         self.assertEqual(output, [('f', (1,), {}), ('f', (2,), {})])
 
+    def test_reentrant_action(self):
+        output = []
+        c = self._makeOne()
+        def f(*a, **k):
+            output.append(('f', a, k))
+            c.actions.append((3, g, (8,), {}))
+        def g(*a, **k):
+            output.append(('g', a, k))
+        c.actions = [
+            (1, f, (1,)),
+        ]
+        c.execute_actions()
+        self.assertEqual(output, [('f', (1,), {}), ('g', (8,), {})])
+
+    def test_reentrant_action_error(self):
+        from pyramid.exceptions import ConfigurationError
+        c = self._makeOne()
+        def f(*a, **k):
+            c.actions.append((3, g, (8,), {}, (), None, -1))
+        def g(*a, **k): pass
+        c.actions = [
+            (1, f, (1,)),
+        ]
+        self.assertRaises(ConfigurationError, c.execute_actions)
+
+    def test_reentrant_action_without_clear(self):
+        c = self._makeOne()
+        def f(*a, **k):
+            c.actions.append((3, g, (8,)))
+        def g(*a, **k): pass
+        c.actions = [
+            (1, f, (1,)),
+        ]
+        c.execute_actions(clear=False)
+        self.assertEqual(c.actions, [
+            (1, f, (1,)),
+            (3, g, (8,)),
+        ])
+
 class Test_resolveConflicts(unittest.TestCase):
     def _callFUT(self, actions):
         from pyramid.config import resolveConflicts
