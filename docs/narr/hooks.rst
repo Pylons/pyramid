@@ -354,6 +354,68 @@ We attach and cache an object named ``extra`` to the ``request`` object.
 
 .. _beforerender_event:
 
+.. index::
+   single: response factory
+
+.. _changing_the_response_factory:
+
+Changing the Response Factory
+----------------------------
+
+Whenever :app:`Pyramid` returns a response from a view it creates a
+:term:`response` object.  By default, an instance of the
+:class:`pyramid.response.Response` class is created to represent the response
+object.
+
+The class (aka "factory") that :app:`Pyramid` uses to create a response object
+instance can be changed by passing a ``response_factory`` argument to the
+constructor of the :term:`configurator`.  This argument can be either a
+callable or a :term:`dotted Python name` representing a callable.
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.response import Response
+
+   class MyResponse(Response):
+       pass
+
+   config = Configurator(response_factory=MyResponse)
+
+If you're doing imperative configuration, and you'd rather do it after you've
+already constructed a :term:`configurator` it can also be registered via the
+:meth:`pyramid.config.Configurator.set_response_factory` method:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.config import Configurator
+   from pyramid.response import Response
+
+   class MyResponse(Response):
+       pass
+
+   config = Configurator()
+   config.set_response_factory(MyRequest)
+
+If you are already using a custom ```request_factory`` you can also set the
+``ResponseClass`` on your :class:`pyramid.request.Request`:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.config import Configurator
+   from pyramid.response import Response
+   from pyramid.request import Request
+
+   class MyResponse(Response):
+       pass
+
+   class MyRequest(Request):
+       ResponseClass = MyResponse
+
+   config = Configurator()
+
 Using The Before Render Event
 -----------------------------
 
