@@ -16,6 +16,9 @@ Glossary
      An object which, provided a :term:`WSGI` environment as a single
      positional argument, returns a Pyramid-compatible request.
 
+   response factory
+     An object which returns a Pyramid-compatible response.
+
    response
      An object returned by a :term:`view callable` that represents response
      data returned to the requesting user agent.  It must implement the

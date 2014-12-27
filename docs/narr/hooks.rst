@@ -360,7 +360,7 @@ We attach and cache an object named ``extra`` to the ``request`` object.
 .. _changing_the_response_factory:
 
 Changing the Response Factory
-----------------------------
+-------------------------------
 
 Whenever :app:`Pyramid` returns a response from a view it creates a
 :term:`response` object.  By default, an instance of the
