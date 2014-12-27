@@ -4,6 +4,12 @@ Next release
 Features
 --------
 
+- The ``pyramid.config.Configurator`` has grown the ability to allow
+  actions to call other actions during a commit-cycle. This enables much more
+  logic to be placed into actions, such as the ability to invoke other actions
+  or group them for improved conflict detection.
+  See https://github.com/Pylons/pyramid/pull/1513
+
 - Added support / testing for 'pypy3' under Tox and Travis.
   See https://github.com/Pylons/pyramid/pull/1469
 
