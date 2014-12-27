@@ -56,7 +56,7 @@ if not PY3:
     tests_require.append('zope.component>=3.11.0')
 
 docs_extras = [
-    'Sphinx',
+    'Sphinx >= 1.2.3',
     'docutils',
     'repoze.sphinx.autointerface',
     ]
