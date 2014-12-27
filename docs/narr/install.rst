@@ -257,7 +257,10 @@ virtualenv (``env``) directory you created in the last step.
 .. code-block:: text
 
    $ cd env
-   $ bin/easy_install pyramid
+
+   .. parsed-literal::
+
+   $ bin/easy_install "pyramid==\ |release|\ "
 
 The ``easy_install`` command will take longer than the previous ones to
 complete, as it downloads and installs a number of dependencies.
@@ -312,9 +315,9 @@ Installing :app:`Pyramid` on a Windows System
 #. Use ``easy_install`` pointed at the "current" index to get
    :app:`Pyramid` and its direct dependencies installed:
 
-   .. code-block:: text
-
-      c:\env> Scripts\easy_install pyramid
+   .. parsed-literal::
+      
+      c:\\env> Scripts\\easy_install "pyramid==\ |release|\ "
 
 .. index::
    single: installing on Google App Engine
