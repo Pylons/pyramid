@@ -316,7 +316,7 @@ Installing :app:`Pyramid` on a Windows System
 
    .. parsed-literal::
 
-      c:\env> Scripts\easy_install "pyramid==\ |release|\ "
+      c:\\env> Scripts\\easy_install "pyramid==\ |release|\ "
 
 What Gets Installed
 -------------------
