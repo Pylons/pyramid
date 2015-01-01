@@ -17,7 +17,7 @@ Glossary
      positional argument, returns a Pyramid-compatible request.
 
    response factory
-     An object which, provied a :term:`request` as a single positional
+     An object which, provided a :term:`request` as a single positional
      argument, returns a Pyramid-compatible response.
 
    response
