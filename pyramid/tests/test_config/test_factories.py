@@ -26,7 +26,7 @@ class TestFactoriesMixin(unittest.TestCase):
     def test_set_response_factory(self):
         from pyramid.interfaces import IResponseFactory
         config = self._makeOne(autocommit=True)
-        factory = object()
+        factory = lambda r: object()
         config.set_response_factory(factory)
         self.assertEqual(config.registry.getUtility(IResponseFactory), factory)
 

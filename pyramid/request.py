@@ -216,8 +216,8 @@ class Request(
         right" attributes (e.g. by calling ``request.response.set_cookie()``)
         within a view that uses a renderer.  Mutations to this response object
         will be preserved in the response sent to the client."""
-        response_factory = _get_response_factory(self.registry, self)
-        return response_factory()
+        response_factory = _get_response_factory(self.registry)
+        return response_factory(self)
 
     def is_response(self, ob):
         """ Return ``True`` if the object passed as ``ob`` is a valid

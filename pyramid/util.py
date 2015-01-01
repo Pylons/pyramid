@@ -556,19 +556,14 @@ def action_method(wrapped):
     wrapper.__docobj__ = wrapped
     return wrapper
 
-def _get_response_factory(registry, request=None):
-    """ Obtain a :class: `pyramid.response.Response` using the
-    ``request.ResponseClass`` property if available.
-    """
-    # Request is `None` or does not have a `ResponseClass`
-    if hasattr(request, 'ResponseClass'):
-        response_class = request.ResponseClass
-    else:
-        response_class = Response
 
+def _get_response_factory(registry):
+    """ Obtain a :class: `pyramid.response.Response` using the
+    `pyramid.interfaces.IResponseFactory`.
+    """
     response_factory = registry.queryUtility(
         IResponseFactory,
-        default=response_class
+        default=lambda r: Response()
     )
 
     return response_factory

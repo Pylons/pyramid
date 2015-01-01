@@ -551,42 +551,12 @@ class ConfiguratorTests(unittest.TestCase):
         from pyramid.interfaces import IResponseFactory
         reg = Registry()
         config = self._makeOne(reg)
-        factory = object()
+        factory = lambda r: object()
         config.setup_registry(response_factory=factory)
         self.assertEqual(reg.queryUtility(IResponseFactory), None)
         config.commit()
         utility = reg.getUtility(IResponseFactory)
         self.assertEqual(utility, factory)
-
-    def test_setup_registry_request_factory_custom_response_class(self):
-        from pyramid.registry import Registry
-        from pyramid.interfaces import IRequestFactory
-        from pyramid.request import Request
-
-        class MyResponse(object):
-            pass
-
-        class MyRequest(Request):
-            ResponseClass = MyResponse
-
-        reg = Registry()
-        config = self._makeOne(reg)
-        factory = MyRequest({
-            'PATH_INFO': '/',
-            'wsgi.url_scheme': 'http',
-            'HTTP_HOST': 'localhost',
-            'SERVER_PROTOCOL': '1.0',
-        })
-        factory.registry = reg
-
-        config.setup_registry(request_factory=factory)
-        self.assertEqual(reg.queryUtility(IRequestFactory), None)
-        config.commit()
-        utility = reg.getUtility(IRequestFactory)
-        self.assertEqual(utility, factory)
-
-        new_response = factory.response
-        self.assertTrue(isinstance(new_response, MyResponse))
 
     def test_setup_registry_request_factory_dottedname(self):
         from pyramid.registry import Registry

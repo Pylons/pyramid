@@ -9,7 +9,6 @@ from zope.interface import (
 
 from pyramid.interfaces import (
     IRequest,
-    IResponseFactory,
     ISession,
     )
 
@@ -40,7 +39,10 @@ from pyramid.threadlocal import (
 from pyramid.i18n import LocalizerRequestMixin
 from pyramid.request import CallbackMethodsMixin
 from pyramid.url import URLMethodsMixin
-from pyramid.util import InstancePropertyMixin
+from pyramid.util import (
+    InstancePropertyMixin,
+    _get_response_factory
+    )
 
 _marker = object()
 
@@ -383,8 +385,8 @@ class DummyRequest(
 
     @reify
     def response(self):
-        f =  self.registry.queryUtility(IResponseFactory, default=Response)
-        return f()
+        f =  _get_response_factory(self.registry)
+        return f(self)
 
 have_zca = True
 

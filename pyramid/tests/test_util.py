@@ -324,7 +324,7 @@ class Test_object_description(unittest.TestCase):
         self.assertEqual(
             self._callFUT(inst),
             "object %s" % str(inst))
-        
+
     def test_shortened_repr(self):
         inst = ['1'] * 1000
         self.assertEqual(
@@ -592,7 +592,7 @@ class TestActionInfo(unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.util import ActionInfo
         return ActionInfo
-        
+
     def _makeOne(self, filename, lineno, function, linerepr):
         return self._getTargetClass()(filename, lineno, function, linerepr)
 
@@ -620,30 +620,14 @@ class TestActionInfo(unittest.TestCase):
 
 
 class TestGetResponseFactory(unittest.TestCase):
-    def test_no_request(self):
+    def test_get_factory(self):
         from pyramid.util import _get_response_factory
         from pyramid.registry import Registry
         from pyramid.response import Response
 
         registry = Registry()
-        factory = _get_response_factory(registry)
-        self.assertEqual(factory, Response)
-
-    def test_with_request(self):
-        from pyramid.util import _get_response_factory
-        from pyramid.registry import Registry
-        from pyramid.request import Request
-
-        class MyResponse(object):
-            pass
-
-        class MyRequest(Request):
-            ResponseClass = MyResponse
-            registry = Registry()
-
-        request = MyRequest({})
-        factory = _get_response_factory(request.registry, request)
-        self.assertEqual(factory, MyResponse)
+        response = _get_response_factory(registry)(None)
+        self.assertTrue(isinstance(response, Response))
 
 
 def dummyfunc(): pass

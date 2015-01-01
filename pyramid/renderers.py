@@ -449,8 +449,8 @@ class RendererHelper(object):
         if response is None:
             # request is None or request is not a pyramid.response.Response
             registry = self.registry
-            response_factory = _get_response_factory(registry, request)
-            response = response_factory()
+            response_factory = _get_response_factory(registry)
+            response = response_factory(request)
 
         if result is not None:
             if isinstance(result, text_type):
