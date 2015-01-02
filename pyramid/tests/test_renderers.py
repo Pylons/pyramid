@@ -182,7 +182,10 @@ class TestRendererHelper(unittest.TestCase):
         from pyramid.interfaces import IResponseFactory
         class ResponseFactory(object):
             pass
-        self.config.registry.registerUtility(ResponseFactory, IResponseFactory)
+
+        self.config.registry.registerUtility(
+            lambda r: ResponseFactory(), IResponseFactory
+        )
 
     def test_render_to_response(self):
         self._registerRendererFactory()
@@ -310,7 +313,9 @@ class TestRendererHelper(unittest.TestCase):
         class ResponseFactory(object):
             def __init__(self):
                 pass
-        self.config.registry.registerUtility(ResponseFactory, IResponseFactory)
+        self.config.registry.registerUtility(
+            lambda r: ResponseFactory(), IResponseFactory
+        )
         request = testing.DummyRequest()
         helper = self._makeOne('loo.foo')
         response = helper._make_response(b'abc', request)

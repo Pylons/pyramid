@@ -59,6 +59,11 @@ Features
   via ``request.static_url('myapp:static/foo.png')``.
   See https://github.com/Pylons/pyramid/issues/1252
 
+- Added ``pyramid.config.Configurator.set_response_factory`` and the
+  ``response_factory`` keyword argument to the ``Configurator`` for defining
+  a factory that will return a custom ``Response`` class.
+  See https://github.com/Pylons/pyramid/pull/1499
+
 Bug Fixes
 ---------
 
