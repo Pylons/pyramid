@@ -113,7 +113,7 @@ class InstancePropertyMixin(object):
             method = fn.__get__(self, self.__class__)
             try:
                 setattr(self, name, method)
-            except UnicodeEncodeError:
+            except (UnicodeEncodeError, TypeError):
                 msg = (
                     '`name="%s"` is invalid. `name` must be ascii because it is '
                     'used on __name__ of the method'

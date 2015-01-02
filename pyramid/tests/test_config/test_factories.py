@@ -120,13 +120,17 @@ class TestFactoriesMixin(unittest.TestCase):
         def boomshaka(r): pass
         name = text_(b'La Pe\xc3\xb1a', 'utf-8')
         config.add_request_method(boomshaka, name=name)
+
+        name2 = b'La Pe\xc3\xb1a'
+        config.add_request_method(boomshaka, name=name2)
+
         exts = config.registry.getUtility(IRequestExtensions)
         inst = InstancePropertyMixin()
 
         def set_extensions():
             inst._set_extensions(exts)
+
         self.assertRaises(ValueError, set_extensions)
-        self.assertTrue(name in exts.methods)
 
 class TestDeprecatedFactoriesMixinMethods(unittest.TestCase):
     def setUp(self):
