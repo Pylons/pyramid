@@ -97,13 +97,18 @@ class PRequestCommand(object):
         if not self.quiet:
             print(msg)
 
+    def configure_logging(self, app_spec):
+        setup_logging(app_spec)
+
     def run(self):
         if not len(self.args) >= 2:
             self.out('You must provide at least two arguments')
             return 2
         app_spec = self.args[0]
-        setup_logging(app_spec)
         path = self.args[1]
+
+        self.configure_logging(app_spec)
+
         if not path.startswith('/'):
             path = '/' + path
 
