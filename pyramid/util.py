@@ -111,7 +111,15 @@ class InstancePropertyMixin(object):
     def _set_extensions(self, extensions):
         for name, fn in iteritems_(extensions.methods):
             method = fn.__get__(self, self.__class__)
-            setattr(self, name, method)
+            try:
+                setattr(self, name, method)
+            except UnicodeEncodeError:
+                msg = (
+                    '`name="%s"` is invalid. `name` must be ascii because it is '
+                    'used on __name__ of the method'
+                )
+                raise ValueError(msg % name)
+
         self._set_properties(extensions.descriptors)
 
     def set_property(self, callable, name=None, reify=False):

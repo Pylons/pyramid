@@ -111,6 +111,22 @@ class TestFactoriesMixin(unittest.TestCase):
         config = self._makeOne(autocommit=True)
         self.assertRaises(AttributeError, config.add_request_method)
 
+    def test_add_request_method_with_text_type_name(self):
+        from pyramid.interfaces import IRequestExtensions
+        from pyramid.compat import text_
+        from pyramid.util import InstancePropertyMixin
+
+        config = self._makeOne(autocommit=True)
+        def boomshaka(r): pass
+        name = text_(b'La Pe\xc3\xb1a', 'utf-8')
+        config.add_request_method(boomshaka, name=name)
+        exts = config.registry.getUtility(IRequestExtensions)
+        inst = InstancePropertyMixin()
+
+        def set_extensions():
+            inst._set_extensions(exts)
+        self.assertRaises(ValueError, set_extensions)
+        self.assertTrue(name in exts.methods)
 
 class TestDeprecatedFactoriesMixinMethods(unittest.TestCase):
     def setUp(self):
@@ -120,7 +136,7 @@ class TestDeprecatedFactoriesMixinMethods(unittest.TestCase):
     def tearDown(self):
         from zope.deprecation import __show__
         __show__.on()
-        
+
     def _makeOne(self, *arg, **kw):
         from pyramid.config import Configurator
         config = Configurator(*arg, **kw)
