@@ -15,6 +15,10 @@ from pyramid.exceptions import (
     CyclicDependencyError,
     )
 
+from pyramid.interfaces import (
+    IResponseFactory,
+    )
+
 from pyramid.compat import (
     iteritems_,
     is_nonstr_iter,
@@ -25,6 +29,7 @@ from pyramid.compat import (
     )
 
 from pyramid.interfaces import IActionInfo
+from pyramid.response import Response
 from pyramid.path import DottedNameResolver as _DottedNameResolver
 
 class DottedNameResolver(_DottedNameResolver):
@@ -550,4 +555,3 @@ def action_method(wrapped):
         functools.update_wrapper(wrapper, wrapped)
     wrapper.__docobj__ = wrapped
     return wrapper
-

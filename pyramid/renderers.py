@@ -10,7 +10,6 @@ from zope.interface.registry import Components
 from pyramid.interfaces import (
     IJSONAdapter,
     IRendererFactory,
-    IResponseFactory,
     IRendererInfo,
     )
 
@@ -25,7 +24,7 @@ from pyramid.events import BeforeRender
 
 from pyramid.path import caller_package
 
-from pyramid.response import Response
+from pyramid.response import Response, _get_response_factory
 from pyramid.threadlocal import get_current_registry
 
 # API
@@ -448,10 +447,8 @@ class RendererHelper(object):
         if response is None:
             # request is None or request is not a pyramid.response.Response
             registry = self.registry
-            response_factory = registry.queryUtility(IResponseFactory,
-                                                     default=Response)
-
-            response = response_factory()
+            response_factory = _get_response_factory(registry)
+            response = response_factory(request)
 
         if result is not None:
             if isinstance(result, text_type):

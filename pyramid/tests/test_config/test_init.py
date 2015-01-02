@@ -546,6 +546,18 @@ class ConfiguratorTests(unittest.TestCase):
         utility = reg.getUtility(IRequestFactory)
         self.assertEqual(utility, factory)
 
+    def test_setup_registry_response_factory(self):
+        from pyramid.registry import Registry
+        from pyramid.interfaces import IResponseFactory
+        reg = Registry()
+        config = self._makeOne(reg)
+        factory = lambda r: object()
+        config.setup_registry(response_factory=factory)
+        self.assertEqual(reg.queryUtility(IResponseFactory), None)
+        config.commit()
+        utility = reg.getUtility(IResponseFactory)
+        self.assertEqual(utility, factory)
+
     def test_setup_registry_request_factory_dottedname(self):
         from pyramid.registry import Registry
         from pyramid.interfaces import IRequestFactory
