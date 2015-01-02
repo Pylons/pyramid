@@ -135,8 +135,6 @@ platforms.
    tutorials/wiki/index.rst
    tutorials/modwsgi/index.rst
 
-.. _html_api_documentation:
-
 API Documentation
 =================
 
@@ -146,6 +144,7 @@ Comprehensive reference material for every public API exposed by :app:`Pyramid`:
    :maxdepth: 1
    :glob:
 
+   api/index
    api/*
 
 Change History

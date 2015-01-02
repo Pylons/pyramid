@@ -1,5 +1,6 @@
 # Wire up travis
 language: python
+sudo: false
 
 env:
   - TOXENV=py26
