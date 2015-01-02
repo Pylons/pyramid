@@ -5,7 +5,7 @@ import textwrap
 
 from pyramid.compat import url_unquote
 from pyramid.request import Request
-from pyramid.paster import get_app
+from pyramid.paster import get_app, setup_logging
 from pyramid.scripts.common import parse_vars
 
 def main(argv=sys.argv, quiet=False):
@@ -102,6 +102,7 @@ class PRequestCommand(object):
             self.out('You must provide at least two arguments')
             return 2
         app_spec = self.args[0]
+        setup_logging(app_spec)
         path = self.args[1]
         if not path.startswith('/'):
             path = '/' + path
