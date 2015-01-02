@@ -619,17 +619,6 @@ class TestActionInfo(unittest.TestCase):
                          "Line 0 of file filename:\n       linerepr  ")
 
 
-class TestGetResponseFactory(unittest.TestCase):
-    def test_get_factory(self):
-        from pyramid.util import _get_response_factory
-        from pyramid.registry import Registry
-        from pyramid.response import Response
-
-        registry = Registry()
-        response = _get_response_factory(registry)(None)
-        self.assertTrue(isinstance(response, Response))
-
-
 def dummyfunc(): pass
 
 class Dummy(object):

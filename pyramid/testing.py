@@ -21,7 +21,7 @@ from pyramid.compat import (
 from pyramid.config import Configurator
 from pyramid.decorator import reify
 from pyramid.path import caller_package
-from pyramid.response import Response
+from pyramid.response import Response, _get_response_factory
 from pyramid.registry import Registry
 
 from pyramid.security import (
@@ -39,10 +39,8 @@ from pyramid.threadlocal import (
 from pyramid.i18n import LocalizerRequestMixin
 from pyramid.request import CallbackMethodsMixin
 from pyramid.url import URLMethodsMixin
-from pyramid.util import (
-    InstancePropertyMixin,
-    _get_response_factory
-    )
+from pyramid.util import InstancePropertyMixin
+
 
 _marker = object()
 

@@ -18,15 +18,13 @@ from pyramid.compat import (
     text_type,
     )
 
-from pyramid.util import _get_response_factory
-
 from pyramid.decorator import reify
 
 from pyramid.events import BeforeRender
 
 from pyramid.path import caller_package
 
-from pyramid.response import Response
+from pyramid.response import Response, _get_response_factory
 from pyramid.threadlocal import get_current_registry
 
 # API

@@ -20,16 +20,13 @@ from pyramid.compat import (
 
 from pyramid.decorator import reify
 from pyramid.i18n import LocalizerRequestMixin
-from pyramid.response import Response
+from pyramid.response import Response,  _get_response_factory
 from pyramid.security import (
     AuthenticationAPIMixin,
     AuthorizationAPIMixin,
     )
 from pyramid.url import URLMethodsMixin
-from pyramid.util import (
-    InstancePropertyMixin,
-    _get_response_factory,
-)
+from pyramid.util import InstancePropertyMixin
 
 class TemplateContext(object):
     pass
