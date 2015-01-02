@@ -351,7 +351,7 @@ For example you may remove request method and place the view first:
              pattern
 
 If you want to temporarily configure the columns and order there is the
-``--format` which is a comma separated list of columns you want to include. The
+``--format`` which is a comma separated list of columns you want to include. The
 current available formats are ``name``, ``pattern``, ``view``, and ``method``.
 
 
