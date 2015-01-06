@@ -64,6 +64,10 @@ Features
   a factory that will return a custom ``Response`` class.
   See https://github.com/Pylons/pyramid/pull/1499
 
+- Allow an iterator to be returned from a renderer. Previously it was only
+  possible to return bytes or unicode.
+  See https://github.com/Pylons/pyramid/pull/1417
+
 Bug Fixes
 ---------
 
