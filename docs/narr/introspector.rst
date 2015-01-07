@@ -121,7 +121,7 @@ introspectables in categories not described here.
   ``subscriber``
 
     The subscriber callable object (the resolution of the ``subscriber``
-    argument passed to ``add_susbcriber``).
+    argument passed to ``add_subscriber``).
 
   ``interfaces``
 
@@ -137,12 +137,12 @@ introspectables in categories not described here.
   ``predicates``
 
     The predicate objects created as the result of passing predicate arguments
-    to ``add_susbcriber``
+    to ``add_subscriber``
 
   ``derived_predicates``
 
     Wrappers around the predicate objects created as the result of passing
-    predicate arguments to ``add_susbcriber`` (to be used when predicates take
+    predicate arguments to ``add_subscriber`` (to be used when predicates take
     only one value but must be passed more than one).
 
 ``response adapters``
