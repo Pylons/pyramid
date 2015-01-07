@@ -777,7 +777,7 @@ If you want to implement your own Response object instead of using the
 :class:`pyramid.response.Response` object in any capacity at all, you'll have
 to make sure the object implements every attribute and method outlined in
 :class:`pyramid.interfaces.IResponse` and you'll have to ensure that it uses
-``zope.interface.implementer(IResponse)`` as a class decoratoror.
+``zope.interface.implementer(IResponse)`` as a class decorator.
 
 .. code-block:: python
    :linenos:
