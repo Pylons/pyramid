@@ -450,9 +450,9 @@ introspectables in categories not described here.
     The :class:`pyramid.interfaces.IRendererInfo` object which represents
     this template's renderer.
 
-``view mapper``
+``view mappers``
 
-  Each introspectable in the ``permissions`` category represents a call to
+  Each introspectable in the ``view mappers`` category represents a call to
   :meth:`pyramid.config.Configurator.add_view` that has an explicit
   ``mapper`` argument to *or* a call to
   :meth:`pyramid.config.Configurator.set_view_mapper`; each will have
@@ -481,8 +481,8 @@ introspectables in categories not described here.
 
 ``translation directories``
 
-  Each introspectable in the ``asset overrides`` category represents an
-  individual element in a ``specs`` argument passed to
+  Each introspectable in the ``translation directories`` category represents
+  an individual element in a ``specs`` argument passed to
   :meth:`pyramid.config.Configurator.add_translation_dirs`; each will have
   the following data.
 
@@ -511,7 +511,7 @@ introspectables in categories not described here.
 
   ``type``
 
-    ``implict`` or ``explicit`` as a string.
+    ``implicit`` or ``explicit`` as a string.
 
   ``under``
 
