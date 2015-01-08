@@ -299,7 +299,9 @@ class TestBaseCookieSession(SharedCookieSessionTests, unittest.TestCase):
 class TestSignedCookieSession(SharedCookieSessionTests, unittest.TestCase):
     def _makeOne(self, request, **kw):
         from pyramid.session import SignedCookieSessionFactory
+        from pyramid.session import PickleSerializer
         kw.setdefault('secret', 'secret')
+        kw.setdefault('serializer', PickleSerializer())
         return SignedCookieSessionFactory(**kw)(request)
 
     def _serialize(self, value, salt=b'pyramid.session.', hashalg='sha512'):
