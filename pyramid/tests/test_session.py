@@ -1,6 +1,7 @@
 import json
 import unittest
 from pyramid import testing
+from pyramid.session import PickleSerializer
 
 class SharedCookieSessionTests(object):
 
@@ -300,6 +301,7 @@ class TestSignedCookieSession(SharedCookieSessionTests, unittest.TestCase):
     def _makeOne(self, request, **kw):
         from pyramid.session import SignedCookieSessionFactory
         kw.setdefault('secret', 'secret')
+        kw.setdefault('serializer', PickleSerializer())
         return SignedCookieSessionFactory(**kw)(request)
 
     def _serialize(self, value, salt=b'pyramid.session.', hashalg='sha512'):
