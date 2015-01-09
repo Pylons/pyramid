@@ -386,6 +386,21 @@ class TestSignedCookieSession(SharedCookieSessionTests, unittest.TestCase):
         session = self._makeOne(request, serializer=serializer)
         self.assertEqual(session['state'], 1)
 
+    def test_json_serializer(self):
+        import base64
+        from hashlib import sha512
+        import hmac
+        import time
+        from pyramid.session import JSONSerializer
+        request = testing.DummyRequest()
+        serializer = JSONSerializer()
+        json_struct = serializer.dumps((time.time(), 0, {'state': 1}))
+        sig = hmac.new(b'pyramid.session.secret', json_struct, sha512).digest()
+        cookieval = base64.urlsafe_b64encode(sig + json_struct).rstrip(b'=')
+        request.cookies['session'] = cookieval
+        session = self._makeOne(request, serializer=serializer)
+        self.assertEqual(session['state'], 1)
+
     def test_invalid_data_size(self):
         from hashlib import sha512
         import base64
