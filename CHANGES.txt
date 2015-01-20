@@ -10,6 +10,9 @@ Next release
   output by showing the module instead of just ``__repr__``.
   See: https://github.com/Pylons/pyramid/pull/1542
 
+- ``pserve`` can now take a ``-b`` or ``--browser`` option to open the server
+  URL in a web browser. See https://github.com/Pylons/pyramid/pull/1533
+
 .. _changes_1.5.2:
 
 1.5.2 (2014-11-09)
