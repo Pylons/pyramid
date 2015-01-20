@@ -68,6 +68,9 @@ Features
   possible to return bytes or unicode.
   See https://github.com/Pylons/pyramid/pull/1417
 
+- ``pserve`` can now take a ``-b`` or ``--browser`` option to open the server
+  URL in a web browser. See https://github.com/Pylons/pyramid/pull/1533
+
 Bug Fixes
 ---------
 
