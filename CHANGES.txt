@@ -68,6 +68,9 @@ Features
   possible to return bytes or unicode.
   See https://github.com/Pylons/pyramid/pull/1417
 
+- ``pserve`` can now take a ``-b`` or ``--browser`` option to open the server
+  URL in a web browser. See https://github.com/Pylons/pyramid/pull/1533
+
 - Overall improvments for the ``proutes`` command. Added ``--format`` and
   ``--glob`` arguments to the command, introduced the ``method``
   column for displaying available request methods, and improved the ``view``

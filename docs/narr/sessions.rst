@@ -44,7 +44,7 @@ It is digitally signed, however, and thus its data cannot easily be
 tampered with.
 
 You can configure this session factory in your :app:`Pyramid` application
-by using the :meth:`pyramid.config.Configurator.set_session_factory`` method.
+by using the :meth:`pyramid.config.Configurator.set_session_factory` method.
 
 .. code-block:: python
    :linenos:
@@ -380,7 +380,7 @@ Checking CSRF Tokens Manually
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In request handling code, you can check the presence and validity of a CSRF
-token with :func:`pyramid.session.check_csrf_token(request)``. If the token is
+token with :func:`pyramid.session.check_csrf_token`. If the token is
 valid, it will return ``True``, otherwise it will raise ``HTTPBadRequest``.
 Optionally, you can specify ``raises=False`` to have the check return ``False``
 instead of raising an exception.
