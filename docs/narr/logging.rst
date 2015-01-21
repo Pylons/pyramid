@@ -262,8 +262,8 @@ Advanced Configuration
 ----------------------
 
 To capture log output to a separate file, use a `FileHandler
-<http://docs.python.org/lib/node412.html>`_ (or a `RotatingFileHandler
-<http://docs.python.org/lib/node413.html>`_):
+<https://docs.python.org/2/library/logging.handlers.html#filehandler>`_ (or a `RotatingFileHandler
+<https://docs.python.org/2/library/logging.handlers.html#rotatingfilehandler>`_):
 
 .. code-block:: ini 
 
