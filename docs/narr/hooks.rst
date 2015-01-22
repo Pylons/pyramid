@@ -349,12 +349,6 @@ We attach and cache an object named ``extra`` to the ``request`` object.
    the property
 
 .. index::
-   single: before render event
-   single: adding renderer globals
-
-.. _beforerender_event:
-
-.. index::
    single: response factory
 
 .. _changing_the_response_factory:
@@ -400,6 +394,11 @@ already constructed a :term:`configurator` it can also be registered via the
    config = Configurator()
    config.set_response_factory(lambda r: MyResponse())
 
+.. index::
+   single: before render event
+   single: adding renderer globals
+
+.. _beforerender_event:
 
 Using The Before Render Event
 -----------------------------
