@@ -60,7 +60,7 @@ class DummyMapper(object):
     def __init__(self, *routes):
         self.routes = routes
 
-    def get_routes(self):
+    def get_routes(self, include_static=False):
         return self.routes
 
 class DummyRoute(object):
