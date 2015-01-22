@@ -254,7 +254,7 @@ level unless they're explicitly set differently. Meaning the ``myapp.views``,
 ``myapp.models`` (and all your app's modules') loggers by default have an
 effective level of ``DEBUG`` too.
 
-For more advanced filtering, the logging module provides
+For more advanced filtering, the logging module provides a
 :class:`logging.Filter` object; however it cannot be used directly from the
 configuration file.
 
