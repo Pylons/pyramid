@@ -341,9 +341,10 @@ class DottedNameResolver(Resolver):
         # See https://pythonhosted.org/setuptools/history.html#id8
         ep = pkg_resources.EntryPoint.parse('x=%s' % value)
         if hasattr(ep, 'resolve'):
-            return ep.resolve()  # setuptools>=10.2
+            # setuptools>=10.2
+            return ep.resolve()  # pragma: NO COVER
         else:
-            return ep.load(False)
+            return ep.load(False)  # pragma: NO COVER
 
     def _zope_dottedname_style(self, value, package):
         """ package.module.attr style """
