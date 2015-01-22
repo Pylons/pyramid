@@ -337,8 +337,13 @@ class DottedNameResolver(Resolver):
                 value = package.__name__
             else:
                 value = package.__name__ + value
-        return pkg_resources.EntryPoint.parse(
-            'x=%s' % value).load(False)
+        # Calling EntryPoint.load with an argument is deprecated.
+        # See https://pythonhosted.org/setuptools/history.html#id8
+        ep = pkg_resources.EntryPoint.parse('x=%s' % value)
+        if hasattr(ep, 'resolve'):
+            return ep.resolve()  # setuptools>=10.2
+        else:
+            return ep.load(False)
 
     def _zope_dottedname_style(self, value, package):
         """ package.module.attr style """

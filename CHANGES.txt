@@ -125,6 +125,9 @@ Bug Fixes
   callback and thus behave just like the ``pyramid.renderers.JSON` renderer.
   See https://github.com/Pylons/pyramid/pull/1561
 
+- Prevent "parameters to load are deprecated" ``DeprecationWarning``
+  from setuptools>=11.3.
+
 Deprecations
 ------------
 
