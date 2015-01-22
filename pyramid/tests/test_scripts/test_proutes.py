@@ -632,7 +632,7 @@ class TestPRoutesCommand(unittest.TestCase):
         self.assertEqual(result, 2)
         self.assertEqual(L[0], expected)
 
-    def test_config_format_ini(self):
+    def test_config_format_ini_newlines(self):
         from pyramid.renderers import null_renderer as nr
         from pyramid.config import not_
 
@@ -648,14 +648,79 @@ class TestPRoutesCommand(unittest.TestCase):
         )
 
         command = self._makeOne()
-        command.options.glob = '*foo*'
-        command.options.format = 'method,name'
+
         L = []
         command.out = L.append
         command.bootstrap = (dummy.DummyBootstrap(registry=config.registry),)
         config_factory = dummy.DummyConfigParserFactory()
         command.ConfigParser = config_factory
-        config_factory.items = [('format', 'method\name')]
+        config_factory.items = [('format', 'method\nname')]
+
+        result = command.run()
+        self.assertEqual(result, 0)
+        self.assertEqual(len(L), 3)
+        compare_to = L[-1].split()
+        expected = ['!POST,*', 'foo']
+
+        self.assertEqual(compare_to, expected)
+        self.assertEqual(L[0].split(), ['Method', 'Name'])
+
+    def test_config_format_ini_spaces(self):
+        from pyramid.renderers import null_renderer as nr
+        from pyramid.config import not_
+
+        def view1(context, request): return 'view1'
+
+        config = self._makeConfig(autocommit=True)
+        config.add_route('foo', '/a/b')
+        config.add_view(
+            route_name='foo',
+            view=view1,
+            renderer=nr,
+            request_method=not_('POST')
+        )
+
+        command = self._makeOne()
+
+        L = []
+        command.out = L.append
+        command.bootstrap = (dummy.DummyBootstrap(registry=config.registry),)
+        config_factory = dummy.DummyConfigParserFactory()
+        command.ConfigParser = config_factory
+        config_factory.items = [('format', 'method name')]
+
+        result = command.run()
+        self.assertEqual(result, 0)
+        self.assertEqual(len(L), 3)
+        compare_to = L[-1].split()
+        expected = ['!POST,*', 'foo']
+
+        self.assertEqual(compare_to, expected)
+        self.assertEqual(L[0].split(), ['Method', 'Name'])
+
+    def test_config_format_ini_commas(self):
+        from pyramid.renderers import null_renderer as nr
+        from pyramid.config import not_
+
+        def view1(context, request): return 'view1'
+
+        config = self._makeConfig(autocommit=True)
+        config.add_route('foo', '/a/b')
+        config.add_view(
+            route_name='foo',
+            view=view1,
+            renderer=nr,
+            request_method=not_('POST')
+        )
+
+        command = self._makeOne()
+
+        L = []
+        command.out = L.append
+        command.bootstrap = (dummy.DummyBootstrap(registry=config.registry),)
+        config_factory = dummy.DummyConfigParserFactory()
+        command.ConfigParser = config_factory
+        config_factory.items = [('format', 'method,name')]
 
         result = command.run()
         self.assertEqual(result, 0)

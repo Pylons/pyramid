@@ -2,6 +2,7 @@ import fnmatch
 import optparse
 import sys
 import textwrap
+import re
 
 from pyramid.paster import bootstrap
 from pyramid.compat import (string_types, configparser)
@@ -291,7 +292,8 @@ class PRoutesCommand(object):
             items = config.items('proutes')
             for k, v in items:
                 if 'format' == k:
-                    self.column_format = [x.strip() for x in v.split('\n')]
+                    cols = re.split(r'[,|\s|\n]*', v)
+                    self.column_format = [x.strip() for x in cols]
 
         except configparser.NoSectionError:
             return
@@ -314,6 +316,7 @@ class PRoutesCommand(object):
         env = self.bootstrap[0](config_uri, options=parse_vars(self.args[1:]))
         registry = env['registry']
         mapper = self._get_mapper(registry)
+
         self.proutes_file_config(config_uri)
 
         if self.options.format:
