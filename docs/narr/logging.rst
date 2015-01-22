@@ -254,16 +254,15 @@ level unless they're explicitly set differently. Meaning the ``myapp.views``,
 ``myapp.models`` (and all your app's modules') loggers by default have an
 effective level of ``DEBUG`` too.
 
-For more advanced filtering, the logging module provides a `Filter
-<http://docs.python.org/lib/node423.html>`_ object; however it cannot be used
-directly from the configuration file.
+For more advanced filtering, the logging module provides
+:class:`logging.Filter` object; however it cannot be used directly from the
+configuration file.
 
-Advanced Configuration 
+Advanced Configuration
 ----------------------
 
-To capture log output to a separate file, use a `FileHandler
-<https://docs.python.org/2/library/logging.handlers.html#filehandler>`_ (or a `RotatingFileHandler
-<https://docs.python.org/2/library/logging.handlers.html#rotatingfilehandler>`_):
+To capture log output to a separate file, use :class:`logging.FileHandler` (or
+:class:`logging.handlers.RotatingFileHandler`):
 
 .. code-block:: ini 
 
@@ -317,8 +316,9 @@ output, etc., but not web traffic.  For web traffic logging Paste provides the
 :term:`middleware`.  TransLogger produces logs in the `Apache Combined Log
 Format <http://httpd.apache.org/docs/2.2/logs.html#combined>`_.  But
 TransLogger does not write to files, the Python logging system must be
-configured to do this.  The Python FileHandler_ logging handler can be used
-alongside TransLogger to create an ``access.log`` file similar to Apache's.
+configured to do this.  The Python :class:`logging.FileHandler` logging
+handler can be used alongside TransLogger to create an ``access.log`` file
+similar to Apache's.
 
 Like any standard :term:`middleware` with a Paste entry point, TransLogger can
 be configured to wrap your application using ``.ini`` file syntax.  First,
