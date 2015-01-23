@@ -8,6 +8,7 @@ Next release
   ``--glob`` arguments to the command, introduced the ``method``
   column for displaying available request methods, and improved the ``view``
   output by showing the module instead of just ``__repr__``.
+  See: https://github.com/Pylons/pyramid/pull/1542
 
 .. _changes_1.5.2:
 
