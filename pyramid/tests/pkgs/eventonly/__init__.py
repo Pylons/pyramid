@@ -1,6 +1,7 @@
 from pyramid.view import view_config
-from pyramid.events import subscriber
+from pyramid.events import subscriber, subscriber_predicate
 
+@subscriber_predicate('yup')
 class Yup(object):
     def __init__(self, val, config):
         self.val = val
@@ -59,6 +60,4 @@ def sendfoobar(request):
     return response
 
 def includeme(config):
-    config.add_subscriber_predicate('yup', Yup)
     config.scan('pyramid.tests.pkgs.eventonly')
-    
