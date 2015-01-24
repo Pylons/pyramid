@@ -80,6 +80,11 @@ Features
 - Support keyword-only arguments and function annotations in views in
   Python 3. See https://github.com/Pylons/pyramid/pull/1556
 
+- Subscriber predicates can have an ``events`` attribute that will be checked
+  when adding a subscriber. A ``ConfigurationError`` will be raised when
+  attempting to use a subscriber predicate with an event that it doesn't
+  support. See https://github.com/Pylons/pyramid/pull/1545
+
 Bug Fixes
 ---------
 
