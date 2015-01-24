@@ -195,7 +195,34 @@ class AdaptersConfiguratorMixinTests(unittest.TestCase):
         config._add_predicate = add_predicate
         config.add_subscriber_predicate('name', 'factory', 1, 2)
         self.assertTrue(L)
-        
+
+    def test_add_subscriber_predicate_checks_supported_events(self):
+        from zope.interface import implementer
+        from zope.interface import Interface
+        from pyramid.exceptions import ConfigurationError
+        class IEvent(Interface):
+            pass
+        @implementer(IEvent)
+        class Event1:
+            pass
+        class Event2:
+            pass
+        class CustomSubscriberPredicate(object):
+            events = (Event1,)
+            def __init__(self, val, config):
+                self.val = val
+            def phash(self):
+                return 'phash'
+        def subscriber(event): pass
+        config = self._makeOne(autocommit=True)
+        config.add_subscriber_predicate('custom', CustomSubscriberPredicate)
+        # CustomSubscriberPredicate supports Event1 so this succeeds
+        config.add_subscriber(subscriber, Event1, custom=1)
+        # CustomSubscriberPredicate doesn't support Event2 so this raises
+        # ConfigurationError
+        self.assertRaises(ConfigurationError,
+            config.add_subscriber, subscriber, Event2, custom=1)
+
     def test_add_response_adapter(self):
         from pyramid.interfaces import IResponse
         config = self._makeOne(autocommit=True)

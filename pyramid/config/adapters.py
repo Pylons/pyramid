@@ -15,6 +15,8 @@ from pyramid.config.util import (
     takes_one_arg,
     )
 
+from pyramid.exceptions import ConfigurationError
+
 
 class AdaptersConfiguratorMixin(object):
     @action_method
@@ -53,6 +55,18 @@ class AdaptersConfiguratorMixin(object):
         def register():
             predlist = self.get_predlist('subscriber')
             order, preds, phash = predlist.make(self, **predicates)
+
+            # Check for predicates that are not supported by the events we're
+            # subscribing for
+            for pred in preds:
+                pred_events = getattr(pred, 'events', None)
+                if pred_events:
+                    for event_class in iface:
+                        if event_class not in pred_events:
+                            raise ConfigurationError(
+                                'Event %r not supported '
+                                'by subscriber predicate %r; supports: %r'
+                                % (event_class, pred.__class__, pred_events))
 
             derived_predicates = [ self._derive_predicate(p) for p in preds ]
             derived_subscriber = self._derive_subscriber(
