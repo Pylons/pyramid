@@ -17,6 +17,8 @@ from pyramid.config.util import (
 
 from pyramid.exceptions import ConfigurationError
 
+import pyramid.config.predicates
+
 
 class AdaptersConfiguratorMixin(object):
     @action_method
@@ -176,6 +178,13 @@ class AdaptersConfiguratorMixin(object):
             weighs_more_than=weighs_more_than,
             weighs_less_than=weighs_less_than
             )
+
+    def add_default_subscriber_predicates(self):
+        p = pyramid.config.predicates
+        for (name, factory) in (
+            ('context', p.ContextSubscriberPredicate),
+            ):
+            self.add_subscriber_predicate(name, factory)
 
     @action_method
     def add_response_adapter(self, adapter, type_or_iface):

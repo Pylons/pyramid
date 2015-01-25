@@ -1,5 +1,6 @@
 import re
 
+from pyramid.events import ContextFound
 from pyramid.exceptions import ConfigurationError
 
 from pyramid.compat import is_nonstr_iter
@@ -294,3 +295,19 @@ class EffectivePrincipalsPredicate(object):
                 return True
         return False
 
+class ContextSubscriberPredicate(object):
+    events = (ContextFound,)
+
+    def __init__(self, val, config):
+        self.val = val
+
+    def text(self):
+        return 'context = %s' % (self.val,)
+
+    phash = text
+
+    def __call__(self, event):
+        try:
+            return isinstance(event.request.context, self.val)
+        except AttributeError as e:
+            pass

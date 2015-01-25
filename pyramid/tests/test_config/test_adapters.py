@@ -223,6 +223,23 @@ class AdaptersConfiguratorMixinTests(unittest.TestCase):
         self.assertRaises(ConfigurationError,
             config.add_subscriber, subscriber, Event2, custom=1)
 
+    def test_context_found_subscriber_predicate(self):
+        from pyramid.events import ContextFound
+        class Foo(object): pass
+        class DummyRequest: pass
+        L = []
+        def subscriber(event): L.append(event)
+        config = self._makeOne(autocommit=True)
+        config.add_subscriber(subscriber, ContextFound, context=Foo)
+        request = DummyRequest()
+        event = ContextFound(request)
+        config.registry.notify(event)
+        self.assertEqual(len(L), 0)
+        request.context = Foo()
+        event = ContextFound(request)
+        config.registry.notify(event)
+        self.assertEqual(len(L), 1)
+
     def test_add_response_adapter(self):
         from pyramid.interfaces import IResponse
         config = self._makeOne(autocommit=True)
