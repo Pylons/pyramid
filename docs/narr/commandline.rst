@@ -325,7 +325,7 @@ For example:
    multiview                  /multiview                  app1.standard_views.multiview                 GET,PATCH
    not_post                   /not_post                   app1.standard_views.multview                  !POST,*
 
-``proutes`` generates a table with three columns: *Name*, *Pattern*, *Method*,
+``proutes`` generates a table with four columns: *Name*, *Pattern*, *Method*,
 and *View*.  The items listed in the
 Name column are route names, the items listed in the Pattern column are route
 patterns, and the items listed in the View column are representations of the
