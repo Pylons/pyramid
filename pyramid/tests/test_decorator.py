@@ -16,7 +16,7 @@ class TestReify(unittest.TestCase):
 
     def test___get__noinst(self):
         def wrapped(inst):
-            return 'a'
+            return 'a'  # pragma: no cover
         decorator = self._makeOne(wrapped)
         result = decorator.__get__(None)
         self.assertEqual(result, decorator)
