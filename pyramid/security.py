@@ -170,12 +170,14 @@ def forget(request):
     possessed by the currently authenticated user.  A common usage
     might look like so within the body of a view function
     (``response`` is assumed to be an :term:`WebOb` -style
-    :term:`response` object computed previously by the view code)::
+    :term:`response` object computed previously by the view code):
 
-      from pyramid.security import forget
-      headers = forget(request)
-      response.headerlist.extend(headers)
-      return response
+    .. code-block:: python
+
+       from pyramid.security import forget
+       headers = forget(request)
+       response.headerlist.extend(headers)
+       return response
 
     If no :term:`authentication policy` is in use, this function will
     always return an empty sequence.
