@@ -124,9 +124,9 @@ def remember(request, principal, **kw):
     current :term:`authentication policy`.  Common usage might look
     like so within the body of a view function (``response`` is
     assumed to be a :term:`WebOb` -style :term:`response` object
-    computed previously by the view code)::
+    computed previously by the view code):
 
-    .. code-block: python
+    .. code-block:: python
 
        from pyramid.security import remember
        headers = remember(request, 'chrism', password='123', max_age='86400')
