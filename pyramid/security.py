@@ -128,7 +128,7 @@ def remember(request, userid=_marker, **kw):
     assumed to be a :term:`WebOb` -style :term:`response` object
     computed previously by the view code)::
 
-    .. code-block:: python
+    .. code-block: python
 
        from pyramid.security import remember
        headers = remember(request, 'chrism', password='123', max_age='86400')
