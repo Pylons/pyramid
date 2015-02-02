@@ -201,7 +201,10 @@ def takes_one_arg(callee, attr=None, argname=None):
             return False
 
     try:
-        argspec = inspect.getargspec(fn)
+        try:
+            argspec = inspect.getfullargspec(fn)
+        except AttributeError:
+            argspec = inspect.getargspec(fn)
     except TypeError:
         return False
 
