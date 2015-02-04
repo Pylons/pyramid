@@ -2,6 +2,10 @@
 language: python
 sudo: false
 
+os:
+  - linux
+  - osx
+
 env:
   - TOXENV=py26
   - TOXENV=py27
@@ -10,10 +14,6 @@ env:
   - TOXENV=py34
   - TOXENV=pypy
   - TOXENV=pypy3
-
-os:
-  - linux
-  - osx
 
 install:
   - travis_retry pip install tox coveralls
