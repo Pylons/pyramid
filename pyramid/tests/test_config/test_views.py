@@ -1055,6 +1055,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
 
         config = self._makeOne(autocommit=True)
         config.add_route('root', '/', factory=Resource)
+
         config.add_view(
             unknown,
             route_name='root',
@@ -1062,6 +1063,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
             request_method=('POST',),
             xhr=True,
         )
+
         config.add_view(
             view, renderer=nr, route_name='root',
             context=Int1, request_method='GET'

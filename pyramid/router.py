@@ -179,13 +179,13 @@ class Router(object):
 
                     # if we have predicates, lets see how many match and try
                     # most specific first.
-                    if hasattr(view_callable, '__predicates__'):
-                        count = 0
-                        for pred in view_callable.__predicates__:
-                            if pred(context, request):
-                                count += 1
-
-                        pred_matches.append((view_callable, count, index))
+                    if hasattr(view_callable, '__predicated__'):
+                        if view_callable.__predicated__(context, request):
+                            pred_matches.append((
+                                view_callable,
+                                len(view_callable.__predicates__),
+                                index
+                            ))
                     else:
                         pred_matches.append((view_callable, 0, index))
 
@@ -195,13 +195,9 @@ class Router(object):
                     reverse=True,
                 )
 
-                for view_callable, count, index in sorted_matches:
-                    if view_callable is not None:
-                        try:
-                            response = view_callable(context, request)
-                            break
-                        except PredicateMismatch:
-                            pass
+                if sorted_matches:
+                    view_callable = sorted_matches[0][0]
+                    response = view_callable(context, request)
                 else:
                     raise
 
