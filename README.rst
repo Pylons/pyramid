@@ -8,6 +8,9 @@ Pyramid
         :target: http://docs.pylonsproject.org/projects/pyramid/en/master/
         :alt: Documentation Status
 
+.. image:: https://coveralls.io/repos/sontek/pyramid/badge.svg
+        :target: https://coveralls.io/r/sontek/pyramid
+
 Pyramid is a small, fast, down-to-earth, open source Python web framework.
 It makes real-world web application development and
 deployment more fun, more predictable, and more productive.

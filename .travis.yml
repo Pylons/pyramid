@@ -10,10 +10,9 @@ env:
   - TOXENV=py34
   - TOXENV=pypy
   - TOXENV=pypy3
-  - TOXENV=cover
 
 install:
-  - travis_retry pip install tox
+  - travis_retry pip install tox coveralls
 
 script:
   - travis_retry tox
@@ -21,3 +20,6 @@ script:
 notifications:
   email:
     - pyramid-checkins@lists.repoze.org
+
+after_success:
+  - coveralls
