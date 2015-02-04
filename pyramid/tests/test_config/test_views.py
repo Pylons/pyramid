@@ -1010,8 +1010,6 @@ class TestViewsConfigurationMixin(unittest.TestCase):
     def test_view_with_most_specific_predicate(self):
         from pyramid.renderers import null_renderer as nr
         from pyramid.router import Router
-        from zope.interface import directlyProvides, providedBy
-        from zope.interface import implementedBy
 
         class OtherBase(object): pass
         class Int1(object): pass
@@ -1026,6 +1024,44 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         config = self._makeOne(autocommit=True)
         config.add_route('root', '/', factory=Resource)
         config.add_view(unknown, route_name='root', renderer=nr)
+        config.add_view(
+            view, renderer=nr, route_name='root',
+            context=Int1, request_method='GET'
+        )
+        config.add_view(
+            view=view, renderer=nr, route_name='root',
+            context=Int2, request_method='POST'
+        )
+        request = self._makeRequest(config)
+        request.method = 'POST'
+        request.params = {}
+        router = Router(config.registry)
+        response = router.handle_request(request)
+        self.assertEqual(response, 'hello')
+
+    def test_view_with_most_specific_predicate_with_mismatch(self):
+        from pyramid.renderers import null_renderer as nr
+        from pyramid.router import Router
+
+        class OtherBase(object): pass
+        class Int1(object): pass
+        class Int2(object): pass
+
+        class Resource(OtherBase, Int1, Int2):
+            def __init__(self, request): pass
+
+        def unknown(context, request): return 'unknown'
+        def view(context, request): return 'hello'
+
+        config = self._makeOne(autocommit=True)
+        config.add_route('root', '/', factory=Resource)
+        config.add_view(
+            unknown,
+            route_name='root',
+            renderer=nr,
+            request_method=('POST',),
+            xhr=True,
+        )
         config.add_view(
             view, renderer=nr, route_name='root',
             context=Int1, request_method='GET'
@@ -4075,13 +4111,14 @@ class DummyRequest:
     subpath = ()
     matchdict = None
 
-    def __init__(self, environ=None):
+    def __init__(self, environ=None, is_xhr=False):
         if environ is None:
             environ = {}
         self.environ = environ
         self.params = {}
         self.cookies = {}
         self.response = DummyResponse()
+        self.is_xhr = is_xhr
 
 class DummyContext:
     pass

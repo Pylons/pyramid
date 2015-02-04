@@ -171,8 +171,10 @@ class Router(object):
                     view_callable = adapters.lookup(
                         (IViewClassifier, request.request_iface, iface),
                         IView, name=view_name, default=None)
+
                     # intermediate bases may lookup same view_callable
-                    if view_callable is previous_view_callable:
+                    if view_callable is previous_view_callable or \
+                       view_callable is None:
                         continue
 
                     # if we have predicates, lets see how many match and try
@@ -214,7 +216,7 @@ class Router(object):
         :term:`tween` in the tween stack closest to the request ingress.  If
         ``use_tweens`` is ``False``, the request will be sent to the main
         router handler, and no tweens will be invoked.
-        
+
         See the API for pyramid.request for complete documentation.
         """
         registry = self.registry

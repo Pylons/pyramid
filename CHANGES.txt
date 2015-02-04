@@ -117,6 +117,9 @@ Bug Fixes
 - Fix route generation for static view asset specifications having no path.
   See https://github.com/Pylons/pyramid/pull/1377
 
+- Fixed view traversal order to prefer the most specific view first.
+  See https://github.com/Pylons/pyramid/pull/1553
+
 Deprecations
 ------------
 
