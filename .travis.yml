@@ -2,10 +2,6 @@
 language: python
 sudo: false
 
-os:
-  - linux
-  - osx
-
 env:
   - TOXENV=py26
   - TOXENV=py27
