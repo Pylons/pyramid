@@ -11,6 +11,10 @@ env:
   - TOXENV=pypy
   - TOXENV=pypy3
 
+os:
+  - linux
+  - osx
+
 install:
   - travis_retry pip install tox coveralls
 
