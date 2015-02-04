@@ -165,9 +165,8 @@ class Router(object):
                 # look for other views that meet the predicate
                 # criteria
                 pred_matches = []
-                missed_count = -1
 
-                for iface in context_iface.__sro__[1:]:
+                for index, iface in enumerate(context_iface.__sro__[1:]):
                     previous_view_callable = view_callable
                     view_callable = adapters.lookup(
                         (IViewClassifier, request.request_iface, iface),
@@ -184,18 +183,17 @@ class Router(object):
                             if pred(context, request):
                                 count += 1
 
-                        pred_matches.append((view_callable, count))
+                        pred_matches.append((view_callable, count, index))
                     else:
-                        pred_matches.append((view_callable, missed_count))
-                        missed_count -= 1
+                        pred_matches.append((view_callable, 0, index))
 
                 sorted_matches = sorted(
                     pred_matches,
-                    key=lambda x: x[1],
+                    key=lambda x: (x[1], x[2]),
                     reverse=True,
                 )
 
-                for view_callable, count in sorted_matches:
+                for view_callable, count, index in sorted_matches:
                     if view_callable is not None:
                         try:
                             response = view_callable(context, request)
