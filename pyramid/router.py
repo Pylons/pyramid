@@ -164,6 +164,9 @@ class Router(object):
             except PredicateMismatch:
                 # look for other views that meet the predicate
                 # criteria
+                pred_matches = []
+                missed_count = -1
+
                 for iface in context_iface.__sro__[1:]:
                     previous_view_callable = view_callable
                     view_callable = adapters.lookup(
@@ -172,6 +175,27 @@ class Router(object):
                     # intermediate bases may lookup same view_callable
                     if view_callable is previous_view_callable:
                         continue
+
+                    # if we have predicates, lets see how many match and try
+                    # most specific first.
+                    if hasattr(view_callable, '__predicates__'):
+                        count = 0
+                        for pred in view_callable.__predicates__:
+                            if pred(context, request):
+                                count += 1
+
+                        pred_matches.append((view_callable, count))
+                    else:
+                        pred_matches.append((view_callable, missed_count))
+                        missed_count -= 1
+
+                sorted_matches = sorted(
+                    pred_matches,
+                    key=lambda x: x[1],
+                    reverse=True,
+                )
+
+                for view_callable, count in sorted_matches:
                     if view_callable is not None:
                         try:
                             response = view_callable(context, request)
@@ -180,6 +204,7 @@ class Router(object):
                             pass
                 else:
                     raise
+
         return response
 
     def invoke_subrequest(self, request, use_tweens=False):
