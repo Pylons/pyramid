@@ -1557,28 +1557,36 @@ events, but it cannot be used with subscribers registered for
 :class:`pyramid.events.ApplicationCreated` because the latter type of event
 has no ``request`` attribute.
 
-Pyramid 1.6 adds the ability to raise an exception when a subscriber predicate
-is used for an event type that it doesn't support. To use this feature, add an
-``events`` attribute to the subscriber predicate with one or more event classes
-that the predicate supports. So the ``RequestPathStartsWith`` subscriber
-predicate shown earlier could be written like this:
+Pyramid 1.6 adds the ability to raise an exception when an attempt is made to
+use a subscriber predicate with an event that doesn't work with that predicate.
+To use this feature, add a ``needed_attrs`` attribute to the subscriber
+predicate class with the names (strings) of one or more attribute names that
+the predicate needs to have in the ``event`` object. So the
+``RequestPathStartsWith`` subscriber predicate shown earlier could be written
+like this:
 
 .. code-block:: python
     :linenos:
+    :emphasize-lines: 2
 
     class RequestPathStartsWith(object):
-        events = (NewRequest, ContextFound)
+        needed_attrs = ('request',)
 
         # The rest of the class is the same as before...
 
     config.add_subscriber_predicate(
         'request_path_startswith', RequestPathStartsWith)
 
-Now if you try to use the subscriber predicate for an unsupported event type,
-say ``ApplicationCreated``:
+The ``needed_attrs`` attribute here is specifying that the
+``RequestPathStartsWith`` subscriber predicate only works with events that have
+a ``request`` attribute.
+
+Now if you try to use the subscriber predicate for an event that doesn't have a
+``request`` attribute, say ``ApplicationCreated``:
 
 .. code-block:: python
     :linenos:
+    :emphasize-lines: 1
 
     @subscriber(ApplicationCreated, request_path_startswith='/path')
     def test_context_found_subscriber(event):
