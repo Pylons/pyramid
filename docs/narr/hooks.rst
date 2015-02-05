@@ -1514,6 +1514,16 @@ Once you've created a subscriber predicate, it may registered via
     config.add_subscriber_predicate(
         'request_path_startswith', RequestPathStartsWith)
 
+If instead you prefer to use decorators and a :term:`scan`, you can use the
+:class:`pyramid.events.subscriber_predicate` decorator to register a class as a
+subscriber predicate:
+
+.. code-block:: python
+
+    @subscriber_predicate('request_path_startswith')
+    class RequestPathStartsWith(object):
+        # Rest of class definition is the same
+
 Once a subscriber predicate is registered, you can use it in a call to
 :meth:`pyramid.config.Configurator.add_subscriber` or to
 :class:`pyramid.events.subscriber`.  Here's an example of using the

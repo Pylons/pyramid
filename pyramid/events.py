@@ -83,6 +83,46 @@ class subscriber(object):
         self.venusian.attach(wrapped, self.register, category='pyramid')
         return wrapped
 
+class subscriber_predicate(object):
+    """ Decorator activated via a :term:`scan` which treats the class
+    being decorated as a :term:`subscriber predicate` with name ``name``.
+
+    For example:
+
+    .. code-block:: python
+
+        @subscriber_predicate('context')
+        class ContextSubscriberPredicate(object):
+            events = (ContextFound,)
+
+            def __init__(self, val, config):
+                self.val = val
+
+            def text(self):
+                return 'context = %s' % (self.val,)
+
+            phash = text
+
+            def __call__(self, event):
+                return isinstance(event.request.context, self.val)
+
+       @subscriber(ContextFound, context=Host)
+       def mysubscriber(event):
+           print(event)
+    """
+    venusian = venusian # for unit testing
+
+    def __init__(self, name):
+        self.name = name
+
+    def register(self, scanner, name, wrapped):
+        config = scanner.config
+        config.add_subscriber_predicate(self.name, wrapped)
+
+    def __call__(self, wrapped):
+        self.venusian.attach(wrapped, self.register, category='pyramid')
+        return wrapped
+
 @implementer(INewRequest)
 class NewRequest(object):
     """ An instance of this class is emitted as an :term:`event`
