@@ -4,6 +4,8 @@ from zope.interface import providedBy
 
 from pyramid.interfaces import (
     IRoutesMapper,
+    IMultiView,
+    ISecuredView,
     IView,
     IViewClassifier,
     )
@@ -414,3 +416,13 @@ class forbidden_view_config(object):
         settings['_info'] = info.codeinfo # fbo "action_method"
         return wrapped
 
+def find_views(registry, request_iface, context_iface, view_name):
+    adapters = registry.adapters
+    for req_type in request_iface.__sro__:
+        for iface in context_iface.__sro__:
+            for view_type in (IView, ISecuredView, IMultiView):
+                view_callable = adapters.registered(
+                    (IViewClassifier, req_type, iface),
+                    view_type, name=view_name)
+                if view_callable is not None:
+                    yield view_callable
