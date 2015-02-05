@@ -1,6 +1,5 @@
 import re
 
-from pyramid.events import ContextFound
 from pyramid.exceptions import ConfigurationError
 
 from pyramid.compat import is_nonstr_iter
@@ -19,7 +18,10 @@ from .util import as_sorted_tuple
 
 _marker = object()
 
+
 class XHRPredicate(object):
+    needed_attrs = ('request',)
+
     def __init__(self, val, config):
         self.val = bool(val)
 
@@ -31,7 +33,10 @@ class XHRPredicate(object):
     def __call__(self, context, request):
         return bool(request.is_xhr) is self.val
 
+
 class RequestMethodPredicate(object):
+    needed_attrs = ('request',)
+
     def __init__(self, val, config):
         request_method = as_sorted_tuple(val)
         if 'GET' in request_method and 'HEAD' not in request_method:
@@ -47,7 +52,10 @@ class RequestMethodPredicate(object):
     def __call__(self, context, request):
         return request.method in self.val
 
+
 class PathInfoPredicate(object):
+    needed_attrs = ('request',)
+
     def __init__(self, val, config):
         self.orig = val
         try:
@@ -63,8 +71,11 @@ class PathInfoPredicate(object):
 
     def __call__(self, context, request):
         return self.val.match(request.upath_info) is not None
-    
+
+
 class RequestParamPredicate(object):
+    needed_attrs = ('request',)
+
     def __init__(self, val, config):
         val = as_sorted_tuple(val)
         reqs = []
@@ -80,7 +91,7 @@ class RequestParamPredicate(object):
 
     def text(self):
         return 'request_param %s' % ','.join(
-            ['%s=%s' % (x,y) if y else x for x, y in self.reqs]
+            ['%s=%s' % (x, y) if y else x for x, y in self.reqs]
         )
 
     phash = text
@@ -94,7 +105,10 @@ class RequestParamPredicate(object):
                 return False
         return True
 
+
 class HeaderPredicate(object):
+    needed_attrs = ('request',)
+
     def __init__(self, val, config):
         name = val
         v = None
@@ -124,7 +138,10 @@ class HeaderPredicate(object):
             return False
         return self.val.match(val) is not None
 
+
 class AcceptPredicate(object):
+    needed_attrs = ('request',)
+
     def __init__(self, val, config):
         self.val = val
 
@@ -136,7 +153,10 @@ class AcceptPredicate(object):
     def __call__(self, context, request):
         return self.val in request.accept
 
+
 class ContainmentPredicate(object):
+    needed_attrs = ('request',)
+
     def __init__(self, val, config):
         self.val = config.maybe_dotted(val)
 
@@ -148,8 +168,11 @@ class ContainmentPredicate(object):
     def __call__(self, context, request):
         ctx = getattr(request, 'context', context)
         return find_interface(ctx, self.val) is not None
-    
+
+
 class RequestTypePredicate(object):
+    needed_attrs = ('request',)
+
     def __init__(self, val, config):
         self.val = val
 
@@ -160,17 +183,20 @@ class RequestTypePredicate(object):
 
     def __call__(self, context, request):
         return self.val.providedBy(request)
-    
+
+
 class MatchParamPredicate(object):
+    needed_attrs = ('request',)
+
     def __init__(self, val, config):
         val = as_sorted_tuple(val)
         self.val = val
-        reqs = [ p.split('=', 1) for p in val ]
-        self.reqs = [ (x.strip(), y.strip()) for x, y in reqs ]
+        reqs = [p.split('=', 1) for p in val]
+        self.reqs = [(x.strip(), y.strip()) for x, y in reqs]
 
     def text(self):
         return 'match_param %s' % ','.join(
-            ['%s=%s' % (x,y) for x, y in self.reqs]
+            ['%s=%s' % (x, y) for x, y in self.reqs]
             )
 
     phash = text
@@ -183,8 +209,11 @@ class MatchParamPredicate(object):
             if request.matchdict.get(k) != v:
                 return False
         return True
-    
+
+
 class CustomPredicate(object):
+    needed_attrs = ('request',)
+
     def __init__(self, func, config):
         self.func = func
 
@@ -206,8 +235,8 @@ class CustomPredicate(object):
 
     def __call__(self, context, request):
         return self.func(context, request)
-    
-    
+
+
 class TraversePredicate(object):
     # Can only be used as a *route* "predicate"; it adds 'traverse' to the
     # matchdict if it's specified in the routing args.  This causes the
@@ -216,7 +245,7 @@ class TraversePredicate(object):
     def __init__(self, val, config):
         _, self.tgenerate = _compile_route(val)
         self.val = val
-        
+
     def text(self):
         return 'traverse matchdict pseudo-predicate'
 
@@ -237,10 +266,12 @@ class TraversePredicate(object):
         # return True.
         return True
 
-class CheckCSRFTokenPredicate(object):
 
-    check_csrf_token = staticmethod(check_csrf_token) # testing
-    
+class CheckCSRFTokenPredicate(object):
+    needed_attrs = ('request',)
+
+    check_csrf_token = staticmethod(check_csrf_token)  # testing
+
     def __init__(self, val, config):
         self.val = val
 
@@ -257,7 +288,10 @@ class CheckCSRFTokenPredicate(object):
             return self.check_csrf_token(request, val, raises=False)
         return True
 
+
 class PhysicalPathPredicate(object):
+    needed_attrs = ('request',)
+
     def __init__(self, val, config):
         if is_nonstr_iter(val):
             self.val = tuple(val)
@@ -275,7 +309,10 @@ class PhysicalPathPredicate(object):
             return resource_path_tuple(context) == self.val
         return False
 
+
 class EffectivePrincipalsPredicate(object):
+    needed_attrs = ('request',)
+
     def __init__(self, val, config):
         if is_nonstr_iter(val):
             self.val = set(val)
@@ -295,8 +332,9 @@ class EffectivePrincipalsPredicate(object):
                 return True
         return False
 
+
 class ContextSubscriberPredicate(object):
-    events = (ContextFound,)
+    needed_attrs = ('request',)
 
     def __init__(self, val, config):
         self.val = val
@@ -309,5 +347,5 @@ class ContextSubscriberPredicate(object):
     def __call__(self, event):
         try:
             return isinstance(event.request.context, self.val)
-        except AttributeError as e:
+        except AttributeError:
             pass

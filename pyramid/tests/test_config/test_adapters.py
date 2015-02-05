@@ -197,18 +197,10 @@ class AdaptersConfiguratorMixinTests(unittest.TestCase):
         self.assertTrue(L)
 
     def test_add_subscriber_predicate_checks_supported_events(self):
-        from zope.interface import implementer
-        from zope.interface import Interface
         from pyramid.exceptions import ConfigurationError
-        class IEvent(Interface):
-            pass
-        @implementer(IEvent)
-        class Event1:
-            pass
-        class Event2:
-            pass
+        from pyramid.events import ContextFound, ApplicationCreated
         class CustomSubscriberPredicate(object):
-            events = (Event1,)
+            needed_attrs = ('request',)
             def __init__(self, val, config):
                 self.val = val
             def phash(self):
@@ -216,12 +208,12 @@ class AdaptersConfiguratorMixinTests(unittest.TestCase):
         def subscriber(event): pass
         config = self._makeOne(autocommit=True)
         config.add_subscriber_predicate('custom', CustomSubscriberPredicate)
-        # CustomSubscriberPredicate supports Event1 so this succeeds
-        config.add_subscriber(subscriber, Event1, custom=1)
-        # CustomSubscriberPredicate doesn't support Event2 so this raises
-        # ConfigurationError
+        # `ContextFound` has a `request` attribute so this succeeds
+        config.add_subscriber(subscriber, ContextFound, custom=1)
+        # `ApplicationCreated` doesn't have a `request` attribute so this
+        # raises a `ConfigurationError`
         self.assertRaises(ConfigurationError,
-            config.add_subscriber, subscriber, Event2, custom=1)
+            config.add_subscriber, subscriber, ApplicationCreated, custom=1)
 
     def test_context_found_subscriber_predicate(self):
         from pyramid.events import ContextFound
@@ -239,6 +231,104 @@ class AdaptersConfiguratorMixinTests(unittest.TestCase):
         event = ContextFound(request)
         config.registry.notify(event)
         self.assertEqual(len(L), 1)
+
+    def test_xhr_subscriber_predicate(self):
+        from pyramid.events import ContextFound
+        class Foo(object): pass
+        class DummyRequest: pass
+        L = []
+        def subscriber(event): L.append(event)
+        config = self._makeOne(autocommit=True)
+        config.add_subscriber(subscriber, ContextFound, xhr=False)
+        request = DummyRequest()
+        event = ContextFound(request)
+        config.registry.notify(event)
+        self.assertEqual(len(L), 0)
+        request.context = Foo()
+        request.is_xhr = True
+        event = ContextFound(request)
+        config.registry.notify(event)
+        self.assertEqual(len(L), 0)
+        request.is_xhr = False
+        event = ContextFound(request)
+        config.registry.notify(event)
+        self.assertEqual(len(L), 1)
+
+    def test_illegal_subscriber_predicate(self):
+        # Some predicates can't be used with some events
+        # because the predicates require something (like the `request`)
+        # that is not available with that event
+        # E.g.: There is no `request` available for an `ApplicationCreated`
+        # event.
+        # For these cases, `add_subscriber` should raise an exception.
+        from pyramid.compat import text_
+        from pyramid.events import ApplicationCreated, BeforeRender
+        from pyramid.exceptions import ConfigurationError
+        class Foo(object): pass
+        class DummyRequest: pass
+        L = []
+        def subscriber(event): L.append(event)
+        config = self._makeOne(autocommit=True)
+        event_classes_that_dont_have_request = (
+            ApplicationCreated,
+            BeforeRender)
+        for event_class in event_classes_that_dont_have_request:
+            self.assertRaises(
+                ConfigurationError,
+                config.add_subscriber, subscriber,
+                event_class, xhr=False)
+            self.assertRaises(
+                ConfigurationError,
+                config.add_subscriber, subscriber,
+                event_class, request_method='GET')
+            self.assertRaises(
+                ConfigurationError,
+                config.add_subscriber, subscriber,
+                event_class, path_info=text_('/foo/bar'))
+            self.assertRaises(
+                ConfigurationError,
+                config.add_subscriber, subscriber,
+                event_class, request_param='abc=123')
+            self.assertRaises(
+                ConfigurationError,
+                config.add_subscriber, subscriber,
+                event_class, header='X-CSRF-Token')
+            self.assertRaises(
+                ConfigurationError,
+                config.add_subscriber, subscriber,
+                event_class, accept='text/html')
+            self.assertRaises(
+                ConfigurationError,
+                config.add_subscriber, subscriber,
+                event_class, containment=Foo)
+            self.assertRaises(
+                ConfigurationError,
+                config.add_subscriber, subscriber,
+                event_class, request_type='request_type')
+            self.assertRaises(
+                ConfigurationError,
+                config.add_subscriber, subscriber,
+                event_class, match_param='foo=bar')
+            self.assertRaises(
+                ConfigurationError,
+                config.add_subscriber, subscriber,
+                event_class, custom=1)
+            self.assertRaises(
+                ConfigurationError,
+                config.add_subscriber, subscriber,
+                event_class, check_csrf=True)
+            self.assertRaises(
+                ConfigurationError,
+                config.add_subscriber, subscriber,
+                event_class, physical_path='/a/b/c')
+            self.assertRaises(
+                ConfigurationError,
+                config.add_subscriber, subscriber,
+                event_class, effective_principals=('fred', 'group:admins'))
+            self.assertRaises(
+                ConfigurationError,
+                config.add_subscriber, subscriber,
+                event_class, context=Foo)
 
     def test_add_response_adapter(self):
         from pyramid.interfaces import IResponse
