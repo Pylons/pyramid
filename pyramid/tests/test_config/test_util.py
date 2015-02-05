@@ -1,5 +1,5 @@
 import unittest
-from pyramid.compat import text_
+from pyramid.compat import text_, PY3
 
 class TestPredicateList(unittest.TestCase):
 
@@ -567,6 +567,14 @@ class Test_takes_one_arg(unittest.TestCase):
                 """ """
         foo = Foo()
         self.assertTrue(self._callFUT(foo.method))
+
+    if PY3:
+        def test_function_annotations(self):
+            def foo(bar):
+                """ """
+            # avoid SyntaxErrors in python2
+            foo.__annotations__.update({'bar': 'baz'})
+            self.assertTrue(self._callFUT(foo))
 
 class TestNotted(unittest.TestCase):
     def _makeOne(self, predicate):
