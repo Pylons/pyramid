@@ -1007,6 +1007,78 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         request.params = {'param':'1'}
         self.assertEqual(wrapper(ctx, request), 'view8')
 
+    def test_view_with_most_specific_predicate(self):
+        from pyramid.renderers import null_renderer as nr
+        from pyramid.router import Router
+
+        class OtherBase(object): pass
+        class Int1(object): pass
+        class Int2(object): pass
+
+        class Resource(OtherBase, Int1, Int2):
+            def __init__(self, request): pass
+
+        def unknown(context, request): return 'unknown'
+        def view(context, request): return 'hello'
+
+        config = self._makeOne(autocommit=True)
+        config.add_route('root', '/', factory=Resource)
+        config.add_view(unknown, route_name='root', renderer=nr)
+        config.add_view(
+            view, renderer=nr, route_name='root',
+            context=Int1, request_method='GET'
+        )
+        config.add_view(
+            view=view, renderer=nr, route_name='root',
+            context=Int2, request_method='POST'
+        )
+        request = self._makeRequest(config)
+        request.method = 'POST'
+        request.params = {}
+        router = Router(config.registry)
+        response = router.handle_request(request)
+        self.assertEqual(response, 'hello')
+
+    def test_view_with_most_specific_predicate_with_mismatch(self):
+        from pyramid.renderers import null_renderer as nr
+        from pyramid.router import Router
+
+        class OtherBase(object): pass
+        class Int1(object): pass
+        class Int2(object): pass
+
+        class Resource(OtherBase, Int1, Int2):
+            def __init__(self, request): pass
+
+        def unknown(context, request): return 'unknown'
+        def view(context, request): return 'hello'
+
+        config = self._makeOne(autocommit=True)
+        config.add_route('root', '/', factory=Resource)
+
+        config.add_view(
+            unknown,
+            route_name='root',
+            renderer=nr,
+            request_method=('POST',),
+            xhr=True,
+        )
+
+        config.add_view(
+            view, renderer=nr, route_name='root',
+            context=Int1, request_method='GET'
+        )
+        config.add_view(
+            view=view, renderer=nr, route_name='root',
+            context=Int2, request_method='POST'
+        )
+        request = self._makeRequest(config)
+        request.method = 'POST'
+        request.params = {}
+        router = Router(config.registry)
+        response = router.handle_request(request)
+        self.assertEqual(response, 'hello')
+
     def test_add_view_multiview___discriminator__(self):
         from pyramid.renderers import null_renderer
         from zope.interface import Interface
