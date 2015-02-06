@@ -1,3 +1,4 @@
+import itertools
 import venusian
 
 from zope.interface import providedBy
@@ -417,12 +418,16 @@ class forbidden_view_config(object):
         return wrapped
 
 def find_views(registry, request_iface, context_iface, view_name):
-    adapters = registry.adapters
-    for req_type in request_iface.__sro__:
-        for iface in context_iface.__sro__:
-            for view_type in (IView, ISecuredView, IMultiView):
-                view_callable = adapters.registered(
-                    (IViewClassifier, req_type, iface),
-                    view_type, name=view_name)
-                if view_callable is not None:
-                    yield view_callable
+    registered = registry.adapters.registered
+    for req_type, iface in itertools.product(
+        request_iface.__sro__, context_iface.__sro__
+    ):
+        source_ifaces = (IViewClassifier, req_type, iface)
+        for view_type in (IView, ISecuredView, IMultiView):
+            view_callable = registered(
+                source_ifaces,
+                view_type,
+                name=view_name,
+            )
+            if view_callable is not None:
+                yield view_callable
