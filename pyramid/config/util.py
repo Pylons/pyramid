@@ -3,6 +3,7 @@ import inspect
 
 from pyramid.compat import (
     bytes_,
+    getargspec,
     is_nonstr_iter,
     )
 
@@ -21,12 +22,6 @@ ActionInfo = ActionInfo # support bw compat imports
 
 MAX_ORDER = 1 << 30
 DEFAULT_PHASH = md5().hexdigest()
-
-# support annotations and keyword-only arguments in PY3
-try:
-    getargspec = inspect.getfullargspec
-except AttributeError:
-    getargspec = inspect.getargspec
 
 def as_sorted_tuple(val):
     if not is_nonstr_iter(val):
