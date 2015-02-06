@@ -164,22 +164,43 @@ class Router(object):
             except PredicateMismatch:
                 # look for other views that meet the predicate
                 # criteria
-                for iface in context_iface.__sro__[1:]:
+                pred_matches = []
+
+                for index, iface in enumerate(context_iface.__sro__[1:]):
                     previous_view_callable = view_callable
                     view_callable = adapters.lookup(
                         (IViewClassifier, request.request_iface, iface),
                         IView, name=view_name, default=None)
+
                     # intermediate bases may lookup same view_callable
-                    if view_callable is previous_view_callable:
+                    if view_callable is previous_view_callable or \
+                       view_callable is None:
                         continue
-                    if view_callable is not None:
-                        try:
-                            response = view_callable(context, request)
-                            break
-                        except PredicateMismatch:
-                            pass
+
+                    # if we have predicates, lets see how many match and try
+                    # most specific first.
+                    if hasattr(view_callable, '__predicated__'):
+                        if view_callable.__predicated__(context, request):
+                            pred_matches.append((
+                                view_callable,
+                                len(view_callable.__predicates__),
+                                index
+                            ))
+                    else:
+                        pred_matches.append((view_callable, 0, index))
+
+                sorted_matches = sorted(
+                    pred_matches,
+                    key=lambda x: (x[1], x[2]),
+                    reverse=True,
+                )
+
+                if sorted_matches:
+                    view_callable = sorted_matches[0][0]
+                    response = view_callable(context, request)
                 else:
                     raise
+
         return response
 
     def invoke_subrequest(self, request, use_tweens=False):
@@ -191,7 +212,7 @@ class Router(object):
         :term:`tween` in the tween stack closest to the request ingress.  If
         ``use_tweens`` is ``False``, the request will be sent to the main
         router handler, and no tweens will be invoked.
-        
+
         See the API for pyramid.request for complete documentation.
         """
         registry = self.registry
