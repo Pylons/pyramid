@@ -56,6 +56,22 @@ class TestPCreateCommand(unittest.TestCase):
         out = self.out_.getvalue()
         self.assertTrue(out.startswith('Unavailable scaffolds'))
 
+    def test_site_package_name_site_is_forbidden(self):
+        self._site_package_name_is_forbidden('site')
+
+    def test_site_package_name_pyramid_is_forbidden(self):
+        self._site_package_name_is_forbidden('pyramid')
+
+    def _site_package_name_is_forbidden(self, forbidden_package_name):
+        cmd = self._makeOne('-s', 'dummy', forbidden_package_name)
+        scaffold = DummyScaffold('dummy')
+        cmd.scaffolds = [scaffold]
+        cmd.pyramid_dist = DummyDist("0.1")
+        result = cmd.run()
+        self.assertEqual(result, 2)
+        out = self.out_.getvalue()
+        self.assertTrue(out.startswith('Sorry, you may not name your package "%s".' % forbidden_package_name), out)
+
     def test_known_scaffold_single_rendered(self):
         import os
         cmd = self._makeOne('-s', 'dummy', 'Distro')
