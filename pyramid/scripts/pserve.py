@@ -345,7 +345,7 @@ class PServeCommand(object):
             def open_browser():
                 context = loadcontext(SERVER, app_spec, name=app_name, relative_to=base,
                         global_conf=vars)
-                url = 'http://{host}:{port}/'.format(**context.config())
+                url = 'http://127.0.0.1:{port}/'.format(**context.config())
                 time.sleep(1)
                 webbrowser.open(url)
             t = threading.Thread(target=open_browser)
