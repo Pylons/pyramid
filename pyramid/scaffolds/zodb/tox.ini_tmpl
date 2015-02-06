@@ -1,0 +1,13 @@
+[tox]
+envlist = py26, py27, py33, py34, pypy, pypy3, flake8
+
+[testenv]
+deps = -r{toxinidir}/test-requirements.txt
+commands =
+    py.test {posargs:--cov={{project}} --cov-report=html --cov-report=xml --cov-report=term-missing {{project}}/tests.py}
+
+[testenv:flake8]
+basepython = python3.4
+commands =
+    pip install flake8
+    flake8 {{project}}
