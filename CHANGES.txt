@@ -77,6 +77,9 @@ Features
   output by showing the module instead of just ``__repr__``.
   See https://github.com/Pylons/pyramid/pull/1488
 
+- Support keyword-only arguments and function annotations in views in
+  Python 3. See https://github.com/Pylons/pyramid/pull/1556
+
 Bug Fixes
 ---------
 
