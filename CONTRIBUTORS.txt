@@ -238,3 +238,5 @@ Contributors
 - Hugo Branquinho, 2014/11/25
 
 - Adrian Teng, 2014/12/17
+
+- Ilja Everila, 2015/02/05
