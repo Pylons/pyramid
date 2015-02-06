@@ -130,6 +130,13 @@ Deprecations
 Docs
 ----
 
+- Moved the documentation for ``accept`` on ``Configurator.add_view`` to no
+  longer be part of the predicate list. See
+  https://github.com/Pylons/pyramid/issues/1391 for a bug report stating
+  ``not_`` was failing on ``accept``. Discussion with @mcdonc led to the
+  conclusion that it should not be documented as a predicate.
+  See https://github.com/Pylons/pyramid/pull/1487 for this PR
+
 - Removed logging configuration from Quick Tutorial ini files except for
   scaffolding- and logging-related chapters to avoid needing to explain it too
   early.
