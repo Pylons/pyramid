@@ -15,6 +15,9 @@ Next release
   the ``pyramid.renderers.JSON`` renderer if there is no request object to
   derive a callback from. See https://github.com/Pylons/pyramid/pull/1562
 
+- Prevent "parameters to load are deprecated" ``DeprecationWarning``
+  from setuptools>=11.3. See https://github.com/Pylons/pyramid/pull/1541
+
 .. _changes_1.5.2:
 
 1.5.2 (2014-11-09)
