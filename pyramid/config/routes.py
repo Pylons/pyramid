@@ -140,16 +140,15 @@ class RoutesConfiguratorMixin(object):
 
         accept
 
-          This value represents a match query for one or more
-          mimetypes in the ``Accept`` HTTP request header.  If this
-          value is specified, it must be in one of the following
-          forms: a mimetype match token in the form ``text/plain``, a
-          wildcard mimetype match token in the form ``text/*`` or a
-          match-all wildcard mimetype match token in the form ``*/*``.
-          If any of the forms matches the ``Accept`` header of the
-          request, or if the ``Accept`` header isn't set at all in the
-          request, this predicate will be true. If this predicate
-          returns ``False``, route matching continues.
+          This value represents a match query for one or more mimetypes in the
+          ``Accept`` HTTP request header.  If this value is specified, it must
+          be in one of the following forms: a mimetype match token in the form
+          ``text/plain``, a wildcard mimetype match token in the form
+          ``text/*`` or a match-all wildcard mimetype match token in the form
+          ``*/*``.  If any of the forms matches the ``Accept`` header of the
+          request, or if the ``Accept`` header isn't set at all in the request,
+          this will match the current route. If this does not match the
+          ``Accept`` header of the request, route matching continues.
 
         Predicate Arguments
 
