@@ -240,3 +240,5 @@ Contributors
 - Adrian Teng, 2014/12/17
 
 - Ilja Everila, 2015/02/05
+
+- Geoffrey T. Dairiki, 2015/02/06
