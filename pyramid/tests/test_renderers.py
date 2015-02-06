@@ -554,6 +554,31 @@ class Test_render_to_response(unittest.TestCase):
         renderer.assert_(a=1)
         renderer.assert_(request=request)
 
+    def test_response_preserved(self):
+        request = testing.DummyRequest()
+        response = object() # should error if mutated
+        request.response = response
+        # use a json renderer, which will mutate the response
+        result = self._callFUT('json', dict(a=1), request=request)
+        self.assertEqual(result.body, b'{"a": 1}')
+        self.assertNotEqual(request.response, result)
+        self.assertEqual(request.response, response)
+
+    def test_no_response_to_preserve(self):
+        from pyramid.decorator import reify
+        class DummyRequestWithClassResponse(object):
+            _response = DummyResponse()
+            _response.content_type = None
+            _response.default_content_type = None
+            @reify
+            def response(self):
+                return self._response
+        request = DummyRequestWithClassResponse()
+        # use a json renderer, which will mutate the response
+        result = self._callFUT('json', dict(a=1), request=request)
+        self.assertEqual(result.body, b'{"a": 1}')
+        self.assertFalse('response' in request.__dict__)
+
 class Test_get_renderer(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp()

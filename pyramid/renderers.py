@@ -1,3 +1,4 @@
+import contextlib
 import json
 import os
 
@@ -73,20 +74,8 @@ def render(renderer_name, value, request=None, package=None):
     helper = RendererHelper(name=renderer_name, package=package,
                             registry=registry)
 
-    saved_response = None
-    # save the current response, preventing the renderer from affecting it
-    attrs = request.__dict__ if request is not None else {}
-    if 'response' in attrs:
-        saved_response = attrs['response']
-        del attrs['response']
-
-    result = helper.render(value, None, request=request)
-
-    # restore the original response, overwriting any changes
-    if saved_response is not None:
-        attrs['response'] = saved_response
-    elif 'response' in attrs:
-        del attrs['response']
+    with temporary_response(request):
+        result = helper.render(value, None, request=request)
 
     return result
 
@@ -134,7 +123,31 @@ def render_to_response(renderer_name, value, request=None, package=None):
         package = caller_package()
     helper = RendererHelper(name=renderer_name, package=package,
                             registry=registry)
-    return helper.render_to_response(value, None, request=request)
+
+    with temporary_response(request):
+        result = helper.render_to_response(value, None, request=request)
+
+    return result
+
+@contextlib.contextmanager
+def temporary_response(request):
+    """
+    Temporarily delete request.response and restore it afterward.
+    """
+    saved_response = None
+    # save the current response, preventing the renderer from affecting it
+    attrs = request.__dict__ if request is not None else {}
+    if 'response' in attrs:
+        saved_response = attrs['response']
+        del attrs['response']
+
+    yield
+
+    # restore the original response, overwriting any changes
+    if saved_response is not None:
+        attrs['response'] = saved_response
+    elif 'response' in attrs:
+        del attrs['response']
 
 def get_renderer(renderer_name, package=None):
     """ Return the renderer object for the renderer ``renderer_name``.
