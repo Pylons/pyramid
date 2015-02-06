@@ -125,6 +125,11 @@ def render_to_response(renderer_name, value, request=None, package=None):
     not passed in, any changes to ``request.response`` attributes made
     before calling this function will be ignored.
 
+    .. versionchanged:: 1.6
+       In previous versions, any changes made to ``request.response`` outside
+       of this function call would affect the returned response. This is no
+       longer the case.
+
     """
     try:
         registry = request.registry
