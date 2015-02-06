@@ -10,6 +10,11 @@ Next release
   output by showing the module instead of just ``__repr__``.
   See: https://github.com/Pylons/pyramid/pull/1542
 
+- The ``pyramid.renderers.JSONP`` renderer would raise an exception if used
+  without a request object. It will now fallback to behave like
+  the ``pyramid.renderers.JSON`` renderer if there is no request object to
+  derive a callback from. See https://github.com/Pylons/pyramid/pull/1562
+
 .. _changes_1.5.2:
 
 1.5.2 (2014-11-09)
