@@ -23,6 +23,21 @@ class TestFactoriesMixin(unittest.TestCase):
         self.assertEqual(config.registry.getUtility(IRequestFactory),
                          dummyfactory)
 
+    def test_set_response_factory(self):
+        from pyramid.interfaces import IResponseFactory
+        config = self._makeOne(autocommit=True)
+        factory = lambda r: object()
+        config.set_response_factory(factory)
+        self.assertEqual(config.registry.getUtility(IResponseFactory), factory)
+
+    def test_set_response_factory_dottedname(self):
+        from pyramid.interfaces import IResponseFactory
+        config = self._makeOne(autocommit=True)
+        config.set_response_factory(
+            'pyramid.tests.test_config.dummyfactory')
+        self.assertEqual(config.registry.getUtility(IResponseFactory),
+                         dummyfactory)
+
     def test_set_root_factory(self):
         from pyramid.interfaces import IRootFactory
         config = self._makeOne()

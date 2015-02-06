@@ -180,6 +180,11 @@ class Configurator(
     See :ref:`changing_the_request_factory`.  By default it is ``None``,
     which means use the default request factory.
 
+    If ``response_factory`` is passed, it should be a :term:`response
+    factory` implementation or a :term:`dotted Python name` to the same.
+    See :ref:`changing_the_response_factory`.  By default it is ``None``,
+    which means use the default response factory.
+
     If ``default_permission`` is passed, it should be a
     :term:`permission` string to be used as the default permission for
     all view configuration registrations performed against this
@@ -191,7 +196,7 @@ class Configurator(
     configurations which do not explicitly declare a permission will
     always be executable by entirely anonymous users (any
     authorization policy in effect is ignored).
-    
+
     .. seealso::
 
         See also :ref:`setting_a_default_permission`.
@@ -255,6 +260,7 @@ class Configurator(
 
     .. versionadded:: 1.6
        The ``root_package`` argument.
+       The ``response_factory`` argument.
     """
     manager = manager # for testing injection
     venusian = venusian # for testing injection
@@ -277,6 +283,7 @@ class Configurator(
                  debug_logger=None,
                  locale_negotiator=None,
                  request_factory=None,
+                 response_factory=None,
                  default_permission=None,
                  session_factory=None,
                  default_view_mapper=None,
@@ -311,6 +318,7 @@ class Configurator(
                 debug_logger=debug_logger,
                 locale_negotiator=locale_negotiator,
                 request_factory=request_factory,
+                response_factory=response_factory,
                 default_permission=default_permission,
                 session_factory=session_factory,
                 default_view_mapper=default_view_mapper,
@@ -326,6 +334,7 @@ class Configurator(
                        debug_logger=None,
                        locale_negotiator=None,
                        request_factory=None,
+                       response_factory=None,
                        default_permission=None,
                        session_factory=None,
                        default_view_mapper=None,
@@ -413,6 +422,9 @@ class Configurator(
         if request_factory:
             self.set_request_factory(request_factory)
 
+        if response_factory:
+            self.set_response_factory(response_factory)
+
         if default_permission:
             self.set_default_permission(default_permission)
 
@@ -470,7 +482,7 @@ class Configurator(
             _registry.registerSelfAdapter = registerSelfAdapter
 
     # API
-            
+
     def _get_introspector(self):
         introspector = getattr(self.registry, 'introspector', _marker)
         if introspector is _marker:

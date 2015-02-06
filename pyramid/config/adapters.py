@@ -143,7 +143,7 @@ class AdaptersConfiguratorMixin(object):
         Adds a subscriber predicate factory.  The associated subscriber
         predicate can later be named as a keyword argument to
         :meth:`pyramid.config.Configurator.add_subscriber` in the
-        ``**predicates`` anonyous keyword argument dictionary.
+        ``**predicates`` anonymous keyword argument dictionary.
 
         ``name`` should be the name of the predicate.  It must be a valid
         Python identifier (it will be used as a ``**predicates`` keyword

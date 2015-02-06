@@ -65,6 +65,27 @@ Features
   via ``request.static_url('myapp:static/foo.png')``.
   See https://github.com/Pylons/pyramid/issues/1252
 
+- Added ``pyramid.config.Configurator.set_response_factory`` and the
+  ``response_factory`` keyword argument to the ``Configurator`` for defining
+  a factory that will return a custom ``Response`` class.
+  See https://github.com/Pylons/pyramid/pull/1499
+
+- Allow an iterator to be returned from a renderer. Previously it was only
+  possible to return bytes or unicode.
+  See https://github.com/Pylons/pyramid/pull/1417
+
+- ``pserve`` can now take a ``-b`` or ``--browser`` option to open the server
+  URL in a web browser. See https://github.com/Pylons/pyramid/pull/1533
+
+- Overall improvments for the ``proutes`` command. Added ``--format`` and
+  ``--glob`` arguments to the command, introduced the ``method``
+  column for displaying available request methods, and improved the ``view``
+  output by showing the module instead of just ``__repr__``.
+  See https://github.com/Pylons/pyramid/pull/1488
+
+- Support keyword-only arguments and function annotations in views in
+  Python 3. See https://github.com/Pylons/pyramid/pull/1556
+
 Bug Fixes
 ---------
 
@@ -105,6 +126,11 @@ Bug Fixes
 - Fix route generation for static view asset specifications having no path.
   See https://github.com/Pylons/pyramid/pull/1377
 
+- Allow the ``pyramid.renderers.JSONP`` renderer to work even if there is no
+  valid request object. In this case it will not wrap the object in a
+  callback and thus behave just like the ``pyramid.renderers.JSON` renderer.
+  See https://github.com/Pylons/pyramid/pull/1561
+
 Deprecations
 ------------
 
@@ -114,6 +140,13 @@ Deprecations
 
 Docs
 ----
+
+- Moved the documentation for ``accept`` on ``Configurator.add_view`` to no
+  longer be part of the predicate list. See
+  https://github.com/Pylons/pyramid/issues/1391 for a bug report stating
+  ``not_`` was failing on ``accept``. Discussion with @mcdonc led to the
+  conclusion that it should not be documented as a predicate.
+  See https://github.com/Pylons/pyramid/pull/1487 for this PR
 
 - Removed logging configuration from Quick Tutorial ini files except for
   scaffolding- and logging-related chapters to avoid needing to explain it too

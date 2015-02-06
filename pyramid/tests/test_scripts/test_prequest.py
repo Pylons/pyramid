@@ -210,7 +210,20 @@ class TestPRequestCommand(unittest.TestCase):
         self.assertEqual(self._path_info, '/')
         self.assertEqual(self._spec, 'development.ini')
         self.assertEqual(self._app_name, None)
+
         self.assertEqual(self._out, [b'abc'])
+
+    def test_command_method_configures_logging(self):
+        command = self._makeOne(['', 'development.ini', '/'])
+        called_args = []
+
+        def configure_logging(app_spec):
+            called_args.append(app_spec)
+
+        command.configure_logging = configure_logging
+        command.run()
+        self.assertEqual(called_args, ['development.ini'])
+
 
 class Test_main(unittest.TestCase):
     def _callFUT(self, argv):

@@ -349,6 +349,52 @@ We attach and cache an object named ``extra`` to the ``request`` object.
    the property
 
 .. index::
+   single: response factory
+
+.. _changing_the_response_factory:
+
+Changing the Response Factory
+-------------------------------
+
+.. versionadded:: 1.6
+
+Whenever :app:`Pyramid` returns a response from a view it creates a
+:term:`response` object.  By default, an instance of the
+:class:`pyramid.response.Response` class is created to represent the response
+object.
+
+The factory that :app:`Pyramid` uses to create a response object instance can be
+changed by passing a ``response_factory`` argument to the constructor of the
+:term:`configurator`.  This argument can be either a callable or a
+:term:`dotted Python name` representing a callable.
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.response import Response
+
+   class MyResponse(Response):
+       pass
+
+   config = Configurator(response_factory=lambda r: MyResponse())
+
+If you're doing imperative configuration, and you'd rather do it after you've
+already constructed a :term:`configurator` it can also be registered via the
+:meth:`pyramid.config.Configurator.set_response_factory` method:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.config import Configurator
+   from pyramid.response import Response
+
+   class MyResponse(Response):
+       pass
+
+   config = Configurator()
+   config.set_response_factory(lambda r: MyResponse())
+
+.. index::
    single: before render event
    single: adding renderer globals
 
@@ -730,7 +776,7 @@ If you want to implement your own Response object instead of using the
 :class:`pyramid.response.Response` object in any capacity at all, you'll have
 to make sure the object implements every attribute and method outlined in
 :class:`pyramid.interfaces.IResponse` and you'll have to ensure that it uses
-``zope.interface.implementer(IResponse)`` as a class decoratoror.
+``zope.interface.implementer(IResponse)`` as a class decorator.
 
 .. code-block:: python
    :linenos:

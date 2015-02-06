@@ -244,6 +244,12 @@ else:
 def is_bound_method(ob):
     return inspect.ismethod(ob) and getattr(ob, im_self, None) is not None
 
+# support annotations and keyword-only arguments in PY3
+if PY3: # pragma: no cover
+    from inspect import getfullargspec as getargspec
+else:
+    from inspect import getargspec
+
 if PY3: # pragma: no cover
     from itertools import zip_longest
 else:

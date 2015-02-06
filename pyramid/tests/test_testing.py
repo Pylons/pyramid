@@ -259,7 +259,9 @@ class TestDummyRequest(unittest.TestCase):
         registry = Registry('this_test')
         class ResponseFactory(object):
             pass
-        registry.registerUtility(ResponseFactory, IResponseFactory)
+        registry.registerUtility(
+            lambda r: ResponseFactory(), IResponseFactory
+        )
         request = self._makeOne()
         request.registry = registry
         resp = request.response
