@@ -79,7 +79,11 @@ def render(renderer_name, value, request=None, package=None):
 
     return result
 
-def render_to_response(renderer_name, value, request=None, package=None):
+def render_to_response(renderer_name,
+                       value,
+                       request=None,
+                       package=None,
+                       response=None):
     """ Using the renderer ``renderer_name`` (a template
     or a static renderer), render the value (or set of values) using
     the result of the renderer's ``__call__`` method (usually a string
@@ -112,12 +116,14 @@ def render_to_response(renderer_name, value, request=None, package=None):
     with the most correct 'system' values (``request`` and ``context``
     in particular). Keep in mind that any changes made to ``request.response``
     prior to calling this function will not be reflected in the resulting
-    response object. A new response object will be created for each call.
+    response object. A new response object will be created for each call
+    unless one is passed as the ``response`` argument.
 
     .. versionchanged:: 1.6
        In previous versions, any changes made to ``request.response`` outside
        of this function call would affect the returned response. This is no
-       longer the case.
+       longer the case. If you wish to send in a pre-initialized response
+       then you may pass one in the ``response`` argument.
 
     """
     try:
@@ -130,6 +136,8 @@ def render_to_response(renderer_name, value, request=None, package=None):
                             registry=registry)
 
     with temporary_response(request):
+        if response is not None:
+            request.response = response
         result = helper.render_to_response(value, None, request=request)
 
     return result

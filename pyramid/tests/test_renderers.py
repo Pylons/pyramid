@@ -517,10 +517,11 @@ class Test_render_to_response(unittest.TestCase):
     def tearDown(self):
         testing.tearDown()
 
-    def _callFUT(self, renderer_name, value, request=None, package=None):
+    def _callFUT(self, renderer_name, value, request=None, package=None,
+                 response=None):
         from pyramid.renderers import render_to_response
         return render_to_response(renderer_name, value, request=request,
-                                  package=package)
+                                  package=package, response=response)
 
     def test_it_no_request(self):
         renderer = self.config.testing_add_renderer(
@@ -576,6 +577,18 @@ class Test_render_to_response(unittest.TestCase):
         request = DummyRequestWithClassResponse()
         # use a json renderer, which will mutate the response
         result = self._callFUT('json', dict(a=1), request=request)
+        self.assertEqual(result.body, b'{"a": 1}')
+        self.assertFalse('response' in request.__dict__)
+
+    def test_custom_response_object(self):
+        class DummyRequestWithClassResponse(object):
+            pass
+        request = DummyRequestWithClassResponse()
+        response = DummyResponse()
+        # use a json renderer, which will mutate the response
+        result = self._callFUT('json', dict(a=1), request=request,
+                               response=response)
+        self.assertTrue(result is response)
         self.assertEqual(result.body, b'{"a": 1}')
         self.assertFalse('response' in request.__dict__)
 
@@ -639,7 +652,14 @@ class Dummy:
 
 class DummyResponse:
     status = '200 OK'
+    default_content_type = 'text/html'
+    content_type = default_content_type
     headerlist = ()
     app_iter = ()
-    body = ''
+    body = b''
+
+    # compat for renderer that will set unicode on py3
+    def _set_text(self, val): # pragma: no cover
+        self.body = val.encode('utf8')
+    text = property(fset=_set_text)
 
