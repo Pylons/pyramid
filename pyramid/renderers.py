@@ -114,6 +114,11 @@ def render_to_response(renderer_name, value, request=None, package=None):
     prior to calling this function will not be reflected in the resulting
     response object. A new response object will be created for each call.
 
+    .. versionchanged:: 1.6
+       In previous versions, any changes made to ``request.response`` outside
+       of this function call would affect the returned response. This is no
+       longer the case.
+
     """
     try:
         registry = request.registry
