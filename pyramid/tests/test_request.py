@@ -438,6 +438,7 @@ class Test_call_app_with_subpath_as_path_info(unittest.TestCase):
 class Test_subclassing_Request(unittest.TestCase):
 
     def test_subclass(self):
+        from pyramid.interfaces import IRequest
         from pyramid.request import Request
         from zope.interface import providedBy, implementedBy
 
@@ -445,7 +446,16 @@ class Test_subclassing_Request(unittest.TestCase):
             pass
 
         self.assertTrue(hasattr(Request, '__provides__'))
+        self.assertTrue(hasattr(Request, '__implemented__'))
+        self.assertTrue(hasattr(Request, '__providedBy__'))
         self.assertFalse(hasattr(RequestSub, '__provides__'))
+        self.assertTrue(hasattr(RequestSub, '__providedBy__'))
+        self.assertTrue(hasattr(RequestSub, '__implemented__'))
+
+        self.assertTrue(IRequest.implementedBy(RequestSub))
+        # The call to implementedBy will add __provides__ to the class
+        self.assertTrue(hasattr(RequestSub, '__provides__'))
+
 
     def test_subclass_with_implementer(self):
         from pyramid.interfaces import IRequest
@@ -457,11 +467,18 @@ class Test_subclassing_Request(unittest.TestCase):
             pass
 
         self.assertTrue(hasattr(Request, '__provides__'))
+        self.assertTrue(hasattr(Request, '__implemented__'))
+        self.assertTrue(hasattr(Request, '__providedBy__'))
         self.assertTrue(hasattr(RequestSub, '__provides__'))
+        self.assertTrue(hasattr(RequestSub, '__providedBy__'))
+        self.assertTrue(hasattr(RequestSub, '__implemented__'))
 
         req = RequestSub({})
         req._set_properties({'b': 'b'})
-        self.assertEqual(providedBy(req), implementedBy(RequestSub))
+
+        self.assertTrue(IRequest.providedBy(req))
+        self.assertTrue(IRequest.implementedBy(RequestSub))
+
 
 class DummyRequest:
     def __init__(self, environ=None):
