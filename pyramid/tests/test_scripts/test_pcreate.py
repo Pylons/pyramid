@@ -35,7 +35,7 @@ class TestPCreateCommand(unittest.TestCase):
         self.assertTrue(out.startswith('No scaffolds available'))
 
     def test_run_no_scaffold_name(self):
-        cmd = self._makeOne()
+        cmd = self._makeOne('dummy')
         result = cmd.run()
         self.assertEqual(result, 2)
         out = self.out_.getvalue()
