@@ -479,6 +479,20 @@ class Test_subclassing_Request(unittest.TestCase):
         self.assertTrue(IRequest.providedBy(req))
         self.assertTrue(IRequest.implementedBy(RequestSub))
 
+    def test_subclass_mutate_before_providedBy(self):
+        from pyramid.interfaces import IRequest
+        from pyramid.request import Request
+        from zope.interface import providedBy, implementedBy, implementer
+
+        class RequestSub(Request):
+            pass
+
+        req = RequestSub({})
+        req._set_properties({'b': 'b'})
+
+        self.assertTrue(IRequest.providedBy(req))
+        self.assertTrue(IRequest.implementedBy(RequestSub))
+
 
 class DummyRequest:
     def __init__(self, environ=None):
