@@ -128,24 +128,21 @@ class TestFactoriesMixin(unittest.TestCase):
 
     def test_add_request_method_with_text_type_name(self):
         from pyramid.interfaces import IRequestExtensions
-        from pyramid.compat import text_
-        from pyramid.util import InstancePropertyMixin
+        from pyramid.compat import text_, PY3
+        from pyramid.exceptions import ConfigurationError
 
         config = self._makeOne(autocommit=True)
         def boomshaka(r): pass
-        name = text_(b'La Pe\xc3\xb1a', 'utf-8')
-        config.add_request_method(boomshaka, name=name)
 
-        name2 = b'La Pe\xc3\xb1a'
-        config.add_request_method(boomshaka, name=name2)
+        def get_bad_name():
+            if PY3:  # pragma: nocover
+                name = b'La Pe\xc3\xb1a'
+            else:  # pragma: nocover
+                name = text_(b'La Pe\xc3\xb1a', 'utf-8')
 
-        exts = config.registry.getUtility(IRequestExtensions)
-        inst = InstancePropertyMixin()
+            config.add_request_method(boomshaka, name=name)
 
-        def set_extensions():
-            inst._set_extensions(exts)
-
-        self.assertRaises(ValueError, set_extensions)
+        self.assertRaises(ConfigurationError, get_bad_name)
 
 class TestDeprecatedFactoriesMixinMethods(unittest.TestCase):
     def setUp(self):
