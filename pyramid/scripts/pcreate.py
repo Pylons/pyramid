@@ -64,7 +64,9 @@ class PCreateCommand(object):
         if self.options.list:
             return self.show_scaffolds()
         if not self.options.scaffold_name:
-            self.out('You must provide at least one scaffold name')
+            self.out('You must provide at least one scaffold name: -s <scaffold name>')
+            self.out('')
+            self.show_scaffolds()
             return 2
         if not self.args:
             self.out('You must provide a project name')
