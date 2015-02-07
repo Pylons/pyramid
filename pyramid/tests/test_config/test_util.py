@@ -568,6 +568,13 @@ class Test_takes_one_arg(unittest.TestCase):
         foo = Foo()
         self.assertTrue(self._callFUT(foo.method))
 
+    def test_function_annotations(self):
+        def foo(bar):
+            """ """
+        # avoid SyntaxErrors in python2, this if effectively nop
+        getattr(foo, '__annotations__', {}).update({'bar': 'baz'})
+        self.assertTrue(self._callFUT(foo))
+
 class TestNotted(unittest.TestCase):
     def _makeOne(self, predicate):
         from pyramid.config.util import Notted

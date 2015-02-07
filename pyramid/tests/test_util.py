@@ -324,7 +324,7 @@ class Test_object_description(unittest.TestCase):
         self.assertEqual(
             self._callFUT(inst),
             "object %s" % str(inst))
-        
+
     def test_shortened_repr(self):
         inst = ['1'] * 1000
         self.assertEqual(
@@ -592,7 +592,7 @@ class TestActionInfo(unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.util import ActionInfo
         return ActionInfo
-        
+
     def _makeOne(self, filename, lineno, function, linerepr):
         return self._getTargetClass()(filename, lineno, function, linerepr)
 

@@ -18,7 +18,7 @@ def main(argv=sys.argv, quiet=False):
 class PCreateCommand(object):
     verbosity = 1 # required
     description = "Render Pyramid scaffolding to an output directory"
-    usage = "usage: %prog [options] output_directory"
+    usage = "usage: %prog [options] -s <scaffold> output_directory"
     parser = optparse.OptionParser(usage, description=description)
     parser.add_option('-s', '--scaffold',
                       dest='scaffold_name',
@@ -63,8 +63,16 @@ class PCreateCommand(object):
     def run(self):
         if self.options.list:
             return self.show_scaffolds()
+        if not self.options.scaffold_name and not self.args:
+            if not self.quiet: # pragma: no cover
+                self.parser.print_help()
+                self.out('')
+                self.show_scaffolds()
+            return 2
         if not self.options.scaffold_name:
-            self.out('You must provide at least one scaffold name')
+            self.out('You must provide at least one scaffold name: -s <scaffold name>')
+            self.out('')
+            self.show_scaffolds()
             return 2
         if not self.args:
             self.out('You must provide a project name')

@@ -4,6 +4,7 @@ from zope.interface import implementer
 from pyramid.interfaces import (
     IDefaultRootFactory,
     IRequestFactory,
+    IResponseFactory,
     IRequestExtensions,
     IRootFactory,
     ISessionFactory,
@@ -95,6 +96,31 @@ class FactoriesConfiguratorMixin(object):
                                    'request factory')
         intr['factory'] = factory
         self.action(IRequestFactory, register, introspectables=(intr,))
+
+    @action_method
+    def set_response_factory(self, factory):
+        """ The object passed as ``factory`` should be an object (or a
+        :term:`dotted Python name` which refers to an object) which
+        will be used by the :app:`Pyramid` as the default response
+        objects. The factory should conform to the
+        :class:`pyramid.interfaces.IResponseFactory` interface.
+
+        .. note::
+
+           Using the ``response_factory`` argument to the
+           :class:`pyramid.config.Configurator` constructor
+           can be used to achieve the same purpose.
+        """
+        factory = self.maybe_dotted(factory)
+
+        def register():
+            self.registry.registerUtility(factory, IResponseFactory)
+
+        intr = self.introspectable('response factory', None,
+                                   self.object_description(factory),
+                                   'response factory')
+        intr['factory'] = factory
+        self.action(IResponseFactory, register, introspectables=(intr,))
 
     @action_method
     def add_request_method(self,

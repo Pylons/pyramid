@@ -558,4 +558,3 @@ def action_method(wrapped):
         functools.update_wrapper(wrapper, wrapped)
     wrapper.__docobj__ = wrapped
     return wrapper
-
