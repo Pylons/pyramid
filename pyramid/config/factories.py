@@ -102,9 +102,8 @@ class FactoriesConfiguratorMixin(object):
         """ The object passed as ``factory`` should be an object (or a
         :term:`dotted Python name` which refers to an object) which
         will be used by the :app:`Pyramid` as the default response
-        objects.  This factory object must have the same
-        methods and attributes as the
-        :class:`pyramid.request.Response` class.
+        objects. The factory should conform to the
+        :class:`pyramid.interfaces.IResponseFactory` interface.
 
         .. note::
 
