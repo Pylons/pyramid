@@ -368,6 +368,9 @@ changed by passing a ``response_factory`` argument to the constructor of the
 :term:`configurator`.  This argument can be either a callable or a
 :term:`dotted Python name` representing a callable.
 
+The factory takes a single positional argument, which is a :term:`Request`
+object. The argument may be the value ``None``.
+
 .. code-block:: python
    :linenos:
 
