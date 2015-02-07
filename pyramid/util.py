@@ -87,10 +87,10 @@ class InstancePropertyMixin(object):
         if attrs:
             parent = self.__class__
             cls = type(parent.__name__, (parent, object), attrs)
-            # We assign __provides__, __implemented__ and __providedBy__ below
-            # to prevent a memory leak that results from from the usage of this
-            # instance's eventual use in an adapter lookup.  Adapter lookup
-            # results in ``zope.interface.implementedBy`` being called with the
+            # We assign __provides__ and __implemented__ below to prevent a
+            # memory leak that results from from the usage of this instance's
+            # eventual use in an adapter lookup.  Adapter lookup results in
+            # ``zope.interface.implementedBy`` being called with the
             # newly-created class as an argument.  Because the newly-created
             # class has no interface specification data of its own, lookup
             # causes new ClassProvides and Implements instances related to our
@@ -99,7 +99,7 @@ class InstancePropertyMixin(object):
             # want this new class to behave exactly like it is the parent class
             # instead.  See https://github.com/Pylons/pyramid/issues/1212 for
             # more information.
-            for name in ('__implemented__', '__providedBy__', '__provides__'):
+            for name in ('__implemented__', '__provides__'):
                 # we assign these attributes conditionally to make it possible
                 # to test this class in isolation without having any interfaces
                 # attached to it

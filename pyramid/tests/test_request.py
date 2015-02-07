@@ -436,7 +436,6 @@ class Test_call_app_with_subpath_as_path_info(unittest.TestCase):
         self.assertEqual(request.environ['PATH_INFO'], '/' + encoded)
 
 class Test_subclassing_Request(unittest.TestCase):
-
     def test_subclass(self):
         from pyramid.interfaces import IRequest
         from pyramid.request import Request
