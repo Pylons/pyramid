@@ -4,6 +4,11 @@ Next release
 Features
 --------
 
+- pcreate when run without a scaffold argument will now print information on
+  the missing flag, as well as a list of available scaffolds.
+  See https://github.com/Pylons/pyramid/pull/1566 and
+  https://github.com/Pylons/pyramid/issues/1297
+
 - Added support / testing for 'pypy3' under Tox and Travis.
   See https://github.com/Pylons/pyramid/pull/1469
 
