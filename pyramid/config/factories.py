@@ -18,8 +18,6 @@ from pyramid.util import (
     get_callable_name,
     )
 
-from pyramid.compat import native_
-
 
 class FactoriesConfiguratorMixin(object):
     @action_method
