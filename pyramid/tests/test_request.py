@@ -435,6 +435,34 @@ class Test_call_app_with_subpath_as_path_info(unittest.TestCase):
         self.assertEqual(request.environ['SCRIPT_NAME'], '/' + encoded)
         self.assertEqual(request.environ['PATH_INFO'], '/' + encoded)
 
+class Test_subclassing_Request(unittest.TestCase):
+
+    def test_subclass(self):
+        from pyramid.request import Request
+        from zope.interface import providedBy, implementedBy
+
+        class RequestSub(Request):
+            pass
+
+        self.assertTrue(hasattr(Request, '__provides__'))
+        self.assertFalse(hasattr(RequestSub, '__provides__'))
+
+    def test_subclass_with_implementer(self):
+        from pyramid.interfaces import IRequest
+        from pyramid.request import Request
+        from zope.interface import providedBy, implementedBy, implementer
+
+        @implementer(IRequest)
+        class RequestSub(Request):
+            pass
+
+        self.assertTrue(hasattr(Request, '__provides__'))
+        self.assertTrue(hasattr(RequestSub, '__provides__'))
+
+        req = RequestSub({})
+        req._set_properties({'b': 'b'})
+        self.assertEqual(providedBy(req), implementedBy(RequestSub))
+
 class DummyRequest:
     def __init__(self, environ=None):
         if environ is None:
