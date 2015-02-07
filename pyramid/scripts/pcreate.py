@@ -63,6 +63,12 @@ class PCreateCommand(object):
     def run(self):
         if self.options.list:
             return self.show_scaffolds()
+        if not self.options.scaffold_name and not self.args:
+            if not self.quiet:
+                self.parser.print_help()
+                self.out('')
+                self.show_scaffolds()
+            return 2
         if not self.options.scaffold_name:
             self.out('You must provide at least one scaffold name: -s <scaffold name>')
             self.out('')
