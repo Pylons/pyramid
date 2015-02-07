@@ -417,7 +417,7 @@ class forbidden_view_config(object):
         settings['_info'] = info.codeinfo # fbo "action_method"
         return wrapped
 
-def find_views(registry, request_iface, context_iface, view_name):
+def _find_views(registry, request_iface, context_iface, view_name):
     registered = registry.adapters.registered
     for req_type, ctx_type in itertools.product(
         request_iface.__sro__, context_iface.__sro__

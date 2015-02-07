@@ -27,7 +27,7 @@ from pyramid.events import (
 from pyramid.exceptions import PredicateMismatch
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.request import Request
-from pyramid.view import find_views
+from pyramid.view import _find_views
 from pyramid.threadlocal import manager
 
 from pyramid.traversal import (
@@ -139,7 +139,7 @@ class Router(object):
 
         # find a view callable
         context_iface = providedBy(context)
-        views_iter = find_views(
+        views_iter = _find_views(
             registry,
             request.request_iface,
             context_iface,
