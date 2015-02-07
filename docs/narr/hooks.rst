@@ -364,9 +364,12 @@ Whenever :app:`Pyramid` returns a response from a view it creates a
 object.
 
 The factory that :app:`Pyramid` uses to create a response object instance can be
-changed by passing a ``response_factory`` argument to the constructor of the
-:term:`configurator`.  This argument can be either a callable or a
-:term:`dotted Python name` representing a callable.
+changed by passing a :class:`pyramid.interfaces.IResponseFactory` argument to
+the constructor of the :term:`configurator`.  This argument can be either a
+callable or a :term:`dotted Python name` representing a callable.
+
+The factory takes a single positional argument, which is a :term:`Request`
+object. The argument may be ``None``.
 
 .. code-block:: python
    :linenos:

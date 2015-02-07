@@ -582,12 +582,11 @@ class IStaticURLInfo(Interface):
         """ Generate a URL for the given path """
 
 class IResponseFactory(Interface):
-    """ A utility which generates a response factory """
-    def __call__():
-        """ Return a response factory (e.g. a callable that returns an object
-        implementing IResponse, e.g. :class:`pyramid.response.Response`). It
-        should accept all the arguments that the Pyramid Response class
-        accepts."""
+    """ A utility which generates a response """
+    def __call__(request):
+        """ Return a response object implementing IResponse,
+        e.g. :class:`pyramid.response.Response`). It should handle the
+        case when ``request`` is ``None``."""
 
 class IRequestFactory(Interface):
     """ A utility which generates a request """
