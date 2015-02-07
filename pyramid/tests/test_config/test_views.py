@@ -4034,6 +4034,7 @@ from pyramid.interfaces import IResponse
 class DummyResponse(object):
     content_type = None
     default_content_type = None
+    implicit_content_type = True
     body = None
 
 class DummyRequest:

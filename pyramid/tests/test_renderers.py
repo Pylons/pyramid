@@ -624,4 +624,4 @@ class DummyResponse:
     headerlist = ()
     app_iter = ()
     body = ''
-
+    implicit_content_type = True
