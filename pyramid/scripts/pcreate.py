@@ -64,7 +64,7 @@ class PCreateCommand(object):
         if self.options.list:
             return self.show_scaffolds()
         if not self.options.scaffold_name and not self.args:
-            if not self.quiet:
+            if not self.quiet: # pragma: no cover
                 self.parser.print_help()
                 self.out('')
                 self.show_scaffolds()
