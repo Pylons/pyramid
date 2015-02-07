@@ -12,10 +12,10 @@ class TestPCreateCommand(unittest.TestCase):
         from pyramid.scripts.pcreate import PCreateCommand
         return PCreateCommand
 
-    def _makeOne(self, *args):
+    def _makeOne(self, *args, **kw):
         effargs = ['pcreate']
         effargs.extend(args)
-        cmd = self._getTargetClass()(effargs)
+        cmd = self._getTargetClass()(effargs, **kw)
         cmd.out = self.out
         return cmd
 
@@ -33,6 +33,11 @@ class TestPCreateCommand(unittest.TestCase):
         self.assertEqual(result, 0)
         out = self.out_.getvalue()
         self.assertTrue(out.startswith('No scaffolds available'))
+
+    def test_run_no_scaffold_no_args(self):
+        cmd = self._makeOne(quiet=True)
+        result = cmd.run()
+        self.assertEqual(result, 2)
 
     def test_run_no_scaffold_name(self):
         cmd = self._makeOne('dummy')
