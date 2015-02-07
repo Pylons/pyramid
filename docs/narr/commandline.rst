@@ -312,23 +312,59 @@ For example:
    :linenos:
 
    $ $VENV/bin/proutes development.ini
-   Name            Pattern                        View
-   ----            -------                        ----                     
-   home            /                              <function my_view>
-   home2           /                              <function my_view>
-   another         /another                       None                     
-   static/         static/*subpath                <static_view object>
-   catchall        /*subpath                      <function static_view>
+   Name                       Pattern                     View
+   ----                       -------                     ----
+   debugtoolbar               /_debug_toolbar/*subpath    <wsgiapp>                                     *
+   __static/                  /static/*subpath            dummy_starter:static/                         *
+   __static2/                 /static2/*subpath           /var/www/static/                              *
+   __pdt_images/              /pdt_images/*subpath        pyramid_debugtoolbar:static/img/              *
+   a                          /                           <unknown>                                     *
+   no_view_attached           /                           <unknown>                                     *
+   route_and_view_attached    /                           app1.standard_views.route_and_view_attached   *
+   method_conflicts           /conflicts                  app1.standard_conflicts                       <route mismatch>
+   multiview                  /multiview                  app1.standard_views.multiview                 GET,PATCH
+   not_post                   /not_post                   app1.standard_views.multview                  !POST,*
 
-``proutes`` generates a table with three columns: *Name*, *Pattern*,
+``proutes`` generates a table with four columns: *Name*, *Pattern*, *Method*,
 and *View*.  The items listed in the
 Name column are route names, the items listed in the Pattern column are route
 patterns, and the items listed in the View column are representations of the
 view callable that will be invoked when a request matches the associated
-route pattern.  The view column may show ``None`` if no associated view
+route pattern.  The view column may show ``<unknown>`` if no associated view
 callable could be found.  If no routes are configured within your
 application, nothing will be printed to the console when ``proutes``
 is executed.
+
+It is convenient when using the ``proutes`` often to configure which columns
+and the order you would like to view them. To facilitate this, ``proutes`` will
+look for a special ``[proutes]`` section in your INI file and use those as
+defaults.
+
+For example you may remove request method and place the view first:
+
+.. code-block:: text
+  :linenos:
+
+    [proutes]
+    format = view
+             name
+             pattern
+
+You can also separate the formats with commas or spaces:
+
+.. code-block:: text
+  :linenos:
+
+    [proutes]
+    format = view name pattern
+
+    [proutes]
+    format = view, name, pattern
+
+If you want to temporarily configure the columns and order there is the
+``--format`` which is a comma separated list of columns you want to include. The
+current available formats are ``name``, ``pattern``, ``view``, and ``method``.
+
 
 .. index::
    pair: tweens; printing
