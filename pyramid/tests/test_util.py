@@ -1,9 +1,11 @@
 import unittest
 from pyramid.compat import PY3
 
+
 class Test_InstancePropertyMixin(unittest.TestCase):
     def _makeOne(self):
         cls = self._getTargetClass()
+
         class Foo(cls):
             pass
         return Foo()
@@ -123,6 +125,21 @@ class Test_InstancePropertyMixin(unittest.TestCase):
         foo._set_properties([x, y])
         self.assertEqual(1, foo.x)
         self.assertEqual(2, foo.y)
+
+    def test__make_property_unicode(self):
+        from pyramid.compat import text_
+        from pyramid.exceptions import ConfigurationError
+
+        cls = self._getTargetClass()
+        if PY3:  # pragma: nocover
+            name = b'La Pe\xc3\xb1a'
+        else:  # pragma: nocover
+            name = text_(b'La Pe\xc3\xb1a', 'utf-8')
+
+        def make_bad_name():
+            cls._make_property(lambda x: 1, name=name, reify=True)
+
+        self.assertRaises(ConfigurationError, make_bad_name)
 
     def test__set_properties_with_dict(self):
         foo = self._makeOne()
@@ -619,7 +636,36 @@ class TestActionInfo(unittest.TestCase):
                          "Line 0 of file filename:\n       linerepr  ")
 
 
+class TestCallableName(unittest.TestCase):
+    def test_valid_ascii(self):
+        from pyramid.util import get_callable_name
+        from pyramid.compat import text_, PY3
+
+        if PY3:  # pragma: nocover
+            name = b'hello world'
+        else:  # pragma: nocover
+            name = text_(b'hello world', 'utf-8')
+
+        self.assertEquals(get_callable_name(name), 'hello world')
+
+    def test_invalid_ascii(self):
+        from pyramid.util import get_callable_name
+        from pyramid.compat import text_, PY3
+        from pyramid.exceptions import ConfigurationError
+
+        def get_bad_name():
+            if PY3:  # pragma: nocover
+                name = b'La Pe\xc3\xb1a'
+            else:  # pragma: nocover
+                name = text_(b'La Pe\xc3\xb1a', 'utf-8')
+
+            get_callable_name(name)
+
+        self.assertRaises(ConfigurationError, get_bad_name)
+
+
 def dummyfunc(): pass
+
 
 class Dummy(object):
     pass

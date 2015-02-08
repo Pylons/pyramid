@@ -126,6 +126,23 @@ class TestFactoriesMixin(unittest.TestCase):
         config = self._makeOne(autocommit=True)
         self.assertRaises(AttributeError, config.add_request_method)
 
+    def test_add_request_method_with_text_type_name(self):
+        from pyramid.interfaces import IRequestExtensions
+        from pyramid.compat import text_, PY3
+        from pyramid.exceptions import ConfigurationError
+
+        config = self._makeOne(autocommit=True)
+        def boomshaka(r): pass
+
+        def get_bad_name():
+            if PY3:  # pragma: nocover
+                name = b'La Pe\xc3\xb1a'
+            else:  # pragma: nocover
+                name = text_(b'La Pe\xc3\xb1a', 'utf-8')
+
+            config.add_request_method(boomshaka, name=name)
+
+        self.assertRaises(ConfigurationError, get_bad_name)
 
 class TestDeprecatedFactoriesMixinMethods(unittest.TestCase):
     def setUp(self):
@@ -135,7 +152,7 @@ class TestDeprecatedFactoriesMixinMethods(unittest.TestCase):
     def tearDown(self):
         from zope.deprecation import __show__
         __show__.on()
-        
+
     def _makeOne(self, *arg, **kw):
         from pyramid.config import Configurator
         config = Configurator(*arg, **kw)
