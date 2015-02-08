@@ -430,7 +430,7 @@ class Configurator(
         if session_factory is not None:
             self.set_session_factory(session_factory)
 
-        tweens   = aslist(registry.settings.get('pyramid.tweens', []))
+        tweens = aslist(registry.settings.get('pyramid.tweens', []))
         for factory in tweens:
             self._add_tween(factory, explicit=True)
 
@@ -950,11 +950,11 @@ class Configurator(
         if package is None: # pragma: no cover
             package = caller_package()
 
-        ctorkw = {'config':self}
+        ctorkw = {'config': self}
         ctorkw.update(kw)
 
         scanner = self.venusian.Scanner(**ctorkw)
-        
+
         scanner.scan(package, categories=categories, onerror=onerror,
                      ignore=ignore)
 
@@ -975,7 +975,7 @@ class Configurator(
         # Push the registry onto the stack in case any code that depends on
         # the registry threadlocal APIs used in listeners subscribed to the
         # IApplicationCreated event.
-        self.manager.push({'registry':self.registry, 'request':None})
+        self.manager.push({'registry': self.registry, 'request': None})
         try:
             self.registry.notify(ApplicationCreated(app))
         finally:
@@ -983,11 +983,12 @@ class Configurator(
 
         return app
 
+
 # this class is licensed under the ZPL (stolen from Zope)
 class ActionState(object):
     def __init__(self):
         # NB "actions" is an API, dep'd upon by pyramid_zcml's load_zcml func
-        self.actions = [] 
+        self.actions = []
         self._seen_files = set()
 
     def processSpec(self, spec):
@@ -1095,7 +1096,7 @@ class ActionState(object):
                                 ConfigurationExecutionError(t, v, info),
                                 tb)
                     finally:
-                       del t, v, tb
+                        del t, v, tb
 
                 if introspector is not None:
                     for introspectable in introspectables:

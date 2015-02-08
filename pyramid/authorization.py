@@ -73,7 +73,7 @@ class ACLAuthorizationPolicy(object):
         :class:`pyramid.security.ACLDenied` if not."""
 
         acl = '<No ACL found on any object in resource lineage>'
-        
+
         for location in lineage(context):
             try:
                 acl = location.__acl__
@@ -121,7 +121,7 @@ class ACLAuthorizationPolicy(object):
 
             allowed_here = set()
             denied_here = set()
-            
+
             if acl and callable(acl):
                 acl = acl()
 
@@ -129,7 +129,7 @@ class ACLAuthorizationPolicy(object):
                 if not is_nonstr_iter(ace_permissions):
                     ace_permissions = [ace_permissions]
                 if (ace_action == Allow) and (permission in ace_permissions):
-                    if not ace_principal in denied_here:
+                    if ace_principal not in denied_here:
                         allowed_here.add(ace_principal)
                 if (ace_action == Deny) and (permission in ace_permissions):
                         denied_here.add(ace_principal)

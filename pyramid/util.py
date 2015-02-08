@@ -430,7 +430,7 @@ class TopologicalSorter(object):
             order.append((a, b))
 
         def add_node(node):
-            if not node in graph:
+            if node not in graph:
                 roots.append(node)
                 graph[node] = [0] # 0 = number of arcs coming into this node
 
@@ -503,7 +503,7 @@ def viewdefaults(wrapped):
         view = self.maybe_dotted(view)
         if inspect.isclass(view):
             defaults = getattr(view, '__view_defaults__', {}).copy()
-        if not '_backframes' in kw:
+        if '_backframes' not in kw:
             kw['_backframes'] = 1 # for action_method
         defaults.update(kw)
         return wrapped(self, *arg, **defaults)

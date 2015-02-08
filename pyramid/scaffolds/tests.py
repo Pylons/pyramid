@@ -8,7 +8,8 @@ import time
 try:
     import httplib
 except ImportError: # pragma: no cover
-    import http.client as httplib #py3
+    import http.client as httplib # py3
+
 
 class TemplateTest(object):
     def make_venv(self, directory): # pragma: no cover
@@ -20,6 +21,7 @@ class TemplateTest(object):
                                       site_packages=False,
                                       clear=False,
                                       unzip_setuptools=True)
+
     def install(self, tmpl_name): # pragma: no cover
         try:
             self.old_cwd = os.getcwd()
@@ -58,7 +60,7 @@ class TemplateTest(object):
                     if hastoolbar:
                         assert toolbarchunk in data, ininame
                     else:
-                        assert not toolbarchunk in data, ininame
+                        assert toolbarchunk not in data, ininame
                 finally:
                     proc.terminate()
         finally:

@@ -268,7 +268,7 @@ class AppendSlashNotFoundViewFactory(object):
                     qs = request.query_string
                     if qs:
                         qs = '?' + qs
-                    return HTTPFound(location=request.path+'/'+qs)
+                    return HTTPFound(location=request.path + '/' + qs)
         return self.notfound_view(context, request)
 
 append_slash_notfound_view = AppendSlashNotFoundViewFactory()

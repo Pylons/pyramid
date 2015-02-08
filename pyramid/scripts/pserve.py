@@ -138,7 +138,7 @@ class PServeCommand(object):
         default=default_verbosity,
         dest='verbose',
         action='count',
-        help="Set verbose level (default "+str(default_verbosity)+")")
+        help="Set verbose level (default " + str(default_verbosity) + ")")
     parser.add_option(
         '-q', '--quiet',
         action='store_const',
@@ -563,7 +563,9 @@ class PServeCommand(object):
     def change_user_group(self, user, group): # pragma: no cover
         if not user and not group:
             return
-        import pwd, grp
+        import pwd
+        import grp
+
         uid = gid = None
         if group:
             try:
@@ -596,6 +598,7 @@ class PServeCommand(object):
             os.setgid(gid)
         if uid:
             os.setuid(uid)
+
 
 class LazyWriter(object):
 
@@ -749,10 +752,11 @@ class _methodwrapper(object):
         self.type = type
 
     def __call__(self, *args, **kw):
-        assert not 'self' in kw and not 'cls' in kw, (
+        assert 'self' not in kw and 'cls' not in kw, (
             "You cannot use 'self' or 'cls' arguments to a "
             "classinstancemethod")
         return self.func(*((self.obj, self.type) + args), **kw)
+
 
 class Monitor(object): # pragma: no cover
     """
@@ -847,7 +851,7 @@ class Monitor(object): # pragma: no cover
                 continue
             if filename.endswith('.pyc') and os.path.exists(filename[:-1]):
                 mtime = max(os.stat(filename[:-1]).st_mtime, mtime)
-            if not filename in self.module_mtimes:
+            if filename not in self.module_mtimes:
                 self.module_mtimes[filename] = mtime
             elif self.module_mtimes[filename] < mtime:
                 print("%s changed; reloading..." % filename)

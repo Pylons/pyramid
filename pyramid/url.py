@@ -606,10 +606,11 @@ class URLMethodsMixin(object):
             if local_url is not None:
                 # the resource handles its own url generation
                 d = dict(
-                    virtual_path = virtual_path,
-                    physical_path = url_adapter.physical_path,
-                    app_url = app_url,
-                    )
+                    virtual_path=virtual_path,
+                    physical_path=url_adapter.physical_path,
+                    app_url=app_url,
+                )
+
                 # allow __resource_url__ to punt by returning None
                 resource_url = local_url(self, d)
 
@@ -698,7 +699,7 @@ class URLMethodsMixin(object):
 
         """
         if not os.path.isabs(path):
-            if not ':' in path:
+            if ':' not in path:
                 # if it's not a package:relative/name and it's not an
                 # /absolute/path it's a relative/path; this means its relative
                 # to the package in which the caller's module is defined.
@@ -743,7 +744,7 @@ class URLMethodsMixin(object):
            to ``static_path`` will be ignored.
         """
         if not os.path.isabs(path):
-            if not ':' in path:
+            if ':' not in path:
                 # if it's not a package:relative/name and it's not an
                 # /absolute/path it's a relative/path; this means its relative
                 # to the package in which the caller's module is defined.
@@ -884,6 +885,7 @@ def resource_url(resource, request, *elements, **kw):
 
 model_url = resource_url # b/w compat (forever)
 
+
 def static_url(path, request, **kw):
     """
     This is a backwards compatibility function.  Its result is the same as
@@ -894,13 +896,14 @@ def static_url(path, request, **kw):
     See :meth:`pyramid.request.Request.static_url` for more information.
     """
     if not os.path.isabs(path):
-        if not ':' in path:
+        if ':' not in path:
             # if it's not a package:relative/name and it's not an
             # /absolute/path it's a relative/path; this means its relative
             # to the package in which the caller's module is defined.
             package = caller_package()
             path = '%s:%s' % (package.__name__, path)
     return request.static_url(path, **kw)
+
 
 def static_path(path, request, **kw):
     """
@@ -912,7 +915,7 @@ def static_path(path, request, **kw):
     See :meth:`pyramid.request.Request.static_path` for more information.
     """
     if not os.path.isabs(path):
-        if not ':' in path:
+        if ':' not in path:
             # if it's not a package:relative/name and it's not an
             # /absolute/path it's a relative/path; this means its relative
             # to the package in which the caller's module is defined.

@@ -116,10 +116,10 @@ Substitution of response headers into template values is always performed.
 Substitution of WSGI environment values is performed if a ``request`` is
 passed to the exception's constructor.
 
-The subclasses of :class:`~_HTTPMove` 
+The subclasses of :class:`~_HTTPMove`
 (:class:`~HTTPMultipleChoices`, :class:`~HTTPMovedPermanently`,
 :class:`~HTTPFound`, :class:`~HTTPSeeOther`, :class:`~HTTPUseProxy` and
-:class:`~HTTPTemporaryRedirect`) are redirections that require a ``Location`` 
+:class:`~HTTPTemporaryRedirect`) are redirections that require a ``Location``
 field. Reflecting this, these subclasses have one additional keyword argument:
 ``location``, which indicates the location to which to redirect.
 """
@@ -296,7 +296,7 @@ class HTTPError(HTTPException):
     base class for exceptions with status codes in the 400s and 500s
 
     This is an exception which indicates that an error has occurred,
-    and that any work in progress should not be committed.  
+    and that any work in progress should not be committed.
     """
 
 class HTTPRedirection(HTTPException):
@@ -324,7 +324,7 @@ class HTTPOk(HTTPSuccessful):
     subclass of :class:`~HTTPSuccessful`
 
     Indicates that the request has succeeded.
-    
+
     code: 200, title: OK
     """
     code = 200
@@ -336,7 +336,7 @@ class HTTPCreated(HTTPSuccessful):
 
     This indicates that request has been fulfilled and resulted in a new
     resource being created.
-    
+
     code: 201, title: Created
     """
     code = 201
@@ -375,7 +375,7 @@ class HTTPNoContent(HTTPSuccessful):
     This indicates that the server has fulfilled the request but does
     not need to return an entity-body, and might want to return updated
     metainformation.
-    
+
     code: 204, title: No Content
     """
     code = 204
@@ -389,7 +389,7 @@ class HTTPResetContent(HTTPSuccessful):
     This indicates that the server has fulfilled the request and
     the user agent SHOULD reset the document view which caused the
     request to be sent.
-    
+
     code: 205, title: Reset Content
     """
     code = 205
@@ -402,7 +402,7 @@ class HTTPPartialContent(HTTPSuccessful):
 
     This indicates that the server has fulfilled the partial GET
     request for the resource.
-    
+
     code: 206, title: Partial Content
     """
     code = 206
@@ -460,7 +460,7 @@ class HTTPMultipleChoices(_HTTPMove):
     and agent-driven negotiation information is being provided so that
     the user can select a preferred representation and redirect its
     request to that location.
-    
+
     code: 300, title: Multiple Choices
     """
     code = 300
@@ -485,7 +485,7 @@ class HTTPFound(_HTTPMove):
 
     This indicates that the requested resource resides temporarily under
     a different URI.
-    
+
     code: 302, title: Found
     """
     code = 302
@@ -501,7 +501,7 @@ class HTTPSeeOther(_HTTPMove):
     This indicates that the response to the request can be found under
     a different URI and SHOULD be retrieved using a GET method on that
     resource.
-    
+
     code: 303, title: See Other
     """
     code = 303
@@ -528,7 +528,7 @@ class HTTPUseProxy(_HTTPMove):
 
     This indicates that the requested resource MUST be accessed through
     the proxy given by the Location field.
-    
+
     code: 305, title: Use Proxy
     """
     # Not a move, but looks a little like one
@@ -543,7 +543,7 @@ class HTTPTemporaryRedirect(_HTTPMove):
 
     This indicates that the requested resource resides temporarily
     under a different URI.
-    
+
     code: 307, title: Temporary Redirect
     """
     code = 307
@@ -583,7 +583,7 @@ class HTTPUnauthorized(HTTPClientError):
     subclass of :class:`~HTTPClientError`
 
     This indicates that the request requires user authentication.
-    
+
     code: 401, title: Unauthorized
     """
     code = 401
@@ -597,7 +597,7 @@ class HTTPUnauthorized(HTTPClientError):
 class HTTPPaymentRequired(HTTPClientError):
     """
     subclass of :class:`~HTTPClientError`
-    
+
     code: 402, title: Payment Required
     """
     code = 402
@@ -636,7 +636,7 @@ class HTTPForbidden(HTTPClientError):
     # differences from webob.exc.HTTPForbidden:
     #
     # - accepts a ``result`` keyword argument
-    # 
+    #
     # - overrides constructor to set ``self.result``
     #
     # differences from older ``pyramid.exceptions.Forbidden``:
@@ -659,7 +659,7 @@ class HTTPNotFound(HTTPClientError):
 
     This indicates that the server did not find anything matching the
     Request-URI.
-    
+
     code: 404, title: Not Found
 
     Raise this exception within :term:`view` code to immediately
@@ -702,7 +702,7 @@ class HTTPNotAcceptable(HTTPClientError):
     capable of generating response entities which have content
     characteristics not acceptable according to the accept headers
     sent in the request.
-    
+
     code: 406, title: Not Acceptable
     """
     # differences from webob.exc.HTTPNotAcceptable:
@@ -717,7 +717,7 @@ class HTTPProxyAuthenticationRequired(HTTPClientError):
 
     This is similar to 401, but indicates that the client must first
     authenticate itself with the proxy.
-    
+
     code: 407, title: Proxy Authentication Required
     """
     code = 407
@@ -730,7 +730,7 @@ class HTTPRequestTimeout(HTTPClientError):
 
     This indicates that the client did not produce a request within
     the time that the server was prepared to wait.
-    
+
     code: 408, title: Request Timeout
     """
     code = 408
@@ -744,7 +744,7 @@ class HTTPConflict(HTTPClientError):
 
     This indicates that the request could not be completed due to a
     conflict with the current state of the resource.
-    
+
     code: 409, title: Conflict
     """
     code = 409
@@ -758,7 +758,7 @@ class HTTPGone(HTTPClientError):
 
     This indicates that the requested resource is no longer available
     at the server and no forwarding address is known.
-    
+
     code: 410, title: Gone
     """
     code = 410
@@ -772,7 +772,7 @@ class HTTPLengthRequired(HTTPClientError):
 
     This indicates that the server refuses to accept the request
     without a defined Content-Length.
-    
+
     code: 411, title: Length Required
     """
     code = 411
@@ -786,7 +786,7 @@ class HTTPPreconditionFailed(HTTPClientError):
     This indicates that the precondition given in one or more of the
     request-header fields evaluated to false when it was tested on the
     server.
-    
+
     code: 412, title: Precondition Failed
     """
     code = 412
@@ -814,7 +814,7 @@ class HTTPRequestURITooLong(HTTPClientError):
     This indicates that the server is refusing to service the request
     because the Request-URI is longer than the server is willing to
     interpret.
-    
+
     code: 414, title: Request-URI Too Long
     """
     code = 414
@@ -828,7 +828,7 @@ class HTTPUnsupportedMediaType(HTTPClientError):
     This indicates that the server is refusing to service the request
     because the entity of the request is in a format not supported by
     the requested resource for the requested method.
-    
+
     code: 415, title: Unsupported Media Type
     """
     # differences from webob.exc.HTTPUnsupportedMediaType:
@@ -846,7 +846,7 @@ class HTTPRequestRangeNotSatisfiable(HTTPClientError):
     range-specifier values in this field overlap the current extent
     of the selected resource, and the request did not include an
     If-Range request-header field.
-    
+
     code: 416, title: Request Range Not Satisfiable
     """
     code = 416
@@ -859,7 +859,7 @@ class HTTPExpectationFailed(HTTPClientError):
 
     This indidcates that the expectation given in an Expect
     request-header field could not be met by this server.
-    
+
     code: 417, title: Expectation Failed
     """
     code = 417
@@ -871,13 +871,13 @@ class HTTPUnprocessableEntity(HTTPClientError):
     subclass of :class:`~HTTPClientError`
 
     This indicates that the server is unable to process the contained
-    instructions. 
+    instructions.
 
     May be used to notify the client that their JSON/XML is well formed, but
     not correct for the current request.
 
     See RFC4918 section 11 for more information.
-    
+
     code: 422, title: Unprocessable Entity
     """
     ## Note: from WebDAV
@@ -890,7 +890,7 @@ class HTTPLocked(HTTPClientError):
     subclass of :class:`~HTTPClientError`
 
     This indicates that the resource is locked.
-    
+
     code: 423, title: Locked
     """
     ## Note: from WebDAV
@@ -904,7 +904,7 @@ class HTTPFailedDependency(HTTPClientError):
 
     This indicates that the method could not be performed because the
     requested action depended on another action and that action failed.
-    
+
     code: 424, title: Failed Dependency
     """
     ## Note: from WebDAV
@@ -1003,7 +1003,7 @@ class HTTPNotImplemented(HTTPServerError):
 
     This indicates that the server does not support the functionality
     required to fulfill the request.
-    
+
     code: 501, title: Not Implemented
     """
     # differences from webob.exc.HTTPNotAcceptable:
@@ -1019,7 +1019,7 @@ class HTTPBadGateway(HTTPServerError):
     This indicates that the server, while acting as a gateway or proxy,
     received an invalid response from the upstream server it accessed
     in attempting to fulfill the request.
-    
+
     code: 502, title: Bad Gateway
     """
     code = 502
@@ -1032,7 +1032,7 @@ class HTTPServiceUnavailable(HTTPServerError):
 
     This indicates that the server is currently unable to handle the
     request due to a temporary overloading or maintenance of the server.
-    
+
     code: 503, title: Service Unavailable
     """
     code = 503
@@ -1075,7 +1075,7 @@ class HTTPInsufficientStorage(HTTPServerError):
 
     This indicates that the server does not have enough space to save
     the resource.
-    
+
     code: 507, title: Insufficient Storage
     """
     code = 507
@@ -1100,7 +1100,7 @@ def default_exceptionresponse_view(context, request):
         context = request.exception or context
     return context # assumed to be an IResponse
 
-status_map={}
+status_map = {}
 code = None
 for name, value in list(globals().items()):
     if (isinstance(value, class_types) and

@@ -33,7 +33,7 @@ class PredicateMismatch(HTTPNotFound):
     be treated as :class:`HTTPNotFound`` by any exception view
     registrations. Thus, typically, this exception will not be seen
     publicly.
-    
+
     However, this exception will be raised if the predicates of all
     views configured to handle another exception context cannot be
     successfully matched.  For instance, if a view is configured to
@@ -79,7 +79,7 @@ class ConfigurationConflictError(ConfigurationError):
             r.append("  For: %s" % (discriminator, ))
             for info in infos:
                 for line in str(info).rstrip().split(CR):
-                    r.append("    "+line)
+                    r.append("    " + line)
 
         return CR.join(r)
 
@@ -109,5 +109,3 @@ class CyclicDependencyError(Exception):
             L.append('%r sorts before %r' % (dependent, dependees))
         msg = 'Implicit ordering cycle:' + '; '.join(L)
         return msg
-
-

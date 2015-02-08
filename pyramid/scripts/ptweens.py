@@ -42,7 +42,7 @@ class PTweensCommand(object):
 
     def _get_tweens(self, registry):
         from pyramid.config import Configurator
-        config = Configurator(registry = registry)
+        config = Configurator(registry=registry)
         return config.registry.queryUtility(ITweens)
 
     def out(self, msg): # pragma: no cover
@@ -52,7 +52,7 @@ class PTweensCommand(object):
     def show_chain(self, chain):
         fmt = '%-10s  %-65s'
         self.out(fmt % ('Position', 'Name'))
-        self.out(fmt % ('-'*len('Position'), '-'*len('Name')))
+        self.out(fmt % ('-' * len('Position'), '-' * len('Name')))
         self.out(fmt % ('-', INGRESS))
         for pos, (name, _) in enumerate(chain):
             self.out(fmt % (pos, name))

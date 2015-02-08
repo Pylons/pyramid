@@ -149,7 +149,7 @@ class IResponse(Interface):
         """Gets and sets and deletes the Content-MD5 header. For more
         information on Content-MD5 see RFC 2616 section 14.14.""")
 
-    content_range  = Attribute(
+    content_range = Attribute(
         """Gets and sets and deletes the Content-Range header. For more
         information on Content-Range see section 14.16. Converts using
         ContentRange object.""")

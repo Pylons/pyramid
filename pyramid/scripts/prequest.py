@@ -52,8 +52,10 @@ class PRequestCommand(object):
     parser.add_option(
         '-n', '--app-name',
         dest='app_name',
-        metavar= 'NAME',
-        help="Load the named application from the config file (default 'main')",
+        metavar='NAME',
+        help=(
+            "Load the named application from the config file (default 'main')"
+        ),
         type="string",
         )
     parser.add_option(
@@ -62,8 +64,10 @@ class PRequestCommand(object):
         metavar='NAME:VALUE',
         type='string',
         action='append',
-        help="Header to add to request (you can use this option multiple times)"
-        )
+        help=(
+            "Header to add to request (you can use this option multiple times)"
+        ),
+    )
     parser.add_option(
         '-d', '--display-headers',
         dest='display_headers',
@@ -167,7 +171,7 @@ class PRequestCommand(object):
             if name.lower() == 'content-type':
                 name = 'CONTENT_TYPE'
             else:
-                name = 'HTTP_'+name.upper().replace('-', '_')
+                name = 'HTTP_' + name.upper().replace('-', '_')
             environ[name] = value
 
         request = Request.blank(path, environ=environ)

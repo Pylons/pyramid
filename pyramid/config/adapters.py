@@ -255,7 +255,7 @@ class AdaptersConfiguratorMixin(object):
         See :ref:`changing_the_traverser` for more information.
         """
         iface = self.maybe_dotted(iface)
-        adapter= self.maybe_dotted(adapter)
+        adapter = self.maybe_dotted(adapter)
         def register(iface=iface):
             if iface is None:
                 iface = Interface
