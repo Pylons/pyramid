@@ -5,6 +5,7 @@ from pyramid.interfaces import (
     IAuthenticationPolicy,
     IAuthorizationPolicy,
     ISecuredView,
+    ISessionFactory,
     IView,
     IViewClassifier,
     )
@@ -161,6 +162,32 @@ def remember(request, userid=_marker, **kw):
     policy = _get_authentication_policy(request)
     if policy is None:
         return []
+
+    session_factory = request.registry.queryUtility(ISessionFactory)
+    if session_factory is not None:
+        # We have a session factory associated with this request, so in order
+        # to protect against session fixation attacks we're going to make sure
+        # that we create a new session (which for sessions with an identifier
+        # will cause it to get a new session identifier).
+        if (request.unauthenticated_userid is not None
+                and request.unauthenticated_userid != userid):
+            # There is already a userid associated with this request and it is
+            # a different userid than the one we're trying to remember now. In
+            # this case we want to drop the existing session completely because
+            # we don't want to leak any data between authenticated userids.
+            request.session.invalidate()
+        else:
+            # We either do not have an associated userid with this request
+            # already, or the userid is the same one we're trying to remember
+            # now. In either case we want to keep all of the data but we want
+            # to make sure that we create a new session since we're crossing
+            # a privilege boundary.
+            # Note: IDict doesn't promise a copy() method, we'll fake it with
+            #       dict(IDict().items()).
+            data = dict(request.session.items())
+            request.session.invalidate()
+            request.session.update(data)
+
     return policy.remember(request, userid, **kw)
 
 def forget(request):
@@ -185,6 +212,19 @@ def forget(request):
     policy = _get_authentication_policy(request)
     if policy is None:
         return []
+
+    session_factory = request.registry.queryUtility(ISessionFactory)
+    if session_factory is not None:
+        # When crossing an authentication boundry we want to create a new
+        # session identifier. We don't want to keep any information in the
+        # session when going from authenticated to unauthenticated because
+        # user's generally expect that logging out is a desctructive action
+        # that erases all of their private data. However if we don't clear the
+        # session then another user can use the computer after them, log in to
+        # their account, and then gain access to anything sensitive stored in
+        # the session for the original user.
+        request.session.invalidate()
+
     return policy.forget(request)
 
 def principals_allowed_by_permission(context, permission):

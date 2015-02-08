@@ -128,6 +128,14 @@ Features
   that as the response class instead of the default ``HTTPFound``.  See
   https://github.com/Pylons/pyramid/pull/1610
 
+- Protect against session fixation attacks and leaking session data across
+  privilege boundaries by ensuring that ``pyramid.security.remember`` and
+  ``pyramid.security.forget`` invalidate the old session when a session factory
+  has been configured. However, ensure that session data is kept intact when
+  calling ``pyramid.security.remember()`` when the previous userid was either
+  ``None`` or the same as the userid that is being remembered.
+  See https://github.com/Pylons/pyramid/pull/1570
+
 Bug Fixes
 ---------
 
