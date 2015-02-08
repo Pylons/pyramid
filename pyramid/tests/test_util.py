@@ -1,9 +1,11 @@
 import unittest
 from pyramid.compat import PY3
 
+
 class Test_InstancePropertyMixin(unittest.TestCase):
     def _makeOne(self):
         cls = self._getTargetClass()
+
         class Foo(cls):
             pass
         return Foo()
@@ -637,8 +639,14 @@ class TestActionInfo(unittest.TestCase):
 class TestCallableName(unittest.TestCase):
     def test_valid_ascii(self):
         from pyramid.util import get_callable_name
-        name = u'hello world'
-        self.assertEquals(get_callable_name(name), name)
+        from pyramid.compat import text_, PY3
+
+        if PY3:  # pragma: nocover
+            name = b'hello world'
+        else:  # pragma: nocover
+            name = text_(b'hello world', 'utf-8')
+
+        self.assertEquals(get_callable_name(name), 'hello world')
 
     def test_invalid_ascii(self):
         from pyramid.util import get_callable_name
