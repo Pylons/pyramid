@@ -126,7 +126,7 @@ def check_csrf_token(request,
     .. versionadded:: 1.4a2
     """
     supplied_token = request.params.get(token, request.headers.get(header))
-    if supplied_token != request.session.get_csrf_token():
+    if strings_differ(request.session.get_csrf_token(), supplied_token):
         if raises:
             raise BadCSRFToken('check_csrf_token(): Invalid token')
         return False
