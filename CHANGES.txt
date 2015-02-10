@@ -18,6 +18,9 @@ Next release
 - Prevent "parameters to load are deprecated" ``DeprecationWarning``
   from setuptools>=11.3. See https://github.com/Pylons/pyramid/pull/1541
 
+- Avoiding timing attacks against CSRF tokens. Backported from
+  https://github.com/Pylons/pyramid/pull/1574
+
 .. _changes_1.5.2:
 
 1.5.2 (2014-11-09)
