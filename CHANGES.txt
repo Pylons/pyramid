@@ -133,6 +133,9 @@ Bug Fixes
 - Prevent "parameters to load are deprecated" ``DeprecationWarning``
   from setuptools>=11.3. See https://github.com/Pylons/pyramid/pull/1541
 
+- Avoiding timing attacks against CSRF tokens.
+  See https://github.com/Pylons/pyramid/pull/1574
+
 Deprecations
 ------------
 
