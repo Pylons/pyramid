@@ -128,6 +128,13 @@ Bug Fixes
 - Prevent "parameters to load are deprecated" ``DeprecationWarning``
   from setuptools>=11.3. See https://github.com/Pylons/pyramid/pull/1541
 
+- Avoiding sharing the ``IRenderer`` objects across threads when attached to
+  a view using the `renderer=` argument. These renderers were instantiated
+  at time of first render and shared between requests, causing potentially
+  subtle effects like `pyramid.reload_templates = true` failing to work
+  in `pyramid_mako`. See https://github.com/Pylons/pyramid/pull/1575
+  and https://github.com/Pylons/pyramid/issues/1268
+
 Deprecations
 ------------
 
