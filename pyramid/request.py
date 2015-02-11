@@ -10,7 +10,6 @@ from pyramid.interfaces import (
     IRequest,
     IResponse,
     ISessionFactory,
-    IResponseFactory,
     )
 
 from pyramid.compat import (
@@ -21,7 +20,7 @@ from pyramid.compat import (
 
 from pyramid.decorator import reify
 from pyramid.i18n import LocalizerRequestMixin
-from pyramid.response import Response
+from pyramid.response import Response,  _get_response_factory
 from pyramid.security import (
     AuthenticationAPIMixin,
     AuthorizationAPIMixin,
@@ -214,10 +213,8 @@ class Request(
         right" attributes (e.g. by calling ``request.response.set_cookie()``)
         within a view that uses a renderer.  Mutations to this response object
         will be preserved in the response sent to the client."""
-        registry = self.registry
-        response_factory = registry.queryUtility(IResponseFactory,
-                                                 default=Response)
-        return response_factory()
+        response_factory = _get_response_factory(self.registry)
+        return response_factory(self)
 
     def is_response(self, ob):
         """ Return ``True`` if the object passed as ``ob`` is a valid

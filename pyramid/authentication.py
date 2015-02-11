@@ -3,7 +3,6 @@ from codecs import utf_8_decode
 from codecs import utf_8_encode
 import hashlib
 import base64
-import datetime
 import re
 import time as time_mod
 import warnings
@@ -741,7 +740,7 @@ def parse_ticket(secret, ticket, ip, hashalg='md5'):
     If the ticket cannot be parsed, a ``BadTicket`` exception will be raised
     with an explanation.
     """
-    ticket = ticket.strip('"')
+    ticket = native_(ticket).strip('"')
     digest_size = hashlib.new(hashalg).digest_size * 2
     digest = ticket[:digest_size]
     try:
@@ -929,7 +928,7 @@ class AuthTktCookieHelper(object):
 
         if reissue and not hasattr(request, '_authtkt_reissued'):
             if ( (now - timestamp) > self.reissue_time ):
-                # work around https://github.com/Pylons/pyramid/issues#issue/108
+                # See https://github.com/Pylons/pyramid/issues#issue/108
                 tokens = list(filter(None, tokens))
                 headers = self.remember(request, userid, max_age=self.max_age,
                                         tokens=tokens)

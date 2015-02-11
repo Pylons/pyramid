@@ -128,8 +128,9 @@ functions accepts various arguments that influence the environment of the
 test.  See the :ref:`testing_module` API for information about the extra
 arguments supported by these functions.
 
-If you also want to make :func:`~pyramid.threadlocal.get_current_request` return something
-other than ``None`` during the course of a single test, you can pass a
+If you also want to make :func:`~pyramid.threadlocal.get_current_request`
+return something other than ``None`` during the course of a single test, you
+can pass a
 :term:`request` object into the :func:`pyramid.testing.setUp` within the
 ``setUp`` method of your test:
 
@@ -333,66 +334,49 @@ Creating Integration Tests
 --------------------------
 
 In :app:`Pyramid`, a *unit test* typically relies on "mock" or "dummy"
-implementations to give the code under test only enough context to run.
+implementations to give the code under test enough context to run.
 
 "Integration testing" implies another sort of testing.  In the context of a
-:app:`Pyramid` integration test, the test logic tests the functionality of
-some code *and* its integration with the rest of the :app:`Pyramid`
+:app:`Pyramid` integration test, the test logic exercises the functionality of
+the code under test *and* its integration with the rest of the :app:`Pyramid`
 framework.
 
-In :app:`Pyramid` applications that are plugins to Pyramid, you can create an
-integration test by including its ``includeme`` function via
-:meth:`pyramid.config.Configurator.include` in the test's setup code.  This
-causes the entire :app:`Pyramid` environment to be set up and torn down as if
-your application was running "for real".  This is a heavy-hammer way of
-making sure that your tests have enough context to run properly, and it tests
-your code's integration with the rest of :app:`Pyramid`.
+Creating an integration test for a :app:`Pyramid` application usually means
+invoking the application's ``includeme`` function via
+:meth:`pyramid.config.Configurator.include` within the test's setup code.  This
+causes the entire :app:`Pyramid` environment to be set up, simulating what
+happens when your application is run "for real".  This is a heavy-hammer way of
+making sure that your tests have enough context to run properly, and tests your
+code's integration with the rest of :app:`Pyramid`.
 
-Let's demonstrate this by showing an integration test for a view.  The below
-test assumes that your application's package name is ``myapp``, and that
-there is a ``views`` module in the app with a function with the name
-``my_view`` in it that returns the response 'Welcome to this application'
-after accessing some values that require a fully set up environment.
+.. seealso::
 
-.. code-block:: python
-   :linenos:
+   See also :ref:`including_configuration`
 
-   import unittest
+Let's demonstrate this by showing an integration test for a view.
 
-   from pyramid import testing
+Given the following view definition, which assumes that your application's
+:term:`package` name is ``myproject``, and within that :term:`package` there
+exists a module ``views``, which in turn contains a :term:`view` function named
+``my_view``:
 
-   class ViewIntegrationTests(unittest.TestCase):
-       def setUp(self):
-           """ This sets up the application registry with the
-           registrations your application declares in its ``includeme`` 
-           function.
-           """
-           import myapp
-           self.config = testing.setUp()
-           self.config.include('myapp')
+   .. literalinclude:: MyProject/myproject/views.py
+      :linenos:
+      :lines: 1-6
+      :language: python
 
-       def tearDown(self):
-           """ Clear out the application registry """
-           testing.tearDown()
+You'd then create a ``tests`` module within your ``myproject`` package,
+containing the following test code:
 
-       def test_my_view(self):
-           from myapp.views import my_view
-           request = testing.DummyRequest()
-           result = my_view(request)
-           self.assertEqual(result.status, '200 OK')
-           body = result.app_iter[0]
-           self.assertTrue('Welcome to' in body)
-           self.assertEqual(len(result.headerlist), 2)
-           self.assertEqual(result.headerlist[0],
-                            ('Content-Type', 'text/html; charset=UTF-8'))
-           self.assertEqual(result.headerlist[1], ('Content-Length',
-                                                   str(len(body))))
+   .. literalinclude:: MyProject/myproject/tests.py
+      :linenos:
+      :pyobject: ViewIntegrationTests
+      :language: python
 
-Unless you cannot avoid it, you should prefer writing unit tests that use the
-:class:`~pyramid.config.Configurator` API to set up the right "mock"
-registrations rather than creating an integration test.  Unit tests will run
-faster (because they do less for each test) and the result of a unit test is
-usually easier to make assertions about.
+Writing unit tests that use the :class:`~pyramid.config.Configurator` API to
+set up the right "mock" registrations is often preferred to creating
+integration tests.  Unit tests will run faster (because they do less for each
+test) and are usually easier to reason about.
 
 .. index::
    single: functional tests
@@ -404,34 +388,40 @@ Creating Functional Tests
 
 Functional tests test your literal application.
 
-The below test assumes that your application's package name is ``myapp``, and
-that there is a view that returns an HTML body when the root URL is invoked.
-It further assumes that you've added a ``tests_require`` dependency on the
-``WebTest`` package within your ``setup.py`` file.  :term:`WebTest` is a
-functional testing package written by Ian Bicking.
+In Pyramid, functional tests are typically written using the :term:`WebTest`
+package, which provides APIs for invoking HTTP(S) requests to your application.
 
-.. code-block:: python
-   :linenos:
+Regardless of which testing :term:`package` you use, ensure to add a
+``tests_require`` dependency on that package to to your application's
+``setup.py`` file:
 
-   import unittest
+   .. literalinclude:: MyProject/setup.py
+      :linenos:
+      :emphasize-lines: 26-28,48
+      :language: python
 
-   class FunctionalTests(unittest.TestCase):
-       def setUp(self):
-           from myapp import main
-           app = main({})
-           from webtest import TestApp
-           self.testapp = TestApp(app)
+Assuming your :term:`package` is named ``myproject``, which contains a
+``views`` module, which in turn contains a :term:`view` function ``my_view``
+that returns a HTML body when the root URL is invoked:
 
-       def test_root(self):
-           res = self.testapp.get('/', status=200)
-           self.assertTrue('Pyramid' in res.body)
+   .. literalinclude:: MyProject/myproject/views.py
+      :linenos:
+      :language: python
 
-When this test is run, each test creates a "real" WSGI application using the
-``main`` function in your ``myapp.__init__`` module and uses :term:`WebTest`
-to wrap that WSGI application.  It assigns the result to ``self.testapp``.
-In the test named ``test_root``, we use the testapp's ``get`` method to
-invoke the root URL.  We then assert that the returned HTML has the string
-``Pyramid`` in it.
+Then the following example functional test (shown below) demonstrates invoking
+the :term:`view` shown above:
+
+   .. literalinclude:: MyProject/myproject/tests.py
+      :linenos:
+      :pyobject: FunctionalTests
+      :language: python
+
+When this test is run, each test method creates a "real" :term:`WSGI`
+application using the ``main`` function in your ``myproject.__init__`` module,
+using :term:`WebTest` to wrap that WSGI application.  It assigns the result to
+``self.testapp``.  In the test named ``test_root``. The ``TestApp``'s ``get``
+method is used to invoke the root URL.  Finally, an assertion is made that the
+returned HTML contains the text ``MyProject``.
 
 See the :term:`WebTest` documentation for further information about the
 methods available to a :class:`webtest.app.TestApp` instance.

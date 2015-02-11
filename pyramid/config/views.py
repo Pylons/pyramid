@@ -42,7 +42,8 @@ from pyramid.compat import (
     url_quote,
     WIN,
     is_bound_method,
-    is_nonstr_iter
+    is_unbound_method,
+    is_nonstr_iter,
     )
 
 from pyramid.exceptions import (
@@ -418,6 +419,12 @@ class DefaultViewMapper(object):
         self.attr = kw.get('attr')
 
     def __call__(self, view):
+        if is_unbound_method(view) and self.attr is None:
+            raise ConfigurationError((
+                'Unbound method calls are not supported, please set the class '
+                'as your `view` and the method as your `attr`'
+            ))
+
         if inspect.isclass(view):
             view = self.map_class(view)
         else:
@@ -841,6 +848,18 @@ class ViewsConfiguratorMixin(object):
           very useful for 'civilians' who are just developing stock Pyramid
           applications. Pay no attention to the man behind the curtain.
 
+        accept
+
+          This value represents a match query for one or more mimetypes in the
+          ``Accept`` HTTP request header.  If this value is specified, it must
+          be in one of the following forms: a mimetype match token in the form
+          ``text/plain``, a wildcard mimetype match token in the form
+          ``text/*`` or a match-all wildcard mimetype match token in the form
+          ``*/*``.  If any of the forms matches the ``Accept`` header of the
+          request, or if the ``Accept`` header isn't set at all in the request,
+          this will match the current view. If this does not match the
+          ``Accept`` header of the request, view matching continues.
+
         Predicate Arguments
 
         name
@@ -940,17 +959,6 @@ class ViewsConfiguratorMixin(object):
           ``XMLHttpRequest`` for this view to be found and called.
           This is useful for detecting AJAX requests issued from
           jQuery, Prototype and other Javascript libraries.
-
-        accept
-
-          The value of this argument represents a match query for one
-          or more mimetypes in the ``Accept`` HTTP request header.  If
-          this value is specified, it must be in one of the following
-          forms: a mimetype match token in the form ``text/plain``, a
-          wildcard mimetype match token in the form ``text/*`` or a
-          match-all wildcard mimetype match token in the form ``*/*``.
-          If any of the forms matches the ``Accept`` header of the
-          request, this predicate will be true.
 
         header
 

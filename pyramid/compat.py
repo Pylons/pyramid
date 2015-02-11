@@ -3,21 +3,21 @@ import platform
 import sys
 import types
 
-if platform.system() == 'Windows': # pragma: no cover
+if platform.system() == 'Windows':  # pragma: no cover
     WIN = True
-else: # pragma: no cover
+else:  # pragma: no cover
     WIN = False
 
-try: # pragma: no cover
+try:  # pragma: no cover
     import __pypy__
     PYPY = True
-except: # pragma: no cover
+except:  # pragma: no cover
     __pypy__ = None
     PYPY = False
 
 try:
     import cPickle as pickle
-except ImportError: # pragma: no cover
+except ImportError:  # pragma: no cover
     import pickle
 
 # True if we are running on Python 3.
@@ -112,17 +112,18 @@ else:
     from urllib import unquote as url_unquote
     from urllib import urlencode as url_encode
     from urllib2 import urlopen as url_open
+
     def url_unquote_text(v, encoding='utf-8', errors='replace'): # pragma: no cover
         v = url_unquote(v)
         return v.decode(encoding, errors)
+
     def url_unquote_native(v, encoding='utf-8', errors='replace'): # pragma: no cover
         return native_(url_unquote_text(v, encoding, errors))
-        
 
-if PY3: # pragma: no cover
+
+if PY3:  # pragma: no cover
     import builtins
     exec_ = getattr(builtins, "exec")
-
 
     def reraise(tp, value, tb=None):
         if value is None:
@@ -131,10 +132,9 @@ if PY3: # pragma: no cover
             raise value.with_traceback(tb)
         raise value
 
-
     del builtins
 
-else: # pragma: no cover
+else:  # pragma: no cover
     def exec_(code, globs=None, locs=None):
         """Execute code in a namespace."""
         if globs is None:
@@ -147,24 +147,27 @@ else: # pragma: no cover
             locs = globs
         exec("""exec code in globs, locs""")
 
-
     exec_("""def reraise(tp, value, tb=None):
     raise tp, value, tb
 """)
 
 
-if PY3: # pragma: no cover
+if PY3:  # pragma: no cover
     def iteritems_(d):
         return d.items()
+
     def itervalues_(d):
         return d.values()
+
     def iterkeys_(d):
         return d.keys()
-else: # pragma: no cover
+else:  # pragma: no cover
     def iteritems_(d):
         return d.iteritems()
+
     def itervalues_(d):
         return d.itervalues()
+
     def iterkeys_(d):
         return d.iterkeys()
 
@@ -174,7 +177,7 @@ if PY3:
         return list(map(*arg))
 else:
     map_ = map
-    
+
 if PY3:
     def is_nonstr_iter(v):
         if isinstance(v, str):
@@ -183,7 +186,7 @@ if PY3:
 else:
     def is_nonstr_iter(v):
         return hasattr(v, '__iter__')
-    
+
 if PY3:
     im_func = '__func__'
     im_self = '__self__'
@@ -212,6 +215,11 @@ else:
     input_ = raw_input
 
 if PY3:
+    from inspect import getfullargspec as getargspec
+else:
+    from inspect import getargspec
+
+if PY3:
     from io import StringIO as NativeIO
 else:
     from io import BytesIO as NativeIO
@@ -220,7 +228,6 @@ else:
 # versions which attempt to import it
 import json
 
-    
 if PY3:
     # see PEP 3333 for why we encode WSGI PATH_INFO to latin-1 before
     # decoding it to utf-8
@@ -233,13 +240,34 @@ else:
 if PY3:
     # see PEP 3333 for why we decode the path to latin-1 
     from urllib.parse import unquote_to_bytes
+
     def unquote_bytes_to_wsgi(bytestring):
         return unquote_to_bytes(bytestring).decode('latin-1')
 else:
     from urlparse import unquote as unquote_to_bytes
+
     def unquote_bytes_to_wsgi(bytestring):
         return unquote_to_bytes(bytestring)
+
 
 def is_bound_method(ob):
     return inspect.ismethod(ob) and getattr(ob, im_self, None) is not None
 
+
+def is_unbound_method(fn):
+    """
+    This consistently verifies that the callable is bound to a
+    class.
+    """
+    is_bound = is_bound_method(fn)
+
+    if not is_bound and inspect.isroutine(fn):
+        spec = getargspec(fn)
+        has_self = len(spec.args) > 0 and spec.args[0] == 'self'
+
+        if PY3 and inspect.isfunction(fn) and has_self:  # pragma: no cover
+            return True
+        elif inspect.ismethod(fn):
+            return True
+
+    return False

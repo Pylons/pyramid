@@ -8,7 +8,8 @@ import venusian
 
 from webob import Response as _Response
 from zope.interface import implementer
-from pyramid.interfaces import IResponse
+from pyramid.interfaces import IResponse, IResponseFactory
+
 
 def init_mimetypes(mimetypes):
     # this is a function so it can be unittested
@@ -143,7 +144,7 @@ class response_adapter(object):
         @response_adapter(dict, list)
         def myadapter(ob):
             return Response(json.dumps(ob))
-        
+
     This method will have no effect until a :term:`scan` is performed
     agains the package or module which contains it, ala:
 
@@ -167,3 +168,15 @@ class response_adapter(object):
     def __call__(self, wrapped):
         self.venusian.attach(wrapped, self.register, category='pyramid')
         return wrapped
+
+
+def _get_response_factory(registry):
+    """ Obtain a :class: `pyramid.response.Response` using the
+    `pyramid.interfaces.IResponseFactory`.
+    """
+    response_factory = registry.queryUtility(
+        IResponseFactory,
+        default=lambda r: Response()
+    )
+
+    return response_factory

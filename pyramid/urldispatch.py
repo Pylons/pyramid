@@ -42,12 +42,17 @@ class Route(object):
 class RoutesMapper(object):
     def __init__(self):
         self.routelist = []
+        self.static_routes = []
+
         self.routes = {}
 
     def has_routes(self):
         return bool(self.routelist)
 
-    def get_routes(self):
+    def get_routes(self, include_static=False):
+        if include_static is True:
+            return self.routelist + self.static_routes
+
         return self.routelist
 
     def get_route(self, name):
@@ -59,9 +64,13 @@ class RoutesMapper(object):
             oldroute = self.routes[name]
             if oldroute in self.routelist:
                 self.routelist.remove(oldroute)
+
         route = Route(name, pattern, factory, predicates, pregenerator)
         if not static:
             self.routelist.append(route)
+        else:
+            self.static_routes.append(route)
+
         self.routes[name] = route
         return route
 

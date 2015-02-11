@@ -14,6 +14,18 @@
      accessed as ``request.registry.settings`` or
      ``config.registry.settings`` in a typical Pyramid application.
 
+   .. attribute:: package_name
+
+     .. versionadded:: 1.6
+
+     When a registry is set up (or created) by a :term:`Configurator`, this
+     attribute will be the shortcut for
+     :attr:`pyramid.config.Configurator.package_name`.
+
+     This attribute is often accessed as ``request.registry.package_name`` or
+     ``config.registry.package_name`` or ``config.package_name``
+     in a typical Pyramid application.
+
    .. attribute:: introspector
 
      .. versionadded:: 1.3

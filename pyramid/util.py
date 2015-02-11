@@ -22,6 +22,7 @@ from pyramid.compat import (
     string_types,
     text_,
     PY3,
+    native_
     )
 
 from pyramid.interfaces import IActionInfo
@@ -55,7 +56,7 @@ class InstancePropertyMixin(object):
                 raise ValueError('cannot reify a property')
         elif name is not None:
             fn = lambda this: callable(this)
-            fn.__name__ = name
+            fn.__name__ = get_callable_name(name)
             fn.__doc__ = callable.__doc__
         else:
             name = callable.__name__
@@ -112,6 +113,7 @@ class InstancePropertyMixin(object):
         for name, fn in iteritems_(extensions.methods):
             method = fn.__get__(self, self.__class__)
             setattr(self, name, method)
+
         self._set_properties(extensions.descriptors)
 
     def set_property(self, callable, name=None, reify=False):
@@ -551,3 +553,17 @@ def action_method(wrapped):
     wrapper.__docobj__ = wrapped
     return wrapper
 
+
+def get_callable_name(name):
+    """
+    Verifies that the ``name`` is ascii and will raise a ``ConfigurationError``
+    if it is not.
+    """
+    try:
+        return native_(name, 'ascii')
+    except (UnicodeEncodeError, UnicodeDecodeError):
+        msg = (
+            '`name="%s"` is invalid. `name` must be ascii because it is '
+            'used on __name__ of the method'
+        )
+        raise ConfigurationError(msg % name)

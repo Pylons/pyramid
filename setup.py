@@ -56,7 +56,7 @@ if not PY3:
     tests_require.append('zope.component>=3.11.0')
 
 docs_extras = [
-    'Sphinx',
+    'Sphinx >= 1.2.3',
     'docutils',
     'repoze.sphinx.autointerface',
     ]
@@ -68,7 +68,7 @@ testing_extras = tests_require + [
     ]
 
 setup(name='pyramid',
-      version='1.6dev',
+      version='1.6.dev0',
       description='The Pyramid Web Framework, a Pylons project',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
