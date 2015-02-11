@@ -1,16 +1,15 @@
 # Wire up travis
 language: python
-#
-#env:
-#  - TOXENV=clean
-#  - TOXENV=py26
-#  - TOXENV=py27
-#  - TOXENV=py32
-#  - TOXENV=py33
-#  - TOXENV=py34
-#  - TOXENV=pypy
-#  - TOXENV=pypy3
-#  - TOXENV=report
+
+env:
+  - TOXENV=py26
+  - TOXENV=py27
+  - TOXENV=py32
+  - TOXENV=py33
+  - TOXENV=py34
+  - TOXENV=pypy
+  - TOXENV=pypy3
+  - TOXENV=py26,py32,cover
 
 install:
   - travis_retry pip install tox
