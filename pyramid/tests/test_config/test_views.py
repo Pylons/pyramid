@@ -2534,6 +2534,8 @@ class TestViewDeriver(unittest.TestCase):
                 self.assertEqual(view_inst, view)
                 self.assertEqual(ctx, context)
                 return response
+            def clone(self):
+                return self
         def view(request):
             return 'OK'
         deriver = self._makeOne(renderer=moo())
@@ -2571,6 +2573,8 @@ class TestViewDeriver(unittest.TestCase):
                 self.assertEqual(view_inst, 'view')
                 self.assertEqual(ctx, context)
                 return response
+            def clone(self):
+                return self
         def view(request):
             return 'OK'
         deriver = self._makeOne(renderer=moo())
@@ -3165,6 +3169,8 @@ class TestViewDeriver(unittest.TestCase):
                 self.assertEqual(view_inst.__class__, View)
                 self.assertEqual(ctx, context)
                 return response
+            def clone(self):
+                return self
         class View(object):
             def __init__(self, context, request):
                 pass
@@ -3189,6 +3195,8 @@ class TestViewDeriver(unittest.TestCase):
                 self.assertEqual(view_inst.__class__, View)
                 self.assertEqual(ctx, context)
                 return response
+            def clone(self):
+                return self
         class View(object):
             def __init__(self, request):
                 pass
@@ -3213,6 +3221,8 @@ class TestViewDeriver(unittest.TestCase):
                 self.assertEqual(view_inst.__class__, View)
                 self.assertEqual(ctx, context)
                 return response
+            def clone(self):
+                return self
         class View:
             def __init__(self, context, request):
                 pass
@@ -3237,6 +3247,8 @@ class TestViewDeriver(unittest.TestCase):
                 self.assertEqual(view_inst.__class__, View)
                 self.assertEqual(ctx, context)
                 return response
+            def clone(self):
+                return self
         class View:
             def __init__(self, request):
                 pass
@@ -3261,6 +3273,8 @@ class TestViewDeriver(unittest.TestCase):
                 self.assertEqual(view_inst, view)
                 self.assertEqual(ctx, context)
                 return response
+            def clone(self):
+                return self
         class View:
             def index(self, context, request):
                 return {'a':'1'}
@@ -3283,6 +3297,8 @@ class TestViewDeriver(unittest.TestCase):
                 self.assertEqual(view_inst, view)
                 self.assertEqual(ctx, context)
                 return response
+            def clone(self):
+                return self
         class View:
             def index(self, request):
                 return {'a':'1'}
