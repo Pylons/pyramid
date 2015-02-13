@@ -88,6 +88,9 @@ Features
 Bug Fixes
 ---------
 
+- Work around an issue where ``pserve --reload`` would leave terminal echo
+  disabled if it reloaded during a pdb session.
+
 - ``pyramid.wsgi.wsgiapp`` and ``pyramid.wsgi.wsgiapp2`` now raise
   ``ValueError`` when accidentally passed ``None``.
   See https://github.com/Pylons/pyramid/pull/1320

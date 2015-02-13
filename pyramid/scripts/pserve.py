@@ -36,6 +36,11 @@ from pyramid.scripts.common import parse_vars
 
 MAXFD = 1024
 
+try:
+    import termios
+except ImportError: # pragma: no cover
+    termios = None
+
 if WIN and not hasattr(os, 'kill'): # pragma: no cover
     # py 2.6 on windows
     def kill(pid, sig=None):
@@ -709,6 +714,14 @@ def _turn_sigterm_into_systemexit(): # pragma: no cover
         raise SystemExit
     signal.signal(signal.SIGTERM, handle_term)
 
+def ensure_echo_on(): # pragma: no cover
+    if termios:
+        fd = sys.stdin.fileno()
+        attr_list = termios.tcgetattr(fd)
+        if not attr_list[3] & termios.ECHO:
+            attr_list[3] |= termios.ECHO
+            termios.tcsetattr(fd, termios.TCSANOW, attr_list)
+
 def install_reloader(poll_interval=1, extra_files=None): # pragma: no cover
     """
     Install the reloading monitor.
@@ -718,6 +731,7 @@ def install_reloader(poll_interval=1, extra_files=None): # pragma: no cover
     ``raise_keyboard_interrupt`` option creates a unignorable signal
     which causes the whole application to shut-down (rudely).
     """
+    ensure_echo_on()
     mon = Monitor(poll_interval=poll_interval)
     if extra_files is None:
         extra_files = []
