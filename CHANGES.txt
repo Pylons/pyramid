@@ -1,6 +1,10 @@
 Next release
 ============
 
+- Work around an issue where ``pserve --reload`` would leave terminal echo
+  disabled if it reloaded during a pdb session.
+  Backported from https://github.com/Pylons/pyramid/pull/1577
+
 - Fixed a failing unittest caused by differing mimetypes on various
   OS platforms. See https://github.com/Pylons/pyramid/issues/1405
 
