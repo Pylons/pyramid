@@ -234,3 +234,5 @@ Contributors
 - Fenton Travers, 2014/05/06
 
 - Geoffrey T. Dairiki, 2015/02/06
+
+- David Glick, 2015/02/12
