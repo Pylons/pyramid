@@ -14,8 +14,8 @@ from pyramid.traversal import DefaultRootFactory
 
 from pyramid.util import (
     action_method,
-    InstancePropertyMixin,
     get_callable_name,
+    InstancePropertyHelper,
     )
 
 
@@ -174,7 +174,7 @@ class FactoriesConfiguratorMixin(object):
 
         property = property or reify
         if property:
-            name, callable = InstancePropertyMixin._make_property(
+            name, callable = InstancePropertyHelper.make_property(
                 callable, name=name, reify=reify)
         elif name is None:
             name = callable.__name__
