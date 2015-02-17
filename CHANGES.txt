@@ -20,7 +20,10 @@ Features
 
 - Cache busting for static resources has been added and is available via a new
   argument to ``pyramid.config.Configurator.add_static_view``: ``cachebust``.
-  See https://github.com/Pylons/pyramid/pull/1380
+  Core APIs are shipped for both cache busting via query strings and
+  path segments and may be extended to fit into custom asset pipelines.
+  See https://github.com/Pylons/pyramid/pull/1380 and
+  https://github.com/Pylons/pyramid/pull/1583
 
 - Add ``pyramid.config.Configurator.root_package`` attribute and init
   parameter to assist with includeable packages that wish to resolve

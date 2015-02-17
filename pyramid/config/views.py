@@ -1980,9 +1980,9 @@ class StaticURLInfo(object):
             cb = self._default_cachebust()
         if cb:
             def cachebust(subpath, kw):
-                token = cb.token(spec + subpath)
                 subpath_tuple = tuple(subpath.split('/'))
-                subpath_tuple, kw = cb.pregenerate(token, subpath_tuple, kw)
+                subpath_tuple, kw = cb.pregenerate(
+                    spec + subpath, subpath_tuple, kw)
                 return '/'.join(subpath_tuple), kw
         else:
             cachebust = None
