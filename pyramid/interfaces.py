@@ -591,8 +591,7 @@ class IResponseFactory(Interface):
 class IRequestFactory(Interface):
     """ A utility which generates a request """
     def __call__(environ):
-        """ Return an object implementing IRequest, e.g. an instance
-        of ``pyramid.request.Request``"""
+        """ Return an instance of ``pyramid.request.Request``"""
 
     def blank(path):
         """ Return an empty request object (see

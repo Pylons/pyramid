@@ -4,6 +4,12 @@ Next release
 Features
 --------
 
+- Add ``pyramid.request.apply_request_extensions`` function which can be
+  used in testing to apply any request extensions configured via
+  ``config.add_request_method``. Previously it was only possible to test
+  the extensions by going through Pyramid's router.
+  See https://github.com/Pylons/pyramid/pull/1581
+
 - pcreate when run without a scaffold argument will now print information on
   the missing flag, as well as a list of available scaffolds.
   See https://github.com/Pylons/pyramid/pull/1566 and
