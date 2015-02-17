@@ -220,8 +220,7 @@ class PathSegmentMd5CacheBuster(PathSegmentCacheBuster,
     .. versionadded:: 1.6
     """
     def __init__(self):
-        PathSegmentCacheBuster.__init__(self)
-        Md5AssetTokenGenerator.__init__(self)
+        super(PathSegmentMd5CacheBuster, self).__init__()
 
 class QueryStringCacheBuster(object):
     """
@@ -262,8 +261,7 @@ class QueryStringMd5CacheBuster(QueryStringCacheBuster,
     .. versionadded:: 1.6
     """
     def __init__(self, param='x'):
-        QueryStringCacheBuster.__init__(self, param=param)
-        Md5AssetTokenGenerator.__init__(self)
+        super(QueryStringMd5CacheBuster, self).__init__(param=param)
 
 class QueryStringConstantCacheBuster(QueryStringCacheBuster):
     """
@@ -279,7 +277,7 @@ class QueryStringConstantCacheBuster(QueryStringCacheBuster):
     .. versionadded:: 1.6
     """
     def __init__(self, token, param='x'):
-        QueryStringCacheBuster.__init__(self, param=param)
+        super(QueryStringConstantCacheBuster, self).__init__(param=param)
         self._token = token
 
     def tokenize(self, pathspec):
