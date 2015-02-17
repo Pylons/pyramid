@@ -78,6 +78,9 @@ class InstancePropertyHelper(object):
 
     @classmethod
     def apply_properties(cls, target, properties):
+        """Accept a list or dict of ``properties`` generated from
+        :meth:`.make_property` and apply them to a ``target`` object.
+        """
         attrs = dict(properties)
         if attrs:
             parent = target.__class__
