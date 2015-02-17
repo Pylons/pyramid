@@ -1,3 +1,6 @@
+import functools
+
+
 class reify(object):
     """ Use as a class method decorator.  It operates almost exactly like the
     Python ``@property`` decorator, but it puts the result of the method it
@@ -26,10 +29,7 @@ class reify(object):
     """
     def __init__(self, wrapped):
         self.wrapped = wrapped
-        try:
-            self.__doc__ = wrapped.__doc__
-        except: # pragma: no cover
-            pass
+        functools.update_wrapper(self, wrapped)
 
     def __get__(self, inst, objtype=None):
         if inst is None:

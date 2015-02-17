@@ -9,7 +9,7 @@
 Request Processing
 ==================
 
-.. image:: ../_static/pyramid_request_processing.svg
+.. image:: ../_static/pyramid_request_processing.*
    :alt: Request Processing
 
 Once a :app:`Pyramid` application is up and running, it is ready to accept
@@ -119,7 +119,8 @@ request enters a :app:`Pyramid` application through to the point that
 
 #. The :term:`thread local` stack is popped.
 
-.. image:: router.png
+.. image:: ../_static/pyramid_router.*
+   :alt: Pyramid Router
 
 This is a very high-level overview that leaves out various details.  For more
 detail about subsystems invoked by the :app:`Pyramid` router such as

@@ -122,11 +122,15 @@ class Test_prepare(unittest.TestCase):
         self.assertEqual(request.context, context)
 
     def test_it_with_extensions(self):
-        exts = Dummy()
+        from pyramid.util import InstancePropertyHelper
+        exts = DummyExtensions()
+        ext_method = lambda r: 'bar'
+        name, fn = InstancePropertyHelper.make_property(ext_method, 'foo')
+        exts.descriptors[name] = fn
         request = DummyRequest({})
         registry = request.registry = self._makeRegistry([exts, DummyFactory])
         info = self._callFUT(request=request, registry=registry)
-        self.assertEqual(request.extensions, exts)
+        self.assertEqual(request.foo, 'bar')
         root, closer = info['root'], info['closer']
         closer()
 
@@ -199,11 +203,13 @@ class DummyThreadLocalManager:
     def pop(self):
         self.popped.append(True)
         
-class DummyRequest:
+class DummyRequest(object):
     matchdict = None
     matched_route = None
     def __init__(self, environ):
         self.environ = environ
 
-    def _set_extensions(self, exts):
-        self.extensions = exts
+class DummyExtensions:
+    def __init__(self):
+        self.descriptors = {}
+        self.methods = {}

@@ -8,26 +8,30 @@ from webob import BaseRequest
 
 from pyramid.interfaces import (
     IRequest,
+    IRequestExtensions,
     IResponse,
     ISessionFactory,
-    IResponseFactory,
     )
 
 from pyramid.compat import (
     text_,
     bytes_,
     native_,
+    iteritems_,
     )
 
 from pyramid.decorator import reify
 from pyramid.i18n import LocalizerRequestMixin
-from pyramid.response import Response
+from pyramid.response import Response,  _get_response_factory
 from pyramid.security import (
     AuthenticationAPIMixin,
     AuthorizationAPIMixin,
     )
 from pyramid.url import URLMethodsMixin
-from pyramid.util import InstancePropertyMixin
+from pyramid.util import (
+    InstancePropertyHelper,
+    InstancePropertyMixin,
+)
 
 class TemplateContext(object):
     pass
@@ -214,10 +218,8 @@ class Request(
         right" attributes (e.g. by calling ``request.response.set_cookie()``)
         within a view that uses a renderer.  Mutations to this response object
         will be preserved in the response sent to the client."""
-        registry = self.registry
-        response_factory = registry.queryUtility(IResponseFactory,
-                                                 default=Response)
-        return response_factory()
+        response_factory = _get_response_factory(self.registry)
+        return response_factory(self)
 
     def is_response(self, ob):
         """ Return ``True`` if the object passed as ``ob`` is a valid
@@ -310,3 +312,22 @@ def call_app_with_subpath_as_path_info(request, app):
     new_request.environ['PATH_INFO'] = new_path_info
 
     return new_request.get_response(app)
+
+def apply_request_extensions(request, extensions=None):
+    """Apply request extensions (methods and properties) to an instance of
+    :class:`pyramid.interfaces.IRequest`. This method is dependent on the
+    ``request`` containing a properly initialized registry.
+
+    After invoking this method, the ``request`` should have the methods
+    and properties that were defined using
+    :meth:`pyramid.config.Configurator.add_request_method`.
+    """
+    if extensions is None:
+        extensions = request.registry.queryUtility(IRequestExtensions)
+    if extensions is not None:
+        for name, fn in iteritems_(extensions.methods):
+            method = fn.__get__(request, request.__class__)
+            setattr(request, name, method)
+
+        InstancePropertyHelper.apply_properties(
+            request, extensions.descriptors)

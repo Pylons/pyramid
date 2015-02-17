@@ -10,7 +10,6 @@ from zope.interface.registry import Components
 from pyramid.interfaces import (
     IJSONAdapter,
     IRendererFactory,
-    IResponseFactory,
     IRendererInfo,
     )
 
@@ -25,7 +24,7 @@ from pyramid.events import BeforeRender
 
 from pyramid.path import caller_package
 
-from pyramid.response import Response
+from pyramid.response import _get_response_factory
 from pyramid.threadlocal import get_current_registry
 
 # API
@@ -356,19 +355,19 @@ class JSONP(JSON):
         ``self.param_name`` is present in request.GET; otherwise returns
         plain-JSON encoded string with content-type ``application/json``"""
         def _render(value, system):
-            request = system['request']
+            request = system.get('request')
             default = self._make_default(request)
             val = self.serializer(value, default=default, **self.kw)
-            callback = request.GET.get(self.param_name)
-            if callback is None:
-                ct = 'application/json'
-                body = val
-            else:
-                ct = 'application/javascript'
-                body = '%s(%s);' % (callback, val)
-            response = request.response
-            if response.content_type == response.default_content_type:
-                response.content_type = ct
+            ct = 'application/json'
+            body = val
+            if request is not None:
+                callback = request.GET.get(self.param_name)
+                if callback is not None:
+                    ct = 'application/javascript'
+                    body = '%s(%s);' % (callback, val)
+                response = request.response
+                if response.content_type == response.default_content_type:
+                    response.content_type = ct
             return body
         return _render
 
@@ -448,14 +447,16 @@ class RendererHelper(object):
         if response is None:
             # request is None or request is not a pyramid.response.Response
             registry = self.registry
-            response_factory = registry.queryUtility(IResponseFactory,
-                                                     default=Response)
-
-            response = response_factory()
+            response_factory = _get_response_factory(registry)
+            response = response_factory(request)
 
         if result is not None:
             if isinstance(result, text_type):
                 response.text = result
+            elif isinstance(result, bytes):
+                response.body = result
+            elif hasattr(result, '__iter__'):
+                response.app_iter = result
             else:
                 response.body = result
 
