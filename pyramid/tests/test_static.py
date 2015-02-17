@@ -393,13 +393,13 @@ class TestMd5AssetTokenGenerator(unittest.TestCase):
         return cls()
 
     def test_package_resource(self):
-        fut = self._makeOne().token
+        fut = self._makeOne().tokenize
         expected = '76d653a3a044e2f4b38bb001d283e3d9'
         token = fut('pyramid.tests:fixtures/static/index.html')
         self.assertEqual(token, expected)
 
     def test_filesystem_resource(self):
-        fut = self._makeOne().token
+        fut = self._makeOne().tokenize
         expected = 'd5155f250bef0e9923e894dbc713c5dd'
         with open(self.fspath, 'w') as f:
             f.write("Are we rich yet?")
@@ -407,7 +407,7 @@ class TestMd5AssetTokenGenerator(unittest.TestCase):
         self.assertEqual(token, expected)
 
     def test_cache(self):
-        fut = self._makeOne().token
+        fut = self._makeOne().tokenize
         expected = 'd5155f250bef0e9923e894dbc713c5dd'
         with open(self.fspath, 'w') as f:
             f.write("Are we rich yet?")
@@ -425,11 +425,11 @@ class TestPathSegmentMd5CacheBuster(unittest.TestCase):
     def _makeOne(self):
         from pyramid.static import PathSegmentMd5CacheBuster as cls
         inst = cls()
-        inst.token = lambda pathspec: 'foo'
+        inst.tokenize = lambda pathspec: 'foo'
         return inst
 
     def test_token(self):
-        fut = self._makeOne().token
+        fut = self._makeOne().tokenize
         self.assertEqual(fut('whatever'), 'foo')
 
     def test_pregenerate(self):
@@ -448,11 +448,11 @@ class TestQueryStringMd5CacheBuster(unittest.TestCase):
             inst = cls(param)
         else:
             inst = cls()
-        inst.token = lambda pathspec: 'foo'
+        inst.tokenize = lambda pathspec: 'foo'
         return inst
 
     def test_token(self):
-        fut = self._makeOne().token
+        fut = self._makeOne().tokenize
         self.assertEqual(fut('whatever'), 'foo')
 
     def test_pregenerate(self):
@@ -490,7 +490,7 @@ class TestQueryStringConstantCacheBuster(TestQueryStringMd5CacheBuster):
         return inst
 
     def test_token(self):
-        fut = self._makeOne().token
+        fut = self._makeOne().tokenize
         self.assertEqual(fut('whatever'), 'foo')
 
     def test_pregenerate(self):
