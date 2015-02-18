@@ -653,7 +653,7 @@ that implements the following interface:
            """
 
 After you do so, you can pass an instance of such a class into the
-:class:`~pyramid.config.Configurator.set_authentication_policy` method
+:class:`~pyramid.config.Configurator.set_authentication_policy` method at
 configuration time to use it.
 
 .. index::
