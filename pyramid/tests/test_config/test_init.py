@@ -1570,8 +1570,7 @@ class Test_reentrant_action_functional(unittest.TestCase):
                    )
         config = self._makeConfigurator()
         config.add_directive('add_auto_route', add_auto_route)
-        def my_view(request):
-            return request.response
+        def my_view(request): return request.response
         config.add_auto_route('foo', my_view)
         config.commit()
         from pyramid.interfaces import IRoutesMapper
