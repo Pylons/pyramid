@@ -295,7 +295,7 @@ but we want it to conflict with any other call to our addon:
    from pyramid.config import PHASE0_CONFIG
 
    def includeme(config):
-       config.add_directive(add_auto_route, 'add_auto_route')
+       config.add_directive('add_auto_route', add_auto_route)
 
    def add_auto_route(config, name, view):
        def register():
