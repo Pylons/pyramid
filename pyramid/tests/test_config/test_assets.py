@@ -51,7 +51,7 @@ class TestAssetsConfiguratorMixin(unittest.TestCase):
         self.assertEqual(override.path, 'templates/foo.pt')
         source = override.source
         self.assertTrue(isinstance(source, PackageAssetSource))
-        self.assertEqual(source.package, subpackage)
+        self.assertEqual(source.package, subpackage.__name__)
         self.assertEqual(source.prefix, 'templates/bar.pt')
 
     def test_override_asset_package_with_package(self):
@@ -68,7 +68,7 @@ class TestAssetsConfiguratorMixin(unittest.TestCase):
         self.assertEqual(override.path, '')
         source = override.source
         self.assertTrue(isinstance(source, PackageAssetSource))
-        self.assertEqual(source.package, subpackage)
+        self.assertEqual(source.package, subpackage.__name__)
         self.assertEqual(source.prefix, '')
 
     def test_override_asset_directory_with_directory(self):
@@ -85,7 +85,7 @@ class TestAssetsConfiguratorMixin(unittest.TestCase):
         self.assertEqual(override.path, 'templates/')
         source = override.source
         self.assertTrue(isinstance(source, PackageAssetSource))
-        self.assertEqual(source.package, subpackage)
+        self.assertEqual(source.package, subpackage.__name__)
         self.assertEqual(source.prefix, 'templates/')
 
     def test_override_asset_directory_with_package(self):
@@ -102,7 +102,7 @@ class TestAssetsConfiguratorMixin(unittest.TestCase):
         self.assertEqual(override.path, 'templates/')
         source = override.source
         self.assertTrue(isinstance(source, PackageAssetSource))
-        self.assertEqual(source.package, subpackage)
+        self.assertEqual(source.package, subpackage.__name__)
         self.assertEqual(source.prefix, '')
 
     def test_override_asset_package_with_directory(self):
@@ -119,7 +119,7 @@ class TestAssetsConfiguratorMixin(unittest.TestCase):
         self.assertEqual(override.path, '')
         source = override.source
         self.assertTrue(isinstance(source, PackageAssetSource))
-        self.assertEqual(source.package, subpackage)
+        self.assertEqual(source.package, subpackage.__name__)
         self.assertEqual(source.prefix, 'templates/')
 
     def test_override_asset_directory_with_absfile(self):

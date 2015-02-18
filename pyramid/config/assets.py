@@ -346,9 +346,8 @@ class AssetsConfiguratorMixin(object):
             if ':' in override_with:
                 override_package, override_prefix = override_with.split(':', 1)
 
-            __import__(override_package)
-            to_package = sys.modules[override_package]
-            override_source = PackageAssetSource(to_package, override_prefix)
+            override_source = PackageAssetSource(
+                override_package, override_prefix)
 
             override_isdir = (
                 override_prefix == '' or
