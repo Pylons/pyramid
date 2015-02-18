@@ -12,7 +12,10 @@ from pyramid.interfaces import (
     IDebugLogger,
     IExceptionResponse,
     IPredicateList,
+    PHASE0_CONFIG,
     PHASE1_CONFIG,
+    PHASE2_CONFIG,
+    PHASE3_CONFIG,
     )
 
 from pyramid.asset import resolve_asset_spec
@@ -55,7 +58,9 @@ from pyramid.settings import aslist
 from pyramid.threadlocal import manager
 
 from pyramid.util import (
+    ActionInfo,
     WeakOrderedSet,
+    action_method,
     object_description,
     )
 
@@ -69,16 +74,17 @@ from pyramid.config.security import SecurityConfiguratorMixin
 from pyramid.config.settings import SettingsConfiguratorMixin
 from pyramid.config.testing import TestingConfiguratorMixin
 from pyramid.config.tweens import TweensConfiguratorMixin
-from pyramid.config.util import PredicateList, not_
+from pyramid.config.util import (
+    PredicateList,
+    not_,
+    PHASE1_CONFIG,
+    PHASE2_CONFIG,
+    PHASE3_CONFIG,
+)
 from pyramid.config.views import ViewsConfiguratorMixin
 from pyramid.config.zca import ZCAConfiguratorMixin
 
 from pyramid.path import DottedNameResolver
-
-from pyramid.util import (
-    action_method,
-    ActionInfo,
-    )
 
 empty = text_('')
 _marker = object()
@@ -87,6 +93,10 @@ ConfigurationError = ConfigurationError # pyflakes
 
 not_ = not_ # pyflakes, this is an API
 
+PHASE0_CONFIG = PHASE0_CONFIG  # api
+PHASE1_CONFIG = PHASE1_CONFIG  # api
+PHASE2_CONFIG = PHASE2_CONFIG  # api
+PHASE3_CONFIG = PHASE3_CONFIG  # api
 
 class Configurator(
     TestingConfiguratorMixin,
@@ -1301,4 +1311,3 @@ def expand_action(discriminator, callable=None, args=(), kw=None,
         )
 
 global_registries = WeakOrderedSet()
-

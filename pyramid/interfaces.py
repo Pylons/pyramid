@@ -1228,6 +1228,7 @@ class ICacheBuster(Interface):
 # with this phase will be executed earlier than those with later phase
 # numbers.  The default phase number is 0, FTR.
 
+PHASE0_CONFIG = -30
 PHASE1_CONFIG = -20
 PHASE2_CONFIG = -10
-
+PHASE3_CONFIG = 0

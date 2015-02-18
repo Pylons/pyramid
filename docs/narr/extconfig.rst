@@ -243,12 +243,17 @@ This means that if an action must be reliably executed before or after another
 action, the ``order`` must be defined explicitly to make this work. For
 example, views are dependent on routes being defined. Thus the action created
 by :meth:`pyramid.config.Configurator.add_route` has an ``order`` of
-:const:`pyramid.interfaces.PHASE2_CONFIG`.
+:const:`pyramid.config.PHASE2_CONFIG`.
 
 Pre-defined Phases
 ~~~~~~~~~~~~~~~~~~
 
-:const:`pyramid.interfaces.PHASE1_CONFIG`
+:const:`pyramid.config.PHASE0_CONFIG`
+
+- This phase is reserved for developers who want to execute actions prior
+  to Pyramid's core directives.
+
+:const:`pyramid.config.PHASE1_CONFIG`
 
 - :meth:`pyramid.config.Configurator.add_renderer`
 - :meth:`pyramid.config.Configurator.add_route_predicate`
@@ -258,12 +263,12 @@ Pre-defined Phases
 - :meth:`pyramid.config.Configurator.set_default_permission`
 - :meth:`pyramid.config.Configurator.set_view_mapper`
 
-:const:`pyramid.interfaces.PHASE2_CONFIG`
+:const:`pyramid.config.PHASE2_CONFIG`
 
 - :meth:`pyramid.config.Configurator.add_route`
 - :meth:`pyramid.config.Configurator.set_authentication_policy`
 
-``0``
+:const:`pyramid.config.PHASE3_CONFIG`
 
 - The default for all builtin or custom directives unless otherwise specified.
 
@@ -285,9 +290,7 @@ but we want it to conflict with any other call to our addon:
 .. code-block:: python
    :linenos:
 
-   from pyramid.interfaces import PHASE1_CONFIG
-
-   PHASE0_CONFIG = PHASE1_CONFIG - 10
+   from pyramid.config import PHASE0_CONFIG
 
    def includeme(config):
        config.add_directive(add_auto_route, 'add_auto_route')
