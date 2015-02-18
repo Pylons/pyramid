@@ -495,17 +495,20 @@ result in a particular view callable being invoked:
     :linenos:
 
     config.add_route('idea', 'site/{id}')
-    config.add_view('mypackage.views.site_view', route_name='idea')
+    config.scan() 
 
 When a route configuration with a ``view`` attribute is added to the system,
 and an incoming request matches the *pattern* of the route configuration, the
 :term:`view callable` named as the ``view`` attribute of the route
 configuration will be invoked.
 
-In the case of the above example, when the URL of a request matches
-``/site/{id}``, the view callable at the Python dotted path name
-``mypackage.views.site_view`` will be called with the request.  In other
-words, we've associated a view callable directly with a route pattern.
+Recall that ``config.scan`` is equivalent to calling ``config.add_view``,
+because the ``@view_config`` decorator in ``mypackage.views``, shown below,
+maps the route name to the matching view callable. In the case of the above
+example, when the URL of a request matches ``/site/{id}``, the view callable at
+the Python dotted path name ``mypackage.views.site_view`` will be called with
+the request.  In other words, we've associated a view callable directly with a
+route pattern.
 
 When the ``/site/{id}`` route pattern matches during a request, the
 ``site_view`` view callable is invoked with that request as its sole
@@ -519,8 +522,10 @@ The ``mypackage.views`` module referred to above might look like so:
 .. code-block:: python
    :linenos:
 
+   from pyramid.view import view_config
    from pyramid.response import Response
 
+   @view_config(route_name='idea')
    def site_view(request):
        return Response(request.matchdict['id'])
 
@@ -542,11 +547,30 @@ add to your application:
    config.add_route('idea', 'ideas/{idea}')
    config.add_route('user', 'users/{user}')
    config.add_route('tag', 'tags/{tag}')
+   config.scan()
 
-   config.add_view('mypackage.views.idea_view', route_name='idea')
-   config.add_view('mypackage.views.user_view', route_name='user')
-   config.add_view('mypackage.views.tag_view', route_name='tag')
+Here is an example of a corresponding ``mypackage.views`` module:
 
+.. code-block:: python
+   :linenos:
+
+   from pyramid.view import view_config
+   from pyramid.response import Response
+
+   @view_config(route_name='idea')
+   def idea_view(request):
+       return Response(request.matchdict['id'])
+   
+   @view_config(route_name='user')
+   def user_view(request):
+       user = request.matchdict['user']
+       return Response(u'The user is {}.'.format(user))
+
+   @view_config(route_name='tag')
+   def tag_view(request):
+       tag = request.matchdict['tag']
+       return Response(u'The tag is {}.'.format(tag))
+    
 The above configuration will allow :app:`Pyramid` to service URLs in these
 forms:
 
@@ -596,7 +620,7 @@ An example of using a route with a factory:
    :linenos:
 
    config.add_route('idea', 'ideas/{idea}', factory='myproject.resources.Idea')
-   config.add_view('myproject.views.idea_view', route_name='idea')
+   config.scan()
 
 The above route will manufacture an ``Idea`` resource as a :term:`context`,
 assuming that ``mypackage.resources.Idea`` resolves to a class that accepts a
@@ -610,7 +634,20 @@ request in its ``__init__``.  For example:
            pass
 
 In a more complicated application, this root factory might be a class
-representing a :term:`SQLAlchemy` model.
+representing a :term:`SQLAlchemy` model. The view ``mypackage.views.idea_view``
+might look like this:
+
+.. code-block:: python
+   :linenos:
+
+   @view_config(route_name='idea')
+   def idea_view(request):
+       idea = request.context
+       return Response(idea)
+
+Here, ``request.context`` is an instance of ``Idea``. If indeed the resource
+object is a SQLAlchemy model, you do not even have to perform a query in the
+view callable, since you have access to the resource via ``request.context``.
 
 See :ref:`route_factories` for more details about how to use route factories.
 
