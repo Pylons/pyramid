@@ -74,13 +74,7 @@ from pyramid.config.security import SecurityConfiguratorMixin
 from pyramid.config.settings import SettingsConfiguratorMixin
 from pyramid.config.testing import TestingConfiguratorMixin
 from pyramid.config.tweens import TweensConfiguratorMixin
-from pyramid.config.util import (
-    PredicateList,
-    not_,
-    PHASE1_CONFIG,
-    PHASE2_CONFIG,
-    PHASE3_CONFIG,
-)
+from pyramid.config.util import PredicateList, not_
 from pyramid.config.views import ViewsConfiguratorMixin
 from pyramid.config.zca import ZCAConfiguratorMixin
 
