@@ -21,9 +21,11 @@ import textwrap
 import threading
 import time
 import traceback
+import webbrowser
 
 from paste.deploy import loadserver
 from paste.deploy import loadapp
+from paste.deploy.loadwsgi import loadcontext, SERVER
 
 from pyramid.compat import PY3
 from pyramid.compat import WIN
@@ -126,6 +128,11 @@ class PServeCommand(object):
         dest='monitor_restart',
         action='store_true',
         help="Auto-restart server if it dies")
+    parser.add_option(
+        '-b', '--browser',
+        dest='browser',
+        action='store_true',
+        help="Open a web browser to server url")
     parser.add_option(
         '--status',
         action='store_true',
@@ -338,6 +345,17 @@ class PServeCommand(object):
                 else:
                     msg = ''
                 self.out('Exiting%s (-v to see traceback)' % msg)
+
+        if self.options.browser:
+            def open_browser():
+                context = loadcontext(SERVER, app_spec, name=app_name, relative_to=base,
+                        global_conf=vars)
+                url = 'http://127.0.0.1:{port}/'.format(**context.config())
+                time.sleep(1)
+                webbrowser.open(url)
+            t = threading.Thread(target=open_browser)
+            t.setDaemon(True)
+            t.start()
 
         serve()
 

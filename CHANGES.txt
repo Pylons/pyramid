@@ -25,6 +25,9 @@ Next release
 - Avoiding timing attacks against CSRF tokens. Backported from
   https://github.com/Pylons/pyramid/pull/1574
 
+- ``pserve`` can now take a ``-b`` or ``--browser`` option to open the server
+  URL in a web browser. See https://github.com/Pylons/pyramid/pull/1533
+
 .. _changes_1.5.2:
 
 1.5.2 (2014-11-09)
