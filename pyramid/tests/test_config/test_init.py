@@ -1554,6 +1554,35 @@ class TestActionState(unittest.TestCase):
             (3, g, (8,)),
         ])
 
+class Test_reentrant_action_functional(unittest.TestCase):
+    def _makeConfigurator(self, *arg, **kw):
+        from pyramid.config import Configurator
+        config = Configurator(*arg, **kw)
+        return config
+
+    def test_functional(self):
+        def add_auto_route(config, name, view):
+               def register():
+                   config.add_view(route_name=name, view=view)
+                   config.add_route(name, '/' + name)
+               config.action(
+                   ('auto route', name), register, order=-30
+                   )
+        config = self._makeConfigurator()
+        config.add_directive('add_auto_route', add_auto_route)
+        def my_view(request):
+            return request.response
+        config.add_auto_route('foo', my_view)
+        config.commit()
+        from pyramid.interfaces import IRoutesMapper
+        mapper = config.registry.getUtility(IRoutesMapper)
+        routes = mapper.get_routes()
+        route = routes[0]
+        self.assertEqual(len(routes), 1)
+        self.assertEqual(route.name, 'foo')
+        self.assertEqual(route.path, '/foo')
+
+
 class Test_resolveConflicts(unittest.TestCase):
     def _callFUT(self, actions):
         from pyramid.config import resolveConflicts
