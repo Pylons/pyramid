@@ -238,8 +238,9 @@ actions. The logic within actions is deferred until a call to
 commit-time. During a commit cycle conflicts are resolved, actions are ordered
 and executed.
 
-By default, almost every action in Pyramid has an ``order`` of ``0``. Every
-action within the same order-level will be executed in the order it was called.
+By default, almost every action in Pyramid has an ``order`` of
+:const:`pyramid.config.PHASE3_CONFIG`. Every action within the same order-level
+will be executed in the order it was called.
 This means that if an action must be reliably executed before or after another
 action, the ``order`` must be defined explicitly to make this work. For
 example, views are dependent on routes being defined. Thus the action created
