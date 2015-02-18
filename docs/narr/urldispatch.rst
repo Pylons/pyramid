@@ -502,9 +502,10 @@ and an incoming request matches the *pattern* of the route configuration, the
 :term:`view callable` named as the ``view`` attribute of the route
 configuration will be invoked.
 
-Recall that ``config.scan`` is equivalent to calling ``config.add_view``,
-because the ``@view_config`` decorator in ``mypackage.views``, shown below,
-maps the route name to the matching view callable. In the case of the above
+Recall that the ``@view_config`` is equivalent to calling ``config.add_view``,
+because the ``config.scan()`` call will import ``mypackage.views``, shown
+below, and execute ``config.add_view`` under the hood. Each view then maps the
+route name to the matching view callable. In the case of the above
 example, when the URL of a request matches ``/site/{id}``, the view callable at
 the Python dotted path name ``mypackage.views.site_view`` will be called with
 the request.  In other words, we've associated a view callable directly with a
