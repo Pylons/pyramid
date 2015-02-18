@@ -4,6 +4,14 @@ Next release
 Features
 --------
 
+- The ``pyramid.config.Configurator`` has grown the ability to allow
+  actions to call other actions during a commit-cycle. This enables much more
+  logic to be placed into actions, such as the ability to invoke other actions
+  or group them for improved conflict detection. We have also exposed and
+  documented the config phases that Pyramid uses in order to further assist
+  in building conforming addons.
+  See https://github.com/Pylons/pyramid/pull/1513
+
 - Add ``pyramid.request.apply_request_extensions`` function which can be
   used in testing to apply any request extensions configured via
   ``config.add_request_method``. Previously it was only possible to test

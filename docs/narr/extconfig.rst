@@ -215,12 +215,114 @@ registers an action with a higher order than the
 passed to it, that a route by this name was already registered by
 ``add_route``, and if such a route has not already been registered, it's a
 configuration error (a view that names a nonexistent route via its
-``route_name`` parameter will never be called).
+``route_name`` parameter will never be called). As of Pyramid 1.6 it is
+possible for one action to invoke another. See :ref:`ordering_actions` for
+more information.
 
 ``introspectables`` is a sequence of :term:`introspectable` objects.  You can
 pass a sequence of introspectables to the
 :meth:`~pyramid.config.Configurator.action` method, which allows you to
 augment Pyramid's configuration introspection system.
+
+.. _ordering_actions:
+
+Ordering Actions
+----------------
+
+In Pyramid every :term:`action` has an inherent ordering relative to other
+actions. The logic within actions is deferred until a call to
+:meth:`pyramid.config.Configurator.commit` (which is automatically invoked by
+:meth:`pyramid.config.Configurator.make_wsgi_app`). This means you may call
+``config.add_view(route_name='foo')`` **before**
+``config.add_route('foo', '/foo')`` because nothing actually happens until
+commit-time. During a commit cycle conflicts are resolved, actions are ordered
+and executed.
+
+By default, almost every action in Pyramid has an ``order`` of
+:const:`pyramid.config.PHASE3_CONFIG`. Every action within the same order-level
+will be executed in the order it was called.
+This means that if an action must be reliably executed before or after another
+action, the ``order`` must be defined explicitly to make this work. For
+example, views are dependent on routes being defined. Thus the action created
+by :meth:`pyramid.config.Configurator.add_route` has an ``order`` of
+:const:`pyramid.config.PHASE2_CONFIG`.
+
+Pre-defined Phases
+~~~~~~~~~~~~~~~~~~
+
+:const:`pyramid.config.PHASE0_CONFIG`
+
+- This phase is reserved for developers who want to execute actions prior
+  to Pyramid's core directives.
+
+:const:`pyramid.config.PHASE1_CONFIG`
+
+- :meth:`pyramid.config.Configurator.add_renderer`
+- :meth:`pyramid.config.Configurator.add_route_predicate`
+- :meth:`pyramid.config.Configurator.add_subscriber_predicate`
+- :meth:`pyramid.config.Configurator.add_view_predicate`
+- :meth:`pyramid.config.Configurator.set_authorization_policy`
+- :meth:`pyramid.config.Configurator.set_default_permission`
+- :meth:`pyramid.config.Configurator.set_view_mapper`
+
+:const:`pyramid.config.PHASE2_CONFIG`
+
+- :meth:`pyramid.config.Configurator.add_route`
+- :meth:`pyramid.config.Configurator.set_authentication_policy`
+
+:const:`pyramid.config.PHASE3_CONFIG`
+
+- The default for all builtin or custom directives unless otherwise specified.
+
+Calling Actions From Actions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.6
+
+Pyramid's configurator allows actions to be added during a commit-cycle as
+long as they are added to the current or a later ``order`` phase. This means
+that your custom action can defer decisions until commit-time and then do
+things like invoke :meth:`pyramid.config.Configurator.add_route`. It can also
+provide better conflict detection if your addon needs to call more than one
+other action.
+
+For example, let's make an addon that invokes ``add_route`` and ``add_view``,
+but we want it to conflict with any other call to our addon:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.config import PHASE0_CONFIG
+
+   def includeme(config):
+       config.add_directive('add_auto_route', add_auto_route)
+
+   def add_auto_route(config, name, view):
+       def register():
+           config.add_view(route_name=name, view=view)
+           config.add_route(name, '/' + name)
+       config.action(('auto route', name), register, order=PHASE0_CONFIG)
+
+Now someone else can use your addon and be informed if there is a conflict
+between this route and another, or two calls to ``add_auto_route``.
+Notice how we had to invoke our action **before** ``add_view`` or
+``add_route``. If we tried to invoke this afterward, the subsequent calls to
+``add_view`` and ``add_route`` would cause conflicts because that phase had
+already been executed, and the configurator cannot go back in time to add more
+views during that commit-cycle.
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.config import Configurator
+
+   def main(global_config, **settings):
+       config = Configurator()
+       config.include('auto_route_addon')
+       config.add_auto_route('foo', my_view)
+
+   def my_view(request):
+       return request.response
 
 .. _introspection:
 
