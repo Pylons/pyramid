@@ -582,18 +582,16 @@ class IStaticURLInfo(Interface):
         """ Generate a URL for the given path """
 
 class IResponseFactory(Interface):
-    """ A utility which generates a response factory """
-    def __call__():
-        """ Return a response factory (e.g. a callable that returns an object
-        implementing IResponse, e.g. :class:`pyramid.response.Response`). It
-        should accept all the arguments that the Pyramid Response class
-        accepts."""
+    """ A utility which generates a response """
+    def __call__(request):
+        """ Return a response object implementing IResponse,
+        e.g. :class:`pyramid.response.Response`). It should handle the
+        case when ``request`` is ``None``."""
 
 class IRequestFactory(Interface):
     """ A utility which generates a request """
     def __call__(environ):
-        """ Return an object implementing IRequest, e.g. an instance
-        of ``pyramid.request.Request``"""
+        """ Return an instance of ``pyramid.request.Request``"""
 
     def blank(path):
         """ Return an empty request object (see
@@ -1194,18 +1192,11 @@ class ICacheBuster(Interface):
 
     .. versionadded:: 1.6
     """
-    def token(pathspec):
-        """
-        Computes and returns a token string used for cache busting.
-        ``pathspec`` is the path specification for the resource to be cache
-        busted.  """
-
-    def pregenerate(token, subpath, kw):
+    def pregenerate(pathspec, subpath, kw):
         """
         Modifies a subpath and/or keyword arguments from which a static asset
-        URL will be computed during URL generation.  The ``token`` argument is
-        a token string computed by
-        :meth:`~pyramid.interfaces.ICacheBuster.token` for a particular asset.
+        URL will be computed during URL generation.  The ``pathspec`` argument
+        is the path specification for the resource to be cache busted.
         The ``subpath`` argument is a tuple of path elements that represent the
         portion of the asset URL which is used to find the asset.  The ``kw``
         argument is a dict of keywords that are to be passed eventually to

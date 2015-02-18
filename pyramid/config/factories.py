@@ -14,8 +14,10 @@ from pyramid.traversal import DefaultRootFactory
 
 from pyramid.util import (
     action_method,
-    InstancePropertyMixin,
+    get_callable_name,
+    InstancePropertyHelper,
     )
+
 
 class FactoriesConfiguratorMixin(object):
     @action_method
@@ -33,9 +35,10 @@ class FactoriesConfiguratorMixin(object):
         factory = self.maybe_dotted(factory)
         if factory is None:
             factory = DefaultRootFactory
+
         def register():
             self.registry.registerUtility(factory, IRootFactory)
-            self.registry.registerUtility(factory, IDefaultRootFactory) # b/c
+            self.registry.registerUtility(factory, IDefaultRootFactory)  # b/c
 
         intr = self.introspectable('root factories',
                                    None,
@@ -44,7 +47,7 @@ class FactoriesConfiguratorMixin(object):
         intr['factory'] = factory
         self.action(IRootFactory, register, introspectables=(intr,))
 
-    _set_root_factory = set_root_factory # bw compat
+    _set_root_factory = set_root_factory  # bw compat
 
     @action_method
     def set_session_factory(self, factory):
@@ -60,6 +63,7 @@ class FactoriesConfiguratorMixin(object):
            achieve the same purpose.
         """
         factory = self.maybe_dotted(factory)
+
         def register():
             self.registry.registerUtility(factory, ISessionFactory)
         intr = self.introspectable('session factory', None,
@@ -89,6 +93,7 @@ class FactoriesConfiguratorMixin(object):
            can be used to achieve the same purpose.
         """
         factory = self.maybe_dotted(factory)
+
         def register():
             self.registry.registerUtility(factory, IRequestFactory)
         intr = self.introspectable('request factory', None,
@@ -102,9 +107,8 @@ class FactoriesConfiguratorMixin(object):
         """ The object passed as ``factory`` should be an object (or a
         :term:`dotted Python name` which refers to an object) which
         will be used by the :app:`Pyramid` as the default response
-        objects.  This factory object must have the same
-        methods and attributes as the
-        :class:`pyramid.request.Response` class.
+        objects. The factory should conform to the
+        :class:`pyramid.interfaces.IResponseFactory` interface.
 
         .. note::
 
@@ -170,10 +174,12 @@ class FactoriesConfiguratorMixin(object):
 
         property = property or reify
         if property:
-            name, callable = InstancePropertyMixin._make_property(
+            name, callable = InstancePropertyHelper.make_property(
                 callable, name=name, reify=reify)
         elif name is None:
             name = callable.__name__
+        else:
+            name = get_callable_name(name)
 
         def register():
             exts = self.registry.queryUtility(IRequestExtensions)
@@ -225,9 +231,9 @@ class FactoriesConfiguratorMixin(object):
         'set_request_propery() is deprecated as of Pyramid 1.5; use '
         'add_request_method() with the property=True argument instead')
 
+
 @implementer(IRequestExtensions)
 class _RequestExtensions(object):
     def __init__(self):
         self.descriptors = {}
         self.methods = {}
-
