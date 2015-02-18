@@ -235,7 +235,8 @@ actions. The logic within actions is deferred until a call to
 :meth:`pyramid.config.Configurator.make_wsgi_app`). This means you may call
 ``config.add_view(route_name='foo')`` **before**
 ``config.add_route('foo', '/foo')`` because nothing actually happens until
-commit-time when conflicts are resolved, actions are ordered and executed.
+commit-time. During a commit cycle conflicts are resolved, actions are ordered
+and executed.
 
 By default, almost every action in Pyramid has an ``order`` of ``0``. Every
 action within the same order-level will be executed in the order it was called.
