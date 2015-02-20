@@ -214,6 +214,10 @@ class PackageAssetSource(object):
     """
     def __init__(self, package, prefix):
         self.package = package
+        if hasattr(package, '__name__'):
+            self.pkg_name = package.__name__
+        else:
+            self.pkg_name = package
         self.prefix = prefix
 
     def get_path(self, resource_name):
@@ -221,33 +225,33 @@ class PackageAssetSource(object):
 
     def get_filename(self, resource_name):
         path = self.get_path(resource_name)
-        if pkg_resources.resource_exists(self.package, path):
-            return pkg_resources.resource_filename(self.package, path)
+        if pkg_resources.resource_exists(self.pkg_name, path):
+            return pkg_resources.resource_filename(self.pkg_name, path)
 
     def get_stream(self, resource_name):
         path = self.get_path(resource_name)
-        if pkg_resources.resource_exists(self.package, path):
-            return pkg_resources.resource_stream(self.package, path)
+        if pkg_resources.resource_exists(self.pkg_name, path):
+            return pkg_resources.resource_stream(self.pkg_name, path)
 
     def get_string(self, resource_name):
         path = self.get_path(resource_name)
-        if pkg_resources.resource_exists(self.package, path):
-            return pkg_resources.resource_string(self.package, path)
+        if pkg_resources.resource_exists(self.pkg_name, path):
+            return pkg_resources.resource_string(self.pkg_name, path)
 
     def exists(self, resource_name):
         path = self.get_path(resource_name)
-        if pkg_resources.resource_exists(self.package, path):
+        if pkg_resources.resource_exists(self.pkg_name, path):
             return True
 
     def isdir(self, resource_name):
         path = self.get_path(resource_name)
-        if pkg_resources.resource_exists(self.package, path):
-            return pkg_resources.resource_isdir(self.package, path)
+        if pkg_resources.resource_exists(self.pkg_name, path):
+            return pkg_resources.resource_isdir(self.pkg_name, path)
 
     def listdir(self, resource_name):
         path = self.get_path(resource_name)
-        if pkg_resources.resource_exists(self.package, path):
-            return pkg_resources.resource_listdir(self.package, path)
+        if pkg_resources.resource_exists(self.pkg_name, path):
+            return pkg_resources.resource_listdir(self.pkg_name, path)
 
 
 class FSAssetSource(object):
