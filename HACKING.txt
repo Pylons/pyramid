@@ -195,7 +195,7 @@ Test Coverage
 -------------
 
 - The codebase *must* have 100% test statement coverage after each commit.
-  You can test coverage via ``tox -e coverage``, or alternately by installing
+  You can test coverage via ``tox -e cover``, or alternately by installing
   ``nose`` and ``coverage`` into your virtualenv (easiest via ``setup.py
   dev``) , and running ``setup.py nosetests --with-coverage``.
 
