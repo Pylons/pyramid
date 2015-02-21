@@ -130,6 +130,13 @@ class Test_string_renderer_factory(unittest.TestCase):
         renderer('', {'request':request})
         self.assertEqual(request.response.content_type, 'text/mishmash')
 
+    def test_with_request_content_type_happens_to_be_default(self):
+        request = testing.DummyRequest()
+        request.response.content_type = 'text/html'
+        renderer = self._callFUT(None)
+        renderer('', {'request':request})
+        self.assertEqual(request.response.content_type, 'text/html')
+
 
 class TestRendererHelper(unittest.TestCase):
     def setUp(self):
@@ -617,4 +624,4 @@ class DummyResponse:
     headerlist = ()
     app_iter = ()
     body = ''
-
+    implicit_content_type = True

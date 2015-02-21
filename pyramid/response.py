@@ -27,7 +27,26 @@ _BLOCK_SIZE = 4096 * 64 # 256K
 
 @implementer(IResponse)
 class Response(_Response):
-    pass
+    # This hack will break if WebOb's __init__ ever starts setting the
+    # content_type using the getter/setter's rather than just shoving it
+    # directly into the header list.
+    #
+    # This hack is required because we have no other way to know if the current
+    # content-type has been set by the developer, or if it is the default of
+    # text/html. We need to know this, so that if it is the default we can
+    # mutate it to the correct one in our renderers, unless it has been
+    # modified. See https://github.com/Pylons/pyramid/issues/1344
+    implicit_content_type = True
+
+    def _content_type__set(self, value):
+        super(Response, self)._content_type__set(value)
+        self.implicit_content_type = False
+
+    content_type = property(_Response._content_type__get, 
+            _content_type__set,
+            _Response._content_type__del,
+            doc=_Response._content_type__get.__doc__
+            )
 
 class FileResponse(Response):
     """
