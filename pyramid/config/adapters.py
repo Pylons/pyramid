@@ -2,7 +2,7 @@ from webob import Response as WebobResponse
 
 from functools import update_wrapper
 
-from zope.interface import Interface
+from zope.interface import Interface, implementedBy
 
 from pyramid.interfaces import (
     IResponse,
@@ -14,6 +14,19 @@ from pyramid.config.util import (
     action_method,
     takes_one_arg,
     )
+
+from pyramid.exceptions import ConfigurationError
+
+import pyramid.config.predicates
+
+
+def doesClassImplementAttribute(cls, attr_name):
+    for iface in implementedBy(cls):
+        # Attributes of interfaces are represented as dict keys
+        if iface.get(attr_name):
+            return True
+
+    return False
 
 
 class AdaptersConfiguratorMixin(object):
@@ -54,6 +67,22 @@ class AdaptersConfiguratorMixin(object):
             predlist = self.get_predlist('subscriber')
             order, preds, phash = predlist.make(self, **predicates)
 
+            # Check for predicates that are not supported by the events we're
+            # subscribing for
+            for pred in preds:
+                # Each predicate can require the event to have attributes
+                needed_attrs = getattr(pred, 'needed_attrs', [])
+                for needed_attr in needed_attrs:
+                    # @todo: It's confusing that `iface` is a tuple
+                    # It should be called `ifaces`
+                    # `iface1` is **actually** a single interface. :-)
+                    for iface1 in iface:
+                        if not doesClassImplementAttribute(iface1, needed_attr):
+                            raise ConfigurationError(
+                                'Event %r not supported by subscriber predicate %r; '
+                                'Event does not have needed attribute: %r'
+                                % (iface1, pred.__class__, needed_attr))
+
             derived_predicates = [ self._derive_predicate(p) for p in preds ]
             derived_subscriber = self._derive_subscriber(
                 subscriber,
@@ -70,7 +99,7 @@ class AdaptersConfiguratorMixin(object):
                 )
 
             self.registry.registerHandler(derived_subscriber, iface)
-            
+
         intr = self.introspectable(
             'subscribers',
             id(subscriber),
@@ -162,6 +191,46 @@ class AdaptersConfiguratorMixin(object):
             weighs_more_than=weighs_more_than,
             weighs_less_than=weighs_less_than
             )
+
+    def add_default_subscriber_predicates(self):
+        def get_subscriber_predicate_from_view_predicate(ViewPred):
+            # view pred takes args: (context, request)
+            # subscriber pred takes arg: (event) (which has event.request.context)
+            class SubscriberPred(ViewPred):
+                def __call__(self, event):
+                    try:
+                        return super(SubscriberPred, self).__call__(
+                            event.request.context,
+                            event.request
+                            )
+                    except AttributeError:
+                        return False
+            return SubscriberPred
+
+        p = pyramid.config.predicates
+
+        for (name, factory) in (
+            ('xhr', p.XHRPredicate),
+            ('request_method', p.RequestMethodPredicate),
+            ('path_info', p.PathInfoPredicate),
+            ('request_param', p.RequestParamPredicate),
+            ('header', p.HeaderPredicate),
+            ('accept', p.AcceptPredicate),
+            ('containment', p.ContainmentPredicate),
+            ('request_type', p.RequestTypePredicate),
+            ('match_param', p.MatchParamPredicate),
+            ('check_csrf', p.CheckCSRFTokenPredicate),
+            ('physical_path', p.PhysicalPathPredicate),
+            ('effective_principals', p.EffectivePrincipalsPredicate),
+            ('custom', p.CustomPredicate),
+            ):
+            factory = get_subscriber_predicate_from_view_predicate(factory)
+            self.add_subscriber_predicate(name, factory)
+
+        for (name, factory) in (
+            ('context', p.ContextSubscriberPredicate),
+            ):
+            self.add_subscriber_predicate(name, factory)
 
     @action_method
     def add_response_adapter(self, adapter, type_or_iface):
