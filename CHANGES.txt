@@ -102,6 +102,20 @@ Features
 - Support keyword-only arguments and function annotations in views in
   Python 3. See https://github.com/Pylons/pyramid/pull/1556
 
+- ``request.response`` will no longer be mutated when using the
+  ``pyramid.renderers.render_to_response()`` API.  It is now necessary to
+  pass in a ``response=`` argument to ``render_to_response`` if you wish to
+  supply the renderer with a custom response object for it to use. If you
+  do not pass one then a response object will be created using the
+  application's ``IResponseFactory``. Almost all renderers
+  mutate the ``request.response`` response object (for example, the JSON
+  renderer sets ``request.response.content_type`` to ``application/json``).
+  However, when invoking ``render_to_response`` it is not expected that the
+  response object being returned would be the same one used later in the
+  request. The response object returned from ``render_to_response`` is now
+  explicitly different from ``request.response``. This does not change the
+  API of a renderer. See https://github.com/Pylons/pyramid/pull/1563
+
 Bug Fixes
 ---------
 
