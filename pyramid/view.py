@@ -419,11 +419,12 @@ class forbidden_view_config(object):
 
 def _find_views(registry, request_iface, context_iface, view_name):
     registered = registry.adapters.registered
+    view_types = (IView, ISecuredView, IMultiView)
     for req_type, ctx_type in itertools.product(
         request_iface.__sro__, context_iface.__sro__
     ):
         source_ifaces = (IViewClassifier, req_type, ctx_type)
-        for view_type in (IView, ISecuredView, IMultiView):
+        for view_type in view_types:
             view_callable = registered(
                 source_ifaces,
                 view_type,
