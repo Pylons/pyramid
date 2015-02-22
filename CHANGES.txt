@@ -1,5 +1,7 @@
-Next release
-============
+.. _changes_1.5.3:
+
+1.5.3 (2015-02-22)
+==================
 
 - Work around an issue where ``pserve --reload`` would leave terminal echo
   disabled if it reloaded during a pdb session.

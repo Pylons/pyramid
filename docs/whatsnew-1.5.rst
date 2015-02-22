@@ -375,6 +375,12 @@ Feature Additions
   information within a finished callback.  See
   https://github.com/Pylons/pyramid/issues/1223.
 
+- Overall improvments for the ``proutes`` command. Added ``--format`` and
+  ``--glob`` arguments to the command, introduced the ``method``
+  column for displaying available request methods, and improved the ``view``
+  output by showing the module instead of just ``__repr__``.
+  See: https://github.com/Pylons/pyramid/pull/1542
+
 
 Other Backwards Incompatibilities
 ---------------------------------
