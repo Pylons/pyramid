@@ -1,3 +1,10 @@
+1.5.4 (unreleased)
+==================
+
+- Fix regression where ``pserve --reload`` would not work when running
+  as a daemon.
+  Backported from https://github.com/Pylons/pyramid/pull/1592
+
 .. _changes_1.5.3:
 
 1.5.3 (2015-02-22)
