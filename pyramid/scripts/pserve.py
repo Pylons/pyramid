@@ -716,11 +716,12 @@ def _turn_sigterm_into_systemexit(): # pragma: no cover
 
 def ensure_echo_on(): # pragma: no cover
     if termios:
-        fd = sys.stdin.fileno()
-        attr_list = termios.tcgetattr(fd)
-        if not attr_list[3] & termios.ECHO:
-            attr_list[3] |= termios.ECHO
-            termios.tcsetattr(fd, termios.TCSANOW, attr_list)
+        fd = sys.stdin
+        if fd.isatty():
+            attr_list = termios.tcgetattr(fd)
+            if not attr_list[3] & termios.ECHO:
+                attr_list[3] |= termios.ECHO
+                termios.tcsetattr(fd, termios.TCSANOW, attr_list)
 
 def install_reloader(poll_interval=1, extra_files=None): # pragma: no cover
     """
