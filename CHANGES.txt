@@ -1,4 +1,6 @@
-1.5.4 (unreleased)
+.. _changes_1.5.4:
+
+1.5.4 (2015-02-24)
 ==================
 
 - Fix regression where ``pserve --reload`` would not work when running
