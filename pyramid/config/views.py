@@ -349,7 +349,6 @@ class ViewDeriver(object):
 
     def _rendered_view(self, view, view_renderer):
         def rendered_view(context, request):
-            renderer = view_renderer
             result = view(context, request)
             if result.__class__ is Response: # potential common case
                 response = result
@@ -367,6 +366,8 @@ class ViewDeriver(object):
                             name=renderer_name,
                             package=self.kw.get('package'),
                             registry = registry)
+                    else:
+                        renderer = view_renderer.clone()
                     if '__view__' in attrs:
                         view_inst = attrs.pop('__view__')
                     else:
