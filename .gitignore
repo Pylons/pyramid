@@ -8,9 +8,12 @@
 *~
 .*.swp
 .coverage
+.coverage.*
 .tox/
 nosetests.xml
 coverage.xml
+nosetests-*.xml
+coverage-*.xml
 tutorial.db
 build/
 dist/

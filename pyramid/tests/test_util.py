@@ -431,9 +431,9 @@ class Test_object_description(unittest.TestCase):
         self.assertEqual(self._callFUT(('a', 'b')), "('a', 'b')")
 
     def test_set(self):
-        if PY3: # pragma: no cover
+        if PY3:
             self.assertEqual(self._callFUT(set(['a'])), "{'a'}")
-        else: # pragma: no cover
+        else:
             self.assertEqual(self._callFUT(set(['a'])), "set(['a'])")
 
     def test_list(self):

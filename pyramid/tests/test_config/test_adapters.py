@@ -219,7 +219,7 @@ class AdaptersConfiguratorMixinTests(unittest.TestCase):
     def test_add_response_adapter_dottednames(self):
         from pyramid.interfaces import IResponse
         config = self._makeOne(autocommit=True)
-        if PY3: # pragma: no cover
+        if PY3:
             str_name = 'builtins.str'
         else:
             str_name = '__builtin__.str'
