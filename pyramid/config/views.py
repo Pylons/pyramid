@@ -42,7 +42,8 @@ from pyramid.compat import (
     url_quote,
     WIN,
     is_bound_method,
-    is_nonstr_iter
+    is_unbound_method,
+    is_nonstr_iter,
     )
 
 from pyramid.exceptions import (
@@ -419,6 +420,12 @@ class DefaultViewMapper(object):
         self.attr = kw.get('attr')
 
     def __call__(self, view):
+        if is_unbound_method(view) and self.attr is None:
+            raise ConfigurationError((
+                'Unbound method calls are not supported, please set the class '
+                'as your `view` and the method as your `attr`'
+            ))
+
         if inspect.isclass(view):
             view = self.map_class(view)
         else:
@@ -1974,9 +1981,9 @@ class StaticURLInfo(object):
             cb = self._default_cachebust()
         if cb:
             def cachebust(subpath, kw):
-                token = cb.token(spec + subpath)
                 subpath_tuple = tuple(subpath.split('/'))
-                subpath_tuple, kw = cb.pregenerate(token, subpath_tuple, kw)
+                subpath_tuple, kw = cb.pregenerate(
+                    spec + subpath, subpath_tuple, kw)
                 return '/'.join(subpath_tuple), kw
         else:
             cachebust = None

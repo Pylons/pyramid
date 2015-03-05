@@ -446,19 +446,20 @@ In order to implement your own cache buster, you can write your own class from
 scratch which implements the :class:`~pyramid.interfaces.ICacheBuster`
 interface.  Alternatively you may choose to subclass one of the existing
 implementations.  One of the most likely scenarios is you'd want to change the
-way the asset token is generated.  To do this just subclass an existing
-implementation and replace the :meth:`~pyramid.interfaces.ICacheBuster.token`
-method.  Here is an example which just uses Git to get the hash of the 
-currently checked out code:
+way the asset token is generated.  To do this just subclass either
+:class:`~pyramid.static.PathSegmentCacheBuster` or
+:class:`~pyramid.static.QueryStringCacheBuster` and define a
+``tokenize(pathspec)`` method. Here is an example which just uses Git to get
+the hash of the currently checked out code:
 
 .. code-block:: python
    :linenos:
 
    import os
    import subprocess
-   from pyramid.static import PathSegmentMd5CacheBuster
+   from pyramid.static import PathSegmentCacheBuster
 
-   class GitCacheBuster(PathSegmentMd5CacheBuster):
+   class GitCacheBuster(PathSegmentCacheBuster):
        """
        Assuming your code is installed as a Git checkout, as opposed to as an
        egg from an egg repository like PYPI, you can use this cachebuster to
@@ -470,7 +471,7 @@ currently checked out code:
                ['git', 'rev-parse', 'HEAD'],
                cwd=here).strip()
 
-       def token(self, pathspec):
+       def tokenize(self, pathspec):
            return self.sha1
    
 Choosing a Cache Buster
