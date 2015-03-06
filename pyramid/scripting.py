@@ -1,12 +1,12 @@
 from pyramid.config import global_registries
 from pyramid.exceptions import ConfigurationError
-from pyramid.request import Request
 
 from pyramid.interfaces import (
-    IRequestExtensions,
     IRequestFactory,
     IRootFactory,
     )
+from pyramid.request import Request
+from pyramid.request import apply_request_extensions
 
 from pyramid.threadlocal import manager as threadlocal_manager
 from pyramid.traversal import DefaultRootFactory
@@ -77,9 +77,7 @@ def prepare(request=None, registry=None):
     request.registry = registry 
     threadlocals = {'registry':registry, 'request':request}
     threadlocal_manager.push(threadlocals)
-    extensions = registry.queryUtility(IRequestExtensions)
-    if extensions is not None:
-        request._set_extensions(extensions)
+    apply_request_extensions(request)
     def closer():
         threadlocal_manager.pop()
     root_factory = registry.queryUtility(IRootFactory,

@@ -176,7 +176,7 @@ class Md5AssetTokenGenerator(object):
     def __init__(self):
         self.token_cache = {}
 
-    def token(self, pathspec):
+    def tokenize(self, pathspec):
         # An astute observer will notice that this use of token_cache doesn't
         # look particularly thread safe.  Basic read/write operations on Python
         # dicts, however, are atomic, so simply accessing and writing values
@@ -194,7 +194,25 @@ class Md5AssetTokenGenerator(object):
             self.token_cache[pathspec] = token = _generate_md5(pathspec)
         return token
 
-class PathSegmentMd5CacheBuster(Md5AssetTokenGenerator):
+class PathSegmentCacheBuster(object):
+    """
+    An implementation of :class:`~pyramid.interfaces.ICacheBuster` which
+    inserts a token for cache busting in the path portion of an asset URL.
+
+    To use this class, subclass it and provide a ``tokenize`` method which
+    accepts a ``pathspec`` and returns a token.
+
+    .. versionadded:: 1.6
+    """
+    def pregenerate(self, pathspec, subpath, kw):
+        token = self.tokenize(pathspec)
+        return (token,) + subpath, kw
+
+    def match(self, subpath):
+        return subpath[1:]
+
+class PathSegmentMd5CacheBuster(PathSegmentCacheBuster,
+                                Md5AssetTokenGenerator):
     """
     An implementation of :class:`~pyramid.interfaces.ICacheBuster` which
     inserts an md5 checksum token for cache busting in the path portion of an
@@ -203,13 +221,36 @@ class PathSegmentMd5CacheBuster(Md5AssetTokenGenerator):
 
     .. versionadded:: 1.6
     """
-    def pregenerate(self, token, subpath, kw):
-        return (token,) + subpath, kw
+    def __init__(self):
+        super(PathSegmentMd5CacheBuster, self).__init__()
 
-    def match(self, subpath):
-        return subpath[1:]
+class QueryStringCacheBuster(object):
+    """
+    An implementation of :class:`~pyramid.interfaces.ICacheBuster` which adds
+    a token for cache busting in the query string of an asset URL.
 
-class QueryStringMd5CacheBuster(Md5AssetTokenGenerator):
+    The optional ``param`` argument determines the name of the parameter added
+    to the query string and defaults to ``'x'``.
+
+    To use this class, subclass it and provide a ``tokenize`` method which
+    accepts a ``pathspec`` and returns a token.
+
+    .. versionadded:: 1.6
+    """
+    def __init__(self, param='x'):
+        self.param = param
+
+    def pregenerate(self, pathspec, subpath, kw):
+        token = self.tokenize(pathspec)
+        query = kw.setdefault('_query', {})
+        if isinstance(query, dict):
+            query[self.param] = token
+        else:
+            kw['_query'] = tuple(query) + ((self.param, token),)
+        return subpath, kw
+
+class QueryStringMd5CacheBuster(QueryStringCacheBuster,
+                                Md5AssetTokenGenerator):
     """
     An implementation of :class:`~pyramid.interfaces.ICacheBuster` which adds
     an md5 checksum token for cache busting in the query string of an asset
@@ -222,18 +263,9 @@ class QueryStringMd5CacheBuster(Md5AssetTokenGenerator):
     .. versionadded:: 1.6
     """
     def __init__(self, param='x'):
-        super(QueryStringMd5CacheBuster, self).__init__()
-        self.param = param
+        super(QueryStringMd5CacheBuster, self).__init__(param=param)
 
-    def pregenerate(self, token, subpath, kw):
-        query = kw.setdefault('_query', {})
-        if isinstance(query, dict):
-            query[self.param] = token
-        else:
-            kw['_query'] = tuple(query) + ((self.param, token),)
-        return subpath, kw
-
-class QueryStringConstantCacheBuster(QueryStringMd5CacheBuster):
+class QueryStringConstantCacheBuster(QueryStringCacheBuster):
     """
     An implementation of :class:`~pyramid.interfaces.ICacheBuster` which adds
     an arbitrary token for cache busting in the query string of an asset URL.
@@ -247,9 +279,8 @@ class QueryStringConstantCacheBuster(QueryStringMd5CacheBuster):
     .. versionadded:: 1.6
     """
     def __init__(self, token, param='x'):
+        super(QueryStringConstantCacheBuster, self).__init__(param=param)
         self._token = token
-        self.param = param
 
-    def token(self, pathspec):
+    def tokenize(self, pathspec):
         return self._token
-

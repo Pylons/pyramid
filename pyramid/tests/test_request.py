@@ -310,7 +310,7 @@ class TestRequest(unittest.TestCase):
             b'/\xe6\xb5\x81\xe8\xa1\x8c\xe8\xb6\x8b\xe5\x8a\xbf',
             'utf-8'
             )
-        if PY3: # pragma: no cover
+        if PY3:
             body = bytes(json.dumps({'a':inp}), 'utf-16')
         else:
             body = json.dumps({'a':inp}).decode('utf-8').encode('utf-16')
@@ -435,7 +435,50 @@ class Test_call_app_with_subpath_as_path_info(unittest.TestCase):
         self.assertEqual(request.environ['SCRIPT_NAME'], '/' + encoded)
         self.assertEqual(request.environ['PATH_INFO'], '/' + encoded)
 
-class DummyRequest:
+class Test_apply_request_extensions(unittest.TestCase):
+    def setUp(self):
+        self.config = testing.setUp()
+
+    def tearDown(self):
+        testing.tearDown()
+
+    def _callFUT(self, request, extensions=None):
+        from pyramid.request import apply_request_extensions
+        return apply_request_extensions(request, extensions=extensions)
+
+    def test_it_with_registry(self):
+        from pyramid.interfaces import IRequestExtensions
+        extensions = Dummy()
+        extensions.methods = {'foo': lambda x, y: y}
+        extensions.descriptors = {'bar': property(lambda x: 'bar')}
+        self.config.registry.registerUtility(extensions, IRequestExtensions)
+        request = DummyRequest()
+        request.registry = self.config.registry
+        self._callFUT(request)
+        self.assertEqual(request.bar, 'bar')
+        self.assertEqual(request.foo('abc'), 'abc')
+
+    def test_it_override_extensions(self):
+        from pyramid.interfaces import IRequestExtensions
+        ignore = Dummy()
+        ignore.methods = {'x': lambda x, y, z: 'asdf'}
+        ignore.descriptors = {'bar': property(lambda x: 'asdf')}
+        self.config.registry.registerUtility(ignore, IRequestExtensions)
+        request = DummyRequest()
+        request.registry = self.config.registry
+
+        extensions = Dummy()
+        extensions.methods = {'foo': lambda x, y: y}
+        extensions.descriptors = {'bar': property(lambda x: 'bar')}
+        self._callFUT(request, extensions=extensions)
+        self.assertRaises(AttributeError, lambda: request.x)
+        self.assertEqual(request.bar, 'bar')
+        self.assertEqual(request.foo('abc'), 'abc')
+
+class Dummy(object):
+    pass
+
+class DummyRequest(object):
     def __init__(self, environ=None):
         if environ is None:
             environ = {}

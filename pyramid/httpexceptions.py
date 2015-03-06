@@ -1103,9 +1103,11 @@ def default_exceptionresponse_view(context, request):
 status_map = {}
 code = None
 for name, value in list(globals().items()):
-    if (isinstance(value, class_types) and
-        issubclass(value, HTTPException)
-        and not name.startswith('_')):
+    if (
+            isinstance(value, class_types) and
+            issubclass(value, HTTPException) and
+            not name.startswith('_')
+    ):
         code = getattr(value, 'code', None)
         if code:
             status_map[code] = value

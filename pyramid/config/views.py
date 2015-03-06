@@ -356,9 +356,8 @@ class ViewDeriver(object):
 
     def _rendered_view(self, view, view_renderer):
         def rendered_view(context, request):
-            renderer = view_renderer
             result = view(context, request)
-            if result.__class__ is Response: # potential common case
+            if result.__class__ is Response:  # potential common case
                 response = result
             else:
                 registry = self.registry
@@ -374,6 +373,9 @@ class ViewDeriver(object):
                             name=renderer_name,
                             package=self.kw.get('package'),
                             registry=registry)
+                    else:
+                        renderer = view_renderer.clone()
+
                     if '__view__' in attrs:
                         view_inst = attrs.pop('__view__')
                     else:
@@ -386,9 +388,10 @@ class ViewDeriver(object):
 
     def _response_resolved_view(self, view):
         registry = self.registry
+
         def viewresult_to_response(context, request):
             result = view(context, request)
-            if result.__class__ is Response: # common case
+            if result.__class__ is Response:  # common case
                 response = result
             else:
                 response = registry.queryAdapterOrSelf(result, IResponse)
@@ -418,6 +421,7 @@ class ViewDeriver(object):
         if decorator is None:
             return view
         return decorator(view)
+
 
 @implementer(IViewMapper)
 @provider(IViewMapperFactory)
@@ -1992,9 +1996,9 @@ class StaticURLInfo(object):
             cb = self._default_cachebust()
         if cb:
             def cachebust(subpath, kw):
-                token = cb.token(spec + subpath)
                 subpath_tuple = tuple(subpath.split('/'))
-                subpath_tuple, kw = cb.pregenerate(token, subpath_tuple, kw)
+                subpath_tuple, kw = cb.pregenerate(
+                    spec + subpath, subpath_tuple, kw)
                 return '/'.join(subpath_tuple), kw
         else:
             cachebust = None

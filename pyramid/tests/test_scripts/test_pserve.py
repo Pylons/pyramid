@@ -4,7 +4,7 @@ import tempfile
 import unittest
 
 from pyramid.compat import PY3
-if PY3: # pragma: no cover
+if PY3:
     import builtins as __builtin__
 else:
     import __builtin__

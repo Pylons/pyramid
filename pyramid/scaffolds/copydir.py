@@ -186,10 +186,10 @@ def query_interactive(src_fn, dest_fn, src_content, dest_content,
         dest_content.splitlines(),
         src_content.splitlines(),
         dest_fn, src_fn))
-    added = len([l for l in u_diff if l.startswith('+')
-                 and not l.startswith('+++')])
-    removed = len([l for l in u_diff if l.startswith('-')
-                   and not l.startswith('---')])
+    added = len([l for l in u_diff if l.startswith('+') and
+                 not l.startswith('+++')])
+    removed = len([l for l in u_diff if l.startswith('-') and
+                   not l.startswith('---')])
     if added > removed:
         msg = '; %i lines added' % (added - removed)
     elif removed > added:

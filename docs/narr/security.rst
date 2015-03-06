@@ -341,9 +341,7 @@ third argument is a permission or sequence of permission names.
 A principal is usually a user id, however it also may be a group id if your
 authentication system provides group information and the effective
 :term:`authentication policy` policy is written to respect group information.
-For example, the
-:class:`pyramid.authentication.RepozeWho1AuthenticationPolicy` respects group
-information if you configure it with a ``callback``.
+See :ref:`extending_default_authentication_policies`.
 
 Each ACE in an ACL is processed by an authorization policy *in the
 order dictated by the ACL*.  So if you have an ACL like this:
@@ -583,6 +581,60 @@ via print statements when a call to
 :meth:`~pyramid.request.Request.has_permission` fails is often useful.
 
 .. index::
+   single: authentication policy (extending)
+
+.. _extending_default_authentication_policies:
+
+Extending Default Authentication Policies
+-----------------------------------------
+
+Pyramid ships with some builtin authentication policies for use in your
+applications. See :mod:`pyramid.authentication` for the available
+policies. They differ on their mechanisms for tracking authentication
+credentials between requests, however they all interface with your
+application in mostly the same way.
+
+Above you learned about :ref:`assigning_acls`. Each :term:`principal` used
+in the :term:`ACL` is matched against the list returned from
+:meth:`pyramid.interfaces.IAuthenticationPolicy.effective_principals`.
+Similarly, :meth:`pyramid.request.Request.authenticated_userid` maps to
+:meth:`pyramid.interfaces.IAuthenticationPolicy.authenticated_userid`.
+
+You may control these values by subclassing the default authentication
+policies. For example, below we subclass the
+:class:`pyramid.authentication.AuthTktAuthenticationPolicy` and define
+extra functionality to query our database before confirming that the
+:term:`userid` is valid in order to avoid blindly trusting the value in the
+cookie (what if the cookie is still valid but the user has deleted their
+account?). We then use that :term:`userid` to augment the
+``effective_principals`` with information about groups and other state for
+that user.
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.authentication import AuthTktAuthenticationPolicy
+
+   class MyAuthenticationPolicy(AuthTktAuthenticationPolicy):
+       def authenticated_userid(self, request):
+           userid = self.unauthenticated_userid(request)
+           if userid:
+               if request.verify_userid_is_still_valid(userid):
+                   return userid
+
+       def effective_principals(self, request):
+           principals = [Everyone]
+           userid = self.authenticated_userid(request)
+           if userid:
+               principals += [Authenticated, str(userid)]
+           return principals
+
+In most instances ``authenticated_userid`` and ``effective_principals`` are
+application-specific whereas ``unauthenticated_userid``, ``remember`` and
+``forget`` are generic and focused on transport/serialization of data
+between consecutive requests.
+
+.. index::
    single: authentication policy (creating)
 
 .. _creating_an_authentication_policy:
@@ -653,7 +705,7 @@ that implements the following interface:
            """
 
 After you do so, you can pass an instance of such a class into the
-:class:`~pyramid.config.Configurator.set_authentication_policy` method
+:class:`~pyramid.config.Configurator.set_authentication_policy` method at
 configuration time to use it.
 
 .. index::

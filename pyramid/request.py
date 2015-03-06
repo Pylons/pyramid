@@ -8,6 +8,7 @@ from webob import BaseRequest
 
 from pyramid.interfaces import (
     IRequest,
+    IRequestExtensions,
     IResponse,
     ISessionFactory,
     )
@@ -16,6 +17,7 @@ from pyramid.compat import (
     text_,
     bytes_,
     native_,
+    iteritems_,
     )
 
 from pyramid.decorator import reify
@@ -26,7 +28,10 @@ from pyramid.security import (
     AuthorizationAPIMixin,
     )
 from pyramid.url import URLMethodsMixin
-from pyramid.util import InstancePropertyMixin
+from pyramid.util import (
+    InstancePropertyHelper,
+    InstancePropertyMixin,
+)
 
 class TemplateContext(object):
     pass
@@ -308,3 +313,22 @@ def call_app_with_subpath_as_path_info(request, app):
     new_request.environ['PATH_INFO'] = new_path_info
 
     return new_request.get_response(app)
+
+def apply_request_extensions(request, extensions=None):
+    """Apply request extensions (methods and properties) to an instance of
+    :class:`pyramid.interfaces.IRequest`. This method is dependent on the
+    ``request`` containing a properly initialized registry.
+
+    After invoking this method, the ``request`` should have the methods
+    and properties that were defined using
+    :meth:`pyramid.config.Configurator.add_request_method`.
+    """
+    if extensions is None:
+        extensions = request.registry.queryUtility(IRequestExtensions)
+    if extensions is not None:
+        for name, fn in iteritems_(extensions.methods):
+            method = fn.__get__(request, request.__class__)
+            setattr(request, name, method)
+
+        InstancePropertyHelper.apply_properties(
+            request, extensions.descriptors)

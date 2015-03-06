@@ -382,6 +382,9 @@ class IRendererInfo(Interface):
     settings = Attribute('The deployment settings dictionary related '
                          'to the current application')
 
+    def clone():
+        """ Return a shallow copy that does not share any mutable state."""
+
 class IRendererFactory(Interface):
     def __call__(info):
         """ Return an object that implements
@@ -591,8 +594,7 @@ class IResponseFactory(Interface):
 class IRequestFactory(Interface):
     """ A utility which generates a request """
     def __call__(environ):
-        """ Return an object implementing IRequest, e.g. an instance
-        of ``pyramid.request.Request``"""
+        """ Return an instance of ``pyramid.request.Request``"""
 
     def blank(path):
         """ Return an empty request object (see
@@ -1193,18 +1195,11 @@ class ICacheBuster(Interface):
 
     .. versionadded:: 1.6
     """
-    def token(pathspec):
-        """
-        Computes and returns a token string used for cache busting.
-        ``pathspec`` is the path specification for the resource to be cache
-        busted.  """
-
-    def pregenerate(token, subpath, kw):
+    def pregenerate(pathspec, subpath, kw):
         """
         Modifies a subpath and/or keyword arguments from which a static asset
-        URL will be computed during URL generation.  The ``token`` argument is
-        a token string computed by
-        :meth:`~pyramid.interfaces.ICacheBuster.token` for a particular asset.
+        URL will be computed during URL generation.  The ``pathspec`` argument
+        is the path specification for the resource to be cache busted.
         The ``subpath`` argument is a tuple of path elements that represent the
         portion of the asset URL which is used to find the asset.  The ``kw``
         argument is a dict of keywords that are to be passed eventually to
@@ -1236,6 +1231,7 @@ class ICacheBuster(Interface):
 # with this phase will be executed earlier than those with later phase
 # numbers.  The default phase number is 0, FTR.
 
+PHASE0_CONFIG = -30
 PHASE1_CONFIG = -20
 PHASE2_CONFIG = -10
-
+PHASE3_CONFIG = 0
