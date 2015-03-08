@@ -309,7 +309,7 @@ def object_description(object):
     if isinstance(object, (bool, float, type(None))):
         return text_(str(object))
     if isinstance(object, set):
-        if PY3: # pragma: no cover
+        if PY3:
             return shortrepr(object, '}')
         else:
             return shortrepr(object, ')')

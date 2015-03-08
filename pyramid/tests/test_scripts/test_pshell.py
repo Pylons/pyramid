@@ -379,7 +379,7 @@ class TestPShellCommand(unittest.TestCase):
             os.path.abspath(
                 os.path.join(
                     os.path.dirname(__file__),
-                    'pystartup.py')))
+                    'pystartup.txt')))
         shell = dummy.DummyShell()
         command.run(shell)
         self.assertEqual(self.bootstrap.a[0], '/foo/bar/myapp.ini#myapp')

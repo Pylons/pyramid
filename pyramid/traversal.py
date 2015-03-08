@@ -575,7 +575,7 @@ the ``safe`` argument to this function.  This corresponds to the
 """
 
 
-if PY3: # pragma: no cover
+if PY3:
     # special-case on Python 2 for speed?  unchecked
     def quote_path_segment(segment, safe=''):
         """ %s """ % quote_path_segment_doc

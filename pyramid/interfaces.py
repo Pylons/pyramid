@@ -382,6 +382,9 @@ class IRendererInfo(Interface):
     settings = Attribute('The deployment settings dictionary related '
                          'to the current application')
 
+    def clone():
+        """ Return a shallow copy that does not share any mutable state."""
+
 class IRendererFactory(Interface):
     def __call__(info):
         """ Return an object that implements
