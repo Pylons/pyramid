@@ -20,6 +20,26 @@ Support and Documentation
 See the `Pylons Project website <http://pylonsproject.org/>`_ to view
 documentation, report bugs, and obtain support.
 
+
+Local documentation
+~~~~~~~~~~~~~~~~~~~
+
+Documentation can be generated locally with this command:
+
+.. code-block:: bash
+
+  $ cd <pyramid-local-directory>/docs
+  $ tox -e py2-docs
+
+
+Please make sure you installed all the required dependencies :
+
+.. code-block:: bash
+
+  $ cd <pyramid-local-directory>/docs
+  $ pip install -r rtd.txt
+
+
 License
 -------
 
