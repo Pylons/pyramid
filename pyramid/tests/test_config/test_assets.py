@@ -54,6 +54,12 @@ class TestAssetsConfiguratorMixin(unittest.TestCase):
         self.assertEqual(source.package, subpackage)
         self.assertEqual(source.prefix, 'templates/bar.pt')
 
+        resource_name = ''
+        expected = os.path.join(here, 'pkgs', 'asset',
+                                'subpackage', 'templates', 'bar.pt')
+        self.assertEqual(override.source.get_filename(resource_name),
+                         expected)
+
     def test_override_asset_package_with_package(self):
         from pyramid.config.assets import PackageAssetSource
         config = self._makeOne(autocommit=True)
@@ -70,6 +76,12 @@ class TestAssetsConfiguratorMixin(unittest.TestCase):
         self.assertTrue(isinstance(source, PackageAssetSource))
         self.assertEqual(source.package, subpackage)
         self.assertEqual(source.prefix, '')
+
+        resource_name = 'templates/bar.pt'
+        expected = os.path.join(here, 'pkgs', 'asset',
+                                'subpackage', 'templates', 'bar.pt')
+        self.assertEqual(override.source.get_filename(resource_name),
+                         expected)
 
     def test_override_asset_directory_with_directory(self):
         from pyramid.config.assets import PackageAssetSource
@@ -88,6 +100,12 @@ class TestAssetsConfiguratorMixin(unittest.TestCase):
         self.assertEqual(source.package, subpackage)
         self.assertEqual(source.prefix, 'templates/')
 
+        resource_name = 'bar.pt'
+        expected = os.path.join(here, 'pkgs', 'asset',
+                                'subpackage', 'templates', 'bar.pt')
+        self.assertEqual(override.source.get_filename(resource_name),
+                         expected)
+
     def test_override_asset_directory_with_package(self):
         from pyramid.config.assets import PackageAssetSource
         config = self._makeOne(autocommit=True)
@@ -105,6 +123,12 @@ class TestAssetsConfiguratorMixin(unittest.TestCase):
         self.assertEqual(source.package, subpackage)
         self.assertEqual(source.prefix, '')
 
+        resource_name = 'templates/bar.pt'
+        expected = os.path.join(here, 'pkgs', 'asset',
+                                'subpackage', 'templates', 'bar.pt')
+        self.assertEqual(override.source.get_filename(resource_name),
+                         expected)
+
     def test_override_asset_package_with_directory(self):
         from pyramid.config.assets import PackageAssetSource
         config = self._makeOne(autocommit=True)
@@ -121,6 +145,12 @@ class TestAssetsConfiguratorMixin(unittest.TestCase):
         self.assertTrue(isinstance(source, PackageAssetSource))
         self.assertEqual(source.package, subpackage)
         self.assertEqual(source.prefix, 'templates/')
+
+        resource_name = 'bar.pt'
+        expected = os.path.join(here, 'pkgs', 'asset',
+                                'subpackage', 'templates', 'bar.pt')
+        self.assertEqual(override.source.get_filename(resource_name),
+                         expected)
 
     def test_override_asset_directory_with_absfile(self):
         from pyramid.exceptions import ConfigurationError
@@ -161,6 +191,12 @@ class TestAssetsConfiguratorMixin(unittest.TestCase):
         self.assertTrue(isinstance(source, FSAssetSource))
         self.assertEqual(source.prefix, abspath)
 
+        resource_name = ''
+        expected = os.path.join(here, 'pkgs', 'asset',
+                                'subpackage', 'templates', 'bar.pt')
+        self.assertEqual(override.source.get_filename(resource_name),
+                         expected)
+
     def test_override_asset_directory_with_absdirectory(self):
         from pyramid.config.assets import FSAssetSource
         config = self._makeOne(autocommit=True)
@@ -177,6 +213,12 @@ class TestAssetsConfiguratorMixin(unittest.TestCase):
         self.assertTrue(isinstance(source, FSAssetSource))
         self.assertEqual(source.prefix, abspath)
 
+        resource_name = 'bar.pt'
+        expected = os.path.join(here, 'pkgs', 'asset',
+                                'subpackage', 'templates', 'bar.pt')
+        self.assertEqual(override.source.get_filename(resource_name),
+                         expected)
+
     def test_override_asset_package_with_absdirectory(self):
         from pyramid.config.assets import FSAssetSource
         config = self._makeOne(autocommit=True)
@@ -192,6 +234,12 @@ class TestAssetsConfiguratorMixin(unittest.TestCase):
         source = override.source
         self.assertTrue(isinstance(source, FSAssetSource))
         self.assertEqual(source.prefix, abspath)
+
+        resource_name = 'bar.pt'
+        expected = os.path.join(here, 'pkgs', 'asset',
+                                'subpackage', 'templates', 'bar.pt')
+        self.assertEqual(override.source.get_filename(resource_name),
+                         expected)
 
     def test__override_not_yet_registered(self):
         from pyramid.interfaces import IPackageOverrides

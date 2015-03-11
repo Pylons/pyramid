@@ -13,8 +13,6 @@ from pyramid.interfaces import (
     IRequestFactory,
     IRoutesMapper,
     ITraverser,
-    IView,
-    IViewClassifier,
     ITweens,
     )
 
@@ -28,6 +26,7 @@ from pyramid.exceptions import PredicateMismatch
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.request import Request
 from pyramid.view import _find_views
+from pyramid.request import apply_request_extensions
 from pyramid.threadlocal import manager
 
 from pyramid.traversal import (
@@ -212,7 +211,7 @@ class Router(object):
             try:
                 extensions = self.request_extensions
                 if extensions is not None:
-                    request._set_extensions(extensions)
+                    apply_request_extensions(request, extensions=extensions)
                 response = handle_request(request)
 
                 if request.response_callbacks:

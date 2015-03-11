@@ -132,3 +132,8 @@
    are being used.
 
 .. autoclass:: not_
+
+.. attribute:: PHASE0_CONFIG
+.. attribute:: PHASE1_CONFIG
+.. attribute:: PHASE2_CONFIG
+.. attribute:: PHASE3_CONFIG

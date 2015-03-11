@@ -4,12 +4,37 @@ Next release
 Features
 --------
 
+- The ``pyramid.config.Configurator`` has grown the ability to allow
+  actions to call other actions during a commit-cycle. This enables much more
+  logic to be placed into actions, such as the ability to invoke other actions
+  or group them for improved conflict detection. We have also exposed and
+  documented the config phases that Pyramid uses in order to further assist
+  in building conforming addons.
+  See https://github.com/Pylons/pyramid/pull/1513
+
+- Add ``pyramid.request.apply_request_extensions`` function which can be
+  used in testing to apply any request extensions configured via
+  ``config.add_request_method``. Previously it was only possible to test
+  the extensions by going through Pyramid's router.
+  See https://github.com/Pylons/pyramid/pull/1581
+
+- pcreate when run without a scaffold argument will now print information on
+  the missing flag, as well as a list of available scaffolds.
+  See https://github.com/Pylons/pyramid/pull/1566 and
+  https://github.com/Pylons/pyramid/issues/1297
+
 - Added support / testing for 'pypy3' under Tox and Travis.
   See https://github.com/Pylons/pyramid/pull/1469
 
+- Automate code coverage metrics across py2 and py3 instead of just py2.
+  See https://github.com/Pylons/pyramid/pull/1471
+
 - Cache busting for static resources has been added and is available via a new
   argument to ``pyramid.config.Configurator.add_static_view``: ``cachebust``.
-  See https://github.com/Pylons/pyramid/pull/1380
+  Core APIs are shipped for both cache busting via query strings and
+  path segments and may be extended to fit into custom asset pipelines.
+  See https://github.com/Pylons/pyramid/pull/1380 and
+  https://github.com/Pylons/pyramid/pull/1583
 
 - Add ``pyramid.config.Configurator.root_package`` attribute and init
   parameter to assist with includeable packages that wish to resolve
@@ -77,8 +102,30 @@ Features
   output by showing the module instead of just ``__repr__``.
   See https://github.com/Pylons/pyramid/pull/1488
 
+- Support keyword-only arguments and function annotations in views in
+  Python 3. See https://github.com/Pylons/pyramid/pull/1556
+
+- ``request.response`` will no longer be mutated when using the
+  ``pyramid.renderers.render_to_response()`` API.  It is now necessary to
+  pass in a ``response=`` argument to ``render_to_response`` if you wish to
+  supply the renderer with a custom response object for it to use. If you
+  do not pass one then a response object will be created using the
+  application's ``IResponseFactory``. Almost all renderers
+  mutate the ``request.response`` response object (for example, the JSON
+  renderer sets ``request.response.content_type`` to ``application/json``).
+  However, when invoking ``render_to_response`` it is not expected that the
+  response object being returned would be the same one used later in the
+  request. The response object returned from ``render_to_response`` is now
+  explicitly different from ``request.response``. This does not change the
+  API of a renderer. See https://github.com/Pylons/pyramid/pull/1563
+
 Bug Fixes
 ---------
+
+- Work around an issue where ``pserve --reload`` would leave terminal echo
+  disabled if it reloaded during a pdb session.
+  See https://github.com/Pylons/pyramid/pull/1577,
+  https://github.com/Pylons/pyramid/pull/1592
 
 - ``pyramid.wsgi.wsgiapp`` and ``pyramid.wsgi.wsgiapp2`` now raise
   ``ValueError`` when accidentally passed ``None``.
@@ -117,6 +164,24 @@ Bug Fixes
 - Fix route generation for static view asset specifications having no path.
   See https://github.com/Pylons/pyramid/pull/1377
 
+- Allow the ``pyramid.renderers.JSONP`` renderer to work even if there is no
+  valid request object. In this case it will not wrap the object in a
+  callback and thus behave just like the ``pyramid.renderers.JSON`` renderer.
+  See https://github.com/Pylons/pyramid/pull/1561
+
+- Prevent "parameters to load are deprecated" ``DeprecationWarning``
+  from setuptools>=11.3. See https://github.com/Pylons/pyramid/pull/1541
+
+- Avoiding sharing the ``IRenderer`` objects across threads when attached to
+  a view using the `renderer=` argument. These renderers were instantiated
+  at time of first render and shared between requests, causing potentially
+  subtle effects like `pyramid.reload_templates = true` failing to work
+  in `pyramid_mako`. See https://github.com/Pylons/pyramid/pull/1575
+  and https://github.com/Pylons/pyramid/issues/1268
+
+- Avoiding timing attacks against CSRF tokens.
+  See https://github.com/Pylons/pyramid/pull/1574
+
 Deprecations
 ------------
 
@@ -126,6 +191,13 @@ Deprecations
 
 Docs
 ----
+
+- Moved the documentation for ``accept`` on ``Configurator.add_view`` to no
+  longer be part of the predicate list. See
+  https://github.com/Pylons/pyramid/issues/1391 for a bug report stating
+  ``not_`` was failing on ``accept``. Discussion with @mcdonc led to the
+  conclusion that it should not be documented as a predicate.
+  See https://github.com/Pylons/pyramid/pull/1487 for this PR
 
 - Removed logging configuration from Quick Tutorial ini files except for
   scaffolding- and logging-related chapters to avoid needing to explain it too

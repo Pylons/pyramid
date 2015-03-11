@@ -369,3 +369,4 @@
    that used as ``request.GET``, ``request.POST``, and ``request.params``),
    see :class:`pyramid.interfaces.IMultiDict`.
 
+.. autofunction:: apply_request_extensions(request)

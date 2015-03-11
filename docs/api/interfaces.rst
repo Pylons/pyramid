@@ -56,6 +56,9 @@ Other Interfaces
   .. autointerface:: IRenderer
      :members:
 
+  .. autointerface:: IResponseFactory
+     :members:
+
   .. autointerface:: IViewMapperFactory
      :members:
 

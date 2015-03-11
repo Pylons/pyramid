@@ -1738,6 +1738,20 @@ class TestViewsConfigurationMixin(unittest.TestCase):
             renderer=null_renderer)
         self.assertRaises(ConfigurationConflictError, config.commit)
 
+    def test_add_view_class_method_no_attr(self):
+        from pyramid.renderers import null_renderer
+        from zope.interface import directlyProvides
+        from pyramid.exceptions import ConfigurationError
+
+        config = self._makeOne(autocommit=True)
+        class DummyViewClass(object):
+            def run(self): pass
+
+        def configure_view():
+            config.add_view(view=DummyViewClass.run, renderer=null_renderer)
+
+        self.assertRaises(ConfigurationError, configure_view)
+
     def test_derive_view_function(self):
         from pyramid.renderers import null_renderer
         def view(request):
@@ -2606,6 +2620,8 @@ class TestViewDeriver(unittest.TestCase):
                 self.assertEqual(view_inst, view)
                 self.assertEqual(ctx, context)
                 return response
+            def clone(self):
+                return self
         def view(request):
             return 'OK'
         deriver = self._makeOne(renderer=moo())
@@ -2643,6 +2659,8 @@ class TestViewDeriver(unittest.TestCase):
                 self.assertEqual(view_inst, 'view')
                 self.assertEqual(ctx, context)
                 return response
+            def clone(self):
+                return self
         def view(request):
             return 'OK'
         deriver = self._makeOne(renderer=moo())
@@ -3237,6 +3255,8 @@ class TestViewDeriver(unittest.TestCase):
                 self.assertEqual(view_inst.__class__, View)
                 self.assertEqual(ctx, context)
                 return response
+            def clone(self):
+                return self
         class View(object):
             def __init__(self, context, request):
                 pass
@@ -3261,6 +3281,8 @@ class TestViewDeriver(unittest.TestCase):
                 self.assertEqual(view_inst.__class__, View)
                 self.assertEqual(ctx, context)
                 return response
+            def clone(self):
+                return self
         class View(object):
             def __init__(self, request):
                 pass
@@ -3285,6 +3307,8 @@ class TestViewDeriver(unittest.TestCase):
                 self.assertEqual(view_inst.__class__, View)
                 self.assertEqual(ctx, context)
                 return response
+            def clone(self):
+                return self
         class View:
             def __init__(self, context, request):
                 pass
@@ -3309,6 +3333,8 @@ class TestViewDeriver(unittest.TestCase):
                 self.assertEqual(view_inst.__class__, View)
                 self.assertEqual(ctx, context)
                 return response
+            def clone(self):
+                return self
         class View:
             def __init__(self, request):
                 pass
@@ -3333,6 +3359,8 @@ class TestViewDeriver(unittest.TestCase):
                 self.assertEqual(view_inst, view)
                 self.assertEqual(ctx, context)
                 return response
+            def clone(self):
+                return self
         class View:
             def index(self, context, request):
                 return {'a':'1'}
@@ -3355,6 +3383,8 @@ class TestViewDeriver(unittest.TestCase):
                 self.assertEqual(view_inst, view)
                 self.assertEqual(ctx, context)
                 return response
+            def clone(self):
+                return self
         class View:
             def index(self, request):
                 return {'a':'1'}
@@ -4053,7 +4083,7 @@ class TestStaticURLInfo(unittest.TestCase):
     def test_add_cachebust_default(self):
         config = self._makeConfig()
         inst = self._makeOne()
-        inst._default_cachebust = DummyCacheBuster
+        inst._default_cachebust = lambda: DummyCacheBuster('foo')
         inst.add(config, 'view', 'mypackage:path', cachebust=True)
         cachebust = config.registry._static_url_registrations[0][3]
         subpath, kw = cachebust('some/path', {})
@@ -4072,7 +4102,7 @@ class TestStaticURLInfo(unittest.TestCase):
         config = self._makeConfig()
         inst = self._makeOne()
         inst.add(config, 'view', 'mypackage:path',
-                 cachebust=DummyCacheBuster())
+                 cachebust=DummyCacheBuster('foo'))
         cachebust = config.registry._static_url_registrations[0][3]
         subpath, kw = cachebust('some/path', {})
         self.assertEqual(subpath, 'some/path')
@@ -4185,10 +4215,10 @@ class DummyMultiView:
         """ """
 
 class DummyCacheBuster(object):
-    def token(self, pathspec):
-        return 'foo'
-    def pregenerate(self, token, subpath, kw):
-        kw['x'] = token
+    def __init__(self, token):
+        self.token = token
+    def pregenerate(self, pathspec, subpath, kw):
+        kw['x'] = self.token
         return subpath, kw
 
 def parse_httpdate(s):
