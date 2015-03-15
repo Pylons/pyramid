@@ -244,3 +244,5 @@ Contributors
 - Geoffrey T. Dairiki, 2015/02/06
 
 - David Glick, 2015/02/12
+
+- Donald Stufft, 2015/03/15
