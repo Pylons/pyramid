@@ -380,7 +380,7 @@ class forbidden_view_config(object):
 
         @forbidden_view_config()
         def forbidden(request):
-            return Response('You are not allowed', status='401 Unauthorized')
+            return Response('You are not allowed', status='403 Forbidden')
 
     All arguments passed to this function have the same meaning as
     :meth:`pyramid.view.view_config` and each predicate argument restricts
