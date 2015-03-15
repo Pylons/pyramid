@@ -842,7 +842,9 @@ route.  When configured, along with at least one other route in your
 application, this view will be invoked if the value of ``PATH_INFO`` does not
 already end in a slash, and if the value of ``PATH_INFO`` *plus* a slash
 matches any route's pattern.  In this case it does an HTTP redirect to the
-slash-appended ``PATH_INFO``.
+slash-appended ``PATH_INFO``. In addition you may pass anything that implements
+:class:`pyramid.interfaces.IResponse` which will then be used in place of the
+default class (:class:`pyramid.httpexceptions.HTTPFound`).
 
 Let's use an example.  If the following routes are configured in your
 application:
