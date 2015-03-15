@@ -119,6 +119,10 @@ Features
   explicitly different from ``request.response``. This does not change the
   API of a renderer. See https://github.com/Pylons/pyramid/pull/1563
 
+- ``Configurator().add_notfound_view()`` will now accept anything that
+  implements the ``IResponse`` interface and will use that as the response
+  class instead of the default ``HTTPFound``.
+
 Bug Fixes
 ---------
 
