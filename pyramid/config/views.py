@@ -1703,7 +1703,11 @@ class ViewsConfiguratorMixin(object):
         Pyramid will return the result of the view callable provided as
         ``view``, as normal.
 
+        If ``append_slash`` implements IResponse then that will be used as the
+        response class instead of the default of ``HTTPFound``.
+
         .. versionadded:: 1.3
+        .. versionchanged:: 1.6
         """
         for arg in ('name', 'permission', 'context', 'for_', 'http_cache'):
             if arg in predicates:
@@ -1737,7 +1741,12 @@ class ViewsConfiguratorMixin(object):
         settings.update(predicates)
         if append_slash:
             view = self._derive_view(view, attr=attr, renderer=renderer)
-            view = AppendSlashNotFoundViewFactory(view)
+            if IResponse.implementedBy(append_slash):
+                view = AppendSlashNotFoundViewFactory(
+                    view, redirect_class=append_slash,
+                )
+            else:
+                view = AppendSlashNotFoundViewFactory(view)
             settings['view'] = view
         else:
             settings['attr'] = attr

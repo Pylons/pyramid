@@ -1941,7 +1941,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         from pyramid.renderers import null_renderer
         from zope.interface import implementedBy
         from pyramid.interfaces import IRequest
-        from pyramid.httpexceptions import HTTPNotFound
+        from pyramid.httpexceptions import HTTPFound, HTTPNotFound
         config = self._makeOne(autocommit=True)
         config.add_route('foo', '/foo/')
         def view(request): return Response('OK')
@@ -1954,6 +1954,30 @@ class TestViewsConfigurationMixin(unittest.TestCase):
                                      ctx_iface=implementedBy(HTTPNotFound),
                                      request_iface=IRequest)
         result = view(None, request)
+        self.assertTrue(isinstance(result, HTTPFound))
+        self.assertEqual(result.location, '/scriptname/foo/?a=1&b=2')
+
+    def test_add_notfound_view_append_slash_custom_response(self):
+        from pyramid.response import Response
+        from pyramid.renderers import null_renderer
+        from zope.interface import implementedBy
+        from pyramid.interfaces import IRequest
+        from pyramid.httpexceptions import HTTPMovedPermanently, HTTPNotFound
+        config = self._makeOne(autocommit=True)
+        config.add_route('foo', '/foo/')
+        def view(request): return Response('OK')
+        config.add_notfound_view(
+            view, renderer=null_renderer,append_slash=HTTPMovedPermanently
+        )
+        request = self._makeRequest(config)
+        request.environ['PATH_INFO'] = '/foo'
+        request.query_string = 'a=1&b=2'
+        request.path = '/scriptname/foo'
+        view = self._getViewCallable(config,
+                                     ctx_iface=implementedBy(HTTPNotFound),
+                                     request_iface=IRequest)
+        result = view(None, request)
+        self.assertTrue(isinstance(result, HTTPMovedPermanently))
         self.assertEqual(result.location, '/scriptname/foo/?a=1&b=2')
 
     def test_add_notfound_view_with_view_defaults(self):
