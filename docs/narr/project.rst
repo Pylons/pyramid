@@ -690,7 +690,7 @@ testing, packaging, and distributing your application.
     distribute their reusable code.  You can read more about ``setup.py`` files
     and their usage in the `Setuptools documentation
     <http://peak.telecommunity.com/DevCenter/setuptools>`_ and `The
-    Hitchhiker's Guide to Packaging <http://guide.python-distribute.org/>`_.
+    Hitchhiker's Guide to Packaging <https://the-hitchhikers-guide-to-packaging.readthedocs.org/en/latest/>`_.
 
 Our generated ``setup.py`` looks like this:
 
