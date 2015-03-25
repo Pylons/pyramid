@@ -1,12 +1,21 @@
 Pyramid
 =======
 
+.. image:: https://img.shields.io/pypi/v/pyramid.svg?style=flat
+        :target: https://pypi.python.org/pypi/pyramid
+        :alt: Last release
+
 .. image:: https://travis-ci.org/Pylons/pyramid.png?branch=master
         :target: https://travis-ci.org/Pylons/pyramid
+        :alt: Build status
 
 .. image:: https://readthedocs.org/projects/pyramid/badge/?version=master
         :target: http://docs.pylonsproject.org/projects/pyramid/en/master/
         :alt: Documentation Status
+
+.. image:: https://img.shields.io/pypi/dm/pyramid.svg?style=flat
+        :target: https://pypi.python.org/pypi/pyramid#downloads
+        :alt: Popularity
 
 Pyramid is a small, fast, down-to-earth, open source Python web framework.
 It makes real-world web application development and
