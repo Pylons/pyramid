@@ -6,12 +6,27 @@
 Security
 ========
 
-:app:`Pyramid` provides an optional declarative authorization system
-that can prevent a :term:`view` from being invoked based on an
+:app:`Pyramid` provides an optional, declarative, security system.
+Security in :app:`Pyramid` is separated into authentication and
+authorization. The two systems communicate via :term:`principal`
+identifiers. Authentication is merely the mechanism by which credentials
+provided in the :term:`request` are resolved to one or more
+:term:`principal` identifiers. These identifiers represent the users and
+groups that are in effect during the request. Authorization then determines
+access based on the :term:`principal` identifiers, the requested
+:term:`permission`, and a :term:`context`.
+
+The :app:`Pyramid` authorization system
+can prevent a :term:`view` from being invoked based on an
 :term:`authorization policy`. Before a view is invoked, the
 authorization system can use the credentials in the :term:`request`
 along with the :term:`context` resource to determine if access will be
 allowed.  Here's how it works at a high level:
+
+- A user may or may not have previously visited the application and
+  supplied authentication credentials, including a :term:`userid`.  If
+  so, the application may have called
+  :func:`pyramid.security.remember` to remember these.
 
 - A :term:`request` is generated when a user visits the application.
 
@@ -25,7 +40,9 @@ allowed.  Here's how it works at a high level:
   context as well as other attributes of the request.
 
 - If an :term:`authentication policy` is in effect, it is passed the
-  request; it returns some number of :term:`principal` identifiers.
+  request. It will return some number of :term:`principal` identifiers.
+  To do this, the policy would need to determine the authenticated
+  :term:`userid` present in the request.
 
 - If an :term:`authorization policy` is in effect and the :term:`view
   configuration` associated with the view callable that was found has
@@ -40,15 +57,6 @@ allowed.  Here's how it works at a high level:
 
 - If the authorization policy denies access, the view callable is not
   invoked; instead the :term:`forbidden view` is invoked.
-
-Security in :app:`Pyramid`, unlike many systems, cleanly and explicitly
-separates authentication and authorization. Authentication is merely the
-mechanism by which credentials provided in the :term:`request` are
-resolved to one or more :term:`principal` identifiers. These identifiers
-represent the users and groups in effect during the request.
-Authorization then determines access based on the :term:`principal`
-identifiers, the :term:`view callable` being invoked, and the
-:term:`context` resource.
 
 Authorization is enabled by modifying your application to include an
 :term:`authentication policy` and :term:`authorization policy`.
@@ -104,7 +112,8 @@ For example:
 
 The above configuration enables a policy which compares the value of an "auth
 ticket" cookie passed in the request's environment which contains a reference
-to a single :term:`principal` against the principals present in any
+to a single :term:`userid` and matches that userid's
+:term:`principals <principal>` against the principals present in any
 :term:`ACL` found in the resource tree when attempting to call some
 :term:`view`.
 
@@ -332,9 +341,7 @@ third argument is a permission or sequence of permission names.
 A principal is usually a user id, however it also may be a group id if your
 authentication system provides group information and the effective
 :term:`authentication policy` policy is written to respect group information.
-For example, the
-:class:`pyramid.authentication.RepozeWho1AuthenticationPolicy` respects group
-information if you configure it with a ``callback``.
+See :ref:`extending_default_authentication_policies`.
 
 Each ACE in an ACL is processed by an authorization policy *in the
 order dictated by the ACL*.  So if you have an ACL like this:
@@ -574,6 +581,60 @@ via print statements when a call to
 :meth:`~pyramid.request.Request.has_permission` fails is often useful.
 
 .. index::
+   single: authentication policy (extending)
+
+.. _extending_default_authentication_policies:
+
+Extending Default Authentication Policies
+-----------------------------------------
+
+Pyramid ships with some builtin authentication policies for use in your
+applications. See :mod:`pyramid.authentication` for the available
+policies. They differ on their mechanisms for tracking authentication
+credentials between requests, however they all interface with your
+application in mostly the same way.
+
+Above you learned about :ref:`assigning_acls`. Each :term:`principal` used
+in the :term:`ACL` is matched against the list returned from
+:meth:`pyramid.interfaces.IAuthenticationPolicy.effective_principals`.
+Similarly, :meth:`pyramid.request.Request.authenticated_userid` maps to
+:meth:`pyramid.interfaces.IAuthenticationPolicy.authenticated_userid`.
+
+You may control these values by subclassing the default authentication
+policies. For example, below we subclass the
+:class:`pyramid.authentication.AuthTktAuthenticationPolicy` and define
+extra functionality to query our database before confirming that the
+:term:`userid` is valid in order to avoid blindly trusting the value in the
+cookie (what if the cookie is still valid but the user has deleted their
+account?). We then use that :term:`userid` to augment the
+``effective_principals`` with information about groups and other state for
+that user.
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.authentication import AuthTktAuthenticationPolicy
+
+   class MyAuthenticationPolicy(AuthTktAuthenticationPolicy):
+       def authenticated_userid(self, request):
+           userid = self.unauthenticated_userid(request)
+           if userid:
+               if request.verify_userid_is_still_valid(userid):
+                   return userid
+
+       def effective_principals(self, request):
+           principals = [Everyone]
+           userid = self.authenticated_userid(request)
+           if userid:
+               principals += [Authenticated, str(userid)]
+           return principals
+
+In most instances ``authenticated_userid`` and ``effective_principals`` are
+application-specific whereas ``unauthenticated_userid``, ``remember`` and
+``forget`` are generic and focused on transport/serialization of data
+between consecutive requests.
+
+.. index::
    single: authentication policy (creating)
 
 .. _creating_an_authentication_policy:
@@ -595,39 +656,56 @@ that implements the following interface:
        """ An object representing a Pyramid authentication policy. """
 
        def authenticated_userid(self, request):
-           """ Return the authenticated userid or ``None`` if no
-           authenticated userid can be found. This method of the policy 
-           should ensure that a record exists in whatever persistent store is 
-           used related to the user (the user should not have been deleted); 
-           if a record associated with the current id does not exist in a 
-           persistent store, it should return ``None``."""
+           """ Return the authenticated :term:`userid` or ``None`` if
+           no authenticated userid can be found. This method of the
+           policy should ensure that a record exists in whatever
+           persistent store is used related to the user (the user
+           should not have been deleted); if a record associated with
+           the current id does not exist in a persistent store, it
+           should return ``None``.
+
+           """
 
        def unauthenticated_userid(self, request):
-           """ Return the *unauthenticated* userid.  This method performs the
-           same duty as ``authenticated_userid`` but is permitted to return the
-           userid based only on data present in the request; it needn't (and
-           shouldn't) check any persistent store to ensure that the user record
-           related to the request userid exists."""
+           """ Return the *unauthenticated* userid.  This method
+           performs the same duty as ``authenticated_userid`` but is
+           permitted to return the userid based only on data present
+           in the request; it needn't (and shouldn't) check any
+           persistent store to ensure that the user record related to
+           the request userid exists.
+
+           This method is intended primarily a helper to assist the
+           ``authenticated_userid`` method in pulling credentials out
+           of the request data, abstracting away the specific headers,
+           query strings, etc that are used to authenticate the request.
+
+           """
 
        def effective_principals(self, request):
            """ Return a sequence representing the effective principals
-           including the userid and any groups belonged to by the current
-           user, including 'system' groups such as
-           ``pyramid.security.Everyone`` and
-           ``pyramid.security.Authenticated``. """
+           typically including the :term:`userid` and any groups belonged
+           to by the current user, always including 'system' groups such
+           as ``pyramid.security.Everyone`` and
+           ``pyramid.security.Authenticated``.
 
-       def remember(self, request, principal, **kw):
+           """
+
+       def remember(self, request, userid, **kw):
            """ Return a set of headers suitable for 'remembering' the
-           principal named ``principal`` when set in a response.  An
-           individual authentication policy and its consumers can decide
-           on the composition and meaning of **kw. """
-       
+           :term:`userid` named ``userid`` when set in a response.  An
+           individual authentication policy and its consumers can
+           decide on the composition and meaning of **kw.
+
+           """
+
        def forget(self, request):
            """ Return a set of headers suitable for 'forgetting' the
-           current user on subsequent requests. """
+           current user on subsequent requests.
+
+           """
 
 After you do so, you can pass an instance of such a class into the
-:class:`~pyramid.config.Configurator.set_authentication_policy` method
+:class:`~pyramid.config.Configurator.set_authentication_policy` method at
 configuration time to use it.
 
 .. index::

@@ -9,7 +9,6 @@ from zope.interface import (
 
 from pyramid.interfaces import (
     IRequest,
-    IResponseFactory,
     ISession,
     )
 
@@ -22,7 +21,7 @@ from pyramid.compat import (
 from pyramid.config import Configurator
 from pyramid.decorator import reify
 from pyramid.path import caller_package
-from pyramid.response import Response
+from pyramid.response import Response, _get_response_factory
 from pyramid.registry import Registry
 
 from pyramid.security import (
@@ -41,6 +40,7 @@ from pyramid.i18n import LocalizerRequestMixin
 from pyramid.request import CallbackMethodsMixin
 from pyramid.url import URLMethodsMixin
 from pyramid.util import InstancePropertyMixin
+
 
 _marker = object()
 
@@ -79,8 +79,8 @@ class DummySecurityPolicy(object):
             effective_principals.extend(self.groupids)
         return effective_principals
 
-    def remember(self, request, principal, **kw):
-        self.remembered = principal
+    def remember(self, request, userid, **kw):
+        self.remembered = userid
         return self.remember_result
 
     def forget(self, request):
@@ -383,8 +383,8 @@ class DummyRequest(
 
     @reify
     def response(self):
-        f =  self.registry.queryUtility(IResponseFactory, default=Response)
-        return f()
+        f =  _get_response_factory(self.registry)
+        return f(self)
 
 have_zca = True
 

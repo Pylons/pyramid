@@ -20,8 +20,8 @@ Objectives
 Steps
 =====
 
-#. In this step let's start by installing the ``pyramid_jinja2``
-   add-on, the copying the ``view_class`` step's directory:
+#. In this step let's start by copying the ``view_class`` step's 
+   directory, and then installing the ``pyramid_jinja2`` add-on. 
 
    .. code-block:: bash
 
@@ -44,12 +44,6 @@ Steps
 
    .. literalinclude:: jinja2/tutorial/home.jinja2
     :language: html
-
-#. Get the ``pyramid.includes`` into the functional test setup in
-   ``jinja2/tutorial/tests.py``:
-
-   .. literalinclude:: jinja2/tutorial/tests.py
-    :linenos:
 
 #. Now run the tests:
 
@@ -77,9 +71,6 @@ in the add-on. In this case the setup code told Pyramid to make a new
 Our view code stayed largely the same. We simply changed the file
 extension on the renderer. For the template, the syntax for Chameleon
 and Jinja2's basic variable insertion is very similar.
-
-Our functional tests don't have ``development.ini`` so they needed the
-``pyramid.includes`` to be setup in the test setup.
 
 Extra Credit
 ============

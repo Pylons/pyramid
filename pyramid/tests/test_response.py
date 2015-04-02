@@ -1,4 +1,5 @@
 import io
+import mimetypes
 import os
 import unittest
 from pyramid import testing
@@ -7,7 +8,7 @@ class TestResponse(unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.response import Response
         return Response
-        
+
     def test_implements_IResponse(self):
         from pyramid.interfaces import IResponse
         cls = self._getTargetClass()
@@ -51,15 +52,11 @@ class TestFileResponse(unittest.TestCase):
         r.app_iter.close()
 
     def test_without_content_type(self):
-        for suffix, content_type in (
-            ('txt', 'text/plain; charset=UTF-8'),
-            ('xml', 'application/xml; charset=UTF-8'),
-            ('pdf', 'application/pdf')
-        ):
+        for suffix in ('txt', 'xml', 'pdf'):
             path = self._getPath(suffix)
             r = self._makeOne(path)
-            self.assertEqual(r.content_type, content_type.split(';')[0])
-            self.assertEqual(r.headers['content-type'], content_type)
+            self.assertEqual(r.headers['content-type'].split(';')[0],
+                             mimetypes.guess_type(path, strict=False)[0])
             r.app_iter.close()
 
     def test_python_277_bug_15207(self):
@@ -122,7 +119,7 @@ class Test_patch_mimetypes(unittest.TestCase):
         result = self._callFUT(module)
         self.assertEqual(result, True)
         self.assertEqual(module.initted, True)
-        
+
     def test_missing_init(self):
         class DummyMimetypes(object):
             pass
@@ -177,6 +174,17 @@ class TestResponseAdapter(unittest.TestCase):
         self.assertEqual(dummy_venusian.attached,
                          [(foo, dec.register, 'pyramid')])
 
+
+class TestGetResponseFactory(unittest.TestCase):
+    def test_get_factory(self):
+        from pyramid.registry import Registry
+        from pyramid.response import Response, _get_response_factory
+
+        registry = Registry()
+        response = _get_response_factory(registry)(None)
+        self.assertTrue(isinstance(response, Response))
+
+
 class Dummy(object):
     pass
 
@@ -193,5 +201,3 @@ class DummyVenusian(object):
 
     def attach(self, wrapped, fn, category=None):
         self.attached.append((wrapped, fn, category))
-
-        

@@ -17,7 +17,7 @@ class SettingsConfiguratorMixin(object):
 
     def add_settings(self, settings=None, **kw):
         """Augment the :term:`deployment settings` with one or more
-        key/value pairs. 
+        key/value pairs.
 
         You may pass a dictionary::
 
@@ -117,6 +117,11 @@ class Settings(dict):
                                              config_prevent_http_cache)
         eff_prevent_http_cache = asbool(eget('PYRAMID_PREVENT_HTTP_CACHE',
                                              config_prevent_http_cache))
+        config_prevent_cachebust = self.get('prevent_cachebust', '')
+        config_prevent_cachebust = self.get('pyramid.prevent_cachebust',
+                                             config_prevent_cachebust)
+        eff_prevent_cachebust = asbool(eget('PYRAMID_PREVENT_CACHEBUST',
+                                             config_prevent_cachebust))
 
         update = {
             'debug_authorization': eff_debug_all or eff_debug_auth,
@@ -128,6 +133,7 @@ class Settings(dict):
             'reload_assets':eff_reload_all or eff_reload_assets,
             'default_locale_name':eff_locale_name,
             'prevent_http_cache':eff_prevent_http_cache,
+            'prevent_cachebust':eff_prevent_cachebust,
 
             'pyramid.debug_authorization': eff_debug_all or eff_debug_auth,
             'pyramid.debug_notfound': eff_debug_all or eff_debug_notfound,
@@ -138,6 +144,7 @@ class Settings(dict):
             'pyramid.reload_assets':eff_reload_all or eff_reload_assets,
             'pyramid.default_locale_name':eff_locale_name,
             'pyramid.prevent_http_cache':eff_prevent_http_cache,
+            'pyramid.prevent_cachebust':eff_prevent_cachebust,
             }
 
         self.update(update)

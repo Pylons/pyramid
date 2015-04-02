@@ -53,7 +53,8 @@ Security
 We'll eventually be adding security to our application.  The components we'll
 use to do this are below.
 
-- USERS, a dictionary mapping users names to their corresponding passwords.
+- USERS, a dictionary mapping users names (the user's :term:`userids
+  <userid>`) to their corresponding passwords.
 
 - GROUPS, a dictionary mapping user names to a list of groups they belong to.
 

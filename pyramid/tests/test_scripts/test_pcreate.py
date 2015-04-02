@@ -12,10 +12,10 @@ class TestPCreateCommand(unittest.TestCase):
         from pyramid.scripts.pcreate import PCreateCommand
         return PCreateCommand
 
-    def _makeOne(self, *args):
+    def _makeOne(self, *args, **kw):
         effargs = ['pcreate']
         effargs.extend(args)
-        cmd = self._getTargetClass()(effargs)
+        cmd = self._getTargetClass()(effargs, **kw)
         cmd.out = self.out
         return cmd
 
@@ -34,8 +34,13 @@ class TestPCreateCommand(unittest.TestCase):
         out = self.out_.getvalue()
         self.assertTrue(out.startswith('No scaffolds available'))
 
+    def test_run_no_scaffold_no_args(self):
+        cmd = self._makeOne(quiet=True)
+        result = cmd.run()
+        self.assertEqual(result, 2)
+
     def test_run_no_scaffold_name(self):
-        cmd = self._makeOne()
+        cmd = self._makeOne('dummy')
         result = cmd.run()
         self.assertEqual(result, 2)
         out = self.out_.getvalue()
@@ -71,6 +76,23 @@ class TestPCreateCommand(unittest.TestCase):
         self.assertEqual(
             scaffold.vars,
             {'project': 'Distro', 'egg': 'Distro', 'package': 'distro',
+             'pyramid_version': '0.1', 'pyramid_docs_branch':'0.1-branch'})
+
+    def test_scaffold_with_hyphen_in_project_name(self):
+        import os
+        cmd = self._makeOne('-s', 'dummy', 'Distro-')
+        scaffold = DummyScaffold('dummy')
+        cmd.scaffolds = [scaffold]
+        cmd.pyramid_dist = DummyDist("0.1")
+        result = cmd.run()
+        self.assertEqual(result, 0)
+        self.assertEqual(
+            scaffold.output_dir,
+            os.path.normpath(os.path.join(os.getcwd(), 'Distro-'))
+            )
+        self.assertEqual(
+            scaffold.vars,
+            {'project': 'Distro-', 'egg': 'Distro_', 'package': 'distro_',
              'pyramid_version': '0.1', 'pyramid_docs_branch':'0.1-branch'})
 
     def test_known_scaffold_absolute_path(self):

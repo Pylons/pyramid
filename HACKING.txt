@@ -31,7 +31,7 @@ By Hand
    $ cd hack-on-pyramid
    # Configure remotes such that you can pull changes from the Pyramid
    # repository into your local repository.
-   $ git remote add upstream https://github.com:Pylons/pyramid.git
+   $ git remote add upstream https://github.com/Pylons/pyramid.git
    # fetch and merge changes from upstream into master
    $ git fetch upstream
    $ git merge upstream/master
@@ -113,6 +113,7 @@ for this use case) and inside that a simple pyramid application named
 ``hacking`` that you can then fire up like so:
 
   cd env27/hacking
+  ../bin/python setup.py develop
   ../bin/pserve development.ini
 
 Adding Features
@@ -194,7 +195,7 @@ Test Coverage
 -------------
 
 - The codebase *must* have 100% test statement coverage after each commit.
-  You can test coverage via ``tox -e coverage``, or alternately by installing
+  You can test coverage via ``tox -e cover``, or alternately by installing
   ``nose`` and ``coverage`` into your virtualenv (easiest via ``setup.py
   dev``) , and running ``setup.py nosetests --with-coverage``.
 

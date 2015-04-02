@@ -1,9 +1,10 @@
-from zope.deprecation import deprecate
+from zope.deprecation import deprecated
 from zope.interface import implementer
 
 from pyramid.interfaces import (
     IDefaultRootFactory,
     IRequestFactory,
+    IResponseFactory,
     IRequestExtensions,
     IRootFactory,
     ISessionFactory,
@@ -13,8 +14,10 @@ from pyramid.traversal import DefaultRootFactory
 
 from pyramid.util import (
     action_method,
-    InstancePropertyMixin,
+    get_callable_name,
+    InstancePropertyHelper,
     )
+
 
 class FactoriesConfiguratorMixin(object):
     @action_method
@@ -32,9 +35,10 @@ class FactoriesConfiguratorMixin(object):
         factory = self.maybe_dotted(factory)
         if factory is None:
             factory = DefaultRootFactory
+
         def register():
             self.registry.registerUtility(factory, IRootFactory)
-            self.registry.registerUtility(factory, IDefaultRootFactory) # b/c
+            self.registry.registerUtility(factory, IDefaultRootFactory)  # b/c
 
         intr = self.introspectable('root factories',
                                    None,
@@ -43,7 +47,7 @@ class FactoriesConfiguratorMixin(object):
         intr['factory'] = factory
         self.action(IRootFactory, register, introspectables=(intr,))
 
-    _set_root_factory = set_root_factory # bw compat
+    _set_root_factory = set_root_factory  # bw compat
 
     @action_method
     def set_session_factory(self, factory):
@@ -59,6 +63,7 @@ class FactoriesConfiguratorMixin(object):
            achieve the same purpose.
         """
         factory = self.maybe_dotted(factory)
+
         def register():
             self.registry.registerUtility(factory, ISessionFactory)
         intr = self.introspectable('session factory', None,
@@ -88,6 +93,7 @@ class FactoriesConfiguratorMixin(object):
            can be used to achieve the same purpose.
         """
         factory = self.maybe_dotted(factory)
+
         def register():
             self.registry.registerUtility(factory, IRequestFactory)
         intr = self.introspectable('request factory', None,
@@ -95,6 +101,31 @@ class FactoriesConfiguratorMixin(object):
                                    'request factory')
         intr['factory'] = factory
         self.action(IRequestFactory, register, introspectables=(intr,))
+
+    @action_method
+    def set_response_factory(self, factory):
+        """ The object passed as ``factory`` should be an object (or a
+        :term:`dotted Python name` which refers to an object) which
+        will be used by the :app:`Pyramid` as the default response
+        objects. The factory should conform to the
+        :class:`pyramid.interfaces.IResponseFactory` interface.
+
+        .. note::
+
+           Using the ``response_factory`` argument to the
+           :class:`pyramid.config.Configurator` constructor
+           can be used to achieve the same purpose.
+        """
+        factory = self.maybe_dotted(factory)
+
+        def register():
+            self.registry.registerUtility(factory, IResponseFactory)
+
+        intr = self.introspectable('response factory', None,
+                                   self.object_description(factory),
+                                   'response factory')
+        intr['factory'] = factory
+        self.action(IResponseFactory, register, introspectables=(intr,))
 
     @action_method
     def add_request_method(self,
@@ -143,10 +174,12 @@ class FactoriesConfiguratorMixin(object):
 
         property = property or reify
         if property:
-            name, callable = InstancePropertyMixin._make_property(
+            name, callable = InstancePropertyHelper.make_property(
                 callable, name=name, reify=reify)
         elif name is None:
             name = callable.__name__
+        else:
+            name = get_callable_name(name)
 
         def register():
             exts = self.registry.queryUtility(IRequestExtensions)
@@ -180,8 +213,6 @@ class FactoriesConfiguratorMixin(object):
                         introspectables=(intr,))
 
     @action_method
-    @deprecate('set_request_propery() is deprecated as of Pyramid 1.5; use '
-               'add_request_method() with the property=True argument instead')
     def set_request_property(self, callable, name=None, reify=False):
         """ Add a property to the request object.
 
@@ -195,9 +226,14 @@ class FactoriesConfiguratorMixin(object):
         self.add_request_method(
             callable, name=name, property=not reify, reify=reify)
 
+    deprecated(
+        set_request_property,
+        'set_request_propery() is deprecated as of Pyramid 1.5; use '
+        'add_request_method() with the property=True argument instead')
+
+
 @implementer(IRequestExtensions)
 class _RequestExtensions(object):
     def __init__(self):
         self.descriptors = {}
         self.methods = {}
-

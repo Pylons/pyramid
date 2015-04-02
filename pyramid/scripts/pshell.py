@@ -1,9 +1,11 @@
 from code import interact
 import optparse
+import os
 import sys
 import textwrap
 
 from pyramid.compat import configparser
+from pyramid.compat import exec_
 from pyramid.util import DottedNameResolver
 from pyramid.paster import bootstrap
 
@@ -51,6 +53,7 @@ class PShellCommand(object):
     loaded_objects = {}
     object_help = {}
     setup = None
+    pystartup = os.environ.get('PYTHONSTARTUP')
 
     def __init__(self, argv, quiet=False):
         self.quiet = quiet
@@ -143,6 +146,12 @@ class PShellCommand(object):
 
         if shell is None:
             shell = self.make_shell()
+
+        if self.pystartup and os.path.isfile(self.pystartup):
+            with open(self.pystartup, 'rb') as fp:
+                exec_(fp.read().decode('utf-8'), env)
+            if '__builtins__' in env:
+                del env['__builtins__']
 
         try:
             shell(env, help)

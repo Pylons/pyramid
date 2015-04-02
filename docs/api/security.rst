@@ -16,7 +16,7 @@ Authentication API Functions
 
 .. autofunction:: forget
 
-.. autofunction:: remember
+.. autofunction:: remember(request, userid, **kwargs)
 
 Authorization API Functions
 ---------------------------

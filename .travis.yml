@@ -1,16 +1,24 @@
 # Wire up travis
 language: python
+sudo: false
 
-python:
-  - 2.6
-  - 2.7
-  - pypy
-  - 3.2
-  - 3.3
+env:
+  - TOXENV=py26
+  - TOXENV=py27
+  - TOXENV=py32
+  - TOXENV=py33
+  - TOXENV=py34
+  - TOXENV=pypy
+  - TOXENV=pypy3
+  - TOXENV=py2-docs
+  - TOXENV=py3-docs
+  - TOXENV=py2-cover,py3-cover,coverage
 
-install: python setup.py dev
+install:
+  - travis_retry pip install tox
 
-script: python setup.py test -q
+script:
+  - travis_retry tox
 
 notifications:
   email:

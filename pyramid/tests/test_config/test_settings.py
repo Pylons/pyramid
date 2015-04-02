@@ -57,7 +57,7 @@ class TestSettingsConfiguratorMixin(unittest.TestCase):
         self.assertEqual(settings['a'], 1)
 
 class TestSettings(unittest.TestCase):
-        
+
     def _getTargetClass(self):
         from pyramid.config.settings import Settings
         return Settings
@@ -130,6 +130,35 @@ class TestSettings(unittest.TestCase):
                                {'PYRAMID_PREVENT_HTTP_CACHE':'1'})
         self.assertEqual(result['prevent_http_cache'], True)
         self.assertEqual(result['pyramid.prevent_http_cache'], True)
+
+    def test_prevent_cachebust(self):
+        settings = self._makeOne({})
+        self.assertEqual(settings['prevent_cachebust'], False)
+        self.assertEqual(settings['pyramid.prevent_cachebust'], False)
+        result = self._makeOne({'prevent_cachebust':'false'})
+        self.assertEqual(result['prevent_cachebust'], False)
+        self.assertEqual(result['pyramid.prevent_cachebust'], False)
+        result = self._makeOne({'prevent_cachebust':'t'})
+        self.assertEqual(result['prevent_cachebust'], True)
+        self.assertEqual(result['pyramid.prevent_cachebust'], True)
+        result = self._makeOne({'prevent_cachebust':'1'})
+        self.assertEqual(result['prevent_cachebust'], True)
+        self.assertEqual(result['pyramid.prevent_cachebust'], True)
+        result = self._makeOne({'pyramid.prevent_cachebust':'t'})
+        self.assertEqual(result['prevent_cachebust'], True)
+        self.assertEqual(result['pyramid.prevent_cachebust'], True)
+        result = self._makeOne({}, {'PYRAMID_PREVENT_CACHEBUST':'1'})
+        self.assertEqual(result['prevent_cachebust'], True)
+        self.assertEqual(result['pyramid.prevent_cachebust'], True)
+        result = self._makeOne({'prevent_cachebust':'false',
+                                'pyramid.prevent_cachebust':'1'})
+        self.assertEqual(result['prevent_cachebust'], True)
+        self.assertEqual(result['pyramid.prevent_cachebust'], True)
+        result = self._makeOne({'prevent_cachebust':'false',
+                                'pyramid.prevent_cachebust':'f'},
+                               {'PYRAMID_PREVENT_CACHEBUST':'1'})
+        self.assertEqual(result['prevent_cachebust'], True)
+        self.assertEqual(result['pyramid.prevent_cachebust'], True)
 
     def test_reload_templates(self):
         settings = self._makeOne({})

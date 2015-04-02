@@ -16,6 +16,11 @@ Glossary
      An object which, provided a :term:`WSGI` environment as a single
      positional argument, returns a Pyramid-compatible request.
 
+   response factory
+     An object which, provided a :term:`request` as a single positional
+     argument, returns a Pyramid-compatible response. See
+     :class:`pyramid.interfaces.IResponseFactory`.
+
    response
      An object returned by a :term:`view callable` that represents response
      data returned to the requesting user agent.  It must implement the
@@ -286,13 +291,22 @@ Glossary
      :term:`authorization policy`.
 
    principal
-     A *principal* is a string or unicode object representing a userid
-     or a group id.  It is provided by an :term:`authentication
-     policy`.  For example, if a user had the user id "bob", and Bob
-     was part of two groups named "group foo" and "group bar", the
-     request might have information attached to it that would
-     indicate that Bob was represented by three principals: "bob",
-     "group foo" and "group bar".
+     A *principal* is a string or unicode object representing an
+     entity, typically a user or group.  Principals are provided by an
+     :term:`authentication policy`.  For example, if a user had the
+     :term:`userid` `"bob"`, and was part of two groups named `"group foo"`
+     and "group bar", the request might have information attached to
+     it that would indicate that Bob was represented by three
+     principals: `"bob"`, `"group foo"` and `"group bar"`.
+
+   userid
+     A *userid* is a string or unicode object used to identify and
+     authenticate a real-world user (or client).  A userid is
+     supplied to an :term:`authentication policy` in order to discover
+     the user's :term:`principals <principal>`.  The default behavior
+     of the authentication policies :app:`Pyramid` provides is to
+     return the user's userid as a principal, but this is not strictly
+     necessary in custom policies that define their principals differently.
 
    authorization policy
      An authorization policy in :app:`Pyramid` terms is a bit of
@@ -749,8 +763,15 @@ Glossary
      made.  For example the word "java" might be translated
      differently if the translation domain is "programming-languages"
      than would be if the translation domain was "coffee".  A
-     translation domain is represnted by a collection of ``.mo`` files
+     translation domain is represented by a collection of ``.mo`` files
      within one or more :term:`translation directory` directories.
+
+   Translation Context
+     A string representing the "context" in which a translation was
+     made within a given :term:`translation domain`. See the gettext
+     documentation, `11.2.5 Using contexts for solving ambiguities
+     <https://www.gnu.org/software/gettext/manual/gettext.html#Contexts>`_
+     for more information.
 
    Translator
      A callable which receives a :term:`translation string` and returns a

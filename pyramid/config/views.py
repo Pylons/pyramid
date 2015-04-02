@@ -34,6 +34,7 @@ from pyramid.interfaces import (
     )
 
 from pyramid import renderers
+from pyramid.static import PathSegmentMd5CacheBuster
 
 from pyramid.compat import (
     string_types,
@@ -41,13 +42,9 @@ from pyramid.compat import (
     url_quote,
     WIN,
     is_bound_method,
-    is_nonstr_iter
+    is_unbound_method,
+    is_nonstr_iter,
     )
-
-from pyramid.encode import (
-    quote_plus,
-    urlencode,
-)
 
 from pyramid.exceptions import (
     ConfigurationError,
@@ -57,6 +54,7 @@ from pyramid.exceptions import (
 from pyramid.httpexceptions import (
     HTTPForbidden,
     HTTPNotFound,
+    default_exceptionresponse_view,
     )
 
 from pyramid.registry import (
@@ -302,7 +300,7 @@ class ViewDeriver(object):
                     raise PredicateMismatch(
                          'predicate mismatch for view %s (%s)' % (
                          view_name, predicate.text()))
-            return view(context, request)        
+            return view(context, request)
         def checker(context, request):
             return all((predicate(context, request) for predicate in
                         preds))
@@ -351,7 +349,6 @@ class ViewDeriver(object):
 
     def _rendered_view(self, view, view_renderer):
         def rendered_view(context, request):
-            renderer = view_renderer
             result = view(context, request)
             if result.__class__ is Response: # potential common case
                 response = result
@@ -369,6 +366,8 @@ class ViewDeriver(object):
                             name=renderer_name,
                             package=self.kw.get('package'),
                             registry = registry)
+                    else:
+                        renderer = view_renderer.clone()
                     if '__view__' in attrs:
                         view_inst = attrs.pop('__view__')
                     else:
@@ -421,6 +420,12 @@ class DefaultViewMapper(object):
         self.attr = kw.get('attr')
 
     def __call__(self, view):
+        if is_unbound_method(view) and self.attr is None:
+            raise ConfigurationError((
+                'Unbound method calls are not supported, please set the class '
+                'as your `view` and the method as your `attr`'
+            ))
+
         if inspect.isclass(view):
             view = self.map_class(view)
         else:
@@ -844,6 +849,18 @@ class ViewsConfiguratorMixin(object):
           very useful for 'civilians' who are just developing stock Pyramid
           applications. Pay no attention to the man behind the curtain.
 
+        accept
+
+          This value represents a match query for one or more mimetypes in the
+          ``Accept`` HTTP request header.  If this value is specified, it must
+          be in one of the following forms: a mimetype match token in the form
+          ``text/plain``, a wildcard mimetype match token in the form
+          ``text/*`` or a match-all wildcard mimetype match token in the form
+          ``*/*``.  If any of the forms matches the ``Accept`` header of the
+          request, or if the ``Accept`` header isn't set at all in the request,
+          this will match the current view. If this does not match the
+          ``Accept`` header of the request, view matching continues.
+
         Predicate Arguments
 
         name
@@ -894,8 +911,8 @@ class ViewsConfiguratorMixin(object):
 
         request_param
 
-          This value can be any string or any sequence of strings.  A view 
-          declaration with this argument ensures that the view will only be 
+          This value can be any string or any sequence of strings.  A view
+          declaration with this argument ensures that the view will only be
           called when the :term:`request` has a key in the ``request.params``
           dictionary (an HTTP ``GET`` or ``POST`` variable) that has a
           name which matches the supplied value (if the value is a string)
@@ -944,17 +961,6 @@ class ViewsConfiguratorMixin(object):
           This is useful for detecting AJAX requests issued from
           jQuery, Prototype and other Javascript libraries.
 
-        accept
-
-          The value of this argument represents a match query for one
-          or more mimetypes in the ``Accept`` HTTP request header.  If
-          this value is specified, it must be in one of the following
-          forms: a mimetype match token in the form ``text/plain``, a
-          wildcard mimetype match token in the form ``text/*`` or a
-          match-all wildcard mimetype match token in the form ``*/*``.
-          If any of the forms matches the ``Accept`` header of the
-          request, this predicate will be true.
-
         header
 
           This value represents an HTTP header name or a header
@@ -1001,7 +1007,7 @@ class ViewsConfiguratorMixin(object):
 
           Note that using this feature requires a :term:`session factory` to
           have been configured.
-         
+
           .. versionadded:: 1.4a2
 
         physical_path
@@ -1039,7 +1045,7 @@ class ViewsConfiguratorMixin(object):
                 This value should be a sequence of references to custom
                 predicate callables.  Use custom predicates when no set of
                 predefined predicates do what you need.  Custom predicates
-                can be combined with predefined predicates as necessary. 
+                can be combined with predefined predicates as necessary.
                 Each custom predicate callable should accept two arguments:
                 ``context`` and ``request`` and should return either
                 ``True`` or ``False`` after doing arbitrary evaluation of
@@ -1074,7 +1080,7 @@ class ViewsConfiguratorMixin(object):
                 DeprecationWarning,
                 stacklevel=4
                 )
-        
+
         view = self.maybe_dotted(view)
         context = self.maybe_dotted(context)
         for_ = self.maybe_dotted(for_)
@@ -1160,7 +1166,7 @@ class ViewsConfiguratorMixin(object):
             view_desc = self.object_description(view)
 
         tmpl_intr = None
-            
+
         view_intr = self.introspectable('views',
                                         discriminator,
                                         view_desc,
@@ -1189,10 +1195,6 @@ class ViewsConfiguratorMixin(object):
         predlist = self.get_predlist('view')
 
         def register(permission=permission, renderer=renderer):
-            # the discrim_func above is guaranteed to have been called already
-            order = view_intr['order']
-            preds = view_intr['predicates']
-            phash = view_intr['phash']
             request_iface = IRequest
             if route_name is not None:
                 request_iface = self.registry.queryUtility(IRouteRequest,
@@ -1569,7 +1571,7 @@ class ViewsConfiguratorMixin(object):
         wrapper=None,
         route_name=None,
         request_type=None,
-        request_method=None, 
+        request_method=None,
         request_param=None,
         containment=None,
         xhr=None,
@@ -1595,9 +1597,12 @@ class ViewsConfiguratorMixin(object):
 
             config.add_forbidden_view(forbidden)
 
+        If ``view`` argument is not provided, the view callable defaults to
+        :func:`~pyramid.httpexceptions.default_exceptionresponse_view`.
+
         All arguments have the same meaning as
         :meth:`pyramid.config.Configurator.add_view` and each predicate
-        argument restricts the set of circumstances under which this notfound
+        argument restricts the set of circumstances under which this forbidden
         view will be invoked.  Unlike
         :meth:`pyramid.config.Configurator.add_view`, this method will raise
         an exception if passed ``name``, ``permission``, ``context``,
@@ -1612,7 +1617,10 @@ class ViewsConfiguratorMixin(object):
                     '%s may not be used as an argument to add_forbidden_view'
                     % arg
                     )
-        
+
+        if view is None:
+            view = default_exceptionresponse_view
+
         settings = dict(
             view=view,
             context=HTTPForbidden,
@@ -1623,7 +1631,7 @@ class ViewsConfiguratorMixin(object):
             containment=containment,
             xhr=xhr,
             accept=accept,
-            header=header, 
+            header=header,
             path_info=path_info,
             custom_predicates=custom_predicates,
             decorator=decorator,
@@ -1638,7 +1646,7 @@ class ViewsConfiguratorMixin(object):
         return self.add_view(**settings)
 
     set_forbidden_view = add_forbidden_view # deprecated sorta-bw-compat alias
-    
+
     @viewdefaults
     @action_method
     def add_notfound_view(
@@ -1649,7 +1657,7 @@ class ViewsConfiguratorMixin(object):
         wrapper=None,
         route_name=None,
         request_type=None,
-        request_method=None, 
+        request_method=None,
         request_param=None,
         containment=None,
         xhr=None,
@@ -1675,6 +1683,9 @@ class ViewsConfiguratorMixin(object):
 
             config.add_notfound_view(notfound)
 
+        If ``view`` argument is not provided, the view callable defaults to
+        :func:`~pyramid.httpexceptions.default_exceptionresponse_view`.
+
         All arguments except ``append_slash`` have the same meaning as
         :meth:`pyramid.config.Configurator.add_view` and each predicate
         argument restricts the set of circumstances under which this notfound
@@ -1692,6 +1703,24 @@ class ViewsConfiguratorMixin(object):
         Pyramid will return the result of the view callable provided as
         ``view``, as normal.
 
+        If the argument provided as ``append_slash`` is not a boolean but
+        instead implements :class:`~pyramid.interfaces.IResponse`, the
+        append_slash logic will behave as if ``append_slash=True`` was passed,
+        but the provided class will be used as the response class instead of
+        the default :class:`~pyramid.httpexceptions.HTTPFound` response class
+        when a redirect is performed.  For example:
+
+          .. code-block:: python
+
+            from pyramid.httpexceptions import HTTPMovedPermanently
+            config.add_notfound_view(append_slash=HTTPMovedPermanently)
+
+        The above means that a redirect to a slash-appended route will be
+        attempted, but instead of :class:`~pyramid.httpexceptions.HTTPFound`
+        being used, :class:`~pyramid.httpexceptions.HTTPMovedPermanently will
+        be used` for the redirect response if a slash-appended route is found.
+
+        .. versionchanged:: 1.6
         .. versionadded:: 1.3
         """
         for arg in ('name', 'permission', 'context', 'for_', 'http_cache'):
@@ -1700,7 +1729,10 @@ class ViewsConfiguratorMixin(object):
                     '%s may not be used as an argument to add_notfound_view'
                     % arg
                     )
-                    
+
+        if view is None:
+            view = default_exceptionresponse_view
+
         settings = dict(
             view=view,
             context=HTTPNotFound,
@@ -1711,7 +1743,7 @@ class ViewsConfiguratorMixin(object):
             containment=containment,
             xhr=xhr,
             accept=accept,
-            header=header, 
+            header=header,
             path_info=path_info,
             custom_predicates=custom_predicates,
             decorator=decorator,
@@ -1723,7 +1755,12 @@ class ViewsConfiguratorMixin(object):
         settings.update(predicates)
         if append_slash:
             view = self._derive_view(view, attr=attr, renderer=renderer)
-            view = AppendSlashNotFoundViewFactory(view)
+            if IResponse.implementedBy(append_slash):
+                view = AppendSlashNotFoundViewFactory(
+                    view, redirect_class=append_slash,
+                )
+            else:
+                view = AppendSlashNotFoundViewFactory(view)
             settings['view'] = view
         else:
             settings['attr'] = attr
@@ -1786,7 +1823,20 @@ class ViewsConfiguratorMixin(object):
         ``Expires`` and ``Cache-Control`` headers for static assets served.
         Note that this argument has no effect when the ``name`` is a *url
         prefix*.  By default, this argument is ``None``, meaning that no
-        particular Expires or Cache-Control headers are set in the response.
+        particular Expires or Cache-Control headers are set in the response,
+        unless ``cachebust`` is specified.
+
+        The ``cachebust`` keyword argument may be set to cause
+        :meth:`~pyramid.request.Request.static_url` to use cache busting when
+        generating URLs. See :ref:`cache_busting` for general information
+        about cache busting.  The value of the ``cachebust`` argument may be
+        ``True``, in which case a default cache busting implementation is used.
+        The value of the ``cachebust`` argument may also be an object which
+        implements :class:`~pyramid.interfaces.ICacheBuster`.  See the
+        :mod:`~pyramid.static` module for some implementations.  If the
+        ``cachebust`` argument is provided, the default for ``cache_max_age``
+        is modified to be ten years.  ``cache_max_age`` may still be explicitly
+        provided to override this default.
 
         The ``permission`` keyword argument is used to specify the
         :term:`permission` required by a user to execute the static view.  By
@@ -1884,6 +1934,8 @@ def isexception(o):
 
 @implementer(IStaticURLInfo)
 class StaticURLInfo(object):
+    # Indirection for testing
+    _default_cachebust = PathSegmentMd5CacheBuster
 
     def _get_registrations(self, registry):
         try:
@@ -1897,11 +1949,14 @@ class StaticURLInfo(object):
             registry = request.registry
         except AttributeError: # bw compat (for tests)
             registry = get_current_registry()
-        for (url, spec, route_name) in self._get_registrations(registry):
+        registrations = self._get_registrations(registry)
+        for (url, spec, route_name, cachebust) in registrations:
             if path.startswith(spec):
                 subpath = path[len(spec):]
                 if WIN: # pragma: no cover
                     subpath = subpath.replace('\\', '/') # windows
+                if cachebust:
+                    subpath, kw = cachebust(subpath, kw)
                 if url is None:
                     kw['subpath'] = subpath
                     return request.route_url(route_name, **kw)
@@ -1928,7 +1983,7 @@ class StaticURLInfo(object):
             sep = os.sep
         else:
             sep = '/'
-        if not spec.endswith(sep):
+        if not spec.endswith(sep) and not spec.endswith(':'):
             spec = spec + sep
 
         # we also make sure the name ends with a slash, purely as a
@@ -1941,6 +1996,21 @@ class StaticURLInfo(object):
             # make sure it ends with a slash
             name = name + '/'
 
+        if config.registry.settings.get('pyramid.prevent_cachebust'):
+            cb = None
+        else:
+            cb = extra.pop('cachebust', None)
+        if cb is True:
+            cb = self._default_cachebust()
+        if cb:
+            def cachebust(subpath, kw):
+                subpath_tuple = tuple(subpath.split('/'))
+                subpath_tuple, kw = cb.pregenerate(
+                    spec + subpath, subpath_tuple, kw)
+                return '/'.join(subpath_tuple), kw
+        else:
+            cachebust = None
+
         if url_parse(name).netloc:
             # it's a URL
             # url, spec, route_name
@@ -1949,10 +2019,14 @@ class StaticURLInfo(object):
         else:
             # it's a view name
             url = None
-            cache_max_age = extra.pop('cache_max_age', None)
+            ten_years = 10 * 365 * 24 * 60 * 60  # more or less
+            default = ten_years if cb else None
+            cache_max_age = extra.pop('cache_max_age', default)
+
             # create a view
+            cb_match = getattr(cb, 'match', None)
             view = static_view(spec, cache_max_age=cache_max_age,
-                               use_subpath=True)
+                               use_subpath=True, cachebust_match=cb_match)
 
             # Mutate extra to allow factory, etc to be passed through here.
             # Treat permission specially because we'd like to default to
@@ -1993,7 +2067,7 @@ class StaticURLInfo(object):
                 registrations.pop(idx)
 
             # url, spec, route_name
-            registrations.append((url, spec, route_name))
+            registrations.append((url, spec, route_name, cachebust))
 
         intr = config.introspectable('static views',
                                      name,
@@ -2003,5 +2077,4 @@ class StaticURLInfo(object):
         intr['spec'] = spec
 
         config.action(None, callable=register, introspectables=(intr,))
-
 

@@ -26,6 +26,9 @@ Releasing Pyramid
 - Copy relevant changes (delta bug fixes) from CHANGES.txt to
   docs/whatsnew-X.X (if it's a major release).
 
+- update README.rst to use correct versions of badges and URLs according to
+  each branch and context, i.e., RTD "latest" == GitHub/Travis "1.x-branch".
+
 - Make sure docs render OK::
 
   $ cd docs

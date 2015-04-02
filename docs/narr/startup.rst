@@ -19,6 +19,7 @@ console.
 
 .. index::
    single: startup process
+   pair: settings; .ini
 
 The Startup Process
 -------------------
@@ -138,6 +139,13 @@ Here's a high-level time-ordered overview of what happens when you press
    is what prints ``serving on 0.0.0.0:6543 view at http://127.0.0.1:6543``.
    The server serves the application, and the application is running, waiting
    to receive requests.
+
+.. seealso::
+   Logging configuration is described in the :ref:`logging_chapter`
+   chapter.  There, in :ref:`request_logging_with_pastes_translogger`,
+   you will also find an example of how to configure
+   :term:`middleware` to add pre-packaged functionality to your
+   application.
 
 .. index::
    pair: settings; deployment

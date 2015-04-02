@@ -232,3 +232,17 @@ Contributors
 - Amit Mane, 2014/01/23
 
 - Fenton Travers, 2014/05/06
+
+- Randall Leeds, 2014/11/11
+
+- Hugo Branquinho, 2014/11/25
+
+- Adrian Teng, 2014/12/17
+
+- Ilja Everila, 2015/02/05
+
+- Geoffrey T. Dairiki, 2015/02/06
+
+- David Glick, 2015/02/12
+
+- Donald Stufft, 2015/03/15

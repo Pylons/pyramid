@@ -1,4 +1,9 @@
 import functools
+try:
+    # py2.7.7+ and py3.3+ have native comparison support
+    from hmac import compare_digest
+except ImportError: # pragma: nocover
+    compare_digest = None
 import inspect
 import traceback
 import weakref
@@ -17,6 +22,7 @@ from pyramid.compat import (
     string_types,
     text_,
     PY3,
+    native_
     )
 
 from pyramid.interfaces import IActionInfo
@@ -28,14 +34,21 @@ class DottedNameResolver(_DottedNameResolver):
 
 _marker = object()
 
-class InstancePropertyMixin(object):
-    """ Mixin that will allow an instance to add properties at
-    run-time as if they had been defined via @property or @reify
-    on the class itself.
+class InstancePropertyHelper(object):
+    """A helper object for assigning properties and descriptors to instances.
+    It is not normally possible to do this because descriptors must be
+    defined on the class itself.
+
+    This class is optimized for adding multiple properties at once to an
+    instance. This is done by calling :meth:`.add_property` once
+    per-property and then invoking :meth:`.apply` on target objects.
+
     """
+    def __init__(self):
+        self.properties = {}
 
     @classmethod
-    def _make_property(cls, callable, name=None, reify=False):
+    def make_property(cls, callable, name=None, reify=False):
         """ Convert a callable into one suitable for adding to the
         instance. This will return a 2-tuple containing the computed
         (name, property) pair.
@@ -50,7 +63,7 @@ class InstancePropertyMixin(object):
                 raise ValueError('cannot reify a property')
         elif name is not None:
             fn = lambda this: callable(this)
-            fn.__name__ = name
+            fn.__name__ = get_callable_name(name)
             fn.__doc__ = callable.__doc__
         else:
             name = callable.__name__
@@ -63,25 +76,15 @@ class InstancePropertyMixin(object):
 
         return name, fn
 
-    def _set_properties(self, properties):
-        """ Create several properties on the instance at once.
-
-        This is a more efficient version of
-        :meth:`pyramid.util.InstancePropertyMixin.set_property` which
-        can accept multiple ``(name, property)`` pairs generated via
-        :meth:`pyramid.util.InstancePropertyMixin._make_property`.
-
-        ``properties`` is a sequence of two-tuples *or* a data structure
-        with an ``.items()`` method which returns a sequence of two-tuples
-        (presumably a dictionary). It will be used to add several
-        properties to the instance in a manner that is more efficient
-        than simply calling ``set_property`` repeatedly.
+    @classmethod
+    def apply_properties(cls, target, properties):
+        """Accept a list or dict of ``properties`` generated from
+        :meth:`.make_property` and apply them to a ``target`` object.
         """
         attrs = dict(properties)
-
         if attrs:
-            parent = self.__class__
-            cls = type(parent.__name__, (parent, object), attrs)
+            parent = target.__class__
+            newcls = type(parent.__name__, (parent, object), attrs)
             # We assign __provides__, __implemented__ and __providedBy__ below
             # to prevent a memory leak that results from from the usage of this
             # instance's eventual use in an adapter lookup.  Adapter lookup
@@ -100,14 +103,34 @@ class InstancePropertyMixin(object):
                 # attached to it
                 val = getattr(parent, name, _marker)
                 if val is not _marker:
-                    setattr(cls, name, val)
-            self.__class__ = cls
+                    setattr(newcls, name, val)
+            target.__class__ = newcls
 
-    def _set_extensions(self, extensions):
-        for name, fn in iteritems_(extensions.methods):
-            method = fn.__get__(self, self.__class__)
-            setattr(self, name, method)
-        self._set_properties(extensions.descriptors)
+    @classmethod
+    def set_property(cls, target, callable, name=None, reify=False):
+        """A helper method to apply a single property to an instance."""
+        prop = cls.make_property(callable, name=name, reify=reify)
+        cls.apply_properties(target, [prop])
+
+    def add_property(self, callable, name=None, reify=False):
+        """Add a new property configuration.
+
+        This should be used in combination with :meth:`.apply` as a
+        more efficient version of :meth:`.set_property`.
+        """
+        name, fn = self.make_property(callable, name=name, reify=reify)
+        self.properties[name] = fn
+
+    def apply(self, target):
+        """ Apply all configured properties to the ``target`` instance."""
+        if self.properties:
+            self.apply_properties(target, self.properties)
+
+class InstancePropertyMixin(object):
+    """ Mixin that will allow an instance to add properties at
+    run-time as if they had been defined via @property or @reify
+    on the class itself.
+    """
 
     def set_property(self, callable, name=None, reify=False):
         """ Add a callable or a property descriptor to the instance.
@@ -161,8 +184,8 @@ class InstancePropertyMixin(object):
            >>> foo.y # notice y keeps the original value
            1
         """
-        prop = self._make_property(callable, name=name, reify=reify)
-        self._set_properties([prop])
+        InstancePropertyHelper.set_property(
+            self, callable, name=name, reify=reify)
 
 class WeakOrderedSet(object):
     """ Maintain a set of items.
@@ -227,7 +250,7 @@ class WeakOrderedSet(object):
             oid = self._order[-1]
             return self._items[oid]()
 
-def strings_differ(string1, string2):
+def strings_differ(string1, string2, compare_digest=compare_digest):
     """Check whether two strings differ while avoiding timing attacks.
 
     This function returns True if the given strings differ and False
@@ -237,14 +260,25 @@ def strings_differ(string1, string2):
 
         http://seb.dbzteam.org/crypto/python-oauth-timing-hmac.pdf
 
+    .. versionchanged:: 1.6
+       Support :func:`hmac.compare_digest` if it is available (Python 2.7.7+
+       and Python 3.3+).
+
     """
-    if len(string1) != len(string2):
-        return True
+    len_eq = len(string1) == len(string2)
+    if len_eq:
+        invalid_bits = 0
+        left = string1
+    else:
+        invalid_bits = 1
+        left = string2
+    right = string2
 
-    invalid_bits = 0
-    for a, b in zip(string1, string2):
-        invalid_bits += a != b
-
+    if compare_digest is not None:
+        invalid_bits += not compare_digest(left, right)
+    else:
+        for a, b in zip(left, right):
+            invalid_bits += a != b
     return invalid_bits != 0
 
 def object_description(object):
@@ -275,7 +309,7 @@ def object_description(object):
     if isinstance(object, (bool, float, type(None))):
         return text_(str(object))
     if isinstance(object, set):
-        if PY3: # pragma: no cover
+        if PY3:
             return shortrepr(object, '}')
         else:
             return shortrepr(object, ')')
@@ -535,3 +569,17 @@ def action_method(wrapped):
     wrapper.__docobj__ = wrapped
     return wrapper
 
+
+def get_callable_name(name):
+    """
+    Verifies that the ``name`` is ascii and will raise a ``ConfigurationError``
+    if it is not.
+    """
+    try:
+        return native_(name, 'ascii')
+    except (UnicodeEncodeError, UnicodeDecodeError):
+        msg = (
+            '`name="%s"` is invalid. `name` must be ascii because it is '
+            'used on __name__ of the method'
+        )
+        raise ConfigurationError(msg % name)

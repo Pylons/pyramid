@@ -546,6 +546,18 @@ class ConfiguratorTests(unittest.TestCase):
         utility = reg.getUtility(IRequestFactory)
         self.assertEqual(utility, factory)
 
+    def test_setup_registry_response_factory(self):
+        from pyramid.registry import Registry
+        from pyramid.interfaces import IResponseFactory
+        reg = Registry()
+        config = self._makeOne(reg)
+        factory = lambda r: object()
+        config.setup_registry(response_factory=factory)
+        self.assertEqual(reg.queryUtility(IResponseFactory), None)
+        config.commit()
+        utility = reg.getUtility(IResponseFactory)
+        self.assertEqual(utility, factory)
+
     def test_setup_registry_request_factory_dottedname(self):
         from pyramid.registry import Registry
         from pyramid.interfaces import IRequestFactory
@@ -735,6 +747,18 @@ pyramid.tests.test_config.dummy_include2""",
                 "file must exist, refusing to use orphan .pyc or .pyo file).")
         else: # pragma: no cover
             raise AssertionError
+
+    def test_include_constant_root_package(self):
+        from pyramid import tests
+        from pyramid.tests import test_config
+        config = self._makeOne(root_package=tests)
+        results = {}
+        def include(config):
+            results['package'] = config.package
+            results['root_package'] = config.root_package
+        config.include(include)
+        self.assertEqual(results['root_package'], tests)
+        self.assertEqual(results['package'], test_config)
 
     def test_action_branching_kw_is_None(self):
         config = self._makeOne(autocommit=True)
@@ -1490,6 +1514,73 @@ class TestActionState(unittest.TestCase):
             ]
         self.assertRaises(ConfigurationExecutionError, c.execute_actions)
         self.assertEqual(output, [('f', (1,), {}), ('f', (2,), {})])
+
+    def test_reentrant_action(self):
+        output = []
+        c = self._makeOne()
+        def f(*a, **k):
+            output.append(('f', a, k))
+            c.actions.append((3, g, (8,), {}))
+        def g(*a, **k):
+            output.append(('g', a, k))
+        c.actions = [
+            (1, f, (1,)),
+        ]
+        c.execute_actions()
+        self.assertEqual(output, [('f', (1,), {}), ('g', (8,), {})])
+
+    def test_reentrant_action_error(self):
+        from pyramid.exceptions import ConfigurationError
+        c = self._makeOne()
+        def f(*a, **k):
+            c.actions.append((3, g, (8,), {}, (), None, -1))
+        def g(*a, **k): pass
+        c.actions = [
+            (1, f, (1,)),
+        ]
+        self.assertRaises(ConfigurationError, c.execute_actions)
+
+    def test_reentrant_action_without_clear(self):
+        c = self._makeOne()
+        def f(*a, **k):
+            c.actions.append((3, g, (8,)))
+        def g(*a, **k): pass
+        c.actions = [
+            (1, f, (1,)),
+        ]
+        c.execute_actions(clear=False)
+        self.assertEqual(c.actions, [
+            (1, f, (1,)),
+            (3, g, (8,)),
+        ])
+
+class Test_reentrant_action_functional(unittest.TestCase):
+    def _makeConfigurator(self, *arg, **kw):
+        from pyramid.config import Configurator
+        config = Configurator(*arg, **kw)
+        return config
+
+    def test_functional(self):
+        def add_auto_route(config, name, view):
+               def register():
+                   config.add_view(route_name=name, view=view)
+                   config.add_route(name, '/' + name)
+               config.action(
+                   ('auto route', name), register, order=-30
+                   )
+        config = self._makeConfigurator()
+        config.add_directive('add_auto_route', add_auto_route)
+        def my_view(request): return request.response
+        config.add_auto_route('foo', my_view)
+        config.commit()
+        from pyramid.interfaces import IRoutesMapper
+        mapper = config.registry.getUtility(IRoutesMapper)
+        routes = mapper.get_routes()
+        route = routes[0]
+        self.assertEqual(len(routes), 1)
+        self.assertEqual(route.name, 'foo')
+        self.assertEqual(route.path, '/foo')
+
 
 class Test_resolveConflicts(unittest.TestCase):
     def _callFUT(self, actions):

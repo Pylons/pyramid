@@ -317,6 +317,7 @@ class TestRouter(unittest.TestCase):
         from pyramid.interfaces import IRequestExtensions
         from pyramid.interfaces import IRequest
         from pyramid.request import Request
+        from pyramid.util import InstancePropertyHelper
         context = DummyContext()
         self._registerTraverserFactory(context)
         class Extensions(object):
@@ -324,11 +325,12 @@ class TestRouter(unittest.TestCase):
                 self.methods = {}
                 self.descriptors = {}
         extensions = Extensions()
-        L = []
+        ext_method = lambda r: 'bar'
+        name, fn = InstancePropertyHelper.make_property(ext_method, name='foo')
+        extensions.descriptors[name] = fn
         request = Request.blank('/')
         request.request_iface = IRequest
         request.registry = self.registry
-        request._set_extensions = lambda *x: L.extend(x)
         def request_factory(environ):
             return request
         self.registry.registerUtility(extensions, IRequestExtensions)
@@ -342,7 +344,7 @@ class TestRouter(unittest.TestCase):
         router.request_factory = request_factory
         start_response = DummyStartResponse()
         router(environ, start_response)
-        self.assertEqual(L, [extensions])
+        self.assertEqual(view.request.foo, 'bar')
 
     def test_call_view_registered_nonspecific_default_path(self):
         from pyramid.interfaces import IViewClassifier
@@ -522,7 +524,7 @@ class TestRouter(unittest.TestCase):
         def view(context, request):
             def callback(request, response):
                 response.called_back = True
-            request.response_callbacks = [callback]
+            request.add_response_callback(callback)
             return response
         environ = self._makeEnviron()
         self._registerView(view, '', IViewClassifier, IRequest, IContext)
@@ -545,7 +547,7 @@ class TestRouter(unittest.TestCase):
         def view(context, request):
             def callback(request):
                 request.environ['called_back'] = True
-            request.finished_callbacks = [callback]
+            request.add_finished_callback(callback)
             return response
         environ = self._makeEnviron()
         self._registerView(view, '', IViewClassifier, IRequest, IContext)
@@ -567,7 +569,7 @@ class TestRouter(unittest.TestCase):
         def view(context, request):
             def callback(request):
                 request.environ['called_back'] = True
-            request.finished_callbacks = [callback]
+            request.add_finished_callback(callback)
             raise NotImplementedError
         environ = self._makeEnviron()
         self._registerView(view, '', IViewClassifier, IRequest, IContext)
@@ -599,17 +601,19 @@ class TestRouter(unittest.TestCase):
         environ = self._makeEnviron()
         self._registerView(view, '', IViewClassifier, None, None)
         request_events = self._registerEventListener(INewRequest)
-        aftertraversal_events = self._registerEventListener(IContextFound)
+        context_found_events = self._registerEventListener(IContextFound)
         response_events = self._registerEventListener(INewResponse)
         router = self._makeOne()
         start_response = DummyStartResponse()
         result = router(environ, start_response)
         self.assertEqual(len(request_events), 1)
         self.assertEqual(request_events[0].request.environ, environ)
-        self.assertEqual(len(aftertraversal_events), 1)
-        self.assertEqual(aftertraversal_events[0].request.environ, environ)
+        self.assertEqual(len(context_found_events), 1)
+        self.assertEqual(context_found_events[0].request.environ, environ)
+        self.assertEqual(context_found_events[0].request.context, context)
         self.assertEqual(len(response_events), 1)
         self.assertEqual(response_events[0].response, response)
+        self.assertEqual(response_events[0].request.context, context)
         self.assertEqual(result, response.app_iter)
 
     def test_call_newrequest_evllist_exc_can_be_caught_by_exceptionview(self):

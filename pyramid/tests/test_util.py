@@ -1,9 +1,193 @@
 import unittest
 from pyramid.compat import PY3
 
+
+class Test_InstancePropertyHelper(unittest.TestCase):
+    def _makeOne(self):
+        cls = self._getTargetClass()
+        return cls()
+
+    def _getTargetClass(self):
+        from pyramid.util import InstancePropertyHelper
+        return InstancePropertyHelper
+
+    def test_callable(self):
+        def worker(obj):
+            return obj.bar
+        foo = Dummy()
+        helper = self._getTargetClass()
+        helper.set_property(foo, worker)
+        foo.bar = 1
+        self.assertEqual(1, foo.worker)
+        foo.bar = 2
+        self.assertEqual(2, foo.worker)
+
+    def test_callable_with_name(self):
+        def worker(obj):
+            return obj.bar
+        foo = Dummy()
+        helper = self._getTargetClass()
+        helper.set_property(foo, worker, name='x')
+        foo.bar = 1
+        self.assertEqual(1, foo.x)
+        foo.bar = 2
+        self.assertEqual(2, foo.x)
+
+    def test_callable_with_reify(self):
+        def worker(obj):
+            return obj.bar
+        foo = Dummy()
+        helper = self._getTargetClass()
+        helper.set_property(foo, worker, reify=True)
+        foo.bar = 1
+        self.assertEqual(1, foo.worker)
+        foo.bar = 2
+        self.assertEqual(1, foo.worker)
+
+    def test_callable_with_name_reify(self):
+        def worker(obj):
+            return obj.bar
+        foo = Dummy()
+        helper = self._getTargetClass()
+        helper.set_property(foo, worker, name='x')
+        helper.set_property(foo, worker, name='y', reify=True)
+        foo.bar = 1
+        self.assertEqual(1, foo.y)
+        self.assertEqual(1, foo.x)
+        foo.bar = 2
+        self.assertEqual(2, foo.x)
+        self.assertEqual(1, foo.y)
+
+    def test_property_without_name(self):
+        def worker(obj): pass
+        foo = Dummy()
+        helper = self._getTargetClass()
+        self.assertRaises(ValueError, helper.set_property, foo, property(worker))
+
+    def test_property_with_name(self):
+        def worker(obj):
+            return obj.bar
+        foo = Dummy()
+        helper = self._getTargetClass()
+        helper.set_property(foo, property(worker), name='x')
+        foo.bar = 1
+        self.assertEqual(1, foo.x)
+        foo.bar = 2
+        self.assertEqual(2, foo.x)
+
+    def test_property_with_reify(self):
+        def worker(obj): pass
+        foo = Dummy()
+        helper = self._getTargetClass()
+        self.assertRaises(ValueError, helper.set_property,
+                          foo, property(worker), name='x', reify=True)
+
+    def test_override_property(self):
+        def worker(obj): pass
+        foo = Dummy()
+        helper = self._getTargetClass()
+        helper.set_property(foo, worker, name='x')
+        def doit():
+            foo.x = 1
+        self.assertRaises(AttributeError, doit)
+
+    def test_override_reify(self):
+        def worker(obj): pass
+        foo = Dummy()
+        helper = self._getTargetClass()
+        helper.set_property(foo, worker, name='x', reify=True)
+        foo.x = 1
+        self.assertEqual(1, foo.x)
+        foo.x = 2
+        self.assertEqual(2, foo.x)
+
+    def test_reset_property(self):
+        foo = Dummy()
+        helper = self._getTargetClass()
+        helper.set_property(foo, lambda _: 1, name='x')
+        self.assertEqual(1, foo.x)
+        helper.set_property(foo, lambda _: 2, name='x')
+        self.assertEqual(2, foo.x)
+
+    def test_reset_reify(self):
+        """ This is questionable behavior, but may as well get notified
+        if it changes."""
+        foo = Dummy()
+        helper = self._getTargetClass()
+        helper.set_property(foo, lambda _: 1, name='x', reify=True)
+        self.assertEqual(1, foo.x)
+        helper.set_property(foo, lambda _: 2, name='x', reify=True)
+        self.assertEqual(1, foo.x)
+
+    def test_make_property(self):
+        from pyramid.decorator import reify
+        helper = self._getTargetClass()
+        name, fn = helper.make_property(lambda x: 1, name='x', reify=True)
+        self.assertEqual(name, 'x')
+        self.assertTrue(isinstance(fn, reify))
+
+    def test_apply_properties_with_iterable(self):
+        foo = Dummy()
+        helper = self._getTargetClass()
+        x = helper.make_property(lambda _: 1, name='x', reify=True)
+        y = helper.make_property(lambda _: 2, name='y')
+        helper.apply_properties(foo, [x, y])
+        self.assertEqual(1, foo.x)
+        self.assertEqual(2, foo.y)
+
+    def test_apply_properties_with_dict(self):
+        foo = Dummy()
+        helper = self._getTargetClass()
+        x_name, x_fn = helper.make_property(lambda _: 1, name='x', reify=True)
+        y_name, y_fn = helper.make_property(lambda _: 2, name='y')
+        helper.apply_properties(foo, {x_name: x_fn, y_name: y_fn})
+        self.assertEqual(1, foo.x)
+        self.assertEqual(2, foo.y)
+
+    def test_make_property_unicode(self):
+        from pyramid.compat import text_
+        from pyramid.exceptions import ConfigurationError
+
+        cls = self._getTargetClass()
+        if PY3:  # pragma: nocover
+            name = b'La Pe\xc3\xb1a'
+        else:  # pragma: nocover
+            name = text_(b'La Pe\xc3\xb1a', 'utf-8')
+
+        def make_bad_name():
+            cls.make_property(lambda x: 1, name=name, reify=True)
+
+        self.assertRaises(ConfigurationError, make_bad_name)
+
+    def test_add_property(self):
+        helper = self._makeOne()
+        helper.add_property(lambda obj: obj.bar, name='x', reify=True)
+        helper.add_property(lambda obj: obj.bar, name='y')
+        self.assertEqual(len(helper.properties), 2)
+        foo = Dummy()
+        helper.apply(foo)
+        foo.bar = 1
+        self.assertEqual(foo.x, 1)
+        self.assertEqual(foo.y, 1)
+        foo.bar = 2
+        self.assertEqual(foo.x, 1)
+        self.assertEqual(foo.y, 2)
+
+    def test_apply_multiple_times(self):
+        helper = self._makeOne()
+        helper.add_property(lambda obj: 1, name='x')
+        foo, bar = Dummy(), Dummy()
+        helper.apply(foo)
+        self.assertEqual(foo.x, 1)
+        helper.add_property(lambda obj: 2, name='x')
+        helper.apply(bar)
+        self.assertEqual(foo.x, 1)
+        self.assertEqual(bar.x, 2)
+
 class Test_InstancePropertyMixin(unittest.TestCase):
     def _makeOne(self):
         cls = self._getTargetClass()
+
         class Foo(cls):
             pass
         return Foo()
@@ -109,43 +293,6 @@ class Test_InstancePropertyMixin(unittest.TestCase):
         foo.set_property(lambda _: 2, name='x', reify=True)
         self.assertEqual(1, foo.x)
 
-    def test__make_property(self):
-        from pyramid.decorator import reify
-        cls = self._getTargetClass()
-        name, fn = cls._make_property(lambda x: 1, name='x', reify=True)
-        self.assertEqual(name, 'x')
-        self.assertTrue(isinstance(fn, reify))
-
-    def test__set_properties_with_iterable(self):
-        foo = self._makeOne()
-        x = foo._make_property(lambda _: 1, name='x', reify=True)
-        y = foo._make_property(lambda _: 2, name='y')
-        foo._set_properties([x, y])
-        self.assertEqual(1, foo.x)
-        self.assertEqual(2, foo.y)
-
-    def test__set_properties_with_dict(self):
-        foo = self._makeOne()
-        x_name, x_fn = foo._make_property(lambda _: 1, name='x', reify=True)
-        y_name, y_fn = foo._make_property(lambda _: 2, name='y')
-        foo._set_properties({x_name: x_fn, y_name: y_fn})
-        self.assertEqual(1, foo.x)
-        self.assertEqual(2, foo.y)
-
-    def test__set_extensions(self):
-        inst = self._makeOne()
-        def foo(self, result):
-            return result
-        n, bar = inst._make_property(lambda _: 'bar', name='bar')
-        class Extensions(object):
-            def __init__(self):
-                self.methods = {'foo':foo}
-                self.descriptors = {'bar':bar}
-        extensions = Extensions()
-        inst._set_extensions(extensions)
-        self.assertEqual(inst.bar, 'bar')
-        self.assertEqual(inst.foo('abc'), 'abc')
-
 class Test_WeakOrderedSet(unittest.TestCase):
     def _makeOne(self):
         from pyramid.config import WeakOrderedSet
@@ -217,6 +364,49 @@ class Test_WeakOrderedSet(unittest.TestCase):
         self.assertEqual(list(wos), [])
         self.assertEqual(wos.last, None)
 
+class Test_strings_differ(unittest.TestCase):
+    def _callFUT(self, *args, **kw):
+        from pyramid.util import strings_differ
+        return strings_differ(*args, **kw)
+
+    def test_it(self):
+        self.assertFalse(self._callFUT(b'foo', b'foo'))
+        self.assertTrue(self._callFUT(b'123', b'345'))
+        self.assertTrue(self._callFUT(b'1234', b'123'))
+        self.assertTrue(self._callFUT(b'123', b'1234'))
+
+    def test_it_with_internal_comparator(self):
+        result = self._callFUT(b'foo', b'foo', compare_digest=None)
+        self.assertFalse(result)
+
+        result = self._callFUT(b'123', b'abc', compare_digest=None)
+        self.assertTrue(result)
+
+    def test_it_with_external_comparator(self):
+        class DummyComparator(object):
+            called = False
+            def __init__(self, ret_val):
+                self.ret_val = ret_val
+
+            def __call__(self, a, b):
+                self.called = True
+                return self.ret_val
+
+        dummy_compare = DummyComparator(True)
+        result = self._callFUT(b'foo', b'foo', compare_digest=dummy_compare)
+        self.assertTrue(dummy_compare.called)
+        self.assertFalse(result)
+
+        dummy_compare = DummyComparator(False)
+        result = self._callFUT(b'123', b'345', compare_digest=dummy_compare)
+        self.assertTrue(dummy_compare.called)
+        self.assertTrue(result)
+
+        dummy_compare = DummyComparator(False)
+        result = self._callFUT(b'abc', b'abc', compare_digest=dummy_compare)
+        self.assertTrue(dummy_compare.called)
+        self.assertTrue(result)
+
 class Test_object_description(unittest.TestCase):
     def _callFUT(self, object):
         from pyramid.util import object_description
@@ -241,9 +431,9 @@ class Test_object_description(unittest.TestCase):
         self.assertEqual(self._callFUT(('a', 'b')), "('a', 'b')")
 
     def test_set(self):
-        if PY3: # pragma: no cover
+        if PY3:
             self.assertEqual(self._callFUT(set(['a'])), "{'a'}")
-        else: # pragma: no cover
+        else:
             self.assertEqual(self._callFUT(set(['a'])), "set(['a'])")
 
     def test_list(self):
@@ -281,7 +471,7 @@ class Test_object_description(unittest.TestCase):
         self.assertEqual(
             self._callFUT(inst),
             "object %s" % str(inst))
-        
+
     def test_shortened_repr(self):
         inst = ['1'] * 1000
         self.assertEqual(
@@ -549,7 +739,7 @@ class TestActionInfo(unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.util import ActionInfo
         return ActionInfo
-        
+
     def _makeOne(self, filename, lineno, function, linerepr):
         return self._getTargetClass()(filename, lineno, function, linerepr)
 
@@ -576,7 +766,36 @@ class TestActionInfo(unittest.TestCase):
                          "Line 0 of file filename:\n       linerepr  ")
 
 
+class TestCallableName(unittest.TestCase):
+    def test_valid_ascii(self):
+        from pyramid.util import get_callable_name
+        from pyramid.compat import text_, PY3
+
+        if PY3:  # pragma: nocover
+            name = b'hello world'
+        else:  # pragma: nocover
+            name = text_(b'hello world', 'utf-8')
+
+        self.assertEqual(get_callable_name(name), 'hello world')
+
+    def test_invalid_ascii(self):
+        from pyramid.util import get_callable_name
+        from pyramid.compat import text_, PY3
+        from pyramid.exceptions import ConfigurationError
+
+        def get_bad_name():
+            if PY3:  # pragma: nocover
+                name = b'La Pe\xc3\xb1a'
+            else:  # pragma: nocover
+                name = text_(b'La Pe\xc3\xb1a', 'utf-8')
+
+            get_callable_name(name)
+
+        self.assertRaises(ConfigurationError, get_bad_name)
+
+
 def dummyfunc(): pass
+
 
 class Dummy(object):
     pass

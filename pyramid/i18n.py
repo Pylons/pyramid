@@ -331,9 +331,9 @@ class Translations(gettext.GNUTranslations, object):
         """Like ``ugettext()``, but look the message up in the specified
         domain.
         """
-        if PY3: # pragma: no cover
+        if PY3:
             return self._domains.get(domain, self).gettext(message)
-        else: # pragma: no cover
+        else:
             return self._domains.get(domain, self).ugettext(message)
     
     def dngettext(self, domain, singular, plural, num):
@@ -352,10 +352,10 @@ class Translations(gettext.GNUTranslations, object):
         """Like ``ungettext()`` but look the message up in the specified
         domain.
         """
-        if PY3: # pragma: no cover
+        if PY3:
             return self._domains.get(domain, self).ngettext(
                 singular, plural, num)
-        else: # pragma: no cover
+        else:
             return self._domains.get(domain, self).ungettext(
                 singular, plural, num)
 

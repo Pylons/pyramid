@@ -1,3 +1,4 @@
+from collections import deque
 import unittest
 from pyramid import testing
 
@@ -119,13 +120,13 @@ class TestRequest(unittest.TestCase):
 
     def test_add_response_callback(self):
         inst = self._makeOne()
-        self.assertEqual(inst.response_callbacks, ())
+        self.assertEqual(inst.response_callbacks, None)
         def callback(request, response):
             """ """
         inst.add_response_callback(callback)
-        self.assertEqual(inst.response_callbacks, [callback])
+        self.assertEqual(list(inst.response_callbacks), [callback])
         inst.add_response_callback(callback)
-        self.assertEqual(inst.response_callbacks, [callback, callback])
+        self.assertEqual(list(inst.response_callbacks), [callback, callback])
 
     def test__process_response_callbacks(self):
         inst = self._makeOne()
@@ -135,24 +136,48 @@ class TestRequest(unittest.TestCase):
         def callback2(request, response):
             request.called2  = True
             response.called2 = True
-        inst.response_callbacks = [callback1, callback2]
+        inst.add_response_callback(callback1)
+        inst.add_response_callback(callback2)
         response = DummyResponse()
         inst._process_response_callbacks(response)
         self.assertEqual(inst.called1, True)
         self.assertEqual(inst.called2, True)
         self.assertEqual(response.called1, True)
         self.assertEqual(response.called2, True)
-        self.assertEqual(inst.response_callbacks, [])
+        self.assertEqual(len(inst.response_callbacks), 0)
+
+    def test__process_response_callback_adding_response_callback(self):
+        """
+        When a response callback adds another callback, that new callback should still be called.
+
+        See https://github.com/Pylons/pyramid/pull/1373
+        """
+        inst = self._makeOne()
+        def callback1(request, response):
+            request.called1 = True
+            response.called1 = True
+            request.add_response_callback(callback2)
+        def callback2(request, response):
+            request.called2  = True
+            response.called2 = True
+        inst.add_response_callback(callback1)
+        response = DummyResponse()
+        inst._process_response_callbacks(response)
+        self.assertEqual(inst.called1, True)
+        self.assertEqual(inst.called2, True)
+        self.assertEqual(response.called1, True)
+        self.assertEqual(response.called2, True)
+        self.assertEqual(len(inst.response_callbacks), 0)
 
     def test_add_finished_callback(self):
         inst = self._makeOne()
-        self.assertEqual(inst.finished_callbacks, ())
+        self.assertEqual(inst.finished_callbacks, None)
         def callback(request):
             """ """
         inst.add_finished_callback(callback)
-        self.assertEqual(inst.finished_callbacks, [callback])
+        self.assertEqual(list(inst.finished_callbacks), [callback])
         inst.add_finished_callback(callback)
-        self.assertEqual(inst.finished_callbacks, [callback, callback])
+        self.assertEqual(list(inst.finished_callbacks), [callback, callback])
 
     def test__process_finished_callbacks(self):
         inst = self._makeOne()
@@ -160,11 +185,12 @@ class TestRequest(unittest.TestCase):
             request.called1 = True
         def callback2(request):
             request.called2  = True
-        inst.finished_callbacks = [callback1, callback2]
+        inst.add_finished_callback(callback1)
+        inst.add_finished_callback(callback2)
         inst._process_finished_callbacks()
         self.assertEqual(inst.called1, True)
         self.assertEqual(inst.called2, True)
-        self.assertEqual(inst.finished_callbacks, [])
+        self.assertEqual(len(inst.finished_callbacks), 0)
 
     def test_resource_url(self):
         self._registerResourceURL()
@@ -284,7 +310,7 @@ class TestRequest(unittest.TestCase):
             b'/\xe6\xb5\x81\xe8\xa1\x8c\xe8\xb6\x8b\xe5\x8a\xbf',
             'utf-8'
             )
-        if PY3: # pragma: no cover
+        if PY3:
             body = bytes(json.dumps({'a':inp}), 'utf-16')
         else:
             body = json.dumps({'a':inp}).decode('utf-8').encode('utf-16')
@@ -409,7 +435,50 @@ class Test_call_app_with_subpath_as_path_info(unittest.TestCase):
         self.assertEqual(request.environ['SCRIPT_NAME'], '/' + encoded)
         self.assertEqual(request.environ['PATH_INFO'], '/' + encoded)
 
-class DummyRequest:
+class Test_apply_request_extensions(unittest.TestCase):
+    def setUp(self):
+        self.config = testing.setUp()
+
+    def tearDown(self):
+        testing.tearDown()
+
+    def _callFUT(self, request, extensions=None):
+        from pyramid.request import apply_request_extensions
+        return apply_request_extensions(request, extensions=extensions)
+
+    def test_it_with_registry(self):
+        from pyramid.interfaces import IRequestExtensions
+        extensions = Dummy()
+        extensions.methods = {'foo': lambda x, y: y}
+        extensions.descriptors = {'bar': property(lambda x: 'bar')}
+        self.config.registry.registerUtility(extensions, IRequestExtensions)
+        request = DummyRequest()
+        request.registry = self.config.registry
+        self._callFUT(request)
+        self.assertEqual(request.bar, 'bar')
+        self.assertEqual(request.foo('abc'), 'abc')
+
+    def test_it_override_extensions(self):
+        from pyramid.interfaces import IRequestExtensions
+        ignore = Dummy()
+        ignore.methods = {'x': lambda x, y, z: 'asdf'}
+        ignore.descriptors = {'bar': property(lambda x: 'asdf')}
+        self.config.registry.registerUtility(ignore, IRequestExtensions)
+        request = DummyRequest()
+        request.registry = self.config.registry
+
+        extensions = Dummy()
+        extensions.methods = {'foo': lambda x, y: y}
+        extensions.descriptors = {'bar': property(lambda x: 'bar')}
+        self._callFUT(request, extensions=extensions)
+        self.assertRaises(AttributeError, lambda: request.x)
+        self.assertEqual(request.bar, 'bar')
+        self.assertEqual(request.foo('abc'), 'abc')
+
+class Dummy(object):
+    pass
+
+class DummyRequest(object):
     def __init__(self, environ=None):
         if environ is None:
             environ = {}

@@ -12,7 +12,10 @@ from pyramid.interfaces import (
     IDebugLogger,
     IExceptionResponse,
     IPredicateList,
+    PHASE0_CONFIG,
     PHASE1_CONFIG,
+    PHASE2_CONFIG,
+    PHASE3_CONFIG,
     )
 
 from pyramid.asset import resolve_asset_spec
@@ -23,6 +26,7 @@ from pyramid.compat import (
     text_,
     reraise,
     string_types,
+    zip_longest,
     )
 
 from pyramid.events import ApplicationCreated
@@ -54,7 +58,9 @@ from pyramid.settings import aslist
 from pyramid.threadlocal import manager
 
 from pyramid.util import (
+    ActionInfo,
     WeakOrderedSet,
+    action_method,
     object_description,
     )
 
@@ -74,11 +80,6 @@ from pyramid.config.zca import ZCAConfiguratorMixin
 
 from pyramid.path import DottedNameResolver
 
-from pyramid.util import (
-    action_method,
-    ActionInfo,
-    )
-
 empty = text_('')
 _marker = object()
 
@@ -86,6 +87,10 @@ ConfigurationError = ConfigurationError # pyflakes
 
 not_ = not_ # pyflakes, this is an API
 
+PHASE0_CONFIG = PHASE0_CONFIG  # api
+PHASE1_CONFIG = PHASE1_CONFIG  # api
+PHASE2_CONFIG = PHASE2_CONFIG  # api
+PHASE3_CONFIG = PHASE3_CONFIG  # api
 
 class Configurator(
     TestingConfiguratorMixin,
@@ -124,6 +129,14 @@ class Configurator(
     which accept a ``renderer`` argument, into absolute paths.  If ``None``
     is passed (the default), the package is assumed to be the Python package
     in which the *caller* of the ``Configurator`` constructor lives.
+
+    If the ``root_package`` is passed, it will propagate through the
+    configuration hierarchy as a way for included packages to locate
+    resources relative to the package in which the main ``Configurator`` was
+    created. If ``None`` is passed (the default), the ``root_package`` will
+    be derived from the ``package`` argument. The ``package`` attribute is
+    always pointing at the package being included when using :meth:`.include`,
+    whereas the ``root_package`` does not change.
 
     If the ``settings`` argument is passed, it should be a Python dictionary
     representing the :term:`deployment settings` for this application.  These
@@ -171,6 +184,11 @@ class Configurator(
     See :ref:`changing_the_request_factory`.  By default it is ``None``,
     which means use the default request factory.
 
+    If ``response_factory`` is passed, it should be a :term:`response
+    factory` implementation or a :term:`dotted Python name` to the same.
+    See :ref:`changing_the_response_factory`.  By default it is ``None``,
+    which means use the default response factory.
+
     If ``default_permission`` is passed, it should be a
     :term:`permission` string to be used as the default permission for
     all view configuration registrations performed against this
@@ -182,7 +200,7 @@ class Configurator(
     configurations which do not explicitly declare a permission will
     always be executable by entirely anonymous users (any
     authorization policy in effect is ignored).
-    
+
     .. seealso::
 
         See also :ref:`setting_a_default_permission`.
@@ -243,6 +261,10 @@ class Configurator(
 
     .. versionadded:: 1.3
        The ``introspection`` argument.
+
+    .. versionadded:: 1.6
+       The ``root_package`` argument.
+       The ``response_factory`` argument.
     """
     manager = manager # for testing injection
     venusian = venusian # for testing injection
@@ -265,6 +287,7 @@ class Configurator(
                  debug_logger=None,
                  locale_negotiator=None,
                  request_factory=None,
+                 response_factory=None,
                  default_permission=None,
                  session_factory=None,
                  default_view_mapper=None,
@@ -272,13 +295,17 @@ class Configurator(
                  exceptionresponse_view=default_exceptionresponse_view,
                  route_prefix=None,
                  introspection=True,
+                 root_package=None,
                  ):
         if package is None:
             package = caller_package()
+        if root_package is None:
+            root_package = package
         name_resolver = DottedNameResolver(package)
         self.name_resolver = name_resolver
         self.package_name = name_resolver.get_package_name()
         self.package = name_resolver.get_package()
+        self.root_package = root_package
         self.registry = registry
         self.autocommit = autocommit
         self.route_prefix = route_prefix
@@ -295,6 +322,7 @@ class Configurator(
                 debug_logger=debug_logger,
                 locale_negotiator=locale_negotiator,
                 request_factory=request_factory,
+                response_factory=response_factory,
                 default_permission=default_permission,
                 session_factory=session_factory,
                 default_view_mapper=default_view_mapper,
@@ -310,6 +338,7 @@ class Configurator(
                        debug_logger=None,
                        locale_negotiator=None,
                        request_factory=None,
+                       response_factory=None,
                        default_permission=None,
                        session_factory=None,
                        default_view_mapper=None,
@@ -397,6 +426,9 @@ class Configurator(
         if request_factory:
             self.set_request_factory(request_factory)
 
+        if response_factory:
+            self.set_response_factory(response_factory)
+
         if default_permission:
             self.set_default_permission(default_permission)
 
@@ -454,7 +486,7 @@ class Configurator(
             _registry.registerSelfAdapter = registerSelfAdapter
 
     # API
-            
+
     def _get_introspector(self):
         introspector = getattr(self.registry, 'introspector', _marker)
         if introspector is _marker:
@@ -747,6 +779,7 @@ class Configurator(
             configurator = self.__class__(
                 registry=self.registry,
                 package=package_of(module),
+                root_package=self.root_package,
                 autocommit=self.autocommit,
                 route_prefix=route_prefix,
                 )
@@ -806,6 +839,7 @@ class Configurator(
         configurator = self.__class__(
             registry=self.registry,
             package=package,
+            root_package=self.root_package,
             autocommit=self.autocommit,
             route_prefix=self.route_prefix,
             introspection=self.introspection,
@@ -958,7 +992,7 @@ class Configurator(
 class ActionState(object):
     def __init__(self):
         # NB "actions" is an API, dep'd upon by pyramid_zcml's load_zcml func
-        self.actions = [] 
+        self.actions = []
         self._seen_files = set()
 
     def processSpec(self, spec):
@@ -1042,10 +1076,82 @@ class ActionState(object):
         >>> output
         [('f', (1,), {}), ('f', (2,), {})]
 
-        """
+        The execution is re-entrant such that actions may be added by other
+        actions with the one caveat that the order of any added actions must
+        be equal to or larger than the current action.
 
+        >>> output = []
+        >>> def f(*a, **k):
+        ...   output.append(('f', a, k))
+        ...   context.actions.append((3, g, (8,), {}))
+        >>> def g(*a, **k):
+        ...    output.append(('g', a, k))
+        >>> context.actions = [
+        ...   (1, f, (1,)),
+        ...   ]
+        >>> context.execute_actions()
+        >>> output
+        [('f', (1,), {}), ('g', (8,), {})]
+
+        """
         try:
-            for action in resolveConflicts(self.actions):
+            all_actions = []
+            executed_actions = []
+            pending_actions = iter([])
+
+            # resolve the new action list against what we have already
+            # executed -- if a new action appears intertwined in the list
+            # of already-executed actions then someone wrote a broken
+            # re-entrant action because it scheduled the action *after* it
+            # should have been executed (as defined by the action order)
+            def resume(actions):
+                for a, b in zip_longest(actions, executed_actions):
+                    if b is None and a is not None:
+                        # common case is that we are executing every action
+                        yield a
+                    elif b is not None and a != b:
+                        raise ConfigurationError(
+                            'During execution a re-entrant action was added '
+                            'that modified the planned execution order in a '
+                            'way that is incompatible with what has already '
+                            'been executed.')
+                    else:
+                        # resolved action is in the same location as before,
+                        # so we are in good shape, but the action is already
+                        # executed so we skip it
+                        assert b is not None and a == b
+
+            while True:
+                # We clear the actions list prior to execution so if there
+                # are some new actions then we add them to the mix and resolve
+                # conflicts again. This orders the new actions as well as
+                # ensures that the previously executed actions have no new
+                # conflicts.
+                if self.actions:
+                    # Only resolve the new actions against executed_actions
+                    # and pending_actions instead of everything to avoid
+                    # redundant checks.
+                    # Assume ``actions = resolveConflicts([A, B, C])`` which
+                    # after conflict checks, resulted in ``actions == [A]``
+                    # then we know action A won out or a conflict would have
+                    # been raised. Thus, when action D is added later, we only
+                    # need to check the new action against A.
+                    # ``actions = resolveConflicts([A, D]) should drop the
+                    # number of redundant checks down from O(n^2) closer to
+                    # O(n lg n).
+                    all_actions.extend(self.actions)
+                    pending_actions = resume(resolveConflicts(
+                        executed_actions
+                        + list(pending_actions)
+                        + self.actions
+                    ))
+                    self.actions = []
+
+                action = next(pending_actions, None)
+                if action is None:
+                    # we are done!
+                    break
+
                 callable = action['callable']
                 args = action['args']
                 kw = action['kw']
@@ -1066,15 +1172,19 @@ class ActionState(object):
                                 ConfigurationExecutionError(t, v, info),
                                 tb)
                     finally:
-                       del t, v, tb
+                        del t, v, tb
 
                 if introspector is not None:
                     for introspectable in introspectables:
                         introspectable.register(introspector, info)
-                
+
+                executed_actions.append(action)
+
         finally:
             if clear:
                 del self.actions[:]
+            else:
+                self.actions = all_actions
 
 # this function is licensed under the ZPL (stolen from Zope)
 def resolveConflicts(actions):
@@ -1195,4 +1305,3 @@ def expand_action(discriminator, callable=None, args=(), kw=None,
         )
 
 global_registries = WeakOrderedSet()
-

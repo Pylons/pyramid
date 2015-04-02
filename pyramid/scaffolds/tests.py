@@ -6,9 +6,9 @@ import tempfile
 import time
 
 try:
+    import http.client as httplib
+except ImportError:
     import httplib
-except ImportError: # pragma: no cover
-    import http.client as httplib #py3
 
 class TemplateTest(object):
     def make_venv(self, directory): # pragma: no cover

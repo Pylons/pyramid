@@ -1,3 +1,4 @@
+import contextlib
 import json
 import os
 
@@ -10,7 +11,6 @@ from zope.interface.registry import Components
 from pyramid.interfaces import (
     IJSONAdapter,
     IRendererFactory,
-    IResponseFactory,
     IRendererInfo,
     )
 
@@ -25,7 +25,7 @@ from pyramid.events import BeforeRender
 
 from pyramid.path import caller_package
 
-from pyramid.response import Response
+from pyramid.response import _get_response_factory
 from pyramid.threadlocal import get_current_registry
 
 # API
@@ -74,24 +74,16 @@ def render(renderer_name, value, request=None, package=None):
     helper = RendererHelper(name=renderer_name, package=package,
                             registry=registry)
 
-    saved_response = None
-    # save the current response, preventing the renderer from affecting it
-    attrs = request.__dict__ if request is not None else {}
-    if 'response' in attrs:
-        saved_response = attrs['response']
-        del attrs['response']
-
-    result = helper.render(value, None, request=request)
-
-    # restore the original response, overwriting any changes
-    if saved_response is not None:
-        attrs['response'] = saved_response
-    elif 'response' in attrs:
-        del attrs['response']
+    with temporary_response(request):
+        result = helper.render(value, None, request=request)
 
     return result
 
-def render_to_response(renderer_name, value, request=None, package=None):
+def render_to_response(renderer_name,
+                       value,
+                       request=None,
+                       package=None,
+                       response=None):
     """ Using the renderer ``renderer_name`` (a template
     or a static renderer), render the value (or set of values) using
     the result of the renderer's ``__call__`` method (usually a string
@@ -122,9 +114,16 @@ def render_to_response(renderer_name, value, request=None, package=None):
 
     Supply a ``request`` parameter in order to provide the renderer
     with the most correct 'system' values (``request`` and ``context``
-    in particular). Keep in mind that if the ``request`` parameter is
-    not passed in, any changes to ``request.response`` attributes made
-    before calling this function will be ignored.
+    in particular). Keep in mind that any changes made to ``request.response``
+    prior to calling this function will not be reflected in the resulting
+    response object. A new response object will be created for each call
+    unless one is passed as the ``response`` argument.
+
+    .. versionchanged:: 1.6
+       In previous versions, any changes made to ``request.response`` outside
+       of this function call would affect the returned response. This is no
+       longer the case. If you wish to send in a pre-initialized response
+       then you may pass one in the ``response`` argument.
 
     """
     try:
@@ -135,7 +134,33 @@ def render_to_response(renderer_name, value, request=None, package=None):
         package = caller_package()
     helper = RendererHelper(name=renderer_name, package=package,
                             registry=registry)
-    return helper.render_to_response(value, None, request=request)
+
+    with temporary_response(request):
+        if response is not None:
+            request.response = response
+        result = helper.render_to_response(value, None, request=request)
+
+    return result
+
+@contextlib.contextmanager
+def temporary_response(request):
+    """
+    Temporarily delete request.response and restore it afterward.
+    """
+    saved_response = None
+    # save the current response, preventing the renderer from affecting it
+    attrs = request.__dict__ if request is not None else {}
+    if 'response' in attrs:
+        saved_response = attrs['response']
+        del attrs['response']
+
+    yield
+
+    # restore the original response, overwriting any changes
+    if saved_response is not None:
+        attrs['response'] = saved_response
+    elif 'response' in attrs:
+        del attrs['response']
 
 def get_renderer(renderer_name, package=None):
     """ Return the renderer object for the renderer ``renderer_name``.
@@ -248,7 +273,7 @@ class JSON(object):
         When you've done this, the JSON renderer will be able to serialize
         instances of the ``Foo`` class when they're encountered in your view
         results."""
-        
+
         self.components.registerAdapter(adapter, (type_or_iface,),
                                         IJSONAdapter)
 
@@ -265,7 +290,7 @@ class JSON(object):
                     response.content_type = 'application/json'
             default = self._make_default(request)
             return self.serializer(value, default=default, **self.kw)
-        
+
         return _render
 
     def _make_default(self, request):
@@ -286,7 +311,7 @@ json_renderer_factory = JSON() # bw compat
 class JSONP(JSON):
     """ `JSONP <http://en.wikipedia.org/wiki/JSONP>`_ renderer factory helper
     which implements a hybrid json/jsonp renderer.  JSONP is useful for
-    making cross-domain AJAX requests.  
+    making cross-domain AJAX requests.
 
     Configure a JSONP renderer using the
     :meth:`pyramid.config.Configurator.add_renderer` API at application
@@ -309,7 +334,7 @@ class JSONP(JSON):
 
        config = Configurator()
        config.add_renderer('jsonp', JSONP(param_name='callback', indent=4))
-    
+
     .. versionchanged:: 1.4
        The ability of this class to accept a ``**kw`` in its constructor.
 
@@ -356,19 +381,19 @@ class JSONP(JSON):
         ``self.param_name`` is present in request.GET; otherwise returns
         plain-JSON encoded string with content-type ``application/json``"""
         def _render(value, system):
-            request = system['request']
+            request = system.get('request')
             default = self._make_default(request)
             val = self.serializer(value, default=default, **self.kw)
-            callback = request.GET.get(self.param_name)
-            if callback is None:
-                ct = 'application/json'
-                body = val
-            else:
-                ct = 'application/javascript'
-                body = '%s(%s);' % (callback, val)
-            response = request.response
-            if response.content_type == response.default_content_type:
-                response.content_type = ct
+            ct = 'application/json'
+            body = val
+            if request is not None:
+                callback = request.GET.get(self.param_name)
+                if callback is not None:
+                    ct = 'application/javascript'
+                    body = '%s(%s);' % (callback, val)
+                response = request.response
+                if response.content_type == response.default_content_type:
+                    response.content_type = ct
             return body
         return _render
 
@@ -448,14 +473,16 @@ class RendererHelper(object):
         if response is None:
             # request is None or request is not a pyramid.response.Response
             registry = self.registry
-            response_factory = registry.queryUtility(IResponseFactory,
-                                                     default=Response)
-
-            response = response_factory()
+            response_factory = _get_response_factory(registry)
+            response = response_factory(request)
 
         if result is not None:
             if isinstance(result, text_type):
                 response.text = result
+            elif isinstance(result, bytes):
+                response.body = result
+            elif hasattr(result, '__iter__'):
+                response.app_iter = result
             else:
                 response.body = result
 
@@ -487,18 +514,18 @@ class NullRendererHelper(RendererHelper):
 
     @property
     def settings(self):
-        return get_current_registry().settings or {}
+        return {}
 
     def render_view(self, request, value, view, context):
         return value
 
     def render(self, value, system_values, request=None):
         return value
-    
+
     def render_to_response(self, value, system_values, request=None):
         return value
 
     def clone(self, name=None, package=None, registry=None):
         return self
-    
+
 null_renderer = NullRendererHelper()

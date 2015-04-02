@@ -252,10 +252,11 @@ class AppendSlashNotFoundViewFactory(object):
     .. deprecated:: 1.3
 
     """
-    def __init__(self, notfound_view=None):
+    def __init__(self, notfound_view=None, redirect_class=HTTPFound):
         if notfound_view is None:
             notfound_view = default_exceptionresponse_view
         self.notfound_view = notfound_view
+        self.redirect_class = redirect_class
 
     def __call__(self, context, request):
         path = decode_path_info(request.environ['PATH_INFO'] or '/')
@@ -268,7 +269,7 @@ class AppendSlashNotFoundViewFactory(object):
                     qs = request.query_string
                     if qs:
                         qs = '?' + qs
-                    return HTTPFound(location=request.path+'/'+qs)
+                    return self.redirect_class(location=request.path+'/'+qs)
         return self.notfound_view(context, request)
 
 append_slash_notfound_view = AppendSlashNotFoundViewFactory()
@@ -331,6 +332,31 @@ class notfound_view_config(object):
     redirect to the URL implied by the route; if it does not, Pyramid will
     return the result of the view callable provided as ``view``, as normal.
 
+    If the argument provided as ``append_slash`` is not a boolean but
+    instead implements :class:`~pyramid.interfaces.IResponse`, the
+    append_slash logic will behave as if ``append_slash=True`` was passed,
+    but the provided class will be used as the response class instead of
+    the default :class:`~pyramid.httpexceptions.HTTPFound` response class
+    when a redirect is performed.  For example:
+
+      .. code-block:: python
+
+        from pyramid.httpexceptions import (
+            HTTPMovedPermanently,
+            HTTPNotFound
+            )
+
+        @notfound_view_config(append_slash=HTTPMovedPermanently)
+        def aview(request):
+            return HTTPNotFound('not found')
+
+    The above means that a redirect to a slash-appended route will be
+    attempted, but instead of :class:`~pyramid.httpexceptions.HTTPFound`
+    being used, :class:`~pyramid.httpexceptions.HTTPMovedPermanently will
+    be used` for the redirect response if a slash-appended route is found.
+
+    .. versionchanged:: 1.6
+
     See :ref:`changing_the_notfound_view` for detailed usage information.
 
     """
@@ -380,7 +406,7 @@ class forbidden_view_config(object):
 
         @forbidden_view_config()
         def forbidden(request):
-            return Response('You are not allowed', status='401 Unauthorized')
+            return Response('You are not allowed', status='403 Forbidden')
 
     All arguments passed to this function have the same meaning as
     :meth:`pyramid.view.view_config` and each predicate argument restricts
