@@ -138,47 +138,40 @@ class Router(object):
 
         # find a view callable
         context_iface = providedBy(context)
-        views_iter = _find_views(
+        view_callables = _find_views(
             registry,
             request.request_iface,
             context_iface,
             view_name,
             )
 
-        view_callable = next(views_iter, None)
+        pme = None
 
-        # invoke the view callable
-        if view_callable is None:
-            if self.debug_notfound:
-                msg = (
-                    'debug_notfound of url %s; path_info: %r, '
-                    'context: %r, view_name: %r, subpath: %r, '
-                    'traversed: %r, root: %r, vroot: %r, '
-                    'vroot_path: %r' % (
-                        request.url, request.path_info, context,
-                        view_name, subpath, traversed, root, vroot,
-                        vroot_path)
-                    )
-                logger and logger.debug(msg)
-            else:
-                msg = request.path_info
-            raise HTTPNotFound(msg)
-        else:
+        for view_callable in view_callables:
+            # look for views that meet the predicate criteria
             try:
                 response = view_callable(context, request)
-            except PredicateMismatch:
-                # look for other views that meet the predicate
-                # criteria
-                for view_callable in views_iter:
-                    if view_callable is not None:
-                        try:
-                            response = view_callable(context, request)
-                            break
-                        except PredicateMismatch:
-                            pass
-                else:
-                    raise
-        return response
+                return response
+            except PredicateMismatch as _pme:
+                pme = _pme
+
+        if pme is not None:
+            raise pme
+
+        if self.debug_notfound:
+            msg = (
+                'debug_notfound of url %s; path_info: %r, '
+                'context: %r, view_name: %r, subpath: %r, '
+                'traversed: %r, root: %r, vroot: %r, '
+                'vroot_path: %r' % (
+                    request.url, request.path_info, context,
+                    view_name, subpath, traversed, root, vroot,
+                    vroot_path)
+                )
+            logger and logger.debug(msg)
+        else:
+            msg = request.path_info
+        raise HTTPNotFound(msg)
 
     def invoke_subrequest(self, request, use_tweens=False):
         """Obtain a response object from the Pyramid application based on

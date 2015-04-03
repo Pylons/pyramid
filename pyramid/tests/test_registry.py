@@ -12,6 +12,16 @@ class TestRegistry(unittest.TestCase):
         registry = self._makeOne()
         self.assertEqual(registry.__nonzero__(), True)
 
+    def test__lock(self):
+        registry = self._makeOne()
+        self.assertTrue(registry._lock)
+
+    def test_clear_view_cache_lookup(self):
+        registry = self._makeOne()
+        registry._view_lookup_cache[1] = 2
+        registry._clear_view_lookup_cache()
+        self.assertEqual(registry._view_lookup_cache, {})
+
     def test_package_name(self):
         package_name = 'testing'
         registry = self._getTargetClass()(package_name)

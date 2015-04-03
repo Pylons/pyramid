@@ -343,6 +343,21 @@ class ConfiguratorTests(unittest.TestCase):
                          {'info': '', 'provided': 'provided',
                           'required': 'required', 'name': 'abc', 'event': True})
 
+    def test__fix_registry_adds__lock(self):
+        reg = DummyRegistry()
+        config = self._makeOne(reg)
+        config._fix_registry()
+        self.assertTrue(hasattr(reg, '_lock'))
+
+    def test__fix_registry_adds_clear_view_lookup_cache(self):
+        reg = DummyRegistry()
+        config = self._makeOne(reg)
+        self.assertFalse(hasattr(reg, '_clear_view_lookup_cache'))
+        config._fix_registry()
+        self.assertFalse(hasattr(reg, '_view_lookup_cache'))
+        reg._clear_view_lookup_cache()
+        self.assertEqual(reg._view_lookup_cache, {})
+
     def test_setup_registry_calls_fix_registry(self):
         reg = DummyRegistry()
         config = self._makeOne(reg)

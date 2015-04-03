@@ -419,16 +419,30 @@ class forbidden_view_config(object):
 
 def _find_views(registry, request_iface, context_iface, view_name):
     registered = registry.adapters.registered
-    view_types = (IView, ISecuredView, IMultiView)
-    for req_type, ctx_type in itertools.product(
-        request_iface.__sro__, context_iface.__sro__
-    ):
-        source_ifaces = (IViewClassifier, req_type, ctx_type)
-        for view_type in view_types:
-            view_callable = registered(
-                source_ifaces,
-                view_type,
-                name=view_name,
-            )
-            if view_callable is not None:
-                yield view_callable
+    cache = registry._view_lookup_cache
+    views = cache.get((request_iface, context_iface, view_name))
+    if views is None:
+        views = []
+        view_types = (IView, ISecuredView, IMultiView)
+        for req_type, ctx_type in itertools.product(
+            request_iface.__sro__, context_iface.__sro__
+        ):
+            source_ifaces = (IViewClassifier, req_type, ctx_type)
+            for view_type in view_types:
+                view_callable = registered(
+                    source_ifaces,
+                    view_type,
+                    name=view_name,
+                )
+                if view_callable is not None:
+                    views.append(view_callable)
+        if views:
+            # do not cache view lookup misses.  rationale: dont allow cache to
+            # grow without bound if somebody tries to hit the site with many
+            # missing URLs.  we could use an LRU cache instead, but then
+            # purposeful misses by an attacker would just blow out the cache
+            # anyway. downside: misses will almost always consume more CPU than
+            # hits in steady state.
+            with registry._lock:
+                cache[(request_iface, context_iface, view_name)] = views
+    return iter(views)
