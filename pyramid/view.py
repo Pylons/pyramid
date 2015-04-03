@@ -445,4 +445,4 @@ def _find_views(registry, request_iface, context_iface, view_name):
             # hits in steady state.
             with registry._lock:
                 cache[(request_iface, context_iface, view_name)] = views
-    return iter(views)
+    return views
