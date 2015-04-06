@@ -66,8 +66,6 @@ class PViewsCommand(object):
         from pyramid.interfaces import IRootFactory
         from pyramid.interfaces import IRouteRequest
         from pyramid.interfaces import IRoutesMapper
-        from pyramid.interfaces import IView
-        from pyramid.interfaces import IViewClassifier
         from pyramid.interfaces import ITraverser
         from pyramid.traversal import DefaultRootFactory
         from pyramid.traversal import ResourceTreeTraverser
