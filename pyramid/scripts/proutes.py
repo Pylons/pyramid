@@ -4,18 +4,16 @@ import sys
 import textwrap
 import re
 
+from zope.interface import Interface
+
 from pyramid.paster import bootstrap
 from pyramid.compat import (string_types, configparser)
-from pyramid.interfaces import (
-    IRouteRequest,
-    IViewClassifier,
-    IView,
-)
+from pyramid.interfaces import IRouteRequest
 from pyramid.config import not_
 
 from pyramid.scripts.common import parse_vars
 from pyramid.static import static_view
-from zope.interface import Interface
+from pyramid.view import _find_views
 
 
 PAD = 3
@@ -159,12 +157,11 @@ def get_route_data(route, registry):
             (route.name, _get_pattern(route), UNKNOWN_KEY, ANY_KEY)
         ]
 
-    view_callable = registry.adapters.lookup(
-        (IViewClassifier, request_iface, Interface),
-        IView,
-        name='',
-        default=None
-    )
+    view_callables = _find_views(registry, request_iface, Interface, '')
+    if view_callables:
+        view_callable = view_callables[0]
+    else:
+        view_callable = None
     view_module = _get_view_module(view_callable)
 
     # Introspectables can be turned off, so there could be a chance
