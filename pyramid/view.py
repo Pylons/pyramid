@@ -9,6 +9,7 @@ from pyramid.interfaces import (
     ISecuredView,
     IView,
     IViewClassifier,
+    IRequest,
     )
 
 from pyramid.compat import decode_path_info
@@ -416,17 +417,27 @@ class forbidden_view_config(object):
         settings['_info'] = info.codeinfo # fbo "action_method"
         return wrapped
 
-def _find_views(registry, request_iface, context_iface, view_name):
+def _find_views(
+    registry,
+    request_iface,
+    context_iface,
+    view_name,
+    view_types=None,
+    view_classifier=None,
+    ):
+    if  view_types is None:
+        view_types = (IView, ISecuredView, IMultiView)
+    if view_classifier is  None:
+        view_classifier = IViewClassifier
     registered = registry.adapters.registered
     cache = registry._view_lookup_cache
     views = cache.get((request_iface, context_iface, view_name))
     if views is None:
         views = []
-        view_types = (IView, ISecuredView, IMultiView)
         for req_type, ctx_type in itertools.product(
             request_iface.__sro__, context_iface.__sro__
         ):
-            source_ifaces = (IViewClassifier, req_type, ctx_type)
+            source_ifaces = (view_classifier, req_type, ctx_type)
             for view_type in view_types:
                 view_callable = registered(
                     source_ifaces,
@@ -453,13 +464,20 @@ def _call_view(
     context,
     context_iface,
     view_name,
+    view_types=None,
+    view_classifier=None,
     secure=True,
+    request_iface=None,
     ):
+    if request_iface is None:
+        request_iface = getattr(request, 'request_iface', IRequest)
     view_callables = _find_views(
         registry,
-        request.request_iface,
+        request_iface,
         context_iface,
         view_name,
+        view_types=view_types,
+        view_classifier=view_classifier,
         )
 
     pme = None
