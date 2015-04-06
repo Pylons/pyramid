@@ -21,7 +21,7 @@ from pyramid.compat import (
 from pyramid.config import Configurator
 from pyramid.decorator import reify
 from pyramid.path import caller_package
-from pyramid.response import Response, _get_response_factory
+from pyramid.response import _get_response_factory
 from pyramid.registry import Registry
 
 from pyramid.security import (
@@ -327,6 +327,7 @@ class DummyRequest(
     charset = 'UTF-8'
     script_name = ''
     _registry = None
+    request_iface = IRequest
 
     def __init__(self, params=None, environ=None, headers=None, path='/',
                  cookies=None, post=None, **kw):

@@ -1,5 +1,4 @@
 import unittest
-import warnings
 
 import os
 
@@ -15,6 +14,8 @@ from pyramid.tests.test_config import DummyContext
 
 from pyramid.exceptions import ConfigurationExecutionError
 from pyramid.exceptions import ConfigurationConflictError
+
+from pyramid.interfaces import IRequest
 
 class ConfiguratorTests(unittest.TestCase):
     def _makeOne(self, *arg, **kw):
@@ -1845,6 +1846,7 @@ class TestGlobalRegistriesIntegration(unittest.TestCase):
 class DummyRequest:
     subpath = ()
     matchdict = None
+    request_iface = IRequest
     def __init__(self, environ=None):
         if environ is None:
             environ = {}

@@ -11,10 +11,7 @@ from pyramid.interfaces import (
     IViewClassifier,
     )
 
-from pyramid.compat import (
-    map_,
-    decode_path_info,
-    )
+from pyramid.compat import decode_path_info
 
 from pyramid.exceptions import PredicateMismatch
 
@@ -45,24 +42,24 @@ def render_view_to_response(context, request, name='', secure=True):
     disallowed.
 
     If ``secure`` is ``False``, no permission checking is done."""
-    provides = [IViewClassifier] + map_(providedBy, (request, context))
-    try:
-        reg = request.registry
-    except AttributeError:
-        reg = get_current_registry()
-    view = reg.adapters.lookup(provides, IView, name=name)
-    if view is None:
-        return None
 
-    if not secure:
-        # the view will have a __call_permissive__ attribute if it's
-        # secured; otherwise it won't.
-        view = getattr(view, '__call_permissive__', view)
+    registry = getattr(request, 'registry', None)
+    if registry is None:
+        registry = get_current_registry()
 
-    # if this view is secured, it will raise a Forbidden
-    # appropriately if the executing user does not have the proper
-    # permission
-    return view(context, request)
+    context_iface = providedBy(context)
+
+    response = _call_view(
+        registry,
+        request,
+        context,
+        context_iface,
+        name,
+        secure = secure,
+        )
+
+    return response # NB: might be None
+
 
 def render_view_to_iterable(context, request, name='', secure=True):
     """ Call the :term:`view callable` configured with a :term:`view
@@ -447,9 +444,17 @@ def _find_views(registry, request_iface, context_iface, view_name):
             # hits in steady state.
             with registry._lock:
                 cache[(request_iface, context_iface, view_name)] = views
+
     return views
 
-def _call_view(registry, request, context, context_iface, view_name):
+def _call_view(
+    registry,
+    request,
+    context,
+    context_iface,
+    view_name,
+    secure=True,
+    ):
     view_callables = _find_views(
         registry,
         request.request_iface,
@@ -463,6 +468,18 @@ def _call_view(registry, request, context, context_iface, view_name):
     for view_callable in view_callables:
         # look for views that meet the predicate criteria
         try:
+            if not secure:
+                # the view will have a __call_permissive__ attribute if it's
+                # secured; otherwise it won't.
+                view_callable = getattr(
+                    view_callable,
+                    '__call_permissive__',
+                    view_callable
+                    )
+
+            # if this view is secured, it will raise a Forbidden
+            # appropriately if the executing user does not have the proper
+            # permission
             response = view_callable(context, request)
             return response
         except PredicateMismatch as _pme:

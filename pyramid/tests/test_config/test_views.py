@@ -4131,7 +4131,11 @@ class DummyRegistry:
         self.settings = {}
 
 from zope.interface import implementer
-from pyramid.interfaces import IResponse
+from pyramid.interfaces import (
+    IResponse,
+    IRequest,
+    )
+
 @implementer(IResponse)
 class DummyResponse(object):
     content_type = None
@@ -4141,6 +4145,7 @@ class DummyResponse(object):
 class DummyRequest:
     subpath = ()
     matchdict = None
+    request_iface  = IRequest
 
     def __init__(self, environ=None):
         if environ is None:

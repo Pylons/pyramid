@@ -182,6 +182,7 @@ class Request(
     exc_info = None
     matchdict = None
     matched_route = None
+    request_iface = IRequest
 
     ResponseClass = Response
 
