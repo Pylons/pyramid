@@ -1344,6 +1344,8 @@ class ViewsConfiguratorMixin(object):
                         multiview,
                         (IExceptionViewClassifier, request_iface, context),
                         IMultiView, name=name)
+
+            self.registry._clear_view_lookup_cache()
             renderer_type = getattr(renderer, 'type', None) # gard against None
             intrspc = self.introspector
             if (

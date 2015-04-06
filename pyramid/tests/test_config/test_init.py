@@ -1,5 +1,4 @@
 import unittest
-import warnings
 
 import os
 
@@ -15,6 +14,8 @@ from pyramid.tests.test_config import DummyContext
 
 from pyramid.exceptions import ConfigurationExecutionError
 from pyramid.exceptions import ConfigurationConflictError
+
+from pyramid.interfaces import IRequest
 
 class ConfiguratorTests(unittest.TestCase):
     def _makeOne(self, *arg, **kw):
@@ -342,6 +343,21 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(kw,
                          {'info': '', 'provided': 'provided',
                           'required': 'required', 'name': 'abc', 'event': True})
+
+    def test__fix_registry_adds__lock(self):
+        reg = DummyRegistry()
+        config = self._makeOne(reg)
+        config._fix_registry()
+        self.assertTrue(hasattr(reg, '_lock'))
+
+    def test__fix_registry_adds_clear_view_lookup_cache(self):
+        reg = DummyRegistry()
+        config = self._makeOne(reg)
+        self.assertFalse(hasattr(reg, '_clear_view_lookup_cache'))
+        config._fix_registry()
+        self.assertFalse(hasattr(reg, '_view_lookup_cache'))
+        reg._clear_view_lookup_cache()
+        self.assertEqual(reg._view_lookup_cache, {})
 
     def test_setup_registry_calls_fix_registry(self):
         reg = DummyRegistry()
@@ -1830,6 +1846,7 @@ class TestGlobalRegistriesIntegration(unittest.TestCase):
 class DummyRequest:
     subpath = ()
     matchdict = None
+    request_iface = IRequest
     def __init__(self, environ=None):
         if environ is None:
             environ = {}
