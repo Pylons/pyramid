@@ -16,6 +16,8 @@ from pyramid.compat import (
     decode_path_info,
     )
 
+from pyramid.exceptions import PredicateMismatch
+
 from pyramid.httpexceptions import (
     HTTPFound,
     default_exceptionresponse_view,
@@ -446,3 +448,27 @@ def _find_views(registry, request_iface, context_iface, view_name):
             with registry._lock:
                 cache[(request_iface, context_iface, view_name)] = views
     return views
+
+def _call_view(registry, request, context, context_iface, view_name):
+    view_callables = _find_views(
+        registry,
+        request.request_iface,
+        context_iface,
+        view_name,
+        )
+
+    pme = None
+    response = None
+
+    for view_callable in view_callables:
+        # look for views that meet the predicate criteria
+        try:
+            response = view_callable(context, request)
+            return response
+        except PredicateMismatch as _pme:
+            pme = _pme
+
+    if pme is not None:
+        raise pme
+
+    return response

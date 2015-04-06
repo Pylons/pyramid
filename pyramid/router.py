@@ -22,10 +22,9 @@ from pyramid.events import (
     NewResponse,
     )
 
-from pyramid.exceptions import PredicateMismatch
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.request import Request
-from pyramid.view import _find_views
+from pyramid.view import _call_view
 from pyramid.request import apply_request_extensions
 from pyramid.threadlocal import manager
 
@@ -138,40 +137,31 @@ class Router(object):
 
         # find a view callable
         context_iface = providedBy(context)
-        view_callables = _find_views(
+        response = _call_view(
             registry,
-            request.request_iface,
+            request,
+            context,
             context_iface,
-            view_name,
+            view_name
             )
 
-        pme = None
+        if response is None:
+            if self.debug_notfound:
+                msg = (
+                    'debug_notfound of url %s; path_info: %r, '
+                    'context: %r, view_name: %r, subpath: %r, '
+                    'traversed: %r, root: %r, vroot: %r, '
+                    'vroot_path: %r' % (
+                        request.url, request.path_info, context,
+                        view_name, subpath, traversed, root, vroot,
+                        vroot_path)
+                    )
+                logger and logger.debug(msg)
+            else:
+                msg = request.path_info
+            raise HTTPNotFound(msg)
 
-        for view_callable in view_callables:
-            # look for views that meet the predicate criteria
-            try:
-                response = view_callable(context, request)
-                return response
-            except PredicateMismatch as _pme:
-                pme = _pme
-
-        if pme is not None:
-            raise pme
-
-        if self.debug_notfound:
-            msg = (
-                'debug_notfound of url %s; path_info: %r, '
-                'context: %r, view_name: %r, subpath: %r, '
-                'traversed: %r, root: %r, vroot: %r, '
-                'vroot_path: %r' % (
-                    request.url, request.path_info, context,
-                    view_name, subpath, traversed, root, vroot,
-                    vroot_path)
-                )
-            logger and logger.debug(msg)
-        else:
-            msg = request.path_info
-        raise HTTPNotFound(msg)
+        return response
 
     def invoke_subrequest(self, request, use_tweens=False):
         """Obtain a response object from the Pyramid application based on
