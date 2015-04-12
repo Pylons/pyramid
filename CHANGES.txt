@@ -4,6 +4,10 @@ Next release
 Features
 --------
 
+- Make it possible to subclass ``pyramid.request.Request`` and also use
+  ``pyramid.request.Request.add_request.method``.  See
+  https://github.com/Pylons/pyramid/issues/1529
+
 - The ``pyramid.config.Configurator`` has grown the ability to allow
   actions to call other actions during a commit-cycle. This enables much more
   logic to be placed into actions, such as the ability to invoke other actions
