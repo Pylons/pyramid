@@ -435,6 +435,7 @@ class Test_call_app_with_subpath_as_path_info(unittest.TestCase):
         self.assertEqual(request.environ['SCRIPT_NAME'], '/' + encoded)
         self.assertEqual(request.environ['PATH_INFO'], '/' + encoded)
 
+<<<<<<< HEAD
 class Test_apply_request_extensions(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp()
@@ -477,6 +478,64 @@ class Test_apply_request_extensions(unittest.TestCase):
 
 class Dummy(object):
     pass
+
+class Test_subclassing_Request(unittest.TestCase):
+    def test_subclass(self):
+        from pyramid.interfaces import IRequest
+        from pyramid.request import Request
+        from zope.interface import providedBy, implementedBy
+
+        class RequestSub(Request):
+            pass
+
+        self.assertTrue(hasattr(Request, '__provides__'))
+        self.assertTrue(hasattr(Request, '__implemented__'))
+        self.assertTrue(hasattr(Request, '__providedBy__'))
+        self.assertFalse(hasattr(RequestSub, '__provides__'))
+        self.assertTrue(hasattr(RequestSub, '__providedBy__'))
+        self.assertTrue(hasattr(RequestSub, '__implemented__'))
+
+        self.assertTrue(IRequest.implementedBy(RequestSub))
+        # The call to implementedBy will add __provides__ to the class
+        self.assertTrue(hasattr(RequestSub, '__provides__'))
+
+
+    def test_subclass_with_implementer(self):
+        from pyramid.interfaces import IRequest
+        from pyramid.request import Request
+        from zope.interface import providedBy, implementedBy, implementer
+
+        @implementer(IRequest)
+        class RequestSub(Request):
+            pass
+
+        self.assertTrue(hasattr(Request, '__provides__'))
+        self.assertTrue(hasattr(Request, '__implemented__'))
+        self.assertTrue(hasattr(Request, '__providedBy__'))
+        self.assertTrue(hasattr(RequestSub, '__provides__'))
+        self.assertTrue(hasattr(RequestSub, '__providedBy__'))
+        self.assertTrue(hasattr(RequestSub, '__implemented__'))
+
+        req = RequestSub({})
+        req._set_properties({'b': 'b'})
+
+        self.assertTrue(IRequest.providedBy(req))
+        self.assertTrue(IRequest.implementedBy(RequestSub))
+
+    def test_subclass_mutate_before_providedBy(self):
+        from pyramid.interfaces import IRequest
+        from pyramid.request import Request
+        from zope.interface import providedBy, implementedBy, implementer
+
+        class RequestSub(Request):
+            pass
+
+        req = RequestSub({})
+        req._set_properties({'b': 'b'})
+
+        self.assertTrue(IRequest.providedBy(req))
+        self.assertTrue(IRequest.implementedBy(RequestSub))
+
 
 class DummyRequest(object):
     def __init__(self, environ=None):
