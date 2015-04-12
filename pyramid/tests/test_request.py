@@ -435,7 +435,6 @@ class Test_call_app_with_subpath_as_path_info(unittest.TestCase):
         self.assertEqual(request.environ['SCRIPT_NAME'], '/' + encoded)
         self.assertEqual(request.environ['PATH_INFO'], '/' + encoded)
 
-<<<<<<< HEAD
 class Test_apply_request_extensions(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp()
@@ -503,7 +502,8 @@ class Test_subclassing_Request(unittest.TestCase):
     def test_subclass_with_implementer(self):
         from pyramid.interfaces import IRequest
         from pyramid.request import Request
-        from zope.interface import providedBy, implementedBy, implementer
+        from pyramid.util import InstancePropertyHelper
+        from zope.interface import implementer
 
         @implementer(IRequest)
         class RequestSub(Request):
@@ -517,7 +517,8 @@ class Test_subclassing_Request(unittest.TestCase):
         self.assertTrue(hasattr(RequestSub, '__implemented__'))
 
         req = RequestSub({})
-        req._set_properties({'b': 'b'})
+        helper = InstancePropertyHelper()
+        helper.apply_properties(req, {'b': 'b'})
 
         self.assertTrue(IRequest.providedBy(req))
         self.assertTrue(IRequest.implementedBy(RequestSub))
@@ -525,13 +526,14 @@ class Test_subclassing_Request(unittest.TestCase):
     def test_subclass_mutate_before_providedBy(self):
         from pyramid.interfaces import IRequest
         from pyramid.request import Request
-        from zope.interface import providedBy, implementedBy, implementer
+        from pyramid.util import InstancePropertyHelper
 
         class RequestSub(Request):
             pass
 
         req = RequestSub({})
-        req._set_properties({'b': 'b'})
+        helper = InstancePropertyHelper()
+        helper.apply_properties(req, {'b': 'b'})
 
         self.assertTrue(IRequest.providedBy(req))
         self.assertTrue(IRequest.implementedBy(RequestSub))
