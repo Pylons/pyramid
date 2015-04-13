@@ -18,7 +18,10 @@ Releasing Pyramid
 - Make sure all scaffold tests pass (Py 2.6, 2.7, 3.2, 3.3 and pypy on UNIX;
   this doesn't work on Windows):
 
-  $ python pyramid/scaffolds/tests.py
+  $ tox py3-scaffolds
+  $ tox py2-scaffolds
+  $ tox pypy-scaffolds
+  $ tox pypy3-scaffolds
 
 - Ensure all features of the release are documented (audit CHANGES.txt or
   communicate with contributors).

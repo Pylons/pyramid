@@ -1,17 +1,20 @@
+import itertools
 import venusian
 
 from zope.interface import providedBy
 
 from pyramid.interfaces import (
     IRoutesMapper,
+    IMultiView,
+    ISecuredView,
     IView,
     IViewClassifier,
+    IRequest,
     )
 
-from pyramid.compat import (
-    map_,
-    decode_path_info,
-    )
+from pyramid.compat import decode_path_info
+
+from pyramid.exceptions import PredicateMismatch
 
 from pyramid.httpexceptions import (
     HTTPFound,
@@ -40,24 +43,24 @@ def render_view_to_response(context, request, name='', secure=True):
     disallowed.
 
     If ``secure`` is ``False``, no permission checking is done."""
-    provides = [IViewClassifier] + map_(providedBy, (request, context))
-    try:
-        reg = request.registry
-    except AttributeError:
-        reg = get_current_registry()
-    view = reg.adapters.lookup(provides, IView, name=name)
-    if view is None:
-        return None
 
-    if not secure:
-        # the view will have a __call_permissive__ attribute if it's
-        # secured; otherwise it won't.
-        view = getattr(view, '__call_permissive__', view)
+    registry = getattr(request, 'registry', None)
+    if registry is None:
+        registry = get_current_registry()
 
-    # if this view is secured, it will raise a Forbidden
-    # appropriately if the executing user does not have the proper
-    # permission
-    return view(context, request)
+    context_iface = providedBy(context)
+
+    response = _call_view(
+        registry,
+        request,
+        context,
+        context_iface,
+        name,
+        secure = secure,
+        )
+
+    return response # NB: might be None
+
 
 def render_view_to_iterable(context, request, name='', secure=True):
     """ Call the :term:`view callable` configured with a :term:`view
@@ -252,10 +255,11 @@ class AppendSlashNotFoundViewFactory(object):
     .. deprecated:: 1.3
 
     """
-    def __init__(self, notfound_view=None):
+    def __init__(self, notfound_view=None, redirect_class=HTTPFound):
         if notfound_view is None:
             notfound_view = default_exceptionresponse_view
         self.notfound_view = notfound_view
+        self.redirect_class = redirect_class
 
     def __call__(self, context, request):
         path = decode_path_info(request.environ['PATH_INFO'] or '/')
@@ -268,7 +272,7 @@ class AppendSlashNotFoundViewFactory(object):
                     qs = request.query_string
                     if qs:
                         qs = '?' + qs
-                    return HTTPFound(location=request.path + '/' + qs)
+                    return self.redirect_class(location=request.path + '/' + qs)
         return self.notfound_view(context, request)
 
 append_slash_notfound_view = AppendSlashNotFoundViewFactory()
@@ -331,6 +335,31 @@ class notfound_view_config(object):
     redirect to the URL implied by the route; if it does not, Pyramid will
     return the result of the view callable provided as ``view``, as normal.
 
+    If the argument provided as ``append_slash`` is not a boolean but
+    instead implements :class:`~pyramid.interfaces.IResponse`, the
+    append_slash logic will behave as if ``append_slash=True`` was passed,
+    but the provided class will be used as the response class instead of
+    the default :class:`~pyramid.httpexceptions.HTTPFound` response class
+    when a redirect is performed.  For example:
+
+      .. code-block:: python
+
+        from pyramid.httpexceptions import (
+            HTTPMovedPermanently,
+            HTTPNotFound
+            )
+
+        @notfound_view_config(append_slash=HTTPMovedPermanently)
+        def aview(request):
+            return HTTPNotFound('not found')
+
+    The above means that a redirect to a slash-appended route will be
+    attempted, but instead of :class:`~pyramid.httpexceptions.HTTPFound`
+    being used, :class:`~pyramid.httpexceptions.HTTPMovedPermanently will
+    be used` for the redirect response if a slash-appended route is found.
+
+    .. versionchanged:: 1.6
+
     See :ref:`changing_the_notfound_view` for detailed usage information.
 
     """
@@ -380,7 +409,7 @@ class forbidden_view_config(object):
 
         @forbidden_view_config()
         def forbidden(request):
-            return Response('You are not allowed', status='401 Unauthorized')
+            return Response('You are not allowed', status='403 Forbidden')
 
     All arguments passed to this function have the same meaning as
     :meth:`pyramid.view.view_config` and each predicate argument restricts
@@ -414,3 +443,93 @@ class forbidden_view_config(object):
         settings['_info'] = info.codeinfo # fbo "action_method"
         return wrapped
 
+def _find_views(
+    registry,
+    request_iface,
+    context_iface,
+    view_name,
+    view_types=None,
+    view_classifier=None,
+    ):
+    if  view_types is None:
+        view_types = (IView, ISecuredView, IMultiView)
+    if view_classifier is  None:
+        view_classifier = IViewClassifier
+    registered = registry.adapters.registered
+    cache = registry._view_lookup_cache
+    views = cache.get((request_iface, context_iface, view_name))
+    if views is None:
+        views = []
+        for req_type, ctx_type in itertools.product(
+            request_iface.__sro__, context_iface.__sro__
+        ):
+            source_ifaces = (view_classifier, req_type, ctx_type)
+            for view_type in view_types:
+                view_callable = registered(
+                    source_ifaces,
+                    view_type,
+                    name=view_name,
+                )
+                if view_callable is not None:
+                    views.append(view_callable)
+        if views:
+            # do not cache view lookup misses.  rationale: dont allow cache to
+            # grow without bound if somebody tries to hit the site with many
+            # missing URLs.  we could use an LRU cache instead, but then
+            # purposeful misses by an attacker would just blow out the cache
+            # anyway. downside: misses will almost always consume more CPU than
+            # hits in steady state.
+            with registry._lock:
+                cache[(request_iface, context_iface, view_name)] = views
+
+    return views
+
+def _call_view(
+    registry,
+    request,
+    context,
+    context_iface,
+    view_name,
+    view_types=None,
+    view_classifier=None,
+    secure=True,
+    request_iface=None,
+    ):
+    if request_iface is None:
+        request_iface = getattr(request, 'request_iface', IRequest)
+    view_callables = _find_views(
+        registry,
+        request_iface,
+        context_iface,
+        view_name,
+        view_types=view_types,
+        view_classifier=view_classifier,
+        )
+
+    pme = None
+    response = None
+
+    for view_callable in view_callables:
+        # look for views that meet the predicate criteria
+        try:
+            if not secure:
+                # the view will have a __call_permissive__ attribute if it's
+                # secured; otherwise it won't.
+                view_callable = getattr(
+                    view_callable,
+                    '__call_permissive__',
+                    view_callable
+                    )
+
+            # if this view is secured, it will raise a Forbidden
+            # appropriately if the executing user does not have the proper
+            # permission
+            response = view_callable(context, request)
+            return response
+        except PredicateMismatch as _pme:
+            pme = _pme
+
+    if pme is not None:
+        raise pme
+
+    return response

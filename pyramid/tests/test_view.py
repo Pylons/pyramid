@@ -5,6 +5,8 @@ from zope.interface import implementer
 
 from pyramid import testing
 
+from pyramid.interfaces import IRequest
+
 class BaseTest(object):
     def setUp(self):
         self.config = testing.setUp()
@@ -13,7 +15,6 @@ class BaseTest(object):
         testing.tearDown()
 
     def _registerView(self, reg, app, name):
-        from pyramid.interfaces import IRequest
         from pyramid.interfaces import IViewClassifier
         for_ = (IViewClassifier, IRequest, IContext)
         from pyramid.interfaces import IView
@@ -32,14 +33,11 @@ class BaseTest(object):
         return environ
 
     def _makeRequest(self, **environ):
-        from pyramid.interfaces import IRequest
-        from zope.interface import directlyProvides
-        from webob import Request
+        from pyramid.request import Request
         from pyramid.registry import Registry
         environ = self._makeEnviron(**environ)
         request = Request(environ)
         request.registry = Registry()
-        directlyProvides(request, IRequest)
         return request
 
     def _makeContext(self):
@@ -676,6 +674,7 @@ def make_view(response):
 
 class DummyRequest:
     exception = None
+    request_iface = IRequest
 
     def __init__(self, environ=None):
         if environ is None:

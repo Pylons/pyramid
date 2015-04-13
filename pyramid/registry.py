@@ -1,4 +1,5 @@
 import operator
+import threading
 
 from zope.interface import implementer
 
@@ -38,6 +39,17 @@ class Registry(Components, dict):
     has_listeners = False
 
     _settings = None
+
+    def __init__(self, *arg, **kw):
+        # add a registry-instance-specific lock, which is used when the lookup
+        # cache is mutated
+        self._lock = threading.Lock()
+        # add a view lookup cache
+        self._clear_view_lookup_cache()
+        Components.__init__(self, *arg, **kw)
+
+    def _clear_view_lookup_cache(self):
+        self._view_lookup_cache = {}
 
     def __nonzero__(self):
         # defeat bool determination via dict.__len__

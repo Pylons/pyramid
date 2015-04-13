@@ -6,6 +6,7 @@ from pyramid.interfaces import IMultiView
 from pyramid.paster import bootstrap
 from pyramid.request import Request
 from pyramid.scripts.common import parse_vars
+from pyramid.view import _find_views
 
 def main(argv=sys.argv, quiet=False):
     command = PViewsCommand(argv, quiet)
@@ -65,8 +66,6 @@ class PViewsCommand(object):
         from pyramid.interfaces import IRootFactory
         from pyramid.interfaces import IRouteRequest
         from pyramid.interfaces import IRoutesMapper
-        from pyramid.interfaces import IView
-        from pyramid.interfaces import IViewClassifier
         from pyramid.interfaces import ITraverser
         from pyramid.traversal import DefaultRootFactory
         from pyramid.traversal import ResourceTreeTraverser
@@ -90,11 +89,15 @@ class PViewsCommand(object):
                             IRouteRequest,
                             name=route.name,
                             default=IRequest)
-                        view = adapters.lookup(
-                            (IViewClassifier, request_iface, context_iface),
-                            IView, name='', default=None)
-                        if view is None:
+                        views = _find_views(
+                            request.registry,
+                            request_iface,
+                            context_iface,
+                            ''
+                            )
+                        if not views:
                             continue
+                        view = views[0]
                         view.__request_attrs__ = {}
                         view.__request_attrs__['matchdict'] = match
                         view.__request_attrs__['matched_route'] = route
@@ -147,17 +150,31 @@ class PViewsCommand(object):
         # find a view callable
         context_iface = providedBy(context)
         if routes_multiview is None:
-            view = adapters.lookup(
-                (IViewClassifier, request_iface, context_iface),
-                IView, name=view_name, default=None)
+            views = _find_views(
+                request.registry,
+                request_iface,
+                context_iface,
+                view_name,
+                )
+            if views:
+                view = views[0]
+            else:
+                view = None
         else:
             view = RoutesMultiView(infos, context_iface, root_factory, request)
 
         # routes are not registered with a view name
         if view is None:
-            view = adapters.lookup(
-                (IViewClassifier, request_iface, context_iface),
-                IView, name='', default=None)
+            views = _find_views(
+                request.registry,
+                request_iface,
+                context_iface,
+                '',
+                )
+            if views:
+                view = views[0]
+            else:
+                view = None
             # we don't want a multiview here
             if IMultiView.providedBy(view):
                 view = None

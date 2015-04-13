@@ -13,8 +13,6 @@ from pyramid.interfaces import (
     IRequestFactory,
     IRoutesMapper,
     ITraverser,
-    IView,
-    IViewClassifier,
     ITweens,
     )
 
@@ -24,9 +22,9 @@ from pyramid.events import (
     NewResponse,
     )
 
-from pyramid.exceptions import PredicateMismatch
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.request import Request
+from pyramid.view import _call_view
 from pyramid.request import apply_request_extensions
 from pyramid.threadlocal import manager
 
@@ -139,12 +137,15 @@ class Router(object):
 
         # find a view callable
         context_iface = providedBy(context)
-        view_callable = adapters.lookup(
-            (IViewClassifier, request.request_iface, context_iface),
-            IView, name=view_name, default=None)
+        response = _call_view(
+            registry,
+            request,
+            context,
+            context_iface,
+            view_name
+            )
 
-        # invoke the view callable
-        if view_callable is None:
+        if response is None:
             if self.debug_notfound:
                 msg = (
                     'debug_notfound of url %s; path_info: %r, '
@@ -159,28 +160,7 @@ class Router(object):
             else:
                 msg = request.path_info
             raise HTTPNotFound(msg)
-        else:
-            try:
-                response = view_callable(context, request)
-            except PredicateMismatch:
-                # look for other views that meet the predicate
-                # criteria
-                for iface in context_iface.__sro__[1:]:
-                    previous_view_callable = view_callable
-                    view_callable = adapters.lookup(
-                        (IViewClassifier, request.request_iface, iface),
-                        IView, name=view_name, default=None)
-                    # intermediate bases may lookup same view_callable
-                    if view_callable is previous_view_callable:
-                        continue
-                    if view_callable is not None:
-                        try:
-                            response = view_callable(context, request)
-                            break
-                        except PredicateMismatch:
-                            pass
-                else:
-                    raise
+
         return response
 
     def invoke_subrequest(self, request, use_tweens=False):
@@ -242,4 +222,3 @@ class Router(object):
         request = self.request_factory(environ)
         response = self.invoke_subrequest(request, use_tweens=True)
         return response(request.environ, start_response)
-

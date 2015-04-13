@@ -3,17 +3,16 @@ import sys
 from pyramid.interfaces import (
     IExceptionViewClassifier,
     IRequest,
-    IView,
     )
 
 from zope.interface import providedBy
+from pyramid.view import _call_view
 
 def excview_tween_factory(handler, registry):
     """ A :term:`tween` factory which produces a tween that catches an
     exception raised by downstream tweens (or the main Pyramid request
     handler) and, if possible, converts it into a Response using an
     :term:`exception view`."""
-    adapters = registry.adapters
 
     def excview_tween(request):
         attrs = request.__dict__
@@ -39,11 +38,17 @@ def excview_tween_factory(handler, registry):
             # https://github.com/Pylons/pyramid/issues/700
             request_iface = attrs.get('request_iface', IRequest)
             provides = providedBy(exc)
-            for_ = (IExceptionViewClassifier, request_iface.combined, provides)
-            view_callable = adapters.lookup(for_, IView, default=None)
-            if view_callable is None:
+            response = _call_view(
+                registry,
+                request,
+                exc,
+                provides,
+                '',
+                view_classifier=IExceptionViewClassifier,
+                request_iface=request_iface.combined
+                )
+            if response is None:
                 raise
-            response = view_callable(exc, request)
 
         return response
 

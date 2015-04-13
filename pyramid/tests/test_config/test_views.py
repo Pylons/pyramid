@@ -1007,6 +1007,78 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         request.params = {'param':'1'}
         self.assertEqual(wrapper(ctx, request), 'view8')
 
+    def test_view_with_most_specific_predicate(self):
+        from pyramid.renderers import null_renderer as nr
+        from pyramid.router import Router
+
+        class OtherBase(object): pass
+        class Int1(object): pass
+        class Int2(object): pass
+
+        class Resource(OtherBase, Int1, Int2):
+            def __init__(self, request): pass
+
+        def unknown(context, request): return 'unknown'
+        def view(context, request): return 'hello'
+
+        config = self._makeOne(autocommit=True)
+        config.add_route('root', '/', factory=Resource)
+        config.add_view(unknown, route_name='root', renderer=nr)
+        config.add_view(
+            view, renderer=nr, route_name='root',
+            context=Int1, request_method='GET'
+        )
+        config.add_view(
+            view=view, renderer=nr, route_name='root',
+            context=Int2, request_method='POST'
+        )
+        request = self._makeRequest(config)
+        request.method = 'POST'
+        request.params = {}
+        router = Router(config.registry)
+        response = router.handle_request(request)
+        self.assertEqual(response, 'hello')
+
+    def test_view_with_most_specific_predicate_with_mismatch(self):
+        from pyramid.renderers import null_renderer as nr
+        from pyramid.router import Router
+
+        class OtherBase(object): pass
+        class Int1(object): pass
+        class Int2(object): pass
+
+        class Resource(OtherBase, Int1, Int2):
+            def __init__(self, request): pass
+
+        def unknown(context, request): return 'unknown'
+        def view(context, request): return 'hello'
+
+        config = self._makeOne(autocommit=True)
+        config.add_route('root', '/', factory=Resource)
+
+        config.add_view(
+            unknown,
+            route_name='root',
+            renderer=nr,
+            request_method=('POST',),
+            xhr=True,
+        )
+
+        config.add_view(
+            view, renderer=nr, route_name='root',
+            context=Int1, request_method='GET'
+        )
+        config.add_view(
+            view=view, renderer=nr, route_name='root',
+            context=Int2, request_method='POST'
+        )
+        request = self._makeRequest(config)
+        request.method = 'POST'
+        request.params = {}
+        router = Router(config.registry)
+        response = router.handle_request(request)
+        self.assertEqual(response, 'hello')
+
     def test_add_view_multiview___discriminator__(self):
         from pyramid.renderers import null_renderer
         from zope.interface import Interface
@@ -1941,7 +2013,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         from pyramid.renderers import null_renderer
         from zope.interface import implementedBy
         from pyramid.interfaces import IRequest
-        from pyramid.httpexceptions import HTTPNotFound
+        from pyramid.httpexceptions import HTTPFound, HTTPNotFound
         config = self._makeOne(autocommit=True)
         config.add_route('foo', '/foo/')
         def view(request): return Response('OK')
@@ -1954,6 +2026,30 @@ class TestViewsConfigurationMixin(unittest.TestCase):
                                      ctx_iface=implementedBy(HTTPNotFound),
                                      request_iface=IRequest)
         result = view(None, request)
+        self.assertTrue(isinstance(result, HTTPFound))
+        self.assertEqual(result.location, '/scriptname/foo/?a=1&b=2')
+
+    def test_add_notfound_view_append_slash_custom_response(self):
+        from pyramid.response import Response
+        from pyramid.renderers import null_renderer
+        from zope.interface import implementedBy
+        from pyramid.interfaces import IRequest
+        from pyramid.httpexceptions import HTTPMovedPermanently, HTTPNotFound
+        config = self._makeOne(autocommit=True)
+        config.add_route('foo', '/foo/')
+        def view(request): return Response('OK')
+        config.add_notfound_view(
+            view, renderer=null_renderer,append_slash=HTTPMovedPermanently
+        )
+        request = self._makeRequest(config)
+        request.environ['PATH_INFO'] = '/foo'
+        request.query_string = 'a=1&b=2'
+        request.path = '/scriptname/foo'
+        view = self._getViewCallable(config,
+                                     ctx_iface=implementedBy(HTTPNotFound),
+                                     request_iface=IRequest)
+        result = view(None, request)
+        self.assertTrue(isinstance(result, HTTPMovedPermanently))
         self.assertEqual(result.location, '/scriptname/foo/?a=1&b=2')
 
     def test_add_notfound_view_with_view_defaults(self):
@@ -4059,7 +4155,11 @@ class DummyRegistry:
         self.settings = {}
 
 from zope.interface import implementer
-from pyramid.interfaces import IResponse
+from pyramid.interfaces import (
+    IResponse,
+    IRequest,
+    )
+
 @implementer(IResponse)
 class DummyResponse(object):
     content_type = None
@@ -4069,6 +4169,7 @@ class DummyResponse(object):
 class DummyRequest:
     subpath = ()
     matchdict = None
+    request_iface  = IRequest
 
     def __init__(self, environ=None):
         if environ is None:

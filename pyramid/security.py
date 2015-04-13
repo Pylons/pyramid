@@ -225,6 +225,8 @@ def view_execution_permitted(context, request, name=''):
     """
     reg = _get_registry(request)
     provides = [IViewClassifier] + map_(providedBy, (request, context))
+    # XXX not sure what to do here about using _find_views or analogue;
+    # for now let's just keep it as-is
     view = reg.adapters.lookup(provides, ISecuredView, name=name)
     if view is None:
         view = reg.adapters.lookup(provides, IView, name=name)

@@ -4,6 +4,10 @@ Next release
 Features
 --------
 
+- Make it possible to subclass ``pyramid.request.Request`` and also use
+  ``pyramid.request.Request.add_request.method``.  See
+  https://github.com/Pylons/pyramid/issues/1529
+
 - The ``pyramid.config.Configurator`` has grown the ability to allow
   actions to call other actions during a commit-cycle. This enables much more
   logic to be placed into actions, such as the ability to invoke other actions
@@ -119,6 +123,11 @@ Features
   explicitly different from ``request.response``. This does not change the
   API of a renderer. See https://github.com/Pylons/pyramid/pull/1563
 
+- The ``append_slash`` argument of ```Configurator().add_notfound_view()`` will
+  now accept anything that implements the ``IResponse`` interface and will use
+  that as the response class instead of the default ``HTTPFound``.  See
+  https://github.com/Pylons/pyramid/pull/1610
+
 Bug Fixes
 ---------
 
@@ -220,6 +229,9 @@ Scaffolds
 
 - Removed non-ascii copyright symbol from templates, as this was
   causing the scaffolds to fail for project generation.
+
+- You can now run the scaffolding func tests via ``tox py2-scaffolds`` and
+  ``tox py3-scaffolds``.
 
 1.5 (2014-04-08)
 ================

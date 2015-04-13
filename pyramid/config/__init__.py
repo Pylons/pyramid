@@ -4,6 +4,7 @@ import logging
 import operator
 import os
 import sys
+import threading
 import venusian
 
 from webob.exc import WSGIHTTPException as WebobWSGIHTTPException
@@ -484,6 +485,15 @@ class Configurator(
                                                  provided=provided, name=name,
                                                  info=info, event=event)
             _registry.registerSelfAdapter = registerSelfAdapter
+
+        if not hasattr(_registry, '_lock'):
+            _registry._lock = threading.Lock()
+
+        if not hasattr(_registry, '_clear_view_lookup_cache'):
+            def _clear_view_lookup_cache():
+                _registry._view_lookup_cache = {}
+            _registry._clear_view_lookup_cache = _clear_view_lookup_cache
+
 
     # API
 

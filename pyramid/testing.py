@@ -328,6 +328,7 @@ class DummyRequest(
     charset = 'UTF-8'
     script_name = ''
     _registry = None
+    request_iface = IRequest
 
     def __init__(self, params=None, environ=None, headers=None, path='/',
                  cookies=None, post=None, **kw):

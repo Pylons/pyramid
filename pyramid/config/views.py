@@ -1359,6 +1359,8 @@ class ViewsConfiguratorMixin(object):
                         multiview,
                         (IExceptionViewClassifier, request_iface, context),
                         IMultiView, name=name)
+
+            self.registry._clear_view_lookup_cache()
             renderer_type = getattr(renderer, 'type', None) # gard against None
             intrspc = self.introspector
             if (
@@ -1718,6 +1720,24 @@ class ViewsConfiguratorMixin(object):
         Pyramid will return the result of the view callable provided as
         ``view``, as normal.
 
+        If the argument provided as ``append_slash`` is not a boolean but
+        instead implements :class:`~pyramid.interfaces.IResponse`, the
+        append_slash logic will behave as if ``append_slash=True`` was passed,
+        but the provided class will be used as the response class instead of
+        the default :class:`~pyramid.httpexceptions.HTTPFound` response class
+        when a redirect is performed.  For example:
+
+          .. code-block:: python
+
+            from pyramid.httpexceptions import HTTPMovedPermanently
+            config.add_notfound_view(append_slash=HTTPMovedPermanently)
+
+        The above means that a redirect to a slash-appended route will be
+        attempted, but instead of :class:`~pyramid.httpexceptions.HTTPFound`
+        being used, :class:`~pyramid.httpexceptions.HTTPMovedPermanently will
+        be used` for the redirect response if a slash-appended route is found.
+
+        .. versionchanged:: 1.6
         .. versionadded:: 1.3
         """
         for arg in ('name', 'permission', 'context', 'for_', 'http_cache'):
@@ -1752,7 +1772,12 @@ class ViewsConfiguratorMixin(object):
         settings.update(predicates)
         if append_slash:
             view = self._derive_view(view, attr=attr, renderer=renderer)
-            view = AppendSlashNotFoundViewFactory(view)
+            if IResponse.implementedBy(append_slash):
+                view = AppendSlashNotFoundViewFactory(
+                    view, redirect_class=append_slash,
+                )
+            else:
+                view = AppendSlashNotFoundViewFactory(view)
             settings['view'] = view
         else:
             settings['attr'] = attr

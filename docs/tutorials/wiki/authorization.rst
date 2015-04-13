@@ -197,9 +197,9 @@ Add the following import statements to the
 head of ``tutorial/tutorial/views.py``:
 
 .. literalinclude:: src/authorization/tutorial/views.py
-   :lines: 6-13,15-17
+   :lines: 6-17
    :linenos:
-   :emphasize-lines: 3,6-9,11
+   :emphasize-lines: 3,6-11
    :language: python
 
 (Only the highlighted lines, with other necessary modifications,

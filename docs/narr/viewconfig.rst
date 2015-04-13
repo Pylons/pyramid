@@ -325,7 +325,7 @@ configured view.
 
 ``match_param``
   This param may be either a single string of the format "key=value" or a
-  dict of key/value pairs.
+  tuple containing one or more of these strings.
 
   This argument ensures that the view will only be called when the
   :term:`request` has key/value pairs in its :term:`matchdict` that equal
@@ -334,8 +334,8 @@ configured view.
   hand side of the expression (``edit``) for the view to "match" the current
   request.
 
-  If the ``match_param`` is a dict, every key/value pair must match for the
-  predicate to pass.
+  If the ``match_param`` is a tuple, every key/value pair must match
+  for the predicate to pass.
 
   If ``match_param`` is not supplied, the view will be invoked without
   consideration of the keys and values in ``request.matchdict``.

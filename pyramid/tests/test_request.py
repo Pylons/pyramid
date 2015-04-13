@@ -478,6 +478,66 @@ class Test_apply_request_extensions(unittest.TestCase):
 class Dummy(object):
     pass
 
+class Test_subclassing_Request(unittest.TestCase):
+    def test_subclass(self):
+        from pyramid.interfaces import IRequest
+        from pyramid.request import Request
+
+        class RequestSub(Request):
+            pass
+
+        self.assertTrue(hasattr(Request, '__provides__'))
+        self.assertTrue(hasattr(Request, '__implemented__'))
+        self.assertTrue(hasattr(Request, '__providedBy__'))
+        self.assertFalse(hasattr(RequestSub, '__provides__'))
+        self.assertTrue(hasattr(RequestSub, '__providedBy__'))
+        self.assertTrue(hasattr(RequestSub, '__implemented__'))
+
+        self.assertTrue(IRequest.implementedBy(RequestSub))
+        # The call to implementedBy will add __provides__ to the class
+        self.assertTrue(hasattr(RequestSub, '__provides__'))
+
+
+    def test_subclass_with_implementer(self):
+        from pyramid.interfaces import IRequest
+        from pyramid.request import Request
+        from pyramid.util import InstancePropertyHelper
+        from zope.interface import implementer
+
+        @implementer(IRequest)
+        class RequestSub(Request):
+            pass
+
+        self.assertTrue(hasattr(Request, '__provides__'))
+        self.assertTrue(hasattr(Request, '__implemented__'))
+        self.assertTrue(hasattr(Request, '__providedBy__'))
+        self.assertTrue(hasattr(RequestSub, '__provides__'))
+        self.assertTrue(hasattr(RequestSub, '__providedBy__'))
+        self.assertTrue(hasattr(RequestSub, '__implemented__'))
+
+        req = RequestSub({})
+        helper = InstancePropertyHelper()
+        helper.apply_properties(req, {'b': 'b'})
+
+        self.assertTrue(IRequest.providedBy(req))
+        self.assertTrue(IRequest.implementedBy(RequestSub))
+
+    def test_subclass_mutate_before_providedBy(self):
+        from pyramid.interfaces import IRequest
+        from pyramid.request import Request
+        from pyramid.util import InstancePropertyHelper
+
+        class RequestSub(Request):
+            pass
+
+        req = RequestSub({})
+        helper = InstancePropertyHelper()
+        helper.apply_properties(req, {'b': 'b'})
+
+        self.assertTrue(IRequest.providedBy(req))
+        self.assertTrue(IRequest.implementedBy(RequestSub))
+
+
 class DummyRequest(object):
     def __init__(self, environ=None):
         if environ is None:
