@@ -191,6 +191,13 @@ Running Tests
    $ $VENV/bin/easy_install pytest
    $ py.test --strict pyramid/
 
+- Functional tests related to the "scaffolds" (starter, zodb, alchemy) which
+  create a virtualenv, install the scaffold package and its dependencies, start
+  a server, and hit a URL on the server can be run like so:
+
+   $ tox py2-scaffolds
+   $ tox py3-scaffolds
+
 Test Coverage
 -------------
 

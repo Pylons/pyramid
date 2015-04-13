@@ -482,7 +482,6 @@ class Test_subclassing_Request(unittest.TestCase):
     def test_subclass(self):
         from pyramid.interfaces import IRequest
         from pyramid.request import Request
-        from zope.interface import providedBy, implementedBy
 
         class RequestSub(Request):
             pass

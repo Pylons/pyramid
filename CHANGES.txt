@@ -230,6 +230,9 @@ Scaffolds
 - Removed non-ascii copyright symbol from templates, as this was
   causing the scaffolds to fail for project generation.
 
+- You can now run the scaffolding func tests via ``tox py2-scaffolds`` and
+  ``tox py3-scaffolds``.
+
 1.5 (2014-04-08)
 ================
 
