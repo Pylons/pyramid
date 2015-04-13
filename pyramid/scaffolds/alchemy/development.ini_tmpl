@@ -3,6 +3,14 @@
 # http://docs.pylonsproject.org/projects/pyramid/en/{{pyramid_docs_branch}}/narr/environment.html
 ###
 
+###
+# SQLAlchemy url is used by both the app:main section and the alembic section and thus is placed into
+# the DEFAULT section
+###
+
+[DEFAULT]
+sqlalchemy.url = sqlite:///%(here)s/{{project}}.sqlite
+
 [app:main]
 use = egg:{{project}}
 
@@ -15,11 +23,16 @@ pyramid.includes =
     pyramid_debugtoolbar
     pyramid_tm
 
-sqlalchemy.url = sqlite:///%(here)s/{{project}}.sqlite
-
 # By default, the toolbar only appears for clients from IP addresses
 # '127.0.0.1' and '::1'.
 # debugtoolbar.hosts = 127.0.0.1 ::1
+
+###
+# alembic configuration
+###
+
+[alembic]
+script_location = %(here)s/{{package}}/alembic
 
 ###
 # wsgi server configuration
