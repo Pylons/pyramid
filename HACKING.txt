@@ -178,7 +178,7 @@ Running Tests
   invoke the ``tox`` console script.  This will read the ``tox.ini`` file and
   execute the tests on multiple Python versions and platforms; while it runs,
   it creates a virtualenv for each version/platform combination.  For
-  example:
+  example::
 
    $ sudo /usr/bin/easy_install tox
    $ cd ~/hack-on-pyramid/
@@ -186,25 +186,27 @@ Running Tests
 
 - The tests can also be run using ``pytest`` (http://pytest.org/).  This is
   intended as a convenience for people who are more used or fond of ``pytest``.
-  Run the tests like so:
+  Run the tests like so::
 
    $ $VENV/bin/easy_install pytest
    $ py.test --strict pyramid/
 
 - Functional tests related to the "scaffolds" (starter, zodb, alchemy) which
   create a virtualenv, install the scaffold package and its dependencies, start
-  a server, and hit a URL on the server can be run like so:
+  a server, and hit a URL on the server can be run like so::
 
-   $ tox py2-scaffolds
-   $ tox py3-scaffolds
+   $ ./scaffoldtests.sh
+
+  Alternately::
+
+   $ tox -e{py26,py27,py32,py33,py34,pypy,pypy3}-scaffolds,
 
 Test Coverage
 -------------
 
-- The codebase *must* have 100% test statement coverage after each commit.
-  You can test coverage via ``tox -e cover``, or alternately by installing
-  ``nose`` and ``coverage`` into your virtualenv (easiest via ``setup.py
-  dev``) , and running ``setup.py nosetests --with-coverage``.
+- The codebase *must* have 100% test statement coverage after each commit.  You
+  can test coverage via ``./coverage.sh`` (which itself just executes ``tox
+  -epy2-cover,py3-cover,coverage``).
 
 Documentation Coverage and Building HTML Documentation
 ------------------------------------------------------
@@ -212,45 +214,31 @@ Documentation Coverage and Building HTML Documentation
 If you fix a bug, and the bug requires an API or behavior modification, all
 documentation in this package which references that API or behavior must be
 changed to reflect the bug fix, ideally in the same commit that fixes the bug
-or adds the feature.
+or adds the feature.  To build and review docs, use the following steps.
 
-To build and review docs (where ``$VENV`` refers to the virtualenv you're
-using to develop Pyramid):
-
-1. After following the steps above in "Using a Development Checkout", install
-   Sphinx and all development requirements in your virtualenv:
-
-     $ cd ~/hack-on-pyramid
-     $ $VENV/bin/python setup.py docs
-
-2. Update all git submodules from the top-level of your Pyramid checkout, like
-   so:
+1. After following the steps above in "Using a Development Checkout", update
+   all git submodules from the top-level of your Pyramid checkout, like so:
 
      $ git submodule update --init --recursive
 
    This will checkout theme subrepositories and prevent error conditions when
    HTML docs are generated.
 
-3. Next change into the submodule's directory and switch to a branch so that
+2. Next change into the submodule's directory and switch to a branch so that
    the submodule repositories are no longer "headless".  Then update the
    repository to ensure that we have the latest updates.
-   See http://chrisjean.com/2009/04/20/git-submodules-adding-using-removing-and-updating/
+   See http://chrisjean.com/2009/04/20/git-submodules-adding-using-removing-and-updating/ ::
 
     $ cd docs/_themes
     $ git checkout master
     $ git pull
 
-4. Change into the ``docs`` directory within your Pyramid checkout and execute
-   the ``make`` command with some flags:
+3. Change back to the main Pyramid checkout dir and run ``./builddocs`` (which
+   just turns around and runs ``tox -e py2-docs,py3-docs``)::
 
-     $ cd ~/hack-on-pyramid/pyramid/docs
-     $ make clean html SPHINXBUILD=$VENV/bin/sphinx-build
+    $ ./builddocs
 
-   The ``SPHINXBUILD=...`` argument tells Sphinx to use the virtualenv Python,
-   which will have both Sphinx and Pyramid (for API documentation generation)
-   installed.
-
-5. Open the ``docs/_build/html/index.html`` file to see the resulting HTML
+5. Open the ``.tox/_build/html/index.html`` file to see the resulting HTML
    rendering.
 
 Change Log
