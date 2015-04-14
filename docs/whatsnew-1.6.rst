@@ -150,3 +150,21 @@ Scaffolding Enhancements
 - Added line numbers to the log formatters in the scaffolds to assist with
   debugging. See https://github.com/Pylons/pyramid/pull/1326
 
+- Update scaffold generating machinery to return the version of pyramid and
+  pyramid docs for use in scaffolds. Updated ``starter``, ``alchemy`` and
+  ``zodb`` templates to have links to correctly versioned documentation and
+  reflect which pyramid was used to generate the scaffold.
+
+- Removed non-ascii copyright symbol from templates, as this was
+  causing the scaffolds to fail for project generation.
+
+Documentation Enhancements
+--------------------------
+
+- Removed logging configuration from Quick Tutorial ini files except for
+  scaffolding- and logging-related chapters to avoid needing to explain it too
+  early.
+
+- Improve and clarify the documentation on what Pyramid defines as a
+  ``principal`` and a ``userid`` in its security APIs.
+  See https://github.com/Pylons/pyramid/pull/1399
