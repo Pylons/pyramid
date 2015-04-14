@@ -37,6 +37,10 @@ from pyramid.path import (
     package_path,
     )
 
+from pyramid.httpexceptions import HTTPBadRequest
+
+from pyramid.path import caller_package
+
 from pyramid.response import Response
 from pyramid.threadlocal import get_current_registry
 
@@ -276,6 +280,8 @@ class JSON(object):
 
 json_renderer_factory = JSON() # bw compat
 
+JSONP_VALID_CALLBACK = re.compile(r"^[a-zA-Z_$][0-9a-zA-Z_$]+$")
+
 class JSONP(JSON):
     """ `JSONP <http://en.wikipedia.org/wiki/JSONP>`_ renderer factory helper
     which implements a hybrid json/jsonp renderer.  JSONP is useful for
@@ -347,19 +353,23 @@ class JSONP(JSON):
         ``self.param_name`` is present in request.GET; otherwise returns
         plain-JSON encoded string with content-type ``application/json``"""
         def _render(value, system):
-            request = system['request']
+            request = system.get('request', None)
             default = self._make_default(request)
             val = self.serializer(value, default=default, **self.kw)
-            callback = request.GET.get(self.param_name)
-            if callback is None:
-                ct = 'application/json'
-                body = val
-            else:
-                ct = 'application/javascript'
-                body = '%s(%s)' % (callback, val)
-            response = request.response
-            if response.content_type == response.default_content_type:
-                response.content_type = ct
+            ct = 'application/json'
+            body = val
+            if request is not None:
+                callback = request.GET.get(self.param_name)
+
+                if callback is not None:
+                    if not JSONP_VALID_CALLBACK.match(callback):
+                        raise HTTPBadRequest('Invalid JSONP callback function name.')
+
+                    ct = 'application/javascript'
+                    body = '%s(%s)' % (callback, val)
+                response = request.response
+                if response.content_type == response.default_content_type:
+                    response.content_type = ct
             return body
         return _render
 
