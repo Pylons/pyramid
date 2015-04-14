@@ -1,3 +1,10 @@
+1.4.7 (2015-04-14)
+==================
+
+- The JSONP renderer created JavaScript code in such a way that a callback
+  variable could be used to arbitrarily inject javascript into the response
+  object.  https://github.com/Pylons/pyramid/pull/1626
+
 1.4.6 (2014-05-31)
 ==================
 
