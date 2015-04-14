@@ -238,7 +238,7 @@ or adds the feature.  To build and review docs, use the following steps.
 
     $ ./builddocs
 
-5. Open the ``.tox/_build/html/index.html`` file to see the resulting HTML
+4. Open the ``.tox/_build/html/index.html`` file to see the resulting HTML
    rendering.
 
 Change Log
