@@ -1,6 +1,7 @@
 import contextlib
 import json
 import os
+import re
 
 from zope.interface import (
     implementer,
@@ -22,6 +23,8 @@ from pyramid.compat import (
 from pyramid.decorator import reify
 
 from pyramid.events import BeforeRender
+
+from pyramid.httpexceptions import HTTPBadRequest
 
 from pyramid.path import caller_package
 
@@ -308,6 +311,8 @@ class JSON(object):
 
 json_renderer_factory = JSON() # bw compat
 
+JSONP_VALID_CALLBACK = re.compile(r"^[a-zA-Z_$][0-9a-zA-Z_$]+$")
+
 class JSONP(JSON):
     """ `JSONP <http://en.wikipedia.org/wiki/JSONP>`_ renderer factory helper
     which implements a hybrid json/jsonp renderer.  JSONP is useful for
@@ -388,7 +393,11 @@ class JSONP(JSON):
             body = val
             if request is not None:
                 callback = request.GET.get(self.param_name)
+
                 if callback is not None:
+                    if not JSONP_VALID_CALLBACK.match(callback):
+                        raise HTTPBadRequest('Invalid JSONP callback function name.')
+
                     ct = 'application/javascript'
                     body = '%s(%s);' % (callback, val)
                 response = request.response
