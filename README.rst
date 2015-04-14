@@ -1,7 +1,7 @@
 Pyramid
 =======
 
-.. image:: https://travis-ci.org/Pylons/pyramid.png?branch=master
+.. image:: https://travis-ci.org/Pylons/pyramid.png?branch=1.6-branch
         :target: https://travis-ci.org/Pylons/pyramid
 
 .. image:: https://readthedocs.org/projects/pyramid/badge/?version=master
