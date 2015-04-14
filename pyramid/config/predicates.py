@@ -70,8 +70,11 @@ class RequestParamPredicate(object):
         for p in val:
             k = p
             v = None
-            if '=' in p and not p.startswith('='):
-                k, v = p.split('=', 1)
+            if '=' in p:
+                if p.startswith('='):
+                    k, v = p.rsplit('=', 1)
+                else:
+                    k, v = p.split('=', 1)
                 k, v = k.strip(), v.strip()
             reqs.append((k, v))
         self.val = val

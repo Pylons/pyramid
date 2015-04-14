@@ -157,8 +157,8 @@ class TestRequestParamPredicate(unittest.TestCase):
         self.assertEqual(inst.text(), 'request_param abc=1,def')
 
     def test_text_multi_equal_sign(self):
-        inst = self._makeOne(('abc=  1', '=def'))
-        self.assertEqual(inst.text(), 'request_param =def,abc=1')
+        inst = self._makeOne(('abc=  1', '=def= 2'))
+        self.assertEqual(inst.text(), 'request_param =def=2,abc=1')
 
     def test_phash_exists(self):
         inst = self._makeOne('abc')
