@@ -1,6 +1,7 @@
 import unittest
 
 from pyramid import testing
+from pyramid.exceptions import ConfigurationError
 
 class TestDeriveView(unittest.TestCase):
 
@@ -833,7 +834,7 @@ class TestDeriveView(unittest.TestCase):
                 pass
             def index(self):
                 return {'a':'1'}
-        result = self.config.derive_view(view, 
+        result = self.config.derive_view(View, 
             renderer=renderer(), attr='index')
         self.assertFalse(result is View)
         self.assertEqual(result.__module__, View.__module__)
@@ -859,7 +860,7 @@ class TestDeriveView(unittest.TestCase):
                 pass
             def index(self):
                 return {'a':'1'}
-        result = self.config.derive_view(view, 
+        result = self.config.derive_view(View, 
             renderer=renderer(), attr='index')
         self.assertFalse(result is View)
         self.assertEqual(result.__module__, View.__module__)
