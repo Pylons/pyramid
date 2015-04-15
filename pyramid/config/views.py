@@ -1078,6 +1078,7 @@ class ViewsConfiguratorMixin(object):
             ('secured_view', d.secured_view),
             ('authdebug_view', d.authdebug_view),
             ('predicated_view', d.predicated_view),
+            ('attr_wrapped_view', d.attr_wrapped_view),
         ]
         after = pyramid.util.FIRST
         for name, deriver in derivers:

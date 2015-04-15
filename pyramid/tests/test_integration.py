@@ -474,7 +474,6 @@ class TestConflictApp(unittest.TestCase):
     def _makeConfig(self):
         from pyramid.config import Configurator
         config = Configurator()
-        config.add_default_view_derivations()
         return config
 
     def test_autoresolved_view(self):
