@@ -211,7 +211,7 @@ routes:
    ``view_page`` route definition:
 
    .. literalinclude:: src/authorization/tutorial/__init__.py
-      :lines: 32
+      :lines: 33
       :linenos:
       :language: python
 
