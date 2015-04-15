@@ -63,7 +63,6 @@ from pyramid.util import (
     WeakOrderedSet,
     action_method,
     object_description,
-    TopologicalSorter,
     )
 
 from pyramid.config.adapters import AdaptersConfiguratorMixin
@@ -312,7 +311,6 @@ class Configurator(
         self.autocommit = autocommit
         self.route_prefix = route_prefix
         self.introspection = introspection
-        self.derivationlist = TopologicalSorter()
         if registry is None:
             registry = Registry(self.package_name)
             self.registry = registry

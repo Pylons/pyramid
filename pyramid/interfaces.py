@@ -1184,6 +1184,9 @@ class IJSONAdapter(Interface):
 class IPredicateList(Interface):
     """ Interface representing a predicate list """
 
+class IViewDerivers(Interface):
+    """ Interface for view derivers list """
+    
 class ICacheBuster(Interface):
     """
     Instances of ``ICacheBuster`` may be provided as arguments to

@@ -28,6 +28,7 @@ from pyramid.interfaces import (
     IStaticURLInfo,
     IView,
     IViewClassifier,
+    IViewDerivers,
     IViewMapper,
     IViewMapperFactory,
     PHASE1_CONFIG,
@@ -80,6 +81,7 @@ from pyramid.util import (
     object_description,
     viewdefaults,
     action_method,
+    TopologicalSorter,
     )
 
 import pyramid.config.predicates
@@ -988,7 +990,8 @@ class ViewsConfiguratorMixin(object):
         inner_derivers = [('mapped_view', (d.mapped_view, None)),
                           ('rendered_view', (d.rendered_view, None))]
 
-        for name, val in inner_derivers + self.derivationlist.sorted():
+        derivers = self.registry.queryUtility(IViewDerivers, default=[])
+        for name, val in inner_derivers + derivers.sorted():
             derivation, default = val
             view = derivation(view, default, **kw)
         return view
@@ -1056,7 +1059,11 @@ class ViewsConfiguratorMixin(object):
         intr['weighs_more_than'] = weighs_more_than
         intr['weighs_less_than'] = weighs_less_than
         def register():
-            self.derivationlist.add(name, (factory, default), 
+            derivers = self.registry.queryUtility(IViewDerivers)
+            if derivers is None:
+                derivers = TopologicalSorter()
+                self.registry.registerUtility(derivers, IViewDerivers)
+            derivers.add(name, (factory, default),
                          after=weighs_more_than,
                          before=weighs_less_than)
         self.action(discriminator, register, introspectables=(intr,),
