@@ -966,12 +966,12 @@ class TestDeriveView(unittest.TestCase):
     def test_attr_wrapped_view_branching_default_phash(self):
         from pyramid.config.util import DEFAULT_PHASH
         def view(context, request): pass
-        result = self.config.derive_view(view, phash=DEFAULT_PHASH)
+        result = self.config._derive_view(view, phash=DEFAULT_PHASH)
         self.assertEqual(result.__wraps__, view)
 
     def test_attr_wrapped_view_branching_nondefault_phash(self):
         def view(context, request): pass
-        result = self.config.derive_view(view, phash='nondefault')
+        result = self.config._derive_view(view, phash='nondefault')
         self.assertNotEqual(result, view)
 
     def test_http_cached_view_integer(self):
@@ -980,7 +980,7 @@ class TestDeriveView(unittest.TestCase):
         response = Response('OK')
         def inner_view(context, request):
             return response
-        result = self.config.derive_view(inner_view, http_cache=3600)
+        result = self.config._derive_view(inner_view, http_cache=3600)
         self.assertFalse(result is inner_view)
         self.assertEqual(inner_view.__module__, result.__module__)
         self.assertEqual(inner_view.__doc__, result.__doc__)
@@ -999,7 +999,7 @@ class TestDeriveView(unittest.TestCase):
         response = Response('OK')
         def inner_view(context, request):
             return response
-        result = self.config.derive_view(inner_view, 
+        result = self.config._derive_view(inner_view, 
             http_cache=datetime.timedelta(hours=1))
         self.assertFalse(result is inner_view)
         self.assertEqual(inner_view.__module__, result.__module__)
@@ -1019,7 +1019,7 @@ class TestDeriveView(unittest.TestCase):
         response = Response('OK')
         def inner_view(context, request):
             return response
-        result = self.config.derive_view(inner_view,
+        result = self.config._derive_view(inner_view,
             http_cache=(3600, {'public':True}))
         self.assertFalse(result is inner_view)
         self.assertEqual(inner_view.__module__, result.__module__)
@@ -1125,4 +1125,17 @@ class DummySecurityPolicy:
 
     def permits(self, context, principals, permission):
         return self.permitted
+
+def parse_httpdate(s):
+    import datetime
+    # cannot use %Z, must use literal GMT; Jython honors timezone
+    # but CPython does not
+    return datetime.datetime.strptime(s, "%a, %d %b %Y %H:%M:%S GMT")
+
+def assert_similar_datetime(one, two):
+    for attr in ('year', 'month', 'day', 'hour', 'minute'):
+        one_attr = getattr(one, attr)
+        two_attr = getattr(two, attr)
+        if not one_attr == two_attr: # pragma: no cover
+            raise AssertionError('%r != %r in %s' % (one_attr, two_attr, attr))
 
