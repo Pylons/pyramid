@@ -32,8 +32,9 @@ from pyramid.exceptions import (
     ConfigurationError,
     PredicateMismatch,
     )
-
+from pyramid.httpexceptions import HTTPForbidden
 from pyramid.util import object_description
+from pyramid.view import render_view_to_response
 from pyramid import renderers
 
 
