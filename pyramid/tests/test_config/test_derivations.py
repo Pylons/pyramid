@@ -136,8 +136,6 @@ class TestDeriveView(unittest.TestCase):
                 pass
             def theviewmethod(self):
                 return None
-            def __call__(self):
-                return None
         result = self.config.derive_view(AView)
         self.assertFalse(result is AView)
         try:
