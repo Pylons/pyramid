@@ -51,6 +51,12 @@ Releasing Pyramid
   $ python setup.py sdist bdist_wheel
   $ twine upload dist/pyramid-X.X-*
 
+- Edit Pylons/pylonshq/templates/home/home.mako for minor and major updates.
+
+- Edit Pylons/pylonshq/templates/home/inside.rst for major updates only.
+
+- Edit Pylons/pylonsrtd/pylonsrtd/docs/pyramid.rst for all updates.
+
 - Edit `http://wiki.python.org/moin/WebFrameworks
   <http://wiki.python.org/moin/WebFrameworks>`_.
 
