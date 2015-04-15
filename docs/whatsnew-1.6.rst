@@ -2,7 +2,7 @@ What's New In Pyramid 1.6
 =========================
 
 This article explains the new features in :app:`Pyramid` version 1.6 as
-compared to its predecessor, :app:`Pyramid` 1.6.  It also documents backwards
+compared to its predecessor, :app:`Pyramid` 1.5.  It also documents backwards
 incompatibilities between the two versions and deprecations added to
 :app:`Pyramid` 1.6, as well as software dependency changes and notable
 documentation additions.

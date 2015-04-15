@@ -29,6 +29,9 @@ Releasing Pyramid
 - update README.rst to use correct versions of badges and URLs according to
   each branch and context, i.e., RTD "latest" == GitHub/Travis "1.x-branch".
 
+- Update whatsnew-X.X.rst in docs to point at change log entries for individual
+  releases if applicable.
+
 - Change setup.py version to the new version number.
 
 - Change CHANGES.txt heading to reflect the new version number.
