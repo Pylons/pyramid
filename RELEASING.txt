@@ -40,10 +40,11 @@ Releasing Pyramid
 
 - Create a release tag.
 
-- Make sure your system Python has ``setuptools-git`` installed and release to
-  PyPI::
+- Make sure your Python has ``setuptools-git``, ``twine`` and ``wheel``
+  installed and release to PyPI::
 
-  $ python setup.py sdist register upload
+  $ python setup.py sdist bdist_wheel
+  $ twine upload dist/pyramid-X.X-*
 
 - Edit `http://wiki.python.org/moin/WebFrameworks
   <http://wiki.python.org/moin/WebFrameworks>`_.
