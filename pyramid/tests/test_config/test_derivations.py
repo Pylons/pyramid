@@ -77,7 +77,7 @@ class TestDeriveView(unittest.TestCase):
             msg = e.args[0]
             self.assertTrue(msg.startswith(
                 'Could not convert return value of the view callable object '
-                '<pyramid.tests.test_config.test_views.'))
+                '<pyramid.tests.test_config.test_derivations.'))
             self.assertTrue(msg.endswith(
                 '> into a response object. The value returned was None. You '
                 'may have forgotten to return a value from the view callable.'))
@@ -135,6 +135,8 @@ class TestDeriveView(unittest.TestCase):
                 pass
             def theviewmethod(self):
                 return None
+            def __call__(self):
+                return None
         result = self.config.derive_view(AView)
         self.assertFalse(result is AView)
         try:
@@ -144,7 +146,7 @@ class TestDeriveView(unittest.TestCase):
                 e.args[0],
                 'Could not convert return value of the view callable '
                 'method theviewmethod of '
-                'class pyramid.tests.test_config.test_views.AView into a '
+                'class pyramid.tests.test_config.test_derivations.AView into a '
                 'response object. The value returned was None. You may have '
                 'forgotten to return a value from the view callable.'
                 )
@@ -351,7 +353,7 @@ class TestDeriveView(unittest.TestCase):
         self.assertFalse(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
-        self.assertTrue('test_views' in result.__name__)
+        self.assertTrue('test_derivations' in result.__name__)
         self.assertFalse(hasattr(result, '__call_permissive__'))
         self.assertEqual(result(None, None), response)
 
@@ -760,7 +762,7 @@ class TestDeriveView(unittest.TestCase):
         inner_response = Response('OK')
         def inner_view(context, request):
             return inner_response
-        result = self.config._derive_view(inner_view, viewname='inner',
+        wrapped = self.config._derive_view(inner_view, viewname='inner',
                                 wrapper_viewname='owrap')
         request = self._makeRequest()
         self.assertRaises(ValueError, wrapped, None, request)
