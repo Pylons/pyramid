@@ -1,3 +1,10 @@
+.. _changes_1.5.6:
+
+1.5.6 (2015-04-14)
+==================
+
+- 1.5.5 was a brown-bag release which was missing files.
+
 .. _changes_1.5.5:
 
 1.5.5 (2015-04-14)
