@@ -24,7 +24,9 @@ Releasing Pyramid
   communicate with contributors).
 
 - Copy relevant changes (delta bug fixes) from CHANGES.txt to
-  docs/whatsnew-X.X (if it's a major release).
+  docs/whatsnew-X.X (if it's a major release).  Minor releases should
+  include a link under "Bug Fix Releases" to the minor feature
+  changes in CHANGES.txt .
 
 - update README.rst to use correct versions of badges and URLs according to
   each branch and context, i.e., RTD "latest" == GitHub/Travis "1.x-branch".
@@ -48,6 +50,12 @@ Releasing Pyramid
 
   $ python setup.py sdist bdist_wheel
   $ twine upload dist/pyramid-X.X-*
+
+- Edit Pylons/pylonshq/templates/home/home.mako for minor and major updates.
+
+- Edit Pylons/pylonshq/templates/home/inside.rst for major updates only.
+
+- Edit Pylons/pylonsrtd/pylonsrtd/docs/pyramid.rst for all updates.
 
 - Edit `http://wiki.python.org/moin/WebFrameworks
   <http://wiki.python.org/moin/WebFrameworks>`_.
