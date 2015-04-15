@@ -24,7 +24,9 @@ Releasing Pyramid
   communicate with contributors).
 
 - Copy relevant changes (delta bug fixes) from CHANGES.txt to
-  docs/whatsnew-X.X (if it's a major release).
+  docs/whatsnew-X.X (if it's a major release).  Minor releases should
+  include a link under "Bug Fix Releases" to the minor feature
+  changes in CHANGES.txt .
 
 - Make sure docs render OK::
 
