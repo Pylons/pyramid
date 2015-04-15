@@ -142,25 +142,22 @@ def render_to_response(renderer_name,
 
     return result
 
+_marker = object()
+
 @contextlib.contextmanager
 def temporary_response(request):
     """
     Temporarily delete request.response and restore it afterward.
     """
-    saved_response = None
-    # save the current response, preventing the renderer from affecting it
     attrs = request.__dict__ if request is not None else {}
-    if 'response' in attrs:
-        saved_response = attrs['response']
-        del attrs['response']
-
-    yield
-
-    # restore the original response, overwriting any changes
-    if saved_response is not None:
-        attrs['response'] = saved_response
-    elif 'response' in attrs:
-        del attrs['response']
+    saved_response = attrs.pop('response', _marker)
+    try:
+        yield
+    finally:
+        if saved_response is not _marker:
+            attrs['response'] = saved_response
+        elif 'response' in attrs:
+            del attrs['response']
 
 def get_renderer(renderer_name, package=None):
     """ Return the renderer object for the renderer ``renderer_name``.
