@@ -63,6 +63,7 @@ from pyramid.util import (
     WeakOrderedSet,
     action_method,
     object_description,
+    TopologicalSorter,
     )
 
 from pyramid.config.adapters import AdaptersConfiguratorMixin
@@ -311,6 +312,7 @@ class Configurator(
         self.autocommit = autocommit
         self.route_prefix = route_prefix
         self.introspection = introspection
+        self.derivationlist = TopologicalSorter()
         if registry is None:
             registry = Registry(self.package_name)
             self.registry = registry
@@ -378,6 +380,7 @@ class Configurator(
         self.add_default_response_adapters()
         self.add_default_renderers()
         self.add_default_view_predicates()
+        self.add_default_view_derivations()
         self.add_default_route_predicates()
 
         if exceptionresponse_view is not None:
@@ -521,10 +524,11 @@ class Configurator(
             self.registry.registerUtility(predlist, IPredicateList, name=name)
         return predlist
 
+
     def _add_predicate(self, type, name, factory, weighs_more_than=None,
                        weighs_less_than=None):
         factory = self.maybe_dotted(factory)
-        discriminator = ('%s predicate' % type, name)
+        discriminator = ('%s option' % type, name)
         intr = self.introspectable(
             '%s predicates' % type,
             discriminator,
