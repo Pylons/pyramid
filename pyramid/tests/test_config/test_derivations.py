@@ -136,7 +136,7 @@ class TestDeriveView(unittest.TestCase):
                 pass
             def theviewmethod(self):
                 return None
-        result = self.config.derive_view(AView)
+        result = self.config.derive_view(AView, attr='theviewmethod')
         self.assertFalse(result is AView)
         try:
             result(None, request)
@@ -173,7 +173,7 @@ class TestDeriveView(unittest.TestCase):
                 return self
         def view(request):
             return 'OK'
-        result = self.config.derive_view(view)
+        result = self.config.derive_view(view, renderer=moo())
         self.assertFalse(result.__wraps__ is view)
         request = self._makeRequest()
         context = testing.DummyResource()
@@ -1081,7 +1081,7 @@ class TestDeriveView(unittest.TestCase):
 
     def test_http_cached_view_bad_tuple(self):
         def view(request): pass
-        self.assertRaises(ConfigurationError, self.config.derive_view, 
+        self.assertRaises(ConfigurationError, self.config._derive_view, 
             view, http_cache=(None,))
 
 from zope.interface import implementer
