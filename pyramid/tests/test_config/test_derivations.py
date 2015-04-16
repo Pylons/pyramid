@@ -1084,6 +1084,119 @@ class TestDeriveView(unittest.TestCase):
         self.assertRaises(ConfigurationError, self.config._derive_view, 
             view, http_cache=(None,))
 
+
+class TestAddDerivation(unittest.TestCase):
+
+    def setUp(self):
+        self.config = testing.setUp()
+
+    def tearDown(self):
+        self.config = None
+
+    def test_add_single_derivation(self):
+        response = DummyResponse()
+        response.deriv = False
+        view = lambda *arg: response
+
+        def deriv(view, default, **kw):
+            self.assertFalse(response.deriv)
+            self.assertEqual(default, None)
+            response.deriv = True
+            return view
+
+        result = self.config._derive_view(view)
+        self.assertFalse(response.deriv)
+        self.config.add_view_derivation('test_deriv', deriv, default=None)
+
+        result = self.config._derive_view(view)
+        self.assertTrue(response.deriv)
+
+    def test_derivation_default(self):
+        response = DummyResponse()
+        response.deriv_default = None
+        test_default = object()
+        view = lambda *arg: response
+
+        def deriv(view, default, **kw):
+            response.deriv_default = default
+            return view
+
+        self.config.add_view_derivation('test_default_deriv', deriv, default=test_default)
+        result = self.config._derive_view(view)
+        self.assertEqual(response.deriv_default, test_default)
+
+    def test_override_derivation(self):
+        flags = {}
+
+        class AView:
+            def __init__(self):
+                self.response = DummyResponse()
+            def __call__(self):
+                return self.response
+
+        def deriv1(view, default, **kw):
+            flags['deriv1'] = True
+            return view
+
+        def deriv2(view, default, **kw):
+            flags['deriv2'] = True
+            return view
+
+        view1 = AView()
+        self.config.add_view_derivation('test_deriv', deriv1, default=None)
+        result = self.config._derive_view(view1)
+        self.assertTrue(flags.get('deriv1'))
+        self.assertFalse(flags.get('deriv2'))
+
+        flags.clear()
+        view2 = AView()
+        self.config.add_view_derivation('test_deriv', deriv2, default=None)
+        result = self.config._derive_view(view2)
+        self.assertFalse(flags.get('deriv1'))
+        self.assertTrue(flags.get('deriv2'))
+
+    def test_override_derivation_default(self):
+        response = DummyResponse()
+        response.deriv_default = None
+        test_default1 = 'first default'
+        test_default2 = 'second default'
+        view = lambda *arg: response
+
+        def deriv(view, default, **kw):
+            response.deriv_default = default
+            return view
+
+        self.config.add_view_derivation('test_default_deriv', deriv, default=test_default1)
+        result = self.config._derive_view(view)
+        self.assertEqual(response.deriv_default, test_default1)
+        self.config.add_view_derivation('test_default_deriv', deriv, default=test_default2)
+        result = self.config._derive_view(view)
+        self.assertEqual(response.deriv_default, test_default2)
+
+    def test_add_multi_derivations_ordered(self):
+        response = DummyResponse()
+        view = lambda *arg: response
+        response.deriv = []
+
+        def deriv1(view, default, **kw):
+            response.deriv.append('deriv1')
+            return view
+
+        def deriv2(view, default, **kw):
+            response.deriv.append('deriv2')
+            return view
+
+        def deriv3(view, default, **kw):
+            response.deriv.append('deriv3')
+            return view
+
+        self.config.add_view_derivation('deriv1', deriv1, default=None)
+        self.config.add_view_derivation('deriv2', deriv2, default=None, weighs_less_than='deriv1')
+        self.config.add_view_derivation('deriv3', deriv3, default=None, weighs_more_than='deriv2')
+        result = self.config._derive_view(view)
+        self.assertEqual(response.deriv, ['deriv2', 'deriv3', 'deriv1'])
+
+
 from zope.interface import implementer
 from pyramid.interfaces import (
     IResponse,
