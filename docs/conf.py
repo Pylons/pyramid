@@ -20,6 +20,7 @@ import warnings
 warnings.simplefilter('ignore', DeprecationWarning)
 
 import pkg_resources
+import pylons_sphinx_themes
 
 # skip raw nodes
 from sphinx.writers.text import TextTranslator
@@ -137,26 +138,8 @@ if book:
 # -----------------------
 
 # Add and use Pylons theme
-if 'sphinx-build' in ' '.join(sys.argv):  # protect against dumb importers
-    from subprocess import call, Popen, PIPE
-    cwd = os.getcwd()
-    p = Popen('which git', shell=True, stdout=PIPE)
-    here = os.path.abspath(os.path.dirname(__file__))
-    parent = os.path.abspath(os.path.dirname(here))
-    _themes = os.path.join(here, '_themes')
-    git = p.stdout.read().strip()
-    try:
-        os.chdir(parent)
-        if not os.listdir(_themes):
-            call([git, 'submodule', '--init'])
-        else:
-            call([git, 'submodule', 'update'])
-        sys.path.append(_themes)
-    finally:
-        os.chdir(cwd)
-
-html_theme_path = ['_themes']
 html_theme = 'pyramid'
+html_theme_path = pylons_sphinx_themes.get_html_themes_path()
 html_theme_options = dict(
     github_url='https://github.com/Pylons/pyramid',
     in_progress='false',
