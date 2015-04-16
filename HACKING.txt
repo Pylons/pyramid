@@ -216,29 +216,12 @@ documentation in this package which references that API or behavior must be
 changed to reflect the bug fix, ideally in the same commit that fixes the bug
 or adds the feature.  To build and review docs, use the following steps.
 
-1. After following the steps above in "Using a Development Checkout", update
-   all git submodules from the top-level of your Pyramid checkout, like so:
+1. In the main Pyramid checkout directory, run ``./builddocs.sh`` (which just
+   turns around and runs ``tox -e py2-docs,py3-docs``)::
 
-     $ git submodule update --init --recursive
+    $ ./builddocs.sh
 
-   This will checkout theme subrepositories and prevent error conditions when
-   HTML docs are generated.
-
-2. Next change into the submodule's directory and switch to a branch so that
-   the submodule repositories are no longer "headless".  Then update the
-   repository to ensure that we have the latest updates.
-   See http://chrisjean.com/2009/04/20/git-submodules-adding-using-removing-and-updating/ ::
-
-    $ cd docs/_themes
-    $ git checkout master
-    $ git pull
-
-3. Change back to the main Pyramid checkout dir and run ``./builddocs`` (which
-   just turns around and runs ``tox -e py2-docs,py3-docs``)::
-
-    $ ./builddocs
-
-4. Open the ``.tox/_build/html/index.html`` file to see the resulting HTML
+2. Open the ``docs/_build/html/index.html`` file to see the resulting HTML
    rendering.
 
 Change Log
