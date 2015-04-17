@@ -50,6 +50,18 @@ class RoutesConfiguratorMixinTests(unittest.TestCase):
         config.add_route('name', 'path')
         self._assertRoute(config, 'name', 'root/path')
 
+    def test_add_route_with_empty_string_with_route_prefix(self):
+        config = self._makeOne(autocommit=True)
+        config.route_prefix = 'root'
+        config.add_route('name', '')
+        self._assertRoute(config, 'name', 'root')
+
+    def test_add_route_with_root_slash_with_route_prefix(self):
+        config = self._makeOne(autocommit=True)
+        config.route_prefix = 'root'
+        config.add_route('name', '/')
+        self._assertRoute(config, 'name', 'root/')
+
     def test_add_route_discriminator(self):
         config = self._makeOne()
         config.add_route('name', 'path')

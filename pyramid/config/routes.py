@@ -333,7 +333,10 @@ class RoutesConfiguratorMixin(object):
             static = True
 
         elif self.route_prefix:
-            pattern = self.route_prefix.rstrip('/') + '/' + pattern.lstrip('/')
+            if pattern == '':
+                pattern = self.route_prefix.rstrip('/')
+            else:
+                pattern = self.route_prefix.rstrip('/') + '/' + pattern.lstrip('/')
 
         mapper = self.get_routes_mapper()
 
