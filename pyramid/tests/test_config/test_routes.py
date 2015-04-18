@@ -99,8 +99,12 @@ class RoutesConfiguratorMixinTests(unittest.TestCase):
         request.method = 'GET'
         self.assertEqual(predicate(None, request), True)
         request = self._makeRequest(config)
+
         request.method = 'POST'
-        self.assertEqual(predicate(None, request), False)
+        from pyramid.exceptions import PredicateMismatchMethodNotAllowed
+        self.assertRaises(
+            PredicateMismatchMethodNotAllowed,
+            predicate, None, request)
 
     def test_add_route_with_path_info(self):
         config = self._makeOne(autocommit=True)

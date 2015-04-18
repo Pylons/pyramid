@@ -58,8 +58,10 @@ class TestRequestMethodPredicate(unittest.TestCase):
         inst = self._makeOne(('GET','HEAD'))
         request = Dummy()
         request.method = 'POST'
-        result = inst(None, request)
-        self.assertFalse(result)
+        from pyramid.exceptions import PredicateMismatchMethodNotAllowed
+        self.assertRaises(
+            PredicateMismatchMethodNotAllowed,
+            inst, None, request)
 
     def test_text(self):
         inst = self._makeOne(('HEAD','GET'))

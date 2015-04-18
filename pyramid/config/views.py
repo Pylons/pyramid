@@ -293,14 +293,32 @@ class ViewDeriver(object):
         preds = self.kw.get('predicates', ())
         if not preds:
             return view
+
         def predicate_wrapper(context, request):
+            error = None
+            predicates_passed = 0
             for predicate in preds:
-                if not predicate(context, request):
-                    view_name = getattr(view, '__name__', view)
-                    raise PredicateMismatch(
-                         'predicate mismatch for view %s (%s)' % (
-                         view_name, predicate.text()))
-            return view(context, request)
+                try:
+                    predicate_result = predicate(context, request)
+                except PredicateMismatch as predicate_error:
+                    error = predicate_error  # python 3.4
+                    break
+                else:
+                    if not predicate_result:
+                        view_name = getattr(view, '__name__', view)
+                        error = PredicateMismatch(
+                             'predicate mismatch for view %s (%s)' % (
+                             view_name, predicate.text()))
+                        break
+                    else:
+                        predicates_passed += 1
+
+            if error:
+                error.__predicates_passed__ = predicates_passed
+                raise error
+            else:
+                return view(context, request)
+
         def checker(context, request):
             return all((predicate(context, request) for predicate in
                         preds))
@@ -596,12 +614,21 @@ class MultiView(object):
         return view(context, request)
 
     def __call__(self, context, request):
+        errors = []
         for order, view, phash in self.get_views(request):
             try:
                 return view(context, request)
-            except PredicateMismatch:
+            except PredicateMismatch as predicate_error:
+                errors.append(predicate_error)
                 continue
-        raise PredicateMismatch(self.name)
+
+        if errors:
+            errors.sort(
+                key=lambda e: getattr(e, '__predicates_passed__', 0),
+                reverse=True)
+            raise errors[0]
+        else:
+            raise PredicateMismatch(self.name)
 
 class ViewsConfiguratorMixin(object):
     @viewdefaults

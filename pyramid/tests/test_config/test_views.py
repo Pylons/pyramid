@@ -2379,6 +2379,17 @@ class TestMultiView(unittest.TestCase):
         response = mv(context, request)
         self.assertEqual(response, expected_response)
 
+    def test___call__predicate_mismatch(self):
+        from pyramid.exceptions import PredicateMismatch
+        mv = self._makeOne()
+        context = DummyContext()
+        request = DummyRequest()
+        request.view_name = ''
+        def view1(context, request):
+            raise PredicateMismatch
+        mv.views = [(100, view1, None)]
+        self.assertRaises(PredicateMismatch, mv, context, request)
+
     def test___call__raise_not_found_isnt_interpreted_as_pred_mismatch(self):
         from pyramid.httpexceptions import HTTPNotFound
         mv = self._makeOne()

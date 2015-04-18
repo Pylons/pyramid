@@ -91,4 +91,34 @@ class TestCyclicDependencyError(unittest.TestCase):
         self.assertTrue("'a' sorts before ['c', 'd']" in result)
         self.assertTrue("'c' sorts before ['a']" in result)
 
+class TestPredicateMismatch(unittest.TestCase):
+    def _makeOne(self, message):
+        from pyramid.exceptions import PredicateMismatch
+        return PredicateMismatch(message)
 
+    def test_it(self):
+        from pyramid.interfaces import IExceptionResponse
+        e = self._makeOne('predicate mismatch')
+        self.assertTrue(IExceptionResponse.providedBy(e))
+        self.assertEqual(e.status, '404 Not Found')
+        self.assertEqual(e.message, 'predicate mismatch')
+
+        from pyramid.httpexceptions import HTTPNotFound
+        self.assertTrue(isinstance(e, HTTPNotFound))
+
+class TestPredicateMismatchMethodNotAllowed(unittest.TestCase):
+    def _makeOne(self, message):
+        from pyramid.exceptions import PredicateMismatchMethodNotAllowed
+        return PredicateMismatchMethodNotAllowed(message)
+
+    def test_it(self):
+        from pyramid.interfaces import IExceptionResponse
+        e = self._makeOne('predicate mismatch')
+        self.assertTrue(IExceptionResponse.providedBy(e))
+        self.assertEqual(e.status, '405 Method Not Allowed')
+        self.assertEqual(e.message, 'predicate mismatch')
+
+        from pyramid.exceptions import PredicateMismatch
+        self.assertTrue(isinstance(e, PredicateMismatch))
+        from pyramid.httpexceptions import HTTPMethodNotAllowed
+        self.assertTrue(isinstance(e, HTTPMethodNotAllowed))
