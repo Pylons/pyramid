@@ -120,7 +120,7 @@ class TestRequest(unittest.TestCase):
 
     def test_add_response_callback(self):
         inst = self._makeOne()
-        self.assertEqual(inst.response_callbacks, None)
+        self.assertEqual(len(inst.response_callbacks), 0)
         def callback(request, response):
             """ """
         inst.add_response_callback(callback)
@@ -171,7 +171,7 @@ class TestRequest(unittest.TestCase):
 
     def test_add_finished_callback(self):
         inst = self._makeOne()
-        self.assertEqual(inst.finished_callbacks, None)
+        self.assertEqual(len(inst.finished_callbacks), 0)
         def callback(request):
             """ """
         inst.add_finished_callback(callback)

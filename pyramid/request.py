@@ -37,8 +37,14 @@ class TemplateContext(object):
     pass
 
 class CallbackMethodsMixin(object):
-    response_callbacks = None
-    finished_callbacks = None
+    @reify
+    def finished_callbacks(self):
+        return deque()
+
+    @reify
+    def response_callbacks(self):
+        return deque()
+
     def add_response_callback(self, callback):
         """
         Add a callback to the set of callbacks to be called by the
@@ -76,11 +82,7 @@ class CallbackMethodsMixin(object):
             See also :ref:`using_response_callbacks`.
         """
 
-        callbacks = self.response_callbacks
-        if callbacks is None:
-            callbacks = deque()
-        callbacks.append(callback)
-        self.response_callbacks = callbacks
+        self.response_callbacks.append(callback)
 
     def _process_response_callbacks(self, response):
         callbacks = self.response_callbacks
@@ -135,12 +137,7 @@ class CallbackMethodsMixin(object):
 
             See also :ref:`using_finished_callbacks`.
         """
-
-        callbacks = self.finished_callbacks
-        if callbacks is None:
-            callbacks = deque()
-        callbacks.append(callback)
-        self.finished_callbacks = callbacks
+        self.finished_callbacks.append(callback)
 
     def _process_finished_callbacks(self):
         callbacks = self.finished_callbacks
