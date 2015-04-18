@@ -16,6 +16,7 @@ import os
 import datetime
 import inspect
 import warnings
+import pylons_sphinx_themes
 
 warnings.simplefilter('ignore', DeprecationWarning)
 
@@ -82,7 +83,7 @@ copyright = '%s, Agendaless Consulting' % datetime.datetime.now().year
 # other places throughout the built documents.
 #
 # The short X.Y version.
-version = '1.4.7'
+version = '1.4.8'
 
 # The full version, including alpha/beta/rc tags.
 release = version
@@ -130,33 +131,8 @@ if book:
 # -----------------------
 
 # Add and use Pylons theme
-if 'sphinx-build' in ' '.join(sys.argv):  # protect against dumb importers
-    from subprocess import call, Popen, PIPE
-
-    p = Popen('which git', shell=True, stdout=PIPE)
-    cwd = os.getcwd()
-    _themes = os.path.join(cwd, '_themes')
-    git = p.stdout.read().strip()
-    if not os.listdir(_themes):
-        call([git, 'submodule', '--init'])
-    else:
-        call([git, 'submodule', 'update'])
-
-    sys.path.append(os.path.abspath('_themes'))
-
-    parent = os.path.dirname(os.path.dirname(__file__))
-    sys.path.append(os.path.abspath(parent))
-    wd = os.getcwd()
-    os.chdir(parent)
-    os.system('%s setup.py test -q' % sys.executable)
-    os.chdir(wd)
-
-    for item in os.listdir(parent):
-        if item.endswith('.egg'):
-            sys.path.append(os.path.join(parent, item))
-
-html_theme_path = ['_themes']
 html_theme = 'pyramid'
+html_theme_path = pylons_sphinx_themes.get_html_themes_path()
 html_theme_options = dict(
     github_url='https://github.com/Pylons/pyramid',
 #    in_progress='true',
