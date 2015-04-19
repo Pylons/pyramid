@@ -14,10 +14,6 @@ from pyramid.interfaces import (
     VH_ROOT_KEY,
     )
 
-with warnings.catch_warnings():
-    warnings.filterwarnings('ignore')
-    from pyramid.interfaces import IContextURL
-
 from pyramid.compat import (
     PY3,
     native_,
@@ -34,6 +30,10 @@ from pyramid.encode import url_quote
 from pyramid.exceptions import URLDecodeError
 from pyramid.location import lineage
 from pyramid.threadlocal import get_current_registry
+
+with warnings.catch_warnings():
+    warnings.filterwarnings('ignore')
+    from pyramid.interfaces import IContextURL
 
 empty = text_('')
 
@@ -664,10 +664,10 @@ class ResourceTreeTraverser(object):
 
         if VH_ROOT_KEY in environ:
             # HTTP_X_VHM_ROOT
-            vroot_path = decode_path_info(environ[VH_ROOT_KEY]) 
+            vroot_path = decode_path_info(environ[VH_ROOT_KEY])
             vroot_tuple = split_path_info(vroot_path)
             vpath = vroot_path + path # both will (must) be unicode or asciistr
-            vroot_idx = len(vroot_tuple) -1
+            vroot_idx = len(vroot_tuple) - 1
         else:
             vroot_tuple = ()
             vpath = path
@@ -689,34 +689,34 @@ class ResourceTreeTraverser(object):
             vpath_tuple = split_path_info(vpath)
             for segment in vpath_tuple:
                 if segment[:2] == view_selector:
-                    return {'context':ob,
-                            'view_name':segment[2:],
-                            'subpath':vpath_tuple[i+1:],
-                            'traversed':vpath_tuple[:vroot_idx+i+1],
-                            'virtual_root':vroot,
-                            'virtual_root_path':vroot_tuple,
-                            'root':root}
+                    return {'context': ob,
+                            'view_name': segment[2:],
+                            'subpath': vpath_tuple[i + 1:],
+                            'traversed': vpath_tuple[:vroot_idx + i + 1],
+                            'virtual_root': vroot,
+                            'virtual_root_path': vroot_tuple,
+                            'root': root}
                 try:
                     getitem = ob.__getitem__
                 except AttributeError:
-                    return {'context':ob,
-                            'view_name':segment,
-                            'subpath':vpath_tuple[i+1:],
-                            'traversed':vpath_tuple[:vroot_idx+i+1],
-                            'virtual_root':vroot,
-                            'virtual_root_path':vroot_tuple,
-                            'root':root}
+                    return {'context': ob,
+                            'view_name': segment,
+                            'subpath': vpath_tuple[i + 1:],
+                            'traversed': vpath_tuple[:vroot_idx + i + 1],
+                            'virtual_root': vroot,
+                            'virtual_root_path': vroot_tuple,
+                            'root': root}
 
                 try:
                     next = getitem(segment)
                 except KeyError:
-                    return {'context':ob,
-                            'view_name':segment,
-                            'subpath':vpath_tuple[i+1:],
-                            'traversed':vpath_tuple[:vroot_idx+i+1],
-                            'virtual_root':vroot,
-                            'virtual_root_path':vroot_tuple,
-                            'root':root}
+                    return {'context': ob,
+                            'view_name': segment,
+                            'subpath': vpath_tuple[i + 1:],
+                            'traversed': vpath_tuple[:vroot_idx + i + 1],
+                            'virtual_root': vroot,
+                            'virtual_root_path': vroot_tuple,
+                            'root': root}
                 if i == vroot_idx:
                     vroot = next
                 ob = next

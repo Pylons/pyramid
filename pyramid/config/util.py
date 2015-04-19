@@ -151,7 +151,7 @@ class PredicateList(object):
                     hashes = [hashes]
                 for h in hashes:
                     phash.update(bytes_(h))
-                weights.append(1 << n+1)
+                weights.append(1 << n + 1)
                 preds.append(pred)
         if kw:
             raise ConfigurationError('Unknown predicate values: %r' % (kw,))

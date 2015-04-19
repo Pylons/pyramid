@@ -132,7 +132,7 @@ class PCreateCommand(object):
             for scaffold in scaffolds:
                 self.out('  %s:%s  %s' % (
                     scaffold.name,
-                    ' '*(max_name-len(scaffold.name)), scaffold.summary))
+                    ' ' * (max_name - len(scaffold.name)), scaffold.summary))
         else:
             self.out('No scaffolds available')
         return 0

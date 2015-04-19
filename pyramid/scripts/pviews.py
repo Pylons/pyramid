@@ -143,10 +143,8 @@ class PViewsCommand(object):
         if traverser is None:
             traverser = ResourceTreeTraverser(root)
         tdict = traverser(request)
-        context, view_name, subpath, traversed, vroot, vroot_path =(
-            tdict['context'], tdict['view_name'], tdict['subpath'],
-            tdict['traversed'], tdict['virtual_root'],
-            tdict['virtual_root_path'])
+        context, view_name = (tdict['context'], tdict['view_name'])
+
         attrs.update(tdict)
 
         # find a view callable
@@ -218,7 +216,7 @@ class PViewsCommand(object):
             if not IMultiView.providedBy(view_wrapper):
                 # single view for this route, so repeat call without route data
                 del request_attrs['matched_route']
-                self.output_view_info(view_wrapper, level+1)
+                self.output_view_info(view_wrapper, level + 1)
         else:
             self.out("%sView:" % indent)
             self.out("%s-----" % indent)

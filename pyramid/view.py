@@ -56,7 +56,7 @@ def render_view_to_response(context, request, name='', secure=True):
         context,
         context_iface,
         name,
-        secure = secure,
+        secure=secure,
         )
 
     return response # NB: might be None
@@ -272,7 +272,7 @@ class AppendSlashNotFoundViewFactory(object):
                     qs = request.query_string
                     if qs:
                         qs = '?' + qs
-                    return self.redirect_class(location=request.path+'/'+qs)
+                    return self.redirect_class(location=request.path + '/' + qs)
         return self.notfound_view(context, request)
 
 append_slash_notfound_view = AppendSlashNotFoundViewFactory()
@@ -451,9 +451,9 @@ def _find_views(
     view_types=None,
     view_classifier=None,
     ):
-    if  view_types is None:
+    if view_types is None:
         view_types = (IView, ISecuredView, IMultiView)
-    if view_classifier is  None:
+    if view_classifier is None:
         view_classifier = IViewClassifier
     registered = registry.adapters.registered
     cache = registry._view_lookup_cache

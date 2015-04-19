@@ -8,9 +8,6 @@ from translationstring import (
     TranslationStringFactory, # API
     )
 
-TranslationString = TranslationString # PyFlakes
-TranslationStringFactory = TranslationStringFactory # PyFlakes
-
 from pyramid.compat import PY3
 from pyramid.decorator import reify
 
@@ -21,6 +18,10 @@ from pyramid.interfaces import (
     )
 
 from pyramid.threadlocal import get_current_registry
+
+TranslationString = TranslationString  # PyFlakes
+TranslationStringFactory = TranslationStringFactory  # PyFlakes
+
 
 class Localizer(object):
     """

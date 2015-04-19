@@ -22,7 +22,7 @@ from pyramid.compat import (
 
 from pyramid.decorator import reify
 from pyramid.i18n import LocalizerRequestMixin
-from pyramid.response import Response,  _get_response_factory
+from pyramid.response import Response, _get_response_factory
 from pyramid.security import (
     AuthenticationAPIMixin,
     AuthorizationAPIMixin,
@@ -70,7 +70,7 @@ class CallbackMethodsMixin(object):
         called if an exception happens in application code, or if the
         response object returned by :term:`view` code is invalid.
 
-        All response callbacks are called *after* the tweens and 
+        All response callbacks are called *after* the tweens and
         *before* the :class:`pyramid.events.NewResponse` event is sent.
 
         Errors raised by callbacks are not handled specially.  They
@@ -234,7 +234,7 @@ class Request(
     def json_body(self):
         return json.loads(text_(self.body, self.charset))
 
-    
+
 def route_request_iface(name, bases=()):
     # zope.interface treats the __name__ as the __doc__ and changes __name__
     # to None for interfaces that contain spaces if you do not pass a
@@ -248,8 +248,9 @@ def route_request_iface(name, bases=()):
     iface.combined = InterfaceClass(
         '%s_combined_IRequest' % name,
         bases=(iface, IRequest),
-        __doc__ = 'route_request_iface-generated combined interface')
+        __doc__='route_request_iface-generated combined interface')
     return iface
+
 
 def add_global_response_headers(request, headerlist):
     def add_headers(request, response):

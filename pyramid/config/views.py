@@ -157,7 +157,7 @@ class ViewDeriver(object):
                                 self.decorated_view(
                                     self.rendered_view(
                                         self.mapped_view(
-                                                view)))))))))
+                                            view)))))))))
 
     @wraps_view
     def mapped_view(self, view):
@@ -232,7 +232,11 @@ class ViewDeriver(object):
             permission = None
 
         wrapped_view = view
-        if self.authn_policy and self.authz_policy and (permission is not None):
+        if (
+                self.authn_policy and
+                self.authz_policy and
+                (permission is not None)
+        ):
             def _permitted(context, request):
                 principals = self.authn_policy.effective_principals(request)
                 return self.authz_policy.permits(context, principals,
@@ -270,7 +274,8 @@ class ViewDeriver(object):
                     else:
                         principals = self.authn_policy.effective_principals(
                             request)
-                        msg = str(self.authz_policy.permits(context, principals,
+                        msg = str(self.authz_policy.permits(context,
+                                                            principals,
                                                             permission))
                 else:
                     msg = 'Allowed (no authorization policy in use)'
@@ -293,14 +298,16 @@ class ViewDeriver(object):
         preds = self.kw.get('predicates', ())
         if not preds:
             return view
+
         def predicate_wrapper(context, request):
             for predicate in preds:
                 if not predicate(context, request):
                     view_name = getattr(view, '__name__', view)
                     raise PredicateMismatch(
-                         'predicate mismatch for view %s (%s)' % (
-                         view_name, predicate.text()))
+                        'predicate mismatch for view %s (%s)' % (
+                            view_name, predicate.text()))
             return view(context, request)
+
         def checker(context, request):
             return all((predicate(context, request) for predicate in
                         preds))
@@ -321,7 +328,7 @@ class ViewDeriver(object):
             (accept is None) and
             (order == MAX_ORDER) and
             (phash == DEFAULT_PHASH)
-            ):
+        ):
             return view # defaults
         def attr_view(context, request):
             return view(context, request)
@@ -350,7 +357,7 @@ class ViewDeriver(object):
     def _rendered_view(self, view, view_renderer):
         def rendered_view(context, request):
             result = view(context, request)
-            if result.__class__ is Response: # potential common case
+            if result.__class__ is Response:  # potential common case
                 response = result
             else:
                 registry = self.registry
@@ -365,9 +372,10 @@ class ViewDeriver(object):
                         renderer = renderers.RendererHelper(
                             name=renderer_name,
                             package=self.kw.get('package'),
-                            registry = registry)
+                            registry=registry)
                     else:
                         renderer = view_renderer.clone()
+
                     if '__view__' in attrs:
                         view_inst = attrs.pop('__view__')
                     else:
@@ -380,9 +388,10 @@ class ViewDeriver(object):
 
     def _response_resolved_view(self, view):
         registry = self.registry
+
         def viewresult_to_response(context, request):
             result = view(context, request)
-            if result.__class__ is Response: # common case
+            if result.__class__ is Response:  # common case
                 response = result
             else:
                 response = registry.queryAdapterOrSelf(result, IResponse)
@@ -412,6 +421,7 @@ class ViewDeriver(object):
         if decorator is None:
             return view
         return decorator(view)
+
 
 @implementer(IViewMapper)
 @provider(IViewMapperFactory)
@@ -631,7 +641,8 @@ class ViewsConfiguratorMixin(object):
         http_cache=None,
         match_param=None,
         check_csrf=None,
-        **predicates):
+        **predicates
+    ):
         """ Add a :term:`view configuration` to the current
         configuration state.  Arguments to ``add_view`` are broken
         down below into *predicate* arguments and *non-predicate*
@@ -1126,7 +1137,7 @@ class ViewsConfiguratorMixin(object):
         if isinstance(renderer, string_types):
             renderer = renderers.RendererHelper(
                 name=renderer, package=self.package,
-                registry = self.registry)
+                registry=self.registry)
 
         if accept is not None:
             accept = accept.lower()
@@ -1154,7 +1165,11 @@ class ViewsConfiguratorMixin(object):
             # is.  It can't be computed any sooner because thirdparty
             # predicates may not yet exist when add_view is called.
             order, preds, phash = predlist.make(self, **pvals)
-            view_intr.update({'phash':phash, 'order':order, 'predicates':preds})
+            view_intr.update({
+                'phash': phash,
+                'order': order,
+                'predicates': preds
+            })
             return ('view', context, name, route_name, phash)
 
         discriminator = Deferred(discrim_func)
@@ -1353,7 +1368,7 @@ class ViewsConfiguratorMixin(object):
                 tmpl_intr is not None and
                 intrspc is not None and
                 intrspc.get('renderer factories', renderer_type) is not None
-                ):
+            ):
                 # allow failure of registered template factories to be deferred
                 # until view execution, like other bad renderer factories; if
                 # we tried to relate this to an existing renderer factory
@@ -1395,7 +1410,7 @@ class ViewsConfiguratorMixin(object):
                 permission,
                 permission,
                 'permission'
-                )
+            )
             perm_intr['value'] = permission
             perm_intr.relate('views', discriminator)
             introspectables.append(perm_intr)
@@ -1427,7 +1442,7 @@ class ViewsConfiguratorMixin(object):
             factory,
             weighs_more_than=weighs_more_than,
             weighs_less_than=weighs_less_than
-            )
+        )
 
     def add_default_view_predicates(self):
         p = pyramid.config.predicates
@@ -1445,7 +1460,7 @@ class ViewsConfiguratorMixin(object):
             ('physical_path', p.PhysicalPathPredicate),
             ('effective_principals', p.EffectivePrincipalsPredicate),
             ('custom', p.CustomPredicate),
-            ):
+        ):
             self.add_view_predicate(name, factory)
 
     def derive_view(self, view, attr=None, renderer=None):
@@ -1537,7 +1552,7 @@ class ViewsConfiguratorMixin(object):
         if isinstance(renderer, string_types):
             renderer = renderers.RendererHelper(
                 name=renderer, package=self.package,
-                registry = self.registry)
+                registry=self.registry)
         if renderer is None:
             # use default renderer if one exists
             if self.registry.queryUtility(IRendererFactory) is not None:
@@ -1585,7 +1600,7 @@ class ViewsConfiguratorMixin(object):
         mapper=None,
         match_param=None,
         **predicates
-        ):
+    ):
         """ Add a forbidden view to the current configuration state.  The
         view will be called when Pyramid or application code raises a
         :exc:`pyramid.httpexceptions.HTTPForbidden` exception and the set of
@@ -1618,7 +1633,7 @@ class ViewsConfiguratorMixin(object):
                 raise ConfigurationError(
                     '%s may not be used as an argument to add_forbidden_view'
                     % arg
-                    )
+                )
 
         if view is None:
             view = default_exceptionresponse_view
@@ -1643,7 +1658,7 @@ class ViewsConfiguratorMixin(object):
             permission=NO_PERMISSION_REQUIRED,
             attr=attr,
             renderer=renderer,
-            )
+        )
         settings.update(predicates)
         return self.add_view(**settings)
 
@@ -1672,7 +1687,7 @@ class ViewsConfiguratorMixin(object):
         match_param=None,
         append_slash=False,
         **predicates
-        ):
+    ):
         """ Add a default Not Found View to the current configuration state.
         The view will be called when Pyramid or application code raises an
         :exc:`pyramid.httpexceptions.HTTPNotFound` exception (e.g. when a
@@ -1730,7 +1745,7 @@ class ViewsConfiguratorMixin(object):
                 raise ConfigurationError(
                     '%s may not be used as an argument to add_notfound_view'
                     % arg
-                    )
+                )
 
         if view is None:
             view = default_exceptionresponse_view
@@ -1753,7 +1768,7 @@ class ViewsConfiguratorMixin(object):
             match_param=match_param,
             route_name=route_name,
             permission=NO_PERMISSION_REQUIRED,
-            )
+        )
         settings.update(predicates)
         if append_slash:
             view = self._derive_view(view, attr=attr, renderer=renderer)
@@ -1931,7 +1946,7 @@ def isexception(o):
     return (
         isinstance(o, Exception) or
         (inspect.isclass(o) and (issubclass(o, Exception)))
-        )
+    )
 
 
 @implementer(IStaticURLInfo)
@@ -2045,7 +2060,7 @@ class StaticURLInfo(object):
 
             # register a route using the computed view, permission, and
             # pattern, plus any extras passed to us via add_static_view
-            pattern = "%s*subpath" % name # name already ends with slash
+            pattern = "%s*subpath" % name  # name already ends with slash
             if config.route_prefix:
                 route_name = '__%s/%s' % (config.route_prefix, name)
             else:
@@ -2057,12 +2072,12 @@ class StaticURLInfo(object):
                 permission=permission,
                 context=context,
                 renderer=renderer,
-                )
+            )
 
         def register():
             registrations = self._get_registrations(config.registry)
 
-            names = [ t[0] for t in  registrations ]
+            names = [t[0] for t in registrations]
 
             if name in names:
                 idx = names.index(name)
@@ -2079,4 +2094,3 @@ class StaticURLInfo(object):
         intr['spec'] = spec
 
         config.action(None, callable=register, introspectables=(intr,))
-

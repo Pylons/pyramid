@@ -16,7 +16,6 @@ from pyramid.exceptions import (
     )
 
 from pyramid.compat import (
-    iteritems_,
     is_nonstr_iter,
     integer_types,
     string_types,
@@ -28,11 +27,13 @@ from pyramid.compat import (
 from pyramid.interfaces import IActionInfo
 from pyramid.path import DottedNameResolver as _DottedNameResolver
 
+
 class DottedNameResolver(_DottedNameResolver):
     def __init__(self, package=None): # default to package = None for bw compat
         return _DottedNameResolver.__init__(self, package)
 
 _marker = object()
+
 
 class InstancePropertyHelper(object):
     """A helper object for assigning properties and descriptors to instances.
@@ -446,7 +447,7 @@ class TopologicalSorter(object):
             order.append((a, b))
 
         def add_node(node):
-            if not node in graph:
+            if node not in graph:
                 roots.append(node)
                 graph[node] = [0] # 0 = number of arcs coming into this node
 
@@ -519,7 +520,7 @@ def viewdefaults(wrapped):
         view = self.maybe_dotted(view)
         if inspect.isclass(view):
             defaults = getattr(view, '__view_defaults__', {}).copy()
-        if not '_backframes' in kw:
+        if '_backframes' not in kw:
             kw['_backframes'] = 1 # for action_method
         defaults.update(kw)
         return wrapped(self, *arg, **defaults)
