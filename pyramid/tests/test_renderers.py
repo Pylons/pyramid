@@ -688,6 +688,14 @@ class TestJSONP(unittest.TestCase):
         result = renderer({'a':'1'}, {})
         self.assertEqual(result, '{"a": "1"}')
 
+    def test_render_to_jsonp_invalid_callback(self):
+        from pyramid.httpexceptions import HTTPBadRequest
+        renderer_factory = self._makeOne()
+        renderer = renderer_factory(None)
+        request = testing.DummyRequest()
+        request.GET['callback'] = '78mycallback'
+        self.assertRaises(HTTPBadRequest, renderer, {'a':'1'}, {'request':request})
+
 
 class Dummy:
     pass
