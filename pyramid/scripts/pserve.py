@@ -200,6 +200,7 @@ class PServeCommand(object):
 
     def run(self):  # pragma: no cover
         if self.options.stop_daemon:
+            self._warn_daemon_deprecated()
             return self.stop_daemon()
 
         if not hasattr(self.options, 'set_user'):
@@ -239,9 +240,11 @@ class PServeCommand(object):
             return 2
 
         if cmd == 'status' or self.options.show_status:
+            self._warn_daemon_deprecated()
             return self.show_status()
 
         if cmd == 'restart' or cmd == 'stop':
+            self._warn_daemon_deprecated()
             result = self.stop_daemon()
             if result:
                 if cmd == 'restart':
@@ -271,6 +274,10 @@ class PServeCommand(object):
             server_spec = app_spec
         base = os.getcwd()
 
+        # warn before setting a default
+        if self.options.pid_file:
+            self._warn_daemon_deprecated()
+
         if getattr(self.options, 'daemon', False):
             if not self.options.pid_file:
                 self.options.pid_file = 'pyramid.pid'
@@ -296,6 +303,7 @@ class PServeCommand(object):
             writeable_pid_file.close()
 
         if getattr(self.options, 'daemon', False):
+            self._warn_daemon_deprecated()
             try:
                 self.daemonize()
             except DaemonizeException as ex:
@@ -610,6 +618,15 @@ class PServeCommand(object):
         if uid:
             os.setuid(uid)
 
+    def _warn_daemon_deprecated(self):
+        self.out('''\
+The daemon options have been deprecated in Pyramid 1.6. They will be removed
+in a future release per Pyramid's deprecation policy. Please consider using
+a real process manager for handling your processes like supervisord or systemd.
+
+The following commands are deprecated:
+    [start,stop,restart,status] --daemon, --stop-server, --status, --pid-file
+''')
 
 class LazyWriter(object):
 
