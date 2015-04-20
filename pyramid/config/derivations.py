@@ -272,8 +272,7 @@ def secured_view(view, default, **kw):
     if authn_policy and authz_policy and (permission is not None):
         def _permitted(context, request):
             principals = authn_policy.effective_principals(request)
-            return authz_policy.permits(context, principals,
-                                             permission)
+            return authz_policy.permits(context, principals, permission)
         def _secured_view(context, request):
             result = _permitted(context, request)
             if result:
@@ -308,10 +307,9 @@ def authdebug_view(view, default, **kw):
                 elif permission is None:
                     msg = 'Allowed (no permission registered)'
                 else:
-                    principals = authn_policy.effective_principals(
-                        request)
-                    msg = str(authz_policy.permits(context, principals,
-                                                        permission))
+                    principals = authn_policy.effective_principals(request)
+                    msg = str(authz_policy.permits(
+                        context, principals, permission))
             else:
                 msg = 'Allowed (no authorization policy in use)'
 
@@ -319,7 +317,8 @@ def authdebug_view(view, default, **kw):
             url = getattr(request, 'url', None)
             msg = ('debug_authorization of url %s (view name %r against '
                    'context %r): %s' % (url, view_name, context, msg))
-            if logger: logger.debug(msg)
+            if logger:
+                logger.debug(msg)
             if request is not None:
                 request.authdebug_message = msg
             return view(context, request)
@@ -338,8 +337,8 @@ def predicated_view(view, default, **kw):
             if not predicate(context, request):
                 view_name = getattr(view, '__name__', view)
                 raise PredicateMismatch(
-                     'predicate mismatch for view %s (%s)' % (
-                     view_name, predicate.text()))
+                    'predicate mismatch for view %s (%s)' % (
+                        view_name, predicate.text()))
         return view(context, request)
     def checker(context, request):
         return all((predicate(context, request) for predicate in
@@ -361,7 +360,7 @@ def attr_wrapped_view(view, default, **kw):
         (accept is None) and
         (order == MAX_ORDER) and
         (phash == DEFAULT_PHASH)
-        ):
+    ):
         return view # defaults
     def attr_view(context, request):
         return view(context, request)
@@ -428,15 +427,15 @@ def rendered_view(view, default, **kw):
                     view_renderer = renderers.RendererHelper(
                         name=renderer_name,
                         package=kw.get('package'),
-                        registry = registry)
+                        registry=registry)
                 else:
                     view_renderer = renderer.clone()
                 if '__view__' in attrs:
                     view_inst = attrs.pop('__view__')
                 else:
                     view_inst = getattr(view, '__original_view__', view)
-                response = view_renderer.render_view(request, result, view_inst,
-                                                context)
+                response = view_renderer.render_view(
+                    request, result, view_inst, context)
         return response
 
     return rendered_view

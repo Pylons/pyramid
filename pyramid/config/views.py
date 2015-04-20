@@ -7,15 +7,11 @@ from zope.interface import (
     Interface,
     implementedBy,
     implementer,
-    provider,
     )
 
 from zope.interface.interfaces import IInterface
 
 from pyramid.interfaces import (
-    IAuthenticationPolicy,
-    IAuthorizationPolicy,
-    IDebugLogger,
     IDefaultPermission,
     IException,
     IExceptionViewClassifier,
@@ -29,7 +25,6 @@ from pyramid.interfaces import (
     IView,
     IViewClassifier,
     IViewDerivers,
-    IViewMapper,
     IViewMapperFactory,
     PHASE1_CONFIG,
     )
@@ -42,8 +37,6 @@ from pyramid.compat import (
     urlparse,
     url_quote,
     WIN,
-    is_bound_method,
-    is_unbound_method,
     is_nonstr_iter,
     )
 
@@ -63,22 +56,16 @@ from pyramid.registry import (
     Deferred,
     )
 
-from pyramid.response import Response
-
 from pyramid.security import NO_PERMISSION_REQUIRED
 from pyramid.static import static_view
 from pyramid.threadlocal import get_current_registry
 
 from pyramid.url import parse_url_overrides
 
-from pyramid.view import (
-    render_view_to_response,
-    AppendSlashNotFoundViewFactory,
-    )
+from pyramid.view import AppendSlashNotFoundViewFactory
 
 import pyramid.util
 from pyramid.util import (
-    object_description,
     viewdefaults,
     action_method,
     TopologicalSorter,
@@ -87,7 +74,6 @@ from pyramid.util import (
 import pyramid.config.predicates
 import pyramid.config.derivations
 
-# bw compat
 from pyramid.config.derivations import (
     preserve_view_attrs,
     view_description,
@@ -98,11 +84,15 @@ from pyramid.config.derivations import (
 from pyramid.config.util import (
     DEFAULT_PHASH,
     MAX_ORDER,
-    takes_one_arg,
     )
 
 urljoin = urlparse.urljoin
 url_parse = urlparse.urlparse
+
+DefaultViewMapper = DefaultViewMapper # bw-compat
+preserve_view_attrs = preserve_view_attrs # bw-compat
+requestonly = requestonly # bw-compat
+view_description = view_description # bw-compat
 
 @implementer(IMultiView)
 class MultiView(object):
@@ -710,7 +700,7 @@ class ViewsConfiguratorMixin(object):
         if isinstance(renderer, string_types):
             renderer = renderers.RendererHelper(
                 name=renderer, package=self.package,
-                registry = self.registry)
+                registry=self.registry)
 
         if accept is not None:
             accept = accept.lower()
@@ -810,7 +800,8 @@ class ViewsConfiguratorMixin(object):
             phash = view_intr['phash']
 
             # __no_permission_required__ handled by _secure_view
-            derived_view = self._apply_view_derivations(view,
+            derived_view = self._apply_view_derivations(
+                view,
                 registry=self.registry,
                 permission=permission,
                 predicates=preds,
@@ -1174,7 +1165,7 @@ class ViewsConfiguratorMixin(object):
         if isinstance(renderer, string_types):
             renderer = renderers.RendererHelper(
                 name=renderer, package=self.package,
-                registry = self.registry)
+                registry=self.registry)
         if renderer is None:
             # use default renderer if one exists
             if self.registry.queryUtility(IRendererFactory) is not None:
@@ -1183,7 +1174,8 @@ class ViewsConfiguratorMixin(object):
                     package=self.package,
                     registry=self.registry)
 
-        return self._apply_view_derivations(view,
+        return self._apply_view_derivations(
+            view,
             registry=self.registry,
             permission=permission,
             predicates=predicates,
@@ -1197,7 +1189,8 @@ class ViewsConfiguratorMixin(object):
             package=self.package,
             mapper=mapper,
             decorator=decorator,
-            http_cache=http_cache)
+            http_cache=http_cache,
+        )
 
     @viewdefaults
     @action_method
@@ -1698,7 +1691,7 @@ class StaticURLInfo(object):
         def register():
             registrations = self._get_registrations(config.registry)
 
-            names = [ t[0] for t in  registrations ]
+            names = [ t[0] for t in registrations ]
 
             if name in names:
                 idx = names.index(name)
