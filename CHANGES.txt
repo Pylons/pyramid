@@ -131,6 +131,10 @@ Features
 Bug Fixes
 ---------
 
+- The JSONP renderer created JavaScript code in such a way that a callback
+  variable could be used to arbitrarily inject javascript into the response
+  object. https://github.com/Pylons/pyramid/pull/1627
+
 - Work around an issue where ``pserve --reload`` would leave terminal echo
   disabled if it reloaded during a pdb session.
   See https://github.com/Pylons/pyramid/pull/1577,
