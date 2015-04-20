@@ -232,3 +232,5 @@ Contributors
 - Amit Mane, 2014/01/23
 
 - Fenton Travers, 2014/05/06
+
+- Timur Izhbulatov, 2015/04/14
