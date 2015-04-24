@@ -191,6 +191,10 @@ Bug Fixes
 - Avoiding timing attacks against CSRF tokens.
   See https://github.com/Pylons/pyramid/pull/1574
 
+- ``request.finished_callbacks`` and ``request.response_callbacks`` now
+  default to an iterable instead of ``None``. It may be checked for a length
+  of 0. This was the behavior in 1.5.
+
 Deprecations
 ------------
 

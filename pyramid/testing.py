@@ -154,8 +154,9 @@ class DummyTemplateRenderer(object):
             if myval != v:
                 raise AssertionError(
                     '\nasserted value for %s: %r\nactual value: %r' % (
-                    k, v, myval))
+                        k, v, myval))
         return True
+
 
 class DummyResource:
     """ A dummy :app:`Pyramid` :term:`resource` object."""
@@ -384,10 +385,11 @@ class DummyRequest(
 
     @reify
     def response(self):
-        f =  _get_response_factory(self.registry)
+        f = _get_response_factory(self.registry)
         return f(self)
 
 have_zca = True
+
 
 def setUp(registry=None, request=None, hook_zca=True, autocommit=True,
           settings=None, package=None):
@@ -578,10 +580,13 @@ def skip_on(*platforms): # pragma: no  cover
             skip = True
         if platform == 'py3' and PY3:
             skip = True
+
     def decorator(func):
         if isinstance(func, class_types):
-            if skip: return None
-            else: return func
+            if skip:
+                return None
+            else:
+                return func
         else:
             def wrapper(*args, **kw):
                 if skip:

@@ -436,7 +436,7 @@ class Configurator(
         if session_factory is not None:
             self.set_session_factory(session_factory)
 
-        tweens   = aslist(registry.settings.get('pyramid.tweens', []))
+        tweens = aslist(registry.settings.get('pyramid.tweens', []))
         for factory in tweens:
             self._add_tween(factory, explicit=True)
 
@@ -965,11 +965,11 @@ class Configurator(
         if package is None: # pragma: no cover
             package = caller_package()
 
-        ctorkw = {'config':self}
+        ctorkw = {'config': self}
         ctorkw.update(kw)
 
         scanner = self.venusian.Scanner(**ctorkw)
-        
+
         scanner.scan(package, categories=categories, onerror=onerror,
                      ignore=ignore)
 
@@ -990,13 +990,14 @@ class Configurator(
         # Push the registry onto the stack in case any code that depends on
         # the registry threadlocal APIs used in listeners subscribed to the
         # IApplicationCreated event.
-        self.manager.push({'registry':self.registry, 'request':None})
+        self.manager.push({'registry': self.registry, 'request': None})
         try:
             self.registry.notify(ApplicationCreated(app))
         finally:
             self.manager.pop()
 
         return app
+
 
 # this class is licensed under the ZPL (stolen from Zope)
 class ActionState(object):
@@ -1151,9 +1152,9 @@ class ActionState(object):
                     # O(n lg n).
                     all_actions.extend(self.actions)
                     pending_actions = resume(resolveConflicts(
-                        executed_actions
-                        + list(pending_actions)
-                        + self.actions
+                        executed_actions +
+                        list(pending_actions) +
+                        self.actions
                     ))
                     self.actions = []
 
@@ -1287,18 +1288,20 @@ def resolveConflicts(actions):
             for _, _, action in rest:
                 includepath = action['includepath']
                 # Test whether path is a prefix of opath
-                if (includepath[:len(basepath)] != basepath # not a prefix
-                    or includepath == basepath):
+                if (includepath[:len(basepath)] != basepath or  # not a prefix
+                        includepath == basepath):
                     L = conflicts.setdefault(discriminator, [baseinfo])
                     L.append(action['info'])
 
         if conflicts:
             raise ConfigurationConflictError(conflicts)
 
-        # sort conflict-resolved actions by (order, i) and yield them one by one
+        # sort conflict-resolved actions by (order, i) and yield them one
+        # by one
         for a in [x[2] for x in sorted(output, key=operator.itemgetter(0, 1))]:
             yield a
-                
+
+
 def expand_action(discriminator, callable=None, args=(), kw=None,
                   includepath=(), info=None, order=0, introspectables=()):
     if kw is None:

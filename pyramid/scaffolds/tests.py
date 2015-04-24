@@ -10,8 +10,9 @@ try:
 except ImportError:
     import httplib
 
+
 class TemplateTest(object):
-    def make_venv(self, directory): # pragma: no cover
+    def make_venv(self, directory):  # pragma: no cover
         import virtualenv
         from virtualenv import Logger
         logger = Logger([(Logger.level_for_integer(2), sys.stdout)])
@@ -20,7 +21,8 @@ class TemplateTest(object):
                                       site_packages=False,
                                       clear=False,
                                       unzip_setuptools=True)
-    def install(self, tmpl_name): # pragma: no cover
+
+    def install(self, tmpl_name):  # pragma: no cover
         try:
             self.old_cwd = os.getcwd()
             self.directory = tempfile.mkdtemp()
@@ -58,7 +60,7 @@ class TemplateTest(object):
                     if hastoolbar:
                         assert toolbarchunk in data, ininame
                     else:
-                        assert not toolbarchunk in data, ininame
+                        assert toolbarchunk not in data, ininame
                 finally:
                     proc.terminate()
         finally:

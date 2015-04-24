@@ -22,7 +22,7 @@ from pyramid.compat import (
 
 from pyramid.decorator import reify
 from pyramid.i18n import LocalizerRequestMixin
-from pyramid.response import Response,  _get_response_factory
+from pyramid.response import Response, _get_response_factory
 from pyramid.security import (
     AuthenticationAPIMixin,
     AuthorizationAPIMixin,
@@ -37,8 +37,14 @@ class TemplateContext(object):
     pass
 
 class CallbackMethodsMixin(object):
-    response_callbacks = None
-    finished_callbacks = None
+    @reify
+    def finished_callbacks(self):
+        return deque()
+
+    @reify
+    def response_callbacks(self):
+        return deque()
+
     def add_response_callback(self, callback):
         """
         Add a callback to the set of callbacks to be called by the
@@ -64,7 +70,7 @@ class CallbackMethodsMixin(object):
         called if an exception happens in application code, or if the
         response object returned by :term:`view` code is invalid.
 
-        All response callbacks are called *after* the tweens and 
+        All response callbacks are called *after* the tweens and
         *before* the :class:`pyramid.events.NewResponse` event is sent.
 
         Errors raised by callbacks are not handled specially.  They
@@ -76,11 +82,7 @@ class CallbackMethodsMixin(object):
             See also :ref:`using_response_callbacks`.
         """
 
-        callbacks = self.response_callbacks
-        if callbacks is None:
-            callbacks = deque()
-        callbacks.append(callback)
-        self.response_callbacks = callbacks
+        self.response_callbacks.append(callback)
 
     def _process_response_callbacks(self, response):
         callbacks = self.response_callbacks
@@ -135,12 +137,7 @@ class CallbackMethodsMixin(object):
 
             See also :ref:`using_finished_callbacks`.
         """
-
-        callbacks = self.finished_callbacks
-        if callbacks is None:
-            callbacks = deque()
-        callbacks.append(callback)
-        self.finished_callbacks = callbacks
+        self.finished_callbacks.append(callback)
 
     def _process_finished_callbacks(self):
         callbacks = self.finished_callbacks
@@ -237,7 +234,7 @@ class Request(
     def json_body(self):
         return json.loads(text_(self.body, self.charset))
 
-    
+
 def route_request_iface(name, bases=()):
     # zope.interface treats the __name__ as the __doc__ and changes __name__
     # to None for interfaces that contain spaces if you do not pass a
@@ -251,8 +248,9 @@ def route_request_iface(name, bases=()):
     iface.combined = InterfaceClass(
         '%s_combined_IRequest' % name,
         bases=(iface, IRequest),
-        __doc__ = 'route_request_iface-generated combined interface')
+        __doc__='route_request_iface-generated combined interface')
     return iface
+
 
 def add_global_response_headers(request, headerlist):
     def add_headers(request, response):

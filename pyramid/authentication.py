@@ -36,6 +36,7 @@ from pyramid.util import strings_differ
 
 VALID_TOKEN = re.compile(r"^[A-Za-z][A-Za-z0-9+_-]*$")
 
+
 class CallbackAuthenticationPolicy(object):
     """ Abstract class """
 
@@ -77,10 +78,10 @@ class CallbackAuthenticationPolicy(object):
             debug and self._log(
                 ('use of userid %r is disallowed by any built-in Pyramid '
                  'security policy, returning None' % userid),
-                'authenticated_userid' ,
+                'authenticated_userid',
                 request)
             return None
-            
+
         if self.callback is None:
             debug and self._log(
                 'there was no groupfinder callback; returning %r' % (userid,),
@@ -146,7 +147,7 @@ class CallbackAuthenticationPolicy(object):
                 request
                 )
             return effective_principals
-            
+
         if self.callback is None:
             debug and self._log(
                 'groupfinder callback is None, so groups is []',
@@ -178,8 +179,9 @@ class CallbackAuthenticationPolicy(object):
                 effective_principals,),
             'effective_principals',
             request
-             )
+        )
         return effective_principals
+
 
 @implementer(IAuthenticationPolicy)
 class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
@@ -248,7 +250,7 @@ class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
                 'authenticated_userid',
                 request)
             return None
-            
+
         if self._clean_principal(userid) is None:
             self.debug and self._log(
                 ('use of userid %r is disallowed by any built-in Pyramid '
@@ -336,7 +338,7 @@ class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
 
     def remember(self, request, userid, **kw):
         """ Store the ``userid`` as ``repoze.who.userid``.
-        
+
         The identity to authenticated to :mod:`repoze.who`
         will contain the given userid as ``userid``, and
         provide all keyword arguments as additional identity
@@ -839,15 +841,15 @@ class AuthTktCookieHelper(object):
                  hashalg='md5', parent_domain=False, domain=None):
 
         serializer = _SimpleSerializer()
-            
+
         self.cookie_profile = CookieProfile(
-            cookie_name = cookie_name,
-            secure = secure,
-            max_age = max_age,
-            httponly = http_only,
-            path = path,
+            cookie_name=cookie_name,
+            secure=secure,
+            max_age=max_age,
+            httponly=http_only,
+            path=path,
             serializer=serializer
-            )
+        )
 
         self.secret = secret
         self.cookie_name = cookie_name
@@ -882,7 +884,7 @@ class AuthTktCookieHelper(object):
         kw['domains'] = domains
         if max_age is not None:
             kw['max_age'] = max_age
-            
+
         headers = profile.get_headers(value, **kw)
         return headers
 
@@ -1187,4 +1189,3 @@ class _SimpleSerializer(object):
 
     def dumps(self, appstruct):
         return bytes_(appstruct)
-

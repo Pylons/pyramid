@@ -15,7 +15,7 @@ init_names = [ '__init__%s' % x[0] for x in imp.get_suffixes() if
 
 def caller_path(path, level=2):
     if not os.path.isabs(path):
-        module = caller_module(level+1)
+        module = caller_module(level + 1)
         prefix = package_path(module)
         path = os.path.join(prefix, path)
     return path
@@ -53,7 +53,7 @@ def package_of(pkg_or_module):
 
 def caller_package(level=2, caller_module=caller_module):
     # caller_module in arglist for tests
-    module = caller_module(level+1)
+    module = caller_module(level + 1)
     f = getattr(module, '__file__', '')
     if (('__init__.py' in f) or ('__init__$py' in f)): # empty at >>>
         # Module is a package

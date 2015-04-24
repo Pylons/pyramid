@@ -107,12 +107,14 @@ class static_view(object):
             raise HTTPNotFound('Out of bounds: %s' % request.url)
 
         if self.package_name: # package resource
-
-            resource_path ='%s/%s' % (self.docroot.rstrip('/'), path)
+            resource_path = '%s/%s' % (self.docroot.rstrip('/'), path)
             if resource_isdir(self.package_name, resource_path):
                 if not request.path_url.endswith('/'):
                     self.add_slash_redirect(request)
-                resource_path = '%s/%s' % (resource_path.rstrip('/'),self.index)
+                resource_path = '%s/%s' % (
+                    resource_path.rstrip('/'), self.index
+                )
+
             if not resource_exists(self.package_name, resource_path):
                 raise HTTPNotFound(request.url)
             filepath = resource_filename(self.package_name, resource_path)

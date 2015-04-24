@@ -20,7 +20,7 @@ class OverrideProvider(pkg_resources.DefaultProvider):
         reg = get_current_registry()
         overrides = reg.queryUtility(IPackageOverrides, self.module_name)
         return overrides
-    
+
     def get_resource_filename(self, manager, resource_name):
         """ Return a true filesystem path for resource_name,
         co-ordinating the extraction with manager, if the resource
@@ -33,12 +33,12 @@ class OverrideProvider(pkg_resources.DefaultProvider):
                 return filename
         return pkg_resources.DefaultProvider.get_resource_filename(
             self, manager, resource_name)
-    
+
     def get_resource_stream(self, manager, resource_name):
         """ Return a readable file-like object for resource_name."""
         overrides = self._get_overrides()
         if overrides is not None:
-            stream =  overrides.get_stream(resource_name)
+            stream = overrides.get_stream(resource_name)
             if stream is not None:
                 return stream
         return pkg_resources.DefaultProvider.get_resource_stream(
@@ -387,5 +387,3 @@ class AssetsConfiguratorMixin(object):
         self.action(None, register, introspectables=(intr,))
 
     override_resource = override_asset # bw compat
-
-
