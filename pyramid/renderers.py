@@ -280,7 +280,7 @@ class JSON(object):
 
 json_renderer_factory = JSON() # bw compat
 
-JSONP_VALID_CALLBACK = re.compile(r"^[a-zA-Z_$][0-9a-zA-Z_$]+$")
+JSONP_VALID_CALLBACK = re.compile(r"^[$a-z_][$0-9a-z_\.\[\]]+[^.]$", re.I)
 
 class JSONP(JSON):
     """ `JSONP <http://en.wikipedia.org/wiki/JSONP>`_ renderer factory helper
@@ -363,10 +363,11 @@ class JSONP(JSON):
 
                 if callback is not None:
                     if not JSONP_VALID_CALLBACK.match(callback):
-                        raise HTTPBadRequest('Invalid JSONP callback function name.')
+                        raise HTTPBadRequest(
+                            'Invalid JSONP callback function name.')
 
                     ct = 'application/javascript'
-                    body = '%s(%s)' % (callback, val)
+                    body = '/**/{0}({1});'.format(callback, val)
                 response = request.response
                 if response.content_type == response.default_content_type:
                     response.content_type = ct
