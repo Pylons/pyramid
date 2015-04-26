@@ -669,7 +669,17 @@ class TestJSONP(unittest.TestCase):
         request = testing.DummyRequest()
         request.GET['callback'] = 'callback'
         result = renderer({'a':'1'}, {'request':request})
-        self.assertEqual(result, 'callback({"a": "1"});')
+        self.assertEqual(result, '/**/callback({"a": "1"});')
+        self.assertEqual(request.response.content_type,
+                         'application/javascript')
+
+    def test_render_to_jsonp_with_dot(self):
+        renderer_factory = self._makeOne()
+        renderer = renderer_factory(None)
+        request = testing.DummyRequest()
+        request.GET['callback'] = 'angular.callbacks._0'
+        result = renderer({'a':'1'}, {'request':request})
+        self.assertEqual(result, '/**/angular.callbacks._0({"a": "1"});')
         self.assertEqual(request.response.content_type,
                          'application/javascript')
 
