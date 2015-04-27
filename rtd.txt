@@ -1,5 +1,1 @@
-Sphinx >= 1.2.3
-repoze.sphinx.autointerface
-repoze.lru
-pylons_sphinx_latesturl
-pylons-sphinx-themes
+-e .[docs]
