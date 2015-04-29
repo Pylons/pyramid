@@ -1,3 +1,0 @@
-[submodule "docs/_themes"]
-	path = docs/_themes
-	url = git://github.com/Pylons/pylons_sphinx_theme.git

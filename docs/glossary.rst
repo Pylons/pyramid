@@ -727,6 +727,13 @@ Glossary
      translation domain is represnted by a collection of ``.mo`` files
      within one or more :term:`translation directory` directories.
 
+   Translation Context
+     A string representing the "context" in which a translation was
+     made within a given :term:`translation domain`. See the gettext
+     documentation, `11.2.5 Using contexts for solving ambiguities
+     <https://www.gnu.org/software/gettext/manual/gettext.html#Contexts>`_
+     for more information.
+
    Translator
      A callable which receives a :term:`translation string` and returns a
      translated Unicode object for the purposes of internationalization.  A
