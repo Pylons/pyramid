@@ -1,4 +1,4 @@
-1.4.8 (2014-04-28)
+1.4.9 (2014-04-28)
 ==================
 
 - Further fix the JSONP renderer by prefixing the returned content with
@@ -8,6 +8,11 @@
 - Allow periods and brackets (``[]``) in the JSONP callback. The original
   fix was overly-restrictive and broke Angular.
   See https://github.com/Pylons/pyramid/pull/1647
+
+1.4.8 (2015-04-14)
+==================
+
+- 1.4.7 had some missing files.
 
 1.4.7 (2015-04-14)
 ==================
