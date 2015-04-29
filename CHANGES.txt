@@ -1,3 +1,14 @@
+unreleased
+==========
+
+- Further fix the JSONP renderer by prefixing the returned content with
+  a comment. This should mitigate attacks from Flash (See CVE-2014-4671).
+  See https://github.com/Pylons/pyramid/pull/1647
+
+- Allow periods and brackets (``[]``) in the JSONP callback. The original
+  fix was overly-restrictive and broke Angular.
+  See https://github.com/Pylons/pyramid/pull/1647
+
 1.4.7 (2015-04-14)
 ==================
 
