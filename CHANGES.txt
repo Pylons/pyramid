@@ -1,5 +1,7 @@
-unreleased
-==========
+.. _changes_1.5.7:
+
+1.5.7 (2015-04-28)
+==================
 
 - Further fix the JSONP renderer by prefixing the returned content with
   a comment. This should mitigate attacks from Flash (See CVE-2014-4671).
