@@ -512,6 +512,92 @@ time at start up as a cachebust token:
 .. index::
    single: static assets view
 
+CSS and JavaScript source and cache busting
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Often one needs to refer to images and other static assets
+inside CSS and JavaScript files. If cache busting is active,
+the final static asset URL is not available until the static
+assets have been assembled. These URLs cannot be handwritten.
+Thus, when having static asset references in CSS and JavaScript,
+one needs either
+
+* Process the files e.g. by using precompiler which rewrites URLs
+  to their final cache busted form
+
+* Templatize JS and CSS and call ``request.static_url()``
+  inside their template code
+
+* Pass static URL references to CSS and JavaScript via other means
+
+Below are some simple approaches for CSS and JS programming
+which consider asset cache busting.
+These approaches do not require additional tools or packages.
+
+Relative cache busted URLs in CSS
++++++++++++++++++++++++++++++++++
+
+Consider the following CSS example file ``/static/theme/css/site.css``:
+
+.. code-block:: css
+
+    body {
+        background: url(/static/theme/img/background.jpg);
+    }
+
+Any changes to ``background.jpg`` would not materialize on the
+file content change if static asset cache busting is in use.
+The final URL of the background image, with the default
+``PathSegmentCacheBuster`` cache busting mechanism, should be::
+
+    https://site/static/1eeb262c717/theme/img/background.jpg
+
+Every time the image is updated the URL changes, so it is not practical
+to write this non-human readable URL into a CSS file.
+
+However, because the CSS file itself is cache busted
+and living under ``static`` asset, relative references work fine.
+You can write:
+
+.. code-block:: css
+
+    body {
+        background: url(../img/background.jpg);
+    }
+
+And the browser would interpret this having the CSS file hash in URL::
+
+    https://site/static/ab234b262c71/theme/css/../img/background.jpg
+
+The downside of this approach is that if the background image changes,
+one needs to bump the CSS file. The CSS file hash change signals the caches
+that the image in CSS relative URL has been changed. When updating
+CSS and related image assets, updates usually happen hand in hand, so this
+does not add extra effort to theming workflow.
+
+Passing cache busted URLs to JavaScript
++++++++++++++++++++++++++++++++++++++++
+
+For JavaScript, one can pass static asset URLs as
+function arguments or globals. The globals can be generated in page
+template code, having access to ``request.static_url()`` function.
+
+Below is a simple example of passing a cached busted image URL in
+Jinja 2 template language. Put into ``<head>`` section of the relevant page:
+
+.. code-block:: html
+
+    <script>
+        window.assets.backgroundImage =
+            "{{ '/theme/img/background.jpg'|static_url() }}";
+    </script>
+
+Then in your main ``site.js`` file you can do:
+
+.. code-block:: javascript
+
+    var image = new Image(window.assets.backgroundImage);
+
 .. _advanced_static:
 
 Advanced: Serving Static Assets Using a View Callable
