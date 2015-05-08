@@ -25,7 +25,7 @@ Steps
     $ cd ..; cp -r view_classes static_assets; cd static_assets
     $ $VENV/bin/python setup.py develop
 
-#. We add a call ``config.add_static_view in
+#. We add a call ``config.add_static_view`` in
    ``static_assets/tutorial/__init__.py``:
 
    .. literalinclude:: static_assets/tutorial/__init__.py
