@@ -93,7 +93,7 @@ In summary: ``hello`` wants ``edit`` permission, ``Root`` says
 Of course, this only applies on ``Root``. Some other part of the site
 (a.k.a. *context*) might have a different ACL.
 
-If you are not logged in and visit ``/hello``, you need to get
+If you are not logged in and visit ``/howdy``, you need to get
 shown the login screen. How does Pyramid know what is the login page to
 use? We explicitly told Pyramid that the ``login`` view should be used
 by decorating the view with ``@forbidden_view_config``.
