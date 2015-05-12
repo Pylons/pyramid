@@ -51,6 +51,7 @@ extensions = [
     'sphinx.ext.doctest',
     'repoze.sphinx.autointerface',
     'sphinx.ext.viewcode',
+    'pylons_sphinx_latesturl',
 #    'sphinx.ext.intersphinx'
     ]
 
