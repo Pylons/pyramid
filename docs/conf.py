@@ -129,13 +129,27 @@ if book:
 
 # Options for HTML output
 # -----------------------
-
+pylons_sphinx_latesturl_base = (
+    'http://docs.pylonsproject.org/projects/pyramid/en/latest/')
+pylons_sphinx_latesturl_pagename_overrides = {
+    # map old pagename -> new pagename
+    'whatsnew-1.0': 'index',
+    'whatsnew-1.1': 'index',
+    'whatsnew-1.2': 'index',
+    'whatsnew-1.3': 'index',
+    'whatsnew-1.4': 'index',
+    'tutorials/gae/index': 'index',
+    'api/chameleon_text': 'api',
+    'api/chameleon_zpt': 'api',
+}
 # Add and use Pylons theme
 html_theme = 'pyramid'
 html_theme_path = pylons_sphinx_themes.get_html_themes_path()
 html_theme_options = dict(
     github_url='https://github.com/Pylons/pyramid',
+    latest_url='http://docs.pylonsproject.org/projects/pyramid/en/latest/',
 #    in_progress='true',
+    outdated='true',
     )
 # The style sheet to use for HTML and HTML Help pages. A file of that name
 # must exist either in Sphinx' static/ path, or in one of the custom paths
