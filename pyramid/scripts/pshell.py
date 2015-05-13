@@ -1,3 +1,4 @@
+from __future__ import print_function
 from code import interact
 import optparse
 import os
@@ -40,7 +41,7 @@ class PShellCommand(object):
         )
     parser.add_option('-p', '--python-shell',
                       action='store', type='string', dest='python_shell',
-                      default='', help='ipython | bpython | python')
+                      default='', help='ipython | bpython | ptpython | ptipython | python')
     parser.add_option('--setup',
                       dest='setup',
                       help=("A callable that will be passed the environment "
@@ -165,12 +166,20 @@ class PShellCommand(object):
             shell = self.make_ipython_shell()
             if shell is None:
                 shell = self.make_bpython_shell()
+            if shell is None:
+                shell = self.make_ptpython_shell()
 
         elif user_shell == 'ipython':
             shell = self.make_ipython_shell()
 
         elif user_shell == 'bpython':
             shell = self.make_bpython_shell()
+
+        elif user_shell == 'ptpython':
+            shell = self.make_ptpython_shell()
+
+        elif user_shell == 'ptipython':
+            shell = self.make_ptipython_shell()
 
         if shell is None:
             shell = self.make_default_shell()
@@ -183,6 +192,30 @@ class PShellCommand(object):
             banner = "Python %s on %s\n%s" % (sys.version, sys.platform, cprt)
             banner += '\n\n' + help + '\n'
             interact(banner, local=env)
+        return shell
+
+    def make_ptpython_shell(self, PTPShell=None):
+        if PTPShell is None:  # pragma: no cover
+            try:
+                from ptpython.repl import embed
+                def PTPShell(banner, **kwargs):
+                    print(banner)
+                    return embed(**kwargs)
+            except ImportError:
+                return None
+        def shell(env, help):
+            PTPShell(banner=help, locals=env)
+        return shell
+
+    def make_ptipython_shell(self, PTIPShell=None):
+        if PTIPShell is None:  # pragma: no cover
+            try:
+                from ptpython.ipython import embed
+                PTIPShell = embed
+            except ImportError:
+                return None
+        def shell(env, help):
+            PTIPShell(banner2=help + '\n', user_ns=env)
         return shell
 
     def make_bpython_shell(self, BPShell=None):

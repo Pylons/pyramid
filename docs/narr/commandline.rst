@@ -273,20 +273,21 @@ exposed, and the request is configured to generate urls from the host
 
 .. _ipython_or_bpython:
 
-IPython or bpython
-~~~~~~~~~~~~~~~~~~
+IPython, bpython or ptpython
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you have `IPython <http://en.wikipedia.org/wiki/IPython>`_ and/or
-`bpython <http://bpython-interpreter.org/>`_ in
+If you have `IPython <http://en.wikipedia.org/wiki/IPython>`_,
+`bpython <http://bpython-interpreter.org/>`_ and/or
+`ptpython <https://github.com/jonathanslenders/ptpython>` in
 the interpreter you use to invoke the ``pshell`` command, ``pshell`` will 
 autodiscover and use the first one found, in this order:
-IPython, bpython, standard Python interpreter. However you could 
+IPython, bpython, ptpython, standard Python interpreter. However you could
 specifically invoke one of your choice with the ``-p choice`` or 
 ``--python-shell choice`` option.
 
 .. code-block:: text
 
-   $ $VENV/bin/pshell -p ipython | bpython | python development.ini#MyProject
+   $ $VENV/bin/pshell -p ipython | bpython | ptpython | ptipython | python development.ini#MyProject
 
 .. index::
    pair: routes; printing
