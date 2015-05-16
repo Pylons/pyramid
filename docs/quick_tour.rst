@@ -505,7 +505,7 @@ Let's look at ``pserve`` and configuration in more depth.
 Application Running with ``pserve``
 ===================================
 
-Prior to scaffolds, our project mixed a number of operations details
+Prior to scaffolds, our project mixed a number of operational details
 into our code. Why should my main code care which HTTP server I want and
 what port number to run on?
 
