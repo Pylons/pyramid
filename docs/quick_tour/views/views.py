@@ -23,7 +23,7 @@ def redirect_view(request):
     return HTTPFound(location="/problem")
 
 
-# /problem which causes an site error
+# /problem which causes a site error
 @view_config(route_name='exception')
 def exception_view(request):
     raise Exception()
