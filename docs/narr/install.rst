@@ -32,13 +32,11 @@ dependency will fall back to using pure Python instead.
 For Mac OS X Users
 ~~~~~~~~~~~~~~~~~~
 
-From `Python.org <http://python.org/download/mac/>`_:
-
-    Python comes pre-installed on Mac OS X, but due to Apple's release cycle,
-    it's often one or even two years old. The overwhelming recommendation of
-    the "MacPython" community is to upgrade your Python by downloading and
-    installing a newer version from `the Python standard release page
-    <http://python.org/download/releases/>`_.
+Python comes pre-installed on Mac OS X, but due to Apple's release cycle, it's
+often one or even two years old. The overwhelming recommendation of the
+"MacPython" community is to upgrade your Python by downloading and installing
+a newer version from `the Python standard release page
+<https://www.python.org/downloads/>`_.
 
 It is recommended to download one of the *installer* versions, unless you
 prefer to install your Python through a packgage manager (e.g., macports or
