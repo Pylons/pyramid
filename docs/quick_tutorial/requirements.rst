@@ -58,11 +58,8 @@ Steps
 Install Python 3.3 or greater
 -----------------------------
 
-Download the latest standard Python 3.3+ release (not development
-release) from
-`python.org <http://www.python.org/download/releases/>`_.  On that page, you
-must click the latest version, then scroll down to the "Downloads" section
-for your operating system.
+Download the latest standard Python 3.3+ release (not development release)
+from `python.org <https://www.python.org/downloads/>`_.
 
 Windows and Mac OS X users can download and run an installer.
 
@@ -73,8 +70,7 @@ directions. Make sure you get the proper 32- or 64-bit build and Python
 version.
 
 Linux users can either use their package manager to install Python 3.3
-or may
-`build Python 3.3 from source
+or may `build Python 3.3 from source
 <http://pyramid.readthedocs.org/en/master/narr/install.html#package-manager-
 method>`_.
 
