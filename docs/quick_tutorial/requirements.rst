@@ -82,13 +82,21 @@ Create a project directory structure
 
 We will arrive at a directory structure of
 ``workspace->project->package``, with our workspace named
-``quick_tutorial``. The following diagram shows how this is structured
-and where our virtual environment will reside:
+``quick_tutorial``. The following tree diagram shows how this will be
+structured and where our virtual environment will reside as we proceed through
+the tutorial:
 
-.. figure:: ../_static/directory_structure_pyramid.png
-   :alt: Final directory structure
+.. code-block:: text
 
-   Final directory structure.
+    └── ~
+        └── projects
+            └── quick_tutorial
+                ├── env
+                └── step_one
+                    ├── intro
+                    │   ├── __init__.py
+                    │   └── app.py
+                    └── setup.py
 
 For Linux, the commands to do so are as follows:
 
@@ -132,11 +140,11 @@ environment. We set an environment variable to save typing later.
 .. code-block:: bash
 
     # Mac and Linux
-    $ export VENV=~/projects/quick_tutorial/env33/
+    $ export VENV=~/projects/quick_tutorial/env
 
     # Windows
     # TODO: This command does not work
-    c:\> set VENV=c:\projects\quick_tutorial\env33
+    c:\> set VENV=c:\projects\quick_tutorial\env
 
 
 .. _create-a-virtual-environment:
