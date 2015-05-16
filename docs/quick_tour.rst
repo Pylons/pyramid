@@ -627,7 +627,7 @@ You'll now see an attractive (and
 collapsible) menu in the right of your browser, providing introspective
 access to debugging information. Even better, if your web application
 generates an error, you will see a nice traceback on the screen. When
-you want to disable this toolbar, no need to change code: you can
+you want to disable this toolbar, there's no need to change code: you can
 remove it from ``pyramid.includes`` in the relevant ``.ini``
 configuration file.
 
