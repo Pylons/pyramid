@@ -14,11 +14,10 @@ Installation
 
 Once you have a standard Python environment setup, getting started with
 Pyramid is a breeze. Unfortunately "standard" is not so simple in Python.
-For this Quick Tour, it means:
-`Python <http://www.python.org/download/releases/>`_, a
-`virtual environment <http://docs.python.org/dev/library/venv.html>`_
-(or `virtualenv for Python 2.7 <https://pypi.python.org/pypi/virtualenv>`_),
-and `setuptools <https://pypi.python.org/pypi/setuptools/>`_.
+For this Quick Tour, it means: `Python <https://www.python.org/downloads/>`_,
+a `virtual environment <http://docs.python.org/dev/library/venv.html>`_ (or
+`virtualenv for Python 2.7 <https://pypi.python.org/pypi/virtualenv>`_), and
+`setuptools <https://pypi.python.org/pypi/setuptools/>`_.
 
 As an example, for Python 3.3+ on Linux:
 
