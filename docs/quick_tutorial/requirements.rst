@@ -58,11 +58,8 @@ Steps
 Install Python 3.3 or greater
 -----------------------------
 
-Download the latest standard Python 3.3+ release (not development
-release) from
-`python.org <http://www.python.org/download/releases/>`_.  On that page, you
-must click the latest version, then scroll down to the "Downloads" section
-for your operating system.
+Download the latest standard Python 3.3+ release (not development release)
+from `python.org <https://www.python.org/downloads/>`_.
 
 Windows and Mac OS X users can download and run an installer.
 
@@ -73,8 +70,7 @@ directions. Make sure you get the proper 32- or 64-bit build and Python
 version.
 
 Linux users can either use their package manager to install Python 3.3
-or may
-`build Python 3.3 from source
+or may `build Python 3.3 from source
 <http://pyramid.readthedocs.org/en/master/narr/install.html#package-manager-
 method>`_.
 
@@ -86,13 +82,21 @@ Create a project directory structure
 
 We will arrive at a directory structure of
 ``workspace->project->package``, with our workspace named
-``quick_tutorial``. The following diagram shows how this is structured
-and where our virtual environment will reside:
+``quick_tutorial``. The following tree diagram shows how this will be
+structured and where our virtual environment will reside as we proceed through
+the tutorial:
 
-.. figure:: ../_static/directory_structure_pyramid.png
-   :alt: Final directory structure
+.. code-block:: text
 
-   Final directory structure.
+    └── ~
+        └── projects
+            └── quick_tutorial
+                ├── env
+                └── step_one
+                    ├── intro
+                    │   ├── __init__.py
+                    │   └── app.py
+                    └── setup.py
 
 For Linux, the commands to do so are as follows:
 
@@ -136,11 +140,11 @@ environment. We set an environment variable to save typing later.
 .. code-block:: bash
 
     # Mac and Linux
-    $ export VENV=~/projects/quick_tutorial/env33/
+    $ export VENV=~/projects/quick_tutorial/env
 
     # Windows
     # TODO: This command does not work
-    c:\> set VENV=c:\projects\quick_tutorial\env33
+    c:\> set VENV=c:\projects\quick_tutorial\env
 
 
 .. _create-a-virtual-environment:

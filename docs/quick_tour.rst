@@ -14,11 +14,10 @@ Installation
 
 Once you have a standard Python environment setup, getting started with
 Pyramid is a breeze. Unfortunately "standard" is not so simple in Python.
-For this Quick Tour, it means:
-`Python <http://www.python.org/download/releases/>`_, a
-`virtual environment <http://docs.python.org/dev/library/venv.html>`_
-(or `virtualenv for Python 2.7 <https://pypi.python.org/pypi/virtualenv>`_),
-and `setuptools <https://pypi.python.org/pypi/setuptools/>`_.
+For this Quick Tour, it means: `Python <https://www.python.org/downloads/>`_,
+a `virtual environment <http://docs.python.org/dev/library/venv.html>`_ (or
+`virtualenv for Python 2.7 <https://pypi.python.org/pypi/virtualenv>`_), and
+`setuptools <https://pypi.python.org/pypi/setuptools/>`_.
 
 As an example, for Python 3.3+ on Linux:
 
@@ -505,7 +504,7 @@ Let's look at ``pserve`` and configuration in more depth.
 Application Running with ``pserve``
 ===================================
 
-Prior to scaffolds, our project mixed a number of operations details
+Prior to scaffolds, our project mixed a number of operational details
 into our code. Why should my main code care which HTTP server I want and
 what port number to run on?
 
@@ -627,7 +626,7 @@ You'll now see an attractive (and
 collapsible) menu in the right of your browser, providing introspective
 access to debugging information. Even better, if your web application
 generates an error, you will see a nice traceback on the screen. When
-you want to disable this toolbar, no need to change code: you can
+you want to disable this toolbar, there's no need to change code: you can
 remove it from ``pyramid.includes`` in the relevant ``.ini``
 configuration file.
 
