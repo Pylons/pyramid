@@ -74,11 +74,11 @@ You'll now see an attractive button on the right side of your browser, which
 you may click to provide introspective access to debugging information in a
 new browser tab. Even better, if your web application generates an error, you
 will see a nice traceback on the screen. When you want to disable this
-toolbar, no need to change code: you can remove it from ``pyramid.includes``
-in the relevant ``.ini`` configuration file (thus showing why configuration
-files are handy.)
+toolbar, there's no need to change code: you can remove it from
+``pyramid.includes`` in the relevant ``.ini`` configuration file (thus showing
+why configuration files are handy.)
 
-Note that the toolbar injects a small amount of html/css into your app just
+Note that the toolbar injects a small amount of HTML/CSS into your app just
 before the closing ``</body>`` tag in order to display itself. If you start to
 experience otherwise inexplicable client-side weirdness, you can shut it off
 by commenting out the ``pyramid_debugtoolbar`` line in ``pyramid.includes``
