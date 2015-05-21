@@ -51,7 +51,7 @@ Steps
     :linenos:
 
 #. Our unit tests in ``view_classes/tutorial/tests.py`` don't run,
-   so let's modify the to import the view class and make an instance
+   so let's modify them to import the view class and make an instance
    before getting a response:
 
    .. literalinclude:: view_classes/tutorial/tests.py
@@ -88,7 +88,7 @@ view class, then updated the tests.
 In our ``TutorialViews`` view class you can see that our two view
 classes are logically grouped together as methods on a common class.
 Since the two views shared the same template, we could move that to a
-``@view_defaults`` decorator on at the class level.
+``@view_defaults`` decorator at the class level.
 
 The tests needed to change. Obviously we needed to import the view
 class. But you can also see the pattern in the tests of instantiating
