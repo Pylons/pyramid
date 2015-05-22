@@ -95,6 +95,23 @@ Steps
    .. literalinclude:: more_view_classes/tutorial/delete.pt
     :language: html
 
+#. Our tests in ``more_view_classes/tutorial/tests.py`` fail, so let's modify
+   them:
+
+   .. literalinclude:: more_view_classes/tutorial/tests.py
+    :linenos:
+
+#. Now run the tests:
+
+   .. code-block:: bash
+
+    $ $VENV/bin/nosetests tutorial
+    .
+    ----------------------------------------------------------------------
+    Ran 2 tests in 0.248s
+
+    OK
+
 #. Run your Pyramid application with:
 
    .. code-block:: bash
@@ -125,7 +142,7 @@ Specifically:
 - The fourth view is returned when clicking on a button such
   as ``<input type="submit" name="form.delete" value="Delete"/>``.
 
-In this step we show using the following information as criteria to
+In this step we show, using the following information as criteria, how to
 decide which view to use:
 
 - Method of the HTTP request (``GET``, ``POST``, etc.)
