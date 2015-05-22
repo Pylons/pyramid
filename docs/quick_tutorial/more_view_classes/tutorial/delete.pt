@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Quick Tour: ${page_title}</title>
+    <title>Quick Tutorial: ${page_title}</title>
 </head>
 <body>
 <h1>${view.view_name} - ${page_title}</h1>
