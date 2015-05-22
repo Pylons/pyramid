@@ -14,7 +14,7 @@ Writing web applications usually means sophisticated URL design. We
 just saw some Pyramid machinery for requests and views. Let's look at
 features that help in routing.
 
-Previously we saw the basics of routing URLs to views in
+Previously we saw the basics of routing URLs to views in Pyramid.
 
 - Your project's "setup" code registers a route name to be used when
   matching part of the URL
