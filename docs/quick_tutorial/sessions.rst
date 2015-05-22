@@ -89,7 +89,7 @@ when you add an item using a form ``POST``, the site usually issues a
 second HTTP Redirect web request to view the new item. You might want a
 message to appear after that second web request saying "Your item was
 added." You can't just return it in the web response for the POST,
-as it will be tossed out during the second web requests.
+as it will be tossed out during the second web request.
 
 Flash messages are a technique where messages can be stored between
 requests, using sessions, then removed when they finally get displayed.
