@@ -12,13 +12,13 @@ Background
 Modern web applications deal extensively with forms. Developers,
 though, have a wide range of philosophies about how frameworks should
 help them with their forms. As such, Pyramid doesn't directly bundle
-one particular form library. Instead, there are a variety of form
+one particular form library. Instead there are a variety of form
 libraries that are easy to use in Pyramid.
 
 :ref:`Deform <deform:overview>`
 is one such library. In this step, we introduce Deform for our
-forms and validation. This also gives us the
-:ref:`Colander <colander:overview>` for schemas and validation.
+forms and validation. This also gives us :ref:`Colander <colander:overview>`
+for schemas and validation.
 
 Deform is getting a facelift, with styling from Twitter Bootstrap and
 advanced widgets from popular JavaScript projects. The work began in
