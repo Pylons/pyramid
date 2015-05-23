@@ -11,7 +11,7 @@ Background
 Our application has URLs that allow people to add/edit/delete content
 via a web browser. Time to add security to the application. Let's
 protect our add/edit views to require a login (username of
-``editor`` and password of ``editor``.) We will allow the other views
+``editor`` and password of ``editor``). We will allow the other views
 to continue working without a password.
 
 Objectives
@@ -101,7 +101,7 @@ by decorating the view with ``@forbidden_view_config``.
 Extra Credit
 ============
 
-#. Perhaps you would like experience of not having enough permissions
+#. Perhaps you would like the experience of not having enough permissions
    (forbidden) to be richer. How could you change this?
 
 #. Perhaps we want to store security statements in a database and
