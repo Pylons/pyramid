@@ -11,8 +11,8 @@ The request object has a dictionary as an attribute named ``matchdict``.  A
 substrings of the path in the :term:`request` URL. For instance, if a call to
 :meth:`pyramid.config.Configurator.add_route` has the pattern ``/{one}/{two}``,
 and a user visits ``http://example.com/foo/bar``, our pattern would be matched
-against ``/foo/bar`` and the ``matchdict`` would look like: ``{'one':'foo',
-'two':'bar'}``
+against ``/foo/bar`` and the ``matchdict`` would look like ``{'one':'foo',
+'two':'bar'}``.
 
 Declaring Dependencies in Our ``setup.py`` File
 ===============================================
@@ -32,7 +32,7 @@ Open ``tutorial/setup.py`` and edit it to look like the following:
    :language: python
    :emphasize-lines: 20
 
-(Only the highlighted line needs to be added.)
+Only the highlighted line needs to be added.
 
 Running ``setup.py develop``
 ============================
@@ -71,9 +71,9 @@ It's time for a major change.  Open ``tutorial/tutorial/views.py`` and edit it t
 .. literalinclude:: src/views/tutorial/views.py
    :linenos:
    :language: python
-   :emphasize-lines: 1-7,12,15-70
+   :emphasize-lines: 1-7,14,16-72
 
-(The highlighted lines are the ones that need to be added or edited.)
+The highlighted lines are the ones that need to be added or edited.
 
 We got rid of the ``my_view`` view function and its decorator that was
 added when we originally rendered the ``alchemy`` scaffold.  It was only an
@@ -93,7 +93,7 @@ afterward.
 .. note::
 
   There is nothing special about the filename ``views.py``.  A project may
-  have many view callables throughout its codebase in arbitrarily-named
+  have many view callables throughout its codebase in arbitrarily named
   files.  Files implementing view callables often have ``view`` in their
   filenames (or may live in a Python subpackage of your application package
   named ``views``), but this is only by convention.
@@ -106,7 +106,8 @@ is made to the root URL of our wiki.  It always redirects to
 a URL which represents the path to our "FrontPage".
 
 .. literalinclude:: src/views/tutorial/views.py
-   :lines: 18-21
+   :lines: 20-24
+   :lineno-start: 20
    :linenos:
    :language: python
 
@@ -116,8 +117,8 @@ the :class:`pyramid.interfaces.IResponse` interface like
 :class:`pyramid.response.Response` does).
 
 It uses the :meth:`pyramid.request.Request.route_url` API to construct a 
-URL to the ``FrontPage`` page (e.g. ``http://localhost:6543/FrontPage``), which 
-is used as the "location" of the ``HTTPFound`` response, forming an HTTP redirect.
+URL to the ``FrontPage`` page (e.g., ``http://localhost:6543/FrontPage``), which 
+is used as the location of the ``HTTPFound`` response, forming an HTTP redirect.
 
 The ``view_page`` view function
 -------------------------------
@@ -129,7 +130,8 @@ HTML anchor for each *WikiWord* reference in the rendered HTML using a
 compiled regular expression.
 
 .. literalinclude:: src/views/tutorial/views.py
-   :lines: 23-43
+   :lines: 25-45
+   :lineno-start: 25
    :linenos:
    :language: python
 
@@ -165,25 +167,26 @@ request passed to the ``add_page()`` view will have the values we need
 to construct URLs and find model objects.
 
 .. literalinclude:: src/views/tutorial/views.py
-   :lines: 45-56
+   :lines: 47-58
+   :lineno-start: 47
    :linenos:
    :language: python
 
 The ``matchdict`` will have a ``'pagename'`` key that matches the name of
 the page we'd like to add.  If our add view is invoked via,
-e.g. ``http://localhost:6543/add_page/SomeName``, the value for
+e.g., ``http://localhost:6543/add_page/SomeName``, the value for
 ``'pagename'`` in the ``matchdict`` will be ``'SomeName'``.
 
-If the view execution *is* a result of a form submission (i.e. the expression
-``'form.submitted' in request.params`` is ``True``), we scrape the page body
+If the view execution *is* a result of a form submission (i.e., the expression
+``'form.submitted' in request.params`` is ``True``), we grab the page body
 from the form data, create a Page object with this page body and the name
 taken from ``matchdict['pagename']``, and save it into the database using
 ``DBSession.add``.  We then redirect back to the ``view_page`` view for the
 newly created page.
 
-If the view execution is *not* a result of a form submission (i.e. the
+If the view execution is *not* a result of a form submission (i.e., the
 expression ``'form.submitted' in request.params`` is ``False``), the view
-callable renders a template.  To do so, it generates a "save url" which the
+callable renders a template.  To do so, it generates a ``save_url`` which the
 template uses as the form post URL during rendering.  We're lazy here, so
 we're going to use the same template (``templates/edit.pt``) for the add
 view as well as the page edit view. To do so we create a dummy Page object
@@ -201,17 +204,18 @@ request passed to the ``edit_page`` view will have a ``'pagename'`` key
 matching the name of the page the user wants to edit.
 
 .. literalinclude:: src/views/tutorial/views.py
-   :lines: 58-70
+   :lines: 60-72
+   :lineno-start: 60
    :linenos:
    :language: python
 
-If the view execution *is* a result of a form submission (i.e. the expression
+If the view execution *is* a result of a form submission (i.e., the expression
 ``'form.submitted' in request.params`` is ``True``), the view grabs the
 ``body`` element of the request parameters and sets it as the ``data``
 attribute of the page object.  It then redirects to the ``view_page`` view
 of the wiki page.
 
-If the view execution is *not* a result of a form submission (i.e. the
+If the view execution is *not* a result of a form submission (i.e., the
 expression ``'form.submitted' in request.params`` is ``False``), the view
 simply renders the edit form, passing the page object and a ``save_url``
 which will be used as the action of the generated form.
@@ -233,18 +237,18 @@ content:
 
 .. literalinclude:: src/views/tutorial/templates/view.pt
    :linenos:
-   :language: xml
+   :language: html
 
 This template is used by ``view_page()`` for displaying a single
 wiki page. It includes:
 
 - A ``div`` element that is replaced with the ``content``
-  value provided by the view (rows 45-47).  ``content``
+  value provided by the view (lines 36-38).  ``content``
   contains HTML, so the ``structure`` keyword is used
-  to prevent escaping it (i.e. changing ">" to "&gt;", etc.)
+  to prevent escaping it (i.e., changing ">" to "&gt;", etc.)
 - A link that points
   at the "edit" URL which invokes the ``edit_page`` view for
-  the page being viewed (rows 49-51).
+  the page being viewed (lines 40-42).
 
 The ``edit.pt`` Template
 ------------------------
@@ -254,18 +258,17 @@ content:
 
 .. literalinclude:: src/views/tutorial/templates/edit.pt
    :linenos:
-   :language: xml
+   :language: html
 
 This template is used by ``add_page()`` and ``edit_page()`` for adding
-and editing a wiki page.  It displays
-a page containing a form that includes:
+and editing a wiki page.  It displays a page containing a form that includes:
 
 - A 10 row by 60 column ``textarea`` field named ``body`` that is filled
-  with any existing page data when it is rendered (rows 46-47).
-- A submit button that has the name ``form.submitted`` (row 48).
+  with any existing page data when it is rendered (line 45).
+- A submit button that has the name ``form.submitted`` (line 48).
 
-The form POSTs back to the "save_url" argument supplied
-by the view (row 45).  The view will use the ``body`` and
+The form POSTs back to the ``save_url`` argument supplied
+by the view (line 43).  The view will use the ``body`` and
 ``form.submitted`` values.
 
 .. note:: Our templates use a ``request`` object that
@@ -286,12 +289,12 @@ to replicate within the body of this guide, however it is available `online
 <https://github.com/Pylons/pyramid/blob/master/docs/tutorials/wiki2/src/views/tutorial/static/pylons.css>`_.
 
 This CSS file will be accessed via
-e.g. ``http://localhost:6543/static/pylons.css`` by virtue of the call to
+``http://localhost:6543/static/pylons.css`` by virtue of the call to the
 ``add_static_view`` directive we've made in the ``__init__.py`` file.  Any
 number and type of static assets can be placed in this directory (or
 subdirectories) and are just referred to by URL or by using the convenience
-method ``static_url``
-e.g. ``request.static_url('{{package}}:static/foo.css')`` within templates.
+method ``static_url``, e.g.,
+``request.static_url('<package>:static/foo.css')`` within templates.
 
 Adding Routes to ``__init__.py``
 ================================
@@ -334,17 +337,17 @@ something like:
 
 .. literalinclude:: src/views/tutorial/__init__.py
    :linenos:
-   :language: python
    :emphasize-lines: 19-22
+   :language: python
 
-(The highlighted lines are the ones that need to be added or edited.)
+The highlighted lines are the ones that need to be added or edited.
 
 Viewing the Application in a Browser
 ====================================
 
 We can finally examine our application in a browser (See
 :ref:`wiki2-start-the-application`).  Launch a browser and visit
-each of the following URLs, check that the result is as expected:
+each of the following URLs, checking that the result is as expected:
 
 - http://localhost:6543 in a browser invokes the
   ``view_wiki`` view.  This always redirects to the ``view_page`` view
