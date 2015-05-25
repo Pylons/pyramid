@@ -24,9 +24,10 @@ following:
 .. literalinclude:: src/models/tutorial/models.py
    :linenos:
    :language: py
-   :emphasize-lines: 20-22,25
+   :emphasize-lines: 20-22,24,25
 
-(The highlighted lines are the ones that need to be changed.)
+The highlighted lines are the ones that need to be changed, as well as
+removing lines that reference ``Index``.
 
 The first thing we've done is remove the stock ``MyModel`` class
 from the generated ``models.py`` file.  The ``MyModel`` class is only a
@@ -57,8 +58,8 @@ Changing ``scripts/initializedb.py``
 
 We haven't looked at the details of this file yet, but within the ``scripts``
 directory of your ``tutorial`` package is a file named ``initializedb.py``.  Code
-in this file is executed whenever we run the ``initialize_tutorial_db`` command
-(as we did in the installation step of this tutorial).
+in this file is executed whenever we run the ``initialize_tutorial_db`` command,
+as we did in the installation step of this tutorial.
 
 Since we've changed our model, we need to make changes to our ``initializedb.py``
 script.  In particular, we'll replace our import of ``MyModel`` with one of
@@ -71,9 +72,11 @@ following:
 .. literalinclude:: src/models/tutorial/scripts/initializedb.py
    :linenos:
    :language: python
-   :emphasize-lines: 14,36
+   :emphasize-lines: 14,31,36
 
-(Only the highlighted lines need to be changed.)
+Only the highlighted lines need to be changed, as well as removing the lines
+referencing ``pyramid.scripts.common`` and ``options`` under the ``main``
+function.
 
 Installing the Project and re-initializing the Database
 -------------------------------------------------------
@@ -85,30 +88,28 @@ See :ref:`initialize_db_wiki2` for instructions.
 
 Success will look something like this::
 
-  2011-11-27 01:22:45,277 INFO  [sqlalchemy.engine.base.Engine][MainThread] 
-                                PRAGMA table_info("pages")
-  2011-11-27 01:22:45,277 INFO  [sqlalchemy.engine.base.Engine][MainThread] ()
-  2011-11-27 01:22:45,277 INFO  [sqlalchemy.engine.base.Engine][MainThread] 
-  CREATE TABLE pages (
-  	id INTEGER NOT NULL, 
-  	name TEXT, 
-  	data TEXT, 
-  	PRIMARY KEY (id), 
-  	UNIQUE (name)
-  )
+    2015-05-24 15:34:14,542 INFO  [sqlalchemy.engine.base.Engine:1192][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
+    2015-05-24 15:34:14,542 INFO  [sqlalchemy.engine.base.Engine:1193][MainThread] ()
+    2015-05-24 15:34:14,543 INFO  [sqlalchemy.engine.base.Engine:1192][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
+    2015-05-24 15:34:14,543 INFO  [sqlalchemy.engine.base.Engine:1193][MainThread] ()
+    2015-05-24 15:34:14,543 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] PRAGMA table_info("pages")
+    2015-05-24 15:34:14,544 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
+    2015-05-24 15:34:14,544 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] 
+    CREATE TABLE pages (
+            id INTEGER NOT NULL, 
+            name TEXT, 
+            data INTEGER, 
+            PRIMARY KEY (id), 
+            UNIQUE (name)
+    )
 
 
-  2011-11-27 01:22:45,278 INFO  [sqlalchemy.engine.base.Engine][MainThread] ()
-  2011-11-27 01:22:45,397 INFO  [sqlalchemy.engine.base.Engine][MainThread] 
-                                COMMIT
-  2011-11-27 01:22:45,400 INFO  [sqlalchemy.engine.base.Engine][MainThread] 
-                                BEGIN (implicit)
-  2011-11-27 01:22:45,401 INFO  [sqlalchemy.engine.base.Engine][MainThread] 
-                                INSERT INTO pages (name, data) VALUES (?, ?)
-  2011-11-27 01:22:45,401 INFO  [sqlalchemy.engine.base.Engine][MainThread] 
-                                ('FrontPage', 'This is the front page')
-  2011-11-27 01:22:45,402 INFO  [sqlalchemy.engine.base.Engine][MainThread] 
-                                COMMIT
+    2015-05-24 15:34:14,545 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
+    2015-05-24 15:34:14,546 INFO  [sqlalchemy.engine.base.Engine:686][MainThread] COMMIT
+    2015-05-24 15:34:14,548 INFO  [sqlalchemy.engine.base.Engine:646][MainThread] BEGIN (implicit)
+    2015-05-24 15:34:14,549 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] INSERT INTO pages (name, data) VALUES (?, ?)
+    2015-05-24 15:34:14,549 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ('FrontPage', 'This is the front page')
+    2015-05-24 15:34:14,550 INFO  [sqlalchemy.engine.base.Engine:686][MainThread] COMMIT
 
 Viewing the Application in a Browser
 ------------------------------------
