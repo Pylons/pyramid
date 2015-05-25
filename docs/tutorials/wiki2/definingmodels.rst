@@ -78,7 +78,7 @@ Only the highlighted lines need to be changed, as well as removing the lines
 referencing ``pyramid.scripts.common`` and ``options`` under the ``main``
 function.
 
-Installing the Project and re-initializing the Database
+Installing the project and re-initializing the database
 -------------------------------------------------------
 
 Because our model has changed, in order to reinitialize the database, we need
@@ -111,8 +111,8 @@ Success will look something like this::
     2015-05-24 15:34:14,549 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ('FrontPage', 'This is the front page')
     2015-05-24 15:34:14,550 INFO  [sqlalchemy.engine.base.Engine:686][MainThread] COMMIT
 
-Viewing the Application in a Browser
-------------------------------------
+View the application in a browser
+---------------------------------
 
 We can't.  At this point, our system is in a "non-runnable" state; we'll need
 to change view-related files in the next chapter to be able to start the
