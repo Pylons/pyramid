@@ -98,7 +98,7 @@ Success will look something like this::
     CREATE TABLE pages (
             id INTEGER NOT NULL, 
             name TEXT, 
-            data INTEGER, 
+            data TEXT, 
             PRIMARY KEY (id), 
             UNIQUE (name)
     )
