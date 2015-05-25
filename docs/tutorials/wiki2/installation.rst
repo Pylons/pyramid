@@ -2,22 +2,41 @@
 Installation
 ============
 
-Before You Begin
+Before you begin
 ================
 
 This tutorial assumes that you have already followed the steps in
-:ref:`installing_chapter`, thereby satisfying the following
-requirements.
+:ref:`installing_chapter`, except **do not create a virtualenv or install
+Pyramid**.  Thereby you will satisfy the following requirements.
 
 * Python interpreter is installed on your operating system
 * :term:`setuptools` or :term:`distribute` is installed
 * :term:`virtualenv` is installed
 
-Create and Use a Virtual Python Environment
+Create directory to contain the project
+---------------------------------------
+
+We need a workspace for our project files.
+
+On UNIX
+^^^^^^^
+
+.. code-block:: text
+
+    $ mkdir ~/pyramidtut
+
+On Windows
+^^^^^^^^^^
+
+.. code-block:: text
+
+   c:\> mkdir pyramidtut
+
+Create and use a virtual Python environment
 -------------------------------------------
 
 Next let's create a `virtualenv` workspace for our project.  We will
-use the `VENV` environment variable instead of absolute path of the
+use the `VENV` environment variable instead of the absolute path of the
 virtual environment.
 
 On UNIX
@@ -32,8 +51,6 @@ On UNIX
 
 On Windows
 ^^^^^^^^^^
-
-Set the `VENV` environment variable.
 
 .. code-block:: text
 
@@ -54,7 +71,7 @@ Python 3.2:
 
    c:\> c:\Python32\Scripts\virtualenv %VENV%
 
-Install Pyramid Into the Virtual Python Environment
+Install Pyramid into the virtual Python environment
 ---------------------------------------------------
 
 On UNIX
@@ -69,9 +86,9 @@ On Windows
 
 .. code-block:: text
 
-   c:\env> %VENV%\Scripts\easy_install pyramid
+   c:\> %VENV%\Scripts\easy_install pyramid
 
-Install SQLite3 and Its Development Packages
+Install SQLite3 and its development packages
 --------------------------------------------
 
 If you used a package manager to install your Python or if you compiled
@@ -87,7 +104,7 @@ the Debian system and apt-get, the command would be the following:
 
    $ sudo apt-get install libsqlite3-dev
 
-Change Directory to Your Virtual Python Environment
+Change directory to your virtual Python environment
 ---------------------------------------------------
 
 Change directory to the ``pyramidtut`` directory.
@@ -108,7 +125,7 @@ On Windows
 
 .. _sql_making_a_project:
 
-Making a Project
+Making a project
 ================
 
 Your next step is to create a project.  For this tutorial we will use
@@ -117,7 +134,7 @@ that uses :term:`SQLAlchemy` and :term:`URL dispatch`.
 
 :app:`Pyramid` supplies a variety of scaffolds to generate sample
 projects. We will use `pcreate`—a script that comes with Pyramid to
-quickly and easily generate scaffolds usually with a single command—to
+quickly and easily generate scaffolds, usually with a single command—to
 create the scaffold for our project.
 
 By passing `alchemy` into the `pcreate` command, the script creates
@@ -126,8 +143,7 @@ the files needed to use SQLAlchemy. By passing in our application name
 required files. For example, `pcreate` creates the
 ``initialize_tutorial_db`` in the ``pyramidtut/bin`` directory.
 
-The below instructions assume your current working directory is the
-"virtualenv" named "pyramidtut".
+The below instructions assume your current working directory is "pyramidtut".
 
 On UNIX
 -------
@@ -141,7 +157,7 @@ On Windows
 
 .. code-block:: text
 
-   c:\pyramidtut> %VENV%\pcreate -s alchemy tutorial
+   c:\pyramidtut> %VENV%\Scripts\pcreate -s alchemy tutorial
 
 .. note:: If you are using Windows, the ``alchemy``
    scaffold may not deal gracefully with installation into a
@@ -151,7 +167,7 @@ On Windows
 
 .. _installing_project_in_dev_mode:
 
-Installing the Project in Development Mode
+Installing the project in development mode
 ==========================================
 
 In order to do development on the project easily, you must "register"
@@ -184,8 +200,8 @@ the following::
 
 .. _sql_running_tests:
 
-Running the Tests
-=================
+Run the tests
+=============
 
 After you've installed the project in development mode, you may run
 the tests for the project.
@@ -212,8 +228,8 @@ For a successful test run, you should see output that ends like this::
  
   OK
 
-Exposing Test Coverage Information
-==================================
+Expose test coverage information
+================================
 
 You can run the ``nosetests`` command to see test coverage
 information.  This runs the tests in the same way that ``setup.py
@@ -274,10 +290,9 @@ If successful, you will see output something like this::
 
 Looks like our package doesn't quite have 100% test coverage.
 
-
 .. _initialize_db_wiki2:
 
-Initializing the Database
+Initializing the database
 =========================
 
 We need to use the ``initialize_tutorial_db`` :term:`console
@@ -333,8 +348,8 @@ directory.  This will be a SQLite database with a single table defined in it
 
 .. _wiki2-start-the-application:
 
-Starting the Application
-========================
+Start the application
+=====================
 
 Start the application.
 
@@ -352,6 +367,11 @@ On Windows
 
    c:\pyramidtut\tutorial> %VENV%\Scripts\pserve development.ini --reload
 
+.. note::
+
+   Your OS firewall, if any, may pop up a dialog asking for authorization
+   to allow python to accept incoming network connections.
+
 If successful, you will see something like this on your console::
 
   Starting subprocess with file monitor
@@ -360,19 +380,22 @@ If successful, you will see something like this on your console::
 
 This means the server is ready to accept requests.
 
-At this point, when you visit ``http://localhost:6543/`` in your web browser,
-you will see the generated application's default page.
+Visit the application in a browser
+==================================
+
+In a browser, visit `http://localhost:6543/ <http://localhost:6543>`_.  You
+will see the generated application's default page.
 
 One thing you'll notice is the "debug toolbar" icon on right hand side of the
 page.  You can read more about the purpose of the icon at
 :ref:`debug_toolbar`.  It allows you to get information about your
 application while you develop.
 
-Decisions the ``alchemy`` Scaffold Has Made for You
+Decisions the ``alchemy`` scaffold has made for you
 =================================================================
 
-Creating a project using the ``alchemy`` scaffold makes
-the following assumptions:
+Creating a project using the ``alchemy`` scaffold makes the following
+assumptions:
 
 - you are willing to use :term:`SQLAlchemy` as a database access tool
 
