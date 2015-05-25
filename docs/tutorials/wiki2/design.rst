@@ -9,7 +9,7 @@ tutorial.
 Overall
 -------
 
-We choose to use :term:`reStructuredText` markup in the wiki text.  Translation
+We choose to use :term:`reStructuredText` markup in the wiki text. Translation
 from reStructuredText to HTML is provided by the widely used ``docutils``
 Python module.  We will add this module in the dependency list on the project
 ``setup.py`` file.
@@ -37,8 +37,8 @@ Views
 -----
 
 There will be three views to handle the normal operations of adding,
-editing and viewing wiki pages, plus one view for the wiki front page.
-Two templates will be used, one for viewing, and one for both for adding
+editing, and viewing wiki pages, plus one view for the wiki front page.
+Two templates will be used, one for viewing, and one for both adding
 and editing wiki pages.
 
 The default templating systems in :app:`Pyramid` are
@@ -53,13 +53,14 @@ Security
 We'll eventually be adding security to our application.  The components we'll
 use to do this are below.
 
-- USERS, a dictionary mapping users names (the user's :term:`userids
-  <userid>`) to their corresponding passwords.
+- USERS, a dictionary mapping :term:`userids <userid>` to their
+  corresponding passwords.
 
-- GROUPS, a dictionary mapping user names to a list of groups they belong to.
+- GROUPS, a dictionary mapping :term:`userids <userid>` to a
+  list of groups to which they belong.
 
 - ``groupfinder``, an *authorization callback* that looks up USERS and
-  GROUPS.  It will be provided in a new *security.py* file.
+  GROUPS.  It will be provided in a new ``security.py`` file.
 
 - An :term:`ACL` is attached to the root :term:`resource`.  Each row below
   details an :term:`ACE`:
@@ -101,7 +102,7 @@ listed in the following table:
 |                      |  with existing        |             |            |            |
 |                      |  content.             |             |            |            |
 |                      |                       |             |            |            |
-|                      |  If the form is       |             |            |            |
+|                      |  If the form was      |             |            |            |
 |                      |  submitted, redirect  |             |            |            |
 |                      |  to /PageName         |             |            |            |
 +----------------------+-----------------------+-------------+------------+------------+
@@ -111,7 +112,7 @@ listed in the following table:
 |                      |  the edit form        |             |            |            |
 |                      |  without content.     |             |            |            |
 |                      |                       |             |            |            |
-|                      |  If the form is       |             |            |            |
+|                      |  If the form was      |             |            |            |
 |                      |  submitted,           |             |            |            |
 |                      |  redirect to          |             |            |            |
 |                      |  /PageName            |             |            |            |
@@ -119,7 +120,7 @@ listed in the following table:
 | /login               |  Display login form,  |  login      |  login.pt  |            |
 |                      |  Forbidden [3]_       |             |            |            |
 |                      |                       |             |            |            |
-|                      |  If the form is       |             |            |            |
+|                      |  If the form was      |             |            |            |
 |                      |  submitted,           |             |            |            |
 |                      |  authenticate.        |             |            |            |
 |                      |                       |             |            |            |
