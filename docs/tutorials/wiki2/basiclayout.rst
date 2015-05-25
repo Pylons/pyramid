@@ -7,13 +7,14 @@ they provide a good orientation for the high-level patterns common to most
 :term:`URL dispatch`-based :app:`Pyramid` projects.
 
 
-Application Configuration with ``__init__.py``
+Application configuration with ``__init__.py``
 ----------------------------------------------
 
 A directory on disk can be turned into a Python :term:`package` by containing
 an ``__init__.py`` file.  Even if empty, this marks a directory as a Python
-package.  We use ``__init__.py``, both as a marker indicating the directory
-it's contained within is a package, and to contain configuration code.
+package.  We use ``__init__.py`` both as a marker, indicating the directory
+in which it's contained is a package, and to contain application configuration
+code.
 
 Open ``tutorial/tutorial/__init__.py``.  It should already contain
 the following:
@@ -136,7 +137,7 @@ Finally, ``main`` is finished configuring things, so it uses the
       :lines: 21
       :language: py
 
-View Declarations via ``views.py``
+View declarations via ``views.py``
 ----------------------------------
 
 The main function of a web framework is mapping each URL pattern to code (a
