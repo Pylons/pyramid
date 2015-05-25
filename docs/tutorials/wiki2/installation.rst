@@ -120,7 +120,7 @@ projects. We will use `pcreate`—a script that comes with Pyramid to
 quickly and easily generate scaffolds usually with a single command—to
 create the scaffold for our project.
 
-By passing in `alchemy` into the `pcreate` command, the script creates
+By passing `alchemy` into the `pcreate` command, the script creates
 the files needed to use SQLAlchemy. By passing in our application name
 `tutorial`, the script inserts that application name into all the
 required files. For example, `pcreate` creates the
@@ -258,20 +258,19 @@ On Windows
 
 If successful, you will see output something like this::
 
-  .
-  Name               Stmts   Miss  Cover   Missing
-  ------------------------------------------------
-  tutorial              11      7    36%   9-15
-  tutorial.models       17      0   100%   
-  tutorial.scripts       0      0   100%   
-  tutorial.tests        24      0   100%   
-  tutorial.views         6      0   100%   
-  ------------------------------------------------
-  TOTAL                 58      7    88%   
-  ----------------------------------------------------------------------
-  Ran 1 test in 0.459s
+    .
+    Name                  Stmts   Miss  Cover   Missing
+    ---------------------------------------------------
+    tutorial.py              13      9    31%   13-21
+    tutorial/models.py       12      0   100%   
+    tutorial/scripts.py       0      0   100%   
+    tutorial/views.py        11      0   100%   
+    ---------------------------------------------------
+    TOTAL                    36      9    75%   
+    ----------------------------------------------------------------------
+    Ran 2 tests in 0.643s
 
-  OK
+    OK
 
 Looks like our package doesn't quite have 100% test coverage.
 
@@ -284,7 +283,7 @@ Initializing the Database
 We need to use the ``initialize_tutorial_db`` :term:`console
 script` to initialize our database.
 
-Type the following command, make sure you are still in the ``tutorial``
+Type the following command, making sure you are still in the ``tutorial``
 directory (the directory with a ``development.ini`` in it):
 
 On UNIX
@@ -303,28 +302,30 @@ On Windows
 
 The output to your console should be something like this::
 
-  2011-11-26 14:42:25,012 INFO  [sqlalchemy.engine.base.Engine][MainThread] 
-                                PRAGMA table_info("models")
-  2011-11-26 14:42:25,013 INFO  [sqlalchemy.engine.base.Engine][MainThread] ()
-  2011-11-26 14:42:25,013 INFO  [sqlalchemy.engine.base.Engine][MainThread] 
-  CREATE TABLE models (
-  	id INTEGER NOT NULL, 
-  	name VARCHAR(255), 
-  	value INTEGER, 
-  	PRIMARY KEY (id), 
-  	UNIQUE (name)
-  )
-  2011-11-26 14:42:25,013 INFO  [sqlalchemy.engine.base.Engine][MainThread] ()
-  2011-11-26 14:42:25,135 INFO  [sqlalchemy.engine.base.Engine][MainThread] 
-                                COMMIT
-  2011-11-26 14:42:25,137 INFO  [sqlalchemy.engine.base.Engine][MainThread] 
-                                BEGIN (implicit)
-  2011-11-26 14:42:25,138 INFO  [sqlalchemy.engine.base.Engine][MainThread] 
-                                INSERT INTO models (name, value) VALUES (?, ?)
-  2011-11-26 14:42:25,139 INFO  [sqlalchemy.engine.base.Engine][MainThread] 
-                                (u'one', 1)
-  2011-11-26 14:42:25,140 INFO  [sqlalchemy.engine.base.Engine][MainThread] 
-                                COMMIT
+    2015-05-23 16:49:49,609 INFO  [sqlalchemy.engine.base.Engine:1192][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
+    2015-05-23 16:49:49,609 INFO  [sqlalchemy.engine.base.Engine:1193][MainThread] ()
+    2015-05-23 16:49:49,610 INFO  [sqlalchemy.engine.base.Engine:1192][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
+    2015-05-23 16:49:49,610 INFO  [sqlalchemy.engine.base.Engine:1193][MainThread] ()
+    2015-05-23 16:49:49,610 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] PRAGMA table_info("models")
+    2015-05-23 16:49:49,610 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
+    2015-05-23 16:49:49,612 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] 
+    CREATE TABLE models (
+            id INTEGER NOT NULL, 
+            name TEXT, 
+            value INTEGER, 
+            PRIMARY KEY (id)
+    )
+
+
+    2015-05-23 16:49:49,612 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
+    2015-05-23 16:49:49,613 INFO  [sqlalchemy.engine.base.Engine:686][MainThread] COMMIT
+    2015-05-23 16:49:49,613 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] CREATE UNIQUE INDEX my_index ON models (name)
+    2015-05-23 16:49:49,613 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
+    2015-05-23 16:49:49,614 INFO  [sqlalchemy.engine.base.Engine:686][MainThread] COMMIT
+    2015-05-23 16:49:49,616 INFO  [sqlalchemy.engine.base.Engine:646][MainThread] BEGIN (implicit)
+    2015-05-23 16:49:49,617 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] INSERT INTO models (name, value) VALUES (?, ?)
+    2015-05-23 16:49:49,617 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ('one', 1)
+    2015-05-23 16:49:49,618 INFO  [sqlalchemy.engine.base.Engine:686][MainThread] COMMIT
 
 Success!  You should now have a ``tutorial.sqlite`` file in your current working
 directory.  This will be a SQLite database with a single table defined in it
@@ -367,7 +368,7 @@ page.  You can read more about the purpose of the icon at
 :ref:`debug_toolbar`.  It allows you to get information about your
 application while you develop.
 
-Decisions the ``alchemy`` Scaffold Has Made For You
+Decisions the ``alchemy`` Scaffold Has Made for You
 =================================================================
 
 Creating a project using the ``alchemy`` scaffold makes
@@ -375,15 +376,15 @@ the following assumptions:
 
 - you are willing to use :term:`SQLAlchemy` as a database access tool
 
-- you are willing to use :term:`url dispatch` to map URLs to code.
+- you are willing to use :term:`URL dispatch` to map URLs to code
 
 - you want to use ``ZopeTransactionExtension`` and ``pyramid_tm`` to scope
   sessions to requests
 
 .. note::
 
-   :app:`Pyramid` supports any persistent storage mechanism (e.g. object
-   database or filesystem files, etc).  It also supports an additional
+   :app:`Pyramid` supports any persistent storage mechanism (e.g., object
+   database or filesystem files). It also supports an additional
    mechanism to map URLs to code (:term:`traversal`).  However, for the
-   purposes of this tutorial, we'll only be using url dispatch and
+   purposes of this tutorial, we'll only be using URL dispatch and
    SQLAlchemy.

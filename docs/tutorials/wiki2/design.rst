@@ -124,7 +124,7 @@ listed in the following table:
 |                      |  authenticate.        |             |            |            |
 |                      |                       |             |            |            |
 |                      |  - If authentication  |             |            |            |
-|                      |    successful,        |             |            |            |
+|                      |    succeeds,          |             |            |            |
 |                      |    redirect to the    |             |            |            |
 |                      |    page that we       |             |            |            |
 |                      |    came from.         |             |            |            |
@@ -144,6 +144,6 @@ listed in the following table:
        when there is no view name.
 .. [2] Pyramid will return a default 404 Not Found page
        if the page *PageName* does not exist yet.
-.. [3] pyramid.exceptions.Forbidden is reached when a
+.. [3] ``pyramid.exceptions.Forbidden`` is reached when a
        user tries to invoke a view that is
        not authorized by the authorization policy.
