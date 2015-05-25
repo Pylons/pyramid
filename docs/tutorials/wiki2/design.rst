@@ -53,10 +53,11 @@ Security
 We'll eventually be adding security to our application.  The components we'll
 use to do this are below.
 
-- USERS, a dictionary mapping usernames to their corresponding passwords.
+- USERS, a dictionary mapping :term:`userids <userid>` to their
+  corresponding passwords.
 
-- GROUPS, a dictionary mapping usernames to a list of groups to which they
-  belong.
+- GROUPS, a dictionary mapping :term:`userids <userid>` to a
+  list of groups to which they belong.
 
 - ``groupfinder``, an *authorization callback* that looks up USERS and
   GROUPS.  It will be provided in a new ``security.py`` file.
