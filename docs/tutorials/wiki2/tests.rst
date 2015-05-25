@@ -3,8 +3,8 @@ Adding Tests
 ============
 
 We will now add tests for the models and the views and a few functional
-tests in the ``tests.py``.  Tests ensure that an application works, and
-that it continues to work after changes are made in the future.
+tests in ``tests.py``.  Tests ensure that an application works, and
+that it continues to work when changes are made in the future.
 
 Testing the Models
 ==================
@@ -17,12 +17,11 @@ Testing the Views
 =================
 
 We'll modify our ``tests.py`` file, adding tests for each view
-function we added above.  As a result, we'll *delete* the
+function we added previously.  As a result, we'll *delete* the
 ``ViewTests`` class that the ``alchemy`` scaffold provided, and add
 four other test classes: ``ViewWikiTests``, ``ViewPageTests``,
 ``AddPageTests``, and ``EditPageTests``.  These test the
-``view_wiki``, ``view_page``, ``add_page``, and ``edit_page`` views
-respectively.
+``view_wiki``, ``view_page``, ``add_page``, and ``edit_page`` views.
 
 Functional tests
 ================
@@ -35,7 +34,8 @@ can, and so on.
 Viewing the results of all our edits to ``tests.py``
 ====================================================
 
-Open the ``tutorial/tests.py`` module, and edit it as follows:
+Open the ``tutorial/tests.py`` module, and edit it such that it appears as
+follows:
 
 .. literalinclude:: src/tests/tutorial/tests.py
    :linenos:
