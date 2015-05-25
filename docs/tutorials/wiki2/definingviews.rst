@@ -106,7 +106,8 @@ is made to the root URL of our wiki.  It always redirects to
 a URL which represents the path to our "FrontPage".
 
 .. literalinclude:: src/views/tutorial/views.py
-   :lines: 20-23
+   :lines: 20-24
+   :lineno-start: 20
    :linenos:
    :language: python
 
@@ -129,7 +130,8 @@ HTML anchor for each *WikiWord* reference in the rendered HTML using a
 compiled regular expression.
 
 .. literalinclude:: src/views/tutorial/views.py
-   :lines: 23-43
+   :lines: 25-45
+   :lineno-start: 25
    :linenos:
    :language: python
 
@@ -166,6 +168,7 @@ to construct URLs and find model objects.
 
 .. literalinclude:: src/views/tutorial/views.py
    :lines: 47-58
+   :lineno-start: 47
    :linenos:
    :language: python
 
@@ -202,6 +205,7 @@ matching the name of the page the user wants to edit.
 
 .. literalinclude:: src/views/tutorial/views.py
    :lines: 60-72
+   :lineno-start: 60
    :linenos:
    :language: python
 
@@ -233,18 +237,18 @@ content:
 
 .. literalinclude:: src/views/tutorial/templates/view.pt
    :linenos:
-   :language: xml
+   :language: html
 
 This template is used by ``view_page()`` for displaying a single
 wiki page. It includes:
 
 - A ``div`` element that is replaced with the ``content``
-  value provided by the view (lines 43-45).  ``content``
+  value provided by the view (lines 36-38).  ``content``
   contains HTML, so the ``structure`` keyword is used
   to prevent escaping it (i.e., changing ">" to "&gt;", etc.)
 - A link that points
   at the "edit" URL which invokes the ``edit_page`` view for
-  the page being viewed (lines 47-49).
+  the page being viewed (lines 40-42).
 
 The ``edit.pt`` Template
 ------------------------
@@ -257,15 +261,14 @@ content:
    :language: html
 
 This template is used by ``add_page()`` and ``edit_page()`` for adding
-and editing a wiki page.  It displays
-a page containing a form that includes:
+and editing a wiki page.  It displays a page containing a form that includes:
 
 - A 10 row by 60 column ``textarea`` field named ``body`` that is filled
-  with any existing page data when it is rendered (rows 46-47).
-- A submit button that has the name ``form.submitted`` (row 48).
+  with any existing page data when it is rendered (line 45).
+- A submit button that has the name ``form.submitted`` (line 48).
 
-The form POSTs back to the "save_url" argument supplied
-by the view (row 43).  The view will use the ``body`` and
+The form POSTs back to the ``save_url`` argument supplied
+by the view (line 43).  The view will use the ``body`` and
 ``form.submitted`` values.
 
 .. note:: Our templates use a ``request`` object that
@@ -286,12 +289,12 @@ to replicate within the body of this guide, however it is available `online
 <https://github.com/Pylons/pyramid/blob/master/docs/tutorials/wiki2/src/views/tutorial/static/pylons.css>`_.
 
 This CSS file will be accessed via
-e.g. ``http://localhost:6543/static/pylons.css`` by virtue of the call to
+``http://localhost:6543/static/pylons.css`` by virtue of the call to the
 ``add_static_view`` directive we've made in the ``__init__.py`` file.  Any
 number and type of static assets can be placed in this directory (or
 subdirectories) and are just referred to by URL or by using the convenience
-method ``static_url``
-e.g. ``request.static_url('{{package}}:static/foo.css')`` within templates.
+method ``static_url``, e.g.,
+``request.static_url('<package>:static/foo.css')`` within templates.
 
 Adding Routes to ``__init__.py``
 ================================
@@ -334,17 +337,17 @@ something like:
 
 .. literalinclude:: src/views/tutorial/__init__.py
    :linenos:
-   :language: python
    :emphasize-lines: 19-22
+   :language: python
 
-(The highlighted lines are the ones that need to be added or edited.)
+The highlighted lines are the ones that need to be added or edited.
 
 Viewing the Application in a Browser
 ====================================
 
 We can finally examine our application in a browser (See
 :ref:`wiki2-start-the-application`).  Launch a browser and visit
-each of the following URLs, check that the result is as expected:
+each of the following URLs, checking that the result is as expected:
 
 - http://localhost:6543 in a browser invokes the
   ``view_wiki`` view.  This always redirects to the ``view_page`` view
