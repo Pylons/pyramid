@@ -80,15 +80,16 @@ statement at the head:
    :linenos:
    :language: python
 
-Add the following class definition:
+Add the following class definition at the end:
 
 .. literalinclude:: src/authorization/tutorial/models.py
    :lines: 33-37
    :linenos:
+   :lineno-start: 33
    :language: python
 
 We import :data:`~pyramid.security.Allow`, an action that
-means that permission is allowed:, and
+means that permission is allowed, and
 :data:`~pyramid.security.Everyone`, a special :term:`principal`
 that is associated to all requests.  Both are used in the
 :term:`ACE` entries that make up the ACL.
@@ -112,9 +113,10 @@ the class we created above:
    :lines: 24-25
    :linenos:
    :emphasize-lines: 2
+   :lineno-start: 16
    :language: python
 
-(Only the highlighted line needs to be added.)
+Only the highlighted line needs to be added.
 
 We are now providing the ACL to the application.  See
 :ref:`assigning_acls` for more information about what an
@@ -130,12 +132,13 @@ We are now providing the ACL to the application.  See
 Add Authentication and Authorization Policies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Open ``tutorial/__init__.py`` and
-add these import statements:
+Open ``tutorial/tutorial/__init__.py`` and add the highlighted import
+statements:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
-   :lines: 2-3,7
+   :lines: 1-7
    :linenos:
+   :emphasize-lines: 2-3,7
    :language: python
 
 Now add those policies to the configuration:
@@ -143,10 +146,11 @@ Now add those policies to the configuration:
 .. literalinclude:: src/authorization/tutorial/__init__.py
    :lines: 21-27
    :linenos:
+   :lineno-start: 21
    :emphasize-lines: 1-3,6-7
    :language: python
 
-(Only the highlighted lines need to be added.)
+Only the highlighted lines need to be added.
 
 We are enabling an ``AuthTktAuthenticationPolicy``, which is based in an
 auth ticket that may be included in the request.
@@ -161,33 +165,38 @@ machinery represented by this policy: it is required.  The ``callback`` is the
 
 Add permission declarations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Open ``tutorial/tutorial/views.py`` and add a ``permission='edit'`` parameter
+to the ``@view_config`` decorators for ``add_page()`` and ``edit_page()``:
 
-Add a ``permission='edit'`` parameter to the ``@view_config``
-decorator for ``add_page()`` and ``edit_page()``, for example:
+.. literalinclude:: src/authorization/tutorial/views.py
+   :lines: 60-61
+   :emphasize-lines: 1-2
+   :language: python
 
-.. code-block:: python
-   :linenos:
-   :emphasize-lines: 2
+.. literalinclude:: src/authorization/tutorial/views.py
+   :lines: 75-76
+   :emphasize-lines: 1-2
+   :language: python
 
-   @view_config(route_name='add_page', renderer='templates/edit.pt',
-                permission='edit')
-
-(Only the highlighted line needs to be added.)
+Only the highlighted lines need to be added or edited.
 
 The result is that only users who possess the ``edit``
 permission at the time of the request may invoke those two views.
 
 Add a ``permission='view'`` parameter to the ``@view_config``
-decorator for ``view_wiki()`` and ``view_page()``, like this:
+decorator for ``view_wiki()`` and ``view_page()`` as follows:
 
-.. code-block:: python
-   :linenos:
-   :emphasize-lines: 2
+.. literalinclude:: src/authorization/tutorial/views.py
+   :lines: 30-31
+   :emphasize-lines: 1-2
+   :language: python
 
-   @view_config(route_name='view_page', renderer='templates/view.pt',
-                permission='view')
+.. literalinclude:: src/authorization/tutorial/views.py
+   :lines: 36-37
+   :emphasize-lines: 1-2
+   :language: python
 
-(Only the highlighted line needs to be added.)
+Only the highlighted lines need to be added or edited.
 
 This allows anyone to invoke these two views.
 
@@ -200,19 +209,18 @@ Login, Logout
 Add routes for /login and /logout
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Go back to ``tutorial/tutorial/__init__.py`` and add these two
-routes:
+routes as highlighted:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
-   :lines: 31-32
-   :linenos:
+   :lines: 30-33
+   :emphasize-lines: 2-3
    :language: python
 
 .. note:: The preceding lines must be added *before* the following
    ``view_page`` route definition:
 
    .. literalinclude:: src/authorization/tutorial/__init__.py
-      :lines: 32
-      :linenos:
+      :lines: 33
       :language: python
 
    This is because ``view_page``'s route definition uses a catch-all
@@ -237,11 +245,10 @@ head of ``tutorial/tutorial/views.py``:
 
 .. literalinclude:: src/authorization/tutorial/views.py
    :lines: 9-19
-   :linenos:
-   :emphasize-lines: 3,6-9,11
+   :emphasize-lines: 1-11
    :language: python
 
-(Only the highlighted lines need to be added.)
+All the highlighted lines need to be added or edited.
 
 :meth:`~pyramid.view.forbidden_view_config` will be used
 to customize the default 403 Forbidden page.
@@ -249,11 +256,10 @@ to customize the default 403 Forbidden page.
 :meth:`~pyramid.security.forget` help to create and
 expire an auth ticket cookie.
 
-Now add the ``login`` and ``logout`` views:
+Now add the ``login`` and ``logout`` views at the end of the file:
 
 .. literalinclude:: src/authorization/tutorial/views.py
    :lines: 91-123
-   :linenos:
    :language: python
 
 ``login()`` is decorated with two decorators:
@@ -286,23 +292,28 @@ content:
 The above template is referred to within the login view we just
 added to ``views.py``.
 
-Return a logged_in flag to the renderer
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Return a ``logged_in`` flag to the renderer
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Add a  ``logged_in`` parameter to the return value of
-``view_page()``, ``edit_page()`` and  ``add_page()``,
-like this:
+Add a ``logged_in`` parameter to the return value of
+``view_page()``, ``edit_page()``, and ``add_page()`` as follows:
 
-.. code-block:: python
-   :linenos:
-   :emphasize-lines: 4
+.. literalinclude:: src/authorization/tutorial/views.py
+   :lines: 57-58
+   :emphasize-lines: 1-2
+   :language: python
 
-   return dict(page = page,
-               content = content,
-               edit_url = edit_url,
-               logged_in = request.authenticated_userid)
+.. literalinclude:: src/authorization/tutorial/views.py
+   :lines: 72-73
+   :emphasize-lines: 1-2
+   :language: python
 
-(Only the highlighted line needs to be added.)
+.. literalinclude:: src/authorization/tutorial/views.py
+   :lines: 85-89
+   :emphasize-lines: 3-4
+   :language: python
+
+Only the highlighted lines need to be added or edited.
 
 The :meth:`~pyramid.request.Request.authenticated_userid` property will be
 ``None`` if the user is not authenticated.
@@ -311,22 +322,21 @@ Add a "Logout" link when logged in
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Open ``tutorial/tutorial/templates/edit.pt`` and
-``tutorial/tutorial/templates/view.pt``  and add this within the
-``<div id="right" class="app-welcome align-right">`` div:
+``tutorial/tutorial/templates/view.pt`` and add the following code as
+indicated by the highlighted lines.
 
-.. code-block:: xml
-
-   <span tal:condition="logged_in">
-      <a href="${request.application_url}/logout">Logout</a>
-   </span>
+.. literalinclude:: src/authorization/tutorial/templates/edit.pt
+   :lines: 34-38
+   :emphasize-lines: 3-5
+   :language: html
 
 The attribute ``tal:condition="logged_in"`` will make the element be
 included when ``logged_in`` is any user id. The link will invoke
 the logout view.  The above element will not be included if ``logged_in``
 is ``None``, such as when a user is not authenticated.
 
-Seeing Our Changes
-------------------
+Reviewing our changes
+---------------------
 
 Our ``tutorial/tutorial/__init__.py`` will look something like this
 when we're done:
@@ -336,7 +346,7 @@ when we're done:
    :emphasize-lines: 2-3,7,21-23,25-27,31-32
    :language: python
 
-(Only the highlighted lines need to be added.)
+Only the highlighted lines need to be added or edited.
 
 Our ``tutorial/tutorial/models.py`` will look something like this
 when we're done:
@@ -346,37 +356,37 @@ when we're done:
    :emphasize-lines: 1-4,33-37
    :language: python
 
-(Only the highlighted lines need to be added.)
+Only the highlighted lines need to be added or edited.
 
 Our ``tutorial/tutorial/views.py`` will look something like this
 when we're done:
 
 .. literalinclude:: src/authorization/tutorial/views.py
    :linenos:
-   :emphasize-lines: 11,14-19,25,31,37,58,61,73,76,88,91-117,119-123
+   :emphasize-lines: 9-11,14-19,25,31,37,58,61,73,76,88,91-117,119-123
    :language: python
 
-(Only the highlighted lines need to be added.)
+Only the highlighted lines need to be added or edited.
 
 Our ``tutorial/tutorial/templates/edit.pt`` template will look
 something like this when we're done:
 
 .. literalinclude:: src/authorization/tutorial/templates/edit.pt
    :linenos:
-   :emphasize-lines: 41-43
-   :language: xml
+   :emphasize-lines: 36-38
+   :language: html
 
-(Only the highlighted lines need to be added.)
+Only the highlighted lines need to be added or edited.
 
 Our ``tutorial/tutorial/templates/view.pt`` template will look
 something like this when we're done:
 
 .. literalinclude:: src/authorization/tutorial/templates/view.pt
    :linenos:
-   :emphasize-lines: 41-43
-   :language: xml
+   :emphasize-lines: 36-38
+   :language: html
 
-(Only the highlighted lines need to be added.)
+Only the highlighted lines need to be added or edited.
 
 Viewing the Application in a Browser
 ------------------------------------
