@@ -33,17 +33,15 @@
           </div>
           <div class="col-md-10">
             <div class="content">
+              <p tal:condition="logged_in" class="pull-right">
+                <a href="${request.application_url}/logout">Logout</a>
+              </p>
               <p>
                 Editing <strong><span tal:replace="page.name">Page Name Goes
                 Here</span></strong>
               </p>
               <p>You can return to the
                 <a href="${request.application_url}">FrontPage</a>.
-              </p>
-              <p class="pull-right">
-                <span tal:condition="logged_in">
-                  <a href="${request.application_url}/logout">Logout</a>
-                </span>
               </p>
               <form action="${save_url}" method="post">
                 <div class="form-group">

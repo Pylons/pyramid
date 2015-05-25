@@ -6,8 +6,6 @@ We will now add tests for the models and the views and a few functional
 tests in the ``tests.py``.  Tests ensure that an application works, and
 that it continues to work after changes are made in the future.
 
-
-
 Testing the Models
 ==================
 
@@ -37,7 +35,7 @@ can, and so on.
 Viewing the results of all our edits to ``tests.py``
 ====================================================
 
-Once we're done with the ``tests.py`` module, it will look a lot like:
+Open the ``tutorial/tests.py`` module, and edit it as follows:
 
 .. literalinclude:: src/tests/tutorial/tests.py
    :linenos:
