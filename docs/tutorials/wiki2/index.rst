@@ -3,7 +3,7 @@
 SQLAlchemy + URL Dispatch Wiki Tutorial
 =======================================
 
-This tutorial introduces a :term:`SQLAlchemy` and :term:`url dispatch` -based
+This tutorial introduces a :term:`SQLAlchemy` and :term:`url dispatch`-based
 :app:`Pyramid` application to a developer familiar with Python.  When the
 tutorial is finished, the developer will have created a basic Wiki
 application with authentication.
@@ -25,5 +25,4 @@ which corresponds to the same location if you have Pyramid sources.
    authorization
    tests
    distributing
-
 
