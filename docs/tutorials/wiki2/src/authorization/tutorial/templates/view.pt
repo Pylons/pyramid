@@ -33,6 +33,9 @@
           </div>
           <div class="col-md-10">
             <div class="content">
+              <p tal:condition="logged_in" class="pull-right">
+                <a href="${request.application_url}/logout">Logout</a>
+              </p>
               <div tal:replace="structure content">
                 Page text goes here.
               </div>
@@ -47,11 +50,6 @@
               </p>
               <p>You can return to the
                 <a href="${request.application_url}">FrontPage</a>.
-              </p>
-              <p class="pull-right">
-                <span tal:condition="logged_in">
-                  <a href="${request.application_url}/logout">Logout</a>
-                </span>
               </p>
             </div>
           </div>
