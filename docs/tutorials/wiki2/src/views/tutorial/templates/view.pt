@@ -1,22 +1,20 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
-      xmlns:tal="http://xml.zope.org/namespaces/tal">
+<!DOCTYPE html>
+<html lang="en">
 <head>
+  <meta charset="utf-8">
   <title>${page.name} - Pyramid tutorial wiki (based on
     TurboGears 20-Minute Wiki)</title>
-  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
-  <meta name="keywords" content="python web application" />
-  <meta name="description" content="pyramid web application" />
+  <meta name="keywords" content="python web application">
+  <meta name="description" content="pyramid web application">
   <link rel="shortcut icon"
-        href="${request.static_url('tutorial:static/favicon.ico')}" />
+        href="${request.static_url('tutorial:static/favicon.ico')}">
   <link rel="stylesheet"
         href="${request.static_url('tutorial:static/pylons.css')}"
-        type="text/css" media="screen" charset="utf-8" />
+        type="text/css" media="screen">
   <!--[if lte IE 6]>
   <link rel="stylesheet"
         href="${request.static_url('tutorial:static/ie6.css')}"
-        type="text/css" media="screen" charset="utf-8" />
+        type="text/css" media="screen">
   <![endif]-->
 </head>
 <body>
@@ -25,7 +23,7 @@
       <div class="top-small align-center">
         <div>
           <img width="220" height="50" alt="pyramid"
-        src="${request.static_url('tutorial:static/pyramid-small.png')}" />
+        src="${request.static_url('tutorial:static/pyramid-small.png')}">
         </div>
       </div>
     </div>
@@ -33,9 +31,9 @@
       <div class="middle align-right">
         <div id="left" class="app-welcome align-left">
           Viewing <b><span tal:replace="page.name">Page Name
-              Goes Here</span></b><br/>
+              Goes Here</span></b><br>
           You can return to the
-          <a href="${request.application_url}">FrontPage</a>.<br/>
+          <a href="${request.application_url}">FrontPage</a>.<br>
         </div>
         <div id="right" class="app-welcome align-right"></div>
       </div>
