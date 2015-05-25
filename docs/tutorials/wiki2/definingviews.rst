@@ -282,14 +282,12 @@ by the view (line 43).  The view will use the ``body`` and
 Static Assets
 -------------
 
-Our templates name a single static asset named ``pylons.css``.  We don't need
-to create this file within our package's ``static`` directory because it was
-provided at the time we created the project. This file is a little too long
-to replicate within the body of this guide, however it is available `online
-<https://github.com/Pylons/pyramid/blob/master/docs/tutorials/wiki2/src/views/tutorial/static/pylons.css>`_.
+Our templates name static assets, including CSS and images.  We don't need
+to create these files within our package's ``static`` directory because they
+were provided at the time we created the project.
 
-This CSS file will be accessed via
-``http://localhost:6543/static/pylons.css`` by virtue of the call to the
+As an example, the CSS file will be accessed via
+``http://localhost:6543/static/theme.css`` by virtue of the call to the
 ``add_static_view`` directive we've made in the ``__init__.py`` file.  Any
 number and type of static assets can be placed in this directory (or
 subdirectories) and are just referred to by URL or by using the convenience
