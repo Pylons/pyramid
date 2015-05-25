@@ -7,18 +7,18 @@ be to define a :term:`domain model` constructor representing a wiki page.
 We'll do this inside our ``models.py`` file.
 
 
-Making Edits to ``models.py``
------------------------------
+Edit ``models.py``
+------------------
 
 .. note::
 
   There is nothing special about the filename ``models.py``.  A
-  project may have many models throughout its codebase in arbitrarily-named
+  project may have many models throughout its codebase in arbitrarily named
   files.  Files implementing models often have ``model`` in their filenames
-  (or they may live in a Python subpackage of your application package named
-  ``models``) , but this is only by convention.
+  or they may live in a Python subpackage of your application package named
+  ``models``, but this is only by convention.
 
-Open ``tutorial/tutorial/models.py`` file and edit it to look like the 
+Open ``tutorial/tutorial/models.py`` file and edit it to look like the
 following:
 
 .. literalinclude:: src/models/tutorial/models.py
@@ -45,29 +45,29 @@ this class inherits from an instance of
 As you can see, our ``Page`` class has a class level attribute
 ``__tablename__`` which equals the string ``'pages'``.  This means that
 SQLAlchemy will store our wiki data in a SQL table named ``pages``.  Our
-``Page`` class will also have class-level attributes named ``id``, ``name`` and
-``data`` (all instances of :class:`sqlalchemy.schema.Column`).
-These will map to columns in the ``pages`` table.
-The ``id`` attribute will be the primary key in the table.
-The ``name`` attribute will be a text attribute, each value of
-which needs to be unique within the column.  The ``data`` attribute is a text
-attribute that will hold the body of each page.
+``Page`` class will also have class-level attributes named ``id``, ``name``
+and ``data`` (all instances of :class:`sqlalchemy.schema.Column`). These will
+map to columns in the ``pages`` table. The ``id`` attribute will be the
+primary key in the table. The ``name`` attribute will be a text attribute,
+each value of which needs to be unique within the column.  The ``data``
+attribute is a text attribute that will hold the body of each page.
 
 Changing ``scripts/initializedb.py``
 ------------------------------------
 
 We haven't looked at the details of this file yet, but within the ``scripts``
-directory of your ``tutorial`` package is a file named ``initializedb.py``.  Code
-in this file is executed whenever we run the ``initialize_tutorial_db`` command,
-as we did in the installation step of this tutorial.
+directory of your ``tutorial`` package is a file named ``initializedb.py``.
+Code in this file is executed whenever we run the ``initialize_tutorial_db``
+command, as we did in the installation step of this tutorial.
 
-Since we've changed our model, we need to make changes to our ``initializedb.py``
-script.  In particular, we'll replace our import of ``MyModel`` with one of
-``Page`` and we'll change the very end of the script to create a ``Page``
-rather than a ``MyModel`` and add it to our ``DBSession``.
+Since we've changed our model, we need to make changes to our
+``initializedb.py`` script.  In particular, we'll replace our import of
+``MyModel`` with one of ``Page`` and we'll change the very end of the script
+to create a ``Page`` rather than a ``MyModel`` and add it to our
+``DBSession``.
 
-Open ``tutorial/tutorial/scripts/initializedb.py`` and edit it to look like the 
-following:
+Open ``tutorial/tutorial/scripts/initializedb.py`` and edit it to look like
+the following:
 
 .. literalinclude:: src/models/tutorial/scripts/initializedb.py
    :linenos:
@@ -82,9 +82,9 @@ Installing the Project and re-initializing the Database
 -------------------------------------------------------
 
 Because our model has changed, in order to reinitialize the database, we need
-to rerun the ``initialize_tutorial_db`` command to pick up the changes you've made
-to both the models.py file and to the initializedb.py file.
-See :ref:`initialize_db_wiki2` for instructions.
+to rerun the ``initialize_tutorial_db`` command to pick up the changes you've
+made to both the models.py file and to the initializedb.py file. See
+:ref:`initialize_db_wiki2` for instructions.
 
 Success will look something like this::
 
