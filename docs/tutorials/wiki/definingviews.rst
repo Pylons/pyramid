@@ -352,7 +352,7 @@ The form POSTs back to the ``save_url`` argument supplied by the view (line
    See :ref:`renderer_system_values` for information about other names that
    are available by default when a template is used as a renderer.
 
-Static Assets
+Static assets
 -------------
 
 Our templates name static assets, including CSS and images.  We don't need
@@ -367,26 +367,25 @@ subdirectories) and are just referred to by URL or by using the convenience
 method ``static_url``, e.g.,
 ``request.static_url('<package>:static/foo.css')`` within templates.
 
-Viewing the Application in a Browser
+Viewing the application in a browser
 ====================================
 
 We can finally examine our application in a browser (See
 :ref:`wiki-start-the-application`).  Launch a browser and visit
 each of the following URLs, checking that the result is as expected:
 
-- ``http://localhost:6543/`` invokes the ``view_wiki`` view.  This always
+- http://localhost:6543/ invokes the ``view_wiki`` view.  This always
   redirects to the ``view_page`` view of the ``FrontPage`` Page resource.
 
-- ``http://localhost:6543/FrontPage/`` invokes the ``view_page`` view of the
-  front page resource.  This is because it's the :term:`default view` (a view
+- http://localhost:6543/FrontPage/ invokes the ``view_page`` view of the front
+  page resource.  This is because it's the :term:`default view` (a view
   without a ``name``) for Page resources.
 
-- ``http://localhost:6543/FrontPage/edit_page`` invokes the edit view for the
+- http://localhost:6543/FrontPage/edit_page invokes the edit view for the
   ``FrontPage`` Page resource.
 
-- ``http://localhost:6543/add_page/SomePageName`` invokes the add view for a
-  Page.
+- http://localhost:6543/add_page/SomePageName invokes the add view for a Page.
 
-- To generate an error, visit ``http://localhost:6543/add_page`` which will
+- To generate an error, visit http://localhost:6543/add_page which will
   generate an ``IndexErrorr: tuple index out of range`` error. You'll see an
   interactive traceback facility provided by :term:`pyramid_debugtoolbar`.

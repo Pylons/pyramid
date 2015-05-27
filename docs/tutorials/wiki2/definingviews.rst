@@ -345,14 +345,14 @@ something like:
 
 The highlighted lines are the ones that need to be added or edited.
 
-Viewing the Application in a Browser
+Viewing the application in a browser
 ====================================
 
 We can finally examine our application in a browser (See
 :ref:`wiki2-start-the-application`).  Launch a browser and visit
 each of the following URLs, checking that the result is as expected:
 
-- ``http://localhost:6543/`` invokes the ``view_wiki`` view.  This always
+- http://localhost:6543/ invokes the ``view_wiki`` view.  This always
   redirects to the ``view_page`` view of the ``FrontPage`` page object.
 
 - http://localhost:6543/FrontPage invokes the ``view_page`` view of the front
@@ -367,4 +367,3 @@ each of the following URLs, checking that the result is as expected:
   will generate a ``NoResultFound: No row was found for one()`` error. You'll
   see an interactive traceback facility provided by
   :term:`pyramid_debugtoolbar`.
-
