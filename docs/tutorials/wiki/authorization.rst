@@ -338,7 +338,7 @@ we're done:
 
 Only the highlighted lines need to be added or edited.
 
-Viewing the Application in a Browser
+Viewing the application in a browser
 ------------------------------------
 
 We can finally examine our application in a browser (See
