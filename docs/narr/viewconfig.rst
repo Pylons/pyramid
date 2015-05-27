@@ -234,6 +234,21 @@ Non-Predicate Arguments
     def myview(request):
       ...
 
+  All view callables in the decorator chain must return a response object
+  implementing :class:`pyramid.interfaces.IResponse` or raise an exception:
+
+  .. code-block:: python
+
+     def log_timer(wrapped):
+         def wrapper(context, request):
+             start = time.time()
+             response = wrapped(context, request)
+             duration = time.time() - start
+             response.headers['X-View-Time'] = '%.3f' % (duration,)
+             log.info('view took %.3f seconds', duration)
+             return response
+         return wrapper
+
 ``mapper``
   A Python object or :term:`dotted Python name` which refers to a :term:`view
   mapper`, or ``None``.  By default it is ``None``, which indicates that the
