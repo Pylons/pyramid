@@ -11,7 +11,7 @@
    :exclude-members: add_response_callback, add_finished_callback,
                      route_url, route_path, current_route_url,
                      current_route_path, static_url, static_path,
-                     model_url, resource_url, set_property, 
+                     model_url, resource_url, resource_path, set_property, 
                      effective_principals, authenticated_userid,
                      unauthenticated_userid, has_permission
 
