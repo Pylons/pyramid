@@ -69,8 +69,8 @@ This simple example is easy to run. Save this as ``app.py`` and run it:
 
     $ python ./app.py
 
-Next, open `http://localhost:6543/ <http://localhost:6543/>`_ in a
-browser and you will see the ``Hello World!`` message.
+Next open http://localhost:6543/ in a browser, and you will see the ``Hello
+World!`` message.
 
 New to Python web programming? If so, some lines in the module merit
 explanation:
@@ -96,7 +96,7 @@ one that we will revisit regurlarly in this *Quick Tour*.
    :ref:`firstapp_chapter`, and
    :ref:`Single File Tasks tutorial <tutorials:single-file-tutorial>`
 
-Handling Web Requests and Responses
+Handling web requests and responses
 ===================================
 
 Developing for the web means processing web requests. As this is a
@@ -104,21 +104,20 @@ critical part of a web application, web developers need a robust,
 mature set of software for web requests.
 
 Pyramid has always fit nicely into the existing world of Python web
-development (virtual environments, packaging, scaffolding,
-first to embrace Python 3, etc.) For request handling, Pyramid turned
-to the well-regarded :term:`WebOb` Python library for request and
-response handling. In our example
-above, Pyramid hands ``hello_world`` a ``request`` that is
-:ref:`based on WebOb <webob_chapter>`.
+development (virtual environments, packaging, scaffolding, one of the first to
+embrace Python 3, etc.). Pyramid turned to the well-regarded :term:`WebOb`
+Python library for request and response handling. In our example above,
+Pyramid hands ``hello_world`` a ``request`` that is :ref:`based on WebOb
+<webob_chapter>`.
 
 Let's see some features of requests and responses in action:
 
 .. literalinclude:: quick_tour/requests/app.py
     :pyobject: hello_world
 
-In this Pyramid view, we get the URL being visited from ``request.url``.
-Also, if you visited ``http://localhost:6543/?name=alice``,
-the name is included in the body of the response::
+In this Pyramid view, we get the URL being visited from ``request.url``. Also,
+if you visited http://localhost:6543/?name=alice in a browser, the name is
+included in the body of the response::
 
   URL http://localhost:6543/?name=alice with name: alice
 
@@ -142,13 +141,15 @@ So far our examples place everything in one file:
 
 - its registration with the configurator
 
-- the route to map it to a URL
+- the route to map it to an URL
 
 - the WSGI application launcher
 
 Let's move the views out to their own ``views.py`` module and change
 the ``app.py`` to scan that module, looking for decorators that set up
-the views. First, our revised ``app.py``:
+the views.
+
+First, our revised ``app.py``:
 
 .. literalinclude:: quick_tour/views/app.py
     :linenos:
@@ -163,8 +164,8 @@ and responses:
 .. literalinclude:: quick_tour/views/views.py
     :linenos:
 
-We have 4 views, each leading to the other. If you start at
-``http://localhost:6543/``, you get a response with a link to the next
+We have four views, each leading to the other. If you start at
+http://localhost:6543/, you get a response with a link to the next
 view. The ``hello_view`` (available at the URL ``/howdy``) has a link
 to the ``redirect_view``, which issues a redirect to the final
 view.
@@ -175,7 +176,7 @@ section introduces ``@view_config``. Pyramid's configuration supports
 the previous example. You can also use :term:`declarative
 configuration`, in which a Python :term:`decorator` is placed on the
 line above the view. Both approaches result in the same final
-configuration, thus usually, it is simply a matter of taste.
+configuration, thus usually it is simply a matter of taste.
 
 .. seealso:: See also:
    :ref:`Quick Tutorial Views <qtut_views>`,
@@ -195,7 +196,7 @@ Above we saw the basics of routing URLs to views in Pyramid:
 - Your project's "setup" code registers a route name to be used when
   matching part of the URL
 
-- Elsewhere, a view is configured to be called for that route name
+- Elsewhere a view is configured to be called for that route name
 
 .. note::
 
@@ -282,12 +283,12 @@ we can use ``name`` as a variable in our template via
     :ref:`debugging_templates`, and
     :ref:`available_template_system_bindings`
 
-Templating With ``jinja2``
+Templating with ``jinja2``
 ==========================
 
 We just said Pyramid doesn't prefer one templating language over
 another. Time to prove it. Jinja2 is a popular templating system,
-modelled after Django's templates. Let's add ``pyramid_jinja2``,
+modeled after Django's templates. Let's add ``pyramid_jinja2``,
 a Pyramid :term:`add-on` which enables Jinja2 as a :term:`renderer` in
 our Pyramid applications:
 
@@ -324,12 +325,12 @@ renderer.
     `Jinja2 homepage <http://jinja.pocoo.org/>`_, and
     :ref:`pyramid_jinja2 Overview <jinja2:overview>`
 
-Static Assets
+Static assets
 =============
 
 Of course the Web is more than just markup. You need static assets:
 CSS, JS, and images. Let's point our web app at a directory where
-Pyramid will serve some static assets. First, another call to the
+Pyramid will serve some static assets. First another call to the
 :term:`configurator`:
 
 .. literalinclude:: quick_tour/static_assets/app.py
@@ -337,10 +338,10 @@ Pyramid will serve some static assets. First, another call to the
     :end-before: End Static 1
 
 This tells our WSGI application to map requests under
-``http://localhost:6543/static/`` to files and directories inside a
+http://localhost:6543/static/ to files and directories inside a
 ``static`` directory alongside our Python module.
 
-Next, make a directory ``static`` and place ``app.css`` inside:
+Next make a directory named ``static``, and place ``app.css`` inside:
 
 .. literalinclude:: quick_tour/static_assets/static/app.css
     :language: css
@@ -394,14 +395,13 @@ into JSON and set the appropriate HTTP headers.
     :ref:`json_renderer`, and
     :ref:`adding_and_overriding_renderers`
 
-View Classes
+View classes
 ============
 
 So far our views have been simple, free-standing functions. Many times
 your views are related: different ways to look at or work on the same
-data or a REST API that handles multiple operations. Grouping these
-together as a
-:ref:`view class <class_as_view>` makes sense:
+data, or a REST API that handles multiple operations. Grouping these
+together as a :ref:`view class <class_as_view>` makes sense.
 
 - Group views
 
@@ -425,14 +425,14 @@ Specifically:
 
 - The second view is returned when the form data contains a field with
   ``form.edit``, such as clicking on
-  ``<input type="submit" name="form.edit" value="Save"/>``. This rule
+  ``<input type="submit" name="form.edit" value="Save">``. This rule
   is specified in the ``@view_config`` for that view.
 
 - The third view is returned when clicking on a button such
-  as ``<input type="submit" name="form.delete" value="Delete"/>``.
+  as ``<input type="submit" name="form.delete" value="Delete">``.
 
-Only one route needed, stated in one place atop the view class. Also,
-the assignment of the ``name`` is done in the ``__init__``. Our
+Only one route is needed, stated in one place atop the view class. Also,
+the assignment of ``name`` is done in the ``__init__`` function. Our
 templates can then use ``{{ view.name }}``.
 
 Pyramid view classes, combined with built-in and custom predicates,
@@ -450,7 +450,7 @@ have much more to offer:
     :ref:`Quick Tutorial More View Classes <qtut_more_view_classes>`, and
     :ref:`class_as_view`
 
-Quick Project Startup with Scaffolds
+Quick project startup with scaffolds
 ====================================
 
 So far we have done all of our *Quick Tour* as a single Python file.
@@ -501,7 +501,7 @@ Let's look at ``pserve`` and configuration in more depth.
     :ref:`project_narr`, and
     :doc:`../narr/scaffolding`
 
-Application Running with ``pserve``
+Application running with ``pserve``
 ===================================
 
 Prior to scaffolds, our project mixed a number of operational details
@@ -530,19 +530,19 @@ take a look at this configuration file.
 .. seealso:: See also:
     :ref:`what_is_this_pserve_thing`
 
-Configuration with ``.ini`` Files
+Configuration with ``.ini`` files
 =================================
 
 Earlier in *Quick Tour* we first met Pyramid's configuration system.
 At that point we did all configuration in Python code. For example,
 the port number chosen for our HTTP server was right there in Python
-code. Our scaffold has moved this decision, and more, into the
+code. Our scaffold has moved this decision and more into the
 ``development.ini`` file:
 
 .. literalinclude:: quick_tour/package/development.ini
     :language: ini
 
-Let's take a quick high-level look. First, the ``.ini`` file is divided
+Let's take a quick high-level look. First the ``.ini`` file is divided
 into sections:
 
 - ``[app:hello_world]`` configures our WSGI app
@@ -555,23 +555,21 @@ into sections:
 
 We have a few decisions made for us in this configuration:
 
-#. *Choice of web server*. The ``use = egg:pyramid#wsgiref`` tells
-   ``pserve`` to use the ``wsgiref`` server that is wrapped in the Pyramid
-   package.
+#. *Choice of web server:* ``use = egg:pyramid#wsgiref`` tells ``pserve`` to
+   use the ``wsgiref`` server that is wrapped in the Pyramid package.
 
-#. *Port number*. ``port = 6543`` tells ``wsgiref`` to listen on port
-   6543.
+#. *Port number:* ``port = 6543`` tells ``wsgiref`` to listen on port 6543.
 
-#. *WSGI app*. What package has our WSGI application in it?
+#. *WSGI app:* What package has our WSGI application in it?
    ``use = egg:hello_world`` in the app section tells the
    configuration what application to load.
 
-#. *Easier development by automatic template reloading*. In development
-   mode, you shouldn't have to restart the server when editing a Jinja2
-   template. ``reload_templates = true`` sets this policy,
-   which might be different in production.
+#. *Easier development by automatic template reloading:* In development mode,
+   you shouldn't have to restart the server when editing a Jinja2 template.
+   ``reload_templates = true`` sets this policy, which might be different in
+   production.
 
-Additionally, the ``development.ini`` generated by this scaffold wired
+Additionally the ``development.ini`` generated by this scaffold wired
 up Python's standard logging. We'll now see in the console, for example,
 a log on every request that comes in, as well as traceback information.
 
@@ -581,7 +579,7 @@ a log on every request that comes in, as well as traceback information.
     :doc:`../narr/paste`
 
 
-Easier Development with ``debugtoolbar``
+Easier development with ``debugtoolbar``
 ========================================
 
 As we introduce the basics, we also want to show how to be productive in
@@ -592,21 +590,21 @@ reloading and earlier we showed ``--reload`` for application reloading.
 several tools available in your browser. Adding it to your project
 illustrates several points about configuration.
 
-First, change your ``setup.py`` to say:
+First change your ``setup.py`` to say:
 
 .. literalinclude:: quick_tour/package/setup.py
     :start-after: Start Requires
     :end-before: End Requires
 
-...and re-run your setup:
+...and rerun your setup:
 
 .. code-block:: bash
 
     $ python ./setup.py develop
 
-The Python package was now installed into our environment. The package
-is a Pyramid add-on, which means we need to include its configuration
-into our web application. We could do this with imperative
+The Python package ``pyramid_debugtoolbar`` is now installed into our
+environment. The package is a Pyramid add-on, which means we need to include
+its configuration into our web application. We could do this with imperative
 configuration, as we did above for the ``pyramid_jinja2`` add-on:
 
 .. literalinclude:: quick_tour/package/hello_world/__init__.py
@@ -635,12 +633,12 @@ configuration file.
     pyramid_debugtoolbar <qtut_debugtoolbar>` and
     :ref:`pyramid_debugtoolbar <toolbar:overview>`
 
-Unit Tests and ``nose``
+Unit tests and ``nose``
 =======================
 
-Yikes! We got this far and we haven't yet discussed tests. Particularly
-egregious, as Pyramid has had a deep commitment to full test coverage
-since before it was released.
+Yikes! We got this far and we haven't yet discussed tests. This is
+particularly egregious, as Pyramid has had a deep commitment to full test
+coverage since before its release.
 
 Our ``pyramid_jinja2_starter`` scaffold generated a ``tests.py`` module
 with one unit test in it. To run it, let's install the handy ``nose``
@@ -656,7 +654,7 @@ the ``coverage`` tool which yells at us for code that isn't tested:
           }
     )
 
-We changed ``setup.py`` which means we need to re-run
+We changed ``setup.py`` which means we need to rerun
 ``python ./setup.py develop``. We can now run all our tests:
 
 .. code-block:: bash
@@ -694,7 +692,7 @@ Logging
 =======
 
 It's important to know what is going on inside our web application.
-In development we might need to collect some output. In production,
+In development we might need to collect some output. In production
 we might need to detect situations when other people use the site. We
 need *logging*.
 
@@ -716,7 +714,7 @@ You can now, in your code, log messages:
     :start-after: Start Logging 2
     :end-before: End Logging 2
 
-This will log ``Some Message`` at a ``debug`` log level,
+This will log ``Some Message`` at a ``debug`` log level
 to the application-configured logger in your ``development.ini``. What
 controls that? These sections in the configuration file:
 
@@ -727,7 +725,7 @@ controls that? These sections in the configuration file:
 
 Our application, a package named ``hello_world``, is set up as a logger
 and configured to log messages at a ``DEBUG`` or higher level. When you
-visit ``http://localhost:6543`` your console will now show::
+visit http://localhost:6543, your console will now show::
 
  2013-08-09 10:42:42,968 DEBUG [hello_world.views][MainThread] Some Message
 
@@ -886,8 +884,8 @@ widgets, schemas, and validation. Recent versions of Deform also
 include a :ref:`retail mode <deform:retail>` for gaining Deform
 features on custom forms.
 
-Also, the ``deform_bootstrap`` Pyramid add-on restyles the stock Deform
-widgets using attractive CSS from Bootstrap and more powerful widgets
+Also the ``deform_bootstrap`` Pyramid add-on restyles the stock Deform
+widgets using attractive CSS from Twitter Bootstrap and more powerful widgets
 from Chosen.
 
 .. seealso:: See also:
