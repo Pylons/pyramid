@@ -1,19 +1,19 @@
 Typographical Conventions
 =========================
 
-Literals, filenames and function arguments are presented using the
+Literals, filenames, and function arguments are presented using the
 following style:
 
   ``argument1``
 
-Warnings, which represent limitations and need-to-know information
+Warnings which represent limitations and need-to-know information
 related to a topic or concept are presented in the following style:
 
   .. warning::
 
      This is a warning.
 
-Notes, which represent additional information related to a topic or
+Notes which represent additional information related to a topic or
 concept are presented in the following style:
 
   .. note::
@@ -105,7 +105,7 @@ It may look unusual, but it has advantages:
 
 * It allows one to swap out the higher-level package ``foo`` for something
   else that provides the similar API. An example would be swapping out
-  one Database for another (e.g. graduating from SQLite to PostgreSQL).
+  one Database for another (e.g., graduating from SQLite to PostgreSQL).
 
 * Looks more neat in cases where a large number of objects get imported from
   that package.

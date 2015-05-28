@@ -39,12 +39,12 @@ For Windows:
 
 Of course Pyramid runs fine on Python 2.6+, as do the examples in this
 *Quick Tour*. We're just showing Python 3 a little love (Pyramid had
-production support in October 2011.)
+production support for Python 3 in October 2011).
 
 .. note::
 
     Why ``easy_install`` and not ``pip``? Pyramid encourages use of namespace
-    packages which, until recently, ``pip`` didn't permit. Also, Pyramid has
+    packages which, until recently, ``pip`` didn't permit. Also Pyramid has
     some optional C extensions for performance. With ``easy_install``, Windows
     users can get these extensions without needing a C compiler.
 
