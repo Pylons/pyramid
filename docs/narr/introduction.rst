@@ -65,11 +65,11 @@ Openness
 
 .. _what_makes_pyramid_unique:
 
-What Makes Pyramid Unique
+What makes Pyramid unique
 -------------------------
 
 Understandably, people don't usually want to hear about squishy engineering
-principles, they want to hear about concrete stuff that solves their
+principles; they want to hear about concrete stuff that solves their
 problems.  With that in mind, what would make someone want to use Pyramid
 instead of one of the many other web frameworks available today?  What makes
 Pyramid unique?
@@ -78,13 +78,13 @@ This is a hard question to answer, because there are lots of excellent
 choices, and it's actually quite hard to make a wrong choice, particularly in
 the Python web framework market.  But one reasonable answer is this: you can
 write very small applications in Pyramid without needing to know a lot.
-"What?", you say, "that can't possibly be a unique feature, lots of other web
+"What?", you say. "That can't possibly be a unique feature. Lots of other web
 frameworks let you do that!"  Well, you're right.  But unlike many other
 systems, you can also write very large applications in Pyramid if you learn a
 little more about it.  Pyramid will allow you to become productive quickly,
-and will grow with you; it won't hold you back when your application is small
+and will grow with you. It won't hold you back when your application is small,
 and it won't get in your way when your application becomes large.  "Well
-that's fine," you say, "lots of other frameworks let me write large apps
+that's fine," you say. "Lots of other frameworks let me write large apps,
 too."  Absolutely.  But other Python web frameworks don't seamlessly let you
 do both.  They seem to fall into two non-overlapping categories: frameworks
 for "small apps" and frameworks for "big apps".  The "small app" frameworks
@@ -95,15 +95,15 @@ in a "small framework" and "big apps" in a "big framework".  You can't really
 know to what size every application will eventually grow.  We don't really
 want to have to rewrite a previously small application in another framework
 when it gets "too big".  We believe the current binary distinction between
-frameworks for small and large applications is just false; a well-designed
+frameworks for small and large applications is just false. A well-designed
 framework should be able to be good at both.  Pyramid strives to be that kind
 of framework.
 
 To this end, Pyramid provides a set of features that, combined, are unique
 amongst Python web frameworks.  Lots of other frameworks contain some
-combination of these features; Pyramid of course actually stole many of them
+combination of these features. Pyramid of course actually stole many of them
 from those other frameworks.  But Pyramid is the only one that has all of
-them in one place, documented appropriately, and useful a la carte without
+them in one place, documented appropriately, and useful *à la carte* without
 necessarily paying for the entire banquet.  These are detailed below.
 
 Single-file applications
@@ -143,14 +143,14 @@ decorators to localize the configuration.  For example:
        return Response('fred')
 
 However, unlike some other systems, using decorators for Pyramid
-configuration does not make your application difficult to extend, test or
+configuration does not make your application difficult to extend, test, or
 reuse.  The :class:`~pyramid.view.view_config` decorator, for example, does
 not actually *change* the input or output of the function it decorates, so
-testing it is a "WYSIWYG" operation; you don't need to understand the
-framework to test your own code, you just behave as if the decorator is not
+testing it is a "WYSIWYG" operation. You don't need to understand the
+framework to test your own code. You just behave as if the decorator is not
 there.  You can also instruct Pyramid to ignore some decorators, or use
 completely imperative configuration instead of decorators to add views.
-Pyramid decorators are inert instead of eager: you detect and activate them
+Pyramid decorators are inert instead of eager. You detect and activate them
 with a :term:`scan`.
 
 Example: :ref:`mapping_views_using_a_decorator_section`.
@@ -171,24 +171,24 @@ Static file serving
 Pyramid is perfectly willing to serve static files itself.  It won't make you
 use some external web server to do that.  You can even serve more than one
 set of static files in a single Pyramid web application (e.g. ``/static`` and
-``/static2``).  You can also, optionally, place your files on an external web
-server and ask Pyramid to help you generate URLs to those files, so you can
-use Pyramid's internal fileserving while doing development, and a faster
-static file server in production without changing any code.
+``/static2``).  You can optionally place your files on an external web
+server and ask Pyramid to help you generate URLs to those files. This let's
+you use Pyramid's internal file serving while doing development, and a faster
+static file server in production, without changing any code.
 
 Example: :ref:`static_assets_section`.
 
-Fully Interactive Development
+Fully interactive development
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When developing a Pyramid application, several interactive features are
 available. Pyramid can automatically utilize changed templates when rendering
-pages and automatically restart the application to incorporate changed python
+pages and automatically restart the application to incorporate changed Python
 code. Plain old ``print()`` calls used for debugging can display to a console.
 
 Pyramid's debug toolbar comes activated when you use a Pyramid scaffold to
 render a project.  This toolbar overlays your application in the browser, and
-allows you access to framework data such as the routes configured, the last
+allows you access to framework data, such as the routes configured, the last
 renderings performed, the current set of packages installed, SQLAlchemy
 queries run, logging data, and various other facts.  When an exception
 occurs, you can use its interactive debugger to poke around right in your
@@ -201,16 +201,16 @@ Debugging settings
 
 Pyramid has debugging settings that allow you to print Pyramid runtime
 information to the console when things aren't behaving as you're expecting.
-For example, you can turn on "debug_notfound", which prints an informative
+For example, you can turn on ``debug_notfound``, which prints an informative
 message to the console every time a URL does not match any view.  You can
-turn on "debug_authorization", which lets you know why a view execution was
+turn on ``debug_authorization``, which lets you know why a view execution was
 allowed or denied by printing a message to the console.  These features are
 useful for those WTF moments.
 
 There are also a number of commands that you can invoke within a Pyramid
-environment that allow you to introspect the configuration of your system:
+environment that allow you to introspect the configuration of your system.
 ``proutes`` shows all configured routes for an application in the order
-they'll be evaluated for matching; ``pviews`` shows all configured views for
+they'll be evaluated for matching. ``pviews`` shows all configured views for
 any given URL.  These are also WTF-crushers in some circumstances.
 
 Examples: :ref:`debug_authorization_section` and :ref:`command_line_chapter`.
@@ -224,8 +224,8 @@ that the Pyramid core doesn't.  Add-on packages already exist which let you
 easily send email, let you use the Jinja2 templating system, let you use
 XML-RPC or JSON-RPC, let you integrate with jQuery Mobile, etc.
 
-Examples: http://docs.pylonsproject.org/en/latest/docs/pyramid.html#pyramid-add-on-documentation
-
+Examples:
+http://docs.pylonsproject.org/en/latest/docs/pyramid.html#pyramid-add-on-documentation
 
 Class-based and function-based views
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -233,13 +233,13 @@ Class-based and function-based views
 Pyramid has a structured, unified concept of a :term:`view callable`.
 View callables can be functions, methods of classes, or even instances.  When
 you add a new view callable, you can choose to make it a function or a method
-of a class; in either case, Pyramid treats it largely the same way.  You can
-change your mind later, and move code between methods of classes and
+of a class. In either case Pyramid treats it largely the same way.  You can
+change your mind later and move code between methods of classes and
 functions.  A collection of similar view callables can be attached to a
 single class as methods, if that floats your boat, and they can share
 initialization code as necessary.  All kinds of views are easy to understand
-and use and operate similarly.  There is no phony distinction between them;
-they can be used for the same purposes.
+and use, and operate similarly.  There is no phony distinction between them.
+They can be used for the same purposes.
 
 Here's a view callable defined as a function:
 
@@ -283,10 +283,10 @@ Asset specifications
 ~~~~~~~~~~~~~~~~~~~~
 
 Asset specifications are strings that contain both a Python package name and
-a file or directory name, e.g. ``MyPackage:static/index.html``.  Use of these
+a file or directory name, e.g., ``MyPackage:static/index.html``.  Use of these
 specifications is omnipresent in Pyramid.  An asset specification can refer
 to a template, a translation directory, or any other package-bound static
-resource.  This makes a system built on Pyramid extensible, because you don't
+resource.  This makes a system built on Pyramid extensible because you don't
 have to rely on globals ("*the* static directory") or lookup schemes ("*the*
 ordered set of template directories") to address your files.  You can move
 files around as necessary, and include other packages that may not share your
@@ -325,10 +325,9 @@ If you use a :term:`renderer`, you don't have to return a special kind of
 "webby" ``Response`` object from a view.  Instead, you can return a
 dictionary, and Pyramid will take care of converting that dictionary
 to a Response using a template on your behalf.  This makes the view easier to
-test, because you don't have to parse HTML in your tests; just make an
-assertion instead that the view returns "the right stuff" in the dictionary
-it returns.  You can write "real" unit tests instead of functionally testing
-all of your views.
+test, because you don't have to parse HTML in your tests; instead just make an
+assertion that the view returns "the right stuff" in the dictionary.  You can
+write "real" unit tests instead of functionally testing all of your views.
 
 .. index::
    pair: renderer; explicitly calling
@@ -394,7 +393,7 @@ Built-in internationalization
 
 Pyramid ships with internationalization-related features in its core:
 localization, pluralization, and creating message catalogs from source files
-and templates.  Pyramid allows for a plurality of message catalog via the use
+and templates.  Pyramid allows for a plurality of message catalogs via the use
 of translation domains: you can create a system that has its own translations
 without conflict with other translations in other domains.
 
@@ -445,7 +444,7 @@ useless without requirements and goals, but if you need speed, Pyramid will
 almost certainly never be your application's bottleneck; at least no more
 than Python will be a bottleneck.
 
-Example: http://blog.curiasolutions.com/the-great-web-framework-shootout/
+Example: http://blog.curiasolutions.com/pages/the-great-web-framework-shootout.html
 
 Exception views
 ~~~~~~~~~~~~~~~
@@ -469,11 +468,11 @@ No singletons
 ~~~~~~~~~~~~~
 
 Pyramid is written in such a way that it requires your application to have
-exactly zero "singleton" data structures.  Or, put another way, Pyramid
+exactly zero "singleton" data structures.  Or put another way, Pyramid
 doesn't require you to construct any "mutable globals".  Or put even a
 different way, an import of a Pyramid application needn't have any
 "import-time side effects".  This is esoteric-sounding, but if you've ever
-tried to cope with parameterizing a Django "settings.py" file for multiple
+tried to cope with parameterizing a Django ``settings.py`` file for multiple
 installations of the same application, or if you've ever needed to
 monkey-patch some framework fixture so that it behaves properly for your use
 case, or if you've ever wanted to deploy your system using an asynchronous
@@ -494,7 +493,7 @@ is the most basic thing you can do with a view predicate.  You can also
 associate views with other request parameters such as the elements in the
 query string, the Accept header, whether the request is an XHR request or
 not, and lots of other things.  This feature allows you to keep your
-individual views "clean"; they won't need much conditional logic, so they'll
+individual views clean. They won't need much conditional logic, so they'll
 be easier to test.
 
 Example: :ref:`view_configuration_parameters`.
@@ -505,10 +504,10 @@ Transaction management
 Pyramid's :term:`scaffold` system renders projects that include a
 *transaction management* system, stolen from Zope.  When you use this
 transaction management system, you cease being responsible for committing
-your data anymore.  Instead, Pyramid takes care of committing: it commits at
+your data anymore.  Instead Pyramid takes care of committing: it commits at
 the end of a request or aborts if there's an exception.  Why is that a good
 thing?  Having a centralized place for transaction management is a great
-thing.  If, instead of managing your transactions in a centralized place, you
+thing.  If instead of managing your transactions in a centralized place you
 sprinkle ``session.commit`` calls in your application logic itself, you can
 wind up in a bad place.  Wherever you manually commit data to your database,
 it's likely that some of your other code is going to run *after* your commit.
@@ -521,8 +520,8 @@ who also care about data integrity.  Either the request completes
 successfully, and all changes are committed, or it does not, and all changes
 are aborted.
 
-Also, Pyramid's transaction management system allows you to synchronize
-commits between multiple databases, and allows you to do things like
+Pyramid's transaction management system allows you to synchronize
+commits between multiple databases. It also allows you to do things like
 conditionally send email if a transaction commits, but otherwise keep quiet.
 
 Example: :ref:`bfg_sql_wiki_tutorial` (note the lack of commit statements
@@ -534,13 +533,14 @@ Configuration conflict detection
 When a system is small, it's reasonably easy to keep it all in your head.
 But when systems grow large, you may have hundreds or thousands of
 configuration statements which add a view, add a route, and so forth.
-Pyramid's configuration system keeps track of your configuration statements,
-and if you accidentally add two that are identical, or Pyramid can't make
+
+Pyramid's configuration system keeps track of your configuration statements.
+If you accidentally add two that are identical, or Pyramid can't make
 sense out of what it would mean to have both statements active at the same
-time, it will complain loudly at startup time.  It's not dumb though: it will
+time, it will complain loudly at startup time.  It's not dumb though. It will
 automatically resolve conflicting configuration statements on its own if you
-use the configuration :meth:`~pyramid.config.Configurator.include` system:
-"more local" statements are preferred over "less local" ones.  This allows
+use the configuration :meth:`~pyramid.config.Configurator.include` system.
+"More local" statements are preferred over "less local" ones.  This allows
 you to intelligently factor large systems into smaller ones.
 
 Example: :ref:`conflict_detection`.
@@ -552,15 +552,15 @@ Unlike other systems, Pyramid provides a structured "include" mechanism (see
 :meth:`~pyramid.config.Configurator.include`) that allows you to combine
 applications from multiple Python packages.  All the configuration statements
 that can be performed in your "main" Pyramid application can also be
-performed by included packages including the addition of views, routes,
+performed by included packages, including the addition of views, routes,
 subscribers, and even authentication and authorization policies. You can even
 extend or override an existing application by including another application's
 configuration in your own, overriding or adding new views and routes to
 it.  This has the potential to allow you to create a big application out of
 many other smaller ones.  For example, if you want to reuse an existing
 application that already has a bunch of routes, you can just use the
-``include`` statement with a ``route_prefix``; the new application will live
-within your application at a URL prefix.  It's not a big deal, and requires
+``include`` statement with a ``route_prefix``. The new application will live
+within your application at an URL prefix.  It's not a big deal, and requires
 little up-front engineering effort.
 
 For example:
@@ -603,8 +603,8 @@ Traversal
 :term:`Traversal` is a concept stolen from :term:`Zope`.  It allows you to
 create a tree of resources, each of which can be addressed by one or more
 URLs.  Each of those resources can have one or more *views* associated with
-it. If your data isn't naturally treelike (or you're unwilling to create a
-treelike representation of your data), you aren't going to find traversal
+it. If your data isn't naturally treelike, or you're unwilling to create a
+treelike representation of your data, you aren't going to find traversal
 very useful.  However, traversal is absolutely fantastic for sites that need
 to be arbitrarily extensible: it's a lot easier to add a node to a tree than
 it is to shoehorn a route into an ordered list of other routes, or to create
@@ -635,7 +635,7 @@ View response adapters
 
 A lot is made of the aesthetics of what *kinds* of objects you're allowed to
 return from view callables in various frameworks.  In a previous section in
-this document we showed you that, if you use a :term:`renderer`, you can
+this document, we showed you that, if you use a :term:`renderer`, you can
 usually return a dictionary from a view callable instead of a full-on
 :term:`Response` object.  But some frameworks allow you to return strings or
 tuples from view callables.  When frameworks allow for this, code looks
@@ -826,7 +826,7 @@ within a function called when another user uses the
 
     See also :ref:`add_directive`.
 
-Programmatic Introspection
+Programmatic introspection
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you're building a large system that other users may plug code into, it's
@@ -856,7 +856,7 @@ callable:
 
     See also :ref:`using_introspection`.
 
-Python 3 Compatibility
+Python 3 compatibility
 ~~~~~~~~~~~~~~~~~~~~~~
 
 Pyramid and most of its add-ons are Python 3 compatible.  If you develop a
@@ -871,11 +871,11 @@ Every release of Pyramid has 100% statement coverage via unit and integration
 tests, as measured by the ``coverage`` tool available on PyPI.  It also has
 greater than 95% decision/condition coverage as measured by the
 ``instrumental`` tool available on PyPI.  It is automatically tested by the
-Jenkins tool on Python 2.6, Python 2.7, Python 3.2 and PyPy after each commit
-to its GitHub repository.  Official Pyramid add-ons are held to a similar
-testing standard.  We still find bugs in Pyramid and its official add-ons,
-but we've noticed we find a lot more of them while working on other projects
-that don't have a good testing regime.
+Jenkins tool on Python 2.6, Python 2.7, Python 3.2, Python 3.3, Python 3.4,
+PyPy, and PyPy3 after each commit to its GitHub repository.  Official Pyramid
+add-ons are held to a similar testing standard.  We still find bugs in Pyramid
+and its official add-ons, but we've noticed we find a lot more of them while
+working on other projects that don't have a good testing regime.
 
 Example: http://jenkins.pylonsproject.org/
 
@@ -883,15 +883,15 @@ Support
 ~~~~~~~
 
 It's our goal that no Pyramid question go unanswered.  Whether you ask a
-question on IRC, on the Pylons-discuss maillist, or on StackOverflow, you're
-likely to get a reasonably prompt response.  We don't tolerate "support
+question on IRC, on the Pylons-discuss mailing list, or on StackOverflow,
+you're likely to get a reasonably prompt response.  We don't tolerate "support
 trolls" or other people who seem to get their rocks off by berating fellow
 users in our various official support channels.  We try to keep it well-lit
 and new-user-friendly.
 
 Example: Visit irc\://freenode.net#pyramid (the ``#pyramid`` channel on
 irc.freenode.net in an IRC client) or the pylons-discuss maillist at
-http://groups.google.com/group/pylons-discuss/ .
+http://groups.google.com/group/pylons-discuss/.
 
 Documentation
 ~~~~~~~~~~~~~
@@ -900,12 +900,12 @@ It's a constant struggle, but we try to maintain a balance between
 completeness and new-user-friendliness in the official narrative Pyramid
 documentation (concrete suggestions for improvement are always appreciated,
 by the way).  We also maintain a "cookbook" of recipes, which are usually
-demonstrations of common integration scenarios, too specific to add to the
+demonstrations of common integration scenarios too specific to add to the
 official narrative docs.  In any case, the Pyramid documentation is
 comprehensive.
 
-Example: The rest of this documentation and the cookbook at
-http://docs.pylonsproject.org/projects/pyramid_cookbook/dev/ .
+Example: The Pyramid Cookbook at
+http://docs.pylonsproject.org/projects/pyramid-cookbook/en/latest/.
 
 .. index::
    single: Pylons Project
@@ -934,25 +934,26 @@ in July of 2008.  At the end of 2010, we changed the name of
 as :app:`Pyramid` in November of that year.
 
 :app:`Pyramid` was inspired by :term:`Zope`, :term:`Pylons` (version
-1.0) and :term:`Django`.  As a result, :app:`Pyramid` borrows several
+1.0), and :term:`Django`.  As a result, :app:`Pyramid` borrows several
 concepts and features from each, combining them into a unique web
 framework.
 
 Many features of :app:`Pyramid` trace their origins back to :term:`Zope`.
-Like Zope applications, :app:`Pyramid` applications can be easily extended:
-if you obey certain constraints, the application you produce can be reused,
+Like Zope applications, :app:`Pyramid` applications can be easily extended.
+If you obey certain constraints, the application you produce can be reused,
 modified, re-integrated, or extended by third-party developers without
 forking the original application.  The concepts of :term:`traversal` and
 declarative security in :app:`Pyramid` were pioneered first in Zope.
 
 The :app:`Pyramid` concept of :term:`URL dispatch` is inspired by the
-:term:`Routes` system used by :term:`Pylons` version 1.0.  Like Pylons
-version 1.0, :app:`Pyramid` is mostly policy-free.  It makes no
-assertions about which database you should use, and its built-in
-templating facilities are included only for convenience.  In essence,
-it only supplies a mechanism to map URLs to :term:`view` code, along
-with a set of conventions for calling those views.  You are free to
-use third-party components that fit your needs in your applications.
+:term:`Routes` system used by :term:`Pylons` version 1.0.  Like Pylons version
+1.0, :app:`Pyramid` is mostly policy-free.  It makes no assertions about which
+database you should use. Pyramid no longer has built-in templating facilities
+as of version 1.5a2, but instead officially supports bindings for templating
+languages, including Chameleon, Jinja2, and Mako.  In essence, it only
+supplies a mechanism to map URLs to :term:`view` code, along with a set of
+conventions for calling those views.  You are free to use third-party
+components that fit your needs in your applications.
 
 The concept of :term:`view` is used by :app:`Pyramid` mostly as it would be
 by Django.  :app:`Pyramid` has a documentation culture more like Django's
@@ -967,15 +968,15 @@ declarations are used for this purpose.  Out of the box, Pyramid supports
 imperative and decorator-based configuration; :term:`ZCML` may be used via an
 add-on package named ``pyramid_zcml``.
 
-Also unlike :term:`Zope` and unlike other "full-stack" frameworks such
+Also unlike :term:`Zope` and other "full-stack" frameworks such
 as :term:`Django`, :app:`Pyramid` makes no assumptions about which
 persistence mechanisms you should use to build an application.  Zope
 applications are typically reliant on :term:`ZODB`; :app:`Pyramid`
 allows you to build :term:`ZODB` applications, but it has no reliance
 on the ZODB software.  Likewise, :term:`Django` tends to assume that
 you want to store your application's data in a relational database.
-:app:`Pyramid` makes no such assumption; it allows you to use a
-relational database but doesn't encourage or discourage the decision.
+:app:`Pyramid` makes no such assumption, allowing you to use a
+relational database, and neither encouraging nor discouraging the decision.
 
 Other Python web frameworks advertise themselves as members of a class
 of web frameworks named `model-view-controller
@@ -987,7 +988,7 @@ frameworks, :app:`Pyramid` also generally fits into this class.
 
    The :app:`Pyramid` authors believe that the MVC pattern just doesn't
    really fit the web very well. In a :app:`Pyramid` application, there is a
-   resource tree, which represents the site structure, and views, which tend
+   resource tree which represents the site structure, and views which tend
    to present the data stored in the resource tree and a user-defined "domain
    model".  However, no facility provided *by the framework* actually
    necessarily maps to the concept of a "controller" or "model".  So if you
