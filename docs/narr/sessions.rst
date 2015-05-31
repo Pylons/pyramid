@@ -414,6 +414,11 @@ See :meth:`pyramid.config.Configurator.add_route`.
     def myview(request):
         ...
 
+.. note::
+   A mismatch of CSRF token is treated like any other predicate miss, and the
+   predicate system, when it doesn't find a view, raises ``HTTPNotFound``
+   instead of ``HTTPBadRequest``, so ``check_csrf=True`` behavior is different
+   from calling :func:`pyramid.session.check_csrf_token`.
 
 Using the ``session.new_csrf_token`` Method
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
