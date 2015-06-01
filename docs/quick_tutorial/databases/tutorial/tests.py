@@ -23,9 +23,11 @@ def _initTestingDB():
 class WikiViewTests(unittest.TestCase):
     def setUp(self):
         self.session = _initTestingDB()
+        self.config = testing.setUp()
 
     def tearDown(self):
         self.session.remove()
+        testing.tearDown()
 
     def test_wiki_view(self):
         from tutorial.views import WikiViews
