@@ -40,7 +40,6 @@ class WikiViewTests(unittest.TestCase):
 
 class WikiFunctionalTests(unittest.TestCase):
     def setUp(self):
-        self.session = _initTestingDB()
         self.config = testing.setUp()
         from pyramid.paster import get_app
         app = get_app('development.ini')
@@ -48,7 +47,8 @@ class WikiFunctionalTests(unittest.TestCase):
         self.testapp = TestApp(app)
 
     def tearDown(self):
-        self.session.remove()
+        from .models import DBSession
+        DBSession.remove()
         testing.tearDown()
 
     def test_it(self):
