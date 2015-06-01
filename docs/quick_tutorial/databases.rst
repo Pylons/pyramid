@@ -90,16 +90,28 @@ Steps
    .. code-block:: bash
 
     $ $VENV/bin/initialize_tutorial_db development.ini
-    2013-09-06 15:54:08,050 INFO  [sqlalchemy.engine.base.Engine][MainThread] PRAGMA table_info("wikipages")
-    2013-09-06 15:54:08,050 INFO  [sqlalchemy.engine.base.Engine][MainThread] ()
-    2013-09-06 15:54:08,051 INFO  [sqlalchemy.engine.base.Engine][MainThread]
+    2015-06-01 11:22:52,650 INFO  [sqlalchemy.engine.base.Engine][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
+    2015-06-01 11:22:52,650 INFO  [sqlalchemy.engine.base.Engine][MainThread] ()
+    2015-06-01 11:22:52,651 INFO  [sqlalchemy.engine.base.Engine][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
+    2015-06-01 11:22:52,651 INFO  [sqlalchemy.engine.base.Engine][MainThread] ()
+    2015-06-01 11:22:52,652 INFO  [sqlalchemy.engine.base.Engine][MainThread] PRAGMA table_info("wikipages")
+    2015-06-01 11:22:52,652 INFO  [sqlalchemy.engine.base.Engine][MainThread] ()
+    2015-06-01 11:22:52,653 INFO  [sqlalchemy.engine.base.Engine][MainThread]
     CREATE TABLE wikipages (
-            uid INTEGER NOT NULL,
-            title TEXT,
-            body TEXT,
-            PRIMARY KEY (uid),
-            UNIQUE (title)
+      uid INTEGER NOT NULL,
+      title TEXT,
+      body TEXT,
+      PRIMARY KEY (uid),
+      UNIQUE (title)
     )
+
+
+    2015-06-01 11:22:52,653 INFO  [sqlalchemy.engine.base.Engine][MainThread] ()
+    2015-06-01 11:22:52,655 INFO  [sqlalchemy.engine.base.Engine][MainThread] COMMIT
+    2015-06-01 11:22:52,658 INFO  [sqlalchemy.engine.base.Engine][MainThread] BEGIN (implicit)
+    2015-06-01 11:22:52,659 INFO  [sqlalchemy.engine.base.Engine][MainThread] INSERT INTO wikipages (title, body) VALUES (?, ?)
+    2015-06-01 11:22:52,659 INFO  [sqlalchemy.engine.base.Engine][MainThread] ('Root', '<p>Root</p>')
+    2015-06-01 11:22:52,659 INFO  [sqlalchemy.engine.base.Engine][MainThread] COMMIT
 
 #. With our data now driven by SQLAlchemy queries, we need to update
    our ``databases/tutorial/views.py``:
