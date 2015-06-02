@@ -289,17 +289,17 @@ follows:
 
 .. literalinclude:: src/authorization/tutorial/views.py
    :lines: 57-58
-   :emphasize-lines: 1-2
+   :emphasize-lines: 2
    :language: python
 
 .. literalinclude:: src/authorization/tutorial/views.py
    :lines: 72-73
-   :emphasize-lines: 1-2
+   :emphasize-lines: 2
    :language: python
 
 .. literalinclude:: src/authorization/tutorial/views.py
    :lines: 85-89
-   :emphasize-lines: 3-4
+   :emphasize-lines: 4
    :language: python
 
 Only the highlighted lines need to be added or edited.
