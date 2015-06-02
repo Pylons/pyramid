@@ -180,12 +180,12 @@ Add a ``permission='view'`` parameter to the ``@view_config`` decorator for
 
 .. literalinclude:: src/authorization/tutorial/views.py
    :lines: 30-31
-   :emphasize-lines: 1-2
+   :emphasize-lines: 2
    :language: python
 
 .. literalinclude:: src/authorization/tutorial/views.py
    :lines: 36-37
-   :emphasize-lines: 1-2
+   :emphasize-lines: 2
    :language: python
 
 Only the highlighted lines, along with their preceding commas, need to be
