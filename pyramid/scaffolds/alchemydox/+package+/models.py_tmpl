@@ -1,0 +1,62 @@
+"""
+@file {{project}}\{{package}}\models.py {{package}} Applications Models Script
+@package {{project}}.{{package}}.models {{package}} Applications Models Script
+@name Applications Models Script
+
+More details about {{package}} models
+
+@author author
+@date date
+@version 0.0
+"""
+
+## The name of the author, or authors, of {{package}} application
+__author__ = 'author'
+## The name of version of this setup script and/or {{package}} application
+__version__ = '0.0'
+
+from sqlalchemy import (
+    Column,
+    Index,
+    Integer,
+    Text,
+    )
+
+from sqlalchemy.ext.declarative import declarative_base
+
+from sqlalchemy.orm import (
+    scoped_session,
+    sessionmaker,
+    )
+
+from zope.sqlalchemy import ZopeTransactionExtension
+
+## Contains the session to connect to the database
+DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
+## Contains the declarative_base for the Alchemy database
+Base = declarative_base()
+
+
+class MyModel(Base):
+    """Provides a sample model table
+	
+    @author author
+    @date date
+    @version 0.0
+    @inherit Base
+    
+	More details for MyModel class
+	"""
+    
+    ## The table name for the MyModel class
+    __tablename__ = 'models'
+    ## The ID for this column in the model
+    id = Column(Integer, primary_key=True)
+    ## The name element in MyModel
+    name = Column(Text)
+    ## The value element in MyModel
+    value = Column(Integer)
+    
+
+# A sample index, called my_index
+Index('my_index', MyModel.name, unique=True, mysql_length=255)

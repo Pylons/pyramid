@@ -1,0 +1,99 @@
+"""
+@file {{project}}\setup.py {{project}} Project Setup
+@package {{project}}.setup {{project}} Project Setup
+@name {{project}} Project Setup
+
+More details about {{package}} setup
+
+@author author
+@date date
+@version 0.0.0
+"""
+
+## The name of the author, or authors, of {{project}} application
+__author__ = 'author'
+## The version of the setup file
+__version__ = '0.0'
+
+import os
+
+from setuptools import setup, find_packages
+
+## Internal reference variable to the path of this Pyramid application.
+here = os.path.abspath(os.path.dirname(__file__))
+with open(os.path.join(here, 'README.txt')) as f:
+    ## Contains the contents of the README.txt source file
+    README = f.read()
+with open(os.path.join(here, 'CHANGES.txt')) as f:
+    ## Contains the contents of the CHANGES.txt source file
+    CHANGES = f.read()
+
+## @var requires
+# Defines the requirements to install, and utilize, this Pyramid application.
+requires = [
+    # Indicates the pyramid package is required to install
+    'pyramid',
+    'pyramid_chameleon',
+    'pyramid_debugtoolbar',
+    'pyramid_tm',
+    'SQLAlchemy',
+    'transaction',
+    'zope.sqlalchemy',
+    'waitress',
+    ]
+
+# The setup definition for this Pyramid application
+setup(name='{{project}}',
+      ## @var version
+      # The version string for this Pyramid application
+      version='0.0',
+      ## @var description
+      # The description for this Pyramid application
+      description='{{project}}',
+      ## @var long_description
+      # The longer version of the description for this Pyramid application
+      long_description=README + '\n\n' + CHANGES,
+      ## @var classifiers
+      # Applicable classifiers for listing this Pyramid application
+      classifiers=[
+        "Programming Language :: Python",
+        "Framework :: Pyramid",
+        "Topic :: Internet :: WWW/HTTP",
+        "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
+        ],
+      ## @var author
+      # The author of this Pyramid application
+      author='',
+      ## @var author_email
+      # The email address of the author of this Pyramid application
+      author_email='',
+      ## @var url
+      # A related URL for the primary source of this Pyramid application
+      url='',
+      ## @var keywords
+      # The keywords that relate to this Pyramid application
+      keywords='web wsgi bfg pylons pyramid',
+      ## @var packages
+      # The packages setting to assist in finding required application packages
+      packages=find_packages(),
+      ## @var include_package_data
+      # True or False indicating if package data should be included.
+      include_package_data=True,
+      ## @var zip_safe
+      # True or False indicating if this package should be installed as a zip.
+      zip_safe=False,
+      ## @var test_suite
+      # Indicates {{package}} contains test suite for this application
+      test_suite='{{package}}',
+      ## @var install_requires
+      # Defines the packages required to install {{package}}
+      install_requires=requires,
+      ## @var entry_points
+      # Defines the entry points for the {{package}} Pyramid application
+      entry_points="""\
+      [paste.app_factory]
+      main = {{package}}:main
+      [console_scripts]
+      initialize_{{project}}_db = {{package}}.scripts.initializedb:main
+      """,
+      )

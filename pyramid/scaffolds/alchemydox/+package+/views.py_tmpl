@@ -1,0 +1,61 @@
+"""
+@file {{project}}\{{package}}\views.py {{package}} Application Views
+@package {{project}}.{{package}}.views {{package}} Application Views
+@name {{package}} Application Views
+
+More details about {{package}} views
+
+@author author
+@date date
+@version 0.0
+"""
+
+## @var __author__
+# The name of the author, or authors, of {{package}} application
+__author__ = 'author'
+## @var __version__
+# The version of the views file
+__version__ = '0.0'
+
+from pyramid.response import Response
+from pyramid.view import view_config
+
+from sqlalchemy.exc import DBAPIError
+
+from .models import (
+    DBSession,
+    MyModel,
+    )
+
+
+@view_config(route_name='home', renderer='templates/mytemplate.pt')
+def my_view(request):
+    """My View Routine
+    @param request Contains the request instance
+    @return dictionary containing values expected by the view template
+    """
+    try:
+        ## Contains the session query
+        one = DBSession.query(MyModel).filter(MyModel.name == 'one').first()
+    except DBAPIError:
+        return Response(conn_err_msg, content_type='text/plain', status_int=500)
+    return {'one': one, 'project': '{{project}}'}
+
+## @var conn_err_msg
+# Contains a sample connection error message if unable to access the application model
+conn_err_msg = """\
+Pyramid is having a problem using your SQL database.  The problem
+might be caused by one of the following things:
+
+1.  You may need to run the "initialize_{{project}}_db" script
+    to initialize your database tables.  Check your virtual 
+    environment's "bin" directory for this script and try to run it.
+
+2.  Your database server may not be running.  Check that the
+    database server referred to by the "sqlalchemy.url" setting in
+    your "development.ini" file is running.
+
+After you fix the problem, please restart the Pyramid application to
+try it again.
+"""
+
