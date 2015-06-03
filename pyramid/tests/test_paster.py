@@ -154,10 +154,10 @@ class Test_bootstrap(unittest.TestCase):
     def test_it_request_with_registry(self):
         request = DummyRequest({})
         request.registry = dummy_registry
-        with self._callFUT('/foo/bar/myapp.ini', request) as result:
-            self.assertEqual(result['app'], self.app)
-            self.assertEqual(result['root'], self.root)
-            self.assertTrue('closer' in result)
+        result = self._callFUT('/foo/bar/myapp.ini', request)
+        self.assertEqual(result['app'], self.app)
+        self.assertEqual(result['root'], self.root)
+        self.assertTrue('closer' in result)
 
 class Dummy:
     pass
