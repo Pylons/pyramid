@@ -1,4 +1,5 @@
 import os
+from contextlib import contextmanager
 
 from paste.deploy import (
     loadapp,
@@ -81,6 +82,7 @@ def _getpathsec(config_uri, name):
         section = name
     return path, section
 
+@contextmanager
 def bootstrap(config_uri, request=None, options=None):
     """ Load a WSGI application from the PasteDeploy config file specified
     by ``config_uri``. The environment will be configured as if it is
@@ -121,7 +123,7 @@ def bootstrap(config_uri, request=None, options=None):
     for you if none is provided. You can mutate the request's ``environ``
     later to setup a specific host/port/scheme/etc.
 
-    ``options`` Is passed to get_app for use as variable assignments like 
+    ``options`` Is passed to get_app for use as variable assignments like
     {'http_port': 8080} and then use %(http_port)s in the
     config file.
 
@@ -131,5 +133,5 @@ def bootstrap(config_uri, request=None, options=None):
     app = get_app(config_uri, options=options)
     env = prepare(request)
     env['app'] = app
-    return env
+    yield env
 
