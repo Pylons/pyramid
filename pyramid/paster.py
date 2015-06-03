@@ -1,5 +1,4 @@
 import os
-from contextlib import contextmanager
 
 from paste.deploy import (
     loadapp,
@@ -82,7 +81,6 @@ def _getpathsec(config_uri, name):
         section = name
     return path, section
 
-@contextmanager
 def bootstrap(config_uri, request=None, options=None):
     """ Load a WSGI application from the PasteDeploy config file specified
     by ``config_uri``. The environment will be configured as if it is
@@ -133,5 +131,5 @@ def bootstrap(config_uri, request=None, options=None):
     app = get_app(config_uri, options=options)
     env = prepare(request)
     env['app'] = app
-    yield env
+    return env
 
