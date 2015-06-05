@@ -1,6 +1,10 @@
 unreleased
 ==========
 
+- Fix an infinite recursion bug introduced in 1.6a1 when
+  ``pyramid.view.render_view_to_response`` was called directly or indirectly.
+  See https://github.com/Pylons/pyramid/issues/1643 .
+
 - Further fix the JSONP renderer by prefixing the returned content with
   a comment. This should mitigate attacks from Flash (See CVE-2014-4671).
   See https://github.com/Pylons/pyramid/pull/1649
@@ -9,8 +13,8 @@ unreleased
   fix was overly-restrictive and broke Angular.
   See https://github.com/Pylons/pyramid/pull/1649
 
-1.6 (2015-04-14)
-================
+1.6a1 (2015-04-15)
+==================
 
 Features
 --------
