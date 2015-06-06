@@ -1,0 +1,22 @@
+"""
+@file {{project}}\{{package}}\scripts\__init__.py {{package}} Application Scripts Initialization
+@package {{project}}.{{package}}.scripts.__init__ {{package}} Application Scripts Initialization
+@name {{package}} Application Scripts Initialization
+
+More details about {{package}} scripts initialization
+
+@author author
+@date date
+@version 0.0
+"""
+
+"""
+@package {{project}}.{{package}}.scripts {{package}} Scripts
+"""
+
+## The name of the author, or authors, of {{package}} application
+__author__ = 'author'
+## The version of this file
+__version__ = '0.0'
+
+# package

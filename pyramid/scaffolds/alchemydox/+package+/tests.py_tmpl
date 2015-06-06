@@ -1,0 +1,113 @@
+"""
+@file {{project}}\{{package}}\tests.py {{package}} Application Tests
+@package {{project}}.{{package}}.tests {{package}} Application Tests
+@name {{package}} Application Tests
+
+More details about {{package}} tests
+
+@author author
+@date date
+@version 0.0
+"""
+
+## The name of the author, or authors, of {{package}} application
+__author__ = 'author'
+## The version of the tests file
+__version__ = '0.0'
+
+import unittest
+import transaction
+
+from pyramid import testing
+
+from .models import DBSession
+
+class TestMyViewSuccessCondition(unittest.TestCase):
+    """Tests for my_view (Should Succeed)
+    @author author
+    @date date
+    @version 0.0
+    @inherit unittest.TestCase"""
+    
+    ## The name of the author(s) of this class
+    __author__ = 'author'
+    ## The version of this class
+    __version__ = '0.0'
+    
+    def setUp(self):
+        """setUp Routine
+        @brief The setUp Routine For Each Test
+        @param self The object instance"""
+        ## Contains the config of this test class
+        self.config = testing.setUp()
+        from sqlalchemy import create_engine
+        engine = create_engine('sqlite://')
+        from .models import (
+            Base,
+            MyModel,
+            )
+        DBSession.configure(bind=engine)
+        Base.metadata.create_all(engine)
+        with transaction.manager:
+            model = MyModel(name='one', value=55)
+            DBSession.add(model)
+
+    def tearDown(self):
+        """tearDown Routine
+        @brief The tearDown Routine For Each Test
+        @param self The object instance"""
+        DBSession.remove()
+        testing.tearDown()
+
+    def test_passing_view(self):
+        """Test My_View (Should Pass)
+        @brief Runs the test of my_view that should pass
+        @param self The object instance"""
+        from .views import my_view
+        request = testing.DummyRequest()
+        info = my_view(request)
+        self.assertEqual(info['one'].name, 'one')
+        self.assertEqual(info['project'], '{{project}}')
+
+
+class TestMyViewFailureCondition(unittest.TestCase):
+    """Tests for my_view (Should Fail)
+    @author author
+    @date date
+    @version 0.0
+    @inherit unittest.TestCase"""
+
+    ## The name of the author(s) of this class
+    __author__ = 'author'
+    ## The version of this class
+    __version__ = '0.0'
+    
+    def setUp(self):
+        """setUp Routine
+        @brief The setUp Routine For Each Test
+        @param self The object instance"""
+        ## Contains the config of this test class
+        self.config = testing.setUp()
+        from sqlalchemy import create_engine
+        engine = create_engine('sqlite://')
+        from .models import (
+            Base,
+            MyModel,
+            )
+        DBSession.configure(bind=engine)
+
+    def tearDown(self):
+        """tearDown Routine
+        @brief The tearDown Routine For Each Test
+        @param self The object instance"""
+        DBSession.remove()
+        testing.tearDown()
+
+    def test_failing_view(self):
+        """Test My_View (Should Fail)
+        @brief Runs the test of my_view that should fail
+        @param self The object instance"""
+        from .views import my_view
+        request = testing.DummyRequest()
+        info = my_view(request)
+        self.assertEqual(info.status_int, 500)
