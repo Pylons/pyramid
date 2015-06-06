@@ -119,7 +119,7 @@ Non-Predicate Arguments
 ``renderer``
   Denotes the :term:`renderer` implementation which will be used to construct
   a :term:`response` from the associated view callable's return value.
-  
+
   .. seealso:: See also :ref:`renderers_chapter`.
 
   This is either a single string term (e.g. ``json``) or a string implying a
@@ -1020,7 +1020,7 @@ there's a ``should_cache`` GET or POST variable:
    @view_config(http_cache=3600)
    def view(request):
        response = Response()
-       if not 'should_cache' in request.params:
+       if 'should_cache' not in request.params:
            response.cache_control.prevent_auto = True
        return response
 
