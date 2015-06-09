@@ -562,10 +562,6 @@ class HTTPClientError(HTTPError):
     a bug.  A server-side traceback is not warranted.  Unless specialized,
     this is a '400 Bad Request'
     """
-    code = 400
-    title = 'Bad Request'
-    explanation = ('The server could not comply with the request since '
-                   'it is either malformed or otherwise incorrect.')
 
 class HTTPBadRequest(HTTPClientError):
     """
@@ -576,7 +572,10 @@ class HTTPBadRequest(HTTPClientError):
 
     code: 400, title: Bad Request
     """
-    pass
+    code = 400
+    title = 'Bad Request'
+    explanation = ('The server could not comply with the request since '
+                   'it is either malformed or otherwise incorrect.')
 
 class HTTPUnauthorized(HTTPClientError):
     """
@@ -988,14 +987,13 @@ class HTTPServerError(HTTPError):
     This is an error condition in which the server is presumed to be
     in-error.  Unless specialized, this is a '500 Internal Server Error'.
     """
+
+class HTTPInternalServerError(HTTPServerError):
     code = 500
     title = 'Internal Server Error'
     explanation = (
       'The server has either erred or is incapable of performing '
       'the requested operation.')
-
-class HTTPInternalServerError(HTTPServerError):
-    pass
 
 class HTTPNotImplemented(HTTPServerError):
     """

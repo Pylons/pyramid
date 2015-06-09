@@ -1,6 +1,10 @@
 unreleased
 ==========
 
+- Ensure that ``pyramid.httpexceptions.exception_response`` returns the
+  appropriate "concreate" class for ``400`` and ``500`` status codes.
+  See: https://github.com/Pylons/pyramid/issues/1832
+
 - Fix an infinite recursion bug introduced in 1.6a1 when
   ``pyramid.view.render_view_to_response`` was called directly or indirectly.
   See https://github.com/Pylons/pyramid/issues/1643 .
