@@ -1,6 +1,10 @@
 unreleased
 ==========
 
+- Ensure that ``pyramid.httpexceptions.exception_response`` returns the
+  appropriate "concreate" class for ``400`` and ``500`` status codes.
+  See: https://github.com/Pylons/pyramid/issues/1832
+
 - Further fix the JSONP renderer by prefixing the returned content with
   a comment. This should mitigate attacks from Flash (See CVE-2014-4671).
   See https://github.com/Pylons/pyramid/pull/1649
