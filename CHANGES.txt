@@ -1,3 +1,9 @@
+1.4.10 (unreleased)
+===================
+
+- Ensure that ``pyramid.httpexceptions.exception_response`` returns the
+  appropriate "concreate" class for ``400`` and ``500`` status codes.
+
 1.4.9 (2014-04-28)
 ==================
 

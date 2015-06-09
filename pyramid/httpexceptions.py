@@ -553,13 +553,20 @@ class HTTPClientError(HTTPError):
     a bug.  A server-side traceback is not warranted.  Unless specialized,
     this is a '400 Bad Request'
     """
+
+class HTTPBadRequest(HTTPClientError):
+    """
+    subclass of :class:`~HTTPClientError`
+
+    This indicates that the request is malformed.
+
+    code: 400, title: Bad Request
+    """
+    pass
     code = 400
     title = 'Bad Request'
     explanation = ('The server could not comply with the request since '
                    'it is either malformed or otherwise incorrect.')
-
-class HTTPBadRequest(HTTPClientError):
-    pass
 
 class HTTPUnauthorized(HTTPClientError):
     """
@@ -911,14 +918,20 @@ class HTTPServerError(HTTPError):
     This is an error condition in which the server is presumed to be
     in-error.  Unless specialized, this is a '500 Internal Server Error'.
     """
+
+class HTTPInternalServerError(HTTPServerError):
+    """
+    subclass of :class:`~HTTPServerError`
+
+    This indicates that the application raised an unexpected exception.
+    
+    code: 500, title: Internal Server Error
+    """
     code = 500
     title = 'Internal Server Error'
     explanation = (
       'The server has either erred or is incapable of performing '
       'the requested operation.')
-
-class HTTPInternalServerError(HTTPServerError):
-    pass
 
 class HTTPNotImplemented(HTTPServerError):
     """
