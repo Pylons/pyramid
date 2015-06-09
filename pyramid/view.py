@@ -49,6 +49,19 @@ def render_view_to_response(context, request, name='', secure=True):
         registry = get_current_registry()
 
     context_iface = providedBy(context)
+    # We explicitly pass in the interfaces provided by the request as
+    # request_iface to _call_view; we don't want _call_view to use
+    # request.request_iface, because render_view_to_response and friends are
+    # pretty much limited to finding views that are not views associated with
+    # routes, and the only thing request.request_iface is used for is to find
+    # route-based views.  The render_view_to_response API is (and always has
+    # been) a stepchild API reserved for use of those who actually use
+    # traversal.  Doing this fixes an infinite recursion bug introduced in
+    # Pyramid 1.6a1, and causes the render_view* APIs to behave as they did in
+    # 1.5 and previous. We should probably provide some sort of different API
+    # that would allow people to find views for routes.  See
+    # https://github.com/Pylons/pyramid/issues/1643 for more info.
+    request_iface = providedBy(request)
 
     response = _call_view(
         registry,
@@ -56,7 +69,8 @@ def render_view_to_response(context, request, name='', secure=True):
         context,
         context_iface,
         name,
-        secure = secure,
+        secure=secure,
+        request_iface=request_iface,
         )
 
     return response # NB: might be None

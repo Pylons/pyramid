@@ -149,7 +149,7 @@ class IResponse(Interface):
         """Gets and sets and deletes the Content-MD5 header. For more
         information on Content-MD5 see RFC 2616 section 14.14.""")
 
-    content_range  = Attribute(
+    content_range = Attribute(
         """Gets and sets and deletes the Content-Range header. For more
         information on Content-Range see section 14.16. Converts using
         ContentRange object.""")
@@ -1205,7 +1205,7 @@ class ICacheBuster(Interface):
         argument is a dict of keywords that are to be passed eventually to
         :meth:`~pyramid.request.Request.route_url` for URL generation.  The
         return value should be a two-tuple of ``(subpath, kw)`` which are
-        versions of the same arguments modified to include the cachebust token
+        versions of the same arguments modified to include the cache bust token
         in the generated URL.
         """
 
