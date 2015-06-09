@@ -553,7 +553,6 @@ class HTTPClientError(HTTPError):
     a bug.  A server-side traceback is not warranted.  Unless specialized,
     this is a '400 Bad Request'
     """
-    pass
 
 class HTTPBadRequest(HTTPClientError):
     """
@@ -919,7 +918,6 @@ class HTTPServerError(HTTPError):
     This is an error condition in which the server is presumed to be
     in-error.  Unless specialized, this is a '500 Internal Server Error'.
     """
-    pass
 
 class HTTPInternalServerError(HTTPServerError):
     """
