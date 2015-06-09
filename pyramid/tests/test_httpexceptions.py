@@ -10,13 +10,22 @@ class Test_exception_response(unittest.TestCase):
         from pyramid.httpexceptions import exception_response
         return exception_response(*arg, **kw)
 
+    def test_status_400(self):
+        from pyramid.httpexceptions import HTTPBadRequest
+        self.assertTrue(isinstance(self._callFUT(400), HTTPBadRequest))
+
     def test_status_404(self):
         from pyramid.httpexceptions import HTTPNotFound
-        self.assertEqual(self._callFUT(404).__class__, HTTPNotFound)
+        self.assertTrue(isinstance(self._callFUT(404), HTTPNotFound))
+
+    def test_status_500(self):
+        from pyramid.httpexceptions import HTTPInternalServerError
+        self.assertTrue(isinstance(self._callFUT(500),
+                        HTTPInternalServerError))
 
     def test_status_201(self):
         from pyramid.httpexceptions import HTTPCreated
-        self.assertEqual(self._callFUT(201).__class__, HTTPCreated)
+        self.assertTrue(isinstance(self._callFUT(201), HTTPCreated))
 
     def test_extra_kw(self):
         resp = self._callFUT(404,  headers=[('abc', 'def')])
