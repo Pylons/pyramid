@@ -9,6 +9,8 @@ import pkg_resources
 import re
 import sys
 
+user_input = input if sys.version_info[0] == 3 else raw_input
+
 _bad_chars_re = re.compile('[^a-zA-Z0-9_]')
 
 def main(argv=sys.argv, quiet=False):
@@ -92,8 +94,6 @@ class PCreateCommand(object):
 
     @property
     def project_vars(self):
-        options = self.options
-        args = self.args
         output_dir = self.output_path
         project_name = os.path.basename(os.path.split(output_dir)[1])
         pkg_name = _bad_chars_re.sub(
@@ -202,11 +202,11 @@ class PCreateCommand(object):
         if self.options.force_bad_name:
             return True
         self.out('Package "{}" already exists, are you sure you want '
-                    'to use it as your project\'s name?'.format(pkg_name))
+                 'to use it as your project\'s name?'.format(pkg_name))
         return self.confirm_bad_name('Really use "{}"?: '.format(pkg_name))
 
     def confirm_bad_name(self, prompt): # pragma: no cover
-        answer = raw_input('{} [y|N]: '.format(prompt))
+        answer = user_input('{} [y|N]: '.format(prompt))
         return answer.strip().lower() == 'y'
 
 if __name__ == '__main__': # pragma: no cover
