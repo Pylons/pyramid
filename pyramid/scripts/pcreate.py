@@ -9,7 +9,10 @@ import pkg_resources
 import re
 import sys
 
-user_input = input if sys.version_info[0] == 3 else raw_input
+if sys.version_info[0] == 3:
+    user_input = input # pragma: no cover
+else:
+    user_input = raw_input # NOQA
 
 _bad_chars_re = re.compile('[^a-zA-Z0-9_]')
 
@@ -187,7 +190,7 @@ class PCreateCommand(object):
             self.out('The package name "site" has a special meaning in '
                      'Python. Are you sure you want to use it as your '
                      'project\'s name?')
-            return self.confirm_bad_name('Really use "{}"?: '.format(pkg_name))
+            return self.confirm_bad_name('Really use "{0}"?: '.format(pkg_name))
 
         # check if pkg_name can be imported (i.e. already exists in current
         # $PYTHON_PATH, if so - let the user confirm
@@ -201,12 +204,12 @@ class PCreateCommand(object):
 
         if self.options.force_bad_name:
             return True
-        self.out('Package "{}" already exists, are you sure you want '
+        self.out('Package "{0}" already exists, are you sure you want '
                  'to use it as your project\'s name?'.format(pkg_name))
-        return self.confirm_bad_name('Really use "{}"?: '.format(pkg_name))
+        return self.confirm_bad_name('Really use "{0}"?: '.format(pkg_name))
 
     def confirm_bad_name(self, prompt): # pragma: no cover
-        answer = user_input('{} [y|N]: '.format(prompt))
+        answer = user_input('{0} [y|N]: '.format(prompt))
         return answer.strip().lower() == 'y'
 
 if __name__ == '__main__': # pragma: no cover
