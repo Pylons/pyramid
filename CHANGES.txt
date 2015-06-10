@@ -23,6 +23,12 @@ unreleased
 Features
 --------
 
+- pcreate will now ask for confirmation if invoked with
+  an argument for a project name that already exists or
+  is importable in the current environment.
+  See https://github.com/Pylons/pyramid/issues/1357 and
+  https://github.com/Pylons/pyramid/pull/1837
+
 - Make it possible to subclass ``pyramid.request.Request`` and also use
   ``pyramid.request.Request.add_request.method``.  See
   https://github.com/Pylons/pyramid/issues/1529
