@@ -19,16 +19,6 @@ def main(argv=sys.argv, quiet=False):
         return 1
 
 
-class InvalidInputError(Exception):
-    """ This is raised in case a project name is
-    missing or a scaffold name was omitted.
-    """
-    pass
-
-class ExistingProjectNameError(InvalidInputError):
-    pass
-
-
 class PCreateCommand(object):
     verbosity = 1 # required
     description = "Render Pyramid scaffolding to an output directory"
