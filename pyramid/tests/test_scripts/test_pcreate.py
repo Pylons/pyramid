@@ -1,5 +1,6 @@
 import unittest
 
+
 class TestPCreateCommand(unittest.TestCase):
     def setUp(self):
         from pyramid.compat import NativeIO
@@ -15,7 +16,8 @@ class TestPCreateCommand(unittest.TestCase):
     def _makeOne(self, *args, **kw):
         effargs = ['pcreate']
         effargs.extend(args)
-        cmd = self._getTargetClass()(effargs, **kw)
+        tgt_class = kw.pop('target_class', self._getTargetClass())
+        cmd = tgt_class(effargs, **kw)
         cmd.out = self.out
         return cmd
 
@@ -219,6 +221,48 @@ class TestPCreateCommand(unittest.TestCase):
             {'project': 'Distro', 'egg': 'Distro', 'package': 'distro',
              'pyramid_version': '0.10.1dev',
              'pyramid_docs_branch': 'master'})
+
+    def test_confirm_override_conflicting_name(self):
+        from pyramid.scripts.pcreate import PCreateCommand
+        class YahInputPCreateCommand(PCreateCommand):
+            def confirm_bad_name(self, pkg_name):
+                return True
+        cmd = self._makeOne('-s', 'dummy', 'Unittest', target_class=YahInputPCreateCommand)
+        scaffold = DummyScaffold('dummy')
+        cmd.scaffolds = [scaffold]
+        cmd.pyramid_dist = DummyDist("0.10.1dev")
+        result = cmd.run()
+        self.assertEqual(result, 0)
+        self.assertEqual(
+            scaffold.vars,
+            {'project': 'Unittest', 'egg': 'Unittest', 'package': 'unittest',
+             'pyramid_version': '0.10.1dev',
+             'pyramid_docs_branch': 'master'})
+
+    def test_force_override_conflicting_name(self):
+        cmd = self._makeOne('-s', 'dummy', 'Unittest', '--force-conflicting-name')
+        scaffold = DummyScaffold('dummy')
+        cmd.scaffolds = [scaffold]
+        cmd.pyramid_dist = DummyDist("0.10.1dev")
+        result = cmd.run()
+        self.assertEqual(result, 0)
+        self.assertEqual(
+            scaffold.vars,
+            {'project': 'Unittest', 'egg': 'Unittest', 'package': 'unittest',
+             'pyramid_version': '0.10.1dev',
+             'pyramid_docs_branch': 'master'})
+
+    def test_force_override_site_name(self):
+        from pyramid.scripts.pcreate import PCreateCommand
+        class NayInputPCreateCommand(PCreateCommand):
+            def confirm_bad_name(self, pkg_name):
+                return False
+        cmd = self._makeOne('-s', 'dummy', 'Site', target_class=NayInputPCreateCommand)
+        scaffold = DummyScaffold('dummy')
+        cmd.scaffolds = [scaffold]
+        cmd.pyramid_dist = DummyDist("0.10.1dev")
+        result = cmd.run()
+        self.assertEqual(result, 2)
 
 
 class Test_main(unittest.TestCase):
