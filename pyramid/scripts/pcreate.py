@@ -8,11 +8,7 @@ import os.path
 import pkg_resources
 import re
 import sys
-
-if sys.version_info[0] == 3:
-    user_input = input # pragma: no cover
-else:
-    user_input = raw_input # NOQA
+from pyramid.compat import input_
 
 _bad_chars_re = re.compile('[^a-zA-Z0-9_]')
 
@@ -61,7 +57,7 @@ class PCreateCommand(object):
                       dest='interactive',
                       action='store_true',
                       help='When a file would be overwritten, interrogate')
-    parser.add_option('--force-conflicting-name',
+    parser.add_option('--ignore-conflicting-name',
                       dest='force_bad_name',
                       action='store_true',
                       default=False,
@@ -181,7 +177,7 @@ class PCreateCommand(object):
         available = [x.name for x in self.scaffolds]
         diff = set(self.options.scaffold_name).difference(available)
         if diff:
-            self.out('Unavailable scaffolds: %s' % ", ".join(list(diff)))
+            self.out('Unavailable scaffolds: %s' % ", ".join(sorted(diff)))
             return False
 
         pkg_name = self.project_vars['package']
@@ -204,12 +200,12 @@ class PCreateCommand(object):
 
         if self.options.force_bad_name:
             return True
-        self.out('Package "{0}" already exists, are you sure you want '
+        self.out('A package named "{0}" already exists, are you sure you want '
                  'to use it as your project\'s name?'.format(pkg_name))
         return self.confirm_bad_name('Really use "{0}"?: '.format(pkg_name))
 
     def confirm_bad_name(self, prompt): # pragma: no cover
-        answer = user_input('{0} [y|N]: '.format(prompt))
+        answer = input_('{0} [y|N]: '.format(prompt))
         return answer.strip().lower() == 'y'
 
 if __name__ == '__main__': # pragma: no cover

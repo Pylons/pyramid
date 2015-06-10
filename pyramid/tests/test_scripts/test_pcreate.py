@@ -240,7 +240,7 @@ class TestPCreateCommand(unittest.TestCase):
              'pyramid_docs_branch': 'master'})
 
     def test_force_override_conflicting_name(self):
-        cmd = self._makeOne('-s', 'dummy', 'Unittest', '--force-conflicting-name')
+        cmd = self._makeOne('-s', 'dummy', 'Unittest', '--ignore-conflicting-name')
         scaffold = DummyScaffold('dummy')
         cmd.scaffolds = [scaffold]
         cmd.pyramid_dist = DummyDist("0.10.1dev")
