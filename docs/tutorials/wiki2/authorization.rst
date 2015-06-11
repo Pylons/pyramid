@@ -5,12 +5,12 @@ Adding authorization
 ====================
 
 :app:`Pyramid` provides facilities for :term:`authentication` and
-::term:`authorization`.  We'll make use of both features to provide security
-:to our application.  Our application currently allows anyone with access to
-:the server to view, edit, and add pages to our wiki.  We'll change that to
-:allow only people who are members of a *group* named ``group:editors`` to add
-:and edit wiki pages but we'll continue allowing anyone with access to the
-:server to view pages.
+:term:`authorization`.  We'll make use of both features to provide security
+to our application.  Our application currently allows anyone with access to
+the server to view, edit, and add pages to our wiki.  We'll change that to
+allow only people who are members of a *group* named ``group:editors`` to add
+and edit wiki pages but we'll continue allowing anyone with access to the
+server to view pages.
 
 We will also add a login page and a logout link on all the pages.  The login
 page will be shown when a user is denied access to any of the views that
