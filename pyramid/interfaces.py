@@ -56,6 +56,15 @@ class IApplicationCreated(Interface):
 
 IWSGIApplicationCreatedEvent = IApplicationCreated # b /c
 
+class IBeforeApplicationCreated(Interface):
+    """ Event issued when the
+    :meth:`pyramid.config.Configurator.make_wsgi_app` method
+    is called.  See the documentation attached to
+    :class:`pyramid.events.BeforeApplicationCreated` for more
+    information.
+    """
+    config = Attribute("Config of application")
+
 class IResponse(Interface):
     """ Represents a WSGI response using the WebOb response interface.
     Some attribute and method documentation of this interface references

@@ -89,6 +89,24 @@ class WSGIApplicationCreatedEventTests(ApplicationCreatedEventTests):
         from zope.interface.verify import verifyObject
         verifyObject(IWSGIApplicationCreatedEvent, self._makeOne())
 
+class BeforeApplicationCreatedEventTests(unittest.TestCase):
+    def _getTargetClass(self):
+        from pyramid.events import BeforeApplicationCreated
+        return BeforeApplicationCreated
+
+    def _makeOne(self, context=object()):
+        return self._getTargetClass()(context)
+
+    def test_class_conforms_to_IApplicationCreated(self):
+        from pyramid.interfaces import IBeforeApplicationCreated
+        from zope.interface.verify import verifyClass
+        verifyClass(IBeforeApplicationCreated, self._getTargetClass())
+
+    def test_object_conforms_to_IApplicationCreated(self):
+        from pyramid.interfaces import IBeforeApplicationCreated
+        from zope.interface.verify import verifyObject
+        verifyObject(IBeforeApplicationCreated, self._makeOne())
+
 class ContextFoundEventTests(unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.events import ContextFound
