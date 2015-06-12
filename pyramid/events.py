@@ -10,6 +10,7 @@ from pyramid.interfaces import (
     INewRequest,
     INewResponse,
     IApplicationCreated,
+    IBeforeApplicationCreated,
     IBeforeRender,
     )
 
@@ -156,10 +157,10 @@ class ContextFound(object):
 AfterTraversal = ContextFound # b/c as of 1.0
 
 @implementer(IApplicationCreated)
-class ApplicationCreated(object):    
+class ApplicationCreated(object):
     """ An instance of this class is emitted as an :term:`event` when
     the :meth:`pyramid.config.Configurator.make_wsgi_app` is
-    called.  The instance has an attribute, ``app``, which is an
+    called. The instance has an attribute, ``app``, which is an
     instance of the :term:`router` that will handle WSGI requests.
     This class implements the
     :class:`pyramid.interfaces.IApplicationCreated` interface.
@@ -167,7 +168,7 @@ class ApplicationCreated(object):
     .. note::
 
        For backwards compatibility purposes, this class can also be imported as
-       :class:`pyramid.events.WSGIApplicationCreatedEvent`.  This was the name
+       :class:`pyramid.events.WSGIApplicationCreatedEvent`. This was the name
        of the event class before :app:`Pyramid` 1.0.
     """
     def __init__(self, app):
@@ -175,6 +176,18 @@ class ApplicationCreated(object):
         self.object = app
 
 WSGIApplicationCreatedEvent = ApplicationCreated # b/c (as of 1.0)
+
+@implementer(IBeforeApplicationCreated)
+class BeforeApplicationCreated(object):
+    """ An instance of this class is emitted as an :term:`event` when the
+    :meth:`pyramid.config.Configurator.make_wsgi_app` is called, before the
+    application is created. The instance has an attribute, ``config``, which is
+    an instance of the :class:`pyramid.config.Configurator`. See that will
+    handle WSGI requests.  This class implements the
+    :class:`pyramid.interfaces.IBeforeApplicationCreated` interface.
+    """
+    def __init__(self, config):
+        self.config = config
 
 @implementer(IBeforeRender)
 class BeforeRender(dict):
@@ -242,5 +255,3 @@ class BeforeRender(dict):
     def __init__(self, system, rendering_val=None):
         dict.__init__(self, system)
         self.rendering_val = rendering_val
-
-

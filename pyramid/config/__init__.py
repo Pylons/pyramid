@@ -30,7 +30,7 @@ from pyramid.compat import (
     zip_longest,
     )
 
-from pyramid.events import ApplicationCreated
+from pyramid.events import ApplicationCreated, BeforeApplicationCreated
 
 from pyramid.exceptions import (
     ConfigurationConflictError,
@@ -975,11 +975,14 @@ class Configurator(
 
     def make_wsgi_app(self):
         """ Commits any pending configuration statements, sends a
-        :class:`pyramid.events.ApplicationCreated` event to all listeners,
-        adds this configuration's registry to
-        :attr:`pyramid.config.global_registries`, and returns a
-        :app:`Pyramid` WSGI application representing the committed
+        :class:`pyramid.events.BeforeApplicationCreated` event to all
+        listeners, adds this configuration's registry to
+        :attr:`pyramid.config.global_registries`, then sends a
+        :class:`pyramid.events.ApplicationCreated` event to all listeners, and
+        returns a :app:`Pyramid` WSGI application representing the committed
         configuration state."""
+        self.commit()
+        self.registry.notify(BeforeApplicationCreated(self))
         self.commit()
         app = Router(self.registry)
 
