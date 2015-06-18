@@ -131,6 +131,8 @@ Extra Credit
 #. The entry point in ``setup.py`` didn't mention ``__init__.py`` when
    it declared ``tutorial:main`` function. Why not?
 
+#. What is the purpose of ``**settings``? What does the ``**`` signify?
+
 .. seealso::
    :ref:`project_narr`,
    :ref:`scaffolding_chapter`,
@@ -138,7 +140,3 @@ Extra Credit
    :ref:`environment_chapter`,
    :ref:`paste_chapter`
 
-Extra Credit
-============
-
-#. What is the purpose of ``**settings``? What does the ``**`` signify?
