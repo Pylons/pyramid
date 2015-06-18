@@ -89,24 +89,24 @@ off by commenting out the ``pyramid_debugtoolbar`` line in
 Extra Credit
 ============
 
-# Why don't we add ``pyramid_debugtoolbar`` to the list of
-  ``install_requires`` dependencies in ``debugtoolbar/setup.py``?
+#. Why don't we add ``pyramid_debugtoolbar`` to the list of
+   ``install_requires`` dependencies in ``debugtoolbar/setup.py``?
 
-# Introduce a bug into your application:  Change:
+#. Introduce a bug into your application:  Change:
 
-  .. code-block:: python
+   .. code-block:: python
 
-    def hello_world(request):
-        return Response('<body><h1>Hello World!</h1></body>')
+     def hello_world(request):
+         return Response('<body><h1>Hello World!</h1></body>')
 
-  to:
+   to:
 
-  .. code-block:: python
+   .. code-block:: python
 
     def hello_world(request):
         return xResponse('<body><h1>Hello World!</h1></body>')
 
-  Save, and visit http://localhost:6543/ again.  Notice the nice
-  traceback display.  On the lowest line, click the "screen" icon to the
-  right, and try typing the variable names ``request`` and ``Response``.
-  What else can you discover?
+   Save, and visit http://localhost:6543/ again.  Notice the nice
+   traceback display.  On the lowest line, click the "screen" icon to the
+   right, and try typing the variable names ``request`` and ``Response``.
+   What else can you discover?
