@@ -248,3 +248,5 @@ Contributors
 - Donald Stufft, 2015/03/15
 
 - Karen Dalton, 2015/06/01
+
+- Igor Stroh, 2015/06/10
