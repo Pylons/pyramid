@@ -453,7 +453,7 @@ commonly in route declarations that look like this:
 .. code-block:: python
    :linenos:
 
-   from pryamid.static import static_view
+   from pyramid.static import static_view
 
    www = static_view('mypackage:static', use_subpath=True)
 
