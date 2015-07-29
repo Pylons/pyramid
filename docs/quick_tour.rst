@@ -43,10 +43,14 @@ production support for Python 3 in October 2011).
 
 .. note::
 
-    Why ``easy_install`` and not ``pip``? Pyramid encourages use of namespace
-    packages which, until recently, ``pip`` didn't permit. Also Pyramid has
-    some optional C extensions for performance. With ``easy_install``, Windows
-    users can get these extensions without needing a C compiler.
+    Why ``easy_install`` and not ``pip``?  Some distributions on which Pyramid
+    depends upon have optional C extensions for performance. ``pip`` cannot
+    install some binary Python distributions.  With ``easy_install``, Windows
+    users are able to obtain binary Python distributions, so they get the
+    benefit of the C extensions without needing a C compiler.  Also, there can
+    be issues when ``pip`` and ``easy_install`` are used side-by-side in the
+    same environment, so we chose to recommend ``easy_install`` for the sake of
+    reducing the complexity of these instructions.
 
 .. seealso:: See also:
     :ref:`Quick Tutorial section on Requirements <qtut_requirements>`,
