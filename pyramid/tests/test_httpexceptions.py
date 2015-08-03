@@ -120,7 +120,7 @@ class TestHTTPException(unittest.TestCase):
 
     def test_ctor_calls_Response_ctor(self):
         exc = self._makeOne('message')
-        self.assertEqual(exc.status, 'None None')
+        self.assertEqual(exc.status, '520 Unknown Error')
 
     def test_ctor_extends_headers(self):
         exc = self._makeOne(headers=[('X-Foo', 'foo')])
@@ -329,7 +329,7 @@ class Test_HTTPMove(unittest.TestCase):
         start_response = DummyStartResponse()
         app_iter = exc(environ, start_response)
         self.assertEqual(app_iter[0],
-                         (b'None None\n\nThe resource has been moved to foo; '
+                         (b'520 Unknown Error\n\nThe resource has been moved to foo; '
                           b'you should be redirected automatically.\n\n'))
 
 class TestHTTPForbidden(unittest.TestCase):
