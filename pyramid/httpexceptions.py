@@ -158,6 +158,13 @@ class HTTPException(Response, Exception):
     # title = 'OK'
     # explanation = 'why this happens'
     # body_template_obj = Template('response template')
+    #
+    # This class itself uses the error code "520" with the error message/title
+    # of "Unknown Error". This is not an RFC standard, however it is
+    # implemented in practice. Sub-classes should be overriding the default
+    # values and 520 should not be seen in the wild from Pyramid applications.
+    # Due to changes in WebOb, a code of "None" is not valid, and WebOb due to
+    # more strict error checking rejects it now.
 
     # differences from webob.exc.WSGIHTTPException:
     #
@@ -176,8 +183,8 @@ class HTTPException(Response, Exception):
     #
     # - documentation improvements (Pyramid-specific docstrings where necessary)
     #
-    code = None
-    title = None
+    code = 520
+    title = 'Unknown Error'
     explanation = ''
     body_template_obj = Template('''\
 ${explanation}${br}${br}
