@@ -47,7 +47,7 @@ Objectives
 
 - Dispatch one route/URL to multiple views based on request data
 
-- Share stated and logic between views and templates via the view class
+- Share states and logic between views and templates via the view class
 
 Steps
 =====
