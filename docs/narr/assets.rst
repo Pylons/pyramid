@@ -390,7 +390,7 @@ in the asset's URL:
 When the asset changes, so will its md5 checksum, and therefore so will its
 URL.  Supplying the ``cachebust`` argument also causes the static view to set
 headers instructing clients to cache the asset for ten years, unless the
-``max_cache_age`` argument is also passed, in which case that value is used.
+``cache_max_age`` argument is also passed, in which case that value is used.
 
 .. note:: 
 
