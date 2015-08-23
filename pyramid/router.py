@@ -20,6 +20,7 @@ from pyramid.events import (
     ContextFound,
     NewRequest,
     NewResponse,
+    RouteFound,
     )
 
 from pyramid.httpexceptions import HTTPNotFound
@@ -111,6 +112,8 @@ class Router(object):
                     IRouteRequest,
                     name=route.name,
                     default=IRequest)
+
+                has_listeners and notify(RouteFound(request))
 
                 root_factory = route.factory or self.root_factory
 
