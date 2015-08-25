@@ -57,6 +57,11 @@ As you create files and directories within the template directory, note that:
   have that string replaced with the value of the ``var`` variable provided
   to the scaffold.
 
+- Files that start with a dot (e.g., ``.env``) are ignored and will not be
+  copied over to the destination directory. If you want to include a file with
+  a leading dot then you must replace the dot with ``+dot+`` (e.g.,
+  ``+dot+env``).
+
 Otherwise, files and directories which live in the template directory will be
 copied directly without modification to the ``pcreate`` output location.
 
