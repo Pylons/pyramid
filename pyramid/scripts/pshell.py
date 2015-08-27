@@ -61,6 +61,7 @@ class PShellCommand(object):
 
     def pshell_file_config(self, filename):
         config = self.ConfigParser()
+        config.optionxform = str
         config.read(filename)
         try:
             items = config.items('pshell')
