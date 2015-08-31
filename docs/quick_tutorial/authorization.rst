@@ -101,6 +101,9 @@ by decorating the view with ``@forbidden_view_config``.
 Extra Credit
 ============
 
+#. Do I have to put a ``renderer`` in my ``@forbidden_view_config``
+   decorator?
+
 #. Perhaps you would like the experience of not having enough permissions
    (forbidden) to be richer. How could you change this?
 
