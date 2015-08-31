@@ -654,7 +654,13 @@ class DummySerializer(object):
         return base64.b64encode(json.dumps(value).encode('utf-8'))
 
     def loads(self, value):
-        return json.loads(base64.b64decode(value).decode('utf-8'))
+        try:
+            return json.loads(base64.b64decode(value).decode('utf-8'))
+
+        # base64.b64decode raises a TypeError on py2 instead of a ValueError
+        # and a ValueError is required for the session to handle it properly
+        except TypeError:
+            raise ValueError
 
 class DummySessionFactory(dict):
     _dirty = False
