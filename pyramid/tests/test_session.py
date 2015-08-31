@@ -1,3 +1,4 @@
+import base64
 import json
 import unittest
 from pyramid import testing
@@ -277,7 +278,7 @@ class TestBaseCookieSession(SharedCookieSessionTests, unittest.TestCase):
         return BaseCookieSessionFactory(serializer, **kw)(request)
 
     def _serialize(self, value):
-        return json.dumps(value)
+        return base64.b64encode(json.dumps(value).encode('utf-8'))
 
     def test_reissue_not_triggered(self):
         import time
@@ -650,10 +651,16 @@ class Test_check_csrf_token(unittest.TestCase):
 
 class DummySerializer(object):
     def dumps(self, value):
-        return json.dumps(value).encode('utf-8')
+        return base64.b64encode(json.dumps(value).encode('utf-8'))
 
     def loads(self, value):
-        return json.loads(value.decode('utf-8'))
+        try:
+            return json.loads(base64.b64decode(value).decode('utf-8'))
+
+        # base64.b64decode raises a TypeError on py2 instead of a ValueError
+        # and a ValueError is required for the session to handle it properly
+        except TypeError:
+            raise ValueError
 
 class DummySessionFactory(dict):
     _dirty = False
