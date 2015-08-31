@@ -1,10 +1,17 @@
-.. _changes_1.5.7:
+.. _changes_1.5.8:
 
 1.5.8 (unreleased)
 ==================
 
 - Ensure that ``pyramid.httpexceptions.exception_response`` returns the
   appropriate "concreate" class for ``400`` and ``500`` status codes.
+
+- ``pyramid.httpexceptions.HTTPException`` now defaults to
+  ``520 Unknown Error`` instead of ``None None`` to conform with changes in
+  WebOb 1.5.
+  See https://github.com/Pylons/pyramid/pull/1865
+
+.. _changes_1.5.7:
 
 1.5.7 (2015-04-28)
 ==================
