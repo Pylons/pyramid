@@ -201,6 +201,11 @@ Bug Fixes
   default to an iterable instead of ``None``. It may be checked for a length
   of 0. This was the behavior in 1.5.
 
+- ``pyramid.httpexceptions.HTTPException`` now defaults to
+  ``520 Unknown Error`` instead of ``None None`` to conform with changes in
+  WebOb 1.5.
+  See https://github.com/Pylons/pyramid/pull/1865
+
 Deprecations
 ------------
 
