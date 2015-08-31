@@ -1,3 +1,11 @@
+unreleased
+==========
+
+- ``pyramid.httpexceptions.HTTPException`` now defaults to
+  ``520 Unknown Error`` instead of ``None None`` to conform with changes in
+  WebOb 1.5.
+  See https://github.com/Pylons/pyramid/pull/1865
+
 1.6a2 (2015-06-30)
 ==================
 
