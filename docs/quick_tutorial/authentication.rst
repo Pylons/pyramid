@@ -123,9 +123,6 @@ Extra Credit
 
 #. Can I use a database behind my ``groupfinder`` to look up principals?
 
-#. Do I have to put a ``renderer`` in my ``@forbidden_view_config``
-   decorator?
-
 #. Once I am logged in, does any user-centric information get jammed
    onto each request? Use ``import pdb; pdb.set_trace()`` to answer
    this.
