@@ -219,10 +219,9 @@ by creating various kinds of gettext files.
    The steps a developer must take to work with :term:`gettext`
    :term:`message catalog` files within a :app:`Pyramid`
    application are very similar to the steps a :term:`Pylons`
-   developer must take to do the same.  See the `Pylons
-   internationalization documentation
-   <http://wiki.pylonshq.com/display/pylonsdocs/Internationalization+and+Localization>`_
-   for more information.
+   developer must take to do the same.  See the :ref:`Pylons
+   Internationalization and Localization documentation
+   <pylonswebframework:i18n>` for more information.
 
 GNU gettext uses three types of files in the translation framework,
 ``.pot`` files, ``.po`` files and ``.mo`` files.
