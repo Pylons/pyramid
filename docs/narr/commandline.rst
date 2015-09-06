@@ -245,7 +245,7 @@ exposed, and the request is configured to generate urls from the host
 .. code-block:: text
 
     $ $VENV/bin/pshell starter/development.ini
-    Python 2.6.5 (r265:79063, Apr 29 2010, 00:31:32) 
+    Python 2.6.5 (r265:79063, Apr 29 2010, 00:31:32)
     [GCC 4.4.3] on linux2
     Type "help" for more information.
 
@@ -278,15 +278,45 @@ IPython or bpython
 
 If you have `IPython <http://en.wikipedia.org/wiki/IPython>`_ and/or
 `bpython <http://bpython-interpreter.org/>`_ in
-the interpreter you use to invoke the ``pshell`` command, ``pshell`` will 
+the interpreter you use to invoke the ``pshell`` command, ``pshell`` will
 autodiscover and use the first one found, in this order:
-IPython, bpython, standard Python interpreter. However you could 
-specifically invoke one of your choice with the ``-p choice`` or 
+IPython, bpython, standard Python interpreter. However you could
+specifically invoke one of your choice with the ``-p choice`` or
 ``--python-shell choice`` option.
 
 .. code-block:: text
 
    $ $VENV/bin/pshell -p ipython | bpython | python development.ini#MyProject
+
+Alternative Shells
+~~~~~~~~~~~~~~~~~~
+If you want to use a shell that isn't supported out of the box you can introduce
+a new shell by registering an entrypoint in your setup.py:
+
+.. code-block:: python
+
+    setup(
+        entry_points = """\
+            [pyramid.pshell]
+            myshell=my_app.ptpython_shell_factory
+        """
+    )
+
+and then your shell factory should return a function that accepts two arguments,
+``env`` and ``help``, this would look like this:
+
+.. code-block:: python
+
+    def ptpython_shell_factory():
+        from ptpython.repl import embed
+        def PTPShell(banner, **kwargs):
+            print(banner)
+            return embed(**kwargs)
+
+        def shell(env, help):
+            PTPShell(banner=help, locals=env)
+
+        return shell
 
 .. index::
    pair: routes; printing

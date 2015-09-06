@@ -164,6 +164,9 @@ Features
   that as the response class instead of the default ``HTTPFound``.  See
   https://github.com/Pylons/pyramid/pull/1610
 
+- Additional shells for ``pshell`` can now be registered as entrypoints. See
+  https://github.com/Pylons/pyramid/pull/1891
+
 Bug Fixes
 ---------
 
