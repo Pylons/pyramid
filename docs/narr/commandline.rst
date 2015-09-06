@@ -288,6 +288,40 @@ specifically invoke one of your choice with the ``-p choice`` or
 
    $ $VENV/bin/pshell -p ipython | bpython | python development.ini#MyProject
 
+Alternative Shells
+~~~~~~~~~~~~~~~~~~
+If you want to use a shell that isn't supported out of the box you can introduce
+a new shell by registering an entrypoint in your setup.py:
+
+.. code-block:: python
+
+    setup(
+        entry_points = """\
+            [pyramid.pshell]
+            myshell=my_app.ptpython_shell_factory
+        """
+    )
+
+and then your shell factory should return a function that accepts two arguments,
+``env`` and ``help``, this would look like this:
+
+.. code-block:: python
+
+    def ptpython_shell_factory():
+        try:
+            from ptpython.repl import embed
+            def PTPShell(banner, **kwargs):
+                print(banner)
+                return embed(**kwargs)
+        except ImportError:
+            return None
+
+        def shell(env, help):
+            PTPShell(banner=help, locals=env)
+
+        return shell
+
+
 .. index::
    pair: routes; printing
    single: proutes
