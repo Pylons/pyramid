@@ -108,7 +108,7 @@ Non-Predicate Arguments
   function) to obtain a response.  The ``attr`` value allows you to vary the
   method attribute used to obtain the response.  For example, if your view
   was a class, and the class has a method named ``index`` and you wanted to
-  use this method instead of the class' ``__call__`` method to return the
+  use this method instead of the class's ``__call__`` method to return the
   response, you'd say ``attr="index"`` in the view configuration for the
   view.  This is most useful when the view definition is a class.
 
