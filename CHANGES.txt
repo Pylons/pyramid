@@ -215,8 +215,8 @@ Deprecations
 
   Please use a real process manager in the future instead of relying on the
   ``pserve`` to daemonize itself. Many options exist including your Operating
-  System's services such as systemd or upstart, as well as the excellent
-  and simple supervisord.
+  System's services such as Systemd or Upstart, as well as Python-based
+  solutions like Circus and Supervisor.
 
   See https://github.com/Pylons/pyramid/pull/1641
 
