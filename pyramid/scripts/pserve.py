@@ -614,7 +614,7 @@ class PServeCommand(object):
         self.out('''\
 The daemon options have been deprecated in Pyramid 1.6. They will be removed
 in a future release per Pyramid's deprecation policy. Please consider using
-a real process manager for handling your processes like supervisord or systemd.
+a real process manager for your processes like Systemd, Circus, or Supervisor.
 
 The following commands are deprecated:
     [start,stop,restart,status] --daemon, --stop-server, --status, --pid-file
