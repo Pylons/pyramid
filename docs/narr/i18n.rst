@@ -403,10 +403,11 @@ command from Gettext:
    $ cd /place/where/myapplication/setup.py/lives
    $ msgfmt -o myapplication/locale/es/LC_MESSAGES/myapplication.mo myapplication/locale/es/LC_MESSAGES/myapplication.po
 
-This will create a ``.mo`` file for each ``.po`` file in your
-application.  As long as the :term:`translation directory` in which
-the ``.mo`` file ends up in is configured into your application (see :ref:`adding_a_translation_directory`), these
-translations will be available to :app:`Pyramid`.
+This will create a ``.mo`` file for each ``.po`` file in your application.  As
+long as the :term:`translation directory` in which the ``.mo`` file ends up in
+is configured into your application (see
+:ref:`adding_a_translation_directory`), these translations will be available
+to :app:`Pyramid`.
 
 .. index::
    single: localizer
