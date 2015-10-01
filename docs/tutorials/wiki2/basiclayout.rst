@@ -247,5 +247,8 @@ The ``MyModel`` class has a ``__tablename__`` attribute.  This informs
 SQLAlchemy which table to use to store the data representing instances of this
 class.
 
+The Index import and the Index object creation is not required for this
+tutorial, and will be removed in the next step.
+
 That's about all there is to it regarding models, views, and initialization
 code in our stock application.
