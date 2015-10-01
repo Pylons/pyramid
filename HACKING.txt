@@ -189,7 +189,7 @@ Running Tests
   Run the tests like so:
 
    $ $VENV/bin/easy_install pytest
-   $ py.test --strict pyramid/
+   $ $VENV/bin/py.test --strict pyramid/
 
 Test Coverage
 -------------
