@@ -189,7 +189,7 @@ Running Tests
   Run the tests like so::
 
    $ $VENV/bin/easy_install pytest
-   $ py.test --strict pyramid/
+   $ $VENV/bin/py.test --strict pyramid/
 
 - Functional tests related to the "scaffolds" (starter, zodb, alchemy) which
   create a virtualenv, install the scaffold package and its dependencies, start
