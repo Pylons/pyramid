@@ -4,7 +4,7 @@
 .. _firstapp_chapter:
 
 Creating Your First :app:`Pyramid` Application
-=================================================
+==============================================
 
 In this chapter, we will walk through the creation of a tiny :app:`Pyramid`
 application.  After we're finished creating the application, we'll explain in
@@ -52,7 +52,7 @@ done by the wsgiref server we've used to serve this application.  It logs an
 Press ``Ctrl-C`` (or ``Ctrl-Break`` on Windows) to stop the application.
 
 Now that we have a rudimentary understanding of what the application does,
-let's examine it piece-by-piece.
+let's examine it piece by piece.
 
 Imports
 ~~~~~~~
@@ -129,7 +129,7 @@ defined imports and function definitions, placed within the confines of an
    :linenos:
    :lines: 9-15
 
-Let's break this down piece-by-piece.
+Let's break this down piece by piece.
 
 Configurator Construction
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -145,7 +145,7 @@ line. For example, if the file named ``helloworld.py`` contains the entire
 script body, the code within the ``if`` statement will only be invoked when
 ``python helloworld.py`` is executed from the command line.
 
-Using the ``if`` clause is necessary -- or at least best practice -- because
+Using the ``if`` clause is necessary—or at least best practice—because
 code in a Python ``.py`` file may be eventually imported via the Python
 ``import`` statement by another ``.py`` file.  ``.py`` files that are
 imported by other ``.py`` files are referred to as *modules*.  By using the
@@ -170,7 +170,7 @@ Adding Configuration
    :linenos:
    :lines: 11-12
 
-First line above calls the :meth:`pyramid.config.Configurator.add_route`
+The first line above calls the :meth:`pyramid.config.Configurator.add_route`
 method, which registers a :term:`route` to match any URL path that begins
 with ``/hello/`` followed by a string.
 
@@ -220,7 +220,7 @@ WSGI Application Serving
 Finally, we actually serve the application to requestors by starting up a
 WSGI server.  We happen to use the :mod:`wsgiref` ``make_server`` server
 maker for this purpose.  We pass in as the first argument ``'0.0.0.0'``,
-which means "listen on all TCP interfaces."  By default, the HTTP server
+which means "listen on all TCP interfaces".  By default, the HTTP server
 listens only on the ``127.0.0.1`` interface, which is problematic if you're
 running the server on a remote system and you wish to access it with a web
 browser from a local system.  We also specify a TCP port number to listen on,
