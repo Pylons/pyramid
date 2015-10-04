@@ -24,7 +24,7 @@ We present Python method names using the following style:
 
   :meth:`pyramid.config.Configurator.add_view`
 
-We present Python class names, module names, attributes and global
+We present Python class names, module names, attributes, and global
 variables using the following style:
 
   :class:`pyramid.config.Configurator.registry`
@@ -105,10 +105,10 @@ It may look unusual, but it has advantages:
 
 * It allows one to swap out the higher-level package ``foo`` for something
   else that provides the similar API. An example would be swapping out
-  one Database for another (e.g., graduating from SQLite to PostgreSQL).
+  one database for another (e.g., graduating from SQLite to PostgreSQL).
 
 * Looks more neat in cases where a large number of objects get imported from
   that package.
 
-* Adding/removing imported objects from the package is quicker and results
+* Adding or removing imported objects from the package is quicker and results
   in simpler diffs.
