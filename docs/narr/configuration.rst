@@ -57,7 +57,7 @@ applications, configured imperatively:
 We won't talk much about what this application does yet.  Just note that the
 "configuration' statements take place underneath the ``if __name__ ==
 '__main__':`` stanza in the form of method calls on a :term:`Configurator`
-object (e.g. ``config.add_view(...)``).  These statements take place one
+object (e.g., ``config.add_view(...)``).  These statements take place one
 after the other, and are executed in order, so the full power of Python,
 including conditionals, can be employed in this mode of configuration.
 
@@ -133,7 +133,7 @@ instance method.
 
 Once scanning is invoked, and :term:`configuration decoration` is found by
 the scanner, a set of calls are made to a :term:`Configurator` on your
-behalf: these calls replace the need to add imperative configuration
+behalf. These calls replace the need to add imperative configuration
 statements that don't live near the code being configured.
 
 The combination of :term:`configuration decoration` and the invocation of a
@@ -151,6 +151,6 @@ Summary
 -------
 
 There are two ways to configure a :app:`Pyramid` application: declaratively
-and imperatively.  You can choose the mode you're most comfortable with; both
-are completely equivalent.  Examples in this documentation will use both
+and imperatively.  You can choose the mode with which you're most comfortable;
+both are completely equivalent.  Examples in this documentation will use both
 modes interchangeably.
