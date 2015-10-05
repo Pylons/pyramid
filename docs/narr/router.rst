@@ -17,12 +17,12 @@ requests and return responses.  What happens from the time a :term:`WSGI`
 request enters a :app:`Pyramid` application through to the point that
 :app:`Pyramid` hands off a response back to WSGI for upstream processing?
 
-#. A user initiates a request from his browser to the hostname and port
+#. A user initiates a request from their browser to the hostname and port
    number of the WSGI server used by the :app:`Pyramid` application.
 
 #. The WSGI server used by the :app:`Pyramid` application passes the WSGI
-   environment to the ``__call__`` method of the :app:`Pyramid`
-   :term:`router` object.
+   environment to the ``__call__`` method of the :app:`Pyramid` :term:`router`
+   object.
 
 #. A :term:`request` object is created based on the WSGI environment.
 
@@ -45,7 +45,7 @@ request enters a :app:`Pyramid` application through to the point that
 #. If any route matches, the route mapper adds attributes to the request:
    ``matchdict`` and ``matched_route`` attributes are added to the request
    object.  The former contains a dictionary representing the matched dynamic
-   elements of the request's ``PATH_INFO`` value, the latter contains the
+   elements of the request's ``PATH_INFO`` value, and the latter contains the
    :class:`~pyramid.interfaces.IRoute` object representing the route which
    matched.  The root object associated with the route found is also
    generated: if the :term:`route configuration` which matched has an
@@ -69,7 +69,7 @@ request enters a :app:`Pyramid` application through to the point that
 
 #. The request is decorated with various names returned from the traverser
    (such as ``context``, ``view_name``, and so forth), so they can be
-   accessed via e.g. ``request.context`` within :term:`view` code.
+   accessed via, for example, ``request.context`` within :term:`view` code.
 
 #. A :class:`~pyramid.events.ContextFound` :term:`event` is sent to any
    subscribers.
@@ -93,7 +93,7 @@ request enters a :app:`Pyramid` application through to the point that
    exception.
 
 #. If any exception is raised within a :term:`root factory`, by
-   :term:`traversal`, by a :term:`view callable` or by :app:`Pyramid` itself
+   :term:`traversal`, by a :term:`view callable`, or by :app:`Pyramid` itself
    (such as when it raises :class:`~pyramid.httpexceptions.HTTPNotFound` or
    :class:`~pyramid.httpexceptions.HTTPForbidden`), the router catches the
    exception, and attaches it to the request as the ``exception`` attribute.
@@ -113,8 +113,8 @@ request enters a :app:`Pyramid` application through to the point that
    generate a WSGI response.  The response is sent back to the upstream WSGI
    server.
 
-#. :app:`Pyramid` will attempt to execute any :term:`finished
-   callback` functions attached via
+#. :app:`Pyramid` will attempt to execute any :term:`finished callback`
+   functions attached via
    :meth:`~pyramid.request.Request.add_finished_callback`.
 
 #. The :term:`thread local` stack is popped.
@@ -123,7 +123,6 @@ request enters a :app:`Pyramid` application through to the point that
    :alt: Pyramid Router
 
 This is a very high-level overview that leaves out various details.  For more
-detail about subsystems invoked by the :app:`Pyramid` router such as
+detail about subsystems invoked by the :app:`Pyramid` router, such as
 traversal, URL dispatch, views, and event processing, see
 :ref:`urldispatch_chapter`, :ref:`views_chapter`, and :ref:`events_chapter`.
-
