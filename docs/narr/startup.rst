@@ -13,9 +13,8 @@ you'll see something much like this show up on the console:
   serving on 0.0.0.0:6543 view at http://127.0.0.1:6543
 
 This chapter explains what happens between the time you press the "Return"
-key on your keyboard after typing ``pserve development.ini``
-and the time the line ``serving on 0.0.0.0:6543 ...`` is output to your
-console.
+key on your keyboard after typing ``pserve development.ini`` and the time the
+line ``serving on 0.0.0.0:6543 ...`` is output to your console.
 
 .. index::
    single: startup process
@@ -42,14 +41,14 @@ Here's a high-level time-ordered overview of what happens when you press
 #. The framework finds a section named either ``[app:main]``,
    ``[pipeline:main]``, or ``[composite:main]`` in the ``.ini`` file.  This
    section represents the configuration of a :term:`WSGI` application that
-   will be served.  If you're using a simple application (e.g.
+   will be served.  If you're using a simple application (e.g.,
    ``[app:main]``), the application's ``paste.app_factory`` :term:`entry
    point` will be named on the ``use=`` line within the section's
-   configuration.  If, instead of a simple application, you're using a WSGI
-   :term:`pipeline` (e.g. a ``[pipeline:main]`` section), the application
+   configuration.  If instead of a simple application, you're using a WSGI
+   :term:`pipeline` (e.g., a ``[pipeline:main]`` section), the application
    named on the "last" element will refer to your :app:`Pyramid` application.
    If instead of a simple application or a pipeline, you're using a
-   "composite" (e.g. ``[composite:main]``), refer to the documentation for
+   "composite" (e.g., ``[composite:main]``), refer to the documentation for
    that particular composite to understand how to make it refer to your
    :app:`Pyramid` application.  In most cases, a Pyramid application built
    from a scaffold will have a single ``[app:main]`` section in it, and this
@@ -60,7 +59,7 @@ Here's a high-level time-ordered overview of what happens when you press
    system for this application.  See :ref:`logging_config` for more
    information.
 
-#. The application's *constructor* named by the entry point reference on the
+#. The application's *constructor* named by the entry point referenced on the
    ``use=`` line of the section representing your :app:`Pyramid` application
    is passed the key/value parameters mentioned within the section in which
    it's defined.  The constructor is meant to return a :term:`router`
@@ -78,14 +77,13 @@ Here's a high-level time-ordered overview of what happens when you press
 
    Note that the constructor function accepts a ``global_config`` argument,
    which is a dictionary of key/value pairs mentioned in the ``[DEFAULT]``
-   section of an ``.ini`` file
-   (if :ref:`[DEFAULT] <defaults_section_of_pastedeploy_file>` is present).
-   It also accepts a ``**settings`` argument, which collects
-   another set of arbitrary key/value pairs.  The arbitrary key/value pairs
-   received by this function in ``**settings`` will be composed of all the
-   key/value pairs that are present in the ``[app:main]`` section (except for
-   the ``use=`` setting) when this function is called by when you run
-   ``pserve``.
+   section of an ``.ini`` file (if :ref:`[DEFAULT]
+   <defaults_section_of_pastedeploy_file>` is present).  It also accepts a
+   ``**settings`` argument, which collects another set of arbitrary
+   key/value pairs.  The arbitrary key/value pairs received by this function in
+   ``**settings`` will be composed of all the key/value pairs that are
+   present in the ``[app:main]`` section (except for the ``use=`` setting)
+   when this function is called when you run ``pserve``.
 
    Our generated ``development.ini`` file looks like so:
 
@@ -95,7 +93,7 @@ Here's a high-level time-ordered overview of what happens when you press
 
    In this case, the ``myproject.__init__:main`` function referred to by the
    entry point URI ``egg:MyProject`` (see :ref:`MyProject_ini` for more
-   information about entry point URIs, and how they relate to callables),
+   information about entry point URIs, and how they relate to callables)
    will receive the key/value pairs ``{'pyramid.reload_templates':'true',
    'pyramid.debug_authorization':'false', 'pyramid.debug_notfound':'false',
    'pyramid.debug_routematch':'false', 'pyramid.debug_templates':'true',
@@ -141,11 +139,10 @@ Here's a high-level time-ordered overview of what happens when you press
    to receive requests.
 
 .. seealso::
-   Logging configuration is described in the :ref:`logging_chapter`
-   chapter.  There, in :ref:`request_logging_with_pastes_translogger`,
-   you will also find an example of how to configure
-   :term:`middleware` to add pre-packaged functionality to your
-   application.
+   Logging configuration is described in the :ref:`logging_chapter` chapter.
+   There, in :ref:`request_logging_with_pastes_translogger`, you will also
+   find an example of how to configure :term:`middleware` to add
+   pre-packaged functionality to your application.
 
 .. index::
    pair: settings; deployment
