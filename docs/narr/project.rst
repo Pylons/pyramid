@@ -1,7 +1,7 @@
 .. _project_narr:
 
 Creating a :app:`Pyramid` Project
-====================================
+=================================
 
 As we saw in :ref:`firstapp_chapter`, it's possible to create a
 :app:`Pyramid` application completely manually.  However, it's usually more
@@ -12,8 +12,8 @@ A project is a directory that contains at least one Python :term:`package`.
 You'll use a scaffold to create a project, and you'll create your application
 logic within a package that lives inside the project.  Even if your
 application is extremely simple, it is useful to place code that drives the
-application within a package, because: 1) a package is more easily extended
-with new code and 2) an application that lives inside a package can also be
+application within a package, because (1) a package is more easily extended
+with new code, and (2) an application that lives inside a package can also be
 distributed more easily than one which does not live within a package.
 
 :app:`Pyramid` comes with a variety of scaffolds that you can use to generate
@@ -32,24 +32,24 @@ as part of Pyramid.
 .. _additional_paster_scaffolds:
 
 Scaffolds Included with :app:`Pyramid`
-------------------------------------------------
+--------------------------------------
 
 The convenience scaffolds included with :app:`Pyramid` differ from
 each other on a number of axes:
 
 - the persistence mechanism they offer (no persistence mechanism,
-  :term:`ZODB`, or :term:`SQLAlchemy`).
+  :term:`ZODB`, or :term:`SQLAlchemy`)
 
 - the mechanism they use to map URLs to code (:term:`traversal` or :term:`URL
-  dispatch`).
+  dispatch`)
 
 The included scaffolds are these:
 
 ``starter``
-  URL mapping via :term:`URL dispatch` and no persistence mechanism.
+  URL mapping via :term:`URL dispatch` and no persistence mechanism
 
 ``zodb``
-  URL mapping via :term:`traversal` and persistence via :term:`ZODB`.
+  URL mapping via :term:`traversal` and persistence via :term:`ZODB`
 
 ``alchemy``
   URL mapping via :term:`URL dispatch` and persistence via
@@ -70,7 +70,7 @@ the ``pcreate`` command installed within the virtualenv.  We'll choose the
 ``starter`` scaffold for this purpose.  When we invoke ``pcreate``, it will
 create a directory that represents our project.
 
-In :ref:`installing_chapter` we called the virtualenv directory ``env``; the
+In :ref:`installing_chapter` we called the virtualenv directory ``env``. The
 following commands assume that our current working directory is the ``env``
 directory.
 
@@ -89,7 +89,6 @@ Or on Windows:
 
    > %VENV%\Scripts\pcreate -s starter MyProject
    
-
 Here's sample output from a run of ``pcreate`` on UNIX for a project we name
 ``MyProject``:
 
@@ -129,8 +128,8 @@ server" directory, and you don't need to put it within a virtualenv
 directory.  The author uses Linux mainly, and tends to put project
 directories which he creates within his ``~/projects`` directory.  On
 Windows, it's a good idea to put project directories within a directory that
-contains no space characters, so it's wise to *avoid* a path that contains
-i.e. ``My Documents``.  As a result, the author, when he uses Windows, just
+contains no space characters, so it's wise to *avoid* a path that contains,
+i.e., ``My Documents``.  As a result, the author, when he uses Windows, just
 puts his projects in ``C:\projects``.
 
 .. warning::
@@ -185,13 +184,13 @@ Elided output from a run of this command on UNIX is shown below:
 This will install a :term:`distribution` representing your project
 into the virtual environment interpreter's library set so it can be
 found by ``import`` statements and by other console scripts such as
-``pserve``, ``pshell``, ``proutes`` and ``pviews``.
+``pserve``, ``pshell``, ``proutes``, and ``pviews``.
 
 .. index::
    single: running tests
    single: tests (running)
 
-Running The Tests For Your Application
+Running the Tests for Your Application
 --------------------------------------
 
 To run unit tests for your application, you should invoke them using the
@@ -250,7 +249,7 @@ single sample test exists.
 
 .. _running_the_project_application:
 
-Running The Project Application
+Running the Project Application
 -------------------------------
 
 Once a project is installed for development, you can run the application it
@@ -285,10 +284,10 @@ respond to requests made to ``127.0.0.1`` and on any external IP address.
 For example, your system might be configured to have an external IP address
 ``192.168.1.50``.  If that's the case, if you use a browser running on the
 same system as Pyramid, it will be able to access the application via
-``http://127.0.0.1:6543/`` as well as via
-``http://192.168.1.50:6543/``. However, *other people* on other computers on
-the same network will also be able to visit your Pyramid application in their
-browser by visiting ``http://192.168.1.50:6543/``.
+``http://127.0.0.1:6543/`` as well as via ``http://192.168.1.50:6543/``.
+However, *other people* on other computers on the same network will also be
+able to visit your Pyramid application in their browser by visiting
+``http://192.168.1.50:6543/``.
 
 If you want to restrict access such that only a browser running on the same
 machine as Pyramid will be able to access your Pyramid application, edit the
@@ -309,19 +308,20 @@ portion of the ``development.ini`` file.  For example, you can change the
 section to ``port = 8080`` to run the server on port 8080 instead of
 port 6543.
 
-You can shut down a server started this way by pressing ``Ctrl-C``.
+You can shut down a server started this way by pressing ``Ctrl-C`` (or
+``Ctrl-Break`` on Windows).
 
 The default server used to run your Pyramid application when a project is
 created from a scaffold is named :term:`Waitress`.  This server is what
 prints the ``serving on...`` line when you run ``pserve``.  It's a good idea
-to use this server during development, because it's very simple.  It can also
+to use this server during development because it's very simple.  It can also
 be used for light production.  Setting your application up under a different
 server is not advised until you've done some development work under the
 default server, particularly if you're not yet experienced with Python web
 development.  Python web server setup can be complex, and you should get some
 confidence that your application works in a default environment before trying
 to optimize it or make it "more like production".  It's awfully easy to get
-sidetracked trying to set up a nondefault server for hours without actually
+sidetracked trying to set up a non-default server for hours without actually
 starting to do any development.  One of the nice things about Python web
 servers is that they're largely interchangeable, so if your application works
 under the default server, it will almost certainly work under any other
@@ -392,25 +392,26 @@ generated ``starter`` application in a browser.
 The Debug Toolbar
 ~~~~~~~~~~~~~~~~~
 
-If you click on the image shown at the right hand top of the page ("^DT"),
-you'll be presented with a debug toolbar that provides various niceties while
-you're developing.  This image will float above every HTML page served by
-:app:`Pyramid` while you develop an application, and allows you show the
-toolbar as necessary.  Click on ``Hide`` to hide the toolbar and show the
-image again.
+.. image:: project-show-toolbar.png
+
+If you click on the :app:`Pyramid` logo at the top right of the page, a new
+target window will open to present a debug toolbar that provides various
+niceties while you're developing.  This logo will float above every HTML
+page served by :app:`Pyramid` while you develop an application, and allows
+you to show the toolbar as necessary.
 
 .. image:: project-debug.png
 
-If you don't see the debug toolbar image on the right hand top of the page,
-it means you're browsing from a system that does not have debugging access.
-By default, for security reasons, only a browser originating from
-``localhost`` (``127.0.0.1``) can see the debug toolbar.  To allow your
-browser on a remote system to access the server, add a line within the
-``[app:main]`` section of the ``development.ini`` file in the form
-``debugtoolbar.hosts = X.X.X.X``.  For example, if your Pyramid application
-is running on a remote system, and you're browsing from a host with the IP
-address ``192.168.1.1``, you'd add something like this to enable the toolbar
-when your system contacts Pyramid:
+If you don't see the Pyramid logo on the top right of the page, it means
+you're browsing from a system that does not have debugging access.  By
+default, for security reasons, only a browser originating from ``localhost``
+(``127.0.0.1``) can see the debug toolbar.  To allow your browser on a
+remote system to access the server, add a line within the ``[app:main]``
+section of the ``development.ini`` file in the form ``debugtoolbar.hosts = X
+.X.X.X``.  For example, if your Pyramid application is running on a remote
+system, and you're browsing from a host with the IP address ``192.168.1.1``,
+you'd add something like this to enable the toolbar when your system
+contacts Pyramid:
 
 .. code-block:: ini
 
@@ -450,9 +451,9 @@ Put a hash mark at the beginning of the ``pyramid_debugtoolbar`` line:
 Then restart the application to see that the toolbar has been turned off.
 
 Note that if you comment out the ``pyramid_debugtoolbar`` line, the ``#``
-*must* be in the first column.  If you put it anywhere else,
-and then attempt to restart the application,
-you'll receive an error that ends something like this:
+*must* be in the first column.  If you put it anywhere else, and then
+attempt to restart the application, you'll receive an error that ends
+something like this:
 
 .. code-block:: text
 
@@ -610,7 +611,7 @@ implementations.
    single: production.ini
 
 ``production.ini``
-~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 
 The ``production.ini`` file is a :term:`PasteDeploy` configuration file with
 a purpose much like that of ``development.ini``.  However, it disables the
@@ -942,7 +943,7 @@ unit tests.
 .. _modifying_package_structure:
 
 Modifying Package Structure
-----------------------------
+---------------------------
 
 It is best practice for your application's code layout to not stray too much
 from accepted Pyramid scaffold defaults.  If you refrain from changing
