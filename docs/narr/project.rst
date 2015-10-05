@@ -1,7 +1,7 @@
 .. _project_narr:
 
 Creating a :app:`Pyramid` Project
-====================================
+=================================
 
 As we saw in :ref:`firstapp_chapter`, it's possible to create a
 :app:`Pyramid` application completely manually.  However, it's usually more
@@ -12,8 +12,8 @@ A project is a directory that contains at least one Python :term:`package`.
 You'll use a scaffold to create a project, and you'll create your application
 logic within a package that lives inside the project.  Even if your
 application is extremely simple, it is useful to place code that drives the
-application within a package, because: 1) a package is more easily extended
-with new code and 2) an application that lives inside a package can also be
+application within a package, because (1) a package is more easily extended
+with new code, and (2) an application that lives inside a package can also be
 distributed more easily than one which does not live within a package.
 
 :app:`Pyramid` comes with a variety of scaffolds that you can use to generate
@@ -32,24 +32,24 @@ as part of Pyramid.
 .. _additional_paster_scaffolds:
 
 Scaffolds Included with :app:`Pyramid`
-------------------------------------------------
+--------------------------------------
 
 The convenience scaffolds included with :app:`Pyramid` differ from
 each other on a number of axes:
 
 - the persistence mechanism they offer (no persistence mechanism,
-  :term:`ZODB`, or :term:`SQLAlchemy`).
+  :term:`ZODB`, or :term:`SQLAlchemy`)
 
 - the mechanism they use to map URLs to code (:term:`traversal` or :term:`URL
-  dispatch`).
+  dispatch`)
 
 The included scaffolds are these:
 
 ``starter``
-  URL mapping via :term:`URL dispatch` and no persistence mechanism.
+  URL mapping via :term:`URL dispatch` and no persistence mechanism
 
 ``zodb``
-  URL mapping via :term:`traversal` and persistence via :term:`ZODB`.
+  URL mapping via :term:`traversal` and persistence via :term:`ZODB`
 
 ``alchemy``
   URL mapping via :term:`URL dispatch` and persistence via
@@ -70,7 +70,7 @@ the ``pcreate`` command installed within the virtualenv.  We'll choose the
 ``starter`` scaffold for this purpose.  When we invoke ``pcreate``, it will
 create a directory that represents our project.
 
-In :ref:`installing_chapter` we called the virtualenv directory ``env``; the
+In :ref:`installing_chapter` we called the virtualenv directory ``env``. The
 following commands assume that our current working directory is the ``env``
 directory.
 
@@ -89,7 +89,6 @@ Or on Windows:
 
    > %VENV%\Scripts\pcreate -s starter MyProject
    
-
 Here's sample output from a run of ``pcreate`` on UNIX for a project we name
 ``MyProject``:
 
@@ -129,8 +128,8 @@ server" directory, and you don't need to put it within a virtualenv
 directory.  The author uses Linux mainly, and tends to put project
 directories which he creates within his ``~/projects`` directory.  On
 Windows, it's a good idea to put project directories within a directory that
-contains no space characters, so it's wise to *avoid* a path that contains
-i.e. ``My Documents``.  As a result, the author, when he uses Windows, just
+contains no space characters, so it's wise to *avoid* a path that contains,
+i.e., ``My Documents``.  As a result, the author, when he uses Windows, just
 puts his projects in ``C:\projects``.
 
 .. warning::
@@ -185,13 +184,13 @@ Elided output from a run of this command on UNIX is shown below:
 This will install a :term:`distribution` representing your project
 into the virtual environment interpreter's library set so it can be
 found by ``import`` statements and by other console scripts such as
-``pserve``, ``pshell``, ``proutes`` and ``pviews``.
+``pserve``, ``pshell``, ``proutes``, and ``pviews``.
 
 .. index::
    single: running tests
    single: tests (running)
 
-Running The Tests For Your Application
+Running the Tests for Your Application
 --------------------------------------
 
 To run unit tests for your application, you should invoke them using the
@@ -250,7 +249,7 @@ single sample test exists.
 
 .. _running_the_project_application:
 
-Running The Project Application
+Running the Project Application
 -------------------------------
 
 Once a project is installed for development, you can run the application it
@@ -285,10 +284,10 @@ respond to requests made to ``127.0.0.1`` and on any external IP address.
 For example, your system might be configured to have an external IP address
 ``192.168.1.50``.  If that's the case, if you use a browser running on the
 same system as Pyramid, it will be able to access the application via
-``http://127.0.0.1:6543/`` as well as via
-``http://192.168.1.50:6543/``. However, *other people* on other computers on
-the same network will also be able to visit your Pyramid application in their
-browser by visiting ``http://192.168.1.50:6543/``.
+``http://127.0.0.1:6543/`` as well as via ``http://192.168.1.50:6543/``.
+However, *other people* on other computers on the same network will also be
+able to visit your Pyramid application in their browser by visiting
+``http://192.168.1.50:6543/``.
 
 If you want to restrict access such that only a browser running on the same
 machine as Pyramid will be able to access your Pyramid application, edit the
@@ -309,19 +308,20 @@ portion of the ``development.ini`` file.  For example, you can change the
 section to ``port = 8080`` to run the server on port 8080 instead of
 port 6543.
 
-You can shut down a server started this way by pressing ``Ctrl-C``.
+You can shut down a server started this way by pressing ``Ctrl-C`` (or
+``Ctrl-Break`` on Windows).
 
 The default server used to run your Pyramid application when a project is
 created from a scaffold is named :term:`Waitress`.  This server is what
 prints the ``serving on...`` line when you run ``pserve``.  It's a good idea
-to use this server during development, because it's very simple.  It can also
+to use this server during development because it's very simple.  It can also
 be used for light production.  Setting your application up under a different
 server is not advised until you've done some development work under the
 default server, particularly if you're not yet experienced with Python web
 development.  Python web server setup can be complex, and you should get some
 confidence that your application works in a default environment before trying
 to optimize it or make it "more like production".  It's awfully easy to get
-sidetracked trying to set up a nondefault server for hours without actually
+sidetracked trying to set up a non-default server for hours without actually
 starting to do any development.  One of the nice things about Python web
 servers is that they're largely interchangeable, so if your application works
 under the default server, it will almost certainly work under any other
@@ -392,25 +392,26 @@ generated ``starter`` application in a browser.
 The Debug Toolbar
 ~~~~~~~~~~~~~~~~~
 
-If you click on the image shown at the right hand top of the page ("^DT"),
-you'll be presented with a debug toolbar that provides various niceties while
-you're developing.  This image will float above every HTML page served by
-:app:`Pyramid` while you develop an application, and allows you show the
-toolbar as necessary.  Click on ``Hide`` to hide the toolbar and show the
-image again.
+.. image:: project-show-toolbar.png
+
+If you click on the :app:`Pyramid` logo at the top right of the page, a new
+target window will open to present a debug toolbar that provides various
+niceties while you're developing.  This logo will float above every HTML
+page served by :app:`Pyramid` while you develop an application, and allows
+you to show the toolbar as necessary.
 
 .. image:: project-debug.png
 
-If you don't see the debug toolbar image on the right hand top of the page,
-it means you're browsing from a system that does not have debugging access.
-By default, for security reasons, only a browser originating from
-``localhost`` (``127.0.0.1``) can see the debug toolbar.  To allow your
-browser on a remote system to access the server, add a line within the
-``[app:main]`` section of the ``development.ini`` file in the form
-``debugtoolbar.hosts = X.X.X.X``.  For example, if your Pyramid application
-is running on a remote system, and you're browsing from a host with the IP
-address ``192.168.1.1``, you'd add something like this to enable the toolbar
-when your system contacts Pyramid:
+If you don't see the Pyramid logo on the top right of the page, it means
+you're browsing from a system that does not have debugging access.  By
+default, for security reasons, only a browser originating from ``localhost``
+(``127.0.0.1``) can see the debug toolbar.  To allow your browser on a
+remote system to access the server, add a line within the ``[app:main]``
+section of the ``development.ini`` file in the form ``debugtoolbar.hosts = X
+.X.X.X``.  For example, if your Pyramid application is running on a remote
+system, and you're browsing from a host with the IP address ``192.168.1.1``,
+you'd add something like this to enable the toolbar when your system
+contacts Pyramid:
 
 .. code-block:: ini
 
@@ -450,9 +451,9 @@ Put a hash mark at the beginning of the ``pyramid_debugtoolbar`` line:
 Then restart the application to see that the toolbar has been turned off.
 
 Note that if you comment out the ``pyramid_debugtoolbar`` line, the ``#``
-*must* be in the first column.  If you put it anywhere else,
-and then attempt to restart the application,
-you'll receive an error that ends something like this:
+*must* be in the first column.  If you put it anywhere else, and then
+attempt to restart the application, you'll receive an error that ends
+something like this:
 
 .. code-block:: text
 
@@ -469,7 +470,7 @@ which contains a Python :term:`package`.  The package is *also* named
 ``myproject``, but it's lowercased; the scaffold generates a project which
 contains a package that shares its name except for case.
 
-All :app:`Pyramid` ``pcreate`` -generated projects share a similar structure.
+All :app:`Pyramid` ``pcreate``-generated projects share a similar structure.
 The ``MyProject`` project we've generated has the following directory
 structure:
 
@@ -541,7 +542,7 @@ The generated ``development.ini`` file looks like so:
    :linenos:
 
 This file contains several sections including ``[app:main]``,
-``[server:main]`` and several other sections related to logging
+``[server:main]``, and several other sections related to logging
 configuration.
 
 The ``[app:main]`` section represents configuration for your :app:`Pyramid`
@@ -553,11 +554,11 @@ to the function named ``main`` in our package's ``__init__.py`` module.  You
 can provide startup-time configuration parameters to your application by
 adding more settings to this section.
 
-.. note:: See :ref:`pastedeploy_entry_points` for more information about the
+.. seealso:: See :ref:`pastedeploy_entry_points` for more information about the
    meaning of the ``use = egg:MyProject`` value in this section.
 
 The ``pyramid.reload_templates`` setting in the ``[app:main]`` section is a
-:app:`Pyramid` -specific setting which is passed into the framework.  If it
+:app:`Pyramid`-specific setting which is passed into the framework.  If it
 exists, and its value is ``true``, supported template changes will not
 require an application restart to be detected.  See
 :ref:`reload_templates_section` for more information.
@@ -570,9 +571,10 @@ The ``pyramid.includes`` setting in the ``[app:main]`` section tells Pyramid
 to "include" configuration from another package.  In this case, the line
 ``pyramid.includes = pyramid_debugtoolbar`` tells Pyramid to include
 configuration from the ``pyramid_debugtoolbar`` package.  This turns on a
-debugging panel in development mode which will be shown on the right hand
-side of the screen.  Including the debug toolbar will also make it possible
-to interactively debug exceptions when an error occurs.
+debugging panel in development mode which can be opened by clicking on the
+:app:`Pyramid` logo on the top right of the screen.  Including the debug
+toolbar will also make it possible to interactively debug exceptions when an
+error occurs.
 
 Various other settings may exist in this section having to do with debugging
 or influencing runtime behavior of a :app:`Pyramid` application.  See
@@ -596,21 +598,21 @@ and ``# End logging configuration`` represent Python's standard library
 between these two markers are passed to the `logging module's config file
 configuration engine
 <http://docs.python.org/howto/logging.html#configuring-logging>`_ when the
-``pserve`` or ``pshell`` commands are executed.  The default
-configuration sends application logging output to the standard error output
-of your terminal.  For more information about logging configuration, see
+``pserve`` or ``pshell`` commands are executed.  The default configuration
+sends application logging output to the standard error output of your
+terminal.  For more information about logging configuration, see
 :ref:`logging_chapter`.
 
 See the :term:`PasteDeploy` documentation for more information about other
 types of things you can put into this ``.ini`` file, such as other
-applications, :term:`middleware` and alternate :term:`WSGI` server
+applications, :term:`middleware`, and alternate :term:`WSGI` server
 implementations.
 
 .. index::
    single: production.ini
 
 ``production.ini``
-~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 
 The ``production.ini`` file is a :term:`PasteDeploy` configuration file with
 a purpose much like that of ``development.ini``.  However, it disables the
@@ -735,7 +737,7 @@ For fun, you can try this command now:
 
 .. code-block:: text
 
-   $ python setup.py sdist
+   $ $VENV/bin/python setup.py sdist
 
 This will create a tarball of your application in a ``dist`` subdirectory
 named ``MyProject-0.1.tar.gz``.  You can send this tarball to other people
@@ -764,11 +766,10 @@ The ``myproject`` :term:`package` lives inside the ``MyProject``
 #. A ``views.py`` module, which contains view code for the
    application.
 
-These are purely conventions established by the scaffold:
-:app:`Pyramid` doesn't insist that you name things in any particular way.
-However, it's generally a good idea to follow Pyramid standards for naming,
-so that other Pyramid developers can get up to speed quickly on your code
-when you need help.
+These are purely conventions established by the scaffold. :app:`Pyramid`
+doesn't insist that you name things in any particular way. However, it's
+generally a good idea to follow Pyramid standards for naming, so that other
+Pyramid developers can get up to speed quickly on your code when you need help.
 
 .. index::
    single: __init__.py
@@ -838,13 +839,13 @@ The view_config decorator asserts that this view be found when a
 route will match when a visitor visits the root URL.  The view_config
 decorator also names a ``renderer``, which in this case is a template that
 will be used to render the result of the view callable.  This particular view
-declaration points at ``templates/mytemplate.pt``, which is a :term:`asset
+declaration points at ``templates/mytemplate.pt``, which is an :term:`asset
 specification` that specifies the ``mytemplate.pt`` file within the
 ``templates`` directory of the ``myproject`` package.  The asset
 specification could have also been specified as
 ``myproject:templates/mytemplate.pt``; the leading package name and colon is
-optional.  The template file pointed to is a :term:`Chameleon` ZPT
-template file (``templates/my_template.pt``).
+optional.  The template file pointed to is a :term:`Chameleon` ZPT template
+file (``templates/my_template.pt``).
 
 This view callable function is handed a single piece of information: the
 :term:`request`.  The *request* is an instance of the :term:`WebOb`
@@ -858,7 +859,7 @@ returns the HTML in a :term:`response`.
 .. note:: Dictionaries provide values to :term:`template`\s.
 
 .. note:: When the application is run with the scaffold's :ref:`default
-   development.ini <MyProject_ini>` configuration :ref:`logging is set up
+   development.ini <MyProject_ini>` configuration, :ref:`logging is set up
    <MyProject_ini_logging>` to aid debugging.  If an exception is raised,
    uncaught tracebacks are displayed after the startup messages on :ref:`the
    console running the server <running_the_project_application>`. Also
@@ -868,7 +869,7 @@ returns the HTML in a :term:`response`.
 .. note:: ``development.ini`` has a setting that controls how templates are
    reloaded, ``pyramid.reload_templates``.
 
-   - When set to ``True`` (as in the scaffold ``development.ini``) changed
+   - When set to ``True`` (as in the scaffold ``development.ini``), changed
      templates automatically reload without a server restart.  This is
      convenient while developing, but slows template rendering speed.
 
@@ -905,7 +906,7 @@ template.  It includes CSS and images.
 ``templates/mytemplate.pt``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The single :term:`Chameleon` template that exists in the project.  Its
+This is the single :term:`Chameleon` template that exists in the project.  Its
 contents are too long to show here, but it displays a default page when
 rendered.  It is referenced by the call to ``@view_config`` as the
 ``renderer`` of the ``my_view`` view callable in the ``views.py`` file.  See
@@ -925,12 +926,13 @@ The ``tests.py`` module includes unit tests for your application.
 
 .. literalinclude:: MyProject/myproject/tests.py
    :language: python
+   :lines: 1-18
    :linenos:
 
 This sample ``tests.py`` file has a single unit test defined within it.  This
 test is executed when you run ``python setup.py test``.  You may add more
 tests here as you build your application.  You are not required to write
-tests to use :app:`Pyramid`, this file is simply provided as convenience and
+tests to use :app:`Pyramid`. This file is simply provided for convenience and
 example.
 
 See :ref:`testing_chapter` for more information about writing :app:`Pyramid`
@@ -942,7 +944,7 @@ unit tests.
 .. _modifying_package_structure:
 
 Modifying Package Structure
-----------------------------
+---------------------------
 
 It is best practice for your application's code layout to not stray too much
 from accepted Pyramid scaffold defaults.  If you refrain from changing
@@ -962,7 +964,8 @@ adding a single file for each view.
 
 If your project package name was ``myproject`` and you wanted to arrange all
 your views in a Python subpackage within the ``myproject`` :term:`package`
-named ``views`` instead of within a single ``views.py`` file, you might:
+named ``views`` instead of within a single ``views.py`` file, you might do the
+following.
 
 - Create a ``views`` directory inside your ``myproject`` package directory
   (the same directory which holds ``views.py``).
@@ -981,8 +984,8 @@ You can then continue to add view callable functions to the ``blog.py``
 module, but you can also add other ``.py`` files which contain view callable
 functions to the ``views`` directory.  As long as you use the
 ``@view_config`` directive to register views in conjunction with
-``config.scan()`` they will be picked up automatically when the application
-is restarted.
+``config.scan()``, they will be picked up automatically when the application is
+restarted.
 
 Using the Interactive Shell
 ---------------------------
@@ -997,22 +1000,22 @@ See :ref:`interactive_shell` for more details.
 What Is This ``pserve`` Thing
 -----------------------------
 
-The code generated by an :app:`Pyramid` scaffold assumes that you will be
-using the ``pserve`` command to start your application while you do
-development.  ``pserve`` is a command that reads a :term:`PasteDeploy`
-``.ini`` file (e.g. ``development.ini``) and configures a server to serve a
-Pyramid application based on the data in the file.
+The code generated by a :app:`Pyramid` scaffold assumes that you will be using
+the ``pserve`` command to start your application while you do development.
+``pserve`` is a command that reads a :term:`PasteDeploy` ``.ini`` file (e.g.,
+``development.ini``), and configures a server to serve a :app:`Pyramid`
+application based on the data in the file.
 
 ``pserve`` is by no means the only way to start up and serve a :app:`Pyramid`
 application.  As we saw in :ref:`firstapp_chapter`, ``pserve`` needn't be
 invoked at all to run a :app:`Pyramid` application.  The use of ``pserve`` to
-run a :app:`Pyramid` application is purely conventional based on the output
-of its scaffolding.  But we strongly recommend using ``pserve`` while
-developing your application, because many other convenience introspection
-commands (such as ``pviews``, ``prequest``, ``proutes`` and others) are also
-implemented in terms of configuration availability of this ``.ini`` file
-format.  It also configures Pyramid logging and provides the ``--reload``
-switch for convenient restarting of the server when code changes.
+run a :app:`Pyramid` application is purely conventional based on the output of
+its scaffolding.  But we strongly recommend using ``pserve`` while developing
+your application because many other convenience introspection commands (such as
+``pviews``, ``prequest``, ``proutes``, and others) are also implemented in
+terms of configuration availability of this ``.ini`` file format.  It also
+configures Pyramid logging and provides the ``--reload``switch for convenient
+restarting of the server when code changes.
 
 .. _alternate_wsgi_server:
 
