@@ -204,7 +204,7 @@ Let's examine this in detail. First, we need some imports to support later code:
 Next we set up a SQLAlchemy ``DBSession`` object:
 
    .. literalinclude:: src/basiclayout/tutorial/models.py
-      :lines: 16
+      :lines: 17
       :language: py
 
 ``scoped_session`` and ``sessionmaker`` are standard SQLAlchemy helpers.
