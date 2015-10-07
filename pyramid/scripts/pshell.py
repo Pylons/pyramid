@@ -122,7 +122,10 @@ class PShellCommand(object):
             # remove any objects from default help that were overidden
             for k, v in env.items():
                 if k not in orig_env or env[k] != orig_env[k]:
-                    env_help[k] = v
+                    if getattr(v, '__doc__', False):
+                        env_help[k] = v.__doc__.replace("\n", " ")
+                    else:
+                        env_help[k] = v
 
         # load the pshell section of the ini file
         env.update(self.loaded_objects)
