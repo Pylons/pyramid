@@ -1014,7 +1014,7 @@ its scaffolding.  But we strongly recommend using ``pserve`` while developing
 your application because many other convenience introspection commands (such as
 ``pviews``, ``prequest``, ``proutes``, and others) are also implemented in
 terms of configuration availability of this ``.ini`` file format.  It also
-configures Pyramid logging and provides the ``--reload``switch for convenient
+configures Pyramid logging and provides the ``--reload`` switch for convenient
 restarting of the server when code changes.
 
 .. _alternate_wsgi_server:
