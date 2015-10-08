@@ -8,7 +8,7 @@ URL Dispatch
 
 :term:`URL dispatch` provides a simple way to map URLs to :term:`view` code
 using a simple pattern matching language.  An ordered set of patterns is
-checked one-by-one.  If one of the patterns matches the path information
+checked one by one.  If one of the patterns matches the path information
 associated with a request, a particular :term:`view callable` is invoked.  A
 view callable is a specific bit of code, defined in your application, that
 receives the :term:`request` and returns a :term:`response` object.
@@ -21,12 +21,12 @@ If any route configuration is present in an application, the :app:`Pyramid`
 matching patterns present in a *route map*.
 
 If any route pattern matches the information in the :term:`request`,
-:app:`Pyramid` will invoke the :term:`view lookup` process to find a
-matching view.
+:app:`Pyramid` will invoke the :term:`view lookup` process to find a matching
+view.
 
 If no route pattern in the route map matches the information in the
-:term:`request` provided in your application, :app:`Pyramid` will fail over
-to using :term:`traversal` to perform resource location and view lookup.
+:term:`request` provided in your application, :app:`Pyramid` will fail over to
+using :term:`traversal` to perform resource location and view lookup.
 
 .. index::
    single: route configuration
@@ -35,11 +35,11 @@ Route Configuration
 -------------------
 
 :term:`Route configuration` is the act of adding a new :term:`route` to an
-application.  A route has a *name*, which acts as an identifier to be used
-for URL generation.  The name also allows developers to associate a view
+application.  A route has a *name*, which acts as an identifier to be used for
+URL generation.  The name also allows developers to associate a view
 configuration with the route.  A route also has a *pattern*, meant to match
 against the ``PATH_INFO`` portion of a URL (the portion following the scheme
-and port, e.g. ``/foo/bar`` in the URL `<http://localhost:8080/foo/bar>`_). It
+and port, e.g., ``/foo/bar`` in the URL ``http://localhost:8080/foo/bar``). It
 also optionally has a ``factory`` and a set of :term:`route predicate`
 attributes.
 
@@ -71,8 +71,8 @@ invoked when the associated route pattern matches during a request.
 
 More commonly, you will not use any ``add_view`` statements in your project's
 "setup" code. You will instead use ``add_route`` statements, and use a
-:term:`scan` to associate view callables with routes.  For example, if
-this is a portion of your project's ``__init__.py``:
+:term:`scan` to associate view callables with routes.  For example, if this is
+a portion of your project's ``__init__.py``:
 
 .. code-block:: python
 
@@ -85,8 +85,8 @@ setup code.  However, the above :term:`scan` execution
 decoration`, including any objects decorated with the
 :class:`pyramid.view.view_config` decorator in the ``mypackage`` Python
 package.  For example, if you have a ``views.py`` in your package, a scan will
-pick up any of its configuration decorators, so we can add one there
-that references ``myroute`` as a ``route_name`` parameter:
+pick up any of its configuration decorators, so we can add one there that
+references ``myroute`` as a ``route_name`` parameter:
 
 .. code-block:: python
 
@@ -97,8 +97,8 @@ that references ``myroute`` as a ``route_name`` parameter:
    def myview(request):
        return Response('OK')
 
-The above combination of ``add_route`` and ``scan`` is completely equivalent
-to using the previous combination of ``add_route`` and ``add_view``.
+The above combination of ``add_route`` and ``scan`` is completely equivalent to
+using the previous combination of ``add_route`` and ``add_view``.
 
 .. index::
    single: route path pattern syntax
@@ -109,13 +109,13 @@ to using the previous combination of ``add_route`` and ``add_view``.
 Route Pattern Syntax
 ~~~~~~~~~~~~~~~~~~~~
 
-The syntax of the pattern matching language used by :app:`Pyramid` URL
-dispatch in the *pattern* argument is straightforward; it is close to that of
-the :term:`Routes` system used by :term:`Pylons`.
+The syntax of the pattern matching language used by :app:`Pyramid` URL dispatch
+in the *pattern* argument is straightforward.  It is close to that of the
+:term:`Routes` system used by :term:`Pylons`.
 
-The *pattern* used in route configuration may start with a slash character.
-If the pattern does not start with a slash character, an implicit slash will
-be prepended to it at matching time.  For example, the following patterns are
+The *pattern* used in route configuration may start with a slash character.  If
+the pattern does not start with a slash character, an implicit slash will be
+prepended to it at matching time.  For example, the following patterns are
 equivalent:
 
 .. code-block:: text
@@ -128,28 +128,29 @@ and:
 
    /{foo}/bar/baz
 
-If a pattern is a valid URL it won't be ever matched against an incoming
-request. Instead it can be useful for generating external URLs. See
-:ref:`External routes <external_route_narr>` for details.
+If a pattern is a valid URL it won't be matched against an incoming request.
+Instead it can be useful for generating external URLs. See :ref:`External
+routes <external_route_narr>` for details.
 
-A pattern segment (an individual item between ``/`` characters in the
-pattern) may either be a literal string (e.g. ``foo``) *or* it may be a
-replacement marker (e.g. ``{foo}``) or a certain combination of both. A
-replacement marker does not need to be preceded by a ``/`` character.
+A pattern segment (an individual item between ``/`` characters in the pattern)
+may either be a literal string (e.g., ``foo``) *or* it may be a replacement
+marker (e.g., ``{foo}``), or a certain combination of both. A replacement
+marker does not need to be preceded by a ``/`` character.
 
-A replacement marker is in the format ``{name}``, where this means "accept
-any characters up to the next slash character and use this as the ``name``
+A replacement marker is in the format ``{name}``, where this means "accept any
+characters up to the next slash character and use this as the ``name``
 :term:`matchdict` value."
 
 A replacement marker in a pattern must begin with an uppercase or lowercase
 ASCII letter or an underscore, and can be composed only of uppercase or
 lowercase ASCII letters, underscores, and numbers.  For example: ``a``,
-``a_b``, ``_b``, and ``b9`` are all valid replacement marker names, but
-``0a`` is not.
+``a_b``, ``_b``, and ``b9`` are all valid replacement marker names, but ``0a``
+is not.
 
-.. note:: A replacement marker could not start with an underscore until
-   Pyramid 1.2.  Previous versions required that the replacement marker start
-   with an uppercase or lowercase letter.
+.. versionchanged:: 1.2
+   A replacement marker could not start with an underscore until Pyramid 1.2.
+   Previous versions required that the replacement marker start with an
+   uppercase or lowercase letter.
 
 A matchdict is the dictionary representing the dynamic parts extracted from a
 URL based on the routing pattern.  It is available as ``request.matchdict``.
@@ -174,18 +175,18 @@ It will not match the following patterns however:
    foo/1/2/        -> No match (trailing slash)
    bar/abc/def     -> First segment literal mismatch
 
-The match for a segment replacement marker in a segment will be done only up
-to the first non-alphanumeric character in the segment in the pattern.  So,
-for instance, if this route pattern was used:
+The match for a segment replacement marker in a segment will be done only up to
+the first non-alphanumeric character in the segment in the pattern.  So, for
+instance, if this route pattern was used:
 
 .. code-block:: text
 
    foo/{name}.html
 
-The literal path ``/foo/biz.html`` will match the above route pattern, and
-the match result will be ``{'name':u'biz'}``.  However, the literal path
-``/foo/biz`` will not match, because it does not contain a literal ``.html``
-at the end of the segment represented by ``{name}.html`` (it only contains
+The literal path ``/foo/biz.html`` will match the above route pattern, and the
+match result will be ``{'name':u'biz'}``.  However, the literal path
+``/foo/biz`` will not match, because it does not contain a literal ``.html`` at
+the end of the segment represented by ``{name}.html`` (it only contains
 ``biz``, not ``biz.html``).
 
 To capture both segments, two replacement markers can be used:
@@ -194,28 +195,27 @@ To capture both segments, two replacement markers can be used:
 
     foo/{name}.{ext}
 
-The literal path ``/foo/biz.html`` will match the above route pattern, and
-the match result will be ``{'name': 'biz', 'ext': 'html'}``. This occurs
-because there is a literal part of ``.`` (period) between the two replacement
-markers ``{name}`` and ``{ext}``.
+The literal path ``/foo/biz.html`` will match the above route pattern, and the
+match result will be ``{'name': 'biz', 'ext': 'html'}``. This occurs because
+there is a literal part of ``.`` (period) between the two replacement markers
+``{name}`` and ``{ext}``.
 
 Replacement markers can optionally specify a regular expression which will be
-used to decide whether a path segment should match the marker.  To specify
-that a replacement marker should match only a specific set of characters as
-defined by a regular expression, you must use a slightly extended form of
-replacement marker syntax.  Within braces, the replacement marker name must
-be followed by a colon, then directly thereafter, the regular expression.
-The *default* regular expression associated with a replacement marker
-``[^/]+`` matches one or more characters which are not a slash.  For example,
-under the hood, the replacement marker ``{foo}`` can more verbosely be
-spelled as ``{foo:[^/]+}``.  You can change this to be an arbitrary regular
-expression to match an arbitrary sequence of characters, such as
-``{foo:\d+}`` to match only digits.
+used to decide whether a path segment should match the marker.  To specify that
+a replacement marker should match only a specific set of characters as defined
+by a regular expression, you must use a slightly extended form of replacement
+marker syntax.  Within braces, the replacement marker name must be followed by
+a colon, then directly thereafter, the regular expression. The *default*
+regular expression associated with a replacement marker ``[^/]+`` matches one
+or more characters which are not a slash.  For example, under the hood, the
+replacement marker ``{foo}`` can more verbosely be spelled as ``{foo:[^/]+}``. 
+You can change this to be an arbitrary regular expression to match an arbitrary
+sequence of characters, such as ``{foo:\d+}`` to match only digits.
 
 It is possible to use two replacement markers without any literal characters
 between them, for instance ``/{foo}{bar}``. However, this would be a
-nonsensical pattern without specifying a custom regular expression to
-restrict what each marker captures.
+nonsensical pattern without specifying a custom regular expression to restrict
+what each marker captures.
 
 Segments must contain at least one character in order to match a segment
 replacement marker.  For example, for the URL ``/abc/``:
@@ -224,7 +224,7 @@ replacement marker.  For example, for the URL ``/abc/``:
 
 - ``/{foo}/`` will match.
 
-Note that values representing matched path segments will be url-unquoted and
+Note that values representing matched path segments will be URL-unquoted and
 decoded from UTF-8 into Unicode within the matchdict.  So for instance, the
 following pattern:
 
@@ -244,9 +244,9 @@ The matchdict will look like so (the value is URL-decoded / UTF-8 decoded):
 
    {'bar':u'La Pe\xf1a'}
 
-Literal strings in the path segment should represent the *decoded* value of
-the ``PATH_INFO`` provided to Pyramid.  You don't want to use a URL-encoded
-value or a bytestring representing the literal's UTF-8 in the pattern.  For
+Literal strings in the path segment should represent the *decoded* value of the
+``PATH_INFO`` provided to Pyramid.  You don't want to use a URL-encoded value
+or a bytestring representing the literal encoded as UTF-8 in the pattern. For
 example, rather than this:
 
 .. code-block:: text
@@ -259,8 +259,8 @@ You'll want to use something like this:
 
    /Foo Bar/{baz}
 
-For patterns that contain "high-order" characters in its literals, you'll
-want to use a Unicode value as the pattern as opposed to any URL-encoded or
+For patterns that contain "high-order" characters in its literals, you'll want
+to use a Unicode value as the pattern as opposed to any URL-encoded or
 UTF-8-encoded value.  For example, you might be tempted to use a bytestring
 pattern like this:
 
@@ -268,12 +268,11 @@ pattern like this:
 
    /La Pe\xc3\xb1a/{x}
 
-But this will either cause an error at startup time or it won't match
-properly.  You'll want to use a Unicode value as the pattern instead rather
-than raw bytestring escapes.  You can use a high-order Unicode value as the
-pattern by using `Python source file encoding
-<http://www.python.org/dev/peps/pep-0263/>`_ plus the "real" character in the
-Unicode pattern in the source, like so:
+But this will either cause an error at startup time or it won't match properly.
+You'll want to use a Unicode value as the pattern instead rather than raw
+bytestring escapes.  You can use a high-order Unicode value as the pattern by
+using `Python source file encoding <http://www.python.org/dev/peps/pep-0263/>`_
+plus the "real" character in the Unicode pattern in the source, like so:
 
 .. code-block:: text
 
@@ -291,8 +290,8 @@ only to literals in the pattern.
 
 If the pattern has a ``*`` in it, the name which follows it is considered a
 "remainder match".  A remainder match *must* come at the end of the pattern.
-Unlike segment replacement markers, it does not need to be preceded by a
-slash.  For example:
+Unlike segment replacement markers, it does not need to be preceded by a slash.
+For example:
 
 .. code-block:: text
 
@@ -310,7 +309,7 @@ The above pattern will match these URLs, generating the following matchdicts:
 
 Note that when a ``*stararg`` remainder match is matched, the value put into
 the matchdict is turned into a tuple of path segments representing the
-remainder of the path.  These path segments are url-unquoted and decoded from
+remainder of the path.  These path segments are URL-unquoted and decoded from
 UTF-8 into Unicode.  For example, for the following pattern:
 
 .. code-block:: text
@@ -357,15 +356,15 @@ Route Declaration Ordering
 
 Route configuration declarations are evaluated in a specific order when a
 request enters the system. As a result, the order of route configuration
-declarations is very important.  The order that routes declarations are
+declarations is very important.  The order in which route declarations are
 evaluated is the order in which they are added to the application at startup
 time.  (This is unlike a different way of mapping URLs to code that
 :app:`Pyramid` provides, named :term:`traversal`, which does not depend on
 pattern ordering).
 
 For routes added via the :mod:`~pyramid.config.Configurator.add_route` method,
-the order that routes are evaluated is the order in which they are added to
-the configuration imperatively.
+the order that routes are evaluated is the order in which they are added to the
+configuration imperatively.
 
 For example, route configuration statements with the following patterns might
 be added in the following order:
@@ -375,10 +374,9 @@ be added in the following order:
    members/{def}
    members/abc
 
-In such a configuration, the ``members/abc`` pattern would *never* be
-matched. This is because the match ordering will always match
-``members/{def}`` first; the route configuration with ``members/abc`` will
-never be evaluated.
+In such a configuration, the ``members/abc`` pattern would *never* be matched.
+This is because the match ordering will always match ``members/{def}`` first;
+the route configuration with ``members/abc`` will never be evaluated.
 
 .. index::
    single: route configuration arguments
@@ -416,19 +414,18 @@ the system, for each route configuration declaration present in the system,
 declared.  This checking happens in the order that the routes were declared
 via :meth:`pyramid.config.Configurator.add_route`.
 
-When a route configuration is declared, it may contain :term:`route
-predicate` arguments.  All route predicates associated with a route
-declaration must be ``True`` for the route configuration to be used for a
-given request during a check.  If any predicate in the set of :term:`route
-predicate` arguments provided to a route configuration returns ``False``
-during a check, that route is skipped and route matching continues through
-the ordered set of routes.
+When a route configuration is declared, it may contain :term:`route predicate`
+arguments.  All route predicates associated with a route declaration must be
+``True`` for the route configuration to be used for a given request during a
+check.  If any predicate in the set of :term:`route predicate` arguments
+provided to a route configuration returns ``False`` during a check, that route
+is skipped and route matching continues through the ordered set of routes.
 
 If any route matches, the route matching process stops and the :term:`view
-lookup` subsystem takes over to find the most reasonable view callable for
-the matched route.  Most often, there's only one view that will match (a view
-configured with a ``route_name`` argument matching the matched route).  To
-gain a better understanding of how routes and views are associated in a real
+lookup` subsystem takes over to find the most reasonable view callable for the
+matched route.  Most often, there's only one view that will match (a view
+configured with a ``route_name`` argument matching the matched route).  To gain
+a better understanding of how routes and views are associated in a real
 application, you can use the ``pviews`` command, as documented in
 :ref:`displaying_matching_views`.
 
@@ -445,11 +442,10 @@ The Matchdict
 ~~~~~~~~~~~~~
 
 When the URL pattern associated with a particular route configuration is
-matched by a request, a dictionary named ``matchdict`` is added as an
-attribute of the :term:`request` object.  Thus, ``request.matchdict`` will
-contain the values that match replacement patterns in the ``pattern``
-element.  The keys in a matchdict will be strings.  The values will be
-Unicode objects.
+matched by a request, a dictionary named ``matchdict`` is added as an attribute
+of the :term:`request` object.  Thus, ``request.matchdict`` will contain the
+values that match replacement patterns in the ``pattern`` element.  The keys in
+a matchdict will be strings.  The values will be Unicode objects.
 
 .. note::
 
@@ -466,10 +462,10 @@ The Matched Route
 
 When the URL pattern associated with a particular route configuration is
 matched by a request, an object named ``matched_route`` is added as an
-attribute of the :term:`request` object.  Thus, ``request.matched_route``
-will be an object implementing the :class:`~pyramid.interfaces.IRoute`
-interface which matched the request.  The most useful attribute of the route
-object is ``name``, which is the name of the route that matched.
+attribute of the :term:`request` object.  Thus, ``request.matched_route`` will
+be an object implementing the :class:`~pyramid.interfaces.IRoute` interface
+which matched the request.  The most useful attribute of the route object is
+``name``, which is the name of the route that matched.
 
 .. note::
 
@@ -480,8 +476,8 @@ Routing Examples
 ----------------
 
 Let's check out some examples of how route configuration statements might be
-commonly declared, and what will happen if they are matched by the
-information present in a request.
+commonly declared, and what will happen if they are matched by the information
+present in a request.
 
 .. _urldispatch_example1:
 
@@ -495,32 +491,38 @@ result in a particular view callable being invoked:
     :linenos:
 
     config.add_route('idea', 'site/{id}')
-    config.add_view('mypackage.views.site_view', route_name='idea')
+    config.scan() 
 
 When a route configuration with a ``view`` attribute is added to the system,
 and an incoming request matches the *pattern* of the route configuration, the
 :term:`view callable` named as the ``view`` attribute of the route
 configuration will be invoked.
 
-In the case of the above example, when the URL of a request matches
-``/site/{id}``, the view callable at the Python dotted path name
-``mypackage.views.site_view`` will be called with the request.  In other
-words, we've associated a view callable directly with a route pattern.
+Recall that the ``@view_config`` is equivalent to calling ``config.add_view``,
+because the ``config.scan()`` call will import ``mypackage.views``, shown
+below, and execute ``config.add_view`` under the hood. Each view then maps the
+route name to the matching view callable. In the case of the above example,
+when the URL of a request matches ``/site/{id}``, the view callable at the
+Python dotted path name ``mypackage.views.site_view`` will be called with the
+request.  In other words, we've associated a view callable directly with a
+route pattern.
 
 When the ``/site/{id}`` route pattern matches during a request, the
-``site_view`` view callable is invoked with that request as its sole
-argument.  When this route matches, a ``matchdict`` will be generated and
-attached to the request as ``request.matchdict``.  If the specific URL
-matched is ``/site/1``, the ``matchdict`` will be a dictionary with a single
-key, ``id``; the value will be the string ``'1'``, ex.: ``{'id':'1'}``.
+``site_view`` view callable is invoked with that request as its sole argument.
+When this route matches, a ``matchdict`` will be generated and attached to the
+request as ``request.matchdict``.  If the specific URL matched is ``/site/1``,
+the ``matchdict`` will be a dictionary with a single key, ``id``; the value
+will be the string ``'1'``, ex.: ``{'id':'1'}``.
 
 The ``mypackage.views`` module referred to above might look like so:
 
 .. code-block:: python
    :linenos:
 
+   from pyramid.view import view_config
    from pyramid.response import Response
 
+   @view_config(route_name='idea')
    def site_view(request):
        return Response(request.matchdict['id'])
 
@@ -533,8 +535,8 @@ information about views.
 Example 2
 ~~~~~~~~~
 
-Below is an example of a more complicated set of route statements you might
-add to your application:
+Below is an example of a more complicated set of route statements you might add
+to your application:
 
 .. code-block:: python
    :linenos:
@@ -542,11 +544,30 @@ add to your application:
    config.add_route('idea', 'ideas/{idea}')
    config.add_route('user', 'users/{user}')
    config.add_route('tag', 'tags/{tag}')
+   config.scan()
 
-   config.add_view('mypackage.views.idea_view', route_name='idea')
-   config.add_view('mypackage.views.user_view', route_name='user')
-   config.add_view('mypackage.views.tag_view', route_name='tag')
+Here is an example of a corresponding ``mypackage.views`` module:
 
+.. code-block:: python
+   :linenos:
+
+   from pyramid.view import view_config
+   from pyramid.response import Response
+
+   @view_config(route_name='idea')
+   def idea_view(request):
+       return Response(request.matchdict['id'])
+   
+   @view_config(route_name='user')
+   def user_view(request):
+       user = request.matchdict['user']
+       return Response(u'The user is {}.'.format(user))
+
+   @view_config(route_name='tag')
+   def tag_view(request):
+       tag = request.matchdict['tag']
+       return Response(u'The tag is {}.'.format(tag))
+    
 The above configuration will allow :app:`Pyramid` to service URLs in these
 forms:
 
@@ -562,33 +583,32 @@ forms:
   and attached to the :term:`request` will consist of ``{'idea':'1'}``.
 
 - When a URL matches the pattern ``/users/{user}``, the view callable
-  available at the dotted Python pathname ``mypackage.views.user_view`` will
-  be called.  For the specific URL ``/users/1``, the ``matchdict`` generated
-  and attached to the :term:`request` will consist of ``{'user':'1'}``.
+  available at the dotted Python pathname ``mypackage.views.user_view`` will be
+  called.  For the specific URL ``/users/1``, the ``matchdict`` generated and
+  attached to the :term:`request` will consist of ``{'user':'1'}``.
 
 - When a URL matches the pattern ``/tags/{tag}``, the view callable available
   at the dotted Python pathname ``mypackage.views.tag_view`` will be called.
-  For the specific URL ``/tags/1``, the ``matchdict`` generated and attached
-  to the :term:`request` will consist of ``{'tag':'1'}``.
+  For the specific URL ``/tags/1``, the ``matchdict`` generated and attached to
+  the :term:`request` will consist of ``{'tag':'1'}``.
 
 In this example we've again associated each of our routes with a :term:`view
-callable` directly.  In all cases, the request, which will have a
-``matchdict`` attribute detailing the information found in the URL by the
-process will be passed to the view callable.
+callable` directly.  In all cases, the request, which will have a ``matchdict``
+attribute detailing the information found in the URL by the process will be
+passed to the view callable.
 
 Example 3
 ~~~~~~~~~
 
-The :term:`context` resource object passed in to a view found as the result
-of URL dispatch will, by default, be an instance of the object returned by
-the :term:`root factory` configured at startup time (the ``root_factory``
-argument to the :term:`Configurator` used to configure the application).
+The :term:`context` resource object passed in to a view found as the result of
+URL dispatch will, by default, be an instance of the object returned by the
+:term:`root factory` configured at startup time (the ``root_factory`` argument
+to the :term:`Configurator` used to configure the application).
 
 You can override this behavior by passing in a ``factory`` argument to the
 :meth:`~pyramid.config.Configurator.add_route` method for a particular route.
-The ``factory`` should be a callable that accepts a :term:`request` and
-returns an instance of a class that will be the context resource used by the
-view.
+The ``factory`` should be a callable that accepts a :term:`request` and returns
+an instance of a class that will be the context resource used by the view.
 
 An example of using a route with a factory:
 
@@ -596,7 +616,7 @@ An example of using a route with a factory:
    :linenos:
 
    config.add_route('idea', 'ideas/{idea}', factory='myproject.resources.Idea')
-   config.add_view('myproject.views.idea_view', route_name='idea')
+   config.scan()
 
 The above route will manufacture an ``Idea`` resource as a :term:`context`,
 assuming that ``mypackage.resources.Idea`` resolves to a class that accepts a
@@ -610,7 +630,20 @@ request in its ``__init__``.  For example:
            pass
 
 In a more complicated application, this root factory might be a class
-representing a :term:`SQLAlchemy` model.
+representing a :term:`SQLAlchemy` model. The view ``mypackage.views.idea_view``
+might look like this:
+
+.. code-block:: python
+   :linenos:
+
+   @view_config(route_name='idea')
+   def idea_view(request):
+       idea = request.context
+       return Response(idea)
+
+Here, ``request.context`` is an instance of ``Idea``. If indeed the resource
+object is a SQLAlchemy model, you do not even have to perform a query in the
+view callable, since you have access to the resource via ``request.context``.
 
 See :ref:`route_factories` for more details about how to use route factories.
 
@@ -647,9 +680,9 @@ Or provide the literal string ``/`` as the pattern:
 Generating Route URLs
 ---------------------
 
-Use the :meth:`pyramid.request.Request.route_url` method to generate URLs
-based on route patterns.  For example, if you've configured a route with the
-``name`` "foo" and the ``pattern`` "{a}/{b}/{c}", you might do this.
+Use the :meth:`pyramid.request.Request.route_url` method to generate URLs based
+on route patterns.  For example, if you've configured a route with the ``name``
+"foo" and the ``pattern`` "{a}/{b}/{c}", you might do this.
 
 .. code-block:: python
    :linenos:
@@ -669,13 +702,12 @@ To generate only the *path* portion of a URL from a route, use the
 
 This will return the string ``/1/2/3`` rather than a full URL.
 
-Replacement values passed to ``route_url`` or ``route_path`` must be Unicode
-or bytestrings encoded in UTF-8.  One exception to this rule exists: if
-you're trying to replace a "remainder" match value (a ``*stararg``
-replacement value), the value may be a tuple containing Unicode strings or
-UTF-8 strings.
+Replacement values passed to ``route_url`` or ``route_path`` must be Unicode or
+bytestrings encoded in UTF-8.  One exception to this rule exists: if you're
+trying to replace a "remainder" match value (a ``*stararg`` replacement value),
+the value may be a tuple containing Unicode strings or UTF-8 strings.
 
-Note that URLs and paths generated by ``route_path`` and ``route_url`` are
+Note that URLs and paths generated by ``route_url`` and ``route_path`` are
 always URL-quoted string types (they contain no non-ASCII characters).
 Therefore, if you've added a route like so:
 
@@ -689,7 +721,7 @@ And you later generate a URL using ``route_path`` or ``route_url`` like so:
 
    url = request.route_path('la', city=u'Québec')
 
-You will wind up with the path encoded to UTF-8 and URL quoted like so:
+You will wind up with the path encoded to UTF-8 and URL-quoted like so:
 
 .. code-block:: text
 
@@ -721,7 +753,7 @@ You can get a similar result by passing a tuple composed of path elements:
 
    url = request.route_path('abc', foo=(u'Québec', u'biz'))
 
-Each value in the tuple will be url-quoted and joined by slashes in this case:
+Each value in the tuple will be URL-quoted and joined by slashes in this case:
 
 .. code-block:: text
 
@@ -755,7 +787,7 @@ ignored when ``static`` is ``True``.
 :ref:`External routes <external_route_narr>` are implicitly static.
 
 .. versionadded:: 1.1
-   the ``static`` argument to :meth:`~pyramid.config.Configurator.add_route`
+   the ``static`` argument to :meth:`~pyramid.config.Configurator.add_route`.
 
 .. _external_route_narr:
 
@@ -798,13 +830,15 @@ argument to :meth:`pyramid.config.Configurator.add_notfound_view` or the
 equivalent ``append_slash`` argument to the
 :class:`pyramid.view.notfound_view_config` decorator.
 
-Adding ``append_slash=True`` is a way to automatically redirect requests
-where the URL lacks a trailing slash, but requires one to match the proper
-route.  When configured, along with at least one other route in your
-application, this view will be invoked if the value of ``PATH_INFO`` does not
-already end in a slash, and if the value of ``PATH_INFO`` *plus* a slash
-matches any route's pattern.  In this case it does an HTTP redirect to the
-slash-appended ``PATH_INFO``.
+Adding ``append_slash=True`` is a way to automatically redirect requests where
+the URL lacks a trailing slash, but requires one to match the proper route.
+When configured, along with at least one other route in your application, this
+view will be invoked if the value of ``PATH_INFO`` does not already end in a
+slash, and if the value of ``PATH_INFO`` *plus* a slash matches any route's
+pattern.  In this case it does an HTTP redirect to the slash-appended
+``PATH_INFO``. In addition you may pass anything that implements
+:class:`pyramid.interfaces.IResponse` which will then be used in place of the
+default class (:class:`pyramid.httpexceptions.HTTPFound`).
 
 Let's use an example.  If the following routes are configured in your
 application:
@@ -832,12 +866,11 @@ application:
        config.add_notfound_view(notfound, append_slash=True)
 
 If a request enters the application with the ``PATH_INFO`` value of
-``/no_slash``, the first route will match and the browser will show "No
-slash".  However, if a request enters the application with the ``PATH_INFO``
-value of ``/no_slash/``, *no* route will match, and the slash-appending not
-found view will not find a matching route with an appended slash.  As a
-result, the ``notfound`` view will be called and it will return a "Not found,
-bro." body.
+``/no_slash``, the first route will match and the browser will show "No slash".
+However, if a request enters the application with the ``PATH_INFO`` value of
+``/no_slash/``, *no* route will match, and the slash-appending not found view
+will not find a matching route with an appended slash.  As a result, the
+``notfound`` view will be called and it will return a "Not found, bro." body.
 
 If a request enters the application with the ``PATH_INFO`` value of
 ``/has_slash/``, the second route will match.  If a request enters the
@@ -894,10 +927,10 @@ Debugging Route Matching
 
 It's useful to be able to take a peek under the hood when requests that enter
 your application aren't matching your routes as you expect them to.  To debug
-route matching, use the ``PYRAMID_DEBUG_ROUTEMATCH`` environment variable or the
-``pyramid.debug_routematch`` configuration file setting (set either to ``true``).
-Details of the route matching decision for a particular request to the
-:app:`Pyramid` application will be printed to the ``stderr`` of the console
+route matching, use the ``PYRAMID_DEBUG_ROUTEMATCH`` environment variable or
+the ``pyramid.debug_routematch`` configuration file setting (set either to
+``true``). Details of the route matching decision for a particular request to
+the :app:`Pyramid` application will be printed to the ``stderr`` of the console
 which you started the application from.  For example:
 
 .. code-block:: text
@@ -914,11 +947,11 @@ which you started the application from.  For example:
                                 http://localhost:6543/static/logo.png; \
                                 route_name: 'static/', ....
 
-See :ref:`environment_chapter` for more information about how, and where to
-set these values.
+See :ref:`environment_chapter` for more information about how and where to set
+these values.
 
-You can also use the ``proutes`` command to see a display of all the
-routes configured in your application; for more information, see
+You can also use the ``proutes`` command to see a display of all the routes
+configured in your application. For more information, see
 :ref:`displaying_application_routes`.
 
 .. _route_prefix:
@@ -939,11 +972,11 @@ named ``route_prefix`` which can be useful to authors of URL-dispatch-based
 applications.  If ``route_prefix`` is supplied to the include method, it must
 be a string.  This string represents a route prefix that will be prepended to
 all route patterns added by the *included* configuration.  Any calls to
-:meth:`pyramid.config.Configurator.add_route` within the included callable
-will have their pattern prefixed with the value of ``route_prefix``. This can
-be used to help mount a set of routes at a different location than the
-included callable's author intended while still maintaining the same route
-names.  For example:
+:meth:`pyramid.config.Configurator.add_route` within the included callable will
+have their pattern prefixed with the value of ``route_prefix``. This can be
+used to help mount a set of routes at a different location than the included
+callable's author intended while still maintaining the same route names.  For
+example:
 
 .. code-block:: python
    :linenos:
@@ -958,15 +991,15 @@ names.  For example:
        config.include(users_include, route_prefix='/users')
 
 In the above configuration, the ``show_users`` route will have an effective
-route pattern of ``/users/show``, instead of ``/show`` because the
+route pattern of ``/users/show`` instead of ``/show`` because the
 ``route_prefix`` argument will be prepended to the pattern.  The route will
 then only match if the URL path is ``/users/show``, and when the
 :meth:`pyramid.request.Request.route_url` function is called with the route
 name ``show_users``, it will generate a URL with that same path.
 
 Route prefixes are recursive, so if a callable executed via an include itself
-turns around and includes another callable, the second-level route prefix
-will be prepended with the first:
+turns around and includes another callable, the second-level route prefix will
+be prepended with the first:
 
 .. code-block:: python
    :linenos:
@@ -985,15 +1018,15 @@ will be prepended with the first:
        config.include(users_include, route_prefix='/users')
 
 In the above configuration, the ``show_users`` route will still have an
-effective route pattern of ``/users/show``.  The ``show_times`` route
-however, will have an effective pattern of ``/users/timing/times``.
+effective route pattern of ``/users/show``.  The ``show_times`` route, however,
+will have an effective pattern of ``/users/timing/times``.
 
-Route prefixes have no impact on the requirement that the set of route
-*names* in any given Pyramid configuration must be entirely unique.  If you
-compose your URL dispatch application out of many small subapplications using
-:meth:`pyramid.config.Configurator.include`, it's wise to use a dotted name
-for your route names, so they'll be unlikely to conflict with other packages
-that may be added in the future.  For example:
+Route prefixes have no impact on the requirement that the set of route *names*
+in any given Pyramid configuration must be entirely unique.  If you compose
+your URL dispatch application out of many small subapplications using
+:meth:`pyramid.config.Configurator.include`, it's wise to use a dotted name for
+your route names so they'll be unlikely to conflict with other packages that
+may be added in the future.  For example:
 
 .. code-block:: python
    :linenos:
@@ -1020,15 +1053,16 @@ Custom Route Predicates
 -----------------------
 
 Each of the predicate callables fed to the ``custom_predicates`` argument of
-:meth:`~pyramid.config.Configurator.add_route` must be a callable accepting
-two arguments.  The first argument passed to a custom predicate is a
-dictionary conventionally named ``info``.  The second argument is the current
+:meth:`~pyramid.config.Configurator.add_route` must be a callable accepting two
+arguments.  The first argument passed to a custom predicate is a dictionary
+conventionally named ``info``.  The second argument is the current
 :term:`request` object.
 
-The ``info`` dictionary has a number of contained values: ``match`` is a
-dictionary: it represents the arguments matched in the URL by the route.
-``route`` is an object representing the route which was matched (see
-:class:`pyramid.interfaces.IRoute` for the API of such a route object).
+The ``info`` dictionary has a number of contained values, including ``match``
+and ``route``. ``match`` is a dictionary which represents the arguments matched
+in the URL by the route. ``route`` is an object representing the route which
+was matched (see :class:`pyramid.interfaces.IRoute` for the API of such a route
+object).
 
 ``info['match']`` is useful when predicates need access to the route match.
 For example:
@@ -1078,9 +1112,9 @@ instance, a predicate might do some type conversion of values:
     config.add_route('ymd', '/{year}/{month}/{day}',
                      custom_predicates=(ymd_to_int,))
 
-Note that a conversion predicate is still a predicate so it must return
-``True`` or ``False``; a predicate that does *only* conversion, such as the
-one we demonstrate above should unconditionally return ``True``.
+Note that a conversion predicate is still a predicate, so it must return
+``True`` or ``False``. A predicate that does *only* conversion, such as the one
+we demonstrate above, should unconditionally return ``True``.
 
 To avoid the try/except uncertainty, the route pattern can contain regular
 expressions specifying requirements for that marker. For instance:
@@ -1101,31 +1135,31 @@ expressions specifying requirements for that marker. For instance:
     config.add_route('ymd', '/{year:\d+}/{month:\d+}/{day:\d+}',
                      custom_predicates=(ymd_to_int,))
 
-Now the try/except is no longer needed because the route will not match at
-all unless these markers match ``\d+`` which requires them to be valid digits
-for an ``int`` type conversion.
+Now the try/except is no longer needed because the route will not match at all
+unless these markers match ``\d+`` which requires them to be valid digits for
+an ``int`` type conversion.
 
-The ``match`` dictionary passed within ``info`` to each predicate attached to
-a route will be the same dictionary.  Therefore, when registering a custom
-predicate which modifies the ``match`` dict, the code registering the
-predicate should usually arrange for the predicate to be the *last* custom
-predicate in the custom predicate list.  Otherwise, custom predicates which
-fire subsequent to the predicate which performs the ``match`` modification
-will receive the *modified* match dictionary.
+The ``match`` dictionary passed within ``info`` to each predicate attached to a
+route will be the same dictionary.  Therefore, when registering a custom
+predicate which modifies the ``match`` dict, the code registering the predicate
+should usually arrange for the predicate to be the *last* custom predicate in
+the custom predicate list.  Otherwise, custom predicates which fire subsequent
+to the predicate which performs the ``match`` modification will receive the
+*modified* match dictionary.
 
 .. warning::
 
    It is a poor idea to rely on ordering of custom predicates to build a
    conversion pipeline, where one predicate depends on the side effect of
-   another.  For instance, it's a poor idea to register two custom
-   predicates, one which handles conversion of a value to an int, the next
-   which handles conversion of that integer to some custom object.  Just do
-   all that in a single custom predicate.
+   another.  For instance, it's a poor idea to register two custom predicates,
+   one which handles conversion of a value to an int, the next which handles
+   conversion of that integer to some custom object.  Just do all that in a
+   single custom predicate.
 
 The ``route`` object in the ``info`` dict is an object that has two useful
-attributes: ``name`` and ``pattern``.  The ``name`` attribute is the route
-name.  The ``pattern`` attribute is the route pattern.  An example of using
-the route in a set of route predicates:
+attributes: ``name`` and ``pattern``.  The ``name`` attribute is the route name. 
+The ``pattern`` attribute is the route pattern.  Here's an example of using the
+route in a set of route predicates:
 
 .. code-block:: python
     :linenos:
@@ -1140,14 +1174,14 @@ the route in a set of route predicates:
                      custom_predicates=(twenty_ten,))
 
 The above predicate, when added to a number of route configurations ensures
-that the year match argument is '2010' if and only if the route name is
-'ymd', 'ym', or 'y'.
+that the year match argument is '2010' if and only if the route name is 'ymd',
+'ym', or 'y'.
 
-You can also caption the predicates by setting the ``__text__``
-attribute. This will help you with the ``pviews`` command (see
+You can also caption the predicates by setting the ``__text__`` attribute. This
+will help you with the ``pviews`` command (see
 :ref:`displaying_application_routes`) and the ``pyramid_debugtoolbar``.
 
-If a predicate is a class just add __text__ property in a standard manner.
+If a predicate is a class, just add ``__text__`` property in a standard manner.
 
 .. code-block:: python
    :linenos:
@@ -1159,8 +1193,8 @@ If a predicate is a class just add __text__ property in a standard manner.
    class DummyCustomPredicate2(object):
        __text__ = 'my custom class predicate'
 
-If a predicate is a method you'll need to assign it after method declaration
-(see `PEP 232 <http://www.python.org/dev/peps/pep-0232/>`_)
+If a predicate is a method, you'll need to assign it after method declaration
+(see `PEP 232 <http://www.python.org/dev/peps/pep-0232/>`_).
 
 .. code-block:: python
    :linenos:
@@ -1169,8 +1203,8 @@ If a predicate is a method you'll need to assign it after method declaration
        pass
    custom_predicate.__text__ = 'my custom method predicate'
 
-If a predicate is a classmethod using @classmethod will not work, but you can
-still easily do it by wrapping it in classmethod call.
+If a predicate is a classmethod, using ``@classmethod`` will not work, but you
+can still easily do it by wrapping it in a classmethod call.
 
 .. code-block:: python
    :linenos:
@@ -1180,7 +1214,7 @@ still easily do it by wrapping it in classmethod call.
    classmethod_predicate.__text__ = 'my classmethod predicate'
    classmethod_predicate = classmethod(classmethod_predicate)
 
-Same will work with staticmethod, just use ``staticmethod`` instead of
+The same will work with ``staticmethod``, using ``staticmethod`` instead of
 ``classmethod``.
 
 .. seealso::
@@ -1196,10 +1230,10 @@ Same will work with staticmethod, just use ``staticmethod`` instead of
 Route Factories
 ---------------
 
-Although it is not a particular common need in basic applications, a "route"
-configuration declaration can mention a "factory".  When that route matches a
-request, and a factory is attached to a route, the :term:`root factory`
-passed at startup time to the :term:`Configurator` is ignored; instead the
+Although it is not a particularly common need in basic applications, a "route"
+configuration declaration can mention a "factory".  When a route matches a
+request, and a factory is attached to the route, the :term:`root factory`
+passed at startup time to the :term:`Configurator` is ignored. Instead the
 factory associated with the route is used to generate a :term:`root` object.
 This object will usually be used as the :term:`context` resource of the view
 callable ultimately found via :term:`view lookup`.
@@ -1215,8 +1249,8 @@ The factory can either be a Python object or a :term:`dotted Python name` (a
 string) which points to such a Python object, as it is above.
 
 In this way, each route can use a different factory, making it possible to
-supply a different :term:`context` resource object to the view related to
-each particular route.
+supply a different :term:`context` resource object to the view related to each
+particular route.
 
 A factory must be a callable which accepts a request and returns an arbitrary
 Python object.  For example, the below class can be used as a factory:
@@ -1228,33 +1262,31 @@ Python object.  For example, the below class can be used as a factory:
        def __init__(self, request):
            pass
 
-A route factory is actually conceptually identical to the :term:`root
-factory` described at :ref:`the_resource_tree`.
+A route factory is actually conceptually identical to the :term:`root factory`
+described at :ref:`the_resource_tree`.
 
 Supplying a different resource factory for each route is useful when you're
 trying to use a :app:`Pyramid` :term:`authorization policy` to provide
-declarative, "context sensitive" security checks; each resource can maintain
-a separate :term:`ACL`, as documented in
-:ref:`using_security_with_urldispatch`.  It is also useful when you wish to
-combine URL dispatch with :term:`traversal` as documented within
-:ref:`hybrid_chapter`.
+declarative, "context sensitive" security checks. Each resource can maintain a
+separate :term:`ACL`, as documented in :ref:`using_security_with_urldispatch`. 
+It is also useful when you wish to combine URL dispatch with :term:`traversal`
+as documented within :ref:`hybrid_chapter`.
 
 .. index::
    pair: URL dispatch; security
 
 .. _using_security_with_urldispatch:
 
-Using :app:`Pyramid` Security With URL Dispatch
---------------------------------------------------
+Using :app:`Pyramid` Security with URL Dispatch
+-----------------------------------------------
 
 :app:`Pyramid` provides its own security framework which consults an
-:term:`authorization policy` before allowing any application code to be
-called.  This framework operates in terms of an access control list, which is
-stored as an ``__acl__`` attribute of a resource object.  A common thing to
-want to do is to attach an ``__acl__`` to the resource object dynamically for
-declarative security purposes.  You can use the ``factory`` argument that
-points at a factory which attaches a custom ``__acl__`` to an object at its
-creation time.
+:term:`authorization policy` before allowing any application code to be called.
+This framework operates in terms of an access control list, which is stored as
+an ``__acl__`` attribute of a resource object.  A common thing to want to do is
+to attach an ``__acl__`` to the resource object dynamically for declarative
+security purposes.  You can use the ``factory`` argument that points at a
+factory which attaches a custom ``__acl__`` to an object at its creation time.
 
 Such a ``factory`` might look like so:
 
@@ -1270,15 +1302,15 @@ Such a ``factory`` might look like so:
 
 If the route ``archives/{article}`` is matched, and the article number is
 ``1``, :app:`Pyramid` will generate an ``Article`` :term:`context` resource
-with an ACL on it that allows the ``editor`` principal the ``view``
-permission.  Obviously you can do more generic things than inspect the routes
-match dict to see if the ``article`` argument matches a particular string;
-our sample ``Article`` factory class is not very ambitious.
+with an ACL on it that allows the ``editor`` principal the ``view`` permission.
+Obviously you can do more generic things than inspect the route's match dict to
+see if the ``article`` argument matches a particular string. Our sample
+``Article`` factory class is not very ambitious.
 
 .. note::
 
-   See :ref:`security_chapter` for more information about
-   :app:`Pyramid` security and ACLs.
+   See :ref:`security_chapter` for more information about :app:`Pyramid`
+   security and ACLs.
 
 .. index::
    pair: route; view callable lookup details
@@ -1290,10 +1322,9 @@ When a request enters the system which matches the pattern of the route, the
 usual result is simple: the view callable associated with the route is
 invoked with the request that caused the invocation.
 
-For most usage, you needn't understand more than this; how it works is an
-implementation detail.  In the interest of completeness, however, we'll
-explain how it *does* work in this section.  You can skip it if you're
-uninterested.
+For most usage, you needn't understand more than this. How it works is an
+implementation detail.  In the interest of completeness, however, we'll explain
+how it *does* work in this section.  You can skip it if you're uninterested.
 
 When a view is associated with a route configuration, :app:`Pyramid` ensures
 that a :term:`view configuration` is registered that will always be found
@@ -1309,26 +1340,25 @@ when the route pattern is matched during a request.  To do so:
 - At runtime, when a request causes any route to match, the :term:`request`
   object is decorated with the route-specific interface.
 
-- The fact that the request is decorated with a route-specific interface
-  causes the :term:`view lookup` machinery to always use the view callable
-  registered using that interface by the route configuration to service
-  requests that match the route pattern.
+- The fact that the request is decorated with a route-specific interface causes
+  the :term:`view lookup` machinery to always use the view callable registered
+  using that interface by the route configuration to service requests that
+  match the route pattern.
 
 As we can see from the above description, technically, URL dispatch doesn't
-actually map a URL pattern directly to a view callable.  Instead, URL
-dispatch is a :term:`resource location` mechanism.  A :app:`Pyramid`
-:term:`resource location` subsystem (i.e., :term:`URL dispatch` or
-:term:`traversal`) finds a :term:`resource` object that is the
-:term:`context` of a :term:`request`. Once the :term:`context` is determined,
-a separate subsystem named :term:`view lookup` is then responsible for
-finding and invoking a :term:`view callable` based on information available
-in the context and the request.  When URL dispatch is used, the resource
-location and view lookup subsystems provided by :app:`Pyramid` are still
-being utilized, but in a way which does not require a developer to understand
-either of them in detail.
+actually map a URL pattern directly to a view callable.  Instead URL dispatch
+is a :term:`resource location` mechanism.  A :app:`Pyramid` :term:`resource
+location` subsystem (i.e., :term:`URL dispatch` or :term:`traversal`) finds a
+:term:`resource` object that is the :term:`context` of a :term:`request`. Once
+the :term:`context` is determined, a separate subsystem named :term:`view
+lookup` is then responsible for finding and invoking a :term:`view callable`
+based on information available in the context and the request.  When URL
+dispatch is used, the resource location and view lookup subsystems provided by
+:app:`Pyramid` are still being utilized, but in a way which does not require a
+developer to understand either of them in detail.
 
-If no route is matched using :term:`URL dispatch`, :app:`Pyramid` falls back
-to :term:`traversal` to handle the :term:`request`.
+If no route is matched using :term:`URL dispatch`, :app:`Pyramid` falls back to
+:term:`traversal` to handle the :term:`request`.
 
 References
 ----------
