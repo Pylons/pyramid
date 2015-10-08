@@ -8,7 +8,7 @@ URL Dispatch
 
 :term:`URL dispatch` provides a simple way to map URLs to :term:`view` code
 using a simple pattern matching language.  An ordered set of patterns is
-checked one-by-one.  If one of the patterns matches the path information
+checked one by one.  If one of the patterns matches the path information
 associated with a request, a particular :term:`view callable` is invoked.  A
 view callable is a specific bit of code, defined in your application, that
 receives the :term:`request` and returns a :term:`response` object.
@@ -21,8 +21,8 @@ If any route configuration is present in an application, the :app:`Pyramid`
 matching patterns present in a *route map*.
 
 If any route pattern matches the information in the :term:`request`,
-:app:`Pyramid` will invoke the :term:`view lookup` process to find a
-matching view.
+:app:`Pyramid` will invoke the :term:`view lookup` process to find a matching
+view.
 
 If no route pattern in the route map matches the information in the
 :term:`request` provided in your application, :app:`Pyramid` will fail over to
@@ -39,7 +39,7 @@ application.  A route has a *name*, which acts as an identifier to be used for
 URL generation.  The name also allows developers to associate a view
 configuration with the route.  A route also has a *pattern*, meant to match
 against the ``PATH_INFO`` portion of a URL (the portion following the scheme
-and port, e.g. ``/foo/bar`` in the URL `<http://localhost:8080/foo/bar>`_). It
+and port, e.g., ``/foo/bar`` in the URL ``http://localhost:8080/foo/bar``). It
 also optionally has a ``factory`` and a set of :term:`route predicate`
 attributes.
 
