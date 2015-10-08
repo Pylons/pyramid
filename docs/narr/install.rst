@@ -32,9 +32,9 @@ dependency will fall back to using pure Python instead.
 For Mac OS X Users
 ~~~~~~~~~~~~~~~~~~
 
-Python comes pre-installed on Mac OS X, but due to Apple's release cycle,
-it is often out of date. Unless you have a need for a specific earlier
-version, it is recommended to install the latest 2.x or 3.x version of Python.
+Python comes pre-installed on Mac OS X, but due to Apple's release cycle, it is
+often out of date. Unless you have a need for a specific earlier version, it is
+recommended to install the latest 2.x or 3.x version of Python.
 
 You can install the latest verion of Python for Mac OS X from the binaries on
 `python.org <https://www.python.org/downloads/mac-osx/>`_.
@@ -90,12 +90,12 @@ Source Compile Method
 
 It's useful to use a Python interpreter that *isn't* the "system" Python
 interpreter to develop your software.  The authors of :app:`Pyramid` tend not
-to use the system Python for development purposes; always a self-compiled one. 
+to use the system Python for development purposes; always a self-compiled one.
 Compiling Python is usually easy, and often the "system" Python is compiled
 with options that aren't optimal for web development. For an explanation, see
 https://github.com/Pylons/pyramid/issues/747.
 
-To compile software on your UNIX system, typically you need development tools. 
+To compile software on your UNIX system, typically you need development tools.
 Often these can be installed via the package manager.  For example, this works
 to do so on an Ubuntu Linux system:
 
@@ -204,7 +204,7 @@ it using the Python interpreter into which you want to install setuptools.
 
    $ python ez_setup.py
 
-Once this command is invoked, setuptools should be installed on your system. 
+Once this command is invoked, setuptools should be installed on your system.
 If the command fails due to permission errors, you may need to be the
 administrative user on your system to successfully invoke the script.  To
 remediate this, you may need to do:
@@ -301,9 +301,9 @@ complete, as it downloads and installs a number of dependencies.
 .. note::
 
    If you see any warnings and/or errors related to failing to compile the C
-   extensions, in most cases you may safely ignore those errors. If you wish
-   to use the C extensions, please verify that you have a functioning compiler
-   and the Python header files installed.
+   extensions, in most cases you may safely ignore those errors. If you wish to
+   use the C extensions, please verify that you have a functioning compiler and
+   the Python header files installed.
 
 .. index::
    single: installing on Windows
@@ -382,4 +382,3 @@ WebOb, PasteDeploy, and others are installed.
 
 Additionally, as chronicled in :ref:`project_narr`, scaffolds will be
 registered, which make it easy to start a new :app:`Pyramid` project.
-
