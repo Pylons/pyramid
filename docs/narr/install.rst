@@ -1,7 +1,7 @@
 .. _installing_chapter:
 
 Installing :app:`Pyramid`
-============================
+=========================
 
 .. index::
    single: install preparation
@@ -48,7 +48,7 @@ install the latest 2.x or 3.x version of Python.
 If you use an installer for your Python, then you can skip to the section
 :ref:`installing_unix`.
 
-If You Don't Yet Have A Python Interpreter (UNIX)
+If You Don't Yet Have a Python Interpreter (UNIX)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If your system doesn't have a Python interpreter, and you're on UNIX, you can
@@ -124,7 +124,7 @@ Once these steps are performed, the Python interpreter will be invokable via
 .. index::
    pair: install; Python (from package, Windows)
 
-If You Don't Yet Have A Python Interpreter (Windows)
+If You Don't Yet Have a Python Interpreter (Windows)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If your Windows system doesn't have a Python interpreter, you'll need to
@@ -149,7 +149,7 @@ also need to download and install the Python for Windows extensions.
 .. _installing_unix:
 
 Installing :app:`Pyramid` on a UNIX System
----------------------------------------------
+------------------------------------------
 
 It is best practice to install :app:`Pyramid` into a "virtual" Python
 environment in order to obtain isolation from any "system" packages you've got
@@ -281,8 +281,8 @@ it's an absolute path.
     acceptable (and desirable) to create a virtualenv as a normal user.
 
 
-Installing :app:`Pyramid` Into the Virtual Python Environment
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Installing :app:`Pyramid` into the Virtual Python Environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 After you've got your virtualenv installed, you may install :app:`Pyramid`
 itself using the following commands:
@@ -307,7 +307,7 @@ complete, as it downloads and installs a number of dependencies.
 .. _installing_windows:
 
 Installing :app:`Pyramid` on a Windows System
--------------------------------------------------
+---------------------------------------------
 
 You can use Pyramid on Windows under Python 2 or 3.
 
