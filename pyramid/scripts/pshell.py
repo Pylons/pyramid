@@ -98,7 +98,7 @@ class PShellCommand(object):
         env = self.bootstrap[0](config_uri, options=parse_vars(self.args[1:]))
 
         # remove the closer from the env
-        closer = env.pop('closer')
+        self.closer = env.pop('closer')
 
         # setup help text for default environment
         env_help = dict(env)
@@ -148,7 +148,12 @@ class PShellCommand(object):
                 help += '\n  %-12s %s' % (var, self.object_help[var])
 
         if shell is None:
-            shell = self.make_shell()
+            try:
+                shell = self.make_shell()
+            except ValueError as e:
+                self.out(str(e))
+                self.closer()
+                return 1
 
         if self.pystartup and os.path.isfile(self.pystartup):
             with open(self.pystartup, 'rb') as fp:
@@ -159,12 +164,12 @@ class PShellCommand(object):
         try:
             shell(env, help)
         finally:
-            closer()
+            self.closer()
 
     def make_shell(self):
         shells = {}
 
-        priority_order = ['ipython', 'bpython']
+        priority_order = ['ipython', 'bpython', 'python']
 
         for ep in self.pkg_resources.iter_entry_points('pyramid.pshell'):
             name = ep.name
@@ -189,6 +194,10 @@ class PShellCommand(object):
 
             if factory is not None:
                 shell = factory()
+            else:
+                raise ValueError(
+                    'could not find a shell named "%s"' % user_shell
+                )
 
         if shell is None:
             shell = self.make_default_shell()

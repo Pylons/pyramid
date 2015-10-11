@@ -89,6 +89,13 @@ class TestPShellCommand(unittest.TestCase):
 
     def test_command_loads_default_shell_with_unknown_shell(self):
         command = self._makeOne()
+        out_calls = []
+
+        def out(msg):
+            out_calls.append(msg)
+
+        command.out = out
+
         shell = dummy.DummyShell()
         bad_shell = dummy.DummyShell()
 
@@ -101,21 +108,17 @@ class TestPShellCommand(unittest.TestCase):
         )
 
         command.make_default_shell = lambda: shell
-        command.options.python_shell = 'unknow_python_shell'
-        command.run()
+        command.options.python_shell = 'unknown_python_shell'
+        result = command.run()
+        self.assertEqual(result, 1)
+        self.assertEqual(
+            out_calls, ['could not find a shell named "unknown_python_shell"']
+        )
         self.assertTrue(self.config_factory.parser)
         self.assertEqual(self.config_factory.parser.filename,
                          '/foo/bar/myapp.ini')
         self.assertEqual(self.bootstrap.a[0], '/foo/bar/myapp.ini#myapp')
-        self.assertEqual(shell.env, {
-            'app':self.bootstrap.app, 'root':self.bootstrap.root,
-            'registry':self.bootstrap.registry,
-            'request':self.bootstrap.request,
-            'root_factory':self.bootstrap.root_factory,
-        })
-        self.assertEqual(bad_shell.env, {})
         self.assertTrue(self.bootstrap.closer.called)
-        self.assertTrue(shell.help)
 
     def test_command_loads_ipython_v1_1(self):
         command = self._makeOne()
@@ -219,6 +222,7 @@ class TestPShellCommand(unittest.TestCase):
             {
                 'ipython': lambda: ipshell,
                 'bpython': lambda: bpshell,
+                'python': lambda: dshell,
             }
         )
 
