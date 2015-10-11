@@ -36,6 +36,16 @@ class DummyBPythonShell:
         self.locals_ = locals_
         self.banner = banner
 
+class DummyPTPythonShell:
+    def __call__(self, locals, banner):
+        self.locals = locals
+        self.banner = banner
+
+class DummyPTIPythonShell:
+    def __call__(self, user_ns, banner2):
+        self.user_ns = user_ns
+        self.banner2 = banner2
+
 class DummyIPShell(object):
     IP = Dummy()
     IP.BANNER = 'foo'

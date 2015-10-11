@@ -46,6 +46,22 @@ class TestPShellCommand(unittest.TestCase):
         self.assertEqual(bpython.locals_, {'foo': 'bar'})
         self.assertTrue('a help message' in bpython.banner)
 
+    def test_make_ptpython_shell(self):
+        command = self._makeOne()
+        ptpython = dummy.DummyPTPythonShell()
+        shell = command.make_ptpython_shell(ptpython)
+        shell({'foo': 'bar'}, 'a help message')
+        self.assertEqual(ptpython.locals, {'foo': 'bar'})
+        self.assertTrue('a help message' in ptpython.banner)
+
+    def test_make_ptipython_shell(self):
+        command = self._makeOne()
+        ptipython = dummy.DummyPTIPythonShell()
+        shell = command.make_ptipython_shell(ptipython)
+        shell({'foo': 'bar'}, 'a help message')
+        self.assertEqual(ptipython.user_ns, {'foo': 'bar'})
+        self.assertTrue('a help message' in ptipython.banner2)
+
     def test_make_ipython_v1_1_shell(self):
         command = self._makeOne()
         ipshell_factory = dummy.DummyIPShellFactory()
@@ -79,6 +95,7 @@ class TestPShellCommand(unittest.TestCase):
         shell = dummy.DummyShell()
         command.make_ipython_shell = lambda: None
         command.make_bpython_shell = lambda: None
+        command.make_ptpython_shell = lambda: None
         command.make_default_shell = lambda: shell
         command.run()
         self.assertTrue(self.config_factory.parser)
@@ -100,6 +117,7 @@ class TestPShellCommand(unittest.TestCase):
         bad_shell = dummy.DummyShell()
         command.make_ipython_shell = lambda: bad_shell
         command.make_bpython_shell = lambda: bad_shell
+        command.make_ptpython_shell = lambda: bad_shell
         command.make_default_shell = lambda: shell
         command.options.python_shell = 'unknow_python_shell'
         command.run()
@@ -124,6 +142,7 @@ class TestPShellCommand(unittest.TestCase):
         command.make_ipython_v0_11_shell = lambda: None
         command.make_ipython_v0_10_shell = lambda: None
         command.make_bpython_shell = lambda: None
+        command.make_ptpython_shell = lambda: None
         command.make_default_shell = lambda: None
         command.options.python_shell = 'ipython'
         command.run()
@@ -147,6 +166,7 @@ class TestPShellCommand(unittest.TestCase):
         command.make_ipython_v0_11_shell = lambda: shell
         command.make_ipython_v0_10_shell = lambda: None
         command.make_bpython_shell = lambda: None
+        command.make_ptpython_shell = lambda: None
         command.make_default_shell = lambda: None
         command.options.python_shell = 'ipython'
         command.run()
@@ -170,6 +190,7 @@ class TestPShellCommand(unittest.TestCase):
         command.make_ipython_v0_11_shell = lambda: None
         command.make_ipython_v0_10_shell = lambda: shell
         command.make_bpython_shell = lambda: None
+        command.make_ptpython_shell = lambda: None
         command.make_default_shell = lambda: None
         command.options.python_shell = 'ipython'
         command.run()
@@ -191,6 +212,7 @@ class TestPShellCommand(unittest.TestCase):
         shell = dummy.DummyBPythonShell()
         command.make_ipython_shell = lambda: None
         command.make_bpython_shell = lambda: shell
+        command.make_ptpython_shell = lambda: None
         command.options.python_shell = 'bpython'
         command.run()
         self.assertTrue(self.config_factory.parser)
@@ -205,6 +227,48 @@ class TestPShellCommand(unittest.TestCase):
         })
         self.assertTrue(self.bootstrap.closer.called)
         self.assertTrue(shell.banner)
+
+    def test_command_loads_ptpython_shell(self):
+        command = self._makeOne()
+        shell = dummy.DummyPTPythonShell()
+        command.make_ipython_shell = lambda: None
+        command.make_bpython_shell = lambda: None
+        command.make_ptpython_shell = lambda: shell
+        command.options.python_shell = 'ptpython'
+        command.run()
+        self.assertTrue(self.config_factory.parser)
+        self.assertEqual(self.config_factory.parser.filename,
+            '/foo/bar/myapp.ini')
+        self.assertEqual(self.bootstrap.a[0], '/foo/bar/myapp.ini#myapp')
+        self.assertEqual(shell.locals, {
+            'app':self.bootstrap.app, 'root':self.bootstrap.root,
+            'registry':self.bootstrap.registry,
+            'request':self.bootstrap.request,
+            'root_factory':self.bootstrap.root_factory,
+        })
+        self.assertTrue(self.bootstrap.closer.called)
+
+    def test_command_loads_ptipython_shell(self):
+        command = self._makeOne()
+        shell = dummy.DummyPTIPythonShell()
+        command.make_ipython_shell = lambda: None
+        command.make_bpython_shell = lambda: None
+        command.make_ptpython_shell = lambda: None
+        command.make_ptipython_shell = lambda: shell
+        command.options.python_shell = 'ptipython'
+        command.run()
+        self.assertTrue(self.config_factory.parser)
+        self.assertEqual(self.config_factory.parser.filename,
+            '/foo/bar/myapp.ini')
+        self.assertEqual(self.bootstrap.a[0], '/foo/bar/myapp.ini#myapp')
+        self.assertEqual(shell.user_ns, {
+            'app':self.bootstrap.app, 'root':self.bootstrap.root,
+            'registry':self.bootstrap.registry,
+            'request':self.bootstrap.request,
+            'root_factory':self.bootstrap.root_factory,
+        })
+        self.assertTrue(self.bootstrap.closer.called)
+        self.assertTrue(shell.banner2)
 
     def test_shell_ipython_ordering(self):
         command = self._makeOne()
@@ -234,9 +298,13 @@ class TestPShellCommand(unittest.TestCase):
         command = self._makeOne()
         ipshell = dummy.DummyShell()
         bpshell = dummy.DummyShell()
+        ptpshell = dummy.DummyShell()
+        ptipshell = dummy.DummyShell()
         dshell = dummy.DummyShell()
         command.make_ipython_shell = lambda: None
         command.make_bpython_shell = lambda: None
+        command.make_ptpython_shell = lambda: None
+        command.make_ptipython_shell = lambda: None
         command.make_default_shell = lambda: dshell
 
         shell = command.make_shell()
@@ -250,8 +318,18 @@ class TestPShellCommand(unittest.TestCase):
         shell = command.make_shell()
         self.assertEqual(shell, dshell)
 
+        command.options.python_shell = 'ptpython'
+        shell = command.make_shell()
+        self.assertEqual(shell, dshell)
+
+        command.options.python_shell = 'ptipython'
+        shell = command.make_shell()
+        self.assertEqual(shell, dshell)
+
         command.make_ipython_shell = lambda: ipshell
         command.make_bpython_shell = lambda: bpshell
+        command.make_ptpython_shell = lambda: ptpshell
+        command.make_ptipython_shell = lambda: ptipshell
         command.options.python_shell = 'ipython'
         shell = command.make_shell()
         self.assertEqual(shell, ipshell)
@@ -259,6 +337,14 @@ class TestPShellCommand(unittest.TestCase):
         command.options.python_shell = 'bpython'
         shell = command.make_shell()
         self.assertEqual(shell, bpshell)
+
+        command.options.python_shell = 'ptpython'
+        shell = command.make_shell()
+        self.assertEqual(shell, ptpshell)
+
+        command.options.python_shell = 'ptipython'
+        shell = command.make_shell()
+        self.assertEqual(shell, ptipshell)
 
         command.options.python_shell = 'python'
         shell = command.make_shell()
