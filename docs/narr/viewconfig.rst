@@ -193,20 +193,20 @@ Non-Predicate Arguments
   the first element of ``None``, i.e., ``(None, {'public':True})``.
 
 ``wrapper``
-   The :term:`view name` of a different :term:`view configuration` which will
-   receive the response body of this view as the ``request.wrapped_body``
-   attribute of its own :term:`request`, and the :term:`response` returned by
-   this view as the ``request.wrapped_response`` attribute of its own request.
-   Using a wrapper makes it possible to "chain" views together to form a
-   composite response.  The response of the outermost wrapper view will be
-   returned to the user.  The wrapper view will be found as any view is found.
-   See :ref:`view_lookup`.  The "best" wrapper view will be found based on the
-   lookup ordering. "Under the hood" this wrapper view is looked up via
-   ``pyramid.view.render_view_to_response(context, request,
-   'wrapper_viewname')``. The context and request of a wrapper view is the same
-   context and request of the inner view.
+  The :term:`view name` of a different :term:`view configuration` which will
+  receive the response body of this view as the ``request.wrapped_body``
+  attribute of its own :term:`request`, and the :term:`response` returned by
+  this view as the ``request.wrapped_response`` attribute of its own request.
+  Using a wrapper makes it possible to "chain" views together to form a
+  composite response.  The response of the outermost wrapper view will be
+  returned to the user.  The wrapper view will be found as any view is found.
+  See :ref:`view_lookup`.  The "best" wrapper view will be found based on the
+  lookup ordering. "Under the hood" this wrapper view is looked up via
+  ``pyramid.view.render_view_to_response(context, request,
+  'wrapper_viewname')``. The context and request of a wrapper view is the same
+  context and request of the inner view.
 
-   If ``wrapper`` is not supplied, no wrapper view is used.
+  If ``wrapper`` is not supplied, no wrapper view is used.
 
 ``decorator``
   A :term:`dotted Python name` to a function (or the function itself) which
