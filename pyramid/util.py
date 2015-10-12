@@ -554,7 +554,11 @@ def action_method(wrapped):
             info = ActionInfo(*info)
         if info is None:
             try:
-                f = traceback.extract_stack(limit=3)
+                f = traceback.extract_stack(limit=4)
+                # Python3.5 bug, don't exclude traceback.py
+                # in the stack
+                if f[-1].name == 'extract_stack':
+                    f.pop()
                 info = ActionInfo(*f[-backframes])
             except: # pragma: no cover
                 info = ActionInfo(None, 0, '', '')
