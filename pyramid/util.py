@@ -560,7 +560,7 @@ def action_method(wrapped):
                 # extra stack frame. This should no longer be necessary in
                 # Python 3.5.1
                 last_frame = ActionInfo(*f[-1])
-                if last_frame.function == 'extract_stack':
+                if last_frame.function == 'extract_stack': # pragma: no cover
                     f.pop()
                 info = ActionInfo(*f[-backframes])
             except: # pragma: no cover
