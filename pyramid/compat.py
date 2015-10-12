@@ -22,6 +22,11 @@ except ImportError:  # pragma: no cover
 
 # True if we are running on Python 3.
 PY3 = sys.version_info[0] == 3
+PY35 = (
+    sys.version_info[0] == 3
+    and sys.version_info[1] == 5
+    and sys.version_info[2] == 0
+)
 
 if PY3:
     string_types = str,
@@ -37,6 +42,26 @@ else:
     text_type = unicode
     binary_type = str
     long = long
+
+if PY35:
+    from traceback import StackSummary, walk_stack
+    # backport fix of extract_stack from python 3.5.1
+    def extract_stack(f=None, limit=None):
+        """Extract the raw traceback from the current stack frame.
+
+        The return value has the same format as for extract_tb().  The
+        optional 'f' and 'limit' arguments have the same meaning as for
+        print_stack().  Each item in the list is a quadruple (filename,
+        line number, function name, text), and the entries are in order
+        from oldest to newest stack frame.
+        """
+        if f is None:
+            f = sys._getframe().f_back
+        stack = StackSummary.extract(walk_stack(f), limit=limit)
+        stack.reverse()
+        return stack
+else:
+    from traceback import extract_stack
 
 def text_(s, encoding='latin-1', errors='strict'):
     """ If ``s`` is an instance of ``binary_type``, return
