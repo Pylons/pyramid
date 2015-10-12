@@ -182,7 +182,7 @@ class TestPShellCommand(unittest.TestCase):
             command,
             {
                 'ipython': lambda: dshell,
-                'bpython': lambda: dhell,
+                'bpython': lambda: dshell,
             }
         )
 
