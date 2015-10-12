@@ -110,6 +110,9 @@ setup(name='pyramid',
         starter=pyramid.scaffolds:StarterProjectTemplate
         zodb=pyramid.scaffolds:ZODBProjectTemplate
         alchemy=pyramid.scaffolds:AlchemyProjectTemplate
+        [pyramid.pshell]
+        ipython=pyramid.scripts.pshell:PShellCommand.make_ipython_shell
+        bpython=pyramid.scripts.pshell:PShellCommand.make_bpython_shell
         [console_scripts]
         pcreate = pyramid.scripts.pcreate:main
         pserve = pyramid.scripts.pserve:main

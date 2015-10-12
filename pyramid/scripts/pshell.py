@@ -3,6 +3,7 @@ import optparse
 import os
 import sys
 import textwrap
+import pkg_resources
 
 from pyramid.compat import configparser
 from pyramid.compat import exec_
@@ -16,6 +17,7 @@ from pyramid.scripts.common import parse_vars
 def main(argv=sys.argv, quiet=False):
     command = PShellCommand(argv, quiet)
     return command.run()
+
 
 class PShellCommand(object):
     usage = '%prog config_uri'
@@ -32,7 +34,8 @@ class PShellCommand(object):
     than one Pyramid application within it, the loader will use the
     last one.
     """
-    bootstrap = (bootstrap,) # for testing
+    bootstrap = (bootstrap,)  # for testing
+    pkg_resources = pkg_resources  # for testing
 
     parser = optparse.OptionParser(
         usage,
@@ -95,7 +98,7 @@ class PShellCommand(object):
         env = self.bootstrap[0](config_uri, options=parse_vars(self.args[1:]))
 
         # remove the closer from the env
-        closer = env.pop('closer')
+        self.closer = env.pop('closer')
 
         # setup help text for default environment
         env_help = dict(env)
@@ -145,7 +148,12 @@ class PShellCommand(object):
                 help += '\n  %-12s %s' % (var, self.object_help[var])
 
         if shell is None:
-            shell = self.make_shell()
+            try:
+                shell = self.make_shell()
+            except ValueError as e:
+                self.out(str(e))
+                self.closer()
+                return 1
 
         if self.pystartup and os.path.isfile(self.pystartup):
             with open(self.pystartup, 'rb') as fp:
@@ -156,21 +164,35 @@ class PShellCommand(object):
         try:
             shell(env, help)
         finally:
-            closer()
+            self.closer()
 
     def make_shell(self):
+        shells = {}
+
+        for ep in self.pkg_resources.iter_entry_points('pyramid.pshell'):
+            name = ep.name
+            shell_module = ep.load()
+            shells[name] = shell_module
+
         shell = None
         user_shell = self.options.python_shell.lower()
+
         if not user_shell:
-            shell = self.make_ipython_shell()
-            if shell is None:
-                shell = self.make_bpython_shell()
+            sorted_shells = sorted(shells.items(), key=lambda x: x[0])
+            for name, factory in sorted_shells:
+                shell = factory()
 
-        elif user_shell == 'ipython':
-            shell = self.make_ipython_shell()
+                if shell is not None:
+                    break
+        else:
+            factory = shells.get(user_shell)
 
-        elif user_shell == 'bpython':
-            shell = self.make_bpython_shell()
+            if factory is not None:
+                shell = factory()
+            else:
+                raise ValueError(
+                    'could not find a shell named "%s"' % user_shell
+                )
 
         if shell is None:
             shell = self.make_default_shell()
@@ -185,7 +207,8 @@ class PShellCommand(object):
             interact(banner, local=env)
         return shell
 
-    def make_bpython_shell(self, BPShell=None):
+    @classmethod
+    def make_bpython_shell(cls, BPShell=None):
         if BPShell is None: # pragma: no cover
             try:
                 from bpython import embed
@@ -196,15 +219,8 @@ class PShellCommand(object):
             BPShell(locals_=env, banner=help + '\n')
         return shell
 
-    def make_ipython_shell(self):
-        shell = self.make_ipython_v1_1_shell()
-        if shell is None:
-            shell = self.make_ipython_v0_11_shell()
-        if shell is None:
-            shell = self.make_ipython_v0_10_shell()
-        return shell
-
-    def make_ipython_v1_1_shell(self, IPShellFactory=None):
+    @classmethod
+    def make_ipython_shell(cls, IPShellFactory=None):
         if IPShellFactory is None: # pragma: no cover
             try:
                 from IPython.terminal.embed import (
@@ -217,31 +233,6 @@ class PShellCommand(object):
             IPShell()
         return shell
 
-    def make_ipython_v0_11_shell(self, IPShellFactory=None):
-        if IPShellFactory is None: # pragma: no cover
-            try:
-                from IPython.frontend.terminal.embed import (
-                    InteractiveShellEmbed)
-                IPShellFactory = InteractiveShellEmbed
-            except ImportError:
-                return None
-        def shell(env, help):
-            IPShell = IPShellFactory(banner2=help + '\n', user_ns=env)
-            IPShell()
-        return shell
-
-    def make_ipython_v0_10_shell(self, IPShellFactory=None):
-        if IPShellFactory is None: # pragma: no cover
-            try:
-                from IPython.Shell import IPShellEmbed
-                IPShellFactory = IPShellEmbed
-            except ImportError:
-                return None
-        def shell(env, help):
-            IPShell = IPShellFactory(argv=[], user_ns=env)
-            IPShell.set_banner(IPShell.IP.BANNER + '\n' + help + '\n')
-            IPShell()
-        return shell
 
 if __name__ == '__main__': # pragma: no cover
     sys.exit(main() or 0)
