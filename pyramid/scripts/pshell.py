@@ -178,7 +178,7 @@ class PShellCommand(object):
         user_shell = self.options.python_shell.lower()
 
         if not user_shell:
-            sorted_shells = sorted(shells.items(), key=lambda k, v: k)
+            sorted_shells = sorted(shells.items(), key=lambda x: x[0])
             for name, factory in sorted_shells:
                 shell = factory()
 
