@@ -169,21 +169,16 @@ class PShellCommand(object):
     def make_shell(self):
         shells = {}
 
-        priority_order = ['ipython', 'bpython', 'python']
-
         for ep in self.pkg_resources.iter_entry_points('pyramid.pshell'):
             name = ep.name
             shell_module = ep.load()
             shells[name] = shell_module
 
-        sorted_shells = sorted(
-            shells.items(), key=lambda x: priority_order.index(x[0])
-        )
-
         shell = None
         user_shell = self.options.python_shell.lower()
 
         if not user_shell:
+            sorted_shells = sorted(shells.items(), key=lambda k, v: k)
             for name, factory in sorted_shells:
                 shell = factory()
 
