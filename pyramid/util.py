@@ -5,7 +5,6 @@ try:
 except ImportError: # pragma: nocover
     compare_digest = None
 import inspect
-import traceback
 import weakref
 
 from zope.interface import implementer
@@ -21,7 +20,8 @@ from pyramid.compat import (
     string_types,
     text_,
     PY3,
-    native_
+    native_,
+    extract_stack
     )
 
 from pyramid.interfaces import IActionInfo
@@ -539,6 +539,7 @@ class ActionInfo(object):
         src = '\n'.join('    %s' % x for x in srclines)
         return 'Line %s of file %s:\n%s' % (self.line, self.file, src)
 
+
 def action_method(wrapped):
     """ Wrapper to provide the right conflict info report data when a method
     that calls Configurator.action calls another that does the same.  Not a
@@ -554,7 +555,7 @@ def action_method(wrapped):
             info = ActionInfo(*info)
         if info is None:
             try:
-                f = traceback.extract_stack(limit=3)
+                f = extract_stack(limit=3)
                 info = ActionInfo(*f[-backframes])
             except: # pragma: no cover
                 info = ActionInfo(None, 0, '', '')
