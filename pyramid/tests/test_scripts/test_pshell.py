@@ -263,6 +263,7 @@ class TestPShellCommand(unittest.TestCase):
         def setup(env):
             env['a'] = 1
             env['root'] = 'root override'
+            env['none'] = None
         self.config_factory.items = [('setup', setup)]
         shell = dummy.DummyShell()
         command.run(shell)
@@ -276,6 +277,7 @@ class TestPShellCommand(unittest.TestCase):
             'request':self.bootstrap.request,
             'root_factory':self.bootstrap.root_factory,
             'a':1,
+            'none': None,
         })
         self.assertTrue(self.bootstrap.closer.called)
         self.assertTrue(shell.help)
