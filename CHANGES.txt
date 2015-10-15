@@ -137,6 +137,10 @@ Features
 - Additional shells for ``pshell`` can now be registered as entrypoints. See
   https://github.com/Pylons/pyramid/pull/1891
 
+- The variables injected into ``pshell`` are now displayed with their
+  docstrings instead of the default ``str(obj)`` when possible.
+  See https://github.com/Pylons/pyramid/pull/1929
+
 Bug Fixes
 ---------
 
