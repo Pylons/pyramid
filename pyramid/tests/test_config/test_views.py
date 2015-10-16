@@ -3067,16 +3067,6 @@ class DummyAccept(object):
     def __contains__(self, val):
         return val in self.matches
 
-class DummySecurityPolicy:
-    def __init__(self, permitted=True):
-        self.permitted = permitted
-
-    def effective_principals(self, request):
-        return []
-
-    def permits(self, context, principals, permission):
-        return self.permitted
-
 class DummyConfig:
     route_prefix = ''
     def add_route(self, *args, **kw):
