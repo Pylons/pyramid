@@ -1249,6 +1249,32 @@ class TestDerivationIntegration(unittest.TestCase):
         self.assertEqual(wrapper(None, request), response)
         self.assertEqual(['test1', 'test2'], response.deriv)
 
+    def test_view_options_default_or_not(self):
+        response = DummyResponse()
+        view = lambda *arg: response
+        response.deriv = []
+
+        def deriv1(view, value, **kw):
+            response.deriv.append(value)
+            response.deriv.append(kw['options'].get('deriv1', None))
+            return view
+
+        def deriv2(view, value, **kw):
+            response.deriv.append(value)
+            response.deriv.append(kw['options'].get('deriv2', None))
+            return view
+
+        self.config.add_view_derivation('deriv1', deriv1, default=None)
+        self.config.add_view_derivation('deriv2', deriv2, default='test2')
+        self.config.add_view(view, deriv1='test1')
+        self.config.commit()
+
+        wrapper = self._getViewCallable(self.config)
+        request = self._makeRequest(self.config)
+        request.method = 'GET'
+        self.assertEqual(wrapper(None, request), response)
+        self.assertEqual(['test1', 'test1', 'test2', None], response.deriv)
+
 
 from zope.interface import implementer
 from pyramid.interfaces import (
