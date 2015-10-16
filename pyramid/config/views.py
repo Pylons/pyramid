@@ -1018,8 +1018,11 @@ class ViewsConfiguratorMixin(object):
         inner_derivers = [('mapped_view', (d.mapped_view, None)),
                           ('rendered_view', (d.rendered_view, None))]
 
+        outer_derivers = [('predicated_view', (d.predicated_view, None)),
+                          ('attr_wrapped_view', (d.attr_wrapped_view, None)),]
+
         derivers = self.registry.queryUtility(IViewDerivers, default=[])
-        for name, val in inner_derivers + derivers.sorted():
+        for name, val in inner_derivers + derivers.sorted() + outer_derivers:
             derivation, default = val
             view = wraps_view(derivation)(view, default, **kw)
         return view
@@ -1105,8 +1108,6 @@ class ViewsConfiguratorMixin(object):
             ('owrapped_view', d.owrapped_view),
             ('secured_view', d.secured_view),
             ('authdebug_view', d.authdebug_view),
-            ('predicated_view', d.predicated_view),
-            ('attr_wrapped_view', d.attr_wrapped_view),
         ]
         after = pyramid.util.FIRST
         for name, deriver in derivers:
