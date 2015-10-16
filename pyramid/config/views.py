@@ -205,7 +205,7 @@ class ViewsConfiguratorMixin(object):
         http_cache=None,
         match_param=None,
         check_csrf=None,
-        **predicates):
+        **view_options):
         """ Add a :term:`view configuration` to the current
         configuration state.  Arguments to ``add_view`` are broken
         down below into *predicate* arguments and *non-predicate*
@@ -646,16 +646,17 @@ class ViewsConfiguratorMixin(object):
                 obsoletes this argument, but it is kept around for backwards
                 compatibility.
 
-        predicates
+        view_options:
 
-          Pass a key/value pair here to use a third-party predicate
-          registered via
-          :meth:`pyramid.config.Configurator.add_view_predicate`.  More than
+          Pass a key/value pair here to use a third-party predicate or set a
+          value for a view derivative option registered via
+          :meth:`pyramid.config.Configurator.add_view_predicate` or
+          :meth:`pyramid.config.Configurator.add_view_derivation`.  More than
           one key/value pair can be used at the same time.  See
           :ref:`view_and_route_predicates` for more information about
           third-party predicates.
 
-          .. versionadded: 1.4a1
+          .. versionadded: 1.7
 
         """
         if custom_predicates:
@@ -722,8 +723,8 @@ class ViewsConfiguratorMixin(object):
             accept = accept.lower()
 
         introspectables = []
-        pvals = predicates.copy()
-        pvals.update(
+        ovals = view_options.copy()
+        ovals.update(
             dict(
                 xhr=xhr,
                 request_method=request_method,
@@ -742,9 +743,26 @@ class ViewsConfiguratorMixin(object):
         def discrim_func():
             # We need to defer the discriminator until we know what the phash
             # is.  It can't be computed any sooner because thirdparty
-            # predicates may not yet exist when add_view is called.
+            # predicates/view derivations may not yet exist when add_view is
+            # called.
+            valid_predicates = predlist.names()
+            pvals = {}
+            options = {}
+
+            for (k, v) in ovals.items():
+                if k in valid_predicates:
+                    pvals[k] = v
+                else:
+                    options[k] = v
+
             order, preds, phash = predlist.make(self, **pvals)
-            view_intr.update({'phash':phash, 'order':order, 'predicates':preds})
+
+            view_intr.update({
+                'phash': phash,
+                'order': order,
+                'predicates': preds,
+                'options': options
+                })
             return ('view', context, name, route_name, phash)
 
         discriminator = Deferred(discrim_func)
@@ -780,7 +798,7 @@ class ViewsConfiguratorMixin(object):
                  decorator=decorator,
                  )
             )
-        view_intr.update(**predicates)
+        view_intr.update(**view_options)
         introspectables.append(view_intr)
         predlist = self.get_predlist('view')
 
@@ -812,6 +830,7 @@ class ViewsConfiguratorMixin(object):
 
             # added by discrim_func above during conflict resolving
             preds = view_intr['predicates']
+            opts  = view_intr['options']
             order = view_intr['order']
             phash = view_intr['phash']
 
@@ -832,6 +851,7 @@ class ViewsConfiguratorMixin(object):
                 mapper=mapper,
                 decorator=decorator,
                 http_cache=http_cache,
+                options=opts,
                 )
             derived_view.__discriminator__ = lambda *arg: discriminator
             # __discriminator__ is used by superdynamic systems
