@@ -93,7 +93,7 @@ Steps
 Analysis
 ========
 
-Unlike many web frameworks, Pyramid includes a built-in (but optional)
+Unlike many web frameworks, Pyramid includes a built-in but optional
 security model for authentication and authorization. This security
 system is intended to be flexible and support many needs. In this
 security model, authentication (who are you) and authorization (what
@@ -122,9 +122,6 @@ Extra Credit
 #. What is the difference between a user and a principal?
 
 #. Can I use a database behind my ``groupfinder`` to look up principals?
-
-#. Do I have to put a ``renderer`` in my ``@forbidden_view_config``
-   decorator?
 
 #. Once I am logged in, does any user-centric information get jammed
    onto each request? Use ``import pdb; pdb.set_trace()`` to answer

@@ -191,25 +191,21 @@ of them.  Here are a couple that might be useful:
     this for subrequests, or testing.
 
 .. index::
-   single: request (and unicode)
-   single: unicode (and the request)
+   single: request (and text/unicode)
+   single: unicode and text (and the request)
 
-Unicode
-+++++++
+Text (Unicode)
+++++++++++++++
 
-Many of the properties in the request object will return unicode
-values if the request encoding/charset is provided.  The client *can*
+Many of the properties of the request object will be text values (``unicode``
+under Python 2 or ``str`` under Python 3) if the request encoding/charset is
+provided.  If it is provided, the values in ``req.POST``, ``req.GET``,
+``req.params``, and ``req.cookies`` will contain text.  The client *can*
 indicate the charset with something like ``Content-Type:
-application/x-www-form-urlencoded; charset=utf8``, but browsers seldom
-set this.  You can set the charset with ``req.charset = 'utf8'``, or
-during instantiation with ``Request(environ, charset='utf8')``.  If
-you subclass ``Request`` you can also set ``charset`` as a class-level
-attribute.
-
-If it is set, then ``req.POST``, ``req.GET``, ``req.params``, and
-``req.cookies`` will contain unicode strings.  Each has a
-corresponding ``req.str_*`` (e.g., ``req.str_POST``) that is always
-a ``str``, and never unicode.
+application/x-www-form-urlencoded; charset=utf8``, but browsers seldom set
+this.  You can reset the charset of an existing request with ``newreq =
+req.decode('utf-8')``, or during instantiation with ``Request(environ,
+charset='utf8')``.
 
 .. index::
    single: multidict (WebOb)
@@ -404,7 +400,7 @@ A response object has three fundamental parts:
 ``response.app_iter``:
     An iterable (such as a list or generator) that will produce the
     content of the response.  This is also accessible as
-    ``response.body`` (a string), ``response.unicode_body`` (a
+    ``response.body`` (a string), ``response.text`` (a
     unicode object, informed by ``response.charset``), and
     ``response.body_file`` (a file-like object; writing to it appends
     to ``app_iter``).
@@ -420,7 +416,7 @@ Here are some highlights:
 
 ``response.charset``:
     The ``charset`` parameter of the content-type, it also informs
-    encoding in ``response.unicode_body``.
+    encoding in ``response.text``.
     ``response.content_type_params`` is a dictionary of all the
     parameters.
 

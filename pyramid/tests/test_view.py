@@ -185,6 +185,20 @@ class RenderViewToResponseTests(BaseTest, unittest.TestCase):
         self.assertEqual(response.status, '200 OK')
         self.assertEqual(response.app_iter, ['anotherview'])
 
+    def test_call_view_with_request_iface_on_request(self):
+        # See https://github.com/Pylons/pyramid/issues/1643
+        from zope.interface import Interface
+        class IWontBeFound(Interface): pass
+        context = self._makeContext()
+        request = self._makeRequest()
+        request.request_iface = IWontBeFound
+        response = DummyResponse('aview')
+        view = make_view(response)
+        self._registerView(request.registry, view, 'aview')
+        response = self._callFUT(context, request, name='aview')
+        self.assertEqual(response.status, '200 OK')
+        self.assertEqual(response.app_iter, ['aview'])
+
 class RenderViewToIterableTests(BaseTest, unittest.TestCase):
     def _callFUT(self, *arg, **kw):
         from pyramid.view import render_view_to_iterable

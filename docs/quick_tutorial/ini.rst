@@ -88,7 +88,7 @@ the Pyramid chapter on
 
 - ``pserve`` looks for ``[app:main]`` and finds ``use = egg:tutorial``
 
-- The projects's ``setup.py`` has defined an "entry point" (lines 9-10)
+- The projects's ``setup.py`` has defined an "entry point" (lines 9-12)
   for the project  "main" entry point of ``tutorial:main``
 
 - The ``tutorial`` package's ``__init__`` has a ``main`` function
@@ -131,6 +131,8 @@ Extra Credit
 #. The entry point in ``setup.py`` didn't mention ``__init__.py`` when
    it declared ``tutorial:main`` function. Why not?
 
+#. What is the purpose of ``**settings``? What does the ``**`` signify?
+
 .. seealso::
    :ref:`project_narr`,
    :ref:`scaffolding_chapter`,
@@ -138,7 +140,3 @@ Extra Credit
    :ref:`environment_chapter`,
    :ref:`paste_chapter`
 
-Extra Credit
-============
-
-#. What is the purpose of ``**settings``? What does the ``**`` signify?
