@@ -3067,14 +3067,6 @@ class DummyAccept(object):
     def __contains__(self, val):
         return val in self.matches
 
-class DummyLogger:
-    def __init__(self):
-        self.messages = []
-    def info(self, msg):
-        self.messages.append(msg)
-    warn = info
-    debug = info
-
 class DummySecurityPolicy:
     def __init__(self, permitted=True):
         self.permitted = permitted
