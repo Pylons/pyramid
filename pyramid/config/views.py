@@ -1193,7 +1193,7 @@ class ViewsConfiguratorMixin(object):
         return self._derive_view(view, attr=attr, renderer=renderer)
 
     # b/w compat
-    def _derive_view(self, view, permission=None, predicates=(), options=(),
+    def _derive_view(self, view, permission=None, predicates=(), options=dict(),
                      attr=None, renderer=None, wrapper_viewname=None,
                      viewname=None, accept=None, order=MAX_ORDER,
                      phash=DEFAULT_PHASH, decorator=None,
