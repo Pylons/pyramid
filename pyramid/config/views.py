@@ -1250,7 +1250,7 @@ class ViewsConfiguratorMixin(object):
         decorator=None,
         mapper=None,
         match_param=None,
-        **predicates
+        **view_options
         ):
         """ Add a forbidden view to the current configuration state.  The
         view will be called when Pyramid or application code raises a
@@ -1280,7 +1280,7 @@ class ViewsConfiguratorMixin(object):
         .. versionadded:: 1.3
         """
         for arg in ('name', 'permission', 'context', 'for_', 'http_cache'):
-            if arg in predicates:
+            if arg in view_options:
                 raise ConfigurationError(
                     '%s may not be used as an argument to add_forbidden_view'
                     % arg
@@ -1310,7 +1310,7 @@ class ViewsConfiguratorMixin(object):
             attr=attr,
             renderer=renderer,
             )
-        settings.update(predicates)
+        settings.update(view_options)
         return self.add_view(**settings)
 
     set_forbidden_view = add_forbidden_view # deprecated sorta-bw-compat alias
@@ -1337,7 +1337,7 @@ class ViewsConfiguratorMixin(object):
         mapper=None,
         match_param=None,
         append_slash=False,
-        **predicates
+        **view_options
         ):
         """ Add a default Not Found View to the current configuration state.
         The view will be called when Pyramid or application code raises an
@@ -1392,7 +1392,7 @@ class ViewsConfiguratorMixin(object):
         .. versionadded:: 1.3
         """
         for arg in ('name', 'permission', 'context', 'for_', 'http_cache'):
-            if arg in predicates:
+            if arg in view_options:
                 raise ConfigurationError(
                     '%s may not be used as an argument to add_notfound_view'
                     % arg
@@ -1420,7 +1420,7 @@ class ViewsConfiguratorMixin(object):
             route_name=route_name,
             permission=NO_PERMISSION_REQUIRED,
             )
-        settings.update(predicates)
+        settings.update(view_options)
         if append_slash:
             view = self._derive_view(view, attr=attr, renderer=renderer)
             if IResponse.implementedBy(append_slash):
