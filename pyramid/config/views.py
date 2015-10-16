@@ -1024,7 +1024,8 @@ class ViewsConfiguratorMixin(object):
         derivers = self.registry.queryUtility(IViewDerivers, default=[])
         for name, val in inner_derivers + derivers.sorted() + outer_derivers:
             derivation, default = val
-            view = wraps_view(derivation)(view, default, **kw)
+            value = kw['options'].get(name, default)
+            view = wraps_view(derivation)(view, value, **kw)
         return view
 
     @action_method
