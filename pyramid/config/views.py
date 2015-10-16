@@ -79,6 +79,7 @@ from pyramid.config.derivations import (
     view_description,
     requestonly,
     DefaultViewMapper,
+    wraps_view,
 )
 
 from pyramid.config.util import (
@@ -1020,7 +1021,7 @@ class ViewsConfiguratorMixin(object):
         derivers = self.registry.queryUtility(IViewDerivers, default=[])
         for name, val in inner_derivers + derivers.sorted():
             derivation, default = val
-            view = derivation(view, default, **kw)
+            view = wraps_view(derivation)(view, default, **kw)
         return view
 
     @action_method

@@ -193,7 +193,6 @@ def preserve_view_attrs(view, wrapper):
 
     return wrapper
 
-@wraps_view
 def mapped_view(view, default, **kw):
     mapper = kw.get('mapper')
     if mapper is None:
@@ -206,7 +205,6 @@ def mapped_view(view, default, **kw):
     mapped_view = mapper(**kw)(view)
     return mapped_view
 
-@wraps_view
 def owrapped_view(view, default, **kw):
     wrapper_viewname = kw.get('wrapper_viewname')
     viewname = kw.get('viewname')
@@ -226,7 +224,6 @@ def owrapped_view(view, default, **kw):
         return wrapped_response
     return _owrapped_view
 
-@wraps_view
 def http_cached_view(view, default, **kw):
     if kw['registry'].settings.get('prevent_http_cache', False):
         return view
@@ -256,7 +253,6 @@ def http_cached_view(view, default, **kw):
 
     return wrapper
 
-@wraps_view
 def secured_view(view, default, **kw):
     permission = kw.get('permission')
     if permission == NO_PERMISSION_REQUIRED:
@@ -289,7 +285,6 @@ def secured_view(view, default, **kw):
 
     return wrapped_view
 
-@wraps_view
 def authdebug_view(view, default, **kw):
     wrapped_view = view
     settings = kw['registry'].settings
@@ -327,7 +322,6 @@ def authdebug_view(view, default, **kw):
 
     return wrapped_view
 
-@wraps_view
 def predicated_view(view, default, **kw):
     preds = kw.get('predicates', ())
     if not preds:
@@ -347,7 +341,6 @@ def predicated_view(view, default, **kw):
     predicate_wrapper.__predicates__ = preds
     return predicate_wrapper
 
-@wraps_view
 def attr_wrapped_view(view, default, **kw):
     kw = kw
     accept, order, phash = (kw.get('accept', None),
@@ -371,7 +364,6 @@ def attr_wrapped_view(view, default, **kw):
     attr_view.__permission__ = kw.get('permission')
     return attr_view
 
-@wraps_view
 def rendered_view(view, default, **kw):
     # one way or another this wrapper must produce a Response (unless
     # the renderer is a NullRendererHelper)
@@ -440,7 +432,6 @@ def rendered_view(view, default, **kw):
 
     return rendered_view
 
-@wraps_view
 def decorated_view(view, default, **kw):
     decorator = kw.get('decorator')
     if decorator is None:
