@@ -830,7 +830,7 @@ class ViewsConfiguratorMixin(object):
 
             # added by discrim_func above during conflict resolving
             preds = view_intr['predicates']
-            opts  = view_intr['options']
+            opts = view_intr['options']
             order = view_intr['order']
             phash = view_intr['phash']
 
