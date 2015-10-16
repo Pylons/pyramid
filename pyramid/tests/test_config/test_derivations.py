@@ -1131,8 +1131,6 @@ class TestAddDerivation(unittest.TestCase):
         class AView:
             def __init__(self):
                 self.response = DummyResponse()
-            def __call__(self):
-                return self.response
 
         def deriv1(view, default, **kw):
             flags['deriv1'] = True
