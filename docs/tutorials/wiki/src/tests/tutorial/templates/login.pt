@@ -1,54 +1,74 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
-      xmlns:tal="http://xml.zope.org/namespaces/tal">
-<head>
-  <title>Login - Pyramid tutorial wiki (based on TurboGears
-    20-Minute Wiki)</title>
-  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
-  <meta name="keywords" content="python web application" />
-  <meta name="description" content="pyramid web application" />
-  <link rel="shortcut icon"
-        href="/static/favicon.ico" />
-  <link rel="stylesheet"
-        href="/static/pylons.css"
-        type="text/css" media="screen" charset="utf-8" />
-  <!--[if lte IE 6]>
-  <link rel="stylesheet"
-        href="/static/ie6.css"
-        type="text/css" media="screen" charset="utf-8" />
-  <![endif]-->
-</head>
-<body>
-  <div id="wrap">
-    <div id="top-small">
-      <div class="top-small align-center">
-        <div>
-          <img width="220" height="50" alt="pyramid"
-        src="/static/pyramid-small.png" />
+<!DOCTYPE html>
+<html lang="${request.locale_name}">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="pyramid web application">
+    <meta name="author" content="Pylons Project">
+    <link rel="shortcut icon" href="${request.static_url('tutorial:static/pyramid-16x16.png')}">
+
+    <title>Login - Pyramid tutorial wiki (based on
+    TurboGears 20-Minute Wiki)</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="//oss.maxcdn.com/libs/twitter-bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this scaffold -->
+    <link href="${request.static_url('tutorial:static/theme.css')}" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="//oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+
+    <div class="starter-template">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-2">
+            <img class="logo img-responsive" src="${request.static_url('tutorial:static/pyramid.png')}" alt="pyramid web framework">
+          </div>
+          <div class="col-md-10">
+            <div class="content">
+              <p>
+                <strong>
+                  Login
+                </strong><br>
+                <span tal:replace="message"></span>
+              </p>
+              <form action="${url}" method="post">
+                <input type="hidden" name="came_from" value="${came_from}">
+                <div class="form-group">
+                  <label for="login">Username</label>
+                  <input type="text" name="login" value="${login}">
+                </div>
+                <div class="form-group">
+                  <label for="password">Password</label>
+                  <input type="password" name="password" value="${password}">
+                </div>
+                <div class="form-group">
+                  <button type="submit" name="form.submitted" value="Log In" class="btn btn-default">Log In</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="copyright">
+            Copyright &copy; Pylons Project
+          </div>
         </div>
       </div>
     </div>
-    <div id="middle">
-      <div class="middle align-right">
-        <div id="left" class="app-welcome align-left">
-          <b>Login</b><br/>
-          <span tal:replace="message"/>
-        </div>
-        <div id="right" class="app-welcome align-right"></div>
-      </div>
-    </div>
-    <div id="bottom">
-      <div class="bottom">
-        <form action="${url}" method="post">
-          <input type="hidden" name="came_from" value="${came_from}"/>
-          <input type="text" name="login" value="${login}"/><br/>
-          <input type="password" name="password"
-                 value="${password}"/><br/>
-          <input type="submit" name="form.submitted" value="Log In"/>
-        </form>
-      </div>
-    </div>
-  </div>
-</body>
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="//oss.maxcdn.com/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="//oss.maxcdn.com/libs/twitter-bootstrap/3.0.3/js/bootstrap.min.js"></script>
+  </body>
 </html>

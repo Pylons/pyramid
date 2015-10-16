@@ -56,7 +56,7 @@ by using the :meth:`pyramid.config.Configurator.set_session_factory` method.
    config = Configurator()
    config.set_session_factory(my_session_factory)
 
-.. warning:: 
+.. warning::
 
    By default the :func:`~pyramid.session.SignedCookieSessionFactory`
    implementation is *unencrypted*.  You should not use it
@@ -112,7 +112,7 @@ Extra attributes:
   An integer timestamp indicating the time that this session was created.
 
 ``new``
-  A boolean.  If ``new`` is True, this session is new.  Otherwise, it has 
+  A boolean.  If ``new`` is True, this session is new.  Otherwise, it has
   been constituted from data that was already serialized.
 
 Extra methods:
@@ -225,7 +225,7 @@ method:
    request.session.flash('mymessage')
 
 The ``flash()`` method appends a message to a flash queue, creating the queue
-if necessary. 
+if necessary.
 
 ``flash()`` accepts three arguments:
 
@@ -406,13 +406,19 @@ Checking CSRF Tokens With A View Predicate
 
 A convenient way to require a valid CSRF Token for a particular view is to
 include ``check_csrf=True`` as a view predicate.
-See :meth:`pyramid.config.Configurator.add_route`.
+See :meth:`pyramid.config.Configurator.add_view`.
 
 .. code-block:: python
 
     @view_config(request_method='POST', check_csrf=True, ...)
     def myview(request):
         ...
+
+.. note::
+   A mismatch of CSRF token is treated like any other predicate miss, and the
+   predicate system, when it doesn't find a view, raises ``HTTPNotFound``
+   instead of ``HTTPBadRequest``, so ``check_csrf=True`` behavior is different
+   from calling :func:`pyramid.session.check_csrf_token`.
 
 
 Using the ``session.new_csrf_token`` Method

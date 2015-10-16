@@ -2,18 +2,28 @@
 language: python
 sudo: false
 
-env:
-  - TOXENV=py26
-  - TOXENV=py27
-  - TOXENV=py32
-  - TOXENV=py33
-  - TOXENV=py34
-  - TOXENV=pypy
-  - TOXENV=pypy3
-  - TOXENV=py2-docs
-  - TOXENV=py3-docs
-  - TOXENV=py2-cover,py3-cover,coverage
-  - TOXENV=pep8
+matrix:
+    include:
+        - python: 2.6
+          env: TOXENV=py26
+        - python: 2.7
+          env: TOXENV=py27
+        - python: 3.2
+          env: TOXENV=py32
+        - python: 3.3
+          env: TOXENV=py33
+        - python: 3.4
+          env: TOXENV=py34
+        - python: 3.5
+          env: TOXENV=py35
+        - python: pypy
+          env: TOXENV=pypy
+        - python: pypy3
+          env: TOXENV=pypy3
+        - python: 3.5
+          env: TOXENV=py2-cover,py3-cover,coverage
+        - python: 3.5
+          env: TOXENV=pep8
 
 install:
   - travis_retry pip install tox
