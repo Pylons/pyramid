@@ -8,6 +8,10 @@ Pyramid
         :target: http://docs.pylonsproject.org/projects/pyramid/en/latest/
         :alt: Documentation Status
 
+.. image:: https://img.shields.io/badge/irc-freenode-blue.svg
+        :target: https://webchat.freenode.net/?channels=pyramid
+        :alt: IRC Freenode
+
 Pyramid is a small, fast, down-to-earth, open source Python web framework.
 It makes real-world web application development and
 deployment more fun, more predictable, and more productive.
