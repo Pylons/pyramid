@@ -10,6 +10,7 @@ class TestDeriveView(unittest.TestCase):
 
     def tearDown(self):
         self.config = None
+        testing.tearDown()
 
     def _makeRequest(self):
         request = DummyRequest()
@@ -1092,6 +1093,7 @@ class TestAddDerivation(unittest.TestCase):
 
     def tearDown(self):
         self.config = None
+        testing.tearDown()
 
     def test_add_single_derivation(self):
         response = DummyResponse()
@@ -1193,6 +1195,59 @@ class TestAddDerivation(unittest.TestCase):
         self.config.add_view_derivation('deriv3', deriv3, default=None, weighs_more_than='deriv2')
         result = self.config._derive_view(view)
         self.assertEqual(response.deriv, ['deriv2', 'deriv3', 'deriv1'])
+
+class TestDerivationIntegration(unittest.TestCase):
+    def setUp(self):
+        self.config = testing.setUp()
+
+    def tearDown(self):
+        self.config = None
+        testing.tearDown()
+
+    def _getViewCallable(self, config, ctx_iface=None, request_iface=None,
+                         name=''):
+        from zope.interface import Interface
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IView
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IExceptionViewClassifier
+        classifier = IViewClassifier
+        if ctx_iface is None:
+            ctx_iface = Interface
+        if request_iface is None:
+            request_iface = IRequest
+        return config.registry.adapters.lookup(
+            (classifier, request_iface, ctx_iface), IView, name=name,
+            default=None)
+
+    def _makeRequest(self, config):
+        request = DummyRequest()
+        request.registry = config.registry
+        return request
+
+    def test_view_options(self):
+        response = DummyResponse()
+        view = lambda *arg: response
+        response.deriv = []
+
+        def deriv1(view, default, **kw):
+            response.deriv.append(kw['options']['deriv1'])
+            return view
+
+        def deriv2(view, default, **kw):
+            response.deriv.append(kw['options']['deriv2'])
+            return view
+
+        self.config.add_view_derivation('deriv1', deriv1, default=None)
+        self.config.add_view_derivation('deriv2', deriv2, default=None)
+        self.config.add_view(view, deriv1='test1', deriv2='test2')
+        self.config.commit()
+
+        wrapper = self._getViewCallable(self.config)
+        request = self._makeRequest(self.config)
+        request.method = 'GET'
+        self.assertEqual(wrapper(None, request), response)
+        self.assertEqual(['test1', 'test2'], response.deriv)
 
 
 from zope.interface import implementer
