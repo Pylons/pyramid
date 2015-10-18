@@ -298,7 +298,7 @@ a new shell by registering an entrypoint in your setup.py:
     setup(
         entry_points = """\
             [pyramid.pshell]
-            myshell=my_app.ptpython_shell_factory
+            myshell=my_app:ptpython_shell_factory
         """
     )
 
