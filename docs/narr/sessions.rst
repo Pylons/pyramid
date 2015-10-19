@@ -96,7 +96,7 @@ of any :term:`request` object.  For example:
        else:
            return Response('Fred was not in the session')
 
-The first time this view is invoked produces ``Fred was not in the session``. 
+The first time this view is invoked produces ``Fred was not in the session``.
 Subsequent invocations produce ``Fred was in the session``, assuming of course
 that the client side maintains the session's identity across multiple requests.
 
