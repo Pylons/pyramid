@@ -311,7 +311,7 @@ configured view.
   view declaration with this argument ensures that the view will only be called
   when the ``method`` attribute of the request (i.e., the ``REQUEST_METHOD`` of
   the WSGI environment) matches a supplied value.
-  
+
   .. versionchanged:: 1.4
     The use of ``"GET"`` also implies that the view will respond to ``"HEAD"``.
 
@@ -972,7 +972,7 @@ responses when they occur unexpectedly due to an application registry
 misconfiguration.  To debug these errors, use the ``PYRAMID_DEBUG_NOTFOUND``
 environment variable or the ``pyramid.debug_notfound`` configuration file
 setting.  Details of why a view was not found will be printed to ``stderr``,
-and the browser representation of the error will include the same information. 
+and the browser representation of the error will include the same information.
 See :ref:`environment_chapter` for more information about how, and where to set
 these values.
 
