@@ -21,10 +21,12 @@ dummy_registry = DummyRegistry()
 class DummyShell(object):
     env = {}
     help = ''
+    called = False
 
     def __call__(self, env, help):
         self.env = env
         self.help = help
+        self.called = True
 
 class DummyInteractor:
     def __call__(self, banner, local):
@@ -35,6 +37,7 @@ class DummyBPythonShell:
     def __call__(self, locals_, banner):
         self.locals_ = locals_
         self.banner = banner
+        self.called = True
 
 class DummyIPShell(object):
     IP = Dummy()

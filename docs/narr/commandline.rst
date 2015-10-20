@@ -269,32 +269,39 @@ request is configured to generate urls from the host
 
 .. _ipython_or_bpython:
 
-IPython or bpython
+Alternative Shells
 ~~~~~~~~~~~~~~~~~~
-
 If you have `IPython <http://en.wikipedia.org/wiki/IPython>`_ and/or `bpython
 <http://bpython-interpreter.org/>`_ in the interpreter you use to invoke the
-``pshell`` command, ``pshell`` will autodiscover and use the first one found,
-in this order: IPython, bpython, standard Python interpreter. However you could
-specifically invoke your choice with the ``-p choice`` or ``--python-shell
-choice`` option.
+``pshell`` command, ``pshell`` will autodiscover and use the first one found.
+However you could specifically invoke your choice with the ``-p choice`` or
+``--python-shell choice`` option.
 
 .. code-block:: text
 
-   $ $VENV/bin/pshell -p ipython | bpython | python development.ini#MyProject
+   $ $VENV/bin/pshell -p ipython development.ini#MyProject
 
-Alternative Shells
-~~~~~~~~~~~~~~~~~~
+You may use the ``--list-shells`` option to see the available shells.
+
+.. code-block:: text
+
+   $ $VENV/bin/pshell --list-shells
+   Available shells:
+     bpython  [not available]
+     ipython
+     python
+
 If you want to use a shell that isn't supported out of the box, you can
 introduce a new shell by registering an entry point in your setup.py:
 
 .. code-block:: python
 
     setup(
-        entry_points = """\
-            [pyramid.pshell]
-            myshell=my_app:ptpython_shell_factory
-        """
+        entry_points={
+            'pyramid.pshell': [
+              'myshell=my_app:ptpython_shell_factory',
+            ],
+        },
     )
 
 And then your shell factory should return a function that accepts two
@@ -303,7 +310,12 @@ arguments, ``env`` and ``help``, which would look like this:
 .. code-block:: python
 
     def ptpython_shell_factory():
-        from ptpython.repl import embed
+        try:
+            from ptpython.repl import embed
+        except ImportError:
+            # ptpython is not installed
+            return None
+
         def PTPShell(banner, **kwargs):
             print(banner)
             return embed(**kwargs)
@@ -312,6 +324,25 @@ arguments, ``env`` and ``help``, which would look like this:
             PTPShell(banner=help, locals=env)
 
         return shell
+
+If the factory returns ``None`` then it is assumed that the shell is not
+supported.
+
+.. versionchanged:: 1.6
+   User-defined shells may be registered using entry points. Prior to this
+   the only supported shells were ``ipython``, ``bpython`` and ``python``.
+
+Setting a Default Shell
+~~~~~~~~~~~~~~~~~~~~~~~
+
+You may use the ``default_shell`` option in your ``[pshell]`` ini section to
+specify a list of preferred shells.
+
+.. code-block:: ini
+   :linenos:
+
+   [pshell]
+   default_shell = ptpython ipython bpython
 
 .. versionadded:: 1.6
 

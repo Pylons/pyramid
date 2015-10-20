@@ -114,6 +114,7 @@ setup(name='pyramid',
         [pyramid.pshell]
         ipython=pyramid.scripts.pshell:PShellCommand.make_ipython_shell
         bpython=pyramid.scripts.pshell:PShellCommand.make_bpython_shell
+        python=pyramid.scripts.pshell:PShellCommand.make_python_shell
         [console_scripts]
         pcreate = pyramid.scripts.pcreate:main
         pserve = pyramid.scripts.pserve:main
