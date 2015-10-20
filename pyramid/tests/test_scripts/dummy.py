@@ -21,33 +21,17 @@ dummy_registry = DummyRegistry()
 class DummyShell(object):
     env = {}
     help = ''
+    called = False
 
     def __call__(self, env, help):
         self.env = env
         self.help = help
+        self.called = True
 
 class DummyInteractor:
     def __call__(self, banner, local):
         self.banner = banner
         self.local = local
-
-class DummyBPythonShell:
-    def __call__(self, locals_, banner):
-        self.locals_ = locals_
-        self.banner = banner
-
-class DummyIPShell(object):
-    IP = Dummy()
-    IP.BANNER = 'foo'
-
-    def __call__(self):
-        self.called = True
-
-class DummyIPShellFactory(object):
-    def __call__(self, **kw):
-        self.kw = kw
-        self.shell = DummyIPShell()
-        return self.shell
 
 class DummyApp:
     def __init__(self):
