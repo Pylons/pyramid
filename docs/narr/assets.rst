@@ -372,30 +372,38 @@ assets by passing the optional argument, ``cachebust`` to
 .. code-block:: python
    :linenos:
 
+   import time
+   from pyramid.static import QueryStringConstantCacheBuster
+
    # config is an instance of pyramid.config.Configurator
-   config.add_static_view(name='static', path='mypackage:folder/static',
-                          cachebust=True)
+   config.add_static_view(
+       name='static', path='mypackage:folder/static',
+       cachebust=QueryStringConstantCacheBuster(str(int(time.time()))),
+   )
 
 Setting the ``cachebust`` argument instructs :app:`Pyramid` to use a cache
-busting scheme which adds the md5 checksum for a static asset as a path segment
-in the asset's URL:
+busting scheme which adds the curent time for a static asset to the query
+string in the asset's URL:
 
 .. code-block:: python
    :linenos:
 
    js_url = request.static_url('mypackage:folder/static/js/myapp.js')
-   # Returns: 'http://www.example.com/static/c9658b3c0a314a1ca21e5988e662a09e/js/myapp.js'
+   # Returns: 'http://www.example.com/static/js/myapp.js?x=1445318121'
 
-When the asset changes, so will its md5 checksum, and therefore so will its
-URL.  Supplying the ``cachebust`` argument also causes the static view to set
-headers instructing clients to cache the asset for ten years, unless the
-``cache_max_age`` argument is also passed, in which case that value is used.
+When the web server restarts, the time constant will change and therefore so
+will its URL.  Supplying the ``cachebust`` argument also causes the static
+view to set headers instructing clients to cache the asset for ten years,
+unless the ``cache_max_age`` argument is also passed, in which case that
+value is used.
 
-.. note::
+.. warning::
 
-   md5 checksums are cached in RAM, so if you change a static resource without
-   restarting your application, you may still generate URLs with a stale md5
-   checksum.
+   Cache busting is an inherently complex topic as it integrates the asset
+   pipeline and the web application. It is expected and desired that
+   application authors will write their own cache buster implementations
+   conforming to the properties of their own asset pipelines. See
+   :ref:`custom_cache_busters` for information on writing your own.
 
 Disabling the Cache Buster
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -406,40 +414,21 @@ configured cache busters without changing calls to
 ``PYRAMID_PREVENT_CACHEBUST`` environment variable or the
 ``pyramid.prevent_cachebust`` configuration value to a true value.
 
+.. _custom_cache_busters:
+
 Customizing the Cache Buster
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Revisiting from the previous section:
+The ``cachebust`` option to
+:meth:`~pyramid.config.Configurator.add_static_view` may be set to any object
+that implements the interface :class:`~pyramid.interfaces.ICacheBuster`.
 
-.. code-block:: python
-   :linenos:
-
-   # config is an instance of pyramid.config.Configurator
-   config.add_static_view(name='static', path='mypackage:folder/static',
-                          cachebust=True)
-
-Setting ``cachebust`` to ``True`` instructs :app:`Pyramid` to use a default
-cache busting implementation that should work for many situations.  The
-``cachebust`` may be set to any object that implements the interface
-:class:`~pyramid.interfaces.ICacheBuster`.  The above configuration is exactly
-equivalent to:
-
-.. code-block:: python
-   :linenos:
-
-   from pyramid.static import PathSegmentMd5CacheBuster
-
-   # config is an instance of pyramid.config.Configurator
-   config.add_static_view(name='static', path='mypackage:folder/static',
-                          cachebust=PathSegmentMd5CacheBuster())
-
-:app:`Pyramid` includes a handful of ready to use cache buster implementations:
-:class:`~pyramid.static.PathSegmentMd5CacheBuster`, which inserts an md5
-checksum token in the path portion of the asset's URL,
-:class:`~pyramid.static.QueryStringMd5CacheBuster`, which adds an md5 checksum
-token to the query string of the asset's URL, and
+:app:`Pyramid` ships with a very simplistic
 :class:`~pyramid.static.QueryStringConstantCacheBuster`, which adds an
-arbitrary token you provide to the query string of the asset's URL.
+arbitrary token you provide to the query string of the asset's URL. This
+is almost never what you want in production as it does not allow fine-grained
+busting of individual assets.
+
 
 In order to implement your own cache buster, you can write your own class from
 scratch which implements the :class:`~pyramid.interfaces.ICacheBuster`
@@ -456,15 +445,16 @@ the hash of the currently checked out code:
 
    import os
    import subprocess
-   from pyramid.static import PathSegmentCacheBuster
+   from pyramid.static import QueryStringCacheBuster
 
-   class GitCacheBuster(PathSegmentCacheBuster):
+   class GitCacheBuster(QueryStringCacheBuster):
        """
        Assuming your code is installed as a Git checkout, as opposed to an egg
        from an egg repository like PYPI, you can use this cachebuster to get
        the current commit's SHA1 to use as the cache bust token.
        """
-       def __init__(self):
+       def __init__(self, param='x'):
+           super(GitCacheBuster, self).__init__(param=param)
            here = os.path.dirname(os.path.abspath(__file__))
            self.sha1 = subprocess.check_output(
                ['git', 'rev-parse', 'HEAD'],

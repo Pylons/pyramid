@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import hashlib
 import os
 
 from os.path import (
@@ -27,7 +26,7 @@ from pyramid.httpexceptions import (
     HTTPMovedPermanently,
     )
 
-from pyramid.path import AssetResolver, caller_package
+from pyramid.path import caller_package
 from pyramid.response import FileResponse
 from pyramid.traversal import traversal_path_info
 
@@ -159,71 +158,6 @@ def _secure_path(path_tuple):
     encoded = slash.join(path_tuple) # will be unicode
     return encoded
 
-def _generate_md5(spec):
-    asset = AssetResolver(None).resolve(spec)
-    md5 = hashlib.md5()
-    with asset.stream() as stream:
-        for block in iter(lambda: stream.read(4096), b''):
-            md5.update(block)
-    return md5.hexdigest()
-
-class Md5AssetTokenGenerator(object):
-    """
-    A mixin class which provides an implementation of
-    :meth:`~pyramid.interfaces.ICacheBuster.target` which generates an md5
-    checksum token for an asset, caching it for subsequent calls.
-    """
-    def __init__(self):
-        self.token_cache = {}
-
-    def tokenize(self, pathspec):
-        # An astute observer will notice that this use of token_cache doesn't
-        # look particularly thread safe.  Basic read/write operations on Python
-        # dicts, however, are atomic, so simply accessing and writing values
-        # to the dict shouldn't cause a segfault or other catastrophic failure.
-        # (See: http://effbot.org/pyfaq/what-kinds-of-global-value-mutation-are-thread-safe.htm)
-        #
-        # We do have a race condition that could result in the same md5
-        # checksum getting computed twice or more times in parallel.  Since
-        # the program would still function just fine if this were to occur,
-        # the extra overhead of using locks to serialize access to the dict
-        # seems an unnecessary burden.
-        #
-        token = self.token_cache.get(pathspec)
-        if not token:
-            self.token_cache[pathspec] = token = _generate_md5(pathspec)
-        return token
-
-class PathSegmentCacheBuster(object):
-    """
-    An implementation of :class:`~pyramid.interfaces.ICacheBuster` which
-    inserts a token for cache busting in the path portion of an asset URL.
-
-    To use this class, subclass it and provide a ``tokenize`` method which
-    accepts a ``pathspec`` and returns a token.
-
-    .. versionadded:: 1.6
-    """
-    def pregenerate(self, pathspec, subpath, kw):
-        token = self.tokenize(pathspec)
-        return (token,) + subpath, kw
-
-    def match(self, subpath):
-        return subpath[1:]
-
-class PathSegmentMd5CacheBuster(PathSegmentCacheBuster,
-                                Md5AssetTokenGenerator):
-    """
-    An implementation of :class:`~pyramid.interfaces.ICacheBuster` which
-    inserts an md5 checksum token for cache busting in the path portion of an
-    asset URL.  Generated md5 checksums are cached in order to speed up
-    subsequent calls.
-
-    .. versionadded:: 1.6
-    """
-    def __init__(self):
-        super(PathSegmentMd5CacheBuster, self).__init__()
-
 class QueryStringCacheBuster(object):
     """
     An implementation of :class:`~pyramid.interfaces.ICacheBuster` which adds
@@ -248,22 +182,6 @@ class QueryStringCacheBuster(object):
         else:
             kw['_query'] = tuple(query) + ((self.param, token),)
         return subpath, kw
-
-class QueryStringMd5CacheBuster(QueryStringCacheBuster,
-                                Md5AssetTokenGenerator):
-    """
-    An implementation of :class:`~pyramid.interfaces.ICacheBuster` which adds
-    an md5 checksum token for cache busting in the query string of an asset
-    URL.  Generated md5 checksums are cached in order to speed up subsequent
-    calls.
-
-    The optional ``param`` argument determines the name of the parameter added
-    to the query string and defaults to ``'x'``.
-
-    .. versionadded:: 1.6
-    """
-    def __init__(self, param='x'):
-        super(QueryStringMd5CacheBuster, self).__init__(param=param)
 
 class QueryStringConstantCacheBuster(QueryStringCacheBuster):
     """
