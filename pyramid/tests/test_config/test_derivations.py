@@ -1192,9 +1192,9 @@ class TestAddDerivation(unittest.TestCase):
         response.deriv = False
         view = lambda *arg: response
 
-        def deriv(view, default, **kw):
+        def deriv(view, value, **kw):
             self.assertFalse(response.deriv)
-            self.assertEqual(default, None)
+            self.assertEqual(value, None)
             response.deriv = True
             return view
 
@@ -1207,17 +1207,17 @@ class TestAddDerivation(unittest.TestCase):
 
     def test_derivation_default(self):
         response = DummyResponse()
-        response.deriv_default = None
+        response.deriv_value = None
         test_default = object()
         view = lambda *arg: response
 
-        def deriv(view, default, **kw):
-            response.deriv_default = default
+        def deriv(view, value, **kw):
+            response.deriv_value = value
             return view
 
         self.config.add_view_derivation('test_default_deriv', deriv, default=test_default)
         result = self.config._derive_view(view)
-        self.assertEqual(response.deriv_default, test_default)
+        self.assertEqual(response.deriv_value, test_default)
 
     def test_override_derivation(self):
         flags = {}
@@ -1226,11 +1226,11 @@ class TestAddDerivation(unittest.TestCase):
             def __init__(self):
                 self.response = DummyResponse()
 
-        def deriv1(view, default, **kw):
+        def deriv1(view, value, **kw):
             flags['deriv1'] = True
             return view
 
-        def deriv2(view, default, **kw):
+        def deriv2(view, value, **kw):
             flags['deriv2'] = True
             return view
 
@@ -1249,36 +1249,36 @@ class TestAddDerivation(unittest.TestCase):
 
     def test_override_derivation_default(self):
         response = DummyResponse()
-        response.deriv_default = None
+        response.deriv_value = None
         test_default1 = 'first default'
         test_default2 = 'second default'
         view = lambda *arg: response
 
-        def deriv(view, default, **kw):
-            response.deriv_default = default
+        def deriv(view, value, **kw):
+            response.deriv_value = value
             return view
 
         self.config.add_view_derivation('test_default_deriv', deriv, default=test_default1)
         result = self.config._derive_view(view)
-        self.assertEqual(response.deriv_default, test_default1)
+        self.assertEqual(response.deriv_value, test_default1)
         self.config.add_view_derivation('test_default_deriv', deriv, default=test_default2)
         result = self.config._derive_view(view)
-        self.assertEqual(response.deriv_default, test_default2)
+        self.assertEqual(response.deriv_value, test_default2)
 
     def test_add_multi_derivations_ordered(self):
         response = DummyResponse()
         view = lambda *arg: response
         response.deriv = []
 
-        def deriv1(view, default, **kw):
+        def deriv1(view, value, **kw):
             response.deriv.append('deriv1')
             return view
 
-        def deriv2(view, default, **kw):
+        def deriv2(view, value, **kw):
             response.deriv.append('deriv2')
             return view
 
-        def deriv3(view, default, **kw):
+        def deriv3(view, value, **kw):
             response.deriv.append('deriv3')
             return view
 
@@ -1323,11 +1323,11 @@ class TestDerivationIntegration(unittest.TestCase):
         view = lambda *arg: response
         response.deriv = []
 
-        def deriv1(view, default, **kw):
+        def deriv1(view, value, **kw):
             response.deriv.append(kw['options']['deriv1'])
             return view
 
-        def deriv2(view, default, **kw):
+        def deriv2(view, value, **kw):
             response.deriv.append(kw['options']['deriv2'])
             return view
 
