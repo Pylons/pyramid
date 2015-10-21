@@ -53,8 +53,8 @@ Steps
 
    .. note::
 
-     We aren't yet doing ``python3.3 setup.py develop`` as we
-     are changing it later.
+     We aren't yet doing ``$VENV/bin/python setup.py develop`` as we
+     will change it later.
 
 #. Our configuration file at ``databases/development.ini`` wires
    together some new pieces:
@@ -72,6 +72,7 @@ Steps
    to initialize the database:
 
    .. literalinclude:: databases/tutorial/initialize_db.py
+    :linenos:
 
 #. Since ``setup.py`` changed, we now run it:
 
@@ -89,21 +90,34 @@ Steps
    .. code-block:: bash
 
     $ $VENV/bin/initialize_tutorial_db development.ini
-    2013-09-06 15:54:08,050 INFO  [sqlalchemy.engine.base.Engine][MainThread] PRAGMA table_info("wikipages")
-    2013-09-06 15:54:08,050 INFO  [sqlalchemy.engine.base.Engine][MainThread] ()
-    2013-09-06 15:54:08,051 INFO  [sqlalchemy.engine.base.Engine][MainThread]
+    2015-06-01 11:22:52,650 INFO  [sqlalchemy.engine.base.Engine][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
+    2015-06-01 11:22:52,650 INFO  [sqlalchemy.engine.base.Engine][MainThread] ()
+    2015-06-01 11:22:52,651 INFO  [sqlalchemy.engine.base.Engine][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
+    2015-06-01 11:22:52,651 INFO  [sqlalchemy.engine.base.Engine][MainThread] ()
+    2015-06-01 11:22:52,652 INFO  [sqlalchemy.engine.base.Engine][MainThread] PRAGMA table_info("wikipages")
+    2015-06-01 11:22:52,652 INFO  [sqlalchemy.engine.base.Engine][MainThread] ()
+    2015-06-01 11:22:52,653 INFO  [sqlalchemy.engine.base.Engine][MainThread]
     CREATE TABLE wikipages (
-            uid INTEGER NOT NULL,
-            title TEXT,
-            body TEXT,
-            PRIMARY KEY (uid),
-            UNIQUE (title)
+      uid INTEGER NOT NULL,
+      title TEXT,
+      body TEXT,
+      PRIMARY KEY (uid),
+      UNIQUE (title)
     )
+
+
+    2015-06-01 11:22:52,653 INFO  [sqlalchemy.engine.base.Engine][MainThread] ()
+    2015-06-01 11:22:52,655 INFO  [sqlalchemy.engine.base.Engine][MainThread] COMMIT
+    2015-06-01 11:22:52,658 INFO  [sqlalchemy.engine.base.Engine][MainThread] BEGIN (implicit)
+    2015-06-01 11:22:52,659 INFO  [sqlalchemy.engine.base.Engine][MainThread] INSERT INTO wikipages (title, body) VALUES (?, ?)
+    2015-06-01 11:22:52,659 INFO  [sqlalchemy.engine.base.Engine][MainThread] ('Root', '<p>Root</p>')
+    2015-06-01 11:22:52,659 INFO  [sqlalchemy.engine.base.Engine][MainThread] COMMIT
 
 #. With our data now driven by SQLAlchemy queries, we need to update
    our ``databases/tutorial/views.py``:
 
    .. literalinclude:: databases/tutorial/views.py
+    :linenos:
 
 #. Our tests in ``databases/tutorial/tests.py`` changed to include
    SQLAlchemy bootstrapping:
@@ -138,8 +152,8 @@ Let's start with the dependencies. We made the decision to use
 ``pyramid_tm`` and ``zope.sqlalchemy``. Why?
 
 Pyramid has a strong orientation towards support for ``transactions``.
-Specifically, you can install a transaction manager into your app
-application, either as middleware or a Pyramid "tween". Then,
+Specifically, you can install a transaction manager into your
+application either as middleware or a Pyramid "tween". Then,
 just before you return the response, all transaction-aware parts of
 your application are executed.
 
@@ -149,7 +163,7 @@ aborts the transaction. This is a very liberating way to write code.
 
 The ``pyramid_tm`` package provides a "tween" that is configured in the
 ``development.ini`` configuration file. That installs it. We then need
-a package that makes SQLAlchemy and thus the RDBMS transaction manager
+a package that makes SQLAlchemy, and thus the RDBMS transaction manager,
 integrate with the Pyramid transaction manager. That's what
 ``zope.sqlalchemy`` does.
 
@@ -167,8 +181,8 @@ console script follows the pattern of being fed a configuration file
 with all the bootstrapping. It then opens SQLAlchemy and creates the
 root of the wiki, which also makes the SQLite file. Note the
 ``with transaction.manager`` part that puts the work in the scope of a
-transaction (as we aren't inside a web request where this is done
-automatically.)
+transaction, as we aren't inside a web request where this is done
+automatically.
 
 The ``models.py`` does a little bit extra work to hook up SQLAlchemy
 into the Pyramid transaction manager. It then declares the model for a

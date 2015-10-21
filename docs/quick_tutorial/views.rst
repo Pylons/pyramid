@@ -92,7 +92,7 @@ module ``views.py`` which is scanned via ``config.scan('.views')``.
 
 We have 2 views, each leading to the other. If you start at
 http://localhost:6543/, you get a response with a link to the next
-view. The ``hello_view`` (available at the URL ``/howdy``) has a link
+view. The ``hello`` view (available at the URL ``/howdy``) has a link
 back to the first view.
 
 This step also shows that the name appearing in the URL,

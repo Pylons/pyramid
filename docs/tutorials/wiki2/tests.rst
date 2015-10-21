@@ -2,29 +2,25 @@
 Adding Tests
 ============
 
-We will now add tests for the models and the views and a few functional
-tests in the ``tests.py``.  Tests ensure that an application works, and
-that it continues to work after changes are made in the future.
+We will now add tests for the models and the views and a few functional tests
+in ``tests.py``.  Tests ensure that an application works, and that it
+continues to work when changes are made in the future.
 
+Test the models
+===============
 
+To test the model class ``Page`` we'll add a new ``PageModelTests`` class to
+our ``tests.py`` file that was generated as part of the ``alchemy`` scaffold.
 
-Testing the Models
-==================
+Test the views
+==============
 
-To test the model class ``Page`` we'll add a new ``PageModelTests``
-class to our ``tests.py`` file that was generated as part of the
-``alchemy`` scaffold.
-
-Testing the Views
-=================
-
-We'll modify our ``tests.py`` file, adding tests for each view
-function we added above.  As a result, we'll *delete* the
-``ViewTests`` class that the ``alchemy`` scaffold provided, and add
-four other test classes: ``ViewWikiTests``, ``ViewPageTests``,
-``AddPageTests``, and ``EditPageTests``.  These test the
-``view_wiki``, ``view_page``, ``add_page``, and ``edit_page`` views
-respectively.
+We'll modify our ``tests.py`` file, adding tests for each view function we
+added previously.  As a result, we'll *delete* the ``ViewTests`` class that
+the ``alchemy`` scaffold provided, and add four other test classes:
+``ViewWikiTests``, ``ViewPageTests``, ``AddPageTests``, and ``EditPageTests``.
+These test the ``view_wiki``, ``view_page``, ``add_page``, and ``edit_page``
+views.
 
 Functional tests
 ================
@@ -34,16 +30,17 @@ tested in the unit tests, like logging in, logging out, checking that
 the ``viewer`` user cannot add or edit pages, but the ``editor`` user
 can, and so on.
 
-Viewing the results of all our edits to ``tests.py``
-====================================================
+View the results of all our edits to ``tests.py``
+=================================================
 
-Once we're done with the ``tests.py`` module, it will look a lot like:
+Open the ``tutorial/tests.py`` module, and edit it such that it appears as
+follows:
 
 .. literalinclude:: src/tests/tutorial/tests.py
    :linenos:
    :language: python
 
-Running the Tests
+Running the tests
 =================
 
 We can run these tests by using ``setup.py test`` in the same way we did in
@@ -57,7 +54,7 @@ Change the ``requires`` list in ``setup.py`` to include ``WebTest``.
    :lines: 11-22
    :emphasize-lines: 11
 
-After we've added a dependency on WebTest in ``setup.py``, we need to rerun
+After we've added a dependency on WebTest in ``setup.py``, we need to run
 ``setup.py develop`` to get WebTest installed into our virtualenv.  Assuming
 our shell's current working directory is the "tutorial" distribution
 directory:
@@ -89,7 +86,7 @@ On Windows:
 
    c:\pyramidtut\tutorial> %VENV%\Scripts\python setup.py test -q
 
-The expected result ends something like:
+The expected result should look like the following:
 
 .. code-block:: text
 

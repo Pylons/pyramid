@@ -11,7 +11,7 @@ Background
 Our application has URLs that allow people to add/edit/delete content
 via a web browser. Time to add security to the application. Let's
 protect our add/edit views to require a login (username of
-``editor`` and password of ``editor``.) We will allow the other views
+``editor`` and password of ``editor``). We will allow the other views
 to continue working without a password.
 
 Objectives
@@ -93,7 +93,7 @@ In summary: ``hello`` wants ``edit`` permission, ``Root`` says
 Of course, this only applies on ``Root``. Some other part of the site
 (a.k.a. *context*) might have a different ACL.
 
-If you are not logged in and visit ``/hello``, you need to get
+If you are not logged in and visit ``/howdy``, you need to get
 shown the login screen. How does Pyramid know what is the login page to
 use? We explicitly told Pyramid that the ``login`` view should be used
 by decorating the view with ``@forbidden_view_config``.
@@ -101,7 +101,10 @@ by decorating the view with ``@forbidden_view_config``.
 Extra Credit
 ============
 
-#. Perhaps you would like experience of not having enough permissions
+#. Do I have to put a ``renderer`` in my ``@forbidden_view_config``
+   decorator?
+
+#. Perhaps you would like the experience of not having enough permissions
    (forbidden) to be richer. How could you change this?
 
 #. Perhaps we want to store security statements in a database and

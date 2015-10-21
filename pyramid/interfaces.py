@@ -1205,7 +1205,7 @@ class ICacheBuster(Interface):
         argument is a dict of keywords that are to be passed eventually to
         :meth:`~pyramid.request.Request.route_url` for URL generation.  The
         return value should be a two-tuple of ``(subpath, kw)`` which are
-        versions of the same arguments modified to include the cachebust token
+        versions of the same arguments modified to include the cache bust token
         in the generated URL.
         """
 

@@ -56,10 +56,11 @@ if not PY3:
     tests_require.append('zope.component>=3.11.0')
 
 docs_extras = [
-    'Sphinx >= 1.2.3',
+    'Sphinx >= 1.3.1',
     'docutils',
     'repoze.sphinx.autointerface',
-    'pylons-sphinx-themes >= 0.3',
+    'pylons_sphinx_latesturl',
+    'pylons-sphinx-themes',
     ]
 
 testing_extras = tests_require + [
@@ -82,6 +83,7 @@ setup(name='pyramid',
         "Programming Language :: Python :: 3.2",
         "Programming Language :: Python :: 3.3",
         "Programming Language :: Python :: 3.4",
+        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
         "Framework :: Pyramid",
@@ -109,6 +111,9 @@ setup(name='pyramid',
         starter=pyramid.scaffolds:StarterProjectTemplate
         zodb=pyramid.scaffolds:ZODBProjectTemplate
         alchemy=pyramid.scaffolds:AlchemyProjectTemplate
+        [pyramid.pshell]
+        ipython=pyramid.scripts.pshell:PShellCommand.make_ipython_shell
+        bpython=pyramid.scripts.pshell:PShellCommand.make_bpython_shell
         [console_scripts]
         pcreate = pyramid.scripts.pcreate:main
         pserve = pyramid.scripts.pserve:main
