@@ -7,15 +7,11 @@ from zope.interface import (
     Interface,
     implementedBy,
     implementer,
-    provider,
     )
 
 from zope.interface.interfaces import IInterface
 
 from pyramid.interfaces import (
-    IAuthenticationPolicy,
-    IAuthorizationPolicy,
-    IDebugLogger,
     IDefaultPermission,
     IException,
     IExceptionViewClassifier,
@@ -28,7 +24,7 @@ from pyramid.interfaces import (
     IStaticURLInfo,
     IView,
     IViewClassifier,
-    IViewMapper,
+    IViewDerivers,
     IViewMapperFactory,
     PHASE1_CONFIG,
     )
@@ -41,8 +37,6 @@ from pyramid.compat import (
     urlparse,
     url_quote,
     WIN,
-    is_bound_method,
-    is_unbound_method,
     is_nonstr_iter,
     )
 
@@ -62,473 +56,44 @@ from pyramid.registry import (
     Deferred,
     )
 
-from pyramid.response import Response
-
 from pyramid.security import NO_PERMISSION_REQUIRED
 from pyramid.static import static_view
 from pyramid.threadlocal import get_current_registry
 
 from pyramid.url import parse_url_overrides
 
-from pyramid.view import (
-    render_view_to_response,
-    AppendSlashNotFoundViewFactory,
-    )
+from pyramid.view import AppendSlashNotFoundViewFactory
 
+import pyramid.util
 from pyramid.util import (
-    object_description,
     viewdefaults,
     action_method,
+    TopologicalSorter,
     )
 
 import pyramid.config.predicates
+import pyramid.config.derivations
+
+from pyramid.config.derivations import (
+    preserve_view_attrs,
+    view_description,
+    requestonly,
+    DefaultViewMapper,
+    wraps_view,
+)
 
 from pyramid.config.util import (
     DEFAULT_PHASH,
     MAX_ORDER,
-    takes_one_arg,
     )
 
 urljoin = urlparse.urljoin
 url_parse = urlparse.urlparse
 
-def view_description(view):
-    try:
-        return view.__text__
-    except AttributeError:
-        # custom view mappers might not add __text__
-        return object_description(view)
-
-def wraps_view(wrapper):
-    def inner(self, view):
-        wrapper_view = wrapper(self, view)
-        return preserve_view_attrs(view, wrapper_view)
-    return inner
-
-def preserve_view_attrs(view, wrapper):
-    if view is None:
-        return wrapper
-
-    if wrapper is view:
-        return view
-
-    original_view = getattr(view, '__original_view__', None)
-
-    if original_view is None:
-        original_view = view
-
-    wrapper.__wraps__ = view
-    wrapper.__original_view__ = original_view
-    wrapper.__module__ = view.__module__
-    wrapper.__doc__ = view.__doc__
-
-    try:
-        wrapper.__name__ = view.__name__
-    except AttributeError:
-        wrapper.__name__ = repr(view)
-
-    # attrs that may not exist on "view", but, if so, must be attached to
-    # "wrapped view"
-    for attr in ('__permitted__', '__call_permissive__', '__permission__',
-                 '__predicated__', '__predicates__', '__accept__',
-                 '__order__', '__text__'):
-        try:
-            setattr(wrapper, attr, getattr(view, attr))
-        except AttributeError:
-            pass
-
-    return wrapper
-
-class ViewDeriver(object):
-    def __init__(self, **kw):
-        self.kw = kw
-        self.registry = kw['registry']
-        self.authn_policy = self.registry.queryUtility(IAuthenticationPolicy)
-        self.authz_policy = self.registry.queryUtility(IAuthorizationPolicy)
-        self.logger = self.registry.queryUtility(IDebugLogger)
-
-    def __call__(self, view):
-        return self.attr_wrapped_view(
-            self.predicated_view(
-                self.authdebug_view(
-                    self.secured_view(
-                        self.owrapped_view(
-                            self.http_cached_view(
-                                self.decorated_view(
-                                    self.rendered_view(
-                                        self.mapped_view(
-                                            view)))))))))
-
-    @wraps_view
-    def mapped_view(self, view):
-        mapper = self.kw.get('mapper')
-        if mapper is None:
-            mapper = getattr(view, '__view_mapper__', None)
-            if mapper is None:
-                mapper = self.registry.queryUtility(IViewMapperFactory)
-                if mapper is None:
-                    mapper = DefaultViewMapper
-
-        mapped_view = mapper(**self.kw)(view)
-        return mapped_view
-
-    @wraps_view
-    def owrapped_view(self, view):
-        wrapper_viewname = self.kw.get('wrapper_viewname')
-        viewname = self.kw.get('viewname')
-        if not wrapper_viewname:
-            return view
-        def _owrapped_view(context, request):
-            response = view(context, request)
-            request.wrapped_response = response
-            request.wrapped_body = response.body
-            request.wrapped_view = view
-            wrapped_response = render_view_to_response(context, request,
-                                                       wrapper_viewname)
-            if wrapped_response is None:
-                raise ValueError(
-                    'No wrapper view named %r found when executing view '
-                    'named %r' % (wrapper_viewname, viewname))
-            return wrapped_response
-        return _owrapped_view
-
-    @wraps_view
-    def http_cached_view(self, view):
-        if self.registry.settings.get('prevent_http_cache', False):
-            return view
-
-        seconds = self.kw.get('http_cache')
-
-        if seconds is None:
-            return view
-
-        options = {}
-
-        if isinstance(seconds, (tuple, list)):
-            try:
-                seconds, options = seconds
-            except ValueError:
-                raise ConfigurationError(
-                    'If http_cache parameter is a tuple or list, it must be '
-                    'in the form (seconds, options); not %s' % (seconds,))
-
-        def wrapper(context, request):
-            response = view(context, request)
-            prevent_caching = getattr(response.cache_control, 'prevent_auto',
-                                      False)
-            if not prevent_caching:
-                response.cache_expires(seconds, **options)
-            return response
-
-        return wrapper
-
-    @wraps_view
-    def secured_view(self, view):
-        permission = self.kw.get('permission')
-        if permission == NO_PERMISSION_REQUIRED:
-            # allow views registered within configurations that have a
-            # default permission to explicitly override the default
-            # permission, replacing it with no permission at all
-            permission = None
-
-        wrapped_view = view
-        if (
-                self.authn_policy and
-                self.authz_policy and
-                (permission is not None)
-        ):
-            def _permitted(context, request):
-                principals = self.authn_policy.effective_principals(request)
-                return self.authz_policy.permits(context, principals,
-                                                 permission)
-            def _secured_view(context, request):
-                result = _permitted(context, request)
-                if result:
-                    return view(context, request)
-                view_name = getattr(view, '__name__', view)
-                msg = getattr(
-                    request, 'authdebug_message',
-                    'Unauthorized: %s failed permission check' % view_name)
-                raise HTTPForbidden(msg, result=result)
-            _secured_view.__call_permissive__ = view
-            _secured_view.__permitted__ = _permitted
-            _secured_view.__permission__ = permission
-            wrapped_view = _secured_view
-
-        return wrapped_view
-
-    @wraps_view
-    def authdebug_view(self, view):
-        wrapped_view = view
-        settings = self.registry.settings
-        permission = self.kw.get('permission')
-        if settings and settings.get('debug_authorization', False):
-            def _authdebug_view(context, request):
-                view_name = getattr(request, 'view_name', None)
-
-                if self.authn_policy and self.authz_policy:
-                    if permission is NO_PERMISSION_REQUIRED:
-                        msg = 'Allowed (NO_PERMISSION_REQUIRED)'
-                    elif permission is None:
-                        msg = 'Allowed (no permission registered)'
-                    else:
-                        principals = self.authn_policy.effective_principals(
-                            request)
-                        msg = str(self.authz_policy.permits(context,
-                                                            principals,
-                                                            permission))
-                else:
-                    msg = 'Allowed (no authorization policy in use)'
-
-                view_name = getattr(request, 'view_name', None)
-                url = getattr(request, 'url', None)
-                msg = ('debug_authorization of url %s (view name %r against '
-                       'context %r): %s' % (url, view_name, context, msg))
-                self.logger and self.logger.debug(msg)
-                if request is not None:
-                    request.authdebug_message = msg
-                return view(context, request)
-
-            wrapped_view = _authdebug_view
-
-        return wrapped_view
-
-    @wraps_view
-    def predicated_view(self, view):
-        preds = self.kw.get('predicates', ())
-        if not preds:
-            return view
-
-        def predicate_wrapper(context, request):
-            for predicate in preds:
-                if not predicate(context, request):
-                    view_name = getattr(view, '__name__', view)
-                    raise PredicateMismatch(
-                        'predicate mismatch for view %s (%s)' % (
-                            view_name, predicate.text()))
-            return view(context, request)
-
-        def checker(context, request):
-            return all((predicate(context, request) for predicate in
-                        preds))
-        predicate_wrapper.__predicated__ = checker
-        predicate_wrapper.__predicates__ = preds
-        return predicate_wrapper
-
-    @wraps_view
-    def attr_wrapped_view(self, view):
-        kw = self.kw
-        accept, order, phash = (kw.get('accept', None),
-                                kw.get('order', MAX_ORDER),
-                                kw.get('phash', DEFAULT_PHASH))
-        # this is a little silly but we don't want to decorate the original
-        # function with attributes that indicate accept, order, and phash,
-        # so we use a wrapper
-        if (
-            (accept is None) and
-            (order == MAX_ORDER) and
-            (phash == DEFAULT_PHASH)
-        ):
-            return view # defaults
-        def attr_view(context, request):
-            return view(context, request)
-        attr_view.__accept__ = accept
-        attr_view.__order__ = order
-        attr_view.__phash__ = phash
-        attr_view.__view_attr__ = self.kw.get('attr')
-        attr_view.__permission__ = self.kw.get('permission')
-        return attr_view
-
-    @wraps_view
-    def rendered_view(self, view):
-        # one way or another this wrapper must produce a Response (unless
-        # the renderer is a NullRendererHelper)
-        renderer = self.kw.get('renderer')
-        if renderer is None:
-            # register a default renderer if you want super-dynamic
-            # rendering.  registering a default renderer will also allow
-            # override_renderer to work if a renderer is left unspecified for
-            # a view registration.
-            return self._response_resolved_view(view)
-        if renderer is renderers.null_renderer:
-            return view
-        return self._rendered_view(view, renderer)
-
-    def _rendered_view(self, view, view_renderer):
-        def rendered_view(context, request):
-            result = view(context, request)
-            if result.__class__ is Response:  # potential common case
-                response = result
-            else:
-                registry = self.registry
-                # this must adapt, it can't do a simple interface check
-                # (avoid trying to render webob responses)
-                response = registry.queryAdapterOrSelf(result, IResponse)
-                if response is None:
-                    attrs = getattr(request, '__dict__', {})
-                    if 'override_renderer' in attrs:
-                        # renderer overridden by newrequest event or other
-                        renderer_name = attrs.pop('override_renderer')
-                        renderer = renderers.RendererHelper(
-                            name=renderer_name,
-                            package=self.kw.get('package'),
-                            registry=registry)
-                    else:
-                        renderer = view_renderer.clone()
-
-                    if '__view__' in attrs:
-                        view_inst = attrs.pop('__view__')
-                    else:
-                        view_inst = getattr(view, '__original_view__', view)
-                    response = renderer.render_view(request, result, view_inst,
-                                                    context)
-            return response
-
-        return rendered_view
-
-    def _response_resolved_view(self, view):
-        registry = self.registry
-
-        def viewresult_to_response(context, request):
-            result = view(context, request)
-            if result.__class__ is Response:  # common case
-                response = result
-            else:
-                response = registry.queryAdapterOrSelf(result, IResponse)
-                if response is None:
-                    if result is None:
-                        append = (' You may have forgotten to return a value '
-                                  'from the view callable.')
-                    elif isinstance(result, dict):
-                        append = (' You may have forgotten to define a '
-                                  'renderer in the view configuration.')
-                    else:
-                        append = ''
-
-                    msg = ('Could not convert return value of the view '
-                           'callable %s into a response object. '
-                           'The value returned was %r.' + append)
-
-                    raise ValueError(msg % (view_description(view), result))
-
-            return response
-
-        return viewresult_to_response
-
-    @wraps_view
-    def decorated_view(self, view):
-        decorator = self.kw.get('decorator')
-        if decorator is None:
-            return view
-        return decorator(view)
-
-
-@implementer(IViewMapper)
-@provider(IViewMapperFactory)
-class DefaultViewMapper(object):
-    def __init__(self, **kw):
-        self.attr = kw.get('attr')
-
-    def __call__(self, view):
-        if is_unbound_method(view) and self.attr is None:
-            raise ConfigurationError((
-                'Unbound method calls are not supported, please set the class '
-                'as your `view` and the method as your `attr`'
-            ))
-
-        if inspect.isclass(view):
-            view = self.map_class(view)
-        else:
-            view = self.map_nonclass(view)
-        return view
-
-    def map_class(self, view):
-        ronly = requestonly(view, self.attr)
-        if ronly:
-            mapped_view = self.map_class_requestonly(view)
-        else:
-            mapped_view = self.map_class_native(view)
-        mapped_view.__text__ = 'method %s of %s' % (
-            self.attr or '__call__', object_description(view))
-        return mapped_view
-
-    def map_nonclass(self, view):
-        # We do more work here than appears necessary to avoid wrapping the
-        # view unless it actually requires wrapping (to avoid function call
-        # overhead).
-        mapped_view = view
-        ronly = requestonly(view, self.attr)
-        if ronly:
-            mapped_view = self.map_nonclass_requestonly(view)
-        elif self.attr:
-            mapped_view = self.map_nonclass_attr(view)
-        if inspect.isroutine(mapped_view):
-            # This branch will be true if the view is a function or a method.
-            # We potentially mutate an unwrapped object here if it's a
-            # function.  We do this to avoid function call overhead of
-            # injecting another wrapper.  However, we must wrap if the
-            # function is a bound method because we can't set attributes on a
-            # bound method.
-            if is_bound_method(view):
-                _mapped_view = mapped_view
-                def mapped_view(context, request):
-                    return _mapped_view(context, request)
-            if self.attr is not None:
-                mapped_view.__text__ = 'attr %s of %s' % (
-                    self.attr, object_description(view))
-            else:
-                mapped_view.__text__ = object_description(view)
-        return mapped_view
-
-    def map_class_requestonly(self, view):
-        # its a class that has an __init__ which only accepts request
-        attr = self.attr
-        def _class_requestonly_view(context, request):
-            inst = view(request)
-            request.__view__ = inst
-            if attr is None:
-                response = inst()
-            else:
-                response = getattr(inst, attr)()
-            return response
-        return _class_requestonly_view
-
-    def map_class_native(self, view):
-        # its a class that has an __init__ which accepts both context and
-        # request
-        attr = self.attr
-        def _class_view(context, request):
-            inst = view(context, request)
-            request.__view__ = inst
-            if attr is None:
-                response = inst()
-            else:
-                response = getattr(inst, attr)()
-            return response
-        return _class_view
-
-    def map_nonclass_requestonly(self, view):
-        # its a function that has a __call__ which accepts only a single
-        # request argument
-        attr = self.attr
-        def _requestonly_view(context, request):
-            if attr is None:
-                response = view(request)
-            else:
-                response = getattr(view, attr)(request)
-            return response
-        return _requestonly_view
-
-    def map_nonclass_attr(self, view):
-        # its a function that has a __call__ which accepts both context and
-        # request, but still has an attr
-        def _attr_view(context, request):
-            response = getattr(view, self.attr)(context, request)
-            return response
-        return _attr_view
-
-def requestonly(view, attr=None):
-    return takes_one_arg(view, attr=attr, argname='request')
+DefaultViewMapper = DefaultViewMapper # bw-compat
+preserve_view_attrs = preserve_view_attrs # bw-compat
+requestonly = requestonly # bw-compat
+view_description = view_description # bw-compat
 
 @implementer(IMultiView)
 class MultiView(object):
@@ -641,8 +206,7 @@ class ViewsConfiguratorMixin(object):
         http_cache=None,
         match_param=None,
         check_csrf=None,
-        **predicates
-    ):
+        **view_options):
         """ Add a :term:`view configuration` to the current
         configuration state.  Arguments to ``add_view`` are broken
         down below into *predicate* arguments and *non-predicate*
@@ -1083,16 +647,17 @@ class ViewsConfiguratorMixin(object):
                 obsoletes this argument, but it is kept around for backwards
                 compatibility.
 
-        predicates
+        view_options:
 
-          Pass a key/value pair here to use a third-party predicate
-          registered via
-          :meth:`pyramid.config.Configurator.add_view_predicate`.  More than
+          Pass a key/value pair here to use a third-party predicate or set a
+          value for a view derivative option registered via
+          :meth:`pyramid.config.Configurator.add_view_predicate` or
+          :meth:`pyramid.config.Configurator.add_view_derivation`.  More than
           one key/value pair can be used at the same time.  See
           :ref:`view_and_route_predicates` for more information about
           third-party predicates.
 
-          .. versionadded: 1.4a1
+          .. versionadded: 1.7
 
         """
         if custom_predicates:
@@ -1159,8 +724,8 @@ class ViewsConfiguratorMixin(object):
             accept = accept.lower()
 
         introspectables = []
-        pvals = predicates.copy()
-        pvals.update(
+        ovals = view_options.copy()
+        ovals.update(
             dict(
                 xhr=xhr,
                 request_method=request_method,
@@ -1179,13 +744,26 @@ class ViewsConfiguratorMixin(object):
         def discrim_func():
             # We need to defer the discriminator until we know what the phash
             # is.  It can't be computed any sooner because thirdparty
-            # predicates may not yet exist when add_view is called.
+            # predicates/view derivations may not yet exist when add_view is
+            # called.
+            valid_predicates = predlist.names()
+            pvals = {}
+            options = {}
+
+            for (k, v) in ovals.items():
+                if k in valid_predicates:
+                    pvals[k] = v
+                else:
+                    options[k] = v
+
             order, preds, phash = predlist.make(self, **pvals)
+
             view_intr.update({
                 'phash': phash,
                 'order': order,
-                'predicates': preds
-            })
+                'predicates': preds,
+                'options': options
+                })
             return ('view', context, name, route_name, phash)
 
         discriminator = Deferred(discrim_func)
@@ -1221,7 +799,7 @@ class ViewsConfiguratorMixin(object):
                  decorator=decorator,
                  )
             )
-        view_intr.update(**predicates)
+        view_intr.update(**view_options)
         introspectables.append(view_intr)
         predlist = self.get_predlist('view')
 
@@ -1253,11 +831,13 @@ class ViewsConfiguratorMixin(object):
 
             # added by discrim_func above during conflict resolving
             preds = view_intr['predicates']
+            opts = view_intr['options']
             order = view_intr['order']
             phash = view_intr['phash']
 
             # __no_permission_required__ handled by _secure_view
-            deriver = ViewDeriver(
+            derived_view = self._apply_view_derivations(
+                view,
                 registry=self.registry,
                 permission=permission,
                 predicates=preds,
@@ -1272,8 +852,8 @@ class ViewsConfiguratorMixin(object):
                 mapper=mapper,
                 decorator=decorator,
                 http_cache=http_cache,
+                options=opts,
                 )
-            derived_view = deriver(view)
             derived_view.__discriminator__ = lambda *arg: discriminator
             # __discriminator__ is used by superdynamic systems
             # that require it for introspection after manual view lookup;
@@ -1384,7 +964,7 @@ class ViewsConfiguratorMixin(object):
                 tmpl_intr is not None and
                 intrspc is not None and
                 intrspc.get('renderer factories', renderer_type) is not None
-            ):
+                ):
                 # allow failure of registered template factories to be deferred
                 # until view execution, like other bad renderer factories; if
                 # we tried to relate this to an existing renderer factory
@@ -1426,11 +1006,26 @@ class ViewsConfiguratorMixin(object):
                 permission,
                 permission,
                 'permission'
-            )
+                )
             perm_intr['value'] = permission
             perm_intr.relate('views', discriminator)
             introspectables.append(perm_intr)
         self.action(discriminator, register, introspectables=introspectables)
+
+    def _apply_view_derivations(self, view, **kw):
+        d = pyramid.config.derivations
+        # These inner derivations have fixed order
+        inner_derivers = [('mapped_view', (d.mapped_view, None))]
+
+        outer_derivers = [('predicated_view', (d.predicated_view, None)),
+                          ('attr_wrapped_view', (d.attr_wrapped_view, None)),]
+
+        derivers = self.registry.queryUtility(IViewDerivers, default=[])
+        for name, val in inner_derivers + derivers.sorted() + outer_derivers:
+            derivation, default = val
+            value = kw['options'].get(name, default)
+            view = wraps_view(derivation)(view, value, **kw)
+        return view
 
     @action_method
     def add_view_predicate(self, name, factory, weighs_more_than=None,
@@ -1458,7 +1053,7 @@ class ViewsConfiguratorMixin(object):
             factory,
             weighs_more_than=weighs_more_than,
             weighs_less_than=weighs_less_than
-        )
+            )
 
     def add_default_view_predicates(self):
         p = pyramid.config.predicates
@@ -1476,8 +1071,53 @@ class ViewsConfiguratorMixin(object):
             ('physical_path', p.PhysicalPathPredicate),
             ('effective_principals', p.EffectivePrincipalsPredicate),
             ('custom', p.CustomPredicate),
-        ):
+            ):
             self.add_view_predicate(name, factory)
+
+    @action_method
+    def add_view_derivation(self, name, factory, default, 
+                            under=None,
+                            over=None):
+        if under is None and over is None:
+            over = 'decorated_view'
+
+        factory = self.maybe_dotted(factory)
+        discriminator = ('view option', name)
+        intr = self.introspectable(
+            '%s derivation' % type,
+            discriminator,
+            '%s derivation named %s' % (type, name),
+            '%s derivation' % type)
+        intr['name'] = name
+        intr['factory'] = factory
+        intr['under'] = under
+        intr['over'] = over
+        def register():
+            derivers = self.registry.queryUtility(IViewDerivers)
+            if derivers is None:
+                derivers = TopologicalSorter()
+                self.registry.registerUtility(derivers, IViewDerivers)
+            derivers.add(name, (factory, default),
+                         after=under,
+                         before=over)
+        self.action(discriminator, register, introspectables=(intr,),
+                    order=PHASE1_CONFIG) # must be registered early
+
+    def add_default_view_derivations(self):
+        d = pyramid.config.derivations
+        derivers = [
+            ('decorated_view', d.decorated_view),
+            ('http_cached_view', d.http_cached_view),
+            ('owrapped_view', d.owrapped_view),
+            ('secured_view', d.secured_view),
+            ('authdebug_view', d.authdebug_view),
+        ]
+        after = pyramid.util.FIRST
+        for name, deriver in derivers:
+            self.add_view_derivation(name, deriver, default=None, under=after)
+            after = name
+
+        self.add_view_derivation('rendered_view', d.rendered_view, default=None, under=pyramid.util.FIRST, over='decorated_view')
 
     def derive_view(self, view, attr=None, renderer=None):
         """
@@ -1558,7 +1198,7 @@ class ViewsConfiguratorMixin(object):
         return self._derive_view(view, attr=attr, renderer=renderer)
 
     # b/w compat
-    def _derive_view(self, view, permission=None, predicates=(),
+    def _derive_view(self, view, permission=None, predicates=(), options=dict(),
                      attr=None, renderer=None, wrapper_viewname=None,
                      viewname=None, accept=None, order=MAX_ORDER,
                      phash=DEFAULT_PHASH, decorator=None,
@@ -1577,22 +1217,24 @@ class ViewsConfiguratorMixin(object):
                     package=self.package,
                     registry=self.registry)
 
-        deriver = ViewDeriver(registry=self.registry,
-                              permission=permission,
-                              predicates=predicates,
-                              attr=attr,
-                              renderer=renderer,
-                              wrapper_viewname=wrapper_viewname,
-                              viewname=viewname,
-                              accept=accept,
-                              order=order,
-                              phash=phash,
-                              package=self.package,
-                              mapper=mapper,
-                              decorator=decorator,
-                              http_cache=http_cache)
-
-        return deriver(view)
+        return self._apply_view_derivations(
+            view,
+            registry=self.registry,
+            permission=permission,
+            predicates=predicates,
+            attr=attr,
+            renderer=renderer,
+            wrapper_viewname=wrapper_viewname,
+            viewname=viewname,
+            accept=accept,
+            order=order,
+            phash=phash,
+            package=self.package,
+            mapper=mapper,
+            decorator=decorator,
+            http_cache=http_cache,
+            options=options,
+        )
 
     @viewdefaults
     @action_method
@@ -1615,8 +1257,8 @@ class ViewsConfiguratorMixin(object):
         decorator=None,
         mapper=None,
         match_param=None,
-        **predicates
-    ):
+        **view_options
+        ):
         """ Add a forbidden view to the current configuration state.  The
         view will be called when Pyramid or application code raises a
         :exc:`pyramid.httpexceptions.HTTPForbidden` exception and the set of
@@ -1645,11 +1287,11 @@ class ViewsConfiguratorMixin(object):
         .. versionadded:: 1.3
         """
         for arg in ('name', 'permission', 'context', 'for_', 'http_cache'):
-            if arg in predicates:
+            if arg in view_options:
                 raise ConfigurationError(
                     '%s may not be used as an argument to add_forbidden_view'
                     % arg
-                )
+                    )
 
         if view is None:
             view = default_exceptionresponse_view
@@ -1674,8 +1316,8 @@ class ViewsConfiguratorMixin(object):
             permission=NO_PERMISSION_REQUIRED,
             attr=attr,
             renderer=renderer,
-        )
-        settings.update(predicates)
+            )
+        settings.update(view_options)
         return self.add_view(**settings)
 
     set_forbidden_view = add_forbidden_view # deprecated sorta-bw-compat alias
@@ -1702,8 +1344,8 @@ class ViewsConfiguratorMixin(object):
         mapper=None,
         match_param=None,
         append_slash=False,
-        **predicates
-    ):
+        **view_options
+        ):
         """ Add a default Not Found View to the current configuration state.
         The view will be called when Pyramid or application code raises an
         :exc:`pyramid.httpexceptions.HTTPNotFound` exception (e.g. when a
@@ -1757,11 +1399,11 @@ class ViewsConfiguratorMixin(object):
         .. versionadded:: 1.3
         """
         for arg in ('name', 'permission', 'context', 'for_', 'http_cache'):
-            if arg in predicates:
+            if arg in view_options:
                 raise ConfigurationError(
                     '%s may not be used as an argument to add_notfound_view'
                     % arg
-                )
+                    )
 
         if view is None:
             view = default_exceptionresponse_view
@@ -1784,8 +1426,8 @@ class ViewsConfiguratorMixin(object):
             match_param=match_param,
             route_name=route_name,
             permission=NO_PERMISSION_REQUIRED,
-        )
-        settings.update(predicates)
+            )
+        settings.update(view_options)
         if append_slash:
             view = self._derive_view(view, attr=attr, renderer=renderer)
             if IResponse.implementedBy(append_slash):
@@ -1962,7 +1604,7 @@ def isexception(o):
     return (
         isinstance(o, Exception) or
         (inspect.isclass(o) and (issubclass(o, Exception)))
-    )
+        )
 
 
 @implementer(IStaticURLInfo)
@@ -2076,7 +1718,7 @@ class StaticURLInfo(object):
 
             # register a route using the computed view, permission, and
             # pattern, plus any extras passed to us via add_static_view
-            pattern = "%s*subpath" % name  # name already ends with slash
+            pattern = "%s*subpath" % name # name already ends with slash
             if config.route_prefix:
                 route_name = '__%s/%s' % (config.route_prefix, name)
             else:
@@ -2088,12 +1730,12 @@ class StaticURLInfo(object):
                 permission=permission,
                 context=context,
                 renderer=renderer,
-            )
+                )
 
         def register():
             registrations = self._get_registrations(config.registry)
 
-            names = [t[0] for t in registrations]
+            names = [ t[0] for t in registrations ]
 
             if name in names:
                 idx = names.index(name)
@@ -2110,3 +1752,4 @@ class StaticURLInfo(object):
         intr['spec'] = spec
 
         config.action(None, callable=register, introspectables=(intr,))
+
