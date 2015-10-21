@@ -5,7 +5,7 @@ def main(global_config, **settings):
     """
     config = Configurator(settings=settings)
     config.include('pyramid_chameleon')
-    config.include('.models')
+    config.include('.models.meta')
     config.add_static_view('static', 'static', cache_max_age=3600)
     config.add_route('home', '/')
     config.scan()
