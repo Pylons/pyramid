@@ -1,6 +1,19 @@
 1.6 (2015-04-14)
 ================
 
+Backward Incompatibilities
+--------------------------
+
+- IPython and BPython support have been removed from pshell in the core.
+  To continue using them on Pyramid 1.6+ you must install the binding
+  packages explicitly::
+
+    $ pip install pyramid_ipython
+
+    or
+
+    $ pip install pyramid_bpython
+
 Features
 --------
 

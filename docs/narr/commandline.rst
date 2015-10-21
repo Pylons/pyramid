@@ -107,9 +107,7 @@ found* message.
 
 .. index::
    single: interactive shell
-   single: IPython
    single: pshell
-   single: bpython
 
 .. _interactive_shell:
 
@@ -263,18 +261,13 @@ request is configured to generate urls from the host
     >>> request.route_url('home')
     'https://www.example.com/'
 
-.. index::
-   single: IPython
-   single: bpython
-
-.. _ipython_or_bpython:
-
 Alternative Shells
 ~~~~~~~~~~~~~~~~~~
-If you have `IPython <http://en.wikipedia.org/wiki/IPython>`_ and/or `bpython
-<http://bpython-interpreter.org/>`_ in the interpreter you use to invoke the
-``pshell`` command, ``pshell`` will autodiscover and use the first one found.
-However you could specifically invoke your choice with the ``-p choice`` or
+
+The ``pshell`` command can be easily extended with alternate REPLs if the
+default python REPL is not satisfactory. Assuming you have a binding
+installed such as ``pyramid_ipython`` it will normally be auto-selected and
+used. You may also specifically invoke your choice with the ``-p choice`` or
 ``--python-shell choice`` option.
 
 .. code-block:: text
@@ -287,7 +280,7 @@ You may use the ``--list-shells`` option to see the available shells.
 
    $ $VENV/bin/pshell --list-shells
    Available shells:
-     bpython  [not available]
+     bpython
      ipython
      python
 
@@ -309,28 +302,18 @@ arguments, ``env`` and ``help``, which would look like this:
 
 .. code-block:: python
 
-    def ptpython_shell_factory():
-        try:
-            from ptpython.repl import embed
-        except ImportError:
-            # ptpython is not installed
-            return None
+    from ptpython.repl import embed
 
-        def PTPShell(banner, **kwargs):
-            print(banner)
-            return embed(**kwargs)
-
-        def shell(env, help):
-            PTPShell(banner=help, locals=env)
-
-        return shell
-
-If the factory returns ``None`` then it is assumed that the shell is not
-supported.
+    def ptpython_shell_runner(env, help):
+        print(help)
+        return embed(locals=env)
 
 .. versionchanged:: 1.6
    User-defined shells may be registered using entry points. Prior to this
    the only supported shells were ``ipython``, ``bpython`` and ``python``.
+
+   ``ipython`` and ``bpython`` have been moved into their respective
+   packages ``pyramid_ipython`` and ``pyramid_bpython``.
 
 Setting a Default Shell
 ~~~~~~~~~~~~~~~~~~~~~~~

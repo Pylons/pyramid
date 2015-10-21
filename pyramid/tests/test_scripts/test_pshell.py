@@ -37,44 +37,12 @@ class TestPShellCommand(unittest.TestCase):
     def _makeEntryPoints(self, command, shells):
         command.pkg_resources = dummy.DummyPkgResources(shells)
 
-    def test_make_default_shell(self):
-        command = self._makeOne()
-        interact = dummy.DummyInteractor()
-        shell = command.make_default_shell(interact)
-        shell({'foo': 'bar'}, 'a help message')
-        self.assertEqual(interact.local, {'foo': 'bar'})
-        self.assertTrue('a help message' in interact.banner)
-
-    def test_make_bpython_shell(self):
-        command = self._makeOne()
-        bpython = dummy.DummyBPythonShell()
-        shell = command.make_bpython_shell(bpython)
-        shell({'foo': 'bar'}, 'a help message')
-        self.assertEqual(bpython.locals_, {'foo': 'bar'})
-        self.assertTrue('a help message' in bpython.banner)
-
-    def test_make_ipython_shell(self):
-        command = self._makeOne()
-        ipshell_factory = dummy.DummyIPShellFactory()
-        shell = command.make_ipython_shell(ipshell_factory)
-        shell({'foo': 'bar'}, 'a help message')
-        self.assertEqual(ipshell_factory.kw['user_ns'], {'foo': 'bar'})
-        self.assertTrue('a help message' in ipshell_factory.kw['banner2'])
-        self.assertTrue(ipshell_factory.shell.called)
-
     def test_command_loads_default_shell(self):
         command = self._makeOne()
         shell = dummy.DummyShell()
-        self._makeEntryPoints(
-            command,
-            {
-                'ipython': lambda: None,
-                'bpython': lambda: None,
-                'python': lambda: None,
-            }
-        )
+        self._makeEntryPoints(command, {})
 
-        command.make_default_shell = lambda: shell
+        command.default_runner = shell
         command.run()
         self.assertTrue(self.config_factory.parser)
         self.assertEqual(self.config_factory.parser.filename,
@@ -99,17 +67,10 @@ class TestPShellCommand(unittest.TestCase):
         command.out = out
 
         shell = dummy.DummyShell()
-        bad_shell = dummy.DummyShell()
 
-        self._makeEntryPoints(
-            command,
-            {
-                'ipython': lambda: bad_shell,
-                'bpython': lambda: bad_shell,
-            }
-        )
+        self._makeEntryPoints(command, {})
 
-        command.make_default_shell = lambda: shell
+        command.default_runner = shell
         command.options.python_shell = 'unknown_python_shell'
         result = command.run()
         self.assertEqual(result, 1)
@@ -129,8 +90,8 @@ class TestPShellCommand(unittest.TestCase):
         self._makeEntryPoints(
             command,
             {
-                'ipython': lambda: shell,
-                'bpython': lambda: bad_shell,
+                'ipython': shell,
+                'bpython': bad_shell,
             }
         )
 
@@ -150,33 +111,6 @@ class TestPShellCommand(unittest.TestCase):
         self.assertTrue(self.bootstrap.closer.called)
         self.assertTrue(shell.help)
 
-    def test_command_loads_bpython_shell(self):
-        command = self._makeOne()
-        shell = dummy.DummyBPythonShell()
-
-        self._makeEntryPoints(
-            command,
-            {
-                'ipython': lambda: None,
-                'bpython': lambda: shell,
-            }
-        )
-
-        command.options.python_shell = 'bpython'
-        command.run()
-        self.assertTrue(self.config_factory.parser)
-        self.assertEqual(self.config_factory.parser.filename,
-                         '/foo/bar/myapp.ini')
-        self.assertEqual(self.bootstrap.a[0], '/foo/bar/myapp.ini#myapp')
-        self.assertEqual(shell.locals_, {
-            'app':self.bootstrap.app, 'root':self.bootstrap.root,
-            'registry':self.bootstrap.registry,
-            'request':self.bootstrap.request,
-            'root_factory':self.bootstrap.root_factory,
-        })
-        self.assertTrue(self.bootstrap.closer.called)
-        self.assertTrue(shell.banner)
-
     def test_shell_entry_points(self):
         command = self._makeOne()
         dshell = dummy.DummyShell()
@@ -184,12 +118,12 @@ class TestPShellCommand(unittest.TestCase):
         self._makeEntryPoints(
             command,
             {
-                'ipython': lambda: dshell,
-                'bpython': lambda: dshell,
+                'ipython': dshell,
+                'bpython': dshell,
             }
         )
 
-        command.make_default_shell = lambda: None
+        command.default_runner = None
         shell = command.make_shell()
         self.assertEqual(shell, dshell)
 
@@ -199,15 +133,9 @@ class TestPShellCommand(unittest.TestCase):
         bpshell = dummy.DummyShell()
         dshell = dummy.DummyShell()
 
-        self._makeEntryPoints(
-            command,
-            {
-                'ipython': lambda: None,
-                'bpython': lambda: None,
-            }
-        )
+        self._makeEntryPoints(command, {})
 
-        command.make_default_shell = lambda: dshell
+        command.default_runner = dshell
 
         shell = command.make_shell()
         self.assertEqual(shell, dshell)
@@ -215,15 +143,12 @@ class TestPShellCommand(unittest.TestCase):
         command.options.python_shell = 'ipython'
         self.assertRaises(ValueError, command.make_shell)
 
-        command.options.python_shell = 'bpython'
-        self.assertRaises(ValueError, command.make_shell)
-
         self._makeEntryPoints(
             command,
             {
-                'ipython': lambda: ipshell,
-                'bpython': lambda: bpshell,
-                'python': lambda: dshell,
+                'ipython': ipshell,
+                'bpython': bpshell,
+                'python': dshell,
             }
         )
 
@@ -248,13 +173,13 @@ class TestPShellCommand(unittest.TestCase):
         self._makeEntryPoints(
             command,
             {
-                'ipython': lambda: ipshell,
-                'bpython': lambda: bpshell,
-                'python': lambda: dshell,
+                'ipython': ipshell,
+                'bpython': bpshell,
+                'python': dshell,
             }
         )
 
-        command.make_default_shell = lambda: dshell
+        command.default_runner = dshell
 
         command.preferred_shells = ['ipython', 'bpython']
         shell = command.make_shell()
@@ -319,9 +244,8 @@ class TestPShellCommand(unittest.TestCase):
         self._makeEntryPoints(
             command,
             {
-                'ipython': lambda: ipshell,
-                'bpython': lambda: None,
-                'python': lambda: dshell,
+                'ipython': ipshell,
+                'python': dshell,
             }
         )
         self.config_factory.items = [
@@ -434,9 +358,8 @@ class TestPShellCommand(unittest.TestCase):
         self._makeEntryPoints(
             command,
             {
-                'ipython': lambda: dshell,
-                'bpython': lambda: None,
-                'python': lambda: dshell,
+                'ipython': dshell,
+                'python': dshell,
             }
         )
 
@@ -445,10 +368,21 @@ class TestPShellCommand(unittest.TestCase):
         self.assertEqual(result, 0)
         self.assertEqual(out_calls, [
             'Available shells:',
-            '  bpython  [not available]',
             '  ipython',
             '  python',
         ])
+
+
+class Test_python_shell_runner(unittest.TestCase):
+    def _callFUT(self, env, help, interact):
+        from pyramid.scripts.pshell import python_shell_runner
+        return python_shell_runner(env, help, interact=interact)
+
+    def test_it(self):
+        interact = dummy.DummyInteractor()
+        self._callFUT({'foo': 'bar'}, 'a help message', interact)
+        self.assertEqual(interact.local, {'foo': 'bar'})
+        self.assertTrue('a help message' in interact.banner)
 
 class Test_main(unittest.TestCase):
     def _callFUT(self, argv):
@@ -458,4 +392,3 @@ class Test_main(unittest.TestCase):
     def test_it(self):
         result = self._callFUT(['pshell'])
         self.assertEqual(result, 2)
-

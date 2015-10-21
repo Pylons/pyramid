@@ -21,6 +21,13 @@ def main(argv=sys.argv, quiet=False):
     return command.run()
 
 
+def python_shell_runner(env, help, interact=interact):
+    cprt = 'Type "help" for more information.'
+    banner = "Python %s on %s\n%s" % (sys.version, sys.platform, cprt)
+    banner += '\n\n' + help + '\n'
+    interact(banner, local=env)
+
+
 class PShellCommand(object):
     usage = '%prog config_uri'
     description = """\
@@ -61,6 +68,7 @@ class PShellCommand(object):
                             "[pshell] ini section."))
 
     ConfigParser = configparser.ConfigParser # testing
+    default_runner = python_shell_runner # testing
 
     loaded_objects = {}
     object_help = {}
@@ -186,23 +194,18 @@ class PShellCommand(object):
 
     def show_shells(self):
         shells = self.find_all_shells()
-        sorted_shells = sorted(shells.items(), key=lambda x: x[0].lower())
-        max_name = max([len(s) for s in shells])
+        sorted_names = sorted(shells.keys(), key=lambda x: x.lower())
 
         self.out('Available shells:')
-        for name, factory in sorted_shells:
-            shell = factory()
-            if shell is not None:
-                self.out('  %s' % (name,))
-            else:
-                self.out('  %s%s  [not available]' % (
-                    name,
-                    ' ' * (max_name - len(name))))
+        for name in sorted_names:
+            self.out('  %s' % (name,))
         return 0
 
     def find_all_shells(self):
+        pkg_resources = self.pkg_resources
+
         shells = {}
-        for ep in self.pkg_resources.iter_entry_points('pyramid.pshell'):
+        for ep in pkg_resources.iter_entry_points('pyramid.pshell_runner'):
             name = ep.name
             shell_factory = ep.load()
             shells[name] = shell_factory
@@ -228,16 +231,15 @@ class PShellCommand(object):
                 except ValueError:
                     return 1
             sorted_shells = sorted(shells.items(), key=order)
-            for name, factory in sorted_shells:
-                shell = factory()
 
-                if shell is not None:
-                    break
+            if len(sorted_shells) > 0:
+                shell = sorted_shells[0][1]
+
         else:
-            factory = shells.get(user_shell)
+            runner = shells.get(user_shell)
 
-            if factory is not None:
-                shell = factory()
+            if runner is not None:
+                shell = runner
 
             if shell is None:
                 raise ValueError(
@@ -245,45 +247,9 @@ class PShellCommand(object):
                 )
 
         if shell is None:
-            shell = self.make_default_shell()
+            # should never happen, but just incase entry points are borked
+            shell = self.default_runner
 
-        return shell
-
-    @classmethod
-    def make_python_shell(cls, interact=interact):
-        def shell(env, help):
-            cprt = 'Type "help" for more information.'
-            banner = "Python %s on %s\n%s" % (sys.version, sys.platform, cprt)
-            banner += '\n\n' + help + '\n'
-            interact(banner, local=env)
-        return shell
-
-    make_default_shell = make_python_shell
-
-    @classmethod
-    def make_bpython_shell(cls, BPShell=None):
-        if BPShell is None: # pragma: no cover
-            try:
-                from bpython import embed
-                BPShell = embed
-            except ImportError:
-                return None
-        def shell(env, help):
-            BPShell(locals_=env, banner=help + '\n')
-        return shell
-
-    @classmethod
-    def make_ipython_shell(cls, IPShellFactory=None):
-        if IPShellFactory is None: # pragma: no cover
-            try:
-                from IPython.terminal.embed import (
-                    InteractiveShellEmbed)
-                IPShellFactory = InteractiveShellEmbed
-            except ImportError:
-                return None
-        def shell(env, help):
-            IPShell = IPShellFactory(banner2=help + '\n', user_ns=env)
-            IPShell()
         return shell
 
 
