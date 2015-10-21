@@ -1077,8 +1077,8 @@ class ViewsConfiguratorMixin(object):
 
     @action_method
     def add_view_derivation(self, name, factory, default, 
-                            weighs_more_than=None,
-                            weighs_less_than=None):
+                            under=None,
+                            over=None):
         factory = self.maybe_dotted(factory)
         discriminator = ('view option', name)
         intr = self.introspectable(
@@ -1088,16 +1088,16 @@ class ViewsConfiguratorMixin(object):
             '%s derivation' % type)
         intr['name'] = name
         intr['factory'] = factory
-        intr['weighs_more_than'] = weighs_more_than
-        intr['weighs_less_than'] = weighs_less_than
+        intr['under'] = under
+        intr['over'] = over
         def register():
             derivers = self.registry.queryUtility(IViewDerivers)
             if derivers is None:
                 derivers = TopologicalSorter()
                 self.registry.registerUtility(derivers, IViewDerivers)
             derivers.add(name, (factory, default),
-                         after=weighs_more_than,
-                         before=weighs_less_than)
+                         after=under,
+                         before=over)
         self.action(discriminator, register, introspectables=(intr,),
                     order=PHASE1_CONFIG) # must be registered early
 
@@ -1112,7 +1112,7 @@ class ViewsConfiguratorMixin(object):
         ]
         after = pyramid.util.FIRST
         for name, deriver in derivers:
-            self.add_view_derivation(name, deriver, default=None, weighs_more_than=after)
+            self.add_view_derivation(name, deriver, default=None, under=after)
             after = name
 
     def derive_view(self, view, attr=None, renderer=None):

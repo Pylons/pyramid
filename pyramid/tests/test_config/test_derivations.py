@@ -1191,8 +1191,8 @@ class TestAddDerivation(unittest.TestCase):
             return view
 
         self.config.add_view_derivation('deriv1', deriv1, default=None)
-        self.config.add_view_derivation('deriv2', deriv2, default=None, weighs_less_than='deriv1')
-        self.config.add_view_derivation('deriv3', deriv3, default=None, weighs_more_than='deriv2')
+        self.config.add_view_derivation('deriv2', deriv2, default=None, over='deriv1')
+        self.config.add_view_derivation('deriv3', deriv3, default=None, under='deriv2')
         result = self.config._derive_view(view)
         self.assertEqual(response.deriv, ['deriv2', 'deriv3', 'deriv1'])
 
