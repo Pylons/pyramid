@@ -1015,8 +1015,7 @@ class ViewsConfiguratorMixin(object):
     def _apply_view_derivations(self, view, **kw):
         d = pyramid.config.derivations
         # These inner derivations have fixed order
-        inner_derivers = [('mapped_view', (d.mapped_view, None)),
-                          ('rendered_view', (d.rendered_view, None))]
+        inner_derivers = [('mapped_view', (d.mapped_view, None))]
 
         outer_derivers = [('predicated_view', (d.predicated_view, None)),
                           ('attr_wrapped_view', (d.attr_wrapped_view, None)),]
@@ -1079,6 +1078,9 @@ class ViewsConfiguratorMixin(object):
     def add_view_derivation(self, name, factory, default, 
                             under=None,
                             over=None):
+        if under is None and over is None:
+            over = 'decorated_view'
+
         factory = self.maybe_dotted(factory)
         discriminator = ('view option', name)
         intr = self.introspectable(
@@ -1114,6 +1116,8 @@ class ViewsConfiguratorMixin(object):
         for name, deriver in derivers:
             self.add_view_derivation(name, deriver, default=None, under=after)
             after = name
+
+        self.add_view_derivation('rendered_view', d.rendered_view, default=None, under=pyramid.util.FIRST, over='decorated_view')
 
     def derive_view(self, view, attr=None, renderer=None):
         """
