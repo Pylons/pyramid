@@ -33,25 +33,6 @@ class DummyInteractor:
         self.banner = banner
         self.local = local
 
-class DummyBPythonShell:
-    def __call__(self, locals_, banner):
-        self.locals_ = locals_
-        self.banner = banner
-        self.called = True
-
-class DummyIPShell(object):
-    IP = Dummy()
-    IP.BANNER = 'foo'
-
-    def __call__(self):
-        self.called = True
-
-class DummyIPShellFactory(object):
-    def __call__(self, **kw):
-        self.kw = kw
-        self.shell = DummyIPShell()
-        return self.shell
-
 class DummyApp:
     def __init__(self):
         self.registry = dummy_registry
