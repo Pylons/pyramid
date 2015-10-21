@@ -10,6 +10,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import (
     scoped_session,
     sessionmaker,
+    configure_mappers,
     )
 
 from zope.sqlalchemy import ZopeTransactionExtension
@@ -25,3 +26,5 @@ class MyModel(Base):
     value = Column(Integer)
 
 Index('my_index', MyModel.name, unique=True, mysql_length=255)
+
+configure_mappers()
