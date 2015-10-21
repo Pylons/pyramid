@@ -9,13 +9,13 @@ from pyramid.paster import (
 
 from pyramid.scripts.common import parse_vars
 
-from ..models.meta import (
+from ..models import (
+    MyModel,
     Base,
     get_session,
     get_engine,
     get_dbmaker,
     )
-from ..models.mymodel import MyModel
 
 
 def usage(argv):

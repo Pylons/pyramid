@@ -13,10 +13,10 @@ class BaseTest(unittest.TestCase):
         self.config = testing.setUp(settings={
             'sqlalchemy.url': 'sqlite:///:memory:'
         })
-        self.config.include('.models.meta')
+        self.config.include('.models')
         settings = self.config.get_settings()
 
-        from .models.meta import (
+        from .models import (
             get_session,
             get_engine,
             get_dbmaker,
@@ -28,11 +28,11 @@ class BaseTest(unittest.TestCase):
         self.session = get_session(transaction.manager, dbmaker)
 
     def init_database(self):
-        from .models.meta import Base
+        from .models import Base
         Base.metadata.create_all(self.engine)
 
     def tearDown(self):
-        from .models.meta import Base
+        from .models import Base
 
         testing.tearDown()
         transaction.abort()
@@ -45,13 +45,13 @@ class TestMyViewSuccessCondition(BaseTest):
         super(TestMyViewSuccessCondition, self).setUp()
         self.init_database()
 
-        from .models.mymodel import MyModel
+        from .models import MyModel
 
         model = MyModel(name='one', value=55)
         self.session.add(model)
 
     def test_passing_view(self):
-        from .views.default import my_view
+        from .views import my_view
         info = my_view(dummy_request(self.session))
         self.assertEqual(info['one'].name, 'one')
         self.assertEqual(info['project'], '{{project}}')
@@ -60,6 +60,6 @@ class TestMyViewSuccessCondition(BaseTest):
 class TestMyViewFailureCondition(BaseTest):
 
     def test_failing_view(self):
-        from .views.default import my_view
+        from .views import my_view
         info = my_view(dummy_request(self.session))
         self.assertEqual(info.status_int, 500)
