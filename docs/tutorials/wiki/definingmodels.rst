@@ -15,7 +15,7 @@ single instance of the "Wiki" class will serve as a container for "Page"
 objects, which will be instances of the "Page" class.
 
 
-Delete the Database
+Delete the database
 -------------------
 
 In the next step, we're going to remove the ``MyModel`` Python model
@@ -32,11 +32,18 @@ Edit ``models.py``
 
 .. note::
 
-  There is nothing automagically special about the filename ``models.py``.  A
+  There is nothing special about the filename ``models.py``.  A
   project may have many models throughout its codebase in arbitrarily named
-  files.  Files implementing models often have ``model`` in their filenames,
+  files.  Files implementing models often have ``model`` in their filenames
   or they may live in a Python subpackage of your application package named
   ``models``, but this is only by convention.
+
+Open ``tutorial/tutorial/models.py`` file and edit it to look like the
+following:
+
+.. literalinclude:: src/models/tutorial/models.py
+   :linenos:
+   :language: python
 
 The first thing we want to do is remove the ``MyModel`` class from the
 generated ``models.py`` file.  The ``MyModel`` class is only a sample and
@@ -70,17 +77,7 @@ front page) into the Wiki within the ``appmaker``.  This will provide
 :term:`traversal` a :term:`resource tree` to work against when it attempts to
 resolve URLs to resources.
 
-Look at the Result of Our Edits to ``models.py``
-------------------------------------------------
-
-The result of all of our edits to ``models.py`` will end up looking
-something like this:
-
-.. literalinclude:: src/models/tutorial/models.py
-   :linenos:
-   :language: python
-
-View the Application in a Browser
+View the application in a browser
 ---------------------------------
 
 We can't.  At this point, our system is in a "non-runnable" state; we'll need

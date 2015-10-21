@@ -79,6 +79,7 @@ from pyramid.config.derivations import (
     view_description,
     requestonly,
     DefaultViewMapper,
+    wraps_view,
 )
 
 from pyramid.config.util import (
@@ -205,7 +206,7 @@ class ViewsConfiguratorMixin(object):
         http_cache=None,
         match_param=None,
         check_csrf=None,
-        **predicates):
+        **view_options):
         """ Add a :term:`view configuration` to the current
         configuration state.  Arguments to ``add_view`` are broken
         down below into *predicate* arguments and *non-predicate*
@@ -410,6 +411,22 @@ class ViewsConfiguratorMixin(object):
           decorator syntax for all view calling conventions and not having to
           think about preserving function attributes such as ``__name__`` and
           ``__module__`` within decorator logic).
+
+          All view callables in the decorator chain must return a response
+          object implementing :class:`pyramid.interfaces.IResponse` or raise
+          an exception:
+
+          .. code-block:: python
+
+             def log_timer(wrapped):
+                 def wrapper(context, request):
+                     start = time.time()
+                     response = wrapped(context, request)
+                     duration = time.time() - start
+                     response.headers['X-View-Time'] = '%.3f' % (duration,)
+                     log.info('view took %.3f seconds', duration)
+                     return response
+                 return wrapper
 
           .. versionchanged:: 1.4a4
              Passing an iterable.
@@ -630,16 +647,17 @@ class ViewsConfiguratorMixin(object):
                 obsoletes this argument, but it is kept around for backwards
                 compatibility.
 
-        predicates
+        view_options:
 
-          Pass a key/value pair here to use a third-party predicate
-          registered via
-          :meth:`pyramid.config.Configurator.add_view_predicate`.  More than
+          Pass a key/value pair here to use a third-party predicate or set a
+          value for a view derivative option registered via
+          :meth:`pyramid.config.Configurator.add_view_predicate` or
+          :meth:`pyramid.config.Configurator.add_view_derivation`.  More than
           one key/value pair can be used at the same time.  See
           :ref:`view_and_route_predicates` for more information about
           third-party predicates.
 
-          .. versionadded: 1.4a1
+          .. versionadded: 1.7
 
         """
         if custom_predicates:
@@ -706,8 +724,8 @@ class ViewsConfiguratorMixin(object):
             accept = accept.lower()
 
         introspectables = []
-        pvals = predicates.copy()
-        pvals.update(
+        ovals = view_options.copy()
+        ovals.update(
             dict(
                 xhr=xhr,
                 request_method=request_method,
@@ -726,9 +744,26 @@ class ViewsConfiguratorMixin(object):
         def discrim_func():
             # We need to defer the discriminator until we know what the phash
             # is.  It can't be computed any sooner because thirdparty
-            # predicates may not yet exist when add_view is called.
+            # predicates/view derivations may not yet exist when add_view is
+            # called.
+            valid_predicates = predlist.names()
+            pvals = {}
+            options = {}
+
+            for (k, v) in ovals.items():
+                if k in valid_predicates:
+                    pvals[k] = v
+                else:
+                    options[k] = v
+
             order, preds, phash = predlist.make(self, **pvals)
-            view_intr.update({'phash':phash, 'order':order, 'predicates':preds})
+
+            view_intr.update({
+                'phash': phash,
+                'order': order,
+                'predicates': preds,
+                'options': options
+                })
             return ('view', context, name, route_name, phash)
 
         discriminator = Deferred(discrim_func)
@@ -764,7 +799,7 @@ class ViewsConfiguratorMixin(object):
                  decorator=decorator,
                  )
             )
-        view_intr.update(**predicates)
+        view_intr.update(**view_options)
         introspectables.append(view_intr)
         predlist = self.get_predlist('view')
 
@@ -796,6 +831,7 @@ class ViewsConfiguratorMixin(object):
 
             # added by discrim_func above during conflict resolving
             preds = view_intr['predicates']
+            opts = view_intr['options']
             order = view_intr['order']
             phash = view_intr['phash']
 
@@ -816,6 +852,7 @@ class ViewsConfiguratorMixin(object):
                 mapper=mapper,
                 decorator=decorator,
                 http_cache=http_cache,
+                options=opts,
                 )
             derived_view.__discriminator__ = lambda *arg: discriminator
             # __discriminator__ is used by superdynamic systems
@@ -978,13 +1015,16 @@ class ViewsConfiguratorMixin(object):
     def _apply_view_derivations(self, view, **kw):
         d = pyramid.config.derivations
         # These inner derivations have fixed order
-        inner_derivers = [('mapped_view', (d.mapped_view, None)),
-                          ('rendered_view', (d.rendered_view, None))]
+        inner_derivers = [('mapped_view', (d.mapped_view, None))]
+
+        outer_derivers = [('predicated_view', (d.predicated_view, None)),
+                          ('attr_wrapped_view', (d.attr_wrapped_view, None)),]
 
         derivers = self.registry.queryUtility(IViewDerivers, default=[])
-        for name, val in inner_derivers + derivers.sorted():
+        for name, val in inner_derivers + derivers.sorted() + outer_derivers:
             derivation, default = val
-            view = derivation(view, default, **kw)
+            value = kw['options'].get(name, default)
+            view = wraps_view(derivation)(view, value, **kw)
         return view
 
     @action_method
@@ -1036,8 +1076,11 @@ class ViewsConfiguratorMixin(object):
 
     @action_method
     def add_view_derivation(self, name, factory, default, 
-                            weighs_more_than=None,
-                            weighs_less_than=None):
+                            under=None,
+                            over=None):
+        if under is None and over is None:
+            over = 'decorated_view'
+
         factory = self.maybe_dotted(factory)
         discriminator = ('view option', name)
         intr = self.introspectable(
@@ -1047,16 +1090,16 @@ class ViewsConfiguratorMixin(object):
             '%s derivation' % type)
         intr['name'] = name
         intr['factory'] = factory
-        intr['weighs_more_than'] = weighs_more_than
-        intr['weighs_less_than'] = weighs_less_than
+        intr['under'] = under
+        intr['over'] = over
         def register():
             derivers = self.registry.queryUtility(IViewDerivers)
             if derivers is None:
                 derivers = TopologicalSorter()
                 self.registry.registerUtility(derivers, IViewDerivers)
             derivers.add(name, (factory, default),
-                         after=weighs_more_than,
-                         before=weighs_less_than)
+                         after=under,
+                         before=over)
         self.action(discriminator, register, introspectables=(intr,),
                     order=PHASE1_CONFIG) # must be registered early
 
@@ -1068,13 +1111,13 @@ class ViewsConfiguratorMixin(object):
             ('owrapped_view', d.owrapped_view),
             ('secured_view', d.secured_view),
             ('authdebug_view', d.authdebug_view),
-            ('predicated_view', d.predicated_view),
-            ('attr_wrapped_view', d.attr_wrapped_view),
         ]
         after = pyramid.util.FIRST
         for name, deriver in derivers:
-            self.add_view_derivation(name, deriver, default=None, weighs_more_than=after)
+            self.add_view_derivation(name, deriver, default=None, under=after)
             after = name
+
+        self.add_view_derivation('rendered_view', d.rendered_view, default=None, under=pyramid.util.FIRST, over='decorated_view')
 
     def derive_view(self, view, attr=None, renderer=None):
         """
@@ -1155,7 +1198,7 @@ class ViewsConfiguratorMixin(object):
         return self._derive_view(view, attr=attr, renderer=renderer)
 
     # b/w compat
-    def _derive_view(self, view, permission=None, predicates=(),
+    def _derive_view(self, view, permission=None, predicates=(), options=dict(),
                      attr=None, renderer=None, wrapper_viewname=None,
                      viewname=None, accept=None, order=MAX_ORDER,
                      phash=DEFAULT_PHASH, decorator=None,
@@ -1190,6 +1233,7 @@ class ViewsConfiguratorMixin(object):
             mapper=mapper,
             decorator=decorator,
             http_cache=http_cache,
+            options=options,
         )
 
     @viewdefaults
@@ -1213,7 +1257,7 @@ class ViewsConfiguratorMixin(object):
         decorator=None,
         mapper=None,
         match_param=None,
-        **predicates
+        **view_options
         ):
         """ Add a forbidden view to the current configuration state.  The
         view will be called when Pyramid or application code raises a
@@ -1243,7 +1287,7 @@ class ViewsConfiguratorMixin(object):
         .. versionadded:: 1.3
         """
         for arg in ('name', 'permission', 'context', 'for_', 'http_cache'):
-            if arg in predicates:
+            if arg in view_options:
                 raise ConfigurationError(
                     '%s may not be used as an argument to add_forbidden_view'
                     % arg
@@ -1273,7 +1317,7 @@ class ViewsConfiguratorMixin(object):
             attr=attr,
             renderer=renderer,
             )
-        settings.update(predicates)
+        settings.update(view_options)
         return self.add_view(**settings)
 
     set_forbidden_view = add_forbidden_view # deprecated sorta-bw-compat alias
@@ -1300,7 +1344,7 @@ class ViewsConfiguratorMixin(object):
         mapper=None,
         match_param=None,
         append_slash=False,
-        **predicates
+        **view_options
         ):
         """ Add a default Not Found View to the current configuration state.
         The view will be called when Pyramid or application code raises an
@@ -1355,7 +1399,7 @@ class ViewsConfiguratorMixin(object):
         .. versionadded:: 1.3
         """
         for arg in ('name', 'permission', 'context', 'for_', 'http_cache'):
-            if arg in predicates:
+            if arg in view_options:
                 raise ConfigurationError(
                     '%s may not be used as an argument to add_notfound_view'
                     % arg
@@ -1383,7 +1427,7 @@ class ViewsConfiguratorMixin(object):
             route_name=route_name,
             permission=NO_PERMISSION_REQUIRED,
             )
-        settings.update(predicates)
+        settings.update(view_options)
         if append_slash:
             view = self._derive_view(view, attr=attr, renderer=renderer)
             if IResponse.implementedBy(append_slash):

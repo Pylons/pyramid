@@ -180,14 +180,14 @@ class TestPServeCommand(unittest.TestCase):
         inst = self._makeOne('--stop-daemon', '--pid-file=%s' % path)
         inst.run()
         msg = 'No PID file exists in %s' % path
-        self.assertEqual(self.out_.getvalue(), msg)
+        self.assertTrue(msg in self.out_.getvalue())
 
     def test_run_stop_daemon_bad_pid_file(self):
         path = __file__
         inst = self._makeOne('--stop-daemon', '--pid-file=%s' % path)
         inst.run()
         msg = 'Not a valid PID file in %s' % path
-        self.assertEqual(self.out_.getvalue(), msg)
+        self.assertTrue(msg in self.out_.getvalue())
 
     def test_run_stop_daemon_invalid_pid_in_file(self):
         fn = tempfile.mktemp()
@@ -197,7 +197,7 @@ class TestPServeCommand(unittest.TestCase):
         inst = self._makeOne('--stop-daemon', '--pid-file=%s' % fn)
         inst.run()
         msg = 'PID in %s is not valid (deleting)' % fn
-        self.assertEqual(self.out_.getvalue(), msg)
+        self.assertTrue(msg in self.out_.getvalue())
 
     def test_get_options_with_command(self):
         inst = self._makeOne()

@@ -160,6 +160,13 @@ class HTTPException(Response, Exception):
     # title = 'OK'
     # explanation = 'why this happens'
     # body_template_obj = Template('response template')
+    #
+    # This class itself uses the error code "520" with the error message/title
+    # of "Unknown Error". This is not an RFC standard, however it is
+    # implemented in practice. Sub-classes should be overriding the default
+    # values and 520 should not be seen in the wild from Pyramid applications.
+    # Due to changes in WebOb, a code of "None" is not valid, and WebOb due to
+    # more strict error checking rejects it now.
 
     # differences from webob.exc.WSGIHTTPException:
     #
@@ -178,8 +185,8 @@ class HTTPException(Response, Exception):
     #
     # - documentation improvements (Pyramid-specific docstrings where necessary)
     #
-    code = None
-    title = None
+    code = 520
+    title = 'Unknown Error'
     explanation = ''
     body_template_obj = Template('''\
 ${explanation}${br}${br}
@@ -562,10 +569,7 @@ class HTTPClientError(HTTPError):
     a bug.  A server-side traceback is not warranted.  Unless specialized,
     this is a '400 Bad Request'
     """
-    code = 400
-    title = 'Bad Request'
-    explanation = ('The server could not comply with the request since '
-                   'it is either malformed or otherwise incorrect.')
+    pass
 
 class HTTPBadRequest(HTTPClientError):
     """
@@ -576,7 +580,10 @@ class HTTPBadRequest(HTTPClientError):
 
     code: 400, title: Bad Request
     """
-    pass
+    code = 400
+    title = 'Bad Request'
+    explanation = ('The server could not comply with the request since '
+                   'it is either malformed or otherwise incorrect.')
 
 class HTTPUnauthorized(HTTPClientError):
     """
@@ -988,14 +995,14 @@ class HTTPServerError(HTTPError):
     This is an error condition in which the server is presumed to be
     in-error.  Unless specialized, this is a '500 Internal Server Error'.
     """
+    pass
+
+class HTTPInternalServerError(HTTPServerError):
     code = 500
     title = 'Internal Server Error'
     explanation = (
       'The server has either erred or is incapable of performing '
       'the requested operation.')
-
-class HTTPInternalServerError(HTTPServerError):
-    pass
 
 class HTTPNotImplemented(HTTPServerError):
     """

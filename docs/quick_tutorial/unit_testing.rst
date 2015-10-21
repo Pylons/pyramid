@@ -24,7 +24,7 @@ and functionality. The Pyramid developers use ``nose``, which we'll thus
 use in this tutorial.
 
 Don't worry, this tutorial won't be pedantic about "test-driven
-development" (TDD.) We'll do just enough to ensure that, in each step,
+development" (TDD). We'll do just enough to ensure that, in each step,
 we haven't majorly broken the code. As you're writing your code you
 might find this more convenient than changing to your browser
 constantly and clicking reload.

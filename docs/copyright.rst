@@ -39,7 +39,7 @@ any trademark or service mark.
 
 Every effort has been made to make this book as complete and as
 accurate as possible, but no warranty or fitness is implied.  The
-information provided is on as "as-is" basis.  The author and the
+information provided is on an "as-is" basis.  The author and the
 publisher shall have neither liability nor responsibility to any
 person or entity with respect to any loss or damages arising from the
 information contained in this book.  No patent liability is assumed
@@ -89,14 +89,14 @@ Contacting The Publisher
 Please send documentation licensing inquiries, translation inquiries,
 and other business communications to `Agendaless Consulting
 <mailto:webmaster@agendaless.com>`_.  Please send software and other
-technical queries to the `Pylons-devel maillist
+technical queries to the `Pylons-devel mailing list
 <http://groups.google.com/group/pylons-devel>`_.
 
 HTML Version and Source Code
 ----------------------------
 
 An HTML version of this book is freely available via
-http://docs.pylonsproject.org
+http://docs.pylonsproject.org/projects/pyramid/en/latest/
 
 The source code for the examples used in this book are available
 within the :app:`Pyramid` software distribution, always available

@@ -154,8 +154,8 @@ class DefaultViewMapper(object):
 
 
 def wraps_view(wrapper):
-    def inner(view, default, **kw):
-        wrapper_view = wrapper(view, default, **kw)
+    def inner(view, value, **kw):
+        wrapper_view = wrapper(view, value, **kw)
         return preserve_view_attrs(view, wrapper_view)
     return inner
 
@@ -193,8 +193,7 @@ def preserve_view_attrs(view, wrapper):
 
     return wrapper
 
-@wraps_view
-def mapped_view(view, default, **kw):
+def mapped_view(view, value, **kw):
     mapper = kw.get('mapper')
     if mapper is None:
         mapper = getattr(view, '__view_mapper__', None)
@@ -206,8 +205,7 @@ def mapped_view(view, default, **kw):
     mapped_view = mapper(**kw)(view)
     return mapped_view
 
-@wraps_view
-def owrapped_view(view, default, **kw):
+def owrapped_view(view, value, **kw):
     wrapper_viewname = kw.get('wrapper_viewname')
     viewname = kw.get('viewname')
     if not wrapper_viewname:
@@ -226,8 +224,7 @@ def owrapped_view(view, default, **kw):
         return wrapped_response
     return _owrapped_view
 
-@wraps_view
-def http_cached_view(view, default, **kw):
+def http_cached_view(view, value, **kw):
     if kw['registry'].settings.get('prevent_http_cache', False):
         return view
 
@@ -256,8 +253,7 @@ def http_cached_view(view, default, **kw):
 
     return wrapper
 
-@wraps_view
-def secured_view(view, default, **kw):
+def secured_view(view, value, **kw):
     permission = kw.get('permission')
     if permission == NO_PERMISSION_REQUIRED:
         # allow views registered within configurations that have a
@@ -289,8 +285,7 @@ def secured_view(view, default, **kw):
 
     return wrapped_view
 
-@wraps_view
-def authdebug_view(view, default, **kw):
+def authdebug_view(view, value, **kw):
     wrapped_view = view
     settings = kw['registry'].settings
     permission = kw.get('permission')
@@ -327,8 +322,7 @@ def authdebug_view(view, default, **kw):
 
     return wrapped_view
 
-@wraps_view
-def predicated_view(view, default, **kw):
+def predicated_view(view, value, **kw):
     preds = kw.get('predicates', ())
     if not preds:
         return view
@@ -347,8 +341,7 @@ def predicated_view(view, default, **kw):
     predicate_wrapper.__predicates__ = preds
     return predicate_wrapper
 
-@wraps_view
-def attr_wrapped_view(view, default, **kw):
+def attr_wrapped_view(view, value, **kw):
     kw = kw
     accept, order, phash = (kw.get('accept', None),
                             kw.get('order', MAX_ORDER),
@@ -371,8 +364,7 @@ def attr_wrapped_view(view, default, **kw):
     attr_view.__permission__ = kw.get('permission')
     return attr_view
 
-@wraps_view
-def rendered_view(view, default, **kw):
+def rendered_view(view, value, **kw):
     # one way or another this wrapper must produce a Response (unless
     # the renderer is a NullRendererHelper)
     renderer = kw.get('renderer')
@@ -440,8 +432,7 @@ def rendered_view(view, default, **kw):
 
     return rendered_view
 
-@wraps_view
-def decorated_view(view, default, **kw):
+def decorated_view(view, value, **kw):
     decorator = kw.get('decorator')
     if decorator is None:
         return view

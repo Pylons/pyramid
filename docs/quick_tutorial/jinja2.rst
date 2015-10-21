@@ -6,7 +6,7 @@
 
 We just said Pyramid doesn't prefer one templating language over
 another. Time to prove it. Jinja2 is a popular templating system,
-used in Flask and modelled after Django's templates. Let's add
+used in Flask and modeled after Django's templates. Let's add
 ``pyramid_jinja2``, a Pyramid :term:`add-on` which enables Jinja2 as a
 :term:`renderer` in our Pyramid applications.
 

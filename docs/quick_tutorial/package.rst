@@ -3,7 +3,7 @@
 ============================================
 
 Most modern Python development is done using Python packages, an approach
-Pyramid puts to good use. In this step we re-do "Hello World" as a
+Pyramid puts to good use. In this step we redo "Hello World" as a
 minimum Python package inside a minimum Python project.
 
 Background
@@ -93,7 +93,7 @@ Python projects, via ``setup.py``, gives us special features when
 our package is installed (in this case, in local development mode.)
 
 In this step we have a Python package called ``tutorial``. We use the
-same name in each step of the tutorial, to avoid unnecessary re-typing.
+same name in each step of the tutorial, to avoid unnecessary retyping.
 
 Above this ``tutorial`` directory we have the files that handle the
 packaging of this project. At the moment, all we need is a

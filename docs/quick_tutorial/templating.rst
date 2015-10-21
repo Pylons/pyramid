@@ -112,7 +112,7 @@ Analysis
 
 Ahh, that looks better. We have a view that is focused on Python code.
 Our ``@view_config`` decorator specifies a :term:`renderer` that points
-our template file. Our view then simply returns data which is then
+to our template file. Our view then simply returns data which is then
 supplied to our template. Note that we used the same template for both
 views.
 

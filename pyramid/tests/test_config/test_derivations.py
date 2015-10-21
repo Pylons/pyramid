@@ -10,6 +10,7 @@ class TestDeriveView(unittest.TestCase):
 
     def tearDown(self):
         self.config = None
+        testing.tearDown()
 
     def _makeRequest(self):
         request = DummyRequest()
@@ -1085,6 +1086,98 @@ class TestDeriveView(unittest.TestCase):
             view, http_cache=(None,))
 
 
+class TestDerivationOrder(unittest.TestCase):
+    def setUp(self):
+        self.config = testing.setUp()
+
+    def tearDown(self):
+        self.config = None
+        testing.tearDown()
+
+    def test_right_order_user_sorted(self):
+        from pyramid.interfaces import IViewDerivers
+
+        self.config.add_view_derivation('deriv1', None, default=None)
+        self.config.add_view_derivation('deriv2', None, default=None, over='deriv1')
+        self.config.add_view_derivation('deriv3', None, default=None, under='deriv2')
+
+        derivers = self.config.registry.queryUtility(IViewDerivers, default=[])
+        derivers_sorted = derivers.sorted()
+        dlist = [d for (d, _) in derivers_sorted]
+        self.assertEqual([
+            'rendered_view',
+            'deriv2',
+            'deriv3',
+            'deriv1',
+            'decorated_view',
+            'http_cached_view',
+            'owrapped_view',
+            'secured_view',
+            'authdebug_view',
+            ], dlist)
+
+    def test_right_order_implicit(self):
+        from pyramid.interfaces import IViewDerivers
+
+        self.config.add_view_derivation('deriv1', None, default=None)
+        self.config.add_view_derivation('deriv2', None, default=None)
+        self.config.add_view_derivation('deriv3', None, default=None)
+
+        derivers = self.config.registry.queryUtility(IViewDerivers, default=[])
+        derivers_sorted = derivers.sorted()
+        dlist = [d for (d, _) in derivers_sorted]
+        self.assertEqual([
+            'rendered_view',
+            'deriv1',
+            'deriv2',
+            'deriv3',
+            'decorated_view',
+            'http_cached_view',
+            'owrapped_view',
+            'secured_view',
+            'authdebug_view',
+            ], dlist)
+
+    def test_right_order_over_rendered_view(self):
+        from pyramid.interfaces import IViewDerivers
+
+        self.config.add_view_derivation('deriv1', None, default=None, over='rendered_view')
+
+        derivers = self.config.registry.queryUtility(IViewDerivers, default=[])
+        derivers_sorted = derivers.sorted()
+        dlist = [d for (d, _) in derivers_sorted]
+        self.assertEqual(['deriv1',
+            'rendered_view',
+            'decorated_view',
+            'http_cached_view',
+            'owrapped_view',
+            'secured_view',
+            'authdebug_view',
+            ], dlist)
+
+
+    def test_right_order_over_rendered_view_others(self):
+        from pyramid.interfaces import IViewDerivers
+
+        self.config.add_view_derivation('deriv1', None, default=None, over='rendered_view')
+        self.config.add_view_derivation('deriv2', None, default=None)
+        self.config.add_view_derivation('deriv3', None, default=None)
+
+        derivers = self.config.registry.queryUtility(IViewDerivers, default=[])
+        derivers_sorted = derivers.sorted()
+        dlist = [d for (d, _) in derivers_sorted]
+        self.assertEqual(['deriv1',
+            'rendered_view',
+            'deriv2',
+            'deriv3',
+            'decorated_view',
+            'http_cached_view',
+            'owrapped_view',
+            'secured_view',
+            'authdebug_view',
+            ], dlist)
+
+
 class TestAddDerivation(unittest.TestCase):
 
     def setUp(self):
@@ -1092,15 +1185,16 @@ class TestAddDerivation(unittest.TestCase):
 
     def tearDown(self):
         self.config = None
+        testing.tearDown()
 
     def test_add_single_derivation(self):
         response = DummyResponse()
         response.deriv = False
         view = lambda *arg: response
 
-        def deriv(view, default, **kw):
+        def deriv(view, value, **kw):
             self.assertFalse(response.deriv)
-            self.assertEqual(default, None)
+            self.assertEqual(value, None)
             response.deriv = True
             return view
 
@@ -1113,17 +1207,17 @@ class TestAddDerivation(unittest.TestCase):
 
     def test_derivation_default(self):
         response = DummyResponse()
-        response.deriv_default = None
+        response.deriv_value = None
         test_default = object()
         view = lambda *arg: response
 
-        def deriv(view, default, **kw):
-            response.deriv_default = default
+        def deriv(view, value, **kw):
+            response.deriv_value = value
             return view
 
         self.config.add_view_derivation('test_default_deriv', deriv, default=test_default)
         result = self.config._derive_view(view)
-        self.assertEqual(response.deriv_default, test_default)
+        self.assertEqual(response.deriv_value, test_default)
 
     def test_override_derivation(self):
         flags = {}
@@ -1131,14 +1225,12 @@ class TestAddDerivation(unittest.TestCase):
         class AView:
             def __init__(self):
                 self.response = DummyResponse()
-            def __call__(self):
-                return self.response
 
-        def deriv1(view, default, **kw):
+        def deriv1(view, value, **kw):
             flags['deriv1'] = True
             return view
 
-        def deriv2(view, default, **kw):
+        def deriv2(view, value, **kw):
             flags['deriv2'] = True
             return view
 
@@ -1157,44 +1249,124 @@ class TestAddDerivation(unittest.TestCase):
 
     def test_override_derivation_default(self):
         response = DummyResponse()
-        response.deriv_default = None
+        response.deriv_value = None
         test_default1 = 'first default'
         test_default2 = 'second default'
         view = lambda *arg: response
 
-        def deriv(view, default, **kw):
-            response.deriv_default = default
+        def deriv(view, value, **kw):
+            response.deriv_value = value
             return view
 
         self.config.add_view_derivation('test_default_deriv', deriv, default=test_default1)
         result = self.config._derive_view(view)
-        self.assertEqual(response.deriv_default, test_default1)
+        self.assertEqual(response.deriv_value, test_default1)
         self.config.add_view_derivation('test_default_deriv', deriv, default=test_default2)
         result = self.config._derive_view(view)
-        self.assertEqual(response.deriv_default, test_default2)
+        self.assertEqual(response.deriv_value, test_default2)
 
     def test_add_multi_derivations_ordered(self):
         response = DummyResponse()
         view = lambda *arg: response
         response.deriv = []
 
-        def deriv1(view, default, **kw):
+        def deriv1(view, value, **kw):
             response.deriv.append('deriv1')
             return view
 
-        def deriv2(view, default, **kw):
+        def deriv2(view, value, **kw):
             response.deriv.append('deriv2')
             return view
 
-        def deriv3(view, default, **kw):
+        def deriv3(view, value, **kw):
             response.deriv.append('deriv3')
             return view
 
         self.config.add_view_derivation('deriv1', deriv1, default=None)
-        self.config.add_view_derivation('deriv2', deriv2, default=None, weighs_less_than='deriv1')
-        self.config.add_view_derivation('deriv3', deriv3, default=None, weighs_more_than='deriv2')
+        self.config.add_view_derivation('deriv2', deriv2, default=None, over='deriv1')
+        self.config.add_view_derivation('deriv3', deriv3, default=None, under='deriv2')
         result = self.config._derive_view(view)
         self.assertEqual(response.deriv, ['deriv2', 'deriv3', 'deriv1'])
+
+
+class TestDerivationIntegration(unittest.TestCase):
+    def setUp(self):
+        self.config = testing.setUp()
+
+    def tearDown(self):
+        self.config = None
+        testing.tearDown()
+
+    def _getViewCallable(self, config, ctx_iface=None, request_iface=None,
+                         name=''):
+        from zope.interface import Interface
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IView
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IExceptionViewClassifier
+        classifier = IViewClassifier
+        if ctx_iface is None:
+            ctx_iface = Interface
+        if request_iface is None:
+            request_iface = IRequest
+        return config.registry.adapters.lookup(
+            (classifier, request_iface, ctx_iface), IView, name=name,
+            default=None)
+
+    def _makeRequest(self, config):
+        request = DummyRequest()
+        request.registry = config.registry
+        return request
+
+    def test_view_options(self):
+        response = DummyResponse()
+        view = lambda *arg: response
+        response.deriv = []
+
+        def deriv1(view, value, **kw):
+            response.deriv.append(kw['options']['deriv1'])
+            return view
+
+        def deriv2(view, value, **kw):
+            response.deriv.append(kw['options']['deriv2'])
+            return view
+
+        self.config.add_view_derivation('deriv1', deriv1, default=None)
+        self.config.add_view_derivation('deriv2', deriv2, default=None)
+        self.config.add_view(view, deriv1='test1', deriv2='test2')
+        self.config.commit()
+
+        wrapper = self._getViewCallable(self.config)
+        request = self._makeRequest(self.config)
+        request.method = 'GET'
+        self.assertEqual(wrapper(None, request), response)
+        self.assertEqual(['test1', 'test2'], response.deriv)
+
+    def test_view_options_default_or_not(self):
+        response = DummyResponse()
+        view = lambda *arg: response
+        response.deriv = []
+
+        def deriv1(view, value, **kw):
+            response.deriv.append(value)
+            response.deriv.append(kw['options'].get('deriv1', None))
+            return view
+
+        def deriv2(view, value, **kw):
+            response.deriv.append(value)
+            response.deriv.append(kw['options'].get('deriv2', None))
+            return view
+
+        self.config.add_view_derivation('deriv1', deriv1, default=None)
+        self.config.add_view_derivation('deriv2', deriv2, default='test2')
+        self.config.add_view(view, deriv1='test1')
+        self.config.commit()
+
+        wrapper = self._getViewCallable(self.config)
+        request = self._makeRequest(self.config)
+        request.method = 'GET'
+        self.assertEqual(wrapper(None, request), response)
+        self.assertEqual(['test1', 'test1', 'test2', None], response.deriv)
 
 
 from zope.interface import implementer

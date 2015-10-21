@@ -115,6 +115,10 @@ class PredicateList(object):
             before=weighs_less_than,
             )
 
+    def names(self):
+        # Return the list of valid predicate names.
+        return self.sorter.names
+
     def make(self, config, **kw):
         # Given a configurator and a list of keywords, a predicate list is
         # computed.  Elsewhere in the code, we evaluate predicates using a
