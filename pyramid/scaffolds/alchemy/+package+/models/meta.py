@@ -31,7 +31,8 @@ def includeme(config):
 
 def get_session(transaction_manager, dbmaker):
     dbsession = dbmaker()
-    zope.sqlalchemy.register(dbsession, transaction_manager=transaction_manager)
+    zope.sqlalchemy.register(dbsession,
+                             transaction_manager=transaction_manager)
     return dbsession
 
 
@@ -43,5 +44,3 @@ def get_dbmaker(engine):
     dbmaker = sessionmaker()
     dbmaker.configure(bind=engine)
     return dbmaker
-
-
