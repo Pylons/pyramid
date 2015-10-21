@@ -196,7 +196,8 @@ class TestPShellCommand(unittest.TestCase):
     def test_command_loads_custom_items(self):
         command = self._makeOne()
         model = dummy.Dummy()
-        self.config_factory.items = [('m', model)]
+        user = dummy.Dummy()
+        self.config_factory.items = [('m', model), ('User', user)]
         shell = dummy.DummyShell()
         command.run(shell)
         self.assertTrue(self.config_factory.parser)
@@ -209,6 +210,7 @@ class TestPShellCommand(unittest.TestCase):
             'request':self.bootstrap.request,
             'root_factory':self.bootstrap.root_factory,
             'm':model,
+            'User': user,
         })
         self.assertTrue(self.bootstrap.closer.called)
         self.assertTrue(shell.help)
