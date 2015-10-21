@@ -2,6 +2,7 @@ from sqlalchemy import (
     Column,
     Integer,
     Text,
+    Index,
     )
 
 from sqlalchemy.ext.declarative import declarative_base
@@ -22,3 +23,5 @@ class MyModel(Base):
     id = Column(Integer, primary_key=True)
     name = Column(Text, unique=True)
     value = Column(Integer)
+
+Index('my_index', MyModel.name, unique=True, mysql_length=255)

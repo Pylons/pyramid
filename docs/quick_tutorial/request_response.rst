@@ -46,14 +46,17 @@ Steps
 #. Simplify the routes in ``request_response/tutorial/__init__.py``:
 
    .. literalinclude:: request_response/tutorial/__init__.py
+    :linenos:
 
 #. We only need one view in ``request_response/tutorial/views.py``:
 
    .. literalinclude:: request_response/tutorial/views.py
+    :linenos:
 
 #. Update the tests in ``request_response/tutorial/tests.py``:
 
    .. literalinclude:: request_response/tutorial/tests.py
+    :linenos:
 
 #. Now run the tests:
 

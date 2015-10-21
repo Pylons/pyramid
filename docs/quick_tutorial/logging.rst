@@ -16,9 +16,9 @@ we might need to detect problems when other people use the site. We
 need *logging*.
 
 Fortunately Pyramid uses the normal Python approach to logging. The
-scaffold generated, in your ``development.ini``, has a number of lines that
+scaffold generated in your ``development.ini`` has a number of lines that
 configure the logging for you to some reasonable defaults. You then see
-messages sent by Pyramid (for example, when a new request comes in.)
+messages sent by Pyramid, for example, when a new request comes in.
 
 Objectives
 ==========
@@ -42,6 +42,12 @@ Steps
    .. literalinclude:: logging/tutorial/views.py
     :linenos:
 
+#. Finally let's edit ``development.ini`` configuration file 
+   to enable logging for our Pyramid application:
+
+   .. literalinclude:: logging/development.ini
+       :language: ini
+
 #. Make sure the tests still pass:
 
    .. code-block:: bash
@@ -61,15 +67,10 @@ Steps
 Analysis
 ========
 
-Our ``development.ini`` configuration file wires up Python standard
-logging for our Pyramid application:
-
-.. literalinclude:: logging/development.ini
-    :language: ini
-
-In this, our ``tutorial`` Python package is setup as a logger
-and configured to log messages at a ``DEBUG`` or higher level. When you
-visit http://localhost:6543 your console will now show::
+In our configuration file ``development.ini``, our ``tutorial`` Python 
+package is setup as a logger and configured to log messages at a 
+``DEBUG`` or higher level. When you visit http://localhost:6543 your 
+console will now show::
 
  2013-08-09 10:42:42,968 DEBUG [tutorial.views][MainThread] In home view
 

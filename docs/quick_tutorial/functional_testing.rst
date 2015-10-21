@@ -10,7 +10,7 @@ Background
 ==========
 
 Unit tests are a common and popular approach to test-driven development
-(TDD.) In web applications, though, the templating and entire apparatus
+(TDD). In web applications, though, the templating and entire apparatus
 of a web site are important parts of the delivered quality. We'd like a
 way to test these.
 
