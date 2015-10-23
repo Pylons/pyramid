@@ -291,7 +291,7 @@ introduce a new shell by registering an entry point in your setup.py:
 
     setup(
         entry_points={
-            'pyramid.pshell': [
+            'pyramid.pshell_runner': [
               'myshell=my_app:ptpython_shell_factory',
             ],
         },
