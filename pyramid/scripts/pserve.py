@@ -14,6 +14,7 @@ import errno
 import logging
 import optparse
 import os
+import py_compile
 import re
 import subprocess
 import sys
@@ -820,7 +821,7 @@ class Monitor(object): # pragma: no cover
         if %errorlevel% == 3 goto repeat
 
     or run a monitoring process in Python (``pserve --reload`` does
-    this).  
+    this).
 
     Use the ``watch_file(filename)`` function to cause a reload/restart for
     other non-Python files (e.g., configuration files).  If you have
@@ -843,6 +844,7 @@ class Monitor(object): # pragma: no cover
         self.poll_interval = poll_interval
         self.extra_files = list(self.global_extra_files)
         self.instances.append(self)
+        self.syntax_error_files = []
         self.file_callbacks = list(self.global_file_callbacks)
 
     def _exit(self):
@@ -887,11 +889,28 @@ class Monitor(object): # pragma: no cover
                 continue
             if filename.endswith('.pyc') and os.path.exists(filename[:-1]):
                 mtime = max(os.stat(filename[:-1]).st_mtime, mtime)
+                pyc = True
+            else:
+                pyc = False
             if filename not in self.module_mtimes:
                 self.module_mtimes[filename] = mtime
             elif self.module_mtimes[filename] < mtime:
-                print("%s changed; reloading..." % filename)
-                return False
+                if pyc:
+                    filename = filename[:-1]
+                # check if a file has syntax errors. If so, track it until it's fixed
+                for filename_promise in self.syntax_error_files + [filename]:
+                    try:
+                        py_compile.compile(filename_promise, doraise=True)
+                    except py_compile.PyCompileError:
+                        print("%s has a SyntaxError; NOT reloading." % filename_promise)
+                        if filename_promise not in self.syntax_error_files:
+                            self.syntax_error_files.append(filename_promise)
+                    else:
+                        if filename_promise in self.syntax_error_files:
+                            self.syntax_error_files.remove(filename_promise)
+                if not self.syntax_error_files:
+                    print("%s changed; reloading..." % filename)
+                    return False
         return True
 
     def watch_file(self, cls, filename):
