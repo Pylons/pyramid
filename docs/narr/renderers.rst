@@ -609,8 +609,8 @@ Pyramid supports overriding almost every aspect of its setup through its
 :ref:`Conflict Resolution <automatic_conflict_resolution>` mechanism. This
 means that, in most cases, overriding a renderer is as simple as using the
 :meth:`pyramid.config.Configurator.add_renderer` method to redefine the
-template extension. For example, if you would like to override the ``.txt``
-extension to specify a new renderer, you could do the following:
+template extension. For example, if you would like to override the ``json``
+renderer to specify a new renderer, you could do the following:
 
 .. code-block:: python
 
