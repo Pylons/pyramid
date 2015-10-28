@@ -53,6 +53,21 @@ class SharedCookieSessionTests(object):
         session = self._makeOne(request, timeout=1)
         self.assertEqual(dict(session), {})
 
+    def test_timeout_str(self):
+        import time
+        request = testing.DummyRequest()
+        cookieval = self._serialize((time.time() - 5, 0, {'state': 1}))
+        request.cookies['session'] = cookieval
+        session = self._makeOne(request, timeout='1')
+        self.assertTrue(isinstance(session._timeout, int))
+
+    def test_timeout_invalid(self):
+        import time
+        request = testing.DummyRequest()
+        cookieval = self._serialize((time.time() - 5, 0, {'state': 1}))
+        request.cookies['session'] = cookieval
+        self.assertRaises(ValueError, self._makeOne, request, timeout='error')
+
     def test_timeout_never(self):
         import time
         request = testing.DummyRequest()

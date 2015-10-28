@@ -244,7 +244,7 @@ def BaseCookieSessionFactory(
         _cookie_secure = secure
         _cookie_httponly = httponly
         _cookie_on_exception = set_on_exception
-        _timeout = timeout
+        _timeout = timeout if timeout is None else int(timeout)
         _reissue_time = reissue_time
 
         # dirty flag
