@@ -844,7 +844,8 @@ class Monitor(object): # pragma: no cover
         self.poll_interval = poll_interval
         self.extra_files = list(self.global_extra_files)
         self.instances.append(self)
-        self.syntax_error_files = []
+        self.syntax_error_files = set()
+        self.pending_reload = False
         self.file_callbacks = list(self.global_file_callbacks)
 
     def _exit(self):
@@ -892,25 +893,34 @@ class Monitor(object): # pragma: no cover
                 pyc = True
             else:
                 pyc = False
-            if filename not in self.module_mtimes:
-                self.module_mtimes[filename] = mtime
-            elif self.module_mtimes[filename] < mtime:
+            old_mtime = self.module_mtimes.get(filename)
+            self.module_mtimes[filename] = mtime
+            if old_mtime is not None and old_mtime < mtime:
+                self.pending_reload = True
                 if pyc:
                     filename = filename[:-1]
-                # check if a file has syntax errors. If so, track it until it's fixed
-                for filename_promise in self.syntax_error_files + [filename]:
-                    try:
-                        py_compile.compile(filename_promise, doraise=True)
-                    except py_compile.PyCompileError:
-                        print("%s has a SyntaxError; NOT reloading." % filename_promise)
-                        if filename_promise not in self.syntax_error_files:
-                            self.syntax_error_files.append(filename_promise)
-                    else:
-                        if filename_promise in self.syntax_error_files:
-                            self.syntax_error_files.remove(filename_promise)
-                if not self.syntax_error_files:
-                    print("%s changed; reloading..." % filename)
-                    return False
+                is_valid = True
+                if filename.endswith('.py'):
+                    is_valid = self.check_syntax(filename)
+                if is_valid:
+                    print("%s changed ..." % filename)
+        if self.pending_reload and not self.syntax_error_files:
+            self.pending_reload = False
+            return False
+        return True
+
+    def check_syntax(self, filename):
+        # check if a file has syntax errors.
+        # If so, track it until it's fixed.
+        try:
+            py_compile.compile(filename, doraise=True)
+        except py_compile.PyCompileError:
+            print("%s has a SyntaxError; NOT reloading." % filename)
+            self.syntax_error_files.add(filename)
+            return False
+        else:
+            if filename in self.syntax_error_files:
+                self.syntax_error_files.remove(filename)
         return True
 
     def watch_file(self, cls, filename):
