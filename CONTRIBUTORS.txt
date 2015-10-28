@@ -252,3 +252,5 @@ Contributors
 - Igor Stroh, 2015/06/10
 
 - Jesse Dhillon, 2015/10/07
+
+- Rami Chousein, 2015/10/28
