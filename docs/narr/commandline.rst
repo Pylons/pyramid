@@ -107,9 +107,7 @@ found* message.
 
 .. index::
    single: interactive shell
-   single: IPython
    single: pshell
-   single: bpython
 
 .. _interactive_shell:
 
@@ -263,25 +261,75 @@ request is configured to generate urls from the host
     >>> request.route_url('home')
     'https://www.example.com/'
 
-.. index::
-   single: IPython
-   single: bpython
-
 .. _ipython_or_bpython:
 
-IPython or bpython
+Alternative Shells
 ~~~~~~~~~~~~~~~~~~
 
-If you have `IPython <http://en.wikipedia.org/wiki/IPython>`_ and/or `bpython
-<http://bpython-interpreter.org/>`_ in the interpreter you use to invoke the
-``pshell`` command, ``pshell`` will autodiscover and use the first one found,
-in this order: IPython, bpython, standard Python interpreter. However you could
-specifically invoke your choice with the ``-p choice`` or ``--python-shell
-choice`` option.
+The ``pshell`` command can be easily extended with alternate REPLs if the
+default python REPL is not satisfactory. Assuming you have a binding
+installed such as ``pyramid_ipython`` it will normally be auto-selected and
+used. You may also specifically invoke your choice with the ``-p choice`` or
+``--python-shell choice`` option.
 
 .. code-block:: text
 
-   $ $VENV/bin/pshell -p ipython | bpython | python development.ini#MyProject
+   $ $VENV/bin/pshell -p ipython development.ini#MyProject
+
+You may use the ``--list-shells`` option to see the available shells.
+
+.. code-block:: text
+
+   $ $VENV/bin/pshell --list-shells
+   Available shells:
+     bpython
+     ipython
+     python
+
+If you want to use a shell that isn't supported out of the box, you can
+introduce a new shell by registering an entry point in your setup.py:
+
+.. code-block:: python
+
+    setup(
+        entry_points={
+            'pyramid.pshell_runner': [
+              'myshell=my_app:ptpython_shell_factory',
+            ],
+        },
+    )
+
+And then your shell factory should return a function that accepts two
+arguments, ``env`` and ``help``, which would look like this:
+
+.. code-block:: python
+
+    from ptpython.repl import embed
+
+    def ptpython_shell_runner(env, help):
+        print(help)
+        return embed(locals=env)
+
+.. versionchanged:: 1.6
+   User-defined shells may be registered using entry points. Prior to this
+   the only supported shells were ``ipython``, ``bpython`` and ``python``.
+
+   ``ipython`` and ``bpython`` have been moved into their respective
+   packages ``pyramid_ipython`` and ``pyramid_bpython``.
+
+Setting a Default Shell
+~~~~~~~~~~~~~~~~~~~~~~~
+
+You may use the ``default_shell`` option in your ``[pshell]`` ini section to
+specify a list of preferred shells.
+
+.. code-block:: ini
+   :linenos:
+
+   [pshell]
+   default_shell = ptpython ipython bpython
+
+.. versionadded:: 1.6
 
 .. index::
    pair: routes; printing
@@ -319,20 +367,23 @@ For example:
    multiview                  /multiview                  app1.standard_views.multiview                 GET,PATCH
    not_post                   /not_post                   app1.standard_views.multview                  !POST,*
 
-``proutes`` generates a table with four columns: *Name*, *Pattern*, *Method*,
-and *View*.  The items listed in the
-Name column are route names, the items listed in the Pattern column are route
-patterns, and the items listed in the View column are representations of the
-view callable that will be invoked when a request matches the associated
-route pattern.  The view column may show ``<unknown>`` if no associated view
-callable could be found.  If no routes are configured within your
-application, nothing will be printed to the console when ``proutes``
-is executed.
+``proutes`` generates a table with four columns: *Name*, *Pattern*, *View*, and
+*Method*.  The items listed in the Name column are route names, the items
+listed in the Pattern column are route patterns, the items listed in the View
+column are representations of the view callable that will be invoked when a
+request matches the associated route pattern, and the items listed in the
+Method column are the request methods that are associated with the route name.
+The View column may show ``<unknown>`` if no associated view callable could be
+found.  The Method column, for the route name, may show either ``<route
+mismatch>`` if the view callable does not accept any of the route's request
+methods, or ``*`` if the view callable will accept any of the route's request
+methods.  If no routes are configured within your application, nothing will be
+printed to the console when ``proutes`` is executed.
 
-It is convenient when using the ``proutes`` often to configure which columns
-and the order you would like to view them. To facilitate this, ``proutes`` will
-look for a special ``[proutes]`` section in your INI file and use those as
-defaults.
+It is convenient when using the ``proutes`` command often to configure which
+columns and the order you would like to view them. To facilitate this,
+``proutes`` will look for a special ``[proutes]`` section in your ``.ini`` file
+and use those as defaults.
 
 For example you may remove the request method and place the view first:
 
