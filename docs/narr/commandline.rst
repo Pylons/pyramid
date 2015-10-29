@@ -107,9 +107,7 @@ found* message.
 
 .. index::
    single: interactive shell
-   single: IPython
    single: pshell
-   single: bpython
 
 .. _interactive_shell:
 
@@ -319,20 +317,23 @@ For example:
    multiview                  /multiview                  app1.standard_views.multiview                 GET,PATCH
    not_post                   /not_post                   app1.standard_views.multview                  !POST,*
 
-``proutes`` generates a table with four columns: *Name*, *Pattern*, *Method*,
-and *View*.  The items listed in the
-Name column are route names, the items listed in the Pattern column are route
-patterns, and the items listed in the View column are representations of the
-view callable that will be invoked when a request matches the associated
-route pattern.  The view column may show ``<unknown>`` if no associated view
-callable could be found.  If no routes are configured within your
-application, nothing will be printed to the console when ``proutes``
-is executed.
+``proutes`` generates a table with four columns: *Name*, *Pattern*, *View*, and
+*Method*.  The items listed in the Name column are route names, the items
+listed in the Pattern column are route patterns, the items listed in the View
+column are representations of the view callable that will be invoked when a
+request matches the associated route pattern, and the items listed in the
+Method column are the request methods that are associated with the route name.
+The View column may show ``<unknown>`` if no associated view callable could be
+found.  The Method column, for the route name, may show either ``<route
+mismatch>`` if the view callable does not accept any of the route's request
+methods, or ``*`` if the view callable will accept any of the route's request
+methods.  If no routes are configured within your application, nothing will be
+printed to the console when ``proutes`` is executed.
 
-It is convenient when using the ``proutes`` often to configure which columns
-and the order you would like to view them. To facilitate this, ``proutes`` will
-look for a special ``[proutes]`` section in your INI file and use those as
-defaults.
+It is convenient when using the ``proutes`` command often to configure which
+columns and the order you would like to view them. To facilitate this,
+``proutes`` will look for a special ``[proutes]`` section in your ``.ini`` file
+and use those as defaults.
 
 For example you may remove the request method and place the view first:
 
