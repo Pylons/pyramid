@@ -261,6 +261,8 @@ request is configured to generate urls from the host
     >>> request.route_url('home')
     'https://www.example.com/'
 
+.. _ipython_or_bpython:
+
 Alternative Shells
 ~~~~~~~~~~~~~~~~~~
 
