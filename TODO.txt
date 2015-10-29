@@ -47,11 +47,9 @@ Nice-to-Have
   the templates chapter and elsewhere.  Scan the documentation for reference
   to a renderer as *only* view configuration (it's a larger concept now).
 
-- Add better docs about what-to-do-when-behind-a-proxy: paste.urlmap ("/foo =
+- Add better docs about what-to-do-when-behind-a-proxy: rutter ("/foo =
   app1" and "domain app1.localhost = app1"), ProxyPreserveHost and the nginx
-  equivalent, preserving HTTPS URLs.
-
-- Alias the stupid long default session factory name.
+  proxy_params, preserving HTTPS URLs.
 
 - Debug option to print view matching decision (e.g. debug_viewlookup or so).
 
@@ -163,3 +161,5 @@ Probably Bad Ideas
 
 - _fix_registry should dictify the registry being fixed.
 
+- Apply a prefix to the userid principal to avoid poisoning the principal
+  namespace. See https://github.com/Pylons/pyramid/issues/2060
