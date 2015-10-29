@@ -9,7 +9,7 @@
   WebOb 1.5.
   See https://github.com/Pylons/pyramid/pull/1865
 
-1.4.9 (2014-04-28)
+1.4.9 (2015-04-28)
 ==================
 
 - Further fix the JSONP renderer by prefixing the returned content with
