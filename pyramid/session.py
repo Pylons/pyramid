@@ -390,7 +390,6 @@ def BaseCookieSessionFactory(
 def UnencryptedCookieSessionFactoryConfig(
     secret,
     timeout=1200,
-    reissue_time=0,
     cookie_name='session',
     cookie_max_age=None,
     cookie_path='/',
