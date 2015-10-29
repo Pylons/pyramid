@@ -267,7 +267,7 @@ request is configured to generate urls from the host
 
 .. _ipython_or_bpython:
 
-iPython or bpython
+IPython or bpython
 ~~~~~~~~~~~~~~~~~~
 
 If you have `IPython <http://en.wikipedia.org/wiki/IPython>`_ and/or `bpython
