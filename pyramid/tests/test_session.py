@@ -77,7 +77,6 @@ class SharedCookieSessionTests(object):
         request.cookies['session'] = cookieval
         self.assertRaises(ValueError, self._makeOne, request, timeout='error')
 
-
     def test_changed(self):
         request = testing.DummyRequest()
         session = self._makeOne(request)
@@ -313,6 +312,19 @@ class TestBaseCookieSession(SharedCookieSessionTests, unittest.TestCase):
         self.assertEqual(session['state'], 1)
         self.assertFalse(session._dirty)
 
+    def test_reissue_str_triggered(self):
+        import time
+        request = testing.DummyRequest()
+        cookieval = self._serialize((time.time() - 2, 0, {'state': 1}))
+        request.cookies['session'] = cookieval
+        session = self._makeOne(request, reissue_time='0')
+        self.assertEqual(session['state'], 1)
+        self.assertTrue(session._dirty)
+
+    def test_reissue_invalid(self):
+        request = testing.DummyRequest()
+        self.assertRaises(ValueError, self._makeOne, request, reissue_time='invalid value')
+
 class TestSignedCookieSession(SharedCookieSessionTests, unittest.TestCase):
     def _makeOne(self, request, **kw):
         from pyramid.session import SignedCookieSessionFactory
@@ -346,6 +358,19 @@ class TestSignedCookieSession(SharedCookieSessionTests, unittest.TestCase):
         session = self._makeOne(request, reissue_time=None, timeout=None)
         self.assertEqual(session['state'], 1)
         self.assertFalse(session._dirty)
+
+    def test_reissue_str_triggered(self):
+        import time
+        request = testing.DummyRequest()
+        cookieval = self._serialize((time.time() - 2, 0, {'state': 1}))
+        request.cookies['session'] = cookieval
+        session = self._makeOne(request, reissue_time='0')
+        self.assertEqual(session['state'], 1)
+        self.assertTrue(session._dirty)
+
+    def test_reissue_invalid(self):
+        request = testing.DummyRequest()
+        self.assertRaises(ValueError, self._makeOne, request, reissue_time='invalid value')
 
     def test_custom_salt(self):
         import time
