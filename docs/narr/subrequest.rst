@@ -17,6 +17,7 @@ application.
 Here's an example application which uses a subrequest:
 
 .. code-block:: python
+  :linenos:
 
    from wsgiref.simple_server import make_server
    from pyramid.config import Configurator
@@ -56,9 +57,12 @@ Note that it doesn't matter if the view callable invoked via a subrequest
 actually returns a *literal* Response object.  Any view callable that uses a
 renderer or which returns an object that can be interpreted by a response
 adapter when found and invoked via
-:meth:`pyramid.request.Request.invoke_subrequest` will return a Response object:
+:meth:`pyramid.request.Request.invoke_subrequest` will return a Response
+object:
 
 .. code-block:: python
+  :linenos:
+  :emphasize-lines: 11
 
    from wsgiref.simple_server import make_server
    from pyramid.config import Configurator
@@ -102,6 +106,8 @@ exception, the exception will be raised to the caller of
 :term:`exception view` configured:
 
 .. code-block:: python
+  :linenos:
+  :emphasize-lines: 11-16
 
    from wsgiref.simple_server import make_server
    from pyramid.config import Configurator
@@ -169,6 +175,8 @@ We can cause the subrequest to be run through the tween stack by passing
 :meth:`~pyramid.request.Request.invoke_subrequest`, like this:
 
 .. code-block:: python
+  :linenos:
+  :emphasize-lines: 7
 
    from wsgiref.simple_server import make_server
    from pyramid.config import Configurator
