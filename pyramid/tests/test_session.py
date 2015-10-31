@@ -322,6 +322,10 @@ class TestBaseCookieSession(SharedCookieSessionTests, unittest.TestCase):
         request = testing.DummyRequest()
         self.assertRaises(ValueError, self._makeOne, request, reissue_time='invalid value')
 
+    def test_cookie_max_age_invalid(self):
+        request = testing.DummyRequest()
+        self.assertRaises(ValueError, self._makeOne, request, max_age='invalid value')
+
 class TestSignedCookieSession(SharedCookieSessionTests, unittest.TestCase):
     def _makeOne(self, request, **kw):
         from pyramid.session import SignedCookieSessionFactory
@@ -368,6 +372,10 @@ class TestSignedCookieSession(SharedCookieSessionTests, unittest.TestCase):
     def test_reissue_invalid(self):
         request = testing.DummyRequest()
         self.assertRaises(ValueError, self._makeOne, request, reissue_time='invalid value')
+
+    def test_cookie_max_age_invalid(self):
+        request = testing.DummyRequest()
+        self.assertRaises(ValueError, self._makeOne, request, max_age='invalid value')
 
     def test_custom_salt(self):
         import time

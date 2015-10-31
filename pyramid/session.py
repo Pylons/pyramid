@@ -238,7 +238,7 @@ def BaseCookieSessionFactory(
 
         # configuration parameters
         _cookie_name = cookie_name
-        _cookie_max_age = max_age
+        _cookie_max_age = max_age if max_age is None else int(max_age)
         _cookie_path = path
         _cookie_domain = domain
         _cookie_secure = secure
