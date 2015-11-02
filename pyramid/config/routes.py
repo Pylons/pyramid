@@ -268,7 +268,7 @@ class RoutesConfiguratorMixin(object):
 
           Pass a key/value pair here to use a third-party predicate
           registered via
-          :meth:`pyramid.config.Configurator.add_view_predicate`.  More than
+          :meth:`pyramid.config.Configurator.add_route_predicate`.  More than
           one key/value pair can be used at the same time.  See
           :ref:`view_and_route_predicates` for more information about
           third-party predicates.
@@ -421,14 +421,14 @@ class RoutesConfiguratorMixin(object):
 
     @action_method
     def add_route_predicate(self, name, factory, weighs_more_than=None,
-                           weighs_less_than=None):
+                            weighs_less_than=None):
         """ Adds a route predicate factory.  The view predicate can later be
         named as a keyword argument to
         :meth:`pyramid.config.Configurator.add_route`.
 
         ``name`` should be the name of the predicate.  It must be a valid
         Python identifier (it will be used as a keyword argument to
-        ``add_view``).
+        ``add_route``).
 
         ``factory`` should be a :term:`predicate factory` or :term:`dotted
         Python name` which refers to a predicate factory.
