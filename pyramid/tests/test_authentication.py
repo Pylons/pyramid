@@ -600,6 +600,15 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         cookies.load(cookie)
         return cookies.get('auth_tkt')
 
+    def test_init_cookie_str_reissue_invalid(self):
+        self.assertRaises(ValueError, self._makeOne, 'secret', reissue_time='invalid value')
+
+    def test_init_cookie_str_timeout_invalid(self):
+        self.assertRaises(ValueError, self._makeOne, 'secret', timeout='invalid value')
+
+    def test_init_cookie_str_max_age_invalid(self):
+        self.assertRaises(ValueError, self._makeOne, 'secret', max_age='invalid value')
+
     def test_identify_nocookie(self):
         helper = self._makeOne('secret')
         request = self._makeRequest()
@@ -758,9 +767,31 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         result = helper.identify(request)
         self.assertEqual(result, None)
 
+    def test_identify_cookie_str_timeout(self):
+        helper = self._makeOne('secret', timeout='1')
+        request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=bogus'})
+        result = helper.identify(request)
+        self.assertEqual(result, None)
+
     def test_identify_cookie_reissue(self):
         import time
         helper = self._makeOne('secret', timeout=10, reissue_time=0)
+        now = time.time()
+        helper.auth_tkt.timestamp = now
+        helper.now = now + 1
+        helper.auth_tkt.tokens = (text_('a'), )
+        request = self._makeRequest('bogus')
+        result = helper.identify(request)
+        self.assertTrue(result)
+        self.assertEqual(len(request.callbacks), 1)
+        response = DummyResponse()
+        request.callbacks[0](request, response)
+        self.assertEqual(len(response.headerlist), 3)
+        self.assertEqual(response.headerlist[0][0], 'Set-Cookie')
+
+    def test_identify_cookie_str_reissue(self):
+        import time
+        helper = self._makeOne('secret', timeout=10, reissue_time='0')
         now = time.time()
         helper.auth_tkt.timestamp = now
         helper.now = now + 1
@@ -1060,12 +1091,27 @@ class TestAuthTktCookieHelper(unittest.TestCase):
     def test_remember_max_age(self):
         helper = self._makeOne('secret')
         request = self._makeRequest()
+        result = helper.remember(request, 'userid', max_age=500)
+        values = self._parseHeaders(result)
+        self.assertEqual(len(result), 3)
+
+        self.assertEqual(values[0]['max-age'], '500')
+        self.assertTrue(values[0]['expires'])
+
+    def test_remember_str_max_age(self):
+        helper = self._makeOne('secret')
+        request = self._makeRequest()
         result = helper.remember(request, 'userid', max_age='500')
         values = self._parseHeaders(result)
         self.assertEqual(len(result), 3)
 
         self.assertEqual(values[0]['max-age'], '500')
         self.assertTrue(values[0]['expires'])
+
+    def test_remember_str_max_age_invalid(self):
+        helper = self._makeOne('secret')
+        request = self._makeRequest()
+        self.assertRaises(ValueError, helper.remember, request, 'userid', max_age='invalid value')
 
     def test_remember_tokens(self):
         helper = self._makeOne('secret')
