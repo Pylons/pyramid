@@ -55,6 +55,9 @@ tests_require = [
 if not PY3:
     tests_require.append('zope.component>=3.11.0')
 
+if py_version == (2, 6):
+    tests_require.append('ordereddict')
+
 docs_extras = [
     'Sphinx >= 1.3.1',
     'docutils',
