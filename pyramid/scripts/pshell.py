@@ -3,6 +3,7 @@ import optparse
 import os
 import sys
 import textwrap
+import pkg_resources
 
 from pyramid.compat import configparser
 from pyramid.compat import exec_
@@ -11,11 +12,21 @@ from pyramid.paster import bootstrap
 
 from pyramid.paster import setup_logging
 
+from pyramid.settings import aslist
+
 from pyramid.scripts.common import parse_vars
 
 def main(argv=sys.argv, quiet=False):
     command = PShellCommand(argv, quiet)
     return command.run()
+
+
+def python_shell_runner(env, help, interact=interact):
+    cprt = 'Type "help" for more information.'
+    banner = "Python %s on %s\n%s" % (sys.version, sys.platform, cprt)
+    banner += '\n\n' + help + '\n'
+    interact(banner, local=env)
+
 
 class PShellCommand(object):
     usage = '%prog config_uri'
@@ -32,7 +43,8 @@ class PShellCommand(object):
     than one Pyramid application within it, the loader will use the
     last one.
     """
-    bootstrap = (bootstrap,) # for testing
+    bootstrap = (bootstrap,)  # for testing
+    pkg_resources = pkg_resources  # for testing
 
     parser = optparse.OptionParser(
         usage,
@@ -40,7 +52,14 @@ class PShellCommand(object):
         )
     parser.add_option('-p', '--python-shell',
                       action='store', type='string', dest='python_shell',
-                      default='', help='ipython | bpython | python')
+                      default='',
+                      help=('Select the shell to use. A list of possible '
+                            'shells is available using the --list-shells '
+                            'option.'))
+    parser.add_option('-l', '--list-shells',
+                      dest='list',
+                      action='store_true',
+                      help='List all available shells.')
     parser.add_option('--setup',
                       dest='setup',
                       help=("A callable that will be passed the environment "
@@ -49,9 +68,11 @@ class PShellCommand(object):
                             "[pshell] ini section."))
 
     ConfigParser = configparser.ConfigParser # testing
+    default_runner = python_shell_runner # testing
 
     loaded_objects = {}
     object_help = {}
+    preferred_shells = []
     setup = None
     pystartup = os.environ.get('PYTHONSTARTUP')
 
@@ -61,6 +82,7 @@ class PShellCommand(object):
 
     def pshell_file_config(self, filename):
         config = self.ConfigParser()
+        config.optionxform = str
         config.read(filename)
         try:
             items = config.items('pshell')
@@ -74,6 +96,8 @@ class PShellCommand(object):
         for k, v in items:
             if k == 'setup':
                 self.setup = v
+            elif k == 'default_shell':
+                self.preferred_shells = [x.lower() for x in aslist(v)]
             else:
                 self.loaded_objects[k] = resolver.maybe_resolve(v)
                 self.object_help[k] = v
@@ -83,6 +107,8 @@ class PShellCommand(object):
             print(msg)
 
     def run(self, shell=None):
+        if self.options.list:
+            return self.show_shells()
         if not self.args:
             self.out('Requires a config file argument')
             return 2
@@ -95,7 +121,7 @@ class PShellCommand(object):
         env = self.bootstrap[0](config_uri, options=parse_vars(self.args[1:]))
 
         # remove the closer from the env
-        closer = env.pop('closer')
+        self.closer = env.pop('closer')
 
         # setup help text for default environment
         env_help = dict(env)
@@ -122,7 +148,10 @@ class PShellCommand(object):
             # remove any objects from default help that were overidden
             for k, v in env.items():
                 if k not in orig_env or env[k] != orig_env[k]:
-                    env_help[k] = v
+                    if getattr(v, '__doc__', False):
+                        env_help[k] = v.__doc__.replace("\n", " ")
+                    else:
+                        env_help[k] = v
 
         # load the pshell section of the ini file
         env.update(self.loaded_objects)
@@ -145,7 +174,12 @@ class PShellCommand(object):
                 help += '\n  %-12s %s' % (var, self.object_help[var])
 
         if shell is None:
-            shell = self.make_shell()
+            try:
+                shell = self.make_shell()
+            except ValueError as e:
+                self.out(str(e))
+                self.closer()
+                return 1
 
         if self.pystartup and os.path.isfile(self.pystartup):
             with open(self.pystartup, 'rb') as fp:
@@ -156,92 +190,68 @@ class PShellCommand(object):
         try:
             shell(env, help)
         finally:
-            closer()
+            self.closer()
+
+    def show_shells(self):
+        shells = self.find_all_shells()
+        sorted_names = sorted(shells.keys(), key=lambda x: x.lower())
+
+        self.out('Available shells:')
+        for name in sorted_names:
+            self.out('  %s' % (name,))
+        return 0
+
+    def find_all_shells(self):
+        pkg_resources = self.pkg_resources
+
+        shells = {}
+        for ep in pkg_resources.iter_entry_points('pyramid.pshell_runner'):
+            name = ep.name
+            shell_factory = ep.load()
+            shells[name] = shell_factory
+        return shells
 
     def make_shell(self):
+        shells = self.find_all_shells()
+
         shell = None
         user_shell = self.options.python_shell.lower()
+
         if not user_shell:
-            shell = self.make_ipython_shell()
+            preferred_shells = self.preferred_shells
+            if not preferred_shells:
+                # by default prioritize all shells above python
+                preferred_shells = [k for k in shells.keys() if k != 'python']
+            max_weight = len(preferred_shells)
+            def order(x):
+                # invert weight to reverse sort the list
+                # (closer to the front is higher priority)
+                try:
+                    return preferred_shells.index(x[0].lower()) - max_weight
+                except ValueError:
+                    return 1
+            sorted_shells = sorted(shells.items(), key=order)
+
+            if len(sorted_shells) > 0:
+                shell = sorted_shells[0][1]
+
+        else:
+            runner = shells.get(user_shell)
+
+            if runner is not None:
+                shell = runner
+
             if shell is None:
-                shell = self.make_bpython_shell()
-
-        elif user_shell == 'ipython':
-            shell = self.make_ipython_shell()
-
-        elif user_shell == 'bpython':
-            shell = self.make_bpython_shell()
+                raise ValueError(
+                    'could not find a shell named "%s"' % user_shell
+                )
 
         if shell is None:
-            shell = self.make_default_shell()
+            # should never happen, but just incase entry points are borked
+            shell = self.default_runner
 
         return shell
 
-    def make_default_shell(self, interact=interact):
-        def shell(env, help):
-            cprt = 'Type "help" for more information.'
-            banner = "Python %s on %s\n%s" % (sys.version, sys.platform, cprt)
-            banner += '\n\n' + help + '\n'
-            interact(banner, local=env)
-        return shell
-
-    def make_bpython_shell(self, BPShell=None):
-        if BPShell is None: # pragma: no cover
-            try:
-                from bpython import embed
-                BPShell = embed
-            except ImportError:
-                return None
-        def shell(env, help):
-            BPShell(locals_=env, banner=help + '\n')
-        return shell
-
-    def make_ipython_shell(self):
-        shell = self.make_ipython_v1_1_shell()
-        if shell is None:
-            shell = self.make_ipython_v0_11_shell()
-        if shell is None:
-            shell = self.make_ipython_v0_10_shell()
-        return shell
-
-    def make_ipython_v1_1_shell(self, IPShellFactory=None):
-        if IPShellFactory is None: # pragma: no cover
-            try:
-                from IPython.terminal.embed import (
-                    InteractiveShellEmbed)
-                IPShellFactory = InteractiveShellEmbed
-            except ImportError:
-                return None
-        def shell(env, help):
-            IPShell = IPShellFactory(banner2=help + '\n', user_ns=env)
-            IPShell()
-        return shell
-
-    def make_ipython_v0_11_shell(self, IPShellFactory=None):
-        if IPShellFactory is None: # pragma: no cover
-            try:
-                from IPython.frontend.terminal.embed import (
-                    InteractiveShellEmbed)
-                IPShellFactory = InteractiveShellEmbed
-            except ImportError:
-                return None
-        def shell(env, help):
-            IPShell = IPShellFactory(banner2=help + '\n', user_ns=env)
-            IPShell()
-        return shell
-
-    def make_ipython_v0_10_shell(self, IPShellFactory=None):
-        if IPShellFactory is None: # pragma: no cover
-            try:
-                from IPython.Shell import IPShellEmbed
-                IPShellFactory = IPShellEmbed
-            except ImportError:
-                return None
-        def shell(env, help):
-            IPShell = IPShellFactory(argv=[], user_ns=env)
-            IPShell.set_banner(IPShell.IP.BANNER + '\n' + help + '\n')
-            IPShell()
-        return shell
 
 if __name__ == '__main__': # pragma: no cover
     sys.exit(main() or 0)

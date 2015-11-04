@@ -1,7 +1,7 @@
 .. _installing_chapter:
 
 Installing :app:`Pyramid`
-============================
+=========================
 
 .. index::
    single: install preparation
@@ -15,8 +15,8 @@ You will need `Python <http://python.org>`_ version 2.6 or better to run
 .. sidebar:: Python Versions
 
     As of this writing, :app:`Pyramid` has been tested under Python 2.6, Python
-    2.7, Python 3.2, Python 3.3, Python 3.4 and PyPy 2.2. :app:`Pyramid` does
-    not run under any version of Python before 2.6.
+    2.7, Python 3.2, Python 3.3, Python 3.4, PyPy, and PyPy3. :app:`Pyramid`
+    does not run under any version of Python before 2.6.
 
 :app:`Pyramid` is known to run on all popular UNIX-like systems such as Linux,
 Mac OS X, and FreeBSD as well as on Windows platforms.  It is also known to run
@@ -32,9 +32,9 @@ dependency will fall back to using pure Python instead.
 For Mac OS X Users
 ~~~~~~~~~~~~~~~~~~
 
-Python comes pre-installed on Mac OS X, but due to Apple's release cycle,
-it is often out of date. Unless you have a need for a specific earlier
-version, it is recommended to install the latest 2.x or 3.x version of Python.
+Python comes pre-installed on Mac OS X, but due to Apple's release cycle, it is
+often out of date. Unless you have a need for a specific earlier version, it is
+recommended to install the latest 2.x or 3.x version of Python.
 
 You can install the latest verion of Python for Mac OS X from the binaries on
 `python.org <https://www.python.org/downloads/mac-osx/>`_.
@@ -52,7 +52,7 @@ Alternatively, you can use the `homebrew <http://brew.sh/>`_ package manager.
 If you use an installer for your Python, then you can skip to the section
 :ref:`installing_unix`.
 
-If You Don't Yet Have A Python Interpreter (UNIX)
+If You Don't Yet Have a Python Interpreter (UNIX)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If your system doesn't have a Python interpreter, and you're on UNIX, you can
@@ -90,12 +90,12 @@ Source Compile Method
 
 It's useful to use a Python interpreter that *isn't* the "system" Python
 interpreter to develop your software.  The authors of :app:`Pyramid` tend not
-to use the system Python for development purposes; always a self-compiled one. 
+to use the system Python for development purposes; always a self-compiled one.
 Compiling Python is usually easy, and often the "system" Python is compiled
 with options that aren't optimal for web development. For an explanation, see
 https://github.com/Pylons/pyramid/issues/747.
 
-To compile software on your UNIX system, typically you need development tools. 
+To compile software on your UNIX system, typically you need development tools.
 Often these can be installed via the package manager.  For example, this works
 to do so on an Ubuntu Linux system:
 
@@ -128,7 +128,7 @@ Once these steps are performed, the Python interpreter will be invokable via
 .. index::
    pair: install; Python (from package, Windows)
 
-If You Don't Yet Have A Python Interpreter (Windows)
+If You Don't Yet Have a Python Interpreter (Windows)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If your Windows system doesn't have a Python interpreter, you'll need to
@@ -153,7 +153,7 @@ also need to download and install the Python for Windows extensions.
 .. _installing_unix:
 
 Installing :app:`Pyramid` on a UNIX System
----------------------------------------------
+------------------------------------------
 
 It is best practice to install :app:`Pyramid` into a "virtual" Python
 environment in order to obtain isolation from any "system" packages you've got
@@ -204,7 +204,7 @@ it using the Python interpreter into which you want to install setuptools.
 
    $ python ez_setup.py
 
-Once this command is invoked, setuptools should be installed on your system. 
+Once this command is invoked, setuptools should be installed on your system.
 If the command fails due to permission errors, you may need to be the
 administrative user on your system to successfully invoke the script.  To
 remediate this, you may need to do:
@@ -285,8 +285,8 @@ it's an absolute path.
     acceptable (and desirable) to create a virtualenv as a normal user.
 
 
-Installing :app:`Pyramid` Into the Virtual Python Environment
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Installing :app:`Pyramid` into the Virtual Python Environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 After you've got your virtualenv installed, you may install :app:`Pyramid`
 itself using the following commands:
@@ -301,9 +301,9 @@ complete, as it downloads and installs a number of dependencies.
 .. note::
 
    If you see any warnings and/or errors related to failing to compile the C
-   extensions, in most cases you may safely ignore those errors. If you wish
-   to use the C extensions, please verify that you have a functioning compiler
-   and the Python header files installed.
+   extensions, in most cases you may safely ignore those errors. If you wish to
+   use the C extensions, please verify that you have a functioning compiler and
+   the Python header files installed.
 
 .. index::
    single: installing on Windows
@@ -311,7 +311,7 @@ complete, as it downloads and installs a number of dependencies.
 .. _installing_windows:
 
 Installing :app:`Pyramid` on a Windows System
--------------------------------------------------
+---------------------------------------------
 
 You can use Pyramid on Windows under Python 2 or 3.
 
@@ -382,4 +382,3 @@ WebOb, PasteDeploy, and others are installed.
 
 Additionally, as chronicled in :ref:`project_narr`, scaffolds will be
 registered, which make it easy to start a new :app:`Pyramid` project.
-

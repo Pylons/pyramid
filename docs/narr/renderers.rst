@@ -5,8 +5,8 @@ Renderers
 
 A view callable needn't *always* return a :term:`Response` object.  If a view
 happens to return something which does not implement the Pyramid Response
-interface, :app:`Pyramid` will attempt to use a :term:`renderer` to construct
-a response.  For example:
+interface, :app:`Pyramid` will attempt to use a :term:`renderer` to construct a
+response.  For example:
 
 .. code-block:: python
    :linenos:
@@ -17,27 +17,26 @@ a response.  For example:
    def hello_world(request):
        return {'content':'Hello!'}
 
-The above example returns a *dictionary* from the view callable.  A
-dictionary does not implement the Pyramid response interface, so you might
-believe that this example would fail.  However, since a ``renderer`` is
-associated with the view callable through its :term:`view configuration` (in
-this case, using a ``renderer`` argument passed to
-:func:`~pyramid.view.view_config`), if the view does *not* return a Response
-object, the renderer will attempt to convert the result of the view to a
-response on the developer's behalf.
+The above example returns a *dictionary* from the view callable.  A dictionary
+does not implement the Pyramid response interface, so you might believe that
+this example would fail.  However, since a ``renderer`` is associated with the
+view callable through its :term:`view configuration` (in this case, using a
+``renderer`` argument passed to :func:`~pyramid.view.view_config`), if the view
+does *not* return a Response object, the renderer will attempt to convert the
+result of the view to a response on the developer's behalf.
 
-Of course, if no renderer is associated with a view's configuration,
-returning anything except an object which implements the Response interface
-will result in an error.  And, if a renderer *is* used, whatever is returned
-by the view must be compatible with the particular kind of renderer used, or
-an error may occur during view invocation.
+Of course, if no renderer is associated with a view's configuration, returning
+anything except an object which implements the Response interface will result
+in an error.  And, if a renderer *is* used, whatever is returned by the view
+must be compatible with the particular kind of renderer used, or an error may
+occur during view invocation.
 
-One exception exists: it is *always* OK to return a Response object, even
-when a ``renderer`` is configured.  In such cases, the renderer is
-bypassed entirely.
+One exception exists: it is *always* OK to return a Response object, even when
+a ``renderer`` is configured.  In such cases, the renderer is bypassed
+entirely.
 
-Various types of renderers exist, including serialization renderers
-and renderers which use templating systems.
+Various types of renderers exist, including serialization renderers and
+renderers which use templating systems.
 
 .. index::
    single: renderer
@@ -49,19 +48,19 @@ Writing View Callables Which Use a Renderer
 -------------------------------------------
 
 As we've seen, a view callable needn't always return a Response object.
-Instead, it may return an arbitrary Python object, with the expectation that
-a :term:`renderer` will convert that object into a response instance on your
-behalf.  Some renderers use a templating system; other renderers use object
-serialization techniques.  In practice, renderers obtain application data
-values from Python dictionaries so, in practice, view callables which use
+Instead, it may return an arbitrary Python object, with the expectation that a
+:term:`renderer` will convert that object into a response instance on your
+behalf.  Some renderers use a templating system, while other renderers use
+object serialization techniques.  In practice, renderers obtain application
+data values from Python dictionaries so, in practice, view callables which use
 renderers return Python dictionaries.
 
 View callables can :ref:`explicitly call <example_render_to_response_call>`
 renderers, but typically don't.  Instead view configuration declares the
 renderer used to render a view callable's results.  This is done with the
 ``renderer`` attribute.  For example, this call to
-:meth:`~pyramid.config.Configurator.add_view` associates the ``json``
-renderer with a view callable:
+:meth:`~pyramid.config.Configurator.add_view` associates the ``json`` renderer
+with a view callable:
 
 .. code-block:: python
 
@@ -71,19 +70,19 @@ When this configuration is added to an application, the
 ``myproject.views.my_view`` view callable will now use a ``json`` renderer,
 which renders view return values to a :term:`JSON` response serialization.
 
-Pyramid defines several :ref:`built_in_renderers`, and additional renderers
-can be added by developers to the system as necessary.
-See :ref:`adding_and_overriding_renderers`.
+Pyramid defines several :ref:`built_in_renderers`, and additional renderers can
+be added by developers to the system as necessary. See
+:ref:`adding_and_overriding_renderers`.
 
 Views which use a renderer and return a non-Response value can vary non-body
 response attributes (such as headers and the HTTP status code) by attaching a
-property to the ``request.response`` attribute.
-See :ref:`request_response_attr`.
+property to the ``request.response`` attribute. See
+:ref:`request_response_attr`.
 
 As already mentioned, if the :term:`view callable` associated with a
-:term:`view configuration` returns a Response object (or its instance),
-any renderer associated with the view configuration is ignored,
-and the response is passed back to :app:`Pyramid` unchanged.  For example:
+:term:`view configuration` returns a Response object (or its instance), any
+renderer associated with the view configuration is ignored, and the response is
+passed back to :app:`Pyramid` unchanged.  For example:
 
 .. code-block:: python
    :linenos:
@@ -126,7 +125,7 @@ avoid rendering:
 
 .. _built_in_renderers:
 
-Built-In Renderers
+Built-in Renderers
 ------------------
 
 Several built-in renderers exist in :app:`Pyramid`.  These renderers can be
@@ -134,8 +133,8 @@ used in the ``renderer`` attribute of view configurations.
 
 .. note::
 
-   Bindings for officially supported templating languages can be found
-   at :ref:`available_template_system_bindings`.
+   Bindings for officially supported templating languages can be found at
+   :ref:`available_template_system_bindings`.
 
 .. index::
    pair: renderer; string
@@ -143,17 +142,15 @@ used in the ``renderer`` attribute of view configurations.
 ``string``: String Renderer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The ``string`` renderer renders a view callable result to
-a string.  If a view callable returns a non-Response object, and the
-``string`` renderer is associated in that view's configuration, the result
-will be to run the object through the Python ``str`` function to generate a
-string.  Note that if a Unicode object is returned by the view callable, it
-is not ``str()`` -ified.
+The ``string`` renderer renders a view callable result to a string.  If a view
+callable returns a non-Response object, and the ``string`` renderer is
+associated in that view's configuration, the result will be to run the object
+through the Python ``str`` function to generate a string.  Note that if a
+Unicode object is returned by the view callable, it is not ``str()``-ified.
 
 Here's an example of a view that returns a dictionary.  If the ``string``
-renderer is specified in the configuration for this view, the view will
-render the returned dictionary to the ``str()`` representation of the
-dictionary:
+renderer is specified in the configuration for this view, the view will render
+the returned dictionary to the ``str()`` representation of the dictionary:
 
 .. code-block:: python
    :linenos:
@@ -164,8 +161,8 @@ dictionary:
    def hello_world(request):
        return {'content':'Hello!'}
 
-The body of the response returned by such a view will be a string
-representing the ``str()`` serialization of the return value:
+The body of the response returned by such a view will be a string representing
+the ``str()`` serialization of the return value:
 
 .. code-block:: python
 
@@ -184,13 +181,13 @@ JSON Renderer
 ~~~~~~~~~~~~~
 
 The ``json`` renderer renders view callable results to :term:`JSON`.  By
-default, it passes the return value through the ``json.dumps`` standard
-library function, and wraps the result in a response object.  It also sets
-the response content-type to ``application/json``.
+default, it passes the return value through the ``json.dumps`` standard library
+function, and wraps the result in a response object.  It also sets the response
+content-type to ``application/json``.
 
 Here's an example of a view that returns a dictionary.  Since the ``json``
-renderer is specified in the configuration for this view, the view will
-render the returned dictionary to a JSON serialization:
+renderer is specified in the configuration for this view, the view will render
+the returned dictionary to a JSON serialization:
 
 .. code-block:: python
    :linenos:
@@ -201,8 +198,8 @@ render the returned dictionary to a JSON serialization:
    def hello_world(request):
        return {'content':'Hello!'}
 
-The body of the response returned by such a view will be a string
-representing the JSON serialization of the return value:
+The body of the response returned by such a view will be a string representing
+the JSON serialization of the return value:
 
 .. code-block:: python
 
@@ -211,8 +208,8 @@ representing the JSON serialization of the return value:
 The return value needn't be a dictionary, but the return value must contain
 values serializable by the configured serializer (by default ``json.dumps``).
 
-You can configure a view to use the JSON renderer by naming``json`` as the
-``renderer`` argument of a view configuration, e.g. by using
+You can configure a view to use the JSON renderer by naming ``json`` as the
+``renderer`` argument of a view configuration, e.g., by using
 :meth:`~pyramid.config.Configurator.add_view`:
 
 .. code-block:: python
@@ -224,7 +221,7 @@ You can configure a view to use the JSON renderer by naming``json`` as the
                    renderer='json')
 
 Views which use the JSON renderer can vary non-body response attributes by
-using the api of the ``request.response`` attribute.  See
+using the API of the ``request.response`` attribute.  See
 :ref:`request_response_attr`.
 
 .. _json_serializing_custom_objects:
@@ -232,23 +229,23 @@ using the api of the ``request.response`` attribute.  See
 Serializing Custom Objects
 ++++++++++++++++++++++++++
 
-Some objects are not, by default, JSON-serializable (such as datetimes and 
-other arbitrary Python objects).  You can, however, register code that makes 
+Some objects are not, by default, JSON-serializable (such as datetimes and
+other arbitrary Python objects).  You can, however, register code that makes
 non-serializable objects serializable in two ways:
 
-- By defining a ``__json__`` method on objects in your application.
+- Define a ``__json__`` method on objects in your application.
 
-- For objects you don't "own", you can register JSON renderer that knows about 
-  an *adapter* for that kind of object.
+- For objects you don't "own", you can register a JSON renderer that knows
+  about an *adapter* for that kind of object.
 
 Using a Custom ``__json__`` Method
 **********************************
 
 Custom objects can be made easily JSON-serializable in Pyramid by defining a
 ``__json__`` method on the object's class. This method should return values
-natively JSON-serializable (such as ints, lists, dictionaries, strings, and
-so forth).  It should accept a single additional argument, ``request``, which
-will be the active request object at render time.
+natively JSON-serializable (such as ints, lists, dictionaries, strings, and so
+forth).  It should accept a single additional argument, ``request``, which will
+be the active request object at render time.
 
 .. code-block:: python
    :linenos:
@@ -272,14 +269,14 @@ will be the active request object at render time.
 Using the ``add_adapter`` Method of a Custom JSON Renderer
 **********************************************************
 
-If you aren't the author of the objects being serialized, it won't be
-possible (or at least not reasonable) to add a custom ``__json__`` method
-to their classes in order to influence serialization.  If the object passed
-to the renderer is not a serializable type, and has no ``__json__`` method,
-usually a :exc:`TypeError` will be raised during serialization.  You can
-change this behavior by creating a custom JSON renderer and adding adapters
-to handle custom types. The renderer will attempt to adapt non-serializable
-objects using the registered adapters. A short example follows:
+If you aren't the author of the objects being serialized, it won't be possible
+(or at least not reasonable) to add a custom ``__json__`` method to their
+classes in order to influence serialization.  If the object passed to the
+renderer is not a serializable type and has no ``__json__`` method, usually a
+:exc:`TypeError` will be raised during serialization.  You can change this
+behavior by creating a custom JSON renderer and adding adapters to handle
+custom types. The renderer will attempt to adapt non-serializable objects using
+the registered adapters. A short example follows:
 
 .. code-block:: python
    :linenos:
@@ -294,16 +291,17 @@ objects using the registered adapters. A short example follows:
        json_renderer.add_adapter(datetime.datetime, datetime_adapter)
        config.add_renderer('json', json_renderer)
 
-The ``add_adapter`` method should accept two arguments: the *class* of the object that you want this adapter to run for (in the example above, 
+The ``add_adapter`` method should accept two arguments: the *class* of the
+object that you want this adapter to run for (in the example above,
 ``datetime.datetime``), and the adapter itself.
 
-The adapter should be a callable.  It should accept two arguments: the object 
-needing to be serialized and ``request``, which will be the current request 
-object at render time. The adapter should raise a :exc:`TypeError` 
-if it can't determine what  to do with the object.
+The adapter should be a callable.  It should accept two arguments: the object
+needing to be serialized and ``request``, which will be the current request
+object at render time. The adapter should raise a :exc:`TypeError` if it can't
+determine what  to do with the object.
 
-See :class:`pyramid.renderers.JSON` and
-:ref:`adding_and_overriding_renderers` for more information.
+See :class:`pyramid.renderers.JSON` and :ref:`adding_and_overriding_renderers`
+for more information.
 
 .. versionadded:: 1.4
    Serializing custom objects.
@@ -319,12 +317,12 @@ JSONP Renderer
 .. versionadded:: 1.1
 
 :class:`pyramid.renderers.JSONP` is a `JSONP
-<http://en.wikipedia.org/wiki/JSONP>`_ renderer factory helper which
-implements a hybrid json/jsonp renderer.  JSONP is useful for making
-cross-domain AJAX requests.
+<http://en.wikipedia.org/wiki/JSONP>`_ renderer factory helper which implements
+a hybrid JSON/JSONP renderer.  JSONP is useful for making cross-domain AJAX
+requests.
 
-Unlike other renderers, a JSONP renderer needs to be configured at startup
-time "by hand".  Configure a JSONP renderer using the
+Unlike other renderers, a JSONP renderer needs to be configured at startup time
+"by hand".  Configure a JSONP renderer using the
 :meth:`pyramid.config.Configurator.add_renderer` method:
 
 .. code-block:: python
@@ -355,8 +353,8 @@ When a view is called that uses a JSONP renderer:
   renderer (by default, ``callback``), the renderer will return a JSONP
   response.
 
-- If there is no callback parameter in the request's query string, the
-  renderer will return a 'plain' JSON response.
+- If there is no callback parameter in the request's query string, the renderer
+  will return a "plain" JSON response.
 
 Javscript library AJAX functionality will help you make JSONP requests.
 For example, JQuery has a `getJSON function
@@ -364,7 +362,7 @@ For example, JQuery has a `getJSON function
 complicated) functionality in its `ajax function
 <http://api.jquery.com/jQuery.ajax/>`_.
 
-For example (Javascript):
+For example (JavaScript):
 
 .. code-block:: javascript
 
@@ -375,10 +373,9 @@ For example (Javascript):
                  '&callback=?';
    jqhxr = $.getJSON(api_url);
 
-The string ``callback=?`` above in the ``url`` param to the JQuery
-``getJSON`` function indicates to jQuery that the query should be made as
-a JSONP request; the ``callback`` parameter will be automatically filled
-in for you and used.
+The string ``callback=?`` above in the ``url`` param to the JQuery ``getJSON``
+function indicates to jQuery that the query should be made as a JSONP request;
+the ``callback`` parameter will be automatically filled in for you and used.
 
 The same custom-object serialization scheme defined used for a "normal" JSON
 renderer in :ref:`json_serializing_custom_objects` can be used when passing
@@ -397,10 +394,9 @@ Before a response constructed by a :term:`renderer` is returned to
 :app:`Pyramid`, several attributes of the request are examined which have the
 potential to influence response behavior.
 
-View callables that don't directly return a response should use the API of
-the :class:`pyramid.response.Response` attribute available as
-``request.response`` during their execution, to influence associated response
-behavior.
+View callables that don't directly return a response should use the API of the
+:class:`pyramid.response.Response` attribute, available as ``request.response``
+during their execution, to influence associated response behavior.
 
 For example, if you need to change the response status from within a view
 callable that uses a renderer, assign the ``status`` attribute to the
@@ -419,7 +415,7 @@ callable that uses a renderer, assign the ``status`` attribute to the
 Note that mutations of ``request.response`` in views which return a Response
 object directly will have no effect unless the response object returned *is*
 ``request.response``.  For example, the following example calls
-``request.response.set_cookie``, but this call will have no effect, because a
+``request.response.set_cookie``, but this call will have no effect because a
 different Response object is returned.
 
 .. code-block:: python
@@ -441,8 +437,8 @@ effect, you must return ``request.response``:
        request.response.set_cookie('abc', '123')
        return request.response
 
-For more information on attributes of the request, see the API documentation
-in :ref:`request_module`.  For more information on the API of
+For more information on attributes of the request, see the API documentation in
+:ref:`request_module`.  For more information on the API of
 ``request.response``, see :attr:`pyramid.request.Request.response`.
 
 .. _adding_and_overriding_renderers:
@@ -481,10 +477,9 @@ You may add a new renderer by creating and registering a :term:`renderer
 factory`.
 
 A renderer factory implementation should conform to the
-:class:`pyramid.interfaces.IRendererFactory` interface. It should be capable
-of creating an object that conforms to the
-:class:`pyramid.interfaces.IRenderer` interface. A typical class that follows
-this setup is as follows:
+:class:`pyramid.interfaces.IRendererFactory` interface. It should be capable of
+creating an object that conforms to the :class:`pyramid.interfaces.IRenderer`
+interface. A typical class that follows this setup is as follows:
 
 .. code-block:: python
    :linenos:
@@ -504,38 +499,36 @@ this setup is as follows:
            the result (a string or unicode object).  The value is
            the return value of a view.  The system value is a
            dictionary containing available system values
-           (e.g. view, context, and request). """
+           (e.g., view, context, and request). """
 
 The formal interface definition of the ``info`` object passed to a renderer
 factory constructor is available as :class:`pyramid.interfaces.IRendererInfo`.
 
 There are essentially two different kinds of renderer factories:
 
-- A renderer factory which expects to accept an :term:`asset
-  specification`, or an absolute path, as the ``name`` attribute of the
-  ``info`` object fed to its constructor.  These renderer factories are
-  registered with a ``name`` value that begins with a dot (``.``).  These
-  types of renderer factories usually relate to a file on the filesystem,
-  such as a template.
+- A renderer factory which expects to accept an :term:`asset specification`, or
+  an absolute path, as the ``name`` attribute of the ``info`` object fed to its
+  constructor.  These renderer factories are registered with a ``name`` value
+  that begins with a dot (``.``).  These types of renderer factories usually
+  relate to a file on the filesystem, such as a template.
 
-- A renderer factory which expects to accept a token that does not represent
-  a filesystem path or an asset specification in the ``name``
-  attribute of the ``info`` object fed to its constructor.  These renderer
-  factories are registered with a ``name`` value that does not begin with a
-  dot.  These renderer factories are typically object serializers.
+- A renderer factory which expects to accept a token that does not represent a
+  filesystem path or an asset specification in the ``name`` attribute of the
+  ``info`` object fed to its constructor.  These renderer factories are
+  registered with a ``name`` value that does not begin with a dot.  These
+  renderer factories are typically object serializers.
 
 .. sidebar:: Asset Specifications
 
-   An asset specification is a colon-delimited identifier for an
-   :term:`asset`.  The colon separates a Python :term:`package`
-   name from a package subpath.  For example, the asset
-   specification ``my.package:static/baz.css`` identifies the file named
-   ``baz.css`` in the ``static`` subdirectory of the ``my.package`` Python
-   :term:`package`.
+   An asset specification is a colon-delimited identifier for an :term:`asset`.
+   The colon separates a Python :term:`package` name from a package subpath.
+   For example, the asset specification ``my.package:static/baz.css``
+   identifies the file named ``baz.css`` in the ``static`` subdirectory of the
+   ``my.package`` Python :term:`package`.
 
 Here's an example of the registration of a simple renderer factory via
-:meth:`~pyramid.config.Configurator.add_renderer`, where ``config``
-is an instance of :meth:`pyramid.config.Configurator`:
+:meth:`~pyramid.config.Configurator.add_renderer`, where ``config`` is an
+instance of :meth:`pyramid.config.Configurator`:
 
 .. code-block:: python
 
@@ -556,16 +549,15 @@ renderer by specifying ``amf`` in the ``renderer`` attribute of a
    def myview(request):
        return {'Hello':'world'}
 
-At startup time, when a :term:`view configuration` is encountered, which
-has a ``name`` attribute that does not contain a dot, the full ``name``
-value is used to construct a renderer from the associated renderer
-factory.  In this case, the view configuration will create an instance
-of an ``MyAMFRenderer`` for each view configuration which includes ``amf``
-as its renderer value.  The ``name`` passed to the ``MyAMFRenderer``
-constructor will always be ``amf``.
+At startup time, when a :term:`view configuration` is encountered which has a
+``name`` attribute that does not contain a dot, the full ``name`` value is used
+to construct a renderer from the associated renderer factory.  In this case,
+the view configuration will create an instance of an ``MyAMFRenderer`` for each
+view configuration which includes ``amf`` as its renderer value.  The ``name``
+passed to the ``MyAMFRenderer`` constructor will always be ``amf``.
 
-Here's an example of the registration of a more complicated renderer
-factory, which expects to be passed a filesystem path:
+Here's an example of the registration of a more complicated renderer factory,
+which expects to be passed a filesystem path:
 
 .. code-block:: python
 
@@ -585,24 +577,23 @@ the ``renderer`` attribute of a :term:`view configuration`:
    def myview(request):
        return {'Hello':'world'}
 
-When a :term:`view configuration` is encountered at startup time, which
-has a ``name`` attribute that does contain a dot, the value of the name
-attribute is split on its final dot.  The second element of the split is
-typically the filename extension.  This extension is used to look up a
-renderer factory for the configured view.  Then the value of
-``renderer`` is passed to the factory to create a renderer for the view.
-In this case, the view configuration will create an instance of a
-``MyJinja2Renderer`` for each view configuration which includes anything
-ending with ``.jinja2`` in its ``renderer`` value.  The ``name`` passed
-to the ``MyJinja2Renderer`` constructor will be the full value that was
-set as ``renderer=`` in the view configuration.
+When a :term:`view configuration` is encountered at startup time which has a
+``name`` attribute that does contain a dot, the value of the name attribute is
+split on its final dot.  The second element of the split is typically the
+filename extension.  This extension is used to look up a renderer factory for
+the configured view.  Then the value of ``renderer`` is passed to the factory
+to create a renderer for the view. In this case, the view configuration will
+create an instance of a ``MyJinja2Renderer`` for each view configuration which
+includes anything ending with ``.jinja2`` in its ``renderer`` value.  The
+``name`` passed to the ``MyJinja2Renderer`` constructor will be the full value
+that was set as ``renderer=`` in the view configuration.
 
 Adding a Default Renderer
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To associate a *default* renderer with *all* view configurations (even
-ones which do not possess a ``renderer`` attribute), pass ``None`` as
-the ``name`` attribute to the renderer tag:
+To associate a *default* renderer with *all* view configurations (even ones
+which do not possess a ``renderer`` attribute), pass ``None`` as the ``name``
+attribute to the renderer tag:
 
 .. code-block:: python
 
@@ -616,40 +607,40 @@ Changing an Existing Renderer
 
 Pyramid supports overriding almost every aspect of its setup through its
 :ref:`Conflict Resolution <automatic_conflict_resolution>` mechanism. This
-means that in most cases overriding a renderer is as simple as using the
-:meth:`pyramid.config.Configurator.add_renderer` method to re-define the
-template extension. For example, if you would like to override the ``.txt``
-extension to specify a new renderer you could do the following:
+means that, in most cases, overriding a renderer is as simple as using the
+:meth:`pyramid.config.Configurator.add_renderer` method to redefine the
+template extension. For example, if you would like to override the ``json``
+renderer to specify a new renderer, you could do the following:
 
 .. code-block:: python
 
    json_renderer = pyramid.renderers.JSON()
    config.add_renderer('json', json_renderer)
 
-After doing this, any views registered with the ``json`` renderer will use
-the new renderer.
+After doing this, any views registered with the ``json`` renderer will use the
+new renderer.
 
 .. index::
    pair: renderer; overriding at runtime
 
-Overriding A Renderer At Runtime
+Overriding a Renderer at Runtime
 --------------------------------
 
 .. warning:: This is an advanced feature, not typically used by "civilians".
 
 In some circumstances, it is necessary to instruct the system to ignore the
 static renderer declaration provided by the developer in view configuration,
-replacing the renderer with another *after a request starts*.  For example,
-an "omnipresent" XML-RPC implementation that detects that the request is from
-an XML-RPC client might override a view configuration statement made by the
-user instructing the view to use a template renderer with one that uses an
-XML-RPC renderer.  This renderer would produce an XML-RPC representation of
-the data returned by an arbitrary view callable.
+replacing the renderer with another *after a request starts*.  For example, an
+"omnipresent" XML-RPC implementation that detects that the request is from an
+XML-RPC client might override a view configuration statement made by the user
+instructing the view to use a template renderer with one that uses an XML-RPC
+renderer.  This renderer would produce an XML-RPC representation of the data
+returned by an arbitrary view callable.
 
 To use this feature, create a :class:`~pyramid.events.NewRequest`
 :term:`subscriber` which sniffs at the request data and which conditionally
-sets an ``override_renderer`` attribute on the request itself, which is the
-*name* of a registered renderer.  For example:
+sets an ``override_renderer`` attribute on the request itself, which in turn is
+the *name* of a registered renderer.  For example:
 
 .. code-block:: python
    :linenos:
@@ -670,6 +661,6 @@ sets an ``override_renderer`` attribute on the request itself, which is the
            request.override_renderer = 'xmlrpc'
            return True
 
-The result of such a subscriber will be to replace any existing static
-renderer configured by the developer with a (notional, nonexistent) XML-RPC
-renderer if the request appears to come from an XML-RPC client.
+The result of such a subscriber will be to replace any existing static renderer
+configured by the developer with a (notional, nonexistent) XML-RPC renderer, if
+the request appears to come from an XML-RPC client.

@@ -83,6 +83,7 @@ setup(name='pyramid',
         "Programming Language :: Python :: 3.2",
         "Programming Language :: Python :: 3.3",
         "Programming Language :: Python :: 3.4",
+        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
         "Framework :: Pyramid",
@@ -110,6 +111,8 @@ setup(name='pyramid',
         starter=pyramid.scaffolds:StarterProjectTemplate
         zodb=pyramid.scaffolds:ZODBProjectTemplate
         alchemy=pyramid.scaffolds:AlchemyProjectTemplate
+        [pyramid.pshell_runner]
+        python=pyramid.scripts.pshell:python_shell_runner
         [console_scripts]
         pcreate = pyramid.scripts.pcreate:main
         pserve = pyramid.scripts.pserve:main

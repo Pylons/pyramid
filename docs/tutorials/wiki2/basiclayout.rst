@@ -204,7 +204,7 @@ Let's examine this in detail. First, we need some imports to support later code:
 Next we set up a SQLAlchemy ``DBSession`` object:
 
    .. literalinclude:: src/basiclayout/tutorial/models.py
-      :lines: 16
+      :lines: 17
       :language: py
 
 ``scoped_session`` and ``sessionmaker`` are standard SQLAlchemy helpers.
@@ -246,6 +246,9 @@ which accepts keyword arguments of the same name as that of the mapped attribute
 The ``MyModel`` class has a ``__tablename__`` attribute.  This informs
 SQLAlchemy which table to use to store the data representing instances of this
 class.
+
+The Index import and the Index object creation is not required for this
+tutorial, and will be removed in the next step.
 
 That's about all there is to it regarding models, views, and initialization
 code in our stock application.

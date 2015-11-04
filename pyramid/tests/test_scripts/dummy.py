@@ -21,36 +21,17 @@ dummy_registry = DummyRegistry()
 class DummyShell(object):
     env = {}
     help = ''
+    called = False
 
     def __call__(self, env, help):
         self.env = env
         self.help = help
+        self.called = True
 
 class DummyInteractor:
     def __call__(self, banner, local):
         self.banner = banner
         self.local = local
-
-class DummyBPythonShell:
-    def __call__(self, locals_, banner):
-        self.locals_ = locals_
-        self.banner = banner
-
-class DummyIPShell(object):
-    IP = Dummy()
-    IP.BANNER = 'foo'
-
-    def set_banner(self, banner):
-        self.banner = banner
-
-    def __call__(self):
-        self.called = True
-
-class DummyIPShellFactory(object):
-    def __call__(self, **kw):
-        self.kw = kw
-        self.shell = DummyIPShell()
-        return self.shell
 
 class DummyApp:
     def __init__(self):
@@ -157,3 +138,23 @@ class DummyBootstrap(object):
             'root_factory': self.root_factory,
             'closer': self.closer,
         }
+
+
+class DummyEntryPoint(object):
+    def __init__(self, name, module):
+        self.name = name
+        self.module = module
+
+    def load(self):
+        return self.module
+
+
+class DummyPkgResources(object):
+    def __init__(self, entry_point_values):
+        self.entry_points = []
+
+        for name, module in entry_point_values.items():
+            self.entry_points.append(DummyEntryPoint(name, module))
+
+    def iter_entry_points(self, name):
+        return self.entry_points
