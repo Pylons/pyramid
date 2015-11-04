@@ -136,7 +136,7 @@ introspectables in categories not described here.
   ``predicates``
 
     The predicate objects created as the result of passing predicate arguments
-    to ``add_subscriber``
+    to ``add_subscriber``.
 
   ``derived_predicates``
 
