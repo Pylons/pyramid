@@ -20,8 +20,7 @@ configuration settings.
 Using the Introspector
 ----------------------
 
-Here's an example of using Pyramid's introspector from within a view
-callable:
+Here's an example of using Pyramid's introspector from within a view callable:
 
 .. code-block:: python
     :linenos:
@@ -36,10 +35,10 @@ callable:
         route_intr = introspector.get('routes', route_name)
         return Response(str(route_intr['pattern']))
 
-This view will return a response that contains the "pattern" argument
-provided to the ``add_route`` method of the route which matched when the view
-was called.  It uses the :meth:`pyramid.interfaces.IIntrospector.get` method
-to return an introspectable in the category ``routes`` with a
+This view will return a response that contains the "pattern" argument provided
+to the ``add_route`` method of the route which matched when the view was
+called.  It uses the :meth:`pyramid.interfaces.IIntrospector.get` method to
+return an introspectable in the category ``routes`` with a
 :term:`discriminator` equal to the matched route name.  It then uses the
 returned introspectable to obtain a "pattern" value.
 
@@ -56,9 +55,9 @@ can be used to query for introspectables.
 Introspectable Objects
 ----------------------
 
-Introspectable objects are returned from query methods of an introspector.
-Each introspectable object implements the attributes and methods
-documented at :class:`pyramid.interfaces.IIntrospectable`.
+Introspectable objects are returned from query methods of an introspector. Each
+introspectable object implements the attributes and methods documented at
+:class:`pyramid.interfaces.IIntrospectable`.
 
 The important attributes shared by all introspectables are the following:
 
@@ -74,12 +73,12 @@ The important attributes shared by all introspectables are the following:
 
 ``discriminator``
 
-  A hashable object representing the unique value of this introspectable
-  within its category.
+  A hashable object representing the unique value of this introspectable within
+  its category.
 
 ``discriminator_hash``
 
-  The integer hash of the discriminator (useful for using in HTML links).
+  The integer hash of the discriminator (useful in HTML links).
 
 ``type_name``
 
@@ -90,8 +89,8 @@ The important attributes shared by all introspectables are the following:
 
 ``action_info``
 
-  An object describing the directive call site which caused this
-  introspectable to be registered; contains attributes described in
+  An object describing the directive call site which caused this introspectable
+  to be registered.  It contains attributes described in
   :class:`pyramid.interfaces.IActionInfo`.
 
 Besides having the attributes described above, an introspectable is a
@@ -116,12 +115,12 @@ introspectables in categories not described here.
 
   Each introspectable in the ``subscribers`` category represents a call to
   :meth:`pyramid.config.Configurator.add_subscriber` (or the decorator
-  equivalent); each will have the following data.
+  equivalent).  Each will have the following data.
 
   ``subscriber``
 
     The subscriber callable object (the resolution of the ``subscriber``
-    argument passed to ``add_susbcriber``).
+    argument passed to ``add_subscriber``).
 
   ``interfaces``
 
@@ -137,19 +136,19 @@ introspectables in categories not described here.
   ``predicates``
 
     The predicate objects created as the result of passing predicate arguments
-    to ``add_susbcriber``
+    to ``add_subscriber``.
 
   ``derived_predicates``
 
     Wrappers around the predicate objects created as the result of passing
-    predicate arguments to ``add_susbcriber`` (to be used when predicates take
+    predicate arguments to ``add_subscriber`` (to be used when predicates take
     only one value but must be passed more than one).
 
 ``response adapters``
 
   Each introspectable in the ``response adapters`` category represents a call
   to :meth:`pyramid.config.Configurator.add_response_adapter` (or a decorator
-  equivalent); each will have the following data.
+  equivalent).  Each will have the following data.
 
   ``adapter``
 
@@ -158,15 +157,14 @@ introspectables in categories not described here.
 
   ``type``
 
-    The resolved ``type_or_iface`` argument passed to
-    ``add_response_adapter``.
+    The resolved ``type_or_iface`` argument passed to ``add_response_adapter``.
 
 ``root factories``
 
   Each introspectable in the ``root factories`` category represents a call to
   :meth:`pyramid.config.Configurator.set_root_factory` (or the Configurator
   constructor equivalent) *or* a ``factory`` argument passed to
-  :meth:`pyramid.config.Configurator.add_route`; each will have the following
+  :meth:`pyramid.config.Configurator.add_route`.  Each will have the following
   data.
 
   ``factory``
@@ -184,7 +182,7 @@ introspectables in categories not described here.
 
   Only one introspectable will exist in the ``session factory`` category.  It
   represents a call to :meth:`pyramid.config.Configurator.set_session_factory`
-  (or the Configurator constructor equivalent); it will have the following
+  (or the Configurator constructor equivalent).  It will have the following
   data.
 
   ``factory``
@@ -196,7 +194,7 @@ introspectables in categories not described here.
 
   Only one introspectable will exist in the ``request factory`` category.  It
   represents a call to :meth:`pyramid.config.Configurator.set_request_factory`
-  (or the Configurator constructor equivalent); it will have the following
+  (or the Configurator constructor equivalent).  It will have the following
   data.
 
   ``factory``
@@ -206,10 +204,10 @@ introspectables in categories not described here.
 
 ``locale negotiator``
 
-  Only one introspectable will exist in the ``locale negotiator`` category.
-  It represents a call to
+  Only one introspectable will exist in the ``locale negotiator`` category.  It
+  represents a call to
   :meth:`pyramid.config.Configurator.set_locale_negotiator` (or the
-  Configurator constructor equivalent); it will have the following data.
+  Configurator constructor equivalent).  It will have the following data.
 
   ``negotiator``
 
@@ -218,9 +216,9 @@ introspectables in categories not described here.
 
 ``renderer factories``
 
-  Each introspectable in the ``renderer factories`` category represents a
-  call to :meth:`pyramid.config.Configurator.add_renderer` (or the
-  Configurator constructor equivalent); each will have the following data.
+  Each introspectable in the ``renderer factories`` category represents a call
+  to :meth:`pyramid.config.Configurator.add_renderer` (or the Configurator
+  constructor equivalent).  Each will have the following data.
 
   ``name``
 
@@ -229,13 +227,12 @@ introspectables in categories not described here.
 
   ``factory``
 
-    The factory object (the resolved ``factory`` argument to
-    ``add_renderer``).
+    The factory object (the resolved ``factory`` argument to ``add_renderer``).
 
 ``routes``
 
   Each introspectable in the ``routes`` category represents a call to
-  :meth:`pyramid.config.Configurator.add_route`; each will have the following
+  :meth:`pyramid.config.Configurator.add_route`.  Each will have the following
   data.
 
   ``name``
@@ -310,7 +307,7 @@ introspectables in categories not described here.
   There will be one and only one introspectable in the ``authentication
   policy`` category.  It represents a call to the
   :meth:`pyramid.config.Configurator.set_authentication_policy` method (or
-  its Configurator constructor equivalent); it will have the following data.
+  its Configurator constructor equivalent).  It will have the following data.
 
   ``policy``
 
@@ -319,10 +316,10 @@ introspectables in categories not described here.
 
 ``authorization policy``
 
-  There will be one and only one introspectable in the ``authorization
-  policy`` category.  It represents a call to the
+  There will be one and only one introspectable in the ``authorization policy``
+  category.  It represents a call to the
   :meth:`pyramid.config.Configurator.set_authorization_policy` method (or its
-  Configurator constructor equivalent); it will have the following data.
+  Configurator constructor equivalent).  It will have the following data.
 
   ``policy``
 
@@ -334,7 +331,7 @@ introspectables in categories not described here.
   There will be one and only one introspectable in the ``default permission``
   category.  It represents a call to the
   :meth:`pyramid.config.Configurator.set_default_permission` method (or its
-  Configurator constructor equivalent); it will have the following data.
+  Configurator constructor equivalent).  It will have the following data.
 
   ``value``
 
@@ -343,7 +340,7 @@ introspectables in categories not described here.
 ``views``
 
   Each introspectable in the ``views`` category represents a call to
-  :meth:`pyramid.config.Configurator.add_view`; each will have the following
+  :meth:`pyramid.config.Configurator.add_view`.  Each will have the following
   data.
 
   ``name``
@@ -423,8 +420,8 @@ introspectables in categories not described here.
 
   Each introspectable in the ``permissions`` category represents a call to
   :meth:`pyramid.config.Configurator.add_view` that has an explicit
-  ``permission`` argument to *or* a call to
-  :meth:`pyramid.config.Configurator.set_default_permission`; each will have
+  ``permission`` argument *or* a call to
+  :meth:`pyramid.config.Configurator.set_default_permission`.  Each will have
   the following data.
 
   ``value``
@@ -435,7 +432,7 @@ introspectables in categories not described here.
 
   Each introspectable in the ``templates`` category represents a call to
   :meth:`pyramid.config.Configurator.add_view` that has a ``renderer``
-  argument which points to a template; each will have the following data.
+  argument which points to a template.  Each will have the following data.
 
   ``name``
 
@@ -447,15 +444,15 @@ introspectables in categories not described here.
 
   ``renderer``
 
-    The :class:`pyramid.interfaces.IRendererInfo` object which represents
-    this template's renderer.
+    The :class:`pyramid.interfaces.IRendererInfo` object which represents this
+    template's renderer.
 
-``view mapper``
+``view mappers``
 
-  Each introspectable in the ``permissions`` category represents a call to
-  :meth:`pyramid.config.Configurator.add_view` that has an explicit
-  ``mapper`` argument to *or* a call to
-  :meth:`pyramid.config.Configurator.set_view_mapper`; each will have
+  Each introspectable in the ``view mappers`` category represents a call to
+  :meth:`pyramid.config.Configurator.add_view` that has an explicit ``mapper``
+  argument *or* a call to
+  :meth:`pyramid.config.Configurator.set_view_mapper`.  Each will have
   the following data.
 
   ``mapper``
@@ -465,14 +462,13 @@ introspectables in categories not described here.
 
 ``asset overrides``
 
-  Each introspectable in the ``asset overrides`` category represents a call
-  to :meth:`pyramid.config.Configurator.override_asset`; each will have the
+  Each introspectable in the ``asset overrides`` category represents a call to
+  :meth:`pyramid.config.Configurator.override_asset`.  Each will have the
   following data.
 
   ``to_override``
 
-    The ``to_override`` argument (an asset spec) passed to
-    ``override_asset``.
+    The ``to_override`` argument (an asset spec) passed to ``override_asset``.
 
   ``override_with``
 
@@ -481,10 +477,10 @@ introspectables in categories not described here.
 
 ``translation directories``
 
-  Each introspectable in the ``asset overrides`` category represents an
+  Each introspectable in the ``translation directories`` category represents an
   individual element in a ``specs`` argument passed to
-  :meth:`pyramid.config.Configurator.add_translation_dirs`; each will have
-  the following data.
+  :meth:`pyramid.config.Configurator.add_translation_dirs`.  Each will have the
+  following data.
 
   ``directory``
 
@@ -497,13 +493,13 @@ introspectables in categories not described here.
 ``tweens``
 
   Each introspectable in the ``tweens`` category represents a call to
-  :meth:`pyramid.config.Configurator.add_tween`; each will have the following
+  :meth:`pyramid.config.Configurator.add_tween`.  Each will have the following
   data.
 
   ``name``
 
-    The dotted name to the tween factory as a string (passed as
-    the ``tween_factory`` argument to ``add_tween``).
+    The dotted name to the tween factory as a string (passed as the
+    ``tween_factory`` argument to ``add_tween``).
 
   ``factory``
 
@@ -511,7 +507,7 @@ introspectables in categories not described here.
 
   ``type``
 
-    ``implict`` or ``explicit`` as a string.
+    ``implicit`` or ``explicit`` as a string.
 
   ``under``
 
@@ -524,7 +520,7 @@ introspectables in categories not described here.
 ``static views``
 
   Each introspectable in the ``static views`` category represents a call to
-  :meth:`pyramid.config.Configurator.add_static_view`; each will have the
+  :meth:`pyramid.config.Configurator.add_static_view`.  Each will have the
   following data.
 
   ``name``
@@ -539,13 +535,13 @@ introspectables in categories not described here.
 ``traversers``
 
   Each introspectable in the ``traversers`` category represents a call to
-  :meth:`pyramid.config.Configurator.add_traverser`; each will have the
+  :meth:`pyramid.config.Configurator.add_traverser`.  Each will have the
   following data.
 
   ``iface``
 
     The (resolved) interface or class object that represents the return value
-    of a root factory that this traverser will be used for.
+    of a root factory for which this traverser will be used.
 
   ``adapter``
 
@@ -554,7 +550,7 @@ introspectables in categories not described here.
 ``resource url adapters``
 
   Each introspectable in the ``resource url adapters`` category represents a
-  call to :meth:`pyramid.config.Configurator.add_resource_url_adapter`; each
+  call to :meth:`pyramid.config.Configurator.add_resource_url_adapter`.  Each
   will have the following data.
 
   ``adapter``
@@ -564,19 +560,20 @@ introspectables in categories not described here.
   ``resource_iface``
 
     The (resolved) interface or class object that represents the resource
-    interface that this url adapter is registered for.
+    interface for which this URL adapter is registered.
 
   ``request_iface``
 
     The (resolved) interface or class object that represents the request
-    interface that this url adapter is registered for.
+    interface for which this URL adapter is registered.
 
 Introspection in the Toolbar
 ----------------------------
 
 The Pyramid debug toolbar (part of the ``pyramid_debugtoolbar`` package)
 provides a canned view of all registered introspectables and their
-relationships.  It looks something like this:
+relationships.  It is currently under the "Global" tab in the main navigation,
+and it looks something like this:
 
 .. image:: tb_introspector.png
 
