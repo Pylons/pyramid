@@ -220,7 +220,7 @@ We also need to create a declarative ``Base`` object to use as a
 base class for our model:
 
    .. literalinclude:: src/basiclayout/tutorial/models.py
-      :lines: 17
+      :lines: 18
       :language: py
 
 Our model classes will inherit from this ``Base`` class so they can be
