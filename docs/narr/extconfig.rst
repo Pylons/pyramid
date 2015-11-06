@@ -215,9 +215,8 @@ view that names a nonexistent route via its ``route_name`` parameter will never
 be called).
 
 .. versionchanged:: 1.6
-  As of Pyramid 1.6 it is possible for one action to invoke another.
-
-See :ref:`ordering_actions` for more information.
+  As of Pyramid 1.6 it is possible for one action to invoke another. See
+  :ref:`ordering_actions` for more information.
 
 Finally, ``introspectables`` is a sequence of :term:`introspectable` objects.
 You can pass a sequence of introspectables to the
