@@ -216,8 +216,8 @@ be called).
 
 ``introspectables`` is a sequence of :term:`introspectable` objects.  You can
 pass a sequence of introspectables to the
-:meth:`~pyramid.config.Configurator.action` method, which allows you to
-augment Pyramid's configuration introspection system.
+:meth:`~pyramid.config.Configurator.action` method, which allows you to augment
+Pyramid's configuration introspection system.
 
 .. _introspection:
 
