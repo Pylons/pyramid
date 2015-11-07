@@ -82,11 +82,15 @@ join the `#pyramid IRC channel <irc://irc.freenode.net/#pyramid>`_.
 
 Browse and check out tagged and trunk versions of :app:`Pyramid` via the
 `Pyramid GitHub repository <https://github.com/Pylons/pyramid/>`_. To check out
-the trunk via ``git``, use this command:
+the trunk via ``git``, use either command:
 
 .. code-block:: text
 
+  # If you have SSH keys configured on GitHub:
   git clone git@github.com:Pylons/pyramid.git
+  
+  # Otherwise, HTTPS will work, using your GitHub login:
+  git clone https://github.com/Pylons/pyramid.git
 
 To find out how to become a contributor to :app:`Pyramid`, please see the
 `contributor's section of the documentation
