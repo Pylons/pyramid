@@ -4,10 +4,9 @@
 The Pyramid Web Framework
 =========================
 
-:app:`Pyramid` is a small, fast, down-to-earth Python web framework.  It
-is developed as part of the `Pylons Project
-<http://docs.pylonsproject.org/>`_.  It is licensed under a `BSD-like license
-<http://repoze.org/license.html>`_.
+:app:`Pyramid` is a small, fast, down-to-earth Python web framework.  It is
+developed as part of the `Pylons Project <http://docs.pylonsproject.org/>`_.
+It is licensed under a `BSD-like license <http://repoze.org/license.html>`_.
 
 Here is one of the simplest :app:`Pyramid` applications you can make:
 
@@ -15,30 +14,17 @@ Here is one of the simplest :app:`Pyramid` applications you can make:
 
 After you install :app:`Pyramid` and run this application, when you visit
 `<http://localhost:8080/hello/world>`_ in a browser, you will see the text
-``Hello, world!``
+``Hello, world!`` See :ref:`firstapp_chapter` for a full explanation of how
+this application works.
 
-See :ref:`firstapp_chapter` for a full explanation of how this application
-works. Read the :ref:`html_narrative_documentation` to understand how
-:app:`Pyramid` is designed to scale from simple applications like this to
-very large web applications.  To just dive in headfirst, read the 
-:doc:`quick_tour`.
-
-Front Matter
-============
-
-.. toctree::
-   :maxdepth: 1
-
-   copyright.rst
-   conventions.rst
 
 .. _html_getting_started:
 
 Getting Started
 ===============
 
-If you are new to Pyramid, we have a few resources that can help you get
-up to speed right away.
+If you are new to Pyramid, we have a few resources that can help you get up to
+speed right away.
 
 .. toctree::
    :hidden:
@@ -46,26 +32,69 @@ up to speed right away.
    quick_tour
    quick_tutorial/index
 
-* :doc:`quick_tour` goes through the major features in Pyramid, covering
-  a little about a lot.
+* :doc:`quick_tour` gives an overview of the major features in Pyramid,
+  covering a little about a lot.
 
-* :doc:`quick_tutorial/index` does the same, but in a tutorial format:
-  deeper treatment of each topic and with working code.
+* :doc:`quick_tutorial/index` is similar to the Quick Tour, but in a tutorial
+  format, with somewhat deeper treatment of each topic and with working code.
 
-* To see a minimal Pyramid web application, check out
-  :ref:`firstapp_chapter`.
+* Like learning by example? Visit the official :ref:`html_tutorials` as well as
+  the community-contributed :ref:`Pyramid tutorials
+  <tutorials:pyramid-tutorials>`, which include a :ref:`Todo List Application
+  in One File <tutorials:single-file-tutorial>`.
 
-* For help getting Pyramid set up, try
-  :ref:`installing_chapter`.
+* For help getting Pyramid set up, try :ref:`installing_chapter`.
 
-* Like learning by example? Visit the official
-  :doc:`wiki tutorial <../tutorials/wiki2/index>` as well as the
-  community-contributed
-  :ref:`Pyramid tutorials <tutorials:pyramid-tutorials>`, which include
-  a :ref:`single file tasks tutorial <tutorials:single-file-tutorial>`.
+* Need help?  See :ref:`Support and Development <support-and-development>`.
 
-* Need help?  See :ref:`Support and
-  Development <support-and-development>`.
+
+.. _html_tutorials:
+
+Tutorials
+=========
+
+Official tutorials explaining how to use :app:`Pyramid` to build various types
+of applications, and how to deploy :app:`Pyramid` applications to various
+platforms.
+
+.. toctree::
+   :maxdepth: 1
+
+   tutorials/wiki2/index.rst
+   tutorials/wiki/index.rst
+   tutorials/modwsgi/index.rst
+
+
+.. _support-and-development:
+
+Support and Development
+=======================
+
+The `Pylons Project web site <http://pylonsproject.org/>`_ is the main online
+source of :app:`Pyramid` support and development information.
+
+To report bugs, use the `issue tracker
+<https://github.com/Pylons/pyramid/issues>`_.
+
+If you've got questions that aren't answered by this documentation, contact the
+`Pylons-discuss maillist <http://groups.google.com/group/pylons-discuss>`_ or
+join the `#pyramid IRC channel <irc://irc.freenode.net/#pyramid>`_.
+
+Browse and check out tagged and trunk versions of :app:`Pyramid` via the
+`Pyramid GitHub repository <https://github.com/Pylons/pyramid/>`_. To check out
+the trunk via ``git``, use either command:
+
+.. code-block:: text
+
+  # If you have SSH keys configured on GitHub:
+  git clone git@github.com:Pylons/pyramid.git
+  
+  # Otherwise, HTTPS will work, using your GitHub login:
+  git clone https://github.com/Pylons/pyramid.git
+
+To find out how to become a contributor to :app:`Pyramid`, please see the
+`contributor's section of the documentation
+<http://docs.pylonsproject.org/en/latest/#contributing>`_.
 
 
 .. _html_narrative_documentation:
@@ -73,8 +102,7 @@ up to speed right away.
 Narrative Documentation
 =======================
 
-Narrative documentation in chapter form explaining how to use
-:app:`Pyramid`.
+Narrative documentation in chapter form explaining how to use :app:`Pyramid`.
 
 .. toctree::
    :maxdepth: 2
@@ -119,26 +147,12 @@ Narrative documentation in chapter form explaining how to use
    narr/threadlocals
    narr/zca
 
-.. _html_tutorials:
-
-Tutorials
-=========
-
-Tutorials explaining how to use :app:`Pyramid` to build various types of
-applications, and how to deploy :app:`Pyramid` applications to various
-platforms.
-
-.. toctree::
-   :maxdepth: 2
-
-   tutorials/wiki2/index.rst
-   tutorials/wiki/index.rst
-   tutorials/modwsgi/index.rst
 
 API Documentation
 =================
 
-Comprehensive reference material for every public API exposed by :app:`Pyramid`:
+Comprehensive reference material for every public API exposed by
+:app:`Pyramid`:
 
 .. toctree::
    :maxdepth: 1
@@ -146,6 +160,7 @@ Comprehensive reference material for every public API exposed by :app:`Pyramid`:
 
    api/index
    api/*
+
 
 Change History
 ==============
@@ -161,6 +176,7 @@ Change History
    whatsnew-1.0
    changes
 
+
 Design Documents
 ================
 
@@ -169,33 +185,24 @@ Design Documents
 
    designdefense
 
-.. _support-and-development:
 
-Support and Development
-=======================
+Copyright, Trademarks, and Attributions
+=======================================
 
-The `Pylons Project web site <http://pylonsproject.org/>`_ is the main online
-source of :app:`Pyramid` support and development information.
+.. toctree::
+   :maxdepth: 1
 
-To report bugs, use the `issue tracker
-<https://github.com/Pylons/pyramid/issues>`_.
+   copyright
 
-If you've got questions that aren't answered by this documentation,
-contact the `Pylons-discuss maillist
-<http://groups.google.com/group/pylons-discuss>`_ or join the `#pyramid
-IRC channel <irc://irc.freenode.net/#pyramid>`_.
 
-Browse and check out tagged and trunk versions of :app:`Pyramid` via
-the `Pyramid GitHub repository <https://github.com/Pylons/pyramid/>`_.
-To check out the trunk via ``git``, use this command:
+Typographical Conventions
+=========================
 
-.. code-block:: text
+.. toctree::
+   :maxdepth: 1
 
-  git clone git@github.com:Pylons/pyramid.git
+   conventions
 
-To find out how to become a contributor to :app:`Pyramid`, please see the
-`contributor's section of the documentation
-<http://docs.pylonsproject.org/en/latest/#contributing>`_.
 
 Index and Glossary
 ==================
