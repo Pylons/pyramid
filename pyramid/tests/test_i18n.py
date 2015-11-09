@@ -82,6 +82,22 @@ class TestLocalizer(unittest.TestCase):
                                      mapping={})
         self.assertEqual(result, 'plural')
 
+    def test_pluralize_non_german_language(self):
+        from pyramid.i18n import Translations
+        translations = Translations()
+        translations._catalog = {}
+        french_translations = Translations()
+        french_translations._catalog = {('singular', 0): 'singulier',
+                                        ('singular', 1): 'pluriel',}
+        # French plurals, as opposed to english where it is n != 1
+        french_translations.plural = lambda n: int(n > 1)
+        translations.add(french_translations)
+
+        localizer = self._makeOne(None, translations)
+        result = localizer.pluralize('singular', 'plural', 0, domain='1',
+                                     mapping={})
+        self.assertEqual(result, 'singulier')
+
 class Test_negotiate_locale_name(unittest.TestCase):
     def setUp(self):
         testing.setUp()
