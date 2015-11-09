@@ -4,8 +4,8 @@ Creating Pyramid Scaffolds
 ==========================
 
 You can extend Pyramid by creating a :term:`scaffold` template.  A scaffold
-template is useful if you'd like to distribute a customizable configuration
-of Pyramid to other users.  Once you've created a scaffold, and someone has
+template is useful if you'd like to distribute a customizable configuration of
+Pyramid to other users.  Once you've created a scaffold, and someone has
 installed the distribution that houses the scaffold, they can use the
 ``pcreate`` script to create a custom version of your scaffold's template.
 Pyramid itself uses scaffolds to allow people to bootstrap new projects.  For
@@ -15,22 +15,22 @@ example, ``pcreate -s alchemy MyStuff`` causes Pyramid to render the
 Basics
 ------
 
-A scaffold template is just a bunch of source files and directories on disk.
-A small definition class points at this directory; it is in turn pointed at
-by a :term:`setuptools` "entry point" which registers the scaffold so it can
-be found by the ``pcreate`` command.
+A scaffold template is just a bunch of source files and directories on disk. A
+small definition class points at this directory.  It is in turn pointed at by a
+:term:`setuptools` "entry point" which registers the scaffold so it can be
+found by the ``pcreate`` command.
 
 To create a scaffold template, create a Python :term:`distribution` to house
 the scaffold which includes a ``setup.py`` that relies on the ``setuptools``
 package.  See `Creating a Package
-<http://guide.python-distribute.org/creation.html>`_ for more information
-about how to do this.  For the sake of example, we'll pretend the
-distribution you create is named ``CoolExtension``, and it has a package
-directory within it named ``coolextension``
+<http://guide.python-distribute.org/creation.html>`_ for more information about
+how to do this.  For example, we'll pretend the distribution you create is
+named ``CoolExtension``, and it has a package directory within it named
+``coolextension``.
 
-Once you've created the distribution put a "scaffolds" directory within your
-distribution's package directory, and create a file within that directory
-named ``__init__.py`` with something like the following:
+Once you've created the distribution, put a "scaffolds" directory within your
+distribution's package directory, and create a file within that directory named
+``__init__.py`` with something like the following:
 
 .. code-block:: python
    :linenos:
@@ -54,12 +54,12 @@ As you create files and directories within the template directory, note that:
   the string value of the variable named ``var`` provided to the scaffold.
 
 - Files and directories with filenames that contain the string ``+var+`` will
-  have that string replaced with the value of the ``var`` variable provided
-  to the scaffold.
+  have that string replaced with the value of the ``var`` variable provided to
+  the scaffold.
 
 - Files that start with a dot (e.g., ``.env``) are ignored and will not be
   copied over to the destination directory. If you want to include a file with
-  a leading dot then you must replace the dot with ``+dot+`` (e.g.,
+  a leading dot, then you must replace the dot with ``+dot+`` (e.g.,
   ``+dot+env``).
 
 Otherwise, files and directories which live in the template directory will be
@@ -67,14 +67,14 @@ copied directly without modification to the ``pcreate`` output location.
 
 The variables provided by the default ``PyramidTemplate`` include ``project``
 (the project name provided by the user as an argument to ``pcreate``),
-``package`` (a lowercasing and normalizing of the project name provided by
-the user), ``random_string`` (a long random string), and ``package_logger``
-(the name of the package's logger).
+``package`` (a lowercasing and normalizing of the project name provided by the
+user), ``random_string`` (a long random string), and ``package_logger`` (the
+name of the package's logger).
 
 See Pyramid's "scaffolds" package
-(https://github.com/Pylons/pyramid/tree/master/pyramid/scaffolds) for
-concrete examples of scaffold directories (``zodb``, ``alchemy``, and
-``starter``, for example).
+(https://github.com/Pylons/pyramid/tree/master/pyramid/scaffolds) for concrete
+examples of scaffold directories (``zodb``, ``alchemy``, and ``starter``, for
+example).
 
 After you've created the template directory, add the following to the
 ``entry_points`` value of your distribution's ``setup.py``:
@@ -96,17 +96,16 @@ For example:
           """
         )
 
-Run your distribution's ``setup.py develop`` or ``setup.py install``
-command. After that, you should be able to see your scaffolding template
-listed when you run ``pcreate -l``.  It will be named ``coolextension``
-because that's the name we gave it in the entry point setup.  Running
-``pcreate -s coolextension MyStuff`` will then render your scaffold to an
-output directory named ``MyStuff``.
+Run your distribution's ``setup.py develop`` or ``setup.py install`` command.
+After that, you should be able to see your scaffolding template listed when you
+run ``pcreate -l``.  It will be named ``coolextension`` because that's the name
+we gave it in the entry point setup.  Running ``pcreate -s coolextension
+MyStuff`` will then render your scaffold to an output directory named
+``MyStuff``.
 
-See the module documentation for :mod:`pyramid.scaffolds` for information
-about the API of the :class:`pyramid.scaffolds.Template` class and
-related classes.  You can override methods of this class to get special
-behavior.
+See the module documentation for :mod:`pyramid.scaffolds` for information about
+the API of the :class:`pyramid.scaffolds.Template` class and related classes.
+You can override methods of this class to get special behavior.
 
 Supporting Older Pyramid Versions
 ---------------------------------
@@ -139,21 +138,22 @@ defining your scaffold template:
 
 And then in the setup.py of the package that contains your scaffold, define
 the template as a target of both ``paste.paster_create_template`` (for
-``paster create``) and ``pyramid.scaffold`` (for ``pcreate``)::
+``paster create``) and ``pyramid.scaffold`` (for ``pcreate``).
 
-      [paste.paster_create_template]
-      coolextension=coolextension.scaffolds:CoolExtensionTemplate
-      [pyramid.scaffold]
-      coolextension=coolextension.scaffolds:CoolExtensionTemplate
+.. code-block:: ini
 
-Doing this hideousness will allow your scaffold to work as a ``paster
-create`` target (under 1.0, 1.1, or 1.2) or as a ``pcreate`` target (under
-1.3).  If an invoker tries to run ``paster create`` against a scaffold
-defined this way under 1.3, an error is raised instructing them to use
-``pcreate`` instead.
+    [paste.paster_create_template]
+    coolextension=coolextension.scaffolds:CoolExtensionTemplate
+    [pyramid.scaffold]
+    coolextension=coolextension.scaffolds:CoolExtensionTemplate
 
-If you want only to support Pyramid 1.3 only, it's much cleaner, and the API
-is stable:
+Doing this hideousness will allow your scaffold to work as a ``paster create``
+target (under 1.0, 1.1, or 1.2) or as a ``pcreate`` target (under 1.3).  If an
+invoker tries to run ``paster create`` against a scaffold defined this way
+under 1.3, an error is raised instructing them to use ``pcreate`` instead.
+
+If you want to support Pyramid 1.3 only, it's much cleaner, and the API is
+stable:
 
 .. code-block:: python
    :linenos:
@@ -164,17 +164,17 @@ is stable:
        _template_dir = 'coolextension_scaffold'
        summary = 'My cool_extension'
 
-You only need to specify a ``paste.paster_create_template`` entry point
-target in your ``setup.py`` if you want your scaffold to be consumable by
-users of Pyramid 1.0, 1.1, or 1.2.  To support only 1.3, specifying only the
+You only need to specify a ``paste.paster_create_template`` entry point target
+in your ``setup.py`` if you want your scaffold to be consumable by users of
+Pyramid 1.0, 1.1, or 1.2.  To support only 1.3, specifying only the
 ``pyramid.scaffold`` entry point is good enough.  If you want to support both
-``paster create`` and ``pcreate`` (meaning you want to support Pyramid 1.2
-and some older version), you'll need to define both.
+``paster create`` and ``pcreate`` (meaning you want to support Pyramid 1.2 and
+some older version), you'll need to define both.
 
 Examples
 --------
 
 Existing third-party distributions which house scaffolding are available via
-:term:`PyPI`.  The ``pyramid_jqm``, ``pyramid_zcml`` and ``pyramid_jinja2``
+:term:`PyPI`.  The ``pyramid_jqm``, ``pyramid_zcml``, and ``pyramid_jinja2``
 packages house scaffolds.  You can install and examine these packages to see
 how they work in the quest to develop your own scaffolding.
