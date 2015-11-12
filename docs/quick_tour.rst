@@ -818,14 +818,14 @@ The ORM eases the mapping of database structures into a programming
 language. SQLAlchemy uses "models" for this mapping. The scaffold
 generated a sample model:
 
-.. literalinclude:: quick_tour/sqla_demo/sqla_demo/models.py
+.. literalinclude:: quick_tour/sqla_demo/sqla_demo/models/mymodel.py
     :start-after: Start Sphinx Include
     :end-before: End Sphinx Include
 
 View code, which mediates the logic between web requests and the rest
 of the system, can then easily get at the data thanks to SQLAlchemy:
 
-.. literalinclude:: quick_tour/sqla_demo/sqla_demo/views.py
+.. literalinclude:: quick_tour/sqla_demo/sqla_demo/views/default.py                    
     :start-after: Start Sphinx Include
     :end-before: End Sphinx Include
 
