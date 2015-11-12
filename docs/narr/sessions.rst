@@ -71,6 +71,35 @@ using the :meth:`pyramid.config.Configurator.set_session_factory` method.
    security doesn't matter", and you are sure your application has no
    cross-site scripting vulnerabilities.
 
+.. _encrypting_the_session:
+
+Encrypting the Session
+----------------------
+
+Pyramid provides an optional session serializer which encrypts the pickled
+session data using the Blowfish algorithm.  You can use this serializer in
+your :app:`Pyramid` application by using the
+:meth:`pyramid.config.Configurator.set_session_factory` method.
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.session import BaseCookieSessionFactory
+   from pyramid.session import BlowfishPickleSerializer
+   serializer = BlowfishPickleSerializer('itsaseekreet')
+   my_session_factory = BaseCookieSessionFactory(serializer)
+
+   from pyramid.config import Configurator
+   config = Configurator()
+   config.set_session_factory(my_session_factory)
+
+.. note::
+
+   The :class:`BlowfishPickleSerializer` requires that you install
+   the optional ``pycrypto`` dependency, either directly (e.g., via
+   ``easy_install pycrypto``) or via the ``encrypted_cookies`` extra
+   (e.g., ``easy_install pyramid[encrypted_cookies]``).
+
 .. index::
    single: session object
 

@@ -3,12 +3,23 @@ import binascii
 import hashlib
 import hmac
 import os
+import struct
 import time
 
 from zope.deprecation import deprecated
 from zope.interface import implementer
 
 from webob.cookies import SignedSerializer
+
+try:
+    from Crypto import Random
+except ImportError:  # pragma: NO COVER
+    _HAS_CRYPTO = False
+else:
+    _HAS_CRYPTO = True
+    from Crypto.Cipher import Blowfish
+    BLOCK_SIZE = Blowfish.block_size
+    IV = Random.new().read(BLOCK_SIZE)
 
 from pyramid.compat import (
     pickle,
@@ -155,7 +166,7 @@ def BaseCookieSessionFactory(
     ):
     """
     .. versionadded:: 1.5
-    
+
     Configure a :term:`session factory` which will provide cookie-based
     sessions.  The return value of this function is a :term:`session factory`,
     which may be provided as the ``session_factory`` argument of a
@@ -407,7 +418,7 @@ def UnencryptedCookieSessionFactoryConfig(
         compatible with cookies generated using
         ``UnencryptedCookieSessionFactory``, so existing user session data
         will be destroyed if you switch to it.
-    
+
     Configure a :term:`session factory` which will provide unencrypted
     (but signed) cookie-based sessions.  The return value of this
     function is a :term:`session factory`, which may be provided as
@@ -466,7 +477,7 @@ def UnencryptedCookieSessionFactoryConfig(
     class SerializerWrapper(object):
         def __init__(self, secret):
             self.secret = secret
-            
+
         def loads(self, bstruct):
             return signed_deserialize(bstruct, secret)
 
@@ -514,7 +525,7 @@ def SignedCookieSessionFactory(
     ):
     """
     .. versionadded:: 1.5
-    
+
     Configure a :term:`session factory` which will provide signed
     cookie-based sessions.  The return value of this
     function is a :term:`session factory`, which may be provided as
@@ -626,3 +637,46 @@ def SignedCookieSessionFactory(
         reissue_time=reissue_time,
         set_on_exception=set_on_exception,
     )
+
+class BlowfishPickleSerializer(object):
+    """ Encrypting Webob cookie serializer.
+
+    Uses the pickle protocol to dump Python data to bytes, then encrypts
+    the value symmetrically using the Blowfish algorithm.
+
+    To encrypt sessions, pass an instance of this class as the ``serializer``
+    argument to :class:`BaseCookieSessionFactory`.
+
+    .. note::
+
+       Before using this serializer, install ``pyramid[encrypted_cookies]`` to
+       get the necessary dependency (``pycrypto``).
+    """
+    def __init__(self, secret):
+        if not _HAS_CRYPTO:
+            raise ValueError("No crypto:  install 'pycrypto' first!")
+        self.secret = secret
+
+    def loads(self, bstruct):
+        iv, payload = bstruct[:BLOCK_SIZE], bstruct[BLOCK_SIZE:]
+        cipher = Blowfish.new(self.secret, Blowfish.MODE_CBC, iv)
+        payload = cipher.decrypt(payload)
+        return pickle.loads(payload)
+
+    def dumps(self, appstruct):
+        pickled = pickle.dumps(appstruct)
+        # For an explanation / example of the padding, see:
+        # https://www.dlitz.net/software/pycrypto/api/current/\
+        # Crypto.Cipher.Blowfish-module.html
+        residue = len(pickled) % BLOCK_SIZE
+        if residue > 0:
+            plen = BLOCK_SIZE - divmod(len(pickled), BLOCK_SIZE)[1]
+            padding = struct.pack(b'b' * plen, *([plen] * plen))
+        else:
+            padding = b''
+        cipher = Blowfish.new(self.secret, Blowfish.MODE_CBC, IV)
+        return IV + cipher.encrypt(pickled + padding)
+
+    def __eq__(self, other):
+        return (isinstance(other, self.__class__) and
+                self.secret == other.secret)

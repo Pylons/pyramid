@@ -433,6 +433,7 @@ class _SharedCookieSessionTests(object):
         self.assertTrue('Set-Cookie' in dict(response.headerlist))
 
 class TestBaseCookieSession(_SharedCookieSessionTests, unittest.TestCase):
+
     def _makeOne(self, request, **kw):
         from pyramid.session import BaseCookieSessionFactory
         serializer = DummySerializer()
@@ -653,6 +654,108 @@ class TestSignedCookieSession(_SharedCookieSessionTests, unittest.TestCase):
         self.assertEqual(result, None)
         self.assertTrue('Set-Cookie' in dict(response.headerlist))
 
+class TestBlowfishPickleSerializer(unittest.TestCase):
+
+    SECRET = 'SEEKRIT'
+
+    def _makeOne(self, secret):
+        from pyramid.session import BlowfishPickleSerializer
+        return BlowfishPickleSerializer(secret)
+
+    def test___init___wo_crypto(self):
+        from pyramid import session as MUT
+        with _Monkey(MUT, _HAS_CRYPTO=False):
+            self.assertRaises(ValueError, self._makeOne, self.SECRET)
+
+    def test___init___w_crypto(self):
+        from pyramid import session as MUT
+        with _Monkey(MUT, _HAS_CRYPTO=True):
+            serializer = self._makeOne(self.SECRET)
+        self.assertEqual(serializer.secret, self.SECRET)
+
+    def test_loads(self):
+        from pyramid import session as MUT
+        PAYLOAD = 'PAYLOAD'
+        IV = 'abcdefgh'
+        BLOCK_SIZE = len(IV)
+        _blowfish = _Blowfish(self.SECRET, _Blowfish.MODE_CBC, IV)
+        _pickle = _Pickle()
+        with _Monkey(MUT,
+                     _HAS_CRYPTO=True,
+                     Blowfish=_blowfish,
+                     pickle=_pickle,
+                     IV=IV,
+                     BLOCK_SIZE=BLOCK_SIZE):
+            serializer = self._makeOne(self.SECRET)
+            loaded = serializer.loads('%s%s' % (IV, PAYLOAD))
+        self.assertEqual(loaded, PAYLOAD)
+        self.assertEqual(_pickle._loaded, PAYLOAD)
+        self.assertEqual(_blowfish._decrypted, PAYLOAD)
+
+    def test_dumps_w_padding(self):
+        from pyramid import session as MUT
+        PAYLOAD = b'PAYLOAD'
+        # len(PAYLOAD) is 7, so one byte of padding
+        PADDED = PAYLOAD + b'\x01'
+        IV = b'DEADBEEF'
+        BLOCK_SIZE = len(IV)
+        _blowfish = _Blowfish(self.SECRET, _Blowfish.MODE_CBC, IV)
+        _pickle = _Pickle()
+        with _Monkey(MUT,
+                     _HAS_CRYPTO=True,
+                     Blowfish=_blowfish,
+                     pickle=_pickle,
+                     IV=IV,
+                     BLOCK_SIZE=BLOCK_SIZE):
+            serializer = self._makeOne(self.SECRET)
+            dumped = serializer.dumps(PAYLOAD)
+        self.assertEqual(dumped, IV + PADDED)
+        self.assertEqual(_pickle._dumped, PAYLOAD)
+        self.assertEqual(_blowfish._encrypted, PADDED)
+
+    def test_dumps_wo_padding(self):
+        from pyramid import session as MUT
+        PAYLOAD = b'PAYLOADX'
+        IV = b'DEADBEEF'
+        BLOCK_SIZE = len(IV)
+        _blowfish = _Blowfish(self.SECRET, _Blowfish.MODE_CBC, IV)
+        _pickle = _Pickle()
+        with _Monkey(MUT,
+                     _HAS_CRYPTO=True,
+                     Blowfish=_blowfish,
+                     pickle=_pickle,
+                     IV=IV,
+                     BLOCK_SIZE=BLOCK_SIZE):
+            serializer = self._makeOne(self.SECRET)
+            dumped = serializer.dumps(PAYLOAD)
+        self.assertEqual(dumped, IV + PAYLOAD)
+        self.assertEqual(_pickle._dumped, PAYLOAD)
+        self.assertEqual(_blowfish._encrypted, PAYLOAD)
+
+    def test___eq___w_different_type(self):
+        from pyramid import session as MUT
+        with _Monkey(MUT, _HAS_CRYPTO=True):
+            serializer = self._makeOne(self.SECRET)
+        self.assertNotEqual(serializer, object())
+
+    def test___eq___w_string(self):
+        from pyramid import session as MUT
+        with _Monkey(MUT, _HAS_CRYPTO=True):
+            serializer = self._makeOne(self.SECRET)
+        self.assertNotEqual(serializer, self.SECRET)
+
+    def test___eq___w_different_secret(self):
+        from pyramid import session as MUT
+        with _Monkey(MUT, _HAS_CRYPTO=True):
+            serializer = self._makeOne(self.SECRET)
+        self.assertNotEqual(serializer, self._makeOne('OTHER'))
+
+    def test___eq___w_same_secret(self):
+        from pyramid import session as MUT
+        with _Monkey(MUT, _HAS_CRYPTO=True):
+            serializer = self._makeOne(self.SECRET)
+        self.assertEqual(serializer, self._makeOne(self.SECRET))
+
 class DummySerializer(object):
     def dumps(self, value):
         import base64
@@ -691,3 +794,55 @@ class DummySessionFactory(dict):
 class DummyResponse(object):
     def __init__(self):
         self.headerlist = []
+
+class _Pickle(object):
+
+    _loaded = _dumped = None
+
+    def loads(self, payload):
+        self._loaded = payload
+        return payload
+
+    def dumps(self, payload):
+        self._dumped = payload
+        return payload
+
+class _Blowfish(object):
+
+    MODE_CBC = 'cbc'
+    _decrypted = _encrypted = None
+
+    def __init__(self, secret, mode, iv):
+        self.secret = secret
+        self.mode = mode
+        self.iv = iv
+
+    def new(self, secret, mode, iv):
+        assert secret == self.secret
+        assert mode == self.mode
+        assert iv == self.iv
+        return self
+
+    def decrypt(self, payload):
+        self._decrypted = payload
+        return payload
+
+    def encrypt(self, payload):
+        self._encrypted = payload
+        return payload
+
+class _Monkey(object):
+    # context-manager for replacing module names in the scope of a test.
+
+    def __init__(self, module, **kw):
+        self.module = module
+        self.to_restore = dict([(key, getattr(module, key)) for key in kw])
+        for key, value in kw.items():
+            setattr(module, key, value)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        for key, value in self.to_restore.items():
+            setattr(self.module, key, value)
