@@ -12,12 +12,12 @@ Application configuration with ``__init__.py``
 
 A directory on disk can be turned into a Python :term:`package` by containing
 an ``__init__.py`` file.  Even if empty, this marks a directory as a Python
-package.  We use ``__init__.py`` both as a marker, indicating the directory in
-which it's contained is a package, and to contain application configuration
+package.  We use ``__init__.py`` both as a marker, indicating the directory
+in which it's contained is a package, and to contain application configuration
 code.
 
-Open ``tutorial/tutorial/__init__.py``.  It should already contain the
-following:
+Open ``tutorial/tutorial/__init__.py``.  It should already contain
+the following:
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
       :linenos:
@@ -43,37 +43,58 @@ When you invoke the ``pserve development.ini`` command, the ``main`` function
 above is executed.  It accepts some settings and returns a :term:`WSGI`
 application.  (See :ref:`startup_chapter` for more about ``pserve``.)
 
+The main function first creates a :term:`SQLAlchemy` database engine using
+:func:`sqlalchemy.engine_from_config` from the ``sqlalchemy.`` prefixed
+settings in the ``development.ini`` file's ``[app:main]`` section.
+This will be a URI (something like ``sqlite://``):
+
+   .. literalinclude:: src/basiclayout/tutorial/__init__.py
+      :lines: 13
+      :language: py
+
+``main`` then initializes our SQLAlchemy session object, passing it the
+engine:
+
+   .. literalinclude:: src/basiclayout/tutorial/__init__.py
+      :lines: 14
+      :language: py
+
+``main`` subsequently initializes our SQLAlchemy declarative ``Base`` object,
+assigning the engine we created to the ``bind`` attribute of it's
+``metadata`` object.  This allows table definitions done imperatively
+(instead of declaratively, via a class statement) to work.  We won't use any
+such tables in our application, but if you add one later, long after you've
+forgotten about this tutorial, you won't be left scratching your head when it
+doesn't work.
+
+   .. literalinclude:: src/basiclayout/tutorial/__init__.py
+      :lines: 15
+      :language: py
+
 The next step of ``main`` is to construct a :term:`Configurator` object:
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
-      :lines: 7
+      :lines: 16
       :language: py
 
 ``settings`` is passed to the Configurator as a keyword argument with the
 dictionary values passed as the ``**settings`` argument.  This will be a
 dictionary of settings parsed from the ``.ini`` file, which contains
 deployment-related values such as ``pyramid.reload_templates``,
-``sqlalchemy.url``, and so on.
+``db_string``, etc.
 
-Next include :term:`Jinja2` templating bindings so that we can use renderers
-with the ``.jinja2`` extension within our project.
-
-   .. literalinclude:: src/basiclayout/tutorial/__init__.py
-      :lines: 8
-      :language: py
-
-Next include the module ``meta`` from the package ``models`` using a dotted
-Python path.
+Next, include :term:`Chameleon` templating bindings so that we can use
+renderers with the ``.pt`` extension within our project.
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
-      :lines: 9
+      :lines: 17
       :language: py
 
 ``main`` now calls :meth:`pyramid.config.Configurator.add_static_view` with
 two arguments: ``static`` (the name), and ``static`` (the path):
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
-      :lines: 10
+      :lines: 18
       :language: py
 
 This registers a static resource view which will match any URL that starts
@@ -91,11 +112,11 @@ via the :meth:`pyramid.config.Configurator.add_route` method that will be
 used when the URL is ``/``:
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
-      :lines: 11
+      :lines: 19
       :language: py
 
-Since this route has a ``pattern`` equaling ``/``, it is the route that will
-be matched when the URL ``/`` is visited, e.g., ``http://localhost:6543/``.
+Since this route has a ``pattern`` equaling ``/`` it is the route that will
+be matched when the URL ``/`` is visited, e.g. ``http://localhost:6543/``.
 
 ``main`` next calls the ``scan`` method of the configurator
 (:meth:`pyramid.config.Configurator.scan`), which will recursively scan our
@@ -105,10 +126,10 @@ view configuration will be registered, which will allow one of our
 application URLs to be mapped to some code.
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
-      :lines: 12
+      :lines: 20
       :language: py
 
-Finally ``main`` is finished configuring things, so it uses the
+Finally, ``main`` is finished configuring things, so it uses the
 :meth:`pyramid.config.Configurator.make_wsgi_app` method to return a
 :term:`WSGI` application:
 
@@ -162,39 +183,6 @@ inform the user about possible actions to take to solve the problem.
 
 Content Models with ``models.py``
 ---------------------------------
-
-.. START moved from Application configuration with ``__init__.py``. This
-  section is a WIP, and needs to be updated using the new models package.
-
-The main function first creates a :term:`SQLAlchemy` database engine using
-:func:`sqlalchemy.engine_from_config` from the ``sqlalchemy.`` prefixed
-settings in the ``development.ini`` file's ``[app:main]`` section.
-This will be a URI (something like ``sqlite://``):
-
-   .. literalinclude:: src/basiclayout/tutorial/__init__.py
-      :lines: 13
-      :language: py
-
-``main`` then initializes our SQLAlchemy session object, passing it the
-engine:
-
-   .. literalinclude:: src/basiclayout/tutorial/__init__.py
-      :lines: 14
-      :language: py
-
-``main`` subsequently initializes our SQLAlchemy declarative ``Base`` object,
-assigning the engine we created to the ``bind`` attribute of it's
-``metadata`` object.  This allows table definitions done imperatively
-(instead of declaratively, via a class statement) to work.  We won't use any
-such tables in our application, but if you add one later, long after you've
-forgotten about this tutorial, you won't be left scratching your head when it
-doesn't work.
-
-   .. literalinclude:: src/basiclayout/tutorial/__init__.py
-      :lines: 15
-      :language: py
-
-.. END moved from Application configuration with ``__init__.py``
 
 In a SQLAlchemy-based application, a *model* object is an object composed by
 querying the SQL database. The ``models.py`` file is where the ``alchemy``
