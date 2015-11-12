@@ -1,5 +1,8 @@
 import datetime
+import os.path
 import unittest
+
+here = os.path.dirname(__file__)
 
 # 5 years from now (more or less)
 fiveyrsfuture = datetime.datetime.utcnow() + datetime.timedelta(5*365)
@@ -405,6 +408,57 @@ class TestQueryStringConstantCacheBuster(unittest.TestCase):
         self.assertEqual(
             fut('foo', ('bar',), {'_query': (('a', 'b'),)}),
             (('bar',), {'_query': (('a', 'b'), ('x', 'foo'))}))
+
+class TestManifestCacheBuster(unittest.TestCase):
+
+    def _makeOne(self, path, **kw):
+        from pyramid.static import ManifestCacheBuster as cls
+        return cls(path, **kw)
+
+    def test_it(self):
+        manifest_path = os.path.join(here, 'fixtures', 'manifest.json')
+        fut = self._makeOne(manifest_path).pregenerate
+        self.assertEqual(fut('foo', ('bar',), {}), (['bar'], {}))
+        self.assertEqual(
+            fut('foo', ('css', 'main.css'), {}),
+            (['css', 'main-test.css'], {}))
+
+    def test_reload(self):
+        manifest_path = os.path.join(here, 'fixtures', 'manifest.json')
+        new_manifest_path = os.path.join(here, 'fixtures', 'manifest2.json')
+        inst = self._makeOne('foo', reload=True)
+        inst.getmtime = lambda *args, **kwargs: 0
+        fut = inst.pregenerate
+
+        # test without a valid manifest
+        self.assertEqual(
+            fut('foo', ('css', 'main.css'), {}),
+            (['css', 'main.css'], {}))
+
+        # swap to a real manifest, setting mtime to 0
+        inst.manifest_path = manifest_path
+        self.assertEqual(
+            fut('foo', ('css', 'main.css'), {}),
+            (['css', 'main-test.css'], {}))
+
+        # ensure switching the path doesn't change the result
+        inst.manifest_path = new_manifest_path
+        self.assertEqual(
+            fut('foo', ('css', 'main.css'), {}),
+            (['css', 'main-test.css'], {}))
+
+        # update mtime, should cause a reload
+        inst.getmtime = lambda *args, **kwargs: 1
+        self.assertEqual(
+            fut('foo', ('css', 'main.css'), {}),
+            (['css', 'main-678b7c80.css'], {}))
+
+    def test_invalid_manifest(self):
+        self.assertRaises(IOError, lambda: self._makeOne('foo'))
+
+    def test_invalid_manifest_with_reload(self):
+        inst = self._makeOne('foo', reload=True)
+        self.assertEqual(inst.manifest, {})
 
 class DummyContext:
     pass
