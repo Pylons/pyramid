@@ -10,7 +10,9 @@ from ..models.mymodel import MyModel
 def my_view(request):
     try:
         query = request.dbsession.query(MyModel)
+        # Start Sphinx Include
         one = query.filter(MyModel.name == 'one').first()
+        # End Sphinx Include
     except DBAPIError:
         return Response(db_err_msg, content_type='text/plain', status_int=500)
     return {'one': one, 'project': 'sqla_demo'}
