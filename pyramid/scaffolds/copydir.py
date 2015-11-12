@@ -106,9 +106,8 @@ def copy_dir(source, dest, vars, verbosity, simulate, indent=0,
         elif use_pkg_resources:
             content = pkg_resources.resource_string(source[0], full)
         else:
-            f = open(full, 'rb')
-            content = f.read()
-            f.close()
+            with open(full, 'rb') as f:
+                content = f.read()
         if sub_file:
             try:
                 content = substitute_content(
@@ -121,9 +120,8 @@ def copy_dir(source, dest, vars, verbosity, simulate, indent=0,
                 continue  # pragma: no cover
         already_exists = os.path.exists(dest_full)
         if already_exists:
-            f = open(dest_full, 'rb')
-            old_content = f.read()
-            f.close()
+            with open(dest_full, 'rb') as f:
+                old_content = f.read()
             if old_content == content:
                 if verbosity:
                     out('%s%s already exists (same content)' %
@@ -144,9 +142,8 @@ def copy_dir(source, dest, vars, verbosity, simulate, indent=0,
                 '%sCopying %s to %s' % (pad, os.path.basename(full),
                                         dest_full))
         if not simulate:
-            f = open(dest_full, 'wb')
-            f.write(content)
-            f.close()
+            with open(dest_full, 'wb') as f:
+                f.write(content)
 
 def should_skip_file(name):
     """
