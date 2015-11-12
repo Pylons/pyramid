@@ -1,6 +1,19 @@
 1.6 (2015-04-14)
 ================
 
+Backward Incompatibilities
+--------------------------
+
+- IPython and BPython support have been removed from pshell in the core.
+  To continue using them on Pyramid 1.6+ you must install the binding
+  packages explicitly::
+
+    $ pip install pyramid_ipython
+
+    or
+
+    $ pip install pyramid_bpython
+
 Features
 --------
 
@@ -135,7 +148,8 @@ Features
   https://github.com/Pylons/pyramid/pull/1610
 
 - Additional shells for ``pshell`` can now be registered as entrypoints. See
-  https://github.com/Pylons/pyramid/pull/1891
+  https://github.com/Pylons/pyramid/pull/1891 and
+  https://github.com/Pylons/pyramid/pull/2012
 
 - The variables injected into ``pshell`` are now displayed with their
   docstrings instead of the default ``str(obj)`` when possible.
@@ -212,6 +226,11 @@ Bug Fixes
   ``520 Unknown Error`` instead of ``None None`` to conform with changes in
   WebOb 1.5.
   See https://github.com/Pylons/pyramid/pull/1865
+
+- ``pshell`` will now preserve the capitalization of variables in the
+  ``[pshell]`` section of the INI file. This makes exposing classes to the
+  shell a little more straightfoward.
+  See https://github.com/Pylons/pyramid/pull/1883
 
 Deprecations
 ------------

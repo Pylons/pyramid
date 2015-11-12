@@ -1284,7 +1284,7 @@ class DummyView:
     def __call__(self, context, request):
         self.context = context
         self.request = request
-        if not self.raise_exception is None:
+        if self.raise_exception is not None:
             raise self.raise_exception
         return self.response
 

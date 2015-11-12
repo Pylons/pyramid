@@ -3,7 +3,9 @@ Contributing
 
 All projects under the Pylons Projects, including this one, follow the
 guidelines established at [How to
-Contribute](http://www.pylonsproject.org/community/how-to-contribute).
+Contribute](http://www.pylonsproject.org/community/how-to-contribute) and
+[Coding Style and
+Standards](http://docs.pylonsproject.org/en/latest/community/codestyle.html).
 
 You can contribute to this project in several ways.
 
@@ -13,10 +15,27 @@ You can contribute to this project in several ways.
   Flow](https://guides.github.com/introduction/flow/index.html) describes the
   workflow process and why it's a good practice. When submitting a pull
   request, sign
-  [CONTRIBUTORS.txt](https://github.com/Pylons/pyramid/blob/master/CONTRIBUTORS.
-txt)
+  [CONTRIBUTORS.txt](https://github.com/Pylons/pyramid/blob/master/CONTRIBUTORS.txt)
   if you have not yet done so.
 * Join the IRC channel #pyramid on irc.freenode.net.
+
+Git Branches
+------------
+Git branches and their purpose and status at the time of this writing are
+listed below.
+
+* [master](https://github.com/Pylons/pyramid/) - The branch on which further
+development takes place. The default branch on GitHub.
+* [1.6-branch](https://github.com/Pylons/pyramid/tree/1.6-branch) - The branch
+to which further development on master should be backported. This is also a
+development branch.
+* [1.5-branch](https://github.com/Pylons/pyramid/tree/1.5-branch) - The branch
+classified as "stable" or "latest". Actively maintained. 
+* [1.4-branch](https://github.com/Pylons/pyramid/tree/1.4-branch) - The oldest
+actively maintained and stable branch.
+
+Older branches are not actively maintained. In general, two stable branches and
+one or two development branches are actively maintained.
 
 Prerequisites
 -------------
@@ -38,7 +57,7 @@ System](http://docs.pylonsproject.org/projects/pyramid/en/latest/narr/install.ht
 1.  Fork the repo on GitHub by clicking the [Fork] button.
 2.  Clone your fork into a workspace on your local machine.
 
-         git@github.com:<username>/pyramid.git
+         git clone git@github.com:<username>/pyramid.git
 
 3.  Add a git remote "upstream" for the cloned fork.
 
@@ -65,8 +84,9 @@ System](http://docs.pylonsproject.org/projects/pyramid/en/latest/narr/install.ht
      load the built documentation in the `/_build/html/` directory in a web
      browser.
 
-6.  From this point forward, follow the typical git workflow.  Start by pulling
-    from the upstream to get the most current changes.
+6.  From this point forward, follow the typical [git
+    workflow](https://help.github.com/articles/what-is-a-good-git-workflow/).
+    Start by pulling from the upstream to get the most current changes.
 
          git pull upstream master
 
