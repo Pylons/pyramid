@@ -9,6 +9,9 @@
      :members:
      :inherited-members:
 
+  .. autoclass:: ManifestCacheBuster
+     :members:
+
   .. autoclass:: QueryStringCacheBuster
      :members:
 
