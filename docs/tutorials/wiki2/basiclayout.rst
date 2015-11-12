@@ -113,7 +113,7 @@ Finally ``main`` is finished configuring things, so it uses the
 :term:`WSGI` application:
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
-      :lines: 21
+      :lines: 13
       :language: py
 
 
@@ -162,94 +162,99 @@ database and provide an alternate error response.  That response will include
 the text shown at the end of the file, which will be displayed in the browser
 to inform the user about possible actions to take to solve the problem.
 
-Content models with ``models.py``
----------------------------------
-
-.. START moved from Application configuration with ``__init__.py``. This
-  section is a WIP, and needs to be updated using the new models package.
-
-The main function first creates a :term:`SQLAlchemy` database engine using
-:func:`sqlalchemy.engine_from_config` from the ``sqlalchemy.`` prefixed
-settings in the ``development.ini`` file's ``[app:main]`` section.
-This will be a URI (something like ``sqlite://``):
-
-   .. literalinclude:: src/basiclayout/tutorial/__init__.py
-      :lines: 13
-      :language: py
-
-``main`` then initializes our SQLAlchemy session object, passing it the
-engine:
-
-   .. literalinclude:: src/basiclayout/tutorial/__init__.py
-      :lines: 14
-      :language: py
-
-``main`` subsequently initializes our SQLAlchemy declarative ``Base`` object,
-assigning the engine we created to the ``bind`` attribute of it's
-``metadata`` object.  This allows table definitions done imperatively
-(instead of declaratively, via a class statement) to work.  We won't use any
-such tables in our application, but if you add one later, long after you've
-forgotten about this tutorial, you won't be left scratching your head when it
-doesn't work.
-
-   .. literalinclude:: src/basiclayout/tutorial/__init__.py
-      :lines: 15
-      :language: py
-
-.. END moved from Application configuration with ``__init__.py``
+Content models with the ``models`` package
+------------------------------------------
 
 In a SQLAlchemy-based application, a *model* object is an object composed by
-querying the SQL database. The ``models.py`` file is where the ``alchemy``
+querying the SQL database. The ``models`` package is where the ``alchemy``
 scaffold put the classes that implement our models.
 
-Open ``tutorial/tutorial/models.py``.  It should already contain the following:
+First, open ``tutorial/tutorial/models/__init__.py``, which should already
+contain the following:
 
-   .. literalinclude:: src/basiclayout/tutorial/models.py
+   .. literalinclude:: src/basiclayout/tutorial/models/__init__.py
       :linenos:
       :language: py
 
-Let's examine this in detail. First, we need some imports to support later code:
+Our ``__init__.py`` will perform some imports to support later code, then calls
+the function :func:`sqlalchemy.orm.configure_mappers`.
 
-   .. literalinclude:: src/basiclayout/tutorial/models.py
-      :end-before: DBSession
+Next open ``tutorial/tutorial/models/meta.py``, which should already contain
+the following:
+
+   .. literalinclude:: src/basiclayout/tutorial/models/meta.py
       :linenos:
       :language: py
 
-Next we set up a SQLAlchemy ``DBSession`` object:
+``meta.py`` contains imports that are used to support later code. We create a
+dictionary ``NAMING_CONVENTION`` as well.
 
-   .. literalinclude:: src/basiclayout/tutorial/models.py
-      :lines: 17
+   .. literalinclude:: src/basiclayout/tutorial/models/meta.py
+      :end-before: metadata
+      :linenos:
       :language: py
 
-``scoped_session`` and ``sessionmaker`` are standard SQLAlchemy helpers.
-``scoped_session`` allows us to access our database connection globally.
-``sessionmaker`` creates a database session object.  We pass to
-``sessionmaker`` the ``extension=ZopeTransactionExtension()`` extension
-option in order to allow the system to automatically manage database
-transactions.  With ``ZopeTransactionExtension`` activated, our application
-will automatically issue a transaction commit after every request unless an
-exception is raised, in which case the transaction will be aborted.
+Next we create a ``metadata`` object from the class
+:class:`sqlalchemy.schema.MetaData`, using ``NAMING_CONVENTION`` as the value
+for the ``naming_convention`` argument. We also need to create a declarative
+``Base`` object to use as a base class for our model. Then our model classes
+will inherit from the ``Base`` class so they can be associated with our
+particular database connection.
 
-We also need to create a declarative ``Base`` object to use as a
-base class for our model:
-
-   .. literalinclude:: src/basiclayout/tutorial/models.py
-      :lines: 17
+   .. literalinclude:: src/basiclayout/tutorial/models/meta.py
+      :lines: 15-16
+      :lineno-start: 15
+      :linenos:
       :language: py
 
-Our model classes will inherit from this ``Base`` class so they can be
-associated with our particular database connection.
+Next we define several functions, the first of which is ``includeme``, which
+configures various database settings by calling subsequently defined functions.
 
-To give a simple example of a  model class, we define one named ``MyModel``:
+   .. literalinclude:: src/basiclayout/tutorial/models/meta.py
+      :pyobject: includeme
+      :linenos:
+      :language: py
 
-   .. literalinclude:: src/basiclayout/tutorial/models.py
+The function ``get_session`` registers a database session with a transaction
+manager, and returns a ``dbsession`` object. With the transaction manager, our
+application will automatically issue a transaction commit after every request
+unless an exception is raised, in which case the transaction will be aborted.
+
+   .. literalinclude:: src/basiclayout/tutorial/models/meta.py
+      :pyobject: get_session
+      :linenos:
+      :language: py
+
+The ``get_engine`` function creates an :term:`SQLAlchemy` database engine using
+:func:`sqlalchemy.engine_from_config` from the ``sqlalchemy.``-prefixed
+settings in the ``development.ini`` file's ``[app:main]`` section, which is a
+URI, something like ``sqlite://``.
+
+   .. literalinclude:: src/basiclayout/tutorial/models/meta.py
+      :pyobject: get_engine
+      :linenos:
+      :language: py
+
+The function ``get_dbmaker`` accepts an :term:`SQLAlchemy` database engine,
+and creates a database session object ``dbmaker`` from the :term:`SQLAlchemy`
+class :class:`sqlalchemy.orm.session.sessionmaker`, which is then used for
+creating a session with the database engine.
+
+   .. literalinclude:: src/basiclayout/tutorial/models/meta.py
+      :pyobject: get_dbmaker
+      :linenos:
+      :language: py
+
+To give a simple example of a model class, we define one named ``MyModel``:
+
+   .. literalinclude:: src/basiclayout/tutorial/models/mymodel.py
       :pyobject: MyModel
       :linenos:
       :language: py
 
 Our example model does not require an ``__init__`` method because SQLAlchemy
-supplies for us a default constructor if one is not already present, 
-which accepts keyword arguments of the same name as that of the mapped attributes.
+supplies for us a default constructor if one is not already present, which
+accepts keyword arguments of the same name as that of the mapped attributes.
 
 .. note:: Example usage of MyModel:
 
