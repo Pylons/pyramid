@@ -423,6 +423,20 @@ class TestManifestCacheBuster(unittest.TestCase):
             fut('foo', ('css', 'main.css'), {}),
             (['css', 'main-test.css'], {}))
 
+    def test_it_with_relspec(self):
+        fut = self._makeOne('fixtures/manifest.json').pregenerate
+        self.assertEqual(fut('foo', ('bar',), {}), (['bar'], {}))
+        self.assertEqual(
+            fut('foo', ('css', 'main.css'), {}),
+            (['css', 'main-test.css'], {}))
+
+    def test_it_with_absspec(self):
+        fut = self._makeOne('pyramid.tests:fixtures/manifest.json').pregenerate
+        self.assertEqual(fut('foo', ('bar',), {}), (['bar'], {}))
+        self.assertEqual(
+            fut('foo', ('css', 'main.css'), {}),
+            (['css', 'main-test.css'], {}))
+
     def test_reload(self):
         manifest_path = os.path.join(here, 'fixtures', 'manifest.json')
         new_manifest_path = os.path.join(here, 'fixtures', 'manifest2.json')

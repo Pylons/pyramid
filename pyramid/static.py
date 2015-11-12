@@ -19,7 +19,10 @@ from pkg_resources import (
 
 from repoze.lru import lru_cache
 
-from pyramid.asset import resolve_asset_spec
+from pyramid.asset import (
+    abspath_from_asset_spec,
+    resolve_asset_spec,
+)
 
 from pyramid.compat import text_
 
@@ -209,7 +212,11 @@ class ManifestCacheBuster(object):
     uses a supplied manifest file to map an asset path to a cache-busted
     version of the path.
 
-    The file is expected to conform to the following simple JSON format:
+    The ``manifest_spec`` can be an absolute path or a :term:`asset spec`
+    pointing to a package-relative file.
+
+    The manifest file is expected to conform to the following simple JSON
+    format:
 
     .. code-block:: json
 
@@ -245,8 +252,10 @@ class ManifestCacheBuster(object):
     exists = staticmethod(exists) # testing
     getmtime = staticmethod(getmtime) # testing
 
-    def __init__(self, manifest_path, reload=False):
-        self.manifest_path = manifest_path
+    def __init__(self, manifest_spec, reload=False):
+        package_name = caller_package().__name__
+        self.manifest_path = abspath_from_asset_spec(
+            manifest_spec, package_name)
         self.reload = reload
 
         self._mtime = None
@@ -258,7 +267,8 @@ class ManifestCacheBuster(object):
         Return a mapping parsed from the ``manifest_path``.
 
         Subclasses may override this method to use something other than
-        ``json.loads``.
+        ``json.loads`` to load any type of file format and return a conforming
+        dictionary.
 
         """
         with open(self.manifest_path, 'rb') as fp:
