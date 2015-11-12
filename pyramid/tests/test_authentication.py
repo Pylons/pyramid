@@ -1233,7 +1233,6 @@ class Test_parse_ticket(unittest.TestCase):
                        'cd7a2fa4910000000auserid!')
         result = self._callFUT('secret', ticket, '2001:db8::1', 'sha256')
         self.assertEqual(result, (10, 'userid', [''], ''))
-        pass
 
 class TestSessionAuthenticationPolicy(unittest.TestCase):
     def _getTargetClass(self):

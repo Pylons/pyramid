@@ -243,7 +243,7 @@ class PServeCommand(object):
             self._warn_daemon_deprecated()
             return self.show_status()
 
-        if cmd == 'restart' or cmd == 'stop':
+        if cmd in ('restart', 'stop'):
             self._warn_daemon_deprecated()
             result = self.stop_daemon()
             if result:

@@ -30,7 +30,7 @@ from pyramid.path import DottedNameResolver as _DottedNameResolver
 
 class DottedNameResolver(_DottedNameResolver):
     def __init__(self, package=None): # default to package = None for bw compat
-        return _DottedNameResolver.__init__(self, package)
+        _DottedNameResolver.__init__(self, package)
 
 _marker = object()
 
