@@ -116,17 +116,19 @@ Finally ``main`` is finished configuring things, so it uses the
       :lines: 21
       :language: py
 
-View declarations via ``views.py``
-----------------------------------
+
+View declarations via the ``views`` package
+-------------------------------------------
 
 The main function of a web framework is mapping each URL pattern to code (a
 :term:`view callable`) that is executed when the requested URL matches the
 corresponding :term:`route`. Our application uses the
 :meth:`pyramid.view.view_config` decorator to perform this mapping.
 
-Open ``tutorial/tutorial/views.py``.  It should already contain the following:
+Open ``tutorial/tutorial/views/default.py`` in the ``views`` package.  It
+should already contain the following:
 
-   .. literalinclude:: src/basiclayout/tutorial/views.py
+   .. literalinclude:: src/basiclayout/tutorial/views/default.py
       :linenos:
       :language: py
 
@@ -135,13 +137,13 @@ function it decorates (``my_view``) with a :term:`view configuration`,
 consisting of:
 
    * a ``route_name`` (``home``)
-   * a ``renderer``, which is a template from the ``templates`` subdirectory 
-     of the package.
+   * a ``renderer``, which is a template from the ``templates`` subdirectory of
+     the package.
 
 When the pattern associated with the ``home`` view is matched during a request,
-``my_view()`` will be executed.  ``my_view()`` returns a dictionary; the 
-renderer will use the ``templates/mytemplate.pt`` template to create a response
-based on the values in the dictionary.
+``my_view()`` will be executed.  ``my_view()`` returns a dictionary; the
+renderer will use the ``templates/mytemplate.jinja2`` template to create a
+response based on the values in the dictionary.
 
 Note that ``my_view()`` accepts a single argument named ``request``.  This is
 the standard call signature for a Pyramid :term:`view callable`.
@@ -154,13 +156,13 @@ application.  Without being processed by ``scan``, the decorator effectively
 does nothing.  ``@view_config`` is inert without being detected via a
 :term:`scan`.
 
-The sample ``my_view()`` created by the scaffold uses a ``try:`` and ``except:``
-clause to detect if there is a problem accessing the project database and
-provide an alternate error response.  That response will include the text
-shown at the end of the file, which will be displayed in the browser to
-inform the user about possible actions to take to solve the problem.
+The sample ``my_view()`` created by the scaffold uses a ``try:`` and
+``except:`` clause to detect if there is a problem accessing the project
+database and provide an alternate error response.  That response will include
+the text shown at the end of the file, which will be displayed in the browser
+to inform the user about possible actions to take to solve the problem.
 
-Content Models with ``models.py``
+Content models with ``models.py``
 ---------------------------------
 
 .. START moved from Application configuration with ``__init__.py``. This
