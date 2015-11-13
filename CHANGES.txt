@@ -47,6 +47,21 @@ Bug Fixes
   shell a little more straightfoward.
   See https://github.com/Pylons/pyramid/pull/1883
 
+- Fixed usage of ``pserve --monitor-restart --daemon`` which would fail in
+  horrible ways. See https://github.com/Pylons/pyramid/pull/2118
+
+- Explicitly prevent ``pserve --reload --daemon`` from being used. It's never
+  been supported but would work and fail in weird ways.
+  See https://github.com/Pylons/pyramid/pull/2119
+
+Deprecations
+------------
+
+- Deprecate ``pserve --monitor-restart`` in favor of user's using a real
+  process manager such as Systemd or Upstart as well as Python-based
+  solutions like Circus and Supervisor.
+  See https://github.com/Pylons/pyramid/pull/2120
+
 1.6a2 (2015-06-30)
 ==================
 

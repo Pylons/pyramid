@@ -69,6 +69,7 @@ class PServeCommand(object):
 
     If start/stop/restart is given, then --daemon is implied, and it will
     start (normal operation), stop (--stop-daemon), or do both.
+    Note: Daemonization features are deprecated.
 
     You can also include variable assignments like 'http_port=8080'
     and then use %(http_port)s in your config files.
@@ -100,13 +101,13 @@ class PServeCommand(object):
             '--daemon',
             dest="daemon",
             action="store_true",
-            help="Run in daemon (background) mode")
+            help="Run in daemon (background) mode [DEPRECATED]")
     parser.add_option(
         '--pid-file',
         dest='pid_file',
         metavar='FILENAME',
         help=("Save PID to file (default to pyramid.pid if running in "
-              "daemon mode)"))
+              "daemon mode) [DEPRECATED]"))
     parser.add_option(
         '--log-file',
         dest='log_file',
@@ -127,7 +128,7 @@ class PServeCommand(object):
         '--monitor-restart',
         dest='monitor_restart',
         action='store_true',
-        help="Auto-restart server if it dies")
+        help="Auto-restart server if it dies [DEPRECATED]")
     parser.add_option(
         '-b', '--browser',
         dest='browser',
@@ -137,7 +138,8 @@ class PServeCommand(object):
         '--status',
         action='store_true',
         dest='show_status',
-        help="Show the status of the (presumably daemonized) server")
+        help=("Show the status of the (presumably daemonized) server "
+              "[DEPRECATED]"))
     parser.add_option(
         '-v', '--verbose',
         default=default_verbosity,
@@ -169,7 +171,7 @@ class PServeCommand(object):
         dest='stop_daemon',
         action='store_true',
         help=('Stop a daemonized server (given a PID file, or default '
-              'pyramid.pid file)'))
+              'pyramid.pid file) [DEPRECATED]'))
 
     _scheme_re = re.compile(r'^[a-z][a-z]+:', re.I)
 
@@ -221,6 +223,10 @@ class PServeCommand(object):
             cmd = None
 
         if self.options.reload:
+            if self.options.daemon or cmd in ('start', 'stop', 'restart'):
+                self.out(
+                    'Error: Cannot use reloading while running as a dameon.')
+                return 2
             if os.environ.get(self._reloader_environ_key):
                 if self.options.verbose > 1:
                     self.out('Running reloading file monitor')
@@ -298,7 +304,21 @@ class PServeCommand(object):
                 raise ValueError(msg)
             writeable_pid_file.close()
 
-        if getattr(self.options, 'daemon', False):
+        # warn before forking
+        if (
+                self.options.monitor_restart and
+                not os.environ.get(self._monitor_environ_key)
+        ):
+            self.out('''\
+--monitor-restart has been deprecated in Pyramid 1.6. It will be removed
+in a future release per Pyramid's deprecation policy. Please consider using
+a real process manager for your processes like Systemd, Circus, or Supervisor.
+''')
+
+        if (
+            getattr(self.options, 'daemon', False) and
+            not os.environ.get(self._monitor_environ_key)
+        ):
             self._warn_daemon_deprecated()
             try:
                 self.daemonize()
@@ -307,12 +327,17 @@ class PServeCommand(object):
                     self.out(str(ex))
                 return 2
 
-        if (self.options.monitor_restart
-            and not os.environ.get(self._monitor_environ_key)):
-            return self.restart_with_monitor()
-
-        if self.options.pid_file:
+        if (
+            not os.environ.get(self._monitor_environ_key) and
+            self.options.pid_file
+        ):
             self.record_pid(self.options.pid_file)
+
+        if (
+                self.options.monitor_restart and
+                not os.environ.get(self._monitor_environ_key)
+        ):
+            return self.restart_with_monitor()
 
         if self.options.log_file:
             stdout_log = LazyWriter(self.options.log_file, 'a')
