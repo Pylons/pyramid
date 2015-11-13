@@ -57,7 +57,8 @@ Features
   Core APIs are shipped for both cache busting via query strings and
   path segments and may be extended to fit into custom asset pipelines.
   See https://github.com/Pylons/pyramid/pull/1380 and
-  https://github.com/Pylons/pyramid/pull/1583
+  https://github.com/Pylons/pyramid/pull/1583 and
+  https://github.com/Pylons/pyramid/pull/2013
 
 - Add ``pyramid.config.Configurator.root_package`` attribute and init
   parameter to assist with includeable packages that wish to resolve
