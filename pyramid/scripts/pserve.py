@@ -225,6 +225,10 @@ class PServeCommand(object):
             cmd = None
 
         if self.options.reload:
+            if self.options.daemon or cmd in ('start', 'stop', 'restart'):
+                self.out(
+                    'Error: Cannot use reloading while running as a dameon.')
+                return 2
             if os.environ.get(self._reloader_environ_key):
                 if self.options.verbose > 1:
                     self.out('Running reloading file monitor')
