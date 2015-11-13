@@ -14,6 +14,11 @@ Backward Incompatibilities
 
     $ pip install pyramid_bpython
 
+- Remove default cache busters introduced in 1.6a1 including
+  ``PathSegmentCacheBuster``, ``PathSegmentMd5CacheBuster``, and
+  ``QueryStringMd5CacheBuster``.
+  See https://github.com/Pylons/pyramid/pull/2116
+
 Features
 --------
 
@@ -24,6 +29,10 @@ Features
 - The variables injected into ``pshell`` are now displayed with their
   docstrings instead of the default ``str(obj)`` when possible.
   See https://github.com/Pylons/pyramid/pull/1929
+
+- Add new ``pyramid.static.ManifestCacheBuster`` for use with external
+  asset pipelines as well as examples of common usages in the narrative.
+  See https://github.com/Pylons/pyramid/pull/2116
 
 Bug Fixes
 ---------

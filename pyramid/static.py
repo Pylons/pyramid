@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-import hashlib
+import json
 import os
 
 from os.path import (
+    getmtime,
     normcase,
     normpath,
     join,
@@ -27,7 +28,7 @@ from pyramid.httpexceptions import (
     HTTPMovedPermanently,
     )
 
-from pyramid.path import AssetResolver, caller_package
+from pyramid.path import caller_package
 from pyramid.response import FileResponse
 from pyramid.traversal import traversal_path_info
 
@@ -157,71 +158,6 @@ def _secure_path(path_tuple):
     encoded = slash.join(path_tuple) # will be unicode
     return encoded
 
-def _generate_md5(spec):
-    asset = AssetResolver(None).resolve(spec)
-    md5 = hashlib.md5()
-    with asset.stream() as stream:
-        for block in iter(lambda: stream.read(4096), b''):
-            md5.update(block)
-    return md5.hexdigest()
-
-class Md5AssetTokenGenerator(object):
-    """
-    A mixin class which provides an implementation of
-    :meth:`~pyramid.interfaces.ICacheBuster.target` which generates an md5
-    checksum token for an asset, caching it for subsequent calls.
-    """
-    def __init__(self):
-        self.token_cache = {}
-
-    def tokenize(self, pathspec):
-        # An astute observer will notice that this use of token_cache doesn't
-        # look particularly thread safe.  Basic read/write operations on Python
-        # dicts, however, are atomic, so simply accessing and writing values
-        # to the dict shouldn't cause a segfault or other catastrophic failure.
-        # (See: http://effbot.org/pyfaq/what-kinds-of-global-value-mutation-are-thread-safe.htm)
-        #
-        # We do have a race condition that could result in the same md5
-        # checksum getting computed twice or more times in parallel.  Since
-        # the program would still function just fine if this were to occur,
-        # the extra overhead of using locks to serialize access to the dict
-        # seems an unnecessary burden.
-        #
-        token = self.token_cache.get(pathspec)
-        if not token:
-            self.token_cache[pathspec] = token = _generate_md5(pathspec)
-        return token
-
-class PathSegmentCacheBuster(object):
-    """
-    An implementation of :class:`~pyramid.interfaces.ICacheBuster` which
-    inserts a token for cache busting in the path portion of an asset URL.
-
-    To use this class, subclass it and provide a ``tokenize`` method which
-    accepts a ``pathspec`` and returns a token.
-
-    .. versionadded:: 1.6
-    """
-    def pregenerate(self, pathspec, subpath, kw):
-        token = self.tokenize(pathspec)
-        return (token,) + subpath, kw
-
-    def match(self, subpath):
-        return subpath[1:]
-
-class PathSegmentMd5CacheBuster(PathSegmentCacheBuster,
-                                Md5AssetTokenGenerator):
-    """
-    An implementation of :class:`~pyramid.interfaces.ICacheBuster` which
-    inserts an md5 checksum token for cache busting in the path portion of an
-    asset URL.  Generated md5 checksums are cached in order to speed up
-    subsequent calls.
-
-    .. versionadded:: 1.6
-    """
-    def __init__(self):
-        super(PathSegmentMd5CacheBuster, self).__init__()
-
 class QueryStringCacheBuster(object):
     """
     An implementation of :class:`~pyramid.interfaces.ICacheBuster` which adds
@@ -247,22 +183,6 @@ class QueryStringCacheBuster(object):
             kw['_query'] = tuple(query) + ((self.param, token),)
         return subpath, kw
 
-class QueryStringMd5CacheBuster(QueryStringCacheBuster,
-                                Md5AssetTokenGenerator):
-    """
-    An implementation of :class:`~pyramid.interfaces.ICacheBuster` which adds
-    an md5 checksum token for cache busting in the query string of an asset
-    URL.  Generated md5 checksums are cached in order to speed up subsequent
-    calls.
-
-    The optional ``param`` argument determines the name of the parameter added
-    to the query string and defaults to ``'x'``.
-
-    .. versionadded:: 1.6
-    """
-    def __init__(self, param='x'):
-        super(QueryStringMd5CacheBuster, self).__init__(param=param)
-
 class QueryStringConstantCacheBuster(QueryStringCacheBuster):
     """
     An implementation of :class:`~pyramid.interfaces.ICacheBuster` which adds
@@ -282,3 +202,83 @@ class QueryStringConstantCacheBuster(QueryStringCacheBuster):
 
     def tokenize(self, pathspec):
         return self._token
+
+class ManifestCacheBuster(object):
+    """
+    An implementation of :class:`~pyramid.interfaces.ICacheBuster` which
+    uses a supplied manifest file to map an asset path to a cache-busted
+    version of the path.
+
+    The file is expected to conform to the following simple JSON format:
+
+    .. code-block:: json
+
+       {
+           "css/main.css": "css/main-678b7c80.css",
+           "images/background.png": "images/background-a8169106.png",
+       }
+
+    Specifically, it is a JSON-serialized dictionary where the keys are the
+    source asset paths used in calls to
+    :meth:`~pyramid.request.Request.static_url. For example::
+
+    .. code-block:: python
+
+       >>> request.static_url('myapp:static/css/main.css')
+       "http://www.example.com/static/css/main-678b7c80.css"
+
+    If a path is not found in the manifest it will pass through unchanged.
+
+    If ``reload`` is ``True`` then the manifest file will be reloaded when
+    changed. It is not recommended to leave this enabled in production.
+
+    If the manifest file cannot be found on disk it will be treated as
+    an empty mapping unless ``reload`` is ``False``.
+
+    The default implementation assumes the requested (possibly cache-busted)
+    path is the actual filename on disk. Subclasses may override the ``match``
+    method to alter this behavior. For example, to strip the cache busting
+    token from the path.
+
+    .. versionadded:: 1.6
+    """
+    exists = staticmethod(exists) # testing
+    getmtime = staticmethod(getmtime) # testing
+
+    def __init__(self, manifest_path, reload=False):
+        self.manifest_path = manifest_path
+        self.reload = reload
+
+        self._mtime = None
+        if not reload:
+            self._manifest = self.parse_manifest()
+
+    def parse_manifest(self):
+        """
+        Return a mapping parsed from the ``manifest_path``.
+
+        Subclasses may override this method to use something other than
+        ``json.loads``.
+
+        """
+        with open(self.manifest_path, 'rb') as fp:
+            content = fp.read().decode('utf-8')
+            return json.loads(content)
+
+    @property
+    def manifest(self):
+        """ The current manifest dictionary."""
+        if self.reload:
+            if not self.exists(self.manifest_path):
+                return {}
+            mtime = self.getmtime(self.manifest_path)
+            if self._mtime is None or mtime > self._mtime:
+                self._manifest = self.parse_manifest()
+                self._mtime = mtime
+        return self._manifest
+
+    def pregenerate(self, pathspec, subpath, kw):
+        path = '/'.join(subpath)
+        path = self.manifest.get(path, path)
+        new_subpath = path.split('/')
+        return (new_subpath, kw)
