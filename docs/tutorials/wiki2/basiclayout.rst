@@ -36,6 +36,7 @@ the ``main`` function we've defined in our ``__init__.py``:
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
       :pyobject: main
+      :lineno-start: 4
       :linenos:
       :language: py
 
@@ -47,6 +48,7 @@ The next step of ``main`` is to construct a :term:`Configurator` object:
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
       :lines: 7
+      :lineno-start: 7
       :language: py
 
 ``settings`` is passed to the Configurator as a keyword argument with the
@@ -60,6 +62,7 @@ with the ``.jinja2`` extension within our project.
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
       :lines: 8
+      :lineno-start: 8
       :language: py
 
 Next include the module ``meta`` from the package ``models`` using a dotted
@@ -67,6 +70,7 @@ Python path.
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
       :lines: 9
+      :lineno-start: 9
       :language: py
 
 ``main`` now calls :meth:`pyramid.config.Configurator.add_static_view` with
@@ -74,6 +78,7 @@ two arguments: ``static`` (the name), and ``static`` (the path):
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
       :lines: 10
+      :lineno-start: 10
       :language: py
 
 This registers a static resource view which will match any URL that starts
@@ -92,6 +97,7 @@ used when the URL is ``/``:
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
       :lines: 11
+      :lineno-start: 11
       :language: py
 
 Since this route has a ``pattern`` equaling ``/``, it is the route that will
@@ -106,6 +112,7 @@ application URLs to be mapped to some code.
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
       :lines: 12
+      :lineno-start: 12
       :language: py
 
 Finally ``main`` is finished configuring things, so it uses the
@@ -114,6 +121,7 @@ Finally ``main`` is finished configuring things, so it uses the
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
       :lines: 13
+      :lineno-start: 13
       :language: py
 
 
@@ -166,39 +174,6 @@ to inform the user about possible actions to take to solve the problem.
 Content models with the ``models`` package
 ------------------------------------------
 
-.. START moved from Application configuration with ``__init__.py``. This
-  section is a WIP, and needs to be updated using the new models package.
-
-The main function first creates a :term:`SQLAlchemy` database engine using
-:func:`sqlalchemy.engine_from_config` from the ``sqlalchemy.`` prefixed
-settings in the ``development.ini`` file's ``[app:main]`` section.
-This will be a URI (something like ``sqlite://``):
-
-   .. literalinclude:: src/basiclayout/tutorial/__init__.py
-      :lines: 13
-      :language: py
-
-``main`` then initializes our SQLAlchemy session object, passing it the
-engine:
-
-   .. literalinclude:: src/basiclayout/tutorial/__init__.py
-      :lines: 14
-      :language: py
-
-``main`` subsequently initializes our SQLAlchemy declarative ``Base`` object,
-assigning the engine we created to the ``bind`` attribute of it's
-``metadata`` object.  This allows table definitions done imperatively
-(instead of declaratively, via a class statement) to work.  We won't use any
-such tables in our application, but if you add one later, long after you've
-forgotten about this tutorial, you won't be left scratching your head when it
-doesn't work.
-
-   .. literalinclude:: src/basiclayout/tutorial/__init__.py
-      :lines: 15
-      :language: py
-
-.. END moved from Application configuration with ``__init__.py``
-
 In a SQLAlchemy-based application, a *model* object is an object composed by
 querying the SQL database. The ``models`` package is where the ``alchemy``
 scaffold put the classes that implement our models.
@@ -246,6 +221,7 @@ configures various database settings by calling subsequently defined functions.
 
    .. literalinclude:: src/basiclayout/tutorial/models/meta.py
       :pyobject: includeme
+      :lineno-start: 19
       :linenos:
       :language: py
 
@@ -256,6 +232,7 @@ unless an exception is raised, in which case the transaction will be aborted.
 
    .. literalinclude:: src/basiclayout/tutorial/models/meta.py
       :pyobject: get_session
+      :lineno-start: 32
       :linenos:
       :language: py
 
@@ -266,6 +243,7 @@ URI, something like ``sqlite://``.
 
    .. literalinclude:: src/basiclayout/tutorial/models/meta.py
       :pyobject: get_engine
+      :lineno-start: 39
       :linenos:
       :language: py
 
@@ -276,6 +254,7 @@ creating a session with the database engine.
 
    .. literalinclude:: src/basiclayout/tutorial/models/meta.py
       :pyobject: get_dbmaker
+      :lineno-start: 43
       :linenos:
       :language: py
 
