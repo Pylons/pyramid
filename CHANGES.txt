@@ -47,6 +47,10 @@ Bug Fixes
   shell a little more straightfoward.
   See https://github.com/Pylons/pyramid/pull/1883
 
+- Explicitly prevent ``pserve --reload --daemon`` from being used. It's never
+  been supported but would work and fail in weird ways.
+  See https://github.com/Pylons/pyramid/pull/2119
+
 1.6a2 (2015-06-30)
 ==================
 
