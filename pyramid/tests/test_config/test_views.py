@@ -4104,16 +4104,6 @@ class TestStaticURLInfo(unittest.TestCase):
         self.assertEqual(config.view_kw['renderer'],
                          'mypackage:templates/index.pt')
 
-    def test_add_cachebust_default(self):
-        config = self._makeConfig()
-        inst = self._makeOne()
-        inst._default_cachebust = lambda: DummyCacheBuster('foo')
-        inst.add(config, 'view', 'mypackage:path', cachebust=True)
-        cachebust = config.registry._static_url_registrations[0][3]
-        subpath, kw = cachebust('some/path', {})
-        self.assertEqual(subpath, 'some/path')
-        self.assertEqual(kw['x'], 'foo')
-
     def test_add_cachebust_prevented(self):
         config = self._makeConfig()
         config.registry.settings['pyramid.prevent_cachebust'] = True
