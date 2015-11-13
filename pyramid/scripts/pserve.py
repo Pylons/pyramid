@@ -229,7 +229,10 @@ class PServeCommand(object):
             cmd = None
 
         if self.options.reload:
-            if self.options.daemon or cmd in ('start', 'stop', 'restart'):
+            if (
+                getattr(self.options, 'daemon', False) or
+                cmd in ('start', 'stop', 'restart')
+            ):
                 self.out(
                     'Error: Cannot use reloading while running as a dameon.')
                 return 2
