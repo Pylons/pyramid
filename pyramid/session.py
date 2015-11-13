@@ -238,14 +238,14 @@ def BaseCookieSessionFactory(
 
         # configuration parameters
         _cookie_name = cookie_name
-        _cookie_max_age = max_age
+        _cookie_max_age = max_age if max_age is None else int(max_age)
         _cookie_path = path
         _cookie_domain = domain
         _cookie_secure = secure
         _cookie_httponly = httponly
         _cookie_on_exception = set_on_exception
-        _timeout = timeout
-        _reissue_time = reissue_time
+        _timeout = timeout if timeout is None else int(timeout)
+        _reissue_time = reissue_time if reissue_time is None else int(reissue_time)
 
         # dirty flag
         _dirty = False

@@ -232,6 +232,11 @@ Bug Fixes
   shell a little more straightfoward.
   See https://github.com/Pylons/pyramid/pull/1883
 
+- Fix an issue when user passes unparsed strings to ``pyramid.session.CookieSession``
+  and ``pyramid.authentication.AuthTktCookieHelper`` for time related parameters
+  ``timeout``, ``reissue_time``, ``max_age`` that expect an integer value.
+  See https://github.com/Pylons/pyramid/pull/2050
+
 - Fixed usage of ``pserve --monitor-restart --daemon`` which would fail in
   horrible ways. See https://github.com/Pylons/pyramid/pull/2118
 
