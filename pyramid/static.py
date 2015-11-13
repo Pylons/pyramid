@@ -220,7 +220,7 @@ class ManifestCacheBuster(object):
 
     Specifically, it is a JSON-serialized dictionary where the keys are the
     source asset paths used in calls to
-    :meth:`~pyramid.request.Request.static_url. For example::
+    :meth:`~pyramid.request.Request.static_url`. For example::
 
     .. code-block:: python
 
