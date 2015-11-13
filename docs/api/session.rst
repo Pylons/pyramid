@@ -17,4 +17,4 @@
 
   .. autofunction:: BaseCookieSessionFactory
 
-
+  .. autoclass:: BlowfishPickleSerializer

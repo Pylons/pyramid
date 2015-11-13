@@ -103,6 +103,7 @@ setup(name='pyramid',
       extras_require = {
           'testing':testing_extras,
           'docs':docs_extras,
+          'encrypted_cookies': ['pycrypto'],
           },
       tests_require = tests_require,
       test_suite="pyramid.tests",
