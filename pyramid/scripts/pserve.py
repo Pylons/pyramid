@@ -302,7 +302,10 @@ class PServeCommand(object):
                 raise ValueError(msg)
             writeable_pid_file.close()
 
-        if getattr(self.options, 'daemon', False):
+        if (
+            getattr(self.options, 'daemon', False) and
+            not os.environ.get(self._monitor_environ_key)
+        ):
             self._warn_daemon_deprecated()
             try:
                 self.daemonize()
@@ -311,12 +314,17 @@ class PServeCommand(object):
                     self.out(str(ex))
                 return 2
 
-        if (self.options.monitor_restart
-            and not os.environ.get(self._monitor_environ_key)):
-            return self.restart_with_monitor()
-
-        if self.options.pid_file:
+        if (
+            not os.environ.get(self._monitor_environ_key) and
+            self.options.pid_file
+        ):
             self.record_pid(self.options.pid_file)
+
+        if (
+                self.options.monitor_restart and
+                not os.environ.get(self._monitor_environ_key)
+        ):
+            return self.restart_with_monitor()
 
         if self.options.log_file:
             stdout_log = LazyWriter(self.options.log_file, 'a')
