@@ -155,6 +155,9 @@ Features
   docstrings instead of the default ``str(obj)`` when possible.
   See https://github.com/Pylons/pyramid/pull/1929
 
+- ``pserve --reload`` will no longer crash on syntax errors!!!
+  See https://github.com/Pylons/pyramid/pull/2044
+
 Bug Fixes
 ---------
 
