@@ -235,6 +235,10 @@ Bug Fixes
 - Fixed usage of ``pserve --monitor-restart --daemon`` which would fail in
   horrible ways. See https://github.com/Pylons/pyramid/pull/2118
 
+- Explicitly prevent ``pserve --reload --daemon`` from being used. It's never
+  been supported but would work and fail in weird ways.
+  See https://github.com/Pylons/pyramid/pull/2119
+
 Deprecations
 ------------
 
