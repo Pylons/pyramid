@@ -769,6 +769,17 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         helper = self._makeOne('secret', timeout='1')
         self.assertEqual(helper.timeout, 1)
 
+    def test_identify_cookie_timeout_aged(self):
+        import time
+        helper = self._makeOne('secret', timeout=10)
+        now = time.time()
+        helper.auth_tkt.timestamp = now - 1
+        helper.now = now + 10
+        helper.auth_tkt.tokens = (text_('a'), )
+        request = self._makeRequest('bogus')
+        result = helper.identify(request)
+        self.assertFalse(result)
+
     def test_identify_cookie_reissue(self):
         import time
         helper = self._makeOne('secret', timeout=10, reissue_time=0)
