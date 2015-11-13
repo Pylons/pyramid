@@ -14,9 +14,11 @@ import errno
 import logging
 import optparse
 import os
+import py_compile
 import re
 import subprocess
 import sys
+import tempfile
 import textwrap
 import threading
 import time
@@ -843,7 +845,7 @@ class Monitor(object): # pragma: no cover
         if %errorlevel% == 3 goto repeat
 
     or run a monitoring process in Python (``pserve --reload`` does
-    this).  
+    this).
 
     Use the ``watch_file(filename)`` function to cause a reload/restart for
     other non-Python files (e.g., configuration files).  If you have
@@ -866,9 +868,19 @@ class Monitor(object): # pragma: no cover
         self.poll_interval = poll_interval
         self.extra_files = list(self.global_extra_files)
         self.instances.append(self)
+        self.syntax_error_files = set()
+        self.pending_reload = False
         self.file_callbacks = list(self.global_file_callbacks)
+        temp_pyc_fp = tempfile.NamedTemporaryFile(delete=False)
+        self.temp_pyc = temp_pyc_fp.name
+        temp_pyc_fp.close()
 
     def _exit(self):
+        try:
+            os.unlink(self.temp_pyc)
+        except IOError:
+            # not worried if the tempfile can't be removed
+            pass
         # use os._exit() here and not sys.exit() since within a
         # thread sys.exit() just closes the given thread and
         # won't kill the process; note os._exit does not call
@@ -899,6 +911,7 @@ class Monitor(object): # pragma: no cover
                 continue
             if filename is not None:
                 filenames.append(filename)
+        new_changes = False
         for filename in filenames:
             try:
                 stat = os.stat(filename)
@@ -910,11 +923,42 @@ class Monitor(object): # pragma: no cover
                 continue
             if filename.endswith('.pyc') and os.path.exists(filename[:-1]):
                 mtime = max(os.stat(filename[:-1]).st_mtime, mtime)
-            if filename not in self.module_mtimes:
-                self.module_mtimes[filename] = mtime
-            elif self.module_mtimes[filename] < mtime:
-                print("%s changed; reloading..." % filename)
-                return False
+                pyc = True
+            else:
+                pyc = False
+            old_mtime = self.module_mtimes.get(filename)
+            self.module_mtimes[filename] = mtime
+            if old_mtime is not None and old_mtime < mtime:
+                new_changes = True
+                if pyc:
+                    filename = filename[:-1]
+                is_valid = True
+                if filename.endswith('.py'):
+                    is_valid = self.check_syntax(filename)
+                if is_valid:
+                    print("%s changed ..." % filename)
+        if new_changes:
+            self.pending_reload = True
+            if self.syntax_error_files:
+                for filename in sorted(self.syntax_error_files):
+                    print("%s has a SyntaxError; NOT reloading." % filename)
+        if self.pending_reload and not self.syntax_error_files:
+            self.pending_reload = False
+            return False
+        return True
+
+    def check_syntax(self, filename):
+        # check if a file has syntax errors.
+        # If so, track it until it's fixed.
+        try:
+            py_compile.compile(filename, cfile=self.temp_pyc, doraise=True)
+        except py_compile.PyCompileError as ex:
+            print(ex.msg)
+            self.syntax_error_files.add(filename)
+            return False
+        else:
+            if filename in self.syntax_error_files:
+                self.syntax_error_files.remove(filename)
         return True
 
     def watch_file(self, cls, filename):
