@@ -14,7 +14,7 @@ and a user visits ``http://example.com/foo/bar``, our pattern would be matched
 against ``/foo/bar`` and the ``matchdict`` would look like ``{'one':'foo',
 'two':'bar'}``.
 
-Declaring Dependencies in Our ``setup.py`` File
+Declaring dependencies in our ``setup.py`` file
 ===============================================
 
 The view code in our application will depend on a package which is not a
@@ -47,7 +47,7 @@ directory in which ``setup.py`` lives) and execute the following command.
 
 On UNIX:
 
-.. code-block:: text
+.. code-block:: bash
 
    $ cd tutorial
    $ $VENV/bin/python setup.py develop
@@ -60,31 +60,32 @@ On Windows:
    c:\pyramidtut\tutorial> %VENV%\Scripts\python setup.py develop
 
 Success executing this command will end with a line to the console something
-like::
+like this::
 
    Finished processing dependencies for tutorial==0.0
 
-Adding view functions in ``views.py``
-=====================================
+Adding view functions in ``views/default.py``
+=============================================
 
-It's time for a major change.  Open ``tutorial/tutorial/views.py`` and edit it
-to look like the following:
+It's time for a major change.  Open ``tutorial/tutorial/views/default.py`` and
+edit it to look like the following:
 
-.. literalinclude:: src/views/tutorial/views.py
+.. literalinclude:: src/views/tutorial/views/default.py
    :linenos:
    :language: python
-   :emphasize-lines: 1-7,14,16-72
+   :emphasize-lines: 1-9,12-70
 
 The highlighted lines need to be added or edited.
 
-We added some imports and created a regular expression to find "WikiWords".
+We added some imports, and created a regular expression to find "WikiWords".
 
 We got rid of the ``my_view`` view function and its decorator that was added
 when we originally rendered the ``alchemy`` scaffold.  It was only an example
-and isn't relevant to our application.
+and isn't relevant to our application.  We also delated the ``db_err_msg``
+string.
 
-Then we added four :term:`view callable` functions to our ``views.py``
-module: 
+Then we added four :term:`view callable` functions to our ``views/default.py``
+module:
 
 * ``view_wiki()`` - Displays the wiki itself. It will answer on the root URL.
 * ``view_page()`` - Displays an individual page.
@@ -95,20 +96,20 @@ We'll describe each one briefly in the following sections.
 
 .. note::
 
-  There is nothing special about the filename ``views.py``.  A project may
-  have many view callables throughout its codebase in arbitrarily named
-  files.  Files implementing view callables often have ``view`` in their
-  filenames (or may live in a Python subpackage of your application package
-  named ``views``), but this is only by convention.
+  There is nothing special about the filename ``default.py``.  A project may
+  have many view callables throughout its codebase in arbitrarily named files.
+  Files implementing view callables often have ``view`` in their filenames (or
+  may live in a Python subpackage of your application package named ``views``,
+  as in our case), but this is only by convention.
 
 The ``view_wiki`` view function
 -------------------------------
 
 Following is the code for the ``view_wiki`` view function and its decorator:
 
-.. literalinclude:: src/views/tutorial/views.py
-   :lines: 20-24
-   :lineno-start: 20
+.. literalinclude:: src/views/tutorial/views/default.py
+   :lines: 17-20
+   :lineno-start: 17
    :linenos:
    :language: python
 
@@ -130,9 +131,9 @@ The ``view_page`` view function
 
 Here is the code for the ``view_page`` view function and its decorator:
 
-.. literalinclude:: src/views/tutorial/views.py
-   :lines: 25-45
-   :lineno-start: 25
+.. literalinclude:: src/views/tutorial/views/default.py
+   :lines: 22-42
+   :lineno-start: 22
    :linenos:
    :language: python
 
@@ -158,17 +159,17 @@ template, and we return a dictionary with a number of arguments.  The fact that
 ``view_page()`` returns a dictionary (as opposed to a :term:`response` object)
 is a cue to :app:`Pyramid` that it should try to use a :term:`renderer`
 associated with the view configuration to render a response.  In our case, the
-renderer used will be the ``templates/view.pt`` template, as indicated in the
-``@view_config`` decorator that is applied to ``view_page()``.
+renderer used will be the ``templates/view.jinja2`` template, as indicated in
+the ``@view_config`` decorator that is applied to ``view_page()``.
 
 The ``add_page`` view function
 ------------------------------
 
 Here is the code for the ``add_page`` view function and its decorator:
 
-.. literalinclude:: src/views/tutorial/views.py
-   :lines: 47-58
-   :lineno-start: 47
+.. literalinclude:: src/views/tutorial/views/default.py
+   :lines: 44-55
+   :lineno-start: 44
    :linenos:
    :language: python
 
@@ -189,15 +190,15 @@ If the view execution *is* a result of a form submission (i.e., the expression
 ``'form.submitted' in request.params`` is ``True``), we grab the page body
 from the form data, create a Page object with this page body and the name
 taken from ``matchdict['pagename']``, and save it into the database using
-``DBSession.add``.  We then redirect back to the ``view_page`` view for the
-newly created page.
+``request.dbession.add``.  We then redirect back to the ``view_page`` view for
+the newly created page.
 
 If the view execution is *not* a result of a form submission (i.e., the
 expression ``'form.submitted' in request.params`` is ``False``), the view
 callable renders a template.  To do so, it generates a ``save_url`` which the
 template uses as the form post URL during rendering.  We're lazy here, so
-we're going to use the same template (``templates/edit.pt``) for the add
-view as well as the page edit view. To do so we create a dummy Page object
+we're going to use the same template (``templates/edit.jinja2``) for the add
+view as well as the page edit view. To do so we create a dummy ``Page`` object
 in order to satisfy the edit form's desire to have *some* page object
 exposed as ``page``. :app:`Pyramid` will render the template associated
 with this view to a response.
@@ -207,14 +208,14 @@ The ``edit_page`` view function
 
 Here is the code for the ``edit_page`` view function and its decorator:
 
-.. literalinclude:: src/views/tutorial/views.py
-   :lines: 60-72
-   :lineno-start: 60
+.. literalinclude:: src/views/tutorial/views/default.py
+   :lines: 57-69
+   :lineno-start: 57
    :linenos:
    :language: python
 
 ``edit_page()`` is invoked when a user clicks the "Edit this
-Page" button on the view form.  It renders an edit form but it also acts as
+Page" button on the view form.  It renders an edit form, but it also acts as
 the handler for the form it renders.  The ``matchdict`` attribute of the
 request passed to the ``edit_page`` view will have a ``'pagename'`` key
 matching the name of the page the user wants to edit.
@@ -234,49 +235,51 @@ Adding templates
 ================
 
 The ``view_page``, ``add_page`` and ``edit_page`` views that we've added
-reference a :term:`template`.  Each template is a :term:`Chameleon`
-:term:`ZPT` template.  These templates will live in the ``templates``
-directory of our tutorial package.  Chameleon templates must have a ``.pt``
-extension to be recognized as such.
+reference a :term:`template`.  Each template is a :term:`Jinja2` template.
+These templates will live in the ``templates`` directory of our tutorial
+package.  Jinja2 templates must have a ``.jinja2`` extension to be recognized
+as such.
 
-The ``view.pt`` template
-------------------------
+The ``view.jinja2`` template
+----------------------------
 
-Create ``tutorial/tutorial/templates/view.pt`` and add the following
+Create ``tutorial/tutorial/templates/view.jinja2`` and add the following
 content:
 
-.. literalinclude:: src/views/tutorial/templates/view.pt
+.. literalinclude:: src/views/tutorial/templates/view.jinja2
    :linenos:
+   :emphasize-lines: 36,38-40
    :language: html
 
 This template is used by ``view_page()`` for displaying a single
 wiki page. It includes:
 
-- A ``div`` element that is replaced with the ``content`` value provided by
-  the view (lines 36-38).  ``content`` contains HTML, so the ``structure``
-  keyword is used to prevent escaping it (i.e., changing ">" to "&gt;", etc.)
-- A link that points at the "edit" URL which invokes the ``edit_page`` view
-  for the page being viewed (lines 40-42).
+- A variable that is replaced with the ``content`` value provided by the view
+  (line 36).  ``content`` contains HTML, so the ``|safe`` filter is used to
+  prevent escaping it (e.g., changing ">" to "&gt;").
+- A link that points at the "edit" URL which invokes the ``edit_page`` view for
+  the page being viewed (lines 38-40).
 
-The ``edit.pt`` template
-------------------------
+The ``edit.jinja2`` template
+----------------------------
 
-Create ``tutorial/tutorial/templates/edit.pt`` and add the following
+Create ``tutorial/tutorial/templates/edit.jinja2`` and add the following
 content:
 
-.. literalinclude:: src/views/tutorial/templates/edit.pt
+.. literalinclude:: src/views/tutorial/templates/edit.jinja2
    :linenos:
+   :emphasize-lines: 42,44,47
    :language: html
 
 This template is used by ``add_page()`` and ``edit_page()`` for adding and
 editing a wiki page.  It displays a page containing a form that includes:
 
-- A 10 row by 60 column ``textarea`` field named ``body`` that is filled
-  with any existing page data when it is rendered (line 45).
-- A submit button that has the name ``form.submitted`` (line 48).
+- A 10-row by 60-column ``textarea`` field named ``body`` that is filled with
+  any existing page data when it is rendered (line 44).
+- A submit button that has the name ``form.submitted`` (line 47).
 
 The form POSTs back to the ``save_url`` argument supplied by the view (line
-43).  The view will use the ``body`` and ``form.submitted`` values.
+42).  The view will use the ``body`` and ``form.submitted`` values.
 
 .. note:: Our templates use a ``request`` object that none of our tutorial
    views return in their dictionary. ``request`` is one of several names that
@@ -284,7 +287,7 @@ The form POSTs back to the ``save_url`` argument supplied by the view (line
    See :ref:`renderer_system_values` for information about other names that
    are available by default when a template is used as a renderer.
 
-Static Assets
+Static assets
 -------------
 
 Our templates name static assets, including CSS and images.  We don't need
@@ -299,7 +302,7 @@ subdirectories) and are just referred to by URL or by using the convenience
 method ``static_url``, e.g.,
 ``request.static_url('<package>:static/foo.css')`` within templates.
 
-Adding Routes to ``__init__.py``
+Adding routes to ``__init__.py``
 ================================
 
 The ``__init__.py`` file contains
@@ -340,7 +343,7 @@ something like:
 
 .. literalinclude:: src/views/tutorial/__init__.py
    :linenos:
-   :emphasize-lines: 19-22
+   :emphasize-lines: 11-14
    :language: python
 
 The highlighted lines are the ones that need to be added or edited.
