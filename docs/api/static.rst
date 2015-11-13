@@ -9,10 +9,16 @@
      :members:
      :inherited-members:
 
-  .. autoclass:: ManifestCacheBuster
+  .. autoclass:: PathSegmentCacheBuster
      :members:
 
   .. autoclass:: QueryStringCacheBuster
+     :members:
+
+  .. autoclass:: PathSegmentMd5CacheBuster
+     :members:
+
+  .. autoclass:: QueryStringMd5CacheBuster
      :members:
 
   .. autoclass:: QueryStringConstantCacheBuster

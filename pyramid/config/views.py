@@ -34,6 +34,7 @@ from pyramid.interfaces import (
     )
 
 from pyramid import renderers
+from pyramid.static import PathSegmentMd5CacheBuster
 
 from pyramid.compat import (
     string_types,
@@ -1861,12 +1862,14 @@ class ViewsConfiguratorMixin(object):
         The ``cachebust`` keyword argument may be set to cause
         :meth:`~pyramid.request.Request.static_url` to use cache busting when
         generating URLs. See :ref:`cache_busting` for general information
-        about cache busting. The value of the ``cachebust`` argument must
-        be an object which implements
-        :class:`~pyramid.interfaces.ICacheBuster`.  If the ``cachebust``
-        argument is provided, the default for ``cache_max_age`` is modified
-        to be ten years.  ``cache_max_age`` may still be explicitly provided
-        to override this default.
+        about cache busting.  The value of the ``cachebust`` argument may be
+        ``True``, in which case a default cache busting implementation is used.
+        The value of the ``cachebust`` argument may also be an object which
+        implements :class:`~pyramid.interfaces.ICacheBuster`.  See the
+        :mod:`~pyramid.static` module for some implementations.  If the
+        ``cachebust`` argument is provided, the default for ``cache_max_age``
+        is modified to be ten years.  ``cache_max_age`` may still be explicitly
+        provided to override this default.
 
         The ``permission`` keyword argument is used to specify the
         :term:`permission` required by a user to execute the static view.  By
@@ -1964,6 +1967,9 @@ def isexception(o):
 
 @implementer(IStaticURLInfo)
 class StaticURLInfo(object):
+    # Indirection for testing
+    _default_cachebust = PathSegmentMd5CacheBuster
+
     def _get_registrations(self, registry):
         try:
             reg = registry._static_url_registrations
@@ -2027,6 +2033,8 @@ class StaticURLInfo(object):
             cb = None
         else:
             cb = extra.pop('cachebust', None)
+        if cb is True:
+            cb = self._default_cachebust()
         if cb:
             def cachebust(subpath, kw):
                 subpath_tuple = tuple(subpath.split('/'))

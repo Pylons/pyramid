@@ -1089,7 +1089,3 @@ Glossary
       data in a Redis database.  See 
       https://pypi.python.org/pypi/pyramid_redis_sessions for more information.
 
-   cache busting
-      A technique used when serving a cacheable static asset in order to force
-      a client to query the new version of the asset. See :ref:`cache_busting`
-      for more information.
