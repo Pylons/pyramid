@@ -232,6 +232,9 @@ Bug Fixes
   shell a little more straightfoward.
   See https://github.com/Pylons/pyramid/pull/1883
 
+- Fixed usage of ``pserve --monitor-restart --daemon`` which would fail in
+  horrible ways. See https://github.com/Pylons/pyramid/pull/2118
+
 Deprecations
 ------------
 
