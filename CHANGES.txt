@@ -34,6 +34,9 @@ Features
   asset pipelines as well as examples of common usages in the narrative.
   See https://github.com/Pylons/pyramid/pull/2116
 
+- Fix ``pserve --reload`` to not crash on syntax errors!!!
+  See https://github.com/Pylons/pyramid/pull/2125
+
 Bug Fixes
 ---------
 
