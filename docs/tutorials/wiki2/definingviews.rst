@@ -14,7 +14,7 @@ and a user visits ``http://example.com/foo/bar``, our pattern would be matched
 against ``/foo/bar`` and the ``matchdict`` would look like ``{'one':'foo',
 'two':'bar'}``.
 
-Declaring Dependencies in Our ``setup.py`` File
+Declaring dependencies in our ``setup.py`` file
 ===============================================
 
 The view code in our application will depend on a package which is not a
@@ -47,7 +47,7 @@ directory in which ``setup.py`` lives) and execute the following command.
 
 On UNIX:
 
-.. code-block:: text
+.. code-block:: bash
 
    $ cd tutorial
    $ $VENV/bin/python setup.py develop
@@ -60,17 +60,17 @@ On Windows:
    c:\pyramidtut\tutorial> %VENV%\Scripts\python setup.py develop
 
 Success executing this command will end with a line to the console something
-like::
+like this::
 
    Finished processing dependencies for tutorial==0.0
 
 Adding view functions in ``views.py``
 =====================================
 
-It's time for a major change.  Open ``tutorial/tutorial/views.py`` and edit it
-to look like the following:
+It's time for a major change.  Open ``tutorial/tutorial/views/default.py`` and
+edit it to look like the following:
 
-.. literalinclude:: src/views/tutorial/views.py
+.. literalinclude:: src/views/tutorial/views/default.py
    :linenos:
    :language: python
    :emphasize-lines: 1-7,14,16-72
