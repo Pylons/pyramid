@@ -242,9 +242,10 @@ Bug Fixes
 Deprecations
 ------------
 
-- The ``pserve`` command's daemonization features have been deprecated. This
-  includes the ``[start,stop,restart,status]`` subcommands as well as the
-  ``--daemon``, ``--stop-server``, ``--pid-file``, and ``--status`` flags.
+- The ``pserve`` command's daemonization features have been deprecated as well
+  as ``--monitor-restart``. This includes the ``[start,stop,restart,status]``
+  subcommands as well as the ``--daemon``, ``--stop-daemon``, ``--pid-file``,
+  and ``--status`` flags.
 
   Please use a real process manager in the future instead of relying on the
   ``pserve`` to daemonize itself. Many options exist including your Operating
@@ -252,6 +253,7 @@ Deprecations
   solutions like Circus and Supervisor.
 
   See https://github.com/Pylons/pyramid/pull/1641
+  and https://github.com/Pylons/pyramid/pull/2120
 
 - Renamed the ``principal`` argument to ``pyramid.security.remember()`` to
   ``userid`` in order to clarify its intended purpose.
