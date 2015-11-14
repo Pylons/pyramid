@@ -44,7 +44,7 @@ When you invoke the ``pserve development.ini`` command, the ``main`` function
 above is executed.  It accepts some settings and returns a :term:`WSGI`
 application.  (See :ref:`startup_chapter` for more about ``pserve``.)
 
-The next step of ``main`` is to construct a :term:`Configurator` object:
+Next in ``main``, construct a :term:`Configurator` object:
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
       :lines: 7
@@ -279,8 +279,8 @@ The ``MyModel`` class has a ``__tablename__`` attribute.  This informs
 SQLAlchemy which table to use to store the data representing instances of this
 class.
 
-The Index import and the Index object creation is not required for this
-tutorial, and will be removed in the next step.
-
 That's about all there is to it regarding models, views, and initialization
 code in our stock application.
+
+The Index import and the Index object creation is not required for this
+tutorial, and will be removed in the next step.
