@@ -37,6 +37,11 @@ Features
 - Fix ``pserve --reload`` to not crash on syntax errors!!!
   See https://github.com/Pylons/pyramid/pull/2125
 
+- Fix an issue when user passes unparsed strings to ``pyramid.session.CookieSession``
+  and ``pyramid.authentication.AuthTktCookieHelper`` for time related parameters
+  ``timeout``, ``reissue_time``, ``max_age`` that expect an integer value.
+  See https://github.com/Pylons/pyramid/pull/2050
+
 Bug Fixes
 ---------
 
