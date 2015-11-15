@@ -18,22 +18,22 @@ require permission, instead of a default "403 Forbidden" page.
 
 We will implement the access control with the following steps:
 
-* Add users and groups (``security.py``, a new module).
-* Add an :term:`ACL` (``models.py`` and ``__init__.py``).
+* Add users and groups (``security/default.py``, a new subpackage).
+* Add an :term:`ACL` (``models/mymodel.py`` and ``__init__.py``).
 * Add an :term:`authentication policy` and an :term:`authorization policy`
   (``__init__.py``).
 * Add :term:`permission` declarations to the ``edit_page`` and ``add_page``
-  views (``views.py``).
+  views (``views/default.py``).
 
 Then we will add the login and logout feature:
 
 * Add routes for /login and /logout (``__init__.py``).
-* Add ``login`` and ``logout`` views (``views.py``).
-* Add a login template (``login.pt``).
+* Add ``login`` and ``logout`` views (``views/default.py``).
+* Add a login template (``login.jinja2``).
 * Make the existing views return a ``logged_in`` flag to the renderer
-  (``views.py``).
+  (``views/default.py``).
 * Add a "Logout" link to be shown when logged in and viewing or editing a page
-  (``view.pt``, ``edit.pt``).
+  (``view.jinja2``, ``edit.jinja2``).
 
 
 Access control
@@ -42,10 +42,10 @@ Access control
 Add users and groups
 ~~~~~~~~~~~~~~~~~~~~
 
-Create a new ``tutorial/tutorial/security.py`` module with the
+Create a new ``tutorial/tutorial/security/default.py`` subpackage with the
 following content:
 
-.. literalinclude:: src/authorization/tutorial/security.py
+.. literalinclude:: src/authorization/tutorial/security/default.py
    :linenos:
    :language: python
 
@@ -68,20 +68,21 @@ database, but here we use "dummy" data to represent user and groups sources.
 Add an ACL
 ~~~~~~~~~~
 
-Open ``tutorial/tutorial/models.py`` and add the following import
-statement at the head:
+Open ``tutorial/tutorial/models/mymodel.py`` and add the following import
+statement just after the ``Base`` import at the top:
 
-.. literalinclude:: src/authorization/tutorial/models.py
-   :lines: 1-4
+.. literalinclude:: src/authorization/tutorial/models/mymodel.py
+   :lines: 3-6
    :linenos:
+   :lineno-start: 3
    :language: python
 
 Add the following class definition at the end:
 
-.. literalinclude:: src/authorization/tutorial/models.py
-   :lines: 33-37
+.. literalinclude:: src/authorization/tutorial/models/mymodel.py
+   :lines: 22-26
    :linenos:
-   :lineno-start: 33
+   :lineno-start: 22
    :language: python
 
 We import :data:`~pyramid.security.Allow`, an action that means that
@@ -90,9 +91,9 @@ permission is allowed, and :data:`~pyramid.security.Everyone`, a special
 :term:`ACE` entries that make up the ACL.
 
 The ACL is a list that needs to be named `__acl__` and be an attribute of a
-class.  We define an :term:`ACL` with two :term:`ACE` entries: the first entry
-allows any user the `view` permission.  The second entry allows the
-``group:editors`` principal the `edit` permission.
+class.  We define an :term:`ACL` with two :term:`ACE` entries.  The first entry
+allows any user (``Everyone``) the `view` permission.  The second entry allows
+the ``group:editors`` principal the `edit` permission.
 
 The ``RootFactory`` class that contains the ACL is a :term:`root factory`. We
 need to associate it to our :app:`Pyramid` application, so the ACL is provided
@@ -103,11 +104,11 @@ Open ``tutorial/tutorial/__init__.py`` and add a ``root_factory`` parameter to
 our :term:`Configurator` constructor, that points to the class we created
 above:
 
+.. TODO update the lines to include, linenos, lineno-start
+
 .. literalinclude:: src/authorization/tutorial/__init__.py
    :lines: 24-25
-   :linenos:
    :emphasize-lines: 2
-   :lineno-start: 16
    :language: python
 
 Only the highlighted line needs to be added.
@@ -336,11 +337,11 @@ Our ``tutorial/tutorial/__init__.py`` will look like this when we're done:
 
 Only the highlighted lines need to be added or edited.
 
-Our ``tutorial/tutorial/models.py`` will look like this when we're done:
+Our ``tutorial/tutorial/models/mymodel.py`` will look like this when we're done:
 
-.. literalinclude:: src/authorization/tutorial/models.py
+.. literalinclude:: src/authorization/tutorial/models/mymodel.py
    :linenos:
-   :emphasize-lines: 1-4,33-37
+   :emphasize-lines: 3-6,22-26
    :language: python
 
 Only the highlighted lines need to be added or edited.
@@ -404,3 +405,5 @@ following URLs, checking that the result is as expected:
   the login form with the ``editor`` credentials), we'll see a Logout link in
   the upper right hand corner.  When we click it, we're logged out, and
   redirected back to the front page.
+
+.. TODO update the lines to include in src/authorization/tutorial/__init__.py
