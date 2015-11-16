@@ -1,3 +1,13 @@
+1.6b2 (2015-10-15)
+==================
+
+Features
+--------
+
+- Allow asset specifications to be supplied to
+  ``pyramid.static.ManifestCacheBuster`` instead of requiring a
+  filesystem path.
+
 1.6b1 (2015-10-15)
 ==================
 
