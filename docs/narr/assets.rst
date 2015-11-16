@@ -500,15 +500,12 @@ The following code would set up a cachebuster:
 .. code-block:: python
    :linenos:
 
-   from pyramid.path import AssetResolver
    from pyramid.static import ManifestCacheBuster
 
-   resolver = AssetResolver()
-   manifest = resolver.resolve('myapp:static/manifest.json')
    config.add_static_view(
        name='http://mycdn.example.com/',
        path='mypackage:static',
-       cachebust=ManifestCacheBuster(manifest.abspath()))
+       cachebust=ManifestCacheBuster('myapp:static/manifest.json'))
 
 A simpler approach is to use the
 :class:`~pyramid.static.QueryStringConstantCacheBuster` to generate a global
