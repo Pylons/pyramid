@@ -62,6 +62,10 @@ Bug Fixes
   been supported but would work and fail in weird ways.
   See https://github.com/Pylons/pyramid/pull/2119
 
+- Fix an issue on Windows when running ``pserve --reload`` in which the
+  process failed to fork because it could not find the pserve script to
+  run. See https://github.com/Pylons/pyramid/pull/2138
+
 Deprecations
 ------------
 
