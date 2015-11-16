@@ -428,6 +428,19 @@ a real process manager for your processes like Systemd, Circus, or Supervisor.
         arg = win32api.GetShortPathName(arg)
         return arg
 
+    def find_script_path(self, name): # pragma: no cover
+        """
+        Return the path to the script being invoked by the python interpreter.
+
+        There's an issue on Windows when running the executable from
+        a console_script causing the script name (sys.argv[0]) to
+        not end with .exe or .py and thus cannot be run via popen.
+        """
+        if sys.platform == 'win32':
+            if not name.endswith('.exe') and not name.endswith('.py'):
+                name += '.exe'
+        return name
+
     def daemonize(self): # pragma: no cover
         pid = live_pidfile(self.options.pid_file)
         if pid:
@@ -573,7 +586,10 @@ a real process manager for your processes like Systemd, Circus, or Supervisor.
             else:
                 self.out('Starting subprocess with monitor parent')
         while 1:
-            args = [self.quote_first_command_arg(sys.executable)] + sys.argv
+            args = [
+                self.quote_first_command_arg(sys.executable),
+                self.find_script_path(sys.argv[0]),
+            ] + sys.argv[1:]
             new_environ = os.environ.copy()
             if reloader:
                 new_environ[self._reloader_environ_key] = 'true'
