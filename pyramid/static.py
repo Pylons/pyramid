@@ -212,8 +212,8 @@ class ManifestCacheBuster(object):
     uses a supplied manifest file to map an asset path to a cache-busted
     version of the path.
 
-    The ``manifest_spec`` can be an absolute path or a :term:`asset spec`
-    pointing to a package-relative file.
+    The ``manifest_spec`` can be an absolute path or a :term:`asset
+    specification` pointing to a package-relative file.
 
     The manifest file is expected to conform to the following simple JSON
     format:
