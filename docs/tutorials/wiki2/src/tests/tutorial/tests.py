@@ -170,6 +170,39 @@ class FunctionalTests(unittest.TestCase):
                    '&came_from=FrontPage&form.submitted=Login'
 
     def setUp(self):
+        import transaction
+
+        from tutorial.models.meta import (
+            Base,
+            )
+        import tutorial.models.meta
+
+        self.added = False
+
+        def add_front_page(dbsession):
+            with transaction.manager:
+                model = Page(name='FrontPage', data='This is the front page')
+                dbsession.add(model)
+                self.added = True
+
+        def wrap_get_session(transaction_manager, dbmaker):
+            dbsession = self.get_session(transaction_manager, dbmaker)
+            if not self.added:
+                add_front_page(dbsession)
+            return dbsession
+
+        def wrap_get_engine(settings):
+            self.engine = self.get_engine(settings)
+            Base.metadata.create_all(self.engine)
+            return self.engine
+
+        self.get_session = tutorial.models.meta.get_session
+        tutorial.models.meta.get_session = wrap_get_session
+
+        self.get_engine = tutorial.models.meta.get_engine
+        tutorial.models.meta.get_engine = wrap_get_engine
+
+        from tutorial.models.mymodel import Page
         from tutorial import main
         settings = { 'sqlalchemy.url': 'sqlite://'}
         app = main({}, **settings)
@@ -177,7 +210,10 @@ class FunctionalTests(unittest.TestCase):
         self.testapp = TestApp(app)
 
     def tearDown(self):
-        del self.testapp
+        import tutorial.models.meta
+
+        tutorial.models.meta.get_session = self.get_session
+        tutorial.models.meta.get_engine = self.get_engine
 
     def test_root(self):
         res = self.testapp.get('/', status=302)
