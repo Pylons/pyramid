@@ -179,7 +179,7 @@ class FunctionalTests(unittest.TestCase):
 
         self.added = False
 
-        def add_front_page(dbsession):
+        def initialize_db(dbsession):
             with transaction.manager:
                 model = Page(name='FrontPage', data='This is the front page')
                 dbsession.add(model)
@@ -188,7 +188,7 @@ class FunctionalTests(unittest.TestCase):
         def wrap_get_session(transaction_manager, dbmaker):
             dbsession = self.get_session(transaction_manager, dbmaker)
             if not self.added:
-                add_front_page(dbsession)
+                initialize_db(dbsession)
             return dbsession
 
         def wrap_get_engine(settings):
