@@ -179,8 +179,8 @@ class FunctionalTests(unittest.TestCase):
 
         self.initialized = False
 
-        def initialize_db(dbsession):
-            Base.metadata.create_all(self.engine)
+        def initialize_db(dbsession, engine):
+            Base.metadata.create_all(engine)
             with transaction.manager:
                 model = Page(name='FrontPage', data='This is the front page')
                 dbsession.add(model)
@@ -189,7 +189,7 @@ class FunctionalTests(unittest.TestCase):
         def wrap_get_session(transaction_manager, dbmaker):
             dbsession = self.get_session(transaction_manager, dbmaker)
             if not self.initialized:
-                initialize_db(dbsession)
+                initialize_db(dbsession, self.engine)
             return dbsession
 
         def wrap_get_engine(settings):
