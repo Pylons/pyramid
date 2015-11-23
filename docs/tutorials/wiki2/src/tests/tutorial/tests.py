@@ -168,8 +168,8 @@ class FunctionalTests(unittest.TestCase):
                    '&came_from=FrontPage&form.submitted=Login'
     editor_login = '/login?login=editor&password=editor' \
                    '&came_from=FrontPage&form.submitted=Login'
-
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
         import transaction
 
         from tutorial.models.meta import (
@@ -177,43 +177,50 @@ class FunctionalTests(unittest.TestCase):
             )
         import tutorial.models.meta
 
-        self.initialized = False
+        cls.initialized = False
 
         def initialize_db(dbsession, engine):
             Base.metadata.create_all(engine)
             with transaction.manager:
                 model = Page(name='FrontPage', data='This is the front page')
                 dbsession.add(model)
-                self.initialized = True
+                cls.initialized = True
 
         def wrap_get_session(transaction_manager, dbmaker):
-            dbsession = self.get_session(transaction_manager, dbmaker)
-            if not self.initialized:
-                initialize_db(dbsession, self.engine)
+            dbsession = cls.get_session(transaction_manager, dbmaker)
+            if not cls.initialized:
+                initialize_db(dbsession, cls.engine)
             return dbsession
 
         def wrap_get_engine(settings):
-            self.engine = self.get_engine(settings)
-            return self.engine
+            cls.engine = cls.get_engine(settings)
+            return cls.engine
 
-        self.get_session = tutorial.models.meta.get_session
+        cls.get_session = tutorial.models.meta.get_session
         tutorial.models.meta.get_session = wrap_get_session
 
-        self.get_engine = tutorial.models.meta.get_engine
+        cls.get_engine = tutorial.models.meta.get_engine
         tutorial.models.meta.get_engine = wrap_get_engine
 
         from tutorial.models.mymodel import Page
         from tutorial import main
         settings = { 'sqlalchemy.url': 'sqlite://'}
-        app = main({}, **settings)
+        cls.app = main({}, **settings)
+
+    def setUp(self):
         from webtest import TestApp
-        self.testapp = TestApp(app)
+        self.testapp = TestApp(self.app)
 
     def tearDown(self):
+        import transaction
+        transaction.abort()
+
+    @classmethod
+    def tearDownClass(cls):
         import tutorial.models.meta
 
-        tutorial.models.meta.get_session = self.get_session
-        tutorial.models.meta.get_engine = self.get_engine
+        tutorial.models.meta.get_session = cls.get_session
+        tutorial.models.meta.get_engine = cls.get_engine
 
     def test_root(self):
         res = self.testapp.get('/', status=302)
