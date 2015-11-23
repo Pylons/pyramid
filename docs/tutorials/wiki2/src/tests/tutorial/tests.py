@@ -177,17 +177,17 @@ class FunctionalTests(unittest.TestCase):
             )
         import tutorial.models.meta
 
-        self.added = False
+        self.initialized = False
 
         def initialize_db(dbsession):
             with transaction.manager:
                 model = Page(name='FrontPage', data='This is the front page')
                 dbsession.add(model)
-                self.added = True
+                self.initialized = True
 
         def wrap_get_session(transaction_manager, dbmaker):
             dbsession = self.get_session(transaction_manager, dbmaker)
-            if not self.added:
+            if not self.initialized:
                 initialize_db(dbsession)
             return dbsession
 
