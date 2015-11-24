@@ -202,14 +202,12 @@ class FunctionalTests(unittest.TestCase):
         cls.get_engine = tutorial.models.meta.get_engine
         tutorial.models.meta.get_engine = wrap_get_engine
 
+        from webtest import TestApp
         from tutorial.models.mymodel import Page
         from tutorial import main
         settings = { 'sqlalchemy.url': 'sqlite://'}
-        cls.app = main({}, **settings)
-
-    def setUp(self):
-        from webtest import TestApp
-        self.testapp = TestApp(self.app)
+        app = main({}, **settings)
+        cls.testapp = TestApp(app)
 
     def tearDown(self):
         import transaction
