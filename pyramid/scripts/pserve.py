@@ -167,6 +167,18 @@ class PServeCommand(object):
             dest='set_group',
             metavar="GROUP",
             help="Set the group (usually only possible when run as root)")
+        parser.add_option(
+            '--groups',
+            dest='set_groups',
+            metavar="GROUPS",
+            help="Set the groups (comma seperated with no spaces) (usually only possible when run as root) (only relevant with --user and --group)")
+        parser.add_option(
+            '--user-groups',
+            dest='user_groups',
+            metavar="USERGROUPS",
+            action="store_true",
+            default=False,
+            help="Set the groups to match the users system groups (usually only possible when run as root) (only relevant with --user and --group)")
 
     parser.add_option(
         '--stop-daemon',
@@ -210,10 +222,11 @@ class PServeCommand(object):
         if not hasattr(self.options, 'set_user'):
             # Windows case:
             self.options.set_user = self.options.set_group = None
+            self.options.set_groups = None
 
         # @@: Is this the right stage to set the user at?
         self.change_user_group(
-            self.options.set_user, self.options.set_group)
+            self.options.set_user, self.options.set_group, self.options.set_groups, self.options.user_groups)
 
         if not self.args:
             self.out('You must give a config file')
@@ -623,7 +636,7 @@ a real process manager for your processes like Systemd, Circus, or Supervisor.
             if self.options.verbose > 0:
                 self.out('%s %s %s' % ('-' * 20, 'Restarting', '-' * 20))
 
-    def change_user_group(self, user, group): # pragma: no cover
+    def change_user_group(self, user, group, additional_groups, user_groups): # pragma: no cover
         if not user and not group:
             return
         import pwd
@@ -651,14 +664,54 @@ a real process manager for your processes like Systemd, Circus, or Supervisor.
             except KeyError:
                 raise ValueError(
                     "Bad username: %r; no such user exists" % user)
-            if not gid:
+            if gid is None: # What if requested group is root (0) since 0 ==
                 gid = entry.pw_gid
             uid = entry.pw_uid
         if self.options.verbose > 0:
             self.out('Changing user to %s:%s (%s:%s)' % (
                 user, group or '(unknown)', uid, gid))
-        if gid:
+        if gid is not None: # What if requested group is root (0) since 0 == False
+            # Should it be allowed to set the group is the requested user is NOT a member of this group?
             os.setgid(gid)
+
+        # Add additional groups
+        groups = set()
+        groups_errors = []
+
+        # get gid from additional_groups
+        if additional_groups:
+            for group in additional_groups.split(","):
+                try:
+                    x_gid = int(group)
+                    group = grp.getgrgid(x_gid).gr_name
+                except ValueError:
+                    try:
+                        entry = grp.getgrnam(group)
+                    except KeyError:
+                        groups_errors.append("Bad group: %r; no such group exists" % group)
+                        continue
+                    
+                    if user in entry.gr_mem:
+                        x_gid = entry.gr_gid
+                    else:
+                        groups_errors.append("%s is not in %s" % (user, group))
+                        continue
+
+                groups.add((x_gid, group))
+
+        # get gid's from the the users system groups
+        if user_groups:
+            groups.update([(e.gr_gid, e.gr_name) for e in grp.getgrall() if user in e.gr_mem])
+
+        if groups_errors:
+            raise ValueError("\n".join(groups_errors))
+
+        if groups:
+            self.out("\n".join(['Adding additional groups:'] + ["\t%s (%s)" % (g[1], g[0]) for g in groups]))
+            os.setgroups([g[0] for g in groups])
+
+        # Finally set the uid
+
         if uid:
             os.setuid(uid)
 
