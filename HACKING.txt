@@ -217,7 +217,7 @@ changed to reflect the bug fix, ideally in the same commit that fixes the bug
 or adds the feature.  To build and review docs, use the following steps.
 
 1. In the main Pyramid checkout directory, run ``./builddocs.sh`` (which just
-   turns around and runs ``tox -e py2-docs,py3-docs``)::
+   turns around and runs ``tox -e docs``)::
 
     $ ./builddocs.sh
 

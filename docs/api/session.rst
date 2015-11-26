@@ -17,4 +17,5 @@
 
   .. autofunction:: BaseCookieSessionFactory
 
+  .. autoclass:: PickleSerializer
 

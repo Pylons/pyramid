@@ -133,13 +133,25 @@ def check_csrf_token(request,
     return True
 
 class PickleSerializer(object):
-    """ A Webob cookie serializer that uses the pickle protocol to dump Python
-    data to bytes."""
+    """ A serializer that uses the pickle protocol to dump Python
+    data to bytes.
+
+    This is the default serializer used by Pyramid.
+
+    ``protocol`` may be specified to control the version of pickle used.
+    Defaults to :attr:`pickle.HIGHEST_PROTOCOL`.
+
+    """
+    def __init__(self, protocol=pickle.HIGHEST_PROTOCOL):
+        self.protocol = protocol
+
     def loads(self, bstruct):
+        """Accept bytes and return a Python object."""
         return pickle.loads(bstruct)
 
     def dumps(self, appstruct):
-        return pickle.dumps(appstruct, pickle.HIGHEST_PROTOCOL)
+        """Accept a Python object and return bytes."""
+        return pickle.dumps(appstruct, self.protocol)
 
 def BaseCookieSessionFactory(
     serializer,
