@@ -234,7 +234,7 @@ or adds the feature.  To build and review docs, use the following steps.
     $ git pull
 
 3. Change back to the main Pyramid checkout dir and run ``./builddocs`` (which
-   just turns around and runs ``tox -e py2-docs,py3-docs``)::
+   just turns around and runs ``tox -e docs``)::
 
     $ ./builddocs
 
