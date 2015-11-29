@@ -215,7 +215,6 @@ class FunctionalTests(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        import tutorial.models.meta
         from tutorial.models.meta import Base
 
         Base.metadata.drop_all(cls.engine)
