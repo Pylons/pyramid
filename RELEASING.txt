@@ -38,9 +38,6 @@ Releasing Pyramid
 
 - Change CHANGES.txt heading to reflect the new version number.
 
-- (Optional) Update the Pyramid Dash docset.
-  https://github.com/Kapeli/Dash-User-Contributions/tree/master/docsets/Pyramid
-
 - Make sure PyPI long description renders (requires ``collective.dist``
   installed into your Python)::
 
