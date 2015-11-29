@@ -177,7 +177,6 @@ class FunctionalTests(unittest.TestCase):
             )
         import tutorial.models.meta
 
-        cls.initialized = False
 
         def initialize_db(dbsession, engine):
             Base.metadata.create_all(engine)
@@ -188,8 +187,9 @@ class FunctionalTests(unittest.TestCase):
 
         def wrap_get_session(transaction_manager, dbmaker):
             dbsession = cls.get_session(transaction_manager, dbmaker)
-            if not cls.initialized:
-                initialize_db(dbsession, cls.engine)
+            initialize_db(dbsession, cls.engine)
+            tutorial.models.meta.get_session = cls.get_session
+            tutorial.models.meta.get_engine = cls.get_engine
             return dbsession
 
         def wrap_get_engine(settings):
@@ -218,8 +218,6 @@ class FunctionalTests(unittest.TestCase):
         import tutorial.models.meta
         from tutorial.models.meta import Base
 
-        tutorial.models.meta.get_session = cls.get_session
-        tutorial.models.meta.get_engine = cls.get_engine
         Base.metadata.drop_all(cls.engine)
 
     def test_root(self):
