@@ -216,9 +216,11 @@ class FunctionalTests(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         import tutorial.models.meta
+        from tutorial.models.meta import Base
 
         tutorial.models.meta.get_session = cls.get_session
         tutorial.models.meta.get_engine = cls.get_engine
+        Base.metadata.drop_all(cls.engine)
 
     def test_root(self):
         res = self.testapp.get('/', status=302)
