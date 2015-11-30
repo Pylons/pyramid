@@ -168,10 +168,11 @@ class FunctionalTests(unittest.TestCase):
                    '&came_from=FrontPage&form.submitted=Login'
     editor_login = '/login?login=editor&password=editor' \
                    '&came_from=FrontPage&form.submitted=Login'
+
     @classmethod
     def setUpClass(cls):
         import transaction
-
+        from tutorial.models.mymodel import Page
         from tutorial.models.meta import (
             Base,
             )
@@ -203,7 +204,6 @@ class FunctionalTests(unittest.TestCase):
         tutorial.models.meta.get_engine = wrap_get_engine
 
         from webtest import TestApp
-        from tutorial.models.mymodel import Page
         from tutorial import main
         settings = { 'sqlalchemy.url': 'sqlite://'}
         app = main({}, **settings)
@@ -216,7 +216,6 @@ class FunctionalTests(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         from tutorial.models.meta import Base
-
         Base.metadata.drop_all(cls.engine)
 
     def test_root(self):
