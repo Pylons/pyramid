@@ -1,3 +1,4 @@
+import bisect
 import inspect
 import operator
 import os
@@ -1855,18 +1856,7 @@ class ViewsConfiguratorMixin(object):
         ``Expires`` and ``Cache-Control`` headers for static assets served.
         Note that this argument has no effect when the ``name`` is a *url
         prefix*.  By default, this argument is ``None``, meaning that no
-        particular Expires or Cache-Control headers are set in the response,
-        unless ``cachebust`` is specified.
-
-        The ``cachebust`` keyword argument may be set to cause
-        :meth:`~pyramid.request.Request.static_url` to use cache busting when
-        generating URLs. See :ref:`cache_busting` for general information
-        about cache busting. The value of the ``cachebust`` argument must
-        be an object which implements
-        :class:`~pyramid.interfaces.ICacheBuster`.  If the ``cachebust``
-        argument is provided, the default for ``cache_max_age`` is modified
-        to be ten years.  ``cache_max_age`` may still be explicitly provided
-        to override this default.
+        particular Expires or Cache-Control headers are set in the response.
 
         The ``permission`` keyword argument is used to specify the
         :term:`permission` required by a user to execute the static view.  By
@@ -1946,11 +1936,32 @@ class ViewsConfiguratorMixin(object):
         See :ref:`static_assets_section` for more information.
         """
         spec = self._make_spec(path)
+        info = self._get_static_info()
+        info.add(self, name, spec, **kw)
+
+    def add_cache_buster(self, path, cachebust):
+        """
+        The ``cachebust`` keyword argument may be set to cause
+        :meth:`~pyramid.request.Request.static_url` to use cache busting when
+        generating URLs. See :ref:`cache_busting` for general information
+        about cache busting. The value of the ``cachebust`` argument must
+        be an object which implements
+        :class:`~pyramid.interfaces.ICacheBuster`.  If the ``cachebust``
+        argument is provided, the default for ``cache_max_age`` is modified
+        to be ten years.  ``cache_max_age`` may still be explicitly provided
+        to override this default.
+
+        """
+        spec = self._make_spec(path)
+        info = self._get_static_info()
+        info.add_cache_buster(self, spec, cachebust)
+
+    def _get_static_info(self):
         info = self.registry.queryUtility(IStaticURLInfo)
         if info is None:
             info = StaticURLInfo()
             self.registry.registerUtility(info, IStaticURLInfo)
-        info.add(self, name, spec, **kw)
+        return info
 
 def isexception(o):
     if IInterface.providedBy(o):
@@ -1964,26 +1975,18 @@ def isexception(o):
 
 @implementer(IStaticURLInfo)
 class StaticURLInfo(object):
-    def _get_registrations(self, registry):
-        try:
-            reg = registry._static_url_registrations
-        except AttributeError:
-            reg = registry._static_url_registrations = []
-        return reg
+    def __init__(self):
+        self.registrations = []
+        self.cache_busters = []
 
     def generate(self, path, request, **kw):
-        try:
-            registry = request.registry
-        except AttributeError: # bw compat (for tests)
-            registry = get_current_registry()
-        registrations = self._get_registrations(registry)
-        for (url, spec, route_name, cachebust) in registrations:
+        for (url, spec, route_name) in self.registrations:
             if path.startswith(spec):
                 subpath = path[len(spec):]
                 if WIN: # pragma: no cover
                     subpath = subpath.replace('\\', '/') # windows
-                if cachebust:
-                    subpath, kw = cachebust(subpath, kw)
+                # translate spec into overridden spec and lookup cache buster
+                # to modify subpath, kw
                 if url is None:
                     kw['subpath'] = subpath
                     return request.route_url(route_name, **kw)
@@ -2023,19 +2026,6 @@ class StaticURLInfo(object):
             # make sure it ends with a slash
             name = name + '/'
 
-        if config.registry.settings.get('pyramid.prevent_cachebust'):
-            cb = None
-        else:
-            cb = extra.pop('cachebust', None)
-        if cb:
-            def cachebust(subpath, kw):
-                subpath_tuple = tuple(subpath.split('/'))
-                subpath_tuple, kw = cb.pregenerate(
-                    spec + subpath, subpath_tuple, kw)
-                return '/'.join(subpath_tuple), kw
-        else:
-            cachebust = None
-
         if url_parse(name).netloc:
             # it's a URL
             # url, spec, route_name
@@ -2044,14 +2034,11 @@ class StaticURLInfo(object):
         else:
             # it's a view name
             url = None
-            ten_years = 10 * 365 * 24 * 60 * 60  # more or less
-            default = ten_years if cb else None
-            cache_max_age = extra.pop('cache_max_age', default)
+            cache_max_age = extra.pop('cache_max_age', None)
 
             # create a view
-            cb_match = getattr(cb, 'match', None)
             view = static_view(spec, cache_max_age=cache_max_age,
-                               use_subpath=True, cachebust_match=cb_match)
+                               use_subpath=True)
 
             # Mutate extra to allow factory, etc to be passed through here.
             # Treat permission specially because we'd like to default to
@@ -2083,7 +2070,7 @@ class StaticURLInfo(object):
             )
 
         def register():
-            registrations = self._get_registrations(config.registry)
+            registrations = self.registrations
 
             names = [t[0] for t in registrations]
 
@@ -2092,7 +2079,7 @@ class StaticURLInfo(object):
                 registrations.pop(idx)
 
             # url, spec, route_name
-            registrations.append((url, spec, route_name, cachebust))
+            registrations.append((url, spec, route_name))
 
         intr = config.introspectable('static views',
                                      name,
@@ -2102,3 +2089,30 @@ class StaticURLInfo(object):
         intr['spec'] = spec
 
         config.action(None, callable=register, introspectables=(intr,))
+
+    def add_cache_buster(self, config, spec, cachebust):
+        def register():
+            cache_busters = self.cache_busters
+
+            specs = [t[0] for t in cache_busters]
+            if spec in specs:
+                idx = specs.index(spec)
+                cache_busters.pop(idx)
+
+            lengths = [len(t[0]) for t in cache_busters]
+            new_idx = bisect.bisect_left(lengths, len(spec))
+            cache_busters.insert(new_idx, (spec, cachebust))
+
+        intr = config.introspectable('cache busters',
+                                     spec,
+                                     'cache buster for %r' % spec,
+                                     'cache buster')
+        intr['cachebust'] = cachebust
+        intr['spec'] = spec
+
+        config.action(None, callable=register, introspectables=(intr,))
+
+    def _find_cache_buster(self, registry, spec):
+        for base_spec, cachebust in self.cache_busters:
+            if base_spec.startswith(spec):
+                pass

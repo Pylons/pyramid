@@ -179,7 +179,7 @@ class QueryStringCacheBuster(object):
     def __init__(self, param='x'):
         self.param = param
 
-    def pregenerate(self, pathspec, subpath, kw):
+    def __call__(self, pathspec, subpath, kw):
         token = self.tokenize(pathspec)
         query = kw.setdefault('_query', {})
         if isinstance(query, dict):
@@ -289,8 +289,6 @@ class ManifestCacheBuster(object):
                 self._mtime = mtime
         return self._manifest
 
-    def pregenerate(self, pathspec, subpath, kw):
-        path = '/'.join(subpath)
-        path = self.manifest.get(path, path)
-        new_subpath = path.split('/')
-        return (new_subpath, kw)
+    def __call__(self, pathspec, subpath, kw):
+        subpath = self.manifest.get(subpath, subpath)
+        return (subpath, kw)
