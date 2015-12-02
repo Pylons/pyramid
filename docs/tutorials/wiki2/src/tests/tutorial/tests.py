@@ -6,18 +6,25 @@ from pyramid import testing
 
 def _initTestingDB():
     from sqlalchemy import create_engine
-    from tutorial.models import (
-        DBSession,
-        Page,
-        Base
+    from .models.meta import (
+        Base,
+        get_session,
+        get_engine,
+        get_dbmaker,
         )
+    from .models.mymodel import Page
+
     engine = create_engine('sqlite://')
+    dbmaker = get_dbmaker(engine)
+
+    dbsession = get_session(transaction.manager, dbmaker)
+
     Base.metadata.create_all(engine)
-    DBSession.configure(bind=engine)
+
     with transaction.manager:
         model = Page(name='FrontPage', data='This is the front page')
-        DBSession.add(model)
-    return DBSession
+        dbsession.add(model)
+    return dbsession
 
 
 def _registerRoutes(config):
@@ -34,7 +41,7 @@ class ViewWikiTests(unittest.TestCase):
         testing.tearDown()
 
     def _callFUT(self, request):
-        from tutorial.views import view_wiki
+        from .views.default import view_wiki
         return view_wiki(request)
 
     def test_it(self):
@@ -50,17 +57,18 @@ class ViewPageTests(unittest.TestCase):
         self.config = testing.setUp()
 
     def tearDown(self):
-        self.session.remove()
+        del self.session
         testing.tearDown()
 
     def _callFUT(self, request):
-        from tutorial.views import view_page
+        from .views.default import view_page
         return view_page(request)
 
     def test_it(self):
         from tutorial.models import Page
         request = testing.DummyRequest()
         request.matchdict['pagename'] = 'IDoExist'
+        request.dbsession = self.session
         page = Page(name='IDoExist', data='Hello CruelWorld IDoExist')
         self.session.add(page)
         _registerRoutes(self.config)
@@ -84,11 +92,11 @@ class AddPageTests(unittest.TestCase):
         self.config = testing.setUp()
 
     def tearDown(self):
-        self.session.remove()
+        del self.session
         testing.tearDown()
 
     def _callFUT(self, request):
-        from tutorial.views import add_page
+        from .views.default import add_page
         return add_page(request)
 
     def test_it_notsubmitted(self):
@@ -106,6 +114,7 @@ class AddPageTests(unittest.TestCase):
         request = testing.DummyRequest({'form.submitted':True,
                                         'body':'Hello yo!'})
         request.matchdict = {'pagename':'AnotherPage'}
+        request.dbsession = self.session
         self._callFUT(request)
         page = self.session.query(Page).filter_by(name='AnotherPage').one()
         self.assertEqual(page.data, 'Hello yo!')
@@ -117,11 +126,11 @@ class EditPageTests(unittest.TestCase):
         self.config = testing.setUp()
 
     def tearDown(self):
-        self.session.remove()
+        del self.session
         testing.tearDown()
 
     def _callFUT(self, request):
-        from tutorial.views import edit_page
+        from .views.default import edit_page
         return edit_page(request)
 
     def test_it_notsubmitted(self):
@@ -129,6 +138,7 @@ class EditPageTests(unittest.TestCase):
         _registerRoutes(self.config)
         request = testing.DummyRequest()
         request.matchdict = {'pagename':'abc'}
+        request.dbsession = self.session
         page = Page(name='abc', data='hello')
         self.session.add(page)
         info = self._callFUT(request)
@@ -142,6 +152,7 @@ class EditPageTests(unittest.TestCase):
         request = testing.DummyRequest({'form.submitted':True,
             'body':'Hello yo!'})
         request.matchdict = {'pagename':'abc'}
+        request.dbsession = self.session
         page = Page(name='abc', data='hello')
         self.session.add(page)
         response = self._callFUT(request)
@@ -158,18 +169,60 @@ class FunctionalTests(unittest.TestCase):
     editor_login = '/login?login=editor&password=editor' \
                    '&came_from=FrontPage&form.submitted=Login'
 
-    def setUp(self):
+    engine = None
+
+    @staticmethod
+    def setup_database():
+        import transaction
+        from tutorial.models.mymodel import Page
+        from tutorial.models.meta import (
+            Base,
+            )
+        import tutorial.models.meta
+
+
+        def initialize_db(dbsession, engine):
+            Base.metadata.create_all(engine)
+            with transaction.manager:
+                model = Page(name='FrontPage', data='This is the front page')
+                dbsession.add(model)
+
+        def wrap_get_session(transaction_manager, dbmaker):
+            dbsession = get_session(transaction_manager, dbmaker)
+            initialize_db(dbsession, engine)
+            tutorial.models.meta.get_session = get_session
+            tutorial.models.meta.get_engine = get_engine
+            return dbsession
+
+        def wrap_get_engine(settings):
+            global engine
+            engine = get_engine(settings)
+            return engine
+
+        get_session = tutorial.models.meta.get_session
+        tutorial.models.meta.get_session = wrap_get_session
+
+        get_engine = tutorial.models.meta.get_engine
+        tutorial.models.meta.get_engine = wrap_get_engine
+
+    @classmethod
+    def setUpClass(cls):
+        cls.setup_database()
+
+        from webtest import TestApp
         from tutorial import main
         settings = { 'sqlalchemy.url': 'sqlite://'}
         app = main({}, **settings)
-        from webtest import TestApp
-        self.testapp = TestApp(app)
-        _initTestingDB()
+        cls.testapp = TestApp(app)
+
+    @classmethod
+    def tearDownClass(cls):
+        from tutorial.models.meta import Base
+        Base.metadata.drop_all(engine)
 
     def tearDown(self):
-        del self.testapp
-        from tutorial.models import DBSession
-        DBSession.remove()
+        import transaction
+        transaction.abort()
 
     def test_root(self):
         res = self.testapp.get('/', status=302)
