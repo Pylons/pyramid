@@ -215,14 +215,14 @@ class FunctionalTests(unittest.TestCase):
         app = main({}, **settings)
         cls.testapp = TestApp(app)
 
-    def tearDown(self):
-        import transaction
-        transaction.abort()
-
     @classmethod
     def tearDownClass(cls):
         from tutorial.models.meta import Base
         Base.metadata.drop_all(engine)
+
+    def tearDown(self):
+        import transaction
+        transaction.abort()
 
     def test_root(self):
         res = self.testapp.get('/', status=302)
