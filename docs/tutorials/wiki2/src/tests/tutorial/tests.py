@@ -169,7 +169,10 @@ class FunctionalTests(unittest.TestCase):
     editor_login = '/login?login=editor&password=editor' \
                    '&came_from=FrontPage&form.submitted=Login'
 
-    def setup_database(self):
+    engine = None
+
+    @staticmethod
+    def setup_database():
         import transaction
         from tutorial.models.mymodel import Page
         from tutorial.models.meta import (
@@ -183,28 +186,28 @@ class FunctionalTests(unittest.TestCase):
             with transaction.manager:
                 model = Page(name='FrontPage', data='This is the front page')
                 dbsession.add(model)
-                cls.initialized = True
 
         def wrap_get_session(transaction_manager, dbmaker):
-            dbsession = cls.get_session(transaction_manager, dbmaker)
-            initialize_db(dbsession, cls.engine)
-            tutorial.models.meta.get_session = cls.get_session
-            tutorial.models.meta.get_engine = cls.get_engine
+            dbsession = get_session(transaction_manager, dbmaker)
+            initialize_db(dbsession, engine)
+            tutorial.models.meta.get_session = get_session
+            tutorial.models.meta.get_engine = get_engine
             return dbsession
 
         def wrap_get_engine(settings):
-            cls.engine = cls.get_engine(settings)
-            return cls.engine
+            global engine
+            engine = get_engine(settings)
+            return engine
 
-        cls.get_session = tutorial.models.meta.get_session
+        get_session = tutorial.models.meta.get_session
         tutorial.models.meta.get_session = wrap_get_session
 
-        cls.get_engine = tutorial.models.meta.get_engine
+        get_engine = tutorial.models.meta.get_engine
         tutorial.models.meta.get_engine = wrap_get_engine
 
     @classmethod
     def setUpClass(cls):
-        cls.setup_database(cls)
+        cls.setup_database()
 
         from webtest import TestApp
         from tutorial import main
