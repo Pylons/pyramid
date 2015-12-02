@@ -211,8 +211,8 @@ will inherit from the ``Base`` class so they can be associated with our
 particular database connection.
 
    .. literalinclude:: src/basiclayout/tutorial/models/meta.py
-      :lines: 15-16
-      :lineno-start: 15
+      :lines: 18-19
+      :lineno-start: 18
       :linenos:
       :language: py
 
@@ -221,7 +221,7 @@ configures various database settings by calling subsequently defined functions.
 
    .. literalinclude:: src/basiclayout/tutorial/models/meta.py
       :pyobject: includeme
-      :lineno-start: 19
+      :lineno-start: 22
       :linenos:
       :language: py
 
@@ -232,7 +232,7 @@ unless an exception is raised, in which case the transaction will be aborted.
 
    .. literalinclude:: src/basiclayout/tutorial/models/meta.py
       :pyobject: get_session
-      :lineno-start: 32
+      :lineno-start: 35
       :linenos:
       :language: py
 
@@ -243,7 +243,7 @@ URI, something like ``sqlite://``.
 
    .. literalinclude:: src/basiclayout/tutorial/models/meta.py
       :pyobject: get_engine
-      :lineno-start: 39
+      :lineno-start: 42
       :linenos:
       :language: py
 
@@ -254,7 +254,7 @@ creating a session with the database engine.
 
    .. literalinclude:: src/basiclayout/tutorial/models/meta.py
       :pyobject: get_dbmaker
-      :lineno-start: 43
+      :lineno-start: 46
       :linenos:
       :language: py
 
