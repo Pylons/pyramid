@@ -169,8 +169,7 @@ class FunctionalTests(unittest.TestCase):
     editor_login = '/login?login=editor&password=editor' \
                    '&came_from=FrontPage&form.submitted=Login'
 
-    @classmethod
-    def setUpClass(cls):
+    def setup_database(self):
         import transaction
         from tutorial.models.mymodel import Page
         from tutorial.models.meta import (
@@ -202,6 +201,10 @@ class FunctionalTests(unittest.TestCase):
 
         cls.get_engine = tutorial.models.meta.get_engine
         tutorial.models.meta.get_engine = wrap_get_engine
+
+    @classmethod
+    def setUpClass(cls):
+        cls.setup_database(cls)
 
         from webtest import TestApp
         from tutorial import main
