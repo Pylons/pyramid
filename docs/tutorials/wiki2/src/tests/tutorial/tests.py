@@ -222,7 +222,7 @@ class FunctionalTests(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         from tutorial.models.meta import Base
-        Base.metadata.drop_all(cls.engine)
+        Base.metadata.drop_all(engine)
 
     def test_root(self):
         res = self.testapp.get('/', status=302)
