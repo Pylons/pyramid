@@ -10,7 +10,7 @@ with open(os.path.join(here, 'CHANGES.txt')) as f:
 
 requires = [
     'pyramid',
-    'pyramid_chameleon',
+    'pyramid_jinja2',
     'pyramid_debugtoolbar',
     'pyramid_tm',
     'SQLAlchemy',
@@ -18,7 +18,7 @@ requires = [
     'zope.sqlalchemy',
     'waitress',
     'docutils',
-    'WebTest', # add this
+    'WebTest',
     ]
 
 setup(name='tutorial',
