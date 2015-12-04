@@ -130,10 +130,10 @@ Feature Additions
   extensions by going through Pyramid's router.  See
   https://github.com/Pylons/pyramid/pull/1581
 
-
 - Make it possible to subclass ``pyramid.request.Request`` and also use
   ``pyramid.request.Request.add_request.method``.  See
   https://github.com/Pylons/pyramid/issues/1529
+
 
 Deprecations
 ------------
@@ -151,12 +151,13 @@ Scaffolding Enhancements
   debugging. See https://github.com/Pylons/pyramid/pull/1326
 
 - Update scaffold generating machinery to return the version of pyramid and
-  pyramid docs for use in scaffolds. Updated ``starter``, ``alchemy`` and
+  pyramid docs for use in scaffolds. Updated ``starter``, ``alchemy``, and
   ``zodb`` templates to have links to correctly versioned documentation and
   reflect which pyramid was used to generate the scaffold.
 
 - Removed non-ascii copyright symbol from templates, as this was
   causing the scaffolds to fail for project generation.
+
 
 Documentation Enhancements
 --------------------------
@@ -168,3 +169,8 @@ Documentation Enhancements
 - Improve and clarify the documentation on what Pyramid defines as a
   ``principal`` and a ``userid`` in its security APIs.
   See https://github.com/Pylons/pyramid/pull/1399
+
+- Updated the Quick Tour and SQLAlchemy + URL Dispatch Wiki Tutorial narrative
+  documentation and source files for each step using the updated scaffold.  For
+  a list of updated files, see
+  https://github.com/Pylons/pyramid/pull/2024#issue-112676079
