@@ -22,10 +22,10 @@ found by the ``pcreate`` command.
 
 To create a scaffold template, create a Python :term:`distribution` to house
 the scaffold which includes a ``setup.py`` that relies on the ``setuptools``
-package.  See `Creating a Package
-<http://guide.python-distribute.org/creation.html>`_ for more information about
-how to do this.  For example, we'll pretend the distribution you create is
-named ``CoolExtension``, and it has a package directory within it named
+package.  See `Packaging and Distributing Projects
+<https://packaging.python.org/en/latest/distributing/>`_ for more information
+about how to do this.  For example, we'll pretend the distribution you create
+is named ``CoolExtension``, and it has a package directory within it named
 ``coolextension``.
 
 Once you've created the distribution, put a "scaffolds" directory within your
