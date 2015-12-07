@@ -680,8 +680,7 @@ testing, packaging, and distributing your application.
    ``setup.py`` is the de facto standard which Python developers use to
    distribute their reusable code.  You can read more about ``setup.py`` files
    and their usage in the `Setuptools documentation
-   <http://peak.telecommunity.com/DevCenter/setuptools>`_ and `The Hitchhiker's
-   Guide to Packaging <http://guide.python-distribute.org/>`_.
+   <http://peak.telecommunity.com/DevCenter/setuptools>`_.
 
 Our generated ``setup.py`` looks like this:
 
