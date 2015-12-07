@@ -1752,7 +1752,7 @@ class ViewsConfiguratorMixin(object):
         signatures than the ones supported by :app:`Pyramid` as described in
         its narrative documentation.
 
-        The ``mapper`` should argument be an object implementing
+        The ``mapper`` argument should be an object implementing
         :class:`pyramid.interfaces.IViewMapperFactory` or a :term:`dotted
         Python name` to such an object.  The provided ``mapper`` will become
         the default view mapper to be used by all subsequent :term:`view
