@@ -366,8 +366,7 @@ resource and requests the asset, regardless of any caching policy set for the
 resource's old URL.
 
 :app:`Pyramid` can be configured to produce cache busting URLs for static
-assets by passing the optional argument, ``cachebust`` to
-:meth:`~pyramid.config.Configurator.add_static_view`:
+assets using :meth:`~pyramid.config.Configurator.add_cache_buster`:
 
 .. code-block:: python
    :linenos:
@@ -376,14 +375,18 @@ assets by passing the optional argument, ``cachebust`` to
    from pyramid.static import QueryStringConstantCacheBuster
 
    # config is an instance of pyramid.config.Configurator
-   config.add_static_view(
-       name='static', path='mypackage:folder/static',
-       cachebust=QueryStringConstantCacheBuster(str(int(time.time()))),
-   )
+   config.add_static_view(name='static', path='mypackage:folder/static/')
+   config.add_cache_buster(
+       'mypackage:folder/static/',
+       QueryStringConstantCacheBuster(str(int(time.time()))))
 
-Setting the ``cachebust`` argument instructs :app:`Pyramid` to use a cache
-busting scheme which adds the curent time for a static asset to the query
-string in the asset's URL:
+.. note::
+   The trailing slash on the ``add_cache_buster`` call is important to
+   indicate that it is overriding every asset in the folder and not just a
+   file named ``static``.
+
+Adding the cachebuster instructs :app:`Pyramid` to add the current time for
+a static asset to the query string in the asset's URL:
 
 .. code-block:: python
    :linenos:
@@ -392,10 +395,7 @@ string in the asset's URL:
    # Returns: 'http://www.example.com/static/js/myapp.js?x=1445318121'
 
 When the web server restarts, the time constant will change and therefore so
-will its URL.  Supplying the ``cachebust`` argument also causes the static
-view to set headers instructing clients to cache the asset for ten years,
-unless the ``cache_max_age`` argument is also passed, in which case that
-value is used.
+will its URL.
 
 .. note::
 
@@ -410,7 +410,7 @@ Disabling the Cache Buster
 
 It can be useful in some situations (e.g., development) to globally disable all
 configured cache busters without changing calls to
-:meth:`~pyramid.config.Configurator.add_static_view`.  To do this set the
+:meth:`~pyramid.config.Configurator.add_cache_buster`.  To do this set the
 ``PYRAMID_PREVENT_CACHEBUST`` environment variable or the
 ``pyramid.prevent_cachebust`` configuration value to a true value.
 
@@ -419,9 +419,9 @@ configured cache busters without changing calls to
 Customizing the Cache Buster
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The ``cachebust`` option to
-:meth:`~pyramid.config.Configurator.add_static_view` may be set to any object
-that implements the interface :class:`~pyramid.interfaces.ICacheBuster`.
+Calls to :meth:`~pyramid.config.Configurator.add_cache_buster` may use
+any object that implements the interface
+:class:`~pyramid.interfaces.ICacheBuster`.
 
 :app:`Pyramid` ships with a very simplistic
 :class:`~pyramid.static.QueryStringConstantCacheBuster`, which adds an
@@ -461,8 +461,30 @@ the hash of the current commit:
        def tokenize(self, pathspec):
            return self.sha1
 
-Choosing a Cache Buster
-~~~~~~~~~~~~~~~~~~~~~~~
+A simple cache buster that modifies the path segment can be constructed as
+well:
+
+.. code-block:: python
+   :linenos:
+
+   import posixpath
+
+   def cache_buster(spec, subpath, kw):
+       base_subpath, ext = posixpath.splitext(subpath)
+       new_subpath = base_subpath + '-asdf' + ext
+       return new_subpath, kw
+
+The caveat with this approach is that modifying the path segment
+changes the file name, and thus must match what is actually on the
+filesystem in order for :meth:`~pyramid.config.Configurator.add_static_view`
+to find the file. It's better to use the
+:class:`~pyramid.static.ManifestCacheBuster` for these situations, as
+described in the next section.
+
+.. _path_segment_cache_busters:
+
+Path Segments and Choosing a Cache Buster
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Many caching HTTP proxies will fail to cache a resource if the URL contains
 a query string.  Therefore, in general, you should prefer a cache busting
@@ -504,8 +526,11 @@ The following code would set up a cachebuster:
 
    config.add_static_view(
        name='http://mycdn.example.com/',
-       path='mypackage:static',
-       cachebust=ManifestCacheBuster('myapp:static/manifest.json'))
+       path='mypackage:static')
+
+   config.add_cache_buster(
+       'mypackage:static/',
+       ManifestCacheBuster('myapp:static/manifest.json'))
 
 A simpler approach is to use the
 :class:`~pyramid.static.QueryStringConstantCacheBuster` to generate a global
@@ -524,8 +549,11 @@ start up as a cachebust token:
 
    config.add_static_view(
        name='http://mycdn.example.com/',
-       path='mypackage:static',
-       cachebust=QueryStringConstantCacheBuster(str(int(time.time()))))
+       path='mypackage:static')
+
+   config.add_cache_buster(
+       'mypackage:static/',
+       QueryStringConstantCacheBuster(str(int(time.time()))))
 
 .. index::
    single: static assets view
@@ -536,25 +564,38 @@ CSS and JavaScript source and cache busting
 Often one needs to refer to images and other static assets inside CSS and
 JavaScript files. If cache busting is active, the final static asset URL is not
 available until the static assets have been assembled. These URLs cannot be
-handwritten. Thus, when having static asset references in CSS and JavaScript,
-one needs to perform one of the following tasks:
+handwritten. Below is an example of how to integrate the cache buster into
+the entire stack. Remember, it is just an example and should be modified to
+fit your specific tools.
 
-* Process the files by using a precompiler which rewrites URLs to their final
-  cache busted form. Then, you can use the
+* First, process the files by using a precompiler which rewrites URLs to their
+  final cache-busted form. Then, you can use the
   :class:`~pyramid.static.ManifestCacheBuster` to synchronize your asset
   pipeline with :app:`Pyramid`, allowing the pipeline to have full control
   over the final URLs of your assets.
 
-* Templatize JS and CSS, and call ``request.static_url()`` inside their
-  template code.
+Now that you are able to generate static URLs within :app:`Pyramid`,
+you'll need to handle URLs that are out of our control. To do this you may
+use some of the following options to get started:
 
-* Pass static URL references to CSS and JavaScript via other means.
+* Configure your asset pipeline to rewrite URL references inline in
+  CSS and JavaScript. This is the best approach because then the files
+  may be hosted by :app:`Pyramid` or an external CDN without haven't to
+  change anything. They really are static.
+
+* Templatize JS and CSS, and call ``request.static_url()`` inside their
+  template code. While this approach may work in certain scenarios, it is not
+  recommended because your static assets will not really be static and are now
+  dependent on :app:`Pyramid` to be served correctly. See
+  :ref:`advanced static` for more information on this approach.
 
 If your CSS and JavaScript assets use URLs to reference other assets it is
 recommended that you implement an external asset pipeline that can rewrite the
 generated static files with new URLs containing cache busting tokens. The
 machinery inside :app:`Pyramid` will not help with this step as it has very
-little knowledge of the asset types your application may use.
+little knowledge of the asset types your application may use. The integration
+into :app:`Pyramid` is simply for linking those assets into your HTML and
+other dynamic content.
 
 .. _advanced_static:
 
