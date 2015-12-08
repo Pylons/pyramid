@@ -1982,15 +1982,16 @@ class StaticURLInfo(object):
         self.cache_busters = []
 
     def generate(self, path, request, **kw):
+        disable_cache_buster = (
+            request.registry.settings['pyramid.prevent_cachebust'])
         for (url, spec, route_name) in self.registrations:
             if path.startswith(spec):
                 subpath = path[len(spec):]
                 if WIN: # pragma: no cover
                     subpath = subpath.replace('\\', '/') # windows
-                # translate spec into overridden spec and lookup cache buster
-                # to modify subpath, kw
-                subpath, kw = self._bust_asset_path(
-                    request.registry, spec, subpath, kw)
+                if not disable_cache_buster:
+                    subpath, kw = self._bust_asset_path(
+                        request.registry, spec, subpath, kw)
                 if url is None:
                     kw['subpath'] = subpath
                     return request.route_url(route_name, **kw)
