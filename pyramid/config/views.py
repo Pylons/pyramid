@@ -2119,7 +2119,7 @@ class StaticURLInfo(object):
 
     def _bust_asset_path(self, registry, spec, subpath, kw):
         pkg_name, pkg_subpath = spec.split(':')
-        absspec = rawspec = '{0}:{1}{2}'.format(pkg_name, pkg_subpath, subpath)
+        rawspec = None
         overrides = registry.queryUtility(IPackageOverrides, name=pkg_name)
         if overrides is not None:
             resource_name = posixpath.join(pkg_subpath, subpath)
@@ -2130,6 +2130,9 @@ class StaticURLInfo(object):
                     rawspec = '{0}:{1}'.format(source.pkg_name, rawspec)
                 break
 
+        if rawspec is None:
+            rawspec = '{0}:{1}{2}'.format(pkg_name, pkg_subpath, subpath)
+
         for base_spec, cachebust in reversed(self.cache_busters):
             if (
                 base_spec == rawspec or
@@ -2139,6 +2142,6 @@ class StaticURLInfo(object):
                     else base_spec.endswith('/')
                 ) and rawspec.startswith(base_spec)
             ):
-                subpath, kw = cachebust(absspec, subpath, kw)
+                subpath, kw = cachebust(rawspec, subpath, kw)
                 break
         return subpath, kw
