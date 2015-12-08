@@ -1943,15 +1943,18 @@ class ViewsConfiguratorMixin(object):
 
     def add_cache_buster(self, path, cachebust):
         """
-        The ``cachebust`` keyword argument may be set to cause
+        Add a cache buster to a set of files on disk.
+
+        The ``path`` should be the path on disk where the static files
+        reside.  This can be an absolute path, a package-relative path, or a
+        :term:`asset specification`.
+
+        The ``cachebust`` argument may be set to cause
         :meth:`~pyramid.request.Request.static_url` to use cache busting when
         generating URLs. See :ref:`cache_busting` for general information
         about cache busting. The value of the ``cachebust`` argument must
         be an object which implements
-        :class:`~pyramid.interfaces.ICacheBuster`.  If the ``cachebust``
-        argument is provided, the default for ``cache_max_age`` is modified
-        to be ten years.  ``cache_max_age`` may still be explicitly provided
-        to override this default.
+        :class:`~pyramid.interfaces.ICacheBuster`.
 
         """
         spec = self._make_spec(path)
@@ -2096,6 +2099,15 @@ class StaticURLInfo(object):
         config.action(None, callable=register, introspectables=(intr,))
 
     def add_cache_buster(self, config, spec, cachebust):
+        # ensure the spec always has a trailing slash as we only support
+        # adding cache busters to folders, not files
+        if os.path.isabs(spec): # FBO windows
+            sep = os.sep
+        else:
+            sep = '/'
+        if not spec.endswith(sep) and not spec.endswith(':'):
+            spec = spec + sep
+
         def register():
             cache_busters = self.cache_busters
 
@@ -2134,14 +2146,7 @@ class StaticURLInfo(object):
             rawspec = '{0}:{1}{2}'.format(pkg_name, pkg_subpath, subpath)
 
         for base_spec, cachebust in reversed(self.cache_busters):
-            if (
-                base_spec == rawspec or
-                (
-                    base_spec.endswith(os.sep)
-                    if os.path.isabs(base_spec)
-                    else base_spec.endswith('/')
-                ) and rawspec.startswith(base_spec)
-            ):
+            if rawspec.startswith(base_spec):
                 subpath, kw = cachebust(rawspec, subpath, kw)
                 break
         return subpath, kw
