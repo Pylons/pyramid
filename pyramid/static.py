@@ -227,7 +227,7 @@ class ManifestCacheBuster(object):
            "images/background.png": "images/background-a8169106.png",
        }
 
-    Specifically, it is a JSON-serialized dictionary where the keys are the
+    By default, it is a JSON-serialized dictionary where the keys are the
     source asset paths used in calls to
     :meth:`~pyramid.request.Request.static_url`. For example::
 
@@ -236,6 +236,9 @@ class ManifestCacheBuster(object):
        >>> request.static_url('myapp:static/css/main.css')
        "http://www.example.com/static/css/main-678b7c80.css"
 
+    The file format and location can be changed by subclassing and overriding
+    :meth:`.parse_manifest`.
+
     If a path is not found in the manifest it will pass through unchanged.
 
     If ``reload`` is ``True`` then the manifest file will be reloaded when
@@ -243,11 +246,6 @@ class ManifestCacheBuster(object):
 
     If the manifest file cannot be found on disk it will be treated as
     an empty mapping unless ``reload`` is ``False``.
-
-    The default implementation assumes the requested (possibly cache-busted)
-    path is the actual filename on disk. Subclasses may override the ``match``
-    method to alter this behavior. For example, to strip the cache busting
-    token from the path.
 
     .. versionadded:: 1.6
     """
@@ -262,20 +260,23 @@ class ManifestCacheBuster(object):
 
         self._mtime = None
         if not reload:
-            self._manifest = self.parse_manifest()
+            self._manifest = self.get_manifest()
 
-    def parse_manifest(self):
+    def get_manifest(self):
+        with open(self.manifest_path, 'rb') as fp:
+            return self.parse_manifest(fp.read())
+
+    def parse_manifest(self, content):
         """
-        Return a mapping parsed from the ``manifest_path``.
+        Parse the ``content`` read from the ``manifest_path`` into a
+        dictionary mapping.
 
         Subclasses may override this method to use something other than
         ``json.loads`` to load any type of file format and return a conforming
         dictionary.
 
         """
-        with open(self.manifest_path, 'rb') as fp:
-            content = fp.read().decode('utf-8')
-            return json.loads(content)
+        return json.loads(content.decode('utf-8'))
 
     @property
     def manifest(self):
@@ -285,7 +286,7 @@ class ManifestCacheBuster(object):
                 return {}
             mtime = self.getmtime(self.manifest_path)
             if self._mtime is None or mtime > self._mtime:
-                self._manifest = self.parse_manifest()
+                self._manifest = self.get_manifest()
                 self._mtime = mtime
         return self._manifest
 
