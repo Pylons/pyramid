@@ -16,6 +16,7 @@ class ViewTests(unittest.TestCase):
         info = my_view(request)
         self.assertEqual(info['project'], 'MyProject')
 
+
 class ViewIntegrationTests(unittest.TestCase):
     def setUp(self):
         """ This sets up the application registry with the
