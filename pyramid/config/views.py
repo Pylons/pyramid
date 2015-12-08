@@ -2132,7 +2132,11 @@ class StaticURLInfo(object):
         for base_spec, cachebust in reversed(self.cache_busters):
             if (
                 base_spec == rawspec or
-                (base_spec.endswith('/') and rawspec.startswith(base_spec))
+                (
+                    base_spec.endswith(os.sep)
+                    if os.path.isabs(base_spec)
+                    else base_spec.endswith('/')
+                ) and rawspec.startswith(base_spec)
             ):
                 subpath, kw = cachebust(absspec, subpath, kw)
                 break
