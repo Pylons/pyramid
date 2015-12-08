@@ -1,5 +1,5 @@
-import bisect
 import inspect
+import posixpath
 import operator
 import os
 import warnings
@@ -21,6 +21,7 @@ from pyramid.interfaces import (
     IException,
     IExceptionViewClassifier,
     IMultiView,
+    IPackageOverrides,
     IRendererFactory,
     IRequest,
     IResponse,
@@ -1987,6 +1988,8 @@ class StaticURLInfo(object):
                     subpath = subpath.replace('\\', '/') # windows
                 # translate spec into overridden spec and lookup cache buster
                 # to modify subpath, kw
+                subpath, kw = self._bust_asset_path(
+                    request.registry, spec, subpath, kw)
                 if url is None:
                     kw['subpath'] = subpath
                     return request.route_url(route_name, **kw)
@@ -2099,9 +2102,7 @@ class StaticURLInfo(object):
                 idx = specs.index(spec)
                 cache_busters.pop(idx)
 
-            lengths = [len(t[0]) for t in cache_busters]
-            new_idx = bisect.bisect_left(lengths, len(spec))
-            cache_busters.insert(new_idx, (spec, cachebust))
+            cache_busters.insert(0, (spec, cachebust))
 
         intr = config.introspectable('cache busters',
                                      spec,
@@ -2112,7 +2113,24 @@ class StaticURLInfo(object):
 
         config.action(None, callable=register, introspectables=(intr,))
 
-    def _find_cache_buster(self, registry, spec):
+    def _bust_asset_path(self, registry, spec, subpath, kw):
+        pkg_name, pkg_subpath = spec.split(':')
+        absspec = rawspec = '{0}:{1}{2}'.format(pkg_name, pkg_subpath, subpath)
+        overrides = registry.queryUtility(IPackageOverrides, name=pkg_name)
+        if overrides is not None:
+            resource_name = posixpath.join(pkg_subpath, subpath)
+            sources = overrides.filtered_sources(resource_name)
+            for source, filtered_path in sources:
+                rawspec = source.get_path(filtered_path)
+                if hasattr(source, 'pkg_name'):
+                    rawspec = '{0}:{1}'.format(source.pkg_name, rawspec)
+                break
+
         for base_spec, cachebust in self.cache_busters:
-            if base_spec.startswith(spec):
-                pass
+            if (
+                base_spec == rawspec or
+                (base_spec.endswith('/') and rawspec.startswith(base_spec))
+            ):
+                subpath, kw = cachebust(absspec, subpath, kw)
+                break
+        return subpath, kw
