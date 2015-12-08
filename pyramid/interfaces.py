@@ -1204,8 +1204,16 @@ class ICacheBuster(Interface):
         The ``kw`` argument is a dict of keywords that are to be passed
         eventually to :meth:`~pyramid.request.Request.static_url` for URL
         generation.  The return value should be a two-tuple of
-        ``(subpath, kw)`` which are versions of the same arguments modified
-        to include the cache bust token in the generated URL.
+        ``(subpath, kw)`` where ``subpath`` is the relative URL from where the
+        file is served and ``kw`` is the same input argument. The return value
+        should be modified to include the cache bust token in the generated
+        URL.
+
+        The ``pathspec`` refers to original location of the file, ignoring any
+        calls to :meth:`pyramid.config.Configurator.override_asset`. For
+        example, with a call ``request.static_url('myapp:static/foo.png'), the
+        ``pathspec`` may be ``themepkg:bar.png``, assuming a call to
+        ``config.override_asset('myapp:static/foo.png', 'themepkg:bar.png')``.
         """
 
 # configuration phases: a lower phase number means the actions associated
