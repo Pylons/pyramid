@@ -1,3 +1,4 @@
+import bisect
 import inspect
 import posixpath
 import operator
@@ -2102,7 +2103,9 @@ class StaticURLInfo(object):
                 idx = specs.index(spec)
                 cache_busters.pop(idx)
 
-            cache_busters.insert(0, (spec, cachebust))
+            lengths = [len(t[0]) for t in cache_busters]
+            new_idx = bisect.bisect_left(lengths, len(spec))
+            cache_busters.insert(new_idx, (spec, cachebust))
 
         intr = config.introspectable('cache busters',
                                      spec,
@@ -2126,7 +2129,7 @@ class StaticURLInfo(object):
                     rawspec = '{0}:{1}'.format(source.pkg_name, rawspec)
                 break
 
-        for base_spec, cachebust in self.cache_busters:
+        for base_spec, cachebust in reversed(self.cache_busters):
             if (
                 base_spec == rawspec or
                 (base_spec.endswith('/') and rawspec.startswith(base_spec))
