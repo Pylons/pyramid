@@ -69,7 +69,6 @@ from pyramid.response import Response
 
 from pyramid.security import NO_PERMISSION_REQUIRED
 from pyramid.static import static_view
-from pyramid.threadlocal import get_current_registry
 
 from pyramid.url import parse_url_overrides
 
