@@ -38,6 +38,7 @@ from pyramid.interfaces import (
 
 from pyramid import renderers
 
+from pyramid.asset import resolve_asset_spec
 from pyramid.compat import (
     string_types,
     urlparse,
@@ -1985,14 +1986,12 @@ class StaticURLInfo(object):
         self.cache_busters = []
 
     def generate(self, path, request, **kw):
-        disable_cache_buster = (
-            request.registry.settings['pyramid.prevent_cachebust'])
         for (url, spec, route_name) in self.registrations:
             if path.startswith(spec):
                 subpath = path[len(spec):]
                 if WIN: # pragma: no cover
                     subpath = subpath.replace('\\', '/') # windows
-                if not disable_cache_buster:
+                if self.cache_busters:
                     subpath, kw = self._bust_asset_path(
                         request.registry, spec, subpath, kw)
                 if url is None:
@@ -2099,6 +2098,9 @@ class StaticURLInfo(object):
         config.action(None, callable=register, introspectables=(intr,))
 
     def add_cache_buster(self, config, spec, cachebust):
+        if config.registry.settings.get('pyramid.prevent_cachebust'):
+            return
+
         # ensure the spec always has a trailing slash as we only support
         # adding cache busters to folders, not files
         if os.path.isabs(spec): # FBO windows
@@ -2130,20 +2132,25 @@ class StaticURLInfo(object):
         config.action(None, callable=register, introspectables=(intr,))
 
     def _bust_asset_path(self, registry, spec, subpath, kw):
-        pkg_name, pkg_subpath = spec.split(':')
+        pkg_name, pkg_subpath = resolve_asset_spec(spec)
         rawspec = None
-        overrides = registry.queryUtility(IPackageOverrides, name=pkg_name)
-        if overrides is not None:
-            resource_name = posixpath.join(pkg_subpath, subpath)
-            sources = overrides.filtered_sources(resource_name)
-            for source, filtered_path in sources:
-                rawspec = source.get_path(filtered_path)
-                if hasattr(source, 'pkg_name'):
-                    rawspec = '{0}:{1}'.format(source.pkg_name, rawspec)
-                break
+
+        if pkg_name is not None:
+            overrides = registry.queryUtility(IPackageOverrides, name=pkg_name)
+            if overrides is not None:
+                resource_name = posixpath.join(pkg_subpath, subpath)
+                sources = overrides.filtered_sources(resource_name)
+                for source, filtered_path in sources:
+                    rawspec = source.get_path(filtered_path)
+                    if hasattr(source, 'pkg_name'):
+                        rawspec = '{0}:{1}'.format(source.pkg_name, rawspec)
+                    break
+
+            if rawspec is None:
+                rawspec = '{0}:{1}{2}'.format(pkg_name, pkg_subpath, subpath)
 
         if rawspec is None:
-            rawspec = '{0}:{1}{2}'.format(pkg_name, pkg_subpath, subpath)
+            rawspec = pkg_subpath + subpath
 
         for base_spec, cachebust in reversed(self.cache_busters):
             if rawspec.startswith(base_spec):
