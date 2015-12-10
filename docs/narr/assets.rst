@@ -587,7 +587,7 @@ use some of the following options to get started:
   template code. While this approach may work in certain scenarios, it is not
   recommended because your static assets will not really be static and are now
   dependent on :app:`Pyramid` to be served correctly. See
-  :ref:`advanced static` for more information on this approach.
+  :ref:`advanced_static` for more information on this approach.
 
 If your CSS and JavaScript assets use URLs to reference other assets it is
 recommended that you implement an external asset pipeline that can rewrite the
