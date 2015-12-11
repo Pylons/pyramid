@@ -12,9 +12,9 @@ Pyramid
         :target: https://webchat.freenode.net/?channels=pyramid
         :alt: IRC Freenode
 
-Pyramid is a small, fast, down-to-earth, open source Python web framework.
-It makes real-world web application development and
-deployment more fun, more predictable, and more productive.
+Pyramid is a small, fast, down-to-earth, open source Python web framework. It
+makes real-world web application development and deployment more fun, more
+predictable, and more productive.
 
 Pyramid is produced by the `Pylons Project <http://pylonsproject.org/>`_.
 
@@ -23,6 +23,13 @@ Support and Documentation
 
 See the `Pylons Project website <http://pylonsproject.org/>`_ to view
 documentation, report bugs, and obtain support.
+
+Developing and Contributing
+---------------------------
+
+See `HACKING.txt` and `contributing.md` for guidelines for running tests,
+adding features, coding style, and updating documentation when developing in or
+contributing to Pyramid.
 
 License
 -------
