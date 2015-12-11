@@ -31,7 +31,7 @@ documentation, report bugs, and obtain support.
 Developing and Contributing
 ---------------------------
 
-See `HACKING.txt` and `contributing.md` for guidelines for running tests,
+See ``HACKING.txt`` and ``contributing.md`` for guidelines for running tests,
 adding features, coding style, and updating documentation when developing in or
 contributing to Pyramid.
 
