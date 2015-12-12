@@ -106,7 +106,7 @@ class URLMethodsMixin(object):
             else:
                 port = e['SERVER_PORT']
         else:
-            port=str(port)
+            port = str(port)
             if ':' in host:
                 host, _ = host.split(':', 1)
         if scheme == 'https':
