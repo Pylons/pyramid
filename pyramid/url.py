@@ -96,11 +96,6 @@ class URLMethodsMixin(object):
             if scheme == 'http':
                 if port is None:
                     port = '80'
-        url = scheme + '://'
-        if port is not None:
-            port = str(port)
-        if host is None:
-            host = e.get('HTTP_HOST')
         if host is None:
             host = e['SERVER_NAME']
         if port is None:
@@ -117,8 +112,9 @@ class URLMethodsMixin(object):
         elif scheme == 'http':
             if port == '80':
                 port = None
-        url += host
+        url = scheme + '://' + host
         if port:
+            
             url += ':%s' % port
 
         url_encoding = getattr(self, 'url_encoding', 'utf-8') # webob 1.2b3+
