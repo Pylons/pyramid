@@ -98,6 +98,8 @@ class URLMethodsMixin(object):
                     port = '80'
         if host is None:
             host = e.get('HTTP_HOST')
+            if host is None:
+                host = e['SERVER_NAME']
         if port is None:
             if ':' in host:
                 host, port = host.split(':', 1)
