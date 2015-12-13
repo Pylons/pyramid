@@ -75,6 +75,9 @@ in your ``.ini`` file.  The ``WSGIScriptAlias`` configuration setting in a
 In the above configuration, we root a :app:`Pyramid` application at
 ``/pyramidapp`` within the Apache configuration.
 
+Alternative approach is to add prefix to all routes by 
+:class:`pyramid.config.Configurator`'s `route_prefix` param. 
+
 .. index::
    single: virtual root
 
