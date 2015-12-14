@@ -3978,13 +3978,15 @@ class TestStaticURLInfo(unittest.TestCase):
             return 'foo' + '/' + subpath, kw
         inst = self._makeOne()
         inst.registrations = [(None, 'package:path/', '__viewname')]
-        inst.cache_busters = [('package:path/', cachebust)]
+        inst.cache_busters = [('package:path/', cachebust, False)]
         request = self._makeRequest()
         called = [False]
         def route_url(n, **kw):
             called[0] = True
             self.assertEqual(n, '__viewname')
-            self.assertEqual(kw, {'subpath': 'foo/abc', 'foo': 'bar'})
+            self.assertEqual(kw, {'subpath': 'foo/abc', 'foo': 'bar',
+                                  'pathspec': 'package:path/abc',
+                                  'rawspec': 'package:path/abc'})
         request.route_url = route_url
         inst.generate('package:path/abc', request)
         self.assertTrue(called[0])
@@ -3996,13 +3998,15 @@ class TestStaticURLInfo(unittest.TestCase):
             return 'foo' + '/' + subpath, kw
         inst = self._makeOne()
         inst.registrations = [(None, here, '__viewname')]
-        inst.cache_busters = [(here, cachebust)]
+        inst.cache_busters = [(here, cachebust, False)]
         request = self._makeRequest()
         called = [False]
         def route_url(n, **kw):
             called[0] = True
             self.assertEqual(n, '__viewname')
-            self.assertEqual(kw, {'subpath': 'foo/abc', 'foo': 'bar'})
+            self.assertEqual(kw, {'subpath': 'foo/abc', 'foo': 'bar',
+                                  'pathspec': here + 'abc',
+                                  'rawspec': here + 'abc'})
         request.route_url = route_url
         inst.generate(here + 'abc', request)
         self.assertTrue(called[0])
@@ -4011,13 +4015,15 @@ class TestStaticURLInfo(unittest.TestCase):
         def fake_cb(*a, **kw): raise AssertionError
         inst = self._makeOne()
         inst.registrations = [(None, 'package:path/', '__viewname')]
-        inst.cache_busters = [('package:path2/', fake_cb)]
+        inst.cache_busters = [('package:path2/', fake_cb, False)]
         request = self._makeRequest()
         called = [False]
         def route_url(n, **kw):
             called[0] = True
             self.assertEqual(n, '__viewname')
-            self.assertEqual(kw, {'subpath': 'abc'})
+            self.assertEqual(kw, {'subpath': 'abc',
+                                  'pathspec': 'package:path/abc',
+                                  'rawspec': 'package:path/abc'})
         request.route_url = route_url
         inst.generate('package:path/abc', request)
         self.assertTrue(called[0])
@@ -4025,17 +4031,22 @@ class TestStaticURLInfo(unittest.TestCase):
     def test_generate_url_cachebust_with_overrides(self):
         config = testing.setUp()
         try:
+            request = testing.DummyRequest()
             config.add_static_view('static', 'path')
             config.override_asset(
                 'pyramid.tests.test_config:path/',
                 'pyramid.tests.test_config:other_path/')
-            def cb(pathspec, subpath, kw):
-                kw['_query'] = {'x': 'foo'}
-                return subpath, kw
-            config.add_cache_buster('other_path', cb)
-            request = testing.DummyRequest()
+            def cb(val):
+                def cb_(request, subpath, kw):
+                    kw['_query'] = {'x': val}
+                    return subpath, kw
+                return cb_
+            config.add_cache_buster('path', cb('foo'))
             result = request.static_url('path/foo.png')
             self.assertEqual(result, 'http://example.com/static/foo.png?x=foo')
+            config.add_cache_buster('other_path', cb('bar'), explicit=True)
+            result = request.static_url('path/foo.png')
+            self.assertEqual(result, 'http://example.com/static/foo.png?x=bar')
         finally:
             testing.tearDown()
 
@@ -4138,7 +4149,7 @@ class TestStaticURLInfo(unittest.TestCase):
         inst = self._makeOne()
         inst.add_cache_buster(config, 'mypackage:path', DummyCacheBuster('foo'))
         cachebust = inst.cache_busters[-1][1]
-        subpath, kw = cachebust('mypackage:some/path', 'some/path', {})
+        subpath, kw = cachebust(None, 'some/path', {})
         self.assertEqual(subpath, 'some/path')
         self.assertEqual(kw['x'], 'foo')
 
@@ -4148,7 +4159,7 @@ class TestStaticURLInfo(unittest.TestCase):
         inst = self._makeOne()
         cb = DummyCacheBuster('foo')
         inst.add_cache_buster(config, here, cb)
-        self.assertEqual(inst.cache_busters, [(here + '/', cb)])
+        self.assertEqual(inst.cache_busters, [(here + '/', cb, False)])
 
     def test_add_cachebuster_overwrite(self):
         config = DummyConfig()
@@ -4158,17 +4169,39 @@ class TestStaticURLInfo(unittest.TestCase):
         inst.add_cache_buster(config, 'mypackage:path/', cb1)
         inst.add_cache_buster(config, 'mypackage:path', cb2)
         self.assertEqual(inst.cache_busters,
-                         [('mypackage:path/', cb2)])
+                         [('mypackage:path/', cb2, False)])
+
+    def test_add_cachebuster_overwrite_explicit(self):
+        config = DummyConfig()
+        inst = self._makeOne()
+        cb1 = DummyCacheBuster('foo')
+        cb2 = DummyCacheBuster('bar')
+        inst.add_cache_buster(config, 'mypackage:path/', cb1)
+        inst.add_cache_buster(config, 'mypackage:path', cb2, True)
+        self.assertEqual(inst.cache_busters,
+                         [('mypackage:path/', cb1, False),
+                          ('mypackage:path/', cb2, True)])
 
     def test_add_cachebuster_for_more_specific_path(self):
         config = DummyConfig()
         inst = self._makeOne()
         cb1 = DummyCacheBuster('foo')
         cb2 = DummyCacheBuster('bar')
+        cb3 = DummyCacheBuster('baz')
+        cb4 = DummyCacheBuster('xyz')
+        cb5 = DummyCacheBuster('w')
         inst.add_cache_buster(config, 'mypackage:path', cb1)
-        inst.add_cache_buster(config, 'mypackage:path/sub', cb2)
-        self.assertEqual(inst.cache_busters,
-                         [('mypackage:path/', cb1), ('mypackage:path/sub/', cb2)])
+        inst.add_cache_buster(config, 'mypackage:path/sub', cb2, True)
+        inst.add_cache_buster(config, 'mypackage:path/sub/other', cb3)
+        inst.add_cache_buster(config, 'mypackage:path/sub/other', cb4, True)
+        inst.add_cache_buster(config, 'mypackage:path/sub/less', cb5, True)
+        self.assertEqual(
+            inst.cache_busters,
+            [('mypackage:path/', cb1, False),
+             ('mypackage:path/sub/other/', cb3, False),
+             ('mypackage:path/sub/', cb2, True),
+             ('mypackage:path/sub/less/', cb5, True),
+             ('mypackage:path/sub/other/', cb4, True)])
 
 class Test_view_description(unittest.TestCase):
     def _callFUT(self, view):
@@ -4293,7 +4326,7 @@ class DummyCacheBuster(object):
     def __init__(self, token):
         self.token = token
 
-    def __call__(self, pathspec, subpath, kw):
+    def __call__(self, request, subpath, kw):
         kw['x'] = self.token
         return subpath, kw
 

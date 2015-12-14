@@ -1,4 +1,3 @@
-import bisect
 import inspect
 import posixpath
 import operator
@@ -1941,7 +1940,7 @@ class ViewsConfiguratorMixin(object):
         info = self._get_static_info()
         info.add(self, name, spec, **kw)
 
-    def add_cache_buster(self, path, cachebust):
+    def add_cache_buster(self, path, cachebust, explicit=False):
         """
         Add a cache buster to a set of files on disk.
 
@@ -1956,10 +1955,16 @@ class ViewsConfiguratorMixin(object):
         be an object which implements
         :class:`~pyramid.interfaces.ICacheBuster`.
 
+        If ``explicit`` is set to ``True`` then the ``path`` for the cache
+        buster will be matched based on the ``rawspec`` instead of the
+        ``pathspec`` as defined in the
+        :class:`~pyramid.interfaces.ICacheBuster` interface.
+        Default: ``False``.
+
         """
         spec = self._make_spec(path)
         info = self._get_static_info()
-        info.add_cache_buster(self, spec, cachebust)
+        info.add_cache_buster(self, spec, cachebust, explicit=explicit)
 
     def _get_static_info(self):
         info = self.registry.queryUtility(IStaticURLInfo)
@@ -1992,7 +1997,7 @@ class StaticURLInfo(object):
                     subpath = subpath.replace('\\', '/') # windows
                 if self.cache_busters:
                     subpath, kw = self._bust_asset_path(
-                        request.registry, spec, subpath, kw)
+                        request, spec, subpath, kw)
                 if url is None:
                     kw['subpath'] = subpath
                     return request.route_url(route_name, **kw)
@@ -2096,7 +2101,7 @@ class StaticURLInfo(object):
 
         config.action(None, callable=register, introspectables=(intr,))
 
-    def add_cache_buster(self, config, spec, cachebust):
+    def add_cache_buster(self, config, spec, cachebust, explicit=False):
         if config.registry.settings.get('pyramid.prevent_cachebust'):
             return
 
@@ -2112,29 +2117,46 @@ class StaticURLInfo(object):
         def register():
             cache_busters = self.cache_busters
 
-            specs = [t[0] for t in cache_busters]
-            if spec in specs:
-                idx = specs.index(spec)
-                cache_busters.pop(idx)
+            # find duplicate cache buster (old_idx)
+            # and insertion location (new_idx)
+            new_idx, old_idx = len(cache_busters), None
+            for idx, (spec_, cb_, explicit_) in enumerate(cache_busters):
+                # if we find an identical (spec, explicit) then use it
+                if spec == spec_ and explicit == explicit_:
+                    old_idx = new_idx = idx
+                    break
 
-            lengths = [len(t[0]) for t in cache_busters]
-            new_idx = bisect.bisect_left(lengths, len(spec))
-            cache_busters.insert(new_idx, (spec, cachebust))
+                # past all explicit==False specs then add to the end
+                elif not explicit and explicit_:
+                    new_idx = idx
+                    break
+
+                # explicit matches and spec is shorter
+                elif explicit == explicit_ and len(spec) < len(spec_):
+                    new_idx = idx
+                    break
+
+            if old_idx is not None:
+                cache_busters.pop(old_idx)
+            cache_busters.insert(new_idx, (spec, cachebust, explicit))
 
         intr = config.introspectable('cache busters',
                                      spec,
                                      'cache buster for %r' % spec,
                                      'cache buster')
         intr['cachebust'] = cachebust
-        intr['spec'] = spec
+        intr['path'] = spec
+        intr['explicit'] = explicit
 
         config.action(None, callable=register, introspectables=(intr,))
 
-    def _bust_asset_path(self, registry, spec, subpath, kw):
+    def _bust_asset_path(self, request, spec, subpath, kw):
+        registry = request.registry
         pkg_name, pkg_subpath = resolve_asset_spec(spec)
         rawspec = None
 
         if pkg_name is not None:
+            pathspec = '{0}:{1}{2}'.format(pkg_name, pkg_subpath, subpath)
             overrides = registry.queryUtility(IPackageOverrides, name=pkg_name)
             if overrides is not None:
                 resource_name = posixpath.join(pkg_subpath, subpath)
@@ -2145,14 +2167,19 @@ class StaticURLInfo(object):
                         rawspec = '{0}:{1}'.format(source.pkg_name, rawspec)
                     break
 
-            if rawspec is None:
-                rawspec = '{0}:{1}{2}'.format(pkg_name, pkg_subpath, subpath)
+        else:
+            pathspec = pkg_subpath + subpath
 
         if rawspec is None:
-            rawspec = pkg_subpath + subpath
+            rawspec = pathspec
 
-        for base_spec, cachebust in reversed(self.cache_busters):
-            if rawspec.startswith(base_spec):
-                subpath, kw = cachebust(rawspec, subpath, kw)
+        kw['pathspec'] = pathspec
+        kw['rawspec'] = rawspec
+        for spec_, cachebust, explicit in reversed(self.cache_busters):
+            if (
+                (explicit and rawspec.startswith(spec_)) or
+                (not explicit and pathspec.startswith(spec_))
+            ):
+                subpath, kw = cachebust(request, subpath, kw)
                 break
         return subpath, kw

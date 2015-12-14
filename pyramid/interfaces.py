@@ -1194,11 +1194,11 @@ class ICacheBuster(Interface):
 
     .. versionadded:: 1.6
     """
-    def __call__(pathspec, subpath, kw):
+    def __call__(request, subpath, kw):
         """
         Modifies a subpath and/or keyword arguments from which a static asset
-        URL will be computed during URL generation.  The ``pathspec`` argument
-        is the path specification for the resource to be cache busted.
+        URL will be computed during URL generation.
+
         The ``subpath`` argument is a path of ``/``-delimited segments that
         represent the portion of the asset URL which is used to find the asset.
         The ``kw`` argument is a dict of keywords that are to be passed
@@ -1209,10 +1209,22 @@ class ICacheBuster(Interface):
         should be modified to include the cache bust token in the generated
         URL.
 
-        The ``pathspec`` refers to original location of the file, ignoring any
-        calls to :meth:`pyramid.config.Configurator.override_asset`. For
-        example, with a call ``request.static_url('myapp:static/foo.png'), the
-        ``pathspec`` may be ``themepkg:bar.png``, assuming a call to
+        The ``kw`` dictionary contains extra arguments passed to
+        :meth:`~pyramid.request.Request.static_url` as well as some extra
+        items that may be usful including:
+
+          - ``pathspec`` is the path specification for the resource
+            to be cache busted.
+
+          - ``rawspec`` is the original location of the file, ignoring
+            any calls to :meth:`pyramid.config.Configurator.override_asset`.
+
+        The ``pathspec`` and ``rawspec`` values are only different in cases
+        where an asset has been mounted into a virtual location using
+        :meth:`pyramid.config.Configurator.override_asset`. For example, with
+        a call to ``request.static_url('myapp:static/foo.png'), the
+        ``pathspec`` is ``myapp:static/foo.png`` whereas the ``rawspec`` may
+        be ``themepkg:bar.png``, assuming a call to
         ``config.override_asset('myapp:static/foo.png', 'themepkg:bar.png')``.
         """
 

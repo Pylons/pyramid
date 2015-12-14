@@ -172,15 +172,15 @@ class QueryStringCacheBuster(object):
     to the query string and defaults to ``'x'``.
 
     To use this class, subclass it and provide a ``tokenize`` method which
-    accepts a ``pathspec`` and returns a token.
+    accepts ``request, pathspec, kw`` and returns a token.
 
     .. versionadded:: 1.6
     """
     def __init__(self, param='x'):
         self.param = param
 
-    def __call__(self, pathspec, subpath, kw):
-        token = self.tokenize(pathspec)
+    def __call__(self, request, subpath, kw):
+        token = self.tokenize(request, subpath, kw)
         query = kw.setdefault('_query', {})
         if isinstance(query, dict):
             query[self.param] = token
@@ -205,7 +205,7 @@ class QueryStringConstantCacheBuster(QueryStringCacheBuster):
         super(QueryStringConstantCacheBuster, self).__init__(param=param)
         self._token = token
 
-    def tokenize(self, pathspec):
+    def tokenize(self, request, subpath, kw):
         return self._token
 
 class ManifestCacheBuster(object):
@@ -290,6 +290,6 @@ class ManifestCacheBuster(object):
                 self._mtime = mtime
         return self._manifest
 
-    def __call__(self, pathspec, subpath, kw):
+    def __call__(self, request, subpath, kw):
         subpath = self.manifest.get(subpath, subpath)
         return (subpath, kw)

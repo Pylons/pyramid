@@ -383,7 +383,7 @@ class TestQueryStringConstantCacheBuster(unittest.TestCase):
 
     def test_token(self):
         fut = self._makeOne().tokenize
-        self.assertEqual(fut('whatever'), 'foo')
+        self.assertEqual(fut(None, 'whatever', None), 'foo')
 
     def test_it(self):
         fut = self._makeOne()
