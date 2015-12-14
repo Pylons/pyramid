@@ -15,3 +15,15 @@ class ViewTests(unittest.TestCase):
         request = testing.DummyRequest()
         info = my_view(request)
         self.assertEqual(info['project'], 'MyProject')
+
+
+class FunctionalTests(unittest.TestCase):
+    def setUp(self):
+        from myproject import main
+        app = main({})
+        from webtest import TestApp
+        self.testapp = TestApp(app)
+
+    def test_root(self):
+        res = self.testapp.get('/', status=200)
+        self.assertTrue('Pyramid' in res.body)
