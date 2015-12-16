@@ -39,5 +39,3 @@ notifications:
   irc:
     channels:
       - "chat.freenode.net#pyramid"
-    template:
-      - "%{repository}/%{branch} (%{commit} - %{author}): %{message}"
