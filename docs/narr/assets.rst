@@ -380,11 +380,6 @@ assets using :meth:`~pyramid.config.Configurator.add_cache_buster`:
        'mypackage:folder/static/',
        QueryStringConstantCacheBuster(str(int(time.time()))))
 
-.. note::
-   The trailing slash on the ``add_cache_buster`` call is important to
-   indicate that it is overriding every asset in the folder and not just a
-   file named ``static``.
-
 Adding the cachebuster instructs :app:`Pyramid` to add the current time for
 a static asset to the query string in the asset's URL:
 
@@ -451,12 +446,13 @@ the hash of the current commit:
        from an egg repository like PYPI, you can use this cachebuster to get
        the current commit's SHA1 to use as the cache bust token.
        """
-       def __init__(self, param='x'):
+       def __init__(self, param='x', repo_path=None):
            super(GitCacheBuster, self).__init__(param=param)
-           here = os.path.dirname(os.path.abspath(__file__))
+           if repo_path is None:
+               repo_path = os.path.dirname(os.path.abspath(__file__))
            self.sha1 = subprocess.check_output(
                ['git', 'rev-parse', 'HEAD'],
-               cwd=here).strip()
+               cwd=repo_path).strip()
 
        def tokenize(self, pathspec):
            return self.sha1
@@ -469,10 +465,14 @@ well:
 
    import posixpath
 
-   def cache_buster(spec, subpath, kw):
-       base_subpath, ext = posixpath.splitext(subpath)
-       new_subpath = base_subpath + '-asdf' + ext
-       return new_subpath, kw
+   class PathConstantCacheBuster(object):
+       def __init__(self, token):
+           self.token = token
+
+       def __call__(self, request, subpath, kw):
+           base_subpath, ext = posixpath.splitext(subpath)
+           new_subpath = base_subpath + self.token + ext
+           return new_subpath, kw
 
 The caveat with this approach is that modifying the path segment
 changes the file name, and thus must match what is actually on the
@@ -531,29 +531,6 @@ The following code would set up a cachebuster:
    config.add_cache_buster(
        'mypackage:static/',
        ManifestCacheBuster('myapp:static/manifest.json'))
-
-A simpler approach is to use the
-:class:`~pyramid.static.QueryStringConstantCacheBuster` to generate a global
-token that will bust all of the assets at once. The advantage of this strategy
-is that it is simple and by using the query string there doesn't need to be
-any shared information between your application and the static assets.
-
-The following code would set up a cachebuster that just uses the time at
-start up as a cachebust token:
-
-.. code-block:: python
-   :linenos:
-
-   import time
-   from pyramid.static import QueryStringConstantCacheBuster
-
-   config.add_static_view(
-       name='http://mycdn.example.com/',
-       path='mypackage:static')
-
-   config.add_cache_buster(
-       'mypackage:static/',
-       QueryStringConstantCacheBuster(str(int(time.time()))))
 
 .. index::
    single: static assets view
@@ -834,3 +811,56 @@ when an override is used.
   As of Pyramid 1.6, it is also possible to override an asset by supplying an
   absolute path to a file or directory. This may be useful if the assets are
   not distributed as part of a Python package.
+
+Cache Busting and Asset Overrides
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Overriding static assets that are being hosted using
+:meth:`pyramid.config.Configurator.add_static_view` can affect your cache
+busting strategy when using any cache busters that are asset-aware such as
+:class:`pyramid.static.ManifestCacheBuster`. What sets asset-aware cache
+busters apart is that they have logic tied to specific assets. For example,
+a manifest is only generated for a specific set of pre-defined assets. Now,
+imagine you have overridden an asset defined in this manifest with a new,
+unknown version. By default, the cache buster will be invoked for an asset
+it has never seen before and will likely end up returning a cache busting
+token for the original asset rather than the asset that will actually end up
+being served! In order to get around this issue it's possible to attach a
+different :class:`pyramid.interfaces.ICacheBuster` implementation to the
+new assets. This would cause the original assets to be served by their
+manifest, and the new assets served by their own cache buster. To do this,
+:meth:`pyramid.config.Configurator.add_cache_buster` supports an ``explicit``
+option. For example:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.static import ManifestCacheBuster
+
+   # define a static view for myapp:static assets
+   config.add_static_view('static', 'myapp:static')
+
+   # setup a cache buster for your app based on the myapp:static assets
+   my_cb = ManifestCacheBuster('myapp:static/manifest.json')
+   config.add_cache_buster('myapp:static', my_cb)
+
+   # override an asset
+   config.override_asset(
+       to_override='myapp:static/background.png',
+       override_with='theme:static/background.png')
+
+   # override the cache buster for theme:static assets
+   theme_cb = ManifestCacheBuster('theme:static/manifest.json')
+   config.add_cache_buster('theme:static', theme_cb, explicit=True)
+
+In the above example there is a default cache buster, ``my_cb`` for all assets
+served from the ``myapp:static`` folder. This would also affect
+``theme:static/background.png`` when generating URLs via
+``request.static_url('myapp:static/background.png')``.
+
+The ``theme_cb`` is defined explicitly for any assets loaded from the
+``theme:static`` folder. Explicit cache busters have priority and thus
+``theme_cb`` would be invoked for
+``request.static_url('myapp:static/background.png')`` but ``my_cb`` would be
+used for any other assets like
+``request.static_url('myapp:static/favicon.ico')``.
