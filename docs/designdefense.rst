@@ -7,98 +7,94 @@ From time to time, challenges to various aspects of :app:`Pyramid` design are
 lodged.  To give context to discussions that follow, we detail some of the
 design decisions and trade-offs here.  In some cases, we acknowledge that the
 framework can be made better and we describe future steps which will be taken
-to improve it; in some cases we just file the challenge as noted, as
-obviously you can't please everyone all of the time.
+to improve it.  In others we just file the challenge as noted, as obviously you
+can't please everyone all of the time.
 
 Pyramid Provides More Than One Way to Do It
 -------------------------------------------
 
 A canon of Python popular culture is "TIOOWTDI" ("there is only one way to do
-it", a slighting, tongue-in-cheek reference to Perl's "TIMTOWTDI", which is
-an acronym for "there is more than one way to do it").
+it", a slighting, tongue-in-cheek reference to Perl's "TIMTOWTDI", which is an
+acronym for "there is more than one way to do it").
 
-:app:`Pyramid` is, for better or worse, a "TIMTOWTDI" system.  For example,
-it includes more than one way to resolve a URL to a :term:`view callable`:
-via :term:`url dispatch` or :term:`traversal`.  Multiple methods of
-configuration exist: :term:`imperative configuration`, :term:`configuration
-decoration`, and :term:`ZCML` (optionally via :term:`pyramid_zcml`). It works
-with multiple different kinds of persistence and templating systems.  And so
-on.  However, the existence of most of these overlapping ways to do things
-are not without reason and purpose: we have a number of audiences to serve,
-and we believe that TIMTOWTI at the web framework level actually *prevents* a
-much more insidious and harmful set of duplication at higher levels in the
-Python web community.
+:app:`Pyramid` is, for better or worse, a "TIMTOWTDI" system.  For example, it
+includes more than one way to resolve a URL to a :term:`view callable`: via
+:term:`url dispatch` or :term:`traversal`. Multiple methods of configuration
+exist: :term:`imperative configuration`, :term:`configuration decoration`, and
+:term:`ZCML` (optionally via :term:`pyramid_zcml`). It works with multiple
+different kinds of persistence and templating systems. And so on. However, the
+existence of most of these overlapping ways to do things are not without reason
+and purpose: we have a number of audiences to serve, and we believe that
+TIMTOWTDI at the web framework level actually *prevents* a much more insidious
+and harmful set of duplication at higher levels in the Python web community.
 
-:app:`Pyramid` began its life as :mod:`repoze.bfg`, written by a team of
-people with many years of prior :term:`Zope` experience.  The idea of
+:app:`Pyramid` began its life as :mod:`repoze.bfg`, written by a team of people
+with many years of prior :term:`Zope` experience.  The idea of
 :term:`traversal` and the way :term:`view lookup` works was stolen entirely
 from Zope.  The authorization subsystem provided by :app:`Pyramid` is a
 derivative of Zope's.  The idea that an application can be *extended* without
 forking is also a Zope derivative.
 
 Implementations of these features were *required* to allow the :app:`Pyramid`
-authors to build the bread-and-butter CMS-type systems for customers in the
-way in which they were accustomed.  No other system, save for Zope itself,
-had such features, and Zope itself was beginning to show signs of its age.
-We were becoming hampered by consequences of its early design mistakes.
-Zope's lack of documentation was also difficult to work around: it was hard
-to hire smart people to work on Zope applications, because there was no
-comprehensive documentation set to point them at which explained "it all" in
-one consumable place, and it was too large and self-inconsistent to document
-properly.  Before :mod:`repoze.bfg` went under development, its authors
-obviously looked around for other frameworks that fit the bill.  But no
-non-Zope framework did.  So we embarked on building :mod:`repoze.bfg`.
+authors to build the bread-and-butter CMS-type systems for customers in the way
+in which they were accustomed. No other system, save for Zope itself, had such
+features, and Zope itself was beginning to show signs of its age. We were
+becoming hampered by consequences of its early design mistakes. Zope's lack of
+documentation was also difficult to work around. It was hard to hire smart
+people to work on Zope applications because there was no comprehensive
+documentation set which explained "it all" in one consumable place, and it was
+too large and self-inconsistent to document properly. Before :mod:`repoze.bfg`
+went under development, its authors obviously looked around for other
+frameworks that fit the bill. But no non-Zope framework did. So we embarked on
+building :mod:`repoze.bfg`.
 
 As the result of our research, however, it became apparent that, despite the
-fact that no *one* framework had all the features we required, lots of
-existing frameworks had good, and sometimes very compelling ideas.  In
-particular, :term:`URL dispatch` is a more direct mechanism to map URLs to
-code.
+fact that no *one* framework had all the features we required, lots of existing
+frameworks had good, and sometimes very compelling ideas. In particular,
+:term:`URL dispatch` is a more direct mechanism to map URLs to code.
 
 So, although we couldn't find a framework, save for Zope, that fit our needs,
 and while we incorporated a lot of Zope ideas into BFG, we also emulated the
 features we found compelling in other frameworks (such as :term:`url
-dispatch`).  After the initial public release of BFG, as time went on,
-features were added to support people allergic to various Zope-isms in the
-system, such as the ability to configure the application using
-:term:`imperative configuration` and :term:`configuration decoration` rather
-than solely using :term:`ZCML`, and the elimination of the required use of
-:term:`interface` objects.  It soon became clear that we had a system that
-was very generic, and was beginning to appeal to non-Zope users as well as
-ex-Zope users.
+dispatch`). After the initial public release of BFG, as time went on, features
+were added to support people allergic to various Zope-isms in the system, such
+as the ability to configure the application using :term:`imperative
+configuration` and :term:`configuration decoration`, rather than solely using
+:term:`ZCML`, and the elimination of the required use of :term:`interface`
+objects. It soon became clear that we had a system that was very generic, and
+was beginning to appeal to non-Zope users as well as ex-Zope users.
 
 As the result of this generalization, it became obvious BFG shared 90% of its
-featureset with the featureset of Pylons 1, and thus had a very similar
-target market.  Because they were so similar, choosing between the two
-systems was an exercise in frustration for an otherwise non-partisan
-developer.  It was also strange for the Pylons and BFG development
-communities to be in competition for the same set of users, given how similar
-the two frameworks were.  So the Pylons and BFG teams began to work together
-to form a plan to merge.  The features missing from BFG (notably :term:`view
-handler` classes, flash messaging, and other minor missing bits), were added,
-to provide familiarity to ex-Pylons users.  The result is :app:`Pyramid`.
+feature set with the feature set of Pylons 1, and thus had a very similar
+target market. Because they were so similar, choosing between the two systems
+was an exercise in frustration for an otherwise non-partisan developer. It was
+also strange for the Pylons and BFG development communities to be in
+competition for the same set of users, given how similar the two frameworks
+were. So the Pylons and BFG teams began to work together to form a plan to
+merge. The features missing from BFG (notably :term:`view handler` classes,
+flash messaging, and other minor missing bits), were added to provide
+familiarity to ex-Pylons users. The result is :app:`Pyramid`.
 
-The Python web framework space is currently notoriously balkanized.  We're
-truly hoping that the amalgamation of components in :app:`Pyramid` will
-appeal to at least two currently very distinct sets of users: Pylons and BFG
-users.  By unifying the best concepts from Pylons and BFG into a single
-codebase and leaving the bad concepts from their ancestors behind, we'll be
-able to consolidate our efforts better, share more code, and promote our
-efforts as a unit rather than competing pointlessly.  We hope to be able to
-shortcut the pack mentality which results in a *much larger* duplication of
-effort, represented by competing but incredibly similar applications and
-libraries, each built upon a specific low level stack that is incompatible
-with the other.  We'll also shrink the choice of credible Python web
-frameworks down by at least one.  We're also hoping to attract users from
-other communities (such as Zope's and TurboGears') by providing the features
-they require, while allowing enough flexibility to do things in a familiar
-fashion.  Some overlap of functionality to achieve these goals is expected
-and unavoidable, at least if we aim to prevent pointless duplication at
-higher levels.  If we've done our job well enough, the various audiences will
-be able to coexist and cooperate rather than firing at each other across some
-imaginary web framework DMZ.
+The Python web framework space is currently notoriously balkanized. We're truly
+hoping that the amalgamation of components in :app:`Pyramid` will appeal to at
+least two currently very distinct sets of users: Pylons and BFG users. By
+unifying the best concepts from Pylons and BFG into a single codebase, and
+leaving the bad concepts from their ancestors behind, we'll be able to
+consolidate our efforts better, share more code, and promote our efforts as a
+unit rather than competing pointlessly. We hope to be able to shortcut the pack
+mentality which results in a *much larger* duplication of effort, represented
+by competing but incredibly similar applications and libraries, each built upon
+a specific low level stack that is incompatible with the other. We'll also
+shrink the choice of credible Python web frameworks down by at least one. We're
+also hoping to attract users from other communities (such as Zope's and
+TurboGears') by providing the features they require, while allowing enough
+flexibility to do things in a familiar fashion. Some overlap of functionality
+to achieve these goals is expected and unavoidable, at least if we aim to
+prevent pointless duplication at higher levels. If we've done our job well
+enough, the various audiences will be able to coexist and cooperate rather than
+firing at each other across some imaginary web framework DMZ.
 
-Pyramid Uses A Zope Component Architecture ("ZCA") Registry
+Pyramid Uses a Zope Component Architecture ("ZCA") Registry
 -----------------------------------------------------------
 
 :app:`Pyramid` uses a :term:`Zope Component Architecture` (ZCA) "component
