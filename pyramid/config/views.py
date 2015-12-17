@@ -2102,9 +2102,6 @@ class StaticURLInfo(object):
         config.action(None, callable=register, introspectables=(intr,))
 
     def add_cache_buster(self, config, spec, cachebust, explicit=False):
-        if config.registry.settings.get('pyramid.prevent_cachebust'):
-            return
-
         # ensure the spec always has a trailing slash as we only support
         # adding cache busters to folders, not files
         if os.path.isabs(spec): # FBO windows
@@ -2115,6 +2112,9 @@ class StaticURLInfo(object):
             spec = spec + sep
 
         def register():
+            if config.registry.settings.get('pyramid.prevent_cachebust'):
+                return
+
             cache_busters = self.cache_busters
 
             # find duplicate cache buster (old_idx)
@@ -2138,6 +2138,7 @@ class StaticURLInfo(object):
 
             if old_idx is not None:
                 cache_busters.pop(old_idx)
+
             cache_busters.insert(new_idx, (spec, cachebust, explicit))
 
         intr = config.introspectable('cache busters',
