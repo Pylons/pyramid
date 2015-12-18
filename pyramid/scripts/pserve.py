@@ -210,8 +210,9 @@ class PServeCommand(object):
             self.options.set_user = self.options.set_group = None
 
         # @@: Is this the right stage to set the user at?
-        self.change_user_group(
-            self.options.set_user, self.options.set_group)
+        if self.options.set_user or self.options.set_group:
+            self.change_user_group(
+                self.options.set_user, self.options.set_group)
 
         if not self.args:
             self.out('You must give a config file')
@@ -620,9 +621,16 @@ a real process manager for your processes like Systemd, Circus, or Supervisor.
                 self.out('%s %s %s' % ('-' * 20, 'Restarting', '-' * 20))
 
     def change_user_group(self, user, group): # pragma: no cover
-        if not user and not group:
-            return
-        import pwd, grp
+        import pwd
+        import grp
+
+        self.out('''\
+The --user and --group options have been deprecated in Pyramid 1.6. They will
+be removed in a future release per Pyramid's deprecation policy. Please
+consider using a real process manager for your processes like Systemd, Circus,
+or Supervisor, all of which support process security.
+''')
+
         uid = gid = None
         if group:
             try:
