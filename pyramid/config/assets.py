@@ -262,12 +262,15 @@ class FSAssetSource(object):
     def __init__(self, prefix):
         self.prefix = prefix
 
-    def get_filename(self, resource_name):
+    def get_path(self, resource_name):
         if resource_name:
             path = os.path.join(self.prefix, resource_name)
         else:
             path = self.prefix
+        return path
 
+    def get_filename(self, resource_name):
+        path = self.get_path(resource_name)
         if os.path.exists(path):
             return path
 

@@ -1,3 +1,29 @@
+1.6b3 (unreleased)
+==================
+
+Backward Incompatibilities
+--------------------------
+
+- Remove the ``cachebust`` option from ``config.add_static_view``. See
+  ``config.add_cache_buster`` for the new way to attach cache busters to
+  static assets.
+  See https://github.com/Pylons/pyramid/pull/2186
+
+- Modify the ``pyramid.interfaces.ICacheBuster`` API to be a simple callable
+  instead of an object with ``match`` and ``pregenerate`` methods. Cache
+  busters are now focused solely on generation. Matching has been dropped.
+
+  Note this affects usage of ``pyramid.static.QueryStringCacheBuster`` and
+  ``pyramid.static.ManifestCacheBuster``.
+
+  See https://github.com/Pylons/pyramid/pull/2186
+
+Features
+--------
+
+- Add a new ``config.add_cache_buster`` API for attaching cache busters to
+  static assets. See https://github.com/Pylons/pyramid/pull/2186
+
 1.6b2 (2015-10-15)
 ==================
 
