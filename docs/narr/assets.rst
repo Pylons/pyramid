@@ -557,7 +557,7 @@ use some of the following options to get started:
 
 * Configure your asset pipeline to rewrite URL references inline in
   CSS and JavaScript. This is the best approach because then the files
-  may be hosted by :app:`Pyramid` or an external CDN without haven't to
+  may be hosted by :app:`Pyramid` or an external CDN without having to
   change anything. They really are static.
 
 * Templatize JS and CSS, and call ``request.static_url()`` inside their
@@ -825,7 +825,7 @@ imagine you have overridden an asset defined in this manifest with a new,
 unknown version. By default, the cache buster will be invoked for an asset
 it has never seen before and will likely end up returning a cache busting
 token for the original asset rather than the asset that will actually end up
-being served! In order to get around this issue it's possible to attach a
+being served! In order to get around this issue, it's possible to attach a
 different :class:`pyramid.interfaces.ICacheBuster` implementation to the
 new assets. This would cause the original assets to be served by their
 manifest, and the new assets served by their own cache buster. To do this,
@@ -853,14 +853,14 @@ option. For example:
    theme_cb = ManifestCacheBuster('theme:static/manifest.json')
    config.add_cache_buster('theme:static', theme_cb, explicit=True)
 
-In the above example there is a default cache buster, ``my_cb`` for all assets
-served from the ``myapp:static`` folder. This would also affect
+In the above example there is a default cache buster, ``my_cb``, for all
+assets served from the ``myapp:static`` folder. This would also affect
 ``theme:static/background.png`` when generating URLs via
 ``request.static_url('myapp:static/background.png')``.
 
 The ``theme_cb`` is defined explicitly for any assets loaded from the
 ``theme:static`` folder. Explicit cache busters have priority and thus
 ``theme_cb`` would be invoked for
-``request.static_url('myapp:static/background.png')`` but ``my_cb`` would be
-used for any other assets like
+``request.static_url('myapp:static/background.png')``, but ``my_cb`` would
+be used for any other assets like
 ``request.static_url('myapp:static/favicon.ico')``.
