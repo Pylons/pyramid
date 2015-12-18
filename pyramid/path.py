@@ -396,7 +396,8 @@ class PkgResourcesAssetDescriptor(object):
         return '%s:%s' % (self.pkg_name, self.path)
 
     def abspath(self):
-        return self.pkg_resources.resource_filename(self.pkg_name, self.path)
+        return os.path.abspath(
+            self.pkg_resources.resource_filename(self.pkg_name, self.path))
 
     def stream(self):
         return self.pkg_resources.resource_stream(self.pkg_name, self.path)
