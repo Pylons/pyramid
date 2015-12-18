@@ -1,4 +1,4 @@
-1.6b3 (unreleased)
+1.6b3 (2015-12-17)
 ==================
 
 Backward Incompatibilities
