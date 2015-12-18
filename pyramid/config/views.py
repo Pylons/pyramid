@@ -1,4 +1,5 @@
 import inspect
+import posixpath
 import operator
 import os
 import warnings
@@ -20,6 +21,7 @@ from pyramid.interfaces import (
     IException,
     IExceptionViewClassifier,
     IMultiView,
+    IPackageOverrides,
     IRendererFactory,
     IRequest,
     IResponse,
@@ -35,6 +37,7 @@ from pyramid.interfaces import (
 
 from pyramid import renderers
 
+from pyramid.asset import resolve_asset_spec
 from pyramid.compat import (
     string_types,
     urlparse,
@@ -65,7 +68,6 @@ from pyramid.response import Response
 
 from pyramid.security import NO_PERMISSION_REQUIRED
 from pyramid.static import static_view
-from pyramid.threadlocal import get_current_registry
 
 from pyramid.url import parse_url_overrides
 
@@ -1855,18 +1857,7 @@ class ViewsConfiguratorMixin(object):
         ``Expires`` and ``Cache-Control`` headers for static assets served.
         Note that this argument has no effect when the ``name`` is a *url
         prefix*.  By default, this argument is ``None``, meaning that no
-        particular Expires or Cache-Control headers are set in the response,
-        unless ``cachebust`` is specified.
-
-        The ``cachebust`` keyword argument may be set to cause
-        :meth:`~pyramid.request.Request.static_url` to use cache busting when
-        generating URLs. See :ref:`cache_busting` for general information
-        about cache busting. The value of the ``cachebust`` argument must
-        be an object which implements
-        :class:`~pyramid.interfaces.ICacheBuster`.  If the ``cachebust``
-        argument is provided, the default for ``cache_max_age`` is modified
-        to be ten years.  ``cache_max_age`` may still be explicitly provided
-        to override this default.
+        particular Expires or Cache-Control headers are set in the response.
 
         The ``permission`` keyword argument is used to specify the
         :term:`permission` required by a user to execute the static view.  By
@@ -1946,11 +1937,41 @@ class ViewsConfiguratorMixin(object):
         See :ref:`static_assets_section` for more information.
         """
         spec = self._make_spec(path)
+        info = self._get_static_info()
+        info.add(self, name, spec, **kw)
+
+    def add_cache_buster(self, path, cachebust, explicit=False):
+        """
+        Add a cache buster to a set of files on disk.
+
+        The ``path`` should be the path on disk where the static files
+        reside.  This can be an absolute path, a package-relative path, or a
+        :term:`asset specification`.
+
+        The ``cachebust`` argument may be set to cause
+        :meth:`~pyramid.request.Request.static_url` to use cache busting when
+        generating URLs. See :ref:`cache_busting` for general information
+        about cache busting. The value of the ``cachebust`` argument must
+        be an object which implements
+        :class:`~pyramid.interfaces.ICacheBuster`.
+
+        If ``explicit`` is set to ``True`` then the ``path`` for the cache
+        buster will be matched based on the ``rawspec`` instead of the
+        ``pathspec`` as defined in the
+        :class:`~pyramid.interfaces.ICacheBuster` interface.
+        Default: ``False``.
+
+        """
+        spec = self._make_spec(path)
+        info = self._get_static_info()
+        info.add_cache_buster(self, spec, cachebust, explicit=explicit)
+
+    def _get_static_info(self):
         info = self.registry.queryUtility(IStaticURLInfo)
         if info is None:
             info = StaticURLInfo()
             self.registry.registerUtility(info, IStaticURLInfo)
-        info.add(self, name, spec, **kw)
+        return info
 
 def isexception(o):
     if IInterface.providedBy(o):
@@ -1964,26 +1985,19 @@ def isexception(o):
 
 @implementer(IStaticURLInfo)
 class StaticURLInfo(object):
-    def _get_registrations(self, registry):
-        try:
-            reg = registry._static_url_registrations
-        except AttributeError:
-            reg = registry._static_url_registrations = []
-        return reg
+    def __init__(self):
+        self.registrations = []
+        self.cache_busters = []
 
     def generate(self, path, request, **kw):
-        try:
-            registry = request.registry
-        except AttributeError: # bw compat (for tests)
-            registry = get_current_registry()
-        registrations = self._get_registrations(registry)
-        for (url, spec, route_name, cachebust) in registrations:
+        for (url, spec, route_name) in self.registrations:
             if path.startswith(spec):
                 subpath = path[len(spec):]
                 if WIN: # pragma: no cover
                     subpath = subpath.replace('\\', '/') # windows
-                if cachebust:
-                    subpath, kw = cachebust(subpath, kw)
+                if self.cache_busters:
+                    subpath, kw = self._bust_asset_path(
+                        request, spec, subpath, kw)
                 if url is None:
                     kw['subpath'] = subpath
                     return request.route_url(route_name, **kw)
@@ -2023,19 +2037,6 @@ class StaticURLInfo(object):
             # make sure it ends with a slash
             name = name + '/'
 
-        if config.registry.settings.get('pyramid.prevent_cachebust'):
-            cb = None
-        else:
-            cb = extra.pop('cachebust', None)
-        if cb:
-            def cachebust(subpath, kw):
-                subpath_tuple = tuple(subpath.split('/'))
-                subpath_tuple, kw = cb.pregenerate(
-                    spec + subpath, subpath_tuple, kw)
-                return '/'.join(subpath_tuple), kw
-        else:
-            cachebust = None
-
         if url_parse(name).netloc:
             # it's a URL
             # url, spec, route_name
@@ -2044,14 +2045,11 @@ class StaticURLInfo(object):
         else:
             # it's a view name
             url = None
-            ten_years = 10 * 365 * 24 * 60 * 60  # more or less
-            default = ten_years if cb else None
-            cache_max_age = extra.pop('cache_max_age', default)
+            cache_max_age = extra.pop('cache_max_age', None)
 
             # create a view
-            cb_match = getattr(cb, 'match', None)
             view = static_view(spec, cache_max_age=cache_max_age,
-                               use_subpath=True, cachebust_match=cb_match)
+                               use_subpath=True)
 
             # Mutate extra to allow factory, etc to be passed through here.
             # Treat permission specially because we'd like to default to
@@ -2083,7 +2081,7 @@ class StaticURLInfo(object):
             )
 
         def register():
-            registrations = self._get_registrations(config.registry)
+            registrations = self.registrations
 
             names = [t[0] for t in registrations]
 
@@ -2092,7 +2090,7 @@ class StaticURLInfo(object):
                 registrations.pop(idx)
 
             # url, spec, route_name
-            registrations.append((url, spec, route_name, cachebust))
+            registrations.append((url, spec, route_name))
 
         intr = config.introspectable('static views',
                                      name,
@@ -2102,3 +2100,87 @@ class StaticURLInfo(object):
         intr['spec'] = spec
 
         config.action(None, callable=register, introspectables=(intr,))
+
+    def add_cache_buster(self, config, spec, cachebust, explicit=False):
+        # ensure the spec always has a trailing slash as we only support
+        # adding cache busters to folders, not files
+        if os.path.isabs(spec): # FBO windows
+            sep = os.sep
+        else:
+            sep = '/'
+        if not spec.endswith(sep) and not spec.endswith(':'):
+            spec = spec + sep
+
+        def register():
+            if config.registry.settings.get('pyramid.prevent_cachebust'):
+                return
+
+            cache_busters = self.cache_busters
+
+            # find duplicate cache buster (old_idx)
+            # and insertion location (new_idx)
+            new_idx, old_idx = len(cache_busters), None
+            for idx, (spec_, cb_, explicit_) in enumerate(cache_busters):
+                # if we find an identical (spec, explicit) then use it
+                if spec == spec_ and explicit == explicit_:
+                    old_idx = new_idx = idx
+                    break
+
+                # past all explicit==False specs then add to the end
+                elif not explicit and explicit_:
+                    new_idx = idx
+                    break
+
+                # explicit matches and spec is shorter
+                elif explicit == explicit_ and len(spec) < len(spec_):
+                    new_idx = idx
+                    break
+
+            if old_idx is not None:
+                cache_busters.pop(old_idx)
+
+            cache_busters.insert(new_idx, (spec, cachebust, explicit))
+
+        intr = config.introspectable('cache busters',
+                                     spec,
+                                     'cache buster for %r' % spec,
+                                     'cache buster')
+        intr['cachebust'] = cachebust
+        intr['path'] = spec
+        intr['explicit'] = explicit
+
+        config.action(None, callable=register, introspectables=(intr,))
+
+    def _bust_asset_path(self, request, spec, subpath, kw):
+        registry = request.registry
+        pkg_name, pkg_subpath = resolve_asset_spec(spec)
+        rawspec = None
+
+        if pkg_name is not None:
+            pathspec = '{0}:{1}{2}'.format(pkg_name, pkg_subpath, subpath)
+            overrides = registry.queryUtility(IPackageOverrides, name=pkg_name)
+            if overrides is not None:
+                resource_name = posixpath.join(pkg_subpath, subpath)
+                sources = overrides.filtered_sources(resource_name)
+                for source, filtered_path in sources:
+                    rawspec = source.get_path(filtered_path)
+                    if hasattr(source, 'pkg_name'):
+                        rawspec = '{0}:{1}'.format(source.pkg_name, rawspec)
+                    break
+
+        else:
+            pathspec = pkg_subpath + subpath
+
+        if rawspec is None:
+            rawspec = pathspec
+
+        kw['pathspec'] = pathspec
+        kw['rawspec'] = rawspec
+        for spec_, cachebust, explicit in reversed(self.cache_busters):
+            if (
+                (explicit and rawspec.startswith(spec_)) or
+                (not explicit and pathspec.startswith(spec_))
+            ):
+                subpath, kw = cachebust(request, subpath, kw)
+                break
+        return subpath, kw

@@ -383,31 +383,31 @@ class TestQueryStringConstantCacheBuster(unittest.TestCase):
 
     def test_token(self):
         fut = self._makeOne().tokenize
-        self.assertEqual(fut('whatever'), 'foo')
+        self.assertEqual(fut(None, 'whatever', None), 'foo')
 
-    def test_pregenerate(self):
-        fut = self._makeOne().pregenerate
+    def test_it(self):
+        fut = self._makeOne()
         self.assertEqual(
-            fut('foo', ('bar',), {}),
-            (('bar',), {'_query': {'x': 'foo'}}))
+            fut('foo', 'bar', {}),
+            ('bar', {'_query': {'x': 'foo'}}))
 
-    def test_pregenerate_change_param(self):
-        fut = self._makeOne('y').pregenerate
+    def test_change_param(self):
+        fut = self._makeOne('y')
         self.assertEqual(
-            fut('foo', ('bar',), {}),
-            (('bar',), {'_query': {'y': 'foo'}}))
+            fut('foo', 'bar', {}),
+            ('bar', {'_query': {'y': 'foo'}}))
 
-    def test_pregenerate_query_is_already_tuples(self):
-        fut = self._makeOne().pregenerate
+    def test_query_is_already_tuples(self):
+        fut = self._makeOne()
         self.assertEqual(
-            fut('foo', ('bar',), {'_query': [('a', 'b')]}),
-            (('bar',), {'_query': (('a', 'b'), ('x', 'foo'))}))
+            fut('foo', 'bar', {'_query': [('a', 'b')]}),
+            ('bar', {'_query': (('a', 'b'), ('x', 'foo'))}))
 
-    def test_pregenerate_query_is_tuple_of_tuples(self):
-        fut = self._makeOne().pregenerate
+    def test_query_is_tuple_of_tuples(self):
+        fut = self._makeOne()
         self.assertEqual(
-            fut('foo', ('bar',), {'_query': (('a', 'b'),)}),
-            (('bar',), {'_query': (('a', 'b'), ('x', 'foo'))}))
+            fut('foo', 'bar', {'_query': (('a', 'b'),)}),
+            ('bar', {'_query': (('a', 'b'), ('x', 'foo'))}))
 
 class TestManifestCacheBuster(unittest.TestCase):
 
@@ -417,55 +417,55 @@ class TestManifestCacheBuster(unittest.TestCase):
 
     def test_it(self):
         manifest_path = os.path.join(here, 'fixtures', 'manifest.json')
-        fut = self._makeOne(manifest_path).pregenerate
-        self.assertEqual(fut('foo', ('bar',), {}), (['bar'], {}))
+        fut = self._makeOne(manifest_path)
+        self.assertEqual(fut('foo', 'bar', {}), ('bar', {}))
         self.assertEqual(
-            fut('foo', ('css', 'main.css'), {}),
-            (['css', 'main-test.css'], {}))
+            fut('foo', 'css/main.css', {}),
+            ('css/main-test.css', {}))
 
     def test_it_with_relspec(self):
-        fut = self._makeOne('fixtures/manifest.json').pregenerate
-        self.assertEqual(fut('foo', ('bar',), {}), (['bar'], {}))
+        fut = self._makeOne('fixtures/manifest.json')
+        self.assertEqual(fut('foo', 'bar', {}), ('bar', {}))
         self.assertEqual(
-            fut('foo', ('css', 'main.css'), {}),
-            (['css', 'main-test.css'], {}))
+            fut('foo', 'css/main.css', {}),
+            ('css/main-test.css', {}))
 
     def test_it_with_absspec(self):
-        fut = self._makeOne('pyramid.tests:fixtures/manifest.json').pregenerate
-        self.assertEqual(fut('foo', ('bar',), {}), (['bar'], {}))
+        fut = self._makeOne('pyramid.tests:fixtures/manifest.json')
+        self.assertEqual(fut('foo', 'bar', {}), ('bar', {}))
         self.assertEqual(
-            fut('foo', ('css', 'main.css'), {}),
-            (['css', 'main-test.css'], {}))
+            fut('foo', 'css/main.css', {}),
+            ('css/main-test.css', {}))
 
     def test_reload(self):
         manifest_path = os.path.join(here, 'fixtures', 'manifest.json')
         new_manifest_path = os.path.join(here, 'fixtures', 'manifest2.json')
         inst = self._makeOne('foo', reload=True)
         inst.getmtime = lambda *args, **kwargs: 0
-        fut = inst.pregenerate
+        fut = inst
 
         # test without a valid manifest
         self.assertEqual(
-            fut('foo', ('css', 'main.css'), {}),
-            (['css', 'main.css'], {}))
+            fut('foo', 'css/main.css', {}),
+            ('css/main.css', {}))
 
         # swap to a real manifest, setting mtime to 0
         inst.manifest_path = manifest_path
         self.assertEqual(
-            fut('foo', ('css', 'main.css'), {}),
-            (['css', 'main-test.css'], {}))
+            fut('foo', 'css/main.css', {}),
+            ('css/main-test.css', {}))
 
         # ensure switching the path doesn't change the result
         inst.manifest_path = new_manifest_path
         self.assertEqual(
-            fut('foo', ('css', 'main.css'), {}),
-            (['css', 'main-test.css'], {}))
+            fut('foo', 'css/main.css', {}),
+            ('css/main-test.css', {}))
 
         # update mtime, should cause a reload
         inst.getmtime = lambda *args, **kwargs: 1
         self.assertEqual(
-            fut('foo', ('css', 'main.css'), {}),
-            (['css', 'main-678b7c80.css'], {}))
+            fut('foo', 'css/main.css', {}),
+            ('css/main-678b7c80.css', {}))
 
     def test_invalid_manifest(self):
         self.assertRaises(IOError, lambda: self._makeOne('foo'))
