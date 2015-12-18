@@ -24,6 +24,13 @@ Features
 - Add a new ``config.add_cache_buster`` API for attaching cache busters to
   static assets. See https://github.com/Pylons/pyramid/pull/2186
 
+Bug Fixes
+---------
+
+- Ensure that ``IAssetDescriptor.abspath`` always returns an absolute path.
+  There were cases depending on the process CWD that a relative path would
+  be returned. See https://github.com/Pylons/pyramid/issues/2188
+
 1.6b2 (2015-10-15)
 ==================
 
