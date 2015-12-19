@@ -1,3 +1,13 @@
+unreleased
+==========
+
+Deprecations
+------------
+
+- Continue removal of ``pserve`` daemon/process management features
+  by deprecating ``--user`` and ``--group`` options.
+  See https://github.com/Pylons/pyramid/pull/2190
+
 1.6b3 (2015-12-17)
 ==================
 
