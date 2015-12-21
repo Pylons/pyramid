@@ -53,14 +53,18 @@ The included scaffolds are these:
 ``alchemy``
   URL mapping via :term:`URL dispatch` and persistence via :term:`SQLAlchemy`
 
+
 .. index::
    single: creating a project
    single: project
+   single: pcreate
 
 .. _creating_a_project:
 
 Creating the Project
 --------------------
+
+.. seealso:: See also the output of :ref:`pcreate --help <pcreate_script>`.
 
 In :ref:`installing_chapter`, you created a virtual Python environment via the
 ``virtualenv`` command.  To start a :app:`Pyramid` :term:`project`, use the
@@ -249,6 +253,8 @@ single sample test exists.
 
 Running the Project Application
 -------------------------------
+
+.. seealso:: See also the output of :ref:`pserve --help <pserve_script>`.
 
 Once a project is installed for development, you can run the application it
 represents using the ``pserve`` command against the generated configuration

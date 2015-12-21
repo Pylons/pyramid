@@ -6,6 +6,7 @@ Command-Line Pyramid
 Your :app:`Pyramid` application can be controlled and inspected using a variety
 of command-line utilities.  These utilities are documented in this chapter.
 
+
 .. index::
    pair: matching views; printing
    single: pviews
@@ -14,6 +15,8 @@ of command-line utilities.  These utilities are documented in this chapter.
 
 Displaying Matching Views for a Given URL
 -----------------------------------------
+
+.. seealso:: See also the output of :ref:`pviews --help <pviews_script>`.
 
 For a big application with several views, it can be hard to keep the view
 configuration details in your head, even if you defined all the views yourself.
@@ -114,6 +117,8 @@ found* message.
 The Interactive Shell
 ---------------------
 
+.. seealso:: See also the output of :ref:`pshell --help <pshell_script>`.
+
 Once you've installed your program for development using ``setup.py develop``,
 you can use an interactive Python shell to execute expressions in a Python
 environment exactly like the one that will be used when your application runs
@@ -178,6 +183,7 @@ hash after the filename:
     $ $VENV/bin/pshell starter/development.ini
 
 Press ``Ctrl-D`` to exit the interactive shell (or ``Ctrl-Z`` on Windows).
+
 
 .. index::
    pair: pshell; extending
@@ -261,6 +267,7 @@ request is configured to generate urls from the host
     >>> request.route_url('home')
     'https://www.example.com/'
 
+
 .. _ipython_or_bpython:
 
 Alternative Shells
@@ -317,6 +324,7 @@ arguments, ``env`` and ``help``, which would look like this:
    ``ipython`` and ``bpython`` have been moved into their respective
    packages ``pyramid_ipython`` and ``pyramid_bpython``.
 
+
 Setting a Default Shell
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -331,6 +339,7 @@ specify a list of preferred shells.
 
 .. versionadded:: 1.6
 
+
 .. index::
    pair: routes; printing
    single: proutes
@@ -339,6 +348,8 @@ specify a list of preferred shells.
 
 Displaying All Application Routes
 ---------------------------------
+
+.. seealso:: See also the output of :ref:`proutes --help <proutes_script>`.
 
 You can use the ``proutes`` command in a terminal window to print a summary of
 routes related to your application.  Much like the ``pshell`` command (see
@@ -421,6 +432,8 @@ include. The current available formats are ``name``, ``pattern``, ``view``, and
 Displaying "Tweens"
 -------------------
 
+.. seealso:: See also the output of :ref:`ptweens --help <ptweens_script>`.
+
 A :term:`tween` is a bit of code that sits between the main Pyramid application
 request handler and the WSGI application which calls it.  A user can get a
 representation of both the implicit tween ordering (the ordering specified by
@@ -497,6 +510,7 @@ used:
 
 See :ref:`registering_tweens` for more information about tweens.
 
+
 .. index::
    single: invoking a request
    single: prequest
@@ -505,6 +519,8 @@ See :ref:`registering_tweens` for more information about tweens.
 
 Invoking a Request
 ------------------
+
+.. seealso:: See also the output of :ref:`prequest --help <prequest_script>`.
 
 You can use the ``prequest`` command-line utility to send a request to your
 application and see the response body without starting a server.
@@ -555,6 +571,7 @@ of the ``prequest`` process is used as the ``POST`` body::
 
    $ $VENV/bin/prequest -mPOST development.ini / < somefile
 
+
 Using Custom Arguments to Python when Running ``p*`` Scripts
 ------------------------------------------------------------
 
@@ -566,10 +583,21 @@ Python interpreter at runtime. For example::
 
       python -3 -m pyramid.scripts.pserve development.ini
 
+
+.. index::
+   single: pdistreport
+   single: distributions, showing installed
+   single: showing installed distributions
+
+.. _showing_distributions:
+
 Showing All Installed Distributions and Their Versions
 ------------------------------------------------------
 
 .. versionadded:: 1.5
+
+.. seealso:: See also the output of :ref:`pdistreport --help
+   <pdistreport_script>`.
 
 You can use the ``pdistreport`` command to show the :app:`Pyramid` version in
 use, the Python version in use, and all installed versions of Python
@@ -589,6 +617,7 @@ distributions in your Python environment::
 pastebin when you are having problems and need someone with more familiarity
 with Python packaging and distribution than you have to look at your
 environment.
+
 
 .. _writing_a_script:
 
@@ -702,6 +731,7 @@ The above example specifies the ``another`` ``app``, ``pipeline``, or
 object present in the ``env`` dictionary returned by
 :func:`pyramid.paster.bootstrap` will be a :app:`Pyramid` :term:`router`.
 
+
 Changing the Request
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -742,6 +772,7 @@ Now you can readily use Pyramid's APIs for generating URLs:
    env['request'].route_url('verify', code='1337')
    # will return 'https://example.com/prefix/verify/1337'
 
+
 Cleanup
 ~~~~~~~
 
@@ -756,6 +787,7 @@ callback:
    # .. do stuff ...
 
    env['closer']()
+
 
 Setting Up Logging
 ~~~~~~~~~~~~~~~~~~
@@ -772,6 +804,7 @@ use the following command:
 
 See :ref:`logging_chapter` for more information on logging within
 :app:`Pyramid`.
+
 
 .. index::
    single: console script
