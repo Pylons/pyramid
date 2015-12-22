@@ -7,7 +7,6 @@
 ------------
 
 .. program-output:: prequest --help
-   :cwd: ../../env/bin
    :prompt:
    :shell:
 

@@ -7,7 +7,6 @@
 ----------
 
 .. program-output:: pviews --help
-   :cwd: ../../env/bin
    :prompt:
    :shell:
 
