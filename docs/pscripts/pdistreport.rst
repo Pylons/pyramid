@@ -7,7 +7,6 @@
 ---------------
 
 .. program-output:: pdistreport --help
-   :cwd: ../../env/bin
    :prompt:
    :shell:
 
