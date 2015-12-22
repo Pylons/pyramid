@@ -7,7 +7,6 @@
 -----------
 
 .. program-output:: pcreate --help
-   :cwd: ../../env/bin
    :prompt:
    :shell:
 
