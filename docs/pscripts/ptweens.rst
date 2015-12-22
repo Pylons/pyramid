@@ -7,7 +7,6 @@
 -----------
 
 .. program-output:: ptweens --help
-   :cwd: ../../env/bin
    :prompt:
    :shell:
 

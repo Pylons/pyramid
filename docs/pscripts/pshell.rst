@@ -7,7 +7,6 @@
 ----------
 
 .. program-output:: pshell --help
-   :cwd: ../../env/bin
    :prompt:
    :shell:
 
