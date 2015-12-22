@@ -3,7 +3,7 @@
 ``p*`` Scripts Documentation
 ============================
 
-``p*`` scripts included with :app:`Pyramid`:.
+Command line programs (``p*`` scripts) included with :app:`Pyramid`.
 
 .. toctree::
    :maxdepth: 1
