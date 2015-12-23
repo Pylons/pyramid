@@ -450,6 +450,8 @@ Bug Fixes
 Features
 --------
 
+- Python 3.3 compatibility.
+
 - Configurator.add_directive now accepts arbitrary callables like partials or
   objects implementing ``__call__`` which dont have ``__name__`` and
   ``__doc__`` attributes.  See https://github.com/Pylons/pyramid/issues/621
@@ -1327,7 +1329,7 @@ Bug Fixes
 - Make test suite pass on 32-bit systems; closes #286.  closes #306.
   See also https://github.com/Pylons/pyramid/issues/286
 
-- The ``pryamid.view.view_config`` decorator did not accept a ``match_params``
+- The ``pyramid.view.view_config`` decorator did not accept a ``match_params``
   predicate argument.  See https://github.com/Pylons/pyramid/pull/308
 
 - The AuthTktCookieHelper could potentially generate Unicode headers
