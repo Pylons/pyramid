@@ -301,6 +301,9 @@ Docs
   ``principal`` and a ``userid`` in its security APIs.
   See https://github.com/Pylons/pyramid/pull/1399
 
+- Add documentation of command line programs (``p*`` scripts). See
+  https://github.com/Pylons/pyramid/pull/2191
+
 Scaffolds
 ---------
 

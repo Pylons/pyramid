@@ -53,12 +53,13 @@ extensions = [
     'sphinx.ext.doctest',
     'repoze.sphinx.autointerface',
     'sphinx.ext.viewcode',
-    'sphinx.ext.intersphinx'
+    'sphinx.ext.intersphinx',
+    'sphinxcontrib.programoutput',
     ]
 
 # Looks for objects in external projects
 intersphinx_mapping = {
-    'colander': (        'http://docs.pylonsproject.org/projects/colander/en/latest', None),
+    'colander': ('http://docs.pylonsproject.org/projects/colander/en/latest', None),
     'cookbook': ('http://docs.pylonsproject.org/projects/pyramid-cookbook/en/latest/', None),
     'deform': ('http://docs.pylonsproject.org/projects/deform/en/latest', None),
     'jinja2': ('http://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/', None),
@@ -66,8 +67,8 @@ intersphinx_mapping = {
     'python': ('http://docs.python.org', None),
     'python3': ('http://docs.python.org/3', None),
     'sqla': ('http://docs.sqlalchemy.org/en/latest', None),
-    'tm': ('http://docs.pylonsproject.org/projects/pyramid_tm/en/latest/',         None),
-    'toolbar':         ('http://docs.pylonsproject.org/projects/pyramid-debugtoolbar/en/latest', None),
+    'tm': ('http://docs.pylonsproject.org/projects/pyramid_tm/en/latest/', None),
+    'toolbar': ('http://docs.pylonsproject.org/projects/pyramid-debugtoolbar/en/latest', None),
     'tstring': ('http://docs.pylonsproject.org/projects/translationstring/en/latest', None),
     'tutorials': ('http://docs.pylonsproject.org/projects/pyramid-tutorials/en/latest/', None),
     'venusian': ('http://docs.pylonsproject.org/projects/venusian/en/latest', None),
