@@ -11,6 +11,9 @@
   WebOb 1.5.
   See https://github.com/Pylons/pyramid/pull/1865
 
+- Add documentation of command line programs (``p*`` scripts). See
+  https://github.com/Pylons/pyramid/pull/2191
+
 .. _changes_1.5.7:
 
 1.5.7 (2015-04-28)
