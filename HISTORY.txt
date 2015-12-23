@@ -1,6 +1,8 @@
 1.5 (2014-04-08)
 ================
 
+- Python 3.4 compatibility.
+
 - Avoid crash in ``pserve --reload`` under Py3k, when iterating over possibly
   mutated ``sys.modules``.
 
@@ -1129,6 +1131,8 @@ Bug Fixes
 
 Features
 --------
+
+- Python 3.3 compatibility.
 
 - Configurator.add_directive now accepts arbitrary callables like partials or
   objects implementing ``__call__`` which dont have ``__name__`` and
