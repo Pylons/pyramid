@@ -252,13 +252,21 @@ Bug Fixes
   process failed to fork because it could not find the pserve script to
   run. See https://github.com/Pylons/pyramid/pull/2137
 
+- Ensure that ``IAssetDescriptor.abspath`` always returns an absolute path.
+  There were cases depending on the process CWD that a relative path would
+  be returned. See https://github.com/Pylons/pyramid/issues/2187
+
+
 Deprecations
 ------------
 
 - The ``pserve`` command's daemonization features have been deprecated as well
   as ``--monitor-restart``. This includes the ``[start,stop,restart,status]``
   subcommands as well as the ``--daemon``, ``--stop-daemon``, ``--pid-file``,
-  and ``--status`` flags.
+  ``--status``, ``--user`` and ``--group`` flags.
+  See https://github.com/Pylons/pyramid/pull/2120
+  and https://github.com/Pylons/pyramid/pull/2189
+  and https://github.com/Pylons/pyramid/pull/1641
 
   Please use a real process manager in the future instead of relying on the
   ``pserve`` to daemonize itself. Many options exist including your Operating
