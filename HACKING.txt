@@ -124,8 +124,8 @@ In order to add a feature to Pyramid:
 - The feature must be documented in both the API and narrative
   documentation (in ``docs/``).
 
-- The feature must work fully on the following CPython versions: 2.6,
-  2.7, 3.2, and 3.3 on both UNIX and Windows.
+- The feature must work fully on the following CPython versions: 2.6, 2.7, 3.2,
+  3.3, and 3.4 on both UNIX and Windows.
 
 - The feature must work on the latest version of PyPy.
 
