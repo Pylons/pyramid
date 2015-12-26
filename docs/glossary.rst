@@ -268,7 +268,7 @@ Glossary
      (Allow, 'bob', 'read'), (Deny, 'fred', 'write')]``.  If an ACL is
      attached to a resource instance, and that resource is findable via the
      context resource, it will be consulted any active security policy to
-     determine wither a particular request can be fulfilled given the
+     determine whether a particular request can be fulfilled given the
      :term:`authentication` information in the request.
 
    authentication
