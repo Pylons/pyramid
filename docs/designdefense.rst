@@ -146,7 +146,7 @@ dictionary API, but that's not very important in this context.  That's
 problem number two.
 
 Third of all, what does the ``getUtility`` function do?  It's performing a
-lookup for the ``ISettings`` "utility" that should return.. well, a utility.
+lookup for the ``ISettings`` "utility" that should return... well, a utility.
 Note how we've already built up a dependency on the understanding of an
 :term:`interface` and the concept of "utility" to answer this question: a bad
 sign so far.  Note also that the answer is circular, a *really* bad sign.
@@ -156,12 +156,12 @@ registry" of course.  What's a component registry?  Problem number four.
 
 Fifth, assuming you buy that there's some magical registry hanging around,
 where *is* this registry?  *Homina homina*... "around"?  That's sort of the
-best answer in this context (a more specific answer would require knowledge
-of internals).  Can there be more than one registry?  Yes.  So *which*
-registry does it find the registration in?  Well, the "current" registry of
-course.  In terms of :app:`Pyramid`, the current registry is a thread local
-variable.  Using an API that consults a thread local makes understanding how
-it works non-local.
+best answer in this context (a more specific answer would require knowledge of
+internals).  Can there be more than one registry?  Yes.  So in *which* registry
+does it find the registration?  Well, the "current" registry of course.  In
+terms of :app:`Pyramid`, the current registry is a thread local variable.
+Using an API that consults a thread local makes understanding how it works
+non-local.
 
 You've now bought in to the fact that there's a registry that is just hanging
 around.  But how does the registry get populated?  Why, via code that calls
@@ -170,10 +170,10 @@ registration of ``ISettings`` is made by the framework itself under the hood:
 it's not present in any user configuration.  This is extremely hard to
 comprehend.  Problem number six.
 
-Clearly there's some amount of cognitive load here that needs to be borne by
-a reader of code that extends the :app:`Pyramid` framework due to its use of
-the ZCA, even if he or she is already an expert Python programmer and whom is
-an expert in the domain of web applications.  This is suboptimal.
+Clearly there's some amount of cognitive load here that needs to be borne by a
+reader of code that extends the :app:`Pyramid` framework due to its use of the
+ZCA, even if they are already an expert Python programmer and an expert in the
+domain of web applications.  This is suboptimal.
 
 Ameliorations
 +++++++++++++
