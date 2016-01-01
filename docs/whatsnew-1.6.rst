@@ -10,6 +10,21 @@ documentation additions.
 Backwards Incompatibilities
 ---------------------------
 
+- IPython and BPython support have been removed from pshell in the core.
+  To continue using them on Pyramid 1.6+ you must install the binding
+  packages explicitly. One way to do this is by adding ``pyramid_ipython``
+  (or ``pyramid_bpython``) to the ``install_requires`` section of your
+  package's ``setup.py`` file and afterwards re-running ``setup.py develop``::
+
+    setup(
+        #...
+        install_requires=[
+            'pyramid_ipython',         # new dependency
+            'pyramid',
+            #...
+        ],
+    )
+
 - ``request.response`` will no longer be mutated when using the
   :func:`~pyramid.renderers.render_to_response` API.  It is now necessary 
   to pass in
@@ -29,12 +44,16 @@ Backwards Incompatibilities
 Feature Additions
 -----------------
 
-- Cache busting for static assets has been added and is available via a new
-  argument to :meth:`pyramid.config.Configurator.add_static_view`:
-  ``cachebust``.  Core APIs are shipped for both cache busting via query
-  strings and path segments and may be extended to fit into custom asset
-  pipelines.  See https://github.com/Pylons/pyramid/pull/1380 and
-  https://github.com/Pylons/pyramid/pull/1583
+- ``pserve --reload`` will no longer crash on syntax errors!!!
+  See https://github.com/Pylons/pyramid/pull/2044
+
+- Cache busting for static resources has been added and is available via a new
+  :meth:`pyramid.config.Configurator.add_cache_buster` API. Core APIs are shipped
+  for both cache busting via query strings and via asset manifests for
+  integrating into custom asset pipelines.
+  See https://github.com/Pylons/pyramid/pull/1380 and
+  https://github.com/Pylons/pyramid/pull/1583 and
+  https://github.com/Pylons/pyramid/pull/2171
 
 - Assets can now be overidden by an absolute path on the filesystem when using
   the :meth:`~pyramid.config.Configurator.override_asset` API. This makes it
@@ -124,19 +143,47 @@ Feature Additions
   https://github.com/Pylons/pyramid/pull/1566 and
   https://github.com/Pylons/pyramid/issues/1297
 
+- ``pcreate`` will now ask for confirmation if invoked with an argument for a
+  project name that already exists or is importable in the current environment.
+  See https://github.com/Pylons/pyramid/issues/1357 and
+  https://github.com/Pylons/pyramid/pull/1837
+
 - Add :func:`pyramid.request.apply_request_extensions` function which can be
   used in testing to apply any request extensions configured via
   ``config.add_request_method``. Previously it was only possible to test the
   extensions by going through Pyramid's router.  See
   https://github.com/Pylons/pyramid/pull/1581
 
-
 - Make it possible to subclass ``pyramid.request.Request`` and also use
   ``pyramid.request.Request.add_request.method``.  See
   https://github.com/Pylons/pyramid/issues/1529
 
+- Additional shells for ``pshell`` can now be registered as entrypoints. See
+  https://github.com/Pylons/pyramid/pull/1891 and
+  https://github.com/Pylons/pyramid/pull/2012
+
+- The variables injected into ``pshell`` are now displayed with their
+  docstrings instead of the default ``str(obj)`` when possible.
+  See https://github.com/Pylons/pyramid/pull/1929
+
 Deprecations
 ------------
+
+- The ``pserve`` command's daemonization features have been deprecated as well
+  as ``--monitor-restart``. This includes the ``[start,stop,restart,status]``
+  subcommands as well as the ``--daemon``, ``--stop-daemon``, ``--pid-file``,
+  ``--status``, ``--user`` and ``--group`` flags.
+  See https://github.com/Pylons/pyramid/pull/2120
+  and https://github.com/Pylons/pyramid/pull/2189
+  and https://github.com/Pylons/pyramid/pull/1641
+
+  Please use a real process manager in the future instead of relying on the
+  ``pserve`` to daemonize itself. Many options exist including your Operating
+  System's services such as Systemd or Upstart, as well as Python-based
+  solutions like Circus and Supervisor.
+
+  See https://github.com/Pylons/pyramid/pull/1641
+  and https://github.com/Pylons/pyramid/pull/2120
 
 - The ``principal`` argument to :func:`pyramid.security.remember` was renamed
   to ``userid``.  Using ``principal`` as the argument name still works and will
@@ -168,3 +215,13 @@ Documentation Enhancements
 - Improve and clarify the documentation on what Pyramid defines as a
   ``principal`` and a ``userid`` in its security APIs.
   See https://github.com/Pylons/pyramid/pull/1399
+
+- Moved the documentation for ``accept`` on
+  :meth:`pyramid.config.Configurator.add_view` to no longer be part of the
+  predicate list. See https://github.com/Pylons/pyramid/issues/1391 for a bug
+  report stating ``not_`` was failing on ``accept``. Discussion with @mcdonc
+  led to the conclusion that it should not be documented as a predicate.
+  See https://github.com/Pylons/pyramid/pull/1487 for this PR
+
+- Clarify a previously-implied detail of the ``ISession.invalidate`` API
+  documentation.
