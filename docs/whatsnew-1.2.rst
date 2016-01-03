@@ -1,4 +1,4 @@
-What's New In Pyramid 1.2
+What's New in Pyramid 1.2
 =========================
 
 This article explains the new features in :app:`Pyramid` version 1.2 as
