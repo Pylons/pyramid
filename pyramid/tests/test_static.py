@@ -1,5 +1,8 @@
 import datetime
+import os.path
 import unittest
+
+here = os.path.dirname(__file__)
 
 # 5 years from now (more or less)
 fiveyrsfuture = datetime.datetime.utcnow() + datetime.timedelta(5*365)
@@ -368,118 +371,7 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
         from pyramid.httpexceptions import HTTPNotFound
         self.assertRaises(HTTPNotFound, inst, context, request)
 
-class TestMd5AssetTokenGenerator(unittest.TestCase):
-    _fspath = None
-    _tmp = None
-
-    @property
-    def fspath(self):
-        if self._fspath:
-            return self._fspath
-
-        import os
-        import tempfile
-        self._tmp = tmp = tempfile.mkdtemp()
-        self._fspath = os.path.join(tmp, 'test.txt')
-        return self._fspath
-
-    def tearDown(self):
-        import shutil
-        if self._tmp:
-            shutil.rmtree(self._tmp)
-
-    def _makeOne(self):
-        from pyramid.static import Md5AssetTokenGenerator as cls
-        return cls()
-
-    def test_package_resource(self):
-        fut = self._makeOne().tokenize
-        expected = '76d653a3a044e2f4b38bb001d283e3d9'
-        token = fut('pyramid.tests:fixtures/static/index.html')
-        self.assertEqual(token, expected)
-
-    def test_filesystem_resource(self):
-        fut = self._makeOne().tokenize
-        expected = 'd5155f250bef0e9923e894dbc713c5dd'
-        with open(self.fspath, 'w') as f:
-            f.write("Are we rich yet?")
-        token = fut(self.fspath)
-        self.assertEqual(token, expected)
-
-    def test_cache(self):
-        fut = self._makeOne().tokenize
-        expected = 'd5155f250bef0e9923e894dbc713c5dd'
-        with open(self.fspath, 'w') as f:
-            f.write("Are we rich yet?")
-        token = fut(self.fspath)
-        self.assertEqual(token, expected)
-
-        # md5 shouldn't change because we've cached it
-        with open(self.fspath, 'w') as f:
-            f.write("Sorry for the convenience.")
-        token = fut(self.fspath)
-        self.assertEqual(token, expected)
-
-class TestPathSegmentMd5CacheBuster(unittest.TestCase):
-
-    def _makeOne(self):
-        from pyramid.static import PathSegmentMd5CacheBuster as cls
-        inst = cls()
-        inst.tokenize = lambda pathspec: 'foo'
-        return inst
-
-    def test_token(self):
-        fut = self._makeOne().tokenize
-        self.assertEqual(fut('whatever'), 'foo')
-
-    def test_pregenerate(self):
-        fut = self._makeOne().pregenerate
-        self.assertEqual(fut('foo', ('bar',), 'kw'), (('foo', 'bar'), 'kw'))
-
-    def test_match(self):
-        fut = self._makeOne().match
-        self.assertEqual(fut(('foo', 'bar')), ('bar',))
-
-class TestQueryStringMd5CacheBuster(unittest.TestCase):
-
-    def _makeOne(self, param=None):
-        from pyramid.static import QueryStringMd5CacheBuster as cls
-        if param:
-            inst = cls(param)
-        else:
-            inst = cls()
-        inst.tokenize = lambda pathspec: 'foo'
-        return inst
-
-    def test_token(self):
-        fut = self._makeOne().tokenize
-        self.assertEqual(fut('whatever'), 'foo')
-
-    def test_pregenerate(self):
-        fut = self._makeOne().pregenerate
-        self.assertEqual(
-            fut('foo', ('bar',), {}),
-            (('bar',), {'_query': {'x': 'foo'}}))
-
-    def test_pregenerate_change_param(self):
-        fut = self._makeOne('y').pregenerate
-        self.assertEqual(
-            fut('foo', ('bar',), {}),
-            (('bar',), {'_query': {'y': 'foo'}}))
-
-    def test_pregenerate_query_is_already_tuples(self):
-        fut = self._makeOne().pregenerate
-        self.assertEqual(
-            fut('foo', ('bar',), {'_query': [('a', 'b')]}),
-            (('bar',), {'_query': (('a', 'b'), ('x', 'foo'))}))
-
-    def test_pregenerate_query_is_tuple_of_tuples(self):
-        fut = self._makeOne().pregenerate
-        self.assertEqual(
-            fut('foo', ('bar',), {'_query': (('a', 'b'),)}),
-            (('bar',), {'_query': (('a', 'b'), ('x', 'foo'))}))
-
-class TestQueryStringConstantCacheBuster(TestQueryStringMd5CacheBuster):
+class TestQueryStringConstantCacheBuster(unittest.TestCase):
 
     def _makeOne(self, param=None):
         from pyramid.static import QueryStringConstantCacheBuster as cls
@@ -491,31 +383,96 @@ class TestQueryStringConstantCacheBuster(TestQueryStringMd5CacheBuster):
 
     def test_token(self):
         fut = self._makeOne().tokenize
-        self.assertEqual(fut('whatever'), 'foo')
+        self.assertEqual(fut(None, 'whatever', None), 'foo')
 
-    def test_pregenerate(self):
-        fut = self._makeOne().pregenerate
+    def test_it(self):
+        fut = self._makeOne()
         self.assertEqual(
-            fut('foo', ('bar',), {}),
-            (('bar',), {'_query': {'x': 'foo'}}))
+            fut('foo', 'bar', {}),
+            ('bar', {'_query': {'x': 'foo'}}))
 
-    def test_pregenerate_change_param(self):
-        fut = self._makeOne('y').pregenerate
+    def test_change_param(self):
+        fut = self._makeOne('y')
         self.assertEqual(
-            fut('foo', ('bar',), {}),
-            (('bar',), {'_query': {'y': 'foo'}}))
+            fut('foo', 'bar', {}),
+            ('bar', {'_query': {'y': 'foo'}}))
 
-    def test_pregenerate_query_is_already_tuples(self):
-        fut = self._makeOne().pregenerate
+    def test_query_is_already_tuples(self):
+        fut = self._makeOne()
         self.assertEqual(
-            fut('foo', ('bar',), {'_query': [('a', 'b')]}),
-            (('bar',), {'_query': (('a', 'b'), ('x', 'foo'))}))
+            fut('foo', 'bar', {'_query': [('a', 'b')]}),
+            ('bar', {'_query': (('a', 'b'), ('x', 'foo'))}))
 
-    def test_pregenerate_query_is_tuple_of_tuples(self):
-        fut = self._makeOne().pregenerate
+    def test_query_is_tuple_of_tuples(self):
+        fut = self._makeOne()
         self.assertEqual(
-            fut('foo', ('bar',), {'_query': (('a', 'b'),)}),
-            (('bar',), {'_query': (('a', 'b'), ('x', 'foo'))}))
+            fut('foo', 'bar', {'_query': (('a', 'b'),)}),
+            ('bar', {'_query': (('a', 'b'), ('x', 'foo'))}))
+
+class TestManifestCacheBuster(unittest.TestCase):
+
+    def _makeOne(self, path, **kw):
+        from pyramid.static import ManifestCacheBuster as cls
+        return cls(path, **kw)
+
+    def test_it(self):
+        manifest_path = os.path.join(here, 'fixtures', 'manifest.json')
+        fut = self._makeOne(manifest_path)
+        self.assertEqual(fut('foo', 'bar', {}), ('bar', {}))
+        self.assertEqual(
+            fut('foo', 'css/main.css', {}),
+            ('css/main-test.css', {}))
+
+    def test_it_with_relspec(self):
+        fut = self._makeOne('fixtures/manifest.json')
+        self.assertEqual(fut('foo', 'bar', {}), ('bar', {}))
+        self.assertEqual(
+            fut('foo', 'css/main.css', {}),
+            ('css/main-test.css', {}))
+
+    def test_it_with_absspec(self):
+        fut = self._makeOne('pyramid.tests:fixtures/manifest.json')
+        self.assertEqual(fut('foo', 'bar', {}), ('bar', {}))
+        self.assertEqual(
+            fut('foo', 'css/main.css', {}),
+            ('css/main-test.css', {}))
+
+    def test_reload(self):
+        manifest_path = os.path.join(here, 'fixtures', 'manifest.json')
+        new_manifest_path = os.path.join(here, 'fixtures', 'manifest2.json')
+        inst = self._makeOne('foo', reload=True)
+        inst.getmtime = lambda *args, **kwargs: 0
+        fut = inst
+
+        # test without a valid manifest
+        self.assertEqual(
+            fut('foo', 'css/main.css', {}),
+            ('css/main.css', {}))
+
+        # swap to a real manifest, setting mtime to 0
+        inst.manifest_path = manifest_path
+        self.assertEqual(
+            fut('foo', 'css/main.css', {}),
+            ('css/main-test.css', {}))
+
+        # ensure switching the path doesn't change the result
+        inst.manifest_path = new_manifest_path
+        self.assertEqual(
+            fut('foo', 'css/main.css', {}),
+            ('css/main-test.css', {}))
+
+        # update mtime, should cause a reload
+        inst.getmtime = lambda *args, **kwargs: 1
+        self.assertEqual(
+            fut('foo', 'css/main.css', {}),
+            ('css/main-678b7c80.css', {}))
+
+    def test_invalid_manifest(self):
+        self.assertRaises(IOError, lambda: self._makeOne('foo'))
+
+    def test_invalid_manifest_with_reload(self):
+        inst = self._makeOne('foo', reload=True)
+        self.assertEqual(inst.manifest, {})
 
 class DummyContext:
     pass

@@ -6,6 +6,7 @@ Command-Line Pyramid
 Your :app:`Pyramid` application can be controlled and inspected using a variety
 of command-line utilities.  These utilities are documented in this chapter.
 
+
 .. index::
    pair: matching views; printing
    single: pviews
@@ -14,6 +15,8 @@ of command-line utilities.  These utilities are documented in this chapter.
 
 Displaying Matching Views for a Given URL
 -----------------------------------------
+
+.. seealso:: See also the output of :ref:`pviews --help <pviews_script>`.
 
 For a big application with several views, it can be hard to keep the view
 configuration details in your head, even if you defined all the views yourself.
@@ -107,14 +110,14 @@ found* message.
 
 .. index::
    single: interactive shell
-   single: IPython
    single: pshell
-   single: bpython
 
 .. _interactive_shell:
 
 The Interactive Shell
 ---------------------
+
+.. seealso:: See also the output of :ref:`pshell --help <pshell_script>`.
 
 Once you've installed your program for development using ``setup.py develop``,
 you can use an interactive Python shell to execute expressions in a Python
@@ -180,6 +183,7 @@ hash after the filename:
     $ $VENV/bin/pshell starter/development.ini
 
 Press ``Ctrl-D`` to exit the interactive shell (or ``Ctrl-Z`` on Windows).
+
 
 .. index::
    pair: pshell; extending
@@ -263,38 +267,43 @@ request is configured to generate urls from the host
     >>> request.route_url('home')
     'https://www.example.com/'
 
-.. index::
-   single: IPython
-   single: bpython
 
 .. _ipython_or_bpython:
 
-IPython or bpython
+Alternative Shells
 ~~~~~~~~~~~~~~~~~~
 
-If you have `IPython <http://en.wikipedia.org/wiki/IPython>`_ and/or `bpython
-<http://bpython-interpreter.org/>`_ in the interpreter you use to invoke the
-``pshell`` command, ``pshell`` will autodiscover and use the first one found,
-in this order: IPython, bpython, standard Python interpreter. However you could
-specifically invoke your choice with the ``-p choice`` or ``--python-shell
-choice`` option.
+The ``pshell`` command can be easily extended with alternate REPLs if the
+default python REPL is not satisfactory. Assuming you have a binding
+installed such as ``pyramid_ipython`` it will normally be auto-selected and
+used. You may also specifically invoke your choice with the ``-p choice`` or
+``--python-shell choice`` option.
 
 .. code-block:: text
 
-   $ $VENV/bin/pshell -p ipython | bpython | python development.ini#MyProject
+   $ $VENV/bin/pshell -p ipython development.ini#MyProject
 
-Alternative Shells
-~~~~~~~~~~~~~~~~~~
+You may use the ``--list-shells`` option to see the available shells.
+
+.. code-block:: text
+
+   $ $VENV/bin/pshell --list-shells
+   Available shells:
+     bpython
+     ipython
+     python
+
 If you want to use a shell that isn't supported out of the box, you can
 introduce a new shell by registering an entry point in your setup.py:
 
 .. code-block:: python
 
     setup(
-        entry_points = """\
-            [pyramid.pshell]
-            myshell=my_app:ptpython_shell_factory
-        """
+        entry_points={
+            'pyramid.pshell_runner': [
+              'myshell=my_app:ptpython_shell_factory',
+            ],
+        },
     )
 
 And then your shell factory should return a function that accepts two
@@ -302,18 +311,34 @@ arguments, ``env`` and ``help``, which would look like this:
 
 .. code-block:: python
 
-    def ptpython_shell_factory():
-        from ptpython.repl import embed
-        def PTPShell(banner, **kwargs):
-            print(banner)
-            return embed(**kwargs)
+    from ptpython.repl import embed
 
-        def shell(env, help):
-            PTPShell(banner=help, locals=env)
+    def ptpython_shell_runner(env, help):
+        print(help)
+        return embed(locals=env)
 
-        return shell
+.. versionchanged:: 1.6
+   User-defined shells may be registered using entry points. Prior to this
+   the only supported shells were ``ipython``, ``bpython`` and ``python``.
+
+   ``ipython`` and ``bpython`` have been moved into their respective
+   packages ``pyramid_ipython`` and ``pyramid_bpython``.
+
+
+Setting a Default Shell
+~~~~~~~~~~~~~~~~~~~~~~~
+
+You may use the ``default_shell`` option in your ``[pshell]`` ini section to
+specify a list of preferred shells.
+
+.. code-block:: ini
+   :linenos:
+
+   [pshell]
+   default_shell = ptpython ipython bpython
 
 .. versionadded:: 1.6
+
 
 .. index::
    pair: routes; printing
@@ -323,6 +348,8 @@ arguments, ``env`` and ``help``, which would look like this:
 
 Displaying All Application Routes
 ---------------------------------
+
+.. seealso:: See also the output of :ref:`proutes --help <proutes_script>`.
 
 You can use the ``proutes`` command in a terminal window to print a summary of
 routes related to your application.  Much like the ``pshell`` command (see
@@ -405,6 +432,8 @@ include. The current available formats are ``name``, ``pattern``, ``view``, and
 Displaying "Tweens"
 -------------------
 
+.. seealso:: See also the output of :ref:`ptweens --help <ptweens_script>`.
+
 A :term:`tween` is a bit of code that sits between the main Pyramid application
 request handler and the WSGI application which calls it.  A user can get a
 representation of both the implicit tween ordering (the ordering specified by
@@ -481,6 +510,7 @@ used:
 
 See :ref:`registering_tweens` for more information about tweens.
 
+
 .. index::
    single: invoking a request
    single: prequest
@@ -489,6 +519,8 @@ See :ref:`registering_tweens` for more information about tweens.
 
 Invoking a Request
 ------------------
+
+.. seealso:: See also the output of :ref:`prequest --help <prequest_script>`.
 
 You can use the ``prequest`` command-line utility to send a request to your
 application and see the response body without starting a server.
@@ -539,6 +571,7 @@ of the ``prequest`` process is used as the ``POST`` body::
 
    $ $VENV/bin/prequest -mPOST development.ini / < somefile
 
+
 Using Custom Arguments to Python when Running ``p*`` Scripts
 ------------------------------------------------------------
 
@@ -550,10 +583,21 @@ Python interpreter at runtime. For example::
 
       python -3 -m pyramid.scripts.pserve development.ini
 
+
+.. index::
+   single: pdistreport
+   single: distributions, showing installed
+   single: showing installed distributions
+
+.. _showing_distributions:
+
 Showing All Installed Distributions and Their Versions
 ------------------------------------------------------
 
 .. versionadded:: 1.5
+
+.. seealso:: See also the output of :ref:`pdistreport --help
+   <pdistreport_script>`.
 
 You can use the ``pdistreport`` command to show the :app:`Pyramid` version in
 use, the Python version in use, and all installed versions of Python
@@ -573,6 +617,7 @@ distributions in your Python environment::
 pastebin when you are having problems and need someone with more familiarity
 with Python packaging and distribution than you have to look at your
 environment.
+
 
 .. _writing_a_script:
 
@@ -686,6 +731,7 @@ The above example specifies the ``another`` ``app``, ``pipeline``, or
 object present in the ``env`` dictionary returned by
 :func:`pyramid.paster.bootstrap` will be a :app:`Pyramid` :term:`router`.
 
+
 Changing the Request
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -726,6 +772,7 @@ Now you can readily use Pyramid's APIs for generating URLs:
    env['request'].route_url('verify', code='1337')
    # will return 'https://example.com/prefix/verify/1337'
 
+
 Cleanup
 ~~~~~~~
 
@@ -740,6 +787,7 @@ callback:
    # .. do stuff ...
 
    env['closer']()
+
 
 Setting Up Logging
 ~~~~~~~~~~~~~~~~~~
@@ -756,6 +804,7 @@ use the following command:
 
 See :ref:`logging_chapter` for more information on logging within
 :app:`Pyramid`.
+
 
 .. index::
    single: console script

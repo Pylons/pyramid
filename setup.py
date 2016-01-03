@@ -61,6 +61,7 @@ docs_extras = [
     'repoze.sphinx.autointerface',
     'pylons_sphinx_latesturl',
     'pylons-sphinx-themes',
+    'sphinxcontrib-programoutput',
     ]
 
 testing_extras = tests_require + [
@@ -111,9 +112,8 @@ setup(name='pyramid',
         starter=pyramid.scaffolds:StarterProjectTemplate
         zodb=pyramid.scaffolds:ZODBProjectTemplate
         alchemy=pyramid.scaffolds:AlchemyProjectTemplate
-        [pyramid.pshell]
-        ipython=pyramid.scripts.pshell:PShellCommand.make_ipython_shell
-        bpython=pyramid.scripts.pshell:PShellCommand.make_bpython_shell
+        [pyramid.pshell_runner]
+        python=pyramid.scripts.pshell:python_shell_runner
         [console_scripts]
         pcreate = pyramid.scripts.pcreate:main
         pserve = pyramid.scripts.pserve:main

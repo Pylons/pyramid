@@ -273,7 +273,7 @@ Glossary
      (Allow, 'bob', 'read'), (Deny, 'fred', 'write')]``.  If an ACL is
      attached to a resource instance, and that resource is findable via the
      context resource, it will be consulted any active security policy to
-     determine wither a particular request can be fulfilled given the
+     determine whether a particular request can be fulfilled given the
      :term:`authentication` information in the request.
 
    authentication
@@ -1089,3 +1089,7 @@ Glossary
       data in a Redis database.  See 
       https://pypi.python.org/pypi/pyramid_redis_sessions for more information.
 
+   cache busting
+      A technique used when serving a cacheable static asset in order to force
+      a client to query the new version of the asset. See :ref:`cache_busting`
+      for more information.

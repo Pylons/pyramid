@@ -855,9 +855,9 @@ class AuthTktCookieHelper(object):
         self.cookie_name = cookie_name
         self.secure = secure
         self.include_ip = include_ip
-        self.timeout = timeout
-        self.reissue_time = reissue_time
-        self.max_age = max_age
+        self.timeout = timeout if timeout is None else int(timeout)
+        self.reissue_time = reissue_time if reissue_time is None else int(reissue_time)
+        self.max_age = max_age if max_age is None else int(max_age)
         self.wild_domain = wild_domain
         self.parent_domain = parent_domain
         self.domain = domain
@@ -977,8 +977,7 @@ class AuthTktCookieHelper(object):
           Tokens are available in the returned identity when an auth_tkt is
           found in the request and unpacked.  Default: ``()``.
         """
-        if max_age is None:
-            max_age = self.max_age
+        max_age = self.max_age if max_age is None else int(max_age)
 
         environ = request.environ
 

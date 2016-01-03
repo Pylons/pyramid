@@ -14,7 +14,7 @@ def main(argv=sys.argv, quiet=False):
 
 class PRequestCommand(object):
     description = """\
-    Run a request for the described application.
+    Submit a HTTP request to a web application.
 
     This command makes an artifical request to a web application that uses a
     PasteDeploy (.ini) configuration file for the server and application.

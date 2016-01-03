@@ -23,6 +23,8 @@ matrix:
         - python: 3.5
           env: TOXENV=py2-cover,py3-cover,coverage
         - python: 3.5
+          env: TOXENV=docs
+        - python: 3.5
           env: TOXENV=pep8
 
 install:
@@ -34,3 +36,6 @@ script:
 notifications:
   email:
     - pyramid-checkins@lists.repoze.org
+  irc:
+    channels:
+      - "chat.freenode.net#pyramid"
