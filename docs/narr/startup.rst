@@ -6,15 +6,15 @@ Startup
 When you cause a :app:`Pyramid` application to start up in a console window,
 you'll see something much like this show up on the console:
 
-.. code-block:: text
+.. code-block:: bash
 
-  $ pserve development.ini
-  Starting server in PID 16601.
-  serving on 0.0.0.0:6543 view at http://127.0.0.1:6543
+    $ $VENV/bin/pserve development.ini
+    Starting server in PID 16305.
+    serving on http://127.0.0.1:6543
 
 This chapter explains what happens between the time you press the "Return" key
 on your keyboard after typing ``pserve development.ini`` and the time the line
-``serving on 0.0.0.0:6543 ...`` is output to your console.
+``serving on http://127.0.0.1:6543`` is output to your console.
 
 .. index::
    single: startup process
@@ -92,11 +92,11 @@ Here's a high-level time-ordered overview of what happens when you press
    In this case, the ``myproject.__init__:main`` function referred to by the
    entry point URI ``egg:MyProject`` (see :ref:`MyProject_ini` for more
    information about entry point URIs, and how they relate to callables) will
-   receive the key/value pairs ``{'pyramid.reload_templates':'true',
-   'pyramid.debug_authorization':'false', 'pyramid.debug_notfound':'false',
-   'pyramid.debug_routematch':'false', 'pyramid.debug_templates':'true',
-   'pyramid.default_locale_name':'en'}``.  See :ref:`environment_chapter` for
-   the meanings of these keys.
+   receive the key/value pairs ``{pyramid.reload_templates = true,
+   pyramid.debug_authorization = false, pyramid.debug_notfound = false,
+   pyramid.debug_routematch = false, pyramid.default_locale_name = en, and
+   pyramid.includes = pyramid_debugtoolbar}``.  See :ref:`environment_chapter`
+   for the meanings of these keys.
 
 #. The ``main`` function first constructs a
    :class:`~pyramid.config.Configurator` instance, passing the ``settings``
@@ -131,10 +131,9 @@ Here's a high-level time-ordered overview of what happens when you press
 #. ``pserve`` starts the WSGI *server* defined within the ``[server:main]``
    section.  In our case, this is the Waitress server (``use =
    egg:waitress#main``), and it will listen on all interfaces (``host =
-   0.0.0.0``), on port number 6543 (``port = 6543``).  The server code itself
-   is what prints ``serving on 0.0.0.0:6543 view at http://127.0.0.1:6543``.
-   The server serves the application, and the application is running, waiting
-   to receive requests.
+   127.0.0.1``), on port number 6543 (``port = 6543``). The server code itself
+   is what prints ``serving on http://127.0.0.1:6543``. The server serves the
+   application, and the application is running, waiting to receive requests.
 
 .. seealso::
    Logging configuration is described in the :ref:`logging_chapter` chapter.

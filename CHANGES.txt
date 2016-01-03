@@ -53,11 +53,12 @@ Features
   See https://github.com/Pylons/pyramid/pull/1471
 
 - Cache busting for static resources has been added and is available via a new
-  argument to ``pyramid.config.Configurator.add_static_view``: ``cachebust``.
-  Core APIs are shipped for both cache busting via query strings and
-  path segments and may be extended to fit into custom asset pipelines.
+  ``pyramid.config.Configurator.add_cache_buster`` API. Core APIs are shipped
+  for both cache busting via query strings and via asset manifests for
+  integrating into custom asset pipelines.
   See https://github.com/Pylons/pyramid/pull/1380 and
-  https://github.com/Pylons/pyramid/pull/1583
+  https://github.com/Pylons/pyramid/pull/1583 and
+  https://github.com/Pylons/pyramid/pull/2171
 
 - Add ``pyramid.config.Configurator.root_package`` attribute and init
   parameter to assist with includeable packages that wish to resolve
@@ -155,6 +156,9 @@ Features
   docstrings instead of the default ``str(obj)`` when possible.
   See https://github.com/Pylons/pyramid/pull/1929
 
+- ``pserve --reload`` will no longer crash on syntax errors!!!
+  See https://github.com/Pylons/pyramid/pull/2044
+
 Bug Fixes
 ---------
 
@@ -232,12 +236,37 @@ Bug Fixes
   shell a little more straightfoward.
   See https://github.com/Pylons/pyramid/pull/1883
 
+- Fix an issue when user passes unparsed strings to ``pyramid.session.CookieSession``
+  and ``pyramid.authentication.AuthTktCookieHelper`` for time related parameters
+  ``timeout``, ``reissue_time``, ``max_age`` that expect an integer value.
+  See https://github.com/Pylons/pyramid/pull/2050
+
+- Fixed usage of ``pserve --monitor-restart --daemon`` which would fail in
+  horrible ways. See https://github.com/Pylons/pyramid/pull/2118
+
+- Explicitly prevent ``pserve --reload --daemon`` from being used. It's never
+  been supported but would work and fail in weird ways.
+  See https://github.com/Pylons/pyramid/pull/2119
+
+- Fix an issue on Windows when running ``pserve --reload`` in which the
+  process failed to fork because it could not find the pserve script to
+  run. See https://github.com/Pylons/pyramid/pull/2137
+
+- Ensure that ``IAssetDescriptor.abspath`` always returns an absolute path.
+  There were cases depending on the process CWD that a relative path would
+  be returned. See https://github.com/Pylons/pyramid/issues/2187
+
+
 Deprecations
 ------------
 
-- The ``pserve`` command's daemonization features have been deprecated. This
-  includes the ``[start,stop,restart,status]`` subcommands as well as the
-  ``--daemon``, ``--stop-server``, ``--pid-file``, and ``--status`` flags.
+- The ``pserve`` command's daemonization features have been deprecated as well
+  as ``--monitor-restart``. This includes the ``[start,stop,restart,status]``
+  subcommands as well as the ``--daemon``, ``--stop-daemon``, ``--pid-file``,
+  ``--status``, ``--user`` and ``--group`` flags.
+  See https://github.com/Pylons/pyramid/pull/2120
+  and https://github.com/Pylons/pyramid/pull/2189
+  and https://github.com/Pylons/pyramid/pull/1641
 
   Please use a real process manager in the future instead of relying on the
   ``pserve`` to daemonize itself. Many options exist including your Operating
@@ -245,6 +274,7 @@ Deprecations
   solutions like Circus and Supervisor.
 
   See https://github.com/Pylons/pyramid/pull/1641
+  and https://github.com/Pylons/pyramid/pull/2120
 
 - Renamed the ``principal`` argument to ``pyramid.security.remember()`` to
   ``userid`` in order to clarify its intended purpose.
@@ -270,6 +300,9 @@ Docs
 - Improve and clarify the documentation on what Pyramid defines as a
   ``principal`` and a ``userid`` in its security APIs.
   See https://github.com/Pylons/pyramid/pull/1399
+
+- Add documentation of command line programs (``p*`` scripts). See
+  https://github.com/Pylons/pyramid/pull/2191
 
 Scaffolds
 ---------
