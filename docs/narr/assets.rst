@@ -532,6 +532,14 @@ The following code would set up a cachebuster:
        'mypackage:static/',
        ManifestCacheBuster('myapp:static/manifest.json'))
 
+It's important to note that the cache buster only handles generating
+cache-busted URLs for static assets. It does **NOT** provide any solutions for
+serving those assets. For example, if you generated a URL for
+``css/main-678b7c80.css`` then that URL needs to be valid either by
+configuring ``add_static_view`` properly to point to the location of the files
+or some other mechanism such as the files existing on your CDN or rewriting
+the incoming URL to remove the cache bust tokens.
+
 .. index::
    single: static assets view
 
