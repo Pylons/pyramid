@@ -1,2 +1,1 @@
 -e .[docs]
-git+https://github.com/sphinx-doc/sphinx.git@222a51e0cf0080b74f3a8a233590c707ee4eec32#egg=sphinx-222a51e0cf0080b74f3a8a233590c707ee4eec32
