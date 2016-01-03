@@ -136,6 +136,8 @@ Feature Additions
 
 The feature additions in Pyramid 1.5 follow.
 
+- Python 3.4 compatibility.
+
 - Add ``pdistreport`` script, which prints the Python version in use, the
   Pyramid version in use, and the version number and location of all Python
   distributions currently installed.
