@@ -98,7 +98,7 @@ one that we will revisit regurlarly in this *Quick Tour*.
 .. seealso:: See also:
    :ref:`Quick Tutorial Hello World <qtut_hello_world>`,
    :ref:`firstapp_chapter`, and
-   :ref:`Single File Tasks tutorial <tutorials:single-file-tutorial>`
+   :ref:`Todo List Application in One File <cookbook:single-file-tutorial>`
 
 Handling web requests and responses
 ===================================
