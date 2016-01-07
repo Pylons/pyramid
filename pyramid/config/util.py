@@ -3,6 +3,7 @@ import inspect
 
 from pyramid.compat import (
     bytes_,
+    getargspec,
     is_nonstr_iter,
     )
 
@@ -201,7 +202,7 @@ def takes_one_arg(callee, attr=None, argname=None):
             return False
 
     try:
-        argspec = inspect.getargspec(fn)
+        argspec = getargspec(fn)
     except TypeError:
         return False
 
