@@ -1,6 +1,6 @@
 .. _changes_1.5.8:
 
-1.5.8 (unreleased)
+1.5.8 (2016-01-07)
 ==================
 
 - Fix compatibility with Python 3.5.

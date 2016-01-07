@@ -22,6 +22,7 @@ include documentation improvements and other minor feature changes.
 - :ref:`changes_1.5.5`
 - :ref:`changes_1.5.6`
 - :ref:`changes_1.5.7`
+- :ref:`changes_1.5.8`
 
 
 Major Backwards Incompatibilities
