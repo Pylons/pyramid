@@ -3,6 +3,9 @@
 1.5.8 (unreleased)
 ==================
 
+- Fix compatibility with Python 3.5.
+  See https://github.com/Pylons/pyramid/pull/2210
+
 - Ensure that ``pyramid.httpexceptions.exception_response`` returns the
   appropriate "concreate" class for ``400`` and ``500`` status codes.
 
