@@ -97,18 +97,6 @@ class Settings(dict):
                                            config_reload_templates)
         eff_reload_templates = asbool(eget('PYRAMID_RELOAD_TEMPLATES',
                                            config_reload_templates))
-        config_reload_assets = self.get('reload_assets', '')
-        config_reload_assets = self.get('pyramid.reload_assets',
-                                        config_reload_assets)
-        reload_assets = asbool(eget('PYRAMID_RELOAD_ASSETS',
-                                    config_reload_assets))
-        config_reload_resources = self.get('reload_resources', '')
-        config_reload_resources = self.get('pyramid.reload_resources',
-                                           config_reload_resources)
-        reload_resources = asbool(eget('PYRAMID_RELOAD_RESOURCES',
-                                    config_reload_resources))
-        # reload_resources is an older alias for reload_assets
-        eff_reload_assets = reload_assets or reload_resources
         locale_name = self.get('default_locale_name', 'en')
         locale_name = self.get('pyramid.default_locale_name', locale_name)
         eff_locale_name = eget('PYRAMID_DEFAULT_LOCALE_NAME', locale_name)
@@ -129,8 +117,6 @@ class Settings(dict):
             'debug_routematch': eff_debug_all or eff_debug_routematch,
             'debug_templates': eff_debug_all or eff_debug_templates,
             'reload_templates': eff_reload_all or eff_reload_templates,
-            'reload_resources':eff_reload_all or eff_reload_assets,
-            'reload_assets':eff_reload_all or eff_reload_assets,
             'default_locale_name':eff_locale_name,
             'prevent_http_cache':eff_prevent_http_cache,
             'prevent_cachebust':eff_prevent_cachebust,
@@ -140,8 +126,6 @@ class Settings(dict):
             'pyramid.debug_routematch': eff_debug_all or eff_debug_routematch,
             'pyramid.debug_templates': eff_debug_all or eff_debug_templates,
             'pyramid.reload_templates': eff_reload_all or eff_reload_templates,
-            'pyramid.reload_resources':eff_reload_all or eff_reload_assets,
-            'pyramid.reload_assets':eff_reload_all or eff_reload_assets,
             'pyramid.default_locale_name':eff_locale_name,
             'pyramid.prevent_http_cache':eff_prevent_http_cache,
             'pyramid.prevent_cachebust':eff_prevent_cachebust,

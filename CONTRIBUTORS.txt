@@ -258,3 +258,5 @@ Contributors
 - Rami Chousein, 2015/10/28
 
 - Sri Sanketh Uppalapati, 2015/12/12
+
+- Mario Idival Gomes Duarte, 2016/01/08
