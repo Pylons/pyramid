@@ -946,7 +946,7 @@ Glossary
      users transition from Pylons and those preferring a more Pylons-like API.
      The scaffold has been retired but the demo plays a similar role. 
 
-   Pyramid Community Cookbook
+   Pyramid Cookbook
      Additional, community-based documentation for Pyramid which presents
      topical, practical uses of Pyramid:
      :ref:`Pyramid Community Cookbook <cookbook:pyramid-cookbook>`
