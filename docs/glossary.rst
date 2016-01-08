@@ -960,10 +960,10 @@ Glossary
      users transition from Pylons and those preferring a more Pylons-like API.
      The scaffold has been retired but the demo plays a similar role. 
 
-   Pyramid Cookbook
-     Additional documentation for Pyramid which presents topical,
-     practical uses of Pyramid:
-     http://docs.pylonsproject.org/projects/pyramid_cookbook/en/latest.
+   Pyramid Community Cookbook
+     Additional, community-based documentation for Pyramid which presents
+     topical, practical uses of Pyramid:
+     :ref:`Pyramid Community Cookbook <cookbook:pyramid-cookbook>`
 
    distutils
      The standard system for packaging and distributing Python packages.  See
