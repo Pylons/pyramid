@@ -175,11 +175,11 @@ Ameliorations
 +++++++++++++
 
 First, the primary amelioration: :app:`Pyramid` *does not expect application
-developers to understand ZCA concepts or any of its APIs*.  If an
-*application* developer needs to understand a ZCA concept or API during the
-creation of a :app:`Pyramid` application, we've failed on some axis.
+developers to understand ZCA concepts or any of its APIs*.  If an *application*
+developer needs to understand a ZCA concept or API during the creation of a
+:app:`Pyramid` application, we've failed on some axis.
 
-Instead, the framework hides the presence of the ZCA registry behind
+Instead the framework hides the presence of the ZCA registry behind
 special-purpose API functions that *do* use ZCA APIs.  Take for example the
 ``pyramid.security.authenticated_userid`` function, which returns the userid
 present in the current request or ``None`` if no userid is present in the
@@ -191,10 +191,9 @@ current request.  The application developer calls it like so:
    from pyramid.security import authenticated_userid
    userid = authenticated_userid(request)
 
-He now has the current user id.
+They now have the current user id.
 
-Under its hood however, the implementation of ``authenticated_userid``
-is this:
+Under its hood however, the implementation of ``authenticated_userid`` is this:
 
 .. code-block:: python
    :linenos:
@@ -211,58 +210,56 @@ is this:
        return policy.authenticated_userid(request)
 
 Using such wrappers, we strive to always hide the ZCA API from application
-developers.  Application developers should just never know about the ZCA API:
-they should call a Python function with some object germane to the domain as
-an argument, and it should return a result.  A corollary that follows is
-that any reader of an application that has been written using :app:`Pyramid`
-needn't understand the ZCA API either.
+developers.  Application developers should just never know about the ZCA API;
+they should call a Python function with some object germane to the domain as an
+argument, and it should return a result.  A corollary that follows is that any
+reader of an application that has been written using :app:`Pyramid` needn't
+understand the ZCA API either.
 
 Hiding the ZCA API from application developers and code readers is a form of
 enhancing domain specificity.  No application developer wants to need to
-understand the small, detailed mechanics of how a web framework does its
-thing.  People want to deal in concepts that are closer to the domain they're
-working in: for example, web developers want to know about *users*, not
-*utilities*.  :app:`Pyramid` uses the ZCA as an implementation detail, not as
-a feature which is exposed to end users.
+understand the small, detailed mechanics of how a web framework does its thing.
+People want to deal in concepts that are closer to the domain they're working
+in. For example, web developers want to know about *users*, not *utilities*.
+:app:`Pyramid` uses the ZCA as an implementation detail, not as a feature which
+is exposed to end users.
 
 However, unlike application developers, *framework developers*, including
 people who want to override :app:`Pyramid` functionality via preordained
-framework plugpoints like traversal or view lookup *must* understand the ZCA
+framework plugpoints like traversal or view lookup, *must* understand the ZCA
 registry API.
 
 :app:`Pyramid` framework developers were so concerned about conceptual load
-issues of the ZCA registry API for framework developers that a `replacement
-registry implementation <https://github.com/repoze/repoze.component>`_
-named :mod:`repoze.component` was actually developed.  Though this package
-has a registry implementation which is fully functional and well-tested, and
-its API is much nicer than the ZCA registry API, work on it was largely
-abandoned and it is not used in :app:`Pyramid`.  We continued to use a ZCA
-registry within :app:`Pyramid` because it ultimately proved a better fit.
+issues of the ZCA registry API that a `replacement registry implementation
+<https://github.com/repoze/repoze.component>`_ named :mod:`repoze.component`
+was actually developed.  Though this package has a registry implementation
+which is fully functional and well-tested, and its API is much nicer than the
+ZCA registry API, work on it was largely abandoned, and it is not used in
+:app:`Pyramid`.  We continued to use a ZCA registry within :app:`Pyramid`
+because it ultimately proved a better fit.
 
 .. note::
 
-   We continued using ZCA registry rather than disusing it in
-   favor of using the registry implementation in
-   :mod:`repoze.component` largely because the ZCA concept of
-   interfaces provides for use of an interface hierarchy, which is
-   useful in a lot of scenarios (such as context type inheritance).
-   Coming up with a marker type that was something like an interface
-   that allowed for this functionality seemed like it was just
-   reinventing the wheel.
+   We continued using ZCA registry rather than disusing it in favor of using
+   the registry implementation in :mod:`repoze.component` largely because the
+   ZCA concept of interfaces provides for use of an interface hierarchy, which
+   is useful in a lot of scenarios (such as context type inheritance).  Coming
+   up with a marker type that was something like an interface that allowed for
+   this functionality seemed like it was just reinventing the wheel.
 
-Making framework developers and extenders understand the ZCA registry API is
-a trade-off.  We (the :app:`Pyramid` developers) like the features that the
-ZCA registry gives us, and we have long-ago borne the weight of understanding
-what it does and how it works.  The authors of :app:`Pyramid` understand the
-ZCA deeply and can read code that uses it as easily as any other code.
+Making framework developers and extenders understand the ZCA registry API is a
+trade-off.  We (the :app:`Pyramid` developers) like the features that the ZCA
+registry gives us, and we have long-ago borne the weight of understanding what
+it does and how it works.  The authors of :app:`Pyramid` understand the ZCA
+deeply and can read code that uses it as easily as any other code.
 
 But we recognize that developers who might want to extend the framework are not
-as comfortable with the ZCA registry API as the original developers are with
-it.  So, for the purposes of being kind to third-party :app:`Pyramid`
-framework developers in, we've drawn some lines in the sand.
+as comfortable with the ZCA registry API as the original developers.  So for
+the purpose of being kind to third-party :app:`Pyramid` framework developers,
+we've drawn some lines in the sand.
 
-In all core code, We've made use of ZCA global API functions such as
-``zope.component.getUtility`` and ``zope.component.getAdapter`` the exception
+In all core code, we've made use of ZCA global API functions, such as
+``zope.component.getUtility`` and ``zope.component.getAdapter``, the exception
 instead of the rule.  So instead of:
 
 .. code-block:: python
@@ -282,9 +279,9 @@ instead of the rule.  So instead of:
    registry = get_current_registry()
    policy = registry.getUtility(IAuthenticationPolicy)
 
-While the latter is more verbose, it also arguably makes it more obvious
-what's going on.  All of the :app:`Pyramid` core code uses this pattern
-rather than the ZCA global API.
+While the latter is more verbose, it also arguably makes it more obvious what's
+going on.  All of the :app:`Pyramid` core code uses this pattern rather than
+the ZCA global API.
 
 Rationale
 +++++++++
