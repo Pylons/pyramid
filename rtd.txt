@@ -1,2 +1,6 @@
--e .[docs]
-sphinx==1.3.4
+Sphinx >= 1.3.4
+docutils
+repoze.sphinx.autointerface
+pylons_sphinx_latesturl
+pylons-sphinx-themes
+sphinxcontrib-programoutput
