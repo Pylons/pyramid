@@ -12,7 +12,7 @@ from webob.cookies import SignedSerializer
 
 from pyramid.compat import (
     pickle,
-    PY3,
+    PY2,
     text_,
     bytes_,
     native_,
@@ -325,7 +325,7 @@ def BaseCookieSessionFactory(
         __len__ = manage_accessed(dict.__len__)
         __iter__ = manage_accessed(dict.__iter__)
 
-        if not PY3:
+        if PY2:
             iteritems = manage_accessed(dict.iteritems)
             itervalues = manage_accessed(dict.itervalues)
             iterkeys = manage_accessed(dict.iterkeys)

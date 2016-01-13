@@ -128,17 +128,17 @@ class TestFactoriesMixin(unittest.TestCase):
 
     def test_add_request_method_with_text_type_name(self):
         from pyramid.interfaces import IRequestExtensions
-        from pyramid.compat import text_, PY3
+        from pyramid.compat import text_, PY2
         from pyramid.exceptions import ConfigurationError
 
         config = self._makeOne(autocommit=True)
         def boomshaka(r): pass
 
         def get_bad_name():
-            if PY3:  # pragma: nocover
-                name = b'La Pe\xc3\xb1a'
-            else:  # pragma: nocover
+            if PY2:
                 name = text_(b'La Pe\xc3\xb1a', 'utf-8')
+            else:
+                name = b'La Pe\xc3\xb1a'
 
             config.add_request_method(boomshaka, name=name)
 

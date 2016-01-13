@@ -1,5 +1,5 @@
 import unittest
-from pyramid.compat import PY3
+from pyramid.compat import PY2
 
 
 class Test_InstancePropertyHelper(unittest.TestCase):
@@ -149,10 +149,10 @@ class Test_InstancePropertyHelper(unittest.TestCase):
         from pyramid.exceptions import ConfigurationError
 
         cls = self._getTargetClass()
-        if PY3:  # pragma: nocover
-            name = b'La Pe\xc3\xb1a'
-        else:  # pragma: nocover
+        if PY2:
             name = text_(b'La Pe\xc3\xb1a', 'utf-8')
+        else:
+            name = b'La Pe\xc3\xb1a'
 
         def make_bad_name():
             cls.make_property(lambda x: 1, name=name, reify=True)
@@ -431,10 +431,10 @@ class Test_object_description(unittest.TestCase):
         self.assertEqual(self._callFUT(('a', 'b')), "('a', 'b')")
 
     def test_set(self):
-        if PY3:
-            self.assertEqual(self._callFUT(set(['a'])), "{'a'}")
-        else:
+        if PY2:
             self.assertEqual(self._callFUT(set(['a'])), "set(['a'])")
+        else:
+            self.assertEqual(self._callFUT(set(['a'])), "{'a'}")
 
     def test_list(self):
         self.assertEqual(self._callFUT(['a']), "['a']")
@@ -769,25 +769,25 @@ class TestActionInfo(unittest.TestCase):
 class TestCallableName(unittest.TestCase):
     def test_valid_ascii(self):
         from pyramid.util import get_callable_name
-        from pyramid.compat import text_, PY3
+        from pyramid.compat import text_
 
-        if PY3:  # pragma: nocover
-            name = b'hello world'
-        else:  # pragma: nocover
+        if PY2:
             name = text_(b'hello world', 'utf-8')
+        else:
+            name = b'hello world'
 
         self.assertEqual(get_callable_name(name), 'hello world')
 
     def test_invalid_ascii(self):
         from pyramid.util import get_callable_name
-        from pyramid.compat import text_, PY3
+        from pyramid.compat import text_
         from pyramid.exceptions import ConfigurationError
 
         def get_bad_name():
-            if PY3:  # pragma: nocover
-                name = b'La Pe\xc3\xb1a'
-            else:  # pragma: nocover
+            if PY2:
                 name = text_(b'La Pe\xc3\xb1a', 'utf-8')
+            else:
+                name = b'La Pe\xc3\xb1a'
 
             get_callable_name(name)
 
