@@ -46,7 +46,7 @@ Alternatively, you can use the `homebrew <http://brew.sh/>`_ package manager.
    # for python 2.7
    $ brew install python
 
-   # for python 3.4
+   # for python 3.5
    $ brew install python3
 
 If you use an installer for your Python, then you can skip to the section
