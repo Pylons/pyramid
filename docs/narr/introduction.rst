@@ -892,8 +892,7 @@ also maintain a "cookbook" of recipes, which are usually demonstrations of
 common integration scenarios too specific to add to the official narrative
 docs.  In any case, the Pyramid documentation is comprehensive.
 
-Example: The Pyramid Cookbook at
-http://docs.pylonsproject.org/projects/pyramid-cookbook/en/latest/.
+Example: The :ref:`Pyramid Community Cookbook <cookbook:pyramid-cookbook>`.
 
 .. index::
    single: Pylons Project
