@@ -20,7 +20,7 @@ try:
 except ImportError:  # pragma: no cover
     import pickle
 
-# True if we are running on Python 3.
+# PY3 is left as bw-compat but PY2 should be used for most checks.
 PY2 = sys.version_info[0] == 2
 PY3 = sys.version_info[0] == 3
 
