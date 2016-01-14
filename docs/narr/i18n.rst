@@ -666,9 +666,9 @@ can always use the more manual translation facility described in
 Mako Pyramid i18n Support
 -------------------------
 
-There exists a recipe within the :term:`Pyramid Cookbook` named ":ref:`Mako
-Internationalization <cookbook:mako_i18n>`" which explains how to add idiomatic
-i18n support to :term:`Mako` templates.
+There exists a recipe within the :term:`Pyramid Community Cookbook` named
+:ref:`Mako Internationalization <cookbook:mako_i18n>` which explains how to add
+idiomatic i18n support to :term:`Mako` templates.
 
 .. index::
    single: localization deployment settings
