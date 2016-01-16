@@ -306,13 +306,12 @@ the ZCA registry:
   view that is only found when the context is some class of object, or when
   the context implements some :term:`interface`.
 
-- Singularity.  There's only one place where "application configuration"
-  lives in a :app:`Pyramid` application: in a component registry.  The
-  component registry answers questions made to it by the framework at runtime
-  based on the configuration of *an application*.  Note: "an application" is
-  not the same as "a process", multiple independently configured copies of
-  the same :app:`Pyramid` application are capable of running in the same
-  process space.
+- Singularity.  There's only one place where "application configuration" lives
+  in a :app:`Pyramid` application: in a component registry.  The component
+  registry answers questions made to it by the framework at runtime based on
+  the configuration of *an application*.  Note: "an application" is not the
+  same as "a process"; multiple independently configured copies of the same
+  :app:`Pyramid` application are capable of running in the same process space.
 
 - Composability.  A ZCA component registry can be populated imperatively, or
   there's an existing mechanism to populate a registry via the use of a
@@ -330,10 +329,9 @@ the ZCA registry:
   (non-Zope) frameworks.
 
 - Testability.  Judicious use of the ZCA registry in framework code makes
-  testing that code slightly easier.  Instead of using monkeypatching or
-  other facilities to register mock objects for testing, we inject
-  dependencies via ZCA registrations and then use lookups in the code find
-  our mock objects.
+  testing that code slightly easier.  Instead of using monkeypatching or other
+  facilities to register mock objects for testing, we inject dependencies via
+  ZCA registrations, then use lookups in the code to find our mock objects.
 
 - Speed.  The ZCA registry is very fast for a specific set of complex lookup
   scenarios that :app:`Pyramid` uses, having been optimized through the years
@@ -347,17 +345,17 @@ Conclusion
 ++++++++++
 
 If you only *develop applications* using :app:`Pyramid`, there's not much to
-complain about here.  You just should never need to understand the ZCA
-registry API: use documented :app:`Pyramid` APIs instead.  However, you may
-be an application developer who doesn't read API documentation because it's
-unmanly. Instead you read the raw source code, and because you haven't read
-the documentation, you don't know what functions, classes, and methods even
-*form* the :app:`Pyramid` API.  As a result, you've now written code that
-uses internals and you've painted yourself into a conceptual corner as a
-result of needing to wrestle with some ZCA-using implementation detail.  If
-this is you, it's extremely hard to have a lot of sympathy for you.  You'll
-either need to get familiar with how we're using the ZCA registry or you'll
-need to use only the documented APIs; that's why we document them as APIs.
+complain about here.  You just should never need to understand the ZCA registry
+API; use documented :app:`Pyramid` APIs instead.  However, you may be an
+application developer who doesn't read API documentation. Instead you
+read the raw source code, and because you haven't read the API documentation,
+you don't know what functions, classes, and methods even *form* the
+:app:`Pyramid` API.  As a result, you've now written code that uses internals,
+and you've painted yourself into a conceptual corner, needing to wrestle with
+some ZCA-using implementation detail.  If this is you, it's extremely hard to
+have a lot of sympathy for you.  You'll either need to get familiar with how
+we're using the ZCA registry or you'll need to use only the documented APIs;
+that's why we document them as APIs.
 
 If you *extend* or *develop* :app:`Pyramid` (create new directives, use some
 of the more obscure hooks as described in :ref:`hooks_chapter`, or work on
@@ -365,6 +363,7 @@ the :app:`Pyramid` core code), you will be faced with needing to understand
 at least some ZCA concepts.  In some places it's used unabashedly, and will
 be forever.  We know it's quirky, but it's also useful and fundamentally
 understandable if you take the time to do some reading about it.
+
 
 .. _zcml_encouragement:
 
@@ -381,15 +380,16 @@ completely optional.  No ZCML is required at all to use :app:`Pyramid`, nor
 any other sort of frameworky declarative frontend to application
 configuration.
 
-Pyramid Does Traversal, And I Don't Like Traversal
+
+Pyramid Does Traversal, and I Don't Like Traversal
 --------------------------------------------------
 
 In :app:`Pyramid`, :term:`traversal` is the act of resolving a URL path to a
-:term:`resource` object in a resource tree.  Some people are uncomfortable
-with this notion, and believe it is wrong.  Thankfully, if you use
-:app:`Pyramid`, and you don't want to model your application in terms of a
-resource tree, you needn't use it at all.  Instead, use :term:`URL dispatch`
-to map URL paths to views.
+:term:`resource` object in a resource tree.  Some people are uncomfortable with
+this notion, and believe it is wrong. Thankfully if you use :app:`Pyramid` and
+you don't want to model your application in terms of a resource tree, you
+needn't use it at all. Instead use :term:`URL dispatch` to map URL paths to
+views.
 
 The idea that some folks believe traversal is unilaterally wrong is
 understandable.  The people who believe it is wrong almost invariably have
@@ -424,7 +424,8 @@ URL pattern matching.
 But the point is ultimately moot.  If you don't want to use traversal, you
 needn't.  Use URL dispatch instead.
 
-Pyramid Does URL Dispatch, And I Don't Like URL Dispatch
+
+Pyramid Does URL Dispatch, and I Don't Like URL Dispatch
 --------------------------------------------------------
 
 In :app:`Pyramid`, :term:`url dispatch` is the act of resolving a URL path to
@@ -446,30 +447,30 @@ I'll argue that URL dispatch is ultimately useful, even if you want to use
 traversal as well.  You can actually *combine* URL dispatch and traversal in
 :app:`Pyramid` (see :ref:`hybrid_chapter`).  One example of such a usage: if
 you want to emulate something like Zope 2's "Zope Management Interface" UI on
-top of your object graph (or any administrative interface), you can register
-a route like ``config.add_route('manage', '/manage/*traverse')`` and then
-associate "management" views in your code by using the ``route_name``
-argument to a ``view`` configuration,
-e.g. ``config.add_view('.some.callable', context=".some.Resource",
-route_name='manage')``.  If you wire things up this way someone then walks up
-to for example, ``/manage/ob1/ob2``, they might be presented with a
-management interface, but walking up to ``/ob1/ob2`` would present them with
-the default object view.  There are other tricks you can pull in these hybrid
-configurations if you're clever (and maybe masochistic) too.
+top of your object graph (or any administrative interface), you can register a
+route like ``config.add_route('manage', '/manage/*traverse')`` and then
+associate "management" views in your code by using the ``route_name`` argument
+to a ``view`` configuration, e.g., ``config.add_view('.some.callable',
+context=".some.Resource", route_name='manage')``.  If you wire things up this
+way, someone then walks up to, for example, ``/manage/ob1/ob2``, they might be
+presented with a management interface, but walking up to ``/ob1/ob2`` would
+present them with the default object view.  There are other tricks you can pull
+in these hybrid configurations if you're clever (and maybe masochistic) too.
 
-Also, if you are a URL dispatch hater, if you should ever be asked to write
-an application that must use some legacy relational database structure, you
-might find that using URL dispatch comes in handy for one-off associations
-between views and URL paths.  Sometimes it's just pointless to add a node to
-the object graph that effectively represents the entry point for some bit of
-code.  You can just use a route and be done with it.  If a route matches, a
-view associated with the route will be called; if no route matches,
-:app:`Pyramid` falls back to using traversal.
+Also, if you are a URL dispatch hater, if you should ever be asked to write an
+application that must use some legacy relational database structure, you might
+find that using URL dispatch comes in handy for one-off associations between
+views and URL paths.  Sometimes it's just pointless to add a node to the object
+graph that effectively represents the entry point for some bit of code.  You
+can just use a route and be done with it.  If a route matches, a view
+associated with the route will be called. If no route matches, :app:`Pyramid`
+falls back to using traversal.
 
 But the point is ultimately moot.  If you use :app:`Pyramid`, and you really
 don't want to use URL dispatch, you needn't use it at all.  Instead, use
 :term:`traversal` exclusively to map URL paths to views, just like you do in
 :term:`Zope`.
+
 
 Pyramid Views Do Not Accept Arbitrary Keyword Arguments
 -------------------------------------------------------
