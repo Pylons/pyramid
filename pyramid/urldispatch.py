@@ -7,7 +7,7 @@ from pyramid.interfaces import (
     )
 
 from pyramid.compat import (
-    PY3,
+    PY2,
     native_,
     text_,
     text_type,
@@ -210,14 +210,14 @@ def _compile_route(route):
     def generator(dict):
         newdict = {}
         for k, v in dict.items():
-            if PY3:
-                if v.__class__ is binary_type:
-                    # url_quote below needs a native string, not bytes on Py3
-                    v = v.decode('utf-8')
-            else:
+            if PY2:
                 if v.__class__ is text_type:
                     # url_quote below needs bytes, not unicode on Py2
                     v = v.encode('utf-8')
+            else:
+                if v.__class__ is binary_type:
+                    # url_quote below needs a native string, not bytes on Py3
+                    v = v.decode('utf-8')
 
             if k == remainder:
                 # a stararg argument

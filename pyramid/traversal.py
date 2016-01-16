@@ -15,7 +15,7 @@ from pyramid.interfaces import (
     )
 
 from pyramid.compat import (
-    PY3,
+    PY2,
     native_,
     text_,
     ascii_native_,
@@ -575,26 +575,8 @@ the ``safe`` argument to this function.  This corresponds to the
 """
 
 
-if PY3:
+if PY2:
     # special-case on Python 2 for speed?  unchecked
-    def quote_path_segment(segment, safe=''):
-        """ %s """ % quote_path_segment_doc
-        # The bit of this code that deals with ``_segment_cache`` is an
-        # optimization: we cache all the computation of URL path segments
-        # in this module-scope dictionary with the original string (or
-        # unicode value) as the key, so we can look it up later without
-        # needing to reencode or re-url-quote it
-        try:
-            return _segment_cache[(segment, safe)]
-        except KeyError:
-            if segment.__class__ not in (text_type, binary_type):
-                segment = str(segment)
-            result = url_quote(native_(segment, 'utf-8'), safe)
-            # we don't need a lock to mutate _segment_cache, as the below
-            # will generate exactly one Python bytecode (STORE_SUBSCR)
-            _segment_cache[(segment, safe)] = result
-            return result
-else:
     def quote_path_segment(segment, safe=''):
         """ %s """ % quote_path_segment_doc
         # The bit of this code that deals with ``_segment_cache`` is an
@@ -613,7 +595,25 @@ else:
             # will generate exactly one Python bytecode (STORE_SUBSCR)
             _segment_cache[(segment, safe)] = result
             return result
-    
+else:
+    def quote_path_segment(segment, safe=''):
+        """ %s """ % quote_path_segment_doc
+        # The bit of this code that deals with ``_segment_cache`` is an
+        # optimization: we cache all the computation of URL path segments
+        # in this module-scope dictionary with the original string (or
+        # unicode value) as the key, so we can look it up later without
+        # needing to reencode or re-url-quote it
+        try:
+            return _segment_cache[(segment, safe)]
+        except KeyError:
+            if segment.__class__ not in (text_type, binary_type):
+                segment = str(segment)
+            result = url_quote(native_(segment, 'utf-8'), safe)
+            # we don't need a lock to mutate _segment_cache, as the below
+            # will generate exactly one Python bytecode (STORE_SUBSCR)
+            _segment_cache[(segment, safe)] = result
+            return result
+
 slash = text_('/')
 
 @implementer(ITraverser)

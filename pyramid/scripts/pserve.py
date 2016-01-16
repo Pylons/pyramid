@@ -29,7 +29,7 @@ from paste.deploy import loadserver
 from paste.deploy import loadapp
 from paste.deploy.loadwsgi import loadcontext, SERVER
 
-from pyramid.compat import PY3
+from pyramid.compat import PY2
 from pyramid.compat import WIN
 
 from pyramid.paster import setup_logging
@@ -1111,7 +1111,7 @@ def cherrypy_server_runner(
     server = wsgiserver.CherryPyWSGIServer(bind_addr, app,
                                            server_name=server_name, **kwargs)
     if ssl_pem is not None:
-        if not PY3:
+        if PY2:
             server.ssl_certificate = server.ssl_private_key = ssl_pem
         else:
             # creates wsgiserver.ssl_builtin as side-effect
