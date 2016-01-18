@@ -457,42 +457,41 @@ have much more to offer:
 Quick project startup with scaffolds
 ====================================
 
-So far we have done all of our *Quick Tour* as a single Python file.
-No Python packages, no structure. Most Pyramid projects, though,
-aren't developed this way.
+So far we have done all of our *Quick Tour* as a single Python file. No Python
+packages, no structure. Most Pyramid projects, though, aren't developed this
+way.
 
-To ease the process of getting started, Pyramid provides *scaffolds*
-that generate sample projects from templates in Pyramid and Pyramid
-add-ons. Pyramid's ``pcreate`` command can list the available scaffolds:
+To ease the process of getting started, Pyramid provides *scaffolds* that
+generate sample projects from templates in Pyramid and Pyramid add-ons.
+Pyramid's ``pcreate`` command can list the available scaffolds:
 
 .. code-block:: bash
 
     $ pcreate --list
     Available scaffolds:
       alchemy:                 Pyramid SQLAlchemy project using url dispatch
-      pyramid_jinja2_starter:  pyramid jinja2 starter project
+      pyramid_jinja2_starter:  Pyramid Jinja2 starter project
       starter:                 Pyramid starter project
       zodb:                    Pyramid ZODB project using traversal
 
-The ``pyramid_jinja2`` add-on gave us a scaffold that we can use. From
-the parent directory of where we want our Python package to be generated,
-let's use that scaffold to make our project:
+The ``pyramid_jinja2`` add-on gave us a scaffold that we can use. From the
+parent directory of where we want our Python package to be generated, let's use
+that scaffold to make our project:
 
 .. code-block:: bash
 
     $ pcreate --scaffold pyramid_jinja2_starter hello_world
 
-We next use the normal Python command to set up our package for
-development:
+We next use the normal Python command to set up our package for development:
 
 .. code-block:: bash
 
     $ cd hello_world
     $ python ./setup.py develop
 
-We are moving in the direction of a full-featured Pyramid project,
-with a proper setup for Python standards (packaging) and Pyramid
-configuration. This includes a new way of running your application:
+We are moving in the direction of a full-featured Pyramid project, with a
+proper setup for Python standards (packaging) and Pyramid configuration. This
+includes a new way of running your application:
 
 .. code-block:: bash
 
@@ -508,28 +507,27 @@ Let's look at ``pserve`` and configuration in more depth.
 Application running with ``pserve``
 ===================================
 
-Prior to scaffolds, our project mixed a number of operational details
-into our code. Why should my main code care which HTTP server I want and
-what port number to run on?
+Prior to scaffolds, our project mixed a number of operational details into our
+code. Why should my main code care which HTTP server I want and what port
+number to run on?
 
-``pserve`` is Pyramid's application runner, separating operational
-details from your code. When you install Pyramid, a small command
-program called ``pserve`` is written to your ``bin`` directory. This
-program is an executable Python module. It's very small, getting most
-of its brains via import.
+``pserve`` is Pyramid's application runner, separating operational details from
+your code. When you install Pyramid, a small command program called ``pserve``
+is written to your ``bin`` directory. This program is an executable Python
+module. It's very small, getting most of its brains via import.
 
-You can run ``pserve`` with ``--help`` to see some of its options.
-Doing so reveals that you can ask ``pserve`` to watch your development
-files and reload the server when they change:
+You can run ``pserve`` with ``--help`` to see some of its options. Doing so
+reveals that you can ask ``pserve`` to watch your development files and reload
+the server when they change:
 
 .. code-block:: bash
 
     $ pserve development.ini --reload
 
-The ``pserve`` command has a number of other options and operations.
-Most of the work, though, comes from your project's wiring, as
-expressed in the configuration file you supply to ``pserve``. Let's
-take a look at this configuration file.
+The ``pserve`` command has a number of other options and operations. Most of
+the work, though, comes from your project's wiring, as expressed in the
+configuration file you supply to ``pserve``. Let's take a look at this
+configuration file.
 
 .. seealso:: See also:
     :ref:`what_is_this_pserve_thing`
@@ -537,21 +535,18 @@ take a look at this configuration file.
 Configuration with ``.ini`` files
 =================================
 
-Earlier in *Quick Tour* we first met Pyramid's configuration system.
-At that point we did all configuration in Python code. For example,
-the port number chosen for our HTTP server was right there in Python
-code. Our scaffold has moved this decision and more into the
-``development.ini`` file:
+Earlier in *Quick Tour* we first met Pyramid's configuration system. At that
+point we did all configuration in Python code. For example, the port number
+chosen for our HTTP server was right there in Python code. Our scaffold has
+moved this decision and more into the ``development.ini`` file:
 
 .. literalinclude:: quick_tour/package/development.ini
     :language: ini
 
-Let's take a quick high-level look. First the ``.ini`` file is divided
-into sections:
+Let's take a quick high-level look. First the ``.ini`` file is divided into
+sections:
 
-- ``[app:hello_world]`` configures our WSGI app
-
-- ``[pipeline:main]`` sets up our WSGI "pipeline"
+- ``[app:main]`` configures our WSGI app
 
 - ``[server:main]`` holds our WSGI server settings
 
@@ -559,23 +554,23 @@ into sections:
 
 We have a few decisions made for us in this configuration:
 
-#. *Choice of web server:* ``use = egg:pyramid#wsgiref`` tells ``pserve`` to
-   use the ``wsgiref`` server that is wrapped in the Pyramid package.
+#. *Choice of web server:* ``use = egg:hello_world`` tells ``pserve`` to
+   use the ``waitress`` server.
 
-#. *Port number:* ``port = 6543`` tells ``wsgiref`` to listen on port 6543.
+#. *Port number:* ``port = 6543`` tells ``waitress`` to listen on port 6543.
 
 #. *WSGI app:* What package has our WSGI application in it?
-   ``use = egg:hello_world`` in the app section tells the
-   configuration what application to load.
+   ``use = egg:hello_world`` in the app section tells the configuration what
+   application to load.
 
 #. *Easier development by automatic template reloading:* In development mode,
    you shouldn't have to restart the server when editing a Jinja2 template.
-   ``reload_templates = true`` sets this policy, which might be different in
-   production.
+   ``pyramid.reload_templates = true`` sets this policy, which might be
+   different in production.
 
-Additionally the ``development.ini`` generated by this scaffold wired
-up Python's standard logging. We'll now see in the console, for example,
-a log on every request that comes in, as well as traceback information.
+Additionally the ``development.ini`` generated by this scaffold wired up
+Python's standard logging. We'll now see in the console, for example, a log on
+every request that comes in, as well as traceback information.
 
 .. seealso:: See also:
     :ref:`Quick Tutorial Application Configuration <qtut_ini>`,
@@ -587,76 +582,77 @@ Easier development with ``debugtoolbar``
 ========================================
 
 As we introduce the basics, we also want to show how to be productive in
-development and debugging. For example, we just discussed template
-reloading and earlier we showed ``--reload`` for application reloading.
+development and debugging. For example, we just discussed template reloading
+and earlier we showed ``--reload`` for application reloading.
 
-``pyramid_debugtoolbar`` is a popular Pyramid add-on which makes
-several tools available in your browser. Adding it to your project
-illustrates several points about configuration.
+``pyramid_debugtoolbar`` is a popular Pyramid add-on which makes several tools
+available in your browser. Adding it to your project illustrates several points
+about configuration.
 
-First change your ``setup.py`` to say:
+The scaffold ``pyramid_jinja2_starter`` is already configured to include the
+add-on ``pyramid_debugtoolbar`` in its ``setup.py``:
 
 .. literalinclude:: quick_tour/package/setup.py
-    :start-after: Start Requires
-    :end-before: End Requires
+    :language: python
+    :linenos:
+    :lineno-start: 11
+    :lines: 11-16
 
-...and rerun your setup:
+It was installed when you previously ran:
 
 .. code-block:: bash
 
     $ python ./setup.py develop
 
-The Python package ``pyramid_debugtoolbar`` is now installed into our
-environment. The package is a Pyramid add-on, which means we need to include
-its configuration into our web application. We could do this with imperative
-configuration, as we did above for the ``pyramid_jinja2`` add-on:
+The ``pyramid_debugtoolbar`` package is a Pyramid add-on, which means we need
+to include its configuration into our web application. The ``pyramid_jinja2``
+add-on already took care of this for us in its ``__init__.py``:
 
 .. literalinclude:: quick_tour/package/hello_world/__init__.py
-    :start-after: Start Include
-    :end-before: End Include
+    :language: python
+    :linenos:
+    :lineno-start: 16
+    :lines: 19
 
-Now that we have a configuration file, we can use the
-``pyramid.includes`` facility and place this in our
-``development.ini`` instead:
+And it uses the ``pyramid.includes`` facility in our ``development.ini``:
 
 .. literalinclude:: quick_tour/package/development.ini
     :language: ini
-    :start-after: Start Includes
-    :end-before: End Includes
+    :linenos:
+    :lineno-start: 15
+    :lines: 15-16
 
-You'll now see an attractive (and
-collapsible) menu in the right of your browser, providing introspective
-access to debugging information. Even better, if your web application
-generates an error, you will see a nice traceback on the screen. When
-you want to disable this toolbar, there's no need to change code: you can
-remove it from ``pyramid.includes`` in the relevant ``.ini``
-configuration file.
+You'll now see a Pyramid logo on the right side of your browser window, which
+when clicked opens a new window that provides introspective access to debugging
+information. Even better, if your web application generates an error, you will
+see a nice traceback on the screen. When you want to disable this toolbar,
+there's no need to change code: you can remove it from ``pyramid.includes`` in
+the relevant ``.ini`` configuration file.
 
 .. seealso:: See also:
-    :ref:`Quick Tutorial
-    pyramid_debugtoolbar <qtut_debugtoolbar>` and
+    :ref:`Quick Tutorial pyramid_debugtoolbar <qtut_debugtoolbar>` and
     :ref:`pyramid_debugtoolbar <toolbar:overview>`
 
 Unit tests and ``nose``
 =======================
 
-Yikes! We got this far and we haven't yet discussed tests. This is
-particularly egregious, as Pyramid has had a deep commitment to full test
-coverage since before its release.
+Yikes! We got this far and we haven't yet discussed tests. This is particularly
+egregious, as Pyramid has had a deep commitment to full test coverage since
+before its release.
 
-Our ``pyramid_jinja2_starter`` scaffold generated a ``tests.py`` module
-with one unit test in it. To run it, let's install the handy ``nose``
-test runner by editing ``setup.py``. While we're at it, we'll throw in
-the ``coverage`` tool which yells at us for code that isn't tested:
+Our ``pyramid_jinja2_starter`` scaffold generated a ``tests.py`` module with
+one unit test in it. To run it, let's install the handy ``nose`` test runner by
+editing ``setup.py``. While we're at it, we'll throw in the ``coverage`` tool
+which yells at us for code that isn't tested. Edit line 36 so it becomes the
+following:
 
 .. code-block:: python
+    :linenos:
+    :lineno-start: 36
 
-    setup(name='hello_world',
-          # Some lines removed...
-          extras_require={
+          tests_require={
               'testing': ['nose', 'coverage'],
-          }
-    )
+          },
 
 We changed ``setup.py`` which means we need to rerun
 ``python ./setup.py develop``. We can now run all our tests:
@@ -667,124 +663,139 @@ We changed ``setup.py`` which means we need to rerun
     .
     Name                  Stmts   Miss  Cover   Missing
     ---------------------------------------------------
-    hello_world             12      8    33%   11-23
-    hello_world.models       5      1    80%   8
-    hello_world.tests       14      0   100%
-    hello_world.views        4      0   100%
+    hello_world              11      8    27%   11-23
+    hello_world.models        5      1    80%   8
+    hello_world.tests        14      0   100%
+    hello_world.views         4      0   100%
     ---------------------------------------------------
-    TOTAL                    35      9    74%
+    TOTAL                    34      9    74%
     ----------------------------------------------------------------------
-    Ran 1 test in 0.931s
+    Ran 1 test in 0.009s
 
     OK
 
 Our unit test passed. What did our test look like?
 
 .. literalinclude:: quick_tour/package/hello_world/tests.py
+    :linenos:
 
-Pyramid supplies helpers for test writing, which we use in the
-test setup and teardown. Our one test imports the view,
-makes a dummy request, and sees if the view returns what we expected.
+Pyramid supplies helpers for test writing, which we use in the test setup and
+teardown. Our one test imports the view, makes a dummy request, and sees if the
+view returns what we expected.
 
 .. seealso:: See also:
-    :ref:`Quick Tutorial Unit Testing <qtut_unit_testing>`,
-    :ref:`Quick Tutorial Functional Testing <qtut_functional_testing>`,
-    and
+    :ref:`Quick Tutorial Unit Testing <qtut_unit_testing>`, :ref:`Quick
+    Tutorial Functional Testing <qtut_functional_testing>`, and
     :ref:`testing_chapter`
 
 Logging
 =======
 
-It's important to know what is going on inside our web application.
-In development we might need to collect some output. In production
-we might need to detect situations when other people use the site. We
-need *logging*.
+It's important to know what is going on inside our web application. In
+development we might need to collect some output. In production we might need
+to detect situations when other people use the site. We need *logging*.
 
-Fortunately Pyramid uses the normal Python approach to logging. The
-scaffold generated in your ``development.ini`` has a number of lines that
-configure the logging for you to some reasonable defaults. You then see
-messages sent by Pyramid (for example, when a new request comes in).
+Fortunately Pyramid uses the normal Python approach to logging. The scaffold
+generated in your ``development.ini`` has a number of lines that configure the
+logging for you to some reasonable defaults. You then see messages sent by
+Pyramid (for example, when a new request comes in).
 
-Maybe you would like to log messages in your code? In your Python
-module, import and set up the logging:
+Maybe you would like to log messages in your code? In your Python module,
+import and set up the logging:
 
 .. literalinclude:: quick_tour/package/hello_world/views.py
-    :start-after: Start Logging 1
-    :end-before: End Logging 1
+    :language: python
+    :linenos:
+    :lineno-start: 3
+    :lines: 3-4
 
 You can now, in your code, log messages:
 
 .. literalinclude:: quick_tour/package/hello_world/views.py
-    :start-after: Start Logging 2
-    :end-before: End Logging 2
+    :language: python
+    :linenos:
+    :lineno-start: 9
+    :lines: 9-10
+    :emphasize-lines: 2
 
-This will log ``Some Message`` at a ``debug`` log level
-to the application-configured logger in your ``development.ini``. What
-controls that? These sections in the configuration file:
+This will log ``Some Message`` at a ``debug`` log level to the
+application-configured logger in your ``development.ini``. What controls that?
+These emphasized sections in the configuration file:
 
 .. literalinclude:: quick_tour/package/development.ini
     :language: ini
-    :start-after: Start Sphinx Include
-    :end-before: End Sphinx Include
+    :linenos:
+    :lineno-start: 36
+    :lines: 36-52
+    :emphasize-lines: 1-2,14-17
 
-Our application, a package named ``hello_world``, is set up as a logger
-and configured to log messages at a ``DEBUG`` or higher level. When you
-visit http://localhost:6543, your console will now show::
+Our application, a package named ``hello_world``, is set up as a logger and
+configured to log messages at a ``DEBUG`` or higher level. When you visit
+http://localhost:6543, your console will now show::
 
- 2013-08-09 10:42:42,968 DEBUG [hello_world.views][MainThread] Some Message
+    2016-01-18 13:55:55,040 DEBUG [hello_world.views:10][waitress] Some Message
 
 .. seealso:: See also:
-    :ref:`Quick Tutorial Logging <qtut_logging>` and
-    :ref:`logging_chapter`
+    :ref:`Quick Tutorial Logging <qtut_logging>` and :ref:`logging_chapter`.
 
 Sessions
 ========
 
-When people use your web application, they frequently perform a task
-that requires semi-permanent data to be saved. For example, a shopping
-cart. This is called a :term:`session`.
+When people use your web application, they frequently perform a task that
+requires semi-permanent data to be saved. For example, a shopping cart. This is
+called a :term:`session`.
 
-Pyramid has basic built-in support for sessions.  Third party packages such as
-``pyramid_redis_sessions`` provide richer session support.  Or you can create
-your own custom sessioning engine.  Let's take a look at the
-:doc:`built-in sessioning support <../narr/sessions>`. In our
-``__init__.py`` we first import the kind of sessioning we want:
+Pyramid has basic built-in support for sessions. Third party packages such as
+``pyramid_redis_sessions`` provide richer session support. Or you can create
+your own custom sessioning engine. Let's take a look at the :doc:`built-in
+sessioning support <../narr/sessions>`. In our ``__init__.py`` we first import
+the kind of sessioning we want:
 
 .. literalinclude:: quick_tour/package/hello_world/__init__.py
-    :start-after: Start Sphinx Include 1
-    :end-before: End Sphinx Include 1
+    :language: python
+    :linenos:
+    :lineno-start: 2
+    :lines: 2-3
+    :emphasize-lines: 2
 
 .. warning::
 
-    As noted in the session docs, this example implementation is
-    not intended for use in settings with security implications.
+    As noted in the session docs, this example implementation is not intended
+    for use in settings with security implications.
 
 Now make a "factory" and pass it to the :term:`configurator`'s
 ``session_factory`` argument:
 
 .. literalinclude:: quick_tour/package/hello_world/__init__.py
-    :start-after: Start Sphinx Include 2
-    :end-before: End Sphinx Include 2
+    :language: python
+    :linenos:
+    :lineno-start: 13
+    :lines: 13-17
+    :emphasize-lines: 3-5
 
-Pyramid's :term:`request` object now has a ``session`` attribute
-that we can use in our view code:
+Pyramid's :term:`request` object now has a ``session`` attribute that we can
+use in our view code in ``views.py``:
 
 .. literalinclude:: quick_tour/package/hello_world/views.py
-    :start-after: Start Sphinx Include 1
-    :end-before: End Sphinx Include 1
+    :language: python
+    :linenos:
+    :lineno-start: 9
+    :lines: 9-15
+    :emphasize-lines: 3-7
 
-With this, each reload will increase the counter displayed in our
-Jinja2 template:
+We need to update our Jinja2 template to show counter increment in the session:
 
 .. literalinclude:: quick_tour/package/hello_world/templates/mytemplate.jinja2
     :language: jinja
-    :start-after: Start Sphinx Include 1
-    :end-before: End Sphinx Include 1
+    :linenos:
+    :lineno-start: 40
+    :lines: 40-42
+    :emphasize-lines: 3
 
 .. seealso:: See also:
-    :ref:`Quick Tutorial Sessions <qtut_sessions>`,
-    :ref:`sessions_chapter`, :ref:`flash_messages`,
-    :ref:`session_module`, and :term:`pyramid_redis_sessions`.
+    :ref:`Quick Tutorial Sessions <qtut_sessions>`, :ref:`sessions_chapter`,
+    :ref:`flash_messages`, :ref:`session_module`, and
+    :term:`pyramid_redis_sessions`.
 
 Databases
 =========
