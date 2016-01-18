@@ -481,11 +481,10 @@ Pyramid Views Do Not Accept Arbitrary Keyword Arguments
 
 Many web frameworks (Zope, TurboGears, Pylons 1.X, Django) allow for their
 variant of a :term:`view callable` to accept arbitrary keyword or positional
-arguments, which are filled in using values present in the ``request.POST``
-or ``request.GET`` dictionaries or by values present in the route match
-dictionary.  For example, a Django view will accept positional arguments
-which match information in an associated "urlconf" such as
-``r'^polls/(?P<poll_id>\d+)/$``:
+arguments, which are filled in using values present in the ``request.POST``,
+``request.GET``, or route match dictionaries.  For example, a Django view will
+accept positional arguments which match information in an associated "urlconf"
+such as ``r'^polls/(?P<poll_id>\d+)/$``:
 
 .. code-block:: python
    :linenos:
@@ -493,8 +492,8 @@ which match information in an associated "urlconf" such as
    def aview(request, poll_id):
        return HttpResponse(poll_id)
 
-Zope, likewise allows you to add arbitrary keyword and positional
-arguments to any method of a resource object found via traversal:
+Zope likewise allows you to add arbitrary keyword and positional arguments to
+any method of a resource object found via traversal:
 
 .. code-block:: python
    :linenos:
@@ -511,13 +510,13 @@ match the names of the positional and keyword arguments in the request, and
 the method is called (if possible) with its argument list filled with values
 mentioned therein.  TurboGears and Pylons 1.X operate similarly.
 
-Out of the box, :app:`Pyramid` is configured to have none of these features.
-By default, :app:`Pyramid` view callables always accept only ``request`` and
-no other arguments.  The rationale: this argument specification matching done
-aggressively can be costly, and :app:`Pyramid` has performance as one of its
-main goals, so we've decided to make people, by default, obtain information
-by interrogating the request object within the view callable body instead of
-providing magic to do unpacking into the view argument list.
+Out of the box, :app:`Pyramid` is configured to have none of these features. By
+default :app:`Pyramid` view callables always accept only ``request`` and no
+other arguments. The rationale is, this argument specification matching when
+done aggressively can be costly, and :app:`Pyramid` has performance as one of
+its main goals. Therefore we've decided to make people, by default, obtain
+information by interrogating the request object within the view callable body
+instead of providing magic to do unpacking into the view argument list.
 
 However, as of :app:`Pyramid` 1.0a9, user code can influence the way view
 callables are expected to be called, making it possible to compose a system
