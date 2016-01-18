@@ -3,12 +3,17 @@ import os
 from setuptools import setup, find_packages
 
 here = os.path.abspath(os.path.dirname(__file__))
-README = open(os.path.join(here, 'README.txt')).read()
-CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
+with open(os.path.join(here, 'README.txt')) as f:
+    README = f.read()
+with open(os.path.join(here, 'CHANGES.txt')) as f:
+    CHANGES = f.read()
 
-# Start Requires
-requires = ['pyramid>=1.0.2', 'pyramid_jinja2', 'pyramid_debugtoolbar']
-# End Requires
+requires = [
+    'pyramid',
+    'pyramid_jinja2',
+    'pyramid_debugtoolbar',
+    'waitress',
+]
 
 setup(name='hello_world',
       version='0.0',
@@ -16,7 +21,7 @@ setup(name='hello_world',
       long_description=README + '\n\n' + CHANGES,
       classifiers=[
           "Programming Language :: Python",
-          "Framework :: Pylons",
+          "Framework :: Pyramid",
           "Topic :: Internet :: WWW/HTTP",
           "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
       ],
@@ -28,14 +33,12 @@ setup(name='hello_world',
       include_package_data=True,
       zip_safe=False,
       install_requires=requires,
-      tests_require=requires,
+      tests_require={
+          'testing': ['nose', 'coverage'],
+      },
       test_suite="hello_world",
       entry_points="""\
       [paste.app_factory]
       main = hello_world:main
       """,
-      paster_plugins=['pyramid'],
-      extras_require={
-          'testing': ['nose', ],
-      }
-)
+      )
