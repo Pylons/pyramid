@@ -550,7 +550,7 @@ you're building a simple bespoke web application:
   sources using :meth:`pyramid.config.Configurator.include`.
 
 - View and subscriber registrations made using :term:`interface` objects
-  instead of class objects (e.g. :ref:`using_resource_interfaces`).
+  instead of class objects (e.g., :ref:`using_resource_interfaces`).
 
 - A declarative :term:`authorization` system.
 
@@ -576,42 +576,41 @@ make unit testing and implementation substitutability easier.
 
 In a bespoke web application, usually there's a single canonical deployment,
 and therefore no possibility of multiple code forks.  Extensibility is not
-required; the code is just changed in-place.  Security requirements are often
-less granular.  Using the features listed above will often be overkill for
-such an application.
+required; the code is just changed in place.  Security requirements are often
+less granular.  Using the features listed above will often be overkill for such
+an application.
 
 If you don't like these features, it doesn't mean you can't or shouldn't use
-:app:`Pyramid`.  They are all optional, and a lot of time has been spent
-making sure you don't need to know about them up-front.  You can build
-"Pylons-1.X-style" applications using :app:`Pyramid` that are purely bespoke
-by ignoring the features above.  You may find these features handy later
-after building a bespoke web application that suddenly becomes popular and
-requires extensibility because it must be deployed in multiple locations.
+:app:`Pyramid`.  They are all optional, and a lot of time has been spent making
+sure you don't need to know about them up front.  You can build "Pylons 1.X
+style" applications using :app:`Pyramid` that are purely bespoke by ignoring
+the features above.  You may find these features handy later after building a
+bespoke web application that suddenly becomes popular and requires
+extensibility because it must be deployed in multiple locations.
 
 Pyramid Is Too Big
 ------------------
 
-"The :app:`Pyramid` compressed tarball is larger than 2MB.  It must be
-enormous!"
+"The :app:`Pyramid` compressed tarball is larger than 2MB.  It must beenormous!"
 
-No.  We just ship it with docs, test code, and scaffolding.  Here's a
-breakdown of what's included in subdirectories of the package tree:
+No.  We just ship it with docs, test code, and scaffolding.  Here's a breakdown
+of what's included in subdirectories of the package tree:
 
 docs/
 
-  4.9MB
+  3.6MB
 
 pyramid/tests/
 
-  2.0MB
+  1.3MB
 
 pyramid/scaffolds/
 
-  460KB
+  133KB
 
 pyramid/ (except for ``pyramd/tests`` and ``pyramid/scaffolds``)
 
-  844KB
+  812KB
 
 Of the approximately 34K lines of Python code in the package, the code
 that actually has a chance of executing during normal operation, excluding
