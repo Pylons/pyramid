@@ -4,7 +4,7 @@ from pyramid.response import Response
 
 
 def hello_world(request):
-    # Some parameters from a request such as /?name=lisa
+    """ Some parameters from a request such as /?name=lisa """
     url = request.url
     name = request.params.get('name', 'No Name Provided')
 
