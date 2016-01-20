@@ -262,7 +262,7 @@ already constructed a :term:`configurator`, it can also be registered via the
 Adding Methods or Properties to a Request Object
 ------------------------------------------------
 
-.. versionadded:: 1.4.
+.. versionadded:: 1.4
 
 Since each Pyramid application can only have one :term:`request` factory,
 :ref:`changing the request factory <changing_the_request_factory>` is not that
