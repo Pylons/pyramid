@@ -18,7 +18,7 @@ Python 3 Compatibility
 .. image:: python-3.png
 
 Pyramid continues to run on Python 2, but Pyramid is now also Python 3
-compatible.  To use Pyramid under Python 3, Python 3.2 or better is required.
+compatible.  To use Pyramid under Python 3, Python 3.3 or better is required.
 
 Many Pyramid add-ons are already Python 3 compatible.  For example,
 ``pyramid_debugtoolbar``, ``pyramid_jinja2``, ``pyramid_exclog``,
