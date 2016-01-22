@@ -1,3 +1,9 @@
+unreleased
+==========
+
+- Dropped Python 3.2 support.
+  See https://github.com/Pylons/pyramid/pull/2256
+
 1.6 (2015-04-14)
 ================
 
