@@ -5,19 +5,20 @@ Quick Tour of Pyramid
 =====================
 
 Pyramid lets you start small and finish big.  This *Quick Tour* of Pyramid is
-for those who want to evaluate Pyramid, whether you are new to Python
-web frameworks, or a pro in a hurry. For more detailed treatment of
-each topic, give the :ref:`quick_tutorial` a try.
+for those who want to evaluate Pyramid, whether you are new to Python web
+frameworks, or a pro in a hurry. For more detailed treatment of each topic,
+give the :ref:`quick_tutorial` a try.
+
 
 Installation
 ============
 
-Once you have a standard Python environment setup, getting started with
-Pyramid is a breeze. Unfortunately "standard" is not so simple in Python.
-For this Quick Tour, it means: `Python <https://www.python.org/downloads/>`_,
-a `virtual environment <http://docs.python.org/dev/library/venv.html>`_ (or
-`virtualenv for Python 2.7 <https://pypi.python.org/pypi/virtualenv>`_), and
-`setuptools <https://pypi.python.org/pypi/setuptools/>`_.
+Once you have a standard Python environment setup, getting started with Pyramid
+is a breeze. Unfortunately "standard" is not so simple in Python. For this
+Quick Tour, it means `Python <https://www.python.org/downloads/>`_, a `virtual
+environment <http://docs.python.org/dev/library/venv.html>`_ (or `virtualenv
+for Python 2.7 <https://pypi.python.org/pypi/virtualenv>`_), and `setuptools
+<https://pypi.python.org/pypi/setuptools/>`_.
 
 As an example, for Python 3.3+ on Linux:
 
@@ -37,9 +38,9 @@ For Windows:
     c:\\> env33\\Scripts\\python ez_setup.py
     c:\\> env33\\Scripts\\easy_install "pyramid==\ |release|\ "
 
-Of course Pyramid runs fine on Python 2.6+, as do the examples in this
-*Quick Tour*. We're just showing Python 3 a little love (Pyramid had
-production support for Python 3 in October 2011).
+Of course Pyramid runs fine on Python 2.6+, as do the examples in this *Quick
+Tour*. We're just showing Python 3 a little love (Pyramid had production
+support for Python 3 in October 2011).
 
 .. note::
 
@@ -54,15 +55,15 @@ production support for Python 3 in October 2011).
 
 .. seealso:: See also:
     :ref:`Quick Tutorial section on Requirements <qtut_requirements>`,
-    :ref:`installing_unix`,
-    :ref:`Before You Install <installing_chapter>`, and
-    :ref:`Installing Pyramid on a Windows System <installing_windows>`
+    :ref:`installing_unix`, :ref:`Before You Install <installing_chapter>`, and
+    :ref:`Installing Pyramid on a Windows System <installing_windows>`.
+
 
 Hello World
 ===========
 
-Microframeworks have shown that learning starts best from a very small
-first step. Here's a tiny application in Pyramid:
+Microframeworks have shown that learning starts best from a very small first
+step. Here's a tiny application in Pyramid:
 
 .. literalinclude:: quick_tour/hello_world/app.py
     :linenos:
@@ -79,65 +80,63 @@ World!`` message.
 New to Python web programming? If so, some lines in the module merit
 explanation:
 
-#. *Line 10*. The ``if __name__ == '__main__':`` is Python's way of
-   saying "Start here when running from the command line".
+#. *Line 10*. ``if __name__ == '__main__':`` is Python's way of saying "Start
+   here when running from the command line".
 
-#. *Lines 11-13*. Use Pyramid's :term:`configurator` to connect
-   :term:`view` code to a particular URL :term:`route`.
+#. *Lines 11-13*. Use Pyramid's :term:`configurator` to connect :term:`view`
+   code to a particular URL :term:`route`.
 
-#. *Lines 6-7*. Implement the view code that generates the
-   :term:`response`.
+#. *Lines 6-7*. Implement the view code that generates the :term:`response`.
 
 #. *Lines 14-16*. Publish a :term:`WSGI` app using an HTTP server.
 
-As shown in this example, the :term:`configurator` plays a central role
-in Pyramid development. Building an application from loosely-coupled
-parts via :doc:`../narr/configuration` is a central idea in Pyramid,
-one that we will revisit regurlarly in this *Quick Tour*.
+As shown in this example, the :term:`configurator` plays a central role in
+Pyramid development. Building an application from loosely-coupled parts via
+:doc:`../narr/configuration` is a central idea in Pyramid, one that we will
+revisit regurlarly in this *Quick Tour*.
 
 .. seealso:: See also:
    :ref:`Quick Tutorial Hello World <qtut_hello_world>`,
-   :ref:`firstapp_chapter`, and
-   :ref:`Todo List Application in One File <cookbook:single-file-tutorial>`
+   :ref:`firstapp_chapter`, and :ref:`Todo List Application in One File
+   <cookbook:single-file-tutorial>`.
+
 
 Handling web requests and responses
 ===================================
 
-Developing for the web means processing web requests. As this is a
-critical part of a web application, web developers need a robust,
-mature set of software for web requests.
+Developing for the web means processing web requests. As this is a critical
+part of a web application, web developers need a robust, mature set of software
+for web requests.
 
-Pyramid has always fit nicely into the existing world of Python web
-development (virtual environments, packaging, scaffolding, one of the first to
-embrace Python 3, etc.). Pyramid turned to the well-regarded :term:`WebOb`
-Python library for request and response handling. In our example above,
-Pyramid hands ``hello_world`` a ``request`` that is :ref:`based on WebOb
-<webob_chapter>`.
+Pyramid has always fit nicely into the existing world of Python web development
+(virtual environments, packaging, scaffolding, one of the first to embrace
+Python 3, etc.). Pyramid turned to the well-regarded :term:`WebOb` Python
+library for request and response handling. In our example above, Pyramid hands
+``hello_world`` a ``request`` that is :ref:`based on WebOb <webob_chapter>`.
 
 Let's see some features of requests and responses in action:
 
 .. literalinclude:: quick_tour/requests/app.py
     :pyobject: hello_world
 
-In this Pyramid view, we get the URL being visited from ``request.url``. Also,
+In this Pyramid view, we get the URL being visited from ``request.url``. Also
 if you visited http://localhost:6543/?name=alice in a browser, the name is
 included in the body of the response::
 
   URL http://localhost:6543/?name=alice with name: alice
 
-Finally, we set the response's content type and return the Response.
+Finally we set the response's content type, and return the Response.
 
 .. seealso:: See also:
-    :ref:`Quick Tutorial Request and Response <qtut_request_response>`
-    and
-    :ref:`webob_chapter`
+    :ref:`Quick Tutorial Request and Response <qtut_request_response>` and
+    :ref:`webob_chapter`.
+
 
 Views
 =====
 
-For the examples above, the ``hello_world`` function is a "view". In
-Pyramid, views are the primary way to accept web requests and return
-responses.
+For the examples above, the ``hello_world`` function is a "view". In Pyramid
+views are the primary way to accept web requests and return responses.
 
 So far our examples place everything in one file:
 
@@ -149,169 +148,169 @@ So far our examples place everything in one file:
 
 - the WSGI application launcher
 
-Let's move the views out to their own ``views.py`` module and change
-the ``app.py`` to scan that module, looking for decorators that set up
-the views.
+Let's move the views out to their own ``views.py`` module and change the
+``app.py`` to scan that module, looking for decorators that set up the views.
 
-First, our revised ``app.py``:
+First our revised ``app.py``:
 
 .. literalinclude:: quick_tour/views/app.py
     :linenos:
 
-We added some more routes, but we also removed the view code.
-Our views and their registrations (via decorators) are now in a module
-``views.py``, which is scanned via ``config.scan('views')``.
+We added some more routes, but we also removed the view code. Our views and
+their registrations (via decorators) are now in a module ``views.py``, which is
+scanned via ``config.scan('views')``.
 
-We now have a ``views.py`` module that is focused on handling requests
-and responses:
+We now have a ``views.py`` module that is focused on handling requests and
+responses:
 
 .. literalinclude:: quick_tour/views/views.py
     :linenos:
 
 We have four views, each leading to the other. If you start at
-http://localhost:6543/, you get a response with a link to the next
-view. The ``hello_view`` (available at the URL ``/howdy``) has a link
-to the ``redirect_view``, which issues a redirect to the final
-view.
+http://localhost:6543/, you get a response with a link to the next view. The
+``hello_view`` (available at the URL ``/howdy``) has a link to the
+``redirect_view``, which issues a redirect to the final view.
 
-Earlier we saw ``config.add_view`` as one way to configure a view. This
-section introduces ``@view_config``. Pyramid's configuration supports
-:term:`imperative configuration`, such as the ``config.add_view`` in
-the previous example. You can also use :term:`declarative
-configuration`, in which a Python :term:`decorator` is placed on the
-line above the view. Both approaches result in the same final
-configuration, thus usually it is simply a matter of taste.
+Earlier we saw ``config.add_view`` as one way to configure a view. This section
+introduces ``@view_config``. Pyramid's configuration supports :term:`imperative
+configuration`, such as the ``config.add_view`` in the previous example. You
+can also use :term:`declarative configuration` in which a Python
+:term:`decorator` is placed on the line above the view. Both approaches result
+in the same final configuration, thus usually it is simply a matter of taste.
 
 .. seealso:: See also:
-   :ref:`Quick Tutorial Views <qtut_views>`,
-   :doc:`../narr/views`,
-   :doc:`../narr/viewconfig`, and
-   :ref:`debugging_view_configuration`
+   :ref:`Quick Tutorial Views <qtut_views>`, :doc:`../narr/views`,
+   :doc:`../narr/viewconfig`, and :ref:`debugging_view_configuration`.
+
 
 Routing
 =======
 
-Writing web applications usually means sophisticated URL design. We
-just saw some Pyramid machinery for requests and views. Let's look at
-features that help in routing.
+Writing web applications usually means sophisticated URL design. We just saw
+some Pyramid machinery for requests and views. Let's look at features that help
+with routing.
 
 Above we saw the basics of routing URLs to views in Pyramid:
 
-- Your project's "setup" code registers a route name to be used when
-  matching part of the URL
+- Your project's "setup" code registers a route name to be used when matching
+  part of the URL.
 
-- Elsewhere a view is configured to be called for that route name
+- Elsewhere a view is configured to be called for that route name.
 
 .. note::
 
-    Why do this twice? Other Python web frameworks let you create a
-    route and associate it with a view in one step. As
-    illustrated in :ref:`routes_need_ordering`, multiple routes might
-    match the same URL pattern. Rather than provide ways to help guess,
-    Pyramid lets you be explicit in ordering. Pyramid also gives
-    facilities to avoid the problem.
+    Why do this twice? Other Python web frameworks let you create a route and
+    associate it with a view in one step. As illustrated in
+    :ref:`routes_need_ordering`, multiple routes might match the same URL
+    pattern. Rather than provide ways to help guess, Pyramid lets you be
+    explicit in ordering. Pyramid also gives facilities to avoid the problem.
 
-What if we want part of the URL to be available as data in my view? This
-route declaration:
+What if we want part of the URL to be available as data in my view? We can use
+this route declaration, for example:
 
 .. literalinclude:: quick_tour/routing/app.py
-    :start-after: Start Route 1
-    :end-before: End Route 1
+    :linenos:
+    :lines: 6
+    :lineno-start: 6
 
-With this, URLs such as ``/howdy/amy/smith`` will assign ``amy`` to
-``first`` and ``smith`` to ``last``. We can then use this data in our
-view:
+With this, URLs such as ``/howdy/amy/smith`` will assign ``amy`` to ``first``
+and ``smith`` to ``last``. We can then use this data in our view:
 
 .. literalinclude:: quick_tour/routing/views.py
-    :start-after: Start Route 1
-    :end-before: End Route 1
+    :linenos:
+    :lines: 5-8
+    :lineno-start: 5
+    :emphasize-lines: 3
 
-``request.matchdict`` contains values from the URL that match the
-"replacement patterns" (the curly braces) in the route declaration.
-This information can then be used in your view.
+``request.matchdict`` contains values from the URL that match the "replacement
+patterns" (the curly braces) in the route declaration. This information can
+then be used in your view.
 
 .. seealso:: See also:
-   :ref:`Quick Tutorial Routing <qtut_routing>`,
-   :doc:`../narr/urldispatch`,
-   :ref:`debug_routematch_section`, and
-   :doc:`../narr/router`
+   :ref:`Quick Tutorial Routing <qtut_routing>`, :doc:`../narr/urldispatch`,
+   :ref:`debug_routematch_section`, and :doc:`../narr/router`.
+
 
 Templating
 ==========
 
-Ouch. We have been making our own ``Response`` and filling the response
-body with HTML. You usually won't embed an HTML string directly in
-Python, but instead, will use a templating language.
+Ouch. We have been making our own ``Response`` and filling the response body
+with HTML. You usually won't embed an HTML string directly in Python, but
+instead you will use a templating language.
 
-Pyramid doesn't mandate a particular database system, form library,
-etc. It encourages replaceability. This applies equally to templating,
-which is fortunate: developers have strong views about template
-languages. That said, the Pylons Project officially supports bindings for
-Chameleon, Jinja2, and Mako, so in this step, let's use Chameleon.
+Pyramid doesn't mandate a particular database system, form library, and so on.
+It encourages replaceability. This applies equally to templating, which is
+fortunate: developers have strong views about template languages. That said,
+the Pylons Project officially supports bindings for Chameleon, Jinja2, and
+Mako. In this step let's use Chameleon.
 
 Let's add ``pyramid_chameleon``, a Pyramid :term:`add-on` which enables
-Chameleon as a :term:`renderer` in our Pyramid applications:
+Chameleon as a :term:`renderer` in our Pyramid application:
 
 .. code-block:: bash
 
     $ easy_install pyramid_chameleon
 
-With the package installed, we can include the template bindings into
-our configuration:
+With the package installed, we can include the template bindings into our
+configuration in ``app.py``:
 
-.. code-block:: python
+.. literalinclude:: quick_tour/templating/app.py
+    :linenos:
+    :lines: 6-8
+    :lineno-start: 6
+    :emphasize-lines: 2
 
-    config.include('pyramid_chameleon')
-    
-Now lets change our views.py file:
+Now lets change our ``views.py`` file:
 
 .. literalinclude:: quick_tour/templating/views.py
-    :start-after: Start View 1
-    :end-before: End View 1
+    :linenos:
+    :emphasize-lines: 4,6
 
-Ahh, that looks better. We have a view that is focused on Python code.
-Our ``@view_config`` decorator specifies a :term:`renderer` that points
-to our template file. Our view then simply returns data which is then
-supplied to our template:
+Ahh, that looks better. We have a view that is focused on Python code. Our
+``@view_config`` decorator specifies a :term:`renderer` that points to our
+template file. Our view then simply returns data which is then supplied to our
+template ``hello_world.pt``:
 
 .. literalinclude:: quick_tour/templating/hello_world.pt
     :language: html
 
-Since our view returned ``dict(name=request.matchdict['name'])``,
-we can use ``name`` as a variable in our template via
-``${name}``.
+Since our view returned ``dict(name=request.matchdict['name'])``, we can use
+``name`` as a variable in our template via ``${name}``.
 
 .. seealso:: See also:
     :ref:`Quick Tutorial Templating <qtut_templating>`,
-    :doc:`../narr/templates`,
-    :ref:`debugging_templates`, and
-    :ref:`available_template_system_bindings`
+    :doc:`../narr/templates`, :ref:`debugging_templates`, and
+    :ref:`available_template_system_bindings`.
 
-Templating with ``jinja2``
-==========================
 
-We just said Pyramid doesn't prefer one templating language over
-another. Time to prove it. Jinja2 is a popular templating system,
-modeled after Django's templates. Let's add ``pyramid_jinja2``,
-a Pyramid :term:`add-on` which enables Jinja2 as a :term:`renderer` in
-our Pyramid applications:
+Templating with Jinja2
+======================
+
+We just said Pyramid doesn't prefer one templating language over another. Time
+to prove it. Jinja2 is a popular templating system, modeled after Django's
+templates. Let's add ``pyramid_jinja2``, a Pyramid :term:`add-on` which enables
+Jinja2 as a :term:`renderer` in our Pyramid applications:
 
 .. code-block:: bash
 
     $ easy_install pyramid_jinja2
 
-With the package installed, we can include the template bindings into
-our configuration:
+With the package installed, we can include the template bindings into our
+configuration:
 
-.. code-block:: python
-
-    config.include('pyramid_jinja2')
+.. literalinclude:: quick_tour/jinja2/app.py
+    :linenos:
+    :lines: 6-8
+    :lineno-start: 6
+    :emphasize-lines: 2
 
 The only change in our view is to point the renderer at the ``.jinja2`` file:
 
 .. literalinclude:: quick_tour/jinja2/views.py
-    :start-after: Start View 1
-    :end-before: End View 1
+    :linenos:
+    :lines: 4-6
+    :lineno-start: 4
+    :emphasize-lines: 1
 
 Our Jinja2 template is very similar to our previous template:
 
@@ -319,54 +318,60 @@ Our Jinja2 template is very similar to our previous template:
     :language: html
 
 Pyramid's templating add-ons register a new kind of renderer into your
-application. The renderer registration maps to different kinds of
-filename extensions. In this case, changing the extension from ``.pt``
-to ``.jinja2`` passed the view response through the ``pyramid_jinja2``
-renderer.
+application. The renderer registration maps to different kinds of filename
+extensions. In this case, changing the extension from ``.pt`` to ``.jinja2``
+passed the view response through the ``pyramid_jinja2`` renderer.
 
 .. seealso:: See also:
-    :ref:`Quick Tutorial Jinja2 <qtut_jinja2>`,
-    `Jinja2 homepage <http://jinja.pocoo.org/>`_, and
-    :ref:`pyramid_jinja2 Overview <jinja2:overview>`
+    :ref:`Quick Tutorial Jinja2 <qtut_jinja2>`, `Jinja2 homepage
+    <http://jinja.pocoo.org/>`_, and :ref:`pyramid_jinja2 Overview
+    <jinja2:overview>`.
+
 
 Static assets
 =============
 
-Of course the Web is more than just markup. You need static assets:
-CSS, JS, and images. Let's point our web app at a directory where
-Pyramid will serve some static assets. First another call to the
+Of course the Web is more than just markup. You need static assets: CSS, JS,
+and images. Let's point our web app at a directory from which Pyramid will
+serve some static assets. First let's make another call to the
 :term:`configurator`:
 
 .. literalinclude:: quick_tour/static_assets/app.py
-    :start-after: Start Static 1
-    :end-before: End Static 1
+    :linenos:
+    :lines: 6-8
+    :lineno-start: 6
+    :emphasize-lines: 2
 
 This tells our WSGI application to map requests under
-http://localhost:6543/static/ to files and directories inside a
-``static`` directory alongside our Python module.
+http://localhost:6543/static/ to files and directories inside a ``static``
+directory alongside our Python module.
 
 Next make a directory named ``static``, and place ``app.css`` inside:
 
 .. literalinclude:: quick_tour/static_assets/static/app.css
     :language: css
 
-All we need to do now is point to it in the ``<head>`` of our Jinja2
-template:
+All we need to do now is point to it in the ``<head>`` of our Jinja2 template,
+``hello_world.jinja2``:
 
-.. literalinclude:: quick_tour/static_assets/hello_world.pt
-    :language: html
-    :start-after: Start Link 1
-    :end-before: End Link 1
+.. literalinclude:: quick_tour/static_assets/hello_world.jinja2
+    :language: jinja
+    :linenos:
+    :lines: 4-6
+    :lineno-start: 4
+    :emphasize-lines: 2
 
-This link presumes that our CSS is at a URL starting with ``/static/``.
-What if the site is later moved under ``/somesite/static/``? Or perhaps
-a web developer changes the arrangement on disk? Pyramid provides a helper
-to allow flexibility on URL generation:
+This link presumes that our CSS is at a URL starting with ``/static/``. What if
+the site is later moved under ``/somesite/static/``? Or perhaps a web developer
+changes the arrangement on disk? Pyramid provides a helper to allow flexibility
+on URL generation:
 
-.. literalinclude:: quick_tour/static_assets/hello_world.pt
-    :language: html
-    :start-after: Start Link 2
-    :end-before: End Link 2
+.. literalinclude:: quick_tour/static_assets/hello_world_static.jinja2
+    :language: jinja
+    :linenos:
+    :lines: 4-6
+    :lineno-start: 4
+    :emphasize-lines: 2
 
 By using ``request.static_url`` to generate the full URL to the static
 assets, you both ensure you stay in sync with the configuration and
@@ -374,38 +379,48 @@ gain refactoring flexibility later.
 
 .. seealso:: See also:
     :ref:`Quick Tutorial Static Assets <qtut_static_assets>`,
-    :doc:`../narr/assets`,
-    :ref:`preventing_http_caching`, and
-    :ref:`influencing_http_caching`
+    :doc:`../narr/assets`, :ref:`preventing_http_caching`, and
+    :ref:`influencing_http_caching`.
+
 
 Returning JSON
 ==============
 
-Modern web apps are more than rendered HTML. Dynamic pages now use
-JavaScript to update the UI in the browser by requesting server data as
-JSON. Pyramid supports this with a JSON renderer:
+Modern web apps are more than rendered HTML. Dynamic pages now use JavaScript
+to update the UI in the browser by requesting server data as JSON. Pyramid
+supports this with a JSON renderer:
 
 .. literalinclude:: quick_tour/json/views.py
-    :start-after: Start View 1
-    :end-before: End View 2
+    :linenos:
+    :lines: 9-
+    :lineno-start: 9
 
-This wires up a view that returns some data through the JSON
-:term:`renderer`, which calls Python's JSON support to serialize the data
-into JSON and set the appropriate HTTP headers.
+This wires up a view that returns some data through the JSON :term:`renderer`,
+which calls Python's JSON support to serialize the data into JSON, and sets the
+appropriate HTTP headers.
+
+We also need to add a route to ``app.py`` so that our app will know how to
+respond to a request for ``hello.json``.
+
+.. literalinclude:: quick_tour/json/app.py
+    :linenos:
+    :lines: 6-8
+    :lineno-start: 6
+    :emphasize-lines: 2
 
 .. seealso:: See also:
-    :ref:`Quick Tutorial JSON <qtut_json>`,
-    :ref:`views_which_use_a_renderer`,
-    :ref:`json_renderer`, and
-    :ref:`adding_and_overriding_renderers`
+    :ref:`Quick Tutorial JSON <qtut_json>`, :ref:`views_which_use_a_renderer`,
+    :ref:`json_renderer`, and :ref:`adding_and_overriding_renderers`.
+
 
 View classes
 ============
 
-So far our views have been simple, free-standing functions. Many times
-your views are related: different ways to look at or work on the same
-data, or a REST API that handles multiple operations. Grouping these
-together as a :ref:`view class <class_as_view>` makes sense.
+So far our views have been simple, free-standing functions. Many times your
+views are related. They may have different ways to look at or work on the same
+data, or they may be a REST API that handles multiple operations. Grouping
+these together as a :ref:`view class <class_as_view>` makes sense and achieves
+the following goals.
 
 - Group views
 
@@ -413,46 +428,46 @@ together as a :ref:`view class <class_as_view>` makes sense.
 
 - Share some state and helpers
 
-The following shows a "Hello World" example with three operations: view
-a form, save a change, or press the delete button:
+The following shows a "Hello World" example with three operations: view a form,
+save a change, or press the delete button in our ``views.py``:
 
 .. literalinclude:: quick_tour/view_classes/views.py
-    :start-after: Start View 1
-    :end-before: End View 1
+    :linenos:
+    :lines: 7-
+    :lineno-start: 7
 
-As you can see, the three views are logically grouped together.
-Specifically:
+As you can see, the three views are logically grouped together. Specifically:
 
-- The first view is returned when you go to ``/howdy/amy``. This URL is
-  mapped to the ``hello`` route that we centrally set using the optional
+- The first view is returned when you go to ``/howdy/amy``. This URL is mapped
+  to the ``hello`` route that we centrally set using the optional
   ``@view_defaults``.
 
 - The second view is returned when the form data contains a field with
-  ``form.edit``, such as clicking on
-  ``<input type="submit" name="form.edit" value="Save">``. This rule
-  is specified in the ``@view_config`` for that view.
+  ``form.edit``, such as clicking on ``<input type="submit" name="form.edit"
+  value="Save">``. This rule is specified in the ``@view_config`` for that
+  view.
 
-- The third view is returned when clicking on a button such
-  as ``<input type="submit" name="form.delete" value="Delete">``.
+- The third view is returned when clicking on a button such as ``<input
+  type="submit" name="form.delete" value="Delete">``.
 
-Only one route is needed, stated in one place atop the view class. Also,
-the assignment of ``name`` is done in the ``__init__`` function. Our
-templates can then use ``{{ view.name }}``.
+Only one route is needed, stated in one place atop the view class. Also, the
+assignment of ``name`` is done in the ``__init__`` function. Our templates can
+then use ``{{ view.name }}``.
 
-Pyramid view classes, combined with built-in and custom predicates,
-have much more to offer:
+Pyramid view classes, combined with built-in and custom predicates, have much
+more to offer:
 
 - All the same view configuration parameters as function views
 
-- One route leading to multiple views, based on information in the
-  request or data such as ``request_param``, ``request_method``,
-  ``accept``, ``header``, ``xhr``, ``containment``, and
-  ``custom_predicates``
+- One route leading to multiple views, based on information in the request or
+  data such as ``request_param``, ``request_method``, ``accept``, ``header``,
+  ``xhr``, ``containment``, and ``custom_predicates``
 
 .. seealso:: See also:
-    :ref:`Quick Tutorial View Classes <qtut_view_classes>`,
-    :ref:`Quick Tutorial More View Classes <qtut_more_view_classes>`, and
-    :ref:`class_as_view`
+    :ref:`Quick Tutorial View Classes <qtut_view_classes>`, :ref:`Quick
+    Tutorial More View Classes <qtut_more_view_classes>`, and
+    :ref:`class_as_view`.
+
 
 Quick project startup with scaffolds
 ====================================
