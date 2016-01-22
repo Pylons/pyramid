@@ -3,9 +3,9 @@ from pyramid.config import Configurator
 
 if __name__ == '__main__':
     config = Configurator()
-    # Start Routes 1
     config.add_route('hello', '/howdy/{name}')
-    # End Routes 1
+    config.add_route('hello_json', 'hello.json')
+    config.add_static_view(name='static', path='static')
     config.include('pyramid_jinja2')
     config.scan('views')
     app = config.make_wsgi_app()
