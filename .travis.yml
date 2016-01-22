@@ -27,6 +27,7 @@ matrix:
 
 install:
   - travis_retry pip install tox
+  - if [[ $TOXENV == 'py32' ]]; then travis_retry pip install "virtualenv<14" ; fi
 
 script:
   - travis_retry tox
