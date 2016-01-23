@@ -812,17 +812,16 @@ We need to update our Jinja2 template to show counter increment in the session:
     :ref:`flash_messages`, :ref:`session_module`, and
     :term:`pyramid_redis_sessions`.
 
+
 Databases
 =========
 
-Web applications mean data. Data means databases. Frequently SQL
-databases. SQL databases frequently mean an "ORM"
-(object-relational mapper.) In Python, ORM usually leads to the
-mega-quality *SQLAlchemy*, a Python package that greatly eases working
-with databases.
+Web applications mean data. Data means databases. Frequently SQL databases. SQL
+databases frequently mean an "ORM" (object-relational mapper.) In Python, ORM
+usually leads to the mega-quality *SQLAlchemy*, a Python package that greatly
+eases working with databases.
 
-Pyramid and SQLAlchemy are great friends. That friendship includes a
-scaffold!
+Pyramid and SQLAlchemy are great friends. That friendship includes a scaffold!
 
 .. code-block:: bash
 
@@ -830,50 +829,53 @@ scaffold!
   $ cd sqla_demo
   $ python setup.py develop
 
-We now have a working sample SQLAlchemy application with all
-dependencies installed. The sample project provides a console script to
-initialize a SQLite database with tables. Let's run it and then start
-the application:
+We now have a working sample SQLAlchemy application with all dependencies
+installed. The sample project provides a console script to initialize a SQLite
+database with tables. Let's run it, then start the application:
 
 .. code-block:: bash
 
   $ initialize_sqla_demo_db development.ini
   $ pserve development.ini
 
-The ORM eases the mapping of database structures into a programming
-language. SQLAlchemy uses "models" for this mapping. The scaffold
-generated a sample model:
+The ORM eases the mapping of database structures into a programming language.
+SQLAlchemy uses "models" for this mapping. The scaffold generated a sample
+model:
 
 .. literalinclude:: quick_tour/sqla_demo/sqla_demo/models.py
-    :start-after: Start Sphinx Include
-    :end-before: End Sphinx Include
+    :language: python
+    :linenos:
+    :lineno-start: 21
+    :lines: 21-
 
-View code, which mediates the logic between web requests and the rest
-of the system, can then easily get at the data thanks to SQLAlchemy:
+View code, which mediates the logic between web requests and the rest of the
+system, can then easily get at the data thanks to SQLAlchemy:
 
 .. literalinclude:: quick_tour/sqla_demo/sqla_demo/views.py
-    :start-after: Start Sphinx Include
-    :end-before: End Sphinx Include
+    :language: python
+    :linenos:
+    :lineno-start: 12
+    :lines: 12-18
+    :emphasize-lines: 4
 
 .. seealso:: See also:
-    :ref:`Quick Tutorial Databases <qtut_databases>`,
-    `SQLAlchemy <http://www.sqlalchemy.org/>`_,
-    :ref:`making_a_console_script`,
-    :ref:`bfg_sql_wiki_tutorial`, and
-    :ref:`Application Transactions With pyramid_tm <tm:overview>`
+    :ref:`Quick Tutorial Databases <qtut_databases>`, `SQLAlchemy
+    <http://www.sqlalchemy.org/>`_, :ref:`making_a_console_script`,
+    :ref:`bfg_sql_wiki_tutorial`, and :ref:`Application Transactions with
+    pyramid_tm <tm:overview>`.
+
 
 Forms
 =====
 
-Developers have lots of opinions about web forms, and thus there are many
-form libraries for Python. Pyramid doesn't directly bundle a form
-library, but *Deform* is a popular choice for forms,
-along with its related *Colander* schema system.
+Developers have lots of opinions about web forms, thus there are many form
+libraries for Python. Pyramid doesn't directly bundle a form library, but
+*Deform* is a popular choice for forms, along with its related *Colander*
+schema system.
 
-As an example, imagine we want a form that edits a wiki page. The form
-should have two fields on it, one of them a required title and the
-other a rich text editor for the body. With Deform we can express this
-as a Colander schema:
+As an example, imagine we want a form that edits a wiki page. The form should
+have two fields on it, one of them a required title and the other a rich text
+editor for the body. With Deform we can express this as a Colander schema:
 
 .. code-block:: python
 
@@ -884,8 +886,8 @@ as a Colander schema:
             widget=deform.widget.RichTextWidget()
         )
 
-With this in place, we can render the HTML for a form,
-perhaps with form data from an existing page:
+With this in place, we can render the HTML for a form, perhaps with form data
+from an existing page:
 
 .. code-block:: python
 
@@ -909,20 +911,18 @@ We'd like to handle form submission, validation, and saving:
     page['title'] = appstruct['title']
     page['body'] = appstruct['body']
 
-Deform and Colander provide a very flexible combination for forms,
-widgets, schemas, and validation. Recent versions of Deform also
-include a :ref:`retail mode <deform:retail>` for gaining Deform
-features on custom forms.
+Deform and Colander provide a very flexible combination for forms, widgets,
+schemas, and validation. Recent versions of Deform also include a :ref:`retail
+mode <deform:retail>` for gaining Deform features on custom forms.
 
-Also the ``deform_bootstrap`` Pyramid add-on restyles the stock Deform
-widgets using attractive CSS from Twitter Bootstrap and more powerful widgets
-from Chosen.
+Also the ``deform_bootstrap`` Pyramid add-on restyles the stock Deform widgets
+using attractive CSS from Twitter Bootstrap and more powerful widgets from
+Chosen.
 
 .. seealso:: See also:
-    :ref:`Quick Tutorial Forms <qtut_forms>`,
-    :ref:`Deform <deform:overview>`,
-    :ref:`Colander <colander:overview>`, and
-    `deform_bootstrap <https://pypi.python.org/pypi/deform_bootstrap>`_
+    :ref:`Quick Tutorial Forms <qtut_forms>`, :ref:`Deform <deform:overview>`,
+    :ref:`Colander <colander:overview>`, and `deform_bootstrap
+    <https://pypi.python.org/pypi/deform_bootstrap>`_.
 
 Conclusion
 ==========
