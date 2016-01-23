@@ -1,5 +1,6 @@
 from sqlalchemy import (
     Column,
+    Index,
     Integer,
     Text,
     )
@@ -16,14 +17,11 @@ from zope.sqlalchemy import ZopeTransactionExtension
 DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 Base = declarative_base()
 
-# Start Sphinx Include
+
 class MyModel(Base):
     __tablename__ = 'models'
     id = Column(Integer, primary_key=True)
-    name = Column(Text, unique=True)
+    name = Column(Text)
     value = Column(Integer)
 
-    def __init__(self, name, value):
-        self.name = name
-        self.value = value
-    # End Sphinx Include
+Index('my_index', MyModel.name, unique=True, mysql_length=255)
