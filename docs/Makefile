@@ -11,8 +11,10 @@ BUILDDIR      = _build
 PAPEROPT_a4     = -D latex_paper_size=a4
 PAPEROPT_letter = -D latex_paper_size=letter
 ALLSPHINXOPTS   = -d $(BUILDDIR)/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
+RST_FILES=`find . -name "*.rst" -printf "%p "`
+DIRECTIVES=automodule,autoclass,autofunction,autointerface,program-output,frontmatter,mainmatter,backmatter
 
-.PHONY: help clean html web pickle htmlhelp latex changes linkcheck
+.PHONY: help clean html web pickle htmlhelp latex changes linkcheck rstcheck
 
 help:
 	@echo "Please use \`make <target>' where <target> is one of"
@@ -22,6 +24,7 @@ help:
 	@echo "  latex     to make LaTeX files, you can set PAPER=a4 or PAPER=letter"
 	@echo "  changes   to make an overview over all changed/added/deprecated items"
 	@echo "  linkcheck to check all external links for integrity"
+	@echo "  rstcheck  to check all rst files for syntax error"
 
 clean:
 	-rm -rf $(BUILDDIR)/*
@@ -90,3 +93,10 @@ epub:
 	@echo
 	@echo "Build finished. The epub file is in $(BUILDDIR)/epub."
 
+rstcheck:
+	@rstcheck $(RST_FILES) \
+		--ignore-roles=app \
+		--ignore-language=python \
+		--ignore-substitutions=release --report 2 \
+		--ignore-directives=$(DIRECTIVES)
+	@echo "Tests is OK!"
