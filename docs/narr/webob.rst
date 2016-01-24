@@ -269,7 +269,7 @@ to a :app:`Pyramid` application:
 When such a request reaches a view in your application, the
 ``request.json_body`` attribute will be available in the view callable body.
 
-.. code-block:: javascript
+.. code-block:: python
 
     @view_config(renderer='string')
     def aview(request):
