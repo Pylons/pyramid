@@ -109,7 +109,7 @@ For Linux, the commands to do so are as follows:
 
 For Windows:
 
-.. code-block:: posh
+.. code-block:: ps1con
 
     # Windows
     c:\> cd \
