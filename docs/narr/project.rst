@@ -435,7 +435,7 @@ commenting out a line.  For example, instead of:
    :linenos:
 
    [app:main]
-   ...
+   # ... elided configuration
    pyramid.includes =
        pyramid_debugtoolbar
 
@@ -445,7 +445,7 @@ Put a hash mark at the beginning of the ``pyramid_debugtoolbar`` line:
    :linenos:
 
    [app:main]
-   ...
+   # ... elided configuration
    pyramid.includes =
    #    pyramid_debugtoolbar
 
