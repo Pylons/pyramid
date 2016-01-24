@@ -292,7 +292,7 @@ After you've got your virtualenv installed, you may install :app:`Pyramid`
 itself using the following commands:
 
 .. parsed-literal::
-      
+
    $ $VENV/bin/easy_install "pyramid==\ |release|\ "
 
 The ``easy_install`` command will take longer than the previous ones to
@@ -371,7 +371,7 @@ You can use Pyramid on Windows under Python 2 or 3.
    installed:
 
    .. parsed-literal::
-      
+
       c:\\env> %VENV%\\Scripts\\easy_install "pyramid==\ |release|\ "
 
 What Gets Installed
