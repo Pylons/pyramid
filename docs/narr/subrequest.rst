@@ -17,7 +17,7 @@ application.
 Here's an example application which uses a subrequest:
 
 .. code-block:: python
-  :linenos:
+   :linenos:
 
    from wsgiref.simple_server import make_server
    from pyramid.config import Configurator
@@ -61,8 +61,8 @@ adapter when found and invoked via
 object:
 
 .. code-block:: python
-  :linenos:
-  :emphasize-lines: 11
+   :linenos:
+   :emphasize-lines: 11
 
    from wsgiref.simple_server import make_server
    from pyramid.config import Configurator
@@ -106,8 +106,8 @@ exception, the exception will be raised to the caller of
 :term:`exception view` configured:
 
 .. code-block:: python
-  :linenos:
-  :emphasize-lines: 11-16
+   :linenos:
+   :emphasize-lines: 11-16
 
    from wsgiref.simple_server import make_server
    from pyramid.config import Configurator
@@ -175,8 +175,8 @@ We can cause the subrequest to be run through the tween stack by passing
 :meth:`~pyramid.request.Request.invoke_subrequest`, like this:
 
 .. code-block:: python
-  :linenos:
-  :emphasize-lines: 7
+   :linenos:
+   :emphasize-lines: 7
 
    from wsgiref.simple_server import make_server
    from pyramid.config import Configurator
