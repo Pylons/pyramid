@@ -630,7 +630,8 @@ dependencies by forcing us to make better packaging decisions.  Removing
 Chameleon and Mako templating system dependencies in the Pyramid core in 1.5
 let us shed most of the remainder of them.
 
-Pyramid "Cheats" To Obtain Speed
+
+Pyramid "Cheats" to Obtain Speed
 --------------------------------
 
 Complaints have been lodged by other web framework authors at various times
@@ -639,10 +640,11 @@ mechanism is our use (transitively) of the C extensions provided by
 :mod:`zope.interface` to do fast lookups.  Another claimed cheating mechanism
 is the religious avoidance of extraneous function calls.
 
-If there's such a thing as cheating to get better performance, we want to
-cheat as much as possible.  We optimize :app:`Pyramid` aggressively.  This
-comes at a cost: the core code has sections that could be expressed more
-readably.  As an amelioration, we've commented these sections liberally.
+If there's such a thing as cheating to get better performance, we want to cheat
+as much as possible. We optimize :app:`Pyramid` aggressively. This comes at a
+cost. The core code has sections that could be expressed with more readability.
+As an amelioration, we've commented these sections liberally.
+
 
 Pyramid Gets Its Terminology Wrong ("MVC")
 ------------------------------------------
@@ -655,8 +657,8 @@ existing "MVC" framework uses its terminology.  For example, you probably
 expect that models are ORM models, controllers are classes that have methods
 that map to URLs, and views are templates.  :app:`Pyramid` indeed has each of
 these concepts, and each probably *works* almost exactly like your existing
-"MVC" web framework. We just don't use the MVC terminology, as we can't
-square its usage in the web framework space with historical reality.
+"MVC" web framework. We just don't use the MVC terminology, as we can't square
+its usage in the web framework space with historical reality.
 
 People very much want to give web applications the same properties as common
 desktop GUI platforms by using similar terminology, and to provide some frame
@@ -665,60 +667,59 @@ hang together.  But in the opinion of the author, "MVC" doesn't match the web
 very well in general. Quoting from the `Model-View-Controller Wikipedia entry
 <http://en.wikipedia.org/wiki/Model–view–controller>`_:
 
-.. code-block:: text
+    Though MVC comes in different flavors, control flow is generally as
+    follows:
 
-  Though MVC comes in different flavors, control flow is generally as
-  follows:
+      The user interacts with the user interface in some way (for example,
+      presses a mouse button).
 
-    The user interacts with the user interface in some way (for
-    example, presses a mouse button).
+      The controller handles the input event from the user interface, often via
+      a registered handler or callback and converts the event into appropriate
+      user action, understandable for the model.
 
-    The controller handles the input event from the user interface,
-    often via a registered handler or callback and converts the event
-    into appropriate user action, understandable for the model.
+      The controller notifies the model of the user action, possibly resulting
+      in a change in the model's state. (For example, the controller updates the
+      user's shopping cart.)[5]
 
-    The controller notifies the model of the user action, possibly  
-    resulting in a change in the model's state. (For example, the
-    controller updates the user's shopping cart.)[5]
+      A view queries the model in order to generate an appropriate user
+      interface (for example, the view lists the shopping cart's contents). Note
+      that the view gets its own data from the model.
 
-    A view queries the model in order to generate an appropriate
-    user interface (for example, the view lists the shopping cart's     
-    contents). Note that the view gets its own data from the model.
+      The controller may (in some implementations) issue a general instruction
+      to the view to render itself. In others, the view is automatically
+      notified by the model of changes in state (Observer) which require a
+      screen update.
 
-    The controller may (in some implementations) issue a general
-    instruction to the view to render itself. In others, the view is
-    automatically notified by the model of changes in state
-    (Observer) which require a screen update.
-
-    The user interface waits for further user interactions, which
-    restarts the cycle.
+      The user interface waits for further user interactions, which restarts the
+      cycle.
 
 To the author, it seems as if someone edited this Wikipedia definition,
 tortuously couching concepts in the most generic terms possible in order to
-account for the use of the term "MVC" by current web frameworks.  I doubt
-such a broad definition would ever be agreed to by the original authors of
-the MVC pattern.  But *even so*, it seems most MVC web frameworks fail to
-meet even this falsely generic definition.
+account for the use of the term "MVC" by current web frameworks.  I doubt such
+a broad definition would ever be agreed to by the original authors of the MVC
+pattern.  But *even so*, it seems most MVC web frameworks fail to meet even
+this falsely generic definition.
 
 For example, do your templates (views) always query models directly as is
-claimed in "note that the view gets its own data from the model"?  Probably
-not.  My "controllers" tend to do this, massaging the data for easier use by
-the "view" (template). What do you do when your "controller" returns JSON? Do
-your controllers use a template to generate JSON? If not, what's the "view"
-then?  Most MVC-style GUI web frameworks have some sort of event system
-hooked up that lets the view detect when the model changes.  The web just has
-no such facility in its current form: it's effectively pull-only.
+claimed in "note that the view gets its own data from the model"? Probably not.
+My "controllers" tend to do this, massaging the data for easier use by the
+"view" (template). What do you do when your "controller" returns JSON? Do your
+controllers use a template to generate JSON? If not, what's the "view" then?
+Most MVC-style GUI web frameworks have some sort of event system hooked up that
+lets the view detect when the model changes. The web just has no such facility
+in its current form; it's effectively pull-only.
 
-So, in the interest of not mistaking desire with reality, and instead of
-trying to jam the square peg that is the web into the round hole of "MVC", we
-just punt and say there are two things: resources and views. The resource
-tree represents a site structure, the view presents a resource.  The
-templates are really just an implementation detail of any given view: a view
-doesn't need a template to return a response.  There's no "controller": it
-just doesn't exist.  The "model" is either represented by the resource tree
-or by a "domain model" (like a SQLAlchemy model) that is separate from the
-framework entirely.  This seems to us like more reasonable terminology, given
-the current constraints of the web.
+So, in the interest of not mistaking desire with reality, and instead of trying
+to jam the square peg that is the web into the round hole of "MVC", we just
+punt and say there are two things: resources and views. The resource tree
+represents a site structure, the view presents a resource. The templates are
+really just an implementation detail of any given view. A view doesn't need a
+template to return a response. There's no "controller"; it just doesn't exist.
+The "model" is either represented by the resource tree or by a "domain model"
+(like an SQLAlchemy model) that is separate from the framework entirely. This
+seems to us like more reasonable terminology, given the current constraints of
+the web.
+
 
 .. _apps_are_extensible:
 
