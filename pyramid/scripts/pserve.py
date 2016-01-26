@@ -9,7 +9,7 @@
 # lib/site.py
 
 import atexit
-import ctypes.
+import ctypes
 import errno
 import logging
 import optparse
