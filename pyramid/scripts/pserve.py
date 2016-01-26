@@ -387,7 +387,7 @@ a real process manager for your processes like Systemd, Circus, or Supervisor.
 
         if self.options.browser:
             def open_browser():
-                context = loadcontext(SERVER, app_spec, name=app_name, relative_to=base,
+                context = loadcontext(SERVER, app_spec, name=server_name, relative_to=base,
                         global_conf=vars)
                 url = 'http://127.0.0.1:{port}/'.format(**context.config())
                 time.sleep(1)
