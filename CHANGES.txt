@@ -4,6 +4,12 @@ unreleased
 - Dropped Python 3.2 support.
   See https://github.com/Pylons/pyramid/pull/2256
 
+- Fix ``pserve --browser`` to use the ``--server-name`` instead of the
+  app name when selecting a section to use. This was only working for people
+  who had server and app sections with the same name, for example
+  ``[app:main]`` and ``[server:main]``.
+  See https://github.com/Pylons/pyramid/pull/2292
+
 1.6 (2015-04-14)
 ================
 
