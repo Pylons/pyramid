@@ -844,17 +844,16 @@ application deployment modifications instead, as if you were deploying an
 application written using any other web framework.
 
 
-Zope 3 Enforces "TTW" Authorization Checks By Default; Pyramid Does Not
+Zope 3 Enforces "TTW" Authorization Checks by Default; Pyramid Does Not
 -----------------------------------------------------------------------
 
 Challenge
 +++++++++
 
 :app:`Pyramid` performs automatic authorization checks only at :term:`view`
-execution time.  Zope 3 wraps context objects with a `security proxy
-<http://wiki.zope.org/zope3/WhatAreSecurityProxies>`_, which causes Zope 3 to
-do also security checks during attribute access.  I like this, because it
-means:
+execution time. Zope 3 wraps context objects with a `security proxy
+<http://wiki.zope.org/zope3/WhatAreSecurityProxies>`_, which causes Zope 3 also
+to do security checks during attribute access. I like this, because it means:
 
 #) When I use the security proxy machinery, I can have a view that
    conditionally displays certain HTML elements (like form fields) or
@@ -886,7 +885,7 @@ web framework.
 
 And since we tend to use the same toolkit for all web applications, it's just
 never been a concern to be able to use the same set of restricted-execution
-code under two web different frameworks.
+code under two different web frameworks.
 
 Justifications for disabling security proxies by default notwithstanding,
 given that Zope 3 security proxies are viral by nature, the only requirement
@@ -898,6 +897,7 @@ behavior, it is possible to plug in a different traverser which returns
 Zope3-security-proxy-wrapped objects for each traversed object (including the
 :term:`context` and the :term:`root`).  This would have the effect of
 creating a more Zope3-like environment without much effort.
+
 
 .. _http_exception_hierarchy:
 
