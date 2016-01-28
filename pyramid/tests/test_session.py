@@ -695,6 +695,13 @@ class Test_check_csrf_token(unittest.TestCase):
         result = self._callFUT(request, 'csrf_token', raises=False)
         self.assertEqual(result, False)
 
+    def test_token_differing_types(self):
+        from pyramid.compat import text_
+        request = testing.DummyRequest()
+        request.session['_csrft_'] = text_('foo')
+        request.params['csrf_token'] = b'foo'
+        self.assertEqual(self._callFUT(request, token='csrf_token'), True)
+
 class DummySerializer(object):
     def dumps(self, value):
         return base64.b64encode(json.dumps(value).encode('utf-8'))

@@ -16,6 +16,7 @@ from pyramid.compat import (
     PY3,
     PYPY,
     class_types,
+    text_,
     )
 
 from pyramid.config import Configurator
@@ -273,7 +274,7 @@ class DummySession(dict):
         return storage
 
     def new_csrf_token(self):
-        token = '0123456789012345678901234567890123456789'
+        token = text_('0123456789012345678901234567890123456789')
         self['_csrft_'] = token
         return token
 
