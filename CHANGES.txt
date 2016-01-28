@@ -1,3 +1,10 @@
+unreleased
+==========
+
+- Fix an issue with differing CSRF token data types on Python runtimes
+  supporting ``hmac.compare_digest``.
+  See https://github.com/Pylons/pyramid/pull/2299
+
 1.6 (2016-01-03)
 ================
 
