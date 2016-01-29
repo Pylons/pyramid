@@ -430,7 +430,7 @@ useless without requirements and goals, but if you need speed, Pyramid will
 almost certainly never be your application's bottleneck; at least no more
 than Python will be a bottleneck.
 
-Example: http://blog.curiasolutions.com/the-great-web-framework-shootout/
+Example: http://blog.curiasolutions.com/pages/the-great-web-framework-shootout.html
 
 Exception views
 ~~~~~~~~~~~~~~~
