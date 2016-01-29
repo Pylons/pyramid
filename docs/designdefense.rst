@@ -907,28 +907,29 @@ much like the ones defined in :mod:`webob.exc`, (e.g.,
 :class:`~pyramid.httpexceptions.HTTPNotFound` or
 :class:`~pyramid.httpexceptions.HTTPForbidden`).  They have the same names and
 largely the same behavior, and all have a very similar implementation, but not
-the same identity.  Here's why they have a separate identity:
+the same identity.  Here's why they have a separate identity.
 
 - Making them separate allows the HTTP exception classes to subclass
   :class:`pyramid.response.Response`.  This speeds up response generation
-  slightly due to the way the Pyramid router works.  The same speedup could be
+  slightly due to the way the Pyramid router works.  The same speed up could be
   gained by monkeypatching :class:`webob.response.Response`, but it's usually
   the case that monkeypatching turns out to be evil and wrong.
 
-- Making them separate allows them to provide alternate ``__call__`` logic
+- Making them separate allows them to provide alternate ``__call__`` logic,
   which also speeds up response generation.
 
 - Making them separate allows the exception classes to provide for the proper
   value of ``RequestClass`` (:class:`pyramid.request.Request`).
 
-- Making them separate allows us freedom from having to think about backwards
-  compatibility code present in :mod:`webob.exc` having to do with Python 2.4,
-  which we no longer support in Pyramid 1.1+.
+- Making them separate gives us freedom from thinking about backwards
+  compatibility code present in :mod:`webob.exc` related to Python 2.4, which
+  we no longer support in Pyramid 1.1+.
 
 - We change the behavior of two classes
   (:class:`~pyramid.httpexceptions.HTTPNotFound` and
   :class:`~pyramid.httpexceptions.HTTPForbidden`) in the module so that they
-  can be used by Pyramid internally for notfound and forbidden exceptions.
+  can be used by Pyramid internally for ``notfound`` and ``forbidden``
+  exceptions.
 
 - Making them separate allows us to influence the docstrings of the exception
   classes to provide Pyramid-specific documentation.
@@ -936,6 +937,7 @@ the same identity.  Here's why they have a separate identity:
 - Making them separate allows us to silence a stupid deprecation warning under
   Python 2.6 when the response objects are used as exceptions (related to
   ``self.message``).
+
 
 .. _simpler_traversal_model:
 
