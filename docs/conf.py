@@ -133,6 +133,7 @@ html_theme_options = dict(
     in_progress='false',
     # on previous branches/major releases true, else false
     outdated='true',
+    latest_url='http://docs.pylonsproject.org/projects/pyramid/en/latest/',
     )
 
 # The name for this set of Sphinx documents.  If None, it defaults to
