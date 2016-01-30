@@ -129,7 +129,10 @@ html_theme = 'pyramid'
 html_theme_path = pylons_sphinx_themes.get_html_themes_path()
 html_theme_options = dict(
     github_url='https://github.com/Pylons/pyramid',
+    # on master branch true, else false
     in_progress='true',
+    # on previous branches/major releases true, else false
+    outdated='false',
     )
 
 # The name for this set of Sphinx documents.  If None, it defaults to
