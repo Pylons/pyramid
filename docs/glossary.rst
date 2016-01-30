@@ -234,7 +234,7 @@ Glossary
      object *location-aware*.
 
    permission
-     A string or unicode object that represents an action being taken against
+     A string or Unicode object that represents an action being taken against
      a :term:`context` resource.  A permission is associated with a view name
      and a resource type by the developer.  Resources are decorated with
      security declarations (e.g. an :term:`ACL`), which reference these
@@ -291,22 +291,22 @@ Glossary
      :term:`authorization policy`.
 
    principal
-     A *principal* is a string or unicode object representing an
-     entity, typically a user or group.  Principals are provided by an
-     :term:`authentication policy`.  For example, if a user had the
-     :term:`userid` `"bob"`, and was part of two groups named `"group foo"`
-     and "group bar", the request might have information attached to
-     it that would indicate that Bob was represented by three
-     principals: `"bob"`, `"group foo"` and `"group bar"`.
+     A *principal* is a string or Unicode object representing an entity,
+     typically a user or group. Principals are provided by an
+     :term:`authentication policy`. For example, if a user has the
+     :term:`userid` `bob`, and is a member of two groups named `group foo` and
+     `group bar`, then the request might have information attached to it
+     indicating that Bob was represented by three principals: `bob`, `group
+     foo` and `group bar`.
 
    userid
-     A *userid* is a string or unicode object used to identify and
-     authenticate a real-world user (or client).  A userid is
-     supplied to an :term:`authentication policy` in order to discover
-     the user's :term:`principals <principal>`.  The default behavior
-     of the authentication policies :app:`Pyramid` provides is to
-     return the user's userid as a principal, but this is not strictly
-     necessary in custom policies that define their principals differently.
+     A *userid* is a string or Unicode object used to identify and authenticate
+     a real-world user or client. A userid is supplied to an
+     :term:`authentication policy` in order to discover the user's
+     :term:`principals <principal>`. In the authentication policies which
+     :app:`Pyramid` provides, the default behavior returns the user's userid as
+     a principal, but this is not strictly necessary in custom policies that
+     define their principals differently.
 
    authorization policy
      An authorization policy in :app:`Pyramid` terms is a bit of
