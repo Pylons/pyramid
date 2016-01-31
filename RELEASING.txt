@@ -36,7 +36,8 @@ Releasing Pyramid
 
 - For major version releases, in docs/conf.py, update values under
   html_theme_options for in_progress and outdated across master, releasing
-  branch, and previously released branch.
+  branch, and previously released branch. Also in the previously released
+  branch only, uncomment the sections to enable pylons_sphinx_latesturl.
 
 - Change setup.py version to the new version number.
 
