@@ -1,10 +1,11 @@
-from .meta import Base
 from sqlalchemy import (
     Column,
     Index,
     Integer,
     Text,
 )
+
+from .meta import Base
 
 
 class MyModel(Base):
