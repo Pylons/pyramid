@@ -175,11 +175,11 @@ Ameliorations
 +++++++++++++
 
 First, the primary amelioration: :app:`Pyramid` *does not expect application
-developers to understand ZCA concepts or any of its APIs*.  If an
-*application* developer needs to understand a ZCA concept or API during the
-creation of a :app:`Pyramid` application, we've failed on some axis.
+developers to understand ZCA concepts or any of its APIs*.  If an *application*
+developer needs to understand a ZCA concept or API during the creation of a
+:app:`Pyramid` application, we've failed on some axis.
 
-Instead, the framework hides the presence of the ZCA registry behind
+Instead the framework hides the presence of the ZCA registry behind
 special-purpose API functions that *do* use ZCA APIs.  Take for example the
 ``pyramid.security.authenticated_userid`` function, which returns the userid
 present in the current request or ``None`` if no userid is present in the
@@ -191,10 +191,9 @@ current request.  The application developer calls it like so:
    from pyramid.security import authenticated_userid
    userid = authenticated_userid(request)
 
-He now has the current user id.
+They now have the current user id.
 
-Under its hood however, the implementation of ``authenticated_userid``
-is this:
+Under its hood however, the implementation of ``authenticated_userid`` is this:
 
 .. code-block:: python
    :linenos:
@@ -211,58 +210,56 @@ is this:
        return policy.authenticated_userid(request)
 
 Using such wrappers, we strive to always hide the ZCA API from application
-developers.  Application developers should just never know about the ZCA API:
-they should call a Python function with some object germane to the domain as
-an argument, and it should return a result.  A corollary that follows is
-that any reader of an application that has been written using :app:`Pyramid`
-needn't understand the ZCA API either.
+developers.  Application developers should just never know about the ZCA API;
+they should call a Python function with some object germane to the domain as an
+argument, and it should return a result.  A corollary that follows is that any
+reader of an application that has been written using :app:`Pyramid` needn't
+understand the ZCA API either.
 
 Hiding the ZCA API from application developers and code readers is a form of
 enhancing domain specificity.  No application developer wants to need to
-understand the small, detailed mechanics of how a web framework does its
-thing.  People want to deal in concepts that are closer to the domain they're
-working in: for example, web developers want to know about *users*, not
-*utilities*.  :app:`Pyramid` uses the ZCA as an implementation detail, not as
-a feature which is exposed to end users.
+understand the small, detailed mechanics of how a web framework does its thing.
+People want to deal in concepts that are closer to the domain they're working
+in. For example, web developers want to know about *users*, not *utilities*.
+:app:`Pyramid` uses the ZCA as an implementation detail, not as a feature which
+is exposed to end users.
 
 However, unlike application developers, *framework developers*, including
 people who want to override :app:`Pyramid` functionality via preordained
-framework plugpoints like traversal or view lookup *must* understand the ZCA
+framework plugpoints like traversal or view lookup, *must* understand the ZCA
 registry API.
 
 :app:`Pyramid` framework developers were so concerned about conceptual load
-issues of the ZCA registry API for framework developers that a `replacement
-registry implementation <https://github.com/repoze/repoze.component>`_
-named :mod:`repoze.component` was actually developed.  Though this package
-has a registry implementation which is fully functional and well-tested, and
-its API is much nicer than the ZCA registry API, work on it was largely
-abandoned and it is not used in :app:`Pyramid`.  We continued to use a ZCA
-registry within :app:`Pyramid` because it ultimately proved a better fit.
+issues of the ZCA registry API that a `replacement registry implementation
+<https://github.com/repoze/repoze.component>`_ named :mod:`repoze.component`
+was actually developed.  Though this package has a registry implementation
+which is fully functional and well-tested, and its API is much nicer than the
+ZCA registry API, work on it was largely abandoned, and it is not used in
+:app:`Pyramid`.  We continued to use a ZCA registry within :app:`Pyramid`
+because it ultimately proved a better fit.
 
 .. note::
 
-   We continued using ZCA registry rather than disusing it in
-   favor of using the registry implementation in
-   :mod:`repoze.component` largely because the ZCA concept of
-   interfaces provides for use of an interface hierarchy, which is
-   useful in a lot of scenarios (such as context type inheritance).
-   Coming up with a marker type that was something like an interface
-   that allowed for this functionality seemed like it was just
-   reinventing the wheel.
+   We continued using ZCA registry rather than disusing it in favor of using
+   the registry implementation in :mod:`repoze.component` largely because the
+   ZCA concept of interfaces provides for use of an interface hierarchy, which
+   is useful in a lot of scenarios (such as context type inheritance).  Coming
+   up with a marker type that was something like an interface that allowed for
+   this functionality seemed like it was just reinventing the wheel.
 
-Making framework developers and extenders understand the ZCA registry API is
-a trade-off.  We (the :app:`Pyramid` developers) like the features that the
-ZCA registry gives us, and we have long-ago borne the weight of understanding
-what it does and how it works.  The authors of :app:`Pyramid` understand the
-ZCA deeply and can read code that uses it as easily as any other code.
+Making framework developers and extenders understand the ZCA registry API is a
+trade-off.  We (the :app:`Pyramid` developers) like the features that the ZCA
+registry gives us, and we have long-ago borne the weight of understanding what
+it does and how it works.  The authors of :app:`Pyramid` understand the ZCA
+deeply and can read code that uses it as easily as any other code.
 
 But we recognize that developers who might want to extend the framework are not
-as comfortable with the ZCA registry API as the original developers are with
-it.  So, for the purposes of being kind to third-party :app:`Pyramid`
-framework developers in, we've drawn some lines in the sand.
+as comfortable with the ZCA registry API as the original developers.  So for
+the purpose of being kind to third-party :app:`Pyramid` framework developers,
+we've drawn some lines in the sand.
 
-In all core code, We've made use of ZCA global API functions such as
-``zope.component.getUtility`` and ``zope.component.getAdapter`` the exception
+In all core code, we've made use of ZCA global API functions, such as
+``zope.component.getUtility`` and ``zope.component.getAdapter``, the exception
 instead of the rule.  So instead of:
 
 .. code-block:: python
@@ -282,9 +279,9 @@ instead of the rule.  So instead of:
    registry = get_current_registry()
    policy = registry.getUtility(IAuthenticationPolicy)
 
-While the latter is more verbose, it also arguably makes it more obvious
-what's going on.  All of the :app:`Pyramid` core code uses this pattern
-rather than the ZCA global API.
+While the latter is more verbose, it also arguably makes it more obvious what's
+going on.  All of the :app:`Pyramid` core code uses this pattern rather than
+the ZCA global API.
 
 Rationale
 +++++++++
@@ -309,13 +306,12 @@ the ZCA registry:
   view that is only found when the context is some class of object, or when
   the context implements some :term:`interface`.
 
-- Singularity.  There's only one place where "application configuration"
-  lives in a :app:`Pyramid` application: in a component registry.  The
-  component registry answers questions made to it by the framework at runtime
-  based on the configuration of *an application*.  Note: "an application" is
-  not the same as "a process", multiple independently configured copies of
-  the same :app:`Pyramid` application are capable of running in the same
-  process space.
+- Singularity.  There's only one place where "application configuration" lives
+  in a :app:`Pyramid` application: in a component registry.  The component
+  registry answers questions made to it by the framework at runtime based on
+  the configuration of *an application*.  Note: "an application" is not the
+  same as "a process"; multiple independently configured copies of the same
+  :app:`Pyramid` application are capable of running in the same process space.
 
 - Composability.  A ZCA component registry can be populated imperatively, or
   there's an existing mechanism to populate a registry via the use of a
@@ -333,10 +329,9 @@ the ZCA registry:
   (non-Zope) frameworks.
 
 - Testability.  Judicious use of the ZCA registry in framework code makes
-  testing that code slightly easier.  Instead of using monkeypatching or
-  other facilities to register mock objects for testing, we inject
-  dependencies via ZCA registrations and then use lookups in the code find
-  our mock objects.
+  testing that code slightly easier.  Instead of using monkeypatching or other
+  facilities to register mock objects for testing, we inject dependencies via
+  ZCA registrations, then use lookups in the code to find our mock objects.
 
 - Speed.  The ZCA registry is very fast for a specific set of complex lookup
   scenarios that :app:`Pyramid` uses, having been optimized through the years
@@ -350,17 +345,17 @@ Conclusion
 ++++++++++
 
 If you only *develop applications* using :app:`Pyramid`, there's not much to
-complain about here.  You just should never need to understand the ZCA
-registry API: use documented :app:`Pyramid` APIs instead.  However, you may
-be an application developer who doesn't read API documentation because it's
-unmanly. Instead you read the raw source code, and because you haven't read
-the documentation, you don't know what functions, classes, and methods even
-*form* the :app:`Pyramid` API.  As a result, you've now written code that
-uses internals and you've painted yourself into a conceptual corner as a
-result of needing to wrestle with some ZCA-using implementation detail.  If
-this is you, it's extremely hard to have a lot of sympathy for you.  You'll
-either need to get familiar with how we're using the ZCA registry or you'll
-need to use only the documented APIs; that's why we document them as APIs.
+complain about here.  You just should never need to understand the ZCA registry
+API; use documented :app:`Pyramid` APIs instead.  However, you may be an
+application developer who doesn't read API documentation. Instead you
+read the raw source code, and because you haven't read the API documentation,
+you don't know what functions, classes, and methods even *form* the
+:app:`Pyramid` API.  As a result, you've now written code that uses internals,
+and you've painted yourself into a conceptual corner, needing to wrestle with
+some ZCA-using implementation detail.  If this is you, it's extremely hard to
+have a lot of sympathy for you.  You'll either need to get familiar with how
+we're using the ZCA registry or you'll need to use only the documented APIs;
+that's why we document them as APIs.
 
 If you *extend* or *develop* :app:`Pyramid` (create new directives, use some
 of the more obscure hooks as described in :ref:`hooks_chapter`, or work on
@@ -368,6 +363,7 @@ the :app:`Pyramid` core code), you will be faced with needing to understand
 at least some ZCA concepts.  In some places it's used unabashedly, and will
 be forever.  We know it's quirky, but it's also useful and fundamentally
 understandable if you take the time to do some reading about it.
+
 
 .. _zcml_encouragement:
 
@@ -384,15 +380,16 @@ completely optional.  No ZCML is required at all to use :app:`Pyramid`, nor
 any other sort of frameworky declarative frontend to application
 configuration.
 
-Pyramid Does Traversal, And I Don't Like Traversal
+
+Pyramid Does Traversal, and I Don't Like Traversal
 --------------------------------------------------
 
 In :app:`Pyramid`, :term:`traversal` is the act of resolving a URL path to a
-:term:`resource` object in a resource tree.  Some people are uncomfortable
-with this notion, and believe it is wrong.  Thankfully, if you use
-:app:`Pyramid`, and you don't want to model your application in terms of a
-resource tree, you needn't use it at all.  Instead, use :term:`URL dispatch`
-to map URL paths to views.
+:term:`resource` object in a resource tree.  Some people are uncomfortable with
+this notion, and believe it is wrong. Thankfully if you use :app:`Pyramid` and
+you don't want to model your application in terms of a resource tree, you
+needn't use it at all. Instead use :term:`URL dispatch` to map URL paths to
+views.
 
 The idea that some folks believe traversal is unilaterally wrong is
 understandable.  The people who believe it is wrong almost invariably have
@@ -427,7 +424,8 @@ URL pattern matching.
 But the point is ultimately moot.  If you don't want to use traversal, you
 needn't.  Use URL dispatch instead.
 
-Pyramid Does URL Dispatch, And I Don't Like URL Dispatch
+
+Pyramid Does URL Dispatch, and I Don't Like URL Dispatch
 --------------------------------------------------------
 
 In :app:`Pyramid`, :term:`url dispatch` is the act of resolving a URL path to
@@ -449,41 +447,40 @@ I'll argue that URL dispatch is ultimately useful, even if you want to use
 traversal as well.  You can actually *combine* URL dispatch and traversal in
 :app:`Pyramid` (see :ref:`hybrid_chapter`).  One example of such a usage: if
 you want to emulate something like Zope 2's "Zope Management Interface" UI on
-top of your object graph (or any administrative interface), you can register
-a route like ``config.add_route('manage', '/manage/*traverse')`` and then
-associate "management" views in your code by using the ``route_name``
-argument to a ``view`` configuration,
-e.g. ``config.add_view('.some.callable', context=".some.Resource",
-route_name='manage')``.  If you wire things up this way someone then walks up
-to for example, ``/manage/ob1/ob2``, they might be presented with a
-management interface, but walking up to ``/ob1/ob2`` would present them with
-the default object view.  There are other tricks you can pull in these hybrid
-configurations if you're clever (and maybe masochistic) too.
+top of your object graph (or any administrative interface), you can register a
+route like ``config.add_route('manage', '/manage/*traverse')`` and then
+associate "management" views in your code by using the ``route_name`` argument
+to a ``view`` configuration, e.g., ``config.add_view('.some.callable',
+context=".some.Resource", route_name='manage')``.  If you wire things up this
+way, someone then walks up to, for example, ``/manage/ob1/ob2``, they might be
+presented with a management interface, but walking up to ``/ob1/ob2`` would
+present them with the default object view.  There are other tricks you can pull
+in these hybrid configurations if you're clever (and maybe masochistic) too.
 
-Also, if you are a URL dispatch hater, if you should ever be asked to write
-an application that must use some legacy relational database structure, you
-might find that using URL dispatch comes in handy for one-off associations
-between views and URL paths.  Sometimes it's just pointless to add a node to
-the object graph that effectively represents the entry point for some bit of
-code.  You can just use a route and be done with it.  If a route matches, a
-view associated with the route will be called; if no route matches,
-:app:`Pyramid` falls back to using traversal.
+Also, if you are a URL dispatch hater, if you should ever be asked to write an
+application that must use some legacy relational database structure, you might
+find that using URL dispatch comes in handy for one-off associations between
+views and URL paths.  Sometimes it's just pointless to add a node to the object
+graph that effectively represents the entry point for some bit of code.  You
+can just use a route and be done with it.  If a route matches, a view
+associated with the route will be called. If no route matches, :app:`Pyramid`
+falls back to using traversal.
 
 But the point is ultimately moot.  If you use :app:`Pyramid`, and you really
 don't want to use URL dispatch, you needn't use it at all.  Instead, use
 :term:`traversal` exclusively to map URL paths to views, just like you do in
 :term:`Zope`.
 
+
 Pyramid Views Do Not Accept Arbitrary Keyword Arguments
 -------------------------------------------------------
 
 Many web frameworks (Zope, TurboGears, Pylons 1.X, Django) allow for their
 variant of a :term:`view callable` to accept arbitrary keyword or positional
-arguments, which are filled in using values present in the ``request.POST``
-or ``request.GET`` dictionaries or by values present in the route match
-dictionary.  For example, a Django view will accept positional arguments
-which match information in an associated "urlconf" such as
-``r'^polls/(?P<poll_id>\d+)/$``:
+arguments, which are filled in using values present in the ``request.POST``,
+``request.GET``, or route match dictionaries.  For example, a Django view will
+accept positional arguments which match information in an associated "urlconf"
+such as ``r'^polls/(?P<poll_id>\d+)/$``:
 
 .. code-block:: python
    :linenos:
@@ -491,8 +488,8 @@ which match information in an associated "urlconf" such as
    def aview(request, poll_id):
        return HttpResponse(poll_id)
 
-Zope, likewise allows you to add arbitrary keyword and positional
-arguments to any method of a resource object found via traversal:
+Zope likewise allows you to add arbitrary keyword and positional arguments to
+any method of a resource object found via traversal:
 
 .. code-block:: python
    :linenos:
@@ -509,13 +506,13 @@ match the names of the positional and keyword arguments in the request, and
 the method is called (if possible) with its argument list filled with values
 mentioned therein.  TurboGears and Pylons 1.X operate similarly.
 
-Out of the box, :app:`Pyramid` is configured to have none of these features.
-By default, :app:`Pyramid` view callables always accept only ``request`` and
-no other arguments.  The rationale: this argument specification matching done
-aggressively can be costly, and :app:`Pyramid` has performance as one of its
-main goals, so we've decided to make people, by default, obtain information
-by interrogating the request object within the view callable body instead of
-providing magic to do unpacking into the view argument list.
+Out of the box, :app:`Pyramid` is configured to have none of these features. By
+default :app:`Pyramid` view callables always accept only ``request`` and no
+other arguments. The rationale is, this argument specification matching when
+done aggressively can be costly, and :app:`Pyramid` has performance as one of
+its main goals. Therefore we've decided to make people, by default, obtain
+information by interrogating the request object within the view callable body
+instead of providing magic to do unpacking into the view argument list.
 
 However, as of :app:`Pyramid` 1.0a9, user code can influence the way view
 callables are expected to be called, making it possible to compose a system
@@ -553,7 +550,7 @@ you're building a simple bespoke web application:
   sources using :meth:`pyramid.config.Configurator.include`.
 
 - View and subscriber registrations made using :term:`interface` objects
-  instead of class objects (e.g. :ref:`using_resource_interfaces`).
+  instead of class objects (e.g., :ref:`using_resource_interfaces`).
 
 - A declarative :term:`authorization` system.
 
@@ -579,42 +576,41 @@ make unit testing and implementation substitutability easier.
 
 In a bespoke web application, usually there's a single canonical deployment,
 and therefore no possibility of multiple code forks.  Extensibility is not
-required; the code is just changed in-place.  Security requirements are often
-less granular.  Using the features listed above will often be overkill for
-such an application.
+required; the code is just changed in place.  Security requirements are often
+less granular.  Using the features listed above will often be overkill for such
+an application.
 
 If you don't like these features, it doesn't mean you can't or shouldn't use
-:app:`Pyramid`.  They are all optional, and a lot of time has been spent
-making sure you don't need to know about them up-front.  You can build
-"Pylons-1.X-style" applications using :app:`Pyramid` that are purely bespoke
-by ignoring the features above.  You may find these features handy later
-after building a bespoke web application that suddenly becomes popular and
-requires extensibility because it must be deployed in multiple locations.
+:app:`Pyramid`.  They are all optional, and a lot of time has been spent making
+sure you don't need to know about them up front.  You can build "Pylons 1.X
+style" applications using :app:`Pyramid` that are purely bespoke by ignoring
+the features above.  You may find these features handy later after building a
+bespoke web application that suddenly becomes popular and requires
+extensibility because it must be deployed in multiple locations.
 
 Pyramid Is Too Big
 ------------------
 
-"The :app:`Pyramid` compressed tarball is larger than 2MB.  It must be
-enormous!"
+"The :app:`Pyramid` compressed tarball is larger than 2MB.  It must beenormous!"
 
-No.  We just ship it with docs, test code, and scaffolding.  Here's a
-breakdown of what's included in subdirectories of the package tree:
+No.  We just ship it with docs, test code, and scaffolding.  Here's a breakdown
+of what's included in subdirectories of the package tree:
 
 docs/
 
-  4.9MB
+  3.6MB
 
 pyramid/tests/
 
-  2.0MB
+  1.3MB
 
 pyramid/scaffolds/
 
-  460KB
+  133KB
 
 pyramid/ (except for ``pyramd/tests`` and ``pyramid/scaffolds``)
 
-  844KB
+  812KB
 
 Of the approximately 34K lines of Python code in the package, the code
 that actually has a chance of executing during normal operation, excluding
@@ -634,7 +630,8 @@ dependencies by forcing us to make better packaging decisions.  Removing
 Chameleon and Mako templating system dependencies in the Pyramid core in 1.5
 let us shed most of the remainder of them.
 
-Pyramid "Cheats" To Obtain Speed
+
+Pyramid "Cheats" to Obtain Speed
 --------------------------------
 
 Complaints have been lodged by other web framework authors at various times
@@ -643,10 +640,11 @@ mechanism is our use (transitively) of the C extensions provided by
 :mod:`zope.interface` to do fast lookups.  Another claimed cheating mechanism
 is the religious avoidance of extraneous function calls.
 
-If there's such a thing as cheating to get better performance, we want to
-cheat as much as possible.  We optimize :app:`Pyramid` aggressively.  This
-comes at a cost: the core code has sections that could be expressed more
-readably.  As an amelioration, we've commented these sections liberally.
+If there's such a thing as cheating to get better performance, we want to cheat
+as much as possible. We optimize :app:`Pyramid` aggressively. This comes at a
+cost. The core code has sections that could be expressed with more readability.
+As an amelioration, we've commented these sections liberally.
+
 
 Pyramid Gets Its Terminology Wrong ("MVC")
 ------------------------------------------
@@ -659,8 +657,8 @@ existing "MVC" framework uses its terminology.  For example, you probably
 expect that models are ORM models, controllers are classes that have methods
 that map to URLs, and views are templates.  :app:`Pyramid` indeed has each of
 these concepts, and each probably *works* almost exactly like your existing
-"MVC" web framework. We just don't use the MVC terminology, as we can't
-square its usage in the web framework space with historical reality.
+"MVC" web framework. We just don't use the MVC terminology, as we can't square
+its usage in the web framework space with historical reality.
 
 People very much want to give web applications the same properties as common
 desktop GUI platforms by using similar terminology, and to provide some frame
@@ -669,194 +667,189 @@ hang together.  But in the opinion of the author, "MVC" doesn't match the web
 very well in general. Quoting from the `Model-View-Controller Wikipedia entry
 <http://en.wikipedia.org/wiki/Model–view–controller>`_:
 
-.. code-block:: text
+    Though MVC comes in different flavors, control flow is generally as
+    follows:
 
-  Though MVC comes in different flavors, control flow is generally as
-  follows:
+      The user interacts with the user interface in some way (for example,
+      presses a mouse button).
 
-    The user interacts with the user interface in some way (for
-    example, presses a mouse button).
+      The controller handles the input event from the user interface, often via
+      a registered handler or callback and converts the event into appropriate
+      user action, understandable for the model.
 
-    The controller handles the input event from the user interface,
-    often via a registered handler or callback and converts the event
-    into appropriate user action, understandable for the model.
+      The controller notifies the model of the user action, possibly resulting
+      in a change in the model's state. (For example, the controller updates the
+      user's shopping cart.)[5]
 
-    The controller notifies the model of the user action, possibly  
-    resulting in a change in the model's state. (For example, the
-    controller updates the user's shopping cart.)[5]
+      A view queries the model in order to generate an appropriate user
+      interface (for example, the view lists the shopping cart's contents). Note
+      that the view gets its own data from the model.
 
-    A view queries the model in order to generate an appropriate
-    user interface (for example, the view lists the shopping cart's     
-    contents). Note that the view gets its own data from the model.
+      The controller may (in some implementations) issue a general instruction
+      to the view to render itself. In others, the view is automatically
+      notified by the model of changes in state (Observer) which require a
+      screen update.
 
-    The controller may (in some implementations) issue a general
-    instruction to the view to render itself. In others, the view is
-    automatically notified by the model of changes in state
-    (Observer) which require a screen update.
-
-    The user interface waits for further user interactions, which
-    restarts the cycle.
+      The user interface waits for further user interactions, which restarts the
+      cycle.
 
 To the author, it seems as if someone edited this Wikipedia definition,
 tortuously couching concepts in the most generic terms possible in order to
-account for the use of the term "MVC" by current web frameworks.  I doubt
-such a broad definition would ever be agreed to by the original authors of
-the MVC pattern.  But *even so*, it seems most MVC web frameworks fail to
-meet even this falsely generic definition.
+account for the use of the term "MVC" by current web frameworks.  I doubt such
+a broad definition would ever be agreed to by the original authors of the MVC
+pattern.  But *even so*, it seems most MVC web frameworks fail to meet even
+this falsely generic definition.
 
 For example, do your templates (views) always query models directly as is
-claimed in "note that the view gets its own data from the model"?  Probably
-not.  My "controllers" tend to do this, massaging the data for easier use by
-the "view" (template). What do you do when your "controller" returns JSON? Do
-your controllers use a template to generate JSON? If not, what's the "view"
-then?  Most MVC-style GUI web frameworks have some sort of event system
-hooked up that lets the view detect when the model changes.  The web just has
-no such facility in its current form: it's effectively pull-only.
+claimed in "note that the view gets its own data from the model"? Probably not.
+My "controllers" tend to do this, massaging the data for easier use by the
+"view" (template). What do you do when your "controller" returns JSON? Do your
+controllers use a template to generate JSON? If not, what's the "view" then?
+Most MVC-style GUI web frameworks have some sort of event system hooked up that
+lets the view detect when the model changes. The web just has no such facility
+in its current form; it's effectively pull-only.
 
-So, in the interest of not mistaking desire with reality, and instead of
-trying to jam the square peg that is the web into the round hole of "MVC", we
-just punt and say there are two things: resources and views. The resource
-tree represents a site structure, the view presents a resource.  The
-templates are really just an implementation detail of any given view: a view
-doesn't need a template to return a response.  There's no "controller": it
-just doesn't exist.  The "model" is either represented by the resource tree
-or by a "domain model" (like a SQLAlchemy model) that is separate from the
-framework entirely.  This seems to us like more reasonable terminology, given
-the current constraints of the web.
+So, in the interest of not mistaking desire with reality, and instead of trying
+to jam the square peg that is the web into the round hole of "MVC", we just
+punt and say there are two things: resources and views. The resource tree
+represents a site structure, the view presents a resource. The templates are
+really just an implementation detail of any given view. A view doesn't need a
+template to return a response. There's no "controller"; it just doesn't exist.
+The "model" is either represented by the resource tree or by a "domain model"
+(like an SQLAlchemy model) that is separate from the framework entirely. This
+seems to us like more reasonable terminology, given the current constraints of
+the web.
+
 
 .. _apps_are_extensible:
 
-Pyramid Applications are Extensible; I Don't Believe In Application Extensibility
+Pyramid Applications Are Extensible; I Don't Believe in Application Extensibility
 ---------------------------------------------------------------------------------
 
 Any :app:`Pyramid` application written obeying certain constraints is
 *extensible*. This feature is discussed in the :app:`Pyramid` documentation
-chapters named :ref:`extending_chapter` and :ref:`advconfig_narr`.  It is
-made possible by the use of the :term:`Zope Component Architecture` and
-within :app:`Pyramid`.
+chapters named :ref:`extending_chapter` and :ref:`advconfig_narr`. It is made
+possible by the use of the :term:`Zope Component Architecture` within
+:app:`Pyramid`.
 
-"Extensible", in this context, means:
+"Extensible" in this context means:
 
-- The behavior of an application can be overridden or extended in a
-  particular *deployment* of the application without requiring that
-  the deployer modify the source of the original application.
+- The behavior of an application can be overridden or extended in a particular
+  *deployment* of the application without requiring that the deployer modify
+  the source of the original application.
 
-- The original developer is not required to anticipate any
-  extensibility plugpoints at application creation time to allow
-  fundamental application behavior to be overriden or extended.
+- The original developer is not required to anticipate any extensibility
+  plug points at application creation time to allow fundamental application
+  behavior to be overridden or extended.
 
 - The original developer may optionally choose to anticipate an
-  application-specific set of plugpoints, which may be hooked by
-  a deployer.  If he chooses to use the facilities provided by the
-  ZCA, the original developer does not need to think terribly hard
-  about the mechanics of introducing such a plugpoint.
+  application-specific set of plug points, which may be hooked by a deployer.
+  If they choose to use the facilities provided by the ZCA, the original
+  developer does not need to think terribly hard about the mechanics of
+  introducing such a plug point.
 
 Many developers seem to believe that creating extensible applications is not
-worth it.  They instead suggest that modifying the source of a given
-application for each deployment to override behavior is more reasonable.
-Much discussion about version control branching and merging typically ensues.
+worth it. They instead suggest that modifying the source of a given application
+for each deployment to override behavior is more reasonable. Much discussion
+about version control branching and merging typically ensues.
 
-It's clear that making every application extensible isn't required.  The
-majority of web applications only have a single deployment, and thus needn't
-be extensible at all.  However, some web applications have multiple
-deployments, and some have *many* deployments.  For example, a generic
-content management system (CMS) may have basic functionality that needs to be
-extended for a particular deployment.  That CMS system may be deployed for
-many organizations at many places.  Some number of deployments of this CMS
-may be deployed centrally by a third party and managed as a group.  It's
-easier to be able to extend such a system for each deployment via preordained
-plugpoints than it is to continually keep each software branch of the system
-in sync with some upstream source: the upstream developers may change code in
-such a way that your changes to the same codebase conflict with theirs in
-fiddly, trivial ways.  Merging such changes repeatedly over the lifetime of a
-deployment can be difficult and time consuming, and it's often useful to be
-able to modify an application for a particular deployment in a less invasive
-way.
+It's clear that making every application extensible isn't required. The
+majority of web applications only have a single deployment, and thus needn't be
+extensible at all. However some web applications have multiple deployments, and
+others have *many* deployments. For example, a generic content management
+system (CMS) may have basic functionality that needs to be extended for a
+particular deployment. That CMS may be deployed for many organizations at many
+places. Some number of deployments of this CMS may be deployed centrally by a
+third party and managed as a group. It's easier to be able to extend such a
+system for each deployment via preordained plug points than it is to
+continually keep each software branch of the system in sync with some upstream
+source. The upstream developers may change code in such a way that your changes
+to the same codebase conflict with theirs in fiddly, trivial ways. Merging such
+changes repeatedly over the lifetime of a deployment can be difficult and time
+consuming, and it's often useful to be able to modify an application for a
+particular deployment in a less invasive way.
 
 If you don't want to think about :app:`Pyramid` application extensibility at
-all, you needn't.  You can ignore extensibility entirely.  However, if you
-follow the set of rules defined in :ref:`extending_chapter`, you don't need
-to *make* your application extensible: any application you write in the
-framework just *is* automatically extensible at a basic level.  The
-mechanisms that deployers use to extend it will be necessarily coarse:
-typically, views, routes, and resources will be capable of being
-overridden. But for most minor (and even some major) customizations, these
-are often the only override plugpoints necessary: if the application doesn't
-do exactly what the deployment requires, it's often possible for a deployer
-to override a view, route, or resource and quickly make it do what he or she
-wants it to do in ways *not necessarily anticipated by the original
-developer*.  Here are some example scenarios demonstrating the benefits of
-such a feature.
+all, you needn't. You can ignore extensibility entirely. However if you follow
+the set of rules defined in :ref:`extending_chapter`, you don't need to *make*
+your application extensible. Any application you write in the framework just
+*is* automatically extensible at a basic level. The mechanisms that deployers
+use to extend it will be necessarily coarse. Typically views, routes, and
+resources will be capable of being overridden. But for most minor (and even
+some major) customizations, these are often the only override plug points
+necessary. If the application doesn't do exactly what the deployment requires,
+it's often possible for a deployer to override a view, route, or resource, and
+quickly make it do what they want it to do in ways *not necessarily anticipated
+by the original developer*. Here are some example scenarios demonstrating the
+benefits of such a feature.
 
-- If a deployment needs a different styling, the deployer may override the
-  main template and the CSS in a separate Python package which defines
-  overrides.
+- If a deployment needs a different styling, the deployer may override the main
+  template and the CSS in a separate Python package which defines overrides.
 
-- If a deployment needs an application page to do something differently, or
-  to expose more or different information, the deployer may override the
-  view that renders the page within a separate Python package.
+- If a deployment needs an application page to do something differently, or to
+  expose more or different information, the deployer may override the view that
+  renders the page within a separate Python package.
 
 - If a deployment needs an additional feature, the deployer may add a view to
   the override package.
 
-As long as the fundamental design of the upstream package doesn't change,
-these types of modifications often survive across many releases of the
-upstream package without needing to be revisited.
+As long as the fundamental design of the upstream package doesn't change, these
+types of modifications often survive across many releases of the upstream
+package without needing to be revisited.
 
 Extending an application externally is not a panacea, and carries a set of
-risks similar to branching and merging: sometimes major changes upstream will
-cause you to need to revisit and update some of your modifications.  But you
-won't regularly need to deal wth meaningless textual merge conflicts that
-trivial changes to upstream packages often entail when it comes time to
-update the upstream package, because if you extend an application externally,
-there just is no textual merge done.  Your modifications will also, for
-whatever it's worth, be contained in one, canonical, well-defined place.
+risks similar to branching and merging. Sometimes major changes upstream will
+cause you to revisit and update some of your modifications. But you won't
+regularly need to deal with meaningless textual merge conflicts that trivial
+changes to upstream packages often entail when it comes time to update the
+upstream package, because if you extend an application externally, there just
+is no textual merge done. Your modifications will also, for whatever it's
+worth, be contained in one, canonical, well-defined place.
 
 Branching an application and continually merging in order to get new features
-and bugfixes is clearly useful.  You can do that with a :app:`Pyramid`
-application just as usefully as you can do it with any application.  But
+and bug fixes is clearly useful. You can do that with a :app:`Pyramid`
+application just as usefully as you can do it with any application. But
 deployment of an application written in :app:`Pyramid` makes it possible to
-avoid the need for this even if the application doesn't define any plugpoints
-ahead of time.  It's possible that promoters of competing web frameworks
-dismiss this feature in favor of branching and merging because applications
-written in their framework of choice aren't extensible out of the box in a
-comparably fundamental way.
+avoid the need for this even if the application doesn't define any plug points
+ahead of time. It's possible that promoters of competing web frameworks dismiss
+this feature in favor of branching and merging because applications written in
+their framework of choice aren't extensible out of the box in a comparably
+fundamental way.
 
 While :app:`Pyramid` applications are fundamentally extensible even if you
 don't write them with specific extensibility in mind, if you're moderately
-adventurous, you can also take it a step further.  If you learn more about
-the :term:`Zope Component Architecture`, you can optionally use it to expose
-other more domain-specific configuration plugpoints while developing an
-application.  The plugpoints you expose needn't be as coarse as the ones
-provided automatically by :app:`Pyramid` itself.  For example, you might
-compose your own directive that configures a set of views for a prebaked
-purpose (e.g. ``restview`` or somesuch) , allowing other people to refer to
-that directive when they make declarations in the ``includeme`` of their
-customization package.  There is a cost for this: the developer of an
-application that defines custom plugpoints for its deployers will need to
-understand the ZCA or he will need to develop his own similar extensibility
-system.
+adventurous, you can also take it a step further. If you learn more about the
+:term:`Zope Component Architecture`, you can optionally use it to expose other
+more domain-specific configuration plug points while developing an application.
+The plug points you expose needn't be as coarse as the ones provided
+automatically by :app:`Pyramid` itself. For example, you might compose your own
+directive that configures a set of views for a pre-baked purpose (e.g.,
+``restview`` or somesuch), allowing other people to refer to that directive
+when they make declarations in the ``includeme`` of their customization
+package. There is a cost for this: the developer of an application that defines
+custom plug points for its deployers will need to understand the ZCA or they
+will need to develop their own similar extensibility system.
 
-Ultimately, any argument about whether the extensibility features lent to
-applications by :app:`Pyramid` are good or bad is mostly pointless. You
-needn't take advantage of the extensibility features provided by a particular
+Ultimately any argument about whether the extensibility features lent to
+applications by :app:`Pyramid` are good or bad is mostly pointless. You needn't
+take advantage of the extensibility features provided by a particular
 :app:`Pyramid` application in order to affect a modification for a particular
-set of its deployments.  You can ignore the application's extensibility
-plugpoints entirely, and use version control branching and merging to
-manage application deployment modifications instead, as if you were deploying
-an application written using any other web framework.
+set of its deployments. You can ignore the application's extensibility plug
+points entirely, and use version control branching and merging to manage
+application deployment modifications instead, as if you were deploying an
+application written using any other web framework.
 
-Zope 3 Enforces "TTW" Authorization Checks By Default; Pyramid Does Not
+
+Zope 3 Enforces "TTW" Authorization Checks by Default; Pyramid Does Not
 -----------------------------------------------------------------------
 
 Challenge
 +++++++++
 
 :app:`Pyramid` performs automatic authorization checks only at :term:`view`
-execution time.  Zope 3 wraps context objects with a `security proxy
-<http://wiki.zope.org/zope3/WhatAreSecurityProxies>`_, which causes Zope 3 to
-do also security checks during attribute access.  I like this, because it
-means:
+execution time. Zope 3 wraps context objects with a `security proxy
+<http://wiki.zope.org/zope3/WhatAreSecurityProxies>`_, which causes Zope 3 also
+to do security checks during attribute access. I like this, because it means:
 
 #) When I use the security proxy machinery, I can have a view that
    conditionally displays certain HTML elements (like form fields) or
@@ -888,7 +881,7 @@ web framework.
 
 And since we tend to use the same toolkit for all web applications, it's just
 never been a concern to be able to use the same set of restricted-execution
-code under two web different frameworks.
+code under two different web frameworks.
 
 Justifications for disabling security proxies by default notwithstanding,
 given that Zope 3 security proxies are viral by nature, the only requirement
@@ -900,6 +893,7 @@ behavior, it is possible to plug in a different traverser which returns
 Zope3-security-proxy-wrapped objects for each traversed object (including the
 :term:`context` and the :term:`root`).  This would have the effect of
 creating a more Zope3-like environment without much effort.
+
 
 .. _http_exception_hierarchy:
 
@@ -913,28 +907,29 @@ much like the ones defined in :mod:`webob.exc`, (e.g.,
 :class:`~pyramid.httpexceptions.HTTPNotFound` or
 :class:`~pyramid.httpexceptions.HTTPForbidden`).  They have the same names and
 largely the same behavior, and all have a very similar implementation, but not
-the same identity.  Here's why they have a separate identity:
+the same identity.  Here's why they have a separate identity.
 
 - Making them separate allows the HTTP exception classes to subclass
   :class:`pyramid.response.Response`.  This speeds up response generation
-  slightly due to the way the Pyramid router works.  The same speedup could be
+  slightly due to the way the Pyramid router works.  The same speed up could be
   gained by monkeypatching :class:`webob.response.Response`, but it's usually
   the case that monkeypatching turns out to be evil and wrong.
 
-- Making them separate allows them to provide alternate ``__call__`` logic
+- Making them separate allows them to provide alternate ``__call__`` logic,
   which also speeds up response generation.
 
 - Making them separate allows the exception classes to provide for the proper
   value of ``RequestClass`` (:class:`pyramid.request.Request`).
 
-- Making them separate allows us freedom from having to think about backwards
-  compatibility code present in :mod:`webob.exc` having to do with Python 2.4,
-  which we no longer support in Pyramid 1.1+.
+- Making them separate gives us freedom from thinking about backwards
+  compatibility code present in :mod:`webob.exc` related to Python 2.4, which
+  we no longer support in Pyramid 1.1+.
 
 - We change the behavior of two classes
   (:class:`~pyramid.httpexceptions.HTTPNotFound` and
   :class:`~pyramid.httpexceptions.HTTPForbidden`) in the module so that they
-  can be used by Pyramid internally for notfound and forbidden exceptions.
+  can be used by Pyramid internally for ``notfound`` and ``forbidden``
+  exceptions.
 
 - Making them separate allows us to influence the docstrings of the exception
   classes to provide Pyramid-specific documentation.
@@ -942,6 +937,7 @@ the same identity.  Here's why they have a separate identity:
 - Making them separate allows us to silence a stupid deprecation warning under
   Python 2.6 when the response objects are used as exceptions (related to
   ``self.message``).
+
 
 .. _simpler_traversal_model:
 

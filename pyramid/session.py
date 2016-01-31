@@ -12,7 +12,7 @@ from webob.cookies import SignedSerializer
 
 from pyramid.compat import (
     pickle,
-    PY3,
+    PY2,
     text_,
     bytes_,
     native_,
@@ -126,7 +126,8 @@ def check_csrf_token(request,
     .. versionadded:: 1.4a2
     """
     supplied_token = request.params.get(token, request.headers.get(header, ""))
-    if strings_differ(request.session.get_csrf_token(), supplied_token):
+    expected_token = request.session.get_csrf_token()
+    if strings_differ(bytes_(expected_token), bytes_(supplied_token)):
         if raises:
             raise BadCSRFToken('check_csrf_token(): Invalid token')
         return False
@@ -325,7 +326,7 @@ def BaseCookieSessionFactory(
         __len__ = manage_accessed(dict.__len__)
         __iter__ = manage_accessed(dict.__iter__)
 
-        if not PY3:
+        if PY2:
             iteritems = manage_accessed(dict.iteritems)
             itervalues = manage_accessed(dict.itervalues)
             iterkeys = manage_accessed(dict.iterkeys)

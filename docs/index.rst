@@ -39,9 +39,9 @@ speed right away.
   format, with somewhat deeper treatment of each topic and with working code.
 
 * Like learning by example? Visit the official :ref:`html_tutorials` as well as
-  the community-contributed :ref:`Pyramid tutorials
-  <tutorials:pyramid-tutorials>`, which include a :ref:`Todo List Application
-  in One File <tutorials:single-file-tutorial>`.
+  the community-contributed :ref:`Pyramid Tutorials
+  <tutorials:pyramid-tutorials>` and :ref:`Pyramid Community Cookbook
+  <cookbook:pyramid-cookbook>`.
 
 * For help getting Pyramid set up, try :ref:`installing_chapter`.
 

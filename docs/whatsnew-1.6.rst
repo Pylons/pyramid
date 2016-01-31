@@ -41,6 +41,18 @@ Backwards Incompatibilities
   This does not change the API of a renderer. See
   https://github.com/Pylons/pyramid/pull/1563
 
+- In an effort to combat a common issue it is now a
+  :class:`~pyramid.exceptions.ConfigurationError` to register a view
+  callable that is actually an unbound method when using the default view
+  mapper. As unbound methods do not exist in PY3+ possible errors are detected
+  by checking if the first parameter is named ``self``. For example,
+  `config.add_view(ViewClass.some_method, ...)` should actually be
+  `config.add_view(ViewClass, attr='some_method)'`. This was always an issue
+  in Pyramid on PY2 but the backward incompatibility is on PY3+ where you may
+  not use a function with the first parameter named ``self``. In this case
+  it looks too much like a common error and the exception will be raised.
+  See https://github.com/Pylons/pyramid/pull/1498
+
 
 Feature Additions
 -----------------

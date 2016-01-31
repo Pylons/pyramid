@@ -75,6 +75,27 @@ changes are noted in the :ref:`changelog`, so it's possible to know that you
 should change older spellings to newer ones to ensure that people reading your
 code can find the APIs you're using in the Pyramid docs.
 
+
+Python support policy
+~~~~~~~~~~~~~~~~~~~~~
+
+At the time of a Pyramid version release, each supports all versions of Python
+through the end of their lifespans. The end-of-life for a given version of
+Python is when security updates are no longer released.
+
+- `Python 3.2 Lifespan <https://www.python.org/dev/peps/pep-0392/#lifespan>`_
+  ends February 2016.
+- `Python 3.3 Lifespan <https://www.python.org/dev/peps/pep-0392/#lifespan>`_
+  ends September 2017.
+- `Python 3.4 Lifespan <https://www.python.org/dev/peps/pep-0429/>`_ TBD.
+- `Python 3.5 Lifespan <https://www.python.org/dev/peps/pep-0478/>`_ TBD.
+- `Python 3.6 Lifespan <https://www.python.org/dev/peps/pep-0494/#id4>`_
+  December 2021.
+
+To determine the Python support for a specific release of Pyramid, view its
+``tox.ini`` file at the root of the repository's version.
+
+
 Consulting the change history
 -----------------------------
 
