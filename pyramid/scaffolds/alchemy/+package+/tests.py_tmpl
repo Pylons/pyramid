@@ -13,10 +13,10 @@ class BaseTest(unittest.TestCase):
         self.config = testing.setUp(settings={
             'sqlalchemy.url': 'sqlite:///:memory:'
         })
-        self.config.include('.models.meta')
+        self.config.include('.models')
         settings = self.config.get_settings()
 
-        from .models.meta import (
+        from .models import (
             get_session,
             get_engine,
             get_dbmaker,
@@ -28,7 +28,7 @@ class BaseTest(unittest.TestCase):
         self.session = get_session(transaction.manager, dbmaker)
 
     def init_database(self):
-        from .models.meta import Base
+        from .models import Base
         Base.metadata.create_all(self.engine)
 
     def tearDown(self):

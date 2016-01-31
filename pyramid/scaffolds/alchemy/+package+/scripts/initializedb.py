@@ -9,7 +9,7 @@ from pyramid.paster import (
 
 from pyramid.scripts.common import parse_vars
 
-from ..models.meta import (
+from ..models import (
     Base,
     get_session,
     get_engine,
