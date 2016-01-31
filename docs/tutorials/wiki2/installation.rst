@@ -94,11 +94,11 @@ Install SQLite3 and its development packages
 If you used a package manager to install your Python or if you compiled
 your Python from source, then you must install SQLite3 and its
 development packages.  If you downloaded your Python as an installer
-from python.org, then you already have it installed and can proceed to
-the next section :ref:`sql_making_a_project`..
+from https://www.python.org, then you already have it installed and can
+proceed to the next section :ref:`sql_making_a_project`.
 
 If you need to install the SQLite3 packages, then, for example, using
-the Debian system and apt-get, the command would be the following:
+the Debian system and ``apt-get``, the command would be the following:
 
 .. code-block:: text
 
@@ -133,8 +133,8 @@ the :term:`scaffold` named ``alchemy`` which generates an application
 that uses :term:`SQLAlchemy` and :term:`URL dispatch`.
 
 :app:`Pyramid` supplies a variety of scaffolds to generate sample
-projects. We will use `pcreate`—a script that comes with Pyramid to
-quickly and easily generate scaffolds, usually with a single command—to
+projects. We will use `pcreate` — a script that comes with Pyramid to
+quickly and easily generate scaffolds, usually with a single command — to
 create the scaffold for our project.
 
 By passing `alchemy` into the `pcreate` command, the script creates
@@ -225,7 +225,7 @@ For a successful test run, you should see output that ends like this::
   .
   ----------------------------------------------------------------------
   Ran 1 test in 0.094s
- 
+
   OK
 
 Expose test coverage information
@@ -383,8 +383,8 @@ This means the server is ready to accept requests.
 Visit the application in a browser
 ==================================
 
-In a browser, visit `http://localhost:6543/ <http://localhost:6543>`_.  You
-will see the generated application's default page.
+In a browser, visit http://localhost:6543/.  You will see the generated
+application's default page.
 
 One thing you'll notice is the "debug toolbar" icon on right hand side of the
 page.  You can read more about the purpose of the icon at
@@ -401,7 +401,7 @@ assumptions:
 
 - you are willing to use :term:`URL dispatch` to map URLs to code
 
-- you want to use ``ZopeTransactionExtension`` and ``pyramid_tm`` to scope
+- you want to use ``zope.sqlalchemy`` and ``pyramid_tm`` to scope
   sessions to requests
 
 .. note::

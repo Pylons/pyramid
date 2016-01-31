@@ -15,7 +15,7 @@ from ..models.meta import (
     get_engine,
     get_dbmaker,
     )
-from ..models.mymodel import MyModel
+from ..models import MyModel
 
 
 def usage(argv):
@@ -34,11 +34,10 @@ def main(argv=sys.argv):
     settings = get_appsettings(config_uri, options=options)
 
     engine = get_engine(settings)
-    dbmaker = get_dbmaker(engine)
-
-    dbsession = get_session(transaction.manager, dbmaker)
-
     Base.metadata.create_all(engine)
+
+    dbmaker = get_dbmaker(engine)
+    dbsession = get_session(transaction.manager, dbmaker)
 
     with transaction.manager:
         model = MyModel(name='one', value=1)
