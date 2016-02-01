@@ -941,7 +941,7 @@ the same identity.  Here's why they have a separate identity.
 
 .. _simpler_traversal_model:
 
-Pyramid has Simpler Traversal Machinery than Does Zope
+Pyramid has simpler traversal machinery than does Zope
 ------------------------------------------------------
 
 Zope's default traverser:
@@ -951,26 +951,26 @@ Zope's default traverser:
 
 - Attempts to use an adaptation to obtain the next element in the path from
   the currently traversed object, falling back to ``__bobo_traverse__``,
-  ``__getitem__`` and eventually ``__getattr__``.
+  ``__getitem__``, and eventually ``__getattr__``.
 
 Zope's default traverser allows developers to mutate the traversal name stack
-during traversal by mutating ``REQUEST['TraversalNameStack']``.  Pyramid's
-default traverser (``pyramid.traversal.ResourceTreeTraverser``) does not
-offer a way to do this; it does not maintain a stack as a request attribute
-and, even if it did, it does not pass the request to resource objects while
-it's traversing.  While it was handy at times, this feature was abused in
-frameworks built atop Zope (like CMF and Plone), often making it difficult to
-tell exactly what was happening when a traversal didn't match a view.  I felt
-it was better to make folks that wanted the feature replace the traverser
-rather than build that particular honey pot in to the default traverser.
+during traversal by mutating ``REQUEST['TraversalNameStack']``. Pyramid's
+default traverser (``pyramid.traversal.ResourceTreeTraverser``) does not offer
+a way to do this. It does not maintain a stack as a request attribute and, even
+if it did, it does not pass the request to resource objects while it's
+traversing. While it was handy at times, this feature was abused in frameworks
+built atop Zope (like CMF and Plone), often making it difficult to tell exactly
+what was happening when a traversal didn't match a view. I felt it was better
+for folks that wanted the feature to make them replace the traverser rather
+than build that particular honey pot in to the default traverser.
 
 Zope uses multiple mechanisms to attempt to obtain the next element in the
 resource tree based on a name.  It first tries an adaptation of the current
-resource to ``ITraversable``, and if that fails, it falls back to attempting
+resource to ``ITraversable``, and if that fails, it falls back to attempting a
 number of magic methods on the resource (``__bobo_traverse__``,
-``__getitem__``, and ``__getattr__``).  My experience while both using Zope
-and attempting to reimplement its publisher in ``repoze.zope2`` led me to
-believe the following:
+``__getitem__``, and ``__getattr__``).  My experience while both using Zope and
+attempting to reimplement its publisher in ``repoze.zope2`` led me to believe
+the following:
 
 - The *default* traverser should be as simple as possible.  Zope's publisher
   is somewhat difficult to follow and replicate due to the fallbacks it tried
@@ -991,7 +991,7 @@ believe the following:
   default implementation of the larger component, no one understands when (or
   whether) they should ever override the larger component entrirely.  This
   results, over time, in a rusting together of the larger "replaceable"
-  component and the framework itself, because people come to depend on the
+  component and the framework itself because people come to depend on the
   availability of the default component in order just to turn its knobs. The
   default component effectively becomes part of the framework, which entirely
   subverts the goal of making it replaceable.  In Pyramid, typically if a
@@ -999,6 +999,7 @@ believe the following:
   state).  If you want to influence behavior controlled by that component,
   you will replace the component instead of turning knobs attached to the
   component.
+
 
 .. _microframeworks_smaller_hello_world:
 
