@@ -114,7 +114,7 @@ class PServeCommand(object):
         '--log-file',
         dest='log_file',
         metavar='LOG_FILE',
-        help="Save output to the given log file (redirects stdout)")
+        help="Save output to the given log file (redirects stdout) [DEPRECATED]")
     parser.add_option(
         '--reload',
         dest='reload',
@@ -283,7 +283,7 @@ class PServeCommand(object):
         base = os.getcwd()
 
         # warn before setting a default
-        if self.options.pid_file:
+        if self.options.pid_file or self.options.log_file:
             self._warn_daemon_deprecated()
 
         if getattr(self.options, 'daemon', False):
@@ -671,7 +671,7 @@ in a future release per Pyramid's deprecation policy. Please consider using
 a real process manager for your processes like Systemd, Circus, or Supervisor.
 
 The following commands are deprecated:
-    [start,stop,restart,status] --daemon, --stop-server, --status, --pid-file
+    [start,stop,restart,status] --daemon, --stop-server, --status, --pid-file, --log-file
 ''')
 
 class LazyWriter(object):
