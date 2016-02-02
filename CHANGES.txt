@@ -6,7 +6,8 @@ Deprecations
 
 - Missed the deprecation of one more daemon/process management feature that
   allowed logging to a file. This deprecates ``--log-file`` which is generally
-  only used with pserve running in daemon mode.
+  only used with pserve running in daemon mode. See
+  https://github.com/Pylons/pyramid/pull/2330
 
 Bug Fixes
 ---------
