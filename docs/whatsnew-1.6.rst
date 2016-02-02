@@ -189,10 +189,11 @@ Deprecations
 - The ``pserve`` command's daemonization features, as well as
   ``--monitor-restart``, have been deprecated. This includes the
   ``[start,stop,restart,status]`` subcommands, as well as the ``--daemon``,
-  ``--stop-daemon``, ``--pid-file``, ``--status``, ``--user``, and ``--group``
-  flags. See https://github.com/Pylons/pyramid/pull/2120 and
+  ``--stop-daemon``, ``--pid-file``, ``--status``, ``--user``, ``--group``, and
+  ``--log-file`` flags. See https://github.com/Pylons/pyramid/pull/2120 and
   https://github.com/Pylons/pyramid/pull/2189 and
-  https://github.com/Pylons/pyramid/pull/1641
+  https://github.com/Pylons/pyramid/pull/1641 and
+  https://github.com/Pylons/pyramid/pull/2329
 
   Please use a real process manager in the future instead of relying on
   ``pserve`` to daemonize itself. Many options exist, including your operating

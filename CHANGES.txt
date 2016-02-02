@@ -1,6 +1,17 @@
 unreleased
 ==========
 
+Deprecations
+------------
+
+- Missed the deprecation of one more daemon/process management feature that
+  allowed logging to a file. This deprecates ``--log-file`` which is generally
+  only used with pserve running in daemon mode. See
+  https://github.com/Pylons/pyramid/pull/2330
+
+Bug Fixes
+---------
+
 - Fix an issue with differing CSRF token data types on Python runtimes
   supporting ``hmac.compare_digest``.
   See https://github.com/Pylons/pyramid/pull/2299
