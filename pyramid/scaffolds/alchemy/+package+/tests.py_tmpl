@@ -17,15 +17,15 @@ class BaseTest(unittest.TestCase):
         settings = self.config.get_settings()
 
         from .models import (
-            get_session,
             get_engine,
-            get_dbmaker,
+            get_sessionmaker,
+            get_tm_session,
             )
 
         self.engine = get_engine(settings)
-        dbmaker = get_dbmaker(self.engine)
+        dbmaker = get_sessionmaker(self.engine)
 
-        self.session = get_session(transaction.manager, dbmaker)
+        self.session = get_tm_session(dbmaker, transaction.manager)
 
     def init_database(self):
         from .models import Base
