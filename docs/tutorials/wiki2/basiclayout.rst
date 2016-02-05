@@ -19,25 +19,25 @@ code.
 Open ``tutorial/tutorial/__init__.py``.  It should already contain the
 following:
 
-   .. literalinclude:: src/basiclayout/tutorial/__init__.py
-      :linenos:
-      :language: py
+.. literalinclude:: src/basiclayout/tutorial/__init__.py
+  :linenos:
+  :language: py
 
 Let's go over this piece-by-piece.  First, we need some imports to support
 later code:
 
-   .. literalinclude:: src/basiclayout/tutorial/__init__.py
-      :end-before: main
-      :linenos:
-      :language: py
+.. literalinclude:: src/basiclayout/tutorial/__init__.py
+  :end-before: main
+  :linenos:
+  :language: py
 
 ``__init__.py`` defines a function named ``main``.  Here is the entirety of
 the ``main`` function we've defined in our ``__init__.py``:
 
-   .. literalinclude:: src/basiclayout/tutorial/__init__.py
-      :pyobject: main
-      :lineno-start: 4
-      :linenos:
+.. literalinclude:: src/basiclayout/tutorial/__init__.py
+  :pyobject: main
+  :lineno-start: 4
+  :linenos:
       :language: py
 
 When you invoke the ``pserve development.ini`` command, the ``main`` function
@@ -46,10 +46,10 @@ application.  (See :ref:`startup_chapter` for more about ``pserve``.)
 
 Next in ``main``, construct a :term:`Configurator` object:
 
-   .. literalinclude:: src/basiclayout/tutorial/__init__.py
-      :lines: 7
-      :lineno-start: 7
-      :language: py
+.. literalinclude:: src/basiclayout/tutorial/__init__.py
+  :lines: 7
+  :lineno-start: 7
+  :language: py
 
 ``settings`` is passed to the Configurator as a keyword argument with the
 dictionary values passed as the ``**settings`` argument.  This will be a
@@ -60,26 +60,26 @@ deployment-related values such as ``pyramid.reload_templates``,
 Next include :term:`Jinja2` templating bindings so that we can use renderers
 with the ``.jinja2`` extension within our project.
 
-   .. literalinclude:: src/basiclayout/tutorial/__init__.py
-      :lines: 8
-      :lineno-start: 8
-      :language: py
+.. literalinclude:: src/basiclayout/tutorial/__init__.py
+  :lines: 8
+  :lineno-start: 8
+  :language: py
 
 Next include the module ``meta`` from the package ``models`` using a dotted
 Python path.
 
-   .. literalinclude:: src/basiclayout/tutorial/__init__.py
-      :lines: 9
-      :lineno-start: 9
-      :language: py
+.. literalinclude:: src/basiclayout/tutorial/__init__.py
+  :lines: 9
+  :lineno-start: 9
+  :language: py
 
 ``main`` now calls :meth:`pyramid.config.Configurator.add_static_view` with
 two arguments: ``static`` (the name), and ``static`` (the path):
 
-   .. literalinclude:: src/basiclayout/tutorial/__init__.py
-      :lines: 10
-      :lineno-start: 10
-      :language: py
+.. literalinclude:: src/basiclayout/tutorial/__init__.py
+  :lines: 10
+  :lineno-start: 10
+  :language: py
 
 This registers a static resource view which will match any URL that starts
 with the prefix ``/static`` (by virtue of the first argument to
@@ -95,10 +95,10 @@ Using the configurator ``main`` also registers a :term:`route configuration`
 via the :meth:`pyramid.config.Configurator.add_route` method that will be
 used when the URL is ``/``:
 
-   .. literalinclude:: src/basiclayout/tutorial/__init__.py
-      :lines: 11
-      :lineno-start: 11
-      :language: py
+.. literalinclude:: src/basiclayout/tutorial/__init__.py
+  :lines: 11
+  :lineno-start: 11
+  :language: py
 
 Since this route has a ``pattern`` equaling ``/``, it is the route that will
 be matched when the URL ``/`` is visited, e.g., ``http://localhost:6543/``.
@@ -110,19 +110,19 @@ other special) decorators.  When it finds a ``@view_config`` decorator, a
 view configuration will be registered, which will allow one of our
 application URLs to be mapped to some code.
 
-   .. literalinclude:: src/basiclayout/tutorial/__init__.py
-      :lines: 12
-      :lineno-start: 12
-      :language: py
+.. literalinclude:: src/basiclayout/tutorial/__init__.py
+  :lines: 12
+  :lineno-start: 12
+  :language: py
 
 Finally ``main`` is finished configuring things, so it uses the
 :meth:`pyramid.config.Configurator.make_wsgi_app` method to return a
 :term:`WSGI` application:
 
-   .. literalinclude:: src/basiclayout/tutorial/__init__.py
-      :lines: 13
-      :lineno-start: 13
-      :language: py
+.. literalinclude:: src/basiclayout/tutorial/__init__.py
+  :lines: 13
+  :lineno-start: 13
+  :language: py
 
 
 View declarations via the ``views`` package
@@ -136,9 +136,9 @@ corresponding :term:`route`. Our application uses the
 Open ``tutorial/tutorial/views/default.py`` in the ``views`` package.  It
 should already contain the following:
 
-   .. literalinclude:: src/basiclayout/tutorial/views/default.py
-      :linenos:
-      :language: py
+.. literalinclude:: src/basiclayout/tutorial/views/default.py
+  :linenos:
+  :language: py
 
 The important part here is that the ``@view_config`` decorator associates the
 function it decorates (``my_view``) with a :term:`view configuration`, 
@@ -181,9 +181,9 @@ scaffold put the classes that implement our models.
 First, open ``tutorial/tutorial/models/__init__.py``, which should already
 contain the following:
 
-   .. literalinclude:: src/basiclayout/tutorial/models/__init__.py
-      :linenos:
-      :language: py
+.. literalinclude:: src/basiclayout/tutorial/models/__init__.py
+  :linenos:
+  :language: py
 
 Our ``__init__.py`` will perform some imports to support later code, then calls
 the function :func:`sqlalchemy.orm.configure_mappers`.
@@ -191,17 +191,17 @@ the function :func:`sqlalchemy.orm.configure_mappers`.
 Next open ``tutorial/tutorial/models/meta.py``, which should already contain
 the following:
 
-   .. literalinclude:: src/basiclayout/tutorial/models/meta.py
-      :linenos:
-      :language: py
+.. literalinclude:: src/basiclayout/tutorial/models/meta.py
+  :linenos:
+  :language: py
 
 ``meta.py`` contains imports that are used to support later code. We create a
 dictionary ``NAMING_CONVENTION`` as well.
 
-   .. literalinclude:: src/basiclayout/tutorial/models/meta.py
-      :end-before: metadata
-      :linenos:
-      :language: py
+.. literalinclude:: src/basiclayout/tutorial/models/meta.py
+  :end-before: metadata
+  :linenos:
+  :language: py
 
 Next we create a ``metadata`` object from the class
 :class:`sqlalchemy.schema.MetaData`, using ``NAMING_CONVENTION`` as the value
@@ -210,60 +210,60 @@ for the ``naming_convention`` argument. We also need to create a declarative
 will inherit from the ``Base`` class so they can be associated with our
 particular database connection.
 
-   .. literalinclude:: src/basiclayout/tutorial/models/meta.py
-      :lines: 18-19
-      :lineno-start: 18
-      :linenos:
-      :language: py
+.. literalinclude:: src/basiclayout/tutorial/models/meta.py
+  :lines: 18-19
+  :lineno-start: 18
+  :linenos:
+  :language: py
 
 Next we define several functions, the first of which is ``includeme``, which
 configures various database settings by calling subsequently defined functions.
 
-   .. literalinclude:: src/basiclayout/tutorial/models/meta.py
-      :pyobject: includeme
-      :lineno-start: 22
-      :linenos:
-      :language: py
+.. literalinclude:: src/basiclayout/tutorial/models/meta.py
+  :pyobject: includeme
+  :lineno-start: 22
+  :linenos:
+  :language: py
 
 The function ``get_session`` registers a database session with a transaction
 manager, and returns a ``dbsession`` object. With the transaction manager, our
 application will automatically issue a transaction commit after every request
 unless an exception is raised, in which case the transaction will be aborted.
 
-   .. literalinclude:: src/basiclayout/tutorial/models/meta.py
-      :pyobject: get_session
-      :lineno-start: 35
-      :linenos:
-      :language: py
+.. literalinclude:: src/basiclayout/tutorial/models/meta.py
+  :pyobject: get_session
+  :lineno-start: 35
+  :linenos:
+  :language: py
 
 The ``get_engine`` function creates an :term:`SQLAlchemy` database engine using
 :func:`sqlalchemy.engine_from_config` from the ``sqlalchemy.``-prefixed
 settings in the ``development.ini`` file's ``[app:main]`` section, which is a
 URI, something like ``sqlite://``.
 
-   .. literalinclude:: src/basiclayout/tutorial/models/meta.py
-      :pyobject: get_engine
-      :lineno-start: 42
-      :linenos:
-      :language: py
+.. literalinclude:: src/basiclayout/tutorial/models/meta.py
+  :pyobject: get_engine
+  :lineno-start: 42
+  :linenos:
+  :language: py
 
 The function ``get_dbmaker`` accepts an :term:`SQLAlchemy` database engine,
 and creates a database session object ``dbmaker`` from the :term:`SQLAlchemy`
 class :class:`sqlalchemy.orm.session.sessionmaker`, which is then used for
 creating a session with the database engine.
 
-   .. literalinclude:: src/basiclayout/tutorial/models/meta.py
-      :pyobject: get_dbmaker
-      :lineno-start: 46
-      :linenos:
-      :language: py
+.. literalinclude:: src/basiclayout/tutorial/models/meta.py
+  :pyobject: get_dbmaker
+  :lineno-start: 46
+  :linenos:
+  :language: py
 
 To give a simple example of a model class, we define one named ``MyModel``:
 
-   .. literalinclude:: src/basiclayout/tutorial/models/mymodel.py
-      :pyobject: MyModel
-      :linenos:
-      :language: py
+.. literalinclude:: src/basiclayout/tutorial/models/mymodel.py
+  :pyobject: MyModel
+  :linenos:
+  :language: py
 
 Our example model does not require an ``__init__`` method because SQLAlchemy
 supplies for us a default constructor if one is not already present, which
@@ -282,5 +282,5 @@ class.
 That's about all there is to it regarding models, views, and initialization
 code in our stock application.
 
-The Index import and the Index object creation is not required for this
-tutorial, and will be removed in the next step.
+The ``Index`` import and the ``Index`` object creation is not required for
+this tutorial, and will be removed in the next step.
