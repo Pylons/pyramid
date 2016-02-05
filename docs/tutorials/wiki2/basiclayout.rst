@@ -29,6 +29,7 @@ later code:
 .. literalinclude:: src/basiclayout/tutorial/__init__.py
   :end-before: main
   :linenos:
+  :lineno-match:
   :language: py
 
 ``__init__.py`` defines a function named ``main``.  Here is the entirety of
@@ -36,9 +37,9 @@ the ``main`` function we've defined in our ``__init__.py``:
 
 .. literalinclude:: src/basiclayout/tutorial/__init__.py
   :pyobject: main
-  :lineno-start: 4
   :linenos:
-      :language: py
+  :lineno-match:
+  :language: py
 
 When you invoke the ``pserve development.ini`` command, the ``main`` function
 above is executed.  It accepts some settings and returns a :term:`WSGI`
@@ -48,7 +49,7 @@ Next in ``main``, construct a :term:`Configurator` object:
 
 .. literalinclude:: src/basiclayout/tutorial/__init__.py
   :lines: 7
-  :lineno-start: 7
+  :lineno-match:
   :language: py
 
 ``settings`` is passed to the Configurator as a keyword argument with the
@@ -62,15 +63,15 @@ with the ``.jinja2`` extension within our project.
 
 .. literalinclude:: src/basiclayout/tutorial/__init__.py
   :lines: 8
-  :lineno-start: 8
+  :lineno-match:
   :language: py
 
-Next include the module ``meta`` from the package ``models`` using a dotted
-Python path.
+Next include the the package ``models`` using a dotted Python path. The
+exact setup of the models will be covered later.
 
 .. literalinclude:: src/basiclayout/tutorial/__init__.py
   :lines: 9
-  :lineno-start: 9
+  :lineno-match:
   :language: py
 
 ``main`` now calls :meth:`pyramid.config.Configurator.add_static_view` with
@@ -78,7 +79,7 @@ two arguments: ``static`` (the name), and ``static`` (the path):
 
 .. literalinclude:: src/basiclayout/tutorial/__init__.py
   :lines: 10
-  :lineno-start: 10
+  :lineno-match:
   :language: py
 
 This registers a static resource view which will match any URL that starts
@@ -97,7 +98,7 @@ used when the URL is ``/``:
 
 .. literalinclude:: src/basiclayout/tutorial/__init__.py
   :lines: 11
-  :lineno-start: 11
+  :lineno-match:
   :language: py
 
 Since this route has a ``pattern`` equaling ``/``, it is the route that will
@@ -112,7 +113,7 @@ application URLs to be mapped to some code.
 
 .. literalinclude:: src/basiclayout/tutorial/__init__.py
   :lines: 12
-  :lineno-start: 12
+  :lineno-match:
   :language: py
 
 Finally ``main`` is finished configuring things, so it uses the
@@ -178,25 +179,16 @@ In a SQLAlchemy-based application, a *model* object is an object composed by
 querying the SQL database. The ``models`` package is where the ``alchemy``
 scaffold put the classes that implement our models.
 
-First, open ``tutorial/tutorial/models/__init__.py``, which should already
-contain the following:
-
-.. literalinclude:: src/basiclayout/tutorial/models/__init__.py
-  :linenos:
-  :language: py
-
-Our ``__init__.py`` will perform some imports to support later code, then calls
-the function :func:`sqlalchemy.orm.configure_mappers`.
-
-Next open ``tutorial/tutorial/models/meta.py``, which should already contain
+First, open ``tutorial/tutorial/models/meta.py``, which should already contain
 the following:
 
 .. literalinclude:: src/basiclayout/tutorial/models/meta.py
   :linenos:
   :language: py
 
-``meta.py`` contains imports that are used to support later code. We create a
-dictionary ``NAMING_CONVENTION`` as well.
+``meta.py`` contains imports and support code for defining the models. We
+create a dictionary ``NAMING_CONVENTION`` as well for consistent naming of
+support objects like indices and constraints.
 
 .. literalinclude:: src/basiclayout/tutorial/models/meta.py
   :end-before: metadata
@@ -205,60 +197,23 @@ dictionary ``NAMING_CONVENTION`` as well.
 
 Next we create a ``metadata`` object from the class
 :class:`sqlalchemy.schema.MetaData`, using ``NAMING_CONVENTION`` as the value
-for the ``naming_convention`` argument. We also need to create a declarative
-``Base`` object to use as a base class for our model. Then our model classes
-will inherit from the ``Base`` class so they can be associated with our
-particular database connection.
+for the ``naming_convention`` argument.
+
+A ``MetaData`` object represents the table and other schema definitions for
+a single database. We also need to create a declarative ``Base`` object to use
+as a base class for our models. Our models will inherit from this ``Base``
+which will attach the tables to the ``metadata`` we created and define our
+application's database schema.
 
 .. literalinclude:: src/basiclayout/tutorial/models/meta.py
-  :lines: 18-19
-  :lineno-start: 18
+  :lines: 15-16
+  :lineno-match:
   :linenos:
   :language: py
 
-Next we define several functions, the first of which is ``includeme``, which
-configures various database settings by calling subsequently defined functions.
-
-.. literalinclude:: src/basiclayout/tutorial/models/meta.py
-  :pyobject: includeme
-  :lineno-start: 22
-  :linenos:
-  :language: py
-
-The function ``get_session`` registers a database session with a transaction
-manager, and returns a ``dbsession`` object. With the transaction manager, our
-application will automatically issue a transaction commit after every request
-unless an exception is raised, in which case the transaction will be aborted.
-
-.. literalinclude:: src/basiclayout/tutorial/models/meta.py
-  :pyobject: get_session
-  :lineno-start: 35
-  :linenos:
-  :language: py
-
-The ``get_engine`` function creates an :term:`SQLAlchemy` database engine using
-:func:`sqlalchemy.engine_from_config` from the ``sqlalchemy.``-prefixed
-settings in the ``development.ini`` file's ``[app:main]`` section, which is a
-URI, something like ``sqlite://``.
-
-.. literalinclude:: src/basiclayout/tutorial/models/meta.py
-  :pyobject: get_engine
-  :lineno-start: 42
-  :linenos:
-  :language: py
-
-The function ``get_dbmaker`` accepts an :term:`SQLAlchemy` database engine,
-and creates a database session object ``dbmaker`` from the :term:`SQLAlchemy`
-class :class:`sqlalchemy.orm.session.sessionmaker`, which is then used for
-creating a session with the database engine.
-
-.. literalinclude:: src/basiclayout/tutorial/models/meta.py
-  :pyobject: get_dbmaker
-  :lineno-start: 46
-  :linenos:
-  :language: py
-
-To give a simple example of a model class, we define one named ``MyModel``:
+We've defined the ``models`` as a packge to make it straightforward to
+define models separately in different modules. To give a simple example of a
+model class, we define one named ``MyModel`` in a ``mymodel.py``:
 
 .. literalinclude:: src/basiclayout/tutorial/models/mymodel.py
   :pyobject: MyModel
@@ -279,8 +234,81 @@ The ``MyModel`` class has a ``__tablename__`` attribute.  This informs
 SQLAlchemy which table to use to store the data representing instances of this
 class.
 
+Finally, open ``tutorial/tutorial/models/__init__.py``, which should already
+contain the following:
+
+.. literalinclude:: src/basiclayout/tutorial/models/__init__.py
+  :linenos:
+  :language: py
+
+Our ``models/__init__.py`` module defines the primary API we will use for
+configuring the database connections within our application and it contains
+several functions we will cover below.
+
+As we mentioned above, the purpose of the ``models.meta.metadata`` object is
+to describe the schema of the database and this is done by defining models
+that inherit from the ``Base`` attached to that ``metadata`` object. In
+Python, code is only executed if it is imported and so to attach the
+``models`` table, defined in ``mymodel.py`` to the ``metadata`` we must
+import it. If we skip this step then later when we run ``metadata.create_all``
+the table will not be created because the ``metadata`` does not know about it!
+Another important reason to import all of the models is that when
+defining relationships between models they must all exist in order for
+SQLAlchemy to find and build those internal mappings. This is why after
+importing all the models we explicitly execute the function
+:func:`sqlalchemy.orm.configure_mappers`, once we are sure all the models have
+been defined and before we start creating connections.
+
+Next we define several functions for connecting to our database. The first
+and lowest level is the ``get_engine`` function which creates an
+:term:`SQLAlchemy` database engine using :func:`sqlalchemy.engine_from_config`
+from the ``sqlalchemy.``-prefixed settings in the ``development.ini``
+file's ``[app:main]`` section, which is a URI (something like ``sqlite://``).
+
+.. literalinclude:: src/basiclayout/tutorial/models/__init__.py
+  :pyobject: get_engine
+  :lineno-match:
+  :linenos:
+  :language: py
+
+The function ``get_session_factory`` accepts an :term:`SQLAlchemy` database
+engine, and creates a ``session_factory`` from the :term:`SQLAlchemy`
+class :class:`sqlalchemy.orm.session.sessionmaker`, which is then used for
+creating sessions bound to the database engine.
+
+.. literalinclude:: src/basiclayout/tutorial/models/__init__.py
+  :pyobject: get_session_factory
+  :lineno-match:
+  :linenos:
+  :language: py
+
+The function ``get_tm_session`` registers a database session with a transaction
+manager, and returns a ``dbsession`` object. With the transaction manager, our
+application will automatically issue a transaction commit after every request
+unless an exception is raised, in which case the transaction will be aborted.
+
+.. literalinclude:: src/basiclayout/tutorial/models/__init__.py
+  :pyobject: get_tm_session
+  :lineno-match:
+  :linenos:
+  :language: py
+
+Finally, we define an ``includeme`` function, which is a hook for use with
+:meth:`pyramid.config.Configurator.include` to activate code in a Pyramid
+application addon. It is the code that is executed above when we ran
+``config.include('.models')`` in our application's ``main`` function. This
+function will take the settings from the application, create an engine
+and define a ``request.dbsession`` property which we can use to do work
+on behalf of an incoming request to our application.
+
+.. literalinclude:: src/basiclayout/tutorial/models/__init__.py
+  :pyobject: includeme
+  :lineno-match:
+  :linenos:
+  :language: py
+
 That's about all there is to it regarding models, views, and initialization
 code in our stock application.
 
-The ``Index`` import and the ``Index`` object creation is not required for
-this tutorial, and will be removed in the next step.
+The ``Index`` import and the ``Index`` object creation in ``mymodel.py`` is
+not required for this tutorial, and will be removed in the next step.
