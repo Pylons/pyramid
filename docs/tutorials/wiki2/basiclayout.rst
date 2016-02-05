@@ -250,8 +250,10 @@ to describe the schema of the database and this is done by defining models
 that inherit from the ``Base`` attached to that ``metadata`` object. In
 Python, code is only executed if it is imported and so to attach the
 ``models`` table, defined in ``mymodel.py`` to the ``metadata`` we must
-import it. If we skip this step then later when we run ``metadata.create_all``
-the table will not be created because the ``metadata`` does not know about it!
+import it. If we skip this step then later when we run
+:meth:`sqlalchemy.schema.MetaData.create_all` the table will not be created
+because the ``metadata`` does not know about it!
+
 Another important reason to import all of the models is that when
 defining relationships between models they must all exist in order for
 SQLAlchemy to find and build those internal mappings. This is why after
