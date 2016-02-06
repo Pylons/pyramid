@@ -1003,31 +1003,32 @@ the following:
 
 .. _microframeworks_smaller_hello_world:
 
-Microframeworks Have Smaller Hello World Programs
+Microframeworks have smaller Hello World programs
 -------------------------------------------------
 
-Self-described "microframeworks" exist: `Bottle <http://bottle.paws.de>`_ and
-`Flask <http://flask.pocoo.org/>`_ are two that are becoming popular.  `Bobo
-<http://bobo.digicool.com/>`_ doesn't describe itself as a microframework,
-but its intended userbase is much the same.  Many others exist.  We've
-actually even (only as a teaching tool, not as any sort of official project)
-`created one using Pyramid <http://bfg.repoze.org/videos#groundhog1>`_ (the
-videos use BFG, a precursor to Pyramid, but the resulting code is `available
-for Pyramid too <https://github.com/Pylons/groundhog>`_). Microframeworks are
-small frameworks with one common feature: each allows its users to create a
-fully functional application that lives in a single Python file.
+Self-described "microframeworks" exist. `Bottle <http://bottle.paws.de>`_ and
+`Flask <http://flask.pocoo.org/>`_ are two that are becoming popular. `Bobo
+<http://bobo.digicool.com/>`_ doesn't describe itself as a microframework, but
+its intended user base is much the same. Many others exist. We've even (only as
+a teaching tool, not as any sort of official project) `created one using
+Pyramid <http://bfg.repoze.org/videos#groundhog1>`_. The videos use BFG, a
+precursor to Pyramid, but the resulting code is `available for Pyramid too
+<https://github.com/Pylons/groundhog>`_). Microframeworks are small frameworks
+with one common feature: each allows its users to create a fully functional
+application that lives in a single Python file.
 
 Some developers and microframework authors point out that Pyramid's "hello
-world" single-file program is longer (by about five lines) than the
-equivalent program in their favorite microframework.  Guilty as charged.
+world" single-file program is longer (by about five lines) than the equivalent
+program in their favorite microframework. Guilty as charged.
 
-This loss isn't for lack of trying. Pyramid is useful in the same
-circumstance in which microframeworks claim dominance: single-file
-applications.  But Pyramid doesn't sacrifice its ability to credibly support
-larger applications in order to achieve hello-world LoC parity with the
-current crop of microframeworks.  Pyramid's design instead tries to avoid
-some common pitfalls associated with naive declarative configuration schemes.
-The subsections which follow explain the rationale.
+This loss isn't for lack of trying. Pyramid is useful in the same circumstance
+in which microframeworks claim dominance: single-file applications. But Pyramid
+doesn't sacrifice its ability to credibly support larger applications in order
+to achieve "hello world" lines of code parity with the current crop of
+microframeworks. Pyramid's design instead tries to avoid some common pitfalls
+associated with naive declarative configuration schemes. The subsections which
+follow explain the rationale.
+
 
 .. _you_dont_own_modulescope:
 
