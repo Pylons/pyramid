@@ -16,7 +16,7 @@ package.  We use ``__init__.py`` both as a marker, indicating the directory in
 which it's contained is a package, and to contain application configuration
 code.
 
-Open ``tutorial/tutorial/__init__.py``.  It should already contain the
+Open ``tutorial/__init__.py``.  It should already contain the
 following:
 
 .. literalinclude:: src/basiclayout/tutorial/__init__.py
@@ -134,7 +134,7 @@ The main function of a web framework is mapping each URL pattern to code (a
 corresponding :term:`route`. Our application uses the
 :meth:`pyramid.view.view_config` decorator to perform this mapping.
 
-Open ``tutorial/tutorial/views/default.py`` in the ``views`` package.  It
+Open ``tutorial/views/default.py`` in the ``views`` package.  It
 should already contain the following:
 
 .. literalinclude:: src/basiclayout/tutorial/views/default.py
@@ -179,7 +179,7 @@ In a SQLAlchemy-based application, a *model* object is an object composed by
 querying the SQL database. The ``models`` package is where the ``alchemy``
 scaffold put the classes that implement our models.
 
-First, open ``tutorial/tutorial/models/meta.py``, which should already contain
+First, open ``tutorial/models/meta.py``, which should already contain
 the following:
 
 .. literalinclude:: src/basiclayout/tutorial/models/meta.py
@@ -234,7 +234,7 @@ The ``MyModel`` class has a ``__tablename__`` attribute.  This informs
 SQLAlchemy which table to use to store the data representing instances of this
 class.
 
-Finally, open ``tutorial/tutorial/models/__init__.py``, which should already
+Finally, open ``tutorial/models/__init__.py``, which should already
 contain the following:
 
 .. literalinclude:: src/basiclayout/tutorial/models/__init__.py

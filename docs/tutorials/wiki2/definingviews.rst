@@ -67,7 +67,7 @@ like this::
 Adding view functions in ``views/default.py``
 =============================================
 
-It's time for a major change.  Open ``tutorial/tutorial/views/default.py`` and
+It's time for a major change.  Open ``tutorial/views/default.py`` and
 edit it to look like the following:
 
 .. literalinclude:: src/views/tutorial/views/default.py
@@ -243,7 +243,7 @@ as such.
 The ``view.jinja2`` template
 ----------------------------
 
-Create ``tutorial/tutorial/templates/view.jinja2`` and add the following
+Create ``tutorial/templates/view.jinja2`` and add the following
 content:
 
 .. literalinclude:: src/views/tutorial/templates/view.jinja2
@@ -263,7 +263,7 @@ wiki page. It includes:
 The ``edit.jinja2`` template
 ----------------------------
 
-Create ``tutorial/tutorial/templates/edit.jinja2`` and add the following
+Create ``tutorial/templates/edit.jinja2`` and add the following
 content:
 
 .. literalinclude:: src/views/tutorial/templates/edit.jinja2

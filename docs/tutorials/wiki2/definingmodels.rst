@@ -14,11 +14,12 @@ Edit ``mymodel.py``
 
   There is nothing special about the filename ``mymodel.py``.  A
   project may have many models throughout its codebase in arbitrarily named
-  files.  Files implementing models often have ``model`` in their filenames
-  or they may live in a Python subpackage of your application package named
-  ``models`` (as we've done in this tutorial), but this is only by convention.
+  modules.  Modules implementing models often have ``model`` in their
+  names or they may live in a Python subpackage of your application package
+  named ``models`` (as we've done in this tutorial), but this is only a
+  convention and not a requirement.
 
-Open the ``tutorial/tutorial/models/mymodel.py`` file and edit it to look like
+Open the ``tutorial/models/mymodel.py`` file and edit it to look like
 the following:
 
 .. literalinclude:: src/models/tutorial/models/mymodel.py
@@ -59,7 +60,7 @@ Edit ``models/__init__.py``
 Since we are using a package for our models, we also need to update our
 ``__init__.py`` file.
 
-Open the ``tutorial/tutorial/models/__init__.py`` file and edit it to look like
+Open the ``tutorial/models/__init__.py`` file and edit it to look like
 the following:
 
 .. literalinclude:: src/models/tutorial/models/__init__.py
@@ -84,7 +85,7 @@ Since we've changed our model, we need to make changes to our
 to create a ``Page`` rather than a ``MyModel`` and add it to our
 ``DBSession``.
 
-Open ``tutorial/tutorial/scripts/initializedb.py`` and edit it to look like
+Open ``tutorial/scripts/initializedb.py`` and edit it to look like
 the following:
 
 .. literalinclude:: src/models/tutorial/scripts/initializedb.py
