@@ -3,7 +3,7 @@ Defining the Domain Model
 =========================
 
 The first change we'll make to our stock ``pcreate``-generated application will
-be to define a :term:`domain model` constructor representing a wiki page.
+be to define a wiki page :term:`domain model`.
 We'll do this inside our ``mymodel.py`` file.
 
 
@@ -12,12 +12,12 @@ Edit ``mymodel.py``
 
 .. note::
 
-  There is nothing special about the filename ``mymodel.py``.  A
-  project may have many models throughout its codebase in arbitrarily named
-  modules.  Modules implementing models often have ``model`` in their
-  names or they may live in a Python subpackage of your application package
-  named ``models`` (as we've done in this tutorial), but this is only a
-  convention and not a requirement.
+  There is nothing special about the filename ``mymodel.py`` except that it
+  is a Python module.  A project may have many models throughout its codebase
+  in arbitrarily named modules.  Modules implementing models often have
+  ``model`` in their names or they may live in a Python subpackage of your
+  application package named ``models`` (as we've done in this tutorial), but
+  this is only a convention and not a requirement.
 
 Open the ``tutorial/models/mymodel.py`` file and edit it to look like
 the following:
@@ -25,7 +25,7 @@ the following:
 .. literalinclude:: src/models/tutorial/models/mymodel.py
    :linenos:
    :language: py
-   :emphasize-lines: 9-11,13,14
+   :emphasize-lines: 10-12,14-15
 
 The highlighted lines are the ones that need to be changed, as well as
 removing lines that reference ``Index``.
@@ -34,7 +34,7 @@ The first thing we've done is remove the stock ``MyModel`` class
 from the generated ``models.py`` file.  The ``MyModel`` class is only a
 sample and we're not going to use it.
 
-Then we added a ``Page`` class.  Because this is an SQLAlchemy application,
+Then we added a ``Page`` class.  Because this is a SQLAlchemy application,
 this class inherits from an instance of
 :func:`sqlalchemy.ext.declarative.declarative_base`.
 
@@ -43,7 +43,7 @@ this class inherits from an instance of
    :linenos:
    :language: python
 
-As you can see, our ``Page`` class has a class level attribute
+As you can see, our ``Page`` class has a class-level attribute
 ``__tablename__`` which equals the string ``'pages'``.  This means that
 SQLAlchemy will store our wiki data in a SQL table named ``pages``.  Our
 ``Page`` class will also have class-level attributes named ``id``, ``name``,
@@ -58,7 +58,7 @@ Edit ``models/__init__.py``
 ---------------------------
 
 Since we are using a package for our models, we also need to update our
-``__init__.py`` file.
+``__init__.py`` file to ensure that the model is attached to the metadata.
 
 Open the ``tutorial/models/__init__.py`` file and edit it to look like
 the following:
@@ -66,7 +66,7 @@ the following:
 .. literalinclude:: src/models/tutorial/models/__init__.py
    :linenos:
    :language: py
-   :emphasize-lines: 4
+   :emphasize-lines: 8
 
 Here we need to align our import with the name of the model ``Page``.
 
@@ -83,7 +83,7 @@ Since we've changed our model, we need to make changes to our
 ``initializedb.py`` script.  In particular, we'll replace our import of
 ``MyModel`` with one of ``Page`` and we'll change the very end of the script
 to create a ``Page`` rather than a ``MyModel`` and add it to our
-``DBSession``.
+``dbsession``.
 
 Open ``tutorial/scripts/initializedb.py`` and edit it to look like
 the following:
@@ -91,11 +91,9 @@ the following:
 .. literalinclude:: src/models/tutorial/scripts/initializedb.py
    :linenos:
    :language: python
-   :emphasize-lines: 16,31,41
+   :emphasize-lines: 18,44-45
 
-Only the highlighted lines need to be changed, as well as removing the lines
-referencing ``pyramid.scripts.common`` and ``options`` under the ``main``
-function.
+Only the highlighted lines need to be changed.
 
 
 Installing the project and re-initializing the database

@@ -1,9 +1,10 @@
-from .meta import Base
 from sqlalchemy import (
     Column,
     Integer,
     Text,
 )
+
+from .meta import Base
 
 
 class Page(Base):

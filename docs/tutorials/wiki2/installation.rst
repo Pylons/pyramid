@@ -298,6 +298,13 @@ Initializing the database
 We need to use the ``initialize_tutorial_db`` :term:`console
 script` to initialize our database.
 
+.. note::
+
+   The ``initialize_tutorial_db`` command is not performing a migration but
+   rather simply creating missing tables and adding some dummy data. If you
+   already have a database, you should delete it before running
+   ``initialize_tutorial_db`` again.
+
 Type the following command, making sure you are still in the ``tutorial``
 directory (the directory with a ``development.ini`` in it):
 
