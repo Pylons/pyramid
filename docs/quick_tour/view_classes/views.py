@@ -4,7 +4,6 @@ from pyramid.view import (
     )
 
 
-# Start View 1
 # One route, at /howdy/amy, so don't repeat on each @view_config
 @view_defaults(route_name='hello')
 class HelloWorldViews:
@@ -29,4 +28,3 @@ class HelloWorldViews:
     def delete_view(self):
         print('Deleted')
         return dict()
-        # End View 1

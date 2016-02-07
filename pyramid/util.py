@@ -20,7 +20,7 @@ from pyramid.compat import (
     integer_types,
     string_types,
     text_,
-    PY3,
+    PY2,
     native_
     )
 
@@ -30,7 +30,7 @@ from pyramid.path import DottedNameResolver as _DottedNameResolver
 
 class DottedNameResolver(_DottedNameResolver):
     def __init__(self, package=None): # default to package = None for bw compat
-        return _DottedNameResolver.__init__(self, package)
+        _DottedNameResolver.__init__(self, package)
 
 _marker = object()
 
@@ -310,10 +310,10 @@ def object_description(object):
     if isinstance(object, (bool, float, type(None))):
         return text_(str(object))
     if isinstance(object, set):
-        if PY3:
-            return shortrepr(object, '}')
-        else:
+        if PY2:
             return shortrepr(object, ')')
+        else:
+            return shortrepr(object, '}')
     if isinstance(object, tuple):
         return shortrepr(object, ')')
     if isinstance(object, list):

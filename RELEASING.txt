@@ -15,7 +15,7 @@ Releasing Pyramid
 
 - Run tests on Windows if feasible.
 
-- Make sure all scaffold tests pass (Py 2.6, 2.7, 3.2, 3.3, 3.4, pypy, and
+- Make sure all scaffold tests pass (Py 2.6, 2.7, 3.2, 3.3, 3.4, 3.5, pypy, and
   pypy3 on UNIX; this doesn't work on Windows):
 
   $ ./scaffoldtests.sh
@@ -28,11 +28,16 @@ Releasing Pyramid
   include a link under "Bug Fix Releases" to the minor feature
   changes in CHANGES.txt .
 
-- update README.rst to use correct versions of badges and URLs according to
+- Update README.rst to use correct versions of badges and URLs according to
   each branch and context, i.e., RTD "latest" == GitHub/Travis "1.x-branch".
 
 - Update whatsnew-X.X.rst in docs to point at change log entries for individual
   releases if applicable.
+
+- For major version releases, in docs/conf.py, update values under
+  html_theme_options for in_progress and outdated across master, releasing
+  branch, and previously released branch. Also in the previously released
+  branch only, uncomment the sections to enable pylons_sphinx_latesturl.
 
 - Change setup.py version to the new version number.
 
@@ -51,11 +56,14 @@ Releasing Pyramid
   $ python setup.py sdist bdist_wheel
   $ twine upload dist/pyramid-X.X-*
 
-- Edit Pylons/pylonshq/templates/home/home.mako for minor and major updates.
+- Edit Pylons/pylonshq/templates/home/home.mako.
 
-- Edit Pylons/pylonshq/templates/home/inside.rst for major updates only.
+- Edit Pylons/pylonshq/templates/home/inside.rst for major releases only.
 
-- Edit Pylons/pylonsrtd/pylonsrtd/docs/pyramid.rst for all updates.
+- Edit Pylons/trypyramid.com/src/templates/resources.html for major releases
+  only.
+
+- Edit Pylons/pylonsrtd/pylonsrtd/docs/pyramid.rst for major releases only.
 
 - Edit `http://wiki.python.org/moin/WebFrameworks
   <http://wiki.python.org/moin/WebFrameworks>`_.
@@ -69,22 +77,22 @@ Releasing Pyramid
 Announcement template
 ----------------------
 
-Pyramid 1.1.X has been released.
+Pyramid 1.X.X has been released.
 
 Here are the changes:
 
 <<changes>>
 
-A "What's New In Pyramid 1.1" document exists at
-http://docs.pylonsproject.org/projects/pyramid/1.1/whatsnew-1.1.html .
+A "What's New In Pyramid 1.X" document exists at
+http://docs.pylonsproject.org/projects/pyramid/1.X/whatsnew-1.X.html .
 
-You will be able to see the 1.1 release documentation (across all
+You will be able to see the 1.X release documentation (across all
 alphas and betas, as well as when it eventually gets to final release)
-at http://docs.pylonsproject.org/projects/pyramid/1.1/ .
+at http://docs.pylonsproject.org/projects/pyramid/1.X/ .
 
 You can install it via PyPI:
 
-  easy_install Pyramid==1.1a4
+  easy_install Pyramid==1.X
 
 Enjoy, and please report any issues you find to the issue tracker at
 https://github.com/Pylons/pyramid/issues

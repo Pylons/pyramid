@@ -1,7 +1,7 @@
-class MyModel(object):
+class MyResource(object):
     pass
 
-root = MyModel()
+root = MyResource()
 
 
 def get_root(request):

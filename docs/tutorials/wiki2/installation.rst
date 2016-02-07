@@ -65,11 +65,11 @@ Python 2.7:
 
    c:\> c:\Python27\Scripts\virtualenv %VENV%
 
-Python 3.2:
+Python 3.3:
 
 .. code-block:: text
 
-   c:\> c:\Python32\Scripts\virtualenv %VENV%
+   c:\> c:\Python33\Scripts\virtualenv %VENV%
 
 Install Pyramid into the virtual Python environment
 ---------------------------------------------------
@@ -392,7 +392,7 @@ page.  You can read more about the purpose of the icon at
 application while you develop.
 
 Decisions the ``alchemy`` scaffold has made for you
-=================================================================
+===================================================
 
 Creating a project using the ``alchemy`` scaffold makes the following
 assumptions:

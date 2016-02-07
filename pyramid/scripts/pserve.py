@@ -14,9 +14,11 @@ import errno
 import logging
 import optparse
 import os
+import py_compile
 import re
 import subprocess
 import sys
+import tempfile
 import textwrap
 import threading
 import time
@@ -27,7 +29,7 @@ from paste.deploy import loadserver
 from paste.deploy import loadapp
 from paste.deploy.loadwsgi import loadcontext, SERVER
 
-from pyramid.compat import PY3
+from pyramid.compat import PY2
 from pyramid.compat import WIN
 
 from pyramid.paster import setup_logging
@@ -69,6 +71,7 @@ class PServeCommand(object):
 
     If start/stop/restart is given, then --daemon is implied, and it will
     start (normal operation), stop (--stop-daemon), or do both.
+    Note: Daemonization features are deprecated.
 
     You can also include variable assignments like 'http_port=8080'
     and then use %(http_port)s in your config files.
@@ -100,18 +103,18 @@ class PServeCommand(object):
             '--daemon',
             dest="daemon",
             action="store_true",
-            help="Run in daemon (background) mode")
+            help="Run in daemon (background) mode [DEPRECATED]")
     parser.add_option(
         '--pid-file',
         dest='pid_file',
         metavar='FILENAME',
         help=("Save PID to file (default to pyramid.pid if running in "
-              "daemon mode)"))
+              "daemon mode) [DEPRECATED]"))
     parser.add_option(
         '--log-file',
         dest='log_file',
         metavar='LOG_FILE',
-        help="Save output to the given log file (redirects stdout)")
+        help="Save output to the given log file (redirects stdout) [DEPRECATED]")
     parser.add_option(
         '--reload',
         dest='reload',
@@ -127,7 +130,7 @@ class PServeCommand(object):
         '--monitor-restart',
         dest='monitor_restart',
         action='store_true',
-        help="Auto-restart server if it dies")
+        help="Auto-restart server if it dies [DEPRECATED]")
     parser.add_option(
         '-b', '--browser',
         dest='browser',
@@ -137,7 +140,8 @@ class PServeCommand(object):
         '--status',
         action='store_true',
         dest='show_status',
-        help="Show the status of the (presumably daemonized) server")
+        help=("Show the status of the (presumably daemonized) server "
+              "[DEPRECATED]"))
     parser.add_option(
         '-v', '--verbose',
         default=default_verbosity,
@@ -169,7 +173,7 @@ class PServeCommand(object):
         dest='stop_daemon',
         action='store_true',
         help=('Stop a daemonized server (given a PID file, or default '
-              'pyramid.pid file)'))
+              'pyramid.pid file) [DEPRECATED]'))
 
     _scheme_re = re.compile(r'^[a-z][a-z]+:', re.I)
 
@@ -208,8 +212,9 @@ class PServeCommand(object):
             self.options.set_user = self.options.set_group = None
 
         # @@: Is this the right stage to set the user at?
-        self.change_user_group(
-            self.options.set_user, self.options.set_group)
+        if self.options.set_user or self.options.set_group:
+            self.change_user_group(
+                self.options.set_user, self.options.set_group)
 
         if not self.args:
             self.out('You must give a config file')
@@ -225,6 +230,13 @@ class PServeCommand(object):
             cmd = None
 
         if self.options.reload:
+            if (
+                getattr(self.options, 'daemon', False) or
+                cmd in ('start', 'stop', 'restart')
+            ):
+                self.out(
+                    'Error: Cannot use reloading while running as a dameon.')
+                return 2
             if os.environ.get(self._reloader_environ_key):
                 if self.options.verbose > 1:
                     self.out('Running reloading file monitor')
@@ -243,7 +255,7 @@ class PServeCommand(object):
             self._warn_daemon_deprecated()
             return self.show_status()
 
-        if cmd == 'restart' or cmd == 'stop':
+        if cmd in ('restart', 'stop'):
             self._warn_daemon_deprecated()
             result = self.stop_daemon()
             if result:
@@ -275,7 +287,7 @@ class PServeCommand(object):
         base = os.getcwd()
 
         # warn before setting a default
-        if self.options.pid_file:
+        if self.options.pid_file or self.options.log_file:
             self._warn_daemon_deprecated()
 
         if getattr(self.options, 'daemon', False):
@@ -302,7 +314,21 @@ class PServeCommand(object):
                 raise ValueError(msg)
             writeable_pid_file.close()
 
-        if getattr(self.options, 'daemon', False):
+        # warn before forking
+        if (
+                self.options.monitor_restart and
+                not os.environ.get(self._monitor_environ_key)
+        ):
+            self.out('''\
+--monitor-restart has been deprecated in Pyramid 1.6. It will be removed
+in a future release per Pyramid's deprecation policy. Please consider using
+a real process manager for your processes like Systemd, Circus, or Supervisor.
+''')
+
+        if (
+            getattr(self.options, 'daemon', False) and
+            not os.environ.get(self._monitor_environ_key)
+        ):
             self._warn_daemon_deprecated()
             try:
                 self.daemonize()
@@ -312,13 +338,16 @@ class PServeCommand(object):
                 return 2
 
         if (
+            not os.environ.get(self._monitor_environ_key) and
+            self.options.pid_file
+        ):
+            self.record_pid(self.options.pid_file)
+
+        if (
                 self.options.monitor_restart and
                 not os.environ.get(self._monitor_environ_key)
         ):
             return self.restart_with_monitor()
-
-        if self.options.pid_file:
-            self.record_pid(self.options.pid_file)
 
         if self.options.log_file:
             stdout_log = LazyWriter(self.options.log_file, 'a')
@@ -362,7 +391,7 @@ class PServeCommand(object):
 
         if self.options.browser:
             def open_browser():
-                context = loadcontext(SERVER, app_spec, name=app_name, relative_to=base,
+                context = loadcontext(SERVER, app_spec, name=server_name, relative_to=base,
                         global_conf=vars)
                 url = 'http://127.0.0.1:{port}/'.format(**context.config())
                 time.sleep(1)
@@ -399,6 +428,19 @@ class PServeCommand(object):
                 "installed" % arg)
         arg = win32api.GetShortPathName(arg)
         return arg
+
+    def find_script_path(self, name): # pragma: no cover
+        """
+        Return the path to the script being invoked by the python interpreter.
+
+        There's an issue on Windows when running the executable from
+        a console_script causing the script name (sys.argv[0]) to
+        not end with .exe or .py and thus cannot be run via popen.
+        """
+        if sys.platform == 'win32':
+            if not name.endswith('.exe') and not name.endswith('.py'):
+                name += '.exe'
+        return name
 
     def daemonize(self): # pragma: no cover
         pid = live_pidfile(self.options.pid_file)
@@ -545,7 +587,10 @@ class PServeCommand(object):
             else:
                 self.out('Starting subprocess with monitor parent')
         while 1:
-            args = [self.quote_first_command_arg(sys.executable)] + sys.argv
+            args = [
+                self.quote_first_command_arg(sys.executable),
+                self.find_script_path(sys.argv[0]),
+            ] + sys.argv[1:]
             new_environ = os.environ.copy()
             if reloader:
                 new_environ[self._reloader_environ_key] = 'true'
@@ -580,10 +625,15 @@ class PServeCommand(object):
                 self.out('%s %s %s' % ('-' * 20, 'Restarting', '-' * 20))
 
     def change_user_group(self, user, group): # pragma: no cover
-        if not user and not group:
-            return
         import pwd
         import grp
+
+        self.out('''\
+The --user and --group options have been deprecated in Pyramid 1.6. They will
+be removed in a future release per Pyramid's deprecation policy. Please
+consider using a real process manager for your processes like Systemd, Circus,
+or Supervisor, all of which support process security.
+''')
 
         uid = gid = None
         if group:
@@ -625,7 +675,7 @@ in a future release per Pyramid's deprecation policy. Please consider using
 a real process manager for your processes like Systemd, Circus, or Supervisor.
 
 The following commands are deprecated:
-    [start,stop,restart,status] --daemon, --stop-server, --status, --pid-file
+    [start,stop,restart,status] --daemon, --stop-server, --status, --pid-file, --log-file
 ''')
 
 class LazyWriter(object):
@@ -820,7 +870,7 @@ class Monitor(object): # pragma: no cover
         if %errorlevel% == 3 goto repeat
 
     or run a monitoring process in Python (``pserve --reload`` does
-    this).  
+    this).
 
     Use the ``watch_file(filename)`` function to cause a reload/restart for
     other non-Python files (e.g., configuration files).  If you have
@@ -843,9 +893,19 @@ class Monitor(object): # pragma: no cover
         self.poll_interval = poll_interval
         self.extra_files = list(self.global_extra_files)
         self.instances.append(self)
+        self.syntax_error_files = set()
+        self.pending_reload = False
         self.file_callbacks = list(self.global_file_callbacks)
+        temp_pyc_fp = tempfile.NamedTemporaryFile(delete=False)
+        self.temp_pyc = temp_pyc_fp.name
+        temp_pyc_fp.close()
 
     def _exit(self):
+        try:
+            os.unlink(self.temp_pyc)
+        except IOError:
+            # not worried if the tempfile can't be removed
+            pass
         # use os._exit() here and not sys.exit() since within a
         # thread sys.exit() just closes the given thread and
         # won't kill the process; note os._exit does not call
@@ -876,6 +936,7 @@ class Monitor(object): # pragma: no cover
                 continue
             if filename is not None:
                 filenames.append(filename)
+        new_changes = False
         for filename in filenames:
             try:
                 stat = os.stat(filename)
@@ -887,11 +948,42 @@ class Monitor(object): # pragma: no cover
                 continue
             if filename.endswith('.pyc') and os.path.exists(filename[:-1]):
                 mtime = max(os.stat(filename[:-1]).st_mtime, mtime)
-            if filename not in self.module_mtimes:
-                self.module_mtimes[filename] = mtime
-            elif self.module_mtimes[filename] < mtime:
-                print("%s changed; reloading..." % filename)
-                return False
+                pyc = True
+            else:
+                pyc = False
+            old_mtime = self.module_mtimes.get(filename)
+            self.module_mtimes[filename] = mtime
+            if old_mtime is not None and old_mtime < mtime:
+                new_changes = True
+                if pyc:
+                    filename = filename[:-1]
+                is_valid = True
+                if filename.endswith('.py'):
+                    is_valid = self.check_syntax(filename)
+                if is_valid:
+                    print("%s changed ..." % filename)
+        if new_changes:
+            self.pending_reload = True
+            if self.syntax_error_files:
+                for filename in sorted(self.syntax_error_files):
+                    print("%s has a SyntaxError; NOT reloading." % filename)
+        if self.pending_reload and not self.syntax_error_files:
+            self.pending_reload = False
+            return False
+        return True
+
+    def check_syntax(self, filename):
+        # check if a file has syntax errors.
+        # If so, track it until it's fixed.
+        try:
+            py_compile.compile(filename, cfile=self.temp_pyc, doraise=True)
+        except py_compile.PyCompileError as ex:
+            print(ex.msg)
+            self.syntax_error_files.add(filename)
+            return False
+        else:
+            if filename in self.syntax_error_files:
+                self.syntax_error_files.remove(filename)
         return True
 
     def watch_file(self, cls, filename):
@@ -1019,7 +1111,7 @@ def cherrypy_server_runner(
     server = wsgiserver.CherryPyWSGIServer(bind_addr, app,
                                            server_name=server_name, **kwargs)
     if ssl_pem is not None:
-        if not PY3:
+        if PY2:
             server.ssl_certificate = server.ssl_private_key = ssl_pem
         else:
             # creates wsgiserver.ssl_builtin as side-effect

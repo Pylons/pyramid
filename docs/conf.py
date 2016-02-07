@@ -53,12 +53,15 @@ extensions = [
     'sphinx.ext.doctest',
     'repoze.sphinx.autointerface',
     'sphinx.ext.viewcode',
-    'sphinx.ext.intersphinx'
+    'sphinx.ext.intersphinx',
+    'sphinxcontrib.programoutput',
+    # enable pylons_sphinx_latesturl when this branch is no longer "latest"
+    # 'pylons_sphinx_latesturl',
     ]
 
 # Looks for objects in external projects
 intersphinx_mapping = {
-    'colander': (        'http://docs.pylonsproject.org/projects/colander/en/latest', None),
+    'colander': ('http://docs.pylonsproject.org/projects/colander/en/latest', None),
     'cookbook': ('http://docs.pylonsproject.org/projects/pyramid-cookbook/en/latest/', None),
     'deform': ('http://docs.pylonsproject.org/projects/deform/en/latest', None),
     'jinja2': ('http://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/', None),
@@ -66,8 +69,8 @@ intersphinx_mapping = {
     'python': ('http://docs.python.org', None),
     'python3': ('http://docs.python.org/3', None),
     'sqla': ('http://docs.sqlalchemy.org/en/latest', None),
-    'tm': ('http://docs.pylonsproject.org/projects/pyramid_tm/en/latest/',         None),
-    'toolbar':         ('http://docs.pylonsproject.org/projects/pyramid-debugtoolbar/en/latest', None),
+    'tm': ('http://docs.pylonsproject.org/projects/pyramid-tm/en/latest/', None),
+    'toolbar': ('http://docs.pylonsproject.org/projects/pyramid-debugtoolbar/en/latest', None),
     'tstring': ('http://docs.pylonsproject.org/projects/translationstring/en/latest', None),
     'tutorials': ('http://docs.pylonsproject.org/projects/pyramid-tutorials/en/latest/', None),
     'venusian': ('http://docs.pylonsproject.org/projects/venusian/en/latest', None),
@@ -123,12 +126,30 @@ if book:
 
 # Options for HTML output
 # -----------------------
+# enable pylons_sphinx_latesturl when this branch is no longer "latest"
+# pylons_sphinx_latesturl_base = (
+#     'http://docs.pylonsproject.org/projects/pyramid/en/latest/')
+# pylons_sphinx_latesturl_pagename_overrides = {
+#     # map old pagename -> new pagename
+#     'whatsnew-1.0': 'index',
+#     'whatsnew-1.1': 'index',
+#     'whatsnew-1.2': 'index',
+#     'whatsnew-1.3': 'index',
+#     'whatsnew-1.4': 'index',
+#     'whatsnew-1.5': 'index',
+#     'tutorials/gae/index': 'index',
+#     'api/chameleon_text': 'api',
+#     'api/chameleon_zpt': 'api',
+# }
 
 html_theme = 'pyramid'
 html_theme_path = pylons_sphinx_themes.get_html_themes_path()
 html_theme_options = dict(
     github_url='https://github.com/Pylons/pyramid',
+    # on master branch true, else false
     in_progress='true',
+    # on previous branches/major releases true, else false
+    outdated='false',
     )
 
 # The name for this set of Sphinx documents.  If None, it defaults to

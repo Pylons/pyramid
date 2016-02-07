@@ -62,6 +62,18 @@ class SharedCookieSessionTests(object):
         session = self._makeOne(request, timeout=None)
         self.assertEqual(dict(session), {'state': 1})
 
+    def test_timeout_str(self):
+        import time
+        request = testing.DummyRequest()
+        cookieval = self._serialize((time.time() - 5, 0, {'state': 1}))
+        request.cookies['session'] = cookieval
+        session = self._makeOne(request, timeout='1')
+        self.assertEqual(dict(session), {})
+
+    def test_timeout_invalid(self):
+        request = testing.DummyRequest()
+        self.assertRaises(ValueError, self._makeOne, request, timeout='Invalid value')
+
     def test_changed(self):
         request = testing.DummyRequest()
         session = self._makeOne(request)
@@ -297,6 +309,23 @@ class TestBaseCookieSession(SharedCookieSessionTests, unittest.TestCase):
         self.assertEqual(session['state'], 1)
         self.assertFalse(session._dirty)
 
+    def test_reissue_str_triggered(self):
+        import time
+        request = testing.DummyRequest()
+        cookieval = self._serialize((time.time() - 2, 0, {'state': 1}))
+        request.cookies['session'] = cookieval
+        session = self._makeOne(request, reissue_time='0')
+        self.assertEqual(session['state'], 1)
+        self.assertTrue(session._dirty)
+
+    def test_reissue_invalid(self):
+        request = testing.DummyRequest()
+        self.assertRaises(ValueError, self._makeOne, request, reissue_time='invalid value')
+
+    def test_cookie_max_age_invalid(self):
+        request = testing.DummyRequest()
+        self.assertRaises(ValueError, self._makeOne, request, max_age='invalid value')
+
 class TestSignedCookieSession(SharedCookieSessionTests, unittest.TestCase):
     def _makeOne(self, request, **kw):
         from pyramid.session import SignedCookieSessionFactory
@@ -330,6 +359,23 @@ class TestSignedCookieSession(SharedCookieSessionTests, unittest.TestCase):
         session = self._makeOne(request, reissue_time=None, timeout=None)
         self.assertEqual(session['state'], 1)
         self.assertFalse(session._dirty)
+
+    def test_reissue_str_triggered(self):
+        import time
+        request = testing.DummyRequest()
+        cookieval = self._serialize((time.time() - 2, 0, {'state': 1}))
+        request.cookies['session'] = cookieval
+        session = self._makeOne(request, reissue_time='0')
+        self.assertEqual(session['state'], 1)
+        self.assertTrue(session._dirty)
+
+    def test_reissue_invalid(self):
+        request = testing.DummyRequest()
+        self.assertRaises(ValueError, self._makeOne, request, reissue_time='invalid value')
+
+    def test_cookie_max_age_invalid(self):
+        request = testing.DummyRequest()
+        self.assertRaises(ValueError, self._makeOne, request, max_age='invalid value')
 
     def test_custom_salt(self):
         import time
@@ -648,6 +694,13 @@ class Test_check_csrf_token(unittest.TestCase):
         request = testing.DummyRequest()
         result = self._callFUT(request, 'csrf_token', raises=False)
         self.assertEqual(result, False)
+
+    def test_token_differing_types(self):
+        from pyramid.compat import text_
+        request = testing.DummyRequest()
+        request.session['_csrft_'] = text_('foo')
+        request.params['csrf_token'] = b'foo'
+        self.assertEqual(self._callFUT(request, token='csrf_token'), True)
 
 class DummySerializer(object):
     def dumps(self, value):

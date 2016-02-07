@@ -124,10 +124,10 @@ In order to add a feature to Pyramid:
 - The feature must be documented in both the API and narrative
   documentation (in ``docs/``).
 
-- The feature must work fully on the following CPython versions: 2.6,
-  2.7, 3.2, and 3.3 on both UNIX and Windows.
+- The feature must work fully on the following CPython versions: 2.6, 2.7, 3.2,
+  3.3, 3.4, and 3.5 on both UNIX and Windows.
 
-- The feature must work on the latest version of PyPy.
+- The feature must work on the latest version of PyPy and PyPy3.
 
 - The feature must not cause installation or runtime failure on App Engine.
   If it doesn't cause installation or runtime failure, but doesn't actually
@@ -199,7 +199,7 @@ Running Tests
 
   Alternately::
 
-   $ tox -e{py26,py27,py32,py33,py34,pypy,pypy3}-scaffolds,
+   $ tox -e{py26,py27,py32,py33,py34,py35,pypy,pypy3}-scaffolds,
 
 Test Coverage
 -------------
@@ -217,7 +217,7 @@ changed to reflect the bug fix, ideally in the same commit that fixes the bug
 or adds the feature.  To build and review docs, use the following steps.
 
 1. In the main Pyramid checkout directory, run ``./builddocs.sh`` (which just
-   turns around and runs ``tox -e py2-docs,py3-docs``)::
+   turns around and runs ``tox -e docs``)::
 
     $ ./builddocs.sh
 

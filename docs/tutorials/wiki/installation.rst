@@ -65,11 +65,11 @@ Python 2.7:
 
    c:\> c:\Python27\Scripts\virtualenv %VENV%
 
-Python 3.2:
+Python 3.3:
 
 .. code-block:: text
 
-   c:\> c:\Python32\Scripts\virtualenv %VENV%
+   c:\> c:\Python33\Scripts\virtualenv %VENV%
 
 Install Pyramid and tutorial dependencies into the virtual Python environment
 -----------------------------------------------------------------------------

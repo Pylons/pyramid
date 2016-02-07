@@ -53,14 +53,18 @@ The included scaffolds are these:
 ``alchemy``
   URL mapping via :term:`URL dispatch` and persistence via :term:`SQLAlchemy`
 
+
 .. index::
    single: creating a project
    single: project
+   single: pcreate
 
 .. _creating_a_project:
 
 Creating the Project
 --------------------
+
+.. seealso:: See also the output of :ref:`pcreate --help <pcreate_script>`.
 
 In :ref:`installing_chapter`, you created a virtual Python environment via the
 ``virtualenv`` command.  To start a :app:`Pyramid` :term:`project`, use the
@@ -77,7 +81,7 @@ The below example uses the ``pcreate`` command to create a project with the
 
 On UNIX:
 
-.. code-block:: text
+.. code-block:: bash
 
    $ $VENV/bin/pcreate -s starter MyProject
 
@@ -90,7 +94,7 @@ Or on Windows:
 Here's sample output from a run of ``pcreate`` on UNIX for a project we name
 ``MyProject``:
 
-.. code-block:: text
+.. code-block:: bash
 
    $ $VENV/bin/pcreate -s starter MyProject
    Creating template pyramid
@@ -158,7 +162,7 @@ created project directory.
 
 On UNIX:
 
-.. code-block:: text
+.. code-block:: bash
 
    $ cd MyProject
    $ $VENV/bin/python setup.py develop
@@ -172,7 +176,7 @@ Or on Windows:
 
 Elided output from a run of this command on UNIX is shown below:
 
-.. code-block:: text
+.. code-block:: bash
 
    $ cd MyProject
    $ $VENV/bin/python setup.py develop
@@ -198,7 +202,7 @@ directory of your virtualenv).
 
 On UNIX:
 
-.. code-block:: text
+.. code-block:: bash
 
    $ $VENV/bin/python setup.py test -q
 
@@ -210,7 +214,7 @@ Or on Windows:
 
 Here's sample output from a test run on UNIX:
 
-.. code-block:: text
+.. code-block:: bash
 
    $ $VENV/bin/python setup.py test -q
    running test
@@ -221,11 +225,23 @@ Here's sample output from a test run on UNIX:
    writing dependency_links to MyProject.egg-info/dependency_links.txt
    writing entry points to MyProject.egg-info/entry_points.txt
    reading manifest file 'MyProject.egg-info/SOURCES.txt'
+   reading manifest template 'MANIFEST.in'
+   warning: no files found matching '*.cfg'
+   warning: no files found matching '*.rst'
+   warning: no files found matching '*.ico' under directory 'myproject'
+   warning: no files found matching '*.gif' under directory 'myproject'
+   warning: no files found matching '*.jpg' under directory 'myproject'
+   warning: no files found matching '*.txt' under directory 'myproject'
+   warning: no files found matching '*.mak' under directory 'myproject'
+   warning: no files found matching '*.mako' under directory 'myproject'
+   warning: no files found matching '*.js' under directory 'myproject'
+   warning: no files found matching '*.html' under directory 'myproject'
+   warning: no files found matching '*.xml' under directory 'myproject'
    writing manifest file 'MyProject.egg-info/SOURCES.txt'
    running build_ext
-   ..
+   .
    ----------------------------------------------------------------------
-   Ran 1 test in 0.108s
+   Ran 1 test in 0.008s
 
    OK
 
@@ -250,13 +266,15 @@ single sample test exists.
 Running the Project Application
 -------------------------------
 
+.. seealso:: See also the output of :ref:`pserve --help <pserve_script>`.
+
 Once a project is installed for development, you can run the application it
 represents using the ``pserve`` command against the generated configuration
 file.  In our case, this file is named ``development.ini``.
 
 On UNIX:
 
-.. code-block:: text
+.. code-block:: bash
 
    $ $VENV/bin/pserve development.ini
 
@@ -268,37 +286,37 @@ On Windows:
 
 Here's sample output from a run of ``pserve`` on UNIX:
 
-.. code-block:: text
+.. code-block:: bash
 
    $ $VENV/bin/pserve development.ini
-   Starting server in PID 16601.
-   serving on http://0.0.0.0:6543
+   Starting server in PID 16208.
+   serving on http://127.0.0.1:6543
 
-When you use ``pserve`` to start the application implied by the default
-rendering of a scaffold, it will respond to requests on *all* IP addresses
-possessed by your system, not just requests to ``localhost``.  This is what the
-``0.0.0.0`` in ``serving on http://0.0.0.0:6543`` means.  The server will
-respond to requests made to ``127.0.0.1`` and on any external IP address. For
-example, your system might be configured to have an external IP address
-``192.168.1.50``.  If that's the case, if you use a browser running on the same
-system as Pyramid, it will be able to access the application via
-``http://127.0.0.1:6543/`` as well as via ``http://192.168.1.50:6543/``.
-However, *other people* on other computers on the same network will also be
-able to visit your Pyramid application in their browser by visiting
-``http://192.168.1.50:6543/``.
-
-If you want to restrict access such that only a browser running on the same
-machine as Pyramid will be able to access your Pyramid application, edit the
+Access is restricted such that only a browser running on the same machine as
+Pyramid will be able to access your Pyramid application.  However, if you want
+to open access to other machines on the same network, then edit the
 ``development.ini`` file, and replace the ``host`` value in the
-``[server:main]`` section.  Change it from ``0.0.0.0`` to ``127.0.0.1``.  For
+``[server:main]`` section, changing it from ``127.0.0.1`` to ``0.0.0.0``.  For
 example:
 
 .. code-block:: ini
 
    [server:main]
    use = egg:waitress#main
-   host = 127.0.0.1
+   host = 0.0.0.0
    port = 6543
+
+Now when you use ``pserve`` to start the application, it will respond to
+requests on *all* IP addresses possessed by your system, not just requests to
+``localhost``.  This is what the ``0.0.0.0`` in
+``serving on http://0.0.0.0:6543`` means.  The server will respond to requests
+made to ``127.0.0.1`` and on any external IP address. For example, your system
+might be configured to have an external IP address ``192.168.1.50``.  If that's
+the case, if you use a browser running on the same system as Pyramid, it will
+be able to access the application via ``http://127.0.0.1:6543/`` as well as via
+``http://192.168.1.50:6543/``. However, *other people* on other computers on
+the same network will also be able to visit your Pyramid application in their
+browser by visiting ``http://192.168.1.50:6543/``.
 
 You can change the port on which the server runs on by changing the same
 portion of the ``development.ini`` file.  For example, you can change the
@@ -347,7 +365,7 @@ For example, on UNIX:
    $ $VENV/bin/pserve development.ini --reload
    Starting subprocess with file monitor
    Starting server in PID 16601.
-   serving on http://0.0.0.0:6543
+   serving on http://127.0.0.1:6543
 
 Now if you make a change to any of your project's ``.py`` files or ``.ini``
 files, you'll see the server restart automatically:
@@ -357,7 +375,7 @@ files, you'll see the server restart automatically:
    development.ini changed; reloading...
    -------------------- Restarting --------------------
    Starting server in PID 16602.
-   serving on http://0.0.0.0:6543
+   serving on http://127.0.0.1:6543
 
 Changes to template files (such as ``.pt`` or ``.mak`` files) won't cause the
 server to restart.  Changes to template files don't require a server restart as
@@ -429,7 +447,7 @@ commenting out a line.  For example, instead of:
    :linenos:
 
    [app:main]
-   ...
+   # ... elided configuration
    pyramid.includes =
        pyramid_debugtoolbar
 
@@ -439,7 +457,7 @@ Put a hash mark at the beginning of the ``pyramid_debugtoolbar`` line:
    :linenos:
 
    [app:main]
-   ...
+   # ... elided configuration
    pyramid.includes =
    #    pyramid_debugtoolbar
 
@@ -579,18 +597,16 @@ file.  The name ``main`` is a convention used by PasteDeploy signifying that it
 is the default application.
 
 The ``[server:main]`` section of the configuration file configures a WSGI
-server which listens on TCP port 6543.  It is configured to listen on all
-interfaces (``0.0.0.0``).  This means that any remote system which has TCP
-access to your system can see your Pyramid application.
+server which listens on TCP port 6543.  It is configured to listen on localhost
+only (``127.0.0.1``).
 
 .. _MyProject_ini_logging:
 
-The sections that live between the markers ``# Begin logging configuration``
-and ``# End logging configuration`` represent Python's standard library
-:mod:`logging` module configuration for your application.  The sections between
-these two markers are passed to the `logging module's config file configuration
-engine <http://docs.python.org/howto/logging.html#configuring-logging>`_ when
-the ``pserve`` or ``pshell`` commands are executed.  The default configuration
+The sections after ``# logging configuration`` represent Python's standard
+library :mod:`logging` module configuration for your application.  These
+sections are passed to the `logging module's config file configuration engine
+<http://docs.python.org/howto/logging.html#configuring-logging>`_ when the
+``pserve`` or ``pshell`` commands are executed.  The default configuration
 sends application logging output to the standard error output of your terminal.
 For more information about logging configuration, see :ref:`logging_chapter`.
 
@@ -680,8 +696,8 @@ testing, packaging, and distributing your application.
    ``setup.py`` is the de facto standard which Python developers use to
    distribute their reusable code.  You can read more about ``setup.py`` files
    and their usage in the `Setuptools documentation
-   <http://peak.telecommunity.com/DevCenter/setuptools>`_ and `The Hitchhiker's
-   Guide to Packaging <http://guide.python-distribute.org/>`_.
+   <http://peak.telecommunity.com/DevCenter/setuptools>`_ and `Python Packaging
+   User Guide <https://packaging.python.org/en/latest/>`_.
 
 Our generated ``setup.py`` looks like this:
 
@@ -912,7 +928,7 @@ The ``tests.py`` module includes unit tests for your application.
 
 .. literalinclude:: MyProject/myproject/tests.py
    :language: python
-   :lines: 1-18
+   :lines: 1-17
    :linenos:
 
 This sample ``tests.py`` file has a single unit test defined within it.  This

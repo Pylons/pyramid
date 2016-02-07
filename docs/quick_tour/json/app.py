@@ -1,7 +1,5 @@
 from wsgiref.simple_server import make_server
-
 from pyramid.config import Configurator
-
 
 if __name__ == '__main__':
     config = Configurator()

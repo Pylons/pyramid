@@ -18,12 +18,13 @@ import sys
 from setuptools import setup, find_packages
 
 py_version = sys.version_info[:2]
+is_pypy = '__pypy__' in sys.builtin_module_names
 
 PY3 = py_version[0] == 3
 
 if PY3:
-    if py_version < (3, 2):
-        raise RuntimeError('On Python 3, Pyramid requires Python 3.2 or better')
+    if py_version < (3, 3) and not is_pypy: # PyPy3 masquerades as Python 3.2...
+        raise RuntimeError('On Python 3, Pyramid requires Python 3.3 or better')
 else:
     if py_version < (2, 6):
         raise RuntimeError('On Python 2, Pyramid requires Python 2.6 or better')
@@ -56,11 +57,12 @@ if not PY3:
     tests_require.append('zope.component>=3.11.0')
 
 docs_extras = [
-    'Sphinx >= 1.3.1',
+    'Sphinx >= 1.3.5',
     'docutils',
     'repoze.sphinx.autointerface',
     'pylons_sphinx_latesturl',
     'pylons-sphinx-themes',
+    'sphinxcontrib-programoutput',
     ]
 
 testing_extras = tests_require + [
@@ -80,7 +82,6 @@ setup(name='pyramid',
         "Programming Language :: Python :: 2.6",
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.2",
         "Programming Language :: Python :: 3.3",
         "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: 3.5",

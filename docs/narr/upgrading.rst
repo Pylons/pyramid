@@ -12,26 +12,26 @@ applications keep working when you upgrade the Pyramid version you're using.
 .. sidebar::   About Release Numbering
 
    Conventionally, application version numbering in Python is described as
-   ``major.minor.micro``.  If your Pyramid version is "1.2.3", it means
-   you're running a version of Pyramid with the major version "1", the minor
-   version "2" and the micro version "3".  A "major" release is one that
-   increments the first-dot number; 2.X.X might follow 1.X.X.  A "minor"
-   release is one that increments the second-dot number; 1.3.X might follow
-   1.2.X.  A "micro" release is one that increments the third-dot number;
-   1.2.3 might follow 1.2.2.  In general, micro releases are "bugfix-only",
-   and contain no new features, minor releases contain new features but are
-   largely backwards compatible with older versions, and a major release
-   indicates a large set of backwards incompatibilities.
+   ``major.minor.micro``.  If your Pyramid version is "1.2.3", it means you're
+   running a version of Pyramid with the major version "1", the minor version
+   "2" and the micro version "3".  A "major" release is one that increments the
+   first-dot number; 2.X.X might follow 1.X.X.  A "minor" release is one that
+   increments the second-dot number; 1.3.X might follow 1.2.X.  A "micro"
+   release is one that increments the third-dot number; 1.2.3 might follow
+   1.2.2.  In general, micro releases are "bugfix-only", and contain no new
+   features, minor releases contain new features but are largely backwards
+   compatible with older versions, and a major release indicates a large set of
+   backwards incompatibilities.
 
 The Pyramid core team is conservative when it comes to removing features.  We
-don't remove features unnecessarily, but we're human, and we make mistakes
-which cause some features to be evolutionary dead ends.  Though we are
-willing to support dead-end features for some amount of time, some eventually
-have to be removed when the cost of supporting them outweighs the benefit of
-keeping them around, because each feature in Pyramid represents a certain
-documentation and maintenance burden.
+don't remove features unnecessarily, but we're human and we make mistakes which
+cause some features to be evolutionary dead ends.  Though we are willing to
+support dead-end features for some amount of time, some eventually have to be
+removed when the cost of supporting them outweighs the benefit of keeping them
+around, because each feature in Pyramid represents a certain documentation and
+maintenance burden.
 
-Deprecation and Removal Policy
+Deprecation and removal policy
 ------------------------------
 
 When a feature is scheduled for removal from Pyramid or any of its official
@@ -51,50 +51,70 @@ When a deprecated feature is eventually removed:
 
 - A note is added to the :ref:`changelog` about the removal.
 
-Features are never removed in *micro* releases.  They are only removed in
-minor and major releases.  Deprecated features are kept around for at least
-*three* minor releases from the time the feature became deprecated.
-Therefore, if a feature is added in Pyramid 1.0, but it's deprecated in
-Pyramid 1.1, it will be kept around through all 1.1.X releases, all 1.2.X
-releases and all 1.3.X releases.  It will finally be removed in the first
-1.4.X release.
+Features are never removed in *micro* releases.  They are only removed in minor
+and major releases.  Deprecated features are kept around for at least *three*
+minor releases from the time the feature became deprecated. Therefore, if a
+feature is added in Pyramid 1.0, but it's deprecated in Pyramid 1.1, it will be
+kept around through all 1.1.X releases, all 1.2.X releases and all 1.3.X
+releases.  It will finally be removed in the first 1.4.X release.
 
-Sometimes features are "docs-deprecated" instead of formally deprecated.
-This means that the feature will be kept around indefinitely, but it will be
-removed from the documentation or a note will be added to the documentation
-telling folks to use some other newer feature.  This happens when the cost of
-keeping an old feature around is very minimal and the support and
-documentation burden is very low.  For example, we might rename a function
-that is an API without changing the arguments it accepts.  In this case,
-we'll often rename the function, and change the docs to point at the new
-function name, but leave around a backwards compatibility alias to the old
-function name so older code doesn't break.
+Sometimes features are "docs-deprecated" instead of formally deprecated. This
+means that the feature will be kept around indefinitely, but it will be removed
+from the documentation or a note will be added to the documentation telling
+folks to use some other newer feature.  This happens when the cost of keeping
+an old feature around is very minimal and the support and documentation burden
+is very low.  For example, we might rename a function that is an API without
+changing the arguments it accepts.  In this case, we'll often rename the
+function, and change the docs to point at the new function name, but leave
+around a backwards compatibility alias to the old function name so older code
+doesn't break.
 
 "Docs deprecated" features tend to work "forever", meaning that they won't be
 removed, and they'll never generate a deprecation warning.  However, such
 changes are noted in the :ref:`changelog`, so it's possible to know that you
-should change older spellings to newer ones to ensure that people reading
-your code can find the APIs you're using in the Pyramid docs.
+should change older spellings to newer ones to ensure that people reading your
+code can find the APIs you're using in the Pyramid docs.
 
-Consulting the Change History
+
+Python support policy
+~~~~~~~~~~~~~~~~~~~~~
+
+At the time of a Pyramid version release, each supports all versions of Python
+through the end of their lifespans. The end-of-life for a given version of
+Python is when security updates are no longer released.
+
+- `Python 3.2 Lifespan <https://www.python.org/dev/peps/pep-0392/#lifespan>`_
+  ends February 2016.
+- `Python 3.3 Lifespan <https://www.python.org/dev/peps/pep-0392/#lifespan>`_
+  ends September 2017.
+- `Python 3.4 Lifespan <https://www.python.org/dev/peps/pep-0429/>`_ TBD.
+- `Python 3.5 Lifespan <https://www.python.org/dev/peps/pep-0478/>`_ TBD.
+- `Python 3.6 Lifespan <https://www.python.org/dev/peps/pep-0494/#id4>`_
+  December 2021.
+
+To determine the Python support for a specific release of Pyramid, view its
+``tox.ini`` file at the root of the repository's version.
+
+
+Consulting the change history
 -----------------------------
 
-Your first line of defense against application failures caused by upgrading
-to a newer Pyramid release is always to read the :ref:`changelog`.  to find
-the deprecations and removals for each release between the release you're
-currently running and the one you wish to upgrade to.  The change history
-notes every deprecation within a ``Deprecation`` section and every removal
-within a ``Backwards Incompatibilies`` section for each release.
+Your first line of defense against application failures caused by upgrading to
+a newer Pyramid release is always to read the :ref:`changelog` to find the
+deprecations and removals for each release between the release you're currently
+running and the one to which you wish to upgrade.  The change history notes
+every deprecation within a ``Deprecation`` section and every removal within a
+``Backwards Incompatibilies`` section for each release.
 
-The change history often contains instructions for changing your code to
-avoid deprecation warnings and how to change docs-deprecated spellings to
-newer ones.  You can follow along with each deprecation explanation in the
-change history, simply doing a grep or other code search to your application,
-using the change log examples to remediate each potential problem.
+The change history often contains instructions for changing your code to avoid
+deprecation warnings and how to change docs-deprecated spellings to newer ones.
+You can follow along with each deprecation explanation in the change history,
+simply doing a grep or other code search to your application, using the change
+log examples to remediate each potential problem.
 
 .. _testing_under_new_release:
 
-Testing Your Application Under a New Pyramid Release
+Testing your application under a new Pyramid release
 ----------------------------------------------------
 
 Once you've upgraded your application to a new Pyramid release and you've
@@ -106,25 +126,24 @@ you can see DeprecationWarnings printed to the console when the tests run.
 
    $ python -Wd setup.py test -q
 
-The ``-Wd`` argument is an argument that tells Python to print deprecation
-warnings to the console.  Note that the ``-Wd`` flag is only required for
-Python 2.7 and better: Python versions 2.6 and older print deprecation
-warnings to the console by default.  See `the Python -W flag documentation
-<http://docs.python.org/using/cmdline.html#cmdoption-W>`_ for more
-information.
+The ``-Wd`` argument tells Python to print deprecation warnings to the console.
+Note that the ``-Wd`` flag is only required for Python 2.7 and better: Python
+versions 2.6 and older print deprecation warnings to the console by default.
+See `the Python -W flag documentation
+<http://docs.python.org/using/cmdline.html#cmdoption-W>`_ for more information.
 
 As your tests run, deprecation warnings will be printed to the console
-explaining the deprecation and providing instructions about how to prevent
-the deprecation warning from being issued.  For example:
+explaining the deprecation and providing instructions about how to prevent the
+deprecation warning from being issued.  For example:
 
-.. code-block:: text
+.. code-block:: bash
 
    $ python -Wd setup.py test -q
    # .. elided ...
    running build_ext
-   /home/chrism/projects/pyramid/env27/myproj/myproj/views.py:3: 
-   DeprecationWarning: static: The "pyramid.view.static" class is deprecated 
-   as of Pyramid 1.1; use the "pyramid.static.static_view" class instead with 
+   /home/chrism/projects/pyramid/env27/myproj/myproj/views.py:3:
+   DeprecationWarning: static: The "pyramid.view.static" class is deprecated
+   as of Pyramid 1.1; use the "pyramid.static.static_view" class instead with
    the "use_subpath" argument set to True.
      from pyramid.view import static
    .
@@ -144,8 +163,8 @@ pyramid.view import static``) that is causing the problem:
     from pyramid.view import static
     myview = static('static', 'static')
 
-The deprecation warning tells me how to fix it, so I can change the code to
-do things the newer way:
+The deprecation warning tells me how to fix it, so I can change the code to do
+things the newer way:
 
 .. code-block:: python
     :linenos:
@@ -155,10 +174,10 @@ do things the newer way:
     from pyramid.static import static_view
     myview = static_view('static', 'static', use_subpath=True)
 
-When I run the tests again, the deprecation warning is no longer printed to
-my console:
+When I run the tests again, the deprecation warning is no longer printed to my
+console:
 
-.. code-block:: text
+.. code-block:: bash
 
    $ python -Wd setup.py test -q
    # .. elided ...
@@ -170,7 +189,7 @@ my console:
    OK
 
 
-My Application Doesn't Have Any Tests or Has Few Tests
+My application doesn't have any tests or has few tests
 ------------------------------------------------------
 
 If your application has no tests, or has only moderate test coverage, running
@@ -178,8 +197,8 @@ tests won't tell you very much, because the Pyramid codepaths that generate
 deprecation warnings won't be executed.
 
 In this circumstance, you can start your application interactively under a
-server run with the ``PYTHONWARNINGS`` environment variable set to
-``default``.  On UNIX, you can do that via:
+server run with the ``PYTHONWARNINGS`` environment variable set to ``default``.
+On UNIX, you can do that via:
 
 .. code-block:: bash
 
@@ -194,16 +213,15 @@ On Windows, you need to issue two commands:
 
 At this point, it's ensured that deprecation warnings will be printed to the
 console whenever a codepath is hit that generates one.  You can then click
-around in your application interactively to try to generate them, and
-remediate as explained in :ref:`testing_under_new_release`.
+around in your application interactively to try to generate them, and remediate
+as explained in :ref:`testing_under_new_release`.
 
 See `the PYTHONWARNINGS environment variable documentation
 <http://docs.python.org/using/cmdline.html#envvar-PYTHONWARNINGS>`_ or `the
 Python -W flag documentation
-<http://docs.python.org/using/cmdline.html#cmdoption-W>`_ for more
-information.
+<http://docs.python.org/using/cmdline.html#cmdoption-W>`_ for more information.
 
-Upgrading to the Very Latest Pyramid Release
+Upgrading to the very latest Pyramid release
 --------------------------------------------
 
 When you upgrade your application to the most recent Pyramid release,
@@ -220,15 +238,13 @@ advisable to do this:
   :ref:`testing_under_new_release`.  Note any deprecation warnings and
   remediate.
 
-- Upgrade to the most recent 1.3 release, 1.3.3.  Run your application's
-  tests, note any deprecation warnings and remediate.
+- Upgrade to the most recent 1.3 release, 1.3.3.  Run your application's tests,
+  note any deprecation warnings, and remediate.
 
 - Upgrade to 1.4.4.  Run your application's tests, note any deprecation
-  warnings and remediate.
+  warnings, and remediate.
 
 If you skip testing your application under each minor release (for example if
-you upgrade directly from 1.2.1 to 1.4.4), you might miss a deprecation
-warning and waste more time trying to figure out an error caused by a feature
-removal than it would take to upgrade stepwise through each minor release.
-
-
+you upgrade directly from 1.2.1 to 1.4.4), you might miss a deprecation warning
+and waste more time trying to figure out an error caused by a feature removal
+than it would take to upgrade stepwise through each minor release.

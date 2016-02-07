@@ -860,8 +860,8 @@ Every release of Pyramid has 100% statement coverage via unit and integration
 tests, as measured by the ``coverage`` tool available on PyPI.  It also has
 greater than 95% decision/condition coverage as measured by the
 ``instrumental`` tool available on PyPI.  It is automatically tested by the
-Jenkins tool on Python 2.6, Python 2.7, Python 3.2, Python 3.3, Python 3.4,
-PyPy, and PyPy3 after each commit to its GitHub repository.  Official Pyramid
+Jenkins tool on Python 2.6, Python 2.7, Python 3.3, Python 3.4, Python 3.5,
+PyPy, and PyPy3 after each commit to its GitHub repository. Official Pyramid
 add-ons are held to a similar testing standard.  We still find bugs in Pyramid
 and its official add-ons, but we've noticed we find a lot more of them while
 working on other projects that don't have a good testing regime.
@@ -892,8 +892,7 @@ also maintain a "cookbook" of recipes, which are usually demonstrations of
 common integration scenarios too specific to add to the official narrative
 docs.  In any case, the Pyramid documentation is comprehensive.
 
-Example: The Pyramid Cookbook at
-http://docs.pylonsproject.org/projects/pyramid-cookbook/en/latest/.
+Example: The :ref:`Pyramid Community Cookbook <cookbook:pyramid-cookbook>`.
 
 .. index::
    single: Pylons Project

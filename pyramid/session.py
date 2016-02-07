@@ -12,7 +12,7 @@ from webob.cookies import SignedSerializer
 
 from pyramid.compat import (
     pickle,
-    PY3,
+    PY2,
     text_,
     bytes_,
     native_,
@@ -126,20 +126,33 @@ def check_csrf_token(request,
     .. versionadded:: 1.4a2
     """
     supplied_token = request.params.get(token, request.headers.get(header, ""))
-    if strings_differ(request.session.get_csrf_token(), supplied_token):
+    expected_token = request.session.get_csrf_token()
+    if strings_differ(bytes_(expected_token), bytes_(supplied_token)):
         if raises:
             raise BadCSRFToken('check_csrf_token(): Invalid token')
         return False
     return True
 
 class PickleSerializer(object):
-    """ A Webob cookie serializer that uses the pickle protocol to dump Python
-    data to bytes."""
+    """ A serializer that uses the pickle protocol to dump Python
+    data to bytes.
+
+    This is the default serializer used by Pyramid.
+
+    ``protocol`` may be specified to control the version of pickle used.
+    Defaults to :attr:`pickle.HIGHEST_PROTOCOL`.
+
+    """
+    def __init__(self, protocol=pickle.HIGHEST_PROTOCOL):
+        self.protocol = protocol
+
     def loads(self, bstruct):
+        """Accept bytes and return a Python object."""
         return pickle.loads(bstruct)
 
     def dumps(self, appstruct):
-        return pickle.dumps(appstruct, pickle.HIGHEST_PROTOCOL)
+        """Accept a Python object and return bytes."""
+        return pickle.dumps(appstruct, self.protocol)
 
 def BaseCookieSessionFactory(
     serializer,
@@ -238,14 +251,14 @@ def BaseCookieSessionFactory(
 
         # configuration parameters
         _cookie_name = cookie_name
-        _cookie_max_age = max_age
+        _cookie_max_age = max_age if max_age is None else int(max_age)
         _cookie_path = path
         _cookie_domain = domain
         _cookie_secure = secure
         _cookie_httponly = httponly
         _cookie_on_exception = set_on_exception
-        _timeout = timeout
-        _reissue_time = reissue_time
+        _timeout = timeout if timeout is None else int(timeout)
+        _reissue_time = reissue_time if reissue_time is None else int(reissue_time)
 
         # dirty flag
         _dirty = False
@@ -313,7 +326,7 @@ def BaseCookieSessionFactory(
         __len__ = manage_accessed(dict.__len__)
         __iter__ = manage_accessed(dict.__iter__)
 
-        if not PY3:
+        if PY2:
             iteritems = manage_accessed(dict.iteritems)
             itervalues = manage_accessed(dict.itervalues)
             iterkeys = manage_accessed(dict.iterkeys)
