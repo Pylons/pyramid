@@ -1,17 +1,5 @@
 import unittest
 
-from pyramid import testing
-
-
-def dummy_request(dbsession):
-    return testing.DummyRequest(dbsession=dbsession)
-
-
-def _register_routes(config):
-    config.add_route('view_page', '{pagename}')
-    config.add_route('edit_page', '{pagename}/edit_page')
-    config.add_route('add_page', 'add_page/{pagename}')
-
 
 class FunctionalTests(unittest.TestCase):
 
@@ -27,11 +15,8 @@ class FunctionalTests(unittest.TestCase):
     @staticmethod
     def setup_database():
         import transaction
-        from tutorial.models.mymodel import Page
-        from tutorial.models.meta import (
-            Base,
-            )
-        import tutorial.models.meta
+        from tutorial.models import Page
+        from tutorial.models.meta import Base
 
 
         def initialize_db(dbsession, engine):
@@ -40,11 +25,9 @@ class FunctionalTests(unittest.TestCase):
                 model = Page(name='FrontPage', data='This is the front page')
                 dbsession.add(model)
 
-        def wrap_get_session(transaction_manager, dbmaker):
-            dbsession = get_session(transaction_manager, dbmaker)
+        def wrap_get_tm_session(session_factory, transaction_manager):
+            dbsession = get_tm_session(session_factory, transaction_manager)
             initialize_db(dbsession, engine)
-            tutorial.models.meta.get_session = get_session
-            tutorial.models.meta.get_engine = get_engine
             return dbsession
 
         def wrap_get_engine(settings):
@@ -53,10 +36,10 @@ class FunctionalTests(unittest.TestCase):
             return engine
 
         get_session = tutorial.models.meta.get_session
-        tutorial.models.meta.get_session = wrap_get_session
+        tutorial.models.get_tm_session = wrap_get_tm_session
 
         get_engine = tutorial.models.meta.get_engine
-        tutorial.models.meta.get_engine = wrap_get_engine
+        tutorial.models.get_engine = wrap_get_engine
 
     @classmethod
     def setUpClass(cls):

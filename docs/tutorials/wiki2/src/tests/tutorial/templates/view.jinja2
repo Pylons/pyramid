@@ -33,9 +33,9 @@
           </div>
           <div class="col-md-10">
             <div class="content">
-              {% if logged_in %}
+              {% if request.authenticated_userid is not None %}
               <p class="pull-right">
-                <a href="{{ request.application_url }}/logout">Logout</a>
+                <a href="{{ request.route_url('logout') }}">Logout</a>
               </p>
               {% endif %}
               <p>{{ content|safe }}</p>
@@ -48,7 +48,7 @@
                   Viewing <strong>{% if page.name %}{{page.name}}{% else %}Page Name Goes Here{% endif %}</strong>
               </p>
               <p>You can return to the
-                <a href="{{request.application_url}}">FrontPage</a>.
+                <a href="{{request.route_url('view_page', pagename='FrontPage')}}">FrontPage</a>.
               </p>
             </div>
           </div>

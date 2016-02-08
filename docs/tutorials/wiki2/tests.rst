@@ -18,6 +18,14 @@ subpackage, and add several new tests.
 
 Start by creating a new directory and a new empty file ``tests/__init__.py``.
 
+.. warning::
+
+   It is very important when refactoring a Python module into a package to
+   be sure to delete the cache files (``.pyc`` files or ``__pycache__``
+   folders) sitting around! Python will prioritize the cache files before
+   traversing into folders and so it will use the old code and you will wonder
+   why none of your changes are working!
+
 
 Test the views
 ==============

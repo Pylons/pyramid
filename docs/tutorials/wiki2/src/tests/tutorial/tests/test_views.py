@@ -10,35 +10,29 @@ def dummy_request(dbsession):
 
 def _register_routes(config):
     config.add_route('view_page', '{pagename}')
-    config.add_route('edit_page', '{pagename}/edit_page')
     config.add_route('add_page', 'add_page/{pagename}')
+    config.add_route('edit_page', '{pagename}/edit_page')
 
 
 class BaseTest(unittest.TestCase):
     def setUp(self):
+        from ..models import get_tm_session
         self.config = testing.setUp(settings={
             'sqlalchemy.url': 'sqlite:///:memory:'
         })
-        self.config.include('..models.meta')
-        _register_routes(self.config)
-        settings = self.config.get_settings()
+        self.config.include('..models')
+        self.config.include(_register_routes)
 
-        from ..models.meta import (
-            get_session,
-            get_engine,
-            get_dbmaker,
-            )
-
-        self.engine = get_engine(settings)
-        dbmaker = get_dbmaker(self.engine)
-
-        self.session = get_session(transaction.manager, dbmaker)
+        session_factory = self.config.registry['dbsession_factory']
+        self.session = get_tm_session(session_factory, transaction.manager)
 
         self.init_database()
 
     def init_database(self):
         from ..models.meta import Base
-        Base.metadata.create_all(self.engine)
+        session_factory = self.config.registry['dbsession_factory']
+        engine = session_factory.get_bind()
+        Base.metadata.create_all(engine)
 
     def tearDown(self):
         testing.tearDown()
@@ -46,7 +40,6 @@ class BaseTest(unittest.TestCase):
 
 
 class ViewWikiTests(unittest.TestCase):
-
     def setUp(self):
         self.config = testing.setUp()
         _register_routes(self.config)
@@ -65,13 +58,6 @@ class ViewWikiTests(unittest.TestCase):
 
 
 class ViewPageTests(BaseTest):
-    def setUp(self):
-        super(ViewPageTests, self).setUp()
-
-    def tearDown(self):
-        transaction.abort()
-        testing.tearDown()
-
     def _callFUT(self, request):
         from tutorial.views.default import view_page
         return view_page(request)
@@ -102,13 +88,6 @@ class ViewPageTests(BaseTest):
 
 
 class AddPageTests(BaseTest):
-    def setUp(self):
-        super(AddPageTests, self).setUp()
-
-    def tearDown(self):
-        transaction.abort()
-        testing.tearDown()
-
     def _callFUT(self, request):
         from tutorial.views.default import add_page
         return add_page(request)
@@ -133,13 +112,6 @@ class AddPageTests(BaseTest):
 
 
 class EditPageTests(BaseTest):
-    def setUp(self):
-        super(EditPageTests, self).setUp()
-
-    def tearDown(self):
-        transaction.abort()
-        testing.tearDown()
-
     def _callFUT(self, request):
         from tutorial.views.default import edit_page
         return edit_page(request)
