@@ -42,7 +42,7 @@ Access control
 Add users and groups
 ~~~~~~~~~~~~~~~~~~~~
 
-Create a new ``tutorial/tutorial/security/default.py`` subpackage with the
+Create a new ``tutorial/security/default.py`` subpackage with the
 following content:
 
 .. literalinclude:: src/authorization/tutorial/security/default.py
@@ -68,21 +68,17 @@ database, but here we use "dummy" data to represent user and groups sources.
 Add an ACL
 ~~~~~~~~~~
 
-Open ``tutorial/tutorial/models/mymodel.py`` and add the following import
-statement just after the ``Base`` import at the top:
+Open ``tutorial/models/mymodel.py`` and add the following import
+statement at the top:
 
 .. literalinclude:: src/authorization/tutorial/models/mymodel.py
-   :lines: 3-6
-   :linenos:
-   :lineno-start: 3
+   :lines: 1-4
    :language: python
 
 Add the following class definition at the end:
 
 .. literalinclude:: src/authorization/tutorial/models/mymodel.py
-   :lines: 22-26
-   :linenos:
-   :lineno-start: 22
+   :lines: 22-29
    :language: python
 
 We import :data:`~pyramid.security.Allow`, an action that means that
@@ -100,13 +96,13 @@ need to associate it to our :app:`Pyramid` application, so the ACL is provided
 to each view in the :term:`context` of the request as the ``context``
 attribute.
 
-Open ``tutorial/tutorial/__init__.py`` and add a ``root_factory`` parameter to
-our :term:`Configurator` constructor, that points to the class we created
-above:
+Open ``tutorial/__init__.py`` and define a new root factory using
+:meth:`pyramid.config.Configurator.set_root_factory` using the class that we
+created above:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
-   :lines: 13-14
-   :emphasize-lines: 2
+   :lines: 14-17
+   :emphasize-lines: 17
    :language: python
 
 Only the highlighted line needs to be added.
@@ -122,22 +118,19 @@ for more information about what an :term:`ACL` represents.
 Add authentication and authorization policies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Open ``tutorial/tutorial/__init__.py`` and add the highlighted import
+Open ``tutorial/__init__.py`` and add the highlighted import
 statements:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
    :lines: 1-5
-   :linenos:
    :emphasize-lines: 2-5
    :language: python
 
 Now add those policies to the configuration:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
-   :lines: 7-16
-   :linenos:
-   :lineno-start: 7
-   :emphasize-lines: 4-6,9-10
+   :lines: 11-19
+   :emphasize-lines: 1-3,8-9
    :language: python
 
 Only the highlighted lines need to be added.
@@ -157,17 +150,17 @@ machinery represented by this policy; it is required.  The ``callback`` is the
 Add permission declarations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Open ``tutorial/tutorial/views/default.py`` and add a ``permission='view'``
+Open ``tutorial/views/default.py`` and add a ``permission='view'``
 parameter to the ``@view_config`` decorator for ``view_wiki()`` and
 ``view_page()`` as follows:
 
 .. literalinclude:: src/authorization/tutorial/views/default.py
-   :lines: 27-29
-   :emphasize-lines: 1-2
+   :lines: 24-25
+   :emphasize-lines: 1
    :language: python
 
 .. literalinclude:: src/authorization/tutorial/views/default.py
-   :lines: 33-35
+   :lines: 29-31
    :emphasize-lines: 1-2
    :language: python
 
@@ -180,12 +173,12 @@ Add a ``permission='edit'`` parameter to the ``@view_config`` decorators for
 ``add_page()`` and ``edit_page()``:
 
 .. literalinclude:: src/authorization/tutorial/views/default.py
-   :lines: 57-59
+   :lines: 52-54
    :emphasize-lines: 1-2
    :language: python
 
 .. literalinclude:: src/authorization/tutorial/views/default.py
-   :lines: 72-74
+   :lines: 66-68
    :emphasize-lines: 1-2
    :language: python
 
@@ -203,11 +196,11 @@ Login, logout
 
 Add routes for /login and /logout
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Go back to ``tutorial/tutorial/__init__.py`` and add these two routes as
+Go back to ``tutorial/__init__.py`` and add these two routes as
 highlighted:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
-   :lines: 20-23
+   :lines: 21-24
    :emphasize-lines: 2-3
    :language: python
 
@@ -215,7 +208,7 @@ highlighted:
    ``view_page`` route definition:
 
    .. literalinclude:: src/authorization/tutorial/__init__.py
-      :lines: 23
+      :lines: 24
       :language: python
 
    This is because ``view_page``'s route definition uses a catch-all
@@ -235,12 +228,12 @@ We'll also add a ``logout`` view callable to our application and provide a
 link to it.  This view will clear the credentials of the logged in user and
 redirect back to the front page.
 
-Add the following import statements to ``tutorial/tutorial/views/default.py``
+Add the following import statements to ``tutorial/views/default.py``
 after the import from ``pyramid.httpexceptions``:
 
 .. literalinclude:: src/authorization/tutorial/views/default.py
-   :lines: 10-20
-   :emphasize-lines: 1-11
+   :lines: 9-19
+   :emphasize-lines: 1-8,11
    :language: python
 
 All the highlighted lines need to be added or edited.
@@ -253,7 +246,7 @@ cookie.
 Now add the ``login`` and ``logout`` views at the end of the file:
 
 .. literalinclude:: src/authorization/tutorial/views/default.py
-   :lines: 88-121
+   :lines: 81-112
    :language: python
 
 ``login()`` has two decorators:
@@ -274,7 +267,7 @@ it with the ``logout`` route.  It will be invoked when we visit ``/logout``.
 Add the ``login.jinja2`` template
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Create ``tutorial/tutorial/templates/login.jinja2`` with the following content:
+Create ``tutorial/templates/login.jinja2`` with the following content:
 
 .. literalinclude:: src/authorization/tutorial/templates/login.jinja2
    :language: html
@@ -282,38 +275,11 @@ Create ``tutorial/tutorial/templates/login.jinja2`` with the following content:
 The above template is referenced in the login view that we just added in
 ``views/default.py``.
 
-Return a ``logged_in`` flag to the renderer
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Open ``tutorial/tutorial/views/default.py`` again. Add a ``logged_in``
-parameter to the return value of ``view_page()``, ``add_page()``, and
-``edit_page()`` as follows:
-
-.. literalinclude:: src/authorization/tutorial/views/default.py
-   :lines: 54-55
-   :emphasize-lines: 1-2
-   :language: python
-
-.. literalinclude:: src/authorization/tutorial/views/default.py
-   :lines: 69-70
-   :emphasize-lines: 1-2
-   :language: python
-
-.. literalinclude:: src/authorization/tutorial/views/default.py
-   :lines: 82-86
-   :emphasize-lines: 3-4
-   :language: python
-
-Only the highlighted lines need to be added or edited.
-
-The :meth:`pyramid.request.Request.authenticated_userid` will be ``None`` if
-the user is not authenticated, or a userid if the user is authenticated.
-
 Add a "Logout" link when logged in
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Open ``tutorial/tutorial/templates/edit.jinja2`` and
-``tutorial/tutorial/templates/view.jinja2`` and add the following code as
+Open ``tutorial/templates/edit.jinja2`` and
+``tutorial/templates/view.jinja2`` and add the following code as
 indicated by the highlighted lines.
 
 .. literalinclude:: src/authorization/tutorial/templates/edit.jinja2
@@ -321,42 +287,41 @@ indicated by the highlighted lines.
    :emphasize-lines: 3-7
    :language: html
 
-The attribute ``logged_in`` will make the element be included when
-``logged_in`` is any user id.  The link will invoke the logout view.  The above
-element will not be included if ``logged_in`` is ``None``, such as when a user
-is not authenticated.
+The :meth:`pyramid.request.Request.authenticated_userid` will be ``None`` if
+the user is not authenticated, or a userid if the user is authenticated. This
+check will make the logout link active only when the user is logged in.
 
 Reviewing our changes
 ---------------------
 
-Our ``tutorial/tutorial/__init__.py`` will look like this when we're done:
+Our ``tutorial/__init__.py`` will look like this when we're done:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
    :linenos:
-   :emphasize-lines: 2-3,5,10-12,14-16,21-22
+   :emphasize-lines: 2-3,5,11-13,17-19,22-23
    :language: python
 
 Only the highlighted lines need to be added or edited.
 
-Our ``tutorial/tutorial/models/mymodel.py`` will look like this when we're done:
+Our ``tutorial/models/mymodel.py`` will look like this when we're done:
 
 .. literalinclude:: src/authorization/tutorial/models/mymodel.py
    :linenos:
-   :emphasize-lines: 3-6,22-26
+   :emphasize-lines: 1-4,22-29
    :language: python
 
 Only the highlighted lines need to be added or edited.
 
-Our ``tutorial/tutorial/views/default.py`` will look like this when we're done:
+Our ``tutorial/views/default.py`` will look like this when we're done:
 
 .. literalinclude:: src/authorization/tutorial/views/default.py
    :linenos:
-   :emphasize-lines: 10-20,27-28,33-34,54-55,57-58,69-70,72-73,84-85,88-121
+   :emphasize-lines: 9-16,19,24,29-30,52-53,66-67,81-112
    :language: python
 
 Only the highlighted lines need to be added or edited.
 
-Our ``tutorial/tutorial/templates/edit.jinja2`` template will look like this when
+Our ``tutorial/templates/edit.jinja2`` template will look like this when
 we're done:
 
 .. literalinclude:: src/authorization/tutorial/templates/edit.jinja2
@@ -366,7 +331,7 @@ we're done:
 
 Only the highlighted lines need to be added or edited.
 
-Our ``tutorial/tutorial/templates/view.jinja2`` template will look like this when
+Our ``tutorial/templates/view.jinja2`` template will look like this when
 we're done:
 
 .. literalinclude:: src/authorization/tutorial/templates/view.jinja2

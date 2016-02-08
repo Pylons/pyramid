@@ -1,15 +1,14 @@
-from .meta import Base
-
 from pyramid.security import (
     Allow,
     Everyone,
-    )
-
+)
 from sqlalchemy import (
     Column,
     Integer,
     Text,
-    )
+)
+
+from .meta import Base
 
 
 class Page(Base):
@@ -19,8 +18,12 @@ class Page(Base):
     name = Column(Text, unique=True)
     data = Column(Integer)
 
+
 class RootFactory(object):
-    __acl__ = [ (Allow, Everyone, 'view'),
-                (Allow, 'group:editors', 'edit') ]
+    __acl__ = [
+        (Allow, Everyone, 'view'),
+        (Allow, 'group:editors', 'edit'),
+    ]
+
     def __init__(self, request):
         pass

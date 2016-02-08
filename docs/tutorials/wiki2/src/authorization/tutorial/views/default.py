@@ -6,31 +6,27 @@ from pyramid.httpexceptions import (
     HTTPFound,
     HTTPNotFound,
     )
-
 from pyramid.view import (
     view_config,
     forbidden_view_config,
     )
-
 from pyramid.security import (
     remember,
     forget,
     )
 
+from ..models import Page
 from ..security.default import USERS
-
-from ..models.mymodel import Page
 
 # regular expression used to find WikiWords
 wikiwords = re.compile(r"\b([A-Z]\w+[A-Z]+\w+)")
 
-@view_config(route_name='view_wiki',
-             permission='view')
+@view_config(route_name='view_wiki', permission='view')
 def view_wiki(request):
-    return HTTPFound(location=request.route_url('view_page',
-                                                pagename='FrontPage'))
+    next_url = request.route_url('view_page', pagename='FrontPage')
+    return HTTPFound(location=next_url)
 
-@view_config(route_name='view_page', renderer='templates/view.jinja2',
+@view_config(route_name='view_page', renderer='../templates/view.jinja2',
              permission='view')
 def view_page(request):
     pagename = request.matchdict['pagename']
@@ -51,10 +47,9 @@ def view_page(request):
     content = publish_parts(page.data, writer_name='html')['html_body']
     content = wikiwords.sub(check, content)
     edit_url = request.route_url('edit_page', pagename=pagename)
-    return dict(page=page, content=content, edit_url=edit_url,
-                logged_in=request.authenticated_userid)
+    return dict(page=page, content=content, edit_url=edit_url)
 
-@view_config(route_name='add_page', renderer='templates/edit.jinja2',
+@view_config(route_name='add_page', renderer='../templates/edit.jinja2',
              permission='edit')
 def add_page(request):
     pagename = request.matchdict['pagename']
@@ -62,28 +57,26 @@ def add_page(request):
         body = request.params['body']
         page = Page(name=pagename, data=body)
         request.dbsession.add(page)
-        return HTTPFound(location = request.route_url('view_page',
-                                                      pagename=pagename))
+        next_url = request.route_url('view_page', pagename=pagename)
+        return HTTPFound(location=next_url)
     save_url = request.route_url('add_page', pagename=pagename)
     page = Page(name='', data='')
-    return dict(page=page, save_url=save_url,
-                logged_in=request.authenticated_userid)
+    return dict(page=page, save_url=save_url)
 
-@view_config(route_name='edit_page', renderer='templates/edit.jinja2',
+@view_config(route_name='edit_page', renderer='../templates/edit.jinja2',
              permission='edit')
 def edit_page(request):
     pagename = request.matchdict['pagename']
     page = request.dbsession.query(Page).filter_by(name=pagename).one()
     if 'form.submitted' in request.params:
         page.data = request.params['body']
-        request.dbsession.add(page)
-        return HTTPFound(location = request.route_url('view_page',
-                                                      pagename=pagename))
+        next_url = request.route_url('view_page', pagename=pagename)
+        return HTTPFound(location=next_url)
     return dict(
         page=page,
-        save_url = request.route_url('edit_page', pagename=pagename),
-        logged_in=request.authenticated_userid
+        save_url=request.route_url('edit_page', pagename=pagename),
         )
+
 
 @view_config(route_name='login', renderer='templates/login.jinja2')
 @forbidden_view_config(renderer='templates/login.jinja2')
@@ -101,20 +94,19 @@ def login(request):
         password = request.params['password']
         if USERS.get(login) == password:
             headers = remember(request, login)
-            return HTTPFound(location = came_from,
-                             headers = headers)
+            return HTTPFound(location=came_from, headers=headers)
         message = 'Failed login'
 
     return dict(
-        message = message,
-        url = request.application_url + '/login',
-        came_from = came_from,
-        login = login,
-        password = password,
+        message=message,
+        url=request.route_url('login'),
+        came_from=came_from,
+        login=login,
+        password=password,
         )
 
 @view_config(route_name='logout')
 def logout(request):
     headers = forget(request)
-    return HTTPFound(location = request.route_url('view_wiki'),
-                     headers = headers)
+    next_url = request.route_url('view_wiki')
+    return HTTPFound(location=next_url, headers=headers)
