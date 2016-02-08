@@ -62,6 +62,7 @@ def includeme(config):
     config.include('pyramid_tm')
 
     session_factory = get_session_factory(get_engine(settings))
+    config.registry['dbsession_factory'] = session_factory
 
     # make request.dbsession available for use in Pyramid
     config.add_request_method(
