@@ -96,11 +96,12 @@ We'll describe each one briefly in the following sections.
 
 .. note::
 
-  There is nothing special about the filename ``default.py``.  A project may
-  have many view callables throughout its codebase in arbitrarily named files.
-  Files implementing view callables often have ``view`` in their filenames (or
+  There is nothing special about the filename ``default.py`` exept that
+  it is a Python module.  A project may have many view callables throughout
+  its codebase in arbitrarily named modules.
+  Modules implementing view callables often have ``view`` in their name (or
   may live in a Python subpackage of your application package named ``views``,
-  as in our case), but this is only by convention.
+  as in our case), but this is only by convention, not a requirement.
 
 The ``view_wiki`` view function
 -------------------------------
@@ -109,7 +110,7 @@ Following is the code for the ``view_wiki`` view function and its decorator:
 
 .. literalinclude:: src/views/tutorial/views/default.py
    :lines: 17-20
-   :lineno-start: 17
+   :lineno-match:
    :linenos:
    :language: python
 
@@ -119,8 +120,8 @@ represents the path to our "FrontPage".
 
 The ``view_wiki`` view callable always redirects to the URL of a Page resource
 named "FrontPage".  To do so, it returns an instance of the
-:class:`pyramid.httpexceptions.HTTPFound` class (instances of which implement
-the :class:`pyramid.interfaces.IResponse` interface, like
+:class:`pyramid.httpexceptions.HTTPFound` class (instances of which
+implement the :class:`pyramid.interfaces.IResponse` interface, like
 :class:`pyramid.response.Response` does). It uses the
 :meth:`pyramid.request.Request.route_url` API to construct an URL to the
 ``FrontPage`` page (i.e., ``http://localhost:6543/FrontPage``), and uses it as
@@ -133,7 +134,7 @@ Here is the code for the ``view_page`` view function and its decorator:
 
 .. literalinclude:: src/views/tutorial/views/default.py
    :lines: 22-42
-   :lineno-start: 22
+   :lineno-match:
    :linenos:
    :language: python
 
@@ -159,7 +160,7 @@ template, and we return a dictionary with a number of arguments.  The fact that
 ``view_page()`` returns a dictionary (as opposed to a :term:`response` object)
 is a cue to :app:`Pyramid` that it should try to use a :term:`renderer`
 associated with the view configuration to render a response.  In our case, the
-renderer used will be the ``templates/view.jinja2`` template, as indicated in
+renderer used will be the ``view.jinja2`` template, as indicated in
 the ``@view_config`` decorator that is applied to ``view_page()``.
 
 The ``add_page`` view function
@@ -169,7 +170,7 @@ Here is the code for the ``add_page`` view function and its decorator:
 
 .. literalinclude:: src/views/tutorial/views/default.py
    :lines: 44-55
-   :lineno-start: 44
+   :lineno-match:
    :linenos:
    :language: python
 
@@ -209,8 +210,8 @@ The ``edit_page`` view function
 Here is the code for the ``edit_page`` view function and its decorator:
 
 .. literalinclude:: src/views/tutorial/views/default.py
-   :lines: 57-69
-   :lineno-start: 57
+   :lines: 57-68
+   :lineno-match:
    :linenos:
    :language: python
 
@@ -281,7 +282,9 @@ editing a wiki page.  It displays a page containing a form that includes:
 The form POSTs back to the ``save_url`` argument supplied by the view (line
 42).  The view will use the ``body`` and ``form.submitted`` values.
 
-.. note:: Our templates use a ``request`` object that none of our tutorial
+.. note::
+
+   Our templates use a ``request`` object that none of our tutorial
    views return in their dictionary. ``request`` is one of several names that
    are available "by default" in a template when a template renderer is used.
    See :ref:`renderer_system_values` for information about other names that

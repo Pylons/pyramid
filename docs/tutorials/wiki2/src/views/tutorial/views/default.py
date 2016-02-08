@@ -9,17 +9,17 @@ from pyramid.httpexceptions import (
 
 from pyramid.view import view_config
 
-from ..models.mymodel import Page
+from ..models import Page
 
 # regular expression used to find WikiWords
 wikiwords = re.compile(r"\b([A-Z]\w+[A-Z]+\w+)")
 
 @view_config(route_name='view_wiki')
 def view_wiki(request):
-    return HTTPFound(location=request.route_url('view_page',
-                                                pagename='FrontPage'))
+    next_url = request.route_url('view_page', pagename='FrontPage')
+    return HTTPFound(location=next_url)
 
-@view_config(route_name='view_page', renderer='templates/view.jinja2')
+@view_config(route_name='view_page', renderer='../templates/view.jinja2')
 def view_page(request):
     pagename = request.matchdict['pagename']
     page = request.dbsession.query(Page).filter_by(name=pagename).first()
@@ -41,29 +41,28 @@ def view_page(request):
     edit_url = request.route_url('edit_page', pagename=pagename)
     return dict(page=page, content=content, edit_url=edit_url)
 
-@view_config(route_name='add_page', renderer='templates/edit.jinja2')
+@view_config(route_name='add_page', renderer='../templates/edit.jinja2')
 def add_page(request):
     pagename = request.matchdict['pagename']
     if 'form.submitted' in request.params:
         body = request.params['body']
         page = Page(name=pagename, data=body)
         request.dbsession.add(page)
-        return HTTPFound(location = request.route_url('view_page',
-                                                      pagename=pagename))
+        next_url = request.route_url('view_page', pagename=pagename)
+        return HTTPFound(location=next_url)
     save_url = request.route_url('add_page', pagename=pagename)
     page = Page(name='', data='')
     return dict(page=page, save_url=save_url)
 
-@view_config(route_name='edit_page', renderer='templates/edit.jinja2')
+@view_config(route_name='edit_page', renderer='../templates/edit.jinja2')
 def edit_page(request):
     pagename = request.matchdict['pagename']
     page = request.dbsession.query(Page).filter_by(name=pagename).one()
     if 'form.submitted' in request.params:
         page.data = request.params['body']
-        request.dbsession.add(page)
-        return HTTPFound(location = request.route_url('view_page',
-                                                      pagename=pagename))
+        next_url = request.route_url('view_page', pagename=pagename)
+        return HTTPFound(location=next_url)
     return dict(
         page=page,
-        save_url = request.route_url('edit_page', pagename=pagename),
+        save_url=request.route_url('edit_page', pagename=pagename),
         )

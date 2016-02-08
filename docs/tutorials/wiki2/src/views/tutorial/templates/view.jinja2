@@ -43,7 +43,7 @@
                   Viewing <strong>{% if page.name %}{{page.name}}{% else %}Page Name Goes Here{% endif %}</strong>
               </p>
               <p>You can return to the
-                <a href="{{request.application_url}}">FrontPage</a>.
+                <a href="{{request.route_url('view_page', pagename='FrontPage')}}">FrontPage</a>.
               </p>
             </div>
           </div>
