@@ -201,8 +201,8 @@ for the ``naming_convention`` argument.
 
 A ``MetaData`` object represents the table and other schema definitions for
 a single database. We also need to create a declarative ``Base`` object to use
-as a base class for our models. Our models will inherit from this ``Base``
-which will attach the tables to the ``metadata`` we created and define our
+as a base class for our models. Our models will inherit from this ``Base``,
+which will attach the tables to the ``metadata`` we created, and define our
 application's database schema.
 
 .. literalinclude:: src/basiclayout/tutorial/models/meta.py
@@ -242,30 +242,30 @@ contain the following:
   :language: py
 
 Our ``models/__init__.py`` module defines the primary API we will use for
-configuring the database connections within our application and it contains
+configuring the database connections within our application, and it contains
 several functions we will cover below.
 
 As we mentioned above, the purpose of the ``models.meta.metadata`` object is
-to describe the schema of the database and this is done by defining models
-that inherit from the ``Base`` attached to that ``metadata`` object. In
-Python, code is only executed if it is imported and so to attach the
-``models`` table, defined in ``mymodel.py`` to the ``metadata`` we must
-import it. If we skip this step then later when we run
-:meth:`sqlalchemy.schema.MetaData.create_all` the table will not be created
+to describe the schema of the database. This is done by defining models that
+inherit from the ``Base`` attached to that ``metadata`` object. In Python, code
+is only executed if it is imported, and so to attach the ``models`` table
+defined in ``mymodel.py`` to the ``metadata``, we must import it. If we skip
+this step, then later, when we run
+:meth:`sqlalchemy.schema.MetaData.create_all`, the table will not be created
 because the ``metadata`` does not know about it!
 
-Another important reason to import all of the models is that when
-defining relationships between models they must all exist in order for
-SQLAlchemy to find and build those internal mappings. This is why after
-importing all the models we explicitly execute the function
+Another important reason to import all of the models is that, when defining
+relationships between models, they must all exist in order for SQLAlchemy to
+find and build those internal mappings. This is why, after importing all the
+models, we explicitly execute the function
 :func:`sqlalchemy.orm.configure_mappers`, once we are sure all the models have
 been defined and before we start creating connections.
 
-Next we define several functions for connecting to our database. The first
-and lowest level is the ``get_engine`` function which creates an
-:term:`SQLAlchemy` database engine using :func:`sqlalchemy.engine_from_config`
-from the ``sqlalchemy.``-prefixed settings in the ``development.ini``
-file's ``[app:main]`` section, which is a URI (something like ``sqlite://``).
+Next we define several functions for connecting to our database. The first and
+lowest level is the ``get_engine`` function. This creates an :term:`SQLAlchemy`
+database engine using :func:`sqlalchemy.engine_from_config` from the
+``sqlalchemy.``-prefixed settings in the ``development.ini`` file's
+``[app:main]`` section. This setting is a URI (something like ``sqlite://``).
 
 .. literalinclude:: src/basiclayout/tutorial/models/__init__.py
   :pyobject: get_engine
@@ -274,9 +274,9 @@ file's ``[app:main]`` section, which is a URI (something like ``sqlite://``).
   :language: py
 
 The function ``get_session_factory`` accepts an :term:`SQLAlchemy` database
-engine, and creates a ``session_factory`` from the :term:`SQLAlchemy`
-class :class:`sqlalchemy.orm.session.sessionmaker`, which is then used for
-creating sessions bound to the database engine.
+engine, and creates a ``session_factory`` from the :term:`SQLAlchemy` class
+:class:`sqlalchemy.orm.session.sessionmaker`. This ``session_factory`` is then
+used for creating sessions bound to the database engine.
 
 .. literalinclude:: src/basiclayout/tutorial/models/__init__.py
   :pyobject: get_session_factory
@@ -286,7 +286,7 @@ creating sessions bound to the database engine.
 
 The function ``get_tm_session`` registers a database session with a transaction
 manager, and returns a ``dbsession`` object. With the transaction manager, our
-application will automatically issue a transaction commit after every request
+application will automatically issue a transaction commit after every request,
 unless an exception is raised, in which case the transaction will be aborted.
 
 .. literalinclude:: src/basiclayout/tutorial/models/__init__.py
@@ -297,10 +297,10 @@ unless an exception is raised, in which case the transaction will be aborted.
 
 Finally, we define an ``includeme`` function, which is a hook for use with
 :meth:`pyramid.config.Configurator.include` to activate code in a Pyramid
-application addon. It is the code that is executed above when we ran
+application add-on. It is the code that is executed above when we ran
 ``config.include('.models')`` in our application's ``main`` function. This
-function will take the settings from the application, create an engine
-and define a ``request.dbsession`` property which we can use to do work
+function will take the settings from the application, create an engine,
+and define a ``request.dbsession`` property, which we can use to do work
 on behalf of an incoming request to our application.
 
 .. literalinclude:: src/basiclayout/tutorial/models/__init__.py
