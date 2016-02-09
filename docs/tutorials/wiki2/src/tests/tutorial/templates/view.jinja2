@@ -33,7 +33,7 @@
           </div>
           <div class="col-md-10">
             <div class="content">
-              {% if request.authenticated_userid is not None %}
+              {% if request.authenticated_userid is not none %}
               <p class="pull-right">
                 <a href="{{ request.route_url('logout') }}">Logout</a>
               </p>
