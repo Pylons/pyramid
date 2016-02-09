@@ -20,6 +20,10 @@ requires = [
     'docutils',
     ]
 
+tests_require = [
+    'WebTest',
+]
+
 setup(name='tutorial',
       version='0.0',
       description='tutorial',
@@ -39,6 +43,7 @@ setup(name='tutorial',
       zip_safe=False,
       test_suite='tutorial',
       install_requires=requires,
+      tests_require=tests_require,
       entry_points="""\
       [paste.app_factory]
       main = tutorial:main

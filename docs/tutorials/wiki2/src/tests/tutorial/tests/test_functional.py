@@ -1,4 +1,6 @@
+import transaction
 import unittest
+from webtest import TestApp
 
 
 class FunctionalTests(unittest.TestCase):
@@ -10,55 +12,32 @@ class FunctionalTests(unittest.TestCase):
     editor_login = '/login?login=editor&password=editor' \
                    '&came_from=FrontPage&form.submitted=Login'
 
-    engine = None
-
-    @staticmethod
-    def setup_database():
-        import transaction
-        from tutorial.models import Page
-        from tutorial.models.meta import Base
-
-
-        def initialize_db(dbsession, engine):
-            Base.metadata.create_all(engine)
-            with transaction.manager:
-                model = Page(name='FrontPage', data='This is the front page')
-                dbsession.add(model)
-
-        def wrap_get_tm_session(session_factory, transaction_manager):
-            dbsession = get_tm_session(session_factory, transaction_manager)
-            initialize_db(dbsession, engine)
-            return dbsession
-
-        def wrap_get_engine(settings):
-            global engine
-            engine = get_engine(settings)
-            return engine
-
-        get_session = tutorial.models.meta.get_session
-        tutorial.models.get_tm_session = wrap_get_tm_session
-
-        get_engine = tutorial.models.meta.get_engine
-        tutorial.models.get_engine = wrap_get_engine
-
     @classmethod
     def setUpClass(cls):
-        cls.setup_database()
-
-        from webtest import TestApp
+        from tutorial.models.meta import Base
+        from tutorial.models import (
+            Page,
+            get_tm_session,
+        )
         from tutorial import main
+
         settings = {'sqlalchemy.url': 'sqlite://'}
         app = main({}, **settings)
         cls.testapp = TestApp(app)
 
+        session_factory = app.registry['dbsession_factory']
+        cls.engine = session_factory.kw['bind']
+        Base.metadata.create_all(bind=cls.engine)
+
+        with transaction.manager:
+            dbsession = get_tm_session(session_factory, transaction.manager)
+            model = Page(name='FrontPage', data='This is the front page')
+            dbsession.add(model)
+
     @classmethod
     def tearDownClass(cls):
         from tutorial.models.meta import Base
-        Base.metadata.drop_all(engine)
-
-    def tearDown(self):
-        import transaction
-        transaction.abort()
+        Base.metadata.drop_all(bind=cls.engine)
 
     def test_root(self):
         res = self.testapp.get('/', status=302)
