@@ -31,7 +31,7 @@ class BaseTest(unittest.TestCase):
     def init_database(self):
         from ..models.meta import Base
         session_factory = self.config.registry['dbsession_factory']
-        engine = session_factory.get_bind()
+        engine = session_factory.kw['bind']
         Base.metadata.create_all(engine)
 
     def tearDown(self):
