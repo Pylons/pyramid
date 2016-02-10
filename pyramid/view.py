@@ -603,7 +603,7 @@ class ViewMethodsMixin(object):
         # here, which adds exception and exc_info as request attrs, and
         # removes response object temporarily (as per the excview tween)
         attrs['exception'] = exc_info[0]
-        attrs['exc_info'] = request.exc_info = exc_info
+        attrs['exc_info'] = exc_info
         # we use .get instead of .__getitem__ below due to
         # https://github.com/Pylons/pyramid/issues/700
         request_iface = attrs.get('request_iface', IRequest)
