@@ -10,6 +10,7 @@ from pyramid.interfaces import (
     IView,
     IViewClassifier,
     IRequest,
+    IExceptionViewClassifier,
     )
 
 from pyramid.compat import decode_path_info
@@ -547,3 +548,32 @@ def _call_view(
         raise pme
 
     return response
+
+class ViewMethodsMixin(object):
+    """ Request methods mixin for BaseRequest having to do with executing
+    views """
+    def invoke_exception_view(
+        self,
+        exc,
+        request=None,
+        secure=True
+        ):
+        if request is None:
+            request = self
+        registry = getattr(request, 'registry', None)
+        if registry is None:
+            registry = get_current_registry()
+        context_iface = providedBy(exc)
+        view_name = getattr(request, 'view_name', '')
+        response = _call_view(
+            registry,
+            request,
+            exc,
+            context_iface,
+            view_name,
+            view_types=None,
+            view_classifier=IExceptionViewClassifier,
+            secure=secure,
+            request_iface=None,
+            )
+        return response
