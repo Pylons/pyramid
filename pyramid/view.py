@@ -1,4 +1,5 @@
 import itertools
+import traceback
 import venusian
 
 from zope.interface import providedBy
@@ -554,21 +555,52 @@ class ViewMethodsMixin(object):
     views """
     def invoke_exception_view(
         self,
-        exc,
+        exc_info=None,
         request=None,
         secure=True
         ):
+        """ Executes an exception view related to the request it's called upon.
+        The arguments it takes are these:
+
+        ``exc_info``
+
+            If provided, should be a 3-tuple in the form provided by
+            ``traceback.exc_info()``.  If not provided,
+            ``traceback.exc_info()`` will be called to obtain the current
+            interpreter exception information.  Default: ``None``.
+
+        ``request``
+
+            If the request to be used is not the same one as the instance that
+            this method is called upon, it may be passed here.  Default:
+            ``None``.
+
+        ``secure``
+
+            If the exception view should not be rendered if the current user
+            does not have the appropriate permission, this should be ``True``.
+            Default: ``True``.
+
+        If called with no arguments, it uses the global exception information
+        returned by ``traceback.exc_info()`` as ``exc_info``, the request
+        object that the method is a member of as the ``request``, and
+        ``secure`` is ``True``.
+
+        This method returns a :term:`response` object."""
+
         if request is None:
             request = self
         registry = getattr(request, 'registry', None)
         if registry is None:
             registry = get_current_registry()
-        context_iface = providedBy(exc)
+        if exc_info is None:
+            exc_info = traceback.exc_info()
+        context_iface = providedBy(exc_info[0])
         view_name = getattr(request, 'view_name', '')
         response = _call_view(
             registry,
             request,
-            exc,
+            exc_info[0],
             context_iface,
             view_name,
             view_types=None,
