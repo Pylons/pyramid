@@ -596,10 +596,17 @@ class ViewMethodsMixin(object):
             registry = get_current_registry()
         if exc_info is None:
             exc_info = traceback.exc_info()
+        attrs = request.__dict__
         context_iface = providedBy(exc_info[0])
-        view_name = getattr(request, 'view_name', '')
-        request.exception = exc_info[0]
-        request.exc_info = exc_info
+        view_name = attrs.get('view_name', '')
+        # probably need something like "with temporarily_munged_request(req)"
+        # here, which adds exception and exc_info as request attrs, and
+        # removes response object temporarily (as per the excview tween)
+        attrs['exception'] = exc_info[0]
+        attrs['exc_info'] = request.exc_info = exc_info
+        # we use .get instead of .__getitem__ below due to
+        # https://github.com/Pylons/pyramid/issues/700
+        request_iface = attrs.get('request_iface', IRequest)
         response = _call_view(
             registry,
             request,
@@ -609,6 +616,6 @@ class ViewMethodsMixin(object):
             view_types=None,
             view_classifier=IExceptionViewClassifier,
             secure=secure,
-            request_iface=None,
+            request_iface=request_iface.combined,
             )
         return response
