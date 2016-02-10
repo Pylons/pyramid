@@ -583,8 +583,8 @@ class ViewMethodsMixin(object):
 
         If called with no arguments, it uses the global exception information
         returned by ``traceback.exc_info()`` as ``exc_info``, the request
-        object that the method is a member of as the ``request``, and
-        ``secure`` is ``True``.
+        object that this method is attached to as the ``request``, and
+        ``True`` for ``secure``.
 
         This method returns a :term:`response` object."""
 
@@ -597,6 +597,8 @@ class ViewMethodsMixin(object):
             exc_info = traceback.exc_info()
         context_iface = providedBy(exc_info[0])
         view_name = getattr(request, 'view_name', '')
+        request.exception = exc_info[0]
+        request.exc_info = exc_info
         response = _call_view(
             registry,
             request,
