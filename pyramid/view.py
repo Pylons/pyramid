@@ -1,5 +1,6 @@
 import itertools
-import traceback
+import sys
+
 import venusian
 
 from zope.interface import providedBy
@@ -565,8 +566,8 @@ class ViewMethodsMixin(object):
         ``exc_info``
 
             If provided, should be a 3-tuple in the form provided by
-            ``traceback.exc_info()``.  If not provided,
-            ``traceback.exc_info()`` will be called to obtain the current
+            ``sys.exc_info()``.  If not provided,
+            ``sys.exc_info()`` will be called to obtain the current
             interpreter exception information.  Default: ``None``.
 
         ``request``
@@ -582,7 +583,7 @@ class ViewMethodsMixin(object):
             Default: ``True``.
 
         If called with no arguments, it uses the global exception information
-        returned by ``traceback.exc_info()`` as ``exc_info``, the request
+        returned by ``sys.exc_info()`` as ``exc_info``, the request
         object that this method is attached to as the ``request``, and
         ``True`` for ``secure``.
 
@@ -595,7 +596,7 @@ class ViewMethodsMixin(object):
         if registry is None:
             registry = get_current_registry()
         if exc_info is None:
-            exc_info = traceback.exc_info()
+            exc_info = sys.exc_info()
         attrs = request.__dict__
         context_iface = providedBy(exc_info[0])
         view_name = attrs.get('view_name', '')
