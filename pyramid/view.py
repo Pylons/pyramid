@@ -586,7 +586,8 @@ class ViewMethodsMixin(object):
         object that this method is attached to as the ``request``, and
         ``True`` for ``secure``.
 
-        This method returns a :term:`response` object."""
+        This method returns a :term:`response` object or ``None`` if no
+        matching exception view can be found.."""
 
         if request is None:
             request = self
