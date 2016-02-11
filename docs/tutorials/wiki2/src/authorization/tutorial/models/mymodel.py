@@ -1,7 +1,3 @@
-from pyramid.security import (
-    Allow,
-    Everyone,
-)
 from sqlalchemy import (
     Column,
     Integer,
@@ -17,13 +13,3 @@ class Page(Base):
     id = Column(Integer, primary_key=True)
     name = Column(Text, unique=True)
     data = Column(Integer)
-
-
-class RootFactory(object):
-    __acl__ = [
-        (Allow, Everyone, 'view'),
-        (Allow, 'group:editors', 'edit'),
-    ]
-
-    def __init__(self, request):
-        pass
