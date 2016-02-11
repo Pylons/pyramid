@@ -5,12 +5,15 @@ from webtest import TestApp
 
 class FunctionalTests(unittest.TestCase):
 
-    viewer_login = '/login?login=viewer&password=viewer' \
-                   '&came_from=FrontPage&form.submitted=Login'
-    viewer_wrong_login = '/login?login=viewer&password=incorrect' \
-                   '&came_from=FrontPage&form.submitted=Login'
-    editor_login = '/login?login=editor&password=editor' \
-                   '&came_from=FrontPage&form.submitted=Login'
+    viewer_login = (
+        '/login?login=viewer&password=viewer'
+        '&came_from=FrontPage&form.submitted=Login')
+    viewer_wrong_login = (
+        '/login?login=viewer&password=incorrect'
+        '&came_from=FrontPage&form.submitted=Login')
+    editor_login = (
+        '/login?login=editor&password=editor'
+        '&came_from=FrontPage&form.submitted=Login')
 
     @classmethod
     def setUpClass(cls):
