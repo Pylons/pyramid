@@ -6,14 +6,11 @@ from pyramid.httpexceptions import (
     HTTPFound,
     HTTPNotFound,
     )
-from pyramid.view import (
-    view_config,
-    forbidden_view_config,
-    )
 from pyramid.security import (
     remember,
     forget,
     )
+from pyramid.view import view_config
 
 from ..models import Page
 from ..security.default import USERS
@@ -77,9 +74,7 @@ def edit_page(request):
         save_url=request.route_url('edit_page', pagename=pagename),
         )
 
-
 @view_config(route_name='login', renderer='templates/login.jinja2')
-@forbidden_view_config(renderer='templates/login.jinja2')
 def login(request):
     login_url = request.route_url('login')
     referrer = request.url

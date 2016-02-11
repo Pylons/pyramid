@@ -70,21 +70,21 @@ class FunctionalTests(unittest.TestCase):
         self.assertTrue(b'Logout' not in res.body)
 
     def test_anonymous_user_cannot_edit(self):
-        res = self.testapp.get('/FrontPage/edit_page', status=200)
+        res = self.testapp.get('/FrontPage/edit_page', status=302).follow()
         self.assertTrue(b'Login' in res.body)
 
     def test_anonymous_user_cannot_add(self):
-        res = self.testapp.get('/add_page/NewPage', status=200)
+        res = self.testapp.get('/add_page/NewPage', status=302).follow()
         self.assertTrue(b'Login' in res.body)
 
     def test_viewer_user_cannot_edit(self):
         self.testapp.get(self.viewer_login, status=302)
-        res = self.testapp.get('/FrontPage/edit_page', status=200)
+        res = self.testapp.get('/FrontPage/edit_page', status=302).follow()
         self.assertTrue(b'Login' in res.body)
 
     def test_viewer_user_cannot_add(self):
         self.testapp.get(self.viewer_login, status=302)
-        res = self.testapp.get('/add_page/NewPage', status=200)
+        res = self.testapp.get('/add_page/NewPage', status=302).follow()
         self.assertTrue(b'Login' in res.body)
 
     def test_editors_member_user_can_edit(self):
