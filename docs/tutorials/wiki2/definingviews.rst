@@ -73,7 +73,7 @@ edit it to look like the following:
 .. literalinclude:: src/views/tutorial/views/default.py
    :linenos:
    :language: python
-   :emphasize-lines: 1-9,12-70
+   :emphasize-lines: 1-9,12-68
 
 The highlighted lines need to be added or edited.
 
@@ -241,6 +241,26 @@ These templates will live in the ``templates`` directory of our tutorial
 package.  Jinja2 templates must have a ``.jinja2`` extension to be recognized
 as such.
 
+The ``layout.jinja2`` template
+------------------------------
+
+Replace ``tutorial/templates/layout.jinja2`` with the following content:
+
+.. literalinclude:: src/views/tutorial/templates/layout.jinja2
+   :linenos:
+   :emphasize-lines: 11,36
+   :language: html
+
+Since we're using a templating engine we can factor common boilerplate out of
+our page templates into reusable components. One method for doing this
+is template inheritance via blocks.
+
+- We have defined 2 placeholders in the layout template where a child template
+  can override the content. These blocks are named ``title`` (line 11) and
+  ``content`` (line 36).
+- Please refer to the Jinja2_ documentation for more information about
+  template inheritance.
+
 The ``view.jinja2`` template
 ----------------------------
 
@@ -249,17 +269,21 @@ content:
 
 .. literalinclude:: src/views/tutorial/templates/view.jinja2
    :linenos:
-   :emphasize-lines: 36,38-40
+   :emphasize-lines: 1,4,6-8
    :language: html
 
 This template is used by ``view_page()`` for displaying a single
 wiki page. It includes:
 
+- We begin by extending the ``layout.jinja2`` template defined above
+  which provides the skeleton of the page (line 1).
+- We override the ``content`` block from the base layout to insert our markup
+  into the body (line 3).
 - A variable that is replaced with the ``content`` value provided by the view
-  (line 36).  ``content`` contains HTML, so the ``|safe`` filter is used to
+  (line 4).  ``content`` contains HTML, so the ``|safe`` filter is used to
   prevent escaping it (e.g., changing ">" to "&gt;").
 - A link that points at the "edit" URL which invokes the ``edit_page`` view for
-  the page being viewed (lines 38-40).
+  the page being viewed (lines 6-8).
 
 The ``edit.jinja2`` template
 ----------------------------
@@ -269,18 +293,57 @@ content:
 
 .. literalinclude:: src/views/tutorial/templates/edit.jinja2
    :linenos:
-   :emphasize-lines: 42,44,47
+   :emphasize-lines: 3,12,14,17
    :language: html
 
 This template is used by ``add_page()`` and ``edit_page()`` for adding and
 editing a wiki page.  It displays a page containing a form that includes:
 
+- Again we are extending the ``layout.jinja2`` template which provides
+  the skeleton of the page.
+- Override the ``title`` block to affect the ``<title>`` tag in the
+  ``head`` of the page (line 3).
 - A 10-row by 60-column ``textarea`` field named ``body`` that is filled with
-  any existing page data when it is rendered (line 44).
-- A submit button that has the name ``form.submitted`` (line 47).
+  any existing page data when it is rendered (line 14).
+- A submit button that has the name ``form.submitted`` (line 17).
 
 The form POSTs back to the ``save_url`` argument supplied by the view (line
-42).  The view will use the ``body`` and ``form.submitted`` values.
+12).  The view will use the ``body`` and ``form.submitted`` values.
+
+The ``404.jinja2`` template
+---------------------------
+
+Replace ``tutorial/templates/404.jinja2`` with the following content:
+
+.. literalinclude:: src/views/tutorial/templates/404.jinja2
+   :linenos:
+   :language: html
+
+This template is linked from the ``notfound_view`` defined in
+``tutorial/views/notfound.py`` as shown here:
+
+.. literalinclude:: src/views/tutorial/views/notfound.py
+   :linenos:
+   :language: python
+
+There are several important things to note about this configuration:
+
+- The ``notfound_view`` in the above snippet is called an
+  :term:`exception view`. For more information see
+  :ref:`special_exceptions_in_callables`.
+- The ``notfound_view`` sets the response status to 404. It's possible to
+  affect the response object used by the renderer via
+  :ref:`request_response_attr`.
+- The ``notfound_view`` is registered as an exception view and will be invoked
+  **only** if ``pyramid.httpexceptions.HTTPNotFound`` is raised as an
+  exception. This means it will not be invoked for any responses returned
+  from a view normally. For example, on line 27 of
+  ``tutorial/views/default.py`` the exception is raised which will trigger
+  the view.
+
+Finally, you may delete the ``tutorial/templates/mytemplate.jinja2``
+template that was provided by the ``alchemy`` scaffold as we have created
+our own templates for the wiki.
 
 .. note::
 
@@ -373,3 +436,5 @@ each of the following URLs, checking that the result is as expected:
   will generate a ``NoResultFound: No row was found for one()`` error. You'll
   see an interactive traceback facility provided by
   :term:`pyramid_debugtoolbar`.
+
+.. _jinja2: http://jinja.pocoo.org/

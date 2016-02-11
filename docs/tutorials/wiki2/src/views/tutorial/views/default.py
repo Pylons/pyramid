@@ -24,7 +24,7 @@ def view_page(request):
     pagename = request.matchdict['pagename']
     page = request.dbsession.query(Page).filter_by(name=pagename).first()
     if page is None:
-        return HTTPNotFound('No such page')
+        raise HTTPNotFound('No such page')
 
     def check(match):
         word = match.group(1)
