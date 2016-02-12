@@ -4,61 +4,84 @@ Defining the Domain Model
 
 The first change we'll make to our stock ``pcreate``-generated application will
 be to define a wiki page :term:`domain model`.
-We'll do this inside our ``mymodel.py`` file.
-
-
-Edit ``mymodel.py``
--------------------
 
 .. note::
 
-  There is nothing special about the filename ``mymodel.py`` except that it
-  is a Python module.  A project may have many models throughout its codebase
-  in arbitrarily named modules.  Modules implementing models often have
-  ``model`` in their names or they may live in a Python subpackage of your
-  application package named ``models`` (as we've done in this tutorial), but
-  this is only a convention and not a requirement.
+  There is nothing special about the filename ``user.py`` or ``page.py`` except
+  that they are Python modules.  A project may have many models throughout its
+  codebase in arbitrarily named modules.  Modules implementing models often
+  have ``model`` in their names or they may live in a Python subpackage of
+  your application package named ``models`` (as we've done in this tutorial),
+  but this is only a convention and not a requirement.
 
-Open the ``tutorial/models/mymodel.py`` file and edit it to look like
-the following:
 
-.. literalinclude:: src/models/tutorial/models/mymodel.py
+Remove ``mymodel.py``
+---------------------
+
+The first thing we'll do is delete the file ``tutorial/models/mymodel.py``.
+The ``MyModel`` class is only a sample and we're not going to use it.
+
+
+Add ``user.py``
+---------------
+
+Create a new file ``tutorial/models/user.py`` with the following contents:
+
+.. literalinclude:: src/models/tutorial/models/user.py
    :linenos:
    :language: py
-   :emphasize-lines: 10-12,14-15
 
-The highlighted lines are the ones that need to be changed, as well as
-removing lines that reference ``Index``.
+This is a very basic model for a user who can authenticate with our wiki.
 
-The first thing we've done is remove the stock ``MyModel`` class
-from the generated ``models.py`` file.  The ``MyModel`` class is only a
-sample and we're not going to use it.
+We discussed briefly in the previous chapter that our models will inherit
+from a SQLAlchemy :func:`sqlalchemy.ext.declarative.declarative_base`. This
+will attach the model to our schema.
 
-Then we added a ``Page`` class.  Because this is a SQLAlchemy application,
-this class inherits from an instance of
-:func:`sqlalchemy.ext.declarative.declarative_base`.
+As you can see, our ``User`` class has a class-level attribute
+``__tablename__`` which equals the string ``users``. Our ``User`` class
+will also have class-level attributes named ``id``, ``name``,
+``password_hash`` and ``role`` (all instances of
+:class:`sqlalchemy.schema.Column`). These will map to columns in the ``users``
+table. The ``id`` attribute will be the primary key in the table. The ``name``
+attribute will be a text column, each value of which needs to be unique within
+the column. The ``password_hash`` is a nullable text attribute that will
+contain a securely hashed password [1]_. Finally, the ``role`` text attribute
+will hold the role of the user.
 
-.. literalinclude:: src/models/tutorial/models/mymodel.py
-   :pyobject: Page
+There are two helper methods that will help us later when using the
+user objects. The first is ``set_password`` which will take a raw password
+and transform it using bcrypt_ into an irreversible representation. The
+``check_password`` method will allow us to compare input passwords to
+see if they resolve to the same hash signifying a match.
+
+
+Add ``page.py``
+---------------
+
+Create a new file ``tutorial/models/page.py`` with the following contents:
+
+.. literalinclude:: src/models/tutorial/models/page.py
    :linenos:
-   :language: python
+   :language: py
 
-As you can see, our ``Page`` class has a class-level attribute
-``__tablename__`` which equals the string ``'pages'``.  This means that
-SQLAlchemy will store our wiki data in a SQL table named ``pages``.  Our
-``Page`` class will also have class-level attributes named ``id``, ``name``,
-and ``data`` (all instances of :class:`sqlalchemy.schema.Column`). These will
-map to columns in the ``pages`` table. The ``id`` attribute will be the
-primary key in the table. The ``name`` attribute will be a text attribute,
-each value of which needs to be unique within the column.  The ``data``
-attribute is a text attribute that will hold the body of each page.
+As you can see, our ``Page`` class is very similar to the ``User`` defined
+above except with attributes focused on storing information about a wiki
+page including ``id``, ``name``, and ``data``. The only new construct
+introduced here is the ``creator_id`` column which is a foreign key
+referencing the ``users`` table. Foreign keys are very useful at the
+schema-level but since we want to relate ``User`` objects with ``Page``
+objects we also define a the ``creator`` attribute which is an ORM-level
+mapping between the two tables. SQLAlchemy will automatically populate this
+value using the foreign key referencing the user. Since the foreign key
+has ``nullable=False`` we are guaranteed that an instance of ``page`` will
+have a corresponding ``page.creator`` which will be a ``User`` instance.
 
 
 Edit ``models/__init__.py``
 ---------------------------
 
 Since we are using a package for our models, we also need to update our
-``__init__.py`` file to ensure that the model is attached to the metadata.
+``__init__.py`` file to ensure that the models are attached to the metadata.
 
 Open the ``tutorial/models/__init__.py`` file and edit it to look like
 the following:
@@ -66,9 +89,10 @@ the following:
 .. literalinclude:: src/models/tutorial/models/__init__.py
    :linenos:
    :language: py
-   :emphasize-lines: 8
+   :emphasize-lines: 8,9
 
-Here we need to align our import with the name of the model ``Page``.
+Here we need to align our imports with the names of the models ``User``,
+and ``Page``.
 
 
 Edit ``scripts/initializedb.py``
@@ -77,13 +101,13 @@ Edit ``scripts/initializedb.py``
 We haven't looked at the details of this file yet, but within the ``scripts``
 directory of your ``tutorial`` package is a file named ``initializedb.py``.
 Code in this file is executed whenever we run the ``initialize_tutorial_db``
-command, as we did in the installation step of this tutorial.
+command, as we did in the installation step of this tutorial [2]_.
 
 Since we've changed our model, we need to make changes to our
 ``initializedb.py`` script.  In particular, we'll replace our import of
-``MyModel`` with one of ``Page`` and we'll change the very end of the script
-to create a ``Page`` rather than a ``MyModel`` and add it to our
-``dbsession``.
+``MyModel`` with those of ``User`` and ``Page`` and we'll change the very end
+of the script to create two ``User`` objects (``basic`` and ``editor``) and a
+``Page`` rather than a ``MyModel`` and add them to our ``dbsession``.
 
 Open ``tutorial/scripts/initializedb.py`` and edit it to look like
 the following:
@@ -91,7 +115,7 @@ the following:
 .. literalinclude:: src/models/tutorial/scripts/initializedb.py
    :linenos:
    :language: python
-   :emphasize-lines: 18,44-45
+   :emphasize-lines: 18,44-57
 
 Only the highlighted lines need to be changed.
 
@@ -164,3 +188,14 @@ up with a Python traceback on your console that ends with this exception:
    ImportError: cannot import name MyModel
 
 This will also happen if you attempt to run the tests.
+
+.. _bcrypt: https://pypi.python.org/pypi/bcrypt
+
+.. [1] We are using the bcrypt_ package from PyPI to hash our passwords
+       securely. There are other one-way hash algorithms for passwords if
+       bcrypt is an issue on your system. Just make sure that it's an
+       algorithm approved for storing passwords versus a generic one-way hash.
+
+.. [2] The command is named ``initialize_tutorial_db`` because of the mapping
+       defined in the ``[console_scripts]`` entry point of our project's
+       ``setup.py`` file.

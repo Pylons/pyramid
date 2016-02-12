@@ -17,12 +17,11 @@ class User(Base):
 
     password_hash = Column(Text)
 
-    def set_password(self, pw, pre_hashed=False):
-        if pre_hashed:
-            pwhash = pw
-        else:
-            pwhash = bcrypt.hashpw(pw, bcrypt.gensalt())
+    def set_password(self, pw):
+        pwhash = bcrypt.hashpw(pw, bcrypt.gensalt())
         self.password_hash = pwhash
 
     def check_password(self, pw):
-        return bcrypt.hashpw(pw, self.password_hash) == self.password_hash
+        if self.password_hash is not None:
+            return bcrypt.hashpw(pw, self.password_hash) == self.password_hash
+        return False
