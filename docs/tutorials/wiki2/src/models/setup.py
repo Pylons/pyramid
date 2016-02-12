@@ -9,6 +9,7 @@ with open(os.path.join(here, 'CHANGES.txt')) as f:
     CHANGES = f.read()
 
 requires = [
+    'bcrypt',
     'pyramid',
     'pyramid_jinja2',
     'pyramid_debugtoolbar',

@@ -10,6 +10,7 @@ from pyramid.view import view_config
 
 from ..models import Page
 
+
 # regular expression used to find WikiWords
 wikiwords = re.compile(r"\b([A-Z]\w+[A-Z]+\w+)")
 
@@ -42,7 +43,7 @@ def view_page(request):
     return dict(page=page, content=content, edit_url=edit_url)
 
 @view_config(route_name='add_page', renderer='../templates/edit.jinja2',
-             permission='edit')
+             permission='create')
 def add_page(request):
     pagename = request.matchdict['pagename']
     if 'form.submitted' in request.params:
