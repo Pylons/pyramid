@@ -106,28 +106,49 @@ made to both the models.py file and to the initializedb.py file. See
 
 Success will look something like this::
 
-    2015-05-24 15:34:14,542 INFO  [sqlalchemy.engine.base.Engine:1192][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
-    2015-05-24 15:34:14,542 INFO  [sqlalchemy.engine.base.Engine:1193][MainThread] ()
-    2015-05-24 15:34:14,543 INFO  [sqlalchemy.engine.base.Engine:1192][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
-    2015-05-24 15:34:14,543 INFO  [sqlalchemy.engine.base.Engine:1193][MainThread] ()
-    2015-05-24 15:34:14,543 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] PRAGMA table_info("pages")
-    2015-05-24 15:34:14,544 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
-    2015-05-24 15:34:14,544 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] 
-    CREATE TABLE pages (
-            id INTEGER NOT NULL, 
-            name TEXT, 
-            data TEXT, 
-            PRIMARY KEY (id), 
-            UNIQUE (name)
-    )
+  2016-02-12 01:06:35,855 INFO  [sqlalchemy.engine.base.Engine:1192][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
+  2016-02-12 01:06:35,855 INFO  [sqlalchemy.engine.base.Engine:1193][MainThread] ()
+  2016-02-12 01:06:35,855 INFO  [sqlalchemy.engine.base.Engine:1192][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
+  2016-02-12 01:06:35,855 INFO  [sqlalchemy.engine.base.Engine:1193][MainThread] ()
+  2016-02-12 01:06:35,856 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] PRAGMA table_info("pages")
+  2016-02-12 01:06:35,856 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
+  2016-02-12 01:06:35,856 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] PRAGMA table_info("users")
+  2016-02-12 01:06:35,856 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
+  2016-02-12 01:06:35,857 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread]
+  CREATE TABLE users (
+    id INTEGER NOT NULL,
+    name TEXT NOT NULL,
+    role TEXT NOT NULL,
+    password_hash TEXT,
+    CONSTRAINT pk_users PRIMARY KEY (id),
+    CONSTRAINT uq_users_name UNIQUE (name)
+  )
 
 
-    2015-05-24 15:34:14,545 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
-    2015-05-24 15:34:14,546 INFO  [sqlalchemy.engine.base.Engine:686][MainThread] COMMIT
-    2015-05-24 15:34:14,548 INFO  [sqlalchemy.engine.base.Engine:646][MainThread] BEGIN (implicit)
-    2015-05-24 15:34:14,549 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] INSERT INTO pages (name, data) VALUES (?, ?)
-    2015-05-24 15:34:14,549 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ('FrontPage', 'This is the front page')
-    2015-05-24 15:34:14,550 INFO  [sqlalchemy.engine.base.Engine:686][MainThread] COMMIT
+  2016-02-12 01:06:35,857 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
+  2016-02-12 01:06:35,858 INFO  [sqlalchemy.engine.base.Engine:686][MainThread] COMMIT
+  2016-02-12 01:06:35,858 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread]
+  CREATE TABLE pages (
+    id INTEGER NOT NULL,
+    name TEXT NOT NULL,
+    data INTEGER NOT NULL,
+    creator_id INTEGER NOT NULL,
+    CONSTRAINT pk_pages PRIMARY KEY (id),
+    CONSTRAINT uq_pages_name UNIQUE (name),
+    CONSTRAINT fk_pages_creator_id_users FOREIGN KEY(creator_id) REFERENCES users (id)
+  )
+
+
+  2016-02-12 01:06:35,859 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
+  2016-02-12 01:06:35,859 INFO  [sqlalchemy.engine.base.Engine:686][MainThread] COMMIT
+  2016-02-12 01:06:36,383 INFO  [sqlalchemy.engine.base.Engine:646][MainThread] BEGIN (implicit)
+  2016-02-12 01:06:36,384 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] INSERT INTO users (name, role, password_hash) VALUES (?, ?, ?)
+  2016-02-12 01:06:36,384 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ('editor', 'editor', '$2b$12$bSr5QR3wFs1LAnld7R94e.TXPj7DVoTxu2hA1kY6rm.Q3cAhD.AQO')
+  2016-02-12 01:06:36,384 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] INSERT INTO users (name, role, password_hash) VALUES (?, ?, ?)
+  2016-02-12 01:06:36,384 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ('basic', 'basic', '$2b$12$.v0BQK2xWEQOnywbX2BFs.qzXo5Qf9oZohGWux/MOSj6Z.pVaY2Z6')
+  2016-02-12 01:06:36,385 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] INSERT INTO pages (name, data, creator_id) VALUES (?, ?, ?)
+  2016-02-12 01:06:36,385 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ('FrontPage', 'This is the front page', 1)
+  2016-02-12 01:06:36,385 INFO  [sqlalchemy.engine.base.Engine:686][MainThread] COMMIT
 
 View the application in a browser
 ---------------------------------

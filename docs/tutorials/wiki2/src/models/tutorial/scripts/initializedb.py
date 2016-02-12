@@ -45,9 +45,9 @@ def main(argv=sys.argv):
         editor.set_password('editor')
         dbsession.add(editor)
 
-        viewer = User(name='viewer', role='viewer')
-        viewer.set_password('viewer')
-        dbsession.add(viewer)
+        basic = User(name='basic', role='basic')
+        basic.set_password('basic')
+        dbsession.add(basic)
 
         page = Page(
             name='FrontPage',
