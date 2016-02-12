@@ -21,12 +21,14 @@ We'll be using an SQLite database to hold our wiki data, and we'll be using
 
 Within the database, we will define two tables:
 
-- The `users` table which will store the `name`, `password_hash` and `role`.
+- The `users` table which will store the `id`, `name`, `password_hash` and
+  `role` of each wiki user.
 - The `pages` table, whose elements will store the wiki pages.
-  There are three columns: `name`, `data` and `creator_id`.
+  There are four columns: `id`, `name`, `data` and `creator_id`.
 
 There is a one-to-many relationship between `users` and `pages` tracking
-the user who created each wiki page.
+the user who created each wiki page defined by the `creator_id` column on the
+`pages` table.
 
 URLs like ``/PageName`` will try to find an element in the `pages` table that
 has a corresponding name.
