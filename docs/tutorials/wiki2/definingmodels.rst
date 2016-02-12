@@ -37,6 +37,36 @@ Open ``tutorial/setup.py`` and edit it to look like the following:
 Only the highlighted line needs to be added.
 
 
+Running ``setup.py develop``
+============================
+
+Since a new software dependency was added, you will need to run ``python
+setup.py develop`` again inside the root of the ``tutorial`` package to obtain
+and register the newly added dependency distribution.
+
+Make sure your current working directory is the root of the project (the
+directory in which ``setup.py`` lives) and execute the following command.
+
+On UNIX:
+
+.. code-block:: bash
+
+   $ cd tutorial
+   $ $VENV/bin/python setup.py develop
+
+On Windows:
+
+.. code-block:: text
+
+   c:\pyramidtut> cd tutorial
+   c:\pyramidtut\tutorial> %VENV%\Scripts\python setup.py develop
+
+Success executing this command will end with a line to the console something
+like this::
+
+   Finished processing dependencies for tutorial==0.0
+
+
 Remove ``mymodel.py``
 ---------------------
 

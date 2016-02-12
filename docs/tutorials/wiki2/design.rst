@@ -6,7 +6,7 @@ Following is a quick overview of the design of our wiki application to help us
 understand the changes that we will be making as we work through the tutorial.
 
 Overall
--------
+=======
 
 We choose to use :term:`reStructuredText` markup in the wiki text. Translation
 from reStructuredText to HTML is provided by the widely used ``docutils``
@@ -14,7 +14,7 @@ Python module.  We will add this module in the dependency list on the project
 ``setup.py`` file.
 
 Models
-------
+======
 
 We'll be using an SQLite database to hold our wiki data, and we'll be using
 :term:`SQLAlchemy` to access the data in this database.
@@ -41,7 +41,7 @@ be created when the storage is initialized, and will be used as the wiki home
 page.
 
 Wiki Views
-----------
+==========
 
 There will be three views to handle the normal operations of adding, editing,
 and viewing wiki pages, plus one view for the wiki front page. Two templates
@@ -53,7 +53,7 @@ designer-friendly templating language for Python, modeled after Django's
 templates.
 
 Security
---------
+========
 
 We'll eventually be adding security to our application.  To do this, we'll
 be using a very simple role-based security model. We'll assign a single
@@ -92,7 +92,7 @@ handling login and logout as well as two exception views for handling
 invalid access attempts and unhandled URLs.
 
 Summary
--------
+=======
 
 The URL, actions, template, and permission associated to each view are listed
 in the following table:
