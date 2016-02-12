@@ -15,7 +15,7 @@ from ..models import (
     get_session_factory,
     get_tm_session,
     )
-from ..models import Page
+from ..models import Page, User
 
 
 def usage(argv):
@@ -41,5 +41,17 @@ def main(argv=sys.argv):
     with transaction.manager:
         dbsession = get_tm_session(session_factory, transaction.manager)
 
-        page = Page(name='FrontPage', data='This is the front page')
+        editor = User(name='editor', role='editor')
+        editor.set_password('editor')
+        dbsession.add(editor)
+
+        basic = User(name='basic', role='basic')
+        basic.set_password('basic')
+        dbsession.add(basic)
+
+        page = Page(
+            name='FrontPage',
+            creator=editor,
+            data='This is the front page',
+        )
         dbsession.add(page)
