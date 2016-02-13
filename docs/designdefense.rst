@@ -1409,7 +1409,9 @@ great fit for very large applications and applications that need to be
 arbitrarily extensible.
 
 
-"Stacked Object Proxies" Are Too Clever / Thread Locals Are A Nuisance
+.. _thread_local_nuisance:
+
+"Stacked object proxies" are too clever / thread locals are a nuisance
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 Some microframeworks use the ``import`` statement to get a handle to an
@@ -1452,32 +1454,33 @@ code below:
        for i in range(10):
            print(i)
 
-By its nature, the *request* object created as the result of a WSGI server's
-call into a long-lived web framework cannot be global, because the lifetime
-of a single request will be much shorter than the lifetime of the process
-running the framework.  A request object created by a web framework actually
-has more similarity to the ``i`` loop counter in our example above than it
-has to any comparable importable object defined in the Python standard
+By its nature, the *request* object that is created as the result of a WSGI
+server's call into a long-lived web framework cannot be global, because the
+lifetime of a single request will be much shorter than the lifetime of the
+process running the framework.  A request object created by a web framework
+actually has more similarity to the ``i`` loop counter in our example above
+than it has to any comparable importable object defined in the Python standard
 library or in normal library code.
 
 However, systems which use stacked object proxies promote locally scoped
-objects such as ``request`` out to module scope, for the purpose of being
+objects, such as ``request``, out to module scope, for the purpose of being
 able to offer users a nice spelling involving ``import``.  They, for what I
-consider dubious reasons, would rather present to their users the canonical
-way of getting at a ``request`` as ``from framework import request`` instead
-of a saner ``from myframework.threadlocals import get_request; request =
-get_request()`` even though the latter is more explicit.
+consider dubious reasons, would rather present to their users the canonical way
+of getting at a ``request`` as ``from framework import request`` instead of a
+saner ``from myframework.threadlocals import get_request; request =
+get_request()``, even though the latter is more explicit.
 
 It would be *most* explicit if the microframeworks did not use thread local
-variables at all.  Pyramid view functions are passed a request object; many
-of Pyramid's APIs require that an explicit request object be passed to them.
-It is *possible* to retrieve the current Pyramid request as a threadlocal
-variable but it is a "in case of emergency, break glass" type of activity.
-This explicitness makes Pyramid view functions more easily unit testable, as
-you don't need to rely on the framework to manufacture suitable "dummy"
-request (and other similarly-scoped) objects during test setup.  It also
-makes them more likely to work on arbitrary systems, such as async servers
-that do no monkeypatching.
+variables at all. Pyramid view functions are passed a request object. Many of
+Pyramid's APIs require that an explicit request object be passed to them. It is
+*possible* to retrieve the current Pyramid request as a threadlocal variable,
+but it is an "in case of emergency, break glass" type of activity. This
+explicitness makes Pyramid view functions more easily unit testable, as you
+don't need to rely on the framework to manufacture suitable "dummy" request
+(and other similarly-scoped) objects during test setup.  It also makes them
+more likely to work on arbitrary systems, such as async servers, that do no
+monkeypatching.
+
 
 Explicitly WSGI
 +++++++++++++++
