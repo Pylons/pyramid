@@ -1478,6 +1478,8 @@ more likely to work on arbitrary systems, such as async servers, that do no
 monkeypatching.
 
 
+.. _explicitly_wsgi:
+
 Explicitly WSGI
 +++++++++++++++
 
@@ -1490,29 +1492,29 @@ import a WSGI server and use it to serve up their Pyramid application as per
 the documentation of that WSGI server.
 
 The extra lines saved by abstracting away the serving step behind ``run()``
-seem to have driven dubious second-order decisions related to API in some
-microframeworks.  For example, Bottle contains a ``ServerAdapter`` subclass
-for each type of WSGI server it supports via its ``app.run()`` mechanism.
-This means that there exists code in ``bottle.py`` that depends on the
-following modules: ``wsgiref``, ``flup``, ``paste``, ``cherrypy``, ``fapws``,
+seems to have driven dubious second-order decisions related to its API in some
+microframeworks. For example, Bottle contains a ``ServerAdapter`` subclass for
+each type of WSGI server it supports via its ``app.run()`` mechanism. This
+means that there exists code in ``bottle.py`` that depends on the following
+modules: ``wsgiref``, ``flup``, ``paste``, ``cherrypy``, ``fapws``,
 ``tornado``, ``google.appengine``, ``twisted.web``, ``diesel``, ``gevent``,
-``gunicorn``, ``eventlet``, and ``rocket``.  You choose the kind of server
-you want to run by passing its name into the ``run`` method.  In theory, this
-sounds great: I can try Bottle out on ``gunicorn`` just by passing in a name!
-However, to fully test Bottle, all of these third-party systems must be
-installed and functional; the Bottle developers must monitor changes to each
-of these packages and make sure their code still interfaces properly with
-them.  This expands the packages required for testing greatly; this is a
-*lot* of requirements.  It is likely difficult to fully automate these tests
-due to requirements conflicts and build issues.
+``gunicorn``, ``eventlet``, and ``rocket``. You choose the kind of server you
+want to run by passing its name into the ``run`` method. In theory, this sounds
+great: I can try out Bottle on ``gunicorn`` just by passing in a name! However,
+to fully test Bottle, all of these third-party systems must be installed and
+functional. The Bottle developers must monitor changes to each of these
+packages and make sure their code still interfaces properly with them. This
+increases the number of packages required for testing greatly; this is a *lot*
+of requirements. It is likely difficult to fully automate these tests due to
+requirements conflicts and build issues.
 
 As a result, for single-file apps, we currently don't bother to offer a
-``run()`` shortcut; we tell folks to import their WSGI server of choice and
-run it by hand.  For the people who want a server abstraction layer, we
-suggest that they use PasteDeploy.  In PasteDeploy-based systems, the onus
-for making sure that the server can interface with a WSGI application is
-placed on the server developer, not the web framework developer, making it
-more likely to be timely and correct.
+``run()`` shortcut. We tell folks to import their WSGI server of choice and run
+it by hand. For the people who want a server abstraction layer, we suggest that
+they use PasteDeploy.  In PasteDeploy-based systems, the onus for making sure
+that the server can interface with a WSGI application is placed on the server
+developer, not the web framework developer, making it more likely to be timely
+and correct.
 
 Wrapping Up
 +++++++++++
