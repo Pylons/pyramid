@@ -101,7 +101,7 @@ something like:
 
 The highlighted lines are the ones that need to be added or edited.
 
-.. warn::
+.. warning::
 
    The order of the routes is important! If you placed
    ``/{pagename}/edit_page`` **before** ``/add_page/{pagename}`` then we would
