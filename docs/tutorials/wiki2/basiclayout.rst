@@ -74,13 +74,54 @@ exact setup of the models will be covered later.
   :lineno-match:
   :language: py
 
-``main`` now calls :meth:`pyramid.config.Configurator.add_static_view` with
-two arguments: ``static`` (the name), and ``static`` (the path):
+Next include the ``routes`` module using a dotted Python path. This module
+will be explained in the next section.
 
 .. literalinclude:: src/basiclayout/tutorial/__init__.py
   :lines: 10
   :lineno-match:
   :language: py
+
+.. note::
+
+   Pyramid's :meth:`pyramid.config.Configurator.include` method is the
+   primary mechanism for extending the configurator and breaking your code
+   into feature-focused modules.
+
+``main`` next calls the ``scan`` method of the configurator
+(:meth:`pyramid.config.Configurator.scan`), which will recursively scan our
+``tutorial`` package, looking for ``@view_config`` (and
+other special) decorators.  When it finds a ``@view_config`` decorator, a
+view configuration will be registered, which will allow one of our
+application URLs to be mapped to some code.
+
+.. literalinclude:: src/basiclayout/tutorial/__init__.py
+  :lines: 11
+  :lineno-match:
+  :language: py
+
+Finally ``main`` is finished configuring things, so it uses the
+:meth:`pyramid.config.Configurator.make_wsgi_app` method to return a
+:term:`WSGI` application:
+
+.. literalinclude:: src/basiclayout/tutorial/__init__.py
+  :lines: 12
+  :lineno-match:
+  :language: py
+
+
+Route declarations
+------------------
+
+Open the ``tutorials/routes.py`` file. It should already contain the
+following:
+
+.. literalinclude:: src/basiclayout/tutorial/routes.py
+  :linenos:
+  :language: py
+
+First, on line 2, call :meth:`pyramid.config.Configurator.add_static_view`
+with two arguments: ``static`` (the name), and ``static`` (the path).
 
 This registers a static resource view which will match any URL that starts
 with the prefix ``/static`` (by virtue of the first argument to
@@ -92,38 +133,11 @@ starts with ``/static`` should go to the static view; any remainder of its
 path (e.g. the ``/foo`` in ``/static/foo``) will be used to compose a path to
 a static file resource, such as a CSS file.
 
-Using the configurator ``main`` also registers a :term:`route configuration`
+Second, on line 3, the module registers a :term:`route configuration`
 via the :meth:`pyramid.config.Configurator.add_route` method that will be
-used when the URL is ``/``:
-
-.. literalinclude:: src/basiclayout/tutorial/__init__.py
-  :lines: 11
-  :lineno-match:
-  :language: py
-
-Since this route has a ``pattern`` equaling ``/``, it is the route that will
-be matched when the URL ``/`` is visited, e.g., ``http://localhost:6543/``.
-
-``main`` next calls the ``scan`` method of the configurator
-(:meth:`pyramid.config.Configurator.scan`), which will recursively scan our
-``tutorial`` package, looking for ``@view_config`` (and
-other special) decorators.  When it finds a ``@view_config`` decorator, a
-view configuration will be registered, which will allow one of our
-application URLs to be mapped to some code.
-
-.. literalinclude:: src/basiclayout/tutorial/__init__.py
-  :lines: 12
-  :lineno-match:
-  :language: py
-
-Finally ``main`` is finished configuring things, so it uses the
-:meth:`pyramid.config.Configurator.make_wsgi_app` method to return a
-:term:`WSGI` application:
-
-.. literalinclude:: src/basiclayout/tutorial/__init__.py
-  :lines: 13
-  :lineno-start: 13
-  :language: py
+used when the URL is ``/``. Since this route has a ``pattern`` equaling
+``/``, it is the route that will be matched when the URL ``/`` is visited,
+e.g., ``http://localhost:6543/``.
 
 
 View declarations via the ``views`` package

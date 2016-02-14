@@ -46,19 +46,19 @@ were provided at the time we created the project.
 
 As an example, the CSS file will be accessed via
 ``http://localhost:6543/static/theme.css`` by virtue of the call to the
-``add_static_view`` directive we've made in the ``__init__.py`` file.  Any
+``add_static_view`` directive we've made in the ``routes.py`` file.  Any
 number and type of static assets can be placed in this directory (or
 subdirectories) and are just referred to by URL or by using the convenience
 method ``static_url``, e.g.,
 ``request.static_url('<package>:static/foo.css')`` within templates.
 
-Adding routes to ``__init__.py``
-================================
+Adding routes to ``routes.py``
+==============================
 
 This is the URL Dispatch tutorial and so let's start by adding some
 URL patterns to our app. Later we'll attach views to handle the URLs.
 
-The ``__init__.py`` file contains
+The ``routes.py`` file contains
 :meth:`pyramid.config.Configurator.add_route` calls which serve to add routes
 to our application.  First, we’ll get rid of the existing route created by
 the template using the name ``'home'``. It’s only an example and isn’t
@@ -66,7 +66,7 @@ relevant to our application.
 
 We then need to add four calls to ``add_route``.  Note that the *ordering* of
 these declarations is very important.  ``route`` declarations are matched in
-the order they're found in the ``__init__.py`` file.
+the order they're registered.
 
 #. Add a declaration which maps the pattern ``/`` (signifying the root URL)
    to the route named ``view_wiki``.  It maps to our ``view_wiki`` view
@@ -91,12 +91,11 @@ the order they're found in the ``__init__.py`` file.
    attached to the ``edit_page`` view function indicating
    ``route_name='edit_page'``.
 
-As a result of our edits, the ``__init__.py`` file should look
-something like:
+As a result of our edits, the ``routes.py`` file should look something like:
 
-.. literalinclude:: src/views/tutorial/__init__.py
+.. literalinclude:: src/views/tutorial/routes.py
    :linenos:
-   :emphasize-lines: 11-14
+   :emphasize-lines: 3-6
    :language: python
 
 The highlighted lines are the ones that need to be added or edited.
