@@ -345,7 +345,7 @@ Create ``tutorial/templates/view.jinja2`` and add the following content:
 
 .. literalinclude:: src/views/tutorial/templates/view.jinja2
    :linenos:
-   :emphasize-lines: 1,4,6-8
+   :emphasize-lines: 1,3,6
    :language: html
 
 This template is used by ``view_page()`` for displaying a single wiki page.
@@ -402,6 +402,7 @@ This template is linked from the ``notfound_view`` defined in
 
 .. literalinclude:: src/views/tutorial/views/notfound.py
    :linenos:
+   :emphasize-lines: 6
    :language: python
 
 There are several important things to note about this configuration:
@@ -409,8 +410,8 @@ There are several important things to note about this configuration:
 - The ``notfound_view`` in the above snippet is called an
   :term:`exception view`. For more information see
   :ref:`special_exceptions_in_callables`.
-- The ``notfound_view`` sets the response status to 404. It's possible to
-  affect the response object used by the renderer via
+- The ``notfound_view`` sets the response status to 404. It's possible
+  to affect the response object used by the renderer via
   :ref:`request_response_attr`.
 - The ``notfound_view`` is registered as an exception view and will be invoked
   **only** if ``pyramid.httpexceptions.HTTPNotFound`` is raised as an
