@@ -109,7 +109,7 @@ For Linux, the commands to do so are as follows:
 
 For Windows:
 
-.. code-block:: ps1con
+.. code-block:: powershell
 
     # Windows
     c:\> cd \
