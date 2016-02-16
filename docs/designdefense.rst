@@ -1516,11 +1516,11 @@ that the server can interface with a WSGI application is placed on the server
 developer, not the web framework developer, making it more likely to be timely
 and correct.
 
-Wrapping Up
+Wrapping up
 +++++++++++
 
-Here's a diagrammed version of the simplest pyramid application, where
-comments take into account what we've discussed in the
+Here's a diagrammed version of the simplest pyramid application, where the
+inlined comments take into account what we've discussed in the
 :ref:`microframeworks_smaller_hello_world` section.
 
 .. code-block:: python
@@ -1531,15 +1531,16 @@ comments take into account what we've discussed in the
 
    def hello_world(request):  # accepts a request; no request thread local reqd
        # explicit response object means no response threadlocal
-       return Response('Hello world!') 
+       return Response('Hello world!')
 
    if __name__ == '__main__':
        from pyramid.config import Configurator
-       config = Configurator()       # no global application object.
+       config = Configurator()       # no global application object
        config.add_view(hello_world)  # explicit non-decorator registration
        app = config.make_wsgi_app()  # explicitly WSGI
        server = make_server('0.0.0.0', 8080, app)
        server.serve_forever()        # explicitly WSGI
+
 
 Pyramid Doesn't Offer Pluggable Apps
 ------------------------------------
