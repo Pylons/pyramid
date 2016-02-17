@@ -18,10 +18,12 @@ class User(Base):
     password_hash = Column(Text)
 
     def set_password(self, pw):
-        pwhash = bcrypt.hashpw(pw, bcrypt.gensalt())
+        pwhash = bcrypt.hashpw(pw.encode('utf8'), bcrypt.gensalt())
         self.password_hash = pwhash
 
     def check_password(self, pw):
         if self.password_hash is not None:
-            return bcrypt.hashpw(pw, self.password_hash) == self.password_hash
+            expected_hash = self.password_hash.encode('utf8')
+            actual_hash = bcrypt.hashpw(pw.encode('utf8'), expected_hash)
+            return expected_hash == actual_hash
         return False
