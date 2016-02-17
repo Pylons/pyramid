@@ -39,7 +39,7 @@ def view_page(request):
 
     content = publish_parts(page.data, writer_name='html')['html_body']
     content = wikiwords.sub(add_link, content)
-    edit_url = request.route_url('edit_page', pagename=pagename)
+    edit_url = request.route_url('edit_page', pagename=page.name)
     return dict(page=page, content=content, edit_url=edit_url)
 
 @view_config(route_name='edit_page', renderer='../templates/edit.jinja2')
@@ -51,12 +51,12 @@ def edit_page(request):
         raise HTTPForbidden
     if 'form.submitted' in request.params:
         page.data = request.params['body']
-        next_url = request.route_url('view_page', pagename=pagename)
+        next_url = request.route_url('view_page', pagename=page.name)
         return HTTPFound(location=next_url)
     return dict(
         pagename=page.name,
         pagedata=page.data,
-        save_url=request.route_url('edit_page', pagename=pagename),
+        save_url=request.route_url('edit_page', pagename=page.name),
         )
 
 @view_config(route_name='add_page', renderer='../templates/edit.jinja2')
