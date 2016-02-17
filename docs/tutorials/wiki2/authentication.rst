@@ -38,7 +38,7 @@ Create a new file ``tutorial/security.py``:
 
 .. literalinclude:: src/authentication/tutorial/security.py
    :linenos:
-   :emphasize-lines: 9,14,28
+   :emphasize-lines: 9,14,21-27
    :language: python
 
 Here we've defined:

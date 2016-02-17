@@ -22,7 +22,6 @@ def includeme(config):
         settings['auth.secret'],
         hashalg='sha512',
     )
-
     config.set_authentication_policy(authn_policy)
     config.set_authorization_policy(ACLAuthorizationPolicy())
     config.add_request_method(get_user, 'user', reify=True)
