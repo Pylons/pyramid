@@ -49,7 +49,7 @@ Here we've defined:
   the :term:`userid` using a signed cookie.
 * A ``get_user`` function which can convert the ``unauthenticated_userid``
   from the policy into a ``User`` object from our database.
-* Finally, the ``get_user`` is registered on the request as ``request.user``
+* The ``get_user`` is registered on the request as ``request.user``
   to be used throughout our application as the authenticated ``User`` object
   for the logged-in user.
 

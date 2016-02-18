@@ -4,342 +4,216 @@
 Adding authorization
 ====================
 
-:app:`Pyramid` provides facilities for :term:`authentication` and
-:term:`authorization`.  We'll make use of both features to provide security
-to our application.  Our application currently allows anyone with access to
-the server to view, edit, and add pages to our wiki.  We'll change that to
-allow only people who are members of a *group* named ``group:editors`` to add
-and edit wiki pages but we'll continue allowing anyone with access to the
-server to view pages.
+In the last chapter we built :term:`authentication` into our wiki2. We also
+went one step further and used the ``request.user`` object to perform some explicit :term:`authorization` checks. This is fine for a lot of
+applications but :app:`Pyramid` provides some facilities for cleaning this
+up and decoupling the constraints from the view function itself.
 
-We will also add a login page and a logout link on all the pages.  The login
-page will be shown when a user is denied access to any of the views that
-require permission, instead of a default "403 Forbidden" page.
+We will implement access control with the following steps:
 
-We will implement the access control with the following steps:
-
-* Add users and groups (``security/default.py``, a new subpackage).
-* Add an :term:`ACL` (``models/mymodel.py`` and ``__init__.py``).
-* Add an :term:`authentication policy` and an :term:`authorization policy`
-  (``__init__.py``).
-* Add :term:`permission` declarations to the ``edit_page`` and ``add_page``
-  views (``views/default.py``).
-
-Then we will add the login and logout feature:
-
-* Add routes for /login and /logout (``__init__.py``).
-* Add ``login`` and ``logout`` views (``views/default.py``).
-* Add a login template (``login.jinja2``).
-* Make the existing views return a ``logged_in`` flag to the renderer
+* Update the :term:`authentication policy` to break down the
+  :term:`userid` into a list of :term:`principals <principal>`
+  (``security.py``).
+* Define an :term:`authorization policy` for mapping users, resources and
+  permissions (``security.py``).
+* Add new :term:`resource` definitions that will be used as the
+  :term:`context` for the wiki pages (``routes.py``).
+* Add an :term:`ACL` to each resource (``routes.py``).
+* Replace the inline checks on the views with :term:`permission` declarations
   (``views/default.py``).
-* Add a "Logout" link to be shown when logged in and viewing or editing a page
-  (``view.jinja2``, ``edit.jinja2``).
 
+Add user principals
+-------------------
 
-Access control
---------------
+A :term:`principal` is a level of abstraction on top of the raw
+:term:`userid` that describes the user in terms of capabilities, roles or
+other identifiers that are easier to generalize. The permissions are then
+written against the principals without focusing on the exact user involved.
 
-Add users and groups
-~~~~~~~~~~~~~~~~~~~~
+:app:`Pyramid` defines two builtin principals used in every application:
+:attr:`pyramid.security.Everyone` and :attr:`pyramid.security.Authenticated`.
+On top of these we have already mentioned the required principals for this
+application in the original design. The user has two possible roles:
+``editor`` and ``basic``. These will be prefixed by the ``role:``
+string to avoid clasing with any other types of principals.
 
-Create a new ``tutorial/security/default.py`` subpackage with the
-following content:
+Open the file ``tutorial/security.py`` and edit the following lines:
 
-.. literalinclude:: src/authorization/tutorial/security/default.py
+.. literalinclude:: src/authorization/tutorial/security.py
    :linenos:
-   :language: python
-
-The ``groupfinder`` function accepts a userid and a request and
-returns one of these values:
-
-- If the userid exists in the system, it will return a sequence of group
-  identifiers (or an empty sequence if the user isn't a member of any groups).
-- If the userid *does not* exist in the system, it will return ``None``.
-
-For example, ``groupfinder('editor', request )`` returns ``['group:editor']``,
-``groupfinder('viewer', request)`` returns ``[]``, and ``groupfinder('admin',
-request)`` returns ``None``.  We will use ``groupfinder()`` as an
-:term:`authentication policy` "callback" that will provide the
-:term:`principal` or principals for a user.
-
-In a production system, user and group data will most often come from a
-database, but here we use "dummy" data to represent user and groups sources.
-
-Add an ACL
-~~~~~~~~~~
-
-Open ``tutorial/models/mymodel.py`` and add the following import
-statement at the top:
-
-.. literalinclude:: src/authorization/tutorial/models/mymodel.py
-   :lines: 1-4
-   :language: python
-
-Add the following class definition at the end:
-
-.. literalinclude:: src/authorization/tutorial/models/mymodel.py
-   :lines: 22-29
-   :language: python
-
-We import :data:`~pyramid.security.Allow`, an action that means that
-permission is allowed, and :data:`~pyramid.security.Everyone`, a special
-:term:`principal` that is associated to all requests.  Both are used in the
-:term:`ACE` entries that make up the ACL.
-
-The ACL is a list that needs to be named `__acl__` and be an attribute of a
-class.  We define an :term:`ACL` with two :term:`ACE` entries.  The first entry
-allows any user (``Everyone``) the `view` permission.  The second entry allows
-the ``group:editors`` principal the `edit` permission.
-
-The ``RootFactory`` class that contains the ACL is a :term:`root factory`. We
-need to associate it to our :app:`Pyramid` application, so the ACL is provided
-to each view in the :term:`context` of the request as the ``context``
-attribute.
-
-Open ``tutorial/__init__.py`` and define a new root factory using
-:meth:`pyramid.config.Configurator.set_root_factory` using the class that we
-created above:
-
-.. literalinclude:: src/authorization/tutorial/__init__.py
-   :lines: 14-17
-   :emphasize-lines: 17
-   :language: python
-
-Only the highlighted line needs to be added.
-
-We are now providing the ACL to the application.  See :ref:`assigning_acls`
-for more information about what an :term:`ACL` represents.
-
-.. note:: Although we don't use the functionality here, the ``factory`` used
-   to create route contexts may differ per-route as opposed to globally.  See
-   the ``factory`` argument to :meth:`pyramid.config.Configurator.add_route`
-   for more info.
-
-Add authentication and authorization policies
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Open ``tutorial/__init__.py`` and add the highlighted import
-statements:
-
-.. literalinclude:: src/authorization/tutorial/__init__.py
-   :lines: 1-5
-   :emphasize-lines: 2-5
-   :language: python
-
-Now add those policies to the configuration:
-
-.. literalinclude:: src/authorization/tutorial/__init__.py
-   :lines: 11-19
-   :emphasize-lines: 1-3,8-9
+   :emphasize-lines: 3-6,17-24
    :language: python
 
 Only the highlighted lines need to be added.
 
-We are enabling an ``AuthTktAuthenticationPolicy``, which is based in an auth
-ticket that may be included in the request. We are also enabling an
-``ACLAuthorizationPolicy``, which uses an ACL to determine the *allow* or
-*deny* outcome for a view.
+Note that the role comes from the ``User`` object and finally we also
+add the ``user.id`` as a principal for when we want to allow that exact
+user to edit page's they've created.
 
-Note that the :class:`pyramid.authentication.AuthTktAuthenticationPolicy`
-constructor accepts two arguments: ``secret`` and ``callback``.  ``secret`` is
-a string representing an encryption key used by the "authentication ticket"
-machinery represented by this policy; it is required.  The ``callback`` is the
-``groupfinder()`` function that we created before.
+Add the authorization policy
+----------------------------
 
+We already added the :term:`authorization policy` in the previous chapter
+because :app:`Pyramid` requires one when adding an
+:term:`authentication policy`. However, it was not used anywhere and so we'll
+mention it now.
 
-Add permission declarations
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Open the file ``tutorial/security.py`` and notice the following lines:
 
-Open ``tutorial/views/default.py`` and add a ``permission='view'``
-parameter to the ``@view_config`` decorator for ``view_wiki()`` and
-``view_page()`` as follows:
+.. literalinclude:: src/authorization/tutorial/security.py
+   :lines: 38-40
+   :lineno-match:
+   :emphasize-lines: 2
+   :language: python
+
+We're using the :class:`pyramid.authorization.ACLAuthorizationPolicy` which
+will suffice for most applications. It uses the :term:`context` to define
+the mapping between a :term:`principal` and :term:`permission` for the
+current request via the ``__acl__``.
+
+Add resources and ACLs
+----------------------
+
+Resources are the hidden gem of :app:`Pyramid`. You've made it!
+
+Every URL in a web application is representing a :term:`resource`
+(the **R** in Uniform Resource Locator). Often the resource is something
+in your data model but it could also be an abstraction over many models.
+
+Our wiki has two resources:
+
+#. A ``PageResource``. Represents a ``Page`` that is to be viewed or edited.
+   Only ``editor`` users as well as the original creator of the ``Page``
+   may edit the ``PageResource`` but anyone may view it.
+
+#. A ``NewPage``. Represents a potential ``Page`` that does not exist.
+   Any logged-in user (roles ``basic`` or ``editor``) can create pages.
+
+.. note::
+
+   The wiki data model is simple enough that the ``PageResource`` is
+   actually mostly redundant with our ``models.Page`` SQLAlchemy class. It is
+   completely valid to combine these into one class. However, for this
+   tutorial they are explicitly separated to make it clear the
+   parts that :app:`Pyramid` cares about versus application-defined objects.
+
+There are many ways to define these resources, and they can even be grouped
+into collections with a hierarchy. However, we're keeping it simple here!
+
+Open the file ``tutorial/routes.py`` and edit the following lines:
+
+.. literalinclude:: src/authorization/tutorial/routes.py
+   :linenos:
+   :emphasize-lines: 1-7,14-50
+   :language: python
+
+The highlighted lines need to be edited or added.
+
+The ``NewPage`` has an ``__acl__`` on it that returns a list of
+mappings from :term:`principal` to :term:`permission`. This defines **who**
+can do **what** with that :term:`resource`. In our case we want to only
+allow users with the principals ``role:editor`` and ``role:basic`` to
+have the ``create`` permission:
+
+.. literalinclude:: src/authorization/tutorial/routes.py
+   :lines: 20-32
+   :lineno-match:
+   :emphasize-lines: 11,12
+   :language: python
+
+The ``NewPage`` is loaded as the :term:`context` of the ``add_page``
+route by declaring a ``factory`` on the route:
+
+.. literalinclude:: src/authorization/tutorial/routes.py
+   :lines: 15-16
+   :lineno-match:
+   :emphasize-lines: 2
+   :language: python
+
+The ``PageResource`` defines the :term:`ACL` for a ``Page``. It uses an
+actual ``Page`` object to determine **who** can do **what** to the page.
+
+.. literalinclude:: src/authorization/tutorial/routes.py
+   :lines: 34-50
+   :lineno-match:
+   :emphasize-lines: 14-16
+   :language: python
+
+The ``PageResource`` is loaded as the :term:`context` of the ``view_page``
+and ``edit_page`` route by declaring a ``factory`` on the routes:
+
+.. literalinclude:: src/authorization/tutorial/routes.py
+   :lines: 14-18
+   :lineno-match:
+   :emphasize-lines: 1,4-5
+   :language: python
+
+Add view permissions
+--------------------
+
+At this point we've modified our application to load the ``PageResource``,
+including the actual ``Page`` model in the ``page_factory``. The
+``PageResource`` is now the :term:`context` for all ``view_page`` and
+``edit_page`` views. Similarly the ``NewPage`` will be the context for
+the ``add_page`` view.
+
+Open the file ``views/default.py``.
+
+First, you can drop a few imports that are no longer necessary:
 
 .. literalinclude:: src/authorization/tutorial/views/default.py
-   :lines: 24-25
+   :lines: 5-7
+   :lineno-match:
    :emphasize-lines: 1
    :language: python
 
-.. literalinclude:: src/authorization/tutorial/views/default.py
-   :lines: 29-31
-   :emphasize-lines: 1-2
-   :language: python
-
-Only the highlighted lines, along with their preceding commas, need to be
-edited and added.
-
-This allows anyone to invoke these two views.
-
-Add a ``permission='edit'`` parameter to the ``@view_config`` decorators for
-``add_page()`` and ``edit_page()``:
+Edit the ``view_page`` view to declare the ``view`` permission and remove
+the explicit checks within the view:
 
 .. literalinclude:: src/authorization/tutorial/views/default.py
-   :lines: 52-54
-   :emphasize-lines: 1-2
+   :lines: 18-23
+   :lineno-match:
+   :emphasize-lines: 2,4
    :language: python
+
+The work of loading the page has already been done in the factory so we
+can just pull the ``page`` object out of the ``PageResource`` loaded as
+``request.context``. Our factory also guarantees we will have a ``Page`` as it
+raises ``HTTPNotFound`` otherwise - again simplifying the view logic.
+
+Edit the ``edit_page`` view to declare the ``edit`` permission:
 
 .. literalinclude:: src/authorization/tutorial/views/default.py
-   :lines: 66-68
-   :emphasize-lines: 1-2
+   :lines: 38-42
+   :lineno-match:
+   :emphasize-lines: 2,4
    :language: python
 
-Only the highlighted lines, along with their preceding commas, need to be
-edited and added.
-
-The result is that only users who possess the ``edit`` permission at the time
-of the request may invoke those two views.
-
-We are done with the changes needed to control access.  The changes that
-follow will add the login and logout feature.
-
-Login, logout
--------------
-
-Add routes for /login and /logout
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Go back to ``tutorial/__init__.py`` and add these two routes as
-highlighted:
-
-.. literalinclude:: src/authorization/tutorial/__init__.py
-   :lines: 21-24
-   :emphasize-lines: 2-3
-   :language: python
-
-.. note:: The preceding lines must be added *before* the following
-   ``view_page`` route definition:
-
-   .. literalinclude:: src/authorization/tutorial/__init__.py
-      :lines: 24
-      :language: python
-
-   This is because ``view_page``'s route definition uses a catch-all
-   "replacement marker" ``/{pagename}`` (see :ref:`route_pattern_syntax`)
-   which will catch any route that was not already caught by any route listed
-   above it in ``__init__.py``. Hence, for ``login`` and ``logout`` views to
-   have the opportunity of being matched (or "caught"), they must be above
-   ``/{pagename}``.
-
-Add login and logout views
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-We'll add a ``login`` view which renders a login form and processes the post
-from the login form, checking credentials.
-
-We'll also add a ``logout`` view callable to our application and provide a
-link to it.  This view will clear the credentials of the logged in user and
-redirect back to the front page.
-
-Add the following import statements to ``tutorial/views/default.py``
-after the import from ``pyramid.httpexceptions``:
+Edit the ``add_page`` view to declare the ``create`` permission:
 
 .. literalinclude:: src/authorization/tutorial/views/default.py
-   :lines: 9-19
-   :emphasize-lines: 1-8,11
+   :lines: 52-56
+   :lineno-match:
+   :emphasize-lines: 2,4
    :language: python
 
-All the highlighted lines need to be added or edited.
+Note the ``pagename`` here is pulled off of the context instead of
+``request.matchdict``. The factory has done a lot of work for us to hide the
+actual route pattern.
 
-:meth:`~pyramid.view.forbidden_view_config` will be used to customize the
-default 403 Forbidden page. :meth:`~pyramid.security.remember` and
-:meth:`~pyramid.security.forget` help to create and expire an auth ticket
-cookie.
+The ACLs defined on each :term:`resource` are used by the
+:term:`authorization policy` to determine if any
+:term:`principal` is allowed to have some :term:`permission`. If this check
+fails (for example, the user is not logged in) then a ``HTTPForbidden``
+exception will be raised automatically, thus we're able to drop those
+exceptions and checks from the views themselves. Rather we've defined them in
+terms of operations on a resource.
 
-Now add the ``login`` and ``logout`` views at the end of the file:
-
-.. literalinclude:: src/authorization/tutorial/views/default.py
-   :lines: 81-112
-   :language: python
-
-``login()`` has two decorators:
-
-- a ``@view_config`` decorator which associates it with the ``login`` route
-  and makes it visible when we visit ``/login``, and
-- a ``@forbidden_view_config`` decorator which turns it into a
-  :term:`forbidden view`. ``login()`` will be invoked when a user tries to
-  execute a view callable for which they lack authorization.  For example, if
-  a user has not logged in and tries to add or edit a wiki page, they will be
-  shown the login form before being allowed to continue.
-
-The order of these two :term:`view configuration` decorators is unimportant.
-
-``logout()`` is decorated with a ``@view_config`` decorator which associates
-it with the ``logout`` route.  It will be invoked when we visit ``/logout``.
-
-Add the ``login.jinja2`` template
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Create ``tutorial/templates/login.jinja2`` with the following content:
-
-.. literalinclude:: src/authorization/tutorial/templates/login.jinja2
-   :language: html
-
-The above template is referenced in the login view that we just added in
-``views/default.py``.
-
-Add a "Logout" link when logged in
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Open ``tutorial/templates/edit.jinja2`` and
-``tutorial/templates/view.jinja2`` and add the following code as
-indicated by the highlighted lines.
-
-.. literalinclude:: src/authorization/tutorial/templates/edit.jinja2
-   :lines: 34-40
-   :emphasize-lines: 3-7
-   :language: html
-
-The :meth:`pyramid.request.Request.authenticated_userid` will be ``None`` if
-the user is not authenticated, or a userid if the user is authenticated. This
-check will make the logout link active only when the user is logged in.
-
-Reviewing our changes
----------------------
-
-Our ``tutorial/__init__.py`` will look like this when we're done:
-
-.. literalinclude:: src/authorization/tutorial/__init__.py
-   :linenos:
-   :emphasize-lines: 2-3,5,11-13,17-19,22-23
-   :language: python
-
-Only the highlighted lines need to be added or edited.
-
-Our ``tutorial/models/mymodel.py`` will look like this when we're done:
-
-.. literalinclude:: src/authorization/tutorial/models/mymodel.py
-   :linenos:
-   :emphasize-lines: 1-4,22-29
-   :language: python
-
-Only the highlighted lines need to be added or edited.
-
-Our ``tutorial/views/default.py`` will look like this when we're done:
+The final ``tutorial/views/default.py`` should look like the following:
 
 .. literalinclude:: src/authorization/tutorial/views/default.py
    :linenos:
-   :emphasize-lines: 9-16,19,24,29-30,52-53,66-67,81-112
    :language: python
-
-Only the highlighted lines need to be added or edited.
-
-Our ``tutorial/templates/edit.jinja2`` template will look like this when
-we're done:
-
-.. literalinclude:: src/authorization/tutorial/templates/edit.jinja2
-   :linenos:
-   :emphasize-lines: 36-40
-   :language: html
-
-Only the highlighted lines need to be added or edited.
-
-Our ``tutorial/templates/view.jinja2`` template will look like this when
-we're done:
-
-.. literalinclude:: src/authorization/tutorial/templates/view.jinja2
-   :linenos:
-   :emphasize-lines: 36-40
-   :language: html
-
-Only the highlighted lines need to be added or edited.
 
 Viewing the application in a browser
 ------------------------------------
