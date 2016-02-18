@@ -20,6 +20,10 @@ requires = [
     'waitress',
     ]
 
+tests_require = [
+    'WebTest',
+]
+
 setup(name='tutorial',
       version='0.0',
       description='tutorial',
@@ -38,6 +42,7 @@ setup(name='tutorial',
       include_package_data=True,
       zip_safe=False,
       test_suite='tutorial',
+      tests_require=tests_require,
       install_requires=requires,
       entry_points="""\
       [paste.app_factory]
