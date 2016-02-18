@@ -6,7 +6,7 @@ Following is a quick overview of the design of our wiki application to help us
 understand the changes that we will be making as we work through the tutorial.
 
 Overall
--------
+=======
 
 We choose to use :term:`reStructuredText` markup in the wiki text. Translation
 from reStructuredText to HTML is provided by the widely used ``docutils``
@@ -14,16 +14,24 @@ Python module.  We will add this module in the dependency list on the project
 ``setup.py`` file.
 
 Models
-------
+======
 
 We'll be using an SQLite database to hold our wiki data, and we'll be using
 :term:`SQLAlchemy` to access the data in this database.
 
-Within the database, we define a single table named `pages`, whose elements
-will store the wiki pages.  There are two columns: `name` and `data`.
+Within the database, we will define two tables:
 
-URLs like ``/PageName`` will try to find an element in the table that has a
-corresponding name.
+- The `users` table which will store the `id`, `name`, `password_hash` and
+  `role` of each wiki user.
+- The `pages` table, whose elements will store the wiki pages.
+  There are four columns: `id`, `name`, `data` and `creator_id`.
+
+There is a one-to-many relationship between `users` and `pages` tracking
+the user who created each wiki page defined by the `creator_id` column on the
+`pages` table.
+
+URLs like ``/PageName`` will try to find an element in the `pages` table that
+has a corresponding name.
 
 To add a page to the wiki, a new row is created and the text is stored in
 `data`.
@@ -32,8 +40,8 @@ A page named ``FrontPage`` containing the text *This is the front page*, will
 be created when the storage is initialized, and will be used as the wiki home
 page.
 
-Views
------
+Wiki Views
+==========
 
 There will be three views to handle the normal operations of adding, editing,
 and viewing wiki pages, plus one view for the wiki front page. Two templates
@@ -45,38 +53,46 @@ designer-friendly templating language for Python, modeled after Django's
 templates.
 
 Security
---------
+========
 
-We'll eventually be adding security to our application.  The components we'll
-use to do this are below.
+We'll eventually be adding security to our application.  To do this, we'll
+be using a very simple role-based security model. We'll assign a single
+role category to each user in our system.
 
-- USERS, a dictionary mapping :term:`userids <userid>` to their corresponding
-  passwords.
+`basic`
+  An authenticated user who can view content and create new pages. A `basic`
+  user may also edit the pages they have created but not pages created by
+  other users.
 
-- GROUPS, a dictionary mapping :term:`userids <userid>` to a list of groups to
-  which they belong.
+`editor`
+  An authenticated user who can create and edit any content in the system.
 
-- ``groupfinder``, an *authorization callback* that looks up USERS and GROUPS.
-  It will be provided in a new ``security/default.py`` subpackage and file.
+In order to accomplish this we'll need to define an authentication policy
+which can identify users by their :term:`userid` and role. Then we'll
+need to define a page :term:`resource` which contains the appropriate
+:term:`ACL`:
 
-- An :term:`ACL` is attached to the root :term:`resource`.  Each row below
-  details an :term:`ACE`:
++----------+--------------------+----------------+
+| Action   | Principal          | Permission     |
++==========+====================+================+
+| Allow    | Everyone           | view           |
++----------+--------------------+----------------+
+| Allow    | group:basic        | create         |
++----------+--------------------+----------------+
+| Allow    | group:editors      | edit           |
++----------+--------------------+----------------+
+| Allow    | <creator of page>  | edit           |
++----------+--------------------+----------------+
 
-  +----------+----------------+----------------+
-  | Action   | Principal      | Permission     |
-  +==========+================+================+
-  | Allow    | Everyone       | View           |
-  +----------+----------------+----------------+
-  | Allow    | group:editors  | Edit           |
-  +----------+----------------+----------------+
+Permission declarations will be added to the views to assert the security
+policies as each request is handled.
 
-- Permission declarations are added to the views to assert the security
-  policies as each request is handled.
-
-Two additional views and one template will handle the login and logout tasks.
+On the security side of the application there are two additional views for
+handling login and logout as well as two exception views for handling
+invalid access attempts and unhandled URLs.
 
 Summary
--------
+=======
 
 The URL, actions, template, and permission associated to each view are listed
 in the following table:
@@ -102,7 +118,7 @@ in the following table:
 |                      |  submitted, redirect  |             |                |            |
 |                      |  to /PageName         |             |                |            |
 +----------------------+-----------------------+-------------+----------------+------------+
-| /add_page/PageName   |  Create the page      |  add_page   |  edit.jinja2   |  edit      |
+| /add_page/PageName   |  Create the page      |  add_page   |  edit.jinja2   |  create    |
 |                      |  *PageName* in        |             |                |            |
 |                      |  storage,  display    |             |                |            |
 |                      |  the edit form        |             |                |            |

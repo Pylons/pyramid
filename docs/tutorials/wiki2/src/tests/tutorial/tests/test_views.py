@@ -8,48 +8,45 @@ def dummy_request(dbsession):
     return testing.DummyRequest(dbsession=dbsession)
 
 
-def _register_routes(config):
-    config.add_route('view_page', '{pagename}')
-    config.add_route('edit_page', '{pagename}/edit_page')
-    config.add_route('add_page', 'add_page/{pagename}')
-
-
 class BaseTest(unittest.TestCase):
     def setUp(self):
+        from ..models import get_tm_session
         self.config = testing.setUp(settings={
             'sqlalchemy.url': 'sqlite:///:memory:'
         })
-        self.config.include('..models.meta')
-        _register_routes(self.config)
-        settings = self.config.get_settings()
+        self.config.include('..models')
+        self.config.include('..routes')
 
-        from ..models.meta import (
-            get_session,
-            get_engine,
-            get_dbmaker,
-            )
-
-        self.engine = get_engine(settings)
-        dbmaker = get_dbmaker(self.engine)
-
-        self.session = get_session(transaction.manager, dbmaker)
+        session_factory = self.config.registry['dbsession_factory']
+        self.session = get_tm_session(session_factory, transaction.manager)
 
         self.init_database()
 
     def init_database(self):
         from ..models.meta import Base
-        Base.metadata.create_all(self.engine)
+        session_factory = self.config.registry['dbsession_factory']
+        engine = session_factory.kw['bind']
+        Base.metadata.create_all(engine)
 
     def tearDown(self):
         testing.tearDown()
         transaction.abort()
 
+    def makeUser(self, name, role, password='dummy'):
+        from ..models import User
+        user = User(name=name, role=role)
+        user.set_password(password)
+        return user
+
+    def makePage(self, name, data, creator):
+        from ..models import Page
+        return Page(name=name, data=data, creator=creator)
+
 
 class ViewWikiTests(unittest.TestCase):
-
     def setUp(self):
         self.config = testing.setUp()
-        _register_routes(self.config)
+        self.config.include('..routes')
 
     def tearDown(self):
         testing.tearDown()
@@ -65,26 +62,21 @@ class ViewWikiTests(unittest.TestCase):
 
 
 class ViewPageTests(BaseTest):
-    def setUp(self):
-        super(ViewPageTests, self).setUp()
-
-    def tearDown(self):
-        transaction.abort()
-        testing.tearDown()
-
     def _callFUT(self, request):
         from tutorial.views.default import view_page
         return view_page(request)
 
     def test_it(self):
+        from ..routes import PageResource
+
         # add a page to the db
-        from ..models.mymodel import Page
-        page = Page(name='IDoExist', data='Hello CruelWorld IDoExist')
-        self.session.add(page)
+        user = self.makeUser('foo', 'editor')
+        page = self.makePage('IDoExist', 'Hello CruelWorld IDoExist', user)
+        self.session.add_all([page, user])
 
         # create a request asking for the page we've created
         request = dummy_request(self.session)
-        request.matchdict['pagename'] = 'IDoExist'
+        request.context = PageResource(page)
 
         # call the view we're testing and check its behavior
         info = self._callFUT(request)
@@ -102,67 +94,63 @@ class ViewPageTests(BaseTest):
 
 
 class AddPageTests(BaseTest):
-    def setUp(self):
-        super(AddPageTests, self).setUp()
-
-    def tearDown(self):
-        transaction.abort()
-        testing.tearDown()
-
     def _callFUT(self, request):
         from tutorial.views.default import add_page
         return add_page(request)
 
     def test_it_notsubmitted(self):
+        from ..routes import NewPage
         request = dummy_request(self.session)
-        request.matchdict = {'pagename': 'AnotherPage'}
+        request.user = self.makeUser('foo', 'editor')
+        request.context = NewPage('AnotherPage')
         info = self._callFUT(request)
-        self.assertEqual(info['page'].data, '')
+        self.assertEqual(info['pagedata'], '')
         self.assertEqual(info['save_url'],
                          'http://example.com/add_page/AnotherPage')
 
     def test_it_submitted(self):
-        from ..models.mymodel import Page
+        from ..models import Page
+        from ..routes import NewPage
         request = testing.DummyRequest({'form.submitted': True,
                                         'body': 'Hello yo!'},
                                        dbsession=self.session)
-        request.matchdict = {'pagename': 'AnotherPage'}
+        request.user = self.makeUser('foo', 'editor')
+        request.context = NewPage('AnotherPage')
         self._callFUT(request)
         page = self.session.query(Page).filter_by(name='AnotherPage').one()
         self.assertEqual(page.data, 'Hello yo!')
 
 
 class EditPageTests(BaseTest):
-    def setUp(self):
-        super(EditPageTests, self).setUp()
-
-    def tearDown(self):
-        transaction.abort()
-        testing.tearDown()
-
     def _callFUT(self, request):
         from tutorial.views.default import edit_page
         return edit_page(request)
 
+    def makeContext(self, page):
+        from ..routes import PageResource
+        return PageResource(page)
+
     def test_it_notsubmitted(self):
-        from ..models.mymodel import Page
+        user = self.makeUser('foo', 'editor')
+        page = self.makePage('abc', 'hello', user)
+        self.session.add_all([page, user])
+
         request = dummy_request(self.session)
-        request.matchdict = {'pagename': 'abc'}
-        page = Page(name='abc', data='hello')
-        self.session.add(page)
+        request.context = self.makeContext(page)
         info = self._callFUT(request)
-        self.assertEqual(info['page'], page)
+        self.assertEqual(info['pagename'], 'abc')
         self.assertEqual(info['save_url'],
                          'http://example.com/abc/edit_page')
 
     def test_it_submitted(self):
-        from ..models.mymodel import Page
+        user = self.makeUser('foo', 'editor')
+        page = self.makePage('abc', 'hello', user)
+        self.session.add_all([page, user])
+
         request = testing.DummyRequest({'form.submitted': True,
                                         'body': 'Hello yo!'},
                                        dbsession=self.session)
-        request.matchdict = {'pagename': 'abc'}
-        page = Page(name='abc', data='hello')
-        self.session.add(page)
+        request.context = self.makeContext(page)
         response = self._callFUT(request)
         self.assertEqual(response.location, 'http://example.com/abc')
         self.assertEqual(page.data, 'Hello yo!')

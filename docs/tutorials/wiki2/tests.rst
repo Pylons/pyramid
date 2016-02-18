@@ -18,6 +18,14 @@ subpackage, and add several new tests.
 
 Start by creating a new directory and a new empty file ``tests/__init__.py``.
 
+.. warning::
+
+   It is very important when refactoring a Python module into a package to
+   be sure to delete the cache files (``.pyc`` files or ``__pycache__``
+   folders) sitting around! Python will prioritize the cache files before
+   traversing into folders and so it will use the old code and you will wonder
+   why none of your changes are working!
+
 
 Test the views
 ==============
@@ -35,7 +43,7 @@ Functional tests
 
 We'll test the whole application, covering security aspects that are not
 tested in the unit tests, like logging in, logging out, checking that
-the ``viewer`` user cannot add or edit pages, but the ``editor`` user
+the ``basic`` user cannot edit pages it didn't create, but the ``editor`` user
 can, and so on.
 
 
@@ -57,39 +65,20 @@ follows:
    :language: python
 
 
+.. note::
+
+   We're utilizing the excellent WebTest_ package to do functional testing
+   of the application. This is defined in the ``tests_require`` section of
+   our ``setup.py``. Any other dependencies needed only for testing purposes
+   can be added there and will be installed automatically when running
+   ``setup.py test``.
+
+
 Running the tests
 =================
 
 We can run these tests by using ``setup.py test`` in the same way we did in
-:ref:`running_tests`.  However, first we must edit our ``setup.py`` to include
-a dependency on `WebTest
-<http://docs.pylonsproject.org/projects/webtest/en/latest/>`_, which we've used
-in our ``tests.py``.  Change the ``requires`` list in ``setup.py`` to include
-``WebTest``.
-
-.. literalinclude:: src/tests/setup.py
-   :linenos:
-   :language: python
-   :lines: 11-22
-   :emphasize-lines: 11
-
-After we've added a dependency on WebTest in ``setup.py``, we need to run
-``setup.py develop`` to get WebTest installed into our virtualenv.  Assuming
-our shell's current working directory is the "tutorial" distribution directory:
-
-On UNIX:
-
-.. code-block:: bash
-
-   $ $VENV/bin/python setup.py develop
-
-On Windows:
-
-.. code-block:: text
-
-   c:\pyramidtut\tutorial> %VENV%\Scripts\python setup.py develop
-
-Once that command has completed successfully, we can run the tests themselves:
+:ref:`running_tests`:
 
 On UNIX:
 
@@ -114,3 +103,5 @@ The expected result should look like the following:
    OK
 
    Process finished with exit code 0
+
+.. _webtest: http://docs.pylonsproject.org/projects/webtest/en/latest/

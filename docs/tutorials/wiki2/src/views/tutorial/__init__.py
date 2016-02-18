@@ -6,11 +6,7 @@ def main(global_config, **settings):
     """
     config = Configurator(settings=settings)
     config.include('pyramid_jinja2')
-    config.include('.models.meta')
-    config.add_static_view('static', 'static', cache_max_age=3600)
-    config.add_route('view_wiki', '/')
-    config.add_route('view_page', '/{pagename}')
-    config.add_route('add_page', '/add_page/{pagename}')
-    config.add_route('edit_page', '/{pagename}/edit_page')
+    config.include('.models')
+    config.include('.routes')
     config.scan()
     return config.make_wsgi_app()

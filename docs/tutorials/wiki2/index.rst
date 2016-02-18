@@ -22,6 +22,7 @@ which corresponds to the same location if you have Pyramid sources.
    basiclayout
    definingmodels
    definingviews
+   authentication
    authorization
    tests
    distributing

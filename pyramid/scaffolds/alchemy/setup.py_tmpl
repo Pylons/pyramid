@@ -19,6 +19,10 @@ requires = [
     'waitress',
     ]
 
+tests_require = [
+    'WebTest',
+]
+
 setup(name='{{project}}',
       version='0.0',
       description='{{project}}',
@@ -37,6 +41,7 @@ setup(name='{{project}}',
       include_package_data=True,
       zip_safe=False,
       test_suite='{{package}}',
+      tests_require=tests_require,
       install_requires=requires,
       entry_points="""\
       [paste.app_factory]

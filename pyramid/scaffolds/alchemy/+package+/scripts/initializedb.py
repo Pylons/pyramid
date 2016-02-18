@@ -9,11 +9,11 @@ from pyramid.paster import (
 
 from pyramid.scripts.common import parse_vars
 
+from ..models.meta import Base
 from ..models import (
-    Base,
-    get_session,
     get_engine,
-    get_dbmaker,
+    get_session_factory,
+    get_tm_session,
     )
 from ..models import MyModel
 
@@ -36,9 +36,10 @@ def main(argv=sys.argv):
     engine = get_engine(settings)
     Base.metadata.create_all(engine)
 
-    dbmaker = get_dbmaker(engine)
-    dbsession = get_session(transaction.manager, dbmaker)
+    session_factory = get_session_factory(engine)
 
     with transaction.manager:
+        dbsession = get_tm_session(session_factory, transaction.manager)
+
         model = MyModel(name='one', value=1)
         dbsession.add(model)

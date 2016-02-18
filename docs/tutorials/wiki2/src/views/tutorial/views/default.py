@@ -9,24 +9,24 @@ from pyramid.httpexceptions import (
 
 from pyramid.view import view_config
 
-from ..models.mymodel import Page
+from ..models import Page, User
 
 # regular expression used to find WikiWords
 wikiwords = re.compile(r"\b([A-Z]\w+[A-Z]+\w+)")
 
 @view_config(route_name='view_wiki')
 def view_wiki(request):
-    return HTTPFound(location=request.route_url('view_page',
-                                                pagename='FrontPage'))
+    next_url = request.route_url('view_page', pagename='FrontPage')
+    return HTTPFound(location=next_url)
 
-@view_config(route_name='view_page', renderer='templates/view.jinja2')
+@view_config(route_name='view_page', renderer='../templates/view.jinja2')
 def view_page(request):
     pagename = request.matchdict['pagename']
     page = request.dbsession.query(Page).filter_by(name=pagename).first()
     if page is None:
-        return HTTPNotFound('No such page')
+        raise HTTPNotFound('No such page')
 
-    def check(match):
+    def add_link(match):
         word = match.group(1)
         exists = request.dbsession.query(Page).filter_by(name=word).all()
         if exists:
@@ -37,33 +37,34 @@ def view_page(request):
             return '<a href="%s">%s</a>' % (add_url, cgi.escape(word))
 
     content = publish_parts(page.data, writer_name='html')['html_body']
-    content = wikiwords.sub(check, content)
-    edit_url = request.route_url('edit_page', pagename=pagename)
+    content = wikiwords.sub(add_link, content)
+    edit_url = request.route_url('edit_page', pagename=page.name)
     return dict(page=page, content=content, edit_url=edit_url)
 
-@view_config(route_name='add_page', renderer='templates/edit.jinja2')
-def add_page(request):
-    pagename = request.matchdict['pagename']
-    if 'form.submitted' in request.params:
-        body = request.params['body']
-        page = Page(name=pagename, data=body)
-        request.dbsession.add(page)
-        return HTTPFound(location = request.route_url('view_page',
-                                                      pagename=pagename))
-    save_url = request.route_url('add_page', pagename=pagename)
-    page = Page(name='', data='')
-    return dict(page=page, save_url=save_url)
-
-@view_config(route_name='edit_page', renderer='templates/edit.jinja2')
+@view_config(route_name='edit_page', renderer='../templates/edit.jinja2')
 def edit_page(request):
     pagename = request.matchdict['pagename']
     page = request.dbsession.query(Page).filter_by(name=pagename).one()
     if 'form.submitted' in request.params:
         page.data = request.params['body']
-        request.dbsession.add(page)
-        return HTTPFound(location = request.route_url('view_page',
-                                                      pagename=pagename))
+        next_url = request.route_url('view_page', pagename=page.name)
+        return HTTPFound(location=next_url)
     return dict(
-        page=page,
-        save_url = request.route_url('edit_page', pagename=pagename),
+        pagename=page.name,
+        pagedata=page.data,
+        save_url=request.route_url('edit_page', pagename=page.name),
         )
+
+@view_config(route_name='add_page', renderer='../templates/edit.jinja2')
+def add_page(request):
+    pagename = request.matchdict['pagename']
+    if 'form.submitted' in request.params:
+        body = request.params['body']
+        page = Page(name=pagename, data=body)
+        page.creator = (
+            request.dbsession.query(User).filter_by(name='editor').one())
+        request.dbsession.add(page)
+        next_url = request.route_url('view_page', pagename=pagename)
+        return HTTPFound(location=next_url)
+    save_url = request.route_url('add_page', pagename=pagename)
+    return dict(pagename=pagename, pagedata='', save_url=save_url)

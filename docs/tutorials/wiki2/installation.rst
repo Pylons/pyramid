@@ -298,6 +298,13 @@ Initializing the database
 We need to use the ``initialize_tutorial_db`` :term:`console
 script` to initialize our database.
 
+.. note::
+
+   The ``initialize_tutorial_db`` command is not performing a migration but
+   rather simply creating missing tables and adding some dummy data. If you
+   already have a database, you should delete it before running
+   ``initialize_tutorial_db`` again.
+
 Type the following command, making sure you are still in the ``tutorial``
 directory (the directory with a ``development.ini`` in it):
 
@@ -397,12 +404,17 @@ Decisions the ``alchemy`` scaffold has made for you
 Creating a project using the ``alchemy`` scaffold makes the following
 assumptions:
 
-- you are willing to use :term:`SQLAlchemy` as a database access tool
+- You are willing to use :term:`SQLAlchemy` as a database access tool.
 
-- you are willing to use :term:`URL dispatch` to map URLs to code
+- You are willing to use :term:`URL dispatch` to map URLs to code.
 
-- you want to use ``zope.sqlalchemy`` and ``pyramid_tm`` to scope
-  sessions to requests
+- You want to use zope.sqlalchemy_, pyramid_tm_ and the transaction_ package
+  to scope sessions to requests.
+
+- You want to use pyramid_jinja2_ to render your templates.
+  Different templating engines can be used but we had to choose one to
+  make the tutorial. See :ref:`available_template_system_bindings` for some
+  options.
 
 .. note::
 
@@ -411,3 +423,15 @@ assumptions:
    mechanism to map URLs to code (:term:`traversal`).  However, for the
    purposes of this tutorial, we'll only be using URL dispatch and
    SQLAlchemy.
+
+.. _pyramid_jinja2:
+   http://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/
+
+.. _pyramid_tm:
+   http://docs.pylonsproject.org/projects/pyramid-tm/en/latest/
+
+.. _zope.sqlalchemy:
+   https://pypi.python.org/pypi/zope.sqlalchemy
+
+.. _transaction:
+   http://zodb.readthedocs.org/en/latest/transactions.html
