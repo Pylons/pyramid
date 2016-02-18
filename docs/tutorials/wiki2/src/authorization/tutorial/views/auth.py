@@ -14,6 +14,8 @@ from ..models import User
 @view_config(route_name='login', renderer='../templates/login.jinja2')
 def login(request):
     next_url = request.params.get('next', request.referrer)
+    if not next_url:
+        next_url = request.route_url('view_wiki')
     message = ''
     login = ''
     if 'form.submitted' in request.params:
