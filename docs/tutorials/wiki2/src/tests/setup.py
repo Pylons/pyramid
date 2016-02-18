@@ -43,8 +43,8 @@ setup(name='tutorial',
       include_package_data=True,
       zip_safe=False,
       test_suite='tutorial',
-      install_requires=requires,
       tests_require=tests_require,
+      install_requires=requires,
       entry_points="""\
       [paste.app_factory]
       main = tutorial:main

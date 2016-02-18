@@ -8,33 +8,30 @@ from pyramid.view import (
     view_config,
 )
 
-from ..security.default import USERS
+from ..models import User
 
 
-@view_config(route_name='login', renderer='templates/login.jinja2')
+@view_config(route_name='login', renderer='../templates/login.jinja2')
 def login(request):
-    login_url = request.route_url('login')
-    referrer = request.url
-    if referrer == login_url:
-        referrer = '/' # never use the login form itself as came_from
-    came_from = request.params.get('came_from', referrer)
+    next_url = request.params.get('next', request.referrer)
+    if not next_url:
+        next_url = request.route_url('view_wiki')
     message = ''
     login = ''
-    password = ''
     if 'form.submitted' in request.params:
         login = request.params['login']
         password = request.params['password']
-        if USERS.get(login) == password:
-            headers = remember(request, login)
-            return HTTPFound(location=came_from, headers=headers)
+        user = request.dbsession.query(User).filter_by(name=login).first()
+        if user is not None and user.check_password(password):
+            headers = remember(request, user.id)
+            return HTTPFound(location=next_url, headers=headers)
         message = 'Failed login'
 
     return dict(
         message=message,
         url=request.route_url('login'),
-        came_from=came_from,
+        next_url=next_url,
         login=login,
-        password=password,
         )
 
 @view_config(route_name='logout')
@@ -45,5 +42,5 @@ def logout(request):
 
 @forbidden_view_config()
 def forbidden_view(request):
-    next_url = request.route_url('login', _query={'came_from': request.url})
+    next_url = request.route_url('login', _query={'next': request.url})
     return HTTPFound(location=next_url)
