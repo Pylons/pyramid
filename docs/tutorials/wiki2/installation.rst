@@ -9,9 +9,9 @@ This tutorial assumes that you have already followed the steps in
 :ref:`installing_chapter`, except **do not create a virtualenv or install
 Pyramid**.  Thereby you will satisfy the following requirements.
 
-* A Python interpreter is installed on your operating system.
-* :term:`virtualenv` is installed.
-* :term:`pip` will be installed when we create a virtual environment.
+* Python interpreter is installed on your operating system
+* :term:`setuptools` or :term:`distribute` is installed
+* :term:`virtualenv` is installed
 
 Create directory to contain the project
 ---------------------------------------
@@ -70,14 +70,6 @@ Python 3.5:
    c:\> c:\Python35\Scripts\virtualenv %VENV%
 
 
-.. Upgrade pip in the virtual environment
-   --------------------------------------
-
-.. .. code-block:: bash
-
-..    $ $VENV/bin/pip install --upgrade pip
-
-
 Install Pyramid into the virtual Python environment
 ---------------------------------------------------
 
@@ -88,16 +80,12 @@ On UNIX
 
    $ $VENV/bin/easy_install pyramid
 
-..   $ $VENV/bin/pip install pyramid
-
 On Windows
 ^^^^^^^^^^
 
 .. code-block:: ps1con
 
    c:\> %VENV%\Scripts\easy_install pyramid
-
-..   c:\> %VENV%\Scripts\pip install pyramid
 
 Install SQLite3 and its development packages
 --------------------------------------------
@@ -197,8 +185,6 @@ On UNIX
    $ cd tutorial
    $ $VENV/bin/python setup.py develop
 
-..   $ $VENV/bin/pip install -e .
-
 On Windows
 ----------
 
@@ -206,8 +192,6 @@ On Windows
 
    c:\pyramidtut> cd tutorial
    c:\pyramidtut\tutorial> %VENV%\Scripts\python setup.py develop
-
-..   c:\pyramidtut\tutorial> %VENV%\Scripts\pip install -e .
 
 The console will show ``setup.py`` checking for packages and installing
 missing packages. Success executing this command will show a line like
@@ -230,16 +214,12 @@ On UNIX
 
    $ $VENV/bin/python setup.py test -q
 
-.. py.test? See https://github.com/Pylons/pyramid/issues/2104#issuecomment-155852046
-
 On Windows
 ----------
 
 .. code-block:: ps1con
 
    c:\pyramidtut\tutorial> %VENV%\Scripts\python setup.py test -q
-
-.. py.test? See https://github.com/Pylons/pyramid/issues/2104#issuecomment-155852046
 
 For a successful test run, you should see output that ends like this::
 
