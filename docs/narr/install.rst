@@ -15,7 +15,7 @@ You will need `Python <http://python.org>`_ version 2.6 or better to run
 .. sidebar:: Python Versions
 
     As of this writing, :app:`Pyramid` has been tested under Python 2.6, Python
-    2.7, Python 3.2, Python 3.3, Python 3.4, PyPy, and PyPy3. :app:`Pyramid`
+    2.7, Python 3.3, Python 3.4, Python 3.5, PyPy, and PyPy3. :app:`Pyramid`
     does not run under any version of Python before 2.6.
 
 :app:`Pyramid` is known to run on all popular UNIX-like systems such as Linux,
@@ -46,7 +46,7 @@ Alternatively, you can use the `homebrew <http://brew.sh/>`_ package manager.
    # for python 2.7
    $ brew install python
 
-   # for python 3.4
+   # for python 3.5
    $ brew install python3
 
 If you use an installer for your Python, then you can skip to the section
@@ -292,7 +292,7 @@ After you've got your virtualenv installed, you may install :app:`Pyramid`
 itself using the following commands:
 
 .. parsed-literal::
-      
+
    $ $VENV/bin/easy_install "pyramid==\ |release|\ "
 
 The ``easy_install`` command will take longer than the previous ones to
@@ -371,7 +371,7 @@ You can use Pyramid on Windows under Python 2 or 3.
    installed:
 
    .. parsed-literal::
-      
+
       c:\\env> %VENV%\\Scripts\\easy_install "pyramid==\ |release|\ "
 
 What Gets Installed

@@ -29,7 +29,7 @@ from paste.deploy import loadserver
 from paste.deploy import loadapp
 from paste.deploy.loadwsgi import loadcontext, SERVER
 
-from pyramid.compat import PY3
+from pyramid.compat import PY2
 from pyramid.compat import WIN
 
 from pyramid.paster import setup_logging
@@ -114,7 +114,7 @@ class PServeCommand(object):
         '--log-file',
         dest='log_file',
         metavar='LOG_FILE',
-        help="Save output to the given log file (redirects stdout)")
+        help="Save output to the given log file (redirects stdout) [DEPRECATED]")
     parser.add_option(
         '--reload',
         dest='reload',
@@ -287,7 +287,7 @@ class PServeCommand(object):
         base = os.getcwd()
 
         # warn before setting a default
-        if self.options.pid_file:
+        if self.options.pid_file or self.options.log_file:
             self._warn_daemon_deprecated()
 
         if getattr(self.options, 'daemon', False):
@@ -391,7 +391,7 @@ a real process manager for your processes like Systemd, Circus, or Supervisor.
 
         if self.options.browser:
             def open_browser():
-                context = loadcontext(SERVER, app_spec, name=app_name, relative_to=base,
+                context = loadcontext(SERVER, app_spec, name=server_name, relative_to=base,
                         global_conf=vars)
                 url = 'http://127.0.0.1:{port}/'.format(**context.config())
                 time.sleep(1)
@@ -675,7 +675,7 @@ in a future release per Pyramid's deprecation policy. Please consider using
 a real process manager for your processes like Systemd, Circus, or Supervisor.
 
 The following commands are deprecated:
-    [start,stop,restart,status] --daemon, --stop-server, --status, --pid-file
+    [start,stop,restart,status] --daemon, --stop-server, --status, --pid-file, --log-file
 ''')
 
 class LazyWriter(object):
@@ -1111,7 +1111,7 @@ def cherrypy_server_runner(
     server = wsgiserver.CherryPyWSGIServer(bind_addr, app,
                                            server_name=server_name, **kwargs)
     if ssl_pem is not None:
-        if not PY3:
+        if PY2:
             server.ssl_certificate = server.ssl_private_key = ssl_pem
         else:
             # creates wsgiserver.ssl_builtin as side-effect

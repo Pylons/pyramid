@@ -5,7 +5,7 @@ from zope.interface import (
     Interface,
     )
 
-from pyramid.compat import PY3
+from pyramid.compat import PY2
 
 # public API interfaces
 
@@ -311,7 +311,7 @@ class IDict(Interface):
     def values():
         """ Return a list of values from the dictionary """
 
-    if not PY3:
+    if PY2:
 
         def iterkeys():
             """ Return an iterator of keys from the dictionary """

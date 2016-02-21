@@ -3,11 +3,11 @@ import os
 import tempfile
 import unittest
 
-from pyramid.compat import PY3
-if PY3:
-    import builtins as __builtin__
-else:
+from pyramid.compat import PY2
+if PY2:
     import __builtin__
+else:
+    import builtins as __builtin__
 
 class TestPServeCommand(unittest.TestCase):
     def setUp(self):

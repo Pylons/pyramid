@@ -2,7 +2,7 @@ import unittest
 from pyramid import testing
 from pyramid.compat import (
     text_,
-    PY3,
+    PY2,
     )
 
 class TestRoute(unittest.TestCase):
@@ -120,10 +120,10 @@ class RoutesMapperTests(unittest.TestCase):
     def test___call__pathinfo_cant_be_decoded(self):
         from pyramid.exceptions import URLDecodeError
         mapper = self._makeOne()
-        if PY3:
-            path_info = b'\xff\xfe\xe6\x00'.decode('latin-1')
-        else:
+        if PY2:
             path_info = b'\xff\xfe\xe6\x00'
+        else:
+            path_info = b'\xff\xfe\xe6\x00'.decode('latin-1')
         request = self._getRequest(PATH_INFO=path_info)
         self.assertRaises(URLDecodeError, mapper, request)
 

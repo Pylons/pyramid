@@ -8,7 +8,7 @@ from translationstring import (
     TranslationStringFactory, # API
     )
 
-from pyramid.compat import PY3
+from pyramid.compat import PY2
 from pyramid.decorator import reify
 
 from pyramid.interfaces import (
@@ -332,10 +332,10 @@ class Translations(gettext.GNUTranslations, object):
         """Like ``ugettext()``, but look the message up in the specified
         domain.
         """
-        if PY3:
-            return self._domains.get(domain, self).gettext(message)
-        else:
+        if PY2:
             return self._domains.get(domain, self).ugettext(message)
+        else:
+            return self._domains.get(domain, self).gettext(message)
     
     def dngettext(self, domain, singular, plural, num):
         """Like ``ngettext()``, but look the message up in the specified
@@ -353,11 +353,11 @@ class Translations(gettext.GNUTranslations, object):
         """Like ``ungettext()`` but look the message up in the specified
         domain.
         """
-        if PY3:
-            return self._domains.get(domain, self).ngettext(
+        if PY2:
+            return self._domains.get(domain, self).ungettext(
                 singular, plural, num)
         else:
-            return self._domains.get(domain, self).ungettext(
+            return self._domains.get(domain, self).ngettext(
                 singular, plural, num)
 
 class LocalizerRequestMixin(object):

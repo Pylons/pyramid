@@ -3,7 +3,7 @@ import unittest
 from pyramid import testing
 
 from pyramid.compat import (
-    PY3,
+    PY2,
     text_,
     bytes_,
     native_,
@@ -310,10 +310,10 @@ class TestRequest(unittest.TestCase):
             b'/\xe6\xb5\x81\xe8\xa1\x8c\xe8\xb6\x8b\xe5\x8a\xbf',
             'utf-8'
             )
-        if PY3:
-            body = bytes(json.dumps({'a':inp}), 'utf-16')
-        else:
+        if PY2:
             body = json.dumps({'a':inp}).decode('utf-8').encode('utf-16')
+        else:
+            body = bytes(json.dumps({'a':inp}), 'utf-16')
         request.body = body
         request.content_type = 'application/json; charset=utf-16'
         self.assertEqual(request.json_body, {'a':inp})

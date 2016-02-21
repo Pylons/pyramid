@@ -175,11 +175,11 @@ Ameliorations
 +++++++++++++
 
 First, the primary amelioration: :app:`Pyramid` *does not expect application
-developers to understand ZCA concepts or any of its APIs*.  If an
-*application* developer needs to understand a ZCA concept or API during the
-creation of a :app:`Pyramid` application, we've failed on some axis.
+developers to understand ZCA concepts or any of its APIs*.  If an *application*
+developer needs to understand a ZCA concept or API during the creation of a
+:app:`Pyramid` application, we've failed on some axis.
 
-Instead, the framework hides the presence of the ZCA registry behind
+Instead the framework hides the presence of the ZCA registry behind
 special-purpose API functions that *do* use ZCA APIs.  Take for example the
 ``pyramid.security.authenticated_userid`` function, which returns the userid
 present in the current request or ``None`` if no userid is present in the
@@ -191,10 +191,9 @@ current request.  The application developer calls it like so:
    from pyramid.security import authenticated_userid
    userid = authenticated_userid(request)
 
-He now has the current user id.
+They now have the current user id.
 
-Under its hood however, the implementation of ``authenticated_userid``
-is this:
+Under its hood however, the implementation of ``authenticated_userid`` is this:
 
 .. code-block:: python
    :linenos:
@@ -211,58 +210,56 @@ is this:
        return policy.authenticated_userid(request)
 
 Using such wrappers, we strive to always hide the ZCA API from application
-developers.  Application developers should just never know about the ZCA API:
-they should call a Python function with some object germane to the domain as
-an argument, and it should return a result.  A corollary that follows is
-that any reader of an application that has been written using :app:`Pyramid`
-needn't understand the ZCA API either.
+developers.  Application developers should just never know about the ZCA API;
+they should call a Python function with some object germane to the domain as an
+argument, and it should return a result.  A corollary that follows is that any
+reader of an application that has been written using :app:`Pyramid` needn't
+understand the ZCA API either.
 
 Hiding the ZCA API from application developers and code readers is a form of
 enhancing domain specificity.  No application developer wants to need to
-understand the small, detailed mechanics of how a web framework does its
-thing.  People want to deal in concepts that are closer to the domain they're
-working in: for example, web developers want to know about *users*, not
-*utilities*.  :app:`Pyramid` uses the ZCA as an implementation detail, not as
-a feature which is exposed to end users.
+understand the small, detailed mechanics of how a web framework does its thing.
+People want to deal in concepts that are closer to the domain they're working
+in. For example, web developers want to know about *users*, not *utilities*.
+:app:`Pyramid` uses the ZCA as an implementation detail, not as a feature which
+is exposed to end users.
 
 However, unlike application developers, *framework developers*, including
 people who want to override :app:`Pyramid` functionality via preordained
-framework plugpoints like traversal or view lookup *must* understand the ZCA
+framework plugpoints like traversal or view lookup, *must* understand the ZCA
 registry API.
 
 :app:`Pyramid` framework developers were so concerned about conceptual load
-issues of the ZCA registry API for framework developers that a `replacement
-registry implementation <https://github.com/repoze/repoze.component>`_
-named :mod:`repoze.component` was actually developed.  Though this package
-has a registry implementation which is fully functional and well-tested, and
-its API is much nicer than the ZCA registry API, work on it was largely
-abandoned and it is not used in :app:`Pyramid`.  We continued to use a ZCA
-registry within :app:`Pyramid` because it ultimately proved a better fit.
+issues of the ZCA registry API that a `replacement registry implementation
+<https://github.com/repoze/repoze.component>`_ named :mod:`repoze.component`
+was actually developed.  Though this package has a registry implementation
+which is fully functional and well-tested, and its API is much nicer than the
+ZCA registry API, work on it was largely abandoned, and it is not used in
+:app:`Pyramid`.  We continued to use a ZCA registry within :app:`Pyramid`
+because it ultimately proved a better fit.
 
 .. note::
 
-   We continued using ZCA registry rather than disusing it in
-   favor of using the registry implementation in
-   :mod:`repoze.component` largely because the ZCA concept of
-   interfaces provides for use of an interface hierarchy, which is
-   useful in a lot of scenarios (such as context type inheritance).
-   Coming up with a marker type that was something like an interface
-   that allowed for this functionality seemed like it was just
-   reinventing the wheel.
+   We continued using ZCA registry rather than disusing it in favor of using
+   the registry implementation in :mod:`repoze.component` largely because the
+   ZCA concept of interfaces provides for use of an interface hierarchy, which
+   is useful in a lot of scenarios (such as context type inheritance).  Coming
+   up with a marker type that was something like an interface that allowed for
+   this functionality seemed like it was just reinventing the wheel.
 
-Making framework developers and extenders understand the ZCA registry API is
-a trade-off.  We (the :app:`Pyramid` developers) like the features that the
-ZCA registry gives us, and we have long-ago borne the weight of understanding
-what it does and how it works.  The authors of :app:`Pyramid` understand the
-ZCA deeply and can read code that uses it as easily as any other code.
+Making framework developers and extenders understand the ZCA registry API is a
+trade-off.  We (the :app:`Pyramid` developers) like the features that the ZCA
+registry gives us, and we have long-ago borne the weight of understanding what
+it does and how it works.  The authors of :app:`Pyramid` understand the ZCA
+deeply and can read code that uses it as easily as any other code.
 
 But we recognize that developers who might want to extend the framework are not
-as comfortable with the ZCA registry API as the original developers are with
-it.  So, for the purposes of being kind to third-party :app:`Pyramid`
-framework developers in, we've drawn some lines in the sand.
+as comfortable with the ZCA registry API as the original developers.  So for
+the purpose of being kind to third-party :app:`Pyramid` framework developers,
+we've drawn some lines in the sand.
 
-In all core code, We've made use of ZCA global API functions such as
-``zope.component.getUtility`` and ``zope.component.getAdapter`` the exception
+In all core code, we've made use of ZCA global API functions, such as
+``zope.component.getUtility`` and ``zope.component.getAdapter``, the exception
 instead of the rule.  So instead of:
 
 .. code-block:: python
@@ -282,9 +279,9 @@ instead of the rule.  So instead of:
    registry = get_current_registry()
    policy = registry.getUtility(IAuthenticationPolicy)
 
-While the latter is more verbose, it also arguably makes it more obvious
-what's going on.  All of the :app:`Pyramid` core code uses this pattern
-rather than the ZCA global API.
+While the latter is more verbose, it also arguably makes it more obvious what's
+going on.  All of the :app:`Pyramid` core code uses this pattern rather than
+the ZCA global API.
 
 Rationale
 +++++++++
@@ -309,13 +306,12 @@ the ZCA registry:
   view that is only found when the context is some class of object, or when
   the context implements some :term:`interface`.
 
-- Singularity.  There's only one place where "application configuration"
-  lives in a :app:`Pyramid` application: in a component registry.  The
-  component registry answers questions made to it by the framework at runtime
-  based on the configuration of *an application*.  Note: "an application" is
-  not the same as "a process", multiple independently configured copies of
-  the same :app:`Pyramid` application are capable of running in the same
-  process space.
+- Singularity.  There's only one place where "application configuration" lives
+  in a :app:`Pyramid` application: in a component registry.  The component
+  registry answers questions made to it by the framework at runtime based on
+  the configuration of *an application*.  Note: "an application" is not the
+  same as "a process"; multiple independently configured copies of the same
+  :app:`Pyramid` application are capable of running in the same process space.
 
 - Composability.  A ZCA component registry can be populated imperatively, or
   there's an existing mechanism to populate a registry via the use of a
@@ -333,10 +329,9 @@ the ZCA registry:
   (non-Zope) frameworks.
 
 - Testability.  Judicious use of the ZCA registry in framework code makes
-  testing that code slightly easier.  Instead of using monkeypatching or
-  other facilities to register mock objects for testing, we inject
-  dependencies via ZCA registrations and then use lookups in the code find
-  our mock objects.
+  testing that code slightly easier.  Instead of using monkeypatching or other
+  facilities to register mock objects for testing, we inject dependencies via
+  ZCA registrations, then use lookups in the code to find our mock objects.
 
 - Speed.  The ZCA registry is very fast for a specific set of complex lookup
   scenarios that :app:`Pyramid` uses, having been optimized through the years
@@ -350,17 +345,17 @@ Conclusion
 ++++++++++
 
 If you only *develop applications* using :app:`Pyramid`, there's not much to
-complain about here.  You just should never need to understand the ZCA
-registry API: use documented :app:`Pyramid` APIs instead.  However, you may
-be an application developer who doesn't read API documentation because it's
-unmanly. Instead you read the raw source code, and because you haven't read
-the documentation, you don't know what functions, classes, and methods even
-*form* the :app:`Pyramid` API.  As a result, you've now written code that
-uses internals and you've painted yourself into a conceptual corner as a
-result of needing to wrestle with some ZCA-using implementation detail.  If
-this is you, it's extremely hard to have a lot of sympathy for you.  You'll
-either need to get familiar with how we're using the ZCA registry or you'll
-need to use only the documented APIs; that's why we document them as APIs.
+complain about here.  You just should never need to understand the ZCA registry
+API; use documented :app:`Pyramid` APIs instead.  However, you may be an
+application developer who doesn't read API documentation. Instead you
+read the raw source code, and because you haven't read the API documentation,
+you don't know what functions, classes, and methods even *form* the
+:app:`Pyramid` API.  As a result, you've now written code that uses internals,
+and you've painted yourself into a conceptual corner, needing to wrestle with
+some ZCA-using implementation detail.  If this is you, it's extremely hard to
+have a lot of sympathy for you.  You'll either need to get familiar with how
+we're using the ZCA registry or you'll need to use only the documented APIs;
+that's why we document them as APIs.
 
 If you *extend* or *develop* :app:`Pyramid` (create new directives, use some
 of the more obscure hooks as described in :ref:`hooks_chapter`, or work on
@@ -368,6 +363,7 @@ the :app:`Pyramid` core code), you will be faced with needing to understand
 at least some ZCA concepts.  In some places it's used unabashedly, and will
 be forever.  We know it's quirky, but it's also useful and fundamentally
 understandable if you take the time to do some reading about it.
+
 
 .. _zcml_encouragement:
 
@@ -384,15 +380,16 @@ completely optional.  No ZCML is required at all to use :app:`Pyramid`, nor
 any other sort of frameworky declarative frontend to application
 configuration.
 
-Pyramid Does Traversal, And I Don't Like Traversal
+
+Pyramid Does Traversal, and I Don't Like Traversal
 --------------------------------------------------
 
 In :app:`Pyramid`, :term:`traversal` is the act of resolving a URL path to a
-:term:`resource` object in a resource tree.  Some people are uncomfortable
-with this notion, and believe it is wrong.  Thankfully, if you use
-:app:`Pyramid`, and you don't want to model your application in terms of a
-resource tree, you needn't use it at all.  Instead, use :term:`URL dispatch`
-to map URL paths to views.
+:term:`resource` object in a resource tree.  Some people are uncomfortable with
+this notion, and believe it is wrong. Thankfully if you use :app:`Pyramid` and
+you don't want to model your application in terms of a resource tree, you
+needn't use it at all. Instead use :term:`URL dispatch` to map URL paths to
+views.
 
 The idea that some folks believe traversal is unilaterally wrong is
 understandable.  The people who believe it is wrong almost invariably have
@@ -427,7 +424,8 @@ URL pattern matching.
 But the point is ultimately moot.  If you don't want to use traversal, you
 needn't.  Use URL dispatch instead.
 
-Pyramid Does URL Dispatch, And I Don't Like URL Dispatch
+
+Pyramid Does URL Dispatch, and I Don't Like URL Dispatch
 --------------------------------------------------------
 
 In :app:`Pyramid`, :term:`url dispatch` is the act of resolving a URL path to
@@ -449,41 +447,40 @@ I'll argue that URL dispatch is ultimately useful, even if you want to use
 traversal as well.  You can actually *combine* URL dispatch and traversal in
 :app:`Pyramid` (see :ref:`hybrid_chapter`).  One example of such a usage: if
 you want to emulate something like Zope 2's "Zope Management Interface" UI on
-top of your object graph (or any administrative interface), you can register
-a route like ``config.add_route('manage', '/manage/*traverse')`` and then
-associate "management" views in your code by using the ``route_name``
-argument to a ``view`` configuration,
-e.g. ``config.add_view('.some.callable', context=".some.Resource",
-route_name='manage')``.  If you wire things up this way someone then walks up
-to for example, ``/manage/ob1/ob2``, they might be presented with a
-management interface, but walking up to ``/ob1/ob2`` would present them with
-the default object view.  There are other tricks you can pull in these hybrid
-configurations if you're clever (and maybe masochistic) too.
+top of your object graph (or any administrative interface), you can register a
+route like ``config.add_route('manage', '/manage/*traverse')`` and then
+associate "management" views in your code by using the ``route_name`` argument
+to a ``view`` configuration, e.g., ``config.add_view('.some.callable',
+context=".some.Resource", route_name='manage')``.  If you wire things up this
+way, someone then walks up to, for example, ``/manage/ob1/ob2``, they might be
+presented with a management interface, but walking up to ``/ob1/ob2`` would
+present them with the default object view.  There are other tricks you can pull
+in these hybrid configurations if you're clever (and maybe masochistic) too.
 
-Also, if you are a URL dispatch hater, if you should ever be asked to write
-an application that must use some legacy relational database structure, you
-might find that using URL dispatch comes in handy for one-off associations
-between views and URL paths.  Sometimes it's just pointless to add a node to
-the object graph that effectively represents the entry point for some bit of
-code.  You can just use a route and be done with it.  If a route matches, a
-view associated with the route will be called; if no route matches,
-:app:`Pyramid` falls back to using traversal.
+Also, if you are a URL dispatch hater, if you should ever be asked to write an
+application that must use some legacy relational database structure, you might
+find that using URL dispatch comes in handy for one-off associations between
+views and URL paths.  Sometimes it's just pointless to add a node to the object
+graph that effectively represents the entry point for some bit of code.  You
+can just use a route and be done with it.  If a route matches, a view
+associated with the route will be called. If no route matches, :app:`Pyramid`
+falls back to using traversal.
 
 But the point is ultimately moot.  If you use :app:`Pyramid`, and you really
 don't want to use URL dispatch, you needn't use it at all.  Instead, use
 :term:`traversal` exclusively to map URL paths to views, just like you do in
 :term:`Zope`.
 
+
 Pyramid Views Do Not Accept Arbitrary Keyword Arguments
 -------------------------------------------------------
 
 Many web frameworks (Zope, TurboGears, Pylons 1.X, Django) allow for their
 variant of a :term:`view callable` to accept arbitrary keyword or positional
-arguments, which are filled in using values present in the ``request.POST``
-or ``request.GET`` dictionaries or by values present in the route match
-dictionary.  For example, a Django view will accept positional arguments
-which match information in an associated "urlconf" such as
-``r'^polls/(?P<poll_id>\d+)/$``:
+arguments, which are filled in using values present in the ``request.POST``,
+``request.GET``, or route match dictionaries.  For example, a Django view will
+accept positional arguments which match information in an associated "urlconf"
+such as ``r'^polls/(?P<poll_id>\d+)/$``:
 
 .. code-block:: python
    :linenos:
@@ -491,8 +488,8 @@ which match information in an associated "urlconf" such as
    def aview(request, poll_id):
        return HttpResponse(poll_id)
 
-Zope, likewise allows you to add arbitrary keyword and positional
-arguments to any method of a resource object found via traversal:
+Zope likewise allows you to add arbitrary keyword and positional arguments to
+any method of a resource object found via traversal:
 
 .. code-block:: python
    :linenos:
@@ -509,13 +506,13 @@ match the names of the positional and keyword arguments in the request, and
 the method is called (if possible) with its argument list filled with values
 mentioned therein.  TurboGears and Pylons 1.X operate similarly.
 
-Out of the box, :app:`Pyramid` is configured to have none of these features.
-By default, :app:`Pyramid` view callables always accept only ``request`` and
-no other arguments.  The rationale: this argument specification matching done
-aggressively can be costly, and :app:`Pyramid` has performance as one of its
-main goals, so we've decided to make people, by default, obtain information
-by interrogating the request object within the view callable body instead of
-providing magic to do unpacking into the view argument list.
+Out of the box, :app:`Pyramid` is configured to have none of these features. By
+default :app:`Pyramid` view callables always accept only ``request`` and no
+other arguments. The rationale is, this argument specification matching when
+done aggressively can be costly, and :app:`Pyramid` has performance as one of
+its main goals. Therefore we've decided to make people, by default, obtain
+information by interrogating the request object within the view callable body
+instead of providing magic to do unpacking into the view argument list.
 
 However, as of :app:`Pyramid` 1.0a9, user code can influence the way view
 callables are expected to be called, making it possible to compose a system
@@ -553,7 +550,7 @@ you're building a simple bespoke web application:
   sources using :meth:`pyramid.config.Configurator.include`.
 
 - View and subscriber registrations made using :term:`interface` objects
-  instead of class objects (e.g. :ref:`using_resource_interfaces`).
+  instead of class objects (e.g., :ref:`using_resource_interfaces`).
 
 - A declarative :term:`authorization` system.
 
@@ -579,42 +576,41 @@ make unit testing and implementation substitutability easier.
 
 In a bespoke web application, usually there's a single canonical deployment,
 and therefore no possibility of multiple code forks.  Extensibility is not
-required; the code is just changed in-place.  Security requirements are often
-less granular.  Using the features listed above will often be overkill for
-such an application.
+required; the code is just changed in place.  Security requirements are often
+less granular.  Using the features listed above will often be overkill for such
+an application.
 
 If you don't like these features, it doesn't mean you can't or shouldn't use
-:app:`Pyramid`.  They are all optional, and a lot of time has been spent
-making sure you don't need to know about them up-front.  You can build
-"Pylons-1.X-style" applications using :app:`Pyramid` that are purely bespoke
-by ignoring the features above.  You may find these features handy later
-after building a bespoke web application that suddenly becomes popular and
-requires extensibility because it must be deployed in multiple locations.
+:app:`Pyramid`.  They are all optional, and a lot of time has been spent making
+sure you don't need to know about them up front.  You can build "Pylons 1.X
+style" applications using :app:`Pyramid` that are purely bespoke by ignoring
+the features above.  You may find these features handy later after building a
+bespoke web application that suddenly becomes popular and requires
+extensibility because it must be deployed in multiple locations.
 
 Pyramid Is Too Big
 ------------------
 
-"The :app:`Pyramid` compressed tarball is larger than 2MB.  It must be
-enormous!"
+"The :app:`Pyramid` compressed tarball is larger than 2MB.  It must beenormous!"
 
-No.  We just ship it with docs, test code, and scaffolding.  Here's a
-breakdown of what's included in subdirectories of the package tree:
+No.  We just ship it with docs, test code, and scaffolding.  Here's a breakdown
+of what's included in subdirectories of the package tree:
 
 docs/
 
-  4.9MB
+  3.6MB
 
 pyramid/tests/
 
-  2.0MB
+  1.3MB
 
 pyramid/scaffolds/
 
-  460KB
+  133KB
 
 pyramid/ (except for ``pyramd/tests`` and ``pyramid/scaffolds``)
 
-  844KB
+  812KB
 
 Of the approximately 34K lines of Python code in the package, the code
 that actually has a chance of executing during normal operation, excluding
@@ -634,7 +630,8 @@ dependencies by forcing us to make better packaging decisions.  Removing
 Chameleon and Mako templating system dependencies in the Pyramid core in 1.5
 let us shed most of the remainder of them.
 
-Pyramid "Cheats" To Obtain Speed
+
+Pyramid "Cheats" to Obtain Speed
 --------------------------------
 
 Complaints have been lodged by other web framework authors at various times
@@ -643,10 +640,11 @@ mechanism is our use (transitively) of the C extensions provided by
 :mod:`zope.interface` to do fast lookups.  Another claimed cheating mechanism
 is the religious avoidance of extraneous function calls.
 
-If there's such a thing as cheating to get better performance, we want to
-cheat as much as possible.  We optimize :app:`Pyramid` aggressively.  This
-comes at a cost: the core code has sections that could be expressed more
-readably.  As an amelioration, we've commented these sections liberally.
+If there's such a thing as cheating to get better performance, we want to cheat
+as much as possible. We optimize :app:`Pyramid` aggressively. This comes at a
+cost. The core code has sections that could be expressed with more readability.
+As an amelioration, we've commented these sections liberally.
+
 
 Pyramid Gets Its Terminology Wrong ("MVC")
 ------------------------------------------
@@ -659,8 +657,8 @@ existing "MVC" framework uses its terminology.  For example, you probably
 expect that models are ORM models, controllers are classes that have methods
 that map to URLs, and views are templates.  :app:`Pyramid` indeed has each of
 these concepts, and each probably *works* almost exactly like your existing
-"MVC" web framework. We just don't use the MVC terminology, as we can't
-square its usage in the web framework space with historical reality.
+"MVC" web framework. We just don't use the MVC terminology, as we can't square
+its usage in the web framework space with historical reality.
 
 People very much want to give web applications the same properties as common
 desktop GUI platforms by using similar terminology, and to provide some frame
@@ -669,194 +667,189 @@ hang together.  But in the opinion of the author, "MVC" doesn't match the web
 very well in general. Quoting from the `Model-View-Controller Wikipedia entry
 <http://en.wikipedia.org/wiki/Model–view–controller>`_:
 
-.. code-block:: text
+    Though MVC comes in different flavors, control flow is generally as
+    follows:
 
-  Though MVC comes in different flavors, control flow is generally as
-  follows:
+      The user interacts with the user interface in some way (for example,
+      presses a mouse button).
 
-    The user interacts with the user interface in some way (for
-    example, presses a mouse button).
+      The controller handles the input event from the user interface, often via
+      a registered handler or callback and converts the event into appropriate
+      user action, understandable for the model.
 
-    The controller handles the input event from the user interface,
-    often via a registered handler or callback and converts the event
-    into appropriate user action, understandable for the model.
+      The controller notifies the model of the user action, possibly resulting
+      in a change in the model's state. (For example, the controller updates the
+      user's shopping cart.)[5]
 
-    The controller notifies the model of the user action, possibly  
-    resulting in a change in the model's state. (For example, the
-    controller updates the user's shopping cart.)[5]
+      A view queries the model in order to generate an appropriate user
+      interface (for example, the view lists the shopping cart's contents). Note
+      that the view gets its own data from the model.
 
-    A view queries the model in order to generate an appropriate
-    user interface (for example, the view lists the shopping cart's     
-    contents). Note that the view gets its own data from the model.
+      The controller may (in some implementations) issue a general instruction
+      to the view to render itself. In others, the view is automatically
+      notified by the model of changes in state (Observer) which require a
+      screen update.
 
-    The controller may (in some implementations) issue a general
-    instruction to the view to render itself. In others, the view is
-    automatically notified by the model of changes in state
-    (Observer) which require a screen update.
-
-    The user interface waits for further user interactions, which
-    restarts the cycle.
+      The user interface waits for further user interactions, which restarts the
+      cycle.
 
 To the author, it seems as if someone edited this Wikipedia definition,
 tortuously couching concepts in the most generic terms possible in order to
-account for the use of the term "MVC" by current web frameworks.  I doubt
-such a broad definition would ever be agreed to by the original authors of
-the MVC pattern.  But *even so*, it seems most MVC web frameworks fail to
-meet even this falsely generic definition.
+account for the use of the term "MVC" by current web frameworks.  I doubt such
+a broad definition would ever be agreed to by the original authors of the MVC
+pattern.  But *even so*, it seems most MVC web frameworks fail to meet even
+this falsely generic definition.
 
 For example, do your templates (views) always query models directly as is
-claimed in "note that the view gets its own data from the model"?  Probably
-not.  My "controllers" tend to do this, massaging the data for easier use by
-the "view" (template). What do you do when your "controller" returns JSON? Do
-your controllers use a template to generate JSON? If not, what's the "view"
-then?  Most MVC-style GUI web frameworks have some sort of event system
-hooked up that lets the view detect when the model changes.  The web just has
-no such facility in its current form: it's effectively pull-only.
+claimed in "note that the view gets its own data from the model"? Probably not.
+My "controllers" tend to do this, massaging the data for easier use by the
+"view" (template). What do you do when your "controller" returns JSON? Do your
+controllers use a template to generate JSON? If not, what's the "view" then?
+Most MVC-style GUI web frameworks have some sort of event system hooked up that
+lets the view detect when the model changes. The web just has no such facility
+in its current form; it's effectively pull-only.
 
-So, in the interest of not mistaking desire with reality, and instead of
-trying to jam the square peg that is the web into the round hole of "MVC", we
-just punt and say there are two things: resources and views. The resource
-tree represents a site structure, the view presents a resource.  The
-templates are really just an implementation detail of any given view: a view
-doesn't need a template to return a response.  There's no "controller": it
-just doesn't exist.  The "model" is either represented by the resource tree
-or by a "domain model" (like a SQLAlchemy model) that is separate from the
-framework entirely.  This seems to us like more reasonable terminology, given
-the current constraints of the web.
+So, in the interest of not mistaking desire with reality, and instead of trying
+to jam the square peg that is the web into the round hole of "MVC", we just
+punt and say there are two things: resources and views. The resource tree
+represents a site structure, the view presents a resource. The templates are
+really just an implementation detail of any given view. A view doesn't need a
+template to return a response. There's no "controller"; it just doesn't exist.
+The "model" is either represented by the resource tree or by a "domain model"
+(like an SQLAlchemy model) that is separate from the framework entirely. This
+seems to us like more reasonable terminology, given the current constraints of
+the web.
+
 
 .. _apps_are_extensible:
 
-Pyramid Applications are Extensible; I Don't Believe In Application Extensibility
+Pyramid Applications Are Extensible; I Don't Believe in Application Extensibility
 ---------------------------------------------------------------------------------
 
 Any :app:`Pyramid` application written obeying certain constraints is
 *extensible*. This feature is discussed in the :app:`Pyramid` documentation
-chapters named :ref:`extending_chapter` and :ref:`advconfig_narr`.  It is
-made possible by the use of the :term:`Zope Component Architecture` and
-within :app:`Pyramid`.
+chapters named :ref:`extending_chapter` and :ref:`advconfig_narr`. It is made
+possible by the use of the :term:`Zope Component Architecture` within
+:app:`Pyramid`.
 
-"Extensible", in this context, means:
+"Extensible" in this context means:
 
-- The behavior of an application can be overridden or extended in a
-  particular *deployment* of the application without requiring that
-  the deployer modify the source of the original application.
+- The behavior of an application can be overridden or extended in a particular
+  *deployment* of the application without requiring that the deployer modify
+  the source of the original application.
 
-- The original developer is not required to anticipate any
-  extensibility plugpoints at application creation time to allow
-  fundamental application behavior to be overriden or extended.
+- The original developer is not required to anticipate any extensibility
+  plug points at application creation time to allow fundamental application
+  behavior to be overridden or extended.
 
 - The original developer may optionally choose to anticipate an
-  application-specific set of plugpoints, which may be hooked by
-  a deployer.  If he chooses to use the facilities provided by the
-  ZCA, the original developer does not need to think terribly hard
-  about the mechanics of introducing such a plugpoint.
+  application-specific set of plug points, which may be hooked by a deployer.
+  If they choose to use the facilities provided by the ZCA, the original
+  developer does not need to think terribly hard about the mechanics of
+  introducing such a plug point.
 
 Many developers seem to believe that creating extensible applications is not
-worth it.  They instead suggest that modifying the source of a given
-application for each deployment to override behavior is more reasonable.
-Much discussion about version control branching and merging typically ensues.
+worth it. They instead suggest that modifying the source of a given application
+for each deployment to override behavior is more reasonable. Much discussion
+about version control branching and merging typically ensues.
 
-It's clear that making every application extensible isn't required.  The
-majority of web applications only have a single deployment, and thus needn't
-be extensible at all.  However, some web applications have multiple
-deployments, and some have *many* deployments.  For example, a generic
-content management system (CMS) may have basic functionality that needs to be
-extended for a particular deployment.  That CMS system may be deployed for
-many organizations at many places.  Some number of deployments of this CMS
-may be deployed centrally by a third party and managed as a group.  It's
-easier to be able to extend such a system for each deployment via preordained
-plugpoints than it is to continually keep each software branch of the system
-in sync with some upstream source: the upstream developers may change code in
-such a way that your changes to the same codebase conflict with theirs in
-fiddly, trivial ways.  Merging such changes repeatedly over the lifetime of a
-deployment can be difficult and time consuming, and it's often useful to be
-able to modify an application for a particular deployment in a less invasive
-way.
+It's clear that making every application extensible isn't required. The
+majority of web applications only have a single deployment, and thus needn't be
+extensible at all. However some web applications have multiple deployments, and
+others have *many* deployments. For example, a generic content management
+system (CMS) may have basic functionality that needs to be extended for a
+particular deployment. That CMS may be deployed for many organizations at many
+places. Some number of deployments of this CMS may be deployed centrally by a
+third party and managed as a group. It's easier to be able to extend such a
+system for each deployment via preordained plug points than it is to
+continually keep each software branch of the system in sync with some upstream
+source. The upstream developers may change code in such a way that your changes
+to the same codebase conflict with theirs in fiddly, trivial ways. Merging such
+changes repeatedly over the lifetime of a deployment can be difficult and time
+consuming, and it's often useful to be able to modify an application for a
+particular deployment in a less invasive way.
 
 If you don't want to think about :app:`Pyramid` application extensibility at
-all, you needn't.  You can ignore extensibility entirely.  However, if you
-follow the set of rules defined in :ref:`extending_chapter`, you don't need
-to *make* your application extensible: any application you write in the
-framework just *is* automatically extensible at a basic level.  The
-mechanisms that deployers use to extend it will be necessarily coarse:
-typically, views, routes, and resources will be capable of being
-overridden. But for most minor (and even some major) customizations, these
-are often the only override plugpoints necessary: if the application doesn't
-do exactly what the deployment requires, it's often possible for a deployer
-to override a view, route, or resource and quickly make it do what he or she
-wants it to do in ways *not necessarily anticipated by the original
-developer*.  Here are some example scenarios demonstrating the benefits of
-such a feature.
+all, you needn't. You can ignore extensibility entirely. However if you follow
+the set of rules defined in :ref:`extending_chapter`, you don't need to *make*
+your application extensible. Any application you write in the framework just
+*is* automatically extensible at a basic level. The mechanisms that deployers
+use to extend it will be necessarily coarse. Typically views, routes, and
+resources will be capable of being overridden. But for most minor (and even
+some major) customizations, these are often the only override plug points
+necessary. If the application doesn't do exactly what the deployment requires,
+it's often possible for a deployer to override a view, route, or resource, and
+quickly make it do what they want it to do in ways *not necessarily anticipated
+by the original developer*. Here are some example scenarios demonstrating the
+benefits of such a feature.
 
-- If a deployment needs a different styling, the deployer may override the
-  main template and the CSS in a separate Python package which defines
-  overrides.
+- If a deployment needs a different styling, the deployer may override the main
+  template and the CSS in a separate Python package which defines overrides.
 
-- If a deployment needs an application page to do something differently, or
-  to expose more or different information, the deployer may override the
-  view that renders the page within a separate Python package.
+- If a deployment needs an application page to do something differently, or to
+  expose more or different information, the deployer may override the view that
+  renders the page within a separate Python package.
 
 - If a deployment needs an additional feature, the deployer may add a view to
   the override package.
 
-As long as the fundamental design of the upstream package doesn't change,
-these types of modifications often survive across many releases of the
-upstream package without needing to be revisited.
+As long as the fundamental design of the upstream package doesn't change, these
+types of modifications often survive across many releases of the upstream
+package without needing to be revisited.
 
 Extending an application externally is not a panacea, and carries a set of
-risks similar to branching and merging: sometimes major changes upstream will
-cause you to need to revisit and update some of your modifications.  But you
-won't regularly need to deal wth meaningless textual merge conflicts that
-trivial changes to upstream packages often entail when it comes time to
-update the upstream package, because if you extend an application externally,
-there just is no textual merge done.  Your modifications will also, for
-whatever it's worth, be contained in one, canonical, well-defined place.
+risks similar to branching and merging. Sometimes major changes upstream will
+cause you to revisit and update some of your modifications. But you won't
+regularly need to deal with meaningless textual merge conflicts that trivial
+changes to upstream packages often entail when it comes time to update the
+upstream package, because if you extend an application externally, there just
+is no textual merge done. Your modifications will also, for whatever it's
+worth, be contained in one, canonical, well-defined place.
 
 Branching an application and continually merging in order to get new features
-and bugfixes is clearly useful.  You can do that with a :app:`Pyramid`
-application just as usefully as you can do it with any application.  But
+and bug fixes is clearly useful. You can do that with a :app:`Pyramid`
+application just as usefully as you can do it with any application. But
 deployment of an application written in :app:`Pyramid` makes it possible to
-avoid the need for this even if the application doesn't define any plugpoints
-ahead of time.  It's possible that promoters of competing web frameworks
-dismiss this feature in favor of branching and merging because applications
-written in their framework of choice aren't extensible out of the box in a
-comparably fundamental way.
+avoid the need for this even if the application doesn't define any plug points
+ahead of time. It's possible that promoters of competing web frameworks dismiss
+this feature in favor of branching and merging because applications written in
+their framework of choice aren't extensible out of the box in a comparably
+fundamental way.
 
 While :app:`Pyramid` applications are fundamentally extensible even if you
 don't write them with specific extensibility in mind, if you're moderately
-adventurous, you can also take it a step further.  If you learn more about
-the :term:`Zope Component Architecture`, you can optionally use it to expose
-other more domain-specific configuration plugpoints while developing an
-application.  The plugpoints you expose needn't be as coarse as the ones
-provided automatically by :app:`Pyramid` itself.  For example, you might
-compose your own directive that configures a set of views for a prebaked
-purpose (e.g. ``restview`` or somesuch) , allowing other people to refer to
-that directive when they make declarations in the ``includeme`` of their
-customization package.  There is a cost for this: the developer of an
-application that defines custom plugpoints for its deployers will need to
-understand the ZCA or he will need to develop his own similar extensibility
-system.
+adventurous, you can also take it a step further. If you learn more about the
+:term:`Zope Component Architecture`, you can optionally use it to expose other
+more domain-specific configuration plug points while developing an application.
+The plug points you expose needn't be as coarse as the ones provided
+automatically by :app:`Pyramid` itself. For example, you might compose your own
+directive that configures a set of views for a pre-baked purpose (e.g.,
+``restview`` or somesuch), allowing other people to refer to that directive
+when they make declarations in the ``includeme`` of their customization
+package. There is a cost for this: the developer of an application that defines
+custom plug points for its deployers will need to understand the ZCA or they
+will need to develop their own similar extensibility system.
 
-Ultimately, any argument about whether the extensibility features lent to
-applications by :app:`Pyramid` are good or bad is mostly pointless. You
-needn't take advantage of the extensibility features provided by a particular
+Ultimately any argument about whether the extensibility features lent to
+applications by :app:`Pyramid` are good or bad is mostly pointless. You needn't
+take advantage of the extensibility features provided by a particular
 :app:`Pyramid` application in order to affect a modification for a particular
-set of its deployments.  You can ignore the application's extensibility
-plugpoints entirely, and use version control branching and merging to
-manage application deployment modifications instead, as if you were deploying
-an application written using any other web framework.
+set of its deployments. You can ignore the application's extensibility plug
+points entirely, and use version control branching and merging to manage
+application deployment modifications instead, as if you were deploying an
+application written using any other web framework.
 
-Zope 3 Enforces "TTW" Authorization Checks By Default; Pyramid Does Not
+
+Zope 3 Enforces "TTW" Authorization Checks by Default; Pyramid Does Not
 -----------------------------------------------------------------------
 
 Challenge
 +++++++++
 
 :app:`Pyramid` performs automatic authorization checks only at :term:`view`
-execution time.  Zope 3 wraps context objects with a `security proxy
-<http://wiki.zope.org/zope3/WhatAreSecurityProxies>`_, which causes Zope 3 to
-do also security checks during attribute access.  I like this, because it
-means:
+execution time. Zope 3 wraps context objects with a `security proxy
+<http://wiki.zope.org/zope3/WhatAreSecurityProxies>`_, which causes Zope 3 also
+to do security checks during attribute access. I like this, because it means:
 
 #) When I use the security proxy machinery, I can have a view that
    conditionally displays certain HTML elements (like form fields) or
@@ -888,7 +881,7 @@ web framework.
 
 And since we tend to use the same toolkit for all web applications, it's just
 never been a concern to be able to use the same set of restricted-execution
-code under two web different frameworks.
+code under two different web frameworks.
 
 Justifications for disabling security proxies by default notwithstanding,
 given that Zope 3 security proxies are viral by nature, the only requirement
@@ -900,6 +893,7 @@ behavior, it is possible to plug in a different traverser which returns
 Zope3-security-proxy-wrapped objects for each traversed object (including the
 :term:`context` and the :term:`root`).  This would have the effect of
 creating a more Zope3-like environment without much effort.
+
 
 .. _http_exception_hierarchy:
 
@@ -913,28 +907,29 @@ much like the ones defined in :mod:`webob.exc`, (e.g.,
 :class:`~pyramid.httpexceptions.HTTPNotFound` or
 :class:`~pyramid.httpexceptions.HTTPForbidden`).  They have the same names and
 largely the same behavior, and all have a very similar implementation, but not
-the same identity.  Here's why they have a separate identity:
+the same identity.  Here's why they have a separate identity.
 
 - Making them separate allows the HTTP exception classes to subclass
   :class:`pyramid.response.Response`.  This speeds up response generation
-  slightly due to the way the Pyramid router works.  The same speedup could be
+  slightly due to the way the Pyramid router works.  The same speed up could be
   gained by monkeypatching :class:`webob.response.Response`, but it's usually
   the case that monkeypatching turns out to be evil and wrong.
 
-- Making them separate allows them to provide alternate ``__call__`` logic
+- Making them separate allows them to provide alternate ``__call__`` logic,
   which also speeds up response generation.
 
 - Making them separate allows the exception classes to provide for the proper
   value of ``RequestClass`` (:class:`pyramid.request.Request`).
 
-- Making them separate allows us freedom from having to think about backwards
-  compatibility code present in :mod:`webob.exc` having to do with Python 2.4,
-  which we no longer support in Pyramid 1.1+.
+- Making them separate gives us freedom from thinking about backwards
+  compatibility code present in :mod:`webob.exc` related to Python 2.4, which
+  we no longer support in Pyramid 1.1+.
 
 - We change the behavior of two classes
   (:class:`~pyramid.httpexceptions.HTTPNotFound` and
   :class:`~pyramid.httpexceptions.HTTPForbidden`) in the module so that they
-  can be used by Pyramid internally for notfound and forbidden exceptions.
+  can be used by Pyramid internally for ``notfound`` and ``forbidden``
+  exceptions.
 
 - Making them separate allows us to influence the docstrings of the exception
   classes to provide Pyramid-specific documentation.
@@ -943,9 +938,10 @@ the same identity.  Here's why they have a separate identity:
   Python 2.6 when the response objects are used as exceptions (related to
   ``self.message``).
 
+
 .. _simpler_traversal_model:
 
-Pyramid has Simpler Traversal Machinery than Does Zope
+Pyramid has simpler traversal machinery than does Zope
 ------------------------------------------------------
 
 Zope's default traverser:
@@ -955,26 +951,26 @@ Zope's default traverser:
 
 - Attempts to use an adaptation to obtain the next element in the path from
   the currently traversed object, falling back to ``__bobo_traverse__``,
-  ``__getitem__`` and eventually ``__getattr__``.
+  ``__getitem__``, and eventually ``__getattr__``.
 
 Zope's default traverser allows developers to mutate the traversal name stack
-during traversal by mutating ``REQUEST['TraversalNameStack']``.  Pyramid's
-default traverser (``pyramid.traversal.ResourceTreeTraverser``) does not
-offer a way to do this; it does not maintain a stack as a request attribute
-and, even if it did, it does not pass the request to resource objects while
-it's traversing.  While it was handy at times, this feature was abused in
-frameworks built atop Zope (like CMF and Plone), often making it difficult to
-tell exactly what was happening when a traversal didn't match a view.  I felt
-it was better to make folks that wanted the feature replace the traverser
-rather than build that particular honey pot in to the default traverser.
+during traversal by mutating ``REQUEST['TraversalNameStack']``. Pyramid's
+default traverser (``pyramid.traversal.ResourceTreeTraverser``) does not offer
+a way to do this. It does not maintain a stack as a request attribute and, even
+if it did, it does not pass the request to resource objects while it's
+traversing. While it was handy at times, this feature was abused in frameworks
+built atop Zope (like CMF and Plone), often making it difficult to tell exactly
+what was happening when a traversal didn't match a view. I felt it was better
+for folks that wanted the feature to make them replace the traverser rather
+than build that particular honey pot in to the default traverser.
 
 Zope uses multiple mechanisms to attempt to obtain the next element in the
 resource tree based on a name.  It first tries an adaptation of the current
-resource to ``ITraversable``, and if that fails, it falls back to attempting
+resource to ``ITraversable``, and if that fails, it falls back to attempting a
 number of magic methods on the resource (``__bobo_traverse__``,
-``__getitem__``, and ``__getattr__``).  My experience while both using Zope
-and attempting to reimplement its publisher in ``repoze.zope2`` led me to
-believe the following:
+``__getitem__``, and ``__getattr__``).  My experience while both using Zope and
+attempting to reimplement its publisher in ``repoze.zope2`` led me to believe
+the following:
 
 - The *default* traverser should be as simple as possible.  Zope's publisher
   is somewhat difficult to follow and replicate due to the fallbacks it tried
@@ -995,7 +991,7 @@ believe the following:
   default implementation of the larger component, no one understands when (or
   whether) they should ever override the larger component entrirely.  This
   results, over time, in a rusting together of the larger "replaceable"
-  component and the framework itself, because people come to depend on the
+  component and the framework itself because people come to depend on the
   availability of the default component in order just to turn its knobs. The
   default component effectively becomes part of the framework, which entirely
   subverts the goal of making it replaceable.  In Pyramid, typically if a
@@ -1004,40 +1000,42 @@ believe the following:
   you will replace the component instead of turning knobs attached to the
   component.
 
+
 .. _microframeworks_smaller_hello_world:
 
-Microframeworks Have Smaller Hello World Programs
+Microframeworks have smaller Hello World programs
 -------------------------------------------------
 
-Self-described "microframeworks" exist: `Bottle <http://bottle.paws.de>`_ and
-`Flask <http://flask.pocoo.org/>`_ are two that are becoming popular.  `Bobo
-<http://bobo.digicool.com/>`_ doesn't describe itself as a microframework,
-but its intended userbase is much the same.  Many others exist.  We've
-actually even (only as a teaching tool, not as any sort of official project)
-`created one using Pyramid <http://bfg.repoze.org/videos#groundhog1>`_ (the
-videos use BFG, a precursor to Pyramid, but the resulting code is `available
-for Pyramid too <https://github.com/Pylons/groundhog>`_). Microframeworks are
-small frameworks with one common feature: each allows its users to create a
-fully functional application that lives in a single Python file.
+Self-described "microframeworks" exist. `Bottle <http://bottle.paws.de>`_ and
+`Flask <http://flask.pocoo.org/>`_ are two that are becoming popular. `Bobo
+<http://bobo.digicool.com/>`_ doesn't describe itself as a microframework, but
+its intended user base is much the same. Many others exist. We've even (only as
+a teaching tool, not as any sort of official project) `created one using
+Pyramid <http://bfg.repoze.org/videos#groundhog1>`_. The videos use BFG, a
+precursor to Pyramid, but the resulting code is `available for Pyramid too
+<https://github.com/Pylons/groundhog>`_). Microframeworks are small frameworks
+with one common feature: each allows its users to create a fully functional
+application that lives in a single Python file.
 
 Some developers and microframework authors point out that Pyramid's "hello
-world" single-file program is longer (by about five lines) than the
-equivalent program in their favorite microframework.  Guilty as charged.
+world" single-file program is longer (by about five lines) than the equivalent
+program in their favorite microframework. Guilty as charged.
 
-This loss isn't for lack of trying. Pyramid is useful in the same
-circumstance in which microframeworks claim dominance: single-file
-applications.  But Pyramid doesn't sacrifice its ability to credibly support
-larger applications in order to achieve hello-world LoC parity with the
-current crop of microframeworks.  Pyramid's design instead tries to avoid
-some common pitfalls associated with naive declarative configuration schemes.
-The subsections which follow explain the rationale.
+This loss isn't for lack of trying. Pyramid is useful in the same circumstance
+in which microframeworks claim dominance: single-file applications. But Pyramid
+doesn't sacrifice its ability to credibly support larger applications in order
+to achieve "hello world" lines of code parity with the current crop of
+microframeworks. Pyramid's design instead tries to avoid some common pitfalls
+associated with naive declarative configuration schemes. The subsections which
+follow explain the rationale.
+
 
 .. _you_dont_own_modulescope:
 
-Application Programmers Don't Control The Module-Scope Codepath (Import-Time Side-Effects Are Evil)
+Application programmers don't control the module-scope codepath (import-time side-effects are evil)
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-Please imagine a directory structure with a set of Python files in it:
+Imagine a directory structure with a set of Python files in it:
 
 .. code-block:: text
 
@@ -1085,13 +1083,13 @@ The contents of ``config.py``:
         L.append(func)
         return func
 
-If we cd to the directory that holds these files and we run ``python app.py``
-given the directory structure and code above, what happens?  Presumably, our
-``decorator`` decorator will be used twice, once by the decorated function
-``foo`` in ``app.py`` and once by the decorated function ``bar`` in
-``app2.py``.  Since each time the decorator is used, the list ``L`` in
-``config.py`` is appended to, we'd expect a list with two elements to be
-printed, right?  Sadly, no:
+If we ``cd`` to the directory that holds these files, and we run
+``python app.py``, given the directory structure and code above, what happens?
+Presumably, our ``decorator`` decorator will be used twice, once by the
+decorated function ``foo`` in ``app.py``, and once by the decorated function
+``bar`` in ``app2.py``. Since each time the decorator is used, the list ``L``
+in ``config.py`` is appended to, we'd expect a list with two elements to be
+printed, right? Sadly, no:
 
 .. code-block:: text
 
@@ -1101,21 +1099,21 @@ printed, right?  Sadly, no:
      <function bar at 0x7f4ea41ab2a8>]
 
 By visual inspection, that outcome (three different functions in the list)
-seems impossible.  We only defined two functions and we decorated each of
-those functions only once, so we believe that the ``decorator`` decorator
-will only run twice.  However, what we believe is wrong because the code at
-module scope in our ``app.py`` module was *executed twice*.  The code is
+seems impossible. We defined only two functions, and we decorated each of those
+functions only once, so we believe that the ``decorator`` decorator will run
+only twice. However, what we believe is in fact wrong, because the code at
+module scope in our ``app.py`` module was *executed twice*. The code is
 executed once when the script is run as ``__main__`` (via ``python app.py``),
 and then it is executed again when ``app2.py`` imports the same file as
 ``app``.
 
-What does this have to do with our comparison to microframeworks?  Many
-microframeworks in the current crop (e.g. Bottle, Flask) encourage you to
-attach configuration decorators to objects defined at module scope.  These
-decorators execute arbitrarily complex registration code which populates a
-singleton registry that is a global defined in external Python module.  This
-is analogous to the above example: the "global registry" in the above example
-is the list ``L``.
+What does this have to do with our comparison to microframeworks? Many
+microframeworks in the current crop (e.g., Bottle and Flask) encourage you to
+attach configuration decorators to objects defined at module scope. These
+decorators execute arbitrarily complex registration code, which populates a
+singleton registry that is a global which is in turn defined in external Python
+module. This is analogous to the above example: the "global registry" in the
+above example is the list ``L``.
 
 Let's see what happens when we use the same pattern with the `Groundhog
 <https://github.com/Pylons/groundhog>`_ microframework.  Replace the contents
@@ -1168,41 +1166,39 @@ will be.
 
 The encouragement to use decorators which perform population of an external
 registry has an unintended consequence: the application developer now must
-assert ownership of every codepath that executes Python module scope
-code. Module-scope code is presumed by the current crop of decorator-based
-microframeworks to execute once and only once; if it executes more than once,
-weird things will start to happen.  It is up to the application developer to
-maintain this invariant.  Unfortunately, however, in reality, this is an
-impossible task, because, Python programmers *do not own the module scope
-codepath, and never will*.  Anyone who tries to sell you on the idea that
-they do is simply mistaken.  Test runners that you may want to use to run
-your code's tests often perform imports of arbitrary code in strange orders
-that manifest bugs like the one demonstrated above.  API documentation
-generation tools do the same.  Some people even think it's safe to use the
-Python ``reload`` command or delete objects from ``sys.modules``, each of
-which has hilarious effects when used against code that has import-time side
-effects.
+assert ownership of every code path that executes Python module scope code.
+Module-scope code is presumed by the current crop of decorator-based
+microframeworks to execute once and only once. If it executes more than once,
+weird things will start to happen. It is up to the application developer to
+maintain this invariant. Unfortunately, in reality this is an impossible task,
+because Python programmers *do not own the module scope code path, and never
+will*. Anyone who tries to sell you on the idea that they do so is simply
+mistaken. Test runners that you may want to use to run your code's tests often
+perform imports of arbitrary code in strange orders that manifest bugs like the
+one demonstrated above. API documentation generation tools do the same. Some
+people even think it's safe to use the Python ``reload`` command, or delete
+objects from ``sys.modules``, each of which has hilarious effects when used
+against code that has import-time side effects.
 
-Global-registry-mutating microframework programmers therefore will at some
-point need to start reading the tea leaves about what *might* happen if
-module scope code gets executed more than once like we do in the previous
-paragraph.  When Python programmers assume they can use the module-scope
-codepath to run arbitrary code (especially code which populates an external
-registry), and this assumption is challenged by reality, the application
-developer is often required to undergo a painful, meticulous debugging
-process to find the root cause of an inevitably obscure symptom.  The
-solution is often to rearrange application import ordering or move an import
-statement from module-scope into a function body.  The rationale for doing so
-can never be expressed adequately in the checkin message which accompanies
-the fix and can't be documented succinctly enough for the benefit of the rest
-of the development team so that the problem never happens again.  It will
-happen again, especially if you are working on a project with other people
-who haven't yet internalized the lessons you learned while you stepped
-through module-scope code using ``pdb``.  This is a really pretty poor
-situation to find yourself in as an application developer: you probably
-didn't even know your or your team signed up for the job, because the
-documentation offered by decorator-based microframeworks don't warn you about
-it.
+Global registry-mutating microframework programmers therefore will at some
+point need to start reading the tea leaves about what *might* happen if module
+scope code gets executed more than once, like we do in the previous paragraph.
+When Python programmers assume they can use the module-scope code path to run
+arbitrary code (especially code which populates an external registry), and this
+assumption is challenged by reality, the application developer is often
+required to undergo a painful, meticulous debugging process to find the root
+cause of an inevitably obscure symptom. The solution is often to rearrange
+application import ordering, or move an import statement from module-scope into
+a function body. The rationale for doing so can never be expressed adequately
+in the commit message which accompanies the fix, and can't be documented
+succinctly enough for the benefit of the rest of the development team so that
+the problem never happens again. It will happen again, especially if you are
+working on a project with other people who haven't yet internalized the lessons
+you learned while you stepped through module-scope code using ``pdb``. This is
+a very poor situation in which to find yourself as an application developer:
+you probably didn't even know you or your team signed up for the job, because
+the documentation offered by decorator-based microframeworks don't warn you
+about it.
 
 Folks who have a large investment in eager decorator-based configuration that
 populates an external data structure (such as microframework authors) may
@@ -1218,7 +1214,7 @@ time, and application complexity.
 
 If microframework authors do admit that the circumstance isn't contrived,
 they might then argue that real damage will never happen as the result of the
-double-execution (or triple-execution, etc) of module scope code.  You would
+double-execution (or triple-execution, etc.) of module scope code.  You would
 be wise to disbelieve this assertion.  The potential outcomes of multiple
 execution are too numerous to predict because they involve delicate
 relationships between application and framework code as well as chronology of
@@ -1226,14 +1222,14 @@ code execution.  It's literally impossible for a framework author to know
 what will happen in all circumstances.  But even if given the gift of
 omniscience for some limited set of circumstances, the framework author
 almost certainly does not have the double-execution anomaly in mind when
-coding new features.  He's thinking of adding a feature, not protecting
+coding new features.  They're thinking of adding a feature, not protecting
 against problems that might be caused by the 1% multiple execution case.
 However, any 1% case may cause 50% of your pain on a project, so it'd be nice
-if it never occured.
+if it never occurred.
 
-Responsible microframeworks actually offer a back-door way around the
-problem.  They allow you to disuse decorator based configuration entirely.
-Instead of requiring you to do the following:
+Responsible microframeworks actually offer a back-door way around the problem.
+They allow you to disuse decorator-based configuration entirely. Instead of
+requiring you to do the following:
 
 .. code-block:: python
     :linenos:
@@ -1247,7 +1243,7 @@ Instead of requiring you to do the following:
     if __name__ == '__main__':
         gh.run()
 
-They allow you to disuse the decorator syntax and go almost-all-imperative:
+They allow you to disuse the decorator syntax and go almost all-imperative:
 
 .. code-block:: python
     :linenos:
@@ -1271,23 +1267,23 @@ predictability.
 
 .. note::
 
-  Astute readers may notice that Pyramid has configuration decorators too.
-  Aha!  Don't these decorators have the same problems?  No.  These decorators
-  do not populate an external Python module when they are executed.  They
-  only mutate the functions (and classes and methods) they're attached to.
-  These mutations must later be found during a scan process that has a
-  predictable and structured import phase.  Module-localized mutation is
-  actually the best-case circumstance for double-imports; if a module only
-  mutates itself and its contents at import time, if it is imported twice,
-  that's OK, because each decorator invocation will always be mutating an
-  independent copy of the object it's attached to, not a shared resource like
-  a registry in another module.  This has the effect that
-  double-registrations will never be performed.
+  Astute readers may notice that Pyramid has configuration decorators too. Aha!
+  Don't these decorators have the same problems? No. These decorators do not
+  populate an external Python module when they are executed. They only mutate
+  the functions (and classes and methods) to which they're attached. These
+  mutations must later be found during a scan process that has a predictable
+  and structured import phase. Module-localized mutation is actually the
+  best-case circumstance for double-imports. If a module only mutates itself
+  and its contents at import time, if it is imported twice, that's OK, because
+  each decorator invocation will always be mutating an independent copy of the
+  object to which it's attached, not a shared resource like a registry in
+  another module. This has the effect that double-registrations will never be
+  performed.
 
 
 .. _routes_need_ordering:
 
-Routes Need Relative Ordering
+Routes need relative ordering
 +++++++++++++++++++++++++++++
 
 Consider the following simple `Groundhog
@@ -1315,8 +1311,8 @@ Consider the following simple `Groundhog
         app.run()
 
 If you run this application and visit the URL ``/admin``, you will see the
-"admin" page.  This is the intended result.  However, what if you rearrange
-the order of the function definitions in the file?
+"admin" page. This is the intended result. However, what if you rearrange the
+order of the function definitions in the file?
 
 .. code-block:: python
     :linenos:
@@ -1339,11 +1335,11 @@ the order of the function definitions in the file?
     if __name__ == '__main__':
         app.run()
 
-If you run this application and visit the URL ``/admin``, you will now be
-returned a 404 error.  This is probably not what you intended.  The reason
-you see a 404 error when you rearrange function definition ordering is that
-routing declarations expressed via our microframework's routing decorators
-have an *ordering*, and that ordering matters.
+If you run this application and visit the URL ``/admin``, your app will now
+return a 404 error. This is probably not what you intended. The reason you see
+a 404 error when you rearrange function definition ordering is that routing
+declarations expressed via our microframework's routing decorators have an
+*ordering*, and that ordering matters.
 
 In the first case, where we achieved the expected result, we first added a
 route with the pattern ``/admin``, then we added a route with the pattern
@@ -1351,65 +1347,67 @@ route with the pattern ``/admin``, then we added a route with the pattern
 scope.  When a request with a ``PATH_INFO`` of ``/admin`` enters our
 application, the web framework loops over each of our application's route
 patterns in the order in which they were defined in our module.  As a result,
-the view associated with the ``/admin`` routing pattern will be invoked: it
-matches first.  All is right with the world.
+the view associated with the ``/admin`` routing pattern will be invoked because
+it matches first. All is right with the world.
 
 In the second case, where we did not achieve the expected result, we first
 added a route with the pattern ``/:action``, then we added a route with the
 pattern ``/admin``.  When a request with a ``PATH_INFO`` of ``/admin`` enters
 our application, the web framework loops over each of our application's route
 patterns in the order in which they were defined in our module.  As a result,
-the view associated with the ``/:action`` routing pattern will be invoked: it
-matches first.  A 404 error is raised.  This is not what we wanted; it just
-happened due to the order in which we defined our view functions.
+the view associated with the ``/:action`` routing pattern will be invoked
+because it matches first. A 404 error is raised. This is not what we wanted; it
+just happened due to the order in which we defined our view functions.
 
-This is because Groundhog routes are added to the routing map in import
-order, and matched in the same order when a request comes in.  Bottle, like
-Groundhog, as of this writing, matches routes in the order in which they're
-defined at Python execution time.  Flask, on the other hand, does not order
-route matching based on import order; it reorders the routes you add to your
-application based on their "complexity".  Other microframeworks have varying
+This is because Groundhog routes are added to the routing map in import order,
+and matched in the same order when a request comes in. Bottle, like Groundhog,
+as of this writing, matches routes in the order in which they're defined at
+Python execution time. Flask, on the other hand, does not order route matching
+based on import order. Instead it reorders the routes you add to your
+application based on their "complexity". Other microframeworks have varying
 strategies to do route ordering.
 
 Your application may be small enough where route ordering will never cause an
-issue.  If your application becomes large enough, however, being able to
-specify or predict that ordering as your application grows larger will be
-difficult.  At some point, you will likely need to more explicitly start
-controlling route ordering, especially in applications that require
-extensibility.
+issue. If your application becomes large enough, however, being able to specify
+or predict that ordering as your application grows larger will be difficult.
+At some point, you will likely need to start controlling route ordering more
+explicitly, especially in applications that require extensibility.
 
 If your microframework orders route matching based on complexity, you'll need
 to understand what is meant by "complexity", and you'll need to attempt to
-inject a "less complex" route to have it get matched before any "more
-complex" one to ensure that it's tried first.
+inject a "less complex" route to have it get matched before any "more complex"
+one to ensure that it's tried first.
 
 If your microframework orders its route matching based on relative
 import/execution of function decorator definitions, you will need to ensure
-you execute all of these statements in the "right" order, and you'll need to
-be cognizant of this import/execution ordering as you grow your application
-or try to extend it.  This is a difficult invariant to maintain for all but
-the smallest applications.
+that you execute all of these statements in the "right" order, and you'll need
+to be cognizant of this import/execution ordering as you grow your application
+or try to extend it. This is a difficult invariant to maintain for all but the
+smallest applications.
 
-In either case, your application must import the non-``__main__`` modules
-which contain configuration decorations somehow for their configuration to be
-executed.  Does that make you a little uncomfortable?  It should, because
+In either case, your application must import the non-``__main__`` modules which
+contain configuration decorations somehow for their configuration to be
+executed. Does that make you a little uncomfortable? It should, because
 :ref:`you_dont_own_modulescope`.
 
 Pyramid uses neither decorator import time ordering nor does it attempt to
-divine the relative complexity of one route to another in order to define a
-route match ordering.  In Pyramid, you have to maintain relative route
-ordering imperatively via the chronology of multiple executions of the
-:meth:`pyramid.config.Configurator.add_route` method.  The order in which you
+divine the relative complexity of one route to another as a means to define a
+route match ordering. In Pyramid, you have to maintain relative route ordering
+imperatively via the chronology of multiple executions of the
+:meth:`pyramid.config.Configurator.add_route` method. The order in which you
 repeatedly call ``add_route`` becomes the order of route matching.
 
 If needing to maintain this imperative ordering truly bugs you, you can use
-:term:`traversal` instead of route matching, which is a completely
-declarative (and completely predictable) mechanism to map code to URLs.
-While URL dispatch is easier to understand for small non-extensible
-applications, traversal is a great fit for very large applications and
-applications that need to be arbitrarily extensible.
+:term:`traversal` instead of route matching, which is a completely declarative
+(and completely predictable) mechanism to map code to URLs. While URL dispatch
+is easier to understand for small non-extensible applications, traversal is a
+great fit for very large applications and applications that need to be
+arbitrarily extensible.
 
-"Stacked Object Proxies" Are Too Clever / Thread Locals Are A Nuisance
+
+.. _thread_local_nuisance:
+
+"Stacked object proxies" are too clever / thread locals are a nuisance
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 Some microframeworks use the ``import`` statement to get a handle to an
@@ -1452,32 +1450,35 @@ code below:
        for i in range(10):
            print(i)
 
-By its nature, the *request* object created as the result of a WSGI server's
-call into a long-lived web framework cannot be global, because the lifetime
-of a single request will be much shorter than the lifetime of the process
-running the framework.  A request object created by a web framework actually
-has more similarity to the ``i`` loop counter in our example above than it
-has to any comparable importable object defined in the Python standard
+By its nature, the *request* object that is created as the result of a WSGI
+server's call into a long-lived web framework cannot be global, because the
+lifetime of a single request will be much shorter than the lifetime of the
+process running the framework.  A request object created by a web framework
+actually has more similarity to the ``i`` loop counter in our example above
+than it has to any comparable importable object defined in the Python standard
 library or in normal library code.
 
 However, systems which use stacked object proxies promote locally scoped
-objects such as ``request`` out to module scope, for the purpose of being
+objects, such as ``request``, out to module scope, for the purpose of being
 able to offer users a nice spelling involving ``import``.  They, for what I
-consider dubious reasons, would rather present to their users the canonical
-way of getting at a ``request`` as ``from framework import request`` instead
-of a saner ``from myframework.threadlocals import get_request; request =
-get_request()`` even though the latter is more explicit.
+consider dubious reasons, would rather present to their users the canonical way
+of getting at a ``request`` as ``from framework import request`` instead of a
+saner ``from myframework.threadlocals import get_request; request =
+get_request()``, even though the latter is more explicit.
 
 It would be *most* explicit if the microframeworks did not use thread local
-variables at all.  Pyramid view functions are passed a request object; many
-of Pyramid's APIs require that an explicit request object be passed to them.
-It is *possible* to retrieve the current Pyramid request as a threadlocal
-variable but it is a "in case of emergency, break glass" type of activity.
-This explicitness makes Pyramid view functions more easily unit testable, as
-you don't need to rely on the framework to manufacture suitable "dummy"
-request (and other similarly-scoped) objects during test setup.  It also
-makes them more likely to work on arbitrary systems, such as async servers
-that do no monkeypatching.
+variables at all. Pyramid view functions are passed a request object. Many of
+Pyramid's APIs require that an explicit request object be passed to them. It is
+*possible* to retrieve the current Pyramid request as a threadlocal variable,
+but it is an "in case of emergency, break glass" type of activity. This
+explicitness makes Pyramid view functions more easily unit testable, as you
+don't need to rely on the framework to manufacture suitable "dummy" request
+(and other similarly-scoped) objects during test setup.  It also makes them
+more likely to work on arbitrary systems, such as async servers, that do no
+monkeypatching.
+
+
+.. _explicitly_wsgi:
 
 Explicitly WSGI
 +++++++++++++++
@@ -1491,35 +1492,35 @@ import a WSGI server and use it to serve up their Pyramid application as per
 the documentation of that WSGI server.
 
 The extra lines saved by abstracting away the serving step behind ``run()``
-seem to have driven dubious second-order decisions related to API in some
-microframeworks.  For example, Bottle contains a ``ServerAdapter`` subclass
-for each type of WSGI server it supports via its ``app.run()`` mechanism.
-This means that there exists code in ``bottle.py`` that depends on the
-following modules: ``wsgiref``, ``flup``, ``paste``, ``cherrypy``, ``fapws``,
+seems to have driven dubious second-order decisions related to its API in some
+microframeworks. For example, Bottle contains a ``ServerAdapter`` subclass for
+each type of WSGI server it supports via its ``app.run()`` mechanism. This
+means that there exists code in ``bottle.py`` that depends on the following
+modules: ``wsgiref``, ``flup``, ``paste``, ``cherrypy``, ``fapws``,
 ``tornado``, ``google.appengine``, ``twisted.web``, ``diesel``, ``gevent``,
-``gunicorn``, ``eventlet``, and ``rocket``.  You choose the kind of server
-you want to run by passing its name into the ``run`` method.  In theory, this
-sounds great: I can try Bottle out on ``gunicorn`` just by passing in a name!
-However, to fully test Bottle, all of these third-party systems must be
-installed and functional; the Bottle developers must monitor changes to each
-of these packages and make sure their code still interfaces properly with
-them.  This expands the packages required for testing greatly; this is a
-*lot* of requirements.  It is likely difficult to fully automate these tests
-due to requirements conflicts and build issues.
+``gunicorn``, ``eventlet``, and ``rocket``. You choose the kind of server you
+want to run by passing its name into the ``run`` method. In theory, this sounds
+great: I can try out Bottle on ``gunicorn`` just by passing in a name! However,
+to fully test Bottle, all of these third-party systems must be installed and
+functional. The Bottle developers must monitor changes to each of these
+packages and make sure their code still interfaces properly with them. This
+increases the number of packages required for testing greatly; this is a *lot*
+of requirements. It is likely difficult to fully automate these tests due to
+requirements conflicts and build issues.
 
 As a result, for single-file apps, we currently don't bother to offer a
-``run()`` shortcut; we tell folks to import their WSGI server of choice and
-run it by hand.  For the people who want a server abstraction layer, we
-suggest that they use PasteDeploy.  In PasteDeploy-based systems, the onus
-for making sure that the server can interface with a WSGI application is
-placed on the server developer, not the web framework developer, making it
-more likely to be timely and correct.
+``run()`` shortcut. We tell folks to import their WSGI server of choice and run
+it by hand. For the people who want a server abstraction layer, we suggest that
+they use PasteDeploy.  In PasteDeploy-based systems, the onus for making sure
+that the server can interface with a WSGI application is placed on the server
+developer, not the web framework developer, making it more likely to be timely
+and correct.
 
-Wrapping Up
+Wrapping up
 +++++++++++
 
-Here's a diagrammed version of the simplest pyramid application, where
-comments take into account what we've discussed in the
+Here's a diagrammed version of the simplest pyramid application, where the
+inlined comments take into account what we've discussed in the
 :ref:`microframeworks_smaller_hello_world` section.
 
 .. code-block:: python
@@ -1530,15 +1531,16 @@ comments take into account what we've discussed in the
 
    def hello_world(request):  # accepts a request; no request thread local reqd
        # explicit response object means no response threadlocal
-       return Response('Hello world!') 
+       return Response('Hello world!')
 
    if __name__ == '__main__':
        from pyramid.config import Configurator
-       config = Configurator()       # no global application object.
+       config = Configurator()       # no global application object
        config.add_view(hello_world)  # explicit non-decorator registration
        app = config.make_wsgi_app()  # explicitly WSGI
        server = make_server('0.0.0.0', 8080, app)
        server.serve_forever()        # explicitly WSGI
+
 
 Pyramid Doesn't Offer Pluggable Apps
 ------------------------------------

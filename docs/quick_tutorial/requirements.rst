@@ -19,7 +19,7 @@ make an isolated environment, and setup packaging tools.)
 
 This *Quick Tutorial* is based on:
 
-* **Python 3.3**. Pyramid fully supports Python 3.2+ and Python 2.6+.
+* **Python 3.3**. Pyramid fully supports Python 3.3+ and Python 2.6+.
   This tutorial uses **Python 3.3** but runs fine under Python 2.7.
 
 * **pyvenv**. We believe in virtual environments. For this tutorial,
@@ -109,7 +109,7 @@ For Linux, the commands to do so are as follows:
 
 For Windows:
 
-.. code-block:: posh
+.. code-block:: ps1con
 
     # Windows
     c:\> cd \
