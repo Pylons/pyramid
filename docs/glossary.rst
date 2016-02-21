@@ -362,13 +362,13 @@ Glossary
      file.  It was developed by Ian Bicking.
 
    Chameleon
-     `chameleon <http://chameleon.repoze.org>`_ is an attribute language
-     template compiler which supports the :term:`ZPT` templating
-     specification.  It is written and maintained by Malthe Borch.  It has
-     several extensions, such as the ability to use bracketed (Mako-style)
-     ``${name}`` syntax.  It is also much faster than the reference
-     implementation of ZPT.  :app:`Pyramid` offers Chameleon templating out
-     of the box in ZPT and text flavors.
+     `chameleon <https://chameleon.readthedocs.org/en/latest/>`_ is an
+     attribute language template compiler which supports the :term:`ZPT`
+     templating specification. It is written and maintained by Malthe Borch. It
+     has several extensions, such as the ability to use bracketed (Mako-style)
+     ``${name}`` syntax. It is also much faster than the reference
+     implementation of ZPT. :app:`Pyramid` offers Chameleon templating out of
+     the box in ZPT and text flavors.
 
    ZPT
      The `Zope Page Template <http://wiki.zope.org/ZPT/FrontPage>`_
@@ -810,11 +810,10 @@ Glossary
      library, used by the :app:`Pyramid` translation machinery.
 
    Babel
-     A `collection of tools <http://babel.edgewall.org/>`_ for
-     internationalizing Python applications.  :app:`Pyramid` does
-     not depend on Babel to operate, but if Babel is installed,
-     additional locale functionality becomes available to your
-     application.
+     A `collection of tools <http://babel.pocoo.org/en/latest/>`_ for
+     internationalizing Python applications. :app:`Pyramid` does not depend on
+     Babel to operate, but if Babel is installed, additional locale
+     functionality becomes available to your application.
 
    Lingua
      A package by Wichert Akkerman which provides the ``pot-create``
