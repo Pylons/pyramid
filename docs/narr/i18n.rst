@@ -585,10 +585,10 @@ Performing Date Formatting and Currency Formatting
 :app:`Pyramid` does not itself perform date and currency formatting for
 different locales.  However, :term:`Babel` can help you do this via the
 :class:`babel.core.Locale` class.  The `Babel documentation for this class
-<http://babel.edgewall.org/wiki/ApiDocs/babel.core#babel.core:Locale>`_
-provides minimal information about how to perform date and currency related
-locale operations.  See :ref:`installing_babel` for information about how to
-install Babel.
+<http://babel.pocoo.org/en/latest/api/core.html#basic-interface>`_ provides
+minimal information about how to perform date and currency related locale
+operations. See :ref:`installing_babel` for information about how to install
+Babel.
 
 The :class:`babel.core.Locale` class requires a :term:`locale name` as an
 argument to its constructor. You can use :app:`Pyramid` APIs to obtain the
