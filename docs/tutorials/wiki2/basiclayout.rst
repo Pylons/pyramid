@@ -16,15 +16,14 @@ package.  We use ``__init__.py`` both as a marker, indicating the directory in
 which it's contained is a package, and to contain application configuration
 code.
 
-Open ``tutorial/__init__.py``.  It should already contain the
-following:
+Open ``tutorial/__init__.py``.  It should already contain the following:
 
 .. literalinclude:: src/basiclayout/tutorial/__init__.py
   :linenos:
   :language: py
 
-Let's go over this piece-by-piece.  First, we need some imports to support
-later code:
+Let's go over this piece-by-piece. First we need some imports to support later
+code:
 
 .. literalinclude:: src/basiclayout/tutorial/__init__.py
   :end-before: main
@@ -52,10 +51,10 @@ Next in ``main``, construct a :term:`Configurator` object:
   :lineno-match:
   :language: py
 
-``settings`` is passed to the Configurator as a keyword argument with the
-dictionary values passed as the ``**settings`` argument.  This will be a
+``settings`` is passed to the ``Configurator`` as a keyword argument with the
+dictionary values passed as the ``**settings`` argument. This will be a
 dictionary of settings parsed from the ``.ini`` file, which contains
-deployment-related values such as ``pyramid.reload_templates``,
+deployment-related values, such as ``pyramid.reload_templates``,
 ``sqlalchemy.url``, and so on.
 
 Next include :term:`Jinja2` templating bindings so that we can use renderers
@@ -66,16 +65,16 @@ with the ``.jinja2`` extension within our project.
   :lineno-match:
   :language: py
 
-Next include the the package ``models`` using a dotted Python path. The
-exact setup of the models will be covered later.
+Next include the the package ``models`` using a dotted Python path. The exact
+setup of the models will be covered later.
 
 .. literalinclude:: src/basiclayout/tutorial/__init__.py
   :lines: 9
   :lineno-match:
   :language: py
 
-Next include the ``routes`` module using a dotted Python path. This module
-will be explained in the next section.
+Next include the ``routes`` module using a dotted Python path. This module will
+be explained in the next section.
 
 .. literalinclude:: src/basiclayout/tutorial/__init__.py
   :lines: 10
@@ -84,16 +83,16 @@ will be explained in the next section.
 
 .. note::
 
-   Pyramid's :meth:`pyramid.config.Configurator.include` method is the
-   primary mechanism for extending the configurator and breaking your code
-   into feature-focused modules.
+   Pyramid's :meth:`pyramid.config.Configurator.include` method is the primary
+   mechanism for extending the configurator and breaking your code into
+   feature-focused modules.
 
 ``main`` next calls the ``scan`` method of the configurator
 (:meth:`pyramid.config.Configurator.scan`), which will recursively scan our
-``tutorial`` package, looking for ``@view_config`` (and
-other special) decorators.  When it finds a ``@view_config`` decorator, a
-view configuration will be registered, which will allow one of our
-application URLs to be mapped to some code.
+``tutorial`` package, looking for ``@view_config`` and other special
+decorators. When it finds a ``@view_config`` decorator, a view configuration
+will be registered, allowing one of our application URLs to be mapped to some
+code.
 
 .. literalinclude:: src/basiclayout/tutorial/__init__.py
   :lines: 11
@@ -113,31 +112,31 @@ Finally ``main`` is finished configuring things, so it uses the
 Route declarations
 ------------------
 
-Open the ``tutorials/routes.py`` file. It should already contain the
-following:
+Open the ``tutorials/routes.py`` file. It should already contain the following:
 
 .. literalinclude:: src/basiclayout/tutorial/routes.py
   :linenos:
   :language: py
 
-First, on line 2, call :meth:`pyramid.config.Configurator.add_static_view`
-with two arguments: ``static`` (the name), and ``static`` (the path).
+On line 2, we call :meth:`pyramid.config.Configurator.add_static_view` with
+three arguments: ``static`` (the name), ``static`` (the path), and
+``cache_max_age`` (a keyword argument).
 
 This registers a static resource view which will match any URL that starts
 with the prefix ``/static`` (by virtue of the first argument to
-``add_static_view``).  This will serve up static resources for us from within
-the ``static`` directory of our ``tutorial`` package, in this case, via
+``add_static_view``). This will serve up static resources for us from within
+the ``static`` directory of our ``tutorial`` package, in this case via
 ``http://localhost:6543/static/`` and below (by virtue of the second argument
 to ``add_static_view``).  With this declaration, we're saying that any URL that
 starts with ``/static`` should go to the static view; any remainder of its
-path (e.g. the ``/foo`` in ``/static/foo``) will be used to compose a path to
+path (e.g., the ``/foo`` in ``/static/foo``) will be used to compose a path to
 a static file resource, such as a CSS file.
 
-Second, on line 3, the module registers a :term:`route configuration`
-via the :meth:`pyramid.config.Configurator.add_route` method that will be
-used when the URL is ``/``. Since this route has a ``pattern`` equaling
-``/``, it is the route that will be matched when the URL ``/`` is visited,
-e.g., ``http://localhost:6543/``.
+On line 3, the module registers a :term:`route configuration` via the
+:meth:`pyramid.config.Configurator.add_route` method that will be used when the
+URL is ``/``. Since this route has a ``pattern`` equaling ``/``, it is the
+route that will be matched when the URL ``/`` is visited, e.g.,
+``http://localhost:6543/``.
 
 
 View declarations via the ``views`` package
@@ -148,15 +147,15 @@ The main function of a web framework is mapping each URL pattern to code (a
 corresponding :term:`route`. Our application uses the
 :meth:`pyramid.view.view_config` decorator to perform this mapping.
 
-Open ``tutorial/views/default.py`` in the ``views`` package.  It
-should already contain the following:
+Open ``tutorial/views/default.py`` in the ``views`` package.  It should already
+contain the following:
 
 .. literalinclude:: src/basiclayout/tutorial/views/default.py
   :linenos:
   :language: py
 
 The important part here is that the ``@view_config`` decorator associates the
-function it decorates (``my_view``) with a :term:`view configuration`, 
+function it decorates (``my_view``) with a :term:`view configuration`,
 consisting of:
 
    * a ``route_name`` (``home``)
@@ -172,12 +171,11 @@ Note that ``my_view()`` accepts a single argument named ``request``.  This is
 the standard call signature for a Pyramid :term:`view callable`.
 
 Remember in our ``__init__.py`` when we executed the
-:meth:`pyramid.config.Configurator.scan` method ``config.scan()``?  The
-purpose of calling the scan method was to find and process this
-``@view_config`` decorator in order to create a view configuration within our
-application.  Without being processed by ``scan``, the decorator effectively
-does nothing.  ``@view_config`` is inert without being detected via a
-:term:`scan`.
+:meth:`pyramid.config.Configurator.scan` method ``config.scan()``? The purpose
+of calling the scan method was to find and process this ``@view_config``
+decorator in order to create a view configuration within our application.
+Without being processed by ``scan``, the decorator effectively does nothing.
+``@view_config`` is inert without being detected via a :term:`scan`.
 
 The sample ``my_view()`` created by the scaffold uses a ``try:`` and
 ``except:`` clause to detect if there is a problem accessing the project
@@ -189,12 +187,12 @@ to inform the user about possible actions to take to solve the problem.
 Content models with the ``models`` package
 ------------------------------------------
 
-In a SQLAlchemy-based application, a *model* object is an object composed by
+In an SQLAlchemy-based application, a *model* object is an object composed by
 querying the SQL database. The ``models`` package is where the ``alchemy``
 scaffold put the classes that implement our models.
 
-First, open ``tutorial/models/meta.py``, which should already contain
-the following:
+First, open ``tutorial/models/meta.py``, which should already contain the
+following:
 
 .. literalinclude:: src/basiclayout/tutorial/models/meta.py
   :linenos:
@@ -213,10 +211,10 @@ Next we create a ``metadata`` object from the class
 :class:`sqlalchemy.schema.MetaData`, using ``NAMING_CONVENTION`` as the value
 for the ``naming_convention`` argument.
 
-A ``MetaData`` object represents the table and other schema definitions for
-a single database. We also need to create a declarative ``Base`` object to use
-as a base class for our models. Our models will inherit from this ``Base``,
-which will attach the tables to the ``metadata`` we created, and define our
+A ``MetaData`` object represents the table and other schema definitions for a
+single database. We also need to create a declarative ``Base`` object to use as
+a base class for our models. Our models will inherit from this ``Base``, which
+will attach the tables to the ``metadata`` we created, and define our
 application's database schema.
 
 .. literalinclude:: src/basiclayout/tutorial/models/meta.py
@@ -225,17 +223,25 @@ application's database schema.
   :linenos:
   :language: py
 
-We've defined the ``models`` as a packge to make it straightforward to
-define models separately in different modules. To give a simple example of a
-model class, we define one named ``MyModel`` in a ``mymodel.py``:
+Next open ``tutorial/models/mymodel.py``, which should already contain the
+following:
+
+.. literalinclude:: src/basiclayout/tutorial/models/mymodel.py
+  :linenos:
+  :language: py
+
+Notice we've defined the ``models`` as a package to make it straightforward for
+defining models in separate modules. To give a simple example of a model class,
+we have defined one named ``MyModel`` in ``mymodel.py``:
 
 .. literalinclude:: src/basiclayout/tutorial/models/mymodel.py
   :pyobject: MyModel
+  :lineno-match:
   :linenos:
   :language: py
 
 Our example model does not require an ``__init__`` method because SQLAlchemy
-supplies for us a default constructor if one is not already present, which
+supplies for us a default constructor, if one is not already present, which
 accepts keyword arguments of the same name as that of the mapped attributes.
 
 .. note:: Example usage of MyModel:
@@ -259,14 +265,14 @@ Our ``models/__init__.py`` module defines the primary API we will use for
 configuring the database connections within our application, and it contains
 several functions we will cover below.
 
-As we mentioned above, the purpose of the ``models.meta.metadata`` object is
-to describe the schema of the database. This is done by defining models that
-inherit from the ``Base`` attached to that ``metadata`` object. In Python, code
-is only executed if it is imported, and so to attach the ``models`` table
-defined in ``mymodel.py`` to the ``metadata``, we must import it. If we skip
-this step, then later, when we run
+As we mentioned above, the purpose of the ``models.meta.metadata`` object is to
+describe the schema of the database. This is done by defining models that
+inherit from the ``Base`` object attached to that ``metadata`` object. In
+Python, code is only executed if it is imported, and so to attach the
+``models`` table defined in ``mymodel.py`` to the ``metadata``, we must import
+it. If we skip this step, then later, when we run
 :meth:`sqlalchemy.schema.MetaData.create_all`, the table will not be created
-because the ``metadata`` does not know about it!
+because the ``metadata`` object does not know about it!
 
 Another important reason to import all of the models is that, when defining
 relationships between models, they must all exist in order for SQLAlchemy to
@@ -313,9 +319,9 @@ Finally, we define an ``includeme`` function, which is a hook for use with
 :meth:`pyramid.config.Configurator.include` to activate code in a Pyramid
 application add-on. It is the code that is executed above when we ran
 ``config.include('.models')`` in our application's ``main`` function. This
-function will take the settings from the application, create an engine,
-and define a ``request.dbsession`` property, which we can use to do work
-on behalf of an incoming request to our application.
+function will take the settings from the application, create an engine, and
+define a ``request.dbsession`` property, which we can use to do work on behalf
+of an incoming request to our application.
 
 .. literalinclude:: src/basiclayout/tutorial/models/__init__.py
   :pyobject: includeme
