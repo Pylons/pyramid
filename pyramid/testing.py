@@ -41,6 +41,7 @@ from pyramid.i18n import LocalizerRequestMixin
 from pyramid.request import CallbackMethodsMixin
 from pyramid.url import URLMethodsMixin
 from pyramid.util import InstancePropertyMixin
+from pyramid.view import ViewMethodsMixin
 
 
 _marker = object()
@@ -293,6 +294,7 @@ class DummyRequest(
     LocalizerRequestMixin,
     AuthenticationAPIMixin,
     AuthorizationAPIMixin,
+    ViewMethodsMixin,
     ):
     """ A DummyRequest object (incompletely) imitates a :term:`request` object.
 

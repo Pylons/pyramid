@@ -602,15 +602,6 @@ class ViewMethodsMixin(object):
         context_iface = providedBy(exc_info[0])
         view_name = attrs.get('view_name', '')
 
-        # WARNING: do not assign the result of sys.exc_info() to a local
-        # var here, doing so will cause a leak.  We used to actually
-        # explicitly delete both "exception" and "exc_info" from ``attrs``
-        # in a ``finally:`` clause below, but now we do not because these
-        # attributes are useful to upstream tweens.  This actually still
-        # apparently causes a reference cycle, but it is broken
-        # successfully by the garbage collector (see
-        # https://github.com/Pylons/pyramid/issues/1223).
-
         # clear old generated request.response, if any; it may
         # have been mutated by the view, and its state is not
         # sane (e.g. caching headers)
