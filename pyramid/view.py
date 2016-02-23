@@ -25,6 +25,7 @@ from pyramid.httpexceptions import (
     )
 
 from pyramid.threadlocal import get_current_registry
+from pyramid.util import hide_attrs
 
 _marker = object()
 
@@ -600,23 +601,32 @@ class ViewMethodsMixin(object):
         attrs = request.__dict__
         context_iface = providedBy(exc_info[0])
         view_name = attrs.get('view_name', '')
-        # probably need something like "with temporarily_munged_request(req)"
-        # here, which adds exception and exc_info as request attrs, and
-        # removes response object temporarily (as per the excview tween)
-        attrs['exception'] = exc_info[0]
-        attrs['exc_info'] = exc_info
-        # we use .get instead of .__getitem__ below due to
-        # https://github.com/Pylons/pyramid/issues/700
-        request_iface = attrs.get('request_iface', IRequest)
-        response = _call_view(
-            registry,
-            request,
-            exc_info[0],
-            context_iface,
-            view_name,
-            view_types=None,
-            view_classifier=IExceptionViewClassifier,
-            secure=secure,
-            request_iface=request_iface.combined,
-            )
-        return response
+
+        # WARNING: do not assign the result of sys.exc_info() to a local
+        # var here, doing so will cause a leak.  We used to actually
+        # explicitly delete both "exception" and "exc_info" from ``attrs``
+        # in a ``finally:`` clause below, but now we do not because these
+        # attributes are useful to upstream tweens.  This actually still
+        # apparently causes a reference cycle, but it is broken
+        # successfully by the garbage collector (see
+        # https://github.com/Pylons/pyramid/issues/1223).
+
+        # clear old generated request.response, if any; it may
+        # have been mutated by the view, and its state is not
+        # sane (e.g. caching headers)
+        with hide_attrs(request, 'exception', 'exc_info', 'response'):
+            # we use .get instead of .__getitem__ below due to
+            # https://github.com/Pylons/pyramid/issues/700
+            request_iface = attrs.get('request_iface', IRequest)
+            response = _call_view(
+                registry,
+                request,
+                exc_info[0],
+                context_iface,
+                view_name,
+                view_types=None,
+                view_classifier=IExceptionViewClassifier,
+                secure=secure,
+                request_iface=request_iface.combined,
+                )
+            return response
