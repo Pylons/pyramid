@@ -248,7 +248,7 @@ Return a ``logged_in`` flag to the renderer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Open ``tutorial/tutorial/views.py`` again. Add a ``logged_in`` parameter to
-the return value of ``view_page()``, ``edit_page()``, and ``add_page()`` as
+the return value of ``view_page()``, ``add_page()``, and ``edit_page()`` as
 follows:
 
 .. literalinclude:: src/authorization/tutorial/views.py
@@ -262,7 +262,7 @@ follows:
    :language: python
 
 .. literalinclude:: src/authorization/tutorial/views.py
-   :lines: 75-77
+   :lines: 78-80
    :emphasize-lines: 2-3
    :language: python
 
