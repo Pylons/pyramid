@@ -123,16 +123,16 @@ Create a new file ``tutorial/models/page.py`` with the following contents:
    :language: py
 
 As you can see, our ``Page`` class is very similar to the ``User`` defined
-above except with attributes focused on storing information about a wiki
-page including ``id``, ``name``, and ``data``. The only new construct
-introduced here is the ``creator_id`` column which is a foreign key
-referencing the ``users`` table. Foreign keys are very useful at the
-schema-level but since we want to relate ``User`` objects with ``Page``
-objects we also define a the ``creator`` attribute which is an ORM-level
-mapping between the two tables. SQLAlchemy will automatically populate this
-value using the foreign key referencing the user. Since the foreign key
-has ``nullable=False`` we are guaranteed that an instance of ``page`` will
-have a corresponding ``page.creator`` which will be a ``User`` instance.
+above, except with attributes focused on storing information about a wiki page,
+including ``id``, ``name``, and ``data``. The only new construct introduced
+here is the ``creator_id`` column, which is a foreign key referencing the
+``users`` table. Foreign keys are very useful at the schema-level, but since we
+want to relate ``User`` objects with ``Page`` objects, we also define a
+``creator`` attribute as an ORM-level mapping between the two tables.
+SQLAlchemy will automatically populate this value using the foreign key
+referencing the user. Since the foreign key has ``nullable=False``, we are
+guaranteed that an instance of ``page`` will have a corresponding
+``page.creator``, which will be a ``User`` instance.
 
 
 Edit ``models/__init__.py``
@@ -149,8 +149,7 @@ the following:
    :language: py
    :emphasize-lines: 8,9
 
-Here we need to align our imports with the names of the models ``User``,
-and ``Page``.
+Here we align our imports with the names of the models, ``User`` and ``Page``.
 
 
 Edit ``scripts/initializedb.py``
@@ -163,12 +162,12 @@ command, as we did in the installation step of this tutorial [2]_.
 
 Since we've changed our model, we need to make changes to our
 ``initializedb.py`` script.  In particular, we'll replace our import of
-``MyModel`` with those of ``User`` and ``Page`` and we'll change the very end
-of the script to create two ``User`` objects (``basic`` and ``editor``) and a
-``Page`` rather than a ``MyModel`` and add them to our ``dbsession``.
+``MyModel`` with those of ``User`` and ``Page``. We'll also change the very end
+of the script to create two ``User`` objects (``basic`` and ``editor``) as well
+as a ``Page``, rather than a ``MyModel``, and add them to our ``dbsession``.
 
-Open ``tutorial/scripts/initializedb.py`` and edit it to look like
-the following:
+Open ``tutorial/scripts/initializedb.py`` and edit it to look like the
+following:
 
 .. literalinclude:: src/models/tutorial/scripts/initializedb.py
    :linenos:
@@ -181,9 +180,9 @@ Only the highlighted lines need to be changed.
 Installing the project and re-initializing the database
 -------------------------------------------------------
 
-Because our model has changed, in order to reinitialize the database, we need
-to rerun the ``initialize_tutorial_db`` command to pick up the changes you've
-made to both the models.py file and to the initializedb.py file. See
+Because our model has changed, and in order to reinitialize the database, we
+need to rerun the ``initialize_tutorial_db`` command to pick up the changes
+we've made to both the models.py file and to the initializedb.py file. See
 :ref:`initialize_db_wiki2` for instructions.
 
 Success will look something like this::
@@ -237,9 +236,9 @@ View the application in a browser
 
 We can't.  At this point, our system is in a "non-runnable" state; we'll need
 to change view-related files in the next chapter to be able to start the
-application successfully.  If you try to start the application (See
-:ref:`wiki2-start-the-application`), you'll wind
-up with a Python traceback on your console that ends with this exception:
+application successfully.  If you try to start the application (see
+:ref:`wiki2-start-the-application`), you'll wind up with a Python traceback on
+your console that ends with this exception:
 
 .. code-block:: text
 
