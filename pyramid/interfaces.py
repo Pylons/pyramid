@@ -53,6 +53,7 @@ class IApplicationCreated(Interface):
        :class:`pyramid.interfaces.IWSGIApplicationCreatedEvent`.
     """
     app = Attribute("Created application")
+    config = Attribute("Configurator used to create application")
 
 IWSGIApplicationCreatedEvent = IApplicationCreated # b /c
 

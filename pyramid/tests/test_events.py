@@ -61,7 +61,7 @@ class ApplicationCreatedEventTests(unittest.TestCase):
         from pyramid.events import ApplicationCreated
         return ApplicationCreated
 
-    def _makeOne(self, context=object()):
+    def _makeOne(self, app=object(), config=object()):
         return self._getTargetClass()(context)
 
     def test_class_conforms_to_IApplicationCreated(self):

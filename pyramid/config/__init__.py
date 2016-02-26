@@ -992,7 +992,7 @@ class Configurator(
         # IApplicationCreated event.
         self.manager.push({'registry':self.registry, 'request':None})
         try:
-            self.registry.notify(ApplicationCreated(app))
+            self.registry.notify(ApplicationCreated(app, self))
         finally:
             self.manager.pop()
 

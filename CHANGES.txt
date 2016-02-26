@@ -1,3 +1,17 @@
+.. _changes_1.6.2:
+
+1.6.2 (unreleased)
+==================
+
+
+Features
+--------
+
+- Add a new ``config`` attribute to the ``ApplicationCreated`` event. This
+  can be helpful to discover which application was created.
+
+
+
 .. _changes_1.6.1:
 
 1.6.1 (2016-02-02)
