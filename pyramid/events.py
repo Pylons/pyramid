@@ -156,13 +156,19 @@ class ContextFound(object):
 AfterTraversal = ContextFound # b/c as of 1.0
 
 @implementer(IApplicationCreated)
-class ApplicationCreated(object):    
+class ApplicationCreated(object):
     """ An instance of this class is emitted as an :term:`event` when
     the :meth:`pyramid.config.Configurator.make_wsgi_app` is
-    called.  The instance has an attribute, ``app``, which is an
-    instance of the :term:`router` that will handle WSGI requests.
-    This class implements the
-    :class:`pyramid.interfaces.IApplicationCreated` interface.
+    called. The instance has two attribuets:
+
+    * ``app``, which is an instance of the :term:`router` that will handle WSGI
+      requests.
+    * ``config``, which is an instance of the
+      :class:`pyramid.config.Configurator` that was used to create the
+      application.
+
+    This class implements the :class:`pyramid.interfaces.IApplicationCreated`
+    interface.
 
     .. note::
 
@@ -170,9 +176,10 @@ class ApplicationCreated(object):
        :class:`pyramid.events.WSGIApplicationCreatedEvent`.  This was the name
        of the event class before :app:`Pyramid` 1.0.
     """
-    def __init__(self, app):
+    def __init__(self, app, config=None):
         self.app = app
         self.object = app
+        self.config = config
 
 WSGIApplicationCreatedEvent = ApplicationCreated # b/c (as of 1.0)
 
