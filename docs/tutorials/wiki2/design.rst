@@ -139,8 +139,8 @@ in the following table:
 |                      |  - If authentication  |             |                |            |
 |                      |    succeeds,          |             |                |            |
 |                      |    redirect to the    |             |                |            |
-|                      |    page that we       |             |                |            |
-|                      |    came from.         |             |                |            |
+|                      |    page that from     |             |                |            |
+|                      |    which we came.     |             |                |            |
 |                      |                       |             |                |            |
 |                      |  - If authentication  |             |                |            |
 |                      |    fails, display     |             |                |            |
