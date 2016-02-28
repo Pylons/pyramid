@@ -9,13 +9,13 @@ current working directory contains the ``tutorial`` package and the
 
 On UNIX:
 
-.. code-block:: text
+.. code-block:: bash
 
    $ $VENV/bin/python setup.py sdist
 
 On Windows:
 
-.. code-block:: text
+.. code-block:: ps1con
 
    c:\pyramidtut> %VENV%\Scripts\python setup.py sdist
 
@@ -26,8 +26,7 @@ The output of such a command will be something like:
    running sdist
    # .. more output ..
    creating dist
-   tar -cf dist/tutorial-0.0.tar tutorial-0.0
-   gzip -f9 dist/tutorial-0.0.tar
+   Creating tar archive
    removing 'tutorial-0.0' (and everything under it)
 
 Note that this command creates a tarball in the "dist" subdirectory named
