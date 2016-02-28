@@ -120,9 +120,9 @@ class TestRequestParamPredicate(unittest.TestCase):
         self.assertTrue(result)
 
     def test___call___true_multi(self):
-        inst = self._makeOne(('abc', 'def =2 '))
+        inst = self._makeOne(('abc', '=def =2= '))
         request = Dummy()
-        request.params = {'abc':'1', 'def': '2'}
+        request.params = {'abc':'1', '=def': '2='}
         result = inst(None, request)
         self.assertTrue(result)
 
