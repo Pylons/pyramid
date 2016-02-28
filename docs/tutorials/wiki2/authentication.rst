@@ -288,14 +288,15 @@ following URLs, checking that the result is as expected:
 - http://localhost:6543/FrontPage/edit_page invokes the edit view for the
   ``FrontPage`` object.  It is executable by only the ``editor`` user. If a
   different user (or the anonymous user) invokes it, then a login form will be
-  displayed. Supplying the credentials with the username ``editor``, password
-  ``editor`` will display the edit page form.
+  displayed. Supplying the credentials with the username ``editor`` and
+  password ``editor`` will display the edit page form.
 
 - http://localhost:6543/add_page/SomePageName invokes the add view for a page.
-  It is executable by the ``editor`` or ``basic`` user. If a different user (or
-  the anonymous user) invokes it, then a login form will be displayed.
-  Supplying the credentials with the username ``basic``, password ``basic``,
-  will display the edit page form.
+  It is executable by either the ``editor`` or ``basic`` user.  If a different
+  user (or the anonymous user) invokes it, then a login form will be displayed.
+  Supplying the credentials with either the username ``editor`` and password
+  ``editor``, or username ``basic`` and password ``basic``, will display the
+  edit page form.
 
 - http://localhost:6543/SomePageName/edit_page is editable by the ``basic``
   user if the page was created by that user in the previous step. If, instead,
