@@ -100,4 +100,11 @@ The expected result should look like the following:
 
    OK
 
+.. note:: If you use Python 3 during this tutorial, you will see deprecation
+   warnings in the output, which we will choose to ignore. In making this
+   tutorial run on both Python 2 and 3, the authors prioritized simplicity and
+   focus for the learner over accommodating warnings. In your own app or as
+   extra credit, you may choose to either drop Python 2 support or hack your
+   code to work without warnings on both Python 2 and 3.
+
 .. _webtest: http://docs.pylonsproject.org/projects/webtest/en/latest/
