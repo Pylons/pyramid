@@ -13,38 +13,36 @@ should contain tests for its corresponding module in our application.  Each
 corresponding pair of modules should have the same names, except the test
 module should have the prefix ``test_``.
 
-We will move parts of ``tests.py`` into appropriate new files in the ``tests``
-subpackage, and add several new tests.
-
-Start by creating a new directory and a new empty file ``tests/__init__.py``.
+Start by deleting ``tests.py``, then create a new directory to contain our new
+tests as well as a new empty file ``tests/__init__.py``.
 
 .. warning::
 
-   It is very important when refactoring a Python module into a package to
-   be sure to delete the cache files (``.pyc`` files or ``__pycache__``
-   folders) sitting around! Python will prioritize the cache files before
-   traversing into folders and so it will use the old code and you will wonder
-   why none of your changes are working!
+   It is very important when refactoring a Python module into a package to be
+   sure to delete the cache files (``.pyc`` files or ``__pycache__`` folders)
+   sitting around! Python will prioritize the cache files before traversing
+   into folders, using the old code, and you will wonder why none of your
+   changes are working!
 
 
 Test the views
 ==============
 
-We'll create a new ``tests/test_views.py`` file, adding tests for each view
-function we previously added to our application.  As a result, we'll *delete*
-the ``ViewTests`` class that the ``alchemy`` scaffold provided, and add four
-other test classes: ``ViewWikiTests``, ``ViewPageTests``, ``AddPageTests``, and
-``EditPageTests``. These test the ``view_wiki``, ``view_page``, ``add_page``,
-and ``edit_page`` views.
+We'll create a new ``tests/test_views.py`` file, adding a ``BaseTest`` class
+used as the base for other test classes. Next we'll add tests for each view
+function we previously added to our application. We'll add four test classes:
+``ViewWikiTests``, ``ViewPageTests``, ``AddPageTests``, and ``EditPageTests``.
+These test the ``view_wiki``, ``view_page``, ``add_page``, and ``edit_page``
+views.
 
 
 Functional tests
 ================
 
-We'll test the whole application, covering security aspects that are not
-tested in the unit tests, like logging in, logging out, checking that
-the ``basic`` user cannot edit pages it didn't create, but the ``editor`` user
-can, and so on.
+We'll test the whole application, covering security aspects that are not tested
+in the unit tests, like logging in, logging out, checking that the ``basic``
+user cannot edit pages that it didn't create but the ``editor`` user can, and
+so on.
 
 
 View the results of all our edits to ``tests`` subpackage
@@ -67,10 +65,10 @@ follows:
 
 .. note::
 
-   We're utilizing the excellent WebTest_ package to do functional testing
-   of the application. This is defined in the ``tests_require`` section of
-   our ``setup.py``. Any other dependencies needed only for testing purposes
-   can be added there and will be installed automatically when running
+   We're utilizing the excellent WebTest_ package to do functional testing of
+   the application. This is defined in the ``tests_require`` section of our
+   ``setup.py``. Any other dependencies needed only for testing purposes can be
+   added there and will be installed automatically when running
    ``setup.py test``.
 
 
@@ -88,7 +86,7 @@ On UNIX:
 
 On Windows:
 
-.. code-block:: text
+.. code-block:: ps1con
 
    c:\pyramidtut\tutorial> %VENV%\Scripts\python setup.py test -q
 
@@ -96,12 +94,10 @@ The expected result should look like the following:
 
 .. code-block:: text
 
-   ....................
+   .....................
    ----------------------------------------------------------------------
-   Ran 20 tests in 0.524s
+   Ran 21 tests in 5.117s
 
    OK
-
-   Process finished with exit code 0
 
 .. _webtest: http://docs.pylonsproject.org/projects/webtest/en/latest/
