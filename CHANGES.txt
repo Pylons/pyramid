@@ -10,6 +10,11 @@ unreleased
   ``[app:main]`` and ``[server:main]``.
   See https://github.com/Pylons/pyramid/pull/2292
 
+- Allow a leading ``=`` on the key of the request param predicate.
+  For example, '=abc=1' is equivalent down to
+  ``request.params['=abc'] == '1'``.
+  See https://github.com/Pylons/pyramid/pull/1370
+
 1.6 (2015-04-14)
 ================
 
