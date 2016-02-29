@@ -1,6 +1,12 @@
 unreleased
 ==========
 
+- A complete overhaul of the ``alchemy`` scaffold as well as the
+  Wiki2 SQLAlchemy + URLDispatch tutorial to introduce more modern features
+  into the usage of SQLAlchemy with Pyramid and provide a better starting
+  point for new projects.
+  See https://github.com/Pylons/pyramid/pull/2024
+
 - Dropped Python 3.2 support.
   See https://github.com/Pylons/pyramid/pull/2256
 
