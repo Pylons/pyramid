@@ -247,6 +247,8 @@ Contributors
 
 - Donald Stufft, 2015/03/15
 
+- Randy Topliffe, 2015/04/14
+
 - Timur Izhbulatov, 2015/04/14
 
 - Karen Dalton, 2015/06/01
