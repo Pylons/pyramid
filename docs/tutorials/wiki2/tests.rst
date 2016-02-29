@@ -96,7 +96,7 @@ The expected result should look like the following:
 
    .....................
    ----------------------------------------------------------------------
-   Ran 21 tests in 5.117s
+   Ran 22 tests in 5.320s
 
    OK
 

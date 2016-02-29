@@ -1,4 +1,7 @@
-from pyramid.httpexceptions import HTTPNotFound
+from pyramid.httpexceptions import (
+    HTTPNotFound,
+    HTTPFound,
+)
 from pyramid.security import (
     Allow,
     Everyone,
@@ -19,6 +22,9 @@ def includeme(config):
 
 def new_page_factory(request):
     pagename = request.matchdict['pagename']
+    if request.dbsession.query(Page).filter_by(name=pagename).count() > 0:
+        next_url = request.route_url('edit_page', pagename=pagename)
+        raise HTTPFound(location=next_url)
     return NewPage(pagename)
 
 class NewPage(object):
