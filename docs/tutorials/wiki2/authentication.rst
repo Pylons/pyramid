@@ -132,23 +132,7 @@ Open the file ``tutorial/views/default.py`` and fix the following imports:
 
 Change the two highlighted lines.
 
-In the same file, now edit the ``add_page`` view function:
-
-.. literalinclude:: src/authentication/tutorial/views/default.py
-   :lines: 62-76
-   :lineno-match:
-   :emphasize-lines: 3-5,10
-   :language: python
-
-Only the highlighted lines need to be changed.
-
-If the user either is not logged in or is not in the ``basic`` or ``editor``
-roles, then we raise ``HTTPForbidden``, which will return a "403 Forbidden"
-response to the user. However, we will hook this later to redirect to the login
-page. Also, now that we have ``request.user``, we no longer have to hard-code
-the creator as the ``editor`` user, so we can finally drop that hack.
-
-Now edit the ``edit_page`` view function:
+In the same file, now edit the ``edit_page`` view function:
 
 .. literalinclude:: src/authentication/tutorial/views/default.py
    :lines: 45-60
@@ -160,6 +144,22 @@ Only the highlighted lines need to be changed.
 
 If the user either is not logged in or the user is not the page's creator
 *and* not an ``editor``, then we raise ``HTTPForbidden``.
+
+In the same file, now edit the ``add_page`` view function:
+
+.. literalinclude:: src/authentication/tutorial/views/default.py
+   :lines: 62-76
+   :lineno-match:
+   :emphasize-lines: 3-5,13
+   :language: python
+
+Only the highlighted lines need to be changed.
+
+If the user either is not logged in or is not in the ``basic`` or ``editor``
+roles, then we raise ``HTTPForbidden``, which will return a "403 Forbidden"
+response to the user. However, we will hook this later to redirect to the login
+page. Also, now that we have ``request.user``, we no longer have to hard-code
+the creator as the ``editor`` user, so we can finally drop that hack.
 
 These simple checks should protect our views.
 
@@ -285,25 +285,28 @@ following URLs, checking that the result is as expected:
   while the user is not authenticated, else it is a "Logout" link when the user
   is authenticated.
 
-- http://localhost:6543/FrontPage/edit_page invokes the edit view for the
-  ``FrontPage`` object.  It is executable by only the ``editor`` user. If a
-  different user (or the anonymous user) invokes it, then a login form will be
-  displayed. Supplying the credentials with the username ``editor`` and
+- http://localhost:6543/FrontPage/edit_page invokes the ``edit_page`` view for
+  the ``FrontPage`` page object.  It is executable by only the ``editor`` user.
+  If a different user (or the anonymous user) invokes it, then a login form
+  will be displayed. Supplying the credentials with the username ``editor`` and
   password ``editor`` will display the edit page form.
 
-- http://localhost:6543/add_page/SomePageName invokes the add view for a page.
-  It is executable by either the ``editor`` or ``basic`` user.  If a different
-  user (or the anonymous user) invokes it, then a login form will be displayed.
-  Supplying the credentials with either the username ``editor`` and password
-  ``editor``, or username ``basic`` and password ``basic``, will display the
-  edit page form.
+- http://localhost:6543/add_page/SomePageName invokes the ``add_page`` view for
+  a page. If the page already exists, then it redirects the user to the
+  ``edit_page`` view for the page object. It is executable by either the
+  ``editor`` or ``basic`` user.  If a different user (or the anonymous user)
+  invokes it, then a login form will be displayed. Supplying the credentials
+  with either the username ``editor`` and password ``editor``, or username
+  ``basic`` and password ``basic``, will display the edit page form.
 
-- http://localhost:6543/SomePageName/edit_page is editable by the ``basic``
-  user if the page was created by that user in the previous step. If, instead,
-  the page was created by the ``editor`` user, then the login page should be
-  shown for the ``basic`` user.
+- http://localhost:6543/SomePageName/edit_page invokes the ``edit_page`` view
+  for an existing page, or generates an error if the page does not exist. It is
+  editable by the ``basic`` user if the page was created by that user in the
+  previous step. If, instead, the page was created by the ``editor`` user, then
+  the login page should be shown for the ``basic`` user.
 
 - After logging in (as a result of hitting an edit or add page and submitting
   the login form with the ``editor`` credentials), we'll see a "Logout" link in
-  the upper right hand corner.  When we click it, we're logged out, and
-  redirected back to the front page.
+  the upper right hand corner.  When we click it, we're logged out, redirected
+  back to the front page, and a "Login" link is shown in the upper right hand
+  corner.

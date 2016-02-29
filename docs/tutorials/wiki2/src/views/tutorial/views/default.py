@@ -58,6 +58,9 @@ def edit_page(request):
 @view_config(route_name='add_page', renderer='../templates/edit.jinja2')
 def add_page(request):
     pagename = request.matchdict['pagename']
+    if request.dbsession.query(Page).filter_by(name=pagename).count() > 0:
+        next_url = request.route_url('edit_page', pagename=pagename)
+        return HTTPFound(location=next_url)
     if 'form.submitted' in request.params:
         body = request.params['body']
         page = Page(name=pagename, data=body)

@@ -108,7 +108,7 @@ Open the file ``tutorial/routes.py`` and edit the following lines:
 
 .. literalinclude:: src/authorization/tutorial/routes.py
    :linenos:
-   :emphasize-lines: 1-7,14-50
+   :emphasize-lines: 1-11,17-
    :language: python
 
 The highlighted lines need to be edited or added.
@@ -120,34 +120,34 @@ the principals of either ``role:editor`` or ``role:basic`` to have the
 ``create`` permission:
 
 .. literalinclude:: src/authorization/tutorial/routes.py
-   :lines: 20-32
+   :lines: 30-38
    :lineno-match:
-   :emphasize-lines: 11,12
+   :emphasize-lines: 5-9
    :language: python
 
 The ``NewPage`` is loaded as the :term:`context` of the ``add_page`` route by
 declaring a ``factory`` on the route:
 
 .. literalinclude:: src/authorization/tutorial/routes.py
-   :lines: 15-16
+   :lines: 18-19
    :lineno-match:
-   :emphasize-lines: 2
+   :emphasize-lines: 1-2
    :language: python
 
 The ``PageResource`` class defines the :term:`ACL` for a ``Page``. It uses an
 actual ``Page`` object to determine *who* can do *what* to the page.
 
 .. literalinclude:: src/authorization/tutorial/routes.py
-   :lines: 34-50
+   :lines: 47-
    :lineno-match:
-   :emphasize-lines: 14-16
+   :emphasize-lines: 5-10
    :language: python
 
 The ``PageResource`` is loaded as the :term:`context` of the ``view_page`` and
 ``edit_page`` routes by declaring a ``factory`` on the routes:
 
 .. literalinclude:: src/authorization/tutorial/routes.py
-   :lines: 14-18
+   :lines: 17-21
    :lineno-match:
    :emphasize-lines: 1,4-5
    :language: python
@@ -236,25 +236,28 @@ following URLs, checking that the result is as expected:
   while the user is not authenticated, else it is a "Logout" link when the user
   is authenticated.
 
-- http://localhost:6543/FrontPage/edit_page invokes the edit view for the
-  ``FrontPage`` object.  It is executable by only the ``editor`` user. If a
-  different user (or the anonymous user) invokes it, then a login form will be
-  displayed. Supplying the credentials with the username ``editor`` and
+- http://localhost:6543/FrontPage/edit_page invokes the ``edit_page`` view for
+  the ``FrontPage`` page object.  It is executable by only the ``editor`` user.
+  If a different user (or the anonymous user) invokes it, then a login form
+  will be displayed. Supplying the credentials with the username ``editor`` and
   password ``editor`` will display the edit page form.
 
-- http://localhost:6543/add_page/SomePageName invokes the add view for a page.
-  It is executable by either the ``editor`` or ``basic`` user.  If a different
-  user (or the anonymous user) invokes it, then a login form will be displayed.
-  Supplying the credentials with either the username ``editor`` and password
-  ``editor``, or username ``basic`` and password ``basic``, will display the
-  edit page form.
+- http://localhost:6543/add_page/SomePageName invokes the ``add_page`` view for
+  a page. If the page already exists, then it redirects the user to the
+  ``edit_page`` view for the page object. It is executable by either the
+  ``editor`` or ``basic`` user.  If a different user (or the anonymous user)
+  invokes it, then a login form will be displayed. Supplying the credentials
+  with either the username ``editor`` and password ``editor``, or username
+  ``basic`` and password ``basic``, will display the edit page form.
 
-- http://localhost:6543/SomePageName/edit_page is editable by the ``basic``
-  user if the page was created by that user in the previous step. If, instead,
-  the page was created by the ``editor`` user, then the login page should be
-  shown for the ``basic`` user.
+- http://localhost:6543/SomePageName/edit_page invokes the ``edit_page`` view
+  for an existing page, or generates an error if the page does not exist. It is
+  editable by the ``basic`` user if the page was created by that user in the
+  previous step. If, instead, the page was created by the ``editor`` user, then
+  the login page should be shown for the ``basic`` user.
 
 - After logging in (as a result of hitting an edit or add page and submitting
   the login form with the ``editor`` credentials), we'll see a "Logout" link in
-  the upper right hand corner.  When we click it, we're logged out, and
-  redirected back to the front page.
+  the upper right hand corner.  When we click it, we're logged out, redirected
+  back to the front page, and a "Login" link is shown in the upper right hand
+  corner.

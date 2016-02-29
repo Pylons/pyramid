@@ -98,6 +98,18 @@ class AddPageTests(BaseTest):
         from tutorial.views.default import add_page
         return add_page(request)
 
+    def test_it_pageexists(self):
+        from ..models import Page
+        from ..routes import NewPage
+        request = testing.DummyRequest({'form.submitted': True,
+                                        'body': 'Hello yo!'},
+                                       dbsession=self.session)
+        request.user = self.makeUser('foo', 'editor')
+        request.context = NewPage('AnotherPage')
+        self._callFUT(request)
+        pagecount = self.session.query(Page).filter_by(name='AnotherPage').count()
+        self.assertGreater(pagecount, 0)
+
     def test_it_notsubmitted(self):
         from ..routes import NewPage
         request = dummy_request(self.session)

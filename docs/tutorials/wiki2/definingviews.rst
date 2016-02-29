@@ -124,7 +124,7 @@ edit it to look like the following:
 .. literalinclude:: src/views/tutorial/views/default.py
    :linenos:
    :language: python
-   :emphasize-lines: 1-9,12-70
+   :emphasize-lines: 1-9,12-
 
 The highlighted lines need to be added or edited.
 
@@ -277,7 +277,7 @@ The ``add_page`` view function
 Here is the code for the ``add_page`` view function and its decorator:
 
 .. literalinclude:: src/views/tutorial/views/default.py
-   :lines: 58-70
+   :lines: 58-
    :lineno-match:
    :linenos:
    :language: python
@@ -293,6 +293,10 @@ The ``matchdict`` will have a ``'pagename'`` key that matches the name of the
 page we'd like to add. If our add view is invoked via, for example,
 ``http://localhost:6543/add_page/SomeName``, the value for ``'pagename'`` in
 the ``matchdict`` will be ``'SomeName'``.
+
+Next a check is performed to determine whether the ``Page`` already exists in
+the database. If it already exists, then the client is redirected to the
+``edit_page`` view, else we continue to the next check.
 
 If the view execution *is* a result of a form submission (i.e., the expression
 ``'form.submitted' in request.params`` is ``True``), we grab the page body from
@@ -452,13 +456,18 @@ each of the following URLs, checking that the result is as expected:
 - http://localhost:6543/ invokes the ``view_wiki`` view.  This always
   redirects to the ``view_page`` view of the ``FrontPage`` page object.
 
-- http://localhost:6543/FrontPage invokes the ``view_page`` view of the front
-  page object.
+- http://localhost:6543/FrontPage invokes the ``view_page`` view of the
+  ``FrontPage`` page object.
 
-- http://localhost:6543/FrontPage/edit_page invokes the edit view for the
-  front page object.
+- http://localhost:6543/FrontPage/edit_page invokes the ``edit_page`` view for
+  the ``FrontPage`` page object.
 
-- http://localhost:6543/add_page/SomePageName invokes the add view for a page.
+- http://localhost:6543/add_page/SomePageName invokes the ``add_page`` view for
+  a page. If the page already exists, then it redirects the user to the
+  ``edit_page`` view for the page object.
+
+- http://localhost:6543/SomePageName/edit_page invokes the ``edit_page`` view
+  for an existing page, or generates an error if the page does not exist.
 
 - To generate an error, visit http://localhost:6543/foobars/edit_page which
   will generate a ``NoResultFound: No row was found for one()`` error. You'll

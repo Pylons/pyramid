@@ -65,6 +65,9 @@ def add_page(request):
     if user is None or user.role not in ('editor', 'basic'):
         raise HTTPForbidden
     pagename = request.matchdict['pagename']
+    if request.dbsession.query(Page).filter_by(name=pagename).count() > 0:
+        next_url = request.route_url('edit_page', pagename=pagename)
+        return HTTPFound(location=next_url)
     if 'form.submitted' in request.params:
         body = request.params['body']
         page = Page(name=pagename, data=body)
