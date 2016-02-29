@@ -207,7 +207,7 @@ Create a new file ``tutorial/views/auth.py``, and add the following code to it:
    :linenos:
    :language: python
 
-This code adds three new views to application:
+This code adds three new views to the application:
 
 - The ``login`` view renders a login form and processes the post from the
   login form, checking credentials against our ``users`` table in the database.

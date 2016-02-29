@@ -162,7 +162,7 @@ including the actual ``Page`` model in the ``page_factory``. The
 ``edit_page`` views. Similarly the ``NewPage`` will be the context for the
 ``add_page`` view.
 
-Open the file ``views/default.py``.
+Open the file ``tutorial/views/default.py``.
 
 First, you can drop a few imports that are no longer necessary:
 
@@ -214,7 +214,7 @@ in) then an ``HTTPForbidden`` exception will be raised automatically. Thus
 we're able to drop those exceptions and checks from the views themselves.
 Rather we've defined them in terms of operations on a resource.
 
-The final ``views/default.py`` should look like the following:
+The final ``tutorial/views/default.py`` should look like the following:
 
 .. literalinclude:: src/authorization/tutorial/views/default.py
    :linenos:
