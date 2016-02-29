@@ -941,7 +941,7 @@ the same identity.  Here's why they have a separate identity.
 
 .. _simpler_traversal_model:
 
-Pyramid has Simpler Traversal Machinery than Does Zope
+Pyramid has simpler traversal machinery than does Zope
 ------------------------------------------------------
 
 Zope's default traverser:
@@ -951,26 +951,26 @@ Zope's default traverser:
 
 - Attempts to use an adaptation to obtain the next element in the path from
   the currently traversed object, falling back to ``__bobo_traverse__``,
-  ``__getitem__`` and eventually ``__getattr__``.
+  ``__getitem__``, and eventually ``__getattr__``.
 
 Zope's default traverser allows developers to mutate the traversal name stack
-during traversal by mutating ``REQUEST['TraversalNameStack']``.  Pyramid's
-default traverser (``pyramid.traversal.ResourceTreeTraverser``) does not
-offer a way to do this; it does not maintain a stack as a request attribute
-and, even if it did, it does not pass the request to resource objects while
-it's traversing.  While it was handy at times, this feature was abused in
-frameworks built atop Zope (like CMF and Plone), often making it difficult to
-tell exactly what was happening when a traversal didn't match a view.  I felt
-it was better to make folks that wanted the feature replace the traverser
-rather than build that particular honey pot in to the default traverser.
+during traversal by mutating ``REQUEST['TraversalNameStack']``. Pyramid's
+default traverser (``pyramid.traversal.ResourceTreeTraverser``) does not offer
+a way to do this. It does not maintain a stack as a request attribute and, even
+if it did, it does not pass the request to resource objects while it's
+traversing. While it was handy at times, this feature was abused in frameworks
+built atop Zope (like CMF and Plone), often making it difficult to tell exactly
+what was happening when a traversal didn't match a view. I felt it was better
+for folks that wanted the feature to make them replace the traverser rather
+than build that particular honey pot in to the default traverser.
 
 Zope uses multiple mechanisms to attempt to obtain the next element in the
 resource tree based on a name.  It first tries an adaptation of the current
-resource to ``ITraversable``, and if that fails, it falls back to attempting
+resource to ``ITraversable``, and if that fails, it falls back to attempting a
 number of magic methods on the resource (``__bobo_traverse__``,
-``__getitem__``, and ``__getattr__``).  My experience while both using Zope
-and attempting to reimplement its publisher in ``repoze.zope2`` led me to
-believe the following:
+``__getitem__``, and ``__getattr__``).  My experience while both using Zope and
+attempting to reimplement its publisher in ``repoze.zope2`` led me to believe
+the following:
 
 - The *default* traverser should be as simple as possible.  Zope's publisher
   is somewhat difficult to follow and replicate due to the fallbacks it tried
@@ -991,7 +991,7 @@ believe the following:
   default implementation of the larger component, no one understands when (or
   whether) they should ever override the larger component entrirely.  This
   results, over time, in a rusting together of the larger "replaceable"
-  component and the framework itself, because people come to depend on the
+  component and the framework itself because people come to depend on the
   availability of the default component in order just to turn its knobs. The
   default component effectively becomes part of the framework, which entirely
   subverts the goal of making it replaceable.  In Pyramid, typically if a
@@ -1000,40 +1000,42 @@ believe the following:
   you will replace the component instead of turning knobs attached to the
   component.
 
+
 .. _microframeworks_smaller_hello_world:
 
-Microframeworks Have Smaller Hello World Programs
+Microframeworks have smaller Hello World programs
 -------------------------------------------------
 
-Self-described "microframeworks" exist: `Bottle <http://bottle.paws.de>`_ and
-`Flask <http://flask.pocoo.org/>`_ are two that are becoming popular.  `Bobo
-<http://bobo.digicool.com/>`_ doesn't describe itself as a microframework,
-but its intended userbase is much the same.  Many others exist.  We've
-actually even (only as a teaching tool, not as any sort of official project)
-`created one using Pyramid <http://bfg.repoze.org/videos#groundhog1>`_ (the
-videos use BFG, a precursor to Pyramid, but the resulting code is `available
-for Pyramid too <https://github.com/Pylons/groundhog>`_). Microframeworks are
-small frameworks with one common feature: each allows its users to create a
-fully functional application that lives in a single Python file.
+Self-described "microframeworks" exist. `Bottle <http://bottle.paws.de>`_ and
+`Flask <http://flask.pocoo.org/>`_ are two that are becoming popular. `Bobo
+<http://bobo.digicool.com/>`_ doesn't describe itself as a microframework, but
+its intended user base is much the same. Many others exist. We've even (only as
+a teaching tool, not as any sort of official project) `created one using
+Pyramid <http://bfg.repoze.org/videos#groundhog1>`_. The videos use BFG, a
+precursor to Pyramid, but the resulting code is `available for Pyramid too
+<https://github.com/Pylons/groundhog>`_). Microframeworks are small frameworks
+with one common feature: each allows its users to create a fully functional
+application that lives in a single Python file.
 
 Some developers and microframework authors point out that Pyramid's "hello
-world" single-file program is longer (by about five lines) than the
-equivalent program in their favorite microframework.  Guilty as charged.
+world" single-file program is longer (by about five lines) than the equivalent
+program in their favorite microframework. Guilty as charged.
 
-This loss isn't for lack of trying. Pyramid is useful in the same
-circumstance in which microframeworks claim dominance: single-file
-applications.  But Pyramid doesn't sacrifice its ability to credibly support
-larger applications in order to achieve hello-world LoC parity with the
-current crop of microframeworks.  Pyramid's design instead tries to avoid
-some common pitfalls associated with naive declarative configuration schemes.
-The subsections which follow explain the rationale.
+This loss isn't for lack of trying. Pyramid is useful in the same circumstance
+in which microframeworks claim dominance: single-file applications. But Pyramid
+doesn't sacrifice its ability to credibly support larger applications in order
+to achieve "hello world" lines of code parity with the current crop of
+microframeworks. Pyramid's design instead tries to avoid some common pitfalls
+associated with naive declarative configuration schemes. The subsections which
+follow explain the rationale.
+
 
 .. _you_dont_own_modulescope:
 
-Application Programmers Don't Control The Module-Scope Codepath (Import-Time Side-Effects Are Evil)
+Application programmers don't control the module-scope codepath (import-time side-effects are evil)
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-Please imagine a directory structure with a set of Python files in it:
+Imagine a directory structure with a set of Python files in it:
 
 .. code-block:: text
 
@@ -1081,13 +1083,13 @@ The contents of ``config.py``:
         L.append(func)
         return func
 
-If we cd to the directory that holds these files and we run ``python app.py``
-given the directory structure and code above, what happens?  Presumably, our
-``decorator`` decorator will be used twice, once by the decorated function
-``foo`` in ``app.py`` and once by the decorated function ``bar`` in
-``app2.py``.  Since each time the decorator is used, the list ``L`` in
-``config.py`` is appended to, we'd expect a list with two elements to be
-printed, right?  Sadly, no:
+If we ``cd`` to the directory that holds these files, and we run
+``python app.py``, given the directory structure and code above, what happens?
+Presumably, our ``decorator`` decorator will be used twice, once by the
+decorated function ``foo`` in ``app.py``, and once by the decorated function
+``bar`` in ``app2.py``. Since each time the decorator is used, the list ``L``
+in ``config.py`` is appended to, we'd expect a list with two elements to be
+printed, right? Sadly, no:
 
 .. code-block:: text
 
@@ -1097,21 +1099,21 @@ printed, right?  Sadly, no:
      <function bar at 0x7f4ea41ab2a8>]
 
 By visual inspection, that outcome (three different functions in the list)
-seems impossible.  We only defined two functions and we decorated each of
-those functions only once, so we believe that the ``decorator`` decorator
-will only run twice.  However, what we believe is wrong because the code at
-module scope in our ``app.py`` module was *executed twice*.  The code is
+seems impossible. We defined only two functions, and we decorated each of those
+functions only once, so we believe that the ``decorator`` decorator will run
+only twice. However, what we believe is in fact wrong, because the code at
+module scope in our ``app.py`` module was *executed twice*. The code is
 executed once when the script is run as ``__main__`` (via ``python app.py``),
 and then it is executed again when ``app2.py`` imports the same file as
 ``app``.
 
-What does this have to do with our comparison to microframeworks?  Many
-microframeworks in the current crop (e.g. Bottle, Flask) encourage you to
-attach configuration decorators to objects defined at module scope.  These
-decorators execute arbitrarily complex registration code which populates a
-singleton registry that is a global defined in external Python module.  This
-is analogous to the above example: the "global registry" in the above example
-is the list ``L``.
+What does this have to do with our comparison to microframeworks? Many
+microframeworks in the current crop (e.g., Bottle and Flask) encourage you to
+attach configuration decorators to objects defined at module scope. These
+decorators execute arbitrarily complex registration code, which populates a
+singleton registry that is a global which is in turn defined in external Python
+module. This is analogous to the above example: the "global registry" in the
+above example is the list ``L``.
 
 Let's see what happens when we use the same pattern with the `Groundhog
 <https://github.com/Pylons/groundhog>`_ microframework.  Replace the contents
@@ -1164,41 +1166,39 @@ will be.
 
 The encouragement to use decorators which perform population of an external
 registry has an unintended consequence: the application developer now must
-assert ownership of every codepath that executes Python module scope
-code. Module-scope code is presumed by the current crop of decorator-based
-microframeworks to execute once and only once; if it executes more than once,
-weird things will start to happen.  It is up to the application developer to
-maintain this invariant.  Unfortunately, however, in reality, this is an
-impossible task, because, Python programmers *do not own the module scope
-codepath, and never will*.  Anyone who tries to sell you on the idea that
-they do is simply mistaken.  Test runners that you may want to use to run
-your code's tests often perform imports of arbitrary code in strange orders
-that manifest bugs like the one demonstrated above.  API documentation
-generation tools do the same.  Some people even think it's safe to use the
-Python ``reload`` command or delete objects from ``sys.modules``, each of
-which has hilarious effects when used against code that has import-time side
-effects.
+assert ownership of every code path that executes Python module scope code.
+Module-scope code is presumed by the current crop of decorator-based
+microframeworks to execute once and only once. If it executes more than once,
+weird things will start to happen. It is up to the application developer to
+maintain this invariant. Unfortunately, in reality this is an impossible task,
+because Python programmers *do not own the module scope code path, and never
+will*. Anyone who tries to sell you on the idea that they do so is simply
+mistaken. Test runners that you may want to use to run your code's tests often
+perform imports of arbitrary code in strange orders that manifest bugs like the
+one demonstrated above. API documentation generation tools do the same. Some
+people even think it's safe to use the Python ``reload`` command, or delete
+objects from ``sys.modules``, each of which has hilarious effects when used
+against code that has import-time side effects.
 
-Global-registry-mutating microframework programmers therefore will at some
-point need to start reading the tea leaves about what *might* happen if
-module scope code gets executed more than once like we do in the previous
-paragraph.  When Python programmers assume they can use the module-scope
-codepath to run arbitrary code (especially code which populates an external
-registry), and this assumption is challenged by reality, the application
-developer is often required to undergo a painful, meticulous debugging
-process to find the root cause of an inevitably obscure symptom.  The
-solution is often to rearrange application import ordering or move an import
-statement from module-scope into a function body.  The rationale for doing so
-can never be expressed adequately in the checkin message which accompanies
-the fix and can't be documented succinctly enough for the benefit of the rest
-of the development team so that the problem never happens again.  It will
-happen again, especially if you are working on a project with other people
-who haven't yet internalized the lessons you learned while you stepped
-through module-scope code using ``pdb``.  This is a really pretty poor
-situation to find yourself in as an application developer: you probably
-didn't even know your or your team signed up for the job, because the
-documentation offered by decorator-based microframeworks don't warn you about
-it.
+Global registry-mutating microframework programmers therefore will at some
+point need to start reading the tea leaves about what *might* happen if module
+scope code gets executed more than once, like we do in the previous paragraph.
+When Python programmers assume they can use the module-scope code path to run
+arbitrary code (especially code which populates an external registry), and this
+assumption is challenged by reality, the application developer is often
+required to undergo a painful, meticulous debugging process to find the root
+cause of an inevitably obscure symptom. The solution is often to rearrange
+application import ordering, or move an import statement from module-scope into
+a function body. The rationale for doing so can never be expressed adequately
+in the commit message which accompanies the fix, and can't be documented
+succinctly enough for the benefit of the rest of the development team so that
+the problem never happens again. It will happen again, especially if you are
+working on a project with other people who haven't yet internalized the lessons
+you learned while you stepped through module-scope code using ``pdb``. This is
+a very poor situation in which to find yourself as an application developer:
+you probably didn't even know you or your team signed up for the job, because
+the documentation offered by decorator-based microframeworks don't warn you
+about it.
 
 Folks who have a large investment in eager decorator-based configuration that
 populates an external data structure (such as microframework authors) may
@@ -1214,7 +1214,7 @@ time, and application complexity.
 
 If microframework authors do admit that the circumstance isn't contrived,
 they might then argue that real damage will never happen as the result of the
-double-execution (or triple-execution, etc) of module scope code.  You would
+double-execution (or triple-execution, etc.) of module scope code.  You would
 be wise to disbelieve this assertion.  The potential outcomes of multiple
 execution are too numerous to predict because they involve delicate
 relationships between application and framework code as well as chronology of
@@ -1222,14 +1222,14 @@ code execution.  It's literally impossible for a framework author to know
 what will happen in all circumstances.  But even if given the gift of
 omniscience for some limited set of circumstances, the framework author
 almost certainly does not have the double-execution anomaly in mind when
-coding new features.  He's thinking of adding a feature, not protecting
+coding new features.  They're thinking of adding a feature, not protecting
 against problems that might be caused by the 1% multiple execution case.
 However, any 1% case may cause 50% of your pain on a project, so it'd be nice
-if it never occured.
+if it never occurred.
 
-Responsible microframeworks actually offer a back-door way around the
-problem.  They allow you to disuse decorator based configuration entirely.
-Instead of requiring you to do the following:
+Responsible microframeworks actually offer a back-door way around the problem.
+They allow you to disuse decorator-based configuration entirely. Instead of
+requiring you to do the following:
 
 .. code-block:: python
     :linenos:
@@ -1243,7 +1243,7 @@ Instead of requiring you to do the following:
     if __name__ == '__main__':
         gh.run()
 
-They allow you to disuse the decorator syntax and go almost-all-imperative:
+They allow you to disuse the decorator syntax and go almost all-imperative:
 
 .. code-block:: python
     :linenos:
@@ -1267,23 +1267,23 @@ predictability.
 
 .. note::
 
-  Astute readers may notice that Pyramid has configuration decorators too.
-  Aha!  Don't these decorators have the same problems?  No.  These decorators
-  do not populate an external Python module when they are executed.  They
-  only mutate the functions (and classes and methods) they're attached to.
-  These mutations must later be found during a scan process that has a
-  predictable and structured import phase.  Module-localized mutation is
-  actually the best-case circumstance for double-imports; if a module only
-  mutates itself and its contents at import time, if it is imported twice,
-  that's OK, because each decorator invocation will always be mutating an
-  independent copy of the object it's attached to, not a shared resource like
-  a registry in another module.  This has the effect that
-  double-registrations will never be performed.
+  Astute readers may notice that Pyramid has configuration decorators too. Aha!
+  Don't these decorators have the same problems? No. These decorators do not
+  populate an external Python module when they are executed. They only mutate
+  the functions (and classes and methods) to which they're attached. These
+  mutations must later be found during a scan process that has a predictable
+  and structured import phase. Module-localized mutation is actually the
+  best-case circumstance for double-imports. If a module only mutates itself
+  and its contents at import time, if it is imported twice, that's OK, because
+  each decorator invocation will always be mutating an independent copy of the
+  object to which it's attached, not a shared resource like a registry in
+  another module. This has the effect that double-registrations will never be
+  performed.
 
 
 .. _routes_need_ordering:
 
-Routes Need Relative Ordering
+Routes need relative ordering
 +++++++++++++++++++++++++++++
 
 Consider the following simple `Groundhog
@@ -1311,8 +1311,8 @@ Consider the following simple `Groundhog
         app.run()
 
 If you run this application and visit the URL ``/admin``, you will see the
-"admin" page.  This is the intended result.  However, what if you rearrange
-the order of the function definitions in the file?
+"admin" page. This is the intended result. However, what if you rearrange the
+order of the function definitions in the file?
 
 .. code-block:: python
     :linenos:
@@ -1335,11 +1335,11 @@ the order of the function definitions in the file?
     if __name__ == '__main__':
         app.run()
 
-If you run this application and visit the URL ``/admin``, you will now be
-returned a 404 error.  This is probably not what you intended.  The reason
-you see a 404 error when you rearrange function definition ordering is that
-routing declarations expressed via our microframework's routing decorators
-have an *ordering*, and that ordering matters.
+If you run this application and visit the URL ``/admin``, your app will now
+return a 404 error. This is probably not what you intended. The reason you see
+a 404 error when you rearrange function definition ordering is that routing
+declarations expressed via our microframework's routing decorators have an
+*ordering*, and that ordering matters.
 
 In the first case, where we achieved the expected result, we first added a
 route with the pattern ``/admin``, then we added a route with the pattern
@@ -1347,65 +1347,67 @@ route with the pattern ``/admin``, then we added a route with the pattern
 scope.  When a request with a ``PATH_INFO`` of ``/admin`` enters our
 application, the web framework loops over each of our application's route
 patterns in the order in which they were defined in our module.  As a result,
-the view associated with the ``/admin`` routing pattern will be invoked: it
-matches first.  All is right with the world.
+the view associated with the ``/admin`` routing pattern will be invoked because
+it matches first. All is right with the world.
 
 In the second case, where we did not achieve the expected result, we first
 added a route with the pattern ``/:action``, then we added a route with the
 pattern ``/admin``.  When a request with a ``PATH_INFO`` of ``/admin`` enters
 our application, the web framework loops over each of our application's route
 patterns in the order in which they were defined in our module.  As a result,
-the view associated with the ``/:action`` routing pattern will be invoked: it
-matches first.  A 404 error is raised.  This is not what we wanted; it just
-happened due to the order in which we defined our view functions.
+the view associated with the ``/:action`` routing pattern will be invoked
+because it matches first. A 404 error is raised. This is not what we wanted; it
+just happened due to the order in which we defined our view functions.
 
-This is because Groundhog routes are added to the routing map in import
-order, and matched in the same order when a request comes in.  Bottle, like
-Groundhog, as of this writing, matches routes in the order in which they're
-defined at Python execution time.  Flask, on the other hand, does not order
-route matching based on import order; it reorders the routes you add to your
-application based on their "complexity".  Other microframeworks have varying
+This is because Groundhog routes are added to the routing map in import order,
+and matched in the same order when a request comes in. Bottle, like Groundhog,
+as of this writing, matches routes in the order in which they're defined at
+Python execution time. Flask, on the other hand, does not order route matching
+based on import order. Instead it reorders the routes you add to your
+application based on their "complexity". Other microframeworks have varying
 strategies to do route ordering.
 
 Your application may be small enough where route ordering will never cause an
-issue.  If your application becomes large enough, however, being able to
-specify or predict that ordering as your application grows larger will be
-difficult.  At some point, you will likely need to more explicitly start
-controlling route ordering, especially in applications that require
-extensibility.
+issue. If your application becomes large enough, however, being able to specify
+or predict that ordering as your application grows larger will be difficult.
+At some point, you will likely need to start controlling route ordering more
+explicitly, especially in applications that require extensibility.
 
 If your microframework orders route matching based on complexity, you'll need
 to understand what is meant by "complexity", and you'll need to attempt to
-inject a "less complex" route to have it get matched before any "more
-complex" one to ensure that it's tried first.
+inject a "less complex" route to have it get matched before any "more complex"
+one to ensure that it's tried first.
 
 If your microframework orders its route matching based on relative
 import/execution of function decorator definitions, you will need to ensure
-you execute all of these statements in the "right" order, and you'll need to
-be cognizant of this import/execution ordering as you grow your application
-or try to extend it.  This is a difficult invariant to maintain for all but
-the smallest applications.
+that you execute all of these statements in the "right" order, and you'll need
+to be cognizant of this import/execution ordering as you grow your application
+or try to extend it. This is a difficult invariant to maintain for all but the
+smallest applications.
 
-In either case, your application must import the non-``__main__`` modules
-which contain configuration decorations somehow for their configuration to be
-executed.  Does that make you a little uncomfortable?  It should, because
+In either case, your application must import the non-``__main__`` modules which
+contain configuration decorations somehow for their configuration to be
+executed. Does that make you a little uncomfortable? It should, because
 :ref:`you_dont_own_modulescope`.
 
 Pyramid uses neither decorator import time ordering nor does it attempt to
-divine the relative complexity of one route to another in order to define a
-route match ordering.  In Pyramid, you have to maintain relative route
-ordering imperatively via the chronology of multiple executions of the
-:meth:`pyramid.config.Configurator.add_route` method.  The order in which you
+divine the relative complexity of one route to another as a means to define a
+route match ordering. In Pyramid, you have to maintain relative route ordering
+imperatively via the chronology of multiple executions of the
+:meth:`pyramid.config.Configurator.add_route` method. The order in which you
 repeatedly call ``add_route`` becomes the order of route matching.
 
 If needing to maintain this imperative ordering truly bugs you, you can use
-:term:`traversal` instead of route matching, which is a completely
-declarative (and completely predictable) mechanism to map code to URLs.
-While URL dispatch is easier to understand for small non-extensible
-applications, traversal is a great fit for very large applications and
-applications that need to be arbitrarily extensible.
+:term:`traversal` instead of route matching, which is a completely declarative
+(and completely predictable) mechanism to map code to URLs. While URL dispatch
+is easier to understand for small non-extensible applications, traversal is a
+great fit for very large applications and applications that need to be
+arbitrarily extensible.
 
-"Stacked Object Proxies" Are Too Clever / Thread Locals Are A Nuisance
+
+.. _thread_local_nuisance:
+
+"Stacked object proxies" are too clever / thread locals are a nuisance
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 Some microframeworks use the ``import`` statement to get a handle to an
@@ -1448,32 +1450,35 @@ code below:
        for i in range(10):
            print(i)
 
-By its nature, the *request* object created as the result of a WSGI server's
-call into a long-lived web framework cannot be global, because the lifetime
-of a single request will be much shorter than the lifetime of the process
-running the framework.  A request object created by a web framework actually
-has more similarity to the ``i`` loop counter in our example above than it
-has to any comparable importable object defined in the Python standard
+By its nature, the *request* object that is created as the result of a WSGI
+server's call into a long-lived web framework cannot be global, because the
+lifetime of a single request will be much shorter than the lifetime of the
+process running the framework.  A request object created by a web framework
+actually has more similarity to the ``i`` loop counter in our example above
+than it has to any comparable importable object defined in the Python standard
 library or in normal library code.
 
 However, systems which use stacked object proxies promote locally scoped
-objects such as ``request`` out to module scope, for the purpose of being
+objects, such as ``request``, out to module scope, for the purpose of being
 able to offer users a nice spelling involving ``import``.  They, for what I
-consider dubious reasons, would rather present to their users the canonical
-way of getting at a ``request`` as ``from framework import request`` instead
-of a saner ``from myframework.threadlocals import get_request; request =
-get_request()`` even though the latter is more explicit.
+consider dubious reasons, would rather present to their users the canonical way
+of getting at a ``request`` as ``from framework import request`` instead of a
+saner ``from myframework.threadlocals import get_request; request =
+get_request()``, even though the latter is more explicit.
 
 It would be *most* explicit if the microframeworks did not use thread local
-variables at all.  Pyramid view functions are passed a request object; many
-of Pyramid's APIs require that an explicit request object be passed to them.
-It is *possible* to retrieve the current Pyramid request as a threadlocal
-variable but it is a "in case of emergency, break glass" type of activity.
-This explicitness makes Pyramid view functions more easily unit testable, as
-you don't need to rely on the framework to manufacture suitable "dummy"
-request (and other similarly-scoped) objects during test setup.  It also
-makes them more likely to work on arbitrary systems, such as async servers
-that do no monkeypatching.
+variables at all. Pyramid view functions are passed a request object. Many of
+Pyramid's APIs require that an explicit request object be passed to them. It is
+*possible* to retrieve the current Pyramid request as a threadlocal variable,
+but it is an "in case of emergency, break glass" type of activity. This
+explicitness makes Pyramid view functions more easily unit testable, as you
+don't need to rely on the framework to manufacture suitable "dummy" request
+(and other similarly-scoped) objects during test setup.  It also makes them
+more likely to work on arbitrary systems, such as async servers, that do no
+monkeypatching.
+
+
+.. _explicitly_wsgi:
 
 Explicitly WSGI
 +++++++++++++++
@@ -1487,35 +1492,35 @@ import a WSGI server and use it to serve up their Pyramid application as per
 the documentation of that WSGI server.
 
 The extra lines saved by abstracting away the serving step behind ``run()``
-seem to have driven dubious second-order decisions related to API in some
-microframeworks.  For example, Bottle contains a ``ServerAdapter`` subclass
-for each type of WSGI server it supports via its ``app.run()`` mechanism.
-This means that there exists code in ``bottle.py`` that depends on the
-following modules: ``wsgiref``, ``flup``, ``paste``, ``cherrypy``, ``fapws``,
+seems to have driven dubious second-order decisions related to its API in some
+microframeworks. For example, Bottle contains a ``ServerAdapter`` subclass for
+each type of WSGI server it supports via its ``app.run()`` mechanism. This
+means that there exists code in ``bottle.py`` that depends on the following
+modules: ``wsgiref``, ``flup``, ``paste``, ``cherrypy``, ``fapws``,
 ``tornado``, ``google.appengine``, ``twisted.web``, ``diesel``, ``gevent``,
-``gunicorn``, ``eventlet``, and ``rocket``.  You choose the kind of server
-you want to run by passing its name into the ``run`` method.  In theory, this
-sounds great: I can try Bottle out on ``gunicorn`` just by passing in a name!
-However, to fully test Bottle, all of these third-party systems must be
-installed and functional; the Bottle developers must monitor changes to each
-of these packages and make sure their code still interfaces properly with
-them.  This expands the packages required for testing greatly; this is a
-*lot* of requirements.  It is likely difficult to fully automate these tests
-due to requirements conflicts and build issues.
+``gunicorn``, ``eventlet``, and ``rocket``. You choose the kind of server you
+want to run by passing its name into the ``run`` method. In theory, this sounds
+great: I can try out Bottle on ``gunicorn`` just by passing in a name! However,
+to fully test Bottle, all of these third-party systems must be installed and
+functional. The Bottle developers must monitor changes to each of these
+packages and make sure their code still interfaces properly with them. This
+increases the number of packages required for testing greatly; this is a *lot*
+of requirements. It is likely difficult to fully automate these tests due to
+requirements conflicts and build issues.
 
 As a result, for single-file apps, we currently don't bother to offer a
-``run()`` shortcut; we tell folks to import their WSGI server of choice and
-run it by hand.  For the people who want a server abstraction layer, we
-suggest that they use PasteDeploy.  In PasteDeploy-based systems, the onus
-for making sure that the server can interface with a WSGI application is
-placed on the server developer, not the web framework developer, making it
-more likely to be timely and correct.
+``run()`` shortcut. We tell folks to import their WSGI server of choice and run
+it by hand. For the people who want a server abstraction layer, we suggest that
+they use PasteDeploy.  In PasteDeploy-based systems, the onus for making sure
+that the server can interface with a WSGI application is placed on the server
+developer, not the web framework developer, making it more likely to be timely
+and correct.
 
-Wrapping Up
+Wrapping up
 +++++++++++
 
-Here's a diagrammed version of the simplest pyramid application, where
-comments take into account what we've discussed in the
+Here's a diagrammed version of the simplest pyramid application, where the
+inlined comments take into account what we've discussed in the
 :ref:`microframeworks_smaller_hello_world` section.
 
 .. code-block:: python
@@ -1526,15 +1531,16 @@ comments take into account what we've discussed in the
 
    def hello_world(request):  # accepts a request; no request thread local reqd
        # explicit response object means no response threadlocal
-       return Response('Hello world!') 
+       return Response('Hello world!')
 
    if __name__ == '__main__':
        from pyramid.config import Configurator
-       config = Configurator()       # no global application object.
+       config = Configurator()       # no global application object
        config.add_view(hello_world)  # explicit non-decorator registration
        app = config.make_wsgi_app()  # explicitly WSGI
        server = make_server('0.0.0.0', 8080, app)
        server.serve_forever()        # explicitly WSGI
+
 
 Pyramid Doesn't Offer Pluggable Apps
 ------------------------------------
