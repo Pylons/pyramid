@@ -606,6 +606,8 @@ class ViewMethodsMixin(object):
         # have been mutated by the view, and its state is not
         # sane (e.g. caching headers)
         with hide_attrs(request, 'exception', 'exc_info', 'response'):
+            attrs['exception'] = exc_info[0]
+            attrs['exc_info'] = exc_info
             # we use .get instead of .__getitem__ below due to
             # https://github.com/Pylons/pyramid/issues/700
             request_iface = attrs.get('request_iface', IRequest)
