@@ -600,7 +600,6 @@ class ViewMethodsMixin(object):
             exc_info = sys.exc_info()
         attrs = request.__dict__
         context_iface = providedBy(exc_info[0])
-        view_name = attrs.get('view_name', '')
 
         # clear old generated request.response, if any; it may
         # have been mutated by the view, and its state is not
@@ -616,7 +615,7 @@ class ViewMethodsMixin(object):
                 request,
                 exc_info[0],
                 context_iface,
-                view_name,
+                '',
                 view_types=None,
                 view_classifier=IExceptionViewClassifier,
                 secure=secure,
