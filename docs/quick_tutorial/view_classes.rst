@@ -10,11 +10,10 @@ then move some declarations to the class level.
 Background
 ==========
 
-So far our views have been simple, free-standing functions. Many times
-your views are related: different ways to look at or work on the same
-data or a REST API that handles multiple operations. Grouping these
-together as a
-:ref:`view class <class_as_view>` makes sense:
+So far our views have been simple, free-standing functions. Many times your
+views are related to one another. They may be different ways to look at or work
+on the same data, or be a REST API that handles multiple operations. Grouping
+these views together as a :ref:`view class <class_as_view>` makes sense:
 
 - Group views
 
