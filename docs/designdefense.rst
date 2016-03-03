@@ -1011,8 +1011,8 @@ Self-described "microframeworks" exist. `Bottle <http://bottle.paws.de>`_ and
 <http://bobo.digicool.com/>`_ doesn't describe itself as a microframework, but
 its intended user base is much the same. Many others exist. We've even (only as
 a teaching tool, not as any sort of official project) `created one using
-Pyramid <http://bfg.repoze.org/videos#groundhog1>`_. The videos use BFG, a
-precursor to Pyramid, but the resulting code is `available for Pyramid too
+Pyramid <http://static.repoze.org/casts/videotags.html>`_. The videos use BFG,
+a precursor to Pyramid, but the resulting code is `available for Pyramid too
 <https://github.com/Pylons/groundhog>`_). Microframeworks are small frameworks
 with one common feature: each allows its users to create a fully functional
 application that lives in a single Python file.
@@ -1542,7 +1542,7 @@ inlined comments take into account what we've discussed in the
        server.serve_forever()        # explicitly WSGI
 
 
-Pyramid Doesn't Offer Pluggable Apps
+Pyramid doesn't offer pluggable apps
 ------------------------------------
 
 It is "Pyramidic" to compose multiple external sources into the same
@@ -1550,7 +1550,7 @@ configuration using :meth:`~pyramid.config.Configurator.include`.  Any
 number of includes can be done to compose an application; includes can even
 be done from within other includes.  Any directive can be used within an
 include that can be used outside of one (such as
-:meth:`~pyramid.config.Configurator.add_view`, etc).
+:meth:`~pyramid.config.Configurator.add_view`).
 
 Pyramid has a conflict detection system that will throw an error if two
 included externals try to add the same configuration in a conflicting way
