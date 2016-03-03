@@ -598,14 +598,15 @@ class ViewMethodsMixin(object):
             registry = get_current_registry()
         if exc_info is None:
             exc_info = sys.exc_info()
+        exc = exc_info[1]
         attrs = request.__dict__
-        context_iface = providedBy(exc_info[0])
+        context_iface = providedBy(exc)
 
         # clear old generated request.response, if any; it may
         # have been mutated by the view, and its state is not
         # sane (e.g. caching headers)
         with hide_attrs(request, 'exception', 'exc_info', 'response'):
-            attrs['exception'] = exc_info[0]
+            attrs['exception'] = exc
             attrs['exc_info'] = exc_info
             # we use .get instead of .__getitem__ below due to
             # https://github.com/Pylons/pyramid/issues/700
@@ -613,7 +614,7 @@ class ViewMethodsMixin(object):
             response = _call_view(
                 registry,
                 request,
-                exc_info[0],
+                exc,
                 context_iface,
                 '',
                 view_types=None,
