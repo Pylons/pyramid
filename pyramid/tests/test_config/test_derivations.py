@@ -1097,9 +1097,9 @@ class TestDerivationOrder(unittest.TestCase):
     def test_right_order_user_sorted(self):
         from pyramid.interfaces import IViewDerivers
 
-        self.config.add_view_derivation('deriv1', None, default=None)
-        self.config.add_view_derivation('deriv2', None, default=None, over='deriv1')
-        self.config.add_view_derivation('deriv3', None, default=None, under='deriv2')
+        self.config.add_view_derivation('deriv1', None)
+        self.config.add_view_derivation('deriv2', None, over='deriv1')
+        self.config.add_view_derivation('deriv3', None, under='deriv2')
 
         derivers = self.config.registry.queryUtility(IViewDerivers, default=[])
         derivers_sorted = derivers.sorted()
@@ -1119,9 +1119,9 @@ class TestDerivationOrder(unittest.TestCase):
     def test_right_order_implicit(self):
         from pyramid.interfaces import IViewDerivers
 
-        self.config.add_view_derivation('deriv1', None, default=None)
-        self.config.add_view_derivation('deriv2', None, default=None)
-        self.config.add_view_derivation('deriv3', None, default=None)
+        self.config.add_view_derivation('deriv1', None)
+        self.config.add_view_derivation('deriv2', None)
+        self.config.add_view_derivation('deriv3', None)
 
         derivers = self.config.registry.queryUtility(IViewDerivers, default=[])
         derivers_sorted = derivers.sorted()
@@ -1141,7 +1141,7 @@ class TestDerivationOrder(unittest.TestCase):
     def test_right_order_over_rendered_view(self):
         from pyramid.interfaces import IViewDerivers
 
-        self.config.add_view_derivation('deriv1', None, default=None, over='rendered_view')
+        self.config.add_view_derivation('deriv1', None, over='rendered_view')
 
         derivers = self.config.registry.queryUtility(IViewDerivers, default=[])
         derivers_sorted = derivers.sorted()
@@ -1159,9 +1159,9 @@ class TestDerivationOrder(unittest.TestCase):
     def test_right_order_over_rendered_view_others(self):
         from pyramid.interfaces import IViewDerivers
 
-        self.config.add_view_derivation('deriv1', None, default=None, over='rendered_view')
-        self.config.add_view_derivation('deriv2', None, default=None)
-        self.config.add_view_derivation('deriv3', None, default=None)
+        self.config.add_view_derivation('deriv1', None, over='rendered_view')
+        self.config.add_view_derivation('deriv2', None)
+        self.config.add_view_derivation('deriv3', None)
 
         derivers = self.config.registry.queryUtility(IViewDerivers, default=[])
         derivers_sorted = derivers.sorted()
@@ -1192,32 +1192,17 @@ class TestAddDerivation(unittest.TestCase):
         response.deriv = False
         view = lambda *arg: response
 
-        def deriv(view, value, **kw):
+        def deriv(view, info):
             self.assertFalse(response.deriv)
-            self.assertEqual(value, None)
             response.deriv = True
             return view
 
         result = self.config._derive_view(view)
         self.assertFalse(response.deriv)
-        self.config.add_view_derivation('test_deriv', deriv, default=None)
+        self.config.add_view_derivation('test_deriv', deriv)
 
         result = self.config._derive_view(view)
         self.assertTrue(response.deriv)
-
-    def test_derivation_default(self):
-        response = DummyResponse()
-        response.deriv_value = None
-        test_default = object()
-        view = lambda *arg: response
-
-        def deriv(view, value, **kw):
-            response.deriv_value = value
-            return view
-
-        self.config.add_view_derivation('test_default_deriv', deriv, default=test_default)
-        result = self.config._derive_view(view)
-        self.assertEqual(response.deriv_value, test_default)
 
     def test_override_derivation(self):
         flags = {}
@@ -1235,35 +1220,17 @@ class TestAddDerivation(unittest.TestCase):
             return view
 
         view1 = AView()
-        self.config.add_view_derivation('test_deriv', deriv1, default=None)
+        self.config.add_view_derivation('test_deriv', deriv1)
         result = self.config._derive_view(view1)
         self.assertTrue(flags.get('deriv1'))
         self.assertFalse(flags.get('deriv2'))
 
         flags.clear()
         view2 = AView()
-        self.config.add_view_derivation('test_deriv', deriv2, default=None)
+        self.config.add_view_derivation('test_deriv', deriv2)
         result = self.config._derive_view(view2)
         self.assertFalse(flags.get('deriv1'))
         self.assertTrue(flags.get('deriv2'))
-
-    def test_override_derivation_default(self):
-        response = DummyResponse()
-        response.deriv_value = None
-        test_default1 = 'first default'
-        test_default2 = 'second default'
-        view = lambda *arg: response
-
-        def deriv(view, value, **kw):
-            response.deriv_value = value
-            return view
-
-        self.config.add_view_derivation('test_default_deriv', deriv, default=test_default1)
-        result = self.config._derive_view(view)
-        self.assertEqual(response.deriv_value, test_default1)
-        self.config.add_view_derivation('test_default_deriv', deriv, default=test_default2)
-        result = self.config._derive_view(view)
-        self.assertEqual(response.deriv_value, test_default2)
 
     def test_add_multi_derivations_ordered(self):
         response = DummyResponse()
@@ -1282,9 +1249,9 @@ class TestAddDerivation(unittest.TestCase):
             response.deriv.append('deriv3')
             return view
 
-        self.config.add_view_derivation('deriv1', deriv1, default=None)
-        self.config.add_view_derivation('deriv2', deriv2, default=None, over='deriv1')
-        self.config.add_view_derivation('deriv3', deriv3, default=None, under='deriv2')
+        self.config.add_view_derivation('deriv1', deriv1)
+        self.config.add_view_derivation('deriv2', deriv2, over='deriv1')
+        self.config.add_view_derivation('deriv3', deriv3, under='deriv2')
         result = self.config._derive_view(view)
         self.assertEqual(response.deriv, ['deriv2', 'deriv3', 'deriv1'])
 
@@ -1323,16 +1290,16 @@ class TestDerivationIntegration(unittest.TestCase):
         view = lambda *arg: response
         response.deriv = []
 
-        def deriv1(view, value, **kw):
-            response.deriv.append(kw['options']['deriv1'])
+        def deriv1(view, info):
+            response.deriv.append(info.options['deriv1'])
             return view
 
-        def deriv2(view, value, **kw):
-            response.deriv.append(kw['options']['deriv2'])
+        def deriv2(view, info):
+            response.deriv.append(info.options['deriv2'])
             return view
 
-        self.config.add_view_derivation('deriv1', deriv1, default=None)
-        self.config.add_view_derivation('deriv2', deriv2, default=None)
+        self.config.add_view_derivation('deriv1', deriv1)
+        self.config.add_view_derivation('deriv2', deriv2)
         self.config.add_view(view, deriv1='test1', deriv2='test2')
         self.config.commit()
 
@@ -1341,32 +1308,6 @@ class TestDerivationIntegration(unittest.TestCase):
         request.method = 'GET'
         self.assertEqual(wrapper(None, request), response)
         self.assertEqual(['test1', 'test2'], response.deriv)
-
-    def test_view_options_default_or_not(self):
-        response = DummyResponse()
-        view = lambda *arg: response
-        response.deriv = []
-
-        def deriv1(view, value, **kw):
-            response.deriv.append(value)
-            response.deriv.append(kw['options'].get('deriv1', None))
-            return view
-
-        def deriv2(view, value, **kw):
-            response.deriv.append(value)
-            response.deriv.append(kw['options'].get('deriv2', None))
-            return view
-
-        self.config.add_view_derivation('deriv1', deriv1, default=None)
-        self.config.add_view_derivation('deriv2', deriv2, default='test2')
-        self.config.add_view(view, deriv1='test1')
-        self.config.commit()
-
-        wrapper = self._getViewCallable(self.config)
-        request = self._makeRequest(self.config)
-        request.method = 'GET'
-        self.assertEqual(wrapper(None, request), response)
-        self.assertEqual(['test1', 'test1', 'test2', None], response.deriv)
 
 
 from zope.interface import implementer

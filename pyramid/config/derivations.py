@@ -154,8 +154,8 @@ class DefaultViewMapper(object):
 
 
 def wraps_view(wrapper):
-    def inner(view, value, **kw):
-        wrapper_view = wrapper(view, value, **kw)
+    def inner(view, info):
+        wrapper_view = wrapper(view, info)
         return preserve_view_attrs(view, wrapper_view)
     return inner
 
@@ -193,21 +193,21 @@ def preserve_view_attrs(view, wrapper):
 
     return wrapper
 
-def mapped_view(view, value, **kw):
-    mapper = kw.get('mapper')
+def mapped_view(view, info):
+    mapper = info.options.get('mapper')
     if mapper is None:
         mapper = getattr(view, '__view_mapper__', None)
         if mapper is None:
-            mapper = kw['registry'].queryUtility(IViewMapperFactory)
+            mapper = info.registry.queryUtility(IViewMapperFactory)
             if mapper is None:
                 mapper = DefaultViewMapper
 
-    mapped_view = mapper(**kw)(view)
+    mapped_view = mapper(**info.options)(view)
     return mapped_view
 
-def owrapped_view(view, value, **kw):
-    wrapper_viewname = kw.get('wrapper_viewname')
-    viewname = kw.get('viewname')
+def owrapped_view(view, info):
+    wrapper_viewname = info.options.get('wrapper_viewname')
+    viewname = info.options.get('viewname')
     if not wrapper_viewname:
         return view
     def _owrapped_view(context, request):
@@ -224,11 +224,11 @@ def owrapped_view(view, value, **kw):
         return wrapped_response
     return _owrapped_view
 
-def http_cached_view(view, value, **kw):
-    if kw['registry'].settings.get('prevent_http_cache', False):
+def http_cached_view(view, info):
+    if info.settings.get('prevent_http_cache', False):
         return view
 
-    seconds = kw.get('http_cache')
+    seconds = info.options.get('http_cache')
 
     if seconds is None:
         return view
@@ -253,8 +253,8 @@ def http_cached_view(view, value, **kw):
 
     return wrapper
 
-def secured_view(view, value, **kw):
-    permission = kw.get('permission')
+def secured_view(view, info):
+    permission = info.options.get('permission')
     if permission == NO_PERMISSION_REQUIRED:
         # allow views registered within configurations that have a
         # default permission to explicitly override the default
@@ -262,8 +262,8 @@ def secured_view(view, value, **kw):
         permission = None
 
     wrapped_view = view
-    authn_policy = kw['registry'].queryUtility(IAuthenticationPolicy)
-    authz_policy = kw['registry'].queryUtility(IAuthorizationPolicy)
+    authn_policy = info.registry.queryUtility(IAuthenticationPolicy)
+    authz_policy = info.registry.queryUtility(IAuthorizationPolicy)
 
     if authn_policy and authz_policy and (permission is not None):
         def _permitted(context, request):
@@ -285,13 +285,13 @@ def secured_view(view, value, **kw):
 
     return wrapped_view
 
-def authdebug_view(view, value, **kw):
+def authdebug_view(view, info):
     wrapped_view = view
-    settings = kw['registry'].settings
-    permission = kw.get('permission')
-    authn_policy = kw['registry'].queryUtility(IAuthenticationPolicy)
-    authz_policy = kw['registry'].queryUtility(IAuthorizationPolicy)
-    logger = kw['registry'].queryUtility(IDebugLogger)
+    settings = info.settings
+    permission = info.options.get('permission')
+    authn_policy = info.registry.queryUtility(IAuthenticationPolicy)
+    authz_policy = info.registry.queryUtility(IAuthorizationPolicy)
+    logger = info.registry.queryUtility(IDebugLogger)
     if settings and settings.get('debug_authorization', False):
         def _authdebug_view(context, request):
             view_name = getattr(request, 'view_name', None)
@@ -322,8 +322,8 @@ def authdebug_view(view, value, **kw):
 
     return wrapped_view
 
-def predicated_view(view, value, **kw):
-    preds = kw.get('predicates', ())
+def predicated_view(view, info):
+    preds = info.predicates
     if not preds:
         return view
     def predicate_wrapper(context, request):
@@ -341,11 +341,11 @@ def predicated_view(view, value, **kw):
     predicate_wrapper.__predicates__ = preds
     return predicate_wrapper
 
-def attr_wrapped_view(view, value, **kw):
-    kw = kw
-    accept, order, phash = (kw.get('accept', None),
-                            kw.get('order', MAX_ORDER),
-                            kw.get('phash', DEFAULT_PHASH))
+def attr_wrapped_view(view, info):
+    opts = info.options
+    accept, order, phash = (opts.get('accept', None),
+                            opts.get('order', MAX_ORDER),
+                            opts.get('phash', DEFAULT_PHASH))
     # this is a little silly but we don't want to decorate the original
     # function with attributes that indicate accept, order, and phash,
     # so we use a wrapper
@@ -360,15 +360,14 @@ def attr_wrapped_view(view, value, **kw):
     attr_view.__accept__ = accept
     attr_view.__order__ = order
     attr_view.__phash__ = phash
-    attr_view.__view_attr__ = kw.get('attr')
-    attr_view.__permission__ = kw.get('permission')
+    attr_view.__view_attr__ = opts.get('attr')
+    attr_view.__permission__ = opts.get('permission')
     return attr_view
 
-def rendered_view(view, value, **kw):
+def rendered_view(view, info):
     # one way or another this wrapper must produce a Response (unless
     # the renderer is a NullRendererHelper)
-    renderer = kw.get('renderer')
-    registry = kw['registry']
+    renderer = info.options.get('renderer')
     if renderer is None:
         # register a default renderer if you want super-dynamic
         # rendering.  registering a default renderer will also allow
@@ -379,7 +378,7 @@ def rendered_view(view, value, **kw):
             if result.__class__ is Response: # common case
                 response = result
             else:
-                response = registry.queryAdapterOrSelf(result, IResponse)
+                response = info.registry.queryAdapterOrSelf(result, IResponse)
                 if response is None:
                     if result is None:
                         append = (' You may have forgotten to return a value '
@@ -410,7 +409,7 @@ def rendered_view(view, value, **kw):
         else:
             # this must adapt, it can't do a simple interface check
             # (avoid trying to render webob responses)
-            response = registry.queryAdapterOrSelf(result, IResponse)
+            response = info.registry.queryAdapterOrSelf(result, IResponse)
             if response is None:
                 attrs = getattr(request, '__dict__', {})
                 if 'override_renderer' in attrs:
@@ -418,8 +417,8 @@ def rendered_view(view, value, **kw):
                     renderer_name = attrs.pop('override_renderer')
                     view_renderer = renderers.RendererHelper(
                         name=renderer_name,
-                        package=kw.get('package'),
-                        registry=registry)
+                        package=info.package,
+                        registry=info.registry)
                 else:
                     view_renderer = renderer.clone()
                 if '__view__' in attrs:
@@ -432,8 +431,8 @@ def rendered_view(view, value, **kw):
 
     return rendered_view
 
-def decorated_view(view, value, **kw):
-    decorator = kw.get('decorator')
+def decorated_view(view, info):
+    decorator = info.options.get('decorator')
     if decorator is None:
         return view
     return decorator(view)

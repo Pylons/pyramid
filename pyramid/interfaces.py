@@ -1189,7 +1189,21 @@ class IPredicateList(Interface):
 
 class IViewDerivers(Interface):
     """ Interface for view derivers list """
-    
+
+class IViewDeriverInfo(Interface):
+    """ An object implementing this interface is passed to every
+    :term:`view deriver` during configuration."""
+    registry = Attribute('The "current" application registry when the '
+                         'view was created')
+    package = Attribute('The "current package" when the view '
+                        'configuration statement was found')
+    settings = Attribute('The deployment settings dictionary related '
+                         'to the current application')
+    options = Attribute('The view options passed to the view, including any '
+                        'default values that were not overriden')
+    predicates = Attribute('The list of predicates active on the view')
+    orig_view = Attribute('The original view object being wrapped')
+
 class ICacheBuster(Interface):
     """
     A cache buster modifies the URL generation machinery for
