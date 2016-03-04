@@ -27,6 +27,7 @@ from pyramid.interfaces import (
     IView,
     IViewClassifier,
     IViewDerivers,
+    IViewDeriverInfo,
     IViewMapperFactory,
     PHASE1_CONFIG,
     )
@@ -41,6 +42,8 @@ from pyramid.compat import (
     WIN,
     is_nonstr_iter,
     )
+
+from pyramid.decorator import reify
 
 from pyramid.exceptions import (
     ConfigurationError,
@@ -653,12 +656,17 @@ class ViewsConfiguratorMixin(object):
           Pass a key/value pair here to use a third-party predicate or set a
           value for a view derivative option registered via
           :meth:`pyramid.config.Configurator.add_view_predicate` or
-          :meth:`pyramid.config.Configurator.add_view_derivation`.  More than
+          :meth:`pyramid.config.Configurator.add_view_option`.  More than
           one key/value pair can be used at the same time.  See
           :ref:`view_and_route_predicates` for more information about
           third-party predicates.
 
-          .. versionadded: 1.7
+          .. versionadded: 1.4a1
+
+          .. versionchanged: 1.7
+
+             Support setting arbitrary view options. Previously, only
+             predicate values could be supplied.
 
         """
         if custom_predicates:
@@ -726,21 +734,19 @@ class ViewsConfiguratorMixin(object):
 
         introspectables = []
         ovals = view_options.copy()
-        ovals.update(
-            dict(
-                xhr=xhr,
-                request_method=request_method,
-                path_info=path_info,
-                request_param=request_param,
-                header=header,
-                accept=accept,
-                containment=containment,
-                request_type=request_type,
-                match_param=match_param,
-                check_csrf=check_csrf,
-                custom=predvalseq(custom_predicates),
-                )
-            )
+        ovals.update(dict(
+            xhr=xhr,
+            request_method=request_method,
+            path_info=path_info,
+            request_param=request_param,
+            header=header,
+            accept=accept,
+            containment=containment,
+            request_type=request_type,
+            match_param=match_param,
+            check_csrf=check_csrf,
+            custom=predvalseq(custom_predicates),
+        ))
 
         def discrim_func():
             # We need to defer the discriminator until we know what the phash
@@ -749,13 +755,10 @@ class ViewsConfiguratorMixin(object):
             # called.
             valid_predicates = predlist.names()
             pvals = {}
-            options = {}
 
             for (k, v) in ovals.items():
                 if k in valid_predicates:
                     pvals[k] = v
-                else:
-                    options[k] = v
 
             order, preds, phash = predlist.make(self, **pvals)
 
@@ -763,7 +766,6 @@ class ViewsConfiguratorMixin(object):
                 'phash': phash,
                 'order': order,
                 'predicates': preds,
-                'options': options
                 })
             return ('view', context, name, route_name, phash)
 
@@ -781,26 +783,25 @@ class ViewsConfiguratorMixin(object):
                                         discriminator,
                                         view_desc,
                                         'view')
-        view_intr.update(
-            dict(name=name,
-                 context=context,
-                 containment=containment,
-                 request_param=request_param,
-                 request_methods=request_method,
-                 route_name=route_name,
-                 attr=attr,
-                 xhr=xhr,
-                 accept=accept,
-                 header=header,
-                 path_info=path_info,
-                 match_param=match_param,
-                 check_csrf=check_csrf,
-                 callable=view,
-                 mapper=mapper,
-                 decorator=decorator,
-                 )
-            )
-        view_intr.update(**view_options)
+        view_intr.update(dict(
+            name=name,
+            context=context,
+            containment=containment,
+            request_param=request_param,
+            request_methods=request_method,
+            route_name=route_name,
+            attr=attr,
+            xhr=xhr,
+            accept=accept,
+            header=header,
+            path_info=path_info,
+            match_param=match_param,
+            check_csrf=check_csrf,
+            callable=view,
+            mapper=mapper,
+            decorator=decorator,
+        ))
+        view_intr.update(view_options)
         introspectables.append(view_intr)
         predlist = self.get_predlist('view')
 
@@ -832,14 +833,12 @@ class ViewsConfiguratorMixin(object):
 
             # added by discrim_func above during conflict resolving
             preds = view_intr['predicates']
-            opts = view_intr['options']
             order = view_intr['order']
             phash = view_intr['phash']
 
             # __no_permission_required__ handled by _secure_view
-            derived_view = self._apply_view_derivations(
+            derived_view = self._derive_view(
                 view,
-                registry=self.registry,
                 permission=permission,
                 predicates=preds,
                 attr=attr,
@@ -849,12 +848,11 @@ class ViewsConfiguratorMixin(object):
                 accept=accept,
                 order=order,
                 phash=phash,
-                package=self.package,
-                mapper=mapper,
                 decorator=decorator,
+                mapper=mapper,
                 http_cache=http_cache,
-                options=opts,
-                )
+                extra_options=view_options,
+            )
             derived_view.__discriminator__ = lambda *arg: discriminator
             # __discriminator__ is used by superdynamic systems
             # that require it for introspection after manual view lookup;
@@ -1013,19 +1011,20 @@ class ViewsConfiguratorMixin(object):
             introspectables.append(perm_intr)
         self.action(discriminator, register, introspectables=introspectables)
 
-    def _apply_view_derivations(self, view, **kw):
+    def _apply_view_derivations(self, info):
         d = pyramid.config.derivations
         # These inner derivations have fixed order
-        inner_derivers = [('mapped_view', (d.mapped_view, None))]
+        inner_derivers = [('mapped_view', d.mapped_view)]
 
-        outer_derivers = [('predicated_view', (d.predicated_view, None)),
-                          ('attr_wrapped_view', (d.attr_wrapped_view, None)),]
+        outer_derivers = [('predicated_view', d.predicated_view),
+                          ('attr_wrapped_view', d.attr_wrapped_view)]
 
+        view = info.orig_view
         derivers = self.registry.queryUtility(IViewDerivers, default=[])
-        for name, val in inner_derivers + derivers.sorted() + outer_derivers:
-            derivation, default = val
-            value = kw['options'].get(name, default)
-            view = wraps_view(derivation)(view, value, **kw)
+        for name, derivation in (
+            inner_derivers + derivers.sorted() + outer_derivers
+        ):
+            view = wraps_view(derivation)(view, info)
         return view
 
     @action_method
@@ -1076,7 +1075,9 @@ class ViewsConfiguratorMixin(object):
             self.add_view_predicate(name, factory)
 
     @action_method
-    def add_view_derivation(self, name, factory, default, 
+    def add_view_derivation(self,
+                            name,
+                            factory,
                             under=None,
                             over=None):
         if under is None and over is None:
@@ -1098,9 +1099,7 @@ class ViewsConfiguratorMixin(object):
             if derivers is None:
                 derivers = TopologicalSorter()
                 self.registry.registerUtility(derivers, IViewDerivers)
-            derivers.add(name, (factory, default),
-                         after=under,
-                         before=over)
+            derivers.add(name, factory, after=under, before=over)
         self.action(discriminator, register, introspectables=(intr,),
                     order=PHASE1_CONFIG) # must be registered early
 
@@ -1115,10 +1114,15 @@ class ViewsConfiguratorMixin(object):
         ]
         after = pyramid.util.FIRST
         for name, deriver in derivers:
-            self.add_view_derivation(name, deriver, default=None, under=after)
+            self.add_view_derivation(name, deriver, under=after)
             after = name
 
-        self.add_view_derivation('rendered_view', d.rendered_view, default=None, under=pyramid.util.FIRST, over='decorated_view')
+        self.add_view_derivation(
+            'rendered_view',
+            d.rendered_view,
+            under=pyramid.util.FIRST,
+            over='decorated_view',
+        )
 
     def derive_view(self, view, attr=None, renderer=None):
         """
@@ -1199,11 +1203,11 @@ class ViewsConfiguratorMixin(object):
         return self._derive_view(view, attr=attr, renderer=renderer)
 
     # b/w compat
-    def _derive_view(self, view, permission=None, predicates=(), options=dict(),
+    def _derive_view(self, view, permission=None, predicates=(),
                      attr=None, renderer=None, wrapper_viewname=None,
                      viewname=None, accept=None, order=MAX_ORDER,
                      phash=DEFAULT_PHASH, decorator=None,
-                     mapper=None, http_cache=None):
+                     mapper=None, http_cache=None, extra_options=None):
         view = self.maybe_dotted(view)
         mapper = self.maybe_dotted(mapper)
         if isinstance(renderer, string_types):
@@ -1218,11 +1222,8 @@ class ViewsConfiguratorMixin(object):
                     package=self.package,
                     registry=self.registry)
 
-        return self._apply_view_derivations(
-            view,
-            registry=self.registry,
+        options = dict(
             permission=permission,
-            predicates=predicates,
             attr=attr,
             renderer=renderer,
             wrapper_viewname=wrapper_viewname,
@@ -1230,12 +1231,22 @@ class ViewsConfiguratorMixin(object):
             accept=accept,
             order=order,
             phash=phash,
-            package=self.package,
             mapper=mapper,
             decorator=decorator,
             http_cache=http_cache,
+        )
+        if extra_options:
+            options.update(extra_options)
+
+        info = ViewDeriverInfo(
+            view=view,
+            registry=self.registry,
+            package=self.package,
+            predicates=predicates,
             options=options,
         )
+
+        return self._apply_view_derivations(info)
 
     @viewdefaults
     @action_method
@@ -1624,6 +1635,18 @@ def isexception(o):
         (inspect.isclass(o) and (issubclass(o, Exception)))
         )
 
+@implementer(IViewDeriverInfo)
+class ViewDeriverInfo(object):
+    def __init__(self, view, registry, package, predicates, options):
+        self.orig_view = view
+        self.registry = registry
+        self.package = package
+        self.predicates = predicates or []
+        self.options = options or {}
+
+    @reify
+    def settings(self):
+        return self.registry.settings
 
 @implementer(IStaticURLInfo)
 class StaticURLInfo(object):
