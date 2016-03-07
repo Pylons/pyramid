@@ -105,17 +105,37 @@ class Test_get_appsettings(unittest.TestCase):
         self.assertEqual(result['foo'], 'baz')
 
 class Test_setup_logging(unittest.TestCase):
-    def _callFUT(self, config_file):
+    def _callFUT(self, config_file, global_conf=None):
         from pyramid.paster import setup_logging
         dummy_cp = DummyConfigParserModule
-        return setup_logging(config_file, self.fileConfig, dummy_cp)
+        return setup_logging(
+            config_uri=config_file,
+            global_conf=global_conf,
+            fileConfig=self.fileConfig,
+            configparser=dummy_cp,
+            )
 
-    def test_it(self):
+    def test_it_no_global_conf(self):
         config_file, dict = self._callFUT('/abc')
         # os.path.abspath is a sop to Windows
         self.assertEqual(config_file, os.path.abspath('/abc'))
         self.assertEqual(dict['__file__'], os.path.abspath('/abc'))
         self.assertEqual(dict['here'], os.path.abspath('/'))
+
+    def test_it_global_conf_empty(self):
+        config_file, dict = self._callFUT('/abc', global_conf={})
+        # os.path.abspath is a sop to Windows
+        self.assertEqual(config_file, os.path.abspath('/abc'))
+        self.assertEqual(dict['__file__'], os.path.abspath('/abc'))
+        self.assertEqual(dict['here'], os.path.abspath('/'))
+
+    def test_it_global_conf_not_empty(self):
+        config_file, dict = self._callFUT('/abc', global_conf={'key': 'val'})
+        # os.path.abspath is a sop to Windows
+        self.assertEqual(config_file, os.path.abspath('/abc'))
+        self.assertEqual(dict['__file__'], os.path.abspath('/abc'))
+        self.assertEqual(dict['here'], os.path.abspath('/'))
+        self.assertEqual(dict['key'], 'val')
 
     def fileConfig(self, config_file, dict):
         return config_file, dict

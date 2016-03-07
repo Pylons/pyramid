@@ -27,6 +27,12 @@ unreleased
   where you may need more control over the request.
   See https://github.com/Pylons/pyramid/pull/2393
 
+- Allow using variable substitutions like ``%(LOGGING_LOGGER_ROOT_LEVEL)s``
+  for logging sections of the .ini file and populate these variables from
+  the ``pserve`` command line -- e.g.:
+  ``pserve development.ini LOGGING_LOGGER_ROOT_LEVEL=DEBUG``
+  See https://github.com/Pylons/pyramid/pull/2399
+
 1.6 (2015-04-14)
 ================
 
