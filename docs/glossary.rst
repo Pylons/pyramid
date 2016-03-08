@@ -558,12 +558,11 @@ Glossary
      A popular `Javascript library <http://jquery.org>`_.
 
    renderer
-     A serializer that can be referred to via :term:`view
-     configuration` which converts a non-:term:`Response` return
-     values from a :term:`view` into a string (and ultimately a
-     response).  Using a renderer can make writing views that require
-     templating or other serialization less tedious.  See
-     :ref:`views_which_use_a_renderer` for more information.
+     A serializer which converts non-:term:`Response` return values from a
+     :term:`view` into a string, and ultimately into a response, usually
+     through :term:`view configuration`. Using a renderer can make writing
+     views that require templating or other serialization, like JSON, less
+     tedious. See :ref:`views_which_use_a_renderer` for more information.
 
    renderer factory
      A factory which creates a :term:`renderer`.  See
