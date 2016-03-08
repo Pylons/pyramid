@@ -229,7 +229,7 @@ class ManifestCacheBuster(object):
     source asset paths used in calls to
     :meth:`~pyramid.request.Request.static_url`. For example:
 
-    .. code-block:: python
+    .. code-block:: pycon
 
        >>> request.static_url('myapp:static/css/main.css')
        "http://www.example.com/static/css/main-678b7c80.css"
