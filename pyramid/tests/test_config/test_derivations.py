@@ -1097,9 +1097,9 @@ class TestDerivationOrder(unittest.TestCase):
     def test_right_order_user_sorted(self):
         from pyramid.interfaces import IViewDerivers
 
-        self.config.add_view_derivation('deriv1', None)
-        self.config.add_view_derivation('deriv2', None, over='deriv1')
-        self.config.add_view_derivation('deriv3', None, under='deriv2')
+        self.config.add_view_deriver('deriv1', None)
+        self.config.add_view_deriver('deriv2', None, over='deriv1')
+        self.config.add_view_deriver('deriv3', None, under='deriv2')
 
         derivers = self.config.registry.queryUtility(IViewDerivers, default=[])
         derivers_sorted = derivers.sorted()
@@ -1119,9 +1119,9 @@ class TestDerivationOrder(unittest.TestCase):
     def test_right_order_implicit(self):
         from pyramid.interfaces import IViewDerivers
 
-        self.config.add_view_derivation('deriv1', None)
-        self.config.add_view_derivation('deriv2', None)
-        self.config.add_view_derivation('deriv3', None)
+        self.config.add_view_deriver('deriv1', None)
+        self.config.add_view_deriver('deriv2', None)
+        self.config.add_view_deriver('deriv3', None)
 
         derivers = self.config.registry.queryUtility(IViewDerivers, default=[])
         derivers_sorted = derivers.sorted()
@@ -1141,7 +1141,7 @@ class TestDerivationOrder(unittest.TestCase):
     def test_right_order_over_rendered_view(self):
         from pyramid.interfaces import IViewDerivers
 
-        self.config.add_view_derivation('deriv1', None, over='rendered_view')
+        self.config.add_view_deriver('deriv1', None, over='rendered_view')
 
         derivers = self.config.registry.queryUtility(IViewDerivers, default=[])
         derivers_sorted = derivers.sorted()
@@ -1159,9 +1159,9 @@ class TestDerivationOrder(unittest.TestCase):
     def test_right_order_over_rendered_view_others(self):
         from pyramid.interfaces import IViewDerivers
 
-        self.config.add_view_derivation('deriv1', None, over='rendered_view')
-        self.config.add_view_derivation('deriv2', None)
-        self.config.add_view_derivation('deriv3', None)
+        self.config.add_view_deriver('deriv1', None, over='rendered_view')
+        self.config.add_view_deriver('deriv2', None)
+        self.config.add_view_deriver('deriv3', None)
 
         derivers = self.config.registry.queryUtility(IViewDerivers, default=[])
         derivers_sorted = derivers.sorted()
@@ -1178,7 +1178,7 @@ class TestDerivationOrder(unittest.TestCase):
             ], dlist)
 
 
-class TestAddDerivation(unittest.TestCase):
+class TestAddDeriver(unittest.TestCase):
 
     def setUp(self):
         self.config = testing.setUp()
@@ -1187,7 +1187,7 @@ class TestAddDerivation(unittest.TestCase):
         self.config = None
         testing.tearDown()
 
-    def test_add_single_derivation(self):
+    def test_add_single_deriver(self):
         response = DummyResponse()
         response.deriv = False
         view = lambda *arg: response
@@ -1199,12 +1199,12 @@ class TestAddDerivation(unittest.TestCase):
 
         result = self.config._derive_view(view)
         self.assertFalse(response.deriv)
-        self.config.add_view_derivation('test_deriv', deriv)
+        self.config.add_view_deriver('test_deriv', deriv)
 
         result = self.config._derive_view(view)
         self.assertTrue(response.deriv)
 
-    def test_override_derivation(self):
+    def test_override_deriver(self):
         flags = {}
 
         class AView:
@@ -1220,19 +1220,19 @@ class TestAddDerivation(unittest.TestCase):
             return view
 
         view1 = AView()
-        self.config.add_view_derivation('test_deriv', deriv1)
+        self.config.add_view_deriver('test_deriv', deriv1)
         result = self.config._derive_view(view1)
         self.assertTrue(flags.get('deriv1'))
         self.assertFalse(flags.get('deriv2'))
 
         flags.clear()
         view2 = AView()
-        self.config.add_view_derivation('test_deriv', deriv2)
+        self.config.add_view_deriver('test_deriv', deriv2)
         result = self.config._derive_view(view2)
         self.assertFalse(flags.get('deriv1'))
         self.assertTrue(flags.get('deriv2'))
 
-    def test_add_multi_derivations_ordered(self):
+    def test_add_multi_derivers_ordered(self):
         response = DummyResponse()
         view = lambda *arg: response
         response.deriv = []
@@ -1249,14 +1249,14 @@ class TestAddDerivation(unittest.TestCase):
             response.deriv.append('deriv3')
             return view
 
-        self.config.add_view_derivation('deriv1', deriv1)
-        self.config.add_view_derivation('deriv2', deriv2, over='deriv1')
-        self.config.add_view_derivation('deriv3', deriv3, under='deriv2')
+        self.config.add_view_deriver('deriv1', deriv1)
+        self.config.add_view_deriver('deriv2', deriv2, over='deriv1')
+        self.config.add_view_deriver('deriv3', deriv3, under='deriv2')
         result = self.config._derive_view(view)
         self.assertEqual(response.deriv, ['deriv2', 'deriv3', 'deriv1'])
 
 
-class TestDerivationIntegration(unittest.TestCase):
+class TestDeriverIntegration(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp()
 
@@ -1298,8 +1298,8 @@ class TestDerivationIntegration(unittest.TestCase):
             response.deriv.append(info.options['deriv2'])
             return view
 
-        self.config.add_view_derivation('deriv1', deriv1)
-        self.config.add_view_derivation('deriv2', deriv2)
+        self.config.add_view_deriver('deriv1', deriv1)
+        self.config.add_view_deriver('deriv2', deriv2)
         self.config.add_view(view, deriv1='test1', deriv2='test2')
         self.config.commit()
 

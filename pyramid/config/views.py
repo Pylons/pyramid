@@ -1012,7 +1012,7 @@ class ViewsConfiguratorMixin(object):
             introspectables.append(perm_intr)
         self.action(discriminator, register, introspectables=introspectables)
 
-    def _apply_view_derivations(self, info):
+    def _apply_view_derivers(self, info):
         d = pyramid.config.derivations
         # These inner derivations have fixed order
         inner_derivers = [('mapped_view', d.mapped_view)]
@@ -1076,23 +1076,19 @@ class ViewsConfiguratorMixin(object):
             self.add_view_predicate(name, factory)
 
     @action_method
-    def add_view_derivation(self,
-                            name,
-                            factory,
-                            under=None,
-                            over=None):
+    def add_view_deriver(self, name, deriver, under=None, over=None):
         if under is None and over is None:
             over = 'decorated_view'
 
-        factory = self.maybe_dotted(factory)
-        discriminator = ('view option', name)
+        deriver = self.maybe_dotted(deriver)
+        discriminator = ('view deriver', name)
         intr = self.introspectable(
-            '%s derivation' % type,
-            discriminator,
-            '%s derivation named %s' % (type, name),
-            '%s derivation' % type)
+            'view derivers',
+            name,
+            name,
+            'view deriver')
         intr['name'] = name
-        intr['factory'] = factory
+        intr['deriver'] = deriver
         intr['under'] = under
         intr['over'] = over
         def register():
@@ -1100,11 +1096,11 @@ class ViewsConfiguratorMixin(object):
             if derivers is None:
                 derivers = TopologicalSorter()
                 self.registry.registerUtility(derivers, IViewDerivers)
-            derivers.add(name, factory, after=under, before=over)
+            derivers.add(name, deriver, after=under, before=over)
         self.action(discriminator, register, introspectables=(intr,),
                     order=PHASE1_CONFIG) # must be registered early
 
-    def add_default_view_derivations(self):
+    def add_default_view_derivers(self):
         d = pyramid.config.derivations
         derivers = [
             ('decorated_view', d.decorated_view),
@@ -1115,10 +1111,10 @@ class ViewsConfiguratorMixin(object):
         ]
         after = pyramid.util.FIRST
         for name, deriver in derivers:
-            self.add_view_derivation(name, deriver, under=after)
+            self.add_view_deriver(name, deriver, under=after)
             after = name
 
-        self.add_view_derivation(
+        self.add_view_deriver(
             'rendered_view',
             d.rendered_view,
             under=pyramid.util.FIRST,
@@ -1249,11 +1245,11 @@ class ViewsConfiguratorMixin(object):
         )
 
         # order and phash are only necessary for the predicated view and
-        # are not really view derivation options
+        # are not really view deriver options
         info.order = order
         info.phash = phash
 
-        return self._apply_view_derivations(info)
+        return self._apply_view_derivers(info)
 
     @viewdefaults
     @action_method
