@@ -206,8 +206,8 @@ def mapped_view(view, info):
     return mapped_view
 
 def owrapped_view(view, info):
-    wrapper_viewname = info.options.get('wrapper_viewname')
-    viewname = info.options.get('viewname')
+    wrapper_viewname = info.options.get('wrapper')
+    viewname = info.options.get('name')
     if not wrapper_viewname:
         return view
     def _owrapped_view(context, request):
