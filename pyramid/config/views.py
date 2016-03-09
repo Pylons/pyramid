@@ -842,6 +842,7 @@ class ViewsConfiguratorMixin(object):
                 permission=permission,
                 predicates=preds,
                 attr=attr,
+                context=context,
                 renderer=renderer,
                 wrapper_viewname=wrapper,
                 viewname=name,
@@ -1207,7 +1208,8 @@ class ViewsConfiguratorMixin(object):
                      attr=None, renderer=None, wrapper_viewname=None,
                      viewname=None, accept=None, order=MAX_ORDER,
                      phash=DEFAULT_PHASH, decorator=None,
-                     mapper=None, http_cache=None, extra_options=None):
+                     mapper=None, http_cache=None, context=None,
+                     extra_options=None):
         view = self.maybe_dotted(view)
         mapper = self.maybe_dotted(mapper)
         if isinstance(renderer, string_types):
@@ -1223,6 +1225,7 @@ class ViewsConfiguratorMixin(object):
                     registry=self.registry)
 
         options = dict(
+            context=context,
             permission=permission,
             attr=attr,
             renderer=renderer,
