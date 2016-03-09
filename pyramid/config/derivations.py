@@ -205,6 +205,8 @@ def mapped_view(view, info):
     mapped_view = mapper(**info.options)(view)
     return mapped_view
 
+mapped_view.options = ('mapper', 'attr')
+
 def owrapped_view(view, info):
     wrapper_viewname = info.options.get('wrapper')
     viewname = info.options.get('name')
@@ -223,6 +225,8 @@ def owrapped_view(view, info):
                 'named %r' % (wrapper_viewname, viewname))
         return wrapped_response
     return _owrapped_view
+
+owrapped_view.options = ('name', 'wrapper')
 
 def http_cached_view(view, info):
     if info.settings.get('prevent_http_cache', False):
@@ -252,6 +256,8 @@ def http_cached_view(view, info):
         return response
 
     return wrapper
+
+http_cached_view.options = ('http_cache',)
 
 def secured_view(view, info):
     permission = info.options.get('permission')
@@ -284,6 +290,8 @@ def secured_view(view, info):
         wrapped_view = _secured_view
 
     return wrapped_view
+
+secured_view.options = ('permission',)
 
 def authdebug_view(view, info):
     wrapped_view = view
@@ -321,6 +329,8 @@ def authdebug_view(view, info):
         wrapped_view = _authdebug_view
 
     return wrapped_view
+
+authdebug_view.options = ('permission',)
 
 def predicated_view(view, info):
     preds = info.predicates
@@ -362,6 +372,8 @@ def attr_wrapped_view(view, info):
     attr_view.__view_attr__ = info.options.get('attr')
     attr_view.__permission__ = info.options.get('permission')
     return attr_view
+
+attr_wrapped_view.options = ('accept', 'attr', 'permission')
 
 def rendered_view(view, info):
     # one way or another this wrapper must produce a Response (unless
@@ -430,8 +442,12 @@ def rendered_view(view, info):
 
     return rendered_view
 
+rendered_view.options = ('renderer',)
+
 def decorated_view(view, info):
     decorator = info.options.get('decorator')
     if decorator is None:
         return view
     return decorator(view)
+
+decorated_view.options = ('decorator',)

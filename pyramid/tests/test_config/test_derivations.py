@@ -1293,21 +1293,30 @@ class TestDeriverIntegration(unittest.TestCase):
         def deriv1(view, info):
             response.deriv.append(info.options['deriv1'])
             return view
+        deriv1.options = ('deriv1',)
 
         def deriv2(view, info):
             response.deriv.append(info.options['deriv2'])
             return view
+        deriv2.options = ('deriv2',)
 
         self.config.add_view_deriver('deriv1', deriv1)
         self.config.add_view_deriver('deriv2', deriv2)
         self.config.add_view(view, deriv1='test1', deriv2='test2')
-        self.config.commit()
 
         wrapper = self._getViewCallable(self.config)
         request = self._makeRequest(self.config)
         request.method = 'GET'
         self.assertEqual(wrapper(None, request), response)
         self.assertEqual(['test1', 'test2'], response.deriv)
+
+    def test_unexpected_view_options(self):
+        from pyramid.exceptions import ConfigurationError
+        def deriv1(view, info): pass
+        self.config.add_view_deriver('deriv1', deriv1)
+        self.assertRaises(
+            ConfigurationError,
+            lambda: self.config.add_view(lambda r: {}, deriv1='test1'))
 
 
 from zope.interface import implementer

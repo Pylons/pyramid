@@ -380,6 +380,9 @@ class TopologicalSorter(object):
         self.first = first
         self.last = last
 
+    def values(self):
+        return self.name2val.values()
+
     def remove(self, name):
         """ Remove a node from the sort input """
         self.names.remove(name)

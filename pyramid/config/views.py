@@ -755,10 +755,15 @@ class ViewsConfiguratorMixin(object):
             # called.
             valid_predicates = predlist.names()
             pvals = {}
+            dvals = {}
 
             for (k, v) in ovals.items():
                 if k in valid_predicates:
                     pvals[k] = v
+                else:
+                    dvals[k] = v
+
+            self._check_view_options(**dvals)
 
             order, preds, phash = predlist.make(self, **pvals)
 
@@ -1011,6 +1016,16 @@ class ViewsConfiguratorMixin(object):
             perm_intr.relate('views', discriminator)
             introspectables.append(perm_intr)
         self.action(discriminator, register, introspectables=introspectables)
+
+    def _check_view_options(self, **kw):
+        # we only need to validate deriver options because the predicates
+        # were checked by the predlist
+        derivers = self.registry.getUtility(IViewDerivers)
+        for deriver in derivers.values():
+            for opt in getattr(deriver, 'options', []):
+                kw.pop(opt, None)
+        if kw:
+            raise ConfigurationError('Unknown view options: %s' % (kw,))
 
     def _apply_view_derivers(self, info):
         d = pyramid.config.derivations
