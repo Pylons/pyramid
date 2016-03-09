@@ -751,7 +751,7 @@ class ViewsConfiguratorMixin(object):
         def discrim_func():
             # We need to defer the discriminator until we know what the phash
             # is.  It can't be computed any sooner because thirdparty
-            # predicates/view derivations may not yet exist when add_view is
+            # predicates/view derivers may not yet exist when add_view is
             # called.
             valid_predicates = predlist.names()
             pvals = {}
@@ -1021,11 +1021,11 @@ class ViewsConfiguratorMixin(object):
                           ('attr_wrapped_view', d.attr_wrapped_view)]
 
         view = info.original_view
-        derivers = self.registry.queryUtility(IViewDerivers, default=[])
-        for name, derivation in (
+        derivers = self.registry.getUtility(IViewDerivers)
+        for name, deriver in (
             inner_derivers + derivers.sorted() + outer_derivers
         ):
-            view = wraps_view(derivation)(view, info)
+            view = wraps_view(deriver)(view, info)
         return view
 
     @action_method

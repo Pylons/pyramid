@@ -1101,7 +1101,7 @@ class TestDerivationOrder(unittest.TestCase):
         self.config.add_view_deriver('deriv2', None, over='deriv1')
         self.config.add_view_deriver('deriv3', None, under='deriv2')
 
-        derivers = self.config.registry.queryUtility(IViewDerivers, default=[])
+        derivers = self.config.registry.getUtility(IViewDerivers)
         derivers_sorted = derivers.sorted()
         dlist = [d for (d, _) in derivers_sorted]
         self.assertEqual([
@@ -1123,7 +1123,7 @@ class TestDerivationOrder(unittest.TestCase):
         self.config.add_view_deriver('deriv2', None)
         self.config.add_view_deriver('deriv3', None)
 
-        derivers = self.config.registry.queryUtility(IViewDerivers, default=[])
+        derivers = self.config.registry.getUtility(IViewDerivers)
         derivers_sorted = derivers.sorted()
         dlist = [d for (d, _) in derivers_sorted]
         self.assertEqual([
@@ -1143,7 +1143,7 @@ class TestDerivationOrder(unittest.TestCase):
 
         self.config.add_view_deriver('deriv1', None, over='rendered_view')
 
-        derivers = self.config.registry.queryUtility(IViewDerivers, default=[])
+        derivers = self.config.registry.getUtility(IViewDerivers)
         derivers_sorted = derivers.sorted()
         dlist = [d for (d, _) in derivers_sorted]
         self.assertEqual(['deriv1',
@@ -1163,7 +1163,7 @@ class TestDerivationOrder(unittest.TestCase):
         self.config.add_view_deriver('deriv2', None)
         self.config.add_view_deriver('deriv3', None)
 
-        derivers = self.config.registry.queryUtility(IViewDerivers, default=[])
+        derivers = self.config.registry.getUtility(IViewDerivers)
         derivers_sorted = derivers.sorted()
         dlist = [d for (d, _) in derivers_sorted]
         self.assertEqual(['deriv1',
