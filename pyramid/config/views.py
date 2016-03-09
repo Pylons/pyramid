@@ -1229,8 +1229,6 @@ class ViewsConfiguratorMixin(object):
             wrapper=wrapper_viewname,
             name=viewname,
             accept=accept,
-            order=order,
-            phash=phash,
             mapper=mapper,
             decorator=decorator,
             http_cache=http_cache,
@@ -1245,6 +1243,11 @@ class ViewsConfiguratorMixin(object):
             predicates=predicates,
             options=options,
         )
+
+        # order and phash are only necessary for the predicated view and
+        # are not really view derivation options
+        info.order = order
+        info.phash = phash
 
         return self._apply_view_derivations(info)
 

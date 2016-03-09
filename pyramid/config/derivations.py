@@ -342,10 +342,9 @@ def predicated_view(view, info):
     return predicate_wrapper
 
 def attr_wrapped_view(view, info):
-    opts = info.options
-    accept, order, phash = (opts.get('accept', None),
-                            opts.get('order', MAX_ORDER),
-                            opts.get('phash', DEFAULT_PHASH))
+    accept, order, phash = (info.options.get('accept', None),
+                            getattr(info, 'order', MAX_ORDER),
+                            getattr(info, 'phash', DEFAULT_PHASH))
     # this is a little silly but we don't want to decorate the original
     # function with attributes that indicate accept, order, and phash,
     # so we use a wrapper
@@ -360,8 +359,8 @@ def attr_wrapped_view(view, info):
     attr_view.__accept__ = accept
     attr_view.__order__ = order
     attr_view.__phash__ = phash
-    attr_view.__view_attr__ = opts.get('attr')
-    attr_view.__permission__ = opts.get('permission')
+    attr_view.__view_attr__ = info.options.get('attr')
+    attr_view.__permission__ = info.options.get('permission')
     return attr_view
 
 def rendered_view(view, info):
