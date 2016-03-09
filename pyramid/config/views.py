@@ -1020,7 +1020,7 @@ class ViewsConfiguratorMixin(object):
         outer_derivers = [('predicated_view', d.predicated_view),
                           ('attr_wrapped_view', d.attr_wrapped_view)]
 
-        view = info.orig_view
+        view = info.original_view
         derivers = self.registry.queryUtility(IViewDerivers, default=[])
         for name, derivation in (
             inner_derivers + derivers.sorted() + outer_derivers
@@ -1225,6 +1225,7 @@ class ViewsConfiguratorMixin(object):
                     registry=self.registry)
 
         options = dict(
+            view=view,
             context=context,
             permission=permission,
             attr=attr,
@@ -1644,7 +1645,7 @@ def isexception(o):
 @implementer(IViewDeriverInfo)
 class ViewDeriverInfo(object):
     def __init__(self, view, registry, package, predicates, options):
-        self.orig_view = view
+        self.original_view = view
         self.registry = registry
         self.package = package
         self.predicates = predicates or []

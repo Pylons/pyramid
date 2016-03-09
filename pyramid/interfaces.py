@@ -1202,7 +1202,7 @@ class IViewDeriverInfo(Interface):
     options = Attribute('The view options passed to the view, including any '
                         'default values that were not overriden')
     predicates = Attribute('The list of predicates active on the view')
-    orig_view = Attribute('The original view object being wrapped')
+    original_view = Attribute('The original view object being wrapped')
 
 class ICacheBuster(Interface):
     """
