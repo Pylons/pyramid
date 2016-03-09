@@ -852,7 +852,7 @@ class ViewsConfiguratorMixin(object):
                 decorator=decorator,
                 mapper=mapper,
                 http_cache=http_cache,
-                extra_options=view_options,
+                extra_options=ovals,
             )
             derived_view.__discriminator__ = lambda *arg: discriminator
             # __discriminator__ is used by superdynamic systems
