@@ -1092,3 +1092,8 @@ Glossary
       A technique used when serving a cacheable static asset in order to force
       a client to query the new version of the asset. See :ref:`cache_busting`
       for more information.
+
+   view deriver
+      A view deriver is a composable component of the view pipeline which is
+      used to create a :term:`view callable`. A view deriver is a callable
+      implementing the :class:`pyramid.interfaces.IViewDeriver` interface.
