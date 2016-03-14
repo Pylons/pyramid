@@ -299,7 +299,7 @@ handling an exception. This can be useful in a few different circumstances:
 
 - Handling exceptions outside of the context of the `EXCVIEW` tween. The
   tween only covers certain parts of the request processing pipeline
-  (See :ref:`router chapter`) and there are some corner cases where an
+  (See :ref:`router_chapter`) and there are some corner cases where an
   exception can be raised which will still bubble up to middleware and possibly
   to the web server where a generic ``500 Internal Server Error`` will be
   returned to the client.
