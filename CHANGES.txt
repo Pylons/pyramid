@@ -21,6 +21,12 @@ unreleased
   ``request.params['=abc'] == '1'``.
   See https://github.com/Pylons/pyramid/pull/1370
 
+- A new ``request.invoke_exception_view(...)`` method which can be used to
+  invoke an exception view and get back a response. This is useful for
+  rendering an exception view outside of the context of the excview tween
+  where you may need more control over the request.
+  See https://github.com/Pylons/pyramid/pull/2393
+
 1.6 (2015-04-14)
 ================
 
