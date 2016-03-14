@@ -280,28 +280,32 @@ function that will cause a subrequest (they are passed a ``handle`` function).
 It's fine to invoke :meth:`~pyramid.request.Request.invoke_subrequest` from
 within an event handler, however.
 
+
+.. index::
+   pair: subrequest; exception view
+
 Invoking an Exception View
 --------------------------
 
 .. versionadded:: 1.7
 
-:app:`Pyramid` apps may define a :term:`exception views <exception view>` which
+:app:`Pyramid` apps may define :term:`exception views <exception view>` which
 can handle any raised exceptions that escape from your code while processing
-a request. By default, an unhandled exception will be caught by the `EXCVIEW`
-:term:`tween` which will then lookup an exception view that can handle the
+a request. By default an unhandled exception will be caught by the ``EXCVIEW``
+:term:`tween`, which will then lookup an exception view that can handle the
 exception type, generating an appropriate error response.
 
 In :app:`Pyramid` 1.7 the :meth:`pyramid.request.Request.invoke_exception_view`
-was introduced which allows a user to invoke an exception view while manually
+was introduced, allowing a user to invoke an exception view while manually
 handling an exception. This can be useful in a few different circumstances:
 
-- Manually handling an exception losing the current call stack / flow.
+- Manually handling an exception losing the current call stack or flow.
 
-- Handling exceptions outside of the context of the `EXCVIEW` tween. The
-  tween only covers certain parts of the request processing pipeline
-  (See :ref:`router_chapter`) and there are some corner cases where an
-  exception can be raised which will still bubble up to middleware and possibly
-  to the web server where a generic ``500 Internal Server Error`` will be
+- Handling exceptions outside of the context of the ``EXCVIEW`` tween. The
+  tween only covers certain parts of the request processing pipeline (See
+  :ref:`router_chapter`). There are also some corner cases where an exception
+  can be raised that will still bubble up to middleware, and possibly to the
+  web server in which case a generic ``500 Internal Server Error`` will be
   returned to the client.
 
 Below is an example usage of
@@ -323,5 +327,5 @@ Below is an example usage of
                # re-raise and let someone else handle it
                raise
 
-Please note that in most cases you do not need to write code like this an may
-rely on the `EXCVIEW` tween to handle this for you.
+Please note that in most cases you do not need to write code like this, and you
+may rely on the ``EXCVIEW`` tween to handle this for you.
