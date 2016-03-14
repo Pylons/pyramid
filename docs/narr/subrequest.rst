@@ -316,11 +316,11 @@ Below is an example usage of
            return response
        except Exception:
            response = request.invoke_exception_view()
-           # there is no exception view for this exception, simply
-           # re-raise and let someone else handle it
            if response is not None:
                return response
            else:
+               # there is no exception view for this exception, simply
+               # re-raise and let someone else handle it
                raise
 
 Please note that in most cases you do not need to write code like this an may
