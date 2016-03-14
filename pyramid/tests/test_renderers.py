@@ -592,48 +592,6 @@ class Test_render_to_response(unittest.TestCase):
         self.assertEqual(result.body, b'{"a": 1}')
         self.assertFalse('response' in request.__dict__)
 
-class Test_temporary_response(unittest.TestCase):
-    def _callFUT(self, request):
-        from pyramid.renderers import temporary_response
-        return temporary_response(request)
-
-    def test_restores_response(self):
-        request = testing.DummyRequest()
-        orig_response = request.response
-        with self._callFUT(request):
-            request.response = object()
-        self.assertEqual(request.response, orig_response)
-
-    def test_restores_response_on_exception(self):
-        request = testing.DummyRequest()
-        orig_response = request.response
-        try:
-            with self._callFUT(request):
-                request.response = object()
-                raise RuntimeError()
-        except RuntimeError:
-            self.assertEqual(request.response, orig_response)
-        else:                   # pragma: no cover
-            self.fail("RuntimeError not raised")
-
-    def test_restores_response_to_none(self):
-        request = testing.DummyRequest(response=None)
-        with self._callFUT(request):
-            request.response = object()
-        self.assertEqual(request.response, None)
-
-    def test_deletes_response(self):
-        request = testing.DummyRequest()
-        with self._callFUT(request):
-            request.response = object()
-        self.assertTrue('response' not in request.__dict__)
-
-    def test_does_not_delete_response_if_no_response_to_delete(self):
-        request = testing.DummyRequest()
-        with self._callFUT(request):
-            pass
-        self.assertTrue('response' not in request.__dict__)
-
 class Test_get_renderer(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp()

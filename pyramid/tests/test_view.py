@@ -673,6 +673,138 @@ class Test_view_defaults(unittest.TestCase):
         class Bar(Foo): pass
         self.assertEqual(Bar.__view_defaults__, {})
 
+class TestViewMethodsMixin(unittest.TestCase):
+    def setUp(self):
+        self.config = testing.setUp()
+
+    def tearDown(self):
+        testing.tearDown()
+
+    def _makeOne(self, environ=None):
+        from pyramid.decorator import reify
+        from pyramid.view import ViewMethodsMixin
+        if environ is None:
+            environ = {}
+        class Request(ViewMethodsMixin):
+            def __init__(self, environ):
+                self.environ = environ
+
+            @reify
+            def response(self):
+                return DummyResponse()
+        request = Request(environ)
+        request.registry = self.config.registry
+        return request
+
+    def test_it(self):
+        def exc_view(exc, request):
+            self.assertTrue(exc is dummy_exc)
+            self.assertTrue(request.exception is dummy_exc)
+            return DummyResponse(b'foo')
+        self.config.add_view(exc_view, context=RuntimeError)
+        request = self._makeOne()
+        dummy_exc = RuntimeError()
+        try:
+            raise dummy_exc
+        except RuntimeError:
+            response = request.invoke_exception_view()
+            self.assertEqual(response.app_iter, [b'foo'])
+        else: # pragma: no cover
+            self.fail()
+
+    def test_it_hides_attrs(self):
+        def exc_view(exc, request):
+            self.assertTrue(exc is not orig_exc)
+            self.assertTrue(request.exception is not orig_exc)
+            self.assertTrue(request.exc_info is not orig_exc_info)
+            self.assertTrue(request.response is not orig_response)
+            request.response.app_iter = [b'bar']
+            return request.response
+        self.config.add_view(exc_view, context=RuntimeError)
+        request = self._makeOne()
+        orig_exc = request.exception = DummyContext()
+        orig_exc_info = request.exc_info = DummyContext()
+        orig_response = request.response = DummyResponse(b'foo')
+        try:
+            raise RuntimeError
+        except RuntimeError:
+            response = request.invoke_exception_view()
+            self.assertEqual(response.app_iter, [b'bar'])
+            self.assertTrue(request.exception is orig_exc)
+            self.assertTrue(request.exc_info is orig_exc_info)
+            self.assertTrue(request.response is orig_response)
+        else: # pragma: no cover
+            self.fail()
+
+    def test_it_supports_alternate_requests(self):
+        def exc_view(exc, request):
+            self.assertTrue(request is other_req)
+            return DummyResponse(b'foo')
+        self.config.add_view(exc_view, context=RuntimeError)
+        request = self._makeOne()
+        other_req = self._makeOne()
+        try:
+            raise RuntimeError
+        except RuntimeError:
+            response = request.invoke_exception_view(request=other_req)
+            self.assertEqual(response.app_iter, [b'foo'])
+        else: # pragma: no cover
+            self.fail()
+
+    def test_it_supports_threadlocal_registry(self):
+        def exc_view(exc, request):
+            return DummyResponse(b'foo')
+        self.config.add_view(exc_view, context=RuntimeError)
+        request = self._makeOne()
+        del request.registry
+        try:
+            raise RuntimeError
+        except RuntimeError:
+            response = request.invoke_exception_view()
+            self.assertEqual(response.app_iter, [b'foo'])
+        else: # pragma: no cover
+            self.fail()
+
+    def test_it_supports_alternate_exc_info(self):
+        def exc_view(exc, request):
+            self.assertTrue(request.exc_info is exc_info)
+            return DummyResponse(b'foo')
+        self.config.add_view(exc_view, context=RuntimeError)
+        request = self._makeOne()
+        try:
+            raise RuntimeError
+        except RuntimeError:
+            exc_info = sys.exc_info()
+        response = request.invoke_exception_view(exc_info=exc_info)
+        self.assertEqual(response.app_iter, [b'foo'])
+
+    def test_it_rejects_secured_view(self):
+        from pyramid.exceptions import Forbidden
+        def exc_view(exc, request): pass
+        self.config.testing_securitypolicy(permissive=False)
+        self.config.add_view(exc_view, context=RuntimeError, permission='view')
+        request = self._makeOne()
+        try:
+            raise RuntimeError
+        except RuntimeError:
+            self.assertRaises(Forbidden, request.invoke_exception_view)
+        else: # pragma: no cover
+            self.fail()
+
+    def test_it_allows_secured_view(self):
+        def exc_view(exc, request):
+            return DummyResponse(b'foo')
+        self.config.testing_securitypolicy(permissive=False)
+        self.config.add_view(exc_view, context=RuntimeError, permission='view')
+        request = self._makeOne()
+        try:
+            raise RuntimeError
+        except RuntimeError:
+            response = request.invoke_exception_view(secure=False)
+            self.assertEqual(response.app_iter, [b'foo'])
+        else: # pragma: no cover
+            self.fail()
+
 class ExceptionResponse(Exception):
     status = '404 Not Found'
     app_iter = ['Not Found']

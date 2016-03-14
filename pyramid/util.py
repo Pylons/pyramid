@@ -1,3 +1,4 @@
+import contextlib
 import functools
 try:
     # py2.7.7+ and py3.3+ have native comparison support
@@ -591,3 +592,22 @@ def get_callable_name(name):
             'used on __name__ of the method'
         )
         raise ConfigurationError(msg % name)
+
+@contextlib.contextmanager
+def hide_attrs(obj, *attrs):
+    """
+    Temporarily delete object attrs and restore afterward.
+    """
+    obj_vals = obj.__dict__ if obj is not None else {}
+    saved_vals = {}
+    for name in attrs:
+        saved_vals[name] = obj_vals.pop(name, _marker)
+    try:
+        yield
+    finally:
+        for name in attrs:
+            saved_val = saved_vals[name]
+            if saved_val is not _marker:
+                obj_vals[name] = saved_val
+            elif name in obj_vals:
+                del obj_vals[name]
