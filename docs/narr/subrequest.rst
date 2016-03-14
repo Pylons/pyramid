@@ -279,3 +279,49 @@ within a tween, because tweens already, by definition, have access to a
 function that will cause a subrequest (they are passed a ``handle`` function).
 It's fine to invoke :meth:`~pyramid.request.Request.invoke_subrequest` from
 within an event handler, however.
+
+Invoking an Exception View
+--------------------------
+
+.. versionadded:: 1.7
+
+:app:`Pyramid` apps may define a :term:`exception views <exception view>` which
+can handle any raised exceptions that escape from your code while processing
+a request. By default, an unhandled exception will be caught by the `EXCVIEW`
+:term:`tween` which will then lookup an exception view that can handle the
+exception type, generating an appropriate error response.
+
+In :app:`Pyramid` 1.7 the :meth:`pyramid.request.Request.invoke_exception_view`
+was introduced which allows a user to invoke an exception view while manually
+handling an exception. This can be useful in a few different circumstances:
+
+- Manually handling an exception losing the current call stack / flow.
+
+- Handling exceptions outside of the context of the `EXCVIEW` tween. The
+  tween only covers certain parts of the request processing pipeline
+  (See :ref:`router chapter`) and there are some corner cases where an
+  exception can be raised which will still bubble up to middleware and possibly
+  to the web server where a generic ``500 Internal Server Error`` will be
+  returned to the client.
+
+Below is an example usage of
+:meth:`pyramid.request.Request.invoke_exception_view`:
+
+.. code-block:: python
+   :linenos:
+
+   def foo(request):
+       try:
+           some_func_that_errors()
+           return response
+       except Exception:
+           response = request.invoke_exception_view()
+           # there is no exception view for this exception, simply
+           # re-raise and let someone else handle it
+           if response is not None:
+               return response
+           else:
+               raise
+
+Please note that in most cases you do not need to write code like this an may
+rely on the `EXCVIEW` tween to handle this for you.
