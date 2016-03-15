@@ -1091,11 +1091,15 @@ class ViewsConfiguratorMixin(object):
             self.add_view_predicate(name, factory)
 
     @action_method
-    def add_view_deriver(self, name, deriver, under=None, over=None):
+    def add_view_deriver(self, deriver, name=None, under=None, over=None):
+        deriver = self.maybe_dotted(deriver)
+
         if under is None and over is None:
             over = 'decorated_view'
 
-        deriver = self.maybe_dotted(deriver)
+        if name is None:
+            name = deriver.__name__
+
         discriminator = ('view deriver', name)
         intr = self.introspectable(
             'view derivers',
@@ -1113,7 +1117,7 @@ class ViewsConfiguratorMixin(object):
                 self.registry.registerUtility(derivers, IViewDerivers)
             derivers.add(name, deriver, after=under, before=over)
         self.action(discriminator, register, introspectables=(intr,),
-                    order=PHASE1_CONFIG) # must be registered early
+                    order=PHASE1_CONFIG) # must be registered before add_view
 
     def add_default_view_derivers(self):
         d = pyramid.config.derivations
@@ -1126,12 +1130,12 @@ class ViewsConfiguratorMixin(object):
         ]
         after = pyramid.util.FIRST
         for name, deriver in derivers:
-            self.add_view_deriver(name, deriver, under=after)
+            self.add_view_deriver(deriver, name=name, under=after)
             after = name
 
         self.add_view_deriver(
-            'rendered_view',
             d.rendered_view,
+            name='rendered_view',
             under=pyramid.util.FIRST,
             over='decorated_view',
         )
