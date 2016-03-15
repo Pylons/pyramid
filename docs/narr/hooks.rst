@@ -1631,7 +1631,7 @@ is a callable that can provide timing information for the view pipeline:
            response.headers['X-View-Performance'] = '%.3f' % (end - start,)
        return wrapper_view
 
-   config.add_view_deriver('timing_view', timing_view)
+   config.add_view_deriver(timing_view)
 
 View derivers are unique in that they have access to most of the options
 passed to :meth:`pyramid.config.Configurator.add_view` in order to decide what
@@ -1656,7 +1656,7 @@ token unless ``disable_csrf=True`` is passed to the view:
 
    require_csrf_view.options = ('disable_csrf',)
 
-   config.add_view_deriver('require_csrf_view', require_csrf_view)
+   config.add_view_deriver(require_csrf_view)
 
    def myview(request):
        return 'protected'
