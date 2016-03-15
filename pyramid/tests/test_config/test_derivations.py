@@ -1260,15 +1260,6 @@ class TestAddDeriver(unittest.TestCase):
         result = self.config._derive_view(view)
         self.assertEqual(response.deriv, ['deriv2', 'deriv3', 'deriv1'])
 
-    def test_add_deriver_without_name(self):
-        from pyramid.interfaces import IViewDerivers
-
-        derivers = self.config.registry.getUtility(IViewDerivers)
-        self.assertFalse('deriv' in derivers.names)
-        def deriv(view, info): pass
-        self.config.add_view_deriver(deriv)
-        self.assertTrue('deriv' in derivers.names)
-
 
 class TestDeriverIntegration(unittest.TestCase):
     def setUp(self):

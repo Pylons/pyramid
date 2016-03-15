@@ -1097,9 +1097,6 @@ class ViewsConfiguratorMixin(object):
         if under is None and over is None:
             over = 'decorated_view'
 
-        if name is None:
-            name = deriver.__name__
-
         discriminator = ('view deriver', name)
         intr = self.introspectable(
             'view derivers',
