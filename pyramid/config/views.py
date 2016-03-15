@@ -654,19 +654,19 @@ class ViewsConfiguratorMixin(object):
         view_options:
 
           Pass a key/value pair here to use a third-party predicate or set a
-          value for a view derivative option registered via
-          :meth:`pyramid.config.Configurator.add_view_predicate` or
-          :meth:`pyramid.config.Configurator.add_view_option`.  More than
-          one key/value pair can be used at the same time.  See
+          value for a view deriver. See
+          :meth:`pyramid.config.Configurator.add_view_predicate` and
+          :meth:`pyramid.config.Configurator.add_view_deriver`. See
           :ref:`view_and_route_predicates` for more information about
-          third-party predicates.
+          third-party predicates and :ref:`view_derivers` for information
+          about view derivers.
 
           .. versionadded: 1.4a1
 
           .. versionchanged: 1.7
 
-             Support setting arbitrary view options. Previously, only
-             predicate values could be supplied.
+             Support setting view deriver options. Previously, only custom
+             view predicate values could be supplied.
 
         """
         if custom_predicates:

@@ -1547,3 +1547,143 @@ in every subscriber registration.  It is not the responsibility of the
 predicate author to make every predicate make sense for every event type; it is
 the responsibility of the predicate consumer to use predicates that make sense
 for a particular event type registration.
+
+.. index::
+   single: view derivers
+
+.. _view_derivers:
+
+View Derivers
+-------------
+
+Every URL processed by :app:`Pyramid` is matched against a custom view
+pipeline. See :ref:`router_chapter` for how this works. The view pipeline
+itself is built from the user-supplied :term:`view callable` which is then
+composed with :term:`view derivers <view deriver>`. A view deriver is a
+composable element of the view pipeline which is used to wrap a view with
+added functionality. View derivers are very similar to the ``decorator``
+argument to :meth:`pyramid.config.Configurator.add_view` except that they have
+the option to execute for every view in the application.
+
+Built-in View Derivers
+~~~~~~~~~~~~~~~~~~~~~~
+
+There are several builtin view derivers that :app:`Pyramid` will automatically
+apply to any view. They are defined in order from closest to furthest from
+the user-defined :term:`view callable`:
+
+``mapped_view``
+
+  Applies the :term:`view mapper` defined by the ``mapper`` option or the
+  application's default view mapper to the :term:`view callable`. This
+  is always the closest deriver to the user-defined view and standardizes the
+  view pipeline interface to accept ``(context, request)`` from all previous
+  view derivers.
+
+``decorated_view``
+
+  Wraps the view with the decorators from the ``decorator`` option.
+
+``http_cached_view``
+
+  Applies cache control headers to the response defined by the ``http_cache``
+  option. This element is a noop if the ``pyramid.prevent_http_cache`` setting
+  is enabled or the ``http_cache`` option is ``None``.
+
+``owrapped_view``
+
+  Invokes the wrapped view defined by the ``wrapper`` option.
+
+``secured_view``
+
+  Enforce the ``permission`` defined on the view. This element is a noop if
+  no permission is defined. Note there will always be a permission defined
+  if a default permission was assigned via
+  :meth:`pyramid.config.Configurator.set_default_permission`.
+
+``authdebug_view``
+
+  Used to output useful debugging information when
+  ``pyramid.debug_authorization`` is enabled. This element is a noop otherwise.
+
+Custom View Derivers
+~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.7
+
+It is possible to define custom view derivers which will affect all views in
+an application. There are many uses for this but most will likely be centered
+around monitoring and security. In order to register a custom
+:term:`view deriver` you should create a callable that conforms to the
+:class:`pyramid.interfaces.IViewDeriver` interface. For example, below
+is a callable that can provide timing information for the view pipeline:
+
+.. code-block:: python
+   :linenos:
+
+   import time
+
+   def timing_view(view, info):
+       def wrapper_view(context, request):
+           start = time.time()
+           response = view(context, request)
+           end = time.time()
+           response.headers['X-View-Performance'] = '%.3f' % (end - start,)
+       return wrapper_view
+
+   config.add_view_deriver('timing_view', timing_view)
+
+View derivers are unique in that they have access to most of the options
+passed to :meth:`pyramid.config.Configurator.add_view` in order to decide what
+to do and they have a chance to affect every view in the application.
+
+Let's look at one more example which will protect views by requiring a CSRF
+token unless ``disable_csrf=True`` is passed to the view:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.session import check_csrf_token
+
+   def require_csrf_view(view, info):
+       wrapper_view = view
+       if not info.options.get('disable_csrf', False):
+           def wrapper_view(context, request):
+               if request.method == 'POST':
+                   check_csrf_token(request)
+               return view(context, request)
+       return wrapper_view
+
+   require_csrf_view.options = ('disable_csrf',)
+
+   config.add_view_deriver('require_csrf_view', require_csrf_view)
+
+   def myview(request):
+       return 'protected'
+
+   def my_unprotected_view(request):
+       return 'unprotected'
+
+   config.add_view(myview, name='safe', renderer='string')
+   config.add_view(my_unprotected_, name='unsafe', disable_csrf=True, renderer='string')
+
+Navigating to ``/safe`` with a POST request will then fail when the call to
+:func:`pyramid.session.check_csrf_token` raises a
+:class:`pyramid.exceptions.BadCSRFToken` exception. However, ``/unsafe`` will
+not error.
+
+Ordering View Derivers
+~~~~~~~~~~~~~~~~~~~~~~
+
+By default, every new view deriver is added between the ``decorated_view``
+and ``mapped_view`` built-in derivers. It is possible to customize this
+ordering using the ``over`` and ``under`` options. Each option can use the
+names of other view derivers in order to specify an ordering. There should
+rarely be a reason to worry about the ordering of the derivers.
+
+It is not possible to add a deriver OVER the ``mapped_view`` as the
+:term:`view mapper` is intimately tied to the signature of the user-defined
+:term:`view callable`. If you simply need to know what the original view
+callable was, it can be found as ``info.original_view`` on the provided
+:class:`pyramid.interfaces.IViewDeriverInfo` object passed to every view
+deriver.

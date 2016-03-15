@@ -1,7 +1,12 @@
 import unittest
+from zope.interface import implementer
 
 from pyramid import testing
 from pyramid.exceptions import ConfigurationError
+from pyramid.interfaces import (
+    IResponse,
+    IRequest,
+    )
 
 class TestDeriveView(unittest.TestCase):
 
@@ -1318,13 +1323,6 @@ class TestDeriverIntegration(unittest.TestCase):
             ConfigurationError,
             lambda: self.config.add_view(lambda r: {}, deriv1='test1'))
 
-
-from zope.interface import implementer
-from pyramid.interfaces import (
-    IResponse,
-    IRequest,
-    )
-
 @implementer(IResponse)
 class DummyResponse(object):
     content_type = None
@@ -1374,4 +1372,3 @@ def assert_similar_datetime(one, two):
         two_attr = getattr(two, attr)
         if not one_attr == two_attr: # pragma: no cover
             raise AssertionError('%r != %r in %s' % (one_attr, two_attr, attr))
-

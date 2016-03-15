@@ -259,6 +259,7 @@ Pre-defined Phases
 - :meth:`pyramid.config.Configurator.add_route_predicate`
 - :meth:`pyramid.config.Configurator.add_subscriber_predicate`
 - :meth:`pyramid.config.Configurator.add_view_predicate`
+- :meth:`pyramid.config.Configurator.add_view_deriver`
 - :meth:`pyramid.config.Configurator.set_authorization_policy`
 - :meth:`pyramid.config.Configurator.set_default_permission`
 - :meth:`pyramid.config.Configurator.set_view_mapper`
