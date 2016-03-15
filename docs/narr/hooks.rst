@@ -1580,6 +1580,10 @@ the user-defined :term:`view callable`:
   view pipeline interface to accept ``(context, request)`` from all previous
   view derivers.
 
+``rendered_view``
+
+  Adapts the result of :term:`view callable` into a :term:`response` object.
+
 ``decorated_view``
 
   Wraps the view with the decorators from the ``decorator`` option.
@@ -1615,8 +1619,10 @@ It is possible to define custom view derivers which will affect all views in
 an application. There are many uses for this but most will likely be centered
 around monitoring and security. In order to register a custom
 :term:`view deriver` you should create a callable that conforms to the
-:class:`pyramid.interfaces.IViewDeriver` interface. For example, below
-is a callable that can provide timing information for the view pipeline:
+:class:`pyramid.interfaces.IViewDeriver` interface and then register it with
+your application using :meth:`pyramid.config.Configurator.add_view_deriver`.
+For example, below is a callable that can provide timing information for the
+view pipeline:
 
 .. code-block:: python
    :linenos:
@@ -1676,7 +1682,7 @@ Ordering View Derivers
 ~~~~~~~~~~~~~~~~~~~~~~
 
 By default, every new view deriver is added between the ``decorated_view``
-and ``mapped_view`` built-in derivers. It is possible to customize this
+and ``rendered_view`` built-in derivers. It is possible to customize this
 ordering using the ``over`` and ``under`` options. Each option can use the
 names of other view derivers in order to specify an ordering. There should
 rarely be a reason to worry about the ordering of the derivers.

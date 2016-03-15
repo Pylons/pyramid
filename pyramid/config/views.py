@@ -1091,7 +1091,36 @@ class ViewsConfiguratorMixin(object):
             self.add_view_predicate(name, factory)
 
     @action_method
-    def add_view_deriver(self, deriver, name=None, under=None, over=None):
+    def add_view_deriver(self, deriver, name, under=None, over=None):
+        """
+        .. versionadded:: 1.7
+
+        Add a :term:`view deriver` to the view pipeline. View derivers are
+        a feature used by extension authors to wrap views in custom code
+        controllable by view-specific options.
+
+        ``deriver`` should be a callable conforming to the
+        :class:`pyramid.interfaces.IViewDeriver` interface.
+
+        ``name`` should be the name of the view deriver.  There are no
+        restrictions on the name of a view deriver. If left unspecified, the
+        name will be constructed from the name of the ``deriver``.
+
+        The ``under`` and ``over`` options may be used to control the ordering
+        of view derivers by providing hints about where in the view pipeline
+        the deriver is used.
+
+        ``under`` means further away from user-defined :term:`view callable`,
+        and ``over`` means closer to the original :term:`view callable`.
+
+        Specifying neither ``under`` nor ``over`` is equivalent to specifying
+        ``over='decorated_view'`` and ``under='rendered_view'``, placing the
+        deriver somewhere between the ``decorated_view`` and ``rendered_view``
+        derivers.
+
+        See :ref:`view_derivers` for more information.
+
+        """
         deriver = self.maybe_dotted(deriver)
 
         if under is None and over is None:
