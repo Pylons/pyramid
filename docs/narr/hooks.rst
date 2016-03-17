@@ -1556,6 +1556,8 @@ for a particular event type registration.
 View Derivers
 -------------
 
+.. versionadded:: 1.7
+
 Every URL processed by :app:`Pyramid` is matched against a custom view
 pipeline. See :ref:`router_chapter` for how this works. The view pipeline
 itself is built from the user-supplied :term:`view callable` which is then
@@ -1565,12 +1567,48 @@ added functionality. View derivers are very similar to the ``decorator``
 argument to :meth:`pyramid.config.Configurator.add_view` except that they have
 the option to execute for every view in the application.
 
+It is helpful to think of a :term:`view deriver` as middleware for views.
+Unlike tweens or WSGI middleware which are scoped to the application itself,
+a view deriver is invoked once per view in the application and can use
+configuration options from the view to customize its behavior.
+
 Built-in View Derivers
 ~~~~~~~~~~~~~~~~~~~~~~
 
 There are several builtin view derivers that :app:`Pyramid` will automatically
-apply to any view. They are defined in order from closest to furthest from
+apply to any view. Below they are defined in order from furthest to closest to
 the user-defined :term:`view callable`:
+
+``authdebug_view``
+
+  Used to output useful debugging information when
+  ``pyramid.debug_authorization`` is enabled. This element is a noop otherwise.
+
+``secured_view``
+
+  Enforce the ``permission`` defined on the view. This element is a noop if
+  no permission is defined. Note there will always be a permission defined
+  if a default permission was assigned via
+  :meth:`pyramid.config.Configurator.set_default_permission`.
+
+``owrapped_view``
+
+  Invokes the wrapped view defined by the ``wrapper`` option.
+
+``http_cached_view``
+
+  Applies cache control headers to the response defined by the ``http_cache``
+  option. This element is a noop if the ``pyramid.prevent_http_cache`` setting
+  is enabled or the ``http_cache`` option is ``None``.
+
+``decorated_view``
+
+  Wraps the view with the decorators from the ``decorator`` option.
+
+``rendered_view``
+
+  Adapts the result of the :term:`view callable` into a :term:`response`
+  object. Below this point the result may be any Python object.
 
 ``mapped_view``
 
@@ -1580,40 +1618,8 @@ the user-defined :term:`view callable`:
   view pipeline interface to accept ``(context, request)`` from all previous
   view derivers.
 
-``rendered_view``
-
-  Adapts the result of :term:`view callable` into a :term:`response` object.
-
-``decorated_view``
-
-  Wraps the view with the decorators from the ``decorator`` option.
-
-``http_cached_view``
-
-  Applies cache control headers to the response defined by the ``http_cache``
-  option. This element is a noop if the ``pyramid.prevent_http_cache`` setting
-  is enabled or the ``http_cache`` option is ``None``.
-
-``owrapped_view``
-
-  Invokes the wrapped view defined by the ``wrapper`` option.
-
-``secured_view``
-
-  Enforce the ``permission`` defined on the view. This element is a noop if
-  no permission is defined. Note there will always be a permission defined
-  if a default permission was assigned via
-  :meth:`pyramid.config.Configurator.set_default_permission`.
-
-``authdebug_view``
-
-  Used to output useful debugging information when
-  ``pyramid.debug_authorization`` is enabled. This element is a noop otherwise.
-
 Custom View Derivers
 ~~~~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 1.7
 
 It is possible to define custom view derivers which will affect all views in
 an application. There are many uses for this but most will likely be centered
@@ -1649,6 +1655,7 @@ token unless ``disable_csrf=True`` is passed to the view:
 .. code-block:: python
    :linenos:
 
+   from pyramid.response import Response
    from pyramid.session import check_csrf_token
 
    def require_csrf_view(view, info):
@@ -1664,14 +1671,14 @@ token unless ``disable_csrf=True`` is passed to the view:
 
    config.add_view_deriver(require_csrf_view, 'require_csrf_view')
 
-   def myview(request):
-       return 'protected'
+   def protected_view(request):
+       return Response('protected')
 
-   def my_unprotected_view(request):
-       return 'unprotected'
+   def unprotected_view(request):
+       return Response('unprotected')
 
-   config.add_view(myview, name='safe', renderer='string')
-   config.add_view(my_unprotected_, name='unsafe', disable_csrf=True, renderer='string')
+   config.add_view(protected_view, name='safe')
+   config.add_view(unprotected_view, name='unsafe', disable_csrf=True)
 
 Navigating to ``/safe`` with a POST request will then fail when the call to
 :func:`pyramid.session.check_csrf_token` raises a
@@ -1685,11 +1692,23 @@ By default, every new view deriver is added between the ``decorated_view``
 and ``rendered_view`` built-in derivers. It is possible to customize this
 ordering using the ``over`` and ``under`` options. Each option can use the
 names of other view derivers in order to specify an ordering. There should
-rarely be a reason to worry about the ordering of the derivers.
+rarely be a reason to worry about the ordering of the derivers. Both ``over``
+and ``under`` may also be iterables of constraints. For either option, if one
+or more constraints was defined, at least one must be satisfied or a
+:class:`pyramid.exceptions.ConfigurationError` will be raised. This may be
+used to define fallback constraints if another deriver is missing.
 
-It is not possible to add a deriver OVER the ``mapped_view`` as the
+It is not possible to add a view deriver under the ``mapped_view`` as the
 :term:`view mapper` is intimately tied to the signature of the user-defined
 :term:`view callable`. If you simply need to know what the original view
 callable was, it can be found as ``info.original_view`` on the provided
 :class:`pyramid.interfaces.IViewDeriverInfo` object passed to every view
 deriver.
+
+.. warning::
+
+   Any view derivers defined ``under`` the ``rendered_view`` are not
+   guaranteed to receive a valid response object. Rather they will receive the
+   result from the :term:`view mapper` which is likely the original response
+   returned from the view. This is possibly a dictionary for a renderer but it
+   may be any Python object that may be adapted into a response.
