@@ -89,7 +89,6 @@ from pyramid.config.derivations import (
 from pyramid.config.util import (
     DEFAULT_PHASH,
     MAX_ORDER,
-    is_string_or_iterable,
     )
 
 urljoin = urlparse.urljoin
