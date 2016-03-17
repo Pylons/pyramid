@@ -89,6 +89,7 @@ from pyramid.config.derivations import (
 from pyramid.config.util import (
     DEFAULT_PHASH,
     MAX_ORDER,
+    is_string_or_iterable,
     )
 
 urljoin = urlparse.urljoin
@@ -690,7 +691,7 @@ class ViewsConfiguratorMixin(object):
 
         def combine(*decorators):
             def decorated(view_callable):
-                # reversed() is allows a more natural ordering in the api
+                # reversed() allows a more natural ordering in the api
                 for decorator in reversed(decorators):
                     view_callable = decorator(view_callable)
                 return view_callable
@@ -1029,16 +1030,15 @@ class ViewsConfiguratorMixin(object):
 
     def _apply_view_derivers(self, info):
         d = pyramid.config.derivations
-        # These inner derivations have fixed order
+        # These derivations have fixed order
+        outer_derivers = [('attr_wrapped_view', d.attr_wrapped_view),
+                          ('predicated_view', d.predicated_view)]
         inner_derivers = [('mapped_view', d.mapped_view)]
-
-        outer_derivers = [('predicated_view', d.predicated_view),
-                          ('attr_wrapped_view', d.attr_wrapped_view)]
 
         view = info.original_view
         derivers = self.registry.getUtility(IViewDerivers)
-        for name, deriver in (
-            inner_derivers + derivers.sorted() + outer_derivers
+        for name, deriver in reversed(
+            outer_derivers + derivers.sorted() + inner_derivers
         ):
             view = wraps_view(deriver)(view, info)
         return view
@@ -1110,11 +1110,11 @@ class ViewsConfiguratorMixin(object):
         of view derivers by providing hints about where in the view pipeline
         the deriver is used.
 
-        ``under`` means further away from user-defined :term:`view callable`,
-        and ``over`` means closer to the original :term:`view callable`.
+        ``under`` means closer to the user-defined :term:`view callable`,
+        and ``over`` means closer to view pipeline ingress.
 
         Specifying neither ``under`` nor ``over`` is equivalent to specifying
-        ``over='decorated_view'`` and ``under='rendered_view'``, placing the
+        ``over='rendered_view'`` and ``under='decorated_view'``, placing the
         deriver somewhere between the ``decorated_view`` and ``rendered_view``
         derivers.
 
@@ -1124,7 +1124,8 @@ class ViewsConfiguratorMixin(object):
         deriver = self.maybe_dotted(deriver)
 
         if under is None and over is None:
-            over = 'decorated_view'
+            under = 'decorated_view'
+            over = 'rendered_view'
 
         discriminator = ('view deriver', name)
         intr = self.introspectable(
@@ -1141,29 +1142,30 @@ class ViewsConfiguratorMixin(object):
             if derivers is None:
                 derivers = TopologicalSorter()
                 self.registry.registerUtility(derivers, IViewDerivers)
-            derivers.add(name, deriver, after=under, before=over)
+            derivers.add(name, deriver, before=over, after=under)
         self.action(discriminator, register, introspectables=(intr,),
                     order=PHASE1_CONFIG) # must be registered before add_view
 
     def add_default_view_derivers(self):
         d = pyramid.config.derivations
         derivers = [
-            ('decorated_view', d.decorated_view),
-            ('http_cached_view', d.http_cached_view),
-            ('owrapped_view', d.owrapped_view),
-            ('secured_view', d.secured_view),
             ('authdebug_view', d.authdebug_view),
+            ('secured_view', d.secured_view),
+            ('owrapped_view', d.owrapped_view),
+            ('http_cached_view', d.http_cached_view),
+            ('decorated_view', d.decorated_view),
         ]
-        after = pyramid.util.FIRST
+        last = pyramid.util.FIRST
         for name, deriver in derivers:
-            self.add_view_deriver(deriver, name=name, under=after)
-            after = name
+            self.add_view_deriver(deriver, name=name, under=last)
+            last = name
 
+        # ensure rendered_view is over LAST
         self.add_view_deriver(
             d.rendered_view,
-            name='rendered_view',
-            under=pyramid.util.FIRST,
-            over='decorated_view',
+            'rendered_view',
+            under=last,
+            over=pyramid.util.LAST,
         )
 
     def derive_view(self, view, attr=None, renderer=None):

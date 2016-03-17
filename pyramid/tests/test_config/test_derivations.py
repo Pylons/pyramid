@@ -1110,15 +1110,15 @@ class TestDerivationOrder(unittest.TestCase):
         derivers_sorted = derivers.sorted()
         dlist = [d for (d, _) in derivers_sorted]
         self.assertEqual([
-            'rendered_view',
+            'authdebug_view',
+            'secured_view',
+            'owrapped_view',
+            'http_cached_view',
+            'decorated_view',
             'deriv2',
             'deriv3',
             'deriv1',
-            'decorated_view',
-            'http_cached_view',
-            'owrapped_view',
-            'secured_view',
-            'authdebug_view',
+            'rendered_view',
             ], dlist)
 
     def test_right_order_implicit(self):
@@ -1132,54 +1132,56 @@ class TestDerivationOrder(unittest.TestCase):
         derivers_sorted = derivers.sorted()
         dlist = [d for (d, _) in derivers_sorted]
         self.assertEqual([
-            'rendered_view',
-            'deriv1',
-            'deriv2',
-            'deriv3',
-            'decorated_view',
-            'http_cached_view',
-            'owrapped_view',
-            'secured_view',
             'authdebug_view',
+            'secured_view',
+            'owrapped_view',
+            'http_cached_view',
+            'decorated_view',
+            'deriv3',
+            'deriv2',
+            'deriv1',
+            'rendered_view',
             ], dlist)
 
-    def test_right_order_over_rendered_view(self):
+    def test_right_order_under_rendered_view(self):
         from pyramid.interfaces import IViewDerivers
 
-        self.config.add_view_deriver(None, 'deriv1', over='rendered_view')
+        self.config.add_view_deriver(None, 'deriv1', under='rendered_view')
 
         derivers = self.config.registry.getUtility(IViewDerivers)
         derivers_sorted = derivers.sorted()
         dlist = [d for (d, _) in derivers_sorted]
-        self.assertEqual(['deriv1',
-            'rendered_view',
-            'decorated_view',
-            'http_cached_view',
-            'owrapped_view',
-            'secured_view',
+        self.assertEqual([
             'authdebug_view',
+            'secured_view',
+            'owrapped_view',
+            'http_cached_view',
+            'decorated_view',
+            'rendered_view',
+            'deriv1',
             ], dlist)
 
 
-    def test_right_order_over_rendered_view_others(self):
+    def test_right_order_under_rendered_view_others(self):
         from pyramid.interfaces import IViewDerivers
 
-        self.config.add_view_deriver(None, 'deriv1', over='rendered_view')
+        self.config.add_view_deriver(None, 'deriv1', under='rendered_view')
         self.config.add_view_deriver(None, 'deriv2')
         self.config.add_view_deriver(None, 'deriv3')
 
         derivers = self.config.registry.getUtility(IViewDerivers)
         derivers_sorted = derivers.sorted()
         dlist = [d for (d, _) in derivers_sorted]
-        self.assertEqual(['deriv1',
-            'rendered_view',
-            'deriv2',
-            'deriv3',
-            'decorated_view',
-            'http_cached_view',
-            'owrapped_view',
-            'secured_view',
+        self.assertEqual([
             'authdebug_view',
+            'secured_view',
+            'owrapped_view',
+            'http_cached_view',
+            'decorated_view',
+            'deriv3',
+            'deriv2',
+            'rendered_view',
+            'deriv1',
             ], dlist)
 
 
@@ -1255,8 +1257,8 @@ class TestAddDeriver(unittest.TestCase):
             return view
 
         self.config.add_view_deriver(deriv1, 'deriv1')
-        self.config.add_view_deriver(deriv2, 'deriv2', over='deriv1')
-        self.config.add_view_deriver(deriv3, 'deriv3', under='deriv2')
+        self.config.add_view_deriver(deriv2, 'deriv2', under='deriv1')
+        self.config.add_view_deriver(deriv3, 'deriv3', over='deriv2')
         result = self.config._derive_view(view)
         self.assertEqual(response.deriv, ['deriv2', 'deriv3', 'deriv1'])
 

@@ -18,6 +18,7 @@ from pyramid.tweens import (
 
 from pyramid.config.util import (
     action_method,
+    is_string_or_iterable,
     TopologicalSorter,
     )
 
@@ -121,12 +122,6 @@ class TweensConfiguratorMixin(object):
             raise ConfigurationError('%s is a reserved tween name' % name)
 
         tween_factory = self.maybe_dotted(tween_factory)
-
-        def is_string_or_iterable(v):
-            if isinstance(v, string_types):
-                return True
-            if hasattr(v, '__iter__'):
-                return True
 
         for t, p in [('over', over), ('under', under)]:
             if p is not None:
