@@ -1188,7 +1188,7 @@ class IPredicateList(Interface):
     """ Interface representing a predicate list """
 
 class IViewDeriver(Interface):
-    options = Attribute('An list of supported options to be passed to '
+    options = Attribute('A list of supported options to be passed to '
                         ':meth:`pyramid.config.Configurator.add_view`. '
                         'This attribute is optional.')
 
