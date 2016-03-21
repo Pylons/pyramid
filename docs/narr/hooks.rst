@@ -1548,6 +1548,7 @@ predicate author to make every predicate make sense for every event type; it is
 the responsibility of the predicate consumer to use predicates that make sense
 for a particular event type registration.
 
+
 .. index::
    single: view derivers
 
@@ -1560,35 +1561,36 @@ View Derivers
 
 Every URL processed by :app:`Pyramid` is matched against a custom view
 pipeline. See :ref:`router_chapter` for how this works. The view pipeline
-itself is built from the user-supplied :term:`view callable` which is then
+itself is built from the user-supplied :term:`view callable`, which is then
 composed with :term:`view derivers <view deriver>`. A view deriver is a
 composable element of the view pipeline which is used to wrap a view with
 added functionality. View derivers are very similar to the ``decorator``
-argument to :meth:`pyramid.config.Configurator.add_view` except that they have
+argument to :meth:`pyramid.config.Configurator.add_view`, except that they have
 the option to execute for every view in the application.
 
 It is helpful to think of a :term:`view deriver` as middleware for views.
 Unlike tweens or WSGI middleware which are scoped to the application itself,
-a view deriver is invoked once per view in the application and can use
+a view deriver is invoked once per view in the application, and can use
 configuration options from the view to customize its behavior.
 
 Built-in View Derivers
 ~~~~~~~~~~~~~~~~~~~~~~
 
-There are several builtin view derivers that :app:`Pyramid` will automatically
+There are several built-in view derivers that :app:`Pyramid` will automatically
 apply to any view. Below they are defined in order from furthest to closest to
 the user-defined :term:`view callable`:
 
 ``authdebug_view``
 
   Used to output useful debugging information when
-  ``pyramid.debug_authorization`` is enabled. This element is a noop otherwise.
+  ``pyramid.debug_authorization`` is enabled. This element is a no-op
+  otherwise.
 
 ``secured_view``
 
-  Enforce the ``permission`` defined on the view. This element is a noop if
-  no permission is defined. Note there will always be a permission defined
-  if a default permission was assigned via
+  Enforce the ``permission`` defined on the view. This element is a no-op if no
+  permission is defined. Note there will always be a permission defined if a
+  default permission was assigned via
   :meth:`pyramid.config.Configurator.set_default_permission`.
 
 ``owrapped_view``
@@ -1598,7 +1600,7 @@ the user-defined :term:`view callable`:
 ``http_cached_view``
 
   Applies cache control headers to the response defined by the ``http_cache``
-  option. This element is a noop if the ``pyramid.prevent_http_cache`` setting
+  option. This element is a no-op if the ``pyramid.prevent_http_cache`` setting
   is enabled or the ``http_cache`` option is ``None``.
 
 ``decorated_view``
@@ -1621,11 +1623,11 @@ the user-defined :term:`view callable`:
 Custom View Derivers
 ~~~~~~~~~~~~~~~~~~~~
 
-It is possible to define custom view derivers which will affect all views in
-an application. There are many uses for this but most will likely be centered
-around monitoring and security. In order to register a custom
-:term:`view deriver` you should create a callable that conforms to the
-:class:`pyramid.interfaces.IViewDeriver` interface and then register it with
+It is possible to define custom view derivers which will affect all views in an
+application. There are many uses for this, but most will likely be centered
+around monitoring and security. In order to register a custom :term:`view
+deriver`, you should create a callable that conforms to the
+:class:`pyramid.interfaces.IViewDeriver` interface, and then register it with
 your application using :meth:`pyramid.config.Configurator.add_view_deriver`.
 For example, below is a callable that can provide timing information for the
 view pipeline:
@@ -1647,7 +1649,7 @@ view pipeline:
 
 View derivers are unique in that they have access to most of the options
 passed to :meth:`pyramid.config.Configurator.add_view` in order to decide what
-to do and they have a chance to affect every view in the application.
+to do, and they have a chance to affect every view in the application.
 
 Let's look at one more example which will protect views by requiring a CSRF
 token unless ``disable_csrf=True`` is passed to the view:
@@ -1688,15 +1690,16 @@ not error.
 Ordering View Derivers
 ~~~~~~~~~~~~~~~~~~~~~~
 
-By default, every new view deriver is added between the ``decorated_view``
-and ``rendered_view`` built-in derivers. It is possible to customize this
-ordering using the ``over`` and ``under`` options. Each option can use the
-names of other view derivers in order to specify an ordering. There should
-rarely be a reason to worry about the ordering of the derivers. Both ``over``
-and ``under`` may also be iterables of constraints. For either option, if one
-or more constraints was defined, at least one must be satisfied or a
-:class:`pyramid.exceptions.ConfigurationError` will be raised. This may be
-used to define fallback constraints if another deriver is missing.
+By default, every new view deriver is added between the ``decorated_view`` and
+``rendered_view`` built-in derivers. It is possible to customize this ordering
+using the ``over`` and ``under`` options. Each option can use the names of
+other view derivers in order to specify an ordering. There should rarely be a
+reason to worry about the ordering of the derivers.
+
+Both ``over`` and ``under`` may also be iterables of constraints. For either
+option, if one or more constraints was defined, at least one must be satisfied,
+else a :class:`pyramid.exceptions.ConfigurationError` will be raised. This may
+be used to define fallback constraints if another deriver is missing.
 
 It is not possible to add a view deriver under the ``mapped_view`` as the
 :term:`view mapper` is intimately tied to the signature of the user-defined
