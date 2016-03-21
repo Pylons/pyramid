@@ -1097,5 +1097,5 @@ Glossary
       A view deriver is a composable component of the view pipeline which is
       used to create a :term:`view callable`. A view deriver is a callable
       implementing the :class:`pyramid.interfaces.IViewDeriver` interface.
-      Examples of builtin derivers including view mapper, the permission
+      Examples of built-in derivers including view mapper, the permission
       checker, and applying a renderer to a dictionary returned from the view.
