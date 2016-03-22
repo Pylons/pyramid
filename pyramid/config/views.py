@@ -213,6 +213,7 @@ class ViewsConfiguratorMixin(object):
         http_cache=None,
         match_param=None,
         check_csrf=None,
+        require_csrf=None,
         **view_options):
         """ Add a :term:`view configuration` to the current
         configuration state.  Arguments to ``add_view`` are broken
@@ -365,6 +366,32 @@ class ViewsConfiguratorMixin(object):
           this machinery, set ``response.cache_control.prevent_auto = True``
           before returning the response from the view.  This effectively
           disables any HTTP caching done by ``http_cache`` for that response.
+
+        require_csrf
+
+          .. versionadded:: 1.7
+
+          If specified, this value should be one of ``None``, ``True``,
+          ``False``, or a string representing the 'check name'.  If the value
+          is ``True`` or a string, CSRF checking will be performed.  If the
+          value is ``False`` or ``None``, CSRF checking will not be performed.
+
+          If the value provided is a string, that string will be used as the
+          'check name'.  If the value provided is ``True``, ``csrf_token`` will
+          be used as the check name.
+
+          If CSRF checking is performed, the checked value will be the value
+          of ``request.params[check_name]``.  This value will be compared
+          against the value of ``request.session.get_csrf_token()``, and the
+          check will pass if these two values are the same.  If the check
+          passes, the associated view will be permitted to execute.  If the
+          check fails, the associated view will not be permitted to execute
+          and a :class:`pyramid.exceptions.BadCSRFToken` exception will
+          be raised. This exception may be caught and handled by an
+          :term:`exception view`.
+
+          Note that using this feature requires a :term:`session factory` to
+          have been configured.
 
         wrapper
 
@@ -805,6 +832,8 @@ class ViewsConfiguratorMixin(object):
             path_info=path_info,
             match_param=match_param,
             check_csrf=check_csrf,
+            http_cache=http_cache,
+            require_csrf=require_csrf,
             callable=view,
             mapper=mapper,
             decorator=decorator,
@@ -860,6 +889,7 @@ class ViewsConfiguratorMixin(object):
                 decorator=decorator,
                 mapper=mapper,
                 http_cache=http_cache,
+                require_csrf=require_csrf,
                 extra_options=ovals,
             )
             derived_view.__discriminator__ = lambda *arg: discriminator
@@ -1183,6 +1213,7 @@ class ViewsConfiguratorMixin(object):
     def add_default_view_derivers(self):
         d = pyramid.viewderivers
         derivers = [
+            ('csrf_view', d.csrf_view),
             ('secured_view', d.secured_view),
             ('owrapped_view', d.owrapped_view),
             ('http_cached_view', d.http_cached_view),
@@ -1284,7 +1315,7 @@ class ViewsConfiguratorMixin(object):
                      viewname=None, accept=None, order=MAX_ORDER,
                      phash=DEFAULT_PHASH, decorator=None,
                      mapper=None, http_cache=None, context=None,
-                     extra_options=None):
+                     require_csrf=None, extra_options=None):
         view = self.maybe_dotted(view)
         mapper = self.maybe_dotted(mapper)
         if isinstance(renderer, string_types):
@@ -1311,6 +1342,7 @@ class ViewsConfiguratorMixin(object):
             mapper=mapper,
             decorator=decorator,
             http_cache=http_cache,
+            require_csrf=require_csrf,
         )
         if extra_options:
             options.update(extra_options)

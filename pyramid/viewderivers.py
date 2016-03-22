@@ -6,6 +6,7 @@ from zope.interface import (
     )
 
 from pyramid.security import NO_PERMISSION_REQUIRED
+from pyramid.session import check_csrf_token
 from pyramid.response import Response
 
 from pyramid.interfaces import (
@@ -454,6 +455,20 @@ def decorated_view(view, info):
     return decorator(view)
 
 decorated_view.options = ('decorator',)
+
+def csrf_view(view, info):
+    val = info.options.get('require_csrf')
+    wrapped_view = view
+    if val:
+        if val is True:
+            val = 'csrf_token'
+        def csrf_view(context, request):
+            check_csrf_token(request, val, raises=True)
+            return view(context, request)
+        wrapped_view = csrf_view
+    return wrapped_view
+
+csrf_view.options = ('require_csrf',)
 
 VIEW = 'VIEW'
 INGRESS = 'INGRESS'

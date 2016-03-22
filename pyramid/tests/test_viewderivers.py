@@ -1090,6 +1090,28 @@ class TestDeriveView(unittest.TestCase):
         self.assertRaises(ConfigurationError, self.config._derive_view, 
             view, http_cache=(None,))
 
+    def test_csrf_view_requires_header(self):
+        response = DummyResponse()
+        def inner_view(request):
+            return response
+        request = self._makeRequest()
+        request.session = DummySession({'csrf_token': 'foo'})
+        request.headers = {'X-CSRF-Token': 'foo'}
+        view = self.config._derive_view(inner_view, require_csrf=True)
+        result = view(None, request)
+        self.assertTrue(result is response)
+
+    def test_csrf_view_requires_param(self):
+        response = DummyResponse()
+        def inner_view(request):
+            return response
+        request = self._makeRequest()
+        request.session = DummySession({'csrf_token': 'foo'})
+        request.params['DUMMY'] = 'foo'
+        view = self.config._derive_view(inner_view, require_csrf='DUMMY')
+        result = view(None, request)
+        self.assertTrue(result is response)
+
 
 class TestDerivationOrder(unittest.TestCase):
     def setUp(self):
@@ -1110,6 +1132,7 @@ class TestDerivationOrder(unittest.TestCase):
         derivers_sorted = derivers.sorted()
         dlist = [d for (d, _) in derivers_sorted]
         self.assertEqual([
+            'csrf_view',
             'secured_view',
             'owrapped_view',
             'http_cached_view',
@@ -1132,6 +1155,7 @@ class TestDerivationOrder(unittest.TestCase):
         derivers_sorted = derivers.sorted()
         dlist = [d for (d, _) in derivers_sorted]
         self.assertEqual([
+            'csrf_view',
             'secured_view',
             'owrapped_view',
             'http_cached_view',
@@ -1152,6 +1176,7 @@ class TestDerivationOrder(unittest.TestCase):
         derivers_sorted = derivers.sorted()
         dlist = [d for (d, _) in derivers_sorted]
         self.assertEqual([
+            'csrf_view',
             'secured_view',
             'owrapped_view',
             'http_cached_view',
@@ -1173,6 +1198,7 @@ class TestDerivationOrder(unittest.TestCase):
         derivers_sorted = derivers.sorted()
         dlist = [d for (d, _) in derivers_sorted]
         self.assertEqual([
+            'csrf_view',
             'secured_view',
             'owrapped_view',
             'http_cached_view',
@@ -1408,6 +1434,7 @@ class DummyRequest:
         self.environ = environ
         self.params = {}
         self.cookies = {}
+        self.headers = {}
         self.response = DummyResponse()
 
 class DummyLogger:
@@ -1427,6 +1454,10 @@ class DummySecurityPolicy:
 
     def permits(self, context, principals, permission):
         return self.permitted
+
+class DummySession(dict):
+    def get_csrf_token(self):
+        return self['csrf_token']
 
 def parse_httpdate(s):
     import datetime

@@ -1580,6 +1580,11 @@ There are several built-in view derivers that :app:`Pyramid` will automatically
 apply to any view. Below they are defined in order from furthest to closest to
 the user-defined :term:`view callable`:
 
+``csrf_view``
+
+  Used to check the CSRF token provided in the request. This element is a
+  no-op if ``require_csrf`` is not defined.
+
 ``secured_view``
 
   Enforce the ``permission`` defined on the view. This element is a no-op if no
@@ -1656,27 +1661,32 @@ View derivers are unique in that they have access to most of the options
 passed to :meth:`pyramid.config.Configurator.add_view` in order to decide what
 to do, and they have a chance to affect every view in the application.
 
-Let's look at one more example which will protect views by requiring a CSRF
-token unless ``disable_csrf=True`` is passed to the view:
+Let's override the default CSRF checker to default to on instead of off and
+only check ``POST`` requests:
 
 .. code-block:: python
    :linenos:
 
    from pyramid.response import Response
    from pyramid.session import check_csrf_token
+   from pyramid.viewderivers import INGRESS
 
-   def require_csrf_view(view, info):
+   def csrf_view(view, info):
+       val = info.options.get('require_csrf', True)
        wrapper_view = view
-       if not info.options.get('disable_csrf', False):
-           def wrapper_view(context, request):
+       if val:
+           if val is True:
+               val = 'csrf_token'
+           def csrf_view(context, request):
                if request.method == 'POST':
-                   check_csrf_token(request)
+                   check_csrf_token(request, val, raises=True)
                return view(context, request)
+           wrapper_view = csrf_view
        return wrapper_view
 
-   require_csrf_view.options = ('disable_csrf',)
+   csrf_view.options = ('require_csrf',)
 
-   config.add_view_deriver(require_csrf_view)
+   config.add_view_deriver(csrf_view, 'csrf_view', over='secured_view', under=INGRESS)
 
    def protected_view(request):
        return Response('protected')
@@ -1685,7 +1695,7 @@ token unless ``disable_csrf=True`` is passed to the view:
        return Response('unprotected')
 
    config.add_view(protected_view, name='safe')
-   config.add_view(unprotected_view, name='unsafe', disable_csrf=True)
+   config.add_view(unprotected_view, name='unsafe', require_csrf=False)
 
 Navigating to ``/safe`` with a POST request will then fail when the call to
 :func:`pyramid.session.check_csrf_token` raises a

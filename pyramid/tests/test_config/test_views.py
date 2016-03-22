@@ -1570,6 +1570,43 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         config.add_view(view=view2)
         self.assertRaises(ConfigurationConflictError, config.commit)
 
+    def test_add_view_with_csrf_header(self):
+        from pyramid.renderers import null_renderer
+        def view(request):
+            return 'OK'
+        config = self._makeOne(autocommit=True)
+        config.add_view(view, require_csrf=True, renderer=null_renderer)
+        view = self._getViewCallable(config)
+        request = self._makeRequest(config)
+        request.headers = {'X-CSRF-Token': 'foo'}
+        request.session = DummySession({'csrf_token': 'foo'})
+        self.assertEqual(view(None, request), 'OK')
+
+    def test_add_view_with_csrf_param(self):
+        from pyramid.renderers import null_renderer
+        def view(request):
+            return 'OK'
+        config = self._makeOne(autocommit=True)
+        config.add_view(view, require_csrf='st', renderer=null_renderer)
+        view = self._getViewCallable(config)
+        request = self._makeRequest(config)
+        request.params = {'st': 'foo'}
+        request.headers = {}
+        request.session = DummySession({'csrf_token': 'foo'})
+        self.assertEqual(view(None, request), 'OK')
+
+    def test_add_view_with_missing_csrf_header(self):
+        from pyramid.exceptions import BadCSRFToken
+        from pyramid.renderers import null_renderer
+        def view(request): return 'OK'
+        config = self._makeOne(autocommit=True)
+        config.add_view(view, require_csrf=True, renderer=null_renderer)
+        view = self._getViewCallable(config)
+        request = self._makeRequest(config)
+        request.headers = {}
+        request.session = DummySession({'csrf_token': 'foo'})
+        self.assertRaises(BadCSRFToken, lambda: view(None, request))
+
     def test_add_view_with_permission(self):
         from pyramid.renderers import null_renderer
         view1 = lambda *arg: 'OK'
@@ -3233,3 +3270,7 @@ class DummyIntrospector(object):
         return self.getval
     def relate(self, a, b):
         self.related.append((a, b))
+
+class DummySession(dict):
+    def get_csrf_token(self):
+        return self['csrf_token']
