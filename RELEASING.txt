@@ -34,6 +34,8 @@ Releasing Pyramid
 - Update whatsnew-X.X.rst in docs to point at change log entries for individual
   releases if applicable.
 
+- For major version releases, in contributing.md, update branch descriptions.
+
 - For major version releases, in docs/conf.py, update values under
   html_theme_options for in_progress and outdated across master, releasing
   branch, and previously released branch. Also in the previously released

@@ -9,8 +9,9 @@ with open(os.path.join(here, 'CHANGES.txt')) as f:
     CHANGES = f.read()
 
 requires = [
+    'bcrypt',
     'pyramid',
-    'pyramid_chameleon',
+    'pyramid_jinja2',
     'pyramid_debugtoolbar',
     'pyramid_tm',
     'SQLAlchemy',
@@ -18,6 +19,10 @@ requires = [
     'zope.sqlalchemy',
     'waitress',
     ]
+
+tests_require = [
+    'WebTest',
+]
 
 setup(name='tutorial',
       version='0.0',
@@ -37,6 +42,7 @@ setup(name='tutorial',
       include_package_data=True,
       zip_safe=False,
       test_suite='tutorial',
+      tests_require=tests_require,
       install_requires=requires,
       entry_points="""\
       [paste.app_factory]
