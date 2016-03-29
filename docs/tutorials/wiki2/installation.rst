@@ -75,9 +75,19 @@ Python 3.5:
 Upgrade pip in the virtual environment
 --------------------------------------
 
-code-block:: bash
+On UNIX
+^^^^^^^
+
+.. code-block:: bash
 
     $ $VENV/bin/pip install --upgrade pip
+
+On Windows
+^^^^^^^^^^
+
+.. code-block:: ps1con
+
+   c:\> %VENV%\Scripts\pip install --upgrade pip
 
 
 Install Pyramid into the virtual Python environment
