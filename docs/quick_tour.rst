@@ -25,19 +25,19 @@ As an example, for Python 3.5+ on Linux:
 
 .. parsed-literal::
 
-    $ pyvenv env35
-    $ env35/bin/pip install pyramid
+    $ pyvenv env
+    $ env/bin/pip install pyramid
     # or for a specific released version
-    $ env35/bin/pip install "pyramid==\ |release|\ "
+    $ env/bin/pip install "pyramid==\ |release|\ "
 
 For Windows:
 
 .. parsed-literal::
 
-    c:\\> c:\\Python35\\python -m venv env35
-    c:\\> env35\\Scripts\\pip install pyramid
+    c:\\> c:\\Python35\\python -m venv env
+    c:\\> env\\Scripts\\pip install pyramid
     # or for a specific released version
-    c:\\> env35\\Scripts\\pip install "pyramid==\ |release|\ "
+    c:\\> env\\Scripts\\pip install "pyramid==\ |release|\ "
 
 Of course Pyramid runs fine on Python 2.6+, as do the examples in this *Quick
 Tour*. We're just showing Python 3 a little love (Pyramid had production
@@ -244,7 +244,7 @@ Chameleon as a :term:`renderer` in our Pyramid application:
 
 .. code-block:: bash
 
-    $ env35/bin/pip install pyramid_chameleon
+    $ env/bin/pip install pyramid_chameleon
 
 With the package installed, we can include the template bindings into our
 configuration in ``app.py``:
@@ -288,7 +288,7 @@ Jinja2 as a :term:`renderer` in our Pyramid applications:
 
 .. code-block:: bash
 
-    $ env35/bin/pip install pyramid_jinja2
+    $ env/bin/pip install pyramid_jinja2
 
 With the package installed, we can include the template bindings into our
 configuration:
