@@ -15,28 +15,29 @@ Installation
 
 Once you have a standard Python environment setup, getting started with Pyramid
 is a breeze. Unfortunately "standard" is not so simple in Python. For this
-Quick Tour, it means `Python <https://www.python.org/downloads/>`_, a `virtual
-environment <http://docs.python.org/dev/library/venv.html>`_ (or `virtualenv
-for Python 2.7 <https://pypi.python.org/pypi/virtualenv>`_), and `setuptools
-<https://pypi.python.org/pypi/setuptools/>`_.
+Quick Tour, it means `Python <https://www.python.org/downloads/>`_, `venv
+<https://packaging.python.org/en/latest/projects/#venv>`_ (or `virtualenv for
+Python 2.7 <https://packaging.python.org/en/latest/projects/#virtualenv>`_),
+`pip <https://packaging.python.org/en/latest/projects/#pip>`_, and `setuptools
+<https://packaging.python.org/en/latest/projects/#easy-install>`_.
 
-As an example, for Python 3.3+ on Linux:
+As an example, for Python 3.5+ on Linux:
 
 .. parsed-literal::
 
-  $ pyvenv env33
-  $ wget https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py -O - | env33/bin/python
-  $ env33/bin/easy_install "pyramid==\ |release|\ "
+    $ pyvenv env35
+    $ env35/bin/pip install pyramid
+    # or for a specific released version
+    $ env35/bin/pip install "pyramid==\ |release|\ "
 
 For Windows:
 
 .. parsed-literal::
 
-    # Use your browser to download:
-    #   https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py
-    c:\\> c:\\Python33\\python -m venv env33
-    c:\\> env33\\Scripts\\python ez_setup.py
-    c:\\> env33\\Scripts\\easy_install "pyramid==\ |release|\ "
+    c:\\> c:\\Python35\\python -m venv env35
+    c:\\> env35\\Scripts\\pip install pyramid
+    # or for a specific released version
+    c:\\> env35\\Scripts\\pip install "pyramid==\ |release|\ "
 
 Of course Pyramid runs fine on Python 2.6+, as do the examples in this *Quick
 Tour*. We're just showing Python 3 a little love (Pyramid had production
@@ -44,14 +45,8 @@ support for Python 3 in October 2011).
 
 .. note::
 
-    Why ``easy_install`` and not ``pip``?  Some distributions upon which
-    Pyramid depends have optional C extensions for performance. ``pip`` cannot
-    install some binary Python distributions.  With ``easy_install``, Windows
-    users are able to obtain binary Python distributions, so they get the
-    benefit of the C extensions without needing a C compiler.  Also there can
-    be issues when ``pip`` and ``easy_install`` are used side-by-side in the
-    same environment, so we chose to recommend ``easy_install`` for the sake of
-    reducing the complexity of these instructions.
+    If you use Python 2.6 or 2.7, then you might need to install
+    ``setuptools``. See references below for more information.
 
 .. seealso:: See also:
     :ref:`Quick Tutorial section on Requirements <qtut_requirements>`,
@@ -249,7 +244,7 @@ Chameleon as a :term:`renderer` in our Pyramid application:
 
 .. code-block:: bash
 
-    $ easy_install pyramid_chameleon
+    $ env35/bin/pip install pyramid_chameleon
 
 With the package installed, we can include the template bindings into our
 configuration in ``app.py``:
@@ -293,7 +288,7 @@ Jinja2 as a :term:`renderer` in our Pyramid applications:
 
 .. code-block:: bash
 
-    $ easy_install pyramid_jinja2
+    $ env35/bin/pip install pyramid_jinja2
 
 With the package installed, we can include the template bindings into our
 configuration:
@@ -502,7 +497,7 @@ We next use the normal Python command to set up our package for development:
 .. code-block:: bash
 
     $ cd hello_world
-    $ python ./setup.py develop
+    $ $VENV/bin/pip install -e .
 
 We are moving in the direction of a full-featured Pyramid project, with a
 proper setup for Python standards (packaging) and Pyramid configuration. This
@@ -617,7 +612,7 @@ It was installed when you previously ran:
 
 .. code-block:: bash
 
-    $ python ./setup.py develop
+    $ $VENV/bin/pip install -e .
 
 The ``pyramid_debugtoolbar`` package is a Pyramid add-on, which means we need
 to include its configuration into our web application. The ``pyramid_jinja2``
@@ -670,7 +665,7 @@ following:
           },
 
 We changed ``setup.py`` which means we need to rerun
-``python ./setup.py develop``. We can now run all our tests:
+``$VENV/bin/pip install -e .``. We can now run all our tests:
 
 .. code-block:: bash
 
@@ -746,7 +741,9 @@ These emphasized sections in the configuration file:
 
 Our application, a package named ``hello_world``, is set up as a logger and
 configured to log messages at a ``DEBUG`` or higher level. When you visit
-http://localhost:6543, your console will now show::
+http://localhost:6543, your console will now show:
+
+.. code-block:: text
 
     2016-01-18 13:55:55,040 DEBUG [hello_world.views:10][waitress] Some Message
 
@@ -827,7 +824,7 @@ Pyramid and SQLAlchemy are great friends. That friendship includes a scaffold!
 
   $ pcreate --scaffold alchemy sqla_demo
   $ cd sqla_demo
-  $ python setup.py develop
+  $ $VENV/bin/pip install -e .
 
 We now have a working sample SQLAlchemy application with all dependencies
 installed. The sample project provides a console script to initialize a SQLite
