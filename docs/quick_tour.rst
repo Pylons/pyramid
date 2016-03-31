@@ -497,7 +497,7 @@ We next use the normal Python command to set up our package for development:
 .. code-block:: bash
 
     $ cd hello_world
-    $ $VENV/bin/pip install -e .
+    $ env/bin/pip install -e .
 
 We are moving in the direction of a full-featured Pyramid project, with a
 proper setup for Python standards (packaging) and Pyramid configuration. This
@@ -612,7 +612,7 @@ It was installed when you previously ran:
 
 .. code-block:: bash
 
-    $ $VENV/bin/pip install -e .
+    $ env/bin/pip install -e .
 
 The ``pyramid_debugtoolbar`` package is a Pyramid add-on, which means we need
 to include its configuration into our web application. The ``pyramid_jinja2``
@@ -665,7 +665,7 @@ following:
           },
 
 We changed ``setup.py`` which means we need to rerun
-``$VENV/bin/pip install -e .``. We can now run all our tests:
+``env/bin/pip install -e .``. We can now run all our tests:
 
 .. code-block:: bash
 
@@ -824,7 +824,7 @@ Pyramid and SQLAlchemy are great friends. That friendship includes a scaffold!
 
   $ pcreate --scaffold alchemy sqla_demo
   $ cd sqla_demo
-  $ $VENV/bin/pip install -e .
+  $ env/bin/pip install -e .
 
 We now have a working sample SQLAlchemy application with all dependencies
 installed. The sample project provides a console script to initialize a SQLite
