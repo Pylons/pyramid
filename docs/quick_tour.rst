@@ -43,11 +43,6 @@ Of course Pyramid runs fine on Python 2.6+, as do the examples in this *Quick
 Tour*. We're just showing Python 3 a little love (Pyramid had production
 support for Python 3 in October 2011).
 
-.. note::
-
-    If you use Python 2.6 or 2.7, then you might need to install
-    ``setuptools``. See references below for more information.
-
 .. seealso:: See also:
     :ref:`Quick Tutorial section on Requirements <qtut_requirements>`,
     :ref:`installing_unix`, :ref:`Before You Install <installing_chapter>`, and
