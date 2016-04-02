@@ -9,9 +9,9 @@ This tutorial assumes that you have already followed the steps in
 :ref:`installing_chapter`, except **do not create a virtualenv or install
 Pyramid**.  Thereby you will satisfy the following requirements.
 
-* Python interpreter is installed on your operating system
-* :term:`setuptools` or :term:`distribute` is installed
-* :term:`virtualenv` is installed
+* A Python interpreter is installed on your operating system.
+* :term:`virtualenv` is installed.
+* :term:`pip` will be installed when we create a virtual environment.
 
 
 Create directory to contain the project
@@ -72,6 +72,24 @@ Python 3.5:
    c:\> c:\Python35\Scripts\virtualenv %VENV%
 
 
+Upgrade pip in the virtual environment
+--------------------------------------
+
+On UNIX
+^^^^^^^
+
+.. code-block:: bash
+
+    $ $VENV/bin/pip install --upgrade pip
+
+On Windows
+^^^^^^^^^^
+
+.. code-block:: ps1con
+
+   c:\> %VENV%\Scripts\pip install --upgrade pip
+
+
 Install Pyramid into the virtual Python environment
 ---------------------------------------------------
 
@@ -80,26 +98,27 @@ On UNIX
 
 .. code-block:: bash
 
-   $ $VENV/bin/easy_install pyramid
+   $ $VENV/bin/pip install pyramid
 
 On Windows
 ^^^^^^^^^^
 
 .. code-block:: ps1con
 
-   c:\> %VENV%\Scripts\easy_install pyramid
+   c:\> %VENV%\Scripts\pip install pyramid
 
 
 Install SQLite3 and its development packages
 --------------------------------------------
 
-If you used a package manager to install your Python or if you compiled your
-Python from source, then you must install SQLite3 and its development packages.
-If you downloaded your Python as an installer from https://www.python.org, then
-you already have it installed and can skip this step.
+If you used a package manager to install your Python or if you compiled
+your Python from source, then you must install SQLite3 and its
+development packages.  If you downloaded your Python as an installer
+from https://www.python.org, then you already have it installed and can skip
+this step.
 
-If you need to install the SQLite3 packages, then, for example, using the
-Debian system and ``apt-get``, the command would be the following:
+If you need to install the SQLite3 packages, then, for example, using
+the Debian system and ``apt-get``, the command would be the following:
 
 .. code-block:: bash
 
@@ -168,6 +187,7 @@ On Windows
    and the project into directories that do not contain spaces in their paths.
 
 
+
 .. _installing_project_in_dev_mode:
 
 Installing the project in development mode
@@ -185,7 +205,7 @@ On UNIX
 .. code-block:: bash
 
    $ cd tutorial
-   $ $VENV/bin/python setup.py develop
+   $ $VENV/bin/pip install -e .
 
 On Windows
 ^^^^^^^^^^
@@ -193,7 +213,7 @@ On Windows
 .. code-block:: ps1con
 
    c:\pyramidtut> cd tutorial
-   c:\pyramidtut\tutorial> %VENV%\Scripts\python setup.py develop
+   c:\pyramidtut\tutorial> %VENV%\Scripts\pip install -e .
 
 The console will show ``setup.py`` checking for packages and installing missing
 packages. Success executing this command will show a line like the following::
@@ -215,12 +235,16 @@ On UNIX
 
    $ $VENV/bin/python setup.py test -q
 
+.. py.test? See https://github.com/Pylons/pyramid/issues/2104#issuecomment-155852046
+
 On Windows
 ^^^^^^^^^^
 
 .. code-block:: ps1con
 
    c:\pyramidtut\tutorial> %VENV%\Scripts\python setup.py test -q
+
+.. py.test? See https://github.com/Pylons/pyramid/issues/2104#issuecomment-155852046
 
 For a successful test run, you should see output that ends like this::
 
@@ -307,6 +331,13 @@ initialize our database.
 
    The ``initialize_tutorial_db`` command does not perform a migration, but
    rather it simply creates missing tables and adds some dummy data. If you
+   already have a database, you should delete it before running
+   ``initialize_tutorial_db`` again.
+
+.. note::
+
+   The ``initialize_tutorial_db`` command is not performing a migration but
+   rather simply creating missing tables and adding some dummy data. If you
    already have a database, you should delete it before running
    ``initialize_tutorial_db`` again.
 
@@ -415,6 +446,13 @@ assumptions:
 
 - You are willing to use :term:`URL dispatch` to map URLs to code.
 
+- You want to use zope.sqlalchemy_, pyramid_tm_ and the transaction_ package
+  to scope sessions to requests.
+
+- You want to use pyramid_jinja2_ to render your templates.
+  Different templating engines can be used but we had to choose one to
+  make the tutorial. See :ref:`available_template_system_bindings` for some
+  options.
 - You want to use zope.sqlalchemy_, pyramid_tm_ and the transaction_ package to
   scope sessions to requests.
 
@@ -428,6 +466,18 @@ assumptions:
    database or filesystem files). It also supports an additional mechanism to
    map URLs to code (:term:`traversal`). However, for the purposes of this
    tutorial, we'll only be using URL dispatch and SQLAlchemy.
+
+.. _pyramid_jinja2:
+   http://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/
+
+.. _pyramid_tm:
+   http://docs.pylonsproject.org/projects/pyramid-tm/en/latest/
+
+.. _zope.sqlalchemy:
+   https://pypi.python.org/pypi/zope.sqlalchemy
+
+.. _transaction:
+   http://zodb.readthedocs.org/en/latest/transactions.html
 
 .. _pyramid_jinja2:
    http://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/
