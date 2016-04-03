@@ -29,6 +29,9 @@ Some :app:`Pyramid` dependencies may attempt to build C extensions for
 performance speedups. If a compiler or Python headers are unavailable the
 dependency will fall back to using pure Python instead.
 
+
+.. _for-mac-os-x-users:
+
 For Mac OS X Users
 ~~~~~~~~~~~~~~~~~~
 
@@ -51,6 +54,9 @@ Alternatively, you can use the `homebrew <http://brew.sh/>`_ package manager.
 
 If you use an installer for your Python, then you can skip to the section
 :ref:`installing_unix`.
+
+
+.. _if-you-don-t-yet-have-a-python-interpreter-unix:
 
 If You Don't Yet Have a Python Interpreter (UNIX)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
