@@ -5,7 +5,7 @@
 ================================
 
 What's the simplest way to get started in Pyramid? A single-file module.
-No Python packages, no ``setup.py``, no other machinery.
+No Python packages, no ``pip install -e .``, no other machinery.
 
 Background
 ==========
