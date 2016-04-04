@@ -12,7 +12,7 @@ Background
 ==========
 
 We're going to cover a lot in this tutorial, focusing on one topic at a
-time and writing everything from scratch. As a warmup, though,
+time and writing everything from scratch. As a warm up, though,
 it sure would be nice to see some pixels on a screen.
 
 Like other web development frameworks, Pyramid provides a number of
@@ -47,21 +47,22 @@ Steps
 
         $ $VENV/bin/pcreate --scaffold starter scaffolds
 
-#. Use normal Python development to setup our project for development:
+#. Install our project in editable mode for development in the current
+   directory:
 
     .. code-block:: bash
 
         $ cd scaffolds
-        $ $VENV/bin/python setup.py develop
+        $ $VENV/bin/pip install -e .
 
-#. Startup the application by pointing Pyramid's ``pserve`` command at
+#. Start up the application by pointing Pyramid's ``pserve`` command at
    the project's (generated) configuration file:
 
     .. code-block:: bash
 
         $ $VENV/bin/pserve development.ini --reload
 
-   On startup, ``pserve`` logs some output:
+   On start up, ``pserve`` logs some output:
 
     .. code-block:: bash
 
