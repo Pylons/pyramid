@@ -257,6 +257,9 @@ intersphinx_mapping = {
     'python': (
         'http://docs.python.org/2',
         None),
+    'python3': (
+        'https://docs.python.org/3/',
+        None),
     'sqla': (
         'http://docs.sqlalchemy.org/en/latest',
         None),
