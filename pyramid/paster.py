@@ -55,8 +55,8 @@ def get_appsettings(config_uri, name=None, options=None, appconfig=appconfig):
 def setup_logging(config_uri, fileConfig=fileConfig,
                   configparser=configparser):
     """
-    Set up logging via the logging module's fileConfig function with the
-    filename specified via ``config_uri`` (a string in the form
+    Set up logging via :func:`logging.config.fileConfig` with the filename
+    specified via ``config_uri`` (a string in the form
     ``filename#sectionname``).
 
     ConfigParser defaults are specified for the special ``__file__``
