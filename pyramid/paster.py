@@ -69,15 +69,12 @@ def setup_logging(config_uri, global_conf=None,
     parser.read([path])
     if parser.has_section('loggers'):
         config_file = os.path.abspath(path)
-        if global_conf:
-            # Copy to avoid side effects
-            global_conf = dict(global_conf)
-        else:
-            global_conf = {}
-        global_conf.update(
+        full_global_conf = dict(
             __file__=config_file,
             here=os.path.dirname(config_file))
-        return fileConfig(config_file, global_conf)
+        if global_conf:
+            full_global_conf.update(global_conf)
+        return fileConfig(config_file, full_global_conf)
 
 def _getpathsec(config_uri, name):
     if '#' in config_uri:
