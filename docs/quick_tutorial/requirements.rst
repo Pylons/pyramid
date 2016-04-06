@@ -178,7 +178,7 @@ we just specified in the environment variable.
     # Windows
     c:\> c:\Python35\python -m venv %VENV%
 
-.. seealso:: See also Python 3's :mod:`venv module <python3:venv>` and Python
+.. seealso:: See also Python 3's :mod:`venv module <python:venv>` and Python
    2's `virtualenv <http://www.virtualenv.org/en/latest/>`_ package.
 
 
