@@ -222,5 +222,8 @@ class DummyConfigParser(object):
     def has_section(self, name):
         return True
 
+    def items(self, section):
+        return {}
+
 class DummyConfigParserModule(object):
     ConfigParser = DummyConfigParser
