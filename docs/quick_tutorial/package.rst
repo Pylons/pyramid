@@ -10,7 +10,7 @@ Background
 ==========
 
 Python developers can organize a collection of modules and files into a
-namespaced unit called a :ref:`package <python3:tut-packages>`. If a
+namespaced unit called a :ref:`package <python:tut-packages>`. If a
 directory is on ``sys.path`` and has a special file named
 ``__init__.py``, it is treated as a Python package.
 
@@ -102,6 +102,6 @@ of an odd duck.  We would never do this unless we were writing a tutorial that
 tries to capture how this stuff works a step at a time.  It's generally a bad
 idea to run a Python module inside a package directly as a script.
 
-.. seealso:: :ref:`Python Packages <python3:tut-packages>` and `Working in
+.. seealso:: :ref:`Python Packages <python:tut-packages>` and `Working in
    "Development Mode"
    <https://packaging.python.org/en/latest/distributing/#working-in-development-mode>`_.
