@@ -53,7 +53,7 @@ Steps
 
    .. note::
 
-     We aren't yet doing ``$VENV/bin/python setup.py develop`` as we
+     We aren't yet doing ``$VENV/bin/pip install -e .`` as we
      will change it later.
 
 #. Our configuration file at ``databases/development.ini`` wires
@@ -78,7 +78,7 @@ Steps
 
    .. code-block:: bash
 
-    $ $VENV/bin/python setup.py develop
+    $ $VENV/bin/pip install -e .
 
 #. The script references some models in ``databases/tutorial/models.py``:
 

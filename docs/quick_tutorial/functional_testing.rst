@@ -34,8 +34,8 @@ Steps
    .. code-block:: bash
 
     $ cd ..; cp -r unit_testing functional_testing; cd functional_testing
-    $ $VENV/bin/python setup.py develop
-    $ $VENV/bin/easy_install webtest
+    $ $VENV/bin/pip install -e .
+    $ $VENV/bin/pip install webtest
 
 #. Let's extend ``functional_testing/tutorial/tests.py`` to include a
    functional test:

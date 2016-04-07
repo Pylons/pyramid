@@ -23,7 +23,7 @@ Steps
    .. code-block:: bash
 
     $ cd ..; cp -r view_classes static_assets; cd static_assets
-    $ $VENV/bin/python setup.py develop
+    $ $VENV/bin/pip install -e .
 
 #. We add a call ``config.add_static_view`` in
    ``static_assets/tutorial/__init__.py``:

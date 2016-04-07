@@ -50,7 +50,7 @@ Steps
 
    .. code-block:: bash
 
-      $ $VENV/bin/python setup.py develop
+      $ $VENV/bin/pip install -e .
 
 #. Register a static view in ``forms/tutorial/__init__.py`` for
    Deform's CSS/JS etc. as well as our demo wikipage scenario's

@@ -57,7 +57,7 @@ Steps
    .. code-block:: bash
 
     $ cd ..; cp -r templating more_view_classes; cd more_view_classes
-    $ $VENV/bin/python setup.py develop
+    $ $VENV/bin/pip install -e .
 
 #. Our route in ``more_view_classes/tutorial/__init__.py`` needs some
    replacement patterns:

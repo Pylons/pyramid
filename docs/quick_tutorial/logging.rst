@@ -35,7 +35,7 @@ Steps
    .. code-block:: bash
 
     $ cd ..; cp -r view_classes logging; cd logging
-    $ $VENV/bin/python setup.py develop
+    $ $VENV/bin/pip install -e .
 
 #. Extend ``logging/tutorial/views.py`` to log a message:
 
