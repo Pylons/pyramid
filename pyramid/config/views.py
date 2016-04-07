@@ -76,9 +76,9 @@ from pyramid.util import (
     )
 
 import pyramid.config.predicates
-import pyramid.config.derivations
+import pyramid.viewderivers
 
-from pyramid.config.derivations import (
+from pyramid.viewderivers import (
     preserve_view_attrs,
     view_description,
     requestonly,
@@ -1028,7 +1028,7 @@ class ViewsConfiguratorMixin(object):
             raise ConfigurationError('Unknown view options: %s' % (kw,))
 
     def _apply_view_derivers(self, info):
-        d = pyramid.config.derivations
+        d = pyramid.viewderivers
         # These derivations have fixed order
         outer_derivers = [('attr_wrapped_view', d.attr_wrapped_view),
                           ('predicated_view', d.predicated_view)]
@@ -1146,7 +1146,7 @@ class ViewsConfiguratorMixin(object):
                     order=PHASE1_CONFIG) # must be registered before add_view
 
     def add_default_view_derivers(self):
-        d = pyramid.config.derivations
+        d = pyramid.viewderivers
         derivers = [
             ('authdebug_view', d.authdebug_view),
             ('secured_view', d.secured_view),
