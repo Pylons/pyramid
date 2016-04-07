@@ -1580,18 +1580,15 @@ There are several built-in view derivers that :app:`Pyramid` will automatically
 apply to any view. Below they are defined in order from furthest to closest to
 the user-defined :term:`view callable`:
 
-``authdebug_view``
-
-  Used to output useful debugging information when
-  ``pyramid.debug_authorization`` is enabled. This element is a no-op
-  otherwise.
-
 ``secured_view``
 
   Enforce the ``permission`` defined on the view. This element is a no-op if no
   permission is defined. Note there will always be a permission defined if a
   default permission was assigned via
   :meth:`pyramid.config.Configurator.set_default_permission`.
+
+  This element will also output useful debugging information when
+  ``pyramid.debug_authorization`` is enabled.
 
 ``owrapped_view``
 

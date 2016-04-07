@@ -1103,14 +1103,13 @@ class TestDerivationOrder(unittest.TestCase):
         from pyramid.interfaces import IViewDerivers
 
         self.config.add_view_deriver(None, 'deriv1')
-        self.config.add_view_deriver(None, 'deriv2', over='deriv1')
-        self.config.add_view_deriver(None, 'deriv3', under='deriv2')
+        self.config.add_view_deriver(None, 'deriv2', 'decorated_view', 'deriv1')
+        self.config.add_view_deriver(None, 'deriv3', 'deriv2', 'deriv1')
 
         derivers = self.config.registry.getUtility(IViewDerivers)
         derivers_sorted = derivers.sorted()
         dlist = [d for (d, _) in derivers_sorted]
         self.assertEqual([
-            'authdebug_view',
             'secured_view',
             'owrapped_view',
             'http_cached_view',
@@ -1119,6 +1118,7 @@ class TestDerivationOrder(unittest.TestCase):
             'deriv3',
             'deriv1',
             'rendered_view',
+            'mapped_view',
             ], dlist)
 
     def test_right_order_implicit(self):
@@ -1132,7 +1132,6 @@ class TestDerivationOrder(unittest.TestCase):
         derivers_sorted = derivers.sorted()
         dlist = [d for (d, _) in derivers_sorted]
         self.assertEqual([
-            'authdebug_view',
             'secured_view',
             'owrapped_view',
             'http_cached_view',
@@ -1141,31 +1140,32 @@ class TestDerivationOrder(unittest.TestCase):
             'deriv2',
             'deriv1',
             'rendered_view',
+            'mapped_view',
             ], dlist)
 
     def test_right_order_under_rendered_view(self):
         from pyramid.interfaces import IViewDerivers
 
-        self.config.add_view_deriver(None, 'deriv1', under='rendered_view')
+        self.config.add_view_deriver(None, 'deriv1', 'rendered_view', 'mapped_view')
 
         derivers = self.config.registry.getUtility(IViewDerivers)
         derivers_sorted = derivers.sorted()
         dlist = [d for (d, _) in derivers_sorted]
         self.assertEqual([
-            'authdebug_view',
             'secured_view',
             'owrapped_view',
             'http_cached_view',
             'decorated_view',
             'rendered_view',
             'deriv1',
+            'mapped_view',
             ], dlist)
 
 
     def test_right_order_under_rendered_view_others(self):
         from pyramid.interfaces import IViewDerivers
 
-        self.config.add_view_deriver(None, 'deriv1', under='rendered_view')
+        self.config.add_view_deriver(None, 'deriv1', 'rendered_view', 'mapped_view')
         self.config.add_view_deriver(None, 'deriv2')
         self.config.add_view_deriver(None, 'deriv3')
 
@@ -1173,7 +1173,6 @@ class TestDerivationOrder(unittest.TestCase):
         derivers_sorted = derivers.sorted()
         dlist = [d for (d, _) in derivers_sorted]
         self.assertEqual([
-            'authdebug_view',
             'secured_view',
             'owrapped_view',
             'http_cached_view',
@@ -1182,6 +1181,7 @@ class TestDerivationOrder(unittest.TestCase):
             'deriv2',
             'rendered_view',
             'deriv1',
+            'mapped_view',
             ], dlist)
 
 
@@ -1218,11 +1218,11 @@ class TestAddDeriver(unittest.TestCase):
             def __init__(self):
                 self.response = DummyResponse()
 
-        def deriv1(view, value, **kw):
+        def deriv1(view, info):
             flags['deriv1'] = True
             return view
 
-        def deriv2(view, value, **kw):
+        def deriv2(view, info):
             flags['deriv2'] = True
             return view
 
@@ -1240,27 +1240,84 @@ class TestAddDeriver(unittest.TestCase):
         self.assertTrue(flags.get('deriv2'))
 
     def test_add_multi_derivers_ordered(self):
+        from pyramid.viewderivers import INGRESS
         response = DummyResponse()
         view = lambda *arg: response
         response.deriv = []
 
-        def deriv1(view, value, **kw):
+        def deriv1(view, info):
             response.deriv.append('deriv1')
             return view
 
-        def deriv2(view, value, **kw):
+        def deriv2(view, info):
             response.deriv.append('deriv2')
             return view
 
-        def deriv3(view, value, **kw):
+        def deriv3(view, info):
             response.deriv.append('deriv3')
             return view
 
         self.config.add_view_deriver(deriv1, 'deriv1')
-        self.config.add_view_deriver(deriv2, 'deriv2', under='deriv1')
-        self.config.add_view_deriver(deriv3, 'deriv3', over='deriv2')
+        self.config.add_view_deriver(deriv2, 'deriv2', INGRESS, 'deriv1')
+        self.config.add_view_deriver(deriv3, 'deriv3', 'deriv2', 'deriv1')
         result = self.config._derive_view(view)
-        self.assertEqual(response.deriv, ['deriv2', 'deriv3', 'deriv1'])
+        self.assertEqual(response.deriv, ['deriv1', 'deriv3', 'deriv2'])
+
+    def test_add_deriver_without_name(self):
+        from pyramid.interfaces import IViewDerivers
+        def deriv1(view, info): pass
+        self.config.add_view_deriver(deriv1)
+        derivers = self.config.registry.getUtility(IViewDerivers)
+        self.assertTrue('deriv1' in derivers.names)
+
+    def test_add_deriver_reserves_ingress(self):
+        from pyramid.exceptions import ConfigurationError
+        from pyramid.viewderivers import INGRESS
+        def deriv1(view, info): pass
+        self.assertRaises(
+            ConfigurationError, self.config.add_view_deriver, deriv1, INGRESS)
+
+    def test_add_deriver_enforces_over_is_defined(self):
+        from pyramid.exceptions import ConfigurationError
+        def deriv1(view, info): pass
+        try:
+            self.config.add_view_deriver(deriv1, under='rendered_view')
+        except ConfigurationError as ex:
+            self.assertTrue('must specify an "over" constraint' in ex.args[0])
+        else: # pragma: no cover
+            raise AssertionError
+
+    def test_add_deriver_enforces_under_is_defined(self):
+        from pyramid.exceptions import ConfigurationError
+        def deriv1(view, info): pass
+        try:
+            self.config.add_view_deriver(deriv1, over='rendered_view')
+        except ConfigurationError as ex:
+            self.assertTrue('must specify an "under" constraint' in ex.args[0])
+        else: # pragma: no cover
+            raise AssertionError
+
+    def test_add_deriver_enforces_ingress_is_first(self):
+        from pyramid.exceptions import ConfigurationError
+        from pyramid.viewderivers import INGRESS
+        def deriv1(view, info): pass
+        try:
+            self.config.add_view_deriver(deriv1, under='rendered_view', over=INGRESS)
+        except ConfigurationError as ex:
+            self.assertTrue('cannot be over view deriver INGRESS' in ex.args[0])
+        else: # pragma: no cover
+            raise AssertionError
+
+    def test_add_deriver_enforces_mapped_view_is_last(self):
+        from pyramid.exceptions import ConfigurationError
+        def deriv1(view, info): pass
+        try:
+            self.config.add_view_deriver(
+                deriv1, 'deriv1', 'mapped_view', 'rendered_view')
+        except ConfigurationError as ex:
+            self.assertTrue('cannot be under view deriver MAPPED_VIEW' in ex.args[0])
+        else: # pragma: no cover
+            raise AssertionError
 
 
 class TestDeriverIntegration(unittest.TestCase):

@@ -79,6 +79,8 @@ import pyramid.config.predicates
 import pyramid.viewderivers
 
 from pyramid.viewderivers import (
+    INGRESS,
+    MAPPED_VIEW,
     preserve_view_attrs,
     view_description,
     requestonly,
@@ -89,6 +91,7 @@ from pyramid.viewderivers import (
 from pyramid.config.util import (
     DEFAULT_PHASH,
     MAX_ORDER,
+    as_sorted_tuple,
     )
 
 urljoin = urlparse.urljoin
@@ -1029,16 +1032,14 @@ class ViewsConfiguratorMixin(object):
 
     def _apply_view_derivers(self, info):
         d = pyramid.viewderivers
-        # These derivations have fixed order
+
+        # These derivers are not really derivers and so have fixed order
         outer_derivers = [('attr_wrapped_view', d.attr_wrapped_view),
                           ('predicated_view', d.predicated_view)]
-        inner_derivers = [('mapped_view', d.mapped_view)]
 
         view = info.original_view
         derivers = self.registry.getUtility(IViewDerivers)
-        for name, deriver in reversed(
-            outer_derivers + derivers.sorted() + inner_derivers
-        ):
+        for name, deriver in reversed(outer_derivers + derivers.sorted()):
             view = wraps_view(deriver)(view, info)
         return view
 
@@ -1090,7 +1091,7 @@ class ViewsConfiguratorMixin(object):
             self.add_view_predicate(name, factory)
 
     @action_method
-    def add_view_deriver(self, deriver, name, under=None, over=None):
+    def add_view_deriver(self, deriver, name=None, under=None, over=None):
         """
         .. versionadded:: 1.7
 
@@ -1105,9 +1106,11 @@ class ViewsConfiguratorMixin(object):
         restrictions on the name of a view deriver. If left unspecified, the
         name will be constructed from the name of the ``deriver``.
 
-        The ``under`` and ``over`` options may be used to control the ordering
+        The ``under`` and ``over`` options can be used to control the ordering
         of view derivers by providing hints about where in the view pipeline
-        the deriver is used.
+        the deriver is used. Each option may be a string or a list of strings.
+        At least one view deriver in each, the over and under directions, must
+        exist to fully satisfy the constraints.
 
         ``under`` means closer to the user-defined :term:`view callable`,
         and ``over`` means closer to view pipeline ingress.
@@ -1122,9 +1125,36 @@ class ViewsConfiguratorMixin(object):
         """
         deriver = self.maybe_dotted(deriver)
 
+        if name is None:
+            name = deriver.__name__
+
+        if name in (INGRESS,):
+            raise ConfigurationError('%s is a reserved view deriver name'
+                                     % name)
+
         if under is None and over is None:
             under = 'decorated_view'
             over = 'rendered_view'
+
+        if over is None and name != MAPPED_VIEW:
+            raise ConfigurationError('must specify an "over" constraint for '
+                                     'the %s view deriver' % name)
+        elif over is not None:
+            over = as_sorted_tuple(over)
+
+        if under is None:
+            raise ConfigurationError('must specify an "under" constraint for '
+                                     'the %s view deriver' % name)
+        else:
+            under = as_sorted_tuple(under)
+
+        if over is not None and INGRESS in over:
+            raise ConfigurationError('%s cannot be over view deriver INGRESS'
+                                     % name)
+
+        if MAPPED_VIEW in under:
+            raise ConfigurationError('%s cannot be under view deriver '
+                                     'MAPPED_VIEW' % name)
 
         discriminator = ('view deriver', name)
         intr = self.introspectable(
@@ -1139,7 +1169,12 @@ class ViewsConfiguratorMixin(object):
         def register():
             derivers = self.registry.queryUtility(IViewDerivers)
             if derivers is None:
-                derivers = TopologicalSorter()
+                derivers = TopologicalSorter(
+                    default_before=None,
+                    default_after=INGRESS,
+                    first=INGRESS,
+                    last=MAPPED_VIEW,
+                )
                 self.registry.registerUtility(derivers, IViewDerivers)
             derivers.add(name, deriver, before=over, after=under)
         self.action(discriminator, register, introspectables=(intr,),
@@ -1148,24 +1183,23 @@ class ViewsConfiguratorMixin(object):
     def add_default_view_derivers(self):
         d = pyramid.viewderivers
         derivers = [
-            ('authdebug_view', d.authdebug_view),
             ('secured_view', d.secured_view),
             ('owrapped_view', d.owrapped_view),
             ('http_cached_view', d.http_cached_view),
             ('decorated_view', d.decorated_view),
+            ('rendered_view', d.rendered_view),
         ]
-        last = pyramid.util.FIRST
+        last = INGRESS
         for name, deriver in derivers:
-            self.add_view_deriver(deriver, name=name, under=last)
+            self.add_view_deriver(
+                deriver,
+                name=name,
+                under=last,
+                over=MAPPED_VIEW,
+            )
             last = name
 
-        # ensure rendered_view is over LAST
-        self.add_view_deriver(
-            d.rendered_view,
-            'rendered_view',
-            under=last,
-            over=pyramid.util.LAST,
-        )
+        self.add_view_deriver(d.mapped_view, name=MAPPED_VIEW, under=last)
 
     def derive_view(self, view, attr=None, renderer=None):
         """
