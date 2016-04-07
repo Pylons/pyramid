@@ -27,7 +27,7 @@ Steps
 
     $ cd ..; cp -r view_classes jinja2; cd jinja2
     $ $VENV/bin/python setup.py develop
-    $ $VENV/bin/easy_install pyramid_jinja2
+    $ $VENV/bin/pip install pyramid_jinja2
 
 #. We need to include ``pyramid_jinja2`` in
    ``jinja2/tutorial/__init__.py``:
