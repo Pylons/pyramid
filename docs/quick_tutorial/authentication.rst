@@ -1,3 +1,5 @@
+.. _qtut_authentication:
+
 ==============================
 20: Logins With Authentication
 ==============================

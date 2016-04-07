@@ -1,3 +1,5 @@
+.. _qtut_authorization:
+
 ===========================================
 21: Protecting Resources With Authorization
 ===========================================
@@ -38,7 +40,7 @@ Steps
    .. code-block:: bash
 
     $ cd ..; cp -r authentication authorization; cd authorization
-    $ $VENV/bin/python setup.py develop
+    $ $VENV/bin/pip install -e .
 
 #. Start by changing ``authorization/tutorial/__init__.py`` to
    specify a root factory to the :term:`configurator`:
