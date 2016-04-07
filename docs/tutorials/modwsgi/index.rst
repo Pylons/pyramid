@@ -1,7 +1,7 @@
 .. _modwsgi_tutorial:
 
 Running a :app:`Pyramid` Application under ``mod_wsgi``
-==========================================================
+=======================================================
 
 :term:`mod_wsgi` is an Apache module developed by Graham Dumpleton.
 It allows :term:`WSGI` programs to be served using the Apache web
@@ -30,11 +30,11 @@ specific path information for commands and files.
     for your platform into your system's Apache installation.
 
 #.  Install :term:`virtualenv` into the Python which mod_wsgi will
-    run using the ``easy_install`` program.
+    run using pip.
 
     .. code-block:: text
 
-       $ sudo /usr/bin/easy_install-2.6 virtualenv
+       $ sudo /usr/bin/pip install virtualenv
 
     This command may need to be performed as the root user.
 
@@ -53,7 +53,7 @@ specific path information for commands and files.
     .. code-block:: text
 
        $ cd ~/modwsgi/env
-       $ $VENV/bin/easy_install pyramid
+       $ $VENV/bin/pip install pyramid
     
 #.  Create and install your :app:`Pyramid` application.  For the purposes of
     this tutorial, we'll just be using the ``pyramid_starter`` application as
@@ -65,7 +65,7 @@ specific path information for commands and files.
        $ cd ~/modwsgi/env
        $ $VENV/bin/pcreate -s starter myapp
        $ cd myapp
-       $ $VENV/bin/python setup.py install
+       $ $VENV/bin/pip install -e .
 
 #.  Within the virtualenv directory (``~/modwsgi/env``), create a
     script named ``pyramid.wsgi``.  Give it these contents:
@@ -131,4 +131,3 @@ serve up a :app:`Pyramid` application.  See the `mod_wsgi
 configuration documentation
 <http://code.google.com/p/modwsgi/wiki/ConfigurationGuidelines>`_ for
 more in-depth configuration information.
-
