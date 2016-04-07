@@ -33,7 +33,7 @@ Steps
    .. code-block:: bash
 
     $ cd ..; cp -r view_classes authentication; cd authentication
-    $ $VENV/bin/python setup.py develop
+    $ $VENV/bin/pip install -e .
 
 #. Put the security hash in the ``authentication/development.ini``
    configuration file as ``tutorial.secret`` instead of putting it in
