@@ -383,28 +383,30 @@ On Windows
 
    c:\pyramidtut\tutorial> %VENV%\Scripts\py.test --cov=tutorial tutorial\tests.py
 
-If successful, you will see output something like this::
+If successful, you will see output something like this:
 
-======================== test session starts ========================
-platform Python 3.5.1, pytest-2.9.1, py-1.4.31, pluggy-0.3.1
-rootdir: /Users/stevepiercy/projects/pyramidtut/tutorial, inifile:
-plugins: cov-2.2.1
-collected 2 items
+.. code-block:: bash
 
-tutorial/tests.py ..
------------------- coverage: platform Python 3.5.1 ------------------
-Name                               Stmts   Miss  Cover
-------------------------------------------------------
-tutorial/__init__.py                  13      9    31%
-tutorial/models.py                    12      0   100%
-tutorial/scripts/__init__.py           0      0   100%
-tutorial/scripts/initializedb.py      24     24     0%
-tutorial/tests.py                     39      0   100%
-tutorial/views.py                     11      0   100%
-------------------------------------------------------
-TOTAL                                 99     33    67%
+   ======================== test session starts ========================
+   platform Python 3.5.1, pytest-2.9.1, py-1.4.31, pluggy-0.3.1
+   rootdir: /Users/stevepiercy/projects/pyramidtut/tutorial, inifile:
+   plugins: cov-2.2.1
+   collected 2 items
 
-===================== 2 passed in 0.57 seconds ======================
+   tutorial/tests.py ..
+   ------------------ coverage: platform Python 3.5.1 ------------------
+   Name                               Stmts   Miss  Cover
+   ------------------------------------------------------
+   tutorial/__init__.py                  13      9    31%
+   tutorial/models.py                    12      0   100%
+   tutorial/scripts/__init__.py           0      0   100%
+   tutorial/scripts/initializedb.py      24     24     0%
+   tutorial/tests.py                     39      0   100%
+   tutorial/views.py                     11      0   100%
+   ------------------------------------------------------
+   TOTAL                                 99     33    67%
+
+   ===================== 2 passed in 0.57 seconds ======================
 
 Our package doesn't quite have 100% test coverage.
 
