@@ -260,6 +260,13 @@ def http_cached_view(view, info):
 http_cached_view.options = ('http_cache',)
 
 def secured_view(view, info):
+    for wrapper in (_secured_view, _authdebug_view):
+        view = wraps_view(wrapper)(view, info)
+    return view
+
+secured_view.options = ('permission',)
+
+def _secured_view(view, info):
     permission = info.options.get('permission')
     if permission == NO_PERMISSION_REQUIRED:
         # allow views registered within configurations that have a
@@ -291,9 +298,7 @@ def secured_view(view, info):
 
     return wrapped_view
 
-secured_view.options = ('permission',)
-
-def authdebug_view(view, info):
+def _authdebug_view(view, info):
     wrapped_view = view
     settings = info.settings
     permission = info.options.get('permission')
@@ -329,8 +334,6 @@ def authdebug_view(view, info):
         wrapped_view = _authdebug_view
 
     return wrapped_view
-
-authdebug_view.options = ('permission',)
 
 def predicated_view(view, info):
     preds = info.predicates
@@ -451,3 +454,6 @@ def decorated_view(view, info):
     return decorator(view)
 
 decorated_view.options = ('decorator',)
+
+VIEW = 'VIEW'
+INGRESS = 'INGRESS'
