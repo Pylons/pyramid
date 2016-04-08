@@ -240,7 +240,7 @@ we need to edit our ``setup.py``:
 
 .. code-block:: python
    :linenos:
-   :emphasize-lines: 23-29,49-51
+   :emphasize-lines: 22-26,46-48
 
    import os
 
