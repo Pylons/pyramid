@@ -670,6 +670,21 @@ There exists a recipe within the :term:`Pyramid Community Cookbook` named
 :ref:`Mako Internationalization <cookbook:mako_i18n>` which explains how to add
 idiomatic i18n support to :term:`Mako` templates.
 
+
+.. index::
+   single: Jinja2 i18n
+
+Jinja2 Pyramid i18n Support
+---------------------------
+
+The add-on `pyramid_jinja2 <https://github.com/Pylons/pyramid_jinja2>`_
+provides a scaffold with an example of how to use internationalization with
+Jinja2 in Pyramid. See the documentation sections `Internalization (i18n)
+<http://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/#internalization-i18n>`_
+and `Paster Template I18N
+<http://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/#paster-template-i18n>`_.
+
+
 .. index::
    single: localization deployment settings
    single:  default_locale_name
