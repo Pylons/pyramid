@@ -263,11 +263,8 @@ we need to edit our ``setup.py``:
        'waitress',
        ]
 
-   tests_require = [
+   testing_extras = [
        'WebTest >= 1.3.1',  # py3 compat
-       ]
-
-   testing_extras = tests_require + [
        'pytest',  # includes virtualenv
        'pytest-cov',
        ]
@@ -293,7 +290,6 @@ we need to edit our ``setup.py``:
          extras_require={
              'testing': testing_extras,
          },
-         tests_require=tests_require,
          install_requires=requires,
          entry_points="""\
          [paste.app_factory]
