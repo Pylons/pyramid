@@ -72,8 +72,8 @@ Python 3.5:
    c:\> c:\Python35\Scripts\virtualenv %VENV%
 
 
-Upgrade pip in the virtual environment
---------------------------------------
+Upgrade ``pip`` in the virtual environment
+------------------------------------------
 
 On UNIX
 ^^^^^^^
@@ -187,16 +187,15 @@ On Windows
    and the project into directories that do not contain spaces in their paths.
 
 
-
 .. _installing_project_in_dev_mode:
 
 Installing the project in development mode
 ------------------------------------------
 
 In order to do development on the project easily, you must "register" the
-project as a development egg in your workspace using the ``setup.py develop``
+project as a development egg in your workspace using the ``pip install -e .``
 command. In order to do so, change directory to the ``tutorial`` directory that
-you created in :ref:`sql_making_a_project`, and run the ``setup.py develop``
+you created in :ref:`sql_making_a_project`, and run the ``pip install -e .``
 command using the virtualenv Python interpreter.
 
 On UNIX
@@ -215,25 +214,130 @@ On Windows
    c:\pyramidtut> cd tutorial
    c:\pyramidtut\tutorial> %VENV%\Scripts\pip install -e .
 
-The console will show ``setup.py`` checking for packages and installing missing
-packages. Success executing this command will show a line like the following::
+The console will show ``pip`` checking for packages and installing missing
+packages. Success executing this command will show a line like the following:
 
-   Finished processing dependencies for tutorial==0.0
+.. code-block:: bash
+
+   Successfully installed Chameleon-2.24 Mako-1.0.4 MarkupSafe-0.23 \
+   Pygments-2.1.3 SQLAlchemy-1.0.12 pyramid-chameleon-0.3 \
+   pyramid-debugtoolbar-2.4.2 pyramid-mako-1.0.2 pyramid-tm-0.12.1 \
+   transaction-1.4.4 tutorial waitress-0.8.10 zope.sqlalchemy-0.7.6
+
+
+.. _install-testing-requirements:
+
+Install testing requirements
+----------------------------
+
+In order to run tests, we need to install the testing requirements, which means
+we need to edit our ``setup.py``:
+
+.. .. literalinclude:: src/installation/setup.py
+   :language: py
+   :linenos:
+   :emphasize-lines: 23-30,50-52
+
+.. code-block:: python
+   :linenos:
+   :emphasize-lines: 23-29,49-51
+
+   import os
+
+   from setuptools import setup, find_packages
+
+   here = os.path.abspath(os.path.dirname(__file__))
+   with open(os.path.join(here, 'README.txt')) as f:
+       README = f.read()
+   with open(os.path.join(here, 'CHANGES.txt')) as f:
+       CHANGES = f.read()
+
+   requires = [
+       'pyramid',
+       'pyramid_jinja2',
+       'pyramid_debugtoolbar',
+       'pyramid_tm',
+       'SQLAlchemy',
+       'transaction',
+       'zope.sqlalchemy',
+       'waitress',
+       ]
+
+   tests_require = [
+       'WebTest >= 1.3.1',  # py3 compat
+       ]
+
+   testing_extras = tests_require + [
+       'pytest',  # includes virtualenv
+       'pytest-cov',
+       ]
+
+   setup(name='tutorial',
+         version='0.0',
+         description='tutorial',
+         long_description=README + '\n\n' + CHANGES,
+         classifiers=[
+           "Programming Language :: Python",
+           "Framework :: Pyramid",
+           "Topic :: Internet :: WWW/HTTP",
+           "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
+           ],
+         author='',
+         author_email='',
+         url='',
+         keywords='web wsgi bfg pylons pyramid',
+         packages=find_packages(),
+         include_package_data=True,
+         zip_safe=False,
+         test_suite='tutorial',
+         extras_require={
+             'testing': testing_extras,
+         },
+         tests_require=tests_require,
+         install_requires=requires,
+         entry_points="""\
+         [paste.app_factory]
+         main = tutorial:main
+         [console_scripts]
+         initialize_tutorial_db = tutorial.scripts.initializedb:main
+         """,
+         )
+
+Only the emphasized lines need to be edited.
+
+Next install the testing requirements.
+
+On UNIX
+^^^^^^^
+
+.. code-block:: bash
+
+   $ $VENV/bin/pip install -e ".[testing]"
+
+On Windows
+^^^^^^^^^^
+
+.. code-block:: ps1con
+
+   c:\pyramidtut\tutorial> %VENV%\Scripts\pip install -e ".[testing]"
+
 
 .. _sql_running_tests:
 
 Run the tests
 -------------
 
-After you've installed the project in development mode, you may run the tests
-for the project.
+After you've installed the project in development mode as well as the testing
+requirements, you may run the tests for the project.
 
 On UNIX
 ^^^^^^^
 
 .. code-block:: bash
 
-   $ $VENV/bin/python setup.py test -q
+   $ $VENV/bin/py.test tutorial/tests.py -q
+
+.. TODO remove comments
 
 .. py.test? See https://github.com/Pylons/pyramid/issues/2104#issuecomment-155852046
 
@@ -242,79 +346,65 @@ On Windows
 
 .. code-block:: ps1con
 
-   c:\pyramidtut\tutorial> %VENV%\Scripts\python setup.py test -q
+   c:\pyramidtut\tutorial> %VENV%\Scripts\py.test tutorial\tests.py -q
 
 .. py.test? See https://github.com/Pylons/pyramid/issues/2104#issuecomment-155852046
 
-For a successful test run, you should see output that ends like this::
+For a successful test run, you should see output that ends like this:
+
+.. code-block:: bash
 
    ..
-   ----------------------------------------------------------------------
-   Ran 2 tests in 0.053s
+   2 passed in 0.44 seconds
 
-   OK
 
 Expose test coverage information
 --------------------------------
 
-You can run the ``nosetests`` command to see test coverage information. This
-runs the tests in the same way that ``setup.py test`` does, but provides
-additional "coverage" information, exposing which lines of your project are
-covered by the tests.
+You can run the ``py.test`` command to see test coverage information. This
+runs the tests in the same way that ``py.test`` does, but provides additional
+"coverage" information, exposing which lines of your project are covered by the
+tests.
 
-To get this functionality working, we'll need to install the ``nose`` and
-``coverage`` packages into our ``virtualenv``:
-
-On UNIX
-^^^^^^^
-
-.. code-block:: bash
-
-   $ $VENV/bin/easy_install nose coverage
-
-On Windows
-^^^^^^^^^^
-
-.. code-block:: ps1con
-
-   c:\pyramidtut\tutorial> %VENV%\Scripts\easy_install nose coverage
-
-Once ``nose`` and ``coverage`` are installed, we can run the tests with
-coverage.
+We've already installed the ``pytest-cov`` package into our ``virtualenv``, so
+we can run the tests with coverage.
 
 On UNIX
 ^^^^^^^
 
 .. code-block:: bash
 
-   $ $VENV/bin/nosetests --cover-package=tutorial --cover-erase --with-coverage
+   $ $VENV/bin/py.test --cov=tutorial tutorial/tests.py
 
 On Windows
 ^^^^^^^^^^
 
 .. code-block:: ps1con
 
-   c:\pyramidtut\tutorial> %VENV%\Scripts\nosetests --cover-package=tutorial \
-         --cover-erase --with-coverage
+   c:\pyramidtut\tutorial> %VENV%\Scripts\py.test --cov=tutorial tutorial\tests.py
 
 If successful, you will see output something like this::
 
-   ..
-   Name                         Stmts   Miss  Cover   Missing
-   ----------------------------------------------------------
-   tutorial.py                      8      6    25%   7-12
-   tutorial/models.py              22      0   100%
-   tutorial/models/meta.py          5      0   100%
-   tutorial/models/mymodel.py       8      0   100%
-   tutorial/scripts.py              0      0   100%
-   tutorial/views.py                0      0   100%
-   tutorial/views/default.py       12      0   100%
-   ----------------------------------------------------------
-   TOTAL                           55      6    89%
-   ----------------------------------------------------------------------
-   Ran 2 tests in 0.579s
+======================== test session starts ========================
+platform Python 3.5.1, pytest-2.9.1, py-1.4.31, pluggy-0.3.1
+rootdir: /Users/stevepiercy/projects/pyramidtut/tutorial, inifile:
+plugins: cov-2.2.1
+collected 2 items
 
-   OK
+tutorial/tests.py ..
+------------------ coverage: platform Python 3.5.1 ------------------
+Name                               Stmts   Miss  Cover
+------------------------------------------------------
+tutorial/__init__.py                  13      9    31%
+tutorial/models.py                    12      0   100%
+tutorial/scripts/__init__.py           0      0   100%
+tutorial/scripts/initializedb.py      24     24     0%
+tutorial/tests.py                     39      0   100%
+tutorial/views.py                     11      0   100%
+------------------------------------------------------
+TOTAL                                 99     33    67%
+
+===================== 2 passed in 0.57 seconds ======================
 
 Our package doesn't quite have 100% test coverage.
 
