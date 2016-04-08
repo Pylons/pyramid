@@ -374,14 +374,15 @@ On UNIX
 
 .. code-block:: bash
 
-   $ $VENV/bin/py.test --cov=tutorial tutorial/tests.py
+   $ $VENV/bin/py.test --cov=tutorial --cov-report=term-missing tutorial/tests.py
 
 On Windows
 ^^^^^^^^^^
 
 .. code-block:: ps1con
 
-   c:\pyramidtut\tutorial> %VENV%\Scripts\py.test --cov=tutorial tutorial\tests.py
+   c:\pyramidtut\tutorial> %VENV%\Scripts\py.test --cov=tutorial \
+       --cov-report=term-missing tutorial\tests.py
 
 If successful, you will see output something like this:
 
@@ -395,15 +396,15 @@ If successful, you will see output something like this:
 
    tutorial/tests.py ..
    ------------------ coverage: platform Python 3.5.1 ------------------
-   Name                               Stmts   Miss  Cover
-   ------------------------------------------------------
-   tutorial/__init__.py                  13      9    31%
+   Name                               Stmts   Miss  Cover   Missing
+   ----------------------------------------------------------------
+   tutorial/__init__.py                  13      9    31%   13-21
    tutorial/models.py                    12      0   100%
    tutorial/scripts/__init__.py           0      0   100%
-   tutorial/scripts/initializedb.py      24     24     0%
+   tutorial/scripts/initializedb.py      24     24     0%   1-40
    tutorial/tests.py                     39      0   100%
    tutorial/views.py                     11      0   100%
-   ------------------------------------------------------
+   ----------------------------------------------------------------
    TOTAL                                 99     33    67%
 
    ===================== 2 passed in 0.57 seconds ======================
