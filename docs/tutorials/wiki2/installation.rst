@@ -286,7 +286,6 @@ we need to edit our ``setup.py``:
          packages=find_packages(),
          include_package_data=True,
          zip_safe=False,
-         test_suite='tutorial',
          extras_require={
              'testing': testing_extras,
          },
