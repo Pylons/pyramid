@@ -1617,6 +1617,14 @@ the user-defined :term:`view callable`:
   view pipeline interface to accept ``(context, request)`` from all previous
   view derivers.
 
+.. warning::
+
+   Any view derivers defined ``under`` the ``rendered_view`` are not
+   guaranteed to receive a valid response object. Rather they will receive the
+   result from the :term:`view mapper` which is likely the original response
+   returned from the view. This is possibly a dictionary for a renderer but it
+   may be any Python object that may be adapted into a response.
+
 Custom View Derivers
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -1642,7 +1650,7 @@ view pipeline:
            response.headers['X-View-Performance'] = '%.3f' % (end - start,)
        return wrapper_view
 
-   config.add_view_deriver(timing_view, 'timing view')
+   config.add_view_deriver(timing_view)
 
 View derivers are unique in that they have access to most of the options
 passed to :meth:`pyramid.config.Configurator.add_view` in order to decide what
@@ -1668,7 +1676,7 @@ token unless ``disable_csrf=True`` is passed to the view:
 
    require_csrf_view.options = ('disable_csrf',)
 
-   config.add_view_deriver(require_csrf_view, 'require_csrf_view')
+   config.add_view_deriver(require_csrf_view)
 
    def protected_view(request):
        return Response('protected')
@@ -1691,12 +1699,18 @@ By default, every new view deriver is added between the ``decorated_view`` and
 ``rendered_view`` built-in derivers. It is possible to customize this ordering
 using the ``over`` and ``under`` options. Each option can use the names of
 other view derivers in order to specify an ordering. There should rarely be a
-reason to worry about the ordering of the derivers.
+reason to worry about the ordering of the derivers except when the deriver
+depends on other operations in the view pipeline.
 
 Both ``over`` and ``under`` may also be iterables of constraints. For either
 option, if one or more constraints was defined, at least one must be satisfied,
 else a :class:`pyramid.exceptions.ConfigurationError` will be raised. This may
 be used to define fallback constraints if another deriver is missing.
+
+Two sentinel values exist, :attr:`pyramid.viewderivers.INGRESS` and
+:attr:`pyramid.viewderivers.VIEW`, which may be used when specifying
+constraints at the edges of the view pipeline. For example, to add a deriver
+at the start of the pipeline you may use ``under=INGRESS``.
 
 It is not possible to add a view deriver under the ``mapped_view`` as the
 :term:`view mapper` is intimately tied to the signature of the user-defined
@@ -1707,8 +1721,12 @@ deriver.
 
 .. warning::
 
-   Any view derivers defined ``under`` the ``rendered_view`` are not
-   guaranteed to receive a valid response object. Rather they will receive the
-   result from the :term:`view mapper` which is likely the original response
-   returned from the view. This is possibly a dictionary for a renderer but it
-   may be any Python object that may be adapted into a response.
+   The default constraints for any view deriver are ``over='rendered_view'``
+   and ``under='decorated_view'``. When escaping these constraints you must
+   take care to avoid cyclic dependencies between derivers. For example, if
+   you want to add a new view deriver before ``secured_view`` then
+   simply specifying ``over='secured_view'`` is not enough, because the
+   default is also under ``decorated view`` there will be an unsatisfiable
+   cycle. You must specify a valid ``under`` constraint as well, such as
+   ``under=INGRESS`` to fall between INGRESS and ``secured_view`` at the
+   beginning of the view pipeline.

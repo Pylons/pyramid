@@ -80,7 +80,7 @@ import pyramid.viewderivers
 
 from pyramid.viewderivers import (
     INGRESS,
-    MAPPED_VIEW,
+    VIEW,
     preserve_view_attrs,
     view_description,
     requestonly,
@@ -1115,9 +1115,12 @@ class ViewsConfiguratorMixin(object):
         ``under`` means closer to the user-defined :term:`view callable`,
         and ``over`` means closer to view pipeline ingress.
 
-        Specifying neither ``under`` nor ``over`` is equivalent to specifying
-        ``over='rendered_view'`` and ``under='decorated_view'``, placing the
-        deriver somewhere between the ``decorated_view`` and ``rendered_view``
+        The default value for ``over`` is ``rendered_view`` and ``under`` is
+        ``decorated_view``. This places the deriver somewhere between the two
+        in the view pipeline. If the deriver should be placed elsewhere in the
+        pipeline, such as above ``decorated_view``, then you MUST also specify
+        ``under`` to something earlier in the order, or a
+        ``CyclicDependencyError`` will be raised when trying to sort the
         derivers.
 
         See :ref:`view_derivers` for more information.
@@ -1128,33 +1131,30 @@ class ViewsConfiguratorMixin(object):
         if name is None:
             name = deriver.__name__
 
-        if name in (INGRESS,):
+        if name in (INGRESS, VIEW):
             raise ConfigurationError('%s is a reserved view deriver name'
                                      % name)
 
-        if under is None and over is None:
+        if under is None:
             under = 'decorated_view'
+
+        if over is None:
             over = 'rendered_view'
 
-        if over is None and name != MAPPED_VIEW:
-            raise ConfigurationError('must specify an "over" constraint for '
-                                     'the %s view deriver' % name)
-        elif over is not None:
-            over = as_sorted_tuple(over)
+        over = as_sorted_tuple(over)
+        under = as_sorted_tuple(under)
 
-        if under is None:
-            raise ConfigurationError('must specify an "under" constraint for '
-                                     'the %s view deriver' % name)
-        else:
-            under = as_sorted_tuple(under)
+        if INGRESS in over:
+            raise ConfigurationError('%s cannot be over INGRESS' % name)
 
-        if over is not None and INGRESS in over:
-            raise ConfigurationError('%s cannot be over view deriver INGRESS'
-                                     % name)
+        # ensure everything is always over mapped_view
+        if VIEW in over and name != 'mapped_view':
+            over = as_sorted_tuple(over + ('mapped_view',))
 
-        if MAPPED_VIEW in under:
-            raise ConfigurationError('%s cannot be under view deriver '
-                                     'MAPPED_VIEW' % name)
+        if VIEW in under:
+            raise ConfigurationError('%s cannot be under VIEW' % name)
+        if 'mapped_view' in under:
+            raise ConfigurationError('%s cannot be under "mapped_view"' % name)
 
         discriminator = ('view deriver', name)
         intr = self.introspectable(
@@ -1173,7 +1173,7 @@ class ViewsConfiguratorMixin(object):
                     default_before=None,
                     default_after=INGRESS,
                     first=INGRESS,
-                    last=MAPPED_VIEW,
+                    last=VIEW,
                 )
                 self.registry.registerUtility(derivers, IViewDerivers)
             derivers.add(name, deriver, before=over, after=under)
@@ -1188,6 +1188,7 @@ class ViewsConfiguratorMixin(object):
             ('http_cached_view', d.http_cached_view),
             ('decorated_view', d.decorated_view),
             ('rendered_view', d.rendered_view),
+            ('mapped_view', d.mapped_view),
         ]
         last = INGRESS
         for name, deriver in derivers:
@@ -1195,11 +1196,9 @@ class ViewsConfiguratorMixin(object):
                 deriver,
                 name=name,
                 under=last,
-                over=MAPPED_VIEW,
+                over=VIEW,
             )
             last = name
-
-        self.add_view_deriver(d.mapped_view, name=MAPPED_VIEW, under=last)
 
     def derive_view(self, view, attr=None, renderer=None):
         """

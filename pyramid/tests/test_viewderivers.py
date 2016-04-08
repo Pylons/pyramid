@@ -1239,6 +1239,25 @@ class TestAddDeriver(unittest.TestCase):
         self.assertFalse(flags.get('deriv1'))
         self.assertTrue(flags.get('deriv2'))
 
+    def test_override_mapped_view(self):
+        from pyramid.viewderivers import VIEW
+        response = DummyResponse()
+        view = lambda *arg: response
+        flags = {}
+
+        def deriv1(view, info):
+            flags['deriv1'] = True
+            return view
+
+        result = self.config._derive_view(view)
+        self.assertFalse(flags.get('deriv1'))
+
+        flags.clear()
+        self.config.add_view_deriver(
+            deriv1, name='mapped_view', under='rendered_view', over=VIEW)
+        result = self.config._derive_view(view)
+        self.assertTrue(flags.get('deriv1'))
+
     def test_add_multi_derivers_ordered(self):
         from pyramid.viewderivers import INGRESS
         response = DummyResponse()
@@ -1277,34 +1296,25 @@ class TestAddDeriver(unittest.TestCase):
         self.assertRaises(
             ConfigurationError, self.config.add_view_deriver, deriv1, INGRESS)
 
-    def test_add_deriver_enforces_over_is_defined(self):
-        from pyramid.exceptions import ConfigurationError
-        def deriv1(view, info): pass
-        try:
-            self.config.add_view_deriver(deriv1, under='rendered_view')
-        except ConfigurationError as ex:
-            self.assertTrue('must specify an "over" constraint' in ex.args[0])
-        else: # pragma: no cover
-            raise AssertionError
-
-    def test_add_deriver_enforces_under_is_defined(self):
-        from pyramid.exceptions import ConfigurationError
-        def deriv1(view, info): pass
-        try:
-            self.config.add_view_deriver(deriv1, over='rendered_view')
-        except ConfigurationError as ex:
-            self.assertTrue('must specify an "under" constraint' in ex.args[0])
-        else: # pragma: no cover
-            raise AssertionError
-
     def test_add_deriver_enforces_ingress_is_first(self):
         from pyramid.exceptions import ConfigurationError
         from pyramid.viewderivers import INGRESS
         def deriv1(view, info): pass
         try:
-            self.config.add_view_deriver(deriv1, under='rendered_view', over=INGRESS)
+            self.config.add_view_deriver(deriv1, over=INGRESS)
         except ConfigurationError as ex:
-            self.assertTrue('cannot be over view deriver INGRESS' in ex.args[0])
+            self.assertTrue('cannot be over INGRESS' in ex.args[0])
+        else: # pragma: no cover
+            raise AssertionError
+
+    def test_add_deriver_enforces_view_is_last(self):
+        from pyramid.exceptions import ConfigurationError
+        from pyramid.viewderivers import VIEW
+        def deriv1(view, info): pass
+        try:
+            self.config.add_view_deriver(deriv1, under=VIEW)
+        except ConfigurationError as ex:
+            self.assertTrue('cannot be under VIEW' in ex.args[0])
         else: # pragma: no cover
             raise AssertionError
 
@@ -1312,10 +1322,9 @@ class TestAddDeriver(unittest.TestCase):
         from pyramid.exceptions import ConfigurationError
         def deriv1(view, info): pass
         try:
-            self.config.add_view_deriver(
-                deriv1, 'deriv1', 'mapped_view', 'rendered_view')
+            self.config.add_view_deriver(deriv1, 'deriv1', under='mapped_view')
         except ConfigurationError as ex:
-            self.assertTrue('cannot be under view deriver MAPPED_VIEW' in ex.args[0])
+            self.assertTrue('cannot be under "mapped_view"' in ex.args[0])
         else: # pragma: no cover
             raise AssertionError
 

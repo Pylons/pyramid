@@ -455,5 +455,5 @@ def decorated_view(view, info):
 
 decorated_view.options = ('decorator',)
 
-MAPPED_VIEW = 'mapped_view'
+VIEW = 'VIEW'
 INGRESS = 'INGRESS'
