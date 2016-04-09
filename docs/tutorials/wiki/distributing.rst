@@ -1,3 +1,5 @@
+.. _wiki_distributing_your_application:
+
 =============================
 Distributing Your Application
 =============================

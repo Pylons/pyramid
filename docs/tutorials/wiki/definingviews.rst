@@ -1,3 +1,5 @@
+.. _wiki_defining_views:
+
 ==============
 Defining Views
 ==============

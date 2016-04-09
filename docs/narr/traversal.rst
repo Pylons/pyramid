@@ -532,7 +532,7 @@ References
 ----------
 
 A tutorial showing how :term:`traversal` can be used within a :app:`Pyramid`
-application exists in :ref:`bfg_wiki_tutorial`.
+application exists in :ref:`bfg_zodb_wiki_tutorial`.
 
 See the :ref:`view_config_chapter` chapter for detailed information about
 :term:`view lookup`.
