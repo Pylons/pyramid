@@ -230,77 +230,22 @@ packages. Success executing this command will show a line like the following:
 Install testing requirements
 ----------------------------
 
-In order to run tests, we need to install the testing requirements, which means
-we need to edit our ``setup.py``:
+In order to run tests, we need to install the testing requirements. This is
+done through our project's ``setup.py`` file, in the ``testing_extras`` and
+``extras_requires`` stanzas, and by issuing the command below for your
+operating system.
 
-.. .. literalinclude:: src/installation/setup.py
-   :language: py
+.. literalinclude:: src/installation/setup.py
+   :language: python
    :linenos:
-   :emphasize-lines: 23-30,50-52
+   :lineno-start: 22
+   :lines: 22-26
 
-.. code-block:: python
+.. literalinclude:: src/installation/setup.py
+   :language: python
    :linenos:
-   :emphasize-lines: 22-26,46-48
-
-   import os
-
-   from setuptools import setup, find_packages
-
-   here = os.path.abspath(os.path.dirname(__file__))
-   with open(os.path.join(here, 'README.txt')) as f:
-       README = f.read()
-   with open(os.path.join(here, 'CHANGES.txt')) as f:
-       CHANGES = f.read()
-
-   requires = [
-       'pyramid',
-       'pyramid_jinja2',
-       'pyramid_debugtoolbar',
-       'pyramid_tm',
-       'SQLAlchemy',
-       'transaction',
-       'zope.sqlalchemy',
-       'waitress',
-       ]
-
-   testing_extras = [
-       'WebTest >= 1.3.1',  # py3 compat
-       'pytest',  # includes virtualenv
-       'pytest-cov',
-       ]
-
-   setup(name='tutorial',
-         version='0.0',
-         description='tutorial',
-         long_description=README + '\n\n' + CHANGES,
-         classifiers=[
-           "Programming Language :: Python",
-           "Framework :: Pyramid",
-           "Topic :: Internet :: WWW/HTTP",
-           "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
-           ],
-         author='',
-         author_email='',
-         url='',
-         keywords='web wsgi bfg pylons pyramid',
-         packages=find_packages(),
-         include_package_data=True,
-         zip_safe=False,
-         extras_require={
-             'testing': testing_extras,
-         },
-         install_requires=requires,
-         entry_points="""\
-         [paste.app_factory]
-         main = tutorial:main
-         [console_scripts]
-         initialize_tutorial_db = tutorial.scripts.initializedb:main
-         """,
-         )
-
-Only the emphasized lines need to be edited.
-
-Next install the testing requirements.
+   :lineno-start: 45
+   :lines: 45-47
 
 On UNIX
 ^^^^^^^
@@ -332,18 +277,12 @@ On UNIX
 
    $ $VENV/bin/py.test tutorial/tests.py -q
 
-.. TODO remove comments
-
-.. py.test? See https://github.com/Pylons/pyramid/issues/2104#issuecomment-155852046
-
 On Windows
 ^^^^^^^^^^
 
 .. code-block:: ps1con
 
    c:\pyramidtut\tutorial> %VENV%\Scripts\py.test tutorial\tests.py -q
-
-.. py.test? See https://github.com/Pylons/pyramid/issues/2104#issuecomment-155852046
 
 For a successful test run, you should see output that ends like this:
 
@@ -393,14 +332,19 @@ If successful, you will see output something like this:
    ------------------ coverage: platform Python 3.5.1 ------------------
    Name                               Stmts   Miss  Cover   Missing
    ----------------------------------------------------------------
-   tutorial/__init__.py                  13      9    31%   13-21
-   tutorial/models.py                    12      0   100%
+   tutorial/__init__.py                   8      6    25%   7-12
+   tutorial/models/__init__.py           22      0   100%
+   tutorial/models/meta.py                5      0   100%
+   tutorial/models/mymodel.py             8      0   100%
+   tutorial/routes.py                     3      3     0%   1-3
    tutorial/scripts/__init__.py           0      0   100%
-   tutorial/scripts/initializedb.py      24     24     0%   1-40
+   tutorial/scripts/initializedb.py      26     26     0%   1-45
    tutorial/tests.py                     39      0   100%
-   tutorial/views.py                     11      0   100%
+   tutorial/views/__init__.py             0      0   100%
+   tutorial/views/default.py             12      0   100%
+   tutorial/views/notfound.py             4      4     0%   1-7
    ----------------------------------------------------------------
-   TOTAL                                 99     33    67%
+   TOTAL                                127     39    69%
 
    ===================== 2 passed in 0.57 seconds ======================
 
@@ -446,15 +390,17 @@ On Windows
 
    c:\pyramidtut\tutorial> %VENV%\Scripts\initialize_tutorial_db development.ini
 
-The output to your console should be something like this::
+The output to your console should be something like this:
 
-   2016-02-21 23:57:41,793 INFO  [sqlalchemy.engine.base.Engine:1192][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
-   2016-02-21 23:57:41,793 INFO  [sqlalchemy.engine.base.Engine:1193][MainThread] ()
-   2016-02-21 23:57:41,794 INFO  [sqlalchemy.engine.base.Engine:1192][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
-   2016-02-21 23:57:41,794 INFO  [sqlalchemy.engine.base.Engine:1193][MainThread] ()
-   2016-02-21 23:57:41,796 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] PRAGMA table_info("models")
-   2016-02-21 23:57:41,796 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
-   2016-02-21 23:57:41,798 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread]
+.. code-block:: bash
+
+   2016-04-09 00:53:37,801 INFO  [sqlalchemy.engine.base.Engine:1192][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
+   2016-04-09 00:53:37,801 INFO  [sqlalchemy.engine.base.Engine:1193][MainThread] ()
+   2016-04-09 00:53:37,802 INFO  [sqlalchemy.engine.base.Engine:1192][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
+   2016-04-09 00:53:37,802 INFO  [sqlalchemy.engine.base.Engine:1193][MainThread] ()
+   2016-04-09 00:53:37,802 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] PRAGMA table_info("models")
+   2016-04-09 00:53:37,803 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
+   2016-04-09 00:53:37,803 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread]
    CREATE TABLE models (
            id INTEGER NOT NULL,
            name TEXT,
@@ -463,15 +409,15 @@ The output to your console should be something like this::
    )
 
 
-   2016-02-21 23:57:41,798 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
-   2016-02-21 23:57:41,798 INFO  [sqlalchemy.engine.base.Engine:686][MainThread] COMMIT
-   2016-02-21 23:57:41,799 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] CREATE UNIQUE INDEX my_index ON models (name)
-   2016-02-21 23:57:41,799 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
-   2016-02-21 23:57:41,799 INFO  [sqlalchemy.engine.base.Engine:686][MainThread] COMMIT
-   2016-02-21 23:57:41,801 INFO  [sqlalchemy.engine.base.Engine:646][MainThread] BEGIN (implicit)
-   2016-02-21 23:57:41,802 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] INSERT INTO models (name, value) VALUES (?, ?)
-   2016-02-21 23:57:41,802 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ('one', 1)
-   2016-02-21 23:57:41,821 INFO  [sqlalchemy.engine.base.Engine:686][MainThread] COMMIT
+   2016-04-09 00:53:37,803 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
+   2016-04-09 00:53:37,804 INFO  [sqlalchemy.engine.base.Engine:686][MainThread] COMMIT
+   2016-04-09 00:53:37,805 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] CREATE UNIQUE INDEX my_index ON models (name)
+   2016-04-09 00:53:37,805 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
+   2016-04-09 00:53:37,806 INFO  [sqlalchemy.engine.base.Engine:686][MainThread] COMMIT
+   2016-04-09 00:53:37,807 INFO  [sqlalchemy.engine.base.Engine:646][MainThread] BEGIN (implicit)
+   2016-04-09 00:53:37,808 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] INSERT INTO models (name, value) VALUES (?, ?)
+   2016-04-09 00:53:37,808 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ('one', 1)
+   2016-04-09 00:53:37,809 INFO  [sqlalchemy.engine.base.Engine:686][MainThread] COMMIT
 
 Success!  You should now have a ``tutorial.sqlite`` file in your current
 working directory. This is an SQLite database with a single table defined in it
@@ -534,15 +480,8 @@ assumptions:
 
 - You are willing to use :term:`URL dispatch` to map URLs to code.
 
-- You want to use zope.sqlalchemy_, pyramid_tm_ and the transaction_ package
+- You want to use zope.sqlalchemy_, pyramid_tm_, and the transaction_ packages
   to scope sessions to requests.
-
-- You want to use pyramid_jinja2_ to render your templates.
-  Different templating engines can be used but we had to choose one to
-  make the tutorial. See :ref:`available_template_system_bindings` for some
-  options.
-- You want to use zope.sqlalchemy_, pyramid_tm_ and the transaction_ package to
-  scope sessions to requests.
 
 - You want to use pyramid_jinja2_ to render your templates. Different
   templating engines can be used, but we had to choose one to make this
