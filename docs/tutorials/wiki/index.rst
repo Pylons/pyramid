@@ -1,4 +1,4 @@
-.. _bfg_wiki_tutorial:
+.. _bfg_zodb_wiki_tutorial:
 
 ZODB + Traversal Wiki Tutorial
 ==============================
