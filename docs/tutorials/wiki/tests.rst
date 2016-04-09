@@ -1,3 +1,5 @@
+.. _wiki_adding_tests:
+
 ============
 Adding Tests
 ============

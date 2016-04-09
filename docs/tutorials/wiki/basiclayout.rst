@@ -1,3 +1,5 @@
+.. _wiki_basic_layout:
+
 ============
 Basic Layout
 ============
