@@ -1,3 +1,5 @@
+.. _wiki2_defining_the_domain_model:
+
 =========================
 Defining the Domain Model
 =========================
