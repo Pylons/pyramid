@@ -25,9 +25,9 @@ testing_extras = [
     'pytest-cov',
     ]
 
-setup(name='{{project}}',
+setup(name='tutorial',
       version='0.0',
-      description='{{project}}',
+      description='tutorial',
       long_description=README + '\n\n' + CHANGES,
       classifiers=[
           "Programming Language :: Python",
@@ -48,8 +48,8 @@ setup(name='{{project}}',
       install_requires=requires,
       entry_points="""\
       [paste.app_factory]
-      main = {{package}}:main
+      main = tutorial:main
       [console_scripts]
-      initialize_{{project}}_db = {{package}}.scripts.initializedb:main
+      initialize_tutorial_db = tutorial.scripts.initializedb:main
       """,
       )
