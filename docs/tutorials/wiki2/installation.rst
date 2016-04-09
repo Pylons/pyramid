@@ -1,3 +1,5 @@
+.. _wiki2_installation:
+
 ============
 Installation
 ============
