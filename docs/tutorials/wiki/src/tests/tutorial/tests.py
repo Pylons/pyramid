@@ -164,6 +164,10 @@ class FunctionalTests(unittest.TestCase):
         res = self.testapp.get('/SomePage', status=404)
         self.assertTrue(b'Not Found' in res.body)
 
+    def test_referrer_is_login(self):
+        res = self.testapp.get('/login', status=200)
+        self.assertTrue(b'name="came_from" value="/"' in res.body)
+
     def test_successful_log_in(self):
         res = self.testapp.get( self.viewer_login, status=302)
         self.assertEqual(res.location, 'http://localhost/FrontPage')
