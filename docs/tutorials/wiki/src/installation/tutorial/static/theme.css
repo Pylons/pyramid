@@ -72,10 +72,12 @@ p {
   color: #f2b7bd;
   font-weight: 400;
 }
-.starter-template .links ul li a {
-  color: #ffffff;
+.starter-template .links ul li a, a {
+  color: #f2b7bd;
+  text-decoration: underline;
 }
-.starter-template .links ul li a:hover {
+.starter-template .links ul li a:hover, a:hover {
+  color: #ffffff;
   text-decoration: underline;
 }
 .starter-template .links ul li .icon-muted {
