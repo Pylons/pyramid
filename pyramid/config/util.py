@@ -5,6 +5,7 @@ from pyramid.compat import (
     bytes_,
     getargspec,
     is_nonstr_iter,
+    string_types,
     )
 
 from pyramid.compat import im_func
@@ -22,6 +23,12 @@ ActionInfo = ActionInfo # support bw compat imports
 
 MAX_ORDER = 1 << 30
 DEFAULT_PHASH = md5().hexdigest()
+
+def is_string_or_iterable(v):
+    if isinstance(v, string_types):
+        return True
+    if hasattr(v, '__iter__'):
+        return True
 
 def as_sorted_tuple(val):
     if not is_nonstr_iter(val):
@@ -114,6 +121,10 @@ class PredicateList(object):
             after=weighs_more_than,
             before=weighs_less_than,
             )
+
+    def names(self):
+        # Return the list of valid predicate names.
+        return self.sorter.names
 
     def make(self, config, **kw):
         # Given a configurator and a list of keywords, a predicate list is

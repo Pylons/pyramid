@@ -53,7 +53,7 @@
 	<key>Creator</key>
 	<string>Steve Piercy</string>
 	<key>DisplayScale</key>
-	<string>1 0/72 in = 1 0/72 in</string>
+	<string>1 0/72 in = 1.0000 in</string>
 	<key>GraphDocumentVersion</key>
 	<integer>8</integer>
 	<key>GraphicsList</key>
@@ -84,8 +84,8 @@
 			<integer>0</integer>
 			<key>Points</key>
 			<array>
-				<string>{344.41667175292969, 402.88506673894034}</string>
-				<string>{375.5, 402.27232108797347}</string>
+				<string>{344.41668319702148, 402.88506673894034}</string>
+				<string>{375.5, 402.77232108797347}</string>
 			</array>
 			<key>Style</key>
 			<dict>
@@ -113,7 +113,7 @@
 			<key>Tail</key>
 			<dict>
 				<key>ID</key>
-				<integer>169428</integer>
+				<integer>169509</integer>
 			</dict>
 		</dict>
 		<dict>
@@ -243,11 +243,11 @@
 			<array>
 				<dict>
 					<key>Bounds</key>
-					<string>{{238.8333613077798, 284.99999999999994}, {105.66668701171875, 18.656048080136394}}</string>
+					<string>{{238.74999618530273, 284.99999999999994}, {105.75002924601222, 18.656048080136394}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>ID</key>
-					<integer>169425</integer>
+					<integer>169506</integer>
 					<key>Magnets</key>
 					<array>
 						<string>{0, 1}</string>
@@ -296,11 +296,11 @@
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{238.75000762939453, 412.15071036499205}, {105.66666412353516, 18.656048080136394}}</string>
+					<string>{{238.74999618530273, 412.15071036499205}, {105.66668701171875, 18.656048080136394}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>ID</key>
-					<integer>169426</integer>
+					<integer>169507</integer>
 					<key>Magnets</key>
 					<array>
 						<string>{0, 1}</string>
@@ -349,11 +349,11 @@
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{238.75000762939453, 303.65604172230951}, {105.66666412353516, 18.656048080136394}}</string>
+					<string>{{238.74999618530273, 303.65604172230951}, {105.66668701171875, 18.656048080136394}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>ID</key>
-					<integer>169427</integer>
+					<integer>169508</integer>
 					<key>Magnets</key>
 					<array>
 						<string>{0, 1}</string>
@@ -402,11 +402,11 @@
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{238.75000762939453, 393.55704269887212}, {105.66666412353516, 18.656048080136394}}</string>
+					<string>{{238.74999618530273, 393.55704269887212}, {105.66668701171875, 18.656048080136394}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>ID</key>
-					<integer>169428</integer>
+					<integer>169509</integer>
 					<key>Magnets</key>
 					<array>
 						<string>{0, 1}</string>
@@ -453,11 +453,11 @@
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{238.75000762939453, 374.90099016834085}, {105.66666412353516, 18.656048080136394}}</string>
+					<string>{{238.74999618530273, 374.90099016834085}, {105.66668701171875, 18.656048080136394}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>ID</key>
-					<integer>169429</integer>
+					<integer>169510</integer>
 					<key>Magnets</key>
 					<array>
 						<string>{0, 1}</string>
@@ -504,11 +504,11 @@
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{238.75000762939453, 341.36561209044055}, {105.66666412353516, 33.089282989501953}}</string>
+					<string>{{238.74999618530273, 341.36561209044055}, {105.66668701171875, 33.089282989501953}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>ID</key>
-					<integer>169430</integer>
+					<integer>169511</integer>
 					<key>Magnets</key>
 					<array>
 						<string>{0, 1}</string>
@@ -555,11 +555,11 @@
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{238.75000762939453, 322.26348241170439}, {105.66666412353516, 18.656048080136394}}</string>
+					<string>{{238.74999618530273, 322.26348241170439}, {105.66668701171875, 18.656048080136394}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>ID</key>
-					<integer>169431</integer>
+					<integer>169512</integer>
 					<key>Magnets</key>
 					<array>
 						<string>{0, 1}</string>
@@ -606,7 +606,7 @@
 				</dict>
 			</array>
 			<key>ID</key>
-			<integer>169424</integer>
+			<integer>169505</integer>
 			<key>Layer</key>
 			<integer>0</integer>
 		</dict>
@@ -1094,7 +1094,7 @@
 			<integer>0</integer>
 			<key>Points</key>
 			<array>
-				<string>{238.75000762939462, 430.80675844512831}</string>
+				<string>{238.74999618530282, 430.80675844512831}</string>
 				<string>{207.66666666666765, 385.656005859375}</string>
 			</array>
 			<key>Style</key>
@@ -1123,7 +1123,7 @@
 			<key>Tail</key>
 			<dict>
 				<key>ID</key>
-				<integer>169426</integer>
+				<integer>169507</integer>
 				<key>Info</key>
 				<integer>6</integer>
 			</dict>
@@ -1144,7 +1144,7 @@
 			<integer>0</integer>
 			<key>Points</key>
 			<array>
-				<string>{239.33336141608385, 285.57837549845181}</string>
+				<string>{239.25039065750093, 285.57837549845181}</string>
 				<string>{207.66666666666777, 353.07514659563753}</string>
 			</array>
 			<key>Style</key>
@@ -1173,7 +1173,7 @@
 			<key>Tail</key>
 			<dict>
 				<key>ID</key>
-				<integer>169425</integer>
+				<integer>169506</integer>
 				<key>Info</key>
 				<integer>6</integer>
 			</dict>
@@ -1515,7 +1515,7 @@
 {\colortbl;\red255\green255\blue255;}
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\qc
 
-\f0\fs20 \cf0 view}</string>
+\f0\fs20 \cf0 view deriver}</string>
 						<key>VerticalPad</key>
 						<integer>0</integer>
 					</dict>
@@ -1742,7 +1742,7 @@
 		</dict>
 		<dict>
 			<key>Bounds</key>
-			<string>{{375.5, 391}, {105.66666412353516, 22.544642175946908}}</string>
+			<string>{{375.5, 391.5}, {105.66666412353516, 22.544642175946908}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
 			<key>ID</key>
@@ -9637,7 +9637,7 @@
 	<key>MasterSheets</key>
 	<array/>
 	<key>ModificationDate</key>
-	<string>2014-11-23 07:19:11 +0000</string>
+	<string>2016-03-13 08:04:48 +0000</string>
 	<key>Modifier</key>
 	<string>Steve Piercy</string>
 	<key>NotesVisible</key>
@@ -9732,15 +9732,15 @@
 		<key>SidebarWidth</key>
 		<integer>163</integer>
 		<key>VisibleRegion</key>
-		<string>{{-231, -226}, {1037, 1186}}</string>
+		<string>{{152.25, 226.5}, {255.75, 292.75}}</string>
 		<key>Zoom</key>
-		<real>1</real>
+		<real>4</real>
 		<key>ZoomValues</key>
 		<array>
 			<array>
 				<string>Request Processing</string>
-				<real>1</real>
-				<real>2</real>
+				<real>4</real>
+				<real>8</real>
 			</array>
 		</array>
 	</dict>

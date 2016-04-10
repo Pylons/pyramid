@@ -91,3 +91,9 @@ Other Interfaces
 
   .. autointerface:: ICacheBuster
      :members:
+
+  .. autointerface:: IViewDeriver
+     :members:
+
+  .. autointerface:: IViewDeriverInfo
+     :members:
