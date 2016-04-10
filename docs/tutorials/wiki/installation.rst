@@ -353,11 +353,13 @@ On Windows
    Your OS firewall, if any, may pop up a dialog asking for authorization
    to allow python to accept incoming network connections.
 
-If successful, you will see something like this on your console::
+If successful, you will see something like this on your console:
+
+.. code-block:: text
 
     Starting subprocess with file monitor
     Starting server in PID 95736.
-    serving on http://0.0.0.0:6543
+    serving on http://127.0.0.1:6543
 
 This means the server is ready to accept requests.
 
