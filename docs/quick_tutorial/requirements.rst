@@ -72,10 +72,11 @@ or may `build Python 3 from source
 <http://pyramid.readthedocs.org/en/master/narr/install.html#package-manager-
 method>`_.
 
-.. seealso:: See also :ref:`For Mac OS X Users <for-mac-os-x-users>`,
-   :ref:`If You Don't Yet Have a Python Interpreter (UNIX)
-   <if-you-don-t-yet-have-a-python-interpreter-unix>`, and :ref:`Installing
-   Pyramid on a Windows System <installing_windows>`.
+.. seealso:: See also :ref:`For Mac OS X Users <for-mac-os-x-users>`, :ref:`If
+   You Don't Yet Have a Python Interpreter (UNIX)
+   <if-you-don-t-yet-have-a-python-interpreter-unix>`, and :ref:`If You Don't
+   Yet Have a Python Interpreter (Windows)
+   <if-you-don-t-yet-have-a-python-interpreter-windows>`.
 
 
 .. _create-a-project-directory-structure:

@@ -1095,3 +1095,8 @@ Glossary
    pip
       The `Python Packaging Authority <https://www.pypa.io/>`_ recommended tool
       for installing Python packages.
+
+   pyvenv
+      The Python Packaging Authority's recommended command for `creating
+      virtual environments on Python 3.4 and greater
+      <https://packaging.python.org/en/latest/installing/#creating-virtual-environments>`_.
