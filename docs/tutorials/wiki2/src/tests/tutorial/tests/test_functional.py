@@ -1,6 +1,6 @@
 import transaction
 import unittest
-from webtest import TestApp
+from webtest import TestApp as WebtestApp
 
 
 class FunctionalTests(unittest.TestCase):
@@ -30,7 +30,7 @@ class FunctionalTests(unittest.TestCase):
             'auth.secret': 'seekrit',
         }
         app = main({}, **settings)
-        cls.testapp = TestApp(app)
+        cls.testapp = WebtestApp(app)
 
         session_factory = app.registry['dbsession_factory']
         cls.engine = session_factory.kw['bind']
