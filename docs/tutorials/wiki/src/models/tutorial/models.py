@@ -10,7 +10,7 @@ class Page(Persistent):
         self.data = data
 
 def appmaker(zodb_root):
-    if not 'app_root' in zodb_root:
+    if 'app_root' not in zodb_root:
         app_root = Wiki()
         frontpage = Page('This is the front page')
         app_root['FrontPage'] = frontpage
