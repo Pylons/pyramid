@@ -124,6 +124,27 @@ class AfterTraversalEventTests(ContextFoundEventTests):
         from pyramid.interfaces import IAfterTraversal
         verifyObject(IAfterTraversal, self._makeOne())
 
+class BeforeTraversalEventTests(unittest.TestCase):
+    def _getTargetClass(self):
+        from pyramid.events import BeforeTraversal
+        return BeforeTraversal
+
+    def _makeOne(self, request=None):
+        if request is None:
+            request = DummyRequest()
+        return self._getTargetClass()(request)
+
+    def test_class_conforms_to_IBeforeTraversal(self):
+        from zope.interface.verify import verifyClass
+        from pyramid.interfaces import IBeforeTraversal
+        verifyClass(IBeforeTraversal, self._getTargetClass())
+
+    def test_instance_conforms_to_IBeforeTraversal(self):
+        from zope.interface.verify import verifyObject
+        from pyramid.interfaces import IBeforeTraversal
+        verifyObject(IBeforeTraversal, self._makeOne())
+
+
 class TestSubscriber(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp()
