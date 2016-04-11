@@ -25,7 +25,7 @@ class IContextFound(Interface):
 
 IAfterTraversal = IContextFound
 
-class IRouteFound(Interface):
+class IBeforeTraversal(Interface):
     """
     An event type that is emitted whenever :app:`Pyramid` has found a route
     but before it calls any traversal or view code. See the documentation

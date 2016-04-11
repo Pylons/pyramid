@@ -11,7 +11,7 @@ from pyramid.interfaces import (
     INewResponse,
     IApplicationCreated,
     IBeforeRender,
-    IRouteFound,
+    IBeforeTraversal,
     )
 
 class subscriber(object):
@@ -130,8 +130,8 @@ class NewResponse(object):
         self.request = request
         self.response = response
 
-@implementer(IRouteFound)
-class RouteFound(object):
+@implementer(IBeforeTraversal)
+class BeforeTraversal(object):
     """
     An instance of this class is emitted as an :term:`event` after the
     :app:`Pyramid` :term:`router` finds a :term:`route` object but before any
@@ -141,7 +141,7 @@ class RouteFound(object):
     Notably, the request object will have an attributed named
     ``matched_route``, which is the matched route that was found.
 
-    This class implements the :class:`pyramid.interfaces.IRouteFound`
+    This class implements the :class:`pyramid.interfaces.IBeforeTraversal`
     interface.
     """
 
