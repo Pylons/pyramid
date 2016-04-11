@@ -46,16 +46,22 @@ request enters a :app:`Pyramid` application through to the point that
    object.  The former contains a dictionary representing the matched dynamic
    elements of the request's ``PATH_INFO`` value, and the latter contains the
    :class:`~pyramid.interfaces.IRoute` object representing the route which
-   matched.  The root object associated with the route found is also generated:
+   matched.
+   
+   A :class:`~pyramid.events.BeforeTraversal` :term:`event` is sent to any
+   subscribers.
+
+   The root object associated with the route found is also generated:
    if the :term:`route configuration` which matched has an associated
    ``factory`` argument, this factory is used to generate the root object,
    otherwise a default :term:`root factory` is used.
 
 #. If a route match was *not* found, and a ``root_factory`` argument was passed
    to the :term:`Configurator` constructor, that callable is used to generate
-   the root object.  If the ``root_factory`` argument passed to the
-   Configurator constructor was ``None``, a default root factory is used to
-   generate a root object.
+   the root object after a :class:`~pyramid.events.BeforeTraversal`
+   :term:`event` is sent to any subscribers.  If the ``root_factory`` argument
+   passed to the Configurator constructor was ``None``, a default root factory
+   is used to generate a root object.
 
 #. The :app:`Pyramid` router calls a "traverser" function with the root object
    and the request.  The traverser function attempts to traverse the root
