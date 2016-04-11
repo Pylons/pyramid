@@ -1570,18 +1570,6 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         config.add_view(view=view2)
         self.assertRaises(ConfigurationConflictError, config.commit)
 
-    def test_add_view_with_csrf_header(self):
-        from pyramid.renderers import null_renderer
-        def view(request):
-            return 'OK'
-        config = self._makeOne(autocommit=True)
-        config.add_view(view, require_csrf=True, renderer=null_renderer)
-        view = self._getViewCallable(config)
-        request = self._makeRequest(config)
-        request.headers = {'X-CSRF-Token': 'foo'}
-        request.session = DummySession({'csrf_token': 'foo'})
-        self.assertEqual(view(None, request), 'OK')
-
     def test_add_view_with_csrf_param(self):
         from pyramid.renderers import null_renderer
         def view(request):
@@ -1590,8 +1578,22 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         config.add_view(view, require_csrf='st', renderer=null_renderer)
         view = self._getViewCallable(config)
         request = self._makeRequest(config)
+        request.method = 'POST'
         request.params = {'st': 'foo'}
         request.headers = {}
+        request.session = DummySession({'csrf_token': 'foo'})
+        self.assertEqual(view(None, request), 'OK')
+
+    def test_add_view_with_csrf_header(self):
+        from pyramid.renderers import null_renderer
+        def view(request):
+            return 'OK'
+        config = self._makeOne(autocommit=True)
+        config.add_view(view, require_csrf=True, renderer=null_renderer)
+        view = self._getViewCallable(config)
+        request = self._makeRequest(config)
+        request.method = 'POST'
+        request.headers = {'X-CSRF-Token': 'foo'}
         request.session = DummySession({'csrf_token': 'foo'})
         self.assertEqual(view(None, request), 'OK')
 
@@ -1603,6 +1605,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         config.add_view(view, require_csrf=True, renderer=null_renderer)
         view = self._getViewCallable(config)
         request = self._makeRequest(config)
+        request.method = 'POST'
         request.headers = {}
         request.session = DummySession({'csrf_token': 'foo'})
         self.assertRaises(BadCSRFToken, lambda: view(None, request))

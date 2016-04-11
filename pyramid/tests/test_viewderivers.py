@@ -1090,11 +1090,36 @@ class TestDeriveView(unittest.TestCase):
         self.assertRaises(ConfigurationError, self.config._derive_view, 
             view, http_cache=(None,))
 
+    def test_csrf_view_requires_bool_or_str_in_require_csrf(self):
+        def view(request): pass
+        try:
+            self.config._derive_view(view, require_csrf=object())
+        except ConfigurationError as ex:
+            self.assertEqual(
+                'View option "require_csrf" must be a string or boolean value',
+                ex.args[0])
+        else: # pragma: no cover
+            raise AssertionError
+
+    def test_csrf_view_requires_bool_or_str_in_config_setting(self):
+        def view(request): pass
+        self.config.add_settings({'pyramid.require_default_csrf': object()})
+        try:
+            self.config._derive_view(view)
+        except ConfigurationError as ex:
+            self.assertEqual(
+                'Config setting "pyramid.require_csrf_default" must be a '
+                'string or boolean value',
+                ex.args[0])
+        else: # pragma: no cover
+            raise AssertionError
+
     def test_csrf_view_requires_header(self):
         response = DummyResponse()
         def inner_view(request):
             return response
         request = self._makeRequest()
+        request.method = 'POST'
         request.session = DummySession({'csrf_token': 'foo'})
         request.headers = {'X-CSRF-Token': 'foo'}
         view = self.config._derive_view(inner_view, require_csrf=True)
@@ -1106,9 +1131,105 @@ class TestDeriveView(unittest.TestCase):
         def inner_view(request):
             return response
         request = self._makeRequest()
+        request.method = 'POST'
         request.session = DummySession({'csrf_token': 'foo'})
         request.params['DUMMY'] = 'foo'
         view = self.config._derive_view(inner_view, require_csrf='DUMMY')
+        result = view(None, request)
+        self.assertTrue(result is response)
+
+    def test_csrf_view_ignores_GET(self):
+        response = DummyResponse()
+        def inner_view(request):
+            return response
+        request = self._makeRequest()
+        request.method = 'GET'
+        view = self.config._derive_view(inner_view, require_csrf=True)
+        result = view(None, request)
+        self.assertTrue(result is response)
+
+    def test_csrf_view_fails_on_bad_POST_param(self):
+        from pyramid.exceptions import BadCSRFToken
+        def inner_view(request): pass
+        request = self._makeRequest()
+        request.method = 'POST'
+        request.session = DummySession({'csrf_token': 'foo'})
+        request.params['DUMMY'] = 'bar'
+        view = self.config._derive_view(inner_view, require_csrf='DUMMY')
+        self.assertRaises(BadCSRFToken, lambda: view(None, request))
+
+    def test_csrf_view_fails_on_bad_POST_header(self):
+        from pyramid.exceptions import BadCSRFToken
+        def inner_view(request): pass
+        request = self._makeRequest()
+        request.method = 'POST'
+        request.session = DummySession({'csrf_token': 'foo'})
+        request.headers = {'X-CSRF-Token': 'bar'}
+        view = self.config._derive_view(inner_view, require_csrf='DUMMY')
+        self.assertRaises(BadCSRFToken, lambda: view(None, request))
+
+    def test_csrf_view_uses_config_setting_truthy(self):
+        response = DummyResponse()
+        def inner_view(request):
+            return response
+        request = self._makeRequest()
+        request.method = 'POST'
+        request.session = DummySession({'csrf_token': 'foo'})
+        request.params['csrf_token'] = 'foo'
+        self.config.add_settings({'pyramid.require_default_csrf': 'yes'})
+        view = self.config._derive_view(inner_view)
+        result = view(None, request)
+        self.assertTrue(result is response)
+
+    def test_csrf_view_uses_config_setting_with_custom_token(self):
+        response = DummyResponse()
+        def inner_view(request):
+            return response
+        request = self._makeRequest()
+        request.method = 'POST'
+        request.session = DummySession({'csrf_token': 'foo'})
+        request.params['DUMMY'] = 'foo'
+        self.config.add_settings({'pyramid.require_default_csrf': 'DUMMY'})
+        view = self.config._derive_view(inner_view)
+        result = view(None, request)
+        self.assertTrue(result is response)
+
+    def test_csrf_view_uses_config_setting_falsey(self):
+        response = DummyResponse()
+        def inner_view(request):
+            return response
+        request = self._makeRequest()
+        request.method = 'POST'
+        request.session = DummySession({'csrf_token': 'foo'})
+        request.params['csrf_token'] = 'foo'
+        self.config.add_settings({'pyramid.require_default_csrf': 'no'})
+        view = self.config._derive_view(inner_view)
+        result = view(None, request)
+        self.assertTrue(result is response)
+
+    def test_csrf_view_uses_view_option_override(self):
+        response = DummyResponse()
+        def inner_view(request):
+            return response
+        request = self._makeRequest()
+        request.method = 'POST'
+        request.session = DummySession({'csrf_token': 'foo'})
+        request.params['DUMMY'] = 'foo'
+        self.config.add_settings({'pyramid.require_default_csrf': 'yes'})
+        view = self.config._derive_view(inner_view, require_csrf='DUMMY')
+        result = view(None, request)
+        self.assertTrue(result is response)
+
+    def test_csrf_view_uses_config_setting_when_view_option_is_true(self):
+        response = DummyResponse()
+        def inner_view(request):
+            return response
+        request = self._makeRequest()
+        request.method = 'POST'
+        request.session = DummySession({'csrf_token': 'foo'})
+        request.params['DUMMY'] = 'foo'
+        self.config.add_settings({'pyramid.require_default_csrf': 'DUMMY'})
+        view = self.config._derive_view(inner_view, require_csrf=True)
         result = view(None, request)
         self.assertTrue(result is response)
 
@@ -1132,8 +1253,8 @@ class TestDerivationOrder(unittest.TestCase):
         derivers_sorted = derivers.sorted()
         dlist = [d for (d, _) in derivers_sorted]
         self.assertEqual([
-            'csrf_view',
             'secured_view',
+            'csrf_view',
             'owrapped_view',
             'http_cached_view',
             'decorated_view',
@@ -1155,8 +1276,8 @@ class TestDerivationOrder(unittest.TestCase):
         derivers_sorted = derivers.sorted()
         dlist = [d for (d, _) in derivers_sorted]
         self.assertEqual([
-            'csrf_view',
             'secured_view',
+            'csrf_view',
             'owrapped_view',
             'http_cached_view',
             'decorated_view',
@@ -1176,8 +1297,8 @@ class TestDerivationOrder(unittest.TestCase):
         derivers_sorted = derivers.sorted()
         dlist = [d for (d, _) in derivers_sorted]
         self.assertEqual([
-            'csrf_view',
             'secured_view',
+            'csrf_view',
             'owrapped_view',
             'http_cached_view',
             'decorated_view',
@@ -1198,8 +1319,8 @@ class TestDerivationOrder(unittest.TestCase):
         derivers_sorted = derivers.sorted()
         dlist = [d for (d, _) in derivers_sorted]
         self.assertEqual([
-            'csrf_view',
             'secured_view',
+            'csrf_view',
             'owrapped_view',
             'http_cached_view',
             'decorated_view',

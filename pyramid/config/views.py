@@ -371,27 +371,26 @@ class ViewsConfiguratorMixin(object):
 
           .. versionadded:: 1.7
 
-          If specified, this value should be one of ``None``, ``True``,
-          ``False``, or a string representing the 'check name'.  If the value
-          is ``True`` or a string, CSRF checking will be performed.  If the
-          value is ``False`` or ``None``, CSRF checking will not be performed.
+          CSRF checks only affect POST requests. Any other request methods
+          will pass untouched. This option is used in combination with the
+          ``pyramid.require_default_csrf`` setting to control which
+          request parameters are checked for CSRF tokens.
 
-          If the value provided is a string, that string will be used as the
-          'check name'.  If the value provided is ``True``, ``csrf_token`` will
-          be used as the check name.
+          This feature requires a configured :term:`session factory`.
 
-          If CSRF checking is performed, the checked value will be the value
-          of ``request.params[check_name]``.  This value will be compared
-          against the value of ``request.session.get_csrf_token()``, and the
-          check will pass if these two values are the same.  If the check
-          passes, the associated view will be permitted to execute.  If the
-          check fails, the associated view will not be permitted to execute
-          and a :class:`pyramid.exceptions.BadCSRFToken` exception will
-          be raised. This exception may be caught and handled by an
-          :term:`exception view`.
+          If this option is set to ``True`` then CSRF checks will be enabled
+          for POST requests to this view. The required token will be whatever
+          was specified by the ``pyramid.require_default_csrf`` setting, or
+          will fallback to ``csrf_token``.
 
-          Note that using this feature requires a :term:`session factory` to
-          have been configured.
+          If this option is set to a string then CSRF checks will be enabled
+          and it will be used as the required token regardless of the
+          ``pyramid.require_default_csrf`` setting.
+
+          If this option is set to ``False`` then CSRF checks will be disabled
+          regardless of the ``pyramid.require_default_csrf`` setting.
+
+          See :ref:`auto_csrf_checking` for more information.
 
         wrapper
 
@@ -1213,8 +1212,8 @@ class ViewsConfiguratorMixin(object):
     def add_default_view_derivers(self):
         d = pyramid.viewderivers
         derivers = [
-            ('csrf_view', d.csrf_view),
             ('secured_view', d.secured_view),
+            ('csrf_view', d.csrf_view),
             ('owrapped_view', d.owrapped_view),
             ('http_cached_view', d.http_cached_view),
             ('decorated_view', d.decorated_view),

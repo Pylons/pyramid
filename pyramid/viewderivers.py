@@ -19,6 +19,7 @@ from pyramid.interfaces import (
     )
 
 from pyramid.compat import (
+    string_types,
     is_bound_method,
     is_unbound_method,
     )
@@ -34,6 +35,10 @@ from pyramid.exceptions import (
     PredicateMismatch,
     )
 from pyramid.httpexceptions import HTTPForbidden
+from pyramid.settings import (
+    falsey,
+    truthy,
+)
 from pyramid.util import object_description
 from pyramid.view import render_view_to_response
 from pyramid import renderers
@@ -456,14 +461,35 @@ def decorated_view(view, info):
 
 decorated_view.options = ('decorator',)
 
+def _parse_csrf_setting(val, error_source):
+    if val:
+        if isinstance(val, string_types):
+            if val.lower() in truthy:
+                val = True
+            elif val.lower() in falsey:
+                val = False
+        elif not isinstance(val, bool):
+            raise ConfigurationError(
+                '{0} must be a string or boolean value'
+                .format(error_source))
+    return val
+
 def csrf_view(view, info):
-    val = info.options.get('require_csrf')
+    default_val = _parse_csrf_setting(
+        info.settings.get('pyramid.require_default_csrf'),
+        'Config setting "pyramid.require_csrf_default"')
+    val = _parse_csrf_setting(
+        info.options.get('require_csrf'),
+        'View option "require_csrf"')
+    if (val is True and default_val) or val is None:
+        val = default_val
+    if val is True:
+        val = 'csrf_token'
     wrapped_view = view
     if val:
-        if val is True:
-            val = 'csrf_token'
         def csrf_view(context, request):
-            check_csrf_token(request, val, raises=True)
+            if request.method == 'POST':
+                check_csrf_token(request, val, raises=True)
             return view(context, request)
         wrapped_view = csrf_view
     return wrapped_view

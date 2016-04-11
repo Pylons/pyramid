@@ -1,13 +1,12 @@
 from pyramid.compat import string_types
 
 truthy = frozenset(('t', 'true', 'y', 'yes', 'on', '1'))
+falsey = frozenset(('f', 'false', 'n', 'no', 'off', '0'))
 
 def asbool(s):
     """ Return the boolean value ``True`` if the case-lowered value of string
-    input ``s`` is any of ``t``, ``true``, ``y``, ``on``, or ``1``, otherwise
-    return the boolean value ``False``.  If ``s`` is the value ``None``,
-    return ``False``.  If ``s`` is already one of the boolean values ``True``
-    or ``False``, return it."""
+    input ``s`` is a :term:`truthy string`. If ``s`` is already one of the
+    boolean values ``True`` or ``False``, return it."""
     if s is None:
         return False
     if isinstance(s, bool):
