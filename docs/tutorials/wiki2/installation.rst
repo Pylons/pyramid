@@ -74,22 +74,22 @@ Python 3.5:
    c:\> c:\Python35\Scripts\virtualenv %VENV%
 
 
-Upgrade ``pip`` in the virtual environment
-------------------------------------------
+Upgrade ``pip`` and ``setuptools`` in the virtual environment
+-------------------------------------------------------------
 
 On UNIX
 ^^^^^^^
 
 .. code-block:: bash
 
-    $ $VENV/bin/pip install --upgrade pip
+    $ $VENV/bin/pip install --upgrade pip setuptools
 
 On Windows
 ^^^^^^^^^^
 
 .. code-block:: ps1con
 
-   c:\> %VENV%\Scripts\pip install --upgrade pip
+   c:\> %VENV%\Scripts\pip install --upgrade pip setuptools
 
 
 Install Pyramid into the virtual Python environment
