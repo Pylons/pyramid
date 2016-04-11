@@ -367,6 +367,21 @@ Or include it as a header in a jQuery AJAX request:
 The handler for the URL that receives the request should then require that the
 correct CSRF token is supplied.
 
+.. index::
+   single: session.new_csrf_token
+
+Using the ``session.new_csrf_token`` Method
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To explicitly create a new CSRF token, use the ``session.new_csrf_token()``
+method.  This differs only from ``session.get_csrf_token()`` inasmuch as it
+clears any existing CSRF token, creates a new CSRF token, sets the token into
+the session, and returns the token.
+
+.. code-block:: python
+
+   token = request.session.new_csrf_token()
+
 Checking CSRF Tokens Manually
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -425,7 +440,7 @@ performing CSRF checking manually.
 If CSRF checks fail then a :class:`pyramid.exceptions.BadCSRFToken` exception
 will be raised. This exception may be caught and handled by an
 :term:`exception view` but, by default, will result in a ``400 Bad Request``
-resposne being sent to the client.
+response being sent to the client.
 
 Checking CSRF Tokens with a View Predicate
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -449,18 +464,3 @@ include ``check_csrf=True`` as a view predicate. See
    predicate system, when it doesn't find a view, raises ``HTTPNotFound``
    instead of ``HTTPBadRequest``, so ``check_csrf=True`` behavior is different
    from calling :func:`pyramid.session.check_csrf_token`.
-
-.. index::
-   single: session.new_csrf_token
-
-Using the ``session.new_csrf_token`` Method
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-To explicitly create a new CSRF token, use the ``session.new_csrf_token()``
-method.  This differs only from ``session.get_csrf_token()`` inasmuch as it
-clears any existing CSRF token, creates a new CSRF token, sets the token into
-the session, and returns the token.
-
-.. code-block:: python
-
-   token = request.session.new_csrf_token()

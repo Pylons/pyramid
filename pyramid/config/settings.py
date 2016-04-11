@@ -6,7 +6,6 @@ from zope.interface import implementer
 from pyramid.interfaces import ISettings
 
 from pyramid.settings import asbool
-from pyramid.settings import truthy
 
 class SettingsConfiguratorMixin(object):
     def _set_settings(self, mapping):

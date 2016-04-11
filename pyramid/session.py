@@ -123,6 +123,9 @@ def check_csrf_token(request,
     Note that using this function requires that a :term:`session factory` is
     configured.
 
+    See :ref:`auto_csrf_checking` for information about how to secure your
+    application automatically against CSRF attacks.
+
     .. versionadded:: 1.4a2
     """
     supplied_token = request.params.get(token, request.headers.get(header, ""))
