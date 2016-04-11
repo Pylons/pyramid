@@ -90,24 +90,13 @@ Or on Windows:
 .. code-block:: text
 
    > %VENV%\Scripts\pcreate -s starter MyProject
-   
-Here's sample output from a run of ``pcreate`` on UNIX for a project we name
-``MyProject``:
-
-.. code-block:: bash
-
-   $ $VENV/bin/pcreate -s starter MyProject
-   Creating template pyramid
-   Creating directory ./MyProject
-   # ... more output ...
-   Running /Users/chrism/projects/pyramid/bin/python setup.py egg_info
 
 As a result of invoking the ``pcreate`` command, a directory named
 ``MyProject`` is created.  That directory is a :term:`project` directory. The
 ``setup.py`` file in that directory can be used to distribute your application,
 or install your application for deployment or development.
 
-A ``.ini`` file named ``development.ini`` will be created in the project
+An ``.ini`` file named ``development.ini`` will be created in the project
 directory.  You will use this ``.ini`` file to configure a server, to run your
 application, and to debug your application.  It contains configuration that
 enables an interactive debugger and settings optimized for development.
@@ -152,7 +141,8 @@ Installing your Newly Created Project for Development
 To install a newly created project for development, you should ``cd`` to the
 newly created project directory and use the Python interpreter from the
 :term:`virtualenv` you created during :ref:`installing_chapter` to invoke the
-command ``python setup.py develop``
+command ``pip install -e .``, which installs the project in development mode
+(``-e`` is for "editable") into the current directory (``.``).
 
 The file named ``setup.py`` will be in the root of the pcreate-generated
 project directory.  The ``python`` you're invoking should be the one that lives
@@ -165,23 +155,24 @@ On UNIX:
 .. code-block:: bash
 
    $ cd MyProject
-   $ $VENV/bin/python setup.py develop
+   $ $VENV/bin/pip install -e .
 
 Or on Windows:
 
-.. code-block:: text
+.. code-block:: ps1con
 
    > cd MyProject
-   > %VENV%\Scripts\python.exe setup.py develop
+   > %VENV%\Scripts\pip install -e .
 
 Elided output from a run of this command on UNIX is shown below:
 
 .. code-block:: bash
 
    $ cd MyProject
-   $ $VENV/bin/python setup.py develop
+   $ $VENV/bin/pip install -e .
    ...
-   Finished processing dependencies for MyProject==0.0
+   Successfully installed Chameleon-2.24 Mako-1.0.4 MyProject \
+   pyramid-chameleon-0.3 pyramid-debugtoolbar-2.4.2 pyramid-mako-1.0.2
 
 This will install a :term:`distribution` representing your project into the
 virtual environment interpreter's library set so it can be found by ``import``
@@ -195,65 +186,54 @@ statements and by other console scripts such as ``pserve``, ``pshell``,
 Running the Tests for Your Application
 --------------------------------------
 
-To run unit tests for your application, you should invoke them using the Python
-interpreter from the :term:`virtualenv` you created during
-:ref:`installing_chapter` (the ``python`` command that lives in the ``bin``
-directory of your virtualenv).
+To run unit tests for your application, you must first install the testing
+dependencies.
 
 On UNIX:
 
 .. code-block:: bash
 
-   $ $VENV/bin/python setup.py test -q
+   $ $VENV/bin/pip install -e ".[testing]"
 
-Or on Windows:
+On Windows:
 
-.. code-block:: text
+.. code-block:: ps1con
 
-   > %VENV%\Scripts\python.exe setup.py test -q
+   > %VENV%\Scripts\pip install -e ".[testing]"
+
+Once the testing requirements are installed, then you can run the tests using
+the ``py.test`` command that was just installed in the ``bin`` directory of
+your virtual environment.
+
+On UNIX:
+
+.. code-block:: bash
+
+   $ $VENV/bin/py.test myproject/tests.py -q
+
+On Windows:
+
+.. code-block:: ps1con
+
+   > %VENV%\Scripts\py.test myproject\tests.py -q
 
 Here's sample output from a test run on UNIX:
 
 .. code-block:: bash
 
-   $ $VENV/bin/python setup.py test -q
-   running test
-   running egg_info
-   writing requirements to MyProject.egg-info/requires.txt
-   writing MyProject.egg-info/PKG-INFO
-   writing top-level names to MyProject.egg-info/top_level.txt
-   writing dependency_links to MyProject.egg-info/dependency_links.txt
-   writing entry points to MyProject.egg-info/entry_points.txt
-   reading manifest file 'MyProject.egg-info/SOURCES.txt'
-   reading manifest template 'MANIFEST.in'
-   warning: no files found matching '*.cfg'
-   warning: no files found matching '*.rst'
-   warning: no files found matching '*.ico' under directory 'myproject'
-   warning: no files found matching '*.gif' under directory 'myproject'
-   warning: no files found matching '*.jpg' under directory 'myproject'
-   warning: no files found matching '*.txt' under directory 'myproject'
-   warning: no files found matching '*.mak' under directory 'myproject'
-   warning: no files found matching '*.mako' under directory 'myproject'
-   warning: no files found matching '*.js' under directory 'myproject'
-   warning: no files found matching '*.html' under directory 'myproject'
-   warning: no files found matching '*.xml' under directory 'myproject'
-   writing manifest file 'MyProject.egg-info/SOURCES.txt'
-   running build_ext
-   .
-   ----------------------------------------------------------------------
-   Ran 1 test in 0.008s
-
-   OK
+   $ $VENV/bin/py.test myproject/tests.py -q
+   ..
+   2 passed in 0.47 seconds
 
 The tests themselves are found in the ``tests.py`` module in your ``pcreate``
-generated project.  Within a project generated by the ``starter`` scaffold, a
-single sample test exists.
+generated project.  Within a project generated by the ``starter`` scaffold,
+only two sample tests exist.
 
 .. note::
 
-    The ``-q`` option is passed to the ``setup.py test`` command to limit the
-    output to a stream of dots.  If you don't pass ``-q``, you'll see more
-    verbose test result output (which normally isn't very useful).
+    The ``-q`` option is passed to the ``py.test`` command to limit the output
+    to a stream of dots. If you don't pass ``-q``, you'll see verbose test
+    result output (which normally isn't very useful).
 
 .. index::
    single: running an application
@@ -432,9 +412,8 @@ like this to enable the toolbar when your system contacts Pyramid:
    # .. other settings ...
    debugtoolbar.hosts = 192.168.1.1
 
-For more information about what the debug toolbar allows you to do, see `the
-documentation for pyramid_debugtoolbar
-<http://docs.pylonsproject.org/projects/pyramid_debugtoolbar/en/latest/>`_.
+For more information about what the debug toolbar allows you to do, see the
+:ref:`documentation for pyramid_debugtoolbar <toolbar:overview>`.
 
 The debug toolbar will not be shown (and all debugging will be turned off) when
 you use the ``production.ini`` file instead of the ``development.ini`` ini file
@@ -688,16 +667,16 @@ control system, you may need to install a setuptools add-on such as
 ~~~~~~~~~~~~
 
 The ``setup.py`` file is a :term:`setuptools` setup file.  It is meant to be
-run directly from the command line to perform a variety of functions, such as
-testing, packaging, and distributing your application.
+used to define requirements for installing dependencies for your package and
+testing, as well as distributing your application.
 
 .. note::
 
    ``setup.py`` is the de facto standard which Python developers use to
    distribute their reusable code.  You can read more about ``setup.py`` files
-   and their usage in the `Setuptools documentation
-   <http://peak.telecommunity.com/DevCenter/setuptools>`_ and `Python Packaging
-   User Guide <https://packaging.python.org/en/latest/>`_.
+   and their usage in the `Python Packaging User Guide
+   <https://packaging.python.org/en/latest/>`_ and `Setuptools documentation
+   <http://pythonhosted.org/setuptools/>`_.
 
 Our generated ``setup.py`` looks like this:
 
@@ -706,7 +685,7 @@ Our generated ``setup.py`` looks like this:
    :linenos:
 
 The ``setup.py`` file calls the setuptools ``setup`` function, which does
-various things depending on the arguments passed to ``setup.py`` on the command
+various things depending on the arguments passed to ``pip`` on the command
 line.
 
 Within the arguments to this function call, information about your application
@@ -717,8 +696,8 @@ exists in this file in this section.
 Your application's name can be any string; it is specified in the ``name``
 field.  The version number is specified in the ``version`` value.  A short
 description is provided in the ``description`` field.  The ``long_description``
-is conventionally the content of the README and CHANGES file appended together.
-The ``classifiers`` field is a list of `Trove
+is conventionally the content of the ``README`` and ``CHANGES`` files appended
+together. The ``classifiers`` field is a list of `Trove
 <http://pypi.python.org/pypi?%3Aaction=list_classifiers>`_ classifiers
 describing your application.  ``author`` and ``author_email`` are text fields
 which probably don't need any description.  ``url`` is a field that should
@@ -726,14 +705,13 @@ point at your application project's URL (if any). ``packages=find_packages()``
 causes all packages within the project to be found when packaging the
 application.  ``include_package_data`` will include non-Python files when the
 application is packaged if those files are checked into version control. 
-``zip_safe`` indicates that this package is not safe to use as a zipped egg;
-instead it will always unpack as a directory, which is more convenient. 
-``install_requires`` and ``tests_require`` indicate that this package depends
-on the ``pyramid`` package.  ``test_suite`` points at the package for our
-application, which means all tests found in the package will be run when
-``setup.py test`` is invoked.  We examined ``entry_points`` in our discussion
-of the ``development.ini`` file; this file defines the ``main`` entry point
-that represents our project's application.
+``zip_safe=False`` indicates that this package is not safe to use as a zipped
+egg; instead it will always unpack as a directory, which is more convenient.
+``install_requires`` indicate that this package depends on the ``pyramid``
+package. ``extras_require`` is a Python dictionary that defines what is
+required to be installed for running tests. We examined ``entry_points`` in our
+discussion of the ``development.ini`` file; this file defines the ``main``
+entry point that represents our project's application.
 
 Usually you only need to think about the contents of the ``setup.py`` file when
 distributing your application to other people, when adding Python package
@@ -745,7 +723,7 @@ you can try this command now:
    $ $VENV/bin/python setup.py sdist
 
 This will create a tarball of your application in a ``dist`` subdirectory named
-``MyProject-0.1.tar.gz``.  You can send this tarball to other people who want
+``MyProject-0.0.tar.gz``.  You can send this tarball to other people who want
 to install and use your application.
 
 .. index::
@@ -928,13 +906,13 @@ The ``tests.py`` module includes unit tests for your application.
 
 .. literalinclude:: MyProject/myproject/tests.py
    :language: python
-   :lines: 1-17
    :linenos:
 
-This sample ``tests.py`` file has a single unit test defined within it.  This
-test is executed when you run ``python setup.py test``.  You may add more tests
-here as you build your application.  You are not required to write tests to use
-:app:`Pyramid`. This file is simply provided for convenience and example.
+This sample ``tests.py`` file has one unit test and one functional test defined
+within it. These tests are executed when you run ``py.test myproject/tests.py
+-q``. You may add more tests here as you build your application. You are not
+required to write tests to use :app:`Pyramid`. This file is simply provided for
+convenience and example.
 
 See :ref:`testing_chapter` for more information about writing :app:`Pyramid`
 unit tests.
