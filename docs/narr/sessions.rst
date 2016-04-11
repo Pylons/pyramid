@@ -430,6 +430,10 @@ resposne being sent to the client.
 Checking CSRF Tokens with a View Predicate
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. deprecated:: 1.7
+   Use the ``require_csrf`` option or read :ref:`auto_csrf_checking` instead
+   to have :class:`pyramid.exceptions.BadCSRFToken` exceptions raised.
+
 A convenient way to require a valid CSRF token for a particular view is to
 include ``check_csrf=True`` as a view predicate. See
 :meth:`pyramid.config.Configurator.add_view`.

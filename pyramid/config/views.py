@@ -613,6 +613,11 @@ class ViewsConfiguratorMixin(object):
 
         check_csrf
 
+          .. deprecated:: 1.7
+             Use the ``require_csrf`` option or see :ref:`auto_csrf_checking`
+             instead to have :class:`pyramid.exceptions.BadCSRFToken`
+             exceptions raised.
+
           If specified, this value should be one of ``None``, ``True``,
           ``False``, or a string representing the 'check name'.  If the value
           is ``True`` or a string, CSRF checking will be performed.  If the
@@ -708,7 +713,18 @@ class ViewsConfiguratorMixin(object):
                  'Predicate" in the "Hooks" chapter of the documentation '
                  'for more information.'),
                 DeprecationWarning,
-                stacklevel=4
+                stacklevel=4,
+                )
+
+        if check_csrf is not None:
+            warnings.warn(
+                ('The "check_csrf" argument to Configurator.add_view is '
+                 'deprecated as of Pyramid 1.7. Use the "require_csrf" option '
+                 'instead or see "Checking CSRF Tokens Automatically" in the '
+                 '"Sessions" chapter of the documentation for more '
+                 'information.'),
+                DeprecationWarning,
+                stacklevel=4,
                 )
 
         view = self.maybe_dotted(view)
