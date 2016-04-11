@@ -1,6 +1,9 @@
 unreleased
 ==========
 
+- Python 2.6 is no longer supported by Pyramid. See
+  https://github.com/Pylons/pyramid/issues/2368
+
 - A complete overhaul of the docs:
 
   - Use pip instead of easy_install.
