@@ -20,7 +20,7 @@ requires = [
     'waitress',
     ]
 
-testing_extras = [
+tests_require = [
     'WebTest >= 1.3.1',  # py3 compat
     'pytest',  # includes virtualenv
     'pytest-cov',
@@ -44,7 +44,7 @@ setup(name='tutorial',
       include_package_data=True,
       zip_safe=False,
       extras_require={
-          'testing': testing_extras,
+          'testing': tests_require,
       },
       install_requires=requires,
       entry_points="""\
