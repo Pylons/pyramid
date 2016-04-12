@@ -8,8 +8,8 @@ Before you begin
 ----------------
 
 This tutorial assumes that you have already followed the steps in
-:ref:`installing_chapter`, except **do not create a virtualenv or install
-Pyramid**.  Thereby you will satisfy the following requirements.
+:ref:`installing_chapter`, except **do not create a virtual environment or
+install Pyramid**.  Thereby you will satisfy the following requirements.
 
 * A Python interpreter is installed on your operating system.
 * :term:`virtualenv` is installed.
