@@ -26,8 +26,8 @@ if PY3:
     if py_version < (3, 3) and not is_pypy: # PyPy3 masquerades as Python 3.2...
         raise RuntimeError('On Python 3, Pyramid requires Python 3.3 or better')
 else:
-    if py_version < (2, 7):
-        raise RuntimeError('On Python 2, Pyramid requires Python 2.7 or better')
+    if py_version < (2, 6):
+        raise RuntimeError('On Python 2, Pyramid requires Python 2.6 or better')
 
 here = os.path.abspath(os.path.dirname(__file__))
 try:
