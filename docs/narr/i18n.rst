@@ -270,12 +270,12 @@ system run this command:
    $ sudo apt-get install gettext
 
 Installing Lingua is done with the Python packaging tools. If the
-:term:`virtualenv` into which you've installed your :app:`Pyramid` application
-lives in ``/my/virtualenv``, you can install Lingua like so:
+:term:`virtual environment` into which you've installed your :app:`Pyramid`
+application lives in ``/my/venv``, you can install Lingua like so:
 
 .. code-block:: text
 
-   $ cd /my/virtualenv
+   $ cd /my/venv
    $ $VENV/bin/easy_install lingua
 
 Installation on Windows
@@ -288,8 +288,8 @@ compile it yourself. Make sure the installation path is added to your
 ``$PATH``.
 
 Installing Lingua is done with the Python packaging tools. If the
-:term:`virtualenv` into which you've installed your :app:`Pyramid` application
-lives in ``C:\my\virtualenv``, you can install Lingua like so:
+:term:`virtual environment` into which you've installed your :app:`Pyramid`
+application lives in ``C:\my\venv``, you can install Lingua like so:
 
 .. code-block:: text
 

@@ -67,14 +67,14 @@ Creating the Project
 .. seealso:: See also the output of :ref:`pcreate --help <pcreate_script>`.
 
 In :ref:`installing_chapter`, you created a virtual Python environment via the
-``virtualenv`` command.  To start a :app:`Pyramid` :term:`project`, use the
-``pcreate`` command installed within the virtualenv.  We'll choose the
+``venv`` command.  To start a :app:`Pyramid` :term:`project`, use the
+``pcreate`` command installed within the virtual environment.  We'll choose the
 ``starter`` scaffold for this purpose.  When we invoke ``pcreate``, it will
 create a directory that represents our project.
 
-In :ref:`installing_chapter` we called the virtualenv directory ``env``. The
-following commands assume that our current working directory is the ``env``
-directory.
+In :ref:`installing_chapter` we called the virtual environment directory
+``env``. The following commands assume that our current working directory is
+the ``env`` directory.
 
 The below example uses the ``pcreate`` command to create a project with the
 ``starter`` scaffold.
@@ -112,16 +112,16 @@ The ``MyProject`` project directory contains an additional subdirectory named
 which holds very simple :app:`Pyramid` sample code.  This is where you'll edit
 your application's Python code and templates.
 
-We created this project within an ``env`` virtualenv directory.  However, note
-that this is not mandatory.  The project directory can go more or less anywhere
-on your filesystem.  You don't need to put it in a special "web server"
-directory, and you don't need to put it within a virtualenv directory.  The
-author uses Linux mainly, and tends to put project directories which he creates
-within his ``~/projects`` directory.  On Windows, it's a good idea to put
-project directories within a directory that contains no space characters, so
-it's wise to *avoid* a path that contains, i.e., ``My Documents``.  As a
-result, the author, when he uses Windows, just puts his projects in
-``C:\projects``.
+We created this project within an ``env`` virtual environment directory.
+However, note that this is not mandatory. The project directory can go more or
+less anywhere on your filesystem. You don't need to put it in a special "web
+server" directory, and you don't need to put it within a virtual environment
+directory. The author uses Linux mainly, and tends to put project directories
+which he creates within his ``~/projects`` directory. On Windows, it's a good
+idea to put project directories within a directory that contains no space
+characters, so it's wise to *avoid* a path that contains, i.e., ``My
+Documents``. As a result, the author, when he uses Windows, just puts his
+projects in ``C:\projects``.
 
 .. warning::
 
@@ -140,9 +140,9 @@ Installing your Newly Created Project for Development
 
 To install a newly created project for development, you should ``cd`` to the
 newly created project directory and use the Python interpreter from the
-:term:`virtualenv` you created during :ref:`installing_chapter` to invoke the
-command ``pip install -e .``, which installs the project in development mode
-(``-e`` is for "editable") into the current directory (``.``).
+:term:`virtual environment` you created during :ref:`installing_chapter` to
+invoke the command ``pip install -e .``, which installs the project in
+development mode (``-e`` is for "editable") into the current directory (``.``).
 
 The file named ``setup.py`` will be in the root of the pcreate-generated
 project directory.  The ``python`` you're invoking should be the one that lives

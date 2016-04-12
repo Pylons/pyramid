@@ -57,7 +57,7 @@ character, e.g.:
 
      $ $VENV/bin/nosetests
 
-(See :term:`virtualenv` for the meaning of ``$VENV``)
+(See :term:`venv` for the meaning of ``$VENV``)
 
 Example blocks representing Windows ``cmd.exe`` commands are prefixed with a
 drive letter and/or a directory name, e.g.:
@@ -66,7 +66,7 @@ drive letter and/or a directory name, e.g.:
 
      c:\examples> %VENV%\Scripts\nosetests
 
-(See :term:`virtualenv` for the meaning of ``%VENV%``)
+(See :term:`venv` for the meaning of ``%VENV%``)
 
 Sometimes, when it's unknown which directory is current, Windows ``cmd.exe``
 example block commands are prefixed only with a ``>`` character, e.g.:
