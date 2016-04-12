@@ -1107,8 +1107,9 @@ Glossary
       The Python Packaging Authority formerly recommended using this command
       for `creating virtual environments on Python 3.4 and 3.5
       <https://packaging.python.org/en/latest/installing/#creating-virtual-environments>`_,
-      but it is deprecated in 3.6 in favor of ``python3 -m venv`` which is
-      backward compatible.
+      but it is deprecated in 3.6 in favor of ``python3 -m venv`` on UNIX or
+      ``python -m venv`` on Windows, which is backward compatible on Python
+      3.3 and greater.
 
    virtual environment
       An isolated Python environment that allows packages to be installed for
@@ -1116,7 +1117,7 @@ Glossary
 
    venv
       The `Python Packaging Authority's <https://www.pypa.io/>`_ recommended
-      tool for creating virtual environments.
+      tool for creating virtual environments on Python 3.3 and greater.
 
       Note: whenever you encounter commands prefixed with ``$VENV`` (Unix)
       or ``%VENV`` (Windows), know that that is the environment variable whose
