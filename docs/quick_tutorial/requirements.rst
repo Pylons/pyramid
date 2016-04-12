@@ -22,9 +22,9 @@ This *Quick Tutorial* is based on:
 * **Python 3.5**. Pyramid fully supports Python 3.3+ and Python 2.6+. This
   tutorial uses **Python 3.5** but runs fine under Python 2.7.
 
-* **pyvenv**. We believe in virtual environments. For this tutorial, we use
-  Python 3.5's built-in solution, the ``pyvenv`` command. For Python 2.7, you
-  can install ``virtualenv``.
+* **venv**. We believe in virtual environments. For this tutorial, we use
+  Python 3.5's built-in solution ``venv``. For Python 2.7, you can install
+  ``virtualenv``.
 
 * **pip**. We use ``pip`` for package management.
 
@@ -158,26 +158,20 @@ environment. We set an environment variable to save typing later.
 Create a Virtual Environment
 ----------------------------
 
-.. warning:: The current state of isolated Python environments using
-    ``pyvenv`` on Windows is suboptimal in comparison to Mac and Linux.  See
-    http://stackoverflow.com/q/15981111/95735 for a discussion of the issue
-    and `PEP 453 <http://www.python.org/dev/peps/pep-0453/>`_ for a proposed
-    resolution.
-
-``pyvenv`` is a tool to create isolated Python 3 environments, each
-with its own Python binary and independent set of installed Python
-packages in its site directories. Let's create one, using the location
-we just specified in the environment variable.
+``venv`` is a tool to create isolated Python 3 environments, each with its own
+Python binary and independent set of installed Python packages in its site
+directories. Let's create one, using the location we just specified in the
+environment variable.
 
 .. code-block:: bash
 
     # Mac and Linux
-    $ pyvenv $VENV
+    $ python3 -m venv $VENV
 
 .. code-block:: ps1con
 
     # Windows
-    c:\> c:\Python35\python -m venv %VENV%
+    c:\> c:\Python35\python3 -m venv %VENV%
 
 .. seealso:: See also Python 3's :mod:`venv module <python:venv>` and Python
    2's `virtualenv <http://www.virtualenv.org/en/latest/>`_ package.

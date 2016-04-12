@@ -578,10 +578,10 @@ Using Custom Arguments to Python when Running ``p*`` Scripts
 .. versionadded:: 1.5
 
 Each of Pyramid's console scripts (``pserve``, ``pviews``, etc.) can be run
-directly using ``python -m``, allowing custom arguments to be sent to the
+directly using ``python3 -m``, allowing custom arguments to be sent to the
 Python interpreter at runtime. For example::
 
-      python -3 -m pyramid.scripts.pserve development.ini
+      python3 -m pyramid.scripts.pserve development.ini
 
 
 .. index::

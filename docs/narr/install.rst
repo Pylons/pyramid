@@ -5,8 +5,8 @@ Installing :app:`Pyramid`
 
 .. note::
 
-    This installation guide now emphasizes the use of Python 3.4 and greater
-    for simplicity.
+    This installation guide emphasizes the use of Python 3.4 and greater for
+    simplicity.
 
 
 .. index::
@@ -126,8 +126,8 @@ also need to download and install the Python for Windows extensions.
 Requirements for Installing Packages
 ------------------------------------
 
-Use :term:`pip` for installing packages and :term:`pyvenv` for creating a
-virtual environment. A virtual environment is a semi-isolated Python
+Use :term:`pip` for installing packages and ``python3 -m venv env`` for
+creating a virtual environment. A virtual environment is a semi-isolated Python
 environment that allows packages to be installed for use by a particular
 application, rather than being installed system wide.
 
@@ -155,7 +155,7 @@ After installing Python as described previously in :ref:`for-mac-os-x-users` or
    .. code-block:: bash
 
       $ export VENV=~/env
-      $ pyvenv $VENV
+      $ python3 -m venv $VENV
 
    You can either follow the use of the environment variable ``$VENV``, or
    replace it with the root directory of the virtual environment. If you choose
@@ -190,7 +190,7 @@ After installing Python as described previously in
 
       c:\> set VENV=c:\env
       # replace "x" with your minor version of Python 3
-      c:\> c:\Python3x\Scripts\pyvenv %VENV%
+      c:\> c:\Python3x\Scripts\python3 -m venv %VENV%
 
    You can either follow the use of the environment variable ``%VENV%``, or
    replace it with the root directory of the virtual environment. If you choose
