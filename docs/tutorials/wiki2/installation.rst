@@ -12,8 +12,7 @@ This tutorial assumes that you have already followed the steps in
 install Pyramid**.  Thereby you will satisfy the following requirements.
 
 * A Python interpreter is installed on your operating system.
-* :term:`virtualenv` is installed.
-* :term:`pip` will be installed when we create a virtual environment.
+* You've satisfied the :ref:`requirements-for-installing-packages`.
 
 
 Create directory to contain the project
@@ -39,8 +38,8 @@ On Windows
 Create and use a virtual Python environment
 -------------------------------------------
 
-Next let's create a ``virtualenv`` workspace for our project.  We will use the
-``VENV`` environment variable instead of the absolute path of the virtual
+Next let's create a virtual environment workspace for our project.  We will use
+the ``VENV`` environment variable instead of the absolute path of the virtual
 environment.
 
 On UNIX
@@ -49,7 +48,7 @@ On UNIX
 .. code-block:: bash
 
    $ export VENV=~/pyramidtut
-   $ virtualenv $VENV
+   $ python3 -m venv $VENV
 
 On Windows
 ^^^^^^^^^^
@@ -71,7 +70,7 @@ Python 3.5:
 
 .. code-block:: ps1con
 
-   c:\> c:\Python35\Scripts\virtualenv %VENV%
+   c:\> c:\Python35\Scripts\python -m venv %VENV%
 
 
 Upgrade ``pip`` and ``setuptools`` in the virtual environment
@@ -185,8 +184,9 @@ On Windows
 
 .. note:: If you are using Windows, the ``alchemy`` scaffold may not deal
    gracefully with installation into a location that contains spaces in the
-   path. If you experience startup problems, try putting both the virtualenv
-   and the project into directories that do not contain spaces in their paths.
+   path. If you experience startup problems, try putting both the virtual
+   environment and the project into directories that do not contain spaces in
+   their paths.
 
 
 .. _installing_project_in_dev_mode:
@@ -198,7 +198,7 @@ In order to do development on the project easily, you must "register" the
 project as a development egg in your workspace using the ``pip install -e .``
 command. In order to do so, change directory to the ``tutorial`` directory that
 you created in :ref:`sql_making_a_project`, and run the ``pip install -e .``
-command using the virtualenv Python interpreter.
+command using the virtual environment Python interpreter.
 
 On UNIX
 ^^^^^^^
@@ -302,8 +302,8 @@ runs the tests in the same way that ``py.test`` does, but provides additional
 "coverage" information, exposing which lines of your project are covered by the
 tests.
 
-We've already installed the ``pytest-cov`` package into our ``virtualenv``, so
-we can run the tests with coverage.
+We've already installed the ``pytest-cov`` package into our virtual
+environment, so we can run the tests with coverage.
 
 On UNIX
 ^^^^^^^

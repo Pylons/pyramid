@@ -176,7 +176,7 @@ module.
 
 The ``initialize_tutorial_db`` is a nice example of framework support.
 You point your setup at the location of some ``[console_scripts]`` and
-these get generated into your virtualenv's ``bin`` directory. Our
+these get generated into your virtual environment's ``bin`` directory. Our
 console script follows the pattern of being fed a configuration file
 with all the bootstrapping. It then opens SQLAlchemy and creates the
 root of the wiki, which also makes the SQLite file. Note the

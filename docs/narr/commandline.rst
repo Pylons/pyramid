@@ -815,17 +815,17 @@ Making Your Script into a Console Script
 ----------------------------------------
 
 A "console script" is :term:`setuptools` terminology for a script that gets
-installed into the ``bin`` directory of a Python :term:`virtualenv` (or "base"
-Python environment) when a :term:`distribution` which houses that script is
-installed.  Because it's installed into the ``bin`` directory of a virtualenv
-when the distribution is installed, it's a convenient way to package and
-distribute functionality that you can call from the command-line. It's often
-more convenient to create a console script than it is to create a ``.py``
-script and instruct people to call it with the "right" Python interpreter.  A
-console script generates a file that lives in ``bin``, and when it's invoked it
-will always use the "right" Python environment, which means it will always be
-invoked in an environment where all the libraries it needs (such as Pyramid)
-are available.
+installed into the ``bin`` directory of a Python :term:`virtual environment`
+(or "base" Python environment) when a :term:`distribution` which houses that
+script is installed. Because it's installed into the ``bin`` directory of a
+virtual environment when the distribution is installed, it's a convenient way
+to package and distribute functionality that you can call from the
+command-line. It's often more convenient to create a console script than it is
+to create a ``.py`` script and instruct people to call it with the "right"
+Python interpreter. A console script generates a file that lives in ``bin``,
+and when it's invoked it will always use the "right" Python environment, which
+means it will always be invoked in an environment where all the libraries it
+needs (such as Pyramid) are available.
 
 In general, you can make your script into a console script by doing the
 following:
@@ -843,7 +843,7 @@ following:
 - Run ``pip install -e .`` or ``pip install .`` to get your distribution
   reinstalled. When you reinstall your distribution, a file representing the
   script that you named in the last step will be in the ``bin`` directory of
-  the virtualenv in which you installed the distribution. It will be
+  the virtual environment in which you installed the distribution. It will be
   executable. Invoking it from a terminal will execute your callable.
 
 As an example, let's create some code that can be invoked by a console script
@@ -1029,7 +1029,7 @@ The result will be something like:
          )
 
 Once you've done this, invoking ``$VENV/bin/pip install -e .`` will install a
-file named ``show_settings`` into the ``$somevirtualenv/bin`` directory with a
+file named ``show_settings`` into the ``$somevenv/bin`` directory with a
 small bit of Python code that points to your entry point. It will be
 executable. Running it without any arguments will print an error and exit.
 Running it with a single argument that is the path of a config file will print

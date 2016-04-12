@@ -24,21 +24,15 @@ specific path information for commands and files.
     system.  If you do not, install Apache 2.X for your platform in
     whatever manner makes sense.
 
+#.  It is also assumed that you have satisfied the
+    :ref:`requirements-for-installing-packages`.
+
 #.  Once you have Apache installed, install ``mod_wsgi``.  Use the
     (excellent) `installation instructions
     <http://code.google.com/p/modwsgi/wiki/InstallationInstructions>`_
     for your platform into your system's Apache installation.
 
-#.  Install :term:`virtualenv` into the Python which mod_wsgi will
-    run using pip.
-
-    .. code-block:: text
-
-       $ sudo /usr/bin/pip install virtualenv
-
-    This command may need to be performed as the root user.
-
-#.  Create a :term:`virtualenv` which we'll use to install our
+#.  Create a :term:`virtual environment` which we'll use to install our
     application.
 
     .. code-block:: text
@@ -46,9 +40,9 @@ specific path information for commands and files.
        $ cd ~
        $ mkdir modwsgi
        $ cd modwsgi
-       $ /usr/local/bin/virtualenv env
+       $ python3 -m venv env
 
-#.  Install :app:`Pyramid` into the newly created virtualenv:
+#.  Install :app:`Pyramid` into the newly created virtual environment:
 
     .. code-block:: text
 
@@ -67,7 +61,7 @@ specific path information for commands and files.
        $ cd myapp
        $ $VENV/bin/pip install -e .
 
-#.  Within the virtualenv directory (``~/modwsgi/env``), create a
+#.  Within the virtual environment directory (``~/modwsgi/env``), create a
     script named ``pyramid.wsgi``.  Give it these contents:
 
     .. code-block:: python

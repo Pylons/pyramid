@@ -150,7 +150,7 @@ After installing Python as described previously in :ref:`for-mac-os-x-users` or
 :ref:`if-you-don-t-yet-have-a-python-interpreter-unix`, and satisfying the
 :ref:`requirements-for-installing-packages`, you can now install Pyramid.
 
-#. Make a :term:`virtualenv` workspace:
+#. Make a :term:`virtual environment` workspace:
 
    .. code-block:: bash
 
@@ -184,7 +184,7 @@ After installing Python as described previously in
 :ref:`if-you-don-t-yet-have-a-python-interpreter-windows`, and satisfying the
 :ref:`requirements-for-installing-packages`, you can now install Pyramid.
 
-#. Make a :term:`virtualenv` workspace:
+#. Make a :term:`virtual environment` workspace:
 
    .. code-block:: ps1con
 

@@ -129,7 +129,7 @@ order to avoid spaces in any of the path names.
 Next within ``projects`` is your workspace directory, here named
 ``quick_tutorial``. A workspace is a common term used by integrated
 development environments (IDE) like PyCharm and PyDev that stores
-isolated Python environments (virtualenvs) and specific project files
+isolated Python environments (virtual environments) and specific project files
 and repositories.
 
 
@@ -174,7 +174,7 @@ environment variable.
     c:\> c:\Python35\python3 -m venv %VENV%
 
 .. seealso:: See also Python 3's :mod:`venv module <python:venv>` and Python
-   2's `virtualenv <http://www.virtualenv.org/en/latest/>`_ package.
+   2's `virtualenv <https://virtualenv.pypa.io/en/latest/>`_ package.
 
 
 .. _install-pyramid:
