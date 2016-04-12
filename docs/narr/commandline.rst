@@ -926,7 +926,7 @@ top-level directory, your ``setup.py`` file will look something like this:
 
    requires = ['pyramid', 'pyramid_debugtoolbar']
 
-   testing_extras = [
+   tests_require = [
        'WebTest >= 1.3.1',  # py3 compat
        'pytest',  # includes virtualenv
        'pytest-cov',
@@ -951,7 +951,7 @@ top-level directory, your ``setup.py`` file will look something like this:
          zip_safe=False,
          install_requires=requires,
          extras_require={
-             'testing': testing_extras,
+             'testing': tests_require,
          },
          entry_points = """\
          [paste.app_factory]
@@ -993,7 +993,7 @@ The result will be something like:
 
    requires = ['pyramid', 'pyramid_debugtoolbar']
 
-   testing_extras = [
+   tests_require = [
        'WebTest >= 1.3.1',  # py3 compat
        'pytest',  # includes virtualenv
        'pytest-cov',
@@ -1018,7 +1018,7 @@ The result will be something like:
          zip_safe=False,
          install_requires=requires,
          extras_require={
-             'testing': testing_extras,
+             'testing': tests_require,
          },
          entry_points = """\
          [paste.app_factory]
