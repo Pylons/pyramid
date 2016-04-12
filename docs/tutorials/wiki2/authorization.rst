@@ -4,7 +4,7 @@
 Adding authorization
 ====================
 
-In the last chapter we built :term:`authentication` into our wiki2. We also
+In the last chapter we built :term:`authentication` into our wiki. We also
 went one step further and used the ``request.user`` object to perform some
 explicit :term:`authorization` checks. This is fine for a lot of applications,
 but :app:`Pyramid` provides some facilities for cleaning this up and decoupling

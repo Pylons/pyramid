@@ -31,7 +31,7 @@ Steps
    .. code-block:: bash
 
     $ cd ..; cp -r view_classes json; cd json
-    $ $VENV/bin/python setup.py develop
+    $ $VENV/bin/pip install -e .
 
 #. We add a new route for ``hello_json`` in
    ``json/tutorial/__init__.py``:

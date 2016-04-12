@@ -50,7 +50,7 @@ Steps
 
    .. code-block:: bash
 
-    $ $VENV/bin/python setup.py develop
+    $ $VENV/bin/pip install -e .
 
 #. Let's make a file ``ini/development.ini`` for our configuration:
 

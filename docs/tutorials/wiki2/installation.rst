@@ -1,3 +1,5 @@
+.. _wiki2_installation:
+
 ============
 Installation
 ============
@@ -6,12 +8,11 @@ Before you begin
 ----------------
 
 This tutorial assumes that you have already followed the steps in
-:ref:`installing_chapter`, except **do not create a virtualenv or install
-Pyramid**.  Thereby you will satisfy the following requirements.
+:ref:`installing_chapter`, except **do not create a virtual environment or
+install Pyramid**.  Thereby you will satisfy the following requirements.
 
-* Python interpreter is installed on your operating system
-* :term:`setuptools` or :term:`distribute` is installed
-* :term:`virtualenv` is installed
+* A Python interpreter is installed on your operating system.
+* You've satisfied the :ref:`requirements-for-installing-packages`.
 
 
 Create directory to contain the project
@@ -37,8 +38,8 @@ On Windows
 Create and use a virtual Python environment
 -------------------------------------------
 
-Next let's create a ``virtualenv`` workspace for our project.  We will use the
-``VENV`` environment variable instead of the absolute path of the virtual
+Next let's create a virtual environment workspace for our project.  We will use
+the ``VENV`` environment variable instead of the absolute path of the virtual
 environment.
 
 On UNIX
@@ -47,7 +48,7 @@ On UNIX
 .. code-block:: bash
 
    $ export VENV=~/pyramidtut
-   $ virtualenv $VENV
+   $ python3 -m venv $VENV
 
 On Windows
 ^^^^^^^^^^
@@ -69,7 +70,25 @@ Python 3.5:
 
 .. code-block:: ps1con
 
-   c:\> c:\Python35\Scripts\virtualenv %VENV%
+   c:\> c:\Python35\Scripts\python -m venv %VENV%
+
+
+Upgrade ``pip`` and ``setuptools`` in the virtual environment
+-------------------------------------------------------------
+
+On UNIX
+^^^^^^^
+
+.. code-block:: bash
+
+    $ $VENV/bin/pip install --upgrade pip setuptools
+
+On Windows
+^^^^^^^^^^
+
+.. code-block:: ps1con
+
+   c:\> %VENV%\Scripts\pip install --upgrade pip setuptools
 
 
 Install Pyramid into the virtual Python environment
@@ -80,26 +99,27 @@ On UNIX
 
 .. code-block:: bash
 
-   $ $VENV/bin/easy_install pyramid
+   $ $VENV/bin/pip install pyramid
 
 On Windows
 ^^^^^^^^^^
 
 .. code-block:: ps1con
 
-   c:\> %VENV%\Scripts\easy_install pyramid
+   c:\> %VENV%\Scripts\pip install pyramid
 
 
 Install SQLite3 and its development packages
 --------------------------------------------
 
-If you used a package manager to install your Python or if you compiled your
-Python from source, then you must install SQLite3 and its development packages.
-If you downloaded your Python as an installer from https://www.python.org, then
-you already have it installed and can skip this step.
+If you used a package manager to install your Python or if you compiled
+your Python from source, then you must install SQLite3 and its
+development packages.  If you downloaded your Python as an installer
+from https://www.python.org, then you already have it installed and can skip
+this step.
 
-If you need to install the SQLite3 packages, then, for example, using the
-Debian system and ``apt-get``, the command would be the following:
+If you need to install the SQLite3 packages, then, for example, using
+the Debian system and ``apt-get``, the command would be the following:
 
 .. code-block:: bash
 
@@ -164,8 +184,9 @@ On Windows
 
 .. note:: If you are using Windows, the ``alchemy`` scaffold may not deal
    gracefully with installation into a location that contains spaces in the
-   path. If you experience startup problems, try putting both the virtualenv
-   and the project into directories that do not contain spaces in their paths.
+   path. If you experience startup problems, try putting both the virtual
+   environment and the project into directories that do not contain spaces in
+   their paths.
 
 
 .. _installing_project_in_dev_mode:
@@ -174,10 +195,10 @@ Installing the project in development mode
 ------------------------------------------
 
 In order to do development on the project easily, you must "register" the
-project as a development egg in your workspace using the ``setup.py develop``
+project as a development egg in your workspace using the ``pip install -e .``
 command. In order to do so, change directory to the ``tutorial`` directory that
-you created in :ref:`sql_making_a_project`, and run the ``setup.py develop``
-command using the virtualenv Python interpreter.
+you created in :ref:`sql_making_a_project`, and run the ``pip install -e .``
+command using the virtual environment Python interpreter.
 
 On UNIX
 ^^^^^^^
@@ -185,7 +206,7 @@ On UNIX
 .. code-block:: bash
 
    $ cd tutorial
-   $ $VENV/bin/python setup.py develop
+   $ $VENV/bin/pip install -e .
 
 On Windows
 ^^^^^^^^^^
@@ -193,104 +214,141 @@ On Windows
 .. code-block:: ps1con
 
    c:\pyramidtut> cd tutorial
-   c:\pyramidtut\tutorial> %VENV%\Scripts\python setup.py develop
+   c:\pyramidtut\tutorial> %VENV%\Scripts\pip install -e .
 
-The console will show ``setup.py`` checking for packages and installing missing
-packages. Success executing this command will show a line like the following::
+The console will show ``pip`` checking for packages and installing missing
+packages. Success executing this command will show a line like the following:
 
-   Finished processing dependencies for tutorial==0.0
+.. code-block:: bash
+
+   Successfully installed Chameleon-2.24 Mako-1.0.4 MarkupSafe-0.23 \
+   Pygments-2.1.3 SQLAlchemy-1.0.12 pyramid-chameleon-0.3 \
+   pyramid-debugtoolbar-2.4.2 pyramid-mako-1.0.2 pyramid-tm-0.12.1 \
+   transaction-1.4.4 tutorial waitress-0.8.10 zope.sqlalchemy-0.7.6
+
+
+.. _install-testing-requirements:
+
+Install testing requirements
+----------------------------
+
+In order to run tests, we need to install the testing requirements. This is
+done through our project's ``setup.py`` file, in the ``tests_require`` and
+``extras_require`` stanzas, and by issuing the command below for your
+operating system.
+
+.. literalinclude:: src/installation/setup.py
+   :language: python
+   :linenos:
+   :lineno-start: 22
+   :lines: 22-26
+
+.. literalinclude:: src/installation/setup.py
+   :language: python
+   :linenos:
+   :lineno-start: 45
+   :lines: 45-47
+
+On UNIX
+^^^^^^^
+
+.. code-block:: bash
+
+   $ $VENV/bin/pip install -e ".[testing]"
+
+On Windows
+^^^^^^^^^^
+
+.. code-block:: ps1con
+
+   c:\pyramidtut\tutorial> %VENV%\Scripts\pip install -e ".[testing]"
+
 
 .. _sql_running_tests:
 
 Run the tests
 -------------
 
-After you've installed the project in development mode, you may run the tests
-for the project.
+After you've installed the project in development mode as well as the testing
+requirements, you may run the tests for the project.
 
 On UNIX
 ^^^^^^^
 
 .. code-block:: bash
 
-   $ $VENV/bin/python setup.py test -q
+   $ $VENV/bin/py.test tutorial/tests.py -q
 
 On Windows
 ^^^^^^^^^^
 
 .. code-block:: ps1con
 
-   c:\pyramidtut\tutorial> %VENV%\Scripts\python setup.py test -q
+   c:\pyramidtut\tutorial> %VENV%\Scripts\py.test tutorial\tests.py -q
 
-For a successful test run, you should see output that ends like this::
+For a successful test run, you should see output that ends like this:
+
+.. code-block:: bash
 
    ..
-   ----------------------------------------------------------------------
-   Ran 2 tests in 0.053s
+   2 passed in 0.44 seconds
 
-   OK
 
 Expose test coverage information
 --------------------------------
 
-You can run the ``nosetests`` command to see test coverage information. This
-runs the tests in the same way that ``setup.py test`` does, but provides
-additional "coverage" information, exposing which lines of your project are
-covered by the tests.
+You can run the ``py.test`` command to see test coverage information. This
+runs the tests in the same way that ``py.test`` does, but provides additional
+"coverage" information, exposing which lines of your project are covered by the
+tests.
 
-To get this functionality working, we'll need to install the ``nose`` and
-``coverage`` packages into our ``virtualenv``:
-
-On UNIX
-^^^^^^^
-
-.. code-block:: bash
-
-   $ $VENV/bin/easy_install nose coverage
-
-On Windows
-^^^^^^^^^^
-
-.. code-block:: ps1con
-
-   c:\pyramidtut\tutorial> %VENV%\Scripts\easy_install nose coverage
-
-Once ``nose`` and ``coverage`` are installed, we can run the tests with
-coverage.
+We've already installed the ``pytest-cov`` package into our virtual
+environment, so we can run the tests with coverage.
 
 On UNIX
 ^^^^^^^
 
 .. code-block:: bash
 
-   $ $VENV/bin/nosetests --cover-package=tutorial --cover-erase --with-coverage
+   $ $VENV/bin/py.test --cov=tutorial --cov-report=term-missing tutorial/tests.py
 
 On Windows
 ^^^^^^^^^^
 
 .. code-block:: ps1con
 
-   c:\pyramidtut\tutorial> %VENV%\Scripts\nosetests --cover-package=tutorial \
-         --cover-erase --with-coverage
+   c:\pyramidtut\tutorial> %VENV%\Scripts\py.test --cov=tutorial \
+       --cov-report=term-missing tutorial\tests.py
 
-If successful, you will see output something like this::
+If successful, you will see output something like this:
 
-   ..
-   Name                         Stmts   Miss  Cover   Missing
-   ----------------------------------------------------------
-   tutorial.py                      8      6    25%   7-12
-   tutorial/models.py              22      0   100%
-   tutorial/models/meta.py          5      0   100%
-   tutorial/models/mymodel.py       8      0   100%
-   tutorial/scripts.py              0      0   100%
-   tutorial/views.py                0      0   100%
-   tutorial/views/default.py       12      0   100%
-   ----------------------------------------------------------
-   TOTAL                           55      6    89%
-   ----------------------------------------------------------------------
-   Ran 2 tests in 0.579s
+.. code-block:: bash
 
-   OK
+   ======================== test session starts ========================
+   platform Python 3.5.1, pytest-2.9.1, py-1.4.31, pluggy-0.3.1
+   rootdir: /Users/stevepiercy/projects/pyramidtut/tutorial, inifile:
+   plugins: cov-2.2.1
+   collected 2 items
+
+   tutorial/tests.py ..
+   ------------------ coverage: platform Python 3.5.1 ------------------
+   Name                               Stmts   Miss  Cover   Missing
+   ----------------------------------------------------------------
+   tutorial/__init__.py                   8      6    25%   7-12
+   tutorial/models/__init__.py           22      0   100%
+   tutorial/models/meta.py                5      0   100%
+   tutorial/models/mymodel.py             8      0   100%
+   tutorial/routes.py                     3      3     0%   1-3
+   tutorial/scripts/__init__.py           0      0   100%
+   tutorial/scripts/initializedb.py      26     26     0%   1-45
+   tutorial/tests.py                     39      0   100%
+   tutorial/views/__init__.py             0      0   100%
+   tutorial/views/default.py             12      0   100%
+   tutorial/views/notfound.py             4      4     0%   1-7
+   ----------------------------------------------------------------
+   TOTAL                                127     39    69%
+
+   ===================== 2 passed in 0.57 seconds ======================
 
 Our package doesn't quite have 100% test coverage.
 
@@ -307,6 +365,13 @@ initialize our database.
 
    The ``initialize_tutorial_db`` command does not perform a migration, but
    rather it simply creates missing tables and adds some dummy data. If you
+   already have a database, you should delete it before running
+   ``initialize_tutorial_db`` again.
+
+.. note::
+
+   The ``initialize_tutorial_db`` command is not performing a migration but
+   rather simply creating missing tables and adding some dummy data. If you
    already have a database, you should delete it before running
    ``initialize_tutorial_db`` again.
 
@@ -327,15 +392,17 @@ On Windows
 
    c:\pyramidtut\tutorial> %VENV%\Scripts\initialize_tutorial_db development.ini
 
-The output to your console should be something like this::
+The output to your console should be something like this:
 
-   2016-02-21 23:57:41,793 INFO  [sqlalchemy.engine.base.Engine:1192][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
-   2016-02-21 23:57:41,793 INFO  [sqlalchemy.engine.base.Engine:1193][MainThread] ()
-   2016-02-21 23:57:41,794 INFO  [sqlalchemy.engine.base.Engine:1192][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
-   2016-02-21 23:57:41,794 INFO  [sqlalchemy.engine.base.Engine:1193][MainThread] ()
-   2016-02-21 23:57:41,796 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] PRAGMA table_info("models")
-   2016-02-21 23:57:41,796 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
-   2016-02-21 23:57:41,798 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread]
+.. code-block:: bash
+
+   2016-04-09 00:53:37,801 INFO  [sqlalchemy.engine.base.Engine:1192][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
+   2016-04-09 00:53:37,801 INFO  [sqlalchemy.engine.base.Engine:1193][MainThread] ()
+   2016-04-09 00:53:37,802 INFO  [sqlalchemy.engine.base.Engine:1192][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
+   2016-04-09 00:53:37,802 INFO  [sqlalchemy.engine.base.Engine:1193][MainThread] ()
+   2016-04-09 00:53:37,802 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] PRAGMA table_info("models")
+   2016-04-09 00:53:37,803 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
+   2016-04-09 00:53:37,803 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread]
    CREATE TABLE models (
            id INTEGER NOT NULL,
            name TEXT,
@@ -344,15 +411,15 @@ The output to your console should be something like this::
    )
 
 
-   2016-02-21 23:57:41,798 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
-   2016-02-21 23:57:41,798 INFO  [sqlalchemy.engine.base.Engine:686][MainThread] COMMIT
-   2016-02-21 23:57:41,799 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] CREATE UNIQUE INDEX my_index ON models (name)
-   2016-02-21 23:57:41,799 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
-   2016-02-21 23:57:41,799 INFO  [sqlalchemy.engine.base.Engine:686][MainThread] COMMIT
-   2016-02-21 23:57:41,801 INFO  [sqlalchemy.engine.base.Engine:646][MainThread] BEGIN (implicit)
-   2016-02-21 23:57:41,802 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] INSERT INTO models (name, value) VALUES (?, ?)
-   2016-02-21 23:57:41,802 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ('one', 1)
-   2016-02-21 23:57:41,821 INFO  [sqlalchemy.engine.base.Engine:686][MainThread] COMMIT
+   2016-04-09 00:53:37,803 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
+   2016-04-09 00:53:37,804 INFO  [sqlalchemy.engine.base.Engine:686][MainThread] COMMIT
+   2016-04-09 00:53:37,805 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] CREATE UNIQUE INDEX my_index ON models (name)
+   2016-04-09 00:53:37,805 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
+   2016-04-09 00:53:37,806 INFO  [sqlalchemy.engine.base.Engine:686][MainThread] COMMIT
+   2016-04-09 00:53:37,807 INFO  [sqlalchemy.engine.base.Engine:646][MainThread] BEGIN (implicit)
+   2016-04-09 00:53:37,808 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] INSERT INTO models (name, value) VALUES (?, ?)
+   2016-04-09 00:53:37,808 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ('one', 1)
+   2016-04-09 00:53:37,809 INFO  [sqlalchemy.engine.base.Engine:686][MainThread] COMMIT
 
 Success!  You should now have a ``tutorial.sqlite`` file in your current
 working directory. This is an SQLite database with a single table defined in it
@@ -415,8 +482,8 @@ assumptions:
 
 - You are willing to use :term:`URL dispatch` to map URLs to code.
 
-- You want to use zope.sqlalchemy_, pyramid_tm_ and the transaction_ package to
-  scope sessions to requests.
+- You want to use zope.sqlalchemy_, pyramid_tm_, and the transaction_ packages
+  to scope sessions to requests.
 
 - You want to use pyramid_jinja2_ to render your templates. Different
   templating engines can be used, but we had to choose one to make this
@@ -428,6 +495,18 @@ assumptions:
    database or filesystem files). It also supports an additional mechanism to
    map URLs to code (:term:`traversal`). However, for the purposes of this
    tutorial, we'll only be using URL dispatch and SQLAlchemy.
+
+.. _pyramid_jinja2:
+   http://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/
+
+.. _pyramid_tm:
+   http://docs.pylonsproject.org/projects/pyramid-tm/en/latest/
+
+.. _zope.sqlalchemy:
+   https://pypi.python.org/pypi/zope.sqlalchemy
+
+.. _transaction:
+   http://zodb.readthedocs.org/en/latest/transactions.html
 
 .. _pyramid_jinja2:
    http://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/

@@ -17,7 +17,7 @@ repo, where each step/topic/directory is a Python package.
 To successfully run each step::
 
   $ cd request_response
-  $ $VENV/bin/python setup.py develop
+  $ $VENV/bin/pip install -e .
 
 ...and repeat for each step you would like to work on. In most cases we
 will start with the results of an earlier step.

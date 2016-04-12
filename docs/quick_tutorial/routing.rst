@@ -48,7 +48,7 @@ Steps
    .. code-block:: bash
 
     $ cd ..; cp -r view_classes routing; cd routing
-    $ $VENV/bin/python setup.py develop
+    $ $VENV/bin/pip install -e .
 
 #. Our ``routing/tutorial/__init__.py`` needs a route with a replacement
    pattern:

@@ -56,7 +56,7 @@ Steps
 
    .. code-block:: bash
 
-    $ $VENV/bin/python setup.py develop
+    $ $VENV/bin/pip install -e .
 
 #. We need to connect ``pyramid_chameleon`` as a renderer by making a
    call in the setup of ``templating/tutorial/__init__.py``:

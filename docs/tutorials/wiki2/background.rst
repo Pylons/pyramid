@@ -1,3 +1,5 @@
+.. _wiki2_background:
+
 ==========
 Background
 ==========

@@ -1,3 +1,5 @@
+.. _wiki2_defining_the_domain_model:
+
 =========================
 Defining the Domain Model
 =========================
@@ -37,12 +39,12 @@ Open ``tutorial/setup.py`` and edit it to look like the following:
 Only the highlighted line needs to be added.
 
 
-Running ``setup.py develop``
+Running ``pip install -e .``
 ============================
 
-Since a new software dependency was added, you will need to run ``python
-setup.py develop`` again inside the root of the ``tutorial`` package to obtain
-and register the newly added dependency distribution.
+Since a new software dependency was added, you will need to run ``pip install
+-e .`` again inside the root of the ``tutorial`` package to obtain and register
+the newly added dependency distribution.
 
 Make sure your current working directory is the root of the project (the
 directory in which ``setup.py`` lives) and execute the following command.
@@ -52,19 +54,19 @@ On UNIX:
 .. code-block:: bash
 
    $ cd tutorial
-   $ $VENV/bin/python setup.py develop
+   $ $VENV/bin/pip install -e .
 
 On Windows:
 
 .. code-block:: ps1con
 
    c:\pyramidtut> cd tutorial
-   c:\pyramidtut\tutorial> %VENV%\Scripts\python setup.py develop
+   c:\pyramidtut\tutorial> %VENV%\Scripts\pip install -e .
 
 Success executing this command will end with a line to the console something
 like this::
 
-   Finished processing dependencies for tutorial==0.0
+   Successfully installed bcrypt-2.0.0 cffi-1.5.2 pycparser-2.14 tutorial-0.0
 
 
 Remove ``mymodel.py``
@@ -149,7 +151,7 @@ the following:
    :language: py
    :emphasize-lines: 8,9
 
-Here we align our imports with the names of the models, ``User`` and ``Page``.
+Here we align our imports with the names of the models, ``Page`` and ``User``.
 
 
 Edit ``scripts/initializedb.py``
@@ -185,51 +187,54 @@ need to rerun the ``initialize_tutorial_db`` command to pick up the changes
 we've made to both the models.py file and to the initializedb.py file. See
 :ref:`initialize_db_wiki2` for instructions.
 
-Success will look something like this::
+Success will look something like this:
 
-  2016-02-12 01:06:35,855 INFO  [sqlalchemy.engine.base.Engine:1192][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
-  2016-02-12 01:06:35,855 INFO  [sqlalchemy.engine.base.Engine:1193][MainThread] ()
-  2016-02-12 01:06:35,855 INFO  [sqlalchemy.engine.base.Engine:1192][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
-  2016-02-12 01:06:35,855 INFO  [sqlalchemy.engine.base.Engine:1193][MainThread] ()
-  2016-02-12 01:06:35,856 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] PRAGMA table_info("pages")
-  2016-02-12 01:06:35,856 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
-  2016-02-12 01:06:35,856 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] PRAGMA table_info("users")
-  2016-02-12 01:06:35,856 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
-  2016-02-12 01:06:35,857 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread]
-  CREATE TABLE users (
-    id INTEGER NOT NULL,
-    name TEXT NOT NULL,
-    role TEXT NOT NULL,
-    password_hash TEXT,
-    CONSTRAINT pk_users PRIMARY KEY (id),
-    CONSTRAINT uq_users_name UNIQUE (name)
-  )
+.. code-block:: bash
 
-
-  2016-02-12 01:06:35,857 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
-  2016-02-12 01:06:35,858 INFO  [sqlalchemy.engine.base.Engine:686][MainThread] COMMIT
-  2016-02-12 01:06:35,858 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread]
-  CREATE TABLE pages (
-    id INTEGER NOT NULL,
-    name TEXT NOT NULL,
-    data INTEGER NOT NULL,
-    creator_id INTEGER NOT NULL,
-    CONSTRAINT pk_pages PRIMARY KEY (id),
-    CONSTRAINT uq_pages_name UNIQUE (name),
-    CONSTRAINT fk_pages_creator_id_users FOREIGN KEY(creator_id) REFERENCES users (id)
-  )
+   2016-04-09 02:49:51,711 INFO  [sqlalchemy.engine.base.Engine:1192][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
+   2016-04-09 02:49:51,711 INFO  [sqlalchemy.engine.base.Engine:1193][MainThread] ()
+   2016-04-09 02:49:51,712 INFO  [sqlalchemy.engine.base.Engine:1192][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
+   2016-04-09 02:49:51,712 INFO  [sqlalchemy.engine.base.Engine:1193][MainThread] ()
+   2016-04-09 02:49:51,713 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] PRAGMA table_info("pages")
+   2016-04-09 02:49:51,714 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
+   2016-04-09 02:49:51,714 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] PRAGMA table_info("users")
+   2016-04-09 02:49:51,714 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
+   2016-04-09 02:49:51,715 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread]
+   CREATE TABLE users (
+           id INTEGER NOT NULL,
+           name TEXT NOT NULL,
+           role TEXT NOT NULL,
+           password_hash TEXT,
+           CONSTRAINT pk_users PRIMARY KEY (id),
+           CONSTRAINT uq_users_name UNIQUE (name)
+   )
 
 
-  2016-02-12 01:06:35,859 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
-  2016-02-12 01:06:35,859 INFO  [sqlalchemy.engine.base.Engine:686][MainThread] COMMIT
-  2016-02-12 01:06:36,383 INFO  [sqlalchemy.engine.base.Engine:646][MainThread] BEGIN (implicit)
-  2016-02-12 01:06:36,384 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] INSERT INTO users (name, role, password_hash) VALUES (?, ?, ?)
-  2016-02-12 01:06:36,384 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ('editor', 'editor', '$2b$12$bSr5QR3wFs1LAnld7R94e.TXPj7DVoTxu2hA1kY6rm.Q3cAhD.AQO')
-  2016-02-12 01:06:36,384 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] INSERT INTO users (name, role, password_hash) VALUES (?, ?, ?)
-  2016-02-12 01:06:36,384 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ('basic', 'basic', '$2b$12$.v0BQK2xWEQOnywbX2BFs.qzXo5Qf9oZohGWux/MOSj6Z.pVaY2Z6')
-  2016-02-12 01:06:36,385 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] INSERT INTO pages (name, data, creator_id) VALUES (?, ?, ?)
-  2016-02-12 01:06:36,385 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ('FrontPage', 'This is the front page', 1)
-  2016-02-12 01:06:36,385 INFO  [sqlalchemy.engine.base.Engine:686][MainThread] COMMIT
+   2016-04-09 02:49:51,715 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
+   2016-04-09 02:49:51,716 INFO  [sqlalchemy.engine.base.Engine:686][MainThread] COMMIT
+   2016-04-09 02:49:51,716 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread]
+   CREATE TABLE pages (
+           id INTEGER NOT NULL,
+           name TEXT NOT NULL,
+           data INTEGER NOT NULL,
+           creator_id INTEGER NOT NULL,
+           CONSTRAINT pk_pages PRIMARY KEY (id),
+           CONSTRAINT uq_pages_name UNIQUE (name),
+           CONSTRAINT fk_pages_creator_id_users FOREIGN KEY(creator_id) REFERENCES users (id)
+   )
+
+
+   2016-04-09 02:49:51,716 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
+   2016-04-09 02:49:51,717 INFO  [sqlalchemy.engine.base.Engine:686][MainThread] COMMIT
+   2016-04-09 02:49:52,256 INFO  [sqlalchemy.engine.base.Engine:646][MainThread] BEGIN (implicit)
+   2016-04-09 02:49:52,257 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] INSERT INTO users (name, role, password_hash) VALUES (?, ?, ?)
+   2016-04-09 02:49:52,257 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ('editor', 'editor', b'$2b$12$APUPJvI/kKxrbQPyQehkR.ggoOM6fFYCZ07SFCkWGltl1wJsKB98y')
+   2016-04-09 02:49:52,258 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] INSERT INTO users (name, role, password_hash) VALUES (?, ?, ?)
+   2016-04-09 02:49:52,258 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ('basic', 'basic', b'$2b$12$GeFnypuQpZyxZLH.sN0akOrPdZMcQjqVTCim67u6f89lOFH/0ddc6')
+   2016-04-09 02:49:52,259 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] INSERT INTO pages (name, data, creator_id) VALUES (?, ?, ?)
+   2016-04-09 02:49:52,259 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ('FrontPage', 'This is the front page', 1)
+   2016-04-09 02:49:52,259 INFO  [sqlalchemy.engine.base.Engine:686][MainThread] COMMIT
+
 
 View the application in a browser
 ---------------------------------
