@@ -215,7 +215,7 @@ Install testing requirements
 
 In order to run tests, we need to install the testing requirements. This is
 done through our project's ``setup.py`` file, in the ``testing_extras`` and
-``extras_requires`` stanzas, and by issuing the command below for your
+``extras_require`` stanzas, and by issuing the command below for your
 operating system.
 
 .. literalinclude:: src/installation/setup.py
