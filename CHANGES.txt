@@ -27,6 +27,19 @@ unreleased
   where you may need more control over the request.
   See https://github.com/Pylons/pyramid/pull/2393
 
+- Allow using variable substitutions like ``%(LOGGING_LOGGER_ROOT_LEVEL)s``
+  for logging sections of the .ini file and populate these variables from
+  the ``pserve`` command line -- e.g.:
+  ``pserve development.ini LOGGING_LOGGER_ROOT_LEVEL=DEBUG``
+  See https://github.com/Pylons/pyramid/pull/2399
+
+- Add a new "view deriver" concept to Pyramid to allow framework authors to
+  inject elements into the standard Pyramid view pipeline and affect all
+  views in an application. This is similar to a decorator except that it
+  has access to options passed to ``config.add_view`` and can affect other
+  stages of the pipeline such as the raw response from a view or prior to
+  security checks. See https://github.com/Pylons/pyramid/pull/2021
+
 1.6 (2015-04-14)
 ================
 

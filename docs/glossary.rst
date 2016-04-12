@@ -1092,6 +1092,13 @@ Glossary
       a client to query the new version of the asset. See :ref:`cache_busting`
       for more information.
 
+   view deriver
+      A view deriver is a composable component of the view pipeline which is
+      used to create a :term:`view callable`. A view deriver is a callable
+      implementing the :class:`pyramid.interfaces.IViewDeriver` interface.
+      Examples of built-in derivers including view mapper, the permission
+      checker, and applying a renderer to a dictionary returned from the view.
+
    pip
       The `Python Packaging Authority <https://www.pypa.io/>`_ recommended tool
       for installing Python packages.

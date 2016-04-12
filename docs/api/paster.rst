@@ -11,4 +11,4 @@
 
     .. autofunction:: get_appsettings(config_uri, name=None, options=None)
 
-    .. autofunction:: setup_logging(config_uri)
+    .. autofunction:: setup_logging(config_uri, global_conf=None)

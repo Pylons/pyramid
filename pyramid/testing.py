@@ -476,6 +476,7 @@ def setUp(registry=None, request=None, hook_zca=True, autocommit=True,
         # method.
         config.add_default_renderers()
         config.add_default_view_predicates()
+        config.add_default_view_derivers()
         config.add_default_route_predicates()
     config.commit()
     global have_zca
