@@ -5,8 +5,8 @@ Installing :app:`Pyramid`
 
 .. note::
 
-    This installation guide now emphasizes the use of Python 3.4 and greater
-    for simplicity.
+    This installation guide emphasizes the use of Python 3.4 and greater for
+    simplicity.
 
 
 .. index::
