@@ -1100,10 +1100,16 @@ Glossary
       checker, and applying a renderer to a dictionary returned from the view.
 
    pip
-      The `Python Packaging Authority <https://www.pypa.io/>`_ recommended tool
-      for installing Python packages.
+      The `Python Packaging Authority's <https://www.pypa.io/>`_ recommended
+      tool for installing Python packages.
 
    pyvenv
-      The Python Packaging Authority's recommended command for `creating
-      virtual environments on Python 3.4 and greater
-      <https://packaging.python.org/en/latest/installing/#creating-virtual-environments>`_.
+      The Python Packaging Authority formerly recommended using this command
+      for `creating virtual environments on Python 3.4 and 3.5
+      <https://packaging.python.org/en/latest/installing/#creating-virtual-environments>`_,
+      but it is deprecated in 3.6 in favor of ``python3 -m venv`` which is
+      backward compatible.
+
+   venv
+      The `Python Packaging Authority's <https://www.pypa.io/>`_ recommended
+      tool for creating virtual environments.

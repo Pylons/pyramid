@@ -25,7 +25,7 @@ As an example, for Python 3.5+ on Linux:
 
 .. parsed-literal::
 
-    $ pyvenv env
+    $ python3 -m venv env
     $ env/bin/pip install pyramid
     # or for a specific released version
     $ env/bin/pip install "pyramid==\ |release|\ "
