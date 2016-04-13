@@ -127,8 +127,6 @@ you can see DeprecationWarnings printed to the console when the tests run.
    $ python -Wd setup.py test -q
 
 The ``-Wd`` argument tells Python to print deprecation warnings to the console.
-Note that the ``-Wd`` flag is only required for Python 2.7 and better: Python
-versions 2.6 and older print deprecation warnings to the console by default.
 See `the Python -W flag documentation
 <http://docs.python.org/using/cmdline.html#cmdoption-W>`_ for more information.
 
