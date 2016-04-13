@@ -367,6 +367,21 @@ Or include it as a header in a jQuery AJAX request:
 The handler for the URL that receives the request should then require that the
 correct CSRF token is supplied.
 
+.. index::
+   single: session.new_csrf_token
+
+Using the ``session.new_csrf_token`` Method
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To explicitly create a new CSRF token, use the ``session.new_csrf_token()``
+method.  This differs only from ``session.get_csrf_token()`` inasmuch as it
+clears any existing CSRF token, creates a new CSRF token, sets the token into
+the session, and returns the token.
+
+.. code-block:: python
+
+   token = request.session.new_csrf_token()
+
 Checking CSRF Tokens Manually
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -389,11 +404,50 @@ header named ``X-CSRF-Token``.
 
         # ...
 
-.. index::
-   single: session.new_csrf_token
+.. _auto_csrf_checking:
+
+Checking CSRF Tokens Automatically
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.7
+
+:app:`Pyramid` supports automatically checking CSRF tokens on POST requests.
+Any other request may be checked manually. This feature can be turned on
+globally for an application using the ``pyramid.require_default_csrf`` setting.
+
+If the ``pyramid.required_default_csrf`` setting is a :term:`truthy string` or
+``True`` then the default CSRF token parameter will be ``csrf_token``. If a
+different token is desired, it may be passed as the value. Finally, a
+:term:`falsey string` or ``False`` will turn off automatic CSRF checking
+globally on every POST request.
+
+No matter what, CSRF checking may be explicitly enabled or disabled on a
+per-view basis using the ``require_csrf`` view option. This option is of the
+same format as the ``pyramid.require_default_csrf`` setting, accepting strings
+or boolean values.
+
+If ``require_csrf`` is ``True`` but does not explicitly define a token to
+check, then the token name is pulled from whatever was set in the
+``pyramid.require_default_csrf`` setting. Finally, if that setting does not
+explicitly define a token, then ``csrf_token`` is the token required. This token
+name will be required in ``request.params`` which is a combination of the
+query string and a submitted form body.
+
+It is always possible to pass the token in the ``X-CSRF-Token`` header as well.
+There is currently no way to define an alternate name for this header without
+performing CSRF checking manually.
+
+If CSRF checks fail then a :class:`pyramid.exceptions.BadCSRFToken` exception
+will be raised. This exception may be caught and handled by an
+:term:`exception view` but, by default, will result in a ``400 Bad Request``
+response being sent to the client.
 
 Checking CSRF Tokens with a View Predicate
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. deprecated:: 1.7
+   Use the ``require_csrf`` option or read :ref:`auto_csrf_checking` instead
+   to have :class:`pyramid.exceptions.BadCSRFToken` exceptions raised.
 
 A convenient way to require a valid CSRF token for a particular view is to
 include ``check_csrf=True`` as a view predicate. See
@@ -410,15 +464,3 @@ include ``check_csrf=True`` as a view predicate. See
    predicate system, when it doesn't find a view, raises ``HTTPNotFound``
    instead of ``HTTPBadRequest``, so ``check_csrf=True`` behavior is different
    from calling :func:`pyramid.session.check_csrf_token`.
-
-Using the ``session.new_csrf_token`` Method
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-To explicitly create a new CSRF token, use the ``session.new_csrf_token()``
-method.  This differs only from ``session.get_csrf_token()`` inasmuch as it
-clears any existing CSRF token, creates a new CSRF token, sets the token into
-the session, and returns the token.
-
-.. code-block:: python
-
-   token = request.session.new_csrf_token()

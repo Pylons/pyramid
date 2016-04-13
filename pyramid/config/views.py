@@ -213,6 +213,7 @@ class ViewsConfiguratorMixin(object):
         http_cache=None,
         match_param=None,
         check_csrf=None,
+        require_csrf=None,
         **view_options):
         """ Add a :term:`view configuration` to the current
         configuration state.  Arguments to ``add_view`` are broken
@@ -365,6 +366,31 @@ class ViewsConfiguratorMixin(object):
           this machinery, set ``response.cache_control.prevent_auto = True``
           before returning the response from the view.  This effectively
           disables any HTTP caching done by ``http_cache`` for that response.
+
+        require_csrf
+
+          .. versionadded:: 1.7
+
+          CSRF checks only affect POST requests. Any other request methods
+          will pass untouched. This option is used in combination with the
+          ``pyramid.require_default_csrf`` setting to control which
+          request parameters are checked for CSRF tokens.
+
+          This feature requires a configured :term:`session factory`.
+
+          If this option is set to ``True`` then CSRF checks will be enabled
+          for POST requests to this view. The required token will be whatever
+          was specified by the ``pyramid.require_default_csrf`` setting, or
+          will fallback to ``csrf_token``.
+
+          If this option is set to a string then CSRF checks will be enabled
+          and it will be used as the required token regardless of the
+          ``pyramid.require_default_csrf`` setting.
+
+          If this option is set to ``False`` then CSRF checks will be disabled
+          regardless of the ``pyramid.require_default_csrf`` setting.
+
+          See :ref:`auto_csrf_checking` for more information.
 
         wrapper
 
@@ -587,6 +613,11 @@ class ViewsConfiguratorMixin(object):
 
         check_csrf
 
+          .. deprecated:: 1.7
+             Use the ``require_csrf`` option or see :ref:`auto_csrf_checking`
+             instead to have :class:`pyramid.exceptions.BadCSRFToken`
+             exceptions raised.
+
           If specified, this value should be one of ``None``, ``True``,
           ``False``, or a string representing the 'check name'.  If the value
           is ``True`` or a string, CSRF checking will be performed.  If the
@@ -682,7 +713,18 @@ class ViewsConfiguratorMixin(object):
                  'Predicate" in the "Hooks" chapter of the documentation '
                  'for more information.'),
                 DeprecationWarning,
-                stacklevel=4
+                stacklevel=4,
+                )
+
+        if check_csrf is not None:
+            warnings.warn(
+                ('The "check_csrf" argument to Configurator.add_view is '
+                 'deprecated as of Pyramid 1.7. Use the "require_csrf" option '
+                 'instead or see "Checking CSRF Tokens Automatically" in the '
+                 '"Sessions" chapter of the documentation for more '
+                 'information.'),
+                DeprecationWarning,
+                stacklevel=4,
                 )
 
         view = self.maybe_dotted(view)
@@ -805,6 +847,8 @@ class ViewsConfiguratorMixin(object):
             path_info=path_info,
             match_param=match_param,
             check_csrf=check_csrf,
+            http_cache=http_cache,
+            require_csrf=require_csrf,
             callable=view,
             mapper=mapper,
             decorator=decorator,
@@ -860,6 +904,7 @@ class ViewsConfiguratorMixin(object):
                 decorator=decorator,
                 mapper=mapper,
                 http_cache=http_cache,
+                require_csrf=require_csrf,
                 extra_options=ovals,
             )
             derived_view.__discriminator__ = lambda *arg: discriminator
@@ -1184,6 +1229,7 @@ class ViewsConfiguratorMixin(object):
         d = pyramid.viewderivers
         derivers = [
             ('secured_view', d.secured_view),
+            ('csrf_view', d.csrf_view),
             ('owrapped_view', d.owrapped_view),
             ('http_cached_view', d.http_cached_view),
             ('decorated_view', d.decorated_view),
@@ -1284,7 +1330,7 @@ class ViewsConfiguratorMixin(object):
                      viewname=None, accept=None, order=MAX_ORDER,
                      phash=DEFAULT_PHASH, decorator=None,
                      mapper=None, http_cache=None, context=None,
-                     extra_options=None):
+                     require_csrf=None, extra_options=None):
         view = self.maybe_dotted(view)
         mapper = self.maybe_dotted(mapper)
         if isinstance(renderer, string_types):
@@ -1311,6 +1357,7 @@ class ViewsConfiguratorMixin(object):
             mapper=mapper,
             decorator=decorator,
             http_cache=http_cache,
+            require_csrf=require_csrf,
         )
         if extra_options:
             options.update(extra_options)

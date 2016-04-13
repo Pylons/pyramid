@@ -1590,6 +1590,12 @@ the user-defined :term:`view callable`:
   This element will also output useful debugging information when
   ``pyramid.debug_authorization`` is enabled.
 
+``csrf_view``
+
+  Used to check the CSRF token provided in the request. This element is a
+  no-op if both the ``require_csrf`` view option and the
+  ``pyramid.require_default_csrf`` setting are disabled.
+
 ``owrapped_view``
 
   Invokes the wrapped view defined by the ``wrapper`` option.
@@ -1655,42 +1661,6 @@ view pipeline:
 View derivers are unique in that they have access to most of the options
 passed to :meth:`pyramid.config.Configurator.add_view` in order to decide what
 to do, and they have a chance to affect every view in the application.
-
-Let's look at one more example which will protect views by requiring a CSRF
-token unless ``disable_csrf=True`` is passed to the view:
-
-.. code-block:: python
-   :linenos:
-
-   from pyramid.response import Response
-   from pyramid.session import check_csrf_token
-
-   def require_csrf_view(view, info):
-       wrapper_view = view
-       if not info.options.get('disable_csrf', False):
-           def wrapper_view(context, request):
-               if request.method == 'POST':
-                   check_csrf_token(request)
-               return view(context, request)
-       return wrapper_view
-
-   require_csrf_view.options = ('disable_csrf',)
-
-   config.add_view_deriver(require_csrf_view)
-
-   def protected_view(request):
-       return Response('protected')
-
-   def unprotected_view(request):
-       return Response('unprotected')
-
-   config.add_view(protected_view, name='safe')
-   config.add_view(unprotected_view, name='unsafe', disable_csrf=True)
-
-Navigating to ``/safe`` with a POST request will then fail when the call to
-:func:`pyramid.session.check_csrf_token` raises a
-:class:`pyramid.exceptions.BadCSRFToken` exception. However, ``/unsafe`` will
-not error.
 
 Ordering View Derivers
 ~~~~~~~~~~~~~~~~~~~~~~
