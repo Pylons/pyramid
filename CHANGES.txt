@@ -1,7 +1,7 @@
 unreleased
 ==========
 
-- Deprecated support for Python 3.3.
+- (Deprecation) Support for Python 3.3 will be removed in Pyramid 1.8.
   https://github.com/Pylons/pyramid/issues/2477
 
 - A new event and interface (BeforeTraversal) has been introduced that will
