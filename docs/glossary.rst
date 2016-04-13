@@ -155,9 +155,9 @@ Glossary
      request before it returns a :term:`context` resource.
 
    virtualenv
-     A term referring both to an isolated Python environment,
-     or `the leading tool <http://www.virtualenv.org>`_ that allows one to
-     create such environments.
+     The `virtualenv tool <https://virtualenv.pypa.io/en/latest/>`_ that allows
+     one to create virtual environments. In Python 3.3 and greater,
+     :term:`venv` is the preferred tool.
 
      Note: whenever you encounter commands prefixed with ``$VENV`` (Unix)
      or ``%VENV`` (Windows), know that that is the environment variable whose
@@ -1012,8 +1012,8 @@ Glossary
 
    console script
      A script written to the ``bin`` (on UNIX, or ``Scripts`` on Windows)
-     directory of a Python installation or :term:`virtualenv` as the result of
-     running ``setup.py install`` or ``setup.py develop``.
+     directory of a Python installation or :term:`virtual environment` as the
+     result of running ``pip install`` or ``pip install -e .``.
 
    introspector
      An object with the methods described by
@@ -1106,3 +1106,27 @@ Glossary
    falsey string
       A string represeting a value of ``False``. Acceptable values are
       ``f``, ``false``, ``n``, ``no``, ``off`` and ``0``.
+
+   pip
+      The `Python Packaging Authority's <https://www.pypa.io/>`_ recommended
+      tool for installing Python packages.
+
+   pyvenv
+      The Python Packaging Authority formerly recommended using this command
+      for `creating virtual environments on Python 3.4 and 3.5
+      <https://packaging.python.org/en/latest/installing/#creating-virtual-environments>`_,
+      but it is deprecated in 3.6 in favor of ``python3 -m venv`` on UNIX or
+      ``python -m venv`` on Windows, which is backward compatible on Python
+      3.3 and greater.
+
+   virtual environment
+      An isolated Python environment that allows packages to be installed for
+      use by a particular application, rather than being installed system wide.
+
+   venv
+      The `Python Packaging Authority's <https://www.pypa.io/>`_ recommended
+      tool for creating virtual environments on Python 3.3 and greater.
+
+      Note: whenever you encounter commands prefixed with ``$VENV`` (Unix)
+      or ``%VENV`` (Windows), know that that is the environment variable whose
+      value is the root of the virtual environment in question.

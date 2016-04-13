@@ -41,7 +41,7 @@ Steps
    .. code-block:: bash
 
     $ cd ..; cp -r templating view_classes; cd view_classes
-    $ $VENV/bin/python setup.py develop
+    $ $VENV/bin/pip install -e .
 
 #. Our ``view_classes/tutorial/views.py`` now has a view class with
    our two views:

@@ -15,43 +15,46 @@ Installation
 
 Once you have a standard Python environment setup, getting started with Pyramid
 is a breeze. Unfortunately "standard" is not so simple in Python. For this
-Quick Tour, it means `Python <https://www.python.org/downloads/>`_, a `virtual
-environment <http://docs.python.org/dev/library/venv.html>`_ (or `virtualenv
-for Python 2.7 <https://pypi.python.org/pypi/virtualenv>`_), and `setuptools
-<https://pypi.python.org/pypi/setuptools/>`_.
+Quick Tour, it means `Python <https://www.python.org/downloads/>`_, `venv
+<https://packaging.python.org/en/latest/projects/#venv>`_ (or `virtualenv for
+Python 2.7 <https://packaging.python.org/en/latest/projects/#virtualenv>`_),
+`pip <https://packaging.python.org/en/latest/projects/#pip>`_, and `setuptools
+<https://packaging.python.org/en/latest/projects/#easy-install>`_.
 
-As an example, for Python 3.3+ on Linux:
+To save a little bit of typing and to be certain that we use the modules,
+scripts, and packages installed in our virtual environment, we'll set an
+environment variable, too.
+
+As an example, for Python 3.5+ on Linux:
 
 .. parsed-literal::
 
-  $ pyvenv env33
-  $ wget https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py -O - | env33/bin/python
-  $ env33/bin/easy_install "pyramid==\ |release|\ "
+    # set an environment variable to where you want your virtual environment
+    $ export VENV=~/env
+    # create the virtual environment
+    $ python3 -m venv $VENV
+    # install pyramid
+    $ $VENV/bin/pip install pyramid
+    # or for a specific released version
+    $ $VENV/bin/pip install "pyramid==\ |release|\ "
 
 For Windows:
 
 .. parsed-literal::
 
-    # Use your browser to download:
-    #   https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py
-    c:\\> c:\\Python33\\python -m venv env33
-    c:\\> env33\\Scripts\\python ez_setup.py
-    c:\\> env33\\Scripts\\easy_install "pyramid==\ |release|\ "
+    # set an environment variable to where you want your virtual environment
+    c:\> set VENV=c:\env
+    # create the virtual environment
+    c:\\> c:\\Python35\\python3 -m venv %VENV%
+    # install pyramid
+    c:\\> %VENV%\\Scripts\\pip install pyramid
+    # or for a specific released version
+    c:\\> %VENV%\\Scripts\\pip install "pyramid==\ |release|\ "
 
 Of course Pyramid runs fine on Python 2.6+, as do the examples in this *Quick
-Tour*. We're just showing Python 3 a little love (Pyramid had production
-support for Python 3 in October 2011).
-
-.. note::
-
-    Why ``easy_install`` and not ``pip``?  Some distributions upon which
-    Pyramid depends have optional C extensions for performance. ``pip`` cannot
-    install some binary Python distributions.  With ``easy_install``, Windows
-    users are able to obtain binary Python distributions, so they get the
-    benefit of the C extensions without needing a C compiler.  Also there can
-    be issues when ``pip`` and ``easy_install`` are used side-by-side in the
-    same environment, so we chose to recommend ``easy_install`` for the sake of
-    reducing the complexity of these instructions.
+Tour*. We're showing Python 3 for simplicity. (Pyramid had production support
+for Python 3 in October 2011.) Also for simplicity, the remaining examples will
+show only UNIX commands.
 
 .. seealso:: See also:
     :ref:`Quick Tutorial section on Requirements <qtut_requirements>`,
@@ -72,7 +75,7 @@ This simple example is easy to run. Save this as ``app.py`` and run it:
 
 .. code-block:: bash
 
-    $ python ./app.py
+    $ $VENV/bin/python ./app.py
 
 Next open http://localhost:6543/ in a browser, and you will see the ``Hello
 World!`` message.
@@ -121,7 +124,9 @@ Let's see some features of requests and responses in action:
 
 In this Pyramid view, we get the URL being visited from ``request.url``. Also
 if you visited http://localhost:6543/?name=alice in a browser, the name is
-included in the body of the response::
+included in the body of the response:
+
+.. code-block:: text
 
   URL http://localhost:6543/?name=alice with name: alice
 
@@ -249,7 +254,7 @@ Chameleon as a :term:`renderer` in our Pyramid application:
 
 .. code-block:: bash
 
-    $ easy_install pyramid_chameleon
+    $ $VENV/bin/pip install pyramid_chameleon
 
 With the package installed, we can include the template bindings into our
 configuration in ``app.py``:
@@ -293,7 +298,7 @@ Jinja2 as a :term:`renderer` in our Pyramid applications:
 
 .. code-block:: bash
 
-    $ easy_install pyramid_jinja2
+    $ $VENV/bin/pip install pyramid_jinja2
 
 With the package installed, we can include the template bindings into our
 configuration:
@@ -502,7 +507,7 @@ We next use the normal Python command to set up our package for development:
 .. code-block:: bash
 
     $ cd hello_world
-    $ python ./setup.py develop
+    $ $VENV/bin/pip install -e .
 
 We are moving in the direction of a full-featured Pyramid project, with a
 proper setup for Python standards (packaging) and Pyramid configuration. This
@@ -510,7 +515,7 @@ includes a new way of running your application:
 
 .. code-block:: bash
 
-    $ pserve development.ini
+    $ $VENV/bin/pserve development.ini
 
 Let's look at ``pserve`` and configuration in more depth.
 
@@ -537,7 +542,7 @@ the server when they change:
 
 .. code-block:: bash
 
-    $ pserve development.ini --reload
+    $ $VENV/bin/pserve development.ini --reload
 
 The ``pserve`` command has a number of other options and operations. Most of
 the work, though, comes from your project's wiring, as expressed in the
@@ -617,7 +622,7 @@ It was installed when you previously ran:
 
 .. code-block:: bash
 
-    $ python ./setup.py develop
+    $ $VENV/bin/pip install -e .
 
 The ``pyramid_debugtoolbar`` package is a Pyramid add-on, which means we need
 to include its configuration into our web application. The ``pyramid_jinja2``
@@ -648,48 +653,79 @@ the relevant ``.ini`` configuration file.
     :ref:`Quick Tutorial pyramid_debugtoolbar <qtut_debugtoolbar>` and
     :ref:`pyramid_debugtoolbar <toolbar:overview>`
 
-Unit tests and ``nose``
-=======================
+Unit tests and ``py.test``
+==========================
 
 Yikes! We got this far and we haven't yet discussed tests. This is particularly
 egregious, as Pyramid has had a deep commitment to full test coverage since
 before its release.
 
 Our ``pyramid_jinja2_starter`` scaffold generated a ``tests.py`` module with
-one unit test in it. To run it, let's install the handy ``nose`` test runner by
-editing ``setup.py``. While we're at it, we'll throw in the ``coverage`` tool
-which yells at us for code that isn't tested. Edit line 36 so it becomes the
-following:
+one unit test in it. To run it, let's install the handy ``pytest`` test runner
+by editing ``setup.py``. While we're at it, we'll throw in the ``pytest-cov``
+tool which yells at us for code that isn't tested. Insert and edit the
+following lines as shown:
 
 .. code-block:: python
     :linenos:
-    :lineno-start: 36
+    :lineno-start: 11
+    :emphasize-lines: 8-12
 
-          tests_require={
-              'testing': ['nose', 'coverage'],
-          },
+    requires = [
+        'pyramid',
+        'pyramid_jinja2',
+        'pyramid_debugtoolbar',
+        'waitress',
+    ]
 
-We changed ``setup.py`` which means we need to rerun
-``python ./setup.py develop``. We can now run all our tests:
+    tests_require = [
+        'WebTest >= 1.3.1',  # py3 compat
+        'pytest',  # includes virtualenv
+        'pytest-cov',
+        ]
+
+.. code-block:: python
+    :linenos:
+    :lineno-start: 34
+    :emphasize-lines: 2-4
+
+        zip_safe=False,
+        extras_require={
+          'testing': tests_require,
+        },
+
+We changed ``setup.py`` which means we need to rerun ``$VENV/bin/pip install -e
+".[testing]"``. We can now run all our tests:
 
 .. code-block:: bash
 
-    $ nosetests hello_world/tests.py
-    .
-    Name                  Stmts   Miss  Cover   Missing
-    ---------------------------------------------------
-    hello_world              11      8    27%   11-23
-    hello_world.models        5      1    80%   8
-    hello_world.tests        14      0   100%
-    hello_world.views         4      0   100%
-    ---------------------------------------------------
-    TOTAL                    34      9    74%
-    ----------------------------------------------------------------------
-    Ran 1 test in 0.009s
+    $ $VENV/bin/py.test --cov=hello_world --cov-report=term-missing hello_world/tests.py
 
-    OK
+This yields the following output.
 
-Our unit test passed. What did our test look like?
+.. code-block:: text
+
+    =========================== test session starts ===========================
+    platform darwin -- Python 3.5.0, pytest-2.9.1, py-1.4.31, pluggy-0.3.1
+    rootdir: /Users/stevepiercy/projects/hack-on-pyramid/hello_world, inifile:
+    plugins: cov-2.2.1
+    collected 1 items
+
+    hello_world/tests.py .
+    ------------- coverage: platform darwin, python 3.5.0-final-0 -------------
+    Name                       Stmts   Miss  Cover   Missing
+    --------------------------------------------------------
+    hello_world/__init__.py       11      8    27%   11-23
+    hello_world/resources.py       5      1    80%   8
+    hello_world/tests.py          14      0   100%
+    hello_world/views.py           4      0   100%
+    --------------------------------------------------------
+    TOTAL                         34      9    74%
+
+    ========================= 1 passed in 0.22 seconds =========================
+
+Our unit test passed, although its coverage is incomplete. What did our test
+look like?
 
 .. literalinclude:: quick_tour/package/hello_world/tests.py
     :linenos:
@@ -746,7 +782,9 @@ These emphasized sections in the configuration file:
 
 Our application, a package named ``hello_world``, is set up as a logger and
 configured to log messages at a ``DEBUG`` or higher level. When you visit
-http://localhost:6543, your console will now show::
+http://localhost:6543, your console will now show:
+
+.. code-block:: text
 
     2016-01-18 13:55:55,040 DEBUG [hello_world.views:10][waitress] Some Message
 
@@ -825,9 +863,9 @@ Pyramid and SQLAlchemy are great friends. That friendship includes a scaffold!
 
 .. code-block:: bash
 
-  $ pcreate --scaffold alchemy sqla_demo
+  $ $VENV/bin/pcreate --scaffold alchemy sqla_demo
   $ cd sqla_demo
-  $ python setup.py develop
+  $ $VENV/bin/pip install -e .
 
 We now have a working sample SQLAlchemy application with all dependencies
 installed. The sample project provides a console script to initialize a SQLite
@@ -835,8 +873,8 @@ database with tables. Let's run it, then start the application:
 
 .. code-block:: bash
 
-  $ initialize_sqla_demo_db development.ini
-  $ pserve development.ini
+  $ $VENV/bin/initialize_sqla_demo_db development.ini
+  $ $VENV/bin/pserve development.ini
 
 The ORM eases the mapping of database structures into a programming language.
 SQLAlchemy uses "models" for this mapping. The scaffold generated a sample

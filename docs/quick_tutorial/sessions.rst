@@ -34,7 +34,7 @@ Steps
    .. code-block:: bash
 
     $ cd ..; cp -r view_classes sessions; cd sessions
-    $ $VENV/bin/python setup.py develop
+    $ $VENV/bin/pip install -e .
 
 #. Our ``sessions/tutorial/__init__.py`` needs a choice of session
    factory to get registered with the :term:`configurator`:

@@ -41,19 +41,24 @@ request enters a :app:`Pyramid` application through to the point that
    user-defined :term:`route` matches the current WSGI environment.  The
    :term:`router` passes the request as an argument to the mapper.
 
-#. If any route matches, the route mapper adds attributes to the request:
-   ``matchdict`` and ``matched_route`` attributes are added to the request
-   object.  The former contains a dictionary representing the matched dynamic
-   elements of the request's ``PATH_INFO`` value, and the latter contains the
+#. If any route matches, the route mapper adds the attributes ``matchdict``
+   and ``matched_route`` to the request object. The former contains a
+   dictionary representing the matched dynamic elements of the request's
+   ``PATH_INFO`` value, and the latter contains the
    :class:`~pyramid.interfaces.IRoute` object representing the route which
-   matched.  The root object associated with the route found is also generated:
-   if the :term:`route configuration` which matched has an associated
-   ``factory`` argument, this factory is used to generate the root object,
-   otherwise a default :term:`root factory` is used.
+   matched.
 
-#. If a route match was *not* found, and a ``root_factory`` argument was passed
+#. A :class:`~pyramid.events.BeforeTraversal` :term:`event` is sent to any
+   subscribers.
+
+#. Continuing, if any route matches, the root object associated with the found
+   route is generated. If the :term:`route configuration` which matched has an
+   associated ``factory`` argument, then this factory is used to generate the
+   root object; otherwise a default :term:`root factory` is used.
+
+   However, if no route matches, and if a ``root_factory`` argument was passed
    to the :term:`Configurator` constructor, that callable is used to generate
-   the root object.  If the ``root_factory`` argument passed to the
+   the root object. If the ``root_factory`` argument passed to the
    Configurator constructor was ``None``, a default root factory is used to
    generate a root object.
 

@@ -43,7 +43,7 @@ Steps
    .. code-block:: bash
 
     $ cd ..; cp -r functional_testing views; cd views
-    $ $VENV/bin/python setup.py develop
+    $ $VENV/bin/pip install -e .
 
 #. Our ``views/tutorial/__init__.py`` gets a lot shorter:
 

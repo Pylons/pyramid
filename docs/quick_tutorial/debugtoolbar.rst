@@ -4,8 +4,7 @@
 04: Easier Development with ``debugtoolbar``
 ============================================
 
-Error-handling and introspection using the ``pyramid_debugtoolbar``
-add-on.
+Error handling and introspection using the ``pyramid_debugtoolbar`` add-on.
 
 Background
 ==========
@@ -36,8 +35,8 @@ Steps
    .. code-block:: bash
 
     $ cd ..; cp -r ini debugtoolbar; cd debugtoolbar
-    $ $VENV/bin/python setup.py develop
-    $ $VENV/bin/easy_install pyramid_debugtoolbar
+    $ $VENV/bin/pip install -e .
+    $ $VENV/bin/pip install pyramid_debugtoolbar
 
 #. Our ``debugtoolbar/development.ini`` gets a configuration entry for
    ``pyramid.includes``:

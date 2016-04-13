@@ -17,6 +17,9 @@ Event-Related Interfaces
   .. autointerface:: IContextFound
      :members:
 
+  .. autointerface:: IBeforeTraversal
+     :members:
+
   .. autointerface:: INewResponse
      :members:
 
