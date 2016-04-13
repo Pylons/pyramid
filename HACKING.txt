@@ -60,8 +60,7 @@ repo, from which you can submit a pull request.
   requirements.
 
    $ cd ~/hack-on-pyramid
-   $ $VENV/bin/pip install -e .
-   $ $VENV/bin/pip install -e ".[testing]"
+   $ $VENV/bin/pip install -e ".[testing,docs]"
 
 - Optionally create a new Pyramid project using ``pcreate``:
 
@@ -105,7 +104,7 @@ named ``hacking`` that you can then fire up like so:
 
   cd env27/hacking
   ../bin/pip install -e .
-  ../bin/pip install -e ".[testing]"
+  ../bin/pip install -e ".[testing,docs]"
   ../bin/pserve development.ini
 
 Adding Features
