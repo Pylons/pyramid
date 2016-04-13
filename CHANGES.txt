@@ -1,6 +1,21 @@
 unreleased
 ==========
 
+- Python 2.6 is no longer supported by Pyramid. See
+  https://github.com/Pylons/pyramid/issues/2368
+
+- A complete overhaul of the docs:
+
+  - Use pip instead of easy_install.
+  - Become opinionated by preferring Python 3.4 or greater to simplify
+    installation of Python and its required packaging tools.
+  - Use venv for the tool, and virtual environment for the thing created,
+    instead of virtualenv.
+  - Use py.test and pytest-cov instead of nose and coverage.
+  - Further updates to the scaffolds as well as tutorials and their src files.
+
+  See https://github.com/Pylons/pyramid/pull/2468
+
 - A complete overhaul of the ``alchemy`` scaffold as well as the
   Wiki2 SQLAlchemy + URLDispatch tutorial to introduce more modern features
   into the usage of SQLAlchemy with Pyramid and provide a better starting

@@ -53,7 +53,7 @@ Steps
 
    .. note::
 
-     We aren't yet doing ``$VENV/bin/python setup.py develop`` as we
+     We aren't yet doing ``$VENV/bin/pip install -e .`` as we
      will change it later.
 
 #. Our configuration file at ``databases/development.ini`` wires
@@ -78,7 +78,7 @@ Steps
 
    .. code-block:: bash
 
-    $ $VENV/bin/python setup.py develop
+    $ $VENV/bin/pip install -e .
 
 #. The script references some models in ``databases/tutorial/models.py``:
 
@@ -176,7 +176,7 @@ module.
 
 The ``initialize_tutorial_db`` is a nice example of framework support.
 You point your setup at the location of some ``[console_scripts]`` and
-these get generated into your virtualenv's ``bin`` directory. Our
+these get generated into your virtual environment's ``bin`` directory. Our
 console script follows the pattern of being fed a configuration file
 with all the bootstrapping. It then opens SQLAlchemy and creates the
 root of the wiki, which also makes the SQLite file. Note the

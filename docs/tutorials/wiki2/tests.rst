@@ -1,3 +1,5 @@
+.. _wiki2_adding_tests:
+
 ============
 Adding Tests
 ============
@@ -75,30 +77,26 @@ follows:
 Running the tests
 =================
 
-We can run these tests by using ``setup.py test`` in the same way we did in
-:ref:`running_tests`:
+We can run these tests similarly to how we did in :ref:`running_tests`:
 
 On UNIX:
 
 .. code-block:: bash
 
-   $ $VENV/bin/python setup.py test -q
+   $ $VENV/bin/py.test -q
 
 On Windows:
 
 .. code-block:: ps1con
 
-   c:\pyramidtut\tutorial> %VENV%\Scripts\python setup.py test -q
+   c:\pyramidtut\tutorial> %VENV%\Scripts\py.test -q
 
 The expected result should look like the following:
 
 .. code-block:: text
 
-   .....................
-   ----------------------------------------------------------------------
-   Ran 22 tests in 5.320s
-
-   OK
+   ......................
+   22 passed, 1 pytest-warnings in 5.81 seconds
 
 .. note:: If you use Python 3 during this tutorial, you will see deprecation
    warnings in the output, which we will choose to ignore. In making this

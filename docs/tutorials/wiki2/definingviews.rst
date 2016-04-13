@@ -1,3 +1,5 @@
+.. _wiki2_defining_views:
+
 ==============
 Defining Views
 ==============
@@ -36,7 +38,7 @@ Open ``tutorial/setup.py`` and edit it to look like the following:
 Only the highlighted line needs to be added.
 
 Again, as we did in the previous chapter, the dependency now needs to be
-installed, so re-run the ``python setup.py develop`` command.
+installed, so re-run the ``$VENV/bin/pip install -e .`` command.
 
 
 Static assets
@@ -338,7 +340,7 @@ indicated by the emphasized lines:
 
 .. literalinclude:: src/views/tutorial/templates/layout.jinja2
    :linenos:
-   :emphasize-lines: 11,36
+   :emphasize-lines: 11,35-36
    :language: html
 
 Since we're using a templating engine, we can factor common boilerplate out of

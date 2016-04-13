@@ -48,8 +48,8 @@ Steps
    .. code-block:: bash
 
     $ cd ..; cp -r debugtoolbar unit_testing; cd unit_testing
-    $ $VENV/bin/python setup.py develop
-    $ $VENV/bin/easy_install nose
+    $ $VENV/bin/pip install -e .
+    $ $VENV/bin/pip install nose
 
 #. Now we write a simple unit test in ``unit_testing/tutorial/tests.py``:
 

@@ -1,9 +1,11 @@
+.. _wiki_defining_the_domain_model:
+
 =========================
 Defining the Domain Model
 =========================
 
-The first change we'll make to our stock pcreate-generated application will be
-to define two :term:`resource` constructors, one representing a wiki page,
+The first change we'll make to our stock ``pcreate``-generated application will
+be to define two :term:`resource` constructors, one representing a wiki page,
 and another representing the wiki as a mapping of wiki page names to page
 objects.  We'll do this inside our ``models.py`` file.
 
@@ -38,8 +40,7 @@ Edit ``models.py``
   or they may live in a Python subpackage of your application package named
   ``models``, but this is only by convention.
 
-Open ``tutorial/tutorial/models.py`` file and edit it to look like the
-following:
+Open ``tutorial/models.py`` file and edit it to look like the following:
 
 .. literalinclude:: src/models/tutorial/models.py
    :linenos:

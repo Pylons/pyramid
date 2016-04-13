@@ -1,3 +1,5 @@
+.. _wiki_adding_tests:
+
 ============
 Adding Tests
 ============
@@ -49,55 +51,25 @@ follows:
 Running the tests
 =================
 
-We can run these tests by using ``setup.py test`` in the same way we did in
-:ref:`running_tests`.  However, first we must edit our ``setup.py`` to
-include a dependency on WebTest, which we've used in our ``tests.py``.
-Change the ``requires`` list in ``setup.py`` to include ``WebTest``.
-
-.. literalinclude:: src/tests/setup.py
-   :linenos:
-   :language: python
-   :lines: 11-22
-   :emphasize-lines: 11
-
-After we've added a dependency on WebTest in ``setup.py``, we need to run
-``setup.py develop`` to get WebTest installed into our virtualenv.  Assuming
-our shell's current working directory is the "tutorial" distribution
-directory:
+We can run these tests by using ``py.test`` similarly to how we did in
+:ref:`running_tests`. Our testing dependencies have already been satisfied,
+courtesy of the scaffold, so we can jump right to running tests.
 
 On UNIX:
 
 .. code-block:: text
 
-   $ $VENV/bin/python setup.py develop
+   $ $VENV/bin/py.test tutorial/tests.py -q
 
 On Windows:
 
 .. code-block:: text
 
-   c:\pyramidtut\tutorial> %VENV%\Scripts\python setup.py develop
-
-Once that command has completed successfully, we can run the tests
-themselves:
-
-On UNIX:
-
-.. code-block:: text
-
-   $ $VENV/bin/python setup.py test -q
-
-On Windows:
-
-.. code-block:: text
-
-   c:\pyramidtut\tutorial> %VENV%\Scripts\python setup.py test -q
+   c:\pyramidtut\tutorial> %VENV%\Scripts\py.test tutorial/tests.py -q
 
 The expected result should look like the following:
 
 .. code-block:: text
 
-   .........
-   ----------------------------------------------------------------------
-   Ran 23 tests in 1.653s
-   
-   OK
+   ........................
+   24 passed in 2.46 seconds

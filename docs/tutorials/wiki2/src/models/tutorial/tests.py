@@ -28,7 +28,7 @@ class BaseTest(unittest.TestCase):
         self.session = get_tm_session(session_factory, transaction.manager)
 
     def init_database(self):
-        from .models import Base
+        from .models.meta import Base
         Base.metadata.create_all(self.engine)
 
     def tearDown(self):

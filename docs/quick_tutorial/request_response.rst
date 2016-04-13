@@ -41,7 +41,7 @@ Steps
    .. code-block:: bash
 
     $ cd ..; cp -r view_classes request_response; cd request_response
-    $ $VENV/bin/python setup.py develop
+    $ $VENV/bin/pip install -e .
 
 #. Simplify the routes in ``request_response/tutorial/__init__.py``:
 
