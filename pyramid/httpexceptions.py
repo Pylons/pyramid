@@ -130,7 +130,7 @@ from string import Template
 from zope.interface import implementer
 
 from webob import html_escape as _html_escape
-from webob.acceptparse import Accept
+from webob.acceptparse import MIMEAccept
 
 from pyramid.compat import (
     class_types,
@@ -247,7 +247,7 @@ ${body}''')
             html_comment = ''
             comment = self.comment or ''
             accept_value = environ.get('HTTP_ACCEPT', '')
-            accept = Accept(accept_value)
+            accept = MIMEAccept(accept_value)
             match = accept.best_match(
                 ['application/json',
                  'text/html',
