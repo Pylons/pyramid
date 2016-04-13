@@ -28,9 +28,9 @@ class Test_exception_response(unittest.TestCase):
         self.assertTrue(isinstance(self._callFUT(201), HTTPCreated))
 
     def test_extra_kw(self):
-        resp = self._callFUT(404,  headers=[('abc', 'def')])
+        resp = self._callFUT(404, headers=[('abc', 'def')])
         self.assertEqual(resp.headers['abc'], 'def')
-        
+
 class Test_default_exceptionresponse_view(unittest.TestCase):
     def _callFUT(self, context, request):
         from pyramid.httpexceptions import default_exceptionresponse_view
@@ -129,7 +129,7 @@ class TestHTTPException(unittest.TestCase):
     def test_ctor_sets_body_template_obj(self):
         exc = self._makeOne(body_template='${foo}')
         self.assertEqual(
-            exc.body_template_obj.substitute({'foo':'foo'}), 'foo')
+            exc.body_template_obj.substitute({'foo': 'foo'}), 'foo')
 
     def test_ctor_with_empty_body(self):
         cls = self._getTargetSubclass(empty_body=True)
@@ -160,7 +160,7 @@ class TestHTTPException(unittest.TestCase):
         self.assertTrue(b'200 OK' in body)
         self.assertTrue(b'explanation' in body)
         self.assertTrue(b'detail' in body)
-        
+
     def test_ctor_with_body_sets_default_app_iter_text(self):
         cls = self._getTargetSubclass()
         exc = cls('detail')
@@ -173,7 +173,7 @@ class TestHTTPException(unittest.TestCase):
         exc = self._makeOne()
         exc.detail = 'abc'
         self.assertEqual(str(exc), 'abc')
-        
+
     def test__str__explanation(self):
         exc = self._makeOne()
         exc.explanation = 'def'
@@ -348,7 +348,8 @@ class TestHTTPException(unittest.TestCase):
         exc = cls(body_template='${REQUEST_METHOD}')
         environ = _makeEnviron()
         class Choke(object):
-            def __str__(self): raise ValueError
+            def __str__(self): # pragma nocover
+                raise ValueError
         environ['gardentheory.user'] = Choke()
         start_response = DummyStartResponse()
         body = list(exc(environ, start_response))[0]
@@ -380,7 +381,7 @@ class TestRenderAllExceptionsWithoutArguments(unittest.TestCase):
                 self.assertTrue(bytes_(exc.status) in result)
             L.append(result)
         self.assertEqual(len(L), len(status_map))
-            
+
     def test_it_plain(self):
         self._doit('text/plain')
 
@@ -454,12 +455,11 @@ class DummyStartResponse(object):
     def __call__(self, status, headerlist):
         self.status = status
         self.headerlist = headerlist
-        
+
 def _makeEnviron(**kw):
-    environ = {'REQUEST_METHOD':'GET',
-               'wsgi.url_scheme':'http',
-               'SERVER_NAME':'localhost',
-               'SERVER_PORT':'80'}
+    environ = {'REQUEST_METHOD': 'GET',
+               'wsgi.url_scheme': 'http',
+               'SERVER_NAME': 'localhost',
+               'SERVER_PORT': '80'}
     environ.update(kw)
     return environ
-
