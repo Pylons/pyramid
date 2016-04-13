@@ -65,10 +65,10 @@ docs_extras = [
     'sphinxcontrib-programoutput',
     ]
 
-testing_extras = tests_require + [
-    'nose',
-    'coverage',
-    'virtualenv', # for scaffolding tests
+tests_require = [
+    'WebTest >= 1.3.1',  # py3 compat
+    'pytest',  # includes virtualenv
+    'pytest-cov',
     ]
 
 setup(name='pyramid',
@@ -101,11 +101,9 @@ setup(name='pyramid',
       zip_safe=False,
       install_requires=install_requires,
       extras_require={
-          'testing': testing_extras,
+          'testing': tests_require,
           'docs': docs_extras,
           },
-      tests_require=tests_require,
-      test_suite="pyramid.tests",
       entry_points="""\
         [pyramid.scaffold]
         starter=pyramid.scaffolds:StarterProjectTemplate
