@@ -104,6 +104,8 @@ setup(name='pyramid',
           'testing': tests_require,
           'docs': docs_extras,
           },
+      tests_require=tests_require,
+      test_suite="pyramid.tests",
       entry_points="""\
         [pyramid.scaffold]
         starter=pyramid.scaffolds:StarterProjectTemplate
