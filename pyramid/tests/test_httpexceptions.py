@@ -239,6 +239,49 @@ class TestHTTPException(unittest.TestCase):
                 self.assertEqual(header[1], 'text/plain; charset=UTF-8')
         self.assertFalse(b'<!-- ' in body)
 
+    def test__content_type(self):
+        cls = self._getTargetSubclass()
+        exc = cls()
+        environ = _makeEnviron()
+        start_response = DummyStartResponse()
+        exc(environ, start_response)
+        for header in start_response.headerlist:
+            if header[0] == 'Content-Type':
+                self.assertEqual(header[1], 'text/plain; charset=UTF-8')
+
+    def test__content_type_default_is_plain(self):
+        cls = self._getTargetSubclass()
+        exc = cls()
+        environ = _makeEnviron()
+        environ['HTTP_ACCEPT'] = '*/*'
+        start_response = DummyStartResponse()
+        exc(environ, start_response)
+        for header in start_response.headerlist:
+            if header[0] == 'Content-Type':
+                self.assertEqual(header[1], 'text/plain; charset=UTF-8')
+
+    def test__content_type_text_html(self):
+        cls = self._getTargetSubclass()
+        exc = cls()
+        environ = _makeEnviron()
+        environ['HTTP_ACCEPT'] = 'text/html'
+        start_response = DummyStartResponse()
+        exc(environ, start_response)
+        for header in start_response.headerlist:
+            if header[0] == 'Content-Type':
+                self.assertEqual(header[1], 'text/html; charset=UTF-8')
+
+    def test__content_type_application_json(self):
+        cls = self._getTargetSubclass()
+        exc = cls()
+        environ = _makeEnviron()
+        environ['HTTP_ACCEPT'] = 'application/json'
+        start_response = DummyStartResponse()
+        exc(environ, start_response)
+        for header in start_response.headerlist:
+            if header[0] == 'Content-Type':
+                self.assertEqual(header[1], 'application/json')
+
     def test__default_app_iter_with_comment_ampersand(self):
         cls = self._getTargetSubclass()
         exc = cls(comment='comment & comment')
