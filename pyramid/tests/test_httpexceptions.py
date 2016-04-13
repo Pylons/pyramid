@@ -230,11 +230,11 @@ class TestHTTPException(unittest.TestCase):
         body = list(exc(environ, start_response))[0]
         self.assertFalse(b'<!-- ' in body)
 
-    def test__default_app_iter_with_comment_html(self):
+    def test__default_app_iter_with_comment_ampersand(self):
         cls = self._getTargetSubclass()
         exc = cls(comment='comment & comment')
         environ = _makeEnviron()
-        environ['HTTP_ACCEPT'] = '*/*'
+        environ['HTTP_ACCEPT'] = 'text/html'
         start_response = DummyStartResponse()
         body = list(exc(environ, start_response))[0]
         self.assertTrue(b'<!-- comment &amp; comment -->' in body)
