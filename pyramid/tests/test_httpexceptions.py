@@ -303,6 +303,38 @@ class TestHTTPException(unittest.TestCase):
         body = list(exc(environ, start_response))[0]
         self.assertTrue(b'<!-- comment &amp; comment -->' in body)
 
+    def test__default_app_iter_with_comment_json(self):
+        cls = self._getTargetSubclass()
+        exc = cls(comment='comment & comment')
+        environ = _makeEnviron()
+        environ['HTTP_ACCEPT'] = 'application/json'
+        start_response = DummyStartResponse()
+        body = list(exc(environ, start_response))[0]
+        import json
+        retval = json.loads(body.decode('UTF-8'))
+        self.assertEqual(retval['code'], '200 OK')
+        self.assertEqual(retval['title'], 'OK')
+
+    def test__default_app_iter_with_custom_json(self):
+        def json_formatter(status, body, title, environ):
+            return {'message': body,
+                    'code': status,
+                    'title': title,
+                    'custom': environ['CUSTOM_VARIABLE']
+                    }
+        cls = self._getTargetSubclass()
+        exc = cls(comment='comment', json_formatter=json_formatter)
+        environ = _makeEnviron()
+        environ['HTTP_ACCEPT'] = 'application/json'
+        environ['CUSTOM_VARIABLE'] = 'custom!'
+        start_response = DummyStartResponse()
+        body = list(exc(environ, start_response))[0]
+        import json
+        retval = json.loads(body.decode('UTF-8'))
+        self.assertEqual(retval['code'], '200 OK')
+        self.assertEqual(retval['title'], 'OK')
+        self.assertEqual(retval['custom'], 'custom!')
+
     def test_custom_body_template(self):
         cls = self._getTargetSubclass()
         exc = cls(body_template='${REQUEST_METHOD}')
