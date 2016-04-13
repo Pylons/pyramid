@@ -146,8 +146,8 @@
 			<integer>0</integer>
 			<key>Points</key>
 			<array>
-				<string>{208.33329937855831, 164.83237970227628}</string>
-				<string>{239.8333613077798, 164.77232074737549}</string>
+				<string>{154.9999760464211, 209.11365574251681}</string>
+				<string>{239.8333613077798, 209.14732074737549}</string>
 			</array>
 			<key>Style</key>
 			<dict>
@@ -175,12 +175,14 @@
 			<key>Tail</key>
 			<dict>
 				<key>ID</key>
-				<integer>169418</integer>
+				<integer>169373</integer>
+				<key>Position</key>
+				<real>0.47711458802223206</real>
 			</dict>
 		</dict>
 		<dict>
 			<key>Bounds</key>
-			<string>{{239.83336130777977, 153.5}, {105.66666412353516, 22.544641494750977}}</string>
+			<string>{{239.83336130777977, 197.875}, {105.66666412353516, 22.544641494750977}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
 			<key>ID</key>
@@ -9803,6 +9805,10 @@
 	<string>YES</string>
 	<key>HPages</key>
 	<integer>1</integer>
+	<key>HorizontalGuides</key>
+	<array>
+		<real>209.875</real>
+	</array>
 	<key>ImageCounter</key>
 	<integer>3</integer>
 	<key>KeepToScale</key>
@@ -9862,7 +9868,7 @@
 	<key>MasterSheets</key>
 	<array/>
 	<key>ModificationDate</key>
-	<string>2016-04-13 07:24:56 +0000</string>
+	<string>2016-04-13 08:32:47 +0000</string>
 	<key>Modifier</key>
 	<string>Steve Piercy</string>
 	<key>NotesVisible</key>
@@ -9943,7 +9949,7 @@
 			</dict>
 		</array>
 		<key>Frame</key>
-		<string>{{35, 93}, {1394, 1325}}</string>
+		<string>{{35, 93}, {2284, 1325}}</string>
 		<key>ListView</key>
 		<true/>
 		<key>OutlineWidth</key>
@@ -9957,14 +9963,14 @@
 		<key>SidebarWidth</key>
 		<integer>163</integer>
 		<key>VisibleRegion</key>
-		<string>{{-231, -226}, {1037, 1186}}</string>
+		<string>{{110.125, 77.875}, {239.125, 146.375}}</string>
 		<key>Zoom</key>
-		<real>1</real>
+		<real>8</real>
 		<key>ZoomValues</key>
 		<array>
 			<array>
 				<string>Request Processing</string>
-				<real>1</real>
+				<real>8</real>
 				<real>4</real>
 			</array>
 		</array>
