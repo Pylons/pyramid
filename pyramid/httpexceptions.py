@@ -255,7 +255,6 @@ ${body}''')
 
             if match == 'text/html':
                 self.content_type = 'text/html'
-                self.charset = 'utf-8'
                 escape = _html_escape
                 page_template = self.html_template_obj
                 br = '<br/>'
@@ -263,7 +262,7 @@ ${body}''')
                     html_comment = '<!-- %s -->' % escape(comment)
             elif match == 'application/json':
                 self.content_type = 'application/json'
-                self.charset = ''
+                self.charset = None
                 escape = _no_escape
                 br = '\n'
                 if comment:
@@ -283,7 +282,6 @@ ${body}''')
                 page_template = JsonPageTemplate(self)
             else:
                 self.content_type = 'text/plain'
-                self.charset = 'utf-8'
                 escape = _no_escape
                 page_template = self.plain_template_obj
                 br = '\n'
@@ -311,7 +309,7 @@ ${body}''')
             body = body_tmpl.substitute(args)
             page = page_template.substitute(status=self.status, body=body)
             if isinstance(page, text_type):
-                page = page.encode(self.charset)
+                page = page.encode(self.charset if self.charset else 'UTF-8')
             self.app_iter = [page]
             self.body = page
 
