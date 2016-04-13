@@ -65,10 +65,10 @@ docs_extras = [
     'sphinxcontrib-programoutput',
     ]
 
-tests_require = [
-    'WebTest >= 1.3.1',  # py3 compat
-    'pytest',  # includes virtualenv
-    'pytest-cov',
+testing_extras = tests_require + [
+    'nose',
+    'coverage',
+    'virtualenv', # for scaffolding tests
     ]
 
 setup(name='pyramid',
@@ -101,7 +101,7 @@ setup(name='pyramid',
       zip_safe=False,
       install_requires=install_requires,
       extras_require={
-          'testing': tests_require,
+          'testing': testing_extras,
           'docs': docs_extras,
           },
       tests_require=tests_require,
