@@ -212,6 +212,9 @@ class TestHTTPException(unittest.TestCase):
         environ = _makeEnviron()
         start_response = DummyStartResponse()
         body = list(exc(environ, start_response))[0]
+        for header in start_response.headerlist:
+            if header[0] == 'Content-Type':
+                self.assertEqual(header[1], 'text/plain; charset=UTF-8')
         self.assertEqual(body, b'200 OK\n\nexplanation\n\n\n\n\n')
 
     def test__default_app_iter_with_comment_plain(self):
@@ -220,14 +223,20 @@ class TestHTTPException(unittest.TestCase):
         environ = _makeEnviron()
         start_response = DummyStartResponse()
         body = list(exc(environ, start_response))[0]
+        for header in start_response.headerlist:
+            if header[0] == 'Content-Type':
+                self.assertEqual(header[1], 'text/plain; charset=UTF-8')
         self.assertEqual(body, b'200 OK\n\nexplanation\n\n\n\ncomment\n')
-        
+
     def test__default_app_iter_no_comment_html(self):
         cls = self._getTargetSubclass()
         exc = cls()
         environ = _makeEnviron()
         start_response = DummyStartResponse()
         body = list(exc(environ, start_response))[0]
+        for header in start_response.headerlist:
+            if header[0] == 'Content-Type':
+                self.assertEqual(header[1], 'text/plain; charset=UTF-8')
         self.assertFalse(b'<!-- ' in body)
 
     def test__default_app_iter_with_comment_ampersand(self):
@@ -237,9 +246,12 @@ class TestHTTPException(unittest.TestCase):
         environ['HTTP_ACCEPT'] = 'text/html'
         start_response = DummyStartResponse()
         body = list(exc(environ, start_response))[0]
+        for header in start_response.headerlist:
+            if header[0] == 'Content-Type':
+                self.assertEqual(header[1], 'text/html; charset=UTF-8')
         self.assertTrue(b'<!-- comment &amp; comment -->' in body)
 
-    def test__default_app_iter_with_comment_html2(self):
+    def test__default_app_iter_with_comment_html(self):
         cls = self._getTargetSubclass()
         exc = cls(comment='comment & comment')
         environ = _makeEnviron()
