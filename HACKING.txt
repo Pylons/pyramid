@@ -3,13 +3,15 @@ Hacking on Pyramid
 
 Here are some guidelines for hacking on Pyramid.
 
+
 Using a Development Checkout
 ----------------------------
 
 You'll have to create a development environment to hack on Pyramid, using a
 Pyramid checkout.  You can either do this by hand, or if you have ``tox``
-installed (it's on PyPI), you can use tox to set up a working development
+installed (it's on PyPI), you can use ``tox`` to set up a working development
 environment.  Each installation method is described below.
+
 
 By Hand
 +++++++
@@ -26,86 +28,87 @@ By Hand
   substituting your account username and specifying the destination as
   "hack-on-pyramid".
 
-   $ cd ~
-   $ git clone git@github.com:USERNAME/pyramid.git hack-on-pyramid
-   $ cd hack-on-pyramid
-   # Configure remotes such that you can pull changes from the Pyramid
-   # repository into your local repository.
-   $ git remote add upstream https://github.com/Pylons/pyramid.git
-   # fetch and merge changes from upstream into master
-   $ git fetch upstream
-   $ git merge upstream/master
+    $ cd ~
+    $ git clone git@github.com:USERNAME/pyramid.git hack-on-pyramid
+    $ cd hack-on-pyramid
+    # Configure remotes such that you can pull changes from the Pyramid
+    # repository into your local repository.
+    $ git remote add upstream https://github.com/Pylons/pyramid.git
+    # fetch and merge changes from upstream into master
+    $ git fetch upstream
+    $ git merge upstream/master
 
 Now your local repo is set up such that you will push changes to your GitHub
 repo, from which you can submit a pull request.
 
 - Create a virtual environment in which to install Pyramid:
 
-   $ cd ~/hack-on-pyramid
-   $ python3 -m venv env
+    $ cd ~/hack-on-pyramid
+    $ python3 -m venv env
 
   From here on in within these instructions, the ``~/hack-on-pyramid/env``
   virtual environment you created above will be referred to as ``$VENV``.
   To use the instructions in the steps that follow literally, use the
   ``export VENV=~/hack-on-pyramid/env`` command.
 
-- Install ``setuptools-git`` into the virtualenv (for good measure, as we're
-  using git to do version control):
+- Install ``setuptools-git`` into the virtual environment (for good measure, as
+  we're using git to do version control):
 
-   $ $VENV/bin/pip install setuptools-git
+    $ $VENV/bin/pip install setuptools-git
 
 - Install Pyramid from the checkout into the virtual environment, where the
   current working directory is the ``pyramid`` checkout directory. We will
   install Pyramid in editable (development) mode as well as its testing
   requirements.
 
-   $ cd ~/hack-on-pyramid
-   $ $VENV/bin/pip install -e ".[testing,docs]"
+    $ cd ~/hack-on-pyramid
+    $ $VENV/bin/pip install -e ".[testing,docs]"
 
 - Optionally create a new Pyramid project using ``pcreate``:
 
-  $ cd $VENV
-  $ bin/pcreate -s starter starter
+    $ cd $VENV
+    $ bin/pcreate -s starter starter
 
 - ...and install the new project into the virtual environment:
 
-  $ cd $VENV/starter
-  $ $VENV/bin/pip install -e .
+    $ cd $VENV/starter
+    $ $VENV/bin/pip install -e .
 
-Using Tox
-+++++++++
+
+Using ``Tox``
++++++++++++++
 
 Alternatively, if you already have ``tox`` installed, there is an easier
 way to get going.
 
 - Create a new directory somewhere and ``cd`` to it:
 
-   $ mkdir ~/hack-on-pyramid
-   $ cd ~/hack-on-pyramid
+    $ mkdir ~/hack-on-pyramid
+    $ cd ~/hack-on-pyramid
 
 - Check out a read-only copy of the Pyramid source:
 
-   $ git clone git://github.com/Pylons/pyramid.git .
+    $ git clone git://github.com/Pylons/pyramid.git .
 
-  (alternately, create a writeable fork on GitHub and check that out).
+  Alternatively, create a writeable fork on GitHub and check that out.
 
-Since Pyramid is a framework and not an application, it can be
-convenient to work against a sample application, preferably in its own
-virtualenv. A quick way to achieve this is to (ab-)use ``tox``
-(http://tox.readthedocs.org/en/latest/) with a custom configuration
-file that's part of the checkout:
+Since Pyramid is a framework and not an application, it can be convenient to
+work against a sample application, preferably in its own virtual environment. A
+quick way to achieve this is to use `tox
+<http://tox.readthedocs.org/en/latest/>`_ with a custom configuration file
+that is part of the checkout:
 
-  tox -c hacking-tox.ini
+    $ tox -c hacking-tox.ini
 
 This will create a python-2.7 based virtual environment named ``env27``
 (Pyramid's ``.gitconfig` ignores all top-level folders that start with ``env``
-specifically for this use case) and inside that a simple pyramid application
+specifically in our use case), and inside that a simple pyramid application
 named ``hacking`` that you can then fire up like so:
 
-  cd env27/hacking
-  ../bin/pip install -e .
-  ../bin/pip install -e ".[testing,docs]"
-  ../bin/pserve development.ini
+    $ cd env27/hacking
+    $ ../bin/pip install -e ".[testing,docs]"
+    $ ../bin/pserve development.ini
+
 
 Adding Features
 ---------------
@@ -131,6 +134,7 @@ has an install-time dependency on something that doesn't work on a particular
 platform, that caveat should be spelled out clearly in *its* documentation
 (within its ``docs/`` directory).
 
+
 Coding Style
 ------------
 
@@ -142,42 +146,68 @@ Coding Style
 - Please do not remove trailing whitespace.  Configure your editor to reduce
   diff noise. See https://github.com/Pylons/pyramid/issues/788 for more.
 
+
 Running Tests
 --------------
 
 - To run all tests for Pyramid on a single Python version from your development
-  virtual environment (See *Using a Development Checkout* above), and assuming
-  you have installed the test requirements::
+  virtual environment (See *Using a Development Checkout* above), run
+  ``nosetests``:
 
-   $ $VENV/bin/py.test --strict pyramid/
+    $ $VENV/bin/nosetests
 
-- To run individual tests (i.e., during development), see "py.test usage -
+- To run individual tests (i.e., during development) you can use a regular
+  expression with the ``-t`` parameter courtesy of the `nose-selecttests
+  <https://pypi.python.org/pypi/nose-selecttests/>`_ plugin that was installed
+  (along with nose itself) via ``pip install -e .``. The easiest usage is to
+  simply provide the verbatim name of the test you're working on.
+
+- The ``tox.ini`` uses ``nose`` and ``coverage``. As such ``tox`` may be used
+  to run groups of tests or only a specific version of Python. For example, the
+  following command will run tests on Python 2.7 only without coverage:
+
+    $ tox -e py27
+
+  This command will run tests on the latest versions of Python 2 and 3 with
+  coverage totaled for both versions.
+
+    $ tox -e py2-cover,py3-cover,coverage
+
+- To run the full set of Pyramid tests on all platforms, install `tox
+  <http://codespeak.net/~hpk/tox/>`_ into a system Python. The ``tox`` console
+  script will be installed into the scripts location for that Python. While
+  ``cd``'ed to the Pyramid checkout root directory (it contains ``tox.ini``),
+  invoke the ``tox`` console script. This will read the ``tox.ini`` file and
+  execute the tests on multiple Python versions and platforms. While it runs,
+  it creates a virtual environment for each version/platform combination.  For
+  example:
+
+    $ sudo /usr/bin/pip install tox
+    $ cd ~/hack-on-pyramid/
+    $ /usr/bin/tox
+
+- The tests can also be run using `pytest <http://pytest.org/>`_. This is
+  intended as a convenience for people who are more used to or fond of
+  ``pytest``. Run the tests like so:
+
+    $ $VENV/bin/pip install pytest
+    $ $VENV/bin/py.test --strict pyramid/
+
+  To run individual tests (i.e., during development), see "py.test usage -
   Specifying tests / selecting tests":
   http://pytest.org/latest/usage.html#specifying-tests-selecting-tests
-
-- To run the full set of Pyramid tests on all platforms, install ``tox``
-  (http://codespeak.net/~hpk/tox/) into a system Python.  The ``tox`` console
-  script will be installed into the scripts location for that Python.  While
-  ``cd``'ed to the Pyramid checkout root directory (it contains ``tox.ini``),
-  invoke the ``tox`` console script.  This will read the ``tox.ini`` file and
-  execute the tests on multiple Python versions and platforms; while it runs,
-  it creates a virtualenv for each version/platform combination.  For
-  example::
-
-   $ sudo /usr/bin/pip install tox
-   $ cd ~/hack-on-pyramid/
-   $ /usr/bin/tox
 
 - Functional tests related to the "scaffolds" (starter, zodb, alchemy) which
   create a virtual environment, install the scaffold package and its
   dependencies, start a server, and hit a URL on the server, can be run like
-  so::
+  so:
 
-   $ ./scaffoldtests.sh
+    $ ./scaffoldtests.sh
 
-  Alternatively::
+  Alternatively:
 
-   $ tox -e{py27,py33,py34,py35,pypy,pypy3}-scaffolds,
+    $ tox -e{py27,py33,py34,py35,pypy,pypy3}-scaffolds,
+
 
 Test Coverage
 -------------
@@ -185,6 +215,7 @@ Test Coverage
 - The codebase *must* have 100% test statement coverage after each commit.  You
   can test coverage via ``./coverage.sh`` (which itself just executes ``tox
   -epy2-cover,py3-cover,coverage``).
+
 
 Documentation Coverage and Building HTML Documentation
 ------------------------------------------------------
@@ -195,12 +226,13 @@ changed to reflect the bug fix, ideally in the same commit that fixes the bug
 or adds the feature.  To build and review docs, use the following steps.
 
 1. In the main Pyramid checkout directory, run ``./builddocs.sh`` (which just
-   turns around and runs ``tox -e docs``)::
+   turns around and runs ``tox -e docs``):
 
-    $ ./builddocs.sh
+     $ ./builddocs.sh
 
 2. Open the ``docs/_build/html/index.html`` file to see the resulting HTML
    rendering.
+
 
 Change Log
 ----------
