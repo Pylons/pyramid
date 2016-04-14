@@ -4,12 +4,10 @@
     <title>WikiPage: Add/Edit</title>
     <tal:block tal:repeat="reqt view.reqts['css']">
         <link rel="stylesheet" type="text/css"
-              href="${request.static_url(reqt)}"/>
+              href="${request.static_url('deform:static/' + reqt)}"/>
     </tal:block>
-    <script src="${request.static_url('deform:static/scripts/jquery-2.0.3.min.js')}"
-        type="text/javascript"></script>
     <tal:block tal:repeat="reqt view.reqts['js']">
-        <script src="${request.static_url(reqt)}"
+        <script src="${request.static_url('deform:static/' + reqt)}"
                 type="text/javascript"></script>
     </tal:block>
 </head>

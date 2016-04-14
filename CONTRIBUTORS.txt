@@ -264,3 +264,5 @@ Contributors
 - Sri Sanketh Uppalapati, 2015/12/12
 
 - Marcin Raczyński, 2016/01/26
+
+- Arian Maykon de A. Diógenes, 2016/04/13
