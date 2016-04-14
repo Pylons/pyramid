@@ -192,6 +192,32 @@ Non-Predicate Arguments
   only influence ``Cache-Control`` headers, pass a tuple as ``http_cache`` with
   the first element of ``None``, i.e., ``(None, {'public':True})``.
 
+
+``require_csrf``
+
+  CSRF checks only affect POST requests. Any other request methods will pass
+  untouched. This option is used in combination with the
+  ``pyramid.require_default_csrf`` setting to control which request parameters
+  are checked for CSRF tokens.
+
+  This feature requires a configured :term:`session factory`.
+
+  If this option is set to ``True`` then CSRF checks will be enabled for POST
+  requests to this view. The required token will be whatever was specified by
+  the ``pyramid.require_default_csrf`` setting, or will fallback to
+  ``csrf_token``.
+
+  If this option is set to a string then CSRF checks will be enabled and it
+  will be used as the required token regardless of the
+  ``pyramid.require_default_csrf`` setting.
+
+  If this option is set to ``False`` then CSRF checks will be disabled
+  regardless of the ``pyramid.require_default_csrf`` setting.
+
+  See :ref:`auto_csrf_checking` for more information.
+
+  .. versionadded:: 1.7
+
 ``wrapper``
   The :term:`view name` of a different :term:`view configuration` which will
   receive the response body of this view as the ``request.wrapped_body``

@@ -21,6 +21,8 @@ Event Types
 
 .. autoclass:: ContextFound
 
+.. autoclass:: BeforeTraversal
+
 .. autoclass:: NewResponse
 
 .. autoclass:: BeforeRender

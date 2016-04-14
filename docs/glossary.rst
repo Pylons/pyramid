@@ -1099,6 +1099,14 @@ Glossary
       Examples of built-in derivers including view mapper, the permission
       checker, and applying a renderer to a dictionary returned from the view.
 
+   truthy string
+      A string represeting a value of ``True``. Acceptable values are
+      ``t``, ``true``, ``y``, ``yes``, ``on`` and ``1``.
+
+   falsey string
+      A string represeting a value of ``False``. Acceptable values are
+      ``f``, ``false``, ``n``, ``no``, ``off`` and ``0``.
+
    pip
       The `Python Packaging Authority's <https://www.pypa.io/>`_ recommended
       tool for installing Python packages.
