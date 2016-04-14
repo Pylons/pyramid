@@ -28,9 +28,9 @@ class Test_exception_response(unittest.TestCase):
         self.assertTrue(isinstance(self._callFUT(201), HTTPCreated))
 
     def test_extra_kw(self):
-        resp = self._callFUT(404,  headers=[('abc', 'def')])
+        resp = self._callFUT(404, headers=[('abc', 'def')])
         self.assertEqual(resp.headers['abc'], 'def')
-        
+
 class Test_default_exceptionresponse_view(unittest.TestCase):
     def _callFUT(self, context, request):
         from pyramid.httpexceptions import default_exceptionresponse_view
@@ -129,7 +129,7 @@ class TestHTTPException(unittest.TestCase):
     def test_ctor_sets_body_template_obj(self):
         exc = self._makeOne(body_template='${foo}')
         self.assertEqual(
-            exc.body_template_obj.substitute({'foo':'foo'}), 'foo')
+            exc.body_template_obj.substitute({'foo': 'foo'}), 'foo')
 
     def test_ctor_with_empty_body(self):
         cls = self._getTargetSubclass(empty_body=True)
@@ -160,7 +160,7 @@ class TestHTTPException(unittest.TestCase):
         self.assertTrue(b'200 OK' in body)
         self.assertTrue(b'explanation' in body)
         self.assertTrue(b'detail' in body)
-        
+
     def test_ctor_with_body_sets_default_app_iter_text(self):
         cls = self._getTargetSubclass()
         exc = cls('detail')
@@ -173,7 +173,7 @@ class TestHTTPException(unittest.TestCase):
         exc = self._makeOne()
         exc.detail = 'abc'
         self.assertEqual(str(exc), 'abc')
-        
+
     def test__str__explanation(self):
         exc = self._makeOne()
         exc.explanation = 'def'
@@ -212,6 +212,9 @@ class TestHTTPException(unittest.TestCase):
         environ = _makeEnviron()
         start_response = DummyStartResponse()
         body = list(exc(environ, start_response))[0]
+        for header in start_response.headerlist:
+            if header[0] == 'Content-Type':
+                self.assertEqual(header[1], 'text/plain; charset=UTF-8')
         self.assertEqual(body, b'200 OK\n\nexplanation\n\n\n\n\n')
 
     def test__default_app_iter_with_comment_plain(self):
@@ -220,26 +223,78 @@ class TestHTTPException(unittest.TestCase):
         environ = _makeEnviron()
         start_response = DummyStartResponse()
         body = list(exc(environ, start_response))[0]
+        for header in start_response.headerlist:
+            if header[0] == 'Content-Type':
+                self.assertEqual(header[1], 'text/plain; charset=UTF-8')
         self.assertEqual(body, b'200 OK\n\nexplanation\n\n\n\ncomment\n')
-        
+
     def test__default_app_iter_no_comment_html(self):
         cls = self._getTargetSubclass()
         exc = cls()
         environ = _makeEnviron()
         start_response = DummyStartResponse()
         body = list(exc(environ, start_response))[0]
+        for header in start_response.headerlist:
+            if header[0] == 'Content-Type':
+                self.assertEqual(header[1], 'text/plain; charset=UTF-8')
         self.assertFalse(b'<!-- ' in body)
 
-    def test__default_app_iter_with_comment_html(self):
+    def test__content_type(self):
         cls = self._getTargetSubclass()
-        exc = cls(comment='comment & comment')
+        exc = cls()
+        environ = _makeEnviron()
+        start_response = DummyStartResponse()
+        exc(environ, start_response)
+        for header in start_response.headerlist:
+            if header[0] == 'Content-Type':
+                self.assertEqual(header[1], 'text/plain; charset=UTF-8')
+
+    def test__content_type_default_is_html(self):
+        cls = self._getTargetSubclass()
+        exc = cls()
         environ = _makeEnviron()
         environ['HTTP_ACCEPT'] = '*/*'
         start_response = DummyStartResponse()
+        exc(environ, start_response)
+        for header in start_response.headerlist:
+            if header[0] == 'Content-Type':
+                self.assertEqual(header[1], 'text/html; charset=UTF-8')
+
+    def test__content_type_text_html(self):
+        cls = self._getTargetSubclass()
+        exc = cls()
+        environ = _makeEnviron()
+        environ['HTTP_ACCEPT'] = 'text/html'
+        start_response = DummyStartResponse()
+        exc(environ, start_response)
+        for header in start_response.headerlist:
+            if header[0] == 'Content-Type':
+                self.assertEqual(header[1], 'text/html; charset=UTF-8')
+
+    def test__content_type_application_json(self):
+        cls = self._getTargetSubclass()
+        exc = cls()
+        environ = _makeEnviron()
+        environ['HTTP_ACCEPT'] = 'application/json'
+        start_response = DummyStartResponse()
+        exc(environ, start_response)
+        for header in start_response.headerlist:
+            if header[0] == 'Content-Type':
+                self.assertEqual(header[1], 'application/json')
+
+    def test__default_app_iter_with_comment_ampersand(self):
+        cls = self._getTargetSubclass()
+        exc = cls(comment='comment & comment')
+        environ = _makeEnviron()
+        environ['HTTP_ACCEPT'] = 'text/html'
+        start_response = DummyStartResponse()
         body = list(exc(environ, start_response))[0]
+        for header in start_response.headerlist:
+            if header[0] == 'Content-Type':
+                self.assertEqual(header[1], 'text/html; charset=UTF-8')
         self.assertTrue(b'<!-- comment &amp; comment -->' in body)
 
-    def test__default_app_iter_with_comment_html2(self):
+    def test__default_app_iter_with_comment_html(self):
         cls = self._getTargetSubclass()
         exc = cls(comment='comment & comment')
         environ = _makeEnviron()
@@ -247,6 +302,38 @@ class TestHTTPException(unittest.TestCase):
         start_response = DummyStartResponse()
         body = list(exc(environ, start_response))[0]
         self.assertTrue(b'<!-- comment &amp; comment -->' in body)
+
+    def test__default_app_iter_with_comment_json(self):
+        cls = self._getTargetSubclass()
+        exc = cls(comment='comment & comment')
+        environ = _makeEnviron()
+        environ['HTTP_ACCEPT'] = 'application/json'
+        start_response = DummyStartResponse()
+        body = list(exc(environ, start_response))[0]
+        import json
+        retval = json.loads(body.decode('UTF-8'))
+        self.assertEqual(retval['code'], '200 OK')
+        self.assertEqual(retval['title'], 'OK')
+
+    def test__default_app_iter_with_custom_json(self):
+        def json_formatter(status, body, title, environ):
+            return {'message': body,
+                    'code': status,
+                    'title': title,
+                    'custom': environ['CUSTOM_VARIABLE']
+                    }
+        cls = self._getTargetSubclass()
+        exc = cls(comment='comment', json_formatter=json_formatter)
+        environ = _makeEnviron()
+        environ['HTTP_ACCEPT'] = 'application/json'
+        environ['CUSTOM_VARIABLE'] = 'custom!'
+        start_response = DummyStartResponse()
+        body = list(exc(environ, start_response))[0]
+        import json
+        retval = json.loads(body.decode('UTF-8'))
+        self.assertEqual(retval['code'], '200 OK')
+        self.assertEqual(retval['title'], 'OK')
+        self.assertEqual(retval['custom'], 'custom!')
 
     def test_custom_body_template(self):
         cls = self._getTargetSubclass()
@@ -261,7 +348,8 @@ class TestHTTPException(unittest.TestCase):
         exc = cls(body_template='${REQUEST_METHOD}')
         environ = _makeEnviron()
         class Choke(object):
-            def __str__(self): raise ValueError
+            def __str__(self): # pragma nocover
+                raise ValueError
         environ['gardentheory.user'] = Choke()
         start_response = DummyStartResponse()
         body = list(exc(environ, start_response))[0]
@@ -293,7 +381,7 @@ class TestRenderAllExceptionsWithoutArguments(unittest.TestCase):
                 self.assertTrue(bytes_(exc.status) in result)
             L.append(result)
         self.assertEqual(len(L), len(status_map))
-            
+
     def test_it_plain(self):
         self._doit('text/plain')
 
@@ -367,12 +455,11 @@ class DummyStartResponse(object):
     def __call__(self, status, headerlist):
         self.status = status
         self.headerlist = headerlist
-        
+
 def _makeEnviron(**kw):
-    environ = {'REQUEST_METHOD':'GET',
-               'wsgi.url_scheme':'http',
-               'SERVER_NAME':'localhost',
-               'SERVER_PORT':'80'}
+    environ = {'REQUEST_METHOD': 'GET',
+               'wsgi.url_scheme': 'http',
+               'SERVER_NAME': 'localhost',
+               'SERVER_PORT': '80'}
     environ.update(kw)
     return environ
-
