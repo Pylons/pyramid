@@ -1,6 +1,13 @@
 unreleased
 ==========
 
+- Pyramid HTTPExceptions will now take into account the best match for the
+  clients Accept header, and depending on what is requested will return
+  text/html, application/json or text/plain. The default for */* is still
+  text/html, but if application/json is explicitly mentioned it will now
+  receive a valid JSON response. See:
+  https://github.com/Pylons/pyramid/pull/2489
+
 - Python 2.6 is no longer supported by Pyramid. See
   https://github.com/Pylons/pyramid/issues/2368
 
