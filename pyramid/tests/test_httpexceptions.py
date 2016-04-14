@@ -249,7 +249,7 @@ class TestHTTPException(unittest.TestCase):
             if header[0] == 'Content-Type':
                 self.assertEqual(header[1], 'text/plain; charset=UTF-8')
 
-    def test__content_type_default_is_plain(self):
+    def test__content_type_default_is_html(self):
         cls = self._getTargetSubclass()
         exc = cls()
         environ = _makeEnviron()
@@ -258,7 +258,7 @@ class TestHTTPException(unittest.TestCase):
         exc(environ, start_response)
         for header in start_response.headerlist:
             if header[0] == 'Content-Type':
-                self.assertEqual(header[1], 'text/plain; charset=UTF-8')
+                self.assertEqual(header[1], 'text/html; charset=UTF-8')
 
     def test__content_type_text_html(self):
         cls = self._getTargetSubclass()
