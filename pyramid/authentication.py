@@ -417,8 +417,6 @@ class RemoteUserAuthenticationPolicy(CallbackAuthenticationPolicy):
         be done somewhere else or in a subclass."""
         return []
 
-_marker = object()
-
 @implementer(IAuthenticationPolicy)
 class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
     """A :app:`Pyramid` :term:`authentication policy` which
@@ -601,34 +599,10 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
                  http_only=False,
                  wild_domain=True,
                  debug=False,
-                 hashalg=_marker,
+                 hashalg='sha512',
                  parent_domain=False,
                  domain=None,
                  ):
-        if hashalg is _marker:
-            hashalg = 'md5'
-            warnings.warn(
-                'The MD5 hash function used by default by the '
-                'AuthTktAuthenticationPolicy is known to be '
-                'susceptible to collision attacks.  It is the current default '
-                'for backwards compatibility reasons, but we recommend that '
-                'you use the SHA512 algorithm instead for improved security.  '
-                'Pass ``hashalg=\'sha512\'`` to the '
-                'AuthTktAuthenticationPolicy constructor to do so.\n\nNote '
-                'that a change to the hash algorithms will invalidate existing '
-                'auth tkt cookies set by your application.  If backwards '
-                'compatibility of existing auth tkt cookies is of greater '
-                'concern than the risk posed by the potential for a hash '
-                'collision, you\'ll want to continue using MD5 explicitly.  '
-                'To do so, pass ``hashalg=\'md5\'`` in your application to '
-                'the AuthTktAuthenticationPolicy constructor.   When you do so '
-                'this warning will not be emitted again.  The default '
-                'algorithm used in this policy will change in the future, so '
-                'setting an explicit hashalg will futureproof your '
-                'application.',
-                DeprecationWarning,
-                stacklevel=2
-                )
         self.cookie = AuthTktCookieHelper(
             secret,
             cookie_name=cookie_name,
