@@ -249,9 +249,8 @@ ${body}''')
             accept_value = environ.get('HTTP_ACCEPT', '')
             accept = MIMEAccept(accept_value)
             # Attempt to match text/html or application/json, if those don't
-            # match, we will always have our default of text/plain
-            match = accept.best_match(['text/html', 'application/json'],
-                                      default_match='text/plain')
+            # match, we will fall through to defaulting to text/plain
+            match = accept.best_match(['text/html', 'application/json'])
 
             if match == 'text/html':
                 self.content_type = 'text/html'
