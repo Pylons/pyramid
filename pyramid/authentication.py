@@ -421,13 +421,6 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
     """A :app:`Pyramid` :term:`authentication policy` which
     obtains data from a Pyramid "auth ticket" cookie.
 
-    .. warning::
-
-       The default hash algorithm used in this policy is MD5 and has known
-       hash collision vulnerabilities. The risk of an exploit is low.
-       However, for improved authentication security, use
-       ``hashalg='sha512'``.
-
     Constructor Arguments
 
     ``secret``
@@ -549,7 +542,7 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
 
     ``hashalg``
 
-       Default: ``md5`` (the literal string).
+       Default: ``sha512`` (the literal string).
 
        Any hash algorithm supported by Python's ``hashlib.new()`` function
        can be used as the ``hashalg``.
@@ -559,20 +552,9 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
        ``hashalg`` will imply that all existing users with a valid cookie will
        be required to re-login.
 
-       A warning is emitted at startup if an explicit ``hashalg`` is not
-       passed.  This is for backwards compatibility reasons.
-
        This option is available as of :app:`Pyramid` 1.4.
 
        Optional.
-
-       .. note::
-
-          ``md5`` is the default for backwards compatibility reasons. However,
-          if you don't specify ``md5`` as the hashalg explicitly, a warning is
-          issued at application startup time.  An explicit value of ``sha512``
-          is recommended for improved security, and ``sha512`` will become the
-          default in a future Pyramid version.
 
     ``debug``
 
