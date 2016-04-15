@@ -1,6 +1,22 @@
 unreleased
 ==========
 
+Backward Incompatibilities
+--------------------------
+
+- Following the Pyramid deprecation period (1.4 -> 1.6),
+  AuthTktAuthenticationPolicy's default hashing algorithm is changing from md5
+  to sha512. If you are using the authentication policy and need to continue
+  using md5, please explicitly set hashalg to 'md5'.
+
+  This change does mean that any existing auth tickets (and associated cookies)
+  will no longer be valid, and users will no longer be logged in, and have to
+  login to their accounts again. No other backwards incompatible changes have
+  been made.
+
+Features
+--------
+
 - Pyramid HTTPExceptions will now take into account the best match for the
   clients Accept header, and depending on what is requested will return
   text/html, application/json or text/plain. The default for */* is still
@@ -8,16 +24,38 @@ unreleased
   receive a valid JSON response. See:
   https://github.com/Pylons/pyramid/pull/2489
 
-- (Deprecation) Support for Python 3.3 will be removed in Pyramid 1.8.
-  https://github.com/Pylons/pyramid/issues/2477
-
 - A new event and interface (BeforeTraversal) has been introduced that will
   notify listeners before traversal starts in the router. See
   https://github.com/Pylons/pyramid/pull/2469 and
   https://github.com/Pylons/pyramid/pull/1876
 
-- Python 2.6 is no longer supported by Pyramid. See
-  https://github.com/Pylons/pyramid/issues/2368
+- Add a new "view deriver" concept to Pyramid to allow framework authors to
+  inject elements into the standard Pyramid view pipeline and affect all
+  views in an application. This is similar to a decorator except that it
+  has access to options passed to ``config.add_view`` and can affect other
+  stages of the pipeline such as the raw response from a view or prior to
+  security checks. See https://github.com/Pylons/pyramid/pull/2021
+
+
+- Allow a leading ``=`` on the key of the request param predicate.
+  For example, '=abc=1' is equivalent down to
+  ``request.params['=abc'] == '1'``.
+  See https://github.com/Pylons/pyramid/pull/1370
+
+- A new ``request.invoke_exception_view(...)`` method which can be used to
+  invoke an exception view and get back a response. This is useful for
+  rendering an exception view outside of the context of the excview tween
+  where you may need more control over the request.
+  See https://github.com/Pylons/pyramid/pull/2393
+
+- Allow using variable substitutions like ``%(LOGGING_LOGGER_ROOT_LEVEL)s``
+  for logging sections of the .ini file and populate these variables from
+  the ``pserve`` command line -- e.g.:
+  ``pserve development.ini LOGGING_LOGGER_ROOT_LEVEL=DEBUG``
+  See https://github.com/Pylons/pyramid/pull/2399
+
+Documentation Changes
+---------------------
 
 - A complete overhaul of the docs:
 
@@ -37,8 +75,8 @@ unreleased
   point for new projects.
   See https://github.com/Pylons/pyramid/pull/2024
 
-- Dropped Python 3.2 support.
-  See https://github.com/Pylons/pyramid/pull/2256
+Bug Fixes
+---------
 
 - Fix ``pserve --browser`` to use the ``--server-name`` instead of the
   app name when selecting a section to use. This was only working for people
@@ -46,29 +84,18 @@ unreleased
   ``[app:main]`` and ``[server:main]``.
   See https://github.com/Pylons/pyramid/pull/2292
 
-- Allow a leading ``=`` on the key of the request param predicate.
-  For example, '=abc=1' is equivalent down to
-  ``request.params['=abc'] == '1'``.
-  See https://github.com/Pylons/pyramid/pull/1370
+Deprecations
+------------
 
-- A new ``request.invoke_exception_view(...)`` method which can be used to
-  invoke an exception view and get back a response. This is useful for
-  rendering an exception view outside of the context of the excview tween
-  where you may need more control over the request.
-  See https://github.com/Pylons/pyramid/pull/2393
+- (Deprecation) Support for Python 3.3 will be removed in Pyramid 1.8.
+  https://github.com/Pylons/pyramid/issues/2477
 
-- Allow using variable substitutions like ``%(LOGGING_LOGGER_ROOT_LEVEL)s``
-  for logging sections of the .ini file and populate these variables from
-  the ``pserve`` command line -- e.g.:
-  ``pserve development.ini LOGGING_LOGGER_ROOT_LEVEL=DEBUG``
-  See https://github.com/Pylons/pyramid/pull/2399
+- Python 2.6 is no longer supported by Pyramid. See
+  https://github.com/Pylons/pyramid/issues/2368
 
-- Add a new "view deriver" concept to Pyramid to allow framework authors to
-  inject elements into the standard Pyramid view pipeline and affect all
-  views in an application. This is similar to a decorator except that it
-  has access to options passed to ``config.add_view`` and can affect other
-  stages of the pipeline such as the raw response from a view or prior to
-  security checks. See https://github.com/Pylons/pyramid/pull/2021
+- Dropped Python 3.2 support.
+  See https://github.com/Pylons/pyramid/pull/2256
+
 
 1.6 (2015-04-14)
 ================

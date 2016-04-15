@@ -5,7 +5,6 @@ import hashlib
 import base64
 import re
 import time as time_mod
-import warnings
 
 from zope.interface import implementer
 
@@ -417,19 +416,10 @@ class RemoteUserAuthenticationPolicy(CallbackAuthenticationPolicy):
         be done somewhere else or in a subclass."""
         return []
 
-_marker = object()
-
 @implementer(IAuthenticationPolicy)
 class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
     """A :app:`Pyramid` :term:`authentication policy` which
     obtains data from a Pyramid "auth ticket" cookie.
-
-    .. warning::
-
-       The default hash algorithm used in this policy is MD5 and has known
-       hash collision vulnerabilities. The risk of an exploit is low.
-       However, for improved authentication security, use
-       ``hashalg='sha512'``.
 
     Constructor Arguments
 
@@ -552,7 +542,7 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
 
     ``hashalg``
 
-       Default: ``md5`` (the literal string).
+       Default: ``sha512`` (the literal string).
 
        Any hash algorithm supported by Python's ``hashlib.new()`` function
        can be used as the ``hashalg``.
@@ -562,20 +552,9 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
        ``hashalg`` will imply that all existing users with a valid cookie will
        be required to re-login.
 
-       A warning is emitted at startup if an explicit ``hashalg`` is not
-       passed.  This is for backwards compatibility reasons.
-
        This option is available as of :app:`Pyramid` 1.4.
 
        Optional.
-
-       .. note::
-
-          ``md5`` is the default for backwards compatibility reasons. However,
-          if you don't specify ``md5`` as the hashalg explicitly, a warning is
-          issued at application startup time.  An explicit value of ``sha512``
-          is recommended for improved security, and ``sha512`` will become the
-          default in a future Pyramid version.
 
     ``debug``
 
@@ -601,34 +580,10 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
                  http_only=False,
                  wild_domain=True,
                  debug=False,
-                 hashalg=_marker,
+                 hashalg='sha512',
                  parent_domain=False,
                  domain=None,
                  ):
-        if hashalg is _marker:
-            hashalg = 'md5'
-            warnings.warn(
-                'The MD5 hash function used by default by the '
-                'AuthTktAuthenticationPolicy is known to be '
-                'susceptible to collision attacks.  It is the current default '
-                'for backwards compatibility reasons, but we recommend that '
-                'you use the SHA512 algorithm instead for improved security.  '
-                'Pass ``hashalg=\'sha512\'`` to the '
-                'AuthTktAuthenticationPolicy constructor to do so.\n\nNote '
-                'that a change to the hash algorithms will invalidate existing '
-                'auth tkt cookies set by your application.  If backwards '
-                'compatibility of existing auth tkt cookies is of greater '
-                'concern than the risk posed by the potential for a hash '
-                'collision, you\'ll want to continue using MD5 explicitly.  '
-                'To do so, pass ``hashalg=\'md5\'`` in your application to '
-                'the AuthTktAuthenticationPolicy constructor.   When you do so '
-                'this warning will not be emitted again.  The default '
-                'algorithm used in this policy will change in the future, so '
-                'setting an explicit hashalg will futureproof your '
-                'application.',
-                DeprecationWarning,
-                stacklevel=2
-                )
         self.cookie = AuthTktCookieHelper(
             secret,
             cookie_name=cookie_name,
