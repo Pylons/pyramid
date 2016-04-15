@@ -411,15 +411,16 @@ Checking CSRF Tokens Automatically
 
 .. versionadded:: 1.7
 
-:app:`Pyramid` supports automatically checking CSRF tokens on POST requests.
-Any other request may be checked manually. This feature can be turned on
-globally for an application using the ``pyramid.require_default_csrf`` setting.
+:app:`Pyramid` supports automatically checking CSRF tokens on requests with an
+unsafe method as defined by RFC2616. Any other request may be checked manually.
+This feature can be turned on globally for an application using the
+``pyramid.require_default_csrf`` setting.
 
 If the ``pyramid.required_default_csrf`` setting is a :term:`truthy string` or
 ``True`` then the default CSRF token parameter will be ``csrf_token``. If a
 different token is desired, it may be passed as the value. Finally, a
 :term:`falsey string` or ``False`` will turn off automatic CSRF checking
-globally on every POST request.
+globally on every request.
 
 No matter what, CSRF checking may be explicitly enabled or disabled on a
 per-view basis using the ``require_csrf`` view option. This option is of the

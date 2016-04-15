@@ -195,10 +195,11 @@ Non-Predicate Arguments
 
 ``require_csrf``
 
-  CSRF checks only affect POST requests. Any other request methods will pass
-  untouched. This option is used in combination with the
-  ``pyramid.require_default_csrf`` setting to control which request parameters
-  are checked for CSRF tokens.
+  CSRF checks will affect any request method that is not defined as a "safe"
+  method by RFC2616. In pratice this means that GET, HEAD, OPTIONS, and TRACE
+  methods will pass untouched and all others methods will require CSRF. This
+  option is used in combination with the ``pyramid.require_default_csrf``
+  setting to control which request parameters are checked for CSRF tokens.
 
   This feature requires a configured :term:`session factory`.
 

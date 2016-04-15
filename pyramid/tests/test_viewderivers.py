@@ -1170,6 +1170,17 @@ class TestDeriveView(unittest.TestCase):
         view = self.config._derive_view(inner_view, require_csrf='DUMMY')
         self.assertRaises(BadCSRFToken, lambda: view(None, request))
 
+    def test_csrf_view_fails_on_bad_PUT_header(self):
+        from pyramid.exceptions import BadCSRFToken
+        def inner_view(request): pass
+        request = self._makeRequest()
+        request.method = 'PUT'
+        request.POST = {}
+        request.session = DummySession({'csrf_token': 'foo'})
+        request.headers = {'X-CSRF-Token': 'bar'}
+        view = self.config._derive_view(inner_view, require_csrf='DUMMY')
+        self.assertRaises(BadCSRFToken, lambda: view(None, request))
+
     def test_csrf_view_uses_config_setting_truthy(self):
         response = DummyResponse()
         def inner_view(request):
