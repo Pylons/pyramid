@@ -54,12 +54,12 @@ Feature Additions
   See :ref:`auto_csrf_checking` and
   https://github.com/Pylons/pyramid/pull/2413
 
-- Pyramid HTTPExceptions will now take into account the best match for the
-  clients ``Accept`` header, and depending on what is requested will return
-  ``text/html``, ``application/json`` or ``text/plain``. The default for
-  ``*/*`` is still ``text/html``, but if ``application/json`` is explicitly
-  mentioned it will now receive a valid JSON response. See:
-  https://github.com/Pylons/pyramid/pull/2489
+- Subclasses of :class:`pyramid.httpexceptions.HTTPException` will now take
+  into account the best match for the clients ``Accept`` header, and depending
+  on what is requested will return ``text/html``, ``application/json`` or
+  ``text/plain``. The default for ``*/*`` is still ``text/html``, but if
+  ``application/json`` is explicitly mentioned it will now receive a valid
+  JSON response. See https://github.com/Pylons/pyramid/pull/2489
 
 - A new event, :class:`pyramid.events.BeforeTraversal`, and interface
   :class:`pyramid.interfaces.IBeforeTraversal` have been introduced that will
