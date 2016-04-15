@@ -15,8 +15,9 @@ Backwards Incompatibilities
   ``md5`` to ``sha512``. If you are using the authentication policy and need to
   continue using ``md5``, please explicitly set ``hashalg='md5'``.
 
-  This change means that any existing auth tickets (and associated cookies)
-  will no longer be valid, users will be logged out, and have to login to their
+  If you are not currently specifying the ``hashalg`` option in your apps, then
+  this change means any existing auth tickets (and associated cookies) will no
+  longer be valid, users will be logged out, and have to login to their
   accounts again.
 
   This change has been issuing a DeprecationWarning since :app:`Pyramid` 1.4.
@@ -64,7 +65,8 @@ Feature Additions
 - A new event, :class:`pyramid.events.BeforeTraversal`, and interface
   :class:`pyramid.interfaces.IBeforeTraversal` have been introduced that will
   notify listeners before traversal starts in the router.
-  See https://github.com/Pylons/pyramid/pull/2469 and
+  See :ref:`router_chapter` as well as
+  https://github.com/Pylons/pyramid/pull/2469 and
   https://github.com/Pylons/pyramid/pull/1876
 
 - A new method, :meth:`pyramid.request.Request.invoke_exception_view`, which
