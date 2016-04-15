@@ -106,13 +106,14 @@ def check_csrf_token(request,
                      header='X-CSRF-Token',
                      raises=True):
     """ Check the CSRF token in the request's session against the value in
-    ``request.params.get(token)`` or ``request.headers.get(header)``.
-    If a ``token`` keyword is not supplied to this function, the string
-    ``csrf_token`` will be used to look up the token in ``request.params``.
-    If a ``header`` keyword is not supplied to this function, the string
-    ``X-CSRF-Token`` will be used to look up the token in ``request.headers``.
+    ``request.POST.get(token)`` (if a POST request) or
+    ``request.headers.get(header)``. If a ``token`` keyword is not supplied to
+    this function, the string ``csrf_token`` will be used to look up the token
+    in ``request.POST``. If a ``header`` keyword is not supplied to this
+    function, the string ``X-CSRF-Token`` will be used to look up the token in
+    ``request.headers``.
 
-    If the value supplied by param or by header doesn't match the value
+    If the value supplied by post or by header doesn't match the value
     supplied by ``request.session.get_csrf_token()``, and ``raises`` is
     ``True``, this function will raise an
     :exc:`pyramid.exceptions.BadCSRFToken` exception.
@@ -128,7 +129,18 @@ def check_csrf_token(request,
 
     .. versionadded:: 1.4a2
     """
-    supplied_token = request.params.get(token, request.headers.get(header, ""))
+    # If this is a POST/PUT/etc request, then we'll check the body to see if it
+    # has a token. We explicitly use request.POST here because CSRF tokens
+    # should never appear in an URL as doing so is a security issue. We also
+    # explicitly check for request.POST here as we do not support sending form
+    # encoded data over anything but a request.POST.
+    supplied_token = request.POST.get(token, "")
+
+    # If we were unable to locate a CSRF token in a request body, then we'll
+    # check to see if there are any headers that have a value for us.
+    if supplied_token == "":
+        supplied_token = request.headers.get(header, "")
+
     expected_token = request.session.get_csrf_token()
     if strings_differ(bytes_(expected_token), bytes_(supplied_token)):
         if raises:

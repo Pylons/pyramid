@@ -391,8 +391,8 @@ will return ``True``, otherwise it will raise ``HTTPBadRequest``. Optionally,
 you can specify ``raises=False`` to have the check return ``False`` instead of
 raising an exception.
 
-By default, it checks for a GET or POST parameter named ``csrf_token`` or a
-header named ``X-CSRF-Token``.
+By default, it checks for a POST parameter named ``csrf_token`` or a header
+named ``X-CSRF-Token``.
 
 .. code-block:: python
 
@@ -411,15 +411,16 @@ Checking CSRF Tokens Automatically
 
 .. versionadded:: 1.7
 
-:app:`Pyramid` supports automatically checking CSRF tokens on POST requests.
-Any other request may be checked manually. This feature can be turned on
-globally for an application using the ``pyramid.require_default_csrf`` setting.
+:app:`Pyramid` supports automatically checking CSRF tokens on requests with an
+unsafe method as defined by RFC2616. Any other request may be checked manually.
+This feature can be turned on globally for an application using the
+``pyramid.require_default_csrf`` setting.
 
 If the ``pyramid.required_default_csrf`` setting is a :term:`truthy string` or
 ``True`` then the default CSRF token parameter will be ``csrf_token``. If a
 different token is desired, it may be passed as the value. Finally, a
 :term:`falsey string` or ``False`` will turn off automatic CSRF checking
-globally on every POST request.
+globally on every request.
 
 No matter what, CSRF checking may be explicitly enabled or disabled on a
 per-view basis using the ``require_csrf`` view option. This option is of the
@@ -430,8 +431,7 @@ If ``require_csrf`` is ``True`` but does not explicitly define a token to
 check, then the token name is pulled from whatever was set in the
 ``pyramid.require_default_csrf`` setting. Finally, if that setting does not
 explicitly define a token, then ``csrf_token`` is the token required. This token
-name will be required in ``request.params`` which is a combination of the
-query string and a submitted form body.
+name will be required in ``request.POST`` which is the submitted form body.
 
 It is always possible to pass the token in the ``X-CSRF-Token`` header as well.
 There is currently no way to define an alternate name for this header without

@@ -488,7 +488,9 @@ def csrf_view(view, info):
     wrapped_view = view
     if val:
         def csrf_view(context, request):
-            if request.method == 'POST':
+            # Assume that anything not defined as 'safe' by RFC2616 needs
+            # protection
+            if request.method not in {"GET", "HEAD", "OPTIONS", "TRACE"}:
                 check_csrf_token(request, val, raises=True)
             return view(context, request)
         wrapped_view = csrf_view

@@ -39,14 +39,14 @@ Feature Additions
   to security checks. See https://github.com/Pylons/pyramid/pull/2021
 
 - Added a new setting, ``pyramid.require_default_csrf`` which may be used
-  to turn on CSRF checks globally for every POST request in the application.
+  to turn on CSRF checks globally for every request in the application.
   This should be considered a good default for websites built on Pyramid.
   It is possible to opt-out of CSRF checks on a per-view basis by setting
   ``require_csrf=False`` on those views.
   See :ref:`auto_csrf_checking` and
   https://github.com/Pylons/pyramid/pull/2413
 
-- Added a ``require_csrf`` view option which will enforce CSRF checks on POST
+- Added a ``require_csrf`` view option which will enforce CSRF checks on
   requests. If the CSRF check fails a ``BadCSRFToken`` exception will be
   raised and may be caught by exception views (the default response is a
   ``400 Bad Request``). This option should be used in place of the deprecated
