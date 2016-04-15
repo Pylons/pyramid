@@ -11,13 +11,13 @@ Backwards Incompatibilities
 ---------------------------
 
 - The default hash algorithm for
-  :class:`pyramid.authentication.AuthTktAuthenticationPolicy` is changing
-  from ``md5`` to ``sha512``. If you are using the authentication policy and
-  need to continue using ``md5``, please explicitly set ``hashalg='md5'``.
+  :class:`pyramid.authentication.AuthTktAuthenticationPolicy` has changed from
+  ``md5`` to ``sha512``. If you are using the authentication policy and need to
+  continue using ``md5``, please explicitly set ``hashalg='md5'``.
 
-  This change does mean that any existing auth tickets (and associated cookies)
-  will no longer be valid, and users will no longer be logged in, and have to
-  login to their accounts again.
+  This change means that any existing auth tickets (and associated cookies)
+  will no longer be valid, users will be logged out, and have to login to their
+  accounts again.
 
   This change has been issuing a DeprecationWarning since :app:`Pyramid` 1.4.
 
@@ -74,15 +74,17 @@ Feature Additions
   See https://github.com/Pylons/pyramid/pull/2393
 
 - Allow a leading ``=`` on the key of the request param predicate.
-  For example, '=abc=1' is equivalent down to
+  For example, ``'=abc=1'`` is equivalent down to
   ``request.params['=abc'] == '1'``.
   See https://github.com/Pylons/pyramid/pull/1370
 
 - Allow using variable substitutions like ``%(LOGGING_LOGGER_ROOT_LEVEL)s``
   for logging sections of the .ini file and populate these variables from
   the ``pserve`` command line -- e.g.:
-  ``pserve development.ini LOGGING_LOGGER_ROOT_LEVEL=DEBUG`` This support
-  is thanks to the new ``global_conf`` option on
+
+  ``pserve development.ini LOGGING_LOGGER_ROOT_LEVEL=DEBUG``
+
+  This support is thanks to the new ``global_conf`` option on
   :func:`pyramid.paster.setup_logging`.
   See https://github.com/Pylons/pyramid/pull/2399
 
@@ -101,7 +103,7 @@ Scaffolding Enhancements
 ------------------------
 
 - A complete overhaul of the ``alchemy`` scaffold to show more modern best
-  practices with regards to SQLAlchemy session management as well as a more
+  practices with regards to SQLAlchemy session management, as well as a more
   modular approach to configuration, separating routes into a separate module
   to illustrate uses of :meth:`pyramid.config.Configurator.include`.
 
@@ -118,8 +120,8 @@ follows:
   greater with access to the ``python3 -m venv`` tool to create virtual
   environments.
 
-- Tutorials now use ``py.test`` and ``pytest-cov`` instead of nose and
-  coverage.
+- Tutorials now use ``py.test`` and ``pytest-cov`` instead of ``nose`` and
+  ``coverage``.
 
 - Further updates to the scaffolds as well as tutorials and their src files.
 
@@ -138,7 +140,7 @@ https://github.com/Pylons/pyramid/pull/2024 for more. Highlights were:
 - Authorization was overhauled to show the use of per-route context factories
   which demonstrate object-level authorization on top of simple group-level
   authorization. Did you want to restrict page edits to only the owner but
-  couldn't figure it out before?
+  couldn't figure it out before? Here you go!
 
 - The users and groups are stored in the database now instead of within
   tutorial-specific global variables.
