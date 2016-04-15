@@ -666,7 +666,8 @@ class Test_check_csrf_token(unittest.TestCase):
 
     def test_success_token(self):
         request = testing.DummyRequest()
-        request.params['csrf_token'] = request.session.get_csrf_token()
+        request.method = "POST"
+        request.POST = {'csrf_token': request.session.get_csrf_token()}
         self.assertEqual(self._callFUT(request, token='csrf_token'), True)
 
     def test_success_header(self):
@@ -676,7 +677,8 @@ class Test_check_csrf_token(unittest.TestCase):
 
     def test_success_default_token(self):
         request = testing.DummyRequest()
-        request.params['csrf_token'] = request.session.get_csrf_token()
+        request.method = "POST"
+        request.POST = {'csrf_token': request.session.get_csrf_token()}
         self.assertEqual(self._callFUT(request), True)
 
     def test_success_default_header(self):
@@ -698,8 +700,9 @@ class Test_check_csrf_token(unittest.TestCase):
     def test_token_differing_types(self):
         from pyramid.compat import text_
         request = testing.DummyRequest()
+        request.method = "POST"
         request.session['_csrft_'] = text_('foo')
-        request.params['csrf_token'] = b'foo'
+        request.POST = {'csrf_token': b'foo'}
         self.assertEqual(self._callFUT(request, token='csrf_token'), True)
 
 class DummySerializer(object):

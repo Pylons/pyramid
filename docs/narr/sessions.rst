@@ -391,8 +391,8 @@ will return ``True``, otherwise it will raise ``HTTPBadRequest``. Optionally,
 you can specify ``raises=False`` to have the check return ``False`` instead of
 raising an exception.
 
-By default, it checks for a GET or POST parameter named ``csrf_token`` or a
-header named ``X-CSRF-Token``.
+By default, it checks for a POST parameter named ``csrf_token`` or a header
+named ``X-CSRF-Token``.
 
 .. code-block:: python
 
@@ -430,8 +430,7 @@ If ``require_csrf`` is ``True`` but does not explicitly define a token to
 check, then the token name is pulled from whatever was set in the
 ``pyramid.require_default_csrf`` setting. Finally, if that setting does not
 explicitly define a token, then ``csrf_token`` is the token required. This token
-name will be required in ``request.params`` which is a combination of the
-query string and a submitted form body.
+name will be required in ``request.POST`` which is the submitted form body.
 
 It is always possible to pass the token in the ``X-CSRF-Token`` header as well.
 There is currently no way to define an alternate name for this header without
