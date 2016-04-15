@@ -106,6 +106,7 @@ Scaffolding Enhancements
   practices with regards to SQLAlchemy session management, as well as a more
   modular approach to configuration, separating routes into a separate module
   to illustrate uses of :meth:`pyramid.config.Configurator.include`.
+  See https://github.com/Pylons/pyramid/pull/2024
 
 Documentation Enhancements
 --------------------------
