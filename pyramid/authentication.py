@@ -5,7 +5,6 @@ import hashlib
 import base64
 import re
 import time as time_mod
-import warnings
 
 from zope.interface import implementer
 
