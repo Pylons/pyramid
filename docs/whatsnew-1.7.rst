@@ -47,13 +47,14 @@ Feature Additions
   https://github.com/Pylons/pyramid/pull/2413
 
 - Added a ``require_csrf`` view option which will enforce CSRF checks on
-  requests. If the CSRF check fails a ``BadCSRFToken`` exception will be
-  raised and may be caught by exception views (the default response is a
-  ``400 Bad Request``). This option should be used in place of the deprecated
-  ``check_csrf`` view predicate which would normally result in unexpected
-  ``404 Not Found`` response to the client instead of a catchable exception.
-  See :ref:`auto_csrf_checking` and
-  https://github.com/Pylons/pyramid/pull/2413
+  requests with an unsafe method as defined by RFC2616. If the CSRF check fails
+  a ``BadCSRFToken`` exception will be raised and may be caught by exception
+  views (the default response is a ``400 Bad Request``). This option should be
+  used in place of the deprecated ``check_csrf`` view predicate which would
+  normally result in unexpected ``404 Not Found`` response to the client
+  instead of a catchable exception.  See :ref:`auto_csrf_checking`,
+  https://github.com/Pylons/pyramid/pull/2413 and
+  https://github.com/Pylons/pyramid/pull/2500
 
 - Subclasses of :class:`pyramid.httpexceptions.HTTPException` will now take
   into account the best match for the clients ``Accept`` header, and depending
