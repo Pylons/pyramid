@@ -1595,6 +1595,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         config.add_view(view, require_csrf='st', renderer=null_renderer)
         view = self._getViewCallable(config)
         request = self._makeRequest(config)
+        request.scheme = "http"
         request.method = 'POST'
         request.POST = {'st': 'foo'}
         request.headers = {}
@@ -1609,6 +1610,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         config.add_view(view, require_csrf=True, renderer=null_renderer)
         view = self._getViewCallable(config)
         request = self._makeRequest(config)
+        request.scheme = "http"
         request.method = 'POST'
         request.POST = {}
         request.headers = {'X-CSRF-Token': 'foo'}
@@ -1623,6 +1625,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         config.add_view(view, require_csrf=True, renderer=null_renderer)
         view = self._getViewCallable(config)
         request = self._makeRequest(config)
+        request.scheme = "http"
         request.method = 'POST'
         request.POST = {}
         request.headers = {}

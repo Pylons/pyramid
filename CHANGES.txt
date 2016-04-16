@@ -35,6 +35,18 @@ Features
   https://github.com/Pylons/pyramid/pull/2413 and
   https://github.com/Pylons/pyramid/pull/2500
 
+- Added an additional CSRF validation that checks the origin/referrer of a
+  request and makes sure it matches the current ``request.domain``. This
+  particular check is only active when accessing a site over HTTPS as otherwise
+  browsers don't always send the required information. If this additional CSRF
+  validation fails a ``BadCSRFOrigin`` exception will be raised and may be
+  caught by exception views (the default response is ``400 Bad Request``).
+  Additional allowed origins may be configured by setting
+  ``pyramid.csrf_trusted_origins`` to a list of domain names (with ports if on
+  a non standard port) to allow. Subdomains are not allowed unless the domain
+  name has been prefixed with a ``.``. See:
+  https://github.com/Pylons/pyramid/pull/2501
+
 - Pyramid HTTPExceptions will now take into account the best match for the
   clients Accept header, and depending on what is requested will return
   text/html, application/json or text/plain. The default for */* is still

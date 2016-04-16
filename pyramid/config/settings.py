@@ -124,6 +124,8 @@ class Settings(dict):
                                              config_prevent_cachebust))
         require_default_csrf = self.get('pyramid.require_default_csrf')
         eff_require_default_csrf = require_default_csrf
+        csrf_trusted_origins = self.get("pyramid.csrf_trusted_origins", [])
+        eff_csrf_trusted_origins = csrf_trusted_origins
 
         update = {
             'debug_authorization': eff_debug_all or eff_debug_auth,
@@ -137,6 +139,7 @@ class Settings(dict):
             'prevent_http_cache':eff_prevent_http_cache,
             'prevent_cachebust':eff_prevent_cachebust,
             'require_default_csrf':eff_require_default_csrf,
+            'csrf_trusted_origins':eff_csrf_trusted_origins,
 
             'pyramid.debug_authorization': eff_debug_all or eff_debug_auth,
             'pyramid.debug_notfound': eff_debug_all or eff_debug_notfound,
@@ -149,6 +152,7 @@ class Settings(dict):
             'pyramid.prevent_http_cache':eff_prevent_http_cache,
             'pyramid.prevent_cachebust':eff_prevent_cachebust,
             'pyramid.require_default_csrf':eff_require_default_csrf,
+            'pyramid.csrf_trusted_origins':eff_csrf_trusted_origins,
         }
 
         self.update(update)

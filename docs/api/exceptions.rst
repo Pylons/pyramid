@@ -5,6 +5,8 @@
 
 .. automodule:: pyramid.exceptions
 
+  .. autoexception:: BadCSRFOrigin
+
   .. autoexception:: BadCSRFToken
 
   .. autoexception:: PredicateMismatch
