@@ -204,8 +204,9 @@ tutorial.
 .. code-block:: bash
 
     # Mac and Linux
-    $ $VENV/bin/pip install webtest deform sqlalchemy pyramid_chameleon \
-      pyramid_debugtoolbar waitress pyramid_tm zope.sqlalchemy
+    $ $VENV/bin/pip install webtest pytest pytest-cov deform sqlalchemy \
+      pyramid_chameleon pyramid_debugtoolbar waitress pyramid_tm \
+      zope.sqlalchemy
 
 .. code-block:: doscon
 
