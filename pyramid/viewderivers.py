@@ -477,6 +477,8 @@ def _parse_csrf_setting(val, error_source):
                 .format(error_source))
     return val
 
+SAFE_REQUEST_METHODS = frozenset(["GET", "HEAD", "OPTIONS", "TRACE"])
+
 def csrf_view(view, info):
     default_val = _parse_csrf_setting(
         info.settings.get('pyramid.require_default_csrf'),
@@ -493,7 +495,7 @@ def csrf_view(view, info):
         def csrf_view(context, request):
             # Assume that anything not defined as 'safe' by RFC2616 needs
             # protection
-            if request.method not in {"GET", "HEAD", "OPTIONS", "TRACE"}:
+            if request.method not in SAFE_REQUEST_METHODS:
                 check_csrf_origin(request, raises=True)
                 check_csrf_token(request, val, raises=True)
             return view(context, request)
