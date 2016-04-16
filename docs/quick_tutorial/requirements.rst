@@ -140,7 +140,7 @@ environment`. We set an environment variable to save typing later.
 
 .. _create-a-virtual-environment:
 
-Create a Virtual Environment
+Create a virtual environment
 ----------------------------
 
 ``venv`` is a tool to create isolated Python 3 environments, each with its own
@@ -162,13 +162,31 @@ environment variable.
    2's `virtualenv <https://virtualenv.pypa.io/en/latest/>`_ package.
 
 
+Update packaging tools in the virtual environment
+-------------------------------------------------
+
+It's always a good idea to update to the very latest version of packaging tools
+because the installed Python bundles only the version that was available at the
+time of its release.
+
+.. code-block:: bash
+
+    # Mac and Linux
+    $VENV/bin/pip install --upgrade pip setuptools
+
+.. code-block:: doscon
+
+    # Windows
+    c:\> %VENV%\Scripts\pip install --upgrade pip setuptools
+
+
 .. _install-pyramid:
 
 Install Pyramid
 ---------------
 
 We have our Python standard prerequisites out of the way. The Pyramid
-part is pretty easy:
+part is pretty easy.
 
 .. parsed-literal::
 
@@ -181,7 +199,7 @@ part is pretty easy:
 Our Python virtual environment now has the Pyramid software available.
 
 You can optionally install some of the extra Python packages used in this
-tutorial:
+tutorial.
 
 .. code-block:: bash
 

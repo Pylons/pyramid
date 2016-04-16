@@ -42,6 +42,6 @@ below:
             └── setup.py
 
 Each of the first-level directories (e.g., ``request_response``) is a *Python
-project* (except as noted for the ``hello_world`` step). The``tutorial``
+project* (except as noted for the ``hello_world`` step). The ``tutorial``
 directory is a *Python package*. At the end of each step, we copy a previous
 directory into a new directory to use as a starting point.
