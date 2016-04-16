@@ -3,16 +3,17 @@
 ============================================
 
 Most modern Python development is done using Python packages, an approach
-Pyramid puts to good use. In this step we redo "Hello World" as a
-minimum Python package inside a minimum Python project.
+Pyramid puts to good use. In this step we redo "Hello World" as a minimal
+Python package inside a minimal Python project.
+
 
 Background
 ==========
 
 Python developers can organize a collection of modules and files into a
-namespaced unit called a :ref:`package <python:tut-packages>`. If a
-directory is on ``sys.path`` and has a special file named
-``__init__.py``, it is treated as a Python package.
+namespaced unit called a :ref:`package <python:tut-packages>`. If a directory
+is on ``sys.path`` and has a special file named ``__init__.py``, it is treated
+as a Python package.
 
 Packages can be bundled up, made available for installation, and installed
 through a toolchain oriented around a ``setup.py`` file. For this tutorial,
@@ -34,6 +35,7 @@ In summary:
 
 - That package will be part of a *project*.
 
+
 Objectives
 ==========
 
@@ -42,6 +44,7 @@ Objectives
 - Get a minimum Python "project" in place by making a ``setup.py``.
 
 - Install our ``tutorial`` project in development mode.
+
 
 Steps
 =====
@@ -56,8 +59,8 @@ Steps
 
    .. literalinclude:: package/setup.py
 
-#. Make the new project installed for development then make a directory
-   for the actual code:
+#. Make the new project installed for development then make a directory for the
+   actual code:
 
    .. code-block:: bash
 
@@ -80,26 +83,27 @@ Steps
 
 #. Open http://localhost:6543/ in your browser.
 
+
 Analysis
 ========
 
-Python packages give us an organized unit of project development.
-Python projects, via ``setup.py``, gives us special features when
-our package is installed (in this case, in local development mode.)
+Python packages give us an organized unit of project development. Python
+projects, via ``setup.py``, give us special features when our package is
+installed (in this case, in local development mode, also called local editable
+mode as indicated by ``-e .``).
 
-In this step we have a Python package called ``tutorial``. We use the
-same name in each step of the tutorial, to avoid unnecessary retyping.
+In this step we have a Python package called ``tutorial``. We use the same name
+in each step of the tutorial, to avoid unnecessary retyping.
 
-Above this ``tutorial`` directory we have the files that handle the
-packaging of this project. At the moment, all we need is a
-bare-bones ``setup.py``.
+Above this ``tutorial`` directory we have the files that handle the packaging
+of this project. At the moment, all we need is a bare-bones ``setup.py``.
 
-Everything else is the same about our application. We simply made a
-Python package with a ``setup.py`` and installed it in development mode.
+Everything else is the same about our application. We simply made a Python
+package with a ``setup.py`` and installed it in development mode.
 
 Note that the way we're running the app (``python tutorial/app.py``) is a bit
 of an odd duck.  We would never do this unless we were writing a tutorial that
-tries to capture how this stuff works a step at a time.  It's generally a bad
+tries to capture how this stuff works one step at a time. It's generally a bad
 idea to run a Python module inside a package directly as a script.
 
 .. seealso:: :ref:`Python Packages <python:tut-packages>` and `Working in
