@@ -6,40 +6,43 @@ Requirements
 
 Let's get our tutorial environment set up. Most of the set up work is in
 standard Python development practices (install Python and make an isolated
-environment.)
+virtual environment.)
 
 .. note::
 
-  Pyramid encourages standard Python development practices with
-  packaging tools, virtual environments, logging, and so on.  There
-  are many variations, implementations, and opinions across the Python
-  community.  For consistency, ease of documentation maintenance,
-  and to minimize confusion, the Pyramid *documentation* has adopted
-  specific conventions.
+  Pyramid encourages standard Python development practices with packaging
+  tools, virtual environments, logging, and so on. There are many variations,
+  implementations, and opinions across the Python community.  For consistency,
+  ease of documentation maintenance, and to minimize confusion, the Pyramid
+  *documentation* has adopted specific conventions that are consistent with the
+  :term:`Python Packaging Authority`.
 
 This *Quick Tutorial* is based on:
 
-* **Python 3.5**. Pyramid fully supports Python 3.3+ and Python 2.6+. This
+* **Python 3.5**. Pyramid fully supports Python 3.3+ and Python 2.7+. This
   tutorial uses **Python 3.5** but runs fine under Python 2.7.
 
 * **venv**. We believe in virtual environments. For this tutorial, we use
-  Python 3.5's built-in solution ``venv``. For Python 2.7, you can install
-  ``virtualenv``.
+  Python 3.5's built-in solution :term:`venv`. For Python 2.7, you can install
+  :term:`virtualenv`.
 
-* **pip**. We use ``pip`` for package management.
+* **pip**. We use :term:`pip` for package management.
 
-* **Workspaces, projects, and packages.** Our home directory
-  will contain a *tutorial workspace* with our Python virtual
-  environment(s) and *Python projects* (a directory with packaging
-  information and *Python packages* of working code.)
+* **Workspaces, projects, and packages.** Our home directory will contain a
+  *tutorial workspace* with our Python virtual environment and *Python
+  projects* (a directory with packaging information and *Python packages* of
+  working code.)
 
-* **Unix commands**. Commands in this tutorial use UNIX syntax and
-  paths.  Windows users should adjust commands accordingly.
+* **Unix commands**. Commands in this tutorial use UNIX syntax and paths.
+  Windows users should adjust commands accordingly.
 
 .. note::
-
     Pyramid was one of the first web frameworks to fully support Python 3 in
     October 2011.
+
+.. note::
+    Windows commands use the plain old MSDOS shell. For PowerShell command
+    syntax, see its documentation.
 
 Steps
 =====
@@ -56,27 +59,12 @@ Steps
 Install Python 3
 ----------------
 
-Windows and Mac OS X users can download and run an installer.
+See the detailed recommendation for your operating system described under
+:ref:`installing_chapter`.
 
-Download the latest standard Python 3 release (not development release) from
-`python.org <https://www.python.org/downloads/>`_.
-
-Windows users should also install the `Python for Windows extensions
-<http://sourceforge.net/projects/pywin32/files/pywin32/>`_. Carefully read the
-``README.txt`` file at the end of the list of builds, and follow its
-directions. Make sure you get the proper 32- or 64-bit build and Python
-version.
-
-Linux users can either use their package manager to install Python 3
-or may `build Python 3 from source
-<http://pyramid.readthedocs.org/en/master/narr/install.html#package-manager-
-method>`_.
-
-.. seealso:: See also :ref:`For Mac OS X Users <for-mac-os-x-users>`, :ref:`If
-   You Don't Yet Have a Python Interpreter (UNIX)
-   <if-you-don-t-yet-have-a-python-interpreter-unix>`, and :ref:`If You Don't
-   Yet Have a Python Interpreter (Windows)
-   <if-you-don-t-yet-have-a-python-interpreter-windows>`.
+- :ref:`for-mac-os-x-users`
+- :ref:`if-you-don-t-yet-have-a-python-interpreter-unix`
+- :ref:`if-you-don-t-yet-have-a-python-interpreter-windows`
 
 
 .. _create-a-project-directory-structure:
@@ -84,11 +72,10 @@ method>`_.
 Create a project directory structure
 ------------------------------------
 
-We will arrive at a directory structure of
-``workspace->project->package``, with our workspace named
-``quick_tutorial``. The following tree diagram shows how this will be
-structured and where our virtual environment will reside as we proceed through
-the tutorial:
+We will arrive at a directory structure of ``workspace -> project -> package``,
+where our workspace is named ``quick_tutorial``. The following tree diagram
+shows how this will be structured, and where our :term:`virtual environment`
+will reside as we proceed through the tutorial:
 
 .. code-block:: text
 
@@ -113,43 +100,41 @@ For Linux, the commands to do so are as follows:
 
 For Windows:
 
-.. code-block:: ps1con
+.. code-block:: doscon
 
     # Windows
     c:\> cd \
     c:\> mkdir projects\quick_tutorial
     c:\> cd projects\quick_tutorial
 
-In the above figure, your user home directory is represented by ``~``.  In
-your home directory, all of your projects are in the ``projects`` directory.
-This is a general convention not specific to Pyramid that many developers use.
-Windows users will do well to use ``c:\`` as the location for ``projects`` in
-order to avoid spaces in any of the path names.
+In the above figure, your user home directory is represented by ``~``. In your
+home directory, all of your projects are in the ``projects`` directory. This is
+a general convention not specific to Pyramid that many developers use. Windows
+users will do well to use ``c:\`` as the location for ``projects`` in order to
+avoid spaces in any of the path names.
 
 Next within ``projects`` is your workspace directory, here named
 ``quick_tutorial``. A workspace is a common term used by integrated
-development environments (IDE) like PyCharm and PyDev that stores
-isolated Python environments (virtual environments) and specific project files
-and repositories.
+development environments (IDE), like PyCharm and PyDev, where virtual
+environments, specific project files, and repositories are stored.
 
 
 .. _set-an-environment-variable:
 
-Set an Environment Variable
+Set an environment variable
 ---------------------------
 
-This tutorial will refer frequently to the location of the virtual
-environment. We set an environment variable to save typing later.
+This tutorial will refer frequently to the location of the :term:`virtual
+environment`. We set an environment variable to save typing later.
 
 .. code-block:: bash
 
     # Mac and Linux
     $ export VENV=~/projects/quick_tutorial/env
 
-.. code-block:: ps1con
+.. code-block:: doscon
 
     # Windows
-    # TODO: This command does not work
     c:\> set VENV=c:\projects\quick_tutorial\env
 
 
@@ -168,7 +153,7 @@ environment variable.
     # Mac and Linux
     $ python3 -m venv $VENV
 
-.. code-block:: ps1con
+.. code-block:: doscon
 
     # Windows
     c:\> c:\Python35\python3 -m venv %VENV%
@@ -195,18 +180,16 @@ part is pretty easy:
 
 Our Python virtual environment now has the Pyramid software available.
 
-You can optionally install some of the extra Python packages used
-during this tutorial:
+You can optionally install some of the extra Python packages used in this
+tutorial:
 
 .. code-block:: bash
 
     # Mac and Linux
-    $ $VENV/bin/pip install nose webtest deform sqlalchemy \
-       pyramid_chameleon pyramid_debugtoolbar waitress \
-       pyramid_tm zope.sqlalchemy
+    $ $VENV/bin/pip install webtest deform sqlalchemy pyramid_chameleon \
+      pyramid_debugtoolbar waitress pyramid_tm zope.sqlalchemy
 
-.. code-block:: ps1con
+.. code-block:: doscon
 
     # Windows
-    c:\> %VENV%\Scripts\pip install nose webtest deform sqlalchemy pyramid_chameleon pyramid_debugtoolbar waitress pyramid_tm zope.sqlalchemy
-
+    c:\> %VENV%\Scripts\pip install webtest deform sqlalchemy pyramid_chameleon pyramid_debugtoolbar waitress pyramid_tm zope.sqlalchemy
