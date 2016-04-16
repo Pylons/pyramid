@@ -73,7 +73,7 @@ example block commands are prefixed only with a ``>`` character, e.g.:
 
   .. code-block:: doscon
 
-     > %VENV%\Scripts\nosetests
+     > %VENV%\Scripts\py.test tutorial\tests.py -q
 
 When a command that should be typed on one line is too long to fit on a page,
 the backslash ``\`` is used to indicate that the following printed line should
