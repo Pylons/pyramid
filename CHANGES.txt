@@ -15,6 +15,10 @@ Backward Incompatibilities
 
   See https://github.com/Pylons/pyramid/pull/2496
 
+- The ``check_csrf_token`` function no longer validates a csrf token in the
+  query string of a request. Only headers and request bodies are supported.
+  See https://github.com/Pylons/pyramid/pull/2500
+
 Features
 --------
 
@@ -44,14 +48,18 @@ Features
   Additional allowed origins may be configured by setting
   ``pyramid.csrf_trusted_origins`` to a list of domain names (with ports if on
   a non standard port) to allow. Subdomains are not allowed unless the domain
-  name has been prefixed with a ``.``. See:
+  name has been prefixed with a ``.``. See
   https://github.com/Pylons/pyramid/pull/2501
+
+- Added a new ``pyramid.session.check_csrf_origin`` API for validating the
+  origin or referrer headers against the request's domain.
+  See https://github.com/Pylons/pyramid/pull/2501
 
 - Pyramid HTTPExceptions will now take into account the best match for the
   clients Accept header, and depending on what is requested will return
   text/html, application/json or text/plain. The default for */* is still
   text/html, but if application/json is explicitly mentioned it will now
-  receive a valid JSON response. See:
+  receive a valid JSON response. See
   https://github.com/Pylons/pyramid/pull/2489
 
 - A new event and interface (BeforeTraversal) has been introduced that will

@@ -28,6 +28,10 @@ Backwards Incompatibilities
   https://github.com/Pylons/pyramid/issues/2368 and
   https://github.com/Pylons/pyramid/pull/2256
 
+- The :func:`pyramid.session.check_csrf_token` function no longer validates a
+  csrf token in the query string of a request. Only headers and request bodies
+  are supported. See https://github.com/Pylons/pyramid/pull/2500
+
 Feature Additions
 -----------------
 
@@ -55,6 +59,22 @@ Feature Additions
   instead of a catchable exception.  See :ref:`auto_csrf_checking`,
   https://github.com/Pylons/pyramid/pull/2413 and
   https://github.com/Pylons/pyramid/pull/2500
+
+- Added an additional CSRF validation that checks the origin/referrer of a
+  request and makes sure it matches the current ``request.domain``. This
+  particular check is only active when accessing a site over HTTPS as otherwise
+  browsers don't always send the required information. If this additional CSRF
+  validation fails a ``BadCSRFOrigin`` exception will be raised and may be
+  caught by exception views (the default response is ``400 Bad Request``).
+  Additional allowed origins may be configured by setting
+  ``pyramid.csrf_trusted_origins`` to a list of domain names (with ports if on
+  a non standard port) to allow. Subdomains are not allowed unless the domain
+  name has been prefixed with a ``.``. See
+  https://github.com/Pylons/pyramid/pull/2501
+
+- Added a new :func:`pyramid.session.check_csrf_origin` API for validating the
+  origin or referrer headers against the request's domain.
+  See https://github.com/Pylons/pyramid/pull/2501
 
 - Subclasses of :class:`pyramid.httpexceptions.HTTPException` will now take
   into account the best match for the clients ``Accept`` header, and depending

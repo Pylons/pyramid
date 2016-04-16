@@ -227,6 +227,11 @@ def check_csrf_token(request,
     application automatically against CSRF attacks.
 
     .. versionadded:: 1.4a2
+
+    .. versionchanged:: 1.7a1
+       A CSRF token passed in the query string of the request is no longer
+       considered valid. It must be passed in either the request body or
+       a header.
     """
     # If this is a POST/PUT/etc request, then we'll check the body to see if it
     # has a token. We explicitly use request.POST here because CSRF tokens
