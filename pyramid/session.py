@@ -192,7 +192,7 @@ def check_csrf_origin(request, trusted_origins=None, raises=True):
         if not any(is_same_domain(originp.netloc, host)
                    for host in trusted_origins):
             reason = (
-                "Referer checking failed - {} does not match any trusted "
+                "Referer checking failed - {0} does not match any trusted "
                 "origins."
             )
             return _fail(reason.format(origin))
