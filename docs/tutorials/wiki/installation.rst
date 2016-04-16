@@ -30,7 +30,7 @@ On UNIX
 On Windows
 ^^^^^^^^^^
 
-.. code-block:: ps1con
+.. code-block:: doscon
 
    c:\> mkdir pyramidtut
 
@@ -53,7 +53,7 @@ On UNIX
 On Windows
 ^^^^^^^^^^
 
-.. code-block:: ps1con
+.. code-block:: doscon
 
    c:\> set VENV=c:\pyramidtut
 
@@ -62,13 +62,13 @@ path to the command for your Python version.
 
 Python 2.7:
 
-.. code-block:: ps1con
+.. code-block:: doscon
 
    c:\> c:\Python27\Scripts\virtualenv %VENV%
 
 Python 3.5:
 
-.. code-block:: ps1con
+.. code-block:: doscon
 
    c:\> c:\Python35\Scripts\python -m venv %VENV%
 
@@ -86,7 +86,7 @@ On UNIX
 On Windows
 ^^^^^^^^^^
 
-.. code-block:: ps1con
+.. code-block:: doscon
 
    c:\> %VENV%\Scripts\pip install --upgrade pip setuptools
 
@@ -104,7 +104,7 @@ On UNIX
 On Windows
 ^^^^^^^^^^
 
-.. code-block:: ps1con
+.. code-block:: doscon
 
    c:\> %VENV%\Scripts\pip install pyramid
 
@@ -124,7 +124,7 @@ On UNIX
 On Windows
 ^^^^^^^^^^
 
-.. code-block:: ps1con
+.. code-block:: doscon
 
    c:\> cd pyramidtut
 
@@ -157,7 +157,7 @@ On UNIX
 On Windows
 ^^^^^^^^^^
 
-.. code-block:: ps1con
+.. code-block:: doscon
 
    c:\pyramidtut> %VENV%\Scripts\pcreate -s zodb tutorial
 
@@ -190,7 +190,7 @@ On UNIX
 On Windows
 ^^^^^^^^^^
 
-.. code-block:: ps1con
+.. code-block:: doscon
 
    c:\pyramidtut> cd tutorial
    c:\pyramidtut\tutorial> %VENV%\Scripts\pip install -e .
@@ -240,7 +240,7 @@ On UNIX
 On Windows
 ^^^^^^^^^^
 
-.. code-block:: ps1con
+.. code-block:: doscon
 
    c:\pyramidtut\tutorial> %VENV%\Scripts\pip install -e ".[testing]"
 
@@ -263,7 +263,7 @@ On UNIX
 On Windows
 ^^^^^^^^^^
 
-.. code-block:: ps1con
+.. code-block:: doscon
 
    c:\pyramidtut\tutorial> %VENV%\Scripts\py.test tutorial\tests.py -q
 
@@ -296,7 +296,7 @@ On UNIX
 On Windows
 ^^^^^^^^^^
 
-.. code-block:: ps1con
+.. code-block:: doscon
 
    c:\pyramidtut\tutorial> %VENV%\Scripts\py.test --cov=tutorial \
        --cov-report=term-missing tutorial\tests.py
@@ -344,7 +344,7 @@ On UNIX
 On Windows
 ^^^^^^^^^^
 
-.. code-block:: ps1con
+.. code-block:: doscon
 
    c:\pyramidtut\tutorial> %VENV%\Scripts\pserve development.ini --reload
 
