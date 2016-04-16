@@ -186,7 +186,7 @@ After installing Python as described previously in
 
 #. Make a :term:`virtual environment` workspace:
 
-   .. code-block:: ps1con
+   .. code-block:: doscon
 
       c:\> set VENV=c:\env
       # replace "x" with your minor version of Python 3
