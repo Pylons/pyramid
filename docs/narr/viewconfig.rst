@@ -195,10 +195,11 @@ Non-Predicate Arguments
 
 ``require_csrf``
 
-  CSRF checks only affect POST requests. Any other request methods will pass
-  untouched. This option is used in combination with the
-  ``pyramid.require_default_csrf`` setting to control which request parameters
-  are checked for CSRF tokens.
+  CSRF checks will affect any request method that is not defined as a "safe"
+  method by RFC2616. In pratice this means that GET, HEAD, OPTIONS, and TRACE
+  methods will pass untouched and all others methods will require CSRF. This
+  option is used in combination with the ``pyramid.require_default_csrf``
+  setting to control which request parameters are checked for CSRF tokens.
 
   This feature requires a configured :term:`session factory`.
 
@@ -213,6 +214,9 @@ Non-Predicate Arguments
 
   If this option is set to ``False`` then CSRF checks will be disabled
   regardless of the ``pyramid.require_default_csrf`` setting.
+
+  In addition, if this option is set to ``True`` or a string then CSRF origin
+  checking will be enabled.
 
   See :ref:`auto_csrf_checking` for more information.
 
@@ -459,7 +463,7 @@ configured view.
   check name.
 
   If CSRF checking is performed, the checked value will be the value of
-  ``request.params[check_name]``.  This value will be compared against the
+  ``request.POST[check_name]``.  This value will be compared against the
   value of ``request.session.get_csrf_token()``, and the check will pass if
   these two values are the same.  If the check passes, the associated view will
   be permitted to execute.  If the check fails, the associated view will not be

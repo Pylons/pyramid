@@ -6,7 +6,10 @@ from zope.interface import (
     )
 
 from pyramid.security import NO_PERMISSION_REQUIRED
-from pyramid.session import check_csrf_token
+from pyramid.session import (
+    check_csrf_origin,
+    check_csrf_token,
+)
 from pyramid.response import Response
 
 from pyramid.interfaces import (
@@ -474,6 +477,8 @@ def _parse_csrf_setting(val, error_source):
                 .format(error_source))
     return val
 
+SAFE_REQUEST_METHODS = frozenset(["GET", "HEAD", "OPTIONS", "TRACE"])
+
 def csrf_view(view, info):
     default_val = _parse_csrf_setting(
         info.settings.get('pyramid.require_default_csrf'),
@@ -488,7 +493,10 @@ def csrf_view(view, info):
     wrapped_view = view
     if val:
         def csrf_view(context, request):
-            if request.method == 'POST':
+            # Assume that anything not defined as 'safe' by RFC2616 needs
+            # protection
+            if request.method not in SAFE_REQUEST_METHODS:
+                check_csrf_origin(request, raises=True)
                 check_csrf_token(request, val, raises=True)
             return view(context, request)
         wrapped_view = csrf_view

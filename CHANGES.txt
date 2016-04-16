@@ -15,6 +15,10 @@ Backward Incompatibilities
 
   See https://github.com/Pylons/pyramid/pull/2496
 
+- The ``check_csrf_token`` function no longer validates a csrf token in the
+  query string of a request. Only headers and request bodies are supported.
+  See https://github.com/Pylons/pyramid/pull/2500
+
 Features
 --------
 
@@ -25,19 +29,37 @@ Features
   ``require_csrf=False`` on those views.
   See https://github.com/Pylons/pyramid/pull/2413
 
-- Added a ``require_csrf`` view option which will enforce CSRF checks on POST
-  requests. If the CSRF check fails a ``BadCSRFToken`` exception will be
-  raised and may be caught by exception views (the default response is a
-  ``400 Bad Request``). This option should be used in place of the deprecated
-  ``check_csrf`` view predicate which would normally result in unexpected
-  ``404 Not Found`` response to the client instead of a catchable exception.
-  See https://github.com/Pylons/pyramid/pull/2413
+- Added a ``require_csrf`` view option which will enforce CSRF checks on any
+  request with an unsafe method as defined by RFC2616. If the CSRF check fails
+  a ``BadCSRFToken`` exception will be raised and may be caught by exception
+  views (the default response is a ``400 Bad Request``). This option should be
+  used in place of the deprecated ``check_csrf`` view predicate which would
+  normally result in unexpected ``404 Not Found`` response to the client
+  instead of a catchable exception.  See
+  https://github.com/Pylons/pyramid/pull/2413 and
+  https://github.com/Pylons/pyramid/pull/2500
+
+- Added an additional CSRF validation that checks the origin/referrer of a
+  request and makes sure it matches the current ``request.domain``. This
+  particular check is only active when accessing a site over HTTPS as otherwise
+  browsers don't always send the required information. If this additional CSRF
+  validation fails a ``BadCSRFOrigin`` exception will be raised and may be
+  caught by exception views (the default response is ``400 Bad Request``).
+  Additional allowed origins may be configured by setting
+  ``pyramid.csrf_trusted_origins`` to a list of domain names (with ports if on
+  a non standard port) to allow. Subdomains are not allowed unless the domain
+  name has been prefixed with a ``.``. See
+  https://github.com/Pylons/pyramid/pull/2501
+
+- Added a new ``pyramid.session.check_csrf_origin`` API for validating the
+  origin or referrer headers against the request's domain.
+  See https://github.com/Pylons/pyramid/pull/2501
 
 - Pyramid HTTPExceptions will now take into account the best match for the
   clients Accept header, and depending on what is requested will return
   text/html, application/json or text/plain. The default for */* is still
   text/html, but if application/json is explicitly mentioned it will now
-  receive a valid JSON response. See:
+  receive a valid JSON response. See
   https://github.com/Pylons/pyramid/pull/2489
 
 - A new event and interface (BeforeTraversal) has been introduced that will

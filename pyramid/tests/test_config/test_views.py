@@ -1502,8 +1502,9 @@ class TestViewsConfigurationMixin(unittest.TestCase):
             self.assertEqual(len(w), 1)
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
+        request.method = "POST"
         request.session = DummySession({'csrf_token': 'foo'})
-        request.params = {'csrf_token': 'foo'}
+        request.POST = {'csrf_token': 'foo'}
         request.headers = {}
         self.assertEqual(wrapper(None, request), 'OK')
 
@@ -1594,8 +1595,9 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         config.add_view(view, require_csrf='st', renderer=null_renderer)
         view = self._getViewCallable(config)
         request = self._makeRequest(config)
+        request.scheme = "http"
         request.method = 'POST'
-        request.params = {'st': 'foo'}
+        request.POST = {'st': 'foo'}
         request.headers = {}
         request.session = DummySession({'csrf_token': 'foo'})
         self.assertEqual(view(None, request), 'OK')
@@ -1608,7 +1610,9 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         config.add_view(view, require_csrf=True, renderer=null_renderer)
         view = self._getViewCallable(config)
         request = self._makeRequest(config)
+        request.scheme = "http"
         request.method = 'POST'
+        request.POST = {}
         request.headers = {'X-CSRF-Token': 'foo'}
         request.session = DummySession({'csrf_token': 'foo'})
         self.assertEqual(view(None, request), 'OK')
@@ -1621,7 +1625,9 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         config.add_view(view, require_csrf=True, renderer=null_renderer)
         view = self._getViewCallable(config)
         request = self._makeRequest(config)
+        request.scheme = "http"
         request.method = 'POST'
+        request.POST = {}
         request.headers = {}
         request.session = DummySession({'csrf_token': 'foo'})
         self.assertRaises(BadCSRFToken, lambda: view(None, request))

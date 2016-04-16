@@ -856,3 +856,24 @@ def dummyfunc(): pass
 
 class Dummy(object):
     pass
+
+
+class Test_is_same_domain(unittest.TestCase):
+    def _callFUT(self, *args, **kw):
+        from pyramid.util import is_same_domain
+        return is_same_domain(*args, **kw)
+
+    def test_it(self):
+        self.assertTrue(self._callFUT("example.com", "example.com"))
+        self.assertFalse(self._callFUT("evil.com", "example.com"))
+        self.assertFalse(self._callFUT("evil.example.com", "example.com"))
+        self.assertFalse(self._callFUT("example.com", ""))
+
+    def test_with_wildcard(self):
+        self.assertTrue(self._callFUT("example.com", ".example.com"))
+        self.assertTrue(self._callFUT("good.example.com", ".example.com"))
+
+    def test_with_port(self):
+        self.assertTrue(self._callFUT("example.com:8080", "example.com:8080"))
+        self.assertFalse(self._callFUT("example.com:8080", "example.com"))
+        self.assertFalse(self._callFUT("example.com", "example.com:8080"))

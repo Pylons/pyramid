@@ -15,8 +15,9 @@ Backwards Incompatibilities
   ``md5`` to ``sha512``. If you are using the authentication policy and need to
   continue using ``md5``, please explicitly set ``hashalg='md5'``.
 
-  This change means that any existing auth tickets (and associated cookies)
-  will no longer be valid, users will be logged out, and have to login to their
+  If you are not currently specifying the ``hashalg`` option in your apps, then
+  this change means any existing auth tickets (and associated cookies) will no
+  longer be valid, users will be logged out, and have to login to their
   accounts again.
 
   This change has been issuing a DeprecationWarning since :app:`Pyramid` 1.4.
@@ -26,6 +27,10 @@ Backwards Incompatibilities
 - Python 2.6 and 3.2 are no longer supported by Pyramid. See
   https://github.com/Pylons/pyramid/issues/2368 and
   https://github.com/Pylons/pyramid/pull/2256
+
+- The :func:`pyramid.session.check_csrf_token` function no longer validates a
+  csrf token in the query string of a request. Only headers and request bodies
+  are supported. See https://github.com/Pylons/pyramid/pull/2500
 
 Feature Additions
 -----------------
@@ -38,21 +43,38 @@ Feature Additions
   to security checks. See https://github.com/Pylons/pyramid/pull/2021
 
 - Added a new setting, ``pyramid.require_default_csrf`` which may be used
-  to turn on CSRF checks globally for every POST request in the application.
+  to turn on CSRF checks globally for every request in the application.
   This should be considered a good default for websites built on Pyramid.
   It is possible to opt-out of CSRF checks on a per-view basis by setting
   ``require_csrf=False`` on those views.
   See :ref:`auto_csrf_checking` and
   https://github.com/Pylons/pyramid/pull/2413
 
-- Added a ``require_csrf`` view option which will enforce CSRF checks on POST
-  requests. If the CSRF check fails a ``BadCSRFToken`` exception will be
-  raised and may be caught by exception views (the default response is a
-  ``400 Bad Request``). This option should be used in place of the deprecated
-  ``check_csrf`` view predicate which would normally result in unexpected
-  ``404 Not Found`` response to the client instead of a catchable exception.
-  See :ref:`auto_csrf_checking` and
-  https://github.com/Pylons/pyramid/pull/2413
+- Added a ``require_csrf`` view option which will enforce CSRF checks on
+  requests with an unsafe method as defined by RFC2616. If the CSRF check fails
+  a ``BadCSRFToken`` exception will be raised and may be caught by exception
+  views (the default response is a ``400 Bad Request``). This option should be
+  used in place of the deprecated ``check_csrf`` view predicate which would
+  normally result in unexpected ``404 Not Found`` response to the client
+  instead of a catchable exception.  See :ref:`auto_csrf_checking`,
+  https://github.com/Pylons/pyramid/pull/2413 and
+  https://github.com/Pylons/pyramid/pull/2500
+
+- Added an additional CSRF validation that checks the origin/referrer of a
+  request and makes sure it matches the current ``request.domain``. This
+  particular check is only active when accessing a site over HTTPS as otherwise
+  browsers don't always send the required information. If this additional CSRF
+  validation fails a ``BadCSRFOrigin`` exception will be raised and may be
+  caught by exception views (the default response is ``400 Bad Request``).
+  Additional allowed origins may be configured by setting
+  ``pyramid.csrf_trusted_origins`` to a list of domain names (with ports if on
+  a non standard port) to allow. Subdomains are not allowed unless the domain
+  name has been prefixed with a ``.``. See
+  https://github.com/Pylons/pyramid/pull/2501
+
+- Added a new :func:`pyramid.session.check_csrf_origin` API for validating the
+  origin or referrer headers against the request's domain.
+  See https://github.com/Pylons/pyramid/pull/2501
 
 - Subclasses of :class:`pyramid.httpexceptions.HTTPException` will now take
   into account the best match for the clients ``Accept`` header, and depending
@@ -64,7 +86,8 @@ Feature Additions
 - A new event, :class:`pyramid.events.BeforeTraversal`, and interface
   :class:`pyramid.interfaces.IBeforeTraversal` have been introduced that will
   notify listeners before traversal starts in the router.
-  See https://github.com/Pylons/pyramid/pull/2469 and
+  See :ref:`router_chapter` as well as
+  https://github.com/Pylons/pyramid/pull/2469 and
   https://github.com/Pylons/pyramid/pull/1876
 
 - A new method, :meth:`pyramid.request.Request.invoke_exception_view`, which
@@ -106,6 +129,7 @@ Scaffolding Enhancements
   practices with regards to SQLAlchemy session management, as well as a more
   modular approach to configuration, separating routes into a separate module
   to illustrate uses of :meth:`pyramid.config.Configurator.include`.
+  See https://github.com/Pylons/pyramid/pull/2024
 
 Documentation Enhancements
 --------------------------
