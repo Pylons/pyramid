@@ -159,7 +159,7 @@ On UNIX:
 
 Or on Windows:
 
-.. code-block:: ps1con
+.. code-block:: doscon
 
    > cd MyProject
    > %VENV%\Scripts\pip install -e .
@@ -197,7 +197,7 @@ On UNIX:
 
 On Windows:
 
-.. code-block:: ps1con
+.. code-block:: doscon
 
    > %VENV%\Scripts\pip install -e ".[testing]"
 
@@ -213,7 +213,7 @@ On UNIX:
 
 On Windows:
 
-.. code-block:: ps1con
+.. code-block:: doscon
 
    > %VENV%\Scripts\py.test myproject\tests.py -q
 

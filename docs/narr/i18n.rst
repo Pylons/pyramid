@@ -292,7 +292,7 @@ Installing Lingua is done with the Python packaging tools. If the
 application lives at the environment variable ``%VENV%``, you can install
 Lingua like so:
 
-.. code-block:: ps1con
+.. code-block:: doscon
 
    C> %VENV%\Scripts\pip install lingua
 
