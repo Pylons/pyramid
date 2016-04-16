@@ -1108,14 +1108,15 @@ Glossary
       ``f``, ``false``, ``n``, ``no``, ``off`` and ``0``.
 
    pip
-      The `Python Packaging Authority's <https://www.pypa.io/>`_ recommended
-      tool for installing Python packages.
+      The :term:`Python Packaging Authority`'s recommended tool for installing
+      Python packages.
 
    pyvenv
-      The Python Packaging Authority formerly recommended using this command
-      for `creating virtual environments on Python 3.4 and 3.5
+      The :term:`Python Packaging Authority` formerly recommended using the
+      ``pyvenv`` command for `creating virtual environments on Python 3.4 and
+      3.5
       <https://packaging.python.org/en/latest/installing/#creating-virtual-environments>`_,
-      but it is deprecated in 3.6 in favor of ``python3 -m venv`` on UNIX or
+      but it was deprecated in 3.6 in favor of ``python3 -m venv`` on UNIX or
       ``python -m venv`` on Windows, which is backward compatible on Python
       3.3 and greater.
 
@@ -1124,9 +1125,14 @@ Glossary
       use by a particular application, rather than being installed system wide.
 
    venv
-      The `Python Packaging Authority's <https://www.pypa.io/>`_ recommended
-      tool for creating virtual environments on Python 3.3 and greater.
+      The :term:`Python Packaging Authority`'s recommended tool for creating
+      virtual environments on Python 3.3 and greater.
 
       Note: whenever you encounter commands prefixed with ``$VENV`` (Unix)
       or ``%VENV`` (Windows), know that that is the environment variable whose
       value is the root of the virtual environment in question.
+
+   Python Packaging Authority
+      The `Python Packaging Authority (PyPA) <https://www.pypa.io/en/latest/>`_
+      is a working group that maintains many of the relevant projects in Python
+      packaging.
