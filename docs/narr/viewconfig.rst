@@ -215,6 +215,9 @@ Non-Predicate Arguments
   If this option is set to ``False`` then CSRF checks will be disabled
   regardless of the ``pyramid.require_default_csrf`` setting.
 
+  In addition, if this option is set to ``True`` or a string then CSRF origin
+  checking will be enabled.
+
   See :ref:`auto_csrf_checking` for more information.
 
   .. versionadded:: 1.7

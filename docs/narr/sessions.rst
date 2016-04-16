@@ -437,6 +437,14 @@ It is always possible to pass the token in the ``X-CSRF-Token`` header as well.
 There is currently no way to define an alternate name for this header without
 performing CSRF checking manually.
 
+In addition to token based CSRF checks, the automatic CSRF checking will also
+check the referrer of the request to ensure that it matches one of the trusted
+origins. By default the only trusted origin is the current host, however
+additional origins may be configured by setting
+``pyramid.csrf_trusted_origins`` to a list of domain names (and ports if they
+are non standard). If a host in the list of domains starts with a ``.`` then
+that will allow all subdomains as well as the domain without the ``.``.
+
 If CSRF checks fail then a :class:`pyramid.exceptions.BadCSRFToken` exception
 will be raised. This exception may be caught and handled by an
 :term:`exception view` but, by default, will result in a ``400 Bad Request``
