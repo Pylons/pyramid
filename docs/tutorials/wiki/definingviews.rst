@@ -72,7 +72,7 @@ On UNIX:
 
 On Windows:
 
-.. code-block:: ps1con
+.. code-block:: doscon
 
    c:\pyramidtut> cd tutorial
    c:\pyramidtut\tutorial> %VENV%\Scripts\pip install -e .

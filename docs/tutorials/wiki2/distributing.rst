@@ -17,7 +17,7 @@ On UNIX:
 
 On Windows:
 
-.. code-block:: ps1con
+.. code-block:: doscon
 
    c:\pyramidtut> %VENV%\Scripts\python setup.py sdist
 
