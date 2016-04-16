@@ -67,6 +67,7 @@ intersphinx_mapping = {
     'jinja2': ('http://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/', None),
     'pylonswebframework': ('http://docs.pylonsproject.org/projects/pylons-webframework/en/latest/', None),
     'python': ('https://docs.python.org/3', None),
+    'pytest': ('http://pytest.org/latest/', None),
     'sqla': ('http://docs.sqlalchemy.org/en/latest', None),
     'tm': ('http://docs.pylonsproject.org/projects/pyramid-tm/en/latest/', None),
     'toolbar': ('http://docs.pylonsproject.org/projects/pyramid-debugtoolbar/en/latest', None),
