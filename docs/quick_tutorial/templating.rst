@@ -22,8 +22,9 @@ fortunate: developers have strong views about template languages. As of
 Pyramid 1.5a2, Pyramid doesn't even bundle a template language!
 
 It does, however, have strong ties to Jinja2, Mako, and Chameleon. In this step
-we see how to add ``pyramid_chameleon`` to your project, then change your views
-to use templating.
+we see how to add `pyramid_chameleon
+<https://github.com/Pylons/pyramid_chameleon>`_ to your project, then change
+your views to use templating.
 
 
 Objectives
