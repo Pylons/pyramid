@@ -247,6 +247,10 @@ Contributors
 
 - Donald Stufft, 2015/03/15
 
+- Randy Topliffe, 2015/04/14
+
+- Timur Izhbulatov, 2015/04/14
+
 - Karen Dalton, 2015/06/01
 
 - Igor Stroh, 2015/06/10
@@ -260,3 +264,5 @@ Contributors
 - Sri Sanketh Uppalapati, 2015/12/12
 
 - Marcin Raczyński, 2016/01/26
+
+- Arian Maykon de A. Diógenes, 2016/04/13

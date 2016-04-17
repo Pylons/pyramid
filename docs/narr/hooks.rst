@@ -1547,3 +1547,156 @@ in every subscriber registration.  It is not the responsibility of the
 predicate author to make every predicate make sense for every event type; it is
 the responsibility of the predicate consumer to use predicates that make sense
 for a particular event type registration.
+
+
+.. index::
+   single: view derivers
+
+.. _view_derivers:
+
+View Derivers
+-------------
+
+.. versionadded:: 1.7
+
+Every URL processed by :app:`Pyramid` is matched against a custom view
+pipeline. See :ref:`router_chapter` for how this works. The view pipeline
+itself is built from the user-supplied :term:`view callable`, which is then
+composed with :term:`view derivers <view deriver>`. A view deriver is a
+composable element of the view pipeline which is used to wrap a view with
+added functionality. View derivers are very similar to the ``decorator``
+argument to :meth:`pyramid.config.Configurator.add_view`, except that they have
+the option to execute for every view in the application.
+
+It is helpful to think of a :term:`view deriver` as middleware for views.
+Unlike tweens or WSGI middleware which are scoped to the application itself,
+a view deriver is invoked once per view in the application, and can use
+configuration options from the view to customize its behavior.
+
+Built-in View Derivers
+~~~~~~~~~~~~~~~~~~~~~~
+
+There are several built-in view derivers that :app:`Pyramid` will automatically
+apply to any view. Below they are defined in order from furthest to closest to
+the user-defined :term:`view callable`:
+
+``secured_view``
+
+  Enforce the ``permission`` defined on the view. This element is a no-op if no
+  permission is defined. Note there will always be a permission defined if a
+  default permission was assigned via
+  :meth:`pyramid.config.Configurator.set_default_permission`.
+
+  This element will also output useful debugging information when
+  ``pyramid.debug_authorization`` is enabled.
+
+``csrf_view``
+
+  Used to check the CSRF token provided in the request. This element is a
+  no-op if both the ``require_csrf`` view option and the
+  ``pyramid.require_default_csrf`` setting are disabled.
+
+``owrapped_view``
+
+  Invokes the wrapped view defined by the ``wrapper`` option.
+
+``http_cached_view``
+
+  Applies cache control headers to the response defined by the ``http_cache``
+  option. This element is a no-op if the ``pyramid.prevent_http_cache`` setting
+  is enabled or the ``http_cache`` option is ``None``.
+
+``decorated_view``
+
+  Wraps the view with the decorators from the ``decorator`` option.
+
+``rendered_view``
+
+  Adapts the result of the :term:`view callable` into a :term:`response`
+  object. Below this point the result may be any Python object.
+
+``mapped_view``
+
+  Applies the :term:`view mapper` defined by the ``mapper`` option or the
+  application's default view mapper to the :term:`view callable`. This
+  is always the closest deriver to the user-defined view and standardizes the
+  view pipeline interface to accept ``(context, request)`` from all previous
+  view derivers.
+
+.. warning::
+
+   Any view derivers defined ``under`` the ``rendered_view`` are not
+   guaranteed to receive a valid response object. Rather they will receive the
+   result from the :term:`view mapper` which is likely the original response
+   returned from the view. This is possibly a dictionary for a renderer but it
+   may be any Python object that may be adapted into a response.
+
+Custom View Derivers
+~~~~~~~~~~~~~~~~~~~~
+
+It is possible to define custom view derivers which will affect all views in an
+application. There are many uses for this, but most will likely be centered
+around monitoring and security. In order to register a custom :term:`view
+deriver`, you should create a callable that conforms to the
+:class:`pyramid.interfaces.IViewDeriver` interface, and then register it with
+your application using :meth:`pyramid.config.Configurator.add_view_deriver`.
+For example, below is a callable that can provide timing information for the
+view pipeline:
+
+.. code-block:: python
+   :linenos:
+
+   import time
+
+   def timing_view(view, info):
+       def wrapper_view(context, request):
+           start = time.time()
+           response = view(context, request)
+           end = time.time()
+           response.headers['X-View-Performance'] = '%.3f' % (end - start,)
+       return wrapper_view
+
+   config.add_view_deriver(timing_view)
+
+View derivers are unique in that they have access to most of the options
+passed to :meth:`pyramid.config.Configurator.add_view` in order to decide what
+to do, and they have a chance to affect every view in the application.
+
+Ordering View Derivers
+~~~~~~~~~~~~~~~~~~~~~~
+
+By default, every new view deriver is added between the ``decorated_view`` and
+``rendered_view`` built-in derivers. It is possible to customize this ordering
+using the ``over`` and ``under`` options. Each option can use the names of
+other view derivers in order to specify an ordering. There should rarely be a
+reason to worry about the ordering of the derivers except when the deriver
+depends on other operations in the view pipeline.
+
+Both ``over`` and ``under`` may also be iterables of constraints. For either
+option, if one or more constraints was defined, at least one must be satisfied,
+else a :class:`pyramid.exceptions.ConfigurationError` will be raised. This may
+be used to define fallback constraints if another deriver is missing.
+
+Two sentinel values exist, :attr:`pyramid.viewderivers.INGRESS` and
+:attr:`pyramid.viewderivers.VIEW`, which may be used when specifying
+constraints at the edges of the view pipeline. For example, to add a deriver
+at the start of the pipeline you may use ``under=INGRESS``.
+
+It is not possible to add a view deriver under the ``mapped_view`` as the
+:term:`view mapper` is intimately tied to the signature of the user-defined
+:term:`view callable`. If you simply need to know what the original view
+callable was, it can be found as ``info.original_view`` on the provided
+:class:`pyramid.interfaces.IViewDeriverInfo` object passed to every view
+deriver.
+
+.. warning::
+
+   The default constraints for any view deriver are ``over='rendered_view'``
+   and ``under='decorated_view'``. When escaping these constraints you must
+   take care to avoid cyclic dependencies between derivers. For example, if
+   you want to add a new view deriver before ``secured_view`` then
+   simply specifying ``over='secured_view'`` is not enough, because the
+   default is also under ``decorated view`` there will be an unsatisfiable
+   cycle. You must specify a valid ``under`` constraint as well, such as
+   ``under=INGRESS`` to fall between INGRESS and ``secured_view`` at the
+   beginning of the view pipeline.

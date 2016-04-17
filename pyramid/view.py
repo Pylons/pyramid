@@ -1,4 +1,6 @@
 import itertools
+import sys
+
 import venusian
 
 from zope.interface import providedBy
@@ -10,6 +12,7 @@ from pyramid.interfaces import (
     IView,
     IViewClassifier,
     IRequest,
+    IExceptionViewClassifier,
     )
 
 from pyramid.compat import decode_path_info
@@ -22,6 +25,7 @@ from pyramid.httpexceptions import (
     )
 
 from pyramid.threadlocal import get_current_registry
+from pyramid.util import hide_attrs
 
 _marker = object()
 
@@ -165,7 +169,8 @@ class view_config(object):
     ``request_type``, ``route_name``, ``request_method``, ``request_param``,
     ``containment``, ``xhr``, ``accept``, ``header``, ``path_info``,
     ``custom_predicates``, ``decorator``, ``mapper``, ``http_cache``,
-    ``match_param``, ``check_csrf``, ``physical_path``, and ``predicates``.
+    ``require_csrf``, ``match_param``, ``check_csrf``, ``physical_path``, and
+    ``view_options``.
 
     The meanings of these arguments are the same as the arguments passed to
     :meth:`pyramid.config.Configurator.add_view`.  If any argument is left
@@ -547,3 +552,75 @@ def _call_view(
         raise pme
 
     return response
+
+class ViewMethodsMixin(object):
+    """ Request methods mixin for BaseRequest having to do with executing
+    views """
+    def invoke_exception_view(
+        self,
+        exc_info=None,
+        request=None,
+        secure=True
+        ):
+        """ Executes an exception view related to the request it's called upon.
+        The arguments it takes are these:
+
+        ``exc_info``
+
+            If provided, should be a 3-tuple in the form provided by
+            ``sys.exc_info()``.  If not provided,
+            ``sys.exc_info()`` will be called to obtain the current
+            interpreter exception information.  Default: ``None``.
+
+        ``request``
+
+            If the request to be used is not the same one as the instance that
+            this method is called upon, it may be passed here.  Default:
+            ``None``.
+
+        ``secure``
+
+            If the exception view should not be rendered if the current user
+            does not have the appropriate permission, this should be ``True``.
+            Default: ``True``.
+
+        If called with no arguments, it uses the global exception information
+        returned by ``sys.exc_info()`` as ``exc_info``, the request
+        object that this method is attached to as the ``request``, and
+        ``True`` for ``secure``.
+
+        This method returns a :term:`response` object or ``None`` if no
+        matching exception view can be found."""
+
+        if request is None:
+            request = self
+        registry = getattr(request, 'registry', None)
+        if registry is None:
+            registry = get_current_registry()
+        if exc_info is None:
+            exc_info = sys.exc_info()
+        exc = exc_info[1]
+        attrs = request.__dict__
+        context_iface = providedBy(exc)
+
+        # clear old generated request.response, if any; it may
+        # have been mutated by the view, and its state is not
+        # sane (e.g. caching headers)
+        with hide_attrs(request, 'exception', 'exc_info', 'response'):
+            attrs['exception'] = exc
+            attrs['exc_info'] = exc_info
+            # we use .get instead of .__getitem__ below due to
+            # https://github.com/Pylons/pyramid/issues/700
+            request_iface = attrs.get('request_iface', IRequest)
+            response = _call_view(
+                registry,
+                request,
+                exc,
+                context_iface,
+                '',
+                view_types=None,
+                view_classifier=IExceptionViewClassifier,
+                secure=secure,
+                request_iface=request_iface.combined,
+                )
+            return response

@@ -37,15 +37,15 @@ def view_page(context, request):
             view_url = request.resource_url(page)
             return '<a href="%s">%s</a>' % (view_url, word)
         else:
-            add_url = request.application_url + '/add_page/' + word 
+            add_url = request.application_url + '/add_page/' + word
             return '<a href="%s">%s</a>' % (add_url, word)
 
     content = publish_parts(context.data, writer_name='html')['html_body']
     content = wikiwords.sub(check, content)
     edit_url = request.resource_url(context, 'edit_page')
 
-    return dict(page = context, content = content, edit_url = edit_url,
-                logged_in = request.authenticated_userid)
+    return dict(page=context, content=content, edit_url=edit_url,
+                logged_in=request.authenticated_userid)
 
 @view_config(name='add_page', context='.models.Wiki',
              renderer='templates/edit.pt',
@@ -58,7 +58,7 @@ def add_page(context, request):
         page.__name__ = pagename
         page.__parent__ = context
         context[pagename] = page
-        return HTTPFound(location = request.resource_url(page))
+        return HTTPFound(location=request.resource_url(page))
     save_url = request.resource_url(context, 'add_page', pagename)
     page = Page('')
     page.__name__ = pagename
@@ -73,7 +73,7 @@ def add_page(context, request):
 def edit_page(context, request):
     if 'form.submitted' in request.params:
         context.data = request.params['body']
-        return HTTPFound(location = request.resource_url(context))
+        return HTTPFound(location=request.resource_url(context))
 
     return dict(page=context,
                 save_url=request.resource_url(context, 'edit_page'),
@@ -86,7 +86,7 @@ def login(request):
     login_url = request.resource_url(request.context, 'login')
     referrer = request.url
     if referrer == login_url:
-        referrer = '/' # never use the login form itself as came_from
+        referrer = '/'  # never use the login form itself as came_from
     came_from = request.params.get('came_from', referrer)
     message = ''
     login = ''
@@ -96,20 +96,21 @@ def login(request):
         password = request.params['password']
         if USERS.get(login) == password:
             headers = remember(request, login)
-            return HTTPFound(location = came_from,
-                             headers = headers)
+            return HTTPFound(location=came_from,
+                             headers=headers)
         message = 'Failed login'
 
     return dict(
-        message = message,
-        url = request.application_url + '/login',
-        came_from = came_from,
-        login = login,
-        password = password,
-        )
+        message=message,
+        url=request.application_url + '/login',
+        came_from=came_from,
+        login=login,
+        password=password,
+    )
+
 
 @view_config(context='.models.Wiki', name='logout')
 def logout(request):
     headers = forget(request)
-    return HTTPFound(location = request.resource_url(request.context),
-                     headers = headers)
+    return HTTPFound(location=request.resource_url(request.context),
+                     headers=headers)

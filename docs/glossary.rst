@@ -155,9 +155,9 @@ Glossary
      request before it returns a :term:`context` resource.
 
    virtualenv
-     A term referring both to an isolated Python environment,
-     or `the leading tool <http://www.virtualenv.org>`_ that allows one to
-     create such environments.
+     The `virtualenv tool <https://virtualenv.pypa.io/en/latest/>`_ that allows
+     one to create virtual environments. In Python 3.3 and greater,
+     :term:`venv` is the preferred tool.
 
      Note: whenever you encounter commands prefixed with ``$VENV`` (Unix)
      or ``%VENV`` (Windows), know that that is the environment variable whose
@@ -367,13 +367,13 @@ Glossary
      file.  It was developed by Ian Bicking.
 
    Chameleon
-     `chameleon <http://chameleon.repoze.org>`_ is an attribute language
-     template compiler which supports the :term:`ZPT` templating
-     specification.  It is written and maintained by Malthe Borch.  It has
-     several extensions, such as the ability to use bracketed (Mako-style)
-     ``${name}`` syntax.  It is also much faster than the reference
-     implementation of ZPT.  :app:`Pyramid` offers Chameleon templating out
-     of the box in ZPT and text flavors.
+     `chameleon <https://chameleon.readthedocs.org/en/latest/>`_ is an
+     attribute language template compiler which supports the :term:`ZPT`
+     templating specification. It is written and maintained by Malthe Borch. It
+     has several extensions, such as the ability to use bracketed (Mako-style)
+     ``${name}`` syntax. It is also much faster than the reference
+     implementation of ZPT. :app:`Pyramid` offers Chameleon templating out of
+     the box in ZPT and text flavors.
 
    ZPT
      The `Zope Page Template <http://wiki.zope.org/ZPT/FrontPage>`_
@@ -558,12 +558,11 @@ Glossary
      A popular `Javascript library <http://jquery.org>`_.
 
    renderer
-     A serializer that can be referred to via :term:`view
-     configuration` which converts a non-:term:`Response` return
-     values from a :term:`view` into a string (and ultimately a
-     response).  Using a renderer can make writing views that require
-     templating or other serialization less tedious.  See
-     :ref:`views_which_use_a_renderer` for more information.
+     A serializer which converts non-:term:`Response` return values from a
+     :term:`view` into a string, and ultimately into a response, usually
+     through :term:`view configuration`. Using a renderer can make writing
+     views that require templating or other serialization, like JSON, less
+     tedious. See :ref:`views_which_use_a_renderer` for more information.
 
    renderer factory
      A factory which creates a :term:`renderer`.  See
@@ -815,11 +814,10 @@ Glossary
      library, used by the :app:`Pyramid` translation machinery.
 
    Babel
-     A `collection of tools <http://babel.edgewall.org/>`_ for
-     internationalizing Python applications.  :app:`Pyramid` does
-     not depend on Babel to operate, but if Babel is installed,
-     additional locale functionality becomes available to your
-     application.
+     A `collection of tools <http://babel.pocoo.org/en/latest/>`_ for
+     internationalizing Python applications. :app:`Pyramid` does not depend on
+     Babel to operate, but if Babel is installed, additional locale
+     functionality becomes available to your application.
 
    Lingua
      A package by Wichert Akkerman which provides the ``pot-create``
@@ -1014,8 +1012,8 @@ Glossary
 
    console script
      A script written to the ``bin`` (on UNIX, or ``Scripts`` on Windows)
-     directory of a Python installation or :term:`virtualenv` as the result of
-     running ``setup.py install`` or ``setup.py develop``.
+     directory of a Python installation or :term:`virtual environment` as the
+     result of running ``pip install`` or ``pip install -e .``.
 
    introspector
      An object with the methods described by
@@ -1093,3 +1091,48 @@ Glossary
       A technique used when serving a cacheable static asset in order to force
       a client to query the new version of the asset. See :ref:`cache_busting`
       for more information.
+
+   view deriver
+      A view deriver is a composable component of the view pipeline which is
+      used to create a :term:`view callable`. A view deriver is a callable
+      implementing the :class:`pyramid.interfaces.IViewDeriver` interface.
+      Examples of built-in derivers including view mapper, the permission
+      checker, and applying a renderer to a dictionary returned from the view.
+
+   truthy string
+      A string represeting a value of ``True``. Acceptable values are
+      ``t``, ``true``, ``y``, ``yes``, ``on`` and ``1``.
+
+   falsey string
+      A string represeting a value of ``False``. Acceptable values are
+      ``f``, ``false``, ``n``, ``no``, ``off`` and ``0``.
+
+   pip
+      The :term:`Python Packaging Authority`'s recommended tool for installing
+      Python packages.
+
+   pyvenv
+      The :term:`Python Packaging Authority` formerly recommended using the
+      ``pyvenv`` command for `creating virtual environments on Python 3.4 and
+      3.5
+      <https://packaging.python.org/en/latest/installing/#creating-virtual-environments>`_,
+      but it was deprecated in 3.6 in favor of ``python3 -m venv`` on UNIX or
+      ``python -m venv`` on Windows, which is backward compatible on Python
+      3.3 and greater.
+
+   virtual environment
+      An isolated Python environment that allows packages to be installed for
+      use by a particular application, rather than being installed system wide.
+
+   venv
+      The :term:`Python Packaging Authority`'s recommended tool for creating
+      virtual environments on Python 3.3 and greater.
+
+      Note: whenever you encounter commands prefixed with ``$VENV`` (Unix)
+      or ``%VENV`` (Windows), know that that is the environment variable whose
+      value is the root of the virtual environment in question.
+
+   Python Packaging Authority
+      The `Python Packaging Authority (PyPA) <https://www.pypa.io/en/latest/>`_
+      is a working group that maintains many of the relevant projects in Python
+      packaging.

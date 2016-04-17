@@ -66,6 +66,7 @@
      .. automethod:: add_tween
      .. automethod:: add_route_predicate
      .. automethod:: add_view_predicate
+     .. automethod:: add_view_deriver
      .. automethod:: set_request_factory
      .. automethod:: set_root_factory
      .. automethod:: set_session_factory

@@ -229,9 +229,9 @@ class ManifestCacheBuster(object):
 
     By default, it is a JSON-serialized dictionary where the keys are the
     source asset paths used in calls to
-    :meth:`~pyramid.request.Request.static_url`. For example::
+    :meth:`~pyramid.request.Request.static_url`. For example:
 
-    .. code-block:: python
+    .. code-block:: pycon
 
        >>> request.static_url('myapp:static/css/main.css')
        "http://www.example.com/static/css/main-678b7c80.css"

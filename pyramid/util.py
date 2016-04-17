@@ -1,3 +1,4 @@
+import contextlib
 import functools
 try:
     # py2.7.7+ and py3.3+ have native comparison support
@@ -380,6 +381,9 @@ class TopologicalSorter(object):
         self.first = first
         self.last = last
 
+    def values(self):
+        return self.name2val.values()
+
     def remove(self, name):
         """ Remove a node from the sort input """
         self.names.remove(name)
@@ -591,3 +595,39 @@ def get_callable_name(name):
             'used on __name__ of the method'
         )
         raise ConfigurationError(msg % name)
+
+@contextlib.contextmanager
+def hide_attrs(obj, *attrs):
+    """
+    Temporarily delete object attrs and restore afterward.
+    """
+    obj_vals = obj.__dict__ if obj is not None else {}
+    saved_vals = {}
+    for name in attrs:
+        saved_vals[name] = obj_vals.pop(name, _marker)
+    try:
+        yield
+    finally:
+        for name in attrs:
+            saved_val = saved_vals[name]
+            if saved_val is not _marker:
+                obj_vals[name] = saved_val
+            elif name in obj_vals:
+                del obj_vals[name]
+
+
+def is_same_domain(host, pattern):
+    """
+    Return ``True`` if the host is either an exact match or a match
+    to the wildcard pattern.
+    Any pattern beginning with a period matches a domain and all of its
+    subdomains. (e.g. ``.example.com`` matches ``example.com`` and
+    ``foo.example.com``). Anything else is an exact string match.
+    """
+    if not pattern:
+        return False
+
+    pattern = pattern.lower()
+    return (pattern[0] == "." and
+            (host.endswith(pattern) or host == pattern[1:]) or
+            pattern == host)

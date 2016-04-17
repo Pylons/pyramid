@@ -66,8 +66,8 @@ intersphinx_mapping = {
     'deform': ('http://docs.pylonsproject.org/projects/deform/en/latest', None),
     'jinja2': ('http://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/', None),
     'pylonswebframework': ('http://docs.pylonsproject.org/projects/pylons-webframework/en/latest/', None),
-    'python': ('http://docs.python.org', None),
-    'python3': ('http://docs.python.org/3', None),
+    'python': ('https://docs.python.org/3', None),
+    'pytest': ('http://pytest.org/latest/', None),
     'sqla': ('http://docs.sqlalchemy.org/en/latest', None),
     'tm': ('http://docs.pylonsproject.org/projects/pyramid-tm/en/latest/', None),
     'toolbar': ('http://docs.pylonsproject.org/projects/pyramid-debugtoolbar/en/latest', None),
@@ -137,6 +137,7 @@ if book:
 #     'whatsnew-1.3': 'index',
 #     'whatsnew-1.4': 'index',
 #     'whatsnew-1.5': 'index',
+#     'whatsnew-1.6': 'index',
 #     'tutorials/gae/index': 'index',
 #     'api/chameleon_text': 'api',
 #     'api/chameleon_zpt': 'api',
@@ -146,9 +147,10 @@ html_theme = 'pyramid'
 html_theme_path = pylons_sphinx_themes.get_html_themes_path()
 html_theme_options = dict(
     github_url='https://github.com/Pylons/pyramid',
-    # on master branch true, else false
+    # On master branch and new branch still in
+    # pre-release status: true; else: false.
     in_progress='true',
-    # on previous branches/major releases true, else false
+    # On branches previous to "latest": true; else: false.
     outdated='false',
     )
 

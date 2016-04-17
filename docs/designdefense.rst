@@ -1011,8 +1011,8 @@ Self-described "microframeworks" exist. `Bottle <http://bottle.paws.de>`_ and
 <http://bobo.digicool.com/>`_ doesn't describe itself as a microframework, but
 its intended user base is much the same. Many others exist. We've even (only as
 a teaching tool, not as any sort of official project) `created one using
-Pyramid <http://bfg.repoze.org/videos#groundhog1>`_. The videos use BFG, a
-precursor to Pyramid, but the resulting code is `available for Pyramid too
+Pyramid <http://static.repoze.org/casts/videotags.html>`_. The videos use BFG,
+a precursor to Pyramid, but the resulting code is `available for Pyramid too
 <https://github.com/Pylons/groundhog>`_). Microframeworks are small frameworks
 with one common feature: each allows its users to create a fully functional
 application that lives in a single Python file.
@@ -1283,7 +1283,7 @@ predictability.
 
 .. _routes_need_ordering:
 
-Routes Need Relative Ordering
+Routes need relative ordering
 +++++++++++++++++++++++++++++
 
 Consider the following simple `Groundhog
@@ -1311,8 +1311,8 @@ Consider the following simple `Groundhog
         app.run()
 
 If you run this application and visit the URL ``/admin``, you will see the
-"admin" page.  This is the intended result.  However, what if you rearrange
-the order of the function definitions in the file?
+"admin" page. This is the intended result. However, what if you rearrange the
+order of the function definitions in the file?
 
 .. code-block:: python
     :linenos:
@@ -1335,11 +1335,11 @@ the order of the function definitions in the file?
     if __name__ == '__main__':
         app.run()
 
-If you run this application and visit the URL ``/admin``, you will now be
-returned a 404 error.  This is probably not what you intended.  The reason
-you see a 404 error when you rearrange function definition ordering is that
-routing declarations expressed via our microframework's routing decorators
-have an *ordering*, and that ordering matters.
+If you run this application and visit the URL ``/admin``, your app will now
+return a 404 error. This is probably not what you intended. The reason you see
+a 404 error when you rearrange function definition ordering is that routing
+declarations expressed via our microframework's routing decorators have an
+*ordering*, and that ordering matters.
 
 In the first case, where we achieved the expected result, we first added a
 route with the pattern ``/admin``, then we added a route with the pattern
@@ -1347,65 +1347,67 @@ route with the pattern ``/admin``, then we added a route with the pattern
 scope.  When a request with a ``PATH_INFO`` of ``/admin`` enters our
 application, the web framework loops over each of our application's route
 patterns in the order in which they were defined in our module.  As a result,
-the view associated with the ``/admin`` routing pattern will be invoked: it
-matches first.  All is right with the world.
+the view associated with the ``/admin`` routing pattern will be invoked because
+it matches first. All is right with the world.
 
 In the second case, where we did not achieve the expected result, we first
 added a route with the pattern ``/:action``, then we added a route with the
 pattern ``/admin``.  When a request with a ``PATH_INFO`` of ``/admin`` enters
 our application, the web framework loops over each of our application's route
 patterns in the order in which they were defined in our module.  As a result,
-the view associated with the ``/:action`` routing pattern will be invoked: it
-matches first.  A 404 error is raised.  This is not what we wanted; it just
-happened due to the order in which we defined our view functions.
+the view associated with the ``/:action`` routing pattern will be invoked
+because it matches first. A 404 error is raised. This is not what we wanted; it
+just happened due to the order in which we defined our view functions.
 
-This is because Groundhog routes are added to the routing map in import
-order, and matched in the same order when a request comes in.  Bottle, like
-Groundhog, as of this writing, matches routes in the order in which they're
-defined at Python execution time.  Flask, on the other hand, does not order
-route matching based on import order; it reorders the routes you add to your
-application based on their "complexity".  Other microframeworks have varying
+This is because Groundhog routes are added to the routing map in import order,
+and matched in the same order when a request comes in. Bottle, like Groundhog,
+as of this writing, matches routes in the order in which they're defined at
+Python execution time. Flask, on the other hand, does not order route matching
+based on import order. Instead it reorders the routes you add to your
+application based on their "complexity". Other microframeworks have varying
 strategies to do route ordering.
 
 Your application may be small enough where route ordering will never cause an
-issue.  If your application becomes large enough, however, being able to
-specify or predict that ordering as your application grows larger will be
-difficult.  At some point, you will likely need to more explicitly start
-controlling route ordering, especially in applications that require
-extensibility.
+issue. If your application becomes large enough, however, being able to specify
+or predict that ordering as your application grows larger will be difficult.
+At some point, you will likely need to start controlling route ordering more
+explicitly, especially in applications that require extensibility.
 
 If your microframework orders route matching based on complexity, you'll need
 to understand what is meant by "complexity", and you'll need to attempt to
-inject a "less complex" route to have it get matched before any "more
-complex" one to ensure that it's tried first.
+inject a "less complex" route to have it get matched before any "more complex"
+one to ensure that it's tried first.
 
 If your microframework orders its route matching based on relative
 import/execution of function decorator definitions, you will need to ensure
-you execute all of these statements in the "right" order, and you'll need to
-be cognizant of this import/execution ordering as you grow your application
-or try to extend it.  This is a difficult invariant to maintain for all but
-the smallest applications.
+that you execute all of these statements in the "right" order, and you'll need
+to be cognizant of this import/execution ordering as you grow your application
+or try to extend it. This is a difficult invariant to maintain for all but the
+smallest applications.
 
-In either case, your application must import the non-``__main__`` modules
-which contain configuration decorations somehow for their configuration to be
-executed.  Does that make you a little uncomfortable?  It should, because
+In either case, your application must import the non-``__main__`` modules which
+contain configuration decorations somehow for their configuration to be
+executed. Does that make you a little uncomfortable? It should, because
 :ref:`you_dont_own_modulescope`.
 
 Pyramid uses neither decorator import time ordering nor does it attempt to
-divine the relative complexity of one route to another in order to define a
-route match ordering.  In Pyramid, you have to maintain relative route
-ordering imperatively via the chronology of multiple executions of the
-:meth:`pyramid.config.Configurator.add_route` method.  The order in which you
+divine the relative complexity of one route to another as a means to define a
+route match ordering. In Pyramid, you have to maintain relative route ordering
+imperatively via the chronology of multiple executions of the
+:meth:`pyramid.config.Configurator.add_route` method. The order in which you
 repeatedly call ``add_route`` becomes the order of route matching.
 
 If needing to maintain this imperative ordering truly bugs you, you can use
-:term:`traversal` instead of route matching, which is a completely
-declarative (and completely predictable) mechanism to map code to URLs.
-While URL dispatch is easier to understand for small non-extensible
-applications, traversal is a great fit for very large applications and
-applications that need to be arbitrarily extensible.
+:term:`traversal` instead of route matching, which is a completely declarative
+(and completely predictable) mechanism to map code to URLs. While URL dispatch
+is easier to understand for small non-extensible applications, traversal is a
+great fit for very large applications and applications that need to be
+arbitrarily extensible.
 
-"Stacked Object Proxies" Are Too Clever / Thread Locals Are A Nuisance
+
+.. _thread_local_nuisance:
+
+"Stacked object proxies" are too clever / thread locals are a nuisance
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 Some microframeworks use the ``import`` statement to get a handle to an
@@ -1448,32 +1450,35 @@ code below:
        for i in range(10):
            print(i)
 
-By its nature, the *request* object created as the result of a WSGI server's
-call into a long-lived web framework cannot be global, because the lifetime
-of a single request will be much shorter than the lifetime of the process
-running the framework.  A request object created by a web framework actually
-has more similarity to the ``i`` loop counter in our example above than it
-has to any comparable importable object defined in the Python standard
+By its nature, the *request* object that is created as the result of a WSGI
+server's call into a long-lived web framework cannot be global, because the
+lifetime of a single request will be much shorter than the lifetime of the
+process running the framework.  A request object created by a web framework
+actually has more similarity to the ``i`` loop counter in our example above
+than it has to any comparable importable object defined in the Python standard
 library or in normal library code.
 
 However, systems which use stacked object proxies promote locally scoped
-objects such as ``request`` out to module scope, for the purpose of being
+objects, such as ``request``, out to module scope, for the purpose of being
 able to offer users a nice spelling involving ``import``.  They, for what I
-consider dubious reasons, would rather present to their users the canonical
-way of getting at a ``request`` as ``from framework import request`` instead
-of a saner ``from myframework.threadlocals import get_request; request =
-get_request()`` even though the latter is more explicit.
+consider dubious reasons, would rather present to their users the canonical way
+of getting at a ``request`` as ``from framework import request`` instead of a
+saner ``from myframework.threadlocals import get_request; request =
+get_request()``, even though the latter is more explicit.
 
 It would be *most* explicit if the microframeworks did not use thread local
-variables at all.  Pyramid view functions are passed a request object; many
-of Pyramid's APIs require that an explicit request object be passed to them.
-It is *possible* to retrieve the current Pyramid request as a threadlocal
-variable but it is a "in case of emergency, break glass" type of activity.
-This explicitness makes Pyramid view functions more easily unit testable, as
-you don't need to rely on the framework to manufacture suitable "dummy"
-request (and other similarly-scoped) objects during test setup.  It also
-makes them more likely to work on arbitrary systems, such as async servers
-that do no monkeypatching.
+variables at all. Pyramid view functions are passed a request object. Many of
+Pyramid's APIs require that an explicit request object be passed to them. It is
+*possible* to retrieve the current Pyramid request as a threadlocal variable,
+but it is an "in case of emergency, break glass" type of activity. This
+explicitness makes Pyramid view functions more easily unit testable, as you
+don't need to rely on the framework to manufacture suitable "dummy" request
+(and other similarly-scoped) objects during test setup.  It also makes them
+more likely to work on arbitrary systems, such as async servers, that do no
+monkeypatching.
+
+
+.. _explicitly_wsgi:
 
 Explicitly WSGI
 +++++++++++++++
@@ -1487,35 +1492,35 @@ import a WSGI server and use it to serve up their Pyramid application as per
 the documentation of that WSGI server.
 
 The extra lines saved by abstracting away the serving step behind ``run()``
-seem to have driven dubious second-order decisions related to API in some
-microframeworks.  For example, Bottle contains a ``ServerAdapter`` subclass
-for each type of WSGI server it supports via its ``app.run()`` mechanism.
-This means that there exists code in ``bottle.py`` that depends on the
-following modules: ``wsgiref``, ``flup``, ``paste``, ``cherrypy``, ``fapws``,
+seems to have driven dubious second-order decisions related to its API in some
+microframeworks. For example, Bottle contains a ``ServerAdapter`` subclass for
+each type of WSGI server it supports via its ``app.run()`` mechanism. This
+means that there exists code in ``bottle.py`` that depends on the following
+modules: ``wsgiref``, ``flup``, ``paste``, ``cherrypy``, ``fapws``,
 ``tornado``, ``google.appengine``, ``twisted.web``, ``diesel``, ``gevent``,
-``gunicorn``, ``eventlet``, and ``rocket``.  You choose the kind of server
-you want to run by passing its name into the ``run`` method.  In theory, this
-sounds great: I can try Bottle out on ``gunicorn`` just by passing in a name!
-However, to fully test Bottle, all of these third-party systems must be
-installed and functional; the Bottle developers must monitor changes to each
-of these packages and make sure their code still interfaces properly with
-them.  This expands the packages required for testing greatly; this is a
-*lot* of requirements.  It is likely difficult to fully automate these tests
-due to requirements conflicts and build issues.
+``gunicorn``, ``eventlet``, and ``rocket``. You choose the kind of server you
+want to run by passing its name into the ``run`` method. In theory, this sounds
+great: I can try out Bottle on ``gunicorn`` just by passing in a name! However,
+to fully test Bottle, all of these third-party systems must be installed and
+functional. The Bottle developers must monitor changes to each of these
+packages and make sure their code still interfaces properly with them. This
+increases the number of packages required for testing greatly; this is a *lot*
+of requirements. It is likely difficult to fully automate these tests due to
+requirements conflicts and build issues.
 
 As a result, for single-file apps, we currently don't bother to offer a
-``run()`` shortcut; we tell folks to import their WSGI server of choice and
-run it by hand.  For the people who want a server abstraction layer, we
-suggest that they use PasteDeploy.  In PasteDeploy-based systems, the onus
-for making sure that the server can interface with a WSGI application is
-placed on the server developer, not the web framework developer, making it
-more likely to be timely and correct.
+``run()`` shortcut. We tell folks to import their WSGI server of choice and run
+it by hand. For the people who want a server abstraction layer, we suggest that
+they use PasteDeploy.  In PasteDeploy-based systems, the onus for making sure
+that the server can interface with a WSGI application is placed on the server
+developer, not the web framework developer, making it more likely to be timely
+and correct.
 
-Wrapping Up
+Wrapping up
 +++++++++++
 
-Here's a diagrammed version of the simplest pyramid application, where
-comments take into account what we've discussed in the
+Here's a diagrammed version of the simplest pyramid application, where the
+inlined comments take into account what we've discussed in the
 :ref:`microframeworks_smaller_hello_world` section.
 
 .. code-block:: python
@@ -1526,17 +1531,18 @@ comments take into account what we've discussed in the
 
    def hello_world(request):  # accepts a request; no request thread local reqd
        # explicit response object means no response threadlocal
-       return Response('Hello world!') 
+       return Response('Hello world!')
 
    if __name__ == '__main__':
        from pyramid.config import Configurator
-       config = Configurator()       # no global application object.
+       config = Configurator()       # no global application object
        config.add_view(hello_world)  # explicit non-decorator registration
        app = config.make_wsgi_app()  # explicitly WSGI
        server = make_server('0.0.0.0', 8080, app)
        server.serve_forever()        # explicitly WSGI
 
-Pyramid Doesn't Offer Pluggable Apps
+
+Pyramid doesn't offer pluggable apps
 ------------------------------------
 
 It is "Pyramidic" to compose multiple external sources into the same
@@ -1544,7 +1550,7 @@ configuration using :meth:`~pyramid.config.Configurator.include`.  Any
 number of includes can be done to compose an application; includes can even
 be done from within other includes.  Any directive can be used within an
 include that can be used outside of one (such as
-:meth:`~pyramid.config.Configurator.add_view`, etc).
+:meth:`~pyramid.config.Configurator.add_view`).
 
 Pyramid has a conflict detection system that will throw an error if two
 included externals try to add the same configuration in a conflicting way

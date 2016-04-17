@@ -794,8 +794,86 @@ class TestCallableName(unittest.TestCase):
         self.assertRaises(ConfigurationError, get_bad_name)
 
 
+class Test_hide_attrs(unittest.TestCase):
+    def _callFUT(self, obj, *attrs):
+        from pyramid.util import hide_attrs
+        return hide_attrs(obj, *attrs)
+
+    def _makeDummy(self):
+        from pyramid.decorator import reify
+        class Dummy(object):
+            x = 1
+
+            @reify
+            def foo(self):
+                return self.x
+        return Dummy()
+
+    def test_restores_attrs(self):
+        obj = self._makeDummy()
+        obj.bar = 'asdf'
+        orig_foo = obj.foo
+        with self._callFUT(obj, 'foo', 'bar'):
+            obj.foo = object()
+            obj.bar = 'nope'
+        self.assertEqual(obj.foo, orig_foo)
+        self.assertEqual(obj.bar, 'asdf')
+
+    def test_restores_attrs_on_exception(self):
+        obj = self._makeDummy()
+        orig_foo = obj.foo
+        try:
+            with self._callFUT(obj, 'foo'):
+                obj.foo = object()
+                raise RuntimeError()
+        except RuntimeError:
+            self.assertEqual(obj.foo, orig_foo)
+        else:                   # pragma: no cover
+            self.fail("RuntimeError not raised")
+
+    def test_restores_attrs_to_none(self):
+        obj = self._makeDummy()
+        obj.foo = None
+        with self._callFUT(obj, 'foo'):
+            obj.foo = object()
+        self.assertEqual(obj.foo, None)
+
+    def test_deletes_attrs(self):
+        obj = self._makeDummy()
+        with self._callFUT(obj, 'foo'):
+            obj.foo = object()
+        self.assertTrue('foo' not in obj.__dict__)
+
+    def test_does_not_delete_attr_if_no_attr_to_delete(self):
+        obj = self._makeDummy()
+        with self._callFUT(obj, 'foo'):
+            pass
+        self.assertTrue('foo' not in obj.__dict__)
+
+
 def dummyfunc(): pass
 
 
 class Dummy(object):
     pass
+
+
+class Test_is_same_domain(unittest.TestCase):
+    def _callFUT(self, *args, **kw):
+        from pyramid.util import is_same_domain
+        return is_same_domain(*args, **kw)
+
+    def test_it(self):
+        self.assertTrue(self._callFUT("example.com", "example.com"))
+        self.assertFalse(self._callFUT("evil.com", "example.com"))
+        self.assertFalse(self._callFUT("evil.example.com", "example.com"))
+        self.assertFalse(self._callFUT("example.com", ""))
+
+    def test_with_wildcard(self):
+        self.assertTrue(self._callFUT("example.com", ".example.com"))
+        self.assertTrue(self._callFUT("good.example.com", ".example.com"))
+
+    def test_with_port(self):
+        self.assertTrue(self._callFUT("example.com:8080", "example.com:8080"))
+        self.assertFalse(self._callFUT("example.com:8080", "example.com"))
+        self.assertFalse(self._callFUT("example.com", "example.com:8080"))

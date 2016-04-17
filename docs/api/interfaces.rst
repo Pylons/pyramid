@@ -17,6 +17,9 @@ Event-Related Interfaces
   .. autointerface:: IContextFound
      :members:
 
+  .. autointerface:: IBeforeTraversal
+     :members:
+
   .. autointerface:: INewResponse
      :members:
 
@@ -90,4 +93,10 @@ Other Interfaces
      :members:
 
   .. autointerface:: ICacheBuster
+     :members:
+
+  .. autointerface:: IViewDeriver
+     :members:
+
+  .. autointerface:: IViewDeriverInfo
      :members:

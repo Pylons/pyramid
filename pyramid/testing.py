@@ -41,6 +41,7 @@ from pyramid.i18n import LocalizerRequestMixin
 from pyramid.request import CallbackMethodsMixin
 from pyramid.url import URLMethodsMixin
 from pyramid.util import InstancePropertyMixin
+from pyramid.view import ViewMethodsMixin
 
 
 _marker = object()
@@ -293,6 +294,7 @@ class DummyRequest(
     LocalizerRequestMixin,
     AuthenticationAPIMixin,
     AuthorizationAPIMixin,
+    ViewMethodsMixin,
     ):
     """ A DummyRequest object (incompletely) imitates a :term:`request` object.
 
@@ -474,6 +476,7 @@ def setUp(registry=None, request=None, hook_zca=True, autocommit=True,
         # method.
         config.add_default_renderers()
         config.add_default_view_predicates()
+        config.add_default_view_derivers()
         config.add_default_route_predicates()
     config.commit()
     global have_zca

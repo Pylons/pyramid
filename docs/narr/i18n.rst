@@ -265,18 +265,18 @@ available you can install it through the packaging system from your OS; the
 package name is almost always ``gettext``. For example on a Debian or Ubuntu
 system run this command:
 
-.. code-block:: text
+.. code-block:: bash
 
    $ sudo apt-get install gettext
 
 Installing Lingua is done with the Python packaging tools. If the
-:term:`virtualenv` into which you've installed your :app:`Pyramid` application
-lives in ``/my/virtualenv``, you can install Lingua like so:
+:term:`virtual environment` into which you've installed your :app:`Pyramid`
+application lives at the environment variable ``$VENV``, you can install Lingua
+like so:
 
-.. code-block:: text
+.. code-block:: bash
 
-   $ cd /my/virtualenv
-   $ $VENV/bin/easy_install lingua
+   $ $VENV/bin/pip install lingua
 
 Installation on Windows
 +++++++++++++++++++++++
@@ -288,12 +288,13 @@ compile it yourself. Make sure the installation path is added to your
 ``$PATH``.
 
 Installing Lingua is done with the Python packaging tools. If the
-:term:`virtualenv` into which you've installed your :app:`Pyramid` application
-lives in ``C:\my\virtualenv``, you can install Lingua like so:
+:term:`virtual environment` into which you've installed your :app:`Pyramid`
+application lives at the environment variable ``%VENV%``, you can install
+Lingua like so:
 
-.. code-block:: text
+.. code-block:: doscon
 
-   C> %VENV%\Scripts\easy_install lingua
+   C> %VENV%\Scripts\pip install lingua
 
 
 .. index::
@@ -308,9 +309,9 @@ Once Lingua is installed, you may extract a message catalog template from the
 code and :term:`Chameleon` templates which reside in your :app:`Pyramid`
 application.  You run a ``pot-create`` command to extract the messages:
 
-.. code-block:: text
+.. code-block:: bash
 
-   $ cd /place/where/myapplication/setup.py/lives
+   $ cd /file/path/to/myapplication_setup.py
    $ mkdir -p myapplication/locale
    $ $VENV/bin/pot-create -o myapplication/locale/myapplication.pot src
 
@@ -331,9 +332,9 @@ represents translations of a particular set of messages to a particular locale.
 Initialize a ``.po`` file for a specific locale from a pre-generated ``.pot``
 template by using the ``msginit`` command from Gettext:
 
-.. code-block:: text
+.. code-block:: bash
 
-   $ cd /place/where/myapplication/setup.py/lives
+   $ cd /file/path/to/myapplication_setup.py
    $ cd myapplication/locale
    $ mkdir -p es/LC_MESSAGES
    $ msginit -l es -o es/LC_MESSAGES/myapplication.po
@@ -362,9 +363,9 @@ translated or re-translated.
 First, regenerate the ``.pot`` file as per :ref:`extracting_messages`. Then use
 the ``msgmerge`` command from Gettext.
 
-.. code-block:: text
+.. code-block:: bash
 
-   $ cd /place/where/myapplication/setup.py/lives
+   $ cd /file/path/to/myapplication_setup.py
    $ cd myapplication/locale
    $ msgmerge --update es/LC_MESSAGES/myapplication.po myapplication.pot
 
@@ -380,9 +381,9 @@ Finally, to prepare an application for performing actual runtime translations,
 compile ``.po`` files to ``.mo`` files using the ``msgfmt`` command from
 Gettext:
 
-.. code-block:: text
+.. code-block:: bash
 
-   $ cd /place/where/myapplication/setup.py/lives
+   $ cd /file/path/to/myapplication_setup.py
    $ msgfmt -o myapplication/locale/es/LC_MESSAGES/myapplication.mo \
          myapplication/locale/es/LC_MESSAGES/myapplication.po
 
@@ -585,10 +586,10 @@ Performing Date Formatting and Currency Formatting
 :app:`Pyramid` does not itself perform date and currency formatting for
 different locales.  However, :term:`Babel` can help you do this via the
 :class:`babel.core.Locale` class.  The `Babel documentation for this class
-<http://babel.edgewall.org/wiki/ApiDocs/babel.core#babel.core:Locale>`_
-provides minimal information about how to perform date and currency related
-locale operations.  See :ref:`installing_babel` for information about how to
-install Babel.
+<http://babel.pocoo.org/en/latest/api/core.html#basic-interface>`_ provides
+minimal information about how to perform date and currency related locale
+operations. See :ref:`installing_babel` for information about how to install
+Babel.
 
 The :class:`babel.core.Locale` class requires a :term:`locale name` as an
 argument to its constructor. You can use :app:`Pyramid` APIs to obtain the
@@ -669,6 +670,21 @@ Mako Pyramid i18n Support
 There exists a recipe within the :term:`Pyramid Community Cookbook` named
 :ref:`Mako Internationalization <cookbook:mako_i18n>` which explains how to add
 idiomatic i18n support to :term:`Mako` templates.
+
+
+.. index::
+   single: Jinja2 i18n
+
+Jinja2 Pyramid i18n Support
+---------------------------
+
+The add-on `pyramid_jinja2 <https://github.com/Pylons/pyramid_jinja2>`_
+provides a scaffold with an example of how to use internationalization with
+Jinja2 in Pyramid. See the documentation sections `Internalization (i18n)
+<http://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/#internalization-i18n>`_
+and `Paster Template I18N
+<http://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/#paster-template-i18n>`_.
+
 
 .. index::
    single: localization deployment settings

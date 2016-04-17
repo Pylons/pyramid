@@ -6,12 +6,12 @@
 
 Organize a views module with decorators and multiple views.
 
+
 Background
 ==========
 
-For the examples so far, the ``hello_world`` function is a "view". In
-Pyramid, views are the primary way to accept web requests and return
-responses.
+For the examples so far, the ``hello_world`` function is a "view". In Pyramid,
+views are the primary way to accept web requests and return responses.
 
 So far our examples place everything in one file:
 
@@ -23,27 +23,29 @@ So far our examples place everything in one file:
 
 - The WSGI application launcher
 
-Let's move the views out to their own ``views.py`` module and change
-our startup code to scan that module, looking for decorators that setup
-the views. Let's also add a second view and update our tests.
+Let's move the views out to their own ``views.py`` module and change our
+startup code to scan that module, looking for decorators that set up the views.
+Let's also add a second view and update our tests.
+
 
 Objectives
 ==========
 
-- Views in a module that is scanned by the configurator
+- Move views into a module that is scanned by the configurator.
 
-- Decorators that do declarative configuration
+- Create decorators that do declarative configuration.
+
 
 Steps
 =====
 
-#. Let's begin by using the previous package as a starting point for a
-   new distribution, then making it active:
+#. Let's begin by using the previous package as a starting point for a new
+   distribution, then making it active:
 
    .. code-block:: bash
 
     $ cd ..; cp -r functional_testing views; cd views
-    $ $VENV/bin/python setup.py develop
+    $ $VENV/bin/pip install -e .
 
 #. Our ``views/tutorial/__init__.py`` gets a lot shorter:
 
@@ -66,12 +68,9 @@ Steps
    .. code-block:: bash
 
 
-    $ $VENV/bin/nosetests tutorial
-    .
-    ----------------------------------------------------------------------
-    Ran 4 tests in 0.141s
-
-    OK
+    $ $VENV/bin/py.test tutorial/tests.py -q
+    ....
+    4 passed in 0.28 seconds
 
 #. Run your Pyramid application with:
 
@@ -82,41 +81,41 @@ Steps
 #. Open http://localhost:6543/ and http://localhost:6543/howdy
    in your browser.
 
+
 Analysis
 ========
 
-We added some more URLs, but we also removed the view code from the
-application startup code in ``tutorial/__init__.py``.
-Our views, and their view registrations (via decorators) are now in a
-module ``views.py`` which is scanned via ``config.scan('.views')``.
+We added some more URLs, but we also removed the view code from the application
+startup code in ``tutorial/__init__.py``. Our views, and their view
+registrations (via decorators) are now in a module ``views.py``, which is
+scanned via ``config.scan('.views')``.
 
-We have 2 views, each leading to the other. If you start at
-http://localhost:6543/, you get a response with a link to the next
-view. The ``hello`` view (available at the URL ``/howdy``) has a link
-back to the first view.
+We have two views, each leading to the other. If you start at
+http://localhost:6543/, you get a response with a link to the next view. The
+``hello`` view (available at the URL ``/howdy``) has a link back to the first
+view.
 
-This step also shows that the name appearing in the URL,
-the name of the "route" that maps a URL to a view,
-and the name of the view, can all be different. More on routes later.
+This step also shows that the name appearing in the URL, the name of the
+"route" that maps a URL to a view, and the name of the view, can all be
+different. More on routes later.
 
-Earlier we saw ``config.add_view`` as one way to configure a view. This
-section introduces ``@view_config``. Pyramid's configuration supports
-:term:`imperative configuration`, such as the
-``config.add_view`` in the previous example. You can also use
-:term:`declarative configuration`, in which a Python
-:term:`python:decorator`
-is placed on the line above the view. Both approaches result in the
-same final configuration, thus usually, it is simply a matter of taste.
+Earlier we saw ``config.add_view`` as one way to configure a view. This section
+introduces ``@view_config``. Pyramid's configuration supports :term:`imperative
+configuration`, such as the ``config.add_view`` in the previous example. You
+can also use :term:`declarative configuration`, in which a Python
+:term:`python:decorator` is placed on the line above the view. Both approaches
+result in the same final configuration, thus usually, it is simply a matter of
+taste.
 
-Extra Credit
+
+Extra credit
 ============
 
 #. What does the dot in ``.views`` signify?
 
-#. Why might ``assertIn`` be a better choice in testing the text in
-   responses than ``assertEqual``?
+#. Why might ``assertIn`` be a better choice in testing the text in responses
+   than ``assertEqual``?
 
 .. seealso:: :ref:`views_chapter`,
    :ref:`view_config_chapter`, and
    :ref:`debugging_view_configuration`
-

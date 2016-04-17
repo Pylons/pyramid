@@ -362,7 +362,7 @@ a real process manager for your processes like Systemd, Circus, or Supervisor.
             log_fn = None
         if log_fn:
             log_fn = os.path.join(base, log_fn)
-            setup_logging(log_fn)
+            setup_logging(log_fn, global_conf=vars)
 
         server = self.loadserver(server_spec, name=server_name,
                                  relative_to=base, global_conf=vars)

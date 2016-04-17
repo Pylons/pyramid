@@ -1,3 +1,5 @@
+.. _wiki_design:
+
 ======
 Design
 ======
