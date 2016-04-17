@@ -137,6 +137,7 @@ if book:
 #     'whatsnew-1.3': 'index',
 #     'whatsnew-1.4': 'index',
 #     'whatsnew-1.5': 'index',
+#     'whatsnew-1.6': 'index',
 #     'tutorials/gae/index': 'index',
 #     'api/chameleon_text': 'api',
 #     'api/chameleon_zpt': 'api',
@@ -146,9 +147,10 @@ html_theme = 'pyramid'
 html_theme_path = pylons_sphinx_themes.get_html_themes_path()
 html_theme_options = dict(
     github_url='https://github.com/Pylons/pyramid',
-    # on master branch true, else false
+    # On master branch and new branch still in
+    # pre-release status: true; else: false.
     in_progress='true',
-    # on previous branches/major releases true, else false
+    # On branches previous to "latest": true; else: false.
     outdated='false',
     )
 
