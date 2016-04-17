@@ -1649,14 +1649,42 @@ view pipeline:
    import time
 
    def timing_view(view, info):
-       def wrapper_view(context, request):
-           start = time.time()
-           response = view(context, request)
-           end = time.time()
-           response.headers['X-View-Performance'] = '%.3f' % (end - start,)
-       return wrapper_view
+       if info.options.get('timed'):
+           def wrapper_view(context, request):
+               start = time.time()
+               response = view(context, request)
+               end = time.time()
+               response.headers['X-View-Performance'] = '%.3f' % (end - start,)
+               return response
+           return wrapper_view
+       return view
+
+   timing_view.options = ('timed',)
 
    config.add_view_deriver(timing_view)
+
+The setting of ``timed`` on the timing_view signifies to Pyramid that ``timed``
+is a valid ``view_config`` keyword argument now.  The ``timing_view`` custom
+view deriver as registered above will only be active for any view defined with
+a ``timed=True`` value passed as one of its ``view_config`` keywords.
+
+For example, this view configuration will *not* be a timed view:
+
+.. code-block:: python
+   :linenos:
+
+   @view_config(route_name='home')
+   def home(request):
+       return Response('Home')
+
+But this view *will* have timing information added to the response headers:
+
+.. code-block:: python
+   :linenos:
+
+   @view_config(route_name='home', timed=True)
+   def home(request):
+       return Response('Home')
 
 View derivers are unique in that they have access to most of the options
 passed to :meth:`pyramid.config.Configurator.add_view` in order to decide what
