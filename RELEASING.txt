@@ -1,7 +1,18 @@
 Releasing Pyramid
 =================
 
-- Do any necessary branch merges (e.g. master to branch, branch to master).
+- For clarity, we define releases as follows.
+
+  - Alpha, beta, dev and similar statuses do not qualify whether a release is
+    major or minor. The term "pre-release" means alpha, beta, or dev.
+
+  - A *major* release is where the first number either before or after the
+    first dot increases. Examples: 1.6 to 1.7a1, or 1.8 to 2.0.
+
+  - A *minor* or *bug fix* release is where the number after the second dot
+    increases. Example: 1.6 to 1.6.1.
+
+- Do any necessary branch merges (e.g., master to branch, branch to master).
 
 - On release branch:
 
@@ -41,7 +52,8 @@ Releasing Pyramid
   branch, and previously released branch. Also in the previously released
   branch only, uncomment the sections to enable pylons_sphinx_latesturl.
 
-- Change setup.py version to the new version number.
+- Change setup.py version to the new version number on both master and the new
+  branch.
 
 - Change CHANGES.txt heading to reflect the new version number.
 
