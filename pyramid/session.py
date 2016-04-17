@@ -182,7 +182,7 @@ def check_csrf_origin(request, trusted_origins=None, raises=True):
                     "pyramid.csrf_trusted_origins", [])
             )
 
-        if request.host_port not in set([80, 443]):
+        if request.host_port not in set(["80", "443"]):
             trusted_origins.append("{0.domain}:{0.host_port}".format(request))
         else:
             trusted_origins.append(request.domain)

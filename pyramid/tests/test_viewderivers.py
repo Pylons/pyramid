@@ -1148,7 +1148,7 @@ class TestDeriveView(unittest.TestCase):
         request = self._makeRequest()
         request.scheme = "https"
         request.domain = "example.com"
-        request.host_port = 443
+        request.host_port = "443"
         request.referrer = "https://example.com/login/"
         request.method = 'POST'
         request.session = DummySession({'csrf_token': 'foo'})
@@ -1208,7 +1208,7 @@ class TestDeriveView(unittest.TestCase):
         request = self._makeRequest()
         request.method = "POST"
         request.scheme = "https"
-        request.host_port = 443
+        request.host_port = "443"
         request.domain = "example.com"
         request.referrer = "https://not-example.com/evil/"
         request.registry.settings = {}
@@ -1221,7 +1221,7 @@ class TestDeriveView(unittest.TestCase):
         request = self._makeRequest()
         request.method = "POST"
         request.scheme = "https"
-        request.host_port = 443
+        request.host_port = "443"
         request.domain = "example.com"
         request.headers = {"Origin": "https://not-example.com/evil/"}
         request.registry.settings = {}
