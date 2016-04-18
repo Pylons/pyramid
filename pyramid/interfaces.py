@@ -916,6 +916,16 @@ class IDefaultPermission(Interface):
     for all view configurations which do not explicitly declare their
     own."""
 
+class IDefaultCSRFOptions(Interface):
+    """ An object representing the default CSRF settings to be used for
+    all view configurations which do not explicitly declare their own."""
+    require_csrf = Attribute(
+        'Boolean attribute. If ``True``, then CSRF checks will be enabled by '
+        'default for the view unless overridden.')
+    token = Attribute('The key to be matched in the body of the request.')
+    header = Attribute('The header to be matched with the CSRF token.')
+    safe_methods = Attribute('A set of safe methods that skip CSRF checks.')
+
 class ISessionFactory(Interface):
     """ An interface representing a factory which accepts a request object and
     returns an ISession object """

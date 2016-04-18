@@ -15,6 +15,7 @@ from pyramid.response import Response
 from pyramid.interfaces import (
     IAuthenticationPolicy,
     IAuthorizationPolicy,
+    IDefaultCSRFOptions,
     IDebugLogger,
     IResponse,
     IViewMapper,
@@ -22,7 +23,6 @@ from pyramid.interfaces import (
     )
 
 from pyramid.compat import (
-    string_types,
     is_bound_method,
     is_unbound_method,
     )
@@ -38,10 +38,6 @@ from pyramid.exceptions import (
     PredicateMismatch,
     )
 from pyramid.httpexceptions import HTTPForbidden
-from pyramid.settings import (
-    falsey,
-    truthy,
-)
 from pyramid.util import object_description
 from pyramid.view import render_view_to_response
 from pyramid import renderers
@@ -464,40 +460,30 @@ def decorated_view(view, info):
 
 decorated_view.options = ('decorator',)
 
-def _parse_csrf_setting(val, error_source):
-    if val:
-        if isinstance(val, string_types):
-            if val.lower() in truthy:
-                val = True
-            elif val.lower() in falsey:
-                val = False
-        elif not isinstance(val, bool):
-            raise ConfigurationError(
-                '{0} must be a string or boolean value'
-                .format(error_source))
-    return val
-
-SAFE_REQUEST_METHODS = frozenset(["GET", "HEAD", "OPTIONS", "TRACE"])
-
 def csrf_view(view, info):
-    default_val = _parse_csrf_setting(
-        info.settings.get('pyramid.require_default_csrf'),
-        'Config setting "pyramid.require_default_csrf"')
-    explicit_val = _parse_csrf_setting(
-        info.options.get('require_csrf'),
-        'View option "require_csrf"')
-    resolved_val = explicit_val
-    if (explicit_val is True and default_val) or explicit_val is None:
-        resolved_val = default_val
-    if resolved_val is True:
-        resolved_val = 'csrf_token'
+    explicit_val = info.options.get('require_csrf')
+    defaults = info.registry.queryUtility(IDefaultCSRFOptions)
+    if defaults is None:
+        default_val = False
+        token = 'csrf_token'
+        header = 'X-CSRF-Token'
+        safe_methods = frozenset(["GET", "HEAD", "OPTIONS", "TRACE"])
+    else:
+        default_val = defaults.require_csrf
+        token = defaults.token
+        header = defaults.header
+        safe_methods = defaults.safe_methods
+    enabled = (
+        explicit_val is True or
+        (explicit_val is not False and default_val)
+    )
+    # disable if both header and token are disabled
+    enabled = enabled and (token or header)
     wrapped_view = view
-    if resolved_val:
+    if enabled:
         def csrf_view(context, request):
-            # Assume that anything not defined as 'safe' by RFC2616 needs
-            # protection
             if (
-                request.method not in SAFE_REQUEST_METHODS and
+                request.method not in safe_methods and
                 (
                     # skip exception views unless value is explicitly defined
                     getattr(request, 'exception', None) is None or
@@ -505,7 +491,7 @@ def csrf_view(view, info):
                 )
             ):
                 check_csrf_origin(request, raises=True)
-                check_csrf_token(request, resolved_val, raises=True)
+                check_csrf_token(request, token, header, raises=True)
             return view(context, request)
         wrapped_view = csrf_view
     return wrapped_view

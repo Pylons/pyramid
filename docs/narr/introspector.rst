@@ -337,6 +337,31 @@ introspectables in categories not described here.
 
     The permission name passed to ``set_default_permission``.
 
+``default csrf options``
+
+  There will be one and only one introspectable in the ``default csrf options``
+  category. It represents a call to the
+  :meth:`pyramid.config.Configurator.set_default_csrf_options` method. It
+  will have the following data.
+
+  ``require_csrf``
+
+    The default value for ``require_csrf`` if left unspecified on calls to
+    :meth:`pyramid.config.Configurator.add_view`.
+
+  ``token``
+
+    The name of the token searched in ``request.POST`` to find a valid CSRF
+    token.
+
+  ``header``
+
+    The name of the request header searched to find a valid CSRF token.
+
+  ``safe_methods``
+
+    The list of HTTP methods considered safe and exempt from CSRF checks.
+
 ``views``
 
   Each introspectable in the ``views`` category represents a call to
