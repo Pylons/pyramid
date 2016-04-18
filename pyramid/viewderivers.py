@@ -482,7 +482,7 @@ SAFE_REQUEST_METHODS = frozenset(["GET", "HEAD", "OPTIONS", "TRACE"])
 def csrf_view(view, info):
     default_val = _parse_csrf_setting(
         info.settings.get('pyramid.require_default_csrf'),
-        'Config setting "pyramid.require_csrf_default"')
+        'Config setting "pyramid.require_default_csrf"')
     val = _parse_csrf_setting(
         info.options.get('require_csrf'),
         'View option "require_csrf"')
