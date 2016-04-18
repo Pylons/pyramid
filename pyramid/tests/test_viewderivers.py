@@ -1297,6 +1297,64 @@ class TestDeriveView(unittest.TestCase):
         result = view(None, request)
         self.assertTrue(result is response)
 
+    def test_csrf_view_skipped_by_default_on_exception_view(self):
+        from pyramid.request import Request
+        def view(request):
+            raise ValueError
+        def excview(request):
+            return 'hello'
+        self.config.add_settings({'pyramid.require_default_csrf': 'yes'})
+        self.config.set_session_factory(
+            lambda request: DummySession({'csrf_token': 'foo'}))
+        self.config.add_view(view, name='foo', require_csrf=False)
+        self.config.add_view(excview, context=ValueError, renderer='string')
+        app = self.config.make_wsgi_app()
+        request = Request.blank('/foo', base_url='http://example.com')
+        request.method = 'POST'
+        response = request.get_response(app)
+        self.assertTrue(b'hello' in response.body)
+
+    def test_csrf_view_failed_on_explicit_exception_view(self):
+        from pyramid.exceptions import BadCSRFToken
+        from pyramid.request import Request
+        def view(request):
+            raise ValueError
+        def excview(request): pass
+        self.config.add_settings({'pyramid.require_default_csrf': 'yes'})
+        self.config.set_session_factory(
+            lambda request: DummySession({'csrf_token': 'foo'}))
+        self.config.add_view(view, name='foo', require_csrf=False)
+        self.config.add_view(excview, context=ValueError, renderer='string',
+                             require_csrf=True)
+        app = self.config.make_wsgi_app()
+        request = Request.blank('/foo', base_url='http://example.com')
+        request.method = 'POST'
+        try:
+            request.get_response(app)
+        except BadCSRFToken:
+            pass
+        else: # pragma: no cover
+            raise AssertionError
+
+    def test_csrf_view_passed_on_explicit_exception_view(self):
+        from pyramid.request import Request
+        def view(request):
+            raise ValueError
+        def excview(request):
+            return 'hello'
+        self.config.add_settings({'pyramid.require_default_csrf': 'yes'})
+        self.config.set_session_factory(
+            lambda request: DummySession({'csrf_token': 'foo'}))
+        self.config.add_view(view, name='foo', require_csrf=False)
+        self.config.add_view(excview, context=ValueError, renderer='string',
+                             require_csrf=True)
+        app = self.config.make_wsgi_app()
+        request = Request.blank('/foo', base_url='http://example.com')
+        request.method = 'POST'
+        request.headers['X-CSRF-Token'] = 'foo'
+        response = request.get_response(app)
+        self.assertTrue(b'hello' in response.body)
+
 
 class TestDerivationOrder(unittest.TestCase):
     def setUp(self):
@@ -1554,7 +1612,6 @@ class TestDeriverIntegration(unittest.TestCase):
         from pyramid.interfaces import IRequest
         from pyramid.interfaces import IView
         from pyramid.interfaces import IViewClassifier
-        from pyramid.interfaces import IExceptionViewClassifier
         classifier = IViewClassifier
         if ctx_iface is None:
             ctx_iface = Interface

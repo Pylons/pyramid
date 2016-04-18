@@ -483,21 +483,29 @@ def csrf_view(view, info):
     default_val = _parse_csrf_setting(
         info.settings.get('pyramid.require_default_csrf'),
         'Config setting "pyramid.require_default_csrf"')
-    val = _parse_csrf_setting(
+    explicit_val = _parse_csrf_setting(
         info.options.get('require_csrf'),
         'View option "require_csrf"')
-    if (val is True and default_val) or val is None:
-        val = default_val
-    if val is True:
-        val = 'csrf_token'
+    resolved_val = explicit_val
+    if (explicit_val is True and default_val) or explicit_val is None:
+        resolved_val = default_val
+    if resolved_val is True:
+        resolved_val = 'csrf_token'
     wrapped_view = view
-    if val:
+    if resolved_val:
         def csrf_view(context, request):
             # Assume that anything not defined as 'safe' by RFC2616 needs
             # protection
-            if request.method not in SAFE_REQUEST_METHODS:
+            if (
+                request.method not in SAFE_REQUEST_METHODS and
+                (
+                    # skip exception views unless value is explicitly defined
+                    getattr(request, 'exception', None) is None or
+                    explicit_val is not None
+                )
+            ):
                 check_csrf_origin(request, raises=True)
-                check_csrf_token(request, val, raises=True)
+                check_csrf_token(request, resolved_val, raises=True)
             return view(context, request)
         wrapped_view = csrf_view
     return wrapped_view
