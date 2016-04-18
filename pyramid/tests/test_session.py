@@ -756,6 +756,15 @@ class Test_check_csrf_origin(unittest.TestCase):
         request.registry.settings = {}
         self.assertTrue(self._callFUT(request))
 
+    def test_success_with_subdomain(self):
+        request = testing.DummyRequest()
+        request.scheme = "https"
+        request.host = "sub.example.com"
+        request.host_port = "443"
+        request.referrer = "https://sub.example.com/"
+        request.registry.settings = {}
+        self.assertTrue(self._callFUT(request))
+
     def test_fails_with_wrong_host(self):
         from pyramid.exceptions import BadCSRFOrigin
         request = testing.DummyRequest()
