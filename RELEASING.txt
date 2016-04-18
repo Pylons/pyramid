@@ -83,7 +83,8 @@ Prepare master for further development (major releases only)
 
 - Checkout master.
 
-- In CHANGES.txt, preserve headings but clear out content.
+- In CHANGES.txt, preserve headings but clear out content. Add heading
+  "unreleased" for the version number.
 
 - From the release branch, forward port the changes in CHANGES.txt to
   HISTORY.txt.
