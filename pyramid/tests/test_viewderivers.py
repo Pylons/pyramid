@@ -1147,7 +1147,7 @@ class TestDeriveView(unittest.TestCase):
             return response
         request = self._makeRequest()
         request.scheme = "https"
-        request.domain = "example.com"
+        request.host = "example.com"
         request.host_port = "443"
         request.referrer = "https://example.com/login/"
         request.method = 'POST'
@@ -1209,7 +1209,7 @@ class TestDeriveView(unittest.TestCase):
         request.method = "POST"
         request.scheme = "https"
         request.host_port = "443"
-        request.domain = "example.com"
+        request.host = "example.com"
         request.referrer = "https://not-example.com/evil/"
         request.registry.settings = {}
         view = self.config._derive_view(inner_view, require_csrf='DUMMY')
@@ -1222,7 +1222,7 @@ class TestDeriveView(unittest.TestCase):
         request.method = "POST"
         request.scheme = "https"
         request.host_port = "443"
-        request.domain = "example.com"
+        request.host = "example.com"
         request.headers = {"Origin": "https://not-example.com/evil/"}
         request.registry.settings = {}
         view = self.config._derive_view(inner_view, require_csrf='DUMMY')
