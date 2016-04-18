@@ -1108,7 +1108,7 @@ class TestDeriveView(unittest.TestCase):
             self.config._derive_view(view)
         except ConfigurationError as ex:
             self.assertEqual(
-                'Config setting "pyramid.require_csrf_default" must be a '
+                'Config setting "pyramid.require_default_csrf" must be a '
                 'string or boolean value',
                 ex.args[0])
         else: # pragma: no cover
