@@ -98,3 +98,24 @@ class ConfiguratorSecurityMethodsTests(unittest.TestCase):
         intr = D['introspectable']
         self.assertEqual(intr['value'], 'perm')
 
+    def test_set_default_csrf_options(self):
+        from pyramid.interfaces import IDefaultCSRFOptions
+        config = self._makeOne(autocommit=True)
+        config.set_default_csrf_options()
+        result = config.registry.getUtility(IDefaultCSRFOptions)
+        self.assertEqual(result.require_csrf, True)
+        self.assertEqual(result.token, 'csrf_token')
+        self.assertEqual(result.header, 'X-CSRF-Token')
+        self.assertEqual(list(sorted(result.safe_methods)),
+                         ['GET', 'HEAD', 'OPTIONS', 'TRACE'])
+
+    def test_changing_set_default_csrf_options(self):
+        from pyramid.interfaces import IDefaultCSRFOptions
+        config = self._makeOne(autocommit=True)
+        config.set_default_csrf_options(
+            require_csrf=False, token='DUMMY', header=None, safe_methods=('PUT',))
+        result = config.registry.getUtility(IDefaultCSRFOptions)
+        self.assertEqual(result.require_csrf, False)
+        self.assertEqual(result.token, 'DUMMY')
+        self.assertEqual(result.header, None)
+        self.assertEqual(list(sorted(result.safe_methods)), ['PUT'])

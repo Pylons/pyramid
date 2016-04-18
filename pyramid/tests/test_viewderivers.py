@@ -1090,45 +1090,52 @@ class TestDeriveView(unittest.TestCase):
         self.assertRaises(ConfigurationError, self.config._derive_view, 
             view, http_cache=(None,))
 
-    def test_csrf_view_requires_bool_or_str_in_require_csrf(self):
-        def view(request): pass
-        try:
-            self.config._derive_view(view, require_csrf=object())
-        except ConfigurationError as ex:
-            self.assertEqual(
-                'View option "require_csrf" must be a string or boolean value',
-                ex.args[0])
-        else: # pragma: no cover
-            raise AssertionError
+    def test_csrf_view_ignores_GET(self):
+        response = DummyResponse()
+        def inner_view(request):
+            return response
+        request = self._makeRequest()
+        request.method = 'GET'
+        view = self.config._derive_view(inner_view, require_csrf=True)
+        result = view(None, request)
+        self.assertTrue(result is response)
 
-    def test_csrf_view_requires_bool_or_str_in_config_setting(self):
-        def view(request): pass
-        self.config.add_settings({'pyramid.require_default_csrf': object()})
-        try:
-            self.config._derive_view(view)
-        except ConfigurationError as ex:
-            self.assertEqual(
-                'Config setting "pyramid.require_default_csrf" must be a '
-                'string or boolean value',
-                ex.args[0])
-        else: # pragma: no cover
-            raise AssertionError
+    def test_csrf_view_fails_with_bad_POST_header(self):
+        from pyramid.exceptions import BadCSRFToken
+        def inner_view(request): pass
+        request = self._makeRequest()
+        request.scheme = "http"
+        request.method = 'POST'
+        request.session = DummySession({'csrf_token': 'foo'})
+        request.headers = {'X-CSRF-Token': 'bar'}
+        view = self.config._derive_view(inner_view, require_csrf=True)
+        self.assertRaises(BadCSRFToken, lambda: view(None, request))
 
-    def test_csrf_view_requires_header(self):
+    def test_csrf_view_passes_with_good_POST_header(self):
         response = DummyResponse()
         def inner_view(request):
             return response
         request = self._makeRequest()
         request.scheme = "http"
         request.method = 'POST'
-        request.POST = {}
         request.session = DummySession({'csrf_token': 'foo'})
         request.headers = {'X-CSRF-Token': 'foo'}
         view = self.config._derive_view(inner_view, require_csrf=True)
         result = view(None, request)
         self.assertTrue(result is response)
 
-    def test_csrf_view_requires_param(self):
+    def test_csrf_view_fails_with_bad_POST_token(self):
+        from pyramid.exceptions import BadCSRFToken
+        def inner_view(request): pass
+        request = self._makeRequest()
+        request.scheme = "http"
+        request.method = 'POST'
+        request.session = DummySession({'csrf_token': 'foo'})
+        request.POST = {'csrf_token': 'bar'}
+        view = self.config._derive_view(inner_view, require_csrf=True)
+        self.assertRaises(BadCSRFToken, lambda: view(None, request))
+
+    def test_csrf_view_passes_with_good_POST_token(self):
         response = DummyResponse()
         def inner_view(request):
             return response
@@ -1136,8 +1143,8 @@ class TestDeriveView(unittest.TestCase):
         request.scheme = "http"
         request.method = 'POST'
         request.session = DummySession({'csrf_token': 'foo'})
-        request.POST = {'DUMMY': 'foo'}
-        view = self.config._derive_view(inner_view, require_csrf='DUMMY')
+        request.POST = {'csrf_token': 'foo'}
+        view = self.config._derive_view(inner_view, require_csrf=True)
         result = view(None, request)
         self.assertTrue(result is response)
 
@@ -1152,43 +1159,10 @@ class TestDeriveView(unittest.TestCase):
         request.referrer = "https://example.com/login/"
         request.method = 'POST'
         request.session = DummySession({'csrf_token': 'foo'})
-        request.POST = {'DUMMY': 'foo'}
-        view = self.config._derive_view(inner_view, require_csrf='DUMMY')
-        result = view(None, request)
-        self.assertTrue(result is response)
-
-    def test_csrf_view_ignores_GET(self):
-        response = DummyResponse()
-        def inner_view(request):
-            return response
-        request = self._makeRequest()
-        request.method = 'GET'
+        request.POST = {'csrf_token': 'foo'}
         view = self.config._derive_view(inner_view, require_csrf=True)
         result = view(None, request)
         self.assertTrue(result is response)
-
-    def test_csrf_view_fails_on_bad_POST_param(self):
-        from pyramid.exceptions import BadCSRFToken
-        def inner_view(request): pass
-        request = self._makeRequest()
-        request.scheme = "http"
-        request.method = 'POST'
-        request.session = DummySession({'csrf_token': 'foo'})
-        request.POST = {'DUMMY': 'bar'}
-        view = self.config._derive_view(inner_view, require_csrf='DUMMY')
-        self.assertRaises(BadCSRFToken, lambda: view(None, request))
-
-    def test_csrf_view_fails_on_bad_POST_header(self):
-        from pyramid.exceptions import BadCSRFToken
-        def inner_view(request): pass
-        request = self._makeRequest()
-        request.scheme = "http"
-        request.method = 'POST'
-        request.POST = {}
-        request.session = DummySession({'csrf_token': 'foo'})
-        request.headers = {'X-CSRF-Token': 'bar'}
-        view = self.config._derive_view(inner_view, require_csrf='DUMMY')
-        self.assertRaises(BadCSRFToken, lambda: view(None, request))
 
     def test_csrf_view_fails_on_bad_PUT_header(self):
         from pyramid.exceptions import BadCSRFToken
@@ -1196,10 +1170,9 @@ class TestDeriveView(unittest.TestCase):
         request = self._makeRequest()
         request.scheme = "http"
         request.method = 'PUT'
-        request.POST = {}
         request.session = DummySession({'csrf_token': 'foo'})
         request.headers = {'X-CSRF-Token': 'bar'}
-        view = self.config._derive_view(inner_view, require_csrf='DUMMY')
+        view = self.config._derive_view(inner_view, require_csrf=True)
         self.assertRaises(BadCSRFToken, lambda: view(None, request))
 
     def test_csrf_view_fails_on_bad_referrer(self):
@@ -1212,7 +1185,7 @@ class TestDeriveView(unittest.TestCase):
         request.domain = "example.com"
         request.referrer = "https://not-example.com/evil/"
         request.registry.settings = {}
-        view = self.config._derive_view(inner_view, require_csrf='DUMMY')
+        view = self.config._derive_view(inner_view, require_csrf=True)
         self.assertRaises(BadCSRFOrigin, lambda: view(None, request))
 
     def test_csrf_view_fails_on_bad_origin(self):
@@ -1225,24 +1198,21 @@ class TestDeriveView(unittest.TestCase):
         request.domain = "example.com"
         request.headers = {"Origin": "https://not-example.com/evil/"}
         request.registry.settings = {}
-        view = self.config._derive_view(inner_view, require_csrf='DUMMY')
+        view = self.config._derive_view(inner_view, require_csrf=True)
         self.assertRaises(BadCSRFOrigin, lambda: view(None, request))
 
-    def test_csrf_view_uses_config_setting_truthy(self):
-        response = DummyResponse()
-        def inner_view(request):
-            return response
+    def test_csrf_view_enabled_by_default(self):
+        from pyramid.exceptions import BadCSRFToken
+        def inner_view(request): pass
         request = self._makeRequest()
         request.scheme = "http"
         request.method = 'POST'
         request.session = DummySession({'csrf_token': 'foo'})
-        request.POST = {'csrf_token': 'foo'}
-        self.config.add_settings({'pyramid.require_default_csrf': 'yes'})
+        self.config.set_default_csrf_options(require_csrf=True)
         view = self.config._derive_view(inner_view)
-        result = view(None, request)
-        self.assertTrue(result is response)
+        self.assertRaises(BadCSRFToken, lambda: view(None, request))
 
-    def test_csrf_view_uses_config_setting_with_custom_token(self):
+    def test_csrf_view_uses_custom_csrf_token(self):
         response = DummyResponse()
         def inner_view(request):
             return response
@@ -1251,20 +1221,35 @@ class TestDeriveView(unittest.TestCase):
         request.method = 'POST'
         request.session = DummySession({'csrf_token': 'foo'})
         request.POST = {'DUMMY': 'foo'}
-        self.config.add_settings({'pyramid.require_default_csrf': 'DUMMY'})
+        self.config.set_default_csrf_options(require_csrf=True, token='DUMMY')
         view = self.config._derive_view(inner_view)
         result = view(None, request)
         self.assertTrue(result is response)
 
-    def test_csrf_view_uses_config_setting_falsey(self):
+    def test_csrf_view_uses_custom_csrf_header(self):
         response = DummyResponse()
         def inner_view(request):
             return response
         request = self._makeRequest()
+        request.scheme = "http"
         request.method = 'POST'
         request.session = DummySession({'csrf_token': 'foo'})
-        request.params['csrf_token'] = 'foo'
-        self.config.add_settings({'pyramid.require_default_csrf': 'no'})
+        request.headers = {'DUMMY': 'foo'}
+        self.config.set_default_csrf_options(require_csrf=True, header='DUMMY')
+        view = self.config._derive_view(inner_view)
+        result = view(None, request)
+        self.assertTrue(result is response)
+
+    def test_csrf_view_uses_custom_methods(self):
+        response = DummyResponse()
+        def inner_view(request):
+            return response
+        request = self._makeRequest()
+        request.scheme = "http"
+        request.method = 'PUT'
+        request.session = DummySession({'csrf_token': 'foo'})
+        self.config.set_default_csrf_options(
+            require_csrf=True, safe_methods=['PUT'])
         view = self.config._derive_view(inner_view)
         result = view(None, request)
         self.assertTrue(result is response)
@@ -1277,23 +1262,9 @@ class TestDeriveView(unittest.TestCase):
         request.scheme = "http"
         request.method = 'POST'
         request.session = DummySession({'csrf_token': 'foo'})
-        request.POST = {'DUMMY': 'foo'}
-        self.config.add_settings({'pyramid.require_default_csrf': 'yes'})
-        view = self.config._derive_view(inner_view, require_csrf='DUMMY')
-        result = view(None, request)
-        self.assertTrue(result is response)
-
-    def test_csrf_view_uses_config_setting_when_view_option_is_true(self):
-        response = DummyResponse()
-        def inner_view(request):
-            return response
-        request = self._makeRequest()
-        request.scheme = "http"
-        request.method = 'POST'
-        request.session = DummySession({'csrf_token': 'foo'})
-        request.POST = {'DUMMY': 'foo'}
-        self.config.add_settings({'pyramid.require_default_csrf': 'DUMMY'})
-        view = self.config._derive_view(inner_view, require_csrf=True)
+        request.POST = {'csrf_token': 'bar'}
+        self.config.set_default_csrf_options(require_csrf=True)
+        view = self.config._derive_view(inner_view, require_csrf=False)
         result = view(None, request)
         self.assertTrue(result is response)
 
@@ -1303,7 +1274,7 @@ class TestDeriveView(unittest.TestCase):
             raise ValueError
         def excview(request):
             return 'hello'
-        self.config.add_settings({'pyramid.require_default_csrf': 'yes'})
+        self.config.set_default_csrf_options(require_csrf=True)
         self.config.set_session_factory(
             lambda request: DummySession({'csrf_token': 'foo'}))
         self.config.add_view(view, name='foo', require_csrf=False)
@@ -1320,7 +1291,7 @@ class TestDeriveView(unittest.TestCase):
         def view(request):
             raise ValueError
         def excview(request): pass
-        self.config.add_settings({'pyramid.require_default_csrf': 'yes'})
+        self.config.set_default_csrf_options(require_csrf=True)
         self.config.set_session_factory(
             lambda request: DummySession({'csrf_token': 'foo'}))
         self.config.add_view(view, name='foo', require_csrf=False)
@@ -1342,7 +1313,7 @@ class TestDeriveView(unittest.TestCase):
             raise ValueError
         def excview(request):
             return 'hello'
-        self.config.add_settings({'pyramid.require_default_csrf': 'yes'})
+        self.config.set_default_csrf_options(require_csrf=True)
         self.config.set_session_factory(
             lambda request: DummySession({'csrf_token': 'foo'}))
         self.config.add_view(view, name='foo', require_csrf=False)
@@ -1675,6 +1646,7 @@ class DummyRequest:
             environ = {}
         self.environ = environ
         self.params = {}
+        self.POST = {}
         self.cookies = {}
         self.headers = {}
         self.response = DummyResponse()

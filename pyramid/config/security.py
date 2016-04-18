@@ -1,11 +1,15 @@
+from zope.interface import implementer
+
 from pyramid.interfaces import (
     IAuthorizationPolicy,
     IAuthenticationPolicy,
+    IDefaultCSRFOptions,
     IDefaultPermission,
     PHASE1_CONFIG,
     PHASE2_CONFIG,
     )
 
+from pyramid.config.util import as_sorted_tuple
 from pyramid.exceptions import ConfigurationError
 from pyramid.util import action_method
 
@@ -138,7 +142,6 @@ class SecurityConfiguratorMixin(object):
         self.action(IDefaultPermission, register, order=PHASE1_CONFIG,
                     introspectables=(intr, perm_intr,))
 
-
     def add_permission(self, permission_name):
         """
         A configurator directive which registers a free-standing
@@ -159,3 +162,55 @@ class SecurityConfiguratorMixin(object):
         intr['value'] = permission_name
         self.action(None, introspectables=(intr,))
 
+    @action_method
+    def set_default_csrf_options(
+        self,
+        require_csrf=True,
+        token='csrf_token',
+        header='X-CSRF-Token',
+        safe_methods=('GET', 'HEAD', 'OPTIONS', 'TRACE'),
+    ):
+        """
+        Set the default CSRF options used by subsequent view registrations.
+
+        ``require_csrf`` controls whether CSRF checks will be automatically
+        enabled on each view in the application. This value is used as the
+        fallback when ``require_csrf`` is left at the default of ``None`` on
+        :meth:`pyramid.config.Configurator.add_view`.
+
+        ``token`` is the name of the CSRF token used in the body of the
+        request, accessed via ``request.POST[token]``. Default: ``csrf_token``.
+
+        ``header`` is the name of the header containing the CSRF token,
+        accessed via ``request.headers[header]``. Default: ``X-CSRF-Token``.
+
+        If ``token`` or ``header`` are set to ``None`` they will not be used
+        for checking CSRF tokens.
+
+        ``safe_methods`` is an iterable of HTTP methods which are expected to
+        not contain side-effects as defined by RFC2616. Safe methods will
+        never be automatically checked for CSRF tokens.
+        Default: ``('GET', 'HEAD', 'OPTIONS', TRACE')``.
+
+        """
+        options = DefaultCSRFOptions(require_csrf, token, header, safe_methods)
+        def register():
+            self.registry.registerUtility(options, IDefaultCSRFOptions)
+        intr = self.introspectable('default csrf view options',
+                                   None,
+                                   options,
+                                   'default csrf view options')
+        intr['require_csrf'] = require_csrf
+        intr['token'] = token
+        intr['header'] = header
+        intr['safe_methods'] = as_sorted_tuple(safe_methods)
+        self.action(IDefaultCSRFOptions, register, order=PHASE1_CONFIG,
+                    introspectables=(intr,))
+
+@implementer(IDefaultCSRFOptions)
+class DefaultCSRFOptions(object):
+    def __init__(self, require_csrf, token, header, safe_methods):
+        self.require_csrf = require_csrf
+        self.token = token
+        self.header = header
+        self.safe_methods = frozenset(safe_methods)
