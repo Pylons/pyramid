@@ -1,104 +1,126 @@
-from zope.configuration.exceptions import ConfigurationError as ZCE
-from zope.interface import implements
+from pyramid.httpexceptions import (
+    HTTPBadRequest,
+    HTTPNotFound,
+    HTTPForbidden,
+    )
 
-from pyramid.decorator import reify
-from pyramid.interfaces import IExceptionResponse
-import cgi
+NotFound = HTTPNotFound # bw compat
+Forbidden = HTTPForbidden # bw compat
 
-class ExceptionResponse(Exception):
-    """ Abstract class to support behaving as a WSGI response object """
-    implements(IExceptionResponse)
-    status = None
+CR = '\n'
 
-    def __init__(self, message=''):
-        Exception.__init__(self, message) # B / C
-        self.message = message
 
-    @reify # defer execution until asked explicitly
-    def app_iter(self):
-         return [
-             """
-             <html>
-             <title>%s</title>
-             <body>
-             <h1>%s</h1>
-             <code>%s</code>
-             </body>
-             </html>
-             """ % (self.status, self.status, cgi.escape(self.message))
-             ]
-
-    @reify # defer execution until asked explicitly
-    def headerlist(self):
-        return [
-            ('Content-Length', str(len(self.app_iter[0]))),
-            ('Content-Type', 'text/html')
-            ]
-        
-        
-class Forbidden(ExceptionResponse):
+class BadCSRFOrigin(HTTPBadRequest):
     """
-    Raise this exception within :term:`view` code to immediately return the
-    :term:`forbidden view` to the invoking user.  Usually this is a basic
-    ``403`` page, but the forbidden view can be customized as necessary.  See
-    :ref:`changing_the_forbidden_view`.  A ``Forbidden`` exception will be
-    the ``context`` of a :term:`Forbidden View`.
-
-    This exception's constructor accepts two arguments.  The first argument,
-    ``message``, should be a string.  The value of this string will be used
-    as the ``message`` attribute of the exception object.  The second
-    argument, ``result`` is usually an instance of
-    :class:`pyramid.security.Denied` or :class:`pyramid.security.ACLDenied`
-    each of which indicates a reason for the forbidden error.  However,
-    ``result`` is also permitted to be just a plain boolean ``False`` object.
-    The ``result`` value will be used as the ``result`` attribute of the
-    exception object.
-
-    The :term:`Forbidden View` can use the attributes of a Forbidden
-    exception as necessary to provide extended information in an error
-    report shown to a user.
+    This exception indicates the request has failed cross-site request forgery
+    origin validation.
     """
-    status = '403 Forbidden'
-    def __init__(self, message='', result=None):
-        ExceptionResponse.__init__(self, message)
-        self.message = message
-        self.result = result
+    title = "Bad CSRF Origin"
+    explanation = (
+        "Access is denied. This server can not verify that the origin or "
+        "referrer of your request matches the current site. Either your "
+        "browser supplied the wrong Origin or Referrer or it did not supply "
+        "one at all."
+    )
 
-class NotFound(ExceptionResponse):
-    """
-    Raise this exception within :term:`view` code to immediately
-    return the :term:`Not Found view` to the invoking user.  Usually
-    this is a basic ``404`` page, but the Not Found view can be
-    customized as necessary.  See :ref:`changing_the_notfound_view`.
 
-    This exception's constructor accepts a single positional argument, which
-    should be a string.  The value of this string will be available as the
-    ``message`` attribute of this exception, for availability to the
-    :term:`Not Found View`.
+class BadCSRFToken(HTTPBadRequest):
     """
-    status = '404 Not Found'
+    This exception indicates the request has failed cross-site request
+    forgery token validation.
+    """
+    title = 'Bad CSRF Token'
+    explanation = (
+        'Access is denied.  This server can not verify that your cross-site '
+        'request forgery token belongs to your login session.  Either you '
+        'supplied the wrong cross-site request forgery token or your session '
+        'no longer exists.  This may be due to session timeout or because '
+        'browser is not supplying the credentials required, as can happen '
+        'when the browser has cookies turned off.')
 
-class PredicateMismatch(NotFound):
+class PredicateMismatch(HTTPNotFound):
     """
-    Internal exception (not an API) raised by multiviews when no
-    view matches.  This exception subclasses the ``NotFound``
-    exception only one reason: if it reaches the main exception
-    handler, it should be treated like a ``NotFound`` by any exception
-    view registrations.
+    This exception is raised by multiviews when no view matches
+    all given predicates.
+
+    This exception subclasses the :class:`HTTPNotFound` exception for a
+    specific reason: if it reaches the main exception handler, it should
+    be treated as :class:`HTTPNotFound`` by any exception view
+    registrations. Thus, typically, this exception will not be seen
+    publicly.
+
+    However, this exception will be raised if the predicates of all
+    views configured to handle another exception context cannot be
+    successfully matched.  For instance, if a view is configured to
+    handle a context of ``HTTPForbidden`` and the configured with
+    additional predicates, then :class:`PredicateMismatch` will be
+    raised if:
+
+    * An original view callable has raised :class:`HTTPForbidden` (thus
+      invoking an exception view); and
+    * The given request fails to match all predicates for said
+      exception view associated with :class:`HTTPForbidden`.
+
+    The same applies to any type of exception being handled by an
+    exception view.
     """
 
 class URLDecodeError(UnicodeDecodeError):
     """
     This exception is raised when :app:`Pyramid` cannot
     successfully decode a URL or a URL path segment.  This exception
-    it behaves just like the Python builtin
+    behaves just like the Python builtin
     :exc:`UnicodeDecodeError`. It is a subclass of the builtin
     :exc:`UnicodeDecodeError` exception only for identity purposes,
     mostly so an exception view can be registered when a URL cannot be
     decoded.
     """
 
-class ConfigurationError(ZCE):
+class ConfigurationError(Exception):
     """ Raised when inappropriate input values are supplied to an API
     method of a :term:`Configurator`"""
 
+class ConfigurationConflictError(ConfigurationError):
+    """ Raised when a configuration conflict is detected during action
+    processing"""
+
+    def __init__(self, conflicts):
+        self._conflicts = conflicts
+
+    def __str__(self):
+        r = ["Conflicting configuration actions"]
+        items = sorted(self._conflicts.items())
+        for discriminator, infos in items:
+            r.append("  For: %s" % (discriminator, ))
+            for info in infos:
+                for line in str(info).rstrip().split(CR):
+                    r.append("    " + line)
+
+        return CR.join(r)
+
+
+class ConfigurationExecutionError(ConfigurationError):
+    """An error occurred during execution of a configuration action
+    """
+
+    def __init__(self, etype, evalue, info):
+        self.etype, self.evalue, self.info = etype, evalue, info
+
+    def __str__(self):
+        return "%s: %s\n  in:\n  %s" % (self.etype, self.evalue, self.info)
+
+class CyclicDependencyError(Exception):
+    """ The exception raised when the Pyramid topological sorter detects a
+    cyclic dependency."""
+    def __init__(self, cycles):
+        self.cycles = cycles
+
+    def __str__(self):
+        L = []
+        cycles = self.cycles
+        for cycle in cycles:
+            dependent = cycle
+            dependees = cycles[cycle]
+            L.append('%r sorts before %r' % (dependent, dependees))
+        msg = 'Implicit ordering cycle:' + '; '.join(L)
+        return msg

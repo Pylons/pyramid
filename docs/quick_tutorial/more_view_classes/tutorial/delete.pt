@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Quick Tutorial: ${page_title}</title>
+</head>
+<body>
+<h1>${view.view_name} - ${page_title}</h1>
+</body>
+</html>

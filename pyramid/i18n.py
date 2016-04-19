@@ -1,27 +1,35 @@
 import gettext
 import os
 
-from translationstring import Translator
-from translationstring import Pluralizer
-from translationstring import TranslationString # API
-from translationstring import TranslationStringFactory # API
+from translationstring import (
+    Translator,
+    Pluralizer,
+    TranslationString, # API
+    TranslationStringFactory, # API
+    )
 
-TranslationString = TranslationString # PyFlakes
-TranslationStringFactory = TranslationStringFactory # PyFlakes
+from pyramid.compat import PY2
+from pyramid.decorator import reify
 
-from pyramid.interfaces import ILocalizer
-from pyramid.interfaces import ITranslationDirectories
-from pyramid.interfaces import ILocaleNegotiator
+from pyramid.interfaces import (
+    ILocalizer,
+    ITranslationDirectories,
+    ILocaleNegotiator,
+    )
 
 from pyramid.threadlocal import get_current_registry
+
+TranslationString = TranslationString  # PyFlakes
+TranslationStringFactory = TranslationStringFactory  # PyFlakes
+
 
 class Localizer(object):
     """
     An object providing translation and pluralizations related to
-     the current request's locale name.  A
-     :class:`pyramid.i18n.Localizer` object is created using the
-     :func:`pyramid.i18n.get_localizer` function.
-     """
+    the current request's locale name.  A
+    :class:`pyramid.i18n.Localizer` object is created using the
+    :func:`pyramid.i18n.get_localizer` function.
+    """
     def __init__(self, locale_name, translations):
         self.locale_name = locale_name
         self.translations = translations
@@ -68,21 +76,34 @@ class Localizer(object):
         :term:`message identifier` objects as a singular/plural pair
         and an ``n`` value representing the number that appears in the
         message using gettext plural forms support.  The ``singular``
-        and ``plural`` objects passed may be translation strings or
-        unicode strings.  ``n`` represents the number of elements.
-        ``domain`` is the translation domain to use to do the
-        pluralization, and ``mapping`` is the interpolation mapping
-        that should be used on the result.  Note that if the objects
-        passed are translation strings, their domains and mappings are
-        ignored.  The domain and mapping arguments must be used
-        instead.  If the ``domain`` is not supplied, a default domain
-        is used (usually ``messages``).
-
+        and ``plural`` objects should be unicode strings. There is no
+        reason to use translation string objects as arguments as all
+        metadata is ignored.
+        
+        ``n`` represents the number of elements. ``domain`` is the
+        translation domain to use to do the pluralization, and ``mapping``
+        is the interpolation mapping that should be used on the result. If
+        the ``domain`` is not supplied, a default domain is used (usually
+        ``messages``).
+        
         Example::
 
            num = 1
            translated = localizer.pluralize('Add ${num} item',
                                             'Add ${num} items',
+                                            num,
+                                            mapping={'num':num})
+
+        If using the gettext plural support, which is required for
+        languages that have pluralisation rules other than n != 1, the
+        ``singular`` argument must be the message_id defined in the
+        translation file. The plural argument is not used in this case.
+
+        Example::
+
+           num = 1
+           translated = localizer.pluralize('item_plural',
+                                            '',
                                             num,
                                             mapping={'num':num})
 
@@ -100,7 +121,8 @@ def default_locale_negotiator(request):
 
     - First, the negotiator looks for the ``_LOCALE_`` attribute of
       the request object (possibly set by a view or a listener for an
-      :term:`event`).
+      :term:`event`). If the attribute exists and it is not ``None``,
+      its value will be used.
   
     - Then it looks for the ``request.params['_LOCALE_']`` value.
 
@@ -121,7 +143,7 @@ def default_locale_negotiator(request):
 
 def negotiate_locale_name(request):
     """ Negotiate and return the :term:`locale name` associated with
-    the current request (never cached)."""
+    the current request."""
     try:
         registry = request.registry
     except AttributeError:
@@ -137,13 +159,12 @@ def negotiate_locale_name(request):
     return locale_name
 
 def get_locale_name(request):
-    """ Return the :term:`locale name` associated with the current
-    request (possibly cached)."""
-    locale_name = getattr(request, 'locale_name', None)
-    if locale_name is None:
-        locale_name = negotiate_locale_name(request)
-        request.locale_name = locale_name
-    return locale_name
+    """
+    .. deprecated:: 1.5
+        Use :attr:`pyramid.request.Request.locale_name` directly instead.
+        Return the :term:`locale name` associated with the current request.
+    """
+    return request.locale_name
 
 def make_localizer(current_locale_name, translation_directories):
     """ Create a :class:`pyramid.i18n.Localizer` object
@@ -152,16 +173,27 @@ def make_localizer(current_locale_name, translation_directories):
     translations = Translations()
     translations._catalog = {}
 
-    locales_to_try = [current_locale_name]
+    locales_to_try = []
     if '_' in current_locale_name:
-        locales_to_try.append(current_locale_name.split('_')[0])
+        locales_to_try = [current_locale_name.split('_')[0]]
+    locales_to_try.append(current_locale_name)
+
+    # intent: order locales left to right in least specific to most specific,
+    # e.g. ['de', 'de_DE'].  This services the intent of creating a
+    # translations object that returns a "more specific" translation for a
+    # region, but will fall back to a "less specific" translation for the
+    # locale if necessary.  Ordering from least specific to most specific
+    # allows us to call translations.add in the below loop to get this
+    # behavior.
 
     for tdir in translation_directories:
-        locale_dirs = [ (lname, os.path.join(tdir, lname)) for lname in
-                        os.listdir(tdir) ]
-        for locale_name, locale_dir in locale_dirs:
-            if locale_name not in locales_to_try:
-                continue
+        locale_dirs = []
+        for lname in locales_to_try:
+            ldir = os.path.realpath(os.path.join(tdir, lname))
+            if os.path.isdir(ldir):
+                locale_dirs.append(ldir)
+
+        for locale_dir in locale_dirs:
             messages_dir = os.path.join(locale_dir, 'LC_MESSAGES')
             if not os.path.isdir(os.path.realpath(messages_dir)):
                 continue
@@ -169,40 +201,23 @@ def make_localizer(current_locale_name, translation_directories):
                 mopath = os.path.realpath(os.path.join(messages_dir,
                                                        mofile))
                 if mofile.endswith('.mo') and os.path.isfile(mopath):
-                    mofp = open(mopath, 'rb')
-                    domain = mofile[:-3]
-                    dtrans = Translations(mofp, domain)
-                    translations.add(dtrans)
+                    with open(mopath, 'rb') as mofp:
+                        domain = mofile[:-3]
+                        dtrans = Translations(mofp, domain)
+                        translations.add(dtrans)
 
     return Localizer(locale_name=current_locale_name,
                           translations=translations)
 
 def get_localizer(request):
-    """ Retrieve a :class:`pyramid.i18n.Localizer` object
-    corresponding to the current request's locale name. """
-    localizer =  getattr(request, 'localizer', None)
+    """
+    .. deprecated:: 1.5
+        Use the :attr:`pyramid.request.Request.localizer` attribute directly
+        instead.  Retrieve a :class:`pyramid.i18n.Localizer` object
+        corresponding to the current request's locale name.
+    """
+    return request.localizer
 
-    if localizer is None:
-        # no locale object cached on request
-        try:
-            registry = request.registry
-        except AttributeError:
-            registry = get_current_registry()
-
-        current_locale_name = get_locale_name(request)
-        localizer = registry.queryUtility(ILocalizer, name=current_locale_name)
-
-    if localizer is None:
-        # no localizer utility registered yet
-        tdirs = registry.queryUtility(ITranslationDirectories, default=[])
-        localizer = make_localizer(current_locale_name, tdirs)
-        
-        registry.registerUtility(localizer, ILocalizer,
-                                 name=current_locale_name)
-        request.localizer = localizer
-
-    return localizer
-                
 class Translations(gettext.GNUTranslations, object):
     """An extended translation catalog class (ripped off from Babel) """
 
@@ -214,8 +229,13 @@ class Translations(gettext.GNUTranslations, object):
         :param fileobj: the file-like object the translation should be read
                         from
         """
+        # germanic plural by default; self.plural will be overwritten by
+        # GNUTranslations._parse (called as a side effect if fileobj is
+        # passed to GNUTranslations.__init__) with a "real" self.plural for
+        # this domain; see https://github.com/Pylons/pyramid/issues/235
+        self.plural = lambda n: int(n != 1) 
         gettext.GNUTranslations.__init__(self, fp=fileobj)
-        self.files = filter(None, [getattr(fileobj, 'name', None)])
+        self.files = list(filter(None, [getattr(fileobj, 'name', None)]))
         self.domain = domain
         self._domains = {}
 
@@ -241,7 +261,8 @@ class Translations(gettext.GNUTranslations, object):
         filename = gettext.find(domain, dirname, locales)
         if not filename:
             return gettext.NullTranslations()
-        return cls(fileobj=open(filename, 'rb'), domain=domain)
+        with open(filename, 'rb') as fp:
+            return cls(fileobj=fp, domain=domain)
 
     def __repr__(self):
         return '<%s: "%s">' % (type(self).__name__,
@@ -311,7 +332,10 @@ class Translations(gettext.GNUTranslations, object):
         """Like ``ugettext()``, but look the message up in the specified
         domain.
         """
-        return self._domains.get(domain, self).ugettext(message)
+        if PY2:
+            return self._domains.get(domain, self).ugettext(message)
+        else:
+            return self._domains.get(domain, self).gettext(message)
     
     def dngettext(self, domain, singular, plural, num):
         """Like ``ngettext()``, but look the message up in the specified
@@ -329,5 +353,35 @@ class Translations(gettext.GNUTranslations, object):
         """Like ``ungettext()`` but look the message up in the specified
         domain.
         """
-        return self._domains.get(domain, self).ungettext(singular, plural, num)
+        if PY2:
+            return self._domains.get(domain, self).ungettext(
+                singular, plural, num)
+        else:
+            return self._domains.get(domain, self).ngettext(
+                singular, plural, num)
 
+class LocalizerRequestMixin(object):
+    @reify
+    def localizer(self):
+        """ Convenience property to return a localizer """
+        registry = self.registry
+
+        current_locale_name = self.locale_name
+        localizer = registry.queryUtility(ILocalizer, name=current_locale_name)
+
+        if localizer is None:
+            # no localizer utility registered yet
+            tdirs = registry.queryUtility(ITranslationDirectories, default=[])
+            localizer = make_localizer(current_locale_name, tdirs)
+
+            registry.registerUtility(localizer, ILocalizer,
+                                     name=current_locale_name)
+
+        return localizer
+
+    @reify
+    def locale_name(self):
+        locale_name = negotiate_locale_name(self)
+        return locale_name
+        
+    

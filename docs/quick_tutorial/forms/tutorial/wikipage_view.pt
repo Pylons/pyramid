@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>WikiPage: View</title>
+</head>
+<body>
+<a href="${request.route_url('wiki_view')}">
+    Up
+</a> |
+<a href="${request.route_url('wikipage_edit', uid=page.uid)}">
+    Edit
+</a>
+
+<h1>${page.title}</h1>
+<p>${structure: page.body}</p>
+</body>
+</html>

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Hello World</title>
+</head>
+<body>
+<h1>Hello {{ view.name }}!</h1>
+<form method="POST"
+      action="{{ request.current_route_url() }}">
+    <input name="new_name">
+    <input type="submit" name="form.edit" value="Save">
+    <input type="submit" name="form.delete" value="Delete">
+</form>
+</body>
+</html>

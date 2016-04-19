@@ -1,29 +1,43 @@
-from zope.interface import implements
-from zope.interface import providedBy
+from zope.interface import (
+    implementer,
+    providedBy,
+    )
 
-from pyramid.interfaces import IDebugLogger
-from pyramid.interfaces import IExceptionViewClassifier
-from pyramid.interfaces import IRequest
-from pyramid.interfaces import IRootFactory
-from pyramid.interfaces import IRouteRequest
-from pyramid.interfaces import IRouter
-from pyramid.interfaces import IRequestFactory
-from pyramid.interfaces import IRoutesMapper
-from pyramid.interfaces import ITraverser
-from pyramid.interfaces import IView
-from pyramid.interfaces import IViewClassifier
+from pyramid.interfaces import (
+    IDebugLogger,
+    IRequest,
+    IRequestExtensions,
+    IRootFactory,
+    IRouteRequest,
+    IRouter,
+    IRequestFactory,
+    IRoutesMapper,
+    ITraverser,
+    ITweens,
+    )
 
-from pyramid.events import ContextFound
-from pyramid.events import NewRequest
-from pyramid.events import NewResponse
-from pyramid.exceptions import NotFound
+from pyramid.events import (
+    ContextFound,
+    NewRequest,
+    NewResponse,
+    BeforeTraversal,
+    )
+
+from pyramid.httpexceptions import HTTPNotFound
 from pyramid.request import Request
+from pyramid.view import _call_view
+from pyramid.request import apply_request_extensions
 from pyramid.threadlocal import manager
-from pyramid.traversal import DefaultRootFactory
-from pyramid.traversal import ResourceTreeTraverser
 
+from pyramid.traversal import (
+    DefaultRootFactory,
+    ResourceTreeTraverser,
+    )
+
+from pyramid.tweens import excview_tween_factory
+
+@implementer(IRouter)
 class Router(object):
-    implements(IRouter)
 
     debug_notfound = False
     debug_routematch = False
@@ -36,13 +50,179 @@ class Router(object):
         self.root_factory = q(IRootFactory, default=DefaultRootFactory)
         self.routes_mapper = q(IRoutesMapper)
         self.request_factory = q(IRequestFactory, default=Request)
+        self.request_extensions = q(IRequestExtensions)
+        tweens = q(ITweens)
+        if tweens is None:
+            tweens = excview_tween_factory
+        self.orig_handle_request = self.handle_request
+        self.handle_request = tweens(self.handle_request, registry)
         self.root_policy = self.root_factory # b/w compat
         self.registry = registry
         settings = registry.settings
-
         if settings is not None:
             self.debug_notfound = settings['debug_notfound']
             self.debug_routematch = settings['debug_routematch']
+
+    def handle_request(self, request):
+        attrs = request.__dict__
+        registry = attrs['registry']
+
+        request.request_iface = IRequest
+        context = None
+        routes_mapper = self.routes_mapper
+        debug_routematch = self.debug_routematch
+        adapters = registry.adapters
+        has_listeners = registry.has_listeners
+        notify = registry.notify
+        logger = self.logger
+
+        has_listeners and notify(NewRequest(request))
+        # find the root object
+        root_factory = self.root_factory
+        if routes_mapper is not None:
+            info = routes_mapper(request)
+            match, route = info['match'], info['route']
+            if route is None:
+                if debug_routematch:
+                    msg = ('no route matched for url %s' %
+                           request.url)
+                    logger and logger.debug(msg)
+            else:
+                attrs['matchdict'] = match
+                attrs['matched_route'] = route
+
+                if debug_routematch:
+                    msg = (
+                        'route matched for url %s; '
+                        'route_name: %r, '
+                        'path_info: %r, '
+                        'pattern: %r, '
+                        'matchdict: %r, '
+                        'predicates: %r' % (
+                            request.url,
+                            route.name,
+                            request.path_info,
+                            route.pattern,
+                            match,
+                            ', '.join([p.text() for p in route.predicates]))
+                        )
+                    logger and logger.debug(msg)
+
+                request.request_iface = registry.queryUtility(
+                    IRouteRequest,
+                    name=route.name,
+                    default=IRequest)
+
+                root_factory = route.factory or self.root_factory
+
+        # Notify anyone listening that we are about to start traversal
+        #
+        # Notify before creating root_factory in case we want to do something
+        # special on a route we may have matched. See
+        # https://github.com/Pylons/pyramid/pull/1876 for ideas of what is
+        # possible.
+        has_listeners and notify(BeforeTraversal(request))
+
+        # Create the root factory
+        root = root_factory(request)
+        attrs['root'] = root
+
+        # We are about to traverse and find a context
+        traverser = adapters.queryAdapter(root, ITraverser)
+        if traverser is None:
+            traverser = ResourceTreeTraverser(root)
+        tdict = traverser(request)
+
+        context, view_name, subpath, traversed, vroot, vroot_path = (
+            tdict['context'],
+            tdict['view_name'],
+            tdict['subpath'],
+            tdict['traversed'],
+            tdict['virtual_root'],
+            tdict['virtual_root_path']
+            )
+
+        attrs.update(tdict)
+
+        # Notify anyone listening that we have a context and traversal is
+        # complete
+        has_listeners and notify(ContextFound(request))
+
+        # find a view callable
+        context_iface = providedBy(context)
+        response = _call_view(
+            registry,
+            request,
+            context,
+            context_iface,
+            view_name
+            )
+
+        if response is None:
+            if self.debug_notfound:
+                msg = (
+                    'debug_notfound of url %s; path_info: %r, '
+                    'context: %r, view_name: %r, subpath: %r, '
+                    'traversed: %r, root: %r, vroot: %r, '
+                    'vroot_path: %r' % (
+                        request.url, request.path_info, context,
+                        view_name, subpath, traversed, root, vroot,
+                        vroot_path)
+                    )
+                logger and logger.debug(msg)
+            else:
+                msg = request.path_info
+            raise HTTPNotFound(msg)
+
+        return response
+
+    def invoke_subrequest(self, request, use_tweens=False):
+        """Obtain a response object from the Pyramid application based on
+        information in the ``request`` object provided.  The ``request``
+        object must be an object that implements the Pyramid request
+        interface (such as a :class:`pyramid.request.Request` instance).  If
+        ``use_tweens`` is ``True``, the request will be sent to the
+        :term:`tween` in the tween stack closest to the request ingress.  If
+        ``use_tweens`` is ``False``, the request will be sent to the main
+        router handler, and no tweens will be invoked.
+        
+        See the API for pyramid.request for complete documentation.
+        """
+        registry = self.registry
+        has_listeners = self.registry.has_listeners
+        notify = self.registry.notify
+        threadlocals = {'registry':registry, 'request':request}
+        manager = self.threadlocal_manager
+        manager.push(threadlocals)
+        request.registry = registry
+        request.invoke_subrequest = self.invoke_subrequest
+        
+        if use_tweens:
+            handle_request = self.handle_request
+        else:
+            handle_request = self.orig_handle_request
+
+        try:
+
+            try:
+                extensions = self.request_extensions
+                if extensions is not None:
+                    apply_request_extensions(request, extensions=extensions)
+                response = handle_request(request)
+
+                if request.response_callbacks:
+                    request._process_response_callbacks(response)
+
+                has_listeners and notify(NewResponse(request, response))
+                
+                return response
+
+            finally:
+                if request.finished_callbacks:
+                    request._process_finished_callbacks()
+
+        finally:
+            manager.pop()
 
     def __call__(self, environ, start_response):
         """
@@ -52,155 +232,6 @@ class Router(object):
         within the application registry; call ``start_response`` and
         return an iterable.
         """
-        registry = self.registry
-        adapters = registry.adapters
-        has_listeners = registry.has_listeners
-        logger = self.logger
-        manager = self.threadlocal_manager
-        request = None
-        threadlocals = {'registry':registry, 'request':request}
-        manager.push(threadlocals)
-
-        try: # matches finally: manager.pop()
-
-            try: # matches finally:  ... call request finished callbacks ...
-                
-                # create the request
-                request = self.request_factory(environ)
-                context = None
-                threadlocals['request'] = request
-                attrs = request.__dict__
-                attrs['registry'] = registry
-                request_iface = IRequest
-
-                try: # matches except Exception (exception view execution)
-                    has_listeners and registry.notify(NewRequest(request))
-                    # find the root object
-                    root_factory = self.root_factory
-                    if self.routes_mapper is not None:
-                        info = self.routes_mapper(request)
-                        match, route = info['match'], info['route']
-                        if route is None:
-                            if self.debug_routematch:
-                                msg = ('no route matched for url %s' %
-                                       request.url)
-                                logger and logger.debug(msg)
-                        else:
-                            # TODO: kill off bfg.routes.* environ keys when
-                            # traverser requires request arg, and cant cope
-                            # with environ anymore (they are docs-deprecated as
-                            # of BFG 1.3)
-                            environ['bfg.routes.route'] = route 
-                            environ['bfg.routes.matchdict'] = match
-                            attrs['matchdict'] = match
-                            attrs['matched_route'] = route
-
-                            if self.debug_routematch:
-                                msg = (
-                                    'route matched for url %s; '
-                                    'route_name: %r, '
-                                    'path_info: %r, '
-                                    'pattern: %r, '
-                                    'matchdict: %r, '
-                                    'predicates: %r' % (
-                                        request.url,
-                                        route.name,
-                                        request.path_info,
-                                        route.pattern, match,
-                                        route.predicates)
-                                    )
-                                logger and logger.debug(msg)
-
-                            request_iface = registry.queryUtility(
-                                IRouteRequest,
-                                name=route.name,
-                                default=IRequest)
-                            root_factory = route.factory or self.root_factory
-
-                    root = root_factory(request)
-                    attrs['root'] = root
-
-                    # find a context
-                    traverser = adapters.queryAdapter(root, ITraverser)
-                    if traverser is None:
-                        traverser = ResourceTreeTraverser(root)
-                    tdict = traverser(request)
-                    context, view_name, subpath, traversed, vroot, vroot_path =(
-                        tdict['context'], tdict['view_name'], tdict['subpath'],
-                        tdict['traversed'], tdict['virtual_root'],
-                        tdict['virtual_root_path'])
-                    attrs.update(tdict)
-                    has_listeners and registry.notify(ContextFound(request))
-
-                    # find a view callable
-                    context_iface = providedBy(context)
-                    view_callable = adapters.lookup(
-                        (IViewClassifier, request_iface, context_iface),
-                        IView, name=view_name, default=None)
-
-                    # invoke the view callable
-                    if view_callable is None:
-                        if self.debug_notfound:
-                            msg = (
-                                'debug_notfound of url %s; path_info: %r, '
-                                'context: %r, view_name: %r, subpath: %r, '
-                                'traversed: %r, root: %r, vroot: %r, '
-                                'vroot_path: %r' % (
-                                    request.url, request.path_info, context,
-                                    view_name,
-                                    subpath, traversed, root, vroot, vroot_path)
-                                )
-                            logger and logger.debug(msg)
-                        else:
-                            msg = request.path_info
-                        raise NotFound(msg)
-                    else:
-                        response = view_callable(context, request)
-
-                # handle exceptions raised during root finding and view-exec
-                except Exception, why:
-                    attrs['exception'] = why
-
-                    for_ = (IExceptionViewClassifier,
-                            request_iface.combined,
-                            providedBy(why))
-                    view_callable = adapters.lookup(for_, IView, default=None)
-
-                    if view_callable is None:
-                        raise
-
-                    try: 
-                        msg = why[0]
-                    except:
-                        msg = ''
-
-                    # repoze.bfg.message docs-deprecated in Pyramid 1.0
-                    environ['repoze.bfg.message'] = msg
-
-                    response = view_callable(why, request)
-
-                # process the response
-
-                has_listeners and registry.notify(NewResponse(request,response))
-
-                if request.response_callbacks:
-                    request._process_response_callbacks(response)
-
-                try:
-                    headers = response.headerlist
-                    app_iter = response.app_iter
-                    status = response.status
-                except AttributeError:
-                    raise ValueError(
-                        'Non-response object returned from view named %s '
-                        '(and no renderer): %r' % (view_name, response))
-
-            finally:
-                if request is not None and request.finished_callbacks:
-                    request._process_finished_callbacks()
-
-            start_response(status, headers)
-            return app_iter
-            
-        finally:
-            manager.pop()
+        request = self.request_factory(environ)
+        response = self.invoke_subrequest(request, use_tweens=True)
+        return response(request.environ, start_response)

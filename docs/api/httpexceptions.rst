@@ -7,92 +7,102 @@
 
   .. attribute:: status_map
 
-     A mapping of integer status code to exception class (eg. the
-     integer "401" maps to
-     :class:`pyramid.httpexceptions.HTTPUnauthorized`).
+     A mapping of integer status code to HTTP exception class (eg. the integer
+     "401" maps to :class:`pyramid.httpexceptions.HTTPUnauthorized`).  All
+     mapped exception classes are children of :class:`pyramid.httpexceptions`,
 
-  .. autoclass:: HTTPException
+  .. autofunction:: exception_response
 
-  .. autoclass:: HTTPOk
+  .. autoexception:: HTTPException
 
-  .. autoclass:: HTTPRedirection
+  .. autoexception:: HTTPOk
 
-  .. autoclass:: HTTPError
+  .. autoexception:: HTTPRedirection
 
-  .. autoclass:: HTTPClientError
+  .. autoexception:: HTTPError
 
-  .. autoclass:: HTTPServerError
+  .. autoexception:: HTTPClientError
 
-  .. autoclass:: HTTPCreated
+  .. autoexception:: HTTPServerError
 
-  .. autoclass:: HTTPAccepted
+  .. autoexception:: HTTPCreated
 
-  .. autoclass:: HTTPNonAuthoritativeInformation
+  .. autoexception:: HTTPAccepted
 
-  .. autoclass:: HTTPNoContent
+  .. autoexception:: HTTPNonAuthoritativeInformation
 
-  .. autoclass:: HTTPResetContent
+  .. autoexception:: HTTPNoContent
 
-  .. autoclass:: HTTPPartialContent
+  .. autoexception:: HTTPResetContent
 
-  .. autoclass:: HTTPMultipleChoices
+  .. autoexception:: HTTPPartialContent
 
-  .. autoclass:: HTTPMovedPermanently
+  .. autoexception:: HTTPMultipleChoices
 
-  .. autoclass:: HTTPFound
+  .. autoexception:: HTTPMovedPermanently
 
-  .. autoclass:: HTTPSeeOther
+  .. autoexception:: HTTPFound
 
-  .. autoclass:: HTTPNotModified
+  .. autoexception:: HTTPSeeOther
 
-  .. autoclass:: HTTPUseProxy
+  .. autoexception:: HTTPNotModified
 
-  .. autoclass:: HTTPTemporaryRedirect
+  .. autoexception:: HTTPUseProxy
 
-  .. autoclass:: HTTPBadRequest
+  .. autoexception:: HTTPTemporaryRedirect
 
-  .. autoclass:: HTTPUnauthorized
+  .. autoexception:: HTTPBadRequest
 
-  .. autoclass:: HTTPPaymentRequired
+  .. autoexception:: HTTPUnauthorized
 
-  .. autoclass:: HTTPForbidden
+  .. autoexception:: HTTPPaymentRequired
 
-  .. autoclass:: HTTPNotFound
+  .. autoexception:: HTTPForbidden
 
-  .. autoclass:: HTTPMethodNotAllowed
+  .. autoexception:: HTTPNotFound
 
-  .. autoclass:: HTTPNotAcceptable
+  .. autoexception:: HTTPMethodNotAllowed
 
-  .. autoclass:: HTTPProxyAuthenticationRequired
+  .. autoexception:: HTTPNotAcceptable
 
-  .. autoclass:: HTTPRequestTimeout
+  .. autoexception:: HTTPProxyAuthenticationRequired
 
-  .. autoclass:: HTTPConflict
+  .. autoexception:: HTTPRequestTimeout
 
-  .. autoclass:: HTTPGone
+  .. autoexception:: HTTPConflict
 
-  .. autoclass:: HTTPLengthRequired
+  .. autoexception:: HTTPGone
 
-  .. autoclass:: HTTPPreconditionFailed
+  .. autoexception:: HTTPLengthRequired
 
-  .. autoclass:: HTTPRequestEntityTooLarge
+  .. autoexception:: HTTPPreconditionFailed
 
-  .. autoclass:: HTTPRequestURITooLong
+  .. autoexception:: HTTPRequestEntityTooLarge
 
-  .. autoclass:: HTTPUnsupportedMediaType
+  .. autoexception:: HTTPRequestURITooLong
 
-  .. autoclass:: HTTPRequestRangeNotSatisfiable
+  .. autoexception:: HTTPUnsupportedMediaType
 
-  .. autoclass:: HTTPExpectationFailed
+  .. autoexception:: HTTPRequestRangeNotSatisfiable
 
-  .. autoclass:: HTTPInternalServerError
+  .. autoexception:: HTTPExpectationFailed
 
-  .. autoclass:: HTTPNotImplemented
+  .. autoexception:: HTTPUnprocessableEntity
 
-  .. autoclass:: HTTPBadGateway
+  .. autoexception:: HTTPLocked
 
-  .. autoclass:: HTTPServiceUnavailable
+  .. autoexception:: HTTPFailedDependency
 
-  .. autoclass:: HTTPGatewayTimeout
+  .. autoexception:: HTTPInternalServerError
 
-  .. autoclass:: HTTPVersionNotSupported
+  .. autoexception:: HTTPNotImplemented
+
+  .. autoexception:: HTTPBadGateway
+
+  .. autoexception:: HTTPServiceUnavailable
+
+  .. autoexception:: HTTPGatewayTimeout
+
+  .. autoexception:: HTTPVersionNotSupported
+
+  .. autoexception:: HTTPInsufficientStorage

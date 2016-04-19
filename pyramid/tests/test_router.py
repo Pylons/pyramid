@@ -4,9 +4,8 @@ from pyramid import testing
 
 class TestRouter(unittest.TestCase):
     def setUp(self):
-        testing.setUp()
-        from pyramid.threadlocal import get_current_registry
-        self.registry = get_current_registry()
+        self.config = testing.setUp()
+        self.registry = self.config.registry
 
     def tearDown(self):
         testing.tearDown()
@@ -25,7 +24,7 @@ class TestRouter(unittest.TestCase):
         if mapper is None:
             mapper = RoutesMapper()
             self.registry.registerUtility(mapper, IRoutesMapper)
-        mapper.connect(name, path, factory)
+        return mapper.connect(name, path, factory)
 
     def _registerLogger(self):
         from pyramid.interfaces import IDebugLogger
@@ -135,70 +134,118 @@ class TestRouter(unittest.TestCase):
         router = self._makeOne()
         self.assertEqual(router.request_factory, DummyRequestFactory)
 
+    def test_tween_factories(self):
+        from pyramid.interfaces import ITweens
+        from pyramid.config.tweens import Tweens
+        from pyramid.response import Response
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IResponse
+        tweens = Tweens()
+        self.registry.registerUtility(tweens, ITweens)
+        L = []
+        def tween_factory1(handler, registry):
+            L.append((handler, registry))
+            def wrapper(request):
+                request.environ['handled'].append('one')
+                return handler(request)
+            wrapper.name = 'one'
+            wrapper.child = handler
+            return wrapper
+        def tween_factory2(handler, registry):
+            L.append((handler, registry))
+            def wrapper(request):
+                request.environ['handled'] = ['two']
+                return handler(request)
+            wrapper.name = 'two'
+            wrapper.child = handler
+            return wrapper
+        tweens.add_implicit('one', tween_factory1)
+        tweens.add_implicit('two', tween_factory2)
+        router = self._makeOne()
+        self.assertEqual(router.handle_request.name, 'two')
+        self.assertEqual(router.handle_request.child.name, 'one')
+        self.assertEqual(router.handle_request.child.child.__name__,
+                         'handle_request')
+        context = DummyContext()
+        self._registerTraverserFactory(context)
+        environ = self._makeEnviron()
+        view = DummyView('abc')
+        self._registerView(self.config.derive_view(view), '',
+                           IViewClassifier, None, None)
+        start_response = DummyStartResponse()
+        def make_response(s):
+            return Response(s)
+        router.registry.registerAdapter(make_response, (str,), IResponse)
+        app_iter = router(environ, start_response)
+        self.assertEqual(app_iter, [b'abc'])
+        self.assertEqual(start_response.status, '200 OK')
+        self.assertEqual(environ['handled'], ['two', 'one'])
+
     def test_call_traverser_default(self):
-        from pyramid.exceptions import NotFound
+        from pyramid.httpexceptions import HTTPNotFound
         environ = self._makeEnviron()
         logger = self._registerLogger()
         router = self._makeOne()
         start_response = DummyStartResponse()
-        why = exc_raised(NotFound, router, environ, start_response)
-        self.assertTrue('/' in why[0], why)
-        self.assertFalse('debug_notfound' in why[0])
+        why = exc_raised(HTTPNotFound, router, environ, start_response)
+        self.assertTrue('/' in why.args[0], why)
+        self.assertFalse('debug_notfound' in why.args[0])
         self.assertEqual(len(logger.messages), 0)
 
     def test_traverser_raises_notfound_class(self):
-        from pyramid.exceptions import NotFound
+        from pyramid.httpexceptions import HTTPNotFound
         environ = self._makeEnviron()
         context = DummyContext()
-        self._registerTraverserFactory(context, raise_error=NotFound)
+        self._registerTraverserFactory(context, raise_error=HTTPNotFound)
         router = self._makeOne()
         start_response = DummyStartResponse()
-        self.assertRaises(NotFound, router, environ, start_response)
+        self.assertRaises(HTTPNotFound, router, environ, start_response)
 
     def test_traverser_raises_notfound_instance(self):
-        from pyramid.exceptions import NotFound
+        from pyramid.httpexceptions import HTTPNotFound
         environ = self._makeEnviron()
         context = DummyContext()
-        self._registerTraverserFactory(context, raise_error=NotFound('foo'))
+        self._registerTraverserFactory(context, raise_error=HTTPNotFound('foo'))
         router = self._makeOne()
         start_response = DummyStartResponse()
-        why = exc_raised(NotFound, router, environ, start_response)
-        self.assertTrue('foo' in why[0], why)
+        why = exc_raised(HTTPNotFound, router, environ, start_response)
+        self.assertTrue('foo' in why.args[0], why)
 
     def test_traverser_raises_forbidden_class(self):
-        from pyramid.exceptions import Forbidden
+        from pyramid.httpexceptions import HTTPForbidden
         environ = self._makeEnviron()
         context = DummyContext()
-        self._registerTraverserFactory(context, raise_error=Forbidden)
+        self._registerTraverserFactory(context, raise_error=HTTPForbidden)
         router = self._makeOne()
         start_response = DummyStartResponse()
-        self.assertRaises(Forbidden, router, environ, start_response)
+        self.assertRaises(HTTPForbidden, router, environ, start_response)
 
     def test_traverser_raises_forbidden_instance(self):
-        from pyramid.exceptions import Forbidden
+        from pyramid.httpexceptions import HTTPForbidden
         environ = self._makeEnviron()
         context = DummyContext()
-        self._registerTraverserFactory(context, raise_error=Forbidden('foo'))
+        self._registerTraverserFactory(context,
+                                       raise_error=HTTPForbidden('foo'))
         router = self._makeOne()
         start_response = DummyStartResponse()
-        why = exc_raised(Forbidden, router, environ, start_response)
-        self.assertTrue('foo' in why[0], why)
+        why = exc_raised(HTTPForbidden, router, environ, start_response)
+        self.assertTrue('foo' in why.args[0], why)
 
     def test_call_no_view_registered_no_isettings(self):
-        from pyramid.exceptions import NotFound
+        from pyramid.httpexceptions import HTTPNotFound
         environ = self._makeEnviron()
         context = DummyContext()
         self._registerTraverserFactory(context)
         logger = self._registerLogger()
         router = self._makeOne()
         start_response = DummyStartResponse()
-        why = exc_raised(NotFound, router, environ, start_response)
-        self.assertTrue('/' in why[0], why)
-        self.assertFalse('debug_notfound' in why[0])
+        why = exc_raised(HTTPNotFound, router, environ, start_response)
+        self.assertTrue('/' in why.args[0], why)
+        self.assertFalse('debug_notfound' in why.args[0])
         self.assertEqual(len(logger.messages), 0)
 
     def test_call_no_view_registered_debug_notfound_false(self):
-        from pyramid.exceptions import NotFound
+        from pyramid.httpexceptions import HTTPNotFound
         environ = self._makeEnviron()
         context = DummyContext()
         self._registerTraverserFactory(context)
@@ -206,13 +253,13 @@ class TestRouter(unittest.TestCase):
         self._registerSettings(debug_notfound=False)
         router = self._makeOne()
         start_response = DummyStartResponse()
-        why = exc_raised(NotFound, router, environ, start_response)
-        self.assertTrue('/' in why[0], why)
-        self.assertFalse('debug_notfound' in why[0])
+        why = exc_raised(HTTPNotFound, router, environ, start_response)
+        self.assertTrue('/' in why.args[0], why)
+        self.assertFalse('debug_notfound' in why.args[0])
         self.assertEqual(len(logger.messages), 0)
 
     def test_call_no_view_registered_debug_notfound_true(self):
-        from pyramid.exceptions import NotFound
+        from pyramid.httpexceptions import HTTPNotFound
         environ = self._makeEnviron()
         context = DummyContext()
         self._registerTraverserFactory(context)
@@ -220,31 +267,84 @@ class TestRouter(unittest.TestCase):
         logger = self._registerLogger()
         router = self._makeOne()
         start_response = DummyStartResponse()
-        why = exc_raised(NotFound, router, environ, start_response)
+        why = exc_raised(HTTPNotFound, router, environ, start_response)
         self.assertTrue(
-            "debug_notfound of url http://localhost:8080/; path_info: '/', "
-            "context:" in why[0])
-        self.assertTrue("view_name: '', subpath: []" in why[0])
-        self.assertTrue('http://localhost:8080' in why[0], why)
+            "debug_notfound of url http://localhost:8080/; " in why.args[0])
+        self.assertTrue("view_name: '', subpath: []" in why.args[0])
+        self.assertTrue('http://localhost:8080' in why.args[0], why)
 
         self.assertEqual(len(logger.messages), 1)
         message = logger.messages[0]
         self.assertTrue('of url http://localhost:8080' in message)
-        self.assertTrue("path_info: '/'" in message)
-        self.assertTrue('DummyContext instance at' in message)
+        self.assertTrue("path_info: " in message)
+        self.assertTrue('DummyContext' in message)
         self.assertTrue("view_name: ''" in message)
         self.assertTrue("subpath: []" in message)
 
-    def test_call_view_returns_nonresponse(self):
+    def test_call_view_returns_non_iresponse(self):
         from pyramid.interfaces import IViewClassifier
         context = DummyContext()
         self._registerTraverserFactory(context)
         environ = self._makeEnviron()
         view = DummyView('abc')
-        self._registerView(view, '', IViewClassifier, None, None)
+        self._registerView(self.config.derive_view(view), '', IViewClassifier,
+                           None, None)
         router = self._makeOne()
         start_response = DummyStartResponse()
         self.assertRaises(ValueError, router, environ, start_response)
+
+    def test_call_view_returns_adapted_response(self):
+        from pyramid.response import Response
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IResponse
+        context = DummyContext()
+        self._registerTraverserFactory(context)
+        environ = self._makeEnviron()
+        view = DummyView('abc')
+        self._registerView(self.config.derive_view(view), '',
+                           IViewClassifier, None, None)
+        router = self._makeOne()
+        start_response = DummyStartResponse()
+        def make_response(s):
+            return Response(s)
+        router.registry.registerAdapter(make_response, (str,), IResponse)
+        app_iter = router(environ, start_response)
+        self.assertEqual(app_iter, [b'abc'])
+        self.assertEqual(start_response.status, '200 OK')
+
+    def test_call_with_request_extensions(self):
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IRequestExtensions
+        from pyramid.interfaces import IRequest
+        from pyramid.request import Request
+        from pyramid.util import InstancePropertyHelper
+        context = DummyContext()
+        self._registerTraverserFactory(context)
+        class Extensions(object):
+            def __init__(self):
+                self.methods = {}
+                self.descriptors = {}
+        extensions = Extensions()
+        ext_method = lambda r: 'bar'
+        name, fn = InstancePropertyHelper.make_property(ext_method, name='foo')
+        extensions.descriptors[name] = fn
+        request = Request.blank('/')
+        request.request_iface = IRequest
+        request.registry = self.registry
+        def request_factory(environ):
+            return request
+        self.registry.registerUtility(extensions, IRequestExtensions)
+        environ = self._makeEnviron()
+        response = DummyResponse()
+        response.app_iter = ['Hello world']
+        view = DummyView(response)
+        self._registerView(self.config.derive_view(view), '',
+                           IViewClassifier, None, None)
+        router = self._makeOne()
+        router.request_factory = request_factory
+        start_response = DummyStartResponse()
+        router(environ, start_response)
+        self.assertEqual(view.request.foo, 'bar')
 
     def test_call_view_registered_nonspecific_default_path(self):
         from pyramid.interfaces import IViewClassifier
@@ -254,7 +354,8 @@ class TestRouter(unittest.TestCase):
         response.app_iter = ['Hello world']
         view = DummyView(response)
         environ = self._makeEnviron()
-        self._registerView(view, '', IViewClassifier, None, None)
+        self._registerView(self.config.derive_view(view), '',
+                           IViewClassifier, None, None)
         self._registerRootFactory(context)
         router = self._makeOne()
         start_response = DummyStartResponse()
@@ -323,7 +424,7 @@ class TestRouter(unittest.TestCase):
     def test_call_view_registered_specific_fail(self):
         from zope.interface import Interface
         from zope.interface import directlyProvides
-        from pyramid.exceptions import NotFound
+        from pyramid.httpexceptions import HTTPNotFound
         from pyramid.interfaces import IViewClassifier
         class IContext(Interface):
             pass
@@ -339,12 +440,12 @@ class TestRouter(unittest.TestCase):
         self._registerView(view, '', IViewClassifier, IRequest, IContext)
         router = self._makeOne()
         start_response = DummyStartResponse()
-        self.assertRaises(NotFound, router, environ, start_response)
+        self.assertRaises(HTTPNotFound, router, environ, start_response)
 
     def test_call_view_raises_forbidden(self):
         from zope.interface import Interface
         from zope.interface import directlyProvides
-        from pyramid.exceptions import Forbidden
+        from pyramid.httpexceptions import HTTPForbidden
         class IContext(Interface):
             pass
         from pyramid.interfaces import IRequest
@@ -353,13 +454,14 @@ class TestRouter(unittest.TestCase):
         directlyProvides(context, IContext)
         self._registerTraverserFactory(context, subpath=[''])
         response = DummyResponse()
-        view = DummyView(response, raise_exception=Forbidden("unauthorized"))
+        view = DummyView(response,
+                         raise_exception=HTTPForbidden("unauthorized"))
         environ = self._makeEnviron()
         self._registerView(view, '', IViewClassifier, IRequest, IContext)
         router = self._makeOne()
         start_response = DummyStartResponse()
-        why = exc_raised(Forbidden, router, environ, start_response)
-        self.assertEqual(why[0], 'unauthorized')
+        why = exc_raised(HTTPForbidden, router, environ, start_response)
+        self.assertEqual(why.args[0], 'unauthorized')
 
     def test_call_view_raises_notfound(self):
         from zope.interface import Interface
@@ -368,18 +470,45 @@ class TestRouter(unittest.TestCase):
             pass
         from pyramid.interfaces import IRequest
         from pyramid.interfaces import IViewClassifier
-        from pyramid.exceptions import NotFound
+        from pyramid.httpexceptions import HTTPNotFound
         context = DummyContext()
         directlyProvides(context, IContext)
         self._registerTraverserFactory(context, subpath=[''])
         response = DummyResponse()
-        view = DummyView(response, raise_exception=NotFound("notfound"))
+        view = DummyView(response, raise_exception=HTTPNotFound("notfound"))
         environ = self._makeEnviron()
         self._registerView(view, '', IViewClassifier, IRequest, IContext)
         router = self._makeOne()
         start_response = DummyStartResponse()
-        why = exc_raised(NotFound, router, environ, start_response)
-        self.assertEqual(why[0], 'notfound')
+        why = exc_raised(HTTPNotFound, router, environ, start_response)
+        self.assertEqual(why.args[0], 'notfound')
+
+    def test_call_view_raises_response_cleared(self):
+        from zope.interface import Interface
+        from zope.interface import directlyProvides
+        from pyramid.interfaces import IExceptionViewClassifier
+        class IContext(Interface):
+            pass
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IViewClassifier
+        context = DummyContext()
+        directlyProvides(context, IContext)
+        self._registerTraverserFactory(context, subpath=[''])
+        def view(context, request):
+            request.response.a = 1
+            raise KeyError
+        def exc_view(context, request):
+            self.assertFalse(hasattr(request.response, 'a'))
+            request.response.body = b'OK'
+            return request.response
+        environ = self._makeEnviron()
+        self._registerView(view, '', IViewClassifier, IRequest, IContext)
+        self._registerView(exc_view, '', IExceptionViewClassifier,
+                           IRequest, KeyError)
+        router = self._makeOne()
+        start_response = DummyStartResponse()
+        itera = router(environ, start_response)
+        self.assertEqual(itera, [b'OK'])
 
     def test_call_request_has_response_callbacks(self):
         from zope.interface import Interface
@@ -395,7 +524,7 @@ class TestRouter(unittest.TestCase):
         def view(context, request):
             def callback(request, response):
                 response.called_back = True
-            request.response_callbacks = [callback]
+            request.add_response_callback(callback)
             return response
         environ = self._makeEnviron()
         self._registerView(view, '', IViewClassifier, IRequest, IContext)
@@ -418,7 +547,7 @@ class TestRouter(unittest.TestCase):
         def view(context, request):
             def callback(request):
                 request.environ['called_back'] = True
-            request.finished_callbacks = [callback]
+            request.add_finished_callback(callback)
             return response
         environ = self._makeEnviron()
         self._registerView(view, '', IViewClassifier, IRequest, IContext)
@@ -440,7 +569,7 @@ class TestRouter(unittest.TestCase):
         def view(context, request):
             def callback(request):
                 request.environ['called_back'] = True
-            request.finished_callbacks = [callback]
+            request.add_finished_callback(callback)
             raise NotImplementedError
         environ = self._makeEnviron()
         self._registerView(view, '', IViewClassifier, IRequest, IContext)
@@ -462,6 +591,7 @@ class TestRouter(unittest.TestCase):
     def test_call_eventsends(self):
         from pyramid.interfaces import INewRequest
         from pyramid.interfaces import INewResponse
+        from pyramid.interfaces import IBeforeTraversal
         from pyramid.interfaces import IContextFound
         from pyramid.interfaces import IViewClassifier
         context = DummyContext()
@@ -472,17 +602,22 @@ class TestRouter(unittest.TestCase):
         environ = self._makeEnviron()
         self._registerView(view, '', IViewClassifier, None, None)
         request_events = self._registerEventListener(INewRequest)
-        aftertraversal_events = self._registerEventListener(IContextFound)
+        beforetraversal_events = self._registerEventListener(IBeforeTraversal)
+        context_found_events = self._registerEventListener(IContextFound)
         response_events = self._registerEventListener(INewResponse)
         router = self._makeOne()
         start_response = DummyStartResponse()
         result = router(environ, start_response)
         self.assertEqual(len(request_events), 1)
         self.assertEqual(request_events[0].request.environ, environ)
-        self.assertEqual(len(aftertraversal_events), 1)
-        self.assertEqual(aftertraversal_events[0].request.environ, environ)
+        self.assertEqual(len(beforetraversal_events), 1)
+        self.assertEqual(beforetraversal_events[0].request.environ, environ)
+        self.assertEqual(len(context_found_events), 1)
+        self.assertEqual(context_found_events[0].request.environ, environ)
+        self.assertEqual(context_found_events[0].request.context, context)
         self.assertEqual(len(response_events), 1)
         self.assertEqual(response_events[0].response, response)
+        self.assertEqual(response_events[0].request.context, context)
         self.assertEqual(result, response.app_iter)
 
     def test_call_newrequest_evllist_exc_can_be_caught_by_exceptionview(self):
@@ -530,7 +665,8 @@ class TestRouter(unittest.TestCase):
         root = object()
         def factory(request):
             return root
-        self._connectRoute('foo', 'archives/:action/:article', factory)
+        route = self._connectRoute('foo', 'archives/:action/:article', factory)
+        route.predicates = [DummyPredicate()]
         context = DummyContext()
         self._registerTraverserFactory(context)
         response = DummyResponse()
@@ -551,22 +687,22 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(request.context, context)
         self.assertEqual(request.root, root)
         matchdict = {'action':'action1', 'article':'article1'}
-        self.assertEqual(environ['bfg.routes.matchdict'], matchdict)
-        self.assertEqual(environ['bfg.routes.route'].name, 'foo')
         self.assertEqual(request.matchdict, matchdict)
         self.assertEqual(request.matched_route.name, 'foo')
-
         self.assertEqual(len(logger.messages), 1)
         self.assertTrue(
             logger.messages[0].startswith(
             "route matched for url http://localhost:8080"
             "/archives/action1/article1; "
             "route_name: 'foo', "
-            "path_info: '/archives/action1/article1', "
-            "pattern: 'archives/:action/:article', "))
+            "path_info: ")
+            )
+        self.assertTrue(
+            "predicates: 'predicate'" in logger.messages[0]
+            )
 
     def test_call_route_match_miss_debug_routematch(self):
-        from pyramid.exceptions import NotFound
+        from pyramid.httpexceptions import HTTPNotFound
         logger = self._registerLogger()
         self._registerSettings(debug_routematch=True)
         self._registerRouteRequest('foo')
@@ -577,7 +713,7 @@ class TestRouter(unittest.TestCase):
         self._registerRootFactory(context)
         router = self._makeOne()
         start_response = DummyStartResponse()
-        self.assertRaises(NotFound, router, environ, start_response)
+        self.assertRaises(HTTPNotFound, router, environ, start_response)
 
         self.assertEqual(len(logger.messages), 1)
         self.assertEqual(
@@ -619,19 +755,17 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(request.context, context)
         self.assertEqual(request.root, root)
         matchdict = {'action':'action1', 'article':'article1'}
-        self.assertEqual(environ['bfg.routes.matchdict'], matchdict)
-        self.assertEqual(environ['bfg.routes.route'].name, 'foo')
         self.assertEqual(request.matchdict, matchdict)
         self.assertEqual(request.matched_route.name, 'foo')
         self.assertTrue(IFoo.providedBy(request))
 
     def test_root_factory_raises_notfound(self):
         from pyramid.interfaces import IRootFactory
-        from pyramid.exceptions import NotFound
+        from pyramid.httpexceptions import HTTPNotFound
         from zope.interface import Interface
         from zope.interface import directlyProvides
         def rootfactory(request):
-            raise NotFound('from root factory')
+            raise HTTPNotFound('from root factory')
         self.registry.registerUtility(rootfactory, IRootFactory)
         class IContext(Interface):
             pass
@@ -640,16 +774,16 @@ class TestRouter(unittest.TestCase):
         environ = self._makeEnviron()
         router = self._makeOne()
         start_response = DummyStartResponse()
-        why = exc_raised(NotFound, router, environ, start_response)
-        self.assertTrue('from root factory' in why[0])
+        why = exc_raised(HTTPNotFound, router, environ, start_response)
+        self.assertTrue('from root factory' in why.args[0])
 
     def test_root_factory_raises_forbidden(self):
         from pyramid.interfaces import IRootFactory
-        from pyramid.exceptions import Forbidden
+        from pyramid.httpexceptions import HTTPForbidden
         from zope.interface import Interface
         from zope.interface import directlyProvides
         def rootfactory(request):
-            raise Forbidden('from root factory')
+            raise HTTPForbidden('from root factory')
         self.registry.registerUtility(rootfactory, IRootFactory)
         class IContext(Interface):
             pass
@@ -658,8 +792,8 @@ class TestRouter(unittest.TestCase):
         environ = self._makeEnviron()
         router = self._makeOne()
         start_response = DummyStartResponse()
-        why = exc_raised(Forbidden, router, environ, start_response)
-        self.assertTrue('from root factory' in why[0])
+        why = exc_raised(HTTPForbidden, router, environ, start_response)
+        self.assertTrue('from root factory' in why.args[0])
 
     def test_root_factory_exception_propagating(self):
         from pyramid.interfaces import IRootFactory
@@ -693,6 +827,7 @@ class TestRouter(unittest.TestCase):
         from pyramid.interfaces import IRequest
         from pyramid.interfaces import IViewClassifier
         from pyramid.interfaces import IRequestFactory
+        from pyramid.interfaces import IExceptionViewClassifier
         def rfactory(environ):
             return request
         self.registry.registerUtility(rfactory, IRequestFactory)
@@ -702,16 +837,26 @@ class TestRouter(unittest.TestCase):
         directlyProvides(context, IContext)
         self._registerTraverserFactory(context, subpath=[''])
         response = DummyResponse()
-        view = DummyView(response, raise_exception=RuntimeError)
+        response.app_iter = ['OK']
+        error = RuntimeError()
+        view = DummyView(response, raise_exception=error)
         environ = self._makeEnviron()
+        def exception_view(context, request):
+            self.assertEqual(request.exc_info[0], RuntimeError)
+            return response
         self._registerView(view, '', IViewClassifier, IRequest, IContext)
+        self._registerView(exception_view, '', IExceptionViewClassifier,
+                           IRequest, RuntimeError)
         router = self._makeOne()
         start_response = DummyStartResponse()
-        self.assertRaises(RuntimeError, router, environ, start_response)
-        # ``exception`` must be attached to request even if a suitable
-        # exception view cannot be found
-        self.assertEqual(request.exception.__class__, RuntimeError)
-
+        result = router(environ, start_response)
+        self.assertEqual(result, ['OK'])
+        # exc_info and exception should still be around on the request after
+        # the excview tween has run (see
+        # https://github.com/Pylons/pyramid/issues/1223)
+        self.assertEqual(request.exception, error)
+        self.assertEqual(request.exc_info[:2], (RuntimeError, error,))
+        
     def test_call_view_raises_exception_view(self):
         from pyramid.interfaces import IViewClassifier
         from pyramid.interfaces import IExceptionViewClassifier
@@ -720,7 +865,9 @@ class TestRouter(unittest.TestCase):
         exception_response = DummyResponse()
         exception_response.app_iter = ["Hello, world"]
         view = DummyView(response, raise_exception=RuntimeError)
-        exception_view = DummyView(exception_response)
+        def exception_view(context, request):
+            self.assertEqual(request.exception.__class__, RuntimeError)
+            return exception_response
         environ = self._makeEnviron()
         self._registerView(view, '', IViewClassifier, IRequest, None)
         self._registerView(exception_view, '', IExceptionViewClassifier,
@@ -729,7 +876,6 @@ class TestRouter(unittest.TestCase):
         start_response = DummyStartResponse()
         result = router(environ, start_response)
         self.assertEqual(result, ["Hello, world"])
-        self.assertEqual(view.request.exception.__class__, RuntimeError)
 
     def test_call_view_raises_super_exception_sub_exception_view(self):
         from pyramid.interfaces import IViewClassifier
@@ -829,16 +975,19 @@ class TestRouter(unittest.TestCase):
         result = router(environ, start_response)
         self.assertEqual(result, ["Hello, world"])
 
-    def test_exception_view_returns_non_response(self):
+    def test_exception_view_returns_non_iresponse(self):
         from pyramid.interfaces import IRequest
         from pyramid.interfaces import IViewClassifier
         from pyramid.interfaces import IExceptionViewClassifier
         environ = self._makeEnviron()
         response = DummyResponse()
         view = DummyView(response, raise_exception=RuntimeError)
-        self._registerView(view, '', IViewClassifier, IRequest, None)
+        
+        self._registerView(self.config.derive_view(view), '',
+                           IViewClassifier, IRequest, None)
         exception_view = DummyView(None)
-        self._registerView(exception_view, '', IExceptionViewClassifier,
+        self._registerView(self.config.derive_view(exception_view), '',
+                           IExceptionViewClassifier,
                            IRequest, RuntimeError)
         router = self._makeOne()
         start_response = DummyStartResponse()
@@ -1026,6 +1175,108 @@ class TestRouter(unittest.TestCase):
         start_response = DummyStartResponse()
         self.assertRaises(RuntimeError, router, environ, start_response)
 
+    def test_call_view_raises_predicate_mismatch(self):
+        from pyramid.exceptions import PredicateMismatch
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IRequest
+        view = DummyView(DummyResponse(), raise_exception=PredicateMismatch)
+        self._registerView(view, '', IViewClassifier, IRequest, None)
+        environ = self._makeEnviron()
+        router = self._makeOne()
+        start_response = DummyStartResponse()
+        self.assertRaises(PredicateMismatch, router, environ, start_response)
+
+    def test_call_view_predicate_mismatch_doesnt_hide_views(self):
+        from pyramid.exceptions import PredicateMismatch
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IRequest, IResponse
+        from pyramid.response import Response
+        class BaseContext:
+            pass
+        class DummyContext(BaseContext):
+            pass
+        context = DummyContext()
+        self._registerTraverserFactory(context)
+        view = DummyView(DummyResponse(), raise_exception=PredicateMismatch)
+        self._registerView(view, '', IViewClassifier, IRequest,
+                           DummyContext)
+        good_view = DummyView('abc')
+        self._registerView(self.config.derive_view(good_view),
+                            '', IViewClassifier, IRequest, BaseContext)
+        router = self._makeOne()
+        def make_response(s):
+            return Response(s)
+        router.registry.registerAdapter(make_response, (str,), IResponse)
+        environ = self._makeEnviron()
+        start_response = DummyStartResponse()
+        app_iter = router(environ, start_response)
+        self.assertEqual(app_iter, [b'abc'])
+
+    def test_call_view_multiple_predicate_mismatches_dont_hide_views(self):
+        from pyramid.exceptions import PredicateMismatch
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IRequest, IResponse
+        from pyramid.response import Response
+        from zope.interface import Interface, implementer
+        class IBaseContext(Interface):
+            pass
+        class IContext(IBaseContext):
+            pass
+        @implementer(IContext)
+        class DummyContext:
+            pass
+        context = DummyContext()
+        self._registerTraverserFactory(context)
+        view1 = DummyView(DummyResponse(), raise_exception=PredicateMismatch)
+        self._registerView(view1, '', IViewClassifier, IRequest,
+                           DummyContext)
+        view2 = DummyView(DummyResponse(), raise_exception=PredicateMismatch)
+        self._registerView(view2, '', IViewClassifier, IRequest,
+                           IContext)
+        good_view = DummyView('abc')
+        self._registerView(self.config.derive_view(good_view),
+                            '', IViewClassifier, IRequest, IBaseContext)
+        router = self._makeOne()
+        def make_response(s):
+            return Response(s)
+        router.registry.registerAdapter(make_response, (str,), IResponse)
+        environ = self._makeEnviron()
+        start_response = DummyStartResponse()
+        app_iter = router(environ, start_response)
+        self.assertEqual(app_iter, [b'abc'])
+
+    def test_call_view_predicate_mismatch_doesnt_find_unrelated_views(self):
+        from pyramid.exceptions import PredicateMismatch
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IRequest
+        from zope.interface import Interface, implementer
+        class IContext(Interface):
+            pass
+        class IOtherContext(Interface):
+            pass
+        @implementer(IContext)
+        class DummyContext:
+            pass
+        context = DummyContext()
+        self._registerTraverserFactory(context)
+        view = DummyView(DummyResponse(), raise_exception=PredicateMismatch)
+        self._registerView(view, '', IViewClassifier, IRequest,
+                           DummyContext)
+        please_dont_call_me_view = DummyView('abc')
+        self._registerView(self.config.derive_view(please_dont_call_me_view),
+                            '', IViewClassifier, IRequest, IOtherContext)
+        router = self._makeOne()
+        environ = self._makeEnviron()
+        router = self._makeOne()
+        start_response = DummyStartResponse()
+        self.assertRaises(PredicateMismatch, router, environ, start_response)
+
+class DummyPredicate(object):
+    def __call__(self, info, request):
+        return True
+    def text(self):
+        return 'predicate'
+
 class DummyContext:
     pass
 
@@ -1037,7 +1288,7 @@ class DummyView:
     def __call__(self, context, request):
         self.context = context
         self.request = request
-        if not self.raise_exception is None:
+        if self.raise_exception is not None:
             raise self.raise_exception
         return self.response
 
@@ -1054,12 +1305,22 @@ class DummyStartResponse:
     def __call__(self, status, headers):
         self.status = status
         self.headers = headers
-        
-class DummyResponse:
+
+from pyramid.interfaces import IResponse
+from zope.interface import implementer
+
+@implementer(IResponse)
+class DummyResponse(object):
     headerlist = ()
     app_iter = ()
+    environ = None
     def __init__(self, status='200 OK'):
         self.status = status
+
+    def __call__(self, environ, start_response):
+        self.environ = environ
+        start_response(self.status, self.headerlist)
+        return self.app_iter
     
 class DummyThreadLocalManager:
     def __init__(self):
@@ -1086,7 +1347,7 @@ class DummyLogger:
 def exc_raised(exc, func, *arg, **kw):
     try:
         func(*arg, **kw)
-    except exc, e:
+    except exc as e:
         return e
     else:
         raise AssertionError('%s not raised' % exc) # pragma: no cover

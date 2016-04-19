@@ -31,5 +31,5 @@ if 0:
                     if filename.endswith('.rst'):
                         docs.append(os.path.join(root, filename))
 
-            print path
+            print(path)
             return manuel.testing.TestSuite(m, *docs)

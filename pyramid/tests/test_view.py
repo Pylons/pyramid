@@ -1,17 +1,20 @@
 import unittest
 import sys
 
-from pyramid.testing import cleanUp
+from zope.interface import implementer
+
+from pyramid import testing
+
+from pyramid.interfaces import IRequest
 
 class BaseTest(object):
     def setUp(self):
-        cleanUp()
+        self.config = testing.setUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.tearDown()
 
     def _registerView(self, reg, app, name):
-        from pyramid.interfaces import IRequest
         from pyramid.interfaces import IViewClassifier
         for_ = (IViewClassifier, IRequest, IContext)
         from pyramid.interfaces import IView
@@ -30,14 +33,11 @@ class BaseTest(object):
         return environ
 
     def _makeRequest(self, **environ):
-        from pyramid.interfaces import IRequest
-        from zope.interface import directlyProvides
-        from webob import Request
+        from pyramid.request import Request
         from pyramid.registry import Registry
         environ = self._makeEnviron(**environ)
         request = Request(environ)
         request.registry = Registry()
-        directlyProvides(request, IRequest)
         return request
 
     def _makeContext(self):
@@ -45,8 +45,94 @@ class BaseTest(object):
         context = DummyContext()
         directlyProvides(context, IContext)
         return context
-        
 
+class Test_notfound_view_config(BaseTest, unittest.TestCase):
+    def _makeOne(self, **kw):
+        from pyramid.view import notfound_view_config
+        return notfound_view_config(**kw)
+
+    def test_ctor(self):
+        inst = self._makeOne(attr='attr', path_info='path_info', 
+                             append_slash=True)
+        self.assertEqual(inst.__dict__,
+                         {'attr':'attr', 'path_info':'path_info',
+                          'append_slash':True})
+
+    def test_it_function(self):
+        def view(request): pass
+        decorator = self._makeOne(attr='attr', renderer='renderer',
+                                  append_slash=True)
+        venusian = DummyVenusian()
+        decorator.venusian = venusian
+        wrapped = decorator(view)
+        self.assertTrue(wrapped is view)
+        config = call_venusian(venusian)
+        settings = config.settings
+        self.assertEqual(
+            settings, 
+            [{'attr': 'attr', 'venusian': venusian, 'append_slash': True, 
+              'renderer': 'renderer', '_info': 'codeinfo', 'view': None}]
+            )
+
+    def test_it_class(self):
+        decorator = self._makeOne()
+        venusian = DummyVenusian()
+        decorator.venusian = venusian
+        decorator.venusian.info.scope = 'class'
+        class view(object): pass
+        wrapped = decorator(view)
+        self.assertTrue(wrapped is view)
+        config = call_venusian(venusian)
+        settings = config.settings
+        self.assertEqual(len(settings), 1)
+        self.assertEqual(len(settings[0]), 4)
+        self.assertEqual(settings[0]['venusian'], venusian)
+        self.assertEqual(settings[0]['view'], None) # comes from call_venusian
+        self.assertEqual(settings[0]['attr'], 'view')
+        self.assertEqual(settings[0]['_info'], 'codeinfo')
+
+class Test_forbidden_view_config(BaseTest, unittest.TestCase):
+    def _makeOne(self, **kw):
+        from pyramid.view import forbidden_view_config
+        return forbidden_view_config(**kw)
+
+    def test_ctor(self):
+        inst = self._makeOne(attr='attr', path_info='path_info')
+        self.assertEqual(inst.__dict__,
+                         {'attr':'attr', 'path_info':'path_info'})
+
+    def test_it_function(self):
+        def view(request): pass
+        decorator = self._makeOne(attr='attr', renderer='renderer')
+        venusian = DummyVenusian()
+        decorator.venusian = venusian
+        wrapped = decorator(view)
+        self.assertTrue(wrapped is view)
+        config = call_venusian(venusian)
+        settings = config.settings
+        self.assertEqual(
+            settings, 
+            [{'attr': 'attr', 'venusian': venusian, 
+              'renderer': 'renderer', '_info': 'codeinfo', 'view': None}]
+            )
+
+    def test_it_class(self):
+        decorator = self._makeOne()
+        venusian = DummyVenusian()
+        decorator.venusian = venusian
+        decorator.venusian.info.scope = 'class'
+        class view(object): pass
+        wrapped = decorator(view)
+        self.assertTrue(wrapped is view)
+        config = call_venusian(venusian)
+        settings = config.settings
+        self.assertEqual(len(settings), 1)
+        self.assertEqual(len(settings[0]), 4)
+        self.assertEqual(settings[0]['venusian'], venusian)
+        self.assertEqual(settings[0]['view'], None) # comes from call_venusian
+        self.assertEqual(settings[0]['attr'], 'view')
+        self.assertEqual(settings[0]['_info'], 'codeinfo')
+        
 class RenderViewToResponseTests(BaseTest, unittest.TestCase):
     def _callFUT(self, *arg, **kw):
         from pyramid.view import render_view_to_response
@@ -99,6 +185,20 @@ class RenderViewToResponseTests(BaseTest, unittest.TestCase):
         self.assertEqual(response.status, '200 OK')
         self.assertEqual(response.app_iter, ['anotherview'])
 
+    def test_call_view_with_request_iface_on_request(self):
+        # See https://github.com/Pylons/pyramid/issues/1643
+        from zope.interface import Interface
+        class IWontBeFound(Interface): pass
+        context = self._makeContext()
+        request = self._makeRequest()
+        request.request_iface = IWontBeFound
+        response = DummyResponse('aview')
+        view = make_view(response)
+        self._registerView(request.registry, view, 'aview')
+        response = self._callFUT(context, request, name='aview')
+        self.assertEqual(response.status, '200 OK')
+        self.assertEqual(response.app_iter, ['aview'])
+
 class RenderViewToIterableTests(BaseTest, unittest.TestCase):
     def _callFUT(self, *arg, **kw):
         from pyramid.view import render_view_to_iterable
@@ -136,12 +236,41 @@ class RenderViewToIterableTests(BaseTest, unittest.TestCase):
         response = DummyResponse()
         view = make_view(response)
         def anotherview(context, request):
-            return DummyResponse('anotherview')
+            return DummyResponse(b'anotherview')
         view.__call_permissive__ = anotherview
         self._registerView(request.registry, view, 'registered')
         iterable = self._callFUT(context, request, name='registered',
                                  secure=False)
-        self.assertEqual(iterable, ['anotherview'])
+        self.assertEqual(iterable, [b'anotherview'])
+
+    def test_verify_output_bytestring(self):
+        from pyramid.request import Request
+        from pyramid.config import Configurator
+        from pyramid.view import render_view
+        from webob.compat import text_type
+        config = Configurator(settings={})
+        def view(request):
+            request.response.text = text_type('<body></body>')
+            return request.response
+
+        config.add_view(name='test', view=view)
+        config.commit()
+
+        r = Request({})
+        r.registry = config.registry
+        self.assertEqual(render_view(object(), r, 'test'), b'<body></body>')
+
+    def test_call_request_has_no_registry(self):
+        request = self._makeRequest()
+        del request.registry
+        registry = self.config.registry
+        context = self._makeContext()
+        response = DummyResponse()
+        view = make_view(response)
+        self._registerView(registry, view, 'registered')
+        iterable = self._callFUT(context, request, name='registered',
+                                 secure=True)
+        self.assertEqual(iterable, ())
 
 class RenderViewTests(BaseTest, unittest.TestCase):
     def _callFUT(self, *arg, **kw):
@@ -161,7 +290,7 @@ class RenderViewTests(BaseTest, unittest.TestCase):
         view = make_view(response)
         self._registerView(request.registry, view, 'registered')
         s = self._callFUT(context, request, name='registered', secure=True)
-        self.assertEqual(s, '')
+        self.assertEqual(s, b'')
 
     def test_call_view_registered_insecure_no_call_permissive(self):
         context = self._makeContext()
@@ -170,7 +299,7 @@ class RenderViewTests(BaseTest, unittest.TestCase):
         view = make_view(response)
         self._registerView(request.registry, view, 'registered')
         s = self._callFUT(context, request, name='registered', secure=False)
-        self.assertEqual(s, '')
+        self.assertEqual(s, b'')
 
     def test_call_view_registered_insecure_with_call_permissive(self):
         context = self._makeContext()
@@ -178,55 +307,18 @@ class RenderViewTests(BaseTest, unittest.TestCase):
         response = DummyResponse()
         view = make_view(response)
         def anotherview(context, request):
-            return DummyResponse('anotherview')
+            return DummyResponse(b'anotherview')
         view.__call_permissive__ = anotherview
         self._registerView(request.registry, view, 'registered')
         s = self._callFUT(context, request, name='registered', secure=False)
-        self.assertEqual(s, 'anotherview')
-
-class TestIsResponse(unittest.TestCase):
-    def _callFUT(self, *arg, **kw):
-        from pyramid.view import is_response
-        return is_response(*arg, **kw)
-
-    def test_is(self):
-        response = DummyResponse()
-        self.assertEqual(self._callFUT(response), True)
-
-    def test_isnt(self):
-        response = None
-        self.assertEqual(self._callFUT(response), False)
-
-    def test_isnt_no_headerlist(self):
-        class Response(object):
-            pass
-        resp = Response
-        resp.status = '200 OK'
-        resp.app_iter = []
-        self.assertEqual(self._callFUT(resp), False)
-
-    def test_isnt_no_status(self):
-        class Response(object):
-            pass
-        resp = Response
-        resp.app_iter = []
-        resp.headerlist = ()
-        self.assertEqual(self._callFUT(resp), False)
-
-    def test_isnt_no_app_iter(self):
-        class Response(object):
-            pass
-        resp = Response
-        resp.status = '200 OK'
-        resp.headerlist = ()
-        self.assertEqual(self._callFUT(resp), False)
+        self.assertEqual(s, b'anotherview')
 
 class TestViewConfigDecorator(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.setUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.tearDown()
 
     def _getTargetClass(self):
         from pyramid.view import view_config
@@ -237,10 +329,7 @@ class TestViewConfigDecorator(unittest.TestCase):
 
     def test_create_defaults(self):
         decorator = self._makeOne()
-        self.assertEqual(decorator.name, '')
-        self.assertEqual(decorator.request_type, None)
-        self.assertEqual(decorator.context, None)
-        self.assertEqual(decorator.permission, None)
+        self.assertEqual(decorator.__dict__, {})
 
     def test_create_context_trumps_for(self):
         decorator = self._makeOne(context='123', for_='456')
@@ -251,15 +340,26 @@ class TestViewConfigDecorator(unittest.TestCase):
         self.assertEqual(decorator.context, '456')
         
     def test_create_nondefaults(self):
-        decorator = self._makeOne(name=None, request_type=None, for_=None,
-                                  permission='foo', mapper='mapper',
-                                  decorator='decorator')
+        decorator = self._makeOne(
+            name=None, request_type=None, for_=None,
+            permission='foo', mapper='mapper',
+            decorator='decorator', match_param='match_param'
+            )
         self.assertEqual(decorator.name, None)
         self.assertEqual(decorator.request_type, None)
         self.assertEqual(decorator.context, None)
         self.assertEqual(decorator.permission, 'foo')
         self.assertEqual(decorator.mapper, 'mapper')
         self.assertEqual(decorator.decorator, 'decorator')
+        self.assertEqual(decorator.match_param, 'match_param')
+
+    def test_create_with_other_predicates(self):
+        decorator = self._makeOne(foo=1)
+        self.assertEqual(decorator.foo, 1)
+
+    def test_create_decorator_tuple(self):
+        decorator = self._makeOne(decorator=('decorator1', 'decorator2'))
+        self.assertEqual(decorator.decorator, ('decorator1', 'decorator2'))
         
     def test_call_function(self):
         decorator = self._makeOne()
@@ -268,11 +368,14 @@ class TestViewConfigDecorator(unittest.TestCase):
         def foo(): pass
         wrapped = decorator(foo)
         self.assertTrue(wrapped is foo)
-        settings = call_venusian(venusian)
+        config = call_venusian(venusian)
+        settings = config.settings
         self.assertEqual(len(settings), 1)
-        self.assertEqual(settings[0]['permission'], None)
-        self.assertEqual(settings[0]['context'], None)
-        self.assertEqual(settings[0]['request_type'], None)
+        self.assertEqual(len(settings), 1)
+        self.assertEqual(len(settings[0]), 3)
+        self.assertEqual(settings[0]['venusian'], venusian)
+        self.assertEqual(settings[0]['view'], None) # comes from call_venusian
+        self.assertEqual(settings[0]['_info'], 'codeinfo')
 
     def test_call_class(self):
         decorator = self._makeOne()
@@ -282,12 +385,14 @@ class TestViewConfigDecorator(unittest.TestCase):
         class foo(object): pass
         wrapped = decorator(foo)
         self.assertTrue(wrapped is foo)
-        settings = call_venusian(venusian)
+        config = call_venusian(venusian)
+        settings = config.settings
         self.assertEqual(len(settings), 1)
-        self.assertEqual(settings[0]['permission'], None)
-        self.assertEqual(settings[0]['context'], None)
-        self.assertEqual(settings[0]['request_type'], None)
+        self.assertEqual(len(settings[0]), 4)
+        self.assertEqual(settings[0]['venusian'], venusian)
+        self.assertEqual(settings[0]['view'], None) # comes from call_venusian
         self.assertEqual(settings[0]['attr'], 'foo')
+        self.assertEqual(settings[0]['_info'], 'codeinfo')
 
     def test_call_class_attr_already_set(self):
         decorator = self._makeOne(attr='abc')
@@ -297,12 +402,14 @@ class TestViewConfigDecorator(unittest.TestCase):
         class foo(object): pass
         wrapped = decorator(foo)
         self.assertTrue(wrapped is foo)
-        settings = call_venusian(venusian)
+        config = call_venusian(venusian)
+        settings = config.settings
         self.assertEqual(len(settings), 1)
-        self.assertEqual(settings[0]['permission'], None)
-        self.assertEqual(settings[0]['context'], None)
-        self.assertEqual(settings[0]['request_type'], None)
+        self.assertEqual(len(settings[0]), 4)
+        self.assertEqual(settings[0]['venusian'], venusian)
+        self.assertEqual(settings[0]['view'], None) # comes from call_venusian
         self.assertEqual(settings[0]['attr'], 'abc')
+        self.assertEqual(settings[0]['_info'], 'codeinfo')
 
     def test_stacking(self):
         decorator1 = self._makeOne(name='1')
@@ -316,12 +423,12 @@ class TestViewConfigDecorator(unittest.TestCase):
         wrapped2 = decorator2(wrapped1)
         self.assertTrue(wrapped1 is foo)
         self.assertTrue(wrapped2 is foo)
-        settings1 = call_venusian(venusian1)
-        self.assertEqual(len(settings1), 1)
-        self.assertEqual(settings1[0]['name'], '1')
-        settings2 = call_venusian(venusian2)
-        self.assertEqual(len(settings2), 1)
-        self.assertEqual(settings2[0]['name'], '2')
+        config1 = call_venusian(venusian1)
+        self.assertEqual(len(config1.settings), 1)
+        self.assertEqual(config1.settings[0]['name'], '1')
+        config2 = call_venusian(venusian2)
+        self.assertEqual(len(config2.settings), 1)
+        self.assertEqual(config2.settings[0]['name'], '2')
 
     def test_call_as_method(self):
         decorator = self._makeOne()
@@ -333,7 +440,8 @@ class TestViewConfigDecorator(unittest.TestCase):
         class foo(object):
             foomethod = decorator(foo)
             barmethod = decorator(bar)
-        settings = call_venusian(venusian)
+        config = call_venusian(venusian)
+        settings = config.settings
         self.assertEqual(len(settings), 2)
         self.assertEqual(settings[0]['attr'], 'foo')
         self.assertEqual(settings[1]['attr'], 'bar')
@@ -345,7 +453,8 @@ class TestViewConfigDecorator(unittest.TestCase):
         def foo(context, request): pass
         decorated = decorator(foo)
         self.assertTrue(decorated is foo)
-        settings = call_venusian(venusian)
+        config = call_venusian(venusian)
+        settings = config.settings
         self.assertEqual(settings[0]['custom_predicates'], (1,))
 
     def test_call_with_renderer_string(self):
@@ -356,23 +465,55 @@ class TestViewConfigDecorator(unittest.TestCase):
         def foo(): pass
         wrapped = decorator(foo)
         self.assertTrue(wrapped is foo)
-        settings = call_venusian(venusian)
+        config = call_venusian(venusian)
+        settings = config.settings
         self.assertEqual(len(settings), 1)
         renderer = settings[0]['renderer']
-        self.assertEqual(renderer.name, 'fixtures/minimal.pt')
-        self.assertEqual(renderer.package, pyramid.tests)
-        self.assertEqual(renderer.registry.__class__, DummyRegistry)
+        self.assertEqual(renderer, 'fixtures/minimal.pt')
+        self.assertEqual(config.pkg, pyramid.tests)
 
     def test_call_with_renderer_dict(self):
+        import pyramid.tests
         decorator = self._makeOne(renderer={'a':1})
         venusian = DummyVenusian()
         decorator.venusian = venusian
         def foo(): pass
         wrapped = decorator(foo)
         self.assertTrue(wrapped is foo)
-        settings = call_venusian(venusian)
+        config = call_venusian(venusian)
+        settings = config.settings
         self.assertEqual(len(settings), 1)
         self.assertEqual(settings[0]['renderer'], {'a':1})
+        self.assertEqual(config.pkg, pyramid.tests)
+
+    def test_call_with_renderer_IRendererInfo(self):
+        import pyramid.tests
+        from pyramid.interfaces import IRendererInfo
+        @implementer(IRendererInfo)
+        class DummyRendererHelper(object):
+            pass
+        renderer_helper = DummyRendererHelper()
+        decorator = self._makeOne(renderer=renderer_helper)
+        venusian = DummyVenusian()
+        decorator.venusian = venusian
+        def foo(): pass
+        wrapped = decorator(foo)
+        self.assertTrue(wrapped is foo)
+        context = DummyVenusianContext()
+        config = call_venusian(venusian, context)
+        settings = config.settings
+        self.assertEqual(len(settings), 1)
+        renderer = settings[0]['renderer']
+        self.assertTrue(renderer is renderer_helper)
+        self.assertEqual(config.pkg, pyramid.tests)
+
+    def test_call_withdepth(self):
+        decorator = self._makeOne(_depth=1)
+        venusian = DummyVenusian()
+        decorator.venusian = venusian
+        def foo(): pass
+        decorator(foo)
+        self.assertEqual(venusian.depth, 2)
 
 class Test_append_slash_notfound_view(BaseTest, unittest.TestCase):
     def _callFUT(self, context, request):
@@ -499,26 +640,170 @@ class Test_default_exceptionresponse_view(unittest.TestCase):
         result = self._callFUT(context, request)
         self.assertEqual(result, 'abc')
 
-class Test_patch_mimetypes(unittest.TestCase):
-    def _callFUT(self, module):
-        from pyramid.view import init_mimetypes
-        return init_mimetypes(module)
+class Test_view_defaults(unittest.TestCase):
+    def test_it(self):
+        from pyramid.view import view_defaults
+        @view_defaults(route_name='abc', renderer='def')
+        class Foo(object): pass
+        self.assertEqual(Foo.__view_defaults__['route_name'],'abc')
+        self.assertEqual(Foo.__view_defaults__['renderer'],'def')
 
-    def test_has_init(self):
-        class DummyMimetypes(object):
-            def init(self):
-                self.initted = True
-        module = DummyMimetypes()
-        result = self._callFUT(module)
-        self.assertEqual(result, True)
-        self.assertEqual(module.initted, True)
-        
-    def test_missing_init(self):
-        class DummyMimetypes(object):
-            pass
-        module = DummyMimetypes()
-        result = self._callFUT(module)
-        self.assertEqual(result, False)
+    def test_it_inheritance_not_overridden(self):
+        from pyramid.view import view_defaults
+        @view_defaults(route_name='abc', renderer='def')
+        class Foo(object): pass
+        class Bar(Foo): pass
+        self.assertEqual(Bar.__view_defaults__['route_name'],'abc')
+        self.assertEqual(Bar.__view_defaults__['renderer'],'def')
+
+    def test_it_inheritance_overriden(self):
+        from pyramid.view import view_defaults
+        @view_defaults(route_name='abc', renderer='def')
+        class Foo(object): pass
+        @view_defaults(route_name='ghi')
+        class Bar(Foo): pass
+        self.assertEqual(Bar.__view_defaults__['route_name'],'ghi')
+        self.assertFalse('renderer' in Bar.__view_defaults__)
+
+    def test_it_inheritance_overriden_empty(self):
+        from pyramid.view import view_defaults
+        @view_defaults(route_name='abc', renderer='def')
+        class Foo(object): pass
+        @view_defaults()
+        class Bar(Foo): pass
+        self.assertEqual(Bar.__view_defaults__, {})
+
+class TestViewMethodsMixin(unittest.TestCase):
+    def setUp(self):
+        self.config = testing.setUp()
+
+    def tearDown(self):
+        testing.tearDown()
+
+    def _makeOne(self, environ=None):
+        from pyramid.decorator import reify
+        from pyramid.view import ViewMethodsMixin
+        if environ is None:
+            environ = {}
+        class Request(ViewMethodsMixin):
+            def __init__(self, environ):
+                self.environ = environ
+
+            @reify
+            def response(self):
+                return DummyResponse()
+        request = Request(environ)
+        request.registry = self.config.registry
+        return request
+
+    def test_it(self):
+        def exc_view(exc, request):
+            self.assertTrue(exc is dummy_exc)
+            self.assertTrue(request.exception is dummy_exc)
+            return DummyResponse(b'foo')
+        self.config.add_view(exc_view, context=RuntimeError)
+        request = self._makeOne()
+        dummy_exc = RuntimeError()
+        try:
+            raise dummy_exc
+        except RuntimeError:
+            response = request.invoke_exception_view()
+            self.assertEqual(response.app_iter, [b'foo'])
+        else: # pragma: no cover
+            self.fail()
+
+    def test_it_hides_attrs(self):
+        def exc_view(exc, request):
+            self.assertTrue(exc is not orig_exc)
+            self.assertTrue(request.exception is not orig_exc)
+            self.assertTrue(request.exc_info is not orig_exc_info)
+            self.assertTrue(request.response is not orig_response)
+            request.response.app_iter = [b'bar']
+            return request.response
+        self.config.add_view(exc_view, context=RuntimeError)
+        request = self._makeOne()
+        orig_exc = request.exception = DummyContext()
+        orig_exc_info = request.exc_info = DummyContext()
+        orig_response = request.response = DummyResponse(b'foo')
+        try:
+            raise RuntimeError
+        except RuntimeError:
+            response = request.invoke_exception_view()
+            self.assertEqual(response.app_iter, [b'bar'])
+            self.assertTrue(request.exception is orig_exc)
+            self.assertTrue(request.exc_info is orig_exc_info)
+            self.assertTrue(request.response is orig_response)
+        else: # pragma: no cover
+            self.fail()
+
+    def test_it_supports_alternate_requests(self):
+        def exc_view(exc, request):
+            self.assertTrue(request is other_req)
+            return DummyResponse(b'foo')
+        self.config.add_view(exc_view, context=RuntimeError)
+        request = self._makeOne()
+        other_req = self._makeOne()
+        try:
+            raise RuntimeError
+        except RuntimeError:
+            response = request.invoke_exception_view(request=other_req)
+            self.assertEqual(response.app_iter, [b'foo'])
+        else: # pragma: no cover
+            self.fail()
+
+    def test_it_supports_threadlocal_registry(self):
+        def exc_view(exc, request):
+            return DummyResponse(b'foo')
+        self.config.add_view(exc_view, context=RuntimeError)
+        request = self._makeOne()
+        del request.registry
+        try:
+            raise RuntimeError
+        except RuntimeError:
+            response = request.invoke_exception_view()
+            self.assertEqual(response.app_iter, [b'foo'])
+        else: # pragma: no cover
+            self.fail()
+
+    def test_it_supports_alternate_exc_info(self):
+        def exc_view(exc, request):
+            self.assertTrue(request.exc_info is exc_info)
+            return DummyResponse(b'foo')
+        self.config.add_view(exc_view, context=RuntimeError)
+        request = self._makeOne()
+        try:
+            raise RuntimeError
+        except RuntimeError:
+            exc_info = sys.exc_info()
+        response = request.invoke_exception_view(exc_info=exc_info)
+        self.assertEqual(response.app_iter, [b'foo'])
+
+    def test_it_rejects_secured_view(self):
+        from pyramid.exceptions import Forbidden
+        def exc_view(exc, request): pass
+        self.config.testing_securitypolicy(permissive=False)
+        self.config.add_view(exc_view, context=RuntimeError, permission='view')
+        request = self._makeOne()
+        try:
+            raise RuntimeError
+        except RuntimeError:
+            self.assertRaises(Forbidden, request.invoke_exception_view)
+        else: # pragma: no cover
+            self.fail()
+
+    def test_it_allows_secured_view(self):
+        def exc_view(exc, request):
+            return DummyResponse(b'foo')
+        self.config.testing_securitypolicy(permissive=False)
+        self.config.add_view(exc_view, context=RuntimeError, permission='view')
+        request = self._makeOne()
+        try:
+            raise RuntimeError
+        except RuntimeError:
+            response = request.invoke_exception_view(secure=False)
+            self.assertEqual(response.app_iter, [b'foo'])
+        else: # pragma: no cover
+            self.fail()
 
 class ExceptionResponse(Exception):
     status = '404 Not Found'
@@ -535,10 +820,21 @@ def make_view(response):
 
 class DummyRequest:
     exception = None
+    request_iface = IRequest
 
-class DummyResponse:
-    status = '200 OK'
+    def __init__(self, environ=None):
+        if environ is None:
+            environ = {}
+        self.environ = environ
+        
+from pyramid.interfaces import IResponse
+
+@implementer(IResponse)
+class DummyResponse(object):
     headerlist = ()
+    app_iter = ()
+    status = '200 OK'
+    environ = None
     def __init__(self, body=None):
         if body is None:
             self.app_iter = ()
@@ -561,8 +857,9 @@ class DummyVenusian(object):
         self.info = info
         self.attachments = []
 
-    def attach(self, wrapped, callback, category=None):
+    def attach(self, wrapped, callback, category=None, depth=1):
         self.attachments.append((wrapped, callback, category))
+        self.depth = depth
         return self.info
 
 class DummyRegistry(object):
@@ -576,13 +873,20 @@ class DummyConfig(object):
     def add_view(self, **kw):
         self.settings.append(kw)
 
+    add_notfound_view = add_forbidden_view = add_view
+
+    def with_package(self, pkg):
+        self.pkg = pkg
+        return self
+
 class DummyVenusianContext(object):
     def __init__(self):
         self.config = DummyConfig()
         
-def call_venusian(venusian):
-    context = DummyVenusianContext()
+def call_venusian(venusian, context=None):
+    if context is None:
+        context = DummyVenusianContext()
     for wrapped, callback, category in venusian.attachments:
         callback(context, None, None)
-    return context.config.settings
+    return context.config
 

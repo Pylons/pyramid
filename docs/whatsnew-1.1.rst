@@ -1,4 +1,4 @@
-What's New In Pyramid 1.1
+What's New in Pyramid 1.1
 =========================
 
 This article explains the new features in Pyramid version 1.1 as compared to
@@ -6,6 +6,15 @@ its predecessor, :app:`Pyramid` 1.0.  It also documents backwards
 incompatibilities between the two versions and deprecations added to Pyramid
 1.1, as well as software dependency changes and notable documentation
 additions.
+
+Terminology Changes
+-------------------
+
+The term "template" used by the Pyramid documentation used to refer to both
+"paster templates" and "rendered templates" (templates created by a rendering
+engine.  i.e. Mako, Chameleon, Jinja, etc.).  "Paster templates" will now be
+referred to as "scaffolds", whereas the name for "rendered templates" will
+remain as "templates."
 
 Major Feature Additions
 -----------------------
@@ -18,28 +27,47 @@ The major feature additions in Pyramid 1.1 are:
 
 - Support for "static" routes.
 
+- Default HTTP exception view.
+
+- ``http_cache`` view configuration parameter causes Pyramid to set HTTP
+  caching headers.
+
+- Features that make it easier to write scripts that work in a :app:`Pyramid`
+  environment.
+
 ``request.response``
 ~~~~~~~~~~~~~~~~~~~~
 
-- Accessing the ``response`` attribute of a :class:`pyramid.request.Request`
-  object (e.g. ``request.response`` within a view) now produces a new
-  :class:`pyramid.response.Response` object.  This feature is meant to be
-  used mainly when a view configured with a renderer needs to set response
-  attributes: all renderers will use the Response object implied by
-  ``request.response`` as the response object returned to the router.
+- Instances of the :class:`pyramid.request.Request` class now have a
+  ``response`` attribute.
 
-  ``request.response`` can also be used by code in a view that does not use a
-  renderer, however the response object that is produced by
-  ``request.response`` must be returned when a renderer is not in play (it is
-  not a "global" response).
+  The object passed to a view callable as ``request`` is an instance of
+  :class:`pyramid.request.Request`. ``request.response`` is an instance of
+  the class :class:`pyramid.response.Response`.  View callables that are
+  configured with a :term:`renderer` will return this response object to the
+  Pyramid router.  Therefore, code in a renderer-using view callable can set
+  response attributes such as ``request.response.content_type`` (before they
+  return, e.g. a dictionary to the renderer) and this will influence the HTTP
+  return value of the view callable.
+
+  ``request.response`` can also be used in view callable code that is not
+  configured to use a renderer.  For example, a view callable might do
+  ``request.response.body = '123'; return request.response``.  However, the
+  response object that is produced by ``request.response`` must be *returned*
+  when a renderer is not in play in order to have any effect on the HTTP
+  response (it is not a "global" response, and modifications to it are not
+  somehow merged into a separately returned response object).
+
+  The ``request.response`` object is lazily created, so its introduction does
+  not negatively impact performance.
 
 ``paster pviews``
 ~~~~~~~~~~~~~~~~~
 
 - A new paster command named ``paster pviews`` was added.  This command
   prints a summary of potentially matching views for a given path.  See
-  documentation the section entitled :ref:`displaying_matching_views` for
-  more information.
+  the section entitled :ref:`displaying_matching_views` for more
+  information.
 
 Static Routes
 ~~~~~~~~~~~~~
@@ -50,12 +78,139 @@ Static Routes
   be useful for URL generation via ``route_url`` and ``route_path``.  See the
   section entitled :ref:`static_route_narr` for more information.
 
+Default HTTP Exception View
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- A default exception view for the interface
+  :class:`pyramid.interfaces.IExceptionResponse` is now registered by
+  default.  This means that an instance of any exception class imported from
+  :mod:`pyramid.httpexceptions` (such as ``HTTPFound``) can now be raised
+  from within view code; when raised, this exception view will render the
+  exception to a response.
+
+  To allow for configuration of this feature, the :term:`Configurator` now
+  accepts an additional keyword argument named ``exceptionresponse_view``.
+  By default, this argument is populated with a default exception view
+  function that will be used when an HTTP exception is raised.  When ``None``
+  is passed for this value, an exception view for HTTP exceptions will not be
+  registered.  Passing ``None`` returns the behavior of raising an HTTP
+  exception to that of Pyramid 1.0 (the exception will propagate to
+  :term:`middleware` and to the WSGI server).
+
+``http_cache``
+~~~~~~~~~~~~~~
+
+A new value ``http_cache`` can be used as a :term:`view configuration`
+parameter.
+
+When you supply an ``http_cache`` value to a view configuration, the
+``Expires`` and ``Cache-Control`` headers of a response generated by the
+associated view callable are modified.  The value for ``http_cache`` may be
+one of the following:
+
+- A nonzero integer.  If it's a nonzero integer, it's treated as a number
+  of seconds.  This number of seconds will be used to compute the
+  ``Expires`` header and the ``Cache-Control: max-age`` parameter of
+  responses to requests which call this view.  For example:
+  ``http_cache=3600`` instructs the requesting browser to 'cache this
+  response for an hour, please'.
+
+- A ``datetime.timedelta`` instance.  If it's a ``datetime.timedelta``
+  instance, it will be converted into a number of seconds, and that number
+  of seconds will be used to compute the ``Expires`` header and the
+  ``Cache-Control: max-age`` parameter of responses to requests which call
+  this view.  For example: ``http_cache=datetime.timedelta(days=1)``
+  instructs the requesting browser to 'cache this response for a day,
+  please'.
+
+- Zero (``0``).  If the value is zero, the ``Cache-Control`` and
+  ``Expires`` headers present in all responses from this view will be
+  composed such that client browser cache (and any intermediate caches) are
+  instructed to never cache the response.
+
+- A two-tuple.  If it's a two tuple (e.g. ``http_cache=(1,
+  {'public':True})``), the first value in the tuple may be a nonzero
+  integer or a ``datetime.timedelta`` instance; in either case this value
+  will be used as the number of seconds to cache the response.  The second
+  value in the tuple must be a dictionary.  The values present in the
+  dictionary will be used as input to the ``Cache-Control`` response
+  header.  For example: ``http_cache=(3600, {'public':True})`` means 'cache
+  for an hour, and add ``public`` to the Cache-Control header of the
+  response'.  All keys and values supported by the
+  ``webob.cachecontrol.CacheControl`` interface may be added to the
+  dictionary.  Supplying ``{'public':True}`` is equivalent to calling
+  ``response.cache_control.public = True``.
+
+Providing a non-tuple value as ``http_cache`` is equivalent to calling
+``response.cache_expires(value)`` within your view's body.
+
+Providing a two-tuple value as ``http_cache`` is equivalent to calling
+``response.cache_expires(value[0], **value[1])`` within your view's body.
+
+If you wish to avoid influencing, the ``Expires`` header, and instead wish
+to only influence ``Cache-Control`` headers, pass a tuple as ``http_cache``
+with the first element of ``None``, e.g.: ``(None, {'public':True})``.
+
+The environment setting ``PYRAMID_PREVENT_HTTP_CACHE`` and configuration
+file value ``prevent_http_cache`` are synonymous and allow you to prevent
+HTTP cache headers from being set by Pyramid's ``http_cache`` machinery
+globally in a process.  see :ref:`influencing_http_caching` and
+:ref:`preventing_http_caching`.
+
+Easier Scripting Writing
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+A new API function :func:`pyramid.paster.bootstrap` has been added to make
+writing scripts that need to work under Pyramid environment easier, e.g.:
+
+.. code-block:: python
+
+    from pyramid.paster import bootstrap
+    info = bootstrap('/path/to/my/development.ini')
+    request = info['request']
+    print request.route_url('myroute')
+
+See :ref:`writing_a_script` for more details.
+
 Minor Feature Additions
 -----------------------
+
+- It is now possible to invoke ``paster pshell`` even if the paste ini file
+  section name pointed to in its argument is not actually a Pyramid WSGI
+  application.  The shell will work in a degraded mode, and will warn the
+  user.  See "The Interactive Shell" in the "Creating a Pyramid Project"
+  narrative documentation section.
+
+- The ``paster pshell``, ``paster pviews``, and ``paster proutes`` commands
+  each now under the hood uses :func:`pyramid.paster.bootstrap`, which makes
+  it possible to supply an ``.ini`` file without naming the "right" section
+  in the file that points at the actual Pyramid application.  Instead, you
+  can generally just run ``paster {pshell|proutes|pviews} development.ini``
+  and it will do mostly the right thing.
+
+- It is now possible to add a ``[pshell]`` section to your application's .ini
+  configuration file, which influences the global names available to a pshell
+  session.  See :ref:`extending_pshell`.
+
+- The :meth:`pyramid.config.Configurator.scan` method has grown a ``**kw``
+  argument.  ``kw`` argument represents a set of keyword arguments to pass to
+  the Venusian ``Scanner`` object created by Pyramid.  (See the
+  :term:`Venusian` documentation for more information about ``Scanner``).
+
+- New request property: ``json_body``. This property will return the
+  JSON-decoded variant of the request body.  If the request body is not
+  well-formed JSON, this property will raise an exception.
+
+- A `JSONP <http://en.wikipedia.org/wiki/JSONP>`_ renderer.  See
+  :ref:`jsonp_renderer` for more details.
 
 - New authentication policy:
   :class:`pyramid.authentication.SessionAuthenticationPolicy`, which uses a
   session to store credentials.
+
+- A function named :func:`pyramid.httpexceptions.exception_response` is a
+  shortcut that can be used to create HTTP exception response objects using
+  an HTTP integer status code.
 
 - Integers and longs passed as ``elements`` to
   :func:`pyramid.url.resource_url` or
@@ -91,8 +246,170 @@ Minor Feature Additions
   although typically nonsensical).  Allowing the nonsensical configuration
   made the code more understandable and required fewer tests.
 
+- The :class:`pyramid.request.Request` class now has a ``ResponseClass``
+  attribute which points at :class:`pyramid.response.Response`.
+
+- The :class:`pyramid.response.Response` class now has a ``RequestClass``
+  interface which points at :class:`pyramid.request.Request`.
+
+- It is now possible to return an arbitrary object from a Pyramid view
+  callable even if a renderer is not used, as long as a suitable adapter to
+  :class:`pyramid.interfaces.IResponse` is registered for the type of the
+  returned object by using the new
+  :meth:`pyramid.config.Configurator.add_response_adapter` API.  See the
+  section in the Hooks chapter of the documentation entitled
+  :ref:`using_iresponse`.
+
+- The Pyramid router will now, by default, call the ``__call__`` method of
+  response objects when returning a WSGI response.  This means that, among
+  other things, the ``conditional_response`` feature response objects
+  inherited from WebOb will now behave properly.
+
+- New method named :meth:`pyramid.request.Request.is_response`.  This method
+  should be used instead of the :func:`pyramid.view.is_response` function,
+  which has been deprecated.
+
+- :class:`pyramid.exceptions.NotFound` is now just an alias for
+  :class:`pyramid.httpexceptions.HTTPNotFound`.
+
+- :class:`pyramid.exceptions.Forbidden` is now just an alias for
+  :class:`pyramid.httpexceptions.HTTPForbidden`.
+
+- Added ``mako.preprocessor`` config file parameter; allows for a Mako
+  preprocessor to be specified as a Python callable or Python dotted name.
+  See https://github.com/Pylons/pyramid/pull/183 for rationale.
+
+- New API class: :class:`pyramid.static.static_view`.  This supersedes the
+  (now deprecated) :class:`pyramid.view.static` class.
+  :class:`pyramid.static.static_view`, by default, serves up documents as the
+  result of the request's ``path_info``, attribute rather than it's
+  ``subpath`` attribute (the inverse was true of
+  :class:`pyramid.view.static`, and still is).
+  :class:`pyramid.static.static_view` exposes a ``use_subpath`` flag for use
+  when you want the static view to behave like the older deprecated version.
+
+- A new api function :func:`pyramid.scripting.prepare` has been added.  It is
+  a lower-level analogue of :func:`pyramid.paster.bootstrap` that accepts a
+  request and a registry instead of a config file argument, and is used for
+  the same purpose:
+
+  .. code-block:: python
+
+      from pyramid.scripting import prepare
+      info = prepare(registry=myregistry)
+      request = info['request']
+      print request.route_url('myroute')
+
+- A new API function :func:`pyramid.scripting.make_request` has been added.
+  The resulting request will have a ``registry`` attribute.  It is meant to
+  be used in conjunction with :func:`pyramid.scripting.prepare` and/or
+  :func:`pyramid.paster.bootstrap` (both of which accept a request as an
+  argument):
+
+  .. code-block:: python
+
+      from pyramid.scripting import make_request
+      request = make_request('/')
+
+- New API attribute :attr:`pyramid.config.global_registries` is an iterable
+  object that contains references to every Pyramid registry loaded into the
+  current process via :meth:`pyramid.config.Configurator.make_wsgi_app`.  It also
+  has a ``last`` attribute containing the last registry loaded.  This is used
+  by the scripting machinery, and is available for introspection.
+
+- Added the :attr:`pyramid.renderers.null_renderer` object as an API.  The
+  null renderer is an object that can be used in advanced integration cases
+  as input to the view configuration ``renderer=`` argument.  When the null
+  renderer is used as a view renderer argument, Pyramid avoids converting the
+  view callable result into a Response object.  This is useful if you want to
+  reuse the view configuration and lookup machinery outside the context of
+  its use by the Pyramid router.  (This feature was added for consumption by
+  the ``pyramid_rpc`` package, which uses view configuration and lookup
+  outside the context of a router in exactly this way.)
+
+Backwards Incompatibilities
+---------------------------
+
+- Pyramid no longer supports Python 2.4.  Python 2.5 or better is required to
+  run Pyramid 1.1+.  Pyramid, however, does not work under any version of
+  Python 3 yet.
+
+- The Pyramid router now, by default, expects response objects returned from
+  view callables to implement the :class:`pyramid.interfaces.IResponse`
+  interface.  Unlike the Pyramid 1.0 version of this interface, objects which
+  implement IResponse now must define a ``__call__`` method that accepts
+  ``environ`` and ``start_response``, and which returns an ``app_iter``
+  iterable, among other things.  Previously, it was possible to return any
+  object which had the three WebOb ``app_iter``, ``headerlist``, and
+  ``status`` attributes as a response, so this is a backwards
+  incompatibility.  It is possible to get backwards compatibility back by
+  registering an adapter to IResponse from the type of object you're now
+  returning from view callables.  See the section in the Hooks chapter of the
+  documentation entitled :ref:`using_iresponse`.
+
+- The :class:`pyramid.interfaces.IResponse` interface is now much more
+  extensive.  Previously it defined only ``app_iter``, ``status`` and
+  ``headerlist``; now it is basically intended to directly mirror the
+  ``webob.Response`` API, which has many methods and attributes.
+
+- The :mod:`pyramid.httpexceptions` classes named ``HTTPFound``,
+  ``HTTPMultipleChoices``, ``HTTPMovedPermanently``, ``HTTPSeeOther``,
+  ``HTTPUseProxy``, and ``HTTPTemporaryRedirect`` now accept ``location`` as
+  their first positional argument rather than ``detail``.  This means that
+  you can do, e.g. ``return pyramid.httpexceptions.HTTPFound('http://foo')``
+  rather than ``return
+  pyramid.httpexceptions.HTTPFound(location='http//foo')`` (the latter will
+  of course continue to work).
+
+- The pyramid Router attempted to set a value into the key
+  ``environ['repoze.bfg.message']`` when it caught a view-related exception
+  for backwards compatibility with applications written for :mod:`repoze.bfg`
+  during error handling.  It did this by using code that looked like so::
+
+                    # "why" is an exception object
+                    try: 
+                        msg = why[0]
+                    except:
+                        msg = ''
+
+                    environ['repoze.bfg.message'] = msg
+
+  Use of the value ``environ['repoze.bfg.message']`` was docs-deprecated in
+  Pyramid 1.0.  Our standing policy is to not remove features after a
+  deprecation for two full major releases, so this code was originally slated
+  to be removed in Pyramid 1.2.  However, computing the
+  ``repoze.bfg.message`` value was the source of at least one bug found in
+  the wild (https://github.com/Pylons/pyramid/issues/199), and there isn't a
+  foolproof way to both preserve backwards compatibility and to fix the bug.
+  Therefore, the code which sets the value has been removed in this release.
+  Code in exception views which relies on this value's presence in the
+  environment should now use the ``exception`` attribute of the request
+  (e.g. ``request.exception[0]``) to retrieve the message instead of relying
+  on ``request.environ['repoze.bfg.message']``.
+
 Deprecations and Behavior Differences
 -------------------------------------
+
+.. note:: Under Python 2.7+, it's necessary to pass the Python interpreter
+   the correct warning flags to see deprecation warnings emitted by Pyramid
+   when porting your application from an older version of Pyramid.  Use the
+   ``PYTHONWARNINGS`` environment variable with the value ``all`` in the
+   shell you use to invoke ``paster serve`` to see these warnings, e.g. on
+   UNIX, ``PYTHONWARNINGS=all $VENV/bin/paster serve development.ini``.
+   Python 2.5 and 2.6 show deprecation warnings by default,
+   so this is unnecessary there.
+   All deprecation warnings are emitted to the console.
+
+- The :class:`pyramid.view.static` class has been deprecated in favor of the
+  newer :class:`pyramid.static.static_view` class.  A deprecation warning is
+  raised when it is used.  You should replace it with a reference to
+  :class:`pyramid.static.static_view` with the ``use_subpath=True`` argument.
+
+- The ``paster pshell``, ``paster proutes``, and ``paster pviews`` commands
+  now take a single argument in the form ``/path/to/config.ini#sectionname``
+  rather than the previous 2-argument spelling ``/path/to/config.ini
+  sectionname``.  ``#sectionname`` may be omitted, in which case ``#main`` is
+  assumed.
 
 - The default Mako renderer is now configured to escape all HTML in
   expression tags. This is intended to help prevent XSS attacks caused by
@@ -133,14 +450,17 @@ Deprecations and Behavior Differences
   spelled::
 
      config.add_route('home', '/')
-     config.add_view('mypackage.views.myview', route_name='home')
+     config.add_view('mypackage.views.myview', route_name='home',
                      renderer='some/renderer.pt')
 
   This deprecation was done to reduce confusion observed in IRC, as well as
-  to (eventually) reduce documentation burden (see also
-  https://github.com/Pylons/pyramid/issues/164).  A deprecation warning is
-  now issued when any view-related parameter is passed to
-  ``add_route``.
+  to (eventually) reduce documentation burden.  A deprecation warning is
+  now issued when any view-related parameter is passed to ``add_route``.
+  
+  .. seealso::
+  
+     See also `issue #164 on GitHub
+     <https://github.com/Pylons/pyramid/issues/164>`_.
 
 - Passing an ``environ`` dictionary to the ``__call__`` method of a
   "traverser" (e.g. an object that implements
@@ -162,20 +482,22 @@ Deprecations and Behavior Differences
   expected an environ object in BFG 1.0 and before).  In a future version,
   these methods will be removed entirely.
 
-- A custom request factory is now required to return a response object that
-  has a ``response`` attribute (or "reified"/lazy property) if they the
+- A custom request factory is now required to return a request object that
+  has a ``response`` attribute (or "reified"/lazy property) if the
   request is meant to be used in a view that uses a renderer.  This
   ``response`` attribute should be an instance of the class
   :class:`pyramid.response.Response`.
 
 - The JSON and string renderer factories now assign to
   ``request.response.content_type`` rather than
-  ``request.response_content_type``.  Each renderer factory determines
-  whether it should change the content type of the response by comparing the
-  response's content type against the response's default content type; if the
-  content type is not the default content type (usually ``text/html``), the
-  renderer changes the content type (to ``application/json`` or
-  ``text/plain`` for JSON and string renderers respectively).
+  ``request.response_content_type``.
+
+- Each built-in renderer factory now determines whether it should change the
+  content type of the response by comparing the response's content type
+  against the response's default content type; if the content type is the
+  default content type (usually ``text/html``), the renderer changes the
+  content type (to ``application/json`` or ``text/plain`` for JSON and string
+  renderers respectively).
 
 - The :func:`pyramid.wsgi.wsgiapp2` now uses a slightly different method of
   figuring out how to "fix" ``SCRIPT_NAME`` and ``PATH_INFO`` for the
@@ -185,13 +507,98 @@ Deprecations and Behavior Differences
 
 - Previously, :class:`pyramid.request.Request` inherited from
   :class:`webob.request.Request` and implemented ``__getattr__``,
-  ``__setattr__`` and ``__delattr__`` itself in order to overidde "adhoc
+  ``__setattr__`` and ``__delattr__`` itself in order to override "adhoc
   attr" WebOb behavior where attributes of the request are stored in the
-  environ.  Now, :class:`pyramid.request.Request inherits from (the more
-  recent) :class:`webob.request.BaseRequest`` instead of
+  environ.  Now, :class:`pyramid.request.Request` inherits from (the more
+  recent) :class:`webob.request.BaseRequest` instead of
   :class:`webob.request.Request`, which provides the same behavior.
   :class:`pyramid.request.Request` no longer implements its own
   ``__getattr__``, ``__setattr__`` or ``__delattr__`` as a result.
+
+- Deprecated :func:`pyramid.view.is_response` function in favor of
+  (newly-added) :meth:`pyramid.request.Request.is_response` method.
+  Determining if an object is truly a valid response object now requires
+  access to the registry, which is only easily available as a request
+  attribute.  The :func:`pyramid.view.is_response` function will still work
+  until it is removed, but now may return an incorrect answer under some
+  (very uncommon) circumstances.
+
+- :class:`pyramid.response.Response` is now a *subclass* of
+  ``webob.response.Response`` (in order to directly implement the
+  :class:`pyramid.interfaces.IResponse` interface, to speed up response
+  generation).
+
+- The "exception response" objects importable from ``pyramid.httpexceptions``
+  (e.g. ``HTTPNotFound``) are no longer just import aliases for classes that
+  actually live in ``webob.exc``.  Instead, we've defined our own exception
+  classes within the module that mirror and emulate the ``webob.exc``
+  exception response objects almost entirely.  See
+  :ref:`http_exception_hierarchy` in the Design Defense chapter for more
+  information.
+
+- When visiting a URL that represented a static view which resolved to a
+  subdirectory, the ``index.html`` of that subdirectory would not be served
+  properly.  Instead, a redirect to ``/subdir`` would be issued.  This has
+  been fixed, and now visiting a subdirectory that contains an ``index.html``
+  within a static view returns the index.html properly.
+  
+  .. seealso::
+  
+     See also `issue #67 on GitHub
+     <https://github.com/Pylons/pyramid/issues/67>`_.
+
+- Deprecated the ``pyramid.config.Configurator.set_renderer_globals_factory``
+  method and the ``renderer_globals`` Configurator constructor parameter.
+  Users should convert code using this feature to use a BeforeRender event. See
+  the section :ref:`beforerender_event` in the Hooks chapter.
+
+- In Pyramid 1.0, the :class:`pyramid.events.subscriber` directive behaved
+  contrary to the documentation when passed more than one interface object to
+  its constructor.  For example, when the following listener was registered::
+
+     @subscriber(IFoo, IBar)
+     def expects_ifoo_events_and_ibar_events(event):
+         print event
+
+  The Events chapter docs claimed that the listener would be registered and
+  listening for both ``IFoo`` and ``IBar`` events.  Instead, it registered an
+  "object event" subscriber which would only be called if an IObjectEvent was
+  emitted where the object interface was ``IFoo`` and the event interface was
+  ``IBar``.
+
+  The behavior now matches the documentation. If you were relying on the
+  buggy behavior of the 1.0 ``subscriber`` directive in order to register an
+  object event subscriber, you must now pass a sequence to indicate you'd
+  like to register a subscriber for an object event. e.g.::
+
+     @subscriber([IFoo, IBar])
+     def expects_object_event(object, event):
+         print object, event
+
+- In 1.0, if a :class:`pyramid.events.BeforeRender` event subscriber added a
+  value via the ``__setitem__`` or ``update`` methods of the event object
+  with a key that already existed in the renderer globals dictionary, a
+  ``KeyError`` was raised.  With the deprecation of the
+  "add_renderer_globals" feature of the configurator, there was no way to
+  override an existing value in the renderer globals dictionary that already
+  existed.  Now, the event object will overwrite an older value that is
+  already in the globals dictionary when its ``__setitem__`` or ``update`` is
+  called (as well as the new ``setdefault`` method), just like a plain old
+  dictionary.  As a result, for maximum interoperability with other
+  third-party subscribers, if you write an event subscriber meant to be used
+  as a BeforeRender subscriber, your subscriber code will now need to (using
+  ``.get`` or ``__contains__`` of the event object) ensure no value already
+  exists in the renderer globals dictionary before setting an overriding
+  value.
+
+- The :meth:`pyramid.config.Configurator.add_route` method allowed two routes
+  with the same route to be added without an intermediate call to
+  :meth:`pyramid.config.Configurator.commit`.  If you now receive a
+  ``ConfigurationError`` at startup time that appears to be ``add_route``
+  related, you'll need to either a) ensure that all of your route names are
+  unique or b) call ``config.commit()`` before adding a second route with the
+  name of a previously added name or c) use a Configurator that works in
+  ``autocommit`` mode.
 
 Dependency Changes
 ------------------
@@ -205,10 +612,8 @@ Dependency Changes
 Documentation Enhancements
 --------------------------
 
-- The term "template" used to refer to both "paster templates" and "rendered
-  templates" (templates created by a rendering engine.  i.e. Mako, Chameleon,
-  Jinja, etc.).  "Paster templates" will now be refered to as "scaffolds",
-  whereas the name for "rendered templates" will remain as "templates."
+- Added a section entitled :ref:`writing_a_script` to the "Command-Line
+  Pyramid" chapter.
 
 - The :ref:`bfg_wiki_tutorial` was updated slightly.
 
@@ -235,3 +640,11 @@ Documentation Enhancements
 
 - Added a section to the "URL Dispatch" narrative chapter regarding the new
   "static" route feature entitled :ref:`static_route_narr`.
+
+- Added API docs for :func:`pyramid.httpexceptions.exception_response`.
+
+- Added :ref:`http_exceptions` section to Views narrative chapter including a
+  description of :func:`pyramid.httpexceptions.exception_response`.
+
+- Added API docs for
+  :class:`pyramid.authentication.SessionAuthenticationPolicy`.

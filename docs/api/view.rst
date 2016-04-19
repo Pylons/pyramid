@@ -11,16 +11,16 @@
 
   .. autofunction:: render_view
 
-  .. autofunction:: is_response
-
   .. autoclass:: view_config
      :members:
 
-  .. autoclass:: static
+  .. autoclass:: view_defaults
      :members:
-     :inherited-members:
 
-  .. autofunction:: append_slash_notfound_view(context, request)
+  .. autoclass:: notfound_view_config
+     :members:
 
-  .. autoclass:: AppendSlashNotFoundViewFactory
+  .. autoclass:: forbidden_view_config
+     :members:
+
 

@@ -1,256 +1,176 @@
 .. _installing_chapter:
 
 Installing :app:`Pyramid`
-============================
+=========================
+
+.. note::
+
+    This installation guide emphasizes the use of Python 3.4 and greater for
+    simplicity.
+
 
 .. index::
    single: install preparation
 
-Before You Install
-------------------
+Before You Install Pyramid
+--------------------------
 
-You will need `Python <http://python.org>`_ version 2.4 or better to
-run :app:`Pyramid`.  
+Install Python version 3.4 or greater for your operating system, and satisfy
+the :ref:`requirements-for-installing-packages`, as described in
+the following sections.
 
 .. sidebar:: Python Versions
 
-    As of this writing, :app:`Pyramid` has been tested under Python
-    2.4.6, Python 2.5.4 and Python 2.6.2, and Python 2.7.  To ensure
-    backwards compatibility, development of :app:`Pyramid` is
-    currently done primarily under Python 2.4 and Python 2.5.
-    :app:`Pyramid` does not run under any version of Python before
-    2.4, and does not yet run under Python 3.X.
+    As of this writing, :app:`Pyramid` has been tested under Python 2.7,
+    Python 3.3, Python 3.4, Python 3.5, PyPy, and PyPy3. :app:`Pyramid` does
+    not run under any version of Python before 2.7.
 
-:app:`Pyramid` is known to run on all popular Unix-like systems such as
-Linux, MacOS X, and FreeBSD as well as on Windows platforms.  It is also
-known to run on Google's App Engine and :term:`Jython`.
+:app:`Pyramid` is known to run on all popular UNIX-like systems such as Linux,
+Mac OS X, and FreeBSD, as well as on Windows platforms.  It is also known to
+run on :term:`PyPy` (1.9+).
 
-:app:`Pyramid` installation does not require the compilation of any
-C code, so you need only a Python interpreter that meets the
-requirements mentioned.
+:app:`Pyramid` installation does not require the compilation of any C code.
+However, some :app:`Pyramid` dependencies may attempt to build binary
+extensions from C code for performance speed ups. If a compiler or Python
+headers are unavailable, the dependency will fall back to using pure Python
+instead.
 
-If You Don't Yet Have A Python Interpreter (UNIX)
+.. note::
+
+   If you see any warnings or errors related to failing to compile the binary
+   extensions, in most cases you may safely ignore those errors. If you wish to
+   use the binary extensions, please verify that you have a functioning
+   compiler and the Python header files installed for your operating system.
+
+
+.. _for-mac-os-x-users:
+
+For Mac OS X Users
+~~~~~~~~~~~~~~~~~~
+
+Python comes pre-installed on Mac OS X, but due to Apple's release cycle, it is
+often out of date. Unless you have a need for a specific earlier version, it is
+recommended to install the latest 3.x version of Python.
+
+You can install the latest verion of Python for Mac OS X from the binaries on
+`python.org <https://www.python.org/downloads/mac-osx/>`_.
+
+Alternatively, you can use the `homebrew <http://brew.sh/>`_ package manager.
+
+.. code-block:: text
+
+   # for python 3.x
+   $ brew install python3
+
+If you use an installer for your Python, then you can skip to the section
+:ref:`installing_unix`.
+
+
+.. _if-you-don-t-yet-have-a-python-interpreter-unix:
+
+If You Don't Yet Have a Python Interpreter (UNIX)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If your system doesn't have a Python interpreter, and you're on UNIX,
-you can either install Python using your operating system's package
-manager *or* you can install Python from source fairly easily on any
-UNIX system that has development tools.
+If your system doesn't have a Python interpreter, and you're on UNIX, you can
+either install Python using your operating system's package manager *or* you
+can install Python from source fairly easily on any UNIX system that has
+development tools.
 
-Package Manager Method
-++++++++++++++++++++++
+.. seealso:: See the official Python documentation :ref:`Using Python on Unix
+   platforms <python:using-on-unix>` for full details.
 
-You can use your system's "package manager" to install Python. Every
-system's package manager is slightly different, but the "flavor" of
-them is usually the same.
 
-For example, on an Ubuntu Linux system, to use the system package
-manager to install a Python 2.6 interpreter, use the following
-command:
+.. index::
+   pair: install; Python (from package, Windows)
 
-.. code-block:: text
+.. _if-you-don-t-yet-have-a-python-interpreter-windows:
 
-   $ sudo apt-get install python2.6-dev
-
-Once these steps are performed, the Python interpreter will usually be
-invokable via ``python2.6`` from a shell prompt.
-
-Source Compile Method
-+++++++++++++++++++++
-
-It's useful to use a Python interpreter that *isn't* the "system"
-Python interpreter to develop your software.  The authors of
-:app:`Pyramid` tend not to use the system Python for development
-purposes; always a self-compiled one.  Compiling Python is usually
-easy, and often the "system" Python is compiled with options that
-aren't optimal for web development.
-
-To compile software on your UNIX system, typically you need
-development tools.  Often these can be installed via the package
-manager.  For example, this works to do so on an Ubuntu Linux system:
-
-.. code-block:: text
-
-   $ sudo apt-get install build-essential
-
-On Mac OS X, installing `XCode
-<http://developer.apple.com/tools/xcode/>`_ has much the same effect.
-
-Once you've got development tools installed on your system, On the
-same system, to install a Python 2.6 interpreter from *source*, use
-the following commands:
-
-.. code-block:: text
-
-   [chrism@vitaminf ~]$ cd ~
-   [chrism@vitaminf ~]$ mkdir tmp
-   [chrism@vitaminf ~]$ mkdir opt
-   [chrism@vitaminf ~]$ cd tmp
-   [chrism@vitaminf tmp]$ wget \
-          http://www.python.org/ftp/python/2.6.4/Python-2.6.4.tgz
-   [chrism@vitaminf tmp]$ tar xvzf Python-2.6.4.tgz
-   [chrism@vitaminf tmp]$ cd Python-2.6.4
-   [chrism@vitaminf Python-2.6.4]$ ./configure \
-           --prefix=$HOME/opt/Python-2.6.4
-   [chrism@vitaminf Python-2.6.4]$ make; make install
-
-Once these steps are performed, the Python interpreter will be
-invokable via ``$HOME/opt/Python-2.6.4/bin/python`` from a shell
-prompt.
-
-If You Don't Yet Have A Python Interpreter (Windows)
+If You Don't Yet Have a Python Interpreter (Windows)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If your Windows system doesn't have a Python interpreter, you'll need
-to install it by downloading a Python 2.6-series interpreter
-executable from `python.org's download section
-<http://python.org/download/>`_ (the files labeled "Windows
-Installer").  Once you've downloaded it, double click on the
-executable and accept the defaults during the installation process.
-You may also need to download and install the `Python for Windows
-extensions <http://sourceforge.net/projects/pywin32/files/>`_.
+If your Windows system doesn't have a Python interpreter, you'll need to
+install it by downloading a Python 3.x-series interpreter executable from
+`python.org's download section <http://python.org/download/>`_ (the files
+labeled "Windows Installer").  Once you've downloaded it, double click on the
+executable and accept the defaults during the installation process. You may
+also need to download and install the Python for Windows extensions.
+
+.. seealso:: See the official Python documentation :ref:`Using Python on
+   Windows <python:using-on-windows>` for full details.
+
+.. seealso:: Download and install the `Python for Windows extensions
+   <http://sourceforge.net/projects/pywin32/files/pywin32/>`_. Carefully read
+   the README.txt file at the end of the list of builds, and follow its
+   directions. Make sure you get the proper 32- or 64-bit build and Python
+   version.
 
 .. warning::
 
-   After you install Python on Windows, you may need to add the
-   ``C:\Python26`` directory to your environment's ``Path`` in order
-   to make it possible to invoke Python from a command prompt by
-   typing ``python``.  To do so, right click ``My Computer``, select
-   ``Properties`` --> ``Advanced Tab`` --> ``Environment Variables``
-   and add that directory to the end of the ``Path`` environment
-   variable.
+   After you install Python on Windows, you may need to add the ``C:\Python3x``
+   directory to your environment's ``Path``, where ``x`` is the minor version
+   of installed Python, in order to make it possible to invoke Python from a
+   command prompt by typing ``python``. To do so, right click ``My Computer``,
+   select ``Properties`` --> ``Advanced Tab`` --> ``Environment Variables`` and
+   add that directory to the end of the ``Path`` environment variable.
+
+   .. seealso:: See `Configuring Python (on Windows)
+      <https://docs.python.org/3/using/windows.html#configuring-python>`_ for
+      full details.
+
+
+.. index::
+   single: requirements for installing packages
+
+.. _requirements-for-installing-packages:
+
+Requirements for Installing Packages
+------------------------------------
+
+Use :term:`pip` for installing packages and ``python3 -m venv env`` for
+creating a virtual environment. A virtual environment is a semi-isolated Python
+environment that allows packages to be installed for use by a particular
+application, rather than being installed system wide.
+
+.. seealso:: See the Python Packaging Authority's (PyPA) documention
+   `Requirements for Installing Packages
+   <https://packaging.python.org/en/latest/installing/#requirements-for-installing-packages>`_
+   for full details.
+
 
 .. index::
    single: installing on UNIX
+   single: installing on Mac OS X
 
 .. _installing_unix:
 
 Installing :app:`Pyramid` on a UNIX System
----------------------------------------------
+------------------------------------------
 
-It is best practice to install :app:`Pyramid` into a "virtual"
-Python environment in order to obtain isolation from any "system"
-packages you've got installed in your Python version.  This can be
-done by using the :term:`virtualenv` package.  Using a virtualenv will
-also prevent :app:`Pyramid` from globally installing versions of
-packages that are not compatible with your system Python.
+After installing Python as described previously in :ref:`for-mac-os-x-users` or
+:ref:`if-you-don-t-yet-have-a-python-interpreter-unix`, and satisfying the
+:ref:`requirements-for-installing-packages`, you can now install Pyramid.
 
-To set up a virtualenv in which to install :app:`Pyramid`, first
-ensure that :term:`setuptools` is installed.  Invoke ``import
-setuptools`` within the Python interpreter you'd like to run
-:app:`Pyramid` under:
+#. Make a :term:`virtual environment` workspace:
 
-.. code-block:: text
+   .. code-block:: bash
 
-   [chrism@vitaminf pyramid]$ python
-   Python 2.4.5 (#1, Aug 29 2008, 12:27:37) 
-   [GCC 4.0.1 (Apple Inc. build 5465)] on darwin
-   Type "help", "copyright", "credits" or "license" for more information.
-   >>> import setuptools
+      $ export VENV=~/env
+      $ python3 -m venv $VENV
 
-If running ``import setuptools`` does not raise an ``ImportError``, it
-means that setuptools is already installed into your Python
-interpreter.  If ``import setuptools`` fails, you will need to install
-setuptools manually.  Note that above we're using a Python 2.4-series
-interpreter on Mac OS X; your output may differ if you're using a
-later Python version or a different platform.
+   You can either follow the use of the environment variable ``$VENV``, or
+   replace it with the root directory of the virtual environment. If you choose
+   the former approach, ensure that ``$VENV`` is an absolute path. In the
+   latter case, the ``export`` command can be skipped.
 
-If you are using a "system" Python (one installed by your OS
-distributor or a 3rd-party packager such as Fink or MacPorts), you can
-usually install the setuptools package by using your system's package
-manager.  If you cannot do this, or if you're using a self-installed
-version of Python, you will need to install setuptools "by hand".
-Installing setuptools "by hand" is always a reasonable thing to do,
-even if your package manager already has a pre-chewed version of
-setuptools for installation.
+#. (Optional) Consider using ``$VENV/bin/activate`` to make your shell
+   environment wired to use the virtual environment.
 
-To install setuptools by hand, first download `ez_setup.py
-<http://peak.telecommunity.com/dist/ez_setup.py>`_ then invoke it
-using the Python interpreter into which you want to install
-setuptools.
+#. Use ``pip`` to get :app:`Pyramid` and its direct dependencies installed:
 
-.. code-block:: text
+   .. parsed-literal::
 
-   $ python ez_setup.py
+      $ $VENV/bin/pip install "pyramid==\ |release|\ "
 
-Once this command is invoked, setuptools should be installed on your
-system.  If the command fails due to permission errors, you may need
-to be the administrative user on your system to successfully invoke
-the script.  To remediate this, you may need to do:
-
-.. code-block:: text
-
-   $ sudo python ez_setup.py
-
-.. index::
-   single: virtualenv
-
-Installing the ``virtualenv`` Package
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Once you've got setuptools installed, you should install the
-:term:`virtualenv` package.  To install the :term:`virtualenv` package
-into your setuptools-enabled Python interpreter, use the
-``easy_install`` command.
-
-.. code-block:: text
-
-   $ easy_install virtualenv
-
-This command should succeed, and tell you that the virtualenv package
-is now installed.  If it fails due to permission errors, you may need
-to install it as your system's administrative user.  For example:
-
-.. code-block:: text
-
-   $ sudo easy_install virtualenv
-
-.. index::
-   single: virtualenv
-
-Creating the Virtual Python Environment
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Once the :term:`virtualenv` package is installed in your Python, you
-can then create a virtual environment.  To do so, invoke the
-following:
-
-.. code-block:: text
-
-   $ virtualenv --no-site-packages env
-   New python executable in env/bin/python
-   Installing setuptools.............done.
-
-.. warning:: Using ``--no-site-packages`` when generating your
-   virtualenv is *very important*. This flag provides the necessary
-   isolation for running the set of packages required by
-   :app:`Pyramid`.  If you do not specify ``--no-site-packages``,
-   it's possible that :app:`Pyramid` will not install properly into
-   the virtualenv, or, even if it does, may not run properly,
-   depending on the packages you've already got installed into your
-   Python's "main" site-packages dir.
-
-.. warning:: If you're on UNIX, *do not* use ``sudo`` to run the
-   ``virtualenv`` script.  It's perfectly acceptable (and desirable)
-   to create a virtualenv as a normal user.
-
-You should perform any following commands that mention a "bin"
-directory from within the ``env`` virtualenv dir.
-
-Installing :app:`Pyramid` Into the Virtual Python Environment
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-After you've got your ``env`` virtualenv installed, you may install
-:app:`Pyramid` itself using the following commands from within the
-virtualenv (``env``) directory you created in the last step:
-
-.. code-block:: text
-
-   $ cd env
-   $ bin/easy_install pyramid
-
-The ``easy_install`` command will take longer than the previous ones to
-complete, as it downloads and installs a number of dependencies.
 
 .. index::
    single: installing on Windows
@@ -258,86 +178,40 @@ complete, as it downloads and installs a number of dependencies.
 .. _installing_windows:
 
 Installing :app:`Pyramid` on a Windows System
--------------------------------------------------
+---------------------------------------------
 
-#. Install, or find `Python 2.6
-   <http://python.org/download/releases/2.6.4/>`_ for your system.
+After installing Python as described previously in
+:ref:`if-you-don-t-yet-have-a-python-interpreter-windows`, and satisfying the
+:ref:`requirements-for-installing-packages`, you can now install Pyramid.
 
-#. Install the `Python for Windows extensions
-   <http://sourceforge.net/projects/pywin32/files/>`_.  Make sure to
-   pick the right download for Python 2.6 and install it using the
-   same Python installation from the previous step.
+#. Make a :term:`virtual environment` workspace:
 
-#. Install latest :term:`setuptools` distribution into the Python you
-   obtained/installed/found in the step above: download `ez_setup.py
-   <http://peak.telecommunity.com/dist/ez_setup.py>`_ and run it using
-   the ``python`` interpreter of your Python 2.6 installation using a
-   command prompt:
+   .. code-block:: doscon
 
-   .. code-block:: text
+      c:\> set VENV=c:\env
+      # replace "x" with your minor version of Python 3
+      c:\> c:\Python3x\Scripts\python3 -m venv %VENV%
 
-      c:\> c:\Python26\python ez_setup.py
+   You can either follow the use of the environment variable ``%VENV%``, or
+   replace it with the root directory of the virtual environment. If you choose
+   the former approach, ensure that ``%VENV%`` is an absolute path. In the
+   latter case, the ``set`` command can be skipped.
 
-#. Use that Python's `bin/easy_install` to install `virtualenv`:
+#. (Optional) Consider using ``%VENV%\Scripts\activate.bat`` to make your shell
+   environment wired to use the virtual environment.
 
-   .. code-block:: text
+#. Use ``pip`` to get :app:`Pyramid` and its direct dependencies installed:
 
-      c:\> c:\Python26\Scripts\easy_install virtualenv
+   .. parsed-literal::
 
-#. Use that Python's virtualenv to make a workspace:
+      c:\\env> %VENV%\\Scripts\\pip install "pyramid==\ |release|\ "
 
-   .. code-block:: text
-
-      c:\> c:\Python26\Scripts\virtualenv --no-site-packages env
-
-#. Switch to the ``env`` directory:
-
-   .. code-block:: text
-
-      c:\> cd env
-
-#. (Optional) Consider using ``Scripts\activate.bat`` to make your shell
-   environment wired to use the virtualenv.
-
-#. Use ``easy_install`` pointed at the "current" index to get
-   :app:`Pyramid` and its direct dependencies installed:
-
-   .. code-block:: text
-
-      c:\env> Scripts\easy_install pyramid
-
-.. index::
-   single: installing on Google App Engine
-
-Installing :app:`Pyramid` on Google App Engine
--------------------------------------------------
-
-:ref:`appengine_tutorial` documents the steps required to install a
-:app:`Pyramid` application on Google App Engine.
-
-Installing :app:`Pyramid` on Jython
---------------------------------------
-
-:app:`Pyramid` is known to work under :term:`Jython` version 2.5.1.
-Install :term:`Jython`, and then follow the installation steps for
-:app:`Pyramid` on your platform described in one of the sections
-entitled :ref:`installing_unix` or :ref:`installing_windows` above,
-replacing the ``python`` command with ``jython`` as necessary.  The
-steps are exactly the same except you should use the ``jython``
-command name instead of the ``python`` command name.
-
-One caveat exists to using :app:`Pyramid` under Jython: the :term:`Chameleon`
-templating engine does not work on Jython.  However, the :term:`Mako`
-templating system, which is also included with Pyramid, does work under
-Jython; use it instead.
 
 What Gets Installed
 -------------------
 
-When you ``easy_install`` :app:`Pyramid`, various Zope libraries,
-various Chameleon libraries, WebOb, Paste, PasteScript, and
-PasteDeploy libraries are installed.
+When you install :app:`Pyramid`, various libraries such as WebOb, PasteDeploy,
+and others are installed.
 
-Additionally, as chronicled in :ref:`project_narr`, scaffolds will be registered,
-which make it easy to start a new :app:`Pyramid` project. 
-
+Additionally, as chronicled in :ref:`project_narr`, scaffolds will be
+registered, which make it easy to start a new :app:`Pyramid` project.

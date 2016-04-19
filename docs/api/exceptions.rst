@@ -5,10 +5,16 @@
 
 .. automodule:: pyramid.exceptions
 
-  .. autoclass:: Forbidden
+  .. autoexception:: BadCSRFOrigin
 
-  .. autoclass:: NotFound
+  .. autoexception:: BadCSRFToken
 
-  .. autoclass:: ConfigurationError
+  .. autoexception:: PredicateMismatch
 
-  .. autoclass:: URLDecodeError
+  .. autoexception:: Forbidden
+
+  .. autoexception:: NotFound
+
+  .. autoexception:: ConfigurationError
+
+  .. autoexception:: URLDecodeError

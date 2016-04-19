@@ -1,66 +1,101 @@
 import unittest
+import warnings
 
 from pyramid.testing import cleanUp
+
+from pyramid.compat import (
+    text_,
+    native_,
+    text_type,
+    url_quote,
+    PY2,
+    )
+
+with warnings.catch_warnings(record=True) as w:
+    warnings.filterwarnings('always')
+    from pyramid.interfaces import IContextURL
+    assert(len(w) == 1)
 
 class TraversalPathTests(unittest.TestCase):
     def _callFUT(self, path):
         from pyramid.traversal import traversal_path
         return traversal_path(path)
 
-    def test_path_startswith_endswith(self):
-        self.assertEqual(self._callFUT('/foo/'), (u'foo',))
-
-    def test_empty_elements(self):
-        self.assertEqual(self._callFUT('foo///'), (u'foo',))
-
-    def test_onedot(self):
-        self.assertEqual(self._callFUT('foo/./bar'), (u'foo', u'bar'))
-
-    def test_twodots(self):
-        self.assertEqual(self._callFUT('foo/../bar'), (u'bar',))
-
-    def test_element_urllquoted(self):
-        self.assertEqual(self._callFUT('/foo/space%20thing/bar'),
-                         (u'foo', u'space thing', u'bar'))
-
-    def test_segments_are_unicode(self):
-        result = self._callFUT('/foo/bar')
-        self.assertEqual(type(result[0]), unicode)
-        self.assertEqual(type(result[1]), unicode)
-
-    def test_same_value_returned_if_cached(self):
-        result1 = self._callFUT('/foo/bar')
-        result2 = self._callFUT('/foo/bar')
-        self.assertEqual(result1, (u'foo', u'bar'))
-        self.assertEqual(result2, (u'foo', u'bar'))
-
     def test_utf8(self):
-        import urllib
-        la = 'La Pe\xc3\xb1a'
-        encoded = urllib.quote(la)
-        decoded = unicode(la, 'utf-8')
+        la = b'La Pe\xc3\xb1a'
+        encoded = url_quote(la)
+        decoded = text_(la, 'utf-8')
         path = '/'.join([encoded, encoded])
-        self.assertEqual(self._callFUT(path), (decoded, decoded))
+        result = self._callFUT(path)
+        self.assertEqual(result, (decoded, decoded))
 
     def test_utf16(self):
         from pyramid.exceptions import URLDecodeError
-        import urllib
-        la = unicode('La Pe\xc3\xb1a', 'utf-8').encode('utf-16')
-        encoded = urllib.quote(la)
+        la = text_(b'La Pe\xc3\xb1a', 'utf-8').encode('utf-16')
+        encoded = url_quote(la)
         path = '/'.join([encoded, encoded])
         self.assertRaises(URLDecodeError, self._callFUT, path)
 
     def test_unicode_highorder_chars(self):
-        path = u'/%E6%B5%81%E8%A1%8C%E8%B6%8B%E5%8A%BF'
-        self.assertEqual(self._callFUT(path), (u'\u6d41\u884c\u8d8b\u52bf',))
+        path = text_('/%E6%B5%81%E8%A1%8C%E8%B6%8B%E5%8A%BF')
+        self.assertEqual(self._callFUT(path),
+                         (text_('\u6d41\u884c\u8d8b\u52bf', 'unicode_escape'),))
 
-    def test_unicode_simple(self):
-        path = u'/abc'
-        self.assertEqual(self._callFUT(path), (u'abc',))
+    def test_element_urllquoted(self):
+        self.assertEqual(self._callFUT('/foo/space%20thing/bar'),
+                         (text_('foo'), text_('space thing'), text_('bar')))
 
     def test_unicode_undecodeable_to_ascii(self):
-        path = unicode('/La Pe\xc3\xb1a', 'utf-8')
+        path = text_(b'/La Pe\xc3\xb1a', 'utf-8')
         self.assertRaises(UnicodeEncodeError, self._callFUT, path)
+
+class TraversalPathInfoTests(unittest.TestCase):
+    def _callFUT(self, path):
+        from pyramid.traversal import traversal_path_info
+        return traversal_path_info(path)
+
+    def test_path_startswith_endswith(self):
+        self.assertEqual(self._callFUT('/foo/'), (text_('foo'),))
+
+    def test_empty_elements(self):
+        self.assertEqual(self._callFUT('foo///'), (text_('foo'),))
+
+    def test_onedot(self):
+        self.assertEqual(self._callFUT('foo/./bar'),
+                         (text_('foo'), text_('bar')))
+
+    def test_twodots(self):
+        self.assertEqual(self._callFUT('foo/../bar'), (text_('bar'),))
+
+    def test_twodots_at_start(self):
+        self.assertEqual(self._callFUT('../../bar'), (text_('bar'),))
+
+    def test_segments_are_unicode(self):
+        result = self._callFUT('/foo/bar')
+        self.assertEqual(type(result[0]), text_type)
+        self.assertEqual(type(result[1]), text_type)
+
+    def test_same_value_returned_if_cached(self):
+        result1 = self._callFUT('/foo/bar')
+        result2 = self._callFUT('/foo/bar')
+        self.assertEqual(result1, (text_('foo'), text_('bar')))
+        self.assertEqual(result2, (text_('foo'), text_('bar')))
+
+    def test_unicode_simple(self):
+        path = text_('/abc')
+        self.assertEqual(self._callFUT(path), (text_('abc'),))
+
+    def test_highorder(self):
+        la = b'La Pe\xc3\xb1a'
+        latin1 = native_(la)
+        result = self._callFUT(latin1)
+        self.assertEqual(result, (text_(la, 'utf-8'),))
+
+    def test_highorder_undecodeable(self):
+        from pyramid.exceptions import URLDecodeError
+        la = text_(b'La Pe\xc3\xb1a', 'utf-8')
+        notlatin1 = native_(la)
+        self.assertRaises(URLDecodeError, self._callFUT, notlatin1)
 
 class ResourceTreeTraverserTests(unittest.TestCase):
     def setUp(self):
@@ -93,10 +128,10 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         context = DummyContext()
         verifyObject(ITraverser, self._makeOne(context))
 
-    def test_call_with_no_pathinfo(self):
+    def test_call_with_empty_pathinfo(self):
         policy = self._makeOne(None)
         environ = self._getEnviron()
-        request = DummyRequest(environ)
+        request = DummyRequest(environ, path_info='')
         result = policy(request)
         self.assertEqual(result['context'], None)
         self.assertEqual(result['view_name'], '')
@@ -106,10 +141,39 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         self.assertEqual(result['virtual_root'], policy.root)
         self.assertEqual(result['virtual_root_path'], ())
 
+    def test_call_with_pathinfo_KeyError(self):
+        policy = self._makeOne(None)
+        environ = self._getEnviron()
+        request = DummyRequest(environ, toraise=KeyError)
+        result = policy(request)
+        self.assertEqual(result['context'], None)
+        self.assertEqual(result['view_name'], '')
+        self.assertEqual(result['subpath'], ())
+        self.assertEqual(result['traversed'], ())
+        self.assertEqual(result['root'], policy.root)
+        self.assertEqual(result['virtual_root'], policy.root)
+        self.assertEqual(result['virtual_root_path'], ())
+
+    def test_call_with_pathinfo_highorder(self):
+        path = text_(b'/Qu\xc3\xa9bec', 'utf-8')
+        foo = DummyContext(None, path)
+        root = DummyContext(foo, 'root')
+        policy = self._makeOne(root)
+        environ = self._getEnviron()
+        request = DummyRequest(environ, path_info=path)
+        result = policy(request)
+        self.assertEqual(result['context'], foo)
+        self.assertEqual(result['view_name'], '')
+        self.assertEqual(result['subpath'], ())
+        self.assertEqual(result['traversed'], (path[1:],))
+        self.assertEqual(result['root'], policy.root)
+        self.assertEqual(result['virtual_root'], policy.root)
+        self.assertEqual(result['virtual_root_path'], ())
+
     def test_call_pathel_with_no_getitem(self):
         policy = self._makeOne(None)
-        environ = self._getEnviron(PATH_INFO='/foo/bar')
-        request = DummyRequest(environ)
+        environ = self._getEnviron()
+        request = DummyRequest(environ, path_info=text_('/foo/bar'))
         result = policy(request)
         self.assertEqual(result['context'], None)
         self.assertEqual(result['view_name'], 'foo')
@@ -122,8 +186,8 @@ class ResourceTreeTraverserTests(unittest.TestCase):
     def test_call_withconn_getitem_emptypath_nosubpath(self):
         root = DummyContext()
         policy = self._makeOne(root)
-        environ = self._getEnviron(PATH_INFO='')
-        request = DummyRequest(environ)
+        environ = self._getEnviron()
+        request = DummyRequest(environ, path_info=text_(''))
         result = policy(request)
         self.assertEqual(result['context'], root)
         self.assertEqual(result['view_name'], '')
@@ -137,13 +201,13 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         foo = DummyContext()
         root = DummyContext(foo)
         policy = self._makeOne(root)
-        environ = self._getEnviron(PATH_INFO='/foo/bar')
-        request = DummyRequest(environ)
+        environ = self._getEnviron()
+        request = DummyRequest(environ, path_info=text_('/foo/bar'))
         result = policy(request)
         self.assertEqual(result['context'], foo)
         self.assertEqual(result['view_name'], 'bar')
         self.assertEqual(result['subpath'], ())
-        self.assertEqual(result['traversed'], (u'foo',))
+        self.assertEqual(result['traversed'], (text_('foo'),))
         self.assertEqual(result['root'], root)
         self.assertEqual(result['virtual_root'], root)
         self.assertEqual(result['virtual_root_path'], ())
@@ -152,13 +216,13 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         foo = DummyContext()
         root = DummyContext(foo)
         policy = self._makeOne(root)
-        environ = self._getEnviron(PATH_INFO='/foo/bar/baz/buz')
-        request = DummyRequest(environ)
+        environ = self._getEnviron()
+        request = DummyRequest(environ, path_info=text_('/foo/bar/baz/buz'))
         result = policy(request)
         self.assertEqual(result['context'], foo)
         self.assertEqual(result['view_name'], 'bar')
         self.assertEqual(result['subpath'], ('baz', 'buz'))
-        self.assertEqual(result['traversed'], (u'foo',))
+        self.assertEqual(result['traversed'], (text_('foo'),))
         self.assertEqual(result['root'], root)
         self.assertEqual(result['virtual_root'], root)
         self.assertEqual(result['virtual_root_path'], ())
@@ -167,8 +231,8 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         foo = DummyContext()
         root = DummyContext(foo)
         policy = self._makeOne(root)
-        environ = self._getEnviron(PATH_INFO='/@@foo')
-        request = DummyRequest(environ)
+        environ = self._getEnviron()
+        request = DummyRequest(environ, path_info=text_('/@@foo'))
         result = policy(request)
         self.assertEqual(result['context'], root)
         self.assertEqual(result['view_name'], 'foo')
@@ -179,82 +243,83 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         self.assertEqual(result['virtual_root_path'], ())
 
     def test_call_with_vh_root(self):
-        environ = self._getEnviron(PATH_INFO='/baz',
-                                   HTTP_X_VHM_ROOT='/foo/bar')
+        environ = self._getEnviron(HTTP_X_VHM_ROOT='/foo/bar')
         baz = DummyContext(None, 'baz')
         bar = DummyContext(baz, 'bar')
         foo = DummyContext(bar, 'foo')
         root = DummyContext(foo, 'root')
         policy = self._makeOne(root)
-        request = DummyRequest(environ)
+        request = DummyRequest(environ, path_info=text_('/baz'))
         result = policy(request)
         self.assertEqual(result['context'], baz)
         self.assertEqual(result['view_name'], '')
         self.assertEqual(result['subpath'], ())
-        self.assertEqual(result['traversed'], (u'foo', u'bar', u'baz'))
+        self.assertEqual(result['traversed'],
+                         (text_('foo'), text_('bar'), text_('baz')))
         self.assertEqual(result['root'], root)
         self.assertEqual(result['virtual_root'], bar)
-        self.assertEqual(result['virtual_root_path'], (u'foo', u'bar'))
+        self.assertEqual(result['virtual_root_path'],
+                         (text_('foo'), text_('bar')))
 
     def test_call_with_vh_root2(self):
-        environ = self._getEnviron(PATH_INFO='/bar/baz',
-                                   HTTP_X_VHM_ROOT='/foo')
+        environ = self._getEnviron(HTTP_X_VHM_ROOT='/foo')
         baz = DummyContext(None, 'baz')
         bar = DummyContext(baz, 'bar')
         foo = DummyContext(bar, 'foo')
         root = DummyContext(foo, 'root')
         policy = self._makeOne(root)
-        request = DummyRequest(environ)
+        request = DummyRequest(environ, path_info=text_('/bar/baz'))
         result = policy(request)
         self.assertEqual(result['context'], baz)
         self.assertEqual(result['view_name'], '')
         self.assertEqual(result['subpath'], ())
-        self.assertEqual(result['traversed'], (u'foo', u'bar', u'baz'))
+        self.assertEqual(result['traversed'],
+                         (text_('foo'), text_('bar'), text_('baz')))
         self.assertEqual(result['root'], root)
         self.assertEqual(result['virtual_root'], foo)
-        self.assertEqual(result['virtual_root_path'], (u'foo',))
+        self.assertEqual(result['virtual_root_path'], (text_('foo'),))
 
     def test_call_with_vh_root3(self):
-        environ = self._getEnviron(PATH_INFO='/foo/bar/baz',
-                                   HTTP_X_VHM_ROOT='/')
+        environ = self._getEnviron(HTTP_X_VHM_ROOT='/')
         baz = DummyContext()
         bar = DummyContext(baz)
         foo = DummyContext(bar)
         root = DummyContext(foo)
         policy = self._makeOne(root)
-        request = DummyRequest(environ)
+        request = DummyRequest(environ, path_info=text_('/foo/bar/baz'))
         result = policy(request)
         self.assertEqual(result['context'], baz)
         self.assertEqual(result['view_name'], '')
         self.assertEqual(result['subpath'], ())
-        self.assertEqual(result['traversed'], (u'foo', u'bar', u'baz'))
+        self.assertEqual(result['traversed'],
+                         (text_('foo'), text_('bar'), text_('baz')))
         self.assertEqual(result['root'], root)
         self.assertEqual(result['virtual_root'], root)
         self.assertEqual(result['virtual_root_path'], ())
 
     def test_call_with_vh_root4(self):
-        environ = self._getEnviron(PATH_INFO='/',
-                                   HTTP_X_VHM_ROOT='/foo/bar/baz')
+        environ = self._getEnviron(HTTP_X_VHM_ROOT='/foo/bar/baz')
         baz = DummyContext(None, 'baz')
         bar = DummyContext(baz, 'bar')
         foo = DummyContext(bar, 'foo')
         root = DummyContext(foo, 'root')
         policy = self._makeOne(root)
-        request = DummyRequest(environ)
+        request = DummyRequest(environ, path_info=text_('/'))
         result = policy(request)
         self.assertEqual(result['context'], baz)
         self.assertEqual(result['view_name'], '')
         self.assertEqual(result['subpath'], ())
-        self.assertEqual(result['traversed'], (u'foo', u'bar', u'baz'))
+        self.assertEqual(result['traversed'],
+                         (text_('foo'), text_('bar'), text_('baz')))
         self.assertEqual(result['root'], root)
         self.assertEqual(result['virtual_root'], baz)
-        self.assertEqual(result['virtual_root_path'], (u'foo', u'bar', u'baz'))
+        self.assertEqual(result['virtual_root_path'],
+                         (text_('foo'), text_('bar'), text_('baz')))
 
     def test_call_with_vh_root_path_root(self):
         policy = self._makeOne(None)
-        environ = self._getEnviron(HTTP_X_VHM_ROOT='/',
-                                   PATH_INFO='/')
-        request = DummyRequest(environ)
+        environ = self._getEnviron(HTTP_X_VHM_ROOT='/')
+        request = DummyRequest(environ, path_info=text_('/'))
         result = policy(request)
         self.assertEqual(result['context'], None)
         self.assertEqual(result['view_name'], '')
@@ -264,31 +329,49 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         self.assertEqual(result['virtual_root'], policy.root)
         self.assertEqual(result['virtual_root_path'], ())
 
-    def test_non_utf8_path_segment_unicode_path_segments_fails(self):
-        foo = DummyContext()
-        root = DummyContext(foo)
+    def test_call_with_vh_root_highorder(self):
+        path = text_(b'Qu\xc3\xa9bec', 'utf-8')
+        bar = DummyContext(None, 'bar')
+        foo = DummyContext(bar, path)
+        root = DummyContext(foo, 'root')
         policy = self._makeOne(root)
-        segment = unicode('LaPe\xc3\xb1a', 'utf-8').encode('utf-16')
-        environ = self._getEnviron(PATH_INFO='/%s' % segment)
-        request = DummyRequest(environ)
-        from pyramid.exceptions import URLDecodeError
-        self.assertRaises(URLDecodeError, policy, request)
+        if PY2:
+            vhm_root = b'/Qu\xc3\xa9bec'
+        else:
+            vhm_root = b'/Qu\xc3\xa9bec'.decode('latin-1')
+        environ = self._getEnviron(HTTP_X_VHM_ROOT=vhm_root)
+        request = DummyRequest(environ, path_info=text_('/bar'))
+        result = policy(request)
+        self.assertEqual(result['context'], bar)
+        self.assertEqual(result['view_name'], '')
+        self.assertEqual(result['subpath'], ())
+        self.assertEqual(
+            result['traversed'],
+            (path, text_('bar'))
+            )
+        self.assertEqual(result['root'], policy.root)
+        self.assertEqual(result['virtual_root'], foo)
+        self.assertEqual(
+            result['virtual_root_path'],
+            (path,)
+            )
 
-    def test_non_utf8_path_segment_settings_unicode_path_segments_fails(self):
+    def test_path_info_raises_unicodedecodeerror(self):
+        from pyramid.exceptions import URLDecodeError
         foo = DummyContext()
         root = DummyContext(foo)
         policy = self._makeOne(root)
-        segment = unicode('LaPe\xc3\xb1a', 'utf-8').encode('utf-16')
-        environ = self._getEnviron(PATH_INFO='/%s' % segment)
-        request = DummyRequest(environ)
-        from pyramid.exceptions import URLDecodeError
+        environ = self._getEnviron()
+        toraise = UnicodeDecodeError('ascii', b'a', 2, 3, '5')
+        request = DummyRequest(environ, toraise=toraise)
+        request.matchdict = None
         self.assertRaises(URLDecodeError, policy, request)
 
     def test_withroute_nothingfancy(self):
         resource = DummyContext()
         traverser = self._makeOne(resource)
-        environ = {'bfg.routes.matchdict': {}}
-        request = DummyRequest(environ)
+        request = DummyRequest({})
+        request.matchdict = {}
         result = traverser(request)
         self.assertEqual(result['context'], resource)
         self.assertEqual(result['view_name'], '')
@@ -301,8 +384,9 @@ class ResourceTreeTraverserTests(unittest.TestCase):
     def test_withroute_with_subpath_string(self):
         resource = DummyContext()
         traverser = self._makeOne(resource)
-        environ = {'bfg.routes.matchdict': {'subpath':'/a/b/c'}}
-        request = DummyRequest(environ)
+        matchdict = {'subpath':'/a/b/c'}
+        request = DummyRequest({})
+        request.matchdict = matchdict
         result = traverser(request)
         self.assertEqual(result['context'], resource)
         self.assertEqual(result['view_name'], '')
@@ -315,8 +399,9 @@ class ResourceTreeTraverserTests(unittest.TestCase):
     def test_withroute_with_subpath_tuple(self):
         resource = DummyContext()
         traverser = self._makeOne(resource)
-        environ = {'bfg.routes.matchdict': {'subpath':('a', 'b', 'c')}}
-        request = DummyRequest(environ)
+        matchdict = {'subpath':('a', 'b', 'c')}
+        request = DummyRequest({})
+        request.matchdict = matchdict
         result = traverser(request)
         self.assertEqual(result['context'], resource)
         self.assertEqual(result['view_name'], '')
@@ -329,8 +414,9 @@ class ResourceTreeTraverserTests(unittest.TestCase):
     def test_withroute_and_traverse_string(self):
         resource = DummyContext()
         traverser = self._makeOne(resource)
-        environ = {'bfg.routes.matchdict': {'traverse':'foo/bar'}}
-        request = DummyRequest(environ)
+        matchdict =  {'traverse':text_('foo/bar')}
+        request = DummyRequest({})
+        request.matchdict = matchdict
         result = traverser(request)
         self.assertEqual(result['context'], resource)
         self.assertEqual(result['view_name'], 'foo')
@@ -343,8 +429,9 @@ class ResourceTreeTraverserTests(unittest.TestCase):
     def test_withroute_and_traverse_tuple(self):
         resource = DummyContext()
         traverser = self._makeOne(resource)
-        environ = {'bfg.routes.matchdict': {'traverse':('foo', 'bar')}}
-        request = DummyRequest(environ)
+        matchdict = {'traverse':('foo', 'bar')}
+        request = DummyRequest({})
+        request.matchdict = matchdict
         result = traverser(request)
         self.assertEqual(result['context'], resource)
         self.assertEqual(result['view_name'], 'foo')
@@ -357,8 +444,9 @@ class ResourceTreeTraverserTests(unittest.TestCase):
     def test_withroute_and_traverse_empty(self):
         resource = DummyContext()
         traverser = self._makeOne(resource)
-        environ = {'bfg.routes.matchdict': {'traverse':''}}
-        request = DummyRequest(environ)
+        matchdict = {'traverse':''}
+        request = DummyRequest({})
+        request.matchdict = matchdict
         result = traverser(request)
         self.assertEqual(result['context'], resource)
         self.assertEqual(result['view_name'], '')
@@ -368,23 +456,23 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         self.assertEqual(result['virtual_root'], resource)
         self.assertEqual(result['virtual_root_path'], ())
 
-    def test_call_with_environ(self):
-        import warnings
-        warnings.filterwarnings('ignore')
-        try:
-            policy = self._makeOne(None)
-            environ = self._getEnviron()
-            result = policy(environ)
-            self.assertEqual(result['context'], None)
-            self.assertEqual(result['view_name'], '')
-            self.assertEqual(result['subpath'], ())
-            self.assertEqual(result['traversed'], ())
-            self.assertEqual(result['root'], policy.root)
-            self.assertEqual(result['virtual_root'], policy.root)
-            self.assertEqual(result['virtual_root_path'], ())
-        finally:
-            warnings.resetwarnings()
-
+    def test_withroute_and_traverse_and_vroot(self):
+        abc = DummyContext()
+        resource = DummyContext(next=abc)
+        environ = self._getEnviron(HTTP_X_VHM_ROOT='/abc')
+        request = DummyRequest(environ)
+        traverser = self._makeOne(resource)
+        matchdict =  {'traverse':text_('/foo/bar')}
+        request.matchdict = matchdict
+        result = traverser(request)
+        self.assertEqual(result['context'], abc)
+        self.assertEqual(result['view_name'], 'foo')
+        self.assertEqual(result['subpath'], ('bar',))
+        self.assertEqual(result['traversed'], ('abc', 'foo'))
+        self.assertEqual(result['root'], resource)
+        self.assertEqual(result['virtual_root'], abc)
+        self.assertEqual(result['virtual_root_path'], ('abc',))
+        
 class FindInterfaceTests(unittest.TestCase):
     def _callFUT(self, context, iface):
         from pyramid.traversal import find_interface
@@ -589,13 +677,16 @@ class FindResourceTests(unittest.TestCase):
         unprintable = DummyContext()
         root = DummyContext(unprintable)
         unprintable.__parent__ = root
-        unprintable.__name__ = unicode(
-            '/\xe6\xb5\x81\xe8\xa1\x8c\xe8\xb6\x8b\xe5\x8a\xbf', 'utf-8')
+        unprintable.__name__ = text_(
+            b'/\xe6\xb5\x81\xe8\xa1\x8c\xe8\xb6\x8b\xe5\x8a\xbf', 'utf-8')
         root.__parent__ = None
         root.__name__ = None
         traverser = ResourceTreeTraverser
         self._registerTraverser(traverser)
-        result = self._callFUT(root, u'/%E6%B5%81%E8%A1%8C%E8%B6%8B%E5%8A%BF')
+        result = self._callFUT(
+            root,
+            text_(b'/%E6%B5%81%E8%A1%8C%E8%B6%8B%E5%8A%BF')
+            )
         self.assertEqual(result, unprintable)
 
 class ResourcePathTests(unittest.TestCase):
@@ -741,7 +832,7 @@ class QuotePathSegmentTests(unittest.TestCase):
         return quote_path_segment(s)
 
     def test_unicode(self):
-        la = unicode('/La Pe\xc3\xb1a', 'utf-8')
+        la = text_(b'/La Pe\xc3\xb1a', 'utf-8')
         result = self._callFUT(la)
         self.assertEqual(result, '%2FLa%20Pe%C3%B1a')
 
@@ -756,8 +847,9 @@ class QuotePathSegmentTests(unittest.TestCase):
         self.assertEqual(result, '12345')
         
     def test_long(self):
+        from pyramid.compat import long
         import sys
-        s = long(sys.maxint + 1)
+        s = long(sys.maxsize + 1)
         result = self._callFUT(s)
         expected = str(s)
         self.assertEqual(result, expected)
@@ -770,13 +862,13 @@ class QuotePathSegmentTests(unittest.TestCase):
         result = self._callFUT(s)
         self.assertEqual(result, 'abc')
 
-class TraversalContextURLTests(unittest.TestCase):
+class ResourceURLTests(unittest.TestCase):
     def _makeOne(self, context, url):
         return self._getTargetClass()(context, url)
 
     def _getTargetClass(self):
-        from pyramid.traversal import TraversalContextURL
-        return TraversalContextURL
+        from pyramid.traversal import ResourceURL
+        return ResourceURL
 
     def _registerTraverser(self, traverser):
         from pyramid.threadlocal import get_current_registry
@@ -786,17 +878,23 @@ class TraversalContextURLTests(unittest.TestCase):
         reg.registerAdapter(traverser, (Interface,), ITraverser)
 
     def test_class_conforms_to_IContextURL(self):
+        # bw compat
         from zope.interface.verify import verifyClass
-        from pyramid.interfaces import IContextURL
         verifyClass(IContextURL, self._getTargetClass())
 
     def test_instance_conforms_to_IContextURL(self):
         from zope.interface.verify import verifyObject
-        from pyramid.interfaces import IContextURL
         context = DummyContext()
         request = DummyRequest()
         verifyObject(IContextURL, self._makeOne(context, request))
 
+    def test_instance_conforms_to_IResourceURL(self):
+        from pyramid.interfaces import IResourceURL
+        from zope.interface.verify import verifyObject
+        context = DummyContext()
+        request = DummyRequest()
+        verifyObject(IResourceURL, self._makeOne(context, request))
+        
     def test_call_withlineage(self):
         baz = DummyContext()
         bar = DummyContext(baz)
@@ -830,15 +928,16 @@ class TraversalContextURLTests(unittest.TestCase):
         root.__name__ = None
         one = DummyContext()
         one.__parent__ = root
-        one.__name__ = unicode('La Pe\xc3\xb1a', 'utf-8')
+        one.__name__ = text_(b'La Pe\xc3\xb1a', 'utf-8')
         two = DummyContext()
         two.__parent__ = one
-        two.__name__ = 'La Pe\xc3\xb1a'
+        two.__name__ = b'La Pe\xc3\xb1a'
         request = DummyRequest()
         context_url = self._makeOne(two, request)
         result = context_url()
-        self.assertEqual(result,
-                     'http://example.com:5432/La%20Pe%C3%B1a/La%20Pe%C3%B1a/')
+        self.assertEqual(
+            result,
+            'http://example.com:5432/La%20Pe%C3%B1a/La%20Pe%C3%B1a/')
 
     def test_call_with_virtual_root_path(self):
         from pyramid.interfaces import VH_ROOT_KEY
@@ -877,6 +976,45 @@ class TraversalContextURLTests(unittest.TestCase):
         result = context_url()
         self.assertEqual(result, 'http://example.com:5432/one/two/')
 
+    def test_call_empty_names_not_ignored(self):
+        bar = DummyContext()
+        empty = DummyContext(bar)
+        root = DummyContext(empty)
+        root.__parent__ = None
+        root.__name__ = None
+        empty.__parent__ = root
+        empty.__name__ = ''
+        bar.__parent__ = empty
+        bar.__name__ = 'bar'
+        request = DummyRequest()
+        context_url = self._makeOne(bar, request)
+        result = context_url()
+        self.assertEqual(result, 'http://example.com:5432//bar/')
+
+    def test_call_local_url_returns_None(self):
+        resource = DummyContext()
+        def resource_url(request, info):
+            self.assertEqual(info['virtual_path'], '/')
+            self.assertEqual(info['physical_path'], '/')
+            return None
+        resource.__resource_url__ = resource_url
+        request = DummyRequest()
+        context_url = self._makeOne(resource, request)
+        result = context_url()
+        self.assertEqual(result, 'http://example.com:5432/')
+        
+    def test_call_local_url_returns_url(self):
+        resource = DummyContext()
+        def resource_url(request, info):
+            self.assertEqual(info['virtual_path'], '/')
+            self.assertEqual(info['physical_path'], '/')
+            return 'abc'
+        resource.__resource_url__ = resource_url
+        request = DummyRequest()
+        context_url = self._makeOne(resource, request)
+        result = context_url()
+        self.assertEqual(result, 'abc')
+
     def test_virtual_root_no_virtual_root_path(self):
         root = DummyContext()
         root.__name__ = None
@@ -909,44 +1047,61 @@ class TraversalContextURLTests(unittest.TestCase):
         self.assertEqual(context_url.virtual_root(), traversed_to)
         self.assertEqual(context.request.environ['PATH_INFO'], '/one')
 
-    def test_empty_names_not_ignored(self):
-        bar = DummyContext()
-        empty = DummyContext(bar)
-        root = DummyContext(empty)
+    def test_IResourceURL_attributes_with_vroot(self):
+        from pyramid.interfaces import VH_ROOT_KEY
+        root = DummyContext()
         root.__parent__ = None
         root.__name__ = None
-        empty.__parent__ = root
-        empty.__name__ = ''
-        bar.__parent__ = empty
-        bar.__name__ = 'bar'
-        request = DummyRequest()
-        context_url = self._makeOne(bar, request)
-        result = context_url()
-        self.assertEqual(result, 'http://example.com:5432//bar/')
-
-    def test_local_url_returns_None(self):
-        resource = DummyContext()
-        def resource_url(request, info):
-            self.assertEqual(info['virtual_path'], '/')
-            self.assertEqual(info['physical_path'], '/')
-            return None
-        resource.__resource_url__ = resource_url
-        request = DummyRequest()
-        context_url = self._makeOne(resource, request)
-        result = context_url()
-        self.assertEqual(result, 'http://example.com:5432/')
+        one = DummyContext()
+        one.__parent__ = root
+        one.__name__ = 'one'
+        two = DummyContext()
+        two.__parent__ = one
+        two.__name__ = 'two'
+        environ = {VH_ROOT_KEY:'/one'}
+        request = DummyRequest(environ)
+        context_url = self._makeOne(two, request)
+        self.assertEqual(context_url.physical_path, '/one/two/')
+        self.assertEqual(context_url.virtual_path, '/two/')
+        self.assertEqual(context_url.physical_path_tuple, ('', 'one', 'two',''))
+        self.assertEqual(context_url.virtual_path_tuple, ('', 'two', ''))
         
-    def test_local_url_returns_url(self):
-        resource = DummyContext()
-        def resource_url(request, info):
-            self.assertEqual(info['virtual_path'], '/')
-            self.assertEqual(info['physical_path'], '/')
-            return 'abc'
-        resource.__resource_url__ = resource_url
-        request = DummyRequest()
-        context_url = self._makeOne(resource, request)
-        result = context_url()
-        self.assertEqual(result, 'abc')
+    def test_IResourceURL_attributes_vroot_ends_with_slash(self):
+        from pyramid.interfaces import VH_ROOT_KEY
+        root = DummyContext()
+        root.__parent__ = None
+        root.__name__ = None
+        one = DummyContext()
+        one.__parent__ = root
+        one.__name__ = 'one'
+        two = DummyContext()
+        two.__parent__ = one
+        two.__name__ = 'two'
+        environ = {VH_ROOT_KEY:'/one/'}
+        request = DummyRequest(environ)
+        context_url = self._makeOne(two, request)
+        self.assertEqual(context_url.physical_path, '/one/two/')
+        self.assertEqual(context_url.virtual_path, '/two/')
+        self.assertEqual(context_url.physical_path_tuple, ('', 'one', 'two',''))
+        self.assertEqual(context_url.virtual_path_tuple, ('', 'two', ''))
+        
+    def test_IResourceURL_attributes_no_vroot(self):
+        root = DummyContext()
+        root.__parent__ = None
+        root.__name__ = None
+        one = DummyContext()
+        one.__parent__ = root
+        one.__name__ = 'one'
+        two = DummyContext()
+        two.__parent__ = one
+        two.__name__ = 'two'
+        environ = {}
+        request = DummyRequest(environ)
+        context_url = self._makeOne(two, request)
+        self.assertEqual(context_url.physical_path, '/one/two/')
+        self.assertEqual(context_url.virtual_path, '/one/two/')
+        self.assertEqual(context_url.physical_path_tuple, ('', 'one', 'two',''))
+        self.assertEqual(context_url.virtual_path_tuple, ('', 'one', 'two', ''))
 
 class TestVirtualRoot(unittest.TestCase):
     def setUp(self):
@@ -960,7 +1115,6 @@ class TestVirtualRoot(unittest.TestCase):
         return virtual_root(resource, request)
 
     def test_registered(self):
-        from pyramid.interfaces import IContextURL
         from zope.interface import Interface
         request = _makeRequest()
         request.registry.registerAdapter(DummyContextURL, (Interface,Interface),
@@ -1031,6 +1185,13 @@ class TraverseTests(unittest.TestCase):
         traverser = make_traverser({'context':resource, 'view_name':''})
         self._registerTraverser(traverser)
         self._callFUT(resource, '')
+        self.assertEqual(resource.request.environ['PATH_INFO'], '')
+
+    def test_self_unicode_found(self):
+        resource = DummyContext()
+        traverser = make_traverser({'context':resource, 'view_name':''})
+        self._registerTraverser(traverser)
+        self._callFUT(resource, text_(''))
         self.assertEqual(resource.request.environ['PATH_INFO'], '')
 
     def test_self_tuple_found(self):
@@ -1117,21 +1278,12 @@ class TestDefaultRootFactory(unittest.TestCase):
     def _makeOne(self, environ):
         return self._getTargetClass()(environ)
 
-    def test_no_matchdict(self):
-        class DummyRequest:
-            matchdict = None
+    def test_it(self):
+        class DummyRequest(object):
+            pass
         root = self._makeOne(DummyRequest())
         self.assertEqual(root.__parent__, None)
         self.assertEqual(root.__name__, None)
-
-    def test_matchdict(self):
-        class DummyRequest:
-            pass
-        request = DummyRequest()
-        request.matchdict = {'a':1, 'b':2}
-        root = self._makeOne(request)
-        self.assertEqual(root.a, 1)
-        self.assertEqual(root.b, 2)
 
 class Test__join_path_tuple(unittest.TestCase):
     def _callFUT(self, tup):
@@ -1165,18 +1317,35 @@ class DummyContext(object):
 
     def __getitem__(self, name):
         if self.next is None:
-            raise KeyError, name
+            raise KeyError(name)
         return self.next
 
     def __repr__(self):
         return '<DummyContext with name %s at id %s>'%(self.__name__, id(self))
 
 class DummyRequest:
+
     application_url = 'http://example.com:5432' # app_url never ends with slash
-    def __init__(self, environ=None):
+    matchdict = None
+    matched_route = None
+
+    def __init__(self, environ=None, path_info=text_('/'), toraise=None):
         if environ is None:
             environ = {}
         self.environ = environ
+        self._set_path_info(path_info)
+        self.toraise = toraise
+
+    def _get_path_info(self):
+        if self.toraise:
+            raise self.toraise
+        return self._path_info
+
+    def _set_path_info(self, v):
+        self._path_info = v
+
+    path_info = property(_get_path_info, _set_path_info)
+        
 
 class DummyContextURL:
     def __init__(self, context, request):

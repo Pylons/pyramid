@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Quick Tutorial: ${view.view_name} - ${page_title}</title>
+</head>
+<body>
+<h1>${view.view_name} - ${page_title}</h1>
+<p>Welcome, ${view.full_name}</p>
+<form method="POST"
+      action="${request.current_route_url()}">
+    <input name="new_name"/>
+    <input type="submit" name="form.edit" value="Save"/>
+    <input type="submit" name="form.delete" value="Delete"/>
+</form>
+</body>
+</html>

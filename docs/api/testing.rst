@@ -9,6 +9,8 @@
 
   .. autofunction:: tearDown
 
+  .. autofunction:: testConfig(registry=None, request=None, hook_zca=True, autocommit=True, settings=None)
+
   .. autofunction:: cleanUp
 
   .. autoclass:: DummyResource

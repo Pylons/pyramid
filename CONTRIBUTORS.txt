@@ -16,7 +16,7 @@ Treatment of Account
 Contributor will not allow anyone other than the Contributor to use his or
 her username or source repository login to submit code to a Pylons Project
 source repository. Should Contributor become aware of any such use,
-Contributor will immediately by notifying Agendaless Consulting.
+Contributor will immediately notify Agendaless Consulting.
 Notification must be performed by sending an email to
 webmaster@agendaless.com.  Until such notice is received, Contributor will be
 presumed to have taken all actions made through Contributor's account. If the
@@ -127,7 +127,7 @@ Contributors
 
 - Wichert Akkerman, 2011/01/19
 
-- Christopher Lambacehr, 2011/02/12
+- Christopher Lambacher, 2011/02/12
 
 - Malthe Borch, 2011/02/28
 
@@ -142,3 +142,127 @@ Contributors
 - Michael Merickel, 2011/5/25
 
 - Christoph Zwerschke, 2011/06/07
+
+- Atsushi Odagiri, 2011/07/02
+
+- Shane Hathaway, 2011/07/22
+
+- Manuel Hermann, 2011/07/11
+
+- Richard Barrell, 2011/11/07
+
+- Chris Shenton, 2011/11/07
+
+- Ken Manheimer, 2011/11/07
+
+- Reed O'Brien, 2011/11/07
+
+- Klee Dienes, 2011/10/30
+
+- Michael Ryabushin, 2011/12/14
+
+- Mike Orr, 2012/02/14
+
+- Paul M. Winkler, 2012/02/22
+
+- Martijn Pieters, 2012/03/02
+
+- Steve Piercy, 2012/03/27
+
+- Wayne Witzel III, 2012/03/27
+
+- Marin Rukavina, 2012/05/03
+
+- Lorenzo M. Catucci, 2012/06/08
+
+- Marc Abramowitz, 2012/06/13
+
+- Brian Sutherland, 2012/06/16
+
+- Jeff Cook, 2012/06/16
+
+- Ian Wilson, 2012/06/17
+
+- Roman Kozlovskyi, 2012/08/11
+
+- Domen Kozar, 2012/09/11
+
+- David Gay, 2012/09/16
+
+- Robert Jackiewicz, 2012/11/12
+
+- John Anderson, 2012/11/14
+
+- Bert JW Regeer, 2013/02/01
+
+- Georges Dubus, 2013/03/21
+
+- Jason McKellar, 2013/03/28
+
+- Luke Cyca, 2013/05/30
+
+- Laurence Rowe, 2013/04/24
+
+- Julian P. Glass, 2013/08/10
+
+- Junaid Ali, 2013/08/10
+
+- Chris Davies, 2013/08/11
+
+- Jonathan Villemaire-Krajden, 2013/08/13
+
+- Charlie Clark, 2013/08/15
+
+- Tom Lazar, 2013/08/15
+
+- Andreas Zeidler, 2013/08/15
+
+- Matthew Wilkes, 2013/08/23
+
+- Takahiro Fujiwara, 2013/08/28
+
+- Doug Hellmann, 2013/09/06
+
+- Karl O. Pinc, 2013/09/27
+
+- Matthew Russell, 2013/10/14
+
+- Antti Haapala, 2013/11/15
+
+- Amit Mane, 2014/01/23
+
+- Fenton Travers, 2014/05/06
+
+- Randall Leeds, 2014/11/11
+
+- Hugo Branquinho, 2014/11/25
+
+- Adrian Teng, 2014/12/17
+
+- Ilja Everila, 2015/02/05
+
+- Geoffrey T. Dairiki, 2015/02/06
+
+- David Glick, 2015/02/12
+
+- Donald Stufft, 2015/03/15
+
+- Randy Topliffe, 2015/04/14
+
+- Timur Izhbulatov, 2015/04/14
+
+- Karen Dalton, 2015/06/01
+
+- Igor Stroh, 2015/06/10
+
+- Jesse Dhillon, 2015/10/07
+
+- Amos Latteier, 2015/10/22
+
+- Rami Chousein, 2015/10/28
+
+- Sri Sanketh Uppalapati, 2015/12/12
+
+- Marcin Raczyński, 2016/01/26
+
+- Arian Maykon de A. Diógenes, 2016/04/13

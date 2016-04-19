@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Quick Tutorial: ${view.view_name} - ${page_title}</title>
+</head>
+<body>
+<h1>${view.view_name} - ${page_title}</h1>
+<p>You submitted <code>${new_name}</code></p>
+</body>
+</html>

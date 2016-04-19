@@ -11,12 +11,16 @@
 # All configuration values have a default value; values that are commented out
 # serve to show the default value.
 
-import sys, os
+import sys
+import os
 import datetime
 import inspect
 import warnings
 
 warnings.simplefilter('ignore', DeprecationWarning)
+
+import pkg_resources
+import pylons_sphinx_themes
 
 # skip raw nodes
 from sphinx.writers.text import TextTranslator
@@ -24,6 +28,7 @@ from sphinx.writers.latex import LaTeXTranslator
 
 from docutils import nodes
 from docutils import utils
+
 
 def raw(*arg):
     raise nodes.SkipNode
@@ -38,20 +43,6 @@ LaTeXTranslator.depart_inline = nothing
 
 book = os.environ.get('BOOK')
 
-# If your extensions are in another directory, add it here. If the directory
-# is relative to the documentation root, use os.path.abspath to make it
-# absolute, like shown here.
-parent = os.path.dirname(os.path.dirname(__file__))
-sys.path.append(os.path.abspath(parent))
-wd = os.getcwd()
-os.chdir(parent)
-os.system('%s setup.py test -q' % sys.executable)
-os.chdir(wd)
-
-for item in os.listdir(parent):
-    if item.endswith('.egg'):
-        sys.path.append(os.path.join(parent, item))
-
 # General configuration
 # ---------------------
 
@@ -61,20 +52,35 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
     'repoze.sphinx.autointerface',
-#    'sphinx.ext.intersphinx'
+    'sphinx.ext.viewcode',
+    'sphinx.ext.intersphinx',
+    'sphinxcontrib.programoutput',
+    # enable pylons_sphinx_latesturl when this branch is no longer "latest"
+    # 'pylons_sphinx_latesturl',
     ]
 
-# Looks for objects in other Pyramid projects
-## intersphinx_mapping = {
-##     'cookbook':
-##     ('http://docs.pylonsproject.org/projects/pyramid_cookbook/dev/', None),
-##     'handlers':
-##     ('http://docs.pylonsproject.org/projects/pyramid_handlers/dev/', None),
-##     'zcml':
-##     ('http://docs.pylonsproject.org/projects/pyramid_zcml/dev/', None),
-##     'jinja2':
-##     ('http://docs.pylonsproject.org/projects/pyramid_jinja2/dev/', None),
-##     }
+# Looks for objects in external projects
+intersphinx_mapping = {
+    'colander': ('http://docs.pylonsproject.org/projects/colander/en/latest', None),
+    'cookbook': ('http://docs.pylonsproject.org/projects/pyramid-cookbook/en/latest/', None),
+    'deform': ('http://docs.pylonsproject.org/projects/deform/en/latest', None),
+    'jinja2': ('http://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/', None),
+    'pylonswebframework': ('http://docs.pylonsproject.org/projects/pylons-webframework/en/latest/', None),
+    'python': ('https://docs.python.org/3', None),
+    'pytest': ('http://pytest.org/latest/', None),
+    'sqla': ('http://docs.sqlalchemy.org/en/latest', None),
+    'tm': ('http://docs.pylonsproject.org/projects/pyramid-tm/en/latest/', None),
+    'toolbar': ('http://docs.pylonsproject.org/projects/pyramid-debugtoolbar/en/latest', None),
+    'tstring': ('http://docs.pylonsproject.org/projects/translationstring/en/latest', None),
+    'tutorials': ('http://docs.pylonsproject.org/projects/pyramid-tutorials/en/latest/', None),
+    'venusian': ('http://docs.pylonsproject.org/projects/venusian/en/latest', None),
+    'webob': ('http://docs.webob.org/en/latest', None),
+    'webtest': ('http://webtest.pythonpaste.org/en/latest', None),
+    'who': ('http://repozewho.readthedocs.org/en/latest', None),
+    'zcml': ('http://docs.pylonsproject.org/projects/pyramid-zcml/en/latest', None),
+    'zcomponent': ('http://docs.zope.org/zope.component', None),
+}
+
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -86,14 +92,16 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General substitutions.
-project = 'The Pyramid Web Application Development Framework'
-copyright = '%s, Agendaless Consulting' % datetime.datetime.now().year
+project = 'The Pyramid Web Framework'
+thisyear = datetime.datetime.now().year
+copyright = '2008-%s, Agendaless Consulting' % thisyear
 
 # The default replacements for |version| and |release|, also used in various
 # other places throughout the built documents.
 #
 # The short X.Y version.
-version = '1.1a0'
+version = pkg_resources.get_distribution('pyramid').version
+
 # The full version, including alpha/beta/rc tags.
 release = version
 
@@ -103,68 +111,53 @@ release = version
 # Else, today_fmt is used as the format for a strftime call.
 today_fmt = '%B %d, %Y'
 
-# List of documents that shouldn't be included in the build.
-#unused_docs = []
-
-# List of directories, relative to source directories, that shouldn't be searched
-# for source files.
-#exclude_dirs = []
-
-# The reST default role (used for this markup: `text`) to use for all documents.
-#default_role = None
-
-# If true, '()' will be appended to :func: etc. cross-reference text.
-#add_function_parentheses = True
+# List of patterns, relative to source directory, that match files and
+# directories to ignore when looking for source files.
+exclude_patterns = ['_themes/README.rst', ]
 
 # If true, the current module name will be prepended to all description
 # unit titles (such as .. function::).
 add_module_names = False
-
-# If true, sectionauthor and moduleauthor directives will be shown in the
-# output. They are ignored by default.
-#show_authors = False
 
 # The name of the Pygments (syntax highlighting) style to use.
 #pygments_style = book and 'bw' or 'tango'
 if book:
     pygments_style = 'bw'
 
-# The default language to highlight source code in.
-#highlight_language = 'guess'
-
 # Options for HTML output
 # -----------------------
+# enable pylons_sphinx_latesturl when this branch is no longer "latest"
+# pylons_sphinx_latesturl_base = (
+#     'http://docs.pylonsproject.org/projects/pyramid/en/latest/')
+# pylons_sphinx_latesturl_pagename_overrides = {
+#     # map old pagename -> new pagename
+#     'whatsnew-1.0': 'index',
+#     'whatsnew-1.1': 'index',
+#     'whatsnew-1.2': 'index',
+#     'whatsnew-1.3': 'index',
+#     'whatsnew-1.4': 'index',
+#     'whatsnew-1.5': 'index',
+#     'whatsnew-1.6': 'index',
+#     'whatsnew-1.7': 'index',
+#     'tutorials/gae/index': 'index',
+#     'api/chameleon_text': 'api',
+#     'api/chameleon_zpt': 'api',
+# }
 
-# Add and use Pylons theme
-sys.path.append(os.path.abspath('_themes'))
-html_theme_path = ['_themes']
 html_theme = 'pyramid'
-
-# The style sheet to use for HTML and HTML Help pages. A file of that name
-# must exist either in Sphinx' static/ path, or in one of the custom paths
-# given in html_static_path.
-#html_style = 'pyramid.css'
+html_theme_path = pylons_sphinx_themes.get_html_themes_path()
+html_theme_options = dict(
+    github_url='https://github.com/Pylons/pyramid',
+    # On master branch and new branch still in
+    # pre-release status: true; else: false.
+    in_progress='true',
+    # On branches previous to "latest": true; else: false.
+    outdated='false',
+    )
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
-html_title = 'The Pyramid Web Application Development Framework v%s' % release
-
-# A shorter title for the navigation bar.  Default is the same as html_title.
-#html_short_title = 'Home'
-
-# The name of an image file (within the static path) to place at the top of
-# the sidebar.
-#html_logo = '_static/pyramid.png'
-
-# The name of an image file (within the static path) to use as favicon of the
-# docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
-# pixels large.
-#html_favicon = '_static/pyramid.ico'
-
-# Add any paths that contain custom static files (such as style sheets) here,
-# relative to this directory. They are copied after the builtin static files,
-# so a file named "default.css" will overwrite the builtin "default.css".
-#html_static_path = ['_static']
+html_title = 'The Pyramid Web Framework v%s' % release
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
@@ -172,34 +165,7 @@ html_last_updated_fmt = '%b %d, %Y'
 
 # If true, SmartyPants will be used to convert quotes and dashes to
 # typographically correct entities.
-#html_use_smartypants = True
-
-# Custom sidebar templates, maps document names to template names.
-#html_sidebars = {}
-
-# Additional templates that should be rendered to pages, maps page names to
-# template names.
-#html_additional_pages = {}
-
-# If false, no module index is generated.
-#html_use_modindex = True
-
-# If false, no index is generated.
-#html_use_index = True
-
-# If true, the index is split into individual pages for each letter.
-#html_split_index = False
-
-# If true, the reST sources are included in the HTML build as _sources/<name>.
-#html_copy_source = True
-
-# If true, an OpenSearch description file will be output, and all pages will
-# contain a <link> tag referring to it.  The value of this option must be the
-# base URL from which the finished HTML is served.
-#html_use_opensearch = ''
-
-# If nonempty, this is the file name suffix for HTML files (e.g. ".xhtml").
-#html_file_suffix = ''
+html_use_smartypants = False # people use cutnpaste in some places
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'pyramid'
@@ -213,27 +179,19 @@ latex_paper_size = 'letter'
 # The font size ('10pt', '11pt' or '12pt').
 latex_font_size = '10pt'
 
+latex_additional_files = ['_static/latex-note.png', '_static/latex-warning.png']
+
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, document class [howto/manual]).
 latex_documents = [
   ('latexindex', 'pyramid.tex',
-   'The Pyramid Web Application Development Framework',
+   'The Pyramid Web Framework',
    'Chris McDonough', 'manual'),
     ]
-
-# The name of an image file (relative to this directory) to place at the top of
-# the title page.
-#latex_logo = '_static/pylons_small.png'
 
 # For "manual" documents, if this is true, then toplevel headings are parts,
 # not chapters.
 latex_use_parts = True
-
-# Additional stuff for the LaTeX preamble.
-#latex_preamble = ''
-
-# Documents to append as an appendix to all manuals.
-#latex_appendices = []
 
 # If false, no module index is generated.
 latex_use_modindex = False
@@ -349,10 +307,10 @@ _PREAMBLE = r"""
 
 latex_elements = {
     'preamble': _PREAMBLE,
-    'wrapperclass':'book',
-    'date':'',
-    'releasename':'Version',
-    'title':r'The Pyramid Web Application \newline Development Framework',
+    'wrapperclass': 'book',
+    'date': '',
+    'releasename': 'Version',
+    'title': r'The Pyramid Web Framework',
 #    'pointsize':'12pt', # uncomment for 12pt version
 }
 
@@ -368,6 +326,7 @@ latex_elements = {
 #paragraph     4
 #subparagraph  5
 
+
 def frontmatter(name, arguments, options, content, lineno,
                 content_offset, block_text, state, state_machine):
     return [nodes.raw(
@@ -381,9 +340,10 @@ def frontmatter(name, arguments, options, content, lineno,
 % reset page counter
 \setcounter{page}{1}
 % suppress first toc pagenum
-\addtocontents{toc}{\protect\thispagestyle{empty}} 
+\addtocontents{toc}{\protect\thispagestyle{empty}}
 """,
         format='latex')]
+
 
 def mainmatter(name, arguments, options, content, lineno,
                content_offset, block_text, state, state_machine):
@@ -394,7 +354,7 @@ def mainmatter(name, arguments, options, content, lineno,
 % allow part/chapter/section numbering
 \setcounter{secnumdepth}{2}
 % get headers back
-\pagestyle{fancy} 
+\pagestyle{fancy}
 \fancyhf{}
 \renewcommand{\headrulewidth}{0.5pt}
 \renewcommand{\footrulewidth}{0pt}
@@ -404,10 +364,12 @@ def mainmatter(name, arguments, options, content, lineno,
 """,
         format='latex')]
 
+
 def backmatter(name, arguments, options, content, lineno,
               content_offset, block_text, state, state_machine):
     return [nodes.raw('', '\\backmatter\n\\setcounter{secnumdepth}{-1}\n',
                       format='latex')]
+
 
 def app_role(role, rawtext, text, lineno, inliner, options={}, content=[]):
     """custom role for :app: marker, does nothing in particular except allow
@@ -425,6 +387,7 @@ def setup(app):
     app.add_directive('mainmatter', mainmatter, 1, (0, 0, 0))
     app.add_directive('backmatter', backmatter, 1, (0, 0, 0))
     app.connect('autodoc-process-signature', resig)
+
 
 def resig(app, what, name, obj, options, signature, return_annotation):
     """ Allow for preservation of ``@action_method`` decorated methods
@@ -452,10 +415,11 @@ def resig(app, what, name, obj, options, signature, return_annotation):
 # -- Options for Epub output ---------------------------------------------------
 
 # Bibliographic Dublin Core info.
-epub_title = 'The Pyramid Web Application Development Framework, Version 1.0'
+epub_title = 'The Pyramid Web Framework, Version %s' \
+             % release
 epub_author = 'Chris McDonough'
 epub_publisher = 'Agendaless Consulting'
-epub_copyright = '2008-2011'
+epub_copyright = '2008-%d' % thisyear
 
 # The language of the text. It defaults to the language option
 # or en if the language is not set.
@@ -469,18 +433,16 @@ epub_scheme = 'ISBN'
 epub_identifier = '0615445675'
 
 # A unique identification for the text.
-epub_uid = 'The Pyramid Web Application Development Framework, Version 1.0'
-
-# HTML files that should be inserted before the pages created by sphinx.
-# The format is a list of tuples containing the path and title.
-#epub_pre_files = []
-
-# HTML files shat should be inserted after the pages created by sphinx.
-# The format is a list of tuples containing the path and title.
-#epub_post_files = []
+epub_uid = 'The Pyramid Web Framework, Version %s' \
+           % release
 
 # A list of files that should not be packed into the epub file.
-#epub_exclude_files = []
+epub_exclude_files = ['_static/opensearch.xml', '_static/doctools.js',
+    '_static/jquery.js', '_static/searchtools.js', '_static/underscore.js',
+    '_static/basic.css', 'search.html', '_static/websupport.js']
+
 
 # The depth of the table of contents in toc.ncx.
 epub_tocdepth = 3
+
+# For a list of all settings, visit http://sphinx-doc.org/config.html

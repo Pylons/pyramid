@@ -1,43 +1,28 @@
-[app:{{project}}]
+###
+# app configuration
+# http://docs.pylonsproject.org/projects/pyramid/en/{{pyramid_docs_branch}}/narr/environment.html
+###
+
+[app:main]
 use = egg:{{project}}
-reload_templates = false
-debug_authorization = false
-debug_notfound = false
-debug_routematch = false
-debug_templates = false
-default_locale_name = en
-sqlalchemy.url = sqlite:///%(here)s/{{project}}.db
 
-[filter:weberror]
-use = egg:WebError#error_catcher
-debug = false
-;error_log = 
-;show_exceptions_in_wsgi_errors = true
-;smtp_server = localhost
-;error_email = janitor@example.com
-;smtp_username = janitor
-;smtp_password = "janitor's password"
-;from_address = paste@localhost
-;error_subject_prefix = "Pyramid Error"
-;smtp_use_tls =
-;error_message =
+pyramid.reload_templates = false
+pyramid.debug_authorization = false
+pyramid.debug_notfound = false
+pyramid.debug_routematch = false
+pyramid.default_locale_name = en
 
-[filter:tm]
-use = egg:repoze.tm2#tm
-commit_veto = repoze.tm:default_commit_veto
-
-[pipeline:main]
-pipeline =
-    weberror
-    tm
-    {{project}}
+sqlalchemy.url = sqlite:///%(here)s/{{project}}.sqlite
 
 [server:main]
-use = egg:Paste#http
+use = egg:waitress#main
 host = 0.0.0.0
 port = 6543
 
-# Begin logging configuration
+###
+# logging configuration
+# http://docs.pylonsproject.org/projects/pyramid/en/{{pyramid_docs_branch}}/narr/logging.html
+###
 
 [loggers]
 keys = root, {{package_logger}}, sqlalchemy
@@ -72,6 +57,4 @@ level = NOTSET
 formatter = generic
 
 [formatter_generic]
-format = %(asctime)s %(levelname)-5.5s [%(name)s][%(threadName)s] %(message)s
-
-# End logging configuration
+format = %(asctime)s %(levelname)-5.5s [%(name)s:%(lineno)s][%(threadName)s] %(message)s

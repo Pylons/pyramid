@@ -9,16 +9,16 @@
 Internationalization and Localization
 =====================================
 
-:term:`Internationalization` (i18n) is the act of creating software
-with a user interface that can potentially be displayed in more than
-one language or cultural context.  :term:`Localization` (l10n) is the
-process of displaying the user interface of an internationalized
-application in a *particular* language or cultural context.
+:term:`Internationalization` (i18n) is the act of creating software with a user
+interface that can potentially be displayed in more than one language or
+cultural context.  :term:`Localization` (l10n) is the process of displaying the
+user interface of an internationalized application in a *particular* language
+or cultural context.
 
-:app:`Pyramid` offers internationalization and localization
-subsystems that can be used to translate the text of buttons, error
-messages and other software- and template-defined values into the
-native language of a user of your application.
+:app:`Pyramid` offers internationalization and localization subsystems that can
+be used to translate the text of buttons, error messages, and other software-
+and template-defined values into the native language of a user of your
+application.
 
 .. index::
    single: translation string
@@ -29,15 +29,15 @@ native language of a user of your application.
 Creating a Translation String
 -----------------------------
 
-While you write your software, you can insert specialized markup into
-your Python code that makes it possible for the system to translate
-text values into the languages used by your application's users.  This
-markup creates a :term:`translation string`.  A translation string is
-an object that behaves mostly like a normal Unicode object, except that
-it also carries around extra information related to its job as part of
-the :app:`Pyramid` translation machinery.
+While you write your software, you can insert specialized markup into your
+Python code that makes it possible for the system to translate text values into
+the languages used by your application's users.  This markup creates a
+:term:`translation string`.  A translation string is an object that behaves
+mostly like a normal Unicode object, except that it also carries around extra
+information related to its job as part of the :app:`Pyramid` translation
+machinery.
 
-Using The ``TranslationString`` Class
+Using the ``TranslationString`` Class
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The most primitive way to create a translation string is to use the
@@ -53,17 +53,17 @@ This creates a Unicode-like object that is a TranslationString.
 
 .. note::
 
-   For people more familiar with :term:`Zope` i18n, a TranslationString
-   is a lot like a ``zope.i18nmessageid.Message`` object.  It is not a
-   subclass, however.  For people more familiar with :term:`Pylons` or
-   :term:`Django` i18n, using a TranslationString is a lot like using
-   "lazy" versions of related gettext APIs.
+   For people more familiar with :term:`Zope` i18n, a TranslationString is a
+   lot like a ``zope.i18nmessageid.Message`` object.  It is not a subclass,
+   however.  For people more familiar with :term:`Pylons` or :term:`Django`
+   i18n, using a TranslationString is a lot like using "lazy" versions of
+   related gettext APIs.
 
-The first argument to :class:`~pyramid.i18n.TranslationString` is
-the ``msgid``; it is required.  It represents the key into the
-translation mappings provided by a particular localization. The
-``msgid`` argument must be a Unicode object or an ASCII string.  The
-msgid may optionally contain *replacement markers*.  For instance:
+The first argument to :class:`~pyramid.i18n.TranslationString` is the
+``msgid``; it is required.  It represents the key into the translation mappings
+provided by a particular localization. The ``msgid`` argument must be a Unicode
+object or an ASCII string.  The msgid may optionally contain *replacement
+markers*.  For instance:
 
 .. code-block:: python
    :linenos:
@@ -71,10 +71,9 @@ msgid may optionally contain *replacement markers*.  For instance:
    from pyramid.i18n import TranslationString
    ts = TranslationString('Add ${number}')
 
-Within the string above, ``${number}`` is a replacement marker.  It
-will be replaced by whatever is in the *mapping* for a translation
-string.  The mapping may be supplied at the same time as the
-replacement marker itself:
+Within the string above, ``${number}`` is a replacement marker.  It will be
+replaced by whatever is in the *mapping* for a translation string.  The mapping
+may be supplied at the same time as the replacement marker itself:
 
 .. code-block:: python
    :linenos:
@@ -82,14 +81,14 @@ replacement marker itself:
    from pyramid.i18n import TranslationString
    ts = TranslationString('Add ${number}', mapping={'number':1})
 
-Any number of replacement markers can be present in the msgid value,
-any number of times.  Only markers which can be replaced by the values
-in the *mapping* will be replaced at translation time.  The others
-will not be interpolated and will be output literally.
+Any number of replacement markers can be present in the msgid value, any number
+of times.  Only markers which can be replaced by the values in the *mapping*
+will be replaced at translation time.  The others will not be interpolated and
+will be output literally.
 
 A translation string should also usually carry a *domain*.  The domain
-represents a translation category to disambiguate it from other
-translations of the same msgid, in case they conflict.
+represents a translation category to disambiguate it from other translations of
+the same msgid, in case they conflict.
 
 .. code-block:: python
    :linenos:
@@ -98,13 +97,12 @@ translations of the same msgid, in case they conflict.
    ts = TranslationString('Add ${number}', mapping={'number':1},
                           domain='form')
 
-The above translation string named a domain of ``form``.  A
-:term:`translator` function will often use the domain to locate the
-right translator file on the filesystem which contains translations
-for a given domain.  In this case, if it were trying to translate
-our msgid to German, it might try to find a translation from a
-:term:`gettext` file within a :term:`translation directory` like this
-one:
+The above translation string named a domain of ``form``.  A :term:`translator`
+function will often use the domain to locate the right translator file on the
+filesystem which contains translations for a given domain.  In this case, if it
+were trying to translate our msgid to German, it might try to find a
+translation from a :term:`gettext` file within a :term:`translation directory`
+like this one:
 
 .. code-block:: text
 
@@ -113,14 +111,13 @@ one:
 In other words, it would want to take translations from the ``form.mo``
 translation file in the German language.
 
-Finally, the TranslationString constructor accepts a ``default``
-argument.  If a ``default`` argument is supplied, it replaces usages
-of the ``msgid`` as the *default value* for the translation string.
-When ``default`` is ``None``, the ``msgid`` value passed to a
-TranslationString is used as an implicit message identifier.  Message
-identifiers are matched with translations in translation files, so it
-is often useful to create translation strings with "opaque" message
-identifiers unrelated to their default text:
+Finally, the TranslationString constructor accepts a ``default`` argument.  If
+a ``default`` argument is supplied, it replaces usages of the ``msgid`` as the
+*default value* for the translation string. When ``default`` is ``None``, the
+``msgid`` value passed to a TranslationString is used as an implicit message
+identifier.  Message identifiers are matched with translations in translation
+files, so it is often useful to create translation strings with "opaque"
+message identifiers unrelated to their default text:
 
 .. code-block:: python
    :linenos:
@@ -129,8 +126,7 @@ identifiers unrelated to their default text:
    ts = TranslationString('add-number', default='Add ${number}',
                            domain='form', mapping={'number':1})
 
-When default text is used, Default text objects may contain
-replacement values.
+When default text is used, Default text objects may contain replacement values.
 
 .. index::
    single: translation string factory
@@ -139,195 +135,167 @@ Using the ``TranslationStringFactory`` Class
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Another way to generate a translation string is to use the
-:attr:`~pyramid.i18n.TranslationStringFactory` object.  This object
-is a *translation string factory*.  Basically a translation string
-factory presets the ``domain`` value of any :term:`translation string`
-generated by using it.  For example:
+:attr:`~pyramid.i18n.TranslationStringFactory` object.  This object is a
+*translation string factory*.  Basically a translation string factory presets
+the ``domain`` value of any :term:`translation string` generated by using it.
+For example:
 
 .. code-block:: python
    :linenos:
 
    from pyramid.i18n import TranslationStringFactory
    _ = TranslationStringFactory('pyramid')
-   ts = _('Add ${number}', msgid='add-number', mapping={'number':1})
+   ts = _('add-number', default='Add ${number}', mapping={'number':1})
 
-.. note:: We assigned the translation string factory to the name
-   ``_``.  This is a convention which will be supported by translation
-   file generation tools.
+.. note:: We assigned the translation string factory to the name ``_``.  This
+   is a convention which will be supported by translation file generation
+   tools.
 
 After assigning ``_`` to the result of a
-:func:`~pyramid.i18n.TranslationStringFactory`, the subsequent result
-of calling ``_`` will be a :class:`~pyramid.i18n.TranslationString`
-instance.  Even though a ``domain`` value was not passed to ``_`` (as
-would have been necessary if the
-:class:`~pyramid.i18n.TranslationString` constructor were used instead
-of a translation string factory), the ``domain`` attribute of the
-resulting translation string will be ``pyramid``.  As a result, the
-previous code example is completely equivalent (except for spelling)
-to:
+:func:`~pyramid.i18n.TranslationStringFactory`, the subsequent result of
+calling ``_`` will be a :class:`~pyramid.i18n.TranslationString` instance.
+Even though a ``domain`` value was not passed to ``_`` (as would have been
+necessary if the :class:`~pyramid.i18n.TranslationString` constructor were used
+instead of a translation string factory), the ``domain`` attribute of the
+resulting translation string will be ``pyramid``.  As a result, the previous
+code example is completely equivalent (except for spelling) to:
 
 .. code-block:: python
    :linenos:
 
    from pyramid.i18n import TranslationString as _
-   ts = _('Add ${number}', msgid='add-number', mapping={'number':1},
+   ts = _('add-number', default='Add ${number}', mapping={'number':1},
           domain='pyramid')
 
-You can set up your own translation string factory much like the one
-provided above by using the
-:class:`~pyramid.i18n.TranslationStringFactory` class.  For example,
-if you'd like to create a translation string factory which presets the
-``domain`` value of generated translation strings to ``form``, you'd
-do something like this:
+You can set up your own translation string factory much like the one provided
+above by using the :class:`~pyramid.i18n.TranslationStringFactory` class.  For
+example, if you'd like to create a translation string factory which presets the
+``domain`` value of generated translation strings to ``form``, you'd do
+something like this:
 
 .. code-block:: python
    :linenos:
 
    from pyramid.i18n import TranslationStringFactory
    _ = TranslationStringFactory('form')
-   ts = _('Add ${number}', msgid='add-number', mapping={'number':1})
+   ts = _('add-number', default='Add ${number}', mapping={'number':1})
 
-Creating a unique domain for your application via a translation string
-factory is best practice.  Using your own unique translation domain
-allows another person to reuse your application without needing to
-merge your translation files with his own.  Instead, he can just
-include your package's :term:`translation directory` via the
-:meth:`pyramid.config.Configurator.add_translation_dirs`
-method.
+Creating a unique domain for your application via a translation string factory
+is best practice.  Using your own unique translation domain allows another
+person to reuse your application without needing to merge your translation
+files with their own.  Instead they can just include your package's
+:term:`translation directory` via the
+:meth:`pyramid.config.Configurator.add_translation_dirs` method.
 
 .. note::
 
    For people familiar with Zope internationalization, a
    TranslationStringFactory is a lot like a
-   ``zope.i18nmessageid.MessageFactory`` object.  It is not a
-   subclass, however.
+   ``zope.i18nmessageid.MessageFactory`` object.  It is not a subclass,
+   however.
 
 .. index::
    single: gettext
    single: translation directories
 
-Working With ``gettext`` Translation Files
+Working with ``gettext`` Translation Files
 ------------------------------------------
 
-The basis of :app:`Pyramid` translation services is
-GNU :term:`gettext`. Once your application source code files and templates
-are marked up with translation markers, you can work on translations
-by creating various kinds of gettext files.
+The basis of :app:`Pyramid` translation services is GNU :term:`gettext`. Once
+your application source code files and templates are marked up with translation
+markers, you can work on translations by creating various kinds of gettext
+files.
 
 .. note::
 
-   The steps a developer must take to work with :term:`gettext`
-   :term:`message catalog` files within a :app:`Pyramid`
-   application are very similar to the steps a :term:`Pylons`
-   developer must take to do the same.  See the `Pylons
-   internationalization documentation
-   <http://wiki.pylonshq.com/display/pylonsdocs/Internationalization+and+Localization>`_
-   for more information.
+   The steps a developer must take to work with :term:`gettext` :term:`message
+   catalog` files within a :app:`Pyramid` application are very similar to the
+   steps a :term:`Pylons` developer must take to do the same.  See the
+   :ref:`Pylons Internationalization and Localization documentation
+   <pylonswebframework:i18n>` for more information.
 
-GNU gettext uses three types of files in the translation framework,
-``.pot`` files, ``.po`` files and ``.mo`` files.
+GNU gettext uses three types of files in the translation framework, ``.pot``
+files, ``.po`` files, and ``.mo`` files.
 
 ``.pot`` (Portable Object Template) files
 
-  A ``.pot`` file is created by a program which searches through your
-  project's source code and which picks out every :term:`message
-  identifier` passed to one of the ``_()`` functions
-  (eg. :term:`translation string` constructions). The list of all
-  message identifiers is placed into a ``.pot`` file, which serves as
-  a template for creating ``.po`` files.
+  A ``.pot`` file is created by a program which searches through your project's
+  source code and which picks out every :term:`message identifier` passed to
+  one of the ``_()`` functions (e.g., :term:`translation string`
+  constructions). The list of all message identifiers is placed into a ``.pot``
+  file, which serves as a template for creating ``.po`` files.
 
 ``.po`` (Portable Object) files
 
-  The list of messages in a ``.pot`` file are translated by a human to
-  a particular language; the result is saved as a ``.po`` file.
+  The list of messages in a ``.pot`` file are translated by a human to a
+  particular language; the result is saved as a ``.po`` file.
 
 ``.mo`` (Machine Object) files
 
-  A ``.po`` file is turned into a machine-readable binary file, which
-  is the ``.mo`` file. Compiling the translations to machine code
-  makes the localized program run faster.
+  A ``.po`` file is turned into a machine-readable binary file, which is the
+  ``.mo`` file. Compiling the translations to machine code makes the
+  localized program start faster.
 
 The tools for working with :term:`gettext` translation files related to a
-:app:`Pyramid` application is :term:`Babel` and :term:`Lingua`.  Lingua is a
-Balel extension that provides support for scraping i18n references out of
-Python and Chameleon files.
+:app:`Pyramid` application are :term:`Lingua` and :term:`Gettext`. Lingua can
+scrape i18n references out of Python and Chameleon files and create the
+``.pot`` file. Gettext includes ``msgmerge`` tool to update a ``.po`` file from
+an updated ``.pot`` file and ``msgfmt`` to compile ``.po`` files to ``.mo``
+files.
 
 .. index::
-   single: Babel
+   single: Gettext
    single: Lingua
 
 .. _installing_babel:
 
-Installing Babel and Lingua
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Installing Lingua and Gettext
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In order for the commands related to working with ``gettext`` translation
-files to work properly, you will need to have :term:`Babel` and
-:term:`Lingua` installed into the same environment in which :app:`Pyramid` is
-installed.
+In order for the commands related to working with ``gettext`` translation files
+to work properly, you will need to have :term:`Lingua` and :term:`Gettext`
+installed into the same environment in which :app:`Pyramid` is installed.
 
 Installation on UNIX
 ++++++++++++++++++++
 
-If the :term:`virtualenv` into which you've installed your :app:`Pyramid`
-application lives in ``/my/virtualenv``, you can install Babel and Lingua
+Gettext is often already installed on UNIX systems. You can check if it is
+installed by testing if the ``msgfmt`` command is available. If it is not
+available you can install it through the packaging system from your OS; the
+package name is almost always ``gettext``. For example on a Debian or Ubuntu
+system run this command:
+
+.. code-block:: bash
+
+   $ sudo apt-get install gettext
+
+Installing Lingua is done with the Python packaging tools. If the
+:term:`virtual environment` into which you've installed your :app:`Pyramid`
+application lives at the environment variable ``$VENV``, you can install Lingua
 like so:
 
-.. code-block:: text
+.. code-block:: bash
 
-   $ cd /my/virtualenv
-   $ bin/easy_install Babel lingua
+   $ $VENV/bin/pip install lingua
 
 Installation on Windows
 +++++++++++++++++++++++
 
-If the :term:`virtualenv` into which you've installed your :app:`Pyramid`
-application lives in ``C:\my\virtualenv``, you can install Babel and Lingua
-like so:
+There are several ways to install Gettext on Windows: it is included in the
+`Cygwin <http://www.cygwin.com/>`_ collection, or you can use the `installer
+from the GnuWin32 <http://gnuwin32.sourceforge.net/packages/gettext.htm>`_, or
+compile it yourself. Make sure the installation path is added to your
+``$PATH``.
 
-.. code-block:: text
+Installing Lingua is done with the Python packaging tools. If the
+:term:`virtual environment` into which you've installed your :app:`Pyramid`
+application lives at the environment variable ``%VENV%``, you can install
+Lingua like so:
 
-   C> cd \my\virtualenv
-   C> Scripts\easy_install Babel lingua
+.. code-block:: doscon
 
-.. index::
-   single: Babel; message extractors
-   single: Lingua
+   C> %VENV%\Scripts\pip install lingua
 
-Changing the ``setup.py``
-+++++++++++++++++++++++++
-
-You need to add a few boilerplate lines to your application's ``setup.py``
-file in order to properly generate :term:`gettext` files from your
-application.
-
-.. note:: See :ref:`project_narr` to learn about about the
-  composition of an application's ``setup.py`` file.
-
-In particular, add the ``Babel`` and ``lingua`` distributions to the
-``install_requires`` list and insert a set of references to :term:`Babel`
-*message extractors* within the call to :func:`setuptools.setup` inside your
-application's ``setup.py`` file:
-
-.. code-block:: python
-   :linenos:
-
-    setup(name="mypackage",
-          # ...
-          install_requires = [
-                # ...
-                'Babel',
-                'lingua',
-                ],
-          message_extractors = { '.': [
-                ('**.py',   'lingua_python', None ),
-                ('**.pt',   'lingua_xml', None ),
-                ]},
-          )
-
-The ``message_extractors`` stanza placed into the ``setup.py`` file causes
-the :term:`Babel` message catalog extraction machinery to also consider
-``*.pt`` files when doing message id extraction.
 
 .. index::
    pair: extracting; messages
@@ -337,87 +305,19 @@ the :term:`Babel` message catalog extraction machinery to also consider
 Extracting Messages from Code and Templates
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Once Babel and Lingua are installed and your application's ``setup.py`` file
-has the correct message extractor references, you may extract a message
-catalog template from the code and :term:`Chameleon` templates which reside
-in your :app:`Pyramid` application.  You run a ``setup.py`` command to
-extract the messages:
+Once Lingua is installed, you may extract a message catalog template from the
+code and :term:`Chameleon` templates which reside in your :app:`Pyramid`
+application.  You run a ``pot-create`` command to extract the messages:
 
-.. code-block:: text
+.. code-block:: bash
 
-   $ cd /place/where/myapplication/setup.py/lives
+   $ cd /file/path/to/myapplication_setup.py
    $ mkdir -p myapplication/locale
-   $ python setup.py extract_messages
+   $ $VENV/bin/pot-create -o myapplication/locale/myapplication.pot src
 
-The message catalog ``.pot`` template will end up in:
-
+The message catalog ``.pot`` template will end up in
 ``myapplication/locale/myapplication.pot``.
 
-Translation Domains
-+++++++++++++++++++
-
-The name ``myapplication`` above in the filename ``myapplication.pot``
-denotes the :term:`translation domain` of the translations that must
-be performed to localize your application.  By default, the
-translation domain is the :term:`project` name of your
-:app:`Pyramid` application.
-
-To change the translation domain of the extracted messages in your
-project, edit the ``setup.cfg`` file of your application, The default
-``setup.cfg`` file of a Paster-generated :app:`Pyramid` application
-has stanzas in it that look something like the following:
-
-.. code-block:: ini
-   :linenos:
-
-    [compile_catalog]
-    directory = myproject/locale
-    domain = MyProject
-    statistics = true
-
-    [extract_messages]
-    add_comments = TRANSLATORS:
-    output_file = myproject/locale/MyProject.pot
-    width = 80
-
-    [init_catalog]
-    domain = MyProject
-    input_file = myproject/locale/MyProject.pot
-    output_dir = myproject/locale
-
-    [update_catalog]
-    domain = MyProject
-    input_file = myproject/locale/MyProject.pot
-    output_dir = myproject/locale
-    previous = true
-
-In the above example, the project name is ``MyProject``.  To indicate
-that you'd like the domain of your translations to be ``mydomain``
-instead, change the ``setup.cfg`` file stanzas to look like so:
-
-.. code-block:: ini
-   :linenos:
-
-    [compile_catalog]
-    directory = myproject/locale
-    domain = mydomain
-    statistics = true
-
-    [extract_messages]
-    add_comments = TRANSLATORS:
-    output_file = myproject/locale/mydomain.pot
-    width = 80
-
-    [init_catalog]
-    domain = mydomain
-    input_file = myproject/locale/mydomain.pot
-    output_dir = myproject/locale
-
-    [update_catalog]
-    domain = mydomain
-    input_file = myproject/locale/mydomain.pot
-    output_dir = myproject/locale
-    previous = true
 
 .. index::
    pair: initializing; message catalog
@@ -426,30 +326,28 @@ Initializing a Message Catalog File
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Once you've extracted messages into a ``.pot`` file (see
-:ref:`extracting_messages`), to begin localizing the messages present
-in the ``.pot`` file, you need to generate at least one ``.po`` file.
-A ``.po`` file represents translations of a particular set of messages
-to a particular locale.  Initialize a ``.po`` file for a specific
-locale from a pre-generated ``.pot`` template by using the ``setup.py
-init_catalog`` command:
+:ref:`extracting_messages`), to begin localizing the messages present in the
+``.pot`` file, you need to generate at least one ``.po`` file. A ``.po`` file
+represents translations of a particular set of messages to a particular locale.
+Initialize a ``.po`` file for a specific locale from a pre-generated ``.pot``
+template by using the ``msginit`` command from Gettext:
 
-.. code-block:: text
+.. code-block:: bash
 
-   $ cd /place/where/myapplication/setup.py/lives
-   $ python setup.py init_catalog -l es
+   $ cd /file/path/to/myapplication_setup.py
+   $ cd myapplication/locale
+   $ mkdir -p es/LC_MESSAGES
+   $ msginit -l es -o es/LC_MESSAGES/myapplication.po
 
-By default, the message catalog ``.po`` file will end up in:
-
+This will create a new message catalog ``.po`` file in
 ``myapplication/locale/es/LC_MESSAGES/myapplication.po``.
 
-Once the file is there, it can be worked on by a human translator.
-One tool which may help with this is `Poedit
-<http://www.poedit.net/>`_.
+Once the file is there, it can be worked on by a human translator. One tool
+which may help with this is `Poedit <http://www.poedit.net/>`_.
 
-Note that :app:`Pyramid` itself ignores the existence of all
-``.po`` files.  For a running application to have translations
-available, a ``.mo`` file must exist.  See
-:ref:`compiling_message_catalog`.
+Note that :app:`Pyramid` itself ignores the existence of all ``.po`` files.
+For a running application to have translations available, a ``.mo`` file must
+exist.  See :ref:`compiling_message_catalog`.
 
 .. index::
    pair: updating; message catalog
@@ -457,18 +355,19 @@ available, a ``.mo`` file must exist.  See
 Updating a Catalog File
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-If more translation strings are added to your application, or
-translation strings change, you will need to update existing ``.po``
-files based on changes to the ``.pot`` file, so that the new and
-changed messages can also be translated or re-translated.
+If more translation strings are added to your application, or translation
+strings change, you will need to update existing ``.po`` files based on changes
+to the ``.pot`` file, so that the new and changed messages can also be
+translated or re-translated.
 
-First, regenerate the ``.pot`` file as per :ref:`extracting_messages`.
-Then use the ``setup.py update_catalog`` command.
+First, regenerate the ``.pot`` file as per :ref:`extracting_messages`. Then use
+the ``msgmerge`` command from Gettext.
 
-.. code-block:: text
+.. code-block:: bash
 
-   $ cd /place/where/myapplication/setup.py/lives
-   $ python setup.py update_catalog
+   $ cd /file/path/to/myapplication_setup.py
+   $ cd myapplication/locale
+   $ msgmerge --update es/LC_MESSAGES/myapplication.po myapplication.pot
 
 .. index::
    pair: compiling; message catalog
@@ -478,42 +377,46 @@ Then use the ``setup.py update_catalog`` command.
 Compiling a Message Catalog File
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Finally, to prepare an application for performing actual runtime
-translations, compile ``.po`` files to ``.mo`` files:
+Finally, to prepare an application for performing actual runtime translations,
+compile ``.po`` files to ``.mo`` files using the ``msgfmt`` command from
+Gettext:
 
-.. code-block:: text
+.. code-block:: bash
 
-   $ cd /place/where/myapplication/setup.py/lives
-   $ python setup.py compile_catalog
+   $ cd /file/path/to/myapplication_setup.py
+   $ msgfmt -o myapplication/locale/es/LC_MESSAGES/myapplication.mo \
+         myapplication/locale/es/LC_MESSAGES/myapplication.po
 
-This will create a ``.mo`` file for each ``.po`` file in your
-application.  As long as the :term:`translation directory` in which
-the ``.mo`` file ends up in is configured into your application, these
-translations will be available to :app:`Pyramid`.
+This will create a ``.mo`` file for each ``.po`` file in your application.  As
+long as the :term:`translation directory` in which the ``.mo`` file ends up in
+is configured into your application (see
+:ref:`adding_a_translation_directory`), these translations will be available to
+:app:`Pyramid`.
 
 .. index::
    single: localizer
-   single: get_localizer
+   single: translation
+   single: pluralization
 
 Using a Localizer
 -----------------
 
 A :term:`localizer` is an object that allows you to perform translation or
 pluralization "by hand" in an application.  You may use the
-:func:`pyramid.i18n.get_localizer` function to obtain a :term:`localizer`.
-This function will return either the localizer object implied by the active
-:term:`locale negotiator` or a default localizer object if no explicit locale
-negotiator is registered.
+:attr:`pyramid.request.Request.localizer` attribute to obtain a
+:term:`localizer`.  The localizer object will be configured to produce
+translations implied by the active :term:`locale negotiator`, or a default
+localizer object if no explicit locale negotiator is registered.
 
 .. code-block:: python
    :linenos:
 
-   from pyramid.i18n import get_localizer
-
    def aview(request):
-       locale = get_localizer(request)
+       localizer = request.localizer
 
-.. note:: If you need to create a localizer for a locale use the
+.. note::
+
+    If you need to create a localizer for a locale, use the
     :func:`pyramid.i18n.make_localizer` function.
 
 .. index::
@@ -525,34 +428,33 @@ Performing a Translation
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 A :term:`localizer` has a ``translate`` method which accepts either a
-:term:`translation string` or a Unicode string and which returns a
-Unicode object representing the translation.  So, generating a
-translation in a view component of an application might look like so:
+:term:`translation string` or a Unicode string and which returns a Unicode
+object representing the translation.  Generating a translation in a view
+component of an application might look like so:
 
 .. code-block:: python
    :linenos:
 
-   from pyramid.i18n import get_localizer
    from pyramid.i18n import TranslationString
 
    ts = TranslationString('Add ${number}', mapping={'number':1},
                           domain='pyramid')
 
    def aview(request):
-       localizer = get_localizer(request)
+       localizer = request.localizer
        translated = localizer.translate(ts) # translation string
        # ... use translated ...
 
-The :func:`~pyramid.i18n.get_localizer` function will return a
-:class:`pyramid.i18n.Localizer` object bound to the locale name
-represented by the request.  The translation returned from its
-:meth:`pyramid.i18n.Localizer.translate` method will depend on the
-``domain`` attribute of the provided translation string as well as the
+The ``request.localizer`` attribute will be a :class:`pyramid.i18n.Localizer`
+object bound to the locale name represented by the request.  The translation
+returned from its :meth:`pyramid.i18n.Localizer.translate` method will depend
+on the ``domain`` attribute of the provided translation string as well as the
 locale of the localizer.
 
-.. note:: If you're using :term:`Chameleon` templates, you don't need
-   to pre-translate translation strings this way.  See
-   :ref:`chameleon_translation_strings`.
+.. note::
+
+   If you're using :term:`Chameleon` templates, you don't need to pre-translate
+   translation strings this way.  See :ref:`chameleon_translation_strings`.
 
 .. index::
    single: pluralizing (i18n)
@@ -562,8 +464,7 @@ locale of the localizer.
 Performing a Pluralization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-A :term:`localizer` has a ``pluralize`` method with the following
-signature:
+A :term:`localizer` has a ``pluralize`` method with the following signature:
 
 .. code-block:: python
    :linenos:
@@ -571,32 +472,60 @@ signature:
    def pluralize(singular, plural, n, domain=None, mapping=None):
        ...
 
-The ``singular`` and ``plural`` arguments should each be a Unicode
-value representing a :term:`message identifier`.  ``n`` should be an
-integer.  ``domain`` should be a :term:`translation domain`, and
-``mapping`` should be a dictionary that is used for *replacement
-value* interpolation of the translated string.  If ``n`` is plural
-for the current locale, ``pluralize`` will return a Unicode
-translation for the message id ``plural``, otherwise it will return a
-Unicode translation for the message id ``singular``.
-
-The arguments provided as ``singular`` and/or ``plural`` may also be
-:term:`translation string` objects, but the domain and mapping
-information attached to those objects is ignored.
+The simplest case is the ``singular`` and ``plural`` arguments being passed as
+Unicode literals. This returns the appropriate literal according to the locale
+pluralization rules for the number ``n``, and interpolates ``mapping``.
 
 .. code-block:: python
    :linenos:
 
-   from pyramid.i18n import get_localizer
-
    def aview(request):
-       localizer = get_localizer(request)
+       localizer = request.localizer
        translated = localizer.pluralize('Item', 'Items', 1, 'mydomain')
        # ... use translated ...
 
+However, for support of other languages, the ``singular`` argument should be a
+Unicode value representing a :term:`message identifier`.  In this case the
+``plural`` value is ignored. ``domain`` should be a :term:`translation domain`,
+and ``mapping`` should be a dictionary that is used for *replacement value*
+interpolation of the translated string.
+
+The value of ``n`` will be used to find the appropriate plural form for the
+current language, and ``pluralize`` will return a Unicode translation for the
+message id ``singular``. The message file must have defined ``singular`` as a
+translation with plural forms.
+
+The argument provided as ``singular`` may be a :term:`translation string`
+object, but the domain and mapping information attached is ignored.
+
+.. code-block:: python
+   :linenos:
+
+   def aview(request):
+       localizer = request.localizer
+       num = 1
+       translated = localizer.pluralize('item_plural', '${number} items',
+           num, 'mydomain', mapping={'number':num})
+
+The corresponding message catalog must have language plural definitions and
+plural alternatives set.
+
+.. code-block:: text
+    :linenos:
+    
+    "Plural-Forms: nplurals=3; plural=n==0 ? 0 : n==1 ? 1 : 2;"
+    
+    msgid "item_plural"
+    msgid_plural ""
+    msgstr[0] "No items"
+    msgstr[1] "${number} item"
+    msgstr[2] "${number} items"
+
+More information on complex plurals can be found in the `gettext documentation
+<https://www.gnu.org/savannah-checkouts/gnu/gettext/manual/html_node/Plural-forms.html>`_.
+
 .. index::
    single: locale name
-   single: get_locale_name
    single: negotiate_locale_name
 
 .. _obtaining_the_locale_name:
@@ -605,28 +534,25 @@ Obtaining the Locale Name for a Request
 ---------------------------------------
 
 You can obtain the locale name related to a request by using the
-:func:`pyramid.i18n.get_locale_name` function.
+:func:`pyramid.request.Request.locale_name` attribute of the request.
 
 .. code-block:: python
    :linenos:
 
-   from pyramid.i18n import get_locale_name
-
    def aview(request):
-       locale_name = get_locale_name(request)
+       locale_name = request.locale_name
 
-This returns the locale name negotiated by the currently active
-:term:`locale negotiator` or the :term:`default locale name` if the
-locale negotiator returns ``None``.  You can change the default locale
-name by changing the ``default_locale_name`` setting; see
-:ref:`default_locale_name_setting`.
+The locale name of a request is dynamically computed; it will be the locale
+name negotiated by the currently active :term:`locale negotiator`, or the
+:term:`default locale name` if the locale negotiator returns ``None``. You can
+change the default locale name by changing the ``pyramid.default_locale_name``
+setting. See :ref:`default_locale_name_setting`.
 
-Once :func:`~pyramid.i18n.get_locale_name` is first run, the locale
-name is stored on the request object.  Subsequent calls to
-:func:`~pyramid.i18n.get_locale_name` will return the stored locale
-name without invoking the :term:`locale negotiator`.  To avoid this
-caching, you can use the :func:`pyramid.i18n.negotiate_locale_name`
-function:
+Once :func:`~pyramid.request.Request.locale_name` is first run, the locale name
+is stored on the request object.  Subsequent calls to
+:func:`~pyramid.request.Request.locale_name` will return the stored locale name
+without invoking the :term:`locale negotiator`.  To avoid this caching, you can
+use the :func:`pyramid.i18n.negotiate_locale_name` function:
 
 .. code-block:: python
    :linenos:
@@ -642,15 +568,13 @@ You can also obtain the locale name related to a request using the
 .. code-block:: python
    :linenos:
 
-   from pyramid.i18n import get_localizer
-
    def aview(request):
-       localizer = get_localizer(request)
+       localizer = request.localizer
        locale_name = localizer.locale_name
 
-Obtaining the locale name as an attribute of a localizer is equivalent
-to obtaining a locale name by calling the
-:func:`~pyramid.i18n.get_locale_name` function.
+Obtaining the locale name as an attribute of a localizer is equivalent to
+obtaining a locale name by asking for the
+:func:`~pyramid.request.Request.locale_name` attribute.
 
 .. index::
    single: date and currency formatting (i18n)
@@ -659,29 +583,26 @@ to obtaining a locale name by calling the
 Performing Date Formatting and Currency Formatting
 --------------------------------------------------
 
-:app:`Pyramid` does not itself perform date and currency formatting
-for different locales.  However, :term:`Babel` can help you do this
-via the :class:`babel.core.Locale` class.  The `Babel documentation
-for this class
-<http://babel.edgewall.org/wiki/ApiDocs/babel.core#babel.core:Locale>`_
-provides minimal information about how to perform date and currency
-related locale operations.  See :ref:`installing_babel` for
-information about how to install Babel.
+:app:`Pyramid` does not itself perform date and currency formatting for
+different locales.  However, :term:`Babel` can help you do this via the
+:class:`babel.core.Locale` class.  The `Babel documentation for this class
+<http://babel.pocoo.org/en/latest/api/core.html#basic-interface>`_ provides
+minimal information about how to perform date and currency related locale
+operations. See :ref:`installing_babel` for information about how to install
+Babel.
 
-The :class:`babel.core.Locale` class requires a :term:`locale name` as
-an argument to its constructor. You can use :app:`Pyramid` APIs to
-obtain the locale name for a request to pass to the
-:class:`babel.core.Locale` constructor; see
-:ref:`obtaining_the_locale_name`.  For example:
+The :class:`babel.core.Locale` class requires a :term:`locale name` as an
+argument to its constructor. You can use :app:`Pyramid` APIs to obtain the
+locale name for a request to pass to the :class:`babel.core.Locale`
+constructor.  See :ref:`obtaining_the_locale_name`.  For example:
 
 .. code-block:: python
    :linenos:
 
    from babel.core import Locale
-   from pyramid.i18n import get_locale_name
 
    def aview(request):
-       locale_name = get_locale_name(request)
+       locale_name = request.locale_name
        locale = Locale(locale_name)
 
 .. index::
@@ -692,15 +613,14 @@ obtain the locale name for a request to pass to the
 Chameleon Template Support for Translation Strings
 --------------------------------------------------
 
-When a :term:`translation string` is used as the subject of textual
-rendering by a :term:`Chameleon` template renderer, it will
-automatically be translated to the requesting user's language if a
-suitable translation exists. This is true of both the ZPT and text
-variants of the Chameleon template renderers.
+When a :term:`translation string` is used as the subject of textual rendering
+by a :term:`Chameleon` template renderer, it will automatically be translated
+to the requesting user's language if a suitable translation exists. This is
+true of both the ZPT and text variants of the Chameleon template renderers.
 
-For example, in a Chameleon ZPT template, the translation string
-represented by "some_translation_string" in each example below will go
-through translation before being rendered:
+For example, in a Chameleon ZPT template, the translation string represented by
+"some_translation_string" in each example below will go through translation
+before being rendered:
 
 .. code-block:: xml
    :linenos:
@@ -725,31 +645,46 @@ through translation before being rendered:
 .. XXX the last example above appears to not yet work as of Chameleon
 .. 1.2.3
 
-The features represented by attributes of the ``i18n`` namespace of
-Chameleon will also consult the :app:`Pyramid` translations.
-See
-`http://chameleon.repoze.org/docs/latest/i18n.html#the-i18n-namespace
-<http://chameleon.repoze.org/docs/latest/i18n.html#the-i18n-namespace>`_.
+The features represented by attributes of the ``i18n`` namespace of Chameleon
+will also consult the :app:`Pyramid` translations. See
+http://chameleon.readthedocs.org/en/latest/reference.html#id50.
 
 .. note::
 
-   Unlike when Chameleon is used outside of :app:`Pyramid`, when it
-   is used *within* :app:`Pyramid`, it does not support use of the
-   ``zope.i18n`` translation framework.  Applications which use
-   :app:`Pyramid` should use the features documented in this
-   chapter rather than ``zope.i18n``.
+   Unlike when Chameleon is used outside of :app:`Pyramid`, when it is used
+   *within* :app:`Pyramid`, it does not support use of the ``zope.i18n``
+   translation framework.  Applications which use :app:`Pyramid` should use the
+   features documented in this chapter rather than ``zope.i18n``.
 
-Third party :app:`Pyramid` template renderers might not provide
-this support out of the box and may need special code to do an
-equivalent.  For those, you can always use the more manual translation
-facility described in :ref:`performing_a_translation`.
+Third party :app:`Pyramid` template renderers might not provide this support
+out of the box and may need special code to do an equivalent.  For those, you
+can always use the more manual translation facility described in
+:ref:`performing_a_translation`.
 
-Mako Pyramid I18N Support
+.. index::
+   single: Mako i18n
+
+Mako Pyramid i18n Support
 -------------------------
 
-There exists a recipe within the :term:`Pyramid Cookbook` named "Mako
-Internationalization" which explains how to add idiomatic I18N support to
-:term:`Mako` templates.
+There exists a recipe within the :term:`Pyramid Community Cookbook` named
+:ref:`Mako Internationalization <cookbook:mako_i18n>` which explains how to add
+idiomatic i18n support to :term:`Mako` templates.
+
+
+.. index::
+   single: Jinja2 i18n
+
+Jinja2 Pyramid i18n Support
+---------------------------
+
+The add-on `pyramid_jinja2 <https://github.com/Pylons/pyramid_jinja2>`_
+provides a scaffold with an example of how to use internationalization with
+Jinja2 in Pyramid. See the documentation sections `Internalization (i18n)
+<http://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/#internalization-i18n>`_
+and `Paster Template I18N
+<http://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/#paster-template-i18n>`_.
+
 
 .. index::
    single: localization deployment settings
@@ -760,83 +695,83 @@ Internationalization" which explains how to add idiomatic I18N support to
 Localization-Related Deployment Settings
 ----------------------------------------
 
-A :app:`Pyramid` application will have a ``default_locale_name``
-setting.  This value represents the :term:`default locale name` used
-when the :term:`locale negotiator` returns ``None``.  Pass it to the
-:mod:`~pyramid.config.Configurator` constructor at startup
-time:
+A :app:`Pyramid` application will have a ``pyramid.default_locale_name``
+setting.  This value represents the :term:`default locale name` used when the
+:term:`locale negotiator` returns ``None``.  Pass it to the
+:mod:`~pyramid.config.Configurator` constructor at startup time:
 
 .. code-block:: python
    :linenos:
 
    from pyramid.config import Configurator
-   config = Configurator(settings={'default_locale_name':'de'})
+   config = Configurator(settings={'pyramid.default_locale_name':'de'})
 
-You may alternately supply a ``default_locale_name`` via an
-application's Paster ``.ini`` file:
+You may alternately supply a ``pyramid.default_locale_name`` via an
+application's ``.ini`` file:
 
 .. code-block:: ini
    :linenos:
 
    [app:main]
-   use = egg:MyProject#app
-   reload_templates = true
-   debug_authorization = false
-   debug_notfound = false
-   default_locale_name = de
+   use = egg:MyProject
+   pyramid.reload_templates = true
+   pyramid.debug_authorization = false
+   pyramid.debug_notfound = false
+   pyramid.default_locale_name = de
 
-If this value is not supplied via the Configurator constructor or via
-a Paste config file, it will default to ``en``.
+If this value is not supplied via the Configurator constructor or via a config
+file, it will default to ``en``.
 
-If this setting is supplied within the :app:`Pyramid` application
-``.ini`` file, it will be available as a settings key:
+If this setting is supplied within the :app:`Pyramid` application ``.ini``
+file, it will be available as a settings key:
 
 .. code-block:: python
    :linenos:
 
    from pyramid.threadlocal import get_current_registry
    settings = get_current_registry().settings
-   default_locale_name = settings['default_locale_name']
+   default_locale_name = settings['pyramid.default_locale_name']
+
+.. index::
+   single: detecting languages
 
 "Detecting" Available Languages
 -------------------------------
 
-Other systems provide an API that returns the set of "available
-languages" as indicated by the union of all languages in all
-translation directories on disk at the time of the call to the API.
+Other systems provide an API that returns the set of "available languages" as
+indicated by the union of all languages in all translation directories on disk
+at the time of the call to the API.
 
-It is by design that :app:`Pyramid` doesn't supply such an API.
-Instead, the application itself is responsible for knowing the "available
-languages".  The rationale is this: any particular application
-deployment must always know which languages it should be translatable
-to anyway, regardless of which translation files are on disk.
+It is by design that :app:`Pyramid` doesn't supply such an API. Instead the
+application itself is responsible for knowing the "available languages".  The
+rationale is this: any particular application deployment must always know which
+languages it should be translatable to anyway, regardless of which translation
+files are on disk.
 
-Here's why: it's not a given that because translations exist in a
-particular language within the registered set of translation
-directories that this particular deployment wants to allow translation
-to that language.  For example, some translations may exist but they
-may be incomplete or incorrect.  Or there may be translations to a
-language but not for all translation domains.
+Here's why: it's not a given that because translations exist in a particular
+language within the registered set of translation directories that this
+particular deployment wants to allow translation to that language.  For
+example, some translations may exist but they may be incomplete or incorrect.
+Or there may be translations to a language but not for all translation domains.
 
 Any nontrivial application deployment will always need to be able to
-selectively choose to allow only some languages even if that set of
-languages is smaller than all those detected within registered
-translation directories.  The easiest way to allow for this is to make
-the application entirely responsible for knowing which languages are
-allowed to be translated to instead of relying on the framework to
-divine this information from translation directory file info.
+selectively choose to allow only some languages even if that set of languages
+is smaller than all those detected within registered translation directories.
+The easiest way to allow for this is to make the application entirely
+responsible for knowing which languages are allowed to be translated to instead
+of relying on the framework to divine this information from translation
+directory file info.
 
-You can set up a system to allow a deployer to select available
-languages based on convention by using the :mod:`pyramid.settings`
-mechanism:
+You can set up a system to allow a deployer to select available languages based
+on convention by using the :mod:`pyramid.settings` mechanism.
 
-Allow a deployer to modify your application's PasteDeploy .ini file:
+Allow a deployer to modify your application's ``.ini`` file:
 
 .. code-block:: ini
    :linenos:
 
    [app:main]
-   use = egg:MyProject#app
+   use = egg:MyProject
    # ...
    available_languages = fr de en ru
 
@@ -845,53 +780,60 @@ Then as a part of the code of a custom :term:`locale negotiator`:
 .. code-block:: python
    :linenos:
 
-   from pyramid.threadlocal import get_current_registry
-   settings = get_current_registry().settings
-   languages = settings['available_languages'].split()
+   from pyramid.settings import aslist
 
-This is only a suggestion.  You can create your own "available
-languages" configuration scheme as necessary.
+   def my_locale_negotiator(request):
+       languages = aslist(request.registry.settings['available_languages'])
+       # ...
+
+This is only a suggestion.  You can create your own "available languages"
+configuration scheme as necessary.
 
 .. index::
    pair: translation; activating
    pair: locale; negotiator
    single: translation directory
 
+.. index::
+   pair: activating; translation
+
 .. _activating_translation:
 
 Activating Translation
 ----------------------
 
-By default, a :app:`Pyramid` application performs no translation.
-To turn translation on, you must:
+By default, a :app:`Pyramid` application performs no translation. To turn
+translation on you must:
 
 - add at least one :term:`translation directory` to your application.
 
 - ensure that your application sets the :term:`locale name` correctly.
+
+.. index::
+   pair: translation directory; adding
 
 .. _adding_a_translation_directory:
 
 Adding a Translation Directory
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-:term:`gettext` is the underlying machinery behind the
-:app:`Pyramid` translation machinery.  A translation directory is a
-directory organized to be useful to :term:`gettext`.  A translation
-directory usually includes a listing of language directories, each of
-which itself includes an ``LC_MESSAGES`` directory.  Each
-``LC_MESSAGES`` directory should contain one or more ``.mo`` files.
-Each ``.mo`` file represents a :term:`message catalog`, which is used
-to provide translations to your application.
+:term:`gettext` is the underlying machinery behind the :app:`Pyramid`
+translation machinery.  A translation directory is a directory organized to be
+useful to :term:`gettext`.  A translation directory usually includes a listing
+of language directories, each of which itself includes an ``LC_MESSAGES``
+directory.  Each ``LC_MESSAGES`` directory should contain one or more ``.mo``
+files. Each ``.mo`` file represents a :term:`message catalog`, which is used to
+provide translations to your application.
 
 Adding a :term:`translation directory` registers all of its constituent
-:term:`message catalog` files within your :app:`Pyramid` application to
-be available to use for translation services.  This includes all of the
-``.mo`` files found within all ``LC_MESSAGES`` directories within each
-locale directory in the translation directory.
+:term:`message catalog` files within your :app:`Pyramid` application to be
+available to use for translation services.  This includes all of the ``.mo``
+files found within all ``LC_MESSAGES`` directories within each locale directory
+in the translation directory.
 
 You can add a translation directory imperatively by using the
-:meth:`pyramid.config.Configurator.add_translation_dirs` during
-application startup.  For example:
+:meth:`pyramid.config.Configurator.add_translation_dirs` during application
+startup.  For example:
 
 .. code-block:: python
    :linenos:
@@ -901,53 +843,56 @@ application startup.  For example:
                                'another.application:locale/')
 
 A message catalog in a translation directory added via
-:meth:`~pyramid.config.Configurator.add_translation_dirs`
-will be merged into translations from a message catalog added earlier
-if both translation directories contain translations for the same
-locale and :term:`translation domain`.
+:meth:`~pyramid.config.Configurator.add_translation_dirs` will be merged into
+translations from a message catalog added earlier if both translation
+directories contain translations for the same locale and :term:`translation
+domain`.
+
+.. index::
+   pair: setting; locale
 
 Setting the Locale
 ~~~~~~~~~~~~~~~~~~
 
-When the *default locale negotiator* (see
-:ref:`default_locale_negotiator`) is in use, you can inform
-:app:`Pyramid` of the current locale name by doing any of these
-things before any translations need to be performed:
+When the *default locale negotiator* (see :ref:`default_locale_negotiator`) is
+in use, you can inform :app:`Pyramid` of the current locale name by doing any
+of these things before any translations need to be performed:
 
-- Set the ``_LOCALE_`` attribute of the request to a valid locale name
-  (usually directly within view code).  E.g. ``request._LOCALE_ =
-  'de'``.
+- Set the ``_LOCALE_`` attribute of the request to a valid locale name (usually
+  directly within view code), e.g., ``request._LOCALE_ = 'de'``.
 
-- Ensure that a valid locale name value is in the ``request.params``
-  dictionary under the key named ``_LOCALE_``.  This is usually the
-  result of passing a ``_LOCALE_`` value in the query string or in the
-  body of a form post associated with a request.  For example,
-  visiting ``http://my.application?_LOCALE_=de``.
+- Ensure that a valid locale name value is in the ``request.params`` dictionary
+  under the key named ``_LOCALE_``.  This is usually the result of passing a
+  ``_LOCALE_`` value in the query string or in the body of a form post
+  associated with a request.  For example, visiting
+  ``http://my.application?_LOCALE_=de``.
 
 - Ensure that a valid locale name value is in the ``request.cookies``
-  dictionary under the key named ``_LOCALE_``.  This is usually the
-  result of setting a ``_LOCALE_`` cookie in a prior response,
-  e.g. ``response.set_cookie('_LOCALE_', 'de')``.
+  dictionary under the key named ``_LOCALE_``.  This is usually the result of
+  setting a ``_LOCALE_`` cookie in a prior response, e.g.,
+  ``response.set_cookie('_LOCALE_', 'de')``.
 
 .. note::
 
    If this locale negotiation scheme is inappropriate for a particular
-   application, you can configure a custom :term:`locale negotiator`
-   function into that application as required.  See
-   :ref:`custom_locale_negotiator`.
+   application, you can configure a custom :term:`locale negotiator` function
+   into that application as required.  See :ref:`custom_locale_negotiator`.
+
+.. index::
+   single: locale negotiator
 
 .. _locale_negotiators:
 
 Locale Negotiators
 ------------------
 
-A :term:`locale negotiator` informs the operation of a
-:term:`localizer` by telling it what :term:`locale name` is related to
-a particular request.  A locale negotiator is a bit of code which
-accepts a request and which returns a :term:`locale name`.  It is
-consulted when :meth:`pyramid.i18n.Localizer.translate` or
-:meth:`pyramid.i18n.Localizer.pluralize` is invoked.  It is also
-consulted when :func:`~pyramid.i18n.get_locale_name` or
+A :term:`locale negotiator` informs the operation of a :term:`localizer` by
+telling it what :term:`locale name` is related to a particular request.  A
+locale negotiator is a bit of code which accepts a request and which returns a
+:term:`locale name`.  It is consulted when
+:meth:`pyramid.i18n.Localizer.translate` or
+:meth:`pyramid.i18n.Localizer.pluralize` is invoked.  It is also consulted when
+:func:`~pyramid.request.Request.locale_name` is accessed or when
 :func:`~pyramid.i18n.negotiate_locale_name` is invoked.
 
 .. _default_locale_negotiator:
@@ -955,63 +900,59 @@ consulted when :func:`~pyramid.i18n.get_locale_name` or
 The Default Locale Negotiator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Most applications can make use of the default locale negotiator, which
-requires no additional coding or configuration.
+Most applications can make use of the default locale negotiator, which requires
+no additional coding or configuration.
 
 The default locale negotiator implementation named
-:class:`~pyramid.i18n.default_locale_negotiator` uses the following
-set of steps to dermine the locale name.
+:class:`~pyramid.i18n.default_locale_negotiator` uses the following set of
+steps to determine the locale name.
 
-- First, the negotiator looks for the ``_LOCALE_`` attribute of the
-  request object (possibly set directly by view code or by a listener
-  for an :term:`event`).
+- First the negotiator looks for the ``_LOCALE_`` attribute of the request
+  object (possibly set directly by view code or by a listener for an
+  :term:`event`).
 
 - Then it looks for the ``request.params['_LOCALE_']`` value.
 
 - Then it looks for the ``request.cookies['_LOCALE_']`` value.
 
-- If no locale can be found via the request, it falls back to using
-  the :term:`default locale name` (see
-  :ref:`localization_deployment_settings`).
+- If no locale can be found via the request, it falls back to using the
+  :term:`default locale name` (see :ref:`localization_deployment_settings`).
 
-- Finally, if the default locale name is not explicitly set, it uses
-  the locale name ``en``.
+- Finally if the default locale name is not explicitly set, it uses the locale
+  name ``en``.
 
 .. _custom_locale_negotiator:
 
 Using a Custom Locale Negotiator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Locale negotiation is sometimes policy-laden and complex.  If the
-(simple) default locale negotiation scheme described in
-:ref:`activating_translation` is inappropriate for your application,
-you may create and a special :term:`locale negotiator`.  Subsequently
-you may override the default locale negotiator by adding your newly
-created locale negotiator to your application's configuration.
+Locale negotiation is sometimes policy-laden and complex.  If the (simple)
+default locale negotiation scheme described in :ref:`activating_translation` is
+inappropriate for your application, you may create a special :term:`locale
+negotiator`.  Subsequently you may override the default locale negotiator by
+adding your newly created locale negotiator to your application's
+configuration.
 
-A locale negotiator is simply a callable which
-accepts a request and returns a single :term:`locale name` or ``None``
-if no locale can be determined.
+A locale negotiator is simply a callable which accepts a request and returns a
+single :term:`locale name` or ``None`` if no locale can be determined.
 
 Here's an implementation of a simple locale negotiator:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
     def my_locale_negotiator(request):
         locale_name = request.params.get('my_locale')
         return locale_name
 
-If a locale negotiator returns ``None``, it signifies to
-:app:`Pyramid` that the default application locale name should be
-used.
+If a locale negotiator returns ``None``, it signifies to :app:`Pyramid` that
+the default application locale name should be used.
 
 You may add your newly created locale negotiator to your application's
 configuration by passing an object which can act as the negotiator (or a
 :term:`dotted Python name` referring to the object) as the
-``locale_negotiator`` argument of the
-:class:`~pyramid.config.Configurator` instance during application
-startup.  For example:
+``locale_negotiator`` argument of the :class:`~pyramid.config.Configurator`
+instance during application startup.  For example:
 
 .. code-block:: python
    :linenos:
@@ -1019,9 +960,8 @@ startup.  For example:
    from pyramid.config import Configurator
    config = Configurator(locale_negotiator=my_locale_negotiator)
 
-Alternately, use the
-:meth:`pyramid.config.Configurator.set_locale_negotiator`
-method.
+Alternatively, use the
+:meth:`pyramid.config.Configurator.set_locale_negotiator` method.
 
 For example:
 
@@ -1031,4 +971,3 @@ For example:
    from pyramid.config import Configurator
    config = Configurator()
    config.set_locale_negotiator(my_locale_negotiator)
-

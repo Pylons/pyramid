@@ -5,7 +5,7 @@ from pyramid import testing
 class PageModelTests(unittest.TestCase):
 
     def _getTargetClass(self):
-        from tutorial.models import Page
+        from .models import Page
         return Page
 
     def _makeOne(self, data=u'some data'):
@@ -18,7 +18,7 @@ class PageModelTests(unittest.TestCase):
 class WikiModelTests(unittest.TestCase):
 
     def _getTargetClass(self):
-        from tutorial.models import Wiki
+        from .models import Wiki
         return Wiki
 
     def _makeOne(self):
@@ -30,8 +30,9 @@ class WikiModelTests(unittest.TestCase):
         self.assertEqual(wiki.__name__, None)
 
 class AppmakerTests(unittest.TestCase):
+
     def _callFUT(self, zodb_root):
-        from tutorial.models import appmaker
+        from .models import appmaker
         return appmaker(zodb_root)
 
     def test_it(self):
@@ -42,7 +43,7 @@ class AppmakerTests(unittest.TestCase):
 
 class ViewWikiTests(unittest.TestCase):
     def test_it(self):
-        from tutorial.views import view_wiki
+        from .views import view_wiki
         context = testing.DummyResource()
         request = testing.DummyRequest()
         response = view_wiki(context, request)
@@ -50,7 +51,7 @@ class ViewWikiTests(unittest.TestCase):
 
 class ViewPageTests(unittest.TestCase):
     def _callFUT(self, context, request):
-        from tutorial.views import view_page
+        from .views import view_page
         return view_page(context, request)
 
     def test_it(self):
@@ -76,11 +77,10 @@ class ViewPageTests(unittest.TestCase):
 
 class AddPageTests(unittest.TestCase):
     def _callFUT(self, context, request):
-        from tutorial.views import add_page
+        from .views import add_page
         return add_page(context, request)
 
     def test_it_notsubmitted(self):
-        from pyramid.url import resource_url
         context = testing.DummyResource()
         request = testing.DummyRequest()
         request.subpath = ['AnotherPage']
@@ -88,7 +88,7 @@ class AddPageTests(unittest.TestCase):
         self.assertEqual(info['page'].data,'')
         self.assertEqual(
             info['save_url'],
-            resource_url(context, request, 'add_page', 'AnotherPage'))
+            request.resource_url(context, 'add_page', 'AnotherPage'))
 
     def test_it_submitted(self):
         context = testing.DummyResource()
@@ -103,17 +103,16 @@ class AddPageTests(unittest.TestCase):
 
 class EditPageTests(unittest.TestCase):
     def _callFUT(self, context, request):
-        from tutorial.views import edit_page
+        from .views import edit_page
         return edit_page(context, request)
 
     def test_it_notsubmitted(self):
-        from pyramid.url import resource_url
         context = testing.DummyResource()
         request = testing.DummyRequest()
         info = self._callFUT(context, request)
         self.assertEqual(info['page'], context)
         self.assertEqual(info['save_url'],
-                         resource_url(context, request, 'edit_page'))
+                         request.resource_url(context, 'edit_page'))
 
     def test_it_submitted(self):
         context = testing.DummyResource()
@@ -135,18 +134,16 @@ class FunctionalTests(unittest.TestCase):
     def setUp(self):
         import tempfile
         import os.path
-        from tutorial import main
+        from . import main
         self.tmpdir = tempfile.mkdtemp()
 
         dbpath = os.path.join( self.tmpdir, 'test.db')
-        from repoze.zodbconn.uri import db_from_uri
-        db = db_from_uri('file://' + dbpath)
-        settings = { 'zodb_uri' : None }
+        uri = 'file://' + dbpath
+        settings = { 'zodbconn.uri' : uri ,
+                     'pyramid.includes': ['pyramid_zodbconn', 'pyramid_tm'] }
 
         app = main({}, **settings)
-        from repoze.zodbconn.connector import Connector
-        app = Connector(app, db)
-        self.db = db
+        self.db = app.registry._zodb_databases['']
         from webtest import TestApp
         self.testapp = TestApp(app)
 
@@ -157,64 +154,68 @@ class FunctionalTests(unittest.TestCase):
 
     def test_root(self):
         res = self.testapp.get('/', status=302)
-        self.assertTrue(not res.body)
+        self.assertEqual(res.location, 'http://localhost/FrontPage')
 
     def test_FrontPage(self):
         res = self.testapp.get('/FrontPage', status=200)
-        self.assertTrue('FrontPage' in res.body)
+        self.assertTrue(b'FrontPage' in res.body)
 
     def test_unexisting_page(self):
         res = self.testapp.get('/SomePage', status=404)
-        self.assertTrue('Not Found' in res.body)
+        self.assertTrue(b'Not Found' in res.body)
+
+    def test_referrer_is_login(self):
+        res = self.testapp.get('/login', status=200)
+        self.assertTrue(b'name="came_from" value="/"' in res.body)
 
     def test_successful_log_in(self):
         res = self.testapp.get( self.viewer_login, status=302)
-        self.assertTrue(res.location == 'FrontPage')
+        self.assertEqual(res.location, 'http://localhost/FrontPage')
 
     def test_failed_log_in(self):
         res = self.testapp.get( self.viewer_wrong_login, status=200)
-        self.assertTrue('login' in res.body)
+        self.assertTrue(b'login' in res.body)
 
     def test_logout_link_present_when_logged_in(self):
         res = self.testapp.get( self.viewer_login, status=302)
         res = self.testapp.get('/FrontPage', status=200)
-        self.assertTrue('Logout' in res.body)
+        self.assertTrue(b'Logout' in res.body)
 
     def test_logout_link_not_present_after_logged_out(self):
         res = self.testapp.get( self.viewer_login, status=302)
         res = self.testapp.get('/FrontPage', status=200)
         res = self.testapp.get('/logout', status=302)
-        self.assertTrue('Logout' not in res.body)
+        self.assertTrue(b'Logout' not in res.body)
 
     def test_anonymous_user_cannot_edit(self):
         res = self.testapp.get('/FrontPage/edit_page', status=200)
-        self.assertTrue('Login' in res.body)
+        self.assertTrue(b'Login' in res.body)
 
     def test_anonymous_user_cannot_add(self):
         res = self.testapp.get('/add_page/NewPage', status=200)
-        self.assertTrue('Login' in res.body)
+        self.assertTrue(b'Login' in res.body)
 
     def test_viewer_user_cannot_edit(self):
         res = self.testapp.get( self.viewer_login, status=302)
         res = self.testapp.get('/FrontPage/edit_page', status=200)
-        self.assertTrue('Login' in res.body)
+        self.assertTrue(b'Login' in res.body)
 
     def test_viewer_user_cannot_add(self):
         res = self.testapp.get( self.viewer_login, status=302)
         res = self.testapp.get('/add_page/NewPage', status=200)
-        self.assertTrue('Login' in res.body)
+        self.assertTrue(b'Login' in res.body)
 
     def test_editors_member_user_can_edit(self):
         res = self.testapp.get( self.editor_login, status=302)
         res = self.testapp.get('/FrontPage/edit_page', status=200)
-        self.assertTrue('Editing' in res.body)
+        self.assertTrue(b'Editing' in res.body)
 
     def test_editors_member_user_can_add(self):
         res = self.testapp.get( self.editor_login, status=302)
         res = self.testapp.get('/add_page/NewPage', status=200)
-        self.assertTrue('Editing' in res.body)
+        self.assertTrue(b'Editing' in res.body)
 
     def test_editors_member_user_can_view(self):
         res = self.testapp.get( self.editor_login, status=302)
         res = self.testapp.get('/FrontPage', status=200)
-        self.assertTrue('FrontPage' in res.body)
+        self.assertTrue(b'FrontPage' in res.body)

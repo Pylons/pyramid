@@ -1,7 +1,7 @@
 Copyright, Trademarks, and Attributions
 =======================================
 
-*The Pyramid Web Application Development Framework, Version 1.0*
+*The Pyramid Web Framework, Version 1.1*
 
 by Chris McDonough
 
@@ -39,7 +39,7 @@ any trademark or service mark.
 
 Every effort has been made to make this book as complete and as
 accurate as possible, but no warranty or fitness is implied.  The
-information provided is on as "as-is" basis.  The author and the
+information provided is on an "as-is" basis.  The author and the
 publisher shall have neither liability nor responsibility to any
 person or entity with respect to any loss or damages arising from the
 information contained in this book.  No patent liability is assumed
@@ -55,7 +55,12 @@ Contributors:
   Ben Bangert, Blaise Laflamme, Rob Miller, Mike Orr, Carlos de la Guardia,
   Paul Everitt, Tres Seaver, John Shipman, Marius Gedminas, Chris Rossi,
   Joachim Krebs, Xavier Spriet, Reed O'Brien, William Chambers, Charlie
-  Choiniere, Jamaludin Ahmad, Graham Higgins, Patricio Paez.
+  Choiniere, Jamaludin Ahmad, Graham Higgins, Patricio Paez, Michael
+  Merickel, Eric Ongerth, Niall O'Higgins, Christoph Zwerschke, John
+  Anderson, Atsushi Odagiri, Kirk Strauser, JD Navarro, Joe Dallago,
+  Savoir-Faire Linux, Łukasz Fidosz, Christopher Lambacher, Claus Conrad,
+  Chris Beelby, Phil Jenvey and a number of people with only pseudonyms on
+  GitHub.
 
 Cover Designer:
    Hugues Laflamme of `Kemeneur <http://www.kemeneur.com/>`_.
@@ -67,6 +72,9 @@ Used with permission:
 
    The :ref:`much_ado_about_traversal_chapter` chapter is adapted,
    with permission, from an article written by Rob Miller.
+
+   The :ref:`logging_chapter` is adapted, with permission, from the Pylons
+   documentation logging chapter, originally written by Phil Jenvey.
 
 Print Production
 ----------------
@@ -81,14 +89,14 @@ Contacting The Publisher
 Please send documentation licensing inquiries, translation inquiries,
 and other business communications to `Agendaless Consulting
 <mailto:webmaster@agendaless.com>`_.  Please send software and other
-technical queries to the `Pylons-devel maillist
+technical queries to the `Pylons-devel mailing list
 <http://groups.google.com/group/pylons-devel>`_.
 
 HTML Version and Source Code
 ----------------------------
 
 An HTML version of this book is freely available via
-http://docs.pylonsproject.org
+http://docs.pylonsproject.org/projects/pyramid/en/latest/
 
 The source code for the examples used in this book are available
 within the :app:`Pyramid` software distribution, always available

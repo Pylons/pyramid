@@ -1,20 +1,39 @@
 Pyramid
 =======
 
-Pyramid is a small, fast, down-to-earth, open source Python web application
-development framework. It makes real-world web application development and
-deployment more fun, more predictable, and more productive.
+.. image:: https://travis-ci.org/Pylons/pyramid.png?branch=master
+        :target: https://travis-ci.org/Pylons/pyramid
 
-Pyramid is the newest web framework produced by the `Pylons Project
-<http://pylonsproject.org/>`_.
+.. image:: https://readthedocs.org/projects/pyramid/badge/?version=master
+        :target: http://docs.pylonsproject.org/projects/pyramid/en/master/
+        :alt: Master Documentation Status
 
-Pyramid was previously known as `repoze.bfg <http://bfg.repoze.org>`_.
+.. image:: https://readthedocs.org/projects/pyramid/badge/?version=latest
+        :target: http://docs.pylonsproject.org/projects/pyramid/en/latest/
+        :alt: Latest Documentation Status
+
+.. image:: https://img.shields.io/badge/irc-freenode-blue.svg
+        :target: https://webchat.freenode.net/?channels=pyramid
+        :alt: IRC Freenode
+
+Pyramid is a small, fast, down-to-earth, open source Python web framework. It
+makes real-world web application development and deployment more fun, more
+predictable, and more productive.
+
+Pyramid is produced by the `Pylons Project <http://pylonsproject.org/>`_.
 
 Support and Documentation
 -------------------------
 
 See the `Pylons Project website <http://pylonsproject.org/>`_ to view
 documentation, report bugs, and obtain support.
+
+Developing and Contributing
+---------------------------
+
+See ``HACKING.txt`` and ``contributing.md`` for guidelines for running tests,
+adding features, coding style, and updating documentation when developing in or
+contributing to Pyramid.
 
 License
 -------

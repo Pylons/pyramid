@@ -15,15 +15,19 @@ class TestReify(unittest.TestCase):
         self.assertEqual(inst.__dict__['wrapped'], 'a')
 
     def test___get__noinst(self):
-        decorator = self._makeOne(None)
+        def wrapped(inst):
+            return 'a'  # pragma: no cover
+        decorator = self._makeOne(wrapped)
         result = decorator.__get__(None)
         self.assertEqual(result, decorator)
 
-    def test___doc__copied(self):
-        def wrapped(inst):
-            """My doc"""
-        decorator = self._makeOne(wrapped)
-        self.assertEqual(decorator.__doc__, "My doc")
-        
+    def test_dunder_attrs_copied(self):
+        from pyramid.util import viewdefaults
+        decorator = self._makeOne(viewdefaults)
+        self.assertEqual(decorator.__doc__, viewdefaults.__doc__)
+        self.assertEqual(decorator.__name__, viewdefaults.__name__)
+        self.assertEqual(decorator.__module__, viewdefaults.__module__)
+
+
 class Dummy(object):
     pass

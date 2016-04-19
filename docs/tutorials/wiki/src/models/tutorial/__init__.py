@@ -1,19 +1,18 @@
 from pyramid.config import Configurator
-from repoze.zodbconn.finder import PersistentApplicationFinder
-from tutorial.models import appmaker
+from pyramid_zodbconn import get_connection
+from .models import appmaker
+
+
+def root_factory(request):
+    conn = get_connection(request)
+    return appmaker(conn.root())
+
 
 def main(global_config, **settings):
-    """ This function returns a WSGI application.
+    """ This function returns a Pyramid WSGI application.
     """
-    zodb_uri = settings.get('zodb_uri', False)
-    if zodb_uri is False:
-        raise ValueError("No 'zodb_uri' in application configuration.")
-
-    finder = PersistentApplicationFinder(zodb_uri, appmaker)
-    def get_root(request):
-        return finder(request.environ)
-    config = Configurator(root_factory=get_root, settings=settings)
-    config.add_static_view('static', 'tutorial:static')
-    config.scan('tutorial')
+    config = Configurator(root_factory=root_factory, settings=settings)
+    config.include('pyramid_chameleon')
+    config.add_static_view('static', 'static', cache_max_age=3600)
+    config.scan()
     return config.make_wsgi_app()
-

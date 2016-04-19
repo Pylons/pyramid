@@ -1,4 +1,201 @@
 import unittest
+import warnings
+from pyramid import testing
+from pyramid.compat import (
+    text_,
+    bytes_,
+    )
+
+class TestCallbackAuthenticationPolicyDebugging(unittest.TestCase):
+    def setUp(self):
+        from pyramid.interfaces import IDebugLogger
+        self.config = testing.setUp()
+        self.config.registry.registerUtility(self, IDebugLogger)
+        self.messages = []
+
+    def tearDown(self):
+        del self.config
+
+    def debug(self, msg):
+        self.messages.append(msg)
+
+    def _makeOne(self, userid=None, callback=None):
+        from pyramid.authentication import CallbackAuthenticationPolicy
+        class MyAuthenticationPolicy(CallbackAuthenticationPolicy):
+            def unauthenticated_userid(self, request):
+                return userid
+        policy = MyAuthenticationPolicy()
+        policy.debug = True
+        policy.callback = callback
+        return policy
+
+    def test_authenticated_userid_no_unauthenticated_userid(self):
+        request = DummyRequest(registry=self.config.registry)
+        policy = self._makeOne()
+        self.assertEqual(policy.authenticated_userid(request), None)
+        self.assertEqual(len(self.messages), 1)
+        self.assertEqual(
+            self.messages[0],
+            'pyramid.tests.test_authentication.MyAuthenticationPolicy.'
+            'authenticated_userid: call to unauthenticated_userid returned '
+            'None; returning None')
+
+    def test_authenticated_userid_no_callback(self):
+        request = DummyRequest(registry=self.config.registry)
+        policy = self._makeOne(userid='fred')
+        self.assertEqual(policy.authenticated_userid(request), 'fred')
+        self.assertEqual(len(self.messages), 1)
+        self.assertEqual(
+            self.messages[0],
+             "pyramid.tests.test_authentication.MyAuthenticationPolicy."
+            "authenticated_userid: there was no groupfinder callback; "
+            "returning 'fred'")
+
+    def test_authenticated_userid_with_callback_fail(self):
+        request = DummyRequest(registry=self.config.registry)
+        def callback(userid, request):
+            return None
+        policy = self._makeOne(userid='fred', callback=callback)
+        self.assertEqual(policy.authenticated_userid(request), None)
+        self.assertEqual(len(self.messages), 1)
+        self.assertEqual(
+            self.messages[0],
+            'pyramid.tests.test_authentication.MyAuthenticationPolicy.'
+            'authenticated_userid: groupfinder callback returned None; '
+            'returning None')
+
+    def test_authenticated_userid_with_callback_success(self):
+        request = DummyRequest(registry=self.config.registry)
+        def callback(userid, request):
+            return []
+        policy = self._makeOne(userid='fred', callback=callback)
+        self.assertEqual(policy.authenticated_userid(request), 'fred')
+        self.assertEqual(len(self.messages), 1)
+        self.assertEqual(
+            self.messages[0],
+            "pyramid.tests.test_authentication.MyAuthenticationPolicy."
+            "authenticated_userid: groupfinder callback returned []; "
+            "returning 'fred'")
+
+    def test_authenticated_userid_fails_cleaning_as_Authenticated(self):
+        request = DummyRequest(registry=self.config.registry)
+        policy = self._makeOne(userid='system.Authenticated')
+        self.assertEqual(policy.authenticated_userid(request), None)
+        self.assertEqual(len(self.messages), 1)
+        self.assertEqual(
+            self.messages[0],
+            "pyramid.tests.test_authentication.MyAuthenticationPolicy."
+            "authenticated_userid: use of userid 'system.Authenticated' is "
+            "disallowed by any built-in Pyramid security policy, returning "
+            "None")
+
+    def test_authenticated_userid_fails_cleaning_as_Everyone(self):
+        request = DummyRequest(registry=self.config.registry)
+        policy = self._makeOne(userid='system.Everyone')
+        self.assertEqual(policy.authenticated_userid(request), None)
+        self.assertEqual(len(self.messages), 1)
+        self.assertEqual(
+            self.messages[0],
+            "pyramid.tests.test_authentication.MyAuthenticationPolicy."
+            "authenticated_userid: use of userid 'system.Everyone' is "
+            "disallowed by any built-in Pyramid security policy, returning "
+            "None")
+
+    def test_effective_principals_no_unauthenticated_userid(self):
+        request = DummyRequest(registry=self.config.registry)
+        policy = self._makeOne()
+        self.assertEqual(policy.effective_principals(request),
+                         ['system.Everyone'])
+        self.assertEqual(len(self.messages), 1)
+        self.assertEqual(
+            self.messages[0],
+            "pyramid.tests.test_authentication.MyAuthenticationPolicy."
+            "effective_principals: unauthenticated_userid returned None; "
+            "returning ['system.Everyone']")
+
+    def test_effective_principals_no_callback(self):
+        request = DummyRequest(registry=self.config.registry)
+        policy = self._makeOne(userid='fred')
+        self.assertEqual(
+            policy.effective_principals(request),
+            ['system.Everyone', 'system.Authenticated', 'fred'])
+        self.assertEqual(len(self.messages), 2)
+        self.assertEqual(
+            self.messages[0],
+            'pyramid.tests.test_authentication.MyAuthenticationPolicy.'
+            'effective_principals: groupfinder callback is None, so groups '
+            'is []')
+        self.assertEqual(
+            self.messages[1],
+            "pyramid.tests.test_authentication.MyAuthenticationPolicy."
+            "effective_principals: returning effective principals: "
+            "['system.Everyone', 'system.Authenticated', 'fred']")
+
+    def test_effective_principals_with_callback_fail(self):
+        request = DummyRequest(registry=self.config.registry)
+        def callback(userid, request):
+            return None
+        policy = self._makeOne(userid='fred', callback=callback)
+        self.assertEqual(
+            policy.effective_principals(request), ['system.Everyone'])
+        self.assertEqual(len(self.messages), 2)
+        self.assertEqual(
+            self.messages[0],
+            'pyramid.tests.test_authentication.MyAuthenticationPolicy.'
+            'effective_principals: groupfinder callback returned None as '
+            'groups')
+        self.assertEqual(
+            self.messages[1],
+            "pyramid.tests.test_authentication.MyAuthenticationPolicy."
+            "effective_principals: returning effective principals: "
+            "['system.Everyone']")
+
+    def test_effective_principals_with_callback_success(self):
+        request = DummyRequest(registry=self.config.registry)
+        def callback(userid, request):
+            return []
+        policy = self._makeOne(userid='fred', callback=callback)
+        self.assertEqual(
+            policy.effective_principals(request),
+            ['system.Everyone', 'system.Authenticated', 'fred'])
+        self.assertEqual(len(self.messages), 2)
+        self.assertEqual(
+            self.messages[0],
+            'pyramid.tests.test_authentication.MyAuthenticationPolicy.'
+            'effective_principals: groupfinder callback returned [] as groups')
+        self.assertEqual(
+            self.messages[1],
+            "pyramid.tests.test_authentication.MyAuthenticationPolicy."
+            "effective_principals: returning effective principals: "
+            "['system.Everyone', 'system.Authenticated', 'fred']")
+
+    def test_effective_principals_with_unclean_principal_Authenticated(self):
+        request = DummyRequest(registry=self.config.registry)
+        policy = self._makeOne(userid='system.Authenticated')
+        self.assertEqual(
+            policy.effective_principals(request),
+            ['system.Everyone'])
+        self.assertEqual(len(self.messages), 1)
+        self.assertEqual(
+            self.messages[0],
+            "pyramid.tests.test_authentication.MyAuthenticationPolicy."
+            "effective_principals: unauthenticated_userid returned disallowed "
+            "'system.Authenticated'; returning ['system.Everyone'] as if it "
+            "was None")
+
+    def test_effective_principals_with_unclean_principal_Everyone(self):
+        request = DummyRequest(registry=self.config.registry)
+        policy = self._makeOne(userid='system.Everyone')
+        self.assertEqual(
+            policy.effective_principals(request),
+            ['system.Everyone'])
+        self.assertEqual(len(self.messages), 1)
+        self.assertEqual(
+            self.messages[0],
+            "pyramid.tests.test_authentication.MyAuthenticationPolicy."
+            "effective_principals: unauthenticated_userid returned disallowed "
+            "'system.Everyone'; returning ['system.Everyone'] as if it "
+            "was None")
 
 class TestRepozeWho1AuthenticationPolicy(unittest.TestCase):
     def _getTargetClass(self):
@@ -7,7 +204,7 @@ class TestRepozeWho1AuthenticationPolicy(unittest.TestCase):
 
     def _makeOne(self, identifier_name='auth_tkt', callback=None):
         return self._getTargetClass()(identifier_name, callback)
-    
+
     def test_class_implements_IAuthenticationPolicy(self):
         from zope.interface.verify import verifyClass
         from pyramid.interfaces import IAuthenticationPolicy
@@ -40,6 +237,12 @@ class TestRepozeWho1AuthenticationPolicy(unittest.TestCase):
         policy = self._makeOne()
         self.assertEqual(policy.authenticated_userid(request), 'fred')
 
+    def test_authenticated_userid_repoze_who_userid_is_None(self):
+        request = DummyRequest(
+            {'repoze.who.identity':{'repoze.who.userid':None}})
+        policy = self._makeOne()
+        self.assertEqual(policy.authenticated_userid(request), None)
+
     def test_authenticated_userid_with_callback_returns_None(self):
         request = DummyRequest(
             {'repoze.who.identity':{'repoze.who.userid':'fred'}})
@@ -55,6 +258,20 @@ class TestRepozeWho1AuthenticationPolicy(unittest.TestCase):
             return ['agroup']
         policy = self._makeOne(callback=callback)
         self.assertEqual(policy.authenticated_userid(request), 'fred')
+
+    def test_authenticated_userid_unclean_principal_Authenticated(self):
+        request = DummyRequest(
+            {'repoze.who.identity':{'repoze.who.userid':'system.Authenticated'}}
+            )
+        policy = self._makeOne()
+        self.assertEqual(policy.authenticated_userid(request), None)
+
+    def test_authenticated_userid_unclean_principal_Everyone(self):
+        request = DummyRequest(
+            {'repoze.who.identity':{'repoze.who.userid':'system.Everyone'}}
+            )
+        policy = self._makeOne()
+        self.assertEqual(policy.authenticated_userid(request), None)
 
     def test_effective_principals_None(self):
         from pyramid.security import Everyone
@@ -93,6 +310,31 @@ class TestRepozeWho1AuthenticationPolicy(unittest.TestCase):
         policy = self._makeOne(callback=callback)
         self.assertEqual(policy.effective_principals(request), [Everyone])
 
+    def test_effective_principals_repoze_who_userid_is_None(self):
+        from pyramid.security import Everyone
+        request = DummyRequest(
+            {'repoze.who.identity':{'repoze.who.userid':None}}
+            )
+        policy = self._makeOne()
+        self.assertEqual(policy.effective_principals(request), [Everyone])
+
+    def test_effective_principals_repoze_who_userid_is_unclean_Everyone(self):
+        from pyramid.security import Everyone
+        request = DummyRequest(
+            {'repoze.who.identity':{'repoze.who.userid':'system.Everyone'}}
+            )
+        policy = self._makeOne()
+        self.assertEqual(policy.effective_principals(request), [Everyone])
+
+    def test_effective_principals_repoze_who_userid_is_unclean_Authenticated(
+        self):
+        from pyramid.security import Everyone
+        request = DummyRequest(
+            {'repoze.who.identity':{'repoze.who.userid':'system.Authenticated'}}
+            )
+        policy = self._makeOne()
+        self.assertEqual(policy.effective_principals(request), [Everyone])
+
     def test_remember_no_plugins(self):
         request = DummyRequest({})
         policy = self._makeOne()
@@ -107,7 +349,15 @@ class TestRepozeWho1AuthenticationPolicy(unittest.TestCase):
         result = policy.remember(request, 'fred')
         self.assertEqual(result[0], request.environ)
         self.assertEqual(result[1], {'repoze.who.userid':'fred'})
-        
+
+    def test_remember_kwargs(self):
+        authtkt = DummyWhoPlugin()
+        request = DummyRequest(
+            {'repoze.who.plugins':{'auth_tkt':authtkt}})
+        policy = self._makeOne()
+        result = policy.remember(request, 'fred', max_age=23)
+        self.assertEqual(result[1], {'repoze.who.userid':'fred', 'max_age': 23})
+
     def test_forget_no_plugins(self):
         request = DummyRequest({})
         policy = self._makeOne()
@@ -132,7 +382,7 @@ class TestRemoteUserAuthenticationPolicy(unittest.TestCase):
 
     def _makeOne(self, environ_key='REMOTE_USER', callback=None):
         return self._getTargetClass()(environ_key, callback)
-    
+
     def test_class_implements_IAuthenticationPolicy(self):
         from zope.interface.verify import verifyClass
         from pyramid.interfaces import IAuthenticationPolicy
@@ -157,7 +407,7 @@ class TestRemoteUserAuthenticationPolicy(unittest.TestCase):
         request = DummyRequest({})
         policy = self._makeOne()
         self.assertEqual(policy.authenticated_userid(request), None)
-        
+
     def test_authenticated_userid(self):
         request = DummyRequest({'REMOTE_USER':'fred'})
         policy = self._makeOne()
@@ -182,14 +432,14 @@ class TestRemoteUserAuthenticationPolicy(unittest.TestCase):
         policy = self._makeOne()
         result = policy.remember(request, 'fred')
         self.assertEqual(result, [])
-        
+
     def test_forget(self):
         request = DummyRequest({'REMOTE_USER':'fred'})
         policy = self._makeOne()
         result = policy.forget(request)
         self.assertEqual(result, [])
 
-class TestAutkTktAuthenticationPolicy(unittest.TestCase):
+class TestAuthTktAuthenticationPolicy(unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.authentication import AuthTktAuthenticationPolicy
         return AuthTktAuthenticationPolicy
@@ -199,23 +449,27 @@ class TestAutkTktAuthenticationPolicy(unittest.TestCase):
         inst.cookie = DummyCookieHelper(cookieidentity)
         return inst
 
+    def setUp(self):
+        self.warnings = warnings.catch_warnings()
+        self.warnings.__enter__()
+        warnings.simplefilter('ignore', DeprecationWarning)
+
+    def tearDown(self):
+        self.warnings.__exit__(None, None, None)
+
     def test_allargs(self):
         # pass all known args
         inst = self._getTargetClass()(
             'secret', callback=None, cookie_name=None, secure=False,
             include_ip=False, timeout=None, reissue_time=None,
+            hashalg='sha512',
             )
         self.assertEqual(inst.callback, None)
 
-    def test_class_implements_IAuthenticationPolicy(self):
-        from zope.interface.verify import verifyClass
-        from pyramid.interfaces import IAuthenticationPolicy
-        verifyClass(IAuthenticationPolicy, self._getTargetClass())
-
-    def test_instance_implements_IAuthenticationPolicy(self):
-        from zope.interface.verify import verifyObject
-        from pyramid.interfaces import IAuthenticationPolicy
-        verifyObject(IAuthenticationPolicy, self._makeOne(None, None))
+    def test_hashalg_override(self):
+        # important to ensure hashalg is passed to cookie helper
+        inst = self._getTargetClass()('secret', hashalg='sha512')
+        self.assertEqual(inst.cookie.hashalg, 'sha512')
 
     def test_unauthenticated_userid_returns_None(self):
         request = DummyRequest({})
@@ -231,7 +485,7 @@ class TestAutkTktAuthenticationPolicy(unittest.TestCase):
         request = DummyRequest({})
         policy = self._makeOne(None, None)
         self.assertEqual(policy.authenticated_userid(request), None)
-        
+
     def test_authenticated_userid_callback_returns_None(self):
         request = DummyRequest({})
         def callback(userid, request):
@@ -282,12 +536,22 @@ class TestAutkTktAuthenticationPolicy(unittest.TestCase):
         result = policy.remember(request, 'fred', a=1, b=2)
         self.assertEqual(policy.cookie.kw, {'a':1, 'b':2})
         self.assertEqual(result, [])
-        
+
     def test_forget(self):
         request = DummyRequest({})
         policy = self._makeOne(None, None)
         result = policy.forget(request)
         self.assertEqual(result, [])
+
+    def test_class_implements_IAuthenticationPolicy(self):
+        from zope.interface.verify import verifyClass
+        from pyramid.interfaces import IAuthenticationPolicy
+        verifyClass(IAuthenticationPolicy, self._getTargetClass())
+
+    def test_instance_implements_IAuthenticationPolicy(self):
+        from zope.interface.verify import verifyObject
+        from pyramid.interfaces import IAuthenticationPolicy
+        verifyObject(IAuthenticationPolicy, self._makeOne(None, None))
 
 class TestAuthTktCookieHelper(unittest.TestCase):
     def _getTargetClass(self):
@@ -295,20 +559,33 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         return AuthTktCookieHelper
 
     def _makeOne(self, *arg, **kw):
-        plugin = self._getTargetClass()(*arg, **kw)
-        plugin.auth_tkt = DummyAuthTktModule()
-        return plugin
+        helper = self._getTargetClass()(*arg, **kw)
+        # laziness after moving auth_tkt classes and funcs into
+        # authentication module
+        auth_tkt = DummyAuthTktModule()
+        helper.auth_tkt = auth_tkt
+        helper.AuthTicket = auth_tkt.AuthTicket
+        helper.parse_ticket = auth_tkt.parse_ticket
+        helper.BadTicket = auth_tkt.BadTicket
+        return helper
 
-    def _makeRequest(self, kw=None):
+    def _makeRequest(self, cookie=None, ipv6=False):
         environ = {'wsgi.version': (1,0)}
-        if kw is not None:
-            environ.update(kw)
-        environ['REMOTE_ADDR'] = '1.1.1.1'
+
+        if ipv6 is False:
+            environ['REMOTE_ADDR'] = '1.1.1.1'
+        else:
+            environ['REMOTE_ADDR'] = '::1'
         environ['SERVER_NAME'] = 'localhost'
-        return DummyRequest(environ)
+        return DummyRequest(environ, cookie=cookie)
 
     def _cookieValue(self, cookie):
-        return eval(cookie.value)
+        items = cookie.value.split('/')
+        D = {}
+        for item in items:
+            k, v = item.split('=', 1)
+            D[k] = v
+        return D
 
     def _parseHeaders(self, headers):
         return [ self._parseHeader(header) for header in headers ]
@@ -318,63 +595,89 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         return cookie
 
     def _parseCookie(self, cookie):
-        from Cookie import SimpleCookie
+        from pyramid.compat import SimpleCookie
         cookies = SimpleCookie()
         cookies.load(cookie)
         return cookies.get('auth_tkt')
 
+    def test_init_cookie_str_reissue_invalid(self):
+        self.assertRaises(ValueError, self._makeOne, 'secret', reissue_time='invalid value')
+
+    def test_init_cookie_str_timeout_invalid(self):
+        self.assertRaises(ValueError, self._makeOne, 'secret', timeout='invalid value')
+
+    def test_init_cookie_str_max_age_invalid(self):
+        self.assertRaises(ValueError, self._makeOne, 'secret', max_age='invalid value')
+
     def test_identify_nocookie(self):
-        plugin = self._makeOne('secret')
+        helper = self._makeOne('secret')
         request = self._makeRequest()
-        result = plugin.identify(request)
+        result = helper.identify(request)
         self.assertEqual(result, None)
 
     def test_identify_cookie_value_is_None(self):
-        plugin = self._makeOne('secret')
-        request = self._makeRequest({'HTTP_COOKIE':'auth_tkt='})
-        result = plugin.identify(request)
+        helper = self._makeOne('secret')
+        request = self._makeRequest(None)
+        result = helper.identify(request)
         self.assertEqual(result, None)
-        
+
     def test_identify_good_cookie_include_ip(self):
-        plugin = self._makeOne('secret', include_ip=True)
-        request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=ticket'})
-        result = plugin.identify(request)
+        helper = self._makeOne('secret', include_ip=True)
+        request = self._makeRequest('ticket')
+        result = helper.identify(request)
         self.assertEqual(len(result), 4)
         self.assertEqual(result['tokens'], ())
         self.assertEqual(result['userid'], 'userid')
         self.assertEqual(result['userdata'], '')
         self.assertEqual(result['timestamp'], 0)
-        self.assertEqual(plugin.auth_tkt.value, 'ticket')
-        self.assertEqual(plugin.auth_tkt.remote_addr, '1.1.1.1')
-        self.assertEqual(plugin.auth_tkt.secret, 'secret')
+        self.assertEqual(helper.auth_tkt.value, 'ticket')
+        self.assertEqual(helper.auth_tkt.remote_addr, '1.1.1.1')
+        self.assertEqual(helper.auth_tkt.secret, 'secret')
+        environ = request.environ
+        self.assertEqual(environ['REMOTE_USER_TOKENS'], ())
+        self.assertEqual(environ['REMOTE_USER_DATA'],'')
+        self.assertEqual(environ['AUTH_TYPE'],'cookie')
+
+    def test_identify_good_cookie_include_ipv6(self):
+        helper = self._makeOne('secret', include_ip=True)
+        request = self._makeRequest('ticket', ipv6=True)
+        result = helper.identify(request)
+        self.assertEqual(len(result), 4)
+        self.assertEqual(result['tokens'], ())
+        self.assertEqual(result['userid'], 'userid')
+        self.assertEqual(result['userdata'], '')
+        self.assertEqual(result['timestamp'], 0)
+        self.assertEqual(helper.auth_tkt.value, 'ticket')
+        self.assertEqual(helper.auth_tkt.remote_addr, '::1')
+        self.assertEqual(helper.auth_tkt.secret, 'secret')
         environ = request.environ
         self.assertEqual(environ['REMOTE_USER_TOKENS'], ())
         self.assertEqual(environ['REMOTE_USER_DATA'],'')
         self.assertEqual(environ['AUTH_TYPE'],'cookie')
 
     def test_identify_good_cookie_dont_include_ip(self):
-        plugin = self._makeOne('secret', include_ip=False)
-        request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=ticket'})
-        result = plugin.identify(request)
+        helper = self._makeOne('secret', include_ip=False)
+        request = self._makeRequest('ticket')
+        result = helper.identify(request)
         self.assertEqual(len(result), 4)
         self.assertEqual(result['tokens'], ())
         self.assertEqual(result['userid'], 'userid')
         self.assertEqual(result['userdata'], '')
         self.assertEqual(result['timestamp'], 0)
-        self.assertEqual(plugin.auth_tkt.value, 'ticket')
-        self.assertEqual(plugin.auth_tkt.remote_addr, '0.0.0.0')
-        self.assertEqual(plugin.auth_tkt.secret, 'secret')
+        self.assertEqual(helper.auth_tkt.value, 'ticket')
+        self.assertEqual(helper.auth_tkt.remote_addr, '0.0.0.0')
+        self.assertEqual(helper.auth_tkt.secret, 'secret')
         environ = request.environ
         self.assertEqual(environ['REMOTE_USER_TOKENS'], ())
         self.assertEqual(environ['REMOTE_USER_DATA'],'')
         self.assertEqual(environ['AUTH_TYPE'],'cookie')
 
     def test_identify_good_cookie_int_useridtype(self):
-        plugin = self._makeOne('secret', include_ip=False)
-        plugin.auth_tkt.userid = '1'
-        plugin.auth_tkt.user_data = 'userid_type:int'
-        request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=ticket'})
-        result = plugin.identify(request)
+        helper = self._makeOne('secret', include_ip=False)
+        helper.auth_tkt.userid = '1'
+        helper.auth_tkt.user_data = 'userid_type:int'
+        request = self._makeRequest('ticket')
+        result = helper.identify(request)
         self.assertEqual(len(result), 4)
         self.assertEqual(result['tokens'], ())
         self.assertEqual(result['userid'], 1)
@@ -386,11 +689,11 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertEqual(environ['AUTH_TYPE'],'cookie')
 
     def test_identify_nonuseridtype_user_data(self):
-        plugin = self._makeOne('secret', include_ip=False)
-        plugin.auth_tkt.userid = '1'
-        plugin.auth_tkt.user_data = 'bogus:int'
-        request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=ticket'})
-        result = plugin.identify(request)
+        helper = self._makeOne('secret', include_ip=False)
+        helper.auth_tkt.userid = '1'
+        helper.auth_tkt.user_data = 'bogus:int'
+        request = self._makeRequest('ticket')
+        result = helper.identify(request)
         self.assertEqual(len(result), 4)
         self.assertEqual(result['tokens'], ())
         self.assertEqual(result['userid'], '1')
@@ -402,11 +705,11 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertEqual(environ['AUTH_TYPE'],'cookie')
 
     def test_identify_good_cookie_unknown_useridtype(self):
-        plugin = self._makeOne('secret', include_ip=False)
-        plugin.auth_tkt.userid = 'abc'
-        plugin.auth_tkt.user_data = 'userid_type:unknown'
-        request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=ticket'})
-        result = plugin.identify(request)
+        helper = self._makeOne('secret', include_ip=False)
+        helper.auth_tkt.userid = 'abc'
+        helper.auth_tkt.user_data = 'userid_type:unknown'
+        request = self._makeRequest('ticket')
+        result = helper.identify(request)
         self.assertEqual(len(result), 4)
         self.assertEqual(result['tokens'], ())
         self.assertEqual(result['userid'], 'abc')
@@ -418,14 +721,15 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertEqual(environ['AUTH_TYPE'],'cookie')
 
     def test_identify_good_cookie_b64str_useridtype(self):
-        plugin = self._makeOne('secret', include_ip=False)
-        plugin.auth_tkt.userid = 'encoded'.encode('base64').strip()
-        plugin.auth_tkt.user_data = 'userid_type:b64str'
-        request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=ticket'})
-        result = plugin.identify(request)
+        from base64 import b64encode
+        helper = self._makeOne('secret', include_ip=False)
+        helper.auth_tkt.userid = b64encode(b'encoded').strip()
+        helper.auth_tkt.user_data = 'userid_type:b64str'
+        request = self._makeRequest('ticket')
+        result = helper.identify(request)
         self.assertEqual(len(result), 4)
         self.assertEqual(result['tokens'], ())
-        self.assertEqual(result['userid'], 'encoded')
+        self.assertEqual(result['userid'], b'encoded')
         self.assertEqual(result['userdata'], 'userid_type:b64str')
         self.assertEqual(result['timestamp'], 0)
         environ = request.environ
@@ -434,14 +738,15 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertEqual(environ['AUTH_TYPE'],'cookie')
 
     def test_identify_good_cookie_b64unicode_useridtype(self):
-        plugin = self._makeOne('secret', include_ip=False)
-        plugin.auth_tkt.userid = '\xc3\xa9ncoded'.encode('base64').strip()
-        plugin.auth_tkt.user_data = 'userid_type:b64unicode'
-        request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=ticket'})
-        result = plugin.identify(request)
+        from base64 import b64encode
+        helper = self._makeOne('secret', include_ip=False)
+        helper.auth_tkt.userid = b64encode(b'\xc3\xa9ncoded').strip()
+        helper.auth_tkt.user_data = 'userid_type:b64unicode'
+        request = self._makeRequest('ticket')
+        result = helper.identify(request)
         self.assertEqual(len(result), 4)
         self.assertEqual(result['tokens'], ())
-        self.assertEqual(result['userid'], unicode('\xc3\xa9ncoded', 'utf-8'))
+        self.assertEqual(result['userid'], text_(b'\xc3\xa9ncoded', 'utf-8'))
         self.assertEqual(result['userdata'], 'userid_type:b64unicode')
         self.assertEqual(result['timestamp'], 0)
         environ = request.environ
@@ -450,78 +755,146 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertEqual(environ['AUTH_TYPE'],'cookie')
 
     def test_identify_bad_cookie(self):
-        plugin = self._makeOne('secret', include_ip=True)
-        plugin.auth_tkt.parse_raise = True
-        request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=bogus'})
-        result = plugin.identify(request)
+        helper = self._makeOne('secret', include_ip=True)
+        helper.auth_tkt.parse_raise = True
+        request = self._makeRequest('ticket')
+        result = helper.identify(request)
         self.assertEqual(result, None)
-    
-    def test_identify_cookie_timed_out(self):
-        plugin = self._makeOne('secret', timeout=1)
-        request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=bogus'})
-        result = plugin.identify(request)
-        self.assertEqual(result, None)
+
+    def test_identify_cookie_timeout(self):
+        helper = self._makeOne('secret', timeout=1)
+        self.assertEqual(helper.timeout, 1)
+
+    def test_identify_cookie_str_timeout(self):
+        helper = self._makeOne('secret', timeout='1')
+        self.assertEqual(helper.timeout, 1)
+
+    def test_identify_cookie_timeout_aged(self):
+        import time
+        helper = self._makeOne('secret', timeout=10)
+        now = time.time()
+        helper.auth_tkt.timestamp = now - 1
+        helper.now = now + 10
+        helper.auth_tkt.tokens = (text_('a'), )
+        request = self._makeRequest('bogus')
+        result = helper.identify(request)
+        self.assertFalse(result)
 
     def test_identify_cookie_reissue(self):
         import time
-        plugin = self._makeOne('secret', timeout=10, reissue_time=0)
+        helper = self._makeOne('secret', timeout=10, reissue_time=0)
         now = time.time()
-        plugin.auth_tkt.timestamp = now
-        plugin.now = now + 1
-        request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=bogus'})
-        result = plugin.identify(request)
+        helper.auth_tkt.timestamp = now
+        helper.now = now + 1
+        helper.auth_tkt.tokens = (text_('a'), )
+        request = self._makeRequest('bogus')
+        result = helper.identify(request)
         self.assertTrue(result)
         self.assertEqual(len(request.callbacks), 1)
         response = DummyResponse()
-        request.callbacks[0](None, response)
+        request.callbacks[0](request, response)
+        self.assertEqual(len(response.headerlist), 3)
+        self.assertEqual(response.headerlist[0][0], 'Set-Cookie')
+
+    def test_identify_cookie_str_reissue(self):
+        import time
+        helper = self._makeOne('secret', timeout=10, reissue_time='0')
+        now = time.time()
+        helper.auth_tkt.timestamp = now
+        helper.now = now + 1
+        helper.auth_tkt.tokens = (text_('a'), )
+        request = self._makeRequest('bogus')
+        result = helper.identify(request)
+        self.assertTrue(result)
+        self.assertEqual(len(request.callbacks), 1)
+        response = DummyResponse()
+        request.callbacks[0](request, response)
         self.assertEqual(len(response.headerlist), 3)
         self.assertEqual(response.headerlist[0][0], 'Set-Cookie')
 
     def test_identify_cookie_reissue_already_reissued_this_request(self):
         import time
-        plugin = self._makeOne('secret', timeout=10, reissue_time=0)
+        helper = self._makeOne('secret', timeout=10, reissue_time=0)
         now = time.time()
-        plugin.auth_tkt.timestamp = now
-        plugin.now = now + 1
-        request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=bogus'})
+        helper.auth_tkt.timestamp = now
+        helper.now = now + 1
+        request = self._makeRequest('bogus')
         request._authtkt_reissued = True
-        result = plugin.identify(request)
+        result = helper.identify(request)
         self.assertTrue(result)
         self.assertEqual(len(request.callbacks), 0)
 
     def test_identify_cookie_reissue_notyet(self):
         import time
-        plugin = self._makeOne('secret', timeout=10, reissue_time=10)
+        helper = self._makeOne('secret', timeout=10, reissue_time=10)
         now = time.time()
-        plugin.auth_tkt.timestamp = now
-        plugin.now = now + 1
-        request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=bogus'})
-        result = plugin.identify(request)
+        helper.auth_tkt.timestamp = now
+        helper.now = now + 1
+        request = self._makeRequest('bogus')
+        result = helper.identify(request)
         self.assertTrue(result)
         self.assertEqual(len(request.callbacks), 0)
+
+    def test_identify_cookie_reissue_revoked_by_forget(self):
+        import time
+        helper = self._makeOne('secret', timeout=10, reissue_time=0)
+        now = time.time()
+        helper.auth_tkt.timestamp = now
+        helper.now = now + 1
+        request = self._makeRequest('bogus')
+        result = helper.identify(request)
+        self.assertTrue(result)
+        self.assertEqual(len(request.callbacks), 1)
+        result = helper.forget(request)
+        self.assertTrue(result)
+        self.assertEqual(len(request.callbacks), 1)
+        response = DummyResponse()
+        request.callbacks[0](request, response)
+        self.assertEqual(len(response.headerlist), 0)
+
+    def test_identify_cookie_reissue_revoked_by_remember(self):
+        import time
+        helper = self._makeOne('secret', timeout=10, reissue_time=0)
+        now = time.time()
+        helper.auth_tkt.timestamp = now
+        helper.now = now + 1
+        request = self._makeRequest('bogus')
+        result = helper.identify(request)
+        self.assertTrue(result)
+        self.assertEqual(len(request.callbacks), 1)
+        result = helper.remember(request, 'bob')
+        self.assertTrue(result)
+        self.assertEqual(len(request.callbacks), 1)
+        response = DummyResponse()
+        request.callbacks[0](request, response)
+        self.assertEqual(len(response.headerlist), 0)
 
     def test_identify_cookie_reissue_with_tokens_default(self):
         # see https://github.com/Pylons/pyramid/issues#issue/108
         import time
-        plugin = self._makeOne('secret', timeout=10, reissue_time=0)
-        plugin.auth_tkt = DummyAuthTktModule(tokens=[''])
+        helper = self._makeOne('secret', timeout=10, reissue_time=0)
+        auth_tkt = DummyAuthTktModule(tokens=[''])
+        helper.auth_tkt = auth_tkt
+        helper.AuthTicket = auth_tkt.AuthTicket
+        helper.parse_ticket = auth_tkt.parse_ticket
+        helper.BadTicket = auth_tkt.BadTicket
         now = time.time()
-        plugin.auth_tkt.timestamp = now
-        plugin.now = now + 1
-        request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=bogus'})
-        result = plugin.identify(request)
+        helper.auth_tkt.timestamp = now
+        helper.now = now + 1
+        request = self._makeRequest('bogus')
+        result = helper.identify(request)
         self.assertTrue(result)
         self.assertEqual(len(request.callbacks), 1)
         response = DummyResponse()
         request.callbacks[0](None, response)
         self.assertEqual(len(response.headerlist), 3)
         self.assertEqual(response.headerlist[0][0], 'Set-Cookie')
-        self.assertTrue("'tokens': []" in response.headerlist[0][1])
+        self.assertTrue("/tokens=/" in response.headerlist[0][1])
 
     def test_remember(self):
-        plugin = self._makeOne('secret')
+        helper = self._makeOne('secret')
         request = self._makeRequest()
-        result = plugin.remember(request, 'userid')
+        result = helper.remember(request, 'userid')
         self.assertEqual(len(result), 3)
 
         self.assertEqual(result[0][0], 'Set-Cookie')
@@ -529,17 +902,17 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertTrue(result[0][1].startswith('auth_tkt='))
 
         self.assertEqual(result[1][0], 'Set-Cookie')
-        self.assertTrue(result[1][1].endswith('; Path=/; Domain=localhost'))
+        self.assertTrue(result[1][1].endswith('; Domain=localhost; Path=/'))
         self.assertTrue(result[1][1].startswith('auth_tkt='))
 
         self.assertEqual(result[2][0], 'Set-Cookie')
-        self.assertTrue(result[2][1].endswith('; Path=/; Domain=.localhost'))
+        self.assertTrue(result[2][1].endswith('; Domain=.localhost; Path=/'))
         self.assertTrue(result[2][1].startswith('auth_tkt='))
 
     def test_remember_include_ip(self):
-        plugin = self._makeOne('secret', include_ip=True)
+        helper = self._makeOne('secret', include_ip=True)
         request = self._makeRequest()
-        result = plugin.remember(request, 'other')
+        result = helper.remember(request, 'other')
         self.assertEqual(len(result), 3)
 
         self.assertEqual(result[0][0], 'Set-Cookie')
@@ -547,18 +920,18 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertTrue(result[0][1].startswith('auth_tkt='))
 
         self.assertEqual(result[1][0], 'Set-Cookie')
-        self.assertTrue(result[1][1].endswith('; Path=/; Domain=localhost'))
+        self.assertTrue(result[1][1].endswith('; Domain=localhost; Path=/'))
         self.assertTrue(result[1][1].startswith('auth_tkt='))
 
         self.assertEqual(result[2][0], 'Set-Cookie')
-        self.assertTrue(result[2][1].endswith('; Path=/; Domain=.localhost'))
+        self.assertTrue(result[2][1].endswith('; Domain=.localhost; Path=/'))
         self.assertTrue(result[2][1].startswith('auth_tkt='))
 
     def test_remember_path(self):
-        plugin = self._makeOne('secret', include_ip=True,
+        helper = self._makeOne('secret', include_ip=True,
                                path="/cgi-bin/app.cgi/")
         request = self._makeRequest()
-        result = plugin.remember(request, 'other')
+        result = helper.remember(request, 'other')
         self.assertEqual(len(result), 3)
 
         self.assertEqual(result[0][0], 'Set-Cookie')
@@ -567,18 +940,18 @@ class TestAuthTktCookieHelper(unittest.TestCase):
 
         self.assertEqual(result[1][0], 'Set-Cookie')
         self.assertTrue(result[1][1].endswith(
-            '; Path=/cgi-bin/app.cgi/; Domain=localhost'))
+            '; Domain=localhost; Path=/cgi-bin/app.cgi/'))
         self.assertTrue(result[1][1].startswith('auth_tkt='))
 
         self.assertEqual(result[2][0], 'Set-Cookie')
         self.assertTrue(result[2][1].endswith(
-            '; Path=/cgi-bin/app.cgi/; Domain=.localhost'))
+            '; Domain=.localhost; Path=/cgi-bin/app.cgi/'))
         self.assertTrue(result[2][1].startswith('auth_tkt='))
 
     def test_remember_http_only(self):
-        plugin = self._makeOne('secret', include_ip=True, http_only=True)
+        helper = self._makeOne('secret', include_ip=True, http_only=True)
         request = self._makeRequest()
-        result = plugin.remember(request, 'other')
+        result = helper.remember(request, 'other')
         self.assertEqual(len(result), 3)
 
         self.assertEqual(result[0][0], 'Set-Cookie')
@@ -586,35 +959,35 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertTrue(result[0][1].startswith('auth_tkt='))
 
         self.assertEqual(result[1][0], 'Set-Cookie')
-        self.assertTrue(result[1][1].endswith('; HttpOnly'))
+        self.assertTrue('; HttpOnly' in result[1][1])
         self.assertTrue(result[1][1].startswith('auth_tkt='))
 
         self.assertEqual(result[2][0], 'Set-Cookie')
-        self.assertTrue(result[2][1].endswith('; HttpOnly'))
+        self.assertTrue('; HttpOnly' in result[2][1])
         self.assertTrue(result[2][1].startswith('auth_tkt='))
 
     def test_remember_secure(self):
-        plugin = self._makeOne('secret', include_ip=True, secure=True)
+        helper = self._makeOne('secret', include_ip=True, secure=True)
         request = self._makeRequest()
-        result = plugin.remember(request, 'other')
+        result = helper.remember(request, 'other')
         self.assertEqual(len(result), 3)
 
         self.assertEqual(result[0][0], 'Set-Cookie')
-        self.assertTrue('; Secure' in result[0][1])
+        self.assertTrue('; secure' in result[0][1])
         self.assertTrue(result[0][1].startswith('auth_tkt='))
 
         self.assertEqual(result[1][0], 'Set-Cookie')
-        self.assertTrue('; Secure' in result[1][1])
+        self.assertTrue('; secure' in result[1][1])
         self.assertTrue(result[1][1].startswith('auth_tkt='))
 
         self.assertEqual(result[2][0], 'Set-Cookie')
-        self.assertTrue('; Secure' in result[2][1])
+        self.assertTrue('; secure' in result[2][1])
         self.assertTrue(result[2][1].startswith('auth_tkt='))
 
     def test_remember_wild_domain_disabled(self):
-        plugin = self._makeOne('secret', wild_domain=False)
+        helper = self._makeOne('secret', wild_domain=False)
         request = self._makeRequest()
-        result = plugin.remember(request, 'other')
+        result = helper.remember(request, 'other')
         self.assertEqual(len(result), 2)
 
         self.assertEqual(result[0][0], 'Set-Cookie')
@@ -622,38 +995,66 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertTrue(result[0][1].startswith('auth_tkt='))
 
         self.assertEqual(result[1][0], 'Set-Cookie')
-        self.assertTrue(result[1][1].endswith('; Path=/; Domain=localhost'))
+        self.assertTrue(result[1][1].endswith('; Domain=localhost; Path=/'))
         self.assertTrue(result[1][1].startswith('auth_tkt='))
 
-    def test_remember_domain_has_port(self):
-        plugin = self._makeOne('secret', wild_domain=False)
+    def test_remember_parent_domain(self):
+        helper = self._makeOne('secret', parent_domain=True)
         request = self._makeRequest()
-        request.environ['HTTP_HOST'] = 'example.com:80'
-        result = plugin.remember(request, 'other')
-        self.assertEqual(len(result), 2)
+        request.domain = 'www.example.com'
+        result = helper.remember(request, 'other')
+        self.assertEqual(len(result), 1)
 
         self.assertEqual(result[0][0], 'Set-Cookie')
-        self.assertTrue(result[0][1].endswith('; Path=/'))
+        self.assertTrue(result[0][1].endswith('; Domain=.example.com; Path=/'))
         self.assertTrue(result[0][1].startswith('auth_tkt='))
 
-        self.assertEqual(result[1][0], 'Set-Cookie')
-        self.assertTrue(result[1][1].endswith('; Path=/; Domain=example.com'))
-        self.assertTrue(result[1][1].startswith('auth_tkt='))
-        
-    def test_remember_string_userid(self):
-        plugin = self._makeOne('secret')
+    def test_remember_parent_domain_supercedes_wild_domain(self):
+        helper = self._makeOne('secret', parent_domain=True, wild_domain=True)
         request = self._makeRequest()
-        result = plugin.remember(request, 'userid')
+        request.domain = 'www.example.com'
+        result = helper.remember(request, 'other')
+        self.assertEqual(len(result), 1)
+        self.assertTrue(result[0][1].endswith('; Domain=.example.com; Path=/'))
+
+    def test_remember_explicit_domain(self):
+        helper = self._makeOne('secret', domain='pyramid.bazinga')
+        request = self._makeRequest()
+        request.domain = 'www.example.com'
+        result = helper.remember(request, 'other')
+        self.assertEqual(len(result), 1)
+
+        self.assertEqual(result[0][0], 'Set-Cookie')
+        self.assertTrue(result[0][1].endswith(
+                '; Domain=pyramid.bazinga; Path=/'))
+        self.assertTrue(result[0][1].startswith('auth_tkt='))
+
+    def test_remember_domain_supercedes_parent_and_wild_domain(self):
+        helper = self._makeOne('secret', domain='pyramid.bazinga',
+                parent_domain=True, wild_domain=True)
+        request = self._makeRequest()
+        request.domain = 'www.example.com'
+        result = helper.remember(request, 'other')
+        self.assertEqual(len(result), 1)
+        self.assertTrue(result[0][1].endswith(
+                '; Domain=pyramid.bazinga; Path=/'))
+
+    def test_remember_binary_userid(self):
+        import base64
+        helper = self._makeOne('secret')
+        request = self._makeRequest()
+        result = helper.remember(request, b'userid')
         values = self._parseHeaders(result)
         self.assertEqual(len(result), 3)
         val = self._cookieValue(values[0])
-        self.assertEqual(val['userid'], 'userid'.encode('base64').strip())
+        self.assertEqual(val['userid'],
+                         text_(base64.b64encode(b'userid').strip()))
         self.assertEqual(val['user_data'], 'userid_type:b64str')
 
     def test_remember_int_userid(self):
-        plugin = self._makeOne('secret')
+        helper = self._makeOne('secret')
         request = self._makeRequest()
-        result = plugin.remember(request, 1)
+        result = helper.remember(request, 1)
         values = self._parseHeaders(result)
         self.assertEqual(len(result), 3)
         val = self._cookieValue(values[0])
@@ -661,9 +1062,10 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertEqual(val['user_data'], 'userid_type:int')
 
     def test_remember_long_userid(self):
-        plugin = self._makeOne('secret')
+        from pyramid.compat import long
+        helper = self._makeOne('secret')
         request = self._makeRequest()
-        result = plugin.remember(request, long(1))
+        result = helper.remember(request, long(1))
         values = self._parseHeaders(result)
         self.assertEqual(len(result), 3)
         val = self._cookieValue(values[0])
@@ -671,86 +1073,219 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertEqual(val['user_data'], 'userid_type:int')
 
     def test_remember_unicode_userid(self):
-        plugin = self._makeOne('secret')
+        import base64
+        helper = self._makeOne('secret')
         request = self._makeRequest()
-        userid = unicode('\xc2\xa9', 'utf-8')
-        result = plugin.remember(request, userid)
+        userid = text_(b'\xc2\xa9', 'utf-8')
+        result = helper.remember(request, userid)
         values = self._parseHeaders(result)
         self.assertEqual(len(result), 3)
         val = self._cookieValue(values[0])
         self.assertEqual(val['userid'],
-                         userid.encode('utf-8').encode('base64').strip())
+                         text_(base64.b64encode(userid.encode('utf-8'))))
         self.assertEqual(val['user_data'], 'userid_type:b64unicode')
 
     def test_remember_insane_userid(self):
-        plugin = self._makeOne('secret')
+        helper = self._makeOne('secret')
         request = self._makeRequest()
         userid = object()
-        result = plugin.remember(request, userid)
+        result = helper.remember(request, userid)
         values = self._parseHeaders(result)
         self.assertEqual(len(result), 3)
         value = values[0]
         self.assertTrue('userid' in value.value)
 
     def test_remember_max_age(self):
-        plugin = self._makeOne('secret')
+        helper = self._makeOne('secret')
         request = self._makeRequest()
-        result = plugin.remember(request, 'userid', max_age='500')
+        result = helper.remember(request, 'userid', max_age=500)
         values = self._parseHeaders(result)
         self.assertEqual(len(result), 3)
 
         self.assertEqual(values[0]['max-age'], '500')
         self.assertTrue(values[0]['expires'])
 
-    def test_remember_tokens(self):
-        plugin = self._makeOne('secret')
+    def test_remember_str_max_age(self):
+        helper = self._makeOne('secret')
         request = self._makeRequest()
-        result = plugin.remember(request, 'other', tokens=('foo', 'bar'))
+        result = helper.remember(request, 'userid', max_age='500')
+        values = self._parseHeaders(result)
+        self.assertEqual(len(result), 3)
+
+        self.assertEqual(values[0]['max-age'], '500')
+        self.assertTrue(values[0]['expires'])
+
+    def test_remember_str_max_age_invalid(self):
+        helper = self._makeOne('secret')
+        request = self._makeRequest()
+        self.assertRaises(ValueError, helper.remember, request, 'userid', max_age='invalid value')
+
+    def test_remember_tokens(self):
+        helper = self._makeOne('secret')
+        request = self._makeRequest()
+        result = helper.remember(request, 'other', tokens=('foo', 'bar'))
         self.assertEqual(len(result), 3)
 
         self.assertEqual(result[0][0], 'Set-Cookie')
-        self.assertTrue("'tokens': ('foo', 'bar')" in result[0][1])
+        self.assertTrue("/tokens=foo|bar/" in result[0][1])
 
         self.assertEqual(result[1][0], 'Set-Cookie')
-        self.assertTrue("'tokens': ('foo', 'bar')" in result[1][1])
+        self.assertTrue("/tokens=foo|bar/" in result[1][1])
 
         self.assertEqual(result[2][0], 'Set-Cookie')
-        self.assertTrue("'tokens': ('foo', 'bar')" in result[2][1])
+        self.assertTrue("/tokens=foo|bar/" in result[2][1])
 
-    def test_remember_non_string_token(self):
-        plugin = self._makeOne('secret')
+    def test_remember_unicode_but_ascii_token(self):
+        helper = self._makeOne('secret')
         request = self._makeRequest()
-        self.assertRaises(ValueError, plugin.remember, request, 'other',
-                          tokens=(u'foo',))
+        la = text_(b'foo', 'utf-8')
+        result = helper.remember(request, 'other', tokens=(la,))
+        # tokens must be str type on both Python 2 and 3
+        self.assertTrue("/tokens=foo/" in result[0][1])
+
+    def test_remember_nonascii_token(self):
+        helper = self._makeOne('secret')
+        request = self._makeRequest()
+        la = text_(b'La Pe\xc3\xb1a', 'utf-8')
+        self.assertRaises(ValueError, helper.remember, request, 'other',
+                          tokens=(la,))
 
     def test_remember_invalid_token_format(self):
-        plugin = self._makeOne('secret')
+        helper = self._makeOne('secret')
         request = self._makeRequest()
-        self.assertRaises(ValueError, plugin.remember, request, 'other',
+        self.assertRaises(ValueError, helper.remember, request, 'other',
                           tokens=('foo bar',))
-        self.assertRaises(ValueError, plugin.remember, request, 'other',
+        self.assertRaises(ValueError, helper.remember, request, 'other',
                           tokens=('1bar',))
 
     def test_forget(self):
-        plugin = self._makeOne('secret')
+        helper = self._makeOne('secret')
         request = self._makeRequest()
-        headers = plugin.forget(request)
+        headers = helper.forget(request)
         self.assertEqual(len(headers), 3)
         name, value = headers[0]
         self.assertEqual(name, 'Set-Cookie')
-        self.assertEqual(value,
-          'auth_tkt=""; Path=/; Max-Age=0; Expires=Wed, 31-Dec-97 23:59:59 GMT')
+        self.assertEqual(
+            value,
+            'auth_tkt=; Max-Age=0; Path=/; '
+            'expires=Wed, 31-Dec-97 23:59:59 GMT'
+            )
         name, value = headers[1]
         self.assertEqual(name, 'Set-Cookie')
-        self.assertEqual(value,
-                         'auth_tkt=""; Path=/; Domain=localhost; Max-Age=0; '
-                         'Expires=Wed, 31-Dec-97 23:59:59 GMT')
+        self.assertEqual(
+            value,
+            'auth_tkt=; Domain=localhost; Max-Age=0; Path=/; '
+            'expires=Wed, 31-Dec-97 23:59:59 GMT'
+            )
         name, value = headers[2]
         self.assertEqual(name, 'Set-Cookie')
-        self.assertEqual(value,
-                         'auth_tkt=""; Path=/; Domain=.localhost; Max-Age=0; '
-                         'Expires=Wed, 31-Dec-97 23:59:59 GMT')
+        self.assertEqual(
+            value,
+            'auth_tkt=; Domain=.localhost; Max-Age=0; Path=/; '
+            'expires=Wed, 31-Dec-97 23:59:59 GMT'
+            )
 
+class TestAuthTicket(unittest.TestCase):
+    def _makeOne(self, *arg, **kw):
+        from pyramid.authentication import AuthTicket
+        return AuthTicket(*arg, **kw)
+
+    def test_ctor_with_tokens(self):
+        ticket = self._makeOne('secret', 'userid', 'ip', tokens=('a', 'b'))
+        self.assertEqual(ticket.tokens, 'a,b')
+
+    def test_ctor_with_time(self):
+        ticket = self._makeOne('secret', 'userid', 'ip', time='time')
+        self.assertEqual(ticket.time, 'time')
+
+    def test_digest(self):
+        ticket = self._makeOne('secret', 'userid', '0.0.0.0', time=10)
+        result = ticket.digest()
+        self.assertEqual(result, '126fd6224912187ee9ffa80e0b81420c')
+
+    def test_digest_sha512(self):
+        ticket = self._makeOne('secret', 'userid', '0.0.0.0',
+                               time=10, hashalg='sha512')
+        result = ticket.digest()
+        self.assertEqual(result, '74770b2e0d5b1a54c2a466ec567a40f7d7823576aa49'\
+                                 '3c65fc3445e9b44097f4a80410319ef8cb256a2e60b9'\
+                                 'c2002e48a9e33a3e8ee4379352c04ef96d2cb278')
+
+    def test_cookie_value(self):
+        ticket = self._makeOne('secret', 'userid', '0.0.0.0', time=10,
+                               tokens=('a', 'b'))
+        result = ticket.cookie_value()
+        self.assertEqual(result,
+                         '66f9cc3e423dc57c91df696cf3d1f0d80000000auserid!a,b!')
+
+    def test_ipv4(self):
+        ticket = self._makeOne('secret', 'userid', '198.51.100.1',
+                               time=10, hashalg='sha256')
+        result = ticket.cookie_value()
+        self.assertEqual(result, 'b3e7156db4f8abde4439c4a6499a0668f9e7ffd7fa27b'\
+                                 '798400ecdade8d76c530000000auserid!')
+
+    def test_ipv6(self):
+        ticket = self._makeOne('secret', 'userid', '2001:db8::1',
+                               time=10, hashalg='sha256')
+        result = ticket.cookie_value()
+        self.assertEqual(result, 'd025b601a0f12ca6d008aa35ff3a22b7d8f3d1c1456c8'\
+                                 '5becf8760cd7a2fa4910000000auserid!')
+
+class TestBadTicket(unittest.TestCase):
+    def _makeOne(self, msg, expected=None):
+        from pyramid.authentication import BadTicket
+        return BadTicket(msg, expected)
+
+    def test_it(self):
+        exc = self._makeOne('msg', expected=True)
+        self.assertEqual(exc.expected, True)
+        self.assertTrue(isinstance(exc, Exception))
+
+class Test_parse_ticket(unittest.TestCase):
+    def _callFUT(self, secret, ticket, ip, hashalg='md5'):
+        from pyramid.authentication import parse_ticket
+        return parse_ticket(secret, ticket, ip, hashalg)
+
+    def _assertRaisesBadTicket(self, secret, ticket, ip, hashalg='md5'):
+        from pyramid.authentication import BadTicket
+        self.assertRaises(BadTicket,self._callFUT, secret, ticket, ip, hashalg)
+
+    def test_bad_timestamp(self):
+        ticket = 'x' * 64
+        self._assertRaisesBadTicket('secret', ticket, 'ip')
+
+    def test_bad_userid_or_data(self):
+        ticket = 'x' * 32 + '11111111' + 'x' * 10
+        self._assertRaisesBadTicket('secret', ticket, 'ip')
+
+    def test_digest_sig_incorrect(self):
+        ticket = 'x' * 32 + '11111111' + 'a!b!c'
+        self._assertRaisesBadTicket('secret', ticket, '0.0.0.0')
+
+    def test_correct_with_user_data(self):
+        ticket = text_('66f9cc3e423dc57c91df696cf3d1f0d80000000auserid!a,b!')
+        result = self._callFUT('secret', ticket, '0.0.0.0')
+        self.assertEqual(result, (10, 'userid', ['a', 'b'], ''))
+
+    def test_correct_with_user_data_sha512(self):
+        ticket = text_('7d947cdef99bad55f8e3382a8bd089bb9dd0547f7925b7d189adc1'
+                       '160cab0ec0e6888faa41eba641a18522b26f19109f3ffafb769767'
+                       'ba8a26d02aaeae56599a0000000auserid!a,b!')
+        result = self._callFUT('secret', ticket, '0.0.0.0', 'sha512')
+        self.assertEqual(result, (10, 'userid', ['a', 'b'], ''))
+
+    def test_ipv4(self):
+        ticket = text_('b3e7156db4f8abde4439c4a6499a0668f9e7ffd7fa27b798400ecd'
+                       'ade8d76c530000000auserid!')
+        result = self._callFUT('secret', ticket, '198.51.100.1', 'sha256')
+        self.assertEqual(result, (10, 'userid', [''], ''))
+
+    def test_ipv6(self):
+        ticket = text_('d025b601a0f12ca6d008aa35ff3a22b7d8f3d1c1456c85becf8760'
+                       'cd7a2fa4910000000auserid!')
+        result = self._callFUT('secret', ticket, '2001:db8::1', 'sha256')
+        self.assertEqual(result, (10, 'userid', [''], ''))
 
 class TestSessionAuthenticationPolicy(unittest.TestCase):
     def _getTargetClass(self):
@@ -844,14 +1379,134 @@ class TestSessionAuthenticationPolicy(unittest.TestCase):
         self.assertEqual(request.session.get('userid'), None)
         self.assertEqual(result, [])
 
+class TestBasicAuthAuthenticationPolicy(unittest.TestCase):
+    def _getTargetClass(self):
+        from pyramid.authentication import BasicAuthAuthenticationPolicy as cls
+        return cls
+
+    def _makeOne(self, check):
+        return self._getTargetClass()(check, realm='SomeRealm')
+
+    def test_class_implements_IAuthenticationPolicy(self):
+        from zope.interface.verify import verifyClass
+        from pyramid.interfaces import IAuthenticationPolicy
+        verifyClass(IAuthenticationPolicy, self._getTargetClass())
+
+    def test_unauthenticated_userid(self):
+        import base64
+        request = testing.DummyRequest()
+        request.headers['Authorization'] = 'Basic %s' % base64.b64encode(
+            bytes_('chrisr:password')).decode('ascii')
+        policy = self._makeOne(None)
+        self.assertEqual(policy.unauthenticated_userid(request), 'chrisr')
+
+    def test_unauthenticated_userid_no_credentials(self):
+        request = testing.DummyRequest()
+        policy = self._makeOne(None)
+        self.assertEqual(policy.unauthenticated_userid(request), None)
+
+    def test_unauthenticated_bad_header(self):
+        request = testing.DummyRequest()
+        request.headers['Authorization'] = '...'
+        policy = self._makeOne(None)
+        self.assertEqual(policy.unauthenticated_userid(request), None)
+
+    def test_unauthenticated_userid_not_basic(self):
+        request = testing.DummyRequest()
+        request.headers['Authorization'] = 'Complicated things'
+        policy = self._makeOne(None)
+        self.assertEqual(policy.unauthenticated_userid(request), None)
+
+    def test_unauthenticated_userid_corrupt_base64(self):
+        request = testing.DummyRequest()
+        request.headers['Authorization'] = 'Basic chrisr:password'
+        policy = self._makeOne(None)
+        self.assertEqual(policy.unauthenticated_userid(request), None)
+
+    def test_authenticated_userid(self):
+        import base64
+        request = testing.DummyRequest()
+        request.headers['Authorization'] = 'Basic %s' % base64.b64encode(
+            bytes_('chrisr:password')).decode('ascii')
+        def check(username, password, request):
+            return []
+        policy = self._makeOne(check)
+        self.assertEqual(policy.authenticated_userid(request), 'chrisr')
+
+    def test_authenticated_userid_utf8(self):
+        import base64
+        request = testing.DummyRequest()
+        inputs = (b'm\xc3\xb6rk\xc3\xb6:'
+                  b'm\xc3\xb6rk\xc3\xb6password').decode('utf-8')
+        request.headers['Authorization'] = 'Basic %s' % (
+            base64.b64encode(inputs.encode('utf-8')).decode('latin-1'))
+        def check(username, password, request):
+            return []
+        policy = self._makeOne(check)
+        self.assertEqual(policy.authenticated_userid(request),
+                         b'm\xc3\xb6rk\xc3\xb6'.decode('utf-8'))
+
+    def test_authenticated_userid_latin1(self):
+        import base64
+        request = testing.DummyRequest()
+        inputs = (b'm\xc3\xb6rk\xc3\xb6:'
+                  b'm\xc3\xb6rk\xc3\xb6password').decode('utf-8')
+        request.headers['Authorization'] = 'Basic %s' % (
+            base64.b64encode(inputs.encode('latin-1')).decode('latin-1'))
+        def check(username, password, request):
+            return []
+        policy = self._makeOne(check)
+        self.assertEqual(policy.authenticated_userid(request),
+                         b'm\xc3\xb6rk\xc3\xb6'.decode('utf-8'))
+
+    def test_unauthenticated_userid_invalid_payload(self):
+        import base64
+        request = testing.DummyRequest()
+        request.headers['Authorization'] = 'Basic %s' % base64.b64encode(
+            bytes_('chrisrpassword')).decode('ascii')
+        policy = self._makeOne(None)
+        self.assertEqual(policy.unauthenticated_userid(request), None)
+
+    def test_remember(self):
+        policy = self._makeOne(None)
+        self.assertEqual(policy.remember(None, None), [])
+
+    def test_forget(self):
+        policy = self._makeOne(None)
+        self.assertEqual(policy.forget(None), [
+            ('WWW-Authenticate', 'Basic realm="SomeRealm"')])
+
+class TestSimpleSerializer(unittest.TestCase):
+    def _makeOne(self):
+        from pyramid.authentication import _SimpleSerializer
+        return _SimpleSerializer()
+
+    def test_loads(self):
+        inst = self._makeOne()
+        self.assertEqual(inst.loads(b'abc'), text_('abc'))
+
+    def test_dumps(self):
+        inst = self._makeOne()
+        self.assertEqual(inst.dumps('abc'), bytes_('abc'))
+        
 class DummyContext:
     pass
 
+class DummyCookies(object):
+    def __init__(self, cookie):
+        self.cookie = cookie
+
+    def get(self, name):
+        return self.cookie
+
 class DummyRequest:
-    def __init__(self, environ=None, session=None):
+    domain = 'localhost'
+    def __init__(self, environ=None, session=None, registry=None, cookie=None):
         self.environ = environ or {}
         self.session = session or {}
+        self.registry = registry
         self.callbacks = []
+        self.cookies = DummyCookies(cookie)
 
     def add_response_callback(self, callback):
         self.callbacks.append(callback)
@@ -859,7 +1514,7 @@ class DummyRequest:
 class DummyWhoPlugin:
     def remember(self, environ, identity):
         return environ, identity
-    
+
     def forget(self, environ, identity):
         return environ, identity
 
@@ -879,13 +1534,14 @@ class DummyCookieHelper:
 
 class DummyAuthTktModule(object):
     def __init__(self, timestamp=0, userid='userid', tokens=(), user_data='',
-                 parse_raise=False):
+                 parse_raise=False, hashalg="md5"):
         self.timestamp = timestamp
         self.userid = userid
         self.tokens = tokens
         self.user_data = user_data
         self.parse_raise = parse_raise
-        def parse_ticket(secret, value, remote_addr):
+        self.hashalg = hashalg
+        def parse_ticket(secret, value, remote_addr, hashalg):
             self.secret = secret
             self.value = value
             self.remote_addr = remote_addr
@@ -893,7 +1549,7 @@ class DummyAuthTktModule(object):
                 raise self.BadTicket()
             return self.timestamp, self.userid, self.tokens, self.user_data
         self.parse_ticket = parse_ticket
-        
+
         class AuthTicket(object):
             def __init__(self, secret, userid, remote_addr, **kw):
                 self.secret = secret
@@ -902,10 +1558,23 @@ class DummyAuthTktModule(object):
                 self.kw = kw
 
             def cookie_value(self):
-                result = {'secret':self.secret, 'userid':self.userid,
-                          'remote_addr':self.remote_addr}
+                result = {
+                    'secret':self.secret,
+                    'userid':self.userid,
+                    'remote_addr':self.remote_addr
+                    }
                 result.update(self.kw)
-                result = repr(result)
+                tokens = result.pop('tokens', None)
+                if tokens is not None:
+                    tokens = '|'.join(tokens)
+                    result['tokens'] = tokens
+                items = sorted(result.items())
+                new_items = []
+                for k, v in items:
+                    if isinstance(v, bytes):
+                        v = text_(v)
+                    new_items.append((k,v))
+                result = '/'.join(['%s=%s' % (k, v) for k,v in new_items ])
                 return result
         self.AuthTicket = AuthTicket
 
@@ -915,4 +1584,4 @@ class DummyAuthTktModule(object):
 class DummyResponse:
     def __init__(self):
         self.headerlist = []
-        
+

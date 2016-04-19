@@ -1,5 +1,17 @@
+from collections import deque
 import unittest
 from pyramid import testing
+
+from pyramid.compat import (
+    PY2,
+    text_,
+    bytes_,
+    native_,
+    )
+from pyramid.security import (
+    AuthenticationAPIMixin,
+    AuthorizationAPIMixin,
+    )
 
 class TestRequest(unittest.TestCase):
     def setUp(self):
@@ -8,24 +20,45 @@ class TestRequest(unittest.TestCase):
     def tearDown(self):
         testing.tearDown()
 
-    def _makeOne(self, environ):
-        return self._getTargetClass()(environ)
-
     def _getTargetClass(self):
         from pyramid.request import Request
         return Request
 
-    def _registerContextURL(self):
-        from pyramid.interfaces import IContextURL
+    def _makeOne(self, environ=None):
+        if environ is None:
+            environ = {}
+        return self._getTargetClass()(environ)
+
+    def _registerResourceURL(self):
+        from pyramid.interfaces import IResourceURL
         from zope.interface import Interface
-        class DummyContextURL(object):
+        class DummyResourceURL(object):
             def __init__(self, context, request):
-                pass
-            def __call__(self):
-                return 'http://example.com/context/'
+                self.physical_path = '/context/'
+                self.virtual_path = '/context/'
         self.config.registry.registerAdapter(
-            DummyContextURL, (Interface, Interface),
-            IContextURL)
+            DummyResourceURL, (Interface, Interface),
+            IResourceURL)
+
+    def test_class_conforms_to_IRequest(self):
+        from zope.interface.verify import verifyClass
+        from pyramid.interfaces import IRequest
+        verifyClass(IRequest, self._getTargetClass())
+
+    def test_instance_conforms_to_IRequest(self):
+        from zope.interface.verify import verifyObject
+        from pyramid.interfaces import IRequest
+        verifyObject(IRequest, self._makeOne())
+
+    def test_ResponseClass_is_pyramid_Response(self):
+        from pyramid.response import Response
+        cls = self._getTargetClass()
+        self.assertEqual(cls.ResponseClass, Response)
+
+    def test_implements_security_apis(self):
+        apis = (AuthenticationAPIMixin, AuthorizationAPIMixin)
+        r = self._makeOne()
+        self.assertTrue(isinstance(r, apis))
 
     def test_charset_defaults_to_utf8(self):
         r = self._makeOne({'PATH_INFO':'/'})
@@ -50,27 +83,17 @@ class TestRequest(unittest.TestCase):
             }
         request = self._makeOne(environ)
         request.charset = None
-        self.assertEqual(request.GET['la'], u'La Pe\xf1a')
-
-    def test_class_implements(self):
-        from pyramid.interfaces import IRequest
-        klass = self._getTargetClass()
-        self.assertTrue(IRequest.implementedBy(klass))
-
-    def test_instance_provides(self):
-        from pyramid.interfaces import IRequest
-        inst = self._makeOne({})
-        self.assertTrue(IRequest.providedBy(inst))
+        self.assertEqual(request.GET['la'], text_(b'La Pe\xf1a'))
 
     def test_tmpl_context(self):
         from pyramid.request import TemplateContext
-        inst = self._makeOne({})
+        inst = self._makeOne()
         result = inst.tmpl_context
         self.assertEqual(result.__class__, TemplateContext)
 
     def test_session_configured(self):
         from pyramid.interfaces import ISessionFactory
-        inst = self._makeOne({})
+        inst = self._makeOne()
         def factory(request):
             return 'orangejuice'
         self.config.registry.registerUtility(factory, ISessionFactory)
@@ -79,13 +102,12 @@ class TestRequest(unittest.TestCase):
         self.assertEqual(inst.__dict__['session'], 'orangejuice')
 
     def test_session_not_configured(self):
-        from pyramid.exceptions import ConfigurationError
-        inst = self._makeOne({})
+        inst = self._makeOne()
         inst.registry = self.config.registry
-        self.assertRaises(ConfigurationError, getattr, inst, 'session')
+        self.assertRaises(AttributeError, getattr, inst, 'session')
 
     def test_setattr_and_getattr_dotnotation(self):
-        inst = self._makeOne({})
+        inst = self._makeOne()
         inst.foo = 1
         self.assertEqual(inst.foo, 1)
 
@@ -97,57 +119,88 @@ class TestRequest(unittest.TestCase):
         self.assertEqual(environ, {}) # make sure we're not using adhoc attrs
 
     def test_add_response_callback(self):
-        inst = self._makeOne({})
-        self.assertEqual(inst.response_callbacks, ())
+        inst = self._makeOne()
+        self.assertEqual(len(inst.response_callbacks), 0)
         def callback(request, response):
             """ """
         inst.add_response_callback(callback)
-        self.assertEqual(inst.response_callbacks, [callback])
+        self.assertEqual(list(inst.response_callbacks), [callback])
         inst.add_response_callback(callback)
-        self.assertEqual(inst.response_callbacks, [callback, callback])
+        self.assertEqual(list(inst.response_callbacks), [callback, callback])
 
     def test__process_response_callbacks(self):
-        inst = self._makeOne({})
+        inst = self._makeOne()
         def callback1(request, response):
             request.called1 = True
             response.called1 = True
         def callback2(request, response):
             request.called2  = True
             response.called2 = True
-        inst.response_callbacks = [callback1, callback2]
+        inst.add_response_callback(callback1)
+        inst.add_response_callback(callback2)
         response = DummyResponse()
         inst._process_response_callbacks(response)
         self.assertEqual(inst.called1, True)
         self.assertEqual(inst.called2, True)
         self.assertEqual(response.called1, True)
         self.assertEqual(response.called2, True)
-        self.assertEqual(inst.response_callbacks, [])
+        self.assertEqual(len(inst.response_callbacks), 0)
+
+    def test__process_response_callback_adding_response_callback(self):
+        """
+        When a response callback adds another callback, that new callback should still be called.
+
+        See https://github.com/Pylons/pyramid/pull/1373
+        """
+        inst = self._makeOne()
+        def callback1(request, response):
+            request.called1 = True
+            response.called1 = True
+            request.add_response_callback(callback2)
+        def callback2(request, response):
+            request.called2  = True
+            response.called2 = True
+        inst.add_response_callback(callback1)
+        response = DummyResponse()
+        inst._process_response_callbacks(response)
+        self.assertEqual(inst.called1, True)
+        self.assertEqual(inst.called2, True)
+        self.assertEqual(response.called1, True)
+        self.assertEqual(response.called2, True)
+        self.assertEqual(len(inst.response_callbacks), 0)
 
     def test_add_finished_callback(self):
-        inst = self._makeOne({})
-        self.assertEqual(inst.finished_callbacks, ())
+        inst = self._makeOne()
+        self.assertEqual(len(inst.finished_callbacks), 0)
         def callback(request):
             """ """
         inst.add_finished_callback(callback)
-        self.assertEqual(inst.finished_callbacks, [callback])
+        self.assertEqual(list(inst.finished_callbacks), [callback])
         inst.add_finished_callback(callback)
-        self.assertEqual(inst.finished_callbacks, [callback, callback])
+        self.assertEqual(list(inst.finished_callbacks), [callback, callback])
 
     def test__process_finished_callbacks(self):
-        inst = self._makeOne({})
+        inst = self._makeOne()
         def callback1(request):
             request.called1 = True
         def callback2(request):
             request.called2  = True
-        inst.finished_callbacks = [callback1, callback2]
+        inst.add_finished_callback(callback1)
+        inst.add_finished_callback(callback2)
         inst._process_finished_callbacks()
         self.assertEqual(inst.called1, True)
         self.assertEqual(inst.called2, True)
-        self.assertEqual(inst.finished_callbacks, [])
+        self.assertEqual(len(inst.finished_callbacks), 0)
 
     def test_resource_url(self):
-        self._registerContextURL()
-        inst = self._makeOne({})
+        self._registerResourceURL()
+        environ = {
+            'PATH_INFO':'/',
+            'SERVER_NAME':'example.com',
+            'SERVER_PORT':'80',
+            'wsgi.url_scheme':'http',
+            }
+        inst = self._makeOne(environ)
         root = DummyContext()
         result = inst.resource_url(root)
         self.assertEqual(result, 'http://example.com/context/')
@@ -166,7 +219,7 @@ class TestRequest(unittest.TestCase):
         self.config.registry.registerUtility(mapper, IRoutesMapper)
         result = inst.route_url('flub', 'extra1', 'extra2',
                                 a=1, b=2, c=3, _query={'a':1},
-                                _anchor=u"foo")
+                                _anchor=text_("foo"))
         self.assertEqual(result,
                          'http://example.com:5432/1/2/3/extra1/extra2?a=1#foo')
 
@@ -184,7 +237,7 @@ class TestRequest(unittest.TestCase):
         self.config.registry.registerUtility(mapper, IRoutesMapper)
         result = inst.route_path('flub', 'extra1', 'extra2',
                                 a=1, b=2, c=3, _query={'a':1},
-                                _anchor=u"foo")
+                                _anchor=text_("foo"))
         self.assertEqual(result, '/1/2/3/extra1/extra2?a=1#foo')
 
     def test_static_url(self):
@@ -203,123 +256,89 @@ class TestRequest(unittest.TestCase):
         self.assertEqual(result, 'abc')
         self.assertEqual(info.args,
                          ('pyramid.tests:static/foo.css', request, {}) )
+
+    def test_is_response_false(self):
+        request = self._makeOne()
+        request.registry = self.config.registry
+        self.assertEqual(request.is_response('abc'), False)
+
+    def test_is_response_true_ob_is_pyramid_response(self):
+        from pyramid.response import Response
+        r = Response('hello')
+        request = self._makeOne()
+        request.registry = self.config.registry
+        self.assertEqual(request.is_response(r), True)
+
+    def test_is_response_false_adapter_is_not_self(self):
+        from pyramid.interfaces import IResponse
+        request = self._makeOne()
+        request.registry = self.config.registry
+        def adapter(ob):
+            return object()
+        class Foo(object):
+            pass
+        foo = Foo()
+        request.registry.registerAdapter(adapter, (Foo,), IResponse)
+        self.assertEqual(request.is_response(foo), False)
         
+    def test_is_response_adapter_true(self):
+        from pyramid.interfaces import IResponse
+        request = self._makeOne()
+        request.registry = self.config.registry
+        class Foo(object):
+            pass
+        foo = Foo()
+        def adapter(ob):
+            return ob
+        request.registry.registerAdapter(adapter, (Foo,), IResponse)
+        self.assertEqual(request.is_response(foo), True)
 
-class TestRequestDeprecatedMethods(unittest.TestCase):
-    def setUp(self):
-        self.config = testing.setUp()
-        self.config.begin()
-        import warnings
-        warnings.filterwarnings('ignore')
+    def test_json_body_invalid_json(self):
+        request = self._makeOne({'REQUEST_METHOD':'POST'})
+        request.body = b'{'
+        self.assertRaises(ValueError, getattr, request, 'json_body')
+        
+    def test_json_body_valid_json(self):
+        request = self._makeOne({'REQUEST_METHOD':'POST'})
+        request.body = b'{"a":1}'
+        self.assertEqual(request.json_body, {'a':1})
 
-    def tearDown(self):
-        testing.tearDown()
-        import warnings
-        warnings.resetwarnings()
+    def test_json_body_alternate_charset(self):
+        import json
+        request = self._makeOne({'REQUEST_METHOD':'POST'})
+        inp = text_(
+            b'/\xe6\xb5\x81\xe8\xa1\x8c\xe8\xb6\x8b\xe5\x8a\xbf',
+            'utf-8'
+            )
+        if PY2:
+            body = json.dumps({'a':inp}).decode('utf-8').encode('utf-16')
+        else:
+            body = bytes(json.dumps({'a':inp}), 'utf-16')
+        request.body = body
+        request.content_type = 'application/json; charset=utf-16'
+        self.assertEqual(request.json_body, {'a':inp})
 
-    def _getTargetClass(self):
-        from pyramid.request import Request
-        return Request
+    def test_json_body_GET_request(self):
+        request = self._makeOne({'REQUEST_METHOD':'GET'})
+        self.assertRaises(ValueError, getattr, request, 'json_body')
 
-    def _makeOne(self, environ):
-        return self._getTargetClass()(environ)
+    def test_set_property(self):
+        request = self._makeOne()
+        opts = [2, 1]
+        def connect(obj):
+            return opts.pop()
+        request.set_property(connect, name='db')
+        self.assertEqual(1, request.db)
+        self.assertEqual(2, request.db)
 
-    def test___contains__(self):
-        environ ={'zooma':1}
-        inst = self._makeOne(environ)
-        self.assertTrue('zooma' in inst)
-
-    def test___delitem__(self):
-        environ = {'zooma':1}
-        inst = self._makeOne(environ)
-        del inst['zooma']
-        self.assertFalse('zooma' in environ)
-
-    def test___getitem__(self):
-        environ = {'zooma':1}
-        inst = self._makeOne(environ)
-        self.assertEqual(inst['zooma'], 1)
-
-    def test___iter__(self):
-        environ = {'zooma':1}
-        inst = self._makeOne(environ)
-        iterator = iter(inst)
-        self.assertEqual(list(iterator), list(iter(environ)))
-
-    def test___setitem__(self):
-        environ = {}
-        inst = self._makeOne(environ)
-        inst['zooma'] = 1
-        self.assertEqual(environ, {'zooma':1})
-
-    def test_get(self):
-        environ = {'zooma':1}
-        inst = self._makeOne(environ)
-        self.assertEqual(inst.get('zooma'), 1)
-
-    def test_has_key(self):
-        environ = {'zooma':1}
-        inst = self._makeOne(environ)
-        self.assertEqual(inst.has_key('zooma'), True)
-
-    def test_items(self):
-        environ = {'zooma':1}
-        inst = self._makeOne(environ)
-        self.assertEqual(inst.items(), environ.items())
-
-    def test_iteritems(self):
-        environ = {'zooma':1}
-        inst = self._makeOne(environ)
-        self.assertEqual(list(inst.iteritems()), list(environ.iteritems()))
-
-    def test_iterkeys(self):
-        environ = {'zooma':1}
-        inst = self._makeOne(environ)
-        self.assertEqual(list(inst.iterkeys()), list(environ.iterkeys()))
-
-    def test_itervalues(self):
-        environ = {'zooma':1}
-        inst = self._makeOne(environ)
-        self.assertEqual(list(inst.itervalues()), list(environ.itervalues()))
-
-    def test_keys(self):
-        environ = {'zooma':1}
-        inst = self._makeOne(environ)
-        self.assertEqual(inst.keys(), environ.keys())
-
-    def test_pop(self):
-        environ = {'zooma':1}
-        inst = self._makeOne(environ)
-        popped = inst.pop('zooma')
-        self.assertEqual(environ, {})
-        self.assertEqual(popped, 1)
-
-    def test_popitem(self):
-        environ = {'zooma':1}
-        inst = self._makeOne(environ)
-        popped = inst.popitem()
-        self.assertEqual(environ, {})
-        self.assertEqual(popped, ('zooma', 1))
-
-    def test_setdefault(self):
-        environ = {}
-        inst = self._makeOne(environ)
-        marker = []
-        result = inst.setdefault('a', marker)
-        self.assertEqual(environ, {'a':marker})
-        self.assertEqual(result, marker)
-
-    def test_update(self):
-        environ = {}
-        inst = self._makeOne(environ)
-        inst.update({'a':1}, b=2)
-        self.assertEqual(environ, {'a':1, 'b':2})
-
-    def test_values(self):
-        environ = {'zooma':1}
-        inst = self._makeOne(environ)
-        result = inst.values()
-        self.assertEqual(result, environ.values())
+    def test_set_property_reify(self):
+        request = self._makeOne()
+        opts = [2, 1]
+        def connect(obj):
+            return opts.pop()
+        request.set_property(connect, name='db', reify=True)
+        self.assertEqual(1, request.db)
+        self.assertEqual(1, request.db)
 
 class Test_route_request_iface(unittest.TestCase):
     def _callFUT(self, name):
@@ -331,6 +350,15 @@ class Test_route_request_iface(unittest.TestCase):
         self.assertEqual(iface.__name__, 'routename_IRequest')
         self.assertTrue(hasattr(iface, 'combined'))
         self.assertEqual(iface.combined.__name__, 'routename_combined_IRequest')
+
+    def test_it_routename_with_spaces(self):
+        #  see https://github.com/Pylons/pyramid/issues/232
+        iface = self._callFUT('routename with spaces')
+        self.assertEqual(iface.__name__, 'routename with spaces_IRequest')
+        self.assertTrue(hasattr(iface, 'combined'))
+        self.assertEqual(iface.combined.__name__,
+                         'routename with spaces_combined_IRequest')
+        
 
 class Test_add_global_response_headers(unittest.TestCase):
     def _callFUT(self, request, headerlist):
@@ -396,16 +424,121 @@ class Test_call_app_with_subpath_as_path_info(unittest.TestCase):
         self.assertEqual(request.environ['PATH_INFO'], '/hello/')
 
     def test_subpath_path_info_and_script_name_have_utf8(self):
-        la = 'La Pe\xc3\xb1a'
-        request = DummyRequest({'PATH_INFO':'/'+la, 'SCRIPT_NAME':'/'+la})
-        request.subpath = (unicode(la, 'utf-8'), )
+        encoded = native_(text_(b'La Pe\xc3\xb1a'))
+        decoded = text_(bytes_(encoded), 'utf-8')
+        request = DummyRequest({'PATH_INFO':'/' + encoded,
+                                'SCRIPT_NAME':'/' + encoded})
+        request.subpath = (decoded, )
         response = self._callFUT(request, 'app')
         self.assertTrue(request.copied)
         self.assertEqual(response, 'app')
-        self.assertEqual(request.environ['SCRIPT_NAME'], '/' + la)
-        self.assertEqual(request.environ['PATH_INFO'], '/' + la)
+        self.assertEqual(request.environ['SCRIPT_NAME'], '/' + encoded)
+        self.assertEqual(request.environ['PATH_INFO'], '/' + encoded)
 
-class DummyRequest:
+class Test_apply_request_extensions(unittest.TestCase):
+    def setUp(self):
+        self.config = testing.setUp()
+
+    def tearDown(self):
+        testing.tearDown()
+
+    def _callFUT(self, request, extensions=None):
+        from pyramid.request import apply_request_extensions
+        return apply_request_extensions(request, extensions=extensions)
+
+    def test_it_with_registry(self):
+        from pyramid.interfaces import IRequestExtensions
+        extensions = Dummy()
+        extensions.methods = {'foo': lambda x, y: y}
+        extensions.descriptors = {'bar': property(lambda x: 'bar')}
+        self.config.registry.registerUtility(extensions, IRequestExtensions)
+        request = DummyRequest()
+        request.registry = self.config.registry
+        self._callFUT(request)
+        self.assertEqual(request.bar, 'bar')
+        self.assertEqual(request.foo('abc'), 'abc')
+
+    def test_it_override_extensions(self):
+        from pyramid.interfaces import IRequestExtensions
+        ignore = Dummy()
+        ignore.methods = {'x': lambda x, y, z: 'asdf'}
+        ignore.descriptors = {'bar': property(lambda x: 'asdf')}
+        self.config.registry.registerUtility(ignore, IRequestExtensions)
+        request = DummyRequest()
+        request.registry = self.config.registry
+
+        extensions = Dummy()
+        extensions.methods = {'foo': lambda x, y: y}
+        extensions.descriptors = {'bar': property(lambda x: 'bar')}
+        self._callFUT(request, extensions=extensions)
+        self.assertRaises(AttributeError, lambda: request.x)
+        self.assertEqual(request.bar, 'bar')
+        self.assertEqual(request.foo('abc'), 'abc')
+
+class Dummy(object):
+    pass
+
+class Test_subclassing_Request(unittest.TestCase):
+    def test_subclass(self):
+        from pyramid.interfaces import IRequest
+        from pyramid.request import Request
+
+        class RequestSub(Request):
+            pass
+
+        self.assertTrue(hasattr(Request, '__provides__'))
+        self.assertTrue(hasattr(Request, '__implemented__'))
+        self.assertTrue(hasattr(Request, '__providedBy__'))
+        self.assertFalse(hasattr(RequestSub, '__provides__'))
+        self.assertTrue(hasattr(RequestSub, '__providedBy__'))
+        self.assertTrue(hasattr(RequestSub, '__implemented__'))
+
+        self.assertTrue(IRequest.implementedBy(RequestSub))
+        # The call to implementedBy will add __provides__ to the class
+        self.assertTrue(hasattr(RequestSub, '__provides__'))
+
+
+    def test_subclass_with_implementer(self):
+        from pyramid.interfaces import IRequest
+        from pyramid.request import Request
+        from pyramid.util import InstancePropertyHelper
+        from zope.interface import implementer
+
+        @implementer(IRequest)
+        class RequestSub(Request):
+            pass
+
+        self.assertTrue(hasattr(Request, '__provides__'))
+        self.assertTrue(hasattr(Request, '__implemented__'))
+        self.assertTrue(hasattr(Request, '__providedBy__'))
+        self.assertTrue(hasattr(RequestSub, '__provides__'))
+        self.assertTrue(hasattr(RequestSub, '__providedBy__'))
+        self.assertTrue(hasattr(RequestSub, '__implemented__'))
+
+        req = RequestSub({})
+        helper = InstancePropertyHelper()
+        helper.apply_properties(req, {'b': 'b'})
+
+        self.assertTrue(IRequest.providedBy(req))
+        self.assertTrue(IRequest.implementedBy(RequestSub))
+
+    def test_subclass_mutate_before_providedBy(self):
+        from pyramid.interfaces import IRequest
+        from pyramid.request import Request
+        from pyramid.util import InstancePropertyHelper
+
+        class RequestSub(Request):
+            pass
+
+        req = RequestSub({})
+        helper = InstancePropertyHelper()
+        helper.apply_properties(req, {'b': 'b'})
+
+        self.assertTrue(IRequest.providedBy(req))
+        self.assertTrue(IRequest.implementedBy(RequestSub))
+
+
+class DummyRequest(object):
     def __init__(self, environ=None):
         if environ is None:
             environ = {}

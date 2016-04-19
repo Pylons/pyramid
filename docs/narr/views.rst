@@ -3,62 +3,45 @@
 Views
 =====
 
-One of the primary jobs of :app:`Pyramid` is to find and invoke a
-:term:`view callable` when a :term:`request` reaches your application.  View
-callables are bits of code which do something interesting in response to a
-request made to your application.
+One of the primary jobs of :app:`Pyramid` is to find and invoke a :term:`view
+callable` when a :term:`request` reaches your application.  View callables are
+bits of code which do something interesting in response to a request made to
+your application.  They are the "meat" of any interesting web application.
 
-.. note:: 
+.. note::
 
    A :app:`Pyramid` :term:`view callable` is often referred to in
-   conversational shorthand as a :term:`view`.  In this documentation,
-   however, we need to use less ambiguous terminology because there
-   are significant differences between view *configuration*, the code
-   that implements a view *callable*, and the process of view
-   *lookup*.
+   conversational shorthand as a :term:`view`.  In this documentation, however,
+   we need to use less ambiguous terminology because there are significant
+   differences between view *configuration*, the code that implements a view
+   *callable*, and the process of view *lookup*.
 
-The :ref:`urldispatch_chapter`, and :ref:`traversal_chapter` chapters
-describes how, using information from the :term:`request`, a
-:term:`context` resource is computed.  But the context resource itself
-isn't very useful without an associated :term:`view callable`.  A view
-callable returns a response to a user, often using the context resource
-to do so.
+This chapter describes how view callables should be defined. We'll have to wait
+until a following chapter (entitled :ref:`view_config_chapter`) to find out how
+we actually tell :app:`Pyramid` to wire up view callables to particular URL
+patterns and other request circumstances.
 
-The job of actually locating and invoking the "best" :term:`view callable` is
-the job of the :term:`view lookup` subsystem.  The view lookup subsystem
-compares the resource supplied by :term:`resource location` and information
-in the :term:`request` against :term:`view configuration` statements made by
-the developer to choose the most appropriate view callable for a specific
-set of circumstances.
-
-This chapter describes how view callables work. In the
-:ref:`view_config_chapter` chapter, there are details about performing
-view configuration, and a detailed explanation of view lookup.
+.. index::
+   single: view callables
 
 View Callables
 --------------
 
-View callables are, at the risk of sounding obvious, callable Python
-objects. Specifically, view callables can be functions, classes, or
-instances that implement an ``__call__`` method (making the
-instance callable).
+View callables are, at the risk of sounding obvious, callable Python objects.
+Specifically, view callables can be functions, classes, or instances that
+implement a ``__call__`` method (making the instance callable).
 
-View callables must, at a minimum, accept a single argument named
-``request``.  This argument represents a :app:`Pyramid` :term:`Request`
-object.  A request object encapsulates a WSGI environment provided to
-:app:`Pyramid` by the upstream :term:`WSGI` server. As you might expect,
-the request object contains everything your application needs to know
-about the specific HTTP request being made.
+View callables must, at a minimum, accept a single argument named ``request``. 
+This argument represents a :app:`Pyramid` :term:`Request` object.  A request
+object represents a :term:`WSGI` environment provided to :app:`Pyramid` by the
+upstream WSGI server. As you might expect, the request object contains
+everything your application needs to know about the specific HTTP request being
+made.
 
-A view callable's ultimate responsibility is to create a :mod:`Pyramid`
-:term:`Response` object. This can be done by creating the response
-object in the view callable code and returning it directly, as we will
-be doing in this chapter. However, if a view callable does not return a
-response itself, it can be configured to use a :term:`renderer` that
-converts its return value into a :term:`Response` object. Using
-renderers is the common way that templates are used with view callables
-to generate markup.  See the :ref:`renderers_chapter` chapter for
-details.
+A view callable's ultimate responsibility is to create a :app:`Pyramid`
+:term:`Response` object. This can be done by creating a :term:`Response` object
+in the view callable code and returning it directly or by raising special kinds
+of exceptions from within the body of a view callable.
 
 .. index::
    single: view calling convention
@@ -92,17 +75,17 @@ Defining a View Callable as a Class
 -----------------------------------
 
 A view callable may also be represented by a Python class instead of a
-function.  When a view callable is a class, the calling semantics are
-slightly different than when it is a function or another non-class callable.
-When a view callable is a class, the class' ``__init__`` method is called with a
+function.  When a view callable is a class, the calling semantics are slightly
+different than when it is a function or another non-class callable. When a view
+callable is a class, the class's ``__init__`` method is called with a
 ``request`` parameter.  As a result, an instance of the class is created.
 Subsequently, that instance's ``__call__`` method is invoked with no
-parameters.  Views defined as classes must have the following traits:
+parameters.  Views defined as classes must have the following traits.
 
-- an ``__init__`` method that accepts a ``request`` argument.
+- an ``__init__`` method that accepts a ``request`` argument
 
-- a ``__call__`` (or other) method that accepts no parameters and which
-  returns a response.
+- a ``__call__`` (or other) method that accepts no parameters and which returns
+  a response
 
 For example:
 
@@ -122,91 +105,12 @@ The request object passed to ``__init__`` is the same type of request object
 described in :ref:`function_as_view`.
 
 If you'd like to use a different attribute than ``__call__`` to represent the
-method expected to return a response, you can use an ``attr`` value as part 
-of the configuration for the view.  See :ref:`view_configuration_parameters`.
-The same view callable class can be used in different view configuration 
-statements with different ``attr`` values, each pointing at a different 
-method of the class if you'd like the class to represent a collection of 
-related view callables.
-
-.. note:: A package named :term:`pyramid_handlers` (available from PyPI)
-   provides an analogue of :term:`Pylons` -style "controllers", which are a
-   special kind of view class which provides more automation when your
-   application uses :term:`URL dispatch` solely.
-
-.. index::
-   single: view calling convention
-
-.. _request_and_context_view_definitions:
-
-Alternate View Callable Argument/Calling Conventions
-----------------------------------------------------
-
-Usually, view callables are defined to accept only a single argument:
-``request``.  However, view callables may alternately be defined as classes,
-functions, or any callable that accept *two* positional arguments: a
-:term:`context` resource as the first argument and a :term:`request` as the
-second argument.
-
-The :term:`context` and :term:`request` arguments passed to a view function
-defined in this style can be defined as follows:
-
-context
-
-  The :term:`resource` object found via tree :term:`traversal` or :term:`URL
-  dispatch`.
-
-request
-  A :app:`Pyramid` Request object representing the current WSGI request.
-
-The following types work as view callables in this style:
-
-#. Functions that accept two arguments: ``context``, and ``request``,
-   e.g.:
-
-   .. code-block:: python
-	  :linenos:
-
-	  from pyramid.response import Response
-
-	  def view(context, request):
-		  return Response('OK')
-
-#. Classes that have an ``__init__`` method that accepts ``context,
-   request`` and a ``__call__`` method which accepts no arguments, e.g.:
-
-   .. code-block:: python
-	  :linenos:
-
-	  from pyramid.response import Response
-
-	  class view(object):
-		  def __init__(self, context, request):
-			  self.context = context
-			  self.request = request
-
-		  def __call__(self):
-			  return Response('OK')
-
-#. Arbitrary callables that have a ``__call__`` method that accepts
-   ``context, request``, e.g.:
-
-   .. code-block:: python
-	  :linenos:
-
-	  from pyramid.response import Response
-
-	  class View(object):
-		  def __call__(self, context, request):
-			  return Response('OK')
-	  view = View() # this is the view callable
-
-This style of calling convention is most useful for :term:`traversal` based
-applications, where the context object is frequently used within the view
-callable code itself.
-
-No matter which view calling convention is used, the view code always has
-access to the context via ``request.context``.
+method expected to return a response, you can use an ``attr`` value as part of
+the configuration for the view.  See :ref:`view_configuration_parameters`. The
+same view callable class can be used in different view configuration statements
+with different ``attr`` values, each pointing at a different method of the
+class if you'd like the class to represent a collection of related view
+callables.
 
 .. index::
    single: view response
@@ -230,117 +134,138 @@ implements the :term:`Response` interface is to return a
    def view(request):
        return Response('OK')
 
-You don't need to always use :class:`~pyramid.response.Response` to represent
-a response.  :app:`Pyramid` provides a range of different "exception" classes
-which can act as response objects too.  For example, an instance of the class
+:app:`Pyramid` provides a range of different "exception" classes which inherit
+from :class:`pyramid.response.Response`.  For example, an instance of the class
 :class:`pyramid.httpexceptions.HTTPFound` is also a valid response object
-(see :ref:`http_redirect`).  A view can actually return any object that has
-the following attributes.
-
-status
-  The HTTP status code (including the name) for the response as a string.
-  E.g. ``200 OK`` or ``401 Unauthorized``.
-
-headerlist
-  A sequence of tuples representing the list of headers that should be
-  set in the response.  E.g. ``[('Content-Type', 'text/html'),
-  ('Content-Length', '412')]``
-
-app_iter
-  An iterable representing the body of the response.  This can be a
-  list, e.g. ``['<html><head></head><body>Hello
-  world!</body></html>']`` or it can be a file-like object, or any
-  other sort of iterable.
-
-These attributes form the structure of the "Pyramid Response interface".
-
-.. index::
-   single: view http redirect
-   single: http redirect (from a view)
-
-.. _http_redirect:
-
-Using a View Callable to Do an HTTP Redirect
---------------------------------------------
-
-You can issue an HTTP redirect from within a view by returning a particular
-kind of response.
-
-.. code-block:: python
-   :linenos:
-
-   from pyramid.httpexceptions import HTTPFound
-
-   def myview(request):
-       return HTTPFound(location='http://example.com')
-
-All exception types from the :mod:`pyramid.httpexceptions` module implement
-the :term:`Response` interface; any can be returned as the response from a
-view.  See :mod:`pyramid.httpexceptions` for the documentation for the
-``HTTPFound`` exception; it also includes other response types that imply
-other HTTP response codes, such as ``HTTPUnauthorized`` for ``401
-Unauthorized``.
+because it inherits from :class:`~pyramid.response.Response`.  For examples,
+see :ref:`http_exceptions` and :ref:`http_redirect`.
 
 .. note::
 
-   Although exception types from the :mod:`pyramid.httpexceptions` module are
-   in fact bona fide Python :class:`Exception` types, the :app:`Pyramid` view
-   machinery expects them to be *returned* by a view callable rather than
-   *raised*.
-
-   It is possible, however, in Python 2.5 and above, to configure an
-   *exception view* to catch these exceptions, and return an appropriate
-   :class:`~pyramid.response.Response`. The simplest such view could just
-   catch and return the original exception. See :ref:`exception_views` for
-   more details.
+   You can also return objects from view callables that aren't instances of
+   :class:`pyramid.response.Response` in various circumstances.  This can be
+   helpful when writing tests and when attempting to share code between view
+   callables.  See :ref:`renderers_chapter` for the common way to allow for
+   this.  A much less common way to allow for view callables to return
+   non-Response objects is documented in :ref:`using_iresponse`.
 
 .. index::
    single: view exceptions
 
 .. _special_exceptions_in_callables:
 
-Using Special Exceptions In View Callables
+Using Special Exceptions in View Callables
 ------------------------------------------
 
 Usually when a Python exception is raised within a view callable,
 :app:`Pyramid` allows the exception to propagate all the way out to the
-:term:`WSGI` server which invoked the application.
+:term:`WSGI` server which invoked the application.  It is usually caught and
+logged there.
 
-However, for convenience, two special exceptions exist which are always
-handled by :app:`Pyramid` itself.  These are
-:exc:`pyramid.exceptions.NotFound` and :exc:`pyramid.exceptions.Forbidden`.
-Both are exception classes which accept a single positional constructor
-argument: a ``message``.
+However, for convenience, a special set of exceptions exists.  When one of
+these exceptions is raised within a view callable, it will always cause
+:app:`Pyramid` to generate a response.  These are known as :term:`HTTP
+exception` objects.
 
-If :exc:`~pyramid.exceptions.NotFound` is raised within view code, the result
-of the :term:`Not Found View` will be returned to the user agent which
-performed the request.
+.. index::
+   single: HTTP exceptions
 
-If :exc:`~pyramid.exceptions.Forbidden` is raised within view code, the result
-of the :term:`Forbidden View` will be returned to the user agent which
-performed the request.
+.. _http_exceptions:
 
-In all cases, the message provided to the exception constructor is made
-available to the view which :app:`Pyramid` invokes as
-``request.exception.args[0]``.
+HTTP Exceptions
+~~~~~~~~~~~~~~~
+
+All :mod:`pyramid.httpexceptions` classes which are documented as inheriting
+from the :class:`pyramid.httpexceptions.HTTPException` are :term:`http
+exception` objects.  Instances of an HTTP exception object may either be
+*returned* or *raised* from within view code.  In either case (return or raise)
+the instance will be used as the view's response.
+
+For example, the :class:`pyramid.httpexceptions.HTTPUnauthorized` exception can
+be raised.  This will cause a response to be generated with a ``401
+Unauthorized`` status:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.httpexceptions import HTTPUnauthorized
+
+   def aview(request):
+       raise HTTPUnauthorized()
+
+An HTTP exception, instead of being raised, can alternately be *returned* (HTTP
+exceptions are also valid response objects):
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.httpexceptions import HTTPUnauthorized
+
+   def aview(request):
+       return HTTPUnauthorized()
+
+A shortcut for creating an HTTP exception is the
+:func:`pyramid.httpexceptions.exception_response` function.  This function
+accepts an HTTP status code and returns the corresponding HTTP exception. For
+example, instead of importing and constructing a
+:class:`~pyramid.httpexceptions.HTTPUnauthorized` response object, you can use
+the :func:`~pyramid.httpexceptions.exception_response` function to construct
+and return the same object.
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.httpexceptions import exception_response
+
+   def aview(request):
+       raise exception_response(401)
+
+This is the case because ``401`` is the HTTP status code for "HTTP
+Unauthorized".  Therefore, ``raise exception_response(401)`` is functionally
+equivalent to ``raise HTTPUnauthorized()``.  Documentation which maps each HTTP
+response code to its purpose and its associated HTTP exception object is
+provided within :mod:`pyramid.httpexceptions`.
+
+.. versionadded:: 1.1
+   The :func:`~pyramid.httpexceptions.exception_response` function.
+
+How Pyramid Uses HTTP Exceptions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+HTTP exceptions are meant to be used directly by application developers.
+However, Pyramid itself will raise two HTTP exceptions at various points during
+normal operations.
+
+* :exc:`~pyramid.httpexceptions.HTTPNotFound` gets raised when a view to
+  service a request is not found.
+* :exc:`~pyramid.httpexceptions.HTTPForbidden` gets raised when authorization
+  was forbidden by a security policy.
+
+If :exc:`~pyramid.httpexceptions.HTTPNotFound` is raised by Pyramid itself or
+within view code, the result of the :term:`Not Found View` will be returned to
+the user agent which performed the request.
+
+If :exc:`~pyramid.httpexceptions.HTTPForbidden` is raised by Pyramid itself
+within view code, the result of the :term:`Forbidden View` will be returned to
+the user agent which performed the request.
 
 .. index::
    single: exception views
 
 .. _exception_views:
 
-Exception Views
----------------
+Custom Exception Views
+----------------------
 
-The machinery which allows the special :exc:`~pyramid.exceptions.NotFound` and
-:exc:`~pyramid.exceptions.Forbidden` exceptions to be caught by specialized
-views as described in :ref:`special_exceptions_in_callables` can also be used
-by application developers to convert arbitrary exceptions to responses.
+The machinery which allows HTTP exceptions to be raised and caught by
+specialized views as described in :ref:`special_exceptions_in_callables` can
+also be used by application developers to convert arbitrary exceptions to
+responses.
 
 To register a view that should be called whenever a particular exception is
-raised from with :app:`Pyramid` view code, use the exception class or one of
-its superclasses as the ``context`` of a view configuration which points at a
-view callable you'd like to generate a response.
+raised from within :app:`Pyramid` view code, use the exception class (or one of
+its superclasses) as the :term:`context` of a view configuration which points
+at a view callable for which you'd like to generate a response.
 
 For example, given the following exception class in a module named
 ``helloworld.exceptions``:
@@ -359,6 +284,7 @@ raises a ``helloworld.exceptions.ValidationFailure`` exception:
 .. code-block:: python
    :linenos:
 
+   from pyramid.view import view_config
    from helloworld.exceptions import ValidationFailure
 
    @view_config(context=ValidationFailure)
@@ -370,44 +296,91 @@ raises a ``helloworld.exceptions.ValidationFailure`` exception:
 Assuming that a :term:`scan` was run to pick up this view registration, this
 view callable will be invoked whenever a
 ``helloworld.exceptions.ValidationFailure`` is raised by your application's
-view code.  The same exception raised by a custom root factory or a custom
-traverser is also caught and hooked.
+view code.  The same exception raised by a custom root factory, a custom
+traverser, or a custom view or route predicate is also caught and hooked.
 
-Other normal view predicates can also be used in combination with an
-exception view registration:
+Other normal view predicates can also be used in combination with an exception
+view registration:
 
 .. code-block:: python
    :linenos:
 
    from pyramid.view import view_config
-   from pyramid.exceptions import NotFound
-   from pyramid.httpexceptions import HTTPNotFound
+   from helloworld.exceptions import ValidationFailure
 
-   @view_config(context=NotFound, route_name='home')
-   def notfound_view(request):
-       return HTTPNotFound()
+   @view_config(context=ValidationFailure, route_name='home')
+   def failed_validation(exc, request):
+       response =  Response('Failed validation: %s' % exc.msg)
+       response.status_int = 500
+       return response
 
-The above exception view names the ``route_name`` of ``home``, meaning that
-it will only be called when the route matched has a name of ``home``.  You
-can therefore have more than one exception view for any given exception in
-the system: the "most specific" one will be called when the set of request
+The above exception view names the ``route_name`` of ``home``, meaning that it
+will only be called when the route matched has a name of ``home``.  You can
+therefore have more than one exception view for any given exception in the
+system: the "most specific" one will be called when the set of request
 circumstances match the view registration.
 
-The only view predicate that cannot be used successfully when creating
-an exception view configuration is ``name``.  The name used to look up
-an exception view is always the empty string.  Views registered as
-exception views which have a name will be ignored.
+The only view predicate that cannot be used successfully when creating an
+exception view configuration is ``name``.  The name used to look up an
+exception view is always the empty string.  Views registered as exception views
+which have a name will be ignored.
 
 .. note::
 
-  Normal (i.e., non-exception) views registered against a context resource
-  type which inherits from :exc:`Exception` will work normally.  When an
-  exception view configuration is processed, *two* views are registered.  One
-  as a "normal" view, the other as an "exception" view.  This means that you
-  can use an exception as ``context`` for a normal view.
+  Normal (i.e., non-exception) views registered against a context resource type
+  which inherits from :exc:`Exception` will work normally.  When an exception
+  view configuration is processed, *two* views are registered.  One as a
+  "normal" view, the other as an "exception" view.  This means that you can use
+  an exception as ``context`` for a normal view.
 
 Exception views can be configured with any view registration mechanism:
-``@view_config`` decorator, ZCML, or imperative ``add_view`` styles.
+``@view_config`` decorator or imperative ``add_view`` styles.
+
+.. note::
+
+   Pyramid's :term:`exception view` handling logic is implemented as a tween
+   factory function: :func:`pyramid.tweens.excview_tween_factory`.  If Pyramid
+   exception view handling is desired, and tween factories are specified via
+   the ``pyramid.tweens`` configuration setting, the
+   :func:`pyramid.tweens.excview_tween_factory` function must be added to the
+   ``pyramid.tweens`` configuration setting list explicitly.  If it is not
+   present, Pyramid will not perform exception view handling.
+
+.. index::
+   single: view http redirect
+   single: http redirect (from a view)
+
+.. _http_redirect:
+
+Using a View Callable to do an HTTP Redirect
+--------------------------------------------
+
+You can issue an HTTP redirect by using the
+:class:`pyramid.httpexceptions.HTTPFound` class.  Raising or returning an
+instance of this class will cause the client to receive a "302 Found" response.
+
+To do so, you can *return* a :class:`pyramid.httpexceptions.HTTPFound` instance.
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.httpexceptions import HTTPFound
+
+   def myview(request):
+       return HTTPFound(location='http://example.com')
+
+Alternately, you can *raise* an HTTPFound exception instead of returning one.
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.httpexceptions import HTTPFound
+
+   def myview(request):
+       raise HTTPFound(location='http://example.com')
+
+When the instance is raised, it is caught by the default :term:`exception
+response` handler and turned into a response.
 
 .. index::
    single: unicode, views, and forms
@@ -422,34 +395,33 @@ various other clients.  In :app:`Pyramid`, form submission handling logic is
 always part of a :term:`view`.  For a general overview of how to handle form
 submission data using the :term:`WebOb` API, see :ref:`webob_chapter` and
 `"Query and POST variables" within the WebOb documentation
-<http://pythonpaste.org/webob/reference.html#query-post-variables>`_.
+<http://docs.webob.org/en/latest/reference.html#query-post-variables>`_.
 :app:`Pyramid` defers to WebOb for its request and response implementations,
-and handling form submission data is a property of the request
-implementation.  Understanding WebOb's request API is the key to
-understanding how to process form submission data.
+and handling form submission data is a property of the request implementation. 
+Understanding WebOb's request API is the key to understanding how to process
+form submission data.
 
-There are some defaults that you need to be aware of when trying to handle
-form submission data in a :app:`Pyramid` view.  Having high-order (i.e.,
-non-ASCII) characters in data contained within form submissions is
-exceedingly common, and the UTF-8 encoding is the most common encoding used
-on the web for character data. Since Unicode values are much saner than
-working with and storing bytestrings, :app:`Pyramid` configures the
-:term:`WebOb` request machinery to attempt to decode form submission values
-into Unicode from UTF-8 implicitly.  This implicit decoding happens when view
-code obtains form field values via the ``request.params``, ``request.GET``,
-or ``request.POST`` APIs (see :ref:`request_module` for details about these
-APIs).
+There are some defaults that you need to be aware of when trying to handle form
+submission data in a :app:`Pyramid` view.  Having high-order (i.e., non-ASCII)
+characters in data contained within form submissions is exceedingly common, and
+the UTF-8 encoding is the most common encoding used on the web for character
+data. Since Unicode values are much saner than working with and storing
+bytestrings, :app:`Pyramid` configures the :term:`WebOb` request machinery to
+attempt to decode form submission values into Unicode from UTF-8 implicitly. 
+This implicit decoding happens when view code obtains form field values via the
+``request.params``, ``request.GET``, or ``request.POST`` APIs (see
+:ref:`request_module` for details about these APIs).
 
 .. note::
 
-   Many people find the difference between Unicode and UTF-8 confusing.
-   Unicode is a standard for representing text that supports most of the
-   world's writing systems. However, there are many ways that Unicode data
-   can be encoded into bytes for transit and storage. UTF-8 is a specific
-   encoding for Unicode, that is backwards-compatible with ASCII. This makes
-   UTF-8 very convenient for encoding data where a large subset of that data
-   is ASCII characters, which is largely true on the web. UTF-8 is also the
-   standard character encoding for URLs.
+   Many people find the difference between Unicode and UTF-8 confusing. Unicode
+   is a standard for representing text that supports most of the world's
+   writing systems. However, there are many ways that Unicode data can be
+   encoded into bytes for transit and storage. UTF-8 is a specific encoding for
+   Unicode that is backwards-compatible with ASCII. This makes UTF-8 very
+   convenient for encoding data where a large subset of that data is ASCII
+   characters, which is largely true on the web. UTF-8 is also the standard
+   character encoding for URLs.
 
 As an example, let's assume that the following form page is served up to a
 browser client, and its ``action`` points at some :app:`Pyramid` view code:
@@ -474,8 +446,8 @@ browser client, and its ``action`` points at some :app:`Pyramid` view code:
 
 The ``myview`` view code in the :app:`Pyramid` application *must* expect that
 the values returned by ``request.params`` will be of type ``unicode``, as
-opposed to type ``str``. The following will work to accept a form post from
-the above form:
+opposed to type ``str``. The following will work to accept a form post from the
+above form:
 
 .. code-block:: python
    :linenos:
@@ -503,30 +475,123 @@ encoding of UTF-8. This can be done via a response that has a
 with a ``meta http-equiv`` tag that implies that the charset is UTF-8 within
 the HTML ``head`` of the page containing the form.  This must be done
 explicitly because all known browser clients assume that they should encode
-form data in the same character set implied by ``Content-Type`` value of the
-response containing the form when subsequently submitting that form. There is
-no other generally accepted way to tell browser clients which charset to use
-to encode form data.  If you do not specify an encoding explicitly, the
-browser client will choose to encode form data in its default character set
-before submitting it, which may not be UTF-8 as the server expects.  If a
-request containing form data encoded in a non-UTF8 charset is handled by your
-view code, eventually the request code accessed within your view will throw
-an error when it can't decode some high-order character encoded in another
-character set within form data, e.g., when ``request.params['somename']`` is
-accessed.
+form data in the same character set implied by the ``Content-Type`` value of
+the response containing the form when subsequently submitting that form. There
+is no other generally accepted way to tell browser clients which charset to use
+to encode form data.  If you do not specify an encoding explicitly, the browser
+client will choose to encode form data in its default character set before
+submitting it, which may not be UTF-8 as the server expects.  If a request
+containing form data encoded in a non-UTF-8 ``charset`` is handled by your view
+code, eventually the request code accessed within your view will throw an error
+when it can't decode some high-order character encoded in another character set
+within form data, e.g., when ``request.params['somename']`` is accessed.
 
 If you are using the :class:`~pyramid.response.Response` class to generate a
 response, or if you use the ``render_template_*`` templating APIs, the UTF-8
-charset is set automatically as the default via the ``Content-Type`` header.
-If you return a ``Content-Type`` header without an explicit charset, a
-request will add a ``;charset=utf-8`` trailer to the ``Content-Type`` header
-value for you, for response content types that are textual
-(e.g. ``text/html``, ``application/xml``, etc) as it is rendered.  If you are
-using your own response object, you will need to ensure you do this yourself.
+``charset`` is set automatically as the default via the ``Content-Type``
+header. If you return a ``Content-Type`` header without an explicit
+``charset``, a request will add a ``;charset=utf-8`` trailer to the
+``Content-Type`` header value for you for response content types that are
+textual (e.g., ``text/html`` or ``application/xml``) as it is rendered.  If you
+are using your own response object, you will need to ensure you do this
+yourself.
 
-.. note:: Only the *values* of request params obtained via
-   ``request.params``, ``request.GET`` or ``request.POST`` are decoded
-   to Unicode objects implicitly in the :app:`Pyramid` default
-   configuration.  The keys are still (byte) strings.
+.. note:: Only the *values* of request params obtained via ``request.params``,
+   ``request.GET`` or ``request.POST`` are decoded to Unicode objects
+   implicitly in the :app:`Pyramid` default configuration.  The keys are still
+   (byte) strings.
 
 
+.. index::
+   single: view calling convention
+
+.. _request_and_context_view_definitions:
+
+Alternate View Callable Argument/Calling Conventions
+----------------------------------------------------
+
+Usually view callables are defined to accept only a single argument:
+``request``.  However, view callables may alternately be defined as classes,
+functions, or any callable that accept *two* positional arguments: a
+:term:`context` resource as the first argument and a :term:`request` as the
+second argument.
+
+The :term:`context` and :term:`request` arguments passed to a view function
+defined in this style can be defined as follows:
+
+context
+  The :term:`resource` object found via tree :term:`traversal` or :term:`URL
+  dispatch`.
+
+request
+  A :app:`Pyramid` Request object representing the current WSGI request.
+
+The following types work as view callables in this style:
+
+#. Functions that accept two arguments: ``context`` and ``request``, e.g.:
+
+   .. code-block:: python
+       :linenos:
+
+       from pyramid.response import Response
+
+       def view(context, request):
+           return Response('OK')
+
+#. Classes that have an ``__init__`` method that accepts ``context, request``,
+   and a ``__call__`` method which accepts no arguments, e.g.:
+
+   .. code-block:: python
+      :linenos:
+
+      from pyramid.response import Response
+
+      class view(object):
+         def __init__(self, context, request):
+             self.context = context
+             self.request = request
+
+         def __call__(self):
+             return Response('OK')
+
+#. Arbitrary callables that have a ``__call__`` method that accepts ``context,
+   request``, e.g.:
+
+   .. code-block:: python
+      :linenos:
+
+      from pyramid.response import Response
+
+      class View(object):
+          def __call__(self, context, request):
+              return Response('OK')
+      view = View() # this is the view callable
+
+This style of calling convention is most useful for :term:`traversal` based
+applications, where the context object is frequently used within the view
+callable code itself.
+
+No matter which view calling convention is used, the view code always has
+access to the context via ``request.context``.
+
+.. index::
+   single: Passing in configuration variables
+
+.. _passing_in_config_variables:
+
+Passing Configuration Variables to a View
+-----------------------------------------
+
+For information on passing a variable from the configuration .ini files to a
+view, see :ref:`deployment_settings`.
+
+.. index::
+   single: Pylons-style controller dispatch
+
+Pylons-1.0-Style "Controller" Dispatch
+--------------------------------------
+
+A package named :term:`pyramid_handlers` (available from PyPI) provides an
+analogue of :term:`Pylons`-style "controllers", which are a special kind of
+view class which provides more automation when your application uses :term:`URL
+dispatch` solely.

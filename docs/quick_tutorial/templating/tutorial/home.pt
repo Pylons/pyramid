@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Quick Tutorial: ${name}</title>
+</head>
+<body>
+<h1>Hi ${name}</h1>
+</body>
+</html>

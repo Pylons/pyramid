@@ -1,0 +1,13 @@
+We specifically use relative package references where possible so this demo
+works even if the user names their package (in the '$VENV/bin/pcreate -s
+zodb ...' step) something other than 'tutorial'.
+
+Specifically:
+
+- use relative imports
+- use plain relative URLs for resources (like stylesheets and images) in
+  page templates.
+
+Direct uses of the package name, like in __init__.py 'config.scan()'
+statements, are already adjusted by the paster/pcreate, so we don't have to
+worry about them.

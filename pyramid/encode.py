@@ -1,57 +1,18 @@
-import re
+from pyramid.compat import (
+    text_type,
+    binary_type,
+    is_nonstr_iter,
+    url_quote as _url_quote,
+    url_quote_plus as _quote_plus,
+    )
 
-always_safe = ('ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-               'abcdefghijklmnopqrstuvwxyz'
-               '0123456789' '_.-')
-_safemaps = {}
-_must_quote = {}
-
-def url_quote(s, safe=''):
-    """quote('abc def') -> 'abc%20def'
-
-    Each part of a URL, e.g. the path info, the query, etc., has a
-    different set of reserved characters that must be quoted.
-
-    RFC 2396 Uniform Resource Identifiers (URI): Generic Syntax lists
-    the following reserved characters.
-
-    reserved    = ";" | "/" | "?" | ":" | "@" | "&" | "=" | "+" |
-                  "$" | ","
-
-    Each of these characters is reserved in some component of a URL,
-    but not necessarily in all of them.
-
-    Unlike the default version of this function in the Python stdlib,
-    by default, the url_quote function is intended for quoting individual
-    path segments instead of an already composed path that might have
-    '/' characters in it.  Thus, it *will* encode any '/' character it
-    finds in a string.  It is also slightly faster than the stdlib version.
-    """
-    cachekey = (safe, always_safe)
-    try:
-        safe_map = _safemaps[cachekey]
-        if not _must_quote[cachekey].search(s):
-            return s
-    except KeyError:
-        safe += always_safe
-        _must_quote[cachekey] = re.compile(r'[^%s]' % safe)
-        safe_map = {}
-        for i in range(256):
-            c = chr(i)
-            if c in safe:
-                safe_map[c] = c
-            else:
-                safe_map[c] = '%%%02X' % i
-        _safemaps[cachekey] = safe_map
-    res = map(safe_map.__getitem__, s)
-    return ''.join(res)
-
-def quote_plus(s, safe=''):
-    """ Version of stdlib quote_plus which uses faster url_quote """
-    if ' ' in s:
-        s = url_quote(s, safe + ' ')
-        return s.replace(' ', '+')
-    return url_quote(s, safe)
+def url_quote(val, safe=''): # bw compat api
+    cls = val.__class__
+    if cls is text_type:
+        val = val.encode('utf-8')
+    elif cls is not binary_type:
+        val = str(val).encode('utf-8')
+    return _url_quote(val, safe=safe)
 
 def urlencode(query, doseq=True):
     """
@@ -76,6 +37,10 @@ def urlencode(query, doseq=True):
 
     See the Python stdlib documentation for ``urllib.urlencode`` for
     more information.
+
+    .. versionchanged:: 1.5
+       In a key/value pair, if the value is ``None`` then it will be
+       dropped from the resulting output.
     """
     try:
         # presumed to be a dictionary
@@ -87,21 +52,28 @@ def urlencode(query, doseq=True):
     prefix = ''
 
     for (k, v) in query:
-        if k.__class__ is unicode:
-            k = k.encode('utf-8')
-        k = quote_plus(str(k))
-        if hasattr(v, '__iter__'):
+        k = quote_plus(k)
+
+        if is_nonstr_iter(v):
             for x in v:
-                if x.__class__ is unicode:
-                    x = x.encode('utf-8')
-                x = quote_plus(str(x))
+                x = quote_plus(x)
                 result += '%s%s=%s' % (prefix, k, x)
                 prefix = '&'
+        elif v is None:
+            result += '%s%s=' % (prefix, k)
         else:
-            if v.__class__ is unicode:
-                v = v.encode('utf-8')
-            v = quote_plus(str(v))
+            v = quote_plus(v)
             result += '%s%s=%s' % (prefix, k, v)
+
         prefix = '&'
 
     return result
+
+# bw compat api (dnr)
+def quote_plus(val, safe=''):
+    cls = val.__class__
+    if cls is text_type:
+        val = val.encode('utf-8')
+    elif cls is not binary_type:
+        val = str(val).encode('utf-8')
+    return _quote_plus(val, safe=safe)

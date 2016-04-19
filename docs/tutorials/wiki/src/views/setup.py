@@ -3,30 +3,39 @@ import os
 from setuptools import setup, find_packages
 
 here = os.path.abspath(os.path.dirname(__file__))
-README = open(os.path.join(here, 'README.txt')).read()
-CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
+with open(os.path.join(here, 'README.txt')) as f:
+    README = f.read()
+with open(os.path.join(here, 'CHANGES.txt')) as f:
+    CHANGES = f.read()
 
 requires = [
     'pyramid',
-    'repoze.zodbconn',
-    'repoze.tm2>=1.0b1', # default_commit_veto
-    'repoze.retry',
+    'pyramid_chameleon',
+    'pyramid_debugtoolbar',
+    'pyramid_tm',
+    'pyramid_zodbconn',
+    'transaction',
     'ZODB3',
-    'WebError',
+    'waitress',
     'docutils',
+    ]
+
+tests_require = [
+    'WebTest >= 1.3.1',  # py3 compat
+    'pytest',  # includes virtualenv
+    'pytest-cov',
     ]
 
 setup(name='tutorial',
       version='0.0',
       description='tutorial',
-      long_description=README + '\n\n' +  CHANGES,
+      long_description=README + '\n\n' + CHANGES,
       classifiers=[
-        "Intended Audience :: Developers",
-        "Framework :: Pylons",
-        "Programming Language :: Python",
-        "Topic :: Internet :: WWW/HTTP",
-        "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
-        ],
+          "Programming Language :: Python",
+          "Framework :: Pyramid",
+          "Topic :: Internet :: WWW/HTTP",
+          "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
+      ],
       author='',
       author_email='',
       url='',
@@ -34,12 +43,12 @@ setup(name='tutorial',
       packages=find_packages(),
       include_package_data=True,
       zip_safe=False,
+      extras_require={
+          'testing': tests_require,
+      },
       install_requires=requires,
-      tests_require=requires,
-      test_suite="tutorial",
-      entry_points = """\
+      entry_points="""\
       [paste.app_factory]
       main = tutorial:main
       """,
-      paster_plugins=['pyramid'],
       )

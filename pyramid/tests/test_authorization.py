@@ -119,6 +119,20 @@ class TestACLAuthorizationPolicy(unittest.TestCase):
             result.acl,
             '<No ACL found on any object in resource lineage>')
 
+    def test_permits_string_permissions_in_acl(self):
+        from pyramid.security import Allow
+        root = DummyContext()
+        root.__acl__ = [
+            (Allow, 'wilma', 'view_stuff'),
+            ]
+
+        policy = self._makeOne()
+
+        result = policy.permits(root, ['wilma'], 'view')
+        # would be True if matching against 'view_stuff' instead of against
+        # ['view_stuff']
+        self.assertEqual(result, False) 
+
     def test_principals_allowed_by_permission_direct(self):
         from pyramid.security import Allow
         from pyramid.security import DENY_ALL
@@ -132,6 +146,30 @@ class TestACLAuthorizationPolicy(unittest.TestCase):
             policy.principals_allowed_by_permission(context, 'read'))
         self.assertEqual(result, ['chrism'])
 
+    def test_principals_allowed_by_permission_callable_acl(self):
+        from pyramid.security import Allow
+        from pyramid.security import DENY_ALL
+        context = DummyContext()
+        acl = lambda: [ (Allow, 'chrism', ('read', 'write')),
+                        DENY_ALL,
+                        (Allow, 'other', 'read') ]
+        context.__acl__ = acl
+        policy = self._makeOne()
+        result = sorted(
+            policy.principals_allowed_by_permission(context, 'read'))
+        self.assertEqual(result, ['chrism'])
+        
+    def test_principals_allowed_by_permission_string_permission(self):
+        from pyramid.security import Allow
+        context = DummyContext()
+        acl = [ (Allow, 'chrism', 'read_it')]
+        context.__acl__ = acl
+        policy = self._makeOne()
+        result = policy.principals_allowed_by_permission(context, 'read')
+        # would be ['chrism'] if 'read' were compared against 'read_it' instead
+        # of against ['read_it']
+        self.assertEqual(list(result), [])
+        
     def test_principals_allowed_by_permission(self):
         from pyramid.security import Allow
         from pyramid.security import Deny
@@ -190,6 +228,15 @@ class TestACLAuthorizationPolicy(unittest.TestCase):
         result = sorted(
             policy.principals_allowed_by_permission(context, 'read'))
         self.assertEqual(result, [])
+
+    def test_callable_acl(self):
+        from pyramid.security import Allow
+        context = DummyContext()
+        fn = lambda self: [(Allow, 'bob', 'read')]
+        context.__acl__ = fn.__get__(context, context.__class__)
+        policy = self._makeOne()
+        result = policy.permits(context, ['bob'], 'read')
+        self.assertTrue(result)
         
 
 class DummyContext:

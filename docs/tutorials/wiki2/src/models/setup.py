@@ -1,34 +1,41 @@
 import os
-import sys
 
 from setuptools import setup, find_packages
 
 here = os.path.abspath(os.path.dirname(__file__))
-README = open(os.path.join(here, 'README.txt')).read()
-CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
+with open(os.path.join(here, 'README.txt')) as f:
+    README = f.read()
+with open(os.path.join(here, 'CHANGES.txt')) as f:
+    CHANGES = f.read()
 
 requires = [
+    'bcrypt',
     'pyramid',
+    'pyramid_jinja2',
+    'pyramid_debugtoolbar',
+    'pyramid_tm',
     'SQLAlchemy',
     'transaction',
-    'repoze.tm2>=1.0b1', # default_commit_veto
     'zope.sqlalchemy',
-    'WebError',
+    'waitress',
     ]
 
-if sys.version_info[:3] < (2,5,0):
-    requires.append('pysqlite')
+tests_require = [
+    'WebTest >= 1.3.1',  # py3 compat
+    'pytest',  # includes virtualenv
+    'pytest-cov',
+    ]
 
 setup(name='tutorial',
       version='0.0',
       description='tutorial',
-      long_description=README + '\n\n' +  CHANGES,
+      long_description=README + '\n\n' + CHANGES,
       classifiers=[
-        "Programming Language :: Python",
-        "Framework :: Pylons",
-        "Topic :: Internet :: WWW/HTTP",
-        "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
-        ],
+          "Programming Language :: Python",
+          "Framework :: Pyramid",
+          "Topic :: Internet :: WWW/HTTP",
+          "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
+      ],
       author='',
       author_email='',
       url='',
@@ -36,12 +43,14 @@ setup(name='tutorial',
       packages=find_packages(),
       include_package_data=True,
       zip_safe=False,
-      test_suite='tutorial',
-      install_requires = requires,
-      entry_points = """\
+      extras_require={
+          'testing': tests_require,
+      },
+      install_requires=requires,
+      entry_points="""\
       [paste.app_factory]
       main = tutorial:main
+      [console_scripts]
+      initialize_tutorial_db = tutorial.scripts.initializedb:main
       """,
-      paster_plugins=['pyramid'],
       )
-

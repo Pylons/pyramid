@@ -34,7 +34,7 @@ class TestLineage(unittest.TestCase):
         self.assertEqual(result, [o1])
 
 from pyramid.interfaces import ILocation
-from zope.interface import implements
+from zope.interface import implementer
+@implementer(ILocation)
 class Location(object):
-    implements(ILocation)
     __name__ = __parent__ = None

@@ -2,7 +2,7 @@
  Author Introduction
 =====================
 
-Welcome to "The :app:`Pyramid` Web Application Framework".  In this
+Welcome to "The :app:`Pyramid` Web Framework".  In this
 introduction, I'll describe the audience for this book, I'll describe
 the book content, I'll provide some context regarding the genesis of
 :app:`Pyramid`, and I'll thank some important people.
@@ -73,7 +73,7 @@ This book is divided into three major parts:
   concepts in terms of the sample.  You should read the tutorials if
   you want a guided tour of :app:`Pyramid`.
 
-:ref:`api_reference`
+:ref:`api_documentation`
 
   Comprehensive reference material for every public API exposed by
   :app:`Pyramid`.  The API documentation is organized
@@ -165,6 +165,7 @@ others' technology.
    single: Shipman, John
    single: Beelby, Chris
    single: Paez, Patricio
+   single: Merickel, Michael
 
 Thanks
 ======
@@ -179,8 +180,9 @@ software which it details would exist: Paul Everitt, Tres Seaver, Andrew
 Sawyers, Malthe Borch, Carlos de la Guardia, Chris Rossi, Shane Hathaway,
 Daniel Holth, Wichert Akkerman, Georg Brandl, Blaise Laflamme, Ben Bangert,
 Casey Duncan, Hugues Laflamme, Mike Orr, John Shipman, Chris Beelby, Patricio
-Paez, Simon Oram, Nat Hardwick, Ian Bicking, Jim Fulton, Tom Moroz of the
-Open Society Institute, and Todd Koym of Environmental Health Sciences.
+Paez, Simon Oram, Nat Hardwick, Ian Bicking, Jim Fulton, Michael Merickel,
+Tom Moroz of the Open Society Institute, and Todd Koym of Environmental
+Health Sciences.
 
 Thanks to Guido van Rossum and Tim Peters for Python.
 

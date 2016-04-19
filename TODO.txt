@@ -1,29 +1,57 @@
 Pyramid TODOs
 =============
 
-Should-Have
------------
-
-- Consider adding a default exception view for HTTPException and attendant
-  ``redirect`` and ``abort`` functions ala Pylons (promised Mike I'd enable
-  this in 1.1).
-
-- Add narrative docs for wsgiapp and wsgiapp2.
-
 Nice-to-Have
 ------------
 
-- Speed up startup time (defer _bootstrap and registerCommonDirectives()
-  until needed by ZCML, as well as unfound speedups).
+- config.set_registry_attr with conflict detection... make sure the attr is
+  added before a commit, but register an action so a conflict can be detected.
 
-- Nicer Mako exceptions in WebError.
+- Provide the presumed renderer name to the called view as an attribute of
+  the request.
 
-- Response.RequestClass should probably be pyramid.request.Request but this
-  may imply actually subclassing webob.Response
+- Have action methods return their discriminators.
 
-- Better "Extending" chapter.
+- Modify view mapper narrative docs to not use pyramid_handlers.
 
-- Try to make test suite pass on IronPython.
+- Modify the urldispatch chapter examples to assume a scan rather than
+  ``add_view``.
+
+- Introspection:
+
+  * ``default root factory`` category (prevent folks from needing to searh
+    "root factories" category)?
+
+  * ``default view mapper`` category (prevent folks from needing to search
+    "view mappers" category)?
+
+  * get rid of "tweens" category (can't sort properly?)
+
+- Fix deployment recipes in cookbook (discourage proxying without changing
+  server).
+
+- Try "with transaction.manager" in an exception view with SQLA (preempt
+  homina homina response about how to write "to the database" from within in
+  an exception view).  Note: tried this and couldn't formulate the right
+  situation where the database could not be written to within an exception
+  view (but didn't try exhaustively).
+
+- Add narrative docs for wsgiapp and wsgiapp2.
+
+- Basic WSGI documentation (pipeline / app / server).
+
+- Change docs about creating a venusian decorator to not use ZCA (use
+  configurator methods instead).
+
+- Try to better explain the relationship between a renderer and a template in
+  the templates chapter and elsewhere.  Scan the documentation for reference
+  to a renderer as *only* view configuration (it's a larger concept now).
+
+- Add better docs about what-to-do-when-behind-a-proxy: rutter ("/foo =
+  app1" and "domain app1.localhost = app1"), ProxyPreserveHost and the nginx
+  proxy_params, preserving HTTPS URLs.
+
+- Debug option to print view matching decision (e.g. debug_viewlookup or so).
 
 - Non-bwcompat use of threadlocals that need to be documented or ameliorated:
 
@@ -37,25 +65,69 @@ Nice-to-Have
   Configurator.add_translation_dirs: not passed any context but a message,
   can't credibly be removed.
 
-- Supply ``X-Vhm-Host`` support.
+- Deprecate pyramid.security.view_execution_permitted (it only works for
+  traversal).
 
-- Basic WSGI documentation (pipeline / app / server).
-
-- Change docs about creating a venusian decorator to not use ZCA.
-
-- Try to better explain the relationship between a renderer and a
-  template in the templates chapter and elsewhere.  Scan the
-  documentation for reference to a renderer as *only* view
-  configuration (it's a larger concept now).
-
-- Create a ``render_view`` that works by using config.derive_view
-  against an existing view instead of querying the registry.
-
-- Create a function which performs a recursive request.
-
-- Debug option to print view matching decision.
+- Provide a ``has_view`` function.
 
 - Update App engine chapter with less creaky directions.
+
+- Idea from Zart:
+
+  diff --git a/pyramid/paster.py b/pyramid/paster.py
+  index b0e4d79..b3bd82a 100644
+  --- a/pyramid/paster.py
+  +++ b/pyramid/paster.py
+  @@ -8,6 +8,7 @@ from paste.deploy import (
+   from pyramid.compat import configparser
+   from logging.config import fileConfig
+   from pyramid.scripting import prepare
+  +from pyramid.config import Configurator
+   
+   def get_app(config_uri, name=None, loadapp=loadapp):
+       """ Return the WSGI application named ``name`` in the PasteDeploy
+  @@ -111,3 +112,10 @@ def bootstrap(config_uri, request=None):
+       env['app'] = app
+       return env
+   
+  +def make_pyramid_app(global_conf, app=None, **settings):
+  +    """Return pyramid application configured with provided settings"""
+  +    config = Configurator(package='pyramid', settings=settings)
+  +    if app:
+  +        config.include(app)
+  +    app = config.make_wsgi_app()
+  +    return app
+  diff --git a/setup.py b/setup.py
+  index 03ebb42..91e0e21 100644
+  --- a/setup.py
+  +++ b/setup.py
+  @@ -118,6 +118,8 @@ setup(name='pyramid',
+           [paste.server_runner]
+           wsgiref = pyramid.scripts.pserve:wsgiref_server_runner
+           cherrypy = pyramid.scripts.pserve:cherrypy_server_runner
+  +        [paster.app_factory]
+  +        main = pyramid.paster:make_pyramid_app
+         """
+         )
+ 
+
+Future
+------
+
+- 1.6: turn ``pyramid.settings.Settings`` into a function that returns the
+  original dict (after ``__getattr__`` deprecation period, it was deprecated
+  in 1.2).
+
+- 1.6: Remove IContextURL and TraversalContextURL.
+
+- 1.8: Remove set_request_property.
+- 1.8: Drop Python 3.3 support.
+
+- 1.9: Remove extra code enabling ``pyramid.security.remember(principal=...)``
+  and force use of ``userid``.
+
+Probably Bad Ideas
+------------------
 
 - Add functionality that mocks the behavior of ``repoze.browserid``.
 
@@ -63,5 +135,29 @@ Nice-to-Have
   http://plope.com/pyramid_auth_design_api_postmortem, phasing out the
   current auth-n-auth abstractions in a backwards compatible way.
 
-- Add doc string for BeforeRender event with more details.
+- Maybe add ``add_renderer_globals`` method to Configurator.
 
+- Supply ``X-Vhm-Host`` support (probably better to do what paste#prefix
+  middleware does).
+
+- Have ``remember`` and ``forget`` actually set headers on the response using
+  a response callback (and return the empty list)?
+
+- http://pythonguy.wordpress.com/2011/06/22/dynamic-variables-revisited/
+  instead of thread locals
+
+- Context manager for creating a new configurator (replacing
+  ``with_package``).  E.g.::
+
+    with config.partial(package='bar') as c:
+        c.add_view(...)
+
+  or::
+
+    with config.partial(introspection=False) as c:
+        c.add_view(..)
+
+- _fix_registry should dictify the registry being fixed.
+
+- Apply a prefix to the userid principal to avoid poisoning the principal
+  namespace. See https://github.com/Pylons/pyramid/issues/2060

@@ -7,7 +7,7 @@
 
   .. autoclass:: TranslationString
  
-  .. autoclass:: TranslationStringFactory
+  .. autofunction:: TranslationStringFactory
 
   .. autoclass:: Localizer
      :members:

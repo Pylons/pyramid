@@ -1,8 +1,10 @@
+:orphan:
+
 .. _latexindex:
 
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-The :app:`Pyramid` Web Application Framework
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+=========================
+The Pyramid Web Framework
+=========================
 
 .. frontmatter::
 
@@ -28,31 +30,41 @@ Narrative Documentation
 
    narr/introduction
    narr/install
-   narr/configuration
    narr/firstapp
+   narr/configuration
    narr/project
+   narr/startup
+   narr/router
    narr/urldispatch
-   narr/muchadoabouttraversal
-   narr/traversal
    narr/views
    narr/renderers
    narr/templates
    narr/viewconfig
-   narr/resources
    narr/assets
    narr/webob
    narr/sessions
-   narr/security
-   narr/hybrid
-   narr/i18n
-   narr/vhosting
    narr/events
    narr/environment
+   narr/logging
+   narr/paste
+   narr/commandline
+   narr/i18n
+   narr/vhosting
    narr/testing
+   narr/resources
+   narr/hellotraversal
+   narr/muchadoabouttraversal
+   narr/traversal
+   narr/security
+   narr/hybrid
+   narr/subrequest
    narr/hooks
-   narr/advconfig
+   narr/introspector
    narr/extending
-   narr/startup
+   narr/advconfig
+   narr/extconfig
+   narr/scaffolding
+   narr/upgrading
    narr/threadlocals
    narr/zca
 
@@ -64,45 +76,20 @@ Tutorials
 .. toctree::
    :maxdepth: 1
 
-   tutorials/wiki/index.rst
    tutorials/wiki2/index.rst
-   tutorials/bfg/index.rst
-   tutorials/gae/index.rst
+   tutorials/wiki/index.rst
    tutorials/modwsgi/index.rst
 
-.. _api_reference:
+.. _api_documentation:
 
-API Reference
-@@@@@@@@@@@@@
+API Documentation
+@@@@@@@@@@@@@@@@@
 
 .. toctree::
    :maxdepth: 1
+   :glob:
 
-   api/authorization
-   api/authentication
-   api/chameleon_text
-   api/chameleon_zpt
-   api/config
-   api/events
-   api/exceptions
-   api/httpexceptions
-   api/i18n
-   api/interfaces
-   api/location
-   api/paster
-   api/registry
-   api/renderers
-   api/request
-   api/response
-   api/scripting
-   api/security
-   api/settings
-   api/testing
-   api/threadlocal
-   api/traversal
-   api/url
-   api/view
-   api/wsgi
+   api/*
 
 .. backmatter::
 

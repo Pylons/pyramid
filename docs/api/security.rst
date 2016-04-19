@@ -16,7 +16,7 @@ Authentication API Functions
 
 .. autofunction:: forget
 
-.. autofunction:: remember
+.. autofunction:: remember(request, userid, **kwargs)
 
 Authorization API Functions
 ---------------------------
@@ -57,6 +57,14 @@ Constants
     last ACE in an ACL in systems that use an "inheriting" security
     policy, representing the concept "don't inherit any other ACEs".
 
+.. attribute:: NO_PERMISSION_REQUIRED
+
+	A special permission which indicates that the view should always
+	be executable by entirely anonymous users, regardless of the
+	default permission, bypassing any :term:`authorization policy`
+	that may be in effect.  Its actual value is the string
+	'__no_permission_required__'.
+
 Return Values
 -------------
 
@@ -64,13 +72,13 @@ Return Values
 
     The ACE "action" (the first element in an ACE e.g. ``(Allow, Everyone,
     'read')`` that means allow access.  A sequence of ACEs makes up an
-    ACL.  It is a string, and it's actual value is "Allow".
+    ACL.  It is a string, and its actual value is "Allow".
 
 .. attribute:: Deny
 
     The ACE "action" (the first element in an ACE e.g. ``(Deny,
     'george', 'read')`` that means deny access.  A sequence of ACEs
-    makes up an ACL.  It is a string, and it's actual value is "Deny".
+    makes up an ACL.  It is a string, and its actual value is "Deny".
 
 .. autoclass:: ACLDenied
    :members:

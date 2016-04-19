@@ -3,11 +3,12 @@
 :mod:`pyramid.paster`
 ---------------------------
 
-.. module:: pyramid.paster
+.. automodule:: pyramid.paster
 
-.. function:: get_app(config_file, name)
+    .. autofunction:: bootstrap
 
-    Return the WSGI application named ``name`` in the PasteDeploy
-    config file ``config_file``.
+    .. autofunction:: get_app(config_uri, name=None, options=None)
 
-     
+    .. autofunction:: get_appsettings(config_uri, name=None, options=None)
+
+    .. autofunction:: setup_logging(config_uri, global_conf=None)

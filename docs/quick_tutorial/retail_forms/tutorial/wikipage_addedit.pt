@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>WikiPage: Add/Edit</title>
+    <tal:block tal:repeat="reqt view.reqts['css']">
+        <link rel="stylesheet" type="text/css"
+              href="${request.static_url('deform:static/' + reqt)}"/>
+    </tal:block>
+    <tal:block tal:repeat="reqt view.reqts['js']">
+        <script src="${request.static_url('deform:static/' + reqt)}"
+                type="text/javascript"></script>
+    </tal:block>
+</head>
+<body>
+<h1>Wiki</h1>
+
+<div class="row"
+        tal:repeat="field form">
+    <div class="span2">
+    ${structure:field.title}
+        <span class="req" tal:condition="field.required">*</span>
+    </div>
+    <div class="span2">
+            ${structure:field.serialize()}
+    </div>
+    <ul tal:condition="field.error">
+        <li tal:repeat="error field.error.messages()">
+                ${structure:error}
+        </li>
+    </ul>
+</div>
+
+<script type="text/javascript">
+    deform.load()
+</script>
+</body>
+</html>

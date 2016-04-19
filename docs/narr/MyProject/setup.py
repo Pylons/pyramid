@@ -3,21 +3,34 @@ import os
 from setuptools import setup, find_packages
 
 here = os.path.abspath(os.path.dirname(__file__))
-README = open(os.path.join(here, 'README.txt')).read()
-CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
+with open(os.path.join(here, 'README.txt')) as f:
+    README = f.read()
+with open(os.path.join(here, 'CHANGES.txt')) as f:
+    CHANGES = f.read()
 
-requires = ['pyramid', 'WebError']
+requires = [
+    'pyramid',
+    'pyramid_chameleon',
+    'pyramid_debugtoolbar',
+    'waitress',
+    ]
+
+tests_require = [
+    'WebTest >= 1.3.1',  # py3 compat
+    'pytest',  # includes virtualenv
+    'pytest-cov',
+    ]
 
 setup(name='MyProject',
       version='0.0',
       description='MyProject',
-      long_description=README + '\n\n' +  CHANGES,
+      long_description=README + '\n\n' + CHANGES,
       classifiers=[
-        "Programming Language :: Python",
-        "Framework :: Pylons",
-        "Topic :: Internet :: WWW/HTTP",
-        "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
-        ],
+          "Programming Language :: Python",
+          "Framework :: Pyramid",
+          "Topic :: Internet :: WWW/HTTP",
+          "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
+      ],
       author='',
       author_email='',
       url='',
@@ -25,13 +38,12 @@ setup(name='MyProject',
       packages=find_packages(),
       include_package_data=True,
       zip_safe=False,
+      extras_require={
+          'testing': tests_require,
+      },
       install_requires=requires,
-      tests_require=requires,
-      test_suite="myproject",
-      entry_points = """\
+      entry_points="""\
       [paste.app_factory]
       main = myproject:main
       """,
-      paster_plugins=['pyramid'],
       )
-

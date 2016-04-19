@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Quick Tutorial: ${name}</title>
+</head>
+<body>
+<h1>${name}</h1>
+<p>First: ${first}, Last: ${last}</p>
+</body>
+</html>
