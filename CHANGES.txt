@@ -1,5 +1,13 @@
-unreleased
-==========
+1.7a2 (2016-04-19)
+==================
+
+Features
+--------
+
+- Automatic CSRF checks are now disabled by default on exception views. They
+  can be turned back on by setting the appropriate `require_csrf` option on
+  the view.
+  See https://github.com/Pylons/pyramid/pull/2517
 
 - The automatic CSRF API was reworked to use a config directive for
   setting the options. The ``pyramid.require_default_csrf`` setting is
@@ -10,10 +18,8 @@ unreleased
   setting is still supported.
   See https://github.com/Pylons/pyramid/pull/2518
 
-- Automatic CSRF checks are now disabled by default on exception views. They
-  can be turned back on by setting the appropriate `require_csrf` option on
-  the view.
-  See https://github.com/Pylons/pyramid/pull/2517
+Bug fixes
+---------
 
 - CSRF origin checks had a bug causing the checks to always fail.
   See https://github.com/Pylons/pyramid/pull/2512
