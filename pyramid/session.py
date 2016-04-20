@@ -109,7 +109,6 @@ def signed_deserialize(serialized, secret, hmac=hmac):
 
     return pickle.loads(pickled)
 
-
 def check_csrf_origin(request, trusted_origins=None, raises=True):
     """
     Check the Origin of the request to see if it is a cross site request or
@@ -233,16 +232,18 @@ def check_csrf_token(request,
        considered valid. It must be passed in either the request body or
        a header.
     """
+    supplied_token = ""
     # If this is a POST/PUT/etc request, then we'll check the body to see if it
     # has a token. We explicitly use request.POST here because CSRF tokens
     # should never appear in an URL as doing so is a security issue. We also
     # explicitly check for request.POST here as we do not support sending form
     # encoded data over anything but a request.POST.
-    supplied_token = request.POST.get(token, "")
+    if token is not None:
+        supplied_token = request.POST.get(token, "")
 
     # If we were unable to locate a CSRF token in a request body, then we'll
     # check to see if there are any headers that have a value for us.
-    if supplied_token == "":
+    if supplied_token == "" and header is not None:
         supplied_token = request.headers.get(header, "")
 
     expected_token = request.session.get_csrf_token()
