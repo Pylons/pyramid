@@ -129,7 +129,7 @@ PyPI
 https://pypi.python.org/pypi/pyramid/1.x
 
 What's New
-http://docs.pylonsproject.org/projects/pyramid/1.X/whatsnew-1.X.html
+http://docs.pylonsproject.org/projects/pyramid/1.X-branch/whatsnew-1.X.html
 
 Issues
 https://github.com/Pylons/pyramid/issues
@@ -145,11 +145,11 @@ Here are the changes:
 <<changes>>
 
 A "What's New In Pyramid 1.X" document exists at
-http://docs.pylonsproject.org/projects/pyramid/1.X/whatsnew-1.X.html .
+http://docs.pylonsproject.org/projects/pyramid/1.X-branch/whatsnew-1.X.html .
 
 You will be able to see the 1.X release documentation (across all
 alphas and betas, as well as when it eventually gets to final release)
-at http://docs.pylonsproject.org/projects/pyramid/1.X/ .
+at http://docs.pylonsproject.org/projects/pyramid/1.X-branch/ .
 
 You can install it via PyPI:
 
