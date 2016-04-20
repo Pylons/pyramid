@@ -1,6 +1,15 @@
 unreleased
 ==========
 
+- The automatic CSRF API was reworked to use a config directive for
+  setting the options. The ``pyramid.require_default_csrf`` setting is
+  no longer supported. Instead, a new ``config.set_default_csrf_options``
+  directive has been introduced that allows the developer to specify
+  the default value for ``require_csrf`` as well as change the CSRF token,
+  header and safe request methods. The ``pyramid.csrf_trusted_origins``
+  setting is still supported.
+  See https://github.com/Pylons/pyramid/pull/2518
+
 - Automatic CSRF checks are now disabled by default on exception views. They
   can be turned back on by setting the appropriate `require_csrf` option on
   the view.
