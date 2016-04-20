@@ -18,6 +18,9 @@ unreleased
 - CSRF origin checks had a bug causing the checks to always fail.
   See https://github.com/Pylons/pyramid/pull/2512
 
+- Fix the test suite to pass on windows.
+  See https://github.com/Pylons/pyramid/pull/2520
+
 1.7a1 (2016-04-16)
 ==================
 
