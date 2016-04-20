@@ -42,14 +42,6 @@ Feature Additions
   other stages of the pipeline such as the raw response from a view or prior
   to security checks. See https://github.com/Pylons/pyramid/pull/2021
 
-- Added a new setting, ``pyramid.require_default_csrf`` which may be used
-  to turn on CSRF checks globally for every request in the application.
-  This should be considered a good default for websites built on Pyramid.
-  It is possible to opt-out of CSRF checks on a per-view basis by setting
-  ``require_csrf=False`` on those views.
-  See :ref:`auto_csrf_checking` and
-  https://github.com/Pylons/pyramid/pull/2413
-
 - Added a ``require_csrf`` view option which will enforce CSRF checks on
   requests with an unsafe method as defined by RFC2616. If the CSRF check fails
   a ``BadCSRFToken`` exception will be raised and may be caught by exception
@@ -59,6 +51,17 @@ Feature Additions
   instead of a catchable exception.  See :ref:`auto_csrf_checking`,
   https://github.com/Pylons/pyramid/pull/2413 and
   https://github.com/Pylons/pyramid/pull/2500
+
+- Added a new method,
+  :meth:`pyramid.config.Configurator.set_csrf_default_options`,
+  for configuring CSRF checks used by the ``require_csrf=True`` view option.
+  This method can be used to turn on CSRF checks globally for every view
+  in the application. This should be considered a good default for websites
+  built on Pyramid. It is possible to opt-out of CSRF checks on a per-view
+  basis by setting ``require_csrf=False`` on those views.
+  See :ref:`auto_csrf_checking` and
+  https://github.com/Pylons/pyramid/pull/2413 and
+  https://github.com/Pylons/pyramid/pull/2518
 
 - Added an additional CSRF validation that checks the origin/referrer of a
   request and makes sure it matches the current ``request.domain``. This
