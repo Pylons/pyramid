@@ -1,3 +1,3 @@
 #!/bin/bash
-tox -e{py26,py27,py32,py33,py34,pypy,pypy3}-scaffolds,
+tox -e{py27,py33,py34,pypy}-scaffolds,
 
