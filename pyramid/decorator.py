@@ -19,15 +19,14 @@ class reify(object):
     And usage of Foo:
 
     >>> f = Foo()
-    >>> print(f.jammy)
+    >>> v = f.jammy
     'jammy called'
+    >>> print(v)
     1
-    >>> print(f.jammy)
+    >>> f.jammy
     1
     >>> # jammy func not called the second time; it replaced itself with 1
-
-    Note: reassignment is possible
-
+    >>> # Note: reassignment is possible
     >>> f.jammy = 2
     >>> f.jammy
     2
