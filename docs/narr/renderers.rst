@@ -317,7 +317,7 @@ JSONP Renderer
 .. versionadded:: 1.1
 
 :class:`pyramid.renderers.JSONP` is a `JSONP
-<http://en.wikipedia.org/wiki/JSONP>`_ renderer factory helper which implements
+<https://en.wikipedia.org/wiki/JSONP>`_ renderer factory helper which implements
 a hybrid JSON/JSONP renderer.  JSONP is useful for making cross-domain AJAX
 requests.
 

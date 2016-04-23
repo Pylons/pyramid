@@ -294,7 +294,7 @@ json_renderer_factory = JSON() # bw compat
 JSONP_VALID_CALLBACK = re.compile(r"^[$a-z_][$0-9a-z_\.\[\]]+[^.]$", re.I)
 
 class JSONP(JSON):
-    """ `JSONP <http://en.wikipedia.org/wiki/JSONP>`_ renderer factory helper
+    """ `JSONP <https://en.wikipedia.org/wiki/JSONP>`_ renderer factory helper
     which implements a hybrid json/jsonp renderer.  JSONP is useful for
     making cross-domain AJAX requests.
 

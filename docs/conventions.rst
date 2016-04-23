@@ -35,7 +35,7 @@ References to glossary terms are presented using the following style:
 
 URLs are presented using the following style:
 
-  `Pylons <http://pylonsproject.org>`_
+  `Pylons <http://www.pylonsproject.org>`_
 
 References to sections and chapters are presented using the following
 style:
