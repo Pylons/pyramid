@@ -343,7 +343,7 @@ This will create a new message catalog ``.po`` file in
 ``myapplication/locale/es/LC_MESSAGES/myapplication.po``.
 
 Once the file is there, it can be worked on by a human translator. One tool
-which may help with this is `Poedit <http://www.poedit.net/>`_.
+which may help with this is `Poedit <https://poedit.net/>`_.
 
 Note that :app:`Pyramid` itself ignores the existence of all ``.po`` files.
 For a running application to have translations available, a ``.mo`` file must
@@ -647,7 +647,7 @@ before being rendered:
 
 The features represented by attributes of the ``i18n`` namespace of Chameleon
 will also consult the :app:`Pyramid` translations. See
-http://chameleon.readthedocs.org/en/latest/reference.html#id50.
+http://chameleon.readthedocs.org/en/latest/reference.html#translation-i18n.
 
 .. note::
 
