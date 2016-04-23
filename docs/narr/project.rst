@@ -584,7 +584,7 @@ only (``127.0.0.1``).
 The sections after ``# logging configuration`` represent Python's standard
 library :mod:`logging` module configuration for your application.  These
 sections are passed to the `logging module's config file configuration engine
-<http://docs.python.org/howto/logging.html#configuring-logging>`_ when the
+<https://docs.python.org/2/howto/logging.html#configuring-logging>`_ when the
 ``pserve`` or ``pshell`` commands are executed.  The default configuration
 sends application logging output to the standard error output of your terminal.
 For more information about logging configuration, see :ref:`logging_chapter`.
@@ -628,8 +628,8 @@ setup.py sdist``.  Due to the information contained in the default
 ``MANIFEST.in``, an sdist of your Pyramid project will include ``.txt`` files,
 ``.ini`` files, ``.rst`` files, graphics files, and template files, as well as
 ``.py`` files.  See
-http://docs.python.org/distutils/sourcedist.html#the-manifest-in-template for
-more information about the syntax and usage of ``MANIFEST.in``.
+https://docs.python.org/2/distutils/sourcedist.html#the-manifest-in-template
+for more information about the syntax and usage of ``MANIFEST.in``.
 
 Without the presence of a ``MANIFEST.in`` file or without checking your source
 code into a version control repository, ``setup.py sdist`` places only *Python
@@ -647,8 +647,8 @@ files with extensions other than the files named in the project's
 ``MANIFEST.in`` and you don't make use of a setuptools-compatible version
 control system, you'll need to edit the ``MANIFEST.in`` file and include the
 statements necessary to include your new files.  See
-http://docs.python.org/distutils/sourcedist.html#principle for more information
-about how to do this.
+https://docs.python.org/2/distutils/sourcedist.html#principle for more
+information about how to do this.
 
 You can also delete ``MANIFEST.in`` from your project and rely on a setuptools
 feature which simply causes all files checked into a version control system to
@@ -697,21 +697,21 @@ Your application's name can be any string; it is specified in the ``name``
 field.  The version number is specified in the ``version`` value.  A short
 description is provided in the ``description`` field.  The ``long_description``
 is conventionally the content of the ``README`` and ``CHANGES`` files appended
-together. The ``classifiers`` field is a list of `Trove
-<http://pypi.python.org/pypi?%3Aaction=list_classifiers>`_ classifiers
-describing your application.  ``author`` and ``author_email`` are text fields
-which probably don't need any description.  ``url`` is a field that should
-point at your application project's URL (if any). ``packages=find_packages()``
-causes all packages within the project to be found when packaging the
-application.  ``include_package_data`` will include non-Python files when the
-application is packaged if those files are checked into version control. 
-``zip_safe=False`` indicates that this package is not safe to use as a zipped
-egg; instead it will always unpack as a directory, which is more convenient.
-``install_requires`` indicate that this package depends on the ``pyramid``
-package. ``extras_require`` is a Python dictionary that defines what is
-required to be installed for running tests. We examined ``entry_points`` in our
-discussion of the ``development.ini`` file; this file defines the ``main``
-entry point that represents our project's application.
+together. The ``classifiers`` field is a list of `Trove classifiers
+<https://pypi.python.org/pypi?%3Aaction=list_classifiers>`_ describing your
+application.  ``author`` and ``author_email`` are text fields which probably
+don't need any description. ``url`` is a field that should point at your
+application project's URL (if any). ``packages=find_packages()`` causes all
+packages within the project to be found when packaging the application.
+``include_package_data`` will include non-Python files when the application is
+packaged if those files are checked into version control. ``zip_safe=False``
+indicates that this package is not safe to use as a zipped egg; instead it will
+always unpack as a directory, which is more convenient. ``install_requires``
+indicates that this package depends on the ``pyramid`` package.
+``extras_require`` is a Python dictionary that defines what is required to be
+installed for running tests. We examined ``entry_points`` in our discussion of
+the ``development.ini`` file; this file defines the ``main`` entry point that
+represents our project's application.
 
 Usually you only need to think about the contents of the ``setup.py`` file when
 distributing your application to other people, when adding Python package

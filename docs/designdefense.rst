@@ -131,7 +131,7 @@ obvious.
 First, what's a "utility"?  Well, for the purposes of this discussion, and
 for the purpose of the code above, it's just not very important.  If you
 really want to know, you can read `this
-<http://www.muthukadan.net/docs/zca.html#utility>`_.  However, still, readers
+<http://muthukadan.net/docs/zca.html#utility>`_.  However, still, readers
 of such code need to understand the concept in order to parse it.  This is
 problem number one.
 
@@ -665,7 +665,7 @@ desktop GUI platforms by using similar terminology, and to provide some frame
 of reference for how various components in the common web framework might
 hang together.  But in the opinion of the author, "MVC" doesn't match the web
 very well in general. Quoting from the `Model-View-Controller Wikipedia entry
-<http://en.wikipedia.org/wiki/Model–view–controller>`_:
+<https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller>`_:
 
     Though MVC comes in different flavors, control flow is generally as
     follows:
@@ -847,9 +847,9 @@ Challenge
 +++++++++
 
 :app:`Pyramid` performs automatic authorization checks only at :term:`view`
-execution time. Zope 3 wraps context objects with a `security proxy
-<http://wiki.zope.org/zope3/WhatAreSecurityProxies>`_, which causes Zope 3 also
-to do security checks during attribute access. I like this, because it means:
+execution time. Zope 3 wraps context objects with a security proxy, which
+causes Zope 3 also to do security checks during attribute access. I like this,
+because it means:
 
 #) When I use the security proxy machinery, I can have a view that
    conditionally displays certain HTML elements (like form fields) or
@@ -1006,16 +1006,18 @@ the following:
 Microframeworks have smaller Hello World programs
 -------------------------------------------------
 
-Self-described "microframeworks" exist. `Bottle <http://bottle.paws.de>`_ and
-`Flask <http://flask.pocoo.org/>`_ are two that are becoming popular. `Bobo
-<http://bobo.digicool.com/>`_ doesn't describe itself as a microframework, but
-its intended user base is much the same. Many others exist. We've even (only as
-a teaching tool, not as any sort of official project) `created one using
-Pyramid <http://static.repoze.org/casts/videotags.html>`_. The videos use BFG,
-a precursor to Pyramid, but the resulting code is `available for Pyramid too
-<https://github.com/Pylons/groundhog>`_). Microframeworks are small frameworks
-with one common feature: each allows its users to create a fully functional
-application that lives in a single Python file.
+Self-described "microframeworks" exist. `Bottle
+<http://bottlepy.org/docs/dev/index.html>`_ and `Flask
+<http://flask.pocoo.org/>`_ are two that are becoming popular. `Bobo
+<http://bobo.digicool.com/en/latest/>`_ doesn't describe itself as a
+microframework, but its intended user base is much the same. Many others exist.
+We've even (only as a teaching tool, not as any sort of official project)
+`created one using Pyramid <http://static.repoze.org/casts/videotags.html>`_.
+The videos use BFG, a precursor to Pyramid, but the resulting code is
+`available for Pyramid too <https://github.com/Pylons/groundhog>`_).
+Microframeworks are small frameworks with one common feature: each allows its
+users to create a fully functional application that lives in a single Python
+file.
 
 Some developers and microframework authors point out that Pyramid's "hello
 world" single-file program is longer (by about five lines) than the equivalent
@@ -1430,9 +1432,9 @@ object which *is not logically global*:
         # this is executed if the request method was GET or the
         # credentials were invalid    
 
-The `Pylons 1.X <http://pylonsproject.org>`_ web framework uses a similar
-strategy.  It calls these things "Stacked Object Proxies", so, for purposes
-of this discussion, I'll do so as well.
+The `Pylons 1.X <http://docs.pylonsproject.org/projects/pyramid/en/latest/>`_
+web framework uses a similar strategy.  It calls these things "Stacked Object
+Proxies", so, for purposes of this discussion, I'll do so as well.
 
 Import statements in Python (``import foo``, ``from bar import baz``) are
 most frequently performed to obtain a reference to an object defined globally
@@ -1701,5 +1703,6 @@ Other Challenges
 ----------------
 
 Other challenges are encouraged to be sent to the `Pylons-devel
-<http://groups.google.com/group/pylons-devel>`_ maillist.  We'll try to address
-them by considering a design change, or at very least via exposition here.
+<https://groups.google.com/forum/#!forum/pylons-devel>`_ maillist.  We'll try
+to address them by considering a design change, or at very least via exposition
+here.
