@@ -44,11 +44,11 @@ specific path information for commands and files.
 
 #.  Install :app:`Pyramid` into the newly created virtual environment:
 
-    .. code-block:: text
+    .. parsed-literal::
 
        $ cd ~/modwsgi/env
-       $ $VENV/bin/pip install pyramid
-    
+       $ $VENV/bin/pip install "pyramid==\ |release|\ "
+
 #.  Create and install your :app:`Pyramid` application.  For the purposes of
     this tutorial, we'll just be using the ``pyramid_starter`` application as
     a baseline application.  Substitute your existing :app:`Pyramid`
