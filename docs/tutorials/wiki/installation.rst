@@ -97,16 +97,17 @@ Install Pyramid into the virtual Python environment
 On UNIX
 ^^^^^^^
 
-.. code-block:: bash
+.. parsed-literal::
 
-   $ $VENV/bin/pip install pyramid
+   $ $VENV/bin/pip install "pyramid==\ |release|\ "
 
 On Windows
 ^^^^^^^^^^
 
-.. code-block:: doscon
+.. parsed-literal::
 
-   c:\> %VENV%\Scripts\pip install pyramid
+   c:\\> %VENV%\\Scripts\\pip install "pyramid==\ |release|\ "
+
 
 Change directory to your virtual Python environment
 ---------------------------------------------------
