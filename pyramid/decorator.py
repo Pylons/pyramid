@@ -1,4 +1,4 @@
-import functools
+from functools import update_wrapper
 
 
 class reify(object):
@@ -8,28 +8,36 @@ class reify(object):
     replacing the function it decorates with an instance variable.  It is, in
     Python parlance, a non-data descriptor.  An example:
 
-    .. code-block:: python
+    .. testsetup::
 
-       class Foo(object):
-           @reify
-           def jammy(self):
-               print('jammy called')
-               return 1
+        from pyramid.decorator import reify
+
+        class Foo(object):
+            @reify
+            def jammy(self):
+                print('jammy called')
+                return 1
 
     And usage of Foo:
 
-    >>> f = Foo()
-    >>> v = f.jammy
-    'jammy called'
-    >>> print(v)
-    1
-    >>> f.jammy
-    1
-    >>> # jammy func not called the second time; it replaced itself with 1
+    .. doctest::
+
+        >>> f = Foo()
+        >>> v = f.jammy
+        jammy called
+        >>> print(v)
+        1
+        >>> f.jammy
+        1
+        >>> # jammy func not called the second time; it replaced itself with 1
+        >>> # Note: reassignment is possible
+        >>> f.jammy = 2
+        >>> f.jammy
+        2
     """
     def __init__(self, wrapped):
         self.wrapped = wrapped
-        functools.update_wrapper(self, wrapped)
+        update_wrapper(self, wrapped)
 
     def __get__(self, inst, objtype=None):
         if inst is None:
