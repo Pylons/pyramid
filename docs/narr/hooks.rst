@@ -300,13 +300,38 @@ added as a property and its result is cached per-request by setting
 ``reify=True``. This way, we eliminate the overhead of running the function
 multiple times.
 
+.. testsetup:: group1
+
+   from pyramid.config import Configurator
+
+
+   def total(request, *args):
+       return sum(args)
+
+
+   def prop(request):
+       print("getting the property")
+       return "the property"
+
+
+
+   config = Configurator()
+   config.add_request_method(total)
+   config.add_request_method(prop, reify=True)
+   config.commit()
+
+   from pyramid.scripting import prepare
+   request = prepare(registry=config.registry)["request"]
+
+.. doctest:: group1
+
    >>> request.total(1, 2, 3)
    6
    >>> request.prop
    getting the property
-   the property
+   'the property'
    >>> request.prop
-   the property
+   'the property'
 
 To not cache the result of ``request.prop``, set ``property=True`` instead of
 ``reify=True``.
@@ -338,13 +363,42 @@ Here is an example of passing a class to ``Configurator.add_request_method``:
 
 We attach and cache an object named ``extra`` to the ``request`` object.
 
+.. testsetup:: group2
+
+   from pyramid.config import Configurator
+   from pyramid.decorator import reify
+
+   class ExtraStuff(object):
+
+       def __init__(self, request):
+           self.request = request
+
+       def total(self, *args):
+           return sum(args)
+
+       # use @property if you don't want to cache the result
+       @reify
+       def prop(self):
+           print("getting the property")
+           return "the property"
+
+   config = Configurator()
+   config.add_request_method(ExtraStuff, 'extra', reify=True)
+   config.commit()
+
+   from pyramid.scripting import prepare
+   request = prepare(registry=config.registry)["request"]
+
+.. doctest:: group2
+
    >>> request.extra.total(1, 2, 3)
    6
    >>> request.extra.prop
    getting the property
-   the property
+   'the property'
    >>> request.extra.prop
-   the property
+   'the property'
+
 
 .. index::
    single: response factory
