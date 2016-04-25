@@ -1,3 +1,12 @@
+1.7b1 (2016-04-25)
+==================
+
+- This release announces the beta period for 1.7.
+
+- Fix an issue where some files were being included in the alchemy scafffold
+  which had been removed from the 1.7 series.
+  See https://github.com/Pylons/pyramid/issues/2525
+
 1.7a2 (2016-04-19)
 ==================
 
