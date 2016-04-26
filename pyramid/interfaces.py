@@ -1224,9 +1224,9 @@ class IViewDeriver(Interface):
 class IViewDeriverInfo(Interface):
     """ An object implementing this interface is passed to every
     :term:`view deriver` during configuration."""
-    registry = Attribute('The "current" application registry when the '
+    registry = Attribute('The "current" application registry where the '
                          'view was created')
-    package = Attribute('The "current package" when the view '
+    package = Attribute('The "current package" where the view '
                         'configuration statement was found')
     settings = Attribute('The deployment settings dictionary related '
                          'to the current application')
