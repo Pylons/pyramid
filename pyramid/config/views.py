@@ -13,7 +13,6 @@ from zope.interface import (
 from zope.interface.interfaces import IInterface
 
 from pyramid.interfaces import (
-    IDefaultPermission,
     IException,
     IExceptionViewClassifier,
     IMultiView,
@@ -878,11 +877,6 @@ class ViewsConfiguratorMixin(object):
                         registry=self.registry
                         )
 
-            if permission is None:
-                # intent: will be None if no default permission is registered
-                # (reg'd in phase 1)
-                permission = self.registry.queryUtility(IDefaultPermission)
-
             # added by discrim_func above during conflict resolving
             preds = view_intr['predicates']
             order = view_intr['order']
@@ -1436,7 +1430,10 @@ class ViewsConfiguratorMixin(object):
 
         .. versionadded:: 1.3
         """
-        for arg in ('name', 'permission', 'context', 'for_', 'http_cache'):
+        for arg in (
+            'name', 'permission', 'context', 'for_', 'http_cache',
+            'require_csrf',
+        ):
             if arg in view_options:
                 raise ConfigurationError(
                     '%s may not be used as an argument to add_forbidden_view'
@@ -1464,6 +1461,7 @@ class ViewsConfiguratorMixin(object):
             match_param=match_param,
             route_name=route_name,
             permission=NO_PERMISSION_REQUIRED,
+            require_csrf=False,
             attr=attr,
             renderer=renderer,
             )
@@ -1548,7 +1546,10 @@ class ViewsConfiguratorMixin(object):
         .. versionchanged:: 1.6
         .. versionadded:: 1.3
         """
-        for arg in ('name', 'permission', 'context', 'for_', 'http_cache'):
+        for arg in (
+            'name', 'permission', 'context', 'for_', 'http_cache',
+            'require_csrf',
+        ):
             if arg in view_options:
                 raise ConfigurationError(
                     '%s may not be used as an argument to add_notfound_view'
@@ -1576,6 +1577,7 @@ class ViewsConfiguratorMixin(object):
             match_param=match_param,
             route_name=route_name,
             permission=NO_PERMISSION_REQUIRED,
+            require_csrf=False,
             )
         settings.update(view_options)
         if append_slash:
