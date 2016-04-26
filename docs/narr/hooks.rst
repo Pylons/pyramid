@@ -1647,8 +1647,9 @@ the user-defined :term:`view callable`:
 ``csrf_view``
 
   Used to check the CSRF token provided in the request. This element is a
-  no-op if both the ``require_csrf`` view option and the
-  ``pyramid.require_default_csrf`` setting are disabled.
+  no-op if ``require_csrf`` view option is not ``True``. Note there will
+  always be a ``require_csrf`` option if a default value was assigned via
+  :meth:`pyramid.config.Configurator.set_default_csrf_options`.
 
 ``owrapped_view``
 
