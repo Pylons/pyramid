@@ -1299,12 +1299,12 @@ Consider the following simple `Groundhog
     from groundhog import Groundhog
     app = Groundhog('myapp', 'seekrit')
 
-    app.route('/admin')
+    @app.route('/admin')
     def admin():
         return '<html>admin page</html>'
 
-    app.route('/:action')
-    def action():
+    @app.route('/:action')
+    def do_action(action):
         if action == 'add':
            return '<html>add</html>'
         if action == 'delete':
@@ -1324,15 +1324,15 @@ order of the function definitions in the file?
     from groundhog import Groundhog
     app = Groundhog('myapp', 'seekrit')
 
-    app.route('/:action')
-    def action():
+    @app.route('/:action')
+    def do_action(action):
         if action == 'add':
            return '<html>add</html>'
         if action == 'delete':
            return '<html>delete</html>'
         return app.abort(404)
 
-    app.route('/admin')
+    @app.route('/admin')
     def admin():
         return '<html>admin page</html>'
 
