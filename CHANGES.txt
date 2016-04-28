@@ -1,3 +1,17 @@
+unreleased
+==========
+
+- A default permission set via ``config.set_default_permission`` will no
+  longer be enforced on an exception view. This has been the case for a while
+  with the default exception views (``config.add_notfound_view`` and
+  ``config.add_forbidden_view``), however for any other exception view a
+  developer had to remember to set ``permission=NO_PERMISSION_REQUIRED`` or
+  be surprised when things didn't work. It is still possible to force a
+  permission check on an exception view by setting the ``permission`` argument
+  manually to ``config.add_view``. This behavior is consistent with the new
+  CSRF features added in the 1.7 series.
+  See https://github.com/Pylons/pyramid/pull/2534
+
 1.7b1 (2016-04-25)
 ==================
 
