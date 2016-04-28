@@ -16,6 +16,7 @@ from pyramid.interfaces import (
     IAuthenticationPolicy,
     IAuthorizationPolicy,
     IDefaultCSRFOptions,
+    IDefaultPermission,
     IDebugLogger,
     IResponse,
     IViewMapper,
@@ -272,7 +273,9 @@ def secured_view(view, info):
 secured_view.options = ('permission',)
 
 def _secured_view(view, info):
-    permission = info.options.get('permission')
+    permission = explicit_val = info.options.get('permission')
+    if permission is None:
+        permission = info.registry.queryUtility(IDefaultPermission)
     if permission == NO_PERMISSION_REQUIRED:
         # allow views registered within configurations that have a
         # default permission to explicitly override the default
@@ -288,6 +291,12 @@ def _secured_view(view, info):
             principals = authn_policy.effective_principals(request)
             return authz_policy.permits(context, principals, permission)
         def _secured_view(context, request):
+            if (
+                getattr(request, 'exception', None) is not None and
+                explicit_val is None
+            ):
+                return view(context, request)
+
             result = _permitted(context, request)
             if result:
                 return view(context, request)
@@ -306,12 +315,20 @@ def _secured_view(view, info):
 def _authdebug_view(view, info):
     wrapped_view = view
     settings = info.settings
-    permission = info.options.get('permission')
+    permission = explicit_val = info.options.get('permission')
+    if permission is None:
+        permission = info.registry.queryUtility(IDefaultPermission)
     authn_policy = info.registry.queryUtility(IAuthenticationPolicy)
     authz_policy = info.registry.queryUtility(IAuthorizationPolicy)
     logger = info.registry.queryUtility(IDebugLogger)
     if settings and settings.get('debug_authorization', False):
         def _authdebug_view(context, request):
+            if (
+                getattr(request, 'exception', None) is not None and
+                explicit_val is None
+            ):
+                return view(context, request)
+
             view_name = getattr(request, 'view_name', None)
 
             if authn_policy and authz_policy:

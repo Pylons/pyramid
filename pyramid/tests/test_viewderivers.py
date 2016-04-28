@@ -628,6 +628,63 @@ class TestDeriveView(unittest.TestCase):
         else: # pragma: no cover
             raise AssertionError
 
+    def test_secured_view_skipped_by_default_on_exception_view(self):
+        from pyramid.request import Request
+        from pyramid.security import NO_PERMISSION_REQUIRED
+        def view(request):
+            raise ValueError
+        def excview(request):
+            return 'hello'
+        self._registerSecurityPolicy(False)
+        self.config.add_settings({'debug_authorization': True})
+        self.config.set_default_permission('view')
+        self.config.add_view(view, name='foo', permission=NO_PERMISSION_REQUIRED)
+        self.config.add_view(excview, context=ValueError, renderer='string')
+        app = self.config.make_wsgi_app()
+        request = Request.blank('/foo', base_url='http://example.com')
+        request.method = 'POST'
+        response = request.get_response(app)
+        self.assertTrue(b'hello' in response.body)
+
+    def test_secured_view_failed_on_explicit_exception_view(self):
+        from pyramid.httpexceptions import HTTPForbidden
+        from pyramid.request import Request
+        from pyramid.security import NO_PERMISSION_REQUIRED
+        def view(request):
+            raise ValueError
+        def excview(request): pass
+        self._registerSecurityPolicy(False)
+        self.config.add_view(view, name='foo', permission=NO_PERMISSION_REQUIRED)
+        self.config.add_view(excview, context=ValueError, renderer='string',
+                             permission='view')
+        app = self.config.make_wsgi_app()
+        request = Request.blank('/foo', base_url='http://example.com')
+        request.method = 'POST'
+        try:
+            request.get_response(app)
+        except HTTPForbidden:
+            pass
+        else: # pragma: no cover
+            raise AssertionError
+
+    def test_secured_view_passed_on_explicit_exception_view(self):
+        from pyramid.request import Request
+        from pyramid.security import NO_PERMISSION_REQUIRED
+        def view(request):
+            raise ValueError
+        def excview(request):
+            return 'hello'
+        self._registerSecurityPolicy(True)
+        self.config.add_view(view, name='foo', permission=NO_PERMISSION_REQUIRED)
+        self.config.add_view(excview, context=ValueError, renderer='string',
+                             permission='view')
+        app = self.config.make_wsgi_app()
+        request = Request.blank('/foo', base_url='http://example.com')
+        request.method = 'POST'
+        request.headers['X-CSRF-Token'] = 'foo'
+        response = request.get_response(app)
+        self.assertTrue(b'hello' in response.body)
+
     def test_predicate_mismatch_view_has_no_name(self):
         from pyramid.exceptions import PredicateMismatch
         response = DummyResponse()
