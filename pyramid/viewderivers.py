@@ -39,6 +39,7 @@ from pyramid.exceptions import (
     PredicateMismatch,
     )
 from pyramid.httpexceptions import HTTPForbidden
+from pyramid.registry import Introspectable
 from pyramid.util import object_description
 from pyramid.view import render_view_to_response
 from pyramid import renderers
@@ -268,6 +269,20 @@ http_cached_view.options = ('http_cache',)
 def secured_view(view, info):
     for wrapper in (_secured_view, _authdebug_view):
         view = wraps_view(wrapper)(view, info)
+
+    view_intr = info.view_intr
+    permission = info.options.get('permission')
+    if view_intr is not None and permission is not None:
+        # if a permission exists, register a permission introspectable
+        perm_intr = Introspectable(
+            'permissions',
+            permission,
+            permission,
+            'permission',
+        )
+        perm_intr['value'] = permission
+        perm_intr.relate('views', view_intr.discriminator)
+        info.add_introspectable(perm_intr)
     return view
 
 secured_view.options = ('permission',)
