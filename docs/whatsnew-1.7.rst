@@ -32,6 +32,11 @@ Backwards Incompatibilities
   csrf token in the query string of a request. Only headers and request bodies
   are supported. See https://github.com/Pylons/pyramid/pull/2500
 
+- A global permission set via
+  :meth:`pyramid.config.Configurator.set_default_permission` will no longer
+  affect exception views. A permission must be set explicitly on the view for
+  it to be enforced. See https://github.com/Pylons/pyramid/pull/2534
+
 Feature Additions
 -----------------
 
@@ -98,6 +103,11 @@ Feature Additions
   useful for rendering an exception view outside of the context of the
   ``EXCVIEW`` tween where you may need more control over the request.
   See https://github.com/Pylons/pyramid/pull/2393
+
+- A global permission set via
+  :meth:`pyramid.config.Configurator.set_default_permission` will no longer
+  affect exception views. A permission must be set explicitly on the view for
+  it to be enforced. See https://github.com/Pylons/pyramid/pull/2534
 
 - Allow a leading ``=`` on the key of the request param predicate.
   For example, ``'=abc=1'`` is equivalent down to
