@@ -1,6 +1,9 @@
 unreleased
 ==========
 
+- Removed inclusion of pyramid_tm in development.ini for alchemy scaffold
+  See https://github.com/Pylons/pyramid/issues/2538
+
 - A default permission set via ``config.set_default_permission`` will no
   longer be enforced on an exception view. This has been the case for a while
   with the default exception views (``config.add_notfound_view`` and
