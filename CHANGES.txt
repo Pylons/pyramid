@@ -1,5 +1,5 @@
-unreleased
-==========
+1.7b2 (2016-05-01)
+==================
 
 - Removed inclusion of pyramid_tm in development.ini for alchemy scaffold
   See https://github.com/Pylons/pyramid/issues/2538
