@@ -129,7 +129,7 @@ PyPI
 https://pypi.python.org/pypi/pyramid/1.x
 
 What's New
-http://docs.pylonsproject.org/projects/pyramid/1.X-branch/whatsnew-1.X.html
+http://docs.pylonsproject.org/projects/pyramid/en/1.X-branch/whatsnew-1.X.html
 
 Issues
 https://github.com/Pylons/pyramid/issues
