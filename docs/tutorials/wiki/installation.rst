@@ -129,6 +129,7 @@ On Windows
 
    c:\> cd pyramidtut
 
+
 .. _making_a_project:
 
 Making a project
@@ -209,7 +210,7 @@ packages. Success executing this command will show a line like the following:
    zc.lockfile-1.1.0 zdaemon-4.1.0 zodbpickle-0.6.0 zodburi-2.0
 
 
-.. _install-testing-requirements_zodb:
+.. _install-testing-requirements-zodb:
 
 Install testing requirements
 ----------------------------
@@ -252,7 +253,9 @@ Run the tests
 -------------
 
 After you've installed the project in development mode as well as the testing
-requirements, you may run the tests for the project.
+requirements, you may run the tests for the project. The following commands
+provide options to py.test that specify the module for which its tests shall be
+run, and to run py.test in quiet mode.
 
 On UNIX
 ^^^^^^^
@@ -274,6 +277,16 @@ For a successful test run, you should see output that ends like this:
 
    .
    1 passed in 0.24 seconds
+
+.. note::
+   py.test follows :ref:`conventions for Python test discovery
+   <pytest:test discovery>`. This explains why we cannot run just ``py.test``
+   without specifying the module to test after generating a project from a
+   scaffold.
+
+   py.test is a :ref:`mature full-featured Python testing tool
+   <pytest:features>`. See py.test's documentation for :ref:`pytest:usage` or
+   invoke ``py.test -h`` to see its full set of options.
 
 
 Expose test coverage information
@@ -358,9 +371,9 @@ If successful, you will see something like this on your console:
 
 .. code-block:: text
 
-    Starting subprocess with file monitor
-    Starting server in PID 95736.
-    serving on http://127.0.0.1:6543
+   Starting subprocess with file monitor
+   Starting server in PID 82349.
+   serving on http://127.0.0.1:6543
 
 This means the server is ready to accept requests.
 
@@ -387,9 +400,28 @@ assumptions:
 
 - You are willing to use :term:`traversal` to map URLs to code.
 
+- You want to use pyramid_zodbconn_, pyramid_tm_, and the transaction_ packages
+  to manage connections and transactions with :term:`ZODB`.
+
+- You want to use pyramid_chameleon_ to render your templates. Different
+  templating engines can be used, but we had to choose one to make this
+  tutorial. See :ref:`available_template_system_bindings` for some options.
+
 .. note::
 
-   :app:`Pyramid` supports any persistent storage mechanism (e.g., a SQL
-   database or filesystem files).  It also supports an additional
-   mechanism to map URLs to code (:term:`URL dispatch`).  However, for the
-   purposes of this tutorial, we'll only be using traversal and ZODB.
+   :app:`Pyramid` supports any persistent storage mechanism (e.g., an SQL
+   database or filesystem files). It also supports an additional mechanism to
+   map URLs to code (:term:`URL dispatch`). However, for the purposes of this
+   tutorial, we'll only be using :term:`traversal` and :term:`ZODB`.
+
+.. _pyramid_chameleon:
+   http://docs.pylonsproject.org/projects/pyramid-chameleon/en/latest/
+
+.. _pyramid_tm:
+   http://docs.pylonsproject.org/projects/pyramid-tm/en/latest/
+
+.. _pyramid_zodbconn:
+   http://docs.pylonsproject.org/projects/pyramid-zodbconn/en/latest/
+
+.. _transaction:
+   http://zodb.readthedocs.org/en/latest/transactions.html
