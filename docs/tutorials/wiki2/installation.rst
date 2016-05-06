@@ -521,6 +521,3 @@ assumptions:
 
 .. _transaction:
    http://zodb.readthedocs.org/en/latest/transactions.html
-
-.. _pyramid_jinja2:
-   http://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/
