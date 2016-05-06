@@ -270,7 +270,9 @@ Run the tests
 -------------
 
 After you've installed the project in development mode as well as the testing
-requirements, you may run the tests for the project.
+requirements, you may run the tests for the project. The following commands
+provide options to py.test that specify the module for which its tests shall be
+run, and to run py.test in quiet mode.
 
 On UNIX
 ^^^^^^^
@@ -292,6 +294,16 @@ For a successful test run, you should see output that ends like this:
 
    ..
    2 passed in 0.44 seconds
+
+.. note::
+   py.test follows :ref:`conventions for Python test discovery
+   <pytest:test discovery>`. This explains why we cannot run just ``py.test``
+   without specifying the module to test after generating a project from a
+   scaffold.
+
+   py.test is a :ref:`mature full-featured Python testing tool
+   <pytest:features>`. See py.test's documentation for :ref:`pytest:usage` or
+   invoke ``py.test -h`` to see its full set of options.
 
 
 Expose test coverage information
@@ -451,7 +463,9 @@ On Windows
    Your OS firewall, if any, may pop up a dialog asking for authorization
    to allow python to accept incoming network connections.
 
-If successful, you will see something like this on your console::
+If successful, you will see something like this on your console:
+
+.. code-block:: text
 
    Starting subprocess with file monitor
    Starting server in PID 82349.
@@ -463,7 +477,7 @@ This means the server is ready to accept requests.
 Visit the application in a browser
 ----------------------------------
 
-In a browser, visit http://localhost:6543/.  You will see the generated
+In a browser, visit http://localhost:6543/. You will see the generated
 application's default page.
 
 One thing you'll notice is the "debug toolbar" icon on right hand side of the
@@ -494,7 +508,7 @@ assumptions:
    :app:`Pyramid` supports any persistent storage mechanism (e.g., object
    database or filesystem files). It also supports an additional mechanism to
    map URLs to code (:term:`traversal`). However, for the purposes of this
-   tutorial, we'll only be using URL dispatch and SQLAlchemy.
+   tutorial, we'll only be using :term:`URL dispatch` and :term:`SQLAlchemy`.
 
 .. _pyramid_jinja2:
    http://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/
@@ -510,12 +524,3 @@ assumptions:
 
 .. _pyramid_jinja2:
    http://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/
-
-.. _pyramid_tm:
-   http://docs.pylonsproject.org/projects/pyramid-tm/en/latest/
-
-.. _zope.sqlalchemy:
-   https://pypi.python.org/pypi/zope.sqlalchemy
-
-.. _transaction:
-   http://zodb.readthedocs.org/en/latest/transactions.html
