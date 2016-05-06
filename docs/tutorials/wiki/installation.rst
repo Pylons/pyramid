@@ -425,6 +425,3 @@ assumptions:
 
 .. _transaction:
    http://zodb.readthedocs.org/en/latest/transactions.html
-
-.. _pyramid_chameleon:
-   http://docs.pylonsproject.org/projects/pyramid-chameleon/en/latest/
