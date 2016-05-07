@@ -279,14 +279,14 @@ On UNIX
 
 .. code-block:: bash
 
-   $ $VENV/bin/py.test tutorial/tests.py -q
+   $ $VENV/bin/py.test -q
 
 On Windows
 ^^^^^^^^^^
 
 .. code-block:: doscon
 
-   c:\pyramidtut\tutorial> %VENV%\Scripts\py.test tutorial\tests.py -q
+   c:\pyramidtut\tutorial> %VENV%\Scripts\py.test -q
 
 For a successful test run, you should see output that ends like this:
 
@@ -294,16 +294,6 @@ For a successful test run, you should see output that ends like this:
 
    ..
    2 passed in 0.44 seconds
-
-.. note::
-   py.test follows :ref:`conventions for Python test discovery
-   <pytest:test discovery>`. This explains why we cannot run just ``py.test``
-   without specifying the module to test after generating a project from a
-   scaffold.
-
-   py.test is a :ref:`mature full-featured Python testing tool
-   <pytest:features>`. See py.test's documentation for :ref:`pytest:usage` or
-   invoke ``py.test -h`` to see its full set of options.
 
 
 Expose test coverage information
@@ -322,15 +312,15 @@ On UNIX
 
 .. code-block:: bash
 
-   $ $VENV/bin/py.test --cov=tutorial --cov-report=term-missing tutorial/tests.py
+   $ $VENV/bin/py.test --cov --cov-report=term-missing
 
 On Windows
 ^^^^^^^^^^
 
 .. code-block:: doscon
 
-   c:\pyramidtut\tutorial> %VENV%\Scripts\py.test --cov=tutorial \
-       --cov-report=term-missing tutorial\tests.py
+   c:\pyramidtut\tutorial> %VENV%\Scripts\py.test --cov \
+       --cov-report=term-missing
 
 If successful, you will see output something like this:
 
@@ -363,6 +353,40 @@ If successful, you will see output something like this:
    ===================== 2 passed in 0.57 seconds ======================
 
 Our package doesn't quite have 100% test coverage.
+
+
+.. _test_and_coverage_scaffold_defaults:
+
+Test and coverage scaffold defaults
+-----------------------------------
+
+Scaffolds include configuration defaults for ``py.test`` and test coverage.
+These configuration files are ``pytest.ini`` and ``.coveragerc``, located at
+the root of your package. Without these defaults, we would need to specify the
+path to the module on which we want to run tests and coverage.
+
+On UNIX
+^^^^^^^
+
+.. code-block:: bash
+
+   $ $VENV/bin/py.test --cov=tutorial tutorial/tests.py -q
+
+On Windows
+^^^^^^^^^^
+
+.. code-block:: doscon
+
+   c:\pyramidtut\tutorial> %VENV%\Scripts\py.test --cov=tutorial \
+       --cov-report=term-missing tutorial\tests.py -q
+
+py.test follows :ref:`conventions for Python test discovery
+<pytest:test discovery>`, and the configuration defaults from the scaffold
+tell ``py.test`` where to find the module on which we want to run tests and
+coverage.
+
+.. seealso:: See py.test's documentation for :ref:`pytest:usage` or invoke
+   ``py.test -h`` to see its full set of options.
 
 
 .. _initialize_db_wiki2:
