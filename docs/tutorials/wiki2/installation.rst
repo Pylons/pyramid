@@ -355,7 +355,7 @@ If successful, you will see output something like this:
 Our package doesn't quite have 100% test coverage.
 
 
-.. _test_and_coverage_scaffold_defaults:
+.. _test_and_coverage_scaffold_defaults_sql:
 
 Test and coverage scaffold defaults
 -----------------------------------
