@@ -608,7 +608,7 @@ pyramid/scaffolds/
 
   133KB
 
-pyramid/ (except for ``pyramd/tests`` and ``pyramid/scaffolds``)
+pyramid/ (except for ``pyramid/tests`` and ``pyramid/scaffolds``)
 
   812KB
 
