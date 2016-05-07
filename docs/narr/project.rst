@@ -929,10 +929,10 @@ The ``tests.py`` module includes unit tests for your application.
    :linenos:
 
 This sample ``tests.py`` file has one unit test and one functional test defined
-within it. These tests are executed when you run ``py.test myproject/tests.py
--q``. You may add more tests here as you build your application. You are not
-required to write tests to use :app:`Pyramid`. This file is simply provided for
-convenience and example.
+within it. These tests are executed when you run ``py.test -q``. You may add
+more tests here as you build your application. You are not required to write
+tests to use :app:`Pyramid`. This file is simply provided for convenience and
+example.
 
 See :ref:`testing_chapter` for more information about writing :app:`Pyramid`
 unit tests.
