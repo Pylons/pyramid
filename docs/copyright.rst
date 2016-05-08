@@ -63,7 +63,7 @@ Contributors:
   GitHub.
 
 Cover Designer:
-   Hugues Laflamme of `Kemeneur <http://www.kemeneur.com/>`_.
+   Hugues Laflamme of Kemeneur.
 
 Used with permission:
 
@@ -80,8 +80,8 @@ Print Production
 ----------------
 
 The print version of this book was produced using the `Sphinx
-<http://sphinx.pocoo.org/>`_ documentation generation system and the
-`LaTeX <http://www.latex-project.org/>`_ typesetting system.
+<http://www.sphinx-doc.org/en/stable/>`_ documentation generation system and
+the `LaTeX <http://www.latex-project.org/>`_ typesetting system.
 
 Contacting The Publisher
 ------------------------
@@ -90,7 +90,7 @@ Please send documentation licensing inquiries, translation inquiries,
 and other business communications to `Agendaless Consulting
 <mailto:webmaster@agendaless.com>`_.  Please send software and other
 technical queries to the `Pylons-devel mailing list
-<http://groups.google.com/group/pylons-devel>`_.
+<https://groups.google.com/forum/#!forum/pylons-devel>`_.
 
 HTML Version and Source Code
 ----------------------------

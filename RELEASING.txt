@@ -120,6 +120,10 @@ Marketing and communications
 - Edit `http://wiki.python.org/moin/WebFrameworks
   <http://wiki.python.org/moin/WebFrameworks>`_.
 
+- Publish new version of docs.
+
+- Announce to maillist.
+
 - Announce to Twitter.
 
 ```

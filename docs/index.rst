@@ -5,7 +5,7 @@ The Pyramid Web Framework
 =========================
 
 :app:`Pyramid` is a small, fast, down-to-earth Python web framework.  It is
-developed as part of the `Pylons Project <http://docs.pylonsproject.org/>`_.
+developed as part of the `Pylons Project <http://www.pylonsproject.org/>`_.
 It is licensed under a `BSD-like license <http://repoze.org/license.html>`_.
 
 Here is one of the simplest :app:`Pyramid` applications you can make:
@@ -70,15 +70,17 @@ platforms.
 Support and Development
 =======================
 
-The `Pylons Project web site <http://pylonsproject.org/>`_ is the main online
-source of :app:`Pyramid` support and development information.
+The `Pylons Project web site <http://www.pylonsproject.org/>`_ is the main
+online source of :app:`Pyramid` support and development information.
 
 To report bugs, use the `issue tracker
 <https://github.com/Pylons/pyramid/issues>`_.
 
 If you've got questions that aren't answered by this documentation, contact the
-`Pylons-discuss maillist <http://groups.google.com/group/pylons-discuss>`_ or
-join the `#pyramid IRC channel <irc://irc.freenode.net/#pyramid>`_.
+`Pylons-discuss maillist
+<https://groups.google.com/forum/#!forum/pylons-discuss>`_ or join the
+`#pyramid IRC channel
+<https://webchat.freenode.net/?channels=pyramid>`_.
 
 Browse and check out tagged and trunk versions of :app:`Pyramid` via the
 `Pyramid GitHub repository <https://github.com/Pylons/pyramid/>`_. To check out
