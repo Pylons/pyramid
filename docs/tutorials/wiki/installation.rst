@@ -278,6 +278,16 @@ For a successful test run, you should see output that ends like this:
    .
    1 passed in 0.24 seconds
 
+.. note::
+   py.test follows :ref:`conventions for Python test discovery
+   <pytest:test discovery>`. This explains why we cannot run just ``py.test``
+   without specifying the module to test after generating a project from a
+   scaffold.
+
+   py.test is a :ref:`mature full-featured Python testing tool
+   <pytest:features>`. See py.test's documentation for :ref:`pytest:usage` or
+   invoke ``py.test -h`` to see its full set of options.
+
 
 Expose test coverage information
 --------------------------------

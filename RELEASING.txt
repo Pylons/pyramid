@@ -61,10 +61,7 @@ Prepare new release branch
   branch, and previously released branch. Also in the previously released
   branch only, uncomment the sections to enable pylons_sphinx_latesturl.
 
-- Change setup.py version to the new version number on both master and the new
-  branch.
-
-- Change CHANGES.txt heading to reflect the new version number.
+- Change setup.py version to the release version number.
 
 - Make sure PyPI long description renders (requires ``collective.dist``
   installed into your Python)::
