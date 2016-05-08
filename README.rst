@@ -1,8 +1,9 @@
 Pyramid
 =======
 
-.. image:: https://travis-ci.org/Pylons/pyramid.png?branch=master
+.. image:: https://travis-ci.org/Pylons/pyramid.png?branch=1.7-branch
         :target: https://travis-ci.org/Pylons/pyramid
+        :alt: 1.7-branch Travis CI Status
 
 .. image:: https://readthedocs.org/projects/pyramid/badge/?version=master
         :target: http://docs.pylonsproject.org/projects/pyramid/en/master/
