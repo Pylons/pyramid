@@ -188,12 +188,12 @@ pipe it to your environment's version of Python.
 .. code-block:: bash
 
     # Mac and Linux
-    $ wget https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py -O - | $VENV/bin/python
+    $ wget https://bootstrap.pypa.io/ez_setup.py -O - | $VENV/bin/python
 
     # Windows
     #
     # Use your web browser to download this file:
-    #   https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py
+    #   https://bootstrap.pypa.io/ez_setup.py
     #
     # ...and save it to:
     # c:\projects\quick_tutorial\ez_setup.py
@@ -207,7 +207,7 @@ If ``wget`` complains with a certificate error, then run this command instead:
 .. code-block:: bash
 
     # Mac and Linux
-    $ wget --no-check-certificate https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py -O - | $VENV/bin/python
+    $ wget --no-check-certificate https://bootstrap.pypa.io/ez_setup.py -O - | $VENV/bin/python
 
 
 .. _install-pyramid:
