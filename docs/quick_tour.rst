@@ -25,7 +25,7 @@ As an example, for Python 3.3+ on Linux:
 .. parsed-literal::
 
   $ pyvenv env33
-  $ wget https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py -O - | env33/bin/python
+  $ wget https://bootstrap.pypa.io/ez_setup.py -O - | env33/bin/python
   $ env33/bin/easy_install "pyramid==\ |release|\ "
 
 For Windows:
@@ -33,7 +33,7 @@ For Windows:
 .. parsed-literal::
 
     # Use your browser to download:
-    #   https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py
+    #   https://bootstrap.pypa.io/ez_setup.py
     c:\\> c:\\Python33\\python -m venv env33
     c:\\> env33\\Scripts\\python ez_setup.py
     c:\\> env33\\Scripts\\easy_install "pyramid==\ |release|\ "

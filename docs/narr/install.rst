@@ -197,8 +197,8 @@ Installing Setuptools
 ~~~~~~~~~~~~~~~~~~~~~
 
 To install setuptools by hand under Python 2, first download `ez_setup.py
-<https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py>`_ then invoke
-it using the Python interpreter into which you want to install setuptools.
+<https://bootstrap.pypa.io/ez_setup.py>`_ then invoke it using the Python
+interpreter into which you want to install setuptools.
 
 .. code-block:: text
 
@@ -325,10 +325,9 @@ You can use Pyramid on Windows under Python 2 or 3.
    version.
 
 #. Install latest :term:`setuptools` distribution into the Python from step 1
-   above: download `ez_setup.py
-   <https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py>`_ and run
-   it using the ``python`` interpreter of your Python 2.7 or 3.3 installation
-   using a command prompt:
+   above: download `ez_setup.py <https://bootstrap.pypa.io/ez_setup.py>`_ and
+   run it using the ``python`` interpreter of your Python 2.7 or 3.3
+   installation using a command prompt:
 
    .. code-block:: text
 
