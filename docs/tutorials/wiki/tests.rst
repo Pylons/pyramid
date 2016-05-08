@@ -52,8 +52,8 @@ Running the tests
 =================
 
 We can run these tests by using ``py.test`` similarly to how we did in
-:ref:`running_tests`. Courtest of the scaffold, our testing dependencies have
-already been satisfied and ``py.test`` and coverage has already been
+:ref:`running_tests`. Courtesy of the scaffold, our testing dependencies have
+already been satisfied and ``py.test`` and coverage have already been
 configured, so we can jump right to running tests.
 
 On UNIX:
