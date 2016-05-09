@@ -80,7 +80,7 @@ If you've got questions that aren't answered by this documentation, contact the
 `Pylons-discuss maillist
 <https://groups.google.com/forum/#!forum/pylons-discuss>`_ or join the
 `#pyramid IRC channel
-<https://webchat.freenode.net?channels=%23pyramid&uio=d4>`_.
+<https://webchat.freenode.net/?channels=pyramid>`_.
 
 Browse and check out tagged and trunk versions of :app:`Pyramid` via the
 `Pyramid GitHub repository <https://github.com/Pylons/pyramid/>`_. To check out
