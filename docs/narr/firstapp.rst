@@ -197,7 +197,7 @@ method returns a :term:`WSGI` application object that can be used by any WSGI
 server to present an application to a requestor. :term:`WSGI` is a protocol
 that allows servers to talk to Python applications.  We don't discuss
 :term:`WSGI` in any depth within this book, but you can learn more about it by
-visiting `wsgi.org <http://wsgi.org>`_.
+reading its `documentation <http://wsgi.readthedocs.org/en/latest/>`_.
 
 The :app:`Pyramid` application object, in particular, is an instance of a class
 representing a :app:`Pyramid` :term:`router`.  It has a reference to the
