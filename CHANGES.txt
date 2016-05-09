@@ -1,3 +1,15 @@
+unreleased
+==========
+
+- Add defaults for py.test configuration and coverage to all three scaffolds,
+  and update documentation accordingly.
+  See https://github.com/Pylons/pyramid/pull/2550
+
+- Add ``linkcheck`` to ``Makefile`` for Sphinx. To check the documentation for
+  broken links, use the command ``make linkcheck
+  SPHINXBUILD=$VENV/bin/sphinx-build``. Also removed and fixed dozens of broken
+  external links.
+
 1.7b2 (2016-05-01)
 ==================
 
