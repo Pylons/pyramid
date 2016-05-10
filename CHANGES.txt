@@ -1,6 +1,12 @@
 unreleased
 ==========
 
+- Fix ``request.invoke_exception_view`` to raise an ``HTTPNotFound``
+  exception if no view is matched. Previously ``None`` would be returned
+  if no views were matched and a ``PredicateMismatch`` would be raised if
+  a view "almost" matched (a view was found matching the context).
+  See https://github.com/Pylons/pyramid/pull/2564
+
 - Add defaults for py.test configuration and coverage to all three scaffolds,
   and update documentation accordingly.
   See https://github.com/Pylons/pyramid/pull/2550
