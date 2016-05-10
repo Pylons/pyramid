@@ -16,6 +16,10 @@ unreleased
   SPHINXBUILD=$VENV/bin/sphinx-build``. Also removed and fixed dozens of broken
   external links.
 
+- Fix the internal runner for scaffold tests to ensure they work with pip
+  and py.test.
+  See https://github.com/Pylons/pyramid/pull/2565
+
 1.7b2 (2016-05-01)
 ==================
 
