@@ -1,5 +1,7 @@
 import sys
 
+from pyramid.compat import reraise
+from pyramid.exceptions import PredicateMismatch
 from pyramid.interfaces import (
     IExceptionViewClassifier,
     IRequest,
@@ -38,17 +40,26 @@ def excview_tween_factory(handler, registry):
             # https://github.com/Pylons/pyramid/issues/700
             request_iface = attrs.get('request_iface', IRequest)
             provides = providedBy(exc)
-            response = _call_view(
-                registry,
-                request,
-                exc,
-                provides,
-                '',
-                view_classifier=IExceptionViewClassifier,
-                request_iface=request_iface.combined
-                )
+            try:
+                response = _call_view(
+                    registry,
+                    request,
+                    exc,
+                    provides,
+                    '',
+                    view_classifier=IExceptionViewClassifier,
+                    request_iface=request_iface.combined
+                    )
+
+            # if views matched but did not pass predicates, squash the error
+            # and re-raise the original exception
+            except PredicateMismatch:
+                response = None
+
+            # re-raise the original exception as no exception views were
+            # able to handle the error
             if response is None:
-                raise
+                reraise(*attrs['exc_info'])
 
         return response
 
