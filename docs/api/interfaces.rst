@@ -59,6 +59,9 @@ Other Interfaces
   .. autointerface:: IRenderer
      :members:
 
+  .. autointerface:: IRequestFactory
+     :members:
+
   .. autointerface:: IResponseFactory
      :members:
 
