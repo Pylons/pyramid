@@ -21,6 +21,7 @@ from pyramid.exceptions import PredicateMismatch
 
 from pyramid.httpexceptions import (
     HTTPFound,
+    HTTPNotFound,
     default_exceptionresponse_view,
     )
 
@@ -589,8 +590,9 @@ class ViewMethodsMixin(object):
         object that this method is attached to as the ``request``, and
         ``True`` for ``secure``.
 
-        This method returns a :term:`response` object or ``None`` if no
-        matching exception view can be found."""
+        This method returns a :term:`response` object or raises
+        :class:`pyramid.httpexceptions.HTTPNotFound` if a matching view cannot
+        be found."""
 
         if request is None:
             request = self
@@ -623,4 +625,6 @@ class ViewMethodsMixin(object):
                 secure=secure,
                 request_iface=request_iface.combined,
                 )
+            if response is None:
+                raise HTTPNotFound
             return response
