@@ -1,5 +1,5 @@
-unreleased
-==========
+1.7b3 (2016-05-10)
+==================
 
 - Fix ``request.invoke_exception_view`` to raise an ``HTTPNotFound``
   exception if no view is matched. Previously ``None`` would be returned
