@@ -1,5 +1,5 @@
-unreleased
-==========
+1.7b4 (2016-05-12)
+==================
 
 - Fixed the exception view tween to re-raise the original exception if
   no exception view could be found to handle the exception. This better
