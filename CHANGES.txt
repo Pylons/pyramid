@@ -1,3 +1,17 @@
+unreleased
+==========
+
+- Fixed the exception view tween to re-raise the original exception if
+  no exception view could be found to handle the exception. This better
+  allows tweens further up the chain to handle exceptions that were
+  left unhandled. Previously they would be converted into a
+  ``PredicateMismatch`` exception if predicates failed to allow the view to
+  handle the exception.
+  See https://github.com/Pylons/pyramid/pull/2567
+
+- Exposed the ``pyramid.interfaces.IRequestFactory`` interface to mirror
+  the public ``pyramid.interfaces.IResponseFactory`` interface.
+
 1.7b3 (2016-05-10)
 ==================
 
