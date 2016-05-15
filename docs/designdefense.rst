@@ -1653,7 +1653,7 @@ If you can understand this hello world program, you can use Pyramid:
        server = make_server('0.0.0.0', 8080, app)
        server.serve_forever()
 
-Pyramid has about 800 pages of documentation (printed), covering topics from
+Pyramid has over 1200 pages of documentation (printed), covering topics from
 the very basic to the most advanced. *Nothing* is left undocumented, quite
 literally.  It also has an *awesome*, very helpful community.  Visit the
 `#pyramid IRC channel on freenode.net
