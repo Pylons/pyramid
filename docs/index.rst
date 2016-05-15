@@ -18,7 +18,7 @@ After you install :app:`Pyramid` and run this application, when you visit
 this application works.
 
 
-.. _html_getting_started:
+.. _getting_started:
 
 Getting Started
 ===============
@@ -60,9 +60,9 @@ platforms.
 .. toctree::
    :maxdepth: 1
 
-   tutorials/wiki2/index.rst
-   tutorials/wiki/index.rst
-   tutorials/modwsgi/index.rst
+   tutorials/wiki2/index
+   tutorials/wiki/index
+   tutorials/modwsgi/index
 
 
 .. _support-and-development:
@@ -167,7 +167,7 @@ Comprehensive reference material for every public API exposed by
 ``p*`` Scripts Documentation
 ============================
 
-``p*`` scripts included with :app:`Pyramid`:.
+``p*`` scripts included with :app:`Pyramid`.
 
 .. toctree::
    :maxdepth: 1

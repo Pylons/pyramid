@@ -1,7 +1,7 @@
 Copyright, Trademarks, and Attributions
 =======================================
 
-*The Pyramid Web Framework, Version 1.1*
+"The Pyramid Web Framework, Version |version|"
 
 by Chris McDonough
 
@@ -101,4 +101,3 @@ http://docs.pylonsproject.org/projects/pyramid/en/latest/
 The source code for the examples used in this book are available
 within the :app:`Pyramid` software distribution, always available
 via https://github.com/Pylons/pyramid
-
