@@ -54,7 +54,14 @@ technologies.
 Book Content
 ============
 
-This book is divided into three major parts:
+This book is divided into four major parts:
+
+:ref:`tutorials`
+
+  Each tutorial builds a sample application or implements a set of
+  concepts with a sample; it then describes the application or
+  concepts in terms of the sample.  You should read the tutorials if
+  you want a guided tour of :app:`Pyramid`.
 
 :ref:`narrative_documentation`
 
@@ -66,18 +73,15 @@ This book is divided into three major parts:
   out-of-order, or when you need only a reminder about a particular
   topic while you're developing an application.
 
-:ref:`tutorials`
-
-  Each tutorial builds a sample application or implements a set of
-  concepts with a sample; it then describes the application or
-  concepts in terms of the sample.  You should read the tutorials if
-  you want a guided tour of :app:`Pyramid`.
-
 :ref:`api_documentation`
 
   Comprehensive reference material for every public API exposed by
   :app:`Pyramid`.  The API documentation is organized
   alphabetically by module name.
+
+:ref:`pscripts_documentation`
+
+   ``p*`` scripts included with :app:`Pyramid`.
 
 .. index::
    single: repoze.zope2
