@@ -167,7 +167,7 @@ Comprehensive reference material for every public API exposed by
 ``p*`` Scripts Documentation
 ============================
 
-``p*`` scripts included with :app:`Pyramid`:.
+``p*`` scripts included with :app:`Pyramid`.
 
 .. toctree::
    :maxdepth: 1
