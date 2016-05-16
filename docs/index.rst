@@ -70,7 +70,7 @@ platforms.
 Support and Development
 =======================
 
-The `Pyramid website <https://trypyramid.com/resources.html/>`_ is the main
+The `Pyramid website <https://trypyramid.com/resources.html>`_ is the main
 entry point to :app:`Pyramid` web framework resources for support and
 development information.
 
