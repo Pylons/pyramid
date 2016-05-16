@@ -70,8 +70,9 @@ platforms.
 Support and Development
 =======================
 
-The `Pylons Project web site <http://www.pylonsproject.org/>`_ is the main
-online source of :app:`Pyramid` support and development information.
+The `Pyramid website <https://trypyramid.com/resources.html/>`_ is the main
+entry point to :app:`Pyramid` web framework resources for support and
+development information.
 
 To report bugs, use the `issue tracker
 <https://github.com/Pylons/pyramid/issues>`_.
