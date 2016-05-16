@@ -5,7 +5,7 @@ The Pyramid Web Framework
 =========================
 
 :app:`Pyramid` is a small, fast, down-to-earth Python web framework.  It is
-developed as part of the `Pylons Project <http://docs.pylonsproject.org/>`_.
+developed as part of the `Pylons Project <http://www.pylonsproject.org/>`_.
 It is licensed under a `BSD-like license <http://repoze.org/license.html>`_.
 
 Here is one of the simplest :app:`Pyramid` applications you can make:
@@ -60,9 +60,9 @@ platforms.
 .. toctree::
    :maxdepth: 1
 
-   tutorials/wiki2/index.rst
-   tutorials/wiki/index.rst
-   tutorials/modwsgi/index.rst
+   tutorials/wiki2/index
+   tutorials/wiki/index
+   tutorials/modwsgi/index
 
 
 .. _support-and-development:
@@ -70,15 +70,18 @@ platforms.
 Support and Development
 =======================
 
-The `Pylons Project web site <http://pylonsproject.org/>`_ is the main online
-source of :app:`Pyramid` support and development information.
+The `Pyramid website <https://trypyramid.com/resources.html/>`_ is the main
+entry point to :app:`Pyramid` web framework resources for support and
+development information.
 
 To report bugs, use the `issue tracker
 <https://github.com/Pylons/pyramid/issues>`_.
 
 If you've got questions that aren't answered by this documentation, contact the
-`Pylons-discuss maillist <http://groups.google.com/group/pylons-discuss>`_ or
-join the `#pyramid IRC channel <irc://irc.freenode.net/#pyramid>`_.
+`Pylons-discuss maillist
+<https://groups.google.com/forum/#!forum/pylons-discuss>`_ or join the
+`#pyramid IRC channel
+<https://webchat.freenode.net/?channels=pyramid>`_.
 
 Browse and check out tagged and trunk versions of :app:`Pyramid` via the
 `Pyramid GitHub repository <https://github.com/Pylons/pyramid/>`_. To check out
@@ -165,7 +168,7 @@ Comprehensive reference material for every public API exposed by
 ``p*`` Scripts Documentation
 ============================
 
-``p*`` scripts included with :app:`Pyramid`:.
+``p*`` scripts included with :app:`Pyramid`.
 
 .. toctree::
    :maxdepth: 1
