@@ -213,11 +213,6 @@ else:
     input_ = input
 
 if PY2:
-    from inspect import getargspec
-else:
-    from inspect import getfullargspec as getargspec
-
-if PY2:
     from io import BytesIO as NativeIO
 else:
     from io import StringIO as NativeIO
