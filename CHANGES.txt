@@ -1,3 +1,9 @@
+unreleased
+==========
+
+- Fix a bug in the wiki2 tutorial where bcrypt is always expecting byte
+  strings. See https://github.com/Pylons/pyramid/pull/2576
+
 1.7b4 (2016-05-12)
 ==================
 
