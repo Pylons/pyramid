@@ -25,8 +25,9 @@ Pyramid is produced by the `Pylons Project <http://pylonsproject.org/>`_.
 Support and Documentation
 -------------------------
 
-See the `Pylons Project website <http://pylonsproject.org/>`_ to view
-documentation, report bugs, and obtain support.
+See `Pyramid Support and Development
+<http://docs.pylonsproject.org/projects/pyramid/en/latest/#support-and-development>`_
+for documentation, reporting bugs, and getting support.
 
 Developing and Contributing
 ---------------------------
