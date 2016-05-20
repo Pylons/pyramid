@@ -149,7 +149,7 @@ html_theme_options = dict(
     # on master branch true, else false
     in_progress='false',
     # on previous branches/major releases true, else false
-    outdated='false',
+    outdated='true',
     )
 
 # The name for this set of Sphinx documents.  If None, it defaults to
