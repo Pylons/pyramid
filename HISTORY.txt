@@ -1,3 +1,104 @@
+1.7 (2016-05-19)
+================
+
+- Fix a bug in the wiki2 tutorial where bcrypt is always expecting byte
+  strings. See https://github.com/Pylons/pyramid/pull/2576
+
+- Simplify windows detection code and remove some duplicated data.
+  See https://github.com/Pylons/pyramid/pull/2585 and
+  https://github.com/Pylons/pyramid/pull/2586
+
+1.7b4 (2016-05-12)
+==================
+
+- Fixed the exception view tween to re-raise the original exception if
+  no exception view could be found to handle the exception. This better
+  allows tweens further up the chain to handle exceptions that were
+  left unhandled. Previously they would be converted into a
+  ``PredicateMismatch`` exception if predicates failed to allow the view to
+  handle the exception.
+  See https://github.com/Pylons/pyramid/pull/2567
+
+- Exposed the ``pyramid.interfaces.IRequestFactory`` interface to mirror
+  the public ``pyramid.interfaces.IResponseFactory`` interface.
+
+1.7b3 (2016-05-10)
+==================
+
+- Fix ``request.invoke_exception_view`` to raise an ``HTTPNotFound``
+  exception if no view is matched. Previously ``None`` would be returned
+  if no views were matched and a ``PredicateMismatch`` would be raised if
+  a view "almost" matched (a view was found matching the context).
+  See https://github.com/Pylons/pyramid/pull/2564
+
+- Add defaults for py.test configuration and coverage to all three scaffolds,
+  and update documentation accordingly.
+  See https://github.com/Pylons/pyramid/pull/2550
+
+- Add ``linkcheck`` to ``Makefile`` for Sphinx. To check the documentation for
+  broken links, use the command ``make linkcheck
+  SPHINXBUILD=$VENV/bin/sphinx-build``. Also removed and fixed dozens of broken
+  external links.
+
+- Fix the internal runner for scaffold tests to ensure they work with pip
+  and py.test.
+  See https://github.com/Pylons/pyramid/pull/2565
+
+1.7b2 (2016-05-01)
+==================
+
+- Removed inclusion of pyramid_tm in development.ini for alchemy scaffold
+  See https://github.com/Pylons/pyramid/issues/2538
+
+- A default permission set via ``config.set_default_permission`` will no
+  longer be enforced on an exception view. This has been the case for a while
+  with the default exception views (``config.add_notfound_view`` and
+  ``config.add_forbidden_view``), however for any other exception view a
+  developer had to remember to set ``permission=NO_PERMISSION_REQUIRED`` or
+  be surprised when things didn't work. It is still possible to force a
+  permission check on an exception view by setting the ``permission`` argument
+  manually to ``config.add_view``. This behavior is consistent with the new
+  CSRF features added in the 1.7 series.
+  See https://github.com/Pylons/pyramid/pull/2534
+
+1.7b1 (2016-04-25)
+==================
+
+- This release announces the beta period for 1.7.
+
+- Fix an issue where some files were being included in the alchemy scafffold
+  which had been removed from the 1.7 series.
+  See https://github.com/Pylons/pyramid/issues/2525
+
+1.7a2 (2016-04-19)
+==================
+
+Features
+--------
+
+- Automatic CSRF checks are now disabled by default on exception views. They
+  can be turned back on by setting the appropriate `require_csrf` option on
+  the view.
+  See https://github.com/Pylons/pyramid/pull/2517
+
+- The automatic CSRF API was reworked to use a config directive for
+  setting the options. The ``pyramid.require_default_csrf`` setting is
+  no longer supported. Instead, a new ``config.set_default_csrf_options``
+  directive has been introduced that allows the developer to specify
+  the default value for ``require_csrf`` as well as change the CSRF token,
+  header and safe request methods. The ``pyramid.csrf_trusted_origins``
+  setting is still supported.
+  See https://github.com/Pylons/pyramid/pull/2518
+
+Bug fixes
+---------
+
+- CSRF origin checks had a bug causing the checks to always fail.
+  See https://github.com/Pylons/pyramid/pull/2512
+
+- Fix the test suite to pass on windows.
+  See https://github.com/Pylons/pyramid/pull/2520
+
 1.7a1 (2016-04-16)
 ==================
 
