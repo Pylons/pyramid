@@ -25,13 +25,11 @@ Git branches and their purpose and status at the time of this writing are
 listed below.
 
 * [master](https://github.com/Pylons/pyramid/) - The branch on which further
-development takes place. The default branch on GitHub.
+  development takes place. The default branch on GitHub.
 * [1.7-branch](https://github.com/Pylons/pyramid/tree/1.7-branch) - The branch
-classified as alpha. Actively maintained.
-* [1.6-branch](https://github.com/Pylons/pyramid/tree/1.6-branch) - The branch
-classified as "stable" or "latest". Actively maintained.
-* [1.5-branch](https://github.com/Pylons/pyramid/tree/1.5-branch) - The oldest
-actively maintained and stable branch.
+  classified as "stable" or "latest".
+* [1.6-branch](https://github.com/Pylons/pyramid/tree/1.6-branch) - The oldest
+  actively maintained and stable branch.
 
 Older branches are not actively maintained. In general, two stable branches and
 one or two development branches are actively maintained.
