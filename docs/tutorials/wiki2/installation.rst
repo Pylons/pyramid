@@ -440,7 +440,7 @@ The output to your console should be something like this:
    CREATE TABLE models (
        id INTEGER NOT NULL,
        name TEXT,
-       value TEXT,
+       value INTEGER,
        CONSTRAINT pk_models PRIMARY KEY (id)
    )
 

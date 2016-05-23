@@ -12,7 +12,7 @@ class MyModel(Base):
     __tablename__ = 'models'
     id = Column(Integer, primary_key=True)
     name = Column(Text)
-    value = Column(Text)
+    value = Column(Integer)
     # End Sphinx Include
 
 
