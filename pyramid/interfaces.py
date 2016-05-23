@@ -1234,6 +1234,17 @@ class IViewDeriverInfo(Interface):
                         'default values that were not overriden')
     predicates = Attribute('The list of predicates active on the view')
     original_view = Attribute('The original view object being wrapped')
+    view_intr = Attribute('The :term:`introspectable` for the view being '
+                          'wrapped. If this attribute is ``None`` then the '
+                          'view deriver is not being wrapped as part of an '
+                          ':term:`action` and no introspectables are created.')
+
+    def add_introspectable(intr):
+        """
+        Add an instance of :class:`pyramid.interfaces.IIntrospectable` to be
+        used when the view is registered with an application.
+
+        """
 
 class IViewDerivers(Interface):
     """ Interface for view derivers list """

@@ -885,6 +885,8 @@ class ViewsConfiguratorMixin(object):
             # __no_permission_required__ handled by _secure_view
             derived_view = self._derive_view(
                 view,
+                view_intr=view_intr,
+                introspectables=introspectables,
                 permission=permission,
                 predicates=preds,
                 attr=attr,
@@ -1046,17 +1048,6 @@ class ViewsConfiguratorMixin(object):
             tmpl_intr['type'] = renderer.type
             tmpl_intr['renderer'] = renderer
             introspectables.append(tmpl_intr)
-        if permission is not None:
-            # if a permission exists, register a permission introspectable
-            perm_intr = self.introspectable(
-                'permissions',
-                permission,
-                permission,
-                'permission'
-                )
-            perm_intr['value'] = permission
-            perm_intr.relate('views', discriminator)
-            introspectables.append(perm_intr)
         self.action(discriminator, register, introspectables=introspectables)
 
     def _check_view_options(self, **kw):
@@ -1333,7 +1324,8 @@ class ViewsConfiguratorMixin(object):
                      viewname=None, accept=None, order=MAX_ORDER,
                      phash=DEFAULT_PHASH, decorator=None,
                      mapper=None, http_cache=None, context=None,
-                     require_csrf=None, extra_options=None):
+                     require_csrf=None, view_intr=None, introspectables=None,
+                     extra_options=None):
         view = self.maybe_dotted(view)
         mapper = self.maybe_dotted(mapper)
         if isinstance(renderer, string_types):
@@ -1371,6 +1363,8 @@ class ViewsConfiguratorMixin(object):
             package=self.package,
             predicates=predicates,
             options=options,
+            view_intr=view_intr,
+            introspectables=introspectables,
         )
 
         # order and phash are only necessary for the predicated view and
@@ -1777,12 +1771,27 @@ def isexception(o):
 
 @implementer(IViewDeriverInfo)
 class ViewDeriverInfo(object):
-    def __init__(self, view, registry, package, predicates, options):
+    def __init__(self,
+                 view,
+                 registry,
+                 package,
+                 predicates,
+                 options,
+                 view_intr=None,
+                 introspectables=None,
+                 ):
         self.original_view = view
         self.registry = registry
         self.package = package
         self.predicates = predicates or []
         self.options = options or {}
+        self.view_intr = view_intr
+        if introspectables is None:
+            introspectables = []
+        self.introspectables = introspectables
+
+    def add_introspectable(self, intr):
+        self.introspectables.append(intr)
 
     @reify
     def settings(self):
