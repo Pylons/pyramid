@@ -1,3 +1,10 @@
+unreleased
+==========
+
+- Properly emit a ``DeprecationWarning`` for using
+  ``pyramid.config.Configurator.set_request_property`` instead of
+  ``pyramid.config.Configurator.add_request_method``.
+
 1.7 (2016-05-19)
 ================
 
