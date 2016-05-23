@@ -4,6 +4,10 @@ unreleased
 - Add option to build docs as PDF only via tox. See:
   https://github.com/Pylons/pyramid/issues/2575
 
+- Correct the column type used in the SQLAlchemy + URL Dispatch tutorial by
+  changing it from Integer to Text. See
+  https://github.com/Pylons/pyramid/pull/2591
+
 - Properly emit a ``DeprecationWarning`` for using
   ``pyramid.config.Configurator.set_request_property`` instead of
   ``pyramid.config.Configurator.add_request_method``.
