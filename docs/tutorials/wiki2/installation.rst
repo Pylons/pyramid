@@ -340,16 +340,14 @@ If successful, you will see output something like this:
    tutorial/models/__init__.py           22      0   100%
    tutorial/models/meta.py                5      0   100%
    tutorial/models/mymodel.py             8      0   100%
-   tutorial/routes.py                     3      3     0%   1-3
+   tutorial/routes.py                     3      2    33%   2-3
    tutorial/scripts/__init__.py           0      0   100%
-   tutorial/scripts/initializedb.py      26     26     0%   1-45
-   tutorial/tests.py                     39      0   100%
+   tutorial/scripts/initializedb.py      26     16    38%   22-25, 29-45
    tutorial/views/__init__.py             0      0   100%
    tutorial/views/default.py             12      0   100%
-   tutorial/views/notfound.py             4      4     0%   1-7
+   tutorial/views/notfound.py             4      2    50%   6-7
    ----------------------------------------------------------------
-   TOTAL                                127     39    69%
-
+   TOTAL                                 88     26    70%
    ===================== 2 passed in 0.57 seconds ======================
 
 Our package doesn't quite have 100% test coverage.
@@ -432,30 +430,30 @@ The output to your console should be something like this:
 
 .. code-block:: bash
 
-   2016-04-09 00:53:37,801 INFO  [sqlalchemy.engine.base.Engine:1192][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
-   2016-04-09 00:53:37,801 INFO  [sqlalchemy.engine.base.Engine:1193][MainThread] ()
-   2016-04-09 00:53:37,802 INFO  [sqlalchemy.engine.base.Engine:1192][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
-   2016-04-09 00:53:37,802 INFO  [sqlalchemy.engine.base.Engine:1193][MainThread] ()
-   2016-04-09 00:53:37,802 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] PRAGMA table_info("models")
-   2016-04-09 00:53:37,803 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
-   2016-04-09 00:53:37,803 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread]
+   2016-05-22 04:03:28,888 INFO  [sqlalchemy.engine.base.Engine:1192][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
+   2016-05-22 04:03:28,888 INFO  [sqlalchemy.engine.base.Engine:1193][MainThread] ()
+   2016-05-22 04:03:28,888 INFO  [sqlalchemy.engine.base.Engine:1192][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
+   2016-05-22 04:03:28,889 INFO  [sqlalchemy.engine.base.Engine:1193][MainThread] ()
+   2016-05-22 04:03:28,890 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] PRAGMA table_info("models")
+   2016-05-22 04:03:28,890 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
+   2016-05-22 04:03:28,892 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread]
    CREATE TABLE models (
-           id INTEGER NOT NULL,
-           name TEXT,
-           value INTEGER,
-           CONSTRAINT pk_models PRIMARY KEY (id)
+       id INTEGER NOT NULL,
+       name TEXT,
+       value TEXT,
+       CONSTRAINT pk_models PRIMARY KEY (id)
    )
 
 
-   2016-04-09 00:53:37,803 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
-   2016-04-09 00:53:37,804 INFO  [sqlalchemy.engine.base.Engine:686][MainThread] COMMIT
-   2016-04-09 00:53:37,805 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] CREATE UNIQUE INDEX my_index ON models (name)
-   2016-04-09 00:53:37,805 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
-   2016-04-09 00:53:37,806 INFO  [sqlalchemy.engine.base.Engine:686][MainThread] COMMIT
-   2016-04-09 00:53:37,807 INFO  [sqlalchemy.engine.base.Engine:646][MainThread] BEGIN (implicit)
-   2016-04-09 00:53:37,808 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] INSERT INTO models (name, value) VALUES (?, ?)
-   2016-04-09 00:53:37,808 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ('one', 1)
-   2016-04-09 00:53:37,809 INFO  [sqlalchemy.engine.base.Engine:686][MainThread] COMMIT
+   2016-05-22 04:03:28,892 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
+   2016-05-22 04:03:28,893 INFO  [sqlalchemy.engine.base.Engine:686][MainThread] COMMIT
+   2016-05-22 04:03:28,893 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] CREATE UNIQUE INDEX my_index ON models (name)
+   2016-05-22 04:03:28,893 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
+   2016-05-22 04:03:28,894 INFO  [sqlalchemy.engine.base.Engine:686][MainThread] COMMIT
+   2016-05-22 04:03:28,896 INFO  [sqlalchemy.engine.base.Engine:646][MainThread] BEGIN (implicit)
+   2016-05-22 04:03:28,897 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] INSERT INTO models (name, value) VALUES (?, ?)
+   2016-05-22 04:03:28,897 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ('one', 1)
+   2016-05-22 04:03:28,898 INFO  [sqlalchemy.engine.base.Engine:686][MainThread] COMMIT
 
 Success!  You should now have a ``tutorial.sqlite`` file in your current
 working directory. This is an SQLite database with a single table defined in it
