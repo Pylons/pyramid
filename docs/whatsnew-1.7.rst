@@ -32,6 +32,11 @@ Backwards Incompatibilities
   csrf token in the query string of a request. Only headers and request bodies
   are supported. See https://github.com/Pylons/pyramid/pull/2500
 
+- A global permission set via
+  :meth:`pyramid.config.Configurator.set_default_permission` will no longer
+  affect exception views. A permission must be set explicitly on the view for
+  it to be enforced. See https://github.com/Pylons/pyramid/pull/2534
+
 Feature Additions
 -----------------
 
@@ -42,14 +47,6 @@ Feature Additions
   other stages of the pipeline such as the raw response from a view or prior
   to security checks. See https://github.com/Pylons/pyramid/pull/2021
 
-- Added a new setting, ``pyramid.require_default_csrf`` which may be used
-  to turn on CSRF checks globally for every request in the application.
-  This should be considered a good default for websites built on Pyramid.
-  It is possible to opt-out of CSRF checks on a per-view basis by setting
-  ``require_csrf=False`` on those views.
-  See :ref:`auto_csrf_checking` and
-  https://github.com/Pylons/pyramid/pull/2413
-
 - Added a ``require_csrf`` view option which will enforce CSRF checks on
   requests with an unsafe method as defined by RFC2616. If the CSRF check fails
   a ``BadCSRFToken`` exception will be raised and may be caught by exception
@@ -59,6 +56,17 @@ Feature Additions
   instead of a catchable exception.  See :ref:`auto_csrf_checking`,
   https://github.com/Pylons/pyramid/pull/2413 and
   https://github.com/Pylons/pyramid/pull/2500
+
+- Added a new method,
+  :meth:`pyramid.config.Configurator.set_csrf_default_options`,
+  for configuring CSRF checks used by the ``require_csrf=True`` view option.
+  This method can be used to turn on CSRF checks globally for every view
+  in the application. This should be considered a good default for websites
+  built on Pyramid. It is possible to opt-out of CSRF checks on a per-view
+  basis by setting ``require_csrf=False`` on those views.
+  See :ref:`auto_csrf_checking` and
+  https://github.com/Pylons/pyramid/pull/2413 and
+  https://github.com/Pylons/pyramid/pull/2518
 
 - Added an additional CSRF validation that checks the origin/referrer of a
   request and makes sure it matches the current ``request.domain``. This
@@ -96,6 +104,11 @@ Feature Additions
   ``EXCVIEW`` tween where you may need more control over the request.
   See https://github.com/Pylons/pyramid/pull/2393
 
+- A global permission set via
+  :meth:`pyramid.config.Configurator.set_default_permission` will no longer
+  affect exception views. A permission must be set explicitly on the view for
+  it to be enforced. See https://github.com/Pylons/pyramid/pull/2534
+
 - Allow a leading ``=`` on the key of the request param predicate.
   For example, ``'=abc=1'`` is equivalent down to
   ``request.params['=abc'] == '1'``.
@@ -110,6 +123,11 @@ Feature Additions
   This support is thanks to the new ``global_conf`` option on
   :func:`pyramid.paster.setup_logging`.
   See https://github.com/Pylons/pyramid/pull/2399
+
+- The :attr:`pyramid.tweens.EXCVIEW` tween will now re-raise the original
+  exception if no exception view could be found to handle it. This allows
+  the exception to be handled upstream by another tween or middelware.
+  See https://github.com/Pylons/pyramid/pull/2567
 
 Deprecations
 ------------

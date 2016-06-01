@@ -699,7 +699,7 @@ We changed ``setup.py`` which means we need to rerun ``$VENV/bin/pip install -e
 
 .. code-block:: bash
 
-    $ $VENV/bin/py.test --cov=hello_world --cov-report=term-missing hello_world/tests.py
+    $ $VENV/bin/py.test --cov --cov-report=term-missing
 
 This yields the following output.
 

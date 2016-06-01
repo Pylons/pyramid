@@ -97,16 +97,16 @@ Install Pyramid into the virtual Python environment
 On UNIX
 ^^^^^^^
 
-.. code-block:: bash
+.. parsed-literal::
 
-   $ $VENV/bin/pip install pyramid
+   $ $VENV/bin/pip install "pyramid==\ |release|\ "
 
 On Windows
 ^^^^^^^^^^
 
-.. code-block:: doscon
+.. parsed-literal::
 
-   c:\> %VENV%\Scripts\pip install pyramid
+   c:\\> %VENV%\\Scripts\\pip install "pyramid==\ |release|\ "
 
 
 Install SQLite3 and its development packages
@@ -270,21 +270,23 @@ Run the tests
 -------------
 
 After you've installed the project in development mode as well as the testing
-requirements, you may run the tests for the project.
+requirements, you may run the tests for the project. The following commands
+provide options to py.test that specify the module for which its tests shall be
+run, and to run py.test in quiet mode.
 
 On UNIX
 ^^^^^^^
 
 .. code-block:: bash
 
-   $ $VENV/bin/py.test tutorial/tests.py -q
+   $ $VENV/bin/py.test -q
 
 On Windows
 ^^^^^^^^^^
 
 .. code-block:: doscon
 
-   c:\pyramidtut\tutorial> %VENV%\Scripts\py.test tutorial\tests.py -q
+   c:\pyramidtut\tutorial> %VENV%\Scripts\py.test -q
 
 For a successful test run, you should see output that ends like this:
 
@@ -310,15 +312,15 @@ On UNIX
 
 .. code-block:: bash
 
-   $ $VENV/bin/py.test --cov=tutorial --cov-report=term-missing tutorial/tests.py
+   $ $VENV/bin/py.test --cov --cov-report=term-missing
 
 On Windows
 ^^^^^^^^^^
 
 .. code-block:: doscon
 
-   c:\pyramidtut\tutorial> %VENV%\Scripts\py.test --cov=tutorial \
-       --cov-report=term-missing tutorial\tests.py
+   c:\pyramidtut\tutorial> %VENV%\Scripts\py.test --cov \
+       --cov-report=term-missing
 
 If successful, you will see output something like this:
 
@@ -338,19 +340,51 @@ If successful, you will see output something like this:
    tutorial/models/__init__.py           22      0   100%
    tutorial/models/meta.py                5      0   100%
    tutorial/models/mymodel.py             8      0   100%
-   tutorial/routes.py                     3      3     0%   1-3
+   tutorial/routes.py                     3      2    33%   2-3
    tutorial/scripts/__init__.py           0      0   100%
-   tutorial/scripts/initializedb.py      26     26     0%   1-45
-   tutorial/tests.py                     39      0   100%
+   tutorial/scripts/initializedb.py      26     16    38%   22-25, 29-45
    tutorial/views/__init__.py             0      0   100%
    tutorial/views/default.py             12      0   100%
-   tutorial/views/notfound.py             4      4     0%   1-7
+   tutorial/views/notfound.py             4      2    50%   6-7
    ----------------------------------------------------------------
-   TOTAL                                127     39    69%
-
+   TOTAL                                 88     26    70%
    ===================== 2 passed in 0.57 seconds ======================
 
 Our package doesn't quite have 100% test coverage.
+
+
+.. _test_and_coverage_scaffold_defaults_sql:
+
+Test and coverage scaffold defaults
+-----------------------------------
+
+Scaffolds include configuration defaults for ``py.test`` and test coverage.
+These configuration files are ``pytest.ini`` and ``.coveragerc``, located at
+the root of your package. Without these defaults, we would need to specify the
+path to the module on which we want to run tests and coverage.
+
+On UNIX
+^^^^^^^
+
+.. code-block:: bash
+
+   $ $VENV/bin/py.test --cov=tutorial tutorial/tests.py -q
+
+On Windows
+^^^^^^^^^^
+
+.. code-block:: doscon
+
+   c:\pyramidtut\tutorial> %VENV%\Scripts\py.test --cov=tutorial \
+       --cov-report=term-missing tutorial\tests.py -q
+
+py.test follows :ref:`conventions for Python test discovery
+<pytest:test discovery>`, and the configuration defaults from the scaffold
+tell ``py.test`` where to find the module on which we want to run tests and
+coverage.
+
+.. seealso:: See py.test's documentation for :ref:`pytest:usage` or invoke
+   ``py.test -h`` to see its full set of options.
 
 
 .. _initialize_db_wiki2:
@@ -396,30 +430,30 @@ The output to your console should be something like this:
 
 .. code-block:: bash
 
-   2016-04-09 00:53:37,801 INFO  [sqlalchemy.engine.base.Engine:1192][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
-   2016-04-09 00:53:37,801 INFO  [sqlalchemy.engine.base.Engine:1193][MainThread] ()
-   2016-04-09 00:53:37,802 INFO  [sqlalchemy.engine.base.Engine:1192][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
-   2016-04-09 00:53:37,802 INFO  [sqlalchemy.engine.base.Engine:1193][MainThread] ()
-   2016-04-09 00:53:37,802 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] PRAGMA table_info("models")
-   2016-04-09 00:53:37,803 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
-   2016-04-09 00:53:37,803 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread]
+   2016-05-22 04:03:28,888 INFO  [sqlalchemy.engine.base.Engine:1192][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
+   2016-05-22 04:03:28,888 INFO  [sqlalchemy.engine.base.Engine:1193][MainThread] ()
+   2016-05-22 04:03:28,888 INFO  [sqlalchemy.engine.base.Engine:1192][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
+   2016-05-22 04:03:28,889 INFO  [sqlalchemy.engine.base.Engine:1193][MainThread] ()
+   2016-05-22 04:03:28,890 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] PRAGMA table_info("models")
+   2016-05-22 04:03:28,890 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
+   2016-05-22 04:03:28,892 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread]
    CREATE TABLE models (
-           id INTEGER NOT NULL,
-           name TEXT,
-           value INTEGER,
-           CONSTRAINT pk_models PRIMARY KEY (id)
+       id INTEGER NOT NULL,
+       name TEXT,
+       value INTEGER,
+       CONSTRAINT pk_models PRIMARY KEY (id)
    )
 
 
-   2016-04-09 00:53:37,803 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
-   2016-04-09 00:53:37,804 INFO  [sqlalchemy.engine.base.Engine:686][MainThread] COMMIT
-   2016-04-09 00:53:37,805 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] CREATE UNIQUE INDEX my_index ON models (name)
-   2016-04-09 00:53:37,805 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
-   2016-04-09 00:53:37,806 INFO  [sqlalchemy.engine.base.Engine:686][MainThread] COMMIT
-   2016-04-09 00:53:37,807 INFO  [sqlalchemy.engine.base.Engine:646][MainThread] BEGIN (implicit)
-   2016-04-09 00:53:37,808 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] INSERT INTO models (name, value) VALUES (?, ?)
-   2016-04-09 00:53:37,808 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ('one', 1)
-   2016-04-09 00:53:37,809 INFO  [sqlalchemy.engine.base.Engine:686][MainThread] COMMIT
+   2016-05-22 04:03:28,892 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
+   2016-05-22 04:03:28,893 INFO  [sqlalchemy.engine.base.Engine:686][MainThread] COMMIT
+   2016-05-22 04:03:28,893 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] CREATE UNIQUE INDEX my_index ON models (name)
+   2016-05-22 04:03:28,893 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
+   2016-05-22 04:03:28,894 INFO  [sqlalchemy.engine.base.Engine:686][MainThread] COMMIT
+   2016-05-22 04:03:28,896 INFO  [sqlalchemy.engine.base.Engine:646][MainThread] BEGIN (implicit)
+   2016-05-22 04:03:28,897 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] INSERT INTO models (name, value) VALUES (?, ?)
+   2016-05-22 04:03:28,897 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ('one', 1)
+   2016-05-22 04:03:28,898 INFO  [sqlalchemy.engine.base.Engine:686][MainThread] COMMIT
 
 Success!  You should now have a ``tutorial.sqlite`` file in your current
 working directory. This is an SQLite database with a single table defined in it
@@ -451,7 +485,9 @@ On Windows
    Your OS firewall, if any, may pop up a dialog asking for authorization
    to allow python to accept incoming network connections.
 
-If successful, you will see something like this on your console::
+If successful, you will see something like this on your console:
+
+.. code-block:: text
 
    Starting subprocess with file monitor
    Starting server in PID 82349.
@@ -463,7 +499,7 @@ This means the server is ready to accept requests.
 Visit the application in a browser
 ----------------------------------
 
-In a browser, visit http://localhost:6543/.  You will see the generated
+In a browser, visit http://localhost:6543/. You will see the generated
 application's default page.
 
 One thing you'll notice is the "debug toolbar" icon on right hand side of the
@@ -494,19 +530,7 @@ assumptions:
    :app:`Pyramid` supports any persistent storage mechanism (e.g., object
    database or filesystem files). It also supports an additional mechanism to
    map URLs to code (:term:`traversal`). However, for the purposes of this
-   tutorial, we'll only be using URL dispatch and SQLAlchemy.
-
-.. _pyramid_jinja2:
-   http://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/
-
-.. _pyramid_tm:
-   http://docs.pylonsproject.org/projects/pyramid-tm/en/latest/
-
-.. _zope.sqlalchemy:
-   https://pypi.python.org/pypi/zope.sqlalchemy
-
-.. _transaction:
-   http://zodb.readthedocs.org/en/latest/transactions.html
+   tutorial, we'll only be using :term:`URL dispatch` and :term:`SQLAlchemy`.
 
 .. _pyramid_jinja2:
    http://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/

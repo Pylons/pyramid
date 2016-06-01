@@ -90,7 +90,7 @@ If You Don't Yet Have a Python Interpreter (Windows)
 
 If your Windows system doesn't have a Python interpreter, you'll need to
 install it by downloading a Python 3.x-series interpreter executable from
-`python.org's download section <http://python.org/download/>`_ (the files
+`python.org's download section <https://www.python.org/downloads/>`_ (the files
 labeled "Windows Installer").  Once you've downloaded it, double click on the
 executable and accept the defaults during the installation process. You may
 also need to download and install the Python for Windows extensions.
@@ -99,7 +99,7 @@ also need to download and install the Python for Windows extensions.
    Windows <python:using-on-windows>` for full details.
 
 .. seealso:: Download and install the `Python for Windows extensions
-   <http://sourceforge.net/projects/pywin32/files/pywin32/>`_. Carefully read
+   <https://sourceforge.net/projects/pywin32/files/pywin32/>`_. Carefully read
    the README.txt file at the end of the list of builds, and follow its
    directions. Make sure you get the proper 32- or 64-bit build and Python
    version.

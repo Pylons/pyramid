@@ -3093,7 +3093,7 @@ class TestStaticURLInfo(unittest.TestCase):
         inst = self._makeOne()
         cb = DummyCacheBuster('foo')
         inst.add_cache_buster(config, here, cb)
-        self.assertEqual(inst.cache_busters, [(here + '/', cb, False)])
+        self.assertEqual(inst.cache_busters, [(here + os.sep, cb, False)])
 
     def test_add_cachebuster_overwrite(self):
         config = DummyConfig()

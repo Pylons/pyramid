@@ -23,7 +23,7 @@ class User(Base):
 
     def check_password(self, pw):
         if self.password_hash is not None:
-            expected_hash = self.password_hash
+            expected_hash = self.password_hash.encode('utf8')
             actual_hash = bcrypt.hashpw(pw.encode('utf8'), expected_hash)
             return expected_hash == actual_hash
         return False

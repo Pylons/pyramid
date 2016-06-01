@@ -52,20 +52,21 @@ Running the tests
 =================
 
 We can run these tests by using ``py.test`` similarly to how we did in
-:ref:`running_tests`. Our testing dependencies have already been satisfied,
-courtesy of the scaffold, so we can jump right to running tests.
+:ref:`running_tests`. Courtesy of the scaffold, our testing dependencies have
+already been satisfied and ``py.test`` and coverage have already been
+configured, so we can jump right to running tests.
 
 On UNIX:
 
 .. code-block:: text
 
-   $ $VENV/bin/py.test tutorial/tests.py -q
+   $ $VENV/bin/py.test -q
 
 On Windows:
 
 .. code-block:: text
 
-   c:\pyramidtut\tutorial> %VENV%\Scripts\py.test tutorial/tests.py -q
+   c:\pyramidtut\tutorial> %VENV%\Scripts\py.test -q
 
 The expected result should look like the following:
 

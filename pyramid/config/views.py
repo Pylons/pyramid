@@ -13,7 +13,6 @@ from zope.interface import (
 from zope.interface.interfaces import IInterface
 
 from pyramid.interfaces import (
-    IDefaultPermission,
     IException,
     IExceptionViewClassifier,
     IMultiView,
@@ -371,24 +370,24 @@ class ViewsConfiguratorMixin(object):
 
           .. versionadded:: 1.7
 
-          CSRF checks only affect POST requests. Any other request methods
-          will pass untouched. This option is used in combination with the
-          ``pyramid.require_default_csrf`` setting to control which
-          request parameters are checked for CSRF tokens.
+          A boolean option or ``None``. Default: ``None``.
+
+          If this option is set to ``True`` then CSRF checks will be enabled
+          for requests to this view. The required token or header default to
+          ``csrf_token`` and ``X-CSRF-Token``, respectively.
+
+          CSRF checks only affect "unsafe" methods as defined by RFC2616. By
+          default, these methods are anything except
+          ``GET``, ``HEAD``, ``OPTIONS``, and ``TRACE``.
+
+          The defaults here may be overridden by
+          :meth:`pyramid.config.Configurator.set_default_csrf_options`.
 
           This feature requires a configured :term:`session factory`.
 
-          If this option is set to ``True`` then CSRF checks will be enabled
-          for POST requests to this view. The required token will be whatever
-          was specified by the ``pyramid.require_default_csrf`` setting, or
-          will fallback to ``csrf_token``.
-
-          If this option is set to a string then CSRF checks will be enabled
-          and it will be used as the required token regardless of the
-          ``pyramid.require_default_csrf`` setting.
-
           If this option is set to ``False`` then CSRF checks will be disabled
-          regardless of the ``pyramid.require_default_csrf`` setting.
+          regardless of the default ``require_csrf`` setting passed
+          to ``set_default_csrf_options``.
 
           See :ref:`auto_csrf_checking` for more information.
 
@@ -878,11 +877,6 @@ class ViewsConfiguratorMixin(object):
                         registry=self.registry
                         )
 
-            if permission is None:
-                # intent: will be None if no default permission is registered
-                # (reg'd in phase 1)
-                permission = self.registry.queryUtility(IDefaultPermission)
-
             # added by discrim_func above during conflict resolving
             preds = view_intr['predicates']
             order = view_intr['order']
@@ -1229,7 +1223,6 @@ class ViewsConfiguratorMixin(object):
         d = pyramid.viewderivers
         derivers = [
             ('secured_view', d.secured_view),
-            ('csrf_view', d.csrf_view),
             ('owrapped_view', d.owrapped_view),
             ('http_cached_view', d.http_cached_view),
             ('decorated_view', d.decorated_view),
@@ -1245,6 +1238,16 @@ class ViewsConfiguratorMixin(object):
                 over=VIEW,
             )
             last = name
+
+        # leave the csrf_view loosely coupled to the rest of the pipeline
+        # by ensuring nothing in the default pipeline depends on the order
+        # of the csrf_view
+        self.add_view_deriver(
+            d.csrf_view,
+            'csrf_view',
+            under='secured_view',
+            over='owrapped_view',
+        )
 
     def derive_view(self, view, attr=None, renderer=None):
         """
@@ -1427,7 +1430,10 @@ class ViewsConfiguratorMixin(object):
 
         .. versionadded:: 1.3
         """
-        for arg in ('name', 'permission', 'context', 'for_', 'http_cache'):
+        for arg in (
+            'name', 'permission', 'context', 'for_', 'http_cache',
+            'require_csrf',
+        ):
             if arg in view_options:
                 raise ConfigurationError(
                     '%s may not be used as an argument to add_forbidden_view'
@@ -1455,6 +1461,7 @@ class ViewsConfiguratorMixin(object):
             match_param=match_param,
             route_name=route_name,
             permission=NO_PERMISSION_REQUIRED,
+            require_csrf=False,
             attr=attr,
             renderer=renderer,
             )
@@ -1539,7 +1546,10 @@ class ViewsConfiguratorMixin(object):
         .. versionchanged:: 1.6
         .. versionadded:: 1.3
         """
-        for arg in ('name', 'permission', 'context', 'for_', 'http_cache'):
+        for arg in (
+            'name', 'permission', 'context', 'for_', 'http_cache',
+            'require_csrf',
+        ):
             if arg in view_options:
                 raise ConfigurationError(
                     '%s may not be used as an argument to add_notfound_view'
@@ -1567,6 +1577,7 @@ class ViewsConfiguratorMixin(object):
             match_param=match_param,
             route_name=route_name,
             permission=NO_PERMISSION_REQUIRED,
+            require_csrf=False,
             )
         settings.update(view_options)
         if append_slash:

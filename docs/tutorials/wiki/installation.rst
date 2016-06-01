@@ -97,16 +97,17 @@ Install Pyramid into the virtual Python environment
 On UNIX
 ^^^^^^^
 
-.. code-block:: bash
+.. parsed-literal::
 
-   $ $VENV/bin/pip install pyramid
+   $ $VENV/bin/pip install "pyramid==\ |release|\ "
 
 On Windows
 ^^^^^^^^^^
 
-.. code-block:: doscon
+.. parsed-literal::
 
-   c:\> %VENV%\Scripts\pip install pyramid
+   c:\\> %VENV%\\Scripts\\pip install "pyramid==\ |release|\ "
+
 
 Change directory to your virtual Python environment
 ---------------------------------------------------
@@ -127,6 +128,7 @@ On Windows
 .. code-block:: doscon
 
    c:\> cd pyramidtut
+
 
 .. _making_a_project:
 
@@ -208,7 +210,7 @@ packages. Success executing this command will show a line like the following:
    zc.lockfile-1.1.0 zdaemon-4.1.0 zodbpickle-0.6.0 zodburi-2.0
 
 
-.. _install-testing-requirements_zodb:
+.. _install-testing-requirements-zodb:
 
 Install testing requirements
 ----------------------------
@@ -251,21 +253,23 @@ Run the tests
 -------------
 
 After you've installed the project in development mode as well as the testing
-requirements, you may run the tests for the project.
+requirements, you may run the tests for the project. The following commands
+provide options to py.test that specify the module for which its tests shall be
+run, and to run py.test in quiet mode.
 
 On UNIX
 ^^^^^^^
 
 .. code-block:: bash
 
-   $ $VENV/bin/py.test tutorial/tests.py -q
+   $ $VENV/bin/py.test -q
 
 On Windows
 ^^^^^^^^^^
 
 .. code-block:: doscon
 
-   c:\pyramidtut\tutorial> %VENV%\Scripts\py.test tutorial\tests.py -q
+   c:\pyramidtut\tutorial> %VENV%\Scripts\py.test -q
 
 For a successful test run, you should see output that ends like this:
 
@@ -291,15 +295,15 @@ On UNIX
 
 .. code-block:: bash
 
-   $ $VENV/bin/py.test --cov=tutorial --cov-report=term-missing tutorial/tests.py
+   $ $VENV/bin/py.test --cov --cov-report=term-missing
 
 On Windows
 ^^^^^^^^^^
 
 .. code-block:: doscon
 
-   c:\pyramidtut\tutorial> %VENV%\Scripts\py.test --cov=tutorial \
-       --cov-report=term-missing tutorial\tests.py
+   c:\pyramidtut\tutorial> %VENV%\Scripts\py.test --cov \
+       --cov-report=term-missing
 
 If successful, you will see output something like this:
 
@@ -325,6 +329,40 @@ If successful, you will see output something like this:
    ===================== 1 passed in 0.31 seconds ======================
 
 Our package doesn't quite have 100% test coverage.
+
+
+.. _test_and_coverage_scaffold_defaults_zodb:
+
+Test and coverage scaffold defaults
+-----------------------------------
+
+Scaffolds include configuration defaults for ``py.test`` and test coverage.
+These configuration files are ``pytest.ini`` and ``.coveragerc``, located at
+the root of your package. Without these defaults, we would need to specify the
+path to the module on which we want to run tests and coverage.
+
+On UNIX
+^^^^^^^
+
+.. code-block:: bash
+
+   $ $VENV/bin/py.test --cov=tutorial tutorial/tests.py -q
+
+On Windows
+^^^^^^^^^^
+
+.. code-block:: doscon
+
+   c:\pyramidtut\tutorial> %VENV%\Scripts\py.test --cov=tutorial \
+       --cov-report=term-missing tutorial\tests.py -q
+
+py.test follows :ref:`conventions for Python test discovery
+<pytest:test discovery>`, and the configuration defaults from the scaffold
+tell ``py.test`` where to find the module on which we want to run tests and
+coverage.
+
+.. seealso:: See py.test's documentation for :ref:`pytest:usage` or invoke
+   ``py.test -h`` to see its full set of options.
 
 
 .. _wiki-start-the-application:
@@ -357,9 +395,9 @@ If successful, you will see something like this on your console:
 
 .. code-block:: text
 
-    Starting subprocess with file monitor
-    Starting server in PID 95736.
-    serving on http://127.0.0.1:6543
+   Starting subprocess with file monitor
+   Starting server in PID 82349.
+   serving on http://127.0.0.1:6543
 
 This means the server is ready to accept requests.
 
@@ -386,9 +424,28 @@ assumptions:
 
 - You are willing to use :term:`traversal` to map URLs to code.
 
+- You want to use pyramid_zodbconn_, pyramid_tm_, and the transaction_ packages
+  to manage connections and transactions with :term:`ZODB`.
+
+- You want to use pyramid_chameleon_ to render your templates. Different
+  templating engines can be used, but we had to choose one to make this
+  tutorial. See :ref:`available_template_system_bindings` for some options.
+
 .. note::
 
-   :app:`Pyramid` supports any persistent storage mechanism (e.g., a SQL
-   database or filesystem files).  It also supports an additional
-   mechanism to map URLs to code (:term:`URL dispatch`).  However, for the
-   purposes of this tutorial, we'll only be using traversal and ZODB.
+   :app:`Pyramid` supports any persistent storage mechanism (e.g., an SQL
+   database or filesystem files). It also supports an additional mechanism to
+   map URLs to code (:term:`URL dispatch`). However, for the purposes of this
+   tutorial, we'll only be using :term:`traversal` and :term:`ZODB`.
+
+.. _pyramid_chameleon:
+   http://docs.pylonsproject.org/projects/pyramid-chameleon/en/latest/
+
+.. _pyramid_tm:
+   http://docs.pylonsproject.org/projects/pyramid-tm/en/latest/
+
+.. _pyramid_zodbconn:
+   http://docs.pylonsproject.org/projects/pyramid-zodbconn/en/latest/
+
+.. _transaction:
+   http://zodb.readthedocs.org/en/latest/transactions.html

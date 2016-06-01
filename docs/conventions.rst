@@ -35,7 +35,7 @@ References to glossary terms are presented using the following style:
 
 URLs are presented using the following style:
 
-  `Pylons <http://pylonsproject.org>`_
+  `Pylons <http://www.pylonsproject.org>`_
 
 References to sections and chapters are presented using the following
 style:
@@ -55,7 +55,7 @@ character, e.g.:
 
   .. code-block:: bash
 
-     $ $VENV/bin/py.test tutorial/tests.py -q
+     $ $VENV/bin/py.test -q
 
 (See :term:`venv` for the meaning of ``$VENV``)
 
@@ -64,7 +64,7 @@ drive letter and/or a directory name, e.g.:
 
   .. code-block:: doscon
 
-     c:\examples> %VENV%\Scripts\py.test tutorial\tests.py -q
+     c:\examples> %VENV%\Scripts\py.test -q
 
 (See :term:`venv` for the meaning of ``%VENV%``)
 
@@ -73,7 +73,7 @@ example block commands are prefixed only with a ``>`` character, e.g.:
 
   .. code-block:: doscon
 
-     > %VENV%\Scripts\py.test tutorial\tests.py -q
+     > %VENV%\Scripts\py.test -q
 
 When a command that should be typed on one line is too long to fit on a page,
 the backslash ``\`` is used to indicate that the following printed line should

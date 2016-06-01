@@ -3,10 +3,7 @@ import platform
 import sys
 import types
 
-if platform.system() == 'Windows':  # pragma: no cover
-    WIN = True
-else:  # pragma: no cover
-    WIN = False
+WIN = platform.system() == 'Windows'
 
 try:  # pragma: no cover
     import __pypy__
@@ -214,11 +211,6 @@ if PY2:
     input_ = raw_input
 else:
     input_ = input
-
-if PY2:
-    from inspect import getargspec
-else:
-    from inspect import getfullargspec as getargspec
 
 if PY2:
     from io import BytesIO as NativeIO

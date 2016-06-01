@@ -721,7 +721,7 @@ class Test_check_csrf_origin(unittest.TestCase):
         request = testing.DummyRequest()
         request.scheme = "https"
         request.host = "example.com"
-        request.host_port = 443
+        request.host_port = "443"
         request.referrer = "https://example.com/login/"
         request.registry.settings = {}
         self.assertTrue(self._callFUT(request))
@@ -730,7 +730,7 @@ class Test_check_csrf_origin(unittest.TestCase):
         request = testing.DummyRequest()
         request.scheme = "https"
         request.host = "example.com"
-        request.host_port = 443
+        request.host_port = "443"
         request.headers = {"Origin": "https://example.com/"}
         request.referrer = "https://not-example.com/"
         request.registry.settings = {}
@@ -740,7 +740,7 @@ class Test_check_csrf_origin(unittest.TestCase):
         request = testing.DummyRequest()
         request.scheme = "https"
         request.host = "example.com"
-        request.host_port = 443
+        request.host_port = "443"
         request.referrer = "https://not-example.com/login/"
         request.registry.settings = {
             "pyramid.csrf_trusted_origins": ["not-example.com"],
@@ -751,7 +751,7 @@ class Test_check_csrf_origin(unittest.TestCase):
         request = testing.DummyRequest()
         request.scheme = "https"
         request.host = "example.com:8080"
-        request.host_port = 8080
+        request.host_port = "8080"
         request.referrer = "https://example.com:8080/login/"
         request.registry.settings = {}
         self.assertTrue(self._callFUT(request))
@@ -761,7 +761,7 @@ class Test_check_csrf_origin(unittest.TestCase):
         request = testing.DummyRequest()
         request.scheme = "https"
         request.host = "example.com"
-        request.host_port = 443
+        request.host_port = "443"
         request.referrer = "https://not-example.com/login/"
         request.registry.settings = {}
         self.assertRaises(BadCSRFOrigin, self._callFUT, request)
@@ -780,7 +780,7 @@ class Test_check_csrf_origin(unittest.TestCase):
         request = testing.DummyRequest()
         request.scheme = "https"
         request.host = "example.com"
-        request.host_port = 443
+        request.host_port = "443"
         request.referrer = "http://example.com/evil/"
         request.registry.settings = {}
         self.assertRaises(BadCSRFOrigin, self._callFUT, request)
@@ -791,7 +791,7 @@ class Test_check_csrf_origin(unittest.TestCase):
         request = testing.DummyRequest()
         request.scheme = "https"
         request.host = "example.com:8080"
-        request.host_port = 8080
+        request.host_port = "8080"
         request.referrer = "https://example.com/login/"
         request.registry.settings = {}
         self.assertRaises(BadCSRFOrigin, self._callFUT, request)

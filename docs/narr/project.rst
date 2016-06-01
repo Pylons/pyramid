@@ -209,19 +209,19 @@ On UNIX:
 
 .. code-block:: bash
 
-   $ $VENV/bin/py.test myproject/tests.py -q
+   $ $VENV/bin/py.test -q
 
 On Windows:
 
 .. code-block:: doscon
 
-   > %VENV%\Scripts\py.test myproject\tests.py -q
+   > %VENV%\Scripts\py.test -q
 
 Here's sample output from a test run on UNIX:
 
 .. code-block:: bash
 
-   $ $VENV/bin/py.test myproject/tests.py -q
+   $ $VENV/bin/py.test -q
    ..
    2 passed in 0.47 seconds
 
@@ -234,6 +234,26 @@ only two sample tests exist.
     The ``-q`` option is passed to the ``py.test`` command to limit the output
     to a stream of dots. If you don't pass ``-q``, you'll see verbose test
     result output (which normally isn't very useful).
+
+Alternatively, if you'd like to see test coverage, pass the ``--cov`` option
+to ``py.test``:
+
+.. code-block:: bash
+
+   $ $VENV/bin/py.test --cov -q
+
+Scaffolds include configuration defaults for ``py.test`` and test coverage.
+These configuration files are ``pytest.ini`` and ``.coveragerc``, located at
+the root of your package. Without these defaults, we would need to specify the
+path to the module on which we want to run tests and coverage.
+
+.. code-block:: bash
+
+   $ $VENV/bin/py.test --cov=myproject myproject/tests.py -q
+
+.. seealso:: See py.test's documentation for :ref:`pytest:usage` or invoke
+   ``py.test -h`` to see its full set of options.
+
 
 .. index::
    single: running an application
@@ -584,7 +604,7 @@ only (``127.0.0.1``).
 The sections after ``# logging configuration`` represent Python's standard
 library :mod:`logging` module configuration for your application.  These
 sections are passed to the `logging module's config file configuration engine
-<http://docs.python.org/howto/logging.html#configuring-logging>`_ when the
+<https://docs.python.org/2/howto/logging.html#configuring-logging>`_ when the
 ``pserve`` or ``pshell`` commands are executed.  The default configuration
 sends application logging output to the standard error output of your terminal.
 For more information about logging configuration, see :ref:`logging_chapter`.
@@ -628,8 +648,8 @@ setup.py sdist``.  Due to the information contained in the default
 ``MANIFEST.in``, an sdist of your Pyramid project will include ``.txt`` files,
 ``.ini`` files, ``.rst`` files, graphics files, and template files, as well as
 ``.py`` files.  See
-http://docs.python.org/distutils/sourcedist.html#the-manifest-in-template for
-more information about the syntax and usage of ``MANIFEST.in``.
+https://docs.python.org/2/distutils/sourcedist.html#the-manifest-in-template
+for more information about the syntax and usage of ``MANIFEST.in``.
 
 Without the presence of a ``MANIFEST.in`` file or without checking your source
 code into a version control repository, ``setup.py sdist`` places only *Python
@@ -647,8 +667,8 @@ files with extensions other than the files named in the project's
 ``MANIFEST.in`` and you don't make use of a setuptools-compatible version
 control system, you'll need to edit the ``MANIFEST.in`` file and include the
 statements necessary to include your new files.  See
-http://docs.python.org/distutils/sourcedist.html#principle for more information
-about how to do this.
+https://docs.python.org/2/distutils/sourcedist.html#principle for more
+information about how to do this.
 
 You can also delete ``MANIFEST.in`` from your project and rely on a setuptools
 feature which simply causes all files checked into a version control system to
@@ -697,21 +717,21 @@ Your application's name can be any string; it is specified in the ``name``
 field.  The version number is specified in the ``version`` value.  A short
 description is provided in the ``description`` field.  The ``long_description``
 is conventionally the content of the ``README`` and ``CHANGES`` files appended
-together. The ``classifiers`` field is a list of `Trove
-<http://pypi.python.org/pypi?%3Aaction=list_classifiers>`_ classifiers
-describing your application.  ``author`` and ``author_email`` are text fields
-which probably don't need any description.  ``url`` is a field that should
-point at your application project's URL (if any). ``packages=find_packages()``
-causes all packages within the project to be found when packaging the
-application.  ``include_package_data`` will include non-Python files when the
-application is packaged if those files are checked into version control. 
-``zip_safe=False`` indicates that this package is not safe to use as a zipped
-egg; instead it will always unpack as a directory, which is more convenient.
-``install_requires`` indicate that this package depends on the ``pyramid``
-package. ``extras_require`` is a Python dictionary that defines what is
-required to be installed for running tests. We examined ``entry_points`` in our
-discussion of the ``development.ini`` file; this file defines the ``main``
-entry point that represents our project's application.
+together. The ``classifiers`` field is a list of `Trove classifiers
+<https://pypi.python.org/pypi?%3Aaction=list_classifiers>`_ describing your
+application.  ``author`` and ``author_email`` are text fields which probably
+don't need any description. ``url`` is a field that should point at your
+application project's URL (if any). ``packages=find_packages()`` causes all
+packages within the project to be found when packaging the application.
+``include_package_data`` will include non-Python files when the application is
+packaged if those files are checked into version control. ``zip_safe=False``
+indicates that this package is not safe to use as a zipped egg; instead it will
+always unpack as a directory, which is more convenient. ``install_requires``
+indicates that this package depends on the ``pyramid`` package.
+``extras_require`` is a Python dictionary that defines what is required to be
+installed for running tests. We examined ``entry_points`` in our discussion of
+the ``development.ini`` file; this file defines the ``main`` entry point that
+represents our project's application.
 
 Usually you only need to think about the contents of the ``setup.py`` file when
 distributing your application to other people, when adding Python package
@@ -909,10 +929,10 @@ The ``tests.py`` module includes unit tests for your application.
    :linenos:
 
 This sample ``tests.py`` file has one unit test and one functional test defined
-within it. These tests are executed when you run ``py.test myproject/tests.py
--q``. You may add more tests here as you build your application. You are not
-required to write tests to use :app:`Pyramid`. This file is simply provided for
-convenience and example.
+within it. These tests are executed when you run ``py.test -q``. You may add
+more tests here as you build your application. You are not required to write
+tests to use :app:`Pyramid`. This file is simply provided for convenience and
+example.
 
 See :ref:`testing_chapter` for more information about writing :app:`Pyramid`
 unit tests.

@@ -191,49 +191,49 @@ Success will look something like this:
 
 .. code-block:: bash
 
-   2016-04-09 02:49:51,711 INFO  [sqlalchemy.engine.base.Engine:1192][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
-   2016-04-09 02:49:51,711 INFO  [sqlalchemy.engine.base.Engine:1193][MainThread] ()
-   2016-04-09 02:49:51,712 INFO  [sqlalchemy.engine.base.Engine:1192][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
-   2016-04-09 02:49:51,712 INFO  [sqlalchemy.engine.base.Engine:1193][MainThread] ()
-   2016-04-09 02:49:51,713 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] PRAGMA table_info("pages")
-   2016-04-09 02:49:51,714 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
-   2016-04-09 02:49:51,714 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] PRAGMA table_info("users")
-   2016-04-09 02:49:51,714 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
-   2016-04-09 02:49:51,715 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread]
+   2016-05-22 04:12:09,226 INFO  [sqlalchemy.engine.base.Engine:1192][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
+   2016-05-22 04:12:09,226 INFO  [sqlalchemy.engine.base.Engine:1193][MainThread] ()
+   2016-05-22 04:12:09,226 INFO  [sqlalchemy.engine.base.Engine:1192][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
+   2016-05-22 04:12:09,227 INFO  [sqlalchemy.engine.base.Engine:1193][MainThread] ()
+   2016-05-22 04:12:09,227 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] PRAGMA table_info("users")
+   2016-05-22 04:12:09,227 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
+   2016-05-22 04:12:09,228 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] PRAGMA table_info("pages")
+   2016-05-22 04:12:09,228 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
+   2016-05-22 04:12:09,229 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread]
    CREATE TABLE users (
-           id INTEGER NOT NULL,
-           name TEXT NOT NULL,
-           role TEXT NOT NULL,
-           password_hash TEXT,
-           CONSTRAINT pk_users PRIMARY KEY (id),
-           CONSTRAINT uq_users_name UNIQUE (name)
+       id INTEGER NOT NULL,
+       name TEXT NOT NULL,
+       role TEXT NOT NULL,
+       password_hash TEXT,
+       CONSTRAINT pk_users PRIMARY KEY (id),
+       CONSTRAINT uq_users_name UNIQUE (name)
    )
 
 
-   2016-04-09 02:49:51,715 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
-   2016-04-09 02:49:51,716 INFO  [sqlalchemy.engine.base.Engine:686][MainThread] COMMIT
-   2016-04-09 02:49:51,716 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread]
+   2016-05-22 04:12:09,229 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
+   2016-05-22 04:12:09,230 INFO  [sqlalchemy.engine.base.Engine:686][MainThread] COMMIT
+   2016-05-22 04:12:09,230 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread]
    CREATE TABLE pages (
-           id INTEGER NOT NULL,
-           name TEXT NOT NULL,
-           data INTEGER NOT NULL,
-           creator_id INTEGER NOT NULL,
-           CONSTRAINT pk_pages PRIMARY KEY (id),
-           CONSTRAINT uq_pages_name UNIQUE (name),
-           CONSTRAINT fk_pages_creator_id_users FOREIGN KEY(creator_id) REFERENCES users (id)
+       id INTEGER NOT NULL,
+       name TEXT NOT NULL,
+       data TEXT NOT NULL,
+       creator_id INTEGER NOT NULL,
+       CONSTRAINT pk_pages PRIMARY KEY (id),
+       CONSTRAINT uq_pages_name UNIQUE (name),
+       CONSTRAINT fk_pages_creator_id_users FOREIGN KEY(creator_id) REFERENCES users (id)
    )
 
 
-   2016-04-09 02:49:51,716 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
-   2016-04-09 02:49:51,717 INFO  [sqlalchemy.engine.base.Engine:686][MainThread] COMMIT
-   2016-04-09 02:49:52,256 INFO  [sqlalchemy.engine.base.Engine:646][MainThread] BEGIN (implicit)
-   2016-04-09 02:49:52,257 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] INSERT INTO users (name, role, password_hash) VALUES (?, ?, ?)
-   2016-04-09 02:49:52,257 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ('editor', 'editor', b'$2b$12$APUPJvI/kKxrbQPyQehkR.ggoOM6fFYCZ07SFCkWGltl1wJsKB98y')
-   2016-04-09 02:49:52,258 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] INSERT INTO users (name, role, password_hash) VALUES (?, ?, ?)
-   2016-04-09 02:49:52,258 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ('basic', 'basic', b'$2b$12$GeFnypuQpZyxZLH.sN0akOrPdZMcQjqVTCim67u6f89lOFH/0ddc6')
-   2016-04-09 02:49:52,259 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] INSERT INTO pages (name, data, creator_id) VALUES (?, ?, ?)
-   2016-04-09 02:49:52,259 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ('FrontPage', 'This is the front page', 1)
-   2016-04-09 02:49:52,259 INFO  [sqlalchemy.engine.base.Engine:686][MainThread] COMMIT
+   2016-05-22 04:12:09,231 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ()
+   2016-05-22 04:12:09,231 INFO  [sqlalchemy.engine.base.Engine:686][MainThread] COMMIT
+   2016-05-22 04:12:09,782 INFO  [sqlalchemy.engine.base.Engine:646][MainThread] BEGIN (implicit)
+   2016-05-22 04:12:09,783 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] INSERT INTO users (name, role, password_hash) VALUES (?, ?, ?)
+   2016-05-22 04:12:09,784 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ('editor', 'editor', b'$2b$12$K/WLVKRl5fMAb6UM58ueTetXlE3rlc5cRK5zFPimK598scXBR/xWC')
+   2016-05-22 04:12:09,784 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] INSERT INTO users (name, role, password_hash) VALUES (?, ?, ?)
+   2016-05-22 04:12:09,784 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ('basic', 'basic', b'$2b$12$JfwLyCJGv3t.RTSmIrh3B.FKXRT9FevkAqafWdK5oq7Hl4mgAQORe')
+   2016-05-22 04:12:09,785 INFO  [sqlalchemy.engine.base.Engine:1097][MainThread] INSERT INTO pages (name, data, creator_id) VALUES (?, ?, ?)
+   2016-05-22 04:12:09,785 INFO  [sqlalchemy.engine.base.Engine:1100][MainThread] ('FrontPage', 'This is the front page', 1)
+   2016-05-22 04:12:09,786 INFO  [sqlalchemy.engine.base.Engine:686][MainThread] COMMIT
 
 
 View the application in a browser

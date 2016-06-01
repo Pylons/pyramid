@@ -15,6 +15,8 @@ from pyramid.response import Response
 from pyramid.interfaces import (
     IAuthenticationPolicy,
     IAuthorizationPolicy,
+    IDefaultCSRFOptions,
+    IDefaultPermission,
     IDebugLogger,
     IResponse,
     IViewMapper,
@@ -22,7 +24,6 @@ from pyramid.interfaces import (
     )
 
 from pyramid.compat import (
-    string_types,
     is_bound_method,
     is_unbound_method,
     )
@@ -38,10 +39,6 @@ from pyramid.exceptions import (
     PredicateMismatch,
     )
 from pyramid.httpexceptions import HTTPForbidden
-from pyramid.settings import (
-    falsey,
-    truthy,
-)
 from pyramid.util import object_description
 from pyramid.view import render_view_to_response
 from pyramid import renderers
@@ -276,7 +273,9 @@ def secured_view(view, info):
 secured_view.options = ('permission',)
 
 def _secured_view(view, info):
-    permission = info.options.get('permission')
+    permission = explicit_val = info.options.get('permission')
+    if permission is None:
+        permission = info.registry.queryUtility(IDefaultPermission)
     if permission == NO_PERMISSION_REQUIRED:
         # allow views registered within configurations that have a
         # default permission to explicitly override the default
@@ -292,6 +291,12 @@ def _secured_view(view, info):
             principals = authn_policy.effective_principals(request)
             return authz_policy.permits(context, principals, permission)
         def _secured_view(context, request):
+            if (
+                getattr(request, 'exception', None) is not None and
+                explicit_val is None
+            ):
+                return view(context, request)
+
             result = _permitted(context, request)
             if result:
                 return view(context, request)
@@ -310,12 +315,20 @@ def _secured_view(view, info):
 def _authdebug_view(view, info):
     wrapped_view = view
     settings = info.settings
-    permission = info.options.get('permission')
+    permission = explicit_val = info.options.get('permission')
+    if permission is None:
+        permission = info.registry.queryUtility(IDefaultPermission)
     authn_policy = info.registry.queryUtility(IAuthenticationPolicy)
     authz_policy = info.registry.queryUtility(IAuthorizationPolicy)
     logger = info.registry.queryUtility(IDebugLogger)
     if settings and settings.get('debug_authorization', False):
         def _authdebug_view(context, request):
+            if (
+                getattr(request, 'exception', None) is not None and
+                explicit_val is None
+            ):
+                return view(context, request)
+
             view_name = getattr(request, 'view_name', None)
 
             if authn_policy and authz_policy:
@@ -464,40 +477,38 @@ def decorated_view(view, info):
 
 decorated_view.options = ('decorator',)
 
-def _parse_csrf_setting(val, error_source):
-    if val:
-        if isinstance(val, string_types):
-            if val.lower() in truthy:
-                val = True
-            elif val.lower() in falsey:
-                val = False
-        elif not isinstance(val, bool):
-            raise ConfigurationError(
-                '{0} must be a string or boolean value'
-                .format(error_source))
-    return val
-
-SAFE_REQUEST_METHODS = frozenset(["GET", "HEAD", "OPTIONS", "TRACE"])
-
 def csrf_view(view, info):
-    default_val = _parse_csrf_setting(
-        info.settings.get('pyramid.require_default_csrf'),
-        'Config setting "pyramid.require_csrf_default"')
-    val = _parse_csrf_setting(
-        info.options.get('require_csrf'),
-        'View option "require_csrf"')
-    if (val is True and default_val) or val is None:
-        val = default_val
-    if val is True:
-        val = 'csrf_token'
+    explicit_val = info.options.get('require_csrf')
+    defaults = info.registry.queryUtility(IDefaultCSRFOptions)
+    if defaults is None:
+        default_val = False
+        token = 'csrf_token'
+        header = 'X-CSRF-Token'
+        safe_methods = frozenset(["GET", "HEAD", "OPTIONS", "TRACE"])
+    else:
+        default_val = defaults.require_csrf
+        token = defaults.token
+        header = defaults.header
+        safe_methods = defaults.safe_methods
+    enabled = (
+        explicit_val is True or
+        (explicit_val is not False and default_val)
+    )
+    # disable if both header and token are disabled
+    enabled = enabled and (token or header)
     wrapped_view = view
-    if val:
+    if enabled:
         def csrf_view(context, request):
-            # Assume that anything not defined as 'safe' by RFC2616 needs
-            # protection
-            if request.method not in SAFE_REQUEST_METHODS:
+            if (
+                request.method not in safe_methods and
+                (
+                    # skip exception views unless value is explicitly defined
+                    getattr(request, 'exception', None) is None or
+                    explicit_val is not None
+                )
+            ):
                 check_csrf_origin(request, raises=True)
-                check_csrf_token(request, val, raises=True)
+                check_csrf_token(request, token, header, raises=True)
             return view(context, request)
         wrapped_view = csrf_view
     return wrapped_view

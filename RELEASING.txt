@@ -6,11 +6,18 @@ Releasing Pyramid
   - Alpha, beta, dev and similar statuses do not qualify whether a release is
     major or minor. The term "pre-release" means alpha, beta, or dev.
 
+  - A release is final when it is no longer pre-release.
+
   - A *major* release is where the first number either before or after the
     first dot increases. Examples: 1.6 to 1.7a1, or 1.8 to 2.0.
 
   - A *minor* or *bug fix* release is where the number after the second dot
     increases. Example: 1.6 to 1.6.1.
+
+Prepare new release branch
+--------------------------
+
+- Create a new release branch, incrementing the version number.
 
 - Do any necessary branch merges (e.g., master to branch, branch to master).
 
@@ -26,13 +33,15 @@ Releasing Pyramid
 
 - Run tests on Windows if feasible.
 
-- Make sure all scaffold tests pass (Py 2.7, 3.3, 3.4, 3.5, pypy, and pypy3 on
-  UNIX; this doesn't work on Windows):
+- Make sure all scaffold tests pass (Py 2.7, 3.3, 3.4, 3.5, and pypy on UNIX;
+  this doesn't work on Windows):
 
   $ ./scaffoldtests.sh
 
 - Ensure all features of the release are documented (audit CHANGES.txt or
   communicate with contributors).
+
+- Change CHANGES.txt heading to reflect the new version number.
 
 - Copy relevant changes (delta bug fixes) from CHANGES.txt to
   docs/whatsnew-X.X (if it's a major release).  Minor releases should
@@ -52,10 +61,7 @@ Releasing Pyramid
   branch, and previously released branch. Also in the previously released
   branch only, uncomment the sections to enable pylons_sphinx_latesturl.
 
-- Change setup.py version to the new version number on both master and the new
-  branch.
-
-- Change CHANGES.txt heading to reflect the new version number.
+- Change setup.py version to the release version number.
 
 - Make sure PyPI long description renders (requires ``collective.dist``
   installed into your Python)::
@@ -70,6 +76,38 @@ Releasing Pyramid
   $ python setup.py sdist bdist_wheel
   $ twine upload dist/pyramid-X.X-*
 
+- Configure RTD to publish the new release version of the docs.
+
+Prepare master for further development (major releases only)
+------------------------------------------------------------
+
+- Checkout master.
+
+- In CHANGES.txt, preserve headings but clear out content. Add heading
+  "unreleased" for the version number.
+
+- From the release branch, forward port the changes in CHANGES.txt to
+  HISTORY.txt.
+
+- In contributing.md, forward port branch descriptions from release branch.
+
+- In docs/conf.py, add a commented line under
+  pylons_sphinx_latesturl_pagename_overrides for the release.
+
+- Change setup.py version to the next version number.
+
+Update previous version (final releases only)
+---------------------------------------------
+
+- In docs/conf.py, update values under html_theme_options for in_progress and
+  outdated. Uncomment the sections to enable pylons_sphinx_latesturl.
+
+- Configure RTD to point the "latest" alias to the new release version of the
+  docs.
+
+Marketing and communications
+----------------------------
+
 - Edit Pylons/pylonshq/templates/home/home.mako.
 
 - Edit Pylons/pylonshq/templates/home/inside.rst for major releases only.
@@ -82,15 +120,28 @@ Releasing Pyramid
 - Edit `http://wiki.python.org/moin/WebFrameworks
   <http://wiki.python.org/moin/WebFrameworks>`_.
 
-- Publish new version of docs.
+- Announce to Twitter.
+
+```
+Pyramid 1.x released.
+
+PyPI
+https://pypi.python.org/pypi/pyramid/1.x
+
+=== One time only for new version, first pre-release ===
+What's New
+http://docs.pylonsproject.org/projects/pyramid/en/1.X-branch/whatsnew-1.X.html
+=== For all subsequent pre-releases ===
+Changes
+http://docs.pylonsproject.org/projects/pyramid/en/1.X-branch/changes.html#version-yyyy-mm-dd
+
+Issues
+https://github.com/Pylons/pyramid/issues
+```
 
 - Announce to maillist.
 
-- Announce to Twitter.
-
-Announcement template
-----------------------
-
+```
 Pyramid 1.X.X has been released.
 
 Here are the changes:
@@ -98,19 +149,20 @@ Here are the changes:
 <<changes>>
 
 A "What's New In Pyramid 1.X" document exists at
-http://docs.pylonsproject.org/projects/pyramid/1.X/whatsnew-1.X.html .
+http://docs.pylonsproject.org/projects/pyramid/1.X-branch/whatsnew-1.X.html .
 
 You will be able to see the 1.X release documentation (across all
 alphas and betas, as well as when it eventually gets to final release)
-at http://docs.pylonsproject.org/projects/pyramid/1.X/ .
+at http://docs.pylonsproject.org/projects/pyramid/1.X-branch/ .
 
 You can install it via PyPI:
 
-  easy_install Pyramid==1.X
+  pip install Pyramid==1.X
 
 Enjoy, and please report any issues you find to the issue tracker at
 https://github.com/Pylons/pyramid/issues
 
 Thanks!
 
-- C
+- Pyramid core developers
+```

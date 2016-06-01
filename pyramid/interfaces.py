@@ -916,6 +916,16 @@ class IDefaultPermission(Interface):
     for all view configurations which do not explicitly declare their
     own."""
 
+class IDefaultCSRFOptions(Interface):
+    """ An object representing the default CSRF settings to be used for
+    all view configurations which do not explicitly declare their own."""
+    require_csrf = Attribute(
+        'Boolean attribute. If ``True``, then CSRF checks will be enabled by '
+        'default for the view unless overridden.')
+    token = Attribute('The key to be matched in the body of the request.')
+    header = Attribute('The header to be matched with the CSRF token.')
+    safe_methods = Attribute('A set of safe methods that skip CSRF checks.')
+
 class ISessionFactory(Interface):
     """ An interface representing a factory which accepts a request object and
     returns an ISession object """
@@ -1214,9 +1224,9 @@ class IViewDeriver(Interface):
 class IViewDeriverInfo(Interface):
     """ An object implementing this interface is passed to every
     :term:`view deriver` during configuration."""
-    registry = Attribute('The "current" application registry when the '
+    registry = Attribute('The "current" application registry where the '
                          'view was created')
-    package = Attribute('The "current package" when the view '
+    package = Attribute('The "current package" where the view '
                         'configuration statement was found')
     settings = Attribute('The deployment settings dictionary related '
                          'to the current application')

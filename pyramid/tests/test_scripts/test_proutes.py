@@ -1,3 +1,4 @@
+import os
 import unittest
 from pyramid.tests.test_scripts import dummy
 
@@ -396,7 +397,8 @@ class TestPRoutesCommand(unittest.TestCase):
         from pyramid.renderers import null_renderer as nr
         config = self._makeConfig(autocommit=True)
         config.add_static_view('static', 'static', cache_max_age=3600)
-        config.add_static_view(name='static2', path='/var/www/static')
+        path2 = os.path.normpath('/var/www/static')
+        config.add_static_view(name='static2', path=path2)
         config.add_static_view(
             name='pyramid_scaffold',
             path='pyramid:scaffolds/starter/+package+/static'
@@ -413,7 +415,7 @@ class TestPRoutesCommand(unittest.TestCase):
         expected = [
             ['__static/', '/static/*subpath',
              'pyramid.tests.test_scripts:static/', '*'],
-            ['__static2/', '/static2/*subpath', '/var/www/static/', '*'],
+            ['__static2/', '/static2/*subpath', path2 + os.sep, '*'],
             ['__pyramid_scaffold/', '/pyramid_scaffold/*subpath',
              'pyramid:scaffolds/starter/+package+/static/',  '*'],
         ]

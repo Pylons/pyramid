@@ -221,7 +221,7 @@ send email, let you use the Jinja2 templating system, let you use XML-RPC or
 JSON-RPC, let you integrate with jQuery Mobile, etc.
 
 Examples:
-http://docs.pylonsproject.org/en/latest/docs/pyramid.html#pyramid-add-on-documentation
+https://trypyramid.com/resources-extending-pyramid.html
 
 Class-based and function-based views
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -881,7 +881,7 @@ new-user-friendly.
 
 Example: Visit irc\://freenode.net#pyramid (the ``#pyramid`` channel on
 irc.freenode.net in an IRC client) or the pylons-discuss maillist at
-http://groups.google.com/group/pylons-discuss/.
+https://groups.google.com/forum/#!forum/pylons-discuss.
 
 Documentation
 ~~~~~~~~~~~~~
@@ -903,7 +903,7 @@ What Is The Pylons Project?
 
 :app:`Pyramid` is a member of the collection of software published under the
 Pylons Project.  Pylons software is written by a loose-knit community of
-contributors.  The `Pylons Project website <http://pylonsproject.org>`_
+contributors.  The `Pylons Project website <http://www.pylonsproject.org>`_
 includes details about how :app:`Pyramid` relates to the Pylons Project.
 
 .. index::
@@ -967,9 +967,9 @@ nor discouraging the decision.
 
 Other Python web frameworks advertise themselves as members of a class of web
 frameworks named `model-view-controller
-<http://en.wikipedia.org/wiki/Model–view–controller>`_ frameworks. Insofar as
-this term has been claimed to represent a class of web frameworks,
-:app:`Pyramid` also generally fits into this class.
+<https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller>`_
+frameworks. Insofar as this term has been claimed to represent a class of web
+frameworks, :app:`Pyramid` also generally fits into this class.
 
 .. sidebar:: You Say :app:`Pyramid` is MVC, but Where's the Controller?
 
