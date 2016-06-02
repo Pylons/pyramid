@@ -213,6 +213,7 @@ class ViewsConfiguratorMixin(object):
         match_param=None,
         check_csrf=None,
         require_csrf=None,
+        exception_only=False,
         **view_options):
         """ Add a :term:`view configuration` to the current
         configuration state.  Arguments to ``add_view`` are broken
@@ -701,6 +702,14 @@ class ViewsConfiguratorMixin(object):
              Support setting view deriver options. Previously, only custom
              view predicate values could be supplied.
 
+        exception_only
+
+          .. versionadded:: 1.8
+
+          A boolean indicating whether the view is registered only as an
+          exception view. When this argument is true, the view context must
+          be an exception.
+
         """
         if custom_predicates:
             warnings.warn(
@@ -758,6 +767,11 @@ class ViewsConfiguratorMixin(object):
             if not IInterface.providedBy(request_type):
                 raise ConfigurationError(
                     'request_type must be an interface, not %s' % request_type)
+
+        if exception_only and not isexception(context):
+            raise ConfigurationError(
+                'context must be an exception when exception_only is true'
+                )
 
         if context is None:
             context = for_
@@ -942,10 +956,13 @@ class ViewsConfiguratorMixin(object):
                     view_iface = ISecuredView
                 else:
                     view_iface = IView
-                self.registry.registerAdapter(
-                    derived_view,
-                    (IViewClassifier, request_iface, context), view_iface, name
-                    )
+                if not exception_only:
+                    self.registry.registerAdapter(
+                        derived_view,
+                        (IViewClassifier, request_iface, context),
+                        view_iface,
+                        name
+                        )
                 if isexc:
                     self.registry.registerAdapter(
                         derived_view,

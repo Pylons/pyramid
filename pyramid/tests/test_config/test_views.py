@@ -1815,6 +1815,38 @@ class TestViewsConfigurationMixin(unittest.TestCase):
 
         self.assertRaises(ConfigurationError, configure_view)
 
+    def test_add_view_exception_only_no_regular_view(self):
+        from zope.interface import implementedBy
+        from pyramid.renderers import null_renderer
+        view1 = lambda *arg: 'OK'
+        config = self._makeOne(autocommit=True)
+        config.add_view(view=view1, context=Exception, renderer=null_renderer,
+                        exception_only=True)
+        view = self._getViewCallable(config, ctx_iface=implementedBy(Exception))
+        self.assertTrue(view is None)
+
+    def test_add_view_exception_only(self):
+        from zope.interface import implementedBy
+        from pyramid.renderers import null_renderer
+        view1 = lambda *arg: 'OK'
+        config = self._makeOne(autocommit=True)
+        config.add_view(view=view1, context=Exception, renderer=null_renderer,
+                        exception_only=True)
+        view = self._getViewCallable(
+            config, ctx_iface=implementedBy(Exception), exception_view=True
+            )
+        self.assertEqual(view1, view)
+
+    def test_add_view_exception_only_misconfiguration(self):
+        view = lambda *arg: 'OK'
+        config = self._makeOne(autocommit=True)
+        class NotAnException(object):
+            pass
+        self.assertRaises(
+            ConfigurationError,
+            config.add_view, view, context=NotAnException, exception_only=True
+            )
+
     def test_derive_view_function(self):
         from pyramid.renderers import null_renderer
         def view(request):
