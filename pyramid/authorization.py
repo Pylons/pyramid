@@ -75,12 +75,12 @@ class ACLAuthorizationPolicy(object):
         acl = '<No ACL found on any object in resource lineage>'
 
         for location in lineage(context):
-            try:
-                acl = location.__acl__
-            except AttributeError:
+            if not hasattr(location, '__acl__'):
                 continue
+            
+            acl = location.__acl__
 
-            if acl and callable(acl):
+            if callable(acl):
                 acl = acl()
 
             for ace in acl:
@@ -114,15 +114,15 @@ class ACLAuthorizationPolicy(object):
 
         for location in reversed(list(lineage(context))):
             # NB: we're walking *up* the object graph from the root
-            try:
-                acl = location.__acl__
-            except AttributeError:
+            if not hasattr(location, '__acl__'):
                 continue
+            
+            acl = location.__acl__
 
             allowed_here = set()
             denied_here = set()
 
-            if acl and callable(acl):
+            if callable(acl):
                 acl = acl()
 
             for ace_action, ace_principal, ace_permissions in acl:
