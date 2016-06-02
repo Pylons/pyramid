@@ -1847,6 +1847,90 @@ class TestViewsConfigurationMixin(unittest.TestCase):
             config.add_view, view, context=NotAnException, exception_only=True
             )
 
+    def test_add_exception_view(self):
+        from zope.interface import implementedBy
+        from pyramid.interfaces import IRequest
+        from pyramid.renderers import null_renderer
+        view1 = lambda *arg: 'OK'
+        config = self._makeOne(autocommit=True)
+        config.add_exception_view(view=view1, context=Exception, renderer=null_renderer)
+        wrapper = self._getViewCallable(
+            config, ctx_iface=implementedBy(Exception), exception_view=True,
+            )
+        context = Exception()
+        request = self._makeRequest(config)
+        self.assertEqual(wrapper(context, request), 'OK')
+
+    def test_add_exception_view_disallows_name(self):
+        config = self._makeOne(autocommit=True)
+        self.assertRaises(ConfigurationError,
+                          config.add_exception_view,
+                          context=Exception(),
+                          name='foo')
+
+    def test_add_exception_view_disallows_permission(self):
+        config = self._makeOne(autocommit=True)
+        self.assertRaises(ConfigurationError,
+                          config.add_exception_view,
+                          context=Exception(),
+                          permission='foo')
+
+    def test_add_exception_view_disallows_for_(self):
+        config = self._makeOne(autocommit=True)
+        self.assertRaises(ConfigurationError,
+                          config.add_exception_view,
+                          context=Exception(),
+                          for_='foo')
+
+    def test_add_exception_view_disallows_http_cache(self):
+        config = self._makeOne(autocommit=True)
+        self.assertRaises(ConfigurationError,
+                          config.add_exception_view,
+                          context=Exception(),
+                          http_cache='foo')
+
+    def test_add_exception_view_disallows_exception_only(self):
+        config = self._makeOne(autocommit=True)
+        self.assertRaises(ConfigurationError,
+                          config.add_exception_view,
+                          context=Exception(),
+                          exception_only=True)
+
+    def test_add_exception_view_requires_context(self):
+        config = self._makeOne(autocommit=True)
+        view = lambda *a: 'OK'
+        self.assertRaises(ConfigurationError,
+                          config.add_exception_view, view=view)
+
+    def test_add_exception_view_with_view_defaults(self):
+        from pyramid.renderers import null_renderer
+        from pyramid.exceptions import PredicateMismatch
+        from pyramid.httpexceptions import HTTPNotFound
+        from zope.interface import directlyProvides
+        from zope.interface import implementedBy
+        class view(object):
+            __view_defaults__ = {
+                'containment':'pyramid.tests.test_config.IDummy'
+                }
+            def __init__(self, request):
+                pass
+            def __call__(self):
+                return 'OK'
+        config = self._makeOne(autocommit=True)
+        config.add_exception_view(
+            view=view,
+            context=Exception,
+            renderer=null_renderer)
+        wrapper = self._getViewCallable(
+            config, ctx_iface=implementedBy(Exception), exception_view=True)
+        context = DummyContext()
+        directlyProvides(context, IDummy)
+        request = self._makeRequest(config)
+        self.assertEqual(wrapper(context, request), 'OK')
+        context = DummyContext()
+        request = self._makeRequest(config)
+        self.assertRaises(PredicateMismatch, wrapper, context, request)
+
     def test_derive_view_function(self):
         from pyramid.renderers import null_renderer
         def view(request):

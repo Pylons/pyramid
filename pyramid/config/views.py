@@ -1613,6 +1613,71 @@ class ViewsConfiguratorMixin(object):
 
     set_notfound_view = add_notfound_view # deprecated sorta-bw-compat alias
 
+    @viewdefaults
+    @action_method
+    def add_exception_view(
+        self,
+        view=None,
+        context=None,
+        attr=None,
+        renderer=None,
+        wrapper=None,
+        route_name=None,
+        request_type=None,
+        request_method=None,
+        request_param=None,
+        containment=None,
+        xhr=None,
+        accept=None,
+        header=None,
+        path_info=None,
+        custom_predicates=(),
+        decorator=None,
+        mapper=None,
+        match_param=None,
+        **view_options
+            ):
+        """ Add a view for an exception to the current configuration state.
+        The view will be called when Pyramid or application code raises an
+        the given exception.
+
+        .. versionadded:: 1.8
+        """
+        for arg in (
+            'name', 'permission', 'for_', 'http_cache',
+            'require_csrf', 'exception_only',
+        ):
+            if arg in view_options:
+                raise ConfigurationError(
+                    '%s may not be used as an argument to add_exception_view'
+                    % arg
+                    )
+        if context is None:
+            raise ConfigurationError('context exception must be specified')
+        settings = dict(
+            view=view,
+            context=context,
+            wrapper=wrapper,
+            renderer=renderer,
+            request_type=request_type,
+            request_method=request_method,
+            request_param=request_param,
+            containment=containment,
+            xhr=xhr,
+            accept=accept,
+            header=header,
+            path_info=path_info,
+            custom_predicates=custom_predicates,
+            decorator=decorator,
+            mapper=mapper,
+            match_param=match_param,
+            route_name=route_name,
+            permission=NO_PERMISSION_REQUIRED,
+            require_csrf=False,
+            exception_only=True,
+            )
+        return self.add_view(**settings)
+
     @action_method
     def set_view_mapper(self, mapper):
         """
