@@ -270,3 +270,5 @@ Contributors
 - Vincent Férotin, 2016/05/08
 
 - Berker Peksag, 2016/05/16
+
+- Marco Martinez, 2016/06/02
