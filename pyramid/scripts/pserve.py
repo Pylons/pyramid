@@ -118,19 +118,6 @@ class PServeCommand(object):
         dest='verbose',
         help="Suppress verbose output")
 
-    if hasattr(os, 'setuid'):
-        # I don't think these are available on Windows
-        parser.add_option(
-            '--user',
-            dest='set_user',
-            metavar="USERNAME",
-            help="Set the user (usually only possible when run as root)")
-        parser.add_option(
-            '--group',
-            dest='set_group',
-            metavar="GROUP",
-            help="Set the group (usually only possible when run as root)")
-
     _scheme_re = re.compile(r'^[a-z][a-z]+:', re.I)
 
     _reloader_environ_key = 'PYTHON_RELOADER_SHOULD_RUN'
@@ -150,15 +137,6 @@ class PServeCommand(object):
         return parse_vars(restvars)
 
     def run(self):  # pragma: no cover
-        if not hasattr(self.options, 'set_user'):
-            # Windows case:
-            self.options.set_user = self.options.set_group = None
-
-        # @@: Is this the right stage to set the user at?
-        if self.options.set_user or self.options.set_group:
-            self.change_user_group(
-                self.options.set_user, self.options.set_group)
-
         if not self.args:
             self.out('You must give a config file')
             return 2
@@ -322,50 +300,6 @@ class PServeCommand(object):
                     return exit_code
             if self.options.verbose > 0:
                 self.out('%s %s %s' % ('-' * 20, 'Restarting', '-' * 20))
-
-    def change_user_group(self, user, group): # pragma: no cover
-        import pwd
-        import grp
-
-        self.out('''\
-The --user and --group options have been deprecated in Pyramid 1.6. They will
-be removed in a future release per Pyramid's deprecation policy. Please
-consider using a real process manager for your processes like Systemd, Circus,
-or Supervisor, all of which support process security.
-''')
-
-        uid = gid = None
-        if group:
-            try:
-                gid = int(group)
-                group = grp.getgrgid(gid).gr_name
-            except ValueError:
-                import grp
-                try:
-                    entry = grp.getgrnam(group)
-                except KeyError:
-                    raise ValueError(
-                        "Bad group: %r; no such group exists" % group)
-                gid = entry.gr_gid
-        try:
-            uid = int(user)
-            user = pwd.getpwuid(uid).pw_name
-        except ValueError:
-            try:
-                entry = pwd.getpwnam(user)
-            except KeyError:
-                raise ValueError(
-                    "Bad username: %r; no such user exists" % user)
-            if not gid:
-                gid = entry.pw_gid
-            uid = entry.pw_uid
-        if self.options.verbose > 0:
-            self.out('Changing user to %s:%s (%s:%s)' % (
-                user, group or '(unknown)', uid, gid))
-        if gid:
-            os.setgid(gid)
-        if uid:
-            os.setuid(uid)
 
 class LazyWriter(object):
 
