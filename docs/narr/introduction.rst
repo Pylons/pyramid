@@ -60,42 +60,28 @@ Openness
 What makes Pyramid unique
 -------------------------
 
-Understandably, people don't usually want to hear about squishy engineering
-principles; they want to hear about concrete stuff that solves their problems. 
-With that in mind, what would make someone want to use Pyramid instead of one
-of the many other web frameworks available today?  What makes Pyramid unique?
+There are many tools available for web development. What would make someone
+want to use Pyramid instead?  What makes Pyramid unique?
 
-This is a hard question to answer because there are lots of excellent choices,
-and it's actually quite hard to make a wrong choice, particularly in the Python
-web framework market.  But one reasonable answer is this: you can write very
-small applications in Pyramid without needing to know a lot. "What?" you say.
-"That can't possibly be a unique feature. Lots of other web frameworks let you
-do that!"  Well, you're right.  But unlike many other systems, you can also
-write very large applications in Pyramid if you learn a little more about it. 
+With Pyramid you can write very small applications without needing to know a
+lot. And by learning a bit more, you can write very large applications too.
 Pyramid will allow you to become productive quickly, and will grow with you. It
 won't hold you back when your application is small, and it won't get in your
-way when your application becomes large.  "Well that's fine," you say. "Lots of
-other frameworks let me write large apps, too."  Absolutely.  But other Python
-web frameworks don't seamlessly let you do both.  They seem to fall into two
-non-overlapping categories: frameworks for "small apps" and frameworks for "big
-apps".  The "small app" frameworks typically sacrifice "big app" features, and
-vice versa.
+way when your application becomes large. Other application frameworks seem to
+fall into two non-overlapping categories: those that support "small apps" and
+those designed for "big apps".
 
-We don't think it's a universally reasonable suggestion to write "small apps"
-in a "small framework" and "big apps" in a "big framework".  You can't really
-know to what size every application will eventually grow.  We don't really want
-to have to rewrite a previously small application in another framework when it
-gets "too big".  We believe the current binary distinction between frameworks
-for small and large applications is just false. A well-designed framework
-should be able to be good at both.  Pyramid strives to be that kind of
-framework.
+We don't believe you should have to make this choice. You can't really know how
+large your application will become.  You certainly shouldn't have to rewrite a
+small application in another framework when it gets "too big". A well-designed
+framework should be able to be good at both. Pyramid is that kind of framework.
 
-To this end, Pyramid provides a set of features that combined are unique
-amongst Python web frameworks.  Lots of other frameworks contain some
-combination of these features. Pyramid of course actually stole many of them
-from those other frameworks.  But Pyramid is the only one that has all of them
-in one place, documented appropriately, and useful *à la carte* without
-necessarily paying for the entire banquet.  These are detailed below.
+Pyramid provides a set of features that are unique among Python web frameworks.
+Others may provide some, but only Pyramid provides them all, in one place,
+fully documented, and useful *à la carte* without needing to pay for the whole
+banquet.
+
+With Pyramid you get:
 
 Single-file applications
 ~~~~~~~~~~~~~~~~~~~~~~~~
