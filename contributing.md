@@ -103,4 +103,4 @@ System](http://docs.pylonsproject.org/projects/pyramid/en/latest/narr/install.ht
 
 10.  Create a [pull request](https://help.github.com/articles/using-pull-requests/).
 
-11.  Repeat the process starting from Step 6.
+11.  Repeat the process starting from Step 7.
