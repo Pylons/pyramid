@@ -120,13 +120,13 @@ skipping decorators entirely.
 
 Example: :ref:`mapping_views_using_a_decorator_section`.
 
-URL generation
-~~~~~~~~~~~~~~
+Generate application URLs
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Pyramid is capable of generating URLs for resources, routes, and static assets.
-Its URL generation APIs are easy to use and flexible.  If you use Pyramid's
-various APIs for generating URLs, you can change your configuration around
-arbitrarily without fear of breaking a link on one of your web pages.
+Dynamic web applications produce URLs that can change depending on what you are
+viewing. Pyramid provides flexible, consistent, easy to use tools for generating
+URLs. When you use these tools to write your application, you can change your
+configuration without fear of breaking links in your web pages.
 
 Example: :ref:`generating_route_urls`.
 
