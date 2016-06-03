@@ -87,7 +87,8 @@ System](http://docs.pylonsproject.org/projects/pyramid/en/latest/narr/install.ht
      the results of the tests covering the documentation will be in
      `.tox/docs/doctest`.
 
-7.  From this point forward, you will follow typical [git workflow](https://help.github.com/articles/what-is-a-good-git-workflow/).
+7.  From this point forward, you will follow typical
+    [git workflow](https://help.github.com/articles/what-is-a-good-git-workflow/).
     *Always* start by pulling from the upstream to get the most current changes.
 
          git pull upstream master
