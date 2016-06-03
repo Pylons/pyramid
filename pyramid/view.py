@@ -491,6 +491,7 @@ class exception_view_config(object):
     :meth:`pyramid.view.view_config` and each predicate argument restricts
     the set of circumstances under which this exception view will be invoked.
     """
+    venusian = venusian
 
     def __init__(self, **settings):
         self.__dict__.update(settings)
