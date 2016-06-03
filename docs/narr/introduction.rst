@@ -97,13 +97,11 @@ in very similar ways.
 
     See also :ref:`firstapp_chapter`.
 
-Decorator-based configuration
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Configure applications with decorators
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you like the idea of framework configuration statements living next to the
-code it configures, so you don't have to constantly switch between files to
-refer to framework configuration when adding new code, you can use Pyramid
-decorators to localize the configuration.  For example:
+Pyramid allows you to keep your configuration right next to your code. That way
+you don't have to switch files to see your configuration. For example:
 
 .. code-block:: python
 
@@ -114,15 +112,11 @@ decorators to localize the configuration.  For example:
    def fred_view(request):
        return Response('fred')
 
-However, unlike some other systems, using decorators for Pyramid configuration
-does not make your application difficult to extend, test, or reuse.  The
-:class:`~pyramid.view.view_config` decorator, for example, does not actually
-*change* the input or output of the function it decorates, so testing it is a
-"WYSIWYG" operation. You don't need to understand the framework to test your
-own code. You just behave as if the decorator is not there.  You can also
-instruct Pyramid to ignore some decorators, or use completely imperative
-configuration instead of decorators to add views. Pyramid decorators are inert
-instead of eager. You detect and activate them with a :term:`scan`.
+However, using Pyramid configuration decorators does not change your code. It
+remains easy to extend, test or reuse. You can test your code as if the
+decorators were not there. You can instruct the framework to ignore some
+decorators. You can even use an imperative style to write your configuration,
+skipping decorators entirely.
 
 Example: :ref:`mapping_views_using_a_decorator_section`.
 
