@@ -12,21 +12,20 @@
 :app:`Pyramid` is a Python web application *framework*. It is designed to make
 creating web applications easier. It is open source.
 
-.. sidebar:: Frameworks vs. Libraries
+.. sidebar:: What Is a Framework?
 
-   A *framework* differs from a *library* in one very important way: library
-   code is always *called* by code that you write, while a framework always
-   *calls* code that you write.  Using a set of libraries to create an
-   application is usually easier than using a framework initially, because you
-   can choose to cede control to library code you have not authored very
-   selectively. But when you use a framework, you are required to cede a
-   greater portion of control to code you have not authored: code that resides
-   in the framework itself.  You needn't use a framework at all to create a web
-   application using Python.  A rich set of libraries already exists for the
-   platform.  In practice, however, using a framework to create an application
-   is often more practical than rolling your own via a set of libraries if the
-   framework provides a set of facilities that fits your application
-   requirements.
+   A *framework* provides capabilities that developers can enhance or extend. A
+   web application framework provides many of the common needs of building web
+   applications allowing developers to concentrate only on the parts that are
+   specific to their application.
+
+   Every framework makes choices about how a particular problem should be
+   solved. When developers choose to use a framework, they cede control over
+   the portions of their application that are provided by the framework. It is
+   possible to write a complete web application without any framework, by using
+   Python libraries. In practice, however, it is often more practical to use a
+   framework, so long as your chosen framework fits the requirements of your
+   application.
 
 Pyramid follows these design and engineering principles:
 
