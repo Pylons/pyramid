@@ -30,31 +30,26 @@ creating web applications easier. It is open source.
 Pyramid follows these design and engineering principles:
 
 Simplicity
-  :app:`Pyramid` takes a *"pay only for what you eat"* approach.  You can get
-  results even if you have only a partial understanding of :app:`Pyramid`.  It
-  doesn't force you to use any particular technology to produce an application,
-  and we try to keep the core set of concepts that you need to understand to a
-  minimum.
+   :app:`Pyramid` is designed to be easy to use. You can get started even if you
+   don't understand it all. And when you're ready to do more, :app:`Pyramid`
+   will be there for you.
 
 Minimalism
-  :app:`Pyramid` tries to solve only the fundamental problems of creating a web
-  application: the mapping of URLs to code, templating, security, and serving
-  static assets. We consider these to be the core activities that are common to
-  nearly all web applications.
+   Out of the box, :app:`Pyramid` provides only the core tools needed for nearly
+   all web applications: mapping URLs to code, security, and serving static
+   assets (files like JavaScript and CSS). Additional tools provide templating,
+   database integration and more. But with :app:`Pyramid` you can *"pay only for
+   what you eat"*.
 
 Documentation
-  Pyramid's minimalism means that it is easier for us to maintain complete and
-  up-to-date documentation. It is our goal that no aspect of Pyramid is
-  undocumented.
+   :app:`Pyramid` is committed to comprehensive and up-to-date documentation.
 
 Speed
-  :app:`Pyramid` is designed to provide noticeably fast execution for common
-  tasks such as templating and simple response generation.
+  :app:`Pyramid` is designed to be noticeably fast.
 
 Reliability
-  :app:`Pyramid` is developed conservatively and tested exhaustively. Where
-  Pyramid source code is concerned, our motto is: "If it ain't tested, it's
-  broke".
+  :app:`Pyramid` is developed conservatively and tested exhaustively. Our motto
+  is: "If it ain't tested, it's broke".
 
 Openness
   As with Python, the Pyramid software is distributed under a `permissive open
