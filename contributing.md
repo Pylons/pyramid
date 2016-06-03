@@ -64,7 +64,7 @@ System](http://docs.pylonsproject.org/projects/pyramid/en/latest/narr/install.ht
 
          git remote add upstream git@github.com:Pylons/pyramid.git
 
-4.  Create a virtualenv and set an environment variable as instructed in the
+4.  Create a virtual environment and set an environment variable as instructed in the
     [prerequisites](https://github.com/Pylons/pyramid/blob/master/HACKING.txt#L55-L58).
 
          # Mac and Linux
@@ -73,7 +73,7 @@ System](http://docs.pylonsproject.org/projects/pyramid/en/latest/narr/install.ht
          # Windows
          set VENV=c:\hack-on-pyramid\env
 
-4.  Install `tox` into your virtualenv.
+4.  Install `tox` into your virtual environment.
 
          $ $VENV/bin/pip install tox
 
