@@ -35,11 +35,10 @@ class PyramidTemplate(Template):
         msg = dedent(
             """
             %(separator)s
-            Tutorials: http://docs.pylonsproject.org/projects/pyramid_tutorials
-            Documentation: http://docs.pylonsproject.org/projects/pyramid
-
-            Twitter (tips & updates): http://twitter.com/pylons
-            Mailing List: http://groups.google.com/group/pylons-discuss
+            Tutorials:     http://docs.pylonsproject.org/projects/pyramid_tutorials/en/latest/
+            Documentation: http://docs.pylonsproject.org/projects/pyramid/en/latest/
+            Twitter:       https://twitter.com/trypyramid
+            Mailing List:  https://groups.google.com/forum/#!forum/pylons-discuss
 
             Welcome to Pyramid.  Sorry for the convenience.
             %(separator)s
@@ -53,12 +52,13 @@ class PyramidTemplate(Template):
 
 class StarterProjectTemplate(PyramidTemplate):
     _template_dir = 'starter'
-    summary = 'Pyramid starter project'
+    summary = 'Pyramid starter project using URL dispatch and Chameleon'
 
 class ZODBProjectTemplate(PyramidTemplate):
     _template_dir = 'zodb'
-    summary = 'Pyramid ZODB project using traversal'
+    summary = 'Pyramid project using ZODB, traversal, and Chameleon'
 
 class AlchemyProjectTemplate(PyramidTemplate):
     _template_dir = 'alchemy'
-    summary = 'Pyramid SQLAlchemy project using url dispatch'
+    summary = 'Pyramid project using SQLAlchemy, SQLite, URL dispatch, and'
+    ' Chameleon'
