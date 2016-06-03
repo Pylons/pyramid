@@ -274,3 +274,5 @@ Contributors
 - Zack Brunson, 2016/06/02
 
 - Marco Martinez, 2016/06/02
+
+- Cris Ewing, 2016/06/03
