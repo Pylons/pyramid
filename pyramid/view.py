@@ -463,6 +463,57 @@ class forbidden_view_config(object):
         settings['_info'] = info.codeinfo # fbo "action_method"
         return wrapped
 
+class exception_view_config(object):
+    """
+    .. versionadded:: 1.8
+
+    An analogue of :class:`pyramid.view.view_config` which registers an
+    exception view.
+
+    The exception_view_config constructor requires an exception context, and
+    additionally accepts most of the same argumenta as the constructor of
+    :class:`pyramid.view.view_config`.  It can be used in the same places,
+    and behaves in largely the same way, except it always registers an exception
+    view instead of a 'normal' view.
+
+    Example:
+
+    .. code-block:: python
+
+        from pyramid.view import exception_view_config
+        from pyramid.response import Response
+
+        @exception_view_config(context=ValueError)
+        def error_view(request):
+            return Response('A value error ocurred')
+
+    All arguments passed to this function have the same meaning as
+    :meth:`pyramid.view.view_config` and each predicate argument restricts
+    the set of circumstances under which this exception view will be invoked.
+    """
+
+    def __init__(self, **settings):
+        self.__dict__.update(settings)
+
+    def __call__(self, wrapped):
+        settings = self.__dict__.copy()
+
+        def callback(context, name, ob):
+            config = context.config.with_package(info.module)
+            config.add_exception_view(view=ob, **settings)
+
+        info = self.venusian.attach(wrapped, callback, category='pyramid')
+
+        if info.scope == 'class':
+            # if the decorator was attached to a method in a class, or
+            # otherwise executed at class scope, we need to set an
+            # 'attr' into the settings if one isn't already in there
+            if settings.get('attr') is None:
+                settings['attr'] = wrapped.__name__
+
+        settings['_info'] = info.codeinfo # fbo "action_method"
+        return wrapped
+
 def _find_views(
     registry,
     request_iface,
