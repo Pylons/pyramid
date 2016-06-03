@@ -130,16 +130,15 @@ configuration without fear of breaking links in your web pages.
 
 Example: :ref:`generating_route_urls`.
 
-Static file serving
+Serve static assets
 ~~~~~~~~~~~~~~~~~~~
 
-Pyramid is perfectly willing to serve static files itself.  It won't make you
-use some external web server to do that.  You can even serve more than one set
-of static files in a single Pyramid web application (e.g., ``/static`` and
-``/static2``).  You can optionally place your files on an external web server
-and ask Pyramid to help you generate URLs to those files. This let's you use
-Pyramid's internal file serving while doing development, and a faster static
-file server in production, without changing any code.
+Web applications often require JavaScript, CSS, images and other so-called
+*static assets*. Pyramid provides flexible tools for serving these kinds of
+files. You can serve them directly from Pyramid, or host them on an external
+server or CDN (content delivery network). Either way, Pyramid can help you to
+generate URLs so you can change where your files come from without changing any
+code.
 
 Example: :ref:`static_assets_section`.
 
