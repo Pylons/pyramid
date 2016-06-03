@@ -59,11 +59,15 @@ System](http://docs.pylonsproject.org/projects/pyramid/en/latest/narr/install.ht
 
          git clone git@github.com:<username>/pyramid.git
 
+2.  Change directories into the cloned repository
+
+         cd pyramid
+
 3.  Add a git remote "upstream" for the cloned fork.
 
          git remote add upstream git@github.com:Pylons/pyramid.git
 
-4.  Set an environment variable as instructed in the
+4.  Create a virtual environment and set an environment variable as instructed in the
     [prerequisites](https://github.com/Pylons/pyramid/blob/master/HACKING.txt#L55-L58).
 
          # Mac and Linux
@@ -72,28 +76,26 @@ System](http://docs.pylonsproject.org/projects/pyramid/en/latest/narr/install.ht
          # Windows
          set VENV=c:\hack-on-pyramid\env
 
+4.  Install `tox` into your virtual environment.
+
+         $ $VENV/bin/pip install tox
+
 5.  Try to build the docs in your workspace.
 
-         # Mac and Linux
-         $ make clean html SPHINXBUILD=$VENV/bin/sphinx-build
+         $ $VENV/bin/tox -e docs
 
-         # Windows
-         c:\> make clean html SPHINXBUILD=%VENV%\bin\sphinx-build
-
-     If successful, then you can make changes to the documentation. You can
-     load the built documentation in the `/_build/html/` directory in a web
-     browser.
+     When the build finishes, you'll find HTML documentation rendered in
+     `.tox/docs/html`. An `epub` version will be in `.tox/docs/epub`. And the
+     result of the tests that are run on the documentation will be in
+     `.tox/docs/doctest`.
 
 6.  From this point forward, follow the typical [git
     workflow](https://help.github.com/articles/what-is-a-good-git-workflow/).
-    Start by pulling from the upstream to get the most current changes.
+    *Always* start by pulling from the upstream to get the most current changes.
 
          git pull upstream master
 
-7.  Make a branch, make changes to the docs, and rebuild them as indicated in
-    step 5.  To speed up the build process, you can omit `clean` from the above
-    command to rebuild only those pages that depend on the files you have
-    changed.
+7.  Make a branch, make changes to the docs, and rebuild them as indicated above.
 
 8.  Once you are satisfied with your changes and the documentation builds
     successfully without errors or warnings, then git commit and push them to
@@ -104,4 +106,4 @@ System](http://docs.pylonsproject.org/projects/pyramid/en/latest/narr/install.ht
 
 9.  Create a [pull request](https://help.github.com/articles/using-pull-requests/).
 
-10.  Repeat the process starting from Step 6.
+10.  Repeat the process starting from Step 8.
