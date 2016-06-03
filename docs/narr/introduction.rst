@@ -9,9 +9,8 @@
 :app:`Pyramid` Introduction
 ===========================
 
-:app:`Pyramid` is a general, open source, Python web application development
-*framework*. Its primary goal is to make it easier for a Python developer to
-create web applications.
+:app:`Pyramid` is a Python web application *framework*. It is designed to make
+creating web applications easier. It is open source.
 
 .. sidebar:: Frameworks vs. Libraries
 
@@ -29,7 +28,7 @@ create web applications.
    framework provides a set of facilities that fits your application
    requirements.
 
-Pyramid attempts to follow these design and engineering principles:
+Pyramid follows these design and engineering principles:
 
 Simplicity
   :app:`Pyramid` takes a *"pay only for what you eat"* approach.  You can get
