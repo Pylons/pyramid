@@ -81,19 +81,15 @@ Others may provide some, but only Pyramid provides them all, in one place,
 fully documented, and useful *à la carte* without needing to pay for the whole
 banquet.
 
-With Pyramid you get:
 
-Single-file applications
-~~~~~~~~~~~~~~~~~~~~~~~~
+Build single-file applications
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You can write a Pyramid application that lives entirely in one Python file, not
-unlike existing Python microframeworks.  This is beneficial for one-off
-prototyping, bug reproduction, and very small applications.  These applications
-are easy to understand because all the information about the application lives
-in a single place, and you can deploy them without needing to understand much
-about Python distributions and packaging.  Pyramid isn't really marketed as a
-microframework, but it allows you to do almost everything that frameworks that
-are marketed as "micro" offer in very similar ways.
+You can write a Pyramid application that lives entirely in one Python file.
+Such an application is easy to understand since everything is in one place. It
+is easy to deploy because you don't need to know much about Python packaging.
+Pyramid allows you to do almost everything that so-called *microframeworks* can
+in very similar ways.
 
 .. literalinclude:: helloworld.py
 
