@@ -142,21 +142,19 @@ code.
 
 Example: :ref:`static_assets_section`.
 
-Fully interactive development
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Develop interactively
+~~~~~~~~~~~~~~~~~~~~~
 
-When developing a Pyramid application, several interactive features are
-available. Pyramid can automatically utilize changed templates when rendering
-pages and automatically restart the application to incorporate changed Python
-code. Plain old ``print()`` calls used for debugging can display to a console.
+Pyramid can automatically detect changes you make to template files and code,
+so your changes are immediately available in your browser. You can debug using
+plain old ``print()`` calls, which will display to your console.
 
-Pyramid's debug toolbar comes activated when you use a Pyramid scaffold to
-render a project.  This toolbar overlays your application in the browser, and
-allows you access to framework data, such as the routes configured, the last
-renderings performed, the current set of packages installed, SQLAlchemy queries
-run, logging data, and various other facts.  When an exception occurs, you can
-use its interactive debugger to poke around right in your browser to try to
-determine the cause of the exception.  It's handy.
+Pyramid has a debug toolbar that allows you to see information about how your
+application is working right in your browser. See configuration, installed
+packages, SQL queries, logging statements and more.
+
+When your application has an error, an interactive debugger allows you to poke
+around from your browser to find out what happened.
 
 Example: :ref:`debug_toolbar`.
 
