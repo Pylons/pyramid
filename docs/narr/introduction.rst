@@ -187,8 +187,8 @@ framework itself. You will find them to be fully tested and well documented.
 Examples:
 https://trypyramid.com/resources-extending-pyramid.html
 
-Write *your* views
-~~~~~~~~~~~~~~~~~~
+Write *your* views, *your* way
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A fundamental task for any framework is to map URLs to code. In Pyramid, that
 code is called a :term:`view callable`. View callables can be functions, class
