@@ -7,98 +7,94 @@ From time to time, challenges to various aspects of :app:`Pyramid` design are
 lodged.  To give context to discussions that follow, we detail some of the
 design decisions and trade-offs here.  In some cases, we acknowledge that the
 framework can be made better and we describe future steps which will be taken
-to improve it; in some cases we just file the challenge as noted, as
-obviously you can't please everyone all of the time.
+to improve it.  In others we just file the challenge as noted, as obviously you
+can't please everyone all of the time.
 
 Pyramid Provides More Than One Way to Do It
 -------------------------------------------
 
 A canon of Python popular culture is "TIOOWTDI" ("there is only one way to do
-it", a slighting, tongue-in-cheek reference to Perl's "TIMTOWTDI", which is
-an acronym for "there is more than one way to do it").
+it", a slighting, tongue-in-cheek reference to Perl's "TIMTOWTDI", which is an
+acronym for "there is more than one way to do it").
 
-:app:`Pyramid` is, for better or worse, a "TIMTOWTDI" system.  For example,
-it includes more than one way to resolve a URL to a :term:`view callable`:
-via :term:`url dispatch` or :term:`traversal`.  Multiple methods of
-configuration exist: :term:`imperative configuration`, :term:`configuration
-decoration`, and :term:`ZCML` (optionally via :term:`pyramid_zcml`). It works
-with multiple different kinds of persistence and templating systems.  And so
-on.  However, the existence of most of these overlapping ways to do things
-are not without reason and purpose: we have a number of audiences to serve,
-and we believe that TIMTOWTI at the web framework level actually *prevents* a
-much more insidious and harmful set of duplication at higher levels in the
-Python web community.
+:app:`Pyramid` is, for better or worse, a "TIMTOWTDI" system.  For example, it
+includes more than one way to resolve a URL to a :term:`view callable`: via
+:term:`url dispatch` or :term:`traversal`. Multiple methods of configuration
+exist: :term:`imperative configuration`, :term:`configuration decoration`, and
+:term:`ZCML` (optionally via :term:`pyramid_zcml`). It works with multiple
+different kinds of persistence and templating systems. And so on. However, the
+existence of most of these overlapping ways to do things are not without reason
+and purpose: we have a number of audiences to serve, and we believe that
+TIMTOWTDI at the web framework level actually *prevents* a much more insidious
+and harmful set of duplication at higher levels in the Python web community.
 
-:app:`Pyramid` began its life as :mod:`repoze.bfg`, written by a team of
-people with many years of prior :term:`Zope` experience.  The idea of
+:app:`Pyramid` began its life as :mod:`repoze.bfg`, written by a team of people
+with many years of prior :term:`Zope` experience.  The idea of
 :term:`traversal` and the way :term:`view lookup` works was stolen entirely
 from Zope.  The authorization subsystem provided by :app:`Pyramid` is a
 derivative of Zope's.  The idea that an application can be *extended* without
 forking is also a Zope derivative.
 
 Implementations of these features were *required* to allow the :app:`Pyramid`
-authors to build the bread-and-butter CMS-type systems for customers in the
-way in which they were accustomed.  No other system, save for Zope itself,
-had such features, and Zope itself was beginning to show signs of its age.
-We were becoming hampered by consequences of its early design mistakes.
-Zope's lack of documentation was also difficult to work around: it was hard
-to hire smart people to work on Zope applications, because there was no
-comprehensive documentation set to point them at which explained "it all" in
-one consumable place, and it was too large and self-inconsistent to document
-properly.  Before :mod:`repoze.bfg` went under development, its authors
-obviously looked around for other frameworks that fit the bill.  But no
-non-Zope framework did.  So we embarked on building :mod:`repoze.bfg`.
+authors to build the bread-and-butter CMS-type systems for customers in the way
+in which they were accustomed. No other system, save for Zope itself, had such
+features, and Zope itself was beginning to show signs of its age. We were
+becoming hampered by consequences of its early design mistakes. Zope's lack of
+documentation was also difficult to work around. It was hard to hire smart
+people to work on Zope applications because there was no comprehensive
+documentation set which explained "it all" in one consumable place, and it was
+too large and self-inconsistent to document properly. Before :mod:`repoze.bfg`
+went under development, its authors obviously looked around for other
+frameworks that fit the bill. But no non-Zope framework did. So we embarked on
+building :mod:`repoze.bfg`.
 
 As the result of our research, however, it became apparent that, despite the
-fact that no *one* framework had all the features we required, lots of
-existing frameworks had good, and sometimes very compelling ideas.  In
-particular, :term:`URL dispatch` is a more direct mechanism to map URLs to
-code.
+fact that no *one* framework had all the features we required, lots of existing
+frameworks had good, and sometimes very compelling ideas. In particular,
+:term:`URL dispatch` is a more direct mechanism to map URLs to code.
 
 So, although we couldn't find a framework, save for Zope, that fit our needs,
 and while we incorporated a lot of Zope ideas into BFG, we also emulated the
 features we found compelling in other frameworks (such as :term:`url
-dispatch`).  After the initial public release of BFG, as time went on,
-features were added to support people allergic to various Zope-isms in the
-system, such as the ability to configure the application using
-:term:`imperative configuration` and :term:`configuration decoration` rather
-than solely using :term:`ZCML`, and the elimination of the required use of
-:term:`interface` objects.  It soon became clear that we had a system that
-was very generic, and was beginning to appeal to non-Zope users as well as
-ex-Zope users.
+dispatch`). After the initial public release of BFG, as time went on, features
+were added to support people allergic to various Zope-isms in the system, such
+as the ability to configure the application using :term:`imperative
+configuration` and :term:`configuration decoration`, rather than solely using
+:term:`ZCML`, and the elimination of the required use of :term:`interface`
+objects. It soon became clear that we had a system that was very generic, and
+was beginning to appeal to non-Zope users as well as ex-Zope users.
 
 As the result of this generalization, it became obvious BFG shared 90% of its
-featureset with the featureset of Pylons 1, and thus had a very similar
-target market.  Because they were so similar, choosing between the two
-systems was an exercise in frustration for an otherwise non-partisan
-developer.  It was also strange for the Pylons and BFG development
-communities to be in competition for the same set of users, given how similar
-the two frameworks were.  So the Pylons and BFG teams began to work together
-to form a plan to merge.  The features missing from BFG (notably :term:`view
-handler` classes, flash messaging, and other minor missing bits), were added,
-to provide familiarity to ex-Pylons users.  The result is :app:`Pyramid`.
+feature set with the feature set of Pylons 1, and thus had a very similar
+target market. Because they were so similar, choosing between the two systems
+was an exercise in frustration for an otherwise non-partisan developer. It was
+also strange for the Pylons and BFG development communities to be in
+competition for the same set of users, given how similar the two frameworks
+were. So the Pylons and BFG teams began to work together to form a plan to
+merge. The features missing from BFG (notably :term:`view handler` classes,
+flash messaging, and other minor missing bits), were added to provide
+familiarity to ex-Pylons users. The result is :app:`Pyramid`.
 
-The Python web framework space is currently notoriously balkanized.  We're
-truly hoping that the amalgamation of components in :app:`Pyramid` will
-appeal to at least two currently very distinct sets of users: Pylons and BFG
-users.  By unifying the best concepts from Pylons and BFG into a single
-codebase and leaving the bad concepts from their ancestors behind, we'll be
-able to consolidate our efforts better, share more code, and promote our
-efforts as a unit rather than competing pointlessly.  We hope to be able to
-shortcut the pack mentality which results in a *much larger* duplication of
-effort, represented by competing but incredibly similar applications and
-libraries, each built upon a specific low level stack that is incompatible
-with the other.  We'll also shrink the choice of credible Python web
-frameworks down by at least one.  We're also hoping to attract users from
-other communities (such as Zope's and TurboGears') by providing the features
-they require, while allowing enough flexibility to do things in a familiar
-fashion.  Some overlap of functionality to achieve these goals is expected
-and unavoidable, at least if we aim to prevent pointless duplication at
-higher levels.  If we've done our job well enough, the various audiences will
-be able to coexist and cooperate rather than firing at each other across some
-imaginary web framework DMZ.
+The Python web framework space is currently notoriously balkanized. We're truly
+hoping that the amalgamation of components in :app:`Pyramid` will appeal to at
+least two currently very distinct sets of users: Pylons and BFG users. By
+unifying the best concepts from Pylons and BFG into a single codebase, and
+leaving the bad concepts from their ancestors behind, we'll be able to
+consolidate our efforts better, share more code, and promote our efforts as a
+unit rather than competing pointlessly. We hope to be able to shortcut the pack
+mentality which results in a *much larger* duplication of effort, represented
+by competing but incredibly similar applications and libraries, each built upon
+a specific low level stack that is incompatible with the other. We'll also
+shrink the choice of credible Python web frameworks down by at least one. We're
+also hoping to attract users from other communities (such as Zope's and
+TurboGears') by providing the features they require, while allowing enough
+flexibility to do things in a familiar fashion. Some overlap of functionality
+to achieve these goals is expected and unavoidable, at least if we aim to
+prevent pointless duplication at higher levels. If we've done our job well
+enough, the various audiences will be able to coexist and cooperate rather than
+firing at each other across some imaginary web framework DMZ.
 
-Pyramid Uses A Zope Component Architecture ("ZCA") Registry
+Pyramid Uses a Zope Component Architecture ("ZCA") Registry
 -----------------------------------------------------------
 
 :app:`Pyramid` uses a :term:`Zope Component Architecture` (ZCA) "component
@@ -135,7 +131,7 @@ obvious.
 First, what's a "utility"?  Well, for the purposes of this discussion, and
 for the purpose of the code above, it's just not very important.  If you
 really want to know, you can read `this
-<http://www.muthukadan.net/docs/zca.html#utility>`_.  However, still, readers
+<http://muthukadan.net/docs/zca.html#utility>`_.  However, still, readers
 of such code need to understand the concept in order to parse it.  This is
 problem number one.
 
@@ -612,7 +608,7 @@ pyramid/scaffolds/
 
   133KB
 
-pyramid/ (except for ``pyramd/tests`` and ``pyramid/scaffolds``)
+pyramid/ (except for ``pyramid/tests`` and ``pyramid/scaffolds``)
 
   812KB
 
@@ -669,7 +665,7 @@ desktop GUI platforms by using similar terminology, and to provide some frame
 of reference for how various components in the common web framework might
 hang together.  But in the opinion of the author, "MVC" doesn't match the web
 very well in general. Quoting from the `Model-View-Controller Wikipedia entry
-<http://en.wikipedia.org/wiki/Model–view–controller>`_:
+<https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller>`_:
 
     Though MVC comes in different flavors, control flow is generally as
     follows:
@@ -851,9 +847,9 @@ Challenge
 +++++++++
 
 :app:`Pyramid` performs automatic authorization checks only at :term:`view`
-execution time. Zope 3 wraps context objects with a `security proxy
-<http://wiki.zope.org/zope3/WhatAreSecurityProxies>`_, which causes Zope 3 also
-to do security checks during attribute access. I like this, because it means:
+execution time. Zope 3 wraps context objects with a security proxy, which
+causes Zope 3 also to do security checks during attribute access. I like this,
+because it means:
 
 #) When I use the security proxy machinery, I can have a view that
    conditionally displays certain HTML elements (like form fields) or
@@ -1010,16 +1006,18 @@ the following:
 Microframeworks have smaller Hello World programs
 -------------------------------------------------
 
-Self-described "microframeworks" exist. `Bottle <http://bottle.paws.de>`_ and
-`Flask <http://flask.pocoo.org/>`_ are two that are becoming popular. `Bobo
-<http://bobo.digicool.com/>`_ doesn't describe itself as a microframework, but
-its intended user base is much the same. Many others exist. We've even (only as
-a teaching tool, not as any sort of official project) `created one using
-Pyramid <http://static.repoze.org/casts/videotags.html>`_. The videos use BFG,
-a precursor to Pyramid, but the resulting code is `available for Pyramid too
-<https://github.com/Pylons/groundhog>`_). Microframeworks are small frameworks
-with one common feature: each allows its users to create a fully functional
-application that lives in a single Python file.
+Self-described "microframeworks" exist. `Bottle
+<http://bottlepy.org/docs/dev/index.html>`_ and `Flask
+<http://flask.pocoo.org/>`_ are two that are becoming popular. `Bobo
+<http://bobo.digicool.com/en/latest/>`_ doesn't describe itself as a
+microframework, but its intended user base is much the same. Many others exist.
+We've even (only as a teaching tool, not as any sort of official project)
+`created one using Pyramid <http://static.repoze.org/casts/videotags.html>`_.
+The videos use BFG, a precursor to Pyramid, but the resulting code is
+`available for Pyramid too <https://github.com/Pylons/groundhog>`_).
+Microframeworks are small frameworks with one common feature: each allows its
+users to create a fully functional application that lives in a single Python
+file.
 
 Some developers and microframework authors point out that Pyramid's "hello
 world" single-file program is longer (by about five lines) than the equivalent
@@ -1434,9 +1432,10 @@ object which *is not logically global*:
         # this is executed if the request method was GET or the
         # credentials were invalid    
 
-The `Pylons 1.X <http://pylonsproject.org>`_ web framework uses a similar
-strategy.  It calls these things "Stacked Object Proxies", so, for purposes
-of this discussion, I'll do so as well.
+The `Pylons 1.X
+<http://docs.pylonsproject.org/projects/pylons-webframework/en/latest/>`_
+web framework uses a similar strategy.  It calls these things "Stacked Object
+Proxies", so, for purposes of this discussion, I'll do so as well.
 
 Import statements in Python (``import foo``, ``from bar import baz``) are
 most frequently performed to obtain a reference to an object defined globally
@@ -1654,10 +1653,11 @@ If you can understand this hello world program, you can use Pyramid:
        server = make_server('0.0.0.0', 8080, app)
        server.serve_forever()
 
-Pyramid has ~ 700 pages of documentation (printed), covering topics from the
-very basic to the most advanced.  *Nothing* is left undocumented, quite
+Pyramid has over 1200 pages of documentation (printed), covering topics from
+the very basic to the most advanced. *Nothing* is left undocumented, quite
 literally.  It also has an *awesome*, very helpful community.  Visit the
-#pyramid IRC channel on freenode.net (irc://freenode.net#pyramid) and see.
+`#pyramid IRC channel on freenode.net
+<https://webchat.freenode.net/?channels=pyramid>`_ and see.
 
 Hate Zope
 +++++++++
@@ -1705,5 +1705,6 @@ Other Challenges
 ----------------
 
 Other challenges are encouraged to be sent to the `Pylons-devel
-<http://groups.google.com/group/pylons-devel>`_ maillist.  We'll try to address
-them by considering a design change, or at very least via exposition here.
+<https://groups.google.com/forum/#!forum/pylons-devel>`_ maillist.  We'll try
+to address them by considering a design change, or at very least via exposition
+here.
