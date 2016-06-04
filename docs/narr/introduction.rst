@@ -174,14 +174,15 @@ application code.
 
 Examples: :ref:`debug_authorization_section` and :ref:`command_line_chapter`.
 
-Add-ons
-~~~~~~~
+Extend your application
+~~~~~~~~~~~~~~~~~~~~~~~
 
-Pyramid has an extensive set of add-ons held to the same quality standards as
-the Pyramid core itself.  Add-ons are packages which provide functionality that
-the Pyramid core doesn't.  Add-on packages already exist which let you easily
-send email, let you use the Jinja2 templating system, let you use XML-RPC or
-JSON-RPC, let you integrate with jQuery Mobile, etc.
+Pyramid add-ons extend the core of the framework with useful abilities. There
+are add-ons available for your favorite template language, SQL and NoSQL
+databases, authentication services and much much more.
+
+Supported Pyramid add-ons are held to the same demanding standards as the
+framework itself. You will find them to be fully tested and well documented.
 
 Examples:
 https://trypyramid.com/resources-extending-pyramid.html
