@@ -187,19 +187,15 @@ framework itself. You will find them to be fully tested and well documented.
 Examples:
 https://trypyramid.com/resources-extending-pyramid.html
 
-Class-based and function-based views
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Write your views
+~~~~~~~~~~~~~~~~
 
-Pyramid has a structured, unified concept of a :term:`view callable`. View
-callables can be functions, methods of classes, or even instances.  When you
-add a new view callable, you can choose to make it a function or a method of a
-class. In either case Pyramid treats it largely the same way.  You can change
-your mind later and move code between methods of classes and functions.  A
-collection of similar view callables can be attached to a single class as
-methods, if that floats your boat, and they can share initialization code as
-necessary.  All kinds of views are easy to understand and use, and operate
-similarly.  There is no phony distinction between them. They can be used for
-the same purposes.
+A fundamental task for any framework is to map URLs to code. In Pyramid, that
+code is called a :term:`view callable`. View callables can be functions, class
+methods or even callable class instances. You are free to choose the approach
+that best fits your use case. Regardless of your choice, Pyramid treats them
+the same. You can change your mind at any time without any penalty. There are
+no artificial distinctions between the various approaches.
 
 Here's a view callable defined as a function:
 
