@@ -158,22 +158,19 @@ around from your browser to find out what happened.
 
 Example: :ref:`debug_toolbar`.
 
-Debugging settings
-~~~~~~~~~~~~~~~~~~
+Debug with power
+~~~~~~~~~~~~~~~~
 
-Pyramid has debugging settings that allow you to print Pyramid runtime
-information to the console when things aren't behaving as you're expecting. For
-example, you can turn on ``debug_notfound``, which prints an informative
-message to the console every time a URL does not match any view.  You can turn
-on ``debug_authorization``, which lets you know why a view execution was
-allowed or denied by printing a message to the console.  These features are
-useful for those WTF moments.
+When things go wrong, Pyramid gives you powerful ways to fix the problem.
 
-There are also a number of commands that you can invoke within a Pyramid
-environment that allow you to introspect the configuration of your system.
-``proutes`` shows all configured routes for an application in the order they'll
-be evaluated for matching. ``pviews`` shows all configured views for any given
-URL.  These are also WTF-crushers in some circumstances.
+You can configure Pyramid to print helpful information to the console. The
+``debug_notfound`` setting shows information about URLs that aren't matched.
+The ``debug_authorization`` setting provides helpful messages about why you
+aren't allowed to do what you just tried.
+
+Pyramid also has command line tools to help you verify your configuration. You
+can use ``proutes`` and ``pviews`` to inspect how URLs are connected to your
+application code.
 
 Examples: :ref:`debug_authorization_section` and :ref:`command_line_chapter`.
 
