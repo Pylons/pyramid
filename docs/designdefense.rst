@@ -1009,7 +1009,7 @@ Microframeworks have smaller Hello World programs
 Self-described "microframeworks" exist. `Bottle
 <http://bottlepy.org/docs/dev/index.html>`_ and `Flask
 <http://flask.pocoo.org/>`_ are two that are becoming popular. `Bobo
-<http://bobo.digicool.com/en/latest/>`_ doesn't describe itself as a
+<https://bobo.readthedocs.io/en/latest/>`_ doesn't describe itself as a
 microframework, but its intended user base is much the same. Many others exist.
 We've even (only as a teaching tool, not as any sort of official project)
 `created one using Pyramid <http://static.repoze.org/casts/videotags.html>`_.
