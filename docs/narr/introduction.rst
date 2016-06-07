@@ -258,19 +258,19 @@ other packages using simple wrappers.
 
 Examples: :ref:`asset_specifications` and :ref:`overriding_assets_section`.
 
-Extensible templating
-~~~~~~~~~~~~~~~~~~~~~
+Use *your* templates
+~~~~~~~~~~~~~~~~~~~~
 
-Pyramid has a structured API that allows for pluggability of "renderers".
-Templating systems such as Mako, Genshi, Chameleon, and Jinja2 can be treated
-as renderers.  Renderer bindings for all of these templating systems already
-exist for use in Pyramid.  But if you'd rather use another, it's not a big
-deal.  Just copy the code from an existing renderer package, and plug in your
-favorite templating system.  You'll then be able to use that templating system
-from within Pyramid just as you'd use one of the "built-in" templating systems.
+In Pyramid, the job of creating a ``Response`` belongs to a :term:`renderer`.
+Any templating system--Mako, Genshi, Chameleon, Jinja2--can be a renderer. In
+fact, packages exist for all of these systems. But if you'd rather use another,
+a structured API exists allowing you to create a renderer using your favorite
+templating system. You can use the templating system *you* understand, not one
+required by the framework.
 
-Pyramid does not make you use a single templating system exclusively.  You can
-use multiple templating systems, even in the same project.
+What's more, Pyramid does not make you use a single templating system
+exclusively.  You can use multiple templating systems, even in the same
+project.
 
 Example: :ref:`templates_used_directly`.
 
