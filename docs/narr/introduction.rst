@@ -274,16 +274,16 @@ project.
 
 Example: :ref:`templates_used_directly`.
 
-Rendered views can return dictionaries
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Write testable views
+~~~~~~~~~~~~~~~~~~~~
 
-If you use a :term:`renderer`, you don't have to return a special kind of
-"webby" ``Response`` object from a view.  Instead you can return a dictionary,
-and Pyramid will take care of converting that dictionary to a Response using a
-template on your behalf.  This makes the view easier to test, because you don't
-have to parse HTML in your tests. Instead just make an assertion that the view
-returns "the right stuff" in the dictionary.  You can write "real" unit tests
-instead of functionally testing all of your views.
+When you use a :term:`renderer` with your view callable, you are freed from
+needing to return a "webby" ``Response`` object. Instead, your views can return
+a simple Python dictionary. Pyramid will take care of rendering the information
+in that dictionary to a ``Response`` on your behalf. As a result, your views
+are more easily tested, since you don't need to parse HTML to evaluate the
+results. Pyramid makes it a snap to write unit tests for your views, instead of
+requiring you to use functional tests.
 
 .. index::
    pair: renderer; explicitly calling
@@ -291,7 +291,7 @@ instead of functionally testing all of your views.
 
 .. _example_render_to_response_call:
 
-For example, instead of returning a ``Response`` object from a
+For example, a typical web framework might return a ``Response`` object from a
 ``render_to_response`` call:
 
 .. code-block:: python
@@ -303,7 +303,7 @@ For example, instead of returning a ``Response`` object from a
         return render_to_response('myapp:templates/mytemplate.pt', {'a':1},
                                   request=request)
 
-You can return a Python dictionary:
+While you *can* do this in Pyramid, you can also return a Python dictionary:
 
 .. code-block:: python
     :linenos:
@@ -314,13 +314,13 @@ You can return a Python dictionary:
     def myview(request):
         return {'a':1}
 
-When this view callable is called by Pyramid, the ``{'a':1}`` dictionary will
-be rendered to a response on your behalf.  The string passed as ``renderer=``
-above is an :term:`asset specification`.  It is in the form
-``packagename:directoryname/filename.ext``.  In this case, it refers to the
-``mytemplate.pt`` file in the ``templates`` directory within the ``myapp``
-Python package.  Asset specifications are omnipresent in Pyramid. See
-:ref:`intro_asset_specs` for more information.
+By configuring your view to use a renderer, you tell Pyramid to use the
+``{'a':1}`` dictionary and the specified template to render a response on your
+behalf.
+
+The string passed as ``renderer=`` above is an :term:`asset specification`.
+Asset specifications are omnipresent in Pyramid. They allow for more reliable
+customization. See :ref:`intro_asset_specs` for more information.
 
 Example: :ref:`renderers_chapter`.
 
