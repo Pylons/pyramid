@@ -235,25 +235,26 @@ Here's a few views defined as methods of a class instead:
 
 .. _intro_asset_specs:
 
-Asset specifications
-~~~~~~~~~~~~~~~~~~~~
+Find *your* static assets
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Asset specifications are strings that contain both a Python package name and a
-file or directory name, e.g., ``MyPackage:static/index.html``.  Use of these
-specifications is omnipresent in Pyramid.  An asset specification can refer to
-a template, a translation directory, or any other package-bound static
-resource.  This makes a system built on Pyramid extensible because you don't
-have to rely on globals ("*the* static directory") or lookup schemes ("*the*
-ordered set of template directories") to address your files.  You can move
-files around as necessary, and include other packages that may not share your
-system's templates or static files without encountering conflicts.
+In many web frameworks, the static assets required by an application are kept
+in a globally shared location, "the *static* directory". Others use a lookup
+scheme, like an ordered set of template directories. Both of these approaches
+have problems when it comes to customization.
 
-Because asset specifications are used heavily in Pyramid, we've also provided a
-way to allow users to override assets.  Say you love a system that someone else
-has created with Pyramid but you just need to change "that one template" to
-make it all better.  No need to fork the application.  Just override the asset
-specification for that template with your own inside a wrapper, and you're good
-to go.
+Pyramid takes a different approach. Static assets are located using *asset
+specifications*, strings that contain reference both to a Python package name
+and a file or directory name, e.g. ``MyPackage:static/index.html``. These
+specifications are used for templates, JavaScript and CSS, translation files,
+and any other package-bound static resource. By using asset specifications,
+Pyramid makes it easy to extend your application with other packages without
+worrying about conflicts.
+
+What happens if another Pyramid package you are using provides an asset you
+need to customize? Maybe that page template needs better HTML, or you want to
+update some CSS. With asset specifications you can override the assets from
+other packages using simple wrappers.
 
 Examples: :ref:`asset_specifications` and :ref:`overriding_assets_section`.
 
