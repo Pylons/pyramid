@@ -292,10 +292,11 @@ properties of the instance.
 
 .. warning::
 
-   Writing ``__acl__`` as properties is discouraged, as AttributeErrors
-   occuring in ``fget`` or ``fset`` will be silently dismissed (this is consistent
-   with Python ``getattr`` and ``hasattr`` behaviors). For dynamic ACLs, simply use
-   callables, as documented above.
+   Writing ``__acl__`` as properties is discouraged because an
+   ``AttributeError`` occurring in ``fget`` or ``fset`` will be silently
+   dismissed (this is consistent with Python ``getattr`` and ``hasattr``
+   behaviors). For dynamic ACLs, simply use callables, as documented above.
+
 
 .. index::
    single: ACE
