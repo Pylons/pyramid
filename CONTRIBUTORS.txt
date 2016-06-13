@@ -276,3 +276,5 @@ Contributors
 - Marco Martinez, 2016/06/02
 
 - Cris Ewing, 2016/06/03
+
+- Jean-Christophe Bohin, 2016/06/13
