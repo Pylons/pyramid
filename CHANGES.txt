@@ -1,6 +1,10 @@
 unreleased
 ==========
 
+- Change flake8 noqa directive to ignore only a single line instead of the
+  entire file in scaffold and documentation. See
+  https://github.com/Pylons/pyramid/pull/2646
+
 - Add option to build docs as PDF only via tox. See:
   https://github.com/Pylons/pyramid/issues/2575
 
