@@ -334,9 +334,10 @@ Static assets
 Of course the Web is more than just markup. You need static assets: CSS, JS,
 and images. Let's point our web app at a directory from which Pyramid will
 serve some static assets. First let's make another call to the
-:term:`configurator`:
+:term:`configurator` in ``app.py``:
 
 .. literalinclude:: quick_tour/static_assets/app.py
+    :language: python
     :linenos:
     :lines: 6-8
     :lineno-start: 6
@@ -354,7 +355,7 @@ Next make a directory named ``static``, and place ``app.css`` inside:
 All we need to do now is point to it in the ``<head>`` of our Jinja2 template,
 ``hello_world.jinja2``:
 
-.. literalinclude:: quick_tour/static_assets/hello_world.jinja2
+.. literalinclude:: quick_tour/static_assets/hello_world_static.jinja2
     :language: jinja
     :linenos:
     :lines: 4-6
@@ -366,16 +367,16 @@ the site is later moved under ``/somesite/static/``? Or perhaps a web developer
 changes the arrangement on disk? Pyramid provides a helper to allow flexibility
 on URL generation:
 
-.. literalinclude:: quick_tour/static_assets/hello_world_static.jinja2
+.. literalinclude:: quick_tour/static_assets/hello_world.jinja2
     :language: jinja
     :linenos:
     :lines: 4-6
     :lineno-start: 4
     :emphasize-lines: 2
 
-By using ``request.static_url`` to generate the full URL to the static
-assets, you both ensure you stay in sync with the configuration and
-gain refactoring flexibility later.
+By using ``request.static_url`` to generate the full URL to the static assets,
+you ensure that you stay in sync with the configuration and gain refactoring
+flexibility later.
 
 .. seealso:: See also:
     :ref:`Quick Tutorial Static Assets <qtut_static_assets>`,
