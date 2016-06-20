@@ -557,7 +557,7 @@ Here is an example of a corresponding ``mypackage.views`` module:
 
    @view_config(route_name='idea')
    def idea_view(request):
-       return Response(request.matchdict['id'])
+       return Response(request.matchdict['idea'])
    
    @view_config(route_name='user')
    def user_view(request):
