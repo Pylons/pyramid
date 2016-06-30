@@ -471,7 +471,7 @@ class exception_view_config(object):
     exception view.
 
     The exception_view_config constructor requires an exception context, and
-    additionally accepts most of the same argumenta as the constructor of
+    additionally accepts most of the same arguments as the constructor of
     :class:`pyramid.view.view_config`.  It can be used in the same places,
     and behaves in largely the same way, except it always registers an exception
     view instead of a 'normal' view.
@@ -483,9 +483,9 @@ class exception_view_config(object):
         from pyramid.view import exception_view_config
         from pyramid.response import Response
 
-        @exception_view_config(context=ValueError)
-        def error_view(request):
-            return Response('A value error ocurred')
+        @exception_view_config(context=ValueError, renderer='json')
+        def error_view(context, request):
+            return {'error': str(context)}
 
     All arguments passed to this function have the same meaning as
     :meth:`pyramid.view.view_config` and each predicate argument restricts
