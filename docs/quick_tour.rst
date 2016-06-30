@@ -1,3 +1,4 @@
+
 .. _quick_tour:
 
 =====================
@@ -70,6 +71,7 @@ step. Here's a tiny application in Pyramid:
 
 .. literalinclude:: quick_tour/hello_world/app.py
     :linenos:
+    :language: python
 
 This simple example is easy to run. Save this as ``app.py`` and run it:
 
@@ -120,6 +122,7 @@ library for request and response handling. In our example above, Pyramid hands
 Let's see some features of requests and responses in action:
 
 .. literalinclude:: quick_tour/requests/app.py
+    :language: python
     :pyobject: hello_world
 
 In this Pyramid view, we get the URL being visited from ``request.url``. Also
@@ -159,6 +162,7 @@ Let's move the views out to their own ``views.py`` module and change the
 First our revised ``app.py``:
 
 .. literalinclude:: quick_tour/views/app.py
+    :language: python
     :linenos:
 
 We added some more routes, but we also removed the view code. Our views and
@@ -169,6 +173,7 @@ We now have a ``views.py`` module that is focused on handling requests and
 responses:
 
 .. literalinclude:: quick_tour/views/views.py
+    :language: python
     :linenos:
 
 We have four views, each leading to the other. If you start at
@@ -214,6 +219,7 @@ What if we want part of the URL to be available as data in my view? We can use
 this route declaration, for example:
 
 .. literalinclude:: quick_tour/routing/app.py
+    :language: python
     :linenos:
     :lines: 6
     :lineno-start: 6
@@ -222,6 +228,7 @@ With this, URLs such as ``/howdy/amy/smith`` will assign ``amy`` to ``first``
 and ``smith`` to ``last``. We can then use this data in our view:
 
 .. literalinclude:: quick_tour/routing/views.py
+    :language: python
     :linenos:
     :lines: 5-8
     :lineno-start: 5
@@ -260,6 +267,7 @@ With the package installed, we can include the template bindings into our
 configuration in ``app.py``:
 
 .. literalinclude:: quick_tour/templating/app.py
+    :language: python
     :linenos:
     :lines: 6-8
     :lineno-start: 6
@@ -268,6 +276,7 @@ configuration in ``app.py``:
 Now lets change our ``views.py`` file:
 
 .. literalinclude:: quick_tour/templating/views.py
+    :language: python
     :linenos:
     :emphasize-lines: 4,6
 
@@ -304,6 +313,7 @@ With the package installed, we can include the template bindings into our
 configuration:
 
 .. literalinclude:: quick_tour/jinja2/app.py
+    :language: python
     :linenos:
     :lines: 6-8
     :lineno-start: 6
@@ -312,6 +322,7 @@ configuration:
 The only change in our view is to point the renderer at the ``.jinja2`` file:
 
 .. literalinclude:: quick_tour/jinja2/views.py
+    :language: python
     :linenos:
     :lines: 4-6
     :lineno-start: 4
@@ -339,9 +350,10 @@ Static assets
 Of course the Web is more than just markup. You need static assets: CSS, JS,
 and images. Let's point our web app at a directory from which Pyramid will
 serve some static assets. First let's make another call to the
-:term:`configurator`:
+:term:`configurator` in ``app.py``:
 
 .. literalinclude:: quick_tour/static_assets/app.py
+    :language: python
     :linenos:
     :lines: 6-8
     :lineno-start: 6
@@ -359,7 +371,7 @@ Next make a directory named ``static``, and place ``app.css`` inside:
 All we need to do now is point to it in the ``<head>`` of our Jinja2 template,
 ``hello_world.jinja2``:
 
-.. literalinclude:: quick_tour/static_assets/hello_world.jinja2
+.. literalinclude:: quick_tour/static_assets/hello_world_static.jinja2
     :language: jinja
     :linenos:
     :lines: 4-6
@@ -371,16 +383,16 @@ the site is later moved under ``/somesite/static/``? Or perhaps a web developer
 changes the arrangement on disk? Pyramid provides a helper to allow flexibility
 on URL generation:
 
-.. literalinclude:: quick_tour/static_assets/hello_world_static.jinja2
+.. literalinclude:: quick_tour/static_assets/hello_world.jinja2
     :language: jinja
     :linenos:
     :lines: 4-6
     :lineno-start: 4
     :emphasize-lines: 2
 
-By using ``request.static_url`` to generate the full URL to the static
-assets, you both ensure you stay in sync with the configuration and
-gain refactoring flexibility later.
+By using ``request.static_url`` to generate the full URL to the static assets,
+you ensure that you stay in sync with the configuration and gain refactoring
+flexibility later.
 
 .. seealso:: See also:
     :ref:`Quick Tutorial Static Assets <qtut_static_assets>`,
@@ -396,6 +408,7 @@ to update the UI in the browser by requesting server data as JSON. Pyramid
 supports this with a JSON renderer:
 
 .. literalinclude:: quick_tour/json/views.py
+    :language: python
     :linenos:
     :lines: 9-
     :lineno-start: 9
@@ -408,6 +421,7 @@ We also need to add a route to ``app.py`` so that our app will know how to
 respond to a request for ``hello.json``.
 
 .. literalinclude:: quick_tour/json/app.py
+    :language: python
     :linenos:
     :lines: 6-8
     :lineno-start: 6
@@ -437,6 +451,7 @@ The following shows a "Hello World" example with three operations: view a form,
 save a change, or press the delete button in our ``views.py``:
 
 .. literalinclude:: quick_tour/view_classes/views.py
+    :language: python
     :linenos:
     :lines: 7-
     :lineno-start: 7
@@ -728,6 +743,7 @@ Our unit test passed, although its coverage is incomplete. What did our test
 look like?
 
 .. literalinclude:: quick_tour/package/hello_world/tests.py
+    :language: python
     :linenos:
 
 Pyramid supplies helpers for test writing, which we use in the test setup and
@@ -881,6 +897,7 @@ SQLAlchemy uses "models" for this mapping. The scaffold generated a sample
 model:
 
 .. literalinclude:: quick_tour/sqla_demo/sqla_demo/models/mymodel.py
+    :language: python
     :start-after: Start Sphinx Include
     :end-before: End Sphinx Include
 
@@ -888,6 +905,7 @@ View code, which mediates the logic between web requests and the rest of the
 system, can then easily get at the data thanks to SQLAlchemy:
 
 .. literalinclude:: quick_tour/sqla_demo/sqla_demo/views/default.py
+    :language: python
     :start-after: Start Sphinx Include
     :end-before: End Sphinx Include
 
