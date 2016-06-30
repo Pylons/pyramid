@@ -4,6 +4,16 @@ unreleased
 Backward Incompatibilities
 --------------------------
 
+ - Following the Pyramid deprecation period (1.6 -> 1.8),
+   daemon support for pserve has been removed. This includes removing the
+   daemon commands (start, stop, restart, status) as well as the following
+   arguments:
+   --daemon --pid-file --log-file --monitor-restart --status --user --group
+   --stop-daemon
+
+   To run your server as a daemon you should use a process manager instead of
+   pserve.
+
 Features
 --------
 

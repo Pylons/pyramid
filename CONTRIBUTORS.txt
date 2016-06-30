@@ -270,3 +270,11 @@ Contributors
 - Vincent Férotin, 2016/05/08
 
 - Berker Peksag, 2016/05/16
+
+- Zack Brunson, 2016/06/02
+
+- Marco Martinez, 2016/06/02
+
+- Cris Ewing, 2016/06/03
+
+- Jean-Christophe Bohin, 2016/06/13

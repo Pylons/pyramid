@@ -899,6 +899,7 @@ class ViewsConfiguratorMixin(object):
             # __no_permission_required__ handled by _secure_view
             derived_view = self._derive_view(
                 view,
+                route_name=route_name,
                 permission=permission,
                 predicates=preds,
                 attr=attr,
@@ -1348,7 +1349,7 @@ class ViewsConfiguratorMixin(object):
     def _derive_view(self, view, permission=None, predicates=(),
                      attr=None, renderer=None, wrapper_viewname=None,
                      viewname=None, accept=None, order=MAX_ORDER,
-                     phash=DEFAULT_PHASH, decorator=None,
+                     phash=DEFAULT_PHASH, decorator=None, route_name=None,
                      mapper=None, http_cache=None, context=None,
                      require_csrf=None, extra_options=None):
         view = self.maybe_dotted(view)
@@ -1378,6 +1379,7 @@ class ViewsConfiguratorMixin(object):
             decorator=decorator,
             http_cache=http_cache,
             require_csrf=require_csrf,
+            route_name=route_name
         )
         if extra_options:
             options.update(extra_options)
