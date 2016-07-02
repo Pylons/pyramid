@@ -16,6 +16,9 @@ unreleased
   ``pyramid.config.Configurator.set_request_property`` instead of
   ``pyramid.config.Configurator.add_request_method``.
 
+- Updated Windows installation instructions and related bits.
+  See: https://github.com/Pylons/pyramid/issues/2661
+
 1.7 (2016-05-19)
 ================
 
