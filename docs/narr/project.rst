@@ -87,9 +87,9 @@ On UNIX:
 
 Or on Windows:
 
-.. code-block:: text
+.. code-block:: doscon
 
-   > %VENV%\Scripts\pcreate -s starter MyProject
+   c:\> %VENV%\Scripts\pcreate -s starter MyProject
 
 As a result of invoking the ``pcreate`` command, a directory named
 ``MyProject`` is created.  That directory is a :term:`project` directory. The
@@ -161,8 +161,8 @@ Or on Windows:
 
 .. code-block:: doscon
 
-   > cd MyProject
-   > %VENV%\Scripts\pip install -e .
+   c:\> cd MyProject
+   c:\> %VENV%\Scripts\pip install -e .
 
 Elided output from a run of this command on UNIX is shown below:
 
@@ -199,7 +199,7 @@ On Windows:
 
 .. code-block:: doscon
 
-   > %VENV%\Scripts\pip install -e ".[testing]"
+   c:\> %VENV%\Scripts\pip install -e ".[testing]"
 
 Once the testing requirements are installed, then you can run the tests using
 the ``py.test`` command that was just installed in the ``bin`` directory of
@@ -215,7 +215,7 @@ On Windows:
 
 .. code-block:: doscon
 
-   > %VENV%\Scripts\py.test -q
+   c:\> %VENV%\Scripts\py.test -q
 
 Here's sample output from a test run on UNIX:
 
@@ -266,7 +266,7 @@ path to the module on which we want to run tests and coverage.
 Running the Project Application
 -------------------------------
 
-.. seealso:: See also the output of :ref:`pserve --help <pserve_script>`.
+.. seealso:: See also the output of :ref:`pserve --help <pserve_scriptc:\>`.
 
 Once a project is installed for development, you can run the application it
 represents using the ``pserve`` command against the generated configuration
@@ -282,7 +282,7 @@ On Windows:
 
 .. code-block:: text
 
-   > %VENV%\Scripts\pserve development.ini
+   c:\> %VENV%\Scripts\pserve development.ini
 
 Here's sample output from a run of ``pserve`` on UNIX:
 
