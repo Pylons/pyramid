@@ -25,3 +25,5 @@ Deprecations
 
 Documentation Changes
 ---------------------
+- Updated Windows installation instructions and related bits.
+  See: https://github.com/Pylons/pyramid/issues/2661

@@ -205,10 +205,10 @@ On UNIX, you can do that via:
 
 On Windows, you need to issue two commands:
 
-.. code-block:: bash
+.. code-block:: doscon
 
-   C:\> set PYTHONWARNINGS=default
-   C:\> Scripts/pserve.exe development.ini
+   c:\> set PYTHONWARNINGS=default
+   c:\> Scripts/pserve.exe development.ini
 
 At this point, it's ensured that deprecation warnings will be printed to the
 console whenever a codepath is hit that generates one.  You can then click
