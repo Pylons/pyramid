@@ -266,7 +266,7 @@ path to the module on which we want to run tests and coverage.
 Running the Project Application
 -------------------------------
 
-.. seealso:: See also the output of :ref:`pserve --help <pserve_scriptc:\>`.
+.. seealso:: See also the output of :ref:`pserve --help <pserve_script>`.
 
 Once a project is installed for development, you can run the application it
 represents using the ``pserve`` command against the generated configuration
