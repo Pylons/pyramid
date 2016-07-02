@@ -1,3 +1,5 @@
+.. _wiki_adding_tests:
+
 ============
 Adding Tests
 ============
@@ -82,13 +84,13 @@ themselves:
 
 On UNIX:
 
-.. code-block:: text
+.. code-block:: bash
 
    $ $VENV/bin/python setup.py test -q
 
 On Windows:
 
-.. code-block:: text
+.. code-block:: doscon
 
    c:\pyramidtut\tutorial> %VENV%\Scripts\python setup.py test -q
 

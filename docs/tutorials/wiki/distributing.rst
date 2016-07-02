@@ -1,3 +1,5 @@
+.. _wiki_distributing_your_application:
+
 =============================
 Distributing Your Application
 =============================
@@ -5,18 +7,18 @@ Distributing Your Application
 Once your application works properly, you can create a "tarball" from it by
 using the ``setup.py sdist`` command.  The following commands assume your
 current working directory is the ``tutorial`` package we've created and that
-the parent directory of the ``tutorial`` package is a virtualenv representing
-a :app:`Pyramid` environment.
+the parent directory of the ``tutorial`` package is a virtual environment
+representing a :app:`Pyramid` environment.
 
 On UNIX:
 
-.. code-block:: text
+.. code-block:: bash
 
    $ $VENV/bin/python setup.py sdist
 
 On Windows:
 
-.. code-block:: text
+.. code-block:: doscon
 
    c:\pyramidtut> %VENV%\Scripts\python setup.py sdist
 
@@ -25,10 +27,9 @@ The output of such a command will be something like:
 .. code-block:: text
 
    running sdist
-   # .. more output ..
+   # more output
    creating dist
-   tar -cf dist/tutorial-0.0.tar tutorial-0.0
-   gzip -f9 dist/tutorial-0.0.tar
+   Creating tar archive
    removing 'tutorial-0.0' (and everything under it)
 
 Note that this command creates a tarball in the "dist" subdirectory named

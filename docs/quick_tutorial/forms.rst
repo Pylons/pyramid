@@ -81,6 +81,14 @@ Steps
     :language: html
     :linenos:
 
+#. Run the tests:
+
+   .. code-block:: bash
+
+    $ $VENV/bin/nosetests tutorial
+    ..
+    2 passed in 0.45 seconds
+
 #. Run your Pyramid application with:
 
    .. code-block:: bash

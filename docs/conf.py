@@ -125,6 +125,7 @@ if book:
 
 # Options for HTML output
 # -----------------------
+# enable pylons_sphinx_latesturl when this branch is no longer "latest"
 pylons_sphinx_latesturl_base = (
     'http://docs.pylonsproject.org/projects/pyramid/en/latest/')
 pylons_sphinx_latesturl_pagename_overrides = {
@@ -144,9 +145,10 @@ html_theme = 'pyramid'
 html_theme_path = pylons_sphinx_themes.get_html_themes_path()
 html_theme_options = dict(
     github_url='https://github.com/Pylons/pyramid',
-    # on master branch true, else false
+    # On master branch and new branch still in
+    # pre-release status: true; else: false.
     in_progress='false',
-    # on previous branches/major releases true, else false
+    # On branches previous to "latest": true; else: false.
     outdated='true',
     )
 

@@ -5,12 +5,12 @@ Adding authorization
 ====================
 
 :app:`Pyramid` provides facilities for :term:`authentication` and
-::term:`authorization`.  We'll make use of both features to provide security
-:to our application.  Our application currently allows anyone with access to
-:the server to view, edit, and add pages to our wiki.  We'll change that to
-:allow only people who are members of a *group* named ``group:editors`` to add
-:and edit wiki pages but we'll continue allowing anyone with access to the
-:server to view pages.
+:term:`authorization`. We'll make use of both features to provide security to
+our application. Our application currently allows anyone with access to the
+server to view, edit, and add pages to our wiki. We'll change that to allow
+only people who are members of a *group* named ``group:editors`` to add and
+edit wiki pages, but we'll continue allowing anyone with access to the server
+to view pages.
 
 We will also add a login page and a logout link on all the pages.  The login
 page will be shown when a user is denied access to any of the views that
@@ -41,7 +41,7 @@ Access control
 Add users and groups
 ~~~~~~~~~~~~~~~~~~~~
 
-Create a new ``tutorial/tutorial/security.py`` module with the
+Create a new ``tutorial/security.py`` module with the
 following content:
 
 .. literalinclude:: src/authorization/tutorial/security.py
@@ -67,7 +67,7 @@ database, but here we use "dummy" data to represent user and groups sources.
 Add an ACL
 ~~~~~~~~~~
 
-Open ``tutorial/tutorial/models.py`` and add the following import
+Open ``tutorial/models.py`` and add the following import
 statement at the head:
 
 .. literalinclude:: src/authorization/tutorial/models.py
@@ -109,7 +109,7 @@ more information about what an :term:`ACL` represents.
 Add authentication and authorization policies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Open ``tutorial/tutorial/__init__.py`` and add the highlighted import
+Open ``tutorial/__init__.py`` and add the highlighted import
 statements:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
@@ -142,7 +142,7 @@ machinery represented by this policy: it is required.  The ``callback`` is the
 
 Add permission declarations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Open ``tutorial/tutorial/views.py`` and add a ``permission='edit'`` parameter
+Open ``tutorial/views.py`` and add a ``permission='edit'`` parameter
 to the ``@view_config`` decorators for ``add_page()`` and ``edit_page()``:
 
 .. literalinclude:: src/authorization/tutorial/views.py
@@ -196,7 +196,7 @@ link to it.  This view will clear the credentials of the logged in user and
 redirect back to the front page.
 
 Add the following import statements to the head of
-``tutorial/tutorial/views.py``:
+``tutorial/views.py``:
 
 .. literalinclude:: src/authorization/tutorial/views.py
    :lines: 6-17
@@ -236,7 +236,7 @@ it with the ``logout`` route.  It will be invoked when we visit ``/logout``.
 Add the ``login.pt`` Template
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Create ``tutorial/tutorial/templates/login.pt`` with the following content:
+Create ``tutorial/templates/login.pt`` with the following content:
 
 .. literalinclude:: src/authorization/tutorial/templates/login.pt
    :language: html
@@ -247,7 +247,7 @@ The above template is referenced in the login view that we just added in
 Return a ``logged_in`` flag to the renderer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Open ``tutorial/tutorial/views.py`` again. Add a ``logged_in`` parameter to
+Open ``tutorial/views.py`` again. Add a ``logged_in`` parameter to
 the return value of ``view_page()``, ``add_page()``, and ``edit_page()`` as
 follows:
 
@@ -274,8 +274,8 @@ the user is not authenticated, or a userid if the user is authenticated.
 Add a "Logout" link when logged in
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Open ``tutorial/tutorial/templates/edit.pt`` and
-``tutorial/tutorial/templates/view.pt`` and add the following code as
+Open ``tutorial/templates/edit.pt`` and
+``tutorial/templates/view.pt`` and add the following code as
 indicated by the highlighted lines.
 
 .. literalinclude:: src/authorization/tutorial/templates/edit.pt
@@ -291,7 +291,7 @@ a user is not authenticated.
 Reviewing our changes
 ---------------------
 
-Our ``tutorial/tutorial/__init__.py`` will look like this when we're done:
+Our ``tutorial/__init__.py`` will look like this when we're done:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
    :linenos:
@@ -300,7 +300,7 @@ Our ``tutorial/tutorial/__init__.py`` will look like this when we're done:
 
 Only the highlighted lines need to be added or edited.
 
-Our ``tutorial/tutorial/models.py`` will look like this when we're done:
+Our ``tutorial/models.py`` will look like this when we're done:
 
 .. literalinclude:: src/authorization/tutorial/models.py
    :linenos:
@@ -309,7 +309,7 @@ Our ``tutorial/tutorial/models.py`` will look like this when we're done:
 
 Only the highlighted lines need to be added or edited.
 
-Our ``tutorial/tutorial/views.py`` will look like this when we're done:
+Our ``tutorial/views.py`` will look like this when we're done:
 
 .. literalinclude:: src/authorization/tutorial/views.py
    :linenos:
@@ -318,7 +318,7 @@ Our ``tutorial/tutorial/views.py`` will look like this when we're done:
 
 Only the highlighted lines need to be added or edited.
 
-Our ``tutorial/tutorial/templates/edit.pt`` template will look like this when
+Our ``tutorial/templates/edit.pt`` template will look like this when
 we're done:
 
 .. literalinclude:: src/authorization/tutorial/templates/edit.pt
@@ -328,7 +328,7 @@ we're done:
 
 Only the highlighted lines need to be added or edited.
 
-Our ``tutorial/tutorial/templates/view.pt`` template will look like this when
+Our ``tutorial/templates/view.pt`` template will look like this when
 we're done:
 
 .. literalinclude:: src/authorization/tutorial/templates/view.pt

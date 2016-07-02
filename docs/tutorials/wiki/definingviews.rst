@@ -1,3 +1,5 @@
+.. _wiki_defining_views:
+
 ==============
 Defining Views
 ==============
@@ -41,7 +43,7 @@ We need to add a dependency on the ``docutils`` package to our ``tutorial``
 package's ``setup.py`` file by assigning this dependency to the ``requires``
 parameter in the ``setup()`` function.
 
-Open ``tutorial/setup.py`` and edit it to look like the following:
+Open ``setup.py`` and edit it to look like the following:
 
 .. literalinclude:: src/views/setup.py
    :linenos:
@@ -62,28 +64,31 @@ directory in which ``setup.py`` lives) and execute the following command.
 
 On UNIX:
 
-.. code-block:: text
+.. code-block:: bash
 
    $ cd tutorial
    $ $VENV/bin/python setup.py develop
 
 On Windows:
 
-.. code-block:: text
+.. code-block:: doscon
 
    c:\pyramidtut> cd tutorial
    c:\pyramidtut\tutorial> %VENV%\Scripts\python setup.py develop
 
 Success executing this command will end with a line to the console something
-like::
+like:
+
+.. code-block:: text
 
    Finished processing dependencies for tutorial==0.0
+
 
 Adding view functions in ``views.py``
 =====================================
 
-It's time for a major change.  Open ``tutorial/tutorial/views.py`` and edit it
-to look like the following:
+It's time for a major change.  Open ``tutorial/views.py`` and edit it to look
+like the following:
 
 .. literalinclude:: src/views/tutorial/views.py
    :linenos:
@@ -310,7 +315,7 @@ extension to be recognized as such.
 The ``view.pt`` template
 ------------------------
 
-Create ``tutorial/tutorial/templates/view.pt`` and add the following
+Create ``tutorial/templates/view.pt`` and add the following
 content:
 
 .. literalinclude:: src/views/tutorial/templates/view.pt
@@ -329,8 +334,7 @@ wiki page. It includes:
 The ``edit.pt`` template
 ------------------------
 
-Create ``tutorial/tutorial/templates/edit.pt`` and add the following
-content:
+Create ``tutorial/templates/edit.pt`` and add the following content:
 
 .. literalinclude:: src/views/tutorial/templates/edit.pt
    :linenos:
@@ -352,6 +356,7 @@ The form POSTs back to the ``save_url`` argument supplied by the view (line
    See :ref:`renderer_system_values` for information about other names that
    are available by default when a template is used as a renderer.
 
+
 Static assets
 -------------
 
@@ -366,6 +371,7 @@ number and type of static assets can be placed in this directory (or
 subdirectories) and are just referred to by URL or by using the convenience
 method ``static_url``, e.g.,
 ``request.static_url('<package>:static/foo.css')`` within templates.
+
 
 Viewing the application in a browser
 ====================================
