@@ -92,7 +92,7 @@ necessary when your test needs to make use of the ``config`` object (it's a
 Configurator) to add stuff to the configuration state before calling the view.
 
 
-Extra Credit
+Extra credit
 ============
 
 #. Change the test to assert that the response status code should be ``404``

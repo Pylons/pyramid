@@ -120,7 +120,7 @@ filesystem for changes to relevant code (Python files, the INI file, etc.) and,
 when something changes, restart the application. Very handy during development.
 
 
-Extra Credit
+Extra credit
 ============
 
 #. If you don't like configuration and/or ``.ini`` files, could you do this
