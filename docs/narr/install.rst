@@ -6,8 +6,8 @@ Installing :app:`Pyramid`
 .. index::
    single: install preparation
 
-Before You Install
-------------------
+Before You Install Pyramid
+--------------------------
 
 You will need `Python <http://python.org>`_ version 2.6 or better to run
 :app:`Pyramid`.
@@ -19,15 +19,24 @@ You will need `Python <http://python.org>`_ version 2.6 or better to run
     :app:`Pyramid` does not run under any version of Python before 2.6.
 
 :app:`Pyramid` is known to run on all popular UNIX-like systems such as Linux,
-Mac OS X, and FreeBSD as well as on Windows platforms.  It is also known to run
-on :term:`PyPy` (1.9+).
+Mac OS X, and FreeBSD, as well as on Windows platforms.  It is also known to
+run on :term:`PyPy` (1.9+).
 
-:app:`Pyramid` installation does not require the compilation of any C code, so
-you need only a Python interpreter that meets the requirements mentioned.
+:app:`Pyramid` installation does not require the compilation of any C code.
+However, some :app:`Pyramid` dependencies may attempt to build binary
+extensions from C code for performance speed ups. If a compiler or Python
+headers are unavailable, the dependency will fall back to using pure Python
+instead.
 
-Some :app:`Pyramid` dependencies may attempt to build C extensions for
-performance speedups. If a compiler or Python headers are unavailable the
-dependency will fall back to using pure Python instead.
+.. note::
+
+   If you see any warnings or errors related to failing to compile the binary
+   extensions, in most cases you may safely ignore those errors. If you wish to
+   use the binary extensions, please verify that you have a functioning
+   compiler and the Python header files installed for your operating system.
+
+
+.. _for-mac-os-x-users:
 
 For Mac OS X Users
 ~~~~~~~~~~~~~~~~~~
@@ -51,6 +60,9 @@ Alternatively, you can use the `homebrew <http://brew.sh/>`_ package manager.
 
 If you use an installer for your Python, then you can skip to the section
 :ref:`installing_unix`.
+
+
+.. _if-you-don-t-yet-have-a-python-interpreter-unix:
 
 If You Don't Yet Have a Python Interpreter (UNIX)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -128,27 +140,65 @@ Once these steps are performed, the Python interpreter will be invokable via
 .. index::
    pair: install; Python (from package, Windows)
 
+.. _if-you-don-t-yet-have-a-python-interpreter-windows:
+
 If You Don't Yet Have a Python Interpreter (Windows)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If your Windows system doesn't have a Python interpreter, you'll need to
-install it by downloading a Python 2.7-series interpreter executable from
-`python.org's download section <http://python.org/download/>`_ (the files
+install it by downloading a Python 3.x-series interpreter executable from
+`python.org's download section <https://www.python.org/downloads/>`_ (the files
 labeled "Windows Installer").  Once you've downloaded it, double click on the
-executable and accept the defaults during the installation process. You may
-also need to download and install the Python for Windows extensions.
+executable, and select appropriate options during the installation process. To
+standardize this documentation, we used the GUI installer and selected the
+following options:
+
+- Screen 1: Install Python 3.x.x (32- or 64-bit)
+    - Check "Install launcher for all users (recommended)"
+    - Check "Add Python 3.x to PATH"
+    - Click "Customize installation"
+- Screen 2: Optional Features
+    - Check all options
+    - Click "Next"
+- Screen 3: Advanced Options
+    - Check all options
+    - Customize install location: "C:\\Python3x", where "x" is the minor
+      version of Python
+    - Click "Next"
+
+You might also need to download and install the Python for Windows extensions.
+
+.. seealso:: See the official Python documentation :ref:`Using Python on
+   Windows <python:using-on-windows>` for full details.
+
+.. seealso:: Download and install the `Python for Windows extensions
+   <https://sourceforge.net/projects/pywin32/files/pywin32/>`_. Carefully read
+   the README.txt file at the end of the list of builds, and follow its
+   directions. Make sure you get the proper 32- or 64-bit build and Python
+   version.
+
+.. seealso:: `Python launcher for Windows
+   <https://docs.python.org/3/using/windows.html#launcher>`_ provides a command
+   ``py`` that allows users to run any installed version of Python.
 
 .. warning::
 
-   After you install Python on Windows, you may need to add the ``C:\Python27``
-   directory to your environment's ``Path`` in order to make it possible to
-   invoke Python from a command prompt by typing ``python``.  To do so, right
-   click ``My Computer``, select ``Properties`` --> ``Advanced Tab`` -->
-   ``Environment Variables`` and add that directory to the end of the ``Path``
+   After you install Python on Windows, you might need to add the
+   ``c:\Python3x`` directory to your environment's ``Path``, where ``x`` is the
+   minor version of installed Python, in order to make it possible to invoke
+   Python from a command prompt by typing ``python``. To do so, right click
+   ``My Computer``, select ``Properties`` --> ``Advanced Tab`` -->
+   ``Environment Variables``, and add that directory to the end of the ``Path``
    environment variable.
+
+   .. seealso:: See `Configuring Python (on Windows)
+      <https://docs.python.org/3/using/windows.html#configuring-python>`_ for
+      full details.
+
 
 .. index::
    single: installing on UNIX
+   single: installing on Mac OS X
 
 .. _installing_unix:
 
@@ -158,13 +208,14 @@ Installing :app:`Pyramid` on a UNIX System
 It is best practice to install :app:`Pyramid` into a "virtual" Python
 environment in order to obtain isolation from any "system" packages you've got
 installed in your Python version.  This can be done by using the
-:term:`virtualenv` package.  Using a virtualenv will also prevent
+:term:`virtualenv` package.  Using a virtual environment will also prevent
 :app:`Pyramid` from globally installing versions of packages that are not
 compatible with your system Python.
 
-To set up a virtualenv in which to install :app:`Pyramid`, first ensure that
-:term:`setuptools` is installed.  To do so, invoke ``import setuptools`` within
-the Python interpreter you'd like to run :app:`Pyramid` under.
+To set up a virtual environment in which to install :app:`Pyramid`, first
+ensure that :term:`setuptools` is installed. To do so, invoke ``import
+setuptools`` within the Python interpreter under which you'd like to run
+:app:`Pyramid`.
 
 The following command will not display anything if setuptools is already
 installed:
@@ -267,22 +318,23 @@ you can then create a virtual environment.  To do so, invoke the following:
    Installing setuptools.............done.
 
 You can either follow the use of the environment variable, ``$VENV``, or
-replace it with the root directory of the :term:`virtualenv`. In that case, the
-`export` command can be skipped. If you choose the former approach, ensure that
-it's an absolute path.
+replace it with the root directory of the virtual environment. In that case,
+the `export` command can be skipped. If you choose the former approach, ensure
+that it's an absolute path.
 
 .. warning::
 
    Avoid using the ``--system-site-packages`` option when creating the
-   virtualenv unless you know what you are doing. For versions of virtualenv
-   prior to 1.7, make sure to use the ``--no-site-packages`` option, because
-   this option was formerly not the default and may produce undesirable
+   virtual environment unless you know what you are doing. For versions of
+   virtualenv prior to 1.7, make sure to use the ``--no-site-packages`` option,
+   because this option was formerly not the default and may produce undesirable
    results.
 
 .. warning::
 
     *do not* use ``sudo`` to run the ``virtualenv`` script.  It's perfectly
-    acceptable (and desirable) to create a virtualenv as a normal user.
+    acceptable (and desirable) to create a virtual environment as a normal
+    user.
 
 
 Installing :app:`Pyramid` into the Virtual Python Environment
@@ -316,7 +368,7 @@ Installing :app:`Pyramid` on a Windows System
 You can use Pyramid on Windows under Python 2 or 3.
 
 #. Download and install the most recent `Python 2.7.x or 3.3.x version
-   <http://www.python.org/download/>`_ for your system.
+   <https://www.python.org/download/>`_ for your system.
 
 #. Download and install the `Python for Windows extensions
    <http://sourceforge.net/projects/pywin32/files/pywin32/>`_. Carefully read
@@ -347,7 +399,7 @@ You can use Pyramid on Windows under Python 2 or 3.
       # for Python 3.3:
       c:\> c:\Python33\Scripts\easy_install virtualenv
 
-#. Make a :term:`virtualenv` workspace:
+#. Make a virtual environment workspace:
 
    .. code-block:: text
 
@@ -358,26 +410,27 @@ You can use Pyramid on Windows under Python 2 or 3.
       # for Python 3.3:
       c:\> c:\Python33\Scripts\virtualenv %VENV%
 
-   You can either follow the use of the environment variable, ``%VENV%``, or
-   replace it with the root directory of the :term:`virtualenv`. In that case,
-   the `set` command can be skipped. If you choose the former approach, ensure
-   that it's an absolute path.
+   You can either follow the use of the environment variable ``%VENV%``, or
+   replace it with the root directory of the virtual environment. If you choose
+   the former approach, ensure that ``%VENV%`` is an absolute path. In the
+   latter case, the ``set`` command can be skipped.
 
 #. (Optional) Consider using ``%VENV%\Scripts\activate.bat`` to make your shell
-   environment wired to use the virtualenv.
+   environment wired to use the virtual environment.
 
 #. Use ``easy_install`` to get :app:`Pyramid` and its direct dependencies
    installed:
 
    .. parsed-literal::
 
-      c:\\env> %VENV%\\Scripts\\easy_install "pyramid==\ |release|\ "
+      c:\\> %VENV%\\Scripts\\easy_install "pyramid==\ |release|\ "
+
 
 What Gets Installed
 -------------------
 
-When you ``easy_install`` :app:`Pyramid`, various other libraries such as
-WebOb, PasteDeploy, and others are installed.
+When you install :app:`Pyramid`, various libraries such as WebOb, PasteDeploy,
+and others are installed.
 
 Additionally, as chronicled in :ref:`project_narr`, scaffolds will be
 registered, which make it easy to start a new :app:`Pyramid` project.
