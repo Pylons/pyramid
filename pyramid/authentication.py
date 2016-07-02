@@ -1169,18 +1169,13 @@ def extract_http_basic_credentials(request):
     ``request``
         The request object
     """
-    try:
-        # First try authorization extraction logic from WebOb
-        try:
-            authmeth, auth = request.authorization
-        except AttributeError:  # Probably a DummyRequest
-            authorization = request.headers.get('Authorization')
-            if not authorization:
-                return None
+    authorization = request.headers.get('Authorization')
+    if not authorization:
+        return None
 
-            authmeth, auth = authorization.split(' ', 1)
-    except (ValueError, TypeError):
-        # not enough values to unpack or None is not iterable
+    try:
+        authmeth, auth = authorization.split(' ', 1)
+    except ValueError:  # not enough values to unpack
         return None
 
     if authmeth.lower() != 'basic':
