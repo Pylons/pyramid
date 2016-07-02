@@ -87,7 +87,7 @@ Pyramid development. Building an application from loosely-coupled parts via
 revisit regularly in this *Quick Tutorial*.
 
 
-Extra Credit
+Extra credit
 ============
 
 #. Why do we do this:
