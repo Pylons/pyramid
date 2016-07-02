@@ -1089,6 +1089,7 @@ Glossary
       A technique used when serving a cacheable static asset in order to force
       a client to query the new version of the asset. See :ref:`cache_busting`
       for more information.
+
    pip
       The :term:`Python Packaging Authority`'s recommended tool for installing
       Python packages.
