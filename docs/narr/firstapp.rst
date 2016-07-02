@@ -27,15 +27,15 @@ installed, an HTTP server is started on TCP port 8080.
 
 On UNIX:
 
-.. code-block:: text
+.. code-block:: bash
 
    $ $VENV/bin/python helloworld.py
 
 On Windows:
 
-.. code-block:: text
+.. code-block:: doscon
 
-   C:\> %VENV%\Scripts\python.exe helloworld.py
+   c:\> %VENV%\Scripts\python helloworld.py
 
 This command will not return and nothing will be printed to the console. When
 port 8080 is visited by a browser on the URL ``/hello/world``, the server will
@@ -197,7 +197,7 @@ method returns a :term:`WSGI` application object that can be used by any WSGI
 server to present an application to a requestor. :term:`WSGI` is a protocol
 that allows servers to talk to Python applications.  We don't discuss
 :term:`WSGI` in any depth within this book, but you can learn more about it by
-visiting `wsgi.org <http://wsgi.org>`_.
+reading its `documentation <http://wsgi.readthedocs.org/en/latest/>`_.
 
 The :app:`Pyramid` application object, in particular, is an instance of a class
 representing a :app:`Pyramid` :term:`router`.  It has a reference to the
