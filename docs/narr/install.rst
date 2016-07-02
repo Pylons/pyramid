@@ -146,11 +146,11 @@ If You Don't Yet Have a Python Interpreter (Windows)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If your Windows system doesn't have a Python interpreter, you'll need to
-install it by downloading a Python 3.x-series interpreter executable from
-`python.org's download section <https://www.python.org/downloads/>`_ (the files
-labeled "Windows Installer").  Once you've downloaded it, double click on the
-executable, and select appropriate options during the installation process. To
-standardize this documentation, we used the GUI installer and selected the
+install it by downloading a Python 2.x- or 3.x-series interpreter executable
+from `python.org's download section <https://www.python.org/downloads/>`_ (the
+files labeled "Windows Installer").  Once you've downloaded it, double click on
+the executable, and select appropriate options during the installation process.
+To standardize this documentation, we used the GUI installer and selected the
 following options:
 
 - Screen 1: Install Python 3.x.x (32- or 64-bit)
@@ -365,23 +365,14 @@ complete, as it downloads and installs a number of dependencies.
 Installing :app:`Pyramid` on a Windows System
 ---------------------------------------------
 
-You can use Pyramid on Windows under Python 2 or 3.
+You can use Pyramid on Windows under Python 2 or 3. See above for how to
+install Python on Windows.
 
-#. Download and install the most recent `Python 2.7.x or 3.3.x version
-   <https://www.python.org/download/>`_ for your system.
+#. Install latest :term:`setuptools` distribution. Sownload `ez_setup.py
+   <https://bootstrap.pypa.io/ez_setup.py>`_ and run it using the ``python``
+   interpreter of your Python 2.7 or 3.3 installation using a command prompt:
 
-#. Download and install the `Python for Windows extensions
-   <http://sourceforge.net/projects/pywin32/files/pywin32/>`_. Carefully read
-   the README.txt file at the end of the list of builds, and follow its
-   directions. Make sure you get the proper 32- or 64-bit build and Python
-   version.
-
-#. Install latest :term:`setuptools` distribution into the Python from step 1
-   above: download `ez_setup.py <https://bootstrap.pypa.io/ez_setup.py>`_ and
-   run it using the ``python`` interpreter of your Python 2.7 or 3.3
-   installation using a command prompt:
-
-   .. code-block:: text
+   .. code-block:: doscon
 
       # modify the command according to the python version, e.g.:
       # for Python 2.7:
@@ -391,7 +382,7 @@ You can use Pyramid on Windows under Python 2 or 3.
 
 #. Install `virtualenv`:
 
-   .. code-block:: text
+   .. code-block:: doscon
 
       # modify the command according to the python version, e.g.:
       # for Python 2.7:
@@ -401,7 +392,7 @@ You can use Pyramid on Windows under Python 2 or 3.
 
 #. Make a virtual environment workspace:
 
-   .. code-block:: text
+   .. code-block:: doscon
 
       c:\> set VENV=c:\env
       # modify the command according to the python version, e.g.:
