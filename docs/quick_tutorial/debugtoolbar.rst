@@ -90,7 +90,7 @@ temporarily.
 .. seealso:: See also :ref:`pyramid_debugtoolbar <toolbar:overview>`.
 
 
-Extra Credit
+Extra credit
 ============
 
 #. Why don't we add ``pyramid_debugtoolbar`` to the list of
