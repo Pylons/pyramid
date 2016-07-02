@@ -294,7 +294,7 @@ You may use the ``--list-shells`` option to see the available shells.
      python
 
 If you want to use a shell that isn't supported out of the box, you can
-introduce a new shell by registering an entry point in your setup.py:
+introduce a new shell by registering an entry point in your ``setup.py``:
 
 .. code-block:: python
 
@@ -815,17 +815,17 @@ Making Your Script into a Console Script
 ----------------------------------------
 
 A "console script" is :term:`setuptools` terminology for a script that gets
-installed into the ``bin`` directory of a Python :term:`virtualenv` (or "base"
-Python environment) when a :term:`distribution` which houses that script is
-installed.  Because it's installed into the ``bin`` directory of a virtualenv
-when the distribution is installed, it's a convenient way to package and
-distribute functionality that you can call from the command-line. It's often
-more convenient to create a console script than it is to create a ``.py``
-script and instruct people to call it with the "right" Python interpreter.  A
-console script generates a file that lives in ``bin``, and when it's invoked it
-will always use the "right" Python environment, which means it will always be
-invoked in an environment where all the libraries it needs (such as Pyramid)
-are available.
+installed into the ``bin`` directory of a Python :term:`virtual environment`
+(or "base" Python environment) when a :term:`distribution` which houses that
+script is installed. Because it's installed into the ``bin`` directory of a
+virtual environment when the distribution is installed, it's a convenient way
+to package and distribute functionality that you can call from the
+command-line. It's often more convenient to create a console script than it is
+to create a ``.py`` script and instruct people to call it with the "right"
+Python interpreter. A console script generates a file that lives in ``bin``,
+and when it's invoked it will always use the "right" Python environment, which
+means it will always be invoked in an environment where all the libraries it
+needs (such as Pyramid) are available.
 
 In general, you can make your script into a console script by doing the
 following:
@@ -841,11 +841,11 @@ following:
   representing the callable you added to your distribution.
 
 - Run ``setup.py develop``, ``setup.py install``, or ``easy_install`` to get
-  your distribution reinstalled.  When you reinstall your distribution, a file
+  your distribution reinstalled. When you reinstall your distribution, a file
   representing the script that you named in the last step will be in the
-  ``bin`` directory of the virtualenv in which you installed the distribution.
-  It will be executable.  Invoking it from a terminal will execute your
-  callable.
+  ``bin`` directory of the virtual environment in which you installed the
+  distribution. It will be executable. Invoking it from a terminal will execute
+  your callable.
 
 As an example, let's create some code that can be invoked by a console script
 that prints the deployment settings of a Pyramid application.  To do so, we'll
@@ -953,12 +953,14 @@ top-level directory, your ``setup.py`` file will look something like this:
          """,
          )
 
-We're going to change the setup.py file to add a ``[console_scripts]`` section
-within the ``entry_points`` string.  Within this section, you should specify a
-``scriptname = dotted.path.to:yourfunction`` line.  For example::
+We're going to change the ``setup.py`` file to add a ``[console_scripts]``
+section within the ``entry_points`` string. Within this section, you should
+specify a ``scriptname = dotted.path.to:yourfunction`` line.  For example:
 
-  [console_scripts]
-  show_settings = myproject.scripts:settings_show
+.. code-block:: ini
+
+   [console_scripts]
+   show_settings = myproject.scripts:settings_show
 
 The ``show_settings`` name will be the name of the script that is installed
 into ``bin``.  The colon (``:``) between ``myproject.scripts`` and
@@ -971,6 +973,7 @@ The result will be something like:
 
 .. code-block:: python
    :linenos:
+   :emphasize-lines: 36-37
 
    import os
 
@@ -989,11 +992,11 @@ The result will be something like:
          description='My project',
          long_description=README + '\n\n' +  CHANGES,
          classifiers=[
-           "Programming Language :: Python",
-           "Framework :: Pylons",
-           "Topic :: Internet :: WWW/HTTP",
-           "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
-           ],
+             "Programming Language :: Python",
+             "Framework :: Pyramid",
+             "Topic :: Internet :: WWW/HTTP",
+             "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
+         ],
          author='',
          author_email='',
          url='',
@@ -1012,15 +1015,17 @@ The result will be something like:
          """,
          )
 
-Once you've done this, invoking ``$$VENV/bin/python setup.py develop`` will
+Once you've done this, invoking ``$VENV/bin/python setup.py develop`` will
 install a file named ``show_settings`` into the ``$somevirtualenv/bin``
-directory with a small bit of Python code that points to your entry point.  It
-will be executable.  Running it without any arguments will print an error and
+directory with a small bit of Python code that points to your entry point. It
+will be executable. Running it without any arguments will print an error and
 exit.  Running it with a single argument that is the path of a config file will
-print the settings.  Running it with an ``--omit=foo`` argument will omit the
-settings that have keys that start with ``foo``.  Running it with two "omit"
+print the settings. Running it with an ``--omit=foo`` argument will omit the
+settings that have keys that start with ``foo``. Running it with two "omit"
 options (e.g., ``--omit=foo --omit=bar``) will omit all settings that have keys
 that start with either ``foo`` or ``bar``::
+
+.. code-block:: bash
 
   $ $VENV/bin/show_settings development.ini --omit=pyramid --omit=debugtoolbar
   debug_routematch                             False
