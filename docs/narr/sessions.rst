@@ -260,19 +260,28 @@ added to the flash queue, and empties the queue.
 
 .. method:: pop_flash(queue='')
 
->>> request.session.flash('info message')
->>> request.session.pop_flash()
-['info message']
+.. testsetup::
+
+   from pyramid import testing
+   request = testing.DummyRequest()
+
+.. doctest::
+
+   >>> request.session.flash('info message')
+   >>> request.session.pop_flash()
+   ['info message']
 
 Calling ``session.pop_flash()`` again like above without a corresponding call
 to ``session.flash()`` will return an empty list, because the queue has already
 been popped.
 
->>> request.session.flash('info message')
->>> request.session.pop_flash()
-['info message']
->>> request.session.pop_flash()
-[]
+.. doctest::
+
+   >>> request.session.flash('info message')
+   >>> request.session.pop_flash()
+   ['info message']
+   >>> request.session.pop_flash()
+   []
 
 .. index::
    single: session.peek_flash
@@ -287,15 +296,17 @@ flash storage.
 
 .. method:: peek_flash(queue='')
 
->>> request.session.flash('info message')
->>> request.session.peek_flash()
-['info message']
->>> request.session.peek_flash()
-['info message']
->>> request.session.pop_flash()
-['info message']
->>> request.session.peek_flash()
-[]
+.. doctest::
+
+   >>> request.session.flash('info message')
+   >>> request.session.peek_flash()
+   ['info message']
+   >>> request.session.peek_flash()
+   ['info message']
+   >>> request.session.pop_flash()
+   ['info message']
+   >>> request.session.peek_flash()
+   []
 
 .. index::
    single: preventing cross-site request forgery attacks
@@ -305,7 +316,7 @@ Preventing Cross-Site Request Forgery Attacks
 ---------------------------------------------
 
 `Cross-site request forgery
-<http://en.wikipedia.org/wiki/Cross-site_request_forgery>`_ attacks are a
+<https://en.wikipedia.org/wiki/Cross-site_request_forgery>`_ attacks are a
 phenomenon whereby a user who is logged in to your website might inadvertantly
 load a URL because it is linked from, or embedded in, an attacker's website.
 If the URL is one that may modify or delete data, the consequences can be dire.
@@ -381,13 +392,13 @@ header named ``X-CSRF-Token``.
 
 .. code-block:: python
 
-    from pyramid.session import check_csrf_token
+   from pyramid.session import check_csrf_token
 
-    def myview(request):
-        # Require CSRF Token
-        check_csrf_token(request)
+   def myview(request):
+       # Require CSRF Token
+       check_csrf_token(request)
 
-        # ...
+       # ...
 
 .. index::
    single: session.new_csrf_token

@@ -6,11 +6,11 @@ Startup
 When you cause a :app:`Pyramid` application to start up in a console window,
 you'll see something much like this show up on the console:
 
-.. code-block:: text
+.. code-block:: bash
 
-  $ pserve development.ini
-  Starting server in PID 16601.
-  serving on 0.0.0.0:6543 view at http://127.0.0.1:6543
+    $ $VENV/bin/pserve development.ini
+    Starting server in PID 16601.
+    serving on 0.0.0.0:6543 view at http://127.0.0.1:6543
 
 This chapter explains what happens between the time you press the "Return" key
 on your keyboard after typing ``pserve development.ini`` and the time the line

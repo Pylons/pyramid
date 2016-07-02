@@ -53,7 +53,7 @@ request enters a :app:`Pyramid` application through to the point that
 
 #. If a route match was *not* found, and a ``root_factory`` argument was passed
    to the :term:`Configurator` constructor, that callable is used to generate
-   the root object.  If the ``root_factory`` argument passed to the
+   the root object. If the ``root_factory`` argument passed to the
    Configurator constructor was ``None``, a default root factory is used to
    generate a root object.
 
