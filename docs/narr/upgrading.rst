@@ -130,7 +130,8 @@ The ``-Wd`` argument tells Python to print deprecation warnings to the console.
 Note that the ``-Wd`` flag is only required for Python 2.7 and better: Python
 versions 2.6 and older print deprecation warnings to the console by default.
 See `the Python -W flag documentation
-<http://docs.python.org/using/cmdline.html#cmdoption-W>`_ for more information.
+<https://docs.python.org/2/using/cmdline.html#cmdoption-W>`_ for more
+information.
 
 As your tests run, deprecation warnings will be printed to the console
 explaining the deprecation and providing instructions about how to prevent the
@@ -206,10 +207,10 @@ On UNIX, you can do that via:
 
 On Windows, you need to issue two commands:
 
-.. code-block:: bash
+.. code-block:: doscon
 
-   C:\> set PYTHONWARNINGS=default
-   C:\> Scripts/pserve.exe development.ini
+   c:\> set PYTHONWARNINGS=default
+   c:\> Scripts/pserve.exe development.ini
 
 At this point, it's ensured that deprecation warnings will be printed to the
 console whenever a codepath is hit that generates one.  You can then click
@@ -217,9 +218,10 @@ around in your application interactively to try to generate them, and remediate
 as explained in :ref:`testing_under_new_release`.
 
 See `the PYTHONWARNINGS environment variable documentation
-<http://docs.python.org/using/cmdline.html#envvar-PYTHONWARNINGS>`_ or `the
+<https://docs.python.org/2/using/cmdline.html#envvar-PYTHONWARNINGS>`_ or `the
 Python -W flag documentation
-<http://docs.python.org/using/cmdline.html#cmdoption-W>`_ for more information.
+<https://docs.python.org/2/using/cmdline.html#cmdoption-W>`_ for more
+information.
 
 Upgrading to the very latest Pyramid release
 --------------------------------------------

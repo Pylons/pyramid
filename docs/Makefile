@@ -12,16 +12,20 @@ PAPEROPT_a4     = -D latex_paper_size=a4
 PAPEROPT_letter = -D latex_paper_size=letter
 ALLSPHINXOPTS   = -d $(BUILDDIR)/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
 
-.PHONY: help clean html web pickle htmlhelp latex changes linkcheck
+.PHONY: help clean html text web pickle htmlhelp latex latexpdf changes linkcheck epub doctest
 
 help:
 	@echo "Please use \`make <target>' where <target> is one of"
-	@echo "  html      to make standalone HTML files"
-	@echo "  pickle    to make pickle files (usable by e.g. sphinx-web)"
-	@echo "  htmlhelp  to make HTML files and a HTML help project"
-	@echo "  latex     to make LaTeX files, you can set PAPER=a4 or PAPER=letter"
-	@echo "  changes   to make an overview over all changed/added/deprecated items"
-	@echo "  linkcheck to check all external links for integrity"
+	@echo "  html       to make standalone HTML files"
+	@echo "  text       to make text files"
+	@echo "  pickle     to make pickle files (usable by e.g. sphinx-web)"
+	@echo "  htmlhelp   to make HTML files and a HTML help project"
+	@echo "  latex      to make LaTeX files, you can set PAPER=a4 or PAPER=letter"
+	@echo "  latexpdf   to make LaTeX files and run them through pdflatex"
+	@echo "  changes    to make an overview over all changed/added/deprecated items"
+	@echo "  linkcheck  to check all external links for integrity"
+	@echo "  epub       to make an epub"
+	@echo "  doctest    to run all doctests embedded in the documentation (if enabled)"
 
 clean:
 	-rm -rf $(BUILDDIR)/*
@@ -90,3 +94,7 @@ epub:
 	@echo
 	@echo "Build finished. The epub file is in $(BUILDDIR)/epub."
 
+doctest:
+	$(SPHINXBUILD) -b doctest $(ALLSPHINXOPTS) $(BUILDDIR)/doctest
+	@echo "Testing of doctests in the sources finished, look at the " \
+	      "results in $(BUILDDIR)/doctest/output.txt."

@@ -36,7 +36,7 @@ Glossary
 
    Repoze
      "Repoze" is essentially a "brand" of software developed by `Agendaless
-     Consulting <http://agendaless.com>`_ and a set of contributors.  The
+     Consulting <https://agendaless.com>`_ and a set of contributors.  The
      term has no special intrinsic meaning.  The project's `website
      <http://repoze.org>`_ has more information.  The software developed
      "under the brand" is available in a `Subversion repository
@@ -51,7 +51,7 @@ Glossary
      You can use :term:`distribute` under Python 3 instead.
 
    distribute
-     `Distribute <http://packages.python.org/distribute/>`_ is a fork of
+     `Distribute <https://pythonhosted.org/distribute/>`_ is a fork of
      :term:`setuptools` which runs on both Python 2 and Python 3.
 
    pkg_resources
@@ -155,9 +155,9 @@ Glossary
      request before it returns a :term:`context` resource.
 
    virtualenv
-     A term referring both to an isolated Python environment,
-     or `the leading tool <http://www.virtualenv.org>`_ that allows one to
-     create such environments.
+     The `virtualenv tool <https://virtualenv.pypa.io/en/latest/>`_ that allows
+     one to create virtual environments. In Python 3.3 and greater,
+     :term:`venv` is the preferred tool.
 
      Note: whenever you encounter commands prefixed with ``$VENV`` (Unix)
      or ``%VENV`` (Windows), know that that is the environment variable whose
@@ -321,18 +321,18 @@ Glossary
      :term:`principal` (or principals) associated with a request.
 
    WSGI
-     `Web Server Gateway Interface <http://www.wsgi.org/>`_.  This is a
-     Python standard for connecting web applications to web servers,
-     similar to the concept of Java Servlets.  :app:`Pyramid` requires
-     that your application be served as a WSGI application.
+     `Web Server Gateway Interface <http://wsgi.readthedocs.org/en/latest/>`_.
+     This is a Python standard for connecting web applications to web servers,
+     similar to the concept of Java Servlets.  :app:`Pyramid` requires that
+     your application be served as a WSGI application.
 
    middleware
      *Middleware* is a :term:`WSGI` concept.  It is a WSGI component
      that acts both as a server and an application.  Interesting uses
      for middleware exist, such as caching, content-transport
-     encoding, and other functions.  See `WSGI.org <http://www.wsgi.org>`_
-     or `PyPI <http://python.org/pypi>`_ to find middleware for your
-     application.
+     encoding, and other functions.  See `WSGI.org
+     <http://wsgi.readthedocs.org/en/latest/>`_ or `PyPI
+     <https://pypi.python.org/pypi>`_ to find middleware for your application.
 
    pipeline
      The :term:`PasteDeploy` term for a single configuration of a WSGI
@@ -346,15 +346,15 @@ Glossary
      `A web framework based on Zope 3 <http://grok.zope.org>`_.
 
    Django
-     `A full-featured Python web framework <http://djangoproject.com>`_.
+     `A full-featured Python web framework <https://www.djangoproject.com/>`_.
 
    Pylons
      `A lightweight Python web framework <http://docs.pylonsproject.org/projects/pylons-webframework/en/latest/>`_
      and a predecessor of Pyramid.
 
    ZODB
-      `Zope Object Database <http://zodb.org>`_, a
-      persistent Python object store.
+      `Zope Object Database <http://www.zodb.org/en/latest/>`_, a persistent
+      Python object store.
 
    WebOb
      `WebOb <http://webob.org>`_ is a WSGI request/response
@@ -376,28 +376,27 @@ Glossary
      the box in ZPT and text flavors.
 
    ZPT
-     The `Zope Page Template <http://wiki.zope.org/ZPT/FrontPage>`_
+     The `Zope Page Template <http://docs.zope.org/zope2/zope2book/ZPT.html>`_
      templating language.
 
    METAL
-     `Macro Expansion for TAL <http://wiki.zope.org/ZPT/METAL>`_, a
-     part of :term:`ZPT` which makes it possible to share common look
-     and feel between templates.
+     `Macro Expansion for TAL
+     <http://docs.zope.org/zope2/zope2book/AppendixC.html#metal-overview>`_, a
+     part of :term:`ZPT` which makes it possible to share common look and feel
+     between templates.
 
    Genshi
-     An `XML templating language <http://pypi.python.org/pypi/Genshi/>`_
+     An `XML templating language <https://pypi.python.org/pypi/Genshi/>`_
      by Christopher Lenz.
 
    Jinja2
-     A `text templating language <http://jinja.pocoo.org/2/>`_ by Armin
-     Ronacher.
+     A `text templating language <http://jinja.pocoo.org/>`_ by Armin Ronacher.
 
    Routes
-     A `system by Ben Bangert <http://routes.groovie.org/>`_ which
-     parses URLs and compares them against a number of user defined
-     mappings. The URL pattern matching syntax in :app:`Pyramid` is
-     inspired by the Routes syntax (which was inspired by Ruby On
-     Rails pattern syntax).
+     A `system by Ben Bangert <http://routes.readthedocs.org/en/latest/>`_
+     which parses URLs and compares them against a number of user defined
+     mappings. The URL pattern matching syntax in :app:`Pyramid` is inspired by
+     the Routes syntax (which was inspired by Ruby On Rails pattern syntax).
 
    route
      A single pattern matched by the :term:`url dispatch` subsystem,
@@ -416,7 +415,7 @@ Glossary
 
    Zope Component Architecture
      The `Zope Component Architecture
-     <http://www.muthukadan.net/docs/zca.html>`_ (aka ZCA) is a system
+     <http://muthukadan.net/docs/zca.html>`_ (aka ZCA) is a system
      which allows for application pluggability and complex dispatching
      based on objects which implement an :term:`interface`.
      :app:`Pyramid` uses the ZCA "under the hood" to perform view
@@ -442,7 +441,7 @@ Glossary
      subpath.  See :ref:`star_subpath` for more information.
 
    interface
-     A `Zope interface <http://pypi.python.org/pypi/zope.interface>`_
+     A `Zope interface <https://pypi.python.org/pypi/zope.interface>`_
      object.  In :app:`Pyramid`, an interface may be attached to a
      :term:`resource` object or a :term:`request` object in order to
      identify that the object is "of a type".  Interfaces are used
@@ -488,13 +487,13 @@ Glossary
 
    repoze.catalog
      An indexing and search facility (fielded and full-text) based on
-     `zope.index <http://pypi.python.org/pypi/zope.index>`_.  See `the
+     `zope.index <https://pypi.python.org/pypi/zope.index>`_.  See `the
      documentation <http://docs.repoze.org/catalog>`_ for more
      information.
 
    repoze.who
-     `Authentication middleware <http://docs.repoze.org/who>`_ for
-     :term:`WSGI` applications.  It can be used by :app:`Pyramid` to
+     `Authentication middleware <http://repozewho.readthedocs.org/en/latest/>`_
+     for :term:`WSGI` applications.  It can be used by :app:`Pyramid` to
      provide authentication information.
 
    repoze.workflow
@@ -555,7 +554,7 @@ Glossary
      serialization format.
 
    jQuery
-     A popular `Javascript library <http://jquery.org>`_.
+     A popular `Javascript library <https://jquery.org>`_.
 
    renderer
      A serializer which converts non-:term:`Response` return values from a
@@ -569,10 +568,10 @@ Glossary
      :ref:`adding_and_overriding_renderers` for more information.
 
    mod_wsgi
-     `mod_wsgi <http://code.google.com/p/modwsgi/>`_ is an Apache
-     module developed by Graham Dumpleton.  It allows :term:`WSGI`
-     applications (such as applications developed using
-     :app:`Pyramid`) to be served using the Apache web server.
+     `mod_wsgi <https://code.google.com/archive/p/modwsgi>`_ is an Apache
+     module developed by Graham Dumpleton.  It allows :term:`WSGI` applications
+     (such as applications developed using :app:`Pyramid`) to be served using
+     the Apache web server.
 
    view predicate
      An argument to a :term:`view configuration` which evaluates to
@@ -609,7 +608,7 @@ Glossary
 
      .. seealso::
      
-        See also `PEP 318 <http://www.python.org/dev/peps/pep-0318/>`_.
+        See also `PEP 318 <https://www.python.org/dev/peps/pep-0318/>`_.
 
    configuration declaration
      An individual method call made to a :term:`configuration directive`,
@@ -683,7 +682,7 @@ Glossary
    thread local
       A thread-local variable is one which is essentially a global variable
       in terms of how it is accessed and treated, however, each `thread
-      <http://en.wikipedia.org/wiki/Thread_(computer_science)>`_ used by the
+      <https://en.wikipedia.org/wiki/Thread_(computer_science)>`_ used by the
       application may have a different value for this same "global" variable.
       :app:`Pyramid` uses a small number of thread local variables, as
       described in :ref:`threadlocals_chapter`.
@@ -700,8 +699,8 @@ Glossary
      :ref:`multidict_narr` and :class:`pyramid.interfaces.IMultiDict`.
 
    PyPI
-     `The Python Package Index <http://pypi.python.org/pypi>`_, a
-     collection of software available for Python.
+     `The Python Package Index <https://pypi.python.org/pypi>`_, a collection
+     of software available for Python.
 
    Agendaless Consulting
      A consulting organization formed by Paul Everitt, Tres Seaver,
@@ -709,14 +708,14 @@ Glossary
 
      .. seealso::
 
-         See also `Agendaless Consulting <http://agendaless.com>`_.
+         See also `Agendaless Consulting <https://agendaless.com>`_.
 
    Jython
      A `Python implementation <http://www.jython.org/>`_ written for
      the Java Virtual Machine.
 
    Python
-     The `programming language <http://python.org>`_ in which
+     The `programming language <https://www.python.org>`_ in which
      :app:`Pyramid` is written.
 
    CPython
@@ -736,7 +735,7 @@ Glossary
      subsystems used by :app:`Pyramid`.
 
    Google App Engine
-     `Google App Engine <http://code.google.com/appengine/>`_ (aka
+     `Google App Engine <https://cloud.google.com/appengine/>`_ (aka
      "GAE") is a Python application hosting service offered by Google.
      :app:`Pyramid` runs on GAE.
 
@@ -913,7 +912,7 @@ Glossary
      can be used as global application values.
 
    WebTest
-     `WebTest <http://pythonpaste.org/webtest/>`_ is a package which can help
+     `WebTest <http://webtest.pythonpaste.org/en/latest/>`_ is a package which can help
      you write functional tests for your WSGI application.
 
    view mapper
@@ -936,20 +935,19 @@ Glossary
 
    ZCML
      `Zope Configuration Markup Language
-     <http://www.muthukadan.net/docs/zca.html#zcml>`_, an XML dialect
+     <http://muthukadan.net/docs/zca.html#zcml>`_, an XML dialect
      used by Zope and :term:`pyramid_zcml` for configuration tasks.
 
    pyramid_handlers
      An add-on package which allows :app:`Pyramid` users to create classes
      that are analogues of Pylons 1 "controllers".  See
-     http://docs.pylonsproject.org/projects/pyramid_handlers/dev/ .
+     http://docs.pylonsproject.org/projects/pyramid_handlers/en/latest/.
 
    pyramid_jinja2
      :term:`Jinja2` templating system bindings for Pyramid, documented at
-     http://docs.pylonsproject.org/projects/pyramid_jinja2/dev/ .  This
-     package also includes a scaffold named
-     ``pyramid_jinja2_starter``, which creates an application package based
-     on the Jinja2 templating system.
+     http://docs.pylonsproject.org/projects/pyramid_jinja2/en/latest/.  This
+     package also includes a scaffold named ``pyramid_jinja2_starter``, which
+     creates an application package based on the Jinja2 templating system.
 
    Akhet
      `Akhet <http://docs.pylonsproject.org/projects/akhet/en/latest/>`_ is a 
@@ -965,7 +963,7 @@ Glossary
 
    distutils
      The standard system for packaging and distributing Python packages.  See
-     http://docs.python.org/distutils/index.html for more information.
+     https://docs.python.org/2/distutils/index.html for more information.
      :term:`setuptools` is actually an *extension* of the Distutils.
 
    exception response
@@ -1008,12 +1006,12 @@ Glossary
      used in production applications, because the logger can be configured to
      log to a file, to UNIX syslog, to the Windows Event Log, or even to
      email. See its `documentation
-     <http://docs.pylonsproject.org/projects/pyramid_exclog/dev/>`_.
+     <http://docs.pylonsproject.org/projects/pyramid_exclog/en/latest/>`_.
 
    console script
      A script written to the ``bin`` (on UNIX, or ``Scripts`` on Windows)
-     directory of a Python installation or :term:`virtualenv` as the result of
-     running ``setup.py install`` or ``setup.py develop``.
+     directory of a Python installation or :term:`virtual environment` as the
+     result of running ``setup.py install`` or ``setup.py develop``.
 
    introspector
      An object with the methods described by
@@ -1091,3 +1089,33 @@ Glossary
       A technique used when serving a cacheable static asset in order to force
       a client to query the new version of the asset. See :ref:`cache_busting`
       for more information.
+
+   pip
+      The :term:`Python Packaging Authority`'s recommended tool for installing
+      Python packages.
+
+   pyvenv
+      The :term:`Python Packaging Authority` formerly recommended using the
+      ``pyvenv`` command for `creating virtual environments on Python 3.4 and
+      3.5
+      <https://packaging.python.org/en/latest/installing/#creating-virtual-environments>`_,
+      but it was deprecated in 3.6 in favor of ``python3 -m venv`` on UNIX or
+      ``python -m venv`` on Windows, which is backward compatible on Python
+      3.3 and greater.
+
+   virtual environment
+      An isolated Python environment that allows packages to be installed for
+      use by a particular application, rather than being installed system wide.
+
+   venv
+      The :term:`Python Packaging Authority`'s recommended tool for creating
+      virtual environments on Python 3.3 and greater.
+
+      Note: whenever you encounter commands prefixed with ``$VENV`` (Unix)
+      or ``%VENV`` (Windows), know that that is the environment variable whose
+      value is the root of the virtual environment in question.
+
+   Python Packaging Authority
+      The `Python Packaging Authority (PyPA) <https://www.pypa.io/en/latest/>`_
+      is a working group that maintains many of the relevant projects in Python
+      packaging.

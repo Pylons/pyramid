@@ -72,42 +72,31 @@ In :ref:`installing_chapter`, you created a virtual Python environment via the
 ``starter`` scaffold for this purpose.  When we invoke ``pcreate``, it will
 create a directory that represents our project.
 
-In :ref:`installing_chapter` we called the virtualenv directory ``env``. The
-following commands assume that our current working directory is the ``env``
-directory.
+In :ref:`installing_chapter` we called the virtual environment directory
+``env``. The following commands assume that our current working directory is
+the ``env`` directory.
 
 The below example uses the ``pcreate`` command to create a project with the
 ``starter`` scaffold.
 
 On UNIX:
 
-.. code-block:: text
+.. code-block:: bash
 
    $ $VENV/bin/pcreate -s starter MyProject
 
 Or on Windows:
 
-.. code-block:: text
+.. code-block:: doscon
 
-   > %VENV%\Scripts\pcreate -s starter MyProject
-   
-Here's sample output from a run of ``pcreate`` on UNIX for a project we name
-``MyProject``:
-
-.. code-block:: text
-
-   $ $VENV/bin/pcreate -s starter MyProject
-   Creating template pyramid
-   Creating directory ./MyProject
-   # ... more output ...
-   Running /Users/chrism/projects/pyramid/bin/python setup.py egg_info
+   c:\> %VENV%\Scripts\pcreate -s starter MyProject
 
 As a result of invoking the ``pcreate`` command, a directory named
 ``MyProject`` is created.  That directory is a :term:`project` directory. The
 ``setup.py`` file in that directory can be used to distribute your application,
 or install your application for deployment or development.
 
-A ``.ini`` file named ``development.ini`` will be created in the project
+An ``.ini`` file named ``development.ini`` will be created in the project
 directory.  You will use this ``.ini`` file to configure a server, to run your
 application, and to debug your application.  It contains configuration that
 enables an interactive debugger and settings optimized for development.
@@ -123,16 +112,16 @@ The ``MyProject`` project directory contains an additional subdirectory named
 which holds very simple :app:`Pyramid` sample code.  This is where you'll edit
 your application's Python code and templates.
 
-We created this project within an ``env`` virtualenv directory.  However, note
-that this is not mandatory.  The project directory can go more or less anywhere
-on your filesystem.  You don't need to put it in a special "web server"
-directory, and you don't need to put it within a virtualenv directory.  The
-author uses Linux mainly, and tends to put project directories which he creates
-within his ``~/projects`` directory.  On Windows, it's a good idea to put
-project directories within a directory that contains no space characters, so
-it's wise to *avoid* a path that contains, i.e., ``My Documents``.  As a
-result, the author, when he uses Windows, just puts his projects in
-``C:\projects``.
+We created this project within an ``env`` virtual environment directory.
+However, note that this is not mandatory. The project directory can go more or
+less anywhere on your filesystem. You don't need to put it in a special "web
+server" directory, and you don't need to put it within a virtual environment
+directory. The author uses Linux mainly, and tends to put project directories
+which he creates within his ``~/projects`` directory. On Windows, it's a good
+idea to put project directories within a directory that contains no space
+characters, so it's wise to *avoid* a path that contains, i.e., ``My
+Documents``. As a result, the author, when he uses Windows, just puts his
+projects in ``C:\projects``.
 
 .. warning::
 
@@ -151,7 +140,7 @@ Installing your Newly Created Project for Development
 
 To install a newly created project for development, you should ``cd`` to the
 newly created project directory and use the Python interpreter from the
-:term:`virtualenv` you created during :ref:`installing_chapter` to invoke the
+virtual environment you created during :ref:`installing_chapter` to invoke the
 command ``python setup.py develop``
 
 The file named ``setup.py`` will be in the root of the pcreate-generated
@@ -162,21 +151,21 @@ created project directory.
 
 On UNIX:
 
-.. code-block:: text
+.. code-block:: bash
 
    $ cd MyProject
    $ $VENV/bin/python setup.py develop
 
 Or on Windows:
 
-.. code-block:: text
+.. code-block:: doscon
 
-   > cd MyProject
-   > %VENV%\Scripts\python.exe setup.py develop
+   c:\> cd MyProject
+   c:\> %VENV%\Scripts\python.exe setup.py develop
 
 Elided output from a run of this command on UNIX is shown below:
 
-.. code-block:: text
+.. code-block:: bash
 
    $ cd MyProject
    $ $VENV/bin/python setup.py develop
@@ -195,26 +184,38 @@ statements and by other console scripts such as ``pserve``, ``pshell``,
 Running the Tests for Your Application
 --------------------------------------
 
-To run unit tests for your application, you should invoke them using the Python
-interpreter from the :term:`virtualenv` you created during
-:ref:`installing_chapter` (the ``python`` command that lives in the ``bin``
-directory of your virtualenv).
+To run unit tests for your application, you must first install the testing
+dependencies.
 
 On UNIX:
 
-.. code-block:: text
+.. code-block:: bash
 
    $ $VENV/bin/python setup.py test -q
 
-Or on Windows:
+On Windows:
 
-.. code-block:: text
+.. code-block:: doscon
 
-   > %VENV%\Scripts\python.exe setup.py test -q
+   c:\> %VENV%\Scripts\python.exe setup.py test -q
+
+Once the testing requirements are installed, then you can run the tests.
+
+On UNIX:
+
+.. code-block:: bash
+
+   $ $VENV/bin/python setup.py test -q
+
+On Windows:
+
+.. code-block:: doscon
+
+   c:\> %VENV%\Scripts\python setup.py test -q
 
 Here's sample output from a test run on UNIX:
 
-.. code-block:: text
+.. code-block:: bash
 
    $ $VENV/bin/python setup.py test -q
    running test
@@ -262,19 +263,19 @@ file.  In our case, this file is named ``development.ini``.
 
 On UNIX:
 
-.. code-block:: text
+.. code-block:: bash
 
    $ $VENV/bin/pserve development.ini
 
 On Windows:
 
-.. code-block:: text
+.. code-block:: doscon
 
-   > %VENV%\Scripts\pserve development.ini
+   c:\> %VENV%\Scripts\pserve development.ini
 
 Here's sample output from a run of ``pserve`` on UNIX:
 
-.. code-block:: text
+.. code-block:: bash
 
    $ $VENV/bin/pserve development.ini
    Starting server in PID 16601.
@@ -420,9 +421,8 @@ like this to enable the toolbar when your system contacts Pyramid:
    # .. other settings ...
    debugtoolbar.hosts = 192.168.1.1
 
-For more information about what the debug toolbar allows you to do, see `the
-documentation for pyramid_debugtoolbar
-<http://docs.pylonsproject.org/projects/pyramid_debugtoolbar/en/latest/>`_.
+For more information about what the debug toolbar allows you to do, see the
+:ref:`documentation for pyramid_debugtoolbar <toolbar:overview>`.
 
 The debug toolbar will not be shown (and all debugging will be turned off) when
 you use the ``production.ini`` file instead of the ``development.ini`` ini file
@@ -639,8 +639,8 @@ setup.py sdist``.  Due to the information contained in the default
 ``MANIFEST.in``, an sdist of your Pyramid project will include ``.txt`` files,
 ``.ini`` files, ``.rst`` files, graphics files, and template files, as well as
 ``.py`` files.  See
-http://docs.python.org/distutils/sourcedist.html#the-manifest-in-template for
-more information about the syntax and usage of ``MANIFEST.in``.
+https://docs.python.org/2/distutils/sourcedist.html#the-manifest-in-template
+for more information about the syntax and usage of ``MANIFEST.in``.
 
 Without the presence of a ``MANIFEST.in`` file or without checking your source
 code into a version control repository, ``setup.py sdist`` places only *Python
@@ -658,8 +658,8 @@ files with extensions other than the files named in the project's
 ``MANIFEST.in`` and you don't make use of a setuptools-compatible version
 control system, you'll need to edit the ``MANIFEST.in`` file and include the
 statements necessary to include your new files.  See
-http://docs.python.org/distutils/sourcedist.html#principle for more information
-about how to do this.
+https://docs.python.org/2/distutils/sourcedist.html#principle for more
+information about how to do this.
 
 You can also delete ``MANIFEST.in`` from your project and rely on a setuptools
 feature which simply causes all files checked into a version control system to
@@ -678,16 +678,16 @@ control system, you may need to install a setuptools add-on such as
 ~~~~~~~~~~~~
 
 The ``setup.py`` file is a :term:`setuptools` setup file.  It is meant to be
-run directly from the command line to perform a variety of functions, such as
-testing, packaging, and distributing your application.
+used to define requirements for installing dependencies for your package and
+testing, as well as distributing your application.
 
 .. note::
 
    ``setup.py`` is the de facto standard which Python developers use to
    distribute their reusable code.  You can read more about ``setup.py`` files
-   and their usage in the `Setuptools documentation
-   <http://peak.telecommunity.com/DevCenter/setuptools>`_ and `Python Packaging
-   User Guide <https://packaging.python.org/en/latest/>`_.
+   and their usage in the `Python Packaging User Guide
+   <https://packaging.python.org/en/latest/>`_ and `Setuptools documentation
+   <http://pythonhosted.org/setuptools/>`_.
 
 Our generated ``setup.py`` looks like this:
 
@@ -707,23 +707,23 @@ exists in this file in this section.
 Your application's name can be any string; it is specified in the ``name``
 field.  The version number is specified in the ``version`` value.  A short
 description is provided in the ``description`` field.  The ``long_description``
-is conventionally the content of the README and CHANGES file appended together.
-The ``classifiers`` field is a list of `Trove
-<http://pypi.python.org/pypi?%3Aaction=list_classifiers>`_ classifiers
-describing your application.  ``author`` and ``author_email`` are text fields
-which probably don't need any description.  ``url`` is a field that should
-point at your application project's URL (if any). ``packages=find_packages()``
-causes all packages within the project to be found when packaging the
-application.  ``include_package_data`` will include non-Python files when the
-application is packaged if those files are checked into version control. 
-``zip_safe`` indicates that this package is not safe to use as a zipped egg;
-instead it will always unpack as a directory, which is more convenient. 
-``install_requires`` and ``tests_require`` indicate that this package depends
-on the ``pyramid`` package.  ``test_suite`` points at the package for our
-application, which means all tests found in the package will be run when
-``setup.py test`` is invoked.  We examined ``entry_points`` in our discussion
-of the ``development.ini`` file; this file defines the ``main`` entry point
-that represents our project's application.
+is conventionally the content of the ``README`` and ``CHANGES`` files appended
+together. The ``classifiers`` field is a list of `Trove classifiers
+<https://pypi.python.org/pypi?%3Aaction=list_classifiers>`_ describing your
+application.  ``author`` and ``author_email`` are text fields which probably
+don't need any description. ``url`` is a field that should point at your
+application project's URL (if any). ``packages=find_packages()`` causes all
+packages within the project to be found when packaging the application.
+``include_package_data`` will include non-Python files when the application is
+packaged if those files are checked into version control. ``zip_safe=False``
+indicates that this package is not safe to use as a zipped egg; instead it will
+always unpack as a directory, which is more convenient. ``install_requires``
+and ``tests_require`` indicate that this package depends on the ``pyramid``
+package. ``test_suite`` points at the package for our application, which means
+all tests found in the package will be run when ``setup.py test`` is invoked.
+We examined ``entry_points`` in our discussion of the ``development.ini`` file;
+this file defines the ``main`` entry point that represents our project's
+application.
 
 Usually you only need to think about the contents of the ``setup.py`` file when
 distributing your application to other people, when adding Python package
