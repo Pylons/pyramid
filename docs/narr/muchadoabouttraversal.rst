@@ -8,9 +8,7 @@ Much Ado About Traversal
 
 .. note::
 
-   This chapter was adapted, with permission, from a blog post by `Rob Miller
-   <http://blog.nonsequitarian.org/>`_, originally published at
-   http://blog.nonsequitarian.org/2010/much-ado-about-traversal/.
+   This chapter was adapted, with permission, from a blog post by Rob Miller.
 
 Traversal is an alternative to :term:`URL dispatch` which allows :app:`Pyramid`
 applications to map URLs to code.
