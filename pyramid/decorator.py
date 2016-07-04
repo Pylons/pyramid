@@ -8,6 +8,16 @@ class reify(object):
     replacing the function it decorates with an instance variable.  It is, in
     Python parlance, a non-data descriptor.  An example:
 
+    .. code-block:: python
+
+        from pyramid.decorator import reify
+
+        class Foo(object):
+            @reify
+            def jammy(self):
+                print('jammy called')
+                return 1
+
     .. testsetup::
 
         from pyramid.decorator import reify
