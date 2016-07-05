@@ -113,14 +113,6 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
         response = inst(context, request)
         self.assertTrue(b'<html>static</html>' in response.body)
 
-    def test_cachebust_match(self):
-        inst = self._makeOne('pyramid.tests:fixtures/static')
-        inst.cachebust_match = lambda subpath: subpath[1:]
-        request = self._makeRequest({'PATH_INFO':'/foo/index.html'})
-        context = DummyContext()
-        response = inst(context, request)
-        self.assertTrue(b'<html>static</html>' in response.body)
-
     def test_resource_is_file_with_wsgi_file_wrapper(self):
         from pyramid.response import _BLOCK_SIZE
         inst = self._makeOne('pyramid.tests:fixtures/static')
