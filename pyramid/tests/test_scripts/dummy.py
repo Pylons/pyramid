@@ -70,6 +70,9 @@ class DummyView(object):
     def __init__(self, **attrs):
         self.__request_attrs__ = attrs
 
+    def view(context, request):
+        return 'view1'
+
 from zope.interface import implementer
 from pyramid.interfaces import IMultiView
 @implementer(IMultiView)
