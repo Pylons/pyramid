@@ -19,6 +19,10 @@ Features
 
 Bug Fixes
 ---------
+- Fixed bug in `pcreate` such that it now shows the correct view when a class
+  and `attr` is involved.
+  See: https://github.com/Pylons/pyramid/pull/2687
+
 
 Deprecations
 ------------
