@@ -1145,9 +1145,10 @@ class BasicAuthAuthenticationPolicy(CallbackAuthenticationPolicy):
         return [('WWW-Authenticate', 'Basic realm="%s"' % self.realm)]
 
     def callback(self, username, request):
-        # Username arg is ignored.  Unfortunately extract_http_basic_credentials winds up
-        # getting called twice when authenticated_userid is called.  Avoiding
-        # that, however, winds up duplicating logic from the superclass.
+        # Username arg is ignored. Unfortunately
+        # extract_http_basic_credentials winds up getting called twice when
+        # authenticated_userid is called. Avoiding that, however,
+        # winds up duplicating logic from the superclass.
         credentials = extract_http_basic_credentials(request)
         if credentials:
             username, password = credentials

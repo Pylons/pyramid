@@ -256,3 +256,6 @@ Contributors
 - Amos Latteier, 2015/10/22
 
 - Rami Chousein, 2015/10/28
+
+- Dariusz Gorecki, 2016/07/15
+
