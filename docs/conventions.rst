@@ -35,7 +35,7 @@ References to glossary terms are presented using the following style:
 
 URLs are presented using the following style:
 
-  `Pylons <http://pylonsproject.org>`_
+  `Pylons <http://www.pylonsproject.org>`_
 
 References to sections and chapters are presented using the following
 style:
@@ -53,46 +53,39 @@ Code and configuration file blocks are presented in the following style:
 Example blocks representing UNIX shell commands are prefixed with a ``$``
 character, e.g.:
 
-  .. code-block:: text
+  .. code-block:: bash
 
-     $ $VENV/bin/nosetests
+     $ $VENV/bin/py.test -q
 
-(See :term:`virtualenv` for the meaning of ``$VENV``)
+See :term:`venv` for the meaning of ``$VENV``.
 
-Example blocks representing Windows ``cmd.exe`` commands are prefixed with a
-drive letter and/or a directory name, e.g.:
+Example blocks representing Windows commands are prefixed with a drive letter
+with an optional directory name, e.g.:
 
-  .. code-block:: text
+  .. code-block:: doscon
 
-     c:\examples> %VENV%\Scripts\nosetests
+     c:\examples> %VENV%\Scripts\py.test -q
 
-(See :term:`virtualenv` for the meaning of ``%VENV%``)
-
-Sometimes, when it's unknown which directory is current, Windows ``cmd.exe``
-example block commands are prefixed only with a ``>`` character, e.g.:
-
-  .. code-block:: text
-
-     > %VENV%\Scripts\nosetests
+See :term:`venv` for the meaning of ``%VENV%``.
 
 When a command that should be typed on one line is too long to fit on a page,
-the backslash ``\`` is used to indicate that the following printed line
-should actually be part of the command:
+the backslash ``\`` is used to indicate that the following printed line should
+be part of the command:
 
-  .. code-block:: text
+  .. code-block:: bash
 
-     c:\bigfntut\tutorial> %VENV%\Scripts\nosetests --cover-package=tutorial \
-           --cover-erase --with-coverage
+     $VENV/bin/py.test tutorial/tests.py --cov-report term-missing \
+                       --cov=tutorial -q
 
-A sidebar, which presents a concept tangentially related to content
-discussed on a page, is rendered like so:
+A sidebar, which presents a concept tangentially related to content discussed
+on a page, is rendered like so:
 
 .. sidebar:: This is a sidebar
 
    Sidebar information.
 
-When multiple objects are imported from the same package,
-the following convention is used:
+When multiple objects are imported from the same package, the following
+convention is used:
 
     .. code-block:: python
 
@@ -103,9 +96,9 @@ the following convention is used:
 
 It may look unusual, but it has advantages:
 
-* It allows one to swap out the higher-level package ``foo`` for something
-  else that provides the similar API. An example would be swapping out
-  one database for another (e.g., graduating from SQLite to PostgreSQL).
+* It allows one to swap out the higher-level package ``foo`` for something else
+  that provides the similar API. An example would be swapping out one database
+  for another (e.g., graduating from SQLite to PostgreSQL).
 
 * Looks more neat in cases where a large number of objects get imported from
   that package.

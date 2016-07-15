@@ -1,5 +1,5 @@
 import unittest
-from pyramid.compat import PY3
+from pyramid.compat import PY2
 
 
 class Test_InstancePropertyHelper(unittest.TestCase):
@@ -149,10 +149,10 @@ class Test_InstancePropertyHelper(unittest.TestCase):
         from pyramid.exceptions import ConfigurationError
 
         cls = self._getTargetClass()
-        if PY3:  # pragma: nocover
-            name = b'La Pe\xc3\xb1a'
-        else:  # pragma: nocover
+        if PY2:
             name = text_(b'La Pe\xc3\xb1a', 'utf-8')
+        else:
+            name = b'La Pe\xc3\xb1a'
 
         def make_bad_name():
             cls.make_property(lambda x: 1, name=name, reify=True)
@@ -431,10 +431,10 @@ class Test_object_description(unittest.TestCase):
         self.assertEqual(self._callFUT(('a', 'b')), "('a', 'b')")
 
     def test_set(self):
-        if PY3:
-            self.assertEqual(self._callFUT(set(['a'])), "{'a'}")
-        else:
+        if PY2:
             self.assertEqual(self._callFUT(set(['a'])), "set(['a'])")
+        else:
+            self.assertEqual(self._callFUT(set(['a'])), "{'a'}")
 
     def test_list(self):
         self.assertEqual(self._callFUT(['a']), "['a']")
@@ -769,29 +769,86 @@ class TestActionInfo(unittest.TestCase):
 class TestCallableName(unittest.TestCase):
     def test_valid_ascii(self):
         from pyramid.util import get_callable_name
-        from pyramid.compat import text_, PY3
+        from pyramid.compat import text_
 
-        if PY3:  # pragma: nocover
-            name = b'hello world'
-        else:  # pragma: nocover
+        if PY2:
             name = text_(b'hello world', 'utf-8')
+        else:
+            name = b'hello world'
 
         self.assertEqual(get_callable_name(name), 'hello world')
 
     def test_invalid_ascii(self):
         from pyramid.util import get_callable_name
-        from pyramid.compat import text_, PY3
+        from pyramid.compat import text_
         from pyramid.exceptions import ConfigurationError
 
         def get_bad_name():
-            if PY3:  # pragma: nocover
-                name = b'La Pe\xc3\xb1a'
-            else:  # pragma: nocover
+            if PY2:
                 name = text_(b'La Pe\xc3\xb1a', 'utf-8')
+            else:
+                name = b'La Pe\xc3\xb1a'
 
             get_callable_name(name)
 
         self.assertRaises(ConfigurationError, get_bad_name)
+
+
+class Test_hide_attrs(unittest.TestCase):
+    def _callFUT(self, obj, *attrs):
+        from pyramid.util import hide_attrs
+        return hide_attrs(obj, *attrs)
+
+    def _makeDummy(self):
+        from pyramid.decorator import reify
+        class Dummy(object):
+            x = 1
+
+            @reify
+            def foo(self):
+                return self.x
+        return Dummy()
+
+    def test_restores_attrs(self):
+        obj = self._makeDummy()
+        obj.bar = 'asdf'
+        orig_foo = obj.foo
+        with self._callFUT(obj, 'foo', 'bar'):
+            obj.foo = object()
+            obj.bar = 'nope'
+        self.assertEqual(obj.foo, orig_foo)
+        self.assertEqual(obj.bar, 'asdf')
+
+    def test_restores_attrs_on_exception(self):
+        obj = self._makeDummy()
+        orig_foo = obj.foo
+        try:
+            with self._callFUT(obj, 'foo'):
+                obj.foo = object()
+                raise RuntimeError()
+        except RuntimeError:
+            self.assertEqual(obj.foo, orig_foo)
+        else:                   # pragma: no cover
+            self.fail("RuntimeError not raised")
+
+    def test_restores_attrs_to_none(self):
+        obj = self._makeDummy()
+        obj.foo = None
+        with self._callFUT(obj, 'foo'):
+            obj.foo = object()
+        self.assertEqual(obj.foo, None)
+
+    def test_deletes_attrs(self):
+        obj = self._makeDummy()
+        with self._callFUT(obj, 'foo'):
+            obj.foo = object()
+        self.assertTrue('foo' not in obj.__dict__)
+
+    def test_does_not_delete_attr_if_no_attr_to_delete(self):
+        obj = self._makeDummy()
+        with self._callFUT(obj, 'foo'):
+            pass
+        self.assertTrue('foo' not in obj.__dict__)
 
 
 def dummyfunc(): pass
@@ -799,3 +856,24 @@ def dummyfunc(): pass
 
 class Dummy(object):
     pass
+
+
+class Test_is_same_domain(unittest.TestCase):
+    def _callFUT(self, *args, **kw):
+        from pyramid.util import is_same_domain
+        return is_same_domain(*args, **kw)
+
+    def test_it(self):
+        self.assertTrue(self._callFUT("example.com", "example.com"))
+        self.assertFalse(self._callFUT("evil.com", "example.com"))
+        self.assertFalse(self._callFUT("evil.example.com", "example.com"))
+        self.assertFalse(self._callFUT("example.com", ""))
+
+    def test_with_wildcard(self):
+        self.assertTrue(self._callFUT("example.com", ".example.com"))
+        self.assertTrue(self._callFUT("good.example.com", ".example.com"))
+
+    def test_with_port(self):
+        self.assertTrue(self._callFUT("example.com:8080", "example.com:8080"))
+        self.assertFalse(self._callFUT("example.com:8080", "example.com"))
+        self.assertFalse(self._callFUT("example.com", "example.com:8080"))

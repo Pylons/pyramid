@@ -1,6 +1,8 @@
-==========
+.. _wiki_design:
+
+======
 Design
-==========
+======
 
 Following is a quick overview of the design of our wiki application, to help
 us understand the changes that we will be making as we work through the

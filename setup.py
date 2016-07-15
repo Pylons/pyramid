@@ -18,12 +18,13 @@ import sys
 from setuptools import setup, find_packages
 
 py_version = sys.version_info[:2]
+is_pypy = '__pypy__' in sys.builtin_module_names
 
 PY3 = py_version[0] == 3
 
 if PY3:
-    if py_version < (3, 2):
-        raise RuntimeError('On Python 3, Pyramid requires Python 3.2 or better')
+    if py_version < (3, 3) and not is_pypy: # PyPy3 masquerades as Python 3.2...
+        raise RuntimeError('On Python 3, Pyramid requires Python 3.3 or better')
 else:
     if py_version < (2, 6):
         raise RuntimeError('On Python 2, Pyramid requires Python 2.6 or better')
@@ -37,7 +38,7 @@ try:
 except IOError:
     README = CHANGES = ''
 
-install_requires=[
+install_requires = [
     'setuptools',
     'WebOb >= 1.3.1', # request.domain and CookieProfile
     'repoze.lru >= 0.4', # py3 compat
@@ -56,11 +57,12 @@ if not PY3:
     tests_require.append('zope.component>=3.11.0')
 
 docs_extras = [
-    'Sphinx >= 1.3.1',
+    'Sphinx >= 1.3.5',
     'docutils',
     'repoze.sphinx.autointerface',
     'pylons_sphinx_latesturl',
     'pylons-sphinx-themes',
+    'sphinxcontrib-programoutput',
     ]
 
 testing_extras = tests_require + [
@@ -70,43 +72,41 @@ testing_extras = tests_require + [
     ]
 
 setup(name='pyramid',
-      version='1.7.dev0',
+      version='1.8.dev0',
       description='The Pyramid Web Framework, a Pylons project',
-      long_description=README + '\n\n' +  CHANGES,
+      long_description=README + '\n\n' + CHANGES,
       classifiers=[
-        "Development Status :: 6 - Mature",
-        "Intended Audience :: Developers",
-        "Programming Language :: Python",
-        "Programming Language :: Python :: 2.6",
-        "Programming Language :: Python :: 2.7",
-        "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.2",
-        "Programming Language :: Python :: 3.3",
-        "Programming Language :: Python :: 3.4",
-        "Programming Language :: Python :: 3.5",
-        "Programming Language :: Python :: Implementation :: CPython",
-        "Programming Language :: Python :: Implementation :: PyPy",
-        "Framework :: Pyramid",
-        "Topic :: Internet :: WWW/HTTP",
-        "Topic :: Internet :: WWW/HTTP :: WSGI",
-        "License :: Repoze Public License",
-        ],
+          "Development Status :: 6 - Mature",
+          "Intended Audience :: Developers",
+          "Programming Language :: Python",
+          "Programming Language :: Python :: 2.7",
+          "Programming Language :: Python :: 3",
+          "Programming Language :: Python :: 3.3",
+          "Programming Language :: Python :: 3.4",
+          "Programming Language :: Python :: 3.5",
+          "Programming Language :: Python :: Implementation :: CPython",
+          "Programming Language :: Python :: Implementation :: PyPy",
+          "Framework :: Pyramid",
+          "Topic :: Internet :: WWW/HTTP",
+          "Topic :: Internet :: WWW/HTTP :: WSGI",
+          "License :: Repoze Public License",
+      ],
       keywords='web wsgi pylons pyramid',
       author="Chris McDonough, Agendaless Consulting",
       author_email="pylons-discuss@googlegroups.com",
-      url="http://docs.pylonsproject.org/en/latest/docs/pyramid.html",
+      url="https://trypyramid.com",
       license="BSD-derived (http://www.repoze.org/LICENSE.txt)",
       packages=find_packages(),
       include_package_data=True,
       zip_safe=False,
-      install_requires = install_requires,
-      extras_require = {
-          'testing':testing_extras,
-          'docs':docs_extras,
+      install_requires=install_requires,
+      extras_require={
+          'testing': testing_extras,
+          'docs': docs_extras,
           },
-      tests_require = tests_require,
+      tests_require=tests_require,
       test_suite="pyramid.tests",
-      entry_points = """\
+      entry_points="""\
         [pyramid.scaffold]
         starter=pyramid.scaffolds:StarterProjectTemplate
         zodb=pyramid.scaffolds:ZODBProjectTemplate
@@ -127,4 +127,3 @@ setup(name='pyramid',
         cherrypy = pyramid.scripts.pserve:cherrypy_server_runner
       """
       )
-

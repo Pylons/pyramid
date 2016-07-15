@@ -120,10 +120,8 @@ Future
 
 - 1.6: Remove IContextURL and TraversalContextURL.
 
-- 1.7: Change ``pyramid.authentication.AuthTktAuthenticationPolicy`` default
-  ``hashalg`` to ``sha512``.
-
 - 1.8: Remove set_request_property.
+- 1.8: Drop Python 3.3 support.
 
 - 1.9: Remove extra code enabling ``pyramid.security.remember(principal=...)``
   and force use of ``userid``.

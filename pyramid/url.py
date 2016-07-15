@@ -96,19 +96,17 @@ class URLMethodsMixin(object):
             if scheme == 'http':
                 if port is None:
                     port = '80'
-        url = scheme + '://'
-        if port is not None:
-            port = str(port)
         if host is None:
             host = e.get('HTTP_HOST')
-        if host is None:
-            host = e['SERVER_NAME']
+            if host is None:
+                host = e['SERVER_NAME']
         if port is None:
             if ':' in host:
                 host, port = host.split(':', 1)
             else:
                 port = e['SERVER_PORT']
         else:
+            port = str(port)
             if ':' in host:
                 host, _ = host.split(':', 1)
         if scheme == 'https':
@@ -117,7 +115,7 @@ class URLMethodsMixin(object):
         elif scheme == 'http':
             if port == '80':
                 port = None
-        url += host
+        url = scheme + '://' + host
         if port:
             url += ':%s' % port
 

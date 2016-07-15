@@ -27,8 +27,8 @@ functionality to the standard WebOb request, which is documented in the
 :ref:`request_module` API documentation.
 
 WebOb provides objects for HTTP requests and responses.  Specifically it does
-this by wrapping the `WSGI <http://wsgi.org>`_ request environment and response
-status, header list, and app_iter (body) values.
+this by wrapping the `WSGI <http://wsgi.readthedocs.org/en/latest/>`_ request
+environment and response status, header list, and app_iter (body) values.
 
 WebOb request and response objects provide many conveniences for parsing WSGI
 requests and forming WSGI responses.  WebOb is a nice way to represent "raw"
@@ -46,7 +46,7 @@ Request
 ~~~~~~~
 
 The request object is a wrapper around the `WSGI environ dictionary
-<http://www.python.org/dev/peps/pep-0333/#environ-variables>`_.  This
+<https://www.python.org/dev/peps/pep-0333/#environ-variables>`_.  This
 dictionary contains keys for each header, keys that describe the request
 (including the path and query string), a file-like object for the request body,
 and a variety of custom keys.  You can always access the environ with
@@ -269,7 +269,7 @@ to a :app:`Pyramid` application:
 When such a request reaches a view in your application, the
 ``request.json_body`` attribute will be available in the view callable body.
 
-.. code-block:: javascript
+.. code-block:: python
 
     @view_config(renderer='string')
     def aview(request):

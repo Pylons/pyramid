@@ -1,3 +1,4 @@
+import os
 import unittest
 from pyramid.tests.test_scripts import dummy
 
@@ -199,6 +200,33 @@ class TestPRoutesCommand(unittest.TestCase):
              'pyramid.tests.test_scripts.test_proutes.view']
         )
 
+    def test_class_view(self):
+        from pyramid.renderers import null_renderer as nr
+
+        config = self._makeConfig(autocommit=True)
+        config.add_route('foo', '/a/b')
+        config.add_view(
+            route_name='foo',
+            view=dummy.DummyView,
+            attr='view',
+            renderer=nr,
+            request_method='POST'
+        )
+
+        command = self._makeOne()
+        L = []
+        command.out = L.append
+        command.bootstrap = (dummy.DummyBootstrap(registry=config.registry),)
+        result = command.run()
+        self.assertEqual(result, 0)
+        self.assertEqual(len(L), 3)
+        compare_to = L[-1].split()
+        expected = [
+            'foo', '/a/b',
+            'pyramid.tests.test_scripts.dummy.DummyView.view', 'POST'
+        ]
+        self.assertEqual(compare_to, expected)
+
     def test_single_route_one_view_registered_with_factory(self):
         from zope.interface import Interface
         from pyramid.interfaces import IRouteRequest
@@ -396,7 +424,8 @@ class TestPRoutesCommand(unittest.TestCase):
         from pyramid.renderers import null_renderer as nr
         config = self._makeConfig(autocommit=True)
         config.add_static_view('static', 'static', cache_max_age=3600)
-        config.add_static_view(name='static2', path='/var/www/static')
+        path2 = os.path.normpath('/var/www/static')
+        config.add_static_view(name='static2', path=path2)
         config.add_static_view(
             name='pyramid_scaffold',
             path='pyramid:scaffolds/starter/+package+/static'
@@ -413,7 +442,7 @@ class TestPRoutesCommand(unittest.TestCase):
         expected = [
             ['__static/', '/static/*subpath',
              'pyramid.tests.test_scripts:static/', '*'],
-            ['__static2/', '/static2/*subpath', '/var/www/static/', '*'],
+            ['__static2/', '/static2/*subpath', path2 + os.sep, '*'],
             ['__pyramid_scaffold/', '/pyramid_scaffold/*subpath',
              'pyramid:scaffolds/starter/+package+/static/',  '*'],
         ]

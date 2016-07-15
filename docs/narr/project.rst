@@ -53,57 +53,50 @@ The included scaffolds are these:
 ``alchemy``
   URL mapping via :term:`URL dispatch` and persistence via :term:`SQLAlchemy`
 
+
 .. index::
    single: creating a project
    single: project
+   single: pcreate
 
 .. _creating_a_project:
 
 Creating the Project
 --------------------
 
+.. seealso:: See also the output of :ref:`pcreate --help <pcreate_script>`.
+
 In :ref:`installing_chapter`, you created a virtual Python environment via the
-``virtualenv`` command.  To start a :app:`Pyramid` :term:`project`, use the
-``pcreate`` command installed within the virtualenv.  We'll choose the
+``venv`` command.  To start a :app:`Pyramid` :term:`project`, use the
+``pcreate`` command installed within the virtual environment.  We'll choose the
 ``starter`` scaffold for this purpose.  When we invoke ``pcreate``, it will
 create a directory that represents our project.
 
-In :ref:`installing_chapter` we called the virtualenv directory ``env``. The
-following commands assume that our current working directory is the ``env``
-directory.
+In :ref:`installing_chapter` we called the virtual environment directory
+``env``. The following commands assume that our current working directory is
+the ``env`` directory.
 
 The below example uses the ``pcreate`` command to create a project with the
 ``starter`` scaffold.
 
 On UNIX:
 
-.. code-block:: text
+.. code-block:: bash
 
    $ $VENV/bin/pcreate -s starter MyProject
 
 Or on Windows:
 
-.. code-block:: text
+.. code-block:: doscon
 
-   > %VENV%\Scripts\pcreate -s starter MyProject
-   
-Here's sample output from a run of ``pcreate`` on UNIX for a project we name
-``MyProject``:
-
-.. code-block:: text
-
-   $ $VENV/bin/pcreate -s starter MyProject
-   Creating template pyramid
-   Creating directory ./MyProject
-   # ... more output ...
-   Running /Users/chrism/projects/pyramid/bin/python setup.py egg_info
+   c:\> %VENV%\Scripts\pcreate -s starter MyProject
 
 As a result of invoking the ``pcreate`` command, a directory named
 ``MyProject`` is created.  That directory is a :term:`project` directory. The
 ``setup.py`` file in that directory can be used to distribute your application,
 or install your application for deployment or development.
 
-A ``.ini`` file named ``development.ini`` will be created in the project
+An ``.ini`` file named ``development.ini`` will be created in the project
 directory.  You will use this ``.ini`` file to configure a server, to run your
 application, and to debug your application.  It contains configuration that
 enables an interactive debugger and settings optimized for development.
@@ -119,16 +112,16 @@ The ``MyProject`` project directory contains an additional subdirectory named
 which holds very simple :app:`Pyramid` sample code.  This is where you'll edit
 your application's Python code and templates.
 
-We created this project within an ``env`` virtualenv directory.  However, note
-that this is not mandatory.  The project directory can go more or less anywhere
-on your filesystem.  You don't need to put it in a special "web server"
-directory, and you don't need to put it within a virtualenv directory.  The
-author uses Linux mainly, and tends to put project directories which he creates
-within his ``~/projects`` directory.  On Windows, it's a good idea to put
-project directories within a directory that contains no space characters, so
-it's wise to *avoid* a path that contains, i.e., ``My Documents``.  As a
-result, the author, when he uses Windows, just puts his projects in
-``C:\projects``.
+We created this project within an ``env`` virtual environment directory.
+However, note that this is not mandatory. The project directory can go more or
+less anywhere on your filesystem. You don't need to put it in a special "web
+server" directory, and you don't need to put it within a virtual environment
+directory. The author uses Linux mainly, and tends to put project directories
+which he creates within his ``~/projects`` directory. On Windows, it's a good
+idea to put project directories within a directory that contains no space
+characters, so it's wise to *avoid* a path that contains, i.e., ``My
+Documents``. As a result, the author, when he uses Windows, just puts his
+projects in ``C:\projects``.
 
 .. warning::
 
@@ -147,8 +140,9 @@ Installing your Newly Created Project for Development
 
 To install a newly created project for development, you should ``cd`` to the
 newly created project directory and use the Python interpreter from the
-:term:`virtualenv` you created during :ref:`installing_chapter` to invoke the
-command ``python setup.py develop``
+:term:`virtual environment` you created during :ref:`installing_chapter` to
+invoke the command ``pip install -e .``, which installs the project in
+development mode (``-e`` is for "editable") into the current directory (``.``).
 
 The file named ``setup.py`` will be in the root of the pcreate-generated
 project directory.  The ``python`` you're invoking should be the one that lives
@@ -158,26 +152,27 @@ created project directory.
 
 On UNIX:
 
-.. code-block:: text
+.. code-block:: bash
 
    $ cd MyProject
-   $ $VENV/bin/python setup.py develop
+   $ $VENV/bin/pip install -e .
 
 Or on Windows:
 
-.. code-block:: text
+.. code-block:: doscon
 
-   > cd MyProject
-   > %VENV%\Scripts\python.exe setup.py develop
+   c:\> cd MyProject
+   c:\> %VENV%\Scripts\pip install -e .
 
 Elided output from a run of this command on UNIX is shown below:
 
-.. code-block:: text
+.. code-block:: bash
 
    $ cd MyProject
-   $ $VENV/bin/python setup.py develop
+   $ $VENV/bin/pip install -e .
    ...
-   Finished processing dependencies for MyProject==0.0
+   Successfully installed Chameleon-2.24 Mako-1.0.4 MyProject \
+   pyramid-chameleon-0.3 pyramid-debugtoolbar-2.4.2 pyramid-mako-1.0.2
 
 This will install a :term:`distribution` representing your project into the
 virtual environment interpreter's library set so it can be found by ``import``
@@ -191,53 +186,74 @@ statements and by other console scripts such as ``pserve``, ``pshell``,
 Running the Tests for Your Application
 --------------------------------------
 
-To run unit tests for your application, you should invoke them using the Python
-interpreter from the :term:`virtualenv` you created during
-:ref:`installing_chapter` (the ``python`` command that lives in the ``bin``
-directory of your virtualenv).
+To run unit tests for your application, you must first install the testing
+dependencies.
 
 On UNIX:
 
-.. code-block:: text
+.. code-block:: bash
 
-   $ $VENV/bin/python setup.py test -q
+   $ $VENV/bin/pip install -e ".[testing]"
 
-Or on Windows:
+On Windows:
 
-.. code-block:: text
+.. code-block:: doscon
 
-   > %VENV%\Scripts\python.exe setup.py test -q
+   c:\> %VENV%\Scripts\pip install -e ".[testing]"
+
+Once the testing requirements are installed, then you can run the tests using
+the ``py.test`` command that was just installed in the ``bin`` directory of
+your virtual environment.
+
+On UNIX:
+
+.. code-block:: bash
+
+   $ $VENV/bin/py.test -q
+
+On Windows:
+
+.. code-block:: doscon
+
+   c:\> %VENV%\Scripts\py.test -q
 
 Here's sample output from a test run on UNIX:
 
-.. code-block:: text
+.. code-block:: bash
 
-   $ $VENV/bin/python setup.py test -q
-   running test
-   running egg_info
-   writing requirements to MyProject.egg-info/requires.txt
-   writing MyProject.egg-info/PKG-INFO
-   writing top-level names to MyProject.egg-info/top_level.txt
-   writing dependency_links to MyProject.egg-info/dependency_links.txt
-   writing entry points to MyProject.egg-info/entry_points.txt
-   reading manifest file 'MyProject.egg-info/SOURCES.txt'
-   writing manifest file 'MyProject.egg-info/SOURCES.txt'
-   running build_ext
+   $ $VENV/bin/py.test -q
    ..
-   ----------------------------------------------------------------------
-   Ran 1 test in 0.108s
-
-   OK
+   2 passed in 0.47 seconds
 
 The tests themselves are found in the ``tests.py`` module in your ``pcreate``
-generated project.  Within a project generated by the ``starter`` scaffold, a
-single sample test exists.
+generated project.  Within a project generated by the ``starter`` scaffold,
+only two sample tests exist.
 
 .. note::
 
-    The ``-q`` option is passed to the ``setup.py test`` command to limit the
-    output to a stream of dots.  If you don't pass ``-q``, you'll see more
-    verbose test result output (which normally isn't very useful).
+    The ``-q`` option is passed to the ``py.test`` command to limit the output
+    to a stream of dots. If you don't pass ``-q``, you'll see verbose test
+    result output (which normally isn't very useful).
+
+Alternatively, if you'd like to see test coverage, pass the ``--cov`` option
+to ``py.test``:
+
+.. code-block:: bash
+
+   $ $VENV/bin/py.test --cov -q
+
+Scaffolds include configuration defaults for ``py.test`` and test coverage.
+These configuration files are ``pytest.ini`` and ``.coveragerc``, located at
+the root of your package. Without these defaults, we would need to specify the
+path to the module on which we want to run tests and coverage.
+
+.. code-block:: bash
+
+   $ $VENV/bin/py.test --cov=myproject myproject/tests.py -q
+
+.. seealso:: See py.test's documentation for :ref:`pytest:usage` or invoke
+   ``py.test -h`` to see its full set of options.
+
 
 .. index::
    single: running an application
@@ -250,13 +266,15 @@ single sample test exists.
 Running the Project Application
 -------------------------------
 
+.. seealso:: See also the output of :ref:`pserve --help <pserve_script>`.
+
 Once a project is installed for development, you can run the application it
 represents using the ``pserve`` command against the generated configuration
 file.  In our case, this file is named ``development.ini``.
 
 On UNIX:
 
-.. code-block:: text
+.. code-block:: bash
 
    $ $VENV/bin/pserve development.ini
 
@@ -264,41 +282,41 @@ On Windows:
 
 .. code-block:: text
 
-   > %VENV%\Scripts\pserve development.ini
+   c:\> %VENV%\Scripts\pserve development.ini
 
 Here's sample output from a run of ``pserve`` on UNIX:
 
-.. code-block:: text
+.. code-block:: bash
 
    $ $VENV/bin/pserve development.ini
-   Starting server in PID 16601.
-   serving on http://0.0.0.0:6543
+   Starting server in PID 16208.
+   serving on http://127.0.0.1:6543
 
-When you use ``pserve`` to start the application implied by the default
-rendering of a scaffold, it will respond to requests on *all* IP addresses
-possessed by your system, not just requests to ``localhost``.  This is what the
-``0.0.0.0`` in ``serving on http://0.0.0.0:6543`` means.  The server will
-respond to requests made to ``127.0.0.1`` and on any external IP address. For
-example, your system might be configured to have an external IP address
-``192.168.1.50``.  If that's the case, if you use a browser running on the same
-system as Pyramid, it will be able to access the application via
-``http://127.0.0.1:6543/`` as well as via ``http://192.168.1.50:6543/``.
-However, *other people* on other computers on the same network will also be
-able to visit your Pyramid application in their browser by visiting
-``http://192.168.1.50:6543/``.
-
-If you want to restrict access such that only a browser running on the same
-machine as Pyramid will be able to access your Pyramid application, edit the
+Access is restricted such that only a browser running on the same machine as
+Pyramid will be able to access your Pyramid application.  However, if you want
+to open access to other machines on the same network, then edit the
 ``development.ini`` file, and replace the ``host`` value in the
-``[server:main]`` section.  Change it from ``0.0.0.0`` to ``127.0.0.1``.  For
+``[server:main]`` section, changing it from ``127.0.0.1`` to ``0.0.0.0``.  For
 example:
 
 .. code-block:: ini
 
    [server:main]
    use = egg:waitress#main
-   host = 127.0.0.1
+   host = 0.0.0.0
    port = 6543
+
+Now when you use ``pserve`` to start the application, it will respond to
+requests on *all* IP addresses possessed by your system, not just requests to
+``localhost``.  This is what the ``0.0.0.0`` in
+``serving on http://0.0.0.0:6543`` means.  The server will respond to requests
+made to ``127.0.0.1`` and on any external IP address. For example, your system
+might be configured to have an external IP address ``192.168.1.50``.  If that's
+the case, if you use a browser running on the same system as Pyramid, it will
+be able to access the application via ``http://127.0.0.1:6543/`` as well as via
+``http://192.168.1.50:6543/``. However, *other people* on other computers on
+the same network will also be able to visit your Pyramid application in their
+browser by visiting ``http://192.168.1.50:6543/``.
 
 You can change the port on which the server runs on by changing the same
 portion of the ``development.ini`` file.  For example, you can change the
@@ -347,7 +365,7 @@ For example, on UNIX:
    $ $VENV/bin/pserve development.ini --reload
    Starting subprocess with file monitor
    Starting server in PID 16601.
-   serving on http://0.0.0.0:6543
+   serving on http://127.0.0.1:6543
 
 Now if you make a change to any of your project's ``.py`` files or ``.ini``
 files, you'll see the server restart automatically:
@@ -357,7 +375,7 @@ files, you'll see the server restart automatically:
    development.ini changed; reloading...
    -------------------- Restarting --------------------
    Starting server in PID 16602.
-   serving on http://0.0.0.0:6543
+   serving on http://127.0.0.1:6543
 
 Changes to template files (such as ``.pt`` or ``.mak`` files) won't cause the
 server to restart.  Changes to template files don't require a server restart as
@@ -414,9 +432,8 @@ like this to enable the toolbar when your system contacts Pyramid:
    # .. other settings ...
    debugtoolbar.hosts = 192.168.1.1
 
-For more information about what the debug toolbar allows you to do, see `the
-documentation for pyramid_debugtoolbar
-<http://docs.pylonsproject.org/projects/pyramid_debugtoolbar/en/latest/>`_.
+For more information about what the debug toolbar allows you to do, see the
+:ref:`documentation for pyramid_debugtoolbar <toolbar:overview>`.
 
 The debug toolbar will not be shown (and all debugging will be turned off) when
 you use the ``production.ini`` file instead of the ``development.ini`` ini file
@@ -429,7 +446,7 @@ commenting out a line.  For example, instead of:
    :linenos:
 
    [app:main]
-   ...
+   # ... elided configuration
    pyramid.includes =
        pyramid_debugtoolbar
 
@@ -439,7 +456,7 @@ Put a hash mark at the beginning of the ``pyramid_debugtoolbar`` line:
    :linenos:
 
    [app:main]
-   ...
+   # ... elided configuration
    pyramid.includes =
    #    pyramid_debugtoolbar
 
@@ -579,18 +596,16 @@ file.  The name ``main`` is a convention used by PasteDeploy signifying that it
 is the default application.
 
 The ``[server:main]`` section of the configuration file configures a WSGI
-server which listens on TCP port 6543.  It is configured to listen on all
-interfaces (``0.0.0.0``).  This means that any remote system which has TCP
-access to your system can see your Pyramid application.
+server which listens on TCP port 6543.  It is configured to listen on localhost
+only (``127.0.0.1``).
 
 .. _MyProject_ini_logging:
 
-The sections that live between the markers ``# Begin logging configuration``
-and ``# End logging configuration`` represent Python's standard library
-:mod:`logging` module configuration for your application.  The sections between
-these two markers are passed to the `logging module's config file configuration
-engine <http://docs.python.org/howto/logging.html#configuring-logging>`_ when
-the ``pserve`` or ``pshell`` commands are executed.  The default configuration
+The sections after ``# logging configuration`` represent Python's standard
+library :mod:`logging` module configuration for your application.  These
+sections are passed to the `logging module's config file configuration engine
+<https://docs.python.org/2/howto/logging.html#configuring-logging>`_ when the
+``pserve`` or ``pshell`` commands are executed.  The default configuration
 sends application logging output to the standard error output of your terminal.
 For more information about logging configuration, see :ref:`logging_chapter`.
 
@@ -633,8 +648,8 @@ setup.py sdist``.  Due to the information contained in the default
 ``MANIFEST.in``, an sdist of your Pyramid project will include ``.txt`` files,
 ``.ini`` files, ``.rst`` files, graphics files, and template files, as well as
 ``.py`` files.  See
-http://docs.python.org/distutils/sourcedist.html#the-manifest-in-template for
-more information about the syntax and usage of ``MANIFEST.in``.
+https://docs.python.org/2/distutils/sourcedist.html#the-manifest-in-template
+for more information about the syntax and usage of ``MANIFEST.in``.
 
 Without the presence of a ``MANIFEST.in`` file or without checking your source
 code into a version control repository, ``setup.py sdist`` places only *Python
@@ -652,8 +667,8 @@ files with extensions other than the files named in the project's
 ``MANIFEST.in`` and you don't make use of a setuptools-compatible version
 control system, you'll need to edit the ``MANIFEST.in`` file and include the
 statements necessary to include your new files.  See
-http://docs.python.org/distutils/sourcedist.html#principle for more information
-about how to do this.
+https://docs.python.org/2/distutils/sourcedist.html#principle for more
+information about how to do this.
 
 You can also delete ``MANIFEST.in`` from your project and rely on a setuptools
 feature which simply causes all files checked into a version control system to
@@ -672,16 +687,16 @@ control system, you may need to install a setuptools add-on such as
 ~~~~~~~~~~~~
 
 The ``setup.py`` file is a :term:`setuptools` setup file.  It is meant to be
-run directly from the command line to perform a variety of functions, such as
-testing, packaging, and distributing your application.
+used to define requirements for installing dependencies for your package and
+testing, as well as distributing your application.
 
 .. note::
 
    ``setup.py`` is the de facto standard which Python developers use to
    distribute their reusable code.  You can read more about ``setup.py`` files
-   and their usage in the `Setuptools documentation
-   <http://peak.telecommunity.com/DevCenter/setuptools>`_ and `The Hitchhiker's
-   Guide to Packaging <http://guide.python-distribute.org/>`_.
+   and their usage in the `Python Packaging User Guide
+   <https://packaging.python.org/en/latest/>`_ and `Setuptools documentation
+   <http://pythonhosted.org/setuptools/>`_.
 
 Our generated ``setup.py`` looks like this:
 
@@ -690,7 +705,7 @@ Our generated ``setup.py`` looks like this:
    :linenos:
 
 The ``setup.py`` file calls the setuptools ``setup`` function, which does
-various things depending on the arguments passed to ``setup.py`` on the command
+various things depending on the arguments passed to ``pip`` on the command
 line.
 
 Within the arguments to this function call, information about your application
@@ -701,23 +716,22 @@ exists in this file in this section.
 Your application's name can be any string; it is specified in the ``name``
 field.  The version number is specified in the ``version`` value.  A short
 description is provided in the ``description`` field.  The ``long_description``
-is conventionally the content of the README and CHANGES file appended together.
-The ``classifiers`` field is a list of `Trove
-<http://pypi.python.org/pypi?%3Aaction=list_classifiers>`_ classifiers
-describing your application.  ``author`` and ``author_email`` are text fields
-which probably don't need any description.  ``url`` is a field that should
-point at your application project's URL (if any). ``packages=find_packages()``
-causes all packages within the project to be found when packaging the
-application.  ``include_package_data`` will include non-Python files when the
-application is packaged if those files are checked into version control. 
-``zip_safe`` indicates that this package is not safe to use as a zipped egg;
-instead it will always unpack as a directory, which is more convenient. 
-``install_requires`` and ``tests_require`` indicate that this package depends
-on the ``pyramid`` package.  ``test_suite`` points at the package for our
-application, which means all tests found in the package will be run when
-``setup.py test`` is invoked.  We examined ``entry_points`` in our discussion
-of the ``development.ini`` file; this file defines the ``main`` entry point
-that represents our project's application.
+is conventionally the content of the ``README`` and ``CHANGES`` files appended
+together. The ``classifiers`` field is a list of `Trove classifiers
+<https://pypi.python.org/pypi?%3Aaction=list_classifiers>`_ describing your
+application.  ``author`` and ``author_email`` are text fields which probably
+don't need any description. ``url`` is a field that should point at your
+application project's URL (if any). ``packages=find_packages()`` causes all
+packages within the project to be found when packaging the application.
+``include_package_data`` will include non-Python files when the application is
+packaged if those files are checked into version control. ``zip_safe=False``
+indicates that this package is not safe to use as a zipped egg; instead it will
+always unpack as a directory, which is more convenient. ``install_requires``
+indicates that this package depends on the ``pyramid`` package.
+``extras_require`` is a Python dictionary that defines what is required to be
+installed for running tests. We examined ``entry_points`` in our discussion of
+the ``development.ini`` file; this file defines the ``main`` entry point that
+represents our project's application.
 
 Usually you only need to think about the contents of the ``setup.py`` file when
 distributing your application to other people, when adding Python package
@@ -729,7 +743,7 @@ you can try this command now:
    $ $VENV/bin/python setup.py sdist
 
 This will create a tarball of your application in a ``dist`` subdirectory named
-``MyProject-0.1.tar.gz``.  You can send this tarball to other people who want
+``MyProject-0.0.tar.gz``.  You can send this tarball to other people who want
 to install and use your application.
 
 .. index::
@@ -912,13 +926,13 @@ The ``tests.py`` module includes unit tests for your application.
 
 .. literalinclude:: MyProject/myproject/tests.py
    :language: python
-   :lines: 1-18
    :linenos:
 
-This sample ``tests.py`` file has a single unit test defined within it.  This
-test is executed when you run ``python setup.py test``.  You may add more tests
-here as you build your application.  You are not required to write tests to use
-:app:`Pyramid`. This file is simply provided for convenience and example.
+This sample ``tests.py`` file has one unit test and one functional test defined
+within it. These tests are executed when you run ``py.test -q``. You may add
+more tests here as you build your application. You are not required to write
+tests to use :app:`Pyramid`. This file is simply provided for convenience and
+example.
 
 See :ref:`testing_chapter` for more information about writing :app:`Pyramid`
 unit tests.

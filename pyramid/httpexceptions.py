@@ -123,12 +123,14 @@ The subclasses of :class:`~_HTTPMove`
 field. Reflecting this, these subclasses have one additional keyword argument:
 ``location``, which indicates the location to which to redirect.
 """
+import json
 
 from string import Template
 
 from zope.interface import implementer
 
 from webob import html_escape as _html_escape
+from webob.acceptparse import MIMEAccept
 
 from pyramid.compat import (
     class_types,
@@ -214,7 +216,7 @@ ${body}''')
     empty_body = False
 
     def __init__(self, detail=None, headers=None, comment=None,
-                 body_template=None, **kw):
+                 body_template=None, json_formatter=None, **kw):
         status = '%s %s' % (self.code, self.title)
         Response.__init__(self, status=status, **kw)
         Exception.__init__(self, detail)
@@ -225,6 +227,8 @@ ${body}''')
         if body_template is not None:
             self.body_template = body_template
             self.body_template_obj = Template(body_template)
+        if json_formatter is not None:
+            self._json_formatter = json_formatter
 
         if self.empty_body:
             del self.content_type
@@ -233,18 +237,48 @@ ${body}''')
     def __str__(self):
         return self.detail or self.explanation
 
+    def _json_formatter(self, status, body, title, environ):
+        return {'message': body,
+                'code': status,
+                'title': self.title}
+
     def prepare(self, environ):
         if not self.body and not self.empty_body:
             html_comment = ''
             comment = self.comment or ''
-            accept = environ.get('HTTP_ACCEPT', '')
-            if accept and 'html' in accept or '*/*' in accept:
+            accept_value = environ.get('HTTP_ACCEPT', '')
+            accept = MIMEAccept(accept_value)
+            # Attempt to match text/html or application/json, if those don't
+            # match, we will fall through to defaulting to text/plain
+            match = accept.best_match(['text/html', 'application/json'])
+
+            if match == 'text/html':
                 self.content_type = 'text/html'
                 escape = _html_escape
                 page_template = self.html_template_obj
                 br = '<br/>'
                 if comment:
                     html_comment = '<!-- %s -->' % escape(comment)
+            elif match == 'application/json':
+                self.content_type = 'application/json'
+                self.charset = None
+                escape = _no_escape
+                br = '\n'
+                if comment:
+                    html_comment = escape(comment)
+
+                class JsonPageTemplate(object):
+                    def __init__(self, excobj):
+                        self.excobj = excobj
+
+                    def substitute(self, status, body):
+                        jsonbody = self.excobj._json_formatter(
+                            status=status,
+                            body=body, title=self.excobj.title,
+                            environ=environ)
+                        return json.dumps(jsonbody)
+
+                page_template = JsonPageTemplate(self)
             else:
                 self.content_type = 'text/plain'
                 escape = _no_escape
@@ -253,11 +287,11 @@ ${body}''')
                 if comment:
                     html_comment = escape(comment)
             args = {
-                'br':br,
+                'br': br,
                 'explanation': escape(self.explanation),
                 'detail': escape(self.detail or ''),
                 'comment': escape(comment),
-                'html_comment':html_comment,
+                'html_comment': html_comment,
                 }
             body_tmpl = self.body_template_obj
             if HTTPException.body_template_obj is not body_tmpl:
@@ -274,7 +308,7 @@ ${body}''')
             body = body_tmpl.substitute(args)
             page = page_template.substitute(status=self.status, body=body)
             if isinstance(page, text_type):
-                page = page.encode(self.charset)
+                page = page.encode(self.charset if self.charset else 'UTF-8')
             self.app_iter = [page]
             self.body = page
 
@@ -1001,8 +1035,8 @@ class HTTPInternalServerError(HTTPServerError):
     code = 500
     title = 'Internal Server Error'
     explanation = (
-      'The server has either erred or is incapable of performing '
-      'the requested operation.')
+        'The server has either erred or is incapable of performing '
+        'the requested operation.')
 
 class HTTPNotImplemented(HTTPServerError):
     """

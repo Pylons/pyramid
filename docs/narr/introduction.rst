@@ -221,7 +221,7 @@ send email, let you use the Jinja2 templating system, let you use XML-RPC or
 JSON-RPC, let you integrate with jQuery Mobile, etc.
 
 Examples:
-http://docs.pylonsproject.org/en/latest/docs/pyramid.html#pyramid-add-on-documentation
+https://trypyramid.com/resources-extending-pyramid.html
 
 Class-based and function-based views
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -859,14 +859,15 @@ Testing
 Every release of Pyramid has 100% statement coverage via unit and integration
 tests, as measured by the ``coverage`` tool available on PyPI.  It also has
 greater than 95% decision/condition coverage as measured by the
-``instrumental`` tool available on PyPI.  It is automatically tested by the
-Jenkins tool on Python 2.6, Python 2.7, Python 3.2, Python 3.3, Python 3.4,
-PyPy, and PyPy3 after each commit to its GitHub repository.  Official Pyramid
-add-ons are held to a similar testing standard.  We still find bugs in Pyramid
-and its official add-ons, but we've noticed we find a lot more of them while
-working on other projects that don't have a good testing regime.
+``instrumental`` tool available on PyPI. It is automatically tested by Travis,
+and Jenkins on Python 2.7, Python 3.3, Python 3.4, Python 3.5, PyPy, and PyPy3
+after each commit to its GitHub repository. Official Pyramid add-ons are held
+to a similar testing standard.  We still find bugs in Pyramid and its official
+add-ons, but we've noticed we find a lot more of them while working on other
+projects that don't have a good testing regime.
 
-Example: http://jenkins.pylonsproject.org/
+Travis: https://travis-ci.org/Pylons/pyramid
+Jenkins: http://jenkins.pylonsproject.org/job/pyramid/
 
 Support
 ~~~~~~~
@@ -880,7 +881,7 @@ new-user-friendly.
 
 Example: Visit irc\://freenode.net#pyramid (the ``#pyramid`` channel on
 irc.freenode.net in an IRC client) or the pylons-discuss maillist at
-http://groups.google.com/group/pylons-discuss/.
+https://groups.google.com/forum/#!forum/pylons-discuss.
 
 Documentation
 ~~~~~~~~~~~~~
@@ -892,8 +893,7 @@ also maintain a "cookbook" of recipes, which are usually demonstrations of
 common integration scenarios too specific to add to the official narrative
 docs.  In any case, the Pyramid documentation is comprehensive.
 
-Example: The Pyramid Cookbook at
-http://docs.pylonsproject.org/projects/pyramid-cookbook/en/latest/.
+Example: The :ref:`Pyramid Community Cookbook <cookbook:pyramid-cookbook>`.
 
 .. index::
    single: Pylons Project
@@ -903,7 +903,7 @@ What Is The Pylons Project?
 
 :app:`Pyramid` is a member of the collection of software published under the
 Pylons Project.  Pylons software is written by a loose-knit community of
-contributors.  The `Pylons Project website <http://pylonsproject.org>`_
+contributors.  The `Pylons Project website <http://www.pylonsproject.org>`_
 includes details about how :app:`Pyramid` relates to the Pylons Project.
 
 .. index::
@@ -967,9 +967,9 @@ nor discouraging the decision.
 
 Other Python web frameworks advertise themselves as members of a class of web
 frameworks named `model-view-controller
-<http://en.wikipedia.org/wiki/Model–view–controller>`_ frameworks. Insofar as
-this term has been claimed to represent a class of web frameworks,
-:app:`Pyramid` also generally fits into this class.
+<https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller>`_
+frameworks. Insofar as this term has been claimed to represent a class of web
+frameworks, :app:`Pyramid` also generally fits into this class.
 
 .. sidebar:: You Say :app:`Pyramid` is MVC, but Where's the Controller?
 

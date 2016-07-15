@@ -1,4 +1,4 @@
-What's New In Pyramid 1.0
+What's New in Pyramid 1.0
 =========================
 
 This article explains the new features in Pyramid version 1.0 as compared to

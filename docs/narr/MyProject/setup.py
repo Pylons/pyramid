@@ -1,30 +1,24 @@
-"""Setup for the MyProject package.
-
-"""
 import os
+
 from setuptools import setup, find_packages
 
+here = os.path.abspath(os.path.dirname(__file__))
+with open(os.path.join(here, 'README.txt')) as f:
+    README = f.read()
+with open(os.path.join(here, 'CHANGES.txt')) as f:
+    CHANGES = f.read()
 
-HERE = os.path.abspath(os.path.dirname(__file__))
-
-
-with open(os.path.join(HERE, 'README.txt')) as fp:
-    README = fp.read()
-
-
-with open(os.path.join(HERE, 'CHANGES.txt')) as fp:
-    CHANGES = fp.read()
-
-
-REQUIRES = [
+requires = [
     'pyramid',
     'pyramid_chameleon',
     'pyramid_debugtoolbar',
     'waitress',
     ]
 
-TESTS_REQUIRE = [
-    'webtest'
+tests_require = [
+    'WebTest >= 1.3.1',  # py3 compat
+    'pytest',  # includes virtualenv
+    'pytest-cov',
     ]
 
 setup(name='MyProject',
@@ -32,10 +26,10 @@ setup(name='MyProject',
       description='MyProject',
       long_description=README + '\n\n' + CHANGES,
       classifiers=[
-          'Programming Language :: Python',
-          'Framework :: Pyramid',
-          'Topic :: Internet :: WWW/HTTP',
-          'Topic :: Internet :: WWW/HTTP :: WSGI :: Application',
+          "Programming Language :: Python",
+          "Framework :: Pyramid",
+          "Topic :: Internet :: WWW/HTTP",
+          "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
       ],
       author='',
       author_email='',
@@ -44,10 +38,12 @@ setup(name='MyProject',
       packages=find_packages(),
       include_package_data=True,
       zip_safe=False,
-      install_requires=REQUIRES,
-      tests_require=TESTS_REQUIRE,
-      test_suite='myproject',
+      extras_require={
+          'testing': tests_require,
+      },
+      install_requires=requires,
       entry_points="""\
       [paste.app_factory]
       main = myproject:main
-      """)
+      """,
+      )

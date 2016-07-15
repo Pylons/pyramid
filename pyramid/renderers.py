@@ -1,4 +1,3 @@
-import contextlib
 import json
 import os
 import re
@@ -30,6 +29,7 @@ from pyramid.path import caller_package
 
 from pyramid.response import _get_response_factory
 from pyramid.threadlocal import get_current_registry
+from pyramid.util import hide_attrs
 
 # API
 
@@ -77,7 +77,7 @@ def render(renderer_name, value, request=None, package=None):
     helper = RendererHelper(name=renderer_name, package=package,
                             registry=registry)
 
-    with temporary_response(request):
+    with hide_attrs(request, 'response'):
         result = helper.render(value, None, request=request)
 
     return result
@@ -138,29 +138,12 @@ def render_to_response(renderer_name,
     helper = RendererHelper(name=renderer_name, package=package,
                             registry=registry)
 
-    with temporary_response(request):
+    with hide_attrs(request, 'response'):
         if response is not None:
             request.response = response
         result = helper.render_to_response(value, None, request=request)
 
     return result
-
-_marker = object()
-
-@contextlib.contextmanager
-def temporary_response(request):
-    """
-    Temporarily delete request.response and restore it afterward.
-    """
-    attrs = request.__dict__ if request is not None else {}
-    saved_response = attrs.pop('response', _marker)
-    try:
-        yield
-    finally:
-        if saved_response is not _marker:
-            attrs['response'] = saved_response
-        elif 'response' in attrs:
-            del attrs['response']
 
 def get_renderer(renderer_name, package=None):
     """ Return the renderer object for the renderer ``renderer_name``.
@@ -311,7 +294,7 @@ json_renderer_factory = JSON() # bw compat
 JSONP_VALID_CALLBACK = re.compile(r"^[$a-z_][$0-9a-z_\.\[\]]+[^.]$", re.I)
 
 class JSONP(JSON):
-    """ `JSONP <http://en.wikipedia.org/wiki/JSONP>`_ renderer factory helper
+    """ `JSONP <https://en.wikipedia.org/wiki/JSONP>`_ renderer factory helper
     which implements a hybrid json/jsonp renderer.  JSONP is useful for
     making cross-domain AJAX requests.
 

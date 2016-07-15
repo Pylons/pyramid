@@ -1,3 +1,5 @@
+.. _wiki_basic_layout:
+
 ============
 Basic Layout
 ============
@@ -12,21 +14,22 @@ Application configuration with ``__init__.py``
 
 A directory on disk can be turned into a Python :term:`package` by containing
 an ``__init__.py`` file.  Even if empty, this marks a directory as a Python
-package.  We use ``__init__.py`` both as a marker, indicating the directory
-in which it's contained is a package, and to contain application configuration
+package.  We use ``__init__.py`` both as a marker, indicating the directory in
+which it's contained is a package, and to contain application configuration
 code.
 
 When you run the application using the ``pserve`` command using the
 ``development.ini`` generated configuration file, the application
-configuration points at a Setuptools *entry point* described as
+configuration points at a setuptools *entry point* described as
 ``egg:tutorial``.  In our application, because the application's ``setup.py``
 file says so, this entry point happens to be the ``main`` function within the
-file named ``__init__.py``. Let's take a look at the code and describe what
-it does:
+file named ``__init__.py``.
 
-   .. literalinclude:: src/basiclayout/tutorial/__init__.py
-      :linenos:
-      :language: py
+Open ``tutorial/__init__.py``.  It should already contain the following:
+
+.. literalinclude:: src/basiclayout/tutorial/__init__.py
+  :linenos:
+  :language: py
 
 #. *Lines 1-3*.  Perform some dependency imports.
 
@@ -81,9 +84,9 @@ resource objects, each of which also happens to be a domain model object.
 
 Here is the source for ``models.py``:
 
-   .. literalinclude:: src/basiclayout/tutorial/models.py
-      :linenos:
-      :language: py
+.. literalinclude:: src/basiclayout/tutorial/models.py
+  :linenos:
+  :language: python
 
 #. *Lines 4-5*.  The ``MyModel`` :term:`resource` class is implemented here.
    Instances of this class are capable of being persisted in :term:`ZODB`
@@ -113,9 +116,9 @@ the URL ``http://localhost:6543/``.
 
 Here is the source for ``views.py``:
 
-   .. literalinclude:: src/basiclayout/tutorial/views.py
-      :linenos:
-      :language: py
+.. literalinclude:: src/basiclayout/tutorial/views.py
+  :linenos:
+  :language: python
 
 Let's try to understand the components in this module:
 
@@ -169,7 +172,7 @@ The ``development.ini`` (in the tutorial :term:`project` directory, as
 opposed to the tutorial :term:`package` directory) looks like this:
 
 .. literalinclude:: src/basiclayout/development.ini
-   :language: ini
+  :language: ini
 
 Note the existence of a ``[app:main]`` section which specifies our WSGI
 application.  Our ZODB database settings are specified as the
