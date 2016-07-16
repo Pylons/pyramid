@@ -50,7 +50,9 @@ Steps
     :linenos:
 
 #. Create an ``authentication/tutorial/security.py`` module that can find our
-   user information by providing an *authentication policy callback*:
+   user information by providing an *authentication policy callback*.
+   One-way hash function ``hash_password_with_salt`` is used to avoid user's
+   password stored in plain text:
 
    .. literalinclude:: authentication/tutorial/security.py
     :linenos:
