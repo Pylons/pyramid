@@ -9,7 +9,10 @@ from pyramid.view import (
     view_defaults
     )
 
-from .security import USERS
+from .security import (
+    USERS,
+    check_password
+)
 
 
 @view_defaults(renderer='home.pt')
@@ -40,7 +43,7 @@ class TutorialViews:
         if 'form.submitted' in request.params:
             login = request.params['login']
             password = request.params['password']
-            if USERS.get(login) == password:
+            if check_password(password, USERS.get(login)):
                 headers = remember(request, login)
                 return HTTPFound(location=came_from,
                                  headers=headers)
