@@ -12,6 +12,10 @@ unreleased
   changing it from Integer to Text. See
   https://github.com/Pylons/pyramid/pull/2591
 
+- Fix a bug in which the ``password_hash`` in the Wiki2 tutorial was sometimes
+  being treated as bytes instead of unicode.
+  See https://github.com/Pylons/pyramid/pull/2705
+
 - Properly emit a ``DeprecationWarning`` for using
   ``pyramid.config.Configurator.set_request_property`` instead of
   ``pyramid.config.Configurator.add_request_method``.
