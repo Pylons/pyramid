@@ -2,7 +2,8 @@ from setuptools import setup
 
 requires = [
     'pyramid',
-    'pyramid_chameleon'
+    'pyramid_chameleon',
+    'bcrypt'
 ]
 
 setup(name='tutorial',
