@@ -290,6 +290,19 @@ class TestRendererHelper(unittest.TestCase):
         response = helper._make_response(la.encode('utf-8'), request)
         self.assertEqual(response.body, la.encode('utf-8'))
 
+    def test__make_response_result_is_str_no_charset(self):
+        from pyramid.response import Response
+        request = testing.DummyRequest()
+        request.response = Response(content_type='application/json', charset=None)
+
+        self.assertIsNone(request.response.charset)
+
+        helper = self._makeOne('loo.foo')
+        la = text_('/La Pe\xc3\xb1a', 'utf-8')
+        response = helper._make_response(la, request)
+        self.assertIsNone(response.charset)
+        self.assertEqual(response.body, la.encode('utf-8'))
+
     def test__make_response_result_is_iterable(self):
         from pyramid.response import Response
         request = testing.DummyRequest()
