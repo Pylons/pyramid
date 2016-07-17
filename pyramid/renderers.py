@@ -1,6 +1,7 @@
 import json
 import os
 import re
+import warnings
 
 from zope.interface import (
     implementer,
@@ -467,7 +468,17 @@ class RendererHelper(object):
 
         if result is not None:
             if isinstance(result, text_type):
-                response.text = result
+                if response.charset is None:
+                    warnings.warn(
+                        "Renderer returned a result of type {0}, "
+                        "however the response Content-Type <{1}> does not "
+                        "have a charset. Implicitly encoding the result as "
+                        "UTF-8.".format(type(result), response.content_type),
+                        RuntimeWarning
+                    )
+                    response.body = result.encode('UTF-8')
+                else:
+                    response.text = result
             elif isinstance(result, bytes):
                 response.body = result
             elif hasattr(result, '__iter__'):
