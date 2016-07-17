@@ -273,7 +273,7 @@ class JSON(object):
                 if ct == response.default_content_type:
                     response.content_type = 'application/json'
             default = self._make_default(request)
-            return self.serializer(value, default=default, **self.kw)
+            return self.serializer(value, default=default, **self.kw).encode('UTF-8')
 
         return _render
 
@@ -380,7 +380,7 @@ class JSONP(JSON):
                         raise HTTPBadRequest('Invalid JSONP callback function name.')
 
                     ct = 'application/javascript'
-                    body = '/**/{0}({1});'.format(callback, val)
+                    body = '/**/{0}({1});'.format(callback, val).encode('UTF-8')
                 response = request.response
                 if response.content_type == response.default_content_type:
                     response.content_type = ct

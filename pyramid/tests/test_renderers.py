@@ -18,7 +18,7 @@ class TestJSON(unittest.TestCase):
     def test_it(self):
         renderer = self._makeOne()(None)
         result = renderer({'a':1}, {})
-        self.assertEqual(result, '{"a": 1}')
+        self.assertEqual(result, b'{"a": 1}')
 
     def test_with_request_content_type_notset(self):
         request = testing.DummyRequest()
@@ -43,7 +43,7 @@ class TestJSON(unittest.TestCase):
         renderer = self._makeOne()
         renderer.add_adapter(datetime, adapter)
         result = renderer(None)({'a':now}, {'request':request})
-        self.assertEqual(result, '{"a": "%s"}' % now.isoformat())
+        self.assertEqual(result, '{{"a": "{0}"}}'.format(now.isoformat()).encode('UTF-8'))
 
     def test_with_custom_adapter2(self):
         request = testing.DummyRequest()
@@ -54,7 +54,7 @@ class TestJSON(unittest.TestCase):
         now = datetime.utcnow()
         renderer = self._makeOne(adapters=((datetime, adapter),))
         result = renderer(None)({'a':now}, {'request':request})
-        self.assertEqual(result, '{"a": "%s"}' % now.isoformat())
+        self.assertEqual(result, '{{"a": "{0}"}}'.format(now.isoformat()).encode('UTF-8'))
 
     def test_with_custom_serializer(self):
         class Serializer(object):
@@ -66,7 +66,7 @@ class TestJSON(unittest.TestCase):
         renderer = self._makeOne(serializer=serializer, baz=5)
         obj = {'a':'b'}
         result = renderer(None)(obj, {})
-        self.assertEqual(result, 'foo')
+        self.assertEqual(result, b'foo')
         self.assertEqual(serializer.obj, obj)
         self.assertEqual(serializer.kw['baz'], 5)
         self.assertTrue('default' in serializer.kw)
@@ -84,7 +84,7 @@ class TestJSON(unittest.TestCase):
         objects = [MyObject(1), MyObject(2)]
         renderer = self._makeOne()(None)
         result = renderer(objects, {'request':request})
-        self.assertEqual(result, '[{"x": 1}, {"x": 2}]')
+        self.assertEqual(result, b'[{"x": 1}, {"x": 2}]')
 
     def test_with_object_adapter_no___json__(self):
         class MyObject(object):
@@ -492,7 +492,7 @@ class Test_render(unittest.TestCase):
         request.response = response
         # use a json renderer, which will mutate the response
         result = self._callFUT('json', dict(a=1), request=request)
-        self.assertEqual(result, '{"a": 1}')
+        self.assertEqual(result, b'{"a": 1}')
         self.assertEqual(request.response, response)
 
     def test_no_response_to_preserve(self):
@@ -507,7 +507,7 @@ class Test_render(unittest.TestCase):
         request = DummyRequestWithClassResponse()
         # use a json renderer, which will mutate the response
         result = self._callFUT('json', dict(a=1), request=request)
-        self.assertEqual(result, '{"a": 1}')
+        self.assertEqual(result, b'{"a": 1}')
         self.assertFalse('response' in request.__dict__)
 
 class Test_render_to_response(unittest.TestCase):
@@ -627,7 +627,7 @@ class TestJSONP(unittest.TestCase):
         request = testing.DummyRequest()
         request.GET['callback'] = 'callback'
         result = renderer({'a':'1'}, {'request':request})
-        self.assertEqual(result, '/**/callback({"a": "1"});')
+        self.assertEqual(result, b'/**/callback({"a": "1"});')
         self.assertEqual(request.response.content_type,
                          'application/javascript')
 
@@ -637,7 +637,7 @@ class TestJSONP(unittest.TestCase):
         request = testing.DummyRequest()
         request.GET['callback'] = 'angular.callbacks._0'
         result = renderer({'a':'1'}, {'request':request})
-        self.assertEqual(result, '/**/angular.callbacks._0({"a": "1"});')
+        self.assertEqual(result, b'/**/angular.callbacks._0({"a": "1"});')
         self.assertEqual(request.response.content_type,
                          'application/javascript')
 
