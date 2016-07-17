@@ -47,7 +47,7 @@ Steps
 
    .. code-block:: bash
 
-    $ $VENV/bin/$VENV/bin/py.test tutorial/tests.py -q
+    $ $VENV/bin/py.test tutorial/tests.py -q
     ....
     4 passed in 0.50 seconds
 
