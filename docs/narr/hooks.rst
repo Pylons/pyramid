@@ -26,7 +26,7 @@ Not Found View by using the
    :linenos:
 
    def notfound(request):
-       return Response('Not Found, dude', status='404 Not Found')
+       return Response('Not Found', status='404 Not Found')
 
    def main(globals, **settings):
        config = Configurator()
@@ -45,7 +45,7 @@ and a :term:`scan`, you can replace the Not Found View by using the
 
    @notfound_view_config()
    def notfound(request):
-       return Response('Not Found, dude', status='404 Not Found')
+       return Response('Not Found', status='404 Not Found')
 
    def main(globals, **settings):
        config = Configurator()
@@ -67,11 +67,11 @@ Views can carry predicates limiting their applicability.  For example:
 
    @notfound_view_config(request_method='GET')
    def notfound_get(request):
-       return Response('Not Found during GET, dude', status='404 Not Found')
+       return Response('Not Found during GET', status='404 Not Found')
 
    @notfound_view_config(request_method='POST')
    def notfound_post(request):
-       return Response('Not Found during POST, dude', status='404 Not Found')
+       return Response('Not Found during POST', status='404 Not Found')
 
    def main(globals, **settings):
       config = Configurator()
