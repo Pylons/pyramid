@@ -5,6 +5,7 @@ import hashlib
 import base64
 import re
 import time as time_mod
+import warnings
 
 from zope.interface import implementer
 
@@ -947,8 +948,19 @@ class AuthTktCookieHelper(object):
 
         if encoding_data:
             encoding, encoder = encoding_data
-            userid = encoder(userid)
-            user_data = 'userid_type:%s' % encoding
+        else:
+            warnings.warn(
+                "userid is of type {}, and is not supported by the "
+                "AuthTktAuthenticationPolicy. Explicitly converting to string "
+                "and storing as base64. Subsequent requests will receive a "
+                "string as the userid, it will not be decoded back to the type "
+                "provided.".format(type(userid)), RuntimeWarning
+            )
+            encoding, encoder = self.userid_type_encoders.get(text_type)
+            userid = str(userid)
+
+        userid = encoder(userid)
+        user_data = 'userid_type:%s' % encoding
 
         new_tokens = []
         for token in tokens:
