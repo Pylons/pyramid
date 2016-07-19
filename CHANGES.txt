@@ -27,6 +27,11 @@ unreleased
   and `attr` is involved.
   See: https://github.com/Pylons/pyramid/pull/2687
 
+- The JSON renderers now encode their result as UTF-8. The renderer helper
+  will now warn the user and encode the result as UTF-8 if a renderer returns a
+  text type and the response does not have a valid character set. See
+  https://github.com/Pylons/pyramid/pull/2706
+
 1.7 (2016-05-19)
 ================
 
