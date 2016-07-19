@@ -295,12 +295,12 @@ class TestRendererHelper(unittest.TestCase):
         request = testing.DummyRequest()
         request.response = Response(content_type='application/json', charset=None)
 
-        self.assertIsNone(request.response.charset)
+        self.assertEqual(request.response.charset, None)
 
         helper = self._makeOne('loo.foo')
         la = text_('/La Pe\xc3\xb1a', 'utf-8')
         response = helper._make_response(la, request)
-        self.assertIsNone(response.charset)
+        self.assertEqual(response.charset, None)
         self.assertEqual(response.body, la.encode('utf-8'))
 
     def test__make_response_result_is_iterable(self):
