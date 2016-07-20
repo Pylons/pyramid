@@ -272,3 +272,5 @@ Contributors
 - Berker Peksag, 2016/05/16
 
 - Cris Ewing, 2016/06/03
+
+- Jon Davidson, 2016/07/18
