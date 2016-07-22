@@ -274,3 +274,5 @@ Contributors
 - Cris Ewing, 2016/06/03
 
 - Jon Davidson, 2016/07/18
+
+- Keith Yang, 2016/07/22
