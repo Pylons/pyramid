@@ -34,6 +34,17 @@ Steps
    .. code-block:: bash
 
     $ cd ..; cp -r view_classes authentication; cd authentication
+
+#. This step depends on bcrypt_, so add it as a dependency in
+   ``authentication/setup.py``:
+
+   .. literalinclude:: authentication/setup.py
+    :linenos:
+
+#. Now we can activate the development-mode distribution:
+
+   .. code-block:: bash
+
     $ $VENV/bin/pip install -e .
 
 #. Put the security hash in the ``authentication/development.ini``
@@ -103,6 +114,11 @@ In this example we chose to use the bundled :ref:`AuthTktAuthenticationPolicy
 <authentication_module>` policy. We enabled it in our configuration and
 provided a ticket-signing secret in our INI file.
 
+The function ``hash_password`` hashes user's password by bcrypt_ instead of
+storing password in plain text directly as a best practice [1]_. And function
+``check_password`` will compare the hashed value of the submitted password
+against the hashed value of the user's password.
+
 Our view class grew a login view. When you reached it via a ``GET`` request, it
 returned a login form. When reached via ``POST``, it processed the submitted
 username and password against the "groupfinder" callable that we registered in
@@ -126,3 +142,10 @@ Extra credit
 
 .. seealso:: See also :ref:`security_chapter`,
    :ref:`AuthTktAuthenticationPolicy <authentication_module>`.
+
+.. _bcrypt: https://pypi.python.org/pypi/bcrypt
+
+.. [1] We are using the bcrypt_ package from PyPI to hash our passwords
+       securely. There are other one-way hash algorithms for passwords if
+       bcrypt is an issue on your system. Just make sure that it's an
+       algorithm approved for storing passwords versus a generic one-way hash.
