@@ -114,7 +114,7 @@ Finally ``main`` is finished configuring things, so it uses the
 Route declarations
 ------------------
 
-Open the ``tutorials/routes.py`` file. It should already contain the following:
+Open the ``tutorial/routes.py`` file. It should already contain the following:
 
 .. literalinclude:: src/basiclayout/tutorial/routes.py
   :linenos:
