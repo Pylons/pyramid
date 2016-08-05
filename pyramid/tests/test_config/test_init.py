@@ -1545,6 +1545,31 @@ class TestActionState(unittest.TestCase):
         c.execute_actions()
         self.assertEqual(output, [('f', (1,), {}), ('g', (8,), {})])
 
+    def test_reentrant_action_with_deferred_discriminator(self):
+        # see https://github.com/Pylons/pyramid/issues/2697
+        from pyramid.registry import Deferred
+        output = []
+        c = self._makeOne()
+        def f(*a, **k):
+            output.append(('f', a, k))
+            c.actions.append((4, g, (4,), {}, (), None, 2))
+        def g(*a, **k):
+            output.append(('g', a, k))
+        def h(*a, **k):
+            output.append(('h', a, k))
+        def discrim():
+            self.assertEqual(output, [('f', (1,), {}), ('g', (2,), {})])
+            return 3
+        d = Deferred(discrim)
+        c.actions = [
+            (d, h, (3,), {}, (), None, 1), # order 1
+            (1, f, (1,)), # order 0
+            (2, g, (2,)), # order 0
+        ]
+        c.execute_actions()
+        self.assertEqual(output, [
+            ('f', (1,), {}), ('g', (2,), {}), ('h', (3,), {}), ('g', (4,), {})])
+
     def test_reentrant_action_error(self):
         from pyramid.exceptions import ConfigurationError
         c = self._makeOne()
@@ -1597,6 +1622,21 @@ class Test_reentrant_action_functional(unittest.TestCase):
         self.assertEqual(route.name, 'foo')
         self.assertEqual(route.path, '/foo')
 
+    def test_deferred_discriminator(self):
+        # see https://github.com/Pylons/pyramid/issues/2697
+        from pyramid.config import PHASE0_CONFIG
+        config = self._makeConfigurator()
+        def deriver(view, info): return view
+        deriver.options = ('foo',)
+        config.add_view_deriver(deriver, 'foo_view')
+        # add_view uses a deferred discriminator and will fail if executed
+        # prior to add_view_deriver executing its action
+        config.add_view(lambda r: r.response, name='', foo=1)
+        def dummy_action():
+            # trigger a re-entrant action
+            config.action(None, lambda: None)
+        config.action(None, dummy_action, order=PHASE0_CONFIG)
+        config.commit()
 
 class Test_resolveConflicts(unittest.TestCase):
     def _callFUT(self, actions):
