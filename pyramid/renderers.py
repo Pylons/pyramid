@@ -1,6 +1,7 @@
 import json
 import os
 import re
+import warnings
 
 from zope.interface import (
     implementer,
@@ -272,7 +273,7 @@ class JSON(object):
                 if ct == response.default_content_type:
                     response.content_type = 'application/json'
             default = self._make_default(request)
-            return self.serializer(value, default=default, **self.kw)
+            return self.serializer(value, default=default, **self.kw).encode('UTF-8')
 
         return _render
 
@@ -379,7 +380,7 @@ class JSONP(JSON):
                         raise HTTPBadRequest('Invalid JSONP callback function name.')
 
                     ct = 'application/javascript'
-                    body = '/**/{0}({1});'.format(callback, val)
+                    body = '/**/{0}({1});'.format(callback, val).encode('UTF-8')
                 response = request.response
                 if response.content_type == response.default_content_type:
                     response.content_type = ct
@@ -467,7 +468,17 @@ class RendererHelper(object):
 
         if result is not None:
             if isinstance(result, text_type):
-                response.text = result
+                if response.charset is None:
+                    warnings.warn(
+                        "Renderer returned a result of type {0}, "
+                        "however the response Content-Type <{1}> does not "
+                        "have a charset. Implicitly encoding the result as "
+                        "UTF-8.".format(type(result), response.content_type),
+                        RuntimeWarning
+                    )
+                    response.body = result.encode('UTF-8')
+                else:
+                    response.text = result
             elif isinstance(result, bytes):
                 response.body = result
             elif hasattr(result, '__iter__'):
