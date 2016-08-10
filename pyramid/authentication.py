@@ -1120,10 +1120,10 @@ class _SimpleSerializer(object):
 
 def extract_http_basic_credentials(request):
     """ A helper function for extraction of HTTP Basic credentials
-    from a given `request`.
+    from a given :term:`request`.
 
     ``request``
-        The request object
+        The :term:`request` object
     """
     authorization = request.headers.get('Authorization')
     if not authorization:

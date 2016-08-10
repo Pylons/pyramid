@@ -1476,6 +1476,67 @@ class TestBasicAuthAuthenticationPolicy(unittest.TestCase):
         self.assertEqual(policy.forget(None), [
             ('WWW-Authenticate', 'Basic realm="SomeRealm"')])
 
+
+class TestExtractHTTPBasicCredentials(unittest.TestCase):
+    def _get_func(self):
+        from pyramid.authentication import extract_http_basic_credentials
+        return extract_http_basic_credentials
+
+    def test_no_auth_header(self):
+        request = testing.DummyRequest()
+        fn = self._get_func()
+
+        self.assertIsNone(fn(request))
+
+    def test_invalid_payload(self):
+        import base64
+        request = testing.DummyRequest()
+        request.headers['Authorization'] = 'Basic %s' % base64.b64encode(
+            bytes_('chrisrpassword')).decode('ascii')
+        fn = self._get_func()
+        self.assertIsNone(fn(request))
+
+    def test_not_a_basic_auth_scheme(self):
+        import base64
+        request = testing.DummyRequest()
+        request.headers['Authorization'] = 'OtherScheme %s' % base64.b64encode(
+            bytes_('chrisr:password')).decode('ascii')
+        fn = self._get_func()
+        self.assertIsNone(fn(request))
+
+    def test_no_base64_encoding(self):
+        request = testing.DummyRequest()
+        request.headers['Authorization'] = 'Basic ...'
+        fn = self._get_func()
+        self.assertIsNone(fn(request))
+
+    def test_latin1_payload(self):
+        import base64
+        request = testing.DummyRequest()
+        inputs = (b'm\xc3\xb6rk\xc3\xb6:'
+                  b'm\xc3\xb6rk\xc3\xb6password').decode('utf-8')
+        request.headers['Authorization'] = 'Basic %s' % (
+            base64.b64encode(inputs.encode('latin-1')).decode('latin-1'))
+        fn = self._get_func()
+        self.assertEqual(fn(request), (
+            b'm\xc3\xb6rk\xc3\xb6'.decode('utf-8'),
+            b'm\xc3\xb6rk\xc3\xb6password'.decode('utf-8')
+        ))
+
+    def test_utf8_payload(self):
+        import base64
+        request = testing.DummyRequest()
+        inputs = (b'm\xc3\xb6rk\xc3\xb6:'
+                  b'm\xc3\xb6rk\xc3\xb6password').decode('utf-8')
+        request.headers['Authorization'] = 'Basic %s' % (
+            base64.b64encode(inputs.encode('utf-8')).decode('latin-1'))
+        fn = self._get_func()
+        self.assertEqual(fn(request), (
+            b'm\xc3\xb6rk\xc3\xb6'.decode('utf-8'),
+            b'm\xc3\xb6rk\xc3\xb6password'.decode('utf-8')
+        ))
+
+
 class TestSimpleSerializer(unittest.TestCase):
     def _makeOne(self):
         from pyramid.authentication import _SimpleSerializer

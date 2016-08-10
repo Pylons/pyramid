@@ -35,4 +35,7 @@ Helper Classes
      :members:
 
 
+Helper Functions
+~~~~~~~~~~~~~~~~
 
+  .. autofunction:: extract_http_basic_credentials
