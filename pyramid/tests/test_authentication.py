@@ -1536,6 +1536,18 @@ class TestExtractHTTPBasicCredentials(unittest.TestCase):
             b'm\xc3\xb6rk\xc3\xb6password'.decode('utf-8')
         ))
 
+    def test_namedtuple_return(self):
+        import base64
+        request = testing.DummyRequest()
+        request.headers['Authorization'] = 'Basic %s' % base64.b64encode(
+            bytes_('chrisr:pass')).decode('ascii')
+        fn = self._get_func()
+        result = fn(request)
+
+        self.assertEqual(result.username, 'chrisr')
+        self.assertEqual(result.password, 'pass')
+
+
 
 class TestSimpleSerializer(unittest.TestCase):
     def _makeOne(self):

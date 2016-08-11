@@ -1,6 +1,7 @@
 import binascii
 from codecs import utf_8_decode
 from codecs import utf_8_encode
+from collections import namedtuple
 import hashlib
 import base64
 import re
@@ -1118,9 +1119,16 @@ class _SimpleSerializer(object):
         return bytes_(appstruct)
 
 
+http_basic_credentials = namedtuple('http_basic_credentials',
+                                    ['username', 'password'])
+
+
 def extract_http_basic_credentials(request):
     """ A helper function for extraction of HTTP Basic credentials
-    from a given :term:`request`.
+    from a given :term:`request`. Returned values:
+
+    - ``None`` - when credentials couldn't be extracted
+    - ``namedtuple`` with extracted ``username`` and ``password`` attributes
 
     ``request``
         The :term:`request` object
@@ -1153,4 +1161,5 @@ def extract_http_basic_credentials(request):
         username, password = auth.split(':', 1)
     except ValueError: # not enough values to unpack
         return None
-    return username, password
+
+    return http_basic_credentials(username, password)
