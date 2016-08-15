@@ -4,7 +4,7 @@ from textwrap import dedent
 
 from pyramid.compat import native_
 
-from pyramid.scaffolds.template import Template # API
+from pyramid.scaffolds.template import Template  # API
 
 class PyramidTemplate(Template):
     """
@@ -60,5 +60,6 @@ class ZODBProjectTemplate(PyramidTemplate):
 
 class AlchemyProjectTemplate(PyramidTemplate):
     _template_dir = 'alchemy'
-    summary = 'Pyramid project using SQLAlchemy, SQLite, URL dispatch, and'
-    ' Chameleon'
+    summary = (
+        'Pyramid project using SQLAlchemy, SQLite, URL dispatch, and '
+        'Jinja2')
