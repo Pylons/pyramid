@@ -504,10 +504,10 @@ Pyramid's ``pcreate`` command can list the available scaffolds:
 
     $ pcreate --list
     Available scaffolds:
-      alchemy:                 Pyramid SQLAlchemy project using url dispatch
+      alchemy:                 Pyramid project using SQLAlchemy, SQLite, URL dispatch, and Jinja2
       pyramid_jinja2_starter:  Pyramid Jinja2 starter project
-      starter:                 Pyramid starter project
-      zodb:                    Pyramid ZODB project using traversal
+      starter:                 Pyramid starter project using URL dispatch and Chameleon
+      zodb:                    Pyramid project using ZODB, traversal, and Chameleon
 
 The ``pyramid_jinja2`` add-on gave us a scaffold that we can use. From the
 parent directory of where we want our Python package to be generated, let's use
