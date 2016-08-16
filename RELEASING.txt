@@ -148,12 +148,12 @@ Here are the changes:
 
 <<changes>>
 
-A "What's New In Pyramid 1.X" document exists at
-http://docs.pylonsproject.org/projects/pyramid/1.X-branch/whatsnew-1.X.html .
+What's New In Pyramid 1.X:
+http://docs.pylonsproject.org/projects/pyramid/en/1.X-branch/whatsnew-1.X.html
 
-You will be able to see the 1.X release documentation (across all
-alphas and betas, as well as when it eventually gets to final release)
-at http://docs.pylonsproject.org/projects/pyramid/1.X-branch/ .
+1.X release documentation (across all alphas and betas, as well as when it gets
+to final release):
+http://docs.pylonsproject.org/projects/pyramid/en/1.X-branch/
 
 You can install it via PyPI:
 
