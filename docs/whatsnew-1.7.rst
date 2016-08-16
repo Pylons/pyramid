@@ -7,6 +7,16 @@ incompatibilities between the two versions and deprecations added to
 :app:`Pyramid` 1.7, as well as software dependency changes and notable
 documentation additions.
 
+Bug Fix Releases
+----------------
+
+Pyramid 1.7 was released on 2016-05-19.
+
+The following bug fix releases were made since then. Bug fix releases also
+include documentation improvements and other minor feature changes.
+
+- :ref:`changes_1.7.1`
+
 Backwards Incompatibilities
 ---------------------------
 

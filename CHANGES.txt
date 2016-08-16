@@ -1,5 +1,7 @@
-unreleased
-==========
+.. _changes_1.7.1:
+
+1.7.1 (2016-08-16)
+==================
 
 - Change flake8 noqa directive to ignore only a single line instead of the
   entire file in scaffold and documentation. See
