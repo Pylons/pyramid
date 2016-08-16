@@ -2106,7 +2106,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
                                      ctx_iface=implementedBy(HTTPNotFound),
                                      request_iface=IRequest)
         result = view(None, request)
-        self._assertBody(result, b'{}')
+        self._assertBody(result, '{}')
 
     def test_add_forbidden_view_with_renderer(self):
         from zope.interface import implementedBy
@@ -2123,7 +2123,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
                                      ctx_iface=implementedBy(HTTPForbidden),
                                      request_iface=IRequest)
         result = view(None, request)
-        self._assertBody(result, b'{}')
+        self._assertBody(result, '{}')
 
     def test_set_view_mapper(self):
         from pyramid.interfaces import IViewMapperFactory
