@@ -1,3 +1,15 @@
+unreleased
+==========
+
+Bug Fixes
+---------
+
+- Revert changes from #2706 released in Pyramid 1.7.1. JSON renderers will
+  continue to return unicode data instead of UTF-8 encoded bytes. This means
+  that WebOb responses are still expected to handle unicode data even though
+  JSON does not have a charset.
+  See https://github.com/Pylons/pyramid/issues/2744
+
 .. _changes_1.7.1:
 
 1.7.1 (2016-08-16)
