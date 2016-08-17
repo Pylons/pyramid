@@ -1,8 +1,7 @@
-unreleased
-==========
+.. _changes_1.7.2:
 
-Bug Fixes
----------
+1.7.2 (2016-08-16)
+==================
 
 - Revert changes from #2706 released in Pyramid 1.7.1. JSON renderers will
   continue to return unicode data instead of UTF-8 encoded bytes. This means
