@@ -1,3 +1,14 @@
+.. _changes_1.6.4:
+
+1.6.4 (2016-08-17)
+==================
+
+Bug Fixes
+---------
+
+- Oops, Apparently wheels do not build cleanly every time, so build artifacts
+  from 1.7.1 creeped into the wheel for 1.6.3. Note to self: ``rm -rf build``.
+
 .. _changes_1.6.3:
 
 1.6.3 (2016-08-16)
