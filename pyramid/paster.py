@@ -72,8 +72,10 @@ def setup_logging(config_uri, global_conf=None,
         full_global_conf = dict(
             __file__=config_file,
             here=os.path.dirname(config_file))
+        full_global_conf.update(parser.items('logging_defaults'))
         if global_conf:
-            full_global_conf.update(global_conf)
+            for key, val in global_conf.items():
+                full_global_conf[key.lower()] = val
         return fileConfig(config_file, full_global_conf)
 
 def _getpathsec(config_uri, name):
