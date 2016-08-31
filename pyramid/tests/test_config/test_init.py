@@ -1728,15 +1728,14 @@ class Test_resolveConflicts(unittest.TestCase):
 
     def test_it_success_dicts(self):
         from pyramid.tests.test_config import dummyfactory as f
-        from pyramid.config import expand_action
         result = self._callFUT([
-            expand_action(None, f),
-            expand_action(1, f, (1,), {}, (), 'first'),
-            expand_action(1, f, (2,), {}, ('x',), 'second'),
-            expand_action(1, f, (3,), {}, ('y',), 'third'),
-            expand_action(4, f, (4,), {}, ('y',), 'should be last', 99999),
-            expand_action(3, f, (3,), {}, ('y',)),
-            expand_action(None, f, (5,), {}, ('y',)),
+            (None, f),
+            (1, f, (1,), {}, (), 'first'),
+            (1, f, (2,), {}, ('x',), 'second'),
+            (1, f, (3,), {}, ('y',), 'third'),
+            (4, f, (4,), {}, ('y',), 'should be last', 99999),
+            (3, f, (3,), {}, ('y',)),
+            (None, f, (5,), {}, ('y',)),
             ])
         result = list(result)
         self.assertEqual(
@@ -1802,17 +1801,16 @@ class Test_resolveConflicts(unittest.TestCase):
 
     def test_it_with_actions_grouped_by_order(self):
         from pyramid.tests.test_config import dummyfactory as f
-        from pyramid.config import expand_action
         result = self._callFUT([
-            expand_action(None, f),                                 # X
-            expand_action(1, f, (1,), {}, (), 'third', 10),         # X
-            expand_action(1, f, (2,), {}, ('x',), 'fourth', 10),
-            expand_action(1, f, (3,), {}, ('y',), 'fifth', 10),
-            expand_action(2, f, (1,), {}, (), 'sixth', 10),         # X
-            expand_action(3, f, (1,), {}, (), 'seventh', 10),       # X
-            expand_action(5, f, (4,), {}, ('y',), 'eighth', 99999), # X
-            expand_action(4, f, (3,), {}, (), 'first', 5),          # X
-            expand_action(4, f, (5,), {}, ('y',), 'second', 5),
+            (None, f),                                 # X
+            (1, f, (1,), {}, (), 'third', 10),         # X
+            (1, f, (2,), {}, ('x',), 'fourth', 10),
+            (1, f, (3,), {}, ('y',), 'fifth', 10),
+            (2, f, (1,), {}, (), 'sixth', 10),         # X
+            (3, f, (1,), {}, (), 'seventh', 10),       # X
+            (5, f, (4,), {}, ('y',), 'eighth', 99999), # X
+            (4, f, (3,), {}, (), 'first', 5),          # X
+            (4, f, (5,), {}, ('y',), 'second', 5),
             ])
         result = list(result)
         self.assertEqual(len(result), 6)
