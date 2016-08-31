@@ -116,7 +116,7 @@ We'll also change ``__init__.py``, adding a call to
 :term:`view callable`.  This is also known as a :term:`forbidden view`:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
-   :lines: 25,41-43
+   :lines: 25,32-33
    :linenos:
    :language: python
 
