@@ -66,7 +66,9 @@ class ViewPageTests(unittest.TestCase):
         self.assertEqual(
             info['content'],
             '<div class="document">\n'
-            '<p>Hello <a href="http://example.com/add_page/CruelWorld">'
+            '<p><a href="http://example.com/add_page/Hello">'
+            'Hello</a> '
+            '<a href="http://example.com/add_page/CruelWorld">'
             'CruelWorld</a> '
             '<a href="http://example.com/IDoExist/">'
             'IDoExist</a>'
