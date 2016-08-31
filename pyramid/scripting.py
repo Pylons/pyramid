@@ -33,6 +33,18 @@ def get_root(app, request=None):
     root = app.root_factory(request)
     return root, closer
 
+
+class EnvManager(dict):
+    def __enter__(self):
+        return self
+
+    def __getattr__(self, att):
+        return self[att]
+
+    def __exit__(self, type, value, traceback):
+        self.closer()
+
+
 def prepare(request=None, registry=None):
     """ This function pushes data onto the Pyramid threadlocal stack
     (request and registry), making those objects 'current'.  It
@@ -74,19 +86,24 @@ def prepare(request=None, registry=None):
     # NB: even though _make_request might have already set registry on
     # request, we reset it in case someone has passed in their own
     # request.
-    request.registry = registry 
+    request.registry = registry
     threadlocals = {'registry':registry, 'request':request}
     threadlocal_manager.push(threadlocals)
     apply_request_extensions(request)
+
     def closer():
         threadlocal_manager.pop()
+
     root_factory = registry.queryUtility(IRootFactory,
                                          default=DefaultRootFactory)
     root = root_factory(request)
+
     if getattr(request, 'context', None) is None:
         request.context = root
-    return {'root':root, 'closer':closer, 'registry':registry,
-            'request':request, 'root_factory':root_factory}
+
+    env = {'root':root, 'closer':closer, 'registry':registry, 'request':request,
+           'root_factory':root_factory}
+    return EnvManager(env)
 
 def _make_request(path, registry=None):
     """ Return a :meth:`pyramid.request.Request` object anchored at a

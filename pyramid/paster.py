@@ -125,7 +125,7 @@ def bootstrap(config_uri, request=None, options=None):
     for you if none is provided. You can mutate the request's ``environ``
     later to setup a specific host/port/scheme/etc.
 
-    ``options`` Is passed to get_app for use as variable assignments like 
+    ``options`` Is passed to get_app for use as variable assignments like
     {'http_port': 8080} and then use %(http_port)s in the
     config file.
 
