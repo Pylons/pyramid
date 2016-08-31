@@ -172,6 +172,36 @@ class TestRemember(unittest.TestCase):
         _registerAuthenticationPolicy(registry, 'yo')
         self.assertRaises(TypeError, lambda: self._callFUT(request))
 
+    def test_with_session_no_current_user(self):
+        request = _makeRequest()
+        request.session = DummySession({'foo': 'bar'})
+        registry = request.registry
+        _registerSessionFactory(registry, object())
+        _registerAuthenticationPolicy(registry, None)
+        self._callFUT(request, 'me')
+        self.assertEqual(request.session, {'foo': 'bar'})
+        self.assertEqual(request.session.invalidations, 1)
+
+    def test_with_session_same_user(self):
+        request = _makeRequest()
+        request.session = DummySession({'foo': 'bar'})
+        registry = request.registry
+        _registerSessionFactory(registry, object())
+        _registerAuthenticationPolicy(registry, 'same user')
+        self._callFUT(request, 'same user')
+        self.assertEqual(request.session, {'foo': 'bar'})
+        self.assertEqual(request.session.invalidations, 1)
+
+    def test_with_session_different_user(self):
+        request = _makeRequest()
+        request.session = DummySession({'foo': 'bar'})
+        registry = request.registry
+        _registerSessionFactory(registry, object())
+        _registerAuthenticationPolicy(registry, 'the other user')
+        self._callFUT(request, 'different user')
+        self.assertEqual(request.session, {})
+        self.assertEqual(request.session.invalidations, 1)
+
 class TestForget(unittest.TestCase):
     def setUp(self):
         testing.setUp()
@@ -202,7 +232,17 @@ class TestForget(unittest.TestCase):
         _registerAuthenticationPolicy(registry, 'yo')
         result = self._callFUT(request)
         self.assertEqual(result, [('X-Pyramid-Test', 'logout')])
-        
+
+    def test_with_session(self):
+        request = _makeRequest()
+        request.session = DummySession({'foo': 'bar'})
+        registry = request.registry
+        _registerSessionFactory(registry, object())
+        _registerAuthenticationPolicy(registry, 'yo')
+        self._callFUT(request)
+        self.assertEqual(request.session, {})
+        self.assertEqual(request.session.invalidations, 1)
+
 class TestViewExecutionPermitted(unittest.TestCase):
     def setUp(self):
         testing.setUp()
@@ -495,6 +535,15 @@ class DummyAuthorizationPolicy:
     def principals_allowed_by_permission(self, context, permission):
         return self.result
 
+class DummySession(dict):
+    def __init__(self, *args, **kwargs):
+        super(DummySession, self).__init__(*args, **kwargs)
+        self.invalidations = 0
+
+    def invalidate(self):
+        self.clear()
+        self.invalidations += 1
+
 def _registerAuthenticationPolicy(reg, result):
     from pyramid.interfaces import IAuthenticationPolicy
     policy = DummyAuthenticationPolicy(result)
@@ -506,6 +555,11 @@ def _registerAuthorizationPolicy(reg, result):
     policy = DummyAuthorizationPolicy(result)
     reg.registerUtility(policy, IAuthorizationPolicy)
     return policy
+
+def _registerSessionFactory(reg, factory):
+    from pyramid.interfaces import ISessionFactory
+    reg.registerUtility(factory, ISessionFactory)
+    return factory
 
 def _makeRequest():
     from pyramid.registry import Registry
