@@ -11,8 +11,9 @@ concise. Details, references, and deeper discussions are mentioned in
 This "Getting Started" tutorial is broken into independent steps,
 starting with the smallest possible "single file WSGI app" example.
 Each of these steps introduce a topic and a very small set of concepts
-via working code. The steps each correspond to a directory in this
-repo, where each step/topic/directory is a Python package.
+via working code. The steps each correspond to a directory in the
+repo `pyramid_tutorials <https://github.com/Pylons/pyramid_tutorials>`_, 
+where each step/topic/directory is a Python package.
 
 To successfully run each step::
 
