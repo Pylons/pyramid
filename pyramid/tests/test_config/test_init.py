@@ -1595,6 +1595,28 @@ class TestActionState(unittest.TestCase):
             (3, g, (8,)),
         ])
 
+    def test_executing_conflicting_action_across_orders(self):
+        from pyramid.exceptions import ConfigurationConflictError
+        c = self._makeOne()
+        def f(*a, **k): pass
+        def g(*a, **k): pass
+        c.actions = [
+            (1, f, (1,), {}, (), None, -1),
+            (1, g, (2,)),
+        ]
+        self.assertRaises(ConfigurationConflictError, c.execute_actions)
+
+    def test_executing_conflicting_action_across_reentrant_orders(self):
+        from pyramid.exceptions import ConfigurationConflictError
+        c = self._makeOne()
+        def f(*a, **k):
+            c.actions.append((1, g, (8,)))
+        def g(*a, **k): pass
+        c.actions = [
+            (1, f, (1,), {}, (), None, -1),
+        ]
+        self.assertRaises(ConfigurationConflictError, c.execute_actions)
+
 class Test_reentrant_action_functional(unittest.TestCase):
     def _makeConfigurator(self, *arg, **kw):
         from pyramid.config import Configurator
@@ -1852,7 +1874,32 @@ class Test_resolveConflicts(unittest.TestCase):
                   'order': 99999}
                   ]
                   )
-        
+
+    def test_override_success_across_orders(self):
+        from pyramid.tests.test_config import dummyfactory as f
+        result = self._callFUT([
+            (1, f, (2,), {}, ('x',), 'eek', 0),
+            (1, f, (3,), {}, ('x', 'y'), 'ack', 10),
+            ])
+        result = list(result)
+        self.assertEqual(result, [
+            {'info': 'eek',
+            'args': (2,),
+            'callable': f,
+            'introspectables': (),
+            'kw': {},
+            'discriminator': 1,
+            'includepath': ('x',),
+            'order': 0},
+        ])
+
+    def test_conflicts_across_orders(self):
+        from pyramid.tests.test_config import dummyfactory as f
+        result = self._callFUT([
+            (1, f, (2,), {}, ('x', 'y'), 'eek', 0),
+            (1, f, (3,), {}, ('x'), 'ack', 10),
+            ])
+        self.assertRaises(ConfigurationConflictError, list, result)
 
 class TestGlobalRegistriesIntegration(unittest.TestCase):
     def setUp(self):
