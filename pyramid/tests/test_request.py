@@ -258,7 +258,10 @@ class TestRequest(unittest.TestCase):
         self.assertEqual(request.json_body, {'a':1})
 
     def test_json_body_alternate_charset(self):
-        import json
+        try:
+            import simplejson as json
+        except ImportError:
+            import json
         request = self._makeOne({'REQUEST_METHOD':'POST'})
         inp = text_(
             b'/\xe6\xb5\x81\xe8\xa1\x8c\xe8\xb6\x8b\xe5\x8a\xbf',
