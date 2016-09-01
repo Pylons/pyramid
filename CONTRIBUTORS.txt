@@ -279,6 +279,8 @@ Contributors
 
 - Jean-Christophe Bohin, 2016/06/13
 
+- Dariusz Gorecki, 2016/07/15
+
 - Jon Davidson, 2016/07/18
 
 - Keith Yang, 2016/07/22

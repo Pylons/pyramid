@@ -1,6 +1,7 @@
 import binascii
 from codecs import utf_8_decode
 from codecs import utf_8_encode
+from collections import namedtuple
 import hashlib
 import base64
 import re
@@ -1095,7 +1096,7 @@ class BasicAuthAuthenticationPolicy(CallbackAuthenticationPolicy):
 
     def unauthenticated_userid(self, request):
         """ The userid parsed from the ``Authorization`` request header."""
-        credentials = self._get_credentials(request)
+        credentials = extract_http_basic_credentials(request)
         if credentials:
             return credentials[0]
 
@@ -1112,42 +1113,15 @@ class BasicAuthAuthenticationPolicy(CallbackAuthenticationPolicy):
         return [('WWW-Authenticate', 'Basic realm="%s"' % self.realm)]
 
     def callback(self, username, request):
-        # Username arg is ignored.  Unfortunately _get_credentials winds up
-        # getting called twice when authenticated_userid is called.  Avoiding
-        # that, however, winds up duplicating logic from the superclass.
-        credentials = self._get_credentials(request)
+        # Username arg is ignored. Unfortunately
+        # extract_http_basic_credentials winds up getting called twice when
+        # authenticated_userid is called. Avoiding that, however,
+        # winds up duplicating logic from the superclass.
+        credentials = extract_http_basic_credentials(request)
         if credentials:
             username, password = credentials
             return self.check(username, password, request)
 
-    def _get_credentials(self, request):
-        authorization = request.headers.get('Authorization')
-        if not authorization:
-            return None
-        try:
-            authmeth, auth = authorization.split(' ', 1)
-        except ValueError: # not enough values to unpack
-            return None
-        if authmeth.lower() != 'basic':
-            return None
-
-        try:
-            authbytes = b64decode(auth.strip())
-        except (TypeError, binascii.Error): # can't decode
-            return None
-
-        # try utf-8 first, then latin-1; see discussion in
-        # https://github.com/Pylons/pyramid/issues/898
-        try:
-            auth = authbytes.decode('utf-8')
-        except UnicodeDecodeError:
-            auth = authbytes.decode('latin-1')
-
-        try:
-            username, password = auth.split(':', 1)
-        except ValueError: # not enough values to unpack
-            return None
-        return username, password
 
 class _SimpleSerializer(object):
     def loads(self, bstruct):
@@ -1155,3 +1129,49 @@ class _SimpleSerializer(object):
 
     def dumps(self, appstruct):
         return bytes_(appstruct)
+
+
+http_basic_credentials = namedtuple('http_basic_credentials',
+                                    ['username', 'password'])
+
+
+def extract_http_basic_credentials(request):
+    """ A helper function for extraction of HTTP Basic credentials
+    from a given :term:`request`. Returned values:
+
+    - ``None`` - when credentials couldn't be extracted
+    - ``namedtuple`` with extracted ``username`` and ``password`` attributes
+
+    ``request``
+        The :term:`request` object
+    """
+    authorization = request.headers.get('Authorization')
+    if not authorization:
+        return None
+
+    try:
+        authmeth, auth = authorization.split(' ', 1)
+    except ValueError:  # not enough values to unpack
+        return None
+
+    if authmeth.lower() != 'basic':
+        return None
+
+    try:
+        authbytes = b64decode(auth.strip())
+    except (TypeError, binascii.Error): # can't decode
+        return None
+
+    # try utf-8 first, then latin-1; see discussion in
+    # https://github.com/Pylons/pyramid/issues/898
+    try:
+        auth = authbytes.decode('utf-8')
+    except UnicodeDecodeError:
+        auth = authbytes.decode('latin-1')
+
+    try:
+        username, password = auth.split(':', 1)
+    except ValueError: # not enough values to unpack
+        return None
+
+    return http_basic_credentials(username, password)
