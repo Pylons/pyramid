@@ -24,6 +24,10 @@ Bug Fixes
   and `attr` is involved.
   See: https://github.com/Pylons/pyramid/pull/2687
 
+- Fix a ``FutureWarning`` in Python 3.5 when using ``re.split`` on the
+  ``format`` setting to the ``proutes`` script.
+  See https://github.com/Pylons/pyramid/pull/2714
+
 Deprecations
 ------------
 
