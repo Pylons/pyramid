@@ -34,6 +34,8 @@ Helper Classes
   .. autoclass:: AuthTktCookieHelper
      :members:
 
+  .. autoclass:: HTTPBasicCredentials
+     :members:
 
 Helper Functions
 ~~~~~~~~~~~~~~~~

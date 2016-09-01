@@ -20,9 +20,9 @@ Features
 --------
 
 - The `_get_credentials` private method of `BasicAuthAuthenticationPolicy`
-  has been extracted into standalone function `extract_http_basic_credentials`
+  has been extracted into standalone function ``extract_http_basic_credentials`
   in `pyramid.authentication` module, this function extracts HTTP Basic
-  credentials from `request` object, and returns them as a named tuple.
+  credentials from a ``request`` object, and returns them as a named tuple.
 
 Bug Fixes
 ---------

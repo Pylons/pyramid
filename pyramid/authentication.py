@@ -1131,19 +1131,17 @@ class _SimpleSerializer(object):
         return bytes_(appstruct)
 
 
-http_basic_credentials = namedtuple('http_basic_credentials',
-                                    ['username', 'password'])
+HTTPBasicCredentials = namedtuple(
+    'HTTPBasicCredentials', ['username', 'password'])
 
 
 def extract_http_basic_credentials(request):
     """ A helper function for extraction of HTTP Basic credentials
-    from a given :term:`request`. Returned values:
+    from a given :term:`request`.
 
-    - ``None`` - when credentials couldn't be extracted
-    - ``namedtuple`` with extracted ``username`` and ``password`` attributes
+    Returns a :class:`.HTTPBasicCredentials` 2-tuple with ``username`` and
+    ``password`` attributes or ``None`` if no credentials could be found.
 
-    ``request``
-        The :term:`request` object
     """
     authorization = request.headers.get('Authorization')
     if not authorization:
@@ -1174,4 +1172,4 @@ def extract_http_basic_credentials(request):
     except ValueError: # not enough values to unpack
         return None
 
-    return http_basic_credentials(username, password)
+    return HTTPBasicCredentials(username, password)
