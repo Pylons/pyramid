@@ -296,7 +296,7 @@ class PRoutesCommand(object):
             items = config.items('proutes')
             for k, v in items:
                 if 'format' == k:
-                    cols = re.split(r'[,|\s|\n]*', v)
+                    cols = re.split(r'[,|\s\n]+', v)
                     self.column_format = [x.strip() for x in cols]
 
         except configparser.NoSectionError:
