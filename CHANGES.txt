@@ -23,6 +23,7 @@ Features
   has been extracted into standalone function ``extract_http_basic_credentials`
   in `pyramid.authentication` module, this function extracts HTTP Basic
   credentials from a ``request`` object, and returns them as a named tuple.
+  See https://github.com/Pylons/pyramid/pull/2662
 
 Bug Fixes
 ---------
