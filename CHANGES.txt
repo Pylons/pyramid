@@ -14,6 +14,8 @@ Backward Incompatibilities
    To run your server as a daemon you should use a process manager instead of
    pserve.
 
+   See https://github.com/Pylons/pyramid/pull/2615
+
 Features
 --------
 
