@@ -129,8 +129,22 @@ def bootstrap(config_uri, request=None, options=None):
     {'http_port': 8080} and then use %(http_port)s in the
     config file.
 
+    This function may be used as a context manager to call the ``closer``
+    automatically:
+
+    .. code-block:: python
+
+       with bootstrap('development.ini') as env:
+           request = env['request']
+           # ...
+
     See :ref:`writing_a_script` for more information about how to use this
     function.
+
+    .. versionchanged:: 1.8
+
+       Added the ability to use the return value as a context manager.
+
     """
     app = get_app(config_uri, options=options)
     env = prepare(request)
