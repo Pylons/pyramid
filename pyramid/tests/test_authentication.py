@@ -1089,7 +1089,10 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         helper = self._makeOne('secret')
         request = self._makeRequest()
         userid = object()
-        result = helper.remember(request, userid)
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always', RuntimeWarning)
+            result = helper.remember(request, userid)
+            self.assertTrue(str(w[-1].message).startswith('userid is of type'))
         values = self._parseHeaders(result)
         self.assertEqual(len(result), 3)
         value = values[0]
