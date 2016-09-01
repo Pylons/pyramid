@@ -124,8 +124,8 @@ In order to add a feature to Pyramid:
 - The feature must be documented in both the API and narrative
   documentation (in ``docs/``).
 
-- The feature must work fully on the following CPython versions: 2.7, 3.2,
-  3.4, and 3.5 on both UNIX and Windows.
+- The feature must work fully on the following CPython versions: 2.7, 3.4,
+  and 3.5 on both UNIX and Windows.
 
 - The feature must work on the latest version of PyPy.
 
@@ -199,7 +199,7 @@ Running Tests
 
   Alternately::
 
-   $ tox -e{py26,py27,py32,py33,py34,py35,pypy,pypy3}-scaffolds,
+   $ tox -e{py27,py34,py35,pypy}-scaffolds,
 
 Test Coverage
 -------------
