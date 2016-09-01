@@ -28,6 +28,14 @@ Bug Fixes
   ``format`` setting to the ``proutes`` script.
   See https://github.com/Pylons/pyramid/pull/2714
 
+- Fix a ``RuntimeWarning`` emitted by WebOb when using arbitrary objects
+  as the ``userid`` in the ``AuthTktAuthenticationPolicy``. This is now caught
+  by the policy and the object is serialized as a base64 string to avoid
+  the cryptic warning. Since the userid will be read back as a string on
+  subsequent requests a more useful warning is emitted encouraging you to
+  use a primitive type instead.
+  See https://github.com/Pylons/pyramid/pull/2715
+
 Deprecations
 ------------
 
