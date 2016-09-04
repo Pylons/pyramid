@@ -14,6 +14,7 @@ class TestTweensConfiguratorMixin(unittest.TestCase):
     def test_add_tweens_names_distinct(self):
         from pyramid.interfaces import ITweens
         from pyramid.tweens import excview_tween_factory
+        from pyramid.tweens import response_callbacks_tween_factory
         def factory1(handler, registry): return handler
         def factory2(handler, registry): return handler
         config = self._makeOne()
@@ -27,6 +28,8 @@ class TestTweensConfiguratorMixin(unittest.TestCase):
         self.assertEqual(
             implicit,
             [
+                ('pyramid.tweens.response_callbacks_tween_factory',
+                 response_callbacks_tween_factory),
                 ('pyramid.tests.test_config.dummy_tween_factory2',
                  dummy_tween_factory2),
                 ('pyramid.tests.test_config.dummy_tween_factory',
@@ -39,6 +42,7 @@ class TestTweensConfiguratorMixin(unittest.TestCase):
     def test_add_tweens_names_with_underover(self):
         from pyramid.interfaces import ITweens
         from pyramid.tweens import excview_tween_factory
+        from pyramid.tweens import response_callbacks_tween_factory
         from pyramid.tweens import MAIN
         config = self._makeOne()
         config.add_tween(
@@ -50,16 +54,39 @@ class TestTweensConfiguratorMixin(unittest.TestCase):
             under='pyramid.tests.test_config.dummy_tween_factory')
         config.commit()
         tweens = config.registry.queryUtility(ITweens)
-        implicit = tweens.implicit()
         self.assertEqual(
-            implicit,
+            tweens.implicit(),
             [
-                ('pyramid.tweens.excview_tween_factory', excview_tween_factory),
+                ('pyramid.tweens.response_callbacks_tween_factory',
+                 response_callbacks_tween_factory),
                 ('pyramid.tests.test_config.dummy_tween_factory',
                  dummy_tween_factory),
                 ('pyramid.tests.test_config.dummy_tween_factory2',
                  dummy_tween_factory2),
-             ])
+                ('pyramid.tweens.excview_tween_factory', excview_tween_factory),
+            ])
+
+    def test_add_tween_default_order(self):
+        from pyramid.interfaces import ITweens
+        from pyramid.tweens import excview_tween_factory
+        from pyramid.tweens import response_callbacks_tween_factory
+        config = self._makeOne()
+        config.add_tween('pyramid.tests.test_config.dummy_tween_factory')
+        config.add_tween('pyramid.tests.test_config.dummy_tween_factory2',
+                         under='pyramid.tests.test_config.dummy_tween_factory')
+        config.commit()
+        tweens = config.registry.queryUtility(ITweens)
+        self.assertEqual(
+            tweens.implicit(),
+            [
+                ('pyramid.tweens.response_callbacks_tween_factory',
+                 response_callbacks_tween_factory),
+                ('pyramid.tests.test_config.dummy_tween_factory',
+                 dummy_tween_factory),
+                ('pyramid.tests.test_config.dummy_tween_factory2',
+                 dummy_tween_factory2),
+                ('pyramid.tweens.excview_tween_factory', excview_tween_factory),
+            ])
 
     def test_add_tweens_names_with_under_nonstringoriter(self):
         from pyramid.exceptions import ConfigurationError
@@ -77,9 +104,30 @@ class TestTweensConfiguratorMixin(unittest.TestCase):
             'pyramid.tests.test_config.dummy_tween_factory',
             over=False)
 
+    def test_add_tweens_names_with_over_nonstriter(self):
+        from pyramid.exceptions import ConfigurationError
+        from pyramid.tweens import MAIN
+        config = self._makeOne()
+        self.assertRaises(
+            ConfigurationError,
+            config.add_tween,
+            'pyramid.tests.test_config.dummy_tween_factory',
+            over=[MAIN, object()])
+
+    def test_add_tweens_names_with_under_nonstriter(self):
+        from pyramid.exceptions import ConfigurationError
+        from pyramid.tweens import INGRESS
+        config = self._makeOne()
+        self.assertRaises(
+            ConfigurationError,
+            config.add_tween,
+            'pyramid.tests.test_config.dummy_tween_factory',
+            under=[INGRESS, object()])
+
     def test_add_tween_dottedname(self):
         from pyramid.interfaces import ITweens
         from pyramid.tweens import excview_tween_factory
+        from pyramid.tweens import response_callbacks_tween_factory
         config = self._makeOne()
         config.add_tween('pyramid.tests.test_config.dummy_tween_factory')
         config.commit()
@@ -87,6 +135,8 @@ class TestTweensConfiguratorMixin(unittest.TestCase):
         self.assertEqual(
             tweens.implicit(),
             [
+                ('pyramid.tweens.response_callbacks_tween_factory',
+                 response_callbacks_tween_factory),
                 ('pyramid.tests.test_config.dummy_tween_factory',
                  dummy_tween_factory),
                 ('pyramid.tweens.excview_tween_factory',

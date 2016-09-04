@@ -20,7 +20,6 @@ from pyramid.interfaces import (
 from pyramid.events import (
     ContextFound,
     NewRequest,
-    NewResponse,
     BeforeTraversal,
     )
 
@@ -28,6 +27,7 @@ from pyramid.httpexceptions import HTTPNotFound
 from pyramid.request import Request
 from pyramid.view import _call_view
 from pyramid.request import apply_request_extensions
+from pyramid.request import _execute_response_callbacks
 from pyramid.threadlocal import manager
 
 from pyramid.traversal import (
@@ -208,8 +208,6 @@ class Router(object):
     def invoke_request(self, request,
                        _use_tweens=True, _apply_extensions=False):
         registry = self.registry
-        has_listeners = self.registry.has_listeners
-        notify = self.registry.notify
         threadlocals = {'registry': registry, 'request': request}
         manager = self.threadlocal_manager
         manager.push(threadlocals)
@@ -225,12 +223,13 @@ class Router(object):
                 extensions = self.request_extensions
                 if _apply_extensions and extensions is not None:
                     apply_request_extensions(request, extensions=extensions)
+
                 response = handle_request(request)
 
-                if request.response_callbacks:
-                    request._process_response_callbacks(response)
-
-                has_listeners and notify(NewResponse(request, response))
+                # bw-compat, in Pyramid < 1.9 callbacks were executed even
+                # when use_tweens was false
+                if not _use_tweens:
+                    _execute_response_callbacks(request, response)
 
                 return response
 

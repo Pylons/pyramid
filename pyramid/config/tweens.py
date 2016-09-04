@@ -10,21 +10,27 @@ from pyramid.compat import (
 from pyramid.exceptions import ConfigurationError
 
 from pyramid.tweens import (
-    MAIN,
-    INGRESS,
     EXCVIEW,
+    INGRESS,
+    MAIN,
+    RESPONSE_CALLBACKS,
     )
 
 from pyramid.config.util import (
     action_method,
+    as_sorted_tuple,
     TopologicalSorter,
     )
-from pyramid.util import is_string_or_iterable
 
 class TweensConfiguratorMixin(object):
     def add_tween(self, tween_factory, under=None, over=None):
         """
         .. versionadded:: 1.2
+
+        .. versionchanged:: 1.9
+           The default values of ``under=INGRESS`` and ``over=MAIN`` were
+           been changed to ``under=RESPONSE_CALLBACKS`` and
+           ``over=EXCVIEW``.
 
         Add a 'tween factory'.  A :term:`tween` (a contraction of 'between')
         is a bit of code that sits between the Pyramid router's main request
@@ -80,15 +86,21 @@ class TweensConfiguratorMixin(object):
         If all options for ``under`` (or ``over``) cannot be found in the
         current configuration, it is an error. If some options are specified
         purely for compatibilty with other tweens, just add a fallback of
-        MAIN or INGRESS. For example, ``under=('mypkg.someothertween',
-        'mypkg.someothertween2', INGRESS)``.  This constraint will require
+        ``MAIN``, ``INGRESS``, ``RESPONSE_CALLBACKS``, or ``EXCVIEW``. For
+        example, ``under=('mypkg.someothertween', 'mypkg.someothertween2',
+        RESPONSE_CALLBACKS)``.  This constraint will require
         the tween to be located under both the 'mypkg.someothertween' tween,
-        the 'mypkg.someothertween2' tween, and INGRESS. If any of these is
-        not in the current configuration, this constraint will only organize
-        itself based on the tweens that are present.
+        the 'mypkg.someothertween2' tween, and ``RESPONSE_CALLBACKS``. If any
+        of these is not in the current configuration, this constraint will
+        only organize itself based on the tweens that are present.
 
-        Specifying neither ``over`` nor ``under`` is equivalent to specifying
-        ``under=INGRESS``.
+        The default value for ``over`` is ``EXCVIEW`` and ``under`` is
+        ``RESPONSE_CALLBACKS``. This places the deriver somewhere between the
+        two in the tween ordering. If the deriver should be placed elsewhere,
+        such as under ``EXCVIEW``, then you MUST also specify ``over`` to
+        something later in the order (such as ``MAIN``), or a
+        ``CyclicDependencyError`` will be raised when trying to sort the
+        tweens.
 
         Implicit tween ordering is obviously only best-effort.  Pyramid will
         attempt to present an implicit order of tweens as best it can, but
@@ -107,7 +119,16 @@ class TweensConfiguratorMixin(object):
                                explicit=False)
 
     def add_default_tweens(self):
-        self.add_tween(EXCVIEW)
+        self.add_tween(
+            'pyramid.tweens.excview_tween_factory',
+            over=MAIN,
+            under=[RESPONSE_CALLBACKS, INGRESS],
+        )
+        self.add_tween(
+            'pyramid.tweens.response_callbacks_tween_factory',
+            over=[EXCVIEW, MAIN],
+            under=INGRESS,
+        )
 
     @action_method
     def _add_tween(self, tween_factory, under=None, over=None, explicit=False):
@@ -125,27 +146,41 @@ class TweensConfiguratorMixin(object):
 
         tween_factory = self.maybe_dotted(tween_factory)
 
+        # ensure over/under contain only strings
         for t, p in [('over', over), ('under', under)]:
             if p is not None:
-                if not is_string_or_iterable(p):
+                if is_nonstr_iter(p):
+                    for v in p:
+                        if not isinstance(v, string_types):
+                            raise ConfigurationError(
+                                '"%s" must contain strings, not %s' % (t, v))
+                elif not isinstance(p, string_types):
                     raise ConfigurationError(
                         '"%s" must be a string or iterable, not %s' % (t, p))
 
-        if over is INGRESS or is_nonstr_iter(over) and INGRESS in over:
+        if over is None:
+            over = EXCVIEW
+
+        if under is None:
+            under = RESPONSE_CALLBACKS
+
+        over = as_sorted_tuple(over)
+        under = as_sorted_tuple(under)
+
+        if INGRESS in over:
             raise ConfigurationError('%s cannot be over INGRESS' % name)
 
-        if under is MAIN or is_nonstr_iter(under) and MAIN in under:
+        if MAIN in under:
             raise ConfigurationError('%s cannot be under MAIN' % name)
 
         registry = self.registry
         introspectables = []
 
-        tweens = registry.queryUtility(ITweens)
-        if tweens is None:
-            tweens = Tweens()
-            registry.registerUtility(tweens, ITweens)
-
         def register():
+            tweens = registry.queryUtility(ITweens)
+            if tweens is None:
+                tweens = Tweens()
+                registry.registerUtility(tweens, ITweens)
             if explicit:
                 tweens.add_explicit(name, tween_factory)
             else:

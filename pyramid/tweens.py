@@ -6,6 +6,7 @@ from pyramid.interfaces import (
     IExceptionViewClassifier,
     IRequest,
     )
+from pyramid.request import _execute_response_callbacks
 
 from zope.interface import providedBy
 from pyramid.view import _call_view
@@ -65,6 +66,19 @@ def excview_tween_factory(handler, registry):
 
     return excview_tween
 
+def response_callbacks_tween_factory(handler, registry):
+    """ A :term:`tween` factory which produces a tween that processes
+    any response callbacks registered using
+    :meth:`pyramid.request.Request.add_response_callback`.
+
+    """
+    def response_callbacks_tween(request):
+        response = handler(request)
+        _execute_response_callbacks(request, response)
+        return response
+    return response_callbacks_tween
+
 MAIN = 'MAIN'
 INGRESS = 'INGRESS'
 EXCVIEW = 'pyramid.tweens.excview_tween_factory'
+RESPONSE_CALLBACKS = 'pyramid.tweens.response_callbacks_tween_factory'
