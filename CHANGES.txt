@@ -25,6 +25,11 @@ Features
   credentials from a ``request`` object, and returns them as a named tuple.
   See https://github.com/Pylons/pyramid/pull/2662
 
+- Pyramid 1.4 silently dropped a feature of the configurator that has been
+  restored. It's again possible for action discriminators to conflict across
+  different action orders.
+  See https://github.com/Pylons/pyramid/pull/2757
+
 Bug Fixes
 ---------
 
@@ -43,6 +48,17 @@ Bug Fixes
   subsequent requests a more useful warning is emitted encouraging you to
   use a primitive type instead.
   See https://github.com/Pylons/pyramid/pull/2715
+
+- Pyramid 1.6 introduced the ability for an action to invoke another action.
+  There was a bug in the way that ``config.add_view`` would interact with
+  custom view derivers introduced in Pyramid 1.7 because the view's
+  discriminator cannot be computed until view derivers and view predicates
+  have been created in earlier orders. Invoking an action from another action
+  would trigger an unrolling of the pipeline and would compute discriminators
+  before they were ready. The new behavior respects the ``order`` of the action
+  and ensures the discriminators are not computed until dependent actions
+  from previous orders have executed.
+  See https://github.com/Pylons/pyramid/pull/2757
 
 Deprecations
 ------------
