@@ -134,6 +134,27 @@ class Test_prepare(unittest.TestCase):
         root, closer = info['root'], info['closer']
         closer()
 
+    def test_it_is_a_context_manager(self):
+        request = DummyRequest({})
+        registry = request.registry = self._makeRegistry()
+        closer_called = [False]
+        with self._callFUT(request=request) as info:
+            root, request = info['root'], info['request']
+            pushed = self.manager.get()
+            self.assertEqual(pushed['request'], request)
+            self.assertEqual(pushed['registry'], registry)
+            self.assertEqual(pushed['request'].registry, registry)
+            self.assertEqual(root.a, (request,))
+            orig_closer = info['closer']
+            def closer():
+                orig_closer()
+                closer_called[0] = True
+            info['closer'] = closer
+        self.assertTrue(closer_called[0])
+        self.assertEqual(self.default, self.manager.get())
+        self.assertEqual(request.context, root)
+        self.assertEqual(request.registry, registry)
+
 class Test__make_request(unittest.TestCase):
     def _callFUT(self, path='/', registry=None):
         from pyramid.scripting import _make_request
