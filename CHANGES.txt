@@ -30,6 +30,11 @@ Features
   different action orders.
   See https://github.com/Pylons/pyramid/pull/2757
 
+- ``pyramid.paster.bootstrap`` and its sibling ``pyramid.scripting.prepare``
+  can now be used as context managers to automatically invoke the ``closer``
+  and pop threadlocals off of the stack to prevent memory leaks.
+  See https://github.com/Pylons/pyramid/pull/2760
+
 Bug Fixes
 ---------
 
