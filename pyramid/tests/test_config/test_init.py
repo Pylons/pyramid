@@ -1545,6 +1545,31 @@ class TestActionState(unittest.TestCase):
         c.execute_actions()
         self.assertEqual(output, [('f', (1,), {}), ('g', (8,), {})])
 
+    def test_reentrant_action_with_deferred_discriminator(self):
+        # see https://github.com/Pylons/pyramid/issues/2697
+        from pyramid.registry import Deferred
+        output = []
+        c = self._makeOne()
+        def f(*a, **k):
+            output.append(('f', a, k))
+            c.actions.append((4, g, (4,), {}, (), None, 2))
+        def g(*a, **k):
+            output.append(('g', a, k))
+        def h(*a, **k):
+            output.append(('h', a, k))
+        def discrim():
+            self.assertEqual(output, [('f', (1,), {}), ('g', (2,), {})])
+            return 3
+        d = Deferred(discrim)
+        c.actions = [
+            (d, h, (3,), {}, (), None, 1), # order 1
+            (1, f, (1,)), # order 0
+            (2, g, (2,)), # order 0
+        ]
+        c.execute_actions()
+        self.assertEqual(output, [
+            ('f', (1,), {}), ('g', (2,), {}), ('h', (3,), {}), ('g', (4,), {})])
+
     def test_reentrant_action_error(self):
         from pyramid.exceptions import ConfigurationError
         c = self._makeOne()
@@ -1569,6 +1594,28 @@ class TestActionState(unittest.TestCase):
             (1, f, (1,)),
             (3, g, (8,)),
         ])
+
+    def test_executing_conflicting_action_across_orders(self):
+        from pyramid.exceptions import ConfigurationConflictError
+        c = self._makeOne()
+        def f(*a, **k): pass
+        def g(*a, **k): pass
+        c.actions = [
+            (1, f, (1,), {}, (), None, -1),
+            (1, g, (2,)),
+        ]
+        self.assertRaises(ConfigurationConflictError, c.execute_actions)
+
+    def test_executing_conflicting_action_across_reentrant_orders(self):
+        from pyramid.exceptions import ConfigurationConflictError
+        c = self._makeOne()
+        def f(*a, **k):
+            c.actions.append((1, g, (8,)))
+        def g(*a, **k): pass
+        c.actions = [
+            (1, f, (1,), {}, (), None, -1),
+        ]
+        self.assertRaises(ConfigurationConflictError, c.execute_actions)
 
 class Test_reentrant_action_functional(unittest.TestCase):
     def _makeConfigurator(self, *arg, **kw):
@@ -1597,6 +1644,21 @@ class Test_reentrant_action_functional(unittest.TestCase):
         self.assertEqual(route.name, 'foo')
         self.assertEqual(route.path, '/foo')
 
+    def test_deferred_discriminator(self):
+        # see https://github.com/Pylons/pyramid/issues/2697
+        from pyramid.config import PHASE0_CONFIG
+        config = self._makeConfigurator()
+        def deriver(view, info): return view
+        deriver.options = ('foo',)
+        config.add_view_deriver(deriver, 'foo_view')
+        # add_view uses a deferred discriminator and will fail if executed
+        # prior to add_view_deriver executing its action
+        config.add_view(lambda r: r.response, name='', foo=1)
+        def dummy_action():
+            # trigger a re-entrant action
+            config.action(None, lambda: None)
+        config.action(None, dummy_action, order=PHASE0_CONFIG)
+        config.commit()
 
 class Test_resolveConflicts(unittest.TestCase):
     def _callFUT(self, actions):
@@ -1666,15 +1728,14 @@ class Test_resolveConflicts(unittest.TestCase):
 
     def test_it_success_dicts(self):
         from pyramid.tests.test_config import dummyfactory as f
-        from pyramid.config import expand_action
         result = self._callFUT([
-            expand_action(None, f),
-            expand_action(1, f, (1,), {}, (), 'first'),
-            expand_action(1, f, (2,), {}, ('x',), 'second'),
-            expand_action(1, f, (3,), {}, ('y',), 'third'),
-            expand_action(4, f, (4,), {}, ('y',), 'should be last', 99999),
-            expand_action(3, f, (3,), {}, ('y',)),
-            expand_action(None, f, (5,), {}, ('y',)),
+            (None, f),
+            (1, f, (1,), {}, (), 'first'),
+            (1, f, (2,), {}, ('x',), 'second'),
+            (1, f, (3,), {}, ('y',), 'third'),
+            (4, f, (4,), {}, ('y',), 'should be last', 99999),
+            (3, f, (3,), {}, ('y',)),
+            (None, f, (5,), {}, ('y',)),
             ])
         result = list(result)
         self.assertEqual(
@@ -1740,17 +1801,16 @@ class Test_resolveConflicts(unittest.TestCase):
 
     def test_it_with_actions_grouped_by_order(self):
         from pyramid.tests.test_config import dummyfactory as f
-        from pyramid.config import expand_action
         result = self._callFUT([
-            expand_action(None, f),                                 # X
-            expand_action(1, f, (1,), {}, (), 'third', 10),         # X
-            expand_action(1, f, (2,), {}, ('x',), 'fourth', 10),
-            expand_action(1, f, (3,), {}, ('y',), 'fifth', 10),
-            expand_action(2, f, (1,), {}, (), 'sixth', 10),         # X
-            expand_action(3, f, (1,), {}, (), 'seventh', 10),       # X
-            expand_action(5, f, (4,), {}, ('y',), 'eighth', 99999), # X
-            expand_action(4, f, (3,), {}, (), 'first', 5),          # X
-            expand_action(4, f, (5,), {}, ('y',), 'second', 5),
+            (None, f),                                 # X
+            (1, f, (1,), {}, (), 'third', 10),         # X
+            (1, f, (2,), {}, ('x',), 'fourth', 10),
+            (1, f, (3,), {}, ('y',), 'fifth', 10),
+            (2, f, (1,), {}, (), 'sixth', 10),         # X
+            (3, f, (1,), {}, (), 'seventh', 10),       # X
+            (5, f, (4,), {}, ('y',), 'eighth', 99999), # X
+            (4, f, (3,), {}, (), 'first', 5),          # X
+            (4, f, (5,), {}, ('y',), 'second', 5),
             ])
         result = list(result)
         self.assertEqual(len(result), 6)
@@ -1812,7 +1872,32 @@ class Test_resolveConflicts(unittest.TestCase):
                   'order': 99999}
                   ]
                   )
-        
+
+    def test_override_success_across_orders(self):
+        from pyramid.tests.test_config import dummyfactory as f
+        result = self._callFUT([
+            (1, f, (2,), {}, ('x',), 'eek', 0),
+            (1, f, (3,), {}, ('x', 'y'), 'ack', 10),
+            ])
+        result = list(result)
+        self.assertEqual(result, [
+            {'info': 'eek',
+            'args': (2,),
+            'callable': f,
+            'introspectables': (),
+            'kw': {},
+            'discriminator': 1,
+            'includepath': ('x',),
+            'order': 0},
+        ])
+
+    def test_conflicts_across_orders(self):
+        from pyramid.tests.test_config import dummyfactory as f
+        result = self._callFUT([
+            (1, f, (2,), {}, ('x', 'y'), 'eek', 0),
+            (1, f, (3,), {}, ('x'), 'ack', 10),
+            ])
+        self.assertRaises(ConfigurationConflictError, list, result)
 
 class TestGlobalRegistriesIntegration(unittest.TestCase):
     def setUp(self):
