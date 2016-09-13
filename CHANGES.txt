@@ -71,4 +71,8 @@ Deprecations
 Documentation Changes
 ---------------------
 - Updated Windows installation instructions and related bits.
-  See: https://github.com/Pylons/pyramid/issues/2661
+  See https://github.com/Pylons/pyramid/issues/2661
+
+- Fix an inconsistency in the documentation between view predicates and
+  route predicates and highlight the differences in their APIs.
+  See https://github.com/Pylons/pyramid/pull/2764
