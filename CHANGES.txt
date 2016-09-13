@@ -4,6 +4,10 @@ unreleased
 - Pin to ``zope.interface < 4.2.0`` on Python 3.2.
   See https://github.com/Pylons/pyramid/pull/2767
 
+- Fix an inconsistency in the documentation between view predicates and
+  route predicates and highlight the differences in their APIs.
+  See https://github.com/Pylons/pyramid/pull/2766
+
 .. _changes_1.6.4:
 
 1.6.4 (2016-08-17)
