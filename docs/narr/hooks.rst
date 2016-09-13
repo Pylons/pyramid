@@ -1481,7 +1481,7 @@ method. For example:
         phash = text
 
         def __call__(self, context, request):
-            return getattr(context, 'content_type', None) == self.val
+            return request.content_type == self.val
 
 The constructor of a predicate factory takes two arguments: ``val`` and
 ``config``.  The ``val`` argument will be the argument passed to
@@ -1500,13 +1500,28 @@ with the name and the value serialized.  The result of ``phash`` is not seen in
 output anywhere, it just informs the uniqueness constraints for view
 configuration.
 
-The ``__call__`` method of a predicate factory must accept a resource
-(``context``) and a request, and must return ``True`` or ``False``.  It is the
-"meat" of the predicate.
+The ``__call__`` method differs depending on whether the predicate is used as
+a :term:`view predicate` or a :term:`route predicate`:
 
-You can use the same predicate factory as both a view predicate and as a route
-predicate, but you'll need to call ``add_view_predicate`` and
-``add_route_predicate`` separately with the same factory.
+- When used as a route predicate, the ``__call__`` signature is
+  ``(info, request)``. The ``info`` object is a dictionary containing two
+  keys: ``match`` and ``route``. ``info['match']`` is the matchdict containing
+  the patterns matched in the route pattern. ``info['route']`` is the
+  :class:`pyramid.interfaces.IRoute` object for the current route.
+
+- When used as a view predicate, the ``__call__`` signature is
+  ``(context, request)``. The ``context`` is the result of :term:`traversal`
+  performed using either the route's :term:`root factory` or the app's
+  :term:`default root factory`.
+
+In both cases the ``__call__`` method is expected to return ``True`` or
+``False``.
+
+It is possible to use the same predicate factory as both a view predicate and
+as a route predicate, but they'll need to handle the ``info`` or ``context``
+argument specially (many predicates do not need this argument) and you'll need
+to call ``add_view_predicate`` and ``add_route_predicate`` separately with
+the same factory.
 
 .. _subscriber_predicates:
 
