@@ -41,12 +41,18 @@ install_requires=[
     'setuptools',
     'WebOb >= 1.3.1', # request.domain and CookieProfile
     'repoze.lru >= 0.4', # py3 compat
-    'zope.interface >= 3.8.0',  # has zope.interface.registry
     'zope.deprecation >= 3.5.0', # py3 compat
     'venusian >= 1.0a3', # ``ignore``
     'translationstring >= 0.4', # py3 compat
     'PasteDeploy >= 1.5.0', # py3 compat
     ]
+
+# 3.8.0 inclues zope.interface.registry
+# zope.interface breaks on python 3.2
+if PY3 and py_version < (3, 3):
+    install_requires.append('zope.interface >= 3.8.0,<4.2.0')
+else:
+    install_requires.append('zope.interface >= 3.8.0')
 
 tests_require = [
     'WebTest >= 1.3.1', # py3 compat
