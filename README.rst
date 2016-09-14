@@ -50,9 +50,10 @@ for documentation, reporting bugs, and getting support.
 Developing and Contributing
 ---------------------------
 
-See ``HACKING.txt`` and ``contributing.md`` for guidelines for running tests,
-adding features, coding style, and updating documentation when developing in or
-contributing to Pyramid.
+See `HACKING.txt <https://github.com/Pylons/pyramid/blob/master/HACKING.txt>`_ and
+`contributing.md <https://github.com/Pylons/pyramid/blob/master/contributing.md>`_
+for guidelines on running tests, adding features, coding style, and updating
+documentation when developing in or contributing to Pyramid.
 
 License
 -------

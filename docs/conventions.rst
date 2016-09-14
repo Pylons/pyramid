@@ -57,23 +57,16 @@ character, e.g.:
 
      $ $VENV/bin/py.test -q
 
-(See :term:`venv` for the meaning of ``$VENV``)
+See :term:`venv` for the meaning of ``$VENV``.
 
-Example blocks representing Windows ``cmd.exe`` commands are prefixed with a
-drive letter and/or a directory name, e.g.:
+Example blocks representing Windows commands are prefixed with a drive letter
+with an optional directory name, e.g.:
 
   .. code-block:: doscon
 
      c:\examples> %VENV%\Scripts\py.test -q
 
-(See :term:`venv` for the meaning of ``%VENV%``)
-
-Sometimes, when it's unknown which directory is current, Windows ``cmd.exe``
-example block commands are prefixed only with a ``>`` character, e.g.:
-
-  .. code-block:: doscon
-
-     > %VENV%\Scripts\py.test -q
+See :term:`venv` for the meaning of ``%VENV%``.
 
 When a command that should be typed on one line is too long to fit on a page,
 the backslash ``\`` is used to indicate that the following printed line should

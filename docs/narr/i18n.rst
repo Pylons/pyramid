@@ -294,7 +294,7 @@ Lingua like so:
 
 .. code-block:: doscon
 
-   C> %VENV%\Scripts\pip install lingua
+   c:\> %VENV%\Scripts\pip install lingua
 
 
 .. index::
