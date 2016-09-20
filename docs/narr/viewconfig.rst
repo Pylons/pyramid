@@ -34,7 +34,7 @@ determine the set of circumstances which must be true for the view callable to
 be invoked.
 
 A view configuration statement is made about information present in the
-:term:`context` resource and the :term:`request`.
+:term:`context` resource (or exception) and the :term:`request`.
 
 View configuration is performed in one of two ways:
 
@@ -306,8 +306,25 @@ configured view.
   represented class or if the :term:`context` resource provides the represented
   interface; it is otherwise false.
 
+  It is possible to pass an exception class as the context if your context may
+  subclass an exception. In this case **two** views will be registered. One
+  will match normal incoming requests and the other will match as an
+  :term:`exception view` which only occurs when an exception is raised during
+  the normal request processing pipeline.
+
   If ``context`` is not supplied, the value ``None``, which matches any
   resource, is used.
+
+``exception_only``
+
+  When this value is ``True`` the ``context`` argument must be a subclass of
+  ``Exception``. This flag indicates that only an :term:`exception view` should
+  be created and that this view should not match if the traversal
+  :term:`context` matches the ``context`` argument. If the ``context`` is a
+  subclass of ``Exception`` and this value is ``False`` (the default) then a
+  view will be registered to match the traversal :term:`context` as well.
+
+  .. versionadded:: 1.8
 
 ``route_name``
   If ``route_name`` is supplied, the view callable will be invoked only when

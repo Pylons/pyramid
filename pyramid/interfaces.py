@@ -1234,6 +1234,7 @@ class IViewDeriverInfo(Interface):
                         'default values that were not overriden')
     predicates = Attribute('The list of predicates active on the view')
     original_view = Attribute('The original view object being wrapped')
+    exception_only = Attribute('The view will only be invoked for exceptions')
 
 class IViewDerivers(Interface):
     """ Interface for view derivers list """

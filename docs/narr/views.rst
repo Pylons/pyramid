@@ -262,10 +262,16 @@ specialized views as described in :ref:`special_exceptions_in_callables` can
 also be used by application developers to convert arbitrary exceptions to
 responses.
 
-To register a view that should be called whenever a particular exception is
-raised from within :app:`Pyramid` view code, use the exception class (or one of
-its superclasses) as the :term:`context` of a view configuration which points
-at a view callable for which you'd like to generate a response.
+To register a :term:`exception view` that should be called whenever a
+particular exception is raised from within :app:`Pyramid` view code, use
+:meth:`pyramid.config.Configurator.add_exception_view` to register a view
+configuration which matches the exception (or a subclass of the exception) and
+points at a view callable for which you'd like to generate a response. The
+exception will be passed as the ``context`` argument to any
+:term:`view predicate` registered with the view as well as to the view itself.
+For convenience a new decorator exists,
+:class:`pyramid.views.exception_view_config`, which may be used to easily
+register exception views.
 
 For example, given the following exception class in a module named
 ``helloworld.exceptions``:
@@ -277,17 +283,16 @@ For example, given the following exception class in a module named
        def __init__(self, msg):
            self.msg = msg
 
-
 You can wire a view callable to be called whenever any of your *other* code
 raises a ``helloworld.exceptions.ValidationFailure`` exception:
 
 .. code-block:: python
    :linenos:
 
-   from pyramid.view import view_config
+   from pyramid.view import exception_view_config
    from helloworld.exceptions import ValidationFailure
 
-   @view_config(context=ValidationFailure)
+   @exception_view_config(ValidationFailure)
    def failed_validation(exc, request):
        response =  Response('Failed validation: %s' % exc.msg)
        response.status_int = 500
@@ -308,7 +313,7 @@ view registration:
    from pyramid.view import view_config
    from helloworld.exceptions import ValidationFailure
 
-   @view_config(context=ValidationFailure, route_name='home')
+   @exception_view_config(ValidationFailure, route_name='home')
    def failed_validation(exc, request):
        response =  Response('Failed validation: %s' % exc.msg)
        response.status_int = 500
@@ -327,14 +332,21 @@ which have a name will be ignored.
 
 .. note::
 
-  Normal (i.e., non-exception) views registered against a context resource type
-  which inherits from :exc:`Exception` will work normally.  When an exception
-  view configuration is processed, *two* views are registered.  One as a
-  "normal" view, the other as an "exception" view.  This means that you can use
-  an exception as ``context`` for a normal view.
+  In most cases, you should register an :term:`exception view` by using
+  :meth:`pyramid.config.Configurator.add_exception_view`. However, it is
+  possible to register 'normal' (i.e., non-exception) views against a context
+  resource type which inherits from :exc:`Exception` (i.e.,
+  ``config.add_view(context=Exception)``).  When the view configuration is
+  processed, *two* views are registered.  One as a "normal" view, the other
+  as an :term:`exception view`.  This means that you can use an exception as
+  ``context`` for a normal view.
+
+  The view derivers that wrap these two views may behave differently.
+  See :ref:`exception_view_derivers` for more information about this.
 
 Exception views can be configured with any view registration mechanism:
-``@view_config`` decorator or imperative ``add_view`` styles.
+``@exception_view_config`` decorator or imperative ``add_exception_view``
+styles.
 
 .. note::
 

@@ -134,14 +134,23 @@ class Test_forbidden_view_config(BaseTest, unittest.TestCase):
         self.assertEqual(settings[0]['_info'], 'codeinfo')
 
 class Test_exception_view_config(BaseTest, unittest.TestCase):
-    def _makeOne(self, **kw):
+    def _makeOne(self, *args, **kw):
         from pyramid.view import exception_view_config
-        return exception_view_config(**kw)
+        return exception_view_config(*args, **kw)
 
     def test_ctor(self):
         inst = self._makeOne(context=Exception, path_info='path_info')
         self.assertEqual(inst.__dict__,
                          {'context':Exception, 'path_info':'path_info'})
+
+    def test_ctor_positional_exception(self):
+        inst = self._makeOne(Exception, path_info='path_info')
+        self.assertEqual(inst.__dict__,
+                         {'context':Exception, 'path_info':'path_info'})
+
+    def test_ctor_positional_extras(self):
+        from pyramid.exceptions import ConfigurationError
+        self.assertRaises(ConfigurationError, lambda: self._makeOne(Exception, True))
 
     def test_it_function(self):
         def view(request): pass
