@@ -98,7 +98,10 @@ be forwarded to its :class:`~pyramid.response.Response` superclass:
      a plain-text override of the default ``detail``
 
    ``headers``
-     a list of (k,v) header pairs
+     a list of (k,v) header pairs, or a dict, to be added to the
+     response; use the content_type='application/json' kwarg and other
+     similar kwargs to to change properties of the response supported by the
+     :class:`pyramid.response.Response` superclass
 
    ``comment``
      a plain-text additional information which is
