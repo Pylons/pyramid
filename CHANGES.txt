@@ -76,3 +76,8 @@ Documentation Changes
 - Fix an inconsistency in the documentation between view predicates and
   route predicates and highlight the differences in their APIs.
   See https://github.com/Pylons/pyramid/pull/2764
+
+- Clarify a possible misuse of the ``headers`` kwarg to subclasses of
+  :class:`pyramid.httpexceptions.HTTPException` in which more appropriate
+  kwargs from the parent class :class:`pyramid.response.Response` should be
+  used instead. See https://github.com/Pylons/pyramid/pull/2750
