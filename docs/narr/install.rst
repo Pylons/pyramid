@@ -192,6 +192,24 @@ After installing Python as described previously in :ref:`for-mac-os-x-users` or
 
       $ $VENV/bin/pip install "pyramid==\ |release|\ "
 
+.. index::
+   single: $VENV/bin/pip vs. source bin/activate
+
+.. _venv-bin-pip-vs-source-bin-activate:
+
+.. note:: Why use ``$VENV/bin/pip`` instead of ``source bin/activate``, then
+   ``pip``?
+
+   Although the latter method requires fewer key strokes to issue commands once
+   invoked, there are numerous reasons why one should avoid using ``activate``
+   within a virtual environment. Michael F. Lamb (datagrok) presents a summary
+   in `Virtualenv's bin/activate is Doing It Wrong
+   <https://gist.github.com/datagrok/2199506>`_, and proposes alternatives,
+   followed by comments from other developers.
+
+   However, we prefer to keep things simple. ``$VENV/bin/pip`` is already
+   UNIX-y. The few extra key strokes are worth avoiding the mess altogether.
+
 
 .. index::
    single: installing on Windows
@@ -227,6 +245,9 @@ After installing Python as described previously in
    .. parsed-literal::
 
       c:\\> %VENV%\\Scripts\\pip install "pyramid==\ |release|\ "
+
+.. note:: See the note above for :ref:`Why use $VENV/bin/pip instead of source
+   bin/activate, then pip <venv-bin-pip-vs-source-bin-activate>`.
 
 
 What Gets Installed
