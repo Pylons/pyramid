@@ -200,15 +200,20 @@ After installing Python as described previously in :ref:`for-mac-os-x-users` or
 .. note:: Why use ``$VENV/bin/pip`` instead of ``source bin/activate``, then
    ``pip``?
 
-   Although the latter method requires fewer key strokes to issue commands once
-   invoked, there are numerous reasons why one should avoid using ``activate``
-   within a virtual environment. Michael F. Lamb (datagrok) presents a summary
-   in `Virtualenv's bin/activate is Doing It Wrong
-   <https://gist.github.com/datagrok/2199506>`_, and proposes alternatives,
-   followed by comments from other developers.
+   ``$VENV/bin/pip`` clearly specifies that ``pip`` is run from within the
+   virtual environment and not at the system level.
 
-   However, we prefer to keep things simple. ``$VENV/bin/pip`` is already
-   UNIX-y. The few extra key strokes are worth avoiding the mess altogether.
+   ``activate`` drops turds into the user's shell environment, leaving them
+   vulnerable to executing commands in the wrong context. ``deactivate`` might
+   not correctly restore previous shell environment variables.
+
+   Although using ``source bin/activate``, then ``pip``, requires fewer key
+   strokes to issue commands once invoked, there are other things to consider.
+   Michael F. Lamb (datagrok) presents a summary in `Virtualenv's bin/activate
+   is Doing It Wrong <https://gist.github.com/datagrok/2199506>`_.
+
+   Ultimately we prefer to keep things clear and simple, so we use
+   ``$VENV/bin/pip``.
 
 
 .. index::
