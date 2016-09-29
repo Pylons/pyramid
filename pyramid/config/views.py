@@ -1458,7 +1458,7 @@ class ViewsConfiguratorMixin(object):
         view will be invoked.  Unlike
         :meth:`pyramid.config.Configurator.add_view`, this method will raise
         an exception if passed ``name``, ``permission``, ``require_csrf``,
-        ``context``, ``for_``, or ``exception_only``  keyword arguments. These
+        ``context``, ``for_``, or ``exception_only`` keyword arguments. These
         argument values make no sense in the context of a forbidden
         :term:`exception view`.
 
