@@ -16,6 +16,12 @@ Backward Incompatibilities
 
    See https://github.com/Pylons/pyramid/pull/2615
 
+- ``pcreate`` is now interactive by default. You will be prompted if it
+  a file already exists with different content. Previously if there were
+  similar files it would silently skip them unless you specified
+  ``--interactive`` or ``--overwrite``.
+  See https://github.com/Pylons/pyramid/pull/2775
+
 Features
 --------
 
