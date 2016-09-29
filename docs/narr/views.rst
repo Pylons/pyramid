@@ -262,13 +262,13 @@ specialized views as described in :ref:`special_exceptions_in_callables` can
 also be used by application developers to convert arbitrary exceptions to
 responses.
 
-To register a :term:`exception view` that should be called whenever a
+To register an :term:`exception view` that should be called whenever a
 particular exception is raised from within :app:`Pyramid` view code, use
 :meth:`pyramid.config.Configurator.add_exception_view` to register a view
 configuration which matches the exception (or a subclass of the exception) and
 points at a view callable for which you'd like to generate a response. The
 exception will be passed as the ``context`` argument to any
-:term:`view predicate` registered with the view as well as to the view itself.
+:term:`view predicate` registered with the view, as well as to the view itself.
 For convenience a new decorator exists,
 :class:`pyramid.views.exception_view_config`, which may be used to easily
 register exception views.
@@ -334,7 +334,7 @@ which have a name will be ignored.
 
   In most cases, you should register an :term:`exception view` by using
   :meth:`pyramid.config.Configurator.add_exception_view`. However, it is
-  possible to register 'normal' (i.e., non-exception) views against a context
+  possible to register "normal" (i.e., non-exception) views against a context
   resource type which inherits from :exc:`Exception` (i.e.,
   ``config.add_view(context=Exception)``).  When the view configuration is
   processed, *two* views are registered.  One as a "normal" view, the other

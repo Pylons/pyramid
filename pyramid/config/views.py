@@ -502,19 +502,19 @@ class ViewsConfiguratorMixin(object):
           if the :term:`context` provides the represented interface;
           it is otherwise false.  This argument may also be provided
           to ``add_view`` as ``for_`` (an older, still-supported
-          spelling). If the view should **only** match when handling
-          exceptions then set the ``exception_only`` to ``True``.
+          spelling). If the view should *only* match when handling
+          exceptions, then set the ``exception_only`` to ``True``.
 
         exception_only
 
           .. versionadded:: 1.8
 
-          When this value is ``True`` the ``context`` argument must be
+          When this value is ``True``, the ``context`` argument must be
           a subclass of ``Exception``. This flag indicates that only an
-          :term:`exception view` should be created and that this view should
+          :term:`exception view` should be created, and that this view should
           not match if the traversal :term:`context` matches the ``context``
           argument. If the ``context`` is a subclass of ``Exception`` and
-          this value is ``False`` (the default) then a view will be
+          this value is ``False`` (the default), then a view will be
           registered to match the traversal :term:`context` as well.
 
         route_name
@@ -908,7 +908,7 @@ class ViewsConfiguratorMixin(object):
                 # allow failure of registered template factories to be deferred
                 # until view execution, like other bad renderer factories; if
                 # we tried to relate this to an existing renderer factory
-                # without checking if it the factory actually existed, we'd end
+                # without checking if the factory actually existed, we'd end
                 # up with a KeyError at startup time, which is inconsistent
                 # with how other bad renderer registrations behave (they throw
                 # a ValueError at view execution time)
@@ -1458,7 +1458,7 @@ class ViewsConfiguratorMixin(object):
         view will be invoked.  Unlike
         :meth:`pyramid.config.Configurator.add_view`, this method will raise
         an exception if passed ``name``, ``permission``, ``require_csrf``,
-        ``context``, ``for_`` or ``exception_only``  keyword arguments. These
+        ``context``, ``for_``, or ``exception_only``  keyword arguments. These
         argument values make no sense in the context of a forbidden
         :term:`exception view`.
 
@@ -1534,7 +1534,7 @@ class ViewsConfiguratorMixin(object):
         ):
         """ Add a default :term:`Not Found View` to the current configuration
         state. The view will be called when Pyramid or application code raises
-        an :exc:`pyramid.httpexceptions.HTTPNotFound` exception (e.g. when a
+        an :exc:`pyramid.httpexceptions.HTTPNotFound` exception (e.g., when a
         view cannot be found for the request).  The simplest example is:
 
           .. code-block:: python
@@ -1656,11 +1656,11 @@ class ViewsConfiguratorMixin(object):
         the current configuration state. The view will be called when Pyramid
         or application code raises the given exception.
 
-        This method accepts accepts almost all of the same arguments as
+        This method accepts almost all of the same arguments as
         :meth:`pyramid.config.Configurator.add_view` except for ``name``,
-        ``permission``, ``for_``, ``require_csrf`` and ``exception_only``.
+        ``permission``, ``for_``, ``require_csrf``, and ``exception_only``.
 
-        By default, this method will set ``context=Exception`` thus
+        By default, this method will set ``context=Exception``, thus
         registering for most default Python exceptions. Any subclass of
         ``Exception`` may be specified.
 

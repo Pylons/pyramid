@@ -480,7 +480,7 @@ class exception_view_config(object):
     and additionally accepts most of the same arguments as the constructor of
     :class:`pyramid.view.view_config`.  It can be used in the same places,
     and behaves in largely the same way, except it always registers an
-    exception view instead of a 'normal' view that dispatches on the request
+    exception view instead of a "normal" view that dispatches on the request
     :term:`context`.
 
     Example:
@@ -495,7 +495,7 @@ class exception_view_config(object):
             return {'error': str(request.exception)}
 
     All arguments passed to this function have the same meaning as
-    :meth:`pyramid.view.view_config` and each predicate argument restricts
+    :meth:`pyramid.view.view_config`, and each predicate argument restricts
     the set of circumstances under which this exception view will be invoked.
 
     """
@@ -521,7 +521,7 @@ class exception_view_config(object):
         if info.scope == 'class':
             # if the decorator was attached to a method in a class, or
             # otherwise executed at class scope, we need to set an
-            # 'attr' into the settings if one isn't already in there
+            # 'attr' in the settings if one isn't already in there
             if settings.get('attr') is None:
                 settings['attr'] = wrapped.__name__
 
