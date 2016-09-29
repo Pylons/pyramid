@@ -1654,7 +1654,8 @@ the user-defined :term:`view callable`:
   Enforce the ``permission`` defined on the view. This element is a no-op if no
   permission is defined. Note there will always be a permission defined if a
   default permission was assigned via
-  :meth:`pyramid.config.Configurator.set_default_permission`.
+  :meth:`pyramid.config.Configurator.set_default_permission` unless the
+  view is an :term:`exception view`.
 
   This element will also output useful debugging information when
   ``pyramid.debug_authorization`` is enabled.
@@ -1664,7 +1665,8 @@ the user-defined :term:`view callable`:
   Used to check the CSRF token provided in the request. This element is a
   no-op if ``require_csrf`` view option is not ``True``. Note there will
   always be a ``require_csrf`` option if a default value was assigned via
-  :meth:`pyramid.config.Configurator.set_default_csrf_options`.
+  :meth:`pyramid.config.Configurator.set_default_csrf_options` unless
+  the view is an :term:`exception view`.
 
 ``owrapped_view``
 
@@ -1710,6 +1712,8 @@ around monitoring and security. In order to register a custom :term:`view
 deriver`, you should create a callable that conforms to the
 :class:`pyramid.interfaces.IViewDeriver` interface, and then register it with
 your application using :meth:`pyramid.config.Configurator.add_view_deriver`.
+The callable should accept the ``view`` to be wrapped and the ``info`` object
+which is an instance of :class:`pyramid.interfaces.IViewDeriverInfo`.
 For example, below is a callable that can provide timing information for the
 view pipeline:
 
@@ -1759,6 +1763,21 @@ But this view *will* have timing information added to the response headers:
 View derivers are unique in that they have access to most of the options
 passed to :meth:`pyramid.config.Configurator.add_view` in order to decide what
 to do, and they have a chance to affect every view in the application.
+
+.. _exception_view_derivers:
+
+Exception Views and View Derivers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A :term:`view deriver` has the opportunity to wrap any view, including
+an :term:`exception view`. In general this is fine, but certain view derivers
+may wish to avoid doing certain things when handling exceptions. For example,
+the ``csrf_view`` and ``secured_view`` built-in view derivers will not perform
+security checks on exception views unless explicitly told to do so.
+
+You can check for ``info.exception_only`` on the
+:class:`pyramid.interfaces.IViewDeriverInfo` object when wrapping the view
+to determine whether you are wrapping an exception view or a normal view.
 
 Ordering View Derivers
 ~~~~~~~~~~~~~~~~~~~~~~
