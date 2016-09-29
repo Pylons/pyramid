@@ -56,7 +56,9 @@ class PCreateCommand(object):
     parser.add_option('--interactive',
                       dest='interactive',
                       action='store_true',
-                      help='When a file would be overwritten, interrogate')
+                      help='When a file would be overwritten, interrogate '
+                           '(this is the default, but you may specify it to '
+                           'override --overwrite)')
     parser.add_option('--ignore-conflicting-name',
                       dest='force_bad_name',
                       action='store_true',
@@ -70,6 +72,8 @@ class PCreateCommand(object):
     def __init__(self, argv, quiet=False):
         self.quiet = quiet
         self.options, self.args = self.parser.parse_args(argv[1:])
+        if not self.options.interactive and not self.options.overwrite:
+            self.options.interactive = True
         self.scaffolds = self.all_scaffolds()
 
     def run(self):
