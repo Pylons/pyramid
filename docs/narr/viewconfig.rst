@@ -307,8 +307,8 @@ configured view.
   interface; it is otherwise false.
 
   It is possible to pass an exception class as the context if your context may
-  subclass an exception. In this case **two** views will be registered. One
-  will match normal incoming requests and the other will match as an
+  subclass an exception. In this case *two* views will be registered. One
+  will match normal incoming requests, and the other will match as an
   :term:`exception view` which only occurs when an exception is raised during
   the normal request processing pipeline.
 
@@ -317,11 +317,11 @@ configured view.
 
 ``exception_only``
 
-  When this value is ``True`` the ``context`` argument must be a subclass of
+  When this value is ``True``, the ``context`` argument must be a subclass of
   ``Exception``. This flag indicates that only an :term:`exception view` should
-  be created and that this view should not match if the traversal
+  be created, and that this view should not match if the traversal
   :term:`context` matches the ``context`` argument. If the ``context`` is a
-  subclass of ``Exception`` and this value is ``False`` (the default) then a
+  subclass of ``Exception`` and this value is ``False`` (the default), then a
   view will be registered to match the traversal :term:`context` as well.
 
   .. versionadded:: 1.8
