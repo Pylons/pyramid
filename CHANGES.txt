@@ -35,6 +35,23 @@ Features
   and pop threadlocals off of the stack to prevent memory leaks.
   See https://github.com/Pylons/pyramid/pull/2760
 
+- Added ``pyramid.config.Configurator.add_exception_view`` and the
+  ``pyramid.view.exception_view_config`` decorator. It is now possible using
+  these methods or via the new ``exception_only=True`` option to ``add_view``
+  to add a view which will only be matched when handling an exception.
+  Previously any exception views were also registered for a traversal
+  context that inherited from the exception class which prevented any
+  exception-only optimizations.
+  See https://github.com/Pylons/pyramid/pull/2660
+
+- Added the ``exception_only`` boolean to
+  ``pyramid.interfaces.IViewDeriverInfo`` which can be used by view derivers
+  to determine if they are wrapping a view which only handles exceptions.
+  This means that it is no longer necessary to perform request-time checks
+  for ``request.exception`` to determine if the view is handling an exception
+  - the pipeline can be optimized at config-time.
+  See https://github.com/Pylons/pyramid/pull/2660
+
 Bug Fixes
 ---------
 
