@@ -200,6 +200,33 @@ class TestPRoutesCommand(unittest.TestCase):
              'pyramid.tests.test_scripts.test_proutes.view']
         )
 
+    def test_class_view(self):
+        from pyramid.renderers import null_renderer as nr
+
+        config = self._makeConfig(autocommit=True)
+        config.add_route('foo', '/a/b')
+        config.add_view(
+            route_name='foo',
+            view=dummy.DummyView,
+            attr='view',
+            renderer=nr,
+            request_method='POST'
+        )
+
+        command = self._makeOne()
+        L = []
+        command.out = L.append
+        command.bootstrap = (dummy.DummyBootstrap(registry=config.registry),)
+        result = command.run()
+        self.assertEqual(result, 0)
+        self.assertEqual(len(L), 3)
+        compare_to = L[-1].split()
+        expected = [
+            'foo', '/a/b',
+            'pyramid.tests.test_scripts.dummy.DummyView.view', 'POST'
+        ]
+        self.assertEqual(compare_to, expected)
+
     def test_single_route_one_view_registered_with_factory(self):
         from zope.interface import Interface
         from pyramid.interfaces import IRouteRequest

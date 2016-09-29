@@ -6,21 +6,18 @@ class reify(object):
     Python ``@property`` decorator, but it puts the result of the method it
     decorates into the instance dict after the first call, effectively
     replacing the function it decorates with an instance variable.  It is, in
-    Python parlance, a non-data descriptor.  An example:
-
-    .. testsetup::
-
-        from pyramid.decorator import reify
-
-        class Foo(object):
-            @reify
-            def jammy(self):
-                print('jammy called')
-                return 1
-
-    And usage of Foo:
+    Python parlance, a non-data descriptor.  The following is an example and
+    its usage:
 
     .. doctest::
+
+        >>> from pyramid.decorator import reify
+
+        >>> class Foo(object):
+        ...     @reify
+        ...     def jammy(self):
+        ...         print('jammy called')
+        ...         return 1
 
         >>> f = Foo()
         >>> v = f.jammy

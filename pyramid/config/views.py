@@ -1585,6 +1585,10 @@ class ViewsConfiguratorMixin(object):
 
         .. versionchanged:: 1.6
 
+           The ``append_slash`` argument was modified to allow any object that
+           implements the ``IResponse`` interface to specify the response class
+           used when a redirect is performed.
+
         .. versionchanged:: 1.8
 
            The view is created using ``exception_only=True``.

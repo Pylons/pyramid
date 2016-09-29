@@ -850,7 +850,7 @@ application:
    from pyramid.httpexceptions import HTTPNotFound
 
    def notfound(request):
-       return HTTPNotFound('Not found, bro.')
+       return HTTPNotFound()
 
    def no_slash(request):
        return Response('No slash')
@@ -871,7 +871,7 @@ If a request enters the application with the ``PATH_INFO`` value of
 However, if a request enters the application with the ``PATH_INFO`` value of
 ``/no_slash/``, *no* route will match, and the slash-appending not found view
 will not find a matching route with an appended slash.  As a result, the
-``notfound`` view will be called and it will return a "Not found, bro." body.
+``notfound`` view will be called and it will return a "Not found" body.
 
 If a request enters the application with the ``PATH_INFO`` value of
 ``/has_slash/``, the second route will match.  If a request enters the
@@ -892,7 +892,7 @@ exactly the same job:
 
    @notfound_view_config(append_slash=True)
    def notfound(request):
-       return HTTPNotFound('Not found, bro.')
+       return HTTPNotFound()
 
    @view_config(route_name='noslash')
    def no_slash(request):

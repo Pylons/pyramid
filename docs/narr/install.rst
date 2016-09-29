@@ -21,9 +21,8 @@ the following sections.
 
 .. sidebar:: Python Versions
 
-    As of this writing, :app:`Pyramid` has been tested under Python 2.7,
-    Python 3.3, Python 3.4, Python 3.5, PyPy, and PyPy3. :app:`Pyramid` does
-    not run under any version of Python before 2.7.
+    As of this writing, :app:`Pyramid` is tested against Python 2.7,
+    Python 3.4, Python 3.5, PyPy.
 
 :app:`Pyramid` is known to run on all popular UNIX-like systems such as Linux,
 Mac OS X, and FreeBSD, as well as on Windows platforms.  It is also known to
@@ -92,8 +91,24 @@ If your Windows system doesn't have a Python interpreter, you'll need to
 install it by downloading a Python 3.x-series interpreter executable from
 `python.org's download section <https://www.python.org/downloads/>`_ (the files
 labeled "Windows Installer").  Once you've downloaded it, double click on the
-executable and accept the defaults during the installation process. You may
-also need to download and install the Python for Windows extensions.
+executable, and select appropriate options during the installation process. To
+standardize this documentation, we used the GUI installer and selected the
+following options:
+
+- Screen 1: Install Python 3.x.x (32- or 64-bit)
+    - Check "Install launcher for all users (recommended)"
+    - Check "Add Python 3.x to PATH"
+    - Click "Customize installation"
+- Screen 2: Optional Features
+    - Check all options
+    - Click "Next"
+- Screen 3: Advanced Options
+    - Check all options
+    - Customize install location: "C:\\Python3x", where "x" is the minor
+      version of Python
+    - Click "Next"
+
+You might also need to download and install the Python for Windows extensions.
 
 .. seealso:: See the official Python documentation :ref:`Using Python on
    Windows <python:using-on-windows>` for full details.
@@ -104,14 +119,19 @@ also need to download and install the Python for Windows extensions.
    directions. Make sure you get the proper 32- or 64-bit build and Python
    version.
 
+.. seealso:: `Python launcher for Windows
+   <https://docs.python.org/3/using/windows.html#launcher>`_ provides a command
+   ``py`` that allows users to run any installed version of Python.
+
 .. warning::
 
-   After you install Python on Windows, you may need to add the ``C:\Python3x``
-   directory to your environment's ``Path``, where ``x`` is the minor version
-   of installed Python, in order to make it possible to invoke Python from a
-   command prompt by typing ``python``. To do so, right click ``My Computer``,
-   select ``Properties`` --> ``Advanced Tab`` --> ``Environment Variables`` and
-   add that directory to the end of the ``Path`` environment variable.
+   After you install Python on Windows, you might need to add the
+   ``c:\Python3x`` directory to your environment's ``Path``, where ``x`` is the
+   minor version of installed Python, in order to make it possible to invoke
+   Python from a command prompt by typing ``python``. To do so, right click
+   ``My Computer``, select ``Properties`` --> ``Advanced Tab`` -->
+   ``Environment Variables``, and add that directory to the end of the ``Path``
+   environment variable.
 
    .. seealso:: See `Configuring Python (on Windows)
       <https://docs.python.org/3/using/windows.html#configuring-python>`_ for
@@ -171,6 +191,29 @@ After installing Python as described previously in :ref:`for-mac-os-x-users` or
 
       $ $VENV/bin/pip install "pyramid==\ |release|\ "
 
+.. index::
+   single: $VENV/bin/pip vs. source bin/activate
+
+.. _venv-bin-pip-vs-source-bin-activate:
+
+.. note:: Why use ``$VENV/bin/pip`` instead of ``source bin/activate``, then
+   ``pip``?
+
+   ``$VENV/bin/pip`` clearly specifies that ``pip`` is run from within the
+   virtual environment and not at the system level.
+
+   ``activate`` drops turds into the user's shell environment, leaving them
+   vulnerable to executing commands in the wrong context. ``deactivate`` might
+   not correctly restore previous shell environment variables.
+
+   Although using ``source bin/activate``, then ``pip``, requires fewer key
+   strokes to issue commands once invoked, there are other things to consider.
+   Michael F. Lamb (datagrok) presents a summary in `Virtualenv's bin/activate
+   is Doing It Wrong <https://gist.github.com/datagrok/2199506>`_.
+
+   Ultimately we prefer to keep things clear and simple, so we use
+   ``$VENV/bin/pip``.
+
 
 .. index::
    single: installing on Windows
@@ -190,7 +233,8 @@ After installing Python as described previously in
 
       c:\> set VENV=c:\env
       # replace "x" with your minor version of Python 3
-      c:\> c:\Python3x\Scripts\python3 -m venv %VENV%
+      c:\> c:\Python3x\python -m venv %VENV%
+      c:\> cd %VENV%
 
    You can either follow the use of the environment variable ``%VENV%``, or
    replace it with the root directory of the virtual environment. If you choose
@@ -204,7 +248,10 @@ After installing Python as described previously in
 
    .. parsed-literal::
 
-      c:\\env> %VENV%\\Scripts\\pip install "pyramid==\ |release|\ "
+      c:\\> %VENV%\\Scripts\\pip install "pyramid==\ |release|\ "
+
+.. note:: See the note above for :ref:`Why use $VENV/bin/pip instead of source
+   bin/activate, then pip <venv-bin-pip-vs-source-bin-activate>`.
 
 
 What Gets Installed

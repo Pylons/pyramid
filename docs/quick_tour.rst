@@ -44,22 +44,24 @@ For Windows:
 .. parsed-literal::
 
     # set an environment variable to where you want your virtual environment
-    c:\> set VENV=c:\env
+    c:\\> set VENV=c:\\env
     # create the virtual environment
-    c:\\> c:\\Python35\\python3 -m venv %VENV%
+    c:\\> %VENV%\\Scripts\\python -m venv %VENV%
     # install pyramid
     c:\\> %VENV%\\Scripts\\pip install pyramid
     # or for a specific released version
     c:\\> %VENV%\\Scripts\\pip install "pyramid==\ |release|\ "
 
-Of course Pyramid runs fine on Python 2.6+, as do the examples in this *Quick
+Of course Pyramid runs fine on Python 2.7+, as do the examples in this *Quick
 Tour*. We're showing Python 3 for simplicity. (Pyramid had production support
 for Python 3 in October 2011.) Also for simplicity, the remaining examples will
 show only UNIX commands.
 
 .. seealso:: See also:
     :ref:`Quick Tutorial section on Requirements <qtut_requirements>`,
-    :ref:`installing_unix`, :ref:`Before You Install <installing_chapter>`, and
+    :ref:`installing_unix`, :ref:`Before You Install <installing_chapter>`,
+    :ref:`Why use $VENV/bin/pip instead of source bin/activate, then pip
+    <venv-bin-pip-vs-source-bin-activate>`, and
     :ref:`Installing Pyramid on a Windows System <installing_windows>`.
 
 
@@ -504,10 +506,10 @@ Pyramid's ``pcreate`` command can list the available scaffolds:
 
     $ pcreate --list
     Available scaffolds:
-      alchemy:                 Pyramid SQLAlchemy project using url dispatch
+      alchemy:                 Pyramid project using SQLAlchemy, SQLite, URL dispatch, and Jinja2
       pyramid_jinja2_starter:  Pyramid Jinja2 starter project
-      starter:                 Pyramid starter project
-      zodb:                    Pyramid ZODB project using traversal
+      starter:                 Pyramid starter project using URL dispatch and Chameleon
+      zodb:                    Pyramid project using ZODB, traversal, and Chameleon
 
 The ``pyramid_jinja2`` add-on gave us a scaffold that we can use. From the
 parent directory of where we want our Python package to be generated, let's use

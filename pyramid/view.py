@@ -345,7 +345,7 @@ class notfound_view_config(object):
 
         @notfound_view_config()
         def notfound(request):
-            return Response('Not found, dude!', status='404 Not Found')
+            return Response('Not found!', status='404 Not Found')
 
     All arguments except ``append_slash`` have the same meaning as
     :meth:`pyramid.view.view_config` and each predicate
