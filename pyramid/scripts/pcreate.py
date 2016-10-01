@@ -224,8 +224,8 @@ class PCreateCommand(object):
 deprecated(
     'PCreateCommand',
     'As of Pyramid 1.8, the "pcreate" script for creating a project from a '
-    'scaffold is now deprecated.  It will be removed in Pyramid 2.0.  Use a'
-    'specific cookiecutter instead:'
+    'scaffold is now deprecated.  It will be removed in Pyramid 2.0.  Use a '
+    'specific cookiecutter instead: '
     '- https://github.com/Pylons/pyramid-cookiecutter-starter '
     '- https://github.com/Pylons/pyramid-cookiecutter-alchemy '
     '- https://github.com/Pylons/pyramid-cookiecutter-zodb'
