@@ -9,6 +9,8 @@ import pkg_resources
 import re
 import sys
 from pyramid.compat import input_
+from zope.deprecation import deprecated
+
 
 _bad_chars_re = re.compile('[^a-zA-Z0-9_]')
 
@@ -19,8 +21,15 @@ def main(argv=sys.argv, quiet=False):
     except KeyboardInterrupt: # pragma: no cover
         return 1
 
-
 class PCreateCommand(object):
+    """
+    .. deprecated:: 1.8
+        Use a specific cookiecutter instead:
+
+        - https://github.com/Pylons/pyramid-cookiecutter-starter
+        - https://github.com/Pylons/pyramid-cookiecutter-alchemy
+        - https://github.com/Pylons/pyramid-cookiecutter-zodb
+    """
     verbosity = 1 # required
     description = "Render Pyramid scaffolding to an output directory"
     usage = "usage: %prog [options] -s <scaffold> output_directory"
@@ -211,6 +220,17 @@ class PCreateCommand(object):
     def confirm_bad_name(self, prompt): # pragma: no cover
         answer = input_('{0} [y|N]: '.format(prompt))
         return answer.strip().lower() == 'y'
+
+deprecated(
+    'main',
+    'As of Pyramid 1.8, the "pcreate" script for creating a project from a '
+    'scaffold is now deprecated.  It will be removed in Pyramid 2.0.  Use a'
+    'specific cookiecutter instead:'
+    '- https://github.com/Pylons/pyramid-cookiecutter-starter '
+    '- https://github.com/Pylons/pyramid-cookiecutter-alchemy '
+    '- https://github.com/Pylons/pyramid-cookiecutter-zodb'
+)
+
 
 if __name__ == '__main__': # pragma: no cover
     sys.exit(main() or 0)
