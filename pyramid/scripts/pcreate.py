@@ -222,7 +222,7 @@ class PCreateCommand(object):
         return answer.strip().lower() == 'y'
 
 deprecated(
-    'main',
+    'PCreateCommand',
     'As of Pyramid 1.8, the "pcreate" script for creating a project from a '
     'scaffold is now deprecated.  It will be removed in Pyramid 2.0.  Use a'
     'specific cookiecutter instead:'
