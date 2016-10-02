@@ -19,6 +19,7 @@ def main(argv=sys.argv, quiet=False):
     except KeyboardInterrupt: # pragma: no cover
         return 1
 
+
 class PCreateCommand(object):
     verbosity = 1 # required
     description = """\
