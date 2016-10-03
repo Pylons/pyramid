@@ -148,7 +148,7 @@ Coding Style
 
 
 Running Tests
---------------
+-------------
 
 - To run all tests for Pyramid on a single Python version from your development
   virtual environment (See *Using a Development Checkout* above), run
@@ -156,11 +156,21 @@ Running Tests
 
     $ $VENV/bin/nosetests
 
-- To run individual tests (i.e., during development) you can use a regular
-  expression with the ``-t`` parameter courtesy of the `nose-selecttests
-  <https://pypi.python.org/pypi/nose-selecttests/>`_ plugin that was installed
-  (along with nose itself) via ``pip install -e .``. The easiest usage is to
-  simply provide the verbatim name of the test you're working on.
+- To run individual tests (i.e., during development), you can use ``nosetests``
+  syntax as follows:
+
+    # run a single test
+    $ $VENV/bin/nosetests pyramid.tests.test_module:ClassName.test_mytestname
+
+    # run all tests in a class
+    $ $VENV/bin/nosetests pyramid.tests.test_module:ClassName
+
+  Optionally you can install a nose plugin, `nose-selecttests
+  <https://pypi.python.org/pypi/nose-selecttests/>`_, and use a regular
+  expression with the ``-t`` parameter to run tests.
+
+    # run a single test
+    $ $VENV/bin/nosetests -t test_mytestname
 
 - The ``tox.ini`` uses ``nose`` and ``coverage``. As such ``tox`` may be used
   to run groups of tests or only a specific version of Python. For example, the
