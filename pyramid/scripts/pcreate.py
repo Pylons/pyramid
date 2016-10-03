@@ -49,8 +49,9 @@ class PCreateCommand(object):
                       dest='package_name',
                       action='store',
                       type='string',
-                      help='Package name to use. Has to be a valid python '
-                           'package name. (By default package name is derived '
+                      help='Package name to use. Named provided is assumed to '
+                           'be a valid python package name and will not be '
+                           'validated. (By default package name is derived '
                            'from output_directory base folder name)')
     parser.add_option('--simulate',
                       dest='simulate',
