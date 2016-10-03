@@ -97,6 +97,9 @@ Deprecations
 
 Documentation Changes
 ---------------------
+- Update HACKING.txt from stale branch that was never merged to master.
+  See https://github.com/Pylons/pyramid/pull/2782
+
 - Updated Windows installation instructions and related bits.
   See https://github.com/Pylons/pyramid/issues/2661
 
