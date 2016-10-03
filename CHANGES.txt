@@ -8,6 +8,9 @@ unreleased
   route predicates and highlight the differences in their APIs.
   See https://github.com/Pylons/pyramid/pull/2766
 
+- Fix incompatibilities in the ``prequest`` test suite caused by changes in
+  WebOb 1.7. See https://github.com/Pylons/pyramid/pull/2789
+
 .. _changes_1.6.4:
 
 1.6.4 (2016-08-17)
