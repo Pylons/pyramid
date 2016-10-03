@@ -90,7 +90,7 @@ way to get going.
 
     $ git clone git://github.com/Pylons/pyramid.git .
 
-  Alternatively, create a writeable fork on GitHub and check that out.
+  Alternatively, create a writeable fork on GitHub and clone it.
 
 Since Pyramid is a framework and not an application, it can be convenient to
 work against a sample application, preferably in its own virtual environment. A
