@@ -97,6 +97,9 @@ Deprecations
 
 Documentation Changes
 ---------------------
+- Add pyramid_nacl_session to session factories.
+  See https://github.com/Pylons/pyramid/issues/2791
+
 - Update HACKING.txt from stale branch that was never merged to master.
   See https://github.com/Pylons/pyramid/pull/2782
 
