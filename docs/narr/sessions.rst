@@ -157,6 +157,12 @@ The following session factories exist at the time of this writing.
 ======================= ======= =============================
 Session Factory         Backend   Description
 ======================= ======= =============================
+pyramid_nacl_session_   PyNaCl_ Defines an encrypting,
+                                pickle-based cookie
+                                serializer, using PyNaCl to
+                                generate the symmetric
+                                encryption for the cookie
+                                state.
 pyramid_redis_sessions_ Redis_  Server-side session library
                                 for Pyramid, using Redis for
                                 storage.
@@ -164,6 +170,9 @@ pyramid_beaker_         Beaker_ Session factory for Pyramid
                                 backed by the Beaker
                                 sessioning system.
 ======================= ======= =============================
+
+.. _pyramid_nacl_session: https://pypi.python.org/pypi/pyramid_nacl_session
+.. _PyNaCl: https://pynacl.readthedocs.io/en/latest/secret/
 
 .. _pyramid_redis_sessions: https://pypi.python.org/pypi/pyramid_redis_sessions
 .. _Redis: http://redis.io/
