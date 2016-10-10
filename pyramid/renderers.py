@@ -194,7 +194,7 @@ class JSON(object):
 
     Once this renderer is registered as above, you can use
     ``myjson`` as the ``renderer=`` parameter to ``@view_config`` or
-    :meth:`~pyramid.config.Configurator.add_view``:
+    :meth:`~pyramid.config.Configurator.add_view`:
 
     .. code-block:: python
 
