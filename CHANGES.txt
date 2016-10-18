@@ -62,6 +62,11 @@ Features
   - the pipeline can be optimized at config-time.
   See https://github.com/Pylons/pyramid/pull/2660
 
+- ``pserve`` should now work with ``gevent`` and other workers that need
+  to monkeypatch the process, assuming the server and / or the app do so
+  as soon as possible before importing the rest of pyramid.
+  See https://github.com/Pylons/pyramid/pull/2797
+
 Bug Fixes
 ---------
 
