@@ -481,11 +481,13 @@ def csrf_view(view, info):
         token = 'csrf_token'
         header = 'X-CSRF-Token'
         safe_methods = frozenset(["GET", "HEAD", "OPTIONS", "TRACE"])
+        callback = None
     else:
         default_val = defaults.require_csrf
         token = defaults.token
         header = defaults.header
         safe_methods = defaults.safe_methods
+        callback = defaults.callback
 
     enabled = (
         explicit_val is True or
@@ -501,7 +503,10 @@ def csrf_view(view, info):
     wrapped_view = view
     if enabled:
         def csrf_view(context, request):
-            if request.method not in safe_methods:
+            if (
+                request.method not in safe_methods and
+                (callback is None or callback(request))
+            ):
                 check_csrf_origin(request, raises=True)
                 check_csrf_token(request, token, header, raises=True)
             return view(context, request)
