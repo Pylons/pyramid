@@ -30,9 +30,8 @@ from paste.deploy.loadwsgi import loadcontext, SERVER
 from pyramid.compat import PY2
 from pyramid.compat import WIN
 
-from pyramid.paster import setup_logging
-
 from pyramid.scripts.common import parse_vars
+from pyramid.scripts.common import setup_logging
 
 MAXFD = 1024
 
