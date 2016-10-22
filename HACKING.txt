@@ -216,7 +216,7 @@ Running Tests
 
   Alternatively:
 
-    $ tox -e{py27,py34,py35,pypy}-scaffolds,
+    $ tox -e{py27,py34,py35,pypy}-scaffolds
 
 
 Test Coverage
