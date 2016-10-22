@@ -9,12 +9,11 @@ from zope.interface import (
     implementedBy,
     implementer,
     )
-
 from zope.interface.interfaces import IInterface
 
 from pyramid.interfaces import (
-    IException,
     IExceptionViewClassifier,
+    IException,
     IMultiView,
     IPackageOverrides,
     IRendererFactory,
@@ -213,6 +212,7 @@ class ViewsConfiguratorMixin(object):
         match_param=None,
         check_csrf=None,
         require_csrf=None,
+        exception_only=False,
         **view_options):
         """ Add a :term:`view configuration` to the current
         configuration state.  Arguments to ``add_view`` are broken
@@ -502,7 +502,20 @@ class ViewsConfiguratorMixin(object):
           if the :term:`context` provides the represented interface;
           it is otherwise false.  This argument may also be provided
           to ``add_view`` as ``for_`` (an older, still-supported
-          spelling).
+          spelling). If the view should *only* match when handling
+          exceptions, then set the ``exception_only`` to ``True``.
+
+        exception_only
+
+          .. versionadded:: 1.8
+
+          When this value is ``True``, the ``context`` argument must be
+          a subclass of ``Exception``. This flag indicates that only an
+          :term:`exception view` should be created, and that this view should
+          not match if the traversal :term:`context` matches the ``context``
+          argument. If the ``context`` is a subclass of ``Exception`` and
+          this value is ``False`` (the default), then a view will be
+          registered to match the traversal :term:`context` as well.
 
         route_name
 
@@ -684,7 +697,7 @@ class ViewsConfiguratorMixin(object):
                 obsoletes this argument, but it is kept around for backwards
                 compatibility.
 
-        view_options:
+        view_options
 
           Pass a key/value pair here to use a third-party predicate or set a
           value for a view deriver. See
@@ -762,6 +775,12 @@ class ViewsConfiguratorMixin(object):
         if context is None:
             context = for_
 
+        isexc = isexception(context)
+        if exception_only and not isexc:
+            raise ConfigurationError(
+                'view "context" must be an exception type when '
+                '"exception_only" is True')
+
         r_context = context
         if r_context is None:
             r_context = Interface
@@ -797,6 +816,7 @@ class ViewsConfiguratorMixin(object):
             # is.  It can't be computed any sooner because thirdparty
             # predicates/view derivers may not yet exist when add_view is
             # called.
+            predlist = self.get_predlist('view')
             valid_predicates = predlist.names()
             pvals = {}
             dvals = {}
@@ -835,6 +855,7 @@ class ViewsConfiguratorMixin(object):
         view_intr.update(dict(
             name=name,
             context=context,
+            exception_only=exception_only,
             containment=containment,
             request_param=request_param,
             request_methods=request_method,
@@ -854,7 +875,6 @@ class ViewsConfiguratorMixin(object):
         ))
         view_intr.update(view_options)
         introspectables.append(view_intr)
-        predlist = self.get_predlist('view')
 
         def register(permission=permission, renderer=renderer):
             request_iface = IRequest
@@ -877,12 +897,54 @@ class ViewsConfiguratorMixin(object):
                         registry=self.registry
                         )
 
+            renderer_type = getattr(renderer, 'type', None)
+            intrspc = self.introspector
+            if (
+                renderer_type is not None and
+                tmpl_intr is not None and
+                intrspc is not None and
+                intrspc.get('renderer factories', renderer_type) is not None
+                ):
+                # allow failure of registered template factories to be deferred
+                # until view execution, like other bad renderer factories; if
+                # we tried to relate this to an existing renderer factory
+                # without checking if the factory actually existed, we'd end
+                # up with a KeyError at startup time, which is inconsistent
+                # with how other bad renderer registrations behave (they throw
+                # a ValueError at view execution time)
+                tmpl_intr.relate('renderer factories', renderer.type)
+
+            # make a new view separately for normal and exception paths
+            if not exception_only:
+                derived_view = derive_view(False, renderer)
+                register_view(IViewClassifier, request_iface, derived_view)
+            if isexc:
+                derived_exc_view = derive_view(True, renderer)
+                register_view(IExceptionViewClassifier, request_iface,
+                              derived_exc_view)
+
+                if exception_only:
+                    derived_view = derived_exc_view
+
+            # if there are two derived views, combine them into one for
+            # introspection purposes
+            if not exception_only and isexc:
+                derived_view = runtime_exc_view(derived_view, derived_exc_view)
+
+            derived_view.__discriminator__ = lambda *arg: discriminator
+            # __discriminator__ is used by superdynamic systems
+            # that require it for introspection after manual view lookup;
+            # see also MultiView.__discriminator__
+            view_intr['derived_callable'] = derived_view
+
+            self.registry._clear_view_lookup_cache()
+
+        def derive_view(isexc_only, renderer):
             # added by discrim_func above during conflict resolving
             preds = view_intr['predicates']
             order = view_intr['order']
             phash = view_intr['phash']
 
-            # __no_permission_required__ handled by _secure_view
             derived_view = self._derive_view(
                 view,
                 route_name=route_name,
@@ -890,6 +952,7 @@ class ViewsConfiguratorMixin(object):
                 predicates=preds,
                 attr=attr,
                 context=context,
+                exception_only=isexc_only,
                 renderer=renderer,
                 wrapper_viewname=wrapper,
                 viewname=name,
@@ -902,14 +965,9 @@ class ViewsConfiguratorMixin(object):
                 require_csrf=require_csrf,
                 extra_options=ovals,
             )
-            derived_view.__discriminator__ = lambda *arg: discriminator
-            # __discriminator__ is used by superdynamic systems
-            # that require it for introspection after manual view lookup;
-            # see also MultiView.__discriminator__
-            view_intr['derived_callable'] = derived_view
+            return derived_view
 
-            registered = self.registry.adapters.registered
-
+        def register_view(classifier, request_iface, derived_view):
             # A multiviews is a set of views which are registered for
             # exactly the same context type/request type/name triad.  Each
             # consituent view in a multiview differs only by the
@@ -929,14 +987,15 @@ class ViewsConfiguratorMixin(object):
             # matches on all the arguments it receives.
 
             old_view = None
+            order, phash = view_intr['order'], view_intr['phash']
+            registered = self.registry.adapters.registered
 
             for view_type in (IView, ISecuredView, IMultiView):
-                old_view = registered((IViewClassifier, request_iface,
-                                       r_context), view_type, name)
+                old_view = registered(
+                    (classifier, request_iface, r_context),
+                    view_type, name)
                 if old_view is not None:
                     break
-
-            isexc = isexception(context)
 
             def regclosure():
                 if hasattr(derived_view, '__call_permissive__'):
@@ -945,13 +1004,10 @@ class ViewsConfiguratorMixin(object):
                     view_iface = IView
                 self.registry.registerAdapter(
                     derived_view,
-                    (IViewClassifier, request_iface, context), view_iface, name
+                    (classifier, request_iface, context),
+                    view_iface,
+                    name
                     )
-                if isexc:
-                    self.registry.registerAdapter(
-                        derived_view,
-                        (IExceptionViewClassifier, request_iface, context),
-                        view_iface, name)
 
             is_multiview = IMultiView.providedBy(old_view)
             old_phash = getattr(old_view, '__phash__', DEFAULT_PHASH)
@@ -988,39 +1044,12 @@ class ViewsConfiguratorMixin(object):
                 for view_type in (IView, ISecuredView):
                     # unregister any existing views
                     self.registry.adapters.unregister(
-                        (IViewClassifier, request_iface, r_context),
+                        (classifier, request_iface, r_context),
                         view_type, name=name)
-                    if isexc:
-                        self.registry.adapters.unregister(
-                            (IExceptionViewClassifier, request_iface,
-                             r_context), view_type, name=name)
                 self.registry.registerAdapter(
                     multiview,
-                    (IViewClassifier, request_iface, context),
+                    (classifier, request_iface, context),
                     IMultiView, name=name)
-                if isexc:
-                    self.registry.registerAdapter(
-                        multiview,
-                        (IExceptionViewClassifier, request_iface, context),
-                        IMultiView, name=name)
-
-            self.registry._clear_view_lookup_cache()
-            renderer_type = getattr(renderer, 'type', None) # gard against None
-            intrspc = self.introspector
-            if (
-                renderer_type is not None and
-                tmpl_intr is not None and
-                intrspc is not None and
-                intrspc.get('renderer factories', renderer_type) is not None
-                ):
-                # allow failure of registered template factories to be deferred
-                # until view execution, like other bad renderer factories; if
-                # we tried to relate this to an existing renderer factory
-                # without checking if it the factory actually existed, we'd end
-                # up with a KeyError at startup time, which is inconsistent
-                # with how other bad renderer registrations behave (they throw
-                # a ValueError at view execution time)
-                tmpl_intr.relate('renderer factories', renderer.type)
 
         if mapper:
             mapper_intr = self.introspectable(
@@ -1334,7 +1363,8 @@ class ViewsConfiguratorMixin(object):
                      viewname=None, accept=None, order=MAX_ORDER,
                      phash=DEFAULT_PHASH, decorator=None, route_name=None,
                      mapper=None, http_cache=None, context=None,
-                     require_csrf=None, extra_options=None):
+                     require_csrf=None, exception_only=False,
+                     extra_options=None):
         view = self.maybe_dotted(view)
         mapper = self.maybe_dotted(mapper)
         if isinstance(renderer, string_types):
@@ -1372,6 +1402,7 @@ class ViewsConfiguratorMixin(object):
             registry=self.registry,
             package=self.package,
             predicates=predicates,
+            exception_only=exception_only,
             options=options,
         )
 
@@ -1426,21 +1457,25 @@ class ViewsConfiguratorMixin(object):
         argument restricts the set of circumstances under which this forbidden
         view will be invoked.  Unlike
         :meth:`pyramid.config.Configurator.add_view`, this method will raise
-        an exception if passed ``name``, ``permission``, ``context``,
-        ``for_``, or ``http_cache`` keyword arguments.  These argument values
-        make no sense in the context of a forbidden view.
+        an exception if passed ``name``, ``permission``, ``require_csrf``,
+        ``context``, ``for_``, or ``exception_only`` keyword arguments. These
+        argument values make no sense in the context of a forbidden
+        :term:`exception view`.
 
         .. versionadded:: 1.3
+
+        .. versionchanged:: 1.8
+
+           The view is created using ``exception_only=True``.
         """
         for arg in (
-            'name', 'permission', 'context', 'for_', 'http_cache',
-            'require_csrf',
+            'name', 'permission', 'context', 'for_', 'require_csrf',
+            'exception_only',
         ):
             if arg in view_options:
                 raise ConfigurationError(
                     '%s may not be used as an argument to add_forbidden_view'
-                    % arg
-                    )
+                    % (arg,))
 
         if view is None:
             view = default_exceptionresponse_view
@@ -1448,6 +1483,7 @@ class ViewsConfiguratorMixin(object):
         settings = dict(
             view=view,
             context=HTTPForbidden,
+            exception_only=True,
             wrapper=wrapper,
             request_type=request_type,
             request_method=request_method,
@@ -1496,9 +1532,9 @@ class ViewsConfiguratorMixin(object):
         append_slash=False,
         **view_options
         ):
-        """ Add a default Not Found View to the current configuration state.
-        The view will be called when Pyramid or application code raises an
-        :exc:`pyramid.httpexceptions.HTTPNotFound` exception (e.g. when a
+        """ Add a default :term:`Not Found View` to the current configuration
+        state. The view will be called when Pyramid or application code raises
+        an :exc:`pyramid.httpexceptions.HTTPNotFound` exception (e.g., when a
         view cannot be found for the request).  The simplest example is:
 
           .. code-block:: python
@@ -1516,9 +1552,9 @@ class ViewsConfiguratorMixin(object):
         argument restricts the set of circumstances under which this notfound
         view will be invoked.  Unlike
         :meth:`pyramid.config.Configurator.add_view`, this method will raise
-        an exception if passed ``name``, ``permission``, ``context``,
-        ``for_``, or ``http_cache`` keyword arguments.  These argument values
-        make no sense in the context of a Not Found View.
+        an exception if passed ``name``, ``permission``, ``require_csrf``,
+        ``context``, ``for_``, or ``exception_only`` keyword arguments. These
+        argument values make no sense in the context of a Not Found View.
 
         If ``append_slash`` is ``True``, when this Not Found View is invoked,
         and the current path info does not end in a slash, the notfound logic
@@ -1545,18 +1581,26 @@ class ViewsConfiguratorMixin(object):
         being used, :class:`~pyramid.httpexceptions.HTTPMovedPermanently will
         be used` for the redirect response if a slash-appended route is found.
 
-        .. versionchanged:: 1.6
         .. versionadded:: 1.3
+
+        .. versionchanged:: 1.6
+
+           The ``append_slash`` argument was modified to allow any object that
+           implements the ``IResponse`` interface to specify the response class
+           used when a redirect is performed.
+
+        .. versionchanged:: 1.8
+
+           The view is created using ``exception_only=True``.
         """
         for arg in (
-            'name', 'permission', 'context', 'for_', 'http_cache',
-            'require_csrf',
+            'name', 'permission', 'context', 'for_', 'require_csrf',
+            'exception_only',
         ):
             if arg in view_options:
                 raise ConfigurationError(
                     '%s may not be used as an argument to add_notfound_view'
-                    % arg
-                    )
+                    % (arg,))
 
         if view is None:
             view = default_exceptionresponse_view
@@ -1564,6 +1608,7 @@ class ViewsConfiguratorMixin(object):
         settings = dict(
             view=view,
             context=HTTPNotFound,
+            exception_only=True,
             wrapper=wrapper,
             request_type=request_type,
             request_method=request_method,
@@ -1597,6 +1642,47 @@ class ViewsConfiguratorMixin(object):
         return self.add_view(**settings)
 
     set_notfound_view = add_notfound_view # deprecated sorta-bw-compat alias
+
+    @viewdefaults
+    @action_method
+    def add_exception_view(
+        self,
+        view=None,
+        context=None,
+        # force all other arguments to be specified as key=value
+        **view_options
+        ):
+        """ Add an :term:`exception view` for the specified ``exception`` to
+        the current configuration state. The view will be called when Pyramid
+        or application code raises the given exception.
+
+        This method accepts almost all of the same arguments as
+        :meth:`pyramid.config.Configurator.add_view` except for ``name``,
+        ``permission``, ``for_``, ``require_csrf``, and ``exception_only``.
+
+        By default, this method will set ``context=Exception``, thus
+        registering for most default Python exceptions. Any subclass of
+        ``Exception`` may be specified.
+
+        .. versionadded:: 1.8
+        """
+        for arg in (
+            'name', 'for_', 'exception_only', 'require_csrf', 'permission',
+        ):
+            if arg in view_options:
+                raise ConfigurationError(
+                    '%s may not be used as an argument to add_exception_view'
+                    % (arg,))
+        if context is None:
+            context = Exception
+        view_options.update(dict(
+            view=view,
+            context=context,
+            exception_only=True,
+            permission=NO_PERMISSION_REQUIRED,
+            require_csrf=False,
+        ))
+        return self.add_view(**view_options)
 
     @action_method
     def set_view_mapper(self, mapper):
@@ -1777,14 +1863,63 @@ def isexception(o):
         (inspect.isclass(o) and (issubclass(o, Exception)))
         )
 
+def runtime_exc_view(view, excview):
+    # create a view callable which can pretend to be both a normal view
+    # and an exception view, dispatching to the appropriate one based
+    # on the state of request.exception
+    def wrapper_view(context, request):
+        if getattr(request, 'exception', None):
+            return excview(context, request)
+        return view(context, request)
+
+    # these constants are the same between the two views
+    wrapper_view.__wraps__ = wrapper_view
+    wrapper_view.__original_view__ = getattr(view, '__original_view__', view)
+    wrapper_view.__module__ = view.__module__
+    wrapper_view.__doc__ = view.__doc__
+    wrapper_view.__name__ = view.__name__
+
+    wrapper_view.__accept__ = getattr(view, '__accept__', None)
+    wrapper_view.__order__ = getattr(view, '__order__', MAX_ORDER)
+    wrapper_view.__phash__ = getattr(view, '__phash__', DEFAULT_PHASH)
+    wrapper_view.__view_attr__ = getattr(view, '__view_attr__', None)
+    wrapper_view.__permission__ = getattr(view, '__permission__', None)
+
+    def wrap_fn(attr):
+        def wrapper(context, request):
+            if getattr(request, 'exception', None):
+                selected_view = excview
+            else:
+                selected_view = view
+            fn = getattr(selected_view, attr, None)
+            if fn is not None:
+                return fn(context, request)
+        return wrapper
+
+    # these methods are dynamic per-request and should dispatch to their
+    # respective views based on whether it's an exception or not
+    wrapper_view.__call_permissive__ = wrap_fn('__call_permissive__')
+    wrapper_view.__permitted__ = wrap_fn('__permitted__')
+    wrapper_view.__predicated__ = wrap_fn('__predicated__')
+    wrapper_view.__predicates__ = wrap_fn('__predicates__')
+    return wrapper_view
+
 @implementer(IViewDeriverInfo)
 class ViewDeriverInfo(object):
-    def __init__(self, view, registry, package, predicates, options):
+    def __init__(self,
+                 view,
+                 registry,
+                 package,
+                 predicates,
+                 exception_only,
+                 options,
+                 ):
         self.original_view = view
         self.registry = registry
         self.package = package
         self.predicates = predicates or []
         self.options = options or {}
+        self.exception_only = exception_only
 
     @reify
     def settings(self):

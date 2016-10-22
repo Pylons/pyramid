@@ -59,7 +59,9 @@ show only UNIX commands.
 
 .. seealso:: See also:
     :ref:`Quick Tutorial section on Requirements <qtut_requirements>`,
-    :ref:`installing_unix`, :ref:`Before You Install <installing_chapter>`, and
+    :ref:`installing_unix`, :ref:`Before You Install <installing_chapter>`,
+    :ref:`Why use $VENV/bin/pip instead of source bin/activate, then pip
+    <venv-bin-pip-vs-source-bin-activate>`, and
     :ref:`Installing Pyramid on a Windows System <installing_windows>`.
 
 

@@ -179,6 +179,9 @@ time of its release.
     # Windows
     c:\> %VENV%\Scripts\pip install --upgrade pip setuptools
 
+.. seealso:: See also :ref:`Why use $VENV/bin/pip instead of source
+   bin/activate, then pip <venv-bin-pip-vs-source-bin-activate>`.
+
 
 .. _install-pyramid:
 

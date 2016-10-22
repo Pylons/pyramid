@@ -16,8 +16,18 @@ Backward Incompatibilities
 
    See https://github.com/Pylons/pyramid/pull/2615
 
+- ``pcreate`` is now interactive by default. You will be prompted if it
+  a file already exists with different content. Previously if there were
+  similar files it would silently skip them unless you specified
+  ``--interactive`` or ``--overwrite``.
+  See https://github.com/Pylons/pyramid/pull/2775
+
 Features
 --------
+
+- pcreate learned about --package-name to allow you to create a new project in
+  an existing folder with a different package name than the project name. See
+  https://github.com/Pylons/pyramid/pull/2783
 
 - The `_get_credentials` private method of `BasicAuthAuthenticationPolicy`
   has been extracted into standalone function ``extract_http_basic_credentials`
@@ -34,6 +44,28 @@ Features
   can now be used as context managers to automatically invoke the ``closer``
   and pop threadlocals off of the stack to prevent memory leaks.
   See https://github.com/Pylons/pyramid/pull/2760
+
+- Added ``pyramid.config.Configurator.add_exception_view`` and the
+  ``pyramid.view.exception_view_config`` decorator. It is now possible using
+  these methods or via the new ``exception_only=True`` option to ``add_view``
+  to add a view which will only be matched when handling an exception.
+  Previously any exception views were also registered for a traversal
+  context that inherited from the exception class which prevented any
+  exception-only optimizations.
+  See https://github.com/Pylons/pyramid/pull/2660
+
+- Added the ``exception_only`` boolean to
+  ``pyramid.interfaces.IViewDeriverInfo`` which can be used by view derivers
+  to determine if they are wrapping a view which only handles exceptions.
+  This means that it is no longer necessary to perform request-time checks
+  for ``request.exception`` to determine if the view is handling an exception
+  - the pipeline can be optimized at config-time.
+  See https://github.com/Pylons/pyramid/pull/2660
+
+- ``pserve`` should now work with ``gevent`` and other workers that need
+  to monkeypatch the process, assuming the server and / or the app do so
+  as soon as possible before importing the rest of pyramid.
+  See https://github.com/Pylons/pyramid/pull/2797
 
 Bug Fixes
 ---------
@@ -70,9 +102,20 @@ Deprecations
 
 Documentation Changes
 ---------------------
+- Add pyramid_nacl_session to session factories.
+  See https://github.com/Pylons/pyramid/issues/2791
+
+- Update HACKING.txt from stale branch that was never merged to master.
+  See https://github.com/Pylons/pyramid/pull/2782
+
 - Updated Windows installation instructions and related bits.
   See https://github.com/Pylons/pyramid/issues/2661
 
 - Fix an inconsistency in the documentation between view predicates and
   route predicates and highlight the differences in their APIs.
   See https://github.com/Pylons/pyramid/pull/2764
+
+- Clarify a possible misuse of the ``headers`` kwarg to subclasses of
+  :class:`pyramid.httpexceptions.HTTPException` in which more appropriate
+  kwargs from the parent class :class:`pyramid.response.Response` should be
+  used instead. See https://github.com/Pylons/pyramid/pull/2750

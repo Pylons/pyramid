@@ -10,11 +10,10 @@ from pyramid.compat import exec_
 from pyramid.util import DottedNameResolver
 from pyramid.paster import bootstrap
 
-from pyramid.paster import setup_logging
-
 from pyramid.settings import aslist
 
 from pyramid.scripts.common import parse_vars
+from pyramid.scripts.common import setup_logging
 
 def main(argv=sys.argv, quiet=False):
     command = PShellCommand(argv, quiet)
