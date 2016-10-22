@@ -17,7 +17,10 @@ from pyramid.interfaces import (
 
 from pyramid.compat import decode_path_info
 
-from pyramid.exceptions import PredicateMismatch
+from pyramid.exceptions import (
+    ConfigurationError,
+    PredicateMismatch,
+)
 
 from pyramid.httpexceptions import (
     HTTPFound,
@@ -166,7 +169,7 @@ class view_config(object):
              :class:`pyramid.view.bfg_view`.
 
     :class:`pyramid.view.view_config` supports the following keyword
-    arguments: ``context``, ``permission``, ``name``,
+    arguments: ``context``, ``exception``, ``permission``, ``name``,
     ``request_type``, ``route_name``, ``request_method``, ``request_param``,
     ``containment``, ``xhr``, ``accept``, ``header``, ``path_info``,
     ``custom_predicates``, ``decorator``, ``mapper``, ``http_cache``,
@@ -325,7 +328,8 @@ class notfound_view_config(object):
     .. versionadded:: 1.3
 
     An analogue of :class:`pyramid.view.view_config` which registers a
-    :term:`Not Found View`.
+    :term:`Not Found View` using
+    :meth:`pyramid.config.Configurator.add_notfound_view`.
 
     The ``notfound_view_config`` constructor accepts most of the same arguments
     as the constructor of :class:`pyramid.view.view_config`.  It can be used
@@ -341,7 +345,7 @@ class notfound_view_config(object):
 
         @notfound_view_config()
         def notfound(request):
-            return Response('Not found, dude!', status='404 Not Found')
+            return Response('Not found!', status='404 Not Found')
 
     All arguments except ``append_slash`` have the same meaning as
     :meth:`pyramid.view.view_config` and each predicate
@@ -413,7 +417,8 @@ class forbidden_view_config(object):
     .. versionadded:: 1.3
 
     An analogue of :class:`pyramid.view.view_config` which registers a
-    :term:`forbidden view`.
+    :term:`forbidden view` using
+    :meth:`pyramid.config.Configurator.add_forbidden_view`.
 
     The forbidden_view_config constructor accepts most of the same arguments
     as the constructor of :class:`pyramid.view.view_config`.  It can be used
@@ -457,6 +462,66 @@ class forbidden_view_config(object):
             # if the decorator was attached to a method in a class, or
             # otherwise executed at class scope, we need to set an
             # 'attr' into the settings if one isn't already in there
+            if settings.get('attr') is None:
+                settings['attr'] = wrapped.__name__
+
+        settings['_info'] = info.codeinfo # fbo "action_method"
+        return wrapped
+
+class exception_view_config(object):
+    """
+    .. versionadded:: 1.8
+
+    An analogue of :class:`pyramid.view.view_config` which registers an
+    :term:`exception view` using
+    :meth:`pyramid.config.Configurator.add_exception_view`.
+
+    The ``exception_view_config`` constructor requires an exception context,
+    and additionally accepts most of the same arguments as the constructor of
+    :class:`pyramid.view.view_config`.  It can be used in the same places,
+    and behaves in largely the same way, except it always registers an
+    exception view instead of a "normal" view that dispatches on the request
+    :term:`context`.
+
+    Example:
+
+    .. code-block:: python
+
+        from pyramid.view import exception_view_config
+        from pyramid.response import Response
+
+        @exception_view_config(ValueError, renderer='json')
+        def error_view(request):
+            return {'error': str(request.exception)}
+
+    All arguments passed to this function have the same meaning as
+    :meth:`pyramid.view.view_config`, and each predicate argument restricts
+    the set of circumstances under which this exception view will be invoked.
+
+    """
+    venusian = venusian
+
+    def __init__(self, *args, **settings):
+        if 'context' not in settings and len(args) > 0:
+            exception, args = args[0], args[1:]
+            settings['context'] = exception
+        if len(args) > 0:
+            raise ConfigurationError('unknown positional arguments')
+        self.__dict__.update(settings)
+
+    def __call__(self, wrapped):
+        settings = self.__dict__.copy()
+
+        def callback(context, name, ob):
+            config = context.config.with_package(info.module)
+            config.add_exception_view(view=ob, **settings)
+
+        info = self.venusian.attach(wrapped, callback, category='pyramid')
+
+        if info.scope == 'class':
+            # if the decorator was attached to a method in a class, or
+            # otherwise executed at class scope, we need to set an
+            # 'attr' in the settings if one isn't already in there
             if settings.get('attr') is None:
                 settings['attr'] = wrapped.__name__
 

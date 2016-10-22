@@ -38,9 +38,9 @@ Steps
 
         $ $VENV/bin/pcreate --list
         Available scaffolds:
-          alchemy:                 Pyramid SQLAlchemy project using url dispatch
-          starter:                 Pyramid starter project
-          zodb:                    Pyramid ZODB project using traversal
+          alchemy:  Pyramid project using SQLAlchemy, SQLite, URL dispatch, and Jinja2
+          starter:  Pyramid starter project using URL dispatch and Chameleon
+          zodb:     Pyramid project using ZODB, traversal, and Chameleon
 
 #. Tell ``pcreate`` to use the ``starter`` scaffold to make our project:
 

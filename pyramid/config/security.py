@@ -169,6 +169,7 @@ class SecurityConfiguratorMixin(object):
         token='csrf_token',
         header='X-CSRF-Token',
         safe_methods=('GET', 'HEAD', 'OPTIONS', 'TRACE'),
+        callback=None,
     ):
         """
         Set the default CSRF options used by subsequent view registrations.
@@ -192,8 +193,20 @@ class SecurityConfiguratorMixin(object):
         never be automatically checked for CSRF tokens.
         Default: ``('GET', 'HEAD', 'OPTIONS', TRACE')``.
 
+        If ``callback`` is set, it must be a callable accepting ``(request)``
+        and returning ``True`` if the request should be checked for a valid
+        CSRF token. This callback allows an application to support
+        alternate authentication methods that do not rely on cookies which
+        are not subject to CSRF attacks. For example, if a request is
+        authenticated using the ``Authorization`` header instead of a cookie,
+        this may return ``False`` for that request so that clients do not
+        need to send the ``X-CSRF-Token` header. The callback is only tested
+        for non-safe methods as defined by ``safe_methods``.
+
         """
-        options = DefaultCSRFOptions(require_csrf, token, header, safe_methods)
+        options = DefaultCSRFOptions(
+            require_csrf, token, header, safe_methods, callback,
+        )
         def register():
             self.registry.registerUtility(options, IDefaultCSRFOptions)
         intr = self.introspectable('default csrf view options',
@@ -204,13 +217,15 @@ class SecurityConfiguratorMixin(object):
         intr['token'] = token
         intr['header'] = header
         intr['safe_methods'] = as_sorted_tuple(safe_methods)
+        intr['callback'] = callback
         self.action(IDefaultCSRFOptions, register, order=PHASE1_CONFIG,
                     introspectables=(intr,))
 
 @implementer(IDefaultCSRFOptions)
 class DefaultCSRFOptions(object):
-    def __init__(self, require_csrf, token, header, safe_methods):
+    def __init__(self, require_csrf, token, header, safe_methods, callback):
         self.require_csrf = require_csrf
         self.token = token
         self.header = header
         self.safe_methods = frozenset(safe_methods)
+        self.callback = callback

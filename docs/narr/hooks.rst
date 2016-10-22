@@ -26,7 +26,7 @@ Not Found View by using the
    :linenos:
 
    def notfound(request):
-       return Response('Not Found, dude', status='404 Not Found')
+       return Response('Not Found', status='404 Not Found')
 
    def main(globals, **settings):
        config = Configurator()
@@ -45,7 +45,7 @@ and a :term:`scan`, you can replace the Not Found View by using the
 
    @notfound_view_config()
    def notfound(request):
-       return Response('Not Found, dude', status='404 Not Found')
+       return Response('Not Found', status='404 Not Found')
 
    def main(globals, **settings):
        config = Configurator()
@@ -67,11 +67,11 @@ Views can carry predicates limiting their applicability.  For example:
 
    @notfound_view_config(request_method='GET')
    def notfound_get(request):
-       return Response('Not Found during GET, dude', status='404 Not Found')
+       return Response('Not Found during GET', status='404 Not Found')
 
    @notfound_view_config(request_method='POST')
    def notfound_post(request):
-       return Response('Not Found during POST, dude', status='404 Not Found')
+       return Response('Not Found during POST', status='404 Not Found')
 
    def main(globals, **settings):
       config = Configurator()
@@ -1481,7 +1481,7 @@ method. For example:
         phash = text
 
         def __call__(self, context, request):
-            return getattr(context, 'content_type', None) == self.val
+            return request.content_type == self.val
 
 The constructor of a predicate factory takes two arguments: ``val`` and
 ``config``.  The ``val`` argument will be the argument passed to
@@ -1500,13 +1500,28 @@ with the name and the value serialized.  The result of ``phash`` is not seen in
 output anywhere, it just informs the uniqueness constraints for view
 configuration.
 
-The ``__call__`` method of a predicate factory must accept a resource
-(``context``) and a request, and must return ``True`` or ``False``.  It is the
-"meat" of the predicate.
+The ``__call__`` method differs depending on whether the predicate is used as
+a :term:`view predicate` or a :term:`route predicate`:
 
-You can use the same predicate factory as both a view predicate and as a route
-predicate, but you'll need to call ``add_view_predicate`` and
-``add_route_predicate`` separately with the same factory.
+- When used as a route predicate, the ``__call__`` signature is
+  ``(info, request)``. The ``info`` object is a dictionary containing two
+  keys: ``match`` and ``route``. ``info['match']`` is the matchdict containing
+  the patterns matched in the route pattern. ``info['route']`` is the
+  :class:`pyramid.interfaces.IRoute` object for the current route.
+
+- When used as a view predicate, the ``__call__`` signature is
+  ``(context, request)``. The ``context`` is the result of :term:`traversal`
+  performed using either the route's :term:`root factory` or the app's
+  :term:`default root factory`.
+
+In both cases the ``__call__`` method is expected to return ``True`` or
+``False``.
+
+It is possible to use the same predicate factory as both a view predicate and
+as a route predicate, but they'll need to handle the ``info`` or ``context``
+argument specially (many predicates do not need this argument) and you'll need
+to call ``add_view_predicate`` and ``add_route_predicate`` separately with
+the same factory.
 
 .. _subscriber_predicates:
 
@@ -1639,7 +1654,8 @@ the user-defined :term:`view callable`:
   Enforce the ``permission`` defined on the view. This element is a no-op if no
   permission is defined. Note there will always be a permission defined if a
   default permission was assigned via
-  :meth:`pyramid.config.Configurator.set_default_permission`.
+  :meth:`pyramid.config.Configurator.set_default_permission` unless the
+  view is an :term:`exception view`.
 
   This element will also output useful debugging information when
   ``pyramid.debug_authorization`` is enabled.
@@ -1649,7 +1665,8 @@ the user-defined :term:`view callable`:
   Used to check the CSRF token provided in the request. This element is a
   no-op if ``require_csrf`` view option is not ``True``. Note there will
   always be a ``require_csrf`` option if a default value was assigned via
-  :meth:`pyramid.config.Configurator.set_default_csrf_options`.
+  :meth:`pyramid.config.Configurator.set_default_csrf_options` unless
+  the view is an :term:`exception view`.
 
 ``owrapped_view``
 
@@ -1695,6 +1712,8 @@ around monitoring and security. In order to register a custom :term:`view
 deriver`, you should create a callable that conforms to the
 :class:`pyramid.interfaces.IViewDeriver` interface, and then register it with
 your application using :meth:`pyramid.config.Configurator.add_view_deriver`.
+The callable should accept the ``view`` to be wrapped and the ``info`` object
+which is an instance of :class:`pyramid.interfaces.IViewDeriverInfo`.
 For example, below is a callable that can provide timing information for the
 view pipeline:
 
@@ -1744,6 +1763,21 @@ But this view *will* have timing information added to the response headers:
 View derivers are unique in that they have access to most of the options
 passed to :meth:`pyramid.config.Configurator.add_view` in order to decide what
 to do, and they have a chance to affect every view in the application.
+
+.. _exception_view_derivers:
+
+Exception Views and View Derivers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A :term:`view deriver` has the opportunity to wrap any view, including
+an :term:`exception view`. In general this is fine, but certain view derivers
+may wish to avoid doing certain things when handling exceptions. For example,
+the ``csrf_view`` and ``secured_view`` built-in view derivers will not perform
+security checks on exception views unless explicitly told to do so.
+
+You can check for ``info.exception_only`` on the
+:class:`pyramid.interfaces.IViewDeriverInfo` object when wrapping the view
+to determine whether you are wrapping an exception view or a normal view.
 
 Ordering View Derivers
 ~~~~~~~~~~~~~~~~~~~~~~

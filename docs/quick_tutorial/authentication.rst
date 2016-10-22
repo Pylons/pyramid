@@ -1,7 +1,7 @@
 .. _qtut_authentication:
 
 ==============================
-20: Logins With Authentication
+20: Logins with authentication
 ==============================
 
 Login views that authenticate a username and password against a list of users.
@@ -34,6 +34,18 @@ Steps
    .. code-block:: bash
 
     $ cd ..; cp -r view_classes authentication; cd authentication
+
+#. Add ``bcrypt`` as a dependency in ``authentication/setup.py``:
+
+   .. literalinclude:: authentication/setup.py
+    :language: python
+    :emphasize-lines: 5-6
+    :linenos:
+
+#. We can now install our project in development mode:
+
+   .. code-block:: bash
+
     $ $VENV/bin/pip install -e .
 
 #. Put the security hash in the ``authentication/development.ini``
@@ -96,8 +108,8 @@ Unlike many web frameworks, Pyramid includes a built-in but optional security
 model for authentication and authorization. This security system is intended to
 be flexible and support many needs. In this security model, authentication (who
 are you) and authorization (what are you allowed to do) are not just pluggable,
-but de-coupled. To learn one step at a time, we provide a system that
-identifies users and lets them log out.
+but decoupled. To learn one step at a time, we provide a system that identifies
+users and lets them log out.
 
 In this example we chose to use the bundled :ref:`AuthTktAuthenticationPolicy
 <authentication_module>` policy. We enabled it in our configuration and
@@ -107,6 +119,20 @@ Our view class grew a login view. When you reached it via a ``GET`` request, it
 returned a login form. When reached via ``POST``, it processed the submitted
 username and password against the "groupfinder" callable that we registered in
 the configuration.
+
+The function ``hash_password`` uses a one-way hashing algorithm with a salt on
+the user's password via ``bcrypt``, instead of storing the password in plain
+text. This is considered to be a "best practice" for security.
+
+.. note::
+    There are alternative libraries to ``bcrypt`` if it is an issue on your
+    system. Just make sure that the library uses an algorithm approved for
+    storing passwords securely.
+
+The function ``check_password`` will compare the two hashed values of the
+submitted password and the user's password stored in the database. If the
+hashed values are equivalent, then the user is authenticated, else
+authentication fails.
 
 In our template, we fetched the ``logged_in`` value from the view class. We use
 this to calculate the logged-in user, if any. In the template we can then
@@ -125,4 +151,5 @@ Extra credit
    request? Use ``import pdb; pdb.set_trace()`` to answer this.
 
 .. seealso:: See also :ref:`security_chapter`,
-   :ref:`AuthTktAuthenticationPolicy <authentication_module>`.
+   :ref:`AuthTktAuthenticationPolicy <authentication_module>`, `bcrypt
+   <https://pypi.python.org/pypi/bcrypt>`_

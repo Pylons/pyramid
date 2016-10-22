@@ -821,7 +821,7 @@ Every release of Pyramid has 100% statement coverage via unit and integration
 tests, as measured by the ``coverage`` tool available on PyPI.  It also has
 greater than 95% decision/condition coverage as measured by the
 ``instrumental`` tool available on PyPI. It is automatically tested by Travis,
-and Jenkins on Python 2.7, Python 3.3, Python 3.4, Python 3.5, PyPy, and PyPy3
+and Jenkins on Python 2.7, Python 3.4, Python 3.5, and PyPy
 after each commit to its GitHub repository. Official Pyramid add-ons are held
 to a similar testing standard.  We still find bugs in Pyramid and its official
 add-ons, but we've noticed we find a lot more of them while working on other

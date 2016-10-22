@@ -34,8 +34,6 @@ from pyramid.traversal import (
     ResourceTreeTraverser,
     )
 
-from pyramid.tweens import excview_tween_factory
-
 @implementer(IRouter)
 class Router(object):
 
@@ -51,11 +49,10 @@ class Router(object):
         self.routes_mapper = q(IRoutesMapper)
         self.request_factory = q(IRequestFactory, default=Request)
         self.request_extensions = q(IRequestExtensions)
-        tweens = q(ITweens)
-        if tweens is None:
-            tweens = excview_tween_factory
         self.orig_handle_request = self.handle_request
-        self.handle_request = tweens(self.handle_request, registry)
+        tweens = q(ITweens)
+        if tweens is not None:
+            self.handle_request = tweens(self.handle_request, registry)
         self.root_policy = self.root_factory # b/w compat
         self.registry = registry
         settings = registry.settings

@@ -18,16 +18,15 @@ import sys
 from setuptools import setup, find_packages
 
 py_version = sys.version_info[:2]
-is_pypy = '__pypy__' in sys.builtin_module_names
 
 PY3 = py_version[0] == 3
 
 if PY3:
-    if py_version < (3, 3) and not is_pypy: # PyPy3 masquerades as Python 3.2...
-        raise RuntimeError('On Python 3, Pyramid requires Python 3.3 or better')
+    if py_version < (3, 4):
+        raise RuntimeError('On Python 3, Pyramid requires Python 3.4 or better')
 else:
-    if py_version < (2, 6):
-        raise RuntimeError('On Python 2, Pyramid requires Python 2.6 or better')
+    if py_version < (2, 7):
+        raise RuntimeError('On Python 2, Pyramid requires Python 2.7 or better')
 
 here = os.path.abspath(os.path.dirname(__file__))
 try:
@@ -81,7 +80,6 @@ setup(name='pyramid',
           "Programming Language :: Python",
           "Programming Language :: Python :: 2.7",
           "Programming Language :: Python :: 3",
-          "Programming Language :: Python :: 3.3",
           "Programming Language :: Python :: 3.4",
           "Programming Language :: Python :: 3.5",
           "Programming Language :: Python :: Implementation :: CPython",
