@@ -13,10 +13,19 @@ import os
 import re
 import sys
 import textwrap
+import threading
+import time
+import webbrowser
 
 import hupper
-from paste.deploy import loadserver
-from paste.deploy import loadapp
+from paste.deploy import (
+    loadapp,
+    loadserver,
+)
+from paste.deploy.loadwsgi import (
+    SERVER,
+    loadcontext,
+)
 
 from pyramid.compat import PY2
 
@@ -109,19 +118,8 @@ class PServeCommand(object):
             return 2
         app_spec = self.args[0]
 
-        if self.options.reload and not hupper.is_active():
-            if self.options.verbose > 1:
-                self.out('Running reloading file monitor')
-            hupper.start_reloader(
-                'pyramid.scripts.pserve.main',
-                reload_interval=int(self.options.reload_interval),
-                verbose=self.options.verbose,
-            )
-            return 0
-
-        app_name = self.options.app_name
-
         vars = self.get_options()
+        app_name = self.options.app_name
 
         if not self._scheme_re.search(app_spec):
             app_spec = 'config:' + app_spec
@@ -133,6 +131,34 @@ class PServeCommand(object):
         else:
             server_spec = app_spec
         base = os.getcwd()
+
+        # do not open the browser on each reload so check hupper first
+        if self.options.browser and not hupper.is_active():
+            def open_browser():
+                context = loadcontext(
+                    SERVER, app_spec, name=server_name, relative_to=base,
+                    global_conf=vars)
+                url = 'http://127.0.0.1:{port}/'.format(**context.config())
+                time.sleep(1)
+                webbrowser.open(url)
+            t = threading.Thread(target=open_browser)
+            t.setDaemon(True)
+            t.start()
+
+        if self.options.reload and not hupper.is_active():
+            if self.options.verbose > 1:
+                self.out('Running reloading file monitor')
+            hupper.start_reloader(
+                'pyramid.scripts.pserve.main',
+                reload_interval=int(self.options.reload_interval),
+                verbose=self.options.verbose,
+            )
+            return 0
+
+        if hupper.is_active():
+            reloader = hupper.get_reloader()
+            if app_spec.startswith('config:'):
+                reloader.watch_files([app_spec[len('config:'):]])
 
         log_fn = app_spec
         if log_fn.startswith('config:'):
@@ -146,8 +172,8 @@ class PServeCommand(object):
         server = self.loadserver(server_spec, name=server_name,
                                  relative_to=base, global_conf=vars)
 
-        app = self.loadapp(app_spec, name=app_name, relative_to=base,
-                global_conf=vars)
+        app = self.loadapp(
+            app_spec, name=app_name, relative_to=base, global_conf=vars)
 
         if self.options.verbose > 0:
             if hasattr(os, 'getpid'):
