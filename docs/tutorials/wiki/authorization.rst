@@ -59,7 +59,9 @@ For example, ``groupfinder('editor', request )`` returns ``['group:editor']``,
 ``groupfinder('viewer', request)`` returns ``[]``, and ``groupfinder('admin',
 request)`` returns ``None``.  We will use ``groupfinder()`` as an
 :term:`authentication policy` "callback" that will provide the
-:term:`principal` or principals for a user.
+:term:`principal` or principals for a user. One-way hash function
+``hash_password_with_salt`` is used to avoid user's password stored in plain
+text.
 
 In a production system, user and group data will most often come from a
 database, but here we use "dummy" data to represent user and groups sources.
