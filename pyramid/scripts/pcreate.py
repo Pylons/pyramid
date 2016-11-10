@@ -9,6 +9,8 @@ import pkg_resources
 import re
 import sys
 from pyramid.compat import input_
+from zope.deprecation import deprecated
+
 
 _bad_chars_re = re.compile('[^a-zA-Z0-9_]')
 
@@ -18,7 +20,6 @@ def main(argv=sys.argv, quiet=False):
         return command.run()
     except KeyboardInterrupt: # pragma: no cover
         return 1
-
 
 class PCreateCommand(object):
     verbosity = 1 # required
