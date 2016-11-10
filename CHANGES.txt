@@ -101,6 +101,7 @@ Bug Fixes
   to an encoding guessed using Python's ``mimetypes`` module.
   This was causing clients to decode the content of gzipped files
   when downloading them.
+  See https://github.com/Pylons/pyramid/pull/2810
 
 Deprecations
 ------------
