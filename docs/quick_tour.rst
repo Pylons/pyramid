@@ -504,7 +504,7 @@ Pyramid's ``pcreate`` command can list the available scaffolds:
 
 .. code-block:: bash
 
-    $ pcreate --list
+    $ $VENV/bin/pcreate --list
     Available scaffolds:
       alchemy:                 Pyramid project using SQLAlchemy, SQLite, URL dispatch, and Jinja2
       pyramid_jinja2_starter:  Pyramid Jinja2 starter project
@@ -517,7 +517,7 @@ that scaffold to make our project:
 
 .. code-block:: bash
 
-    $ pcreate --scaffold pyramid_jinja2_starter hello_world
+    $ $VENV/bin/pcreate --scaffold pyramid_jinja2_starter hello_world
 
 We next use the normal Python command to set up our package for development:
 
