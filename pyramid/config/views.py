@@ -11,6 +11,11 @@ from zope.interface import (
     )
 from zope.interface.interfaces import IInterface
 
+from pyramid.deprecation import (
+    RemoveInPyramid19Warning,
+    RemoveInPyramid110Warning,
+)
+
 from pyramid.interfaces import (
     IExceptionViewClassifier,
     IException,
@@ -724,7 +729,7 @@ class ViewsConfiguratorMixin(object):
                  'See "Adding A Third Party View, Route, or Subscriber '
                  'Predicate" in the "Hooks" chapter of the documentation '
                  'for more information.'),
-                DeprecationWarning,
+                RemoveInPyramid19Warning,
                 stacklevel=4,
                 )
 
@@ -735,7 +740,7 @@ class ViewsConfiguratorMixin(object):
                  'instead or see "Checking CSRF Tokens Automatically" in the '
                  '"Sessions" chapter of the documentation for more '
                  'information.'),
-                DeprecationWarning,
+                RemoveInPyramid110Warning,
                 stacklevel=4,
                 )
 

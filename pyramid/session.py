@@ -5,7 +5,6 @@ import hmac
 import os
 import time
 
-from zope.deprecation import deprecated
 from zope.interface import implementer
 
 from webob.cookies import SignedSerializer
@@ -518,117 +517,6 @@ def BaseCookieSessionFactory(
             return True
 
     return CookieSession
-
-
-def UnencryptedCookieSessionFactoryConfig(
-    secret,
-    timeout=1200,
-    cookie_name='session',
-    cookie_max_age=None,
-    cookie_path='/',
-    cookie_domain=None,
-    cookie_secure=False,
-    cookie_httponly=False,
-    cookie_on_exception=True,
-    signed_serialize=signed_serialize,
-    signed_deserialize=signed_deserialize,
-    ):
-    """
-    .. deprecated:: 1.5
-        Use :func:`pyramid.session.SignedCookieSessionFactory` instead.
-        Caveat: Cookies generated using ``SignedCookieSessionFactory`` are not
-        compatible with cookies generated using
-        ``UnencryptedCookieSessionFactory``, so existing user session data
-        will be destroyed if you switch to it.
-    
-    Configure a :term:`session factory` which will provide unencrypted
-    (but signed) cookie-based sessions.  The return value of this
-    function is a :term:`session factory`, which may be provided as
-    the ``session_factory`` argument of a
-    :class:`pyramid.config.Configurator` constructor, or used
-    as the ``session_factory`` argument of the
-    :meth:`pyramid.config.Configurator.set_session_factory`
-    method.
-
-    The session factory returned by this function will create sessions
-    which are limited to storing fewer than 4000 bytes of data (as the
-    payload must fit into a single cookie).
-
-    Parameters:
-
-    ``secret``
-      A string which is used to sign the cookie.
-
-    ``timeout``
-      A number of seconds of inactivity before a session times out.
-
-    ``cookie_name``
-      The name of the cookie used for sessioning.
-
-    ``cookie_max_age``
-      The maximum age of the cookie used for sessioning (in seconds).
-      Default: ``None`` (browser scope).
-
-    ``cookie_path``
-      The path used for the session cookie.
-
-    ``cookie_domain``
-      The domain used for the session cookie.  Default: ``None`` (no domain).
-
-    ``cookie_secure``
-      The 'secure' flag of the session cookie.
-
-    ``cookie_httponly``
-      The 'httpOnly' flag of the session cookie.
-
-    ``cookie_on_exception``
-      If ``True``, set a session cookie even if an exception occurs
-      while rendering a view.
-
-    ``signed_serialize``
-      A callable which takes more or less arbitrary Python data structure and
-      a secret and returns a signed serialization in bytes.
-      Default: ``signed_serialize`` (using pickle).
-
-    ``signed_deserialize``
-      A callable which takes a signed and serialized data structure in bytes
-      and a secret and returns the original data structure if the signature
-      is valid. Default: ``signed_deserialize`` (using pickle).
-    """
-
-    class SerializerWrapper(object):
-        def __init__(self, secret):
-            self.secret = secret
-            
-        def loads(self, bstruct):
-            return signed_deserialize(bstruct, secret)
-
-        def dumps(self, appstruct):
-            return signed_serialize(appstruct, secret)
-
-    serializer = SerializerWrapper(secret)
-
-    return BaseCookieSessionFactory(
-        serializer,
-        cookie_name=cookie_name,
-        max_age=cookie_max_age,
-        path=cookie_path,
-        domain=cookie_domain,
-        secure=cookie_secure,
-        httponly=cookie_httponly,
-        timeout=timeout,
-        reissue_time=0, # to keep session.accessed == session.renewed
-        set_on_exception=cookie_on_exception,
-    )
-
-deprecated(
-    'UnencryptedCookieSessionFactoryConfig',
-    'The UnencryptedCookieSessionFactoryConfig callable is deprecated as of '
-    'Pyramid 1.5.  Use ``pyramid.session.SignedCookieSessionFactory`` instead.'
-    ' Caveat: Cookies generated using SignedCookieSessionFactory are not '
-    'compatible with cookies generated using UnencryptedCookieSessionFactory, '
-    'so existing user session data will be destroyed if you switch to it.'
-    )
 
 def SignedCookieSessionFactory(
     secret,

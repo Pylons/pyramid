@@ -10,6 +10,10 @@ from translationstring import (
 
 from pyramid.compat import PY2
 from pyramid.decorator import reify
+from pyramid.deprecation import (
+    RemoveInPyramid19Warning,
+    deprecated,
+)
 
 from pyramid.interfaces import (
     ILocalizer,
@@ -166,6 +170,13 @@ def get_locale_name(request):
     """
     return request.locale_name
 
+deprecated(
+    'get_locale_name',
+    'As of Pyramid 1.5 the "pyramid.i18n.get_locale_name" function is '
+    'scheduled to be removed. Use "request.locale_name" instead.',
+    RemoveInPyramid19Warning,
+)
+
 def make_localizer(current_locale_name, translation_directories):
     """ Create a :class:`pyramid.i18n.Localizer` object
     corresponding to the provided locale name from the 
@@ -217,6 +228,13 @@ def get_localizer(request):
         corresponding to the current request's locale name.
     """
     return request.localizer
+
+deprecated(
+    'get_localizer',
+    'As of Pyramid 1.5 the "pyramid.i18n.get_localizer" method is scheduled '
+    'to be removed. Use "request.locale_name" instead.',
+    RemoveInPyramid19Warning,
+)
 
 class Translations(gettext.GNUTranslations, object):
     """An extended translation catalog class (ripped off from Babel) """

@@ -1,11 +1,14 @@
 import warnings
 
-from zope.deprecation import deprecated
-
 from zope.interface import implementer
 from zope.interface.interfaces import IInterface
 
 from repoze.lru import lru_cache
+
+from pyramid.deprecation import (
+    RemoveInPyramid19Warning,
+    deprecated,
+)
 
 from pyramid.interfaces import (
     IResourceURL,
@@ -811,7 +814,8 @@ deprecated(
     'scheduled to be removed.   Use the '
     '"pyramid.config.Configurator.add_resource_url_adapter" method to register '
     'a class that implements "pyramid.interfaces.IResourceURL" instead. '
-    'See the "What\'s new In Pyramid 1.3" document for a further description.'
+    'See the "What\'s new In Pyramid 1.3" document for a further description.',
+    RemoveInPyramid19Warning,
     )
 
 @lru_cache(1000)

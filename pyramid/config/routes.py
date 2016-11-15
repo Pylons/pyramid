@@ -1,5 +1,7 @@
 import warnings
 
+from pyramid.deprecation import RemoveInPyramid19Warning
+
 from pyramid.compat import urlparse
 from pyramid.interfaces import (
     IRequest,
@@ -285,7 +287,7 @@ class RoutesConfiguratorMixin(object):
                  'instead. See "Adding A Third Party View, Route, or '
                  'Subscriber Predicate" in the "Hooks" chapter of the '
                  'documentation for more information.'),
-                DeprecationWarning,
+                RemoveInPyramid19Warning,
                 stacklevel=3
                 )
         # these are route predicates; if they do not match, the next route
