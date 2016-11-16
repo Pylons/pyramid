@@ -26,6 +26,15 @@ Backward Incompatibilities
   ``pyramid.static.static_view``. This argument was shipped accidentally
   in Pyramid 1.6. See https://github.com/Pylons/pyramid/pull/2681
 
+- Change static view to avoid setting the ``Content-Encoding`` response header
+  to an encoding guessed using Python's ``mimetypes`` module. This was causing
+  clients to decode the content of gzipped files when downloading them. The
+  client would end up with a ``foo.txt.gz`` file on disk that was already
+  decoded, thus should really be ``foo.txt``. Also, the ``Content-Encoding``
+  should only have been used if the client itself broadcast support for the
+  encoding via ``Accept-Encoding`` request headers.
+  See https://github.com/Pylons/pyramid/pull/2810
+
 Features
 --------
 
@@ -100,12 +109,6 @@ Bug Fixes
   and ensures the discriminators are not computed until dependent actions
   from previous orders have executed.
   See https://github.com/Pylons/pyramid/pull/2757
-
-- Fix static view to avoid setting the ``Content-Encoding`` response header
-  to an encoding guessed using Python's ``mimetypes`` module.
-  This was causing clients to decode the content of gzipped files
-  when downloading them.
-  See https://github.com/Pylons/pyramid/pull/2810
 
 Deprecations
 ------------
