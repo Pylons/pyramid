@@ -678,10 +678,10 @@ egregious, as Pyramid has had a deep commitment to full test coverage since
 before its release.
 
 Our ``pyramid_jinja2_starter`` scaffold generated a ``tests.py`` module with
-one unit test in it. To run it, let's install the handy ``pytest`` test runner
-by editing ``setup.py``. While we're at it, we'll throw in the ``pytest-cov``
-tool which yells at us for code that isn't tested. Insert and edit the
-following lines as shown:
+one unit test in it. It also setup ``setup.py`` with test requirements:
+``py.test`` as the test runner, ``WebTest`` for running view tests, and the
+``pytest-cov`` tool which yells at us for code that isn't tested. The
+highlighted lines show this:
 
 .. code-block:: python
     :linenos:
@@ -711,7 +711,7 @@ following lines as shown:
           'testing': tests_require,
         },
 
-We changed ``setup.py`` which means we need to rerun ``$VENV/bin/pip install -e
+To install the test requirements, run ``$VENV/bin/pip install -e
 ".[testing]"``. We can now run all our tests:
 
 .. code-block:: bash
