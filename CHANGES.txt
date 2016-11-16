@@ -16,11 +16,15 @@ Backward Incompatibilities
 
    See https://github.com/Pylons/pyramid/pull/2615
 
-- ``pcreate`` is now interactive by default. You will be prompted if it
+- ``pcreate`` is now interactive by default. You will be prompted if
   a file already exists with different content. Previously if there were
   similar files it would silently skip them unless you specified
   ``--interactive`` or ``--overwrite``.
   See https://github.com/Pylons/pyramid/pull/2775
+
+- Removed undocumented argument ``cachebust_match`` from
+  ``pyramid.static.static_view``. This argument was shipped accidentally
+  in Pyramid 1.6. See https://github.com/Pylons/pyramid/pull/2681
 
 Features
 --------
