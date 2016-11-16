@@ -1,13 +1,11 @@
+from zope.deprecation import deprecated
+
 from zope.interface import (
     Attribute,
     Interface,
     )
 
 from pyramid.compat import PY2
-from pyramid.deprecation import (
-    RemoveInPyramid19Warning,
-    deprecated,
-)
 
 # public API interfaces
 
@@ -426,8 +424,7 @@ deprecated(
     'ITemplateRenderer',
     'As of Pyramid 1.5 the, "pyramid.interfaces.ITemplateRenderer" interface '
     'is scheduled to be removed. It was used by the Mako and Chameleon '
-    'renderers which have been split into their own packages.',
-    RemoveInPyramid19Warning,
+    'renderers which have been split into their own packages.'
     )
 
 class IViewMapper(Interface):
@@ -851,8 +848,7 @@ deprecated(
     'scheduled to be removed.   Use the '
     '"pyramid.config.Configurator.add_resource_url_adapter" method to register '
     'a class that implements "pyramid.interfaces.IResourceURL" instead. '
-    'See the "What\'s new In Pyramid 1.3" document for more details.',
-    RemoveInPyramid19Warning,
+    'See the "What\'s new In Pyramid 1.3" document for more details.'
     )
 
 class IPEP302Loader(Interface):

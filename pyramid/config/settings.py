@@ -1,4 +1,5 @@
 import os
+import warnings
 
 from zope.interface import implementer
 
@@ -151,4 +152,20 @@ class Settings(dict):
         }
 
         self.update(update)
+
+    def __getattr__(self, name):
+        try:
+            val = self[name]
+            # only deprecate on success; a probing getattr/hasattr should not
+            # print this warning
+            warnings.warn(
+                'Obtaining settings via attributes of the settings dictionary '
+                'is deprecated as of Pyramid 1.2; use settings["foo"] instead '
+                'of settings.foo',
+                DeprecationWarning,
+                2
+                )
+            return val
+        except KeyError:
+            raise AttributeError(name)
 

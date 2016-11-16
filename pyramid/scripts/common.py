@@ -1,11 +1,6 @@
 import os
-import logging
-from logging.config import fileConfig
-import sys
-import warnings
-
 from pyramid.compat import configparser
-from pyramid.deprecation import RemoveInNextVersionWarning
+from logging.config import fileConfig
 
 def parse_vars(args):
     """
@@ -34,11 +29,6 @@ def setup_logging(config_uri, global_conf=None,
     and ``here`` variables, similar to PasteDeploy config loading.
     Extra defaults can optionally be specified as a dict in ``global_conf``.
     """
-    logging.captureWarnings(True)
-
-    if not sys.warnoptions:
-        warnings.simplefilter('default', RemoveInNextVersionWarning)
-
     path = config_uri.split('#', 1)[0]
     parser = configparser.ConfigParser()
     parser.read([path])

@@ -1,9 +1,5 @@
+from zope.deprecation import deprecated
 from zope.interface import implementer
-
-from pyramid.deprecation import (
-    RemoveInPyramid19Warning,
-    deprecated,
-)
 
 from pyramid.interfaces import (
     IDefaultRootFactory,
@@ -233,8 +229,7 @@ class FactoriesConfiguratorMixin(object):
     deprecated(
         set_request_property,
         'set_request_propery() is deprecated as of Pyramid 1.5; use '
-        'add_request_method() with the property=True argument instead',
-        RemoveInPyramid19Warning)
+        'add_request_method() with the property=True argument instead')
 
 
 @implementer(IRequestExtensions)
