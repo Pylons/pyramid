@@ -32,7 +32,12 @@ from pyramid.httpexceptions import (
     )
 
 from pyramid.path import caller_package
-from pyramid.response import FileResponse
+
+from pyramid.response import (
+    _guess_type,
+    FileResponse,
+)
+
 from pyramid.traversal import traversal_path_info
 
 slash = text_('/')
@@ -134,7 +139,10 @@ class static_view(object):
             if not exists(filepath):
                 raise HTTPNotFound(request.url)
 
-        return FileResponse(filepath, request, self.cache_max_age)
+        content_type, content_encoding = _guess_type(filepath)
+        return FileResponse(
+            filepath, request, self.cache_max_age,
+            content_type, content_encoding=None)
 
     def add_slash_redirect(self, request):
         url = request.path_url + '/'
