@@ -678,7 +678,7 @@ egregious, as Pyramid has had a deep commitment to full test coverage since
 before its release.
 
 Our ``pyramid_jinja2_starter`` scaffold generated a ``tests.py`` module with
-one unit test in it. It also setup ``setup.py`` with test requirements:
+one unit test in it. It also configured ``setup.py`` with test requirements:
 ``py.test`` as the test runner, ``WebTest`` for running view tests, and the
 ``pytest-cov`` tool which yells at us for code that isn't tested. The
 highlighted lines show this:
