@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import unittest
-import warnings
 
 from pyramid.testing import cleanUp
 
@@ -11,11 +10,6 @@ from pyramid.compat import (
     url_quote,
     PY2,
     )
-
-with warnings.catch_warnings(record=True) as w:
-    warnings.filterwarnings('always')
-    from pyramid.interfaces import IContextURL
-    assert(len(w) == 1)
 
 class TraversalPathTests(unittest.TestCase):
     def _callFUT(self, path):
@@ -871,182 +865,12 @@ class ResourceURLTests(unittest.TestCase):
         from pyramid.traversal import ResourceURL
         return ResourceURL
 
-    def _registerTraverser(self, traverser):
-        from pyramid.threadlocal import get_current_registry
-        reg = get_current_registry()
-        from pyramid.interfaces import ITraverser
-        from zope.interface import Interface
-        reg.registerAdapter(traverser, (Interface,), ITraverser)
-
-    def test_class_conforms_to_IContextURL(self):
-        # bw compat
-        from zope.interface.verify import verifyClass
-        verifyClass(IContextURL, self._getTargetClass())
-
-    def test_instance_conforms_to_IContextURL(self):
-        from zope.interface.verify import verifyObject
-        context = DummyContext()
-        request = DummyRequest()
-        verifyObject(IContextURL, self._makeOne(context, request))
-
     def test_instance_conforms_to_IResourceURL(self):
         from pyramid.interfaces import IResourceURL
         from zope.interface.verify import verifyObject
         context = DummyContext()
         request = DummyRequest()
         verifyObject(IResourceURL, self._makeOne(context, request))
-        
-    def test_call_withlineage(self):
-        baz = DummyContext()
-        bar = DummyContext(baz)
-        foo = DummyContext(bar)
-        root = DummyContext(foo)
-        root.__parent__ = None
-        root.__name__ = None
-        foo.__parent__ = root
-        foo.__name__ = 'foo '
-        bar.__parent__ = foo
-        bar.__name__ = 'bar'
-        baz.__parent__ = bar
-        baz.__name__ = 'baz'
-        request = DummyRequest()
-        context_url = self._makeOne(baz, request)
-        result = context_url()
-        self.assertEqual(result, 'http://example.com:5432/foo%20/bar/baz/')
-
-    def test_call_nolineage(self):
-        context = DummyContext()
-        context.__name__ = ''
-        context.__parent__ = None
-        request = DummyRequest()
-        context_url = self._makeOne(context, request)
-        result = context_url()
-        self.assertEqual(result, 'http://example.com:5432/')
-
-    def test_call_unicode_mixed_with_bytes_in_resource_names(self):
-        root = DummyContext()
-        root.__parent__ = None
-        root.__name__ = None
-        one = DummyContext()
-        one.__parent__ = root
-        one.__name__ = text_(b'La Pe\xc3\xb1a', 'utf-8')
-        two = DummyContext()
-        two.__parent__ = one
-        two.__name__ = b'La Pe\xc3\xb1a'
-        request = DummyRequest()
-        context_url = self._makeOne(two, request)
-        result = context_url()
-        self.assertEqual(
-            result,
-            'http://example.com:5432/La%20Pe%C3%B1a/La%20Pe%C3%B1a/')
-
-    def test_call_with_virtual_root_path(self):
-        from pyramid.interfaces import VH_ROOT_KEY
-        root = DummyContext()
-        root.__parent__ = None
-        root.__name__ = None
-        one = DummyContext()
-        one.__parent__ = root
-        one.__name__ = 'one'
-        two = DummyContext()
-        two.__parent__ = one
-        two.__name__ = 'two'
-        request = DummyRequest({VH_ROOT_KEY:'/one'})
-        context_url = self._makeOne(two, request)
-        result = context_url()
-        self.assertEqual(result, 'http://example.com:5432/two/')
-
-        request = DummyRequest({VH_ROOT_KEY:'/one/two'})
-        context_url = self._makeOne(two, request)
-        result = context_url()
-        self.assertEqual(result, 'http://example.com:5432/')
-
-    def test_call_with_virtual_root_path_physical_not_startwith_vroot(self):
-        from pyramid.interfaces import VH_ROOT_KEY
-        root = DummyContext()
-        root.__parent__ = None
-        root.__name__ = None
-        one = DummyContext()
-        one.__parent__ = root
-        one.__name__ = 'one'
-        two = DummyContext()
-        two.__parent__ = one
-        two.__name__ = 'two'
-        request = DummyRequest({VH_ROOT_KEY:'/wrong'})
-        context_url = self._makeOne(two, request)
-        result = context_url()
-        self.assertEqual(result, 'http://example.com:5432/one/two/')
-
-    def test_call_empty_names_not_ignored(self):
-        bar = DummyContext()
-        empty = DummyContext(bar)
-        root = DummyContext(empty)
-        root.__parent__ = None
-        root.__name__ = None
-        empty.__parent__ = root
-        empty.__name__ = ''
-        bar.__parent__ = empty
-        bar.__name__ = 'bar'
-        request = DummyRequest()
-        context_url = self._makeOne(bar, request)
-        result = context_url()
-        self.assertEqual(result, 'http://example.com:5432//bar/')
-
-    def test_call_local_url_returns_None(self):
-        resource = DummyContext()
-        def resource_url(request, info):
-            self.assertEqual(info['virtual_path'], '/')
-            self.assertEqual(info['physical_path'], '/')
-            return None
-        resource.__resource_url__ = resource_url
-        request = DummyRequest()
-        context_url = self._makeOne(resource, request)
-        result = context_url()
-        self.assertEqual(result, 'http://example.com:5432/')
-        
-    def test_call_local_url_returns_url(self):
-        resource = DummyContext()
-        def resource_url(request, info):
-            self.assertEqual(info['virtual_path'], '/')
-            self.assertEqual(info['physical_path'], '/')
-            return 'abc'
-        resource.__resource_url__ = resource_url
-        request = DummyRequest()
-        context_url = self._makeOne(resource, request)
-        result = context_url()
-        self.assertEqual(result, 'abc')
-
-    def test_virtual_root_no_virtual_root_path(self):
-        root = DummyContext()
-        root.__name__ = None
-        root.__parent__ = None
-        one = DummyContext()
-        one.__name__ = 'one'
-        one.__parent__ = root
-        request = DummyRequest()
-        context_url = self._makeOne(one, request)
-        self.assertEqual(context_url.virtual_root(), root)
-
-    def test_virtual_root_no_virtual_root_path_with_root_on_request(self):
-        context = DummyContext()
-        context.__parent__ = None
-        request = DummyRequest()
-        request.root = DummyContext()
-        context_url = self._makeOne(context, request)
-        self.assertEqual(context_url.virtual_root(), request.root)
-
-    def test_virtual_root_with_virtual_root_path(self):
-        from pyramid.interfaces import VH_ROOT_KEY
-        context = DummyContext()
-        context.__parent__ = None
-        traversed_to = DummyContext()
-        environ = {VH_ROOT_KEY:'/one'}
-        request = DummyRequest(environ)
-        traverser = make_traverser({'context':traversed_to, 'view_name':''})
-        self._registerTraverser(traverser)
-        context_url = self._makeOne(context, request)
-        self.assertEqual(context_url.virtual_root(), traversed_to)
-        self.assertEqual(context.request.environ['PATH_INFO'], '/one')
 
     def test_IResourceURL_attributes_with_vroot(self):
         from pyramid.interfaces import VH_ROOT_KEY
@@ -1115,14 +939,47 @@ class TestVirtualRoot(unittest.TestCase):
         from pyramid.traversal import virtual_root
         return virtual_root(resource, request)
 
-    def test_registered(self):
+    def _registerTraverser(self, traverser):
+        from pyramid.threadlocal import get_current_registry
+        reg = get_current_registry()
+        from pyramid.interfaces import ITraverser
         from zope.interface import Interface
-        request = _makeRequest()
-        request.registry.registerAdapter(DummyContextURL, (Interface,Interface),
-                                         IContextURL)
+        reg.registerAdapter(traverser, (Interface,), ITraverser)
+
+    def test_virtual_root_no_virtual_root_path(self):
+        root = DummyContext()
+        root.__name__ = None
+        root.__parent__ = None
+        one = DummyContext()
+        one.__name__ = 'one'
+        one.__parent__ = root
+        request = DummyRequest()
+        result = self._callFUT(one, request)
+        self.assertEqual(result, root)
+
+    def test_virtual_root_no_virtual_root_path_with_root_on_request(self):
         context = DummyContext()
+        context.__parent__ = None
+        request = DummyRequest()
+        request.root = DummyContext()
         result = self._callFUT(context, request)
-        self.assertEqual(result, '123')
+        self.assertEqual(result, request.root)
+
+    def test_virtual_root_with_virtual_root_path(self):
+        from pyramid.interfaces import VH_ROOT_KEY
+        root = DummyContext()
+        root.__parent__ = None
+        context = DummyContext()
+        context.__name__ = 'one'
+        context.__parent__ = root
+        traversed_to = DummyContext()
+        environ = {VH_ROOT_KEY:'/one'}
+        request = DummyRequest(environ)
+        traverser = make_traverser({'context':traversed_to, 'view_name':''})
+        self._registerTraverser(traverser)
+        result = self._callFUT(context, request)
+        self.assertEqual(result, traversed_to)
+        self.assertEqual(root.request.environ['PATH_INFO'], '/one')
 
     def test_default(self):
         context = DummyContext()
@@ -1356,13 +1213,6 @@ class DummyRequest:
 
     path_info = property(_get_path_info, _set_path_info)
         
-
-class DummyContextURL:
-    def __init__(self, context, request):
-        pass
-
-    def virtual_root(self):
-        return '123'
 
 def _makeRequest(environ=None):
     from pyramid.registry import Registry
