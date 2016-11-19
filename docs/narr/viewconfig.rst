@@ -252,7 +252,7 @@ Non-Predicate Arguments
     def myview(request):
       ...
 
-  Is similar to doing::
+  Is similar to decorating the view callable directly::
 
     @view_config(...)
     @decorator2
@@ -260,8 +260,10 @@ Non-Predicate Arguments
     def myview(request):
       ...
 
-  All view callables in the decorator chain must return a response object
-  implementing :class:`pyramid.interfaces.IResponse` or raise an exception:
+  An important distinction is that each decorator will receive a response
+  object implementing :class:`pyramid.interfaces.IResponse` instead of the
+  raw value returned from the view callable. All decorators in the chain must
+  return a response object or raise an exception:
 
   .. code-block:: python
 
