@@ -68,26 +68,6 @@ class TestSettings(unittest.TestCase):
         klass = self._getTargetClass()
         return klass(d, _environ_=environ)
 
-    def test_getattr_success(self):
-        import warnings
-        with warnings.catch_warnings(record=True) as w:
-            warnings.filterwarnings('always')
-            settings = self._makeOne({'reload_templates':False})
-            self.assertEqual(settings.reload_templates, False)
-            self.assertEqual(len(w), 1)
-
-    def test_getattr_fail(self):
-        import warnings
-        with warnings.catch_warnings(record=True) as w:
-            warnings.filterwarnings('always')
-            settings = self._makeOne({})
-            self.assertRaises(AttributeError, settings.__getattr__, 'wontexist')
-            self.assertEqual(len(w), 0)
-
-    def test_getattr_raises_attribute_error(self):
-        settings = self._makeOne()
-        self.assertRaises(AttributeError, settings.__getattr__, 'mykey')
-
     def test_noargs(self):
         settings = self._makeOne()
         self.assertEqual(settings['debug_authorization'], False)
