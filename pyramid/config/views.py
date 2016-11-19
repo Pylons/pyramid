@@ -444,9 +444,11 @@ class ViewsConfiguratorMixin(object):
           think about preserving function attributes such as ``__name__`` and
           ``__module__`` within decorator logic).
 
-          All view callables in the decorator chain must return a response
-          object implementing :class:`pyramid.interfaces.IResponse` or raise
-          an exception:
+          An important distinction is that each decorator will receive a
+          response object implementing :class:`pyramid.interfaces.IResponse`
+          instead of the raw value returned from the view callable. All
+          decorators in the chain must return a response object or raise an
+          exception:
 
           .. code-block:: python
 
