@@ -750,7 +750,9 @@ The API that must be implemented by a class that provides
           """ Accept the resource and request and set self.physical_path and
           self.virtual_path """
           self.virtual_path =  some_function_of(resource, request)
+          self.virtual_path_tuple =  some_function_of(resource, request)
           self.physical_path =  some_other_function_of(resource, request)
+          self.physical_path_tuple =  some_function_of(resource, request)
 
 The default context URL generator is available for perusal as the class
 :class:`pyramid.traversal.ResourceURL` in the `traversal module
