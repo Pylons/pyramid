@@ -116,20 +116,19 @@ callable:
 
 .. note::
 
-   Both :meth:`pyramid.config.Configurator.add_notfound_view` and
-   :class:`pyramid.view.notfound_view_config` are new as of Pyramid 1.3.
-   Older Pyramid documentation instructed users to use ``add_view`` instead,
-   with a ``context`` of ``HTTPNotFound``.  This still works; the convenience
-   method and decorator are just wrappers around this functionality.
-
-.. warning::
-
    When a Not Found View callable accepts an argument list as described in
    :ref:`request_and_context_view_definitions`, the ``context`` passed as the
    first argument to the view callable will be the
    :exc:`~pyramid.httpexceptions.HTTPNotFound` exception instance.  If
    available, the resource context will still be available as
    ``request.context``.
+
+.. warning::
+
+   The :term:`Not Found View` callables are only invoked when a
+   :exc:`~pyramid.httpexceptions.HTTPNotFound` exception is raised. If the
+   exception is returned from a view then it will be treated as a regular
+   response object and it will not trigger the custom view.
 
 .. index::
    single: forbidden view
@@ -209,6 +208,13 @@ Here's some sample code that implements a minimal forbidden view:
    forbidden exception.  These messages have different values depending on
    whether the ``pyramid.debug_authorization`` environment setting is true or
    false.
+
+.. warning::
+
+   The :term:`forbidden view` callables are only invoked when a
+   :exc:`~pyramid.httpexceptions.HTTPForbidden` exception is raised. If the
+   exception is returned from a view then it will be treated as a regular
+   response object and it will not trigger the custom view.
 
 .. index::
    single: request factory
