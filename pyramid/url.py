@@ -364,7 +364,7 @@ class URLMethodsMixin(object):
         of ``query`` may be a sequence of two-tuples *or* a data structure with
         an ``.items()`` method that returns a sequence of two-tuples
         (presumably a dictionary).  This data structure will be turned into a
-        query string per the documentation of :func:``pyramid.url.urlencode``
+        query string per the documentation of :func:`pyramid.url.urlencode`
         function.  This will produce a query string in the
         ``x-www-form-urlencoded`` encoding.  A non-``x-www-form-urlencoded``
         query string may be used by passing a *string* value as ``query`` in
