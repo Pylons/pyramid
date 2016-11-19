@@ -454,7 +454,7 @@ class URLMethodsMixin(object):
         ``resource_url(someresource, 'element1', 'element2', query={'a':1},
         route_name='blogentry')`` is roughly equivalent to doing::
 
-           remainder_path = request.resource_path(someobject)
+           traversal_path = request.resource_path(someobject)
            url = request.route_url(
                      'blogentry',
                      'element1',
@@ -486,7 +486,7 @@ class URLMethodsMixin(object):
         'element2', route_name='blogentry', route_kw={'id':'4'},
         _query={'a':'1'})`` is roughly equivalent to::
 
-           remainder_path = request.resource_path_tuple(someobject)
+           traversal_path = request.resource_path_tuple(someobject)
            kw = {'id':'4', '_query':{'a':'1'}, 'traverse':traversal_path}
            url = request.route_url(
                      'blogentry',
