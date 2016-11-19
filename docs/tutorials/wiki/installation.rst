@@ -370,7 +370,8 @@ coverage.
 Start the application
 ---------------------
 
-Start the application.
+Start the application. See :ref:`what_is_this_pserve_thing` for more
+information on ``pserve``.
 
 On UNIX
 ^^^^^^^

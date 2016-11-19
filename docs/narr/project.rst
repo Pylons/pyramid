@@ -1045,3 +1045,23 @@ Another good production alternative is :term:`Green Unicorn` (aka
 mod_wsgi, although it depends, in its default configuration, on having a
 buffering HTTP proxy in front of it.  It does not, as of this writing, work on
 Windows.
+
+Automatically Reloading Your Code
+---------------------------------
+
+During development, it can be really useful to automatically have the
+webserver restart when you make changes. ``pserve`` has a ``--reload`` switch
+to enable this. It uses the
+`hupper <http://docs.pylonsproject.org/projects/hupper/en/latest/>` package
+to enable this behavior. When your code crashes, ``hupper`` will wait for
+another change or the ``SIGHUP`` signal before restarting again.
+
+inotify support
+~~~~~~~~~~~~~~~
+
+By default, ``hupper`` will poll the filesystem for changes to all python
+code. This can be pretty inefficient in larger projects. To be nicer to your
+hard drive, you should install the
+`watchdog <http://pythonhosted.org/watchdog/>` package in development.
+``hupper`` will automatically use ``watchdog`` to more efficiently poll the
+filesystem.
