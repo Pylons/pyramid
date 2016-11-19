@@ -22,6 +22,7 @@ from pyramid.exceptions import URLDecodeError
 from pyramid.traversal import (
     quote_path_segment,
     split_path_info,
+    PATH_SAFE,
     )
 
 _marker = object()
@@ -209,7 +210,7 @@ def _compile_route(route):
     gen = ''.join(gen)
 
     def q(v):
-        return quote_path_segment(v, safe='/:@&+$,')
+        return quote_path_segment(v, safe=PATH_SAFE)
 
     def generator(dict):
         newdict = {}

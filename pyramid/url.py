@@ -25,10 +25,11 @@ from pyramid.threadlocal import get_current_registry
 from pyramid.traversal import (
     ResourceURL,
     quote_path_segment,
+    PATH_SAFE,
+    PATH_SEGMENT_SAFE,
     )
 
-PATH_SAFE = '/:@&+$,' # from webob
-QUERY_SAFE = '/?:@!$&\'()*+,;=' # RFC 3986
+QUERY_SAFE = "/?:@!$&'()*+,;=" # RFC 3986
 ANCHOR_SAFE = QUERY_SAFE
 
 def parse_url_overrides(kw):
@@ -947,4 +948,4 @@ def current_route_path(request, *elements, **kw):
 
 @lru_cache(1000)
 def _join_elements(elements):
-    return '/'.join([quote_path_segment(s, safe=':@&+$,') for s in elements])
+    return '/'.join([quote_path_segment(s, safe=PATH_SEGMENT_SAFE) for s in elements])
