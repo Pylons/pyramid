@@ -11,6 +11,13 @@ class TestSettingsConfiguratorMixin(unittest.TestCase):
         settings = config._set_settings(None)
         self.assertTrue(settings)
 
+    def test__set_settings_uses_original_dict(self):
+        config = self._makeOne()
+        dummy = {}
+        result = config._set_settings(dummy)
+        self.assertTrue(dummy is result)
+        self.assertEqual(dummy['pyramid.debug_all'], False)
+
     def test__set_settings_as_dictwithvalues(self):
         config = self._makeOne()
         settings = config._set_settings({'a':'1'})
@@ -536,6 +543,18 @@ class TestSettings(unittest.TestCase):
                                {'PYRAMID_DEFAULT_LOCALE_NAME':'abc'})
         self.assertEqual(result['default_locale_name'], 'abc')
         self.assertEqual(result['pyramid.default_locale_name'], 'abc')
+
+    def test_csrf_trusted_origins(self):
+        result = self._makeOne({})
+        self.assertEqual(result['pyramid.csrf_trusted_origins'], [])
+        result = self._makeOne({'pyramid.csrf_trusted_origins': 'example.com'})
+        self.assertEqual(result['pyramid.csrf_trusted_origins'], ['example.com'])
+        result = self._makeOne({'pyramid.csrf_trusted_origins': ['example.com']})
+        self.assertEqual(result['pyramid.csrf_trusted_origins'], ['example.com'])
+        result = self._makeOne({'pyramid.csrf_trusted_origins': (
+            'example.com foo.example.com\nasdf.example.com')})
+        self.assertEqual(result['pyramid.csrf_trusted_origins'], [
+            'example.com', 'foo.example.com', 'asdf.example.com'])
 
     def test_originals_kept(self):
         result = self._makeOne({'a':'i am so a'})

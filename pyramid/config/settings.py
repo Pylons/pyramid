@@ -4,7 +4,7 @@ from pyramid.settings import asbool, aslist
 
 class SettingsConfiguratorMixin(object):
     def _set_settings(self, mapping):
-        if not mapping:
+        if mapping is None:
             mapping = {}
         settings = Settings(mapping)
         self.registry.settings = settings

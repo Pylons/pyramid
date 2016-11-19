@@ -35,6 +35,10 @@ Backward Incompatibilities
   encoding via ``Accept-Encoding`` request headers.
   See https://github.com/Pylons/pyramid/pull/2810
 
+- Settings are no longer accessible as attributes on the settings object
+  (e.g. ``request.registry.settings.foo``). This was deprecated in Pyramid 1.2.
+  See https://github.com/Pylons/pyramid/pull/2823
+
 Features
 --------
 
@@ -79,6 +83,15 @@ Features
   to monkeypatch the process, assuming the server and / or the app do so
   as soon as possible before importing the rest of pyramid.
   See https://github.com/Pylons/pyramid/pull/2797
+
+- Pyramid no longer copies the settings object passed to the
+  ``pyramid.config.Configurator(settings=)``. The original ``dict`` is kept.
+  See https://github.com/Pylons/pyramid/pull/2823
+
+- The csrf trusted origins setting may now be a whitespace-separated list of
+  domains. Previously only a python list was allowed. Also, it can now be set
+  using the ``PYRAMID_CSRF_TRUSTED_ORIGINS`` environment variable similar to
+  other settings. See https://github.com/Pylons/pyramid/pull/2823
 
 Bug Fixes
 ---------
