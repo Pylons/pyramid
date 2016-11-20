@@ -284,3 +284,5 @@ Contributors
 - Jon Davidson, 2016/07/18
 
 - Keith Yang, 2016/07/22
+
+- Moriyoshi Koizumi, 2016/11/20
