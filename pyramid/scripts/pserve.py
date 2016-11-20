@@ -8,49 +8,29 @@
 # Code taken also from QP: http://www.mems-exchange.org/software/qp/ From
 # lib/site.py
 
-import atexit
-import ctypes
 import optparse
 import os
-import py_compile
 import re
-import subprocess
 import sys
-import tempfile
 import textwrap
 import threading
 import time
-import traceback
 import webbrowser
 
-from paste.deploy import loadserver
-from paste.deploy import loadapp
-from paste.deploy.loadwsgi import loadcontext, SERVER
+import hupper
+from paste.deploy import (
+    loadapp,
+    loadserver,
+)
+from paste.deploy.loadwsgi import (
+    SERVER,
+    loadcontext,
+)
 
 from pyramid.compat import PY2
-from pyramid.compat import WIN
 
 from pyramid.scripts.common import parse_vars
 from pyramid.scripts.common import setup_logging
-
-MAXFD = 1024
-
-try:
-    import termios
-except ImportError: # pragma: no cover
-    termios = None
-
-if WIN and not hasattr(os, 'kill'): # pragma: no cover
-    # py 2.6 on windows
-    def kill(pid, sig=None):
-        """kill function for Win32"""
-        # signal is ignored, semibogus raise message
-        kernel32 = ctypes.windll.kernel32
-        handle = kernel32.OpenProcess(1, 0, pid)
-        if (0 == kernel32.TerminateProcess(handle, 0)):
-            raise OSError('No such process %s' % pid)
-else:
-    kill = os.kill
 
 def main(argv=sys.argv, quiet=False):
     command = PServeCommand(argv, quiet=quiet)
@@ -119,9 +99,6 @@ class PServeCommand(object):
 
     _scheme_re = re.compile(r'^[a-z][a-z]+:', re.I)
 
-    _reloader_environ_key = 'PYTHON_RELOADER_SHOULD_RUN'
-    _monitor_environ_key = 'PASTE_MONITOR_SHOULD_RUN'
-
     def __init__(self, argv, quiet=False):
         self.options, self.args = self.parser.parse_args(argv[1:])
         if quiet:
@@ -141,19 +118,8 @@ class PServeCommand(object):
             return 2
         app_spec = self.args[0]
 
-        if self.options.reload:
-            if os.environ.get(self._reloader_environ_key):
-                if self.options.verbose > 1:
-                    self.out('Running reloading file monitor')
-                install_reloader(int(self.options.reload_interval), [app_spec])
-                # if self.requires_config_file:
-                #     watch_file(self.args[0])
-            else:
-                return self.restart_with_reloader()
-
-        app_name = self.options.app_name
-
         vars = self.get_options()
+        app_name = self.options.app_name
 
         if not self._scheme_re.search(app_spec):
             app_spec = 'config:' + app_spec
@@ -165,6 +131,34 @@ class PServeCommand(object):
         else:
             server_spec = app_spec
         base = os.getcwd()
+
+        # do not open the browser on each reload so check hupper first
+        if self.options.browser and not hupper.is_active():
+            def open_browser():
+                context = loadcontext(
+                    SERVER, app_spec, name=server_name, relative_to=base,
+                    global_conf=vars)
+                url = 'http://127.0.0.1:{port}/'.format(**context.config())
+                time.sleep(1)
+                webbrowser.open(url)
+            t = threading.Thread(target=open_browser)
+            t.setDaemon(True)
+            t.start()
+
+        if self.options.reload and not hupper.is_active():
+            if self.options.verbose > 1:
+                self.out('Running reloading file monitor')
+            hupper.start_reloader(
+                'pyramid.scripts.pserve.main',
+                reload_interval=int(self.options.reload_interval),
+                verbose=self.options.verbose,
+            )
+            return 0
+
+        if hupper.is_active():
+            reloader = hupper.get_reloader()
+            if app_spec.startswith('config:'):
+                reloader.watch_files([app_spec[len('config:'):]])
 
         log_fn = app_spec
         if log_fn.startswith('config:'):
@@ -178,8 +172,8 @@ class PServeCommand(object):
         server = self.loadserver(server_spec, name=server_name,
                                  relative_to=base, global_conf=vars)
 
-        app = self.loadapp(app_spec, name=app_name, relative_to=base,
-                global_conf=vars)
+        app = self.loadapp(
+            app_spec, name=app_name, relative_to=base, global_conf=vars)
 
         if self.options.verbose > 0:
             if hasattr(os, 'getpid'):
@@ -200,17 +194,6 @@ class PServeCommand(object):
                     msg = ''
                 self.out('Exiting%s (-v to see traceback)' % msg)
 
-        if self.options.browser:
-            def open_browser():
-                context = loadcontext(SERVER, app_spec, name=server_name, relative_to=base,
-                        global_conf=vars)
-                url = 'http://127.0.0.1:{port}/'.format(**context.config())
-                time.sleep(1)
-                webbrowser.open(url)
-            t = threading.Thread(target=open_browser)
-            t.setDaemon(True)
-            t.start()
-
         serve()
 
     def loadapp(self, app_spec, name, relative_to, **kw): # pragma: no cover
@@ -219,394 +202,6 @@ class PServeCommand(object):
     def loadserver(self, server_spec, name, relative_to, **kw):# pragma:no cover
         return loadserver(
             server_spec, name=name, relative_to=relative_to, **kw)
-
-    def quote_first_command_arg(self, arg): # pragma: no cover
-        """
-        There's a bug in Windows when running an executable that's
-        located inside a path with a space in it.  This method handles
-        that case, or on non-Windows systems or an executable with no
-        spaces, it just leaves well enough alone.
-        """
-        if (sys.platform != 'win32' or ' ' not in arg):
-            # Problem does not apply:
-            return arg
-        try:
-            import win32api
-        except ImportError:
-            raise ValueError(
-                "The executable %r contains a space, and in order to "
-                "handle this issue you must have the win32api module "
-                "installed" % arg)
-        arg = win32api.GetShortPathName(arg)
-        return arg
-
-    def find_script_path(self, name): # pragma: no cover
-        """
-        Return the path to the script being invoked by the python interpreter.
-
-        There's an issue on Windows when running the executable from
-        a console_script causing the script name (sys.argv[0]) to
-        not end with .exe or .py and thus cannot be run via popen.
-        """
-        if sys.platform == 'win32':
-            if not name.endswith('.exe') and not name.endswith('.py'):
-                name += '.exe'
-        return name
-
-    def restart_with_reloader(self): # pragma: no cover
-        self.restart_with_monitor(reloader=True)
-
-    def restart_with_monitor(self, reloader=False): # pragma: no cover
-        if self.options.verbose > 0:
-            if reloader:
-                self.out('Starting subprocess with file monitor')
-            else:
-                self.out('Starting subprocess with monitor parent')
-        while 1:
-            args = [
-                self.quote_first_command_arg(sys.executable),
-                self.find_script_path(sys.argv[0]),
-            ] + sys.argv[1:]
-            new_environ = os.environ.copy()
-            if reloader:
-                new_environ[self._reloader_environ_key] = 'true'
-            else:
-                new_environ[self._monitor_environ_key] = 'true'
-            proc = None
-            try:
-                try:
-                    _turn_sigterm_into_systemexit()
-                    proc = subprocess.Popen(args, env=new_environ)
-                    exit_code = proc.wait()
-                    proc = None
-                except KeyboardInterrupt:
-                    self.out('^C caught in monitor process')
-                    if self.options.verbose > 1:
-                        raise
-                    return 1
-            finally:
-                if proc is not None:
-                    import signal
-                    try:
-                        kill(proc.pid, signal.SIGTERM)
-                    except (OSError, IOError):
-                        pass
-
-            if reloader:
-                # Reloader always exits with code 3; but if we are
-                # a monitor, any exit code will restart
-                if exit_code != 3:
-                    return exit_code
-            if self.options.verbose > 0:
-                self.out('%s %s %s' % ('-' * 20, 'Restarting', '-' * 20))
-
-class LazyWriter(object):
-
-    """
-    File-like object that opens a file lazily when it is first written
-    to.
-    """
-
-    def __init__(self, filename, mode='w'):
-        self.filename = filename
-        self.fileobj = None
-        self.lock = threading.Lock()
-        self.mode = mode
-
-    def open(self):
-        if self.fileobj is None:
-            with self.lock:
-                self.fileobj = open(self.filename, self.mode)
-        return self.fileobj
-
-    def close(self):
-        fileobj = self.fileobj
-        if fileobj is not None:
-            fileobj.close()
-
-    def __del__(self):
-        self.close()
-
-    def write(self, text):
-        fileobj = self.open()
-        fileobj.write(text)
-        fileobj.flush()
-
-    def writelines(self, text):
-        fileobj = self.open()
-        fileobj.writelines(text)
-        fileobj.flush()
-
-    def flush(self):
-        self.open().flush()
-
-def ensure_port_cleanup(
-    bound_addresses, maxtries=30, sleeptime=2): # pragma: no cover
-    """
-    This makes sure any open ports are closed.
-
-    Does this by connecting to them until they give connection
-    refused.  Servers should call like::
-
-        ensure_port_cleanup([80, 443])
-    """
-    atexit.register(_cleanup_ports, bound_addresses, maxtries=maxtries,
-                    sleeptime=sleeptime)
-
-def _cleanup_ports(
-    bound_addresses, maxtries=30, sleeptime=2): # pragma: no cover
-    # Wait for the server to bind to the port.
-    import socket
-    import errno
-    for bound_address in bound_addresses:
-        for attempt in range(maxtries):
-            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            try:
-                sock.connect(bound_address)
-            except socket.error as e:
-                if e.args[0] != errno.ECONNREFUSED:
-                    raise
-                break
-            else:
-                time.sleep(sleeptime)
-        else:
-            raise SystemExit('Timeout waiting for port.')
-        sock.close()
-
-def _turn_sigterm_into_systemexit(): # pragma: no cover
-    """
-    Attempts to turn a SIGTERM exception into a SystemExit exception.
-    """
-    try:
-        import signal
-    except ImportError:
-        return
-    def handle_term(signo, frame):
-        raise SystemExit
-    signal.signal(signal.SIGTERM, handle_term)
-
-def ensure_echo_on(): # pragma: no cover
-    if termios:
-        fd = sys.stdin
-        if fd.isatty():
-            attr_list = termios.tcgetattr(fd)
-            if not attr_list[3] & termios.ECHO:
-                attr_list[3] |= termios.ECHO
-                termios.tcsetattr(fd, termios.TCSANOW, attr_list)
-
-def install_reloader(poll_interval=1, extra_files=None): # pragma: no cover
-    """
-    Install the reloading monitor.
-
-    On some platforms server threads may not terminate when the main
-    thread does, causing ports to remain open/locked.
-    """
-    ensure_echo_on()
-    mon = Monitor(poll_interval=poll_interval)
-    if extra_files is None:
-        extra_files = []
-    mon.extra_files.extend(extra_files)
-    t = threading.Thread(target=mon.periodic_reload)
-    t.setDaemon(True)
-    t.start()
-
-class classinstancemethod(object):
-    """
-    Acts like a class method when called from a class, like an
-    instance method when called by an instance.  The method should
-    take two arguments, 'self' and 'cls'; one of these will be None
-    depending on how the method was called.
-    """
-
-    def __init__(self, func):
-        self.func = func
-        self.__doc__ = func.__doc__
-
-    def __get__(self, obj, type=None):
-        return _methodwrapper(self.func, obj=obj, type=type)
-
-class _methodwrapper(object):
-
-    def __init__(self, func, obj, type):
-        self.func = func
-        self.obj = obj
-        self.type = type
-
-    def __call__(self, *args, **kw):
-        assert 'self' not in kw and 'cls' not in kw, (
-            "You cannot use 'self' or 'cls' arguments to a "
-            "classinstancemethod")
-        return self.func(*((self.obj, self.type) + args), **kw)
-
-
-class Monitor(object): # pragma: no cover
-    """
-    A file monitor and server restarter.
-
-    Use this like:
-
-    ..code-block:: Python
-
-        install_reloader()
-
-    Then make sure your server is installed with a shell script like::
-
-        err=3
-        while test "$err" -eq 3 ; do
-            python server.py
-            err="$?"
-        done
-
-    or is run from this .bat file (if you use Windows)::
-
-        @echo off
-        :repeat
-            python server.py
-        if %errorlevel% == 3 goto repeat
-
-    or run a monitoring process in Python (``pserve --reload`` does
-    this).
-
-    Use the ``watch_file(filename)`` function to cause a reload/restart for
-    other non-Python files (e.g., configuration files).  If you have
-    a dynamic set of files that grows over time you can use something like::
-
-        def watch_config_files():
-            return CONFIG_FILE_CACHE.keys()
-        add_file_callback(watch_config_files)
-
-    Then every time the reloader polls files it will call
-    ``watch_config_files`` and check all the filenames it returns.
-    """
-    instances = []
-    global_extra_files = []
-    global_file_callbacks = []
-
-    def __init__(self, poll_interval):
-        self.module_mtimes = {}
-        self.keep_running = True
-        self.poll_interval = poll_interval
-        self.extra_files = list(self.global_extra_files)
-        self.instances.append(self)
-        self.syntax_error_files = set()
-        self.pending_reload = False
-        self.file_callbacks = list(self.global_file_callbacks)
-        temp_pyc_fp = tempfile.NamedTemporaryFile(delete=False)
-        self.temp_pyc = temp_pyc_fp.name
-        temp_pyc_fp.close()
-
-    def _exit(self):
-        try:
-            os.unlink(self.temp_pyc)
-        except IOError:
-            # not worried if the tempfile can't be removed
-            pass
-        # use os._exit() here and not sys.exit() since within a
-        # thread sys.exit() just closes the given thread and
-        # won't kill the process; note os._exit does not call
-        # any atexit callbacks, nor does it do finally blocks,
-        # flush open files, etc.  In otherwords, it is rude.
-        os._exit(3)
-
-    def periodic_reload(self):
-        while True:
-            if not self.check_reload():
-                self._exit()
-                break
-            time.sleep(self.poll_interval)
-
-    def check_reload(self):
-        filenames = list(self.extra_files)
-        for file_callback in self.file_callbacks:
-            try:
-                filenames.extend(file_callback())
-            except:
-                print(
-                    "Error calling reloader callback %r:" % file_callback)
-                traceback.print_exc()
-        for module in list(sys.modules.values()):
-            try:
-                filename = module.__file__
-            except (AttributeError, ImportError):
-                continue
-            if filename is not None:
-                filenames.append(filename)
-        new_changes = False
-        for filename in filenames:
-            try:
-                stat = os.stat(filename)
-                if stat:
-                    mtime = stat.st_mtime
-                else:
-                    mtime = 0
-            except (OSError, IOError):
-                continue
-            if filename.endswith('.pyc') and os.path.exists(filename[:-1]):
-                mtime = max(os.stat(filename[:-1]).st_mtime, mtime)
-                pyc = True
-            else:
-                pyc = False
-            old_mtime = self.module_mtimes.get(filename)
-            self.module_mtimes[filename] = mtime
-            if old_mtime is not None and old_mtime < mtime:
-                new_changes = True
-                if pyc:
-                    filename = filename[:-1]
-                is_valid = True
-                if filename.endswith('.py'):
-                    is_valid = self.check_syntax(filename)
-                if is_valid:
-                    print("%s changed ..." % filename)
-        if new_changes:
-            self.pending_reload = True
-            if self.syntax_error_files:
-                for filename in sorted(self.syntax_error_files):
-                    print("%s has a SyntaxError; NOT reloading." % filename)
-        if self.pending_reload and not self.syntax_error_files:
-            self.pending_reload = False
-            return False
-        return True
-
-    def check_syntax(self, filename):
-        # check if a file has syntax errors.
-        # If so, track it until it's fixed.
-        try:
-            py_compile.compile(filename, cfile=self.temp_pyc, doraise=True)
-        except py_compile.PyCompileError as ex:
-            print(ex.msg)
-            self.syntax_error_files.add(filename)
-            return False
-        else:
-            if filename in self.syntax_error_files:
-                self.syntax_error_files.remove(filename)
-        return True
-
-    def watch_file(self, cls, filename):
-        """Watch the named file for changes"""
-        filename = os.path.abspath(filename)
-        if self is None:
-            for instance in cls.instances:
-                instance.watch_file(filename)
-            cls.global_extra_files.append(filename)
-        else:
-            self.extra_files.append(filename)
-
-    watch_file = classinstancemethod(watch_file)
-
-    def add_file_callback(self, cls, callback):
-        """Add a callback -- a function that takes no parameters -- that will
-        return a list of filenames to watch for changes."""
-        if self is None:
-            for instance in cls.instances:
-                instance.add_file_callback(callback)
-            cls.global_file_callbacks.append(callback)
-        else:
-            self.file_callbacks.append(callback)
-
-    add_file_callback = classinstancemethod(add_file_callback)
-
-watch_file = Monitor.watch_file
-add_file_callback = Monitor.add_file_callback
 
 # For paste.deploy server instantiation (egg:pyramid#wsgiref)
 def wsgiref_server_runner(wsgi_app, global_conf, **kw): # pragma: no cover

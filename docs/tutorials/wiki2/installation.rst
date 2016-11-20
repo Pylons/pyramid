@@ -457,7 +457,8 @@ working directory. This is an SQLite database with a single table defined in it
 Start the application
 ---------------------
 
-Start the application.
+Start the application. See :ref:`what_is_this_pserve_thing` for more
+information on ``pserve``.
 
 On UNIX
 ^^^^^^^

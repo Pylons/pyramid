@@ -93,6 +93,29 @@ Features
   using the ``PYRAMID_CSRF_TRUSTED_ORIGINS`` environment variable similar to
   other settings. See https://github.com/Pylons/pyramid/pull/2823
 
+- ``pserve --reload`` now uses the
+  `hupper <http://docs.pylonsproject.org/projects/hupper/en/latest/>`
+  library to monitor file changes. This comes with many improvements:
+
+  - If the `watchdog <http://pythonhosted.org/watchdog/>`_ package is
+    installed then monitoring will be done using inotify instead of
+    cpu and disk-intensive polling.
+
+  - The monitor is now a separate process that will not crash and starts up
+    before any of your code.
+
+  - The monitor will not restart the process after a crash until a file is
+    saved.
+
+  - The monitor works on windows.
+
+  - You can now trigger a reload manually from a pyramid view or any other
+    code via ``hupper.get_reloader().trigger_reload()``. Kind of neat.
+
+  - You can trigger a reload by issuing a ``SIGHUP`` to the monitor process.
+
+  See https://github.com/Pylons/pyramid/pull/2805
+
 Bug Fixes
 ---------
 
