@@ -1,5 +1,7 @@
-Typographical Conventions
-=========================
+.. _style_guide:
+
+Style Guide
+===========
 
 Literals, filenames, and function arguments are presented using the
 following style:
