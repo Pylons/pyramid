@@ -3,7 +3,17 @@
 Style Guide
 ===========
 
-This chapter describes how to edit, update, and build the :app:`Pyramid` documentation.
+.. admonition:: description
+
+   This chapter describes how to edit, update, and build the :app:`Pyramid` documentation.
+
+
+.. _style-guide-introduction:
+
+Introduction
+------------
+
+This chapter provides details of how to contribute updates to the documentation following style guidelines and conventions. We provide examples, including reStructuredText code and its rendered output for both visual and technical reference.
 
 
 .. _style-guide-contribute:
@@ -37,6 +47,43 @@ Location, referencing, and naming of files
   will select the image ``pyramid_request_processing.svg`` for the HTML documentation builder, and ``pyramid_request_processing.png`` for the PDF builder. See the related [Stack Overflow post](http://stackoverflow.com/questions/6473660/using-sphinx-docs-how-can-i-specify-png-image-formats-for-html-builds-and-pdf-im/6486713#6486713).
 
 
+.. _style-guide-page-structure:
+
+Page structure
+--------------
+
+Each page should contain in order the following.
+
+- The main heading. This will be visible in the table of contents.
+
+    .. code-block:: rst
+
+        ================
+        The main heading
+        ================
+
+- The description of the page. This text will be displayed to the reader below the main heading as well as be inserted into the description metadata field of the document. It will be displayed in search engine listings for the page. This is created using the reST ``admonition`` directive. A single paragraph of text consisting of no more than three sentences is recommended, so that the same text fits into search engine results:
+
+    .. code-block:: rst
+
+        .. admonition:: description
+
+           This is a description of the page, which will appear inline and in the description metadata field.
+
+    .. note:: The ``description`` metadata field is not yet implemented in the documentation's Sphinx theme, but it is a `feature request <https://github.com/Pylons/pylons_sphinx_theme/wiki/New-Theme-Requests>`_, so it is helpful to start using the ``description`` admonition now.
+
+- Introduction paragraph.
+
+    .. code-block:: rst
+
+        Introduction
+        ------------
+
+        This chapter is an introduction.
+
+- Finally the content of the document page, consisting of reST elements such as headings, paragraphs, tables, and so on.
+
+
 .. _style-guide-line-lengths:
 
 Line lengths
@@ -54,14 +101,6 @@ Trailing white spaces
 - Always use a line feed or carriage return at the end of a file.
 
 
-.. _style-guide-paragraphs:
-
-Paragraphs
-----------
-
-A paragraph should be on one line. Paragraphs must be separated by two line feeds.
-
-
 .. _style-guide-indentation:
 
 Indentation
@@ -70,6 +109,42 @@ Indentation
 - Indent using four spaces.
 - Do not use tabs to indent.
 
+
+.. _style-guide-headings:
+
+Headings
+--------
+
+Capitalize only the first letter in a heading, unless other words are proper nouns or acronyms, e.g., "Pyramid" or "HTML".
+
+
+.. _style-guide-paragraphs:
+
+Paragraphs
+----------
+
+A paragraph should be on one line. Paragraphs must be separated by two line feeds.
+
+
+.. _style-guide-grammar-spelling-preferences:
+
+Grammar, spelling, and capitalization preferences
+-------------------------------------------------
+
+Use any commercial or free professional style guide in general. Use a spell- and grammar-checker. The following table lists the preferred grammar, spelling, and capitalization of words and phrases for frequently used items in the documentation.
+
+==========           ======================
+Preferred            Avoid
+==========           ======================
+add-on	             addon
+and so on	         etc.
+GitHub	             Github, github
+JavaScript	         Javascript, javascript
+plug-in	             plugin
+select	             check, tick (checkbox)
+such as	             like
+verify	             be sure
+==========           ======================
 
 
 
