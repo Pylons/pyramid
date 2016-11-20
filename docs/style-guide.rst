@@ -1,7 +1,79 @@
-.. _style_guide:
+.. _style-guide:
 
 Style Guide
 ===========
+
+This chapter describes how to edit, update, and build the :app:`Pyramid` documentation.
+
+
+.. _style-guide-contribute:
+
+How to update and contribute to documentation
+---------------------------------------------
+
+All projects under the Pylons Projects, including this one, follow the guidelines established at `How to Contribute <http://www.pylonsproject.org/community/how-to-contribute>`_ and `Coding Style and Standards <http://docs.pylonsproject.org/en/latest/community/codestyle.html>`_.
+
+By building the documentation locally, you can preview the output before committing and pushing your changes to the repository. Follow the instructions for `Building documentation for a Pylons Project project <https://github.com/Pylons/pyramid/blob/master/contributing.md#building-documentation-for-a-pylons-project-project>`_. These instructions also include how to install packages required to build the documentation, and how to follow our recommended git workflow.
+
+When submitting a pull request for the first time in a project, sign `CONTRIBUTORS.txt <https://github.com/Pylons/pyramid/blob/master/CONTRIBUTORS.txt>`_ and commit it along with your pull request.
+
+
+.. _style-guide-file-conventions:
+
+Location, referencing, and naming of files
+------------------------------------------
+
+- reStructuredText (reST) files must be located in ``docs/`` and its subdirectories.
+- Image files must be located in ``docs/_static/``.
+- reST directives must refer to files either relative to the source file or absolute from the top source directory. For example, in ``docs/narr/source.rst``, you could refer to a file in a different directory as either ``.. include:: ../diff-dir/diff-source.rst`` or ``.. include:: /diff-dir/diff-source.rst``.
+- File names should be lower-cased and have words separated with either a hyphen "-" or an underscore "_".
+- reST files must have an extension of ``.rst``.
+- Image files may be any format but must have lower-cased file names and have standard file extensions that consist three letters (``.gif``, ``.jpg``, ``.png``, ``.svg``).  ``.gif`` and ``.svg`` are not currently supported by PDF builders in Sphinx, but you can allow the Sphinx builder to automatically select the correct image format for the desired output by replacing the three-letter file extension with ``*``.  For example:
+
+  .. code-block:: rst
+
+     .. image:: ../_static/pyramid_request_processing.-
+
+  will select the image ``pyramid_request_processing.svg`` for the HTML documentation builder, and ``pyramid_request_processing.png`` for the PDF builder. See the related [Stack Overflow post](http://stackoverflow.com/questions/6473660/using-sphinx-docs-how-can-i-specify-png-image-formats-for-html-builds-and-pdf-im/6486713#6486713).
+
+
+.. _style-guide-line-lengths:
+
+Line lengths
+------------
+
+Narrative documentation is not code, and should therefore not adhere to PEP8 or other line length conventions. When a translator sees only part of a sentence or paragraph, it makes it more difficult to translate the concept. Line lengths make ``diff`` more difficult. Text editors can soft wrap lines for display to avoid horizontal scrolling. We admit, we boofed it by using arbitrary 79-character line lengths in our own documentation, but we have seen the error of our ways and wish to correct this going forward.
+
+
+.. _style-guide-trailing-white-space:
+
+Trailing white spaces
+---------------------
+
+- No trailing white spaces.
+- Always use a line feed or carriage return at the end of a file.
+
+
+.. _style-guide-paragraphs:
+
+Paragraphs
+----------
+
+A paragraph should be on one line. Paragraphs must be separated by two line feeds.
+
+
+.. _style-guide-indentation:
+
+Indentation
+-----------
+
+- Indent using four spaces.
+- Do not use tabs to indent.
+
+
+
+
+
 
 Literals, filenames, and function arguments are presented using the
 following style:
@@ -98,12 +170,12 @@ convention is used:
 
 It may look unusual, but it has advantages:
 
-* It allows one to swap out the higher-level package ``foo`` for something else
+- It allows one to swap out the higher-level package ``foo`` for something else
   that provides the similar API. An example would be swapping out one database
   for another (e.g., graduating from SQLite to PostgreSQL).
 
-* Looks more neat in cases where a large number of objects get imported from
+- Looks more neat in cases where a large number of objects get imported from
   that package.
 
-* Adding or removing imported objects from the package is quicker and results
+- Adding or removing imported objects from the package is quicker and results
   in simpler diffs.
