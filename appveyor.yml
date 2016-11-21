@@ -8,6 +8,8 @@ environment:
 cache:
     - '%LOCALAPPDATA%\pip\Cache'
 
+version: '{branch}.{build}'
+
 install:
   - "%PYTHON%\\python.exe -m pip install tox"
 
