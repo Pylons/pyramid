@@ -67,6 +67,7 @@ Each section, or a subdirectory of reST files, such as a tutorial, must contain 
            chapter2
            chapter3
 
+
 .. _style-guide-page-structure:
 
 Page structure
@@ -104,10 +105,18 @@ Each page should contain in order the following.
 - Finally the content of the document page, consisting of reST elements such as headings, paragraphs, tables, and so on.
 
 
+.. _style-guide-page-content:
+
+Page content
+------------
+
+Within a page, content should adhere to specific guidelines.
+
+
 .. _style-guide-line-lengths:
 
 Line lengths
-------------
+^^^^^^^^^^^^
 
 Narrative documentation is not code, and should therefore not adhere to PEP8 or other line length conventions. When a translator sees only part of a sentence or paragraph, it makes it more difficult to translate the concept. Line lengths make ``diff`` more difficult. Text editors can soft wrap lines for display to avoid horizontal scrolling. We admit, we boofed it by using arbitrary 79-character line lengths in our own documentation, but we have seen the error of our ways and wish to correct this going forward.
 
@@ -115,7 +124,7 @@ Narrative documentation is not code, and should therefore not adhere to PEP8 or 
 .. _style-guide-trailing-white-space:
 
 Trailing white spaces
----------------------
+^^^^^^^^^^^^^^^^^^^^^
 
 - No trailing white spaces.
 - Always use a line feed or carriage return at the end of a file.
@@ -124,7 +133,7 @@ Trailing white spaces
 .. _style-guide-indentation:
 
 Indentation
------------
+^^^^^^^^^^^
 
 - Indent using four spaces.
 - Do not use tabs to indent.
@@ -133,15 +142,37 @@ Indentation
 .. _style-guide-headings:
 
 Headings
---------
+^^^^^^^^
 
-Capitalize only the first letter in a heading, unless other words are proper nouns or acronyms, e.g., "Pyramid" or "HTML".
+Capitalize only the first letter in a heading (sentence-case), unless other words are proper nouns or acronyms, e.g., "Pyramid" or "HTML".
 
+For consistent heading characters throughout the documentation, follow the guidelines stated in the `Python Developer's Guide <https://docs.python.org/devguide/documenting.html#sections>`_. Specifically:
+
+- =, for sections
+- -, for subsections
+- ^, for subsubsections
+- ", for paragraphs
+
+As individual files do not have so-called "parts" or "chapters", the headings would be underlined with characters as shown.
+
+    .. code-block:: rst
+
+        Heading Level 1
+        ===============
+
+        Heading Level 2
+        ---------------
+
+        Heading Level 3
+        ^^^^^^^^^^^^^^^
+
+        Heading Level 4
+        ```````````````
 
 .. _style-guide-paragraphs:
 
 Paragraphs
-----------
+^^^^^^^^^^
 
 A paragraph should be on one line. Paragraphs must be separated by two line feeds.
 
@@ -149,7 +180,7 @@ A paragraph should be on one line. Paragraphs must be separated by two line feed
 .. _style-guide-grammar-spelling-preferences:
 
 Grammar, spelling, and capitalization preferences
--------------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Use any commercial or free professional style guide in general. Use a spell- and grammar-checker. The following table lists the preferred grammar, spelling, and capitalization of words and phrases for frequently used items in the documentation.
 
