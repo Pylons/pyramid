@@ -47,6 +47,26 @@ Location, referencing, and naming of files
   will select the image ``pyramid_request_processing.svg`` for the HTML documentation builder, and ``pyramid_request_processing.png`` for the PDF builder. See the related [Stack Overflow post](http://stackoverflow.com/questions/6473660/using-sphinx-docs-how-can-i-specify-png-image-formats-for-html-builds-and-pdf-im/6486713#6486713).
 
 
+.. _style-guide-section-structure:
+
+Section structure
+-----------------
+
+Each section, or a subdirectory of reST files, such as a tutorial, must contain an ``index.rst`` file. ``index.rst`` must contain the following.
+
+- A section heading. This will be visible in the table of contents.
+- A single paragraph describing this section.
+- A Sphinx ``toctree`` directive, with a ``maxdepth`` of 2. Each ``.rst`` file in the folder should be linked to this ``toctree``.
+
+    .. code-block:: rst
+
+        .. toctree::
+           :maxdepth: 2
+
+           chapter1
+           chapter2
+           chapter3
+
 .. _style-guide-page-structure:
 
 Page structure
