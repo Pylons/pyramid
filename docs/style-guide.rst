@@ -139,6 +139,27 @@ Indentation
 - Do not use tabs to indent.
 
 
+.. _style-guide-grammar-spelling-preferences:
+
+Grammar, spelling, and capitalization preferences
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Use any commercial or free professional style guide in general. Use a spell- and grammar-checker. The following table lists the preferred grammar, spelling, and capitalization of words and phrases for frequently used items in the documentation.
+
+==========           ======================
+Preferred            Avoid
+==========           ======================
+add-on	             addon
+and so on	         etc.
+GitHub	             Github, github
+JavaScript	         Javascript, javascript
+plug-in	             plugin
+select	             check, tick (checkbox)
+such as	             like
+verify	             be sure
+==========           ======================
+
+
 .. _style-guide-headings:
 
 Headings
@@ -177,25 +198,14 @@ Paragraphs
 A paragraph should be on one line. Paragraphs must be separated by two line feeds.
 
 
-.. _style-guide-grammar-spelling-preferences:
+Links
+^^^^^
 
-Grammar, spelling, and capitalization preferences
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Use inline links to keep the context or link label together with the URL. Do not use targets and links at the end of the page, because the separation makes it difficult to update and translate. Here is an example of inline links, our required method.
 
-Use any commercial or free professional style guide in general. Use a spell- and grammar-checker. The following table lists the preferred grammar, spelling, and capitalization of words and phrases for frequently used items in the documentation.
+    .. code-block:: rst
 
-==========           ======================
-Preferred            Avoid
-==========           ======================
-add-on	             addon
-and so on	         etc.
-GitHub	             Github, github
-JavaScript	         Javascript, javascript
-plug-in	             plugin
-select	             check, tick (checkbox)
-such as	             like
-verify	             be sure
-==========           ======================
+        `Example <http://example.com>`_
 
 
 
