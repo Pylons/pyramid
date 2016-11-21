@@ -28,9 +28,11 @@ from paste.deploy.loadwsgi import (
 )
 
 from pyramid.compat import PY2
+from pyramid.compat import configparser
 
 from pyramid.scripts.common import parse_vars
 from pyramid.scripts.common import setup_logging
+from pyramid.settings import aslist
 
 def main(argv=sys.argv, quiet=False):
     command = PServeCommand(argv, quiet=quiet)
@@ -97,12 +99,17 @@ class PServeCommand(object):
         dest='verbose',
         help="Suppress verbose output")
 
+    ConfigParser = configparser.ConfigParser  # testing
+    loadapp = staticmethod(loadapp)  # testing
+    loadserver = staticmethod(loadserver)  # testing
+
     _scheme_re = re.compile(r'^[a-z][a-z]+:', re.I)
 
     def __init__(self, argv, quiet=False):
         self.options, self.args = self.parser.parse_args(argv[1:])
         if quiet:
             self.options.verbose = 0
+        self.watch_files = []
 
     def out(self, msg): # pragma: no cover
         if self.options.verbose > 0:
@@ -111,6 +118,24 @@ class PServeCommand(object):
     def get_options(self):
         restvars = self.args[1:]
         return parse_vars(restvars)
+
+    def pserve_file_config(self, filename):
+        config = self.ConfigParser()
+        config.optionxform = str
+        config.read(filename)
+        try:
+            items = dict(config.items('pserve'))
+        except configparser.NoSectionError:
+            return
+
+        watch_files = aslist(items.get('watch_files', ''), flatten=False)
+
+        # track file paths relative to the ini file
+        basedir = os.path.dirname(filename)
+        for file in watch_files:
+            if not os.path.isabs(file):
+                file = os.path.join(basedir, file)
+            self.watch_files.append(os.path.normpath(file))
 
     def run(self):  # pragma: no cover
         if not self.args:
@@ -121,8 +146,12 @@ class PServeCommand(object):
         vars = self.get_options()
         app_name = self.options.app_name
 
+        base = os.getcwd()
         if not self._scheme_re.search(app_spec):
+            config_path = os.path.join(base, app_spec)
             app_spec = 'config:' + app_spec
+        else:
+            config_path = None
         server_name = self.options.server_name
         if self.options.server:
             server_spec = 'egg:pyramid'
@@ -130,7 +159,6 @@ class PServeCommand(object):
             server_name = self.options.server
         else:
             server_spec = app_spec
-        base = os.getcwd()
 
         # do not open the browser on each reload so check hupper first
         if self.options.browser and not hupper.is_active():
@@ -155,22 +183,17 @@ class PServeCommand(object):
             )
             return 0
 
+        if config_path:
+            setup_logging(config_path, global_conf=vars)
+            self.watch_files.append(config_path)
+            self.pserve_file_config(config_path)
+
         if hupper.is_active():
             reloader = hupper.get_reloader()
-            if app_spec.startswith('config:'):
-                reloader.watch_files([app_spec[len('config:'):]])
+            reloader.watch_files(self.watch_files)
 
-        log_fn = app_spec
-        if log_fn.startswith('config:'):
-            log_fn = app_spec[len('config:'):]
-        elif log_fn.startswith('egg:'):
-            log_fn = None
-        if log_fn:
-            log_fn = os.path.join(base, log_fn)
-            setup_logging(log_fn, global_conf=vars)
-
-        server = self.loadserver(server_spec, name=server_name,
-                                 relative_to=base, global_conf=vars)
+        server = self.loadserver(
+            server_spec, name=server_name, relative_to=base, global_conf=vars)
 
         app = self.loadapp(
             app_spec, name=app_name, relative_to=base, global_conf=vars)
@@ -195,13 +218,6 @@ class PServeCommand(object):
                 self.out('Exiting%s (-v to see traceback)' % msg)
 
         serve()
-
-    def loadapp(self, app_spec, name, relative_to, **kw): # pragma: no cover
-        return loadapp(app_spec, name=name, relative_to=relative_to, **kw)
-
-    def loadserver(self, server_spec, name, relative_to, **kw):# pragma:no cover
-        return loadserver(
-            server_spec, name=name, relative_to=relative_to, **kw)
 
 # For paste.deploy server instantiation (egg:pyramid#wsgiref)
 def wsgiref_server_runner(wsgi_app, global_conf, **kw): # pragma: no cover

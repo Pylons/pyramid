@@ -1065,3 +1065,23 @@ hard drive, you should install the
 `watchdog <http://pythonhosted.org/watchdog/>` package in development.
 ``hupper`` will automatically use ``watchdog`` to more efficiently poll the
 filesystem.
+
+Monitoring Custom Files
+~~~~~~~~~~~~~~~~~~~~~~~
+
+By default, ``pserve --reload`` will monitor all imported Python code
+(everything in ``sys.modules``) as well as the config file passed to
+``pserve`` (e.g. ``development.ini``). You can instruct ``pserve`` to watch
+other files for changes as well by defining a ``[pserve]`` section in your
+configuration file. For example, let's say your application loads the
+``favicon.ico`` file at startup and stores it in memory to efficiently
+serve it many times. When you change it you want ``pserve`` to restart:
+
+.. code-block:: ini
+
+    [pserve]
+    watch_files =
+        myapp/static/favicon.ico
+
+Paths are relative to the configuration file and are passed to ``hupper``
+to watch. Currently it does not support globs but this may change.
