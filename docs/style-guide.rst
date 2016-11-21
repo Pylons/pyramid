@@ -198,6 +198,8 @@ Paragraphs
 A paragraph should be on one line. Paragraphs must be separated by two line feeds.
 
 
+.. _style-guide-links:
+
 Links
 ^^^^^
 
@@ -208,7 +210,22 @@ Use inline links to keep the context or link label together with the URL. Do not
         `Example <http://example.com>`_
 
 
+.. _style-guide-topic:
 
+Topic
+^^^^^
+
+A topic is similar to a block quote with a title, or a self-contained section with no subsections. Use the ``topic`` directive to indicate a self-contained idea that is separate from the flow of the document. Topics may occur anywhere a section or transition may occur. Body elements and topics may not contain nested topics.
+
+The directive's sole argument is interpreted as the topic title, and next line must be blank. All subsequent lines make up the topic body, interpreted as body elements.
+
+    .. code-block:: rst
+
+        .. topic:: Topic Title
+
+            Subsequent indented lines comprise
+            the body of the topic, and are
+            interpreted as body elements.
 
 
 Literals, filenames, and function arguments are presented using the
