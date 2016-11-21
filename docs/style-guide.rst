@@ -228,6 +228,96 @@ The directive's sole argument is interpreted as the topic title, and next line m
             interpreted as body elements.
 
 
+.. _style-guide-syntax-highlighting:
+
+Syntax highlighting
+^^^^^^^^^^^^^^^^^^^
+
+Sphinx does syntax highlighting using the `Pygments <http://pygments.org/>`_ library.
+
+Do not use two colons "::" at the end of a line, followed by a blank line, then indented code. Always specify the language to be used for syntax highlighting by using the ``code-block`` directive and indenting the code.
+
+    .. code-block:: rst
+
+        .. code-block:: python
+
+            if "foo" == "bar":
+                # This is Python code
+                pass
+
+XML:
+
+    .. code-block:: rst
+
+        .. code-block:: xml
+
+            <somesnippet>Some XML</somesnippet>
+
+Unix shell:
+
+    .. code-block:: rst
+
+        .. code-block:: bash
+
+           # Start Plone in foreground mode for a test run
+           cd ~/Plone/zinstance
+           bin/plonectl fg
+
+Windows console:
+
+    .. code-block:: rst
+
+        .. code-block:: doscon
+
+           c:\> %VENV%\Scripts\pcreate -s starter MyProject
+
+cfg:
+
+    .. code-block:: rst
+
+        .. code-block:: cfg
+
+           [some-part]
+           # A random part in the buildout
+           recipe = collective.recipe.foo
+           option = value
+
+ini:
+
+    .. code-block:: rst
+
+        .. code-block:: ini
+
+            [nosetests]
+            match=^test
+            where=pyramid
+            nocapture=1
+
+Interactive Python:
+
+    .. code-block:: rst
+
+        .. code-block:: pycon
+
+           >>> class Foo:
+           ...     bar = 100
+           ...
+           >>> f = Foo()
+           >>> f.bar
+           100
+           >>> f.bar / 0
+           Traceback (most recent call last):
+             File "<stdin>", line 1, in <module>
+           ZeroDivisionError: integer division or modulo by zero
+
+If syntax highlighting is not enabled for your code block, you probably have a syntax error and Pygments will fail silently.
+
+View the `full list of lexers and associated short names <http://pygments.org/docs/lexers/>`_.
+
+
+
+
+
 Literals, filenames, and function arguments are presented using the
 following style:
 
