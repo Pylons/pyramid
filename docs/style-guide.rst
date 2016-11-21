@@ -5,7 +5,7 @@ Style Guide
 
 .. admonition:: description
 
-   This chapter describes how to edit, update, and build the :app:`Pyramid` documentation.
+   This chapter describes how to edit, update, and build the :app:`Pyramid` documentation. For coding style guidelines, see `Coding Style <http://docs.pylonsproject.org/en/latest/community/codestyle.html#coding-style>`_.
 
 
 .. _style-guide-introduction:
@@ -146,18 +146,18 @@ Grammar, spelling, and capitalization preferences
 
 Use any commercial or free professional style guide in general. Use a spell- and grammar-checker. The following table lists the preferred grammar, spelling, and capitalization of words and phrases for frequently used items in the documentation.
 
-==========           ======================
-Preferred            Avoid
-==========           ======================
-add-on	             addon
-and so on	         etc.
-GitHub	             Github, github
-JavaScript	         Javascript, javascript
-plug-in	             plugin
-select	             check, tick (checkbox)
-such as	             like
-verify	             be sure
-==========           ======================
+========== ======================
+Preferred  Avoid
+========== ======================
+add-on     addon
+and so on  etc.
+GitHub     Github, github
+JavaScript Javascript, javascript
+plug-in    plugin
+select     check, tick (checkbox)
+such as    like
+verify     be sure
+========== ======================
 
 
 .. _style-guide-headings:
@@ -228,12 +228,22 @@ The directive's sole argument is interpreted as the topic title, and next line m
             interpreted as body elements.
 
 
+.. _style-guide-displaying-code:
+
+Displaying code
+^^^^^^^^^^^^^^^
+
+Code may be displayed in blocks or inline. You can include blocks of code from other source files. Blocks of code should use syntax highlighting.
+
+.. seealso:: See also the Sphinx documentation for :ref:`Showing code examples <sphinx:code-examples>`.
+
+
 .. _style-guide-syntax-highlighting:
 
 Syntax highlighting
-^^^^^^^^^^^^^^^^^^^
+```````````````````
 
-Sphinx does syntax highlighting using the `Pygments <http://pygments.org/>`_ library.
+Sphinx does syntax highlighting of code blocks using the `Pygments <http://pygments.org/>`_ library.
 
 Do not use two colons "::" at the end of a line, followed by a blank line, then indented code. Always specify the language to be used for syntax highlighting by using the ``code-block`` directive and indenting the code.
 
@@ -253,23 +263,23 @@ XML:
 
             <somesnippet>Some XML</somesnippet>
 
-Unix shell:
+Unix shell commands are prefixed with a ``$`` character. (See :term:`venv` for the meaning of ``$VENV``.)
 
     .. code-block:: rst
 
         .. code-block:: bash
 
-           # Start Plone in foreground mode for a test run
-           cd ~/Plone/zinstance
-           bin/plonectl fg
+           $ $VENV/bin/pip install -e .
 
-Windows console:
+Windows commands are prefixed with a drive letter with an optional directory name. (See :term:`venv` for the meaning of ``%VENV%``.)
 
     .. code-block:: rst
 
         .. code-block:: doscon
 
            c:\> %VENV%\Scripts\pcreate -s starter MyProject
+
+  .. code-block:: doscon
 
 cfg:
 
@@ -315,6 +325,174 @@ If syntax highlighting is not enabled for your code block, you probably have a s
 View the `full list of lexers and associated short names <http://pygments.org/docs/lexers/>`_.
 
 
+.. _style-guide-long-commands:
+
+Displaying long commands
+````````````````````````
+
+When a command that should be typed on one line is too long to fit on the displayed width of a page, the backslash character ``\`` is used to indicate that the subsequent printed line should be part of the command:
+
+    .. code-block:: rst
+
+        .. code-block:: bash
+
+            $ $VENV/bin/py.test tutorial/tests.py --cov-report term-missing \
+                --cov=tutorial -q
+
+
+.. _style-guide-code-block-options:
+
+Code block options
+``````````````````
+
+To emphasize lines (give the appearance that a highlighting pen has been used on the code), use the ``emphasize-lines`` option. The argument passed to ``emphasize-lines`` must be a comma-separated list of either single or ranges of line numbers.
+
+.. code-block:: rst
+
+    .. code-block:: python
+        :emphasize-lines: 1,3
+
+        if "foo" == "bar":
+            # This is Python code
+            pass
+
+The above code renders as follows.
+
+.. code-block:: python
+    :emphasize-lines: 1,3
+
+    if "foo" == "bar":
+        # This is Python code
+        pass
+
+To display a code block with line numbers, use the ``linenos`` option.
+
+.. code-block:: rst
+
+    .. code-block:: python
+        :linenos:
+
+        if "foo" == "bar":
+            # This is Python code
+            pass
+
+The above code renders as follows.
+
+.. code-block:: python
+    :linenos:
+
+    if "foo" == "bar":
+        # This is Python code
+        pass
+
+Code blocks may be given a caption, which may serve as a filename or other description, using the ``caption`` option. They may also be given a ``name`` option, providing an implicit target name that can be referenced by using ``ref``.
+
+.. code-block:: rst
+
+    .. code-block:: python
+        :caption: sample.py
+        :name: sample-py
+
+        if "foo" == "bar":
+            # This is Python code
+            pass
+
+The above code renders as follows.
+
+.. code-block:: python
+    :caption: sample.py
+    :name: sample-py
+
+    if "foo" == "bar":
+        # This is Python code
+        pass
+
+To specify the starting number to use for line numbering, use the ``lineno-start`` directive.
+
+.. code-block:: rst
+
+    .. code-block:: python
+        :lineno-start: 2
+
+        if "foo" == "bar":
+            # This is Python code
+            pass
+
+The above code renders as follows. As you can see, ``lineno-start`` is not altogether meaningful.
+
+.. code-block:: python
+    :lineno-start: 2
+
+    if "foo" == "bar":
+        # This is Python code
+        pass
+
+
+.. _style-guide-includes:
+
+Includes
+````````
+
+Longer displays of verbatim text may be included by storing the example text in an external file containing only plain text or code. The file may be included using the ``literalinclude`` directive. The file name follows the conventions of :ref:`style-guide-file-conventions`.
+
+.. code-block:: rst
+
+    .. literalinclude:: narr/helloworld.py
+        :language: python
+
+The above code renders as follows.
+
+.. literalinclude:: narr/helloworld.py
+    :language: python
+
+Like code blocks, ``literalinclude`` supports the following options.
+
+- ``language`` to select a language for syntax highlighting
+- ``linenos`` to switch on line numbers
+- ``lineno-start`` to specify the starting number to use for line numbering
+- ``emphasize-lines`` to emphasize particular lines
+
+.. code-block:: rst
+
+    .. literalinclude:: narr/helloworld.py
+        :language: python
+        :linenos:
+        :lineno-start: 11
+        :emphasize-lines: 1,6-7,9-
+
+The above code renders as follows. Note that ``lineno-start`` and ``emphasize-lines`` do not align.  The former displays numbering starting from the *arbitrarily provided value*, whereas the latter emphasizes the line numbers of the *source file*.
+
+.. literalinclude:: narr/helloworld.py
+    :language: python
+    :linenos:
+    :lineno-start: 11
+    :emphasize-lines: 1,6-7,9-
+
+Additional options include the following.
+
+.. literalinclude:: narr/helloworld.py
+    :lines: 1-3
+    :emphasize-lines: 3
+    :lineno-match:
+    :language: python
+
+.. literalinclude:: narr/helloworld.py
+    :linenos:
+    :pyobject: hello_world
+
+.. literalinclude:: quick_tour/sqla_demo/sqla_demo/models/mymodel.py
+    :language: python
+    :start-after: Start Sphinx Include
+    :end-before: End Sphinx Include
+
+
+.. _style-guide-inline-code:
+
+Inline code
+```````````
+
+
+
 
 
 
@@ -350,75 +528,7 @@ References to glossary terms are presented using the following style:
 
   :term:`Pylons`
 
-URLs are presented using the following style:
-
-  `Pylons <http://www.pylonsproject.org>`_
-
 References to sections and chapters are presented using the following
 style:
 
   :ref:`traversal_chapter`
-
-Code and configuration file blocks are presented in the following style:
-
-  .. code-block:: python
-     :linenos:
-
-     def foo(abc):
-         pass
-
-Example blocks representing UNIX shell commands are prefixed with a ``$``
-character, e.g.:
-
-  .. code-block:: bash
-
-     $ $VENV/bin/py.test -q
-
-See :term:`venv` for the meaning of ``$VENV``.
-
-Example blocks representing Windows commands are prefixed with a drive letter
-with an optional directory name, e.g.:
-
-  .. code-block:: doscon
-
-     c:\examples> %VENV%\Scripts\py.test -q
-
-See :term:`venv` for the meaning of ``%VENV%``.
-
-When a command that should be typed on one line is too long to fit on a page,
-the backslash ``\`` is used to indicate that the following printed line should
-be part of the command:
-
-  .. code-block:: bash
-
-     $VENV/bin/py.test tutorial/tests.py --cov-report term-missing \
-                       --cov=tutorial -q
-
-A sidebar, which presents a concept tangentially related to content discussed
-on a page, is rendered like so:
-
-.. sidebar:: This is a sidebar
-
-   Sidebar information.
-
-When multiple objects are imported from the same package, the following
-convention is used:
-
-    .. code-block:: python
-
-       from foo import (
-           bar,
-           baz,
-           )
-
-It may look unusual, but it has advantages:
-
-- It allows one to swap out the higher-level package ``foo`` for something else
-  that provides the similar API. An example would be swapping out one database
-  for another (e.g., graduating from SQLite to PostgreSQL).
-
-- Looks more neat in cases where a large number of objects get imported from
-  that package.
-
-- Adding or removing imported objects from the package is quicker and results
-  in simpler diffs.
