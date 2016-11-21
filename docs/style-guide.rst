@@ -468,22 +468,65 @@ The above code renders as follows. Note that ``lineno-start`` and ``emphasize-li
     :lineno-start: 11
     :emphasize-lines: 1,6-7,9-
 
-Additional options include the following.
+``literalinclude`` also supports including only parts of a file. If it is a Python module, you can select a class, function, or method to include using the ``pyobject`` option.
+
+.. code-block:: rst
+
+    .. literalinclude:: narr/helloworld.py
+        :language: python
+        :pyobject: hello_world
+
+The above code renders as follows. It returns the function ``hello_world`` in the source file.
 
 .. literalinclude:: narr/helloworld.py
-    :lines: 1-3
-    :emphasize-lines: 3
-    :lineno-match:
     :language: python
-
-.. literalinclude:: narr/helloworld.py
-    :linenos:
     :pyobject: hello_world
 
-.. literalinclude:: quick_tour/sqla_demo/sqla_demo/models/mymodel.py
+Alternatively, you can specify exactly which lines to include by giving a ``lines`` option.
+
+.. code-block:: rst
+
+    .. literalinclude:: narr/helloworld.py
+        :language: python
+        :lines: 6-7
+
+The above code renders as follows.
+
+.. literalinclude:: narr/helloworld.py
     :language: python
-    :start-after: Start Sphinx Include
-    :end-before: End Sphinx Include
+    :lines: 6-7
+
+Another way to control which part of the file is included is to use the ``start-after`` and ``end-before`` options (or only one of them). If ``start-after`` is given as a string option, only lines that follow the first line containing that string are included. If ``end-before`` is given as a string option, only lines that precede the first lines containing that string are included.
+
+.. code-block:: rst
+
+    .. literalinclude:: narr/helloworld.py
+        :language: python
+        :start-after: from pyramid.response import Response
+        :end-before: if __name__ == '__main__':
+
+The above code renders as follows.
+
+.. literalinclude:: narr/helloworld.py
+    :language: python
+    :start-after: from pyramid.response import Response
+    :end-before: if __name__ == '__main__':
+
+When specifying particular parts of a file to display, it can be useful to display exactly which lines are being presented. This can be done using the ``lineno-match`` option.
+
+.. code-block:: rst
+
+    .. literalinclude:: narr/helloworld.py
+        :language: python
+        :lines: 6-7
+        :lineno-match:
+
+The above code renders as follows.
+
+.. literalinclude:: narr/helloworld.py
+    :language: python
+    :lines: 6-7
+    :lineno-match:
 
 
 .. _style-guide-inline-code:
