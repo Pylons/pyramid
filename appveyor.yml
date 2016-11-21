@@ -5,6 +5,9 @@ environment:
     - PYTHON: "C:\\Python27"
       TOXENV: "py27"
 
+cache:
+    - '%LOCALAPPDATA%\pip\Cache'
+
 install:
   - "%PYTHON%\\python.exe -m pip install tox"
 
