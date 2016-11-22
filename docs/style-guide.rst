@@ -468,7 +468,9 @@ The above code renders as follows. Note that ``lineno-start`` and ``emphasize-li
     :lineno-start: 11
     :emphasize-lines: 1,6-7,9-
 
-``literalinclude`` also supports including only parts of a file. If it is a Python module, you can select a class, function, or method to include using the ``pyobject`` option.
+``literalinclude`` also supports including only parts of a file.
+
+If the source code is a Python module, you can select a class, function, or method to include using the ``pyobject`` option.
 
 .. code-block:: rst
 
@@ -481,20 +483,6 @@ The above code renders as follows. It returns the function ``hello_world`` in th
 .. literalinclude:: narr/helloworld.py
     :language: python
     :pyobject: hello_world
-
-Alternatively, you can specify exactly which lines to include by giving a ``lines`` option.
-
-.. code-block:: rst
-
-    .. literalinclude:: narr/helloworld.py
-        :language: python
-        :lines: 6-7
-
-The above code renders as follows.
-
-.. literalinclude:: narr/helloworld.py
-    :language: python
-    :lines: 6-7
 
 Another way to control which part of the file is included is to use the ``start-after`` and ``end-before`` options (or only one of them). If ``start-after`` is given as a string option, only lines that follow the first line containing that string are included. If ``end-before`` is given as a string option, only lines that precede the first lines containing that string are included.
 
@@ -512,6 +500,20 @@ The above code renders as follows.
     :start-after: from pyramid.response import Response
     :end-before: if __name__ == '__main__':
 
+You can specify exactly which lines to include by giving a ``lines`` option.
+
+.. code-block:: rst
+
+    .. literalinclude:: narr/helloworld.py
+        :language: python
+        :lines: 6-7
+
+The above code renders as follows.
+
+.. literalinclude:: narr/helloworld.py
+    :language: python
+    :lines: 6-7
+
 When specifying particular parts of a file to display, it can be useful to display exactly which lines are being presented. This can be done using the ``lineno-match`` option.
 
 .. code-block:: rst
@@ -528,42 +530,86 @@ The above code renders as follows.
     :lines: 6-7
     :lineno-match:
 
+.. literalinclude:: narr/helloworld.py
+    :language: python
+    :lines: 6-7
+    :linenos:
+
+Out of all the ways to include parts of a file, ``pyobject`` is the most preferred option because if you change your code and add or remove lines, you don't need to adjust line numbering, whereas with ``lines`` you would have to adjust. ``start-after`` and ``end-before`` are less desirable because they depend on source code not changing, or you can insert comments into your source code to act as the delimiters but that just adds comments that have nothing to do with the functionality of your code.
+
+Above all with includes, if you use line numbering, it's much preferred to use ``lineno-match`` over ``linenos`` with ``lineno-start`` because it "just works" without thinking.
+
 
 .. _style-guide-inline-code:
 
 Inline code
 ```````````
 
+Inline code is surrounded by double backtick marks. Literals, filenames, and function arguments are presented using this style.
+
+.. code-block:: rst
+
+    Install requirements for building documentation: ``pip install -e ".[docs]"``
+
+The above code renders as follows.
+
+Install requirements for building documentation: ``pip install -e ".[docs]"``
 
 
+.. _style-guide-block-rest-markup:
 
+Block reST markup
+-----------------
 
-
-Literals, filenames, and function arguments are presented using the
-following style:
-
-  ``argument1``
-
-Warnings which represent limitations and need-to-know information
-related to a topic or concept are presented in the following style:
+Warnings which represent limitations and need-to-know information related to a topic or concept are presented in the following style:
 
   .. warning::
 
      This is a warning.
 
-Notes which represent additional information related to a topic or
-concept are presented in the following style:
+Notes which represent additional information related to a topic or concept are presented in the following style:
 
   .. note::
 
      This is a note.
 
+
+
+.. _style-guide-inline-rest-markup:
+
+Inline reST markup
+------------------
+
+Italics.
+
+.. code-block:: rst
+
+    This *word* is italicized.
+
+The above code renders as follows.
+
+This *word* is italicized.
+
+Strong.
+
+.. code-block:: rst
+
+    This **word** is in bold text.
+
+The above code renders as follows.
+
+This **word** is in bold text.
+
+
+
+
+
+
 We present Python method names using the following style:
 
   :meth:`pyramid.config.Configurator.add_view`
 
-We present Python class names, module names, attributes, and global
-variables using the following style:
+We present Python class names, module names, attributes, and global variables using the following style:
 
   :class:`pyramid.config.Configurator.registry`
 
@@ -571,7 +617,6 @@ References to glossary terms are presented using the following style:
 
   :term:`Pylons`
 
-References to sections and chapters are presented using the following
-style:
+References to sections and chapters are presented using the following style:
 
   :ref:`traversal_chapter`
