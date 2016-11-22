@@ -1083,5 +1083,7 @@ serve it many times. When you change it you want ``pserve`` to restart:
     watch_files =
         myapp/static/favicon.ico
 
-Paths are relative to the configuration file and are passed to ``hupper``
-to watch. Currently it does not support globs but this may change.
+Paths may be absolute or relative to the configuration file. They may also
+be an :term:`asset specification`. These paths are passed to ``hupper`` which
+has some basic support for globbing. Acceptable glob patterns depend on the
+version of Python being used.
