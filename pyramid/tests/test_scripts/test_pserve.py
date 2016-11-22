@@ -2,6 +2,8 @@ import os
 import unittest
 from pyramid.tests.test_scripts import dummy
 
+here = os.path.abspath(os.path.dirname(__file__))
+
 class TestPServeCommand(unittest.TestCase):
     def setUp(self):
         from pyramid.compat import NativeIO
@@ -59,12 +61,19 @@ class TestPServeCommand(unittest.TestCase):
 
     def test_config_file_finds_watch_files(self):
         inst = self._makeOne('development.ini')
-        self.config_factory.items = [('watch_files', 'foo\nbar\n/baz')]
-        inst.pserve_file_config('/base/path.ini')
+        self.config_factory.items = [(
+            'watch_files',
+            'foo\n/baz\npyramid.tests.test_scripts:*.py',
+        )]
+        inst.pserve_file_config('/base/path.ini', global_conf={'a': '1'})
+        self.assertEqual(self.config_factory.defaults, {
+            'a': '1',
+            'here': os.path.abspath('/base'),
+        })
         self.assertEqual(inst.watch_files, [
-            os.path.normpath('/base/foo'),
-            os.path.normpath('/base/bar'),
-            os.path.normpath('/baz'),
+            os.path.abspath('/base/foo'),
+            os.path.abspath('/baz'),
+            os.path.abspath(os.path.join(here, '*.py')),
         ])
 
 class Test_main(unittest.TestCase):

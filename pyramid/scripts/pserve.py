@@ -32,6 +32,7 @@ from pyramid.compat import configparser
 
 from pyramid.scripts.common import parse_vars
 from pyramid.scripts.common import setup_logging
+from pyramid.path import AssetResolver
 from pyramid.settings import aslist
 
 def main(argv=sys.argv, quiet=False):
@@ -119,8 +120,14 @@ class PServeCommand(object):
         restvars = self.args[1:]
         return parse_vars(restvars)
 
-    def pserve_file_config(self, filename):
-        config = self.ConfigParser()
+    def pserve_file_config(self, filename, global_conf=None):
+        here = os.path.abspath(os.path.dirname(filename))
+        defaults = {}
+        if global_conf:
+            defaults.update(global_conf)
+        defaults['here'] = here
+
+        config = self.ConfigParser(defaults=defaults)
         config.optionxform = str
         config.read(filename)
         try:
@@ -131,11 +138,13 @@ class PServeCommand(object):
         watch_files = aslist(items.get('watch_files', ''), flatten=False)
 
         # track file paths relative to the ini file
-        basedir = os.path.dirname(filename)
+        resolver = AssetResolver(package=None)
         for file in watch_files:
-            if not os.path.isabs(file):
-                file = os.path.join(basedir, file)
-            self.watch_files.append(os.path.normpath(file))
+            if ':' in file:
+                file = resolver.resolve(file).abspath()
+            elif not os.path.isabs(file):
+                file = os.path.join(here, file)
+            self.watch_files.append(os.path.abspath(file))
 
     def run(self):  # pragma: no cover
         if not self.args:
@@ -185,8 +194,8 @@ class PServeCommand(object):
 
         if config_path:
             setup_logging(config_path, global_conf=vars)
+            self.pserve_file_config(config_path, global_conf=vars)
             self.watch_files.append(config_path)
-            self.pserve_file_config(config_path)
 
         if hupper.is_active():
             reloader = hupper.get_reloader()
@@ -205,19 +214,16 @@ class PServeCommand(object):
                 msg = 'Starting server.'
             self.out(msg)
 
-        def serve():
-            try:
-                server(app)
-            except (SystemExit, KeyboardInterrupt) as e:
-                if self.options.verbose > 1:
-                    raise
-                if str(e):
-                    msg = ' ' + str(e)
-                else:
-                    msg = ''
-                self.out('Exiting%s (-v to see traceback)' % msg)
-
-        serve()
+        try:
+            server(app)
+        except (SystemExit, KeyboardInterrupt) as e:
+            if self.options.verbose > 1:
+                raise
+            if str(e):
+                msg = ' ' + str(e)
+            else:
+                msg = ''
+            self.out('Exiting%s (-v to see traceback)' % msg)
 
 # For paste.deploy server instantiation (egg:pyramid#wsgiref)
 def wsgiref_server_runner(wsgi_app, global_conf, **kw): # pragma: no cover
