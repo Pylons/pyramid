@@ -281,6 +281,17 @@ class TestRouter(unittest.TestCase):
         self.assertTrue("view_name: ''" in message)
         self.assertTrue("subpath: []" in message)
 
+    def test_call_no_view_registered_debug_notfound_false_quote_url(self):
+        from pyramid.httpexceptions import HTTPNotFound
+        environ = self._makeEnviron(PATH_INFO="/<script>alert('hello world')</script>")
+        context = DummyContext()
+        self._registerTraverserFactory(context)
+        self._registerSettings(debug_notfound=False)
+        router = self._makeOne()
+        start_response = DummyStartResponse()
+        why = exc_raised(HTTPNotFound, router, environ, start_response)
+        self.assertEqual('/%3Cscript%3Ealert%28%27hello%20world%27%29%3C/script%3E', why.args[0])
+
     def test_call_view_returns_non_iresponse(self):
         from pyramid.interfaces import IViewClassifier
         context = DummyContext()
@@ -852,7 +863,7 @@ class TestRouter(unittest.TestCase):
         # https://github.com/Pylons/pyramid/issues/1223)
         self.assertEqual(request.exception, error)
         self.assertEqual(request.exc_info[:2], (RuntimeError, error,))
-        
+
     def test_call_view_raises_exception_view(self):
         from pyramid.interfaces import IViewClassifier
         from pyramid.interfaces import IExceptionViewClassifier
@@ -978,7 +989,7 @@ class TestRouter(unittest.TestCase):
         environ = self._makeEnviron()
         response = DummyResponse()
         view = DummyView(response, raise_exception=RuntimeError)
-        
+
         self._registerView(self.config.derive_view(view), '',
                            IViewClassifier, IRequest, None)
         exception_view = DummyView(None)
@@ -1317,7 +1328,7 @@ class DummyResponse(object):
         self.environ = environ
         start_response(self.status, self.headerlist)
         return self.app_iter
-    
+
 class DummyThreadLocalManager:
     def __init__(self):
         self.pushed = []
@@ -1328,7 +1339,7 @@ class DummyThreadLocalManager:
 
     def pop(self):
         self.popped.append(True)
-    
+
 class DummyAuthenticationPolicy:
     pass
 
@@ -1348,4 +1359,4 @@ def exc_raised(exc, func, *arg, **kw):
     else:
         raise AssertionError('%s not raised' % exc) # pragma: no cover
 
-    
+
