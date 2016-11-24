@@ -190,6 +190,20 @@ As individual files do not have so-called "parts" or "chapters", the headings wo
         Heading Level 4
         ```````````````
 
+The above code renders as follows.
+
+Heading Level 1
+===============
+
+Heading Level 2
+---------------
+
+Heading Level 3
+^^^^^^^^^^^^^^^
+
+Heading Level 4
+```````````````
+
 .. _style-guide-paragraphs:
 
 Paragraphs
@@ -205,9 +219,43 @@ Links
 
 Use inline links to keep the context or link label together with the URL. Do not use targets and links at the end of the page, because the separation makes it difficult to update and translate. Here is an example of inline links, our required method.
 
-    .. code-block:: rst
+.. code-block:: rst
 
-        `Example <http://example.com>`_
+    `TryPyramid <https://trypyramid.com>`_
+
+The above code renders as follows.
+
+`TryPyramid <https://TryPyramid.com>`_
+
+To link to pages within this documentation:
+
+.. code-block:: rst
+
+    :doc:`quick_tour`
+
+The above code renders as follows.
+
+:doc:`quick_tour`
+
+To link to a section within a page in this documentation:
+
+.. code-block:: rst
+
+    :ref:`quick_tour`
+
+The above code renders as follows.
+
+:ref:`quick_tour`
+
+To link to pages configured via intersphinx:
+
+.. code-block:: rst
+
+    :ref:`Deform <deform:overview>`
+
+The above code renders as follows.
+
+:ref:`Deform <deform:overview>`
 
 
 .. _style-guide-topic:
@@ -227,6 +275,13 @@ The directive's sole argument is interpreted as the topic title, and next line m
             the body of the topic, and are
             interpreted as body elements.
 
+The above code renders as follows.
+
+.. topic:: Topic Title
+
+    Subsequent indented lines comprise
+    the body of the topic, and are
+    interpreted as body elements.
 
 .. _style-guide-displaying-code:
 
@@ -247,78 +302,76 @@ Sphinx does syntax highlighting of code blocks using the `Pygments <http://pygme
 
 Do not use two colons "::" at the end of a line, followed by a blank line, then indented code. Always specify the language to be used for syntax highlighting by using the ``code-block`` directive and indenting the code.
 
-    .. code-block:: rst
+.. code-block:: rst
 
-        .. code-block:: python
+    .. code-block:: python
 
-            if "foo" == "bar":
-                # This is Python code
-                pass
+        if "foo" == "bar":
+            # This is Python code
+            pass
 
 XML:
 
-    .. code-block:: rst
+.. code-block:: rst
 
-        .. code-block:: xml
+    .. code-block:: xml
 
-            <somesnippet>Some XML</somesnippet>
+        <somesnippet>Some XML</somesnippet>
 
 Unix shell commands are prefixed with a ``$`` character. (See :term:`venv` for the meaning of ``$VENV``.)
 
-    .. code-block:: rst
+.. code-block:: rst
 
-        .. code-block:: bash
+    .. code-block:: bash
 
-           $ $VENV/bin/pip install -e .
+        $ $VENV/bin/pip install -e .
 
 Windows commands are prefixed with a drive letter with an optional directory name. (See :term:`venv` for the meaning of ``%VENV%``.)
 
-    .. code-block:: rst
+.. code-block:: rst
 
-        .. code-block:: doscon
+    .. code-block:: doscon
 
-           c:\> %VENV%\Scripts\pcreate -s starter MyProject
-
-  .. code-block:: doscon
+        c:\> %VENV%\Scripts\pcreate -s starter MyProject
 
 cfg:
 
-    .. code-block:: rst
+.. code-block:: rst
 
-        .. code-block:: cfg
+    .. code-block:: cfg
 
-           [some-part]
-           # A random part in the buildout
-           recipe = collective.recipe.foo
-           option = value
+       [some-part]
+       # A random part in the buildout
+       recipe = collective.recipe.foo
+       option = value
 
 ini:
 
-    .. code-block:: rst
+.. code-block:: rst
 
-        .. code-block:: ini
+    .. code-block:: ini
 
-            [nosetests]
-            match=^test
-            where=pyramid
-            nocapture=1
+        [nosetests]
+        match=^test
+        where=pyramid
+        nocapture=1
 
 Interactive Python:
 
-    .. code-block:: rst
+.. code-block:: rst
 
-        .. code-block:: pycon
+    .. code-block:: pycon
 
-           >>> class Foo:
-           ...     bar = 100
-           ...
-           >>> f = Foo()
-           >>> f.bar
-           100
-           >>> f.bar / 0
-           Traceback (most recent call last):
-             File "<stdin>", line 1, in <module>
-           ZeroDivisionError: integer division or modulo by zero
+       >>> class Foo:
+       ...     bar = 100
+       ...
+       >>> f = Foo()
+       >>> f.bar
+       100
+       >>> f.bar / 0
+       Traceback (most recent call last):
+         File "<stdin>", line 1, in <module>
+       ZeroDivisionError: integer division or modulo by zero
 
 If syntax highlighting is not enabled for your code block, you probably have a syntax error and Pygments will fail silently.
 
@@ -332,12 +385,12 @@ Displaying long commands
 
 When a command that should be typed on one line is too long to fit on the displayed width of a page, the backslash character ``\`` is used to indicate that the subsequent printed line should be part of the command:
 
-    .. code-block:: rst
+.. code-block:: rst
 
-        .. code-block:: bash
+    .. code-block:: bash
 
-            $ $VENV/bin/py.test tutorial/tests.py --cov-report term-missing \
-                --cov=tutorial -q
+        $ $VENV/bin/py.test tutorial/tests.py --cov-report term-missing \
+            --cov=tutorial -q
 
 
 .. _style-guide-code-block-options:
@@ -530,14 +583,9 @@ The above code renders as follows.
     :lines: 6-7
     :lineno-match:
 
-.. literalinclude:: narr/helloworld.py
-    :language: python
-    :lines: 6-7
-    :linenos:
+Out of all the ways to include parts of a file, ``pyobject`` is the most preferred option because if you change your code and add or remove lines, you don't need to adjust line numbering, whereas with ``lines`` you would have to adjust. ``start-after`` and ``end-before`` are less desirable because they depend on source code not changing. Alternatively you can insert comments into your source code to act as the delimiters, but that just adds comments that have nothing to do with the functionality of your code.
 
-Out of all the ways to include parts of a file, ``pyobject`` is the most preferred option because if you change your code and add or remove lines, you don't need to adjust line numbering, whereas with ``lines`` you would have to adjust. ``start-after`` and ``end-before`` are less desirable because they depend on source code not changing, or you can insert comments into your source code to act as the delimiters but that just adds comments that have nothing to do with the functionality of your code.
-
-Above all with includes, if you use line numbering, it's much preferred to use ``lineno-match`` over ``linenos`` with ``lineno-start`` because it "just works" without thinking.
+Above all with includes, if you use line numbering, it's much preferred to use ``lineno-match`` over ``linenos`` with ``lineno-start`` because it "just works" without thinking and with less markup.
 
 
 .. _style-guide-inline-code:
@@ -580,7 +628,13 @@ Notes which represent additional information related to a topic or concept are p
 Inline reST markup
 ------------------
 
-Italics.
+Within a block of content, inline markup is useful to apply styles and links to other files.
+
+
+.. _style-guide-italics:
+
+Italics
+^^^^^^^
 
 .. code-block:: rst
 
@@ -590,7 +644,11 @@ The above code renders as follows.
 
 This *word* is italicized.
 
-Strong.
+
+.. _style-guide-strong:
+
+Strong
+^^^^^^
 
 .. code-block:: rst
 
@@ -601,17 +659,59 @@ The above code renders as follows.
 This **word** is in bold text.
 
 
+.. _style-guide-python:
+
+Python modules, classes, methods, and functions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Python module names use the ``mod`` directive, with the module name as the argument.
+
+.. code-block:: rst
+
+    :mod:`pyramid.config`
+
+The above code renders as follows.
+
+:mod:`pyramid.config`
+
+Python class names use the ``class`` directive, with the class name as the argument.
+
+.. code-block:: rst
+
+    :class:`pyramid.config.Configurator`
+
+The above code renders as follows.
+
+:class:`pyramid.config.Configurator`
+
+Python method names use the ``meth`` directive, with the method name as the argument.
+
+.. code-block:: rst
+
+    :meth:`pyramid.config.Configurator.add_view`
+
+The above code renders as follows.
+
+:meth:`pyramid.config.Configurator.add_view`
+
+Python function names use the ``func`` directive, with the function name as the argument.
+
+.. code-block:: rst
+
+    :func:`pyramid.renderers.render_to_response`
+
+The above code renders as follows.
+
+:func:`pyramid.renderers.render_to_response`
 
 
 
 
-We present Python method names using the following style:
 
-  :meth:`pyramid.config.Configurator.add_view`
 
-We present Python class names, module names, attributes, and global variables using the following style:
+:app:`Pyramid`
 
-  :class:`pyramid.config.Configurator.registry`
+:ref:`i18n_chapter`
 
 References to glossary terms are presented using the following style:
 
@@ -620,3 +720,18 @@ References to glossary terms are presented using the following style:
 References to sections and chapters are presented using the following style:
 
   :ref:`traversal_chapter`
+
+.. _style-guide-tables:
+
+Tables
+^^^^^^
+
+API documentation
+-----------------
+
+.. automodule:: pyramid.i18n
+
+.. autoclass:: TranslationString
+
+.. autofunction:: TranslationStringFactory
+
