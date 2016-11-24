@@ -731,7 +731,7 @@ API documentation
 
 .. automodule:: pyramid.i18n
 
-.. autoclass:: TranslationString
+.. .. autoclass:: TranslationString
 
-.. autofunction:: TranslationStringFactory
+.. .. autofunction:: TranslationStringFactory
 
