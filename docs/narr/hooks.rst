@@ -1772,6 +1772,11 @@ View derivers are unique in that they have access to most of the options
 passed to :meth:`pyramid.config.Configurator.add_view` in order to decide what
 to do, and they have a chance to affect every view in the application.
 
+.. warning::
+
+Only views which are added to the configuration *after* a view deriver has been
+added will be derived by it.
+
 .. _exception_view_derivers:
 
 Exception Views and View Derivers
