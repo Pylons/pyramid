@@ -1774,8 +1774,8 @@ to do, and they have a chance to affect every view in the application.
 
 .. warning::
 
-Only views which are added to the configuration *after* a view deriver has been
-added will be derived by it.
+    Only views which are added to the configuration *after* a view deriver has been
+    added will be derived by it.
 
 .. _exception_view_derivers:
 
