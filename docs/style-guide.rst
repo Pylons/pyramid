@@ -3,9 +3,9 @@
 Style Guide
 ===========
 
-.. admonition:: description
-
-   This chapter describes how to edit, update, and build the :app:`Pyramid` documentation. For coding style guidelines, see `Coding Style <http://docs.pylonsproject.org/en/latest/community/codestyle.html#coding-style>`_.
+.. meta::
+   :description: This chapter describes how to edit, update, and build the Pyramid documentation.
+   :keywords: Pyramid, Style Guide
 
 
 .. _style-guide-introduction:
@@ -14,6 +14,8 @@ Introduction
 ------------
 
 This chapter provides details of how to contribute updates to the documentation following style guidelines and conventions. We provide examples, including reStructuredText code and its rendered output for both visual and technical reference.
+
+For coding style guidelines, see `Coding Style <http://docs.pylonsproject.org/en/latest/community/codestyle.html#coding-style>`_.
 
 
 .. _style-guide-contribute:
@@ -75,7 +77,7 @@ Page structure
 
 Each page should contain in order the following.
 
-- The main heading. This will be visible in the table of contents.
+#. The main heading. This will be visible in the table of contents.
 
     .. code-block:: rst
 
@@ -83,17 +85,22 @@ Each page should contain in order the following.
         The main heading
         ================
 
-- The description of the page. This text will be displayed to the reader below the main heading as well as be inserted into the description metadata field of the document. It will be displayed in search engine listings for the page. This is created using the reST ``admonition`` directive. A single paragraph of text consisting of no more than three sentences is recommended, so that the same text fits into search engine results:
+#. Meta tag information. The "meta" directive is used to specify HTML metadata stored in HTML META tags. "Metadata" is data about data, in this case data about web pages. Metadata is used to describe and classify web pages in the World Wide Web, in a form that is easy for search engines to extract and collate.
 
     .. code-block:: rst
 
-        .. admonition:: description
+        .. meta::
+           :description: This chapter describes how to edit, update, and build the Pyramid documentation.
+           :keywords: Pyramid, Style Guide
 
-           This is a description of the page, which will appear inline and in the description metadata field.
+    The above code renders as follows.
 
-    .. note:: The ``description`` metadata field is not yet implemented in the documentation's Sphinx theme, but it is a `feature request <https://github.com/Pylons/pylons_sphinx_theme/wiki/New-Theme-Requests>`_, so it is helpful to start using the ``description`` admonition now.
+    .. code-block:: xml
 
-- Introduction paragraph.
+        <meta content="This chapter describes how to edit, update, and build the Pyramid documentation." name="description" />
+        <meta content="Pyramid, Style Guide" name="keywords" />
+
+#. Introduction paragraph.
 
     .. code-block:: rst
 
@@ -102,7 +109,7 @@ Each page should contain in order the following.
 
         This chapter is an introduction.
 
-- Finally the content of the document page, consisting of reST elements such as headings, paragraphs, tables, and so on.
+#. Finally the content of the document page, consisting of reST elements such as headings, paragraphs, tables, and so on.
 
 
 .. _style-guide-page-content:
@@ -376,6 +383,26 @@ Interactive Python:
 If syntax highlighting is not enabled for your code block, you probably have a syntax error and Pygments will fail silently.
 
 View the `full list of lexers and associated short names <http://pygments.org/docs/lexers/>`_.
+
+
+.. _style-guide-parsed-literals:
+
+Parsed literals
+```````````````
+
+Parsed literals are used to render, for example, a specific version number of the application in code blocks. Use the directive ``parsed-literal``. Note that syntax highlighting is not supported and code is rendered as plain text.
+
+.. code-block:: rst
+
+    .. parsed-literal::
+
+        $ $VENV/bin/pip install "pyramid==\ |release|\ "
+
+The above code renders as follows.
+
+.. parsed-literal::
+
+    $ $VENV/bin/pip install "pyramid==\ |release|\ "
 
 
 .. _style-guide-long-commands:
@@ -736,12 +763,12 @@ The above code renders as follows.
 +------------------------+------------+---------------------+
 
 
-.. _style-guide-danger-errors:
+.. _style-guide-danger:
 
-Danger and errors
-^^^^^^^^^^^^^^^^^
+Danger
+^^^^^^
 
-Danger and errors represent critical information related to a topic or concept, and should recommend to the user "don't do this dangerous thing". ``danger`` and ``error`` appear similarly when rendered, but the HTML generated has the appropriate semantic context.
+Danger represents critical information related to a topic or concept, and should recommend to the user "don't do this dangerous thing".
 
 .. code-block:: rst
 
