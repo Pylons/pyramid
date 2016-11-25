@@ -146,9 +146,9 @@ Grammar, spelling, and capitalization preferences
 
 Use any commercial or free professional style guide in general. Use a spell- and grammar-checker. The following table lists the preferred grammar, spelling, and capitalization of words and phrases for frequently used items in the documentation.
 
-========== ======================
+========== =====
 Preferred  Avoid
-========== ======================
+========== =====
 add-on     addon
 and so on  etc.
 GitHub     Github, github
@@ -157,7 +157,7 @@ plug-in    plugin
 select     check, tick (checkbox)
 such as    like
 verify     be sure
-========== ======================
+========== =====
 
 
 .. _style-guide-headings:
@@ -604,31 +604,244 @@ The above code renders as follows.
 Install requirements for building documentation: ``pip install -e ".[docs]"``
 
 
-.. _style-guide-block-rest-markup:
+.. _style-guide-rest-block-markup:
 
-Block reST markup
+reST block markup
 -----------------
 
-Warnings which represent limitations and need-to-know information related to a topic or concept are presented in the following style:
-
-  .. warning::
-
-     This is a warning.
-
-Notes which represent additional information related to a topic or concept are presented in the following style:
-
-  .. note::
-
-     This is a note.
+This section contains miscellaneous reST block markup for items not already covered.
 
 
+.. _style-guide-lists:
 
-.. _style-guide-inline-rest-markup:
+Lists
+^^^^^
 
-Inline reST markup
+Bulleted lists use an asterisk "``*``".
+
+.. code-block:: rst
+
+    * This is an item in a bulleted list.
+    * This is another item in a bulleted list.
+
+The above code renders as follows.
+
+* This is an item in a bulleted list.
+* This is another item in a bulleted list.
+
+Numbered lists should use a number sign followed by a period "``#.``" and will be numbered automatically.
+
+.. code-block:: rst
+
+    #. This is an item in a numbered list.
+    #. This is another item in a numbered list.
+
+The above code renders as follows.
+
+#. This is an item in a numbered list.
+#. This is another item in a numbered list.
+
+The appearance of nested lists can be created by separating the child lists from their parent list by blank lines, and indenting by two spaces. Note that Sphinx renders the reST markup not as nested HTML lists, but instead merely indents the children using ``<blockquote>``.
+
+.. code-block:: rst
+
+    #. This is a list item in the parent list.
+    #. This is another list item in the parent list.
+
+      #. This is a list item in the child list.
+      #. This is another list item in the child list.
+
+    #. This is one more list item in the parent list.
+
+The above code renders as follows.
+
+#. This is a list item in the parent list.
+#. This is another list item in the parent list.
+
+  #. This is a list item in the child list.
+  #. This is another list item in the child list.
+
+#. This is one more list item in the parent list.
+
+
+.. _style-guide-tables:
+
+Tables
+^^^^^^
+
+Two forms of tables are supported, `simple <http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html#simple-tables>`_ and `grid <http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html#grid-tables>`_.
+
+Simple tables require less markup but have fewer features and some constraints compared to grid tables. The right-most column in simple tables is unbound to the length of the underline in the column header.
+
+.. code-block:: rst
+
+    =====  =====
+    col 1  col 2
+    =====  =====
+    1      Second column of row 1.
+    2      Second column of row 2.
+           Second line of paragraph.
+    3      - Second column of row 3.
+
+           - Second item in bullet
+             list (row 3, column 2).
+    \      Row 4; column 1 will be empty.
+    =====  =====
+
+The above code renders as follows.
+
+=====  =====
+col 1  col 2
+=====  =====
+1      Second column of row 1.
+2      Second column of row 2.
+       Second line of paragraph.
+3      - Second column of row 3.
+
+       - Second item in bullet
+         list (row 3, column 2).
+\      Row 4; column 1 will be empty.
+=====  =====
+
+Grid tables have much more cumbersome markup, although Emacs' table mode may lessen the tedium.
+
+.. code-block:: rst
+
+    +------------------------+------------+----------+----------+
+    | Header row, column 1   | Header 2   | Header 3 | Header 4 |
+    | (header rows optional) |            |          |          |
+    +========================+============+==========+==========+
+    | body row 1, column 1   | column 2   | column 3 | column 4 |
+    +------------------------+------------+----------+----------+
+    | body row 2             | Cells may span columns.          |
+    +------------------------+------------+---------------------+
+    | body row 3             | Cells may  | - Table cells       |
+    +------------------------+ span rows. | - contain           |
+    | body row 4             |            | - body elements.    |
+    +------------------------+------------+---------------------+
+
+The above code renders as follows.
+
++------------------------+------------+----------+----------+
+| Header row, column 1   | Header 2   | Header 3 | Header 4 |
+| (header rows optional) |            |          |          |
++========================+============+==========+==========+
+| body row 1, column 1   | column 2   | column 3 | column 4 |
++------------------------+------------+----------+----------+
+| body row 2             | Cells may span columns.          |
++------------------------+------------+---------------------+
+| body row 3             | Cells may  | - Table cells       |
++------------------------+ span rows. | - contain           |
+| body row 4             |            | - body elements.    |
++------------------------+------------+---------------------+
+
+
+.. _style-guide-danger-errors:
+
+Danger and errors
+^^^^^^^^^^^^^^^^^
+
+Danger and errors represent critical information related to a topic or concept, and should recommend to the user "don't do this dangerous thing". ``danger`` and ``error`` appear similarly when rendered, but the HTML generated has the appropriate semantic context.
+
+.. code-block:: rst
+
+    .. danger::
+
+        This is danger or an error.
+
+The above code renders as follows.
+
+.. danger::
+
+    This is danger or an error.
+
+.. todo::
+
+    The style for ``danger`` and ``error`` has not yet been created.
+
+
+.. _style-guide-warnings:
+
+Warnings
+^^^^^^^^
+
+Warnings represent limitations and advice related to a topic or concept.
+
+.. code-block:: rst
+
+    .. warning::
+
+        This is a warning.
+
+The above code renders as follows.
+
+.. warning::
+
+    This is a warning.
+
+
+.. _style-guide-notes:
+
+Notes
+^^^^^
+
+Notes represent additional information related to a topic or concept.
+
+.. code-block:: rst
+
+    .. note::
+
+        This is a note.
+
+The above code renders as follows.
+
+.. note::
+
+    This is a note.
+
+
+.. _style-guide-todo:
+
+Todo
+^^^^
+
+Todo items designated tasks that require further work.
+
+.. code-block:: rst
+
+    .. todo::
+
+        This is a todo item.
+
+The above code renders as follows.
+
+.. todo::
+
+    This is a todo item.
+
+.. todo::
+
+    The todo style is not yet implemented and needs further work.
+
+
+.. _style-guide-comments:
+
+Comments
+^^^^^^^^
+
+Comments of the documentation within the documentation may be generated with two periods ``..``. Comments are not rendered, but provide information to documentation authors.
+
+.. code-block:: rst
+
+    .. This is an example comment.
+
+
+.. _style-guide-rest-inline-markup:
+
+reST inline markup
 ------------------
 
-Within a block of content, inline markup is useful to apply styles and links to other files.
+This section contains miscellaneous reST inline markup for items not already covered. Within a block of content, inline markup is useful to apply styles and links to other files.
 
 
 .. _style-guide-italics:
@@ -704,8 +917,9 @@ The above code renders as follows.
 
 :func:`pyramid.renderers.render_to_response`
 
+.. seealso::
 
-
+    See also the Sphinx documentation for the :ref:`reStructuredText Primer <sphinx:rst-primer>`.
 
 
 
@@ -717,14 +931,14 @@ References to glossary terms are presented using the following style:
 
   :term:`Pylons`
 
+Glossary terms appear in the Glossary
+
+.. glossary:: :sorted:
+
 References to sections and chapters are presented using the following style:
 
   :ref:`traversal_chapter`
 
-.. _style-guide-tables:
-
-Tables
-^^^^^^
 
 API documentation
 -----------------
