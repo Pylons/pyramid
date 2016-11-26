@@ -259,7 +259,7 @@ Indentation
 Grammar, spelling, and capitalization preferences
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Use any commercial or free professional style guide in general. Use a spell* and grammar-checker. The following table lists the preferred grammar, spelling, and capitalization of words and phrases for frequently used items in the documentation.
+Use any commercial or free professional style guide in general. Use a spell- and grammar-checker. The following table lists the preferred grammar, spelling, and capitalization of words and phrases for frequently used items in the documentation.
 
 ========== =====
 Preferred  Avoid
@@ -303,7 +303,7 @@ As individual files do not have so-called "parts" or "chapters", the headings wo
         ^^^^^^^^^^^^^^^
 
         Heading Level 4
-        ```````````````
+        """""""""""""""
 
 The above code renders as follows.
 
@@ -317,7 +317,7 @@ Heading Level 3
 ^^^^^^^^^^^^^^^
 
 Heading Level 4
-```````````````
+"""""""""""""""
 
 .. _style-guide-paragraphs:
 
@@ -383,7 +383,7 @@ Code may be displayed in blocks or inline. You can include blocks of code from o
 .. _style-guide-syntax-highlighting:
 
 Syntax highlighting
-```````````````````
+"""""""""""""""""""
 
 Sphinx does syntax highlighting of code blocks using the `Pygments <http://pygments.org/>`_ library.
 
@@ -468,7 +468,7 @@ View the `full list of lexers and associated short names <http://pygments.org/do
 .. _style-guide-parsed-literals:
 
 Parsed literals
-```````````````
+"""""""""""""""
 
 Parsed literals are used to render, for example, a specific version number of the application in code blocks. Use the directive ``parsed-literal``. Note that syntax highlighting is not supported and code is rendered as plain text.
 
@@ -488,7 +488,7 @@ The above code renders as follows.
 .. _style-guide-long-commands:
 
 Displaying long commands
-````````````````````````
+""""""""""""""""""""""""
 
 When a command that should be typed on one line is too long to fit on the displayed width of a page, the backslash character ``\`` is used to indicate that the subsequent printed line should be part of the command:
 
@@ -503,7 +503,7 @@ When a command that should be typed on one line is too long to fit on the displa
 .. _style-guide-code-block-options:
 
 Code block options
-``````````````````
+""""""""""""""""""
 
 To emphasize lines (give the appearance that a highlighting pen has been used on the code), use the ``emphasize-lines`` option. The argument passed to ``emphasize-lines`` must be a comma-separated list of either single or ranges of line numbers.
 
@@ -591,7 +591,7 @@ The above code renders as follows. As you can see, ``lineno-start`` is not altog
 .. _style-guide-includes:
 
 Includes
-````````
+""""""""
 
 Longer displays of verbatim text may be included by storing the example text in an external file containing only plain text or code. The file may be included using the ``literalinclude`` directive. The file name follows the conventions of :ref:`style-guide-file-conventions`.
 
@@ -698,7 +698,7 @@ Above all with includes, if you use line numbering, it's much preferred to use `
 .. _style-guide-inline-code:
 
 Inline code
-```````````
+"""""""""""
 
 Inline code is surrounded by double backtick marks. Literals, filenames, and function arguments are presented using this style.
 
@@ -854,7 +854,7 @@ Three directives designate the version in which something is added, changed, or 
 .. _style-guide-version-added:
 
 Version added
-`````````````
+"""""""""""""
 
 To indicate the version in which a feature is added to a project, use the ``versionadded`` directive. If the feature is an entire module, then the directive should be placed at the top of the module section before any prose.
 
@@ -874,7 +874,7 @@ The above code renders as follows.
 .. _style-guide-version-changed:
 
 Version changed
-```````````````
+"""""""""""""""
 
 To indicate the version in which a feature is changed in a project, use the ``versionchanged`` directive. Its arguments are the same as ``versionadded``.
 
@@ -892,7 +892,7 @@ The above code renders as follows.
 .. _style-guide-deprecated:
 
 Deprecated
-``````````
+""""""""""
 
 Similar to ``versionchanged``, ``deprecated`` describes when the feature was deprecated. An explanation can also be given, for example, to inform the reader what should be used instead.
 
@@ -1082,7 +1082,7 @@ To create cross-references to a document, arbitrary location, object, or other i
 .. _style-guide-cross-referencing-documents:
 
 Cross-referencing documents
-```````````````````````````
+"""""""""""""""""""""""""""
 
 To link to pages within this documentation:
 
@@ -1098,7 +1098,7 @@ The above code renders as follows.
 .. _style-guide-cross-referencing-arbitrary-locations:
 
 Cross-referencing arbitrary locations
-`````````````````````````````````````
+"""""""""""""""""""""""""""""""""""""
 
 To support cross-referencing to arbitrary locations in any document and between documentation sets via intersphinx, the standard reST labels are used. For this to work, label names must be unique throughout the entire documentation including externally linked intersphinx references. There are two ways in which you can refer to labels, if they are placed directly before a section title, a figure, or table with a caption, or at any other location. The following section has a label with the syntax ``.. _label_name:`` followed by the section title.
 
@@ -1129,7 +1129,7 @@ For labels that are not placed as mentioned, the link must be given an explicit 
 .. _style-guide-cross-referencing-python:
 
 Python modules, classes, methods, and functions
-```````````````````````````````````````````````
+"""""""""""""""""""""""""""""""""""""""""""""""
 
 Python module names use the ``mod`` directive, with the module name as the argument.
 
@@ -1188,7 +1188,6 @@ The role ``:app:`Pyramid```
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 We use the special role ``app`` to refer to the application "Pyramid".
-
 
 .. code-block:: rst
 
