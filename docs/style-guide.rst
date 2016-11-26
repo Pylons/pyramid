@@ -250,7 +250,7 @@ Trailing white spaces
 Indentation
 ^^^^^^^^^^^
 
-* Indent using four spaces.
+* Indent using four spaces, except for :ref:`nested lists <style-guide-lists>`.
 * Do not use tabs to indent.
 
 
@@ -387,7 +387,7 @@ Syntax highlighting
 
 Sphinx does syntax highlighting of code blocks using the `Pygments <http://pygments.org/>`_ library.
 
-Do not use two colons "::" at the end of a line, followed by a blank line, then indented code. Always specify the language to be used for syntax highlighting by using the ``code-block`` directive and indenting the code.
+Do not use two colons "::" at the end of a line, followed by a blank line, then code. Always specify the language to be used for syntax highlighting by using a language argument in the ``code-block`` directive. Always indent the subsequent code.
 
 .. code-block:: rst
 
@@ -449,16 +449,16 @@ Interactive Python:
 
     .. code-block:: pycon
 
-       >>> class Foo:
-       ...     bar = 100
-       ...
-       >>> f = Foo()
-       >>> f.bar
-       100
-       >>> f.bar / 0
-       Traceback (most recent call last):
-         File "<stdin>", line 1, in <module>
-       ZeroDivisionError: integer division or modulo by zero
+        >>> class Foo:
+        ...     bar = 100
+        ...
+        >>> f = Foo()
+        >>> f.bar
+        100
+        >>> f.bar / 0
+        Traceback (most recent call last):
+          File "<stdin>", line 1, in <module>
+        ZeroDivisionError: integer division or modulo by zero
 
 If syntax highlighting is not enabled for your code block, you probably have a syntax error and Pygments will fail silently.
 
@@ -545,7 +545,7 @@ The above code renders as follows.
         # This is Python code
         pass
 
-Code blocks may be given a caption, which may serve as a filename or other description, using the ``caption`` option. They may also be given a ``name`` option, providing an implicit target name that can be referenced by using ``ref``.
+Code blocks may be given a caption, which may serve as a filename or other description, using the ``caption`` option. They may also be given a ``name`` option, providing an implicit target name that can be referenced by using ``ref`` (see :ref:`style-guide-cross-referencing-arbitrary-locations`).
 
 .. code-block:: rst
 
@@ -578,7 +578,7 @@ To specify the starting number to use for line numbering, use the ``lineno-start
             # This is Python code
             pass
 
-The above code renders as follows. As you can see, ``lineno-start`` is not altogether meaningful.
+The above code renders as follows. As you can see, ``lineno-start`` is not altogether accurate.
 
 .. code-block:: python
     :lineno-start: 2
@@ -1171,15 +1171,15 @@ The above code renders as follows.
 
 :func:`pyramid.renderers.render_to_response`
 
-Note that you can use either or combine the ``~`` and ``.`` prefixes. However, we prefer not to use the ``.`` prefix because Sphinx might generate an error if it cannot disambiguate the reference.
+Note that you can use the ``~`` prefix to show only the last segment of a Python object's name. We prefer not to use the ``.`` prefix, even though it may seem to be a convenience to documentation authors, because Sphinx might generate an error if it cannot disambiguate the reference.
 
 .. code-block:: rst
 
-    :func:`~.render_to_response`
+    :func:`~pyramid.renderers.render_to_response`
 
 The above code renders as follows.
 
-:func:`~.render_to_response`
+:func:`~pyramid.renderers.render_to_response`
 
 
 .. _style-guide-role-app-pyramid:
