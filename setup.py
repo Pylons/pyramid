@@ -14,19 +14,21 @@
 
 import os
 import sys
+import warnings
 
 from setuptools import setup, find_packages
 
 py_version = sys.version_info[:2]
 
-PY3 = py_version[0] == 3
+PY2 = py_version[0] == 2
 
-if PY3:
-    if py_version < (3, 4):
-        raise RuntimeError('On Python 3, Pyramid requires Python 3.4 or better')
-else:
-    if py_version < (2, 7):
-        raise RuntimeError('On Python 2, Pyramid requires Python 2.7 or better')
+if (3, 0) <= py_version < (3, 4):
+    warnings.warn(
+        'On Python 3, Pyramid only supports Python 3.4 or better',
+        UserWarning,
+    )
+elif py_version < (2, 7):
+    raise RuntimeError('On Python 2, Pyramid requires Python 2.7 or better')
 
 here = os.path.abspath(os.path.dirname(__file__))
 try:
@@ -53,7 +55,7 @@ tests_require = [
     'WebTest >= 1.3.1', # py3 compat
     ]
 
-if not PY3:
+if PY2:
     tests_require.append('zope.component>=3.11.0')
 
 docs_extras = [
