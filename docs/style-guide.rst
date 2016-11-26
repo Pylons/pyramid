@@ -35,18 +35,60 @@ When submitting a pull request for the first time in a project, sign `CONTRIBUTO
 Location, referencing, and naming of files
 ------------------------------------------
 
-- reStructuredText (reST) files must be located in ``docs/`` and its subdirectories.
-- Image files must be located in ``docs/_static/``.
-- reST directives must refer to files either relative to the source file or absolute from the top source directory. For example, in ``docs/narr/source.rst``, you could refer to a file in a different directory as either ``.. include:: ../diff-dir/diff-source.rst`` or ``.. include:: /diff-dir/diff-source.rst``.
-- File names should be lower-cased and have words separated with either a hyphen "-" or an underscore "_".
-- reST files must have an extension of ``.rst``.
-- Image files may be any format but must have lower-cased file names and have standard file extensions that consist three letters (``.gif``, ``.jpg``, ``.png``, ``.svg``).  ``.gif`` and ``.svg`` are not currently supported by PDF builders in Sphinx, but you can allow the Sphinx builder to automatically select the correct image format for the desired output by replacing the three-letter file extension with ``*``.  For example:
+* reStructuredText (reST) files must be located in ``docs/`` and its subdirectories.
+* Image files must be located in ``docs/_static/``.
+* reST directives must refer to files either relative to the source file or absolute from the top source directory. For example, in ``docs/narr/source.rst``, you could refer to a file in a different directory as either ``.. include:: ../diff-dir/diff-source.rst`` or ``.. include:: /diff-dir/diff-source.rst``.
+* File names should be lower-cased and have words separated with either a hyphen "-" or an underscore "_".
+* reST files must have an extension of ``.rst``.
+* Image files may be any format but must have lower-cased file names and have standard file extensions that consist three letters (``.gif``, ``.jpg``, ``.png``, ``.svg``).  ``.gif`` and ``.svg`` are not currently supported by PDF builders in Sphinx, but you can allow the Sphinx builder to automatically select the correct image format for the desired output by replacing the three-letter file extension with ``*``.  For example:
 
   .. code-block:: rst
 
-     .. image:: ../_static/pyramid_request_processing.-
+      .. image:: ../_static/pyramid_request_processing.
 
-  will select the image ``pyramid_request_processing.svg`` for the HTML documentation builder, and ``pyramid_request_processing.png`` for the PDF builder. See the related [Stack Overflow post](http://stackoverflow.com/questions/6473660/using-sphinx-docs-how-can-i-specify-png-image-formats-for-html-builds-and-pdf-im/6486713#6486713).
+  will select the image ``pyramid_request_processing.svg`` for the HTML documentation builder, and ``pyramid_request_processing.png`` for the PDF builder. See the related `Stack Overflow post <http://stackoverflow.com/questions/6473660/using-sphinx-docs-how-can-i-specify-png-image-formats-for-html-builds-and-pdf-im/6486713#6486713>`_.
+
+
+.. _style-guide-glossary:
+
+Glossary
+--------
+
+A glossary defines terms used throughout the documentation.
+
+The glossary file must be named ``glossary.rst``. Its content must begin with the directive ``glossary``. An optional ``sorted`` argument should be used to sort the terms alphabetically when rendered, making it easier for the user to find a given term. Without the argument ``sorted``, terms will appear in the order of the ``glossary`` source file.
+
+.. code-block:: rst
+
+    .. glossary::
+        :sorted:
+
+        voom
+            Theoretically, the sound a parrot makes when four-thousand volts of electricity pass through it.
+
+        pining
+            What the Norwegien Blue does when it misses its homeland, e.g., pining for the fjords.
+
+The above code renders as follows.
+
+.. glossary::
+    :sorted:
+
+    voom
+        Theoretically, the sound a parrot makes when four-thousand volts of electricity pass through it.
+
+    pining
+        What the Norwegien Blue does when it misses its homeland, e.g., pining for the fjords.
+
+References to glossary terms use the ``term`` directive.
+
+.. code-block:: rst
+
+    :term:`voom`
+
+The above code renders as follows. Note it is hyperlinked, and when clicked it will take the user to the term in the Glossary and highlight the term.
+
+:term:`voom`
 
 
 .. _style-guide-section-structure:
@@ -56,9 +98,9 @@ Section structure
 
 Each section, or a subdirectory of reST files, such as a tutorial, must contain an ``index.rst`` file. ``index.rst`` must contain the following.
 
-- A section heading. This will be visible in the table of contents.
-- A single paragraph describing this section.
-- A Sphinx ``toctree`` directive, with a ``maxdepth`` of 2. Each ``.rst`` file in the folder should be linked to this ``toctree``.
+* A section heading. This will be visible in the table of contents.
+* A single paragraph describing this section.
+* A Sphinx ``toctree`` directive, with a ``maxdepth`` of 2. Each ``.rst`` file in the folder should be linked to this ``toctree``.
 
     .. code-block:: rst
 
@@ -133,8 +175,8 @@ Narrative documentation is not code, and should therefore not adhere to PEP8 or 
 Trailing white spaces
 ^^^^^^^^^^^^^^^^^^^^^
 
-- No trailing white spaces.
-- Always use a line feed or carriage return at the end of a file.
+* No trailing white spaces.
+* Always use a line feed or carriage return at the end of a file.
 
 
 .. _style-guide-indentation:
@@ -142,8 +184,8 @@ Trailing white spaces
 Indentation
 ^^^^^^^^^^^
 
-- Indent using four spaces.
-- Do not use tabs to indent.
+* Indent using four spaces.
+* Do not use tabs to indent.
 
 
 .. _style-guide-grammar-spelling-preferences:
@@ -151,7 +193,7 @@ Indentation
 Grammar, spelling, and capitalization preferences
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Use any commercial or free professional style guide in general. Use a spell- and grammar-checker. The following table lists the preferred grammar, spelling, and capitalization of words and phrases for frequently used items in the documentation.
+Use any commercial or free professional style guide in general. Use a spell* and grammar-checker. The following table lists the preferred grammar, spelling, and capitalization of words and phrases for frequently used items in the documentation.
 
 ========== =====
 Preferred  Avoid
@@ -176,10 +218,10 @@ Capitalize only the first letter in a heading (sentence-case), unless other word
 
 For consistent heading characters throughout the documentation, follow the guidelines stated in the `Python Developer's Guide <https://docs.python.org/devguide/documenting.html#sections>`_. Specifically:
 
-- =, for sections
-- -, for subsections
-- ^, for subsubsections
-- ", for paragraphs
+* =, for sections
+* -, for subsections
+* ^, for subsubsections
+* ", for paragraphs
 
 As individual files do not have so-called "parts" or "chapters", the headings would be underlined with characters as shown.
 
@@ -527,10 +569,10 @@ The above code renders as follows.
 
 Like code blocks, ``literalinclude`` supports the following options.
 
-- ``language`` to select a language for syntax highlighting
-- ``linenos`` to switch on line numbers
-- ``lineno-start`` to specify the starting number to use for line numbering
-- ``emphasize-lines`` to emphasize particular lines
+* ``language`` to select a language for syntax highlighting
+* ``linenos`` to switch on line numbers
+* ``lineno-start`` to specify the starting number to use for line numbering
+* ``emphasize-lines`` to emphasize particular lines
 
 .. code-block:: rst
 
@@ -708,9 +750,9 @@ Simple tables require less markup but have fewer features and some constraints c
     1      Second column of row 1.
     2      Second column of row 2.
            Second line of paragraph.
-    3      - Second column of row 3.
+    3      * Second column of row 3.
 
-           - Second item in bullet
+           * Second item in bullet
              list (row 3, column 2).
     \      Row 4; column 1 will be empty.
     =====  =====
@@ -723,9 +765,9 @@ col 1  col 2
 1      Second column of row 1.
 2      Second column of row 2.
        Second line of paragraph.
-3      - Second column of row 3.
+3      * Second column of row 3.
 
-       - Second item in bullet
+       * Second item in bullet
          list (row 3, column 2).
 \      Row 4; column 1 will be empty.
 =====  =====
@@ -742,9 +784,9 @@ Grid tables have much more cumbersome markup, although Emacs' table mode may les
     +------------------------+------------+----------+----------+
     | body row 2             | Cells may span columns.          |
     +------------------------+------------+---------------------+
-    | body row 3             | Cells may  | - Table cells       |
-    +------------------------+ span rows. | - contain           |
-    | body row 4             |            | - body elements.    |
+    | body row 3             | Cells may  | * Table cells       |
+    +------------------------+ span rows. | * contain           |
+    | body row 4             |            | * body elements.    |
     +------------------------+------------+---------------------+
 
 The above code renders as follows.
@@ -757,9 +799,9 @@ The above code renders as follows.
 +------------------------+------------+----------+----------+
 | body row 2             | Cells may span columns.          |
 +------------------------+------------+---------------------+
-| body row 3             | Cells may  | - Table cells       |
-+------------------------+ span rows. | - contain           |
-| body row 4             |            | - body elements.    |
+| body row 3             | Cells may  | * Table cells       |
++------------------------+ span rows. | * contain           |
+| body row 4             |            | * body elements.    |
 +------------------------+------------+---------------------+
 
 
@@ -1034,17 +1076,12 @@ The above code renders as follows.
 
 
 
+
+
+
 :app:`Pyramid`
 
 :ref:`i18n_chapter`
-
-References to glossary terms are presented using the following style:
-
-  :term:`Pylons`
-
-Glossary terms appear in the Glossary
-
-.. glossary:: :sorted:
 
 References to sections and chapters are presented using the following style:
 
