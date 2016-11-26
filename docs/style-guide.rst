@@ -763,6 +763,70 @@ The above code renders as follows.
 +------------------------+------------+---------------------+
 
 
+.. _style-guide-feature-versioning:
+
+Feature versioning
+^^^^^^^^^^^^^^^^^^
+
+Three directives designate the version in which something is added, changed, or deprecated in the project.
+
+
+.. _style-guide-version-added:
+
+Version added
+`````````````
+
+To indicate the version in which a feature is added to a project, use the ``versionadded`` directive. If the feature is an entire module, then the directive should be placed at the top of the module section before any prose.
+
+The first argument is the version. An optional second argument must appear upon a subsequent line, without blank lines in between, and indented.
+
+.. code-block:: rst
+
+    .. versionadded:: 1.1
+        :func:`pyramid.paster.bootstrap`
+
+The above code renders as follows.
+
+.. versionadded:: 1.1
+    :func:`pyramid.paster.bootstrap`
+
+
+.. _style-guide-version-changed:
+
+Version changed
+```````````````
+
+To indicate the version in which a feature is changed in a project, use the ``versionchanged`` directive. Its arguments are the same as ``versionadded``.
+
+.. code-block:: rst
+
+    .. versionchanged:: 1.8
+        Added the ability for ``bootstrap`` to cleanup automatically via the ``with`` statement.
+
+The above code renders as follows.
+
+.. versionchanged:: 1.8
+    Added the ability for ``bootstrap`` to cleanup automatically via the ``with`` statement.
+
+
+.. _style-guide-deprecated:
+
+Deprecated
+``````````
+
+Similar to ``versionchanged``, ``deprecated`` describes when the feature was deprecated. An explanation can also be given, for example, to inform the reader what should be used instead.
+
+.. code-block:: rst
+
+    .. deprecated:: 1.7
+        Use the ``require_csrf`` option or read :ref:`auto_csrf_checking` instead to have :class:`pyramid.exceptions.BadCSRFToken` exceptions raised.
+
+The above code renders as follows.
+
+.. deprecated:: 1.7
+    Use the ``require_csrf`` option or read :ref:`auto_csrf_checking` instead to have :class:`pyramid.exceptions.BadCSRFToken` exceptions raised.
+
+
 .. _style-guide-danger:
 
 Danger
@@ -825,6 +889,26 @@ The above code renders as follows.
 .. note::
 
     This is a note.
+
+
+.. _style-guide-see-also:
+
+See also
+^^^^^^^^
+
+"See also" messages refer to topics that are related to the current topic, but have a narrative tone to them instead of merely a link without explanation. "See also" is rendered in a block as well, so that it stands out for the reader's attention.
+
+.. code-block:: rst
+
+    .. seealso::
+
+        See :ref:`Quick Tutorial section on Requirements <qtut_requirements>`.
+
+The above code renders as follows.
+
+.. seealso::
+
+    See :ref:`Quick Tutorial section on Requirements <qtut_requirements>`.
 
 
 .. _style-guide-todo:
