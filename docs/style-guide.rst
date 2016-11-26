@@ -112,7 +112,7 @@ The above code renders as follows.
 
 * :doc:`quick_tour` gives an overview of the major features in Pyramid, covering a little about a lot.
 
-.. seealso:: Sphinx documentation of :ref:`The TOC tree <sphinx:toctree-directive>`.
+.. seealso:: Sphinx documentation of :ref:`toctree-directive`.
 
 
 .. _style-guide-glossary:
@@ -342,35 +342,7 @@ The above code renders as follows.
 
 `TryPyramid <https://TryPyramid.com>`_
 
-To link to pages within this documentation:
-
-.. code-block:: rst
-
-    :doc:`quick_tour`
-
-The above code renders as follows.
-
-:doc:`quick_tour`
-
-To link to a section within a page in this documentation:
-
-.. code-block:: rst
-
-    :ref:`quick_tour`
-
-The above code renders as follows.
-
-:ref:`quick_tour`
-
-To link to pages configured via intersphinx:
-
-.. code-block:: rst
-
-    :ref:`Deform <deform:overview>`
-
-The above code renders as follows.
-
-:ref:`Deform <deform:overview>`
+.. seealso:: See also :ref:`style-guide-cross-references` for generating links throughout the entire documentation.
 
 
 .. _style-guide-topic:
@@ -405,7 +377,7 @@ Displaying code
 
 Code may be displayed in blocks or inline. You can include blocks of code from other source files. Blocks of code should use syntax highlighting.
 
-.. seealso:: See also the Sphinx documentation for :ref:`Showing code examples <sphinx:code-examples>`.
+.. seealso:: See also the Sphinx documentation for :ref:`code-examples`.
 
 
 .. _style-guide-syntax-highlighting:
@@ -1138,20 +1110,71 @@ The above code renders as follows.
 
 .. seealso::
 
-    See also the Sphinx documentation for the :ref:`reStructuredText Primer <sphinx:rst-primer>`.
+    See also the Sphinx documentation for the :ref:`rst-primer`.
 
 
+.. _style-guide-cross-references:
+
+Cross-references
+^^^^^^^^^^^^^^^^
+
+To create cross-references to an arbitrary location, object, document, or other items, use variations of the following syntax.
+
+* ``:role:`target``` creates a link to the item named ``target`` of the type indicated by ``role``, with the link's text as the title of the target. ``target`` may need to be disambiguated between documentation sets linked through intersphinx, in which case the syntax would be ``deform:overview``.
+* ``:role:`~target``` displays the link as only the last component of the target.
+* ``:role:`title <target>``` creates a custom title, instead of the default title of the target.
+
+
+.. _style-guide-cross-referencing-documents:
+
+Cross-referencing documents
+```````````````````````````
+
+To link to pages within this documentation:
+
+.. code-block:: rst
+
+    :doc:`quick_tour`
+
+The above code renders as follows.
+
+:doc:`quick_tour`
+
+
+.. _style-guide-cross-referencing-arbitrary-locations:
+
+Cross-referencing arbitrary locations
+`````````````````````````````````````
+
+To support cross-referencing to arbitrary locations in any document and between documentation sets via intersphinx, the standard reST labels are used. For this to work, label names must be unique throughout the entire documentation including externally linked intersphinx references. There are two ways in which you can refer to labels, if they are placed directly before a section title, a figure, or table with a caption, or at any other location. The following section has a label with the syntax ``.. _label_name:`` followed by the section title.
+
+.. code-block:: rst
+
+    .. _i18n_chapter:
+
+    Internationalization and Localization
+    =====================================
+
+To generate a link to that section with its title, use the following syntax.
+
+.. code-block:: rst
+
+    :ref:`i18n_chapter`
+
+The above code renders as follows.
+
+:ref:`i18n_chapter`
+
+The same syntax works figures and tables with captions.
+
+For labels that are not placed as mentioned, the link must be given an explicit title, such as ``:ref:`Link title <label-name>```.
+
+.. seealso:: See also the Sphinx documentation, :ref:`inline-markup`.
 
 
 
 
 :app:`Pyramid`
-
-:ref:`i18n_chapter`
-
-References to sections and chapters are presented using the following style:
-
-  :ref:`traversal_chapter`
 
 
 API documentation
