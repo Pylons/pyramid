@@ -1062,52 +1062,6 @@ The above code renders as follows.
 
 This **word** is in bold text.
 
-
-.. _style-guide-python:
-
-Python modules, classes, methods, and functions
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Python module names use the ``mod`` directive, with the module name as the argument.
-
-.. code-block:: rst
-
-    :mod:`pyramid.config`
-
-The above code renders as follows.
-
-:mod:`pyramid.config`
-
-Python class names use the ``class`` directive, with the class name as the argument.
-
-.. code-block:: rst
-
-    :class:`pyramid.config.Configurator`
-
-The above code renders as follows.
-
-:class:`pyramid.config.Configurator`
-
-Python method names use the ``meth`` directive, with the method name as the argument.
-
-.. code-block:: rst
-
-    :meth:`pyramid.config.Configurator.add_view`
-
-The above code renders as follows.
-
-:meth:`pyramid.config.Configurator.add_view`
-
-Python function names use the ``func`` directive, with the function name as the argument.
-
-.. code-block:: rst
-
-    :func:`pyramid.renderers.render_to_response`
-
-The above code renders as follows.
-
-:func:`pyramid.renderers.render_to_response`
-
 .. seealso::
 
     See also the Sphinx documentation for the :ref:`rst-primer`.
@@ -1118,7 +1072,7 @@ The above code renders as follows.
 Cross-references
 ^^^^^^^^^^^^^^^^
 
-To create cross-references to an arbitrary location, object, document, or other items, use variations of the following syntax.
+To create cross-references to a document, arbitrary location, object, or other items, use variations of the following syntax.
 
 * ``:role:`target``` creates a link to the item named ``target`` of the type indicated by ``role``, with the link's text as the title of the target. ``target`` may need to be disambiguated between documentation sets linked through intersphinx, in which case the syntax would be ``deform:overview``.
 * ``:role:`~target``` displays the link as only the last component of the target.
@@ -1172,17 +1126,144 @@ For labels that are not placed as mentioned, the link must be given an explicit 
 .. seealso:: See also the Sphinx documentation, :ref:`inline-markup`.
 
 
+.. _style-guide-cross-referencing-python:
 
+Python modules, classes, methods, and functions
+```````````````````````````````````````````````
+
+Python module names use the ``mod`` directive, with the module name as the argument.
+
+.. code-block:: rst
+
+    :mod:`pyramid.config`
+
+The above code renders as follows.
+
+:mod:`pyramid.config`
+
+Python class names use the ``class`` directive, with the class name as the argument.
+
+.. code-block:: rst
+
+    :class:`pyramid.config.Configurator`
+
+The above code renders as follows.
+
+:class:`pyramid.config.Configurator`
+
+Python method names use the ``meth`` directive, with the method name as the argument.
+
+.. code-block:: rst
+
+    :meth:`pyramid.config.Configurator.add_view`
+
+The above code renders as follows.
+
+:meth:`pyramid.config.Configurator.add_view`
+
+Python function names use the ``func`` directive, with the function name as the argument.
+
+.. code-block:: rst
+
+    :func:`pyramid.renderers.render_to_response`
+
+The above code renders as follows.
+
+:func:`pyramid.renderers.render_to_response`
+
+Note that you can use either or combine the ``~`` and ``.`` prefixes. However, we prefer not to use the ``.`` prefix because Sphinx might generate an error if it cannot disambiguate the reference.
+
+.. code-block:: rst
+
+    :func:`~.render_to_response`
+
+The above code renders as follows.
+
+:func:`~.render_to_response`
+
+
+.. _style-guide-role-app-pyramid:
+
+The role ``:app:`Pyramid```
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+We use the special role ``app`` to refer to the application "Pyramid".
+
+
+.. code-block:: rst
+
+    :app:`Pyramid`
+
+The above code renders as follows.
 
 :app:`Pyramid`
 
 
-API documentation
+.. _style-guide-sphinx-extensions:
+
+Sphinx extensions
 -----------------
 
-.. automodule:: pyramid.i18n
+We use several Sphinx extensions to add features to our documentation. Extensions need to be enabled and configured in ``docs/conf.py`` before they can be used.
 
-.. .. autoclass:: TranslationString
 
-.. .. autofunction:: TranslationStringFactory
+.. _style-guide-sphinx-extension-autodoc:
 
+:mod:`sphinx.ext.autodoc`
+-------------------------
+
+API documentation uses the Sphinx extension :mod:`sphinx.ext.autodoc` to include documentation from docstrings.
+
+See the source of any documentation within the ``docs/api/`` directory for conventions and usage, as well as the Sphinx extension's :mod:`documentation <sphinx.ext.autodoc>`.
+
+
+.. _style-guide-sphinx-extension-doctest:
+
+:mod:`sphinx.ext.doctest`
+-------------------------
+
+:mod:`sphinx.ext.doctest` allows you to test code snippets in the documentation in a natural way. It works by collecting specially-marked up code blocks and running them as doctest tests. We have only a few tests in our Pyramid documentation which can be found in ``narr/sessions.rst`` and ``narr/hooks.rst``.
+
+
+.. _style-guide-sphinx-extension-intersphinx:
+
+:mod:`sphinx.ext.intersphinx`
+-----------------------------
+
+:mod:`sphinx.ext.intersphinx` generates links to the documentation of objects in other projects.
+
+
+.. _style-guide-sphinx-extension-todo:
+
+:mod:`sphinx.ext.todo`
+----------------------
+
+:mod:`sphinx.ext.todo` adds support for todo items.
+
+
+.. _style-guide-sphinx-extension-viewcode:
+
+:mod:`sphinx.ext.viewcode`
+--------------------------
+
+:mod:`sphinx.ext.viewcode` looks at your Python object descriptions and tries to find the source files where the objects are contained. When found, a separate HTML page will be output for each module with a highlighted version of the source code, and a link will be added to all object descriptions that leads to the source code of the described object. A link back from the source to the description will also be inserted.
+
+
+.. _style-guide-sphinx-extension-repoze-sphinx-autointerface:
+
+`repoze.sphinx.autointerface <https://pypi.python.org/pypi/repoze.sphinx.autointerface>`_
+-----------------------------------------------------------------------------------------
+
+`repoze.sphinx.autointerface <https://pypi.python.org/pypi/repoze.sphinx.autointerface>`_ auto-generates API docs from Zope interfaces.
+
+
+.. _style-guide-script-documentation:
+
+Script documentation
+--------------------
+
+We currently use `sphinxcontrib-programoutput <https://pypi.python.org/pypi/sphinxcontrib-programoutput>`_ to generate program output of the p* scripts. It is no longer maintained and may cause future builds of the documentation to fail.
+
+.. todo::
+
+    See `issue #2804 <https://github.com/Pylons/pyramid/issues/2804>`_ for further discussion.
