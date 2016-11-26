@@ -115,6 +115,9 @@ Deprecations
 
 Documentation Changes
 ---------------------
+- Replace Typographical Conventions with an enhanced Style Guide.
+  https://github.com/Pylons/pyramid/pull/2838
+
 - Add pyramid_nacl_session to session factories.
   See https://github.com/Pylons/pyramid/issues/2791
 
