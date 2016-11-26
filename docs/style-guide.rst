@@ -49,6 +49,72 @@ Location, referencing, and naming of files
   will select the image ``pyramid_request_processing.svg`` for the HTML documentation builder, and ``pyramid_request_processing.png`` for the PDF builder. See the related `Stack Overflow post <http://stackoverflow.com/questions/6473660/using-sphinx-docs-how-can-i-specify-png-image-formats-for-html-builds-and-pdf-im/6486713#6486713>`_.
 
 
+.. _style-guide-table-of-contents-tree:
+
+Table of contents tree
+----------------------
+
+To insert a table of contents (TOC), use the ``toctree`` directive. Entries listed under the ``toctree`` directive follow :ref:`location conventions <style-guide-file-conventions>`. A numeric ``maxdepth`` option may be given to indicate the depth of the tree; by default, all levels are included.
+
+.. code-block:: rst
+
+    .. toctree::
+        :maxdepth: 2
+
+        narr/introduction
+        narr/install
+
+The above code renders as follows.
+
+.. toctree::
+    :maxdepth: 2
+
+    narr/introduction
+    narr/install
+
+Globbing can be used.
+
+.. code-block:: rst
+
+    .. toctree::
+        :maxdepth: 1
+        :glob:
+
+        pscripts/index
+        pscripts/*
+
+The above code renders as follows.
+
+.. toctree::
+    :maxdepth: 1
+    :glob:
+
+    pscripts/index
+    pscripts/*
+
+To notify Sphinx of the document hierarchy, but not insert links into the document at the location of the directive, use the option ``hidden``. This makes sense when you want to insert these links yourself, in a different style, or in the HTML sidebar.
+
+.. code-block:: rst
+
+    .. toctree::
+        :hidden:
+
+        quick_tour
+
+    * :doc:`quick_tour` gives an overview of the major features in Pyramid, covering a little about a lot.
+
+The above code renders as follows.
+
+.. toctree::
+    :hidden:
+
+    quick_tour
+
+* :doc:`quick_tour` gives an overview of the major features in Pyramid, covering a little about a lot.
+
+.. seealso:: Sphinx documentation of :ref:`The TOC tree <sphinx:toctree-directive>`.
+
+
 .. _style-guide-glossary:
 
 Glossary
