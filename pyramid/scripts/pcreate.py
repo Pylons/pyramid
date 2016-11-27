@@ -2,7 +2,7 @@
 # (http://pythonpaste.org) Licensed under the MIT license:
 # http://www.opensource.org/licenses/mit-license.php
 
-import optparse
+import argparse
 import os
 import os.path
 import pkg_resources
@@ -22,79 +22,79 @@ def main(argv=sys.argv, quiet=False):
 
 class PCreateCommand(object):
     verbosity = 1 # required
-    description = """\
+    parser = argparse.ArgumentParser(description="""\
 Render Pyramid scaffolding to an output directory.
 
 Note: As of Pyramid 1.8, this command is deprecated. Use a specific
 cookiecutter instead:
 https://github.com/Pylons/?q=cookiecutter
-"""
-    usage = "usage: %prog [options] -s <scaffold> output_directory"
-    parser = optparse.OptionParser(usage, description=description)
-    parser.add_option('-s', '--scaffold',
+""")
+    parser.add_argument('-s', '--scaffold',
                       dest='scaffold_name',
                       action='append',
                       help=("Add a scaffold to the create process "
                             "(multiple -s args accepted)"))
-    parser.add_option('-t', '--template',
+    parser.add_argument('-t', '--template',
                       dest='scaffold_name',
                       action='append',
                       help=('A backwards compatibility alias for '
                             '-s/--scaffold.  Add a scaffold to the '
                             'create process (multiple -t args accepted)'))
-    parser.add_option('-l', '--list',
+    parser.add_argument('-l', '--list',
                       dest='list',
                       action='store_true',
                       help="List all available scaffold names")
-    parser.add_option('--list-templates',
+    parser.add_argument('--list-templates',
                       dest='list',
                       action='store_true',
                       help=("A backwards compatibility alias for -l/--list.  "
                             "List all available scaffold names."))
-    parser.add_option('--package-name',
+    parser.add_argument('--package-name',
                       dest='package_name',
                       action='store',
-                      type='string',
                       help='Package name to use. The name provided is assumed '
                            'to be a valid Python package name, and will not '
                            'be validated. By default the package name is '
                            'derived from the value of output_directory.')
-    parser.add_option('--simulate',
+    parser.add_argument('--simulate',
                       dest='simulate',
                       action='store_true',
                       help='Simulate but do no work')
-    parser.add_option('--overwrite',
+    parser.add_argument('--overwrite',
                       dest='overwrite',
                       action='store_true',
                       help='Always overwrite')
-    parser.add_option('--interactive',
+    parser.add_argument('--interactive',
                       dest='interactive',
                       action='store_true',
                       help='When a file would be overwritten, interrogate '
                            '(this is the default, but you may specify it to '
                            'override --overwrite)')
-    parser.add_option('--ignore-conflicting-name',
+    parser.add_argument('--ignore-conflicting-name',
                       dest='force_bad_name',
                       action='store_true',
                       default=False,
                       help='Do create a project even if the chosen name '
                            'is the name of an already existing / importable '
                            'package.')
+    parser.add_argument('output_directory',
+                        help='The directory where the project will be '
+                             'created.')
 
     pyramid_dist = pkg_resources.get_distribution("pyramid")
 
     def __init__(self, argv, quiet=False):
         self.quiet = quiet
-        self.options, self.args = self.parser.parse_args(argv[1:])
-        if not self.options.interactive and not self.options.overwrite:
-            self.options.interactive = True
+        self.args = self.parser.parse_args()
+        if not self.args.interactive and not self.args.overwrite:
+            self.args.interactive = True
         self.scaffolds = self.all_scaffolds()
 
     def run(self):
         self._warn_pcreate_deprecated()
-        if self.options.list:
+        if self.args.list:
             return self.show_scaffolds()
-        if not self.options.scaffold_name and not self.args:
+        if not self.args.scaffold_name and not self.args:
             if not self.quiet: # pragma: no cover
                 self.parser.print_help()
                 self.out('')
@@ -108,18 +108,18 @@ https://github.com/Pylons/?q=cookiecutter
 
     @property
     def output_path(self):
-        return os.path.abspath(os.path.normpath(self.args[0]))
+        return os.path.abspath(os.path.normpath(self.args.output_directory))
 
     @property
     def project_vars(self):
         output_dir = self.output_path
         project_name = os.path.basename(os.path.split(output_dir)[1])
-        if self.options.package_name is None:
+        if self.args.package_name is None:
             pkg_name = _bad_chars_re.sub(
                 '', project_name.lower().replace('-', '_'))
             safe_name = pkg_resources.safe_name(project_name)
         else:
-            pkg_name = self.options.package_name
+            pkg_name = self.args.package_name
             safe_name = pkg_name
         egg_name = pkg_resources.to_filename(safe_name)
 
@@ -152,7 +152,7 @@ https://github.com/Pylons/?q=cookiecutter
     def render_scaffolds(self):
         props = self.project_vars
         output_dir = self.output_path
-        for scaffold_name in self.options.scaffold_name:
+        for scaffold_name in self.args.scaffold_name:
             for scaffold in self.scaffolds:
                 if scaffold.name == scaffold_name:
                     scaffold.run(self, output_dir, props)
@@ -189,7 +189,7 @@ https://github.com/Pylons/?q=cookiecutter
             print(msg)
 
     def validate_input(self):
-        if not self.options.scaffold_name:
+        if not self.args.scaffold_name:
             self.out('You must provide at least one scaffold name: -s <scaffold name>')
             self.out('')
             self.show_scaffolds()
@@ -198,14 +198,14 @@ https://github.com/Pylons/?q=cookiecutter
             self.out('You must provide a project name')
             return False
         available = [x.name for x in self.scaffolds]
-        diff = set(self.options.scaffold_name).difference(available)
+        diff = set(self.args.scaffold_name).difference(available)
         if diff:
             self.out('Unavailable scaffolds: %s' % ", ".join(sorted(diff)))
             return False
 
         pkg_name = self.project_vars['package']
 
-        if pkg_name == 'site' and not self.options.force_bad_name:
+        if pkg_name == 'site' and not self.args.force_bad_name:
             self.out('The package name "site" has a special meaning in '
                      'Python. Are you sure you want to use it as your '
                      'project\'s name?')
@@ -221,7 +221,7 @@ https://github.com/Pylons/?q=cookiecutter
         if not pkg_exists:
             return True
 
-        if self.options.force_bad_name:
+        if self.args.force_bad_name:
             return True
         self.out('A package named "{0}" already exists, are you sure you want '
                  'to use it as your project\'s name?'.format(pkg_name))

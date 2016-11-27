@@ -6,8 +6,7 @@
 ``pcreate``
 -----------
 
-.. program-output:: pcreate --help
-   :prompt:
-   :shell:
+.. autoprogram:: pyramid.scripts.pcreate:PCreateCommand
+   :prog: pcreate.py
 
 .. seealso:: :ref:`creating_a_project`
