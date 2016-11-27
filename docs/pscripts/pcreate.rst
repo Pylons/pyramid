@@ -6,7 +6,7 @@
 ``pcreate``
 -----------
 
-.. autoprogram:: pyramid.scripts.pcreate:PCreateCommand
+.. autoprogram:: pyramid.scripts.pcreate:PCreateCommand.parser
    :prog: pcreate.py
 
 .. seealso:: :ref:`creating_a_project`

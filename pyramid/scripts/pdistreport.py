@@ -14,7 +14,7 @@ def main(argv=sys.argv, pkg_resources=pkg_resources, platform=platform.platform,
          out=out):
     # all args except argv are for unit testing purposes only
     description = "Show Python distribution versions and locations in use"
-    usage = "usage: %prog"
+    usage = "usage: %(prog)s"
     parser = argparse.ArgumentParser(usage, description=description)
     parser.parse_args(argv[1:])
     packages = []
