@@ -3,7 +3,7 @@ import functools
 try:
     # py2.7.7+ and py3.3+ have native comparison support
     from hmac import compare_digest
-except ImportError: # pragma: nocover
+except ImportError:  # pragma: no cover
     compare_digest = None
 import inspect
 import traceback
