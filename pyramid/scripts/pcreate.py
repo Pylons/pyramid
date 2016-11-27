@@ -12,6 +12,7 @@ from pyramid.compat import input_
 
 _bad_chars_re = re.compile('[^a-zA-Z0-9_]')
 
+
 def main(argv=sys.argv, quiet=False):
     command = PCreateCommand(argv, quiet)
     try:
@@ -30,53 +31,54 @@ cookiecutter instead:
 https://github.com/Pylons/?q=cookiecutter
 """)
     parser.add_argument('-s', '--scaffold',
-                      dest='scaffold_name',
-                      action='append',
-                      help=("Add a scaffold to the create process "
-                            "(multiple -s args accepted)"))
+                        dest='scaffold_name',
+                        action='append',
+                        help=("Add a scaffold to the create process "
+                              "(multiple -s args accepted)"))
     parser.add_argument('-t', '--template',
-                      dest='scaffold_name',
-                      action='append',
-                      help=('A backwards compatibility alias for '
-                            '-s/--scaffold.  Add a scaffold to the '
-                            'create process (multiple -t args accepted)'))
+                        dest='scaffold_name',
+                        action='append',
+                        help=('A backwards compatibility alias for '
+                              '-s/--scaffold.  Add a scaffold to the '
+                              'create process (multiple -t args accepted)'))
     parser.add_argument('-l', '--list',
-                      dest='list',
-                      action='store_true',
-                      help="List all available scaffold names")
+                        dest='list',
+                        action='store_true',
+                        help="List all available scaffold names")
     parser.add_argument('--list-templates',
-                      dest='list',
-                      action='store_true',
-                      help=("A backwards compatibility alias for -l/--list.  "
-                            "List all available scaffold names."))
+                        dest='list',
+                        action='store_true',
+                        help=("A backwards compatibility alias for -l/--list. "
+                              "List all available scaffold names."))
     parser.add_argument('--package-name',
-                      dest='package_name',
-                      action='store',
-                      help='Package name to use. The name provided is assumed '
-                           'to be a valid Python package name, and will not '
-                           'be validated. By default the package name is '
-                           'derived from the value of output_directory.')
+                        dest='package_name',
+                        action='store',
+                        help='Package name to use. The name provided is '
+                             'assumed to be a valid Python package name, and '
+                             'will not be validated. By default the package '
+                             'name is derived from the value of '
+                             'output_directory.')
     parser.add_argument('--simulate',
-                      dest='simulate',
-                      action='store_true',
-                      help='Simulate but do no work')
+                        dest='simulate',
+                        action='store_true',
+                        help='Simulate but do no work')
     parser.add_argument('--overwrite',
-                      dest='overwrite',
-                      action='store_true',
-                      help='Always overwrite')
+                        dest='overwrite',
+                        action='store_true',
+                        help='Always overwrite')
     parser.add_argument('--interactive',
-                      dest='interactive',
-                      action='store_true',
-                      help='When a file would be overwritten, interrogate '
-                           '(this is the default, but you may specify it to '
-                           'override --overwrite)')
+                        dest='interactive',
+                        action='store_true',
+                        help='When a file would be overwritten, interrogate '
+                             '(this is the default, but you may specify it to '
+                             'override --overwrite)')
     parser.add_argument('--ignore-conflicting-name',
-                      dest='force_bad_name',
-                      action='store_true',
-                      default=False,
-                      help='Do create a project even if the chosen name '
-                           'is the name of an already existing / importable '
-                           'package.')
+                        dest='force_bad_name',
+                        action='store_true',
+                        default=False,
+                        help='Do create a project even if the chosen name '
+                             'is the name of an already existing / importable '
+                             'package.')
     parser.add_argument('output_directory',
                         help='The directory where the project will be '
                              'created.')
