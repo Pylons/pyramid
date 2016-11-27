@@ -85,7 +85,7 @@ https://github.com/Pylons/?q=cookiecutter
 
     def __init__(self, argv, quiet=False):
         self.quiet = quiet
-        self.args = self.parser.parse_args()
+        self.args = self.parser.parse_args(argv)
         if not self.args.interactive and not self.args.overwrite:
             self.args.interactive = True
         self.scaffolds = self.all_scaffolds()
