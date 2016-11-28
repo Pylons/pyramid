@@ -11,10 +11,10 @@ def out(*args): # pragma: no cover
     sys.stdout.write('\n')
 
 def get_parser():
-    _parser = argparse.ArgumentParser(
+    parser = argparse.ArgumentParser(
         usage="%(prog)s",
         description="Show Python distribution versions and locations in use")
-    return _parser
+    return parser
 
 def main(argv=sys.argv, pkg_resources=pkg_resources, platform=platform.platform,
          out=out):
