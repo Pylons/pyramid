@@ -3,9 +3,6 @@
 
 .. _pcreate_script:
 
-``pcreate``
------------
-
 .. autoprogram:: pyramid.scripts.pcreate:PCreateCommand.parser
    :prog: pcreate
 

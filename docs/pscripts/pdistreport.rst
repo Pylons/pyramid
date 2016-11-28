@@ -3,9 +3,6 @@
 
 .. _pdistreport_script:
 
-``pdistreport``
----------------
-
 .. autoprogram:: pyramid.scripts.pdistreport:get_parser()
    :prog: pdistreport
 
