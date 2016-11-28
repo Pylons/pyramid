@@ -1,5 +1,5 @@
 import base64
-import optparse
+import argparse
 import sys
 import textwrap
 
@@ -45,50 +45,55 @@ class PRequestCommand(object):
     the request's WSGI environment, so your application can distinguish these
     calls from normal requests.
     """
-    usage = "usage: %prog config_uri path_info [args/options]"
-    parser = optparse.OptionParser(
-        usage=usage,
+    parser = argparse.ArgumentParser(
+        usage="%(prog)s config_uri path_info [args/options]",
         description=textwrap.dedent(description)
         )
-    parser.add_option(
+    parser.add_argument(
         '-n', '--app-name',
         dest='app_name',
         metavar='NAME',
         help=(
             "Load the named application from the config file (default 'main')"
         ),
-        type="string",
         )
-    parser.add_option(
+    parser.add_argument(
         '--header',
         dest='headers',
         metavar='NAME:VALUE',
-        type='string',
         action='append',
         help=(
             "Header to add to request (you can use this option multiple times)"
         ),
     )
-    parser.add_option(
+    parser.add_argument(
         '-d', '--display-headers',
         dest='display_headers',
         action='store_true',
         help='Display status and headers before the response body'
         )
-    parser.add_option(
+    parser.add_argument(
         '-m', '--method',
         dest='method',
         choices=['GET', 'HEAD', 'POST', 'PUT', 'PATCH','DELETE',
                  'PROPFIND', 'OPTIONS'],
-        type='choice',
         help='Request method type (GET, POST, PUT, PATCH, DELETE, '
              'PROPFIND, OPTIONS)',
         )
-    parser.add_option(
+    parser.add_argument(
         '-l', '--login',
         dest='login',
-        type='string',
         help='HTTP basic auth username:password pair',
+        )
+
+    parser.add_argument(
+        'config_uri',
+        help='The URI to the configuration file.',
+        )
+
+    parser.add_argument(
+        'path_info',
+        help='The path of the request.',
         )
 
     get_app = staticmethod(get_app)
@@ -96,7 +101,7 @@ class PRequestCommand(object):
 
     def __init__(self, argv, quiet=False):
         self.quiet = quiet
-        self.options, self.args = self.parser.parse_args(argv[1:])
+        self.args = self.parser.parse_args(argv[1:])
 
     def out(self, msg): # pragma: no cover
         if not self.quiet:
@@ -125,12 +130,12 @@ class PRequestCommand(object):
         path = url_unquote(path)
 
         headers = {}
-        if self.options.login:
-            enc = base64.b64encode(self.options.login.encode('ascii'))
+        if self.args.login:
+            enc = base64.b64encode(self.args.login.encode('ascii'))
             headers['Authorization'] = 'Basic ' + enc.decode('ascii')
 
-        if self.options.headers:
-            for item in self.options.headers:
+        if self.args.headers:
+            for item in self.args.headers:
                 if ':' not in item:
                     self.out(
                         "Bad --header=%s option, value must be in the form "
@@ -139,10 +144,10 @@ class PRequestCommand(object):
                 name, value = item.split(':', 1)
                 headers[name] = value.strip()
 
-        app = self.get_app(app_spec, self.options.app_name,
+        app = self.get_app(app_spec, self.args.app_name,
                 options=parse_vars(self.args[2:]))
 
-        request_method = (self.options.method or 'GET').upper()
+        request_method = (self.args.method or 'GET').upper()
 
         environ = {
             'REQUEST_METHOD': request_method,
@@ -177,7 +182,7 @@ class PRequestCommand(object):
 
         request = Request.blank(path, environ=environ)
         response = request.get_response(app)
-        if self.options.display_headers:
+        if self.args.display_headers:
             self.out(response.status)
             for name, value in response.headerlist:
                 self.out('%s: %s' % (name, value))
