@@ -1,5 +1,5 @@
 import fnmatch
-import optparse
+import argparse
 import sys
 import textwrap
 import re
@@ -249,22 +249,31 @@ class PRoutesCommand(object):
     stdout = sys.stdout
     usage = '%prog config_uri'
     ConfigParser = configparser.ConfigParser # testing
-    parser = optparse.OptionParser(
+    parser = argparse.ArgumentParser(
         usage,
         description=textwrap.dedent(description)
     )
-    parser.add_option('-g', '--glob',
-                      action='store', type='string', dest='glob',
-                      default='', help='Display routes matching glob pattern')
+    parser.add_argument('-g', '--glob',
+                        action='store',
+                        dest='glob',
+                        default='',
+                        help='Display routes matching glob pattern')
 
-    parser.add_option('-f', '--format',
-                      action='store', type='string', dest='format',
-                      default='', help=('Choose which columns to display, this '
-                                        'will override the format key in the '
-                                        '[proutes] ini section'))
+    parser.add_argument('-f', '--format',
+                        action='store',
+                        dest='format',
+                        default='',
+                        help=('Choose which columns to display, this will '
+                              'override the format key in the [proutes] ini '
+                              'section'))
+
+    parser.add_argument(
+        'config_uri',
+        help='The URI to the configuration file.',
+        )
 
     def __init__(self, argv, quiet=False):
-        self.options, self.args = self.parser.parse_args(argv[1:])
+        self.args = self.parser.parse_args(argv[1:])
         self.quiet = quiet
         self.available_formats = [
             'name', 'pattern', 'view', 'method'
@@ -323,8 +332,8 @@ class PRoutesCommand(object):
 
         self.proutes_file_config(config_uri)
 
-        if self.options.format:
-            columns = self.options.format.split(',')
+        if self.args.format:
+            columns = self.args.format.split(',')
             self.column_format = [x.strip() for x in columns]
 
         is_valid = self.validate_formats(self.column_format)
@@ -361,9 +370,9 @@ class PRoutesCommand(object):
             route_data = get_route_data(route, registry)
 
             for name, pattern, view, method in route_data:
-                if self.options.glob:
-                    match = (fnmatch.fnmatch(name, self.options.glob) or
-                             fnmatch.fnmatch(pattern, self.options.glob))
+                if self.args.glob:
+                    match = (fnmatch.fnmatch(name, self.args.glob) or
+                             fnmatch.fnmatch(pattern, self.args.glob))
                     if not match:
                         continue
 
