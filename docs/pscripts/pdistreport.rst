@@ -6,8 +6,7 @@
 ``pdistreport``
 ---------------
 
-.. program-output:: pdistreport --help
-   :prompt:
-   :shell:
+.. autoprogram:: pyramid.scripts.pdistreport:parser
+   :prog: pdistreport.py
 
 .. seealso:: :ref:`showing_distributions`
