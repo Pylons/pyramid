@@ -3,11 +3,7 @@
 
 .. _pviews_script:
 
-``pviews``
-----------
-
-.. program-output:: pviews --help
-   :prompt:
-   :shell:
+.. autoprogram:: pyramid.scripts.pviews:PViewsCommand.parser
+    :prog: pviews
 
 .. seealso:: :ref:`displaying_matching_views`
