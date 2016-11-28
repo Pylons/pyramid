@@ -45,6 +45,7 @@ class PRequestCommand(object):
     the request's WSGI environment, so your application can distinguish these
     calls from normal requests.
     """
+
     parser = argparse.ArgumentParser(
         usage="%(prog)s config_uri path_info [args/options]",
         description=textwrap.dedent(description)
