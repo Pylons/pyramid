@@ -7,6 +7,6 @@
 ---------------
 
 .. autoprogram:: pyramid.scripts.pdistreport:parser
-   :prog: pdistreport.py
+   :prog: pdistreport
 
 .. seealso:: :ref:`showing_distributions`
