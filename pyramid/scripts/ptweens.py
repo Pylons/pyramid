@@ -1,4 +1,4 @@
-import optparse
+import argparse
 import sys
 import textwrap
 
@@ -14,7 +14,6 @@ def main(argv=sys.argv, quiet=False):
     return command.run()
 
 class PTweensCommand(object):
-    usage = '%prog config_uri'
     description = """\
     Print all implicit and explicit tween objects used by a Pyramid
     application.  The handler output includes whether the system is using an
@@ -28,17 +27,20 @@ class PTweensCommand(object):
     will be assumed.  Example: "ptweens myapp.ini#main".
 
     """
-    parser = optparse.OptionParser(
-        usage,
+    parser = argparse.ArgumentParser(
+        usage="%(prog)s config_uri",
         description=textwrap.dedent(description),
         )
+
+    parser.add_argument('config_uri',
+                        help='The URI to the configuration file.')
 
     stdout = sys.stdout
     bootstrap = (bootstrap,) # testing
 
     def __init__(self, argv, quiet=False):
         self.quiet = quiet
-        self.options, self.args = self.parser.parse_args(argv[1:])
+        self.args = self.parser.parse_args(argv[1:])
 
     def _get_tweens(self, registry):
         from pyramid.config import Configurator
