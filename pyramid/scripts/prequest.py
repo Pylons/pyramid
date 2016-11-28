@@ -39,7 +39,7 @@ class PRequestCommand(object):
 
     If the path is relative (doesn't begin with "/") it is interpreted as
     relative to "/".  The path passed to this script should be URL-quoted.
-    The path can be succeeded with a query string (e.g. `/path?a=1&=b2').
+    The path can be succeeded with a query string (e.g. '/path?a=1&=b2').
 
     The variable "environ['paste.command_request']" will be set to "True" in
     the request's WSGI environment, so your application can distinguish these
