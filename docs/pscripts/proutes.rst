@@ -3,11 +3,7 @@
 
 .. _proutes_script:
 
-``proutes``
------------
-
-.. program-output:: proutes --help
-   :prompt:
-   :shell:
+.. autoprogram:: pyramid.scripts.proutes:PRoutesCommand.parser
+    :prog: proutes
 
 .. seealso:: :ref:`displaying_application_routes`
