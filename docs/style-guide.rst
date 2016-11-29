@@ -293,31 +293,21 @@ As individual files do not have so-called "parts" or "chapters", the headings wo
 
     .. code-block:: rst
 
-        Heading Level 1
-        ===============
+        ==================================
+        The main heading or web page title
+        ==================================
 
-        Heading Level 2
+        Heading Level 1
         ---------------
 
-        Heading Level 3
+        Heading Level 2
         ^^^^^^^^^^^^^^^
 
-        Heading Level 4
+        Heading Level 3
         """""""""""""""
 
-The above code renders as follows.
+Note, we do not render heading levels here because doing so causes a loss in page structure.
 
-Heading Level 1
-===============
-
-Heading Level 2
----------------
-
-Heading Level 3
-^^^^^^^^^^^^^^^
-
-Heading Level 4
-"""""""""""""""
 
 .. _style-guide-paragraphs:
 
@@ -375,7 +365,7 @@ The above code renders as follows.
 Displaying code
 ^^^^^^^^^^^^^^^
 
-Code may be displayed in blocks or inline. You can include blocks of code from other source files. Blocks of code should use syntax highlighting.
+Code may be displayed in blocks or inline. You can include blocks of code from other source files. Blocks of code should use syntax highlighting, and may use line numbering or emphasis.
 
 .. seealso:: See also the Sphinx documentation for :ref:`code-examples`.
 
@@ -427,10 +417,10 @@ cfg:
 
     .. code-block:: cfg
 
-       [some-part]
-       # A random part in the buildout
-       recipe = collective.recipe.foo
-       option = value
+        [some-part]
+        # A random part in the buildout
+        recipe = collective.recipe.foo
+        option = value
 
 ini:
 

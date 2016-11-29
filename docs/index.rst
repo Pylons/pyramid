@@ -213,12 +213,13 @@ Copyright, Trademarks, and Attributions
    copyright
 
 
-Style Guide
-===========
+Typographical Conventions and Style Guide
+=========================================
 
 .. toctree::
    :maxdepth: 1
 
+   typographical-conventions
    style-guide
 
 
