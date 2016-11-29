@@ -185,7 +185,7 @@ Some code blocks may be given a caption.
 
 .. code-block:: python
     :caption: sample.py
-    :name: sample-py
+    :name: sample-py-typographical-conventions
 
     if "foo" == "bar":
         # This is Python code
