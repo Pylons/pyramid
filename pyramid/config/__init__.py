@@ -329,6 +329,13 @@ class Configurator(
                 exceptionresponse_view=exceptionresponse_view,
                 )
 
+    def run_app(self, host='localhost', port=8080, **kwargs):
+        from wsgiref.simple_server import make_server
+        app = self.make_wsgi_app()
+        server = make_server(host, port, app, **kwargs)
+        print('Running on http://{}:{} (stop with Ctrl-C)'.format(host, port))
+        server.serve_forever()
+
     def setup_registry(self,
                        settings=None,
                        root_factory=None,
