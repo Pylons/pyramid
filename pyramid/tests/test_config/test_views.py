@@ -2373,7 +2373,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         view = lambda r: 'OK'
         config.set_default_csrf_options(require_csrf=True)
         config.add_view(view, context=Exception, renderer=null_renderer)
-        view_intr = introspector.introspectables[1]
+        view_intr = introspector.introspectables[-1]
         self.assertTrue(view_intr.type_name, 'view')
         self.assertEqual(view_intr['callable'], view)
         derived_view = view_intr['derived_callable']

@@ -3,15 +3,20 @@ from zope.interface import implementer
 from pyramid.interfaces import (
     IAuthorizationPolicy,
     IAuthenticationPolicy,
+    ICSRFPolicy,
     IDefaultCSRFOptions,
     IDefaultPermission,
     PHASE1_CONFIG,
     PHASE2_CONFIG,
     )
 
+from pyramid.csrf import csrf_token_template_global
+from pyramid.csrf import SessionCSRF
+from pyramid.events import BeforeRender
 from pyramid.exceptions import ConfigurationError
 from pyramid.util import action_method
 from pyramid.util import as_sorted_tuple
+
 
 class SecurityConfiguratorMixin(object):
     @action_method
@@ -165,6 +170,7 @@ class SecurityConfiguratorMixin(object):
     @action_method
     def set_default_csrf_options(
         self,
+        implementation=None,
         require_csrf=True,
         token='csrf_token',
         header='X-CSRF-Token',
@@ -173,6 +179,10 @@ class SecurityConfiguratorMixin(object):
     ):
         """
         Set the default CSRF options used by subsequent view registrations.
+
+        ``implementation`` is a class that implements the
+        :meth:`pyramid.interfaces.ICSRFPolicy` interface that will be used for all
+        CSRF functionality. Default: :class:`pyramid.csrf.SessionCSRF`.
 
         ``require_csrf`` controls whether CSRF checks will be automatically
         enabled on each view in the application. This value is used as the
@@ -207,7 +217,10 @@ class SecurityConfiguratorMixin(object):
         options = DefaultCSRFOptions(
             require_csrf, token, header, safe_methods, callback,
         )
+        if implementation is None:
+            implementation = SessionCSRF()
         def register():
+            self.registry.registerUtility(implementation, ICSRFPolicy)
             self.registry.registerUtility(options, IDefaultCSRFOptions)
         intr = self.introspectable('default csrf view options',
                                    None,
@@ -218,8 +231,11 @@ class SecurityConfiguratorMixin(object):
         intr['header'] = header
         intr['safe_methods'] = as_sorted_tuple(safe_methods)
         intr['callback'] = callback
+
+        self.add_subscriber(csrf_token_template_global, [BeforeRender])
         self.action(IDefaultCSRFOptions, register, order=PHASE1_CONFIG,
                     introspectables=(intr,))
+
 
 @implementer(IDefaultCSRFOptions)
 class DefaultCSRFOptions(object):

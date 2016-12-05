@@ -661,7 +661,7 @@ class Test_signed_deserialize(unittest.TestCase):
 
 class Test_check_csrf_token(unittest.TestCase):
     def _callFUT(self, *args, **kwargs):
-        from ..session import check_csrf_token
+        from ..csrf import check_csrf_token
         return check_csrf_token(*args, **kwargs)
 
     def test_success_token(self):
@@ -709,7 +709,7 @@ class Test_check_csrf_token(unittest.TestCase):
 class Test_check_csrf_origin(unittest.TestCase):
 
     def _callFUT(self, *args, **kwargs):
-        from ..session import check_csrf_origin
+        from ..csrf import check_csrf_origin
         return check_csrf_origin(*args, **kwargs)
 
     def test_success_with_http(self):

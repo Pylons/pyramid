@@ -447,7 +447,6 @@ class RendererHelper(object):
 
         registry = self.registry
         registry.notify(system_values)
-
         result = renderer(value, system_values)
         return result
 

@@ -765,3 +765,194 @@ which would allow the attacker to control the content of the payload.  Re-using
 a secret across two different subsystems might drop the security of signing to
 zero. Keys should not be re-used across different contexts where an attacker
 has the possibility of providing a chosen plaintext.
+
+Preventing Cross-Site Request Forgery Attacks
+---------------------------------------------
+
+`Cross-site request forgery
+<https://en.wikipedia.org/wiki/Cross-site_request_forgery>`_ attacks are a
+phenomenon whereby a user who is logged in to your website might inadvertantly
+load a URL because it is linked from, or embedded in, an attacker's website.
+If the URL is one that may modify or delete data, the consequences can be dire.
+
+You can avoid most of these attacks by issuing a unique token to the browser
+and then requiring that it be present in all potentially unsafe requests.
+:app:`Pyramid` sessions provide facilities to create and check CSRF tokens.
+
+To use CSRF tokens, you must first enable a :term:`session factory` as
+described in :ref:`using_the_default_session_factory` or
+:ref:`using_alternate_session_factories`.
+
+.. index::
+   single: csrf.get_csrf_token
+
+Using the ``csrf.get_csrf_token`` Method
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To get the current CSRF token, use the
+:data:`pyramid.csrf.get_csrf_token` method.
+
+.. code-block:: python
+
+   from pyramid.csrf import get_csrf_token
+   token = get_csrf_token(request)
+
+The ``get_csrf_token()`` method accepts a single argument: the request. It
+returns a CSRF *token* string. If ``get_csrf_token()`` or ``new_csrf_token()``
+was invoked previously for this user, then the existing token will be returned.
+If no CSRF token previously existed for this user, then a new token will be set
+into the session and returned. The newly created token will be opaque and
+randomized.
+
+
+Using the ``get_csrf_token`` global in templates
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Templates have a ``get_csrf_token()`` method inserted into their globals, which
+allows you to get the current token without modifying the view code. This
+method takes no arguments and returns a CSRF token string. You can use the
+returned token as the value of a hidden field in a form that posts to a method
+that requires elevated privileges, or supply it as a request header in AJAX
+requests.
+
+For example, include the CSRF token as a hidden field:
+
+.. code-block:: html
+
+    <form method="post" action="/myview">
+      <input type="hidden" name="csrf_token" value="${get_csrf_token()}">
+      <input type="submit" value="Delete Everything">
+    </form>
+
+Or include it as a header in a jQuery AJAX request:
+
+.. code-block:: javascript
+
+    var csrfToken = "${get_csrf_token()}";
+    $.ajax({
+      type: "POST",
+      url: "/myview",
+      headers: { 'X-CSRF-Token': csrfToken }
+    }).done(function() {
+      alert("Deleted");
+    });
+
+The handler for the URL that receives the request should then require that the
+correct CSRF token is supplied.
+
+.. index::
+   single: csrf.new_csrf_token
+
+Using the ``csrf.new_csrf_token`` Method
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To explicitly create a new CSRF token, use the ``csrf.new_csrf_token()``
+method.  This differs only from ``csrf.get_csrf_token()`` inasmuch as it
+clears any existing CSRF token, creates a new CSRF token, sets the token into
+the user, and returns the token.
+
+.. code-block:: python
+
+   from pyramid.csrf import get_csrf_token
+   token = new_csrf_token()
+
+.. note::
+
+    It is not possible to force a new CSRF token from a template. If you
+    want to regenerate your CSRF token then do it in the view code and return
+    the new token as part of the context.
+
+Checking CSRF Tokens Manually
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In request handling code, you can check the presence and validity of a CSRF
+token with :func:`pyramid.session.check_csrf_token`. If the token is valid, it
+will return ``True``, otherwise it will raise ``HTTPBadRequest``. Optionally,
+you can specify ``raises=False`` to have the check return ``False`` instead of
+raising an exception.
+
+By default, it checks for a POST parameter named ``csrf_token`` or a header
+named ``X-CSRF-Token``.
+
+.. code-block:: python
+
+   from pyramid.session import check_csrf_token
+
+   def myview(request):
+       # Require CSRF Token
+       check_csrf_token(request)
+
+       # ...
+
+.. _auto_csrf_checking:
+
+Checking CSRF Tokens Automatically
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.7
+
+:app:`Pyramid` supports automatically checking CSRF tokens on requests with an
+unsafe method as defined by RFC2616. Any other request may be checked manually.
+This feature can be turned on globally for an application using the
+:meth:`pyramid.config.Configurator.set_default_csrf_options` directive.
+For example:
+
+.. code-block:: python
+
+   from pyramid.config import Configurator
+
+   config = Configurator()
+   config.set_default_csrf_options(require_csrf=True)
+
+CSRF checking may be explicitly enabled or disabled on a per-view basis using
+the ``require_csrf`` view option. A value of ``True`` or ``False`` will
+override the default set by ``set_default_csrf_options``. For example:
+
+.. code-block:: python
+
+   @view_config(route_name='hello', require_csrf=False)
+   def myview(request):
+       # ...
+
+When CSRF checking is active, the token and header used to find the
+supplied CSRF token will be ``csrf_token`` and ``X-CSRF-Token``, respectively,
+unless otherwise overridden by ``set_default_csrf_options``. The token is
+checked against the value in ``request.POST`` which is the submitted form body.
+If this value is not present, then the header will be checked.
+
+In addition to token based CSRF checks, if the request is using HTTPS then the
+automatic CSRF checking will also check the referrer of the request to ensure
+that it matches one of the trusted origins. By default the only trusted origin
+is the current host, however additional origins may be configured by setting
+``pyramid.csrf_trusted_origins`` to a list of domain names (and ports if they
+are non standard). If a host in the list of domains starts with a ``.`` then
+that will allow all subdomains as well as the domain without the ``.``.
+
+If CSRF checks fail then a :class:`pyramid.exceptions.BadCSRFToken` or
+:class:`pyramid.exceptions.BadCSRFOrigin` exception will be raised. This
+exception may be caught and handled by an :term:`exception view` but, by
+default, will result in a ``400 Bad Request`` response being sent to the
+client.
+
+Checking CSRF Tokens with a View Predicate
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. deprecated:: 1.7
+   Use the ``require_csrf`` option or read :ref:`auto_csrf_checking` instead
+   to have :class:`pyramid.exceptions.BadCSRFToken` exceptions raised.
+
+A convenient way to require a valid CSRF token for a particular view is to
+include ``check_csrf=True`` as a view predicate. See
+:meth:`pyramid.config.Configurator.add_view`.
+
+.. code-block:: python
+
+    @view_config(request_method='POST', check_csrf=True, ...)
+    def myview(request):
+        ...
+
+.. note::
+   A mismatch of a CSRF token is treated like any other predicate miss, and the
+   predicate system, when it doesn't find a view, raises ``HTTPNotFound``
+   instead of ``HTTPBadRequest``, so ``check_csrf=True`` behavior is different
+   from calling :func:`pyramid.session.check_csrf_token`.
