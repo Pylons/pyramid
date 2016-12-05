@@ -1996,3 +1996,23 @@ class DummyIntrospectable(object):
         
 class DummyPredicate(object):
     pass
+
+class TestRunAppHelper(unittest.TestCase):
+
+    def test_run_app(self):
+        from pyramid.config import Configurator
+        from pyramid.response import Response
+
+        self.running = False
+        # Mocks wsgiref's serve_forever method
+        def serve_forever_mock(*args, **kwargs):
+            self.running = True
+
+        from wsgiref.simple_server import WSGIServer
+        WSGIServer.serve_forever = serve_forever_mock
+
+        config = Configurator()
+
+        config.run_app()
+        self.assertTrue(self.running)
+
