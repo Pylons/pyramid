@@ -286,3 +286,5 @@ Contributors
 - Keith Yang, 2016/07/22
 
 - Moriyoshi Koizumi, 2016/11/20
+
+- Jan Likar, 2016/12/05
