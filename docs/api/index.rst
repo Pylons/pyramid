@@ -1,4 +1,4 @@
-.. _html_api_documentation:
+.. _api_documentation:
 
 API Documentation
 =================

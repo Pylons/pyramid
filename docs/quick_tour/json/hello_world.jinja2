@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Quick Glance</title>
-    <link rel="stylesheet" href="/static/app.css"/>
+    <title>Hello World</title>
+    <link rel="stylesheet" href="{{ request.static_url('__main__:static/app.css') }}"/>
 </head>
 <body>
 <h1>Hello {{ name }}!</h1>

@@ -1,5 +1,663 @@
+1.7 (2016-05-19)
+================
+
+- Fix a bug in the wiki2 tutorial where bcrypt is always expecting byte
+  strings. See https://github.com/Pylons/pyramid/pull/2576
+
+- Simplify windows detection code and remove some duplicated data.
+  See https://github.com/Pylons/pyramid/pull/2585 and
+  https://github.com/Pylons/pyramid/pull/2586
+
+1.7b4 (2016-05-12)
+==================
+
+- Fixed the exception view tween to re-raise the original exception if
+  no exception view could be found to handle the exception. This better
+  allows tweens further up the chain to handle exceptions that were
+  left unhandled. Previously they would be converted into a
+  ``PredicateMismatch`` exception if predicates failed to allow the view to
+  handle the exception.
+  See https://github.com/Pylons/pyramid/pull/2567
+
+- Exposed the ``pyramid.interfaces.IRequestFactory`` interface to mirror
+  the public ``pyramid.interfaces.IResponseFactory`` interface.
+
+1.7b3 (2016-05-10)
+==================
+
+- Fix ``request.invoke_exception_view`` to raise an ``HTTPNotFound``
+  exception if no view is matched. Previously ``None`` would be returned
+  if no views were matched and a ``PredicateMismatch`` would be raised if
+  a view "almost" matched (a view was found matching the context).
+  See https://github.com/Pylons/pyramid/pull/2564
+
+- Add defaults for py.test configuration and coverage to all three scaffolds,
+  and update documentation accordingly.
+  See https://github.com/Pylons/pyramid/pull/2550
+
+- Add ``linkcheck`` to ``Makefile`` for Sphinx. To check the documentation for
+  broken links, use the command ``make linkcheck
+  SPHINXBUILD=$VENV/bin/sphinx-build``. Also removed and fixed dozens of broken
+  external links.
+
+- Fix the internal runner for scaffold tests to ensure they work with pip
+  and py.test.
+  See https://github.com/Pylons/pyramid/pull/2565
+
+1.7b2 (2016-05-01)
+==================
+
+- Removed inclusion of pyramid_tm in development.ini for alchemy scaffold
+  See https://github.com/Pylons/pyramid/issues/2538
+
+- A default permission set via ``config.set_default_permission`` will no
+  longer be enforced on an exception view. This has been the case for a while
+  with the default exception views (``config.add_notfound_view`` and
+  ``config.add_forbidden_view``), however for any other exception view a
+  developer had to remember to set ``permission=NO_PERMISSION_REQUIRED`` or
+  be surprised when things didn't work. It is still possible to force a
+  permission check on an exception view by setting the ``permission`` argument
+  manually to ``config.add_view``. This behavior is consistent with the new
+  CSRF features added in the 1.7 series.
+  See https://github.com/Pylons/pyramid/pull/2534
+
+1.7b1 (2016-04-25)
+==================
+
+- This release announces the beta period for 1.7.
+
+- Fix an issue where some files were being included in the alchemy scafffold
+  which had been removed from the 1.7 series.
+  See https://github.com/Pylons/pyramid/issues/2525
+
+1.7a2 (2016-04-19)
+==================
+
+Features
+--------
+
+- Automatic CSRF checks are now disabled by default on exception views. They
+  can be turned back on by setting the appropriate `require_csrf` option on
+  the view.
+  See https://github.com/Pylons/pyramid/pull/2517
+
+- The automatic CSRF API was reworked to use a config directive for
+  setting the options. The ``pyramid.require_default_csrf`` setting is
+  no longer supported. Instead, a new ``config.set_default_csrf_options``
+  directive has been introduced that allows the developer to specify
+  the default value for ``require_csrf`` as well as change the CSRF token,
+  header and safe request methods. The ``pyramid.csrf_trusted_origins``
+  setting is still supported.
+  See https://github.com/Pylons/pyramid/pull/2518
+
+Bug fixes
+---------
+
+- CSRF origin checks had a bug causing the checks to always fail.
+  See https://github.com/Pylons/pyramid/pull/2512
+
+- Fix the test suite to pass on windows.
+  See https://github.com/Pylons/pyramid/pull/2520
+
+1.7a1 (2016-04-16)
+==================
+
+Backward Incompatibilities
+--------------------------
+
+- Following the Pyramid deprecation period (1.4 -> 1.6),
+  AuthTktAuthenticationPolicy's default hashing algorithm is changing from md5
+  to sha512. If you are using the authentication policy and need to continue
+  using md5, please explicitly set hashalg to 'md5'.
+
+  This change does mean that any existing auth tickets (and associated cookies)
+  will no longer be valid, and users will no longer be logged in, and have to
+  login to their accounts again.
+
+  See https://github.com/Pylons/pyramid/pull/2496
+
+- The ``check_csrf_token`` function no longer validates a csrf token in the
+  query string of a request. Only headers and request bodies are supported.
+  See https://github.com/Pylons/pyramid/pull/2500
+
+Features
+--------
+
+- Added a new setting, ``pyramid.require_default_csrf`` which may be used
+  to turn on CSRF checks globally for every POST request in the application.
+  This should be considered a good default for websites built on Pyramid.
+  It is possible to opt-out of CSRF checks on a per-view basis by setting
+  ``require_csrf=False`` on those views.
+  See https://github.com/Pylons/pyramid/pull/2413
+
+- Added a ``require_csrf`` view option which will enforce CSRF checks on any
+  request with an unsafe method as defined by RFC2616. If the CSRF check fails
+  a ``BadCSRFToken`` exception will be raised and may be caught by exception
+  views (the default response is a ``400 Bad Request``). This option should be
+  used in place of the deprecated ``check_csrf`` view predicate which would
+  normally result in unexpected ``404 Not Found`` response to the client
+  instead of a catchable exception.  See
+  https://github.com/Pylons/pyramid/pull/2413 and
+  https://github.com/Pylons/pyramid/pull/2500
+
+- Added an additional CSRF validation that checks the origin/referrer of a
+  request and makes sure it matches the current ``request.domain``. This
+  particular check is only active when accessing a site over HTTPS as otherwise
+  browsers don't always send the required information. If this additional CSRF
+  validation fails a ``BadCSRFOrigin`` exception will be raised and may be
+  caught by exception views (the default response is ``400 Bad Request``).
+  Additional allowed origins may be configured by setting
+  ``pyramid.csrf_trusted_origins`` to a list of domain names (with ports if on
+  a non standard port) to allow. Subdomains are not allowed unless the domain
+  name has been prefixed with a ``.``. See
+  https://github.com/Pylons/pyramid/pull/2501
+
+- Added a new ``pyramid.session.check_csrf_origin`` API for validating the
+  origin or referrer headers against the request's domain.
+  See https://github.com/Pylons/pyramid/pull/2501
+
+- Pyramid HTTPExceptions will now take into account the best match for the
+  clients Accept header, and depending on what is requested will return
+  text/html, application/json or text/plain. The default for */* is still
+  text/html, but if application/json is explicitly mentioned it will now
+  receive a valid JSON response. See
+  https://github.com/Pylons/pyramid/pull/2489
+
+- A new event and interface (BeforeTraversal) has been introduced that will
+  notify listeners before traversal starts in the router. See
+  https://github.com/Pylons/pyramid/pull/2469 and
+  https://github.com/Pylons/pyramid/pull/1876
+
+- Add a new "view deriver" concept to Pyramid to allow framework authors to
+  inject elements into the standard Pyramid view pipeline and affect all
+  views in an application. This is similar to a decorator except that it
+  has access to options passed to ``config.add_view`` and can affect other
+  stages of the pipeline such as the raw response from a view or prior to
+  security checks. See https://github.com/Pylons/pyramid/pull/2021
+
+- Allow a leading ``=`` on the key of the request param predicate.
+  For example, '=abc=1' is equivalent down to
+  ``request.params['=abc'] == '1'``.
+  See https://github.com/Pylons/pyramid/pull/1370
+
+- A new ``request.invoke_exception_view(...)`` method which can be used to
+  invoke an exception view and get back a response. This is useful for
+  rendering an exception view outside of the context of the excview tween
+  where you may need more control over the request.
+  See https://github.com/Pylons/pyramid/pull/2393
+
+- Allow using variable substitutions like ``%(LOGGING_LOGGER_ROOT_LEVEL)s``
+  for logging sections of the .ini file and populate these variables from
+  the ``pserve`` command line -- e.g.:
+  ``pserve development.ini LOGGING_LOGGER_ROOT_LEVEL=DEBUG``
+  See https://github.com/Pylons/pyramid/pull/2399
+
+Documentation Changes
+---------------------
+
+- A complete overhaul of the docs:
+
+  - Use pip instead of easy_install.
+  - Become opinionated by preferring Python 3.4 or greater to simplify
+    installation of Python and its required packaging tools.
+  - Use venv for the tool, and virtual environment for the thing created,
+    instead of virtualenv.
+  - Use py.test and pytest-cov instead of nose and coverage.
+  - Further updates to the scaffolds as well as tutorials and their src files.
+
+  See https://github.com/Pylons/pyramid/pull/2468
+
+- A complete overhaul of the ``alchemy`` scaffold as well as the
+  Wiki2 SQLAlchemy + URLDispatch tutorial to introduce more modern features
+  into the usage of SQLAlchemy with Pyramid and provide a better starting
+  point for new projects.
+  See https://github.com/Pylons/pyramid/pull/2024
+
+Bug Fixes
+---------
+
+- Fix ``pserve --browser`` to use the ``--server-name`` instead of the
+  app name when selecting a section to use. This was only working for people
+  who had server and app sections with the same name, for example
+  ``[app:main]`` and ``[server:main]``.
+  See https://github.com/Pylons/pyramid/pull/2292
+
+Deprecations
+------------
+
+- The ``check_csrf`` view predicate has been deprecated. Use the
+  new ``require_csrf`` option or the ``pyramid.require_default_csrf`` setting
+  to ensure that the ``BadCSRFToken`` exception is raised.
+  See https://github.com/Pylons/pyramid/pull/2413
+
+- Support for Python 3.3 will be removed in Pyramid 1.8.
+  https://github.com/Pylons/pyramid/issues/2477
+
+- Python 2.6 is no longer supported by Pyramid. See
+  https://github.com/Pylons/pyramid/issues/2368
+
+- Dropped Python 3.2 support.
+  See https://github.com/Pylons/pyramid/pull/2256
+
+1.6 (2016-01-03)
+================
+
+Deprecations
+------------
+
+- Continue removal of ``pserve`` daemon/process management features
+  by deprecating ``--user`` and ``--group`` options.
+  See https://github.com/Pylons/pyramid/pull/2190
+
+1.6b3 (2015-12-17)
+==================
+
+Backward Incompatibilities
+--------------------------
+
+- Remove the ``cachebust`` option from ``config.add_static_view``. See
+  ``config.add_cache_buster`` for the new way to attach cache busters to
+  static assets.
+  See https://github.com/Pylons/pyramid/pull/2186
+
+- Modify the ``pyramid.interfaces.ICacheBuster`` API to be a simple callable
+  instead of an object with ``match`` and ``pregenerate`` methods. Cache
+  busters are now focused solely on generation. Matching has been dropped.
+
+  Note this affects usage of ``pyramid.static.QueryStringCacheBuster`` and
+  ``pyramid.static.ManifestCacheBuster``.
+
+  See https://github.com/Pylons/pyramid/pull/2186
+
+Features
+--------
+
+- Add a new ``config.add_cache_buster`` API for attaching cache busters to
+  static assets. See https://github.com/Pylons/pyramid/pull/2186
+
+Bug Fixes
+---------
+
+- Ensure that ``IAssetDescriptor.abspath`` always returns an absolute path.
+  There were cases depending on the process CWD that a relative path would
+  be returned. See https://github.com/Pylons/pyramid/issues/2188
+
+1.6b2 (2015-10-15)
+==================
+
+Features
+--------
+
+- Allow asset specifications to be supplied to
+  ``pyramid.static.ManifestCacheBuster`` instead of requiring a
+  filesystem path.
+
+1.6b1 (2015-10-15)
+==================
+
+Backward Incompatibilities
+--------------------------
+
+- IPython and BPython support have been removed from pshell in the core.
+  To continue using them on Pyramid 1.6+ you must install the binding
+  packages explicitly::
+
+    $ pip install pyramid_ipython
+
+    or
+
+    $ pip install pyramid_bpython
+
+- Remove default cache busters introduced in 1.6a1 including
+  ``PathSegmentCacheBuster``, ``PathSegmentMd5CacheBuster``, and
+  ``QueryStringMd5CacheBuster``.
+  See https://github.com/Pylons/pyramid/pull/2116
+
+Features
+--------
+
+- Additional shells for ``pshell`` can now be registered as entrypoints. See
+  https://github.com/Pylons/pyramid/pull/1891 and
+  https://github.com/Pylons/pyramid/pull/2012
+
+- The variables injected into ``pshell`` are now displayed with their
+  docstrings instead of the default ``str(obj)`` when possible.
+  See https://github.com/Pylons/pyramid/pull/1929
+
+- Add new ``pyramid.static.ManifestCacheBuster`` for use with external
+  asset pipelines as well as examples of common usages in the narrative.
+  See https://github.com/Pylons/pyramid/pull/2116
+
+- Fix ``pserve --reload`` to not crash on syntax errors!!!
+  See https://github.com/Pylons/pyramid/pull/2125
+
+- Fix an issue when user passes unparsed strings to ``pyramid.session.CookieSession``
+  and ``pyramid.authentication.AuthTktCookieHelper`` for time related parameters
+  ``timeout``, ``reissue_time``, ``max_age`` that expect an integer value.
+  See https://github.com/Pylons/pyramid/pull/2050
+
+Bug Fixes
+---------
+
+- ``pyramid.httpexceptions.HTTPException`` now defaults to
+  ``520 Unknown Error`` instead of ``None None`` to conform with changes in
+  WebOb 1.5.
+  See https://github.com/Pylons/pyramid/pull/1865
+
+- ``pshell`` will now preserve the capitalization of variables in the
+  ``[pshell]`` section of the INI file. This makes exposing classes to the
+  shell a little more straightfoward.
+  See https://github.com/Pylons/pyramid/pull/1883
+
+- Fixed usage of ``pserve --monitor-restart --daemon`` which would fail in
+  horrible ways. See https://github.com/Pylons/pyramid/pull/2118
+
+- Explicitly prevent ``pserve --reload --daemon`` from being used. It's never
+  been supported but would work and fail in weird ways.
+  See https://github.com/Pylons/pyramid/pull/2119
+
+- Fix an issue on Windows when running ``pserve --reload`` in which the
+  process failed to fork because it could not find the pserve script to
+  run. See https://github.com/Pylons/pyramid/pull/2138
+
+Deprecations
+------------
+
+- Deprecate ``pserve --monitor-restart`` in favor of user's using a real
+  process manager such as Systemd or Upstart as well as Python-based
+  solutions like Circus and Supervisor.
+  See https://github.com/Pylons/pyramid/pull/2120
+
+1.6a2 (2015-06-30)
+==================
+
+Bug Fixes
+---------
+
+- Ensure that ``pyramid.httpexceptions.exception_response`` returns the
+  appropriate "concrete" class for ``400`` and ``500`` status codes.
+  See https://github.com/Pylons/pyramid/issues/1832
+
+- Fix an infinite recursion bug introduced in 1.6a1 when
+  ``pyramid.view.render_view_to_response`` was called directly or indirectly.
+  See https://github.com/Pylons/pyramid/issues/1643
+
+- Further fix the JSONP renderer by prefixing the returned content with
+  a comment. This should mitigate attacks from Flash (See CVE-2014-4671).
+  See https://github.com/Pylons/pyramid/pull/1649
+
+- Allow periods and brackets (``[]``) in the JSONP callback. The original
+  fix was overly-restrictive and broke Angular.
+  See https://github.com/Pylons/pyramid/pull/1649
+
+1.6a1 (2015-04-15)
+==================
+
+Features
+--------
+
+- pcreate will now ask for confirmation if invoked with
+  an argument for a project name that already exists or
+  is importable in the current environment.
+  See https://github.com/Pylons/pyramid/issues/1357 and
+  https://github.com/Pylons/pyramid/pull/1837
+
+- Make it possible to subclass ``pyramid.request.Request`` and also use
+  ``pyramid.request.Request.add_request.method``.  See
+  https://github.com/Pylons/pyramid/issues/1529
+
+- The ``pyramid.config.Configurator`` has grown the ability to allow
+  actions to call other actions during a commit-cycle. This enables much more
+  logic to be placed into actions, such as the ability to invoke other actions
+  or group them for improved conflict detection. We have also exposed and
+  documented the config phases that Pyramid uses in order to further assist
+  in building conforming addons.
+  See https://github.com/Pylons/pyramid/pull/1513
+
+- Add ``pyramid.request.apply_request_extensions`` function which can be
+  used in testing to apply any request extensions configured via
+  ``config.add_request_method``. Previously it was only possible to test
+  the extensions by going through Pyramid's router.
+  See https://github.com/Pylons/pyramid/pull/1581
+
+- pcreate when run without a scaffold argument will now print information on
+  the missing flag, as well as a list of available scaffolds.
+  See https://github.com/Pylons/pyramid/pull/1566 and
+  https://github.com/Pylons/pyramid/issues/1297
+
+- Added support / testing for 'pypy3' under Tox and Travis.
+  See https://github.com/Pylons/pyramid/pull/1469
+
+- Automate code coverage metrics across py2 and py3 instead of just py2.
+  See https://github.com/Pylons/pyramid/pull/1471
+
+- Cache busting for static resources has been added and is available via a new
+  argument to ``pyramid.config.Configurator.add_static_view``: ``cachebust``.
+  Core APIs are shipped for both cache busting via query strings and
+  path segments and may be extended to fit into custom asset pipelines.
+  See https://github.com/Pylons/pyramid/pull/1380 and
+  https://github.com/Pylons/pyramid/pull/1583
+
+- Add ``pyramid.config.Configurator.root_package`` attribute and init
+  parameter to assist with includeable packages that wish to resolve
+  resources relative to the package in which the ``Configurator`` was created.
+  This is especially useful for addons that need to load asset specs from
+  settings, in which case it is may be natural for a developer to define
+  imports or assets relative to the top-level package.
+  See https://github.com/Pylons/pyramid/pull/1337
+
+- Added line numbers to the log formatters in the scaffolds to assist with
+  debugging. See https://github.com/Pylons/pyramid/pull/1326
+
+- Add new HTTP exception objects for status codes
+  ``428 Precondition Required``, ``429 Too Many Requests`` and
+  ``431 Request Header Fields Too Large`` in ``pyramid.httpexceptions``.
+  See https://github.com/Pylons/pyramid/pull/1372/files
+
+- The ``pshell`` script will now load a ``PYTHONSTARTUP`` file if one is
+  defined in the environment prior to launching the interpreter.
+  See https://github.com/Pylons/pyramid/pull/1448
+
+- Make it simple to define notfound and forbidden views that wish to use
+  the default exception-response view but with altered predicates and other
+  configuration options. The ``view`` argument is now optional in
+  ``config.add_notfound_view`` and ``config.add_forbidden_view``..
+  See https://github.com/Pylons/pyramid/issues/494
+
+- Greatly improve the readability of the ``pcreate`` shell script output.
+  See https://github.com/Pylons/pyramid/pull/1453
+
+- Improve robustness to timing attacks in the ``AuthTktCookieHelper`` and
+  the ``SignedCookieSessionFactory`` classes by using the stdlib's
+  ``hmac.compare_digest`` if it is available (such as Python 2.7.7+ and 3.3+).
+  See https://github.com/Pylons/pyramid/pull/1457
+
+- Assets can now be overidden by an absolute path on the filesystem when using
+  the ``config.override_asset`` API. This makes it possible to fully support
+  serving up static content from a mutable directory while still being able
+  to use the ``request.static_url`` API and ``config.add_static_view``.
+  Previously it was not possible to use ``config.add_static_view`` with an
+  absolute path **and** generate urls to the content. This change replaces
+  the call, ``config.add_static_view('/abs/path', 'static')``, with
+  ``config.add_static_view('myapp:static', 'static')`` and
+  ``config.override_asset(to_override='myapp:static/',
+  override_with='/abs/path/')``. The ``myapp:static`` asset spec is completely
+  made up and does not need to exist - it is used for generating urls
+  via ``request.static_url('myapp:static/foo.png')``.
+  See https://github.com/Pylons/pyramid/issues/1252
+
+- Added ``pyramid.config.Configurator.set_response_factory`` and the
+  ``response_factory`` keyword argument to the ``Configurator`` for defining
+  a factory that will return a custom ``Response`` class.
+  See https://github.com/Pylons/pyramid/pull/1499
+
+- Allow an iterator to be returned from a renderer. Previously it was only
+  possible to return bytes or unicode.
+  See https://github.com/Pylons/pyramid/pull/1417
+
+- ``pserve`` can now take a ``-b`` or ``--browser`` option to open the server
+  URL in a web browser. See https://github.com/Pylons/pyramid/pull/1533
+
+- Overall improvments for the ``proutes`` command. Added ``--format`` and
+  ``--glob`` arguments to the command, introduced the ``method``
+  column for displaying available request methods, and improved the ``view``
+  output by showing the module instead of just ``__repr__``.
+  See https://github.com/Pylons/pyramid/pull/1488
+
+- Support keyword-only arguments and function annotations in views in
+  Python 3. See https://github.com/Pylons/pyramid/pull/1556
+
+- ``request.response`` will no longer be mutated when using the
+  ``pyramid.renderers.render_to_response()`` API.  It is now necessary to
+  pass in a ``response=`` argument to ``render_to_response`` if you wish to
+  supply the renderer with a custom response object for it to use. If you
+  do not pass one then a response object will be created using the
+  application's ``IResponseFactory``. Almost all renderers
+  mutate the ``request.response`` response object (for example, the JSON
+  renderer sets ``request.response.content_type`` to ``application/json``).
+  However, when invoking ``render_to_response`` it is not expected that the
+  response object being returned would be the same one used later in the
+  request. The response object returned from ``render_to_response`` is now
+  explicitly different from ``request.response``. This does not change the
+  API of a renderer. See https://github.com/Pylons/pyramid/pull/1563
+
+- The ``append_slash`` argument of ```Configurator().add_notfound_view()`` will
+  now accept anything that implements the ``IResponse`` interface and will use
+  that as the response class instead of the default ``HTTPFound``.  See
+  https://github.com/Pylons/pyramid/pull/1610
+
+Bug Fixes
+---------
+
+- The JSONP renderer created JavaScript code in such a way that a callback
+  variable could be used to arbitrarily inject javascript into the response
+  object. https://github.com/Pylons/pyramid/pull/1627
+
+- Work around an issue where ``pserve --reload`` would leave terminal echo
+  disabled if it reloaded during a pdb session.
+  See https://github.com/Pylons/pyramid/pull/1577,
+  https://github.com/Pylons/pyramid/pull/1592
+
+- ``pyramid.wsgi.wsgiapp`` and ``pyramid.wsgi.wsgiapp2`` now raise
+  ``ValueError`` when accidentally passed ``None``.
+  See https://github.com/Pylons/pyramid/pull/1320
+
+- Fix an issue whereby predicates would be resolved as maybe_dotted in the
+  introspectable but not when passed for registration. This would mean that
+  ``add_route_predicate`` for example can not take a string and turn it into
+  the actual callable function.
+  See https://github.com/Pylons/pyramid/pull/1306
+
+- Fix ``pyramid.testing.setUp`` to return a ``Configurator`` with a proper
+  package. Previously it was not possible to do package-relative includes
+  using the returned ``Configurator`` during testing. There is now a
+  ``package`` argument that can override this behavior as well.
+  See https://github.com/Pylons/pyramid/pull/1322
+
+- Fix an issue where a ``pyramid.response.FileResponse`` may apply a charset
+  where it does not belong. See https://github.com/Pylons/pyramid/pull/1251
+
+- Work around a bug introduced in Python 2.7.7 on Windows where
+  ``mimetypes.guess_type`` returns Unicode rather than str for the content
+  type, unlike any previous version of Python.  See
+  https://github.com/Pylons/pyramid/issues/1360 for more information.
+
+- ``pcreate`` now normalizes the package name by converting hyphens to
+  underscores. See https://github.com/Pylons/pyramid/pull/1376
+
+- Fix an issue with the final response/finished callback being unable to
+  add another callback to the list. See
+  https://github.com/Pylons/pyramid/pull/1373
+
+- Fix a failing unittest caused by differing mimetypes across various OSs.
+  See https://github.com/Pylons/pyramid/issues/1405
+
+- Fix route generation for static view asset specifications having no path.
+  See https://github.com/Pylons/pyramid/pull/1377
+
+- Allow the ``pyramid.renderers.JSONP`` renderer to work even if there is no
+  valid request object. In this case it will not wrap the object in a
+  callback and thus behave just like the ``pyramid.renderers.JSON`` renderer.
+  See https://github.com/Pylons/pyramid/pull/1561
+
+- Prevent "parameters to load are deprecated" ``DeprecationWarning``
+  from setuptools>=11.3. See https://github.com/Pylons/pyramid/pull/1541
+
+- Avoiding sharing the ``IRenderer`` objects across threads when attached to
+  a view using the `renderer=` argument. These renderers were instantiated
+  at time of first render and shared between requests, causing potentially
+  subtle effects like `pyramid.reload_templates = true` failing to work
+  in `pyramid_mako`. See https://github.com/Pylons/pyramid/pull/1575
+  and https://github.com/Pylons/pyramid/issues/1268
+
+- Avoiding timing attacks against CSRF tokens.
+  See https://github.com/Pylons/pyramid/pull/1574
+
+- ``request.finished_callbacks`` and ``request.response_callbacks`` now
+  default to an iterable instead of ``None``. It may be checked for a length
+  of 0. This was the behavior in 1.5.
+
+Deprecations
+------------
+
+- The ``pserve`` command's daemonization features have been deprecated. This
+  includes the ``[start,stop,restart,status]`` subcommands as well as the
+  ``--daemon``, ``--stop-server``, ``--pid-file``, and ``--status`` flags.
+
+  Please use a real process manager in the future instead of relying on the
+  ``pserve`` to daemonize itself. Many options exist including your Operating
+  System's services such as Systemd or Upstart, as well as Python-based
+  solutions like Circus and Supervisor.
+
+  See https://github.com/Pylons/pyramid/pull/1641
+
+- Renamed the ``principal`` argument to ``pyramid.security.remember()`` to
+  ``userid`` in order to clarify its intended purpose.
+  See https://github.com/Pylons/pyramid/pull/1399
+
+Docs
+----
+
+- Moved the documentation for ``accept`` on ``Configurator.add_view`` to no
+  longer be part of the predicate list. See
+  https://github.com/Pylons/pyramid/issues/1391 for a bug report stating
+  ``not_`` was failing on ``accept``. Discussion with @mcdonc led to the
+  conclusion that it should not be documented as a predicate.
+  See https://github.com/Pylons/pyramid/pull/1487 for this PR
+
+- Removed logging configuration from Quick Tutorial ini files except for
+  scaffolding- and logging-related chapters to avoid needing to explain it too
+  early.
+
+- Clarify a previously-implied detail of the ``ISession.invalidate`` API
+  documentation.
+
+- Improve and clarify the documentation on what Pyramid defines as a
+  ``principal`` and a ``userid`` in its security APIs.
+  See https://github.com/Pylons/pyramid/pull/1399
+
+- Add documentation of command line programs (``p*`` scripts). See
+  https://github.com/Pylons/pyramid/pull/2191
+
+Scaffolds
+---------
+
+- Update scaffold generating machinery to return the version of pyramid and
+  pyramid docs for use in scaffolds. Updated starter, alchemy and zodb
+  templates to have links to correctly versioned documentation and reflect
+  which pyramid was used to generate the scaffold.
+
+- Removed non-ascii copyright symbol from templates, as this was
+  causing the scaffolds to fail for project generation.
+
+- You can now run the scaffolding func tests via ``tox py2-scaffolds`` and
+  ``tox py3-scaffolds``.
+
+
 1.5 (2014-04-08)
 ================
+
+- Python 3.4 compatibility.
 
 - Avoid crash in ``pserve --reload`` under Py3k, when iterating over possibly
   mutated ``sys.modules``.
@@ -1129,6 +1787,8 @@ Bug Fixes
 
 Features
 --------
+
+- Python 3.3 compatibility.
 
 - Configurator.add_directive now accepts arbitrary callables like partials or
   objects implementing ``__call__`` which dont have ``__name__`` and

@@ -247,6 +247,10 @@ Contributors
 
 - Donald Stufft, 2015/03/15
 
+- Randy Topliffe, 2015/04/14
+
+- Timur Izhbulatov, 2015/04/14
+
 - Karen Dalton, 2015/06/01
 
 - Igor Stroh, 2015/06/10
@@ -254,3 +258,31 @@ Contributors
 - Jesse Dhillon, 2015/10/07
 
 - Amos Latteier, 2015/10/22
+
+- Rami Chousein, 2015/10/28
+
+- Sri Sanketh Uppalapati, 2015/12/12
+
+- Marcin Raczyński, 2016/01/26
+
+- Arian Maykon de A. Diógenes, 2016/04/13
+
+- Vincent Férotin, 2016/05/08
+
+- Berker Peksag, 2016/05/16
+
+- Zack Brunson, 2016/06/02
+
+- Marco Martinez, 2016/06/02
+
+- Cris Ewing, 2016/06/03
+
+- Jean-Christophe Bohin, 2016/06/13
+
+- Dariusz Gorecki, 2016/07/15
+
+- Jon Davidson, 2016/07/18
+
+- Keith Yang, 2016/07/22
+
+- Moriyoshi Koizumi, 2016/11/20

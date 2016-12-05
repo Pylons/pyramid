@@ -448,7 +448,7 @@ templating languages including the following:
 .. _pyramid_chameleon:
    http://docs.pylonsproject.org/projects/pyramid-chameleon/en/latest/
 
-.. _Jinja2: http://jinja.pocoo.org/docs/
+.. _Jinja2: http://jinja.pocoo.org/docs/dev/
 .. _pyramid_jinja2:
    http://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/
 

@@ -1,15 +1,10 @@
 import os
-import warnings
 
-from zope.interface import implementer
-
-from pyramid.interfaces import ISettings
-
-from pyramid.settings import asbool
+from pyramid.settings import asbool, aslist
 
 class SettingsConfiguratorMixin(object):
     def _set_settings(self, mapping):
-        if not mapping:
+        if mapping is None:
             mapping = {}
         settings = Settings(mapping)
         self.registry.settings = settings
@@ -54,114 +49,58 @@ class SettingsConfiguratorMixin(object):
         return self.registry.settings
 
 
-@implementer(ISettings)
-class Settings(dict):
+def Settings(d=None, _environ_=os.environ, **kw):
     """ Deployment settings.  Update application settings (usually
     from PasteDeploy keywords) with framework-specific key/value pairs
     (e.g. find ``PYRAMID_DEBUG_AUTHORIZATION`` in os.environ and jam into
     keyword args)."""
-    # _environ_ is dep inj for testing
-    def __init__(self, d=None, _environ_=os.environ, **kw):
-        if d is None:
-            d = {}
-        dict.__init__(self, d, **kw)
-        eget = _environ_.get
-        config_debug_all = self.get('debug_all', '')
-        config_debug_all = self.get('pyramid.debug_all', config_debug_all)
-        eff_debug_all = asbool(eget('PYRAMID_DEBUG_ALL', config_debug_all))
-        config_reload_all = self.get('reload_all', '')
-        config_reload_all = self.get('pyramid.reload_all', config_reload_all)
-        eff_reload_all = asbool(eget('PYRAMID_RELOAD_ALL', config_reload_all))
-        config_debug_auth = self.get('debug_authorization', '')
-        config_debug_auth = self.get('pyramid.debug_authorization',
-                                     config_debug_auth)
-        eff_debug_auth = asbool(eget('PYRAMID_DEBUG_AUTHORIZATION',
-                                     config_debug_auth))
-        config_debug_notfound = self.get('debug_notfound', '')
-        config_debug_notfound = self.get('pyramid.debug_notfound',
-                                         config_debug_notfound)
-        eff_debug_notfound = asbool(eget('PYRAMID_DEBUG_NOTFOUND',
-                                         config_debug_notfound))
-        config_debug_routematch = self.get('debug_routematch', '')
-        config_debug_routematch = self.get('pyramid.debug_routematch',
-                                           config_debug_routematch)
-        eff_debug_routematch = asbool(eget('PYRAMID_DEBUG_ROUTEMATCH',
-                                         config_debug_routematch))
-        config_debug_templates = self.get('debug_templates', '')
-        config_debug_templates = self.get('pyramid.debug_templates',
-                                          config_debug_templates)
-        eff_debug_templates = asbool(eget('PYRAMID_DEBUG_TEMPLATES',
-                                          config_debug_templates))
-        config_reload_templates = self.get('reload_templates', '')
-        config_reload_templates = self.get('pyramid.reload_templates',
-                                           config_reload_templates)
-        eff_reload_templates = asbool(eget('PYRAMID_RELOAD_TEMPLATES',
-                                           config_reload_templates))
-        config_reload_assets = self.get('reload_assets', '')
-        config_reload_assets = self.get('pyramid.reload_assets',
-                                        config_reload_assets)
-        reload_assets = asbool(eget('PYRAMID_RELOAD_ASSETS',
-                                    config_reload_assets))
-        config_reload_resources = self.get('reload_resources', '')
-        config_reload_resources = self.get('pyramid.reload_resources',
-                                           config_reload_resources)
-        reload_resources = asbool(eget('PYRAMID_RELOAD_RESOURCES',
-                                    config_reload_resources))
-        # reload_resources is an older alias for reload_assets
-        eff_reload_assets = reload_assets or reload_resources
-        locale_name = self.get('default_locale_name', 'en')
-        locale_name = self.get('pyramid.default_locale_name', locale_name)
-        eff_locale_name = eget('PYRAMID_DEFAULT_LOCALE_NAME', locale_name)
-        config_prevent_http_cache = self.get('prevent_http_cache', '')
-        config_prevent_http_cache = self.get('pyramid.prevent_http_cache',
-                                             config_prevent_http_cache)
-        eff_prevent_http_cache = asbool(eget('PYRAMID_PREVENT_HTTP_CACHE',
-                                             config_prevent_http_cache))
-        config_prevent_cachebust = self.get('prevent_cachebust', '')
-        config_prevent_cachebust = self.get('pyramid.prevent_cachebust',
-                                             config_prevent_cachebust)
-        eff_prevent_cachebust = asbool(eget('PYRAMID_PREVENT_CACHEBUST',
-                                             config_prevent_cachebust))
+    if d is None:
+        d = {}
+    d.update(**kw)
 
-        update = {
-            'debug_authorization': eff_debug_all or eff_debug_auth,
-            'debug_notfound': eff_debug_all or eff_debug_notfound,
-            'debug_routematch': eff_debug_all or eff_debug_routematch,
-            'debug_templates': eff_debug_all or eff_debug_templates,
-            'reload_templates': eff_reload_all or eff_reload_templates,
-            'reload_resources':eff_reload_all or eff_reload_assets,
-            'reload_assets':eff_reload_all or eff_reload_assets,
-            'default_locale_name':eff_locale_name,
-            'prevent_http_cache':eff_prevent_http_cache,
-            'prevent_cachebust':eff_prevent_cachebust,
+    eget = _environ_.get
+    def expand_key(key):
+        keys = [key]
+        if not key.startswith('pyramid.'):
+            keys.append('pyramid.' + key)
+        return keys
+    def S(settings_key, env_key=None, type_=str, default=False):
+        value = default
+        keys = expand_key(settings_key)
+        for key in keys:
+            value = d.get(key, value)
+        if env_key:
+            value = eget(env_key, value)
+        value = type_(value)
+        d.update({k: value for k in keys})
+    def O(settings_key, override_key):
+        for key in expand_key(settings_key):
+            d[key] = d[key] or d[override_key]
 
-            'pyramid.debug_authorization': eff_debug_all or eff_debug_auth,
-            'pyramid.debug_notfound': eff_debug_all or eff_debug_notfound,
-            'pyramid.debug_routematch': eff_debug_all or eff_debug_routematch,
-            'pyramid.debug_templates': eff_debug_all or eff_debug_templates,
-            'pyramid.reload_templates': eff_reload_all or eff_reload_templates,
-            'pyramid.reload_resources':eff_reload_all or eff_reload_assets,
-            'pyramid.reload_assets':eff_reload_all or eff_reload_assets,
-            'pyramid.default_locale_name':eff_locale_name,
-            'pyramid.prevent_http_cache':eff_prevent_http_cache,
-            'pyramid.prevent_cachebust':eff_prevent_cachebust,
-            }
+    S('debug_all', 'PYRAMID_DEBUG_ALL', asbool)
+    S('debug_authorization', 'PYRAMID_DEBUG_AUTHORIZATION', asbool)
+    O('debug_authorization', 'debug_all')
+    S('debug_notfound', 'PYRAMID_DEBUG_NOTFOUND', asbool)
+    O('debug_notfound', 'debug_all')
+    S('debug_routematch', 'PYRAMID_DEBUG_ROUTEMATCH', asbool)
+    O('debug_routematch', 'debug_all')
+    S('debug_templates', 'PYRAMID_DEBUG_TEMPLATES', asbool)
+    O('debug_templates', 'debug_all')
 
-        self.update(update)
+    S('reload_all', 'PYRAMID_RELOAD_ALL', asbool)
+    S('reload_templates', 'PYRAMID_RELOAD_TEMPLATES', asbool)
+    O('reload_templates', 'reload_all')
+    S('reload_assets', 'PYRAMID_RELOAD_ASSETS', asbool)
+    O('reload_assets', 'reload_all')
+    S('reload_resources', 'PYRAMID_RELOAD_RESOURCES', asbool)
+    O('reload_resources', 'reload_all')
+    # reload_resources is an older alias for reload_assets
+    for k in expand_key('reload_assets') + expand_key('reload_resources'):
+        d[k] = d['reload_assets'] or d['reload_resources']
 
-    def __getattr__(self, name):
-        try:
-            val = self[name]
-            # only deprecate on success; a probing getattr/hasattr should not
-            # print this warning
-            warnings.warn(
-                'Obtaining settings via attributes of the settings dictionary '
-                'is deprecated as of Pyramid 1.2; use settings["foo"] instead '
-                'of settings.foo',
-                DeprecationWarning,
-                2
-                )
-            return val
-        except KeyError:
-            raise AttributeError(name)
+    S('default_locale_name', 'PYRAMID_DEFAULT_LOCALE_NAME', str, 'en')
+    S('prevent_http_cache', 'PYRAMID_PREVENT_HTTP_CACHE', asbool)
+    S('prevent_cachebust', 'PYRAMID_PREVENT_CACHEBUST', asbool)
+    S('csrf_trusted_origins', 'PYRAMID_CSRF_TRUSTED_ORIGINS', aslist, [])
 
+    return d

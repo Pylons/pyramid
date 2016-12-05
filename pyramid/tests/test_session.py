@@ -62,6 +62,18 @@ class SharedCookieSessionTests(object):
         session = self._makeOne(request, timeout=None)
         self.assertEqual(dict(session), {'state': 1})
 
+    def test_timeout_str(self):
+        import time
+        request = testing.DummyRequest()
+        cookieval = self._serialize((time.time() - 5, 0, {'state': 1}))
+        request.cookies['session'] = cookieval
+        session = self._makeOne(request, timeout='1')
+        self.assertEqual(dict(session), {})
+
+    def test_timeout_invalid(self):
+        request = testing.DummyRequest()
+        self.assertRaises(ValueError, self._makeOne, request, timeout='Invalid value')
+
     def test_changed(self):
         request = testing.DummyRequest()
         session = self._makeOne(request)
@@ -297,6 +309,23 @@ class TestBaseCookieSession(SharedCookieSessionTests, unittest.TestCase):
         self.assertEqual(session['state'], 1)
         self.assertFalse(session._dirty)
 
+    def test_reissue_str_triggered(self):
+        import time
+        request = testing.DummyRequest()
+        cookieval = self._serialize((time.time() - 2, 0, {'state': 1}))
+        request.cookies['session'] = cookieval
+        session = self._makeOne(request, reissue_time='0')
+        self.assertEqual(session['state'], 1)
+        self.assertTrue(session._dirty)
+
+    def test_reissue_invalid(self):
+        request = testing.DummyRequest()
+        self.assertRaises(ValueError, self._makeOne, request, reissue_time='invalid value')
+
+    def test_cookie_max_age_invalid(self):
+        request = testing.DummyRequest()
+        self.assertRaises(ValueError, self._makeOne, request, max_age='invalid value')
+
 class TestSignedCookieSession(SharedCookieSessionTests, unittest.TestCase):
     def _makeOne(self, request, **kw):
         from pyramid.session import SignedCookieSessionFactory
@@ -330,6 +359,23 @@ class TestSignedCookieSession(SharedCookieSessionTests, unittest.TestCase):
         session = self._makeOne(request, reissue_time=None, timeout=None)
         self.assertEqual(session['state'], 1)
         self.assertFalse(session._dirty)
+
+    def test_reissue_str_triggered(self):
+        import time
+        request = testing.DummyRequest()
+        cookieval = self._serialize((time.time() - 2, 0, {'state': 1}))
+        request.cookies['session'] = cookieval
+        session = self._makeOne(request, reissue_time='0')
+        self.assertEqual(session['state'], 1)
+        self.assertTrue(session._dirty)
+
+    def test_reissue_invalid(self):
+        request = testing.DummyRequest()
+        self.assertRaises(ValueError, self._makeOne, request, reissue_time='invalid value')
+
+    def test_cookie_max_age_invalid(self):
+        request = testing.DummyRequest()
+        self.assertRaises(ValueError, self._makeOne, request, max_age='invalid value')
 
     def test_custom_salt(self):
         import time
@@ -620,7 +666,8 @@ class Test_check_csrf_token(unittest.TestCase):
 
     def test_success_token(self):
         request = testing.DummyRequest()
-        request.params['csrf_token'] = request.session.get_csrf_token()
+        request.method = "POST"
+        request.POST = {'csrf_token': request.session.get_csrf_token()}
         self.assertEqual(self._callFUT(request, token='csrf_token'), True)
 
     def test_success_header(self):
@@ -630,7 +677,8 @@ class Test_check_csrf_token(unittest.TestCase):
 
     def test_success_default_token(self):
         request = testing.DummyRequest()
-        request.params['csrf_token'] = request.session.get_csrf_token()
+        request.method = "POST"
+        request.POST = {'csrf_token': request.session.get_csrf_token()}
         self.assertEqual(self._callFUT(request), True)
 
     def test_success_default_header(self):
@@ -648,6 +696,107 @@ class Test_check_csrf_token(unittest.TestCase):
         request = testing.DummyRequest()
         result = self._callFUT(request, 'csrf_token', raises=False)
         self.assertEqual(result, False)
+
+    def test_token_differing_types(self):
+        from pyramid.compat import text_
+        request = testing.DummyRequest()
+        request.method = "POST"
+        request.session['_csrft_'] = text_('foo')
+        request.POST = {'csrf_token': b'foo'}
+        self.assertEqual(self._callFUT(request, token='csrf_token'), True)
+
+
+class Test_check_csrf_origin(unittest.TestCase):
+
+    def _callFUT(self, *args, **kwargs):
+        from ..session import check_csrf_origin
+        return check_csrf_origin(*args, **kwargs)
+
+    def test_success_with_http(self):
+        request = testing.DummyRequest()
+        request.scheme = "http"
+        self.assertTrue(self._callFUT(request))
+
+    def test_success_with_https_and_referrer(self):
+        request = testing.DummyRequest()
+        request.scheme = "https"
+        request.host = "example.com"
+        request.host_port = "443"
+        request.referrer = "https://example.com/login/"
+        request.registry.settings = {}
+        self.assertTrue(self._callFUT(request))
+
+    def test_success_with_https_and_origin(self):
+        request = testing.DummyRequest()
+        request.scheme = "https"
+        request.host = "example.com"
+        request.host_port = "443"
+        request.headers = {"Origin": "https://example.com/"}
+        request.referrer = "https://not-example.com/"
+        request.registry.settings = {}
+        self.assertTrue(self._callFUT(request))
+
+    def test_success_with_additional_trusted_host(self):
+        request = testing.DummyRequest()
+        request.scheme = "https"
+        request.host = "example.com"
+        request.host_port = "443"
+        request.referrer = "https://not-example.com/login/"
+        request.registry.settings = {
+            "pyramid.csrf_trusted_origins": ["not-example.com"],
+        }
+        self.assertTrue(self._callFUT(request))
+
+    def test_success_with_nonstandard_port(self):
+        request = testing.DummyRequest()
+        request.scheme = "https"
+        request.host = "example.com:8080"
+        request.host_port = "8080"
+        request.referrer = "https://example.com:8080/login/"
+        request.registry.settings = {}
+        self.assertTrue(self._callFUT(request))
+
+    def test_fails_with_wrong_host(self):
+        from pyramid.exceptions import BadCSRFOrigin
+        request = testing.DummyRequest()
+        request.scheme = "https"
+        request.host = "example.com"
+        request.host_port = "443"
+        request.referrer = "https://not-example.com/login/"
+        request.registry.settings = {}
+        self.assertRaises(BadCSRFOrigin, self._callFUT, request)
+        self.assertFalse(self._callFUT(request, raises=False))
+
+    def test_fails_with_no_origin(self):
+        from pyramid.exceptions import BadCSRFOrigin
+        request = testing.DummyRequest()
+        request.scheme = "https"
+        request.referrer = None
+        self.assertRaises(BadCSRFOrigin, self._callFUT, request)
+        self.assertFalse(self._callFUT(request, raises=False))
+
+    def test_fails_when_http_to_https(self):
+        from pyramid.exceptions import BadCSRFOrigin
+        request = testing.DummyRequest()
+        request.scheme = "https"
+        request.host = "example.com"
+        request.host_port = "443"
+        request.referrer = "http://example.com/evil/"
+        request.registry.settings = {}
+        self.assertRaises(BadCSRFOrigin, self._callFUT, request)
+        self.assertFalse(self._callFUT(request, raises=False))
+
+    def test_fails_with_nonstandard_port(self):
+        from pyramid.exceptions import BadCSRFOrigin
+        request = testing.DummyRequest()
+        request.scheme = "https"
+        request.host = "example.com:8080"
+        request.host_port = "8080"
+        request.referrer = "https://example.com/login/"
+        request.registry.settings = {}
+        self.assertRaises(BadCSRFOrigin, self._callFUT, request)
+        self.assertFalse(self._callFUT(request, raises=False))
+
 
 class DummySerializer(object):
     def dumps(self, value):

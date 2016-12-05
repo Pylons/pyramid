@@ -25,14 +25,11 @@ Git branches and their purpose and status at the time of this writing are
 listed below.
 
 * [master](https://github.com/Pylons/pyramid/) - The branch on which further
-development takes place. The default branch on GitHub.
-* [1.6-branch](https://github.com/Pylons/pyramid/tree/1.6-branch) - The branch
-to which further development on master should be backported. This is also a
-development branch.
-* [1.5-branch](https://github.com/Pylons/pyramid/tree/1.5-branch) - The branch
-classified as "stable" or "latest". Actively maintained. 
-* [1.4-branch](https://github.com/Pylons/pyramid/tree/1.4-branch) - The oldest
-actively maintained and stable branch.
+  development takes place. The default branch on GitHub.
+* [1.7-branch](https://github.com/Pylons/pyramid/tree/1.7-branch) - The branch
+  classified as "stable" or "latest".
+* [1.6-branch](https://github.com/Pylons/pyramid/tree/1.6-branch) - The oldest
+  actively maintained and stable branch.
 
 Older branches are not actively maintained. In general, two stable branches and
 one or two development branches are actively maintained.
@@ -59,11 +56,15 @@ System](http://docs.pylonsproject.org/projects/pyramid/en/latest/narr/install.ht
 
          git clone git@github.com:<username>/pyramid.git
 
-3.  Add a git remote "upstream" for the cloned fork.
+3.  Change directories into the cloned repository
+
+         cd pyramid
+
+4.  Add a git remote "upstream" for the cloned fork.
 
          git remote add upstream git@github.com:Pylons/pyramid.git
 
-4.  Set an environment variable as instructed in the
+5.  Create a virtual environment and set an environment variable as instructed in the
     [prerequisites](https://github.com/Pylons/pyramid/blob/master/HACKING.txt#L55-L58).
 
          # Mac and Linux
@@ -72,36 +73,34 @@ System](http://docs.pylonsproject.org/projects/pyramid/en/latest/narr/install.ht
          # Windows
          set VENV=c:\hack-on-pyramid\env
 
-5.  Try to build the docs in your workspace.
+6.  Install `tox` into your virtual environment.
 
-         # Mac and Linux
-         $ make clean html SPHINXBUILD=$VENV/bin/sphinx-build
+         $ $VENV/bin/pip install tox
 
-         # Windows
-         c:\> make clean html SPHINXBUILD=%VENV%\bin\sphinx-build
+7.  Try to build the docs in your workspace.
 
-     If successful, then you can make changes to the documentation. You can
-     load the built documentation in the `/_build/html/` directory in a web
-     browser.
+         $ $VENV/bin/tox -e docs
 
-6.  From this point forward, follow the typical [git
+     When the build finishes, you'll find HTML documentation rendered in
+     `.tox/docs/html`. An `epub` version will be in `.tox/docs/epub`. And the
+     result of the tests that are run on the documentation will be in
+     `.tox/docs/doctest`.
+
+8.  From this point forward, follow the typical [git
     workflow](https://help.github.com/articles/what-is-a-good-git-workflow/).
-    Start by pulling from the upstream to get the most current changes.
+    *Always* start by pulling from the upstream to get the most current changes.
 
          git pull upstream master
 
-7.  Make a branch, make changes to the docs, and rebuild them as indicated in
-    step 5.  To speed up the build process, you can omit `clean` from the above
-    command to rebuild only those pages that depend on the files you have
-    changed.
+9.  Make a branch, make changes to the docs, and rebuild them as indicated above.
 
-8.  Once you are satisfied with your changes and the documentation builds
-    successfully without errors or warnings, then git commit and push them to
-    your "origin" repository on GitHub.
+10.  Once you are satisfied with your changes and the documentation builds
+     successfully without errors or warnings, then git commit and push them to
+     your "origin" repository on GitHub.
 
          git commit -m "commit message"
          git push -u origin --all # first time only, subsequent can be just 'git push'.
 
-9.  Create a [pull request](https://help.github.com/articles/using-pull-requests/).
+11.  Create a [pull request](https://help.github.com/articles/using-pull-requests/).
 
-10.  Repeat the process starting from Step 6.
+12.  Repeat the process starting from Step 8.

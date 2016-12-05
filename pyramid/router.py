@@ -20,6 +20,7 @@ from pyramid.events import (
     ContextFound,
     NewRequest,
     NewResponse,
+    BeforeTraversal,
     )
 
 from pyramid.httpexceptions import HTTPNotFound
@@ -32,8 +33,6 @@ from pyramid.traversal import (
     DefaultRootFactory,
     ResourceTreeTraverser,
     )
-
-from pyramid.tweens import excview_tween_factory
 
 @implementer(IRouter)
 class Router(object):
@@ -50,11 +49,10 @@ class Router(object):
         self.routes_mapper = q(IRoutesMapper)
         self.request_factory = q(IRequestFactory, default=Request)
         self.request_extensions = q(IRequestExtensions)
-        tweens = q(ITweens)
-        if tweens is None:
-            tweens = excview_tween_factory
         self.orig_handle_request = self.handle_request
-        self.handle_request = tweens(self.handle_request, registry)
+        tweens = q(ITweens)
+        if tweens is not None:
+            self.handle_request = tweens(self.handle_request, registry)
         self.root_policy = self.root_factory # b/w compat
         self.registry = registry
         settings = registry.settings
@@ -114,10 +112,19 @@ class Router(object):
 
                 root_factory = route.factory or self.root_factory
 
+        # Notify anyone listening that we are about to start traversal
+        #
+        # Notify before creating root_factory in case we want to do something
+        # special on a route we may have matched. See
+        # https://github.com/Pylons/pyramid/pull/1876 for ideas of what is
+        # possible.
+        has_listeners and notify(BeforeTraversal(request))
+
+        # Create the root factory
         root = root_factory(request)
         attrs['root'] = root
 
-        # find a context
+        # We are about to traverse and find a context
         traverser = adapters.queryAdapter(root, ITraverser)
         if traverser is None:
             traverser = ResourceTreeTraverser(root)
@@ -133,6 +140,9 @@ class Router(object):
             )
 
         attrs.update(tdict)
+
+        # Notify anyone listening that we have a context and traversal is
+        # complete
         has_listeners and notify(ContextFound(request))
 
         # find a view callable

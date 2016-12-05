@@ -255,8 +255,12 @@ class Deferred(object):
     def __init__(self, func):
         self.func = func
 
-    def resolve(self):
+    @reify
+    def value(self):
         return self.func()
+
+    def resolve(self):
+        return self.value
 
 def undefer(v):
     """ Function which accepts an object and returns it unless it is a

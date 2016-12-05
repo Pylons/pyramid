@@ -1,4 +1,6 @@
 import itertools
+import sys
+
 import venusian
 
 from zope.interface import providedBy
@@ -10,18 +12,24 @@ from pyramid.interfaces import (
     IView,
     IViewClassifier,
     IRequest,
+    IExceptionViewClassifier,
     )
 
 from pyramid.compat import decode_path_info
 
-from pyramid.exceptions import PredicateMismatch
+from pyramid.exceptions import (
+    ConfigurationError,
+    PredicateMismatch,
+)
 
 from pyramid.httpexceptions import (
     HTTPFound,
+    HTTPNotFound,
     default_exceptionresponse_view,
     )
 
 from pyramid.threadlocal import get_current_registry
+from pyramid.util import hide_attrs
 
 _marker = object()
 
@@ -161,11 +169,12 @@ class view_config(object):
              :class:`pyramid.view.bfg_view`.
 
     :class:`pyramid.view.view_config` supports the following keyword
-    arguments: ``context``, ``permission``, ``name``,
+    arguments: ``context``, ``exception``, ``permission``, ``name``,
     ``request_type``, ``route_name``, ``request_method``, ``request_param``,
     ``containment``, ``xhr``, ``accept``, ``header``, ``path_info``,
     ``custom_predicates``, ``decorator``, ``mapper``, ``http_cache``,
-    ``match_param``, ``csrf_token``, ``physical_path``, and ``predicates``.
+    ``require_csrf``, ``match_param``, ``check_csrf``, ``physical_path``, and
+    ``view_options``.
 
     The meanings of these arguments are the same as the arguments passed to
     :meth:`pyramid.config.Configurator.add_view`.  If any argument is left
@@ -319,7 +328,8 @@ class notfound_view_config(object):
     .. versionadded:: 1.3
 
     An analogue of :class:`pyramid.view.view_config` which registers a
-    :term:`Not Found View`.
+    :term:`Not Found View` using
+    :meth:`pyramid.config.Configurator.add_notfound_view`.
 
     The ``notfound_view_config`` constructor accepts most of the same arguments
     as the constructor of :class:`pyramid.view.view_config`.  It can be used
@@ -335,7 +345,7 @@ class notfound_view_config(object):
 
         @notfound_view_config()
         def notfound(request):
-            return Response('Not found, dude!', status='404 Not Found')
+            return Response('Not found!', status='404 Not Found')
 
     All arguments except ``append_slash`` have the same meaning as
     :meth:`pyramid.view.view_config` and each predicate
@@ -407,7 +417,8 @@ class forbidden_view_config(object):
     .. versionadded:: 1.3
 
     An analogue of :class:`pyramid.view.view_config` which registers a
-    :term:`forbidden view`.
+    :term:`forbidden view` using
+    :meth:`pyramid.config.Configurator.add_forbidden_view`.
 
     The forbidden_view_config constructor accepts most of the same arguments
     as the constructor of :class:`pyramid.view.view_config`.  It can be used
@@ -451,6 +462,66 @@ class forbidden_view_config(object):
             # if the decorator was attached to a method in a class, or
             # otherwise executed at class scope, we need to set an
             # 'attr' into the settings if one isn't already in there
+            if settings.get('attr') is None:
+                settings['attr'] = wrapped.__name__
+
+        settings['_info'] = info.codeinfo # fbo "action_method"
+        return wrapped
+
+class exception_view_config(object):
+    """
+    .. versionadded:: 1.8
+
+    An analogue of :class:`pyramid.view.view_config` which registers an
+    :term:`exception view` using
+    :meth:`pyramid.config.Configurator.add_exception_view`.
+
+    The ``exception_view_config`` constructor requires an exception context,
+    and additionally accepts most of the same arguments as the constructor of
+    :class:`pyramid.view.view_config`.  It can be used in the same places,
+    and behaves in largely the same way, except it always registers an
+    exception view instead of a "normal" view that dispatches on the request
+    :term:`context`.
+
+    Example:
+
+    .. code-block:: python
+
+        from pyramid.view import exception_view_config
+        from pyramid.response import Response
+
+        @exception_view_config(ValueError, renderer='json')
+        def error_view(request):
+            return {'error': str(request.exception)}
+
+    All arguments passed to this function have the same meaning as
+    :meth:`pyramid.view.view_config`, and each predicate argument restricts
+    the set of circumstances under which this exception view will be invoked.
+
+    """
+    venusian = venusian
+
+    def __init__(self, *args, **settings):
+        if 'context' not in settings and len(args) > 0:
+            exception, args = args[0], args[1:]
+            settings['context'] = exception
+        if len(args) > 0:
+            raise ConfigurationError('unknown positional arguments')
+        self.__dict__.update(settings)
+
+    def __call__(self, wrapped):
+        settings = self.__dict__.copy()
+
+        def callback(context, name, ob):
+            config = context.config.with_package(info.module)
+            config.add_exception_view(view=ob, **settings)
+
+        info = self.venusian.attach(wrapped, callback, category='pyramid')
+
+        if info.scope == 'class':
+            # if the decorator was attached to a method in a class, or
+            # otherwise executed at class scope, we need to set an
+            # 'attr' in the settings if one isn't already in there
             if settings.get('attr') is None:
                 settings['attr'] = wrapped.__name__
 
@@ -547,3 +618,78 @@ def _call_view(
         raise pme
 
     return response
+
+class ViewMethodsMixin(object):
+    """ Request methods mixin for BaseRequest having to do with executing
+    views """
+    def invoke_exception_view(
+        self,
+        exc_info=None,
+        request=None,
+        secure=True
+        ):
+        """ Executes an exception view related to the request it's called upon.
+        The arguments it takes are these:
+
+        ``exc_info``
+
+            If provided, should be a 3-tuple in the form provided by
+            ``sys.exc_info()``.  If not provided,
+            ``sys.exc_info()`` will be called to obtain the current
+            interpreter exception information.  Default: ``None``.
+
+        ``request``
+
+            If the request to be used is not the same one as the instance that
+            this method is called upon, it may be passed here.  Default:
+            ``None``.
+
+        ``secure``
+
+            If the exception view should not be rendered if the current user
+            does not have the appropriate permission, this should be ``True``.
+            Default: ``True``.
+
+        If called with no arguments, it uses the global exception information
+        returned by ``sys.exc_info()`` as ``exc_info``, the request
+        object that this method is attached to as the ``request``, and
+        ``True`` for ``secure``.
+
+        This method returns a :term:`response` object or raises
+        :class:`pyramid.httpexceptions.HTTPNotFound` if a matching view cannot
+        be found."""
+
+        if request is None:
+            request = self
+        registry = getattr(request, 'registry', None)
+        if registry is None:
+            registry = get_current_registry()
+        if exc_info is None:
+            exc_info = sys.exc_info()
+        exc = exc_info[1]
+        attrs = request.__dict__
+        context_iface = providedBy(exc)
+
+        # clear old generated request.response, if any; it may
+        # have been mutated by the view, and its state is not
+        # sane (e.g. caching headers)
+        with hide_attrs(request, 'exception', 'exc_info', 'response'):
+            attrs['exception'] = exc
+            attrs['exc_info'] = exc_info
+            # we use .get instead of .__getitem__ below due to
+            # https://github.com/Pylons/pyramid/issues/700
+            request_iface = attrs.get('request_iface', IRequest)
+            response = _call_view(
+                registry,
+                request,
+                exc,
+                context_iface,
+                '',
+                view_types=None,
+                view_classifier=IExceptionViewClassifier,
+                secure=secure,
+                request_iface=request_iface.combined,
+                )
+            if response is None:
+                raise HTTPNotFound
+            return response

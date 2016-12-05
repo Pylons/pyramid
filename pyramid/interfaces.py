@@ -5,7 +5,7 @@ from zope.interface import (
     Interface,
     )
 
-from pyramid.compat import PY3
+from pyramid.compat import PY2
 
 # public API interfaces
 
@@ -24,6 +24,14 @@ class IContextFound(Interface):
     request = Attribute('The request object')
 
 IAfterTraversal = IContextFound
+
+class IBeforeTraversal(Interface):
+    """
+    An event type that is emitted after :app:`Pyramid` attempted to find a
+    route but before it calls any traversal or view code. See the documentation
+    attached to :class:`pyramid.events.Routefound` for more information.
+    """
+    request = Attribute('The request object')
 
 class INewRequest(Interface):
     """ An event type that is emitted whenever :app:`Pyramid`
@@ -311,7 +319,7 @@ class IDict(Interface):
     def values():
         """ Return a list of values from the dictionary """
 
-    if not PY3:
+    if PY2:
 
         def iterkeys():
             """ Return an iterator of keys from the dictionary """
@@ -583,6 +591,9 @@ class IStaticURLInfo(Interface):
 
     def generate(path, request, **kw):
         """ Generate a URL for the given path """
+
+    def add_cache_buster(config, spec, cache_buster):
+        """ Add a new cache buster to a particular set of assets """
 
 class IResponseFactory(Interface):
     """ A utility which generates a response """
@@ -905,6 +916,17 @@ class IDefaultPermission(Interface):
     for all view configurations which do not explicitly declare their
     own."""
 
+class IDefaultCSRFOptions(Interface):
+    """ An object representing the default CSRF settings to be used for
+    all view configurations which do not explicitly declare their own."""
+    require_csrf = Attribute(
+        'Boolean attribute. If ``True``, then CSRF checks will be enabled by '
+        'default for the view unless overridden.')
+    token = Attribute('The key to be matched in the body of the request.')
+    header = Attribute('The header to be matched with the CSRF token.')
+    safe_methods = Attribute('A set of safe methods that skip CSRF checks.')
+    callback = Attribute('A callback to disable CSRF checks per-request.')
+
 class ISessionFactory(Interface):
     """ An interface representing a factory which accepts a request object and
     returns an ISession object """
@@ -1184,47 +1206,79 @@ class IJSONAdapter(Interface):
 class IPredicateList(Interface):
     """ Interface representing a predicate list """
 
+class IViewDeriver(Interface):
+    options = Attribute('A list of supported options to be passed to '
+                        ':meth:`pyramid.config.Configurator.add_view`. '
+                        'This attribute is optional.')
+
+    def __call__(view, info):
+        """
+        Derive a new view from the supplied view.
+
+        View options, package information and registry are available on
+        ``info``, an instance of :class:`pyramid.interfaces.IViewDeriverInfo`.
+
+        The ``view`` is a callable accepting ``(context, request)``.
+
+        """
+
+class IViewDeriverInfo(Interface):
+    """ An object implementing this interface is passed to every
+    :term:`view deriver` during configuration."""
+    registry = Attribute('The "current" application registry where the '
+                         'view was created')
+    package = Attribute('The "current package" where the view '
+                        'configuration statement was found')
+    settings = Attribute('The deployment settings dictionary related '
+                         'to the current application')
+    options = Attribute('The view options passed to the view, including any '
+                        'default values that were not overriden')
+    predicates = Attribute('The list of predicates active on the view')
+    original_view = Attribute('The original view object being wrapped')
+    exception_only = Attribute('The view will only be invoked for exceptions')
+
+class IViewDerivers(Interface):
+    """ Interface for view derivers list """
+
 class ICacheBuster(Interface):
     """
-    Instances of ``ICacheBuster`` may be provided as arguments to
-    :meth:`~pyramid.config.Configurator.add_static_view`.  Instances of
-    ``ICacheBuster`` provide mechanisms for generating a cache bust token for
-    a static asset, modifying a static asset URL to include a cache bust token,
-    and, optionally, unmodifying a static asset URL in order to look up an
-    asset.  See :ref:`cache_busting`.
+    A cache buster modifies the URL generation machinery for
+    :meth:`~pyramid.request.Request.static_url`. See :ref:`cache_busting`.
 
     .. versionadded:: 1.6
     """
-    def pregenerate(pathspec, subpath, kw):
+    def __call__(request, subpath, kw):
         """
         Modifies a subpath and/or keyword arguments from which a static asset
-        URL will be computed during URL generation.  The ``pathspec`` argument
-        is the path specification for the resource to be cache busted.
-        The ``subpath`` argument is a tuple of path elements that represent the
-        portion of the asset URL which is used to find the asset.  The ``kw``
-        argument is a dict of keywords that are to be passed eventually to
-        :meth:`~pyramid.request.Request.route_url` for URL generation.  The
-        return value should be a two-tuple of ``(subpath, kw)`` which are
-        versions of the same arguments modified to include the cache bust token
-        in the generated URL.
-        """
+        URL will be computed during URL generation.
 
-    def match(subpath):
-        """
-        Performs the logical inverse of
-        :meth:`~pyramid.interfaces.ICacheBuster.pregenerate` by taking a
-        subpath from a cache busted URL and removing the cache bust token, so
-        that :app:`Pyramid` can find the underlying asset.
+        The ``subpath`` argument is a path of ``/``-delimited segments that
+        represent the portion of the asset URL which is used to find the asset.
+        The ``kw`` argument is a dict of keywords that are to be passed
+        eventually to :meth:`~pyramid.request.Request.static_url` for URL
+        generation.  The return value should be a two-tuple of
+        ``(subpath, kw)`` where ``subpath`` is the relative URL from where the
+        file is served and ``kw`` is the same input argument. The return value
+        should be modified to include the cache bust token in the generated
+        URL.
 
-        ``subpath`` is the subpath portion of the URL for an incoming request
-        for a static asset.  The return value should be the same tuple with the
-        cache busting token elided.
+        The ``kw`` dictionary contains extra arguments passed to
+        :meth:`~pyramid.request.Request.static_url` as well as some extra
+        items that may be usful including:
 
-        If the cache busting scheme in use doesn't specifically modify the path
-        portion of the generated URL (e.g. it adds a query string), a method
-        which implements this interface may not be necessary.  It is
-        permissible for an instance of
-        :class:`~pyramid.interfaces.ICacheBuster` to omit this method.
+          - ``pathspec`` is the path specification for the resource
+            to be cache busted.
+
+          - ``rawspec`` is the original location of the file, ignoring
+            any calls to :meth:`pyramid.config.Configurator.override_asset`.
+
+        The ``pathspec`` and ``rawspec`` values are only different in cases
+        where an asset has been mounted into a virtual location using
+        :meth:`pyramid.config.Configurator.override_asset`. For example, with
+        a call to ``request.static_url('myapp:static/foo.png'), the
+        ``pathspec`` is ``myapp:static/foo.png`` whereas the ``rawspec`` may
+        be ``themepkg:bar.png``, assuming a call to
+        ``config.override_asset('myapp:static/foo.png', 'themepkg:bar.png')``.
         """
 
 # configuration phases: a lower phase number means the actions associated

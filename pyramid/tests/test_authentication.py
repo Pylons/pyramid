@@ -600,6 +600,15 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         cookies.load(cookie)
         return cookies.get('auth_tkt')
 
+    def test_init_cookie_str_reissue_invalid(self):
+        self.assertRaises(ValueError, self._makeOne, 'secret', reissue_time='invalid value')
+
+    def test_init_cookie_str_timeout_invalid(self):
+        self.assertRaises(ValueError, self._makeOne, 'secret', timeout='invalid value')
+
+    def test_init_cookie_str_max_age_invalid(self):
+        self.assertRaises(ValueError, self._makeOne, 'secret', max_age='invalid value')
+
     def test_identify_nocookie(self):
         helper = self._makeOne('secret')
         request = self._makeRequest()
@@ -752,15 +761,44 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         result = helper.identify(request)
         self.assertEqual(result, None)
 
-    def test_identify_cookie_timed_out(self):
+    def test_identify_cookie_timeout(self):
         helper = self._makeOne('secret', timeout=1)
-        request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=bogus'})
+        self.assertEqual(helper.timeout, 1)
+
+    def test_identify_cookie_str_timeout(self):
+        helper = self._makeOne('secret', timeout='1')
+        self.assertEqual(helper.timeout, 1)
+
+    def test_identify_cookie_timeout_aged(self):
+        import time
+        helper = self._makeOne('secret', timeout=10)
+        now = time.time()
+        helper.auth_tkt.timestamp = now - 1
+        helper.now = now + 10
+        helper.auth_tkt.tokens = (text_('a'), )
+        request = self._makeRequest('bogus')
         result = helper.identify(request)
-        self.assertEqual(result, None)
+        self.assertFalse(result)
 
     def test_identify_cookie_reissue(self):
         import time
         helper = self._makeOne('secret', timeout=10, reissue_time=0)
+        now = time.time()
+        helper.auth_tkt.timestamp = now
+        helper.now = now + 1
+        helper.auth_tkt.tokens = (text_('a'), )
+        request = self._makeRequest('bogus')
+        result = helper.identify(request)
+        self.assertTrue(result)
+        self.assertEqual(len(request.callbacks), 1)
+        response = DummyResponse()
+        request.callbacks[0](request, response)
+        self.assertEqual(len(response.headerlist), 3)
+        self.assertEqual(response.headerlist[0][0], 'Set-Cookie')
+
+    def test_identify_cookie_str_reissue(self):
+        import time
+        helper = self._makeOne('secret', timeout=10, reissue_time='0')
         now = time.time()
         helper.auth_tkt.timestamp = now
         helper.now = now + 1
@@ -1051,7 +1089,10 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         helper = self._makeOne('secret')
         request = self._makeRequest()
         userid = object()
-        result = helper.remember(request, userid)
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always', RuntimeWarning)
+            result = helper.remember(request, userid)
+            self.assertTrue(str(w[-1].message).startswith('userid is of type'))
         values = self._parseHeaders(result)
         self.assertEqual(len(result), 3)
         value = values[0]
@@ -1060,12 +1101,27 @@ class TestAuthTktCookieHelper(unittest.TestCase):
     def test_remember_max_age(self):
         helper = self._makeOne('secret')
         request = self._makeRequest()
+        result = helper.remember(request, 'userid', max_age=500)
+        values = self._parseHeaders(result)
+        self.assertEqual(len(result), 3)
+
+        self.assertEqual(values[0]['max-age'], '500')
+        self.assertTrue(values[0]['expires'])
+
+    def test_remember_str_max_age(self):
+        helper = self._makeOne('secret')
+        request = self._makeRequest()
         result = helper.remember(request, 'userid', max_age='500')
         values = self._parseHeaders(result)
         self.assertEqual(len(result), 3)
 
         self.assertEqual(values[0]['max-age'], '500')
         self.assertTrue(values[0]['expires'])
+
+    def test_remember_str_max_age_invalid(self):
+        helper = self._makeOne('secret')
+        request = self._makeRequest()
+        self.assertRaises(ValueError, helper.remember, request, 'userid', max_age='invalid value')
 
     def test_remember_tokens(self):
         helper = self._makeOne('secret')
@@ -1233,7 +1289,6 @@ class Test_parse_ticket(unittest.TestCase):
                        'cd7a2fa4910000000auserid!')
         result = self._callFUT('secret', ticket, '2001:db8::1', 'sha256')
         self.assertEqual(result, (10, 'userid', [''], ''))
-        pass
 
 class TestSessionAuthenticationPolicy(unittest.TestCase):
     def _getTargetClass(self):
@@ -1423,6 +1478,79 @@ class TestBasicAuthAuthenticationPolicy(unittest.TestCase):
         policy = self._makeOne(None)
         self.assertEqual(policy.forget(None), [
             ('WWW-Authenticate', 'Basic realm="SomeRealm"')])
+
+
+class TestExtractHTTPBasicCredentials(unittest.TestCase):
+    def _get_func(self):
+        from pyramid.authentication import extract_http_basic_credentials
+        return extract_http_basic_credentials
+
+    def test_no_auth_header(self):
+        request = testing.DummyRequest()
+        fn = self._get_func()
+
+        self.assertIsNone(fn(request))
+
+    def test_invalid_payload(self):
+        import base64
+        request = testing.DummyRequest()
+        request.headers['Authorization'] = 'Basic %s' % base64.b64encode(
+            bytes_('chrisrpassword')).decode('ascii')
+        fn = self._get_func()
+        self.assertIsNone(fn(request))
+
+    def test_not_a_basic_auth_scheme(self):
+        import base64
+        request = testing.DummyRequest()
+        request.headers['Authorization'] = 'OtherScheme %s' % base64.b64encode(
+            bytes_('chrisr:password')).decode('ascii')
+        fn = self._get_func()
+        self.assertIsNone(fn(request))
+
+    def test_no_base64_encoding(self):
+        request = testing.DummyRequest()
+        request.headers['Authorization'] = 'Basic ...'
+        fn = self._get_func()
+        self.assertIsNone(fn(request))
+
+    def test_latin1_payload(self):
+        import base64
+        request = testing.DummyRequest()
+        inputs = (b'm\xc3\xb6rk\xc3\xb6:'
+                  b'm\xc3\xb6rk\xc3\xb6password').decode('utf-8')
+        request.headers['Authorization'] = 'Basic %s' % (
+            base64.b64encode(inputs.encode('latin-1')).decode('latin-1'))
+        fn = self._get_func()
+        self.assertEqual(fn(request), (
+            b'm\xc3\xb6rk\xc3\xb6'.decode('utf-8'),
+            b'm\xc3\xb6rk\xc3\xb6password'.decode('utf-8')
+        ))
+
+    def test_utf8_payload(self):
+        import base64
+        request = testing.DummyRequest()
+        inputs = (b'm\xc3\xb6rk\xc3\xb6:'
+                  b'm\xc3\xb6rk\xc3\xb6password').decode('utf-8')
+        request.headers['Authorization'] = 'Basic %s' % (
+            base64.b64encode(inputs.encode('utf-8')).decode('latin-1'))
+        fn = self._get_func()
+        self.assertEqual(fn(request), (
+            b'm\xc3\xb6rk\xc3\xb6'.decode('utf-8'),
+            b'm\xc3\xb6rk\xc3\xb6password'.decode('utf-8')
+        ))
+
+    def test_namedtuple_return(self):
+        import base64
+        request = testing.DummyRequest()
+        request.headers['Authorization'] = 'Basic %s' % base64.b64encode(
+            bytes_('chrisr:pass')).decode('ascii')
+        fn = self._get_func()
+        result = fn(request)
+
+        self.assertEqual(result.username, 'chrisr')
+        self.assertEqual(result.password, 'pass')
+
+
 
 class TestSimpleSerializer(unittest.TestCase):
     def _makeOne(self):

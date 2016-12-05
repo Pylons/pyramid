@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import unittest
 import warnings
 
@@ -8,7 +9,7 @@ from pyramid.compat import (
     native_,
     text_type,
     url_quote,
-    PY3,
+    PY2,
     )
 
 with warnings.catch_warnings(record=True) as w:
@@ -335,10 +336,10 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         foo = DummyContext(bar, path)
         root = DummyContext(foo, 'root')
         policy = self._makeOne(root)
-        if PY3:
-            vhm_root = b'/Qu\xc3\xa9bec'.decode('latin-1')
-        else:
+        if PY2:
             vhm_root = b'/Qu\xc3\xa9bec'
+        else:
+            vhm_root = b'/Qu\xc3\xa9bec'.decode('latin-1')
         environ = self._getEnviron(HTTP_X_VHM_ROOT=vhm_root)
         request = DummyRequest(environ, path_info=text_('/bar'))
         result = policy(request)
@@ -839,7 +840,7 @@ class QuotePathSegmentTests(unittest.TestCase):
     def test_string(self):
         s = '/ hello!'
         result = self._callFUT(s)
-        self.assertEqual(result, '%2F%20hello%21')
+        self.assertEqual(result, '%2F%20hello!')
 
     def test_int(self):
         s = 12345
@@ -1298,6 +1299,15 @@ class Test__join_path_tuple(unittest.TestCase):
     def test_nonempty_tuple(self):
         result = self._callFUT(('x',))
         self.assertEqual(result, 'x')
+
+    def test_segments_with_unsafes(self):
+        safe_segments = tuple(u"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-._~!$&'()*+,;=:@")
+        result = self._callFUT(safe_segments)
+        self.assertEqual(result, u'/'.join(safe_segments))
+        unsafe_segments = tuple(chr(i) for i in range(0x20, 0x80) if not chr(i) in safe_segments) + (u'あ',)
+        result = self._callFUT(unsafe_segments)
+        self.assertEqual(result, u'/'.join(''.join('%%%02X' % (ord(c) if isinstance(c, str) else c) for c in unsafe_segment.encode('utf-8')) for unsafe_segment in unsafe_segments))
+
 
 def make_traverser(result):
     class DummyTraverser(object):

@@ -5,7 +5,7 @@ The Pyramid Web Framework
 =========================
 
 :app:`Pyramid` is a small, fast, down-to-earth Python web framework.  It is
-developed as part of the `Pylons Project <http://docs.pylonsproject.org/>`_.
+developed as part of the `Pylons Project <http://www.pylonsproject.org/>`_.
 It is licensed under a `BSD-like license <http://repoze.org/license.html>`_.
 
 Here is one of the simplest :app:`Pyramid` applications you can make:
@@ -18,7 +18,7 @@ After you install :app:`Pyramid` and run this application, when you visit
 this application works.
 
 
-.. _html_getting_started:
+.. _getting_started:
 
 Getting Started
 ===============
@@ -39,9 +39,9 @@ speed right away.
   format, with somewhat deeper treatment of each topic and with working code.
 
 * Like learning by example? Visit the official :ref:`html_tutorials` as well as
-  the community-contributed :ref:`Pyramid tutorials
-  <tutorials:pyramid-tutorials>`, which include a :ref:`Todo List Application
-  in One File <tutorials:single-file-tutorial>`.
+  the community-contributed :ref:`Pyramid Tutorials
+  <tutorials:pyramid-tutorials>` and :ref:`Pyramid Community Cookbook
+  <cookbook:pyramid-cookbook>`.
 
 * For help getting Pyramid set up, try :ref:`installing_chapter`.
 
@@ -60,9 +60,9 @@ platforms.
 .. toctree::
    :maxdepth: 1
 
-   tutorials/wiki2/index.rst
-   tutorials/wiki/index.rst
-   tutorials/modwsgi/index.rst
+   tutorials/wiki2/index
+   tutorials/wiki/index
+   tutorials/modwsgi/index
 
 
 .. _support-and-development:
@@ -70,15 +70,18 @@ platforms.
 Support and Development
 =======================
 
-The `Pylons Project web site <http://pylonsproject.org/>`_ is the main online
-source of :app:`Pyramid` support and development information.
+The `Pyramid website <https://trypyramid.com/resources.html>`_ is the main
+entry point to :app:`Pyramid` web framework resources for support and
+development information.
 
 To report bugs, use the `issue tracker
 <https://github.com/Pylons/pyramid/issues>`_.
 
 If you've got questions that aren't answered by this documentation, contact the
-`Pylons-discuss maillist <http://groups.google.com/group/pylons-discuss>`_ or
-join the `#pyramid IRC channel <irc://irc.freenode.net/#pyramid>`_.
+`Pylons-discuss maillist
+<https://groups.google.com/forum/#!forum/pylons-discuss>`_ or join the
+`#pyramid IRC channel
+<https://webchat.freenode.net/?channels=pyramid>`_.
 
 Browse and check out tagged and trunk versions of :app:`Pyramid` via the
 `Pyramid GitHub repository <https://github.com/Pylons/pyramid/>`_. To check out
@@ -162,12 +165,26 @@ Comprehensive reference material for every public API exposed by
    api/*
 
 
+``p*`` Scripts Documentation
+============================
+
+``p*`` scripts included with :app:`Pyramid`.
+
+.. toctree::
+   :maxdepth: 1
+   :glob:
+
+   pscripts/index
+   pscripts/*
+
+
 Change History
 ==============
 
 .. toctree::
    :maxdepth: 1
 
+   whatsnew-1.7
    whatsnew-1.6
    whatsnew-1.5
    whatsnew-1.4

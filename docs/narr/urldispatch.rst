@@ -271,8 +271,9 @@ pattern like this:
 But this will either cause an error at startup time or it won't match properly.
 You'll want to use a Unicode value as the pattern instead rather than raw
 bytestring escapes.  You can use a high-order Unicode value as the pattern by
-using `Python source file encoding <http://www.python.org/dev/peps/pep-0263/>`_
-plus the "real" character in the Unicode pattern in the source, like so:
+using `Python source file encoding
+<https://www.python.org/dev/peps/pep-0263/>`_ plus the "real" character in the
+Unicode pattern in the source, like so:
 
 .. code-block:: text
 
@@ -556,7 +557,7 @@ Here is an example of a corresponding ``mypackage.views`` module:
 
    @view_config(route_name='idea')
    def idea_view(request):
-       return Response(request.matchdict['id'])
+       return Response(request.matchdict['idea'])
    
    @view_config(route_name='user')
    def user_view(request):
@@ -849,7 +850,7 @@ application:
    from pyramid.httpexceptions import HTTPNotFound
 
    def notfound(request):
-       return HTTPNotFound('Not found, bro.')
+       return HTTPNotFound()
 
    def no_slash(request):
        return Response('No slash')
@@ -870,7 +871,7 @@ If a request enters the application with the ``PATH_INFO`` value of
 However, if a request enters the application with the ``PATH_INFO`` value of
 ``/no_slash/``, *no* route will match, and the slash-appending not found view
 will not find a matching route with an appended slash.  As a result, the
-``notfound`` view will be called and it will return a "Not found, bro." body.
+``notfound`` view will be called and it will return a "Not found" body.
 
 If a request enters the application with the ``PATH_INFO`` value of
 ``/has_slash/``, the second route will match.  If a request enters the
@@ -891,7 +892,7 @@ exactly the same job:
 
    @notfound_view_config(append_slash=True)
    def notfound(request):
-       return HTTPNotFound('Not found, bro.')
+       return HTTPNotFound()
 
    @view_config(route_name='noslash')
    def no_slash(request):
@@ -1194,7 +1195,7 @@ If a predicate is a class, just add ``__text__`` property in a standard manner.
        __text__ = 'my custom class predicate'
 
 If a predicate is a method, you'll need to assign it after method declaration
-(see `PEP 232 <http://www.python.org/dev/peps/pep-0232/>`_).
+(see `PEP 232 <https://www.python.org/dev/peps/pep-0232/>`_).
 
 .. code-block:: python
    :linenos:

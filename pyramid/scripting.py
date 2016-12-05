@@ -56,12 +56,25 @@ def prepare(request=None, registry=None):
     ``root`` returned is the application's root resource object.  The
     ``closer`` returned is a callable (accepting no arguments) that
     should be called when your scripting application is finished
-    using the root.  ``registry`` is the registry object passed or
-    the last registry loaded into
-    :attr:`pyramid.config.global_registries` if no registry is passed.
+    using the root.  ``registry`` is the resolved registry object.
     ``request`` is the request object passed or the constructed request
     if no request is passed.  ``root_factory`` is the root factory used
     to construct the root.
+
+    This function may be used as a context manager to call the ``closer``
+    automatically:
+
+    .. code-block:: python
+
+       registry = config.registry
+       with prepare(registry) as env:
+           request = env['request']
+           # ...
+
+    .. versionchanged:: 1.8
+
+       Added the ability to use the return value as a context manager.
+
     """
     if registry is None:
         registry = getattr(request, 'registry', global_registries.last)
@@ -85,8 +98,20 @@ def prepare(request=None, registry=None):
     root = root_factory(request)
     if getattr(request, 'context', None) is None:
         request.context = root
-    return {'root':root, 'closer':closer, 'registry':registry,
-            'request':request, 'root_factory':root_factory}
+    return AppEnvironment(
+        root=root,
+        closer=closer,
+        registry=registry,
+        request=request,
+        root_factory=root_factory,
+    )
+
+class AppEnvironment(dict):
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        self['closer']()
 
 def _make_request(path, registry=None):
     """ Return a :meth:`pyramid.request.Request` object anchored at a

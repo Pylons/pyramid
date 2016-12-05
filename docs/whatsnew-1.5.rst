@@ -1,4 +1,4 @@
-What's New In Pyramid 1.5
+What's New in Pyramid 1.5
 =========================
 
 This article explains the new features in :app:`Pyramid` version 1.5 as
@@ -135,6 +135,8 @@ Feature Additions
 -----------------
 
 The feature additions in Pyramid 1.5 follow.
+
+- Python 3.4 compatibility.
 
 - Add ``pdistreport`` script, which prints the Python version in use, the
   Pyramid version in use, and the version number and location of all Python

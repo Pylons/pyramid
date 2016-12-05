@@ -6,6 +6,7 @@ Command-Line Pyramid
 Your :app:`Pyramid` application can be controlled and inspected using a variety
 of command-line utilities.  These utilities are documented in this chapter.
 
+
 .. index::
    pair: matching views; printing
    single: pviews
@@ -14,6 +15,8 @@ of command-line utilities.  These utilities are documented in this chapter.
 
 Displaying Matching Views for a Given URL
 -----------------------------------------
+
+.. seealso:: See also the output of :ref:`pviews --help <pviews_script>`.
 
 For a big application with several views, it can be hard to keep the view
 configuration details in your head, even if you defined all the views yourself.
@@ -114,7 +117,9 @@ found* message.
 The Interactive Shell
 ---------------------
 
-Once you've installed your program for development using ``setup.py develop``,
+.. seealso:: See also the output of :ref:`pshell --help <pshell_script>`.
+
+Once you've installed your program for development using ``pip install -e .``,
 you can use an interactive Python shell to execute expressions in a Python
 environment exactly like the one that will be used when your application runs
 "for real".  To do so, use the ``pshell`` command line utility.
@@ -178,6 +183,7 @@ hash after the filename:
     $ $VENV/bin/pshell starter/development.ini
 
 Press ``Ctrl-D`` to exit the interactive shell (or ``Ctrl-Z`` on Windows).
+
 
 .. index::
    pair: pshell; extending
@@ -261,6 +267,7 @@ request is configured to generate urls from the host
     >>> request.route_url('home')
     'https://www.example.com/'
 
+
 .. _ipython_or_bpython:
 
 Alternative Shells
@@ -287,7 +294,7 @@ You may use the ``--list-shells`` option to see the available shells.
      python
 
 If you want to use a shell that isn't supported out of the box, you can
-introduce a new shell by registering an entry point in your setup.py:
+introduce a new shell by registering an entry point in your ``setup.py``:
 
 .. code-block:: python
 
@@ -317,6 +324,7 @@ arguments, ``env`` and ``help``, which would look like this:
    ``ipython`` and ``bpython`` have been moved into their respective
    packages ``pyramid_ipython`` and ``pyramid_bpython``.
 
+
 Setting a Default Shell
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -331,6 +339,7 @@ specify a list of preferred shells.
 
 .. versionadded:: 1.6
 
+
 .. index::
    pair: routes; printing
    single: proutes
@@ -339,6 +348,8 @@ specify a list of preferred shells.
 
 Displaying All Application Routes
 ---------------------------------
+
+.. seealso:: See also the output of :ref:`proutes --help <proutes_script>`.
 
 You can use the ``proutes`` command in a terminal window to print a summary of
 routes related to your application.  Much like the ``pshell`` command (see
@@ -421,6 +432,8 @@ include. The current available formats are ``name``, ``pattern``, ``view``, and
 Displaying "Tweens"
 -------------------
 
+.. seealso:: See also the output of :ref:`ptweens --help <ptweens_script>`.
+
 A :term:`tween` is a bit of code that sits between the main Pyramid application
 request handler and the WSGI application which calls it.  A user can get a
 representation of both the implicit tween ordering (the ordering specified by
@@ -497,6 +510,7 @@ used:
 
 See :ref:`registering_tweens` for more information about tweens.
 
+
 .. index::
    single: invoking a request
    single: prequest
@@ -505,6 +519,8 @@ See :ref:`registering_tweens` for more information about tweens.
 
 Invoking a Request
 ------------------
+
+.. seealso:: See also the output of :ref:`prequest --help <prequest_script>`.
 
 You can use the ``prequest`` command-line utility to send a request to your
 application and see the response body without starting a server.
@@ -555,21 +571,33 @@ of the ``prequest`` process is used as the ``POST`` body::
 
    $ $VENV/bin/prequest -mPOST development.ini / < somefile
 
+
 Using Custom Arguments to Python when Running ``p*`` Scripts
 ------------------------------------------------------------
 
 .. versionadded:: 1.5
 
 Each of Pyramid's console scripts (``pserve``, ``pviews``, etc.) can be run
-directly using ``python -m``, allowing custom arguments to be sent to the
+directly using ``python3 -m``, allowing custom arguments to be sent to the
 Python interpreter at runtime. For example::
 
-      python -3 -m pyramid.scripts.pserve development.ini
+      python3 -m pyramid.scripts.pserve development.ini
+
+
+.. index::
+   single: pdistreport
+   single: distributions, showing installed
+   single: showing installed distributions
+
+.. _showing_distributions:
 
 Showing All Installed Distributions and Their Versions
 ------------------------------------------------------
 
 .. versionadded:: 1.5
+
+.. seealso:: See also the output of :ref:`pdistreport --help
+   <pdistreport_script>`.
 
 You can use the ``pdistreport`` command to show the :app:`Pyramid` version in
 use, the Python version in use, and all installed versions of Python
@@ -589,6 +617,7 @@ distributions in your Python environment::
 pastebin when you are having problems and need someone with more familiarity
 with Python packaging and distribution than you have to look at your
 environment.
+
 
 .. _writing_a_script:
 
@@ -620,6 +649,10 @@ using the :func:`pyramid.paster.bootstrap` command in the body of your script.
 .. versionadded:: 1.1
    :func:`pyramid.paster.bootstrap`
 
+.. versionchanged:: 1.8
+   Added the ability for ``bootstrap`` to cleanup automatically via the
+   ``with`` statement.
+
 In the simplest case, :func:`pyramid.paster.bootstrap` can be used with a
 single argument, which accepts the :term:`PasteDeploy` ``.ini`` file
 representing your Pyramid application's configuration as a single argument:
@@ -627,8 +660,9 @@ representing your Pyramid application's configuration as a single argument:
 .. code-block:: python
 
    from pyramid.paster import bootstrap
-   env = bootstrap('/path/to/my/development.ini')
-   print(env['request'].route_url('home'))
+
+   with bootstrap('/path/to/my/development.ini') as env:
+       print(env['request'].route_url('home'))
 
 :func:`pyramid.paster.bootstrap` returns a dictionary containing
 framework-related information.  This dictionary will always contain a
@@ -694,13 +728,15 @@ load instead of ``main``:
 .. code-block:: python
 
    from pyramid.paster import bootstrap
-   env = bootstrap('/path/to/my/development.ini#another')
-   print(env['request'].route_url('home'))
+
+   with bootstrap('/path/to/my/development.ini#another') as env:
+       print(env['request'].route_url('home'))
 
 The above example specifies the ``another`` ``app``, ``pipeline``, or
 ``composite`` section of your PasteDeploy configuration file. The ``app``
 object present in the ``env`` dictionary returned by
 :func:`pyramid.paster.bootstrap` will be a :app:`Pyramid` :term:`router`.
+
 
 Changing the Request
 ~~~~~~~~~~~~~~~~~~~~
@@ -731,9 +767,9 @@ desired request and passing it into :func:`~pyramid.paster.bootstrap`:
    from pyramid.request import Request
 
    request = Request.blank('/', base_url='https://example.com/prefix')
-   env = bootstrap('/path/to/my/development.ini#another', request=request)
-   print(env['request'].application_url)
-   # will print 'https://example.com/prefix'
+   with bootstrap('/path/to/my/development.ini#another', request=request) as env:
+       print(env['request'].application_url)
+       # will print 'https://example.com/prefix'
 
 Now you can readily use Pyramid's APIs for generating URLs:
 
@@ -742,10 +778,13 @@ Now you can readily use Pyramid's APIs for generating URLs:
    env['request'].route_url('verify', code='1337')
    # will return 'https://example.com/prefix/verify/1337'
 
+
 Cleanup
 ~~~~~~~
 
-When your scripting logic finishes, it's good manners to call the ``closer``
+If you're using the ``with``-statement variant then there's nothing to
+worry about. However if you're using the returned environment directly then
+when your scripting logic finishes, it's good manners to call the ``closer``
 callback:
 
 .. code-block:: python
@@ -756,6 +795,7 @@ callback:
    # .. do stuff ...
 
    env['closer']()
+
 
 Setting Up Logging
 ~~~~~~~~~~~~~~~~~~
@@ -773,6 +813,7 @@ use the following command:
 See :ref:`logging_chapter` for more information on logging within
 :app:`Pyramid`.
 
+
 .. index::
    single: console script
 
@@ -782,17 +823,17 @@ Making Your Script into a Console Script
 ----------------------------------------
 
 A "console script" is :term:`setuptools` terminology for a script that gets
-installed into the ``bin`` directory of a Python :term:`virtualenv` (or "base"
-Python environment) when a :term:`distribution` which houses that script is
-installed.  Because it's installed into the ``bin`` directory of a virtualenv
-when the distribution is installed, it's a convenient way to package and
-distribute functionality that you can call from the command-line. It's often
-more convenient to create a console script than it is to create a ``.py``
-script and instruct people to call it with the "right" Python interpreter.  A
-console script generates a file that lives in ``bin``, and when it's invoked it
-will always use the "right" Python environment, which means it will always be
-invoked in an environment where all the libraries it needs (such as Pyramid)
-are available.
+installed into the ``bin`` directory of a Python :term:`virtual environment`
+(or "base" Python environment) when a :term:`distribution` which houses that
+script is installed. Because it's installed into the ``bin`` directory of a
+virtual environment when the distribution is installed, it's a convenient way
+to package and distribute functionality that you can call from the
+command-line. It's often more convenient to create a console script than it is
+to create a ``.py`` script and instruct people to call it with the "right"
+Python interpreter. A console script generates a file that lives in ``bin``,
+and when it's invoked it will always use the "right" Python environment, which
+means it will always be invoked in an environment where all the libraries it
+needs (such as Pyramid) are available.
 
 In general, you can make your script into a console script by doing the
 following:
@@ -807,12 +848,11 @@ following:
   distribution which creates a mapping between a script name and a dotted name
   representing the callable you added to your distribution.
 
-- Run ``setup.py develop``, ``setup.py install``, or ``easy_install`` to get
-  your distribution reinstalled.  When you reinstall your distribution, a file
-  representing the script that you named in the last step will be in the
-  ``bin`` directory of the virtualenv in which you installed the distribution.
-  It will be executable.  Invoking it from a terminal will execute your
-  callable.
+- Run ``pip install -e .`` or ``pip install .`` to get your distribution
+  reinstalled. When you reinstall your distribution, a file representing the
+  script that you named in the last step will be in the ``bin`` directory of
+  the virtual environment in which you installed the distribution. It will be
+  executable. Invoking it from a terminal will execute your callable.
 
 As an example, let's create some code that can be invoked by a console script
 that prints the deployment settings of a Pyramid application.  To do so, we'll
@@ -859,15 +899,12 @@ contains the following code:
        omit = options.omit
        if omit is None:
            omit = []
-       env = bootstrap(config_uri)
-       settings, closer = env['registry'].settings, env['closer']
-       try:
+       with bootstrap(config_uri) as env:
+           settings = env['registry'].settings
            for k, v in settings.items():
                if any([k.startswith(x) for x in omit]):
                    continue
                print('%-40s     %-20s' % (k, v))
-       finally:
-           closer()
 
 This script uses the Python ``optparse`` module to allow us to make sense out
 of extra arguments passed to the script.  It uses the
@@ -894,16 +931,22 @@ top-level directory, your ``setup.py`` file will look something like this:
 
    requires = ['pyramid', 'pyramid_debugtoolbar']
 
+   tests_require = [
+       'WebTest >= 1.3.1',  # py3 compat
+       'pytest',  # includes virtualenv
+       'pytest-cov',
+       ]
+
    setup(name='MyProject',
          version='0.0',
          description='My project',
          long_description=README + '\n\n' +  CHANGES,
          classifiers=[
-           "Programming Language :: Python",
-           "Framework :: Pylons",
-           "Topic :: Internet :: WWW/HTTP",
-           "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
-           ],
+             "Programming Language :: Python",
+             "Framework :: Pyramid",
+             "Topic :: Internet :: WWW/HTTP",
+             "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
+         ],
          author='',
          author_email='',
          url='',
@@ -912,20 +955,23 @@ top-level directory, your ``setup.py`` file will look something like this:
          include_package_data=True,
          zip_safe=False,
          install_requires=requires,
-         tests_require=requires,
-         test_suite="myproject",
+         extras_require={
+             'testing': tests_require,
+         },
          entry_points = """\
          [paste.app_factory]
          main = myproject:main
          """,
          )
 
-We're going to change the setup.py file to add a ``[console_scripts]`` section
-within the ``entry_points`` string.  Within this section, you should specify a
-``scriptname = dotted.path.to:yourfunction`` line.  For example::
+We're going to change the ``setup.py`` file to add a ``[console_scripts]``
+section within the ``entry_points`` string. Within this section, you should
+specify a ``scriptname = dotted.path.to:yourfunction`` line.  For example:
 
-  [console_scripts]
-  show_settings = myproject.scripts:settings_show
+.. code-block:: ini
+
+   [console_scripts]
+   show_settings = myproject.scripts:settings_show
 
 The ``show_settings`` name will be the name of the script that is installed
 into ``bin``.  The colon (``:``) between ``myproject.scripts`` and
@@ -938,6 +984,7 @@ The result will be something like:
 
 .. code-block:: python
    :linenos:
+   :emphasize-lines: 43-44
 
    import os
 
@@ -951,16 +998,22 @@ The result will be something like:
 
    requires = ['pyramid', 'pyramid_debugtoolbar']
 
+   tests_require = [
+       'WebTest >= 1.3.1',  # py3 compat
+       'pytest',  # includes virtualenv
+       'pytest-cov',
+       ]
+
    setup(name='MyProject',
          version='0.0',
          description='My project',
          long_description=README + '\n\n' +  CHANGES,
          classifiers=[
-           "Programming Language :: Python",
-           "Framework :: Pylons",
-           "Topic :: Internet :: WWW/HTTP",
-           "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
-           ],
+             "Programming Language :: Python",
+             "Framework :: Pyramid",
+             "Topic :: Internet :: WWW/HTTP",
+             "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
+         ],
          author='',
          author_email='',
          url='',
@@ -969,8 +1022,9 @@ The result will be something like:
          include_package_data=True,
          zip_safe=False,
          install_requires=requires,
-         tests_require=requires,
-         test_suite="myproject",
+         extras_require={
+             'testing': tests_require,
+         },
          entry_points = """\
          [paste.app_factory]
          main = myproject:main
@@ -979,15 +1033,17 @@ The result will be something like:
          """,
          )
 
-Once you've done this, invoking ``$$VENV/bin/python setup.py develop`` will
-install a file named ``show_settings`` into the ``$somevirtualenv/bin``
-directory with a small bit of Python code that points to your entry point.  It
-will be executable.  Running it without any arguments will print an error and
-exit.  Running it with a single argument that is the path of a config file will
-print the settings.  Running it with an ``--omit=foo`` argument will omit the
-settings that have keys that start with ``foo``.  Running it with two "omit"
-options (e.g., ``--omit=foo --omit=bar``) will omit all settings that have keys
-that start with either ``foo`` or ``bar``::
+Once you've done this, invoking ``$VENV/bin/pip install -e .`` will install a
+file named ``show_settings`` into the ``$somevenv/bin`` directory with a
+small bit of Python code that points to your entry point. It will be
+executable. Running it without any arguments will print an error and exit.
+Running it with a single argument that is the path of a config file will print
+the settings. Running it with an ``--omit=foo`` argument will omit the settings
+that have keys that start with ``foo``. Running it with two "omit" options
+(e.g., ``--omit=foo --omit=bar``) will omit all settings that have keys that
+start with either ``foo`` or ``bar``:
+
+.. code-block:: bash
 
   $ $VENV/bin/show_settings development.ini --omit=pyramid --omit=debugtoolbar
   debug_routematch                             False

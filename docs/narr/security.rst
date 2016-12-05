@@ -290,6 +290,14 @@ properties of the instance.
        def __init__(self, owner):
            self.owner = owner
 
+.. warning::
+
+   Writing ``__acl__`` as properties is discouraged because an
+   ``AttributeError`` occurring in ``fget`` or ``fset`` will be silently
+   dismissed (this is consistent with Python ``getattr`` and ``hasattr``
+   behaviors). For dynamic ACLs, simply use callables, as documented above.
+
+
 .. index::
    single: ACE
    single: access control entry

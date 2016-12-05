@@ -16,6 +16,7 @@ from pyramid.compat import (
     PY3,
     PYPY,
     class_types,
+    text_,
     )
 
 from pyramid.config import Configurator
@@ -40,6 +41,7 @@ from pyramid.i18n import LocalizerRequestMixin
 from pyramid.request import CallbackMethodsMixin
 from pyramid.url import URLMethodsMixin
 from pyramid.util import InstancePropertyMixin
+from pyramid.view import ViewMethodsMixin
 
 
 _marker = object()
@@ -274,7 +276,7 @@ class DummySession(dict):
         return storage
 
     def new_csrf_token(self):
-        token = '0123456789012345678901234567890123456789'
+        token = text_('0123456789012345678901234567890123456789')
         self['_csrft_'] = token
         return token
 
@@ -292,6 +294,7 @@ class DummyRequest(
     LocalizerRequestMixin,
     AuthenticationAPIMixin,
     AuthorizationAPIMixin,
+    ViewMethodsMixin,
     ):
     """ A DummyRequest object (incompletely) imitates a :term:`request` object.
 
@@ -473,7 +476,9 @@ def setUp(registry=None, request=None, hook_zca=True, autocommit=True,
         # method.
         config.add_default_renderers()
         config.add_default_view_predicates()
+        config.add_default_view_derivers()
         config.add_default_route_predicates()
+        config.add_default_tweens()
     config.commit()
     global have_zca
     try:

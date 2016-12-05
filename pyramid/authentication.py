@@ -1,6 +1,7 @@
 import binascii
 from codecs import utf_8_decode
 from codecs import utf_8_encode
+from collections import namedtuple
 import hashlib
 import base64
 import re
@@ -417,19 +418,10 @@ class RemoteUserAuthenticationPolicy(CallbackAuthenticationPolicy):
         be done somewhere else or in a subclass."""
         return []
 
-_marker = object()
-
 @implementer(IAuthenticationPolicy)
 class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
     """A :app:`Pyramid` :term:`authentication policy` which
     obtains data from a Pyramid "auth ticket" cookie.
-
-    .. warning::
-
-       The default hash algorithm used in this policy is MD5 and has known
-       hash collision vulnerabilities. The risk of an exploit is low.
-       However, for improved authentication security, use
-       ``hashalg='sha512'``.
 
     Constructor Arguments
 
@@ -552,7 +544,7 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
 
     ``hashalg``
 
-       Default: ``md5`` (the literal string).
+       Default: ``sha512`` (the literal string).
 
        Any hash algorithm supported by Python's ``hashlib.new()`` function
        can be used as the ``hashalg``.
@@ -562,20 +554,9 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
        ``hashalg`` will imply that all existing users with a valid cookie will
        be required to re-login.
 
-       A warning is emitted at startup if an explicit ``hashalg`` is not
-       passed.  This is for backwards compatibility reasons.
-
        This option is available as of :app:`Pyramid` 1.4.
 
        Optional.
-
-       .. note::
-
-          ``md5`` is the default for backwards compatibility reasons. However,
-          if you don't specify ``md5`` as the hashalg explicitly, a warning is
-          issued at application startup time.  An explicit value of ``sha512``
-          is recommended for improved security, and ``sha512`` will become the
-          default in a future Pyramid version.
 
     ``debug``
 
@@ -601,34 +582,10 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
                  http_only=False,
                  wild_domain=True,
                  debug=False,
-                 hashalg=_marker,
+                 hashalg='sha512',
                  parent_domain=False,
                  domain=None,
                  ):
-        if hashalg is _marker:
-            hashalg = 'md5'
-            warnings.warn(
-                'The MD5 hash function used by default by the '
-                'AuthTktAuthenticationPolicy is known to be '
-                'susceptible to collision attacks.  It is the current default '
-                'for backwards compatibility reasons, but we recommend that '
-                'you use the SHA512 algorithm instead for improved security.  '
-                'Pass ``hashalg=\'sha512\'`` to the '
-                'AuthTktAuthenticationPolicy constructor to do so.\n\nNote '
-                'that a change to the hash algorithms will invalidate existing '
-                'auth tkt cookies set by your application.  If backwards '
-                'compatibility of existing auth tkt cookies is of greater '
-                'concern than the risk posed by the potential for a hash '
-                'collision, you\'ll want to continue using MD5 explicitly.  '
-                'To do so, pass ``hashalg=\'md5\'`` in your application to '
-                'the AuthTktAuthenticationPolicy constructor.   When you do so '
-                'this warning will not be emitted again.  The default '
-                'algorithm used in this policy will change in the future, so '
-                'setting an explicit hashalg will futureproof your '
-                'application.',
-                DeprecationWarning,
-                stacklevel=2
-                )
         self.cookie = AuthTktCookieHelper(
             secret,
             cookie_name=cookie_name,
@@ -855,9 +812,9 @@ class AuthTktCookieHelper(object):
         self.cookie_name = cookie_name
         self.secure = secure
         self.include_ip = include_ip
-        self.timeout = timeout
-        self.reissue_time = reissue_time
-        self.max_age = max_age
+        self.timeout = timeout if timeout is None else int(timeout)
+        self.reissue_time = reissue_time if reissue_time is None else int(reissue_time)
+        self.max_age = max_age if max_age is None else int(max_age)
         self.wild_domain = wild_domain
         self.parent_domain = parent_domain
         self.domain = domain
@@ -977,8 +934,7 @@ class AuthTktCookieHelper(object):
           Tokens are available in the returned identity when an auth_tkt is
           found in the request and unpacked.  Default: ``()``.
         """
-        if max_age is None:
-            max_age = self.max_age
+        max_age = self.max_age if max_age is None else int(max_age)
 
         environ = request.environ
 
@@ -993,8 +949,19 @@ class AuthTktCookieHelper(object):
 
         if encoding_data:
             encoding, encoder = encoding_data
-            userid = encoder(userid)
-            user_data = 'userid_type:%s' % encoding
+        else:
+            warnings.warn(
+                "userid is of type {}, and is not supported by the "
+                "AuthTktAuthenticationPolicy. Explicitly converting to string "
+                "and storing as base64. Subsequent requests will receive a "
+                "string as the userid, it will not be decoded back to the type "
+                "provided.".format(type(userid)), RuntimeWarning
+            )
+            encoding, encoder = self.userid_type_encoders.get(text_type)
+            userid = str(userid)
+
+        userid = encoder(userid)
+        user_data = 'userid_type:%s' % encoding
 
         new_tokens = []
         for token in tokens:
@@ -1129,7 +1096,7 @@ class BasicAuthAuthenticationPolicy(CallbackAuthenticationPolicy):
 
     def unauthenticated_userid(self, request):
         """ The userid parsed from the ``Authorization`` request header."""
-        credentials = self._get_credentials(request)
+        credentials = extract_http_basic_credentials(request)
         if credentials:
             return credentials[0]
 
@@ -1146,42 +1113,15 @@ class BasicAuthAuthenticationPolicy(CallbackAuthenticationPolicy):
         return [('WWW-Authenticate', 'Basic realm="%s"' % self.realm)]
 
     def callback(self, username, request):
-        # Username arg is ignored.  Unfortunately _get_credentials winds up
-        # getting called twice when authenticated_userid is called.  Avoiding
-        # that, however, winds up duplicating logic from the superclass.
-        credentials = self._get_credentials(request)
+        # Username arg is ignored. Unfortunately
+        # extract_http_basic_credentials winds up getting called twice when
+        # authenticated_userid is called. Avoiding that, however,
+        # winds up duplicating logic from the superclass.
+        credentials = extract_http_basic_credentials(request)
         if credentials:
             username, password = credentials
             return self.check(username, password, request)
 
-    def _get_credentials(self, request):
-        authorization = request.headers.get('Authorization')
-        if not authorization:
-            return None
-        try:
-            authmeth, auth = authorization.split(' ', 1)
-        except ValueError: # not enough values to unpack
-            return None
-        if authmeth.lower() != 'basic':
-            return None
-
-        try:
-            authbytes = b64decode(auth.strip())
-        except (TypeError, binascii.Error): # can't decode
-            return None
-
-        # try utf-8 first, then latin-1; see discussion in
-        # https://github.com/Pylons/pyramid/issues/898
-        try:
-            auth = authbytes.decode('utf-8')
-        except UnicodeDecodeError:
-            auth = authbytes.decode('latin-1')
-
-        try:
-            username, password = auth.split(':', 1)
-        except ValueError: # not enough values to unpack
-            return None
-        return username, password
 
 class _SimpleSerializer(object):
     def loads(self, bstruct):
@@ -1189,3 +1129,47 @@ class _SimpleSerializer(object):
 
     def dumps(self, appstruct):
         return bytes_(appstruct)
+
+
+HTTPBasicCredentials = namedtuple(
+    'HTTPBasicCredentials', ['username', 'password'])
+
+
+def extract_http_basic_credentials(request):
+    """ A helper function for extraction of HTTP Basic credentials
+    from a given :term:`request`.
+
+    Returns a :class:`.HTTPBasicCredentials` 2-tuple with ``username`` and
+    ``password`` attributes or ``None`` if no credentials could be found.
+
+    """
+    authorization = request.headers.get('Authorization')
+    if not authorization:
+        return None
+
+    try:
+        authmeth, auth = authorization.split(' ', 1)
+    except ValueError:  # not enough values to unpack
+        return None
+
+    if authmeth.lower() != 'basic':
+        return None
+
+    try:
+        authbytes = b64decode(auth.strip())
+    except (TypeError, binascii.Error): # can't decode
+        return None
+
+    # try utf-8 first, then latin-1; see discussion in
+    # https://github.com/Pylons/pyramid/issues/898
+    try:
+        auth = authbytes.decode('utf-8')
+    except UnicodeDecodeError:
+        auth = authbytes.decode('latin-1')
+
+    try:
+        username, password = auth.split(':', 1)
+    except ValueError: # not enough values to unpack
+        return None
+
+    return HTTPBasicCredentials(username, password)

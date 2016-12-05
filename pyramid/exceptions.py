@@ -9,6 +9,21 @@ Forbidden = HTTPForbidden # bw compat
 
 CR = '\n'
 
+
+class BadCSRFOrigin(HTTPBadRequest):
+    """
+    This exception indicates the request has failed cross-site request forgery
+    origin validation.
+    """
+    title = "Bad CSRF Origin"
+    explanation = (
+        "Access is denied. This server can not verify that the origin or "
+        "referrer of your request matches the current site. Either your "
+        "browser supplied the wrong Origin or Referrer or it did not supply "
+        "one at all."
+    )
+
+
 class BadCSRFToken(HTTPBadRequest):
     """
     This exception indicates the request has failed cross-site request
@@ -93,6 +108,7 @@ class ConfigurationExecutionError(ConfigurationError):
 
     def __str__(self):
         return "%s: %s\n  in:\n  %s" % (self.etype, self.evalue, self.info)
+
 
 class CyclicDependencyError(Exception):
     """ The exception raised when the Pyramid topological sorter detects a

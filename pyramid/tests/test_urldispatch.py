@@ -2,7 +2,7 @@ import unittest
 from pyramid import testing
 from pyramid.compat import (
     text_,
-    PY3,
+    PY2,
     )
 
 class TestRoute(unittest.TestCase):
@@ -120,10 +120,10 @@ class RoutesMapperTests(unittest.TestCase):
     def test___call__pathinfo_cant_be_decoded(self):
         from pyramid.exceptions import URLDecodeError
         mapper = self._makeOne()
-        if PY3:
-            path_info = b'\xff\xfe\xe6\x00'.decode('latin-1')
-        else:
+        if PY2:
             path_info = b'\xff\xfe\xe6\x00'
+        else:
+            path_info = b'\xff\xfe\xe6\x00'.decode('latin-1')
         request = self._getRequest(PATH_INFO=path_info)
         self.assertRaises(URLDecodeError, mapper, request)
 
@@ -485,11 +485,15 @@ class TestCompileRouteFunctional(unittest.TestCase):
     def test_generator_functional_newstyle(self):
         self.generates('/{x}', {'x':''}, '/')
         self.generates('/{x}', {'x':'a'}, '/a')
+        self.generates('/{x}', {'x':'a/b/c'}, '/a/b/c')
+        self.generates('/{x}', {'x':':@&+$,'}, '/:@&+$,')
         self.generates('zzz/{x}', {'x':'abc'}, '/zzz/abc')
         self.generates('zzz/{x}*traverse', {'x':'abc', 'traverse':''},
                        '/zzz/abc')
         self.generates('zzz/{x}*traverse', {'x':'abc', 'traverse':'/def/g'},
                        '/zzz/abc/def/g')
+        self.generates('zzz/{x}*traverse', {'x':':@&+$,', 'traverse':'/:@&+$,'},
+                       '/zzz/:@&+$,/:@&+$,')
         self.generates('/{x}', {'x':text_(b'/La Pe\xc3\xb1a', 'utf-8')},
                        '//La%20Pe%C3%B1a')
         self.generates('/{x}*y', {'x':text_(b'/La Pe\xc3\xb1a', 'utf-8'),

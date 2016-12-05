@@ -14,11 +14,26 @@ Front Matter
 .. toctree::
    :maxdepth: 1
 
-   copyright.rst
-   conventions.rst
-   authorintro.rst
+   copyright
+   conventions
+   authorintro
+   designdefense
 
 .. mainmatter::
+
+.. _tutorials:
+
+Tutorials
+@@@@@@@@@
+
+.. toctree::
+   :maxdepth: 1
+
+   quick_tour
+   quick_tutorial/index
+   tutorials/wiki2/index
+   tutorials/wiki/index
+   tutorials/modwsgi/index
 
 .. _narrative_documentation:
 
@@ -68,20 +83,6 @@ Narrative Documentation
    narr/threadlocals
    narr/zca
 
-.. _tutorials:
-
-Tutorials
-@@@@@@@@@
-
-.. toctree::
-   :maxdepth: 1
-
-   tutorials/wiki2/index.rst
-   tutorials/wiki/index.rst
-   tutorials/modwsgi/index.rst
-
-.. _api_documentation:
-
 API Documentation
 @@@@@@@@@@@@@@@@@
 
@@ -89,9 +90,39 @@ API Documentation
    :maxdepth: 1
    :glob:
 
+   api/index
    api/*
 
+
+``p*`` Scripts Documentation
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+.. toctree::
+   :maxdepth: 1
+   :glob:
+
+   pscripts/index
+   pscripts/*
+
+
 .. backmatter::
+
+Change History
+@@@@@@@@@@@@@@
+
+.. toctree::
+   :maxdepth: 1
+
+   whatsnew-1.7
+   whatsnew-1.6
+   whatsnew-1.5
+   whatsnew-1.4
+   whatsnew-1.3
+   whatsnew-1.2
+   whatsnew-1.1
+   whatsnew-1.0
+   changes
+
 
 Glossary and Index
 @@@@@@@@@@@@@@@@@@

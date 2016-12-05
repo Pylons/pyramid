@@ -34,7 +34,7 @@ determine the set of circumstances which must be true for the view callable to
 be invoked.
 
 A view configuration statement is made about information present in the
-:term:`context` resource and the :term:`request`.
+:term:`context` resource (or exception) and the :term:`request`.
 
 View configuration is performed in one of two ways:
 
@@ -192,6 +192,36 @@ Non-Predicate Arguments
   only influence ``Cache-Control`` headers, pass a tuple as ``http_cache`` with
   the first element of ``None``, i.e., ``(None, {'public':True})``.
 
+
+``require_csrf``
+
+  CSRF checks will affect any request method that is not defined as a "safe"
+  method by RFC2616. In pratice this means that GET, HEAD, OPTIONS, and TRACE
+  methods will pass untouched and all others methods will require CSRF. This
+  option is used in combination with the ``pyramid.require_default_csrf``
+  setting to control which request parameters are checked for CSRF tokens.
+
+  This feature requires a configured :term:`session factory`.
+
+  If this option is set to ``True`` then CSRF checks will be enabled for POST
+  requests to this view. The required token will be whatever was specified by
+  the ``pyramid.require_default_csrf`` setting, or will fallback to
+  ``csrf_token``.
+
+  If this option is set to a string then CSRF checks will be enabled and it
+  will be used as the required token regardless of the
+  ``pyramid.require_default_csrf`` setting.
+
+  If this option is set to ``False`` then CSRF checks will be disabled
+  regardless of the ``pyramid.require_default_csrf`` setting.
+
+  In addition, if this option is set to ``True`` or a string then CSRF origin
+  checking will be enabled.
+
+  See :ref:`auto_csrf_checking` for more information.
+
+  .. versionadded:: 1.7
+
 ``wrapper``
   The :term:`view name` of a different :term:`view configuration` which will
   receive the response body of this view as the ``request.wrapped_body``
@@ -222,7 +252,7 @@ Non-Predicate Arguments
     def myview(request):
       ...
 
-  Is similar to doing::
+  Is similar to decorating the view callable directly::
 
     @view_config(...)
     @decorator2
@@ -230,8 +260,10 @@ Non-Predicate Arguments
     def myview(request):
       ...
 
-  All view callables in the decorator chain must return a response object
-  implementing :class:`pyramid.interfaces.IResponse` or raise an exception:
+  An important distinction is that each decorator will receive a response
+  object implementing :class:`pyramid.interfaces.IResponse` instead of the
+  raw value returned from the view callable. All decorators in the chain must
+  return a response object or raise an exception:
 
   .. code-block:: python
 
@@ -276,8 +308,25 @@ configured view.
   represented class or if the :term:`context` resource provides the represented
   interface; it is otherwise false.
 
+  It is possible to pass an exception class as the context if your context may
+  subclass an exception. In this case *two* views will be registered. One
+  will match normal incoming requests, and the other will match as an
+  :term:`exception view` which only occurs when an exception is raised during
+  the normal request processing pipeline.
+
   If ``context`` is not supplied, the value ``None``, which matches any
   resource, is used.
+
+``exception_only``
+
+  When this value is ``True``, the ``context`` argument must be a subclass of
+  ``Exception``. This flag indicates that only an :term:`exception view` should
+  be created, and that this view should not match if the traversal
+  :term:`context` matches the ``context`` argument. If the ``context`` is a
+  subclass of ``Exception`` and this value is ``False`` (the default), then a
+  view will be registered to match the traversal :term:`context` as well.
+
+  .. versionadded:: 1.8
 
 ``route_name``
   If ``route_name`` is supplied, the view callable will be invoked only when
@@ -433,7 +482,7 @@ configured view.
   check name.
 
   If CSRF checking is performed, the checked value will be the value of
-  ``request.params[check_name]``.  This value will be compared against the
+  ``request.POST[check_name]``.  This value will be compared against the
   value of ``request.session.get_csrf_token()``, and the check will pass if
   these two values are the same.  If the check passes, the associated view will
   be permitted to execute.  If the check fails, the associated view will not be

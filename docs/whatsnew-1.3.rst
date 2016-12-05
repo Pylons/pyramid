@@ -1,4 +1,4 @@
-What's New In Pyramid 1.3
+What's New in Pyramid 1.3
 =========================
 
 This article explains the new features in :app:`Pyramid` version 1.3 as
@@ -18,7 +18,7 @@ Python 3 Compatibility
 .. image:: python-3.png
 
 Pyramid continues to run on Python 2, but Pyramid is now also Python 3
-compatible.  To use Pyramid under Python 3, Python 3.2 or better is required.
+compatible.  To use Pyramid under Python 3, Python 3.3 or better is required.
 
 Many Pyramid add-ons are already Python 3 compatible.  For example,
 ``pyramid_debugtoolbar``, ``pyramid_jinja2``, ``pyramid_exclog``,
@@ -523,10 +523,11 @@ Documentation Enhancements
   :ref:`making_a_console_script`.
 
 - Removed the "Running Pyramid on Google App Engine" tutorial from the main
-  docs.  It survives on in the Cookbook
-  (http://docs.pylonsproject.org/projects/pyramid_cookbook/en/latest/deployment/gae.html).
-  Rationale: it provides the correct info for the Python 2.5 version of GAE
-  only, and this version of Pyramid does not support Python 2.5.
+  docs.  It survives on in the Pyramid Community Cookbook as
+  :ref:`Pyramid on Google's App Engine (using appengine-monkey)
+  <cookbook:appengine_tutorial>`. Rationale: it provides the correct info for
+  the Python 2.5 version of GAE only, and this version of Pyramid does not
+  support Python 2.5.
 
 - Updated the :ref:`changing_the_forbidden_view` section, replacing
   explanations of registering a view using ``add_view`` or ``view_config``

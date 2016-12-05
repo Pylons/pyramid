@@ -591,6 +591,7 @@ class TestRouter(unittest.TestCase):
     def test_call_eventsends(self):
         from pyramid.interfaces import INewRequest
         from pyramid.interfaces import INewResponse
+        from pyramid.interfaces import IBeforeTraversal
         from pyramid.interfaces import IContextFound
         from pyramid.interfaces import IViewClassifier
         context = DummyContext()
@@ -601,6 +602,7 @@ class TestRouter(unittest.TestCase):
         environ = self._makeEnviron()
         self._registerView(view, '', IViewClassifier, None, None)
         request_events = self._registerEventListener(INewRequest)
+        beforetraversal_events = self._registerEventListener(IBeforeTraversal)
         context_found_events = self._registerEventListener(IContextFound)
         response_events = self._registerEventListener(INewResponse)
         router = self._makeOne()
@@ -608,6 +610,8 @@ class TestRouter(unittest.TestCase):
         result = router(environ, start_response)
         self.assertEqual(len(request_events), 1)
         self.assertEqual(request_events[0].request.environ, environ)
+        self.assertEqual(len(beforetraversal_events), 1)
+        self.assertEqual(beforetraversal_events[0].request.environ, environ)
         self.assertEqual(len(context_found_events), 1)
         self.assertEqual(context_found_events[0].request.environ, environ)
         self.assertEqual(context_found_events[0].request.context, context)
@@ -1284,7 +1288,7 @@ class DummyView:
     def __call__(self, context, request):
         self.context = context
         self.request = request
-        if not self.raise_exception is None:
+        if self.raise_exception is not None:
             raise self.raise_exception
         return self.response
 

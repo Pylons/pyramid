@@ -26,7 +26,7 @@ Not Found View by using the
    :linenos:
 
    def notfound(request):
-       return Response('Not Found, dude', status='404 Not Found')
+       return Response('Not Found', status='404 Not Found')
 
    def main(globals, **settings):
        config = Configurator()
@@ -45,7 +45,7 @@ and a :term:`scan`, you can replace the Not Found View by using the
 
    @notfound_view_config()
    def notfound(request):
-       return Response('Not Found, dude', status='404 Not Found')
+       return Response('Not Found', status='404 Not Found')
 
    def main(globals, **settings):
        config = Configurator()
@@ -67,11 +67,11 @@ Views can carry predicates limiting their applicability.  For example:
 
    @notfound_view_config(request_method='GET')
    def notfound_get(request):
-       return Response('Not Found during GET, dude', status='404 Not Found')
+       return Response('Not Found during GET', status='404 Not Found')
 
    @notfound_view_config(request_method='POST')
    def notfound_post(request):
-       return Response('Not Found during POST, dude', status='404 Not Found')
+       return Response('Not Found during POST', status='404 Not Found')
 
    def main(globals, **settings):
       config = Configurator()
@@ -116,20 +116,19 @@ callable:
 
 .. note::
 
-   Both :meth:`pyramid.config.Configurator.add_notfound_view` and
-   :class:`pyramid.view.notfound_view_config` are new as of Pyramid 1.3.
-   Older Pyramid documentation instructed users to use ``add_view`` instead,
-   with a ``context`` of ``HTTPNotFound``.  This still works; the convenience
-   method and decorator are just wrappers around this functionality.
-
-.. warning::
-
    When a Not Found View callable accepts an argument list as described in
    :ref:`request_and_context_view_definitions`, the ``context`` passed as the
    first argument to the view callable will be the
    :exc:`~pyramid.httpexceptions.HTTPNotFound` exception instance.  If
    available, the resource context will still be available as
    ``request.context``.
+
+.. warning::
+
+   The :term:`Not Found View` callables are only invoked when a
+   :exc:`~pyramid.httpexceptions.HTTPNotFound` exception is raised. If the
+   exception is returned from a view then it will be treated as a regular
+   response object and it will not trigger the custom view.
 
 .. index::
    single: forbidden view
@@ -210,6 +209,13 @@ Here's some sample code that implements a minimal forbidden view:
    whether the ``pyramid.debug_authorization`` environment setting is true or
    false.
 
+.. warning::
+
+   The :term:`forbidden view` callables are only invoked when a
+   :exc:`~pyramid.httpexceptions.HTTPForbidden` exception is raised. If the
+   exception is returned from a view then it will be treated as a regular
+   response object and it will not trigger the custom view.
+
 .. index::
    single: request factory
 
@@ -262,7 +268,7 @@ already constructed a :term:`configurator`, it can also be registered via the
 Adding Methods or Properties to a Request Object
 ------------------------------------------------
 
-.. versionadded:: 1.4.
+.. versionadded:: 1.4
 
 Since each Pyramid application can only have one :term:`request` factory,
 :ref:`changing the request factory <changing_the_request_factory>` is not that
@@ -300,13 +306,38 @@ added as a property and its result is cached per-request by setting
 ``reify=True``. This way, we eliminate the overhead of running the function
 multiple times.
 
+.. testsetup:: group1
+
+   from pyramid.config import Configurator
+
+
+   def total(request, *args):
+       return sum(args)
+
+
+   def prop(request):
+       print("getting the property")
+       return "the property"
+
+
+
+   config = Configurator()
+   config.add_request_method(total)
+   config.add_request_method(prop, reify=True)
+   config.commit()
+
+   from pyramid.scripting import prepare
+   request = prepare(registry=config.registry)["request"]
+
+.. doctest:: group1
+
    >>> request.total(1, 2, 3)
    6
    >>> request.prop
    getting the property
-   the property
+   'the property'
    >>> request.prop
-   the property
+   'the property'
 
 To not cache the result of ``request.prop``, set ``property=True`` instead of
 ``reify=True``.
@@ -338,13 +369,42 @@ Here is an example of passing a class to ``Configurator.add_request_method``:
 
 We attach and cache an object named ``extra`` to the ``request`` object.
 
+.. testsetup:: group2
+
+   from pyramid.config import Configurator
+   from pyramid.decorator import reify
+
+   class ExtraStuff(object):
+
+       def __init__(self, request):
+           self.request = request
+
+       def total(self, *args):
+           return sum(args)
+
+       # use @property if you don't want to cache the result
+       @reify
+       def prop(self):
+           print("getting the property")
+           return "the property"
+
+   config = Configurator()
+   config.add_request_method(ExtraStuff, 'extra', reify=True)
+   config.commit()
+
+   from pyramid.scripting import prepare
+   request = prepare(registry=config.registry)["request"]
+
+.. doctest:: group2
+
    >>> request.extra.total(1, 2, 3)
    6
    >>> request.extra.prop
    getting the property
-   the property
+   'the property'
    >>> request.extra.prop
-   the property
+   'the property'
+
 
 .. index::
    single: response factory
@@ -690,7 +750,9 @@ The API that must be implemented by a class that provides
           """ Accept the resource and request and set self.physical_path and
           self.virtual_path """
           self.virtual_path =  some_function_of(resource, request)
+          self.virtual_path_tuple =  some_function_of(resource, request)
           self.physical_path =  some_other_function_of(resource, request)
+          self.physical_path_tuple =  some_function_of(resource, request)
 
 The default context URL generator is available for perusal as the class
 :class:`pyramid.traversal.ResourceURL` in the `traversal module
@@ -1427,7 +1489,7 @@ method. For example:
         phash = text
 
         def __call__(self, context, request):
-            return getattr(context, 'content_type', None) == self.val
+            return request.content_type == self.val
 
 The constructor of a predicate factory takes two arguments: ``val`` and
 ``config``.  The ``val`` argument will be the argument passed to
@@ -1446,13 +1508,28 @@ with the name and the value serialized.  The result of ``phash`` is not seen in
 output anywhere, it just informs the uniqueness constraints for view
 configuration.
 
-The ``__call__`` method of a predicate factory must accept a resource
-(``context``) and a request, and must return ``True`` or ``False``.  It is the
-"meat" of the predicate.
+The ``__call__`` method differs depending on whether the predicate is used as
+a :term:`view predicate` or a :term:`route predicate`:
 
-You can use the same predicate factory as both a view predicate and as a route
-predicate, but you'll need to call ``add_view_predicate`` and
-``add_route_predicate`` separately with the same factory.
+- When used as a route predicate, the ``__call__`` signature is
+  ``(info, request)``. The ``info`` object is a dictionary containing two
+  keys: ``match`` and ``route``. ``info['match']`` is the matchdict containing
+  the patterns matched in the route pattern. ``info['route']`` is the
+  :class:`pyramid.interfaces.IRoute` object for the current route.
+
+- When used as a view predicate, the ``__call__`` signature is
+  ``(context, request)``. The ``context`` is the result of :term:`traversal`
+  performed using either the route's :term:`root factory` or the app's
+  :term:`default root factory`.
+
+In both cases the ``__call__`` method is expected to return ``True`` or
+``False``.
+
+It is possible to use the same predicate factory as both a view predicate and
+as a route predicate, but they'll need to handle the ``info`` or ``context``
+argument specially (many predicates do not need this argument) and you'll need
+to call ``add_view_predicate`` and ``add_route_predicate`` separately with
+the same factory.
 
 .. _subscriber_predicates:
 
@@ -1547,3 +1624,204 @@ in every subscriber registration.  It is not the responsibility of the
 predicate author to make every predicate make sense for every event type; it is
 the responsibility of the predicate consumer to use predicates that make sense
 for a particular event type registration.
+
+
+.. index::
+   single: view derivers
+
+.. _view_derivers:
+
+View Derivers
+-------------
+
+.. versionadded:: 1.7
+
+Every URL processed by :app:`Pyramid` is matched against a custom view
+pipeline. See :ref:`router_chapter` for how this works. The view pipeline
+itself is built from the user-supplied :term:`view callable`, which is then
+composed with :term:`view derivers <view deriver>`. A view deriver is a
+composable element of the view pipeline which is used to wrap a view with
+added functionality. View derivers are very similar to the ``decorator``
+argument to :meth:`pyramid.config.Configurator.add_view`, except that they have
+the option to execute for every view in the application.
+
+It is helpful to think of a :term:`view deriver` as middleware for views.
+Unlike tweens or WSGI middleware which are scoped to the application itself,
+a view deriver is invoked once per view in the application, and can use
+configuration options from the view to customize its behavior.
+
+Built-in View Derivers
+~~~~~~~~~~~~~~~~~~~~~~
+
+There are several built-in view derivers that :app:`Pyramid` will automatically
+apply to any view. Below they are defined in order from furthest to closest to
+the user-defined :term:`view callable`:
+
+``secured_view``
+
+  Enforce the ``permission`` defined on the view. This element is a no-op if no
+  permission is defined. Note there will always be a permission defined if a
+  default permission was assigned via
+  :meth:`pyramid.config.Configurator.set_default_permission` unless the
+  view is an :term:`exception view`.
+
+  This element will also output useful debugging information when
+  ``pyramid.debug_authorization`` is enabled.
+
+``csrf_view``
+
+  Used to check the CSRF token provided in the request. This element is a
+  no-op if ``require_csrf`` view option is not ``True``. Note there will
+  always be a ``require_csrf`` option if a default value was assigned via
+  :meth:`pyramid.config.Configurator.set_default_csrf_options` unless
+  the view is an :term:`exception view`.
+
+``owrapped_view``
+
+  Invokes the wrapped view defined by the ``wrapper`` option.
+
+``http_cached_view``
+
+  Applies cache control headers to the response defined by the ``http_cache``
+  option. This element is a no-op if the ``pyramid.prevent_http_cache`` setting
+  is enabled or the ``http_cache`` option is ``None``.
+
+``decorated_view``
+
+  Wraps the view with the decorators from the ``decorator`` option.
+
+``rendered_view``
+
+  Adapts the result of the :term:`view callable` into a :term:`response`
+  object. Below this point the result may be any Python object.
+
+``mapped_view``
+
+  Applies the :term:`view mapper` defined by the ``mapper`` option or the
+  application's default view mapper to the :term:`view callable`. This
+  is always the closest deriver to the user-defined view and standardizes the
+  view pipeline interface to accept ``(context, request)`` from all previous
+  view derivers.
+
+.. warning::
+
+   Any view derivers defined ``under`` the ``rendered_view`` are not
+   guaranteed to receive a valid response object. Rather they will receive the
+   result from the :term:`view mapper` which is likely the original response
+   returned from the view. This is possibly a dictionary for a renderer but it
+   may be any Python object that may be adapted into a response.
+
+Custom View Derivers
+~~~~~~~~~~~~~~~~~~~~
+
+It is possible to define custom view derivers which will affect all views in an
+application. There are many uses for this, but most will likely be centered
+around monitoring and security. In order to register a custom :term:`view
+deriver`, you should create a callable that conforms to the
+:class:`pyramid.interfaces.IViewDeriver` interface, and then register it with
+your application using :meth:`pyramid.config.Configurator.add_view_deriver`.
+The callable should accept the ``view`` to be wrapped and the ``info`` object
+which is an instance of :class:`pyramid.interfaces.IViewDeriverInfo`.
+For example, below is a callable that can provide timing information for the
+view pipeline:
+
+.. code-block:: python
+   :linenos:
+
+   import time
+
+   def timing_view(view, info):
+       if info.options.get('timed'):
+           def wrapper_view(context, request):
+               start = time.time()
+               response = view(context, request)
+               end = time.time()
+               response.headers['X-View-Performance'] = '%.3f' % (end - start,)
+               return response
+           return wrapper_view
+       return view
+
+   timing_view.options = ('timed',)
+
+   config.add_view_deriver(timing_view)
+
+The setting of ``timed`` on the timing_view signifies to Pyramid that ``timed``
+is a valid ``view_config`` keyword argument now.  The ``timing_view`` custom
+view deriver as registered above will only be active for any view defined with
+a ``timed=True`` value passed as one of its ``view_config`` keywords.
+
+For example, this view configuration will *not* be a timed view:
+
+.. code-block:: python
+   :linenos:
+
+   @view_config(route_name='home')
+   def home(request):
+       return Response('Home')
+
+But this view *will* have timing information added to the response headers:
+
+.. code-block:: python
+   :linenos:
+
+   @view_config(route_name='home', timed=True)
+   def home(request):
+       return Response('Home')
+
+View derivers are unique in that they have access to most of the options
+passed to :meth:`pyramid.config.Configurator.add_view` in order to decide what
+to do, and they have a chance to affect every view in the application.
+
+.. _exception_view_derivers:
+
+Exception Views and View Derivers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A :term:`view deriver` has the opportunity to wrap any view, including
+an :term:`exception view`. In general this is fine, but certain view derivers
+may wish to avoid doing certain things when handling exceptions. For example,
+the ``csrf_view`` and ``secured_view`` built-in view derivers will not perform
+security checks on exception views unless explicitly told to do so.
+
+You can check for ``info.exception_only`` on the
+:class:`pyramid.interfaces.IViewDeriverInfo` object when wrapping the view
+to determine whether you are wrapping an exception view or a normal view.
+
+Ordering View Derivers
+~~~~~~~~~~~~~~~~~~~~~~
+
+By default, every new view deriver is added between the ``decorated_view`` and
+``rendered_view`` built-in derivers. It is possible to customize this ordering
+using the ``over`` and ``under`` options. Each option can use the names of
+other view derivers in order to specify an ordering. There should rarely be a
+reason to worry about the ordering of the derivers except when the deriver
+depends on other operations in the view pipeline.
+
+Both ``over`` and ``under`` may also be iterables of constraints. For either
+option, if one or more constraints was defined, at least one must be satisfied,
+else a :class:`pyramid.exceptions.ConfigurationError` will be raised. This may
+be used to define fallback constraints if another deriver is missing.
+
+Two sentinel values exist, :attr:`pyramid.viewderivers.INGRESS` and
+:attr:`pyramid.viewderivers.VIEW`, which may be used when specifying
+constraints at the edges of the view pipeline. For example, to add a deriver
+at the start of the pipeline you may use ``under=INGRESS``.
+
+It is not possible to add a view deriver under the ``mapped_view`` as the
+:term:`view mapper` is intimately tied to the signature of the user-defined
+:term:`view callable`. If you simply need to know what the original view
+callable was, it can be found as ``info.original_view`` on the provided
+:class:`pyramid.interfaces.IViewDeriverInfo` object passed to every view
+deriver.
+
+.. warning::
+
+   The default constraints for any view deriver are ``over='rendered_view'``
+   and ``under='decorated_view'``. When escaping these constraints you must
+   take care to avoid cyclic dependencies between derivers. For example, if
+   you want to add a new view deriver before ``secured_view`` then
+   simply specifying ``over='secured_view'`` is not enough, because the
+   default is also under ``decorated view`` there will be an unsatisfiable
+   cycle. You must specify a valid ``under`` constraint as well, such as
+   ``under=INGRESS`` to fall between INGRESS and ``secured_view`` at the
+   beginning of the view pipeline.

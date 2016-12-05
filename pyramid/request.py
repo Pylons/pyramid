@@ -32,6 +32,7 @@ from pyramid.util import (
     InstancePropertyHelper,
     InstancePropertyMixin,
 )
+from pyramid.view import ViewMethodsMixin
 
 class TemplateContext(object):
     pass
@@ -154,6 +155,7 @@ class Request(
     LocalizerRequestMixin,
     AuthenticationAPIMixin,
     AuthorizationAPIMixin,
+    ViewMethodsMixin,
     ):
     """
     A subclass of the :term:`WebOb` Request class.  An instance of
