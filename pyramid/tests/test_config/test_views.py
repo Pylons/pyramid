@@ -18,6 +18,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
     def _makeOne(self, *arg, **kw):
         from pyramid.config import Configurator
         config = Configurator(*arg, **kw)
+        config.set_default_csrf_options(require_csrf=False)
         return config
 
     def _getViewCallable(self, config, ctx_iface=None, exc_iface=None,

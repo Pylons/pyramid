@@ -44,7 +44,7 @@ Other Interfaces
   .. autointerface:: IRoutePregenerator
      :members:
 
-  .. autointerface:: ICSRF
+  .. autointerface:: ICSRFPolicy
      :members:
 
   .. autointerface:: ISession

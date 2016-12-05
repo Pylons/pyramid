@@ -53,11 +53,12 @@ class CookieCSRF(object):
     """ An alternative CSRF implementation that stores its information in
     unauthenticated cookies, known as the 'Double Submit Cookie' method in the
     OWASP CSRF guidelines. This gives some additional flexibility with regards
-    to scalingas the tokens can be generated and verified by a front-end server.
-    
+    to scaling as the tokens can be generated and verified by a front-end
+    server.
+
     .. versionadded :: 1.8a1
     """
-    
+
     def __init__(self, cookie_name='csrf_token', secure=False, httponly=False,
                  domain=None, path='/'):
         self.cookie_name = cookie_name
@@ -108,8 +109,7 @@ def csrf_token_template_global(event):
         return
     else:
         csrf = registry.getUtility(ICSRFPolicy)
-        if csrf is not None:
-            event['get_csrf_token'] = partial(csrf.get_csrf_token, request)
+        event['get_csrf_token'] = partial(csrf.get_csrf_token, request)
 
 
 def get_csrf_token(request):
@@ -121,8 +121,7 @@ def get_csrf_token(request):
     """
     registry = request.registry
     csrf = registry.getUtility(ICSRFPolicy)
-    if csrf is not None:
-        return csrf.get_csrf_token(request)
+    return csrf.get_csrf_token(request)
 
 
 def new_csrf_token(request):
@@ -134,25 +133,25 @@ def new_csrf_token(request):
     """
     registry = request.registry
     csrf = registry.getUtility(ICSRFPolicy)
-    if csrf is not None:
-        return csrf.new_csrf_token(request)
+    return csrf.new_csrf_token(request)
 
 
 def check_csrf_token(request,
                      token='csrf_token',
                      header='X-CSRF-Token',
                      raises=True):
-    """ Check the CSRF token returned by the :meth:`pyramid.interfaces.ICSRFPolicy`
-    implementation against the value in ``request.POST.get(token)`` (if a POST
-    request) or ``request.headers.get(header)``. If a ``token`` keyword is not
-    supplied to this function, the string ``csrf_token`` will be used to look
-    up the token in ``request.POST``. If a ``header`` keyword is not supplied
-    to this function, the string ``X-CSRF-Token`` will be used to look up the
-    token in ``request.headers``.
+    """ Check the CSRF token returned by the
+    :class:`pyramid.interfaces.ICSRFPolicy` implementation against the value in
+    ``request.POST.get(token)`` (if a POST request) or
+    ``request.headers.get(header)``. If a ``token`` keyword is not supplied to
+    this function, the string ``csrf_token`` will be used to look up the token
+    in ``request.POST``. If a ``header`` keyword is not supplied to this
+    function, the string ``X-CSRF-Token`` will be used to look up the token in
+    ``request.headers``.
 
     If the value supplied by post or by header doesn't match the value supplied
-    by ``impl.get_csrf_token()`` (where ``impl`` is an implementation of
-    :meth:`pyramid.interfaces.ICSRFPolicy`), and ``raises`` is ``True``, this
+    by ``policy.get_csrf_token()`` (where ``policy`` is an implementation of
+    :class:`pyramid.interfaces.ICSRFPolicy`), and ``raises`` is ``True``, this
     function will raise an :exc:`pyramid.exceptions.BadCSRFToken` exception. If
     the values differ and ``raises`` is ``False``, this function will return
     ``False``.  If the CSRF check is successful, this function will return

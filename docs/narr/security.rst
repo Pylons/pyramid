@@ -146,7 +146,7 @@ For example, the following view declaration protects the view named
    # config is an instance of pyramid.config.Configurator
 
    config.add_view('mypackage.views.blog_entry_add_view',
-                   name='add_entry.html', 
+                   name='add_entry.html',
                    context='mypackage.resources.Blog',
                    permission='add')
 
@@ -725,7 +725,7 @@ object that implements the following interface:
             """ Return ``True`` if any of the ``principals`` is allowed the
             ``permission`` in the current ``context``, else return ``False``
             """
-            
+
         def principals_allowed_by_permission(self, context, permission):
             """ Return a set of principal identifiers allowed by the
             ``permission`` in ``context``.  This behavior is optional; if you
@@ -777,11 +777,27 @@ If the URL is one that may modify or delete data, the consequences can be dire.
 
 You can avoid most of these attacks by issuing a unique token to the browser
 and then requiring that it be present in all potentially unsafe requests.
-:app:`Pyramid` sessions provide facilities to create and check CSRF tokens.
+:app:`Pyramid` provides facilities to create and check CSRF tokens.
 
-To use CSRF tokens, you must first enable a :term:`session factory` as
-described in :ref:`using_the_default_session_factory` or
-:ref:`using_alternate_session_factories`.
+By default :app:`Pyramid` comes with a session-based CSRF implementation
+:class:`pyramid.csrf.SessionCSRF`. To use it, you must first enable
+a :term:`session factory` as described in
+:ref:`using_the_default_session_factory` or
+:ref:`using_alternate_session_factories`. Alternatively, you can use
+a cookie-based implementation :class:`pyramid.csrf.CookieCSRF` which gives
+some additional flexibility as it does not require a session for each user.
+You can also define your own implementation of
+:class:`pyramid.interfaces.ICSRFPolicy` and register it with the
+:meth:`pyramid.config.Configurator.set_default_csrf_options` directive.
+
+For example:
+
+.. code-block:: python
+
+   from pyramid.config import Configurator
+
+   config = Configurator()
+   config.set_default_csrf_options(implementation=MyCustomCSRFPolicy())
 
 .. index::
    single: csrf.get_csrf_token
@@ -866,7 +882,7 @@ Checking CSRF Tokens Manually
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In request handling code, you can check the presence and validity of a CSRF
-token with :func:`pyramid.session.check_csrf_token`. If the token is valid, it
+token with :func:`pyramid.csrf.check_csrf_token`. If the token is valid, it
 will return ``True``, otherwise it will raise ``HTTPBadRequest``. Optionally,
 you can specify ``raises=False`` to have the check return ``False`` instead of
 raising an exception.
@@ -876,7 +892,7 @@ named ``X-CSRF-Token``.
 
 .. code-block:: python
 
-   from pyramid.session import check_csrf_token
+   from pyramid.csrf import check_csrf_token
 
    def myview(request):
        # Require CSRF Token
@@ -955,4 +971,4 @@ include ``check_csrf=True`` as a view predicate. See
    A mismatch of a CSRF token is treated like any other predicate miss, and the
    predicate system, when it doesn't find a view, raises ``HTTPNotFound``
    instead of ``HTTPBadRequest``, so ``check_csrf=True`` behavior is different
-   from calling :func:`pyramid.session.check_csrf_token`.
+   from calling :func:`pyramid.csrf.check_csrf_token`.

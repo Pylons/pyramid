@@ -12,8 +12,7 @@ application.
 
 This chapter describes how to configure sessions, what session implementations
 :app:`Pyramid` provides out of the box, how to store and retrieve data from
-sessions, and two session-specific features: flash messages, and cross-site
-request forgery attack prevention.
+sessions, and a session-specific feature: flash messages.
 
 .. index::
    single: session factory (default)
@@ -320,4 +319,3 @@ flash storage.
 .. index::
    single: preventing cross-site request forgery attacks
    single: cross-site request forgery attacks, prevention
-
