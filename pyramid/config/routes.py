@@ -13,12 +13,10 @@ from pyramid.registry import predvalseq
 from pyramid.request import route_request_iface
 from pyramid.urldispatch import RoutesMapper
 
-from pyramid.config.util import (
-    action_method,
-    as_sorted_tuple,
-    )
+from pyramid.config.util import action_method
+from pyramid.util import as_sorted_tuple
 
-import pyramid.config.predicates
+import pyramid.predicates
 
 class RoutesConfiguratorMixin(object):
     @action_method
@@ -446,7 +444,7 @@ class RoutesConfiguratorMixin(object):
             )
 
     def add_default_route_predicates(self):
-        p = pyramid.config.predicates
+        p = pyramid.predicates
         for (name, factory) in (
             ('xhr', p.XHRPredicate),
             ('request_method', p.RequestMethodPredicate),
