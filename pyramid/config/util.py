@@ -24,18 +24,6 @@ ActionInfo = ActionInfo # support bw compat imports
 MAX_ORDER = 1 << 30
 DEFAULT_PHASH = md5().hexdigest()
 
-def is_string_or_iterable(v):
-    if isinstance(v, string_types):
-        return True
-    if hasattr(v, '__iter__'):
-        return True
-
-def as_sorted_tuple(val):
-    if not is_nonstr_iter(val):
-        val = (val,)
-    val = tuple(sorted(val))
-    return val
-
 class not_(object):
     """
 
