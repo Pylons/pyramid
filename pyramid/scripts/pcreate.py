@@ -24,7 +24,7 @@ def main(argv=sys.argv, quiet=False):
 class PCreateCommand(object):
     verbosity = 1  # required
     parser = argparse.ArgumentParser(
-        usage="%(prog)s [options] -s <scaffold> output_directory",
+        prog="pcreate",
         description="Render Pyramid scaffolding to an output directory")
     parser.add_argument('-s', '--scaffold',
                         dest='scaffold_name',
@@ -76,6 +76,8 @@ class PCreateCommand(object):
                              'is the name of an already existing / importable '
                              'package.')
     parser.add_argument('output_directory',
+                        nargs = '?',
+                        default = None,
                         help='The directory where the project will be '
                              'created.')
 
