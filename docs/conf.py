@@ -194,7 +194,7 @@ latex_documents = [
 latex_toplevel_sectioning = "section"
 
 # If false, no module index is generated.
-latex_use_modindex = False
+latex_domain_indices = False
 
 ## Say, for a moment that you have a twoside document that needs a 3cm
 ## inner margin to allow for binding and at least two centimetres the
