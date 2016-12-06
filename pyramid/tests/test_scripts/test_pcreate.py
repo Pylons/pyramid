@@ -50,11 +50,15 @@ class TestPCreateCommand(unittest.TestCase):
             'You must provide at least one scaffold name'))
 
     def test_no_project_name(self):
-        cmd = self._makeOne('-s', 'dummy')
-        result = cmd.run()
-        self.assertEqual(result, 2)
-        out = self.out_.getvalue()
-        self.assertTrue(out.startswith('You must provide a project name'))
+        try:
+            cmd = self._makeOne('-s', 'dummy')
+            result = cmd.run()
+            self.assertEqual(result, 2)
+            out = self.out_.getvalue()
+            self.assertTrue(out.startswith('You must provide a project name'))
+        except SystemExit as e:
+            code = e.args[0]
+            self.assertEqual(code, 2)
 
     def test_unknown_scaffold_name(self):
         cmd = self._makeOne('-s', 'dummyXX', 'distro')
