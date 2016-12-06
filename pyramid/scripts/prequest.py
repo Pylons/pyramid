@@ -89,11 +89,15 @@ class PRequestCommand(object):
 
     parser.add_argument(
         'config_uri',
+        nargs='?',
+        default=None,
         help='The URI to the configuration file.',
         )
 
     parser.add_argument(
         'path_info',
+        nargs='?',
+        default=None,
         help='The path of the request.',
         )
 
@@ -112,11 +116,11 @@ class PRequestCommand(object):
         setup_logging(app_spec)
 
     def run(self):
-        if not len(self.args) >= 2:
+        if not self.args.config_uri and not self.args.path_info:
             self.out('You must provide at least two arguments')
             return 2
-        app_spec = self.args[0]
-        path = self.args[1]
+        app_spec = self.args.config_uri
+        path = self.args.path_info
 
         self.configure_logging(app_spec)
 
@@ -146,7 +150,7 @@ class PRequestCommand(object):
                 headers[name] = value.strip()
 
         app = self.get_app(app_spec, self.args.app_name,
-                options=parse_vars(self.args[2:]))
+                options=self.args)
 
         request_method = (self.args.method or 'GET').upper()
 
