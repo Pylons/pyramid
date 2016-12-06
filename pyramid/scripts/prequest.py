@@ -47,7 +47,7 @@ class PRequestCommand(object):
     """
 
     parser = argparse.ArgumentParser(
-        usage="%(prog)s config_uri path_info [args/options]",
+        prog="prequest",
         description=textwrap.dedent(description)
         )
     parser.add_argument(

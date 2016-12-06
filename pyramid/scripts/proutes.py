@@ -247,10 +247,9 @@ class PRoutesCommand(object):
     """
     bootstrap = (bootstrap,)
     stdout = sys.stdout
-    usage = '%prog config_uri'
-    ConfigParser = configparser.ConfigParser # testing
+    ConfigParser = configparser.ConfigParser  # testing
     parser = argparse.ArgumentParser(
-        usage,
+        prog="proutes",
         description=textwrap.dedent(description)
     )
     parser.add_argument('-g', '--glob',
