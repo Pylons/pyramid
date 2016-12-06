@@ -193,7 +193,7 @@ class PCreateCommand(object):
             self.out('')
             self.show_scaffolds()
             return False
-        if not self.args:
+        if not self.args.output_directory:
             self.out('You must provide a project name')
             return False
         available = [x.name for x in self.scaffolds]

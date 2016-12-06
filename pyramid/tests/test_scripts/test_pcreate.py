@@ -1,30 +1,4 @@
-from contextlib import contextmanager
 import unittest
-
-
-@contextmanager
-def patch_argparser(parser):
-    result = {}
-    old_exit = parser.exit
-    old_error = parser.error
-    try:
-        def dummy_exit(status=0, message=None):
-            result['status'] = status
-            result['message'] = message
-            raise ArgumentParserExit
-
-        def dummy_error(message):
-            result['message'] = message
-
-        parser.exit = dummy_exit
-        parser.error = dummy_error
-        yield result
-    finally:
-        parser.exit = old_exit
-        parser.error = old_error
-
-class ArgumentParserExit(Exception):
-    pass
 
 
 class TestPCreateCommand(unittest.TestCase):
@@ -74,19 +48,6 @@ class TestPCreateCommand(unittest.TestCase):
         out = self.out_.getvalue()
         self.assertTrue(out.startswith(
             'You must provide at least one scaffold name'))
-
-    def test_test_no_project_name(self):
-        cmd = self._makeOne('-s', 'dummy')
-        with patch_argparser(cmd.parser) as result:
-            try:
-                cmd.run()
-            except ArgumentParserExit:
-                self.assertEqual(result['status'], 2)
-                self.assertTrue(result['message'].startswith(
-                    'usage: pcreate [-h] [-s SCAFFOLD_NAME] [-t SCAFFOLD_NAME] [-l]'
-                ))
-            else:  # pragma: no cover
-                raise AssertionError
 
     def test_no_project_name(self):
         try:
