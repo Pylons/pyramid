@@ -288,3 +288,5 @@ Contributors
 - Moriyoshi Koizumi, 2016/11/20
 
 - Mikko Ohtamaa, 2016/12/6
+
+- Martin Frlin, 2016/12/6
