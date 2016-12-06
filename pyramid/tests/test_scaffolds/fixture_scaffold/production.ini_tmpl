@@ -10,8 +10,7 @@ pyramid.default_locale_name = en
 
 [server:main]
 use = egg:pyramid#wsgiref
-host = 0.0.0.0
-port = 6543
+listen = 0.0.0.0:6543
 
 # Begin logging configuration
 

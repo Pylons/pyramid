@@ -24,8 +24,7 @@ zodbconn.uri = file://%(here)s/Data.fs?connection_cache_size=20000
 
 [server:main]
 use = egg:waitress#main
-host = 0.0.0.0
-port = 6543
+listen = 0.0.0.0:6543
 
 ###
 # logging configuration
