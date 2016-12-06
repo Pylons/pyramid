@@ -33,6 +33,8 @@ class PViewsCommand(object):
         )
 
     parser.add_argument('config_uri',
+                        nargs='?',
+                        default=None,
                         help='The URI to the configuration file.')
 
     bootstrap = (bootstrap,) # testing

@@ -66,6 +66,8 @@ class PShellCommand(object):
                               "option will override the 'setup' key in the "
                               "[pshell] ini section."))
     parser.add_argument('config_uri',
+                        nargs='?',
+                        default=None,
                         help='The URI to the configuration file.')
 
     ConfigParser = configparser.ConfigParser # testing
