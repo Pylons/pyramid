@@ -122,6 +122,17 @@ class EditPageTests(unittest.TestCase):
         self.assertEqual(response.location, 'http://example.com/')
         self.assertEqual(context.data, 'Hello yo!')
 
+class SecurityTests(unittest.TestCase):
+    def test_hashing(self):
+        from .security import hash_password, check_password
+        password = 'secretpassword'
+        hashed_password = hash_password(password)
+        self.assertTrue(check_password(hashed_password, password))
+
+        self.assertFalse(check_password(hashed_password, 'attackerpassword'))
+
+        self.assertFalse(check_password(None, password))
+
 class FunctionalTests(unittest.TestCase):
 
     viewer_login = '/login?login=viewer&password=viewer' \
