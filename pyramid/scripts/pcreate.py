@@ -80,6 +80,8 @@ https://github.com/Pylons/?q=cookiecutter
                              'is the name of an already existing / importable '
                              'package.')
     parser.add_argument('output_directory',
+                        nargs = '?',
+                        default = None,
                         help='The directory where the project will be '
                              'created.')
 
