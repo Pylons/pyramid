@@ -4,8 +4,7 @@ import inspect
 from pyramid.compat import (
     bytes_,
     getargspec,
-    is_nonstr_iter,
-    string_types,
+    is_nonstr_iter
     )
 
 from pyramid.compat import im_func
