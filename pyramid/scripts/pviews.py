@@ -28,7 +28,7 @@ class PViewsCommand(object):
     stdout = sys.stdout
 
     parser = argparse.ArgumentParser(
-        usage="%(prog)s config_uri url",
+        prog="pviews",
         description=textwrap.dedent(description)
         )
 

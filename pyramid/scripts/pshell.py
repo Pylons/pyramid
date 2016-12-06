@@ -45,7 +45,7 @@ class PShellCommand(object):
     pkg_resources = pkg_resources  # for testing
 
     parser = argparse.ArgumentParser(
-        usage="%(prog)s config_uri",
+        prog="pshell",
         description=textwrap.dedent(description)
         )
     parser.add_argument('-p', '--python-shell',

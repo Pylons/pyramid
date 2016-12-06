@@ -28,7 +28,7 @@ class PTweensCommand(object):
 
     """
     parser = argparse.ArgumentParser(
-        usage="%(prog)s config_uri",
+        prog="ptweens",
         description=textwrap.dedent(description),
         )
 
