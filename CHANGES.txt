@@ -39,6 +39,9 @@ Backward Incompatibilities
   (e.g. ``request.registry.settings.foo``). This was deprecated in Pyramid 1.2.
   See https://github.com/Pylons/pyramid/pull/2823
 
+- Scaffolds, documentation and tutorials now use ``listen`` option instead
+  of ``host`` and ``port`` to configure Waitress server.
+
 Features
 --------
 
