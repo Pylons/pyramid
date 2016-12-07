@@ -295,15 +295,16 @@ Here's sample output from a run of ``pserve`` on UNIX:
 Access is restricted such that only a browser running on the same machine as
 Pyramid will be able to access your Pyramid application.  However, if you want
 to open access to other machines on the same network, then edit the
-``development.ini`` file, and replace the ``listen`` value in the
-``[server:main]`` section, changing it from ``127.0.0.1:6543`` to ``0.0.0.0:6543``.  For
+``development.ini`` file, and replace the ``host`` value in the
+``[server:main]`` section, changing it from ``127.0.0.1`` to ``0.0.0.0``.  For
 example:
 
 .. code-block:: ini
 
    [server:main]
    use = egg:waitress#main
-   listen = 0.0.0.0:6543
+   host = 0.0.0.0
+   port = 6543
 
 Now when you use ``pserve`` to start the application, it will respond to
 requests on *all* IP addresses possessed by your system, not just requests to
@@ -319,8 +320,8 @@ browser by visiting ``http://192.168.1.50:6543/``.
 
 You can change the port on which the server runs on by changing the same
 portion of the ``development.ini`` file.  For example, you can change the
-``listen = 127.0.0.1:6543`` line in the ``development.ini`` file's ``[server:main]``
-section to ``listen = 127:0.0.1:8080`` to run the server on port 8080 instead of port 6543.
+``port = 6543`` line in the ``development.ini`` file's ``[server:main]``
+section to ``port = 8080`` to run the server on port 8080 instead of port 6543.
 
 You can shut down a server started this way by pressing ``Ctrl-C`` (or
 ``Ctrl-Break`` on Windows).
