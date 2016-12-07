@@ -43,7 +43,7 @@ Add dependencies
 ~~~~~~~~~~~~~~~~
 
 Just like in :ref:`wiki_defining_views` we need a new dependency.
-We need to add the ``bcrypt`` package, to our tutorial package's
+We need to add the ``bcrypt`` [1]_ package, to our tutorial package's
 ``setup.py`` file by assigning this dependency to the ``requires`` parameter
 in the ``setup()`` function.
 
@@ -81,15 +81,15 @@ request)`` returns ``None``.  We will use ``groupfinder()`` as an
 :term:`authentication policy` "callback" that will provide the
 :term:`principal` or principals for a user.
 
-There are two helper methods that will help us later when loging-in users.
+There are two helper methods that will help us later to authenticate users.
 The first is ``hash_password`` which takes a raw password and transforms it using
-bcrypt into an irreversible representation, a process known as "hashing". The
+bcrypt_ into an irreversible representation, a process known as "hashing". The
 second method, ``check_password``, will allow us to compare the hashed value of the
 submitted password against the hashed value of the password stored in the user's
 record. If the two hashed values match, then the submitted
 password is valid, and we can authenticate the user.
 
-We hash passwords so that it is impossible to decrypt them and use them to
+We hash passwords so that it is impossible to decrypt and use them to
 authenticate in the application. If we stored passwords foolishly in clear text,
 then anyone with access to the database could retrieve any password to authenticate
 as any user.
@@ -403,3 +403,11 @@ following URLs, checking that the result is as expected:
   the login form with the ``editor`` credentials), we'll see a Logout link in
   the upper right hand corner.  When we click it, we're logged out, and
   redirected back to the front page.
+
+
+.. _bcrypt: https://pypi.python.org/pypi/bcrypt
+
+.. [1] We are using the bcrypt_ package from PyPI to hash our passwords
+       securely. There are other one-way hash algorithms for passwords if
+       bcrypt is an issue on your system. Just make sure that it's an
+       algorithm approved for storing passwords versus a generic one-way hash.
