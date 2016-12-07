@@ -23,6 +23,10 @@ TranslationString = TranslationString  # PyFlakes
 TranslationStringFactory = TranslationStringFactory  # PyFlakes
 
 
+# Germanic plural
+_DEFAULT_PLURAL = lambda n: int(n != 1)
+
+
 class Localizer(object):
     """
     An object providing translation and pluralizations related to
@@ -233,7 +237,7 @@ class Translations(gettext.GNUTranslations, object):
         # GNUTranslations._parse (called as a side effect if fileobj is
         # passed to GNUTranslations.__init__) with a "real" self.plural for
         # this domain; see https://github.com/Pylons/pyramid/issues/235
-        self.plural = lambda n: int(n != 1) 
+        self.plural = _DEFAULT_PLURAL
         gettext.GNUTranslations.__init__(self, fp=fileobj)
         self.files = list(filter(None, [getattr(fileobj, 'name', None)]))
         self.domain = domain
@@ -286,6 +290,8 @@ class Translations(gettext.GNUTranslations, object):
         """
         domain = getattr(translations, 'domain', self.DEFAULT_DOMAIN)
         if merge and domain == self.domain:
+            if self.plural == _DEFAULT_PLURAL:
+                self.plural = translations.plural
             return self.merge(translations)
 
         existing = self._domains.get(domain)
@@ -294,6 +300,9 @@ class Translations(gettext.GNUTranslations, object):
         else:
             translations.add_fallback(self)
             self._domains[domain] = translations
+
+        if self.plural == _DEFAULT_PLURAL:
+            self.plural = translations.plural
 
         return self
 
