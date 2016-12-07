@@ -16,7 +16,8 @@ sqlalchemy.url = sqlite:///%(here)s/{{project}}.sqlite
 
 [server:main]
 use = egg:waitress#main
-listen = 0.0.0.0:6543
+host = 0.0.0.0
+port = 6543
 
 ###
 # logging configuration
