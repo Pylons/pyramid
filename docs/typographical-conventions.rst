@@ -28,32 +28,6 @@ A glossary defines terms used throughout the documentation. References to glossa
 Note it is hyperlinked, and when clicked it will take the user to the term in the Glossary and highlight the term.
 
 
-.. _typographical-conventions-headings:
-
-Headings
---------
-
-Sections, sub-sections, and sub-sub-sections within a web page or chapter are denoted with headings at various levels. The immediately preceding heading "Headings" is a section heading. Sub-section and sub-sub-section headings are shown as follows.
-
-Heading Level 2
-^^^^^^^^^^^^^^^
-
-sub-section
-
-Heading Level 3
-"""""""""""""""
-
-sub-sub-section
-
-
-.. _typographical-conventions-paragraphs:
-
-Paragraphs
-----------
-
-A paragraph of text looks exactly like this paragraph.
-
-
 .. _typographical-conventions-links:
 
 Links
@@ -202,53 +176,6 @@ Inline code is displayed as follows, where the inline code is 'pip install -e ".
 Install requirements for building documentation: ``pip install -e ".[docs]"``
 
 
-.. _typographical-conventions-lists:
-
-Lists
------
-
-Bulleted lists display as follows.
-
-* This is an item in a bulleted list.
-* This is another item in a bulleted list.
-
-Numbered lists display as follows.
-
-#. This is an item in a numbered list.
-#. This is another item in a numbered list.
-
-Nested lists display as follows.
-
-#. This is a list item in the parent list.
-#. This is another list item in the parent list.
-
-  #. This is a list item in the child list.
-  #. This is another list item in the child list.
-
-#. This is one more list item in the parent list.
-
-
-.. _typographical-conventions-tables:
-
-Tables
-------
-
-Tables display as follows.
-
-=====  =====
-col 1  col 2
-=====  =====
-1      Second column of row 1.
-2      Second column of row 2.
-       Second line of paragraph.
-3      * Second column of row 3.
-
-       * Second item in bullet
-         list (row 3, column 2).
-\      Row 4; column 1 will be empty.
-=====  =====
-
-
 .. _typographical-conventions-feature-versioning:
 
 Feature versioning
@@ -348,22 +275,6 @@ Todo items designated tasks that require further work.
 .. todo::
 
     This is a todo item.
-
-
-.. _typographical-conventions-italics:
-
-Italics
--------
-
-This *word* is italicized.
-
-
-.. _typographical-conventions-strong:
-
-Strong
-------
-
-This **word** is in bold text.
 
 
 .. _typographical-conventions-cross-references:
