@@ -326,8 +326,8 @@ class PRoutesCommand(object):
             self.out('requires a config file argument')
             return 2
 
-        config_uri = self.args[0]
-        env = self.bootstrap[0](config_uri, options=parse_vars(self.args[1:]))
+        config_uri = self.args.config_uri
+        env = self.bootstrap[0](config_uri, options=vars(self.args))
         registry = env['registry']
         mapper = self._get_mapper(registry)
 
