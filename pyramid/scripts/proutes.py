@@ -322,7 +322,7 @@ class PRoutesCommand(object):
         return config.get_routes_mapper()
 
     def run(self, quiet=False):
-        if not self.args:
+        if not self.args.config_uri:
             self.out('requires a config file argument')
             return 2
 
