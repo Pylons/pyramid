@@ -18,6 +18,7 @@ requires = [
     'ZODB3',
     'waitress',
     'docutils',
+    'bcrypt',
     ]
 
 tests_require = [
