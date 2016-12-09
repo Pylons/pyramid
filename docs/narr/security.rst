@@ -787,7 +787,7 @@ a :term:`session factory` as described in
 a cookie-based implementation :class:`pyramid.csrf.CookieCSRF` which gives
 some additional flexibility as it does not require a session for each user.
 You can also define your own implementation of
-:class:`pyramid.interfaces.ICSRFPolicy` and register it with the
+:class:`pyramid.interfaces.ICSRFStoragePolicy` and register it with the
 :meth:`pyramid.config.Configurator.set_default_csrf_options` directive.
 
 For example:

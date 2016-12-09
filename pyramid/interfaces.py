@@ -982,7 +982,7 @@ class ISession(IDict):
         """
 
 
-class ICSRFPolicy(Interface):
+class ICSRFStoragePolicy(Interface):
     """ An object that offers the ability to verify CSRF tokens and generate
     new ones"""
 

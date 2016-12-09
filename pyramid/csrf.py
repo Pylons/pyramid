@@ -11,7 +11,7 @@ from pyramid.exceptions import (
     BadCSRFOrigin,
     BadCSRFToken,
 )
-from pyramid.interfaces import ICSRFPolicy
+from pyramid.interfaces import ICSRFStoragePolicy
 from pyramid.settings import aslist
 from pyramid.util import (
     is_same_domain,
@@ -19,7 +19,7 @@ from pyramid.util import (
 )
 
 
-@implementer(ICSRFPolicy)
+@implementer(ICSRFStoragePolicy)
 class SessionCSRF(object):
     """ The default CSRF implementation, which mimics the behavior from older
     versions of Pyramid. The ``new_csrf_token`` and ``get_csrf_token`` methods
@@ -48,7 +48,7 @@ class SessionCSRF(object):
             bytes_(supplied_token, 'ascii'),
         )
 
-@implementer(ICSRFPolicy)
+@implementer(ICSRFStoragePolicy)
 class CookieCSRF(object):
     """ An alternative CSRF implementation that stores its information in
     unauthenticated cookies, known as the 'Double Submit Cookie' method in the
@@ -108,7 +108,7 @@ def csrf_token_template_global(event):
     except AttributeError:
         return
     else:
-        csrf = registry.getUtility(ICSRFPolicy)
+        csrf = registry.getUtility(ICSRFStoragePolicy)
         event['get_csrf_token'] = partial(csrf.get_csrf_token, request)
 
 
@@ -120,7 +120,7 @@ def get_csrf_token(request):
     .. versionadded :: 1.8a1
     """
     registry = request.registry
-    csrf = registry.getUtility(ICSRFPolicy)
+    csrf = registry.getUtility(ICSRFStoragePolicy)
     return csrf.get_csrf_token(request)
 
 
@@ -132,7 +132,7 @@ def new_csrf_token(request):
     .. versionadded :: 1.8a1
     """
     registry = request.registry
-    csrf = registry.getUtility(ICSRFPolicy)
+    csrf = registry.getUtility(ICSRFStoragePolicy)
     return csrf.new_csrf_token(request)
 
 
@@ -141,7 +141,7 @@ def check_csrf_token(request,
                      header='X-CSRF-Token',
                      raises=True):
     """ Check the CSRF token returned by the
-    :class:`pyramid.interfaces.ICSRFPolicy` implementation against the value in
+    :class:`pyramid.interfaces.ICSRFStoragePolicy` implementation against the value in
     ``request.POST.get(token)`` (if a POST request) or
     ``request.headers.get(header)``. If a ``token`` keyword is not supplied to
     this function, the string ``csrf_token`` will be used to look up the token
@@ -151,7 +151,7 @@ def check_csrf_token(request,
 
     If the value supplied by post or by header doesn't match the value supplied
     by ``policy.get_csrf_token()`` (where ``policy`` is an implementation of
-    :class:`pyramid.interfaces.ICSRFPolicy`), and ``raises`` is ``True``, this
+    :class:`pyramid.interfaces.ICSRFStoragePolicy`), and ``raises`` is ``True``, this
     function will raise an :exc:`pyramid.exceptions.BadCSRFToken` exception. If
     the values differ and ``raises`` is ``False``, this function will return
     ``False``.  If the CSRF check is successful, this function will return
@@ -184,7 +184,7 @@ def check_csrf_token(request,
     if supplied_token == "" and token is not None:
         supplied_token = request.POST.get(token, "")
 
-    policy = request.registry.getUtility(ICSRFPolicy)
+    policy = request.registry.getUtility(ICSRFStoragePolicy)
     if not policy.check_csrf_token(request, supplied_token):
         if raises:
             raise BadCSRFToken('check_csrf_token(): Invalid token')

@@ -117,13 +117,13 @@ class TestSessionCSRF(unittest.TestCase):
 
     def test_register_session_csrf_policy(self):
         from pyramid.csrf import SessionCSRF
-        from pyramid.interfaces import ICSRFPolicy
+        from pyramid.interfaces import ICSRFStoragePolicy
 
         config = Configurator()
         config.set_default_csrf_options(implementation=self._makeOne())
         config.commit()
 
-        policy = config.registry.queryUtility(ICSRFPolicy)
+        policy = config.registry.queryUtility(ICSRFStoragePolicy)
 
         self.assertTrue(isinstance(policy, SessionCSRF))
 
@@ -163,13 +163,13 @@ class TestCookieCSRF(unittest.TestCase):
 
     def test_register_cookie_csrf_policy(self):
         from pyramid.csrf import CookieCSRF
-        from pyramid.interfaces import ICSRFPolicy
+        from pyramid.interfaces import ICSRFStoragePolicy
 
         config = Configurator()
         config.set_default_csrf_options(implementation=self._makeOne())
         config.commit()
 
-        policy = config.registry.queryUtility(ICSRFPolicy)
+        policy = config.registry.queryUtility(ICSRFStoragePolicy)
 
         self.assertTrue(isinstance(policy, CookieCSRF))
 

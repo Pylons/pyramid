@@ -644,7 +644,7 @@ class ViewsConfiguratorMixin(object):
           If CSRF checking is performed, the checked value will be the value of
           ``request.params[check_name]``. This value will be compared against
           the value of ``policy.get_csrf_token()`` (where ``policy`` is an
-          implementation of :meth:`pyramid.interfaces.ICSRFPolicy`), and the
+          implementation of :meth:`pyramid.interfaces.ICSRFStoragePolicy`), and the
           check will pass if these two values are the same. If the check
           passes, the associated view will be permitted to execute. If the
           check fails, the associated view will not be permitted to execute.
