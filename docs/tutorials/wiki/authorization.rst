@@ -18,7 +18,7 @@ require permission, instead of a default "403 Forbidden" page.
 
 We will implement the access control with the following steps:
 
-* Add password hashing dependencies
+* Add password hashing dependencies.
 * Add users and groups (``security.py``, a new module).
 * Add an :term:`ACL` (``models.py``).
 * Add an :term:`authentication policy` and an :term:`authorization policy`
@@ -39,13 +39,11 @@ Then we will add the login and logout feature:
 Access control
 --------------
 
+
 Add dependencies
 ~~~~~~~~~~~~~~~~
 
-Just like in :ref:`wiki_defining_views` we need a new dependency.
-We need to add the ``bcrypt`` [1]_ package, to our tutorial package's
-``setup.py`` file by assigning this dependency to the ``requires`` parameter
-in the ``setup()`` function.
+Just like in :ref:`wiki_defining_views`, we need a new dependency. We need to add the `bcrypt <https://pypi.python.org/pypi/bcrypt>`_ package, to our tutorial package's ``setup.py`` file by assigning this dependency to the ``requires`` parameter in the ``setup()`` function.
 
 Open ``setup.py`` and edit it to look like the following:
 
@@ -58,11 +56,15 @@ Only the highlighted line needs to be added.
 
 Do not forget to run ``pip install -e .`` just like in :ref:`wiki-running-pip-install`.
 
+.. note::
+
+   We are using the ``bcrypt`` package from PyPI to hash our passwords securely. There are other one-way hash algorithms for passwords if bcrypt is an issue on your system. Just make sure that it's an algorithm approved for storing passwords versus a generic one-way hash.
+
+
 Add users and groups
 ~~~~~~~~~~~~~~~~~~~~
 
-Create a new ``tutorial/security.py`` module with the
-following content:
+Create a new ``tutorial/security.py`` module with the following content:
 
 .. literalinclude:: src/authorization/tutorial/security.py
    :linenos:
@@ -83,7 +85,7 @@ request)`` returns ``None``.  We will use ``groupfinder()`` as an
 
 There are two helper methods that will help us later to authenticate users.
 The first is ``hash_password`` which takes a raw password and transforms it using
-bcrypt_ into an irreversible representation, a process known as "hashing". The
+bcrypt into an irreversible representation, a process known as "hashing". The
 second method, ``check_password``, will allow us to compare the hashed value of the
 submitted password against the hashed value of the password stored in the user's
 record. If the two hashed values match, then the submitted
@@ -403,11 +405,3 @@ following URLs, checking that the result is as expected:
   the login form with the ``editor`` credentials), we'll see a Logout link in
   the upper right hand corner.  When we click it, we're logged out, and
   redirected back to the front page.
-
-
-.. _bcrypt: https://pypi.python.org/pypi/bcrypt
-
-.. [1] We are using the bcrypt_ package from PyPI to hash our passwords
-       securely. There are other one-way hash algorithms for passwords if
-       bcrypt is an issue on your system. Just make sure that it's an
-       algorithm approved for storing passwords versus a generic one-way hash.
