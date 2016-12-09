@@ -317,8 +317,8 @@ the case, if you use a browser running on the same system as Pyramid, it will
 be able to access the application via ``http://127.0.0.1:6543/`` as well as via
 ``http://192.168.1.50:6543/``. However, *other people* on other computers on
 the same network will also be able to visit your Pyramid application in their
-browser by visiting ``http://192.168.1.50:6543/``. Same holds true if you use
-ipv6. ``[::]`` means the same as ``0.0.0.0`` but for ipv6 protocol.
+browser by visiting ``http://192.168.1.50:6543/``. The same holds true if you use
+IPv6. ``[::]`` means the same as ``0.0.0.0`` but for IPv6 protocol.
 
 You can change the port on which the server runs on by changing the same
 portion of the ``development.ini`` file.  For example, you can change the
