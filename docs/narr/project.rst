@@ -290,20 +290,22 @@ Here's sample output from a run of ``pserve`` on UNIX:
 
    $ $VENV/bin/pserve development.ini
    Starting server in PID 16208.
-   serving on http://127.0.0.1:6543
+   Serving on http://127.0.0.1:6543
+   Serving on http://[::1]:6543
+
 
 Access is restricted such that only a browser running on the same machine as
 Pyramid will be able to access your Pyramid application.  However, if you want
 to open access to other machines on the same network, then edit the
 ``development.ini`` file, and replace the ``listen`` value in the
-``[server:main]`` section, changing it from ``127.0.0.1:6543`` to ``0.0.0.0:6543``.  For
-example:
+``[server:main]`` section, changing it from ``127.0.0.1:6543 [::1]:6543`` to ``*:6543``
+(this is equivalent to ``0.0.0.0:6543 [::]:6543``).  For example:
 
 .. code-block:: ini
 
    [server:main]
    use = egg:waitress#main
-   listen = 0.0.0.0:6543
+   listen = *:6543
 
 Now when you use ``pserve`` to start the application, it will respond to
 requests on *all* IP addresses possessed by your system, not just requests to
@@ -315,12 +317,13 @@ the case, if you use a browser running on the same system as Pyramid, it will
 be able to access the application via ``http://127.0.0.1:6543/`` as well as via
 ``http://192.168.1.50:6543/``. However, *other people* on other computers on
 the same network will also be able to visit your Pyramid application in their
-browser by visiting ``http://192.168.1.50:6543/``.
+browser by visiting ``http://192.168.1.50:6543/``. Same holds true if you use
+ipv6. ``[::]`` means the same as ``0.0.0.0`` but for ipv6 protocol.
 
 You can change the port on which the server runs on by changing the same
 portion of the ``development.ini`` file.  For example, you can change the
-``listen = 127.0.0.1:6543`` line in the ``development.ini`` file's ``[server:main]``
-section to ``listen = 127:0.0.1:8080`` to run the server on port 8080 instead of port 6543.
+``listen = 127.0.0.1:6543 [::1]:6543`` line in the ``development.ini`` file's ``[server:main]``
+section to ``listen = 127:0.0.1:8080 [::1]:8080`` to run the server on port 8080 instead of port 6543.
 
 You can shut down a server started this way by pressing ``Ctrl-C`` (or
 ``Ctrl-Break`` on Windows).
