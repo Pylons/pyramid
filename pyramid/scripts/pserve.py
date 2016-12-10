@@ -100,8 +100,18 @@ class PServeCommand(object):
         help="Suppress verbose output")
     parser.add_argument(
         'config_uri',
+        nargs='?',
+        default=None,
         help='The URI to the configuration file.',
         )
+    parser.add_argument(
+        'config_args',
+        nargs='*',
+        default=(),
+        help='Arbitrary options to override those in the [app:main] section '
+             'of the configuration file.',
+    )
+
 
     ConfigParser = configparser.ConfigParser  # testing
     loadapp = staticmethod(loadapp)  # testing
@@ -120,7 +130,7 @@ class PServeCommand(object):
             print(msg)
 
     def get_options(self):
-        restvars = self.args[1:]
+        restvars = self.args.config_args
         return parse_vars(restvars)
 
     def pserve_file_config(self, filename, global_conf=None):
@@ -150,10 +160,10 @@ class PServeCommand(object):
             self.watch_files.append(os.path.abspath(file))
 
     def run(self):  # pragma: no cover
-        if not self.args:
+        if not self.args.config_uri:
             self.out('You must give a config file')
             return 2
-        app_spec = self.args[0]
+        app_spec = self.args.config_uri
 
         vars = self.get_options()
         app_name = self.args.app_name
