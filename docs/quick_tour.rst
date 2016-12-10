@@ -26,7 +26,7 @@ To save a little bit of typing and to be certain that we use the modules,
 scripts, and packages installed in our virtual environment, we'll set an
 environment variable, too.
 
-As an example, for Python 3.5+ on Linux:
+As an example, for Python 3.6+ on Linux:
 
 .. parsed-literal::
 
@@ -729,7 +729,7 @@ This yields the following output.
     collected 1 items
 
     hello_world/tests.py .
-    ------------- coverage: platform darwin, python 3.5.0-final-0 -------------
+    ------------- coverage: platform darwin, python 3.6.0-final-0 -------------
     Name                       Stmts   Miss  Cover   Missing
     --------------------------------------------------------
     hello_world/__init__.py       11      8    27%   11-23

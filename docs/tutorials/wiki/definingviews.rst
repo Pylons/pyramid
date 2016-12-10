@@ -52,6 +52,7 @@ Open ``setup.py`` and edit it to look like the following:
 
 Only the highlighted line needs to be added.
 
+.. _wiki-running-pip-install:
 
 Running ``pip install -e .``
 ============================

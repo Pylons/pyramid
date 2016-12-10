@@ -42,6 +42,9 @@ Backward Incompatibilities
 Features
 --------
 
+- Python 3.6 compatibility.
+  https://github.com/Pylons/pyramid/issues/2835
+
 - pcreate learned about --package-name to allow you to create a new project in
   an existing folder with a different package name than the project name. See
   https://github.com/Pylons/pyramid/pull/2783
@@ -120,6 +123,12 @@ Features
   ``watch_files`` key that can configure ``pserve --reload`` to monitor custom
   file paths. See https://github.com/Pylons/pyramid/pull/2827
 
+- Allow streaming responses to be made from subclasses of
+  ``pyramid.httpexceptions.HTTPException``. Previously the response would
+  be unrolled while testing for a body, making it impossible to stream
+  a response.
+  See https://github.com/Pylons/pyramid/pull/2863
+
 Bug Fixes
 ---------
 
@@ -155,6 +164,9 @@ Deprecations
 
 Documentation Changes
 ---------------------
+- Replace Typographical Conventions with an enhanced Style Guide.
+  https://github.com/Pylons/pyramid/pull/2838
+
 - Add pyramid_nacl_session to session factories.
   See https://github.com/Pylons/pyramid/issues/2791
 
