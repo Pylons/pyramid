@@ -119,6 +119,12 @@ Features
 
   See https://github.com/Pylons/pyramid/pull/2805
 
+- Allow streaming responses to be made from subclasses of
+  ``pyramid.httpexceptions.HTTPException``. Previously the response would
+  be unrolled while testing for a body, making it impossible to stream
+  a response.
+  See https://github.com/Pylons/pyramid/pull/2863
+
 Bug Fixes
 ---------
 
