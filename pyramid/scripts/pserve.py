@@ -129,7 +129,7 @@ class PServeCommand(object):
         if self.args.verbose > 0:
             print(msg)
 
-    def get_options(self):
+    def get_config_args(self):
         restvars = self.args.config_args
         return parse_vars(restvars)
 
@@ -165,7 +165,7 @@ class PServeCommand(object):
             return 2
         app_spec = self.args.config_uri
 
-        vars = self.get_options()
+        vars = self.get_config_args()
         app_name = self.args.app_name
 
         base = os.getcwd()
