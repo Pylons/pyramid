@@ -119,6 +119,10 @@ Features
 
   See https://github.com/Pylons/pyramid/pull/2805
 
+- A new ``[pserve]`` section is supported in your config files with a
+  ``watch_files`` key that can configure ``pserve --reload`` to monitor custom
+  file paths. See https://github.com/Pylons/pyramid/pull/2827
+
 - Allow streaming responses to be made from subclasses of
   ``pyramid.httpexceptions.HTTPException``. Previously the response would
   be unrolled while testing for a body, making it impossible to stream

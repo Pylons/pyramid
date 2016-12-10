@@ -1,9 +1,14 @@
+import os
 import unittest
+from pyramid.tests.test_scripts import dummy
+
+here = os.path.abspath(os.path.dirname(__file__))
 
 class TestPServeCommand(unittest.TestCase):
     def setUp(self):
         from pyramid.compat import NativeIO
         self.out_ = NativeIO()
+        self.config_factory = dummy.DummyConfigParserFactory()
 
     def out(self, msg):
         self.out_.write(msg)
@@ -11,7 +16,6 @@ class TestPServeCommand(unittest.TestCase):
     def _get_server(*args, **kwargs):
         def server(app):
             return ''
-
         return server
 
     def _getTargetClass(self):
@@ -23,6 +27,7 @@ class TestPServeCommand(unittest.TestCase):
         effargs.extend(args)
         cmd = self._getTargetClass()(effargs)
         cmd.out = self.out
+        cmd.ConfigParser = self.config_factory
         return cmd
 
     def test_run_no_args(self):
@@ -38,26 +43,38 @@ class TestPServeCommand(unittest.TestCase):
         self.assertEqual(result, {'a': '1', 'b': '2'})
 
     def test_parse_vars_good(self):
-        from pyramid.tests.test_scripts.dummy import DummyApp
-
         inst = self._makeOne('development.ini', 'a=1', 'b=2')
         inst.loadserver = self._get_server
 
-
-        app = DummyApp()
-
+        app = dummy.DummyApp()
         def get_app(*args, **kwargs):
             app.global_conf = kwargs.get('global_conf', None)
-
         inst.loadapp = get_app
-        inst.run()
 
+        inst.run()
         self.assertEqual(app.global_conf, {'a': '1', 'b': '2'})
 
     def test_parse_vars_bad(self):
         inst = self._makeOne('development.ini', 'a')
         inst.loadserver = self._get_server
         self.assertRaises(ValueError, inst.run)
+
+    def test_config_file_finds_watch_files(self):
+        inst = self._makeOne('development.ini')
+        self.config_factory.items = [(
+            'watch_files',
+            'foo\n/baz\npyramid.tests.test_scripts:*.py',
+        )]
+        inst.pserve_file_config('/base/path.ini', global_conf={'a': '1'})
+        self.assertEqual(self.config_factory.defaults, {
+            'a': '1',
+            'here': os.path.abspath('/base'),
+        })
+        self.assertEqual(inst.watch_files, [
+            os.path.abspath('/base/foo'),
+            os.path.abspath('/baz'),
+            os.path.abspath(os.path.join(here, '*.py')),
+        ])
 
 class Test_main(unittest.TestCase):
     def _callFUT(self, argv):
