@@ -107,9 +107,10 @@ class PServeCommand(object):
         'config_vars',
         nargs='*',
         default=(),
-        help='Arbitrary options to override those in the [app:main] section '
-             'of the configuration file.',
-    )
+        help="Variables required by the config file. For example, "
+             "`http_port=%%(http_port)s` would expect `http_port=8080` to be "
+             "passed here.",
+        )
 
 
     ConfigParser = configparser.ConfigParser  # testing
