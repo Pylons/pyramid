@@ -68,6 +68,14 @@ class PShellCommand(object):
                         nargs='?',
                         default=None,
                         help='The URI to the configuration file.')
+    parser.add_argument(
+        'config_vars',
+        nargs='*',
+        default=(),
+        help="Variables required by the config file. For example, "
+             "`http_port=%%(http_port)s` would expect `http_port=8080` to be "
+             "passed here.",
+        )
 
     ConfigParser = configparser.ConfigParser # testing
     default_runner = python_shell_runner # testing
@@ -120,7 +128,8 @@ class PShellCommand(object):
         self.pshell_file_config(config_file)
 
         # bootstrap the environ
-        env = self.bootstrap[0](config_uri, options=parse_vars(self.args[1:]))
+        env = self.bootstrap[0](config_uri,
+                                options=parse_vars(self.args.config_vars))
 
         # remove the closer from the env
         self.closer = env.pop('closer')
