@@ -249,9 +249,8 @@ class PRoutesCommand(object):
     stdout = sys.stdout
     ConfigParser = configparser.ConfigParser  # testing
     parser = argparse.ArgumentParser(
-        prog="proutes",
         description=textwrap.dedent(description)
-    )
+        )
     parser.add_argument('-g', '--glob',
                         action='store',
                         dest='glob',
