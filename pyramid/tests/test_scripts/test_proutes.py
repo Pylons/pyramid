@@ -20,7 +20,7 @@ class TestPRoutesCommand(unittest.TestCase):
     def _makeOne(self):
         cmd = self._getTargetClass()([])
         cmd.bootstrap = (dummy.DummyBootstrap(),)
-        cmd.args.config_uri = ('/foo/bar/myapp.ini#myapp',)
+        cmd.args.config_uri = '/foo/bar/myapp.ini#myapp'
 
         return cmd
 
@@ -53,8 +53,8 @@ class TestPRoutesCommand(unittest.TestCase):
     def test_bad_args(self):
         cmd = self._getTargetClass()([])
         cmd.bootstrap = (dummy.DummyBootstrap(),)
-        cmd.args.config_uri = ('/foo/bar/myapp.ini#myapp',)
-        cmd.args.config_args = ('a',)
+        cmd.args.config_uri = '/foo/bar/myapp.ini#myapp'
+        cmd.args.config_vars = ('a',)
         route = dummy.DummyRoute('a', '/a')
         mapper = dummy.DummyMapper(route)
         cmd._get_mapper = lambda *arg: mapper
