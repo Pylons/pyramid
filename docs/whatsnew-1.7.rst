@@ -126,7 +126,7 @@ Feature Additions
 
 - The :attr:`pyramid.tweens.EXCVIEW` tween will now re-raise the original
   exception if no exception view could be found to handle it. This allows
-  the exception to be handled upstream by another tween or middelware.
+  the exception to be handled upstream by another tween or middleware.
   See https://github.com/Pylons/pyramid/pull/2567
 
 Deprecations

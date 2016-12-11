@@ -1,4 +1,4 @@
-import optparse
+import argparse
 import sys
 import textwrap
 
@@ -13,7 +13,6 @@ def main(argv=sys.argv, quiet=False):
     return command.run()
 
 class PViewsCommand(object):
-    usage = '%prog config_uri url'
     description = """\
     Print, for a given URL, the views that might match. Underneath each
     potentially matching route, list the predicates required. Underneath
@@ -28,16 +27,21 @@ class PViewsCommand(object):
     """
     stdout = sys.stdout
 
-    parser = optparse.OptionParser(
-        usage,
+    parser = argparse.ArgumentParser(
+        prog="pviews",
         description=textwrap.dedent(description)
         )
+
+    parser.add_argument('config_uri',
+                        nargs='?',
+                        default=None,
+                        help='The URI to the configuration file.')
 
     bootstrap = (bootstrap,) # testing
 
     def __init__(self, argv, quiet=False):
         self.quiet = quiet
-        self.options, self.args = self.parser.parse_args(argv[1:])
+        self.args = self.parser.parse_args(argv[1:])
 
     def out(self, msg): # pragma: no cover
         if not self.quiet:

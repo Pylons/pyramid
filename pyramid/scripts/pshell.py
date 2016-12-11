@@ -1,5 +1,5 @@
 from code import interact
-import optparse
+import argparse
 import os
 import sys
 import textwrap
@@ -28,7 +28,6 @@ def python_shell_runner(env, help, interact=interact):
 
 
 class PShellCommand(object):
-    usage = '%prog config_uri'
     description = """\
     Open an interactive shell with a Pyramid app loaded.  This command
     accepts one positional argument named "config_uri" which specifies the
@@ -45,26 +44,30 @@ class PShellCommand(object):
     bootstrap = (bootstrap,)  # for testing
     pkg_resources = pkg_resources  # for testing
 
-    parser = optparse.OptionParser(
-        usage,
+    parser = argparse.ArgumentParser(
         description=textwrap.dedent(description)
         )
-    parser.add_option('-p', '--python-shell',
-                      action='store', type='string', dest='python_shell',
-                      default='',
-                      help=('Select the shell to use. A list of possible '
-                            'shells is available using the --list-shells '
-                            'option.'))
-    parser.add_option('-l', '--list-shells',
-                      dest='list',
-                      action='store_true',
-                      help='List all available shells.')
-    parser.add_option('--setup',
-                      dest='setup',
-                      help=("A callable that will be passed the environment "
-                            "before it is made available to the shell. This "
-                            "option will override the 'setup' key in the "
-                            "[pshell] ini section."))
+    parser.add_argument('-p', '--python-shell',
+                        action='store',
+                        dest='python_shell',
+                        default='',
+                        help=('Select the shell to use. A list of possible '
+                              'shells is available using the --list-shells '
+                              'option.'))
+    parser.add_argument('-l', '--list-shells',
+                        dest='list',
+                        action='store_true',
+                        help='List all available shells.')
+    parser.add_argument('--setup',
+                        dest='setup',
+                        help=("A callable that will be passed the environment "
+                              "before it is made available to the shell. This "
+                              "option will override the 'setup' key in the "
+                              "[pshell] ini section."))
+    parser.add_argument('config_uri',
+                        nargs='?',
+                        default=None,
+                        help='The URI to the configuration file.')
 
     ConfigParser = configparser.ConfigParser # testing
     default_runner = python_shell_runner # testing
@@ -77,7 +80,7 @@ class PShellCommand(object):
 
     def __init__(self, argv, quiet=False):
         self.quiet = quiet
-        self.options, self.args = self.parser.parse_args(argv[1:])
+        self.args = self.parser.parse_args(argv[1:])
 
     def pshell_file_config(self, filename):
         config = self.ConfigParser()
@@ -106,12 +109,12 @@ class PShellCommand(object):
             print(msg)
 
     def run(self, shell=None):
-        if self.options.list:
+        if self.args.list:
             return self.show_shells()
-        if not self.args:
+        if not self.args.config_uri:
             self.out('Requires a config file argument')
             return 2
-        config_uri = self.args[0]
+        config_uri = self.args.config_uri
         config_file = config_uri.split('#', 1)[0]
         setup_logging(config_file)
         self.pshell_file_config(config_file)
@@ -132,8 +135,8 @@ class PShellCommand(object):
             'Default root factory used to create `root`.')
 
         # override use_script with command-line options
-        if self.options.setup:
-            self.setup = self.options.setup
+        if self.args.setup:
+            self.setup = self.args.setup
 
         if self.setup:
             # store the env before muddling it with the script
@@ -214,7 +217,7 @@ class PShellCommand(object):
         shells = self.find_all_shells()
 
         shell = None
-        user_shell = self.options.python_shell.lower()
+        user_shell = self.args.python_shell.lower()
 
         if not user_shell:
             preferred_shells = self.preferred_shells

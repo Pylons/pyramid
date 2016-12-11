@@ -1,7 +1,7 @@
 import sys
 import platform
 import pkg_resources
-import optparse
+import argparse
 from operator import itemgetter
 
 def out(*args): # pragma: no cover
@@ -10,12 +10,15 @@ def out(*args): # pragma: no cover
         sys.stdout.write(' ')
     sys.stdout.write('\n')
 
+def get_parser():
+    parser = argparse.ArgumentParser(
+        description="Show Python distribution versions and locations in use")
+    return parser
+
 def main(argv=sys.argv, pkg_resources=pkg_resources, platform=platform.platform,
          out=out):
     # all args except argv are for unit testing purposes only
-    description = "Show Python distribution versions and locations in use"
-    usage = "usage: %prog"
-    parser = optparse.OptionParser(usage, description=description)
+    parser = get_parser()
     parser.parse_args(argv[1:])
     packages = []
     for distribution in pkg_resources.working_set:

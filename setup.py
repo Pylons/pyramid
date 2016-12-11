@@ -41,7 +41,7 @@ except IOError:
 
 install_requires = [
     'setuptools',
-    'WebOb >= 1.3.1', # request.domain and CookieProfile
+    'WebOb >= 1.7.0rc2', # Response.has_body
     'repoze.lru >= 0.4', # py3 compat
     'zope.interface >= 3.8.0',  # has zope.interface.registry
     'zope.deprecation >= 3.5.0', # py3 compat
@@ -64,7 +64,7 @@ docs_extras = [
     'repoze.sphinx.autointerface',
     'pylons_sphinx_latesturl',
     'pylons-sphinx-themes',
-    'sphinxcontrib-programoutput',
+    'sphinxcontrib-autoprogram',
     ]
 
 testing_extras = tests_require + [

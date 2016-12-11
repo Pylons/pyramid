@@ -246,7 +246,7 @@ ${body}''')
                 'title': self.title}
 
     def prepare(self, environ):
-        if not self.body and not self.empty_body:
+        if not self.has_body and not self.empty_body:
             html_comment = ''
             comment = self.comment or ''
             accept_value = environ.get('HTTP_ACCEPT', '')
