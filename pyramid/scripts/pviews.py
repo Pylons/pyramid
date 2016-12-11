@@ -28,7 +28,6 @@ class PViewsCommand(object):
     stdout = sys.stdout
 
     parser = argparse.ArgumentParser(
-        prog="pviews",
         description=textwrap.dedent(description)
         )
 
