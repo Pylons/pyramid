@@ -38,8 +38,8 @@ class TestPServeCommand(unittest.TestCase):
 
     def test_config_args_no_command(self):
         inst = self._makeOne()
-        inst.args.config_args = ['a=1', 'b=2']
-        result = inst.get_config_args()
+        inst.args.config_args = ['foo', 'a=1', 'b=2']
+        result = inst.get_config_vars()
         self.assertEqual(result, {'a': '1', 'b': '2'})
 
     def test_parse_vars_good(self):
