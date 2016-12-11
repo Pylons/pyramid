@@ -36,9 +36,9 @@ class TestPServeCommand(unittest.TestCase):
         self.assertEqual(result, 2)
         self.assertEqual(self.out_.getvalue(), 'You must give a config file')
 
-    def test_config_args_no_command(self):
+    def test_config_vars_no_command(self):
         inst = self._makeOne()
-        inst.args.config_args = ['foo', 'a=1', 'b=2']
+        inst.args.config_vars = ['foo', 'a=1', 'b=2']
         result = inst.get_config_vars()
         self.assertEqual(result, {'a': '1', 'b': '2'})
 
