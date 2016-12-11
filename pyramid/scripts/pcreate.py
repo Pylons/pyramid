@@ -98,7 +98,7 @@ https://github.com/Pylons/?q=cookiecutter
         self._warn_pcreate_deprecated()
         if self.args.list:
             return self.show_scaffolds()
-        if not self.args.scaffold_name and not self.args:
+        if not self.args.scaffold_name and not self.args.output_directory:
             if not self.quiet: # pragma: no cover
                 self.parser.print_help()
                 self.out('')
