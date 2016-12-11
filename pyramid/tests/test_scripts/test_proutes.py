@@ -38,7 +38,7 @@ class TestPRoutesCommand(unittest.TestCase):
     def test_good_args(self):
         cmd = self._getTargetClass()([])
         cmd.bootstrap = (dummy.DummyBootstrap(),)
-        cmd.args.config_uri = ('/foo/bar/myapp.ini#myapp',)
+        cmd.args.config_uri = '/foo/bar/myapp.ini#myapp'
         cmd.args.config_args = ('a=1',)
         route = dummy.DummyRoute('a', '/a')
         mapper = dummy.DummyMapper(route)
