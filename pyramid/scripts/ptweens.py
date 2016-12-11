@@ -36,6 +36,14 @@ class PTweensCommand(object):
                         default=None,
                         help='The URI to the configuration file.')
 
+    parser.add_argument(
+        'config_vars',
+        nargs='*',
+        default=(),
+        help='Arbitrary options to override those in the [app:main] section '
+             'of the configuration file.',
+        )
+
     stdout = sys.stdout
     bootstrap = (bootstrap,) # testing
 
@@ -62,11 +70,11 @@ class PTweensCommand(object):
         self.out(fmt % ('-', MAIN))
 
     def run(self):
-        if not self.args:
+        if not self.args.config_uri:
             self.out('Requires a config file argument')
             return 2
-        config_uri = self.args[0]
-        env = self.bootstrap[0](config_uri, options=parse_vars(self.args[1:]))
+        config_uri = self.args.config_uri
+        env = self.bootstrap[0](config_uri, options=parse_vars(self.args.config_vars))
         registry = env['registry']
         tweens = self._get_tweens(registry)
         if tweens is not None:
