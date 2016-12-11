@@ -36,6 +36,20 @@ class PViewsCommand(object):
                         default=None,
                         help='The URI to the configuration file.')
 
+    parser.add_argument('url',
+                        nargs='?',
+                        default=None,
+                        help='The path info portion of the URL.')
+    parser.add_argument(
+        'config_vars',
+        nargs='*',
+        default=(),
+        help="Variables required by the config file. For example, "
+             "`http_port=%%(http_port)s` would expect `http_port=8080` to be "
+             "passed here.",
+        )
+
+
     bootstrap = (bootstrap,) # testing
 
     def __init__(self, argv, quiet=False):
@@ -233,16 +247,16 @@ class PViewsCommand(object):
                 self.out("%sview predicates (%s)" % (indent, predicate_text))
 
     def run(self):
-        if len(self.args) < 2:
+        if not self.args.config_uri and not self.args.url:
             self.out('Command requires a config file arg and a url arg')
             return 2
-        config_uri = self.args[0]
-        url = self.args[1]
+        config_uri = self.args.config_uri
+        url = self.args.url
 
         if not url.startswith('/'):
             url = '/%s' % url
         request = Request.blank(url)
-        env = self.bootstrap[0](config_uri, options=parse_vars(self.args[2:]),
+        env = self.bootstrap[0](config_uri, options=parse_vars(self.args.config_vars),
                                 request=request)
         view = self._find_view(request)
         self.out('')

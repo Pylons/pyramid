@@ -9,7 +9,7 @@ class TestPViewsCommand(unittest.TestCase):
     def _makeOne(self, registry=None):
         cmd = self._getTargetClass()([])
         cmd.bootstrap = (dummy.DummyBootstrap(registry=registry),)
-        cmd.args = ('/foo/bar/myapp.ini#myapp',)
+        cmd.args.config_uri = '/foo/bar/myapp.ini#myapp'
         return cmd
 
     def _makeRequest(self, url, registry):
@@ -242,7 +242,8 @@ class TestPViewsCommand(unittest.TestCase):
         L = []
         command.out = L.append
         command._find_view = lambda arg1: None
-        command.args = ('/foo/bar/myapp.ini#myapp', '/a')
+        command.args.config_uri = '/foo/bar/myapp.ini#myapp'
+        command.args.url = '/a'
         result = command.run()
         self.assertEqual(result, 0)
         self.assertEqual(L[1], 'URL = /a')
@@ -255,7 +256,8 @@ class TestPViewsCommand(unittest.TestCase):
         L = []
         command.out = L.append
         command._find_view = lambda arg1: None
-        command.args = ('/foo/bar/myapp.ini#myapp', 'a')
+        command.args.config_uri = '/foo/bar/myapp.ini#myapp'
+        command.args.url = '/a'
         result = command.run()
         self.assertEqual(result, 0)
         self.assertEqual(L[1], 'URL = /a')
@@ -269,7 +271,8 @@ class TestPViewsCommand(unittest.TestCase):
         command.out = L.append
         view = dummy.DummyView(context='context', view_name='a')
         command._find_view = lambda arg1: view
-        command.args = ('/foo/bar/myapp.ini#myapp', '/a')
+        command.args.config_uri = '/foo/bar/myapp.ini#myapp'
+        command.args.url = '/a'
         result = command.run()
         self.assertEqual(result, 0)
         self.assertEqual(L[1], 'URL = /a')
@@ -287,7 +290,8 @@ class TestPViewsCommand(unittest.TestCase):
         def view(): pass
         view.__request_attrs__ = {'context': 'context', 'view_name': 'a'}
         command._find_view = lambda arg1: view
-        command.args = ('/foo/bar/myapp.ini#myapp', '/a')
+        command.args.config_uri = '/foo/bar/myapp.ini#myapp'
+        command.args.url = '/a'
         result = command.run()
         self.assertEqual(result, 0)
         self.assertEqual(L[1], 'URL = /a')
@@ -305,7 +309,8 @@ class TestPViewsCommand(unittest.TestCase):
         view = dummy.DummyView(context='context', view_name='a')
         view.__permission__ = 'test'
         command._find_view = lambda arg1: view
-        command.args = ('/foo/bar/myapp.ini#myapp', '/a')
+        command.args.config_uri = '/foo/bar/myapp.ini#myapp'
+        command.args.url = '/a'
         result = command.run()
         self.assertEqual(result, 0)
         self.assertEqual(L[1], 'URL = /a')
@@ -326,7 +331,8 @@ class TestPViewsCommand(unittest.TestCase):
         view = dummy.DummyView(context='context', view_name='a')
         view.__predicates__ = [predicate]
         command._find_view = lambda arg1: view
-        command.args = ('/foo/bar/myapp.ini#myapp', '/a')
+        command.args.config_uri = '/foo/bar/myapp.ini#myapp'
+        command.args.url = '/a'
         result = command.run()
         self.assertEqual(result, 0)
         self.assertEqual(L[1], 'URL = /a')
@@ -346,7 +352,8 @@ class TestPViewsCommand(unittest.TestCase):
         view = dummy.DummyView(context='context', view_name='a',
                          matched_route=route, subpath='')
         command._find_view = lambda arg1: view
-        command.args = ('/foo/bar/myapp.ini#myapp', '/a')
+        command.args.config_uri = '/foo/bar/myapp.ini#myapp'
+        command.args.url = '/a'
         result = command.run()
         self.assertEqual(result, 0)
         self.assertEqual(L[1], 'URL = /a')
@@ -374,7 +381,8 @@ class TestPViewsCommand(unittest.TestCase):
         multiview2 = dummy.DummyMultiView(multiview1, context='context',
                                     view_name='a')
         command._find_view = lambda arg1: multiview2
-        command.args = ('/foo/bar/myapp.ini#myapp', '/a')
+        command.args.config_uri = '/foo/bar/myapp.ini#myapp'
+        command.args.url = '/a'
         result = command.run()
         self.assertEqual(result, 0)
         self.assertEqual(L[1], 'URL = /a')
@@ -397,7 +405,8 @@ class TestPViewsCommand(unittest.TestCase):
         view = dummy.DummyView(context='context', view_name='a',
                          matched_route=route, subpath='')
         command._find_view = lambda arg1: view
-        command.args = ('/foo/bar/myapp.ini#myapp', '/a')
+        command.args.config_uri = '/foo/bar/myapp.ini#myapp'
+        command.args.url = '/a'
         result = command.run()
         self.assertEqual(result, 0)
         self.assertEqual(L[1], 'URL = /a')
@@ -423,7 +432,8 @@ class TestPViewsCommand(unittest.TestCase):
         view.__view_attr__ = 'call'
         multiview = dummy.DummyMultiView(view, context='context', view_name='a')
         command._find_view = lambda arg1: multiview
-        command.args = ('/foo/bar/myapp.ini#myapp', '/a')
+        command.args.config_uri = '/foo/bar/myapp.ini#myapp'
+        command.args.url = '/a'
         result = command.run()
         self.assertEqual(result, 0)
         self.assertEqual(L[1], 'URL = /a')
@@ -444,7 +454,8 @@ class TestPViewsCommand(unittest.TestCase):
         view.__permission__ = 'test'
         multiview = dummy.DummyMultiView(view, context='context', view_name='a')
         command._find_view = lambda arg1: multiview
-        command.args = ('/foo/bar/myapp.ini#myapp', '/a')
+        command.args.config_uri = '/foo/bar/myapp.ini#myapp'
+        command.args.url = '/a'
         result = command.run()
         self.assertEqual(result, 0)
         self.assertEqual(L[1], 'URL = /a')
@@ -468,7 +479,8 @@ class TestPViewsCommand(unittest.TestCase):
         view.__predicates__ = [predicate]
         multiview = dummy.DummyMultiView(view, context='context', view_name='a')
         command._find_view = lambda arg1: multiview
-        command.args = ('/foo/bar/myapp.ini#myapp', '/a')
+        command.args.config_uri = '/foo/bar/myapp.ini#myapp'
+        command.args.url = '/a'
         result = command.run()
         self.assertEqual(result, 0)
         self.assertEqual(L[1], 'URL = /a')
