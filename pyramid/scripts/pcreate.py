@@ -92,7 +92,7 @@ class PCreateCommand(object):
     def run(self):
         if self.args.list:
             return self.show_scaffolds()
-        if not self.args.scaffold_name and not self.args:
+        if not self.args.scaffold_name and not self.args.output_directory:
             if not self.quiet: # pragma: no cover
                 self.parser.print_help()
                 self.out('')
