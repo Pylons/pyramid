@@ -28,7 +28,6 @@ class PTweensCommand(object):
 
     """
     parser = argparse.ArgumentParser(
-        prog="ptweens",
         description=textwrap.dedent(description),
         )
 

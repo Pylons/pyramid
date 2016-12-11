@@ -47,7 +47,6 @@ class PRequestCommand(object):
     """
 
     parser = argparse.ArgumentParser(
-        prog="prequest",
         description=textwrap.dedent(description)
         )
     parser.add_argument(
