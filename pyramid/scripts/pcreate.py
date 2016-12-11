@@ -24,7 +24,6 @@ def main(argv=sys.argv, quiet=False):
 class PCreateCommand(object):
     verbosity = 1  # required
     parser = argparse.ArgumentParser(
-        prog="pcreate",
         description="Render Pyramid scaffolding to an output directory")
     parser.add_argument('-s', '--scaffold',
                         dest='scaffold_name',
