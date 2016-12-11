@@ -110,12 +110,12 @@ class PShellCommand(object):
             print(msg)
 
     def run(self, shell=None):
-        if self.options.list:
+        if self.args.list:
             return self.show_shells()
-        if not self.args:
+        if not self.args.config_uri:
             self.out('Requires a config file argument')
             return 2
-        config_uri = self.args[0]
+        config_uri = self.args.config_uri
         config_file = config_uri.split('#', 1)[0]
         setup_logging(config_file)
         self.pshell_file_config(config_file)
