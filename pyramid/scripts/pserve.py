@@ -104,7 +104,7 @@ class PServeCommand(object):
         help='The URI to the configuration file.',
         )
     parser.add_argument(
-        'config_args',
+        'config_vars',
         nargs='*',
         default=(),
         help='Arbitrary options to override those in the [app:main] section '
@@ -128,8 +128,8 @@ class PServeCommand(object):
         if self.args.verbose > 0:
             print(msg)
 
-    def get_config_args(self):
-        restvars = self.args.config_args
+    def get_config_vars(self):
+        restvars = self.args.config_vars
         return parse_vars(restvars)
 
     def pserve_file_config(self, filename, global_conf=None):
@@ -164,7 +164,7 @@ class PServeCommand(object):
             return 2
         app_spec = self.args.config_uri
 
-        vars = self.get_config_args()
+        vars = self.get_config_vars()
         app_name = self.args.app_name
 
         base = os.getcwd()

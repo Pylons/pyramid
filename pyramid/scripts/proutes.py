@@ -273,7 +273,7 @@ class PRoutesCommand(object):
         )
 
     parser.add_argument(
-        'config_args',
+        'config_vars',
         nargs='*',
         default=(),
         help='Arbitrary options to override those in the [app:main] section '
@@ -334,7 +334,7 @@ class PRoutesCommand(object):
             return 2
 
         config_uri = self.args.config_uri
-        env = self.bootstrap[0](config_uri, options=parse_vars(self.args.config_args))
+        env = self.bootstrap[0](config_uri, options=parse_vars(self.args.config_vars))
         registry = env['registry']
         mapper = self._get_mapper(registry)
 

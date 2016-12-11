@@ -101,7 +101,7 @@ class PRequestCommand(object):
         )
 
     parser.add_argument(
-        'config_args',
+        'config_vars',
         nargs='*',
         default=(),
         help='Arbitrary options to override those in the [app:main] section '
@@ -157,7 +157,7 @@ class PRequestCommand(object):
                 headers[name] = value.strip()
 
         app = self.get_app(app_spec, self.args.app_name,
-                options=self.args.config_args)
+                options=self.args.config_vars)
 
         request_method = (self.args.method or 'GET').upper()
 
