@@ -51,7 +51,6 @@ class PServeCommand(object):
     default_verbosity = 1
 
     parser = argparse.ArgumentParser(
-        usage="%(prog)s config_uri [var=value]",
         description=textwrap.dedent(description)
         )
     parser.add_argument(
