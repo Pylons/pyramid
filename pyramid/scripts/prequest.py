@@ -101,6 +101,14 @@ class PRequestCommand(object):
         help='The path of the request.',
         )
 
+    parser.add_argument(
+        'config_args',
+        nargs='*',
+        default=(),
+        help='Arbitrary options to override those in the [app:main] section '
+             'of the configuration file.',
+    )
+
     get_app = staticmethod(get_app)
     stdin = sys.stdin
 
@@ -150,7 +158,7 @@ class PRequestCommand(object):
                 headers[name] = value.strip()
 
         app = self.get_app(app_spec, self.args.app_name,
-                options=self.args)
+                options=self.args.config_args)
 
         request_method = (self.args.method or 'GET').upper()
 
