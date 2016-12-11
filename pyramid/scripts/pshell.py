@@ -33,7 +33,7 @@ class PShellCommand(object):
     accepts one positional argument named "config_uri" which specifies the
     PasteDeploy config file to use for the interactive shell. The format is
     "inifile#name". If the name is left off, the Pyramid default application
-    will be assumed.  Example: "pshell myapp.ini#main"
+    will be assumed.  Example: "pshell myapp.ini#main".
 
     If you do not point the loader directly at the section of the ini file
     containing your Pyramid application, the command will attempt to
