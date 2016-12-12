@@ -160,9 +160,8 @@ Bug Fixes
   See https://github.com/Pylons/pyramid/pull/2757
 
 - Fix bug in i18n where the default domain would always use the Germanic plural
-  style, even if a different plural function is defined in the relevant messages
-  file.
-  See https://github.com/Pylons/pyramid/pull/2102
+  style, even if a different plural function is defined in the relevant
+  messages file. See https://github.com/Pylons/pyramid/pull/2859
 
 Deprecations
 ------------
