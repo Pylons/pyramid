@@ -257,7 +257,7 @@ class TestPViewsCommand(unittest.TestCase):
         command.out = L.append
         command._find_view = lambda arg1: None
         command.args.config_uri = '/foo/bar/myapp.ini#myapp'
-        command.args.url = '/a'
+        command.args.url = 'a'
         result = command.run()
         self.assertEqual(result, 0)
         self.assertEqual(L[1], 'URL = /a')
