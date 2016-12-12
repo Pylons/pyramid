@@ -1000,6 +1000,10 @@ Glossary
      application and helps users to quickly get started writing larger
      applications.  Scaffolds are usually used via the ``pcreate`` command.
 
+     .. deprecated:: 1.8
+
+     .. seealso:: See also :term:`cookiecutter`.
+
    pyramid_exclog
      A package which logs Pyramid application exception (error) information
      to a standard Python logger.  This add-on is most useful when
@@ -1134,3 +1138,10 @@ Glossary
       The `Python Packaging Authority (PyPA) <https://www.pypa.io/en/latest/>`_
       is a working group that maintains many of the relevant projects in Python
       packaging.
+
+   cookiecutter
+      A command-line utility that creates projects from :ref:`cookiecutters <cookiecutter:readme>` (project templates), e.g., creating a Python package project from a Python package project template.
+
+      .. versionadded:: 1.8
+
+      .. seealso:: See also :term:`scaffold`.
