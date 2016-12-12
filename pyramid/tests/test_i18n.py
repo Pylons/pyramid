@@ -357,6 +357,36 @@ class TestTranslations(unittest.TestCase):
         inst.add(inst2)
         self.assertEqual(inst._catalog['a'], 'b')
 
+    def test_add_default_domain_replaces_plural_first_time(self):
+        # Create three empty message catalogs in the default domain
+        inst = self._getTargetClass()(None, domain='messages')
+        inst2 = self._getTargetClass()(None, domain='messages')
+        inst3 = self._getTargetClass()(None, domain='messages')
+        inst._catalog = {}
+        inst2._catalog = {}
+        inst3._catalog = {}
+
+        # The default plural scheme is the germanic one
+        self.assertEqual(inst.plural(0), 1)
+        self.assertEqual(inst.plural(1), 0)
+        self.assertEqual(inst.plural(2), 1)
+
+        # inst2 represents a message file that declares french plurals
+        inst2.plural = lambda n: n > 1
+        inst.add(inst2)
+        # that plural rule should now apply to inst
+        self.assertEqual(inst.plural(0), 0)
+        self.assertEqual(inst.plural(1), 0)
+        self.assertEqual(inst.plural(2), 1)
+
+        # We load a second message file with different plural rules
+        inst3.plural = lambda n: n > 0
+        inst.add(inst3)
+        # It doesn't override the previously loaded rule
+        self.assertEqual(inst.plural(0), 0)
+        self.assertEqual(inst.plural(1), 0)
+        self.assertEqual(inst.plural(2), 1)
+
     def test_dgettext(self):
         t = self._makeOne()
         self.assertEqual(t.dgettext('messages', 'foo'), 'Voh')
