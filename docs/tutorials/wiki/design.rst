@@ -43,11 +43,7 @@ editing, and viewing wiki pages, plus one view for the wiki front page.
 Two templates will be used, one for viewing, and one for both adding
 and editing wiki pages.
 
-The default templating systems in :app:`Pyramid` are
-:term:`Chameleon` and :term:`Mako`.  Chameleon is a variant of
-:term:`ZPT`, which is an XML-based templating language.  Mako is a
-non-XML-based templating language.  Because we had to pick one,
-we chose Chameleon for this tutorial.
+As of version 1.5 :app:`Pyramid` no longer ships with templating systems.  In this tutorial, we will use :term:`Chameleon`.  Chameleon is a variant of :term:`ZPT`, which is an XML-based templating language.
 
 Security
 --------
