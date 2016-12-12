@@ -11,6 +11,10 @@ unreleased
 - Fix incompatibilities in the ``prequest`` test suite caused by changes in
   WebOb 1.7. See https://github.com/Pylons/pyramid/pull/2788
 
+- Fix bug in i18n where the default domain would always use the Germanic plural
+  style, even if a different plural function is defined in the relevant
+  messages file. See https://github.com/Pylons/pyramid/pull/2865
+
 .. _changes_1.7.3:
 
 1.7.3 (2016-08-17)
