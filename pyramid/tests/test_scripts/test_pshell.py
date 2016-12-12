@@ -19,8 +19,10 @@ class TestPShellCommand(unittest.TestCase):
             self.config_factory = dummy.DummyConfigParserFactory()
             cmd.ConfigParser = self.config_factory
         if patch_args:
-            self.args = ('/foo/bar/myapp.ini#myapp',)
-            cmd.args = self.args
+            class Args(object): pass
+            self.args = Args()
+            self.args.config_uri = '/foo/bar/myapp.ini#myapp'
+            cmd.args.config_uri = self.args.config_uri
         if patch_options:
             class Options(object): pass
             self.options = Options()
