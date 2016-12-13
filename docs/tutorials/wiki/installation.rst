@@ -15,6 +15,11 @@ install Pyramid**.  Thereby you will satisfy the following requirements.
 * You've satisfied the :ref:`requirements-for-installing-packages`.
 
 
+Install cookiecutter
+--------------------
+We will use a :term:`cookiecutter` to create a Python package project from a Python package project template.  See `Installation <https://cookiecutter.readthedocs.io/en/latest/installation.html>`_ for instructions.
+
+
 Create directory to contain the project
 ---------------------------------------
 
