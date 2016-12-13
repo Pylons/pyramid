@@ -215,9 +215,9 @@ def check_csrf_token(request,
     supplied by ``request.session.get_csrf_token()``, and ``raises`` is
     ``True``, this function will raise an
     :exc:`pyramid.exceptions.BadCSRFToken` exception.
-    If the check does succeed and ``raises`` is ``False``, this
-    function will return ``False``.  If the CSRF check is successful, this
-    function will return ``True`` unconditionally.
+    If the values differ and ``raises`` is ``False``, this function will
+    return ``False``.  If the CSRF check is successful, this function will
+    return ``True`` unconditionally.
 
     Note that using this function requires that a :term:`session factory` is
     configured.

@@ -35,6 +35,9 @@ with warnings.catch_warnings():
     warnings.filterwarnings('ignore')
     from pyramid.interfaces import IContextURL
 
+PATH_SEGMENT_SAFE = "~!$&'()*+,;=:@" # from webob
+PATH_SAFE = PATH_SEGMENT_SAFE + "/"
+
 empty = text_('')
 
 def find_root(resource):
@@ -577,7 +580,7 @@ the ``safe`` argument to this function.  This corresponds to the
 
 if PY2:
     # special-case on Python 2 for speed?  unchecked
-    def quote_path_segment(segment, safe=''):
+    def quote_path_segment(segment, safe=PATH_SEGMENT_SAFE):
         """ %s """ % quote_path_segment_doc
         # The bit of this code that deals with ``_segment_cache`` is an
         # optimization: we cache all the computation of URL path segments
@@ -596,7 +599,7 @@ if PY2:
             _segment_cache[(segment, safe)] = result
             return result
 else:
-    def quote_path_segment(segment, safe=''):
+    def quote_path_segment(segment, safe=PATH_SEGMENT_SAFE):
         """ %s """ % quote_path_segment_doc
         # The bit of this code that deals with ``_segment_cache`` is an
         # optimization: we cache all the computation of URL path segments

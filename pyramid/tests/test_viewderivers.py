@@ -1291,6 +1291,34 @@ class TestDeriveView(unittest.TestCase):
         view = self.config._derive_view(inner_view)
         self.assertRaises(BadCSRFToken, lambda: view(None, request))
 
+    def test_csrf_view_enabled_via_callback(self):
+        def callback(request):
+            return True
+        from pyramid.exceptions import BadCSRFToken
+        def inner_view(request): pass
+        request = self._makeRequest()
+        request.scheme = "http"
+        request.method = 'POST'
+        request.session = DummySession({'csrf_token': 'foo'})
+        self.config.set_default_csrf_options(require_csrf=True, callback=callback)
+        view = self.config._derive_view(inner_view)
+        self.assertRaises(BadCSRFToken, lambda: view(None, request))
+
+    def test_csrf_view_disabled_via_callback(self):
+        def callback(request):
+            return False
+        response = DummyResponse()
+        def inner_view(request):
+            return response
+        request = self._makeRequest()
+        request.scheme = "http"
+        request.method = 'POST'
+        request.session = DummySession({'csrf_token': 'foo'})
+        self.config.set_default_csrf_options(require_csrf=True, callback=callback)
+        view = self.config._derive_view(inner_view)
+        result = view(None, request)
+        self.assertTrue(result is response)
+
     def test_csrf_view_uses_custom_csrf_token(self):
         response = DummyResponse()
         def inner_view(request):

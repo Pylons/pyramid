@@ -5,7 +5,7 @@ class TestPredicateList(unittest.TestCase):
 
     def _makeOne(self):
         from pyramid.config.util import PredicateList
-        from pyramid.config import predicates
+        from pyramid import predicates
         inst = PredicateList()
         for name, factory in (
             ('xhr', predicates.XHRPredicate),
@@ -593,6 +593,15 @@ class TestNotted(unittest.TestCase):
         self.assertEqual(inst.text(), '')
         self.assertEqual(inst.phash(), '')
         self.assertEqual(inst(None, None), True)
+
+
+class TestDeprecatedPredicates(unittest.TestCase):
+    def test_it(self):
+        import warnings
+        with warnings.catch_warnings(record=True) as w:
+            warnings.filterwarnings('always')
+            from pyramid.config.predicates import XHRPredicate
+            self.assertEqual(len(w), 1)
 
 class DummyPredicate(object):
     def __init__(self, result):

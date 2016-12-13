@@ -51,9 +51,10 @@ book = os.environ.get('BOOK')
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
-    'repoze.sphinx.autointerface',
-    'sphinx.ext.viewcode',
     'sphinx.ext.intersphinx',
+    'sphinx.ext.todo',
+    'sphinx.ext.viewcode',
+    'repoze.sphinx.autointerface',
     'sphinxcontrib.programoutput',
     # enable pylons_sphinx_latesturl when this branch is no longer "latest"
     # 'pylons_sphinx_latesturl',
@@ -68,6 +69,7 @@ intersphinx_mapping = {
     'pylonswebframework': ('http://docs.pylonsproject.org/projects/pylons-webframework/en/latest/', None),
     'python': ('https://docs.python.org/3', None),
     'pytest': ('http://pytest.org/latest/', None),
+    'sphinx': ('http://www.sphinx-doc.org/en/latest', None),
     'sqla': ('http://docs.sqlalchemy.org/en/latest', None),
     'tm': ('http://docs.pylonsproject.org/projects/pyramid-tm/en/latest/', None),
     'toolbar': ('http://docs.pylonsproject.org/projects/pyramid-debugtoolbar/en/latest', None),
@@ -118,6 +120,9 @@ exclude_patterns = ['_themes/README.rst', ]
 # If true, the current module name will be prepended to all description
 # unit titles (such as .. function::).
 add_module_names = False
+
+# Add support for todo items
+todo_include_todos = True
 
 # The name of the Pygments (syntax highlighting) style to use.
 #pygments_style = book and 'bw' or 'tango'
@@ -191,10 +196,10 @@ latex_documents = [
 
 # For "manual" documents, if this is true, then toplevel headings are parts,
 # not chapters.
-latex_use_parts = True
+latex_toplevel_sectioning = "section"
 
 # If false, no module index is generated.
-latex_use_modindex = False
+latex_domain_indices = False
 
 ## Say, for a moment that you have a twoside document that needs a 3cm
 ## inner margin to allow for binding and at least two centimetres the

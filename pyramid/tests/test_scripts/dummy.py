@@ -82,8 +82,9 @@ class DummyMultiView(object):
         self.__request_attrs__ = attrs
 
 class DummyConfigParser(object):
-    def __init__(self, result):
+    def __init__(self, result, defaults=None):
         self.result = result
+        self.defaults = defaults
 
     def read(self, filename):
         self.filename = filename
@@ -98,8 +99,9 @@ class DummyConfigParser(object):
 class DummyConfigParserFactory(object):
     items = None
 
-    def __call__(self):
-        self.parser = DummyConfigParser(self.items)
+    def __call__(self, defaults=None):
+        self.defaults = defaults
+        self.parser = DummyConfigParser(self.items, defaults)
         return self.parser
 
 class DummyCloser(object):

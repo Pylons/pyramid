@@ -2,6 +2,13 @@ environment:
   matrix:
     - PYTHON: "C:\\Python35"
       TOXENV: "py35"
+    - PYTHON: "C:\\Python27"
+      TOXENV: "py27"
+
+cache:
+    - '%LOCALAPPDATA%\pip\Cache'
+
+version: '{branch}.{build}'
 
 install:
   - "%PYTHON%\\python.exe -m pip install tox"

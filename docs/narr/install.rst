@@ -22,7 +22,7 @@ the following sections.
 .. sidebar:: Python Versions
 
     As of this writing, :app:`Pyramid` is tested against Python 2.7,
-    Python 3.4, Python 3.5, PyPy.
+    Python 3.4, Python 3.5, Python 3.6, and PyPy.
 
 :app:`Pyramid` is known to run on all popular UNIX-like systems such as Linux,
 Mac OS X, and FreeBSD, as well as on Windows platforms.  It is also known to

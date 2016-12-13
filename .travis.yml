@@ -18,10 +18,13 @@ matrix:
           env: TOXENV=docs
         - python: 3.5
           env: TOXENV=pep8
-        - python: nightly
+        - python: 3.6-dev
           env: TOXENV=py36
+        - python: nightly
+          env: TOXENV=py37
     allow_failures:
         - env: TOXENV=py36
+        - env: TOXENV=py37
 
 install:
   - travis_retry pip install tox

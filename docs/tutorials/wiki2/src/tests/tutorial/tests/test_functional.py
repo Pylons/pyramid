@@ -11,6 +11,9 @@ class FunctionalTests(unittest.TestCase):
     basic_wrong_login = (
         '/login?login=basic&password=incorrect'
         '&next=FrontPage&form.submitted=Login')
+    basic_login_no_next = (
+        '/login?login=basic&password=basic'
+        '&form.submitted=Login')
     editor_login = (
         '/login?login=editor&password=editor'
         '&next=FrontPage&form.submitted=Login')
@@ -68,6 +71,10 @@ class FunctionalTests(unittest.TestCase):
         res = self.testapp.get(self.basic_login, status=302)
         self.assertEqual(res.location, 'http://localhost/FrontPage')
 
+    def test_successful_log_in_no_next(self):
+        res = self.testapp.get(self.basic_login_no_next, status=302)
+        self.assertEqual(res.location, 'http://localhost/')
+
     def test_failed_log_in(self):
         res = self.testapp.get(self.basic_wrong_login, status=200)
         self.assertTrue(b'login' in res.body)
@@ -119,4 +126,9 @@ class FunctionalTests(unittest.TestCase):
     def test_editors_member_user_can_view(self):
         self.testapp.get(self.editor_login, status=302)
         res = self.testapp.get('/FrontPage', status=200)
+        self.assertTrue(b'FrontPage' in res.body)
+
+    def test_redirect_to_edit_for_existing_page(self):
+        self.testapp.get(self.editor_login, status=302)
+        res = self.testapp.get('/add_page/FrontPage', status=302)
         self.assertTrue(b'FrontPage' in res.body)

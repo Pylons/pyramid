@@ -66,7 +66,7 @@ Python 2.7:
 
    c:\> c:\Python27\Scripts\virtualenv %VENV%
 
-Python 3.5:
+Python 3.6:
 
 .. code-block:: doscon
 
@@ -327,13 +327,13 @@ If successful, you will see output something like this:
 .. code-block:: bash
 
    ======================== test session starts ========================
-   platform Python 3.5.1, pytest-2.9.1, py-1.4.31, pluggy-0.3.1
+   platform Python 3.6.0, pytest-2.9.1, py-1.4.31, pluggy-0.3.1
    rootdir: /Users/stevepiercy/projects/pyramidtut/tutorial, inifile:
    plugins: cov-2.2.1
    collected 2 items
 
    tutorial/tests.py ..
-   ------------------ coverage: platform Python 3.5.1 ------------------
+   ------------------ coverage: platform Python 3.6.0 ------------------
    Name                               Stmts   Miss  Cover   Missing
    ----------------------------------------------------------------
    tutorial/__init__.py                   8      6    25%   7-12
@@ -457,7 +457,8 @@ working directory. This is an SQLite database with a single table defined in it
 Start the application
 ---------------------
 
-Start the application.
+Start the application. See :ref:`what_is_this_pserve_thing` for more
+information on ``pserve``.
 
 On UNIX
 ^^^^^^^

@@ -925,6 +925,7 @@ class IDefaultCSRFOptions(Interface):
     token = Attribute('The key to be matched in the body of the request.')
     header = Attribute('The header to be matched with the CSRF token.')
     safe_methods = Attribute('A set of safe methods that skip CSRF checks.')
+    callback = Attribute('A callback to disable CSRF checks per-request.')
 
 class ISessionFactory(Interface):
     """ An interface representing a factory which accepts a request object and

@@ -6,6 +6,7 @@
 .. automodule:: pyramid.i18n
 
   .. autoclass:: TranslationString
+     :noindex:
  
   .. autofunction:: TranslationStringFactory
 

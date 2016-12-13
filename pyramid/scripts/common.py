@@ -17,20 +17,26 @@ def parse_vars(args):
         result[name] = value
     return result
 
-def logging_file_config(config_file, fileConfig=fileConfig,
-                        configparser=configparser):
+def setup_logging(config_uri, global_conf=None,
+                  fileConfig=fileConfig,
+                  configparser=configparser):
     """
-    Setup logging via the logging module's fileConfig function with the
-    specified ``config_file``, if applicable.
+    Set up logging via :func:`logging.config.fileConfig` with the filename
+    specified via ``config_uri`` (a string in the form
+    ``filename#sectionname``).
 
     ConfigParser defaults are specified for the special ``__file__``
     and ``here`` variables, similar to PasteDeploy config loading.
+    Extra defaults can optionally be specified as a dict in ``global_conf``.
     """
+    path = config_uri.split('#', 1)[0]
     parser = configparser.ConfigParser()
-    parser.read([config_file])
+    parser.read([path])
     if parser.has_section('loggers'):
-        config_file = os.path.abspath(config_file)
-        return fileConfig(
-            config_file,
-            dict(__file__=config_file, here=os.path.dirname(config_file))
-            )
+        config_file = os.path.abspath(path)
+        full_global_conf = dict(
+            __file__=config_file,
+            here=os.path.dirname(config_file))
+        if global_conf:
+            full_global_conf.update(global_conf)
+        return fileConfig(config_file, full_global_conf)

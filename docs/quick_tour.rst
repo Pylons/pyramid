@@ -26,7 +26,7 @@ To save a little bit of typing and to be certain that we use the modules,
 scripts, and packages installed in our virtual environment, we'll set an
 environment variable, too.
 
-As an example, for Python 3.5+ on Linux:
+As an example, for Python 3.6+ on Linux:
 
 .. parsed-literal::
 
@@ -504,7 +504,7 @@ Pyramid's ``pcreate`` command can list the available scaffolds:
 
 .. code-block:: bash
 
-    $ pcreate --list
+    $ $VENV/bin/pcreate --list
     Available scaffolds:
       alchemy:                 Pyramid project using SQLAlchemy, SQLite, URL dispatch, and Jinja2
       pyramid_jinja2_starter:  Pyramid Jinja2 starter project
@@ -517,7 +517,7 @@ that scaffold to make our project:
 
 .. code-block:: bash
 
-    $ pcreate --scaffold pyramid_jinja2_starter hello_world
+    $ $VENV/bin/pcreate --scaffold pyramid_jinja2_starter hello_world
 
 We next use the normal Python command to set up our package for development:
 
@@ -678,10 +678,10 @@ egregious, as Pyramid has had a deep commitment to full test coverage since
 before its release.
 
 Our ``pyramid_jinja2_starter`` scaffold generated a ``tests.py`` module with
-one unit test in it. To run it, let's install the handy ``pytest`` test runner
-by editing ``setup.py``. While we're at it, we'll throw in the ``pytest-cov``
-tool which yells at us for code that isn't tested. Insert and edit the
-following lines as shown:
+one unit test in it. It also configured ``setup.py`` with test requirements:
+``py.test`` as the test runner, ``WebTest`` for running view tests, and the
+``pytest-cov`` tool which yells at us for code that isn't tested. The
+highlighted lines show this:
 
 .. code-block:: python
     :linenos:
@@ -711,7 +711,7 @@ following lines as shown:
           'testing': tests_require,
         },
 
-We changed ``setup.py`` which means we need to rerun ``$VENV/bin/pip install -e
+To install the test requirements, run ``$VENV/bin/pip install -e
 ".[testing]"``. We can now run all our tests:
 
 .. code-block:: bash
@@ -729,7 +729,7 @@ This yields the following output.
     collected 1 items
 
     hello_world/tests.py .
-    ------------- coverage: platform darwin, python 3.5.0-final-0 -------------
+    ------------- coverage: platform darwin, python 3.6.0-final-0 -------------
     Name                       Stmts   Miss  Cover   Missing
     --------------------------------------------------------
     hello_world/__init__.py       11      8    27%   11-23
