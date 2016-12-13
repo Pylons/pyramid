@@ -22,6 +22,7 @@ from pyramid.exceptions import URLDecodeError
 from pyramid.traversal import (
     quote_path_segment,
     split_path_info,
+    PATH_SAFE,
     )
 
 _marker = object()
@@ -207,6 +208,10 @@ def _compile_route(route):
         return d
 
     gen = ''.join(gen)
+
+    def q(v):
+        return quote_path_segment(v, safe=PATH_SAFE)
+
     def generator(dict):
         newdict = {}
         for k, v in dict.items():
@@ -223,17 +228,17 @@ def _compile_route(route):
                 # a stararg argument
                 if is_nonstr_iter(v):
                     v = '/'.join(
-                        [quote_path_segment(x, safe='/') for x in v]
+                        [q(x) for x in v]
                         ) # native
                 else:
                     if v.__class__ not in string_types:
                         v = str(v)
-                    v = quote_path_segment(v, safe='/')
+                    v = q(v)
             else:
                 if v.__class__ not in string_types:
                     v = str(v)
                 # v may be bytes (py2) or native string (py3)
-                v = quote_path_segment(v, safe='/')
+                v = q(v)
 
             # at this point, the value will be a native string
             newdict[k] = v

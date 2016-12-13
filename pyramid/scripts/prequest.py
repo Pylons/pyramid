@@ -5,8 +5,9 @@ import textwrap
 
 from pyramid.compat import url_unquote
 from pyramid.request import Request
-from pyramid.paster import get_app, setup_logging
+from pyramid.paster import get_app
 from pyramid.scripts.common import parse_vars
+from pyramid.scripts.common import setup_logging
 
 def main(argv=sys.argv, quiet=False):
     command = PRequestCommand(argv, quiet)

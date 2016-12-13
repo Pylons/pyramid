@@ -16,14 +16,38 @@ Backward Incompatibilities
 
    See https://github.com/Pylons/pyramid/pull/2615
 
-- ``pcreate`` is now interactive by default. You will be prompted if it
+- ``pcreate`` is now interactive by default. You will be prompted if
   a file already exists with different content. Previously if there were
   similar files it would silently skip them unless you specified
   ``--interactive`` or ``--overwrite``.
   See https://github.com/Pylons/pyramid/pull/2775
 
+- Removed undocumented argument ``cachebust_match`` from
+  ``pyramid.static.static_view``. This argument was shipped accidentally
+  in Pyramid 1.6. See https://github.com/Pylons/pyramid/pull/2681
+
+- Change static view to avoid setting the ``Content-Encoding`` response header
+  to an encoding guessed using Python's ``mimetypes`` module. This was causing
+  clients to decode the content of gzipped files when downloading them. The
+  client would end up with a ``foo.txt.gz`` file on disk that was already
+  decoded, thus should really be ``foo.txt``. Also, the ``Content-Encoding``
+  should only have been used if the client itself broadcast support for the
+  encoding via ``Accept-Encoding`` request headers.
+  See https://github.com/Pylons/pyramid/pull/2810
+
+- Settings are no longer accessible as attributes on the settings object
+  (e.g. ``request.registry.settings.foo``). This was deprecated in Pyramid 1.2.
+  See https://github.com/Pylons/pyramid/pull/2823
+
 Features
 --------
+
+- Python 3.6 compatibility.
+  https://github.com/Pylons/pyramid/issues/2835
+
+- pcreate learned about --package-name to allow you to create a new project in
+  an existing folder with a different package name than the project name. See
+  https://github.com/Pylons/pyramid/pull/2783
 
 - The `_get_credentials` private method of `BasicAuthAuthenticationPolicy`
   has been extracted into standalone function ``extract_http_basic_credentials`
@@ -58,6 +82,53 @@ Features
   - the pipeline can be optimized at config-time.
   See https://github.com/Pylons/pyramid/pull/2660
 
+- ``pserve`` should now work with ``gevent`` and other workers that need
+  to monkeypatch the process, assuming the server and / or the app do so
+  as soon as possible before importing the rest of pyramid.
+  See https://github.com/Pylons/pyramid/pull/2797
+
+- Pyramid no longer copies the settings object passed to the
+  ``pyramid.config.Configurator(settings=)``. The original ``dict`` is kept.
+  See https://github.com/Pylons/pyramid/pull/2823
+
+- The csrf trusted origins setting may now be a whitespace-separated list of
+  domains. Previously only a python list was allowed. Also, it can now be set
+  using the ``PYRAMID_CSRF_TRUSTED_ORIGINS`` environment variable similar to
+  other settings. See https://github.com/Pylons/pyramid/pull/2823
+
+- ``pserve --reload`` now uses the
+  `hupper <http://docs.pylonsproject.org/projects/hupper/en/latest/>`
+  library to monitor file changes. This comes with many improvements:
+
+  - If the `watchdog <http://pythonhosted.org/watchdog/>`_ package is
+    installed then monitoring will be done using inotify instead of
+    cpu and disk-intensive polling.
+
+  - The monitor is now a separate process that will not crash and starts up
+    before any of your code.
+
+  - The monitor will not restart the process after a crash until a file is
+    saved.
+
+  - The monitor works on windows.
+
+  - You can now trigger a reload manually from a pyramid view or any other
+    code via ``hupper.get_reloader().trigger_reload()``. Kind of neat.
+
+  - You can trigger a reload by issuing a ``SIGHUP`` to the monitor process.
+
+  See https://github.com/Pylons/pyramid/pull/2805
+
+- A new ``[pserve]`` section is supported in your config files with a
+  ``watch_files`` key that can configure ``pserve --reload`` to monitor custom
+  file paths. See https://github.com/Pylons/pyramid/pull/2827
+
+- Allow streaming responses to be made from subclasses of
+  ``pyramid.httpexceptions.HTTPException``. Previously the response would
+  be unrolled while testing for a body, making it impossible to stream
+  a response.
+  See https://github.com/Pylons/pyramid/pull/2863
+
 Bug Fixes
 ---------
 
@@ -88,11 +159,24 @@ Bug Fixes
   from previous orders have executed.
   See https://github.com/Pylons/pyramid/pull/2757
 
+- Fix bug in i18n where the default domain would always use the Germanic plural
+  style, even if a different plural function is defined in the relevant
+  messages file. See https://github.com/Pylons/pyramid/pull/2859
+
 Deprecations
 ------------
 
 Documentation Changes
 ---------------------
+- Replace Typographical Conventions with an enhanced Style Guide.
+  https://github.com/Pylons/pyramid/pull/2838
+
+- Add pyramid_nacl_session to session factories.
+  See https://github.com/Pylons/pyramid/issues/2791
+
+- Update HACKING.txt from stale branch that was never merged to master.
+  See https://github.com/Pylons/pyramid/pull/2782
+
 - Updated Windows installation instructions and related bits.
   See https://github.com/Pylons/pyramid/issues/2661
 

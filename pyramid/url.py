@@ -25,10 +25,11 @@ from pyramid.threadlocal import get_current_registry
 from pyramid.traversal import (
     ResourceURL,
     quote_path_segment,
+    PATH_SAFE,
+    PATH_SEGMENT_SAFE,
     )
 
-PATH_SAFE = '/:@&+$,' # from webob
-QUERY_SAFE = '/?:@!$&\'()*+,;=' # RFC 3986
+QUERY_SAFE = "/?:@!$&'()*+,;=" # RFC 3986
 ANCHOR_SAFE = QUERY_SAFE
 
 def parse_url_overrides(kw):
@@ -364,7 +365,7 @@ class URLMethodsMixin(object):
         of ``query`` may be a sequence of two-tuples *or* a data structure with
         an ``.items()`` method that returns a sequence of two-tuples
         (presumably a dictionary).  This data structure will be turned into a
-        query string per the documentation of :func:``pyramid.url.urlencode``
+        query string per the documentation of :func:`pyramid.url.urlencode`
         function.  This will produce a query string in the
         ``x-www-form-urlencoded`` encoding.  A non-``x-www-form-urlencoded``
         query string may be used by passing a *string* value as ``query`` in
@@ -454,7 +455,7 @@ class URLMethodsMixin(object):
         ``resource_url(someresource, 'element1', 'element2', query={'a':1},
         route_name='blogentry')`` is roughly equivalent to doing::
 
-           remainder_path = request.resource_path(someobject)
+           traversal_path = request.resource_path(someobject)
            url = request.route_url(
                      'blogentry',
                      'element1',
@@ -486,7 +487,7 @@ class URLMethodsMixin(object):
         'element2', route_name='blogentry', route_kw={'id':'4'},
         _query={'a':'1'})`` is roughly equivalent to::
 
-           remainder_path = request.resource_path_tuple(someobject)
+           traversal_path = request.resource_path_tuple(someobject)
            kw = {'id':'4', '_query':{'a':'1'}, 'traverse':traversal_path}
            url = request.route_url(
                      'blogentry',
@@ -947,4 +948,4 @@ def current_route_path(request, *elements, **kw):
 
 @lru_cache(1000)
 def _join_elements(elements):
-    return '/'.join([quote_path_segment(s, safe=':@&+$,') for s in elements])
+    return '/'.join([quote_path_segment(s, safe=PATH_SEGMENT_SAFE) for s in elements])

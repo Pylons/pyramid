@@ -70,10 +70,11 @@ import pyramid.util
 from pyramid.util import (
     viewdefaults,
     action_method,
+    as_sorted_tuple,
     TopologicalSorter,
     )
 
-import pyramid.config.predicates
+import pyramid.predicates
 import pyramid.viewderivers
 
 from pyramid.viewderivers import (
@@ -89,7 +90,6 @@ from pyramid.viewderivers import (
 from pyramid.config.util import (
     DEFAULT_PHASH,
     MAX_ORDER,
-    as_sorted_tuple,
     )
 
 urljoin = urlparse.urljoin
@@ -444,9 +444,11 @@ class ViewsConfiguratorMixin(object):
           think about preserving function attributes such as ``__name__`` and
           ``__module__`` within decorator logic).
 
-          All view callables in the decorator chain must return a response
-          object implementing :class:`pyramid.interfaces.IResponse` or raise
-          an exception:
+          An important distinction is that each decorator will receive a
+          response object implementing :class:`pyramid.interfaces.IResponse`
+          instead of the raw value returned from the view callable. All
+          decorators in the chain must return a response object or raise an
+          exception:
 
           .. code-block:: python
 
@@ -1141,7 +1143,7 @@ class ViewsConfiguratorMixin(object):
             )
 
     def add_default_view_predicates(self):
-        p = pyramid.config.predicates
+        p = pyramid.predicates
         for (name, factory) in (
             ('xhr', p.XHRPredicate),
             ('request_method', p.RequestMethodPredicate),

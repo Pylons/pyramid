@@ -3,7 +3,7 @@ import functools
 try:
     # py2.7.7+ and py3.3+ have native comparison support
     from hmac import compare_digest
-except ImportError: # pragma: nocover
+except ImportError:  # pragma: no cover
     compare_digest = None
 import inspect
 import traceback
@@ -28,13 +28,24 @@ from pyramid.compat import (
 from pyramid.interfaces import IActionInfo
 from pyramid.path import DottedNameResolver as _DottedNameResolver
 
+_marker = object()
+
 
 class DottedNameResolver(_DottedNameResolver):
     def __init__(self, package=None): # default to package = None for bw compat
         _DottedNameResolver.__init__(self, package)
 
-_marker = object()
+def is_string_or_iterable(v):
+    if isinstance(v, string_types):
+        return True
+    if hasattr(v, '__iter__'):
+        return True
 
+def as_sorted_tuple(val):
+    if not is_nonstr_iter(val):
+        val = (val,)
+    val = tuple(sorted(val))
+    return val
 
 class InstancePropertyHelper(object):
     """A helper object for assigning properties and descriptors to instances.

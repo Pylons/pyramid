@@ -51,6 +51,14 @@ https://github.com/pylons/?query=cookiecutter
                       action='store_true',
                       help=("A backwards compatibility alias for -l/--list.  "
                             "List all available scaffold names."))
+    parser.add_option('--package-name',
+                      dest='package_name',
+                      action='store',
+                      type='string',
+                      help='Package name to use. The name provided is assumed '
+                           'to be a valid Python package name, and will not '
+                           'be validated. By default the package name is '
+                           'derived from the value of output_directory.')
     parser.add_option('--simulate',
                       dest='simulate',
                       action='store_true',
@@ -106,9 +114,13 @@ https://github.com/pylons/?query=cookiecutter
     def project_vars(self):
         output_dir = self.output_path
         project_name = os.path.basename(os.path.split(output_dir)[1])
-        pkg_name = _bad_chars_re.sub(
-            '', project_name.lower().replace('-', '_'))
-        safe_name = pkg_resources.safe_name(project_name)
+        if self.options.package_name is None:
+            pkg_name = _bad_chars_re.sub(
+                '', project_name.lower().replace('-', '_'))
+            safe_name = pkg_resources.safe_name(project_name)
+        else:
+            pkg_name = self.options.package_name
+            safe_name = pkg_name
         egg_name = pkg_resources.to_filename(safe_name)
 
         # get pyramid package version

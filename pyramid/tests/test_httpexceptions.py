@@ -348,7 +348,7 @@ class TestHTTPException(unittest.TestCase):
         exc = cls(body_template='${REQUEST_METHOD}')
         environ = _makeEnviron()
         class Choke(object):
-            def __str__(self): # pragma nocover
+            def __str__(self):  # pragma no cover
                 raise ValueError
         environ['gardentheory.user'] = Choke()
         start_response = DummyStartResponse()
