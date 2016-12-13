@@ -14,7 +14,7 @@
     <link href="//oss.maxcdn.com/libs/twitter-bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Custom styles for this scaffold -->
-    <link href="\{\{request.static_url('{{package}}:static/theme.css')\}\}" rel="stylesheet">
+    <link href="${request.static_url('{{package}}:static/theme.css')}" rel="stylesheet">
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -29,12 +29,13 @@
       <div class="container">
         <div class="row">
           <div class="col-md-2">
-            <img class="logo img-responsive" src="\{\{request.static_url('{{package}}:static/pyramid.png')\}\}" alt="pyramid web framework">
+            <img class="logo img-responsive" src="${request.static_url('{{package}}:static/pyramid.png')}" alt="pyramid web framework">
           </div>
           <div class="col-md-10">
-          {% block content %}
-            <p>No content</p>
-          {% endblock content %}
+            <div class="content">
+              <h1><span class="font-semi-bold">Pyramid</span> <span class="smaller">ZODB scaffold</span></h1>
+              <p class="lead">Welcome to <span class="font-normal">${project}</span>, an&nbsp;application generated&nbsp;by<br>the <span class="font-normal">Pyramid Web Framework {{pyramid_version}}</span>.</p>
+            </div>
           </div>
         </div>
         <div class="row">
