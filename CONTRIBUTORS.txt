@@ -286,3 +286,7 @@ Contributors
 - Keith Yang, 2016/07/22
 
 - Hannah Krager, 2016/10/22
+
+- Moriyoshi Koizumi, 2016/11/20
+
+- Mikko Ohtamaa, 2016/12/6
