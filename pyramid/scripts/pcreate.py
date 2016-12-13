@@ -22,7 +22,13 @@ def main(argv=sys.argv, quiet=False):
 
 class PCreateCommand(object):
     verbosity = 1 # required
-    description = "Render Pyramid scaffolding to an output directory"
+    description = """\
+Render Pyramid scaffolding to an output directory.
+
+Note: As of Pyramid 1.8, this command is deprecated. Use a specific
+cookiecutter instead:
+https://github.com/Pylons/?q=cookiecutter
+"""
     usage = "usage: %prog [options] -s <scaffold> output_directory"
     parser = optparse.OptionParser(usage, description=description)
     parser.add_option('-s', '--scaffold',
@@ -85,6 +91,7 @@ class PCreateCommand(object):
         self.scaffolds = self.all_scaffolds()
 
     def run(self):
+        self._warn_pcreate_deprecated()
         if self.options.list:
             return self.show_scaffolds()
         if not self.options.scaffold_name and not self.args:
@@ -223,6 +230,13 @@ class PCreateCommand(object):
     def confirm_bad_name(self, prompt): # pragma: no cover
         answer = input_('{0} [y|N]: '.format(prompt))
         return answer.strip().lower() == 'y'
+
+    def _warn_pcreate_deprecated(self):
+        self.out('''\
+Note: As of Pyramid 1.8, this command is deprecated. Use a specific
+cookiecutter instead:
+https://github.com/pylons/?query=cookiecutter
+''')
 
 if __name__ == '__main__': # pragma: no cover
     sys.exit(main() or 0)
