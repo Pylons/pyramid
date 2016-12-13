@@ -27,7 +27,7 @@ Render Pyramid scaffolding to an output directory.
 
 Note: As of Pyramid 1.8, this command is deprecated. Use a specific
 cookiecutter instead:
-https://github.com/Pylons/?query=cookiecutter
+https://github.com/Pylons/?q=cookiecutter
 """
     usage = "usage: %prog [options] -s <scaffold> output_directory"
     parser = optparse.OptionParser(usage, description=description)
