@@ -95,7 +95,6 @@ https://github.com/Pylons/?q=cookiecutter
         self.scaffolds = self.all_scaffolds()
 
     def run(self):
-        self._warn_pcreate_deprecated()
         if self.args.list:
             return self.show_scaffolds()
         if not self.args.scaffold_name and not self.args.output_directory:
@@ -107,6 +106,7 @@ https://github.com/Pylons/?q=cookiecutter
 
         if not self.validate_input():
             return 2
+        self._warn_pcreate_deprecated()
 
         return self.render_scaffolds()
 
