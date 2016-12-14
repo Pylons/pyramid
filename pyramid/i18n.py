@@ -22,6 +22,7 @@ from pyramid.threadlocal import get_current_registry
 TranslationString = TranslationString  # PyFlakes
 TranslationStringFactory = TranslationStringFactory  # PyFlakes
 
+DEFAULT_PLURAL = lambda n: int(n != 1)
 
 class Localizer(object):
     """
@@ -233,7 +234,13 @@ class Translations(gettext.GNUTranslations, object):
         # GNUTranslations._parse (called as a side effect if fileobj is
         # passed to GNUTranslations.__init__) with a "real" self.plural for
         # this domain; see https://github.com/Pylons/pyramid/issues/235
-        self.plural = lambda n: int(n != 1) 
+        # It is only overridden the first time a new message file is found
+        # for a given domain, so all message files must have matching plural
+        # rules if they are in the same domain. We keep track of if we have
+        # overridden so we can special case the default domain, which is always
+        # instantiated before a message file is read.
+        # See also https://github.com/Pylons/pyramid/pull/2102
+        self.plural = DEFAULT_PLURAL
         gettext.GNUTranslations.__init__(self, fp=fileobj)
         self.files = list(filter(None, [getattr(fileobj, 'name', None)]))
         self.domain = domain
@@ -285,6 +292,9 @@ class Translations(gettext.GNUTranslations, object):
         :rtype: `Translations`
         """
         domain = getattr(translations, 'domain', self.DEFAULT_DOMAIN)
+        if domain == self.DEFAULT_DOMAIN and self.plural is DEFAULT_PLURAL:
+            self.plural = translations.plural
+
         if merge and domain == self.domain:
             return self.merge(translations)
 
