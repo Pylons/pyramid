@@ -123,7 +123,7 @@ class PRequestCommand(object):
         setup_logging(app_spec)
 
     def run(self):
-        if not self.args.config_uri and not self.args.path_info:
+        if not self.args.config_uri or not self.args.path_info:
             self.out('You must provide at least two arguments')
             return 2
         app_spec = self.args.config_uri

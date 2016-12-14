@@ -247,7 +247,7 @@ class PViewsCommand(object):
                 self.out("%sview predicates (%s)" % (indent, predicate_text))
 
     def run(self):
-        if not self.args.config_uri and not self.args.url:
+        if not self.args.config_uri or not self.args.url:
             self.out('Command requires a config file arg and a url arg')
             return 2
         config_uri = self.args.config_uri
