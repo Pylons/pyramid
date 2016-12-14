@@ -39,9 +39,6 @@ Backward Incompatibilities
   (e.g. ``request.registry.settings.foo``). This was deprecated in Pyramid 1.2.
   See https://github.com/Pylons/pyramid/pull/2823
 
-- Scaffolds, documentation and tutorials now use ``listen`` option instead
-  of ``host`` and ``port`` to configure Waitress server.
-
 Features
 --------
 
@@ -131,6 +128,10 @@ Features
   be unrolled while testing for a body, making it impossible to stream
   a response.
   See https://github.com/Pylons/pyramid/pull/2863
+
+- Update starter, alchemy and zodb scaffolds to support IPv6 by using the
+  new ``listen`` directives in waitress.
+  See https://github.com/Pylons/pyramid/pull/2853
 
 Bug Fixes
 ---------
