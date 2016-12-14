@@ -17,12 +17,12 @@ def main(argv=sys.argv, quiet=False):
     command = PCreateCommand(argv, quiet)
     try:
         return command.run()
-    except KeyboardInterrupt: # pragma: no cover
+    except KeyboardInterrupt:  # pragma: no cover
         return 1
 
 
 class PCreateCommand(object):
-    verbosity = 1 # required
+    verbosity = 1  # required
     parser = argparse.ArgumentParser(description="""\
 Render Pyramid scaffolding to an output directory.
 
@@ -98,7 +98,7 @@ https://github.com/Pylons/?q=cookiecutter
         if self.args.list:
             return self.show_scaffolds()
         if not self.args.scaffold_name and not self.args.output_directory:
-            if not self.quiet: # pragma: no cover
+            if not self.quiet:  # pragma: no cover
                 self.parser.print_help()
                 self.out('')
                 self.show_scaffolds()
@@ -130,7 +130,7 @@ https://github.com/Pylons/?q=cookiecutter
         # get pyramid package version
         pyramid_version = self.pyramid_dist.version
 
-        ## map pyramid package version of the documentation branch ##
+        # map pyramid package version of the documentation branch ##
         # if version ends with 'dev' then docs version is 'master'
         if self.pyramid_dist.version[-3:] == 'dev':
             pyramid_docs_branch = 'master'
@@ -151,7 +151,6 @@ https://github.com/Pylons/?q=cookiecutter
             'pyramid_version': pyramid_version,
             'pyramid_docs_branch': pyramid_docs_branch,
         }
-
 
     def render_scaffolds(self):
         props = self.project_vars
@@ -183,18 +182,19 @@ https://github.com/Pylons/?q=cookiecutter
                 scaffold_class = entry.load()
                 scaffold = scaffold_class(entry.name)
                 scaffolds.append(scaffold)
-            except Exception as e: # pragma: no cover
+            except Exception as e:  # pragma: no cover
                 self.out('Warning: could not load entry point %s (%s: %s)' % (
                     entry.name, e.__class__.__name__, e))
         return scaffolds
 
-    def out(self, msg): # pragma: no cover
+    def out(self, msg):  # pragma: no cover
         if not self.quiet:
             print(msg)
 
     def validate_input(self):
         if not self.args.scaffold_name:
-            self.out('You must provide at least one scaffold name: -s <scaffold name>')
+            self.out('You must provide at least one scaffold name: '
+                     '-s <scaffold name>')
             self.out('')
             self.show_scaffolds()
             return False
@@ -213,13 +213,15 @@ https://github.com/Pylons/?q=cookiecutter
             self.out('The package name "site" has a special meaning in '
                      'Python. Are you sure you want to use it as your '
                      'project\'s name?')
-            return self.confirm_bad_name('Really use "{0}"?: '.format(pkg_name))
+            return self.confirm_bad_name('Really use "{0}"?: '.format(
+                pkg_name))
 
         # check if pkg_name can be imported (i.e. already exists in current
         # $PYTHON_PATH, if so - let the user confirm
         pkg_exists = True
         try:
-            __import__(pkg_name, globals(), locals(), [], 0) # use absolute imports
+            # use absolute imports
+            __import__(pkg_name, globals(), locals(), [], 0)
         except ImportError as error:
             pkg_exists = False
         if not pkg_exists:
@@ -231,7 +233,7 @@ https://github.com/Pylons/?q=cookiecutter
                  'to use it as your project\'s name?'.format(pkg_name))
         return self.confirm_bad_name('Really use "{0}"?: '.format(pkg_name))
 
-    def confirm_bad_name(self, prompt): # pragma: no cover
+    def confirm_bad_name(self, prompt):  # pragma: no cover
         answer = input_('{0} [y|N]: '.format(prompt))
         return answer.strip().lower() == 'y'
 
@@ -242,5 +244,5 @@ cookiecutter instead:
 https://github.com/pylons/?query=cookiecutter
 ''')
 
-if __name__ == '__main__': # pragma: no cover
+if __name__ == '__main__':  # pragma: no cover
     sys.exit(main() or 0)
