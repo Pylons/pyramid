@@ -1145,3 +1145,6 @@ Glossary
       .. versionadded:: 1.8
 
       .. seealso:: See also :term:`scaffold`.
+
+   coverage
+      A measurement of code coverage, usually expressed as a percentage of which lines of code have been executed over which lines are executable, typically run during test execution.
