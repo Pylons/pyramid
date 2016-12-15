@@ -44,110 +44,57 @@ Open ``tutorial/__init__.py``.  It should already contain the following:
 Resources and models with ``models.py``
 ---------------------------------------
 
-:app:`Pyramid` uses the word :term:`resource` to describe objects arranged
-hierarchically in a :term:`resource tree`.  This tree is consulted by
-:term:`traversal` to map URLs to code.  In this application, the resource
-tree represents the site structure, but it *also* represents the
-:term:`domain model` of the application, because each resource is a node
-stored persistently in a :term:`ZODB` database.  The ``models.py`` file is
-where the ``zodb`` cookiecutter put the classes that implement our
-resource objects, each of which also happens to be a domain model object.
+:app:`Pyramid` uses the word :term:`resource` to describe objects arranged hierarchically in a :term:`resource tree`.  This tree is consulted by :term:`traversal` to map URLs to code.  In this application, the resource tree represents the site structure, but it *also* represents the
+:term:`domain model` of the application, because each resource is a node stored persistently in a :term:`ZODB` database.  The ``models.py`` file is where the ``zodb`` cookiecutter put the classes that implement our resource objects, each of which also happens to be a domain model object.
 
 Here is the source for ``models.py``:
 
-.. literalinclude:: src/basiclayout/tutorial/models.py
+.. literalinclude:: src/basiclayout/pyramidtut/models.py
   :linenos:
   :language: python
 
-#. *Lines 4-5*.  The ``MyModel`` :term:`resource` class is implemented here.
-   Instances of this class are capable of being persisted in :term:`ZODB`
-   because the class inherits from the
-   :class:`persistent.mapping.PersistentMapping` class.  The ``__parent__``
-   and ``__name__`` are important parts of the :term:`traversal` protocol.
-   By default, have these as ``None`` indicating that this is the
-   :term:`root` object.
+#. *Lines 4-5*.  The ``MyModel`` :term:`resource` class is implemented here. Instances of this class are capable of being persisted in :term:`ZODB` because the class inherits from the :class:`persistent.mapping.PersistentMapping` class.  The ``__parent__`` and ``__name__`` are important parts of the :term:`traversal` protocol.  By default, set these to ``None`` to indicate that this is the :term:`root` object.
 
-#. *Lines 8-14*.  ``appmaker`` is used to return the *application
-   root* object.  It is called on *every request* to the
-   :app:`Pyramid` application.  It also performs bootstrapping by
-   *creating* an application root (inside the ZODB root object) if one
-   does not already exist.  It is used by the ``root_factory`` we've defined
-   in our ``__init__.py``.
+#. *Lines 8-14*.  ``appmaker`` is used to return the *application root* object.  It is called on *every request* to the :app:`Pyramid` application.  It also performs bootstrapping by creating* an application root (inside the ZODB root object) if one does not already exist.  It is used by the ``root_factory`` we've defined in our ``__init__.py``.
  
-   Bootstrapping is done by first seeing if the database has the persistent
-   application root.  If not, we make an instance, store it, and commit the
-   transaction.  We then return the application root object.
+   Bootstrapping is done by first seeing if the database has the persistent application root.  If not, we make an instance, store it, and commit the transaction.  We then return the application root object.
+
 
 Views With ``views.py``
 -----------------------
 
-Our cookiecutter generated a default ``views.py`` on our behalf.  It
-contains a single view, which is used to render the page shown when you visit
-the URL ``http://localhost:6543/``.
+Our cookiecutter generated a default ``views.py`` on our behalf.  It contains a single view, which is used to render the page shown when you visit the URL ``http://localhost:6543/``.
 
 Here is the source for ``views.py``:
 
-.. literalinclude:: src/basiclayout/tutorial/views.py
+.. literalinclude:: src/basiclayout/pyramidtut/views.py
   :linenos:
   :language: python
 
 Let's try to understand the components in this module:
 
-#. *Lines 1-2*. Perform some dependency imports.
+#.  *Lines 1-2*. Perform some dependency imports.
 
-#. *Line 5*.  Use the :func:`pyramid.view.view_config` :term:`configuration
-   decoration` to perform a :term:`view configuration` registration.  This
-   view configuration registration will be activated when the application is
-   started.  It will be activated by virtue of it being found as the result
-   of a :term:`scan` (when Line 14 of ``__init__.py`` is run).
+#.  *Line 5*. Use the :func:`pyramid.view.view_config` :term:`configuration decoration` to perform a :term:`view configuration` registration.  This view configuration registration will be activated when the application is started.  It will be activated by virtue of it being found as the result of a :term:`scan` (when Line 14 of ``__init__.py`` is run).
 
-   The ``@view_config`` decorator accepts a number of keyword arguments.  We
-   use two keyword arguments here: ``context`` and ``renderer``.
+    The ``@view_config`` decorator accepts a number of keyword arguments.  We use two keyword arguments here: ``context`` and ``renderer``.
 
-   The ``context`` argument signifies that the decorated view callable should
-   only be run when :term:`traversal` finds the ``tutorial.models.MyModel``
-   :term:`resource` to be the :term:`context` of a request.  In English, this
-   means that when the URL ``/`` is visited, because ``MyModel`` is the root
-   model, this view callable will be invoked.
+    The ``context`` argument signifies that the decorated view callable should only be run when :term:`traversal` finds the ``tutorial.models.MyModel`` :term:`resource` to be the :term:`context` of a request.  In English, this means that when the URL ``/`` is visited, because ``MyModel`` is the root model, this view callable will be invoked.
 
-   The ``renderer`` argument names an :term:`asset specification` of
-   ``templates/mytemplate.pt``.  This asset specification points at a
-   :term:`Chameleon` template which lives in the ``mytemplate.pt`` file
-   within the ``templates`` directory of the ``tutorial`` package.  And
-   indeed if you look in the ``templates`` directory of this package, you'll
-   see a ``mytemplate.pt`` template file, which renders the default home page
-   of the generated project.  This asset specification is *relative* (to the
-   view.py's current package).  Alternatively we could have used the
-   absolute asset specification ``tutorial:templates/mytemplate.pt``, but
-   chose to use the relative version.
+    The ``renderer`` argument names an :term:`asset specification` of ``templates/mytemplate.pt``.  This asset specification points at a :term:`Chameleon` template which lives in the ``mytemplate.pt`` file within the ``templates`` directory of the ``tutorial`` package.  And indeed if you look in the ``templates`` directory of this package, you'll see a ``mytemplate.pt`` template file, which renders the default home page of the generated project.  This asset specification is *relative* (to the view.py's current package).  Alternatively we could have used the absolute asset specification ``tutorial:templates/mytemplate.pt``, but chose to use the relative version.
 
-   Since this call to ``@view_config`` doesn't pass a ``name`` argument, the
-   ``my_view`` function which it decorates represents the "default" view
-   callable used when the context is of the type ``MyModel``.
+    Since this call to ``@view_config`` doesn't pass a ``name`` argument, the ``my_view`` function which it decorates represents the "default" view callable used when the context is of the type ``MyModel``.
 
-#. *Lines 6-7*.  We define a :term:`view callable` named ``my_view``, which
-   we decorated in the step above.  This view callable is a *function* we
-   write generated by the ``zodb`` cookiecutter that is given a
-   ``request`` and which returns a dictionary.  The ``mytemplate.pt``
-   :term:`renderer` named by the asset specification in the step above will
-   convert this dictionary to a :term:`response` on our behalf.
+#.  *Lines 6-7*.  We define a :term:`view callable` named ``my_view``, which we decorated in the step above.  This view callable is a *function* we write generated by the ``zodb`` cookiecutter that is given a ``request`` and which returns a dictionary.  The ``mytemplate.pt`` :term:`renderer` named by the asset specification in the step above will convert this dictionary to a :term:`response` on our behalf.
 
-   The function returns the dictionary ``{'project':'tutorial'}``.  This
-   dictionary is used by the template named by the ``mytemplate.pt`` asset
-   specification to fill in certain values on the page.
+    The function returns the dictionary ``{'project':'tutorial'}``.  This dictionary is used by the template named by the ``mytemplate.pt`` asset specification to fill in certain values on the page.
 
 Configuration in ``development.ini``
 ------------------------------------
 
-The ``development.ini`` (in the tutorial :term:`project` directory, as
-opposed to the tutorial :term:`package` directory) looks like this:
+The ``development.ini`` (in the ``pyramidtut`` :term:`project` directory, as opposed to the ``pyramidtut`` :term:`package` directory) looks like this:
 
 .. literalinclude:: src/basiclayout/development.ini
   :language: ini
 
-Note the existence of a ``[app:main]`` section which specifies our WSGI
-application.  Our ZODB database settings are specified as the
-``zodbconn.uri`` setting within this section.  This value, and the other
-values within this section, are passed as ``**settings`` to the ``main``
-function we defined in ``__init__.py`` when the server is started via
-``pserve``.
+Note the existence of a ``[app:main]`` section which specifies our WSGI application.  Our ZODB database settings are specified as the ``zodbconn.uri`` setting within this section.  This value, and the other values within this section, are passed as ``**settings`` to the ``main`` function we defined in ``__init__.py`` when the server is started via ``pserve``.
