@@ -49,13 +49,13 @@ book = os.environ.get('BOOK')
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = [
+    'repoze.sphinx.autointerface',
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
-    'repoze.sphinx.autointerface',
-    'sphinx.ext.viewcode',
     'sphinx.ext.intersphinx',
-    'sphinxcontrib.autoprogram',
     'sphinx.ext.todo',
+    'sphinx.ext.viewcode',
+    'sphinxcontrib.autoprogram',
     # enable pylons_sphinx_latesturl when this branch is no longer "latest"
     # 'pylons_sphinx_latesturl',
     ]
