@@ -4,6 +4,9 @@ unreleased
 Backward Incompatibilities
 --------------------------
 
+ - Support for the ``IContextURL`` interface that was deprecated in Pyramid 1.3
+   has been removed.  See https://github.com/Pylons/pyramid/pull/2822
+
  - Following the Pyramid deprecation period (1.6 -> 1.8),
    daemon support for pserve has been removed. This includes removing the
    daemon commands (start, stop, restart, status) as well as the following
