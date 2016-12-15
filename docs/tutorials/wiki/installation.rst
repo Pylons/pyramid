@@ -253,7 +253,7 @@ If successful, you will see output something like this:
     plugins: cov-2.4.0
     collected 1 items
 
-    tutorial/tests.py .
+    pyramidtut/tests.py .
     ------------------ coverage: platform Python 3.6.0 ------------------
     Name                   Stmts   Miss  Cover   Missing
     ----------------------------------------------------

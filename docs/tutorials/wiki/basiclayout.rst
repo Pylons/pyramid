@@ -14,7 +14,7 @@ A directory on disk can be turned into a Python :term:`package` by containing an
 
 When you run the application using the ``pserve`` command using the ``development.ini`` generated configuration file, the application configuration points at a setuptools *entry point* described as ``egg:tutorial``.  In our application, because the application's ``setup.py`` file says so, this entry point happens to be the ``main`` function within the file named ``__init__.py``.
 
-Open ``tutorial/__init__.py``.  It should already contain the following:
+Open ``pyramidtut/__init__.py``.  It should already contain the following:
 
 .. literalinclude:: src/basiclayout/pyramidtut/__init__.py
     :linenos:
