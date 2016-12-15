@@ -51,11 +51,11 @@ book = os.environ.get('BOOK')
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
-    'sphinx.ext.intersphinx',
-    'sphinx.ext.todo',
-    'sphinx.ext.viewcode',
     'repoze.sphinx.autointerface',
-    'sphinxcontrib.programoutput',
+    'sphinx.ext.viewcode',
+    'sphinx.ext.intersphinx',
+    'sphinxcontrib.autoprogram',
+    'sphinx.ext.todo',
     # enable pylons_sphinx_latesturl when this branch is no longer "latest"
     # 'pylons_sphinx_latesturl',
     ]

@@ -64,7 +64,7 @@ docs_extras = [
     'repoze.sphinx.autointerface',
     'pylons_sphinx_latesturl',
     'pylons-sphinx-themes',
-    'sphinxcontrib-programoutput',
+    'sphinxcontrib-autoprogram',
     ]
 
 testing_extras = tests_require + [

@@ -8,7 +8,7 @@
 # Code taken also from QP: http://www.mems-exchange.org/software/qp/ From
 # lib/site.py
 
-import optparse
+import argparse
 import os
 import re
 import sys
@@ -41,7 +41,6 @@ def main(argv=sys.argv, quiet=False):
 
 class PServeCommand(object):
 
-    usage = '%prog config_uri [var=value]'
     description = """\
     This command serves a web application that uses a PasteDeploy
     configuration file for the server and application.
@@ -51,54 +50,68 @@ class PServeCommand(object):
     """
     default_verbosity = 1
 
-    parser = optparse.OptionParser(
-        usage,
+    parser = argparse.ArgumentParser(
         description=textwrap.dedent(description)
         )
-    parser.add_option(
+    parser.add_argument(
         '-n', '--app-name',
         dest='app_name',
         metavar='NAME',
         help="Load the named application (default main)")
-    parser.add_option(
+    parser.add_argument(
         '-s', '--server',
         dest='server',
         metavar='SERVER_TYPE',
         help="Use the named server.")
-    parser.add_option(
+    parser.add_argument(
         '--server-name',
         dest='server_name',
         metavar='SECTION_NAME',
         help=("Use the named server as defined in the configuration file "
               "(default: main)"))
-    parser.add_option(
+    parser.add_argument(
         '--reload',
         dest='reload',
         action='store_true',
         help="Use auto-restart file monitor")
-    parser.add_option(
+    parser.add_argument(
         '--reload-interval',
         dest='reload_interval',
         default=1,
         help=("Seconds between checking files (low number can cause "
               "significant CPU usage)"))
-    parser.add_option(
+    parser.add_argument(
         '-b', '--browser',
         dest='browser',
         action='store_true',
         help="Open a web browser to server url")
-    parser.add_option(
+    parser.add_argument(
         '-v', '--verbose',
         default=default_verbosity,
         dest='verbose',
         action='count',
         help="Set verbose level (default " + str(default_verbosity) + ")")
-    parser.add_option(
+    parser.add_argument(
         '-q', '--quiet',
         action='store_const',
         const=0,
         dest='verbose',
         help="Suppress verbose output")
+    parser.add_argument(
+        'config_uri',
+        nargs='?',
+        default=None,
+        help='The URI to the configuration file.',
+        )
+    parser.add_argument(
+        'config_vars',
+        nargs='*',
+        default=(),
+        help="Variables required by the config file. For example, "
+             "`http_port=%%(http_port)s` would expect `http_port=8080` to be "
+             "passed here.",
+        )
+
 
     ConfigParser = configparser.ConfigParser  # testing
     loadapp = staticmethod(loadapp)  # testing
@@ -107,17 +120,17 @@ class PServeCommand(object):
     _scheme_re = re.compile(r'^[a-z][a-z]+:', re.I)
 
     def __init__(self, argv, quiet=False):
-        self.options, self.args = self.parser.parse_args(argv[1:])
+        self.args = self.parser.parse_args(argv[1:])
         if quiet:
-            self.options.verbose = 0
+            self.args.verbose = 0
         self.watch_files = []
 
     def out(self, msg): # pragma: no cover
-        if self.options.verbose > 0:
+        if self.args.verbose > 0:
             print(msg)
 
-    def get_options(self):
-        restvars = self.args[1:]
+    def get_config_vars(self):
+        restvars = self.args.config_vars
         return parse_vars(restvars)
 
     def pserve_file_config(self, filename, global_conf=None):
@@ -147,13 +160,13 @@ class PServeCommand(object):
             self.watch_files.append(os.path.abspath(file))
 
     def run(self):  # pragma: no cover
-        if not self.args:
+        if not self.args.config_uri:
             self.out('You must give a config file')
             return 2
-        app_spec = self.args[0]
+        app_spec = self.args.config_uri
 
-        vars = self.get_options()
-        app_name = self.options.app_name
+        vars = self.get_config_vars()
+        app_name = self.args.app_name
 
         base = os.getcwd()
         if not self._scheme_re.search(app_spec):
@@ -161,16 +174,16 @@ class PServeCommand(object):
             app_spec = 'config:' + app_spec
         else:
             config_path = None
-        server_name = self.options.server_name
-        if self.options.server:
+        server_name = self.args.server_name
+        if self.args.server:
             server_spec = 'egg:pyramid'
             assert server_name is None
-            server_name = self.options.server
+            server_name = self.args.server
         else:
             server_spec = app_spec
 
         # do not open the browser on each reload so check hupper first
-        if self.options.browser and not hupper.is_active():
+        if self.args.browser and not hupper.is_active():
             def open_browser():
                 context = loadcontext(
                     SERVER, app_spec, name=server_name, relative_to=base,
@@ -182,13 +195,13 @@ class PServeCommand(object):
             t.setDaemon(True)
             t.start()
 
-        if self.options.reload and not hupper.is_active():
-            if self.options.verbose > 1:
+        if self.args.reload and not hupper.is_active():
+            if self.args.verbose > 1:
                 self.out('Running reloading file monitor')
             hupper.start_reloader(
                 'pyramid.scripts.pserve.main',
-                reload_interval=int(self.options.reload_interval),
-                verbose=self.options.verbose,
+                reload_interval=int(self.args.reload_interval),
+                verbose=self.args.verbose,
             )
             return 0
 
@@ -207,7 +220,7 @@ class PServeCommand(object):
         app = self.loadapp(
             app_spec, name=app_name, relative_to=base, global_conf=vars)
 
-        if self.options.verbose > 0:
+        if self.args.verbose > 0:
             if hasattr(os, 'getpid'):
                 msg = 'Starting server in PID %i.' % os.getpid()
             else:
@@ -217,7 +230,7 @@ class PServeCommand(object):
         try:
             server(app)
         except (SystemExit, KeyboardInterrupt) as e:
-            if self.options.verbose > 1:
+            if self.args.verbose > 1:
                 raise
             if str(e):
                 msg = ' ' + str(e)

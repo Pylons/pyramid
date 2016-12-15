@@ -19,8 +19,10 @@ class TestPShellCommand(unittest.TestCase):
             self.config_factory = dummy.DummyConfigParserFactory()
             cmd.ConfigParser = self.config_factory
         if patch_args:
-            self.args = ('/foo/bar/myapp.ini#myapp',)
-            cmd.args = self.args
+            class Args(object): pass
+            self.args = Args()
+            self.args.config_uri = '/foo/bar/myapp.ini#myapp'
+            cmd.args.config_uri = self.args.config_uri
         if patch_options:
             class Options(object): pass
             self.options = Options()
@@ -71,7 +73,7 @@ class TestPShellCommand(unittest.TestCase):
         self._makeEntryPoints(command, {})
 
         command.default_runner = shell
-        command.options.python_shell = 'unknown_python_shell'
+        command.args.python_shell = 'unknown_python_shell'
         result = command.run()
         self.assertEqual(result, 1)
         self.assertEqual(
@@ -95,7 +97,7 @@ class TestPShellCommand(unittest.TestCase):
             }
         )
 
-        command.options.python_shell = 'ipython'
+        command.args.python_shell = 'ipython'
 
         command.run()
         self.assertTrue(self.config_factory.parser)
@@ -140,7 +142,7 @@ class TestPShellCommand(unittest.TestCase):
         shell = command.make_shell()
         self.assertEqual(shell, dshell)
 
-        command.options.python_shell = 'ipython'
+        command.args.python_shell = 'ipython'
         self.assertRaises(ValueError, command.make_shell)
 
         self._makeEntryPoints(
@@ -152,15 +154,15 @@ class TestPShellCommand(unittest.TestCase):
             }
         )
 
-        command.options.python_shell = 'ipython'
+        command.args.python_shell = 'ipython'
         shell = command.make_shell()
         self.assertEqual(shell, ipshell)
 
-        command.options.python_shell = 'bpython'
+        command.args.python_shell = 'bpython'
         shell = command.make_shell()
         self.assertEqual(shell, bpshell)
 
-        command.options.python_shell = 'python'
+        command.args.python_shell = 'python'
         shell = command.make_shell()
         self.assertEqual(shell, dshell)
 
@@ -291,7 +293,7 @@ class TestPShellCommand(unittest.TestCase):
         model = dummy.Dummy()
         self.config_factory.items = [('setup', 'abc'),
                                      ('m', model)]
-        command.options.setup = setup
+        command.args.setup = setup
         shell = dummy.DummyShell()
         command.run(shell)
         self.assertTrue(self.config_factory.parser)
@@ -365,7 +367,7 @@ class TestPShellCommand(unittest.TestCase):
             }
         )
 
-        command.options.list = True
+        command.args.list = True
         result = command.run()
         self.assertEqual(result, 0)
         self.assertEqual(out_calls, [
