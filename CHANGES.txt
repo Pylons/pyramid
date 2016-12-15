@@ -133,6 +133,10 @@ Features
   new ``listen`` directives in waitress.
   See https://github.com/Pylons/pyramid/pull/2853
 
+- All p* scripts now use argparse instead of optparse. This improves their
+  ``--help`` output as well as enabling nicer documentation of their options.
+  See https://github.com/Pylons/pyramid/pull/2864
+
 Bug Fixes
 ---------
 
