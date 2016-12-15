@@ -29,18 +29,6 @@ class TestURLMethodsMixin(unittest.TestCase):
         request.registry = self.config.registry
         return request
 
-    def _registerContextURL(self, reg):
-        with warnings.catch_warnings(record=True):
-            from pyramid.interfaces import IContextURL
-        from zope.interface import Interface
-        class DummyContextURL(object):
-            def __init__(self, context, request):
-                pass
-            def __call__(self):
-                return 'http://example.com/context/'
-        reg.registerAdapter(DummyContextURL, (Interface, Interface),
-                            IContextURL)
-
     def _registerResourceURL(self, reg):
         from pyramid.interfaces import IResourceURL
         from zope.interface import Interface
@@ -186,16 +174,6 @@ class TestURLMethodsMixin(unittest.TestCase):
         root = DummyContext()
         result = request.resource_url(root)
         self.assertEqual(result, 'http://example.com:5432/context/')
-
-    def test_resource_url_finds_IContextURL(self):
-        request = self._makeOne()
-        self._registerContextURL(request.registry)
-        root = DummyContext()
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter('always')
-            result = request.resource_url(root)
-            self.assertEqual(len(w), 1)
-        self.assertEqual(result, 'http://example.com/context/')
         
     def test_resource_url_with_app_url(self):
         request = self._makeOne()
