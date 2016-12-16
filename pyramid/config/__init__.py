@@ -451,9 +451,6 @@ class Configurator(
             return filename # absolute filename
         return '%s:%s' % (package, filename)
 
-    def _split_spec(self, path_or_spec):
-        return resolve_asset_spec(path_or_spec, self.package_name)
-
     def _fix_registry(self):
         """ Fix up a ZCA component registry that is not a
         pyramid.registry.Registry by adding analogues of ``has_listeners``,
@@ -651,7 +648,11 @@ class Configurator(
         of this error will be information about the source of the conflict,
         usually including file names and line numbers of the cause of the
         configuration conflicts."""
-        self.action_state.execute_actions(introspector=self.introspector)
+        self.begin()
+        try:
+            self.action_state.execute_actions(introspector=self.introspector)
+        finally:
+            self.end()
         self.action_state = ActionState() # old actions have been processed
 
     def include(self, callable, route_prefix=None):
@@ -992,11 +993,11 @@ class Configurator(
         # Push the registry onto the stack in case any code that depends on
         # the registry threadlocal APIs used in listeners subscribed to the
         # IApplicationCreated event.
-        self.manager.push({'registry': self.registry, 'request': None})
+        self.begin()
         try:
             self.registry.notify(ApplicationCreated(app))
         finally:
-            self.manager.pop()
+            self.end()
 
         return app
 
