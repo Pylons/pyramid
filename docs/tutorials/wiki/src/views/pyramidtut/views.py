@@ -24,7 +24,7 @@ def view_page(context, request):
             view_url = request.resource_url(page)
             return '<a href="%s">%s</a>' % (view_url, word)
         else:
-            add_url = request.application_url + '/add_page/' + word 
+            add_url = request.application_url + '/add_page/' + word
             return '<a href="%s">%s</a>' % (add_url, word)
 
     content = publish_parts(context.data, writer_name='html')['html_body']
