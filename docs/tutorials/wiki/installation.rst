@@ -7,9 +7,7 @@ Installation
 Before you begin
 ----------------
 
-This tutorial assumes that you have already followed the steps in
-:ref:`installing_chapter`, except **do not create a virtual environment or
-install Pyramid**.  Thereby you will satisfy the following requirements.
+This tutorial assumes that you have already followed the steps in :ref:`installing_chapter`, except **do not create a virtual environment or install Pyramid**.  Thereby you will satisfy the following requirements.
 
 * A Python interpreter is installed on your operating system.
 * You've satisfied the :ref:`requirements-for-installing-packages`.
