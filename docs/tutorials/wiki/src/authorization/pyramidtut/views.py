@@ -43,7 +43,6 @@ def view_page(context, request):
     content = publish_parts(context.data, writer_name='html')['html_body']
     content = wikiwords.sub(check, content)
     edit_url = request.resource_url(context, 'edit_page')
-
     return dict(page=context, content=content, edit_url=edit_url,
                 logged_in=request.authenticated_userid)
 
@@ -63,7 +62,6 @@ def add_page(context, request):
     page = Page('')
     page.__name__ = pagename
     page.__parent__ = context
-
     return dict(page=page, save_url=save_url,
                 logged_in=request.authenticated_userid)
 
