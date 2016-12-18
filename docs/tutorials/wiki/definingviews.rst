@@ -395,5 +395,5 @@ each of the following URLs, checking that the result is as expected:
 - http://localhost:6543/add_page/SomePageName invokes the add view for a Page.
 
 - To generate an error, visit http://localhost:6543/add_page which will
-  generate an ``IndexErrorr: tuple index out of range`` error. You'll see an
+  generate an ``IndexError: tuple index out of range`` error. You'll see an
   interactive traceback facility provided by :term:`pyramid_debugtoolbar`.
