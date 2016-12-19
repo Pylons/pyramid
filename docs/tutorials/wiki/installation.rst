@@ -53,10 +53,8 @@ If prompted for the first item, accept the default ``yes`` by hitting return.
 #. ``repo_name [scaffold]: pyramidtut``
 
 
-Configure the project
----------------------
-
-Change directory into your newly created project.
+Change directory into your newly created project
+------------------------------------------------
 
 On UNIX
 ^^^^^^^
@@ -253,12 +251,12 @@ If successful, you will see output something like this:
 
     pyramidtut/tests.py .
     ------------------ coverage: platform Python 3.6.0 ------------------
-    Name                   Stmts   Miss  Cover   Missing
-    ----------------------------------------------------
+    Name                     Stmts   Miss  Cover   Missing
+    ---------------------------------------------------------
     pyramidtut/__init__.py      14      9    36%   7-8, 14-20
     pyramidtut/models.py        10      6    40%   9-14
     pyramidtut/views.py          4      0   100%
-    ------------------------------------------------------
+    ---------------------------------------------------------
     TOTAL                       28     15    46%
 
     ===================== 1 passed in 0.31 seconds ======================
@@ -287,11 +285,11 @@ On Windows
 
     c:\pyramidtut> %VENV%\Scripts\pytest --cov=pyramidtut pyramidtut\tests.py -q
 
-pytest follows :ref:`conventions for Python test discovery <pytest:test discovery>`, and the configuration defaults from the scaffold tell ``pytest`` where to find the module on which we want to run tests and coverage.
+``pytest`` follows :ref:`conventions for Python test discovery <pytest:test discovery>`, and the configuration defaults from the scaffold tell ``pytest`` where to find the module on which we want to run tests and coverage.
 
 .. seealso::
 
-    See pytest's documentation for :ref:`pytest:usage` or invoke ``pytest -h`` to see its full set of options.
+    See ``pytest``'s documentation for :ref:`pytest:usage` or invoke ``pytest -h`` to see its full set of options.
 
 
 .. _wiki-start-the-application:
@@ -345,12 +343,9 @@ Decisions the ``zodb`` cookiecutter has made for you
 Creating a project using the ``zodb`` cookiecutter makes the following assumptions:
 
 - You are willing to use :term:`ZODB` for persistent storage.
-
 - You are willing to use :term:`traversal` to map URLs to code.
-
 - You want to use `pyramid_zodbconn <http://docs.pylonsproject.org/projects/pyramid-zodbconn/en/latest/>`_, `pyramid_tm <http://docs.pylonsproject.org/projects/pyramid-tm/en/latest/>`_, and the `transaction <http://zodb.readthedocs.org/en/latest/transactions.html>`_ packages
   to manage connections and transactions with :term:`ZODB`.
-
 - You want to use `pyramid_chameleon <http://docs.pylonsproject.org/projects/pyramid-chameleon/en/latest/>`_ to render your templates. Different templating engines can be used, but we had to choose one to make this tutorial. See :ref:`available_template_system_bindings` for some options.
 
 .. note::
