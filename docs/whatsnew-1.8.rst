@@ -1,11 +1,14 @@
-unreleased
-==========
+What's New in Pyramid 1.8
+=========================
 
-Backward Incompatibilities
---------------------------
+This article explains the new features in :app:`Pyramid` version 1.8 as
+compared to its predecessor, :app:`Pyramid` 1.7. It also documents backwards
+incompatibilities between the two versions and deprecations added to
+:app:`Pyramid` 1.8, as well as software dependency changes and notable
+documentation additions.
 
-- Support for the ``IContextURL`` interface that was deprecated in Pyramid 1.3
-  has been removed.  See https://github.com/Pylons/pyramid/pull/2822
+Backwards Incompatibilities
+---------------------------
 
 - Following the Pyramid deprecation period (1.6 -> 1.8),
   daemon support for pserve has been removed. This includes removing the
@@ -19,16 +22,6 @@ Backward Incompatibilities
 
   See https://github.com/Pylons/pyramid/pull/2615
 
-- ``pcreate`` is now interactive by default. You will be prompted if a file
-  already exists with different content. Previously if there were similar
-  files it would silently skip them unless you specified ``--interactive``
-  or ``--overwrite``.
-  See https://github.com/Pylons/pyramid/pull/2775
-
-- Removed undocumented argument ``cachebust_match`` from
-  ``pyramid.static.static_view``. This argument was shipped accidentally
-  in Pyramid 1.6. See https://github.com/Pylons/pyramid/pull/2681
-
 - Change static view to avoid setting the ``Content-Encoding`` response header
   to an encoding guessed using Python's ``mimetypes`` module. This was causing
   clients to decode the content of gzipped files when downloading them. The
@@ -38,51 +31,65 @@ Backward Incompatibilities
   encoding via ``Accept-Encoding`` request headers.
   See https://github.com/Pylons/pyramid/pull/2810
 
+- ``pcreate`` is now interactive by default. You will be prompted if a file
+  already exists with different content. Previously if there were similar
+  files it would silently skip them unless you specified ``--interactive``
+  or ``--overwrite``.
+  See https://github.com/Pylons/pyramid/pull/2775
+
+- Support for the ``IContextURL`` interface that was deprecated in Pyramid 1.3
+  has been removed.  See https://github.com/Pylons/pyramid/pull/2822
+
 - Settings are no longer accessible as attributes on the settings object
   (e.g. ``request.registry.settings.foo``). This was deprecated in Pyramid 1.2.
   See https://github.com/Pylons/pyramid/pull/2823
 
-Features
---------
+- Removed undocumented argument ``cachebust_match`` from
+  ``pyramid.static.static_view``. This argument was shipped accidentally
+  in Pyramid 1.6. See https://github.com/Pylons/pyramid/pull/2681
+
+Feature Additions
+-----------------
 
 - Python 3.6 compatibility.
   https://github.com/Pylons/pyramid/issues/2835
 
-- pcreate learned about ``--package-name`` to allow you to create a new project
+- ``pcreate`` learned about --package-name to allow you to create a new project
   in an existing folder with a different package name than the project name.
   See https://github.com/Pylons/pyramid/pull/2783
 
-- The ``_get_credentials`` private method of ``BasicAuthAuthenticationPolicy``
-  has been extracted into standalone function ``extract_http_basic_credentials``
-  in ``pyramid.authentication`` module, this function extracts HTTP Basic
-  credentials from a ``request`` object, and returns them as a named tuple.
-  See https://github.com/Pylons/pyramid/pull/2662
+- The ``_get_credentials`` private method of
+  :class:`pyramid.authentication.BasicAuthAuthenticationPolicy`
+  has been extracted into standalone function
+  :func:`pyramid.authentication.extract_http_basic_credentials`, this function
+  extracts HTTP Basic credentials from a ``request`` object, and returns them
+  as a named tuple. See https://github.com/Pylons/pyramid/pull/2662
 
 - Pyramid 1.4 silently dropped a feature of the configurator that has been
   restored. It's again possible for action discriminators to conflict across
   different action orders.
   See https://github.com/Pylons/pyramid/pull/2757
 
-- ``pyramid.paster.bootstrap`` and its sibling ``pyramid.scripting.prepare``
-  can now be used as context managers to automatically invoke the ``closer``
-  and pop threadlocals off of the stack to prevent memory leaks.
-  See https://github.com/Pylons/pyramid/pull/2760
+- :func:`pyramid.paster.bootstrap` and its sibling
+  :func:`pyramid.scripting.prepare` can now be used as context managers to
+  automatically invoke the ``closer`` and pop threadlocals off of the stack
+  to prevent memory leaks. See https://github.com/Pylons/pyramid/pull/2760
 
-- Added ``pyramid.config.Configurator.add_exception_view`` and the
-  ``pyramid.view.exception_view_config`` decorator. It is now possible using
-  these methods or via the new ``exception_only=True`` option to ``add_view``
-  to add a view which will only be matched when handling an exception.
-  Previously any exception views were also registered for a traversal
-  context that inherited from the exception class which prevented any
-  exception-only optimizations.
+- Added :meth:`pyramid.config.Configurator.add_exception_view` and the
+  :func:`pyramid.view.exception_view_config` decorator. It is now possible
+  using these methods or via the new ``exception_only=True`` option to
+  :meth:`pyramid.config.Configurator.add_view` to add a view which will only
+  be matched when handling an exception. Previously, any exception views were
+  also registered for a traversal context that inherited from the exception
+  class which prevented any exception-only optimizations.
   See https://github.com/Pylons/pyramid/pull/2660
 
 - Added the ``exception_only`` boolean to
-  ``pyramid.interfaces.IViewDeriverInfo`` which can be used by view derivers
-  to determine if they are wrapping a view which only handles exceptions.
-  This means that it is no longer necessary to perform request-time checks
-  for ``request.exception`` to determine if the view is handling an exception
-  - the pipeline can be optimized at config-time.
+  :class:`pyramid.interfaces.IViewDeriverInfo` which can be used by view
+  derivers to determine if they are wrapping a view which only handles
+  exceptions. This means that it is no longer necessary to perform request-time
+  checks for ``request.exception`` to determine if the view is handling an
+  exception - the pipeline can be optimized at config-time.
   See https://github.com/Pylons/pyramid/pull/2660
 
 - ``pserve`` should now work with ``gevent`` and other workers that need
@@ -127,7 +134,7 @@ Features
   file paths. See https://github.com/Pylons/pyramid/pull/2827
 
 - Allow streaming responses to be made from subclasses of
-  ``pyramid.httpexceptions.HTTPException``. Previously the response would
+  :class:`pyramid.httpexceptions.HTTPException`. Previously the response would
   be unrolled while testing for a body, making it impossible to stream
   a response.
   See https://github.com/Pylons/pyramid/pull/2863
@@ -140,45 +147,16 @@ Features
   ``--help`` output as well as enabling nicer documentation of their options.
   See https://github.com/Pylons/pyramid/pull/2864
 
-Bug Fixes
----------
-
-- Fixed bug in ``proutes`` such that it now shows the correct view when a
-  class and ``attr`` is involved.
-  See: https://github.com/Pylons/pyramid/pull/2687
-
-- Fix a ``FutureWarning`` in Python 3.5 when using ``re.split`` on the
-  ``format`` setting to the ``proutes`` script.
-  See https://github.com/Pylons/pyramid/pull/2714
-
-- Fix a ``RuntimeWarning`` emitted by WebOb when using arbitrary objects
-  as the ``userid`` in the ``AuthTktAuthenticationPolicy``. This is now caught
-  by the policy and the object is serialized as a base64 string to avoid
-  the cryptic warning. Since the userid will be read back as a string on
-  subsequent requests a more useful warning is emitted encouraging you to
-  use a primitive type instead.
-  See https://github.com/Pylons/pyramid/pull/2715
-
-- Pyramid 1.6 introduced the ability for an action to invoke another action.
-  There was a bug in the way that ``config.add_view`` would interact with
-  custom view derivers introduced in Pyramid 1.7 because the view's
-  discriminator cannot be computed until view derivers and view predicates
-  have been created in earlier orders. Invoking an action from another action
-  would trigger an unrolling of the pipeline and would compute discriminators
-  before they were ready. The new behavior respects the ``order`` of the action
-  and ensures the discriminators are not computed until dependent actions
-  from previous orders have executed.
-  See https://github.com/Pylons/pyramid/pull/2757
-
-- Fix bug in i18n where the default domain would always use the Germanic plural
-  style, even if a different plural function is defined in the relevant
-  messages file. See https://github.com/Pylons/pyramid/pull/2859
-
 Deprecations
 ------------
 
-Documentation Changes
----------------------
+
+Scaffolding Enhancements
+------------------------
+
+
+Documentation Enhancements
+--------------------------
 
 - Replace Typographical Conventions with an enhanced Style Guide.
   https://github.com/Pylons/pyramid/pull/2838
@@ -187,7 +165,7 @@ Documentation Changes
   <http://docs.pylonsproject.org/projects/pyramid-nacl-session/en/latest/>`_
   to session factories. See https://github.com/Pylons/pyramid/issues/2791
 
-- Update ``HACKING.txt`` from stale branch that was never merged to master.
+- Update HACKING.txt from stale branch that was never merged to master.
   See https://github.com/Pylons/pyramid/pull/2782
 
 - Updated Windows installation instructions and related bits.
