@@ -127,14 +127,14 @@ On UNIX
 
 .. code-block:: bash
 
-    $ $VENV/bin/pip install --upgrade pip setuptools wheel
+    $ $VENV/bin/pip install --upgrade pip setuptools
 
 On Windows
 ^^^^^^^^^^
 
 .. code-block:: doscon
 
-    c:\pyramidtut\> %VENV%\Scripts\pip install --upgrade pip setuptools wheel
+    c:\pyramidtut\> %VENV%\Scripts\pip install --upgrade pip setuptools
 
 
 .. _installing_project_in_dev_mode_zodb:
