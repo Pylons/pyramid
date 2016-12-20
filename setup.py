@@ -55,8 +55,7 @@ else:
     install_requires.append('zope.interface >= 3.8.0')
 
 tests_require = [
-    'WebTest >= 1.3.1',  # py3 compat
-    'waitress < 1.0',
+    'WebTest >= 1.3.1, <= 2.0.23',  # py3 compat
     ]
 
 if not PY3:
