@@ -218,7 +218,7 @@ On Windows
 
 .. code-block:: doscon
 
-    c:\pyramidtut> %VENV%\Scripts\pytest -q
+    c:\pyramidtut\> %VENV%\Scripts\pytest -q
 
 For a successful test run, you should see output that ends like this:
 
@@ -247,7 +247,7 @@ On Windows
 
 .. code-block:: doscon
 
-    c:\pyramidtut> %VENV%\Scripts\pytest --cov --cov-report=term-missing
+    c:\pyramidtut\> %VENV%\Scripts\pytest --cov --cov-report=term-missing
 
 If successful, you will see output something like this:
 
@@ -300,7 +300,7 @@ On Windows
 
 .. code-block:: doscon
 
-    c:\pyramidtut> %VENV%\Scripts\pytest --cov=pyramidtut pyramidtut\tests.py -q
+    c:\pyramidtut\> %VENV%\Scripts\pytest --cov=pyramidtut pyramidtut\tests.py -q
 
 ``pytest`` follows :ref:`conventions for Python test discovery <pytest:test discovery>`, and the configuration defaults from the scaffold tell ``pytest`` where to find the module on which we want to run tests and coverage.
 
@@ -334,7 +334,7 @@ On Windows
 
 .. code-block:: doscon
 
-    c:\pyramidtut> %VENV%\Scripts\initialize_pyramidtut_db development.ini
+    c:\pyramidtut\> %VENV%\Scripts\initialize_pyramidtut_db development.ini
 
 The output to your console should be something like this:
 
@@ -386,7 +386,7 @@ On Windows
 
 .. code-block:: doscon
 
-    c:\pyramidtut> %VENV%\Scripts\pserve development.ini --reload
+    c:\pyramidtut\> %VENV%\Scripts\pserve development.ini --reload
 
 .. note::
 
