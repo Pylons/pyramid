@@ -417,11 +417,15 @@ Decisions the ``alchemy`` cookiecutter has made for you
 
 Creating a project using the ``alchemy`` cookiecutter makes the following assumptions:
 
-- You are willing to use SQLite for persistent storage, although almost any SQL database could be used with SQLAlchemy.
-- You are willing to use :term:`SQLAlchemy` as a database access tool.
-- You are willing to use :term:`URL dispatch` to map URLs to code.
-- You want to use `zope.sqlalchemy <https://pypi.python.org/pypi/zope.sqlalchemy>`_, `pyramid_tm <http://docs.pylonsproject.org/projects/pyramid-tm/en/latest/>`_, and the `transaction <https://pypi.python.org/pypi/transaction>`_ packages to scope sessions to requests.
-- You want to use `pyramid_jinja2 <http://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/>`_ to render your templates. Different templating engines can be used, but we had to choose one to make this tutorial. See :ref:`available_template_system_bindings` for some options.
+* You are willing to use SQLite for persistent storage, although almost any SQL database could be used with SQLAlchemy.
+
+* You are willing to use :term:`SQLAlchemy` as a database access tool.
+
+* You are willing to use :term:`URL dispatch` to map URLs to code.
+
+* You want to use `zope.sqlalchemy <https://pypi.python.org/pypi/zope.sqlalchemy>`_, `pyramid_tm <http://docs.pylonsproject.org/projects/pyramid-tm/en/latest/>`_, and the `transaction <https://pypi.python.org/pypi/transaction>`_ packages to scope sessions to requests.
+
+* You want to use `pyramid_jinja2 <http://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/>`_ to render your templates. Different templating engines can be used, but we had to choose one to make this tutorial. See :ref:`available_template_system_bindings` for some options.
 
 .. note::
 

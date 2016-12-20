@@ -20,8 +20,9 @@ We'll be using an SQLite database to hold our wiki data, and we'll be using :ter
 
 Within the database, we will define two tables:
 
-- The ``users`` table, which will store the ``id``, ``name``, ``password_hash``, and ``role`` of each wiki user.
-- The ``pages`` table, whose elements will store the wiki pages. There are four columns: ``id``, ``name``, ``data``, and ``creator_id``.
+* The ``users`` table, which will store the ``id``, ``name``, ``password_hash``, and ``role`` of each wiki user.
+
+* The ``pages`` table, whose elements will store the wiki pages. There are four columns: ``id``, ``name``, ``data``, and ``creator_id``.
 
 There is a one-to-many relationship between ``users`` and ``pages`` tracking the user who created each wiki page defined by the ``creator_id`` column on the ``pages`` table.
 

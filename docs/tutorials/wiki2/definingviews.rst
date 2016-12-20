@@ -201,9 +201,9 @@ Update ``pyramidtut/templates/layout.jinja2`` with the following content, as ind
 
 Since we're using a templating engine, we can factor common boilerplate out of our page templates into reusable components. One method for doing this is template inheritance via blocks.
 
-- We have defined two placeholders in the layout template where a child template can override the content. These blocks are named ``subtitle`` (line 11) and ``content`` (line 36).
+* We have defined two placeholders in the layout template where a child template can override the content. These blocks are named ``subtitle`` (line 11) and ``content`` (line 36).
 
-- Please refer to the `Jinja2 documentation <http://jinja.pocoo.org/>`_ for more information about template inheritance.
+* Please refer to the `Jinja2 documentation <http://jinja.pocoo.org/>`_ for more information about template inheritance.
 
 
 The ``view.jinja2`` template
@@ -217,15 +217,15 @@ Create ``pyramidtut/templates/view.jinja2`` and add the following content:
 
 This template is used by ``view_page()`` for displaying a single wiki page.
 
-- We begin by extending the ``layout.jinja2`` template defined above, which provides the skeleton of the page (line 1).
+* We begin by extending the ``layout.jinja2`` template defined above, which provides the skeleton of the page (line 1).
 
-- We override the ``subtitle`` block from the base layout, inserting the page name into the page's title (line 3).
+* We override the ``subtitle`` block from the base layout, inserting the page name into the page's title (line 3).
 
-- We override the ``content`` block from the base layout to insert our markup into the body (lines 5-18).
+* We override the ``content`` block from the base layout to insert our markup into the body (lines 5-18).
 
-- We use a variable that is replaced with the ``content`` value provided by the view (line 6). ``content`` contains HTML, so the ``|safe`` filter is used to prevent escaping it (e.g., changing ">" to "&gt;").
+* We use a variable that is replaced with the ``content`` value provided by the view (line 6). ``content`` contains HTML, so the ``|safe`` filter is used to prevent escaping it (e.g., changing ">" to "&gt;").
 
-- We create a link that points at the "edit" URL, which when clicked invokes the ``edit_page`` view for the requested page (line 9).
+* We create a link that points at the "edit" URL, which when clicked invokes the ``edit_page`` view for the requested page (line 9).
 
 
 The ``edit.jinja2`` template
@@ -240,15 +240,15 @@ Create ``pyramidtut/templates/edit.jinja2`` and add the following content:
 
 This template serves two use cases. It is used by ``add_page()`` and ``edit_page()`` for adding and editing a wiki page.  It displays a page containing a form and which provides the following:
 
-- Again, we extend the ``layout.jinja2`` template, which provides the skeleton of the page (line 1).
+* Again, we extend the ``layout.jinja2`` template, which provides the skeleton of the page (line 1).
 
-- Override the ``subtitle`` block to affect the ``<title>`` tag in the ``head`` of the page (line 3).
+* Override the ``subtitle`` block to affect the ``<title>`` tag in the ``head`` of the page (line 3).
 
-- A 10-row by 60-column ``textarea`` field named ``body`` that is filled with any existing page data when it is rendered (line 14).
+* A 10-row by 60-column ``textarea`` field named ``body`` that is filled with any existing page data when it is rendered (line 14).
 
-- A submit button that has the name ``form.submitted`` (line 17).
+* A submit button that has the name ``form.submitted`` (line 17).
 
-- The form POSTs back to the ``save_url`` argument supplied by the view (line 12). The view will use the ``body`` and ``form.submitted`` values.
+* The form POSTs back to the ``save_url`` argument supplied by the view (line 12). The view will use the ``body`` and ``form.submitted`` values.
 
 
 The ``404.jinja2`` template
@@ -269,11 +269,11 @@ This template is linked from the ``notfound_view`` defined in ``pyramidtut/views
 
 There are several important things to note about this configuration:
 
-- The ``notfound_view`` in the above snippet is called an :term:`exception view`. For more information see :ref:`special_exceptions_in_callables`.
+* The ``notfound_view`` in the above snippet is called an :term:`exception view`. For more information see :ref:`special_exceptions_in_callables`.
 
-- The ``notfound_view`` sets the response status to 404. It's possible to affect the response object used by the renderer via :ref:`request_response_attr`.
+* The ``notfound_view`` sets the response status to 404. It's possible to affect the response object used by the renderer via :ref:`request_response_attr`.
 
-- The ``notfound_view`` is registered as an exception view and will be invoked **only** if ``pyramid.httpexceptions.HTTPNotFound`` is raised as an exception. This means it will not be invoked for any responses returned from a view normally. For example, on line 27 of ``pyramidtut/views/default.py`` the exception is raised which will trigger the view.
+* The ``notfound_view`` is registered as an exception view and will be invoked **only** if ``pyramid.httpexceptions.HTTPNotFound`` is raised as an exception. This means it will not be invoked for any responses returned from a view normally. For example, on line 27 of ``pyramidtut/views/default.py`` the exception is raised which will trigger the view.
 
 Finally, we may delete the ``pyramidtut/templates/mytemplate.jinja2`` template that was provided by the ``alchemy`` cookiecutter, as we have created our own templates for the wiki.
 
@@ -287,14 +287,14 @@ Viewing the application in a browser
 
 We can finally examine our application in a browser (See :ref:`wiki2-start-the-application`).  Launch a browser and visit each of the following URLs, checking that the result is as expected:
 
-- http://localhost:6543/ invokes the ``view_wiki`` view.  This always redirects to the ``view_page`` view of the ``FrontPage`` page object.
+* http://localhost:6543/ invokes the ``view_wiki`` view.  This always redirects to the ``view_page`` view of the ``FrontPage`` page object.
 
-- http://localhost:6543/FrontPage invokes the ``view_page`` view of the ``FrontPage`` page object.
+* http://localhost:6543/FrontPage invokes the ``view_page`` view of the ``FrontPage`` page object.
 
-- http://localhost:6543/FrontPage/edit_page invokes the ``edit_page`` view for the ``FrontPage`` page object.
+* http://localhost:6543/FrontPage/edit_page invokes the ``edit_page`` view for the ``FrontPage`` page object.
 
-- http://localhost:6543/add_page/SomePageName invokes the ``add_page`` view for a page. If the page already exists, then it redirects the user to the ``edit_page`` view for the page object.
+* http://localhost:6543/add_page/SomePageName invokes the ``add_page`` view for a page. If the page already exists, then it redirects the user to the ``edit_page`` view for the page object.
 
-- http://localhost:6543/SomePageName/edit_page invokes the ``edit_page`` view for an existing page, or generates an error if the page does not exist.
+* http://localhost:6543/SomePageName/edit_page invokes the ``edit_page`` view for an existing page, or generates an error if the page does not exist.
 
-- To generate an error, visit http://localhost:6543/foobars/edit_page which will generate a ``NoResultFound: No row was found for one()`` error. You'll see an interactive traceback facility provided by :term:`pyramid_debugtoolbar`.
+* To generate an error, visit http://localhost:6543/foobars/edit_page which will generate a ``NoResultFound: No row was found for one()`` error. You'll see an interactive traceback facility provided by :term:`pyramid_debugtoolbar`.
