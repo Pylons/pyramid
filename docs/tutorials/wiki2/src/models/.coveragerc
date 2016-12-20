@@ -1,0 +1,3 @@
+[run]
+source = pyramidtut
+omit = pyramidtut/test*
