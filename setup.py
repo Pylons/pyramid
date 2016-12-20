@@ -56,7 +56,7 @@ else:
 
 tests_require = [
     'WebTest >= 1.3.1',  # py3 compat
-    'waitrees < 1.0',
+    'waitress < 1.0',
     ]
 
 if not PY3:
