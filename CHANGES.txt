@@ -1,6 +1,9 @@
 unreleased
 ==========
 
+- Remove testing on pypy3.
+  See https://github.com/Pylons/pyramid/issues/2871
+
 - Pin to ``zope.interface < 4.2.0`` on Python 3.2.
   See https://github.com/Pylons/pyramid/pull/2767
 
