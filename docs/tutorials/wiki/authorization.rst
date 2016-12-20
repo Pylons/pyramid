@@ -11,16 +11,23 @@ We will also add a login page and a logout link on all the pages.  The login pag
 We will implement the access control with the following steps:
 
 * Add password hashing dependencies.
+
 * Add users and groups (``security.py``, a new module).
+
 * Add an :term:`ACL` (``models.py``).
+
 * Add an :term:`authentication policy` and an :term:`authorization policy` (``__init__.py``).
+
 * Add :term:`permission` declarations to the ``edit_page`` and ``add_page`` views (``views.py``).
 
 Then we will add the login and logout features:
 
 * Add ``login`` and ``logout`` views (``views.py``).
+
 * Add a login template (``login.pt``).
+
 * Make the existing views return a ``logged_in`` flag to the renderer (``views.py``).
+
 * Add a "Logout" link to be shown when logged in and viewing or editing a page (``view.pt``, ``edit.pt``).
 
 
@@ -60,8 +67,9 @@ Create a new ``pyramidtut/security.py`` module with the following content:
 
 The ``groupfinder`` function accepts a userid and a request and returns one of these values:
 
-- If ``userid`` exists in the system, it will return a sequence of group identifiers (or an empty sequence if the user isn't a member of any groups).
-- If ``userid`` *does not* exist in the system, it will return ``None``.
+* If ``userid`` exists in the system, it will return a sequence of group identifiers (or an empty sequence if the user isn't a member of any groups).
+
+* If ``userid`` *does not* exist in the system, it will return ``None``.
 
 For example, ``groupfinder('editor', request )`` returns ``['group:editor']``, ``groupfinder('viewer', request)`` returns ``[]``, and ``groupfinder('admin', request)`` returns ``None``.  We will use ``groupfinder()`` as an :term:`authentication policy` "callback" that will provide the :term:`principal` or principals for a user.
 
@@ -195,8 +203,9 @@ Now add the ``login`` and ``logout`` views at the end of the file:
 
 ``login()`` has two decorators:
 
-- a ``@view_config`` decorator which associates it with the ``login`` route and makes it visible when we visit ``/login``,
-- a ``@forbidden_view_config`` decorator which turns it into a :term:`forbidden view`. ``login()`` will be invoked when a user tries to execute a view callable for which they lack authorization.  For example, if a user has not logged in and tries to add or edit a Wiki page, they will be shown the login form before being allowed to continue.
+* a ``@view_config`` decorator which associates it with the ``login`` route and makes it visible when we visit ``/login``,
+
+* a ``@forbidden_view_config`` decorator which turns it into a :term:`forbidden view`. ``login()`` will be invoked when a user tries to execute a view callable for which they lack authorization.  For example, if a user has not logged in and tries to add or edit a Wiki page, they will be shown the login form before being allowed to continue.
 
 The order of these two :term:`view configuration` decorators is unimportant.
 
@@ -306,8 +315,12 @@ Viewing the application in a browser
 
 We can finally examine our application in a browser (See :ref:`wiki-start-the-application`).  Launch a browser and visit each of the following URLs, checking that the result is as expected:
 
-- http://localhost:6543/ invokes the ``view_wiki`` view.  This always redirects to the ``view_page`` view of the ``FrontPage`` Page resource.  It is executable by any user.
-- http://localhost:6543/FrontPage invokes the ``view_page`` view of the ``FrontPage`` Page resource. This is because it's the :term:`default view` (a view without a ``name``) for ``Page`` resources.  It is executable by any user.
-- http://localhost:6543/FrontPage/edit_page invokes the edit view for the FrontPage object.  It is executable by only the ``editor`` user.  If a different user (or the anonymous user) invokes it, a login form will be displayed.  Supplying the credentials with the username ``editor``, password ``editor`` will display the edit page form.
-- http://localhost:6543/add_page/SomePageName invokes the add view for a page. It is executable by only the ``editor`` user.  If a different user (or the anonymous user) invokes it, a login form will be displayed. Supplying the credentials with the username ``editor``, password ``editor`` will display the edit page form.
-- After logging in (as a result of hitting an edit or add page and submitting the login form with the ``editor`` credentials), we'll see a Logout link in the upper right hand corner.  When we click it, we're logged out, and redirected back to the front page.
+* http://localhost:6543/ invokes the ``view_wiki`` view.  This always redirects to the ``view_page`` view of the ``FrontPage`` Page resource.  It is executable by any user.
+
+* http://localhost:6543/FrontPage invokes the ``view_page`` view of the ``FrontPage`` Page resource. This is because it's the :term:`default view` (a view without a ``name``) for ``Page`` resources.  It is executable by any user.
+
+* http://localhost:6543/FrontPage/edit_page invokes the edit view for the FrontPage object.  It is executable by only the ``editor`` user.  If a different user (or the anonymous user) invokes it, a login form will be displayed.  Supplying the credentials with the username ``editor``, password ``editor`` will display the edit page form.
+
+* http://localhost:6543/add_page/SomePageName invokes the add view for a page. It is executable by only the ``editor`` user.  If a different user (or the anonymous user) invokes it, a login form will be displayed. Supplying the credentials with the username ``editor``, password ``editor`` will display the edit page form.
+
+* After logging in (as a result of hitting an edit or add page and submitting the login form with the ``editor`` credentials), we'll see a Logout link in the upper right hand corner.  When we click it, we're logged out, and redirected back to the front page.

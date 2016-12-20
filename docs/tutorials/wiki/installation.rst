@@ -342,11 +342,14 @@ Decisions the ``zodb`` cookiecutter has made for you
 
 Creating a project using the ``zodb`` cookiecutter makes the following assumptions:
 
-- You are willing to use :term:`ZODB` for persistent storage.
-- You are willing to use :term:`traversal` to map URLs to code.
-- You want to use `pyramid_zodbconn <http://docs.pylonsproject.org/projects/pyramid-zodbconn/en/latest/>`_, `pyramid_tm <http://docs.pylonsproject.org/projects/pyramid-tm/en/latest/>`_, and the `transaction <http://zodb.readthedocs.org/en/latest/transactions.html>`_ packages
+* You are willing to use :term:`ZODB` for persistent storage.
+
+* You are willing to use :term:`traversal` to map URLs to code.
+
+* You want to use `pyramid_zodbconn <http://docs.pylonsproject.org/projects/pyramid-zodbconn/en/latest/>`_, `pyramid_tm <http://docs.pylonsproject.org/projects/pyramid-tm/en/latest/>`_, and the `transaction <http://zodb.readthedocs.org/en/latest/transactions.html>`_ packages
   to manage connections and transactions with :term:`ZODB`.
-- You want to use `pyramid_chameleon <http://docs.pylonsproject.org/projects/pyramid-chameleon/en/latest/>`_ to render your templates. Different templating engines can be used, but we had to choose one to make this tutorial. See :ref:`available_template_system_bindings` for some options.
+
+* You want to use `pyramid_chameleon <http://docs.pylonsproject.org/projects/pyramid-chameleon/en/latest/>`_ to render your templates. Different templating engines can be used, but we had to choose one to make this tutorial. See :ref:`available_template_system_bindings` for some options.
 
 .. note::
 

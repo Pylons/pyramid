@@ -74,8 +74,11 @@ We got rid of the ``my_view`` view function and its decorator that was added whe
 Then we added four :term:`view callable` functions to our ``views.py`` module:
 
 * ``view_wiki()`` - Displays the wiki itself. It will answer on the root URL.
+
 * ``view_page()`` - Displays an individual page.
+
 * ``add_page()`` - Allows the user to add a page.
+
 * ``edit_page()`` - Allows the user to edit a page.
 
 We'll describe each one briefly in the following sections.
@@ -190,8 +193,9 @@ Rename ``pyramidtut/templates/mytemplate.pt`` to ``pyramidtut/templates/view.pt`
 
 This template is used by ``view_page()`` for displaying a single wiki page. It includes:
 
-- A ``div`` element that is replaced with the ``content`` value provided by the view (lines 37-39).  ``content`` contains HTML, so the ``structure`` keyword is used to prevent escaping it (i.e., changing ">" to "&gt;", etc.)
-- A link that points at the "edit" URL which invokes the ``edit_page`` view for the page being viewed (lines 41-43).
+* A ``div`` element that is replaced with the ``content`` value provided by the view (lines 37-39).  ``content`` contains HTML, so the ``structure`` keyword is used to prevent escaping it (i.e., changing ">" to "&gt;", etc.)
+
+* A link that points at the "edit" URL which invokes the ``edit_page`` view for the page being viewed (lines 41-43).
 
 
 The ``edit.pt`` template
@@ -205,8 +209,9 @@ Copy ``pyramidtut/templates/view.pt`` to ``pyramidtut/templates/edit.pt`` and ed
 
 This template is used by ``add_page()`` and ``edit_page()`` for adding and editing a wiki page.  It displays a page containing a form that includes:
 
-- A 10-row by 60-column ``textarea`` field named ``body`` that is filled with any existing page data when it is rendered (line 46).
-- A submit button that has the name ``form.submitted`` (line 49).
+* A 10-row by 60-column ``textarea`` field named ``body`` that is filled with any existing page data when it is rendered (line 46).
+
+* A submit button that has the name ``form.submitted`` (line 49).
 
 The form POSTs back to the ``save_url`` argument supplied by the view (line 44).  The view will use the ``body`` and ``form.submitted`` values.
 
@@ -230,12 +235,12 @@ Viewing the application in a browser
 
 We can finally examine our application in a browser (See :ref:`wiki-start-the-application`).  Launch a browser and visit each of the following URLs, checking that the result is as expected:
 
-- http://localhost:6543/ invokes the ``view_wiki`` view.  This always redirects to the ``view_page`` view of the ``FrontPage`` Page resource.
+* http://localhost:6543/ invokes the ``view_wiki`` view.  This always redirects to the ``view_page`` view of the ``FrontPage`` Page resource.
 
-- http://localhost:6543/FrontPage/ invokes the ``view_page`` view of the front page resource.  This is because it's the :term:`default view` (a view without a ``name``) for Page resources.
+* http://localhost:6543/FrontPage/ invokes the ``view_page`` view of the front page resource.  This is because it's the :term:`default view` (a view without a ``name``) for Page resources.
 
-- http://localhost:6543/FrontPage/edit_page invokes the edit view for the ``FrontPage`` Page resource.
+* http://localhost:6543/FrontPage/edit_page invokes the edit view for the ``FrontPage`` Page resource.
 
-- http://localhost:6543/add_page/SomePageName invokes the add view for a Page.
+* http://localhost:6543/add_page/SomePageName invokes the add view for a Page.
 
-- To generate an error, visit http://localhost:6543/add_page which will generate an ``IndexErrorr: tuple index out of range`` error. You'll see an interactive traceback facility provided by :term:`pyramid_debugtoolbar`.
+* To generate an error, visit http://localhost:6543/add_page which will generate an ``IndexErrorr: tuple index out of range`` error. You'll see an interactive traceback facility provided by :term:`pyramid_debugtoolbar`.
