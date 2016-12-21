@@ -140,6 +140,29 @@ Features
   ``--help`` output as well as enabling nicer documentation of their options.
   See https://github.com/Pylons/pyramid/pull/2864
 
+- Any deferred configuration action registered via ``config.action`` may now
+  depend on threadlocal state, such as asset overrides, being active when
+  the action is executed.
+  See https://github.com/Pylons/pyramid/pull/2873
+
+- Asset specifications for directories passed to
+  ``config.add_translation_dirs`` now support overriding the entire asset
+  specification, including the folder name. Previously only the package name
+  was supported and the folder would always need to have the same name.
+  See https://github.com/Pylons/pyramid/pull/2873
+
+- ``config.begin()`` will propagate the current threadlocal request through
+  as long as the registry is the same. For example:
+
+  .. code-block:: python
+
+     request = Request.blank(...)
+     config.begin(request)  # pushes a request
+     config.begin()         # propagates the previous request through unchanged
+     assert get_current_request() is request
+
+  See https://github.com/Pylons/pyramid/pull/2873
+
 Bug Fixes
 ---------
 
@@ -173,6 +196,11 @@ Bug Fixes
 - Fix bug in i18n where the default domain would always use the Germanic plural
   style, even if a different plural function is defined in the relevant
   messages file. See https://github.com/Pylons/pyramid/pull/2859
+
+- The ``config.override_asset`` method now occurs during
+  ``pyramid.config.PHASE1_CONFIG`` such that it is ordered to execute before
+  any calls to ``config.add_translation_dirs``.
+  See https://github.com/Pylons/pyramid/pull/2873
 
 Deprecations
 ------------
