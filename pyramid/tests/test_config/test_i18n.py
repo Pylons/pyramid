@@ -36,9 +36,8 @@ class TestI18NConfiguratorMixin(unittest.TestCase):
     def test_add_translation_dirs_missing_dir(self):
         from pyramid.exceptions import ConfigurationError
         config = self._makeOne()
-        self.assertRaises(ConfigurationError,
-                          config.add_translation_dirs,
-                          '/wont/exist/on/my/system')
+        config.add_translation_dirs('/wont/exist/on/my/system')
+        self.assertRaises(ConfigurationError, config.commit)
 
     def test_add_translation_dirs_no_specs(self):
         from pyramid.interfaces import ITranslationDirectories
@@ -87,3 +86,30 @@ class TestI18NConfiguratorMixin(unittest.TestCase):
         self.assertEqual(config.registry.getUtility(ITranslationDirectories),
                          [locale])
 
+    def test_add_translation_dirs_uses_override_out_of_order(self):
+        from pyramid.interfaces import ITranslationDirectories
+        config = self._makeOne()
+        config.add_translation_dirs('pyramid.tests.pkgs.localeapp:locale')
+        config.override_asset('pyramid.tests.pkgs.localeapp:locale/',
+                              'pyramid.tests.pkgs.localeapp:locale2/')
+        config.commit()
+        self.assertEqual(config.registry.getUtility(ITranslationDirectories),
+                         [locale2])
+
+    def test_add_translation_dirs_doesnt_use_override_w_autocommit(self):
+        from pyramid.interfaces import ITranslationDirectories
+        config = self._makeOne(autocommit=True)
+        config.add_translation_dirs('pyramid.tests.pkgs.localeapp:locale')
+        config.override_asset('pyramid.tests.pkgs.localeapp:locale/',
+                              'pyramid.tests.pkgs.localeapp:locale2/')
+        self.assertEqual(config.registry.getUtility(ITranslationDirectories),
+                         [locale])
+
+    def test_add_translation_dirs_uses_override_w_autocommit(self):
+        from pyramid.interfaces import ITranslationDirectories
+        config = self._makeOne(autocommit=True)
+        config.override_asset('pyramid.tests.pkgs.localeapp:locale/',
+                              'pyramid.tests.pkgs.localeapp:locale2/')
+        config.add_translation_dirs('pyramid.tests.pkgs.localeapp:locale')
+        self.assertEqual(config.registry.getUtility(ITranslationDirectories),
+                         [locale2])

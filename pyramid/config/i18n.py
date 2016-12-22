@@ -1,13 +1,10 @@
-import os
-import sys
-
 from pyramid.interfaces import (
     ILocaleNegotiator,
     ITranslationDirectories,
     )
 
 from pyramid.exceptions import ConfigurationError
-from pyramid.path import package_path
+from pyramid.path import AssetResolver
 from pyramid.util import action_method
 
 class I18NConfiguratorMixin(object):
@@ -69,32 +66,32 @@ class I18NConfiguratorMixin(object):
         directories will be inserted into the beginning of the directory list
         in the order they're provided in the ``*specs`` list argument (items
         earlier in the list trump ones later in the list).
+
         """
         directories = []
         introspectables = []
-
-        for spec in specs[::-1]: # reversed
-            package_name, filename = self._split_spec(spec)
-            if package_name is None: # absolute filename
-                directory = filename
-            else:
-                __import__(package_name)
-                package = sys.modules[package_name]
-                directory = os.path.join(package_path(package), filename)
-
-            if not os.path.isdir(os.path.realpath(directory)):
-                raise ConfigurationError('"%s" is not a directory' %
-                                         directory)
-            intr = self.introspectable('translation directories', directory,
-                                       spec, 'translation directory')
-            intr['directory'] = directory
-            intr['spec'] = spec
-            introspectables.append(intr)
-            directories.append(directory)
+        resolver = AssetResolver(self.package_name)
 
         def register():
-            for directory in directories:
+            # defer spec resolution until register to allow for asset
+            # overrides to take place in an earlier config phase
+            for spec in specs[::-1]: # reversed
+                # the trailing slash helps match asset overrides for folders
+                if not spec.endswith('/'):
+                    spec += '/'
+                asset = resolver.resolve(spec)
+                directory = asset.abspath()
+                if not asset.isdir():
+                    raise ConfigurationError('"%s" is not a directory' %
+                                            directory)
+                intr = self.introspectable('translation directories', directory,
+                                        spec, 'translation directory')
+                intr['directory'] = directory
+                intr['spec'] = spec
+                introspectables.append(intr)
+                directories.append(directory)
 
+            for directory in directories:
                 tdirs = self.registry.queryUtility(ITranslationDirectories)
                 if tdirs is None:
                     tdirs = []

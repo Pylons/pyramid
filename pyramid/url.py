@@ -1,7 +1,6 @@
 """ Utility functions for dealing with URLs in pyramid """
 
 import os
-import warnings
 
 from repoze.lru import lru_cache
 
@@ -534,89 +533,72 @@ class URLMethodsMixin(object):
 
         virtual_path = getattr(url_adapter, 'virtual_path', None)
 
-        if virtual_path is None:
-            # old-style IContextURL adapter (Pyramid 1.2 and previous)
-            warnings.warn(
-                'Pyramid is using an IContextURL adapter to generate a '
-                'resource URL; any "app_url", "host", "port", or "scheme" '
-                'arguments passed to resource_url are being ignored.  To '
-                'avoid this behavior, as of Pyramid 1.3, register an '
-                'IResourceURL adapter instead of an IContextURL '
-                'adapter for the resource type(s).  IContextURL adapters '
-                'will be ignored in a later major release of Pyramid.',
-                DeprecationWarning,
-                2)
+        app_url = None
+        scheme = None
+        host = None
+        port = None
 
-            resource_url = url_adapter()
+        if 'route_name' in kw:
+            newkw = {}
+            route_name = kw['route_name']
+            remainder = getattr(url_adapter, 'virtual_path_tuple', None)
+            if remainder is None:
+                # older user-supplied IResourceURL adapter without 1.5
+                # virtual_path_tuple
+                remainder = tuple(url_adapter.virtual_path.split('/'))
+            remainder_name = kw.get('route_remainder_name', 'traverse')
+            newkw[remainder_name] = remainder
 
-        else:
-            # IResourceURL adapter (Pyramid 1.3 and after)
-            app_url = None
-            scheme = None
-            host = None
-            port = None
+            for name in (
+                'app_url', 'scheme', 'host', 'port', 'query', 'anchor'
+                ):
+                val = kw.get(name, None)
+                if val is not None:
+                    newkw['_' + name] = val
+                
+            if 'route_kw' in kw:
+                route_kw = kw.get('route_kw')
+                if route_kw is not None:
+                    newkw.update(route_kw)
 
-            if 'route_name' in kw:
-                newkw = {}
-                route_name = kw['route_name']
-                remainder = getattr(url_adapter, 'virtual_path_tuple', None)
-                if remainder is None:
-                    # older user-supplied IResourceURL adapter without 1.5
-                    # virtual_path_tuple
-                    remainder = tuple(url_adapter.virtual_path.split('/'))
-                remainder_name = kw.get('route_remainder_name', 'traverse')
-                newkw[remainder_name] = remainder
+            return self.route_url(route_name, *elements, **newkw)
 
-                for name in (
-                    'app_url', 'scheme', 'host', 'port', 'query', 'anchor'
-                    ):
-                    val = kw.get(name, None)
-                    if val is not None:
-                        newkw['_' + name] = val
-                    
-                if 'route_kw' in kw:
-                    route_kw = kw.get('route_kw')
-                    if route_kw is not None:
-                        newkw.update(route_kw)
+        if 'app_url' in kw:
+            app_url = kw['app_url']
 
-                return self.route_url(route_name, *elements, **newkw)
+        if 'scheme' in kw:
+            scheme = kw['scheme']
 
-            if 'app_url' in kw:
-                app_url = kw['app_url']
+        if 'host' in kw:
+            host = kw['host']
 
-            if 'scheme' in kw:
-                scheme = kw['scheme']
+        if 'port' in kw:
+            port = kw['port']
 
-            if 'host' in kw:
-                host = kw['host']
+        if app_url is None:
+            if scheme or host or port:
+                app_url = self._partial_application_url(scheme, host, port)
+            else:
+                app_url = self.application_url
 
-            if 'port' in kw:
-                port = kw['port']
+        resource_url = None
+        local_url = getattr(resource, '__resource_url__', None)
 
-            if app_url is None:
-                if scheme or host or port:
-                    app_url = self._partial_application_url(scheme, host, port)
-                else:
-                    app_url = self.application_url
+        if local_url is not None:
+            # the resource handles its own url generation
+            d = dict(
+                virtual_path=virtual_path,
+                physical_path=url_adapter.physical_path,
+                app_url=app_url,
+            )
 
-            resource_url = None
-            local_url = getattr(resource, '__resource_url__', None)
+            # allow __resource_url__ to punt by returning None
+            resource_url = local_url(self, d)
 
-            if local_url is not None:
-                # the resource handles its own url generation
-                d = dict(
-                    virtual_path=virtual_path,
-                    physical_path=url_adapter.physical_path,
-                    app_url=app_url,
-                )
-
-                # allow __resource_url__ to punt by returning None
-                resource_url = local_url(self, d)
-
-            if resource_url is None:
-                # the resource did not handle its own url generation or the
-                # __resource_url__ function returned None
-                resource_url = app_url + virtual_path
+        if resource_url is None:
+            # the resource did not handle its own url generation or the
+            # __resource_url__ function returned None
+            resource_url = app_url + virtual_path
 
         qs = ''
         anchor = ''
