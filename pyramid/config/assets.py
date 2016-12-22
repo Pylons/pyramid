@@ -4,7 +4,10 @@ import sys
 
 from zope.interface import implementer
 
-from pyramid.interfaces import IPackageOverrides
+from pyramid.interfaces import (
+    IPackageOverrides,
+    PHASE1_CONFIG,
+)
 
 from pyramid.exceptions import ConfigurationError
 from pyramid.threadlocal import get_current_registry
@@ -387,6 +390,7 @@ class AssetsConfiguratorMixin(object):
             )
         intr['to_override'] = to_override
         intr['override_with'] = override_with
-        self.action(None, register, introspectables=(intr,))
+        self.action(None, register, introspectables=(intr,),
+                    order=PHASE1_CONFIG)
 
     override_resource = override_asset # bw compat

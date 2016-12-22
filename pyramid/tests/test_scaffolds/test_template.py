@@ -143,13 +143,13 @@ class DummyCopydir(object):
         self.vars = vars
         self.kw = kw
 
-class DummyOptions(object):
+class DummyArgs(object):
     simulate = False
     overwrite = False
     interactive = False
 
 class DummyCommand(object):
-    options = DummyOptions()
+    args = DummyArgs()
     verbosity = 1
 
 

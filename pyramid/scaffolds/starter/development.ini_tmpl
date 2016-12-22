@@ -24,8 +24,7 @@ pyramid.includes =
 
 [server:main]
 use = egg:waitress#main
-host = 127.0.0.1
-port = 6543
+listen = 127.0.0.1:6543 [::1]:6543
 
 ###
 # logging configuration

@@ -451,9 +451,6 @@ class Configurator(
             return filename # absolute filename
         return '%s:%s' % (package, filename)
 
-    def _split_spec(self, path_or_spec):
-        return resolve_asset_spec(path_or_spec, self.package_name)
-
     def _fix_registry(self):
         """ Fix up a ZCA component registry that is not a
         pyramid.registry.Registry by adding analogues of ``has_listeners``,
@@ -606,11 +603,15 @@ class Configurator(
         if autocommit:
             # callables can depend on the side effects of resolving a
             # deferred discriminator
-            undefer(discriminator)
-            if callable is not None:
-                callable(*args, **kw)
-            for introspectable in introspectables:
-                introspectable.register(self.introspector, action_info)
+            self.begin()
+            try:
+                undefer(discriminator)
+                if callable is not None:
+                    callable(*args, **kw)
+                for introspectable in introspectables:
+                    introspectable.register(self.introspector, action_info)
+            finally:
+                self.end()
 
         else:
             action = extra
@@ -651,7 +652,11 @@ class Configurator(
         of this error will be information about the source of the conflict,
         usually including file names and line numbers of the cause of the
         configuration conflicts."""
-        self.action_state.execute_actions(introspector=self.introspector)
+        self.begin()
+        try:
+            self.action_state.execute_actions(introspector=self.introspector)
+        finally:
+            self.end()
         self.action_state = ActionState() # old actions have been processed
 
     def include(self, callable, route_prefix=None):
@@ -885,14 +890,30 @@ class Configurator(
 
     absolute_resource_spec = absolute_asset_spec # b/w compat forever
 
-    def begin(self, request=None):
+    def begin(self, request=_marker):
         """ Indicate that application or test configuration has begun.
         This pushes a dictionary containing the :term:`application
         registry` implied by ``registry`` attribute of this
         configurator and the :term:`request` implied by the
         ``request`` argument onto the :term:`thread local` stack
         consulted by various :mod:`pyramid.threadlocal` API
-        functions."""
+        functions.
+
+        If ``request`` is not specified and the registry owned by the
+        configurator is already pushed as the current threadlocal registry
+        then this method will keep the current threadlocal request unchanged.
+
+        .. versionchanged:: 1.8
+           The current threadlocal request is propagated if the current
+           threadlocal registry remains unchanged.
+
+        """
+        if request is _marker:
+            current = self.manager.get()
+            if current['registry'] == self.registry:
+                request = current['request']
+            else:
+                request = None
         self.manager.push({'registry':self.registry, 'request':request})
 
     def end(self):
@@ -992,11 +1013,11 @@ class Configurator(
         # Push the registry onto the stack in case any code that depends on
         # the registry threadlocal APIs used in listeners subscribed to the
         # IApplicationCreated event.
-        self.manager.push({'registry': self.registry, 'request': None})
+        self.begin()
         try:
             self.registry.notify(ApplicationCreated(app))
         finally:
-            self.manager.pop()
+            self.end()
 
         return app
 
