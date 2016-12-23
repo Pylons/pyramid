@@ -40,7 +40,7 @@ Only the highlighted line needs to be added.
 
 .. note::
 
-    We are using the ``bcrypt`` package from PyPI to hash our passwords securely. There are other one-way hash algorithms for passwords if bcrypt is an issue on your system. Just make sure that it's an algorithm approved for storing passwords versus a generic one-way hash.
+    We are using the ``bcrypt`` package from PyPI to hash our passwords securely. There are other one-way hash algorithms for passwords if ``bcrypt`` is an issue on your system. Just make sure that it's an algorithm approved for storing passwords versus a generic one-way hash.
 
 
 Running ``pip install -e .``
