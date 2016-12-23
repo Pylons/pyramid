@@ -183,8 +183,8 @@ The console will show ``pip`` checking for packages and installing missing packa
     PasteDeploy-1.5.2 Pygments-2.1.3 SQLAlchemy-1.1.4 WebOb-1.6.3 \
     WebTest-2.0.24 beautifulsoup4-4.5.1 coverage-4.2 py-1.4.32 pyramid-1.7.3 \
     pyramid-debugtoolbar-3.0.5 pyramid-jinja2-2.7 pyramid-mako-1.0.2 \
-    pyramid-tm-1.1.1 tutorial pytest-3.0.5 pytest-cov-2.4.0 repoze.lru-0.6 \
-    six-1.10.0 transaction-2.0.3 translationstring-1.3 venusian-1.0 \
+    pyramid-tm-1.1.1 pytest-3.0.5 pytest-cov-2.4.0 repoze.lru-0.6 six-1.10.0 \
+    transaction-2.0.3 translationstring-1.3 tutorial venusian-1.0 \
     waitress-1.0.1 zope.deprecation-4.2.0 zope.interface-4.3.3 \
     zope.sqlalchemy-0.7.7
 

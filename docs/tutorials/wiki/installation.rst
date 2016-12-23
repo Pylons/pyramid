@@ -172,11 +172,11 @@ The console will show ``pip`` checking for packages and installing missing packa
     WebTest-2.0.23 ZConfig-3.1.0 ZEO-5.0.4 ZODB-5.1.1 ZODB3-3.11.0 \
     beautifulsoup4-4.5.1 coverage-4.2 mock-2.0.0 pbr-1.10.0 persistent-4.2.2 \
     py-1.4.31 pyramid-1.7.3 pyramid-chameleon-0.3 pyramid-debugtoolbar-3.0.5 \
-    pyramid-mako-1.0.2 pyramid-tm-1.1.1 pyramid-zodbconn-0.7 tutorial \
-    pytest-3.0.5 pytest-cov-2.4.0 repoze.lru-0.6 six-1.10.0 transaction-2.0.3 \
-    translationstring-1.3 venusian-1.0 waitress-1.0.1 zc.lockfile-1.2.1 \
-    zdaemon-4.2.0 zodbpickle-0.6.0 zodburi-2.0 zope.deprecation-4.2.0 \
-    zope.interface-4.3.3
+    pyramid-mako-1.0.2 pyramid-tm-1.1.1 pyramid-zodbconn-0.7 pytest-3.0.5 \
+    pytest-cov-2.4.0 repoze.lru-0.6 six-1.10.0 transaction-2.0.3 \
+    translationstring-1.3 tutorial venusian-1.0 waitress-1.0.1 \
+    zc.lockfile-1.2.1 zdaemon-4.2.0 zodbpickle-0.6.0 zodburi-2.0 \
+    zope.deprecation-4.2.0 zope.interface-4.3.3
 
 Testing requirements are defined in our project's ``setup.py`` file, in the ``tests_require`` and ``extras_require`` stanzas.
 
