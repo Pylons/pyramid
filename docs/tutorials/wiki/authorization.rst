@@ -232,7 +232,7 @@ Add the following import statements to the head of
 ``tutorial/views.py``:
 
 .. literalinclude:: src/authorization/tutorial/views.py
-   :lines: 5-18
+   :lines: 6-17
    :emphasize-lines: 1-14
    :language: python
 
@@ -311,7 +311,7 @@ Open ``tutorial/templates/edit.pt`` and
 indicated by the highlighted lines.
 
 .. literalinclude:: src/authorization/tutorial/templates/edit.pt
-   :lines: 34-38
+   :lines: 35-39
    :emphasize-lines: 3-5
    :language: html
 
