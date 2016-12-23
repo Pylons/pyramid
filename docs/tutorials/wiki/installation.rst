@@ -90,7 +90,7 @@ On Windows
 
 .. code-block:: doscon
 
-    c:\tutorial\> set VENV=c:\tutorial
+    c:\tutorial> set VENV=c:\tutorial
 
 
 Create a virtual environment
@@ -112,13 +112,13 @@ Python 2.7:
 
 .. code-block:: doscon
 
-    c:\tutorial\> c:\Python27\Scripts\virtualenv %VENV%
+    c:\tutorial> c:\Python27\Scripts\virtualenv %VENV%
 
 Python 3.6:
 
 .. code-block:: doscon
 
-    c:\tutorial\> c:\Python36\Scripts\python -m venv %VENV%
+    c:\tutorial> c:\Python36\Scripts\python -m venv %VENV%
 
 
 Upgrade packaging tools in the virtual environment
@@ -136,7 +136,7 @@ On Windows
 
 .. code-block:: doscon
 
-    c:\tutorial\> %VENV%\Scripts\pip install --upgrade pip setuptools
+    c:\tutorial> %VENV%\Scripts\pip install --upgrade pip setuptools
 
 
 .. _installing_project_in_dev_mode_zodb:
@@ -158,7 +158,7 @@ On Windows
 
 .. code-block:: doscon
 
-    c:\tutorial\> %VENV%\Scripts\pip install -e ".[testing]"
+    c:\tutorial> %VENV%\Scripts\pip install -e ".[testing]"
 
 On all operating systems
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -213,7 +213,7 @@ On Windows
 
 .. code-block:: doscon
 
-   c:\tutorial\> %VENV%\Scripts\py.test -q
+   c:\tutorial> %VENV%\Scripts\py.test -q
 
 For a successful test run, you should see output that ends like this:
 
@@ -246,7 +246,7 @@ On Windows
 
 .. code-block:: doscon
 
-   c:\tutorial\> %VENV%\Scripts\py.test --cov \
+   c:\tutorial> %VENV%\Scripts\py.test --cov \
        --cov-report=term-missing
 
 If successful, you will see output something like this:
@@ -296,7 +296,7 @@ On Windows
 
 .. code-block:: doscon
 
-   c:\tutorial\> %VENV%\Scripts\py.test --cov=tutorial tutorial\tests.py -q
+   c:\tutorial> %VENV%\Scripts\py.test --cov=tutorial tutorial\tests.py -q
 
 py.test follows :ref:`conventions for Python test discovery
 <pytest:test discovery>`, and the configuration defaults from the cookiecutter
@@ -327,7 +327,7 @@ On Windows
 
 .. code-block:: doscon
 
-   c:\tutorial\> %VENV%\Scripts\pserve development.ini --reload
+   c:\tutorial> %VENV%\Scripts\pserve development.ini --reload
 
 .. note::
 

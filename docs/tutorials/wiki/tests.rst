@@ -66,7 +66,7 @@ On Windows:
 
 .. code-block:: text
 
-   c:\tutorial\> %VENV%\Scripts\py.test -q
+   c:\tutorial> %VENV%\Scripts\py.test -q
 
 The expected result should look like the following:
 
