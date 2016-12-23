@@ -6,9 +6,8 @@ Distributing Your Application
 
 Once your application works properly, you can create a "tarball" from it by
 using the ``setup.py sdist`` command.  The following commands assume your
-current working directory is the ``tutorial`` package we've created and that
-the parent directory of the ``tutorial`` package is a virtual environment
-representing a :app:`Pyramid` environment.
+current working directory contains the ``tutorial`` package and the
+``setup.py`` file.
 
 On UNIX:
 
