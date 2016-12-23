@@ -221,7 +221,6 @@ Typographical Conventions and Style Guide
    :maxdepth: 1
 
    typographical-conventions
-   style-guide
 
 
 Index and Glossary
