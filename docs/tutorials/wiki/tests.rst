@@ -58,13 +58,13 @@ configured, so we can jump right to running tests.
 
 On UNIX:
 
-.. code-block:: text
+.. code-block:: bash
 
    $ $VENV/bin/py.test -q
 
 On Windows:
 
-.. code-block:: text
+.. code-block:: doscon
 
    c:\tutorial> %VENV%\Scripts\py.test -q
 
