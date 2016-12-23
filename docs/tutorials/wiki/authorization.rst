@@ -26,7 +26,7 @@ We will implement the access control with the following steps:
 * Add :term:`permission` declarations to the ``edit_page`` and ``add_page``
   views (``views.py``).
 
-Then we will add the login and logout feature:
+Then we will add the login and logout features:
 
 * Add ``login`` and ``logout`` views (``views.py``).
 * Add a login template (``login.pt``).
@@ -73,7 +73,7 @@ Create a new ``tutorial/security.py`` module with the following content:
 The ``groupfinder`` function accepts a userid and a request and
 returns one of these values:
 
-- If the userid exists in the system, it will return a sequence of group
+- If ``userid`` exists in the system, it will return a sequence of group
   identifiers (or an empty sequence if the user isn't a member of any groups).
 - If the userid *does not* exist in the system, it will return ``None``.
 
@@ -103,19 +103,18 @@ Add an ACL
 ~~~~~~~~~~
 
 Open ``tutorial/models.py`` and add the following import
-statement at the head:
+statement near the top:
 
 .. literalinclude:: src/authorization/tutorial/models.py
-   :lines: 4-7
-   :linenos:
+   :lines: 4-8
+   :lineno-match:
    :language: python
 
 Add the following lines to the ``Wiki`` class:
 
 .. literalinclude:: src/authorization/tutorial/models.py
    :lines: 9-13
-   :linenos:
-   :lineno-start: 9
+   :lineno-match:
    :emphasize-lines: 4-5
    :language: python
 
@@ -124,10 +123,10 @@ permission is allowed, and :data:`~pyramid.security.Everyone`, a special
 :term:`principal` that is associated to all requests.  Both are used in the
 :term:`ACE` entries that make up the ACL.
 
-The ACL is a list that needs to be named `__acl__` and be an attribute of a
+The ACL is a list that needs to be named ``__acl__`` and be an attribute of a
 class.  We define an :term:`ACL` with two :term:`ACE` entries: the first entry
-allows any user the `view` permission.  The second entry allows the
-``group:editors`` principal the `edit` permission.
+allows any user the ``view`` permission.  The second entry allows the
+``group:editors`` principal the ``edit`` permission.
 
 The ``Wiki`` class that contains the ACL is the :term:`resource` constructor
 for the :term:`root` resource, which is a ``Wiki`` instance.  The ACL is
@@ -150,15 +149,14 @@ statements:
 .. literalinclude:: src/authorization/tutorial/__init__.py
    :lines: 1-8
    :linenos:
-   :emphasize-lines: 4-5,8
+   :emphasize-lines: 3-6,8
    :language: python
 
 Now add those policies to the configuration:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
    :lines: 18-23
-   :linenos:
-   :lineno-start: 18
+   :lineno-match:
    :emphasize-lines: 1-3,5-6
    :language: python
 
@@ -181,12 +179,12 @@ Open ``tutorial/views.py`` and add a ``permission='edit'`` parameter
 to the ``@view_config`` decorators for ``add_page()`` and ``edit_page()``:
 
 .. literalinclude:: src/authorization/tutorial/views.py
-   :lines: 50-52
+   :lines: 49-51
    :emphasize-lines: 2-3
    :language: python
 
 .. literalinclude:: src/authorization/tutorial/views.py
-   :lines: 70-72
+   :lines: 68-70
    :emphasize-lines: 2-3
    :language: python
 
@@ -235,7 +233,7 @@ Add the following import statements to the head of
 
 .. literalinclude:: src/authorization/tutorial/views.py
    :lines: 6-17
-   :emphasize-lines: 1-12
+   :emphasize-lines: 1-14
    :language: python
 
 All the highlighted lines need to be added or edited.
@@ -248,9 +246,8 @@ cookie.
 Now add the ``login`` and ``logout`` views at the end of the file:
 
 .. literalinclude:: src/authorization/tutorial/views.py
-   :lines: 82-116
-   :linenos:
-   :lineno-start: 82
+   :lines: 80-
+   :lineno-match:
    :language: python
 
 ``login()`` has two decorators:
@@ -287,17 +284,17 @@ the return value of ``view_page()``, ``add_page()``, and ``edit_page()`` as
 follows:
 
 .. literalinclude:: src/authorization/tutorial/views.py
-   :lines: 47-48
+   :lines: 46-47
    :emphasize-lines: 1-2
    :language: python
 
 .. literalinclude:: src/authorization/tutorial/views.py
-   :lines: 67-68
+   :lines: 65-66
    :emphasize-lines: 1-2
    :language: python
 
 .. literalinclude:: src/authorization/tutorial/views.py
-   :lines: 78-80
+   :lines: 76-78
    :emphasize-lines: 2-3
    :language: python
 
@@ -314,7 +311,7 @@ Open ``tutorial/templates/edit.pt`` and
 indicated by the highlighted lines.
 
 .. literalinclude:: src/authorization/tutorial/templates/edit.pt
-   :lines: 34-38
+   :lines: 35-39
    :emphasize-lines: 3-5
    :language: html
 
@@ -348,7 +345,7 @@ Our ``tutorial/views.py`` will look like this when we're done:
 
 .. literalinclude:: src/authorization/tutorial/views.py
    :linenos:
-   :emphasize-lines: 8,11-15,17,24,29,48,52,68,72,80,82-120
+   :emphasize-lines: 8,11-15,17,24,29,47,51,66,70,78,80-
    :language: python
 
 Only the highlighted lines need to be added or edited.
@@ -358,7 +355,7 @@ we're done:
 
 .. literalinclude:: src/authorization/tutorial/templates/edit.pt
    :linenos:
-   :emphasize-lines: 36-38
+   :emphasize-lines: 37-39
    :language: html
 
 Only the highlighted lines need to be added or edited.
@@ -368,7 +365,7 @@ we're done:
 
 .. literalinclude:: src/authorization/tutorial/templates/view.pt
    :linenos:
-   :emphasize-lines: 36-38
+   :emphasize-lines: 37-39
    :language: html
 
 Only the highlighted lines need to be added or edited.

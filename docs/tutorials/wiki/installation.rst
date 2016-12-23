@@ -15,66 +15,114 @@ install Pyramid**.  Thereby you will satisfy the following requirements.
 * You've satisfied the :ref:`requirements-for-installing-packages`.
 
 
-Create directory to contain the project
----------------------------------------
+Install cookiecutter
+--------------------
+We will use a :term:`cookiecutter` to create a Python package project from a Python package project template.  See `Cookiecutter Installation <https://cookiecutter.readthedocs.io/en/latest/installation.html>`_ for instructions.
 
-We need a workspace for our project files.
+.. note::
+
+    At the time of writing, the installation instructions for Cookiecutter suggest the optional use of ``sudo``, implying to install it in the system Python. We suggest that you install it in a virtual environment instead.
+
+
+Generate a Pyramid project from a cookiecutter
+----------------------------------------------
+
+We will create a Pyramid project in your home directory for UNIX or at the root for Windows. It is assumed you know the path to where you installed ``cookiecutter``. Issue the following commands and override the defaults in the prompts as follows.
 
 On UNIX
 ^^^^^^^
 
 .. code-block:: bash
 
-    $ mkdir ~/pyramidtut
+    $ cd ~
+    $ cookiecutter https://github.com/Pylons/pyramid-cookiecutter-zodb
 
 On Windows
 ^^^^^^^^^^
 
 .. code-block:: doscon
 
-   c:\> mkdir pyramidtut
+    c:\> cd \
+    c:\> cookiecutter https://github.com/Pylons/pyramid-cookiecutter-zodb
+
+On all operating systems
+^^^^^^^^^^^^^^^^^^^^^^^^
+If prompted for the first item, accept the default ``yes`` by hitting return.
+
+#. ``You've cloned ~/.cookiecutters/pyramid-cookiecutter-zodb before. Is it
+   okay to delete and re-clone it? [yes]:``
+#. ``project_name [Pyramid Scaffold]: myproj``
+#. ``repo_name [scaffold]: tutorial``
 
 
-Create and use a virtual Python environment
+Change directory into your newly created project
+------------------------------------------------
+
+On UNIX
+^^^^^^^
+
+.. code-block:: bash
+
+    $ cd tutorial
+
+On Windows
+^^^^^^^^^^
+
+.. code-block:: doscon
+
+    c:\> cd tutorial
+
+
+Set and use a ``VENV`` environment variable
 -------------------------------------------
 
-Next let's create a virtual environment workspace for our project.  We will use
-the ``VENV`` environment variable instead of the absolute path of the virtual
-environment.
+We will set the ``VENV`` environment variable to the absolute path of the virtual environment, and use it going forward.
 
 On UNIX
 ^^^^^^^
 
 .. code-block:: bash
 
-   $ export VENV=~/pyramidtut
-   $ python3 -m venv $VENV
+    $ export VENV=~/tutorial
 
 On Windows
 ^^^^^^^^^^
 
 .. code-block:: doscon
 
-   c:\> set VENV=c:\pyramidtut
+    c:\tutorial> set VENV=c:\tutorial
 
-Each version of Python uses different paths, so you will need to adjust the
-path to the command for your Python version.
+
+Create a virtual environment
+----------------------------
+
+On UNIX
+^^^^^^^
+
+.. code-block:: bash
+
+    $ python3 -m venv $VENV
+
+On Windows
+^^^^^^^^^^
+
+Each version of Python uses different paths, so you will need to adjust the path to the command for your Python version.
 
 Python 2.7:
 
 .. code-block:: doscon
 
-   c:\> c:\Python27\Scripts\virtualenv %VENV%
+    c:\tutorial> c:\Python27\Scripts\virtualenv %VENV%
 
 Python 3.6:
 
 .. code-block:: doscon
 
-   c:\> c:\Python35\Scripts\python -m venv %VENV%
+    c:\tutorial> c:\Python36\Scripts\python -m venv %VENV%
 
 
-Upgrade ``pip`` and ``setuptools`` in the virtual environment
--------------------------------------------------------------
+Upgrade packaging tools in the virtual environment
+--------------------------------------------------
 
 On UNIX
 ^^^^^^^
@@ -88,86 +136,7 @@ On Windows
 
 .. code-block:: doscon
 
-   c:\> %VENV%\Scripts\pip install --upgrade pip setuptools
-
-
-Install Pyramid into the virtual Python environment
----------------------------------------------------
-
-On UNIX
-^^^^^^^
-
-.. parsed-literal::
-
-   $ $VENV/bin/pip install "pyramid==\ |release|\ "
-
-On Windows
-^^^^^^^^^^
-
-.. parsed-literal::
-
-   c:\\> %VENV%\\Scripts\\pip install "pyramid==\ |release|\ "
-
-
-Change directory to your virtual Python environment
----------------------------------------------------
-
-Change directory to the ``pyramidtut`` directory, which is both your workspace
-and your virtual environment.
-
-On UNIX
-^^^^^^^
-
-.. code-block:: bash
-
-   $ cd pyramidtut
-
-On Windows
-^^^^^^^^^^
-
-.. code-block:: doscon
-
-   c:\> cd pyramidtut
-
-
-.. _making_a_project:
-
-Making a project
-----------------
-
-Your next step is to create a project.  For this tutorial, we will use
-the :term:`scaffold` named ``zodb``, which generates an application
-that uses :term:`ZODB` and :term:`traversal`.
-
-:app:`Pyramid` supplies a variety of scaffolds to generate sample projects. We
-will use ``pcreate``, a script that comes with Pyramid, to create our project
-using a scaffold.
-
-By passing ``zodb`` into the ``pcreate`` command, the script creates the files
-needed to use ZODB. By passing in our application name ``tutorial``, the script
-inserts that application name into all the required files.
-
-The below instructions assume your current working directory is "pyramidtut".
-
-On UNIX
-^^^^^^^
-
-.. code-block:: bash
-
-   $ $VENV/bin/pcreate -s zodb tutorial
-
-On Windows
-^^^^^^^^^^
-
-.. code-block:: doscon
-
-   c:\pyramidtut> %VENV%\Scripts\pcreate -s zodb tutorial
-
-.. note:: If you are using Windows, the ``zodb`` scaffold may not deal
-   gracefully with installation into a location that contains spaces in the
-   path. If you experience startup problems, try putting both the virtual
-   environment and the project into directories that do not contain spaces in
-   their paths.
+    c:\tutorial> %VENV%\Scripts\pip install --upgrade pip setuptools
 
 
 .. _installing_project_in_dev_mode_zodb:
@@ -175,76 +144,51 @@ On Windows
 Installing the project in development mode
 ------------------------------------------
 
-In order to do development on the project easily, you must "register" the
-project as a development egg in your workspace using the ``pip install -e .``
-command. In order to do so, change directory to the ``tutorial`` directory that
-you created in :ref:`making_a_project`, and run the ``pip install -e .``
-command using the virtual environment Python interpreter.
+In order to do development on the project easily, you must "register" the project as a development egg in your workspace. We will install testing requirements at the same time. We do so with the following command.
 
 On UNIX
 ^^^^^^^
 
 .. code-block:: bash
 
-   $ cd tutorial
-   $ $VENV/bin/pip install -e .
+    $ $VENV/bin/pip install -e ".[testing]"
 
 On Windows
 ^^^^^^^^^^
 
 .. code-block:: doscon
 
-   c:\pyramidtut> cd tutorial
-   c:\pyramidtut\tutorial> %VENV%\Scripts\pip install -e .
+    c:\tutorial> %VENV%\Scripts\pip install -e ".[testing]"
 
-The console will show ``pip`` checking for packages and installing missing
-packages. Success executing this command will show a line like the following:
+On all operating systems
+^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. code-block:: bash
-
-   Successfully installed BTrees-4.2.0 Chameleon-2.24 Mako-1.0.4 \
-   MarkupSafe-0.23 Pygments-2.1.3 ZConfig-3.1.0 ZEO-4.2.0b1 ZODB-4.2.0 \
-   ZODB3-3.11.0 mock-2.0.0 pbr-1.8.1 persistent-4.1.1 pyramid-chameleon-0.3 \
-   pyramid-debugtoolbar-2.4.2 pyramid-mako-1.0.2 pyramid-tm-0.12.1 \
-   pyramid-zodbconn-0.7 six-1.10.0 transaction-1.4.4 tutorial waitress-0.8.10 \
-   zc.lockfile-1.1.0 zdaemon-4.1.0 zodbpickle-0.6.0 zodburi-2.0
-
-
-.. _install-testing-requirements-zodb:
-
-Install testing requirements
-----------------------------
-
-In order to run tests, we need to install the testing requirements. This is
-done through our project's ``setup.py`` file, in the ``tests_require`` and
-``extras_require`` stanzas, and by issuing the command below for your
-operating system.
-
-.. literalinclude:: src/installation/setup.py
-   :language: python
-   :linenos:
-   :lineno-start: 22
-   :lines: 22-26
-
-.. literalinclude:: src/installation/setup.py
-   :language: python
-   :linenos:
-   :lineno-start: 45
-   :lines: 45-47
-
-On UNIX
-^^^^^^^
+The console will show ``pip`` checking for packages and installing missing packages. Success executing this command will show a line like the following:
 
 .. code-block:: bash
 
-   $ $VENV/bin/pip install -e ".[testing]"
+    Successfully installed BTrees-4.3.1 Chameleon-3.0 Mako-1.0.6 \
+    MarkupSafe-0.23 PasteDeploy-1.5.2 Pygments-2.1.3 WebOb-1.6.3 \
+    WebTest-2.0.23 ZConfig-3.1.0 ZEO-5.0.4 ZODB-5.1.1 ZODB3-3.11.0 \
+    beautifulsoup4-4.5.1 coverage-4.2 mock-2.0.0 pbr-1.10.0 persistent-4.2.2 \
+    py-1.4.31 pyramid-1.7.3 pyramid-chameleon-0.3 pyramid-debugtoolbar-3.0.5 \
+    pyramid-mako-1.0.2 pyramid-tm-1.1.1 pyramid-zodbconn-0.7 pyramidtut \
+    pytest-3.0.5 pytest-cov-2.4.0 repoze.lru-0.6 six-1.10.0 transaction-2.0.3 \
+    translationstring-1.3 venusian-1.0 waitress-1.0.1 zc.lockfile-1.2.1 \
+    zdaemon-4.2.0 zodbpickle-0.6.0 zodburi-2.0 zope.deprecation-4.2.0 \
+    zope.interface-4.3.3
 
-On Windows
-^^^^^^^^^^
+Testing requirements are defined in our project's ``setup.py`` file, in the ``tests_require`` and ``extras_require`` stanzas.
 
-.. code-block:: doscon
+.. literalinclude:: src/installation/setup.py
+    :language: python
+    :lineno-match:
+    :lines: 22-26
 
-   c:\pyramidtut\tutorial> %VENV%\Scripts\pip install -e ".[testing]"
+.. literalinclude:: src/installation/setup.py
+    :language: python
+    :lineno-match:
+    :lines: 46-48
 
 
 .. _running_tests:
@@ -269,7 +213,7 @@ On Windows
 
 .. code-block:: doscon
 
-   c:\pyramidtut\tutorial> %VENV%\Scripts\py.test -q
+   c:\tutorial> %VENV%\Scripts\py.test -q
 
 For a successful test run, you should see output that ends like this:
 
@@ -284,7 +228,7 @@ Expose test coverage information
 
 You can run the ``py.test`` command to see test coverage information. This
 runs the tests in the same way that ``py.test`` does, but provides additional
-"coverage" information, exposing which lines of your project are covered by the
+:term:`coverage` information, exposing which lines of your project are covered by the
 tests.
 
 We've already installed the ``pytest-cov`` package into our virtual
@@ -302,41 +246,40 @@ On Windows
 
 .. code-block:: doscon
 
-   c:\pyramidtut\tutorial> %VENV%\Scripts\py.test --cov \
+   c:\tutorial> %VENV%\Scripts\py.test --cov \
        --cov-report=term-missing
 
 If successful, you will see output something like this:
 
 .. code-block:: bash
 
-   ======================== test session starts ========================
-   platform Python 3.6.0, pytest-2.9.1, py-1.4.31, pluggy-0.3.1
-   rootdir: /Users/stevepiercy/projects/pyramidtut/tutorial, inifile:
-   plugins: cov-2.2.1
-   collected 1 items
+    ======================== test session starts ========================
+    platform Python 3.6.0, pytest-3.0.5, py-1.4.31, pluggy-0.4.0
+    rootdir: /Users/stevepiercy/tutorial, inifile:
+    plugins: cov-2.4.0
+    collected 1 items
 
-   tutorial/tests.py .
-   ------------------ coverage: platform Python 3.6.0 ------------------
-   Name                   Stmts   Miss  Cover   Missing
-   ----------------------------------------------------
-   tutorial/__init__.py      12      7    42%   7-8, 14-18
-   tutorial/models.py        10      6    40%   9-14
-   tutorial/tests.py         12      0   100%
-   tutorial/views.py          4      0   100%
-   ----------------------------------------------------
-   TOTAL                     38     13    66%
+    tutorial/tests.py .
+    ------------------ coverage: platform Python 3.6.0 ------------------
+    Name                   Stmts   Miss  Cover   Missing
+    -------------------------------------------------------
+    tutorial/__init__.py      14      9    36%   7-8, 14-20
+    tutorial/models.py        10      6    40%   9-14
+    tutorial/views.py          4      0   100%
+    -------------------------------------------------------
+    TOTAL                     28     15    46%
 
-   ===================== 1 passed in 0.31 seconds ======================
+    ===================== 1 passed in 0.31 seconds ======================
 
 Our package doesn't quite have 100% test coverage.
 
 
-.. _test_and_coverage_scaffold_defaults_zodb:
+.. _test_and_coverage_cookiecutter_defaults_zodb:
 
-Test and coverage scaffold defaults
------------------------------------
+Test and coverage cookiecutter defaults
+---------------------------------------
 
-Scaffolds include configuration defaults for ``py.test`` and test coverage.
+Cookiecutters include configuration defaults for ``py.test`` and test coverage.
 These configuration files are ``pytest.ini`` and ``.coveragerc``, located at
 the root of your package. Without these defaults, we would need to specify the
 path to the module on which we want to run tests and coverage.
@@ -353,11 +296,10 @@ On Windows
 
 .. code-block:: doscon
 
-   c:\pyramidtut\tutorial> %VENV%\Scripts\py.test --cov=tutorial \
-       --cov-report=term-missing tutorial\tests.py -q
+   c:\tutorial> %VENV%\Scripts\py.test --cov=tutorial tutorial\tests.py -q
 
 py.test follows :ref:`conventions for Python test discovery
-<pytest:test discovery>`, and the configuration defaults from the scaffold
+<pytest:test discovery>`, and the configuration defaults from the cookiecutter
 tell ``py.test`` where to find the module on which we want to run tests and
 coverage.
 
@@ -385,7 +327,7 @@ On Windows
 
 .. code-block:: doscon
 
-   c:\pyramidtut\tutorial> %VENV%\Scripts\pserve development.ini --reload
+   c:\tutorial> %VENV%\Scripts\pserve development.ini --reload
 
 .. note::
 
@@ -396,9 +338,10 @@ If successful, you will see something like this on your console:
 
 .. code-block:: text
 
-   Starting subprocess with file monitor
-   Starting server in PID 82349.
-   serving on http://127.0.0.1:6543
+    Starting subprocess with file monitor
+    Starting server in PID 44078.
+    Serving on http://localhost:6543
+    Serving on http://localhost:6543
 
 This means the server is ready to accept requests.
 
@@ -415,13 +358,13 @@ page.  You can read more about the purpose of the icon at
 application while you develop.
 
 
-Decisions the ``zodb`` scaffold has made for you
-------------------------------------------------
+Decisions the ``zodb`` cookiecutter has made for you
+----------------------------------------------------
 
-Creating a project using the ``zodb`` scaffold makes the following
+Creating a project using the ``zodb`` cookiecutter makes the following
 assumptions:
 
-- You are willing to use :term:`ZODB` as persistent storage.
+- You are willing to use :term:`ZODB` for persistent storage.
 
 - You are willing to use :term:`traversal` to map URLs to code.
 
