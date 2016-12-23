@@ -43,11 +43,7 @@ editing, and viewing wiki pages, plus one view for the wiki front page.
 Two templates will be used, one for viewing, and one for both adding
 and editing wiki pages.
 
-The default templating systems in :app:`Pyramid` are
-:term:`Chameleon` and :term:`Mako`.  Chameleon is a variant of
-:term:`ZPT`, which is an XML-based templating language.  Mako is a
-non-XML-based templating language.  Because we had to pick one,
-we chose Chameleon for this tutorial.
+As of version 1.5 :app:`Pyramid` no longer ships with templating systems.  In this tutorial, we will use :term:`Chameleon`.  Chameleon is a variant of :term:`ZPT`, which is an XML-based templating language.
 
 Security
 --------
@@ -55,16 +51,16 @@ Security
 We'll eventually be adding security to our application.  The components we'll
 use to do this are below.
 
-- USERS, a dictionary mapping :term:`userids <userid>` to their
+* USERS, a dictionary mapping :term:`userids <userid>` to their
   corresponding passwords.
 
-- GROUPS, a dictionary mapping :term:`userids <userid>` to a
+* GROUPS, a dictionary mapping :term:`userids <userid>` to a
   list of groups to which they belong.
 
-- ``groupfinder``, an *authorization callback* that looks up USERS and
+* ``groupfinder``, an *authorization callback* that looks up USERS and
   GROUPS.  It will be provided in a new ``security.py`` file.
 
-- An :term:`ACL` is attached to the root :term:`resource`.  Each row below
+* An :term:`ACL` is attached to the root :term:`resource`.  Each row below
   details an :term:`ACE`:
 
   +----------+----------------+----------------+
@@ -75,7 +71,7 @@ use to do this are below.
   | Allow    | group:editors  | Edit           |
   +----------+----------------+----------------+
 
-- Permission declarations are added to the views to assert the security
+* Permission declarations are added to the views to assert the security
   policies as each request is handled.
 
 Two additional views and one template will handle the login and
@@ -125,13 +121,13 @@ listed in the following table:
 |                      |             |                 |  submitted,           |            |            |
 |                      |             |                 |  authenticate.        |            |            |
 |                      |             |                 |                       |            |            |
-|                      |             |                 |  - If authentication  |            |            |
+|                      |             |                 |  * If authentication  |            |            |
 |                      |             |                 |    succeeds,          |            |            |
 |                      |             |                 |    redirect to the    |            |            |
 |                      |             |                 |    page that we       |            |            |
 |                      |             |                 |    came from.         |            |            |
 |                      |             |                 |                       |            |            |
-|                      |             |                 |  - If authentication  |            |            |
+|                      |             |                 |  * If authentication  |            |            |
 |                      |             |                 |    fails, display     |            |            |
 |                      |             |                 |    login form with    |            |            |
 |                      |             |                 |    "login failed"     |            |            |
