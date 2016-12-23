@@ -15,7 +15,7 @@ Front Matter
    :maxdepth: 1
 
    copyright
-   style-guide
+   typographical-conventions
    authorintro
    designdefense
 

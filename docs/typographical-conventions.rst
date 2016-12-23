@@ -13,7 +13,7 @@ Typographical Conventions
 Introduction
 ------------
 
-This chapter describes typographical conventions used in the Pyramid documentation. Documentation authors and contributors should review the :ref:`style-guide`.
+This chapter describes typographical conventions used in the Pyramid documentation.
 
 
 .. _typographical-conventions-glossary:
