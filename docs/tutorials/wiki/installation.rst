@@ -259,17 +259,17 @@ If successful, you will see output something like this:
     plugins: cov-2.4.0
     collected 1 items
 
-   tutorial/tests.py .
-   ------------------ coverage: platform Python 3.6.0 ------------------
-   Name                   Stmts   Miss  Cover   Missing
-   -------------------------------------------------------
-   tutorial/__init__.py      14      9    36%   7-8, 14-20
-   tutorial/models.py        10      6    40%   9-14
-   tutorial/views.py          4      0   100%
-   -------------------------------------------------------
-   TOTAL                     28     15    46%
+    tutorial/tests.py .
+    ------------------ coverage: platform Python 3.6.0 ------------------
+    Name                   Stmts   Miss  Cover   Missing
+    -------------------------------------------------------
+    tutorial/__init__.py      14      9    36%   7-8, 14-20
+    tutorial/models.py        10      6    40%   9-14
+    tutorial/views.py          4      0   100%
+    -------------------------------------------------------
+    TOTAL                     28     15    46%
 
-   ===================== 1 passed in 0.31 seconds ======================
+    ===================== 1 passed in 0.31 seconds ======================
 
 Our package doesn't quite have 100% test coverage.
 
