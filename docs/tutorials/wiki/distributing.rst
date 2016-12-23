@@ -20,7 +20,7 @@ On Windows:
 
 .. code-block:: doscon
 
-   c:\pyramidtut> %VENV%\Scripts\python setup.py sdist
+   c:\tutorial> %VENV%\Scripts\python setup.py sdist
 
 The output of such a command will be something like:
 

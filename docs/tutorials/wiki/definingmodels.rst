@@ -4,7 +4,7 @@
 Defining the Domain Model
 =========================
 
-The first change we'll make to our stock ``pcreate``-generated application will
+The first change we'll make to our stock cookiecutter-generated application will
 be to define two :term:`resource` constructors, one representing a wiki page,
 and another representing the wiki as a mapping of wiki page names to page
 objects.  We'll do this inside our ``models.py`` file.
@@ -50,7 +50,9 @@ The first thing we want to do is remove the ``MyModel`` class from the
 generated ``models.py`` file.  The ``MyModel`` class is only a sample and
 we're not going to use it.
 
-Then, we'll add a ``Wiki`` class.  We want it to inherit from the
+Then we'll add an import at the top for the :class:`persistent.Persistent` class.  We'll use this for a new ``Page`` class in a moment.
+
+Then we'll add a ``Wiki`` class.  We want it to inherit from the
 :class:`persistent.mapping.PersistentMapping` class because it provides
 mapping behavior, and it makes sure that our Wiki page is stored as a
 "first-class" persistent object in our ZODB database.
