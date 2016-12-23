@@ -92,7 +92,7 @@ Our authentication policy is expecting a new setting, ``auth.secret``. Open
 the file ``development.ini`` and add the highlighted line below:
 
 .. literalinclude:: src/authentication/development.ini
-   :lines: 18-20
+   :lines: 17-19
    :emphasize-lines: 3
    :lineno-match:
    :language: ini

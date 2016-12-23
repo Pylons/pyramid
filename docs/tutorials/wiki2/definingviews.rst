@@ -42,7 +42,7 @@ installed, so re-run the ``$VENV/bin/pip install -e .`` command.
 
 
 Static assets
--------------
+=============
 
 Our templates name static assets, including CSS and images.  We don't need
 to create these files within our package's ``static`` directory because they
@@ -133,7 +133,7 @@ The highlighted lines need to be added or edited.
 We added some imports, and created a regular expression to find "WikiWords".
 
 We got rid of the ``my_view`` view function and its decorator that was added
-when we originally rendered the ``alchemy`` scaffold.  It was only an example
+when we originally rendered the ``alchemy`` cookiecutter.  It was only an example
 and isn't relevant to our application.  We also deleted the ``db_err_msg``
 string.
 
@@ -340,7 +340,7 @@ indicated by the emphasized lines:
 
 .. literalinclude:: src/views/tutorial/templates/layout.jinja2
    :linenos:
-   :emphasize-lines: 11,35-36
+   :emphasize-lines: 11,35-37
    :language: html
 
 Since we're using a templating engine, we can factor common boilerplate out of
@@ -350,7 +350,7 @@ template inheritance via blocks.
 - We have defined two placeholders in the layout template where a child
   template can override the content. These blocks are named ``subtitle`` (line
   11) and ``content`` (line 36).
-- Please refer to the Jinja2_ documentation for more information about template
+- Please refer to the `Jinja2 documentation <http://jinja.pocoo.org/>`_ for more information about template
   inheritance.
 
 
@@ -436,7 +436,7 @@ There are several important things to note about this configuration:
   the view.
 
 Finally, we may delete the ``tutorial/templates/mytemplate.jinja2`` template
-that was provided by the ``alchemy`` scaffold, as we have created our own
+that was provided by the ``alchemy`` cookiecutter, as we have created our own
 templates for the wiki.
 
 .. note::
@@ -475,5 +475,3 @@ each of the following URLs, checking that the result is as expected:
   will generate a ``NoResultFound: No row was found for one()`` error. You'll
   see an interactive traceback facility provided by
   :term:`pyramid_debugtoolbar`.
-
-.. _jinja2: http://jinja.pocoo.org/
