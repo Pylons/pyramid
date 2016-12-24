@@ -375,7 +375,7 @@ This template is used by ``view_page()`` for displaying a single wiki page.
   view (line 6). ``content`` contains HTML, so the ``|safe`` filter is used to
   prevent escaping it (e.g., changing ">" to "&gt;").
 - We create a link that points at the "edit" URL, which when clicked invokes
-  the ``edit_page`` view for the requested page (line 9).
+  the ``edit_page`` view for the requested page (lines 8-10).
 
 
 The ``edit.jinja2`` template
