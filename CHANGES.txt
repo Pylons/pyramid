@@ -163,6 +163,14 @@ Features
 
   See https://github.com/Pylons/pyramid/pull/2873
 
+- The SQLAlchemy + URL Dispatch + Jinja2 (``wiki2``) and
+  ZODB + Traversal + Chameleon (``wiki``) tutorials have been updated to
+  utilize the new cookiecutters and drop support for the ``pcreate``
+  scaffolds.
+
+  See https://github.com/Pylons/pyramid/pull/2881 and
+  https://github.com/Pylons/pyramid/pull/2883.
+
 Bug Fixes
 ---------
 
