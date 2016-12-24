@@ -31,7 +31,7 @@ The output of such a command will be something like:
    Creating tar archive
    removing 'tutorial-0.0' (and everything under it)
 
-Note that this command creates a tarball in the "dist" subdirectory named
+Note that this command creates a tarball in the ``dist`` subdirectory named
 ``tutorial-0.0.tar.gz``.  You can send this file to your friends to show them
 your cool new application.  They should be able to install it by pointing the
 ``pip install`` command directly at it. Or you can upload it to `PyPI

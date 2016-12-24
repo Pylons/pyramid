@@ -13,7 +13,7 @@ def my_view(request):
         one = query.filter(MyModel.name == 'one').first()
     except DBAPIError:
         return Response(db_err_msg, content_type='text/plain', status=500)
-    return {'one': one, 'project': 'tutorial'}
+    return {'one': one, 'project': 'myproj'}
 
 
 db_err_msg = """\
