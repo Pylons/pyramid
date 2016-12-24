@@ -250,7 +250,7 @@ class PRoutesCommand(object):
     ConfigParser = configparser.ConfigParser  # testing
     parser = argparse.ArgumentParser(
         description=textwrap.dedent(description),
-        formatter_class = argparse.RawDescriptionHelpFormatter,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
         )
     parser.add_argument('-g', '--glob',
                         action='store',

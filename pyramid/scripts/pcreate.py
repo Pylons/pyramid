@@ -31,7 +31,7 @@ Note: As of Pyramid 1.8, this command is deprecated. Use a specific
 cookiecutter instead:
 https://github.com/Pylons/?q=cookiecutter
 """,
-        formatter_class = argparse.RawDescriptionHelpFormatter,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument('-s', '--scaffold',
                         dest='scaffold_name',
