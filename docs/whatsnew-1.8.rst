@@ -107,7 +107,7 @@ Feature Additions
   other settings. See https://github.com/Pylons/pyramid/pull/2823
 
 - ``pserve --reload`` now uses the
-  `hupper <http://docs.pylonsproject.org/projects/hupper/en/latest/>`
+  `hupper <http://docs.pylonsproject.org/projects/hupper/en/latest/>`_
   library to monitor file changes. This comes with many improvements:
 
   - If the `watchdog <http://pythonhosted.org/watchdog/>`_ package is
