@@ -107,7 +107,7 @@ Feature Additions
   other settings. See https://github.com/Pylons/pyramid/pull/2823
 
 - ``pserve --reload`` now uses the
-  `hupper <http://docs.pylonsproject.org/projects/hupper/en/latest/>`
+  `hupper <http://docs.pylonsproject.org/projects/hupper/en/latest/>`_
   library to monitor file changes. This comes with many improvements:
 
   - If the `watchdog <http://pythonhosted.org/watchdog/>`_ package is
@@ -150,9 +150,18 @@ Feature Additions
 Deprecations
 ------------
 
-- The ``pcreate`` script and related scaffolds have been deprecated in favor
-  of the popular
-  `cookiecutter <https://cookiecutter.readthedocs.io/en/latest/>`_ project.
+- The ``pcreate`` script and the core scaffolds (``starter``, ``alchemy`` and
+  ``zodb``) have been deprecated.
+
+  They have been replaced with the decision to embrace the popular
+  `cookiecutter <https://cookiecutter.readthedocs.io/en/latest/>`_ project
+  as a best-of-breed project templating solution.
+
+  ``pcreate`` was originally introduced when very few alternatives existed
+  that supported Python 3. Fortunately the situation has improved and
+  with possible tooling support for cookiecutters being discussed by major
+  IDEs, and the simplicity of the jinja2 syntax, it is exciting to embrace
+  the project moving forward!
 
   All of Pyramid's official scaffolds as well as the tutorials have been
   ported to cookiecutters:
