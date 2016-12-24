@@ -51,7 +51,8 @@ class PServeCommand(object):
     default_verbosity = 1
 
     parser = argparse.ArgumentParser(
-        description=textwrap.dedent(description)
+        description=textwrap.dedent(description),
+        formatter_class = argparse.RawDescriptionHelpFormatter,
         )
     parser.add_argument(
         '-n', '--app-name',

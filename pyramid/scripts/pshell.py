@@ -45,7 +45,8 @@ class PShellCommand(object):
     pkg_resources = pkg_resources  # for testing
 
     parser = argparse.ArgumentParser(
-        description=textwrap.dedent(description)
+        description=textwrap.dedent(description),
+        formatter_class = argparse.RawDescriptionHelpFormatter,
         )
     parser.add_argument('-p', '--python-shell',
                         action='store',

@@ -28,7 +28,8 @@ class PViewsCommand(object):
     stdout = sys.stdout
 
     parser = argparse.ArgumentParser(
-        description=textwrap.dedent(description)
+        description=textwrap.dedent(description),
+        formatter_class = argparse.RawDescriptionHelpFormatter,
         )
 
     parser.add_argument('config_uri',
