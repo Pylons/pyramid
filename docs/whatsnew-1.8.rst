@@ -180,7 +180,7 @@ Deprecations
 Documentation Enhancements
 --------------------------
 
-- Update Typographical Conventions and add a Style Guide.
+- Update Typographical Conventions.
   https://github.com/Pylons/pyramid/pull/2838
 
 - Add `pyramid_nacl_session
