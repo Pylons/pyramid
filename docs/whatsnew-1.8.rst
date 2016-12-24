@@ -150,10 +150,23 @@ Feature Additions
 Deprecations
 ------------
 
+- The ``pcreate`` script and related scaffolds have been deprecated in favor
+  of the popular
+  `cookiecutter <https://cookiecutter.readthedocs.io/en/latest/>`_ project.
 
-Scaffolding Enhancements
-------------------------
+  All of Pyramid's official scaffolds as well as the tutorials have been
+  ported to cookiecutters:
 
+  - `pyramid-cookiecutter-starter
+    <https://github.com/Pylons/pyramid-cookiecutter-starter>`_
+
+  - `pyramid-cookiecutter-alchemy
+    <https://github.com/Pylons/pyramid-cookiecutter-alchemy>`_
+
+  - `pyramid-cookiecutter-zodb
+    <https://github.com/Pylons/pyramid-cookiecutter-zodb>`_
+
+  See https://github.com/Pylons/pyramid/pull/2780
 
 Documentation Enhancements
 --------------------------
@@ -179,3 +192,11 @@ Documentation Enhancements
   :class:`pyramid.httpexceptions.HTTPException` in which more appropriate
   kwargs from the parent class :class:`pyramid.response.Response` should be
   used instead. See https://github.com/Pylons/pyramid/pull/2750
+
+- The SQLAlchemy + URL Dispatch + Jinja2 (``wiki2``) and
+  ZODB + Traversal + Chameleon (``wiki``) tutorials have been updated to
+  utilize the new cookiecutters and drop support for the ``pcreate``
+  scaffolds.
+
+  See https://github.com/Pylons/pyramid/pull/2881 and
+  https://github.com/Pylons/pyramid/pull/2883.
