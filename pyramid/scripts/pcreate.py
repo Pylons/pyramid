@@ -23,13 +23,16 @@ def main(argv=sys.argv, quiet=False):
 
 class PCreateCommand(object):
     verbosity = 1  # required
-    parser = argparse.ArgumentParser(description="""\
+    parser = argparse.ArgumentParser(
+        description="""\
 Render Pyramid scaffolding to an output directory.
 
 Note: As of Pyramid 1.8, this command is deprecated. Use a specific
 cookiecutter instead:
 https://github.com/Pylons/?q=cookiecutter
-""")
+""",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
     parser.add_argument('-s', '--scaffold',
                         dest='scaffold_name',
                         action='append',
