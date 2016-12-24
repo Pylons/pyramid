@@ -545,7 +545,7 @@ includes a new way of running your application:
 Let's look at ``pserve`` and configuration in more depth.
 
 .. seealso:: See also:
-    :ref:`Quick Tutorial Cookiecutters <qtut_scaffolds>`,
+    :ref:`Quick Tutorial Cookiecutters <qtut_cookiecutters>`,
     :ref:`project_narr`, and
     :doc:`../narr/scaffolding`
 
