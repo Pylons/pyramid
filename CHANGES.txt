@@ -205,6 +205,24 @@ Bug Fixes
 Deprecations
 ------------
 
+- The ``pcreate`` script and related scaffolds have been deprecated in favor
+  of the popular
+  `cookiecutter <https://cookiecutter.readthedocs.io/en/latest/>`_ project.
+
+  All of Pyramid's official scaffolds as well as the tutorials have been
+  ported to cookiecutters:
+
+  - `pyramid-cookiecutter-starter
+    <https://github.com/Pylons/pyramid-cookiecutter-starter>`_
+
+  - `pyramid-cookiecutter-alchemy
+    <https://github.com/Pylons/pyramid-cookiecutter-alchemy>`_
+
+  - `pyramid-cookiecutter-zodb
+    <https://github.com/Pylons/pyramid-cookiecutter-zodb>`_
+
+  See https://github.com/Pylons/pyramid/pull/2780
+
 Documentation Changes
 ---------------------
 
