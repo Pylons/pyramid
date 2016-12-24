@@ -491,40 +491,48 @@ more to offer:
     :ref:`class_as_view`.
 
 
-Quick project startup with scaffolds
-====================================
+Quick project startup with cookiecutters
+========================================
 
 So far we have done all of our *Quick Tour* as a single Python file. No Python
 packages, no structure. Most Pyramid projects, though, aren't developed this
 way.
 
-To ease the process of getting started, Pyramid provides *scaffolds* that
-generate sample projects from templates in Pyramid and Pyramid add-ons.
-Pyramid's ``pcreate`` command can list the available scaffolds:
+To ease the process of getting started, the Pylons Project provides :term:`cookiecutter`\ s that generate sample Pyramid projects from project templates. In addition these cookiecutters will install Pyramid and its dependencies.
+
+First you'll need to install cookiecutter.
 
 .. code-block:: bash
 
-    $ $VENV/bin/pcreate --list
-    Available scaffolds:
-      alchemy:                 Pyramid project using SQLAlchemy, SQLite, URL dispatch, and Jinja2
-      pyramid_jinja2_starter:  Pyramid Jinja2 starter project
-      starter:                 Pyramid starter project using URL dispatch and Chameleon
-      zodb:                    Pyramid project using ZODB, traversal, and Chameleon
+    $ $VENV/bin/pip install cookiecutter
 
-The ``pyramid_jinja2`` add-on gave us a scaffold that we can use. From the
-parent directory of where we want our Python package to be generated, let's use
-that scaffold to make our project:
+In the directory where we want our sample Pyramid project to be generated, let's use the cookiecutter ``pyramid-cookiecutter-starter``, following the prompts of the command.
 
 .. code-block:: bash
 
-    $ $VENV/bin/pcreate --scaffold pyramid_jinja2_starter hello_world
+    $ $VENV/bin/cookiecutter https://github.com/Pylons/pyramid-cookiecutter-starter
 
-We next use the normal Python command to set up our package for development:
+If prompted for the first item, accept the default ``yes`` by hitting return.
+
+#. ``You've cloned ~/.cookiecutters/pyramid-cookiecutter-starter before. Is it
+   okay to delete and re-clone it? [yes]:``
+#. ``project_name [Pyramid Scaffold]: myproject``
+#. ``repo_name [scaffold]: qtour``
+
+We then run through the following commands
 
 .. code-block:: bash
 
-    $ cd hello_world
-    $ $VENV/bin/pip install -e .
+    # Change directory into your newly created project.
+    $ cd qtour
+    # Create a new virtual environment...
+    $ python3 -m venv env
+    # ...where we upgrade packaging tools...
+    $ env/bin/pip install --upgrade pip setuptools
+    # ...and into which we install our project and its testing requirements.
+    $ env/bin/pip install -e ".[testing]"
+    # Reset our environment variable to use the new virtual environment.
+    $ export VENV=~/env/qtour/env
 
 We are moving in the direction of a full-featured Pyramid project, with a
 proper setup for Python standards (packaging) and Pyramid configuration. This
@@ -537,7 +545,7 @@ includes a new way of running your application:
 Let's look at ``pserve`` and configuration in more depth.
 
 .. seealso:: See also:
-    :ref:`Quick Tutorial Scaffolds <qtut_scaffolds>`,
+    :ref:`Quick Tutorial Cookiecutters <qtut_scaffolds>`,
     :ref:`project_narr`, and
     :doc:`../narr/scaffolding`
 
