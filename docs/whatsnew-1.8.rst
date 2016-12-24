@@ -7,73 +7,8 @@ incompatibilities between the two versions and deprecations added to
 :app:`Pyramid` 1.8, as well as software dependency changes and notable
 documentation additions.
 
-Backwards Incompatibilities
----------------------------
-
-- Following the Pyramid deprecation period (1.6 -> 1.8),
-  daemon support for pserve has been removed. This includes removing the
-  daemon commands (start, stop, restart, status) as well as the following
-  arguments: ``--daemon``, ``--pid-file``, ``--log-file``,
-  ``--monitor-restart``, ``--status``, ``--user``, ``--group``,
-  ``--stop-daemon``
-
-  To run your server as a daemon you should use a process manager instead of
-  pserve.
-
-  See https://github.com/Pylons/pyramid/pull/2615
-
-- Change static view to avoid setting the ``Content-Encoding`` response header
-  to an encoding guessed using Python's ``mimetypes`` module. This was causing
-  clients to decode the content of gzipped files when downloading them. The
-  client would end up with a ``foo.txt.gz`` file on disk that was already
-  decoded, thus should really be ``foo.txt``. Also, the ``Content-Encoding``
-  should only have been used if the client itself broadcast support for the
-  encoding via ``Accept-Encoding`` request headers.
-  See https://github.com/Pylons/pyramid/pull/2810
-
-- ``pcreate`` is now interactive by default. You will be prompted if a file
-  already exists with different content. Previously if there were similar
-  files it would silently skip them unless you specified ``--interactive``
-  or ``--overwrite``.
-  See https://github.com/Pylons/pyramid/pull/2775
-
-- Support for the ``IContextURL`` interface that was deprecated in Pyramid 1.3
-  has been removed.  See https://github.com/Pylons/pyramid/pull/2822
-
-- Settings are no longer accessible as attributes on the settings object
-  (e.g. ``request.registry.settings.foo``). This was deprecated in Pyramid 1.2.
-  See https://github.com/Pylons/pyramid/pull/2823
-
-- Removed undocumented argument ``cachebust_match`` from
-  ``pyramid.static.static_view``. This argument was shipped accidentally
-  in Pyramid 1.6. See https://github.com/Pylons/pyramid/pull/2681
-
-Feature Additions
------------------
-
-- Python 3.6 compatibility.
-  https://github.com/Pylons/pyramid/issues/2835
-
-- ``pcreate`` learned about --package-name to allow you to create a new project
-  in an existing folder with a different package name than the project name.
-  See https://github.com/Pylons/pyramid/pull/2783
-
-- The ``_get_credentials`` private method of
-  :class:`pyramid.authentication.BasicAuthAuthenticationPolicy`
-  has been extracted into standalone function
-  :func:`pyramid.authentication.extract_http_basic_credentials`, this function
-  extracts HTTP Basic credentials from a ``request`` object, and returns them
-  as a named tuple. See https://github.com/Pylons/pyramid/pull/2662
-
-- Pyramid 1.4 silently dropped a feature of the configurator that has been
-  restored. It's again possible for action discriminators to conflict across
-  different action orders.
-  See https://github.com/Pylons/pyramid/pull/2757
-
-- :func:`pyramid.paster.bootstrap` and its sibling
-  :func:`pyramid.scripting.prepare` can now be used as context managers to
-  automatically invoke the ``closer`` and pop threadlocals off of the stack
-  to prevent memory leaks. See https://github.com/Pylons/pyramid/pull/2760
+Major Feature Additions
+-----------------------
 
 - Added :meth:`pyramid.config.Configurator.add_exception_view` and the
   :func:`pyramid.view.exception_view_config` decorator. It is now possible
@@ -83,28 +18,6 @@ Feature Additions
   also registered for a traversal context that inherited from the exception
   class which prevented any exception-only optimizations.
   See https://github.com/Pylons/pyramid/pull/2660
-
-- Added the ``exception_only`` boolean to
-  :class:`pyramid.interfaces.IViewDeriverInfo` which can be used by view
-  derivers to determine if they are wrapping a view which only handles
-  exceptions. This means that it is no longer necessary to perform request-time
-  checks for ``request.exception`` to determine if the view is handling an
-  exception - the pipeline can be optimized at config-time.
-  See https://github.com/Pylons/pyramid/pull/2660
-
-- ``pserve`` should now work with ``gevent`` and other workers that need
-  to monkeypatch the process, assuming the server and / or the app do so
-  as soon as possible before importing the rest of pyramid.
-  See https://github.com/Pylons/pyramid/pull/2797
-
-- Pyramid no longer copies the settings object passed to the
-  ``pyramid.config.Configurator(settings=)``. The original ``dict`` is kept.
-  See https://github.com/Pylons/pyramid/pull/2823
-
-- The csrf trusted origins setting may now be a whitespace-separated list of
-  domains. Previously only a python list was allowed. Also, it can now be set
-  using the ``PYRAMID_CSRF_TRUSTED_ORIGINS`` environment variable similar to
-  other settings. See https://github.com/Pylons/pyramid/pull/2823
 
 - ``pserve --reload`` now uses the
   `hupper <http://docs.pylonsproject.org/projects/hupper/en/latest/>`_
@@ -129,6 +42,51 @@ Feature Additions
 
   See https://github.com/Pylons/pyramid/pull/2805
 
+Minor Feature Additions
+-----------------------
+
+- Python 3.6 compatibility.
+  https://github.com/Pylons/pyramid/issues/2835
+
+- The ``_get_credentials`` private method of
+  :class:`pyramid.authentication.BasicAuthAuthenticationPolicy`
+  has been extracted into standalone function
+  :func:`pyramid.authentication.extract_http_basic_credentials`, this function
+  extracts HTTP Basic credentials from a ``request`` object, and returns them
+  as a named tuple. See https://github.com/Pylons/pyramid/pull/2662
+
+- Pyramid 1.4 silently dropped a feature of the configurator that has been
+  restored. It's again possible for action discriminators to conflict across
+  different action orders.
+  See https://github.com/Pylons/pyramid/pull/2757
+
+- :func:`pyramid.paster.bootstrap` and its sibling
+  :func:`pyramid.scripting.prepare` can now be used as context managers to
+  automatically invoke the ``closer`` and pop threadlocals off of the stack
+  to prevent memory leaks. See https://github.com/Pylons/pyramid/pull/2760
+
+- Added the ``exception_only`` boolean to
+  :class:`pyramid.interfaces.IViewDeriverInfo` which can be used by view
+  derivers to determine if they are wrapping a view which only handles
+  exceptions. This means that it is no longer necessary to perform request-time
+  checks for ``request.exception`` to determine if the view is handling an
+  exception - the pipeline can be optimized at config-time.
+  See https://github.com/Pylons/pyramid/pull/2660
+
+- ``pserve`` should now work with ``gevent`` and other workers that need
+  to monkeypatch the process, assuming the server and / or the app do so
+  as soon as possible before importing the rest of pyramid.
+  See https://github.com/Pylons/pyramid/pull/2797
+
+- Pyramid no longer copies the settings object passed to the
+  ``pyramid.config.Configurator(settings=)``. The original ``dict`` is kept.
+  See https://github.com/Pylons/pyramid/pull/2823
+
+- The csrf trusted origins setting may now be a whitespace-separated list of
+  domains. Previously only a python list was allowed. Also, it can now be set
+  using the ``PYRAMID_CSRF_TRUSTED_ORIGINS`` environment variable similar to
+  other settings. See https://github.com/Pylons/pyramid/pull/2823
+
 - A new ``[pserve]`` section is supported in your config files with a
   ``watch_files`` key that can configure ``pserve --reload`` to monitor custom
   file paths. See https://github.com/Pylons/pyramid/pull/2827
@@ -146,6 +104,51 @@ Feature Additions
 - All p* scripts now use argparse instead of optparse. This improves their
   ``--help`` output as well as enabling nicer documentation of their options.
   See https://github.com/Pylons/pyramid/pull/2864
+
+Backwards Incompatibilities
+---------------------------
+
+- Following the Pyramid deprecation period (1.6 -> 1.8),
+  daemon support for pserve has been removed. This includes removing the
+  daemon commands (start, stop, restart, status) as well as the following
+  arguments: ``--daemon``, ``--pid-file``, ``--log-file``,
+  ``--monitor-restart``, ``--status``, ``--user``, ``--group``,
+  ``--stop-daemon``
+
+  To run your server as a daemon you should use a process manager instead of
+  pserve.
+
+  See https://github.com/Pylons/pyramid/pull/2615
+
+- Change static view to avoid setting the ``Content-Encoding`` response header
+  to an encoding guessed using Python's ``mimetypes`` module. This was causing
+  clients to decode the content of gzipped files when downloading them. The
+  client would end up with a ``foo.txt.gz`` file on disk that was already
+  decoded, thus should really be ``foo.txt``. Also, the ``Content-Encoding``
+  should only have been used if the client itself broadcast support for the
+  encoding via ``Accept-Encoding`` request headers.
+  See https://github.com/Pylons/pyramid/pull/2810
+
+- ``pcreate`` learned about ``--package-name`` to allow you to create a new
+  project in an existing folder with a different package name than the project
+  name. See https://github.com/Pylons/pyramid/pull/2783
+
+- ``pcreate`` is now interactive by default. You will be prompted if a file
+  already exists with different content. Previously if there were similar
+  files it would silently skip them unless you specified ``--interactive``
+  or ``--overwrite``.
+  See https://github.com/Pylons/pyramid/pull/2775
+
+- Support for the ``IContextURL`` interface that was deprecated in Pyramid 1.3
+  has been removed.  See https://github.com/Pylons/pyramid/pull/2822
+
+- Settings are no longer accessible as attributes on the settings object
+  (e.g. ``request.registry.settings.foo``). This was deprecated in Pyramid 1.2.
+  See https://github.com/Pylons/pyramid/pull/2823
+
+- Removed undocumented argument ``cachebust_match`` from
+  ``pyramid.static.static_view``. This argument was shipped accidentally
+  in Pyramid 1.6. See https://github.com/Pylons/pyramid/pull/2681
 
 Deprecations
 ------------

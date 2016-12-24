@@ -48,9 +48,9 @@ Features
 - Python 3.6 compatibility.
   https://github.com/Pylons/pyramid/issues/2835
 
-- pcreate learned about ``--package-name`` to allow you to create a new project
-  in an existing folder with a different package name than the project name.
-  See https://github.com/Pylons/pyramid/pull/2783
+- ``pcreate`` learned about ``--package-name`` to allow you to create a new
+  project in an existing folder with a different package name than the project
+  name. See https://github.com/Pylons/pyramid/pull/2783
 
 - The ``_get_credentials`` private method of ``BasicAuthAuthenticationPolicy``
   has been extracted into standalone function ``extract_http_basic_credentials``
