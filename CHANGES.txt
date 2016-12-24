@@ -256,5 +256,5 @@ Documentation Changes
   See https://github.com/Pylons/pyramid/pull/2881 and
   https://github.com/Pylons/pyramid/pull/2883.
 
-- Improve output of p* script output of description for help.
+- Improve output of p* script descriptions for help.
   See https://github.com/Pylons/pyramid/pull/2886
