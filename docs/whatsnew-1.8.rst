@@ -150,9 +150,18 @@ Feature Additions
 Deprecations
 ------------
 
-- The ``pcreate`` script and related scaffolds have been deprecated in favor
-  of the popular
-  `cookiecutter <https://cookiecutter.readthedocs.io/en/latest/>`_ project.
+- The ``pcreate`` script and the core scaffolds (``starter``, ``alchemy`` and
+  ``zodb``) have been deprecated.
+
+  They have been replaced with the decision to embrace the popular
+  `cookiecutter <https://cookiecutter.readthedocs.io/en/latest/>`_ project
+  as a best-of-breed project templating solution.
+
+  ``pcreate`` was originally introduced when very few alternatives existed
+  that supported Python 3. Fortunately the situation has improved and
+  with possible tooling support for cookiecutters being discussed by major
+  IDEs, and the simplicity of the jinja2 syntax, it is exciting to embrace
+  the project moving forward!
 
   All of Pyramid's official scaffolds as well as the tutorials have been
   ported to cookiecutters:
