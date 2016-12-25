@@ -634,38 +634,35 @@ and earlier we showed ``--reload`` for application reloading.
 available in your browser. Adding it to your project illustrates several points
 about configuration.
 
-The scaffold ``pyramid_jinja2_starter`` is already configured to include the
+The cookiecutter ``pyramid-cookiecutter-starter`` already configured our package to include the
 add-on ``pyramid_debugtoolbar`` in its ``setup.py``:
 
 .. literalinclude:: quick_tour/package/setup.py
     :language: python
-    :linenos:
-    :lineno-start: 11
+    :lineno-match:
     :lines: 11-16
+    :emphasize-lines: 4
 
 It was installed when you previously ran:
 
 .. code-block:: bash
 
-    $ $VENV/bin/pip install -e .
+    $ $VENV/bin/pip install -e ".[testing]"
 
 The ``pyramid_debugtoolbar`` package is a Pyramid add-on, which means we need
-to include its configuration into our web application. The ``pyramid_jinja2``
-add-on already took care of this for us in its ``__init__.py``:
+to include its configuration into our web application. The cookiecutter already took care of this for us in its ``__init__.py``:
 
 .. literalinclude:: quick_tour/package/hello_world/__init__.py
     :language: python
-    :linenos:
-    :lineno-start: 16
-    :lines: 19
+    :lineno-match:
+    :lines: 8
 
 And it uses the ``pyramid.includes`` facility in our ``development.ini``:
 
 .. literalinclude:: quick_tour/package/development.ini
     :language: ini
-    :linenos:
-    :lineno-start: 15
-    :lines: 15-16
+    :lineno-match:
+    :lines: 14-15
 
 You'll now see a Pyramid logo on the right side of your browser window, which
 when clicked opens a new window that provides introspective access to debugging
