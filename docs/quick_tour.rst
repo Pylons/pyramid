@@ -803,11 +803,10 @@ your own custom sessioning engine. Let's take a look at the :doc:`built-in
 sessioning support <../narr/sessions>`. In our ``__init__.py`` we first import
 the kind of sessioning we want:
 
-.. literalinclude:: quick_tour/package/hello_world/__init__.py
+.. literalinclude:: quick_tour/sessions/hello_world/__init__.py
     :language: python
-    :linenos:
-    :lineno-start: 2
-    :lines: 2-3
+    :lineno-match:
+    :lines: 1-2
     :emphasize-lines: 2
 
 .. warning::
@@ -818,31 +817,28 @@ the kind of sessioning we want:
 Now make a "factory" and pass it to the :term:`configurator`'s
 ``session_factory`` argument:
 
-.. literalinclude:: quick_tour/package/hello_world/__init__.py
+.. literalinclude:: quick_tour/sessions/hello_world/__init__.py
     :language: python
-    :linenos:
-    :lineno-start: 13
-    :lines: 13-17
-    :emphasize-lines: 3-5
+    :lineno-match:
+    :lines: 10-13
+    :emphasize-lines: 2-3
 
 Pyramid's :term:`request` object now has a ``session`` attribute that we can
 use in our view code in ``views.py``:
 
-.. literalinclude:: quick_tour/package/hello_world/views.py
+.. literalinclude:: quick_tour/sessions/hello_world/views.py
     :language: python
-    :linenos:
-    :lineno-start: 9
-    :lines: 9-15
+    :lineno-match:
+    :lines: 7-
     :emphasize-lines: 3-7
 
-We need to update our Jinja2 template to show counter increment in the session:
+We need to update our Jinja2 template ``templates/mytemplate.jinja2`` to show counter increment in the session:
 
-.. literalinclude:: quick_tour/package/hello_world/templates/mytemplate.jinja2
+.. literalinclude:: quick_tour/sessions/hello_world/templates/mytemplate.jinja2
     :language: jinja
-    :linenos:
-    :lineno-start: 40
-    :lines: 40-42
-    :emphasize-lines: 3
+    :lineno-match:
+    :lines: 4-8
+    :emphasize-lines: 4
 
 .. seealso:: See also:
     :ref:`Quick Tutorial Sessions <qtut_sessions>`, :ref:`sessions_chapter`,
