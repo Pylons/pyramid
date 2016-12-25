@@ -966,14 +966,10 @@ Deform and Colander provide a very flexible combination for forms, widgets,
 schemas, and validation. Recent versions of Deform also include a :ref:`retail
 mode <deform:retail>` for gaining Deform features on custom forms.
 
-Also the ``deform_bootstrap`` Pyramid add-on restyles the stock Deform widgets
-using attractive CSS from Twitter Bootstrap and more powerful widgets from
-Chosen.
+Deform uses attractive CSS from Twitter Bootstrap and more powerful select, checkbox, and date and time widgets.
 
 .. seealso:: See also:
-    :ref:`Quick Tutorial Forms <qtut_forms>`, :ref:`Deform <deform:overview>`,
-    :ref:`Colander <colander:overview>`, and `deform_bootstrap
-    <https://pypi.python.org/pypi/deform_bootstrap>`_.
+    :ref:`Quick Tutorial Forms <qtut_forms>`, :ref:`Deform <deform:overview>`, and :ref:`Colander <colander:overview>`.
 
 Conclusion
 ==========
