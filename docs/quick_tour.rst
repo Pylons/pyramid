@@ -599,14 +599,14 @@ sections:
 
 We have a few decisions made for us in this configuration:
 
-#. *Choice of web server:* ``use = egg:hello_world`` tells ``pserve`` to
-   use the ``waitress`` server.
-
-#. *Port number:* ``port = 6543`` tells ``waitress`` to listen on port 6543.
-
 #. *WSGI app:* What package has our WSGI application in it?
    ``use = egg:hello_world`` in the app section tells the configuration what
    application to load.
+
+#. *Choice of web server:* ``use = egg:waitress#main`` tells ``pserve`` to
+   use the ``waitress`` server.
+
+#. *Interfaces:* ``listen = 127.0.0.1:6543 [::1]:6543`` tells ``waitress`` to listen on all interfaces on port 6543 for both IPv4 and IPv6.
 
 #. *Easier development by automatic template reloading:* In development mode,
    you shouldn't have to restart the server when editing a Jinja2 template.
