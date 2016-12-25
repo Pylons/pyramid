@@ -498,7 +498,7 @@ So far we have done all of our *Quick Tour* as a single Python file. No Python
 packages, no structure. Most Pyramid projects, though, aren't developed this
 way.
 
-To ease the process of getting started, the Pylons Project provides :term:`cookiecutter`\ s that generate sample Pyramid projects from project templates. In addition these cookiecutters will install Pyramid and its dependencies.
+To ease the process of getting started, the Pylons Project provides :term:`cookiecutter`\ s that generate sample Pyramid projects from project templates. These cookiecutters will install Pyramid and its dependencies as well.
 
 First you'll need to install cookiecutter.
 
@@ -506,7 +506,7 @@ First you'll need to install cookiecutter.
 
     $ $VENV/bin/pip install cookiecutter
 
-In the directory where we want our sample Pyramid project to be generated, let's use the cookiecutter ``pyramid-cookiecutter-starter``, following the prompts of the command.
+Let's use the cookiecutter ``pyramid-cookiecutter-starter`` to create a starter Pyramid project in the current directory, entering values at the prompts as shown below for the following command.
 
 .. code-block:: bash
 
@@ -516,23 +516,23 @@ If prompted for the first item, accept the default ``yes`` by hitting return.
 
 #. ``You've cloned ~/.cookiecutters/pyramid-cookiecutter-starter before. Is it
    okay to delete and re-clone it? [yes]:``
-#. ``project_name [Pyramid Scaffold]: myproject``
-#. ``repo_name [scaffold]: qtour``
+#. ``project_name [Pyramid Scaffold]: hello_world``
+#. ``repo_name [scaffold]: hello_world``
 
 We then run through the following commands
 
 .. code-block:: bash
 
     # Change directory into your newly created project.
-    $ cd qtour
+    $ cd hello_world
     # Create a new virtual environment...
     $ python3 -m venv env
     # ...where we upgrade packaging tools...
     $ env/bin/pip install --upgrade pip setuptools
     # ...and into which we install our project and its testing requirements.
     $ env/bin/pip install -e ".[testing]"
-    # Reset our environment variable to use the new virtual environment.
-    $ export VENV=~/env/qtour/env
+    # Reset our environment variable for a new virtual environment.
+    $ export VENV=~/env/hello_world/env
 
 We are moving in the direction of a full-featured Pyramid project, with a
 proper setup for Python standards (packaging) and Pyramid configuration. This
@@ -552,7 +552,7 @@ Let's look at ``pserve`` and configuration in more depth.
 Application running with ``pserve``
 ===================================
 
-Prior to scaffolds, our project mixed a number of operational details into our
+Prior to the cookiecutter, our project mixed a number of operational details into our
 code. Why should my main code care which HTTP server I want and what port
 number to run on?
 
@@ -582,7 +582,7 @@ Configuration with ``.ini`` files
 
 Earlier in *Quick Tour* we first met Pyramid's configuration system. At that
 point we did all configuration in Python code. For example, the port number
-chosen for our HTTP server was right there in Python code. Our scaffold has
+chosen for our HTTP server was right there in Python code. Our cookiecutter has
 moved this decision and more into the ``development.ini`` file:
 
 .. literalinclude:: quick_tour/package/development.ini
