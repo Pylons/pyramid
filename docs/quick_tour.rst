@@ -519,7 +519,7 @@ If prompted for the first item, accept the default ``yes`` by hitting return.
 #. ``project_name [Pyramid Scaffold]: hello_world``
 #. ``repo_name [scaffold]: hello_world``
 
-We then run through the following commands
+We then run through the following commands.
 
 .. code-block:: bash
 
@@ -532,7 +532,7 @@ We then run through the following commands
     # ...and into which we install our project and its testing requirements.
     $ env/bin/pip install -e ".[testing]"
     # Reset our environment variable for a new virtual environment.
-    $ export VENV=~/env/hello_world/env
+    $ export VENV=~/hello_world/env
 
 We are moving in the direction of a full-featured Pyramid project, with a
 proper setup for Python standards (packaging) and Pyramid configuration. This
@@ -854,13 +854,34 @@ databases frequently mean an "ORM" (object-relational mapper.) In Python, ORM
 usually leads to the mega-quality *SQLAlchemy*, a Python package that greatly
 eases working with databases.
 
-Pyramid and SQLAlchemy are great friends. That friendship includes a scaffold!
+Pyramid and SQLAlchemy are great friends. That friendship includes a cookiecutter!
 
 .. code-block:: bash
 
-  $ $VENV/bin/pcreate --scaffold alchemy sqla_demo
-  $ cd sqla_demo
-  $ $VENV/bin/pip install -e .
+    $ cd ~
+    $ env/bin/cookiecutter https://github.com/Pylons/pyramid-cookiecutter-alchemy
+
+If prompted for the first item, accept the default ``yes`` by hitting return.
+
+#. ``You've cloned ~/.cookiecutters/pyramid-cookiecutter-alchemy before. Is it
+   okay to delete and re-clone it? [yes]:``
+#. ``project_name [Pyramid Scaffold]: sqla_demo``
+#. ``repo_name [scaffold]: sqla_demo``
+
+We then run through the following commands as before.
+
+.. code-block:: bash
+
+    # Change directory into your newly created project.
+    $ cd sqla_demo
+    # Create a new virtual environment...
+    $ python3 -m venv env
+    # ...where we upgrade packaging tools...
+    $ env/bin/pip install --upgrade pip setuptools
+    # ...and into which we install our project and its testing requirements.
+    $ env/bin/pip install -e ".[testing]"
+    # Reset our environment variable for a new virtual environment.
+    $ export VENV=~/sqla_demo/env
 
 We now have a working sample SQLAlchemy application with all dependencies
 installed. The sample project provides a console script to initialize a SQLite
@@ -877,16 +898,16 @@ model:
 
 .. literalinclude:: quick_tour/sqla_demo/sqla_demo/models/mymodel.py
     :language: python
-    :start-after: Start Sphinx Include
-    :end-before: End Sphinx Include
+    :lineno-match:
+    :pyobject: MyModel
 
 View code, which mediates the logic between web requests and the rest of the
 system, can then easily get at the data thanks to SQLAlchemy:
 
 .. literalinclude:: quick_tour/sqla_demo/sqla_demo/views/default.py
     :language: python
-    :start-after: Start Sphinx Include
-    :end-before: End Sphinx Include
+    :lineno-match:
+    :lines: 13
 
 .. seealso:: See also:
     :ref:`Quick Tutorial Databases <qtut_databases>`, `SQLAlchemy
