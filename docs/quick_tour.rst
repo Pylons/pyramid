@@ -749,38 +749,34 @@ It's important to know what is going on inside our web application. In
 development we might need to collect some output. In production we might need
 to detect situations when other people use the site. We need *logging*.
 
-Fortunately Pyramid uses the normal Python approach to logging. The scaffold
-generated in your ``development.ini`` has a number of lines that configure the
+Fortunately Pyramid uses the normal Python approach to logging. The ``development.ini`` file for your project has a number of lines that configure the
 logging for you to some reasonable defaults. You then see messages sent by
 Pyramid (for example, when a new request comes in).
 
 Maybe you would like to log messages in your code? In your Python module,
-import and set up the logging:
+import and set up the logging in your ``views.py``:
 
-.. literalinclude:: quick_tour/package/hello_world/views.py
+.. literalinclude:: quick_tour/logging/hello_world/views.py
     :language: python
-    :linenos:
-    :lineno-start: 3
+    :lineno-match:
     :lines: 3-4
 
 You can now, in your code, log messages:
 
-.. literalinclude:: quick_tour/package/hello_world/views.py
+.. literalinclude:: quick_tour/logging/hello_world/views.py
     :language: python
-    :linenos:
-    :lineno-start: 9
-    :lines: 9-10
+    :lineno-match:
+    :lines: 7-8
     :emphasize-lines: 2
 
-This will log ``Some Message`` at a ``debug`` log level to the
+This will log ``Some Message`` at a ``DEBUG`` log level to the
 application-configured logger in your ``development.ini``. What controls that?
 These emphasized sections in the configuration file:
 
-.. literalinclude:: quick_tour/package/development.ini
+.. literalinclude:: quick_tour/logging/development.ini
     :language: ini
-    :linenos:
-    :lineno-start: 36
-    :lines: 36-52
+    :lineno-match:
+    :lines: 34-50
     :emphasize-lines: 1-2,14-17
 
 Our application, a package named ``hello_world``, is set up as a logger and
@@ -789,7 +785,7 @@ http://localhost:6543, your console will now show:
 
 .. code-block:: text
 
-    2016-01-18 13:55:55,040 DEBUG [hello_world.views:10][waitress] Some Message
+    2016-12-25 03:03:57,059 DEBUG [hello_world.views:8][waitress] Some Message
 
 .. seealso:: See also:
     :ref:`Quick Tutorial Logging <qtut_logging>` and :ref:`logging_chapter`.
