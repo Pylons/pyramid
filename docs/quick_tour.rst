@@ -682,42 +682,23 @@ Yikes! We got this far and we haven't yet discussed tests. This is particularly
 egregious, as Pyramid has had a deep commitment to full test coverage since
 before its release.
 
-Our ``pyramid_jinja2_starter`` scaffold generated a ``tests.py`` module with
-one unit test in it. It also configured ``setup.py`` with test requirements:
+Our ``pyramid-cookiecutter-starter`` cookiecutter generated a ``tests.py`` module with
+one unit test and one functional test in it. It also configured ``setup.py`` with test requirements:
 ``py.test`` as the test runner, ``WebTest`` for running view tests, and the
 ``pytest-cov`` tool which yells at us for code that isn't tested. The
 highlighted lines show this:
 
-.. code-block:: python
-    :linenos:
-    :lineno-start: 11
-    :emphasize-lines: 8-12
+.. literalinclude:: quick_tour/package/setup.py
+    :language: python
+    :lineno-match:
+    :lines: 18-22
 
-    requires = [
-        'pyramid',
-        'pyramid_jinja2',
-        'pyramid_debugtoolbar',
-        'waitress',
-    ]
+.. literalinclude:: quick_tour/package/setup.py
+    :language: python
+    :lineno-match:
+    :lines: 42-44
 
-    tests_require = [
-        'WebTest >= 1.3.1',  # py3 compat
-        'pytest',  # includes virtualenv
-        'pytest-cov',
-        ]
-
-.. code-block:: python
-    :linenos:
-    :lineno-start: 34
-    :emphasize-lines: 2-4
-
-        zip_safe=False,
-        extras_require={
-          'testing': tests_require,
-        },
-
-To install the test requirements, run ``$VENV/bin/pip install -e
-".[testing]"``. We can now run all our tests:
+We already installed the test requirements when we ran the command ``$VENV/bin/pip install -e ".[testing]"``. We can now run all our tests:
 
 .. code-block:: bash
 
@@ -728,34 +709,33 @@ This yields the following output.
 .. code-block:: text
 
     =========================== test session starts ===========================
-    platform darwin -- Python 3.5.0, pytest-2.9.1, py-1.4.31, pluggy-0.3.1
-    rootdir: /Users/stevepiercy/projects/hack-on-pyramid/hello_world, inifile:
-    plugins: cov-2.2.1
-    collected 1 items
+    platform darwin -- Python 3.6.0, pytest-3.0.5, py-1.4.32, pluggy-0.4.0
+    rootdir: /Users/stevepiercy/hello_world, inifile: pytest.ini
+    plugins: cov-2.4.0
+    collected 2 items
 
-    hello_world/tests.py .
+    hello_world/tests.py ..
+
     ------------- coverage: platform darwin, python 3.6.0-final-0 -------------
-    Name                       Stmts   Miss  Cover   Missing
-    --------------------------------------------------------
-    hello_world/__init__.py       11      8    27%   11-23
-    hello_world/resources.py       5      1    80%   8
-    hello_world/tests.py          14      0   100%
-    hello_world/views.py           4      0   100%
-    --------------------------------------------------------
-    TOTAL                         34      9    74%
+    Name                                      Stmts   Miss  Cover   Missing
+    -----------------------------------------------------------------------
+    hello_world/__init__.py                       8      0   100%
+    hello_world/views.py                          3      0   100%
+    -----------------------------------------------------------------------
+    TOTAL                                        11      0   100%
 
-    ========================= 1 passed in 0.22 seconds =========================
 
-Our unit test passed, although its coverage is incomplete. What did our test
-look like?
+    ========================= 2 passed in 1.37 seconds =========================
+
+Our tests passed, and its coverage is complete. What did our test look like?
 
 .. literalinclude:: quick_tour/package/hello_world/tests.py
     :language: python
     :linenos:
 
 Pyramid supplies helpers for test writing, which we use in the test setup and
-teardown. Our one test imports the view, makes a dummy request, and sees if the
-view returns what we expected.
+teardown. Our first test imports the view, makes a dummy request, and sees if the
+view returns what we expected. Our second test verifies that the response body from a request to the web root contains what we expected.
 
 .. seealso:: See also:
     :ref:`Quick Tutorial Unit Testing <qtut_unit_testing>`, :ref:`Quick
