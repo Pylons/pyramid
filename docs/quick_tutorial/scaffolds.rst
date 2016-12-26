@@ -1,4 +1,4 @@
-.. _qtut_scaffolds:
+.. _qtut_cookiecutters:
 
 =============================================
 Prelude: Quick Project Startup with Scaffolds
