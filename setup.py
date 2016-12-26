@@ -20,8 +20,6 @@ from setuptools import setup, find_packages
 
 py_version = sys.version_info[:2]
 
-PY2 = py_version[0] == 2
-
 if (3, 0) <= py_version < (3, 4):
     warnings.warn(
         'On Python 3, Pyramid only supports Python 3.4 or better',
@@ -53,10 +51,9 @@ install_requires = [
 
 tests_require = [
     'WebTest >= 1.3.1', # py3 compat
+    'zope.component >= 4.0', # py3 compat
     ]
 
-if PY2:
-    tests_require.append('zope.component>=3.11.0')
 
 docs_extras = [
     'Sphinx >= 1.3.5',
