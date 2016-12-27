@@ -50,7 +50,7 @@ Here's a high-level time-ordered overview of what happens when you press
    application or a pipeline, you're using a "composite" (e.g.,
    ``[composite:main]``), refer to the documentation for that particular
    composite to understand how to make it refer to your :app:`Pyramid`
-   application.  In most cases, a Pyramid application built from a scaffold
+   application.  In most cases, a Pyramid application built from a cookiecutter
    will have a single ``[app:main]`` section in it, and this will be the
    application served.
 
