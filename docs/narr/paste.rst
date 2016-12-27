@@ -3,7 +3,7 @@
 PasteDeploy Configuration Files
 ===============================
 
-Packages generated via a :term:`scaffold` make use of a system created by Ian
+Packages generated via a :term:`cookiecutter` make use of a system created by Ian
 Bicking named :term:`PasteDeploy`.  PasteDeploy defines a way to declare
 :term:`WSGI` application configuration in an ``.ini`` file.
 
@@ -14,7 +14,7 @@ runner ``pserve``, as well as other commands such as ``pviews``, ``pshell``,
 PasteDeploy is not a particularly integral part of Pyramid.  It's possible to
 create a Pyramid application which does not use PasteDeploy at all.  We show a
 Pyramid application that doesn't use PasteDeploy in :ref:`firstapp_chapter`.
-However, all Pyramid scaffolds render PasteDeploy configuration files, to
+However, all Pyramid cookiecutters render PasteDeploy configuration files, to
 provide new developers with a standardized way of setting deployment values,
 and to provide new users with a standardized way of starting, stopping, and
 debugging an application.
@@ -80,7 +80,7 @@ In English, this entry point can thus be referred to as a "PasteDeploy
 application factory in the ``MyProject`` project which has the entry point
 named ``main`` where the entry point refers to a ``main`` function in the
 ``mypackage`` module".  Indeed, if you open up the ``__init__.py`` module
-generated within any scaffold-generated package, you'll see a ``main``
+generated within any cookiecutter-generated package, you'll see a ``main``
 function.  This is the function called by :term:`PasteDeploy` when the
 ``pserve`` command is invoked against our application.  It accepts a global
 configuration object and *returns* an instance of our application.
