@@ -111,7 +111,7 @@ following options:
 You might also need to download and install the Python for Windows extensions.
 
 .. seealso:: See the official Python documentation :ref:`Using Python on
-   Windows <python:using-on-windows>` for full details.
+   Windows <python:using-python-on-windows>` for full details.
 
 .. seealso:: Download and install the `Python for Windows extensions
    <https://sourceforge.net/projects/pywin32/files/pywin32/>`_. Carefully read
