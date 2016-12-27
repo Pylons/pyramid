@@ -5,33 +5,44 @@ Creating a :app:`Pyramid` Project
 
 As we saw in :ref:`firstapp_chapter`, it's possible to create a :app:`Pyramid`
 application completely manually.  However, it's usually more convenient to use
-a :term:`scaffold` to generate a basic :app:`Pyramid` :term:`project`.
+a :term:`cookiecutter` to generate a basic :app:`Pyramid` :term:`project`.
 
 A project is a directory that contains at least one Python :term:`package`.
-You'll use a scaffold to create a project, and you'll create your application
+You'll use a cookiecutter to create a project, and you'll create your application
 logic within a package that lives inside the project.  Even if your application
 is extremely simple, it is useful to place code that drives the application
 within a package, because (1) a package is more easily extended with new code,
 and (2) an application that lives inside a package can also be distributed more
 easily than one which does not live within a package.
 
-:app:`Pyramid` comes with a variety of scaffolds that you can use to generate a
-project.  Each scaffold makes different configuration assumptions about what
+The Pylons Project provides several :app:`Pyramid` cookiecutters that you can use to generate a
+project.  Each cookiecutter makes different configuration assumptions about what
 type of application you're trying to construct.
 
-These scaffolds are rendered using the ``pcreate`` command that is installed as
-part of Pyramid.
+These cookiecutters are rendered using the ``cookiecutter`` command that you may install.
+
+.. seealso::
+
+
+
 
 .. index::
-   single: scaffolds
-   single: starter scaffold
-   single: zodb scaffold
-   single: alchemy scaffold
+   single: cookiecutters
+   single: pyramid-cookiecutter-starter
+   single: pyramid-cookiecutter-zodb
+   single: pyramid-cookiecutter-alchemy
 
-.. _additional_paster_scaffolds:
+.. _additional_cookiecutters:
 
-Scaffolds Included with :app:`Pyramid`
---------------------------------------
+:app:`Pyramid` cookiecutters
+----------------------------
+
+Pyramid cookiecutters released under the Pylons Project include:
+
+* `pyramid-cookiecutter-alchemy <https://github.com/Pylons/pyramid-cookiecutter-alchemy>`_
+* `pyramid-cookiecutter-starter <https://github.com/Pylons/pyramid-cookiecutter-starter>`_
+* `pyramid-cookiecutter-zodb <https://github.com/Pylons/pyramid-cookiecutter-zodb>`_
+
 
 The convenience scaffolds included with :app:`Pyramid` differ from each other
 on a number of axes:

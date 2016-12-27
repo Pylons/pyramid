@@ -13,8 +13,10 @@ Pyramid cookiecutters have replaced the now deprecated Pyramid scaffolds, and sh
 * `pyramid-cookiecutter-starter <https://github.com/Pylons/pyramid-cookiecutter-starter>`_
 * `pyramid-cookiecutter-zodb <https://github.com/Pylons/pyramid-cookiecutter-zodb>`_
 
-Development of cookiecutters is documented under `Learn the Basics of Cookiecutter by Creating a Cookiecutter <https://cookiecutter.readthedocs.io/en/latest/first_steps.html>`_.
+.. seealso::
 
-.. seealso:: See also `Cookiecutter Features <https://cookiecutter.readthedocs.io/en/latest/readme.html#features>`_.
+    See also `Cookiecutter Installation <https://cookiecutter.readthedocs.io/en/latest/installation.html>`_ and `Cookiecutter Features <https://cookiecutter.readthedocs.io/en/latest/readme.html#features>`_. Development of cookiecutters is documented under `Learn the Basics of Cookiecutter by Creating a Cookiecutter <https://cookiecutter.readthedocs.io/en/latest/first_steps.html>`_.
 
-.. seealso:: See also :term:`scaffold`.
+.. seealso::
+
+    See also :term:`scaffold`.
