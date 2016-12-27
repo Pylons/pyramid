@@ -839,7 +839,7 @@ In general, you can make your script into a console script by doing the
 following:
 
 - Use an existing distribution (such as one you've already created via
-  ``pcreate``) or create a new distribution that possesses at least one package
+  ``cookiecutter``) or create a new distribution that possesses at least one package
   or module.  It should, within any module within the distribution, house a
   callable (usually a function) that takes no arguments and which runs any of
   the code you wish to run.
