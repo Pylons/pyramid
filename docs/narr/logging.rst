@@ -50,7 +50,7 @@ Default logging configuration is provided in both the default
 ``development.ini`` and the ``production.ini`` files.  If you use ``pyramid-cookiecutter-starter`` to generate a Pyramid project with the name of the package as ``hello_world``, then the logging configuration
 in the ``development.ini`` file is as follows:
 
-.. literalinclude:: MyProject/development.ini
+.. literalinclude:: myproject/development.ini
     :language: ini
     :lineno-match:
     :lines: 29-
@@ -253,14 +253,14 @@ translogger and your application in it.  For instance, change from this:
 .. code-block:: ini
 
     [app:main]
-    use = egg:MyProject
+    use = egg:myproject
 
 To this:
 
 .. code-block:: ini
 
     [app:mypyramidapp]
-    use = egg:MyProject
+    use = egg:myproject
 
     [filter:translogger]
     use = egg:Paste#translogger

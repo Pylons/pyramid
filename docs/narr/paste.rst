@@ -40,25 +40,25 @@ Entry Points and PasteDeploy ``.ini`` Files
 
 In the :ref:`project_narr` chapter, we breezed over the meaning of a
 configuration line in the ``deployment.ini`` file.  This was the ``use =
-egg:MyProject`` line in the ``[app:main]`` section.  We breezed over it because
+egg:myproject`` line in the ``[app:main]`` section.  We breezed over it because
 it's pretty confusing and "too much information" for an introduction to the
 system.  We'll try to give it a bit of attention here.  Let's see the config
 file again:
 
-.. literalinclude:: MyProject/development.ini
+.. literalinclude:: myproject/development.ini
    :language: ini
    :linenos:
 
-The line in ``[app:main]`` above that says ``use = egg:MyProject`` is actually
-shorthand for a longer spelling: ``use = egg:MyProject#main``.  The ``#main``
+The line in ``[app:main]`` above that says ``use = egg:myproject`` is actually
+shorthand for a longer spelling: ``use = egg:myproject#main``.  The ``#main``
 part is omitted for brevity, as ``#main`` is a default defined by PasteDeploy.
-``egg:MyProject#main`` is a string which has meaning to PasteDeploy.  It points
+``egg:myproject#main`` is a string which has meaning to PasteDeploy.  It points
 at a :term:`setuptools` :term:`entry point` named ``main`` defined in the
-``MyProject`` project.
+``myproject`` project.
 
 Take a look at the generated ``setup.py`` file for this project.
 
-.. literalinclude:: MyProject/setup.py
+.. literalinclude:: myproject/setup.py
    :language: python
    :linenos:
 
@@ -66,18 +66,18 @@ Note that ``entry_points`` is assigned a string which looks a lot like an
 ``.ini`` file.  This string representation of an ``.ini`` file has a section
 named ``[paste.app_factory]``.  Within this section, there is a key named
 ``main`` (the entry point name) which has a value ``myproject:main``.  The
-*key* ``main`` is what our ``egg:MyProject#main`` value of the ``use`` section
+*key* ``main`` is what our ``egg:myproject#main`` value of the ``use`` section
 in our config file is pointing at, although it is actually shortened to
-``egg:MyProject`` there.  The value represents a :term:`dotted Python name`
+``egg:myproject`` there.  The value represents a :term:`dotted Python name`
 path, which refers to a callable in our ``myproject`` package's ``__init__.py``
 module.
 
-The ``egg:`` prefix in ``egg:MyProject`` indicates that this is an entry point
+The ``egg:`` prefix in ``egg:myproject`` indicates that this is an entry point
 *URI* specifier, where the "scheme" is "egg".  An "egg" is created when you run
 ``setup.py install`` or ``setup.py develop`` within your project.
 
 In English, this entry point can thus be referred to as a "PasteDeploy
-application factory in the ``MyProject`` project which has the entry point
+application factory in the ``myproject`` project which has the entry point
 named ``main`` where the entry point refers to a ``main`` function in the
 ``mypackage`` module".  Indeed, if you open up the ``__init__.py`` module
 generated within any cookiecutter-generated package, you'll see a ``main``
