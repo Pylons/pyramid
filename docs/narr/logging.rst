@@ -50,7 +50,7 @@ Default logging configuration is provided in both the default
 ``development.ini`` and the ``production.ini`` files.  If you use ``pyramid-cookiecutter-starter`` to generate a Pyramid project with the name of the package as ``hello_world``, then the logging configuration
 in the ``development.ini`` file is as follows:
 
-.. literalinclude:: ../quick_tour/package/development.ini
+.. literalinclude:: MyProject/development.ini
     :language: ini
     :lineno-match:
     :lines: 29-
