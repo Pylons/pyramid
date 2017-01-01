@@ -19,10 +19,6 @@ Install cookiecutter
 --------------------
 We will use a :term:`cookiecutter` to create a Python package project from a Python package project template.  See `Cookiecutter Installation <https://cookiecutter.readthedocs.io/en/latest/installation.html>`_ for instructions.
 
-.. note::
-
-    At the time of writing, the installation instructions for Cookiecutter suggest the optional use of ``sudo``, implying to install it in the system Python. We suggest that you install it in a virtual environment instead.
-
 
 Generate a Pyramid project from a cookiecutter
 ----------------------------------------------
