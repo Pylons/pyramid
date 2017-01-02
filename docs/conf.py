@@ -81,7 +81,8 @@ intersphinx_mapping = {
     'webtest': ('http://webtest.pythonpaste.org/en/latest', None),
     'who': ('http://repozewho.readthedocs.org/en/latest', None),
     'zcml': ('http://docs.pylonsproject.org/projects/pyramid-zcml/en/latest', None),
-    'zcomponent': ('http://zopecomponent.readthedocs.io/en/stable/', None),
+    'zcomponent': ('http://zopecomponent.readthedocs.io/en/latest/', None),
+    'zinterface': ('http://zopeinterface.readthedocs.io/en/latest/', None),
 }
 
 
