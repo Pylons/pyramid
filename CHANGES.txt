@@ -258,3 +258,8 @@ Documentation Changes
 
 - Improve output of p* script descriptions for help.
   See https://github.com/Pylons/pyramid/pull/2886
+
+- Quick Tour, Quick Tutorial, and most files throughout the documentation have
+  been updated to use cookiecutters instead of pcreate and scaffolds.
+  See https://github.com/Pylons/pyramid/pull/2888 and
+  https://github.com/Pylons/pyramid/pull/2889
