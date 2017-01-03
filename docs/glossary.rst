@@ -992,7 +992,7 @@ Glossary
      pages rendered by your application, displaying request, routing, and
      database information.  :mod:`pyramid_debugtoolbar` is configured into
      the ``development.ini`` of all applications which use a Pyramid
-     :term:`scaffold`.  For more information, see
+     :term:`cookiecutter`.  For more information, see
      http://docs.pylonsproject.org/projects/pyramid_debugtoolbar/en/latest/.
 
    scaffold
@@ -1062,8 +1062,8 @@ Glossary
       :class:`pyramid.interfaces.IAssetDescriptor`.
 
    Waitress
-      A :term:`WSGI` server that runs on UNIX and Windows under Python 2.6+
-      and Python 3.2+.  Projects generated via Pyramid scaffolding use
+      A :term:`WSGI` server that runs on UNIX and Windows under Python 2.7+
+      and Python 3.3+.  Projects generated via Pyramid cookiecutters use
       Waitress as a WGSI server.  See
       http://docs.pylonsproject.org/projects/waitress/en/latest/ for detailed
       information.

@@ -145,6 +145,7 @@ Narrative documentation in chapter form explaining how to use :app:`Pyramid`.
    narr/extending
    narr/advconfig
    narr/extconfig
+   narr/cookiecutters
    narr/scaffolding
    narr/upgrading
    narr/threadlocals

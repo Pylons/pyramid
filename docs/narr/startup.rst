@@ -50,7 +50,7 @@ Here's a high-level time-ordered overview of what happens when you press
    application or a pipeline, you're using a "composite" (e.g.,
    ``[composite:main]``), refer to the documentation for that particular
    composite to understand how to make it refer to your :app:`Pyramid`
-   application.  In most cases, a Pyramid application built from a scaffold
+   application.  In most cases, a Pyramid application built from a cookiecutter
    will have a single ``[app:main]`` section in it, and this will be the
    application served.
 
@@ -70,7 +70,7 @@ Here's a high-level time-ordered overview of what happens when you press
    :app:`Pyramid` :term:`router` instance.  Here's the contents of an example
    ``__init__.py`` module:
 
-   .. literalinclude:: MyProject/myproject/__init__.py
+   .. literalinclude:: myproject/myproject/__init__.py
       :language: python
       :linenos:
 
@@ -86,12 +86,12 @@ Here's a high-level time-ordered overview of what happens when you press
 
    Our generated ``development.ini`` file looks like so:
 
-   .. literalinclude:: MyProject/development.ini
+   .. literalinclude:: myproject/development.ini
       :language: ini
       :linenos:
 
    In this case, the ``myproject.__init__:main`` function referred to by the
-   entry point URI ``egg:MyProject`` (see :ref:`MyProject_ini` for more
+   entry point URI ``egg:myproject`` (see :ref:`myproject_ini` for more
    information about entry point URIs, and how they relate to callables) will
    receive the key/value pairs ``{pyramid.reload_templates = true,
    pyramid.debug_authorization = false, pyramid.debug_notfound = false,

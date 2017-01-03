@@ -83,7 +83,7 @@ Windows commands are prefixed with a drive letter with an optional directory nam
 
 .. code-block:: doscon
 
-    c:\> %VENV%\Scripts\pcreate -s starter MyProject
+    c:\> %VENV%\Scripts\pserve development.ini
 
 cfg:
 

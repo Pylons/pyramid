@@ -182,7 +182,7 @@ available. Pyramid can automatically utilize changed templates when rendering
 pages and automatically restart the application to incorporate changed Python
 code. Plain old ``print()`` calls used for debugging can display to a console.
 
-Pyramid's debug toolbar comes activated when you use a Pyramid scaffold to
+Pyramid's debug toolbar comes activated when you use a Pyramid :term:`cookiecutter` to
 render a project.  This toolbar overlays your application in the browser, and
 allows you access to framework data, such as the routes configured, the last
 renderings performed, the current set of packages installed, SQLAlchemy queries
@@ -494,7 +494,7 @@ Example: :ref:`view_configuration_parameters`.
 Transaction management
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Pyramid's :term:`scaffold` system renders projects that include a *transaction
+A couple of Pyramid's :term:`cookiecutter`\ s include a *transaction
 management* system, stolen from Zope.  When you use this transaction management
 system, you cease being responsible for committing your data anymore.  Instead
 Pyramid takes care of committing: it commits at the end of a request or aborts

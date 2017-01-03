@@ -172,7 +172,7 @@ time of its release.
 .. code-block:: bash
 
     # Mac and Linux
-    $VENV/bin/pip install --upgrade pip setuptools
+    $ $VENV/bin/pip install --upgrade pip setuptools
 
 .. code-block:: doscon
 

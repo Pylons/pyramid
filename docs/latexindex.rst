@@ -78,6 +78,7 @@ Narrative Documentation
    narr/extending
    narr/advconfig
    narr/extconfig
+   narr/cookiecutters
    narr/scaffolding
    narr/upgrading
    narr/threadlocals
