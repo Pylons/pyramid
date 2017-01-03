@@ -212,3 +212,8 @@ Documentation Enhancements
 
   See https://github.com/Pylons/pyramid/pull/2881 and
   https://github.com/Pylons/pyramid/pull/2883.
+
+- Quick Tour, Quick Tutorial, and most files throughout the documentation have
+  been updated to use cookiecutters instead of pcreate and scaffolds.
+  See https://github.com/Pylons/pyramid/pull/2888 and
+  https://github.com/Pylons/pyramid/pull/2889
