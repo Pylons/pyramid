@@ -1062,8 +1062,8 @@ Glossary
       :class:`pyramid.interfaces.IAssetDescriptor`.
 
    Waitress
-      A :term:`WSGI` server that runs on UNIX and Windows under Python 2.6+
-      and Python 3.2+.  Projects generated via Pyramid cookiecutters use
+      A :term:`WSGI` server that runs on UNIX and Windows under Python 2.7+
+      and Python 3.3+.  Projects generated via Pyramid cookiecutters use
       Waitress as a WGSI server.  See
       http://docs.pylonsproject.org/projects/waitress/en/latest/ for detailed
       information.
