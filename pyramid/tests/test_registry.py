@@ -27,6 +27,10 @@ class TestRegistry(unittest.TestCase):
         registry = self._getTargetClass()(package_name)
         self.assertEqual(registry.package_name, package_name)
 
+    def test_default_package_name(self):
+        registry = self._getTargetClass()()
+        self.assertEqual(registry.package_name, 'pyramid.tests')
+
     def test_registerHandler_and_notify(self):
         registry = self._makeOne()
         self.assertEqual(registry.has_listeners, False)

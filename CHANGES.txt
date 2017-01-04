@@ -1,3 +1,12 @@
+unreleased
+==========
+
+Documentation Changes
+---------------------
+
+- Improve registry documentation to discuss uses as a component registry
+  and as a dictionary. See https://github.com/Pylons/pyramid/pull/2893
+
 1.8a1 (2016-12-25)
 ==================
 
