@@ -95,7 +95,7 @@ Or on Windows:
 
 .. code-block:: doscon
 
-   c:\> %VENV%\cookiecutter https://github.com/Pylons/pyramid-cookiecutter-starter
+   c:\> %VENV%\Scripts\cookiecutter https://github.com/Pylons/pyramid-cookiecutter-starter
 
 If prompted for the first item, accept the default ``yes`` by hitting return.
 
