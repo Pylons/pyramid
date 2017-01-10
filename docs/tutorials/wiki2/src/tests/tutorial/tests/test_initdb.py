@@ -1,20 +1,16 @@
-import mock
+import os
 import unittest
 
 
 class TestInitializeDB(unittest.TestCase):
 
-    @mock.patch('tutorial.scripts.initializedb.sys')
-    def test_usage(self, mocked_sys):
+    def test_usage(self):
         from ..scripts.initializedb import main
-        main(argv=['foo'])
-        mocked_sys.exit.assert_called_with(1)
+        with self.assertRaises(SystemExit):
+            main(argv=['foo'])
 
-    @mock.patch('tutorial.scripts.initializedb.get_tm_session')
-    @mock.patch('tutorial.scripts.initializedb.sys')
-    def test_run(self, mocked_sys, mocked_session):
+    def test_run(self):
         from ..scripts.initializedb import main
         main(argv=['foo', 'development.ini'])
-        mocked_session.assert_called_once()
-
-
+        self.assertTrue(os.path.exists('tutorial.sqlite'))
+        os.remove('tutorial.sqlite')
