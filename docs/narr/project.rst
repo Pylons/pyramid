@@ -75,27 +75,17 @@ In :ref:`installing_chapter`, you created a virtual Python environment via the
 ``venv`` command. We called the virtual environment directory
 ``env`` and set an environment variable ``VENV`` to its path.
 
-We assume that you previously installed cookiecutter using the following command:
-
-.. code-block:: bash
-
-    $ $VENV/bin/pip install cookiecutter
+We assume that you :ref:`previously installed cookiecutter <cookiecutters>`, following its installation instructions.
 
 We'll choose ``pyramid-cookiecutter-starter`` to start the project.  When we invoke ``cookiecutter``, it will create a directory that represents our project.
 
-The following commands assume that our current working directory is the value of ``$VENV``.
+We assume our current working directory is the value of ``VENV``.
 
-On UNIX:
+On all platforms, generate a project using cookiecutter.
 
 .. code-block:: bash
 
-   $ $VENV/bin/cookiecutter https://github.com/Pylons/pyramid-cookiecutter-starter
-
-Or on Windows:
-
-.. code-block:: doscon
-
-   c:\> %VENV%\Scripts\cookiecutter https://github.com/Pylons/pyramid-cookiecutter-starter
+   $ cookiecutter https://github.com/Pylons/pyramid-cookiecutter-starter
 
 If prompted for the first item, accept the default ``yes`` by hitting return.
 
@@ -128,9 +118,9 @@ Or on Windows:
     # Change directory into your newly created project.
     c:\> cd myproject
     # Create a new virtual environment...
-    c:\myproject\> c:\Python3x\python -m venv %VENV%
+    c:\myproject> python -m venv %VENV%
     # ...where we upgrade packaging tools.
-    c:\myproject\> %VENV%\Scripts\pip install --upgrade pip setuptools
+    c:\myproject> %VENV%\Scripts\pip install --upgrade pip setuptools
 
 As a result of invoking the ``cookiecutter`` command, a directory named
 ``myproject`` is created.  That directory is a :term:`project` directory. The
@@ -201,7 +191,7 @@ Or on Windows:
 
 .. code-block:: doscon
 
-    c:\env\myproject\> %VENV%\Scripts\pip install -e .
+    c:\env\myproject> %VENV%\Scripts\pip install -e .
 
 Elided output from a run of this command on UNIX is shown below:
 
@@ -239,7 +229,7 @@ On Windows:
 
 .. code-block:: doscon
 
-   c:\env\myproject\> %VENV%\Scripts\pip install -e ".[testing]"
+   c:\env\myproject> %VENV%\Scripts\pip install -e ".[testing]"
 
 Once the testing requirements are installed, then you can run the tests using
 the ``py.test`` command that was just installed in the ``bin`` directory of
@@ -255,7 +245,7 @@ On Windows:
 
 .. code-block:: doscon
 
-   c:\env\myproject\> %VENV%\Scripts\py.test -q
+   c:\env\myproject> %VENV%\Scripts\py.test -q
 
 Here's sample output from a test run on UNIX:
 
@@ -320,7 +310,7 @@ On Windows:
 
 .. code-block:: doscon
 
-   c:\env\myproject\> %VENV%\Scripts\pserve development.ini
+   c:\env\myproject> %VENV%\Scripts\pserve development.ini
 
 Here's sample output from a run of ``pserve`` on UNIX:
 

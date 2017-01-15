@@ -156,7 +156,7 @@ environment variable.
 .. code-block:: doscon
 
     # Windows
-    c:\> c:\Python35\python -m venv %VENV%
+    c:\> python -m venv %VENV%
 
 .. seealso:: See also Python 3's :mod:`venv module <python:venv>` and Python
    2's `virtualenv <https://virtualenv.pypa.io/en/latest/>`_ package.
@@ -214,4 +214,4 @@ tutorial.
 .. code-block:: doscon
 
     # Windows
-    c:\> %VENV%\Scripts\pip install webtest deform sqlalchemy pyramid_chameleon pyramid_debugtoolbar pyramid_jinja2 waitress pyramid_tm zope.sqlalchemy
+    c:\> %VENV%\Scripts\pip install webtest pytest pytest-cov deform sqlalchemy pyramid_chameleon pyramid_debugtoolbar pyramid_jinja2 waitress pyramid_tm zope.sqlalchemy

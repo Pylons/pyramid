@@ -114,7 +114,7 @@ On UNIX
 On Windows
 ^^^^^^^^^^
 
-Each version of Python uses different paths, so you will need to adjust the path to the command for your Python version.
+Each version of Python uses different paths, so you will need to adjust the path to the command for your Python version. Recent versions of the Python 3 installer for Windows now install a Python launcher.
 
 Python 2.7:
 
@@ -126,7 +126,7 @@ Python 3.6:
 
 .. code-block:: doscon
 
-    c:\tutorial> c:\Python36\Scripts\python -m venv %VENV%
+    c:\tutorial> python -m venv %VENV%
 
 
 Upgrade packaging tools in the virtual environment

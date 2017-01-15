@@ -122,15 +122,20 @@ following options:
    possible to invoke them from a command prompt.
 
    To do so, search for "Environment Variables" on your computer (on Windows
-   10, it is under ``System Properties`` --> ``Advanced``) and append that
-   directory to the end of the ``Path`` environment variable, separating each
-   path segment with a semi-colon (;) or use the GUI to add New or Edit
-   existing path segments. Example segments should look like
+   10, it is under ``System Properties`` --> ``Advanced``) and add that
+   directory to the ``Path`` environment variable, using the GUI to edit path
+   segments.
+
+   Example segments should look like
    ``C:\Users\<username>\AppData\Local\Programs\Python3x-32``, where you have
-   your username instead of the bracketed example, and your version of Python
-   and whether it is 32- or 64-bit. Additionally ensure you have the path
-   segment ending with ``\Scripts``, i.e.,
-   ``C:\Users\<username>\AppData\Local\Programs\Python3x-32\Scripts``.
+   your username instead of ``<username>``, and your version of Python and
+   whether it is 32- or 64-bit. Additionally ensure you have the path segment
+   ending with ``\Scripts``, i.e.,
+   ``C:\Users\<username>\AppData\Local\Programs\Python3x-32\Scripts``, and for
+   user-installed Python programs, ``%APPDATA%\Python\Python3x\Scripts``.
+
+   You may need to restart your command prompt session to load the environment
+   variables.
 
    .. seealso:: See `Configuring Python (on Windows)
       <https://docs.python.org/3/using/windows.html#configuring-python>`_ for
@@ -230,7 +235,7 @@ After installing Python as described previously in
 
    .. code-block:: doscon
 
-      c:\> cd \dir
+      c:\> cd \
       c:\> set VENV=c:\env
       c:\> python -m venv %VENV%
       c:\> cd %VENV%
