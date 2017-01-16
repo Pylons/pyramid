@@ -7,6 +7,16 @@ Documentation Changes
 - Improve registry documentation to discuss uses as a component registry
   and as a dictionary. See https://github.com/Pylons/pyramid/pull/2893
 
+- Quick Ttutorial and most other remaining documentation updated to use
+  cookiecutters instead of pcreate and scaffolds.
+  See https://github.com/Pylons/pyramid/pull/2889
+
+- Fix unittests in wiki2 to work without different dependencies between
+  py2 and py3. See https://github.com/Pylons/pyramid/pull/2899
+
+- Update Windows documentation to track newer Python 3 improvements to the
+  installer. See https://github.com/Pylons/pyramid/pull/2900
+
 1.8a1 (2016-12-25)
 ==================
 
@@ -268,7 +278,5 @@ Documentation Changes
 - Improve output of p* script descriptions for help.
   See https://github.com/Pylons/pyramid/pull/2886
 
-- Quick Tour, Quick Tutorial, and most files throughout the documentation have
-  been updated to use cookiecutters instead of pcreate and scaffolds.
-  See https://github.com/Pylons/pyramid/pull/2888 and
-  https://github.com/Pylons/pyramid/pull/2889
+- Quick Tour updated to use cookiecutters instead of pcreate and scaffolds.
+  See https://github.com/Pylons/pyramid/pull/2888

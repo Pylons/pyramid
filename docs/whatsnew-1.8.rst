@@ -73,6 +73,10 @@ Minor Feature Additions
   exception - the pipeline can be optimized at config-time.
   See https://github.com/Pylons/pyramid/pull/2660
 
+- ``pcreate`` learned about ``--package-name`` to allow you to create a new
+  project in an existing folder with a different package name than the project
+  name. See https://github.com/Pylons/pyramid/pull/2783
+
 - ``pserve`` should now work with ``gevent`` and other workers that need
   to monkeypatch the process, assuming the server and / or the app do so
   as soon as possible before importing the rest of pyramid.
@@ -128,10 +132,6 @@ Backwards Incompatibilities
   should only have been used if the client itself broadcast support for the
   encoding via ``Accept-Encoding`` request headers.
   See https://github.com/Pylons/pyramid/pull/2810
-
-- ``pcreate`` learned about ``--package-name`` to allow you to create a new
-  project in an existing folder with a different package name than the project
-  name. See https://github.com/Pylons/pyramid/pull/2783
 
 - ``pcreate`` is now interactive by default. You will be prompted if a file
   already exists with different content. Previously if there were similar
