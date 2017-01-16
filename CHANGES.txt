@@ -7,9 +7,10 @@ Documentation Changes
 - Improve registry documentation to discuss uses as a component registry
   and as a dictionary. See https://github.com/Pylons/pyramid/pull/2893
 
-- Quick Ttutorial and most other remaining documentation updated to use
-  cookiecutters instead of pcreate and scaffolds.
-  See https://github.com/Pylons/pyramid/pull/2889
+- Quick Tour, Quick Tutorial, and most other remaining documentation updated to
+  use cookiecutters instead of pcreate and scaffolds.
+  See https://github.com/Pylons/pyramid/pull/2888 and
+  https://github.com/Pylons/pyramid/pull/2889
 
 - Fix unittests in wiki2 to work without different dependencies between
   py2 and py3. See https://github.com/Pylons/pyramid/pull/2899
