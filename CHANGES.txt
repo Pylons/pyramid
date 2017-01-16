@@ -18,6 +18,9 @@ Documentation Changes
 - Update Windows documentation to track newer Python 3 improvements to the
   installer. See https://github.com/Pylons/pyramid/pull/2900
 
+- Updated the ``mod_wsgi`` tutorial to use cookiecutters and Apache 2.4+.
+  See https://github.com/Pylons/pyramid/pull/2901
+
 1.8a1 (2016-12-25)
 ==================
 

@@ -217,3 +217,6 @@ Documentation Enhancements
   been updated to use cookiecutters instead of pcreate and scaffolds.
   See https://github.com/Pylons/pyramid/pull/2888 and
   https://github.com/Pylons/pyramid/pull/2889
+
+- Updated the ``mod_wsgi`` tutorial to use cookiecutters and Apache 2.4+.
+  See https://github.com/Pylons/pyramid/pull/2901
