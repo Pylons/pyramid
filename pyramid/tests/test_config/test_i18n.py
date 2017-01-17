@@ -79,6 +79,23 @@ class TestI18NConfiguratorMixin(unittest.TestCase):
         self.assertEqual(config.registry.getUtility(ITranslationDirectories),
                          [locale3, locale, locale2])
 
+    def test_add_translation_dirs_override_multiple_specs_multiple_calls(self):
+        from pyramid.interfaces import ITranslationDirectories
+        config = self._makeOne(autocommit=True)
+        config.add_translation_dirs('pyramid.tests.pkgs.localeapp:locale',
+                                    'pyramid.tests.pkgs.localeapp:locale2')
+        config.add_translation_dirs('pyramid.tests.pkgs.localeapp:locale3',
+                                    override=True)
+        self.assertEqual(config.registry.getUtility(ITranslationDirectories),
+                         [locale, locale2, locale3])
+
+    def test_add_translation_dirs_invalid_kwargs(self):
+        from pyramid.interfaces import ITranslationDirectories
+        config = self._makeOne(autocommit=True)
+        with self.assertRaises(TypeError):
+            config.add_translation_dirs('pyramid.tests.pkgs.localeapp:locale',
+                                        foo=1)
+
     def test_add_translation_dirs_abspath(self):
         from pyramid.interfaces import ITranslationDirectories
         config = self._makeOne(autocommit=True)
