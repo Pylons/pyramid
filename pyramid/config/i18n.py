@@ -60,15 +60,20 @@ class I18NConfiguratorMixin(object):
            config.add_translation_dirs('/usr/share/locale',
                                        'some.package:locale')
 
-        Later calls to ``add_translation_dir`` insert directories into the
-        beginning of the list of translation directories created by earlier
-        calls.  This means that the same translation found in a directory
-        added later in the configuration process will be found before one
-        added earlier in the configuration process.  However, if multiple
-        specs are provided in a single call to ``add_translation_dirs``, the
-        directories will be inserted into the beginning of the directory list
-        in the order they're provided in the ``*specs`` list argument (items
-        earlier in the list trump ones later in the list).
+        The translation directories are defined as a list in which
+        translations defined later have precedence over translations defined
+        earlier.
+
+        If multiple specs are provided in a single call to
+        ``add_translation_dirs``, the directories will be inserted in the
+        order they're provided (earlier items are trumped by later items).
+
+        .. warning::
+
+           Consecutive calls to ``add_translation_dirs`` will sort the
+           directories such that the later calls will add folders with
+           lower precedence than earlier calls.
+
         """
         directories = []
         introspectables = []
