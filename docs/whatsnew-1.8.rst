@@ -109,6 +109,10 @@ Minor Feature Additions
   ``--help`` output as well as enabling nicer documentation of their options.
   See https://github.com/Pylons/pyramid/pull/2864
 
+- Added an ``override`` option to ``config.add_translation_dirs`` to allow
+  later calls to place translation directories at a higher priority then
+  earlier calls. See https://github.com/Pylons/pyramid/pull/2902
+
 Backwards Incompatibilities
 ---------------------------
 
