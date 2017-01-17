@@ -274,8 +274,8 @@ Documentation Changes
   See https://github.com/Pylons/pyramid/pull/2764
 
 - Clarify a possible misuse of the ``headers`` kwarg to subclasses of
-  :class:`pyramid.httpexceptions.HTTPException` in which more appropriate
-  kwargs from the parent class :class:`pyramid.response.Response` should be
+  ``pyramid.httpexceptions.HTTPException`` in which more appropriate
+  kwargs from the parent class ``pyramid.response.Response`` should be
   used instead. See https://github.com/Pylons/pyramid/pull/2750
 
 - The SQLAlchemy + URL Dispatch + Jinja2 (``wiki2``) and
