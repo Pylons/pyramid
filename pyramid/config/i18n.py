@@ -68,11 +68,12 @@ class I18NConfiguratorMixin(object):
         earlier in the list trump ones later in the list).
 
         """
-        directories = []
         introspectables = []
-        resolver = AssetResolver(self.package_name)
 
         def register():
+            directories = []
+            resolver = AssetResolver(self.package_name)
+
             # defer spec resolution until register to allow for asset
             # overrides to take place in an earlier config phase
             for spec in specs[::-1]: # reversed
@@ -91,13 +92,11 @@ class I18NConfiguratorMixin(object):
                 introspectables.append(intr)
                 directories.append(directory)
 
+            tdirs = self.registry.queryUtility(ITranslationDirectories)
+            if tdirs is None:
+                tdirs = []
+                self.registry.registerUtility(tdirs, ITranslationDirectories)
             for directory in directories:
-                tdirs = self.registry.queryUtility(ITranslationDirectories)
-                if tdirs is None:
-                    tdirs = []
-                    self.registry.registerUtility(tdirs,
-                                                  ITranslationDirectories)
-
                 tdirs.insert(0, directory)
 
         self.action(None, register, introspectables=introspectables)
