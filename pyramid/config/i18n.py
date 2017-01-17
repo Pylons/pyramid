@@ -42,7 +42,7 @@ class I18NConfiguratorMixin(object):
         self.registry.registerUtility(locale_negotiator, ILocaleNegotiator)
 
     @action_method
-    def add_translation_dirs(self, *specs):
+    def add_translation_dirs(self, *specs, **kw):
         """ Add one or more :term:`translation directory` paths to the
         current configuration state.  The ``specs`` argument is a
         sequence that may contain absolute directory paths
@@ -61,18 +61,27 @@ class I18NConfiguratorMixin(object):
         translations defined later have precedence over translations defined
         earlier.
 
+        By default, consecutive calls to ``add_translation_dirs`` will add
+        directories to the start of the list. This means later calls to
+        ``add_translation_dirs`` will have their translations trumped by
+        earlier calls. If you explicitly need this call to trump an earlier
+        call then you may set ``override`` to ``True``.
+
         If multiple specs are provided in a single call to
         ``add_translation_dirs``, the directories will be inserted in the
         order they're provided (earlier items are trumped by later items).
 
-        .. warning::
+        .. versionchanged:: 1.8
 
-           Consecutive calls to ``add_translation_dirs`` will sort the
-           directories such that the later calls will add folders with
-           lower precedence than earlier calls.
+           The ``override`` parameter was added to allow a later call
+           to ``add_translation_dirs`` to override an earlier call, inserting
+           folders at the beginning of the translation directory list.
 
         """
         introspectables = []
+        override = kw.pop('override', False)
+        if kw:
+            raise TypeError('invalid keyword arguments: %s', sorted(kw.keys()))
 
         def register():
             directories = []
@@ -80,7 +89,7 @@ class I18NConfiguratorMixin(object):
 
             # defer spec resolution until register to allow for asset
             # overrides to take place in an earlier config phase
-            for spec in specs[::-1]:  # reversed
+            for spec in specs:
                 # the trailing slash helps match asset overrides for folders
                 if not spec.endswith('/'):
                     spec += '/'
@@ -100,8 +109,11 @@ class I18NConfiguratorMixin(object):
             if tdirs is None:
                 tdirs = []
                 self.registry.registerUtility(tdirs, ITranslationDirectories)
-            for directory in directories:
-                tdirs.insert(0, directory)
+            if override:
+                tdirs.extend(directories)
+            else:
+                for directory in reversed(directories):
+                    tdirs.insert(0, directory)
 
         self.action(None, register, introspectables=introspectables)
 
