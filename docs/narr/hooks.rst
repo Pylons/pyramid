@@ -161,7 +161,7 @@ forbidden view:
 
    def main(globals, **settings):
        config = Configurator()
-       config.add_forbidden_view(forbidden_view)
+       config.add_forbidden_view(forbidden)
 
 If instead you prefer to use decorators and a :term:`scan`, you can use the
 :class:`pyramid.view.forbidden_view_config` decorator to mark a view callable
