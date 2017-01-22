@@ -5,7 +5,7 @@ Features
 --------
 
 - Added an ``override`` option to ``config.add_translation_dirs`` to allow
-  later calls to place translation directories at a higher priority then
+  later calls to place translation directories at a higher priority than
   earlier calls. See https://github.com/Pylons/pyramid/pull/2902
 
 Documentation Changes
