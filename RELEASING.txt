@@ -108,10 +108,6 @@ Update previous version (final releases only)
 Marketing and communications
 ----------------------------
 
-- Edit Pylons/pylonshq/templates/home/home.mako.
-
-- Edit Pylons/pylonshq/templates/home/inside.rst for major releases only.
-
 - Edit Pylons/trypyramid.com/src/templates/resources.html for major releases
   only.
 
