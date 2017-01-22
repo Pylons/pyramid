@@ -71,7 +71,7 @@ testing_extras = tests_require + [
     ]
 
 setup(name='pyramid',
-      version='1.8b1',
+      version='1.9.dev0',
       description='The Pyramid Web Framework, a Pylons project',
       long_description=README + '\n\n' + CHANGES,
       classifiers=[
