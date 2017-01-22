@@ -5,9 +5,9 @@ Pyramid
         :target: https://travis-ci.org/Pylons/pyramid
         :alt: 1.7-branch Travis CI Status
 
-.. image:: https://readthedocs.org/projects/pyramid/badge/?version=master
-        :target: http://docs.pylonsproject.org/projects/pyramid/en/master/
-        :alt: Master Documentation Status
+.. image:: https://readthedocs.org/projects/pyramid/badge/?version=1.7-branch
+        :target: http://docs.pylonsproject.org/projects/pyramid/en/1.7-branch/
+        :alt: 1.7-branch Documentation Status
 
 .. image:: https://readthedocs.org/projects/pyramid/badge/?version=latest
         :target: http://docs.pylonsproject.org/projects/pyramid/en/latest/
