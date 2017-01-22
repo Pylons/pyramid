@@ -136,6 +136,7 @@ pylons_sphinx_latesturl_pagename_overrides = {
     'whatsnew-1.3': 'index',
     'whatsnew-1.4': 'index',
     'whatsnew-1.5': 'index',
+    'whatsnew-1.6': 'index',
     'tutorials/gae/index': 'index',
     'api/chameleon_text': 'api',
     'api/chameleon_zpt': 'api',
