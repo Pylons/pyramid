@@ -63,10 +63,10 @@ Prepare new release branch
 
 - Change setup.py version to the release version number.
 
-- Make sure PyPI long description renders (requires ``collective.dist``
-  installed into your Python)::
+- Make sure PyPI long description renders (requires ``readme`` installed
+  into your Python)::
 
-  $ python setup.py check -r
+  $ python setup.py check -r -s -m
 
 - Create a release tag.
 
