@@ -1,3 +1,11 @@
+unreleased
+==========
+
+- Restore the ``pyramid.registry.Registry`` signature that forwards extra
+  ``*args, **kwargs`` to ``zope.interface.registry.Components`` allowing
+  implementations to specify a custom registry with ``bases``.
+  See https://github.com/Pylons/pyramid/pull/2918
+
 1.8 (2017-01-21)
 ================
 
