@@ -1,5 +1,7 @@
-unreleased
-==========
+.. _changes_1.6.5:
+
+1.6.5 (2017-01-24)
+==================
 
 - Remove testing on pypy3.
   See https://github.com/Pylons/pyramid/issues/2871
