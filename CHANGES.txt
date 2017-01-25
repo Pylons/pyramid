@@ -1,5 +1,7 @@
-unreleased
-==========
+.. _changes_1_8_1:
+
+1.8.1 (2017-01-24)
+==================
 
 - Restore the ``pyramid.registry.Registry`` signature that forwards extra
   ``*args, **kwargs`` to ``zope.interface.registry.Components`` allowing
