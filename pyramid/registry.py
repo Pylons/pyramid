@@ -56,7 +56,7 @@ class Registry(Components, dict):
 
     _settings = None
 
-    def __init__(self, package_name=CALLER_PACKAGE):
+    def __init__(self, package_name=CALLER_PACKAGE, *args, **kw):
         # add a registry-instance-specific lock, which is used when the lookup
         # cache is mutated
         self._lock = threading.Lock()
@@ -64,7 +64,7 @@ class Registry(Components, dict):
         self._clear_view_lookup_cache()
         if package_name is CALLER_PACKAGE:
             package_name = caller_package().__name__
-        Components.__init__(self, package_name)
+        Components.__init__(self, package_name, *args, **kw)
         dict.__init__(self)
 
     def _clear_view_lookup_cache(self):
