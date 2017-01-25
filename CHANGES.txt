@@ -1,5 +1,7 @@
-unreleased
-==========
+.. _changes_1.7.4:
+
+1.7.4 (2017-01-24)
+==================
 
 - Update HACKING.txt from stale branch that was never merged to master.
   See https://github.com/Pylons/pyramid/pull/2785
