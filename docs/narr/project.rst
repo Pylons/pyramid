@@ -1115,7 +1115,7 @@ inotify support
 By default, ``hupper`` will poll the filesystem for changes to all python
 code. This can be pretty inefficient in larger projects. To be nicer to your
 hard drive, you should install the
-`watchdog <http://pythonhosted.org/watchdog/>` package in development.
+`watchdog <http://pythonhosted.org/watchdog/>`_ package in development.
 ``hupper`` will automatically use ``watchdog`` to more efficiently poll the
 filesystem.
 
