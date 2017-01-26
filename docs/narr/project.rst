@@ -37,7 +37,7 @@ These cookiecutters are rendered using the ``cookiecutter`` command that you may
 :app:`Pyramid` cookiecutters
 ----------------------------
 
-Pyramid cookiecutters released under the Pylons Project include differ from each other on a number of axes:
+Pyramid cookiecutters released under the Pylons Project differ from each other on a number of axes:
 
 - the persistence mechanism they offer (no persistence mechanism, :term:`SQLAlchemy` with SQLite, or :term:`ZODB`)
 
