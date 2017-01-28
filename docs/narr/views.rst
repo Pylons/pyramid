@@ -246,7 +246,7 @@ within view code, the result of the :term:`Not Found View` will be returned to
 the user agent which performed the request.
 
 If :exc:`~pyramid.httpexceptions.HTTPForbidden` is raised by Pyramid itself
-within view code, the result of the :term:`Forbidden View` will be returned to
+or within view code, the result of the :term:`Forbidden View` will be returned to
 the user agent which performed the request.
 
 .. index::
