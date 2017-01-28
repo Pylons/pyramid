@@ -52,7 +52,7 @@ of exceptions from within the body of a view callable.
 Defining a View Callable as a Function
 --------------------------------------
 
-One of the easiest way to define a view callable is to create a function that
+One of the easiest ways to define a view callable is to create a function that
 accepts a single argument named ``request``, and which returns a
 :term:`Response` object.  For example, this is a "hello world" view callable
 implemented as a function:
