@@ -524,7 +524,7 @@ Alternate View Callable Argument/Calling Conventions
 
 Usually view callables are defined to accept only a single argument:
 ``request``.  However, view callables may alternately be defined as classes,
-functions, or any callable that accept *two* positional arguments: a
+functions, or any callable that accepts *two* positional arguments: a
 :term:`context` resource as the first argument and a :term:`request` as the
 second argument.
 
