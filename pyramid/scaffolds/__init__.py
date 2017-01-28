@@ -52,7 +52,7 @@ class PyramidTemplate(Template):
 
 class StarterProjectTemplate(PyramidTemplate):
     _template_dir = 'starter'
-    summary = 'Pyramid starter project using URL dispatch and Chameleon'
+    summary = 'Pyramid starter project using URL dispatch and Jinja2'
 
 class ZODBProjectTemplate(PyramidTemplate):
     _template_dir = 'zodb'
