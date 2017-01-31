@@ -110,7 +110,7 @@ Minor Feature Additions
   See https://github.com/Pylons/pyramid/pull/2864
 
 - Added an ``override`` option to
-  :meth:`pyraid.config.Configurator.add_translation_dirs` to allow
+  :meth:`pyramid.config.Configurator.add_translation_dirs` to allow
   later calls to place translation directories at a higher priority then
   earlier calls. See https://github.com/Pylons/pyramid/pull/2902
 
