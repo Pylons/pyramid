@@ -568,7 +568,7 @@ Glossary
      :ref:`adding_and_overriding_renderers` for more information.
 
    mod_wsgi
-     `mod_wsgi <https://code.google.com/archive/p/modwsgi>`_ is an Apache
+     `mod_wsgi <https://modwsgi.readthedocs.io>`_ is an Apache
      module developed by Graham Dumpleton.  It allows :term:`WSGI` applications
      (such as applications developed using :app:`Pyramid`) to be served using
      the Apache web server.

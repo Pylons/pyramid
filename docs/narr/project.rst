@@ -1089,13 +1089,13 @@ configuration on a local system that you have complete control over; it will
 provide the best development experience.
 
 One popular production alternative to the default Waitress server is
-:term:`mod_wsgi`. You can use mod_wsgi to serve your :app:`Pyramid` application
+:term:`mod_wsgi`. You can use ``mod_wsgi`` to serve your :app:`Pyramid` application
 using the Apache web server rather than any "pure-Python" server like Waitress.
 It is fast and featureful.  See :ref:`modwsgi_tutorial` for details.
 
 Another good production alternative is :term:`Green Unicorn` (aka
 ``gunicorn``).  It's faster than Waitress and slightly easier to configure than
-mod_wsgi, although it depends, in its default configuration, on having a
+``mod_wsgi``, although it depends, in its default configuration, on having a
 buffering HTTP proxy in front of it.  It does not, as of this writing, work on
 Windows.
 
