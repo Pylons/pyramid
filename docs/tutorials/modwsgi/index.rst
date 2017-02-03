@@ -122,5 +122,5 @@ specific path information for commands and files.
 :term:`mod_wsgi` has many knobs and a great variety of deployment modes. This
 is just one representation of how you might use it to serve up a :app:`Pyramid`
 application.  See the `mod_wsgi configuration documentation
-<https://code.google.com/archive/p/modwsgi/wikis/ConfigurationGuidelines.wiki>`_
+<https://modwsgi.readthedocs.io/en/develop/configuration.html>`_
 for more in-depth configuration information.
