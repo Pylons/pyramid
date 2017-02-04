@@ -54,7 +54,7 @@ configured imperatively:
        server.serve_forever()
 
 We won't talk much about what this application does yet.  Just note that the
-"configuration' statements take place underneath the ``if __name__ ==
+"configuration" statements take place underneath the ``if __name__ ==
 '__main__':`` stanza in the form of method calls on a :term:`Configurator`
 object (e.g., ``config.add_view(...)``).  These statements take place one after
 the other, and are executed in order, so the full power of Python, including
