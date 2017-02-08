@@ -1098,7 +1098,7 @@ class BasicAuthAuthenticationPolicy(CallbackAuthenticationPolicy):
         """ The userid parsed from the ``Authorization`` request header."""
         credentials = extract_http_basic_credentials(request)
         if credentials:
-            return credentials[0]
+            return credentials.username
 
     def remember(self, request, userid, **kw):
         """ A no-op. Basic authentication does not provide a protocol for
