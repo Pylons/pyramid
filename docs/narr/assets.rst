@@ -28,7 +28,7 @@ asset:
 
 The use of assets is quite common in most web development projects.  For
 example, when you create a :app:`Pyramid` application using one of the
-available scaffolds, as described in :ref:`creating_a_project`, the directory
+available :term:`cookiecutter`\ s, as described in :ref:`creating_a_project`, the directory
 representing the application contains a Python :term:`package`. Within that
 Python package, there are directories full of files which are static assets.
 For example, there's a ``static`` directory which contains ``.css``, ``.js``,

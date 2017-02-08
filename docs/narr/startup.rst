@@ -10,7 +10,8 @@ you'll see something much like this show up on the console:
 
     $ $VENV/bin/pserve development.ini
     Starting server in PID 16305.
-    serving on http://127.0.0.1:6543
+    Serving on http://127.0.0.1:6543
+    Serving on http://[::1]:6543
 
 This chapter explains what happens between the time you press the "Return" key
 on your keyboard after typing ``pserve development.ini`` and the time the line
@@ -49,7 +50,7 @@ Here's a high-level time-ordered overview of what happens when you press
    application or a pipeline, you're using a "composite" (e.g.,
    ``[composite:main]``), refer to the documentation for that particular
    composite to understand how to make it refer to your :app:`Pyramid`
-   application.  In most cases, a Pyramid application built from a scaffold
+   application.  In most cases, a Pyramid application built from a cookiecutter
    will have a single ``[app:main]`` section in it, and this will be the
    application served.
 
@@ -69,7 +70,7 @@ Here's a high-level time-ordered overview of what happens when you press
    :app:`Pyramid` :term:`router` instance.  Here's the contents of an example
    ``__init__.py`` module:
 
-   .. literalinclude:: MyProject/myproject/__init__.py
+   .. literalinclude:: myproject/myproject/__init__.py
       :language: python
       :linenos:
 
@@ -85,12 +86,12 @@ Here's a high-level time-ordered overview of what happens when you press
 
    Our generated ``development.ini`` file looks like so:
 
-   .. literalinclude:: MyProject/development.ini
+   .. literalinclude:: myproject/development.ini
       :language: ini
       :linenos:
 
    In this case, the ``myproject.__init__:main`` function referred to by the
-   entry point URI ``egg:MyProject`` (see :ref:`MyProject_ini` for more
+   entry point URI ``egg:myproject`` (see :ref:`myproject_ini` for more
    information about entry point URIs, and how they relate to callables) will
    receive the key/value pairs ``{pyramid.reload_templates = true,
    pyramid.debug_authorization = false, pyramid.debug_notfound = false,
@@ -130,10 +131,10 @@ Here's a high-level time-ordered overview of what happens when you press
 
 #. ``pserve`` starts the WSGI *server* defined within the ``[server:main]``
    section.  In our case, this is the Waitress server (``use =
-   egg:waitress#main``), and it will listen on all interfaces (``host =
-   127.0.0.1``), on port number 6543 (``port = 6543``). The server code itself
-   is what prints ``serving on http://127.0.0.1:6543``. The server serves the
-   application, and the application is running, waiting to receive requests.
+   egg:waitress#main``), and it will listen on all interfaces on port 6543
+   for both IPv4 and IPv6 (``listen = 127.0.0.1:6543 [::1]:6543``). The server
+   code itself is what prints ``serving on http://127.0.0.1:6543``. The server
+   serves the application, and the application is running, waiting to receive requests.
 
 .. seealso::
    Logging configuration is described in the :ref:`logging_chapter` chapter.

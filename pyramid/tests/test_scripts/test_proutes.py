@@ -20,7 +20,7 @@ class TestPRoutesCommand(unittest.TestCase):
     def _makeOne(self):
         cmd = self._getTargetClass()([])
         cmd.bootstrap = (dummy.DummyBootstrap(),)
-        cmd.args = ('/foo/bar/myapp.ini#myapp',)
+        cmd.args.config_uri = '/foo/bar/myapp.ini#myapp'
 
         return cmd
 
@@ -38,7 +38,8 @@ class TestPRoutesCommand(unittest.TestCase):
     def test_good_args(self):
         cmd = self._getTargetClass()([])
         cmd.bootstrap = (dummy.DummyBootstrap(),)
-        cmd.args = ('/foo/bar/myapp.ini#myapp', 'a=1')
+        cmd.args.config_uri = '/foo/bar/myapp.ini#myapp'
+        cmd.args.config_args = ('a=1',)
         route = dummy.DummyRoute('a', '/a')
         mapper = dummy.DummyMapper(route)
         cmd._get_mapper = lambda *arg: mapper
@@ -52,7 +53,8 @@ class TestPRoutesCommand(unittest.TestCase):
     def test_bad_args(self):
         cmd = self._getTargetClass()([])
         cmd.bootstrap = (dummy.DummyBootstrap(),)
-        cmd.args = ('/foo/bar/myapp.ini#myapp', 'a')
+        cmd.args.config_uri = '/foo/bar/myapp.ini#myapp'
+        cmd.args.config_vars = ('a',)
         route = dummy.DummyRoute('a', '/a')
         mapper = dummy.DummyMapper(route)
         cmd._get_mapper = lambda *arg: mapper
@@ -199,6 +201,33 @@ class TestPRoutesCommand(unittest.TestCase):
              '/and_very_long_pattern_as_well',
              'pyramid.tests.test_scripts.test_proutes.view']
         )
+
+    def test_class_view(self):
+        from pyramid.renderers import null_renderer as nr
+
+        config = self._makeConfig(autocommit=True)
+        config.add_route('foo', '/a/b')
+        config.add_view(
+            route_name='foo',
+            view=dummy.DummyView,
+            attr='view',
+            renderer=nr,
+            request_method='POST'
+        )
+
+        command = self._makeOne()
+        L = []
+        command.out = L.append
+        command.bootstrap = (dummy.DummyBootstrap(registry=config.registry),)
+        result = command.run()
+        self.assertEqual(result, 0)
+        self.assertEqual(len(L), 3)
+        compare_to = L[-1].split()
+        expected = [
+            'foo', '/a/b',
+            'pyramid.tests.test_scripts.dummy.DummyView.view', 'POST'
+        ]
+        self.assertEqual(compare_to, expected)
 
     def test_single_route_one_view_registered_with_factory(self):
         from zope.interface import Interface
@@ -559,7 +588,7 @@ class TestPRoutesCommand(unittest.TestCase):
         )
 
         command = self._makeOne()
-        command.options.glob = '*foo*'
+        command.args.glob = '*foo*'
 
         L = []
         command.out = L.append
@@ -591,8 +620,8 @@ class TestPRoutesCommand(unittest.TestCase):
         )
 
         command = self._makeOne()
-        command.options.glob = '*foo*'
-        command.options.format = 'method,name'
+        command.args.glob = '*foo*'
+        command.args.format = 'method,name'
         L = []
         command.out = L.append
         command.bootstrap = (dummy.DummyBootstrap(registry=config.registry),)
@@ -621,8 +650,8 @@ class TestPRoutesCommand(unittest.TestCase):
         )
 
         command = self._makeOne()
-        command.options.glob = '*foo*'
-        command.options.format = 'predicates,name,pattern'
+        command.args.glob = '*foo*'
+        command.args.format = 'predicates,name,pattern'
         L = []
         command.out = L.append
         command.bootstrap = (dummy.DummyBootstrap(registry=config.registry),)

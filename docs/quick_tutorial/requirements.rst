@@ -19,11 +19,11 @@ virtual environment.)
 
 This *Quick Tutorial* is based on:
 
-* **Python 3.5**. Pyramid fully supports Python 3.3+ and Python 2.7+. This
-  tutorial uses **Python 3.5** but runs fine under Python 2.7.
+* **Python 3.6**. Pyramid fully supports Python 3.4+ and Python 2.7+. This
+  tutorial uses **Python 3.6** but runs fine under Python 2.7.
 
 * **venv**. We believe in virtual environments. For this tutorial, we use
-  Python 3.5's built-in solution :term:`venv`. For Python 2.7, you can install
+  Python 3.6's built-in solution :term:`venv`. For Python 2.7, you can install
   :term:`virtualenv`.
 
 * **pip**. We use :term:`pip` for package management.
@@ -79,15 +79,15 @@ will reside as we proceed through the tutorial:
 
 .. code-block:: text
 
-    └── ~
-        └── projects
-            └── quick_tutorial
-                ├── env
-                └── step_one
-                    ├── intro
-                    │   ├── __init__.py
-                    │   └── app.py
-                    └── setup.py
+    `── ~
+        `── projects
+            `── quick_tutorial
+                │── env
+                `── step_one
+                    │── intro
+                    │   │── __init__.py
+                    │   `── app.py
+                    `── setup.py
 
 For Linux, the commands to do so are as follows:
 
@@ -156,7 +156,7 @@ environment variable.
 .. code-block:: doscon
 
     # Windows
-    c:\> c:\Python35\python3 -m venv %VENV%
+    c:\> python -m venv %VENV%
 
 .. seealso:: See also Python 3's :mod:`venv module <python:venv>` and Python
    2's `virtualenv <https://virtualenv.pypa.io/en/latest/>`_ package.
@@ -172,12 +172,15 @@ time of its release.
 .. code-block:: bash
 
     # Mac and Linux
-    $VENV/bin/pip install --upgrade pip setuptools
+    $ $VENV/bin/pip install --upgrade pip setuptools
 
 .. code-block:: doscon
 
     # Windows
     c:\> %VENV%\Scripts\pip install --upgrade pip setuptools
+
+.. seealso:: See also :ref:`Why use $VENV/bin/pip instead of source
+   bin/activate, then pip <venv-bin-pip-vs-source-bin-activate>`.
 
 
 .. _install-pyramid:
@@ -211,4 +214,4 @@ tutorial.
 .. code-block:: doscon
 
     # Windows
-    c:\> %VENV%\Scripts\pip install webtest deform sqlalchemy pyramid_chameleon pyramid_debugtoolbar pyramid_jinja2 waitress pyramid_tm zope.sqlalchemy
+    c:\> %VENV%\Scripts\pip install webtest pytest pytest-cov deform sqlalchemy pyramid_chameleon pyramid_debugtoolbar pyramid_jinja2 waitress pyramid_tm zope.sqlalchemy

@@ -15,7 +15,7 @@ It's important to know what is going on inside our web application. In
 development we might need to collect some output. In production, we might need
 to detect problems when other people use the site. We need *logging*.
 
-Fortunately Pyramid uses the normal Python approach to logging. The scaffold
+Fortunately Pyramid uses the normal Python approach to logging. The project
 generated in your ``development.ini`` has a number of lines that configure the
 logging for you to some reasonable defaults. You then see messages sent by
 Pyramid, for example, when a new request comes in.

@@ -5,7 +5,7 @@ The Pyramid Web Framework
 =========================
 
 :app:`Pyramid` is a small, fast, down-to-earth Python web framework.  It is
-developed as part of the `Pylons Project <http://www.pylonsproject.org/>`_.
+developed as part of the `Pylons Project <http://pylonsproject.org/>`_.
 It is licensed under a `BSD-like license <http://repoze.org/license.html>`_.
 
 Here is one of the simplest :app:`Pyramid` applications you can make:
@@ -18,7 +18,7 @@ After you install :app:`Pyramid` and run this application, when you visit
 this application works.
 
 
-.. _html_getting_started:
+.. _getting_started:
 
 Getting Started
 ===============
@@ -60,9 +60,9 @@ platforms.
 .. toctree::
    :maxdepth: 1
 
-   tutorials/wiki2/index.rst
-   tutorials/wiki/index.rst
-   tutorials/modwsgi/index.rst
+   tutorials/wiki2/index
+   tutorials/wiki/index
+   tutorials/modwsgi/index
 
 
 .. _support-and-development:
@@ -70,8 +70,9 @@ platforms.
 Support and Development
 =======================
 
-The `Pylons Project web site <http://www.pylonsproject.org/>`_ is the main
-online source of :app:`Pyramid` support and development information.
+The `Pyramid website <https://trypyramid.com/resources.html>`_ is the main
+entry point to :app:`Pyramid` web framework resources for support and
+development information.
 
 To report bugs, use the `issue tracker
 <https://github.com/Pylons/pyramid/issues>`_.
@@ -80,7 +81,7 @@ If you've got questions that aren't answered by this documentation, contact the
 `Pylons-discuss maillist
 <https://groups.google.com/forum/#!forum/pylons-discuss>`_ or join the
 `#pyramid IRC channel
-<https://webchat.freenode.net?channels=%23pyramid&uio=d4>`_.
+<https://webchat.freenode.net/?channels=pyramid>`_.
 
 Browse and check out tagged and trunk versions of :app:`Pyramid` via the
 `Pyramid GitHub repository <https://github.com/Pylons/pyramid/>`_. To check out
@@ -144,6 +145,7 @@ Narrative documentation in chapter form explaining how to use :app:`Pyramid`.
    narr/extending
    narr/advconfig
    narr/extconfig
+   narr/cookiecutters
    narr/scaffolding
    narr/upgrading
    narr/threadlocals
@@ -167,7 +169,7 @@ Comprehensive reference material for every public API exposed by
 ``p*`` Scripts Documentation
 ============================
 
-``p*`` scripts included with :app:`Pyramid`:.
+``p*`` scripts included with :app:`Pyramid`.
 
 .. toctree::
    :maxdepth: 1
@@ -183,6 +185,7 @@ Change History
 .. toctree::
    :maxdepth: 1
 
+   whatsnew-1.8
    whatsnew-1.7
    whatsnew-1.6
    whatsnew-1.5
@@ -212,13 +215,13 @@ Copyright, Trademarks, and Attributions
    copyright
 
 
-Typographical Conventions
-=========================
+Typographical Conventions and Style Guide
+=========================================
 
 .. toctree::
    :maxdepth: 1
 
-   conventions
+   typographical-conventions
 
 
 Index and Glossary

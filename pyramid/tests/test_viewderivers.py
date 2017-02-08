@@ -551,6 +551,28 @@ class TestDeriveView(unittest.TestCase):
                          "'view_name' against context None): "
                          "Allowed (NO_PERMISSION_REQUIRED)")
 
+    def test_debug_auth_permission_authpol_permitted_excview(self):
+        response = DummyResponse()
+        view = lambda *arg: response
+        self.config.registry.settings = dict(
+            debug_authorization=True, reload_templates=True)
+        logger = self._registerLogger()
+        self._registerSecurityPolicy(True)
+        result = self.config._derive_view(
+            view, context=Exception, permission='view')
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        self.assertEqual(result.__call_permissive__.__wraps__, view)
+        request = self._makeRequest()
+        request.view_name = 'view_name'
+        request.url = 'url'
+        self.assertEqual(result(Exception(), request), response)
+        self.assertEqual(len(logger.messages), 1)
+        self.assertEqual(logger.messages[0],
+                         "debug_authorization of url url (view name "
+                         "'view_name' against context Exception()): True")
+
     def test_secured_view_authn_policy_no_authz_policy(self):
         response = DummyResponse()
         view = lambda *arg: response
@@ -627,6 +649,63 @@ class TestDeriveView(unittest.TestCase):
                              'Unauthorized: myview failed permission check')
         else: # pragma: no cover
             raise AssertionError
+
+    def test_secured_view_skipped_by_default_on_exception_view(self):
+        from pyramid.request import Request
+        from pyramid.security import NO_PERMISSION_REQUIRED
+        def view(request):
+            raise ValueError
+        def excview(request):
+            return 'hello'
+        self._registerSecurityPolicy(False)
+        self.config.add_settings({'debug_authorization': True})
+        self.config.set_default_permission('view')
+        self.config.add_view(view, name='foo', permission=NO_PERMISSION_REQUIRED)
+        self.config.add_view(excview, context=ValueError, renderer='string')
+        app = self.config.make_wsgi_app()
+        request = Request.blank('/foo', base_url='http://example.com')
+        request.method = 'POST'
+        response = request.get_response(app)
+        self.assertTrue(b'hello' in response.body)
+
+    def test_secured_view_failed_on_explicit_exception_view(self):
+        from pyramid.httpexceptions import HTTPForbidden
+        from pyramid.request import Request
+        from pyramid.security import NO_PERMISSION_REQUIRED
+        def view(request):
+            raise ValueError
+        def excview(request): pass
+        self._registerSecurityPolicy(False)
+        self.config.add_view(view, name='foo', permission=NO_PERMISSION_REQUIRED)
+        self.config.add_view(excview, context=ValueError, renderer='string',
+                             permission='view')
+        app = self.config.make_wsgi_app()
+        request = Request.blank('/foo', base_url='http://example.com')
+        request.method = 'POST'
+        try:
+            request.get_response(app)
+        except HTTPForbidden:
+            pass
+        else: # pragma: no cover
+            raise AssertionError
+
+    def test_secured_view_passed_on_explicit_exception_view(self):
+        from pyramid.request import Request
+        from pyramid.security import NO_PERMISSION_REQUIRED
+        def view(request):
+            raise ValueError
+        def excview(request):
+            return 'hello'
+        self._registerSecurityPolicy(True)
+        self.config.add_view(view, name='foo', permission=NO_PERMISSION_REQUIRED)
+        self.config.add_view(excview, context=ValueError, renderer='string',
+                             permission='view')
+        app = self.config.make_wsgi_app()
+        request = Request.blank('/foo', base_url='http://example.com')
+        request.method = 'POST'
+        request.headers['X-CSRF-Token'] = 'foo'
+        response = request.get_response(app)
+        self.assertTrue(b'hello' in response.body)
 
     def test_predicate_mismatch_view_has_no_name(self):
         from pyramid.exceptions import PredicateMismatch
@@ -1211,6 +1290,34 @@ class TestDeriveView(unittest.TestCase):
         self.config.set_default_csrf_options(require_csrf=True)
         view = self.config._derive_view(inner_view)
         self.assertRaises(BadCSRFToken, lambda: view(None, request))
+
+    def test_csrf_view_enabled_via_callback(self):
+        def callback(request):
+            return True
+        from pyramid.exceptions import BadCSRFToken
+        def inner_view(request): pass
+        request = self._makeRequest()
+        request.scheme = "http"
+        request.method = 'POST'
+        request.session = DummySession({'csrf_token': 'foo'})
+        self.config.set_default_csrf_options(require_csrf=True, callback=callback)
+        view = self.config._derive_view(inner_view)
+        self.assertRaises(BadCSRFToken, lambda: view(None, request))
+
+    def test_csrf_view_disabled_via_callback(self):
+        def callback(request):
+            return False
+        response = DummyResponse()
+        def inner_view(request):
+            return response
+        request = self._makeRequest()
+        request.scheme = "http"
+        request.method = 'POST'
+        request.session = DummySession({'csrf_token': 'foo'})
+        self.config.set_default_csrf_options(require_csrf=True, callback=callback)
+        view = self.config._derive_view(inner_view)
+        result = view(None, request)
+        self.assertTrue(result is response)
 
     def test_csrf_view_uses_custom_csrf_token(self):
         response = DummyResponse()

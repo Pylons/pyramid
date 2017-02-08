@@ -27,7 +27,6 @@ from pyramid.compat import (
     text_,
     reraise,
     string_types,
-    zip_longest,
     )
 
 from pyramid.events import ApplicationCreated
@@ -380,6 +379,7 @@ class Configurator(
         self.add_default_view_predicates()
         self.add_default_view_derivers()
         self.add_default_route_predicates()
+        self.add_default_tweens()
 
         if exceptionresponse_view is not None:
             exceptionresponse_view = self.maybe_dotted(exceptionresponse_view)
@@ -450,9 +450,6 @@ class Configurator(
         if package is None:
             return filename # absolute filename
         return '%s:%s' % (package, filename)
-
-    def _split_spec(self, path_or_spec):
-        return resolve_asset_spec(path_or_spec, self.package_name)
 
     def _fix_registry(self):
         """ Fix up a ZCA component registry that is not a
@@ -606,11 +603,15 @@ class Configurator(
         if autocommit:
             # callables can depend on the side effects of resolving a
             # deferred discriminator
-            undefer(discriminator)
-            if callable is not None:
-                callable(*args, **kw)
-            for introspectable in introspectables:
-                introspectable.register(self.introspector, action_info)
+            self.begin()
+            try:
+                undefer(discriminator)
+                if callable is not None:
+                    callable(*args, **kw)
+                for introspectable in introspectables:
+                    introspectable.register(self.introspector, action_info)
+            finally:
+                self.end()
 
         else:
             action = extra
@@ -651,7 +652,11 @@ class Configurator(
         of this error will be information about the source of the conflict,
         usually including file names and line numbers of the cause of the
         configuration conflicts."""
-        self.action_state.execute_actions(introspector=self.introspector)
+        self.begin()
+        try:
+            self.action_state.execute_actions(introspector=self.introspector)
+        finally:
+            self.end()
         self.action_state = ActionState() # old actions have been processed
 
     def include(self, callable, route_prefix=None):
@@ -885,14 +890,30 @@ class Configurator(
 
     absolute_resource_spec = absolute_asset_spec # b/w compat forever
 
-    def begin(self, request=None):
+    def begin(self, request=_marker):
         """ Indicate that application or test configuration has begun.
         This pushes a dictionary containing the :term:`application
         registry` implied by ``registry`` attribute of this
         configurator and the :term:`request` implied by the
         ``request`` argument onto the :term:`thread local` stack
         consulted by various :mod:`pyramid.threadlocal` API
-        functions."""
+        functions.
+
+        If ``request`` is not specified and the registry owned by the
+        configurator is already pushed as the current threadlocal registry
+        then this method will keep the current threadlocal request unchanged.
+
+        .. versionchanged:: 1.8
+           The current threadlocal request is propagated if the current
+           threadlocal registry remains unchanged.
+
+        """
+        if request is _marker:
+            current = self.manager.get()
+            if current['registry'] == self.registry:
+                request = current['request']
+            else:
+                request = None
         self.manager.push({'registry':self.registry, 'request':request})
 
     def end(self):
@@ -992,11 +1013,11 @@ class Configurator(
         # Push the registry onto the stack in case any code that depends on
         # the registry threadlocal APIs used in listeners subscribed to the
         # IApplicationCreated event.
-        self.manager.push({'registry': self.registry, 'request': None})
+        self.begin()
         try:
             self.registry.notify(ApplicationCreated(app))
         finally:
-            self.manager.pop()
+            self.end()
 
         return app
 
@@ -1110,29 +1131,8 @@ class ActionState(object):
         try:
             all_actions = []
             executed_actions = []
-            pending_actions = iter([])
-
-            # resolve the new action list against what we have already
-            # executed -- if a new action appears intertwined in the list
-            # of already-executed actions then someone wrote a broken
-            # re-entrant action because it scheduled the action *after* it
-            # should have been executed (as defined by the action order)
-            def resume(actions):
-                for a, b in zip_longest(actions, executed_actions):
-                    if b is None and a is not None:
-                        # common case is that we are executing every action
-                        yield a
-                    elif b is not None and a != b:
-                        raise ConfigurationError(
-                            'During execution a re-entrant action was added '
-                            'that modified the planned execution order in a '
-                            'way that is incompatible with what has already '
-                            'been executed.')
-                    else:
-                        # resolved action is in the same location as before,
-                        # so we are in good shape, but the action is already
-                        # executed so we skip it
-                        assert b is not None and a == b
+            action_iter = iter([])
+            conflict_state = ConflictResolverState()
 
             while True:
                 # We clear the actions list prior to execution so if there
@@ -1141,26 +1141,14 @@ class ActionState(object):
                 # ensures that the previously executed actions have no new
                 # conflicts.
                 if self.actions:
-                    # Only resolve the new actions against executed_actions
-                    # and pending_actions instead of everything to avoid
-                    # redundant checks.
-                    # Assume ``actions = resolveConflicts([A, B, C])`` which
-                    # after conflict checks, resulted in ``actions == [A]``
-                    # then we know action A won out or a conflict would have
-                    # been raised. Thus, when action D is added later, we only
-                    # need to check the new action against A.
-                    # ``actions = resolveConflicts([A, D]) should drop the
-                    # number of redundant checks down from O(n^2) closer to
-                    # O(n lg n).
                     all_actions.extend(self.actions)
-                    pending_actions = resume(resolveConflicts(
-                        executed_actions +
-                        list(pending_actions) +
-                        self.actions
-                    ))
+                    action_iter = resolveConflicts(
+                        self.actions,
+                        state=conflict_state,
+                    )
                     self.actions = []
 
-                action = next(pending_actions, None)
+                action = next(action_iter, None)
                 if action is None:
                     # we are done!
                     break
@@ -1176,9 +1164,7 @@ class ActionState(object):
                 try:
                     if callable is not None:
                         callable(*args, **kw)
-                except (KeyboardInterrupt, SystemExit): # pragma: no cover
-                    raise
-                except:
+                except Exception:
                     t, v, tb = sys.exc_info()
                     try:
                         reraise(ConfigurationExecutionError,
@@ -1193,65 +1179,102 @@ class ActionState(object):
 
                 executed_actions.append(action)
 
+            self.actions = all_actions
+            return executed_actions
+
         finally:
             if clear:
-                del self.actions[:]
-            else:
-                self.actions = all_actions
+                self.actions = []
+
+
+class ConflictResolverState(object):
+    def __init__(self):
+        # keep a set of resolved discriminators to test against to ensure
+        # that a new action does not conflict with something already executed
+        self.resolved_ainfos = {}
+
+        # actions left over from a previous iteration
+        self.remaining_actions = []
+
+        # after executing an action we memoize its order to avoid any new
+        # actions sending us backward
+        self.min_order = None
+
+        # unique tracks the index of the action so we need it to increase
+        # monotonically across invocations to resolveConflicts
+        self.start = 0
+
 
 # this function is licensed under the ZPL (stolen from Zope)
-def resolveConflicts(actions):
+def resolveConflicts(actions, state=None):
     """Resolve conflicting actions
 
     Given an actions list, identify and try to resolve conflicting actions.
     Actions conflict if they have the same non-None discriminator.
+
     Conflicting actions can be resolved if the include path of one of
     the actions is a prefix of the includepaths of the other
     conflicting actions and is unequal to the include paths in the
     other conflicting actions.
+
+    Actions are resolved on a per-order basis because some discriminators
+    cannot be computed until earlier actions have executed. An action in an
+    earlier order may execute successfully only to find out later that it was
+    overridden by another action with a smaller include path. This will result
+    in a conflict as there is no way to revert the original action.
+
+    ``state`` may be an instance of ``ConflictResolverState`` that
+    can be used to resume execution and resolve the new actions against the
+    list of executed actions from a previous call.
+
     """
+    if state is None:
+        state = ConflictResolverState()
+
+    # pick up where we left off last time, but track the new actions as well
+    state.remaining_actions.extend(normalize_actions(actions))
+    actions = state.remaining_actions
 
     def orderandpos(v):
         n, v = v
-        if not isinstance(v, dict):
-            # old-style tuple action
-            v = expand_action(*v)
         return (v['order'] or 0, n)
-
-    sactions = sorted(enumerate(actions), key=orderandpos)
 
     def orderonly(v):
         n, v = v
-        if not isinstance(v, dict):
-            # old-style tuple action
-            v = expand_action(*v)
         return v['order'] or 0
 
+    sactions = sorted(enumerate(actions, start=state.start), key=orderandpos)
     for order, actiongroup in itertools.groupby(sactions, orderonly):
         # "order" is an integer grouping. Actions in a lower order will be
         # executed before actions in a higher order.  All of the actions in
         # one grouping will be executed (its callable, if any will be called)
         # before any of the actions in the next.
-        
-        unique = {}
         output = []
+        unique = {}
+
+        # error out if we went backward in order
+        if state.min_order is not None and order < state.min_order:
+            r = ['Actions were added to order={0} after execution had moved '
+                 'on to order={1}. Conflicting actions: '
+                 .format(order, state.min_order)]
+            for i, action in actiongroup:
+                for line in str(action['info']).rstrip().split('\n'):
+                    r.append("  " + line)
+            raise ConfigurationError('\n'.join(r))
 
         for i, action in actiongroup:
             # Within an order, actions are executed sequentially based on
             # original action ordering ("i").
 
-            if not isinstance(action, dict):
-                # old-style tuple action
-                action = expand_action(*action)
+            # "ainfo" is a tuple of (i, action) where "i" is an integer
+            # expressing the relative position of this action in the action
+            # list being resolved, and "action" is an action dictionary.  The
+            # purpose of an ainfo is to associate an "i" with a particular
+            # action; "i" exists for sorting after conflict resolution.
+            ainfo = (i, action)
 
-            # "ainfo" is a tuple of (order, i, action) where "order" is a
-            # user-supplied grouping, "i" is an integer expressing the relative
-            # position of this action in the action list being resolved, and
-            # "action" is an action dictionary.  The purpose of an ainfo is to
-            # associate an "order" and an "i" with a particular action; "order"
-            # and "i" exist for sorting purposes after conflict resolution.
-            ainfo = (order, i, action)
-
+            # wait to defer discriminators until we are on their order because
+            # the discriminator may depend on state from a previous order
             discriminator = undefer(action['discriminator'])
             action['discriminator'] = discriminator
 
@@ -1266,28 +1289,39 @@ def resolveConflicts(actions):
 
         # Check for conflicts
         conflicts = {}
-
         for discriminator, ainfos in unique.items():
-            # We use (includepath, order, i) as a sort key because we need to
+            # We use (includepath, i) as a sort key because we need to
             # sort the actions by the paths so that the shortest path with a
             # given prefix comes first.  The "first" action is the one with the
-            # shortest include path.  We break sorting ties using "order", then
-            # "i".
+            # shortest include path.  We break sorting ties using "i".
             def bypath(ainfo):
-                path, order, i = ainfo[2]['includepath'], ainfo[0], ainfo[1]
+                path, i = ainfo[1]['includepath'], ainfo[0]
                 return path, order, i
 
             ainfos.sort(key=bypath)
             ainfo, rest = ainfos[0], ainfos[1:]
-            output.append(ainfo)
-            _, _, action = ainfo
-            basepath, baseinfo, discriminator = (
-                action['includepath'],
-                action['info'],
-                action['discriminator'],
-                )
+            _, action = ainfo
 
-            for _, _, action in rest:
+            # ensure this new action does not conflict with a previously
+            # resolved action from an earlier order / invocation
+            prev_ainfo = state.resolved_ainfos.get(discriminator)
+            if prev_ainfo is not None:
+                _, paction = prev_ainfo
+                basepath, baseinfo = paction['includepath'], paction['info']
+                includepath = action['includepath']
+                # if the new action conflicts with the resolved action then
+                # note the conflict, otherwise drop the action as it's
+                # effectively overriden by the previous action
+                if (includepath[:len(basepath)] != basepath or
+                        includepath == basepath):
+                    L = conflicts.setdefault(discriminator, [baseinfo])
+                    L.append(action['info'])
+
+            else:
+                output.append(ainfo)
+
+            basepath, baseinfo = action['includepath'], action['info']
+            for _, action in rest:
                 includepath = action['includepath']
                 # Test whether path is a prefix of opath
                 if (includepath[:len(basepath)] != basepath or  # not a prefix
@@ -1298,14 +1332,30 @@ def resolveConflicts(actions):
         if conflicts:
             raise ConfigurationConflictError(conflicts)
 
-        # sort conflict-resolved actions by (order, i) and yield them one
-        # by one
-        for a in [x[2] for x in sorted(output, key=operator.itemgetter(0, 1))]:
-            yield a
+        # sort resolved actions by "i" and yield them one by one
+        for i, action in sorted(output, key=operator.itemgetter(0)):
+            # do not memoize the order until we resolve an action inside it
+            state.min_order = action['order']
+            state.start = i + 1
+            state.remaining_actions.remove(action)
+            state.resolved_ainfos[action['discriminator']] = (i, action)
+            yield action
 
 
-def expand_action(discriminator, callable=None, args=(), kw=None,
-                  includepath=(), info=None, order=0, introspectables=()):
+def normalize_actions(actions):
+    """Convert old-style tuple actions to new-style dicts."""
+    result = []
+    for v in actions:
+        if not isinstance(v, dict):
+            v = expand_action_tuple(*v)
+        result.append(v)
+    return result
+
+
+def expand_action_tuple(
+    discriminator, callable=None, args=(), kw=None, includepath=(),
+    info=None, order=0, introspectables=(),
+):
     if kw is None:
         kw = {}
     return dict(
@@ -1318,5 +1368,6 @@ def expand_action(discriminator, callable=None, args=(), kw=None,
         order=order,
         introspectables=introspectables,
         )
+
 
 global_registries = WeakOrderedSet()

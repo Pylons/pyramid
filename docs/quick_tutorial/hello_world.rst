@@ -11,7 +11,7 @@ Python packages, no ``pip install -e .``, no other machinery.
 Background
 ==========
 
-Microframeworks are all the rage these days. "Microframework" is a marketing
+Microframeworks were all the rage, until the next shiny thing came along. "Microframework" is a marketing
 term, not a technical one. They have a low mental overhead: they do so little,
 the only things you have to worry about are *your things*.
 
@@ -49,7 +49,7 @@ Steps
 
    .. code-block:: bash
 
-    $ mkdir hello_world; cd hello_world
+    $ cd ~/projects/quick_tutorial; mkdir hello_world; cd hello_world
 
 #. Copy the following into ``hello_world/app.py``:
 
@@ -88,7 +88,7 @@ Pyramid development. Building an application from loosely-coupled parts via
 revisit regularly in this *Quick Tutorial*.
 
 
-Extra Credit
+Extra credit
 ============
 
 #. Why do we do this:

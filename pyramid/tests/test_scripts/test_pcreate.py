@@ -26,7 +26,7 @@ class TestPCreateCommand(unittest.TestCase):
         result = cmd.run()
         self.assertEqual(result, 0)
         out = self.out_.getvalue()
-        self.assertTrue(out.startswith('Available scaffolds'))
+        self.assertTrue(out.count('Available scaffolds'))
 
     def test_run_show_scaffolds_none_exist(self):
         cmd = self._makeOne('-l')
@@ -34,7 +34,7 @@ class TestPCreateCommand(unittest.TestCase):
         result = cmd.run()
         self.assertEqual(result, 0)
         out = self.out_.getvalue()
-        self.assertTrue(out.startswith('No scaffolds available'))
+        self.assertTrue(out.count('No scaffolds available'))
 
     def test_run_no_scaffold_no_args(self):
         cmd = self._makeOne(quiet=True)
@@ -46,7 +46,7 @@ class TestPCreateCommand(unittest.TestCase):
         result = cmd.run()
         self.assertEqual(result, 2)
         out = self.out_.getvalue()
-        self.assertTrue(out.startswith(
+        self.assertTrue(out.count(
             'You must provide at least one scaffold name'))
 
     def test_no_project_name(self):
@@ -54,14 +54,14 @@ class TestPCreateCommand(unittest.TestCase):
         result = cmd.run()
         self.assertEqual(result, 2)
         out = self.out_.getvalue()
-        self.assertTrue(out.startswith('You must provide a project name'))
+        self.assertTrue(out.count('You must provide a project name'))
 
     def test_unknown_scaffold_name(self):
         cmd = self._makeOne('-s', 'dummyXX', 'distro')
         result = cmd.run()
         self.assertEqual(result, 2)
         out = self.out_.getvalue()
-        self.assertTrue(out.startswith('Unavailable scaffolds'))
+        self.assertTrue(out.count('Unavailable scaffolds'))
 
     def test_known_scaffold_single_rendered(self):
         import os
@@ -79,6 +79,27 @@ class TestPCreateCommand(unittest.TestCase):
             scaffold.vars,
             {'project': 'Distro', 'egg': 'Distro', 'package': 'distro',
              'pyramid_version': '0.1', 'pyramid_docs_branch':'0.1-branch'})
+
+    def test_scaffold_with_package_name(self):
+        import os
+        cmd = self._makeOne('-s', 'dummy', '--package-name', 'dummy_package',
+                            'Distro')
+        scaffold = DummyScaffold('dummy')
+        cmd.scaffolds = [scaffold]
+        cmd.pyramid_dist = DummyDist("0.1")
+        result = cmd.run()
+
+        self.assertEqual(result, 0)
+        self.assertEqual(
+            scaffold.output_dir,
+            os.path.normpath(os.path.join(os.getcwd(), 'Distro'))
+            )
+        self.assertEqual(
+            scaffold.vars,
+            {'project': 'Distro', 'egg': 'dummy_package',
+             'package': 'dummy_package', 'pyramid_version': '0.1',
+             'pyramid_docs_branch':'0.1-branch'})
+
 
     def test_scaffold_with_hyphen_in_project_name(self):
         import os

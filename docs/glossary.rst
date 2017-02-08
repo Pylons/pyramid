@@ -568,7 +568,7 @@ Glossary
      :ref:`adding_and_overriding_renderers` for more information.
 
    mod_wsgi
-     `mod_wsgi <https://code.google.com/archive/p/modwsgi>`_ is an Apache
+     `mod_wsgi <https://modwsgi.readthedocs.io>`_ is an Apache
      module developed by Graham Dumpleton.  It allows :term:`WSGI` applications
      (such as applications developed using :app:`Pyramid`) to be served using
      the Apache web server.
@@ -992,13 +992,17 @@ Glossary
      pages rendered by your application, displaying request, routing, and
      database information.  :mod:`pyramid_debugtoolbar` is configured into
      the ``development.ini`` of all applications which use a Pyramid
-     :term:`scaffold`.  For more information, see
+     :term:`cookiecutter`.  For more information, see
      http://docs.pylonsproject.org/projects/pyramid_debugtoolbar/en/latest/.
 
    scaffold
      A project template that generates some of the major parts of a Pyramid
      application and helps users to quickly get started writing larger
      applications.  Scaffolds are usually used via the ``pcreate`` command.
+
+     .. deprecated:: 1.8
+
+     .. seealso:: See also :term:`cookiecutter`.
 
    pyramid_exclog
      A package which logs Pyramid application exception (error) information
@@ -1058,8 +1062,8 @@ Glossary
       :class:`pyramid.interfaces.IAssetDescriptor`.
 
    Waitress
-      A :term:`WSGI` server that runs on UNIX and Windows under Python 2.6+
-      and Python 3.2+.  Projects generated via Pyramid scaffolding use
+      A :term:`WSGI` server that runs on UNIX and Windows under Python 2.7+
+      and Python 3.3+.  Projects generated via Pyramid cookiecutters use
       Waitress as a WGSI server.  See
       http://docs.pylonsproject.org/projects/waitress/en/latest/ for detailed
       information.
@@ -1134,3 +1138,19 @@ Glossary
       The `Python Packaging Authority (PyPA) <https://www.pypa.io/en/latest/>`_
       is a working group that maintains many of the relevant projects in Python
       packaging.
+
+   cookiecutter
+      A command-line utility that creates projects from :ref:`cookiecutters <cookiecutter:readme>` (project templates), e.g., creating a Python package project from a Python package project template.
+
+      Pyramid cookiecutters include:
+
+      * `pyramid-cookiecutter-alchemy <https://github.com/Pylons/pyramid-cookiecutter-alchemy>`_
+      * `pyramid-cookiecutter-starter <https://github.com/Pylons/pyramid-cookiecutter-starter>`_
+      * `pyramid-cookiecutter-zodb <https://github.com/Pylons/pyramid-cookiecutter-zodb>`_
+
+      .. versionadded:: 1.8
+
+      .. seealso:: See also :term:`scaffold`.
+
+   coverage
+      A measurement of code coverage, usually expressed as a percentage of which lines of code have been executed over which lines are executable, typically run during test execution.

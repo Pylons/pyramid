@@ -266,3 +266,29 @@ Contributors
 - Marcin Raczyński, 2016/01/26
 
 - Arian Maykon de A. Diógenes, 2016/04/13
+
+- Vincent Férotin, 2016/05/08
+
+- Berker Peksag, 2016/05/16
+
+- Zack Brunson, 2016/06/02
+
+- Marco Martinez, 2016/06/02
+
+- Cris Ewing, 2016/06/03
+
+- Jean-Christophe Bohin, 2016/06/13
+
+- Dariusz Gorecki, 2016/07/15
+
+- Jon Davidson, 2016/07/18
+
+- Keith Yang, 2016/07/22
+
+- Hannah Krager, 2016/10/22
+
+- Moriyoshi Koizumi, 2016/11/20
+
+- Mikko Ohtamaa, 2016/12/6
+
+- Martin Frlin, 2016/12/7

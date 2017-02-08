@@ -49,12 +49,13 @@ book = os.environ.get('BOOK')
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = [
+    'repoze.sphinx.autointerface',
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
-    'repoze.sphinx.autointerface',
-    'sphinx.ext.viewcode',
     'sphinx.ext.intersphinx',
-    'sphinxcontrib.programoutput',
+    'sphinx.ext.todo',
+    'sphinx.ext.viewcode',
+    'sphinxcontrib.autoprogram',
     # enable pylons_sphinx_latesturl when this branch is no longer "latest"
     # 'pylons_sphinx_latesturl',
     ]
@@ -63,11 +64,13 @@ extensions = [
 intersphinx_mapping = {
     'colander': ('http://docs.pylonsproject.org/projects/colander/en/latest', None),
     'cookbook': ('http://docs.pylonsproject.org/projects/pyramid-cookbook/en/latest/', None),
+    'cookiecutter': ('https://cookiecutter.readthedocs.io/en/latest/', None),
     'deform': ('http://docs.pylonsproject.org/projects/deform/en/latest', None),
     'jinja2': ('http://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/', None),
     'pylonswebframework': ('http://docs.pylonsproject.org/projects/pylons-webframework/en/latest/', None),
     'python': ('https://docs.python.org/3', None),
     'pytest': ('http://pytest.org/latest/', None),
+    'sphinx': ('http://www.sphinx-doc.org/en/latest', None),
     'sqla': ('http://docs.sqlalchemy.org/en/latest', None),
     'tm': ('http://docs.pylonsproject.org/projects/pyramid-tm/en/latest/', None),
     'toolbar': ('http://docs.pylonsproject.org/projects/pyramid-debugtoolbar/en/latest', None),
@@ -78,7 +81,8 @@ intersphinx_mapping = {
     'webtest': ('http://webtest.pythonpaste.org/en/latest', None),
     'who': ('http://repozewho.readthedocs.org/en/latest', None),
     'zcml': ('http://docs.pylonsproject.org/projects/pyramid-zcml/en/latest', None),
-    'zcomponent': ('http://docs.zope.org/zope.component', None),
+    'zcomponent': ('http://zopecomponent.readthedocs.io/en/latest/', None),
+    'zinterface': ('http://zopeinterface.readthedocs.io/en/latest/', None),
 }
 
 
@@ -119,6 +123,9 @@ exclude_patterns = ['_themes/README.rst', ]
 # unit titles (such as .. function::).
 add_module_names = False
 
+# Add support for todo items
+todo_include_todos = True
+
 # The name of the Pygments (syntax highlighting) style to use.
 #pygments_style = book and 'bw' or 'tango'
 if book:
@@ -139,6 +146,7 @@ if book:
 #     'whatsnew-1.5': 'index',
 #     'whatsnew-1.6': 'index',
 #     'whatsnew-1.7': 'index',
+#     'whatsnew-1.8': 'index',
 #     'tutorials/gae/index': 'index',
 #     'api/chameleon_text': 'api',
 #     'api/chameleon_zpt': 'api',
@@ -191,10 +199,10 @@ latex_documents = [
 
 # For "manual" documents, if this is true, then toplevel headings are parts,
 # not chapters.
-latex_use_parts = True
+latex_toplevel_sectioning = "section"
 
 # If false, no module index is generated.
-latex_use_modindex = False
+latex_domain_indices = False
 
 ## Say, for a moment that you have a twoside document that needs a 3cm
 ## inner margin to allow for binding and at least two centimetres the

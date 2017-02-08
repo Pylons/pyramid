@@ -649,6 +649,10 @@ using the :func:`pyramid.paster.bootstrap` command in the body of your script.
 .. versionadded:: 1.1
    :func:`pyramid.paster.bootstrap`
 
+.. versionchanged:: 1.8
+   Added the ability for ``bootstrap`` to cleanup automatically via the
+   ``with`` statement.
+
 In the simplest case, :func:`pyramid.paster.bootstrap` can be used with a
 single argument, which accepts the :term:`PasteDeploy` ``.ini`` file
 representing your Pyramid application's configuration as a single argument:
@@ -656,8 +660,9 @@ representing your Pyramid application's configuration as a single argument:
 .. code-block:: python
 
    from pyramid.paster import bootstrap
-   env = bootstrap('/path/to/my/development.ini')
-   print(env['request'].route_url('home'))
+
+   with bootstrap('/path/to/my/development.ini') as env:
+       print(env['request'].route_url('home'))
 
 :func:`pyramid.paster.bootstrap` returns a dictionary containing
 framework-related information.  This dictionary will always contain a
@@ -723,8 +728,9 @@ load instead of ``main``:
 .. code-block:: python
 
    from pyramid.paster import bootstrap
-   env = bootstrap('/path/to/my/development.ini#another')
-   print(env['request'].route_url('home'))
+
+   with bootstrap('/path/to/my/development.ini#another') as env:
+       print(env['request'].route_url('home'))
 
 The above example specifies the ``another`` ``app``, ``pipeline``, or
 ``composite`` section of your PasteDeploy configuration file. The ``app``
@@ -761,9 +767,9 @@ desired request and passing it into :func:`~pyramid.paster.bootstrap`:
    from pyramid.request import Request
 
    request = Request.blank('/', base_url='https://example.com/prefix')
-   env = bootstrap('/path/to/my/development.ini#another', request=request)
-   print(env['request'].application_url)
-   # will print 'https://example.com/prefix'
+   with bootstrap('/path/to/my/development.ini#another', request=request) as env:
+       print(env['request'].application_url)
+       # will print 'https://example.com/prefix'
 
 Now you can readily use Pyramid's APIs for generating URLs:
 
@@ -776,7 +782,9 @@ Now you can readily use Pyramid's APIs for generating URLs:
 Cleanup
 ~~~~~~~
 
-When your scripting logic finishes, it's good manners to call the ``closer``
+If you're using the ``with``-statement variant then there's nothing to
+worry about. However if you're using the returned environment directly then
+when your scripting logic finishes, it's good manners to call the ``closer``
 callback:
 
 .. code-block:: python
@@ -831,7 +839,7 @@ In general, you can make your script into a console script by doing the
 following:
 
 - Use an existing distribution (such as one you've already created via
-  ``pcreate``) or create a new distribution that possesses at least one package
+  ``cookiecutter``) or create a new distribution that possesses at least one package
   or module.  It should, within any module within the distribution, house a
   callable (usually a function) that takes no arguments and which runs any of
   the code you wish to run.
@@ -891,15 +899,12 @@ contains the following code:
        omit = options.omit
        if omit is None:
            omit = []
-       env = bootstrap(config_uri)
-       settings, closer = env['registry'].settings, env['closer']
-       try:
+       with bootstrap(config_uri) as env:
+           settings = env['registry'].settings
            for k, v in settings.items():
                if any([k.startswith(x) for x in omit]):
                    continue
                print('%-40s     %-20s' % (k, v))
-       finally:
-           closer()
 
 This script uses the Python ``optparse`` module to allow us to make sense out
 of extra arguments passed to the script.  It uses the

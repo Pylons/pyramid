@@ -29,19 +29,18 @@ class TemplateTest(object):
             self.make_venv(self.directory)
             here = os.path.abspath(os.path.dirname(__file__))
             os.chdir(os.path.dirname(os.path.dirname(here)))
-            subprocess.check_call(
-                [os.path.join(self.directory, 'bin', 'python'),
-                 'setup.py', 'develop'])
+            pip = os.path.join(self.directory, 'bin', 'pip')
+            subprocess.check_call([pip, 'install', '-e', '.'])
             os.chdir(self.directory)
             subprocess.check_call(['bin/pcreate', '-s', tmpl_name, 'Dingle'])
             os.chdir('Dingle')
-            py = os.path.join(self.directory, 'bin', 'python')
-            subprocess.check_call([py, 'setup.py', 'install'])
+            subprocess.check_call([pip, 'install', '.[testing]'])
             if tmpl_name == 'alchemy':
                 populate = os.path.join(self.directory, 'bin',
                                         'initialize_Dingle_db')
                 subprocess.check_call([populate, 'development.ini'])
-            subprocess.check_call([py, 'setup.py', 'test'])
+            subprocess.check_call([
+                os.path.join(self.directory, 'bin', 'py.test')])
             pserve = os.path.join(self.directory, 'bin', 'pserve')
             for ininame, hastoolbar in (('development.ini', True),
                                         ('production.ini', False)):

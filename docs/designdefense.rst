@@ -591,7 +591,7 @@ extensibility because it must be deployed in multiple locations.
 Pyramid Is Too Big
 ------------------
 
-"The :app:`Pyramid` compressed tarball is larger than 2MB.  It must beenormous!"
+"The :app:`Pyramid` compressed tarball is larger than 2MB.  It must be enormous!"
 
 No.  We just ship it with docs, test code, and scaffolding.  Here's a breakdown
 of what's included in subdirectories of the package tree:
@@ -608,7 +608,7 @@ pyramid/scaffolds/
 
   133KB
 
-pyramid/ (except for ``pyramd/tests`` and ``pyramid/scaffolds``)
+pyramid/ (except for ``pyramid/tests`` and ``pyramid/scaffolds``)
 
   812KB
 
@@ -1009,7 +1009,7 @@ Microframeworks have smaller Hello World programs
 Self-described "microframeworks" exist. `Bottle
 <http://bottlepy.org/docs/dev/index.html>`_ and `Flask
 <http://flask.pocoo.org/>`_ are two that are becoming popular. `Bobo
-<http://bobo.digicool.com/en/latest/>`_ doesn't describe itself as a
+<https://bobo.readthedocs.io/en/latest/>`_ doesn't describe itself as a
 microframework, but its intended user base is much the same. Many others exist.
 We've even (only as a teaching tool, not as any sort of official project)
 `created one using Pyramid <http://static.repoze.org/casts/videotags.html>`_.
@@ -1297,12 +1297,12 @@ Consider the following simple `Groundhog
     from groundhog import Groundhog
     app = Groundhog('myapp', 'seekrit')
 
-    app.route('/admin')
+    @app.route('/admin')
     def admin():
         return '<html>admin page</html>'
 
-    app.route('/:action')
-    def action():
+    @app.route('/:action')
+    def do_action(action):
         if action == 'add':
            return '<html>add</html>'
         if action == 'delete':
@@ -1322,15 +1322,15 @@ order of the function definitions in the file?
     from groundhog import Groundhog
     app = Groundhog('myapp', 'seekrit')
 
-    app.route('/:action')
-    def action():
+    @app.route('/:action')
+    def do_action(action):
         if action == 'add':
            return '<html>add</html>'
         if action == 'delete':
            return '<html>delete</html>'
         return app.abort(404)
 
-    app.route('/admin')
+    @app.route('/admin')
     def admin():
         return '<html>admin page</html>'
 
@@ -1432,7 +1432,8 @@ object which *is not logically global*:
         # this is executed if the request method was GET or the
         # credentials were invalid    
 
-The `Pylons 1.X <http://docs.pylonsproject.org/projects/pyramid/en/latest/>`_
+The `Pylons 1.X
+<http://docs.pylonsproject.org/projects/pylons-webframework/en/latest/>`_
 web framework uses a similar strategy.  It calls these things "Stacked Object
 Proxies", so, for purposes of this discussion, I'll do so as well.
 
@@ -1652,10 +1653,11 @@ If you can understand this hello world program, you can use Pyramid:
        server = make_server('0.0.0.0', 8080, app)
        server.serve_forever()
 
-Pyramid has ~ 700 pages of documentation (printed), covering topics from the
-very basic to the most advanced.  *Nothing* is left undocumented, quite
+Pyramid has over 1200 pages of documentation (printed), covering topics from
+the very basic to the most advanced. *Nothing* is left undocumented, quite
 literally.  It also has an *awesome*, very helpful community.  Visit the
-#pyramid IRC channel on freenode.net (irc://freenode.net#pyramid) and see.
+`#pyramid IRC channel on freenode.net
+<https://webchat.freenode.net/?channels=pyramid>`_ and see.
 
 Hate Zope
 +++++++++

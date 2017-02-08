@@ -10,7 +10,6 @@ from pyramid.compat import (
 from pyramid.exceptions import ConfigurationError
 
 from pyramid.tweens import (
-    excview_tween_factory,
     MAIN,
     INGRESS,
     EXCVIEW,
@@ -18,9 +17,9 @@ from pyramid.tweens import (
 
 from pyramid.config.util import (
     action_method,
-    is_string_or_iterable,
     TopologicalSorter,
     )
+from pyramid.util import is_string_or_iterable
 
 class TweensConfiguratorMixin(object):
     def add_tween(self, tween_factory, under=None, over=None):
@@ -107,6 +106,9 @@ class TweensConfiguratorMixin(object):
         return self._add_tween(tween_factory, under=under, over=over,
                                explicit=False)
 
+    def add_default_tweens(self):
+        self.add_tween(EXCVIEW)
+
     @action_method
     def _add_tween(self, tween_factory, under=None, over=None, explicit=False):
 
@@ -142,17 +144,6 @@ class TweensConfiguratorMixin(object):
         if tweens is None:
             tweens = Tweens()
             registry.registerUtility(tweens, ITweens)
-            ex_intr = self.introspectable('tweens',
-                                          ('tween', EXCVIEW, False),
-                                          EXCVIEW,
-                                          'implicit tween')
-            ex_intr['name'] = EXCVIEW
-            ex_intr['factory'] = excview_tween_factory
-            ex_intr['type'] = 'implicit'
-            ex_intr['under'] = None
-            ex_intr['over'] = MAIN
-            introspectables.append(ex_intr)
-            tweens.add_implicit(EXCVIEW, excview_tween_factory, over=MAIN)
 
         def register():
             if explicit:

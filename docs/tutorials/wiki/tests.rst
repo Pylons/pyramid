@@ -16,7 +16,7 @@ We write tests for the ``model`` classes and the ``appmaker``.  Changing
 we'll write a test class for the ``appmaker``.
 
 To do so, we'll retain the ``tutorial.tests.ViewTests`` class that was
-generated as part of the ``zodb`` scaffold.  We'll add three test classes: one
+generated as part of the ``zodb`` cookiecutter.  We'll add three test classes: one
 for the ``Page`` model named ``PageModelTests``, one for the ``Wiki`` model
 named ``WikiModelTests``, and one for the appmaker named ``AppmakerTests``.
 
@@ -24,8 +24,8 @@ Test the views
 ==============
 
 We'll modify our ``tests.py`` file, adding tests for each view function we
-added previously.  As a result, we'll *delete* the ``ViewTests`` class that
-the ``zodb`` scaffold provided, and add four other test classes:
+added previously.  As a result, we'll delete the ``ViewTests`` class that
+the ``zodb`` cookiecutter provided, and add four other test classes:
 ``ViewWikiTests``, ``ViewPageTests``, ``AddPageTests``, and ``EditPageTests``.
 These test the ``view_wiki``, ``view_page``, ``add_page``, and ``edit_page``
 views.
@@ -52,24 +52,25 @@ Running the tests
 =================
 
 We can run these tests by using ``py.test`` similarly to how we did in
-:ref:`running_tests`. Our testing dependencies have already been satisfied,
-courtesy of the scaffold, so we can jump right to running tests.
+:ref:`running_tests`. Courtesy of the cookiecutter, our testing dependencies have
+already been satisfied and ``py.test`` and coverage have already been
+configured, so we can jump right to running tests.
 
 On UNIX:
 
-.. code-block:: text
+.. code-block:: bash
 
-   $ $VENV/bin/py.test tutorial/tests.py -q
+   $ $VENV/bin/py.test -q
 
 On Windows:
 
-.. code-block:: text
+.. code-block:: doscon
 
-   c:\pyramidtut\tutorial> %VENV%\Scripts\py.test tutorial/tests.py -q
+   c:\tutorial> %VENV%\Scripts\py.test -q
 
 The expected result should look like the following:
 
 .. code-block:: text
 
-   ........................
-   24 passed in 2.46 seconds
+    .........................
+    25 passed in 6.87 seconds

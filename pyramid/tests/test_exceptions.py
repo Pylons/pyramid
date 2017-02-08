@@ -90,5 +90,3 @@ class TestCyclicDependencyError(unittest.TestCase):
         result = str(exc)
         self.assertTrue("'a' sorts before ['c', 'd']" in result)
         self.assertTrue("'c' sorts before ['a']" in result)
-
-

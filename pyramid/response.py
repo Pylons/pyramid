@@ -54,16 +54,7 @@ class FileResponse(Response):
     def __init__(self, path, request=None, cache_max_age=None,
                  content_type=None, content_encoding=None):
         if content_type is None:
-            content_type, content_encoding = mimetypes.guess_type(
-                path,
-                strict=False
-                )
-            if content_type is None:
-                content_type = 'application/octet-stream'
-            # str-ifying content_type is a workaround for a bug in Python 2.7.7
-            # on Windows where mimetypes.guess_type returns unicode for the
-            # content_type.
-            content_type = str(content_type)
+            content_type, content_encoding = _guess_type(path)
         super(FileResponse, self).__init__(
             conditional_response=True,
             content_type=content_type,
@@ -180,3 +171,17 @@ def _get_response_factory(registry):
     )
 
     return response_factory
+
+
+def _guess_type(path):
+    content_type, content_encoding = mimetypes.guess_type(
+        path,
+        strict=False
+        )
+    if content_type is None:
+        content_type = 'application/octet-stream'
+    # str-ifying content_type is a workaround for a bug in Python 2.7.7
+    # on Windows where mimetypes.guess_type returns unicode for the
+    # content_type.
+    content_type = str(content_type)
+    return content_type, content_encoding

@@ -485,11 +485,15 @@ class TestCompileRouteFunctional(unittest.TestCase):
     def test_generator_functional_newstyle(self):
         self.generates('/{x}', {'x':''}, '/')
         self.generates('/{x}', {'x':'a'}, '/a')
+        self.generates('/{x}', {'x':'a/b/c'}, '/a/b/c')
+        self.generates('/{x}', {'x':':@&+$,'}, '/:@&+$,')
         self.generates('zzz/{x}', {'x':'abc'}, '/zzz/abc')
         self.generates('zzz/{x}*traverse', {'x':'abc', 'traverse':''},
                        '/zzz/abc')
         self.generates('zzz/{x}*traverse', {'x':'abc', 'traverse':'/def/g'},
                        '/zzz/abc/def/g')
+        self.generates('zzz/{x}*traverse', {'x':':@&+$,', 'traverse':'/:@&+$,'},
+                       '/zzz/:@&+$,/:@&+$,')
         self.generates('/{x}', {'x':text_(b'/La Pe\xc3\xb1a', 'utf-8')},
                        '//La%20Pe%C3%B1a')
         self.generates('/{x}*y', {'x':text_(b'/La Pe\xc3\xb1a', 'utf-8'),

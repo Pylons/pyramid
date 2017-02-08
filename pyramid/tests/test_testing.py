@@ -1,4 +1,5 @@
 import unittest
+from zope.component import getSiteManager
 
 class TestDummyRootFactory(unittest.TestCase):
     def _makeOne(self, environ):
@@ -320,22 +321,11 @@ class Test_setUp(unittest.TestCase):
     def tearDown(self):
         from pyramid.threadlocal import manager
         manager.clear()
-        getSiteManager = self._getSM()
-        if getSiteManager is not None:
-            getSiteManager.reset()
-
-    def _getSM(self):
-        try:
-            from zope.component import getSiteManager
-        except ImportError: # pragma: no cover
-            getSiteManager = None
-        return getSiteManager
+        getSiteManager.reset()
 
     def _assertSMHook(self, hook):
-        getSiteManager = self._getSM()
-        if getSiteManager is not None:
-            result = getSiteManager.sethook(None)
-            self.assertEqual(result, hook)
+        result = getSiteManager.sethook(None)
+        self.assertEqual(result, hook)
 
     def test_it_defaults(self):
         from pyramid.threadlocal import manager
@@ -375,10 +365,8 @@ class Test_setUp(unittest.TestCase):
         from pyramid.registry import Registry
         registry = Registry()
         self._callFUT(registry=registry, hook_zca=False)
-        getSiteManager = self._getSM()
-        if getSiteManager is not None:
-            sm = getSiteManager()
-            self.assertFalse(sm is registry)
+        sm = getSiteManager()
+        self.assertFalse(sm is registry)
 
     def test_it_with_settings_passed_explicit_registry(self):
         from pyramid.registry import Registry
@@ -403,27 +391,14 @@ class Test_tearDown(unittest.TestCase):
     def tearDown(self):
         from pyramid.threadlocal import manager
         manager.clear()
-        getSiteManager = self._getSM()
-        if getSiteManager is not None:
-            getSiteManager.reset()
-
-    def _getSM(self):
-        try:
-            from zope.component import getSiteManager
-        except ImportError: # pragma: no cover
-            getSiteManager = None
-        return getSiteManager
+        getSiteManager.reset()
 
     def _assertSMHook(self, hook):
-        getSiteManager = self._getSM()
-        if getSiteManager is not None:
-            result = getSiteManager.sethook(None)
-            self.assertEqual(result, hook)
+        result = getSiteManager.sethook(None)
+        self.assertEqual(result, hook)
 
     def _setSMHook(self, hook):
-        getSiteManager = self._getSM()
-        if getSiteManager is not None:
-            getSiteManager.sethook(hook)
+        getSiteManager.sethook(hook)
 
     def test_defaults(self):
         from pyramid.threadlocal import manager
@@ -438,10 +413,8 @@ class Test_tearDown(unittest.TestCase):
             self.assertNotEqual(current, old)
             self.assertEqual(registry.inited, 2)
         finally:
-            getSiteManager = self._getSM()
-            if getSiteManager is not None:
-                result = getSiteManager.sethook(None)
-                self.assertNotEqual(result, hook)
+            result = getSiteManager.sethook(None)
+            self.assertNotEqual(result, hook)
 
     def test_registry_cannot_be_inited(self):
         from pyramid.threadlocal import manager

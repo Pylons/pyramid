@@ -182,7 +182,7 @@ available. Pyramid can automatically utilize changed templates when rendering
 pages and automatically restart the application to incorporate changed Python
 code. Plain old ``print()`` calls used for debugging can display to a console.
 
-Pyramid's debug toolbar comes activated when you use a Pyramid scaffold to
+Pyramid's debug toolbar comes activated when you use a Pyramid :term:`cookiecutter` to
 render a project.  This toolbar overlays your application in the browser, and
 allows you access to framework data, such as the routes configured, the last
 renderings performed, the current set of packages installed, SQLAlchemy queries
@@ -221,7 +221,7 @@ send email, let you use the Jinja2 templating system, let you use XML-RPC or
 JSON-RPC, let you integrate with jQuery Mobile, etc.
 
 Examples:
-http://docs.pylonsproject.org/en/latest/docs/pyramid.html#pyramid-add-ons
+https://trypyramid.com/resources-extending-pyramid.html
 
 Class-based and function-based views
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -433,7 +433,7 @@ for speed.  It only does as much work as absolutely necessary when you ask it
 to get a job done.  Extraneous function calls and suboptimal algorithms in its
 core codepaths are avoided.  It is feasible to get, for example, between 3500
 and 4000 requests per second from a simple Pyramid view on commodity dual-core
-laptop hardware and an appropriate WSGI server (mod_wsgi or gunicorn).  In any
+laptop hardware and an appropriate WSGI server (:term:`mod_wsgi` or gunicorn).  In any
 case, performance statistics are largely useless without requirements and
 goals, but if you need speed, Pyramid will almost certainly never be your
 application's bottleneck; at least no more than Python will be a bottleneck.
@@ -494,7 +494,7 @@ Example: :ref:`view_configuration_parameters`.
 Transaction management
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Pyramid's :term:`scaffold` system renders projects that include a *transaction
+A couple of Pyramid's :term:`cookiecutter`\ s include a *transaction
 management* system, stolen from Zope.  When you use this transaction management
 system, you cease being responsible for committing your data anymore.  Instead
 Pyramid takes care of committing: it commits at the end of a request or aborts
@@ -860,7 +860,7 @@ Every release of Pyramid has 100% statement coverage via unit and integration
 tests, as measured by the ``coverage`` tool available on PyPI.  It also has
 greater than 95% decision/condition coverage as measured by the
 ``instrumental`` tool available on PyPI. It is automatically tested by Travis,
-and Jenkins on Python 2.7, Python 3.3, Python 3.4, Python 3.5, PyPy, and PyPy3
+and Jenkins on Python 2.7, Python 3.4, Python 3.5, Python 3.6, and PyPy
 after each commit to its GitHub repository. Official Pyramid add-ons are held
 to a similar testing standard.  We still find bugs in Pyramid and its official
 add-ons, but we've noticed we find a lot more of them while working on other

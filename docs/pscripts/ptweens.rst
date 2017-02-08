@@ -3,11 +3,7 @@
 
 .. _ptweens_script:
 
-``ptweens``
------------
-
-.. program-output:: ptweens --help
-   :prompt:
-   :shell:
+.. autoprogram:: pyramid.scripts.ptweens:PTweensCommand.parser
+    :prog: ptweens
 
 .. seealso:: :ref:`displaying_tweens`

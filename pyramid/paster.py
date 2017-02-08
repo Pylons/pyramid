@@ -5,9 +5,8 @@ from paste.deploy import (
     appconfig,
     )
 
-from pyramid.compat import configparser
-from logging.config import fileConfig
 from pyramid.scripting import prepare
+from pyramid.scripts.common import setup_logging  # noqa, api
 
 def get_app(config_uri, name=None, options=None, loadapp=loadapp):
     """ Return the WSGI application named ``name`` in the PasteDeploy
@@ -51,30 +50,6 @@ def get_appsettings(config_uri, name=None, options=None, appconfig=appconfig):
         name=section,
         relative_to=here_dir,
         global_conf=options)
-
-def setup_logging(config_uri, global_conf=None,
-                  fileConfig=fileConfig,
-                  configparser=configparser):
-    """
-    Set up logging via :func:`logging.config.fileConfig` with the filename
-    specified via ``config_uri`` (a string in the form
-    ``filename#sectionname``).
-
-    ConfigParser defaults are specified for the special ``__file__``
-    and ``here`` variables, similar to PasteDeploy config loading.
-    Extra defaults can optionally be specified as a dict in ``global_conf``.
-    """
-    path, _ = _getpathsec(config_uri, None)
-    parser = configparser.ConfigParser()
-    parser.read([path])
-    if parser.has_section('loggers'):
-        config_file = os.path.abspath(path)
-        full_global_conf = dict(
-            __file__=config_file,
-            here=os.path.dirname(config_file))
-        if global_conf:
-            full_global_conf.update(global_conf)
-        return fileConfig(config_file, full_global_conf)
 
 def _getpathsec(config_uri, name):
     if '#' in config_uri:
@@ -129,8 +104,22 @@ def bootstrap(config_uri, request=None, options=None):
     {'http_port': 8080} and then use %(http_port)s in the
     config file.
 
+    This function may be used as a context manager to call the ``closer``
+    automatically:
+
+    .. code-block:: python
+
+       with bootstrap('development.ini') as env:
+           request = env['request']
+           # ...
+
     See :ref:`writing_a_script` for more information about how to use this
     function.
+
+    .. versionchanged:: 1.8
+
+       Added the ability to use the return value as a context manager.
+
     """
     app = get_app(config_uri, options=options)
     env = prepare(request)

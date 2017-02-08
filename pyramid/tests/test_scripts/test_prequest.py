@@ -34,7 +34,8 @@ class TestPRequestCommand(unittest.TestCase):
         self.assertEqual(self._out, ['You must provide at least two arguments'])
 
     def test_command_two_args(self):
-        command = self._makeOne(['', 'development.ini', '/'])
+        command = self._makeOne(['', 'development.ini', '/'],
+                [('Content-Type', 'text/html; charset=UTF-8')])
         command.run()
         self.assertEqual(self._path_info, '/')
         self.assertEqual(self._spec, 'development.ini')
@@ -42,7 +43,8 @@ class TestPRequestCommand(unittest.TestCase):
         self.assertEqual(self._out, ['abc'])
 
     def test_command_path_doesnt_start_with_slash(self):
-        command = self._makeOne(['', 'development.ini', 'abc'])
+        command = self._makeOne(['', 'development.ini', 'abc'],
+                [('Content-Type', 'text/html; charset=UTF-8')])
         command.run()
         self.assertEqual(self._path_info, '/abc')
         self.assertEqual(self._spec, 'development.ini')
@@ -60,7 +62,8 @@ class TestPRequestCommand(unittest.TestCase):
 
     def test_command_has_good_header_var(self):
         command = self._makeOne(
-            ['', '--header=name:value','development.ini', '/'])
+            ['', '--header=name:value','development.ini', '/'],
+            [('Content-Type', 'text/html; charset=UTF-8')])
         command.run()
         self.assertEqual(self._environ['HTTP_NAME'], 'value')
         self.assertEqual(self._path_info, '/')
@@ -71,7 +74,8 @@ class TestPRequestCommand(unittest.TestCase):
     def test_command_w_basic_auth(self):
         command = self._makeOne(
             ['', '--login=user:password',
-                 '--header=name:value','development.ini', '/'])
+                 '--header=name:value','development.ini', '/'],
+            [('Content-Type', 'text/html; charset=UTF-8')])
         command.run()
         self.assertEqual(self._environ['HTTP_NAME'], 'value')
         self.assertEqual(self._environ['HTTP_AUTHORIZATION'],
@@ -83,7 +87,8 @@ class TestPRequestCommand(unittest.TestCase):
 
     def test_command_has_content_type_header_var(self):
         command = self._makeOne(
-            ['', '--header=content-type:app/foo','development.ini', '/'])
+            ['', '--header=content-type:app/foo','development.ini', '/'],
+            [('Content-Type', 'text/html; charset=UTF-8')])
         command.run()
         self.assertEqual(self._environ['CONTENT_TYPE'], 'app/foo')
         self.assertEqual(self._path_info, '/')
@@ -97,7 +102,9 @@ class TestPRequestCommand(unittest.TestCase):
              '--header=name:value',
              '--header=name2:value2',
              'development.ini',
-             '/'])
+             '/'],
+            [('Content-Type', 'text/html; charset=UTF-8')]
+            )
         command.run()
         self.assertEqual(self._environ['HTTP_NAME'], 'value')
         self.assertEqual(self._environ['HTTP_NAME2'], 'value2')
@@ -107,7 +114,8 @@ class TestPRequestCommand(unittest.TestCase):
         self.assertEqual(self._out, ['abc'])
 
     def test_command_method_get(self):
-        command = self._makeOne(['', '--method=GET', 'development.ini', '/'])
+        command = self._makeOne(['', '--method=GET', 'development.ini', '/'],
+                [('Content-Type', 'text/html; charset=UTF-8')])
         command.run()
         self.assertEqual(self._environ['REQUEST_METHOD'], 'GET')
         self.assertEqual(self._path_info, '/')
@@ -117,7 +125,8 @@ class TestPRequestCommand(unittest.TestCase):
 
     def test_command_method_post(self):
         from pyramid.compat import NativeIO
-        command = self._makeOne(['', '--method=POST', 'development.ini', '/'])
+        command = self._makeOne(['', '--method=POST', 'development.ini', '/'],
+                [('Content-Type', 'text/html; charset=UTF-8')])
         stdin = NativeIO()
         command.stdin = stdin
         command.run()
@@ -131,7 +140,8 @@ class TestPRequestCommand(unittest.TestCase):
 
     def test_command_method_put(self):
         from pyramid.compat import NativeIO
-        command = self._makeOne(['', '--method=PUT', 'development.ini', '/'])
+        command = self._makeOne(['', '--method=PUT', 'development.ini', '/'],
+                [('Content-Type', 'text/html; charset=UTF-8')])
         stdin = NativeIO()
         command.stdin = stdin
         command.run()
@@ -145,7 +155,8 @@ class TestPRequestCommand(unittest.TestCase):
 
     def test_command_method_patch(self):
         from pyramid.compat import NativeIO
-        command = self._makeOne(['', '--method=PATCH', 'development.ini', '/'])
+        command = self._makeOne(['', '--method=PATCH', 'development.ini', '/'],
+                [('Content-Type', 'text/html; charset=UTF-8')])
         stdin = NativeIO()
         command.stdin = stdin
         command.run()
@@ -160,7 +171,8 @@ class TestPRequestCommand(unittest.TestCase):
     def test_command_method_propfind(self):
         from pyramid.compat import NativeIO
         command = self._makeOne(['', '--method=PROPFIND', 'development.ini',
-                                '/'])
+                                '/'],
+                                [('Content-Type', 'text/html; charset=UTF-8')])
         stdin = NativeIO()
         command.stdin = stdin
         command.run()
@@ -173,7 +185,8 @@ class TestPRequestCommand(unittest.TestCase):
     def test_command_method_options(self):
         from pyramid.compat import NativeIO
         command = self._makeOne(['', '--method=OPTIONS', 'development.ini',
-                                '/'])
+                                '/'],
+                                [('Content-Type', 'text/html; charset=UTF-8')])
         stdin = NativeIO()
         command.stdin = stdin
         command.run()
@@ -184,7 +197,8 @@ class TestPRequestCommand(unittest.TestCase):
         self.assertEqual(self._out, ['abc'])
 
     def test_command_with_query_string(self):
-        command = self._makeOne(['', 'development.ini', '/abc?a=1&b=2&c'])
+        command = self._makeOne(['', 'development.ini', '/abc?a=1&b=2&c'],
+                [('Content-Type', 'text/html; charset=UTF-8')])
         command.run()
         self.assertEqual(self._environ['QUERY_STRING'], 'a=1&b=2&c')
         self.assertEqual(self._path_info, '/abc')
@@ -194,7 +208,8 @@ class TestPRequestCommand(unittest.TestCase):
 
     def test_command_display_headers(self):
         command = self._makeOne(
-            ['', '--display-headers', 'development.ini', '/'])
+            ['', '--display-headers', 'development.ini', '/'],
+            [('Content-Type', 'text/html; charset=UTF-8')])
         command.run()
         self.assertEqual(self._path_info, '/')
         self.assertEqual(self._spec, 'development.ini')
