@@ -235,7 +235,7 @@ ${body}''')
             del self.content_length
 
     def __str__(self):
-        return self.detail or self.explanation
+        return str(self.detail) if self.detail else self.explanation
 
     def _json_formatter(self, status, body, title, environ):
         return {'message': body,
