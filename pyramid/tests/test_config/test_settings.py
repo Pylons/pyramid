@@ -66,7 +66,7 @@ class TestSettingsConfiguratorMixin(unittest.TestCase):
 
     def test_settings_parameter_dict_is_never_updated(self):
         class ReadOnlyDict(dict):
-            def __readonly__(self, *args, **kwargs):
+            def __readonly__(self, *args, **kwargs):  # pragma: no cover
                 raise RuntimeError("Cannot modify ReadOnlyDict")
             __setitem__ = __readonly__
             __delitem__ = __readonly__
