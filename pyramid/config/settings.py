@@ -56,6 +56,7 @@ def Settings(d=None, _environ_=os.environ, **kw):
     keyword args)."""
     if d is None:
         d = {}
+    d = dict(d)
     d.update(**kw)
 
     eget = _environ_.get
