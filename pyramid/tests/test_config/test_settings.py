@@ -12,12 +12,12 @@ class TestSettingsConfiguratorMixin(unittest.TestCase):
         settings = config._set_settings(None)
         self.assertTrue(settings)
 
-    def test__set_settings_uses_original_dict(self):
+    def test__set_settings_does_not_uses_original_dict(self):
         config = self._makeOne()
         dummy = {}
         result = config._set_settings(dummy)
-        self.assertTrue(dummy is result)
-        self.assertEqual(dummy['pyramid.debug_all'], False)
+        self.assertTrue(dummy is not result)
+        self.assertNotIn('pyramid.debug_all', dummy)
 
     def test__set_settings_as_dictwithvalues(self):
         config = self._makeOne()
