@@ -23,4 +23,6 @@
   .. autoclass:: forbidden_view_config
      :members:
 
+  .. autoclass:: exception_view_config
+     :members:
 

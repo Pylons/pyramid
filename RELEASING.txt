@@ -33,8 +33,8 @@ Prepare new release branch
 
 - Run tests on Windows if feasible.
 
-- Make sure all scaffold tests pass (CPython 2.7, 3.4, and 3.5, and PyPy on
-  UNIX; this doesn't work on Windows):
+- Make sure all scaffold tests pass (CPython 2.7, 3.4, 3.5, and 3.6, and PyPy
+  on UNIX; this doesn't work on Windows):
 
   $ ./scaffoldtests.sh
 
@@ -63,10 +63,10 @@ Prepare new release branch
 
 - Change setup.py version to the release version number.
 
-- Make sure PyPI long description renders (requires ``collective.dist``
-  installed into your Python)::
+- Make sure PyPI long description renders (requires ``readme`` installed
+  into your Python)::
 
-  $ python setup.py check -r
+  $ python setup.py check -r -s -m
 
 - Create a release tag.
 
@@ -107,10 +107,6 @@ Update previous version (final releases only)
 
 Marketing and communications
 ----------------------------
-
-- Edit Pylons/pylonshq/templates/home/home.mako.
-
-- Edit Pylons/pylonshq/templates/home/inside.rst for major releases only.
 
 - Edit Pylons/trypyramid.com/src/templates/resources.html for major releases
   only.

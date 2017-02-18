@@ -19,7 +19,7 @@ Contents
 
     requirements
     tutorial_approach
-    scaffolds
+    cookiecutters
     hello_world
     package
     ini

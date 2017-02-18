@@ -26,6 +26,7 @@
     .. automethod:: add_view
     .. automethod:: add_notfound_view
     .. automethod:: add_forbidden_view
+    .. automethod:: add_exception_view
 
   :methodcategory:`Adding an Event Subscriber`
 

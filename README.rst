@@ -3,7 +3,7 @@ Pyramid
 
 .. image:: https://travis-ci.org/Pylons/pyramid.png?branch=master
         :target: https://travis-ci.org/Pylons/pyramid
-        :alt: Master Travis CI Status
+        :alt: master Travis CI Status
 
 .. image:: https://readthedocs.org/projects/pyramid/badge/?version=master
         :target: http://docs.pylonsproject.org/projects/pyramid/en/master/
@@ -38,7 +38,7 @@ and deployment more fun, more predictable, and more productive.
        server = make_server('0.0.0.0', 8080, app)
        server.serve_forever()
 
-Pyramid is a project of the `Pylons Project <http://www.pylonsproject.org/>`_.
+Pyramid is a project of the `Pylons Project <http://pylonsproject.org/>`_.
 
 Support and Documentation
 -------------------------

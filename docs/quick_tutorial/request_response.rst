@@ -26,7 +26,7 @@ part of a web application, web developers need a robust, mature set of software
 for web requests and returning web responses.
 
 Pyramid has always fit nicely into the existing world of Python web development
-(virtual environments, packaging, scaffolding, first to embrace Python 3, and
+(virtual environments, packaging, cookiecutters, first to embrace Python 3, and
 so on). Pyramid turned to the well-regarded :term:`WebOb` Python library for
 request and response handling. In our example above, Pyramid hands
 ``hello_world`` a ``request`` that is :ref:`based on WebOb <webob_chapter>`.

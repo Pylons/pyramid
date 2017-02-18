@@ -15,7 +15,7 @@ Front Matter
    :maxdepth: 1
 
    copyright
-   conventions
+   typographical-conventions
    authorintro
    designdefense
 
@@ -78,6 +78,7 @@ Narrative Documentation
    narr/extending
    narr/advconfig
    narr/extconfig
+   narr/cookiecutters
    narr/scaffolding
    narr/upgrading
    narr/threadlocals

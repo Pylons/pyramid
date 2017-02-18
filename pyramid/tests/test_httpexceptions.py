@@ -2,6 +2,7 @@ import unittest
 
 from pyramid.compat import (
     bytes_,
+    string_types,
     text_,
     )
 
@@ -348,7 +349,7 @@ class TestHTTPException(unittest.TestCase):
         exc = cls(body_template='${REQUEST_METHOD}')
         environ = _makeEnviron()
         class Choke(object):
-            def __str__(self): # pragma nocover
+            def __str__(self):  # pragma no cover
                 raise ValueError
         environ['gardentheory.user'] = Choke()
         start_response = DummyStartResponse()
@@ -363,6 +364,11 @@ class TestHTTPException(unittest.TestCase):
         start_response = DummyStartResponse()
         body = list(exc(environ, start_response))[0]
         self.assertEqual(body, b'200 OK\n\n/La Pe\xc3\xb1a')
+
+    def test_allow_detail_non_str(self):
+        exc = self._makeOne(detail={'error': 'This is a test'})
+        self.assertIsInstance(exc.__str__(), string_types)
+
 
 class TestRenderAllExceptionsWithoutArguments(unittest.TestCase):
     def _doit(self, content_type):

@@ -114,15 +114,7 @@ Nice-to-Have
 Future
 ------
 
-- 1.6: turn ``pyramid.settings.Settings`` into a function that returns the
-  original dict (after ``__getattr__`` deprecation period, it was deprecated
-  in 1.2).
-
-- 1.6: Remove IContextURL and TraversalContextURL.
-
-- 1.8: Remove set_request_property.
-- 1.8: Drop Python 3.3 support.
-
+- 1.9: Remove set_request_property.
 - 1.9: Remove extra code enabling ``pyramid.security.remember(principal=...)``
   and force use of ``userid``.
 

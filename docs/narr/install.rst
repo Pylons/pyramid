@@ -22,7 +22,7 @@ the following sections.
 .. sidebar:: Python Versions
 
     As of this writing, :app:`Pyramid` is tested against Python 2.7,
-    Python 3.4, Python 3.5, PyPy.
+    Python 3.4, Python 3.5, Python 3.6, and PyPy.
 
 :app:`Pyramid` is known to run on all popular UNIX-like systems such as Linux,
 Mac OS X, and FreeBSD, as well as on Windows platforms.  It is also known to
@@ -91,29 +91,22 @@ If your Windows system doesn't have a Python interpreter, you'll need to
 install it by downloading a Python 3.x-series interpreter executable from
 `python.org's download section <https://www.python.org/downloads/>`_ (the files
 labeled "Windows Installer").  Once you've downloaded it, double click on the
-executable, and select appropriate options during the installation process. To
+executable and select appropriate options during the installation process. To
 standardize this documentation, we used the GUI installer and selected the
 following options:
 
 - Screen 1: Install Python 3.x.x (32- or 64-bit)
-    - Check "Install launcher for all users (recommended)"
-    - Check "Add Python 3.x to PATH"
-    - Click "Customize installation"
-- Screen 2: Optional Features
-    - Check all options
-    - Click "Next"
-- Screen 3: Advanced Options
-    - Check all options
-    - Customize install location: "C:\\Python3x", where "x" is the minor
-      version of Python
-    - Click "Next"
-
-You might also need to download and install the Python for Windows extensions.
+    - Check "Install launcher for all users (recommended)".
+    - Check "Add Python 3.x to PATH".
+    - Click "Install Now".
+- Screen 2: User Account Control
+    - Click "Yes".
 
 .. seealso:: See the official Python documentation :ref:`Using Python on
    Windows <python:using-on-windows>` for full details.
 
-.. seealso:: Download and install the `Python for Windows extensions
+.. seealso:: You might also need to download and install the `Python for
+   Windows extensions
    <https://sourceforge.net/projects/pywin32/files/pywin32/>`_. Carefully read
    the README.txt file at the end of the list of builds, and follow its
    directions. Make sure you get the proper 32- or 64-bit build and Python
@@ -123,15 +116,26 @@ You might also need to download and install the Python for Windows extensions.
    <https://docs.python.org/3/using/windows.html#launcher>`_ provides a command
    ``py`` that allows users to run any installed version of Python.
 
-.. warning::
+.. warning:: After you install Python on Windows, you might need to add the
+   directory where Python and other programs—such as pip, setuptools, and
+   cookiecutter—are installed to your environment's ``Path``. This will make it
+   possible to invoke them from a command prompt.
 
-   After you install Python on Windows, you might need to add the
-   ``c:\Python3x`` directory to your environment's ``Path``, where ``x`` is the
-   minor version of installed Python, in order to make it possible to invoke
-   Python from a command prompt by typing ``python``. To do so, right click
-   ``My Computer``, select ``Properties`` --> ``Advanced Tab`` -->
-   ``Environment Variables``, and add that directory to the end of the ``Path``
-   environment variable.
+   To do so, search for "Environment Variables" on your computer (on Windows
+   10, it is under ``System Properties`` --> ``Advanced``) and add that
+   directory to the ``Path`` environment variable, using the GUI to edit path
+   segments.
+
+   Example segments should look like
+   ``C:\Users\<username>\AppData\Local\Programs\Python3x-32``, where you have
+   your username instead of ``<username>``, and your version of Python and
+   whether it is 32- or 64-bit. Additionally ensure you have the path segment
+   ending with ``\Scripts``, i.e.,
+   ``C:\Users\<username>\AppData\Local\Programs\Python3x-32\Scripts``, and for
+   user-installed Python programs, ``%APPDATA%\Python\Python3x\Scripts``.
+
+   You may need to restart your command prompt session to load the environment
+   variables.
 
    .. seealso:: See `Configuring Python (on Windows)
       <https://docs.python.org/3/using/windows.html#configuring-python>`_ for
@@ -231,9 +235,9 @@ After installing Python as described previously in
 
    .. code-block:: doscon
 
+      c:\> cd \
       c:\> set VENV=c:\env
-      # replace "x" with your minor version of Python 3
-      c:\> c:\Python3x\python -m venv %VENV%
+      c:\> python -m venv %VENV%
       c:\> cd %VENV%
 
    You can either follow the use of the environment variable ``%VENV%``, or
@@ -260,5 +264,5 @@ What Gets Installed
 When you install :app:`Pyramid`, various libraries such as WebOb, PasteDeploy,
 and others are installed.
 
-Additionally, as chronicled in :ref:`project_narr`, scaffolds will be
-registered, which make it easy to start a new :app:`Pyramid` project.
+Additionally, as chronicled in :ref:`project_narr`, :term:`cookiecutter`\ s will be
+used, which make it easy to start a new :app:`Pyramid` project.

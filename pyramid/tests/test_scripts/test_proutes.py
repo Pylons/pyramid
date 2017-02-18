@@ -20,7 +20,7 @@ class TestPRoutesCommand(unittest.TestCase):
     def _makeOne(self):
         cmd = self._getTargetClass()([])
         cmd.bootstrap = (dummy.DummyBootstrap(),)
-        cmd.args = ('/foo/bar/myapp.ini#myapp',)
+        cmd.args.config_uri = '/foo/bar/myapp.ini#myapp'
 
         return cmd
 
@@ -38,7 +38,8 @@ class TestPRoutesCommand(unittest.TestCase):
     def test_good_args(self):
         cmd = self._getTargetClass()([])
         cmd.bootstrap = (dummy.DummyBootstrap(),)
-        cmd.args = ('/foo/bar/myapp.ini#myapp', 'a=1')
+        cmd.args.config_uri = '/foo/bar/myapp.ini#myapp'
+        cmd.args.config_args = ('a=1',)
         route = dummy.DummyRoute('a', '/a')
         mapper = dummy.DummyMapper(route)
         cmd._get_mapper = lambda *arg: mapper
@@ -52,7 +53,8 @@ class TestPRoutesCommand(unittest.TestCase):
     def test_bad_args(self):
         cmd = self._getTargetClass()([])
         cmd.bootstrap = (dummy.DummyBootstrap(),)
-        cmd.args = ('/foo/bar/myapp.ini#myapp', 'a')
+        cmd.args.config_uri = '/foo/bar/myapp.ini#myapp'
+        cmd.args.config_vars = ('a',)
         route = dummy.DummyRoute('a', '/a')
         mapper = dummy.DummyMapper(route)
         cmd._get_mapper = lambda *arg: mapper
@@ -586,7 +588,7 @@ class TestPRoutesCommand(unittest.TestCase):
         )
 
         command = self._makeOne()
-        command.options.glob = '*foo*'
+        command.args.glob = '*foo*'
 
         L = []
         command.out = L.append
@@ -618,8 +620,8 @@ class TestPRoutesCommand(unittest.TestCase):
         )
 
         command = self._makeOne()
-        command.options.glob = '*foo*'
-        command.options.format = 'method,name'
+        command.args.glob = '*foo*'
+        command.args.format = 'method,name'
         L = []
         command.out = L.append
         command.bootstrap = (dummy.DummyBootstrap(registry=config.registry),)
@@ -648,8 +650,8 @@ class TestPRoutesCommand(unittest.TestCase):
         )
 
         command = self._makeOne()
-        command.options.glob = '*foo*'
-        command.options.format = 'predicates,name,pattern'
+        command.args.glob = '*foo*'
+        command.args.format = 'predicates,name,pattern'
         L = []
         command.out = L.append
         command.bootstrap = (dummy.DummyBootstrap(registry=config.registry),)

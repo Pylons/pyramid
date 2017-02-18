@@ -52,7 +52,7 @@ of exceptions from within the body of a view callable.
 Defining a View Callable as a Function
 --------------------------------------
 
-One of the easiest way to define a view callable is to create a function that
+One of the easiest ways to define a view callable is to create a function that
 accepts a single argument named ``request``, and which returns a
 :term:`Response` object.  For example, this is a "hello world" view callable
 implemented as a function:
@@ -246,7 +246,7 @@ within view code, the result of the :term:`Not Found View` will be returned to
 the user agent which performed the request.
 
 If :exc:`~pyramid.httpexceptions.HTTPForbidden` is raised by Pyramid itself
-within view code, the result of the :term:`Forbidden View` will be returned to
+or within view code, the result of the :term:`Forbidden View` will be returned to
 the user agent which performed the request.
 
 .. index::
@@ -523,8 +523,7 @@ Alternate View Callable Argument/Calling Conventions
 ----------------------------------------------------
 
 Usually view callables are defined to accept only a single argument:
-``request``.  However, view callables may alternately be defined as classes,
-functions, or any callable that accept *two* positional arguments: a
+``request``.  However, a view callable may alternately be defined as any class, function, or callable that accepts *two* positional arguments: a
 :term:`context` resource as the first argument and a :term:`request` as the
 second argument.
 

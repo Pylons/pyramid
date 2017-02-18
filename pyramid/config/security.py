@@ -9,9 +9,9 @@ from pyramid.interfaces import (
     PHASE2_CONFIG,
     )
 
-from pyramid.config.util import as_sorted_tuple
 from pyramid.exceptions import ConfigurationError
 from pyramid.util import action_method
+from pyramid.util import as_sorted_tuple
 
 class SecurityConfiguratorMixin(object):
     @action_method

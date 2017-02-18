@@ -26,9 +26,9 @@ listed below.
 
 * [master](https://github.com/Pylons/pyramid/) - The branch on which further
   development takes place. The default branch on GitHub.
-* [1.7-branch](https://github.com/Pylons/pyramid/tree/1.7-branch) - The branch
+* [1.8-branch](https://github.com/Pylons/pyramid/tree/1.8-branch) - The branch
   classified as "stable" or "latest".
-* [1.6-branch](https://github.com/Pylons/pyramid/tree/1.6-branch) - The oldest
+* [1.7-branch](https://github.com/Pylons/pyramid/tree/1.7-branch) - The oldest
   actively maintained and stable branch.
 
 Older branches are not actively maintained. In general, two stable branches and

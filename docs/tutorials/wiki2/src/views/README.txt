@@ -1,14 +1,33 @@
-tutorial README
-==================
+myproj
+===============================
 
 Getting Started
 ---------------
 
-- cd <directory containing this file>
+- Change directory into your newly created project.
 
-- $VENV/bin/pip install -e .
+    cd myproj
 
-- $VENV/bin/initialize_tutorial_db development.ini
+- Create a Python virtual environment.
 
-- $VENV/bin/pserve development.ini
+    python3 -m venv env
 
+- Upgrade packaging tools.
+
+    env/bin/pip install --upgrade pip setuptools wheel
+
+- Install the project in editable mode with its testing requirements.
+
+    env/bin/pip install -e ".[testing]"
+
+- Configure the database.
+
+    env/bin/initialize_tutorial_db development.ini
+
+- Run your project's tests.
+
+    env/bin/pytest
+
+- Run your project.
+
+    env/bin/pserve development.ini

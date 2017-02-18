@@ -26,7 +26,7 @@ To save a little bit of typing and to be certain that we use the modules,
 scripts, and packages installed in our virtual environment, we'll set an
 environment variable, too.
 
-As an example, for Python 3.5+ on Linux:
+As an example, for Python 3.6+ on Linux:
 
 .. parsed-literal::
 
@@ -116,7 +116,7 @@ part of a web application, web developers need a robust, mature set of software
 for web requests.
 
 Pyramid has always fit nicely into the existing world of Python web development
-(virtual environments, packaging, scaffolding, one of the first to embrace
+(virtual environments, packaging, cookiecutters, one of the first to embrace
 Python 3, etc.). Pyramid turned to the well-regarded :term:`WebOb` Python
 library for request and response handling. In our example above, Pyramid hands
 ``hello_world`` a ``request`` that is :ref:`based on WebOb <webob_chapter>`.
@@ -491,40 +491,48 @@ more to offer:
     :ref:`class_as_view`.
 
 
-Quick project startup with scaffolds
-====================================
+Quick project startup with cookiecutters
+========================================
 
 So far we have done all of our *Quick Tour* as a single Python file. No Python
 packages, no structure. Most Pyramid projects, though, aren't developed this
 way.
 
-To ease the process of getting started, Pyramid provides *scaffolds* that
-generate sample projects from templates in Pyramid and Pyramid add-ons.
-Pyramid's ``pcreate`` command can list the available scaffolds:
+To ease the process of getting started, the Pylons Project provides :term:`cookiecutter`\ s that generate sample Pyramid projects from project templates. These cookiecutters will install Pyramid and its dependencies as well.
+
+First you'll need to install cookiecutter.
 
 .. code-block:: bash
 
-    $ pcreate --list
-    Available scaffolds:
-      alchemy:                 Pyramid project using SQLAlchemy, SQLite, URL dispatch, and Jinja2
-      pyramid_jinja2_starter:  Pyramid Jinja2 starter project
-      starter:                 Pyramid starter project using URL dispatch and Chameleon
-      zodb:                    Pyramid project using ZODB, traversal, and Chameleon
+    $ $VENV/bin/pip install cookiecutter
 
-The ``pyramid_jinja2`` add-on gave us a scaffold that we can use. From the
-parent directory of where we want our Python package to be generated, let's use
-that scaffold to make our project:
+Let's use the cookiecutter ``pyramid-cookiecutter-starter`` to create a starter Pyramid project in the current directory, entering values at the prompts as shown below for the following command.
 
 .. code-block:: bash
 
-    $ pcreate --scaffold pyramid_jinja2_starter hello_world
+    $ $VENV/bin/cookiecutter https://github.com/Pylons/pyramid-cookiecutter-starter
 
-We next use the normal Python command to set up our package for development:
+If prompted for the first item, accept the default ``yes`` by hitting return.
+
+#. ``You've cloned ~/.cookiecutters/pyramid-cookiecutter-starter before. Is it
+   okay to delete and re-clone it? [yes]:``
+#. ``project_name [Pyramid Scaffold]: hello_world``
+#. ``repo_name [scaffold]: hello_world``
+
+We then run through the following commands.
 
 .. code-block:: bash
 
+    # Change directory into your newly created project.
     $ cd hello_world
-    $ $VENV/bin/pip install -e .
+    # Create a new virtual environment...
+    $ python3 -m venv env
+    # ...where we upgrade packaging tools...
+    $ env/bin/pip install --upgrade pip setuptools
+    # ...and into which we install our project and its testing requirements.
+    $ env/bin/pip install -e ".[testing]"
+    # Reset our environment variable for a new virtual environment.
+    $ export VENV=~/hello_world/env
 
 We are moving in the direction of a full-featured Pyramid project, with a
 proper setup for Python standards (packaging) and Pyramid configuration. This
@@ -537,14 +545,14 @@ includes a new way of running your application:
 Let's look at ``pserve`` and configuration in more depth.
 
 .. seealso:: See also:
-    :ref:`Quick Tutorial Scaffolds <qtut_scaffolds>`,
+    :ref:`Quick Tutorial Cookiecutters <qtut_cookiecutters>`,
     :ref:`project_narr`, and
-    :doc:`../narr/scaffolding`
+    :doc:`../narr/cookiecutters`
 
 Application running with ``pserve``
 ===================================
 
-Prior to scaffolds, our project mixed a number of operational details into our
+Prior to the cookiecutter, our project mixed a number of operational details into our
 code. Why should my main code care which HTTP server I want and what port
 number to run on?
 
@@ -574,7 +582,7 @@ Configuration with ``.ini`` files
 
 Earlier in *Quick Tour* we first met Pyramid's configuration system. At that
 point we did all configuration in Python code. For example, the port number
-chosen for our HTTP server was right there in Python code. Our scaffold has
+chosen for our HTTP server was right there in Python code. Our cookiecutter has
 moved this decision and more into the ``development.ini`` file:
 
 .. literalinclude:: quick_tour/package/development.ini
@@ -591,11 +599,6 @@ sections:
 
 We have a few decisions made for us in this configuration:
 
-#. *Choice of web server:* ``use = egg:hello_world`` tells ``pserve`` to
-   use the ``waitress`` server.
-
-#. *Port number:* ``port = 6543`` tells ``waitress`` to listen on port 6543.
-
 #. *WSGI app:* What package has our WSGI application in it?
    ``use = egg:hello_world`` in the app section tells the configuration what
    application to load.
@@ -605,7 +608,12 @@ We have a few decisions made for us in this configuration:
    ``pyramid.reload_templates = true`` sets this policy, which might be
    different in production.
 
-Additionally the ``development.ini`` generated by this scaffold wired up
+#. *Choice of web server:* ``use = egg:waitress#main`` tells ``pserve`` to
+   use the ``waitress`` server.
+
+#. *Interfaces:* ``listen = 127.0.0.1:6543 [::1]:6543`` tells ``waitress`` to listen on all interfaces on port 6543 for both IPv4 and IPv6.
+
+Additionally the ``development.ini`` generated by this cookiecutter wired up
 Python's standard logging. We'll now see in the console, for example, a log on
 every request that comes in, as well as traceback information.
 
@@ -626,38 +634,35 @@ and earlier we showed ``--reload`` for application reloading.
 available in your browser. Adding it to your project illustrates several points
 about configuration.
 
-The scaffold ``pyramid_jinja2_starter`` is already configured to include the
+The cookiecutter ``pyramid-cookiecutter-starter`` already configured our package to include the
 add-on ``pyramid_debugtoolbar`` in its ``setup.py``:
 
 .. literalinclude:: quick_tour/package/setup.py
     :language: python
-    :linenos:
-    :lineno-start: 11
+    :lineno-match:
     :lines: 11-16
+    :emphasize-lines: 4
 
 It was installed when you previously ran:
 
 .. code-block:: bash
 
-    $ $VENV/bin/pip install -e .
+    $ $VENV/bin/pip install -e ".[testing]"
 
 The ``pyramid_debugtoolbar`` package is a Pyramid add-on, which means we need
-to include its configuration into our web application. The ``pyramid_jinja2``
-add-on already took care of this for us in its ``__init__.py``:
+to include its configuration into our web application. The cookiecutter already took care of this for us in its ``__init__.py``:
 
 .. literalinclude:: quick_tour/package/hello_world/__init__.py
     :language: python
-    :linenos:
-    :lineno-start: 16
-    :lines: 19
+    :lineno-match:
+    :lines: 8
 
 And it uses the ``pyramid.includes`` facility in our ``development.ini``:
 
 .. literalinclude:: quick_tour/package/development.ini
     :language: ini
-    :linenos:
-    :lineno-start: 15
-    :lines: 15-16
+    :lineno-match:
+    :lines: 14-15
 
 You'll now see a Pyramid logo on the right side of your browser window, which
 when clicked opens a new window that provides introspective access to debugging
@@ -677,42 +682,23 @@ Yikes! We got this far and we haven't yet discussed tests. This is particularly
 egregious, as Pyramid has had a deep commitment to full test coverage since
 before its release.
 
-Our ``pyramid_jinja2_starter`` scaffold generated a ``tests.py`` module with
-one unit test in it. To run it, let's install the handy ``pytest`` test runner
-by editing ``setup.py``. While we're at it, we'll throw in the ``pytest-cov``
-tool which yells at us for code that isn't tested. Insert and edit the
-following lines as shown:
+Our ``pyramid-cookiecutter-starter`` cookiecutter generated a ``tests.py`` module with
+one unit test and one functional test in it. It also configured ``setup.py`` with test requirements:
+``py.test`` as the test runner, ``WebTest`` for running view tests, and the
+``pytest-cov`` tool which yells at us for code that isn't tested. The
+highlighted lines show this:
 
-.. code-block:: python
-    :linenos:
-    :lineno-start: 11
-    :emphasize-lines: 8-12
+.. literalinclude:: quick_tour/package/setup.py
+    :language: python
+    :lineno-match:
+    :lines: 18-22
 
-    requires = [
-        'pyramid',
-        'pyramid_jinja2',
-        'pyramid_debugtoolbar',
-        'waitress',
-    ]
+.. literalinclude:: quick_tour/package/setup.py
+    :language: python
+    :lineno-match:
+    :lines: 42-44
 
-    tests_require = [
-        'WebTest >= 1.3.1',  # py3 compat
-        'pytest',  # includes virtualenv
-        'pytest-cov',
-        ]
-
-.. code-block:: python
-    :linenos:
-    :lineno-start: 34
-    :emphasize-lines: 2-4
-
-        zip_safe=False,
-        extras_require={
-          'testing': tests_require,
-        },
-
-We changed ``setup.py`` which means we need to rerun ``$VENV/bin/pip install -e
-".[testing]"``. We can now run all our tests:
+We already installed the test requirements when we ran the command ``$VENV/bin/pip install -e ".[testing]"``. We can now run all our tests:
 
 .. code-block:: bash
 
@@ -723,34 +709,33 @@ This yields the following output.
 .. code-block:: text
 
     =========================== test session starts ===========================
-    platform darwin -- Python 3.5.0, pytest-2.9.1, py-1.4.31, pluggy-0.3.1
-    rootdir: /Users/stevepiercy/projects/hack-on-pyramid/hello_world, inifile:
-    plugins: cov-2.2.1
-    collected 1 items
+    platform darwin -- Python 3.6.0, pytest-3.0.5, py-1.4.32, pluggy-0.4.0
+    rootdir: /Users/stevepiercy/hello_world, inifile: pytest.ini
+    plugins: cov-2.4.0
+    collected 2 items
 
-    hello_world/tests.py .
-    ------------- coverage: platform darwin, python 3.5.0-final-0 -------------
-    Name                       Stmts   Miss  Cover   Missing
-    --------------------------------------------------------
-    hello_world/__init__.py       11      8    27%   11-23
-    hello_world/resources.py       5      1    80%   8
-    hello_world/tests.py          14      0   100%
-    hello_world/views.py           4      0   100%
-    --------------------------------------------------------
-    TOTAL                         34      9    74%
+    hello_world/tests.py ..
 
-    ========================= 1 passed in 0.22 seconds =========================
+    ------------- coverage: platform darwin, python 3.6.0-final-0 -------------
+    Name                                      Stmts   Miss  Cover   Missing
+    -----------------------------------------------------------------------
+    hello_world/__init__.py                       8      0   100%
+    hello_world/views.py                          3      0   100%
+    -----------------------------------------------------------------------
+    TOTAL                                        11      0   100%
 
-Our unit test passed, although its coverage is incomplete. What did our test
-look like?
+
+    ========================= 2 passed in 1.37 seconds =========================
+
+Our tests passed, and its coverage is complete. What did our test look like?
 
 .. literalinclude:: quick_tour/package/hello_world/tests.py
     :language: python
     :linenos:
 
 Pyramid supplies helpers for test writing, which we use in the test setup and
-teardown. Our one test imports the view, makes a dummy request, and sees if the
-view returns what we expected.
+teardown. Our first test imports the view, makes a dummy request, and sees if the
+view returns what we expected. Our second test verifies that the response body from a request to the web root contains what we expected.
 
 .. seealso:: See also:
     :ref:`Quick Tutorial Unit Testing <qtut_unit_testing>`, :ref:`Quick
@@ -764,38 +749,34 @@ It's important to know what is going on inside our web application. In
 development we might need to collect some output. In production we might need
 to detect situations when other people use the site. We need *logging*.
 
-Fortunately Pyramid uses the normal Python approach to logging. The scaffold
-generated in your ``development.ini`` has a number of lines that configure the
+Fortunately Pyramid uses the normal Python approach to logging. The ``development.ini`` file for your project has a number of lines that configure the
 logging for you to some reasonable defaults. You then see messages sent by
 Pyramid (for example, when a new request comes in).
 
 Maybe you would like to log messages in your code? In your Python module,
-import and set up the logging:
+import and set up the logging in your ``views.py``:
 
-.. literalinclude:: quick_tour/package/hello_world/views.py
+.. literalinclude:: quick_tour/logging/hello_world/views.py
     :language: python
-    :linenos:
-    :lineno-start: 3
+    :lineno-match:
     :lines: 3-4
 
 You can now, in your code, log messages:
 
-.. literalinclude:: quick_tour/package/hello_world/views.py
+.. literalinclude:: quick_tour/logging/hello_world/views.py
     :language: python
-    :linenos:
-    :lineno-start: 9
-    :lines: 9-10
+    :lineno-match:
+    :lines: 7-8
     :emphasize-lines: 2
 
-This will log ``Some Message`` at a ``debug`` log level to the
+This will log ``Some Message`` at a ``DEBUG`` log level to the
 application-configured logger in your ``development.ini``. What controls that?
 These emphasized sections in the configuration file:
 
-.. literalinclude:: quick_tour/package/development.ini
+.. literalinclude:: quick_tour/logging/development.ini
     :language: ini
-    :linenos:
-    :lineno-start: 36
-    :lines: 36-52
+    :lineno-match:
+    :lines: 34-50
     :emphasize-lines: 1-2,14-17
 
 Our application, a package named ``hello_world``, is set up as a logger and
@@ -804,7 +785,7 @@ http://localhost:6543, your console will now show:
 
 .. code-block:: text
 
-    2016-01-18 13:55:55,040 DEBUG [hello_world.views:10][waitress] Some Message
+    2016-12-25 03:03:57,059 DEBUG [hello_world.views:8][waitress] Some Message
 
 .. seealso:: See also:
     :ref:`Quick Tutorial Logging <qtut_logging>` and :ref:`logging_chapter`.
@@ -822,11 +803,10 @@ your own custom sessioning engine. Let's take a look at the :doc:`built-in
 sessioning support <../narr/sessions>`. In our ``__init__.py`` we first import
 the kind of sessioning we want:
 
-.. literalinclude:: quick_tour/package/hello_world/__init__.py
+.. literalinclude:: quick_tour/sessions/hello_world/__init__.py
     :language: python
-    :linenos:
-    :lineno-start: 2
-    :lines: 2-3
+    :lineno-match:
+    :lines: 1-2
     :emphasize-lines: 2
 
 .. warning::
@@ -837,31 +817,28 @@ the kind of sessioning we want:
 Now make a "factory" and pass it to the :term:`configurator`'s
 ``session_factory`` argument:
 
-.. literalinclude:: quick_tour/package/hello_world/__init__.py
+.. literalinclude:: quick_tour/sessions/hello_world/__init__.py
     :language: python
-    :linenos:
-    :lineno-start: 13
-    :lines: 13-17
-    :emphasize-lines: 3-5
+    :lineno-match:
+    :lines: 10-13
+    :emphasize-lines: 2-3
 
 Pyramid's :term:`request` object now has a ``session`` attribute that we can
 use in our view code in ``views.py``:
 
-.. literalinclude:: quick_tour/package/hello_world/views.py
+.. literalinclude:: quick_tour/sessions/hello_world/views.py
     :language: python
-    :linenos:
-    :lineno-start: 9
-    :lines: 9-15
+    :lineno-match:
+    :lines: 7-
     :emphasize-lines: 3-7
 
-We need to update our Jinja2 template to show counter increment in the session:
+We need to update our Jinja2 template ``templates/mytemplate.jinja2`` to show counter increment in the session:
 
-.. literalinclude:: quick_tour/package/hello_world/templates/mytemplate.jinja2
+.. literalinclude:: quick_tour/sessions/hello_world/templates/mytemplate.jinja2
     :language: jinja
-    :linenos:
-    :lineno-start: 40
-    :lines: 40-42
-    :emphasize-lines: 3
+    :lineno-match:
+    :lines: 4-8
+    :emphasize-lines: 4
 
 .. seealso:: See also:
     :ref:`Quick Tutorial Sessions <qtut_sessions>`, :ref:`sessions_chapter`,
@@ -877,13 +854,34 @@ databases frequently mean an "ORM" (object-relational mapper.) In Python, ORM
 usually leads to the mega-quality *SQLAlchemy*, a Python package that greatly
 eases working with databases.
 
-Pyramid and SQLAlchemy are great friends. That friendship includes a scaffold!
+Pyramid and SQLAlchemy are great friends. That friendship includes a cookiecutter!
 
 .. code-block:: bash
 
-  $ $VENV/bin/pcreate --scaffold alchemy sqla_demo
-  $ cd sqla_demo
-  $ $VENV/bin/pip install -e .
+    $ cd ~
+    $ env/bin/cookiecutter https://github.com/Pylons/pyramid-cookiecutter-alchemy
+
+If prompted for the first item, accept the default ``yes`` by hitting return.
+
+#. ``You've cloned ~/.cookiecutters/pyramid-cookiecutter-alchemy before. Is it
+   okay to delete and re-clone it? [yes]:``
+#. ``project_name [Pyramid Scaffold]: sqla_demo``
+#. ``repo_name [scaffold]: sqla_demo``
+
+We then run through the following commands as before.
+
+.. code-block:: bash
+
+    # Change directory into your newly created project.
+    $ cd sqla_demo
+    # Create a new virtual environment...
+    $ python3 -m venv env
+    # ...where we upgrade packaging tools...
+    $ env/bin/pip install --upgrade pip setuptools
+    # ...and into which we install our project and its testing requirements.
+    $ env/bin/pip install -e ".[testing]"
+    # Reset our environment variable for a new virtual environment.
+    $ export VENV=~/sqla_demo/env
 
 We now have a working sample SQLAlchemy application with all dependencies
 installed. The sample project provides a console script to initialize a SQLite
@@ -895,21 +893,21 @@ database with tables. Let's run it, then start the application:
   $ $VENV/bin/pserve development.ini
 
 The ORM eases the mapping of database structures into a programming language.
-SQLAlchemy uses "models" for this mapping. The scaffold generated a sample
+SQLAlchemy uses "models" for this mapping. The cookiecutter generated a sample
 model:
 
 .. literalinclude:: quick_tour/sqla_demo/sqla_demo/models/mymodel.py
     :language: python
-    :start-after: Start Sphinx Include
-    :end-before: End Sphinx Include
+    :lineno-match:
+    :pyobject: MyModel
 
 View code, which mediates the logic between web requests and the rest of the
 system, can then easily get at the data thanks to SQLAlchemy:
 
 .. literalinclude:: quick_tour/sqla_demo/sqla_demo/views/default.py
     :language: python
-    :start-after: Start Sphinx Include
-    :end-before: End Sphinx Include
+    :lineno-match:
+    :lines: 13
 
 .. seealso:: See also:
     :ref:`Quick Tutorial Databases <qtut_databases>`, `SQLAlchemy
@@ -968,14 +966,10 @@ Deform and Colander provide a very flexible combination for forms, widgets,
 schemas, and validation. Recent versions of Deform also include a :ref:`retail
 mode <deform:retail>` for gaining Deform features on custom forms.
 
-Also the ``deform_bootstrap`` Pyramid add-on restyles the stock Deform widgets
-using attractive CSS from Twitter Bootstrap and more powerful widgets from
-Chosen.
+Deform uses attractive CSS from Twitter Bootstrap and more powerful select, checkbox, and date and time widgets.
 
 .. seealso:: See also:
-    :ref:`Quick Tutorial Forms <qtut_forms>`, :ref:`Deform <deform:overview>`,
-    :ref:`Colander <colander:overview>`, and `deform_bootstrap
-    <https://pypi.python.org/pypi/deform_bootstrap>`_.
+    :ref:`Quick Tutorial Forms <qtut_forms>`, :ref:`Deform <deform:overview>`, and :ref:`Colander <colander:overview>`.
 
 Conclusion
 ==========

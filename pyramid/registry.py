@@ -9,28 +9,44 @@ from pyramid.compat import text_
 from pyramid.decorator import reify
 
 from pyramid.interfaces import (
-    ISettings,
     IIntrospector,
     IIntrospectable,
+    ISettings,
     )
+
+from pyramid.path import (
+    CALLER_PACKAGE,
+    caller_package,
+)
 
 empty = text_('')
 
 class Registry(Components, dict):
-    """ A registry object is an :term:`application registry`.  It is used by
-    the framework itself to perform mappings of URLs to view callables, as
-    well as servicing other various framework duties. A registry has its own
-    internal API, but this API is rarely used by Pyramid application
-    developers (it's usually only used by developers of the Pyramid
-    framework).  But it has a number of attributes that may be useful to
-    application developers within application code, such as ``settings``,
-    which is a dictionary containing application deployment settings.
+    """ A registry object is an :term:`application registry`.
+
+    It is used by the framework itself to perform mappings of URLs to view
+    callables, as well as servicing other various framework duties. A registry
+    has its own internal API, but this API is rarely used by Pyramid
+    application developers (it's usually only used by developers of the
+    Pyramid framework and Pyramid addons).  But it has a number of attributes
+    that may be useful to application developers within application code,
+    such as ``settings``, which is a dictionary containing application
+    deployment settings.
 
     For information about the purpose and usage of the application registry,
     see :ref:`zca_chapter`.
 
+    The registry may be used both as an :class:`pyramid.interfaces.IDict` and
+    as a Zope component registry.
+    These two ways of storing configuration are independent.
+    Applications will tend to prefer to store information as key-values
+    whereas addons may prefer to use the component registry to avoid naming
+    conflicts and to provide more complex lookup mechanisms.
+
     The application registry is usually accessed as ``request.registry`` in
-    application code.
+    application code. By the time a registry is used to handle requests it
+    should be considered frozen and read-only. Any changes to its internal
+    state should be done with caution and concern for thread-safety.
 
     """
 
@@ -40,13 +56,16 @@ class Registry(Components, dict):
 
     _settings = None
 
-    def __init__(self, *arg, **kw):
+    def __init__(self, package_name=CALLER_PACKAGE, *args, **kw):
         # add a registry-instance-specific lock, which is used when the lookup
         # cache is mutated
         self._lock = threading.Lock()
         # add a view lookup cache
         self._clear_view_lookup_cache()
-        Components.__init__(self, *arg, **kw)
+        if package_name is CALLER_PACKAGE:
+            package_name = caller_package().__name__
+        Components.__init__(self, package_name, *args, **kw)
+        dict.__init__(self)
 
     def _clear_view_lookup_cache(self):
         self._view_lookup_cache = {}

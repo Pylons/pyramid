@@ -5,8 +5,8 @@ class TestRegistry(unittest.TestCase):
         from pyramid.registry import Registry
         return Registry
     
-    def _makeOne(self):
-        return self._getTargetClass()()
+    def _makeOne(self, *args, **kw):
+        return self._getTargetClass()(*args, **kw)
 
     def test___nonzero__(self):
         registry = self._makeOne()
@@ -24,8 +24,12 @@ class TestRegistry(unittest.TestCase):
 
     def test_package_name(self):
         package_name = 'testing'
-        registry = self._getTargetClass()(package_name)
+        registry = self._makeOne(package_name)
         self.assertEqual(registry.package_name, package_name)
+
+    def test_default_package_name(self):
+        registry = self._makeOne()
+        self.assertEqual(registry.package_name, 'pyramid.tests')
 
     def test_registerHandler_and_notify(self):
         registry = self._makeOne()
@@ -56,6 +60,25 @@ class TestRegistry(unittest.TestCase):
         registry = self._makeOne()
         registry.settings = 'foo'
         self.assertEqual(registry._settings, 'foo')
+
+    def test_init_forwards_args(self):
+        from zope.interface import Interface
+        from zope.interface.registry import Components
+        dummy = object()
+        c = Components()
+        c.registerUtility(dummy, Interface)
+        registry = self._makeOne('foo', (c,))
+        self.assertEqual(registry.__name__, 'foo')
+        self.assertEqual(registry.getUtility(Interface), dummy)
+
+    def test_init_forwards_kw(self):
+        from zope.interface import Interface
+        from zope.interface.registry import Components
+        dummy = object()
+        c = Components()
+        c.registerUtility(dummy, Interface)
+        registry = self._makeOne(bases=(c,))
+        self.assertEqual(registry.getUtility(Interface), dummy)
 
 class TestIntrospector(unittest.TestCase):
     def _getTargetClass(slf):

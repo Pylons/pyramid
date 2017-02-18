@@ -6,9 +6,8 @@ Distributing Your Application
 
 Once your application works properly, you can create a "tarball" from it by
 using the ``setup.py sdist`` command.  The following commands assume your
-current working directory is the ``tutorial`` package we've created and that
-the parent directory of the ``tutorial`` package is a virtual environment
-representing a :app:`Pyramid` environment.
+current working directory contains the ``tutorial`` package and the
+``setup.py`` file.
 
 On UNIX:
 
@@ -20,7 +19,7 @@ On Windows:
 
 .. code-block:: doscon
 
-   c:\pyramidtut> %VENV%\Scripts\python setup.py sdist
+   c:\tutorial> %VENV%\Scripts\python setup.py sdist
 
 The output of such a command will be something like:
 
@@ -35,7 +34,7 @@ The output of such a command will be something like:
 Note that this command creates a tarball in the "dist" subdirectory named
 ``tutorial-0.0.tar.gz``.  You can send this file to your friends to show them
 your cool new application.  They should be able to install it by pointing the
-``pip install .`` command directly at it. Or you can upload it to `PyPI
+``pip install`` command directly at it. Or you can upload it to `PyPI
 <https://pypi.python.org/pypi>`_ and share it with the rest of the world, where
 it can be downloaded via ``pip install`` remotely like any other package people
 download from PyPI.

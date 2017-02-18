@@ -1,13 +1,9 @@
 .. index::
-   single: pcreate; --help
+    single: pcreate; --help
 
 .. _pcreate_script:
 
-``pcreate``
------------
-
-.. program-output:: pcreate --help
-   :prompt:
-   :shell:
+.. autoprogram:: pyramid.scripts.pcreate:PCreateCommand.parser
+    :prog: pcreate
 
 .. seealso:: :ref:`creating_a_project`
