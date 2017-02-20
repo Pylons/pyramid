@@ -35,9 +35,11 @@ from pyramid.scripts.common import setup_logging
 from pyramid.path import AssetResolver
 from pyramid.settings import aslist
 
+
 def main(argv=sys.argv, quiet=False):
     command = PServeCommand(argv, quiet=quiet)
     return command.run()
+
 
 class PServeCommand(object):
 
@@ -113,7 +115,6 @@ class PServeCommand(object):
              "passed here.",
         )
 
-
     ConfigParser = configparser.ConfigParser  # testing
     loadapp = staticmethod(loadapp)  # testing
     loadserver = staticmethod(loadserver)  # testing
@@ -126,7 +127,7 @@ class PServeCommand(object):
             self.args.verbose = 0
         self.watch_files = []
 
-    def out(self, msg): # pragma: no cover
+    def out(self, msg):  # pragma: no cover
         if self.args.verbose > 0:
             print(msg)
 
@@ -239,8 +240,9 @@ class PServeCommand(object):
                 msg = ''
             self.out('Exiting%s (-v to see traceback)' % msg)
 
+
 # For paste.deploy server instantiation (egg:pyramid#wsgiref)
-def wsgiref_server_runner(wsgi_app, global_conf, **kw): # pragma: no cover
+def wsgiref_server_runner(wsgi_app, global_conf, **kw):  # pragma: no cover
     from wsgiref.simple_server import make_server
     host = kw.get('host', '0.0.0.0')
     port = int(kw.get('port', 8080))
@@ -248,13 +250,14 @@ def wsgiref_server_runner(wsgi_app, global_conf, **kw): # pragma: no cover
     print('Starting HTTP server on http://%s:%s' % (host, port))
     server.serve_forever()
 
+
 # For paste.deploy server instantiation (egg:pyramid#cherrypy)
 def cherrypy_server_runner(
         app, global_conf=None, host='127.0.0.1', port=None,
         ssl_pem=None, protocol_version=None, numthreads=None,
         server_name=None, max=None, request_queue_size=None,
         timeout=None
-        ): # pragma: no cover
+        ):  # pragma: no cover
     """
     Entry point for CherryPy's WSGI server
 
@@ -361,5 +364,6 @@ def cherrypy_server_runner(
 
     return server
 
-if __name__ == '__main__': # pragma: no cover
+
+if __name__ == '__main__':  # pragma: no cover
     sys.exit(main() or 0)
