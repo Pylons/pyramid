@@ -1,5 +1,7 @@
-Unreleased
-==========
+.. _changes_1.8.2:
+
+1.8.2 (2017-02-20)
+==================
 
 - ``HTTPException``'s accepts a detail kwarg that may be used to pass
   additional details to the exception. You may now pass objects so long as

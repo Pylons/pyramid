@@ -16,6 +16,7 @@ The following bug fix releases were made since then. Bug fix releases also
 include documentation improvements and other minor feature changes.
 
 - :ref:`changes_1.8.1`
+- :ref:`changes_1.8.2`
 
 Major Feature Additions
 -----------------------
