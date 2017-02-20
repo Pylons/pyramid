@@ -1,5 +1,6 @@
 import unittest
 
+
 class TestSettingsConfiguratorMixin(unittest.TestCase):
     def _makeOne(self, *arg, **kw):
         from pyramid.config import Configurator
@@ -11,12 +12,12 @@ class TestSettingsConfiguratorMixin(unittest.TestCase):
         settings = config._set_settings(None)
         self.assertTrue(settings)
 
-    def test__set_settings_uses_original_dict(self):
+    def test__set_settings_does_not_uses_original_dict(self):
         config = self._makeOne()
         dummy = {}
         result = config._set_settings(dummy)
-        self.assertTrue(dummy is result)
-        self.assertEqual(dummy['pyramid.debug_all'], False)
+        self.assertTrue(dummy is not result)
+        self.assertNotIn('pyramid.debug_all', dummy)
 
     def test__set_settings_as_dictwithvalues(self):
         config = self._makeOne()
@@ -62,6 +63,24 @@ class TestSettingsConfiguratorMixin(unittest.TestCase):
         config.add_settings(None, a=1)
         settings = reg.getUtility(ISettings)
         self.assertEqual(settings['a'], 1)
+
+    def test_settings_parameter_dict_is_never_updated(self):
+        class ReadOnlyDict(dict):
+            def __readonly__(self, *args, **kwargs):  # pragma: no cover
+                raise RuntimeError("Cannot modify ReadOnlyDict")
+            __setitem__ = __readonly__
+            __delitem__ = __readonly__
+            pop = __readonly__
+            popitem = __readonly__
+            clear = __readonly__
+            update = __readonly__
+            setdefault = __readonly__
+            del __readonly__
+
+        initial = ReadOnlyDict()
+        config = self._makeOne(settings=initial)
+        config._set_settings({'a': '1'})
+
 
 class TestSettings(unittest.TestCase):
 
