@@ -125,6 +125,8 @@ class PServeCommand(object):
         self.args = self.parser.parse_args(argv[1:])
         if quiet:
             self.args.verbose = 0
+        if self.args.reload:
+            self.worker_kwargs = {'argv': argv, "quiet": quiet}
         self.watch_files = []
 
     def out(self, msg):  # pragma: no cover
@@ -204,6 +206,7 @@ class PServeCommand(object):
                 'pyramid.scripts.pserve.main',
                 reload_interval=int(self.args.reload_interval),
                 verbose=self.args.verbose,
+                worker_kwargs=self.worker_kwargs
             )
             return 0
 
