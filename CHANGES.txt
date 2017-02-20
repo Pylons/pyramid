@@ -1,11 +1,17 @@
-.. _changes_1.8.1:
-
 Unreleased
 ==========
 
-- HTTPException's accepts a detail kwarg that may be used to pass additional
-  details to the exception. You may now pass objects so long as they have a
-  valid __str__ method. See https://github.com/Pylons/pyramid/pull/2951 
+- ``HTTPException``'s accepts a detail kwarg that may be used to pass
+  additional details to the exception. You may now pass objects so long as
+  they have a valid ``__str__`` method.
+  See https://github.com/Pylons/pyramid/pull/2951
+
+- Fix ``Configurator(settings=settings)`` to copy the passed in settings
+  dictionary instead of using it verbatim. This fixes a regression from 1.7
+  introduced via https://github.com/Pylons/pyramid/pull/2823.
+  See https://github.com/Pylons/pyramid/pull/2960
+
+.. _changes_1.8.1:
 
 1.8.1 (2017-01-24)
 ==================
