@@ -67,7 +67,7 @@ docs_extras = [
 testing_extras = tests_require + [
     'nose',
     'coverage',
-    'virtualenv', # for scaffolding tests
+    'virtualenv',  # for scaffolding tests
     ]
 
 setup(name='pyramid',
