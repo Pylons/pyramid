@@ -1,8 +1,10 @@
+import mock
 import os
 import unittest
 from pyramid.tests.test_scripts import dummy
 
 here = os.path.abspath(os.path.dirname(__file__))
+
 
 class TestPServeCommand(unittest.TestCase):
     def setUp(self):
@@ -48,10 +50,11 @@ class TestPServeCommand(unittest.TestCase):
         inst.loadserver = self._get_server
 
         app = dummy.DummyApp()
+
         def get_app(*args, **kwargs):
             app.global_conf = kwargs.get('global_conf', None)
-        inst.loadapp = get_app
 
+        inst.loadapp = get_app
         inst.run()
         self.assertEqual(app.global_conf, {'a': '1', 'b': '2'})
 
@@ -76,6 +79,21 @@ class TestPServeCommand(unittest.TestCase):
             os.path.abspath('/baz'),
             os.path.abspath(os.path.join(here, '*.py')),
         ])
+
+    def test_reload_call_hupper_with_correct_args(self):
+        with mock.patch('pyramid.scripts.pserve.hupper') as hupper_mock:
+            hupper_mock.is_active.side_effect = [False, True]
+            inst = self._makeOne('--reload', 'development.ini')
+            inst.loadserver = mock.MagicMock()
+            inst.loadapp = mock.MagicMock()
+            inst.run()
+            hupper_mock.start_reloader.assert_called_with(
+                'pyramid.scripts.pserve.main',
+                reload_interval=1,
+                verbose=1,
+                worker_kwargs={'argv': ['pserve', '--reload', 'development.ini'],
+                               'quiet': False})
+
 
 class Test_main(unittest.TestCase):
     def _callFUT(self, argv):
