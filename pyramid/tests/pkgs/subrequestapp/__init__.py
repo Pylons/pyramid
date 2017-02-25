@@ -7,7 +7,8 @@ def view_one(request):
     return response
 
 def view_two(request):
-    return 'This came from view_two'
+    # check that request.foo is valid for a subrequest
+    return 'This came from view_two, foo=%s' % (request.foo,)
 
 def view_three(request):
     subreq = Request.blank('/view_four')
@@ -46,5 +47,6 @@ def main():
     config.add_view(view_three, route_name='three')
     config.add_view(view_four, route_name='four')
     config.add_view(view_five, route_name='five')
+    config.add_request_method(lambda r: 'bar', 'foo', property=True)
     return config
 

@@ -682,7 +682,48 @@ class IRouter(Interface):
     registry = Attribute(
         """Component architecture registry local to this application.""")
 
-class ISettings(Interface):
+    def make_request(environ):
+        """
+        Create a new request object.
+
+        This method initializes a new :class:`pyramid.interfaces.IRequest`
+        object using the application's
+        :class:`pyramid.interfaces.IRequestFactory`.
+        """
+
+    def invoke_request(request):
+        """
+        Invoke the :app:`Pyramid` request pipeline.
+
+        See :ref:`router_chapter` for information on the request pipeline.
+        """
+
+class IExecutionPolicy(Interface):
+    def __call__(environ, router):
+        """
+        This callable triggers the router to process a raw WSGI environ dict
+        into a response and controls the :app:`Pyramid` request pipeline.
+
+        The ``environ`` is the raw WSGI environ.
+
+        The ``router`` is an :class:`pyramid.interfaces.IRouter` object which
+        should be used to create a request object and send it into the
+        processing pipeline.
+
+        The return value should be a :class:`pyramid.interfaces.IResponse`
+        object or an exception that will be handled by WSGI middleware.
+
+        The default execution policy simple creates a request and sends it
+        through the pipeline:
+
+        .. code-block:: python
+
+            def simple_execution_policy(environ, router):
+                request = router.make_request(environ)
+                return router.invoke_request(request)
+        """
+
+class ISettings(IDict):
     """ Runtime settings utility for pyramid; represents the
     deployment settings for the application.  Implements a mapping
     interface."""

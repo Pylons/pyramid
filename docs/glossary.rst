@@ -1154,3 +1154,7 @@ Glossary
 
    coverage
       A measurement of code coverage, usually expressed as a percentage of which lines of code have been executed over which lines are executable, typically run during test execution.
+   execution policy
+      A policy which wraps the :term:`router` by creating the request object
+      and sending it through the request pipeline.
+      See :class:`pyramid.config.Configurator.set_execution_policy`.
