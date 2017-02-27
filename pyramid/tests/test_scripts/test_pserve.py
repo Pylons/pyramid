@@ -1,7 +1,7 @@
-import mock
 import os
 import unittest
 from pyramid.tests.test_scripts import dummy
+
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -81,18 +81,29 @@ class TestPServeCommand(unittest.TestCase):
         ])
 
     def test_reload_call_hupper_with_correct_args(self):
-        with mock.patch('pyramid.scripts.pserve.hupper') as hupper_mock:
-            hupper_mock.is_active.side_effect = [False, True]
-            inst = self._makeOne('--reload', 'development.ini')
-            inst.loadserver = mock.MagicMock()
-            inst.loadapp = mock.MagicMock()
-            inst.run()
-            hupper_mock.start_reloader.assert_called_with(
-                'pyramid.scripts.pserve.main',
-                reload_interval=1,
-                verbose=1,
-                worker_kwargs={'argv': ['pserve', '--reload', 'development.ini'],
-                               'quiet': False})
+        from pyramid.scripts import pserve
+
+        class AttrDict(dict):
+            def __init__(self, *args, **kwargs):
+                super(AttrDict, self).__init__(*args, **kwargs)
+                self.__dict__ = self
+
+        def dummy_start_reloader(*args, **kwargs):
+            dummy_start_reloader.args = args
+            dummy_start_reloader.kwargs = kwargs
+
+        pserve.hupper = AttrDict(is_active=lambda: False,
+                                 start_reloader=dummy_start_reloader)
+
+        inst = self._makeOne('--reload', 'development.ini')
+        inst.run()
+
+        self.assertEquals(dummy_start_reloader.args, ('pyramid.scripts.pserve.main',))
+        self.assertEquals(dummy_start_reloader.kwargs, {
+            'reload_interval': 1,
+            'verbose': 1,
+            'worker_kwargs': {'argv': ['pserve', '--reload', 'development.ini'],
+                              'quiet': False}})
 
 
 class Test_main(unittest.TestCase):
