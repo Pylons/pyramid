@@ -89,10 +89,16 @@ On all platforms, generate a project using cookiecutter.
 
 If prompted for the first item, accept the default ``yes`` by hitting return.
 
-#. ``You've cloned ~/.cookiecutters/pyramid-cookiecutter-starter before. Is it
-   okay to delete and re-clone it? [yes]:``
-#. ``project_name [Pyramid Scaffold]: myproject``
-#. ``repo_name [scaffold]: myproject``
+.. code-block:: text
+
+    You've cloned ~/.cookiecutters/pyramid-cookiecutter-starter before.
+    Is it okay to delete and re-clone it? [yes]: yes
+    project_name [Pyramid Scaffold]: myproject
+    repo_name [scaffold]: myproject
+    Select template_language:
+    1 - jinja2
+    2 - chameleon
+    Choose from 1, 2 [1]: 1
 
 We then run through the following commands.
 
