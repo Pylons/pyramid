@@ -514,10 +514,16 @@ Let's use the cookiecutter ``pyramid-cookiecutter-starter`` to create a starter 
 
 If prompted for the first item, accept the default ``yes`` by hitting return.
 
-#. ``You've cloned ~/.cookiecutters/pyramid-cookiecutter-starter before. Is it
-   okay to delete and re-clone it? [yes]:``
-#. ``project_name [Pyramid Scaffold]: hello_world``
-#. ``repo_name [scaffold]: hello_world``
+.. code-block:: text
+
+    You've cloned ~/.cookiecutters/pyramid-cookiecutter-starter before.
+    Is it okay to delete and re-clone it? [yes]: yes
+    project_name [Pyramid Scaffold]: hello_world
+    repo_name [scaffold]: hello_world
+    Select template_language:
+    1 - jinja2
+    2 - chameleon
+    Choose from 1, 2 [1]: 1
 
 We then run through the following commands.
 
@@ -863,10 +869,12 @@ Pyramid and SQLAlchemy are great friends. That friendship includes a cookiecutte
 
 If prompted for the first item, accept the default ``yes`` by hitting return.
 
-#. ``You've cloned ~/.cookiecutters/pyramid-cookiecutter-alchemy before. Is it
-   okay to delete and re-clone it? [yes]:``
-#. ``project_name [Pyramid Scaffold]: sqla_demo``
-#. ``repo_name [scaffold]: sqla_demo``
+.. code-block:: text
+
+    You've cloned ~/.cookiecutters/pyramid-cookiecutter-alchemy before.
+    Is it okay to delete and re-clone it? [yes]: yes
+    project_name [Pyramid Scaffold]: sqla_demo
+    repo_name [scaffold]: sqla_demo
 
 We then run through the following commands as before.
 
