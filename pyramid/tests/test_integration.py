@@ -9,6 +9,7 @@ import unittest
 from pyramid.wsgi import wsgiapp
 from pyramid.view import view_config
 from pyramid.static import static_view
+from pyramid.testing import skip_on
 from pyramid.compat import (
     text_,
     url_quote,
@@ -759,6 +760,7 @@ class MemoryLeaksTest(unittest.TestCase):
             last_collected = collected
         return len(gc.get_objects())
 
+    @skip_on('pypy')
     def test_memory_leaks(self):
         from pyramid.config import Configurator
         Configurator().make_wsgi_app()  # Initialize all global objects
