@@ -4,6 +4,12 @@ unreleased
 Features
 --------
 
+- Added an execution policy hook to the request pipeline. An execution
+  policy has the ability to control creation and execution of the request
+  objects before they enter rest of the pipeline. This means for a given
+  request that the policy may create more than one request for retry
+  purposes. See https://github.com/Pylons/pyramid/pull/2964
+
 Bug Fixes
 ---------
 
