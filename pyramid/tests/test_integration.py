@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import datetime
+import gc
 import locale
 import os
 import unittest
@@ -741,3 +742,28 @@ def _assertBody(body, filename):
     data = data.replace(b'\r', b'')
     data = data.replace(b'\n', b'')
     assert(body == data)
+
+
+class MemoryLeaksTest(unittest.TestCase):
+
+    def tearDown(self):
+        import pyramid.config
+        pyramid.config.global_registries.empty()
+
+    def get_gc_count(self):
+        last_collected = 0
+        while True:
+            collected = gc.collect()
+            if collected == last_collected:
+                break
+            last_collected = collected
+        return len(gc.get_objects())
+
+    def test_memory_leaks(self):
+        from pyramid.config import Configurator
+        Configurator().make_wsgi_app()  # Initialize all global objects
+
+        initial_count = self.get_gc_count()
+        Configurator().make_wsgi_app()
+        current_count = self.get_gc_count()
+        self.assertEqual(current_count, initial_count)

@@ -42,7 +42,7 @@ def excview_tween_factory(handler, registry):
             provides = providedBy(exc)
             try:
                 response = _call_view(
-                    registry,
+                    request.registry,
                     request,
                     exc,
                     provides,
