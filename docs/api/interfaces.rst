@@ -65,6 +65,9 @@ Other Interfaces
   .. autointerface:: IResponseFactory
      :members:
 
+  .. autointerface:: IRouter
+     :members:
+
   .. autointerface:: IViewMapperFactory
      :members:
 

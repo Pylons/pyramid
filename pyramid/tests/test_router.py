@@ -1271,6 +1271,19 @@ class TestRouter(unittest.TestCase):
         start_response = DummyStartResponse()
         self.assertRaises(PredicateMismatch, router, environ, start_response)
 
+    def test_custom_execution_policy(self):
+        from pyramid.interfaces import IExecutionPolicy
+        from pyramid.request import Request
+        from pyramid.response import Response
+        registry = self.config.registry
+        def dummy_policy(environ, router):
+            return Response(status=200, body=b'foo')
+        registry.registerUtility(dummy_policy, IExecutionPolicy)
+        router = self._makeOne()
+        resp = Request.blank('/').get_response(router)
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.body, b'foo')
+
 class DummyPredicate(object):
     def __call__(self, info, request):
         return True

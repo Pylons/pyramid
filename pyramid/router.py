@@ -5,6 +5,7 @@ from zope.interface import (
 
 from pyramid.interfaces import (
     IDebugLogger,
+    IExecutionPolicy,
     IRequest,
     IRequestExtensions,
     IRootFactory,
@@ -49,6 +50,8 @@ class Router(object):
         self.routes_mapper = q(IRoutesMapper)
         self.request_factory = q(IRequestFactory, default=Request)
         self.request_extensions = q(IRequestExtensions)
+        self.execution_policy = q(
+            IExecutionPolicy, default=default_execution_policy)
         self.orig_handle_request = self.handle_request
         tweens = q(ITweens)
         if tweens is not None:
@@ -182,19 +185,36 @@ class Router(object):
         :term:`tween` in the tween stack closest to the request ingress.  If
         ``use_tweens`` is ``False``, the request will be sent to the main
         router handler, and no tweens will be invoked.
-        
+
         See the API for pyramid.request for complete documentation.
         """
+        request.registry = self.registry
+        request.invoke_subrequest = self.invoke_subrequest
+        return self.invoke_request(
+            request,
+            _use_tweens=use_tweens,
+            _apply_extensions=True,
+        )
+
+    def make_request(self, environ):
+        request = self.request_factory(environ)
+        request.registry = self.registry
+        request.invoke_subrequest = self.invoke_subrequest
+        extensions = self.request_extensions
+        if extensions is not None:
+            apply_request_extensions(request, extensions=extensions)
+        return request
+
+    def invoke_request(self, request,
+                       _use_tweens=True, _apply_extensions=False):
         registry = self.registry
         has_listeners = self.registry.has_listeners
         notify = self.registry.notify
-        threadlocals = {'registry':registry, 'request':request}
+        threadlocals = {'registry': registry, 'request': request}
         manager = self.threadlocal_manager
         manager.push(threadlocals)
-        request.registry = registry
-        request.invoke_subrequest = self.invoke_subrequest
-        
-        if use_tweens:
+
+        if _use_tweens:
             handle_request = self.handle_request
         else:
             handle_request = self.orig_handle_request
@@ -203,7 +223,7 @@ class Router(object):
 
             try:
                 extensions = self.request_extensions
-                if extensions is not None:
+                if _apply_extensions and extensions is not None:
                     apply_request_extensions(request, extensions=extensions)
                 response = handle_request(request)
 
@@ -211,7 +231,7 @@ class Router(object):
                     request._process_response_callbacks(response)
 
                 has_listeners and notify(NewResponse(request, response))
-                
+
                 return response
 
             finally:
@@ -229,6 +249,10 @@ class Router(object):
         within the application registry; call ``start_response`` and
         return an iterable.
         """
-        request = self.request_factory(environ)
-        response = self.invoke_subrequest(request, use_tweens=True)
-        return response(request.environ, start_response)
+        response = self.execution_policy(environ, self)
+        return response(environ, start_response)
+
+
+def default_execution_policy(environ, router):
+    request = router.make_request(environ)
+    return router.invoke_request(request)

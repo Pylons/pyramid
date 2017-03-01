@@ -610,7 +610,7 @@ class SubrequestAppTest(unittest.TestCase):
 
     def test_one(self):
         res = self.testapp.get('/view_one', status=200)
-        self.assertTrue(b'This came from view_two' in res.body)
+        self.assertTrue(b'This came from view_two, foo=bar' in res.body)
 
     def test_three(self):
         res = self.testapp.get('/view_three', status=500)
