@@ -57,11 +57,12 @@ On all operating systems
 ^^^^^^^^^^^^^^^^^^^^^^^^
 If prompted for the first item, accept the default ``yes`` by hitting return.
 
-#. ``You've cloned ~/.cookiecutters/pyramid-cookiecutter-alchemy before. Is it
-   okay to delete and re-clone it? [yes]:``
-#. ``project_name [Pyramid Scaffold]: myproj``
-#. ``repo_name [scaffold]: tutorial``
+.. code-block:: text
 
+    You've cloned ~/.cookiecutters/pyramid-cookiecutter-alchemy before.
+    Is it okay to delete and re-clone it? [yes]: yes
+    project_name [Pyramid Scaffold]: myproj
+    repo_name [scaffold]: tutorial
 
 Change directory into your newly created project
 ------------------------------------------------

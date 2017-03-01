@@ -1,3 +1,14 @@
+.. _changes_1.8.3:
+
+1.8.3 (unreleased)
+==================
+
+Documentation Changes
+---------------------
+
+- Updated pyramid-cookiecutter-starter prompts and reformat presentation of all
+  cookiecutter prompts. See https://github.com/Pylons/pyramid/pull/2966
+
 .. _changes_1.8.2:
 
 1.8.2 (2017-02-20)
