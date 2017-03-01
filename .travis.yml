@@ -31,6 +31,10 @@ install:
 script:
   - travis_retry tox
 
+cache:
+  directories:
+    - $HOME/.cache/pip
+
 notifications:
   email:
     - pyramid-checkins@lists.repoze.org
