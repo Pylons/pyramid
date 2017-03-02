@@ -13,8 +13,6 @@ from pyramid.compat import (
 from pyramid.exceptions import ConfigurationError
 from pyramid.exceptions import ConfigurationExecutionError
 from pyramid.exceptions import ConfigurationConflictError
-from pyramid.registry import undefer
-
 
 class TestViewsConfigurationMixin(unittest.TestCase):
     def _makeOne(self, *arg, **kw):
@@ -150,7 +148,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         self.assertEqual(wrapper.__module__, view.__module__)
         self.assertEqual(wrapper.__name__, view.__name__)
         self.assertEqual(wrapper.__doc__, view.__doc__)
-        self.assertEqual(undefer(wrapper.__discriminator__(None, None))[0],
+        self.assertEqual(wrapper.__discriminator__(None, None).resolve()[0],
                          'view')
 
     def test_add_view_view_callable_dottedname(self):
