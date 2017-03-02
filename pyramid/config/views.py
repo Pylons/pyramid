@@ -933,7 +933,7 @@ class ViewsConfiguratorMixin(object):
             if not exception_only and isexc:
                 derived_view = runtime_exc_view(derived_view, derived_exc_view)
 
-            derived_view.__discriminator__ = lambda *arg: view_intr.discriminator
+            derived_view.__discriminator__ = lambda *arg: discriminator
             # __discriminator__ is used by superdynamic systems
             # that require it for introspection after manual view lookup;
             # see also MultiView.__discriminator__

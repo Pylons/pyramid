@@ -31,7 +31,6 @@ class Test_excview_tween_factory(unittest.TestCase):
             raise HTTPNotFound
         tween = self._makeOne(handler)
         request = Request.blank('/')
-        request.registry = self.config.registry
         result = tween(request)
         self.assertEqual(result.status, '404 Not Found')
 
@@ -45,7 +44,6 @@ class Test_excview_tween_factory(unittest.TestCase):
             raise ValueError
         tween = self._makeOne(handler)
         request = Request.blank('/')
-        request.registry = self.config.registry
         result = tween(request)
         self.assertTrue(b'foo' in result.body)
 
@@ -57,7 +55,6 @@ class Test_excview_tween_factory(unittest.TestCase):
             raise ValueError
         tween = self._makeOne(handler)
         request = Request.blank('/')
-        request.registry = self.config.registry
         request.method = 'POST'
         self.assertRaises(ValueError, lambda: tween(request))
 
@@ -67,7 +64,6 @@ class Test_excview_tween_factory(unittest.TestCase):
             raise ValueError
         tween = self._makeOne(handler)
         request = Request.blank('/')
-        request.registry = self.config.registry
         self.assertRaises(ValueError, lambda: tween(request))
 
 class DummyRequest:
