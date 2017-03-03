@@ -292,3 +292,5 @@ Contributors
 - Mikko Ohtamaa, 2016/12/6
 
 - Martin Frlin, 2016/12/7
+
+- Anthony Sottile, 2017/03/03
