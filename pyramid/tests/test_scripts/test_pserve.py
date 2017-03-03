@@ -92,11 +92,15 @@ class TestPServeCommand(unittest.TestCase):
             dummy_start_reloader.args = args
             dummy_start_reloader.kwargs = kwargs
 
-        pserve.hupper = AttrDict(is_active=lambda: False,
-                                 start_reloader=dummy_start_reloader)
+        orig_hupper = pserve.hupper
+        try:
+            pserve.hupper = AttrDict(is_active=lambda: False,
+                                     start_reloader=dummy_start_reloader)
 
-        inst = self._makeOne('--reload', 'development.ini')
-        inst.run()
+            inst = self._makeOne('--reload', 'development.ini')
+            inst.run()
+        finally:
+            pserve.hupper = orig_hupper
 
         self.assertEquals(dummy_start_reloader.args, ('pyramid.scripts.pserve.main',))
         self.assertEquals(dummy_start_reloader.kwargs, {
