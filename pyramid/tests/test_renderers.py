@@ -25,6 +25,7 @@ class TestJSON(unittest.TestCase):
         renderer = self._makeOne()(None)
         renderer({'a':1}, {'request':request})
         self.assertEqual(request.response.content_type, 'application/json')
+        self.assertEqual(request.response.charset.lower(), 'utf-8')
 
     def test_with_request_content_type_set(self):
         request = testing.DummyRequest()

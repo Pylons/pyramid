@@ -270,7 +270,7 @@ class JSON(object):
                 response = request.response
                 ct = response.content_type
                 if ct == response.default_content_type:
-                    response.content_type = 'application/json'
+                    response.content_type = 'application/json; charset=utf-8'
             default = self._make_default(request)
             return self.serializer(value, default=default, **self.kw)
 
