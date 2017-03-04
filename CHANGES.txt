@@ -3,6 +3,15 @@
 1.8.3 (unreleased)
 ==================
 
+Bug Fixes
+---------
+
+- Fix a reference cycle causing memory leaks in which the registry
+  would keep a ``Configurator`` instance alive even after the configurator
+  was discarded. Another fix was also added for the ``global_registries``
+  object in which the registry was stored in a closure preventing it from
+  being deallocated. See https://github.com/Pylons/pyramid/pull/2973
+
 Documentation Changes
 ---------------------
 
