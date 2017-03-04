@@ -257,7 +257,9 @@ class Deferred(object):
 
     @reify
     def value(self):
-        return self.func()
+        result = self.func()
+        del self.func
+        return result
 
     def resolve(self):
         return self.value
