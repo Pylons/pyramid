@@ -17,6 +17,7 @@ include documentation improvements and other minor feature changes.
 
 - :ref:`changes_1.8.1`
 - :ref:`changes_1.8.2`
+- :ref:`changes_1.8.3`
 
 Major Feature Additions
 -----------------------
