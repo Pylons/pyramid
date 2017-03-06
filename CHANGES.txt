@@ -23,6 +23,11 @@ Bug Fixes
   object in which the registry was stored in a closure preventing it from
   being deallocated. See https://github.com/Pylons/pyramid/pull/2967
 
+- Fix a bug directly invoking ``pyramid.scripts.pserve.main`` with the
+  ``--reload`` option in which ``sys.argv`` is always used in the subprocess
+  instead of the supplied ``argv``.
+  See https://github.com/Pylons/pyramid/pull/2962
+
 Deprecations
 ------------
 
