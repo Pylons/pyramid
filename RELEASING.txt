@@ -120,6 +120,8 @@ Marketing and communications
 - Edit `http://wiki.python.org/moin/WebFrameworks
   <http://wiki.python.org/moin/WebFrameworks>`_.
 
+- Edit `https://en.wikipedia.org/wiki/Pylons_project <https://en.wikipedia.org/wiki/Pylons_project>`_.
+
 - Announce to Twitter.
 
 ```
