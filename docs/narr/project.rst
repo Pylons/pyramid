@@ -52,7 +52,7 @@ Pyramid cookiecutters released under the Pylons Project differ from each other o
 These cookiecutters include:
 
 ``pyramid-cookiecutter-starter``
-    :term:`URL dispatch` for routing and :term:`Jinja2` for templating
+    :term:`URL dispatch` for routing and either :term:`Jinja2` or :term:`Chameleon` for templating
 
 ``pyramid-cookiecutter-alchemy``
     SQLite for persistent storage, :term:`SQLAlchemy` for an ORM, :term:`URL dispatch` for routing, and :term:`Jinja2` for templating.
