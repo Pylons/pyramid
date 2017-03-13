@@ -1,4 +1,6 @@
-1.7.5 (unreleased)
+.. _changes_1.7.5:
+
+1.7.5 (2017-03-12)
 ==================
 
 - HTTPException's accepts a detail kwarg that may be used to pass additional
