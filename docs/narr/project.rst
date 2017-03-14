@@ -43,7 +43,7 @@ Pyramid cookiecutters released under the Pylons Project differ from each other o
 
 - the mechanism they use to map URLs to code (:term:`URL dispatch` or :term:`traversal`)
 
-- templating libraries (:term:`Jinja2` or :term:`Chameleon`)
+- templating libraries (:term:`Jinja2`, :term:`Chameleon`, or :term:`Mako`)
 
 * `pyramid-cookiecutter-starter <https://github.com/Pylons/pyramid-cookiecutter-starter>`_
 * `pyramid-cookiecutter-alchemy <https://github.com/Pylons/pyramid-cookiecutter-alchemy>`_
@@ -52,7 +52,7 @@ Pyramid cookiecutters released under the Pylons Project differ from each other o
 These cookiecutters include:
 
 ``pyramid-cookiecutter-starter``
-    :term:`URL dispatch` for routing and either :term:`Jinja2` or :term:`Chameleon` for templating
+    :term:`URL dispatch` for routing and either :term:`Jinja2`, :term:`Chameleon`, or :term:`Mako` for templating
 
 ``pyramid-cookiecutter-alchemy``
     SQLite for persistent storage, :term:`SQLAlchemy` for an ORM, :term:`URL dispatch` for routing, and :term:`Jinja2` for templating.
@@ -98,7 +98,8 @@ If prompted for the first item, accept the default ``yes`` by hitting return.
     Select template_language:
     1 - jinja2
     2 - chameleon
-    Choose from 1, 2 [1]: 1
+    3 - mako
+    Choose from 1, 2, 3 [1]: 1
 
 We then run through the following commands.
 
