@@ -52,7 +52,8 @@ specific path information for commands and files.
         Select template_language:
         1 - jinja2
         2 - chameleon
-        Choose from 1, 2 [1]: 1
+        3 - mako
+        Choose from 1, 2, 3 [1]: 1
 
 #.  Create a :term:`virtual environment` which we'll use to install our
     application. It is important to use the same base Python interpreter
