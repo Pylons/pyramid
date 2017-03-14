@@ -523,7 +523,8 @@ If prompted for the first item, accept the default ``yes`` by hitting return.
     Select template_language:
     1 - jinja2
     2 - chameleon
-    Choose from 1, 2 [1]: 1
+    3 - mako
+    Choose from 1, 2, 3 [1]: 1
 
 We then run through the following commands.
 
