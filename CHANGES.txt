@@ -1,3 +1,17 @@
+.. _changes_1.8.4:
+
+1.8.4 (unreleased)
+==================
+
+Bug Fixes
+---------
+
+Documentation Changes
+---------------------
+
+- Updated pyramid-cookiecutter-starter prompts and description to include Mako. See https://github.com/Pylons/pyramid/pull/2982
+
+
 .. _changes_1.8.3:
 
 1.8.3 (2017-03-12)
