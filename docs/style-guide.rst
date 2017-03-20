@@ -682,7 +682,7 @@ The above code renders as follows.
 
 Out of all the ways to include parts of a file, ``pyobject`` is the most preferred option because if you change your code and add or remove lines, you don't need to adjust line numbering, whereas with ``lines`` you would have to adjust. ``start-after`` and ``end-before`` are less desirable because they depend on source code not changing. Alternatively you can insert comments into your source code to act as the delimiters, but that just adds comments that have nothing to do with the functionality of your code.
 
-Above all with includes, if you use line numbering, it's much preferred to use ``lineno-match`` over ``linenos`` with ``lineno-start`` because it "just works" without thinking and with less markup.
+Above all with includes, if you use line numbering, it's much preferred to use ``lineno-match`` over ``linenos`` with ``lineno-start`` because it "just works" without thinking and with less markup. One exception to this preference is when line numbering within an included file is altered during the course of a step-by-step tutorial and there are not multiple versions of the source files to align with the tutorial's steps.
 
 
 .. _style-guide-inline-code:
