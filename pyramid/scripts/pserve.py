@@ -150,7 +150,7 @@ class PServeCommand(object):
         try:
             items = dict(config.items('pserve'))
         except configparser.NoSectionError:
-            items = {}
+            return
 
         watch_files = aslist(items.get('watch_files', ''), flatten=False)
 
@@ -163,9 +163,30 @@ class PServeCommand(object):
                 file = os.path.join(here, file)
             self.watch_files.add(os.path.abspath(file))
 
+        # attempt to determine the url of the server
         open_url = items.get('open_url')
         if open_url:
             self.open_url = open_url
+
+    def _guess_server_url(self, filename, server_name,
+                          global_conf=None):  # pragma: no cover
+        server_name = server_name or 'main'
+        here = os.path.abspath(os.path.dirname(filename))
+        defaults = {}
+        if global_conf:
+            defaults.update(global_conf)
+        defaults['here'] = here
+
+        config = self.ConfigParser(defaults=defaults)
+        config.optionxform = str
+        config.read(filename)
+        try:
+            items = dict(config.items('server:' + server_name))
+        except configparser.NoSectionError:
+            return
+
+        if 'port' in items:
+            return 'http://127.0.0.1:{port}'.format(**items)
 
     def run(self):  # pragma: no cover
         if not self.args.config_uri:
@@ -194,6 +215,12 @@ class PServeCommand(object):
         if self.args.browser and not hupper.is_active():
             self.pserve_file_config(config_path, global_conf=vars)
             url = self.open_url
+
+            # do not guess the url if the server is sourced from a different
+            # location than the config_path
+            if not url and server_spec == app_spec:
+                url = self._guess_server_url(config_path, server_name, vars)
+
             if not url:
                 self.out('WARNING: could not determine the server\'s url to '
                          'open the browser. To fix this set the "open_url" '
