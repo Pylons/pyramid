@@ -74,11 +74,11 @@ class TestPServeCommand(unittest.TestCase):
             'a': '1',
             'here': os.path.abspath('/base'),
         })
-        self.assertEqual(inst.watch_files, [
+        self.assertEqual(inst.watch_files, set([
             os.path.abspath('/base/foo'),
             os.path.abspath('/baz'),
             os.path.abspath(os.path.join(here, '*.py')),
-        ])
+        ]))
 
     def test_reload_call_hupper_with_correct_args(self):
         from pyramid.scripts import pserve
