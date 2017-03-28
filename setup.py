@@ -13,20 +13,8 @@
 ##############################################################################
 
 import os
-import sys
-import warnings
 
 from setuptools import setup, find_packages
-
-py_version = sys.version_info[:2]
-
-if (3, 0) <= py_version < (3, 4):
-    warnings.warn(
-        'On Python 3, Pyramid only supports Python 3.4 or better',
-        UserWarning,
-    )
-elif py_version < (2, 7):
-    raise RuntimeError('On Python 2, Pyramid requires Python 2.7 or better')
 
 here = os.path.abspath(os.path.dirname(__file__))
 try:
