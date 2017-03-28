@@ -162,3 +162,44 @@ class DummyPkgResources(object):
 
     def iter_entry_points(self, name):
         return self.entry_points
+
+
+class dummy_setup_logging(object):
+    def __call__(self, config_uri, global_conf):
+        self.config_uri = config_uri
+        self.global_conf = global_conf
+
+
+class DummyLoader(object):
+    def __init__(self, settings=None, app_settings=None, app=None):
+        if not settings:
+            settings = {}
+        if not app_settings:
+            app_settings = {}
+        self.settings = settings
+        self.app_settings = app_settings
+        self.app = app
+        self.calls = []
+
+    def __call__(self, uri):
+        self.uri = uri
+        return self
+
+    def add_call(self, op, name, defaults):
+        self.calls.append({'op': op, 'name': name, 'defaults': defaults})
+
+    def get_settings(self, name=None, defaults=None):
+        self.add_call('settings', name, defaults)
+        return self.result
+
+    def get_wsgi_app(self, name=None, defaults=None):
+        self.add_call('app', name, defaults)
+        return self.app
+
+    def get_wsgi_app_settings(self, name=None, defaults=None):
+        self.add_call('app_settings', name, defaults)
+        return self.app_settings
+
+    def setup_logging(self, defaults):
+        self.add_call('logging', None, defaults)
+        self.defaults = defaults

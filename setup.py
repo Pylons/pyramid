@@ -34,10 +34,12 @@ install_requires = [
     'venusian >= 1.0a3', # ``ignore``
     'translationstring >= 0.4', # py3 compat
     'PasteDeploy >= 1.5.0', # py3 compat
+    'plaster',
     'hupper',
     ]
 
 tests_require = [
+    'plaster_pastedeploy',
     'WebTest >= 1.3.1', # py3 compat
     'zope.component >= 4.0', # py3 compat
     ]

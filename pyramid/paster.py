@@ -1,14 +1,17 @@
-import os
-
-from paste.deploy import (
-    loadapp,
-    appconfig,
-    )
-
 from pyramid.scripting import prepare
-from pyramid.scripts.common import setup_logging  # noqa, api
+from pyramid.scripts.common import get_config_loader
 
-def get_app(config_uri, name=None, options=None, loadapp=loadapp):
+def setup_logging(config_uri, global_conf=None):
+    """
+    Set up Python logging with the filename specified via ``config_uri``
+    (a string in the form ``filename#sectionname``).
+
+    Extra defaults can optionally be specified as a dict in ``global_conf``.
+    """
+    loader = get_config_loader(config_uri)
+    loader.setup_logging(global_conf)
+
+def get_app(config_uri, name=None, options=None):
     """ Return the WSGI application named ``name`` in the PasteDeploy
     config file specified by ``config_uri``.
 
@@ -18,20 +21,13 @@ def get_app(config_uri, name=None, options=None, loadapp=loadapp):
 
     If the ``name`` is None, this will attempt to parse the name from
     the ``config_uri`` string expecting the format ``inifile#name``.
-    If no name is found, the name will default to "main"."""
-    path, section = _getpathsec(config_uri, name)
-    config_name = 'config:%s' % path
-    here_dir = os.getcwd()
+    If no name is found, the name will default to "main".
 
-    app = loadapp(
-        config_name,
-        name=section,
-        relative_to=here_dir,
-        global_conf=options)
+    """
+    loader = get_config_loader(config_uri)
+    return loader.get_wsgi_app(name, options)
 
-    return app
-
-def get_appsettings(config_uri, name=None, options=None, appconfig=appconfig):
+def get_appsettings(config_uri, name=None, options=None):
     """ Return a dictionary representing the key/value pairs in an ``app``
     section within the file represented by ``config_uri``.
 
@@ -41,24 +37,11 @@ def get_appsettings(config_uri, name=None, options=None, appconfig=appconfig):
 
     If the ``name`` is None, this will attempt to parse the name from
     the ``config_uri`` string expecting the format ``inifile#name``.
-    If no name is found, the name will default to "main"."""
-    path, section = _getpathsec(config_uri, name)
-    config_name = 'config:%s' % path
-    here_dir = os.getcwd()
-    return appconfig(
-        config_name,
-        name=section,
-        relative_to=here_dir,
-        global_conf=options)
+    If no name is found, the name will default to "main".
 
-def _getpathsec(config_uri, name):
-    if '#' in config_uri:
-        path, section = config_uri.split('#', 1)
-    else:
-        path, section = config_uri, 'main'
-    if name:
-        section = name
-    return path, section
+    """
+    loader = get_config_loader(config_uri)
+    return loader.get_wsgi_app_settings(name, options)
 
 def bootstrap(config_uri, request=None, options=None):
     """ Load a WSGI application from the PasteDeploy config file specified
