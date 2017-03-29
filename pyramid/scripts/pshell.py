@@ -5,15 +5,14 @@ import sys
 import textwrap
 import pkg_resources
 
-from pyramid.compat import configparser
 from pyramid.compat import exec_
 from pyramid.util import DottedNameResolver
 from pyramid.paster import bootstrap
 
 from pyramid.settings import aslist
 
+from pyramid.scripts.common import get_config_loader
 from pyramid.scripts.common import parse_vars
-from pyramid.scripts.common import setup_logging
 
 def main(argv=sys.argv, quiet=False):
     command = PShellCommand(argv, quiet)
@@ -41,7 +40,8 @@ class PShellCommand(object):
     than one Pyramid application within it, the loader will use the
     last one.
     """
-    bootstrap = (bootstrap,)  # for testing
+    bootstrap = staticmethod(bootstrap)  # for testing
+    get_config_loader = staticmethod(get_config_loader)  # for testing
     pkg_resources = pkg_resources  # for testing
 
     parser = argparse.ArgumentParser(
@@ -78,7 +78,6 @@ class PShellCommand(object):
              "passed here.",
         )
 
-    ConfigParser = configparser.ConfigParser # testing
     default_runner = python_shell_runner # testing
 
     loaded_objects = {}
@@ -91,20 +90,13 @@ class PShellCommand(object):
         self.quiet = quiet
         self.args = self.parser.parse_args(argv[1:])
 
-    def pshell_file_config(self, filename):
-        config = self.ConfigParser()
-        config.optionxform = str
-        config.read(filename)
-        try:
-            items = config.items('pshell')
-        except configparser.NoSectionError:
-            return
-
+    def pshell_file_config(self, loader, defaults):
+        settings = loader.get_settings('pshell', defaults)
         resolver = DottedNameResolver(None)
         self.loaded_objects = {}
         self.object_help = {}
         self.setup = None
-        for k, v in items:
+        for k, v in settings.items():
             if k == 'setup':
                 self.setup = v
             elif k == 'default_shell':
@@ -124,13 +116,12 @@ class PShellCommand(object):
             self.out('Requires a config file argument')
             return 2
         config_uri = self.args.config_uri
-        config_file = config_uri.split('#', 1)[0]
-        setup_logging(config_file)
-        self.pshell_file_config(config_file)
+        config_vars = parse_vars(self.args.config_vars)
+        loader = self.get_config_loader(config_uri)
+        loader.setup_logging(config_vars)
+        self.pshell_file_config(loader, config_vars)
 
-        # bootstrap the environ
-        env = self.bootstrap[0](config_uri,
-                                options=parse_vars(self.args.config_vars))
+        env = self.bootstrap(config_uri, options=config_vars)
 
         # remove the closer from the env
         self.closer = env.pop('closer')
