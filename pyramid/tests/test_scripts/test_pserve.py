@@ -74,11 +74,37 @@ class TestPServeCommand(unittest.TestCase):
             'a': '1',
             'here': os.path.abspath('/base'),
         })
-        self.assertEqual(inst.watch_files, [
+        self.assertEqual(inst.watch_files, set([
             os.path.abspath('/base/foo'),
             os.path.abspath('/baz'),
             os.path.abspath(os.path.join(here, '*.py')),
-        ])
+        ]))
+
+    def test_config_file_finds_open_url(self):
+        inst = self._makeOne('development.ini')
+        self.config_factory.items = [(
+            'open_url', 'http://127.0.0.1:8080/',
+        )]
+        inst.pserve_file_config('/base/path.ini', global_conf={'a': '1'})
+        self.assertEqual(self.config_factory.defaults, {
+            'a': '1',
+            'here': os.path.abspath('/base'),
+        })
+        self.assertEqual(inst.open_url, 'http://127.0.0.1:8080/')
+
+    def test__guess_server_url(self):
+        inst = self._makeOne('development.ini')
+        self.config_factory.items = [(
+            'port', '8080',
+        )]
+        url = inst._guess_server_url(
+            '/base/path.ini', 'main', global_conf={'a': '1'})
+        self.assertEqual(self.config_factory.defaults, {
+            'a': '1',
+            'here': os.path.abspath('/base'),
+        })
+        self.assertEqual(self.config_factory.parser.section, 'server:main')
+        self.assertEqual(url, 'http://127.0.0.1:8080')
 
     def test_reload_call_hupper_with_correct_args(self):
         from pyramid.scripts import pserve

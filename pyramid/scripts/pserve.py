@@ -22,10 +22,6 @@ from paste.deploy import (
     loadapp,
     loadserver,
 )
-from paste.deploy.loadwsgi import (
-    SERVER,
-    loadcontext,
-)
 
 from pyramid.compat import PY2
 from pyramid.compat import configparser
@@ -87,7 +83,9 @@ class PServeCommand(object):
         '-b', '--browser',
         dest='browser',
         action='store_true',
-        help="Open a web browser to server url")
+        help=("Open a web browser to the server url. The server url is "
+              "determined from the 'open_url' setting in the 'pserve' "
+              "section of the configuration file."))
     parser.add_argument(
         '-v', '--verbose',
         default=default_verbosity,
@@ -119,6 +117,8 @@ class PServeCommand(object):
     loadapp = staticmethod(loadapp)  # testing
     loadserver = staticmethod(loadserver)  # testing
 
+    open_url = None
+
     _scheme_re = re.compile(r'^[a-z][a-z]+:', re.I)
 
     def __init__(self, argv, quiet=False):
@@ -127,7 +127,7 @@ class PServeCommand(object):
             self.args.verbose = 0
         if self.args.reload:
             self.worker_kwargs = {'argv': argv, "quiet": quiet}
-        self.watch_files = []
+        self.watch_files = set()
 
     def out(self, msg):  # pragma: no cover
         if self.args.verbose > 0:
@@ -161,7 +161,32 @@ class PServeCommand(object):
                 file = resolver.resolve(file).abspath()
             elif not os.path.isabs(file):
                 file = os.path.join(here, file)
-            self.watch_files.append(os.path.abspath(file))
+            self.watch_files.add(os.path.abspath(file))
+
+        # attempt to determine the url of the server
+        open_url = items.get('open_url')
+        if open_url:
+            self.open_url = open_url
+
+    def _guess_server_url(self, filename, server_name,
+                          global_conf=None):  # pragma: no cover
+        server_name = server_name or 'main'
+        here = os.path.abspath(os.path.dirname(filename))
+        defaults = {}
+        if global_conf:
+            defaults.update(global_conf)
+        defaults['here'] = here
+
+        config = self.ConfigParser(defaults=defaults)
+        config.optionxform = str
+        config.read(filename)
+        try:
+            items = dict(config.items('server:' + server_name))
+        except configparser.NoSectionError:
+            return
+
+        if 'port' in items:
+            return 'http://127.0.0.1:{port}'.format(**items)
 
     def run(self):  # pragma: no cover
         if not self.args.config_uri:
@@ -188,16 +213,27 @@ class PServeCommand(object):
 
         # do not open the browser on each reload so check hupper first
         if self.args.browser and not hupper.is_active():
-            def open_browser():
-                context = loadcontext(
-                    SERVER, app_spec, name=server_name, relative_to=base,
-                    global_conf=vars)
-                url = 'http://127.0.0.1:{port}/'.format(**context.config())
-                time.sleep(1)
-                webbrowser.open(url)
-            t = threading.Thread(target=open_browser)
-            t.setDaemon(True)
-            t.start()
+            self.pserve_file_config(config_path, global_conf=vars)
+            url = self.open_url
+
+            # do not guess the url if the server is sourced from a different
+            # location than the config_path
+            if not url and server_spec == app_spec:
+                url = self._guess_server_url(config_path, server_name, vars)
+
+            if not url:
+                self.out('WARNING: could not determine the server\'s url to '
+                         'open the browser. To fix this set the "open_url" '
+                         'setting in the [pserve] section of the '
+                         'configuration file.')
+
+            else:
+                def open_browser():
+                    time.sleep(1)
+                    webbrowser.open(url)
+                t = threading.Thread(target=open_browser)
+                t.setDaemon(True)
+                t.start()
 
         if self.args.reload and not hupper.is_active():
             if self.args.verbose > 1:
@@ -213,11 +249,11 @@ class PServeCommand(object):
         if config_path:
             setup_logging(config_path, global_conf=vars)
             self.pserve_file_config(config_path, global_conf=vars)
-            self.watch_files.append(config_path)
+            self.watch_files.add(config_path)
 
         if hupper.is_active():
             reloader = hupper.get_reloader()
-            reloader.watch_files(self.watch_files)
+            reloader.watch_files(list(self.watch_files))
 
         server = self.loadserver(
             server_spec, name=server_name, relative_to=base, global_conf=vars)
