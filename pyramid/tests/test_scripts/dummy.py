@@ -167,7 +167,7 @@ class DummyPkgResources(object):
 class dummy_setup_logging(object):
     def __call__(self, config_uri, global_conf):
         self.config_uri = config_uri
-        self.global_conf = global_conf
+        self.defaults = global_conf
 
 
 class DummyLoader(object):
@@ -190,7 +190,7 @@ class DummyLoader(object):
 
     def get_settings(self, name=None, defaults=None):
         self.add_call('settings', name, defaults)
-        return self.result
+        return self.settings.get(name, {})
 
     def get_wsgi_app(self, name=None, defaults=None):
         self.add_call('app', name, defaults)
