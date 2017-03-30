@@ -81,29 +81,6 @@ class DummyMultiView(object):
         self.views = [(None, view, None) for view in views]
         self.__request_attrs__ = attrs
 
-class DummyConfigParser(object):
-    def __init__(self, result, defaults=None):
-        self.result = result
-        self.defaults = defaults
-
-    def read(self, filename):
-        self.filename = filename
-
-    def items(self, section):
-        self.section = section
-        if self.result is None:
-            from pyramid.compat import configparser
-            raise configparser.NoSectionError(section)
-        return self.result
-
-class DummyConfigParserFactory(object):
-    items = None
-
-    def __call__(self, defaults=None):
-        self.defaults = defaults
-        self.parser = DummyConfigParser(self.items, defaults)
-        return self.parser
-
 class DummyCloser(object):
     def __call__(self):
         self.called = True
@@ -171,7 +148,7 @@ class dummy_setup_logging(object):
 
 
 class DummyLoader(object):
-    def __init__(self, settings=None, app_settings=None, app=None):
+    def __init__(self, settings=None, app_settings=None, app=None, server=None):
         if not settings:
             settings = {}
         if not app_settings:
@@ -179,10 +156,12 @@ class DummyLoader(object):
         self.settings = settings
         self.app_settings = app_settings
         self.app = app
+        self.server = server
         self.calls = []
 
     def __call__(self, uri):
-        self.uri = uri
+        import plaster
+        self.uri = plaster.parse_uri(uri)
         return self
 
     def add_call(self, op, name, defaults):
@@ -199,6 +178,10 @@ class DummyLoader(object):
     def get_wsgi_app_settings(self, name=None, defaults=None):
         self.add_call('app_settings', name, defaults)
         return self.app_settings
+
+    def get_wsgi_server(self, name=None, defaults=None):
+        self.add_call('server', name, defaults)
+        return self.server
 
     def setup_logging(self, defaults):
         self.add_call('logging', None, defaults)

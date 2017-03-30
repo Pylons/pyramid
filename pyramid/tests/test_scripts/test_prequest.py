@@ -33,7 +33,7 @@ class TestPRequestCommand(unittest.TestCase):
                 [('Content-Type', 'text/html; charset=UTF-8')])
         command.run()
         self.assertEqual(self._path_info, '/')
-        self.assertEqual(self.loader.uri, 'development.ini')
+        self.assertEqual(self.loader.uri.path, 'development.ini')
         self.assertEqual(self.loader.calls[0]['op'], 'logging')
         self.assertEqual(self.loader.calls[1]['op'], 'app')
         self.assertEqual(self.loader.calls[1]['name'], None)
@@ -44,7 +44,7 @@ class TestPRequestCommand(unittest.TestCase):
                 [('Content-Type', 'text/html; charset=UTF-8')])
         command.run()
         self.assertEqual(self._path_info, '/abc')
-        self.assertEqual(self.loader.uri, 'development.ini')
+        self.assertEqual(self.loader.uri.path, 'development.ini')
         self.assertEqual(self._out, ['abc'])
 
     def test_command_has_bad_config_header(self):

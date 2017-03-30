@@ -22,7 +22,7 @@ class Test_get_app(unittest.TestCase):
         result = self._callFUT(
             '/foo/bar/myapp.ini', 'myapp', options={'a': 'b'},
             _loader=loader)
-        self.assertEqual(loader.uri, '/foo/bar/myapp.ini')
+        self.assertEqual(loader.uri.path, '/foo/bar/myapp.ini')
         self.assertEqual(len(loader.calls), 1)
         self.assertEqual(loader.calls[0]['op'], 'app')
         self.assertEqual(loader.calls[0]['name'], 'myapp')
@@ -54,7 +54,7 @@ class Test_get_appsettings(unittest.TestCase):
         result = self._callFUT(
             '/foo/bar/myapp.ini', 'myapp', options={'a': 'b'},
             _loader=loader)
-        self.assertEqual(loader.uri, '/foo/bar/myapp.ini')
+        self.assertEqual(loader.uri.path, '/foo/bar/myapp.ini')
         self.assertEqual(len(loader.calls), 1)
         self.assertEqual(loader.calls[0]['op'], 'app_settings')
         self.assertEqual(loader.calls[0]['name'], 'myapp')
@@ -81,24 +81,24 @@ class Test_setup_logging(unittest.TestCase):
 
     def test_it_no_global_conf(self):
         loader = DummyLoader()
-        self._callFUT('/abc', _loader=loader)
-        self.assertEqual(loader.uri, '/abc')
+        self._callFUT('/abc.ini', _loader=loader)
+        self.assertEqual(loader.uri.path, '/abc.ini')
         self.assertEqual(len(loader.calls), 1)
         self.assertEqual(loader.calls[0]['op'], 'logging')
         self.assertEqual(loader.calls[0]['defaults'], None)
 
     def test_it_global_conf_empty(self):
         loader = DummyLoader()
-        self._callFUT('/abc', global_conf={}, _loader=loader)
-        self.assertEqual(loader.uri, '/abc')
+        self._callFUT('/abc.ini', global_conf={}, _loader=loader)
+        self.assertEqual(loader.uri.path, '/abc.ini')
         self.assertEqual(len(loader.calls), 1)
         self.assertEqual(loader.calls[0]['op'], 'logging')
         self.assertEqual(loader.calls[0]['defaults'], {})
 
     def test_it_global_conf_not_empty(self):
         loader = DummyLoader()
-        self._callFUT('/abc', global_conf={'key': 'val'}, _loader=loader)
-        self.assertEqual(loader.uri, '/abc')
+        self._callFUT('/abc.ini', global_conf={'key': 'val'}, _loader=loader)
+        self.assertEqual(loader.uri.path, '/abc.ini')
         self.assertEqual(len(loader.calls), 1)
         self.assertEqual(loader.calls[0]['op'], 'logging')
         self.assertEqual(loader.calls[0]['defaults'], {'key': 'val'})
@@ -166,13 +166,3 @@ class DummyRequest:
     def __init__(self, environ):
         self.environ = environ
         self.matchdict = {}
-
-class DummyConfigParser(object):
-    def read(self, x):
-        pass
-
-    def has_section(self, name):
-        return True
-
-class DummyConfigParserModule(object):
-    ConfigParser = DummyConfigParser
