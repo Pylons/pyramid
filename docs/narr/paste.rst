@@ -26,12 +26,7 @@ documentation, see http://pythonpaste.org/deploy/.
 PasteDeploy
 -----------
 
-:term:`PasteDeploy` is the system that Pyramid uses to allow :term:`deployment
-settings` to be specified using an ``.ini`` configuration file format.  It also
-allows the ``pserve`` command to work.  Its configuration format provides a
-convenient place to define application :term:`deployment settings` and WSGI
-server settings, and its server runner allows you to stop and start a Pyramid
-application easily.
+:term:`plaster` is the system that Pyramid uses to load settings from configuration files. The most common format for these files is an ``.ini`` format structured in a way defined by :term:`PasteDeploy`.  The format supports mechanisms to define WSGI app :term:`deployment settings`, WSGI server settings and logging. This allows the ``pserve`` command to work, allowing you to stop and start a Pyramid application easily.
 
 .. _pastedeploy_entry_points:
 
@@ -96,3 +91,8 @@ applications, servers, and :term:`middleware` defined within the configuration
 file.  The values in a ``[DEFAULT]`` section will be passed to your
 application's ``main`` function as ``global_config`` (see the reference to the
 ``main`` function in :ref:`init_py`).
+
+Alternative Configuration File Formats
+--------------------------------------
+
+It is possible to use different file formats with :app:`Pyramid` if you do not like :term:`PasteDeploy`. Under the hood all command-line scripts such as ``pserve`` and ``pshell`` pass the ``config_uri`` (e.g. ``development.ini`` or ``production.ini``) to the :term:`plaster` library which performs a lookup for an appropriate parser. For ``.ini`` files it uses PasteDeploy but you can register your own configuration formats that plaster will find instead.

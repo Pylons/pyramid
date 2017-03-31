@@ -7,7 +7,7 @@ Major Features
 - The file format used by all ``p*`` command line scripts such as ``pserve``
   and ``pshell``, as well as the ``pyramid.paster.bootstrap`` function
   is now replaceable thanks to a new dependency on
-  `plaster <http://docs.pylonsproject.org/projects/plaster/en/latest/>`.
+  `plaster <http://docs.pylonsproject.org/projects/plaster/en/latest/>`_.
 
   For now, Pyramid is still shipping with integrated support for the
   PasteDeploy INI format by depending on the ``plaster_pastedeploy`` binding.
@@ -16,12 +16,12 @@ Major Features
 
 - Added an execution policy hook to the request pipeline. An execution
   policy has the ability to control creation and execution of the request
-  objects before they enter rest of the pipeline. This means for a single
+  objects before they enter the rest of the pipeline. This means for a single
   request environ the policy may create more than one request object.
 
   The first library to use this feature is
   `pyramid_retry
-  <http://docs.pylonsproject.org/projects/pyramid-retry/en/latest/>`.
+  <http://docs.pylonsproject.org/projects/pyramid-retry/en/latest/>`_.
 
   See https://github.com/Pylons/pyramid/pull/2964
 
