@@ -133,7 +133,7 @@ The glossary file must be named ``glossary.rst``. Its content must begin with th
             Theoretically, the sound a parrot makes when four-thousand volts of electricity pass through it.
 
         pining
-            What the Norwegien Blue does when it misses its homeland, e.g., pining for the fjords.
+            What the Norwegien Blue does when it misses its homeland, in other words, pining for the fjords.
 
 The above code renders as follows.
 
@@ -144,7 +144,7 @@ The above code renders as follows.
         Theoretically, the sound a parrot makes when four-thousand volts of electricity pass through it.
 
     pining
-        What the Norwegien Blue does when it misses its homeland, e.g., pining for the fjords.
+        What the Norwegien Blue does when it misses its homeland, in other words, pining for the fjords.
 
 References to glossary terms use the ``term`` directive.
 
@@ -261,18 +261,26 @@ Grammar, spelling, and capitalization preferences
 
 Use any commercial or free professional style guide in general. Use a spell- and grammar-checker. The following table lists the preferred grammar, spelling, and capitalization of words and phrases for frequently used items in the documentation.
 
-========== =====
-Preferred  Avoid
-========== =====
-add-on     addon
-and so on  etc.
-GitHub     Github, github
-JavaScript Javascript, javascript
-plug-in    plugin
-select     check, tick (checkbox)
-such as    like
-verify     be sure
-========== =====
+============== =====
+Preferred      Avoid
+============== =====
+add-on         addon
+and so on      etc.
+for example    e.g.
+GitHub         Github, github
+in other words i.e.
+JavaScript     Javascript, javascript
+plug-in        plugin
+select         check, tick (checkbox)
+such as        like
+verify         be sure
+============== =====
+
+There are exceptions to the usage of the Latin abbreviations "etc.", "e.g.", and "i.e.".
+
+* When there are space limitations or other technical reasons.
+* The abbreviation must be confined to a parenthetical remark or footnote.
+* The abbreviations "e.g." and "i.e." should be followed by a comma.
 
 
 .. _style-guide-headings:
@@ -280,7 +288,7 @@ verify     be sure
 Headings
 ^^^^^^^^
 
-Capitalize only the first letter in a heading (sentence-case), unless other words are proper nouns or acronyms, e.g., "Pyramid" or "HTML".
+Capitalize only the first letter in a heading (sentence-case), unless other words are proper nouns or acronyms, such as "Pyramid" or "HTML".
 
 For consistent heading characters throughout the documentation, follow the guidelines stated in the `Python Developer's Guide <https://docs.python.org/devguide/documenting.html#sections>`_. Specifically:
 
