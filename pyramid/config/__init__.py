@@ -753,6 +753,11 @@ class Configurator(
         .. versionadded:: 1.2
            The ``route_prefix`` parameter.
 
+        .. versionchanged:: 1.9
+           The included function is wrapped with a call to
+           :meth:`pyramid.config.Configurator.begin` and
+           :meth:`pyramid.config.Configurator.end` while it is executed.
+
         """
         # """ <-- emacs
 
@@ -802,7 +807,11 @@ class Configurator(
                 )
             configurator.basepath = os.path.dirname(sourcefile)
             configurator.includepath = self.includepath + (spec,)
-            c(configurator)
+            self.begin()
+            try:
+                c(configurator)
+            finally:
+                self.end()
 
     def add_directive(self, name, directive, action_wrap=True):
         """
