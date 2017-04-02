@@ -817,6 +817,16 @@ pyramid.tests.test_config.dummy_include2""",
         self.assertEqual(results['root_package'], tests)
         self.assertEqual(results['package'], test_config)
 
+    def test_include_threadlocals_active(self):
+        from pyramid.tests import test_config
+        from pyramid.threadlocal import get_current_registry
+        stack = []
+        def include(config):
+            stack.append(get_current_registry())
+        config = self._makeOne()
+        config.include(include)
+        self.assertTrue(stack[0] is config.registry)
+
     def test_action_branching_kw_is_None(self):
         config = self._makeOne(autocommit=True)
         self.assertEqual(config.action('discrim'), None)
