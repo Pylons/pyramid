@@ -1569,7 +1569,7 @@ event type.
         def __call__(self, event):
             return event.request.path.startswith(self.val)
 
-Once you've created a subscriber predicate, it may registered via
+Once you've created a subscriber predicate, it may be registered via
 :meth:`pyramid.config.Configurator.add_subscriber_predicate`.  For example:
 
 .. code-block:: python
