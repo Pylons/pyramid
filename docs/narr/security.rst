@@ -780,15 +780,15 @@ and then requiring that it be present in all potentially unsafe requests.
 :app:`Pyramid` provides facilities to create and check CSRF tokens.
 
 By default :app:`Pyramid` comes with a session-based CSRF implementation
-:class:`pyramid.csrf.SessionCSRF`. To use it, you must first enable
+:class:`pyramid.csrf.SessionCSRFStoragePolicy`. To use it, you must first enable
 a :term:`session factory` as described in
 :ref:`using_the_default_session_factory` or
 :ref:`using_alternate_session_factories`. Alternatively, you can use
-a cookie-based implementation :class:`pyramid.csrf.CookieCSRF` which gives
+a cookie-based implementation :class:`pyramid.csrf.CookieCSRFStoragePolicy` which gives
 some additional flexibility as it does not require a session for each user.
 You can also define your own implementation of
 :class:`pyramid.interfaces.ICSRFStoragePolicy` and register it with the
-:meth:`pyramid.config.Configurator.set_default_csrf_options` directive.
+:meth:`pyramid.config.Configurator.set_csrf_storage_policy` directive.
 
 For example:
 
@@ -797,7 +797,7 @@ For example:
    from pyramid.config import Configurator
 
    config = Configurator()
-   config.set_default_csrf_options(implementation=MyCustomCSRFPolicy())
+   config.set_csrf_storage_policy(MyCustomCSRFPolicy())
 
 .. index::
    single: csrf.get_csrf_token

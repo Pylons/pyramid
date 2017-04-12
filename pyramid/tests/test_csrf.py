@@ -22,7 +22,7 @@ class Test_get_csrf_token(unittest.TestCase):
             self._callFUT(request)
 
     def test_success(self):
-        self.config.set_default_csrf_options(implementation=DummyCSRF())
+        self.config.set_csrf_storage_policy(DummyCSRF())
         request = testing.DummyRequest()
 
         csrf_token = self._callFUT(request)
@@ -45,7 +45,7 @@ class Test_new_csrf_token(unittest.TestCase):
             self._callFUT(request)
 
     def test_success(self):
-        self.config.set_default_csrf_options(implementation=DummyCSRF())
+        self.config.set_csrf_storage_policy(DummyCSRF())
         request = testing.DummyRequest()
 
         csrf_token = self._callFUT(request)
@@ -53,57 +53,7 @@ class Test_new_csrf_token(unittest.TestCase):
         self.assertEquals(csrf_token, 'e5e9e30a08b34ff9842ff7d2b958c14b')
 
 
-class Test_csrf_token_template_global(unittest.TestCase):
-    def setUp(self):
-        self.config = testing.setUp()
-
-    def _callFUT(self, *args, **kwargs):
-        from pyramid.csrf import csrf_token_template_global
-        return csrf_token_template_global(*args, **kwargs)
-
-    def test_event_is_missing_request(self):
-        event = BeforeRender({}, {})
-
-        self._callFUT(event)
-
-        self.assertNotIn('get_csrf_token', event)
-
-    def test_request_is_missing_registry(self):
-        request = DummyRequest(registry=None)
-        del request.registry
-        del request.__class__.registry
-        event = BeforeRender({'request': request}, {})
-
-        self._callFUT(event)
-
-        self.assertNotIn('get_csrf_token', event)
-
-    def test_csrf_utility_not_registered(self):
-        request = testing.DummyRequest()
-        event = BeforeRender({'request': request}, {})
-
-        with self.assertRaises(ComponentLookupError):
-            self._callFUT(event)
-
-    def test_csrf_token_passed_to_template(self):
-        config = Configurator()
-        config.set_default_csrf_options(implementation=DummyCSRF())
-        config.commit()
-
-        request = testing.DummyRequest()
-        request.registry = config.registry
-
-        before = BeforeRender({'request': request}, {})
-        config.registry.notify(before)
-
-        self.assertIn('get_csrf_token', before)
-        self.assertEqual(
-            before['get_csrf_token'](),
-            '02821185e4c94269bdc38e6eeae0a2f8'
-        )
-
-
-class TestSessionCSRF(unittest.TestCase):
+class TestSessionCSRFStoragePolicy(unittest.TestCase):
     class MockSession(object):
         def new_csrf_token(self):
             return 'e5e9e30a08b34ff9842ff7d2b958c14b'
@@ -112,20 +62,20 @@ class TestSessionCSRF(unittest.TestCase):
             return '02821185e4c94269bdc38e6eeae0a2f8'
 
     def _makeOne(self):
-        from pyramid.csrf import SessionCSRF
-        return SessionCSRF()
+        from pyramid.csrf import SessionCSRFStoragePolicy
+        return SessionCSRFStoragePolicy()
 
     def test_register_session_csrf_policy(self):
-        from pyramid.csrf import SessionCSRF
+        from pyramid.csrf import SessionCSRFStoragePolicy
         from pyramid.interfaces import ICSRFStoragePolicy
 
         config = Configurator()
-        config.set_default_csrf_options(implementation=self._makeOne())
+        config.set_csrf_storage_policy(self._makeOne())
         config.commit()
 
         policy = config.registry.queryUtility(ICSRFStoragePolicy)
 
-        self.assertTrue(isinstance(policy, SessionCSRF))
+        self.assertTrue(isinstance(policy, SessionCSRFStoragePolicy))
 
     def test_session_csrf_implementation_delegates_to_session(self):
         policy = self._makeOne()
@@ -156,22 +106,22 @@ class TestSessionCSRF(unittest.TestCase):
         self.assertTrue(result)
 
 
-class TestCookieCSRF(unittest.TestCase):
+class TestCookieCSRFStoragePolicy(unittest.TestCase):
     def _makeOne(self):
-        from pyramid.csrf import CookieCSRF
-        return CookieCSRF()
+        from pyramid.csrf import CookieCSRFStoragePolicy
+        return CookieCSRFStoragePolicy()
 
     def test_register_cookie_csrf_policy(self):
-        from pyramid.csrf import CookieCSRF
+        from pyramid.csrf import CookieCSRFStoragePolicy
         from pyramid.interfaces import ICSRFStoragePolicy
 
         config = Configurator()
-        config.set_default_csrf_options(implementation=self._makeOne())
+        config.set_csrf_storage_policy(self._makeOne())
         config.commit()
 
         policy = config.registry.queryUtility(ICSRFStoragePolicy)
 
-        self.assertTrue(isinstance(policy, CookieCSRF))
+        self.assertTrue(isinstance(policy, CookieCSRFStoragePolicy))
 
     def test_get_cookie_csrf_with_no_existing_cookie_sets_cookies(self):
         response = MockResponse()
@@ -179,20 +129,9 @@ class TestCookieCSRF(unittest.TestCase):
 
         policy = self._makeOne()
         token = policy.get_csrf_token(request)
-
         self.assertEqual(
-            response.called_args,
-            ('csrf_token', token),
-        )
-        self.assertEqual(
-            response.called_kwargs,
-            {
-                'secure': False,
-                'httponly': False,
-                'domain': None,
-                'path': '/',
-                'overwrite': True
-            }
+            response.headerlist,
+            [('Set-Cookie', 'csrf_token={}; Path=/'.format(token))]
         )
 
     def test_existing_cookie_csrf_does_not_set_cookie(self):
@@ -208,12 +147,8 @@ class TestCookieCSRF(unittest.TestCase):
             'e6f325fee5974f3da4315a8ccf4513d2'
         )
         self.assertEqual(
-            response.called_args,
-            (),
-        )
-        self.assertEqual(
-            response.called_kwargs,
-            {}
+            response.headerlist,
+            [],
         )
 
     def test_new_cookie_csrf_with_existing_cookie_sets_cookies(self):
@@ -223,20 +158,9 @@ class TestCookieCSRF(unittest.TestCase):
 
         policy = self._makeOne()
         token = policy.new_csrf_token(request)
-
         self.assertEqual(
-            response.called_args,
-            ('csrf_token', token),
-        )
-        self.assertEqual(
-            response.called_kwargs,
-            {
-                'secure': False,
-                'httponly': False,
-                'domain': None,
-                'path': '/',
-                'overwrite': True
-            }
+            response.headerlist,
+            [('Set-Cookie', 'csrf_token={}; Path=/'.format(token))]
         )
 
     def test_verifying_token_invalid_token(self):
@@ -264,7 +188,7 @@ class Test_check_csrf_token(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp()
 
-        # set up CSRF (this will also register SessionCSRF policy)
+        # set up CSRF (this will also register SessionCSRFStoragePolicy policy)
         self.config.set_default_csrf_options(require_csrf=False)
 
     def _callFUT(self, *args, **kwargs):
@@ -446,13 +370,7 @@ class DummyRequest(object):
 
 class MockResponse(object):
     def __init__(self):
-        self.called_args = ()
-        self.called_kwargs = {}
-
-    def set_cookie(self, *args, **kwargs):
-        self.called_args = args
-        self.called_kwargs = kwargs
-        return
+        self.headerlist = []
 
 
 class DummyCSRF(object):

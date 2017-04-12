@@ -5,10 +5,10 @@
 
 .. automodule:: pyramid.csrf
 
-  .. autoclass:: SessionCSRF
+  .. autoclass:: SessionCSRFStoragePolicy
      :members:
 
-  .. autoclass:: CookieCSRF
+  .. autoclass:: CookieCSRFStoragePolicy
      :members:
 
   .. autofunction:: get_csrf_token

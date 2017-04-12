@@ -263,6 +263,7 @@ Pre-defined Phases
 - :meth:`pyramid.config.Configurator.override_asset`
 - :meth:`pyramid.config.Configurator.set_authorization_policy`
 - :meth:`pyramid.config.Configurator.set_default_csrf_options`
+- :meth:`pyramid.config.Configurator.set_csrf_storage_policy`
 - :meth:`pyramid.config.Configurator.set_default_permission`
 - :meth:`pyramid.config.Configurator.set_view_mapper`
 

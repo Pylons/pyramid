@@ -1,7 +1,10 @@
-from functools import partial
 import uuid
 
+from webob.cookies import CookieProfile
 from zope.interface import implementer
+
+
+from pyramid.authentication import _SimpleSerializer
 
 from pyramid.compat import (
     urlparse,
@@ -20,7 +23,7 @@ from pyramid.util import (
 
 
 @implementer(ICSRFStoragePolicy)
-class SessionCSRF(object):
+class SessionCSRFStoragePolicy(object):
     """ The default CSRF implementation, which mimics the behavior from older
     versions of Pyramid. The ``new_csrf_token`` and ``get_csrf_token`` methods
     are indirected to the underlying session implementation.
@@ -49,7 +52,7 @@ class SessionCSRF(object):
         )
 
 @implementer(ICSRFStoragePolicy)
-class CookieCSRF(object):
+class CookieCSRFStoragePolicy(object):
     """ An alternative CSRF implementation that stores its information in
     unauthenticated cookies, known as the 'Double Submit Cookie' method in the
     OWASP CSRF guidelines. This gives some additional flexibility with regards
@@ -60,25 +63,25 @@ class CookieCSRF(object):
     """
 
     def __init__(self, cookie_name='csrf_token', secure=False, httponly=False,
-                 domain=None, path='/'):
-        self.cookie_name = cookie_name
-        self.secure = secure
-        self.httponly = httponly
+                 domain=None, max_age=None, path='/'):
+        serializer = _SimpleSerializer()
+        self.cookie_profile = CookieProfile(
+            cookie_name=cookie_name,
+            secure=secure,
+            max_age=max_age,
+            httponly=httponly,
+            path=path,
+            serializer=serializer
+        )
         self.domain = domain
-        self.path = path
 
     def new_csrf_token(self, request):
         """ Sets a new CSRF token into the request and returns it. """
         token = uuid.uuid4().hex
         def set_cookie(request, response):
-            response.set_cookie(
-                self.cookie_name,
+            self.cookie_profile.set_cookies(
+                response,
                 token,
-                httponly=self.httponly,
-                secure=self.secure,
-                domain=self.domain,
-                path=self.path,
-                overwrite=True,
             )
         request.add_response_callback(set_cookie)
         return token
@@ -86,7 +89,8 @@ class CookieCSRF(object):
     def get_csrf_token(self, request):
         """ Returns the currently active CSRF token by checking the cookies
         sent with the current request."""
-        token = request.cookies.get(self.cookie_name)
+        bound_cookies = self.cookie_profile.bind(request)
+        token = bound_cookies.get_value()
         if not token:
             token = self.new_csrf_token(request)
         return token
@@ -99,18 +103,6 @@ class CookieCSRF(object):
             bytes_(expected, 'ascii'),
             bytes_(supplied_token, 'ascii'),
         )
-
-
-def csrf_token_template_global(event):
-    request = event.get('request', None)
-    try:
-        registry = request.registry
-    except AttributeError:
-        return
-    else:
-        csrf = registry.getUtility(ICSRFStoragePolicy)
-        event['get_csrf_token'] = partial(csrf.get_csrf_token, request)
-
 
 def get_csrf_token(request):
     """ Get the currently active CSRF token for the request passed, generating
@@ -188,9 +180,9 @@ def check_csrf_token(request,
     if policy is None:
         # There is no policy set, but we are trying to validate a CSRF token
         # This means explicit validation has been asked for without configuring
-        # the CSRF implementation. Fall back to SessionCSRF as that is the
+        # the CSRF implementation. Fall back to SessionCSRFStoragePolicy as that is the
         # default
-        policy = SessionCSRF()
+        policy = SessionCSRFStoragePolicy()
     if not policy.check_csrf_token(request, supplied_token):
         if raises:
             raise BadCSRFToken('check_csrf_token(): Invalid token')

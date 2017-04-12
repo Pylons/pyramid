@@ -10,15 +10,17 @@ from pyramid.interfaces import (
     PHASE2_CONFIG,
     )
 
-from pyramid.csrf import csrf_token_template_global
-from pyramid.csrf import SessionCSRF
-from pyramid.events import BeforeRender
+from pyramid.csrf import SessionCSRFStoragePolicy
 from pyramid.exceptions import ConfigurationError
 from pyramid.util import action_method
 from pyramid.util import as_sorted_tuple
 
 
 class SecurityConfiguratorMixin(object):
+
+    def add_default_security(self):
+        self.set_csrf_storage_policy(SessionCSRFStoragePolicy())
+
     @action_method
     def set_authentication_policy(self, policy):
         """ Override the :app:`Pyramid` :term:`authentication policy` in the
@@ -170,7 +172,6 @@ class SecurityConfiguratorMixin(object):
     @action_method
     def set_default_csrf_options(
         self,
-        implementation=None,
         require_csrf=True,
         token='csrf_token',
         header='X-CSRF-Token',
@@ -179,10 +180,6 @@ class SecurityConfiguratorMixin(object):
     ):
         """
         Set the default CSRF options used by subsequent view registrations.
-
-        ``implementation`` is a class that implements the
-        :meth:`pyramid.interfaces.ICSRFStoragePolicy` interface that will be used for all
-        CSRF functionality. Default: :class:`pyramid.csrf.SessionCSRF`.
 
         ``require_csrf`` controls whether CSRF checks will be automatically
         enabled on each view in the application. This value is used as the
@@ -217,10 +214,7 @@ class SecurityConfiguratorMixin(object):
         options = DefaultCSRFOptions(
             require_csrf, token, header, safe_methods, callback,
         )
-        if implementation is None:
-            implementation = SessionCSRF()
         def register():
-            self.registry.registerUtility(implementation, ICSRFStoragePolicy)
             self.registry.registerUtility(options, IDefaultCSRFOptions)
         intr = self.introspectable('default csrf view options',
                                    None,
@@ -232,9 +226,22 @@ class SecurityConfiguratorMixin(object):
         intr['safe_methods'] = as_sorted_tuple(safe_methods)
         intr['callback'] = callback
 
-        self.add_subscriber(csrf_token_template_global, [BeforeRender])
         self.action(IDefaultCSRFOptions, register, order=PHASE1_CONFIG,
                     introspectables=(intr,))
+
+    @action_method
+    def set_csrf_storage_policy(self, policy):
+        """
+        Set the CSRF storage policy used by subsequent view registrations.
+
+        ``policy`` is a class that implements the
+        :meth:`pyramid.interfaces.ICSRFStoragePolicy` interface that will be used for all
+        CSRF functionality.
+        """
+        def register():
+            self.registry.registerUtility(policy, ICSRFStoragePolicy)
+
+        self.action(ICSRFStoragePolicy, register, order=PHASE1_CONFIG)
 
 
 @implementer(IDefaultCSRFOptions)
