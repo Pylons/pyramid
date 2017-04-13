@@ -141,6 +141,12 @@ Backward Incompatibilities
   (e.g. ``request.registry.settings.foo``). This was deprecated in Pyramid 1.2.
   See https://github.com/Pylons/pyramid/pull/2823
 
+- Added a new ``callback`` option to ``config.set_default_csrf_options`` which
+  can be used to determine per-request whether CSRF checking should be enabled
+  to allow for a mix authentication methods. Only cookie-based methods
+  generally require CSRF checking.
+  See https://github.com/Pylons/pyramid/pull/2778
+
 Features
 --------
 
