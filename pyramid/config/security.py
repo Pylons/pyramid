@@ -192,6 +192,8 @@ class SecurityConfiguratorMixin(object):
         never be automatically checked for CSRF tokens.
         Default: ``('GET', 'HEAD', 'OPTIONS', TRACE')``.
 
+        .. versionadded:: 1.7
+
         """
         options = DefaultCSRFOptions(require_csrf, token, header, safe_methods)
         def register():
