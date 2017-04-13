@@ -203,6 +203,11 @@ class SecurityConfiguratorMixin(object):
         need to send the ``X-CSRF-Token`` header. The callback is only tested
         for non-safe methods as defined by ``safe_methods``.
 
+        .. versionadded:: 1.7
+
+        .. versionchanged:: 1.8
+           Added the ``callback`` option.
+
         """
         options = DefaultCSRFOptions(
             require_csrf, token, header, safe_methods, callback,
