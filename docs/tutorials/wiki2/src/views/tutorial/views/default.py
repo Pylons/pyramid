@@ -1,4 +1,4 @@
-import html
+from pyramid.compat import escape
 import re
 from docutils.core import publish_parts
 
@@ -31,10 +31,10 @@ def view_page(request):
         exists = request.dbsession.query(Page).filter_by(name=word).all()
         if exists:
             view_url = request.route_url('view_page', pagename=word)
-            return '<a href="%s">%s</a>' % (view_url, html.escape(word))
+            return '<a href="%s">%s</a>' % (view_url, escape(word))
         else:
             add_url = request.route_url('add_page', pagename=word)
-            return '<a href="%s">%s</a>' % (add_url, html.escape(word))
+            return '<a href="%s">%s</a>' % (add_url, escape(word))
 
     content = publish_parts(page.data, writer_name='html')['html_body']
     content = wikiwords.sub(add_link, content)
