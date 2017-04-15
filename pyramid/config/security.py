@@ -200,8 +200,13 @@ class SecurityConfiguratorMixin(object):
         are not subject to CSRF attacks. For example, if a request is
         authenticated using the ``Authorization`` header instead of a cookie,
         this may return ``False`` for that request so that clients do not
-        need to send the ``X-CSRF-Token` header. The callback is only tested
+        need to send the ``X-CSRF-Token`` header. The callback is only tested
         for non-safe methods as defined by ``safe_methods``.
+
+        .. versionadded:: 1.7
+
+        .. versionchanged:: 1.8
+           Added the ``callback`` option.
 
         """
         options = DefaultCSRFOptions(
