@@ -1032,7 +1032,7 @@ class ViewsConfiguratorMixin(object):
 
                 # XXX we could try to be more efficient here and register
                 # a non-secured view for a multiview if none of the
-                # multiview's consituent views have a permission
+                # multiview's constituent views have a permission
                 # associated with them, but this code is getting pretty
                 # rough already
                 if is_multiview:
