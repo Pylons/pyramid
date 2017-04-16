@@ -51,7 +51,7 @@ class TestAssetsConfiguratorMixin(unittest.TestCase):
         self.assertEqual(override.path, 'templates/foo.pt')
         source = override.source
         self.assertTrue(isinstance(source, PackageAssetSource))
-        self.assertEqual(source.package, subpackage)
+        self.assertEqual(source.package, subpackage.__name__)
         self.assertEqual(source.prefix, 'templates/bar.pt')
 
         resource_name = ''
@@ -74,7 +74,7 @@ class TestAssetsConfiguratorMixin(unittest.TestCase):
         self.assertEqual(override.path, '')
         source = override.source
         self.assertTrue(isinstance(source, PackageAssetSource))
-        self.assertEqual(source.package, subpackage)
+        self.assertEqual(source.package, subpackage.__name__)
         self.assertEqual(source.prefix, '')
 
         resource_name = 'templates/bar.pt'
@@ -97,7 +97,7 @@ class TestAssetsConfiguratorMixin(unittest.TestCase):
         self.assertEqual(override.path, 'templates/')
         source = override.source
         self.assertTrue(isinstance(source, PackageAssetSource))
-        self.assertEqual(source.package, subpackage)
+        self.assertEqual(source.package, subpackage.__name__)
         self.assertEqual(source.prefix, 'templates/')
 
         resource_name = 'bar.pt'
@@ -120,7 +120,7 @@ class TestAssetsConfiguratorMixin(unittest.TestCase):
         self.assertEqual(override.path, 'templates/')
         source = override.source
         self.assertTrue(isinstance(source, PackageAssetSource))
-        self.assertEqual(source.package, subpackage)
+        self.assertEqual(source.package, subpackage.__name__)
         self.assertEqual(source.prefix, '')
 
         resource_name = 'templates/bar.pt'
@@ -143,7 +143,7 @@ class TestAssetsConfiguratorMixin(unittest.TestCase):
         self.assertEqual(override.path, '')
         source = override.source
         self.assertTrue(isinstance(source, PackageAssetSource))
-        self.assertEqual(source.package, subpackage)
+        self.assertEqual(source.package, subpackage.__name__)
         self.assertEqual(source.prefix, 'templates/')
 
         resource_name = 'bar.pt'
