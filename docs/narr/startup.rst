@@ -132,7 +132,7 @@ Here's a high-level time-ordered overview of what happens when you press
 #. ``pserve`` starts the WSGI *server* defined within the ``[server:main]``
    section.  In our case, this is the Waitress server (``use =
    egg:waitress#main``), and it will listen on all interfaces on port 6543
-   for both IPv4 and IPv6 (``listen = 127.0.0.1:6543 [::1]:6543``). The server
+   for both IPv4 and IPv6 (``listen = localhost:6543``). The server
    code itself is what prints ``serving on http://127.0.0.1:6543``. The server
    serves the application, and the application is running, waiting to receive requests.
 
