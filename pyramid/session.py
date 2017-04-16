@@ -11,6 +11,7 @@ from zope.interface import implementer
 from webob.cookies import SignedSerializer
 
 from pyramid.compat import (
+    json,
     pickle,
     PY2,
     text_,
@@ -273,6 +274,16 @@ class PickleSerializer(object):
     def dumps(self, appstruct):
         """Accept a Python object and return bytes."""
         return pickle.dumps(appstruct, self.protocol)
+
+class JSONSerializer(object):
+    """ A Webob cookie serializer that uses the JSON protocol to dump supported 
+    Python objects to the JSON equivalent."""
+    _compact = (',', ':')
+    def loads(self, bstruct):
+        return json.loads(text_(bstruct))
+
+    def dumps(self, objstruct):
+        return bytes_(json.dumps(objstruct, separators=self._compact))
 
 def BaseCookieSessionFactory(
     serializer,
