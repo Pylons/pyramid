@@ -18,6 +18,7 @@ from pyramid.interfaces import (
     )
 
 from pyramid.threadlocal import get_current_registry
+from pyramid.settings import aslist
 
 TranslationString = TranslationString  # PyFlakes
 TranslationStringFactory = TranslationStringFactory  # PyFlakes
@@ -135,11 +136,44 @@ def default_locale_negotiator(request):
       :term:`default locale name` should be used.)
     """
     name = '_LOCALE_'
+
+    # TODO: this needs to be moved to Configurator
+    try:
+        registry = request.registry
+    except AttributeError:
+        registry = get_current_registry()
+        
+    available_languages = dict(
+        [
+            i.split(None, maxsplit=1)
+            for i in aslist(
+                registry.settings.get(
+                    'pyramid.available_languages',
+                    []
+                ),
+                flatten=False
+            )
+        ]
+    )
+
     locale_name = getattr(request, name, None)
     if locale_name is None:
         locale_name = request.params.get(name)
         if locale_name is None:
             locale_name = request.cookies.get(name)
+
+    if len(available_languages) > 0 and locale_name not in available_languages:
+        locale_name = None
+
+    # try matching HTTP Accept-Language request header
+    if locale_name is None:
+        try:
+            locale_name = request.accept_language.best_match(
+                available_languages
+            )
+        except AttributeError:
+            pass
+
     return locale_name
 
 def negotiate_locale_name(request):
