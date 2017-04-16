@@ -3,6 +3,14 @@
 # http://docs.pylonsproject.org/projects/pyramid/en/{{pyramid_docs_branch}}/narr/environment.html
 ###
 
+###
+# SQLAlchemy url is used by both the app:main section and the alembic section and thus is placed into
+# the DEFAULT section
+###
+
+[DEFAULT]
+sqlalchemy.url = sqlite:///%(here)s/{{project}}.sqlite
+
 [app:main]
 use = egg:{{project}}
 
@@ -12,11 +20,16 @@ pyramid.debug_notfound = false
 pyramid.debug_routematch = false
 pyramid.default_locale_name = en
 
-sqlalchemy.url = sqlite:///%(here)s/{{project}}.sqlite
-
 [server:main]
 use = egg:waitress#main
 listen = *:6543
+
+###
+# alembic configuration
+###
+
+[alembic]
+script_location = %(here)s/{{package}}/alembic
 
 ###
 # logging configuration
