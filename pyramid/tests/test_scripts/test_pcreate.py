@@ -137,6 +137,38 @@ class TestPCreateCommand(unittest.TestCase):
             {'project': 'Distro', 'egg': 'Distro', 'package': 'distro',
              'pyramid_version': '0.1', 'pyramid_docs_branch':'0.1-branch'})
 
+    def test_known_scaffold_absolute_path(self):
+        import os
+        path = os.path.abspath('Distro')
+        cmd = self._makeOne('-s', 'dummy', path)
+        scaffold = DummyScaffold('dummy')
+        cmd.scaffolds = [scaffold]
+        result = cmd.run()
+        self.assertEqual(result, True)
+        self.assertEqual(
+            scaffold.output_dir,
+            os.path.normpath(os.path.join(os.getcwd(), 'Distro'))
+            )
+        self.assertEqual(
+            scaffold.vars,
+            {'project': 'Distro', 'egg': 'Distro', 'package': 'distro'})
+
+    def test_known_scaffold_absolute_path(self):
+        import os
+        path = os.path.abspath('Distro')
+        cmd = self._makeOne('-s', 'dummy', path)
+        scaffold = DummyScaffold('dummy')
+        cmd.scaffolds = [scaffold]
+        result = cmd.run()
+        self.assertEqual(result, True)
+        self.assertEqual(
+            scaffold.output_dir,
+            os.path.normpath(os.path.join(os.getcwd(), 'Distro'))
+            )
+        self.assertEqual(
+            scaffold.vars,
+            {'project': 'Distro', 'egg': 'Distro', 'package': 'distro'})
+
     def test_known_scaffold_multiple_rendered(self):
         import os
         cmd = self._makeOne('-s', 'dummy1', '-s', 'dummy2', 'Distro')
