@@ -719,7 +719,7 @@ object that implements the following interface:
 .. code-block:: python
     :linenos:
 
-    class IAuthorizationPolicy(object):
+    class AuthorizationPolicy(object):
         """ An object representing a Pyramid authorization policy. """
         def permits(self, context, principals, permission):
             """ Return ``True`` if any of the ``principals`` is allowed the
