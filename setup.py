@@ -43,6 +43,9 @@ tests_require = [
     ]
 
 
+if py_version == (2, 6):
+    tests_require.append('ordereddict')
+
 docs_extras = [
     'Sphinx >= 1.3.5',
     'docutils',
