@@ -1021,23 +1021,38 @@ class SessionAuthenticationPolicy(CallbackAuthenticationPolicy):
         steps.  The output from debugging is useful for reporting to maillist
         or IRC channels when asking for support.
 
+    ``invalidate``
+
+        Default: ``False``. If ``invalidate`` is ``True``, every call to the
+        ``remember`` or ``forget`` methods will invalidate session first.
+        This is considered as best practice and recommended by OWASP.
+
     """
 
-    def __init__(self, prefix='auth.', callback=None, debug=False):
+    def __init__(self, prefix='auth.', callback=None, debug=False,
+        invalidate=False):
+
         self.callback = callback
         self.prefix = prefix or ''
         self.userid_key = prefix + 'userid'
         self.debug = debug
+        self.invalidate = invalidate
 
     def remember(self, request, userid, **kw):
         """ Store a userid in the session."""
+        if self.invalidate:
+            request.session.invalidate()
+
         request.session[self.userid_key] = userid
         return []
 
     def forget(self, request):
         """ Remove the stored userid from the session."""
         if self.userid_key in request.session:
-            del request.session[self.userid_key]
+            if self.invalidate:
+                request.session.invalidate()
+            else:
+                del request.session[self.userid_key]
         return []
 
     def unauthenticated_userid(self, request):
