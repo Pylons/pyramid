@@ -60,7 +60,7 @@ def _getpathsec(config_uri, name):
         section = name
     return path, section
 
-def bootstrap(config_uri, request=None, options=None):
+def bootstrap(config_uri, request=None, options=None, name=None):
     """ Load a WSGI application from the PasteDeploy config file specified
     by ``config_uri``. The environment will be configured as if it is
     currently serving ``request``, leaving a natural environment in place
@@ -121,7 +121,7 @@ def bootstrap(config_uri, request=None, options=None):
        Added the ability to use the return value as a context manager.
 
     """
-    app = get_app(config_uri, options=options)
+    app = get_app(config_uri, name=name, options=options)
     env = prepare(request)
     env['app'] = app
     return env
