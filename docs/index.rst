@@ -179,6 +179,14 @@ Comprehensive reference material for every public API exposed by
    pscripts/*
 
 
+Quick reference
+===============
+
+.. toctree::
+   :maxdepth: 1
+
+   quickref
+
 Change History
 ==============
 
