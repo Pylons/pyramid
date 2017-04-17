@@ -16,7 +16,7 @@ to send log messages to loggers that you've configured.
    scaffold which does not create these files, the configuration information in
    this chapter may not be applicable.
 
-.. index:
+.. index::
    pair: settings; logging
    pair: .ini; logging
    pair: logging; configuration
