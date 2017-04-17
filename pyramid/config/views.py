@@ -913,7 +913,7 @@ class ViewsConfiguratorMixin(object):
 
             # A multiviews is a set of views which are registered for
             # exactly the same context type/request type/name triad.  Each
-            # consituent view in a multiview differs only by the
+            # constituent view in a multiview differs only by the
             # predicates which it possesses.
 
             # To find a previously registered view for a context
