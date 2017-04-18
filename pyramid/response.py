@@ -92,7 +92,10 @@ class FileIter(object):
         return self
 
     def next(self):
-        val = self.file.read(self.block_size)
+        val = ''
+        if self.block_size > 0:
+            # If the client requests an empty or malformed range
+            val = self.file.read(self.block_size)
         if not val:
             raise StopIteration
         return val
