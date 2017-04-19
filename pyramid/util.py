@@ -35,12 +35,6 @@ class DottedNameResolver(_DottedNameResolver):
     def __init__(self, package=None): # default to package = None for bw compat
         _DottedNameResolver.__init__(self, package)
 
-def is_string_or_iterable(v):
-    if isinstance(v, string_types):
-        return True
-    if hasattr(v, '__iter__'):
-        return True
-
 def as_sorted_tuple(val):
     if not is_nonstr_iter(val):
         val = (val,)

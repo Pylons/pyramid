@@ -20,6 +20,7 @@ from pyramid.compat import (
     iteritems_,
     )
 
+from pyramid.events import NewResponse
 from pyramid.decorator import reify
 from pyramid.i18n import LocalizerRequestMixin
 from pyramid.response import Response, _get_response_factory
@@ -332,3 +333,12 @@ def apply_request_extensions(request, extensions=None):
 
         InstancePropertyHelper.apply_properties(
             request, extensions.descriptors)
+
+def _execute_response_callbacks(request, response):
+    """ Execute response callbacks and emit a NewResponse event."""
+    registry = request.registry
+    if getattr(request, 'response_callbacks', False):
+        request._process_response_callbacks(response)
+
+    if registry.has_listeners:
+        registry.notify(NewResponse(request, response))

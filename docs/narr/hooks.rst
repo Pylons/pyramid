@@ -1249,6 +1249,7 @@ very last tween factory added) as its request handler function.  For example:
 The above example will generate an implicit tween chain that looks like this::
 
     INGRESS (implicit)
+    pyramid.tweens.response_callbacks_tween_factory (implicit)
     myapp.tween_factory2
     myapp.tween_factory1
     pyramid.tweens.excview_tween_factory (implicit)
@@ -1276,6 +1277,7 @@ Allowable values for ``under`` or ``over`` (or both) are:
 
 - one of the constants :attr:`pyramid.tweens.MAIN`,
   :attr:`pyramid.tweens.INGRESS`, or :attr:`pyramid.tweens.EXCVIEW`, or
+  :attr:`pyramid.tweens.RESPONSE_CALLBACKS`, or
 
 - an iterable of any combination of the above. This allows the user to specify
   fallbacks if the desired tween is not included, as well as compatibility
@@ -1296,7 +1298,8 @@ order) the main Pyramid request handler.
 
    import pyramid.tweens
 
-   config.add_tween('myapp.tween_factory', over=pyramid.tweens.MAIN)
+   config.add_tween('myapp.tween_factory',
+                    under=pyramid.tweens.EXCVIEW, over=pyramid.tweens.MAIN)
 
 The above example will generate an implicit tween chain that looks like this::
 
@@ -1315,7 +1318,7 @@ factory "above" the main handler but "below" a separately added tween factory:
    import pyramid.tweens
 
    config.add_tween('myapp.tween_factory1',
-                    over=pyramid.tweens.MAIN)
+                    under=pyramid.tweens.EXCVIEW, over=pyramid.tweens.MAIN)
    config.add_tween('myapp.tween_factory2',
                     over=pyramid.tweens.MAIN,
                     under='myapp.tween_factory1')
@@ -1328,8 +1331,12 @@ The above example will generate an implicit tween chain that looks like this::
     myapp.tween_factory2
     MAIN (implicit)
 
-Specifying neither ``over`` nor ``under`` is equivalent to specifying
-``under=INGRESS``.
+The default value for ``over`` is :attr:`pyramid.tweens.EXCVIEW` and ``under``
+is :attr:`pyramid.tweens.RESPONSE_CALLBACKS`. This places the tween somewhere
+between the two in the tween ordering. If the tween should be placed elsewhere,
+such as under ``EXCVIEW``, then you MUST also specify ``over`` to
+something later in the order (such as ``MAIN``), or a ``CyclicDependencyError``
+will be raised when trying to sort the tweens.
 
 If all options for ``under`` (or ``over``) cannot be found in the current
 configuration, it is an error. If some options are specified purely for
