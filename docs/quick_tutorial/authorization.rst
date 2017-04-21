@@ -60,7 +60,13 @@ Steps
 
    .. literalinclude:: authorization/tutorial/views.py
     :linenos:
+    
+#. We can now install our project in development mode:
 
+   .. code-block:: bash
+
+    $ $VENV/bin/pip install -e .
+    
 #. Run your Pyramid application with:
 
    .. code-block:: bash
