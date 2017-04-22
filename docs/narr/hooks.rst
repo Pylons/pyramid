@@ -155,7 +155,7 @@ forbidden view:
 .. code-block:: python
    :linenos:
 
-   def forbidden(request):
+   def forbidden_view(request):
        return Response('forbidden')
 
    def main(globals, **settings):
