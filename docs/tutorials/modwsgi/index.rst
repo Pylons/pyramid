@@ -48,7 +48,7 @@ specific path information for commands and files.
         You've cloned ~/.cookiecutters/pyramid-cookiecutter-starter before.
         Is it okay to delete and re-clone it? [yes]: yes
         project_name [Pyramid Scaffold]: myproject
-        repo_name [scaffold]: myproject
+        repo_name [myproject]: myproject
         Select template_language:
         1 - jinja2
         2 - chameleon
