@@ -50,7 +50,7 @@ If prompted for the first item, accept the default ``yes`` by hitting return.
     You've cloned ~/.cookiecutters/pyramid-cookiecutter-zodb before.
     Is it okay to delete and re-clone it? [yes]: yes
     project_name [Pyramid Scaffold]: myproj
-    repo_name [scaffold]: tutorial
+    repo_name [myproj]: tutorial
 
 Change directory into your newly created project
 ------------------------------------------------

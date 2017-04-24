@@ -37,7 +37,7 @@ Steps
         You've cloned ~/.cookiecutters/pyramid-cookiecutter-starter before.
         Is it okay to delete and re-clone it? [yes]: yes
         project_name [Pyramid Scaffold]: cc_starter
-        repo_name [scaffold]: cc_starter
+        repo_name [cc_starter]: cc_starter
         Select template_language:
         1 - jinja2
         2 - chameleon
