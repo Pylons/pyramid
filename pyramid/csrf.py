@@ -177,12 +177,6 @@ def check_csrf_token(request,
         supplied_token = request.POST.get(token, "")
 
     policy = request.registry.queryUtility(ICSRFStoragePolicy)
-    if policy is None:
-        # There is no policy set, but we are trying to validate a CSRF token
-        # This means explicit validation has been asked for without configuring
-        # the CSRF implementation. Fall back to SessionCSRFStoragePolicy as that is the
-        # default
-        policy = SessionCSRFStoragePolicy()
     if not policy.check_csrf_token(request, supplied_token):
         if raises:
             raise BadCSRFToken('check_csrf_token(): Invalid token')

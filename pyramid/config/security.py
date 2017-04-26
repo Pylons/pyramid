@@ -241,7 +241,7 @@ class SecurityConfiguratorMixin(object):
         def register():
             self.registry.registerUtility(policy, ICSRFStoragePolicy)
 
-        self.action(ICSRFStoragePolicy, register, order=PHASE1_CONFIG)
+        self.action(ICSRFStoragePolicy, register)
 
 
 @implementer(IDefaultCSRFOptions)

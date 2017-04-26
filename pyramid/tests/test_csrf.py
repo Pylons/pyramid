@@ -15,11 +15,9 @@ class Test_get_csrf_token(unittest.TestCase):
         from pyramid.csrf import get_csrf_token
         return get_csrf_token(*args, **kwargs)
 
-    def test_no_csrf_utility_registered(self):
+    def test_no_override_csrf_utility_registered(self):
         request = testing.DummyRequest()
-
-        with self.assertRaises(ComponentLookupError):
-            self._callFUT(request)
+        self._callFUT(request)
 
     def test_success(self):
         self.config.set_csrf_storage_policy(DummyCSRF())
@@ -38,11 +36,9 @@ class Test_new_csrf_token(unittest.TestCase):
         from pyramid.csrf import new_csrf_token
         return new_csrf_token(*args, **kwargs)
 
-    def test_no_csrf_utility_registered(self):
+    def test_no_override_csrf_utility_registered(self):
         request = testing.DummyRequest()
-
-        with self.assertRaises(ComponentLookupError):
-            self._callFUT(request)
+        self._callFUT(request)
 
     def test_success(self):
         self.config.set_csrf_storage_policy(DummyCSRF())
@@ -188,7 +184,7 @@ class Test_check_csrf_token(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp()
 
-        # set up CSRF (this will also register SessionCSRFStoragePolicy policy)
+        # set up CSRF
         self.config.set_default_csrf_options(require_csrf=False)
 
     def _callFUT(self, *args, **kwargs):
