@@ -15,9 +15,6 @@ import sys
 import os
 import datetime
 import inspect
-import warnings
-
-warnings.simplefilter('ignore', DeprecationWarning)
 
 import pkg_resources
 import pylons_sphinx_themes
