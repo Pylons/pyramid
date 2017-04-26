@@ -315,7 +315,3 @@ flash storage.
    ['info message']
    >>> request.session.peek_flash()
    []
-
-.. index::
-   single: preventing cross-site request forgery attacks
-   single: cross-site request forgery attacks, prevention

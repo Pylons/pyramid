@@ -766,6 +766,10 @@ a secret across two different subsystems might drop the security of signing to
 zero. Keys should not be re-used across different contexts where an attacker
 has the possibility of providing a chosen plaintext.
 
+.. index::
+   single: preventing cross-site request forgery attacks
+   single: cross-site request forgery attacks, prevention
+
 Preventing Cross-Site Request Forgery Attacks
 ---------------------------------------------
 

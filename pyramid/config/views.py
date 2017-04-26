@@ -651,6 +651,12 @@ class ViewsConfiguratorMixin(object):
 
           .. versionadded:: 1.4a2
 
+          .. versionchanged:: 1.9
+            This feature requires either a :term:`session factory` to have been
+            configured, or a :term:`CSRF storage policy` other than the default
+            to be in use.
+
+
         physical_path
 
           If specified, this value should be a string or a tuple representing

@@ -31,7 +31,7 @@ class SessionCSRFStoragePolicy(object):
     Note that using this CSRF implementation requires that
     a :term:`session factory` is configured.
 
-    .. versionadded :: 1.8a1
+    .. versionadded :: 1.9
     """
     def new_csrf_token(self, request):
         """ Sets a new CSRF token into the session and returns it. """
@@ -43,8 +43,8 @@ class SessionCSRFStoragePolicy(object):
         return request.session.get_csrf_token()
 
     def check_csrf_token(self, request, supplied_token):
-        """ Returns True if supplied_token is the same value as get_csrf_token
-        returns for this request. """
+        """ Returns ``True`` if ``supplied_token is`` the same value as
+        ``get_csrf_token(request)``."""
         expected = self.get_csrf_token(request)
         return not strings_differ(
             bytes_(expected, 'ascii'),
@@ -55,11 +55,11 @@ class SessionCSRFStoragePolicy(object):
 class CookieCSRFStoragePolicy(object):
     """ An alternative CSRF implementation that stores its information in
     unauthenticated cookies, known as the 'Double Submit Cookie' method in the
-    OWASP CSRF guidelines. This gives some additional flexibility with regards
-    to scaling as the tokens can be generated and verified by a front-end
-    server.
+    `OWASP CSRF guidelines <https://www.owasp.org/index.php/Cross-Site_Request_Forgery_(CSRF)_Prevention_Cheat_Sheet#Double_Submit_Cookie>`_.
+    This gives some additional flexibility with regards to scaling as the tokens
+    can be generated and verified by a front-end server.
 
-    .. versionadded :: 1.8a1
+    .. versionadded :: 1.9
     """
 
     def __init__(self, cookie_name='csrf_token', secure=False, httponly=False,
@@ -96,8 +96,8 @@ class CookieCSRFStoragePolicy(object):
         return token
 
     def check_csrf_token(self, request, supplied_token):
-        """ Returns True if supplied_token is the same value as get_csrf_token
-        returns for this request. """
+        """ Returns ``True`` if ``supplied_token is`` the same value as
+        ``get_csrf_token(request)``."""
         expected = self.get_csrf_token(request)
         return not strings_differ(
             bytes_(expected, 'ascii'),
@@ -109,7 +109,7 @@ def get_csrf_token(request):
     a new one using ``new_csrf_token(request)`` if one does not exist. This
     calls the equivalent method in the chosen CSRF protection implementation.
 
-    .. versionadded :: 1.8a1
+    .. versionadded :: 1.9
     """
     registry = request.registry
     csrf = registry.getUtility(ICSRFStoragePolicy)
@@ -121,7 +121,7 @@ def new_csrf_token(request):
     implementation defined manner. This calls the equivalent method in the
     chosen CSRF protection implementation.
 
-    .. versionadded :: 1.8a1
+    .. versionadded :: 1.9
     """
     registry = request.registry
     csrf = registry.getUtility(ICSRFStoragePolicy)
@@ -159,8 +159,8 @@ def check_csrf_token(request,
        considered valid. It must be passed in either the request body or
        a header.
 
-    .. versionchanged:: 1.8a1
-       Moved from pyramid.session to pyramid.csrf
+    .. versionchanged:: 1.9
+       Moved from :mod:`pyramid.session` to :mod:`pyramid.csrf`
     """
     supplied_token = ""
     # We first check the headers for a csrf token, as that is significantly
@@ -192,27 +192,28 @@ def check_csrf_token(request,
 
 def check_csrf_origin(request, trusted_origins=None, raises=True):
     """
-    Check the Origin of the request to see if it is a cross site request or
+    Check the ``Origin`` of the request to see if it is a cross site request or
     not.
 
-    If the value supplied by the Origin or Referer header isn't one of the
+    If the value supplied by the ``Origin`` or ``Referer`` header isn't one of the
     trusted origins and ``raises`` is ``True``, this function will raise a
-    :exc:`pyramid.exceptions.BadCSRFOrigin` exception but if ``raises`` is
-    ``False`` this function will return ``False`` instead. If the CSRF origin
+    :exc:`pyramid.exceptions.BadCSRFOrigin` exception, but if ``raises`` is
+    ``False``, this function will return ``False`` instead. If the CSRF origin
     checks are successful this function will return ``True`` unconditionally.
 
     Additional trusted origins may be added by passing a list of domain (and
-    ports if nonstandard like `['example.com', 'dev.example.com:8080']`) in
+    ports if nonstandard like ``['example.com', 'dev.example.com:8080']``) in
     with the ``trusted_origins`` parameter. If ``trusted_origins`` is ``None``
     (the default) this list of additional domains will be pulled from the
     ``pyramid.csrf_trusted_origins`` setting.
 
-    Note that this function will do nothing if request.scheme is not https.
+    Note that this function will do nothing if ``request.scheme`` is not
+    ``https``.
 
     .. versionadded:: 1.7
 
-    .. versionchanged:: 1.8a1
-       Moved from pyramid.session to pyramid.csrf
+    .. versionchanged:: 1.9
+       Moved from :mod:`pyramid.session` to :mod:`pyramid.csrf`
     """
     def _fail(reason):
         if raises:

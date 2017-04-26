@@ -232,7 +232,7 @@ class SecurityConfiguratorMixin(object):
     @action_method
     def set_csrf_storage_policy(self, policy):
         """
-        Set the CSRF storage policy used by subsequent view registrations.
+        Set the :term:`CSRF storage policy` used by subsequent view registrations.
 
         ``policy`` is a class that implements the
         :meth:`pyramid.interfaces.ICSRFStoragePolicy` interface that will be used for all

@@ -999,8 +999,8 @@ class ICSRFStoragePolicy(Interface):
         """
 
     def check_csrf_token(request, supplied_token):
-        """ Returns a boolean that represents if supplied_token is a valid CSRF
-        token for this request. Comparing strings for equality must be done
+        """ Returns a boolean that represents if ``supplied_token`` is a valid
+        CSRF token for this request. Comparing strings for equality must be done
         using :func:`pyramid.utils.strings_differ` to avoid timing attacks.
         """
 
