@@ -824,6 +824,7 @@ If no CSRF token previously existed for this user, then a new token will be set
 into the session and returned. The newly created token will be opaque and
 randomized.
 
+.. _get_csrf_token_in_templates:
 
 Using the ``get_csrf_token`` global in templates
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

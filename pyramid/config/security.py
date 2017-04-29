@@ -10,7 +10,7 @@ from pyramid.interfaces import (
     PHASE2_CONFIG,
     )
 
-from pyramid.csrf import SessionCSRFStoragePolicy
+from pyramid.csrf import LegacySessionCSRFStoragePolicy
 from pyramid.exceptions import ConfigurationError
 from pyramid.util import action_method
 from pyramid.util import as_sorted_tuple
@@ -19,7 +19,7 @@ from pyramid.util import as_sorted_tuple
 class SecurityConfiguratorMixin(object):
 
     def add_default_security(self):
-        self.set_csrf_storage_policy(SessionCSRFStoragePolicy())
+        self.set_csrf_storage_policy(LegacySessionCSRFStoragePolicy())
 
     @action_method
     def set_authentication_policy(self, policy):
@@ -232,16 +232,22 @@ class SecurityConfiguratorMixin(object):
     @action_method
     def set_csrf_storage_policy(self, policy):
         """
-        Set the :term:`CSRF storage policy` used by subsequent view registrations.
+        Set the :term:`CSRF storage policy` used by subsequent view
+        registrations.
 
         ``policy`` is a class that implements the
-        :meth:`pyramid.interfaces.ICSRFStoragePolicy` interface that will be used for all
-        CSRF functionality.
+        :meth:`pyramid.interfaces.ICSRFStoragePolicy` interface and defines
+        how to generate and persist CSRF tokens.
+
         """
         def register():
             self.registry.registerUtility(policy, ICSRFStoragePolicy)
-
-        self.action(ICSRFStoragePolicy, register)
+        intr = self.introspectable('csrf storage policy',
+                                   None,
+                                   policy,
+                                   'csrf storage policy')
+        intr['policy'] = policy
+        self.action(ICSRFStoragePolicy, register, introspectables=(intr,))
 
 
 @implementer(IDefaultCSRFOptions)

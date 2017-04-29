@@ -927,6 +927,13 @@ class ISession(IDict):
     usually accessed via ``request.session``.
 
     Keys and values of a session must be pickleable.
+
+    .. versionchanged:: 1.9
+
+       Sessions are no longer required to implement ``get_csrf_token`` and
+       ``new_csrf_token``. CSRF token support was moved to the pluggable
+       :class:`pyramid.interfaces.ICSRFStoragePolicy` configuration hook.
+
     """
 
     # attributes
@@ -984,24 +991,23 @@ class ISession(IDict):
 
 class ICSRFStoragePolicy(Interface):
     """ An object that offers the ability to verify CSRF tokens and generate
-    new ones"""
+    new ones."""
 
     def new_csrf_token(request):
-        """ Create and return a new, random cross-site request forgery 
-        protection token.  Return the token.  It will be a string."""
+        """ Create and return a new, random cross-site request forgery
+        protection token. The token will be an ascii-compatible unicode
+        string.
+
+        """
 
     def get_csrf_token(request):
         """ Return a cross-site request forgery protection token.  It
-        will be a string.  If a token was previously set for this user via
-        ``new_csrf_token``, that token will be returned.  If no CSRF token
-        was previously set, ``new_csrf_token`` will be called, which will 
-        create and set a token, and this token will be returned.
-        """
+        will be an ascii-compatible unicode string.  If a token was previously
+        set for this user via ``new_csrf_token``, that token will be returned.
+        If no CSRF token was previously set, ``new_csrf_token`` will be
+        called, which will create and set a token, and this token will be
+        returned.
 
-    def check_csrf_token(request, supplied_token):
-        """ Returns a boolean that represents if ``supplied_token`` is a valid
-        CSRF token for this request. Comparing strings for equality must be done
-        using :func:`pyramid.utils.strings_differ` to avoid timing attacks.
         """
 
 

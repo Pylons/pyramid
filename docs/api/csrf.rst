@@ -5,6 +5,9 @@
 
 .. automodule:: pyramid.csrf
 
+  .. autoclass:: LegacySessionCSRFStoragePolicy
+     :members:
+
   .. autoclass:: SessionCSRFStoragePolicy
      :members:
 

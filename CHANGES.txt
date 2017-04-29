@@ -24,12 +24,13 @@ Features
   can be alleviated by invoking ``config.begin()`` and ``config.end()``
   appropriately. See https://github.com/Pylons/pyramid/pull/2989
 
-- A new CSRF implementation, :class:`pyramid.csrf.SessionCSRF` has been added,
-  which delegates all CSRF generation to the current session, following the
-  old API for this. A ``get_csrf_token()`` method is now available in template
-  global scope, to make it easy for template developers to get the current CSRF
-  token without adding it to Python code.
-  See https://github.com/Pylons/pyramid/pull/2854
+- A new CSRF implementation, ``pyramid.csrf.SessionCSRFStoragePolicy``,
+  has been added which delegates all CSRF generation to the current session,
+  following the old API for this. A ``pyramid.csrf.get_csrf_token()`` api is now
+  available in template global scope, to make it easy for template developers
+  to get the current CSRF token without adding it to Python code.
+  See https://github.com/Pylons/pyramid/pull/2854 and
+  https://github.com/Pylons/pyramid/pull/3019
 
 
 Bug Fixes

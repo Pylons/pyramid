@@ -7,8 +7,9 @@ from zope.interface import implementer
 from pyramid.authentication import _SimpleSerializer
 
 from pyramid.compat import (
+    bytes_,
     urlparse,
-    bytes_
+    text_,
 )
 from pyramid.exceptions import (
     BadCSRFOrigin,
@@ -23,44 +24,79 @@ from pyramid.util import (
 
 
 @implementer(ICSRFStoragePolicy)
-class SessionCSRFStoragePolicy(object):
-    """ The default CSRF implementation, which mimics the behavior from older
-    versions of Pyramid. The ``new_csrf_token`` and ``get_csrf_token`` methods
-    are indirected to the underlying session implementation.
+class LegacySessionCSRFStoragePolicy(object):
+    """ A CSRF storage policy that defers control of CSRF storage to the
+    session.
+
+    This policy maintains compatibility with legacy ISession implementations
+    that know how to manage CSRF tokens themselves via
+    ``ISession.new_csrf_token`` and ``ISession.get_csrf_token``.
 
     Note that using this CSRF implementation requires that
     a :term:`session factory` is configured.
 
-    .. versionadded :: 1.9
+    .. versionadded:: 1.9
+
     """
     def new_csrf_token(self, request):
         """ Sets a new CSRF token into the session and returns it. """
         return request.session.new_csrf_token()
 
     def get_csrf_token(self, request):
-        """ Returns the currently active CSRF token from the session, generating
-        a new one if needed."""
+        """ Returns the currently active CSRF token from the session,
+        generating a new one if needed."""
         return request.session.get_csrf_token()
 
-    def check_csrf_token(self, request, supplied_token):
-        """ Returns ``True`` if ``supplied_token is`` the same value as
-        ``get_csrf_token(request)``."""
-        expected = self.get_csrf_token(request)
-        return not strings_differ(
-            bytes_(expected, 'ascii'),
-            bytes_(supplied_token, 'ascii'),
-        )
+
+@implementer(ICSRFStoragePolicy)
+class SessionCSRFStoragePolicy(object):
+    """ A CSRF storage policy that persists the CSRF token in the session.
+
+    Note that using this CSRF implementation requires that
+    a :term:`session factory` is configured.
+
+    ``key``
+
+        The session key where the CSRF token will be stored.
+        Default: `_csrft_`.
+
+    .. versionadded:: 1.9
+
+    """
+    _token_factory = staticmethod(lambda: text_(uuid.uuid4().hex))
+
+    def __init__(self, key='_csrft_'):
+        self.key = key
+
+    def new_csrf_token(self, request):
+        """ Sets a new CSRF token into the session and returns it. """
+        token = self._token_factory()
+        request.session[self.key] = token
+        return token
+
+    def get_csrf_token(self, request):
+        """ Returns the currently active CSRF token from the session,
+        generating a new one if needed."""
+        token = request.session.get(self.key, None)
+        if not token:
+            token = self.new_csrf_token(request)
+        return token
+
 
 @implementer(ICSRFStoragePolicy)
 class CookieCSRFStoragePolicy(object):
     """ An alternative CSRF implementation that stores its information in
     unauthenticated cookies, known as the 'Double Submit Cookie' method in the
-    `OWASP CSRF guidelines <https://www.owasp.org/index.php/Cross-Site_Request_Forgery_(CSRF)_Prevention_Cheat_Sheet#Double_Submit_Cookie>`_.
-    This gives some additional flexibility with regards to scaling as the tokens
-    can be generated and verified by a front-end server.
+    `OWASP CSRF guidelines <https://www.owasp.org/index.php/
+    Cross-Site_Request_Forgery_(CSRF)_Prevention_Cheat_Sheet#
+    Double_Submit_Cookie>`_. This gives some additional flexibility with
+    regards to scaling as the tokens can be generated and verified by a
+    front-end server.
 
-    .. versionadded :: 1.9
+    .. versionadded:: 1.9
+
     """
+    _token_factory = staticmethod(lambda: text_(uuid.uuid4().hex))
 
     def __init__(self, cookie_name='csrf_token', secure=False, httponly=False,
                  domain=None, max_age=None, path='/'):
@@ -71,13 +107,15 @@ class CookieCSRFStoragePolicy(object):
             max_age=max_age,
             httponly=httponly,
             path=path,
+            domains=[domain],
             serializer=serializer
         )
-        self.domain = domain
+        self.cookie_name = cookie_name
 
     def new_csrf_token(self, request):
         """ Sets a new CSRF token into the request and returns it. """
-        token = uuid.uuid4().hex
+        token = self._token_factory()
+        request.cookies[self.cookie_name] = token
         def set_cookie(request, response):
             self.cookie_profile.set_cookies(
                 response,
@@ -95,14 +133,6 @@ class CookieCSRFStoragePolicy(object):
             token = self.new_csrf_token(request)
         return token
 
-    def check_csrf_token(self, request, supplied_token):
-        """ Returns ``True`` if ``supplied_token is`` the same value as
-        ``get_csrf_token(request)``."""
-        expected = self.get_csrf_token(request)
-        return not strings_differ(
-            bytes_(expected, 'ascii'),
-            bytes_(supplied_token, 'ascii'),
-        )
 
 def get_csrf_token(request):
     """ Get the currently active CSRF token for the request passed, generating
@@ -133,8 +163,8 @@ def check_csrf_token(request,
                      header='X-CSRF-Token',
                      raises=True):
     """ Check the CSRF token returned by the
-    :class:`pyramid.interfaces.ICSRFStoragePolicy` implementation against the value in
-    ``request.POST.get(token)`` (if a POST request) or
+    :class:`pyramid.interfaces.ICSRFStoragePolicy` implementation against the
+    value in ``request.POST.get(token)`` (if a POST request) or
     ``request.headers.get(header)``. If a ``token`` keyword is not supplied to
     this function, the string ``csrf_token`` will be used to look up the token
     in ``request.POST``. If a ``header`` keyword is not supplied to this
@@ -143,11 +173,12 @@ def check_csrf_token(request,
 
     If the value supplied by post or by header doesn't match the value supplied
     by ``policy.get_csrf_token()`` (where ``policy`` is an implementation of
-    :class:`pyramid.interfaces.ICSRFStoragePolicy`), and ``raises`` is ``True``, this
-    function will raise an :exc:`pyramid.exceptions.BadCSRFToken` exception. If
-    the values differ and ``raises`` is ``False``, this function will return
-    ``False``.  If the CSRF check is successful, this function will return
-    ``True`` unconditionally.
+    :class:`pyramid.interfaces.ICSRFStoragePolicy`), and ``raises`` is
+    ``True``, this function will raise an
+    :exc:`pyramid.exceptions.BadCSRFToken` exception. If the values differ
+    and ``raises`` is ``False``, this function will return ``False``.  If the
+    CSRF check is successful, this function will return ``True``
+    unconditionally.
 
     See :ref:`auto_csrf_checking` for information about how to secure your
     application automatically against CSRF attacks.
@@ -176,8 +207,8 @@ def check_csrf_token(request,
     if supplied_token == "" and token is not None:
         supplied_token = request.POST.get(token, "")
 
-    policy = request.registry.queryUtility(ICSRFStoragePolicy)
-    if not policy.check_csrf_token(request, supplied_token):
+    expected_token = get_csrf_token(request)
+    if strings_differ(bytes_(expected_token), bytes_(supplied_token)):
         if raises:
             raise BadCSRFToken('check_csrf_token(): Invalid token')
         return False

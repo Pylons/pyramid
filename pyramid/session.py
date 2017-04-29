@@ -17,6 +17,10 @@ from pyramid.compat import (
     bytes_,
     native_,
     )
+from pyramid.csrf import (
+    check_csrf_origin,
+    check_csrf_token,
+)
 
 from pyramid.interfaces import ISession
 from pyramid.util import strings_differ
@@ -608,3 +612,13 @@ def SignedCookieSessionFactory(
         reissue_time=reissue_time,
         set_on_exception=set_on_exception,
     )
+
+check_csrf_origin = check_csrf_origin  # api
+deprecated('check_csrf_origin',
+           'pyramid.session.check_csrf_origin is deprecated as of Pyramid '
+           '1.9. Use pyramid.csrf.check_csrf_origin instead.')
+
+check_csrf_token = check_csrf_token  # api
+deprecated('check_csrf_token',
+           'pyramid.session.check_csrf_token is deprecated as of Pyramid '
+           '1.9. Use pyramid.csrf.check_csrf_token instead.')
