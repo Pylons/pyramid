@@ -249,7 +249,7 @@ def check_csrf_origin(request, trusted_origins=None, raises=True):
     checks are successful this function will return ``True`` unconditionally.
 
     Additional trusted origins may be added by passing a list of domain (and
-    ports if nonstandard like ``['example.com', 'dev.example.com:8080']``) in
+    ports if non-standard like ``['example.com', 'dev.example.com:8080']``) in
     with the ``trusted_origins`` parameter. If ``trusted_origins`` is ``None``
     (the default) this list of additional domains will be pulled from the
     ``pyramid.csrf_trusted_origins`` setting.
