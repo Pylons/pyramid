@@ -296,3 +296,5 @@ Contributors
 - Martin Frlin, 2016/12/7
 
 - Kirill Kuzminykh, 2017/03/01
+
+- Jeremy(Ching-Rui) Chen, 2017/04/19

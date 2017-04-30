@@ -32,6 +32,11 @@ Features
   See https://github.com/Pylons/pyramid/pull/2854 and
   https://github.com/Pylons/pyramid/pull/3019
 
+- The ``pyramid.config.Configurator`` can now be used as a context manager
+  which will automatically push/pop threadlocals (similar to
+  ``config.begin()`` and ``config.end()``). It will also automatically perform
+  a ``config.commit()`` and thus it is only recommended to be used at the
+  top-level of your app. See https://github.com/Pylons/pyramid/pull/2874
 
 Bug Fixes
 ---------

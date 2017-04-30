@@ -976,7 +976,7 @@ class ViewsConfiguratorMixin(object):
         def register_view(classifier, request_iface, derived_view):
             # A multiviews is a set of views which are registered for
             # exactly the same context type/request type/name triad.  Each
-            # consituent view in a multiview differs only by the
+            # constituent view in a multiview differs only by the
             # predicates which it possesses.
 
             # To find a previously registered view for a context
@@ -1036,7 +1036,7 @@ class ViewsConfiguratorMixin(object):
 
                 # XXX we could try to be more efficient here and register
                 # a non-secured view for a multiview if none of the
-                # multiview's consituent views have a permission
+                # multiview's constituent views have a permission
                 # associated with them, but this code is getting pretty
                 # rough already
                 if is_multiview:

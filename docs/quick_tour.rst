@@ -519,7 +519,7 @@ If prompted for the first item, accept the default ``yes`` by hitting return.
     You've cloned ~/.cookiecutters/pyramid-cookiecutter-starter before.
     Is it okay to delete and re-clone it? [yes]: yes
     project_name [Pyramid Scaffold]: hello_world
-    repo_name [scaffold]: hello_world
+    repo_name [hello_world]: hello_world
     Select template_language:
     1 - jinja2
     2 - chameleon
@@ -875,7 +875,7 @@ If prompted for the first item, accept the default ``yes`` by hitting return.
     You've cloned ~/.cookiecutters/pyramid-cookiecutter-alchemy before.
     Is it okay to delete and re-clone it? [yes]: yes
     project_name [Pyramid Scaffold]: sqla_demo
-    repo_name [scaffold]: sqla_demo
+    repo_name [sqla_demo]: sqla_demo
 
 We then run through the following commands as before.
 
