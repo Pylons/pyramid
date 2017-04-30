@@ -1010,6 +1010,16 @@ class ICSRFStoragePolicy(Interface):
 
         """
 
+    def check_csrf_token(request, token):
+        """ Determine if the supplied ``token`` is valid. Most implementations
+        should simply compare the ``token`` to the current value of
+        ``get_csrf_token`` but it is possible to verify the token using
+        any mechanism necessary using this method.
+
+        Returns ``True`` if the ``token`` is valid, otherwise ``False``.
+
+        """
+
 
 class IIntrospector(Interface):
     def get(category_name, discriminator, default=None):

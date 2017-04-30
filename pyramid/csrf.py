@@ -47,6 +47,12 @@ class LegacySessionCSRFStoragePolicy(object):
         generating a new one if needed."""
         return request.session.get_csrf_token()
 
+    def check_csrf_token(self, request, supplied_token):
+        """ Returns ``True`` if the ``supplied_token`` is valid."""
+        expected_token = self.get_csrf_token(request)
+        return not strings_differ(
+            bytes_(expected_token), bytes_(supplied_token))
+
 
 @implementer(ICSRFStoragePolicy)
 class SessionCSRFStoragePolicy(object):
@@ -81,6 +87,12 @@ class SessionCSRFStoragePolicy(object):
         if not token:
             token = self.new_csrf_token(request)
         return token
+
+    def check_csrf_token(self, request, supplied_token):
+        """ Returns ``True`` if the ``supplied_token`` is valid."""
+        expected_token = self.get_csrf_token(request)
+        return not strings_differ(
+            bytes_(expected_token), bytes_(supplied_token))
 
 
 @implementer(ICSRFStoragePolicy)
@@ -133,6 +145,12 @@ class CookieCSRFStoragePolicy(object):
             token = self.new_csrf_token(request)
         return token
 
+    def check_csrf_token(self, request, supplied_token):
+        """ Returns ``True`` if the ``supplied_token`` is valid."""
+        expected_token = self.get_csrf_token(request)
+        return not strings_differ(
+            bytes_(expected_token), bytes_(supplied_token))
+
 
 def get_csrf_token(request):
     """ Get the currently active CSRF token for the request passed, generating
@@ -140,6 +158,7 @@ def get_csrf_token(request):
     calls the equivalent method in the chosen CSRF protection implementation.
 
     .. versionadded :: 1.9
+
     """
     registry = request.registry
     csrf = registry.getUtility(ICSRFStoragePolicy)
@@ -152,6 +171,7 @@ def new_csrf_token(request):
     chosen CSRF protection implementation.
 
     .. versionadded :: 1.9
+
     """
     registry = request.registry
     csrf = registry.getUtility(ICSRFStoragePolicy)
@@ -171,9 +191,8 @@ def check_csrf_token(request,
     function, the string ``X-CSRF-Token`` will be used to look up the token in
     ``request.headers``.
 
-    If the value supplied by post or by header doesn't match the value supplied
-    by ``policy.get_csrf_token()`` (where ``policy`` is an implementation of
-    :class:`pyramid.interfaces.ICSRFStoragePolicy`), and ``raises`` is
+    If the value supplied by post or by header cannot be verified by the
+    :class:`pyramid.interfaces.ICSRFStoragePolicy`, and ``raises`` is
     ``True``, this function will raise an
     :exc:`pyramid.exceptions.BadCSRFToken` exception. If the values differ
     and ``raises`` is ``False``, this function will return ``False``.  If the
@@ -191,7 +210,10 @@ def check_csrf_token(request,
        a header.
 
     .. versionchanged:: 1.9
-       Moved from :mod:`pyramid.session` to :mod:`pyramid.csrf`
+       Moved from :mod:`pyramid.session` to :mod:`pyramid.csrf` and updated
+       to use the configured :class:`pyramid.interfaces.ICSRFStoragePolicy` to
+       verify the CSRF token.
+
     """
     supplied_token = ""
     # We first check the headers for a csrf token, as that is significantly
@@ -207,8 +229,8 @@ def check_csrf_token(request,
     if supplied_token == "" and token is not None:
         supplied_token = request.POST.get(token, "")
 
-    expected_token = get_csrf_token(request)
-    if strings_differ(bytes_(expected_token), bytes_(supplied_token)):
+    policy = request.registry.getUtility(ICSRFStoragePolicy)
+    if not policy.check_csrf_token(request, text_(supplied_token)):
         if raises:
             raise BadCSRFToken('check_csrf_token(): Invalid token')
         return False
@@ -239,6 +261,7 @@ def check_csrf_origin(request, trusted_origins=None, raises=True):
 
     .. versionchanged:: 1.9
        Moved from :mod:`pyramid.session` to :mod:`pyramid.csrf`
+
     """
     def _fail(reason):
         if raises:
