@@ -7,10 +7,11 @@ import re
 from zope.interface import Interface
 
 from pyramid.paster import bootstrap
-from pyramid.compat import (string_types, configparser)
+from pyramid.compat import string_types
 from pyramid.interfaces import IRouteRequest
 from pyramid.config import not_
 
+from pyramid.scripts.common import get_config_loader
 from pyramid.scripts.common import parse_vars
 from pyramid.static import static_view
 from pyramid.view import _find_views
@@ -175,7 +176,6 @@ def get_route_data(route, registry):
                 (route.name, route_intr['external_url'], UNKNOWN_KEY, ANY_KEY)
             ]
 
-
         route_request_methods = route_intr['request_methods']
         view_intr = registry.introspector.related(route_intr)
 
@@ -245,9 +245,9 @@ class PRoutesCommand(object):
     will be assumed.  Example: 'proutes myapp.ini'.
 
     """
-    bootstrap = (bootstrap,)
+    bootstrap = staticmethod(bootstrap)  # testing
+    get_config_loader = staticmethod(get_config_loader)  # testing
     stdout = sys.stdout
-    ConfigParser = configparser.ConfigParser  # testing
     parser = argparse.ArgumentParser(
         description=textwrap.dedent(description),
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -308,18 +308,12 @@ class PRoutesCommand(object):
 
         return True
 
-    def proutes_file_config(self, filename):
-        config = self.ConfigParser()
-        config.read(filename)
-        try:
-            items = config.items('proutes')
-            for k, v in items:
-                if 'format' == k:
-                    cols = re.split(r'[,|\s\n]+', v)
-                    self.column_format = [x.strip() for x in cols]
-
-        except configparser.NoSectionError:
-            return
+    def proutes_file_config(self, loader, global_conf=None):
+        settings = loader.get_settings('proutes', global_conf)
+        format = settings.get('format')
+        if format:
+            cols = re.split(r'[,|\s\n]+', format)
+            self.column_format = [x.strip() for x in cols]
 
     def out(self, msg):  # pragma: no cover
         if not self.quiet:
@@ -336,11 +330,14 @@ class PRoutesCommand(object):
             return 2
 
         config_uri = self.args.config_uri
-        env = self.bootstrap[0](config_uri, options=parse_vars(self.args.config_vars))
+        config_vars = parse_vars(self.args.config_vars)
+        loader = self.get_config_loader(config_uri)
+        loader.setup_logging(config_vars)
+        self.proutes_file_config(loader, config_vars)
+
+        env = self.bootstrap(config_uri, options=config_vars)
         registry = env['registry']
         mapper = self._get_mapper(registry)
-
-        self.proutes_file_config(config_uri)
 
         if self.args.format:
             columns = self.args.format.split(',')

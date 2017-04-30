@@ -38,7 +38,14 @@ Here's a high-level time-ordered overview of what happens when you press
    begin to run and serve an application using the information contained
    within the ``development.ini`` file.
 
-#. The framework finds a section named either ``[app:main]``,
+#. ``pserve`` passes the ``development.ini`` path to :term:`plaster` which
+   finds an available configuration loader that recognizes the ``ini`` format.
+
+#. :term:`plaster` finds the ``plaster_pastedeploy`` library which binds
+   the :term:`PasteDeploy` library and returns a parser that can understand
+   the format.
+
+#. The :term:`PasteDeploy` finds a section named either ``[app:main]``,
    ``[pipeline:main]``, or ``[composite:main]`` in the ``.ini`` file.  This
    section represents the configuration of a :term:`WSGI` application that will
    be served.  If you're using a simple application (e.g., ``[app:main]``), the

@@ -8,7 +8,8 @@ class TestPViewsCommand(unittest.TestCase):
 
     def _makeOne(self, registry=None):
         cmd = self._getTargetClass()([])
-        cmd.bootstrap = (dummy.DummyBootstrap(registry=registry),)
+        cmd.bootstrap = dummy.DummyBootstrap(registry=registry)
+        cmd.setup_logging = dummy.dummy_setup_logging()
         cmd.args.config_uri = '/foo/bar/myapp.ini#myapp'
         return cmd
 

@@ -5,9 +5,8 @@ import textwrap
 
 from pyramid.compat import url_unquote
 from pyramid.request import Request
-from pyramid.paster import get_app
+from pyramid.scripts.common import get_config_loader
 from pyramid.scripts.common import parse_vars
-from pyramid.scripts.common import setup_logging
 
 def main(argv=sys.argv, quiet=False):
     command = PRequestCommand(argv, quiet)
@@ -110,7 +109,7 @@ class PRequestCommand(object):
              "passed here.",
         )
 
-    get_app = staticmethod(get_app)
+    _get_config_loader = staticmethod(get_config_loader)
     stdin = sys.stdin
 
     def __init__(self, argv, quiet=False):
@@ -121,17 +120,18 @@ class PRequestCommand(object):
         if not self.quiet:
             print(msg)
 
-    def configure_logging(self, app_spec):
-        setup_logging(app_spec)
-
     def run(self):
         if not self.args.config_uri or not self.args.path_info:
             self.out('You must provide at least two arguments')
             return 2
-        app_spec = self.args.config_uri
+        config_uri = self.args.config_uri
+        config_vars = parse_vars(self.args.config_vars)
         path = self.args.path_info
 
-        self.configure_logging(app_spec)
+        loader = self._get_config_loader(config_uri)
+        loader.setup_logging(config_vars)
+
+        app = loader.get_wsgi_app(self.args.app_name, config_vars)
 
         if not path.startswith('/'):
             path = '/' + path
@@ -157,9 +157,6 @@ class PRequestCommand(object):
                     return 2
                 name, value = item.split(':', 1)
                 headers[name] = value.strip()
-
-        app = self.get_app(app_spec, self.args.app_name,
-                options=parse_vars(self.args.config_vars))
 
         request_method = (self.args.method or 'GET').upper()
 

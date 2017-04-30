@@ -4,6 +4,7 @@ import textwrap
 
 from pyramid.interfaces import IMultiView
 from pyramid.paster import bootstrap
+from pyramid.paster import setup_logging
 from pyramid.request import Request
 from pyramid.scripts.common import parse_vars
 from pyramid.view import _find_views
@@ -51,7 +52,8 @@ class PViewsCommand(object):
         )
 
 
-    bootstrap = (bootstrap,) # testing
+    bootstrap = staticmethod(bootstrap) # testing
+    setup_logging = staticmethod(setup_logging) # testing
 
     def __init__(self, argv, quiet=False):
         self.quiet = quiet
@@ -252,13 +254,15 @@ class PViewsCommand(object):
             self.out('Command requires a config file arg and a url arg')
             return 2
         config_uri = self.args.config_uri
+        config_vars = parse_vars(self.args.config_vars)
         url = self.args.url
+
+        self.setup_logging(config_uri, global_conf=config_vars)
 
         if not url.startswith('/'):
             url = '/%s' % url
         request = Request.blank(url)
-        env = self.bootstrap[0](config_uri, options=parse_vars(self.args.config_vars),
-                                request=request)
+        env = self.bootstrap(config_uri, options=config_vars, request=request)
         view = self._find_view(request)
         self.out('')
         self.out("URL = %s" % url)

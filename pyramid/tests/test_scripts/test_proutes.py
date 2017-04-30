@@ -19,7 +19,8 @@ class TestPRoutesCommand(unittest.TestCase):
 
     def _makeOne(self):
         cmd = self._getTargetClass()([])
-        cmd.bootstrap = (dummy.DummyBootstrap(),)
+        cmd.bootstrap = dummy.DummyBootstrap()
+        cmd.get_config_loader = dummy.DummyLoader()
         cmd.args.config_uri = '/foo/bar/myapp.ini#myapp'
 
         return cmd
@@ -37,14 +38,15 @@ class TestPRoutesCommand(unittest.TestCase):
 
     def test_good_args(self):
         cmd = self._getTargetClass()([])
-        cmd.bootstrap = (dummy.DummyBootstrap(),)
+        cmd.bootstrap = dummy.DummyBootstrap()
+        cmd.get_config_loader = dummy.DummyLoader()
         cmd.args.config_uri = '/foo/bar/myapp.ini#myapp'
         cmd.args.config_args = ('a=1',)
         route = dummy.DummyRoute('a', '/a')
         mapper = dummy.DummyMapper(route)
         cmd._get_mapper = lambda *arg: mapper
         registry = self._makeRegistry()
-        cmd.bootstrap = (dummy.DummyBootstrap(registry=registry),)
+        cmd.bootstrap = dummy.DummyBootstrap(registry=registry)
         L = []
         cmd.out = lambda msg: L.append(msg)
         cmd.run()
@@ -52,7 +54,8 @@ class TestPRoutesCommand(unittest.TestCase):
 
     def test_bad_args(self):
         cmd = self._getTargetClass()([])
-        cmd.bootstrap = (dummy.DummyBootstrap(),)
+        cmd.bootstrap = dummy.DummyBootstrap()
+        cmd.get_config_loader = dummy.DummyLoader()
         cmd.args.config_uri = '/foo/bar/myapp.ini#myapp'
         cmd.args.config_vars = ('a',)
         route = dummy.DummyRoute('a', '/a')
@@ -86,7 +89,7 @@ class TestPRoutesCommand(unittest.TestCase):
         mapper = dummy.DummyMapper(route)
         command._get_mapper = lambda *arg: mapper
         registry = self._makeRegistry()
-        command.bootstrap = (dummy.DummyBootstrap(registry=registry),)
+        command.bootstrap = dummy.DummyBootstrap(registry=registry)
 
         L = []
         command.out = L.append
@@ -103,7 +106,7 @@ class TestPRoutesCommand(unittest.TestCase):
         L = []
         command.out = L.append
         registry = self._makeRegistry()
-        command.bootstrap = (dummy.DummyBootstrap(registry=registry),)
+        command.bootstrap = dummy.DummyBootstrap(registry=registry)
         result = command.run()
         self.assertEqual(result, 0)
         self.assertEqual(len(L), 3)
@@ -124,7 +127,7 @@ class TestPRoutesCommand(unittest.TestCase):
         command._get_mapper = lambda *arg: mapper
         L = []
         command.out = L.append
-        command.bootstrap = (dummy.DummyBootstrap(registry=registry),)
+        command.bootstrap = dummy.DummyBootstrap(registry=registry)
         result = command.run()
         self.assertEqual(result, 0)
         self.assertEqual(len(L), 3)
@@ -150,7 +153,7 @@ class TestPRoutesCommand(unittest.TestCase):
         command._get_mapper = lambda *arg: mapper
         L = []
         command.out = L.append
-        command.bootstrap = (dummy.DummyBootstrap(registry=registry),)
+        command.bootstrap = dummy.DummyBootstrap(registry=registry)
         result = command.run()
         self.assertEqual(result, 0)
         self.assertEqual(len(L), 3)
@@ -190,7 +193,7 @@ class TestPRoutesCommand(unittest.TestCase):
         command._get_mapper = lambda *arg: mapper
         L = []
         command.out = L.append
-        command.bootstrap = (dummy.DummyBootstrap(registry=registry),)
+        command.bootstrap = dummy.DummyBootstrap(registry=registry)
         result = command.run()
         self.assertEqual(result, 0)
         self.assertEqual(len(L), 3)
@@ -218,7 +221,7 @@ class TestPRoutesCommand(unittest.TestCase):
         command = self._makeOne()
         L = []
         command.out = L.append
-        command.bootstrap = (dummy.DummyBootstrap(registry=config.registry),)
+        command.bootstrap = dummy.DummyBootstrap(registry=config.registry)
         result = command.run()
         self.assertEqual(result, 0)
         self.assertEqual(len(L), 3)
@@ -252,7 +255,7 @@ class TestPRoutesCommand(unittest.TestCase):
         command._get_mapper = lambda *arg: mapper
         L = []
         command.out = L.append
-        command.bootstrap = (dummy.DummyBootstrap(registry=registry),)
+        command.bootstrap = dummy.DummyBootstrap(registry=registry)
         result = command.run()
         self.assertEqual(result, 0)
         self.assertEqual(len(L), 3)
@@ -288,7 +291,7 @@ class TestPRoutesCommand(unittest.TestCase):
         command._get_mapper = lambda *arg: mapper
         L = []
         command.out = L.append
-        command.bootstrap = (dummy.DummyBootstrap(registry=registry),)
+        command.bootstrap = dummy.DummyBootstrap(registry=registry)
         result = command.run()
         self.assertEqual(result, 0)
         self.assertEqual(len(L), 3)
@@ -327,7 +330,7 @@ class TestPRoutesCommand(unittest.TestCase):
         command = self._makeOne()
         L = []
         command.out = L.append
-        command.bootstrap = (dummy.DummyBootstrap(registry=config.registry),)
+        command.bootstrap = dummy.DummyBootstrap(registry=config.registry)
         result = command.run()
         self.assertEqual(result, 0)
         self.assertEqual(len(L), 3)
@@ -354,7 +357,7 @@ class TestPRoutesCommand(unittest.TestCase):
         command = self._makeOne()
         L = []
         command.out = L.append
-        command.bootstrap = (dummy.DummyBootstrap(registry=config.registry),)
+        command.bootstrap = dummy.DummyBootstrap(registry=config.registry)
         result = command.run()
         self.assertEqual(result, 0)
         self.assertEqual(len(L), 3)
@@ -382,7 +385,7 @@ class TestPRoutesCommand(unittest.TestCase):
         command = self._makeOne()
         L = []
         command.out = L.append
-        command.bootstrap = (dummy.DummyBootstrap(registry=config.registry),)
+        command.bootstrap = dummy.DummyBootstrap(registry=config.registry)
         result = command.run()
         self.assertEqual(result, 0)
         self.assertEqual(len(L), 3)
@@ -410,7 +413,7 @@ class TestPRoutesCommand(unittest.TestCase):
         command = self._makeOne()
         L = []
         command.out = L.append
-        command.bootstrap = (dummy.DummyBootstrap(registry=config.registry),)
+        command.bootstrap = dummy.DummyBootstrap(registry=config.registry)
         result = command.run()
         self.assertEqual(result, 0)
         self.assertEqual(len(L), 3)
@@ -436,7 +439,7 @@ class TestPRoutesCommand(unittest.TestCase):
         command = self._makeOne()
         L = []
         command.out = L.append
-        command.bootstrap = (dummy.DummyBootstrap(registry=config.registry),)
+        command.bootstrap = dummy.DummyBootstrap(registry=config.registry)
         result = command.run()
         self.assertEqual(result, 0)
         self.assertEqual(len(L), 5)
@@ -461,7 +464,7 @@ class TestPRoutesCommand(unittest.TestCase):
         command = self._makeOne()
         L = []
         command.out = L.append
-        command.bootstrap = (dummy.DummyBootstrap(registry=config.registry),)
+        command.bootstrap = dummy.DummyBootstrap(registry=config.registry)
         result = command.run()
         self.assertEqual(result, 0)
         self.assertEqual(len(L), 3)
@@ -491,7 +494,7 @@ class TestPRoutesCommand(unittest.TestCase):
         command = self._makeOne()
         L = []
         command.out = L.append
-        command.bootstrap = (dummy.DummyBootstrap(registry=config2.registry),)
+        command.bootstrap = dummy.DummyBootstrap(registry=config2.registry)
         result = command.run()
         self.assertEqual(result, 0)
         self.assertEqual(len(L), 3)
@@ -521,7 +524,7 @@ class TestPRoutesCommand(unittest.TestCase):
         command = self._makeOne()
         L = []
         command.out = L.append
-        command.bootstrap = (dummy.DummyBootstrap(registry=config.registry),)
+        command.bootstrap = dummy.DummyBootstrap(registry=config.registry)
         result = command.run()
         self.assertEqual(result, 0)
         self.assertEqual(len(L), 3)
@@ -551,7 +554,7 @@ class TestPRoutesCommand(unittest.TestCase):
         command = self._makeOne()
         L = []
         command.out = L.append
-        command.bootstrap = (dummy.DummyBootstrap(registry=config.registry),)
+        command.bootstrap = dummy.DummyBootstrap(registry=config.registry)
         result = command.run()
         self.assertEqual(result, 0)
         self.assertEqual(len(L), 3)
@@ -592,7 +595,7 @@ class TestPRoutesCommand(unittest.TestCase):
 
         L = []
         command.out = L.append
-        command.bootstrap = (dummy.DummyBootstrap(registry=config.registry),)
+        command.bootstrap = dummy.DummyBootstrap(registry=config.registry)
         result = command.run()
         self.assertEqual(result, 0)
         self.assertEqual(len(L), 3)
@@ -624,7 +627,7 @@ class TestPRoutesCommand(unittest.TestCase):
         command.args.format = 'method,name'
         L = []
         command.out = L.append
-        command.bootstrap = (dummy.DummyBootstrap(registry=config.registry),)
+        command.bootstrap = dummy.DummyBootstrap(registry=config.registry)
         result = command.run()
         self.assertEqual(result, 0)
         self.assertEqual(len(L), 3)
@@ -654,7 +657,7 @@ class TestPRoutesCommand(unittest.TestCase):
         command.args.format = 'predicates,name,pattern'
         L = []
         command.out = L.append
-        command.bootstrap = (dummy.DummyBootstrap(registry=config.registry),)
+        command.bootstrap = dummy.DummyBootstrap(registry=config.registry)
         expected = (
             "You provided invalid formats ['predicates'], "
             "Available formats are ['name', 'pattern', 'view', 'method']"
@@ -682,10 +685,9 @@ class TestPRoutesCommand(unittest.TestCase):
 
         L = []
         command.out = L.append
-        command.bootstrap = (dummy.DummyBootstrap(registry=config.registry),)
-        config_factory = dummy.DummyConfigParserFactory()
-        command.ConfigParser = config_factory
-        config_factory.items = [('format', 'method\nname')]
+        command.bootstrap = dummy.DummyBootstrap(registry=config.registry)
+        command.get_config_loader = dummy.DummyLoader(
+            {'proutes': {'format': 'method\nname'}})
 
         result = command.run()
         self.assertEqual(result, 0)
@@ -715,10 +717,9 @@ class TestPRoutesCommand(unittest.TestCase):
 
         L = []
         command.out = L.append
-        command.bootstrap = (dummy.DummyBootstrap(registry=config.registry),)
-        config_factory = dummy.DummyConfigParserFactory()
-        command.ConfigParser = config_factory
-        config_factory.items = [('format', 'method name')]
+        command.bootstrap = dummy.DummyBootstrap(registry=config.registry)
+        command.get_config_loader = dummy.DummyLoader(
+            {'proutes': {'format': 'method name'}})
 
         result = command.run()
         self.assertEqual(result, 0)
@@ -748,10 +749,9 @@ class TestPRoutesCommand(unittest.TestCase):
 
         L = []
         command.out = L.append
-        command.bootstrap = (dummy.DummyBootstrap(registry=config.registry),)
-        config_factory = dummy.DummyConfigParserFactory()
-        command.ConfigParser = config_factory
-        config_factory.items = [('format', 'method,name')]
+        command.bootstrap = dummy.DummyBootstrap(registry=config.registry)
+        command.get_config_loader = dummy.DummyLoader(
+            {'proutes': {'format': 'method,name'}})
 
         result = command.run()
         self.assertEqual(result, 0)
@@ -771,7 +771,7 @@ class TestPRoutesCommand(unittest.TestCase):
         command = self._makeOne()
         L = []
         command.out = L.append
-        command.bootstrap = (dummy.DummyBootstrap(registry=config.registry),)
+        command.bootstrap = dummy.DummyBootstrap(registry=config.registry)
         result = command.run()
         self.assertEqual(result, 0)
         self.assertEqual(len(L), 3)
