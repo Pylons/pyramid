@@ -228,6 +228,10 @@ These values are provided to the template:
   provided if the template is rendered as the result of a ``renderer=``
   argument to the view configuration being used.
 
+``get_csrf_token()``
+  A convenience function to access the current CSRF token. See
+  :ref:`get_csrf_token_in_templates` for more information.
+
 ``renderer_name``
   The renderer name used to perform the rendering, e.g.,
   ``mypackage:templates/foo.pt``.

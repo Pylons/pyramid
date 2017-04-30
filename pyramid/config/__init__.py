@@ -396,6 +396,7 @@ class Configurator(
         self.add_default_view_derivers()
         self.add_default_route_predicates()
         self.add_default_tweens()
+        self.add_default_security()
 
         if exceptionresponse_view is not None:
             exceptionresponse_view = self.maybe_dotted(exceptionresponse_view)

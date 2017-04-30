@@ -891,6 +891,11 @@ Glossary
       :meth:`pyramid.config.Configurator.set_session_factory` for more
       information.
 
+   CSRF storage policy
+      A utility that implements :class:`pyramid.interfaces.ICSRFStoragePolicy`
+      which is responsible for allocating CSRF tokens to a user and verifying
+      that a provided token is acceptable.
+
    Mako
      `Mako <http://www.makotemplates.org/>`_ is a template language
      which refines the familiar ideas of componentized layout and inheritance

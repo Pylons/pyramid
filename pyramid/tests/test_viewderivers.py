@@ -12,6 +12,7 @@ class TestDeriveView(unittest.TestCase):
 
     def setUp(self):
         self.config = testing.setUp()
+        self.config.set_default_csrf_options(require_csrf=False)
 
     def tearDown(self):
         self.config = None

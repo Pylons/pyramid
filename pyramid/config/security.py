@@ -3,17 +3,24 @@ from zope.interface import implementer
 from pyramid.interfaces import (
     IAuthorizationPolicy,
     IAuthenticationPolicy,
+    ICSRFStoragePolicy,
     IDefaultCSRFOptions,
     IDefaultPermission,
     PHASE1_CONFIG,
     PHASE2_CONFIG,
     )
 
+from pyramid.csrf import LegacySessionCSRFStoragePolicy
 from pyramid.exceptions import ConfigurationError
 from pyramid.util import action_method
 from pyramid.util import as_sorted_tuple
 
+
 class SecurityConfiguratorMixin(object):
+
+    def add_default_security(self):
+        self.set_csrf_storage_policy(LegacySessionCSRFStoragePolicy())
+
     @action_method
     def set_authentication_policy(self, policy):
         """ Override the :app:`Pyramid` :term:`authentication policy` in the
@@ -223,8 +230,30 @@ class SecurityConfiguratorMixin(object):
         intr['header'] = header
         intr['safe_methods'] = as_sorted_tuple(safe_methods)
         intr['callback'] = callback
+
         self.action(IDefaultCSRFOptions, register, order=PHASE1_CONFIG,
                     introspectables=(intr,))
+
+    @action_method
+    def set_csrf_storage_policy(self, policy):
+        """
+        Set the :term:`CSRF storage policy` used by subsequent view
+        registrations.
+
+        ``policy`` is a class that implements the
+        :meth:`pyramid.interfaces.ICSRFStoragePolicy` interface and defines
+        how to generate and persist CSRF tokens.
+
+        """
+        def register():
+            self.registry.registerUtility(policy, ICSRFStoragePolicy)
+        intr = self.introspectable('csrf storage policy',
+                                   None,
+                                   policy,
+                                   'csrf storage policy')
+        intr['policy'] = policy
+        self.action(ICSRFStoragePolicy, register, introspectables=(intr,))
+
 
 @implementer(IDefaultCSRFOptions)
 class DefaultCSRFOptions(object):

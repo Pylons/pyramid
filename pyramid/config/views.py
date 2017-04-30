@@ -641,17 +641,21 @@ class ViewsConfiguratorMixin(object):
           'check name'.  If the value provided is ``True``, ``csrf_token`` will
           be used as the check name.
 
-          If CSRF checking is performed, the checked value will be the value
-          of ``request.params[check_name]``.  This value will be compared
-          against the value of ``request.session.get_csrf_token()``, and the
-          check will pass if these two values are the same.  If the check
-          passes, the associated view will be permitted to execute.  If the
+          If CSRF checking is performed, the checked value will be the value of
+          ``request.params[check_name]``. This value will be compared against
+          the value of ``policy.get_csrf_token()`` (where ``policy`` is an
+          implementation of :meth:`pyramid.interfaces.ICSRFStoragePolicy`), and the
+          check will pass if these two values are the same. If the check
+          passes, the associated view will be permitted to execute. If the
           check fails, the associated view will not be permitted to execute.
 
-          Note that using this feature requires a :term:`session factory` to
-          have been configured.
-
           .. versionadded:: 1.4a2
+
+          .. versionchanged:: 1.9
+            This feature requires either a :term:`session factory` to have been
+            configured, or a :term:`CSRF storage policy` other than the default
+            to be in use.
+
 
         physical_path
 
