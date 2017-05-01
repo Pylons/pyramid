@@ -26,23 +26,6 @@ Major Features
 
   See https://github.com/Pylons/pyramid/pull/2964
 
-Features
---------
-
-- Support an ``open_url`` config setting in the ``pserve`` section of the
-  config file. This url is used to open a web browser when ``pserve --browser``
-  is invoked. When this setting is unavailable the ``pserve`` script will
-  attempt to guess the port the server is using from the
-  ``server:<server_name>`` section of the config file but there is no
-  requirement that the server is being run in this format so it may fail.
-  See https://github.com/Pylons/pyramid/pull/2984
-
-- The threadlocals are now available inside any function invoked via
-  ``config.include``. This means the only config-time code that cannot rely
-  on threadlocals is code executed from non-actions inside the main. This
-  can be alleviated by invoking ``config.begin()`` and ``config.end()``
-  appropriately. See https://github.com/Pylons/pyramid/pull/2989
-
 - CSRF support has been refactored out of sessions and into its own
   independent API in the ``pyramid.csrf`` module. It supports a pluggable
   ``pyramid.interfaces.ICSRFStoragePolicy`` which can be used to define your
@@ -65,6 +48,23 @@ Features
 
   See https://github.com/Pylons/pyramid/pull/2854 and
   https://github.com/Pylons/pyramid/pull/3019
+
+Features
+--------
+
+- Support an ``open_url`` config setting in the ``pserve`` section of the
+  config file. This url is used to open a web browser when ``pserve --browser``
+  is invoked. When this setting is unavailable the ``pserve`` script will
+  attempt to guess the port the server is using from the
+  ``server:<server_name>`` section of the config file but there is no
+  requirement that the server is being run in this format so it may fail.
+  See https://github.com/Pylons/pyramid/pull/2984
+
+- The threadlocals are now available inside any function invoked via
+  ``config.include``. This means the only config-time code that cannot rely
+  on threadlocals is code executed from non-actions inside the main. This
+  can be alleviated by invoking ``config.begin()`` and ``config.end()``
+  appropriately. See https://github.com/Pylons/pyramid/pull/2989
 
 - The ``pyramid.config.Configurator`` can now be used as a context manager
   which will automatically push/pop threadlocals (similar to
