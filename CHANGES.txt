@@ -11,6 +11,7 @@ Major Features
 
   For now, Pyramid is still shipping with integrated support for the
   PasteDeploy INI format by depending on the ``plaster_pastedeploy`` binding.
+  This may change in the future.
 
   See https://github.com/Pylons/pyramid/pull/2985
 
@@ -42,11 +43,26 @@ Features
   can be alleviated by invoking ``config.begin()`` and ``config.end()``
   appropriately. See https://github.com/Pylons/pyramid/pull/2989
 
-- A new CSRF implementation, ``pyramid.csrf.SessionCSRFStoragePolicy``,
-  has been added which delegates all CSRF generation to the current session,
-  following the old API for this. A ``pyramid.csrf.get_csrf_token()`` api is now
-  available in template global scope, to make it easy for template developers
-  to get the current CSRF token without adding it to Python code.
+- CSRF support has been refactored out of sessions and into its own
+  independent API in the ``pyramid.csrf`` module. It supports a pluggable
+  ``pyramid.interfaces.ICSRFStoragePolicy`` which can be used to define your
+  own mechanism for generating and validating CSRF tokens. By default,
+  Pyramid continues to use the ``pyramid.csrf.LegacySessionCSRFStoragePolicy``
+  that uses the ``request.session.get_csrf_token`` and
+  ``request.session.new_csrf_token`` APIs under the hood to preserve
+  compatibility. Two new policies are shipped as well,
+  ``pyramid.csrf.SessionCSRFStoragePolicy`` and
+  ``pyramid.csrf.CookieCSRFStoragePolicy`` which will store the CSRF tokens
+  in the session and in a standalone cookie, respectively. The storage policy
+  can be changed by using the new
+  ``pyramid.config.Configurator.set_csrf_storage_policy`` config directive.
+
+  CSRF tokens should be used via the new ``pyramid.csrf.get_csrf_token``,
+  ``pyramid.csrf.new_csrf_token`` and ``pyramid.csrf.check_csrf_token`` APIs
+  in order to continue working if the storage policy is changed. Also, the
+  ``pyramid.csrf.get_csrf_token`` function is injected into templates to be
+  used conveniently in UI code.
+
   See https://github.com/Pylons/pyramid/pull/2854 and
   https://github.com/Pylons/pyramid/pull/3019
 
