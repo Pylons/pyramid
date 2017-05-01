@@ -60,17 +60,18 @@ Features
   requirement that the server is being run in this format so it may fail.
   See https://github.com/Pylons/pyramid/pull/2984
 
-- The threadlocals are now available inside any function invoked via
-  ``config.include``. This means the only config-time code that cannot rely
-  on threadlocals is code executed from non-actions inside the main. This
-  can be alleviated by invoking ``config.begin()`` and ``config.end()``
-  appropriately. See https://github.com/Pylons/pyramid/pull/2989
-
 - The ``pyramid.config.Configurator`` can now be used as a context manager
   which will automatically push/pop threadlocals (similar to
   ``config.begin()`` and ``config.end()``). It will also automatically perform
   a ``config.commit()`` and thus it is only recommended to be used at the
   top-level of your app. See https://github.com/Pylons/pyramid/pull/2874
+
+- The threadlocals are now available inside any function invoked via
+  ``config.include``. This means the only config-time code that cannot rely
+  on threadlocals is code executed from non-actions inside the main. This
+  can be alleviated by invoking ``config.begin()`` and ``config.end()``
+  appropriately or using the new context manager feature of the configurator.
+  See https://github.com/Pylons/pyramid/pull/2989
 
 Bug Fixes
 ---------
