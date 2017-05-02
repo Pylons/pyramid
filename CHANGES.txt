@@ -49,8 +49,8 @@ Major Features
   See https://github.com/Pylons/pyramid/pull/2854 and
   https://github.com/Pylons/pyramid/pull/3019
 
-Features
---------
+Minor Features
+--------------
 
 - Support an ``open_url`` config setting in the ``pserve`` section of the
   config file. This url is used to open a web browser when ``pserve --browser``
@@ -94,12 +94,21 @@ Bug Fixes
 Deprecations
 ------------
 
-Backward Incompatibilities
---------------------------
+- Pyramid currently depends on ``plaster_pastedeploy`` to simplify the
+  transition to ``plaster`` by maintaining integrated support for INI files.
+  This dependency on ``plaster_pastedeploy`` should be considered subject to
+  Pyramid's deprecation policy and is subject to removal in the future.
+  Applications should depend on the appropriate plaster binding to satisfy
+  their needs.
 
-Documentation Changes
----------------------
+- Retrieving CSRF token from the session has been deprecated in favor of
+  equivalent methods in the ``pyramid.csrf`` module. The CSRF methods
+  (``ISession.get_csrf_token`` and ``ISession.new_csrf_token``) are no longer
+  required on the ``ISession`` interface except when using the default
+  ``pyramid.csrf.LegacySessionCSRFStoragePolicy``.
 
-- Retrieving CSRF token from the session has been deprecated, in favor of
-  equivalent methods in :mod:`pyramid.csrf`.
-  See https://github.com/Pylons/pyramid/pull/2854
+  Also, ``pyramid.session.check_csrf_token`` is now located at
+  ``pyramid.csrf.check_csrf_token``.
+
+  See https://github.com/Pylons/pyramid/pull/2854 and
+  https://github.com/Pylons/pyramid/pull/3019
