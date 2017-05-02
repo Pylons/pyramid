@@ -8,7 +8,7 @@ Major Feature Additions
 
 - The file format used by all ``p*`` command line scripts such as ``pserve`` and ``pshell``, as well as the :func:`pyramid.paster.bootstrap` function is now replaceable thanks to a new dependency on `plaster <http://docs.pylonsproject.org/projects/plaster/en/latest/>`_.
 
-  For now, Pyramid is still shipping with integrated support for the PasteDeploy INI format by depending on the ``plaster_pastedeploy`` binding library. This may change in the future so it is recommended for applications to start depending on the appropriate plaster binding for their needs.
+  For now, Pyramid is still shipping with integrated support for the PasteDeploy INI format by depending on the `plaster_pastedeploy <https://github.com/Pylons/plaster_pastedeploy`_ binding library. This may change in the future so it is recommended for applications to start depending on the appropriate plaster binding for their needs.
 
   See https://github.com/Pylons/pyramid/pull/2985
 
@@ -22,7 +22,7 @@ Major Feature Additions
 
 - CSRF support has been refactored out of sessions and into its own independent API in the :mod:`pyramid.csrf` module. It supports a pluggable :class:`pyramid.interfaces.ICSRFStoragePolicy` which can be used to define your own mechanism for generating and validating CSRF tokens. By default, Pyramid continues to use the :class:`pyramid.csrf.LegacySessionCSRFStoragePolicy` that uses the ``request.session.get_csrf_token`` and ``request.session.new_csrf_token`` APIs under the hood to preserve compatibility with older Pyramid applications. Two new policies are shipped as well, :class:`pyramid.csrf.SessionCSRFStoragePolicy` and :class:`pyramid.csrf.CookieCSRFStoragePolicy` which will store the CSRF tokens in the session and in a standalone cookie, respectively. The storage policy can be changed by using the new :meth:`pyramid.config.Configurator.set_csrf_storage_policy` config directive.
 
-  CSRF tokens should be used via the new :func:`pyramid.csrf.get_csrf_token`, :func:`pyramid.csrf.new_csrf_token` and :func:`pyramid.csrf.check_csrf_token`` APIs in order to continue working if the storage policy is changed. Also, the :func:`pyramid.csrf.get_csrf_token` function is now injected into templates to be used conveniently in UI code.
+  CSRF tokens should be used via the new :func:`pyramid.csrf.get_csrf_token`, :func:`pyramid.csrf.new_csrf_token` and :func:`pyramid.csrf.check_csrf_token` APIs in order to continue working if the storage policy is changed. Also, the :func:`pyramid.csrf.get_csrf_token` function is now injected into templates to be used conveniently in UI code.
 
   See https://github.com/Pylons/pyramid/pull/2854 and https://github.com/Pylons/pyramid/pull/3019
 
