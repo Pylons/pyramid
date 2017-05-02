@@ -47,3 +47,9 @@ Deprecations
 
   See https://github.com/Pylons/pyramid/pull/2854 and
   https://github.com/Pylons/pyramid/pull/3019
+
+Documentation Enhancements
+--------------------------
+
+- Added the :term:`execution policy` to the routing diagram in
+  :ref:`router_chapter`. See https://github.com/Pylons/pyramid/pull/2993
