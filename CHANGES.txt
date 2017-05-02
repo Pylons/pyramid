@@ -118,4 +118,4 @@ Documentation Changes
 ---------------------
 
 - Added the execution policy to the routing diagram in the Request Processing
-  chatper. See https://github.com/Pylons/pyramid/pull/2993
+  chapter. See https://github.com/Pylons/pyramid/pull/2993
