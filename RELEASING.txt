@@ -111,8 +111,6 @@ Marketing and communications
 - Edit Pylons/trypyramid.com/src/templates/resources.html for major releases
   only.
 
-- Edit Pylons/pylonsrtd/pylonsrtd/docs/pyramid.rst for major releases only.
-
 - Edit `http://wiki.python.org/moin/WebFrameworks
   <http://wiki.python.org/moin/WebFrameworks>`_.
 
