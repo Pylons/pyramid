@@ -8,7 +8,7 @@ Major Feature Additions
 
 - The file format used by all ``p*`` command line scripts such as ``pserve`` and ``pshell``, as well as the :func:`pyramid.paster.bootstrap` function is now replaceable thanks to a new dependency on `plaster <http://docs.pylonsproject.org/projects/plaster/en/latest/>`_.
 
-  For now, Pyramid is still shipping with integrated support for the PasteDeploy INI format by depending on the `plaster_pastedeploy <https://github.com/Pylons/plaster_pastedeploy`_ binding library. This may change in the future so it is recommended for applications to start depending on the appropriate plaster binding for their needs.
+  For now, Pyramid is still shipping with integrated support for the PasteDeploy INI format by depending on the `plaster_pastedeploy <https://github.com/Pylons/plaster_pastedeploy>`_ binding library. This may change in the future so it is recommended for applications to start depending on the appropriate plaster binding for their needs.
 
   See https://github.com/Pylons/pyramid/pull/2985
 
