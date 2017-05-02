@@ -11,7 +11,7 @@ Major Features
 
   For now, Pyramid is still shipping with integrated support for the
   PasteDeploy INI format by depending on the
-  `plaster_pastedeploy <https://github.com/Pylons/plaster_pastedeploy`_
+  `plaster_pastedeploy <https://github.com/Pylons/plaster_pastedeploy>`_
   binding library. This may change in the future.
 
   See https://github.com/Pylons/pyramid/pull/2985

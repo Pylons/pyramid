@@ -67,6 +67,7 @@ intersphinx_mapping = {
     'cookiecutter': ('https://cookiecutter.readthedocs.io/en/latest/', None),
     'deform': ('http://docs.pylonsproject.org/projects/deform/en/latest', None),
     'jinja2': ('http://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/', None),
+    'plaster': ('http://docs.pylonsproject.org/projects/plaster/en/latest/', None),
     'pylonswebframework': ('http://docs.pylonsproject.org/projects/pylons-webframework/en/latest/', None),
     'python': ('https://docs.python.org/3', None),
     'pytest': ('http://pytest.org/latest/', None),
