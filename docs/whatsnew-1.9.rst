@@ -38,18 +38,15 @@ Minor Feature Additions
 Deprecations
 ------------
 
-- Pyramid currently depends on ``plaster_pastedeploy`` to simplify the transition to ``plaster`` by maintaining integrated support for INI files. This dependency on ``plaster_pastedeploy`` should be considered subject to Pyramid's deprecation policy and is subject to removal in the future. Applications should depend on the appropriate plaster binding to satisfy their needs.
+- Pyramid currently depends on ``plaster_pastedeploy`` to simplify the transition to ``plaster`` by maintaining integrated support for INI files. This dependency on ``plaster_pastedeploy`` should be considered subject to Pyramid's deprecation policy and may be removed in the future. Applications should depend on the appropriate plaster binding to satisfy their needs.
 
 - Retrieving CSRF token from the session has been deprecated in favor of equivalent methods in the :mod:`pyramid.csrf` module. The CSRF methods (``ISession.get_csrf_token`` and ``ISession.new_csrf_token``) are no longer required on the :class:`pyramid.interfaces.ISession` interface except when using the default :class:`pyramid.csrf.LegacySessionCSRFStoragePolicy`.
 
-  Also, ``pyramid.session.check_csrf_token`` is now located at
-  :func:`pyramid.csrf.check_csrf_token`.
+  Also, ``pyramid.session.check_csrf_token`` is now located at :func:`pyramid.csrf.check_csrf_token`.
 
-  See https://github.com/Pylons/pyramid/pull/2854 and
-  https://github.com/Pylons/pyramid/pull/3019
+  See https://github.com/Pylons/pyramid/pull/2854 and https://github.com/Pylons/pyramid/pull/3019
 
 Documentation Enhancements
 --------------------------
 
-- Added the :term:`execution policy` to the routing diagram in
-  :ref:`router_chapter`. See https://github.com/Pylons/pyramid/pull/2993
+- Added the :term:`execution policy` to the routing diagram in :ref:`router_chapter`. See https://github.com/Pylons/pyramid/pull/2993

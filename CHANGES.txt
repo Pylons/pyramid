@@ -98,7 +98,7 @@ Deprecations
 - Pyramid currently depends on ``plaster_pastedeploy`` to simplify the
   transition to ``plaster`` by maintaining integrated support for INI files.
   This dependency on ``plaster_pastedeploy`` should be considered subject to
-  Pyramid's deprecation policy and is subject to removal in the future.
+  Pyramid's deprecation policy and may be removed in the future.
   Applications should depend on the appropriate plaster binding to satisfy
   their needs.
 
