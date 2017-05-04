@@ -664,6 +664,11 @@ class ViewMethodsMixin(object):
         response. Otherwise the previous values for ``request.exception`` and
         ``request.exc_info`` will be restored.
 
+        .. versionchanged:: 1.9
+           The ``request.exception`` and ``request.exc_info`` properties will
+           reflect the exception used to render the response where previously
+           they were reset to the values prior to invoking the method.
+
         """
         if request is None:
             request = self
