@@ -657,8 +657,14 @@ class ViewMethodsMixin(object):
 
         This method returns a :term:`response` object or raises
         :class:`pyramid.httpexceptions.HTTPNotFound` if a matching view cannot
-        be found."""
+        be found.
 
+        If a response is generated then ``request.exception`` and
+        ``request.exc_info`` will be left at the values used to render the
+        response. Otherwise the previous values for ``request.exception`` and
+        ``request.exc_info`` will be restored.
+
+        """
         if request is None:
             request = self
         registry = getattr(request, 'registry', None)
@@ -673,7 +679,7 @@ class ViewMethodsMixin(object):
         # clear old generated request.response, if any; it may
         # have been mutated by the view, and its state is not
         # sane (e.g. caching headers)
-        with hide_attrs(request, 'exception', 'exc_info', 'response'):
+        with hide_attrs(request, 'response', 'exc_info', 'exception'):
             attrs['exception'] = exc
             attrs['exc_info'] = exc_info
             # we use .get instead of .__getitem__ below due to
@@ -690,6 +696,11 @@ class ViewMethodsMixin(object):
                 secure=secure,
                 request_iface=request_iface.combined,
                 )
-            if response is None:
-                raise HTTPNotFound
-            return response
+
+        if response is None:
+            raise HTTPNotFound
+
+        # successful response, overwrite exception/exc_info
+        attrs['exception'] = exc
+        attrs['exc_info'] = exc_info
+        return response
