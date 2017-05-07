@@ -34,40 +34,28 @@ ANCHOR_SAFE = QUERY_SAFE
 def parse_url_overrides(kw):
     """Parse special arguments passed when generating urls.
 
-    The supplied dictionary is mutated, popping arguments as necessary.
-    Returns a 6-tuple of the format ``(app_url, scheme, host, port,
-    qs, anchor)``.
-    """
-    anchor = ''
-    qs = ''
-    app_url = None
-    host = None
-    scheme = None
-    port = None
+    The supplied dictionary is mutated when we pop arguments.
+    Returns a 6-tuple of the format:
 
-    if '_query' in kw:
-        query = kw.pop('_query')
+      ``(app_url, scheme, host, port, qs, anchor)``.
+    """
+    app_url = kw.pop('_app_url', None)
+    scheme = kw.pop('_scheme', None)
+    host = kw.pop('_host', None)
+    port = kw.pop('_port', None)
+    qs = query = kw.pop('_query', '')
+    anchor = kw.pop('_anchor', '')
+
+    if query:
         if isinstance(query, string_types):
             qs = '?' + url_quote(query, QUERY_SAFE)
         elif query:
             qs = '?' + urlencode(query, doseq=True)
 
-    if '_anchor' in kw:
-        anchor = kw.pop('_anchor')
+    if anchor:
         anchor = url_quote(anchor, ANCHOR_SAFE)
-        anchor = '#' + anchor
-
-    if '_app_url' in kw:
-        app_url = kw.pop('_app_url')
-
-    if '_host' in kw:
-        host = kw.pop('_host')
-
-    if '_scheme' in kw:
-        scheme = kw.pop('_scheme')
-
-    if '_port' in kw:
-        port = kw.pop('_port')
+        if anchor.startswith('#') == False:
+            anchor = '#' + anchor
 
     return app_url, scheme, host, port, qs, anchor
 
