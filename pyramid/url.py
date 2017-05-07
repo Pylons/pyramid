@@ -43,13 +43,14 @@ def parse_url_overrides(kw):
     scheme = kw.pop('_scheme', None)
     host = kw.pop('_host', None)
     port = kw.pop('_port', None)
-    qs = query = kw.pop('_query', '')
+    query = kw.pop('_query', '')
     anchor = kw.pop('_anchor', '')
 
+    qs = ''
     if query:
         if isinstance(query, string_types):
             qs = '?' + url_quote(query, QUERY_SAFE)
-        elif query:
+        else:
             qs = '?' + urlencode(query, doseq=True)
 
     if anchor:
