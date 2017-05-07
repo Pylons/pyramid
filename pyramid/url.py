@@ -55,7 +55,7 @@ def parse_url_overrides(kw):
 
     if anchor:
         anchor = url_quote(anchor, ANCHOR_SAFE)
-        if anchor.startswith('#') == False:
+        if not anchor.startswith('#'):
             anchor = '#' + anchor
 
     return app_url, scheme, host, port, qs, anchor
