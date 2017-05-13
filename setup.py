@@ -34,6 +34,8 @@ install_requires = [
     'venusian >= 1.0a3', # ``ignore``
     'translationstring >= 0.4', # py3 compat
     'PasteDeploy >= 1.5.0', # py3 compat
+    'plaster',
+    'plaster_pastedeploy',
     'hupper',
     ]
 
@@ -59,7 +61,7 @@ testing_extras = tests_require + [
     ]
 
 setup(name='pyramid',
-      version='1.9.dev0',
+      version='1.9a2',
       description='The Pyramid Web Framework, a Pylons project',
       long_description=README + '\n\n' + CHANGES,
       classifiers=[

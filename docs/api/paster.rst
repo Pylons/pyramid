@@ -7,8 +7,8 @@
 
     .. autofunction:: bootstrap
 
-    .. autofunction:: get_app(config_uri, name=None, options=None)
+    .. autofunction:: get_app
 
-    .. autofunction:: get_appsettings(config_uri, name=None, options=None)
+    .. autofunction:: get_appsettings
 
-    .. autofunction:: setup_logging(config_uri, global_conf=None)
+    .. autofunction:: setup_logging

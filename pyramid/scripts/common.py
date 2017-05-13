@@ -1,6 +1,4 @@
-import os
-from pyramid.compat import configparser
-from logging.config import fileConfig
+import plaster
 
 def parse_vars(args):
     """
@@ -17,26 +15,9 @@ def parse_vars(args):
         result[name] = value
     return result
 
-def setup_logging(config_uri, global_conf=None,
-                  fileConfig=fileConfig,
-                  configparser=configparser):
+def get_config_loader(config_uri):
     """
-    Set up logging via :func:`logging.config.fileConfig` with the filename
-    specified via ``config_uri`` (a string in the form
-    ``filename#sectionname``).
+    Find a ``plaster.ILoader`` object supporting the "wsgi" protocol.
 
-    ConfigParser defaults are specified for the special ``__file__``
-    and ``here`` variables, similar to PasteDeploy config loading.
-    Extra defaults can optionally be specified as a dict in ``global_conf``.
     """
-    path = config_uri.split('#', 1)[0]
-    parser = configparser.ConfigParser()
-    parser.read([path])
-    if parser.has_section('loggers'):
-        config_file = os.path.abspath(path)
-        full_global_conf = dict(
-            __file__=config_file,
-            here=os.path.dirname(config_file))
-        if global_conf:
-            full_global_conf.update(global_conf)
-        return fileConfig(config_file, full_global_conf)
+    return plaster.get_loader(config_uri, protocols=['wsgi'])

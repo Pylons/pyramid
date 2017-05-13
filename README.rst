@@ -1,16 +1,16 @@
 Pyramid
 =======
 
-.. image:: https://travis-ci.org/Pylons/pyramid.png?branch=master
+.. image:: https://travis-ci.org/Pylons/pyramid.png?branch=1.9-branch
         :target: https://travis-ci.org/Pylons/pyramid
         :alt: master Travis CI Status
 
-.. image:: https://readthedocs.org/projects/pyramid/badge/?version=master
-        :target: http://docs.pylonsproject.org/projects/pyramid/en/master/
+.. image:: https://readthedocs.org/projects/pyramid/badge/?version=1.9-branch
+        :target: http://docs.pylonsproject.org/projects/pyramid/en/1.9-branch/
         :alt: Master Documentation Status
 
-.. image:: https://readthedocs.org/projects/pyramid/badge/?version=latest
-        :target: http://docs.pylonsproject.org/projects/pyramid/en/latest/
+.. image:: https://readthedocs.org/projects/pyramid/badge/?version=1.9-branch
+        :target: http://docs.pylonsproject.org/projects/pyramid/en/1.9-branch/
         :alt: Latest Documentation Status
 
 .. image:: https://img.shields.io/badge/irc-freenode-blue.svg
@@ -31,10 +31,10 @@ and deployment more fun, more predictable, and more productive.
        return Response('Hello %(name)s!' % request.matchdict)
 
    if __name__ == '__main__':
-       config = Configurator()
-       config.add_route('hello', '/hello/{name}')
-       config.add_view(hello_world, route_name='hello')
-       app = config.make_wsgi_app()
+       with Configurator() as config:
+           config.add_route('hello', '/hello/{name}')
+           config.add_view(hello_world, route_name='hello')
+           app = config.make_wsgi_app()
        server = make_server('0.0.0.0', 8080, app)
        server.serve_forever()
 

@@ -778,11 +778,11 @@ class TestViewMethodsMixin(unittest.TestCase):
         orig_response = request.response = DummyResponse(b'foo')
         try:
             raise RuntimeError
-        except RuntimeError:
+        except RuntimeError as ex:
             response = request.invoke_exception_view()
             self.assertEqual(response.app_iter, [b'bar'])
-            self.assertTrue(request.exception is orig_exc)
-            self.assertTrue(request.exc_info is orig_exc_info)
+            self.assertTrue(request.exception is ex)
+            self.assertTrue(request.exc_info[1] is ex)
             self.assertTrue(request.response is orig_response)
         else: # pragma: no cover
             self.fail()

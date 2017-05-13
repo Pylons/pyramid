@@ -10,15 +10,9 @@ class TestPServeCommand(unittest.TestCase):
     def setUp(self):
         from pyramid.compat import NativeIO
         self.out_ = NativeIO()
-        self.config_factory = dummy.DummyConfigParserFactory()
 
     def out(self, msg):
         self.out_.write(msg)
-
-    def _get_server(*args, **kwargs):
-        def server(app):
-            return ''
-        return server
 
     def _getTargetClass(self):
         from pyramid.scripts.pserve import PServeCommand
@@ -29,7 +23,8 @@ class TestPServeCommand(unittest.TestCase):
         effargs.extend(args)
         cmd = self._getTargetClass()(effargs)
         cmd.out = self.out
-        cmd.ConfigParser = self.config_factory
+        self.loader = dummy.DummyLoader()
+        cmd._get_config_loader = self.loader
         return cmd
 
     def test_run_no_args(self):
@@ -38,41 +33,33 @@ class TestPServeCommand(unittest.TestCase):
         self.assertEqual(result, 2)
         self.assertEqual(self.out_.getvalue(), 'You must give a config file')
 
-    def test_config_vars_no_command(self):
-        inst = self._makeOne()
-        inst.args.config_uri = 'foo'
-        inst.args.config_vars = ['a=1', 'b=2']
-        result = inst.get_config_vars()
-        self.assertEqual(result, {'a': '1', 'b': '2'})
-
     def test_parse_vars_good(self):
         inst = self._makeOne('development.ini', 'a=1', 'b=2')
-        inst.loadserver = self._get_server
-
         app = dummy.DummyApp()
 
-        def get_app(*args, **kwargs):
-            app.global_conf = kwargs.get('global_conf', None)
+        def get_app(name, global_conf):
+            app.name = name
+            app.global_conf = global_conf
+            return app
+        self.loader.get_wsgi_app = get_app
+        self.loader.server = lambda x: x
 
-        inst.loadapp = get_app
         inst.run()
         self.assertEqual(app.global_conf, {'a': '1', 'b': '2'})
 
     def test_parse_vars_bad(self):
         inst = self._makeOne('development.ini', 'a')
-        inst.loadserver = self._get_server
         self.assertRaises(ValueError, inst.run)
 
     def test_config_file_finds_watch_files(self):
         inst = self._makeOne('development.ini')
-        self.config_factory.items = [(
-            'watch_files',
-            'foo\n/baz\npyramid.tests.test_scripts:*.py',
-        )]
-        inst.pserve_file_config('/base/path.ini', global_conf={'a': '1'})
-        self.assertEqual(self.config_factory.defaults, {
+        loader = self.loader('/base/path.ini')
+        loader.settings = {'pserve': {
+            'watch_files': 'foo\n/baz\npyramid.tests.test_scripts:*.py',
+        }}
+        inst.pserve_file_config(loader, global_conf={'a': '1'})
+        self.assertEqual(loader.calls[0]['defaults'], {
             'a': '1',
-            'here': os.path.abspath('/base'),
         })
         self.assertEqual(inst.watch_files, set([
             os.path.abspath('/base/foo'),
@@ -82,28 +69,26 @@ class TestPServeCommand(unittest.TestCase):
 
     def test_config_file_finds_open_url(self):
         inst = self._makeOne('development.ini')
-        self.config_factory.items = [(
-            'open_url', 'http://127.0.0.1:8080/',
-        )]
-        inst.pserve_file_config('/base/path.ini', global_conf={'a': '1'})
-        self.assertEqual(self.config_factory.defaults, {
+        loader = self.loader('/base/path.ini')
+        loader.settings = {'pserve': {
+            'open_url': 'http://127.0.0.1:8080/',
+        }}
+        inst.pserve_file_config(loader, global_conf={'a': '1'})
+        self.assertEqual(loader.calls[0]['defaults'], {
             'a': '1',
-            'here': os.path.abspath('/base'),
         })
         self.assertEqual(inst.open_url, 'http://127.0.0.1:8080/')
 
-    def test__guess_server_url(self):
+    def test_guess_server_url(self):
         inst = self._makeOne('development.ini')
-        self.config_factory.items = [(
-            'port', '8080',
-        )]
-        url = inst._guess_server_url(
-            '/base/path.ini', 'main', global_conf={'a': '1'})
-        self.assertEqual(self.config_factory.defaults, {
+        loader = self.loader('/base/path.ini')
+        loader.settings = {'server:foo': {
+            'port': '8080',
+        }}
+        url = inst.guess_server_url(loader, 'foo', global_conf={'a': '1'})
+        self.assertEqual(loader.calls[0]['defaults'], {
             'a': '1',
-            'here': os.path.abspath('/base'),
         })
-        self.assertEqual(self.config_factory.parser.section, 'server:main')
         self.assertEqual(url, 'http://127.0.0.1:8080')
 
     def test_reload_call_hupper_with_correct_args(self):

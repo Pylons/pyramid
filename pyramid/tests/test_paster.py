@@ -1,58 +1,32 @@
 import os
 import unittest
+from pyramid.tests.test_scripts.dummy import DummyLoader
 
 here = os.path.dirname(__file__)
 
 class Test_get_app(unittest.TestCase):
-    def _callFUT(self, config_file, section_name, **kw):
-        from pyramid.paster import get_app
-        return get_app(config_file, section_name, **kw)
+    def _callFUT(self, config_file, section_name, options=None, _loader=None):
+        import pyramid.paster
+        old_loader = pyramid.paster.get_config_loader
+        try:
+            if _loader is not None:
+                pyramid.paster.get_config_loader = _loader
+            return pyramid.paster.get_app(config_file, section_name,
+                                          options=options)
+        finally:
+            pyramid.paster.get_config_loader = old_loader
 
     def test_it(self):
         app = DummyApp()
-        loadapp = DummyLoadWSGI(app)
-        result = self._callFUT('/foo/bar/myapp.ini', 'myapp', loadapp=loadapp)
-        self.assertEqual(loadapp.config_name, 'config:/foo/bar/myapp.ini')
-        self.assertEqual(loadapp.section_name, 'myapp')
-        self.assertEqual(loadapp.relative_to, os.getcwd())
-        self.assertEqual(result, app)
-
-    def test_it_with_hash(self):
-        app = DummyApp()
-        loadapp = DummyLoadWSGI(app)
+        loader = DummyLoader(app=app)
         result = self._callFUT(
-            '/foo/bar/myapp.ini#myapp', None, loadapp=loadapp
-            )
-        self.assertEqual(loadapp.config_name, 'config:/foo/bar/myapp.ini')
-        self.assertEqual(loadapp.section_name, 'myapp')
-        self.assertEqual(loadapp.relative_to, os.getcwd())
-        self.assertEqual(result, app)
-
-    def test_it_with_hash_and_name_override(self):
-        app = DummyApp()
-        loadapp = DummyLoadWSGI(app)
-        result = self._callFUT(
-            '/foo/bar/myapp.ini#myapp', 'yourapp', loadapp=loadapp
-            )
-        self.assertEqual(loadapp.config_name, 'config:/foo/bar/myapp.ini')
-        self.assertEqual(loadapp.section_name, 'yourapp')
-        self.assertEqual(loadapp.relative_to, os.getcwd())
-        self.assertEqual(result, app)
-
-    def test_it_with_options(self):
-        app = DummyApp()
-        loadapp = DummyLoadWSGI(app)
-        options = {'a':1}
-        result = self._callFUT(
-            '/foo/bar/myapp.ini#myapp',
-            'yourapp',
-            loadapp=loadapp,
-            options=options,
-            )
-        self.assertEqual(loadapp.config_name, 'config:/foo/bar/myapp.ini')
-        self.assertEqual(loadapp.section_name, 'yourapp')
-        self.assertEqual(loadapp.relative_to, os.getcwd())
-        self.assertEqual(loadapp.kw, {'global_conf':options})
+            '/foo/bar/myapp.ini', 'myapp', options={'a': 'b'},
+            _loader=loader)
+        self.assertEqual(loader.uri.path, '/foo/bar/myapp.ini')
+        self.assertEqual(len(loader.calls), 1)
+        self.assertEqual(loader.calls[0]['op'], 'app')
+        self.assertEqual(loader.calls[0]['name'], 'myapp')
+        self.assertEqual(loader.calls[0]['defaults'], {'a': 'b'})
         self.assertEqual(result, app)
 
     def test_it_with_dummyapp_requiring_options(self):
@@ -63,38 +37,28 @@ class Test_get_app(unittest.TestCase):
         self.assertEqual(app.settings['foo'], 'baz')
 
 class Test_get_appsettings(unittest.TestCase):
-    def _callFUT(self, config_file, section_name, **kw):
-        from pyramid.paster import get_appsettings
-        return get_appsettings(config_file, section_name, **kw)
+    def _callFUT(self, config_file, section_name, options=None, _loader=None):
+        import pyramid.paster
+        old_loader = pyramid.paster.get_config_loader
+        try:
+            if _loader is not None:
+                pyramid.paster.get_config_loader = _loader
+            return pyramid.paster.get_appsettings(config_file, section_name,
+                                                  options=options)
+        finally:
+            pyramid.paster.get_config_loader = old_loader
 
     def test_it(self):
-        values = {'a':1}
-        appconfig = DummyLoadWSGI(values)
-        result = self._callFUT('/foo/bar/myapp.ini', 'myapp',
-                               appconfig=appconfig)
-        self.assertEqual(appconfig.config_name, 'config:/foo/bar/myapp.ini')
-        self.assertEqual(appconfig.section_name, 'myapp')
-        self.assertEqual(appconfig.relative_to, os.getcwd())
-        self.assertEqual(result, values)
-
-    def test_it_with_hash(self):
-        values = {'a':1}
-        appconfig = DummyLoadWSGI(values)
-        result = self._callFUT('/foo/bar/myapp.ini#myapp', None,
-                               appconfig=appconfig)
-        self.assertEqual(appconfig.config_name, 'config:/foo/bar/myapp.ini')
-        self.assertEqual(appconfig.section_name, 'myapp')
-        self.assertEqual(appconfig.relative_to, os.getcwd())
-        self.assertEqual(result, values)
-
-    def test_it_with_hash_and_name_override(self):
-        values = {'a':1}
-        appconfig = DummyLoadWSGI(values)
-        result = self._callFUT('/foo/bar/myapp.ini#myapp', 'yourapp',
-                               appconfig=appconfig)
-        self.assertEqual(appconfig.config_name, 'config:/foo/bar/myapp.ini')
-        self.assertEqual(appconfig.section_name, 'yourapp')
-        self.assertEqual(appconfig.relative_to, os.getcwd())
+        values = {'a': 1}
+        loader = DummyLoader(app_settings=values)
+        result = self._callFUT(
+            '/foo/bar/myapp.ini', 'myapp', options={'a': 'b'},
+            _loader=loader)
+        self.assertEqual(loader.uri.path, '/foo/bar/myapp.ini')
+        self.assertEqual(len(loader.calls), 1)
+        self.assertEqual(loader.calls[0]['op'], 'app_settings')
+        self.assertEqual(loader.calls[0]['name'], 'myapp')
+        self.assertEqual(loader.calls[0]['defaults'], {'a': 'b'})
         self.assertEqual(result, values)
 
     def test_it_with_dummyapp_requiring_options(self):
@@ -105,40 +69,39 @@ class Test_get_appsettings(unittest.TestCase):
         self.assertEqual(result['foo'], 'baz')
 
 class Test_setup_logging(unittest.TestCase):
-    def _callFUT(self, config_file, global_conf=None):
-        from pyramid.paster import setup_logging
-        dummy_cp = DummyConfigParserModule
-        return setup_logging(
-            config_uri=config_file,
-            global_conf=global_conf,
-            fileConfig=self.fileConfig,
-            configparser=dummy_cp,
-            )
+    def _callFUT(self, config_file, global_conf=None, _loader=None):
+        import pyramid.paster
+        old_loader = pyramid.paster.get_config_loader
+        try:
+            if _loader is not None:
+                pyramid.paster.get_config_loader = _loader
+            return pyramid.paster.setup_logging(config_file, global_conf)
+        finally:
+            pyramid.paster.get_config_loader = old_loader
 
     def test_it_no_global_conf(self):
-        config_file, dict = self._callFUT('/abc')
-        # os.path.abspath is a sop to Windows
-        self.assertEqual(config_file, os.path.abspath('/abc'))
-        self.assertEqual(dict['__file__'], os.path.abspath('/abc'))
-        self.assertEqual(dict['here'], os.path.abspath('/'))
+        loader = DummyLoader()
+        self._callFUT('/abc.ini', _loader=loader)
+        self.assertEqual(loader.uri.path, '/abc.ini')
+        self.assertEqual(len(loader.calls), 1)
+        self.assertEqual(loader.calls[0]['op'], 'logging')
+        self.assertEqual(loader.calls[0]['defaults'], None)
 
     def test_it_global_conf_empty(self):
-        config_file, dict = self._callFUT('/abc', global_conf={})
-        # os.path.abspath is a sop to Windows
-        self.assertEqual(config_file, os.path.abspath('/abc'))
-        self.assertEqual(dict['__file__'], os.path.abspath('/abc'))
-        self.assertEqual(dict['here'], os.path.abspath('/'))
+        loader = DummyLoader()
+        self._callFUT('/abc.ini', global_conf={}, _loader=loader)
+        self.assertEqual(loader.uri.path, '/abc.ini')
+        self.assertEqual(len(loader.calls), 1)
+        self.assertEqual(loader.calls[0]['op'], 'logging')
+        self.assertEqual(loader.calls[0]['defaults'], {})
 
     def test_it_global_conf_not_empty(self):
-        config_file, dict = self._callFUT('/abc', global_conf={'key': 'val'})
-        # os.path.abspath is a sop to Windows
-        self.assertEqual(config_file, os.path.abspath('/abc'))
-        self.assertEqual(dict['__file__'], os.path.abspath('/abc'))
-        self.assertEqual(dict['here'], os.path.abspath('/'))
-        self.assertEqual(dict['key'], 'val')
-
-    def fileConfig(self, config_file, dict):
-        return config_file, dict
+        loader = DummyLoader()
+        self._callFUT('/abc.ini', global_conf={'key': 'val'}, _loader=loader)
+        self.assertEqual(loader.uri.path, '/abc.ini')
+        self.assertEqual(len(loader.calls), 1)
+        self.assertEqual(loader.calls[0]['op'], 'logging')
+        self.assertEqual(loader.calls[0]['defaults'], {'key': 'val'})
 
 class Test_bootstrap(unittest.TestCase):
     def _callFUT(self, config_uri, request=None):
@@ -187,17 +150,6 @@ class DummyRegistry(object):
 
 dummy_registry = DummyRegistry()
 
-class DummyLoadWSGI:
-    def __init__(self, result):
-        self.result = result
-
-    def __call__(self, config_name, name=None, relative_to=None, **kw):
-        self.config_name = config_name
-        self.section_name = name
-        self.relative_to = relative_to
-        self.kw = kw
-        return self.result
-
 class DummyApp:
     def __init__(self):
         self.registry = dummy_registry
@@ -214,13 +166,3 @@ class DummyRequest:
     def __init__(self, environ):
         self.environ = environ
         self.matchdict = {}
-
-class DummyConfigParser(object):
-    def read(self, x):
-        pass
-
-    def has_section(self, name):
-        return True
-
-class DummyConfigParserModule(object):
-    ConfigParser = DummyConfigParser

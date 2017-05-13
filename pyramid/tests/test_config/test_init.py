@@ -141,6 +141,22 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(manager.pushed, pushed)
         self.assertEqual(manager.popped, True)
 
+    def test_context_manager(self):
+        from pyramid.config import Configurator
+        config = Configurator()
+        manager = DummyThreadLocalManager()
+        config.manager = manager
+        view = lambda r: None
+        with config as ctx:
+            self.assertTrue(config is ctx)
+            self.assertEqual(manager.pushed,
+                             {'registry': config.registry, 'request': None})
+            self.assertFalse(manager.popped)
+            config.add_view(view)
+        self.assertTrue(manager.popped)
+        config.add_view(view)  # did not raise a conflict because of commit
+        config.commit()
+
     def test_ctor_with_package_registry(self):
         import sys
         from pyramid.config import Configurator

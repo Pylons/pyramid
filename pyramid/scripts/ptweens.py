@@ -7,6 +7,7 @@ from pyramid.interfaces import ITweens
 from pyramid.tweens import MAIN
 from pyramid.tweens import INGRESS
 from pyramid.paster import bootstrap
+from pyramid.paster import setup_logging
 from pyramid.scripts.common import parse_vars
 
 def main(argv=sys.argv, quiet=False):
@@ -47,7 +48,8 @@ class PTweensCommand(object):
         )
 
     stdout = sys.stdout
-    bootstrap = (bootstrap,) # testing
+    bootstrap = staticmethod(bootstrap) # testing
+    setup_logging = staticmethod(setup_logging) # testing
 
     def __init__(self, argv, quiet=False):
         self.quiet = quiet
@@ -76,7 +78,9 @@ class PTweensCommand(object):
             self.out('Requires a config file argument')
             return 2
         config_uri = self.args.config_uri
-        env = self.bootstrap[0](config_uri, options=parse_vars(self.args.config_vars))
+        config_vars = parse_vars(self.args.config_vars)
+        self.setup_logging(config_uri, global_conf=config_vars)
+        env = self.bootstrap(config_uri, options=config_vars)
         registry = env['registry']
         tweens = self._get_tweens(registry)
         if tweens is not None:

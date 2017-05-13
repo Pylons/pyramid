@@ -366,6 +366,14 @@ Glossary
      :term:`WSGI` components together declaratively within an ``.ini``
      file.  It was developed by Ian Bicking.
 
+   plaster
+     `plaster <http://docs.pylonsproject.org/projects/plaster/en/latest/>`_ is
+     a library used by :app:`Pyramid` which acts as an abstraction between
+     command-line scripts and the file format used to load the :term:`WSGI`
+     components and application settings. By default :app:`Pyramid` ships
+     with the ``plaster_pastedeploy`` library installed which provides
+     integrated support for loading a :term:`PasteDeploy` INI file.
+
    Chameleon
      `chameleon <https://chameleon.readthedocs.org/en/latest/>`_ is an
      attribute language template compiler which supports the :term:`ZPT`
@@ -890,6 +898,11 @@ Glossary
       :ref:`using_alternate_session_factories` and
       :meth:`pyramid.config.Configurator.set_session_factory` for more
       information.
+
+   CSRF storage policy
+      A utility that implements :class:`pyramid.interfaces.ICSRFStoragePolicy`
+      which is responsible for allocating CSRF tokens to a user and verifying
+      that a provided token is acceptable.
 
    Mako
      `Mako <http://www.makotemplates.org/>`_ is a template language

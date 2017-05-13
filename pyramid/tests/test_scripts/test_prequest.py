@@ -1,4 +1,5 @@
 import unittest
+from pyramid.tests.test_scripts import dummy
 
 class TestPRequestCommand(unittest.TestCase):
     def _getTargetClass(self):
@@ -7,23 +8,17 @@ class TestPRequestCommand(unittest.TestCase):
 
     def _makeOne(self, argv, headers=None):
         cmd = self._getTargetClass()(argv)
-        cmd.get_app = self.get_app
-        self._headers = headers or []
-        self._out = []
-        cmd.out = self.out
-        return cmd
-
-    def get_app(self, spec, app_name=None, options=None):
-        self._spec = spec
-        self._app_name = app_name
-        self._options = options or {}
 
         def helloworld(environ, start_request):
             self._environ = environ
             self._path_info = environ['PATH_INFO']
-            start_request('200 OK', self._headers)
+            start_request('200 OK', headers or [])
             return [b'abc']
-        return helloworld
+        self.loader = dummy.DummyLoader(app=helloworld)
+        self._out = []
+        cmd._get_config_loader = self.loader
+        cmd.out = self.out
+        return cmd
 
     def out(self, msg):
         self._out.append(msg)
@@ -38,8 +33,10 @@ class TestPRequestCommand(unittest.TestCase):
                 [('Content-Type', 'text/html; charset=UTF-8')])
         command.run()
         self.assertEqual(self._path_info, '/')
-        self.assertEqual(self._spec, 'development.ini')
-        self.assertEqual(self._app_name, None)
+        self.assertEqual(self.loader.uri.path, 'development.ini')
+        self.assertEqual(self.loader.calls[0]['op'], 'logging')
+        self.assertEqual(self.loader.calls[1]['op'], 'app')
+        self.assertEqual(self.loader.calls[1]['name'], None)
         self.assertEqual(self._out, ['abc'])
 
     def test_command_path_doesnt_start_with_slash(self):
@@ -47,8 +44,7 @@ class TestPRequestCommand(unittest.TestCase):
                 [('Content-Type', 'text/html; charset=UTF-8')])
         command.run()
         self.assertEqual(self._path_info, '/abc')
-        self.assertEqual(self._spec, 'development.ini')
-        self.assertEqual(self._app_name, None)
+        self.assertEqual(self.loader.uri.path, 'development.ini')
         self.assertEqual(self._out, ['abc'])
 
     def test_command_has_bad_config_header(self):
@@ -67,8 +63,6 @@ class TestPRequestCommand(unittest.TestCase):
         command.run()
         self.assertEqual(self._environ['HTTP_NAME'], 'value')
         self.assertEqual(self._path_info, '/')
-        self.assertEqual(self._spec, 'development.ini')
-        self.assertEqual(self._app_name, None)
         self.assertEqual(self._out, ['abc'])
 
     def test_command_w_basic_auth(self):
@@ -81,8 +75,6 @@ class TestPRequestCommand(unittest.TestCase):
         self.assertEqual(self._environ['HTTP_AUTHORIZATION'],
                         'Basic dXNlcjpwYXNzd29yZA==')
         self.assertEqual(self._path_info, '/')
-        self.assertEqual(self._spec, 'development.ini')
-        self.assertEqual(self._app_name, None)
         self.assertEqual(self._out, ['abc'])
 
     def test_command_has_content_type_header_var(self):
@@ -92,8 +84,6 @@ class TestPRequestCommand(unittest.TestCase):
         command.run()
         self.assertEqual(self._environ['CONTENT_TYPE'], 'app/foo')
         self.assertEqual(self._path_info, '/')
-        self.assertEqual(self._spec, 'development.ini')
-        self.assertEqual(self._app_name, None)
         self.assertEqual(self._out, ['abc'])
 
     def test_command_has_multiple_header_vars(self):
@@ -109,8 +99,6 @@ class TestPRequestCommand(unittest.TestCase):
         self.assertEqual(self._environ['HTTP_NAME'], 'value')
         self.assertEqual(self._environ['HTTP_NAME2'], 'value2')
         self.assertEqual(self._path_info, '/')
-        self.assertEqual(self._spec, 'development.ini')
-        self.assertEqual(self._app_name, None)
         self.assertEqual(self._out, ['abc'])
 
     def test_command_method_get(self):
@@ -119,8 +107,6 @@ class TestPRequestCommand(unittest.TestCase):
         command.run()
         self.assertEqual(self._environ['REQUEST_METHOD'], 'GET')
         self.assertEqual(self._path_info, '/')
-        self.assertEqual(self._spec, 'development.ini')
-        self.assertEqual(self._app_name, None)
         self.assertEqual(self._out, ['abc'])
 
     def test_command_method_post(self):
@@ -134,8 +120,6 @@ class TestPRequestCommand(unittest.TestCase):
         self.assertEqual(self._environ['CONTENT_LENGTH'], '-1')
         self.assertEqual(self._environ['wsgi.input'], stdin)
         self.assertEqual(self._path_info, '/')
-        self.assertEqual(self._spec, 'development.ini')
-        self.assertEqual(self._app_name, None)
         self.assertEqual(self._out, ['abc'])
 
     def test_command_method_put(self):
@@ -149,8 +133,6 @@ class TestPRequestCommand(unittest.TestCase):
         self.assertEqual(self._environ['CONTENT_LENGTH'], '-1')
         self.assertEqual(self._environ['wsgi.input'], stdin)
         self.assertEqual(self._path_info, '/')
-        self.assertEqual(self._spec, 'development.ini')
-        self.assertEqual(self._app_name, None)
         self.assertEqual(self._out, ['abc'])
 
     def test_command_method_patch(self):
@@ -164,8 +146,6 @@ class TestPRequestCommand(unittest.TestCase):
         self.assertEqual(self._environ['CONTENT_LENGTH'], '-1')
         self.assertEqual(self._environ['wsgi.input'], stdin)
         self.assertEqual(self._path_info, '/')
-        self.assertEqual(self._spec, 'development.ini')
-        self.assertEqual(self._app_name, None)
         self.assertEqual(self._out, ['abc'])
 
     def test_command_method_propfind(self):
@@ -178,8 +158,6 @@ class TestPRequestCommand(unittest.TestCase):
         command.run()
         self.assertEqual(self._environ['REQUEST_METHOD'], 'PROPFIND')
         self.assertEqual(self._path_info, '/')
-        self.assertEqual(self._spec, 'development.ini')
-        self.assertEqual(self._app_name, None)
         self.assertEqual(self._out, ['abc'])
 
     def test_command_method_options(self):
@@ -192,8 +170,6 @@ class TestPRequestCommand(unittest.TestCase):
         command.run()
         self.assertEqual(self._environ['REQUEST_METHOD'], 'OPTIONS')
         self.assertEqual(self._path_info, '/')
-        self.assertEqual(self._spec, 'development.ini')
-        self.assertEqual(self._app_name, None)
         self.assertEqual(self._out, ['abc'])
 
     def test_command_with_query_string(self):
@@ -202,8 +178,6 @@ class TestPRequestCommand(unittest.TestCase):
         command.run()
         self.assertEqual(self._environ['QUERY_STRING'], 'a=1&b=2&c')
         self.assertEqual(self._path_info, '/abc')
-        self.assertEqual(self._spec, 'development.ini')
-        self.assertEqual(self._app_name, None)
         self.assertEqual(self._out, ['abc'])
 
     def test_command_display_headers(self):
@@ -212,8 +186,6 @@ class TestPRequestCommand(unittest.TestCase):
             [('Content-Type', 'text/html; charset=UTF-8')])
         command.run()
         self.assertEqual(self._path_info, '/')
-        self.assertEqual(self._spec, 'development.ini')
-        self.assertEqual(self._app_name, None)
         self.assertEqual(
             self._out,
             ['200 OK', 'Content-Type: text/html; charset=UTF-8', 'abc'])
@@ -223,21 +195,13 @@ class TestPRequestCommand(unittest.TestCase):
                                 headers=[('Content-Type', 'image/jpeg')])
         command.run()
         self.assertEqual(self._path_info, '/')
-        self.assertEqual(self._spec, 'development.ini')
-        self.assertEqual(self._app_name, None)
 
         self.assertEqual(self._out, [b'abc'])
 
     def test_command_method_configures_logging(self):
         command = self._makeOne(['', 'development.ini', '/'])
-        called_args = []
-
-        def configure_logging(app_spec):
-            called_args.append(app_spec)
-
-        command.configure_logging = configure_logging
         command.run()
-        self.assertEqual(called_args, ['development.ini'])
+        self.assertEqual(self.loader.calls[0]['op'], 'logging')
 
 
 class Test_main(unittest.TestCase):

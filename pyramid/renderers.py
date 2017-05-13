@@ -1,3 +1,4 @@
+from functools import partial
 import json
 import os
 import re
@@ -19,6 +20,7 @@ from pyramid.compat import (
     text_type,
     )
 
+from pyramid.csrf import get_csrf_token
 from pyramid.decorator import reify
 
 from pyramid.events import BeforeRender
@@ -428,6 +430,7 @@ class RendererHelper(object):
                   'context':context,
                   'request':request,
                   'req':request,
+                  'get_csrf_token':partial(get_csrf_token, request),
                   }
         return self.render_to_response(response, system, request=request)
 
@@ -441,13 +444,13 @@ class RendererHelper(object):
                 'context':getattr(request, 'context', None),
                 'request':request,
                 'req':request,
+                'get_csrf_token':partial(get_csrf_token, request),
                 }
 
         system_values = BeforeRender(system_values, value)
 
         registry = self.registry
         registry.notify(system_values)
-
         result = renderer(value, system_values)
         return result
 

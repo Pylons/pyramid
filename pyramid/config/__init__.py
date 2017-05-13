@@ -110,6 +110,17 @@ class Configurator(
     A Configurator is used to configure a :app:`Pyramid`
     :term:`application registry`.
 
+    The Configurator lifecycle can be managed by using a context manager to
+    automatically handle calling :meth:`pyramid.config.Configurator.begin` and
+    :meth:`pyramid.config.Configurator.end` as well as
+    :meth:`pyramid.config.Configurator.commit`.
+
+    .. code-block:: python
+
+        with Configurator(settings=settings) as config:
+            config.add_route('home', '/')
+            app = config.make_wsgi_app()
+
     If the ``registry`` argument is not ``None``, it must
     be an instance of the :class:`pyramid.registry.Registry` class
     representing the registry to configure.  If ``registry`` is ``None``, the
@@ -265,6 +276,11 @@ class Configurator(
     .. versionadded:: 1.6
        The ``root_package`` argument.
        The ``response_factory`` argument.
+
+    .. versionadded:: 1.9
+       The ability to use the configurator as a context manager with the
+       ``with``-statement to make threadlocal configuration available for
+       further configuration with an implicit commit.
     """
     manager = manager # for testing injection
     venusian = venusian # for testing injection
@@ -380,6 +396,7 @@ class Configurator(
         self.add_default_view_derivers()
         self.add_default_route_predicates()
         self.add_default_tweens()
+        self.add_default_security()
 
         if exceptionresponse_view is not None:
             exceptionresponse_view = self.maybe_dotted(exceptionresponse_view)
@@ -646,12 +663,22 @@ class Configurator(
     _ctx = action_state # bw compat
 
     def commit(self):
-        """ Commit any pending configuration actions. If a configuration
+        """
+        Commit any pending configuration actions. If a configuration
         conflict is detected in the pending configuration actions, this method
         will raise a :exc:`ConfigurationConflictError`; within the traceback
         of this error will be information about the source of the conflict,
         usually including file names and line numbers of the cause of the
-        configuration conflicts."""
+        configuration conflicts.
+
+        .. warning::
+           You should think very carefully before manually invoking
+           ``commit()``. Especially not as part of any reusable configuration
+           methods. Normally it should only be done by an application author at
+           the end of configuration in order to override certain aspects of an
+           addon.
+
+        """
         self.begin()
         try:
             self.action_state.execute_actions(introspector=self.introspector)
@@ -932,6 +959,16 @@ class Configurator(
         value.
         """
         return self.manager.pop()
+
+    def __enter__(self):
+        self.begin()
+        return self
+
+    def __exit__(self, exc_type, exc_value, exc_traceback):
+        self.end()
+
+        if exc_value is None:
+            self.commit()
 
     # this is *not* an action method (uses caller_package)
     def scan(self, package=None, categories=None, onerror=None, ignore=None,

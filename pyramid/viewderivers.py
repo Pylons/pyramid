@@ -6,7 +6,7 @@ from zope.interface import (
     )
 
 from pyramid.security import NO_PERMISSION_REQUIRED
-from pyramid.session import (
+from pyramid.csrf import (
     check_csrf_origin,
     check_csrf_token,
 )

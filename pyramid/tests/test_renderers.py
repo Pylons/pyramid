@@ -203,6 +203,7 @@ class TestRendererHelper(unittest.TestCase):
         self.assertEqual(helper.get_renderer(), factory.respond)
 
     def test_render_view(self):
+        import pyramid.csrf
         self._registerRendererFactory()
         self._registerResponseFactory()
         request = Dummy()
@@ -212,6 +213,9 @@ class TestRendererHelper(unittest.TestCase):
         request = testing.DummyRequest()
         response = 'response'
         response = helper.render_view(request, response, view, context)
+        get_csrf = response.app_iter[1].pop('get_csrf_token')
+        self.assertEqual(get_csrf.args, (request, ))
+        self.assertEqual(get_csrf.func, pyramid.csrf.get_csrf_token)
         self.assertEqual(response.app_iter[0], 'response')
         self.assertEqual(response.app_iter[1],
                           {'renderer_info': helper,
@@ -242,12 +246,16 @@ class TestRendererHelper(unittest.TestCase):
         self.assertEqual(reg.event.__class__.__name__, 'BeforeRender')
 
     def test_render_system_values_is_None(self):
+        import pyramid.csrf
         self._registerRendererFactory()
         request = Dummy()
         context = Dummy()
         request.context = context
         helper = self._makeOne('loo.foo')
         result = helper.render('values', None, request=request)
+        get_csrf = result[1].pop('get_csrf_token')
+        self.assertEqual(get_csrf.args, (request, ))
+        self.assertEqual(get_csrf.func, pyramid.csrf.get_csrf_token)
         system = {'request':request,
                   'context':context,
                   'renderer_name':'loo.foo',

@@ -37,6 +37,7 @@
      .. automethod:: set_authentication_policy
      .. automethod:: set_authorization_policy
      .. automethod:: set_default_csrf_options
+     .. automethod:: set_csrf_storage_policy
      .. automethod:: set_default_permission
      .. automethod:: add_permission
 

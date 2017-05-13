@@ -479,6 +479,7 @@ def setUp(registry=None, request=None, hook_zca=True, autocommit=True,
         config.add_default_view_derivers()
         config.add_default_route_predicates()
         config.add_default_tweens()
+        config.add_default_security()
     config.commit()
     global have_zca
     try:
