@@ -46,7 +46,7 @@ For Windows:
     # set an environment variable to where you want your virtual environment
     c:\\> set VENV=c:\\env
     # create the virtual environment
-    c:\\> %VENV%\\Scripts\\python -m venv %VENV%
+    c:\\> python -m venv %VENV%
     # install pyramid
     c:\\> %VENV%\\Scripts\\pip install pyramid
     # or for a specific released version
