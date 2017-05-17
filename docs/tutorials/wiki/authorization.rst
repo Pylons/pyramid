@@ -233,7 +233,7 @@ Add the following import statements to the head of
 
 .. literalinclude:: src/authorization/tutorial/views.py
    :lines: 6-17
-   :emphasize-lines: 1-14
+   :emphasize-lines: 1-12
    :language: python
 
 All the highlighted lines need to be added or edited.
