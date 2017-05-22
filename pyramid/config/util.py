@@ -36,7 +36,7 @@ class not_(object):
 
        config.add_view(
            'mypackage.views.my_view',
-           route_name='ok', 
+           route_name='ok',
            request_method=not_('POST')
            )
 
@@ -69,7 +69,7 @@ class Notted(object):
         # if the underlying predicate doesnt return a value, it's not really
         # a predicate, it's just something pretending to be a predicate,
         # so dont update the hash
-        if val: 
+        if val:
             val = '!' + val
         return val
 
@@ -90,7 +90,7 @@ class Notted(object):
 # over = before
 
 class PredicateList(object):
-    
+
     def __init__(self):
         self.sorter = TopologicalSorter()
         self.last_added = None
@@ -152,7 +152,16 @@ class PredicateList(object):
                 weights.append(1 << n + 1)
                 preds.append(pred)
         if kw:
-            raise ConfigurationError('Unknown predicate values: %r' % (kw,))
+            from difflib import get_close_matches
+            closest = []
+            names = [ name for name, _ in ordered ]
+            for name in kw:
+                closest.extend(get_close_matches(name, names, 3))
+
+            raise ConfigurationError(
+                'Unknown predicate values: %r (did you mean %s)'
+                % (kw, ','.join(closest))
+            )
         # A "order" is computed for the predicate list.  An order is
         # a scoring.
         #
