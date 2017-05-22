@@ -18,6 +18,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
     def _makeOne(self, *arg, **kw):
         from pyramid.config import Configurator
         config = Configurator(*arg, **kw)
+        config.set_default_csrf_options(require_csrf=False)
         return config
 
     def _getViewCallable(self, config, ctx_iface=None, exc_iface=None,
@@ -2309,9 +2310,9 @@ class TestViewsConfigurationMixin(unittest.TestCase):
     # Since Python 3 has to be all cool and fancy and different...
     def _assertBody(self, response, value):
         from pyramid.compat import text_type
-        if isinstance(value, text_type): # pragma: nocover
+        if isinstance(value, text_type):  # pragma: no cover
             self.assertEqual(response.text, value)
-        else: # pragma: nocover
+        else:  # pragma: no cover
             self.assertEqual(response.body, value)
 
     def test_add_notfound_view_with_renderer(self):
@@ -2373,7 +2374,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         view = lambda r: 'OK'
         config.set_default_csrf_options(require_csrf=True)
         config.add_view(view, context=Exception, renderer=null_renderer)
-        view_intr = introspector.introspectables[1]
+        view_intr = introspector.introspectables[-1]
         self.assertTrue(view_intr.type_name, 'view')
         self.assertEqual(view_intr['callable'], view)
         derived_view = view_intr['derived_callable']

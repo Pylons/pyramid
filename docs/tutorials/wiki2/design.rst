@@ -23,22 +23,22 @@ We'll be using an SQLite database to hold our wiki data, and we'll be using
 
 Within the database, we will define two tables:
 
-- The `users` table which will store the `id`, `name`, `password_hash` and
-  `role` of each wiki user.
-- The `pages` table, whose elements will store the wiki pages.
-  There are four columns: `id`, `name`, `data` and `creator_id`.
+- The ``users`` table which will store the ``id``, ``name``, ``password_hash`` and
+  ``role`` of each wiki user.
+- The ``pages`` table, whose elements will store the wiki pages.
+  There are four columns: ``id``, ``name``, ``data`` and ``creator_id``.
 
-There is a one-to-many relationship between `users` and `pages` tracking
-the user who created each wiki page defined by the `creator_id` column on the
-`pages` table.
+There is a one-to-many relationship between ``users`` and ``pages`` tracking
+the user who created each wiki page defined by the ``creator_id`` column on the
+``pages`` table.
 
-URLs like ``/PageName`` will try to find an element in the `pages` table that
+URLs like ``/PageName`` will try to find an element in the ``pages`` table that
 has a corresponding name.
 
 To add a page to the wiki, a new row is created and the text is stored in
-`data`.
+``data``.
 
-A page named ``FrontPage`` containing the text *This is the front page*, will
+A page named ``FrontPage`` containing the text "This is the front page" will
 be created when the storage is initialized, and will be used as the wiki home
 page.
 
@@ -61,12 +61,12 @@ We'll eventually be adding security to our application.  To do this, we'll
 be using a very simple role-based security model. We'll assign a single
 role category to each user in our system.
 
-`basic`
-  An authenticated user who can view content and create new pages. A `basic`
+``basic``
+  An authenticated user who can view content and create new pages. A ``basic``
   user may also edit the pages they have created but not pages created by
   other users.
 
-`editor`
+``editor``
   An authenticated user who can create and edit any content in the system.
 
 In order to accomplish this we'll need to define an authentication policy
@@ -101,16 +101,12 @@ in the following table:
 
 +----------------------+-----------------------+-------------+----------------+------------+
 | URL                  |  Action               |  View       |  Template      | Permission |
-|                      |                       |             |                |            |
 +======================+=======================+=============+================+============+
 | /                    |  Redirect to          |  view_wiki  |                |            |
 |                      |  /FrontPage           |             |                |            |
 +----------------------+-----------------------+-------------+----------------+------------+
 | /PageName            |  Display existing     |  view_page  |  view.jinja2   |  view      |
 |                      |  page [2]_            |  [1]_       |                |            |
-|                      |                       |             |                |            |
-|                      |                       |             |                |            |
-|                      |                       |             |                |            |
 +----------------------+-----------------------+-------------+----------------+------------+
 | /PageName/edit_page  |  Display edit form    |  edit_page  |  edit.jinja2   |  edit      |
 |                      |  with existing        |             |                |            |
@@ -149,14 +145,13 @@ in the following table:
 |                      |    login form with    |             |                |            |
 |                      |    "login failed"     |             |                |            |
 |                      |    message.           |             |                |            |
-|                      |                       |             |                |            |
 +----------------------+-----------------------+-------------+----------------+------------+
 | /logout              |  Redirect to          |  logout     |                |            |
 |                      |  /FrontPage           |             |                |            |
 +----------------------+-----------------------+-------------+----------------+------------+
 
 .. [1] This is the default view for a Page context when there is no view name.
-.. [2] Pyramid will return a default 404 Not Found page if the page *PageName*
+.. [2] Pyramid will return a default 404 Not Found page if the page ``PageName``
        does not exist yet.
 .. [3] ``pyramid.exceptions.Forbidden`` is reached when a user tries to invoke
        a view that is not authorized by the authorization policy.

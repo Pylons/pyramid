@@ -591,7 +591,7 @@ extensibility because it must be deployed in multiple locations.
 Pyramid Is Too Big
 ------------------
 
-"The :app:`Pyramid` compressed tarball is larger than 2MB.  It must beenormous!"
+"The :app:`Pyramid` compressed tarball is larger than 2MB.  It must be enormous!"
 
 No.  We just ship it with docs, test code, and scaffolding.  Here's a breakdown
 of what's included in subdirectories of the package tree:

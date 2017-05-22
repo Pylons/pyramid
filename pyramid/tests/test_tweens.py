@@ -22,6 +22,8 @@ class Test_excview_tween_factory(unittest.TestCase):
         request = DummyRequest()
         result = tween(request)
         self.assertTrue(result is dummy_response)
+        self.assertIsNone(request.exception)
+        self.assertIsNone(request.exc_info)
 
     def test_it_catches_notfound(self):
         from pyramid.request import Request
@@ -31,8 +33,11 @@ class Test_excview_tween_factory(unittest.TestCase):
             raise HTTPNotFound
         tween = self._makeOne(handler)
         request = Request.blank('/')
+        request.registry = self.config.registry
         result = tween(request)
         self.assertEqual(result.status, '404 Not Found')
+        self.assertIsInstance(request.exception, HTTPNotFound)
+        self.assertEqual(request.exception, request.exc_info[1])
 
     def test_it_catches_with_predicate(self):
         from pyramid.request import Request
@@ -44,8 +49,11 @@ class Test_excview_tween_factory(unittest.TestCase):
             raise ValueError
         tween = self._makeOne(handler)
         request = Request.blank('/')
+        request.registry = self.config.registry
         result = tween(request)
         self.assertTrue(b'foo' in result.body)
+        self.assertIsInstance(request.exception, ValueError)
+        self.assertEqual(request.exception, request.exc_info[1])
 
     def test_it_reraises_on_mismatch(self):
         from pyramid.request import Request
@@ -55,8 +63,11 @@ class Test_excview_tween_factory(unittest.TestCase):
             raise ValueError
         tween = self._makeOne(handler)
         request = Request.blank('/')
+        request.registry = self.config.registry
         request.method = 'POST'
         self.assertRaises(ValueError, lambda: tween(request))
+        self.assertIsNone(request.exception)
+        self.assertIsNone(request.exc_info)
 
     def test_it_reraises_on_no_match(self):
         from pyramid.request import Request
@@ -64,10 +75,14 @@ class Test_excview_tween_factory(unittest.TestCase):
             raise ValueError
         tween = self._makeOne(handler)
         request = Request.blank('/')
+        request.registry = self.config.registry
         self.assertRaises(ValueError, lambda: tween(request))
+        self.assertIsNone(request.exception)
+        self.assertIsNone(request.exc_info)
 
 class DummyRequest:
-    pass
+    exception = None
+    exc_info = None
 
 class DummyResponse:
     pass

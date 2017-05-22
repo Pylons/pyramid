@@ -1,5 +1,6 @@
 import unittest
 
+
 class TestSettingsConfiguratorMixin(unittest.TestCase):
     def _makeOne(self, *arg, **kw):
         from pyramid.config import Configurator
@@ -10,6 +11,13 @@ class TestSettingsConfiguratorMixin(unittest.TestCase):
         config = self._makeOne()
         settings = config._set_settings(None)
         self.assertTrue(settings)
+
+    def test__set_settings_does_not_uses_original_dict(self):
+        config = self._makeOne()
+        dummy = {}
+        result = config._set_settings(dummy)
+        self.assertTrue(dummy is not result)
+        self.assertNotIn('pyramid.debug_all', dummy)
 
     def test__set_settings_as_dictwithvalues(self):
         config = self._makeOne()
@@ -56,6 +64,24 @@ class TestSettingsConfiguratorMixin(unittest.TestCase):
         settings = reg.getUtility(ISettings)
         self.assertEqual(settings['a'], 1)
 
+    def test_settings_parameter_dict_is_never_updated(self):
+        class ReadOnlyDict(dict):
+            def __readonly__(self, *args, **kwargs):  # pragma: no cover
+                raise RuntimeError("Cannot modify ReadOnlyDict")
+            __setitem__ = __readonly__
+            __delitem__ = __readonly__
+            pop = __readonly__
+            popitem = __readonly__
+            clear = __readonly__
+            update = __readonly__
+            setdefault = __readonly__
+            del __readonly__
+
+        initial = ReadOnlyDict()
+        config = self._makeOne(settings=initial)
+        config._set_settings({'a': '1'})
+
+
 class TestSettings(unittest.TestCase):
 
     def _getTargetClass(self):
@@ -67,26 +93,6 @@ class TestSettings(unittest.TestCase):
             environ = {}
         klass = self._getTargetClass()
         return klass(d, _environ_=environ)
-
-    def test_getattr_success(self):
-        import warnings
-        with warnings.catch_warnings(record=True) as w:
-            warnings.filterwarnings('always')
-            settings = self._makeOne({'reload_templates':False})
-            self.assertEqual(settings.reload_templates, False)
-            self.assertEqual(len(w), 1)
-
-    def test_getattr_fail(self):
-        import warnings
-        with warnings.catch_warnings(record=True) as w:
-            warnings.filterwarnings('always')
-            settings = self._makeOne({})
-            self.assertRaises(AttributeError, settings.__getattr__, 'wontexist')
-            self.assertEqual(len(w), 0)
-
-    def test_getattr_raises_attribute_error(self):
-        settings = self._makeOne()
-        self.assertRaises(AttributeError, settings.__getattr__, 'mykey')
 
     def test_noargs(self):
         settings = self._makeOne()
@@ -556,6 +562,18 @@ class TestSettings(unittest.TestCase):
                                {'PYRAMID_DEFAULT_LOCALE_NAME':'abc'})
         self.assertEqual(result['default_locale_name'], 'abc')
         self.assertEqual(result['pyramid.default_locale_name'], 'abc')
+
+    def test_csrf_trusted_origins(self):
+        result = self._makeOne({})
+        self.assertEqual(result['pyramid.csrf_trusted_origins'], [])
+        result = self._makeOne({'pyramid.csrf_trusted_origins': 'example.com'})
+        self.assertEqual(result['pyramid.csrf_trusted_origins'], ['example.com'])
+        result = self._makeOne({'pyramid.csrf_trusted_origins': ['example.com']})
+        self.assertEqual(result['pyramid.csrf_trusted_origins'], ['example.com'])
+        result = self._makeOne({'pyramid.csrf_trusted_origins': (
+            'example.com foo.example.com\nasdf.example.com')})
+        self.assertEqual(result['pyramid.csrf_trusted_origins'], [
+            'example.com', 'foo.example.com', 'asdf.example.com'])
 
     def test_originals_kept(self):
         result = self._makeOne({'a':'i am so a'})

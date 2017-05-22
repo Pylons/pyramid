@@ -9,14 +9,14 @@ to send log messages to loggers that you've configured.
 
 .. warning::
 
-   This chapter assumes you've used a :term:`scaffold` to create a project
+   This chapter assumes you've used a :term:`cookiecutter` to create a project
    which contains ``development.ini`` and ``production.ini`` files which help
-   configure logging.  All of the scaffolds which ship with :app:`Pyramid` do
-   this.  If you're not using a scaffold, or if you've used a third-party
-   scaffold which does not create these files, the configuration information in
+   configure logging.  All of the Pyramid cookiecutters provided by the Pylons Project do
+   this.  If you're not using a cookiecutter, or if you've used a third-party
+   cookiecutter which does not create these files, the configuration information in
    this chapter may not be applicable.
 
-.. index:
+.. index::
    pair: settings; logging
    pair: .ini; logging
    pair: logging; configuration
@@ -26,11 +26,11 @@ to send log messages to loggers that you've configured.
 Logging Configuration
 ---------------------
 
-A :app:`Pyramid` project created from a :term:`scaffold` is configured to allow
+A :app:`Pyramid` project created from a :term:`cookiecutter` is configured to allow
 you to send messages to :mod:`Python standard library logging package
 <logging>` loggers from within your application.  In particular, the
 :term:`PasteDeploy` ``development.ini`` and ``production.ini`` files created
-when you use a scaffold include a basic configuration for the Python
+when you use a cookiecutter include a basic configuration for the Python
 :mod:`logging` package.
 
 PasteDeploy ``.ini`` files use the Python standard library :mod:`ConfigParser
@@ -43,94 +43,20 @@ from when you run ``pserve``.
 The ``pserve`` command calls the :func:`pyramid.paster.setup_logging` function,
 a thin wrapper around the :func:`logging.config.fileConfig` using the specified
 ``.ini`` file, if it contains a ``[loggers]`` section (all of the
-scaffold-generated ``.ini`` files do). ``setup_logging`` reads the logging
+cookiecutter-generated ``.ini`` files do). ``setup_logging`` reads the logging
 configuration from the ini file upon which ``pserve`` was invoked.
 
 Default logging configuration is provided in both the default
-``development.ini`` and the ``production.ini`` file.  The logging configuration
+``development.ini`` and the ``production.ini`` files.  If you use ``pyramid-cookiecutter-starter`` to generate a Pyramid project with the name of the package as ``hello_world``, then the logging configuration
 in the ``development.ini`` file is as follows:
 
-.. code-block:: ini
-   :linenos:
-
-   # Begin logging configuration
-
-   [loggers]
-   keys = root, {{package_logger}}
-
-   [handlers]
-   keys = console
-
-   [formatters]
-   keys = generic
-
-   [logger_root]
-   level = INFO
-   handlers = console
-
-   [logger_{{package_logger}}]
-   level = DEBUG
-   handlers =
-   qualname = {{package}}
-
-   [handler_console]
-   class = StreamHandler
-   args = (sys.stderr,)
-   level = NOTSET
-   formatter = generic
-
-   [formatter_generic]
-   format = %(asctime)s %(levelname)-5.5s [%(name)s][%(threadName)s] %(message)s
-
-   # End logging configuration
+.. literalinclude:: myproject/development.ini
+    :language: ini
+    :lineno-match:
+    :lines: 29-
 
 The ``production.ini`` file uses the ``WARN`` level in its logger
-configuration, but it is otherwise identical.
-
-The name ``{{package_logger}}`` above will be replaced with the name of your
-project's :term:`package`, which is derived from the name you provide to your
-project.  For instance, if you do:
-
-.. code-block:: text
-   :linenos:
-
-   pcreate -s starter MyApp
-
-The logging configuration will literally be:
-
-.. code-block:: ini
-   :linenos:
-
-   # Begin logging configuration
-
-   [loggers]
-   keys = root, myapp
-
-   [handlers]
-   keys = console
-
-   [formatters]
-   keys = generic
-
-   [logger_root]
-   level = INFO
-   handlers = console
-
-   [logger_myapp]
-   level = DEBUG
-   handlers =
-   qualname = myapp
-
-   [handler_console]
-   class = StreamHandler
-   args = (sys.stderr,)
-   level = NOTSET
-   formatter = generic
-
-   [formatter_generic]
-   format = %(asctime)s %(levelname)-5.5s [%(name)s][%(threadName)s] %(message)s
-
-   # End logging configuration
+configuration instead of ``DEBUG``, but it is otherwise identical.
 
 In this logging configuration:
 
@@ -149,7 +75,7 @@ that ask for a logger (via ``logging.getLogger``) that has a name which begins
 with anything except your project's package name (e.g., ``myapp``). The logger
 with the same name as your package name is reserved for your own usage in your
 :app:`Pyramid` application.  Its existence means that you can log to a known
-logging location from any :app:`Pyramid` application generated via a scaffold.
+logging location from any :app:`Pyramid` application generated via a cookiecutter.
 
 :app:`Pyramid` and many other libraries (such as Beaker, SQLAlchemy, Paste) log
 a number of messages to the root logger for debugging purposes. Switching the
@@ -162,9 +88,9 @@ root logger level to ``DEBUG`` reveals them:
     level = DEBUG
     handlers = console
 
-Some scaffolds configure additional loggers for additional subsystems they use
+Some cookiecutters configure additional loggers for additional subsystems they use
 (such as SQLALchemy).  Take a look at the ``production.ini`` and
-``development.ini`` files rendered when you create a project from a scaffold.
+``development.ini`` files rendered when you create a project from a cookiecutter.
 
 Sending Logging Messages
 ------------------------
@@ -327,14 +253,14 @@ translogger and your application in it.  For instance, change from this:
 .. code-block:: ini
 
     [app:main]
-    use = egg:MyProject
+    use = egg:myproject
 
 To this:
 
 .. code-block:: ini
 
     [app:mypyramidapp]
-    use = egg:MyProject
+    use = egg:myproject
 
     [filter:translogger]
     use = egg:Paste#translogger

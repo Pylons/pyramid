@@ -33,7 +33,7 @@ def asset_spec_from_abspath(abspath, package):
                           relpath.replace(os.path.sep, '/'))
     return abspath
 
-# bw compat only; use pyramid.path.AssetDescriptor.abspath() instead
+# bw compat only; use pyramid.path.AssetResolver().resolve(spec).abspath()
 def abspath_from_asset_spec(spec, pname='__main__'):
     if pname is None:
         return spec

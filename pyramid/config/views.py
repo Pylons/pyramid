@@ -70,10 +70,11 @@ import pyramid.util
 from pyramid.util import (
     viewdefaults,
     action_method,
+    as_sorted_tuple,
     TopologicalSorter,
     )
 
-import pyramid.config.predicates
+import pyramid.predicates
 import pyramid.viewderivers
 
 from pyramid.viewderivers import (
@@ -89,7 +90,6 @@ from pyramid.viewderivers import (
 from pyramid.config.util import (
     DEFAULT_PHASH,
     MAX_ORDER,
-    as_sorted_tuple,
     )
 
 urljoin = urlparse.urljoin
@@ -444,9 +444,11 @@ class ViewsConfiguratorMixin(object):
           think about preserving function attributes such as ``__name__`` and
           ``__module__`` within decorator logic).
 
-          All view callables in the decorator chain must return a response
-          object implementing :class:`pyramid.interfaces.IResponse` or raise
-          an exception:
+          An important distinction is that each decorator will receive a
+          response object implementing :class:`pyramid.interfaces.IResponse`
+          instead of the raw value returned from the view callable. All
+          decorators in the chain must return a response object or raise an
+          exception:
 
           .. code-block:: python
 
@@ -639,17 +641,21 @@ class ViewsConfiguratorMixin(object):
           'check name'.  If the value provided is ``True``, ``csrf_token`` will
           be used as the check name.
 
-          If CSRF checking is performed, the checked value will be the value
-          of ``request.params[check_name]``.  This value will be compared
-          against the value of ``request.session.get_csrf_token()``, and the
-          check will pass if these two values are the same.  If the check
-          passes, the associated view will be permitted to execute.  If the
+          If CSRF checking is performed, the checked value will be the value of
+          ``request.params[check_name]``. This value will be compared against
+          the value of ``policy.get_csrf_token()`` (where ``policy`` is an
+          implementation of :meth:`pyramid.interfaces.ICSRFStoragePolicy`), and the
+          check will pass if these two values are the same. If the check
+          passes, the associated view will be permitted to execute. If the
           check fails, the associated view will not be permitted to execute.
 
-          Note that using this feature requires a :term:`session factory` to
-          have been configured.
-
           .. versionadded:: 1.4a2
+
+          .. versionchanged:: 1.9
+            This feature requires either a :term:`session factory` to have been
+            configured, or a :term:`CSRF storage policy` other than the default
+            to be in use.
+
 
         physical_path
 
@@ -970,7 +976,7 @@ class ViewsConfiguratorMixin(object):
         def register_view(classifier, request_iface, derived_view):
             # A multiviews is a set of views which are registered for
             # exactly the same context type/request type/name triad.  Each
-            # consituent view in a multiview differs only by the
+            # constituent view in a multiview differs only by the
             # predicates which it possesses.
 
             # To find a previously registered view for a context
@@ -1030,7 +1036,7 @@ class ViewsConfiguratorMixin(object):
 
                 # XXX we could try to be more efficient here and register
                 # a non-secured view for a multiview if none of the
-                # multiview's consituent views have a permission
+                # multiview's constituent views have a permission
                 # associated with them, but this code is getting pretty
                 # rough already
                 if is_multiview:
@@ -1141,7 +1147,7 @@ class ViewsConfiguratorMixin(object):
             )
 
     def add_default_view_predicates(self):
-        p = pyramid.config.predicates
+        p = pyramid.predicates
         for (name, factory) in (
             ('xhr', p.XHRPredicate),
             ('request_method', p.RequestMethodPredicate),

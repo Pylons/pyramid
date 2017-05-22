@@ -213,6 +213,9 @@ packages, SQL queries, logging statements and more.
 When your application has an error, an interactive debugger allows you to poke
 around from your browser to find out what happened.
 
+To use the Pyramid debug toolbar, build your project with a Pyramid
+:term:`cookiecutter`.
+
 Example: :ref:`debug_toolbar`.
 
 Debug with power
@@ -376,7 +379,7 @@ By configuring your view to use a renderer, you tell Pyramid to use the
 behalf.
 
 The string passed as ``renderer=`` above is an :term:`asset specification`.
-Asset specifications are omnipresent in Pyramid. They allow for more reliable
+Asset specifications are widely used in Pyramid. They allow for more reliable
 customization. See :ref:`intro_asset_specs` for more information.
 
 Example: :ref:`renderers_chapter`.
@@ -412,27 +415,19 @@ Example: :ref:`events_chapter` and :ref:`event_types`.
 Build international applications
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Pyramid ships with features that allow you to write applications for
-international audiences. You can mark text in your source files and templates
-and build catalogs of messages to be translated. You can translate these
-catalogs into other languages. Users may then indicate their preference, and
-see your application in their language.
-
-Many systems which offer internationalization suffer from a common problem. A
-message in your code may have the same text as one in some other package.
-Messages can conflict with each-other, leading to translation errors. Pyramid
-solves this problem by using translation *domains*. Each application can have
-its own translation domain. Messages in one domain cannot conflict with
-messages in another. Problem solved.
+Pyramid ships with internationalization-related features in its core:
+localization, pluralization, and creating message catalogs from source files
+and templates.  Pyramid allows for a plurality of message catalogs via the use
+of translation domains.  You can create a system that has its own translations
+without conflict with other translations in other domains.
 
 Example: :ref:`i18n_chapter`.
 
 Build efficient applications
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Views in dynamic web applications can be expensive or slow to build. Pyramid
-allows you to save the results of such a view by *caching* the rendered
-response. Indicate in configuration that you want a view to be cached::
+Pyramid provides an easy way to *cache* the results of slow or expensive views.
+You can indicate in view configuration that you want a view to be cached::
 
     @view_config(http_cache=3600) # 60 minutes
     def myview(request): ...
@@ -446,7 +441,7 @@ documentation for more information.
 Build fast applications
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-The Pyramid core is fast.  It has been engineered from the ground up for speed.
+The Pyramid core is fast. It has been engineered from the ground up for speed.
 It only does as much work as absolutely necessary when you ask it to get a job
 done. If you need speed from your application, Pyramid is the right choice for
 you.
@@ -456,15 +451,11 @@ Example: http://blog.curiasolutions.com/pages/the-great-web-framework-shootout.h
 Store session data
 ~~~~~~~~~~~~~~~~~~
 
-HTTP is a *stateless* protocol. No request can have knowledge of any other
-request. But it is often desireable to associate data with a particular user.
-Think of a shopping cart that remembers the items you have added to it even as
-you move through the shopping site finding other items to add.
-
-Pyramid allows you to use *sessions* to solve this problem. Many other
-frameworks also support sessions. But Pyramid allows you to plug in your own
-custom sessioning system. So long as your system conforms to a documented
-interface, you can drop it in in place of the provided system.
+Pyramid has built-in support for HTTP sessions, so you can associate data with
+specific users between requests. Lots of other frameworks also support
+sessions. But Pyramid allows you to plug in your own custom sessioning system.
+So long as your system conforms to a documented interface, you can drop it in
+in place of the provided system.
 
 Currently there is a binding package for the third-party Redis sessioning
 system that does exactly this. But if you have a specialized need (perhaps you

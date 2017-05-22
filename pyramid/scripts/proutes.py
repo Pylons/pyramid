@@ -1,5 +1,5 @@
 import fnmatch
-import optparse
+import argparse
 import sys
 import textwrap
 import re
@@ -7,10 +7,11 @@ import re
 from zope.interface import Interface
 
 from pyramid.paster import bootstrap
-from pyramid.compat import (string_types, configparser)
+from pyramid.compat import string_types
 from pyramid.interfaces import IRouteRequest
 from pyramid.config import not_
 
+from pyramid.scripts.common import get_config_loader
 from pyramid.scripts.common import parse_vars
 from pyramid.static import static_view
 from pyramid.view import _find_views
@@ -175,7 +176,6 @@ def get_route_data(route, registry):
                 (route.name, route_intr['external_url'], UNKNOWN_KEY, ANY_KEY)
             ]
 
-
         route_request_methods = route_intr['request_methods']
         view_intr = registry.introspector.related(route_intr)
 
@@ -245,26 +245,45 @@ class PRoutesCommand(object):
     will be assumed.  Example: 'proutes myapp.ini'.
 
     """
-    bootstrap = (bootstrap,)
+    bootstrap = staticmethod(bootstrap)  # testing
+    get_config_loader = staticmethod(get_config_loader)  # testing
     stdout = sys.stdout
-    usage = '%prog config_uri'
-    ConfigParser = configparser.ConfigParser # testing
-    parser = optparse.OptionParser(
-        usage,
-        description=textwrap.dedent(description)
-    )
-    parser.add_option('-g', '--glob',
-                      action='store', type='string', dest='glob',
-                      default='', help='Display routes matching glob pattern')
+    parser = argparse.ArgumentParser(
+        description=textwrap.dedent(description),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        )
+    parser.add_argument('-g', '--glob',
+                        action='store',
+                        dest='glob',
+                        default='',
+                        help='Display routes matching glob pattern')
 
-    parser.add_option('-f', '--format',
-                      action='store', type='string', dest='format',
-                      default='', help=('Choose which columns to display, this '
-                                        'will override the format key in the '
-                                        '[proutes] ini section'))
+    parser.add_argument('-f', '--format',
+                        action='store',
+                        dest='format',
+                        default='',
+                        help=('Choose which columns to display, this will '
+                              'override the format key in the [proutes] ini '
+                              'section'))
+
+    parser.add_argument(
+        'config_uri',
+        nargs='?',
+        default=None,
+        help='The URI to the configuration file.',
+        )
+
+    parser.add_argument(
+        'config_vars',
+        nargs='*',
+        default=(),
+        help="Variables required by the config file. For example, "
+             "`http_port=%%(http_port)s` would expect `http_port=8080` to be "
+             "passed here.",
+        )
 
     def __init__(self, argv, quiet=False):
-        self.options, self.args = self.parser.parse_args(argv[1:])
+        self.args = self.parser.parse_args(argv[1:])
         self.quiet = quiet
         self.available_formats = [
             'name', 'pattern', 'view', 'method'
@@ -289,18 +308,12 @@ class PRoutesCommand(object):
 
         return True
 
-    def proutes_file_config(self, filename):
-        config = self.ConfigParser()
-        config.read(filename)
-        try:
-            items = config.items('proutes')
-            for k, v in items:
-                if 'format' == k:
-                    cols = re.split(r'[,|\s\n]+', v)
-                    self.column_format = [x.strip() for x in cols]
-
-        except configparser.NoSectionError:
-            return
+    def proutes_file_config(self, loader, global_conf=None):
+        settings = loader.get_settings('proutes', global_conf)
+        format = settings.get('format')
+        if format:
+            cols = re.split(r'[,|\s\n]+', format)
+            self.column_format = [x.strip() for x in cols]
 
     def out(self, msg):  # pragma: no cover
         if not self.quiet:
@@ -312,19 +325,22 @@ class PRoutesCommand(object):
         return config.get_routes_mapper()
 
     def run(self, quiet=False):
-        if not self.args:
+        if not self.args.config_uri:
             self.out('requires a config file argument')
             return 2
 
-        config_uri = self.args[0]
-        env = self.bootstrap[0](config_uri, options=parse_vars(self.args[1:]))
+        config_uri = self.args.config_uri
+        config_vars = parse_vars(self.args.config_vars)
+        loader = self.get_config_loader(config_uri)
+        loader.setup_logging(config_vars)
+        self.proutes_file_config(loader, config_vars)
+
+        env = self.bootstrap(config_uri, options=config_vars)
         registry = env['registry']
         mapper = self._get_mapper(registry)
 
-        self.proutes_file_config(config_uri)
-
-        if self.options.format:
-            columns = self.options.format.split(',')
+        if self.args.format:
+            columns = self.args.format.split(',')
             self.column_format = [x.strip() for x in columns]
 
         is_valid = self.validate_formats(self.column_format)
@@ -361,9 +377,9 @@ class PRoutesCommand(object):
             route_data = get_route_data(route, registry)
 
             for name, pattern, view, method in route_data:
-                if self.options.glob:
-                    match = (fnmatch.fnmatch(name, self.options.glob) or
-                             fnmatch.fnmatch(pattern, self.options.glob))
+                if self.args.glob:
+                    match = (fnmatch.fnmatch(name, self.args.glob) or
+                             fnmatch.fnmatch(pattern, self.args.glob))
                     if not match:
                         continue
 

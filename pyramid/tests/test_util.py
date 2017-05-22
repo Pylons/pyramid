@@ -369,11 +369,15 @@ class Test_strings_differ(unittest.TestCase):
         from pyramid.util import strings_differ
         return strings_differ(*args, **kw)
 
-    def test_it(self):
+    def test_it_bytes(self):
         self.assertFalse(self._callFUT(b'foo', b'foo'))
         self.assertTrue(self._callFUT(b'123', b'345'))
         self.assertTrue(self._callFUT(b'1234', b'123'))
         self.assertTrue(self._callFUT(b'123', b'1234'))
+
+    def test_it_native_str(self):
+        self.assertFalse(self._callFUT('123', '123'))
+        self.assertTrue(self._callFUT('123', '1234'))
 
     def test_it_with_internal_comparator(self):
         result = self._callFUT(b'foo', b'foo', compare_digest=None)

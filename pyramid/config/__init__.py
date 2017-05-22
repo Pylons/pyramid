@@ -110,6 +110,17 @@ class Configurator(
     A Configurator is used to configure a :app:`Pyramid`
     :term:`application registry`.
 
+    The Configurator lifecycle can be managed by using a context manager to
+    automatically handle calling :meth:`pyramid.config.Configurator.begin` and
+    :meth:`pyramid.config.Configurator.end` as well as
+    :meth:`pyramid.config.Configurator.commit`.
+
+    .. code-block:: python
+
+        with Configurator(settings=settings) as config:
+            config.add_route('home', '/')
+            app = config.make_wsgi_app()
+
     If the ``registry`` argument is not ``None``, it must
     be an instance of the :class:`pyramid.registry.Registry` class
     representing the registry to configure.  If ``registry`` is ``None``, the
@@ -265,6 +276,11 @@ class Configurator(
     .. versionadded:: 1.6
        The ``root_package`` argument.
        The ``response_factory`` argument.
+
+    .. versionadded:: 1.9
+       The ability to use the configurator as a context manager with the
+       ``with``-statement to make threadlocal configuration available for
+       further configuration with an implicit commit.
     """
     manager = manager # for testing injection
     venusian = venusian # for testing injection
@@ -380,6 +396,7 @@ class Configurator(
         self.add_default_view_derivers()
         self.add_default_route_predicates()
         self.add_default_tweens()
+        self.add_default_security()
 
         if exceptionresponse_view is not None:
             exceptionresponse_view = self.maybe_dotted(exceptionresponse_view)
@@ -450,9 +467,6 @@ class Configurator(
         if package is None:
             return filename # absolute filename
         return '%s:%s' % (package, filename)
-
-    def _split_spec(self, path_or_spec):
-        return resolve_asset_spec(path_or_spec, self.package_name)
 
     def _fix_registry(self):
         """ Fix up a ZCA component registry that is not a
@@ -606,11 +620,15 @@ class Configurator(
         if autocommit:
             # callables can depend on the side effects of resolving a
             # deferred discriminator
-            undefer(discriminator)
-            if callable is not None:
-                callable(*args, **kw)
-            for introspectable in introspectables:
-                introspectable.register(self.introspector, action_info)
+            self.begin()
+            try:
+                undefer(discriminator)
+                if callable is not None:
+                    callable(*args, **kw)
+                for introspectable in introspectables:
+                    introspectable.register(self.introspector, action_info)
+            finally:
+                self.end()
 
         else:
             action = extra
@@ -645,13 +663,27 @@ class Configurator(
     _ctx = action_state # bw compat
 
     def commit(self):
-        """ Commit any pending configuration actions. If a configuration
+        """
+        Commit any pending configuration actions. If a configuration
         conflict is detected in the pending configuration actions, this method
         will raise a :exc:`ConfigurationConflictError`; within the traceback
         of this error will be information about the source of the conflict,
         usually including file names and line numbers of the cause of the
-        configuration conflicts."""
-        self.action_state.execute_actions(introspector=self.introspector)
+        configuration conflicts.
+
+        .. warning::
+           You should think very carefully before manually invoking
+           ``commit()``. Especially not as part of any reusable configuration
+           methods. Normally it should only be done by an application author at
+           the end of configuration in order to override certain aspects of an
+           addon.
+
+        """
+        self.begin()
+        try:
+            self.action_state.execute_actions(introspector=self.introspector)
+        finally:
+            self.end()
         self.action_state = ActionState() # old actions have been processed
 
     def include(self, callable, route_prefix=None):
@@ -748,6 +780,11 @@ class Configurator(
         .. versionadded:: 1.2
            The ``route_prefix`` parameter.
 
+        .. versionchanged:: 1.9
+           The included function is wrapped with a call to
+           :meth:`pyramid.config.Configurator.begin` and
+           :meth:`pyramid.config.Configurator.end` while it is executed.
+
         """
         # """ <-- emacs
 
@@ -797,7 +834,11 @@ class Configurator(
                 )
             configurator.basepath = os.path.dirname(sourcefile)
             configurator.includepath = self.includepath + (spec,)
-            c(configurator)
+            self.begin()
+            try:
+                c(configurator)
+            finally:
+                self.end()
 
     def add_directive(self, name, directive, action_wrap=True):
         """
@@ -885,14 +926,30 @@ class Configurator(
 
     absolute_resource_spec = absolute_asset_spec # b/w compat forever
 
-    def begin(self, request=None):
+    def begin(self, request=_marker):
         """ Indicate that application or test configuration has begun.
         This pushes a dictionary containing the :term:`application
         registry` implied by ``registry`` attribute of this
         configurator and the :term:`request` implied by the
         ``request`` argument onto the :term:`thread local` stack
         consulted by various :mod:`pyramid.threadlocal` API
-        functions."""
+        functions.
+
+        If ``request`` is not specified and the registry owned by the
+        configurator is already pushed as the current threadlocal registry
+        then this method will keep the current threadlocal request unchanged.
+
+        .. versionchanged:: 1.8
+           The current threadlocal request is propagated if the current
+           threadlocal registry remains unchanged.
+
+        """
+        if request is _marker:
+            current = self.manager.get()
+            if current['registry'] == self.registry:
+                request = current['request']
+            else:
+                request = None
         self.manager.push({'registry':self.registry, 'request':request})
 
     def end(self):
@@ -902,6 +959,16 @@ class Configurator(
         value.
         """
         return self.manager.pop()
+
+    def __enter__(self):
+        self.begin()
+        return self
+
+    def __exit__(self, exc_type, exc_value, exc_traceback):
+        self.end()
+
+        if exc_value is None:
+            self.commit()
 
     # this is *not* an action method (uses caller_package)
     def scan(self, package=None, categories=None, onerror=None, ignore=None,
@@ -992,11 +1059,11 @@ class Configurator(
         # Push the registry onto the stack in case any code that depends on
         # the registry threadlocal APIs used in listeners subscribed to the
         # IApplicationCreated event.
-        self.manager.push({'registry': self.registry, 'request': None})
+        self.begin()
         try:
             self.registry.notify(ApplicationCreated(app))
         finally:
-            self.manager.pop()
+            self.end()
 
         return app
 

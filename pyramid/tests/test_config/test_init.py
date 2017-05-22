@@ -91,14 +91,71 @@ class ConfiguratorTests(unittest.TestCase):
                          {'registry':config.registry, 'request':request})
         self.assertEqual(manager.popped, False)
 
+    def test_begin_overrides_request(self):
+        from pyramid.config import Configurator
+        config = Configurator()
+        manager = DummyThreadLocalManager()
+        req = object()
+        # set it up for auto-propagation
+        pushed = {'registry': config.registry, 'request': None}
+        manager.pushed = pushed
+        config.manager = manager
+        config.begin(req)
+        self.assertTrue(manager.pushed is not pushed)
+        self.assertEqual(manager.pushed['request'], req)
+        self.assertEqual(manager.pushed['registry'], config.registry)
+
+    def test_begin_propagates_request_for_same_registry(self):
+        from pyramid.config import Configurator
+        config = Configurator()
+        manager = DummyThreadLocalManager()
+        req = object()
+        pushed = {'registry': config.registry, 'request': req}
+        manager.pushed = pushed
+        config.manager = manager
+        config.begin()
+        self.assertTrue(manager.pushed is not pushed)
+        self.assertEqual(manager.pushed['request'], req)
+        self.assertEqual(manager.pushed['registry'], config.registry)
+
+    def test_begin_does_not_propagate_request_for_diff_registry(self):
+        from pyramid.config import Configurator
+        config = Configurator()
+        manager = DummyThreadLocalManager()
+        req = object()
+        pushed = {'registry': object(), 'request': req}
+        manager.pushed = pushed
+        config.manager = manager
+        config.begin()
+        self.assertTrue(manager.pushed is not pushed)
+        self.assertEqual(manager.pushed['request'], None)
+        self.assertEqual(manager.pushed['registry'], config.registry)
+
     def test_end(self):
         from pyramid.config import Configurator
         config = Configurator()
         manager = DummyThreadLocalManager()
+        pushed = manager.pushed
         config.manager = manager
         config.end()
-        self.assertEqual(manager.pushed, None)
+        self.assertEqual(manager.pushed, pushed)
         self.assertEqual(manager.popped, True)
+
+    def test_context_manager(self):
+        from pyramid.config import Configurator
+        config = Configurator()
+        manager = DummyThreadLocalManager()
+        config.manager = manager
+        view = lambda r: None
+        with config as ctx:
+            self.assertTrue(config is ctx)
+            self.assertEqual(manager.pushed,
+                             {'registry': config.registry, 'request': None})
+            self.assertFalse(manager.popped)
+            config.add_view(view)
+        self.assertTrue(manager.popped)
+        config.add_view(view)  # did not raise a conflict because of commit
+        config.commit()
 
     def test_ctor_with_package_registry(self):
         import sys
@@ -775,6 +832,16 @@ pyramid.tests.test_config.dummy_include2""",
         config.include(include)
         self.assertEqual(results['root_package'], tests)
         self.assertEqual(results['package'], test_config)
+
+    def test_include_threadlocals_active(self):
+        from pyramid.tests import test_config
+        from pyramid.threadlocal import get_current_registry
+        stack = []
+        def include(config):
+            stack.append(get_current_registry())
+        config = self._makeOne()
+        config.include(include)
+        self.assertTrue(stack[0] is config.registry)
 
     def test_action_branching_kw_is_None(self):
         config = self._makeOne(autocommit=True)
@@ -1940,10 +2007,13 @@ class DummyRequest:
         self.cookies = {}
 
 class DummyThreadLocalManager(object):
-    pushed = None
-    popped = False
+    def __init__(self):
+        self.pushed = {'registry': None, 'request': None}
+        self.popped = False
     def push(self, d):
         self.pushed = d
+    def get(self):
+        return self.pushed
     def pop(self):
         self.popped = True
 

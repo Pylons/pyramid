@@ -28,6 +28,7 @@ def usage(argv):
 def main(argv=sys.argv):
     if len(argv) < 2:
         usage(argv)
+        return
     config_uri = argv[1]
     options = parse_vars(argv[2:])
     setup_logging(config_uri)

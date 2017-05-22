@@ -26,20 +26,20 @@ Hosting an Application Under a URL Prefix
 ``http://example.com/``).
 
 If you use a "pure Python" environment, this functionality can be provided by
-Paste's `urlmap <http://pythonpaste.org/modules/urlmap.html>`_ "composite" WSGI
-application.  Alternatively, you can use :term:`mod_wsgi` to serve your
+`rutter <http://rutter.readthedocs.io/en/latest/>`_, forming a "composite"
+WSGI application.  Alternatively, you can use :term:`mod_wsgi` to serve your
 application, which handles this virtual hosting translation for you "under the
 hood".
 
-If you use the ``urlmap`` composite application "in front" of a :app:`Pyramid`
+If you use the ``rutter`` composite application "in front" of a :app:`Pyramid`
 application or if you use :term:`mod_wsgi` to serve up a :app:`Pyramid`
 application, nothing special needs to be done within the application for URLs
-to be generated that contain a prefix. :mod:`paste.urlmap` and :term:`mod_wsgi`
+to be generated that contain a prefix. Rutter and :term:`mod_wsgi`
 manipulate the :term:`WSGI` environment in such a way that the ``PATH_INFO``
 and ``SCRIPT_NAME`` variables are correct for some given prefix.
 
 Here's an example of a PasteDeploy configuration snippet that includes a
-``urlmap`` composite.
+``rutter`` composite.
 
 .. code-block:: ini
   :linenos:
@@ -48,13 +48,13 @@ Here's an example of a PasteDeploy configuration snippet that includes a
   use = egg:mypyramidapp
 
   [composite:main]
-  use = egg:Paste#urlmap
+  use = egg:rutter#urlmap
   /pyramidapp = mypyramidapp
 
 This "roots" the :app:`Pyramid` application at the prefix ``/pyramidapp`` and
 serves up the composite as the "main" application in the file.
 
-.. note:: If you're using an Apache server to proxy to a Paste ``urlmap``
+.. note:: If you're using an Apache server to proxy to a ``urlmap``
    composite, you may have to use the `ProxyPreserveHost
    <http://httpd.apache.org/docs/2.2/mod/mod_proxy.html#proxypreservehost>`_
    directive to pass the original ``HTTP_HOST`` header along to the

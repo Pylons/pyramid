@@ -8,7 +8,7 @@ We will now add tests for the models and views as well as a few functional
 tests in a new ``tests`` subpackage.  Tests ensure that an application works,
 and that it continues to work when changes are made in the future.
 
-The file ``tests.py`` was generated as part of the ``alchemy`` scaffold, but it
+The file ``tests.py`` was generated as part of the ``alchemy`` cookiecutter, but it
 is a common practice to put tests into a ``tests`` subpackage, especially as
 projects grow in size and complexity.  Each module in the test subpackage
 should contain tests for its corresponding module in our application.  Each
@@ -50,17 +50,33 @@ so on.
 View the results of all our edits to ``tests`` subpackage
 =========================================================
 
-Open ``tutorial/tests/test_views.py``, and edit it such that it appears as
-follows:
+Create ``tutorial/tests/test_views.py`` such that it appears as follows:
 
 .. literalinclude:: src/tests/tutorial/tests/test_views.py
    :linenos:
    :language: python
 
-Open ``tutorial/tests/test_functional.py``, and edit it such that it appears as
-follows:
+Create ``tutorial/tests/test_functional.py`` such that it appears as follows:
 
 .. literalinclude:: src/tests/tutorial/tests/test_functional.py
+   :linenos:
+   :language: python
+
+Create ``tutorial/tests/test_initdb.py`` such that it appears as follows:
+
+.. literalinclude:: src/tests/tutorial/tests/test_initdb.py
+   :linenos:
+   :language: python
+
+Create ``tutorial/tests/test_security.py`` such that it appears as follows:
+
+.. literalinclude:: src/tests/tutorial/tests/test_security.py
+   :linenos:
+   :language: python
+
+Create ``tutorial/tests/test_user_model.py`` such that it appears as follows:
+
+.. literalinclude:: src/tests/tutorial/tests/test_user_model.py
    :linenos:
    :language: python
 
@@ -77,32 +93,27 @@ follows:
 Running the tests
 =================
 
-We can run these tests similarly to how we did in :ref:`running_tests`:
+We can run these tests similarly to how we did in :ref:`running_tests`, but first delete the SQLite database ``tutorial.sqlite``. If you do not delete the database, then you will see an integrity error when running the tests.
 
 On UNIX:
 
 .. code-block:: bash
 
+   $ rm tutorial.sqlite
    $ $VENV/bin/py.test -q
 
 On Windows:
 
 .. code-block:: doscon
 
-   c:\pyramidtut\tutorial> %VENV%\Scripts\py.test -q
+   c:\tutorial> del tutorial.sqlite
+   c:\tutorial> %VENV%\Scripts\py.test -q
 
 The expected result should look like the following:
 
 .. code-block:: text
 
-   ......................
-   22 passed, 1 pytest-warnings in 5.81 seconds
-
-.. note:: If you use Python 3 during this tutorial, you will see deprecation
-   warnings in the output, which we will choose to ignore. In making this
-   tutorial run on both Python 2 and 3, the authors prioritized simplicity and
-   focus for the learner over accommodating warnings. In your own app or as
-   extra credit, you may choose to either drop Python 2 support or hack your
-   code to work without warnings on both Python 2 and 3.
+   ................................
+   32 passed in 9.90 seconds
 
 .. _webtest: http://docs.pylonsproject.org/projects/webtest/en/latest/

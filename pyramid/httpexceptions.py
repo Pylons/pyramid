@@ -238,7 +238,7 @@ ${body}''')
             del self.content_length
 
     def __str__(self):
-        return self.detail or self.explanation
+        return str(self.detail) if self.detail else self.explanation
 
     def _json_formatter(self, status, body, title, environ):
         return {'message': body,
@@ -246,7 +246,7 @@ ${body}''')
                 'title': self.title}
 
     def prepare(self, environ):
-        if not self.body and not self.empty_body:
+        if not self.has_body and not self.empty_body:
             html_comment = ''
             comment = self.comment or ''
             accept_value = environ.get('HTTP_ACCEPT', '')

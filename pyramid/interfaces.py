@@ -682,7 +682,48 @@ class IRouter(Interface):
     registry = Attribute(
         """Component architecture registry local to this application.""")
 
-class ISettings(Interface):
+    def make_request(environ):
+        """
+        Create a new request object.
+
+        This method initializes a new :class:`pyramid.interfaces.IRequest`
+        object using the application's
+        :class:`pyramid.interfaces.IRequestFactory`.
+        """
+
+    def invoke_request(request):
+        """
+        Invoke the :app:`Pyramid` request pipeline.
+
+        See :ref:`router_chapter` for information on the request pipeline.
+        """
+
+class IExecutionPolicy(Interface):
+    def __call__(environ, router):
+        """
+        This callable triggers the router to process a raw WSGI environ dict
+        into a response and controls the :app:`Pyramid` request pipeline.
+
+        The ``environ`` is the raw WSGI environ.
+
+        The ``router`` is an :class:`pyramid.interfaces.IRouter` object which
+        should be used to create a request object and send it into the
+        processing pipeline.
+
+        The return value should be a :class:`pyramid.interfaces.IResponse`
+        object or an exception that will be handled by WSGI middleware.
+
+        The default execution policy simple creates a request and sends it
+        through the pipeline:
+
+        .. code-block:: python
+
+            def simple_execution_policy(environ, router):
+                request = router.make_request(environ)
+                return router.invoke_request(request)
+        """
+
+class ISettings(IDict):
     """ Runtime settings utility for pyramid; represents the
     deployment settings for the application.  Implements a mapping
     interface."""
@@ -799,58 +840,6 @@ class IResourceURL(Interface):
         'The physical url path of the resource as a tuple. (New in 1.5)'
         )
 
-class IContextURL(IResourceURL):
-    """
-    .. deprecated:: 1.3
-        An adapter which deals with URLs related to a context.  Use
-        :class:`pyramid.interfaces.IResourceURL` instead.
-    """
-    # this class subclasses IResourceURL because request.resource_url looks
-    # for IResourceURL via queryAdapter.  queryAdapter will find a deprecated
-    # IContextURL registration if no registration for IResourceURL exists.
-    # In reality, however, IContextURL objects were never required to have
-    # the virtual_path or physical_path attributes spelled in IResourceURL.
-    # The inheritance relationship is purely to benefit adapter lookup,
-    # not to imply an inheritance relationship of interface attributes
-    # and methods.
-    #
-    # Mechanics:
-    #
-    # class Fudge(object):
-    #     def __init__(self, one, two):
-    #         print(one, two)
-    # class Another(object):
-    #     def __init__(self, one, two):
-    #         print(one, two)
-    # ob = object()
-    # r.registerAdapter(Fudge, (Interface, Interface), IContextURL)
-    # print(r.queryMultiAdapter((ob, ob), IResourceURL))
-    # r.registerAdapter(Another, (Interface, Interface), IResourceURL)
-    # print(r.queryMultiAdapter((ob, ob), IResourceURL))
-    #
-    # prints
-    #
-    # <object object at 0x7fa678f3e2a0> <object object at 0x7fa678f3e2a0>
-    # <__main__.Fudge object at 0x1cda890>
-    # <object object at 0x7fa678f3e2a0> <object object at 0x7fa678f3e2a0>
-    # <__main__.Another object at 0x1cda850>
-
-    def virtual_root():
-        """ Return the virtual root related to a request and the
-        current context"""
-
-    def __call__():
-        """ Return a URL that points to the context. """
-
-deprecated(
-    'IContextURL',
-    'As of Pyramid 1.3 the, "pyramid.interfaces.IContextURL" interface is '
-    'scheduled to be removed.   Use the '
-    '"pyramid.config.Configurator.add_resource_url_adapter" method to register '
-    'a class that implements "pyramid.interfaces.IResourceURL" instead. '
-    'See the "What\'s new In Pyramid 1.3" document for more details.'
-    )
-
 class IPEP302Loader(Interface):
     """ See http://www.python.org/dev/peps/pep-0302/#id30.
     """
@@ -938,6 +927,13 @@ class ISession(IDict):
     usually accessed via ``request.session``.
 
     Keys and values of a session must be pickleable.
+
+    .. versionchanged:: 1.9
+
+       Sessions are no longer required to implement ``get_csrf_token`` and
+       ``new_csrf_token``. CSRF token support was moved to the pluggable
+       :class:`pyramid.interfaces.ICSRFStoragePolicy` configuration hook.
+
     """
 
     # attributes
@@ -992,18 +988,38 @@ class ISession(IDict):
         :meth:`pyramid.interfaces.ISession.flash`
         """
 
-    def new_csrf_token():
-        """ Create and set into the session a new, random cross-site request
-        forgery protection token.  Return the token.  It will be a string."""
 
-    def get_csrf_token():
-        """ Return a random cross-site request forgery protection token.  It
-        will be a string.  If a token was previously added to the session via
-        ``new_csrf_token``, that token will be returned.  If no CSRF token
-        was previously set into the session, ``new_csrf_token`` will be
+class ICSRFStoragePolicy(Interface):
+    """ An object that offers the ability to verify CSRF tokens and generate
+    new ones."""
+
+    def new_csrf_token(request):
+        """ Create and return a new, random cross-site request forgery
+        protection token. The token will be an ascii-compatible unicode
+        string.
+
+        """
+
+    def get_csrf_token(request):
+        """ Return a cross-site request forgery protection token.  It
+        will be an ascii-compatible unicode string.  If a token was previously
+        set for this user via ``new_csrf_token``, that token will be returned.
+        If no CSRF token was previously set, ``new_csrf_token`` will be
         called, which will create and set a token, and this token will be
         returned.
+
         """
+
+    def check_csrf_token(request, token):
+        """ Determine if the supplied ``token`` is valid. Most implementations
+        should simply compare the ``token`` to the current value of
+        ``get_csrf_token`` but it is possible to verify the token using
+        any mechanism necessary using this method.
+
+        Returns ``True`` if the ``token`` is valid, otherwise ``False``.
+
+        """
+
 
 class IIntrospector(Interface):
     def get(category_name, discriminator, default=None):

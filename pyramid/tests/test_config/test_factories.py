@@ -144,6 +144,24 @@ class TestFactoriesMixin(unittest.TestCase):
 
         self.assertRaises(ConfigurationError, get_bad_name)
 
+    def test_set_execution_policy(self):
+        from pyramid.interfaces import IExecutionPolicy
+        config = self._makeOne(autocommit=True)
+        def dummy_policy(environ, router): pass
+        config.set_execution_policy(dummy_policy)
+        registry = config.registry
+        result = registry.queryUtility(IExecutionPolicy)
+        self.assertEqual(result, dummy_policy)
+
+    def test_set_execution_policy_to_None(self):
+        from pyramid.interfaces import IExecutionPolicy
+        from pyramid.router import default_execution_policy
+        config = self._makeOne(autocommit=True)
+        config.set_execution_policy(None)
+        registry = config.registry
+        result = registry.queryUtility(IExecutionPolicy)
+        self.assertEqual(result, default_execution_policy)
+
 class TestDeprecatedFactoriesMixinMethods(unittest.TestCase):
     def setUp(self):
         from zope.deprecation import __show__
@@ -203,4 +221,3 @@ class TestDeprecatedFactoriesMixinMethods(unittest.TestCase):
         config.set_request_property(bar, name='bar')
         self.assertRaises(ConfigurationConflictError, config.commit)
 
-    

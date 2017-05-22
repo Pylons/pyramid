@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import datetime
+import gc
 import locale
 import os
 import unittest
@@ -8,6 +9,7 @@ import unittest
 from pyramid.wsgi import wsgiapp
 from pyramid.view import view_config
 from pyramid.static import static_view
+from pyramid.testing import skip_on
 from pyramid.compat import (
     text_,
     url_quote,
@@ -610,7 +612,7 @@ class SubrequestAppTest(unittest.TestCase):
 
     def test_one(self):
         res = self.testapp.get('/view_one', status=200)
-        self.assertTrue(b'This came from view_two' in res.body)
+        self.assertTrue(b'This came from view_two, foo=bar' in res.body)
 
     def test_three(self):
         res = self.testapp.get('/view_three', status=500)
@@ -741,3 +743,29 @@ def _assertBody(body, filename):
     data = data.replace(b'\r', b'')
     data = data.replace(b'\n', b'')
     assert(body == data)
+
+
+class MemoryLeaksTest(unittest.TestCase):
+
+    def tearDown(self):
+        import pyramid.config
+        pyramid.config.global_registries.empty()
+
+    def get_gc_count(self):
+        last_collected = 0
+        while True:
+            collected = gc.collect()
+            if collected == last_collected:
+                break
+            last_collected = collected
+        return len(gc.get_objects())
+
+    @skip_on('pypy')
+    def test_memory_leaks(self):
+        from pyramid.config import Configurator
+        Configurator().make_wsgi_app()  # Initialize all global objects
+
+        initial_count = self.get_gc_count()
+        Configurator().make_wsgi_app()
+        current_count = self.get_gc_count()
+        self.assertEqual(current_count, initial_count)

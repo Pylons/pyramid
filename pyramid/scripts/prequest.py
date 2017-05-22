@@ -1,13 +1,12 @@
 import base64
-import optparse
+import argparse
 import sys
 import textwrap
 
 from pyramid.compat import url_unquote
 from pyramid.request import Request
-from pyramid.paster import get_app
+from pyramid.scripts.common import get_config_loader
 from pyramid.scripts.common import parse_vars
-from pyramid.scripts.common import setup_logging
 
 def main(argv=sys.argv, quiet=False):
     command = PRequestCommand(argv, quiet)
@@ -39,80 +38,100 @@ class PRequestCommand(object):
 
     If the path is relative (doesn't begin with "/") it is interpreted as
     relative to "/".  The path passed to this script should be URL-quoted.
-    The path can be succeeded with a query string (e.g. `/path?a=1&=b2').
+    The path can be succeeded with a query string (e.g. '/path?a=1&=b2').
 
     The variable "environ['paste.command_request']" will be set to "True" in
     the request's WSGI environment, so your application can distinguish these
     calls from normal requests.
     """
-    usage = "usage: %prog config_uri path_info [args/options]"
-    parser = optparse.OptionParser(
-        usage=usage,
-        description=textwrap.dedent(description)
+
+    parser = argparse.ArgumentParser(
+        description=textwrap.dedent(description),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
         )
-    parser.add_option(
+    parser.add_argument(
         '-n', '--app-name',
         dest='app_name',
         metavar='NAME',
         help=(
             "Load the named application from the config file (default 'main')"
         ),
-        type="string",
         )
-    parser.add_option(
+    parser.add_argument(
         '--header',
         dest='headers',
         metavar='NAME:VALUE',
-        type='string',
         action='append',
         help=(
             "Header to add to request (you can use this option multiple times)"
         ),
     )
-    parser.add_option(
+    parser.add_argument(
         '-d', '--display-headers',
         dest='display_headers',
         action='store_true',
         help='Display status and headers before the response body'
         )
-    parser.add_option(
+    parser.add_argument(
         '-m', '--method',
         dest='method',
         choices=['GET', 'HEAD', 'POST', 'PUT', 'PATCH','DELETE',
                  'PROPFIND', 'OPTIONS'],
-        type='choice',
         help='Request method type (GET, POST, PUT, PATCH, DELETE, '
              'PROPFIND, OPTIONS)',
         )
-    parser.add_option(
+    parser.add_argument(
         '-l', '--login',
         dest='login',
-        type='string',
         help='HTTP basic auth username:password pair',
         )
 
-    get_app = staticmethod(get_app)
+    parser.add_argument(
+        'config_uri',
+        nargs='?',
+        default=None,
+        help='The URI to the configuration file.',
+        )
+
+    parser.add_argument(
+        'path_info',
+        nargs='?',
+        default=None,
+        help='The path of the request.',
+        )
+
+    parser.add_argument(
+        'config_vars',
+        nargs='*',
+        default=(),
+        help="Variables required by the config file. For example, "
+             "`http_port=%%(http_port)s` would expect `http_port=8080` to be "
+             "passed here.",
+        )
+
+    _get_config_loader = staticmethod(get_config_loader)
     stdin = sys.stdin
 
     def __init__(self, argv, quiet=False):
         self.quiet = quiet
-        self.options, self.args = self.parser.parse_args(argv[1:])
+        self.args = self.parser.parse_args(argv[1:])
 
     def out(self, msg): # pragma: no cover
         if not self.quiet:
             print(msg)
 
-    def configure_logging(self, app_spec):
-        setup_logging(app_spec)
-
     def run(self):
-        if not len(self.args) >= 2:
+        if not self.args.config_uri or not self.args.path_info:
             self.out('You must provide at least two arguments')
             return 2
-        app_spec = self.args[0]
-        path = self.args[1]
+        config_uri = self.args.config_uri
+        config_vars = parse_vars(self.args.config_vars)
+        path = self.args.path_info
 
-        self.configure_logging(app_spec)
+        loader = self._get_config_loader(config_uri)
+        loader.setup_logging(config_vars)
+
+        app = loader.get_wsgi_app(self.args.app_name, config_vars)
 
         if not path.startswith('/'):
             path = '/' + path
@@ -125,12 +144,12 @@ class PRequestCommand(object):
         path = url_unquote(path)
 
         headers = {}
-        if self.options.login:
-            enc = base64.b64encode(self.options.login.encode('ascii'))
+        if self.args.login:
+            enc = base64.b64encode(self.args.login.encode('ascii'))
             headers['Authorization'] = 'Basic ' + enc.decode('ascii')
 
-        if self.options.headers:
-            for item in self.options.headers:
+        if self.args.headers:
+            for item in self.args.headers:
                 if ':' not in item:
                     self.out(
                         "Bad --header=%s option, value must be in the form "
@@ -139,10 +158,7 @@ class PRequestCommand(object):
                 name, value = item.split(':', 1)
                 headers[name] = value.strip()
 
-        app = self.get_app(app_spec, self.options.app_name,
-                options=parse_vars(self.args[2:]))
-
-        request_method = (self.options.method or 'GET').upper()
+        request_method = (self.args.method or 'GET').upper()
 
         environ = {
             'REQUEST_METHOD': request_method,
@@ -177,7 +193,7 @@ class PRequestCommand(object):
 
         request = Request.blank(path, environ=environ)
         response = request.get_response(app)
-        if self.options.display_headers:
+        if self.args.display_headers:
             self.out(response.status)
             for name, value in response.headerlist:
                 self.out('%s: %s' % (name, value))

@@ -32,60 +32,71 @@ specific path information for commands and files.
     <https://code.google.com/archive/p/modwsgi/wikis/InstallationInstructions.wiki>`_
     for your platform into your system's Apache installation.
 
-#.  Create a :term:`virtual environment` which we'll use to install our
-    application.
+#.  Create a :app:`Pyramid` application. For this tutorial we'll use the
+    ``starter`` :term:`cookiecutter`. See :ref:`project_narr` for more
+    in-depth information about creating a new project.
 
-    .. code-block:: text
+    .. code-block:: bash
 
        $ cd ~
-       $ mkdir modwsgi
-       $ cd modwsgi
-       $ python3 -m venv env
+       $ cookiecutter https://github.com/Pylons/pyramid-cookiecutter-starter
 
-#.  Install :app:`Pyramid` into the newly created virtual environment:
-
-    .. parsed-literal::
-
-       $ cd ~/modwsgi/env
-       $ $VENV/bin/pip install "pyramid==\ |release|\ "
-
-#.  Create and install your :app:`Pyramid` application.  For the purposes of
-    this tutorial, we'll just be using the ``pyramid_starter`` application as
-    a baseline application.  Substitute your existing :app:`Pyramid`
-    application as necessary if you already have one.
+    If prompted for the first item, accept the default ``yes`` by hitting return.
 
     .. code-block:: text
 
-       $ cd ~/modwsgi/env
-       $ $VENV/bin/pcreate -s starter myapp
-       $ cd myapp
-       $ $VENV/bin/pip install -e .
+        You've cloned ~/.cookiecutters/pyramid-cookiecutter-starter before.
+        Is it okay to delete and re-clone it? [yes]: yes
+        project_name [Pyramid Scaffold]: myproject
+        repo_name [myproject]: myproject
+        Select template_language:
+        1 - jinja2
+        2 - chameleon
+        3 - mako
+        Choose from 1, 2, 3 [1]: 1
 
-#.  Within the virtual environment directory (``~/modwsgi/env``), create a
-    script named ``pyramid.wsgi``.  Give it these contents:
+#.  Create a :term:`virtual environment` which we'll use to install our
+    application. It is important to use the same base Python interpreter
+    that was used to build ``mod_wsgi``. For example, if ``mod_wsgi`` was
+    built against the system Python 3.x, then your project should use a
+    virtual environment created from that same system Python 3.x.
+
+    .. code-block:: bash
+
+       $ cd myproject
+       $ python3 -m venv env
+
+#.  Install your :app:`Pyramid` application and its dependencies.
+
+    .. code-block:: bash
+
+       $ env/bin/pip install -e .
+
+#.  Within the project directory (``~/myproject``), create a script
+    named ``pyramid.wsgi``.  Give it these contents:
 
     .. code-block:: python
 
        from pyramid.paster import get_app, setup_logging
-       ini_path = '/Users/chrism/modwsgi/env/myapp/production.ini'
+       ini_path = '/Users/chrism/myproject/production.ini'
        setup_logging(ini_path)
        application = get_app(ini_path, 'main')
 
-    The first argument to ``get_app`` is the project configuration file
-    name.  It's best to use the ``production.ini`` file provided by your
-    scaffold, as it contains settings appropriate for
-    production.  The second is the name of the section within the .ini file
-    that should be loaded by ``mod_wsgi``.  The assignment to the name
+    The first argument to :func:`pyramid.paster.get_app` is the project
+    configuration file name.  It's best to use the ``production.ini`` file
+    provided by your cookiecutter, as it contains settings appropriate for
+    production.  The second is the name of the section within the ``.ini``
+    file that should be loaded by ``mod_wsgi``.  The assignment to the name
     ``application`` is important: mod_wsgi requires finding such an
     assignment when it opens the file.
 
-    The call to ``setup_logging`` initializes the standard library's
-    `logging` module to allow logging within your application.
+    The call to :func:`pyramid.paster.setup_logging` initializes the standard
+    library's `logging` module to allow logging within your application.
     See :ref:`logging_config`.
 
     There is no need to make the ``pyramid.wsgi`` script executable.
     However, you'll need to make sure that *two* users have access to change
-    into the ``~/modwsgi/env`` directory: your current user (mine is
+    into the ``~/myproject`` directory: your current user (mine is
     ``chrism`` and the user that Apache will run as often named ``apache`` or
     ``httpd``).  Make sure both of these users can "cd" into that directory.
 
@@ -101,18 +112,17 @@ specific path information for commands and files.
        WSGIApplicationGroup %{GLOBAL}
        WSGIPassAuthorization On
        WSGIDaemonProcess pyramid user=chrism group=staff threads=4 \
-          python-path=/Users/chrism/modwsgi/env/lib/python2.7/site-packages
-       WSGIScriptAlias /myapp /Users/chrism/modwsgi/env/pyramid.wsgi
+          python-path=/Users/chrism/myproject/env/lib/python3.5/site-packages
+       WSGIScriptAlias /myapp /Users/chrism/myproject/pyramid.wsgi
 
-       <Directory /Users/chrism/modwsgi/env>
+       <Directory /Users/chrism/myproject>
          WSGIProcessGroup pyramid
-         Order allow,deny
-         Allow from all
+         Require all granted
        </Directory>
  
 #.  Restart Apache
 
-    .. code-block:: text
+    .. code-block:: bash
 
        $ sudo /usr/sbin/apachectl restart
 
@@ -122,5 +132,5 @@ specific path information for commands and files.
 :term:`mod_wsgi` has many knobs and a great variety of deployment modes. This
 is just one representation of how you might use it to serve up a :app:`Pyramid`
 application.  See the `mod_wsgi configuration documentation
-<https://code.google.com/archive/p/modwsgi/wikis/ConfigurationGuidelines.wiki>`_
+<https://modwsgi.readthedocs.io/en/develop/configuration.html>`_
 for more in-depth configuration information.
