@@ -1,4 +1,3 @@
-from difflib import get_close_matches
 from hashlib import md5
 import inspect
 
@@ -153,6 +152,7 @@ class PredicateList(object):
                 weights.append(1 << n + 1)
                 preds.append(pred)
         if kw:
+            from difflib import get_close_matches
             closest = []
             names = [ name for name, _ in ordered ]
             for name in kw:
