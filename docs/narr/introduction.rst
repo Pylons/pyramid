@@ -517,7 +517,7 @@ includes details about how :app:`Pyramid` relates to the Pylons Project.
    single: MVC
 
 :app:`Pyramid` and Other Web Frameworks
-------------------------------------------
+---------------------------------------
 
 The first release of Pyramid's predecessor (named :mod:`repoze.bfg`) was made
 in July of 2008.  At the end of 2010, we changed the name of :mod:`repoze.bfg`
@@ -528,63 +528,25 @@ November of that year.
 :term:`Django`.  As a result, :app:`Pyramid` borrows several concepts and
 features from each, combining them into a unique web framework.
 
-Many features of :app:`Pyramid` trace their origins back to :term:`Zope`. Like
-Zope applications, :app:`Pyramid` applications can be easily extended. If you
-obey certain constraints, the application you produce can be reused, modified,
-re-integrated, or extended by third-party developers without forking the
-original application.  The concepts of :term:`traversal` and declarative
-security in :app:`Pyramid` were pioneered first in Zope.
+Similar to :term:`Zope`, :app:`Pyramid` applications may easily be extended. If
+you work within the constraints of the framework, you can produce applications
+that can be reused, modified or extended without needing to modify the original
+application code. :app:`Pyramid` also inherits the concepts of :term:`traversal`
+and declarative security from Zope.
 
-The :app:`Pyramid` concept of :term:`URL dispatch` is inspired by the
-:term:`Routes` system used by :term:`Pylons` version 1.0.  Like Pylons version
-1.0, :app:`Pyramid` is mostly policy-free.  It makes no assertions about which
-database you should use. Pyramid no longer has built-in templating facilities
-as of version 1.5a2, but instead officially supports bindings for templating
-languages, including Chameleon, Jinja2, and Mako.  In essence, it only supplies
-a mechanism to map URLs to :term:`view` code, along with a set of conventions
-for calling those views.  You are free to use third-party components that fit
-your needs in your applications.
+Similar to :term:`Pylons` version 1.0, :app:`Pyramid` is largely free of
+policy. It makes no assertions about which database or template system you
+should use. You are free to use whatever third-party components fit the needs
+of your specific application. :app:`Pyramid` also inherits its approach to
+:term:`URL dispatch` from Pylons.
 
-The concept of :term:`view` is used by :app:`Pyramid` mostly as it would be by
-Django.  :app:`Pyramid` has a documentation culture more like Django's than
-like Zope's.
-
-
-.. sidebar:: You Say :app:`Pyramid` is MVC, but Where's the Controller?
-
-   The :app:`Pyramid` authors believe that the MVC pattern just doesn't really
-   fit the web very well. In a :app:`Pyramid` application, there is a resource
-   tree which represents the site structure, and views which tend to present
-   the data stored in the resource tree and a user-defined "domain model".
-   However, no facility provided *by the framework* actually necessarily maps
-   to the concept of a "controller" or "model".  So if you had to give it some
-   acronym, I guess you'd say :app:`Pyramid` is actually an "RV" framework
-   rather than an "MVC" framework.  "MVC", however, is close enough as a
-   general classification moniker for purposes of comparison with other web
-   frameworks.
-
-
-Like :term:`Pylons` version 1.0, but unlike :term:`Zope`, a :app:`Pyramid`
-application developer may use completely imperative code to perform common
-framework configuration tasks such as adding a view or a route.  In Zope,
-:term:`ZCML` is typically required for similar purposes.  In :term:`Grok`, a
-Zope-based web framework, :term:`decorator` objects and class-level
-declarations are used for this purpose.  Out of the box, Pyramid supports
-imperative and decorator-based configuration. :term:`ZCML` may be used via an
-add-on package named ``pyramid_zcml``.
-
-Also unlike :term:`Zope` and other "full-stack" frameworks such as
-:term:`Django`, :app:`Pyramid` makes no assumptions about which persistence
-mechanisms you should use to build an application.  Zope applications are
-typically reliant on :term:`ZODB`. :app:`Pyramid` allows you to build
-:term:`ZODB` applications, but it has no reliance on the ZODB software.
-Likewise, :term:`Django` tends to assume that you want to store your
-application's data in a relational database. :app:`Pyramid` makes no such
-assumption, allowing you to use a relational database, and neither encouraging
-nor discouraging the decision.
+Similar to :term:`Django`, :app:`Pyramid` values extensive documentation. In
+addition, the concept of a :term:`view` is used by :app:`Pyramid` much as it
+would be by Django.
 
 Other Python web frameworks advertise themselves as members of a class of web
 frameworks named `model-view-controller
 <https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller>`_
-frameworks. Insofar as this term has been claimed to represent a class of web
-frameworks, :app:`Pyramid` also generally fits into this class.
+frameworks. The authors of :app:`Pyramid` do not believe that the MVC pattern
+fits the web particularly well. However, if this abstraction works for you,
+:app:`Pyramid` also generally fits into this class.
