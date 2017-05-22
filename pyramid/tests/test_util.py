@@ -1096,6 +1096,31 @@ class Test_takes_one_arg(unittest.TestCase):
         getattr(foo, '__annotations__', {}).update({'bar': 'baz'})
         self.assertTrue(self._callFUT(foo))
 
+    def test_partial_decorated_func(self):
+        from functools import partial
+
+        def func(a, b, c):
+            pass
+
+        self.assertFalse(self._callFUT(partial(func)))
+        self.assertFalse(self._callFUT(partial(func, 1)))
+        self.assertTrue(self._callFUT(partial(func, 1, 2)))
+        self.assertFalse(self._callFUT(partial(func, 1, 2, 3)))
+
+    def test_partial_decorated_method(self):
+        from functools import partial
+
+        class Foo:
+            def func(self, a, b, c):
+                pass
+
+        foo = Foo()
+        self.assertFalse(self._callFUT(partial(foo.func)))
+        self.assertFalse(self._callFUT(partial(foo.func, 1)))
+        self.assertTrue(self._callFUT(partial(foo.func, 1, 2)))
+        self.assertFalse(self._callFUT(partial(foo.func, 1, 2, 3)))
+
+
 
 class TestSimpleSerializer(unittest.TestCase):
     def _makeOne(self):
