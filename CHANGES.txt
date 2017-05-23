@@ -5,6 +5,10 @@ unreleased
   new message suggests alternatives based on the list of known predicates.
   See https://github.com/Pylons/pyramid/pull/3054
 
+- Added integrity attributes for JavaScripts in cookiecutters, scaffolds, and
+  resulting source files in tutorials.
+  See https://github.com/Pylons/pyramid/issues/2548
+
 1.9a2 (2017-05-09)
 ==================
 
