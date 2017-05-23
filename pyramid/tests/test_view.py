@@ -819,9 +819,6 @@ class TestViewMethodsMixin(unittest.TestCase):
             self.fail()
 
     def test_it_raises_if_no_registry(self):
-        def exc_view(exc, request):
-            return DummyResponse(b'foo')
-        self.config.add_view(exc_view, context=RuntimeError)
         request = self._makeOne()
         del request.registry
         from pyramid.threadlocal import manager
