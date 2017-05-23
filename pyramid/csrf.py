@@ -15,7 +15,10 @@ from pyramid.exceptions import (
     BadCSRFOrigin,
     BadCSRFToken,
 )
-from pyramid.interfaces import ICSRFStoragePolicy
+from pyramid.interfaces import (
+    ICSRFStoragePolicy,
+    IDefaultCSRFOptions
+)
 from pyramid.settings import aslist
 from pyramid.util import (
     is_same_domain,
@@ -179,7 +182,7 @@ def new_csrf_token(request):
 
 
 def check_csrf_token(request,
-                     token='csrf_token',
+                     token=None,
                      header=None,
                      raises=True):
     """ Check the CSRF token returned by the
@@ -216,9 +219,21 @@ def check_csrf_token(request,
 
     """
     supplied_token = ""
+
+    # Try to read options from `config.set_default_csrf_options` set previously
+    # as the default value
+    csrf_options = request.registry.getUtility(IDefaultCSRFOptions)
     if header is None:
-        # TODO: get value from config `set_default_csrf_options` as the default
-        header = 'X-CSRF-Token'
+        if csrf_options.header is not None:
+            header = csrf_options.header
+        else:
+            header = 'X-CSRF-Token'
+    if token is None:
+        if csrf_options.token is not None:
+            token = csrf_options.token
+        else:
+            token = 'csrf_token'
+
     # We first check the headers for a csrf token, as that is significantly
     # cheaper than checking the POST body
     if header is not None:
