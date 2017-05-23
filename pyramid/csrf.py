@@ -184,7 +184,8 @@ def new_csrf_token(request):
 def check_csrf_token(request,
                      token=None,
                      header=None,
-                     raises=True):
+                     raises=True,
+                     safe_methods=None):
     """ Check the CSRF token returned by the
     :class:`pyramid.interfaces.ICSRFStoragePolicy` implementation against the
     value in ``request.POST.get(token)`` (if a POST request) or
@@ -217,6 +218,7 @@ def check_csrf_token(request,
        to use the configured :class:`pyramid.interfaces.ICSRFStoragePolicy` to
        verify the CSRF token.
 
+    # TODO: add versionchanged and the new safe_methods parameter doc here
     """
     supplied_token = ""
 
@@ -227,12 +229,25 @@ def check_csrf_token(request,
         if csrf_options.header is not None:
             header = csrf_options.header
         else:
+            # TODO: extract as constant var?
             header = 'X-CSRF-Token'
     if token is None:
         if csrf_options.token is not None:
             token = csrf_options.token
         else:
+            # TODO: extract as constant var?
             token = 'csrf_token'
+    if safe_methods is None:
+        if csrf_options.safe_methods is not None:
+            safe_methods = csrf_options.safe_methods
+        else:
+            # TODO: I saw these default values appear at many places, maybe we
+            # should extract them as constant values somehwere and use them,
+            # so that we won't be out of sync?
+            safe_methods = frozenset(["GET", "HEAD", "OPTIONS", "TRACE"])
+
+    if request.method in safe_methods:
+        return True
 
     # We first check the headers for a csrf token, as that is significantly
     # cheaper than checking the POST body
