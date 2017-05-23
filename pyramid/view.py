@@ -700,10 +700,9 @@ class ViewMethodsMixin(object):
             # https://github.com/Pylons/pyramid/issues/700
             request_iface = attrs.get('request_iface', IRequest)
 
-            try:
-                if request is not self:
-                    manager.push({'request': request, 'registry': registry})
+            manager.push({'request': request, 'registry': registry})
 
+            try:
                 response = _call_view(
                     registry,
                     request,
