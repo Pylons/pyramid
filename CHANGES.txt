@@ -11,6 +11,10 @@ Documentation Changes
 
 - Updated pyramid-cookiecutter-starter prompts and description to include Mako. See https://github.com/Pylons/pyramid/pull/2982
 
+- Added integrity attributes for JavaScripts in cookiecutters, scaffolds, and
+  resulting source files in tutorials.
+  See https://github.com/Pylons/pyramid/issues/2548
+
 
 .. _changes_1.8.3:
 
