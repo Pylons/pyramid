@@ -180,7 +180,7 @@ def new_csrf_token(request):
 
 def check_csrf_token(request,
                      token='csrf_token',
-                     header='X-CSRF-Token',
+                     header=None,
                      raises=True):
     """ Check the CSRF token returned by the
     :class:`pyramid.interfaces.ICSRFStoragePolicy` implementation against the
@@ -216,6 +216,9 @@ def check_csrf_token(request,
 
     """
     supplied_token = ""
+    if header is None:
+        # TODO: get value from config `set_default_csrf_options` as the default
+        header = 'X-CSRF-Token'
     # We first check the headers for a csrf token, as that is significantly
     # cheaper than checking the POST body
     if header is not None:
