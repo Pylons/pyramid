@@ -1284,6 +1284,33 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.body, b'foo')
 
+    def test_execution_policy_handles_exception(self):
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IExceptionViewClassifier
+        from pyramid.interfaces import IRequest
+        class Exception1(Exception):
+            pass
+        class Exception2(Exception):
+            pass
+        req_iface = self._registerRouteRequest('foo')
+        self._connectRoute('foo', 'archives/:action/:article', None)
+        view = DummyView(DummyResponse(), raise_exception=Exception1)
+        self._registerView(view, '', IViewClassifier, req_iface, None)
+        exception_view1 = DummyView(DummyResponse(),
+                                    raise_exception=Exception2)
+        self._registerView(exception_view1, '', IExceptionViewClassifier,
+                           IRequest, Exception1)
+        response = DummyResponse()
+        response.app_iter = ["Hello, world"]
+        exception_view2 = DummyView(response)
+        self._registerView(exception_view2, '', IExceptionViewClassifier,
+                           IRequest, Exception2)
+        environ = self._makeEnviron(PATH_INFO='/archives/action1/article1')
+        start_response = DummyStartResponse()
+        router = self._makeOne()
+        result = router(environ, start_response)
+        self.assertEqual(result, ["Hello, world"])
+
 class DummyPredicate(object):
     def __call__(self, info, request):
         return True

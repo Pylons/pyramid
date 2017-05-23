@@ -1,3 +1,4 @@
+import sys
 from zope.interface import (
     implementer,
     providedBy,
@@ -24,6 +25,7 @@ from pyramid.events import (
     BeforeTraversal,
     )
 
+from pyramid.compat import reraise
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.request import Request
 from pyramid.view import _call_view
@@ -252,7 +254,15 @@ class Router(object):
         response = self.execution_policy(environ, self)
         return response(environ, start_response)
 
-
 def default_execution_policy(environ, router):
     request = router.make_request(environ)
-    return router.invoke_request(request)
+    try:
+        return router.invoke_request(request)
+    except Exception:
+        exc_info = sys.exc_info()
+        try:
+            return request.invoke_exception_view(exc_info)
+        except HTTPNotFound:
+            reraise(*exc_info)
+        finally:
+            del exc_info  # avoid local ref cycle
