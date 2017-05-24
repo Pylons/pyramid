@@ -245,6 +245,8 @@ But if you're a developer who likes the aesthetics of simplicity,
 
 A new response adapter is registered in configuration:
 
+.. code-block:: python
+
    if __name__ == '__main__':
        config = Configurator()
        config.add_response_adapter(string_response_adapter, basestring)
@@ -325,15 +327,14 @@ use it directly, if you prefer:
 Extend Configuration
 --------------------
 
-Perhaps the :app:`Pyramid` configurator's syntax feels a bit verbose to you. Or
-possibly you would like to add a feature to configuration without asking the
-core developers to change :app:`Pyramid` itself?
+Perhaps the :app:`Pyramid` configurator's syntax feels a bit verbose to you.
+Or possibly you would like to add a feature to configuration
+without asking the core developers to change :app:`Pyramid` itself?
 
-You can extend :app:`Pyramid`\ 's :term:`configurator` with your own
-directives.  For example, let's say you find yourself calling
-:meth:`pyramid.config.Configurator.add_view` repetitively. Usually you can get
-rid of the boring with existing shortcuts, but let's say that this is a case
-where there is no such shortcut:
+You can extend :app:`Pyramid`\ 's :term:`configurator` with your own directives.
+For example, let's say you find yourself calling :meth:`pyramid.config.Configurator.add_view` repetitively.
+Usually you can get rid of the boring with existing shortcuts,
+but let's say that this is a case where there is no such shortcut:
 
 .. code-block:: python
    :linenos:
@@ -349,8 +350,8 @@ where there is no such shortcut:
    config.add_view('my.package.HEAD_view', route_name='xhr_route',
                    xhr=True, permission='view', request_method='HEAD')
 
-Pretty tedious right?  You can add a directive to the :app:`Pyramid`
-:term:`configurator` to automate some of the tedium away:
+Pretty tedious right?
+You can add a directive to the :app:`Pyramid` :term:`configurator` to automate some of the tedium away:
 
 .. code-block:: python
    :linenos:
@@ -368,8 +369,8 @@ Pretty tedious right?  You can add a directive to the :app:`Pyramid`
    config = Configurator()
    config.add_directive('add_protected_xhr_views', add_protected_xhr_views)
 
-Once that's done, you can call the directive you've just added as a method of
-the :term:`configurator` object:
+Once that's done,
+you can call the directive you've just added as a method of the :term:`configurator` object:
 
 .. code-block:: python
    :linenos:
@@ -379,10 +380,11 @@ the :term:`configurator` object:
 
 Much better!
 
-You can share your configuration code with others, too. Package it up and call
-:meth:`~pyramid.config.Configurator.add_directive` from within a function
-called when another user uses the
-:meth:`~pyramid.config.Configurator.include` method against your code.
+You can share your configuration code with others, too.
+Add your code to a Python package.
+Put the call to :meth:`~pyramid.config.Configurator.add_directive` in a function.
+When other programmers install your package,
+they'll be able to use your configuration by passing your function to a call to :meth:`~pyramid.config.Configurator.include`.
 
 .. seealso::
 
@@ -391,14 +393,14 @@ called when another user uses the
 Introspect Your Application
 ---------------------------
 
-If you're building a large, pluggalbe system, it's useful to be able to get a
-list of what has been plugged in *at application runtime*.  For example, you
-might want to show users a set of tabs at the top of the screen based on a list
-of the views they registered.
+If you're building a large, pluggable system,
+it's useful to be able to get a list of what has been plugged in *at application runtime*.
+For example, you might want to show users a set of tabs at the top of the screen
+based on a list of the views they registered.
 
 :app:`Pyramid` provides an :term:`introspector` for just this purpose.
 
-Here's an example of using Pyramid's introspector from within a view callable:
+Here's an example of using :app:`Pyramid`\ 's :term:`introspector` from within a view:
 
 .. code-block:: python
     :linenos:
