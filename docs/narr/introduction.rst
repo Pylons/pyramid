@@ -492,7 +492,7 @@ that make it adaptable. Read more about them below.
 .. toctree::
    :maxdepth: 2
 
-   advfeatures
+   advanced-features
 
 
 

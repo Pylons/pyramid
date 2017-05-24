@@ -751,7 +751,7 @@ Glossary
      :ref:`Venusian` is a library which
      allows framework authors to defer decorator actions.  Instead of
      taking actions when a function (or class) decorator is executed
-     at import time, the action usually taken by the decorator is
+     at :term:`import time`, the action usually taken by the decorator is
      deferred until a separate "scan" phase.  :app:`Pyramid` relies
      on Venusian to provide a basis for its :term:`scan` feature.
 
@@ -1172,3 +1172,34 @@ Glossary
       A policy which wraps the :term:`router` by creating the request object
       and sending it through the request pipeline.
       See :class:`pyramid.config.Configurator.set_execution_policy`.
+
+   singleton
+      A singleton is a class which will only ever have one instance.
+      As there is only one, it is shared by all other code.
+      This makes it an example of :term:`global state`.
+
+      Using a singleton is `considered a poor design choice. <https://softwareengineering.stackexchange.com/questions/148108/why-is-global-state-so-evil>`_
+      As :term:`mutable` global state, it can be changed by any other code,
+      and so the values it represents cannot be reasoned about or tested properly.
+
+   global state
+      A set of values that are available to the entirety of a program.
+
+   mutable
+      In Python, a value is mutable if it can be changed *in place*.
+      The Python ``list`` and ``dict`` types are mutable.
+      When a value is added to or removed from an instance of either, the original object remains.
+      The opposite of mutable is :term:`immutable`.
+
+   immutable
+      In Python, a value is immutable if it cannot be changed.
+      The Python ``str``, ``int``, and ``tuple`` data types are all ``immutable``.
+
+   import time
+      In Python, the moment when a module is referred to in an ``import`` statement.
+      At this moment, all statements in that module at the module scope (at the left margin) are executed.
+      It is a bad design decision to put statements in a Python module that have :term:`side effect`\ s at import time.
+
+   side effect
+      A statement or function has a side effect when it changes a value outside its own scope.
+      Put another way, if one can observe the change made by a function from outside that function, it has a side effect.
