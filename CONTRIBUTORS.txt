@@ -291,10 +291,14 @@ Contributors
 
 - Mikko Ohtamaa, 2016/12/6
 
+- Jure Cerjak, 2016/12/7
+
 - Martin Frlin, 2016/12/7
 
 - Kirill Kuzminykh, 2017/03/01
 
 - Aleph Melo, 2017/04/16
 
-- Jeremy(Ching-Rui) Chen, 2017/04/
+- Jeremy(Ching-Rui) Chen, 2017/04/19
+
+- Fang-Pen Lin, 2017/05/22
