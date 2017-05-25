@@ -30,6 +30,7 @@ How many times have you found yourself beginning the logic of your view code
 with something like this:
 
 .. code-block:: python
+    :linenos:
 
     if request.user.is_authenticated:
         # do one thing
@@ -51,6 +52,7 @@ the request is an AJAX (XHR) request or not, and lots of other things.
 For our example above, you can do this instead:
 
 .. code-block:: python
+    :linenos:
 
     @view_config(route_name="items", effective_principals=pyramid.security.Authenticated)
     def auth_view(request):
@@ -135,15 +137,15 @@ bunch of routes, you can just use the ``include`` statement with a
 as you requested:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.config import Configurator
+    from pyramid.config import Configurator
 
-   if __name__ == '__main__':
-      config = Configurator()
-      config.include('pyramid_jinja2')
-      config.include('pyramid_exclog')
-      config.include('some.other.package', route_prefix='/somethingelse')
+    if __name__ == '__main__':
+       config = Configurator()
+       config.include('pyramid_jinja2')
+       config.include('pyramid_exclog')
+       config.include('some.other.package', route_prefix='/somethingelse')
 
 .. seealso::
 
@@ -207,20 +209,20 @@ When frameworks allow for this, code looks slightly prettier because there are
 fewer imports and less code. For example, compare this:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.response import Response
+    from pyramid.response import Response
 
-   def aview(request):
-       return Response("Hello world!")
+    def aview(request):
+        return Response("Hello world!")
 
 To this:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   def aview(request):
-       return "Hello world!"
+    def aview(request):
+        return "Hello world!"
 
 Nicer to look at, right?
 
@@ -233,71 +235,72 @@ But if you're a developer who likes the aesthetics of simplicity,
 :term:`response adapter`\ :
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.config import Configurator
-   from pyramid.response import Response
+    from pyramid.config import Configurator
+    from pyramid.response import Response
 
-   def string_response_adapter(s):
-       response = Response(s)
-       response.content_type = 'text/html'
-       return response
+    def string_response_adapter(s):
+        response = Response(s)
+        response.content_type = 'text/html'
+        return response
 
 A new response adapter is registered in configuration:
 
 .. code-block:: python
+    :linenos:
 
-   if __name__ == '__main__':
-       config = Configurator()
-       config.add_response_adapter(string_response_adapter, basestring)
+    if __name__ == '__main__':
+        config = Configurator()
+        config.add_response_adapter(string_response_adapter, basestring)
 
 With that, you may return strings from any of your view callables, e.g.:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   def helloview(request):
-       return "Hello world!"
+    def helloview(request):
+        return "Hello world!"
 
-   def goodbyeview(request):
-       return "Goodbye world!"
+    def goodbyeview(request):
+        return "Goodbye world!"
 
 You can even use a :term:`response adapter` to allow for custom content types
 and return codes:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.config import Configurator
+    from pyramid.config import Configurator
 
-   def tuple_response_adapter(val):
-       status_int, content_type, body = val
-       response = Response(body)
-       response.content_type = content_type
-       response.status_int = status_int
-       return response
+    def tuple_response_adapter(val):
+        status_int, content_type, body = val
+        response = Response(body)
+        response.content_type = content_type
+        response.status_int = status_int
+        return response
 
-   def string_response_adapter(body):
-       response = Response(body)
-       response.content_type = 'text/html'
-       response.status_int = 200
-       return response
+    def string_response_adapter(body):
+        response = Response(body)
+        response.content_type = 'text/html'
+        response.status_int = 200
+        return response
 
-   if __name__ == '__main__':
-       config = Configurator()
-       config.add_response_adapter(string_response_adapter, basestring)
-       config.add_response_adapter(tuple_response_adapter, tuple)
+    if __name__ == '__main__':
+        config = Configurator()
+        config.add_response_adapter(string_response_adapter, basestring)
+        config.add_response_adapter(tuple_response_adapter, tuple)
 
 With this, both of these views will work as expected:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   def aview(request):
-       return "Hello world!"
+    def aview(request):
+        return "Hello world!"
 
-   def anotherview(request):
-       return (403, 'text/plain', "Forbidden")
+    def anotherview(request):
+        return (403, 'text/plain', "Forbidden")
 
 .. seealso::
 
@@ -312,13 +315,13 @@ much work. :app:`Pyramid` provides a global response object as well.  You can
 use it directly, if you prefer:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   def aview(request):
-       response = request.response
-       response.body = 'Hello world!'
-       response.content_type = 'text/plain'
-       return response
+    def aview(request):
+        response = request.response
+        response.body = 'Hello world!'
+        response.content_type = 'text/plain'
+        return response
 
 .. seealso::
 
@@ -337,46 +340,46 @@ Usually you can get rid of the boring with existing shortcuts,
 but let's say that this is a case where there is no such shortcut:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.config import Configurator
+    from pyramid.config import Configurator
 
-   config = Configurator()
-   config.add_route('xhr_route', '/xhr/{id}')
-   config.add_view('my.package.GET_view', route_name='xhr_route',
-                   xhr=True,  permission='view', request_method='GET')
-   config.add_view('my.package.POST_view', route_name='xhr_route',
-                   xhr=True, permission='view', request_method='POST')
-   config.add_view('my.package.HEAD_view', route_name='xhr_route',
-                   xhr=True, permission='view', request_method='HEAD')
+    config = Configurator()
+    config.add_route('xhr_route', '/xhr/{id}')
+    config.add_view('my.package.GET_view', route_name='xhr_route',
+                    xhr=True,  permission='view', request_method='GET')
+    config.add_view('my.package.POST_view', route_name='xhr_route',
+                    xhr=True, permission='view', request_method='POST')
+    config.add_view('my.package.HEAD_view', route_name='xhr_route',
+                    xhr=True, permission='view', request_method='HEAD')
 
 Pretty tedious right?
 You can add a directive to the :app:`Pyramid` :term:`configurator` to automate some of the tedium away:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.config import Configurator
+    from pyramid.config import Configurator
 
-   def add_protected_xhr_views(config, module):
-       module = config.maybe_dotted(module)
-       for method in ('GET', 'POST', 'HEAD'):
-           view = getattr(module, 'xhr_%s_view' % method, None)
-           if view is not None:
-               config.add_view(view, route_name='xhr_route', xhr=True,
-                               permission='view', request_method=method)
+    def add_protected_xhr_views(config, module):
+        module = config.maybe_dotted(module)
+        for method in ('GET', 'POST', 'HEAD'):
+            view = getattr(module, 'xhr_%s_view' % method, None)
+            if view is not None:
+                config.add_view(view, route_name='xhr_route', xhr=True,
+                                permission='view', request_method=method)
 
-   config = Configurator()
-   config.add_directive('add_protected_xhr_views', add_protected_xhr_views)
+    config = Configurator()
+    config.add_directive('add_protected_xhr_views', add_protected_xhr_views)
 
 Once that's done,
 you can call the directive you've just added as a method of the :term:`configurator` object:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   config.add_route('xhr_route', '/xhr/{id}')
-   config.add_protected_xhr_views('my.package')
+    config.add_route('xhr_route', '/xhr/{id}')
+    config.add_protected_xhr_views('my.package')
 
 Much better!
 
