@@ -73,44 +73,47 @@ working on a framework that is up-to-date and forward-looking.
 Tested
 ~~~~~~
 
-Untested code is broken by design. The Pyramid community has a strong testing
-culture and our framework reflects that. Every release of Pyramid has 100%
-statement coverage [#]_ and 95% decision/condition coverage. [#]_ It is
-automatically tested using `Travis <https://travis-ci.org/Pylons/pyramid>`_ and
-`Jenkins <http://jenkins.pylonsproject.org/job/pyramid/>`_ on Python 2.7,
-Python 3.4, Python 3.5, and PyPy after each commit to its GitHub repository.
+Untested code is broken by design.
+The Pyramid community has a strong testing culture and our framework reflects that.
+Every release of Pyramid has 100% statement coverage (as measured by `coverage <https://coverage.readthedocs.io>`_)
+and 95% decision/condition coverage. (as measured by `instrumental <http://instrumental.readthedocs.io/en/latest/intro.html>`_)
+It is automatically tested using `Travis <https://travis-ci.org/Pylons/pyramid>`_
+and `Jenkins <http://jenkins.pylonsproject.org/job/pyramid/>`_
+on supported versions of Python after each commit to its GitHub repository.
 `Official Pyramid add-ons <https://trypyramid.com/resources-extending-pyramid.html>`_
 are held to a similar testing standard.
 
 We still find bugs in Pyramid, but we've noticed we find a lot fewer of them
 while working on projects with a solid testing regime.
 
-.. [#] as measured by `coverage <https://coverage.readthedocs.io>`_
-.. [#] as measured by `instrumental <http://instrumental.readthedocs.io/en/latest/intro.html>`_
-
 Documented
 ~~~~~~~~~~
 
-The Pyramid documentation is comprehensive. We strive to keep our narrative
-documentation both complete and friendly to newcomers. We also maintain a
-:ref:`cookbook <cookbook:pyramid-cookbook>` of recipes, demonstrations of
-common scenarios you might face. And contributions in the form of improvements
-to our documentation are always appreciated.
+The Pyramid documentation is comprehensive.
+We strive to keep our narrative documentation both complete and friendly to newcomers.
+We also maintain a :ref:`cookbook <cookbook:pyramid-cookbook>` of recipes,
+demonstrations of common scenarios you might face.
+Contributions in the form of improvements to our documentation are always appreciated.
+And we always welcome improvements to our `official tutorials <http://docs.pylonsproject.org/projects/pyramid/en/latest/#tutorials>`_
+as well as new contributions to our `community maintained tutorials <http://docs.pylonsproject.org/projects/pyramid-tutorials/en/latest/index.html#pyramid-tutorials>`_.
 
 Supported
 ~~~~~~~~~
 
-You can get help quickly with Pyramid. It's our goal that no Pyramid question
-go unanswered. Whether you ask a question on IRC, on the Pylons-discuss mailing
-list, or on StackOverflow, you're likely to get a reasonably prompt response.
+You can get help quickly with :app:`Pyramid`.
+It's our goal that no :app:`Pyramid` question go unanswered.
+Whether you ask a question on IRC, on the Pylons-discuss mailing list, or on StackOverflow,
+you're likely to get a reasonably prompt response.
 
-Pyramid is also a welcoming, friendly space for newcomers. We don't tolerate
-"support trolls" or those who enjoy berating fellow users in our support
-channels.  We try to keep it well-lit and new-user-friendly.
+:app:`Pyramid` is also a welcoming, friendly space for newcomers.
+We don't tolerate "support trolls" or those who enjoy berating fellow users in our support channels.
+We try to keep it well-lit and new-user-friendly.
 
-Example: Visit irc\://freenode.net#pyramid (the ``#pyramid`` channel on
-irc.freenode.net in an IRC client) or the pylons-discuss maillist at
-https://groups.google.com/forum/#!forum/pylons-discuss.
+.. seealso::
+
+    See also our `#pyramid IRC channel <https://webchat.freenode.net/?channels=pyramid>`_,
+    our `pylons-discuss mailing list <https://groups.google.com/forum/#!forum/pylons-discuss>`_,
+    and :ref:`support-and-development`.
 
 .. _what_makes_pyramid_unique:
 
@@ -135,8 +138,7 @@ framework should be able to be good at both. Pyramid is that kind of framework.
 
 Pyramid provides a set of features that are unique among Python web frameworks.
 Others may provide some, but only Pyramid provides them all, in one place,
-fully documented, and useful *à la carte* without needing to pay for the whole
-banquet.
+fully documented, and *à la carte* without needing to pay for the whole banquet.
 
 
 Build single-file applications
@@ -170,12 +172,14 @@ you don't have to switch files to see your configuration. For example:
        return Response('fred')
 
 However, using Pyramid configuration decorators does not change your code. It
-remains easy to extend, test or reuse. You can test your code as if the
+remains easy to extend, test, or reuse. You can test your code as if the
 decorators were not there. You can instruct the framework to ignore some
 decorators. You can even use an imperative style to write your configuration,
 skipping decorators entirely.
 
-Example: :ref:`mapping_views_using_a_decorator_section`.
+.. seealso::
+
+    See also :ref:`mapping_views_using_a_decorator_section`.
 
 Generate application URLs
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -185,7 +189,9 @@ viewing. Pyramid provides flexible, consistent, easy to use tools for generating
 URLs. When you use these tools to write your application, you can change your
 configuration without fear of breaking links in your web pages.
 
-Example: :ref:`generating_route_urls`.
+.. seealso::
+
+    See also :ref:`generating_route_urls`.
 
 Serve static assets
 ~~~~~~~~~~~~~~~~~~~
@@ -197,7 +203,9 @@ server or CDN (content delivery network). Either way, Pyramid can help you to
 generate URLs so you can change where your files come from without changing any
 code.
 
-Example: :ref:`static_assets_section`.
+.. seealso::
+
+    See also :ref:`static_assets_section`.
 
 Develop interactively
 ~~~~~~~~~~~~~~~~~~~~~
@@ -216,7 +224,9 @@ around from your browser to find out what happened.
 To use the Pyramid debug toolbar, build your project with a Pyramid
 :term:`cookiecutter`.
 
-Example: :ref:`debug_toolbar`.
+.. seealso::
+
+    See also :ref:`debug_toolbar`.
 
 Debug with power
 ~~~~~~~~~~~~~~~~
@@ -232,20 +242,24 @@ Pyramid also has command line tools to help you verify your configuration. You
 can use ``proutes`` and ``pviews`` to inspect how URLs are connected to your
 application code.
 
-Examples: :ref:`debug_authorization_section` and :ref:`command_line_chapter`.
+.. seealso::
+
+    See also :ref:`debug_authorization_section`, :ref:`command_line_chapter`,
+    and :doc:`../pscripts/index`
 
 Extend your application
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Pyramid add-ons extend the core of the framework with useful abilities. There
 are add-ons available for your favorite template language, SQL and NoSQL
-databases, authentication services and much much more.
+databases, authentication services and more.
 
 Supported Pyramid add-ons are held to the same demanding standards as the
 framework itself. You will find them to be fully tested and well documented.
 
-Examples:
-https://trypyramid.com/resources-extending-pyramid.html
+.. seealso::
+
+    See also https://trypyramid.com/resources-extending-pyramid.html
 
 Write your views, *your* way
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
