@@ -49,7 +49,7 @@ Prepare new release branch
   changes in CHANGES.txt.
 
 - Update README.rst to use correct versions of badges, URLs, and ALT option
-  according to each branch and context.
+  according to the new release branch name.
 
 - Update whatsnew-X.X.rst in docs to point at change log entries for individual
   releases if applicable.
@@ -95,6 +95,9 @@ Prepare master for further development (major releases only)
   pylons_sphinx_latesturl_pagename_overrides for the release.
 
 - Change setup.py version to the next version number.
+
+- Update README.rst to use correct versions of badges, URLs, and ALT option
+  for "master" instead of the major release version.
 
 Update previous version (final releases only)
 ---------------------------------------------
