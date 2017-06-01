@@ -1,13 +1,13 @@
 Pyramid
 =======
 
-.. image:: https://travis-ci.org/Pylons/pyramid.png?branch=master
+.. image:: https://travis-ci.org/Pylons/pyramid.png?branch=1.9-branch
         :target: https://travis-ci.org/Pylons/pyramid
-        :alt: master Travis CI Status
+        :alt: 1.9-branch Travis CI Status
 
-.. image:: https://readthedocs.org/projects/pyramid/badge/?version=master
-        :target: http://docs.pylonsproject.org/projects/pyramid/en/master/
-        :alt: master Documentation Status
+.. image:: https://readthedocs.org/projects/pyramid/badge/?version=1.9-branch
+        :target: http://docs.pylonsproject.org/projects/pyramid/en/1.9-branch/
+        :alt: 1.9-branch Documentation Status
 
 .. image:: https://img.shields.io/badge/irc-freenode-blue.svg
         :target: https://webchat.freenode.net/?channels=pyramid
