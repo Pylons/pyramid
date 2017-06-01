@@ -9,10 +9,6 @@ Pyramid
         :target: http://docs.pylonsproject.org/projects/pyramid/en/1.8-branch/
         :alt: 1.8-branch Documentation Status
 
-.. image:: https://readthedocs.org/projects/pyramid/badge/?version=latest
-        :target: http://docs.pylonsproject.org/projects/pyramid/en/latest/
-        :alt: Latest Documentation Status
-
 .. image:: https://img.shields.io/badge/irc-freenode-blue.svg
         :target: https://webchat.freenode.net/?channels=pyramid
         :alt: IRC Freenode
