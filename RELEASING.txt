@@ -48,8 +48,8 @@ Prepare new release branch
   include a link under "Bug Fix Releases" to the minor feature
   changes in CHANGES.txt.
 
-- Update README.rst to use correct versions of badges and URLs according to
-  each branch and context, i.e., RTD "latest" == GitHub/Travis "1.x-branch".
+- Update README.rst to use correct versions of badges, URLs, and ALT option
+  according to the new release branch name.
 
 - Update whatsnew-X.X.rst in docs to point at change log entries for individual
   releases if applicable.
@@ -95,6 +95,9 @@ Prepare master for further development (major releases only)
   pylons_sphinx_latesturl_pagename_overrides for the release.
 
 - Change setup.py version to the next version number.
+
+- Update README.rst to use correct versions of badges, URLs, and ALT option
+  for "master" instead of the major release version.
 
 Update previous version (final releases only)
 ---------------------------------------------
