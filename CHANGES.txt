@@ -9,6 +9,10 @@ unreleased
   resulting source files in tutorials.
   See https://github.com/Pylons/pyramid/issues/2548
 
+- Update RELEASING.txt for updating cookiecutters. Change cookiecutter URLs to
+  use shortcut.
+  See: https://github.com/Pylons/pyramid/issues/3042
+
 1.9a2 (2017-05-09)
 ==================
 

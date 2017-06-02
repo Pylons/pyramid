@@ -38,6 +38,9 @@ Prepare new release branch
 
   $ ./scaffoldtests.sh
 
+- For each ``pyramid-cookiecutter-*``, make a new branch off "master" with the
+  same name to align with the new Pyramid release branch name.
+
 - Ensure all features of the release are documented (audit CHANGES.txt or
   communicate with contributors).
 
@@ -101,6 +104,11 @@ Prepare master for further development (major releases only)
 
 Update previous version (final releases only)
 ---------------------------------------------
+
+- In the docs, update the ``cookiecutter`` command by appending the previous
+  branch name for checkout, for example, ``cookiecutter
+  gh:Pylons/pyramid-cookiecutter-starter --checkout 1.8-branch``. A search for
+  ``cookiecutter gh:Pylons/pyramid-cookiecutter-`` should return all instances.
 
 - In docs/conf.py, update values under html_theme_options for in_progress and
   outdated. Uncomment the sections to enable pylons_sphinx_latesturl.
