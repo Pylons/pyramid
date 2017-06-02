@@ -107,6 +107,11 @@ Prepare master for further development (major releases only)
 - Update README.rst to use correct versions of badges, URLs, and ALT option
   for "master" instead of the major release version.
 
+- In the docs, update the ``cookiecutter`` command with ``master``,
+  for example, ``cookiecutter gh:Pylons/pyramid-cookiecutter-starter --checkout
+  master``. A search for ``cookiecutter gh:Pylons/pyramid-cookiecutter-``
+  should return all instances to be updated.
+
 Update previous version (final releases only)
 ---------------------------------------------
 
