@@ -259,6 +259,9 @@ class DummySession(dict):
     def changed(self):
         pass
 
+    def delete(self):
+        pass
+
     def invalidate(self):
         self.clear()
 
@@ -274,6 +277,9 @@ class DummySession(dict):
     def peek_flash(self, queue=''):
         storage = self.get('_f_' + queue, [])
         return storage
+
+    def save(self):
+        pass
 
     def new_csrf_token(self):
         token = text_('0123456789012345678901234567890123456789')
