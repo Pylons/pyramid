@@ -15,6 +15,10 @@ Documentation Changes
   resulting source files in tutorials.
   See https://github.com/Pylons/pyramid/issues/2548
 
+- Update ``cookiecutter`` command to use a checkout for specific branch and
+  shorten it.
+  See https://github.com/Pylons/pyramid/issues/3042
+
 
 .. _changes_1.8.3:
 
