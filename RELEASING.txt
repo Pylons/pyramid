@@ -38,6 +38,14 @@ Prepare new release branch
 
   $ ./scaffoldtests.sh
 
+- For each ``pyramid-cookiecutter-*``, make a new branch off "master" with the
+  same name to align with the new Pyramid release branch name.
+
+- In the docs, update the ``cookiecutter`` command with the new branch name,
+  for example, ``cookiecutter gh:Pylons/pyramid-cookiecutter-starter --checkout
+  x.y-branch``. A search for ``cookiecutter gh:Pylons/pyramid-cookiecutter-``
+  should return all instances to be updated.
+
 - Ensure all features of the release are documented (audit CHANGES.txt or
   communicate with contributors).
 

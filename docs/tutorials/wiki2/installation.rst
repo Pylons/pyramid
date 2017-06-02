@@ -43,7 +43,7 @@ On UNIX
 .. code-block:: bash
 
     $ cd ~
-    $ cookiecutter https://github.com/Pylons/pyramid-cookiecutter-alchemy
+    $ cookiecutter gh:Pylons/pyramid-cookiecutter-alchemy --checkout 1.9-branch
 
 On Windows
 ^^^^^^^^^^
@@ -51,7 +51,7 @@ On Windows
 .. code-block:: doscon
 
     c:\> cd \
-    c:\> cookiecutter https://github.com/Pylons/pyramid-cookiecutter-alchemy
+    c:\> cookiecutter gh:Pylons/pyramid-cookiecutter-alchemy --checkout 1.9-branch
 
 On all operating systems
 ^^^^^^^^^^^^^^^^^^^^^^^^
