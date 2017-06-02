@@ -31,7 +31,7 @@ On UNIX
 .. code-block:: bash
 
     $ cd ~
-    $ cookiecutter https://github.com/Pylons/pyramid-cookiecutter-zodb
+    $ cookiecutter gh:Pylons/pyramid-cookiecutter-zodb --checkout 1.8-branch
 
 On Windows
 ^^^^^^^^^^
@@ -39,7 +39,7 @@ On Windows
 .. code-block:: doscon
 
     c:\> cd \
-    c:\> cookiecutter https://github.com/Pylons/pyramid-cookiecutter-zodb
+    c:\> cookiecutter gh:Pylons/pyramid-cookiecutter-zodb --checkout 1.8-branch
 
 On all operating systems
 ^^^^^^^^^^^^^^^^^^^^^^^^
