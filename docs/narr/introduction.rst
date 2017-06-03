@@ -73,15 +73,17 @@ working on a framework that is up-to-date and forward-looking.
 Tested
 ~~~~~~
 
-Untested code is broken by design.
-The Pyramid community has a strong testing culture and our framework reflects that.
-Every release of Pyramid has 100% statement coverage (as measured by `coverage <https://coverage.readthedocs.io>`_)
-and 95% decision/condition coverage. (as measured by `instrumental <http://instrumental.readthedocs.io/en/latest/intro.html>`_)
-It is automatically tested using `Travis <https://travis-ci.org/Pylons/pyramid>`_
-and `Jenkins <http://jenkins.pylonsproject.org/job/pyramid/>`_
-on supported versions of Python after each commit to its GitHub repository.
-`Official Pyramid add-ons <https://trypyramid.com/resources-extending-pyramid.html>`_
-are held to a similar testing standard.
+Untested code is broken by design. The Pyramid community has a strong testing
+culture and our framework reflects that. Every release of Pyramid has 100%
+statement coverage (as measured by `coverage
+<https://coverage.readthedocs.io>`_) and 95% decision/condition coverage. (as
+measured by `instrumental
+<http://instrumental.readthedocs.io/en/latest/intro.html>`_) It is
+automatically tested using `Travis <https://travis-ci.org/Pylons/pyramid>`_ and
+`Jenkins <http://jenkins.pylonsproject.org/job/pyramid/>`_ on supported
+versions of Python after each commit to its GitHub repository. `Official
+Pyramid add-ons <https://trypyramid.com/resources-extending-pyramid.html>`_ are
+held to a similar testing standard.
 
 We still find bugs in Pyramid, but we've noticed we find a lot fewer of them
 while working on projects with a solid testing regime.
@@ -89,25 +91,27 @@ while working on projects with a solid testing regime.
 Documented
 ~~~~~~~~~~
 
-The Pyramid documentation is comprehensive.
-We strive to keep our narrative documentation both complete and friendly to newcomers.
-We also maintain a :ref:`cookbook <cookbook:pyramid-cookbook>` of recipes,
-demonstrations of common scenarios you might face.
-Contributions in the form of improvements to our documentation are always appreciated.
-And we always welcome improvements to our `official tutorials <http://docs.pylonsproject.org/projects/pyramid/en/latest/#tutorials>`_
-as well as new contributions to our `community maintained tutorials <http://docs.pylonsproject.org/projects/pyramid-tutorials/en/latest/index.html#pyramid-tutorials>`_.
+The Pyramid documentation is comprehensive. We strive to keep our narrative
+documentation both complete and friendly to newcomers. We also maintain a
+:ref:`cookbook <cookbook:pyramid-cookbook>` of recipes, demonstrations of
+common scenarios you might face. Contributions in the form of improvements to
+our documentation are always appreciated. And we always welcome improvements to
+our `official tutorials
+<http://docs.pylonsproject.org/projects/pyramid/en/latest/#tutorials>`_ as well
+as new contributions to our `community maintained tutorials
+<http://docs.pylonsproject.org/projects/pyramid-tutorials/en/latest/index.html#pyramid-tutorials>`_.
 
 Supported
 ~~~~~~~~~
 
-You can get help quickly with :app:`Pyramid`.
-It's our goal that no :app:`Pyramid` question go unanswered.
-Whether you ask a question on IRC, on the Pylons-discuss mailing list, or on StackOverflow,
-you're likely to get a reasonably prompt response.
+You can get help quickly with :app:`Pyramid`. It's our goal that no
+:app:`Pyramid` question go unanswered. Whether you ask a question on IRC, on
+the Pylons-discuss mailing list, or on StackOverflow, you're likely to get a
+reasonably prompt response.
 
-:app:`Pyramid` is also a welcoming, friendly space for newcomers.
-We don't tolerate "support trolls" or those who enjoy berating fellow users in our support channels.
-We try to keep it well-lit and new-user-friendly.
+:app:`Pyramid` is also a welcoming, friendly space for newcomers. We don't
+tolerate "support trolls" or those who enjoy berating fellow users in our
+support channels. We try to keep it well-lit and new-user-friendly.
 
 .. seealso::
 
@@ -336,9 +340,9 @@ Use *your* templates
 ~~~~~~~~~~~~~~~~~~~~
 
 In Pyramid, the job of creating a ``Response`` belongs to a :term:`renderer`.
-Any templating system--Mako, Genshi, Chameleon, Jinja2--can be a renderer. In
-fact, packages exist for all of these systems. But if you'd rather use another,
-a structured API exists allowing you to create a renderer using your favorite
+Any templating system—Mako, Chameleon, Jinja2—can be a renderer. In fact,
+packages exist for all of these systems. But if you'd rather use another, a
+structured API exists allowing you to create a renderer using your favorite
 templating system. You can use the templating system *you* understand, not one
 required by the framework.
 
@@ -352,7 +356,7 @@ Write testable views
 ~~~~~~~~~~~~~~~~~~~~
 
 When you use a :term:`renderer` with your view callable, you are freed from
-needing to return a "webby" ``Response`` object. Instead, your views can return
+needing to return a "webby" ``Response`` object. Instead your views can return
 a simple Python dictionary. Pyramid will take care of rendering the information
 in that dictionary to a ``Response`` on your behalf. As a result, your views
 are more easily tested, since you don't need to parse HTML to evaluate the
@@ -398,8 +402,8 @@ customization. See :ref:`intro_asset_specs` for more information.
 
 Example: :ref:`renderers_chapter`.
 
-Use events to coordinate
-~~~~~~~~~~~~~~~~~~~~~~~~
+Use events to coordinate actions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When writing web applications, it is often important to have your code run at a
 specific point in the lifecycle of a request. In Pyramid, you can accomplish
@@ -441,10 +445,13 @@ Build efficient applications
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Pyramid provides an easy way to *cache* the results of slow or expensive views.
-You can indicate in view configuration that you want a view to be cached::
+You can indicate in view configuration that you want a view to be cached:
+
+.. code-block:: python
 
     @view_config(http_cache=3600) # 60 minutes
-    def myview(request): ...
+    def myview(request):
+        # ...
 
 Pyramid will automatically add the appropriate ``Cache-Control`` and
 ``Expires`` headers to the response it creates.
@@ -544,9 +551,9 @@ features from each, combining them into a unique web framework.
 
 Similar to :term:`Zope`, :app:`Pyramid` applications may easily be extended. If
 you work within the constraints of the framework, you can produce applications
-that can be reused, modified or extended without needing to modify the original
-application code. :app:`Pyramid` also inherits the concepts of :term:`traversal`
-and declarative security from Zope.
+that can be reused, modified, or extended without needing to modify the
+original application code. :app:`Pyramid` also inherits the concepts of
+:term:`traversal` and declarative security from Zope.
 
 Similar to :term:`Pylons` version 1.0, :app:`Pyramid` is largely free of
 policy. It makes no assertions about which database or template system you
