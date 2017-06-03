@@ -252,7 +252,7 @@ A new response adapter is registered in configuration:
 
     if __name__ == '__main__':
         config = Configurator()
-        config.add_response_adapter(string_response_adapter, basestring)
+        config.add_response_adapter(string_response_adapter, str)
 
 With that, you may return strings from any of your view callables, e.g.:
 
@@ -288,7 +288,7 @@ and return codes:
 
     if __name__ == '__main__':
         config = Configurator()
-        config.add_response_adapter(string_response_adapter, basestring)
+        config.add_response_adapter(string_response_adapter, str)
         config.add_response_adapter(tuple_response_adapter, tuple)
 
 With this, both of these views will work as expected:
