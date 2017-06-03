@@ -27,19 +27,19 @@ creating web applications easier. It is open source.
    framework, so long as your chosen framework fits the requirements of your
    application.
 
-Pyramid follows these design and engineering principles:
+:app:`Pyramid` follows these design and engineering principles:
 
 Simplicity
-   :app:`Pyramid` is designed to be easy to use. You can get started even if you
-   don't understand it all. And when you're ready to do more, :app:`Pyramid`
-   will be there for you.
+   :app:`Pyramid` is designed to be easy to use. You can get started even if
+   you don't understand it all. And when you're ready to do more,
+   :app:`Pyramid` will be there for you.
 
 Minimalism
-   Out of the box, :app:`Pyramid` provides only the core tools needed for nearly
-   all web applications: mapping URLs to code, security, and serving static
-   assets (files like JavaScript and CSS). Additional tools provide templating,
-   database integration and more. But with :app:`Pyramid` you can *"pay only for
-   what you eat"*.
+   Out of the box, :app:`Pyramid` provides only the core tools needed for
+   nearly all web applications: mapping URLs to code, security, and serving
+   static assets (files like JavaScript and CSS). Additional tools provide
+   templating, database integration and more. But with :app:`Pyramid` you can
+   *"pay only for what you eat"*.
 
 Documentation
    :app:`Pyramid` is committed to comprehensive and up-to-date documentation.
@@ -52,30 +52,31 @@ Reliability
   is: "If it ain't tested, it's broke".
 
 Openness
-  As with Python, the Pyramid software is distributed under a `permissive open
-  source license <http://repoze.org/license.html>`_.
+  As with Python, the :app:`Pyramid` software is distributed under a
+  `permissive open source license <http://repoze.org/license.html>`_.
 
 .. _why_pyramid:
 
 Why Pyramid?
 ------------
 
-In a world filled with web frameworks, why should you choose Pyramid?
+In a world filled with web frameworks, why should you choose :app:`Pyramid`\ ?
 
 Modern
 ~~~~~~
 
-Pyramid is fully compatible with Python 3. If you develop a Pyramid application
-today, you can rest assured that you'll be able to use the most modern features
-of your favorite language. And in the years to come, you'll continue to be
-working on a framework that is up-to-date and forward-looking.
+:app:`Pyramid` is fully compatible with Python 3. If you develop a
+:app:`Pyramid` application today, you can rest assured that you'll be able
+to use the most modern features of your favorite language. And in the years
+to come, you'll continue to bed working on a framework that is up-to-date
+and forward-looking.
 
 Tested
 ~~~~~~
 
-Untested code is broken by design. The Pyramid community has a strong testing
-culture and our framework reflects that. Every release of Pyramid has 100%
-statement coverage (as measured by `coverage
+Untested code is broken by design. The :app:`Pyramid` community has a strong
+testing culture and our framework reflects that. Every release of
+:app:`Pyramid` has 100% statement coverage (as measured by `coverage
 <https://coverage.readthedocs.io>`_) and 95% decision/condition coverage. (as
 measured by `instrumental
 <http://instrumental.readthedocs.io/en/latest/intro.html>`_) It is
@@ -85,18 +86,18 @@ versions of Python after each commit to its GitHub repository. `Official
 Pyramid add-ons <https://trypyramid.com/resources-extending-pyramid.html>`_ are
 held to a similar testing standard.
 
-We still find bugs in Pyramid, but we've noticed we find a lot fewer of them
-while working on projects with a solid testing regime.
+We still find bugs in :app:`Pyramid`, but we've noticed we find a lot fewer of
+them while working on projects with a solid testing regime.
 
 Documented
 ~~~~~~~~~~
 
-The Pyramid documentation is comprehensive. We strive to keep our narrative
-documentation both complete and friendly to newcomers. We also maintain a
-:ref:`cookbook <cookbook:pyramid-cookbook>` of recipes, demonstrations of
-common scenarios you might face. Contributions in the form of improvements to
-our documentation are always appreciated. And we always welcome improvements to
-our `official tutorials
+The :app:`Pyramid` documentation is comprehensive. We strive to keep our
+narrative documentation both complete and friendly to newcomers. We also
+maintain a :ref:`cookbook <cookbook:pyramid-cookbook>` of recipes,
+demonstrations of common scenarios you might face. Contributions in the form of
+improvements to our documentation are always appreciated. And we always welcome
+improvements to our `official tutorials
 <http://docs.pylonsproject.org/projects/pyramid/en/latest/#tutorials>`_ as well
 as new contributions to our `community maintained tutorials
 <http://docs.pylonsproject.org/projects/pyramid-tutorials/en/latest/index.html#pyramid-tutorials>`_.
@@ -125,34 +126,36 @@ What makes Pyramid unique
 -------------------------
 
 There are many tools available for web development. What would make someone
-want to use Pyramid instead?  What makes Pyramid unique?
+want to use :app:`Pyramid` instead?  What makes :app:`Pyramid` unique?
 
-With Pyramid you can write very small applications without needing to know a
-lot. And by learning a bit more, you can write very large applications too.
-Pyramid will allow you to become productive quickly, and will grow with you. It
-won't hold you back when your application is small, and it won't get in your
-way when your application becomes large. Other application frameworks seem to
-fall into two non-overlapping categories: those that support "small apps" and
-those designed for "big apps".
+With :app:`Pyramid` you can write very small applications without needing to
+know a lot. And by learning a bit more, you can write very large applications
+too. :app:`Pyramid` will allow you to become productive quickly, and will grow
+with you. It won't hold you back when your application is small, and it won't
+get in your way when your application becomes large. Other application
+frameworks seem to fall into two non-overlapping categories: those that support
+"small apps" and those designed for "big apps".
 
 We don't believe you should have to make this choice. You can't really know how
 large your application will become.  You certainly shouldn't have to rewrite a
 small application in another framework when it gets "too big". A well-designed
-framework should be able to be good at both. Pyramid is that kind of framework.
+framework should be able to be good at both. :app:`Pyramid` is that kind of
+framework.
 
-Pyramid provides a set of features that are unique among Python web frameworks.
-Others may provide some, but only Pyramid provides them all, in one place,
-fully documented, and *à la carte* without needing to pay for the whole banquet.
+:app:`Pyramid` provides a set of features that are unique among Python web
+frameworks. Others may provide some, but only :app:`Pyramid` provides them all,
+in one place, fully documented, and *à la carte* without needing to pay for the
+whole banquet.
 
 
 Build single-file applications
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You can write a Pyramid application that lives entirely in one Python file.
-Such an application is easy to understand since everything is in one place. It
-is easy to deploy because you don't need to know much about Python packaging.
-Pyramid allows you to do almost everything that so-called *microframeworks* can
-in very similar ways.
+You can write a :app:`Pyramid` application that lives entirely in one Python
+file. Such an application is easy to understand since everything is in one
+place. It is easy to deploy because you don't need to know much about Python
+packaging. :app:`Pyramid` allows you to do almost everything that so-called
+*microframeworks* can in very similar ways.
 
 .. literalinclude:: helloworld.py
 
@@ -163,8 +166,8 @@ in very similar ways.
 Configure applications with decorators
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Pyramid allows you to keep your configuration right next to your code. That way
-you don't have to switch files to see your configuration. For example:
+:app:`Pyramid` allows you to keep your configuration right next to your code.
+That way you don't have to switch files to see your configuration. For example:
 
 .. code-block:: python
 
@@ -175,9 +178,9 @@ you don't have to switch files to see your configuration. For example:
    def fred_view(request):
        return Response('fred')
 
-However, using Pyramid configuration decorators does not change your code. It
-remains easy to extend, test, or reuse. You can test your code as if the
-decorators were not there. You can instruct the framework to ignore some
+However, using :app:`Pyramid` configuration decorators does not change your
+code. It remains easy to extend, test, or reuse. You can test your code as if
+the decorators were not there. You can instruct the framework to ignore some
 decorators. You can even use an imperative style to write your configuration,
 skipping decorators entirely.
 
@@ -189,9 +192,9 @@ Generate application URLs
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Dynamic web applications produce URLs that can change depending on what you are
-viewing. Pyramid provides flexible, consistent, easy to use tools for generating
-URLs. When you use these tools to write your application, you can change your
-configuration without fear of breaking links in your web pages.
+viewing. :app:`Pyramid` provides flexible, consistent, easy to use tools for
+generating URLs. When you use these tools to write your application, you can
+change your configuration without fear of breaking links in your web pages.
 
 .. seealso::
 
@@ -201,11 +204,11 @@ Serve static assets
 ~~~~~~~~~~~~~~~~~~~
 
 Web applications often require JavaScript, CSS, images and other so-called
-*static assets*. Pyramid provides flexible tools for serving these kinds of
-files. You can serve them directly from Pyramid, or host them on an external
-server or CDN (content delivery network). Either way, Pyramid can help you to
-generate URLs so you can change where your files come from without changing any
-code.
+*static assets*. :app:`Pyramid` provides flexible tools for serving these kinds
+of files. You can serve them directly from :app:`Pyramid`, or host them on an
+external server or CDN (content delivery network). Either way, :app:`Pyramid`
+can help you to generate URLs so you can change where your files come from
+without changing any code.
 
 .. seealso::
 
@@ -214,19 +217,19 @@ code.
 Develop interactively
 ~~~~~~~~~~~~~~~~~~~~~
 
-Pyramid can automatically detect changes you make to template files and code,
-so your changes are immediately available in your browser. You can debug using
-plain old ``print()`` calls, which will display to your console.
+:app:`Pyramid` can automatically detect changes you make to template files and
+code, so your changes are immediately available in your browser. You can debug
+using plain old ``print()`` calls, which will display to your console.
 
-Pyramid has a debug toolbar that allows you to see information about how your
-application is working right in your browser. See configuration, installed
+:app:`Pyramid` has a debug toolbar that allows you to see information about how
+your application is working right in your browser. See configuration, installed
 packages, SQL queries, logging statements and more.
 
 When your application has an error, an interactive debugger allows you to poke
 around from your browser to find out what happened.
 
-To use the Pyramid debug toolbar, build your project with a Pyramid
-:term:`cookiecutter`.
+To use the :app:`Pyramid` debug toolbar, build your project with a
+:app:`Pyramid` :term:`cookiecutter`.
 
 .. seealso::
 
@@ -235,16 +238,16 @@ To use the Pyramid debug toolbar, build your project with a Pyramid
 Debug with power
 ~~~~~~~~~~~~~~~~
 
-When things go wrong, Pyramid gives you powerful ways to fix the problem.
+When things go wrong, :app:`Pyramid` gives you powerful ways to fix the problem.
 
-You can configure Pyramid to print helpful information to the console. The
-``debug_notfound`` setting shows information about URLs that aren't matched.
-The ``debug_authorization`` setting provides helpful messages about why you
-aren't allowed to do what you just tried.
+You can configure :app:`Pyramid` to print helpful information to the console.
+The ``debug_notfound`` setting shows information about URLs that aren't
+matched. The ``debug_authorization`` setting provides helpful messages about
+why you aren't allowed to do what you just tried.
 
-Pyramid also has command line tools to help you verify your configuration. You
-can use ``proutes`` and ``pviews`` to inspect how URLs are connected to your
-application code.
+:app:`Pyramid` also has command line tools to help you verify your
+configuration. You can use ``proutes`` and ``pviews`` to inspect how URLs are
+connected to your application code.
 
 .. seealso::
 
@@ -254,12 +257,13 @@ application code.
 Extend your application
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Pyramid add-ons extend the core of the framework with useful abilities. There
-are add-ons available for your favorite template language, SQL and NoSQL
+:app:`Pyramid` add-ons extend the core of the framework with useful abilities.
+There are add-ons available for your favorite template language, SQL and NoSQL
 databases, authentication services and more.
 
-Supported Pyramid add-ons are held to the same demanding standards as the
-framework itself. You will find them to be fully tested and well documented.
+Supported :app:`Pyramid` add-ons are held to the same demanding standards as
+the framework itself. You will find them to be fully tested and well
+documented.
 
 .. seealso::
 
@@ -268,12 +272,13 @@ framework itself. You will find them to be fully tested and well documented.
 Write your views, *your* way
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-A fundamental task for any framework is to map URLs to code. In Pyramid, that
-code is called a :term:`view callable`. View callables can be functions, class
-methods or even callable class instances. You are free to choose the approach
-that best fits your use case. Regardless of your choice, Pyramid treats them
-the same. You can change your mind at any time without any penalty. There are
-no artificial distinctions between the various approaches.
+A fundamental task for any framework is to map URLs to code. In :app:`Pyramid`,
+that code is called a :term:`view callable`. View callables can be functions,
+class methods or even callable class instances. You are free to choose the
+approach that best fits your use case. Regardless of your choice,
+:app:`Pyramid` treats them the same. You can change your mind at any time
+without any penalty. There are no artificial distinctions between the various
+approaches.
 
 Here's a view callable defined as a function:
 
@@ -321,17 +326,17 @@ in a globally shared location, "the *static* directory". Others use a lookup
 scheme, like an ordered set of template directories. Both of these approaches
 have problems when it comes to customization.
 
-Pyramid takes a different approach. Static assets are located using *asset
+:app:`Pyramid` takes a different approach. Static assets are located using *asset
 specifications*, strings that contain reference both to a Python package name
 and a file or directory name, e.g. ``MyPackage:static/index.html``. These
 specifications are used for templates, JavaScript and CSS, translation files,
 and any other package-bound static resource. By using asset specifications,
-Pyramid makes it easy to extend your application with other packages without
+:app:`Pyramid` makes it easy to extend your application with other packages without
 worrying about conflicts.
 
-What happens if another Pyramid package you are using provides an asset you
-need to customize? Maybe that page template needs better HTML, or you want to
-update some CSS. With asset specifications you can override the assets from
+What happens if another :app:`Pyramid` package you are using provides an asset
+you need to customize? Maybe that page template needs better HTML, or you want
+to update some CSS. With asset specifications you can override the assets from
 other packages using simple wrappers.
 
 Examples: :ref:`asset_specifications` and :ref:`overriding_assets_section`.
@@ -339,14 +344,14 @@ Examples: :ref:`asset_specifications` and :ref:`overriding_assets_section`.
 Use *your* templates
 ~~~~~~~~~~~~~~~~~~~~
 
-In Pyramid, the job of creating a ``Response`` belongs to a :term:`renderer`.
-Any templating system—Mako, Chameleon, Jinja2—can be a renderer. In fact,
-packages exist for all of these systems. But if you'd rather use another, a
-structured API exists allowing you to create a renderer using your favorite
-templating system. You can use the templating system *you* understand, not one
-required by the framework.
+In :app:`Pyramid`, the job of creating a ``Response`` belongs to a
+:term:`renderer`. Any templating system—Mako, Chameleon, Jinja2—can be a
+renderer. In fact, packages exist for all of these systems. But if you'd rather
+use another, a structured API exists allowing you to create a renderer using
+your favorite templating system. You can use the templating system *you*
+understand, not one required by the framework.
 
-What's more, Pyramid does not make you use a single templating system
+What's more, :app:`Pyramid` does not make you use a single templating system
 exclusively.  You can use multiple templating systems, even in the same
 project.
 
@@ -357,11 +362,11 @@ Write testable views
 
 When you use a :term:`renderer` with your view callable, you are freed from
 needing to return a "webby" ``Response`` object. Instead your views can return
-a simple Python dictionary. Pyramid will take care of rendering the information
-in that dictionary to a ``Response`` on your behalf. As a result, your views
-are more easily tested, since you don't need to parse HTML to evaluate the
-results. Pyramid makes it a snap to write unit tests for your views, instead of
-requiring you to use functional tests.
+a simple Python dictionary. :app:`Pyramid` will take care of rendering the
+information in that dictionary to a ``Response`` on your behalf. As a result,
+your views are more easily tested, since you don't need to parse HTML to
+evaluate the results. :app:`Pyramid` makes it a snap to write unit tests for
+your views, instead of requiring you to use functional tests.
 
 .. index::
    pair: renderer; explicitly calling
@@ -381,7 +386,8 @@ For example, a typical web framework might return a ``Response`` object from a
         return render_to_response('myapp:templates/mytemplate.pt', {'a':1},
                                   request=request)
 
-While you *can* do this in Pyramid, you can also return a Python dictionary:
+While you *can* do this in :app:`Pyramid`, you can also return a Python
+dictionary:
 
 .. code-block:: python
     :linenos:
@@ -392,13 +398,13 @@ While you *can* do this in Pyramid, you can also return a Python dictionary:
     def myview(request):
         return {'a':1}
 
-By configuring your view to use a renderer, you tell Pyramid to use the
+By configuring your view to use a renderer, you tell :app:`Pyramid` to use the
 ``{'a':1}`` dictionary and the specified template to render a response on your
 behalf.
 
 The string passed as ``renderer=`` above is an :term:`asset specification`.
-Asset specifications are widely used in Pyramid. They allow for more reliable
-customization. See :ref:`intro_asset_specs` for more information.
+Asset specifications are widely used in :app:`Pyramid`. They allow for more
+reliable customization. See :ref:`intro_asset_specs` for more information.
 
 Example: :ref:`renderers_chapter`.
 
@@ -406,13 +412,13 @@ Use events to coordinate actions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When writing web applications, it is often important to have your code run at a
-specific point in the lifecycle of a request. In Pyramid, you can accomplish
-this using *subscribers* and *events*.
+specific point in the lifecycle of a request. In :app:`Pyramid`, you can
+accomplish this using *subscribers* and *events*.
 
 For example, you might have a job that needs to be done each time your
-application handles a new request. Pyramid emits a ``NewRequest`` event at this
-point in the request handling lifecycle. You can register your code as a
-subscriber to this event using a clear, declarative style:
+application handles a new request. :app:`Pyramid` emits a ``NewRequest`` event
+at this point in the request handling lifecycle. You can register your code as
+a subscriber to this event using a clear, declarative style:
 
 .. code-block:: python
 
@@ -423,29 +429,30 @@ subscriber to this event using a clear, declarative style:
     def my_job(event):
         do_something(event.request)
 
-Pyramid's event system can be extended as well. If you need, you can create
-events of your own and send them using Pyramid's event system. Then anyone
-working with your application can subscribe to your events and coordinate their
-code with yours.
+:app:`Pyramid`\ 's event system can be extended as well. If you need, you can
+create events of your own and send them using :app:`Pyramid`\ 's event system.
+Then anyone working with your application can subscribe to your events and
+coordinate their code with yours.
 
 Example: :ref:`events_chapter` and :ref:`event_types`.
 
 Build international applications
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Pyramid ships with internationalization-related features in its core:
+:app:`Pyramid` ships with internationalization-related features in its core:
 localization, pluralization, and creating message catalogs from source files
-and templates.  Pyramid allows for a plurality of message catalogs via the use
-of translation domains.  You can create a system that has its own translations
-without conflict with other translations in other domains.
+and templates.  :app:`Pyramid` allows for a plurality of message catalogs via
+the use of translation domains.  You can create a system that has its own
+translations without conflict with other translations in other domains.
 
 Example: :ref:`i18n_chapter`.
 
 Build efficient applications
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Pyramid provides an easy way to *cache* the results of slow or expensive views.
-You can indicate in view configuration that you want a view to be cached:
+:app:`Pyramid` provides an easy way to *cache* the results of slow or expensive
+views. You can indicate in view configuration that you want a view to be
+cached:
 
 .. code-block:: python
 
@@ -453,7 +460,7 @@ You can indicate in view configuration that you want a view to be cached:
     def myview(request):
         # ...
 
-Pyramid will automatically add the appropriate ``Cache-Control`` and
+:app:`Pyramid` will automatically add the appropriate ``Cache-Control`` and
 ``Expires`` headers to the response it creates.
 
 See the :meth:`~pyramid.config.Configurator.add_view` method's ``http_cache``
@@ -462,21 +469,21 @@ documentation for more information.
 Build fast applications
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-The Pyramid core is fast. It has been engineered from the ground up for speed.
-It only does as much work as absolutely necessary when you ask it to get a job
-done. If you need speed from your application, Pyramid is the right choice for
-you.
+The :app:`Pyramid` core is fast. It has been engineered from the ground up for
+speed. It only does as much work as absolutely necessary when you ask it to get
+a job done. If you need speed from your application, :app:`Pyramid` is the
+right choice for you.
 
 Example: http://blog.curiasolutions.com/pages/the-great-web-framework-shootout.html
 
 Store session data
 ~~~~~~~~~~~~~~~~~~
 
-Pyramid has built-in support for HTTP sessions, so you can associate data with
-specific users between requests. Lots of other frameworks also support
-sessions. But Pyramid allows you to plug in your own custom sessioning system.
-So long as your system conforms to a documented interface, you can drop it in
-in place of the provided system.
+:app:`Pyramid` has built-in support for HTTP sessions, so you can associate
+data with specific users between requests. Lots of other frameworks also
+support sessions. But :app:`Pyramid` allows you to plug in your own custom
+sessioning system. So long as your system conforms to a documented interface,
+you can drop it in in place of the provided system.
 
 Currently there is a binding package for the third-party Redis sessioning
 system that does exactly this. But if you have a specialized need (perhaps you
@@ -488,7 +495,7 @@ Example: :ref:`sessions_chapter`.
 Handle problems with grace
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Mistakes happen. Problems crop up. No-one writes bug-free code. Pyramid
+Mistakes happen. Problems crop up. No-one writes bug-free code. :app:`Pyramid`
 provides a way to handle the exceptions your code encounters. An
 :term:`exception view` is a special kind of view which is automatically called
 when an particular exception type "bubbles up" without being handled by your
@@ -507,8 +514,8 @@ Example: :ref:`exception_views`.
 And much, much more...
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Pyramid has been built with a number of other sophisticated design features
-that make it adaptable. Read more about them below.
+:app:`Pyramid` has been built with a number of other sophisticated design
+features that make it adaptable. Read more about them below.
 
 .. toctree::
    :maxdepth: 2
@@ -540,10 +547,10 @@ includes details about how :app:`Pyramid` relates to the Pylons Project.
 :app:`Pyramid` and Other Web Frameworks
 ---------------------------------------
 
-The first release of Pyramid's predecessor (named :mod:`repoze.bfg`) was made
-in July of 2008.  At the end of 2010, we changed the name of :mod:`repoze.bfg`
-to :app:`Pyramid`.  It was merged into the Pylons project as :app:`Pyramid` in
-November of that year.
+The first release of :app:`Pyramid`\ 's predecessor (named :mod:`repoze.bfg`)
+was made in July of 2008.  At the end of 2010, we changed the name of
+:mod:`repoze.bfg` to :app:`Pyramid`.  It was merged into the Pylons project as
+:app:`Pyramid` in November of that year.
 
 :app:`Pyramid` was inspired by :term:`Zope`, :term:`Pylons` (version 1.0), and
 :term:`Django`.  As a result, :app:`Pyramid` borrows several concepts and

@@ -1,9 +1,8 @@
 Advanced :app:`Pyramid` Design Features
 =======================================
 
-Pyramid has been built from the ground up to avoid the problems that other
-frameworks can suffer.
-
+:app:`Pyramid` has been built from the ground up to avoid the problems
+that other frameworks can suffer.
 
 You Don't Need Singletons
 -------------------------
@@ -37,8 +36,8 @@ with something like this:
     else:
         # do something else
 
-Unlike many other systems, :app:`Pyramid` allows you to associate more than one view
-with a single route. For example, you can create a route with the pattern
+Unlike many other systems, :app:`Pyramid` allows you to associate more than one
+view with a single route. For example, you can create a route with the pattern
 ``/items`` and when the route is matched, you can send the request to one view
 if the request method is GET, another view if the request method is POST, and
 so on.
@@ -72,10 +71,11 @@ understandable, and more directly testable.
 Stop Worrying About Transactions
 --------------------------------
 
-:app:`Pyramid`\ 's :term:`cookiecutter`\ s render projects that include a *transaction
-management* system.  When you use this system, you can stop worrying about when
-to commit your changes, :app:`Pyramid` handles it for you. The system will
-commit at the end of a request or abort if there was an exception.
+:app:`Pyramid`\ 's :term:`cookiecutter`\ s render projects that include a
+*transaction management* system.  When you use this system, you can stop
+worrying about when to commit your changes, :app:`Pyramid` handles it for you.
+The system will commit at the end of a request or abort if there was an
+exception.
 
 Why is that a good thing? Imagine a situation where you manually commit a
 change to your persistence layer. It's very likely that other framework code
@@ -86,10 +86,10 @@ Using transaction management saves you from needing to think about this. Either
 a request completes successfully and all changes are committed, or it does
 not and all changes are aborted.
 
-Pyramid's transaction management is extendable, so you can synchronize commits
-between multiple databases or databases of different kinds. It also allows you
-to do things like conditionally send email if a transaction is committed, but
-otherwise keep quiet.
+:app:`Pyramid`\ 's transaction management is extendable, so you can synchronize
+commits between multiple databases or databases of different kinds. It also
+allows you to do things like conditionally send email if a transaction is
+committed, but otherwise keep quiet.
 
 .. seealso::
 
@@ -103,10 +103,10 @@ When a system is small, it's reasonably easy to keep it all in your head. But
 as systems grow large, configuration grows more complex. Your app may grow to
 have hundreds or even thousands of configuration statements.
 
-:app:`Pyramid`\ 's configuration system keeps track of each of your statements. If you
-accidentally add two that are identical, or :app:`Pyramid` can't make sense out of
-what it would mean to have both statements active at the same time, it will
-complain loudly at startup time.
+:app:`Pyramid`\ 's configuration system keeps track of each of your statements.
+If you accidentally add two that are identical, or :app:`Pyramid` can't make
+sense out of what it would mean to have both statements active at the same
+time, it will complain loudly at startup time.
 
 :app:`Pyramid`\ 's configuration system is not dumb though. If you use the
 :meth:`~pyramid.config.Configurator.include` system, it can automatically
@@ -123,9 +123,9 @@ Compose Powerful Apps From Simple Parts
 Speaking of the :app:`Pyramid` structured "include" mechanism (see
 :meth:`~pyramid.config.Configurator.include`), it allows you to compose complex
 applications from multiple, simple Python packages. All the configuration
-statements that can be performed in your main :app:`Pyramid` application can also be
-used in included packages. You can add views, routes, and subscribers, and even
-set authentication and authorization policies.
+statements that can be performed in your main :app:`Pyramid` application can
+also be used in included packages. You can add views, routes, and subscribers,
+and even set authentication and authorization policies.
 
 If you need, you can extend or override the configuration of an existing
 application by including its configuration in your own and then modifying it.
@@ -155,9 +155,10 @@ as you requested:
 Authenticate Users Your Way
 ---------------------------
 
-:app:`Pyramid` ships with prebuilt, well-tested authentication and authorization
-schemes out of the box. Using a scheme is a matter of configuration. So if you
-need to change approaches later, you need only update your configuration.
+:app:`Pyramid` ships with prebuilt, well-tested authentication and
+authorization schemes out of the box. Using a scheme is a matter of
+configuration. So if you need to change approaches later, you need only update
+your configuration.
 
 In addition, the system that handles authentication and authorization is
 flexible and pluggable. If you want to use another security add-on, or define
@@ -202,11 +203,11 @@ transaction manager.
 Return What You Want From Your Views
 ------------------------------------
 
-We have shown elsewhere (in the :doc:`introduction`) how using a :term:`renderer`
-allows you to return simple Python dictionaries from your view code. But some
-frameworks allow you to return strings or tuples from view callables.
-When frameworks allow for this, code looks slightly prettier because there are
-fewer imports and less code. For example, compare this:
+We have shown elsewhere (in the :doc:`introduction`) how using a
+:term:`renderer` allows you to return simple Python dictionaries from your view
+code. But some frameworks allow you to return strings or tuples from view
+callables. When frameworks allow for this, code looks slightly prettier because
+there are fewer imports and less code. For example, compare this:
 
 .. code-block:: python
     :linenos:
@@ -334,10 +335,11 @@ Perhaps the :app:`Pyramid` configurator's syntax feels a bit verbose to you.
 Or possibly you would like to add a feature to configuration
 without asking the core developers to change :app:`Pyramid` itself?
 
-You can extend :app:`Pyramid`\ 's :term:`configurator` with your own directives.
-For example, let's say you find yourself calling :meth:`pyramid.config.Configurator.add_view` repetitively.
-Usually you can get rid of the boring with existing shortcuts,
-but let's say that this is a case where there is no such shortcut:
+You can extend :app:`Pyramid`\ 's :term:`configurator` with your own
+directives. For example, let's say you find yourself calling
+:meth:`pyramid.config.Configurator.add_view` repetitively. Usually you can get
+rid of the boring with existing shortcuts, but let's say that this is a case
+where there is no such shortcut:
 
 .. code-block:: python
     :linenos:
@@ -353,8 +355,8 @@ but let's say that this is a case where there is no such shortcut:
     config.add_view('my.package.HEAD_view', route_name='xhr_route',
                     xhr=True, permission='view', request_method='HEAD')
 
-Pretty tedious right?
-You can add a directive to the :app:`Pyramid` :term:`configurator` to automate some of the tedium away:
+Pretty tedious right? You can add a directive to the :app:`Pyramid`
+:term:`configurator` to automate some of the tedium away:
 
 .. code-block:: python
     :linenos:
@@ -372,8 +374,8 @@ You can add a directive to the :app:`Pyramid` :term:`configurator` to automate s
     config = Configurator()
     config.add_directive('add_protected_xhr_views', add_protected_xhr_views)
 
-Once that's done,
-you can call the directive you've just added as a method of the :term:`configurator` object:
+Once that's done, you can call the directive you've just added as a method of
+the :term:`configurator` object:
 
 .. code-block:: python
     :linenos:
@@ -383,11 +385,12 @@ you can call the directive you've just added as a method of the :term:`configura
 
 Much better!
 
-You can share your configuration code with others, too.
-Add your code to a Python package.
-Put the call to :meth:`~pyramid.config.Configurator.add_directive` in a function.
-When other programmers install your package,
-they'll be able to use your configuration by passing your function to a call to :meth:`~pyramid.config.Configurator.include`.
+You can share your configuration code with others, too. Add your code to a
+Python package. Put the call to
+:meth:`~pyramid.config.Configurator.add_directive` in a function. When other
+programmers install your package, they'll be able to use your configuration by
+passing your function to a call to
+:meth:`~pyramid.config.Configurator.include`.
 
 .. seealso::
 
@@ -396,14 +399,15 @@ they'll be able to use your configuration by passing your function to a call to 
 Introspect Your Application
 ---------------------------
 
-If you're building a large, pluggable system,
-it's useful to be able to get a list of what has been plugged in *at application runtime*.
-For example, you might want to show users a set of tabs at the top of the screen
-based on a list of the views they registered.
+If you're building a large, pluggable system, it's useful to be able to get a
+list of what has been plugged in *at application runtime*. For example, you
+might want to show users a set of tabs at the top of the screen based on a list
+of the views they registered.
 
 :app:`Pyramid` provides an :term:`introspector` for just this purpose.
 
-Here's an example of using :app:`Pyramid`\ 's :term:`introspector` from within a view:
+Here's an example of using :app:`Pyramid`\ 's :term:`introspector` from within
+a view:
 
 .. code-block:: python
     :linenos:
