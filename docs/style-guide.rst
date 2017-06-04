@@ -235,6 +235,13 @@ Line lengths
 
 Narrative documentation is not code, and should therefore not adhere to PEP8 or other line length conventions. When a translator sees only part of a sentence or paragraph, it makes it more difficult to translate the concept. Line lengths make ``diff`` more difficult. Text editors can soft wrap lines for display to avoid horizontal scrolling. We admit, we boofed it by using arbitrary 79-character line lengths in our own documentation, but we have seen the error of our ways and wish to correct this going forward.
 
+Here are our preferences for line lengths and line breaks.
+
+* The preferred line length pattern is *one line per paragraph* in `.rst` source files.
+* It's acceptable not to change existing line breaks within `.rst` source files, going beyond 79 characters per line and not rewrapping text. The 79-character limit applies only to source code and docstrings in Python source files.
+* One line per sentence is acceptable, but we strongly prefer one line per paragraph.
+* Semantic line breaks are despised.
+
 
 .. _style-guide-trailing-white-space:
 
