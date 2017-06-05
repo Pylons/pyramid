@@ -790,6 +790,8 @@ class TestViewMethodsMixin(unittest.TestCase):
     def test_it_supports_alternate_requests(self):
         def exc_view(exc, request):
             self.assertTrue(request is other_req)
+            from pyramid.threadlocal import get_current_request
+            self.assertTrue(get_current_request() is other_req)
             return DummyResponse(b'foo')
         self.config.add_view(exc_view, context=RuntimeError)
         request = self._makeOne()
@@ -815,6 +817,23 @@ class TestViewMethodsMixin(unittest.TestCase):
             self.assertEqual(response.app_iter, [b'foo'])
         else: # pragma: no cover
             self.fail()
+
+    def test_it_raises_if_no_registry(self):
+        request = self._makeOne()
+        del request.registry
+        from pyramid.threadlocal import manager
+        manager.push({'registry': None, 'request': request})
+        try:
+            raise RuntimeError
+        except RuntimeError:
+            try:
+                request.invoke_exception_view()
+            except RuntimeError as e:
+                self.assertEqual(e.args[0], "Unable to retrieve registry")
+        else: # pragma: no cover
+            self.fail()
+        finally:
+            manager.pop()
 
     def test_it_supports_alternate_exc_info(self):
         def exc_view(exc, request):
