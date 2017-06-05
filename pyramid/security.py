@@ -21,10 +21,13 @@ _marker = object()
 
 class AllPermissionsList(object):
     """ Stand in 'permission list' to represent all permissions """
+
     def __iter__(self):
-        return ()
+        return iter(())
+
     def __contains__(self, other):
         return True
+
     def __eq__(self, other):
         return isinstance(other, self.__class__)
 
