@@ -78,12 +78,20 @@ class TestRequest(unittest.TestCase):
 
     def test_params_decoded_from_utf_8_by_default(self):
         environ = {
-            'PATH_INFO':'/',
-            'QUERY_STRING':'la=La%20Pe%C3%B1a'
-            }
+            'PATH_INFO': '/',
+            'QUERY_STRING': 'la=La%20Pe%C3%B1a'
+        }
         request = self._makeOne(environ)
         request.charset = None
         self.assertEqual(request.GET['la'], text_(b'La Pe\xf1a'))
+
+    def test_params_handle_wrong_utf_8_parameters(self):
+        environ = {
+            'PATH_INFO': '/\x80',
+        }
+        request = self._makeOne(environ)
+        request.charset = None
+        self.assertEqual(request.path, text_(b'/\\x80'))
 
     def test_tmpl_context(self):
         from pyramid.request import TemplateContext
