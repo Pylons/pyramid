@@ -28,7 +28,11 @@ from pyramid.httpexceptions import (
     default_exceptionresponse_view,
     )
 
-from pyramid.threadlocal import get_current_registry
+from pyramid.threadlocal import (
+    get_current_registry,
+    manager,
+    )
+
 from pyramid.util import hide_attrs
 
 _marker = object()
@@ -675,8 +679,13 @@ class ViewMethodsMixin(object):
         registry = getattr(request, 'registry', None)
         if registry is None:
             registry = get_current_registry()
+
+        if registry is None:
+            raise RuntimeError("Unable to retrieve registry")
+
         if exc_info is None:
             exc_info = sys.exc_info()
+
         exc = exc_info[1]
         attrs = request.__dict__
         context_iface = providedBy(exc)
@@ -690,17 +699,23 @@ class ViewMethodsMixin(object):
             # we use .get instead of .__getitem__ below due to
             # https://github.com/Pylons/pyramid/issues/700
             request_iface = attrs.get('request_iface', IRequest)
-            response = _call_view(
-                registry,
-                request,
-                exc,
-                context_iface,
-                '',
-                view_types=None,
-                view_classifier=IExceptionViewClassifier,
-                secure=secure,
-                request_iface=request_iface.combined,
-                )
+
+            manager.push({'request': request, 'registry': registry})
+
+            try:
+                response = _call_view(
+                    registry,
+                    request,
+                    exc,
+                    context_iface,
+                    '',
+                    view_types=None,
+                    view_classifier=IExceptionViewClassifier,
+                    secure=secure,
+                    request_iface=request_iface.combined,
+                    )
+            finally:
+                manager.pop()
 
         if response is None:
             raise HTTPNotFound

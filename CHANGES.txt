@@ -11,7 +11,11 @@ unreleased
 
 - Update RELEASING.txt for updating cookiecutters. Change cookiecutter URLs to
   use shortcut.
-  See: https://github.com/Pylons/pyramid/issues/3042
+  See https://github.com/Pylons/pyramid/issues/3042
+
+- Ensure the correct threadlocals are pushed during view execution when
+  invoked from ``request.invoke_exception_view``.
+  See https://github.com/Pylons/pyramid/pull/3060
 
 1.9a2 (2017-05-09)
 ==================
