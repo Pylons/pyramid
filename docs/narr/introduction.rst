@@ -59,7 +59,7 @@ We still find bugs in :app:`Pyramid`, but we've noticed we find a lot fewer of t
 Documented
 ~~~~~~~~~~
 
-The :app:`Pyramid` documentation is comprehensive. We strive to keep our narrative documentation both complete and friendly to newcomers. We also maintain the :ref:`Pyramid Community Cookbook <cookbook:pyramid-cookbook>` of  ecipes demonstrating common scenarios you might face. Contributions in the form of improvements to our documentation are always appreciated. And we always welcome improvements to our `official tutorials <html_tutorials>`_ as well as new contributions to our `community maintained tutorials <tutorials:pyramid-tutorials>`_.
+The :app:`Pyramid` documentation is comprehensive. We strive to keep our narrative documentation both complete and friendly to newcomers. We also maintain the :ref:`Pyramid Community Cookbook <cookbook:pyramid-cookbook>` of  recipes demonstrating common scenarios you might face. Contributions in the form of improvements to our documentation are always appreciated. And we always welcome improvements to our `official tutorials <html_tutorials>`_ as well as new contributions to our `community maintained tutorials <tutorials:pyramid-tutorials>`_.
 
 Supported
 ~~~~~~~~~
