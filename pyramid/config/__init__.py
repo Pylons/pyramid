@@ -345,6 +345,17 @@ class Configurator(
                 exceptionresponse_view=exceptionresponse_view,
                 )
 
+    def run_app(self, host='localhost', port=8080):
+        """ Helper method to quickly run a development server listening on ``host`` and ``port``."""
+        from wsgiref.simple_server import make_server
+        app = self.make_wsgi_app()
+        server = make_server(host, port, app)
+        print('Running on http://{}:{} (stop with Ctrl-C)'.format(host, port))
+        docs_link = 'http://docs.pylonsproject.org/projects/pyramid/en/latest/narr/project.html#using-an-alternate-wsgi-server'
+        print('This is running on wsgiref server and is not appropriate for production' \
+              'please see: {}'.format(docs_link))
+        server.serve_forever()
+
     def setup_registry(self,
                        settings=None,
                        root_factory=None,
