@@ -206,7 +206,7 @@ After installing Python as described previously in :ref:`for-mac-os-x-users` or
    ``$VENV/bin/pip`` clearly specifies that ``pip`` is run from within the
    virtual environment and not at the system level.
 
-   ``activate`` drops turds into the user's shell environment, leaving them
+   ``activate`` makes changes to the user's shell environment, leaving them
    vulnerable to executing commands in the wrong context. ``deactivate`` might
    not correctly restore previous shell environment variables.
 
