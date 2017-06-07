@@ -592,8 +592,11 @@ class ViewMethodsMixin(object):
 
         This method returns a :term:`response` object or raises
         :class:`pyramid.httpexceptions.HTTPNotFound` if a matching view cannot
-        be found."""
+        be found.
 
+        .. versionadded:: 1.7
+
+        """
         if request is None:
             request = self
         registry = getattr(request, 'registry', None)
