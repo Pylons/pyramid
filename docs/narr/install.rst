@@ -206,9 +206,7 @@ After installing Python as described previously in :ref:`for-mac-os-x-users` or
    ``$VENV/bin/pip`` clearly specifies that ``pip`` is run from within the
    virtual environment and not at the system level.
 
-   ``activate`` drops turds into the user's shell environment, leaving them
-   vulnerable to executing commands in the wrong context. ``deactivate`` might
-   not correctly restore previous shell environment variables.
+   ``activate`` makes changes to the user's shell environment which can often be convenient. However, in the context of long-form documentation, environment configuration can easily be forgotten. By keeping each snippet explicit we can reduce copy / paste errors by users in which commands are executed against the wrong Python environment. Also, ``deactivate`` might not correctly restore previous shell environment variables. Avoiding ``activate`` keeps the environment more reproducible.
 
    Although using ``source bin/activate``, then ``pip``, requires fewer key
    strokes to issue commands once invoked, there are other things to consider.
