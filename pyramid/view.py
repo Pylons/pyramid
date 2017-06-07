@@ -668,6 +668,8 @@ class ViewMethodsMixin(object):
         response. Otherwise the previous values for ``request.exception`` and
         ``request.exc_info`` will be restored.
 
+        .. versionadded:: 1.7
+
         .. versionchanged:: 1.9
            The ``request.exception`` and ``request.exc_info`` properties will
            reflect the exception used to render the response where previously
