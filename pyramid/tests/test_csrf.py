@@ -288,6 +288,38 @@ class Test_check_csrf_token_without_defaults_configured(unittest.TestCase):
         self.assertEqual(result, False)
 
 
+class Test_check_csrf_token_with_defaults_configured(unittest.TestCase):
+    def setUp(self):
+        self.config = testing.setUp()
+        self.config.set_default_csrf_options(
+            token='my_csrf_token',
+            header='My-CSRF-Token',
+        )
+
+    def _callFUT(self, *args, **kwargs):
+        from ..csrf import check_csrf_token
+        return check_csrf_token(*args, **kwargs)
+
+    def test_success_token(self):
+        request = testing.DummyRequest()
+        request.method = "POST"
+        request.POST = {'my_csrf_token': request.session.get_csrf_token()}
+        self.assertEqual(self._callFUT(request), True)
+
+    def test_failure_raises(self):
+        from pyramid.exceptions import BadCSRFToken
+        request = testing.DummyRequest()
+        self.assertRaises(BadCSRFToken, self._callFUT, request, 'csrf_token')
+
+    def test_failure_raises_with_bad_token(self):
+        request = testing.DummyRequest()
+        request.method = "POST"
+        request.POST = {'csrf_token': request.session.get_csrf_token()}
+        self.assertRaises(BadCSRFToken, self._callFUT, request, 'csrf_token')
+
+    # TODO: add more tests for header, safe_methods
+
+
 class Test_check_csrf_origin(unittest.TestCase):
     def _callFUT(self, *args, **kwargs):
         from ..csrf import check_csrf_origin
