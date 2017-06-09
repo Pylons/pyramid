@@ -6,18 +6,22 @@
 Bug Fixes
 ---------
 
+- Fix a bug in which ``pyramid.security.ALL_PERMISSIONS`` failed to return
+  a valid iterator in its ``__iter__`` implementation.
+  See https://github.com/Pylons/pyramid/pull/3076
+
 Documentation Changes
 ---------------------
 
-- Updated pyramid-cookiecutter-starter prompts and description to include Mako. See https://github.com/Pylons/pyramid/pull/2982
+- Updated pyramid-cookiecutter-starter prompts and description to include Mako.
+  See https://github.com/Pylons/pyramid/pull/2982
 
 - Added integrity attributes for JavaScripts in cookiecutters, scaffolds, and
   resulting source files in tutorials.
   See https://github.com/Pylons/pyramid/issues/2548
 
 - Update ``cookiecutter`` command to use a checkout for specific branch and
-  shorten it.
-  See https://github.com/Pylons/pyramid/issues/3042
+  shorten it. See https://github.com/Pylons/pyramid/issues/3042
 
 
 .. _changes_1.8.3:
