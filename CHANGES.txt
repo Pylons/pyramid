@@ -1,3 +1,10 @@
+unreleased
+==========
+
+- Fix a bug in which ``pyramid.security.ALL_PERMISSIONS`` failed to return
+  a valid iterator in its ``__iter__`` implementation.
+  See https://github.com/Pylons/pyramid/pull/3077
+
 .. _changes_1.7.5:
 
 1.7.5 (2017-03-12)
