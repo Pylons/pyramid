@@ -1072,29 +1072,31 @@ class BasicAuthAuthenticationPolicy(CallbackAuthenticationPolicy):
         steps.  The output from debugging is useful for reporting to maillist
         or IRC channels when asking for support.
 
-    **Issuing a challenge**
+    ``use_http_unauthorized_exception``
 
-    Regular browsers will not send username/password credentials unless they
-    first receive a challenge from the server.  The following recipe will
-    register a view that will send a Basic Auth challenge to the user whenever
-    there is an attempt to call a view which results in a Forbidden response::
+        Default: ``False``.  Regular browsers will not send username/password
+        credentials unless they first receive a challenge from the server.
+        Setting ``use_http_unauthorized_exception`` to ``True`` will send a
+        Basic Auth challenge to the user whenever the user is not authenticated
+        (``request.authenticated_userid`` is ``None``) and there is an attempt
+        to call a view which is forbidden.  You can perform custom operations
+        on a challenge page by providing a custom exception view for
+        ``HTTPUnauthorized``::
 
-        from pyramid.httpexceptions import HTTPUnauthorized
-        from pyramid.security import forget
-        from pyramid.view import forbidden_view_config
+            from pyramid.httpexceptions import HTTPUnauthorized
+            from pyramid.security import forget
+            from pyramid.view import exception_view_config
 
-        @forbidden_view_config()
-        def forbidden_view(request):
-            if request.authenticated_userid is None:
-                response = HTTPUnauthorized()
+            @exception_view_config(HTTPUnauthorized)
+            def unauthorized_view(request):
                 response.headers.update(forget(request))
                 return response
-            return HTTPForbidden()
     """
-    def __init__(self, check, realm='Realm', debug=False):
+    def __init__(self, check, realm='Realm', debug=False, use_http_unauthorized_exception=False):
         self.check = check
         self.realm = realm
         self.debug = debug
+        self.use_http_unauthorized_exception = use_http_unauthorized_exception
 
     def unauthenticated_userid(self, request):
         """ The userid parsed from the ``Authorization`` request header."""
