@@ -302,6 +302,8 @@ def _secured_view(view, info):
             msg = getattr(
                 request, 'authdebug_message',
                 'Unauthorized: %s failed permission check' % view_name)
+            if getattr(authn_policy, 'use_http_unauthorized_exception', False) and request.authenticated_userid is None:
+                raise HTTPUnauthorized(msg, result=result)
             raise HTTPForbidden(msg, result=result)
         wrapped_view = secured_view
         wrapped_view.__call_permissive__ = view
