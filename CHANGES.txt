@@ -17,6 +17,10 @@ unreleased
   invoked from ``request.invoke_exception_view``.
   See https://github.com/Pylons/pyramid/pull/3060
 
+- Fix a bug in which ``pyramid.security.ALL_PERMISSIONS`` failed to return
+  a valid iterator in its ``__iter__`` implementation.
+  See https://github.com/Pylons/pyramid/pull/3074
+
 1.9a2 (2017-05-09)
 ==================
 
