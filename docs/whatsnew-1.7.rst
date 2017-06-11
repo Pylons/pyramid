@@ -20,6 +20,7 @@ include documentation improvements and other minor feature changes.
 - :ref:`changes_1.7.3`
 - :ref:`changes_1.7.4`
 - :ref:`changes_1.7.5`
+- :ref:`changes_1.7.6`
 
 Backwards Incompatibilities
 ---------------------------
