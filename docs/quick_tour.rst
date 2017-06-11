@@ -647,8 +647,8 @@ add-on ``pyramid_debugtoolbar`` in its ``setup.py``:
 .. literalinclude:: quick_tour/package/setup.py
     :language: python
     :lineno-match:
-    :lines: 11-16
-    :emphasize-lines: 4
+    :lines: 11-17
+    :emphasize-lines: 5
 
 It was installed when you previously ran:
 
@@ -657,14 +657,7 @@ It was installed when you previously ran:
     $ $VENV/bin/pip install -e ".[testing]"
 
 The ``pyramid_debugtoolbar`` package is a Pyramid add-on, which means we need
-to include its configuration into our web application. The cookiecutter already took care of this for us in its ``__init__.py``:
-
-.. literalinclude:: quick_tour/package/hello_world/__init__.py
-    :language: python
-    :lineno-match:
-    :lines: 8
-
-And it uses the ``pyramid.includes`` facility in our ``development.ini``:
+to include its configuration into our web application. The cookiecutter already took care of this for us in its ``development.ini`` using the ``pyramid.includes`` facility:
 
 .. literalinclude:: quick_tour/package/development.ini
     :language: ini
@@ -692,18 +685,17 @@ before its release.
 Our ``pyramid-cookiecutter-starter`` cookiecutter generated a ``tests.py`` module with
 one unit test and one functional test in it. It also configured ``setup.py`` with test requirements:
 ``py.test`` as the test runner, ``WebTest`` for running view tests, and the
-``pytest-cov`` tool which yells at us for code that isn't tested. The
-highlighted lines show this:
+``pytest-cov`` tool which yells at us for code that isn't tested:
 
 .. literalinclude:: quick_tour/package/setup.py
     :language: python
     :lineno-match:
-    :lines: 18-22
+    :lines: 19-23
 
 .. literalinclude:: quick_tour/package/setup.py
     :language: python
     :lineno-match:
-    :lines: 42-44
+    :lines: 43-45
 
 We already installed the test requirements when we ran the command ``$VENV/bin/pip install -e ".[testing]"``. We can now run all our tests:
 

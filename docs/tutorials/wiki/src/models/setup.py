@@ -9,9 +9,11 @@ with open(os.path.join(here, 'CHANGES.txt')) as f:
     CHANGES = f.read()
 
 requires = [
-    'pyramid',
+    'plaster_pastedeploy',
+    'pyramid >= 1.9a',
     'pyramid_chameleon',
     'pyramid_debugtoolbar',
+    'pyramid_retry',
     'pyramid_tm',
     'pyramid_zodbconn',
     'transaction',

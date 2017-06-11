@@ -41,14 +41,18 @@ Open ``tutorial/__init__.py``.  It should already contain the following:
    factory and the settings keywords parsed by :term:`PasteDeploy`.  The root
    factory is named ``root_factory``.
 
-#. *Line 15*.  Include support for the :term:`Chameleon` template rendering
+#. *Lines 15 and 16*.  Get the settings and use an explicit transaction transaction manager for apps so that they do not implicitly create new transactions when touching the manager outside of the ``pyramid_tm`` lifecycle.
+
+#. *Line 17*.  Include support for the :term:`Chameleon` template rendering
    bindings, allowing us to use the ``.pt`` templates.
 
-#. *Line 16*.  Include support for ``pyramid_tm``, allowing Pyramid requests to join the active transaction as provided by the `transaction <https://pypi.python.org/pypi/transaction>`_ package.
+#. *Line 18*.  Include support for ``pyramid_tm``, allowing Pyramid requests to join the active transaction as provided by the `transaction <https://pypi.python.org/pypi/transaction>`_ package.
 
-#. *Line 17*.  Include support for ``pyramid_zodbconn``, providing integration between :term:`ZODB` and a Pyramid application.
+#. *Line 19*.  Include support for ``pyramid_retry`` to retry a request when transient exceptions occur.
 
-#. *Line 18*.  Register a "static view", which answers requests whose URL
+#. *Line 20*.  Include support for ``pyramid_zodbconn``, providing integration between :term:`ZODB` and a Pyramid application.
+
+#. *Line 21*.  Register a "static view", which answers requests whose URL
    paths start with ``/static``, using the
    :meth:`pyramid.config.Configurator.add_static_view` method.  This
    statement registers a view that will serve up static assets, such as CSS

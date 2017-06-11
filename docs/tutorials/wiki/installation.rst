@@ -180,12 +180,12 @@ Testing requirements are defined in our project's ``setup.py`` file, in the ``te
 .. literalinclude:: src/installation/setup.py
     :language: python
     :lineno-match:
-    :lines: 22-26
+    :lines: 24-28
 
 .. literalinclude:: src/installation/setup.py
     :language: python
     :lineno-match:
-    :lines: 46-48
+    :lines: 48-50
 
 
 .. _running_tests:

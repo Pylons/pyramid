@@ -153,7 +153,7 @@ the following:
 .. literalinclude:: src/models/tutorial/models/__init__.py
    :linenos:
    :language: py
-   :emphasize-lines: 10,11
+   :emphasize-lines: 8,9
 
 Here we align our imports with the names of the models, ``Page`` and ``User``.
 
