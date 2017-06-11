@@ -1,6 +1,6 @@
 .. _changes_1.8.4:
 
-1.8.4 (unreleased)
+1.8.4 (2017-06-11)
 ==================
 
 Bug Fixes
@@ -22,7 +22,6 @@ Documentation Changes
 
 - Update ``cookiecutter`` command to use a checkout for specific branch and
   shorten it. See https://github.com/Pylons/pyramid/issues/3042
-
 
 .. _changes_1.8.3:
 
