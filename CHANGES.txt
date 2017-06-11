@@ -1,5 +1,5 @@
-unreleased
-==========
+1.7.6 (2017-06-11)
+==================
 
 - Fix a bug in which ``pyramid.security.ALL_PERMISSIONS`` failed to return
   a valid iterator in its ``__iter__`` implementation.
