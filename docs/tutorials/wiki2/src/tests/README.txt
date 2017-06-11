@@ -14,7 +14,7 @@ Getting Started
 
 - Upgrade packaging tools.
 
-    env/bin/pip install --upgrade pip setuptools wheel
+    env/bin/pip install --upgrade pip setuptools
 
 - Install the project in editable mode with its testing requirements.
 
