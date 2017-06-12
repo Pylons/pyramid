@@ -713,7 +713,7 @@ class IExecutionPolicy(Interface):
         The return value should be a :class:`pyramid.interfaces.IResponse`
         object or an exception that will be handled by WSGI middleware.
 
-        The default execution policy simple creates a request and sends it
+        The default execution policy simply creates a request and sends it
         through the pipeline:
 
         .. code-block:: python
