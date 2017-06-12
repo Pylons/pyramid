@@ -192,13 +192,21 @@ class Router(object):
         """
         request.registry = self.registry
         request.invoke_subrequest = self.invoke_subrequest
-        return self.invoke_request(
-            request,
-            _use_tweens=use_tweens,
-            _apply_extensions=True,
-        )
+        extensions = self.request_extensions
+        if extensions is not None:
+            apply_request_extensions(request, extensions=extensions)
+        return self.invoke_request(request, _use_tweens=use_tweens)
 
     def make_request(self, environ):
+        """
+        Configure a request object for use by the router.
+
+        The request is created using the configured
+        :class:`pyramid.interfaces.IRequestFactory` and will have any
+        configured request methods / properties added that were set by
+        :meth:`pyramid.config.Configurator.add_request_method`.
+
+        """
         request = self.request_factory(environ)
         request.registry = self.registry
         request.invoke_subrequest = self.invoke_subrequest
@@ -207,8 +215,12 @@ class Router(object):
             apply_request_extensions(request, extensions=extensions)
         return request
 
-    def invoke_request(self, request,
-                       _use_tweens=True, _apply_extensions=False):
+    def invoke_request(self, request, _use_tweens=True):
+        """
+        Execute a request through the request processing pipeline and
+        return the generated response.
+
+        """
         registry = self.registry
         has_listeners = self.registry.has_listeners
         notify = self.registry.notify
@@ -224,9 +236,6 @@ class Router(object):
         try:
 
             try:
-                extensions = self.request_extensions
-                if _apply_extensions and extensions is not None:
-                    apply_request_extensions(request, extensions=extensions)
                 response = handle_request(request)
 
                 if request.response_callbacks:
