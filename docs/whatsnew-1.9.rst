@@ -35,6 +35,10 @@ Minor Feature Additions
 
 - The threadlocals are now available inside any function invoked via :meth:`pyramid.config.Configurator.include`. This means the only config-time code that cannot rely on threadlocals is code executed from non-actions inside the main. This can be alleviated by invoking :meth:`pyramid.config.Configurator.begin` and :meth:`pyramid.config.Configurator.end` appropriately or using the new context manager feature of the configurator. See https://github.com/Pylons/pyramid/pull/2989
 
+- The threadlocals are now available inside exception views invoked via :meth:`pyramid.request.Request.invoke_exception_view` even when the ``request`` argument is overridden. See https://github.com/Pylons/pyramid/pull/3060
+
+- When unsupported predicates are supplied to :meth:`pyramid.config.Configurator.add_view`, :meth:`pyramid.config.Configurator.add_route` and :meth:`pyramid.config.Configurator.add_subscriber` a much more helpful error message is output with a guess as to which predicate was intended. See https://github.com/Pylons/pyramid/pull/3054
+
 Deprecations
 ------------
 
