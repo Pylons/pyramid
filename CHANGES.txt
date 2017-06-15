@@ -21,6 +21,12 @@ unreleased
   a valid iterator in its ``__iter__`` implementation.
   See https://github.com/Pylons/pyramid/pull/3074
 
+- Normalize the permission results to a proper class hierarchy.
+  ``pyramid.security.ACLAllowed`` is now a subclass of
+  ``pyramid.security.Allowed`` and ``pyramid.securit.ACLDenied`` is now a
+  subclass of ``pyramid.security.Denied``.
+  See https://github.com/Pylons/pyramid/pull/3084
+
 1.9a2 (2017-05-09)
 ==================
 
