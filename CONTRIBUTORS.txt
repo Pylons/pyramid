@@ -304,3 +304,5 @@ Contributors
 - Fang-Pen Lin, 2017/05/22
 
 - Volker Diels-Grabsch, 2017/06/09
+
+- Denis Rykov, 2017/06/15

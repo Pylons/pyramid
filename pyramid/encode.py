@@ -14,7 +14,16 @@ def url_quote(val, safe=''): # bw compat api
         val = str(val).encode('utf-8')
     return _url_quote(val, safe=safe)
 
-def urlencode(query, doseq=True):
+# bw compat api (dnr)
+def quote_plus(val, safe=''):
+    cls = val.__class__
+    if cls is text_type:
+        val = val.encode('utf-8')
+    elif cls is not binary_type:
+        val = str(val).encode('utf-8')
+    return _quote_plus(val, safe=safe)
+
+def urlencode(query, doseq=True, quote_via=quote_plus):
     """
     An alternate implementation of Python's stdlib `urllib.urlencode
     function <http://docs.python.org/library/urllib.html>`_ which
@@ -52,28 +61,19 @@ def urlencode(query, doseq=True):
     prefix = ''
 
     for (k, v) in query:
-        k = quote_plus(k)
+        k = quote_via(k)
 
         if is_nonstr_iter(v):
             for x in v:
-                x = quote_plus(x)
+                x = quote_via(x)
                 result += '%s%s=%s' % (prefix, k, x)
                 prefix = '&'
         elif v is None:
             result += '%s%s=' % (prefix, k)
         else:
-            v = quote_plus(v)
+            v = quote_via(v)
             result += '%s%s=%s' % (prefix, k, v)
 
         prefix = '&'
 
     return result
-
-# bw compat api (dnr)
-def quote_plus(val, safe=''):
-    cls = val.__class__
-    if cls is text_type:
-        val = val.encode('utf-8')
-    elif cls is not binary_type:
-        val = str(val).encode('utf-8')
-    return _quote_plus(val, safe=safe)
