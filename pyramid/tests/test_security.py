@@ -92,9 +92,11 @@ class TestACLAllowed(unittest.TestCase):
         return klass(*arg, **kw)
 
     def test_it(self):
+        from pyramid.security import Allowed
         msg = ("ACLAllowed permission 'permission' via ACE 'ace' in ACL 'acl' "
                "on context 'ctx' for principals 'principals'")
         allowed = self._makeOne('ace', 'acl', 'permission', 'principals', 'ctx')
+        self.assertIsInstance(allowed, Allowed)
         self.assertTrue(msg in allowed.msg)
         self.assertEqual(allowed, True)
         self.assertTrue(allowed)
@@ -112,9 +114,11 @@ class TestACLDenied(unittest.TestCase):
         return klass(*arg, **kw)
 
     def test_it(self):
+        from pyramid.security import Denied
         msg = ("ACLDenied permission 'permission' via ACE 'ace' in ACL 'acl' "
                "on context 'ctx' for principals 'principals'")
         denied = self._makeOne('ace', 'acl', 'permission', 'principals', 'ctx')
+        self.assertIsInstance(denied, Denied)
         self.assertTrue(msg in denied.msg)
         self.assertEqual(denied, False)
         self.assertFalse(denied)

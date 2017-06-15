@@ -80,15 +80,23 @@ Return Values
     'george', 'read')`` that means deny access.  A sequence of ACEs
     makes up an ACL.  It is a string, and its actual value is "Deny".
 
-.. autoclass:: ACLDenied
-   :members:
-
-.. autoclass:: ACLAllowed
-   :members:
-
 .. autoclass:: Denied
-   :members:
+   :members: msg
+
+   .. automethod:: __new__
 
 .. autoclass:: Allowed
-   :members:
+   :members: msg
+
+   .. automethod:: __new__
+
+.. autoclass:: ACLDenied
+   :members: msg
+
+   .. automethod:: __new__
+
+.. autoclass:: ACLAllowed
+   :members: msg
+
+   .. automethod:: __new__
 
