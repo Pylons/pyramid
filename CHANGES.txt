@@ -23,7 +23,7 @@ unreleased
 
 - Normalize the permission results to a proper class hierarchy.
   ``pyramid.security.ACLAllowed`` is now a subclass of
-  ``pyramid.security.Allowed`` and ``pyramid.securit.ACLDenied`` is now a
+  ``pyramid.security.Allowed`` and ``pyramid.security.ACLDenied`` is now a
   subclass of ``pyramid.security.Denied``.
   See https://github.com/Pylons/pyramid/pull/3084
 

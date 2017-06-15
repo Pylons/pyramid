@@ -39,6 +39,8 @@ Minor Feature Additions
 
 - When unsupported predicates are supplied to :meth:`pyramid.config.Configurator.add_view`, :meth:`pyramid.config.Configurator.add_route` and :meth:`pyramid.config.Configurator.add_subscriber` a much more helpful error message is output with a guess as to which predicate was intended. See https://github.com/Pylons/pyramid/pull/3054
 
+- Normalize the permission results to a proper class hierarchy. :class:`pyramid.security.ACLAllowed` is now a subclass of :class:`pyramid.security.Allowed` and :class:`pyramid.security.ACLDenied` is now a subclass of :class:`pyramid.security.Denied`. See https://github.com/Pylons/pyramid/pull/3084
+
 Deprecations
 ------------
 
