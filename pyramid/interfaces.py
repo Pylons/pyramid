@@ -679,18 +679,41 @@ class IViewPermission(Interface):
         """
 
 class IRouter(Interface):
-    """ WSGI application which routes requests to 'view' code based on
-    a view registry."""
+    """
+    WSGI application which routes requests to 'view' code based on
+    a view registry.
+
+    """
     registry = Attribute(
         """Component architecture registry local to this application.""")
 
-    def make_request(environ):
+    def request_context(environ):
         """
-        Create a new request object.
+        Create a new request context from a WSGI environ.
 
-        This method initializes a new :class:`pyramid.interfaces.IRequest`
-        object using the application's
-        :class:`pyramid.interfaces.IRequestFactory`.
+        The request context is used to push/pop the threadlocals required
+        when processing the request. It also contains an initialized
+        :class:`pyramid.interfaces.IRequest` instance using the registered
+        :class:`pyramid.interfaces.IRequestFactory`. The context may be
+        used as a context manager to control the threadlocal lifecycle:
+
+        .. code-block:: python
+
+            with router.request_context(environ) as request:
+                ...
+
+        Alternatively, the context may be used without the ``with`` statement
+        by manually invoking its ``begin()`` and ``end()`` methods.
+
+        .. code-block:: python
+
+            ctx = router.request_context(environ)
+            request = ctx.begin()
+            try:
+                ...
+            finally:
+                ctx.end()
+
         """
 
     def invoke_request(request):
@@ -698,6 +721,10 @@ class IRouter(Interface):
         Invoke the :app:`Pyramid` request pipeline.
 
         See :ref:`router_chapter` for information on the request pipeline.
+
+        The output should be a :class:`pyramid.interfaces.IResponse` object
+        or a raised exception.
+
         """
 
 class IExecutionPolicy(Interface):
@@ -716,13 +743,16 @@ class IExecutionPolicy(Interface):
         object or an exception that will be handled by WSGI middleware.
 
         The default execution policy simply creates a request and sends it
-        through the pipeline:
+        through the pipeline, attempting to render any exception that escapes:
 
         .. code-block:: python
 
             def simple_execution_policy(environ, router):
-                request = router.make_request(environ)
-                return router.invoke_request(request)
+                with router.request_context(environ) as request:
+                    try:
+                        return router.invoke_request(request)
+                    except Exception:
+                        return request.invoke_exception_view(reraise=True)
         """
 
 class ISettings(IDict):
