@@ -886,6 +886,18 @@ class TestViewMethodsMixin(unittest.TestCase):
         else: # pragma: no cover
             self.fail()
 
+    def test_it_reraises_if_not_found(self):
+        request = self._makeOne()
+        dummy_exc = RuntimeError()
+        try:
+            raise dummy_exc
+        except RuntimeError:
+            self.assertRaises(
+                RuntimeError,
+                lambda: request.invoke_exception_view(reraise=True))
+        else: # pragma: no cover
+            self.fail()
+
     def test_it_raises_predicate_mismatch(self):
         from pyramid.exceptions import PredicateMismatch
         def exc_view(exc, request): pass
@@ -897,6 +909,21 @@ class TestViewMethodsMixin(unittest.TestCase):
             raise dummy_exc
         except RuntimeError:
             self.assertRaises(PredicateMismatch, request.invoke_exception_view)
+        else: # pragma: no cover
+            self.fail()
+
+    def test_it_reraises_after_predicate_mismatch(self):
+        def exc_view(exc, request): pass
+        self.config.add_view(exc_view, context=Exception, request_method='POST')
+        request = self._makeOne()
+        request.method = 'GET'
+        dummy_exc = RuntimeError()
+        try:
+            raise dummy_exc
+        except RuntimeError:
+            self.assertRaises(
+                RuntimeError,
+                lambda: request.invoke_exception_view(reraise=True))
         else: # pragma: no cover
             self.fail()
 
