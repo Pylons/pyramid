@@ -34,7 +34,7 @@ and deployment more fun, more predictable, and more productive.
        server = make_server('0.0.0.0', 8080, app)
        server.serve_forever()
 
-Pyramid is a project of the `Pylons Project <http://pylonsproject.org/>`_.
+Pyramid is a project of the `Pylons Project <https://pylonsproject.org/>`_.
 
 Support and Documentation
 -------------------------
