@@ -16,6 +16,7 @@ from pyramid.interfaces import (
     )
 
 from pyramid.compat import decode_path_info
+from pyramid.compat import reraise as reraise_
 
 from pyramid.exceptions import (
     ConfigurationError,
@@ -630,8 +631,9 @@ class ViewMethodsMixin(object):
         self,
         exc_info=None,
         request=None,
-        secure=True
-        ):
+        secure=True,
+        reraise=False,
+    ):
         """ Executes an exception view related to the request it's called upon.
         The arguments it takes are these:
 
@@ -654,14 +656,12 @@ class ViewMethodsMixin(object):
             does not have the appropriate permission, this should be ``True``.
             Default: ``True``.
 
-        If called with no arguments, it uses the global exception information
-        returned by ``sys.exc_info()`` as ``exc_info``, the request
-        object that this method is attached to as the ``request``, and
-        ``True`` for ``secure``.
+        ``reraise``
 
-        This method returns a :term:`response` object or raises
-        :class:`pyramid.httpexceptions.HTTPNotFound` if a matching view cannot
-        be found.
+            A boolean indicating whether the original error should be reraised
+            if a :term:`response` object could not be created. If ``False``
+            then an :class:`pyramid.httpexceptions.HTTPNotFound`` exception
+            will be raised. Default: ``False``.
 
         If a response is generated then ``request.exception`` and
         ``request.exc_info`` will be left at the values used to render the
@@ -674,6 +674,8 @@ class ViewMethodsMixin(object):
            The ``request.exception`` and ``request.exc_info`` properties will
            reflect the exception used to render the response where previously
            they were reset to the values prior to invoking the method.
+
+           Also added the ``reraise`` argument.
 
         """
         if request is None:
@@ -716,10 +718,16 @@ class ViewMethodsMixin(object):
                     secure=secure,
                     request_iface=request_iface.combined,
                     )
+            except:
+                if reraise:
+                    reraise_(*exc_info)
+                raise
             finally:
                 manager.pop()
 
         if response is None:
+            if reraise:
+                reraise_(*exc_info)
             raise HTTPNotFound
 
         # successful response, overwrite exception/exc_info
