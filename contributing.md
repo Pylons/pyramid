@@ -3,7 +3,7 @@ Contributing
 
 All projects under the Pylons Projects, including this one, follow the
 guidelines established at [How to
-Contribute](https://pylonsproject.org//community/how-to-contribute) and
+Contribute](https://pylonsproject.org/community/how-to-contribute) and
 [Coding Style and
 Standards](http://docs.pylonsproject.org/en/latest/community/codestyle.html).
 
