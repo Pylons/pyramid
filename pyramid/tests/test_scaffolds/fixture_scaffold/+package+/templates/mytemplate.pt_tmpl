@@ -41,7 +41,7 @@
           <h2>Pyramid links</h2>
           <ul class="links">
             <li>
-              <a href="http://pylonsproject.org">Pylons Website</a>
+              <a href="https://pylonsproject.org">Pylons Website</a>
             </li>
             <li>
               <a href="http://docs.pylonsproject.org/projects/pyramid/current/#narrative-documentation">Narrative Documentation</a>
