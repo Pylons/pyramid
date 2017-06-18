@@ -41,6 +41,8 @@ Minor Feature Additions
 
 - Normalize the permission results to a proper class hierarchy. :class:`pyramid.security.ACLAllowed` is now a subclass of :class:`pyramid.security.Allowed` and :class:`pyramid.security.ACLDenied` is now a subclass of :class:`pyramid.security.Denied`. See https://github.com/Pylons/pyramid/pull/3084
 
+- Add a ``quote_via`` argument to :func:`pyramid.encode.urlencode` to follow the stdlib's version and enable custom quoting functions. See https://github.com/Pylons/pyramid/pull/3088
+
 Deprecations
 ------------
 

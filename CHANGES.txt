@@ -27,6 +27,10 @@ unreleased
   subclass of ``pyramid.security.Denied``.
   See https://github.com/Pylons/pyramid/pull/3084
 
+- Add a ``quote_via`` argument to ``pyramid.encode.urlencode`` to follow
+  the stdlib's version and enable custom quoting functions.
+  See https://github.com/Pylons/pyramid/pull/3088
+
 1.9a2 (2017-05-09)
 ==================
 
