@@ -5,7 +5,7 @@
 
 .. automodule:: pyramid.url
 
-  .. autofunction:: pyramid.url.resource_url(context, request, *elements, query=None, anchor=None)
+  .. autofunction:: resource_url
 
   .. autofunction:: route_url
 

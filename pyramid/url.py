@@ -31,13 +31,13 @@ from pyramid.traversal import (
 QUERY_SAFE = "/?:@!$&'()*+,;=" # RFC 3986
 ANCHOR_SAFE = QUERY_SAFE
 
-def parse_url_overrides(kw):
+def parse_url_overrides(request, kw):
     """Parse special arguments passed when generating urls.
 
     The supplied dictionary is mutated when we pop arguments.
-    Returns a 6-tuple of the format:
+    Returns a 3-tuple of the format:
 
-      ``(app_url, scheme, host, port, qs, anchor)``.
+      ``(app_url, qs, anchor)``.
     """
     app_url = kw.pop('_app_url', None)
     scheme = kw.pop('_scheme', None)
@@ -45,6 +45,12 @@ def parse_url_overrides(kw):
     port = kw.pop('_port', None)
     query = kw.pop('_query', '')
     anchor = kw.pop('_anchor', '')
+
+    if app_url is None:
+        if (scheme is not None or host is not None or port is not None):
+            app_url = request._partial_application_url(scheme, host, port)
+        else:
+            app_url = request.application_url
 
     qs = ''
     if query:
@@ -54,11 +60,9 @@ def parse_url_overrides(kw):
             qs = '?' + urlencode(query, doseq=True)
 
     if anchor:
-        anchor = url_quote(anchor, ANCHOR_SAFE)
-        if not anchor.startswith('#'):
-            anchor = '#' + anchor
+        anchor = '#' + url_quote(anchor, ANCHOR_SAFE)
 
-    return app_url, scheme, host, port, qs, anchor
+    return app_url, qs, anchor
 
 class URLMethodsMixin(object):
     """ Request methods mixin for BaseRequest having to do with URL
@@ -255,13 +259,7 @@ class URLMethodsMixin(object):
         if route.pregenerator is not None:
             elements, kw = route.pregenerator(self, elements, kw)
 
-        app_url, scheme, host, port, qs, anchor = parse_url_overrides(kw)
-
-        if app_url is None:
-            if (scheme is not None or host is not None or port is not None):
-                app_url = self._partial_application_url(scheme, host, port)
-            else:
-                app_url = self.application_url
+        app_url, qs, anchor = parse_url_overrides(self, kw)
 
         path = route.generate(kw) # raises KeyError if generate fails
 
@@ -522,13 +520,15 @@ class URLMethodsMixin(object):
 
         virtual_path = getattr(url_adapter, 'virtual_path', None)
 
-        app_url = None
-        scheme = None
-        host = None
-        port = None
+        urlkw = {}
+        for name in (
+            'app_url', 'scheme', 'host', 'port', 'query', 'anchor'
+        ):
+            val = kw.get(name, None)
+            if val is not None:
+                urlkw['_' + name] = val
 
         if 'route_name' in kw:
-            newkw = {}
             route_name = kw['route_name']
             remainder = getattr(url_adapter, 'virtual_path_tuple', None)
             if remainder is None:
@@ -536,39 +536,16 @@ class URLMethodsMixin(object):
                 # virtual_path_tuple
                 remainder = tuple(url_adapter.virtual_path.split('/'))
             remainder_name = kw.get('route_remainder_name', 'traverse')
-            newkw[remainder_name] = remainder
+            urlkw[remainder_name] = remainder
 
-            for name in (
-                'app_url', 'scheme', 'host', 'port', 'query', 'anchor'
-                ):
-                val = kw.get(name, None)
-                if val is not None:
-                    newkw['_' + name] = val
-                
             if 'route_kw' in kw:
                 route_kw = kw.get('route_kw')
                 if route_kw is not None:
-                    newkw.update(route_kw)
+                    urlkw.update(route_kw)
 
-            return self.route_url(route_name, *elements, **newkw)
+            return self.route_url(route_name, *elements, **urlkw)
 
-        if 'app_url' in kw:
-            app_url = kw['app_url']
-
-        if 'scheme' in kw:
-            scheme = kw['scheme']
-
-        if 'host' in kw:
-            host = kw['host']
-
-        if 'port' in kw:
-            port = kw['port']
-
-        if app_url is None:
-            if scheme or host or port:
-                app_url = self._partial_application_url(scheme, host, port)
-            else:
-                app_url = self.application_url
+        app_url, qs, anchor = parse_url_overrides(self, urlkw)
 
         resource_url = None
         local_url = getattr(resource, '__resource_url__', None)
@@ -588,21 +565,6 @@ class URLMethodsMixin(object):
             # the resource did not handle its own url generation or the
             # __resource_url__ function returned None
             resource_url = app_url + virtual_path
-
-        qs = ''
-        anchor = ''
-
-        if 'query' in kw:
-            query = kw['query']
-            if isinstance(query, string_types):
-                qs = '?' + url_quote(query, QUERY_SAFE)
-            elif query:
-                qs = '?' + urlencode(query, doseq=True)
-
-        if 'anchor' in kw:
-            anchor = kw['anchor']
-            anchor = url_quote(anchor, ANCHOR_SAFE)
-            anchor = '#' + anchor
 
         if elements:
             suffix = _join_elements(elements)
