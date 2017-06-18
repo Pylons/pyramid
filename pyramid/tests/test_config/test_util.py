@@ -365,6 +365,16 @@ class TestPredicateList(unittest.TestCase):
         from pyramid.exceptions import ConfigurationError
         self.assertRaises(ConfigurationError, self._callFUT, unknown=1)
 
+    def test_predicate_close_matches(self):
+        from pyramid.exceptions import ConfigurationError
+        with  self.assertRaises(ConfigurationError) as context:
+            self._callFUT(method='GET')
+        expected_msg = (
+            "Unknown predicate values: {'method': 'GET'} "
+            "(did you mean request_method)"
+        )
+        self.assertEqual(context.exception.args[0], expected_msg)
+
     def test_notted(self):
         from pyramid.config import not_
         from pyramid.testing import DummyRequest

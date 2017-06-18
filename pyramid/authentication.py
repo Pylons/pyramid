@@ -1084,10 +1084,12 @@ class BasicAuthAuthenticationPolicy(CallbackAuthenticationPolicy):
         from pyramid.view import forbidden_view_config
 
         @forbidden_view_config()
-        def basic_challenge(request):
-            response = HTTPUnauthorized()
-            response.headers.update(forget(request))
-            return response
+        def forbidden_view(request):
+            if request.authenticated_userid is None:
+                response = HTTPUnauthorized()
+                response.headers.update(forget(request))
+                return response
+            return HTTPForbidden()
     """
     def __init__(self, check, realm='Realm', debug=False):
         self.check = check

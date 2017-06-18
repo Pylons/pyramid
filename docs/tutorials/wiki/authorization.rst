@@ -49,7 +49,7 @@ Open ``setup.py`` and edit it to look like the following:
 
 .. literalinclude:: src/authorization/setup.py
    :linenos:
-   :emphasize-lines: 21
+   :emphasize-lines: 23
    :language: python
 
 Only the highlighted line needs to be added.
@@ -155,9 +155,9 @@ statements:
 Now add those policies to the configuration:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
-   :lines: 18-23
+   :lines: 18-25
    :lineno-match:
-   :emphasize-lines: 1-3,5-6
+   :emphasize-lines: 1-3,7-8
    :language: python
 
 Only the highlighted lines need to be added.
@@ -233,7 +233,7 @@ Add the following import statements to the head of
 
 .. literalinclude:: src/authorization/tutorial/views.py
    :lines: 6-17
-   :emphasize-lines: 1-14
+   :emphasize-lines: 1-12
    :language: python
 
 All the highlighted lines need to be added or edited.
@@ -327,7 +327,7 @@ Our ``tutorial/__init__.py`` will look like this when we're done:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
    :linenos:
-   :emphasize-lines: 4-5,8,18-20,22-23
+   :emphasize-lines: 4-5,8,18-20,24-25
    :language: python
 
 Only the highlighted lines need to be added or edited.

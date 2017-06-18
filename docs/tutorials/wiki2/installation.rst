@@ -43,7 +43,7 @@ On UNIX
 .. code-block:: bash
 
     $ cd ~
-    $ cookiecutter https://github.com/Pylons/pyramid-cookiecutter-alchemy
+    $ cookiecutter gh:Pylons/pyramid-cookiecutter-alchemy --checkout 1.9-branch
 
 On Windows
 ^^^^^^^^^^
@@ -51,7 +51,7 @@ On Windows
 .. code-block:: doscon
 
     c:\> cd \
-    c:\> cookiecutter https://github.com/Pylons/pyramid-cookiecutter-alchemy
+    c:\> cookiecutter gh:Pylons/pyramid-cookiecutter-alchemy --checkout 1.9-branch
 
 On all operating systems
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -190,12 +190,12 @@ Testing requirements are defined in our project's ``setup.py`` file, in the ``te
 .. literalinclude:: src/installation/setup.py
    :language: python
    :lineno-match:
-   :lines: 22-26
+   :lines: 24-28
 
 .. literalinclude:: src/installation/setup.py
    :language: python
    :lineno-match:
-   :lines: 46-48
+   :lines: 48-50
 
 
 .. _sql_running_tests:

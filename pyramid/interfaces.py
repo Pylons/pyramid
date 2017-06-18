@@ -503,8 +503,10 @@ class IAuthenticationPolicy(Interface):
 class IAuthorizationPolicy(Interface):
     """ An object representing a Pyramid authorization policy. """
     def permits(context, principals, permission):
-        """ Return ``True`` if any of the ``principals`` is allowed the
-        ``permission`` in the current ``context``, else return ``False``
+        """ Return an instance of :class:`pyramid.security.Allowed` if any
+        of the ``principals`` is allowed the ``permission`` in the current
+        ``context``, else return an instance of
+        :class:`pyramid.security.Denied`.
         """
 
     def principals_allowed_by_permission(context, permission):
@@ -713,7 +715,7 @@ class IExecutionPolicy(Interface):
         The return value should be a :class:`pyramid.interfaces.IResponse`
         object or an exception that will be handled by WSGI middleware.
 
-        The default execution policy simple creates a request and sends it
+        The default execution policy simply creates a request and sends it
         through the pipeline:
 
         .. code-block:: python

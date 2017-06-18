@@ -5,7 +5,7 @@ The Pyramid Web Framework
 =========================
 
 :app:`Pyramid` is a small, fast, down-to-earth Python web framework.  It is
-developed as part of the `Pylons Project <http://pylonsproject.org/>`_.
+developed as part of the `Pylons Project <https://pylonsproject.org>`_.
 It is licensed under a `BSD-like license <http://repoze.org/license.html>`_.
 
 Here is one of the simplest :app:`Pyramid` applications you can make:
@@ -95,9 +95,7 @@ the trunk via ``git``, use either command:
   # Otherwise, HTTPS will work, using your GitHub login:
   git clone https://github.com/Pylons/pyramid.git
 
-To find out how to become a contributor to :app:`Pyramid`, please see the
-`contributor's section of the documentation
-<http://docs.pylonsproject.org/en/latest/#contributing>`_.
+To find out how to become a contributor to :app:`Pyramid`, please see `How to Contribute Source Code and Documentation <https://pylonsproject.org/community-how-to-contribute.html>`_.
 
 
 .. _html_narrative_documentation:

@@ -85,7 +85,7 @@ On all platforms, generate a project using cookiecutter.
 
 .. code-block:: bash
 
-   $ cookiecutter https://github.com/Pylons/pyramid-cookiecutter-starter
+   $ cookiecutter gh:Pylons/pyramid-cookiecutter-starter --checkout 1.9-branch
 
 If prompted for the first item, accept the default ``yes`` by hitting return.
 
@@ -332,7 +332,7 @@ Access is restricted such that only a browser running on the same machine as
 Pyramid will be able to access your Pyramid application.  However, if you want
 to open access to other machines on the same network, then edit the
 ``development.ini`` file, and replace the ``listen`` value in the
-``[server:main]`` section, changing it from ``127.0.0.1:6543 [::1]:6543`` to ``*:6543``
+``[server:main]`` section, changing it from ``localhost:6543`` to ``*:6543``
 (this is equivalent to ``0.0.0.0:6543 [::]:6543``).  For example:
 
 .. code-block:: ini
@@ -356,8 +356,8 @@ IPv6. ``[::]`` means the same as ``0.0.0.0`` but for IPv6 protocol.
 
 You can change the port on which the server runs on by changing the same
 portion of the ``development.ini`` file.  For example, you can change the
-``listen = 127.0.0.1:6543 [::1]:6543`` line in the ``development.ini`` file's ``[server:main]``
-section to ``listen = 127:0.0.1:8080 [::1]:8080`` to run the server on port 8080 instead of port 6543.
+``listen = localhost:6543`` line in the ``development.ini`` file's ``[server:main]``
+section to ``listen = localhost:8080`` to run the server on port 8080 instead of port 6543.
 
 You can shut down a server started this way by pressing ``Ctrl-C`` (or
 ``Ctrl-Break`` on Windows).

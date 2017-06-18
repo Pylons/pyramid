@@ -16,6 +16,7 @@ from pyramid.interfaces import (
     )
 
 from pyramid.compat import decode_path_info
+from pyramid.compat import reraise as reraise_
 
 from pyramid.exceptions import (
     ConfigurationError,
@@ -28,7 +29,11 @@ from pyramid.httpexceptions import (
     default_exceptionresponse_view,
     )
 
-from pyramid.threadlocal import get_current_registry
+from pyramid.threadlocal import (
+    get_current_registry,
+    manager,
+    )
+
 from pyramid.util import hide_attrs
 
 _marker = object()
@@ -626,8 +631,9 @@ class ViewMethodsMixin(object):
         self,
         exc_info=None,
         request=None,
-        secure=True
-        ):
+        secure=True,
+        reraise=False,
+    ):
         """ Executes an exception view related to the request it's called upon.
         The arguments it takes are these:
 
@@ -650,24 +656,26 @@ class ViewMethodsMixin(object):
             does not have the appropriate permission, this should be ``True``.
             Default: ``True``.
 
-        If called with no arguments, it uses the global exception information
-        returned by ``sys.exc_info()`` as ``exc_info``, the request
-        object that this method is attached to as the ``request``, and
-        ``True`` for ``secure``.
+        ``reraise``
 
-        This method returns a :term:`response` object or raises
-        :class:`pyramid.httpexceptions.HTTPNotFound` if a matching view cannot
-        be found.
+            A boolean indicating whether the original error should be reraised
+            if a :term:`response` object could not be created. If ``False``
+            then an :class:`pyramid.httpexceptions.HTTPNotFound`` exception
+            will be raised. Default: ``False``.
 
         If a response is generated then ``request.exception`` and
         ``request.exc_info`` will be left at the values used to render the
         response. Otherwise the previous values for ``request.exception`` and
         ``request.exc_info`` will be restored.
 
+        .. versionadded:: 1.7
+
         .. versionchanged:: 1.9
            The ``request.exception`` and ``request.exc_info`` properties will
            reflect the exception used to render the response where previously
            they were reset to the values prior to invoking the method.
+
+           Also added the ``reraise`` argument.
 
         """
         if request is None:
@@ -675,8 +683,13 @@ class ViewMethodsMixin(object):
         registry = getattr(request, 'registry', None)
         if registry is None:
             registry = get_current_registry()
+
+        if registry is None:
+            raise RuntimeError("Unable to retrieve registry")
+
         if exc_info is None:
             exc_info = sys.exc_info()
+
         exc = exc_info[1]
         attrs = request.__dict__
         context_iface = providedBy(exc)
@@ -690,19 +703,31 @@ class ViewMethodsMixin(object):
             # we use .get instead of .__getitem__ below due to
             # https://github.com/Pylons/pyramid/issues/700
             request_iface = attrs.get('request_iface', IRequest)
-            response = _call_view(
-                registry,
-                request,
-                exc,
-                context_iface,
-                '',
-                view_types=None,
-                view_classifier=IExceptionViewClassifier,
-                secure=secure,
-                request_iface=request_iface.combined,
-                )
+
+            manager.push({'request': request, 'registry': registry})
+
+            try:
+                response = _call_view(
+                    registry,
+                    request,
+                    exc,
+                    context_iface,
+                    '',
+                    view_types=None,
+                    view_classifier=IExceptionViewClassifier,
+                    secure=secure,
+                    request_iface=request_iface.combined,
+                    )
+            except:
+                if reraise:
+                    reraise_(*exc_info)
+                raise
+            finally:
+                manager.pop()
 
         if response is None:
+            if reraise:
+                reraise_(*exc_info)
             raise HTTPNotFound
 
         # successful response, overwrite exception/exc_info
