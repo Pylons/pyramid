@@ -115,6 +115,14 @@ class TestURLMethodsMixin(unittest.TestCase):
         self.assertEqual(result,
             'http://example.com:5432/context/a')
 
+    def test_resource_url_with_query_None(self):
+        request = self._makeOne()
+        self._registerResourceURL(request.registry)
+        context = DummyContext()
+        result = request.resource_url(context, 'a', query=None)
+        self.assertEqual(result,
+            'http://example.com:5432/context/a')
+
     def test_resource_url_anchor_is_after_root_when_no_elements(self):
         request = self._makeOne()
         self._registerResourceURL(request.registry)
@@ -156,6 +164,13 @@ class TestURLMethodsMixin(unittest.TestCase):
         result = request.resource_url(context, anchor=' /#?&+')
         self.assertEqual(result,
                          'http://example.com:5432/context/#%20/%23?&+')
+
+    def test_resource_url_anchor_is_None(self):
+        request = self._makeOne()
+        self._registerResourceURL(request.registry)
+        context = DummyContext()
+        result = request.resource_url(context, anchor=None)
+        self.assertEqual(result, 'http://example.com:5432/context/')
 
     def test_resource_url_no_IResourceURL_registered(self):
         # falls back to ResourceURL
@@ -421,6 +436,14 @@ class TestURLMethodsMixin(unittest.TestCase):
         self.assertEqual(result,
                          'http://example.com:5432/1/2/3?a=1#foo')
 
+    def test_route_url_with_query_None(self):
+        from pyramid.interfaces import IRoutesMapper
+        request = self._makeOne()
+        mapper = DummyRoutesMapper(route=DummyRoute('/1/2/3'))
+        request.registry.registerUtility(mapper, IRoutesMapper)
+        result = request.route_url('flub', a=1, b=2, c=3, _query=None)
+        self.assertEqual(result, 'http://example.com:5432/1/2/3')
+
     def test_route_url_with_anchor_binary(self):
         from pyramid.interfaces import IRoutesMapper
         request = self._makeOne()
@@ -441,6 +464,15 @@ class TestURLMethodsMixin(unittest.TestCase):
 
         self.assertEqual(result,
                          'http://example.com:5432/1/2/3#La%20Pe%C3%B1a')
+
+    def test_route_url_with_anchor_None(self):
+        from pyramid.interfaces import IRoutesMapper
+        request = self._makeOne()
+        mapper = DummyRoutesMapper(route=DummyRoute('/1/2/3'))
+        request.registry.registerUtility(mapper, IRoutesMapper)
+        result = request.route_url('flub', _anchor=None)
+
+        self.assertEqual(result, 'http://example.com:5432/1/2/3')
 
     def test_route_url_with_query(self):
         from pyramid.interfaces import IRoutesMapper

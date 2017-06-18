@@ -32,12 +32,14 @@ QUERY_SAFE = "/?:@!$&'()*+,;=" # RFC 3986
 ANCHOR_SAFE = QUERY_SAFE
 
 def parse_url_overrides(request, kw):
-    """Parse special arguments passed when generating urls.
+    """
+    Parse special arguments passed when generating urls.
 
     The supplied dictionary is mutated when we pop arguments.
     Returns a 3-tuple of the format:
 
       ``(app_url, qs, anchor)``.
+
     """
     app_url = kw.pop('_app_url', None)
     scheme = kw.pop('_scheme', None)
@@ -59,10 +61,11 @@ def parse_url_overrides(request, kw):
         else:
             qs = '?' + urlencode(query, doseq=True)
 
+    frag = ''
     if anchor:
-        anchor = '#' + url_quote(anchor, ANCHOR_SAFE)
+        frag = '#' + url_quote(anchor, ANCHOR_SAFE)
 
-    return app_url, qs, anchor
+    return app_url, qs, frag
 
 class URLMethodsMixin(object):
     """ Request methods mixin for BaseRequest having to do with URL
@@ -78,6 +81,7 @@ class URLMethodsMixin(object):
         passed, the ``port`` value is assumed to ``443``.  Likewise, if
         ``scheme`` is passed as ``http`` and ``port`` is not passed, the
         ``port`` value is assumed to be ``80``.
+
         """
         e = self.environ
         if scheme is None:
@@ -184,10 +188,6 @@ class URLMethodsMixin(object):
            as values, and a k=v pair will be placed into the query string for
            each value.
 
-        .. versionchanged:: 1.5
-           Allow the ``_query`` option to be a string to enable alternative
-           encodings.
-
         If a keyword argument ``_anchor`` is present, its string
         representation will be quoted per :rfc:`3986#section-3.5` and used as
         a named anchor in the generated URL
@@ -200,10 +200,6 @@ class URLMethodsMixin(object):
            If ``_anchor`` is passed as a string, it should be UTF-8 encoded. If
            ``_anchor`` is passed as a Unicode object, it will be converted to
            UTF-8 before being appended to the URL.
-
-        .. versionchanged:: 1.5
-           The ``_anchor`` option will be escaped instead of using
-           its raw string representation.
 
         If both ``_anchor`` and ``_query`` are specified, the anchor
         element will always follow the query element,
@@ -245,6 +241,18 @@ class URLMethodsMixin(object):
         If the route object which matches the ``route_name`` argument has
         a :term:`pregenerator`, the ``*elements`` and ``**kw``
         arguments passed to this function might be augmented or changed.
+
+        .. versionchanged:: 1.5
+           Allow the ``_query`` option to be a string to enable alternative
+           encodings.
+
+           The ``_anchor`` option will be escaped instead of using
+           its raw string representation.
+
+        .. versionchanged:: 1.9
+           If ``_query`` or ``_anchor`` are falsey (such as ``None`` or an
+           empty string) they will not be included in the generated url.
+
         """
         try:
             reg = self.registry
@@ -298,13 +306,13 @@ class URLMethodsMixin(object):
            implemented in terms of :meth:`pyramid.request.Request.route_url`
            in just this way. As a result, any ``_app_url`` passed within the
            ``**kw`` values to ``route_path`` will be ignored.
+
         """
         kw['_app_url'] = self.script_name
         return self.route_url(route_name, *elements, **kw)
 
     def resource_url(self, resource, *elements, **kw):
         """
-
         Generate a string representing the absolute URL of the
         :term:`resource` object based on the ``wsgi.url_scheme``,
         ``HTTP_HOST`` or ``SERVER_NAME`` in the request, plus any
@@ -370,10 +378,6 @@ class URLMethodsMixin(object):
            as values, and a k=v pair will be placed into the query string for
            each value.
 
-        .. versionchanged:: 1.5
-           Allow the ``query`` option to be a string to enable alternative
-           encodings.
-
         If a keyword argument ``anchor`` is present, its string
         representation will be used as a named anchor in the generated URL
         (e.g. if ``anchor`` is passed as ``foo`` and the resource URL is
@@ -385,10 +389,6 @@ class URLMethodsMixin(object):
            If ``anchor`` is passed as a string, it should be UTF-8 encoded. If
            ``anchor`` is passed as a Unicode object, it will be converted to
            UTF-8 before being appended to the URL.
-
-        .. versionchanged:: 1.5
-           The ``anchor`` option will be escaped instead of using
-           its raw string representation.
 
         If both ``anchor`` and ``query`` are specified, the anchor element
         will always follow the query element,
@@ -418,9 +418,6 @@ class URLMethodsMixin(object):
         pass ``app_url=''``.  Passing ``app_url=''`` when the resource path is
         ``/baz/bar`` will return ``/baz/bar``.
 
-        .. versionadded:: 1.3
-           ``app_url``
-
         If ``app_url`` is passed and any of ``scheme``, ``port``, or ``host``
         are also passed, ``app_url`` will take precedence and the values
         passed for ``scheme``, ``host``, and/or ``port`` will be ignored.
@@ -432,9 +429,6 @@ class URLMethodsMixin(object):
         .. seealso::
 
             See also :ref:`overriding_resource_url_generation`.
-
-        .. versionadded:: 1.5
-           ``route_name``, ``route_kw``, and ``route_remainder_name``
            
         If ``route_name`` is passed, this function will delegate its URL
         production to the ``route_url`` function.  Calling
@@ -508,6 +502,23 @@ class URLMethodsMixin(object):
 
            For backwards compatibility purposes, this method is also
            aliased as the ``model_url`` method of request.
+
+        .. versionchanged:: 1.3
+           Added the ``app_url`` keyword argument.
+
+        .. versionchanged:: 1.5
+           Allow the ``query`` option to be a string to enable alternative
+           encodings.
+
+           The ``anchor`` option will be escaped instead of using
+           its raw string representation.
+
+           Added the ``route_name``, ``route_kw``, and
+           ``route_remainder_name`` keyword arguments.
+
+        .. versionchanged:: 1.9
+           If ``query`` or ``anchor`` are falsey (such as ``None`` or an
+           empty string) they will not be included in the generated url.
         """
         try:
             reg = self.registry
