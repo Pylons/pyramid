@@ -25,11 +25,10 @@ def quote_plus(val, safe=''):
 
 def urlencode(query, doseq=True, quote_via=quote_plus):
     """
-    An alternate implementation of Python's stdlib `urllib.urlencode
-    function <http://docs.python.org/library/urllib.html>`_ which
-    accepts unicode keys and values within the ``query``
-    dict/sequence; all Unicode keys and values are first converted to
-    UTF-8 before being used to compose the query string.
+    An alternate implementation of Python's stdlib
+    :func:`urllib.parse.urlencode` function which accepts unicode keys and
+    values within the ``query`` dict/sequence; all Unicode keys and values are
+    first converted to UTF-8 before being used to compose the query string.
 
     The value of ``query`` must be a sequence of two-tuples
     representing key/value pairs *or* an object (often a dictionary)
@@ -44,12 +43,18 @@ def urlencode(query, doseq=True, quote_via=quote_plus):
     the ``doseq=True`` mode, no matter what the value of the second
     argument.
 
-    See the Python stdlib documentation for ``urllib.urlencode`` for
-    more information.
+    Both the key and value are encoded using the ``quote_via`` function which
+    by default is using a similar algorithm to :func:`urllib.parse.quote_plus`
+    which converts spaces into '+' characters and '/' into '%2F'.
 
     .. versionchanged:: 1.5
        In a key/value pair, if the value is ``None`` then it will be
        dropped from the resulting output.
+
+    .. versionchanged:: 1.9
+       Added the ``quote_via`` argument to allow alternate quoting algorithms
+       to be used.
+
     """
     try:
         # presumed to be a dictionary
