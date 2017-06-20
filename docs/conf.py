@@ -67,7 +67,7 @@ intersphinx_mapping = {
     'jinja2': ('http://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/', None),
     'pylonswebframework': ('http://docs.pylonsproject.org/projects/pylons-webframework/en/latest/', None),
     'python': ('https://docs.python.org/3', None),
-    'pytest': ('https://pytest.org/en/latest/', None),
+    'pytest': ('https://docs.pytest.org/en/latest/', None),
     'sqla': ('http://docs.sqlalchemy.org/en/latest', None),
     'tm': ('http://docs.pylonsproject.org/projects/pyramid-tm/en/latest/', None),
     'toolbar': ('http://docs.pylonsproject.org/projects/pyramid-debugtoolbar/en/latest', None),
@@ -76,9 +76,9 @@ intersphinx_mapping = {
     'venusian': ('http://docs.pylonsproject.org/projects/venusian/en/latest', None),
     'webob': ('http://docs.webob.org/en/latest', None),
     'webtest': ('http://webtest.pythonpaste.org/en/latest', None),
-    'who': ('http://repozewho.readthedocs.org/en/latest', None),
+    'who': ('http://repozewho.readthedocs.io/en/latest', None),
     'zcml': ('http://docs.pylonsproject.org/projects/pyramid-zcml/en/latest', None),
-    'zcomponent': ('http://zopecomponent.readthedocs.io/en/stable/', None),
+    'zcomponent': ('http://zopecomponent.readthedocs.io/en/latest/', None),
 }
 
 
