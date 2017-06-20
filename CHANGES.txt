@@ -37,6 +37,12 @@ unreleased
   with nothing after it.
   See https://github.com/Pylons/pyramid/pull/3034
 
+- Revamp the ``IRouter`` API used by ``IExecutionPolicy`` to force
+  pushing/popping the request threadlocals. The
+  ``IRouter.make_request(environ)`` API has been replaced by
+  ``IRouter.request_context(environ)`` which should be used as a context
+  manager. See https://github.com/Pylons/pyramid/pull/3086
+
 1.9a2 (2017-05-09)
 ==================
 
