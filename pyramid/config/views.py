@@ -1950,8 +1950,7 @@ class StaticURLInfo(object):
                     kw['subpath'] = subpath
                     return request.route_url(route_name, **kw)
                 else:
-                    app_url, scheme, host, port, qs, anchor = \
-                        parse_url_overrides(kw)
+                    app_url, qs, anchor = parse_url_overrides(request, kw)
                     parsed = url_parse(url)
                     if not parsed.scheme:
                         url = urlparse.urlunparse(parsed._replace(

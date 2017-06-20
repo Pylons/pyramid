@@ -301,6 +301,8 @@ Contributors
 
 - Jeremy(Ching-Rui) Chen, 2017/04/19
 
+- Russell Ballestrini, 2017/05/06
+
 - Fang-Pen Lin, 2017/05/22
 
 - Volker Diels-Grabsch, 2017/06/09

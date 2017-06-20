@@ -31,45 +31,41 @@ from pyramid.traversal import (
 QUERY_SAFE = "/?:@!$&'()*+,;=" # RFC 3986
 ANCHOR_SAFE = QUERY_SAFE
 
-def parse_url_overrides(kw):
-    """Parse special arguments passed when generating urls.
-
-    The supplied dictionary is mutated, popping arguments as necessary.
-    Returns a 6-tuple of the format ``(app_url, scheme, host, port,
-    qs, anchor)``.
+def parse_url_overrides(request, kw):
     """
-    anchor = ''
-    qs = ''
-    app_url = None
-    host = None
-    scheme = None
-    port = None
+    Parse special arguments passed when generating urls.
 
-    if '_query' in kw:
-        query = kw.pop('_query')
+    The supplied dictionary is mutated when we pop arguments.
+    Returns a 3-tuple of the format:
+
+      ``(app_url, qs, anchor)``.
+
+    """
+    app_url = kw.pop('_app_url', None)
+    scheme = kw.pop('_scheme', None)
+    host = kw.pop('_host', None)
+    port = kw.pop('_port', None)
+    query = kw.pop('_query', '')
+    anchor = kw.pop('_anchor', '')
+
+    if app_url is None:
+        if (scheme is not None or host is not None or port is not None):
+            app_url = request._partial_application_url(scheme, host, port)
+        else:
+            app_url = request.application_url
+
+    qs = ''
+    if query:
         if isinstance(query, string_types):
             qs = '?' + url_quote(query, QUERY_SAFE)
-        elif query:
+        else:
             qs = '?' + urlencode(query, doseq=True)
 
-    if '_anchor' in kw:
-        anchor = kw.pop('_anchor')
-        anchor = url_quote(anchor, ANCHOR_SAFE)
-        anchor = '#' + anchor
+    frag = ''
+    if anchor:
+        frag = '#' + url_quote(anchor, ANCHOR_SAFE)
 
-    if '_app_url' in kw:
-        app_url = kw.pop('_app_url')
-
-    if '_host' in kw:
-        host = kw.pop('_host')
-
-    if '_scheme' in kw:
-        scheme = kw.pop('_scheme')
-
-    if '_port' in kw:
-        port = kw.pop('_port')
-
-    return app_url, scheme, host, port, qs, anchor
+    return app_url, qs, frag
 
 class URLMethodsMixin(object):
     """ Request methods mixin for BaseRequest having to do with URL
@@ -85,6 +81,7 @@ class URLMethodsMixin(object):
         passed, the ``port`` value is assumed to ``443``.  Likewise, if
         ``scheme`` is passed as ``http`` and ``port`` is not passed, the
         ``port`` value is assumed to be ``80``.
+
         """
         e = self.environ
         if scheme is None:
@@ -191,10 +188,6 @@ class URLMethodsMixin(object):
            as values, and a k=v pair will be placed into the query string for
            each value.
 
-        .. versionchanged:: 1.5
-           Allow the ``_query`` option to be a string to enable alternative
-           encodings.
-
         If a keyword argument ``_anchor`` is present, its string
         representation will be quoted per :rfc:`3986#section-3.5` and used as
         a named anchor in the generated URL
@@ -207,10 +200,6 @@ class URLMethodsMixin(object):
            If ``_anchor`` is passed as a string, it should be UTF-8 encoded. If
            ``_anchor`` is passed as a Unicode object, it will be converted to
            UTF-8 before being appended to the URL.
-
-        .. versionchanged:: 1.5
-           The ``_anchor`` option will be escaped instead of using
-           its raw string representation.
 
         If both ``_anchor`` and ``_query`` are specified, the anchor
         element will always follow the query element,
@@ -252,6 +241,18 @@ class URLMethodsMixin(object):
         If the route object which matches the ``route_name`` argument has
         a :term:`pregenerator`, the ``*elements`` and ``**kw``
         arguments passed to this function might be augmented or changed.
+
+        .. versionchanged:: 1.5
+           Allow the ``_query`` option to be a string to enable alternative
+           encodings.
+
+           The ``_anchor`` option will be escaped instead of using
+           its raw string representation.
+
+        .. versionchanged:: 1.9
+           If ``_query`` or ``_anchor`` are falsey (such as ``None`` or an
+           empty string) they will not be included in the generated url.
+
         """
         try:
             reg = self.registry
@@ -266,13 +267,7 @@ class URLMethodsMixin(object):
         if route.pregenerator is not None:
             elements, kw = route.pregenerator(self, elements, kw)
 
-        app_url, scheme, host, port, qs, anchor = parse_url_overrides(kw)
-
-        if app_url is None:
-            if (scheme is not None or host is not None or port is not None):
-                app_url = self._partial_application_url(scheme, host, port)
-            else:
-                app_url = self.application_url
+        app_url, qs, anchor = parse_url_overrides(self, kw)
 
         path = route.generate(kw) # raises KeyError if generate fails
 
@@ -311,13 +306,13 @@ class URLMethodsMixin(object):
            implemented in terms of :meth:`pyramid.request.Request.route_url`
            in just this way. As a result, any ``_app_url`` passed within the
            ``**kw`` values to ``route_path`` will be ignored.
+
         """
         kw['_app_url'] = self.script_name
         return self.route_url(route_name, *elements, **kw)
 
     def resource_url(self, resource, *elements, **kw):
         """
-
         Generate a string representing the absolute URL of the
         :term:`resource` object based on the ``wsgi.url_scheme``,
         ``HTTP_HOST`` or ``SERVER_NAME`` in the request, plus any
@@ -383,10 +378,6 @@ class URLMethodsMixin(object):
            as values, and a k=v pair will be placed into the query string for
            each value.
 
-        .. versionchanged:: 1.5
-           Allow the ``query`` option to be a string to enable alternative
-           encodings.
-
         If a keyword argument ``anchor`` is present, its string
         representation will be used as a named anchor in the generated URL
         (e.g. if ``anchor`` is passed as ``foo`` and the resource URL is
@@ -398,10 +389,6 @@ class URLMethodsMixin(object):
            If ``anchor`` is passed as a string, it should be UTF-8 encoded. If
            ``anchor`` is passed as a Unicode object, it will be converted to
            UTF-8 before being appended to the URL.
-
-        .. versionchanged:: 1.5
-           The ``anchor`` option will be escaped instead of using
-           its raw string representation.
 
         If both ``anchor`` and ``query`` are specified, the anchor element
         will always follow the query element,
@@ -431,9 +418,6 @@ class URLMethodsMixin(object):
         pass ``app_url=''``.  Passing ``app_url=''`` when the resource path is
         ``/baz/bar`` will return ``/baz/bar``.
 
-        .. versionadded:: 1.3
-           ``app_url``
-
         If ``app_url`` is passed and any of ``scheme``, ``port``, or ``host``
         are also passed, ``app_url`` will take precedence and the values
         passed for ``scheme``, ``host``, and/or ``port`` will be ignored.
@@ -445,9 +429,6 @@ class URLMethodsMixin(object):
         .. seealso::
 
             See also :ref:`overriding_resource_url_generation`.
-
-        .. versionadded:: 1.5
-           ``route_name``, ``route_kw``, and ``route_remainder_name``
            
         If ``route_name`` is passed, this function will delegate its URL
         production to the ``route_url`` function.  Calling
@@ -521,6 +502,23 @@ class URLMethodsMixin(object):
 
            For backwards compatibility purposes, this method is also
            aliased as the ``model_url`` method of request.
+
+        .. versionchanged:: 1.3
+           Added the ``app_url`` keyword argument.
+
+        .. versionchanged:: 1.5
+           Allow the ``query`` option to be a string to enable alternative
+           encodings.
+
+           The ``anchor`` option will be escaped instead of using
+           its raw string representation.
+
+           Added the ``route_name``, ``route_kw``, and
+           ``route_remainder_name`` keyword arguments.
+
+        .. versionchanged:: 1.9
+           If ``query`` or ``anchor`` are falsey (such as ``None`` or an
+           empty string) they will not be included in the generated url.
         """
         try:
             reg = self.registry
@@ -533,13 +531,15 @@ class URLMethodsMixin(object):
 
         virtual_path = getattr(url_adapter, 'virtual_path', None)
 
-        app_url = None
-        scheme = None
-        host = None
-        port = None
+        urlkw = {}
+        for name in (
+            'app_url', 'scheme', 'host', 'port', 'query', 'anchor'
+        ):
+            val = kw.get(name, None)
+            if val is not None:
+                urlkw['_' + name] = val
 
         if 'route_name' in kw:
-            newkw = {}
             route_name = kw['route_name']
             remainder = getattr(url_adapter, 'virtual_path_tuple', None)
             if remainder is None:
@@ -547,39 +547,16 @@ class URLMethodsMixin(object):
                 # virtual_path_tuple
                 remainder = tuple(url_adapter.virtual_path.split('/'))
             remainder_name = kw.get('route_remainder_name', 'traverse')
-            newkw[remainder_name] = remainder
+            urlkw[remainder_name] = remainder
 
-            for name in (
-                'app_url', 'scheme', 'host', 'port', 'query', 'anchor'
-                ):
-                val = kw.get(name, None)
-                if val is not None:
-                    newkw['_' + name] = val
-                
             if 'route_kw' in kw:
                 route_kw = kw.get('route_kw')
                 if route_kw is not None:
-                    newkw.update(route_kw)
+                    urlkw.update(route_kw)
 
-            return self.route_url(route_name, *elements, **newkw)
+            return self.route_url(route_name, *elements, **urlkw)
 
-        if 'app_url' in kw:
-            app_url = kw['app_url']
-
-        if 'scheme' in kw:
-            scheme = kw['scheme']
-
-        if 'host' in kw:
-            host = kw['host']
-
-        if 'port' in kw:
-            port = kw['port']
-
-        if app_url is None:
-            if scheme or host or port:
-                app_url = self._partial_application_url(scheme, host, port)
-            else:
-                app_url = self.application_url
+        app_url, qs, anchor = parse_url_overrides(self, urlkw)
 
         resource_url = None
         local_url = getattr(resource, '__resource_url__', None)
@@ -599,21 +576,6 @@ class URLMethodsMixin(object):
             # the resource did not handle its own url generation or the
             # __resource_url__ function returned None
             resource_url = app_url + virtual_path
-
-        qs = ''
-        anchor = ''
-
-        if 'query' in kw:
-            query = kw['query']
-            if isinstance(query, string_types):
-                qs = '?' + url_quote(query, QUERY_SAFE)
-            elif query:
-                qs = '?' + urlencode(query, doseq=True)
-
-        if 'anchor' in kw:
-            anchor = kw['anchor']
-            anchor = url_quote(anchor, ANCHOR_SAFE)
-            anchor = '#' + anchor
 
         if elements:
             suffix = _join_elements(elements)

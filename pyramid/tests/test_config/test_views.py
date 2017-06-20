@@ -3411,6 +3411,7 @@ class DummyRequest:
     subpath = ()
     matchdict = None
     request_iface  = IRequest
+    application_url = 'http://example.com/foo'
 
     def __init__(self, environ=None):
         if environ is None:
