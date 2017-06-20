@@ -34,8 +34,8 @@ unreleased
 - Support `_query=None` and `_anchor=None` in ``request.route_url`` as well
   as ``query=None`` and ``anchor=None`` in ``request.resource_url``.
   Previously this would cause an `?` and a `#`, respectively, in the url
-  with nothing after it.
-  See https://github.com/Pylons/pyramid/pull/3034
+  with nothing after it. Now the unnecessary parts are dropped from the
+  generated URL. See https://github.com/Pylons/pyramid/pull/3034
 
 - Revamp the ``IRouter`` API used by ``IExecutionPolicy`` to force
   pushing/popping the request threadlocals. The

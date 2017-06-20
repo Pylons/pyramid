@@ -43,6 +43,8 @@ Minor Feature Additions
 
 - Add a ``quote_via`` argument to :func:`pyramid.encode.urlencode` to follow the stdlib's version and enable custom quoting functions. See https://github.com/Pylons/pyramid/pull/3088
 
+- Support `_query=None` and `_anchor=None` in :meth:`pyramid.request.Request.route_url` as well as ``query=None`` and ``anchor=None`` in :meth:`pyramid.request.Request.resource_url`. Previously this would cause an `?` and a `#`, respectively, in the url with nothing after it. Now the unnecessary parts are dropped from the generated URL. See https://github.com/Pylons/pyramid/pull/3034
+
 Deprecations
 ------------
 
