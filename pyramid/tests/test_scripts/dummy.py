@@ -111,14 +111,21 @@ class DummyBootstrap(object):
         registry = kw.get('registry', self.registry)
         request = kw.get('request', self.request)
         request.registry = registry
-        return {
-            'app': self.app,
-            'registry': registry,
-            'request': request,
-            'root': self.root,
-            'root_factory': self.root_factory,
-            'closer': self.closer,
-        }
+        return DummyAppEnvironment(
+            app=self.app,
+            registry=registry,
+            request=request,
+            root=self.root,
+            root_factory=self.root_factory,
+            closer=self.closer,
+        )
+
+class DummyAppEnvironment(dict):
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        self['closer']()
 
 
 class DummyEntryPoint(object):

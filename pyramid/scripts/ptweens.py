@@ -80,29 +80,29 @@ class PTweensCommand(object):
         config_uri = self.args.config_uri
         config_vars = parse_vars(self.args.config_vars)
         self.setup_logging(config_uri, global_conf=config_vars)
-        env = self.bootstrap(config_uri, options=config_vars)
-        registry = env['registry']
-        tweens = self._get_tweens(registry)
-        if tweens is not None:
-            explicit = tweens.explicit
-            if explicit:
-                self.out('"pyramid.tweens" config value set '
-                         '(explicitly ordered tweens used)')
-                self.out('')
-                self.out('Explicit Tween Chain (used)')
-                self.out('')
-                self.show_chain(tweens.explicit)
-                self.out('')
-                self.out('Implicit Tween Chain (not used)')
-                self.out('')
-                self.show_chain(tweens.implicit())
-            else:
-                self.out('"pyramid.tweens" config value NOT set '
-                         '(implicitly ordered tweens used)')
-                self.out('')
-                self.out('Implicit Tween Chain')
-                self.out('')
-                self.show_chain(tweens.implicit())
+        with self.bootstrap(config_uri, options=config_vars) as env:
+            registry = env['registry']
+            tweens = self._get_tweens(registry)
+            if tweens is not None:
+                explicit = tweens.explicit
+                if explicit:
+                    self.out('"pyramid.tweens" config value set '
+                             '(explicitly ordered tweens used)')
+                    self.out('')
+                    self.out('Explicit Tween Chain (used)')
+                    self.out('')
+                    self.show_chain(tweens.explicit)
+                    self.out('')
+                    self.out('Implicit Tween Chain (not used)')
+                    self.out('')
+                    self.show_chain(tweens.implicit())
+                else:
+                    self.out('"pyramid.tweens" config value NOT set '
+                             '(implicitly ordered tweens used)')
+                    self.out('')
+                    self.out('Implicit Tween Chain')
+                    self.out('')
+                    self.show_chain(tweens.implicit())
         return 0
 
 if __name__ == '__main__': # pragma: no cover
