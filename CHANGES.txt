@@ -31,6 +31,12 @@ unreleased
   the stdlib's version and enable custom quoting functions.
   See https://github.com/Pylons/pyramid/pull/3088
 
+- Support `_query=None` and `_anchor=None` in ``request.route_url`` as well
+  as ``query=None`` and ``anchor=None`` in ``request.resource_url``.
+  Previously this would cause an `?` and a `#`, respectively, in the url
+  with nothing after it.
+  See https://github.com/Pylons/pyramid/pull/3034
+
 1.9a2 (2017-05-09)
 ==================
 
