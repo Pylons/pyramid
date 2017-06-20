@@ -1,5 +1,5 @@
-unreleased
-==========
+1.9b1 (2017-06-19)
+==================
 
 - Add an informative error message when unknown predicates are supplied. The
   new message suggests alternatives based on the list of known predicates.
