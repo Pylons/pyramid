@@ -36,7 +36,8 @@ def defaults():
 manager = ThreadLocalManager(default=defaults)
 
 def get_current_request():
-    """Return the currently active request or ``None`` if no request
+    """
+    Return the currently active request or ``None`` if no request
     is currently active.
 
     This function should be used *extremely sparingly*, usually only
@@ -44,11 +45,13 @@ def get_current_request():
     ``get_current_request`` outside a testing context because its
     usage makes it possible to write code that can be neither easily
     tested nor scripted.
+
     """
     return manager.get()['request']
 
 def get_current_registry(context=None): # context required by getSiteManager API
-    """Return the currently active :term:`application registry` or the
+    """
+    Return the currently active :term:`application registry` or the
     global application registry if no request is currently active.
 
     This function should be used *extremely sparingly*, usually only
@@ -56,5 +59,25 @@ def get_current_registry(context=None): # context required by getSiteManager API
     ``get_current_registry`` outside a testing context because its
     usage makes it possible to write code that can be neither easily
     tested nor scripted.
+
     """
     return manager.get()['registry']
+
+class RequestContext(object):
+    def __init__(self, request):
+        self.request = request
+
+    def begin(self):
+        request = self.request
+        registry = request.registry
+        manager.push({'registry': registry, 'request': request})
+        return request
+
+    def end(self):
+        manager.pop()
+
+    def __enter__(self):
+        return self.begin()
+
+    def __exit__(self, *args):
+        self.end()

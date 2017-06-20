@@ -641,22 +641,6 @@ class TestRouter(unittest.TestCase):
         result = router(environ, start_response)
         self.assertEqual(result, exception_response.app_iter)
 
-    def test_call_pushes_and_pops_threadlocal_manager(self):
-        from pyramid.interfaces import IViewClassifier
-        context = DummyContext()
-        self._registerTraverserFactory(context)
-        response = DummyResponse()
-        response.app_iter = ['Hello world']
-        view = DummyView(response)
-        environ = self._makeEnviron()
-        self._registerView(view, '', IViewClassifier, None, None)
-        router = self._makeOne()
-        start_response = DummyStartResponse()
-        router.threadlocal_manager = DummyThreadLocalManager()
-        router(environ, start_response)
-        self.assertEqual(len(router.threadlocal_manager.pushed), 1)
-        self.assertEqual(len(router.threadlocal_manager.popped), 1)
-
     def test_call_route_matches_and_has_factory(self):
         from pyramid.interfaces import IViewClassifier
         logger = self._registerLogger()
@@ -1311,6 +1295,48 @@ class TestRouter(unittest.TestCase):
         result = router(environ, start_response)
         self.assertEqual(result, ["Hello, world"])
 
+    def test_request_context_with_statement(self):
+        from pyramid.threadlocal import get_current_request
+        from pyramid.interfaces import IExecutionPolicy
+        from pyramid.request import Request
+        from pyramid.response import Response
+        registry = self.config.registry
+        result = []
+        def dummy_policy(environ, router):
+            with router.request_context(environ):
+                result.append(get_current_request())
+            result.append(get_current_request())
+            return Response(status=200, body=b'foo')
+        registry.registerUtility(dummy_policy, IExecutionPolicy)
+        router = self._makeOne()
+        resp = Request.blank('/test_path').get_response(router)
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.body, b'foo')
+        self.assertEqual(result[0].path_info, '/test_path')
+        self.assertEqual(result[1], None)
+
+    def test_request_context_manually(self):
+        from pyramid.threadlocal import get_current_request
+        from pyramid.interfaces import IExecutionPolicy
+        from pyramid.request import Request
+        from pyramid.response import Response
+        registry = self.config.registry
+        result = []
+        def dummy_policy(environ, router):
+            ctx = router.request_context(environ)
+            ctx.begin()
+            result.append(get_current_request())
+            ctx.end()
+            result.append(get_current_request())
+            return Response(status=200, body=b'foo')
+        registry.registerUtility(dummy_policy, IExecutionPolicy)
+        router = self._makeOne()
+        resp = Request.blank('/test_path').get_response(router)
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.body, b'foo')
+        self.assertEqual(result[0].path_info, '/test_path')
+        self.assertEqual(result[1], None)
+
 class DummyPredicate(object):
     def __call__(self, info, request):
         return True
@@ -1361,17 +1387,6 @@ class DummyResponse(object):
         self.environ = environ
         start_response(self.status, self.headerlist)
         return self.app_iter
-    
-class DummyThreadLocalManager:
-    def __init__(self):
-        self.pushed = []
-        self.popped = []
-
-    def push(self, val):
-        self.pushed.append(val)
-
-    def pop(self):
-        self.popped.append(True)
     
 class DummyAuthenticationPolicy:
     pass

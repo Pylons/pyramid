@@ -1,4 +1,3 @@
-import sys
 from zope.interface import (
     implementer,
     providedBy,
@@ -25,12 +24,11 @@ from pyramid.events import (
     BeforeTraversal,
     )
 
-from pyramid.compat import reraise
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.request import Request
 from pyramid.view import _call_view
 from pyramid.request import apply_request_extensions
-from pyramid.threadlocal import manager
+from pyramid.threadlocal import RequestContext
 
 from pyramid.traversal import (
     DefaultRootFactory,
@@ -42,8 +40,6 @@ class Router(object):
 
     debug_notfound = False
     debug_routematch = False
-
-    threadlocal_manager = manager
 
     def __init__(self, registry):
         q = registry.queryUtility
@@ -195,16 +191,35 @@ class Router(object):
         extensions = self.request_extensions
         if extensions is not None:
             apply_request_extensions(request, extensions=extensions)
-        return self.invoke_request(request, _use_tweens=use_tweens)
+        with RequestContext(request):
+            return self.invoke_request(request, _use_tweens=use_tweens)
 
-    def make_request(self, environ):
+    def request_context(self, environ):
         """
-        Configure a request object for use by the router.
+        Create a new request context from a WSGI environ.
 
-        The request is created using the configured
-        :class:`pyramid.interfaces.IRequestFactory` and will have any
-        configured request methods / properties added that were set by
-        :meth:`pyramid.config.Configurator.add_request_method`.
+        The request context is used to push/pop the threadlocals required
+        when processing the request. It also contains an initialized
+        :class:`pyramid.interfaces.IRequest` instance using the registered
+        :class:`pyramid.interfaces.IRequestFactory`. The context may be
+        used as a context manager to control the threadlocal lifecycle:
+
+        .. code-block:: python
+
+            with router.request_context(environ) as request:
+                ...
+
+        Alternatively, the context may be used without the ``with`` statement
+        by manually invoking its ``begin()`` and ``end()`` methods.
+
+        .. code-block:: python
+
+            ctx = router.request_context(environ)
+            request = ctx.begin()
+            try:
+                ...
+            finally:
+                ctx.end()
 
         """
         request = self.request_factory(environ)
@@ -213,7 +228,7 @@ class Router(object):
         extensions = self.request_extensions
         if extensions is not None:
             apply_request_extensions(request, extensions=extensions)
-        return request
+        return RequestContext(request)
 
     def invoke_request(self, request, _use_tweens=True):
         """
@@ -222,11 +237,8 @@ class Router(object):
 
         """
         registry = self.registry
-        has_listeners = self.registry.has_listeners
-        notify = self.registry.notify
-        threadlocals = {'registry': registry, 'request': request}
-        manager = self.threadlocal_manager
-        manager.push(threadlocals)
+        has_listeners = registry.has_listeners
+        notify = registry.notify
 
         if _use_tweens:
             handle_request = self.handle_request
@@ -234,23 +246,18 @@ class Router(object):
             handle_request = self.orig_handle_request
 
         try:
+            response = handle_request(request)
 
-            try:
-                response = handle_request(request)
+            if request.response_callbacks:
+                request._process_response_callbacks(response)
 
-                if request.response_callbacks:
-                    request._process_response_callbacks(response)
+            has_listeners and notify(NewResponse(request, response))
 
-                has_listeners and notify(NewResponse(request, response))
-
-                return response
-
-            finally:
-                if request.finished_callbacks:
-                    request._process_finished_callbacks()
+            return response
 
         finally:
-            manager.pop()
+            if request.finished_callbacks:
+                request._process_finished_callbacks()
 
     def __call__(self, environ, start_response):
         """
@@ -264,14 +271,8 @@ class Router(object):
         return response(environ, start_response)
 
 def default_execution_policy(environ, router):
-    request = router.make_request(environ)
-    try:
-        return router.invoke_request(request)
-    except Exception:
-        exc_info = sys.exc_info()
+    with router.request_context(environ) as request:
         try:
-            return request.invoke_exception_view(exc_info)
-        except HTTPNotFound:
-            reraise(*exc_info)
-        finally:
-            del exc_info  # avoid local ref cycle
+            return router.invoke_request(request)
+        except Exception:
+            return request.invoke_exception_view(reraise=True)
