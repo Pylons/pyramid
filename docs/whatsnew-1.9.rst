@@ -52,7 +52,7 @@ Deprecations
 
 - Retrieving CSRF token from the session has been deprecated in favor of equivalent methods in the :mod:`pyramid.csrf` module. The CSRF methods (``ISession.get_csrf_token`` and ``ISession.new_csrf_token``) are no longer required on the :class:`pyramid.interfaces.ISession` interface except when using the default :class:`pyramid.csrf.LegacySessionCSRFStoragePolicy`.
 
-  Also, ``pyramid.session.check_csrf_token`` is now located at :func:`pyramid.csrf.check_csrf_token`.
+  Also, ``pyramid.session.check_csrf_token`` is now located at :func:`pyramid.csrf.check_csrf_token` and ``pyramid.session.check_csrf_origin`` is moved to :func:`pyramid.csrf.check_csrf_origin`.
 
   See https://github.com/Pylons/pyramid/pull/2854 and https://github.com/Pylons/pyramid/pull/3019
 
