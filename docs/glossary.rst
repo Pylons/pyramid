@@ -349,7 +349,7 @@ Glossary
      `A full-featured Python web framework <https://www.djangoproject.com/>`_.
 
    Pylons
-     `A lightweight Python web framework <http://docs.pylonsproject.org/projects/pylons-webframework/en/latest/>`_
+     `A lightweight Python web framework <https://docs.pylonsproject.org/projects/pylons-webframework/en/latest/>`_
      and a predecessor of Pyramid.
 
    ZODB
@@ -367,7 +367,7 @@ Glossary
      file.  It was developed by Ian Bicking.
 
    plaster
-     `plaster <http://docs.pylonsproject.org/projects/plaster/en/latest/>`_ is
+     `plaster <https://docs.pylonsproject.org/projects/plaster/en/latest/>`_ is
      a library used by :app:`Pyramid` which acts as an abstraction between
      command-line scripts and the file format used to load the :term:`WSGI`
      components and application settings. By default :app:`Pyramid` ships
@@ -954,16 +954,16 @@ Glossary
    pyramid_handlers
      An add-on package which allows :app:`Pyramid` users to create classes
      that are analogues of Pylons 1 "controllers".  See
-     http://docs.pylonsproject.org/projects/pyramid_handlers/en/latest/.
+     https://docs.pylonsproject.org/projects/pyramid_handlers/en/latest/.
 
    pyramid_jinja2
      :term:`Jinja2` templating system bindings for Pyramid, documented at
-     http://docs.pylonsproject.org/projects/pyramid_jinja2/en/latest/.  This
+     https://docs.pylonsproject.org/projects/pyramid_jinja2/en/latest/.  This
      package also includes a scaffold named ``pyramid_jinja2_starter``, which
      creates an application package based on the Jinja2 templating system.
 
    Akhet
-     `Akhet <http://docs.pylonsproject.org/projects/akhet/en/latest/>`_ is a 
+     `Akhet <https://docs.pylonsproject.org/projects/akhet/en/latest/>`_ is a
      Pyramid library and demo application with a Pylons-like feel.
      It's most known for its former application scaffold, which helped 
      users transition from Pylons and those preferring a more Pylons-like API.
@@ -1006,7 +1006,7 @@ Glossary
      database information.  :mod:`pyramid_debugtoolbar` is configured into
      the ``development.ini`` of all applications which use a Pyramid
      :term:`cookiecutter`.  For more information, see
-     http://docs.pylonsproject.org/projects/pyramid_debugtoolbar/en/latest/.
+     https://docs.pylonsproject.org/projects/pyramid_debugtoolbar/en/latest/.
 
    scaffold
      A project template that generates some of the major parts of a Pyramid
@@ -1023,7 +1023,7 @@ Glossary
      used in production applications, because the logger can be configured to
      log to a file, to UNIX syslog, to the Windows Event Log, or even to
      email. See its `documentation
-     <http://docs.pylonsproject.org/projects/pyramid_exclog/en/latest/>`_.
+     <https://docs.pylonsproject.org/projects/pyramid_exclog/en/latest/>`_.
 
    console script
      A script written to the ``bin`` (on UNIX, or ``Scripts`` on Windows)
@@ -1078,7 +1078,7 @@ Glossary
       A :term:`WSGI` server that runs on UNIX and Windows under Python 2.7+
       and Python 3.3+.  Projects generated via Pyramid cookiecutters use
       Waitress as a WGSI server.  See
-      http://docs.pylonsproject.org/projects/waitress/en/latest/ for detailed
+      https://docs.pylonsproject.org/projects/waitress/en/latest/ for detailed
       information.
 
    Green Unicorn

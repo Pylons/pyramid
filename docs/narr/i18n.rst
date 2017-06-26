@@ -681,9 +681,9 @@ Jinja2 Pyramid i18n Support
 The add-on `pyramid_jinja2 <https://github.com/Pylons/pyramid_jinja2>`_
 provides a scaffold with an example of how to use internationalization with
 Jinja2 in Pyramid. See the documentation sections `Internalization (i18n)
-<http://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/#internalization-i18n>`_
+<https://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/#internalization-i18n>`_
 and `Paster Template I18N
-<http://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/#paster-template-i18n>`_.
+<https://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/#paster-template-i18n>`_.
 
 
 .. index::

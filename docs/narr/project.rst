@@ -1112,7 +1112,7 @@ Automatically Reloading Your Code
 During development, it can be really useful to automatically have the
 webserver restart when you make changes. ``pserve`` has a ``--reload`` switch
 to enable this. It uses the
-`hupper <http://docs.pylonsproject.org/projects/hupper/en/latest/>`_ package
+`hupper <https://docs.pylonsproject.org/projects/hupper/en/latest/>`_ package
 to enable this behavior. When your code crashes, ``hupper`` will wait for
 another change or the ``SIGHUP`` signal before restarting again.
 

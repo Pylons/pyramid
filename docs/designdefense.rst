@@ -1433,7 +1433,7 @@ object which *is not logically global*:
         # credentials were invalid    
 
 The `Pylons 1.X
-<http://docs.pylonsproject.org/projects/pylons-webframework/en/latest/>`_
+<https://docs.pylonsproject.org/projects/pylons-webframework/en/latest/>`_
 web framework uses a similar strategy.  It calls these things "Stacked Object
 Proxies", so, for purposes of this discussion, I'll do so as well.
 

@@ -462,10 +462,10 @@ assumptions:
    tutorial, we'll only be using :term:`URL dispatch` and :term:`SQLAlchemy`.
 
 .. _pyramid_jinja2:
-   http://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/
+   https://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/
 
 .. _pyramid_tm:
-   http://docs.pylonsproject.org/projects/pyramid-tm/en/latest/
+   https://docs.pylonsproject.org/projects/pyramid-tm/en/latest/
 
 .. _zope.sqlalchemy:
    https://pypi.python.org/pypi/zope.sqlalchemy
