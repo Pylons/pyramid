@@ -116,4 +116,4 @@ The expected result should look like the following:
    ................................
    32 passed in 9.90 seconds
 
-.. _webtest: http://docs.pylonsproject.org/projects/webtest/en/latest/
+.. _webtest: https://docs.pylonsproject.org/projects/webtest/en/latest/

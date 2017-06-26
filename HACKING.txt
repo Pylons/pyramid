@@ -140,7 +140,7 @@ Coding Style
 
 - PEP8 compliance.  Whitespace rules are relaxed: not necessary to put two
   newlines between classes.  But 79-column lines, in particular, are mandatory.
-  See http://docs.pylonsproject.org/en/latest/community/codestyle.html for more
+  See https://pylonsproject.org/community-coding-style-standards.html for more
   information.
 
 - Please do not remove trailing whitespace.  Configure your editor to reduce

@@ -450,12 +450,12 @@ templating languages including the following:
 
 .. _Chameleon: http://chameleon.readthedocs.org/en/latest/
 .. _pyramid_chameleon:
-   http://docs.pylonsproject.org/projects/pyramid-chameleon/en/latest/
+   https://docs.pylonsproject.org/projects/pyramid-chameleon/en/latest/
 
 .. _Jinja2: http://jinja.pocoo.org/docs/dev/
 .. _pyramid_jinja2:
-   http://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/
+   https://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/
 
 .. _Mako: http://www.makotemplates.org/
 .. _pyramid_mako:
-   http://docs.pylonsproject.org/projects/pyramid-mako/en/latest/
+   https://docs.pylonsproject.org/projects/pyramid-mako/en/latest/

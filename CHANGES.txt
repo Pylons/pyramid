@@ -77,7 +77,7 @@ Major Features
 - The file format used by all ``p*`` command line scripts such as ``pserve``
   and ``pshell``, as well as the ``pyramid.paster.bootstrap`` function
   is now replaceable thanks to a new dependency on
-  `plaster <http://docs.pylonsproject.org/projects/plaster/en/latest/>`_.
+  `plaster <https://docs.pylonsproject.org/projects/plaster/en/latest/>`_.
 
   For now, Pyramid is still shipping with integrated support for the
   PasteDeploy INI format by depending on the
@@ -93,7 +93,7 @@ Major Features
 
   The first library to use this feature is
   `pyramid_retry
-  <http://docs.pylonsproject.org/projects/pyramid-retry/en/latest/>`_.
+  <https://docs.pylonsproject.org/projects/pyramid-retry/en/latest/>`_.
 
   See https://github.com/Pylons/pyramid/pull/2964
 

@@ -6,7 +6,7 @@ This article explains the new features in :app:`Pyramid` version 1.9 as compared
 Major Feature Additions
 -----------------------
 
-- The file format used by all ``p*`` command line scripts such as ``pserve`` and ``pshell``, as well as the :func:`pyramid.paster.bootstrap` function is now replaceable thanks to a new dependency on `plaster <http://docs.pylonsproject.org/projects/plaster/en/latest/>`_.
+- The file format used by all ``p*`` command line scripts such as ``pserve`` and ``pshell``, as well as the :func:`pyramid.paster.bootstrap` function is now replaceable thanks to a new dependency on `plaster <https://docs.pylonsproject.org/projects/plaster/en/latest/>`_.
 
   For now, Pyramid is still shipping with integrated support for the PasteDeploy INI format by depending on the `plaster_pastedeploy <https://github.com/Pylons/plaster_pastedeploy>`_ binding library. This may change in the future so it is recommended for applications to start depending on the appropriate plaster binding for their needs.
 
@@ -16,7 +16,7 @@ Major Feature Additions
 
   The execution policy can be replaced using the new :meth:`pyramid.config.Configurator.set_execution_policy` config directive.
 
-  The first library to use this feature is `pyramid_retry <http://docs.pylonsproject.org/projects/pyramid-retry/en/latest/>`_.
+  The first library to use this feature is `pyramid_retry <https://docs.pylonsproject.org/projects/pyramid-retry/en/latest/>`_.
 
   See https://github.com/Pylons/pyramid/pull/2964
 
