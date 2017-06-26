@@ -35,8 +35,8 @@ class PyramidTemplate(Template):
         msg = dedent(
             """
             %(separator)s
-            Tutorials:     http://docs.pylonsproject.org/projects/pyramid_tutorials/en/latest/
-            Documentation: http://docs.pylonsproject.org/projects/pyramid/en/latest/
+            Tutorials:     https://docs.pylonsproject.org/projects/pyramid_tutorials/en/latest/
+            Documentation: https://docs.pylonsproject.org/projects/pyramid/en/latest/
             Twitter:       https://twitter.com/PylonsProject
             Mailing List:  https://groups.google.com/forum/#!forum/pylons-discuss
 

@@ -96,7 +96,7 @@ HTML Version and Source Code
 ----------------------------
 
 An HTML version of this book is freely available via
-http://docs.pylonsproject.org/projects/pyramid/en/latest/
+https://docs.pylonsproject.org/projects/pyramid/en/latest/
 
 The source code for the examples used in this book are available
 within the :app:`Pyramid` software distribution, always available

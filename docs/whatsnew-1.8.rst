@@ -33,7 +33,7 @@ Major Feature Additions
   See https://github.com/Pylons/pyramid/pull/2660
 
 - ``pserve --reload`` now uses the
-  `hupper <http://docs.pylonsproject.org/projects/hupper/en/latest/>`_
+  `hupper <https://docs.pylonsproject.org/projects/hupper/en/latest/>`_
   library to monitor file changes. This comes with many improvements:
 
   - If the `watchdog <http://pythonhosted.org/watchdog/>`_ package is
@@ -212,7 +212,7 @@ Documentation Enhancements
   https://github.com/Pylons/pyramid/pull/2838
 
 - Add `pyramid_nacl_session
-  <http://docs.pylonsproject.org/projects/pyramid-nacl-session/en/latest/>`_
+  <https://docs.pylonsproject.org/projects/pyramid-nacl-session/en/latest/>`_
   to session factories. See https://github.com/Pylons/pyramid/issues/2791
 
 - Update HACKING.txt from stale branch that was never merged to master.

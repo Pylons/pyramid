@@ -379,13 +379,13 @@ assumptions:
    tutorial, we'll only be using :term:`traversal` and :term:`ZODB`.
 
 .. _pyramid_chameleon:
-   http://docs.pylonsproject.org/projects/pyramid-chameleon/en/latest/
+   https://docs.pylonsproject.org/projects/pyramid-chameleon/en/latest/
 
 .. _pyramid_tm:
-   http://docs.pylonsproject.org/projects/pyramid-tm/en/latest/
+   https://docs.pylonsproject.org/projects/pyramid-tm/en/latest/
 
 .. _pyramid_zodbconn:
-   http://docs.pylonsproject.org/projects/pyramid-zodbconn/en/latest/
+   https://docs.pylonsproject.org/projects/pyramid-zodbconn/en/latest/
 
 .. _transaction:
    http://zodb.readthedocs.org/en/latest/transactions.html
