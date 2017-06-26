@@ -5,7 +5,7 @@ All projects under the Pylons Projects, including this one, follow the
 guidelines established at [How to
 Contribute](https://pylonsproject.org/community-how-to-contribute.html) and
 [Coding Style and
-Standards](http://docs.pylonsproject.org/en/latest/community/codestyle.html).
+Standards](https://pylonsproject.org/community-coding-style-standards.html).
 
 You can contribute to this project in several ways.
 
@@ -49,7 +49,7 @@ Building documentation for a Pylons Project project
 improve the process for Windows users are welcome by submitting an issue or a
 pull request. Windows users may find it helpful to follow the guide [Installing
 Pyramid on a Windows
-System](http://docs.pylonsproject.org/projects/pyramid/en/latest/narr/install.html#installing-pyramid-on-a-windows-system).
+System](https://docs.pylonsproject.org/projects/pyramid/en/latest/narr/install.html#installing-pyramid-on-a-windows-system).
 
 1.  Fork the repo on GitHub by clicking the [Fork] button.
 2.  Clone your fork into a workspace on your local machine.

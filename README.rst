@@ -6,7 +6,7 @@ Pyramid
         :alt: 1.8-branch Travis CI Status
 
 .. image:: https://readthedocs.org/projects/pyramid/badge/?version=1.8-branch
-        :target: http://docs.pylonsproject.org/projects/pyramid/en/1.8-branch/
+        :target: https://docs.pylonsproject.org/projects/pyramid/en/1.8-branch/
         :alt: 1.8-branch Documentation Status
 
 .. image:: https://img.shields.io/badge/irc-freenode-blue.svg
@@ -40,7 +40,7 @@ Support and Documentation
 -------------------------
 
 See `Pyramid Support and Development
-<http://docs.pylonsproject.org/projects/pyramid/en/latest/#support-and-development>`_
+<https://docs.pylonsproject.org/projects/pyramid/en/latest/#support-and-development>`_
 for documentation, reporting bugs, and getting support.
 
 Developing and Contributing

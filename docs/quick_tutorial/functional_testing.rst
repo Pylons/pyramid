@@ -14,7 +14,7 @@ Unit tests are a common and popular approach to test-driven development (TDD).
 In web applications, though, the templating and entire apparatus of a web site
 are important parts of the delivered quality. We'd like a way to test these.
 
-`WebTest <http://docs.pylonsproject.org/projects/webtest/en/latest/>`_ is a
+`WebTest <https://docs.pylonsproject.org/projects/webtest/en/latest/>`_ is a
 Python package that does functional testing. With WebTest you can write tests
 which simulate a full HTTP request against a WSGI application, then test the
 information in the response. For speed purposes, WebTest skips the
