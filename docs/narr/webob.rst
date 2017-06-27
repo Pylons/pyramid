@@ -27,7 +27,7 @@ functionality to the standard WebOb request, which is documented in the
 :ref:`request_module` API documentation.
 
 WebOb provides objects for HTTP requests and responses.  Specifically it does
-this by wrapping the `WSGI <http://wsgi.readthedocs.org/en/latest/>`_ request
+this by wrapping the `WSGI <https://wsgi.readthedocs.io/en/latest/>`_ request
 environment and response status, header list, and app_iter (body) values.
 
 WebOb request and response objects provide many conveniences for parsing WSGI
@@ -88,7 +88,7 @@ below.
 ``req.urlvars`` and ``req.urlargs``
     ``req.urlvars`` are the keyword parameters associated with the request URL.
     ``req.urlargs`` are the positional parameters. These are set by products
-    like `Routes <http://routes.readthedocs.org/en/latest/>`_ and `Selector
+    like `Routes <https://routes.readthedocs.io/en/latest/>`_ and `Selector
     <https://github.com/lukearno/selector>`_.
 
 Also for standard HTTP request headers, there are usually attributes such as

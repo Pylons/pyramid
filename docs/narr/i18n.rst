@@ -647,7 +647,7 @@ before being rendered:
 
 The features represented by attributes of the ``i18n`` namespace of Chameleon
 will also consult the :app:`Pyramid` translations. See
-http://chameleon.readthedocs.org/en/latest/reference.html#translation-i18n.
+https://chameleon.readthedocs.io/en/latest/reference.html#translation-i18n.
 
 .. note::
 

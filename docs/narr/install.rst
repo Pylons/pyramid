@@ -54,7 +54,7 @@ recommended to install the latest 3.x version of Python.
 You can install the latest verion of Python for Mac OS X from the binaries on
 `python.org <https://www.python.org/downloads/mac-osx/>`_.
 
-Alternatively, you can use the `homebrew <http://brew.sh/>`_ package manager.
+Alternatively, you can use the `homebrew <https://brew.sh/>`_ package manager.
 
 .. code-block:: text
 
@@ -157,7 +157,7 @@ application, rather than being installed system wide.
 
 .. seealso:: See the Python Packaging Authority's (PyPA) documention
    `Requirements for Installing Packages
-   <https://packaging.python.org/en/latest/installing/#requirements-for-installing-packages>`_
+   <https://packaging.python.org/tutorials/installing-packages/#requirements-for-installing-packages>`_
    for full details.
 
 

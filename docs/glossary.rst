@@ -321,7 +321,7 @@ Glossary
      :term:`principal` (or principals) associated with a request.
 
    WSGI
-     `Web Server Gateway Interface <http://wsgi.readthedocs.org/en/latest/>`_.
+     `Web Server Gateway Interface <https://wsgi.readthedocs.io/en/latest/>`_.
      This is a Python standard for connecting web applications to web servers,
      similar to the concept of Java Servlets.  :app:`Pyramid` requires that
      your application be served as a WSGI application.
@@ -330,8 +330,8 @@ Glossary
      *Middleware* is a :term:`WSGI` concept.  It is a WSGI component
      that acts both as a server and an application.  Interesting uses
      for middleware exist, such as caching, content-transport
-     encoding, and other functions.  See `WSGI.org
-     <http://wsgi.readthedocs.org/en/latest/>`_ or `PyPI
+     encoding, and other functions.  See `WSGI documentation
+     <https://wsgi.readthedocs.io/en/latest/>`_ or `PyPI
      <https://pypi.python.org/pypi>`_ to find middleware for your application.
 
    pipeline
@@ -339,7 +339,7 @@ Glossary
      server, a WSGI application, with a set of :term:`middleware` in-between.
 
    Zope
-     `The Z Object Publishing Framework <http://zope.org>`_, a
+     `The Z Object Publishing Framework <http://www.zope.org/en/latest/>`_, a
      full-featured Python web framework.
 
    Grok
@@ -357,7 +357,7 @@ Glossary
       Python object store.
 
    WebOb
-     `WebOb <http://webob.org>`_ is a WSGI request/response
+     `WebOb <https://webob.org>`_ is a WSGI request/response
      library created by Ian Bicking.
 
    PasteDeploy
@@ -375,7 +375,7 @@ Glossary
      integrated support for loading a :term:`PasteDeploy` INI file.
 
    Chameleon
-     `chameleon <https://chameleon.readthedocs.org/en/latest/>`_ is an
+     `chameleon <https://chameleon.readthedocs.io/en/latest/>`_ is an
      attribute language template compiler which supports the :term:`ZPT`
      templating specification. It is written and maintained by Malthe Borch. It
      has several extensions, such as the ability to use bracketed (Mako-style)
@@ -401,7 +401,7 @@ Glossary
      A `text templating language <http://jinja.pocoo.org/>`_ by Armin Ronacher.
 
    Routes
-     A `system by Ben Bangert <http://routes.readthedocs.org/en/latest/>`_
+     A `system by Ben Bangert <https://routes.readthedocs.io/en/latest/>`_
      which parses URLs and compares them against a number of user defined
      mappings. The URL pattern matching syntax in :app:`Pyramid` is inspired by
      the Routes syntax (which was inspired by Ruby On Rails pattern syntax).
@@ -500,7 +500,7 @@ Glossary
      information.
 
    repoze.who
-     `Authentication middleware <http://repozewho.readthedocs.org/en/latest/>`_
+     `Authentication middleware <https://repozewho.readthedocs.io/en/latest/>`_
      for :term:`WSGI` applications.  It can be used by :app:`Pyramid` to
      provide authentication information.
 
@@ -576,7 +576,7 @@ Glossary
      :ref:`adding_and_overriding_renderers` for more information.
 
    mod_wsgi
-     `mod_wsgi <https://modwsgi.readthedocs.io>`_ is an Apache
+     `mod_wsgi <https://modwsgi.readthedocs.io/en/develop/>`_ is an Apache
      module developed by Graham Dumpleton.  It allows :term:`WSGI` applications
      (such as applications developed using :app:`Pyramid`) to be served using
      the Apache web server.
@@ -1130,7 +1130,7 @@ Glossary
       The :term:`Python Packaging Authority` formerly recommended using the
       ``pyvenv`` command for `creating virtual environments on Python 3.4 and
       3.5
-      <https://packaging.python.org/en/latest/installing/#creating-virtual-environments>`_,
+      <https://packaging.python.org/tutorials/installing-packages/#creating-virtual-environments>`_,
       but it was deprecated in 3.6 in favor of ``python3 -m venv`` on UNIX or
       ``python -m venv`` on Windows, which is backward compatible on Python
       3.3 and greater.

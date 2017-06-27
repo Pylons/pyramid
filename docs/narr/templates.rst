@@ -448,7 +448,7 @@ templating languages including the following:
 | Mako_                     | pyramid_mako_              | .mak, .mako        |
 +---------------------------+----------------------------+--------------------+
 
-.. _Chameleon: http://chameleon.readthedocs.org/en/latest/
+.. _Chameleon: https://chameleon.readthedocs.io/en/latest/
 .. _pyramid_chameleon:
    https://docs.pylonsproject.org/projects/pyramid-chameleon/en/latest/
 
