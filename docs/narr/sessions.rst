@@ -174,10 +174,10 @@ pyramid_beaker_         Beaker_ Session factory for Pyramid
 .. _PyNaCl: https://pynacl.readthedocs.io/en/latest/secret/
 
 .. _pyramid_redis_sessions: https://pypi.python.org/pypi/pyramid_redis_sessions
-.. _Redis: http://redis.io/
+.. _Redis: https://redis.io/
 
 .. _pyramid_beaker: https://pypi.python.org/pypi/pyramid_beaker
-.. _Beaker: http://beaker.readthedocs.org/en/latest/
+.. _Beaker: https://beaker.readthedocs.io/en/latest/
 
 .. index::
    single: session factory (custom)

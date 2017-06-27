@@ -740,7 +740,7 @@ testing, as well as distributing your application.
    ``setup.py`` is the de facto standard which Python developers use to
    distribute their reusable code.  You can read more about ``setup.py`` files
    and their usage in the `Python Packaging User Guide
-   <https://packaging.python.org/en/latest/>`_ and `Setuptools documentation
+   <https://packaging.python.org/>`_ and `Setuptools documentation
    <http://pythonhosted.org/setuptools/>`_.
 
 Our generated ``setup.py`` looks like this:
