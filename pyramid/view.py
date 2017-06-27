@@ -186,7 +186,7 @@ class view_config(object):
     out, its default will be the equivalent ``add_view`` default.
 
     Two additional keyword arguments which will be passed to the
-    :term:`venusian` ``attach`` function are ``_depth`` and ``category``.
+    :term:`venusian` ``attach`` function are ``_depth`` and ``_category``.
 
     ``_depth`` is provided for people who wish to reuse this class from another
     decorator. The default value is ``0`` and should be specified relative to
@@ -195,7 +195,7 @@ class view_config(object):
     Venusian checks if the decorator is being used in a class or module
     context. It's not often used, but it can be useful in this circumstance.
 
-    ``category`` sets the decorator category name. It can be useful in
+    ``_category`` sets the decorator category name. It can be useful in
     combination with the ``category`` argument of ``scan`` to control which
     views should be processed.
 
@@ -222,7 +222,7 @@ class view_config(object):
     def __call__(self, wrapped):
         settings = self.__dict__.copy()
         depth = settings.pop('_depth', 0)
-        category = settings.pop('category', 'pyramid')
+        category = settings.pop('_category', 'pyramid')
 
         def callback(context, name, ob):
             config = context.config.with_package(info.module)

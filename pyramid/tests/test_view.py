@@ -577,7 +577,7 @@ class TestViewConfigDecorator(unittest.TestCase):
         self.assertEqual(category, 'pyramid')
 
     def test_call_withcategory(self):
-        decorator = self._makeOne(category='not_pyramid')
+        decorator = self._makeOne(_category='not_pyramid')
         venusian = DummyVenusian()
         decorator.venusian = venusian
         def foo(): pass
