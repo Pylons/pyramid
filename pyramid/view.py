@@ -196,10 +196,10 @@ class view_config(object):
     context. It's not often used, but it can be useful in this circumstance.
 
     ``category`` sets the decorator category name. It can be useful in
-    combination with the ``category`` argument to ``scan`` to control which
+    combination with the ``category`` argument of ``scan`` to control which
     views should be processed.
 
-    See the ``attach`` function in Venusian for more information.
+    See the :py:func:`venusian.attach` function in Venusian for more information.
     
     .. seealso::
     
