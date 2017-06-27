@@ -1,3 +1,10 @@
+1.9 (2017-06-26)
+================
+
+- No major changes from 1.9b1.
+
+- Updated documentation links for ``docs.pylonsproject.org`` to use HTTPS.
+
 1.9b1 (2017-06-19)
 ==================
 
