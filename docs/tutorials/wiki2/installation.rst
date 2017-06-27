@@ -471,4 +471,4 @@ assumptions:
    https://pypi.python.org/pypi/zope.sqlalchemy
 
 .. _transaction:
-   http://zodb.readthedocs.org/en/latest/transactions.html
+   https://zodb.readthedocs.io/en/latest/transactions.html
