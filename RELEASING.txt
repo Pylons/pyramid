@@ -121,6 +121,13 @@ Update previous version (final releases only)
 - Configure RTD to point the "latest" alias to the new release version of the
   docs.
 
+
+Cookiecutters
+-------------
+
+- For each cookiecutter, clone the newly released branch to "latest" branch.
+
+
 Marketing and communications
 ----------------------------
 
