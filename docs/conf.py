@@ -148,6 +148,7 @@ if book:
 #     'whatsnew-1.6': 'index',
 #     'whatsnew-1.7': 'index',
 #     'whatsnew-1.8': 'index',
+#     'whatsnew-1.9': 'index',
 #     'tutorials/gae/index': 'index',
 #     'api/chameleon_text': 'api',
 #     'api/chameleon_zpt': 'api',
