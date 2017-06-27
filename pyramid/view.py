@@ -215,12 +215,13 @@ class view_config(object):
     def __call__(self, wrapped):
         settings = self.__dict__.copy()
         depth = settings.pop('_depth', 0)
+        category = settings.pop('category', 'pyramid')
 
         def callback(context, name, ob):
             config = context.config.with_package(info.module)
             config.add_view(view=ob, **settings)
 
-        info = self.venusian.attach(wrapped, callback, category='pyramid',
+        info = self.venusian.attach(wrapped, callback, category=category,
                                     depth=depth + 1)
 
         if info.scope == 'class':

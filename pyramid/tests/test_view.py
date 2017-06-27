@@ -566,6 +566,26 @@ class TestViewConfigDecorator(unittest.TestCase):
         decorator(foo)
         self.assertEqual(venusian.depth, 2)
 
+    def test_call_withoutcategory(self):
+        decorator = self._makeOne()
+        venusian = DummyVenusian()
+        decorator.venusian = venusian
+        def foo(): pass
+        decorator(foo)
+        attachments = venusian.attachments
+        category = attachments[0][2]
+        self.assertEqual(category, 'pyramid')
+
+    def test_call_withcategory(self):
+        decorator = self._makeOne(category='not_pyramid')
+        venusian = DummyVenusian()
+        decorator.venusian = venusian
+        def foo(): pass
+        decorator(foo)
+        attachments = venusian.attachments
+        category = attachments[0][2]
+        self.assertEqual(category, 'not_pyramid')
+
 class Test_append_slash_notfound_view(BaseTest, unittest.TestCase):
     def _callFUT(self, context, request):
         from pyramid.view import append_slash_notfound_view
