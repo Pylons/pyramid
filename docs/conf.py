@@ -57,7 +57,7 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinxcontrib.autoprogram',
     # enable pylons_sphinx_latesturl when this branch is no longer "latest"
-    # 'pylons_sphinx_latesturl',
+    'pylons_sphinx_latesturl',
     ]
 
 # Looks for objects in external projects
@@ -134,23 +134,23 @@ if book:
 # Options for HTML output
 # -----------------------
 # enable pylons_sphinx_latesturl when this branch is no longer "latest"
-# pylons_sphinx_latesturl_base = (
-#     'https://docs.pylonsproject.org/projects/pyramid/en/latest/')
-# pylons_sphinx_latesturl_pagename_overrides = {
-#     # map old pagename -> new pagename
-#     'whatsnew-1.0': 'index',
-#     'whatsnew-1.1': 'index',
-#     'whatsnew-1.2': 'index',
-#     'whatsnew-1.3': 'index',
-#     'whatsnew-1.4': 'index',
-#     'whatsnew-1.5': 'index',
-#     'whatsnew-1.6': 'index',
-#     'whatsnew-1.7': 'index',
-#     'whatsnew-1.8': 'index',
-#     'tutorials/gae/index': 'index',
-#     'api/chameleon_text': 'api',
-#     'api/chameleon_zpt': 'api',
-# }
+pylons_sphinx_latesturl_base = (
+    'https://docs.pylonsproject.org/projects/pyramid/en/latest/')
+pylons_sphinx_latesturl_pagename_overrides = {
+    # map old pagename -> new pagename
+    'whatsnew-1.0': 'index',
+    'whatsnew-1.1': 'index',
+    'whatsnew-1.2': 'index',
+    'whatsnew-1.3': 'index',
+    'whatsnew-1.4': 'index',
+    'whatsnew-1.5': 'index',
+    'whatsnew-1.6': 'index',
+    'whatsnew-1.7': 'index',
+    'whatsnew-1.8': 'index',
+    'tutorials/gae/index': 'index',
+    'api/chameleon_text': 'api',
+    'api/chameleon_zpt': 'api',
+}
 
 html_theme = 'pyramid'
 html_theme_path = pylons_sphinx_themes.get_html_themes_path()
@@ -160,7 +160,7 @@ html_theme_options = dict(
     # pre-release status: true; else: false.
     in_progress='false',
     # On branches previous to "latest": true; else: false.
-    outdated='false',
+    outdated='true',
     )
 
 # The name for this set of Sphinx documents.  If None, it defaults to
