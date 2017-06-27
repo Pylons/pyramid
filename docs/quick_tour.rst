@@ -510,7 +510,7 @@ Let's use the cookiecutter ``pyramid-cookiecutter-starter`` to create a starter 
 
 .. code-block:: bash
 
-    $ $VENV/bin/cookiecutter gh:Pylons/pyramid-cookiecutter-starter --checkout 1.9-branch
+    $ $VENV/bin/cookiecutter gh:Pylons/pyramid-cookiecutter-starter --checkout master
 
 If prompted for the first item, accept the default ``yes`` by hitting return.
 
@@ -858,7 +858,7 @@ Pyramid and SQLAlchemy are great friends. That friendship includes a cookiecutte
 .. code-block:: bash
 
     $ cd ~
-    $ env/bin/cookiecutter gh:Pylons/pyramid-cookiecutter-alchemy --checkout 1.9-branch
+    $ env/bin/cookiecutter gh:Pylons/pyramid-cookiecutter-alchemy --checkout master
 
 If prompted for the first item, accept the default ``yes`` by hitting return.
 
