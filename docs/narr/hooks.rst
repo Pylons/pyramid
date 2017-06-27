@@ -1059,8 +1059,8 @@ enabling you to set up the utility in advance:
        server = make_server('0.0.0.0', 8080, app)
        server.serve_forever()
 
-For full details, please read the `Venusian documentation
-<http://docs.repoze.org/venusian>`_.
+For full details, please read the :ref:`Venusian documentation <venusian:venusian>`.
+
 
 .. _registering_tweens:
 
