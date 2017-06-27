@@ -185,14 +185,21 @@ class view_config(object):
     :meth:`pyramid.config.Configurator.add_view`.  If any argument is left
     out, its default will be the equivalent ``add_view`` default.
 
-    An additional keyword argument named ``_depth`` is provided for people who
-    wish to reuse this class from another decorator.  The default value is
-    ``0`` and should be specified relative to the ``view_config`` invocation.
-    It will be passed in to the :term:`venusian` ``attach`` function as the
-    depth of the callstack when Venusian checks if the decorator is being used
-    in a class or module context.  It's not often used, but it can be useful
-    in this circumstance.  See the ``attach`` function in Venusian for more
-    information.
+    Two additional keyword arguments which will be passed to the
+    :term:`venusian` ``attach`` function are ``_depth`` and ``_category``.
+
+    ``_depth`` is provided for people who wish to reuse this class from another
+    decorator. The default value is ``0`` and should be specified relative to
+    the ``view_config`` invocation. It will be passed in to the
+    :term:`venusian` ``attach`` function as the depth of the callstack when
+    Venusian checks if the decorator is being used in a class or module
+    context. It's not often used, but it can be useful in this circumstance.
+
+    ``_category`` sets the decorator category name. It can be useful in
+    combination with the ``category`` argument of ``scan`` to control which
+    views should be processed.
+
+    See the :py:func:`venusian.attach` function in Venusian for more information.
     
     .. seealso::
     
@@ -215,12 +222,13 @@ class view_config(object):
     def __call__(self, wrapped):
         settings = self.__dict__.copy()
         depth = settings.pop('_depth', 0)
+        category = settings.pop('_category', 'pyramid')
 
         def callback(context, name, ob):
             config = context.config.with_package(info.module)
             config.add_view(view=ob, **settings)
 
-        info = self.venusian.attach(wrapped, callback, category='pyramid',
+        info = self.venusian.attach(wrapped, callback, category=category,
                                     depth=depth + 1)
 
         if info.scope == 'class':
