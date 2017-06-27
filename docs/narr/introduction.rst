@@ -52,7 +52,7 @@ Modern
 Tested
 ~~~~~~
 
-Untested code is broken by design. The :app:`Pyramid` community has a strong testing culture and our framework reflects that. Every release of :app:`Pyramid` has 100% statement coverage (as measured by `coverage <https://coverage.readthedocs.io>`_) and 95% decision/condition coverage. (as measured by `instrumental <http://instrumental.readthedocs.io/en/latest/intro.html>`_) It is automatically tested using `Travis <https://travis-ci.org/Pylons/pyramid>`_ and `Jenkins <http://jenkins.pylonsproject.org/job/pyramid/>`_ on supported versions of Python after each commit to its GitHub repository. `Official Pyramid add-ons <https://trypyramid.com/resources-extending-pyramid.html>`_ are held to a similar testing standard.
+Untested code is broken by design. The :app:`Pyramid` community has a strong testing culture and our framework reflects that. Every release of :app:`Pyramid` has 100% statement coverage (as measured by `coverage <http://coverage.readthedocs.io/en/latest/>`_) and 95% decision/condition coverage. (as measured by `instrumental <http://instrumental.readthedocs.io/en/latest/intro.html>`_) It is automatically tested using `Travis <https://travis-ci.org/Pylons/pyramid>`_ and `Jenkins <http://jenkins.pylonsproject.org/job/pyramid/>`_ on supported versions of Python after each commit to its GitHub repository. `Official Pyramid add-ons <https://trypyramid.com/resources-extending-pyramid.html>`_ are held to a similar testing standard.
 
 We still find bugs in :app:`Pyramid`, but we've noticed we find a lot fewer of them while working on projects with a solid testing regime.
 
@@ -324,7 +324,7 @@ Build fast applications
 
 The :app:`Pyramid` core is fast. It has been engineered from the ground up for speed. It only does as much work as absolutely necessary when you ask it to get a job done. If you need speed from your application, :app:`Pyramid` is the right choice for you.
 
-Example: http://blog.curiasolutions.com/pages/the-great-web-framework-shootout.html
+Example: https://blog.curiasolutions.com/pages/the-great-web-framework-shootout.html
 
 Store session data
 ~~~~~~~~~~~~~~~~~~

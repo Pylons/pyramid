@@ -388,4 +388,4 @@ assumptions:
    https://docs.pylonsproject.org/projects/pyramid-zodbconn/en/latest/
 
 .. _transaction:
-   http://zodb.readthedocs.org/en/latest/transactions.html
+   https://zodb.readthedocs.io/en/latest/transactions.html
