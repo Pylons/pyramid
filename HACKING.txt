@@ -51,11 +51,6 @@ repo, from which you can submit a pull request.
   To use the instructions in the steps that follow literally, use the
   ``export VENV=~/hack-on-pyramid/env`` command.
 
-- Install ``setuptools-git`` into the virtual environment (for good measure, as
-  we're using git to do version control):
-
-    $ $VENV/bin/pip install setuptools-git
-
 - Install Pyramid from the checkout into the virtual environment, where the
   current working directory is the ``pyramid`` checkout directory. We will
   install Pyramid in editable (development) mode as well as its testing

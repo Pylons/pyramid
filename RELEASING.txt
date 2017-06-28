@@ -71,15 +71,9 @@ Prepare new release branch
 
 - Change setup.py version to the release version number.
 
-- Make sure PyPI long description renders (requires ``readme_renderer``
-  installed into your Python)::
-
-  $ python setup.py check -r -s -m
-
 - Create a release tag.
 
-- Make sure your Python has ``setuptools-git``, ``twine``, and ``wheel``
-  installed and release to PyPI::
+- Build and publish to PyPI::
 
   $ python setup.py sdist bdist_wheel
   $ twine upload dist/pyramid-X.X-*
@@ -163,9 +157,8 @@ https://github.com/Pylons/pyramid/issues
 ```
 Pyramid 1.X.X has been released.
 
-Here are the changes:
-
-<<changes>>
+The full changelog is here:
+https://docs.pylonsproject.org/projects/pyramid/en/1.X-branch/changes.html
 
 What's New In Pyramid 1.X:
 https://docs.pylonsproject.org/projects/pyramid/en/1.X-branch/whatsnew-1.X.html
