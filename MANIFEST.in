@@ -1,0 +1,16 @@
+graft pyramid
+graft docs
+prune docs/_build
+
+include README.rst
+include CHANGES.txt HISTORY.txt BFG_HISTORY.txt
+include CONTRIBUTORS.txt LICENSE.txt COPYRIGHT.txt
+
+include contributing.md RELEASING.txt
+include tox.ini appveyor.yml .travis.yml rtd.txt
+
+include HACKING.txt hacking-tox.ini
+include builddocs.sh coverage.sh scaffoldtests.sh
+include TODO.txt
+
+global-exclude __pycache__ *.py[cod]
