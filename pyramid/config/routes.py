@@ -10,14 +10,17 @@ from pyramid.interfaces import (
     )
 
 from pyramid.exceptions import ConfigurationError
-from pyramid.registry import predvalseq
 from pyramid.request import route_request_iface
 from pyramid.urldispatch import RoutesMapper
 
-from pyramid.config.util import action_method
 from pyramid.util import as_sorted_tuple
 
 import pyramid.predicates
+
+from pyramid.config.util import (
+    action_method,
+    predvalseq,
+)
 
 class RoutesConfiguratorMixin(object):
     @action_method

@@ -1,2 +1,2 @@
 import zope.deprecation
-zope.deprecation.moved('pyramid.predicates', 'Pyramid 2.0')
+zope.deprecation.moved('pyramid.predicates', 'Pyramid 1.10')
