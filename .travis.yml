@@ -19,9 +19,7 @@ matrix:
         - python: 3.5
           env: TOXENV=docs
         - python: 3.5
-          env: TOXENV=pep8
-        - python: 3.5
-          env: TOXENV=sdist
+          env: TOXENV=lint
         - python: nightly
           env: TOXENV=py37
     allow_failures:
