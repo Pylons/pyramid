@@ -75,7 +75,7 @@ configuration for the debugtoolbar.
 
 You'll now see an attractive button on the right side of your browser, which
 you may click to provide introspective access to debugging information in a new
-rowser tab. Even better, if your web application generates an error, you will
+browser tab. Even better, if your web application generates an error, you will
 see a nice traceback on the screen. When you want to disable this toolbar,
 there's no need to change code: you can remove it from ``pyramid.includes`` in
 the relevant ``.ini`` configuration file (thus showing why configuration files
