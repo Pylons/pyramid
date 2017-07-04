@@ -75,7 +75,7 @@ explanation:
    "Start here when running from the command line", rather than when this
    module is imported.
 
-#. *Lines 12-14*. Use Pyramid's :term:`configurator` to connect :term:`view`
+#. *Lines 12-14*. Use Pyramid's :term:`configurator` in a :term:`context manager` to connect :term:`view`
    code to a particular URL :term:`route`.
 
 #. *Lines 6-8*. Implement the view code that generates the :term:`response`.
