@@ -1203,3 +1203,6 @@ Glossary
    side effect
       A statement or function has a side effect when it changes a value outside its own scope.
       Put another way, if one can observe the change made by a function from outside that function, it has a side effect.
+
+   context manager
+      A context manager is an object that defines the runtime context to be established when executing a :ref:`with <python:with>` statement in Python. The context manager handles the entry into, and the exit from, the desired runtime context for the execution of the block of code. Context managers are normally invoked using the ``with`` statement, but can also be used by directly invoking their methods. Pyramid adds context managers for :func:`pyramid.testing.testConfig`, :func:`pyramid.scripting.prepare`, and :class:`pyramid.config.Configurator`.
