@@ -101,6 +101,8 @@ class PShellCommand(object):
                 self.setup = v
             elif k == 'default_shell':
                 self.preferred_shells = [x.lower() for x in aslist(v)]
+            elif k in ('__file__', 'here'):
+                continue
             else:
                 self.loaded_objects[k] = resolver.maybe_resolve(v)
                 self.object_help[k] = v
