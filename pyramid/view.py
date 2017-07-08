@@ -199,7 +199,8 @@ class view_config(object):
     combination with the ``category`` argument of ``scan`` to control which
     views should be processed.
 
-    See the :py:func:`venusian.attach` function in Venusian for more information.
+    See the :py:func:`venusian.attach` function in Venusian for more
+    information about the ``_depth`` and ``_category`` arguments.
     
     .. seealso::
     
@@ -395,9 +396,10 @@ class notfound_view_config(object):
     being used, :class:`~pyramid.httpexceptions.HTTPMovedPermanently will
     be used` for the redirect response if a slash-appended route is found.
 
-    .. versionchanged:: 1.6
-
     See :ref:`changing_the_notfound_view` for detailed usage information.
+
+    .. versionchanged:: 1.9.1
+       Added the ``_depth`` and ``_category`` arguments.
 
     """
 
@@ -408,12 +410,15 @@ class notfound_view_config(object):
 
     def __call__(self, wrapped):
         settings = self.__dict__.copy()
+        depth = settings.pop('_depth', 0)
+        category = settings.pop('_category', 'pyramid')
 
         def callback(context, name, ob):
             config = context.config.with_package(info.module)
             config.add_notfound_view(view=ob, **settings)
 
-        info = self.venusian.attach(wrapped, callback, category='pyramid')
+        info = self.venusian.attach(wrapped, callback, category=category,
+                                    depth=depth + 1)
 
         if info.scope == 'class':
             # if the decorator was attached to a method in a class, or
@@ -455,6 +460,9 @@ class forbidden_view_config(object):
 
     See :ref:`changing_the_forbidden_view` for detailed usage information.
 
+    .. versionchanged:: 1.9.1
+       Added the ``_depth`` and ``_category`` arguments.
+
     """
 
     venusian = venusian
@@ -464,12 +472,15 @@ class forbidden_view_config(object):
 
     def __call__(self, wrapped):
         settings = self.__dict__.copy()
+        depth = settings.pop('_depth', 0)
+        category = settings.pop('_category', 'pyramid')
 
         def callback(context, name, ob):
             config = context.config.with_package(info.module)
             config.add_forbidden_view(view=ob, **settings)
 
-        info = self.venusian.attach(wrapped, callback, category='pyramid')
+        info = self.venusian.attach(wrapped, callback, category=category,
+                                    depth=depth + 1)
 
         if info.scope == 'class':
             # if the decorator was attached to a method in a class, or
@@ -511,6 +522,9 @@ class exception_view_config(object):
     :meth:`pyramid.view.view_config`, and each predicate argument restricts
     the set of circumstances under which this exception view will be invoked.
 
+    .. versionchanged:: 1.9.1
+       Added the ``_depth`` and ``_category`` arguments.
+
     """
     venusian = venusian
 
@@ -524,12 +538,15 @@ class exception_view_config(object):
 
     def __call__(self, wrapped):
         settings = self.__dict__.copy()
+        depth = settings.pop('_depth', 0)
+        category = settings.pop('_category', 'pyramid')
 
         def callback(context, name, ob):
             config = context.config.with_package(info.module)
             config.add_exception_view(view=ob, **settings)
 
-        info = self.venusian.attach(wrapped, callback, category='pyramid')
+        info = self.venusian.attach(wrapped, callback, category=category,
+                                    depth=depth + 1)
 
         if info.scope == 'class':
             # if the decorator was attached to a method in a class, or
