@@ -209,7 +209,16 @@ class TestSubscriber(unittest.TestCase):
         def foo(): pass
         dec(foo)
         self.assertEqual(dummy_venusian.attached,
-                         [(foo, dec.register, 'pyramid')])
+                         [(foo, dec.register, 'pyramid', 1)])
+
+    def test___call___with_venusian_args(self):
+        dec = self._makeOne(_category='foo', _depth=1)
+        dummy_venusian = DummyVenusian()
+        dec.venusian = dummy_venusian
+        def foo(): pass
+        dec(foo)
+        self.assertEqual(dummy_venusian.attached,
+                         [(foo, dec.register, 'foo', 2)])
 
     def test_regsister_with_predicates(self):
         from zope.interface import Interface
@@ -308,8 +317,8 @@ class DummyVenusian(object):
     def __init__(self):
         self.attached = []
 
-    def attach(self, wrapped, fn, category=None):
-        self.attached.append((wrapped, fn, category))
+    def attach(self, wrapped, fn, category=None, depth=None):
+        self.attached.append((wrapped, fn, category, depth))
 
 class Dummy:
     pass

@@ -136,9 +136,9 @@ class TestResponseAdapter(unittest.TestCase):
     def tearDown(self):
         self.config.end()
 
-    def _makeOne(self, *types_or_ifaces):
+    def _makeOne(self, *types_or_ifaces, **kw):
         from pyramid.response import response_adapter
-        return response_adapter(*types_or_ifaces)
+        return response_adapter(*types_or_ifaces, **kw)
 
     def test_register_single(self):
         from zope.interface import Interface
@@ -172,7 +172,18 @@ class TestResponseAdapter(unittest.TestCase):
         def foo(): pass
         dec(foo)
         self.assertEqual(dummy_venusian.attached,
-                         [(foo, dec.register, 'pyramid')])
+                         [(foo, dec.register, 'pyramid', 1)])
+
+    def test___call___with_venusian_args(self):
+        from zope.interface import Interface
+        class IFoo(Interface): pass
+        dec = self._makeOne(IFoo, _category='foo', _depth=1)
+        dummy_venusian = DummyVenusian()
+        dec.venusian = dummy_venusian
+        def foo(): pass
+        dec(foo)
+        self.assertEqual(dummy_venusian.attached,
+                         [(foo, dec.register, 'foo', 2)])
 
 
 class TestGetResponseFactory(unittest.TestCase):
@@ -199,5 +210,5 @@ class DummyVenusian(object):
     def __init__(self):
         self.attached = []
 
-    def attach(self, wrapped, fn, category=None):
-        self.attached.append((wrapped, fn, category))
+    def attach(self, wrapped, fn, category=None, depth=None):
+        self.attached.append((wrapped, fn, category, depth))

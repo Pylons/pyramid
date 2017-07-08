@@ -145,19 +145,43 @@ class response_adapter(object):
         config = Configurator()
         config.scan('somepackage_containing_adapters')
 
+    Two additional keyword arguments which will be passed to the
+    :term:`venusian` ``attach`` function are ``_depth`` and ``_category``.
+
+    ``_depth`` is provided for people who wish to reuse this class from another
+    decorator. The default value is ``0`` and should be specified relative to
+    the ``response_adapter`` invocation. It will be passed in to the
+    :term:`venusian` ``attach`` function as the depth of the callstack when
+    Venusian checks if the decorator is being used in a class or module
+    context. It's not often used, but it can be useful in this circumstance.
+
+    ``_category`` sets the decorator category name. It can be useful in
+    combination with the ``category`` argument of ``scan`` to control which
+    views should be processed.
+
+    See the :py:func:`venusian.attach` function in Venusian for more
+    information about the ``_depth`` and ``_category`` arguments.
+
+    .. versionchanged:: 1.9.1
+       Added the ``_depth`` and ``_category`` arguments.
+
     """
     venusian = venusian # for unit testing
 
-    def __init__(self, *types_or_ifaces):
+    def __init__(self, *types_or_ifaces, **kwargs):
         self.types_or_ifaces = types_or_ifaces
+        self.depth = kwargs.pop('_depth', 0)
+        self.category = kwargs.pop('_category', 'pyramid')
+        self.kwargs = kwargs
 
     def register(self, scanner, name, wrapped):
         config = scanner.config
         for type_or_iface in self.types_or_ifaces:
-            config.add_response_adapter(wrapped, type_or_iface)
+            config.add_response_adapter(wrapped, type_or_iface, **self.kwargs)
 
     def __call__(self, wrapped):
-        self.venusian.attach(wrapped, self.register, category='pyramid')
+        self.venusian.attach(wrapped, self.register, category=self.category,
+                             depth=self.depth + 1)
         return wrapped
 
 
