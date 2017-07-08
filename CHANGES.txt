@@ -1,3 +1,11 @@
+unreleased
+==========
+
+- Add a ``_category`` argument to the ``pyramid.view.view_config`` decorator.
+  This argument will be forwarded to venusian and can be used to affect
+  what items are picked up by ``config.scan(..., category=...)``.
+  See https://github.com/Pylons/pyramid/pull/3121
+
 1.9 (2017-06-26)
 ================
 
