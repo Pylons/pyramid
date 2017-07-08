@@ -4,6 +4,11 @@ unreleased
 Features
 --------
 
+- Add a ``_category`` argument to the ``pyramid.view.view_config`` decorator
+  that can be used to affect which actions are registered when performing
+  a ``config.scan(..., category=...)`` with a specific category.
+  See https://github.com/Pylons/pyramid/pull/3105
+
 Bug Fixes
 ---------
 
