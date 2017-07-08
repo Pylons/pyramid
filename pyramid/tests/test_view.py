@@ -91,6 +91,18 @@ class Test_notfound_view_config(BaseTest, unittest.TestCase):
         self.assertEqual(settings[0]['attr'], 'view')
         self.assertEqual(settings[0]['_info'], 'codeinfo')
 
+    def test_call_with_venusian_args(self):
+        decorator = self._makeOne(_depth=1, _category='foo')
+        venusian = DummyVenusian()
+        decorator.venusian = venusian
+        def foo(): pass
+        decorator(foo)
+        attachments = venusian.attachments
+        category = attachments[0][2]
+        depth = attachments[0][3]
+        self.assertEqual(depth, 2)
+        self.assertEqual(category, 'foo')
+
 class Test_forbidden_view_config(BaseTest, unittest.TestCase):
     def _makeOne(self, **kw):
         from pyramid.view import forbidden_view_config
@@ -132,6 +144,18 @@ class Test_forbidden_view_config(BaseTest, unittest.TestCase):
         self.assertEqual(settings[0]['view'], None) # comes from call_venusian
         self.assertEqual(settings[0]['attr'], 'view')
         self.assertEqual(settings[0]['_info'], 'codeinfo')
+
+    def test_call_with_venusian_args(self):
+        decorator = self._makeOne(_depth=1, _category='foo')
+        venusian = DummyVenusian()
+        decorator.venusian = venusian
+        def foo(): pass
+        decorator(foo)
+        attachments = venusian.attachments
+        category = attachments[0][2]
+        depth = attachments[0][3]
+        self.assertEqual(depth, 2)
+        self.assertEqual(category, 'foo')
 
 class Test_exception_view_config(BaseTest, unittest.TestCase):
     def _makeOne(self, *args, **kw):
@@ -183,6 +207,18 @@ class Test_exception_view_config(BaseTest, unittest.TestCase):
         self.assertEqual(settings[0]['view'], None) # comes from call_venusian
         self.assertEqual(settings[0]['attr'], 'view')
         self.assertEqual(settings[0]['_info'], 'codeinfo')
+
+    def test_call_with_venusian_args(self):
+        decorator = self._makeOne(_depth=1, _category='foo')
+        venusian = DummyVenusian()
+        decorator.venusian = venusian
+        def foo(): pass
+        decorator(foo)
+        attachments = venusian.attachments
+        category = attachments[0][2]
+        depth = attachments[0][3]
+        self.assertEqual(depth, 2)
+        self.assertEqual(category, 'foo')
 
 class RenderViewToResponseTests(BaseTest, unittest.TestCase):
     def _callFUT(self, *arg, **kw):
@@ -564,7 +600,9 @@ class TestViewConfigDecorator(unittest.TestCase):
         decorator.venusian = venusian
         def foo(): pass
         decorator(foo)
-        self.assertEqual(venusian.depth, 2)
+        attachments = venusian.attachments
+        depth = attachments[0][3]
+        self.assertEqual(depth, 2)
 
     def test_call_withoutcategory(self):
         decorator = self._makeOne()
@@ -1000,8 +1038,7 @@ class DummyVenusian(object):
         self.attachments = []
 
     def attach(self, wrapped, callback, category=None, depth=1):
-        self.attachments.append((wrapped, callback, category))
-        self.depth = depth
+        self.attachments.append((wrapped, callback, category, depth))
         return self.info
 
 class DummyRegistry(object):
@@ -1028,7 +1065,7 @@ class DummyVenusianContext(object):
 def call_venusian(venusian, context=None):
     if context is None:
         context = DummyVenusianContext()
-    for wrapped, callback, category in venusian.attachments:
+    for wrapped, callback, category, depth in venusian.attachments:
         callback(context, None, None)
     return context.config
 
