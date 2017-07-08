@@ -308,3 +308,5 @@ Contributors
 - Volker Diels-Grabsch, 2017/06/09
 
 - Denis Rykov, 2017/06/15
+
+- Tosh Lyons, 2017/06/27
