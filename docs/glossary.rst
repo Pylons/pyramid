@@ -361,7 +361,7 @@ Glossary
      library created by Ian Bicking.
 
    PasteDeploy
-     `PasteDeploy <http://pythonpaste.org/deploy/>`_ is a library used by
+     `PasteDeploy <https://pastedeploy.readthedocs.io/en/latest/>`_ is a library used by
      :app:`Pyramid` which makes it possible to configure
      :term:`WSGI` components together declaratively within an ``.ini``
      file.  It was developed by Ian Bicking.
