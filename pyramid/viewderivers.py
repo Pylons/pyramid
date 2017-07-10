@@ -1,3 +1,4 @@
+from hashlib import md5
 import inspect
 
 from zope.interface import (
@@ -28,21 +29,21 @@ from pyramid.compat import (
     is_unbound_method,
     )
 
-from pyramid.config.util import (
-    DEFAULT_PHASH,
-    MAX_ORDER,
-    takes_one_arg,
-    )
-
 from pyramid.exceptions import (
     ConfigurationError,
     PredicateMismatch,
     )
 from pyramid.httpexceptions import HTTPForbidden
-from pyramid.util import object_description
+from pyramid.util import (
+    object_description,
+    takes_one_arg,
+    )
 from pyramid.view import render_view_to_response
 from pyramid import renderers
 
+
+MAX_ORDER = 1 << 30
+DEFAULT_PHASH = md5().hexdigest()
 
 def view_description(view):
     try:

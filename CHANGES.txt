@@ -12,6 +12,10 @@ unreleased
   decorators. See https://github.com/Pylons/pyramid/pull/3121 and
   https://github.com/Pylons/pyramid/pull/3123
 
+- Fix a circular import which made it impossible to import
+  ``pyramid.viewderivers`` before ``pyramid.config``.
+  See https://github.com/Pylons/pyramid/pull/3124
+
 1.9 (2017-06-26)
 ================
 

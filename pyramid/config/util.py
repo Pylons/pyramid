@@ -1,13 +1,10 @@
 from hashlib import md5
-import inspect
 
 from pyramid.compat import (
     bytes_,
-    getargspec,
     is_nonstr_iter
     )
 
-from pyramid.compat import im_func
 from pyramid.exceptions import ConfigurationError
 from pyramid.registry import predvalseq
 
@@ -15,13 +12,21 @@ from pyramid.util import (
     TopologicalSorter,
     action_method,
     ActionInfo,
+    takes_one_arg,
     )
+
+from pyramid.viewderivers import (
+    MAX_ORDER,
+    DEFAULT_PHASH,
+)
 
 action_method = action_method # support bw compat imports
 ActionInfo = ActionInfo # support bw compat imports
 
-MAX_ORDER = 1 << 30
-DEFAULT_PHASH = md5().hexdigest()
+MAX_ORDER = MAX_ORDER  # support bw compat imports
+DEFAULT_PHASH = DEFAULT_PHASH  # support bw compat imports
+
+takes_one_arg = takes_one_arg  # support bw compat imports
 
 class not_(object):
     """
@@ -189,52 +194,3 @@ class PredicateList(object):
             score = score | bit
         order = (MAX_ORDER - score) / (len(preds) + 1)
         return order, preds, phash.hexdigest()
-
-def takes_one_arg(callee, attr=None, argname=None):
-    ismethod = False
-    if attr is None:
-        attr = '__call__'
-    if inspect.isroutine(callee):
-        fn = callee
-    elif inspect.isclass(callee):
-        try:
-            fn = callee.__init__
-        except AttributeError:
-            return False
-        ismethod = hasattr(fn, '__call__')
-    else:
-        try:
-            fn = getattr(callee, attr)
-        except AttributeError:
-            return False
-
-    try:
-        argspec = getargspec(fn)
-    except TypeError:
-        return False
-
-    args = argspec[0]
-
-    if hasattr(fn, im_func) or ismethod:
-        # it's an instance method (or unbound method on py2)
-        if not args:
-            return False
-        args = args[1:]
-
-    if not args:
-        return False
-
-    if len(args) == 1:
-        return True
-
-    if argname:
-
-        defaults = argspec[3]
-        if defaults is None:
-            defaults = ()
-
-        if args[0] == argname:
-            if len(args) - len(defaults) == 1:
-                return True
-
-    return False
