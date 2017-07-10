@@ -1,3 +1,10 @@
+unreleased
+==========
+
+- Fix a circular import which made it impossible to import
+  ``pyramid.viewderivers`` before ``pyramid.config``.
+  See https://github.com/Pylons/pyramid/pull/3125
+
 .. _changes_1.8.4:
 
 1.8.4 (2017-06-11)
