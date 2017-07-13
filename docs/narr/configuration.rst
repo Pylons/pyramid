@@ -47,9 +47,9 @@ configured imperatively:
        return Response('Hello world!')
 
    if __name__ == '__main__':
-       config = Configurator()
-       config.add_view(hello_world)
-       app = config.make_wsgi_app()
+       with Configurator() as config:
+           config.add_view(hello_world)
+           app = config.make_wsgi_app()
        server = make_server('0.0.0.0', 8080, app)
        server.serve_forever()
 
@@ -116,9 +116,9 @@ and its subpackages.  For example:
        return Response('Hello')
 
    if __name__ == '__main__':
-       config = Configurator()
-       config.scan()
-       app = config.make_wsgi_app()
+       with Configurator() as config:
+           config.scan()
+           app = config.make_wsgi_app()
        server = make_server('0.0.0.0', 8080, app)
        server.serve_forever()
 

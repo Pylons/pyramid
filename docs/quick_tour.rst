@@ -90,7 +90,7 @@ explanation:
 #. *Line 10*. ``if __name__ == '__main__':`` is Python's way of saying "Start
    here when running from the command line".
 
-#. *Lines 11-13*. Use Pyramid's :term:`configurator` to connect :term:`view`
+#. *Lines 11-13*. Use Pyramid's :term:`configurator` in a :term:`context manager` to connect :term:`view`
    code to a particular URL :term:`route`.
 
 #. *Lines 6-7*. Implement the view code that generates the :term:`response`.
