@@ -16,6 +16,10 @@ unreleased
   ``pyramid.viewderivers`` before ``pyramid.config``.
   See https://github.com/Pylons/pyramid/pull/3124
 
+- Improve documentation to show the ``pyramid.config.Configurator`` being
+  used as a context manager in more places.
+  See https://github.com/Pylons/pyramid/pull/3126
+
 1.9 (2017-06-26)
 ================
 
