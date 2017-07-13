@@ -60,7 +60,7 @@ Imports
 The above ``helloworld.py`` script uses the following set of import statements:
 
 .. literalinclude:: helloworld.py
-   :linenos:
+   :lineno-match:
    :lines: 1-3
 
 The script imports the :class:`~pyramid.config.Configurator` class from the
@@ -83,7 +83,7 @@ The above script, beneath its set of imports, defines a function named
 ``hello_world``.
 
 .. literalinclude:: helloworld.py
-   :linenos:
+   :lineno-match:
    :pyobject: hello_world
 
 The function accepts a single argument (``request``) and it returns an instance
@@ -125,7 +125,7 @@ imports and function definitions, placed within the confines of an ``if``
 statement:
 
 .. literalinclude:: helloworld.py
-   :linenos:
+   :lineno-match:
    :lines: 9-15
 
 Let's break this down piece by piece.
@@ -134,7 +134,7 @@ Configurator Construction
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. literalinclude:: helloworld.py
-   :linenos:
+   :lineno-match:
    :lines: 9-10
 
 The ``if __name__ == '__main__':`` line in the code sample above represents a
@@ -153,8 +153,8 @@ code within the ``if`` statement to execute if this module is imported from
 another; the code within the ``if`` block should only be run during a direct
 script execution.
 
-The ``config = Configurator()`` line above creates an instance of the
-:class:`~pyramid.config.Configurator` class.  The resulting ``config`` object
+The ``with Configurator() as config:`` line above creates an instance of the
+:class:`~pyramid.config.Configurator` class using a :term:`context manager`.  The resulting ``config`` object
 represents an API which the script uses to configure this particular
 :app:`Pyramid` application.  Methods called on the Configurator will cause
 registrations to be made in an :term:`application registry` associated with the
@@ -166,7 +166,7 @@ Adding Configuration
 ~~~~~~~~~~~~~~~~~~~~
 
 .. literalinclude:: helloworld.py
-   :linenos:
+   :lineno-match:
    :lines: 11-12
 
 The first line above calls the :meth:`pyramid.config.Configurator.add_route`
@@ -185,7 +185,7 @@ WSGI Application Creation
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. literalinclude:: helloworld.py
-   :linenos:
+   :lineno-match:
    :lines: 13
 
 After configuring views and ending configuration, the script creates a WSGI
@@ -212,7 +212,7 @@ WSGI Application Serving
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. literalinclude:: helloworld.py
-   :linenos:
+   :lineno-match:
    :lines: 14-15
 
 Finally, we actually serve the application to requestors by starting up a WSGI

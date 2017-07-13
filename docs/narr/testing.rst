@@ -158,7 +158,7 @@ Test setup using a context manager
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 An alternative style of setting up a test configuration is to use the ``with``
-statement and :func:`pyramid.testing.testConfig` to create a context manager.
+statement and :func:`pyramid.testing.testConfig` to create a :term:`context manager`.
 The context manager will call :func:`pyramid.testing.setUp` before the code
 under test and :func:`pyramid.testing.tearDown` afterwards.
 

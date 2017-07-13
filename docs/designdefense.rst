@@ -1529,20 +1529,20 @@ inlined comments take into account what we've discussed in the
 .. code-block:: python
    :linenos:
 
-   from pyramid.response import Response # explicit response, no thread local
-   from wsgiref.simple_server import make_server # explicitly WSGI
+   from wsgiref.simple_server import make_server  # explicitly WSGI
+   from pyramid.config import Configurator  # to configure app registry
+   from pyramid.response import Response  # explicit response, no threadlocal
 
-   def hello_world(request):  # accepts a request; no request thread local reqd
+   def hello_world(request):  # accept a request; no request threadlocal reqd
        # explicit response object means no response threadlocal
        return Response('Hello world!')
 
    if __name__ == '__main__':
-       from pyramid.config import Configurator
-       config = Configurator()       # no global application object
-       config.add_view(hello_world)  # explicit non-decorator registration
-       app = config.make_wsgi_app()  # explicitly WSGI
+       with Configurator() as config:    # no global application object
+           config.add_view(hello_world)  # explicit non-decorator registration
+           app = config.make_wsgi_app()  # explicitly WSGI
        server = make_server('0.0.0.0', 8080, app)
-       server.serve_forever()        # explicitly WSGI
+       server.serve_forever()            # explicitly WSGI
 
 
 Pyramid doesn't offer pluggable apps
@@ -1634,7 +1634,7 @@ Let's take this criticism point-by-point.
 Too Complex
 +++++++++++
 
-If you can understand this hello world program, you can use Pyramid:
+If you can understand this "hello world" program, you can use Pyramid:
 
 .. code-block:: python
    :linenos:
@@ -1647,9 +1647,9 @@ If you can understand this hello world program, you can use Pyramid:
        return Response('Hello world!')
 
    if __name__ == '__main__':
-       config = Configurator()
-       config.add_view(hello_world)
-       app = config.make_wsgi_app()
+       with Configurator() as config:
+           config.add_view(hello_world)
+           app = config.make_wsgi_app()
        server = make_server('0.0.0.0', 8080, app)
        server.serve_forever()
 
