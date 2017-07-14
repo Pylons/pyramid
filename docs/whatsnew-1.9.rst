@@ -3,6 +3,15 @@ What's New in Pyramid 1.9
 
 This article explains the new features in :app:`Pyramid` version 1.9 as compared to its predecessor, :app:`Pyramid` 1.8. It also documents backwards incompatibilities between the two versions and deprecations added to :app:`Pyramid` 1.9, as well as software dependency changes and notable documentation additions.
 
+Bug Fix Releases
+----------------
+
+Pyramid 1.9 was released on 2017-06-26.
+
+The following bug fix releases were made since then. Bug fix releases also include documentation improvements and other minor feature changes.
+
+- :ref:`changes_1.9.1`
+
 Major Feature Additions
 -----------------------
 
