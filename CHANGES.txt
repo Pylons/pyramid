@@ -1,5 +1,7 @@
-unreleased
-==========
+.. _changes_1.8.5:
+
+1.8.5 (2017-07-13)
+==================
 
 - Fix a circular import which made it impossible to import
   ``pyramid.viewderivers`` before ``pyramid.config``.
