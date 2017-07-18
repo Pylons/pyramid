@@ -97,6 +97,9 @@ class InstancePropertyHelper(object):
         attrs = dict(properties)
         if attrs:
             parent = target.__class__
+            # fix the module name so it appears to still be the parent
+            # e.g. pyramid.request instead of pyramid.util
+            attrs.setdefault('__module__', parent.__module__)
             newcls = type(parent.__name__, (parent, object), attrs)
             # We assign __provides__ and __implemented__ below to prevent a
             # memory leak that results from from the usage of this instance's
