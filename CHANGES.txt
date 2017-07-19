@@ -15,6 +15,12 @@ Features
   decorators. See https://github.com/Pylons/pyramid/pull/3105 and
   https://github.com/Pylons/pyramid/pull/3122
 
+- Fix the ``pyramid.request.Request`` class name after using
+  ``set_property`` or ``config.add_request_method`` such that the
+  ``str(request.__class__)`` would appear as ``pyramid.request.Request``
+  instead of ``pyramid.util.Request``.
+  See https://github.com/Pylons/pyramid/pull/3129
+
 Bug Fixes
 ---------
 
