@@ -293,6 +293,14 @@ class Test_InstancePropertyMixin(unittest.TestCase):
         foo.set_property(lambda _: 2, name='x', reify=True)
         self.assertEqual(1, foo.x)
 
+    def test_new_class_keeps_parent_module_name(self):
+        foo = self._makeOne()
+        self.assertEqual(foo.__module__, 'pyramid.tests.test_util')
+        self.assertEqual(foo.__class__.__module__, 'pyramid.tests.test_util')
+        foo.set_property(lambda _: 1, name='x', reify=True)
+        self.assertEqual(foo.__module__, 'pyramid.tests.test_util')
+        self.assertEqual(foo.__class__.__module__, 'pyramid.tests.test_util')
+
 class Test_WeakOrderedSet(unittest.TestCase):
     def _makeOne(self):
         from pyramid.config import WeakOrderedSet
