@@ -119,6 +119,3 @@ Extra credit
 
 #. What happens if you to go the URL http://localhost:6543/howdy? Is this the
    result that you expected?
-
-.. seealso:: `Weird Stuff You Can Do With URL Dispatch
-   <http://www.plope.com/weird_pyramid_urldispatch>`_
