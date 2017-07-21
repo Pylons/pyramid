@@ -78,7 +78,7 @@ intersphinx_mapping = {
     'tstring': ('https://docs.pylonsproject.org/projects/translationstring/en/latest', None),
     'tutorials': ('https://docs.pylonsproject.org/projects/pyramid-tutorials/en/latest/', None),
     'venusian': ('https://docs.pylonsproject.org/projects/venusian/en/latest', None),
-    'webob': ('http://docs.webob.org/en/latest', None),
+    'webob': ('https://docs.pylonsproject.org/projects/webob/en/latest/', None),
     'webtest': ('http://webtest.pythonpaste.org/en/latest', None),
     'who': ('http://repozewho.readthedocs.io/en/latest', None),
     'zcml': ('https://docs.pylonsproject.org/projects/pyramid-zcml/en/latest', None),
