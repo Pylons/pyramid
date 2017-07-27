@@ -24,6 +24,4 @@ def appmaker(zodb_root):
         frontpage.__name__ = 'FrontPage'
         frontpage.__parent__ = app_root
         zodb_root['app_root'] = app_root
-        import transaction
-        transaction.commit()
     return zodb_root['app_root']
