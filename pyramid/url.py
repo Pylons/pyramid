@@ -2,8 +2,6 @@
 
 import os
 
-from repoze.lru import lru_cache
-
 from pyramid.interfaces import (
     IResourceURL,
     IRoutesMapper,
@@ -12,6 +10,7 @@ from pyramid.interfaces import (
 
 from pyramid.compat import (
     bytes_,
+    lru_cache,
     string_types,
     )
 from pyramid.encode import (

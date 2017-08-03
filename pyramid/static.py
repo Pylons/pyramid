@@ -17,14 +17,15 @@ from pkg_resources import (
     resource_isdir,
     )
 
-from repoze.lru import lru_cache
-
 from pyramid.asset import (
     abspath_from_asset_spec,
     resolve_asset_spec,
 )
 
-from pyramid.compat import text_
+from pyramid.compat import (
+    lru_cache,
+    text_,
+)
 
 from pyramid.httpexceptions import (
     HTTPNotFound,
