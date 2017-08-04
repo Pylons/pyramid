@@ -37,20 +37,20 @@ Open ``tutorial/__init__.py``.  It should already contain the following:
 
 #. *Line 11*.  ``__init__.py`` defines a function named ``main``.
 
-#. *Line 14*.  We construct a :term:`Configurator` with a root
-   factory and the settings keywords parsed by :term:`PasteDeploy`.  The root
-   factory is named ``root_factory``.
+#. *Line 14*.  Use an explicit transaction manager for apps so that they do not implicitly create new transactions when touching the manager outside of the ``pyramid_tm`` lifecycle.
 
-#. *Lines 15 and 16*.  Get the settings and use an explicit transaction transaction manager for apps so that they do not implicitly create new transactions when touching the manager outside of the ``pyramid_tm`` lifecycle.
+#. *Line 15*.  Construct a :term:`Configurator` as a :term:`context manager` with the settings keyword parsed by :term:`PasteDeploy`.
 
-#. *Line 17*.  Include support for the :term:`Chameleon` template rendering
+#. *Line 16*.  Include support for the :term:`Chameleon` template rendering
    bindings, allowing us to use the ``.pt`` templates.
 
-#. *Line 18*.  Include support for ``pyramid_tm``, allowing Pyramid requests to join the active transaction as provided by the `transaction <https://pypi.python.org/pypi/transaction>`_ package.
+#. *Line 17*.  Include support for ``pyramid_tm``, allowing Pyramid requests to join the active transaction as provided by the `transaction <https://pypi.python.org/pypi/transaction>`_ package.
 
-#. *Line 19*.  Include support for ``pyramid_retry`` to retry a request when transient exceptions occur.
+#. *Line 18*.  Include support for ``pyramid_retry`` to retry a request when transient exceptions occur.
 
-#. *Line 20*.  Include support for ``pyramid_zodbconn``, providing integration between :term:`ZODB` and a Pyramid application.
+#. *Line 19*.  Include support for ``pyramid_zodbconn``, providing integration between :term:`ZODB` and a Pyramid application.
+
+#. *Line 20*.  Set a root factory using our function named ``root_factory``.
 
 #. *Line 21*.  Register a "static view", which answers requests whose URL
    paths start with ``/static``, using the
@@ -65,7 +65,7 @@ Open ``tutorial/__init__.py``.  It should already contain the following:
    package.  Alternatively the cookiecutter could have used an *absolute* asset
    specification as the path (``tutorial:static``).
 
-#. *Line 19*.  Perform a :term:`scan`.  A scan will find :term:`configuration
+#. *Line 22*.  Perform a :term:`scan`.  A scan will find :term:`configuration
    decoration`, such as view configuration decorators (e.g., ``@view_config``)
    in the source code of the ``tutorial`` package and will take actions based
    on these decorators.  We don't pass any arguments to
@@ -74,7 +74,7 @@ Open ``tutorial/__init__.py``.  It should already contain the following:
    The cookiecutter could have equivalently said ``config.scan('tutorial')``, but
    it chose to omit the package name argument.
 
-#. *Line 20*.  Use the
+#. *Line 23*.  Use the
    :meth:`pyramid.config.Configurator.make_wsgi_app` method
    to return a :term:`WSGI` application.
 
@@ -104,7 +104,7 @@ Here is the source for ``models.py``:
    By default, set these to ``None`` to indicate that this is the
    :term:`root` object.
 
-#. *Lines 8-14*.  ``appmaker`` is used to return the *application
+#. *Lines 8-12*.  ``appmaker`` is used to return the *application
    root* object.  It is called on *every request* to the
    :app:`Pyramid` application.  It also performs bootstrapping by
    *creating* an application root (inside the ZODB root object) if one
