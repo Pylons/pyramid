@@ -1036,7 +1036,7 @@ following.
   new ``views`` directory named, say, ``blog.py``.  Because the ``templates``
   directory remains in the ``myproject`` package, the template :term:`asset
   specification` values in ``blog.py`` must now be fully qualified with the
-  project's package name (``myproject:templates/blog.pt``).
+  project's package name (``myproject:templates/blog.py``).
 
 You can then continue to add view callable functions to the ``blog.py`` module,
 but you can also add other ``.py`` files which contain view callable functions
