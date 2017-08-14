@@ -85,7 +85,7 @@ Extra credit
 
 #. We used ``config.include`` which is an imperative configuration to get the
    :term:`Configurator` to load ``pyramid_jinja2``'s configuration. What is
-   another way could include it into the config?
+   another way we could include it into the config?
 
 .. seealso:: `Jinja2 homepage <http://jinja.pocoo.org/>`_, and
    :ref:`pyramid_jinja2 Overview <jinja2:overview>`
