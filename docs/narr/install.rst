@@ -51,7 +51,7 @@ Python comes pre-installed on Mac OS X, but due to Apple's release cycle, it is
 often out of date. Unless you have a need for a specific earlier version, it is
 recommended to install the latest 3.x version of Python.
 
-You can install the latest verion of Python for Mac OS X from the binaries on
+You can install the latest version of Python for Mac OS X from the binaries on
 `python.org <https://www.python.org/downloads/mac-osx/>`_.
 
 Alternatively, you can use the `homebrew <https://brew.sh/>`_ package manager.
