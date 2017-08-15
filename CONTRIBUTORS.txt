@@ -310,3 +310,6 @@ Contributors
 - Denis Rykov, 2017/06/15
 
 - Tosh Lyons, 2017/06/27
+
+- Lars Blumberg, 2017/08/14
+
