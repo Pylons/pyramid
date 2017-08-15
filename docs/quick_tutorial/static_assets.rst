@@ -46,7 +46,9 @@ Steps
 #. We add a functional test that asserts that the newly added static file is delivered:
 
    .. literalinclude:: static_assets/tutorial/tests.py
-    :linenos:
+    :language: python
+    :pyobject: TutorialFunctionalTests.test_css
+    :lineno-match:
 
 #. Now run the tests:
 
