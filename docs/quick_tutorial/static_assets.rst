@@ -43,13 +43,20 @@ Steps
    .. literalinclude:: static_assets/tutorial/static/app.css
     :language: css
 
-#. Make sure we haven't broken any existing code by running the tests:
+#. We add a functional test that asserts that the newly added static file is delivered:
+
+   .. literalinclude:: static_assets/tutorial/tests.py
+    :language: python
+    :pyobject: TutorialFunctionalTests.test_css
+    :lineno-match:
+
+#. Now run the tests:
 
    .. code-block:: bash
 
     $ $VENV/bin/py.test tutorial/tests.py -q
     ....
-    4 passed in 0.50 seconds
+    5 passed in 0.50 seconds
 
 #. Run your Pyramid application with:
 
