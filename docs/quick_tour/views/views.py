@@ -1,4 +1,4 @@
-import cgi
+from pyramid.compat import escape
 
 from pyramid.httpexceptions import HTTPFound
 from pyramid.response import Response
@@ -17,7 +17,7 @@ def hello_view(request):
     name = request.params.get('name', 'No Name')
     body = '<p>Hi %s, this <a href="/goto">redirects</a></p>'
     # cgi.escape to prevent Cross-Site Scripting (XSS) [CWE 79]
-    return Response(body % cgi.escape(name))
+    return Response(body % escape(name))
 
 
 # /goto which issues HTTP redirect to the last view
