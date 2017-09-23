@@ -626,7 +626,7 @@ def testConfig(registry=None,
         with testConfig() as config:
             config.add_route('bar', '/bar/{id}')
             req = DummyRequest()
-            resp = myview(req),
+            resp = myview(req)
     """
     config = setUp(registry=registry,
             request=request,
