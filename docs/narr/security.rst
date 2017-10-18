@@ -874,8 +874,8 @@ the user, and returns the token.
 
 .. code-block:: python
 
-   from pyramid.csrf import get_csrf_token
-   token = new_csrf_token()
+   from pyramid.csrf import new_csrf_token
+   token = new_csrf_token(request)
 
 .. note::
 
