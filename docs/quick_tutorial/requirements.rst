@@ -78,7 +78,7 @@ shows how this will be structured, and where our :term:`virtual environment`
 will reside as we proceed through the tutorial:
 
 .. code-block:: text
-
+``
     `── ~
         `── projects
             `── quick_tutorial
@@ -88,7 +88,7 @@ will reside as we proceed through the tutorial:
                     │   │── __init__.py
                     │   `── app.py
                     `── setup.py
-
+``
 For Linux, the commands to do so are as follows:
 
 .. code-block:: bash
