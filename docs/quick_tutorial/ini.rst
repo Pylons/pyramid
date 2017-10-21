@@ -102,8 +102,9 @@ The ``.ini`` file is also used for two other functions:
 - *Configuring the WSGI server*. ``[server:main]`` wires up the choice
   of which WSGI *server* for your WSGI *application*. In this case, we
   are using ``waitress`` which was specified in
-  ``tutorial/setup.py``. It also wires up the *port number*: ``listen
-  = localhost:6543`` tells ``waitress`` to listen on port 6543.
+  ``tutorial/setup.py``. It also wires up the *port number*:
+  ``listen = localhost:6543`` tells ``waitress`` to listen on host
+  ``localhost`` at port ``6543``.
 
 - *Configuring Python logging*. Pyramid uses Python standard logging, which
   needs a number of configuration values. The ``.ini`` serves this function.

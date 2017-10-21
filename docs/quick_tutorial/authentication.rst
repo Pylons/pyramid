@@ -39,7 +39,7 @@ Steps
 
    .. literalinclude:: authentication/setup.py
     :language: python
-    :emphasize-lines: 6-7
+    :emphasize-lines: 7
     :linenos:
 
 #. We can now install our project in development mode:
