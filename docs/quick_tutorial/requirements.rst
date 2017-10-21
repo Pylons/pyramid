@@ -194,12 +194,13 @@ part is pretty easy.
 .. parsed-literal::
 
     # Mac and Linux
-    $ $VENV/bin/pip install "pyramid==\ |release|\ "
+    $ $VENV/bin/pip install "pyramid==\ |release|\ " waitress
 
     # Windows
-    c:\\> %VENV%\\Scripts\\pip install "pyramid==\ |release|\ "
+    c:\\> %VENV%\\Scripts\\pip install "pyramid==\ |release|\ " waitress
 
-Our Python virtual environment now has the Pyramid software available.
+Our Python virtual environment now has the Pyramid software available
+as well as the ``waitress`` server.
 
 You can optionally install some of the extra Python packages used in this
 tutorial.
