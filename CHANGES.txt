@@ -30,6 +30,11 @@ Deprecations
 Backward Incompatibilities
 --------------------------
 
+- On Python 3.4+ the ``repoze.lru`` dependency is dropped. If you were using
+  this package directly in your apps you should make sure that you are
+  depending on it directly within your project.
+  See https://github.com/Pylons/pyramid/pull/3140
+
 Documentation Changes
 ---------------------
 

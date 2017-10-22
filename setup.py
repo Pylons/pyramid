@@ -11,9 +11,6 @@
 # FITNESS FOR A PARTICULAR PURPOSE
 #
 ##############################################################################
-
-import sys
-
 from setuptools import setup, find_packages
 
 def readfile(name):

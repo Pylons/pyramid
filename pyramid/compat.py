@@ -19,7 +19,6 @@ except ImportError:  # pragma: no cover
 
 try:
     from functools import lru_cache
-
 except ImportError:
     from repoze.lru import lru_cache
 
