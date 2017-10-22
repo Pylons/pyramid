@@ -108,4 +108,4 @@ idea to run a Python module inside a package directly as a script.
 
 .. seealso:: :ref:`Python Packages <python:tut-packages>` and `Working in
    "Development Mode"
-   <https://packaging.python.org/en/latest/distributing/#working-in-development-mode>`_.
+   <https://packaging.python.org/tutorials/distributing-packages/#working-in-development-mode>`_.
