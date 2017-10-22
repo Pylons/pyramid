@@ -189,17 +189,18 @@ Install Pyramid
 ---------------
 
 We have our Python standard prerequisites out of the way. The Pyramid
-part is pretty easy.
+part is pretty easy. We'll also install a WSGI server, Waitress.
 
 .. parsed-literal::
 
     # Mac and Linux
-    $ $VENV/bin/pip install "pyramid==\ |release|\ "
+    $ $VENV/bin/pip install "pyramid==\ |release|\ " waitress
 
     # Windows
-    c:\\> %VENV%\\Scripts\\pip install "pyramid==\ |release|\ "
+    c:\\> %VENV%\\Scripts\\pip install "pyramid==\ |release|\ " waitress
 
-Our Python virtual environment now has the Pyramid software available.
+Our Python virtual environment now has the Pyramid software available
+as well as the ``waitress`` package.
 
 You can optionally install some of the extra Python packages used in this
 tutorial.
