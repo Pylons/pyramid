@@ -11,7 +11,6 @@
 # FITNESS FOR A PARTICULAR PURPOSE
 #
 ##############################################################################
-
 from setuptools import setup, find_packages
 
 def readfile(name):
@@ -24,7 +23,6 @@ CHANGES = readfile('CHANGES.txt')
 install_requires = [
     'setuptools',
     'WebOb >= 1.7.0rc2', # Response.has_body
-    'repoze.lru >= 0.4', # py3 compat
     'zope.interface >= 3.8.0',  # has zope.interface.registry
     'zope.deprecation >= 3.5.0', # py3 compat
     'venusian >= 1.0a3', # ``ignore``
@@ -87,6 +85,7 @@ setup(name='pyramid',
       python_requires='>=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*',
       install_requires=install_requires,
       extras_require={
+          ':python_version<"3.2"': ['repoze.lru >= 0.4'],
           'testing': testing_extras,
           'docs': docs_extras,
           },

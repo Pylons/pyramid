@@ -1,8 +1,6 @@
 from zope.interface import implementer
 from zope.interface.interfaces import IInterface
 
-from repoze.lru import lru_cache
-
 from pyramid.interfaces import (
     IResourceURL,
     IRequestFactory,
@@ -20,6 +18,7 @@ from pyramid.compat import (
     is_nonstr_iter,
     decode_path_info,
     unquote_bytes_to_wsgi,
+    lru_cache,
     )
 
 from pyramid.encode import url_quote
