@@ -73,7 +73,7 @@ def package_path(package):
         # will be the same: a directory name to the package itself
         try:
             package.__abspath__ = prefix
-        except:
+        except Exception:
             # this is only an optimization, ignore any error
             pass
     return prefix

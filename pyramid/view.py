@@ -743,7 +743,7 @@ class ViewMethodsMixin(object):
                     secure=secure,
                     request_iface=request_iface.combined,
                     )
-            except:
+            except Exception:
                 if reraise:
                     reraise_(*exc_info)
                 raise
