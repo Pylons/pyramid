@@ -583,7 +583,7 @@ def action_method(wrapped):
                 if last_frame.function == 'extract_stack': # pragma: no cover
                     f.pop()
                 info = ActionInfo(*f[-backframes])
-            except: # pragma: no cover
+            except Exception: # pragma: no cover
                 info = ActionInfo(None, 0, '', '')
         self._ainfo.append(info)
         try:
