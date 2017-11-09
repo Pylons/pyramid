@@ -12,7 +12,7 @@ from pyramid.interfaces import (
     IIntrospector,
     IIntrospectable,
     ISettings,
-    )
+)
 
 from pyramid.path import (
     CALLER_PACKAGE,
