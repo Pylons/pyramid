@@ -225,7 +225,7 @@ class BeforeRender(dict):
     """
     Subscribers to this event may introspect and modify the set of
     :term:`renderer globals` before they are passed to a :term:`renderer`.
-    This event object iself has a dictionary-like interface that can be used
+    This event object itself has a dictionary-like interface that can be used
     for this purpose.  For example::
 
       from pyramid.events import subscriber
