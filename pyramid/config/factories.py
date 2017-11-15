@@ -144,9 +144,10 @@ class FactoriesConfiguratorMixin(object):
 
         When adding a property to the request, ``callable`` can either
         be a callable that accepts the request as its single positional
-        parameter, or it can be a property descriptor. If ``name`` is
-        ``None``, the name of the property will be computed from the
-        name of the ``callable``.
+        parameter, or it can be a property descriptor. If ``callable`` is
+        a property descriptor, it has to be a instance of a class which is
+        a subclass of ``property``. If ``name`` is ``None``, the name of
+        the property will be computed from the name of the ``callable``.
 
         If the ``callable`` is a property descriptor a ``ValueError``
         will be raised if ``name`` is ``None`` or ``reify`` is ``True``.
