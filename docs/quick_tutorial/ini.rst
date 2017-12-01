@@ -101,10 +101,12 @@ The ``.ini`` file is also used for two other functions:
 
 - *Configuring the WSGI server*. ``[server:main]`` wires up the choice
   of which WSGI *server* for your WSGI *application*. In this case, we
-  are using ``waitress`` which was specified in
-  ``tutorial/setup.py``. It also wires up the *port number*:
+  are using ``waitress`` which we specified in
+  ``tutorial/setup.py`` and was installed in the :doc:`requirements` step at the start of this tutorial.  It also wires up the *port number*:
   ``listen = localhost:6543`` tells ``waitress`` to listen on host
   ``localhost`` at port ``6543``.
+
+  .. note:: Running the command ``$VENV/bin/pip install -e .`` will check for previously installed packages in our virtual environment that are specified in our package's ``setup.py`` file, then install our package in editable mode, installing any requirements that were not previously installed.  If a requirement was manually installed previously on the command line or otherwise, in this case Waitress, then ``$VENV/bin/pip install -e .`` will merely check that it is installed and move on.
 
 - *Configuring Python logging*. Pyramid uses Python standard logging, which
   needs a number of configuration values. The ``.ini`` serves this function.
