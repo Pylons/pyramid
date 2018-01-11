@@ -67,7 +67,7 @@ In this logging configuration:
 
      2007-08-17 15:04:08,704 INFO [packagename] Loading resource, id: 86
 
-- a logger named ``myapp`` is configured that logs messages sent at a level
+- a logger named ``myproject`` is configured that logs messages sent at a level
   above or equal to ``DEBUG`` to stderr in the same format as the root logger.
 
 The ``root`` logger will be used by all applications in the Pyramid process
