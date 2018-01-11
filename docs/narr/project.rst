@@ -1141,7 +1141,7 @@ serve it many times. When you change it, you want ``pserve`` to restart:
 
     [pserve]
     watch_files =
-        myapp/static/favicon.ico
+        myproject/static/favicon.ico
 
 Paths may be absolute or relative to the configuration file. They may also
 be an :term:`asset specification`. These paths are passed to ``hupper``, which

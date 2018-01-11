@@ -67,12 +67,12 @@ In this logging configuration:
 
      2007-08-17 15:04:08,704 INFO [packagename] Loading resource, id: 86
 
-- a logger named ``myapp`` is configured that logs messages sent at a level
+- a logger named ``myproject`` is configured that logs messages sent at a level
   above or equal to ``DEBUG`` to stderr in the same format as the root logger.
 
 The ``root`` logger will be used by all applications in the Pyramid process
 that ask for a logger (via ``logging.getLogger``) that has a name which begins
-with anything except your project's package name (e.g., ``myapp``). The logger
+with anything except your project's package name (e.g., ``myproject``). The logger
 with the same name as your package name is reserved for your own usage in your
 :app:`Pyramid` application.  Its existence means that you can log to a known
 logging location from any :app:`Pyramid` application generated via a cookiecutter.
@@ -96,10 +96,10 @@ Sending Logging Messages
 ------------------------
 
 Python's special ``__name__`` variable refers to the current module's fully
-qualified name.  From any module in a package named ``myapp``, the ``__name__``
-builtin variable will always be something like ``myapp``, or
-``myapp.subpackage`` or ``myapp.package.subpackage`` if your project is named
-``myapp``.  Sending a message to this logger will send it to the ``myapp``
+qualified name.  From any module in a package named ``myproject``, the ``__name__``
+builtin variable will always be something like ``myproject``, or
+``myproject.subpackage`` or ``myproject.package.subpackage`` if your project is named
+``myproject``.  Sending a message to this logger will send it to the ``myproject``
 logger.
 
 To log messages to the package-specific logger configured in your ``.ini``
@@ -123,7 +123,7 @@ This will result in the following printed to the console, on ``stderr``:
 
 .. code-block:: text
 
-    16:20:20,440 DEBUG [myapp.views] Returning: Hello World!
+    16:20:20,440 DEBUG [myproject.views] Returning: Hello World!
                        (content-type: text/plain)
 
 Filtering log messages
@@ -150,7 +150,7 @@ then add it to the list of loggers:
 .. code-block:: ini
 
     [loggers]
-    keys = root, myapp, sqlalchemy.pool
+    keys = root, myproject, sqlalchemy.pool
 
 No handlers need to be configured for this logger as by default non-root
 loggers will propagate their log records up to their parent logger's handlers.
@@ -165,16 +165,16 @@ level is set to ``INFO``, whereas the application's log level is set to
     # Begin logging configuration
 
     [loggers]
-    keys = root, myapp
+    keys = root, myproject
 
-    [logger_myapp]
+    [logger_myproject]
     level = DEBUG
     handlers =
-    qualname = myapp
+    qualname = myproject
 
-All of the child loggers of the ``myapp`` logger will inherit the ``DEBUG``
-level unless they're explicitly set differently. Meaning the ``myapp.views``,
-``myapp.models``, and all your app's modules' loggers by default have an
+All of the child loggers of the ``myproject`` logger will inherit the ``DEBUG``
+level unless they're explicitly set differently. Meaning the ``myproject.views``,
+``myproject.models``, and all your app's modules' loggers by default have an
 effective level of ``DEBUG`` too.
 
 For more advanced filtering, the logging module provides a
@@ -191,7 +191,7 @@ To capture log output to a separate file, use :class:`logging.FileHandler` (or
 
     [handler_filelog]
     class = FileHandler
-    args = ('%(here)s/myapp.log','a')
+    args = ('%(here)s/myproject.log','a')
     level = INFO
     formatter = generic
 
@@ -200,7 +200,7 @@ Before it's recognized, it needs to be added to the list of handlers:
 .. code-block:: ini
 
     [handlers]
-    keys = console, myapp, filelog
+    keys = console, myproject, filelog
 
 and finally utilized by a logger.
 
@@ -211,7 +211,7 @@ and finally utilized by a logger.
     handlers = console, filelog
 
 These final three lines of configuration direct all of the root logger's output
-to the ``myapp.log`` as well as the console.
+to the ``myproject.log`` as well as the console.
 
 Logging Exceptions
 ------------------
@@ -294,7 +294,7 @@ output to the console when we request a page:
 
 .. code-block:: text
 
-    00:50:53,694 INFO [myapp.views] Returning: Hello World!
+    00:50:53,694 INFO [myproject.views] Returning: Hello World!
                       (content-type: text/plain)
     00:50:53,695 INFO [wsgi] 192.168.1.111 - - [11/Aug/2011:20:09:33 -0700] "GET /hello
     HTTP/1.1" 404 - "-"
@@ -310,7 +310,7 @@ that the ``wsgi`` logger is configured and uses this handler accordingly:
     # Begin logging configuration
 
     [loggers]
-    keys = root, myapp, wsgi
+    keys = root, myproject, wsgi
 
     [handlers]
     keys = console, accesslog
