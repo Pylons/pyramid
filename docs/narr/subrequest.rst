@@ -62,7 +62,7 @@ object:
 
 .. code-block:: python
    :linenos:
-   :emphasize-lines: 11
+   :emphasize-lines: 11,18
 
    from wsgiref.simple_server import make_server
    from pyramid.config import Configurator
