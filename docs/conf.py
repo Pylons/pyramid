@@ -173,10 +173,6 @@ html_title = 'The Pyramid Web Framework v%s' % release
 # using the given strftime format.
 html_last_updated_fmt = '%b %d, %Y'
 
-# If true, SmartyPants will be used to convert quotes and dashes to
-# typographically correct entities.
-html_use_smartypants = False # people use cutnpaste in some places
-
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'pyramid'
 
