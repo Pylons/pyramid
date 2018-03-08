@@ -341,9 +341,12 @@ def cherrypy_server_runner(
         if var is not None:
             kwargs[var_name] = int(var)
 
-    from cherrypy import wsgiserver
+    try:
+        from cheroot.wsgi import Server as WSGIServer
+    except ImportError:
+        from cherrypy.wsgiserver import CherryPyWSGIServer as WSGIServer
 
-    server = wsgiserver.CherryPyWSGIServer(bind_addr, app,
+    server = WSGIServer(bind_addr, app,
                                            server_name=server_name, **kwargs)
     if ssl_pem is not None:
         if PY2:
