@@ -18,7 +18,7 @@ def readfile(name):
         return f.read()
 
 README = readfile('README.rst')
-CHANGES = readfile('CHANGES.txt')
+CHANGES = readfile('CHANGES.rst')
 
 install_requires = [
     'setuptools',

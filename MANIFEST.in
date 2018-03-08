@@ -3,7 +3,7 @@ graft docs
 prune docs/_build
 
 include README.rst
-include CHANGES.txt HISTORY.txt BFG_HISTORY.txt
+include CHANGES.rst HISTORY.rst BFG_HISTORY.rst
 include CONTRIBUTORS.txt LICENSE.txt COPYRIGHT.txt
 
 include contributing.md RELEASING.txt
