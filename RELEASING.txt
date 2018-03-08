@@ -46,15 +46,15 @@ Prepare new release branch
   x.y-branch``. A search for ``cookiecutter gh:Pylons/pyramid-cookiecutter-``
   should return all instances to be updated.
 
-- Ensure all features of the release are documented (audit CHANGES.txt or
+- Ensure all features of the release are documented (audit CHANGES.rst or
   communicate with contributors).
 
-- Change CHANGES.txt heading to reflect the new version number.
+- Change CHANGES.rst heading to reflect the new version number.
 
-- Copy relevant changes (delta bug fixes) from CHANGES.txt to
+- Copy relevant changes (delta bug fixes) from CHANGES.rst to
   docs/whatsnew-X.X (if it's a major release).  Minor releases should
   include a link under "Bug Fix Releases" to the minor feature
-  changes in CHANGES.txt.
+  changes in CHANGES.rst.
 
 - Update README.rst to use correct versions of badges, URLs, and ALT option
   according to the new release branch name.
@@ -85,11 +85,11 @@ Prepare master for further development (major releases only)
 
 - Checkout master.
 
-- In CHANGES.txt, preserve headings but clear out content. Add heading
+- In CHANGES.rst, preserve headings but clear out content. Add heading
   "unreleased" for the version number.
 
-- From the release branch, forward port the changes in CHANGES.txt to
-  HISTORY.txt.
+- From the release branch, forward port the changes in CHANGES.rst to
+  HISTORY.rst.
 
 - In contributing.md, forward port branch descriptions from release branch.
 
