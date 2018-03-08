@@ -353,9 +353,14 @@ def cherrypy_server_runner(
             server.ssl_certificate = server.ssl_private_key = ssl_pem
         else:
             # creates wsgiserver.ssl_builtin as side-effect
-            from cherrypy.wsgiserver import get_ssl_adapter_class, ssl_builtin
+            try:
+                from cheroot.server import get_ssl_adapter_class
+                from cheroot.ssl.builtin import BuiltinSSLAdapter
+            except ImportError:
+                from cherrypy.wsgiserver import get_ssl_adapter_class
+                from cherrypy.wsgiserver.ssl_builtin import BuiltinSSLAdapter
             get_ssl_adapter_class()
-            server.ssl_adapter = ssl_builtin.BuiltinSSLAdapter(ssl_pem, ssl_pem)
+            server.ssl_adapter = BuiltinSSLAdapter(ssl_pem, ssl_pem)
 
     if protocol_version:
         server.protocol = protocol_version
