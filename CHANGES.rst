@@ -21,7 +21,7 @@ Features
   instead of ``pyramid.util.Request``.
   See https://github.com/Pylons/pyramid/pull/3129
 
-- In ``cherrypy_server_runner``, prefer imports from the ``cheroot` package over the legacy
+- In ``cherrypy_server_runner``, prefer imports from the ``cheroot`` package over the legacy
   imports from `cherrypy.wsgiserver`.
   See https://github.com/Pylons/pyramid/pull/3235
 
