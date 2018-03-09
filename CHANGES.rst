@@ -39,9 +39,6 @@ Backward Incompatibilities
   depending on it directly within your project.
   See https://github.com/Pylons/pyramid/pull/3140
 
-- On CherryPy 9+ all functionality from ``cherrypy.wsgiserver`` was moved to ``cheroot``.
-  See https://github.com/Pylons/pyramid/issues/3195
-
 Documentation Changes
 ---------------------
 
