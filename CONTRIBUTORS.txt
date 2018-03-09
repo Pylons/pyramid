@@ -314,3 +314,5 @@ Contributors
 - Lars Blumberg, 2017/08/14
 
 - Deneys Maartens, 2017/11/03
+
+- Heron Rossi, 2018/03/08

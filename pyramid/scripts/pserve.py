@@ -341,18 +341,26 @@ def cherrypy_server_runner(
         if var is not None:
             kwargs[var_name] = int(var)
 
-    from cherrypy import wsgiserver
+    try:
+        from cheroot.wsgi import Server as WSGIServer
+    except ImportError:
+        from cherrypy.wsgiserver import CherryPyWSGIServer as WSGIServer
 
-    server = wsgiserver.CherryPyWSGIServer(bind_addr, app,
-                                           server_name=server_name, **kwargs)
+    server = WSGIServer(bind_addr, app,
+                        server_name=server_name, **kwargs)
     if ssl_pem is not None:
         if PY2:
             server.ssl_certificate = server.ssl_private_key = ssl_pem
         else:
             # creates wsgiserver.ssl_builtin as side-effect
-            wsgiserver.get_ssl_adapter_class()
-            server.ssl_adapter = wsgiserver.ssl_builtin.BuiltinSSLAdapter(
-                ssl_pem, ssl_pem)
+            try:
+                from cheroot.server import get_ssl_adapter_class
+                from cheroot.ssl.builtin import BuiltinSSLAdapter
+            except ImportError:
+                from cherrypy.wsgiserver import get_ssl_adapter_class
+                from cherrypy.wsgiserver.ssl_builtin import BuiltinSSLAdapter
+            get_ssl_adapter_class()
+            server.ssl_adapter = BuiltinSSLAdapter(ssl_pem, ssl_pem)
 
     if protocol_version:
         server.protocol = protocol_version
