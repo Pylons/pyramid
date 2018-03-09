@@ -21,8 +21,8 @@ Features
   instead of ``pyramid.util.Request``.
   See https://github.com/Pylons/pyramid/pull/3129
 
-- Added a fallback ``try/except`` block on ``pyramid/scripts/pserve.cherrypy_server_runner``
-  due to module/import changes on CherryPy 9+
+- In ``cherrypy_server_runner``, prefer imports from the ``cheroot` package over the legacy
+  imports from `cherrypy.wsgiserver`.
   See https://github.com/Pylons/pyramid/pull/3235
 
 Bug Fixes
