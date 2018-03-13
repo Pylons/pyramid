@@ -682,7 +682,7 @@ class URLMethodsMixin(object):
            Calling ``request.static_path(apath)`` is the same as calling
            ``request.static_url(apath, _app_url=request.script_name)``.
            :meth:`pyramid.request.Request.static_path` is, in fact, implemented
-           in terms of `:meth:`pyramid.request.Request.static_url` in just this
+           in terms of :meth:`pyramid.request.Request.static_url` in just this
            way. As a result, any ``_app_url`` passed within the ``**kw`` values
            to ``static_path`` will be ignored.
         """
