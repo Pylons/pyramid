@@ -5,9 +5,9 @@ from pyramid.compat import (
     )
 
 class UrlEncodeTests(unittest.TestCase):
-    def _callFUT(self, query, doseq=False):
+    def _callFUT(self, query, doseq=False, **kw):
         from pyramid.encode import urlencode
-        return urlencode(query, doseq)
+        return urlencode(query, doseq, **kw)
 
     def test_ascii_only(self):
         result = self._callFUT([('a',1), ('b',2)])
@@ -52,6 +52,13 @@ class UrlEncodeTests(unittest.TestCase):
     def test_None_value_with_prefix_values(self):
         result = self._callFUT([('a', '1'), ('b', None), ('c', None)])
         self.assertEqual(result, 'a=1&b=&c=')
+
+    def test_quote_via(self):
+        def my_quoter(value):
+            return 'xxx' + value
+        result = self._callFUT([('a', '1'), ('b', None), ('c', None)],
+                               quote_via=my_quoter)
+        self.assertEqual(result, 'xxxa=xxx1&xxxb=&xxxc=')
 
 class URLQuoteTests(unittest.TestCase):
     def _callFUT(self, val, safe=''):

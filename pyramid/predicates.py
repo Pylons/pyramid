@@ -4,7 +4,7 @@ from pyramid.exceptions import ConfigurationError
 
 from pyramid.compat import is_nonstr_iter
 
-from pyramid.session import check_csrf_token
+from pyramid.csrf import check_csrf_token
 from pyramid.traversal import (
     find_interface,
     traversal_path,

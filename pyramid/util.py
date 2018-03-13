@@ -97,6 +97,9 @@ class InstancePropertyHelper(object):
         attrs = dict(properties)
         if attrs:
             parent = target.__class__
+            # fix the module name so it appears to still be the parent
+            # e.g. pyramid.request instead of pyramid.util
+            attrs.setdefault('__module__', parent.__module__)
             newcls = type(parent.__name__, (parent, object), attrs)
             # We assign __provides__ and __implemented__ below to prevent a
             # memory leak that results from from the usage of this instance's
@@ -231,16 +234,19 @@ class WeakOrderedSet(object):
             self._order.remove(oid)
             self._order.append(oid)
             return
-        ref = weakref.ref(item, lambda x: self.remove(item))
+        ref = weakref.ref(item, lambda x: self._remove_by_id(oid))
         self._items[oid] = ref
         self._order.append(oid)
 
-    def remove(self, item):
+    def _remove_by_id(self, oid):
         """ Remove an item from the set."""
-        oid = id(item)
         if oid in self._items:
             del self._items[oid]
             self._order.remove(oid)
+
+    def remove(self, item):
+        """ Remove an item from the set."""
+        self._remove_by_id(id(item))
 
     def empty(self):
         """ Clear all objects from the set."""
@@ -578,7 +584,7 @@ def action_method(wrapped):
                 if last_frame.function == 'extract_stack': # pragma: no cover
                     f.pop()
                 info = ActionInfo(*f[-backframes])
-            except: # pragma: no cover
+            except Exception: # pragma: no cover
                 info = ActionInfo(None, 0, '', '')
         self._ainfo.append(info)
         try:

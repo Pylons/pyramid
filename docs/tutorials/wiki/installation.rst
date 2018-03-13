@@ -31,7 +31,7 @@ On UNIX
 .. code-block:: bash
 
     $ cd ~
-    $ cookiecutter https://github.com/Pylons/pyramid-cookiecutter-zodb
+    $ cookiecutter gh:Pylons/pyramid-cookiecutter-zodb --checkout master
 
 On Windows
 ^^^^^^^^^^
@@ -39,17 +39,18 @@ On Windows
 .. code-block:: doscon
 
     c:\> cd \
-    c:\> cookiecutter https://github.com/Pylons/pyramid-cookiecutter-zodb
+    c:\> cookiecutter gh:Pylons/pyramid-cookiecutter-zodb --checkout master
 
 On all operating systems
 ^^^^^^^^^^^^^^^^^^^^^^^^
 If prompted for the first item, accept the default ``yes`` by hitting return.
 
-#. ``You've cloned ~/.cookiecutters/pyramid-cookiecutter-zodb before. Is it
-   okay to delete and re-clone it? [yes]:``
-#. ``project_name [Pyramid Scaffold]: myproj``
-#. ``repo_name [scaffold]: tutorial``
+.. code-block:: text
 
+    You've cloned ~/.cookiecutters/pyramid-cookiecutter-zodb before.
+    Is it okay to delete and re-clone it? [yes]: yes
+    project_name [Pyramid Scaffold]: myproj
+    repo_name [myproj]: tutorial
 
 Change directory into your newly created project
 ------------------------------------------------
@@ -179,12 +180,12 @@ Testing requirements are defined in our project's ``setup.py`` file, in the ``te
 .. literalinclude:: src/installation/setup.py
     :language: python
     :lineno-match:
-    :lines: 22-26
+    :lines: 24-28
 
 .. literalinclude:: src/installation/setup.py
     :language: python
     :lineno-match:
-    :lines: 46-48
+    :lines: 48-50
 
 
 .. _running_tests:
@@ -378,13 +379,13 @@ assumptions:
    tutorial, we'll only be using :term:`traversal` and :term:`ZODB`.
 
 .. _pyramid_chameleon:
-   http://docs.pylonsproject.org/projects/pyramid-chameleon/en/latest/
+   https://docs.pylonsproject.org/projects/pyramid-chameleon/en/latest/
 
 .. _pyramid_tm:
-   http://docs.pylonsproject.org/projects/pyramid-tm/en/latest/
+   https://docs.pylonsproject.org/projects/pyramid-tm/en/latest/
 
 .. _pyramid_zodbconn:
-   http://docs.pylonsproject.org/projects/pyramid-zodbconn/en/latest/
+   https://docs.pylonsproject.org/projects/pyramid-zodbconn/en/latest/
 
 .. _transaction:
-   http://zodb.readthedocs.org/en/latest/transactions.html
+   https://zodb.readthedocs.io/en/latest/transactions.html

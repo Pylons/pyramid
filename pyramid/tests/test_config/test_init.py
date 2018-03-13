@@ -141,6 +141,22 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(manager.pushed, pushed)
         self.assertEqual(manager.popped, True)
 
+    def test_context_manager(self):
+        from pyramid.config import Configurator
+        config = Configurator()
+        manager = DummyThreadLocalManager()
+        config.manager = manager
+        view = lambda r: None
+        with config as ctx:
+            self.assertTrue(config is ctx)
+            self.assertEqual(manager.pushed,
+                             {'registry': config.registry, 'request': None})
+            self.assertFalse(manager.popped)
+            config.add_view(view)
+        self.assertTrue(manager.popped)
+        config.add_view(view)  # did not raise a conflict because of commit
+        config.commit()
+
     def test_ctor_with_package_registry(self):
         import sys
         from pyramid.config import Configurator
@@ -816,6 +832,16 @@ pyramid.tests.test_config.dummy_include2""",
         config.include(include)
         self.assertEqual(results['root_package'], tests)
         self.assertEqual(results['package'], test_config)
+
+    def test_include_threadlocals_active(self):
+        from pyramid.tests import test_config
+        from pyramid.threadlocal import get_current_registry
+        stack = []
+        def include(config):
+            stack.append(get_current_registry())
+        config = self._makeOne()
+        config.include(include)
+        self.assertTrue(stack[0] is config.registry)
 
     def test_action_branching_kw_is_None(self):
         config = self._makeOne(autocommit=True)

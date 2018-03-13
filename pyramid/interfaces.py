@@ -503,8 +503,10 @@ class IAuthenticationPolicy(Interface):
 class IAuthorizationPolicy(Interface):
     """ An object representing a Pyramid authorization policy. """
     def permits(context, principals, permission):
-        """ Return ``True`` if any of the ``principals`` is allowed the
-        ``permission`` in the current ``context``, else return ``False``
+        """ Return an instance of :class:`pyramid.security.Allowed` if any
+        of the ``principals`` is allowed the ``permission`` in the current
+        ``context``, else return an instance of
+        :class:`pyramid.security.Denied`.
         """
 
     def principals_allowed_by_permission(context, permission):
@@ -677,12 +679,83 @@ class IViewPermission(Interface):
         """
 
 class IRouter(Interface):
-    """ WSGI application which routes requests to 'view' code based on
-    a view registry."""
+    """
+    WSGI application which routes requests to 'view' code based on
+    a view registry.
+
+    """
     registry = Attribute(
         """Component architecture registry local to this application.""")
 
-class ISettings(Interface):
+    def request_context(environ):
+        """
+        Create a new request context from a WSGI environ.
+
+        The request context is used to push/pop the threadlocals required
+        when processing the request. It also contains an initialized
+        :class:`pyramid.interfaces.IRequest` instance using the registered
+        :class:`pyramid.interfaces.IRequestFactory`. The context may be
+        used as a context manager to control the threadlocal lifecycle:
+
+        .. code-block:: python
+
+            with router.request_context(environ) as request:
+                ...
+
+        Alternatively, the context may be used without the ``with`` statement
+        by manually invoking its ``begin()`` and ``end()`` methods.
+
+        .. code-block:: python
+
+            ctx = router.request_context(environ)
+            request = ctx.begin()
+            try:
+                ...
+            finally:
+                ctx.end()
+
+        """
+
+    def invoke_request(request):
+        """
+        Invoke the :app:`Pyramid` request pipeline.
+
+        See :ref:`router_chapter` for information on the request pipeline.
+
+        The output should be a :class:`pyramid.interfaces.IResponse` object
+        or a raised exception.
+
+        """
+
+class IExecutionPolicy(Interface):
+    def __call__(environ, router):
+        """
+        This callable triggers the router to process a raw WSGI environ dict
+        into a response and controls the :app:`Pyramid` request pipeline.
+
+        The ``environ`` is the raw WSGI environ.
+
+        The ``router`` is an :class:`pyramid.interfaces.IRouter` object which
+        should be used to create a request object and send it into the
+        processing pipeline.
+
+        The return value should be a :class:`pyramid.interfaces.IResponse`
+        object or an exception that will be handled by WSGI middleware.
+
+        The default execution policy simply creates a request and sends it
+        through the pipeline, attempting to render any exception that escapes:
+
+        .. code-block:: python
+
+            def simple_execution_policy(environ, router):
+                with router.request_context(environ) as request:
+                    try:
+                        return router.invoke_request(request)
+                    except Exception:
+                        return request.invoke_exception_view(reraise=True)
+        """
+
+class ISettings(IDict):
     """ Runtime settings utility for pyramid; represents the
     deployment settings for the application.  Implements a mapping
     interface."""
@@ -886,6 +959,13 @@ class ISession(IDict):
     usually accessed via ``request.session``.
 
     Keys and values of a session must be pickleable.
+
+    .. versionchanged:: 1.9
+
+       Sessions are no longer required to implement ``get_csrf_token`` and
+       ``new_csrf_token``. CSRF token support was moved to the pluggable
+       :class:`pyramid.interfaces.ICSRFStoragePolicy` configuration hook.
+
     """
 
     # attributes
@@ -940,18 +1020,38 @@ class ISession(IDict):
         :meth:`pyramid.interfaces.ISession.flash`
         """
 
-    def new_csrf_token():
-        """ Create and set into the session a new, random cross-site request
-        forgery protection token.  Return the token.  It will be a string."""
 
-    def get_csrf_token():
-        """ Return a random cross-site request forgery protection token.  It
-        will be a string.  If a token was previously added to the session via
-        ``new_csrf_token``, that token will be returned.  If no CSRF token
-        was previously set into the session, ``new_csrf_token`` will be
+class ICSRFStoragePolicy(Interface):
+    """ An object that offers the ability to verify CSRF tokens and generate
+    new ones."""
+
+    def new_csrf_token(request):
+        """ Create and return a new, random cross-site request forgery
+        protection token. The token will be an ascii-compatible unicode
+        string.
+
+        """
+
+    def get_csrf_token(request):
+        """ Return a cross-site request forgery protection token.  It
+        will be an ascii-compatible unicode string.  If a token was previously
+        set for this user via ``new_csrf_token``, that token will be returned.
+        If no CSRF token was previously set, ``new_csrf_token`` will be
         called, which will create and set a token, and this token will be
         returned.
+
         """
+
+    def check_csrf_token(request, token):
+        """ Determine if the supplied ``token`` is valid. Most implementations
+        should simply compare the ``token`` to the current value of
+        ``get_csrf_token`` but it is possible to verify the token using
+        any mechanism necessary using this method.
+
+        Returns ``True`` if the ``token`` is valid, otherwise ``False``.
+
+        """
+
 
 class IIntrospector(Interface):
     def get(category_name, discriminator, default=None):

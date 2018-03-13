@@ -43,7 +43,7 @@ Pyramid cookiecutters released under the Pylons Project differ from each other o
 
 - the mechanism they use to map URLs to code (:term:`URL dispatch` or :term:`traversal`)
 
-- templating libraries (:term:`Jinja2` or :term:`Chameleon`)
+- templating libraries (:term:`Jinja2`, :term:`Chameleon`, or :term:`Mako`)
 
 * `pyramid-cookiecutter-starter <https://github.com/Pylons/pyramid-cookiecutter-starter>`_
 * `pyramid-cookiecutter-alchemy <https://github.com/Pylons/pyramid-cookiecutter-alchemy>`_
@@ -52,7 +52,7 @@ Pyramid cookiecutters released under the Pylons Project differ from each other o
 These cookiecutters include:
 
 ``pyramid-cookiecutter-starter``
-    :term:`URL dispatch` for routing and :term:`Jinja2` for templating
+    :term:`URL dispatch` for routing and either :term:`Jinja2`, :term:`Chameleon`, or :term:`Mako` for templating
 
 ``pyramid-cookiecutter-alchemy``
     SQLite for persistent storage, :term:`SQLAlchemy` for an ORM, :term:`URL dispatch` for routing, and :term:`Jinja2` for templating.
@@ -85,14 +85,21 @@ On all platforms, generate a project using cookiecutter.
 
 .. code-block:: bash
 
-   $ cookiecutter https://github.com/Pylons/pyramid-cookiecutter-starter
+   $ cookiecutter gh:Pylons/pyramid-cookiecutter-starter --checkout master
 
 If prompted for the first item, accept the default ``yes`` by hitting return.
 
-#. ``You've cloned ~/.cookiecutters/pyramid-cookiecutter-starter before. Is it
-   okay to delete and re-clone it? [yes]:``
-#. ``project_name [Pyramid Scaffold]: myproject``
-#. ``repo_name [scaffold]: myproject``
+.. code-block:: text
+
+    You've cloned ~/.cookiecutters/pyramid-cookiecutter-starter before.
+    Is it okay to delete and re-clone it? [yes]: yes
+    project_name [Pyramid Scaffold]: myproject
+    repo_name [myproject]: myproject
+    Select template_language:
+    1 - jinja2
+    2 - chameleon
+    3 - mako
+    Choose from 1, 2, 3 [1]: 1
 
 We then run through the following commands.
 
@@ -325,7 +332,7 @@ Access is restricted such that only a browser running on the same machine as
 Pyramid will be able to access your Pyramid application.  However, if you want
 to open access to other machines on the same network, then edit the
 ``development.ini`` file, and replace the ``listen`` value in the
-``[server:main]`` section, changing it from ``127.0.0.1:6543 [::1]:6543`` to ``*:6543``
+``[server:main]`` section, changing it from ``localhost:6543`` to ``*:6543``
 (this is equivalent to ``0.0.0.0:6543 [::]:6543``).  For example:
 
 .. code-block:: ini
@@ -349,8 +356,8 @@ IPv6. ``[::]`` means the same as ``0.0.0.0`` but for IPv6 protocol.
 
 You can change the port on which the server runs on by changing the same
 portion of the ``development.ini`` file.  For example, you can change the
-``listen = 127.0.0.1:6543 [::1]:6543`` line in the ``development.ini`` file's ``[server:main]``
-section to ``listen = 127:0.0.1:8080 [::1]:8080`` to run the server on port 8080 instead of port 6543.
+``listen = localhost:6543`` line in the ``development.ini`` file's ``[server:main]``
+section to ``listen = localhost:8080`` to run the server on port 8080 instead of port 6543.
 
 You can shut down a server started this way by pressing ``Ctrl-C`` (or
 ``Ctrl-Break`` on Windows).
@@ -733,7 +740,7 @@ testing, as well as distributing your application.
    ``setup.py`` is the de facto standard which Python developers use to
    distribute their reusable code.  You can read more about ``setup.py`` files
    and their usage in the `Python Packaging User Guide
-   <https://packaging.python.org/en/latest/>`_ and `Setuptools documentation
+   <https://packaging.python.org/>`_ and `Setuptools documentation
    <http://pythonhosted.org/setuptools/>`_.
 
 Our generated ``setup.py`` looks like this:
@@ -1105,7 +1112,7 @@ Automatically Reloading Your Code
 During development, it can be really useful to automatically have the
 webserver restart when you make changes. ``pserve`` has a ``--reload`` switch
 to enable this. It uses the
-`hupper <http://docs.pylonsproject.org/projects/hupper/en/latest/>`_ package
+`hupper <https://docs.pylonsproject.org/projects/hupper/en/latest/>`_ package
 to enable this behavior. When your code crashes, ``hupper`` will wait for
 another change or the ``SIGHUP`` signal before restarting again.
 
@@ -1134,7 +1141,7 @@ serve it many times. When you change it, you want ``pserve`` to restart:
 
     [pserve]
     watch_files =
-        myapp/static/favicon.ico
+        myproject/static/favicon.ico
 
 Paths may be absolute or relative to the configuration file. They may also
 be an :term:`asset specification`. These paths are passed to ``hupper``, which

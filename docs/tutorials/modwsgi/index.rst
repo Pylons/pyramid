@@ -39,9 +39,21 @@ specific path information for commands and files.
     .. code-block:: bash
 
        $ cd ~
-       $ cookiecutter https://github.com/Pylons/pyramid-cookiecutter-starter
-       project_name [Pyramid Scaffold]: myproject
-       repo_name [scaffold]: myproject
+       $ cookiecutter gh:Pylons/pyramid-cookiecutter-starter --checkout master
+
+    If prompted for the first item, accept the default ``yes`` by hitting return.
+
+    .. code-block:: text
+
+        You've cloned ~/.cookiecutters/pyramid-cookiecutter-starter before.
+        Is it okay to delete and re-clone it? [yes]: yes
+        project_name [Pyramid Scaffold]: myproject
+        repo_name [myproject]: myproject
+        Select template_language:
+        1 - jinja2
+        2 - chameleon
+        3 - mako
+        Choose from 1, 2, 3 [1]: 1
 
 #.  Create a :term:`virtual environment` which we'll use to install our
     application. It is important to use the same base Python interpreter

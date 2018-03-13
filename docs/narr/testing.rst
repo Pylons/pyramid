@@ -158,7 +158,7 @@ Test setup using a context manager
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 An alternative style of setting up a test configuration is to use the ``with``
-statement and :func:`pyramid.testing.testConfig` to create a context manager.
+statement and :func:`pyramid.testing.testConfig` to create a :term:`context manager`.
 The context manager will call :func:`pyramid.testing.setUp` before the code
 under test and :func:`pyramid.testing.tearDown` afterwards.
 
@@ -376,18 +376,16 @@ following the ``requires`` block in the file ``myproject/setup.py``.
 
 .. literalinclude:: myproject/setup.py
     :language: python
-    :linenos:
-    :lines: 11-22
-    :lineno-start: 11
-    :emphasize-lines: 8-
+    :lines: 11-23
+    :lineno-match:
+    :emphasize-lines: 9-
 
 Remember to change the dependency.
 
 .. literalinclude:: myproject/setup.py
     :language: python
-    :linenos:
-    :lines: 40-44
-    :lineno-start: 40
+    :lines: 42-46
+    :lineno-match:
     :emphasize-lines: 2-4
 
 As always, whenever you change your dependencies, make sure to run the correct

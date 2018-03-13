@@ -38,18 +38,26 @@ Prepare new release branch
 
   $ ./scaffoldtests.sh
 
-- Ensure all features of the release are documented (audit CHANGES.txt or
+- For each ``pyramid-cookiecutter-*``, make a new branch off "master" with the
+  same name to align with the new Pyramid release branch name.
+
+- In the docs, update the ``cookiecutter`` command with the new branch name,
+  for example, ``cookiecutter gh:Pylons/pyramid-cookiecutter-starter --checkout
+  x.y-branch``. A search for ``cookiecutter gh:Pylons/pyramid-cookiecutter-``
+  should return all instances to be updated.
+
+- Ensure all features of the release are documented (audit CHANGES.rst or
   communicate with contributors).
 
-- Change CHANGES.txt heading to reflect the new version number.
+- Change CHANGES.rst heading to reflect the new version number.
 
-- Copy relevant changes (delta bug fixes) from CHANGES.txt to
+- Copy relevant changes (delta bug fixes) from CHANGES.rst to
   docs/whatsnew-X.X (if it's a major release).  Minor releases should
   include a link under "Bug Fix Releases" to the minor feature
-  changes in CHANGES.txt.
+  changes in CHANGES.rst.
 
-- Update README.rst to use correct versions of badges and URLs according to
-  each branch and context, i.e., RTD "latest" == GitHub/Travis "1.x-branch".
+- Update README.rst to use correct versions of badges, URLs, and ALT option
+  according to the new release branch name.
 
 - Update whatsnew-X.X.rst in docs to point at change log entries for individual
   releases if applicable.
@@ -63,15 +71,9 @@ Prepare new release branch
 
 - Change setup.py version to the release version number.
 
-- Make sure PyPI long description renders (requires ``readme`` installed
-  into your Python)::
-
-  $ python setup.py check -r -s -m
-
 - Create a release tag.
 
-- Make sure your Python has ``setuptools-git``, ``twine``, and ``wheel``
-  installed and release to PyPI::
+- Build and publish to PyPI::
 
   $ python setup.py sdist bdist_wheel
   $ twine upload dist/pyramid-X.X-*
@@ -83,11 +85,11 @@ Prepare master for further development (major releases only)
 
 - Checkout master.
 
-- In CHANGES.txt, preserve headings but clear out content. Add heading
+- In CHANGES.rst, preserve headings but clear out content. Add heading
   "unreleased" for the version number.
 
-- From the release branch, forward port the changes in CHANGES.txt to
-  HISTORY.txt.
+- From the release branch, forward port the changes in CHANGES.rst to
+  HISTORY.rst.
 
 - In contributing.md, forward port branch descriptions from release branch.
 
@@ -95,6 +97,14 @@ Prepare master for further development (major releases only)
   pylons_sphinx_latesturl_pagename_overrides for the release.
 
 - Change setup.py version to the next version number.
+
+- Update README.rst to use correct versions of badges, URLs, and ALT option
+  for "master" instead of the major release version.
+
+- In the docs, update the ``cookiecutter`` command with ``master``,
+  for example, ``cookiecutter gh:Pylons/pyramid-cookiecutter-starter --checkout
+  master``. A search for ``cookiecutter gh:Pylons/pyramid-cookiecutter-``
+  should return all instances to be updated.
 
 Update previous version (final releases only)
 ---------------------------------------------
@@ -105,16 +115,23 @@ Update previous version (final releases only)
 - Configure RTD to point the "latest" alias to the new release version of the
   docs.
 
+
+Cookiecutters
+-------------
+
+- For each cookiecutter, clone the newly released branch to "latest" branch.
+
+
 Marketing and communications
 ----------------------------
 
-- Edit Pylons/trypyramid.com/src/templates/resources.html for major releases
-  only.
-
-- Edit Pylons/pylonsrtd/pylonsrtd/docs/pyramid.rst for major releases only.
+- Edit Pylons/trypyramid.com/src/templates/resources.html for major releases,
+  pre-releases, and once pre-releases are final.
 
 - Edit `http://wiki.python.org/moin/WebFrameworks
   <http://wiki.python.org/moin/WebFrameworks>`_.
+
+- Edit `https://en.wikipedia.org/wiki/Pylons_project <https://en.wikipedia.org/wiki/Pylons_project>`_.
 
 - Announce to Twitter.
 
@@ -126,10 +143,10 @@ https://pypi.python.org/pypi/pyramid/1.x
 
 === One time only for new version, first pre-release ===
 What's New
-http://docs.pylonsproject.org/projects/pyramid/en/1.X-branch/whatsnew-1.X.html
+https://docs.pylonsproject.org/projects/pyramid/en/1.X-branch/whatsnew-1.X.html
 === For all subsequent pre-releases ===
 Changes
-http://docs.pylonsproject.org/projects/pyramid/en/1.X-branch/changes.html#version-yyyy-mm-dd
+https://docs.pylonsproject.org/projects/pyramid/en/1.X-branch/changes.html#version-yyyy-mm-dd
 
 Issues
 https://github.com/Pylons/pyramid/issues
@@ -140,16 +157,15 @@ https://github.com/Pylons/pyramid/issues
 ```
 Pyramid 1.X.X has been released.
 
-Here are the changes:
-
-<<changes>>
+The full changelog is here:
+https://docs.pylonsproject.org/projects/pyramid/en/1.X-branch/changes.html
 
 What's New In Pyramid 1.X:
-http://docs.pylonsproject.org/projects/pyramid/en/1.X-branch/whatsnew-1.X.html
+https://docs.pylonsproject.org/projects/pyramid/en/1.X-branch/whatsnew-1.X.html
 
 1.X release documentation (across all alphas and betas, as well as when it gets
 to final release):
-http://docs.pylonsproject.org/projects/pyramid/en/1.X-branch/
+https://docs.pylonsproject.org/projects/pyramid/en/1.X-branch/
 
 You can install it via PyPI:
 

@@ -56,6 +56,7 @@ def Settings(d=None, _environ_=os.environ, **kw):
     keyword args)."""
     if d is None:
         d = {}
+    d = dict(d)
     d.update(**kw)
 
     eget = _environ_.get
@@ -73,7 +74,7 @@ def Settings(d=None, _environ_=os.environ, **kw):
             value = eget(env_key, value)
         value = type_(value)
         d.update({k: value for k in keys})
-    def O(settings_key, override_key):
+    def O(settings_key, override_key):  # noqa: E743
         for key in expand_key(settings_key):
             d[key] = d[key] or d[override_key]
 

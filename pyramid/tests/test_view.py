@@ -91,6 +91,18 @@ class Test_notfound_view_config(BaseTest, unittest.TestCase):
         self.assertEqual(settings[0]['attr'], 'view')
         self.assertEqual(settings[0]['_info'], 'codeinfo')
 
+    def test_call_with_venusian_args(self):
+        decorator = self._makeOne(_depth=1, _category='foo')
+        venusian = DummyVenusian()
+        decorator.venusian = venusian
+        def foo(): pass
+        decorator(foo)
+        attachments = venusian.attachments
+        category = attachments[0][2]
+        depth = attachments[0][3]
+        self.assertEqual(depth, 2)
+        self.assertEqual(category, 'foo')
+
 class Test_forbidden_view_config(BaseTest, unittest.TestCase):
     def _makeOne(self, **kw):
         from pyramid.view import forbidden_view_config
@@ -132,6 +144,18 @@ class Test_forbidden_view_config(BaseTest, unittest.TestCase):
         self.assertEqual(settings[0]['view'], None) # comes from call_venusian
         self.assertEqual(settings[0]['attr'], 'view')
         self.assertEqual(settings[0]['_info'], 'codeinfo')
+
+    def test_call_with_venusian_args(self):
+        decorator = self._makeOne(_depth=1, _category='foo')
+        venusian = DummyVenusian()
+        decorator.venusian = venusian
+        def foo(): pass
+        decorator(foo)
+        attachments = venusian.attachments
+        category = attachments[0][2]
+        depth = attachments[0][3]
+        self.assertEqual(depth, 2)
+        self.assertEqual(category, 'foo')
 
 class Test_exception_view_config(BaseTest, unittest.TestCase):
     def _makeOne(self, *args, **kw):
@@ -183,6 +207,18 @@ class Test_exception_view_config(BaseTest, unittest.TestCase):
         self.assertEqual(settings[0]['view'], None) # comes from call_venusian
         self.assertEqual(settings[0]['attr'], 'view')
         self.assertEqual(settings[0]['_info'], 'codeinfo')
+
+    def test_call_with_venusian_args(self):
+        decorator = self._makeOne(_depth=1, _category='foo')
+        venusian = DummyVenusian()
+        decorator.venusian = venusian
+        def foo(): pass
+        decorator(foo)
+        attachments = venusian.attachments
+        category = attachments[0][2]
+        depth = attachments[0][3]
+        self.assertEqual(depth, 2)
+        self.assertEqual(category, 'foo')
 
 class RenderViewToResponseTests(BaseTest, unittest.TestCase):
     def _callFUT(self, *arg, **kw):
@@ -564,7 +600,29 @@ class TestViewConfigDecorator(unittest.TestCase):
         decorator.venusian = venusian
         def foo(): pass
         decorator(foo)
-        self.assertEqual(venusian.depth, 2)
+        attachments = venusian.attachments
+        depth = attachments[0][3]
+        self.assertEqual(depth, 2)
+
+    def test_call_withoutcategory(self):
+        decorator = self._makeOne()
+        venusian = DummyVenusian()
+        decorator.venusian = venusian
+        def foo(): pass
+        decorator(foo)
+        attachments = venusian.attachments
+        category = attachments[0][2]
+        self.assertEqual(category, 'pyramid')
+
+    def test_call_withcategory(self):
+        decorator = self._makeOne(_category='not_pyramid')
+        venusian = DummyVenusian()
+        decorator.venusian = venusian
+        def foo(): pass
+        decorator(foo)
+        attachments = venusian.attachments
+        category = attachments[0][2]
+        self.assertEqual(category, 'not_pyramid')
 
 class Test_append_slash_notfound_view(BaseTest, unittest.TestCase):
     def _callFUT(self, context, request):
@@ -778,11 +836,11 @@ class TestViewMethodsMixin(unittest.TestCase):
         orig_response = request.response = DummyResponse(b'foo')
         try:
             raise RuntimeError
-        except RuntimeError:
+        except RuntimeError as ex:
             response = request.invoke_exception_view()
             self.assertEqual(response.app_iter, [b'bar'])
-            self.assertTrue(request.exception is orig_exc)
-            self.assertTrue(request.exc_info is orig_exc_info)
+            self.assertTrue(request.exception is ex)
+            self.assertTrue(request.exc_info[1] is ex)
             self.assertTrue(request.response is orig_response)
         else: # pragma: no cover
             self.fail()
@@ -790,6 +848,8 @@ class TestViewMethodsMixin(unittest.TestCase):
     def test_it_supports_alternate_requests(self):
         def exc_view(exc, request):
             self.assertTrue(request is other_req)
+            from pyramid.threadlocal import get_current_request
+            self.assertTrue(get_current_request() is other_req)
             return DummyResponse(b'foo')
         self.config.add_view(exc_view, context=RuntimeError)
         request = self._makeOne()
@@ -815,6 +875,23 @@ class TestViewMethodsMixin(unittest.TestCase):
             self.assertEqual(response.app_iter, [b'foo'])
         else: # pragma: no cover
             self.fail()
+
+    def test_it_raises_if_no_registry(self):
+        request = self._makeOne()
+        del request.registry
+        from pyramid.threadlocal import manager
+        manager.push({'registry': None, 'request': request})
+        try:
+            raise RuntimeError
+        except RuntimeError:
+            try:
+                request.invoke_exception_view()
+            except RuntimeError as e:
+                self.assertEqual(e.args[0], "Unable to retrieve registry")
+        else: # pragma: no cover
+            self.fail()
+        finally:
+            manager.pop()
 
     def test_it_supports_alternate_exc_info(self):
         def exc_view(exc, request):
@@ -867,6 +944,18 @@ class TestViewMethodsMixin(unittest.TestCase):
         else: # pragma: no cover
             self.fail()
 
+    def test_it_reraises_if_not_found(self):
+        request = self._makeOne()
+        dummy_exc = RuntimeError()
+        try:
+            raise dummy_exc
+        except RuntimeError:
+            self.assertRaises(
+                RuntimeError,
+                lambda: request.invoke_exception_view(reraise=True))
+        else: # pragma: no cover
+            self.fail()
+
     def test_it_raises_predicate_mismatch(self):
         from pyramid.exceptions import PredicateMismatch
         def exc_view(exc, request): pass
@@ -878,6 +967,21 @@ class TestViewMethodsMixin(unittest.TestCase):
             raise dummy_exc
         except RuntimeError:
             self.assertRaises(PredicateMismatch, request.invoke_exception_view)
+        else: # pragma: no cover
+            self.fail()
+
+    def test_it_reraises_after_predicate_mismatch(self):
+        def exc_view(exc, request): pass
+        self.config.add_view(exc_view, context=Exception, request_method='POST')
+        request = self._makeOne()
+        request.method = 'GET'
+        dummy_exc = RuntimeError()
+        try:
+            raise dummy_exc
+        except RuntimeError:
+            self.assertRaises(
+                RuntimeError,
+                lambda: request.invoke_exception_view(reraise=True))
         else: # pragma: no cover
             self.fail()
 
@@ -934,8 +1038,7 @@ class DummyVenusian(object):
         self.attachments = []
 
     def attach(self, wrapped, callback, category=None, depth=1):
-        self.attachments.append((wrapped, callback, category))
-        self.depth = depth
+        self.attachments.append((wrapped, callback, category, depth))
         return self.info
 
 class DummyRegistry(object):
@@ -962,7 +1065,7 @@ class DummyVenusianContext(object):
 def call_venusian(venusian, context=None):
     if context is None:
         context = DummyVenusianContext()
-    for wrapped, callback, category in venusian.attachments:
+    for wrapped, callback, category, depth in venusian.attachments:
         callback(context, None, None)
     return context.config
 

@@ -35,7 +35,7 @@ Links
 
 Links are presented as follows, and may be clickable.
 
-`TryPyramid <https://TryPyramid.com>`_
+`TryPyramid <https://trypyramid.com>`_
 
 .. seealso:: See also :ref:`typographical-conventions-cross-references` for other links within the documentation.
 

@@ -18,26 +18,19 @@ import time
 import webbrowser
 
 import hupper
-from paste.deploy import (
-    loadapp,
-    loadserver,
-)
-from paste.deploy.loadwsgi import (
-    SERVER,
-    loadcontext,
-)
 
 from pyramid.compat import PY2
-from pyramid.compat import configparser
 
+from pyramid.scripts.common import get_config_loader
 from pyramid.scripts.common import parse_vars
-from pyramid.scripts.common import setup_logging
 from pyramid.path import AssetResolver
 from pyramid.settings import aslist
+
 
 def main(argv=sys.argv, quiet=False):
     command = PServeCommand(argv, quiet=quiet)
     return command.run()
+
 
 class PServeCommand(object):
 
@@ -85,7 +78,9 @@ class PServeCommand(object):
         '-b', '--browser',
         dest='browser',
         action='store_true',
-        help="Open a web browser to server url")
+        help=("Open a web browser to the server url. The server url is "
+              "determined from the 'open_url' setting in the 'pserve' "
+              "section of the configuration file."))
     parser.add_argument(
         '-v', '--verbose',
         default=default_verbosity,
@@ -113,10 +108,9 @@ class PServeCommand(object):
              "passed here.",
         )
 
+    _get_config_loader = staticmethod(get_config_loader)  # for testing
 
-    ConfigParser = configparser.ConfigParser  # testing
-    loadapp = staticmethod(loadapp)  # testing
-    loadserver = staticmethod(loadserver)  # testing
+    open_url = None
 
     _scheme_re = re.compile(r'^[a-z][a-z]+:', re.I)
 
@@ -124,32 +118,22 @@ class PServeCommand(object):
         self.args = self.parser.parse_args(argv[1:])
         if quiet:
             self.args.verbose = 0
-        self.watch_files = []
+        if self.args.reload:
+            self.worker_kwargs = {'argv': argv, "quiet": quiet}
+        self.watch_files = set()
 
-    def out(self, msg): # pragma: no cover
+    def out(self, msg):  # pragma: no cover
         if self.args.verbose > 0:
             print(msg)
 
-    def get_config_vars(self):
-        restvars = self.args.config_vars
-        return parse_vars(restvars)
+    def get_config_path(self, loader):
+        return os.path.abspath(loader.uri.path)
 
-    def pserve_file_config(self, filename, global_conf=None):
-        here = os.path.abspath(os.path.dirname(filename))
-        defaults = {}
-        if global_conf:
-            defaults.update(global_conf)
-        defaults['here'] = here
-
-        config = self.ConfigParser(defaults=defaults)
-        config.optionxform = str
-        config.read(filename)
-        try:
-            items = dict(config.items('pserve'))
-        except configparser.NoSectionError:
-            return
-
-        watch_files = aslist(items.get('watch_files', ''), flatten=False)
+    def pserve_file_config(self, loader, global_conf=None):
+        settings = loader.get_settings('pserve', global_conf)
+        config_path = self.get_config_path(loader)
+        here = os.path.dirname(config_path)
+        watch_files = aslist(settings.get('watch_files', ''), flatten=False)
 
         # track file paths relative to the ini file
         resolver = AssetResolver(package=None)
@@ -158,23 +142,33 @@ class PServeCommand(object):
                 file = resolver.resolve(file).abspath()
             elif not os.path.isabs(file):
                 file = os.path.join(here, file)
-            self.watch_files.append(os.path.abspath(file))
+            self.watch_files.add(os.path.abspath(file))
+
+        # attempt to determine the url of the server
+        open_url = settings.get('open_url')
+        if open_url:
+            self.open_url = open_url
+
+    def guess_server_url(self, loader, server_name, global_conf=None):
+        server_name = server_name or 'main'
+        settings = loader.get_settings('server:' + server_name, global_conf)
+        if 'port' in settings:
+            return 'http://127.0.0.1:{port}'.format(**settings)
 
     def run(self):  # pragma: no cover
         if not self.args.config_uri:
             self.out('You must give a config file')
             return 2
+        config_uri = self.args.config_uri
+        config_vars = parse_vars(self.args.config_vars)
         app_spec = self.args.config_uri
-
-        vars = self.get_config_vars()
         app_name = self.args.app_name
 
-        base = os.getcwd()
-        if not self._scheme_re.search(app_spec):
-            config_path = os.path.join(base, app_spec)
-            app_spec = 'config:' + app_spec
-        else:
-            config_path = None
+        loader = self._get_config_loader(config_uri)
+        loader.setup_logging(config_vars)
+
+        self.pserve_file_config(loader, global_conf=config_vars)
+
         server_name = self.args.server_name
         if self.args.server:
             server_spec = 'egg:pyramid'
@@ -183,18 +177,31 @@ class PServeCommand(object):
         else:
             server_spec = app_spec
 
+        server_loader = loader
+        if server_spec != app_spec:
+            server_loader = self.get_config_loader(server_spec)
+
         # do not open the browser on each reload so check hupper first
         if self.args.browser and not hupper.is_active():
-            def open_browser():
-                context = loadcontext(
-                    SERVER, app_spec, name=server_name, relative_to=base,
-                    global_conf=vars)
-                url = 'http://127.0.0.1:{port}/'.format(**context.config())
-                time.sleep(1)
-                webbrowser.open(url)
-            t = threading.Thread(target=open_browser)
-            t.setDaemon(True)
-            t.start()
+            url = self.open_url
+
+            if not url:
+                url = self.guess_server_url(
+                    server_loader, server_name, config_vars)
+
+            if not url:
+                self.out('WARNING: could not determine the server\'s url to '
+                         'open the browser. To fix this set the "open_url" '
+                         'setting in the [pserve] section of the '
+                         'configuration file.')
+
+            else:
+                def open_browser():
+                    time.sleep(1)
+                    webbrowser.open(url)
+                t = threading.Thread(target=open_browser)
+                t.setDaemon(True)
+                t.start()
 
         if self.args.reload and not hupper.is_active():
             if self.args.verbose > 1:
@@ -203,23 +210,23 @@ class PServeCommand(object):
                 'pyramid.scripts.pserve.main',
                 reload_interval=int(self.args.reload_interval),
                 verbose=self.args.verbose,
+                worker_kwargs=self.worker_kwargs
             )
             return 0
 
-        if config_path:
-            setup_logging(config_path, global_conf=vars)
-            self.pserve_file_config(config_path, global_conf=vars)
-            self.watch_files.append(config_path)
+        config_path = self.get_config_path(loader)
+        self.watch_files.add(config_path)
+
+        server_path = self.get_config_path(server_loader)
+        self.watch_files.add(server_path)
 
         if hupper.is_active():
             reloader = hupper.get_reloader()
-            reloader.watch_files(self.watch_files)
+            reloader.watch_files(list(self.watch_files))
 
-        server = self.loadserver(
-            server_spec, name=server_name, relative_to=base, global_conf=vars)
+        server = server_loader.get_wsgi_server(server_name, config_vars)
 
-        app = self.loadapp(
-            app_spec, name=app_name, relative_to=base, global_conf=vars)
+        app = loader.get_wsgi_app(app_name, config_vars)
 
         if self.args.verbose > 0:
             if hasattr(os, 'getpid'):
@@ -239,8 +246,9 @@ class PServeCommand(object):
                 msg = ''
             self.out('Exiting%s (-v to see traceback)' % msg)
 
+
 # For paste.deploy server instantiation (egg:pyramid#wsgiref)
-def wsgiref_server_runner(wsgi_app, global_conf, **kw): # pragma: no cover
+def wsgiref_server_runner(wsgi_app, global_conf, **kw):  # pragma: no cover
     from wsgiref.simple_server import make_server
     host = kw.get('host', '0.0.0.0')
     port = int(kw.get('port', 8080))
@@ -248,13 +256,14 @@ def wsgiref_server_runner(wsgi_app, global_conf, **kw): # pragma: no cover
     print('Starting HTTP server on http://%s:%s' % (host, port))
     server.serve_forever()
 
+
 # For paste.deploy server instantiation (egg:pyramid#cherrypy)
 def cherrypy_server_runner(
         app, global_conf=None, host='127.0.0.1', port=None,
         ssl_pem=None, protocol_version=None, numthreads=None,
         server_name=None, max=None, request_queue_size=None,
         timeout=None
-        ): # pragma: no cover
+        ):  # pragma: no cover
     """
     Entry point for CherryPy's WSGI server
 
@@ -332,18 +341,26 @@ def cherrypy_server_runner(
         if var is not None:
             kwargs[var_name] = int(var)
 
-    from cherrypy import wsgiserver
+    try:
+        from cheroot.wsgi import Server as WSGIServer
+    except ImportError:
+        from cherrypy.wsgiserver import CherryPyWSGIServer as WSGIServer
 
-    server = wsgiserver.CherryPyWSGIServer(bind_addr, app,
-                                           server_name=server_name, **kwargs)
+    server = WSGIServer(bind_addr, app,
+                        server_name=server_name, **kwargs)
     if ssl_pem is not None:
         if PY2:
             server.ssl_certificate = server.ssl_private_key = ssl_pem
         else:
             # creates wsgiserver.ssl_builtin as side-effect
-            wsgiserver.get_ssl_adapter_class()
-            server.ssl_adapter = wsgiserver.ssl_builtin.BuiltinSSLAdapter(
-                ssl_pem, ssl_pem)
+            try:
+                from cheroot.server import get_ssl_adapter_class
+                from cheroot.ssl.builtin import BuiltinSSLAdapter
+            except ImportError:
+                from cherrypy.wsgiserver import get_ssl_adapter_class
+                from cherrypy.wsgiserver.ssl_builtin import BuiltinSSLAdapter
+            get_ssl_adapter_class()
+            server.ssl_adapter = BuiltinSSLAdapter(ssl_pem, ssl_pem)
 
     if protocol_version:
         server.protocol = protocol_version
@@ -361,5 +378,6 @@ def cherrypy_server_runner(
 
     return server
 
-if __name__ == '__main__': # pragma: no cover
+
+if __name__ == '__main__':  # pragma: no cover
     sys.exit(main() or 0)

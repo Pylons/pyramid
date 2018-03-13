@@ -228,6 +228,10 @@ These values are provided to the template:
   provided if the template is rendered as the result of a ``renderer=``
   argument to the view configuration being used.
 
+``get_csrf_token()``
+  A convenience function to access the current CSRF token. See
+  :ref:`get_csrf_token_in_templates` for more information.
+
 ``renderer_name``
   The renderer name used to perform the rendering, e.g.,
   ``mypackage:templates/foo.pt``.
@@ -444,14 +448,14 @@ templating languages including the following:
 | Mako_                     | pyramid_mako_              | .mak, .mako        |
 +---------------------------+----------------------------+--------------------+
 
-.. _Chameleon: http://chameleon.readthedocs.org/en/latest/
+.. _Chameleon: https://chameleon.readthedocs.io/en/latest/
 .. _pyramid_chameleon:
-   http://docs.pylonsproject.org/projects/pyramid-chameleon/en/latest/
+   https://docs.pylonsproject.org/projects/pyramid-chameleon/en/latest/
 
 .. _Jinja2: http://jinja.pocoo.org/docs/dev/
 .. _pyramid_jinja2:
-   http://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/
+   https://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/
 
 .. _Mako: http://www.makotemplates.org/
 .. _pyramid_mako:
-   http://docs.pylonsproject.org/projects/pyramid-mako/en/latest/
+   https://docs.pylonsproject.org/projects/pyramid-mako/en/latest/

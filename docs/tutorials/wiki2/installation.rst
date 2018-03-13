@@ -43,7 +43,7 @@ On UNIX
 .. code-block:: bash
 
     $ cd ~
-    $ cookiecutter https://github.com/Pylons/pyramid-cookiecutter-alchemy
+    $ cookiecutter gh:Pylons/pyramid-cookiecutter-alchemy --checkout master
 
 On Windows
 ^^^^^^^^^^
@@ -51,17 +51,18 @@ On Windows
 .. code-block:: doscon
 
     c:\> cd \
-    c:\> cookiecutter https://github.com/Pylons/pyramid-cookiecutter-alchemy
+    c:\> cookiecutter gh:Pylons/pyramid-cookiecutter-alchemy --checkout master
 
 On all operating systems
 ^^^^^^^^^^^^^^^^^^^^^^^^
 If prompted for the first item, accept the default ``yes`` by hitting return.
 
-#. ``You've cloned ~/.cookiecutters/pyramid-cookiecutter-alchemy before. Is it
-   okay to delete and re-clone it? [yes]:``
-#. ``project_name [Pyramid Scaffold]: myproj``
-#. ``repo_name [scaffold]: tutorial``
+.. code-block:: text
 
+    You've cloned ~/.cookiecutters/pyramid-cookiecutter-alchemy before.
+    Is it okay to delete and re-clone it? [yes]: yes
+    project_name [Pyramid Scaffold]: myproj
+    repo_name [myproj]: tutorial
 
 Change directory into your newly created project
 ------------------------------------------------
@@ -189,12 +190,12 @@ Testing requirements are defined in our project's ``setup.py`` file, in the ``te
 .. literalinclude:: src/installation/setup.py
    :language: python
    :lineno-match:
-   :lines: 22-26
+   :lines: 24-28
 
 .. literalinclude:: src/installation/setup.py
    :language: python
    :lineno-match:
-   :lines: 46-48
+   :lines: 48-50
 
 
 .. _sql_running_tests:
@@ -461,13 +462,13 @@ assumptions:
    tutorial, we'll only be using :term:`URL dispatch` and :term:`SQLAlchemy`.
 
 .. _pyramid_jinja2:
-   http://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/
+   https://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/
 
 .. _pyramid_tm:
-   http://docs.pylonsproject.org/projects/pyramid-tm/en/latest/
+   https://docs.pylonsproject.org/projects/pyramid-tm/en/latest/
 
 .. _zope.sqlalchemy:
    https://pypi.python.org/pypi/zope.sqlalchemy
 
 .. _transaction:
-   http://zodb.readthedocs.org/en/latest/transactions.html
+   https://zodb.readthedocs.io/en/latest/transactions.html

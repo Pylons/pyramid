@@ -42,3 +42,7 @@ class TutorialFunctionalTests(unittest.TestCase):
     def test_hello(self):
         res = self.testapp.get('/howdy', status=200)
         self.assertIn(b'<h1>Hi Hello View', res.body)
+
+    def test_css(self):
+        res = self.testapp.get('/static/app.css', status=200)
+        self.assertIn(b'body', res.body)

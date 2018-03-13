@@ -11,41 +11,25 @@
 # FITNESS FOR A PARTICULAR PURPOSE
 #
 ##############################################################################
-
-import os
-import sys
-import warnings
-
 from setuptools import setup, find_packages
 
-py_version = sys.version_info[:2]
+def readfile(name):
+    with open(name) as f:
+        return f.read()
 
-if (3, 0) <= py_version < (3, 4):
-    warnings.warn(
-        'On Python 3, Pyramid only supports Python 3.4 or better',
-        UserWarning,
-    )
-elif py_version < (2, 7):
-    raise RuntimeError('On Python 2, Pyramid requires Python 2.7 or better')
-
-here = os.path.abspath(os.path.dirname(__file__))
-try:
-    with open(os.path.join(here, 'README.rst')) as f:
-        README = f.read()
-    with open(os.path.join(here, 'CHANGES.txt')) as f:
-        CHANGES = f.read()
-except IOError:
-    README = CHANGES = ''
+README = readfile('README.rst')
+CHANGES = readfile('CHANGES.rst')
 
 install_requires = [
     'setuptools',
     'WebOb >= 1.7.0rc2', # Response.has_body
-    'repoze.lru >= 0.4', # py3 compat
     'zope.interface >= 3.8.0',  # has zope.interface.registry
     'zope.deprecation >= 3.5.0', # py3 compat
     'venusian >= 1.0a3', # ``ignore``
     'translationstring >= 0.4', # py3 compat
     'PasteDeploy >= 1.5.0', # py3 compat
+    'plaster',
+    'plaster_pastedeploy',
     'hupper',
     ]
 
@@ -67,11 +51,11 @@ docs_extras = [
 testing_extras = tests_require + [
     'nose',
     'coverage',
-    'virtualenv', # for scaffolding tests
+    'virtualenv',  # for scaffolding tests
     ]
 
 setup(name='pyramid',
-      version='1.9.dev0',
+      version='1.10.dev0',
       description='The Pyramid Web Framework, a Pylons project',
       long_description=README + '\n\n' + CHANGES,
       classifiers=[
@@ -98,8 +82,10 @@ setup(name='pyramid',
       packages=find_packages(),
       include_package_data=True,
       zip_safe=False,
+      python_requires='>=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*',
       install_requires=install_requires,
       extras_require={
+          ':python_version<"3.2"': ['repoze.lru >= 0.4'],
           'testing': testing_extras,
           'docs': docs_extras,
           },

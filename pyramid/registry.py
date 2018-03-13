@@ -12,7 +12,7 @@ from pyramid.interfaces import (
     IIntrospector,
     IIntrospectable,
     ISettings,
-    )
+)
 
 from pyramid.path import (
     CALLER_PACKAGE,
@@ -276,7 +276,9 @@ class Deferred(object):
 
     @reify
     def value(self):
-        return self.func()
+        result = self.func()
+        del self.func
+        return result
 
     def resolve(self):
         return self.value

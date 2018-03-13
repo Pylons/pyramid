@@ -5,7 +5,7 @@ The Pyramid Web Framework
 =========================
 
 :app:`Pyramid` is a small, fast, down-to-earth Python web framework.  It is
-developed as part of the `Pylons Project <http://pylonsproject.org/>`_.
+developed as part of the `Pylons Project <https://pylonsproject.org>`_.
 It is licensed under a `BSD-like license <http://repoze.org/license.html>`_.
 
 Here is one of the simplest :app:`Pyramid` applications you can make:
@@ -35,9 +35,6 @@ speed right away.
 * :doc:`quick_tour` gives an overview of the major features in Pyramid,
   covering a little about a lot.
 
-* :doc:`quick_tutorial/index` is similar to the Quick Tour, but in a tutorial
-  format, with somewhat deeper treatment of each topic and with working code.
-
 * Like learning by example? Visit the official :ref:`html_tutorials` as well as
   the community-contributed :ref:`Pyramid Tutorials
   <tutorials:pyramid-tutorials>` and :ref:`Pyramid Community Cookbook
@@ -53,13 +50,12 @@ speed right away.
 Tutorials
 =========
 
-Official tutorials explaining how to use :app:`Pyramid` to build various types
-of applications, and how to deploy :app:`Pyramid` applications to various
-platforms.
+Official tutorials provide a quick overview of :app:`Pyramid`'s features in more depth than the Quick Tour and with working code, explain how to use :app:`Pyramid` to build various types of applications, and how to deploy :app:`Pyramid` applications to various platforms.
 
 .. toctree::
    :maxdepth: 1
 
+   quick_tutorial/index
    tutorials/wiki2/index
    tutorials/wiki/index
    tutorials/modwsgi/index
@@ -95,9 +91,7 @@ the trunk via ``git``, use either command:
   # Otherwise, HTTPS will work, using your GitHub login:
   git clone https://github.com/Pylons/pyramid.git
 
-To find out how to become a contributor to :app:`Pyramid`, please see the
-`contributor's section of the documentation
-<http://docs.pylonsproject.org/en/latest/#contributing>`_.
+To find out how to become a contributor to :app:`Pyramid`, please see `How to Contribute Source Code and Documentation <https://pylonsproject.org/community-how-to-contribute.html>`_.
 
 
 .. _html_narrative_documentation:
@@ -185,6 +179,7 @@ Change History
 .. toctree::
    :maxdepth: 1
 
+   whatsnew-1.9
    whatsnew-1.8
    whatsnew-1.7
    whatsnew-1.6

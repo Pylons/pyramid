@@ -293,6 +293,14 @@ class Test_InstancePropertyMixin(unittest.TestCase):
         foo.set_property(lambda _: 2, name='x', reify=True)
         self.assertEqual(1, foo.x)
 
+    def test_new_class_keeps_parent_module_name(self):
+        foo = self._makeOne()
+        self.assertEqual(foo.__module__, 'pyramid.tests.test_util')
+        self.assertEqual(foo.__class__.__module__, 'pyramid.tests.test_util')
+        foo.set_property(lambda _: 1, name='x', reify=True)
+        self.assertEqual(foo.__module__, 'pyramid.tests.test_util')
+        self.assertEqual(foo.__class__.__module__, 'pyramid.tests.test_util')
+
 class Test_WeakOrderedSet(unittest.TestCase):
     def _makeOne(self):
         from pyramid.config import WeakOrderedSet
@@ -369,11 +377,15 @@ class Test_strings_differ(unittest.TestCase):
         from pyramid.util import strings_differ
         return strings_differ(*args, **kw)
 
-    def test_it(self):
+    def test_it_bytes(self):
         self.assertFalse(self._callFUT(b'foo', b'foo'))
         self.assertTrue(self._callFUT(b'123', b'345'))
         self.assertTrue(self._callFUT(b'1234', b'123'))
         self.assertTrue(self._callFUT(b'123', b'1234'))
+
+    def test_it_native_str(self):
+        self.assertFalse(self._callFUT('123', '123'))
+        self.assertTrue(self._callFUT('123', '1234'))
 
     def test_it_with_internal_comparator(self):
         result = self._callFUT(b'foo', b'foo', compare_digest=None)

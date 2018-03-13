@@ -16,11 +16,31 @@ class TestAllPermissionsList(unittest.TestCase):
     def _makeOne(self):
         return self._getTargetClass()()
 
-    def test_it(self):
+    def test_equality_w_self(self):
         thing = self._makeOne()
         self.assertTrue(thing.__eq__(thing))
-        self.assertEqual(thing.__iter__(), ())
+
+    def test_equality_w_other_instances_of_class(self):
+        thing = self._makeOne()
+        other = self._makeOne()
+        self.assertTrue(thing.__eq__(other))
+
+    def test_equality_miss(self):
+        thing = self._makeOne()
+        other = object()
+        self.assertFalse(thing.__eq__(other))
+
+    def test_contains_w_string(self):
+        thing = self._makeOne()
         self.assertTrue('anything' in thing)
+
+    def test_contains_w_object(self):
+        thing = self._makeOne()
+        self.assertTrue(object() in thing)
+
+    def test_iterable(self):
+        thing = self._makeOne()
+        self.assertEqual(list(thing), [])
 
     def test_singleton(self):
         from pyramid.security import ALL_PERMISSIONS
@@ -72,9 +92,11 @@ class TestACLAllowed(unittest.TestCase):
         return klass(*arg, **kw)
 
     def test_it(self):
+        from pyramid.security import Allowed
         msg = ("ACLAllowed permission 'permission' via ACE 'ace' in ACL 'acl' "
                "on context 'ctx' for principals 'principals'")
         allowed = self._makeOne('ace', 'acl', 'permission', 'principals', 'ctx')
+        self.assertIsInstance(allowed, Allowed)
         self.assertTrue(msg in allowed.msg)
         self.assertEqual(allowed, True)
         self.assertTrue(allowed)
@@ -92,9 +114,11 @@ class TestACLDenied(unittest.TestCase):
         return klass(*arg, **kw)
 
     def test_it(self):
+        from pyramid.security import Denied
         msg = ("ACLDenied permission 'permission' via ACE 'ace' in ACL 'acl' "
                "on context 'ctx' for principals 'principals'")
         denied = self._makeOne('ace', 'acl', 'permission', 'principals', 'ctx')
+        self.assertIsInstance(denied, Denied)
         self.assertTrue(msg in denied.msg)
         self.assertEqual(denied, False)
         self.assertFalse(denied)

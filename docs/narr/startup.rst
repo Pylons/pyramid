@@ -10,12 +10,12 @@ you'll see something much like this show up on the console:
 
     $ $VENV/bin/pserve development.ini
     Starting server in PID 16305.
-    Serving on http://127.0.0.1:6543
-    Serving on http://[::1]:6543
+    Serving on http://localhost:6543
+    Serving on http://localhost:6543
 
 This chapter explains what happens between the time you press the "Return" key
-on your keyboard after typing ``pserve development.ini`` and the time the line
-``serving on http://127.0.0.1:6543`` is output to your console.
+on your keyboard after typing ``pserve development.ini`` and the time the lines
+``Serving on http://localhost:6543`` are output to your console.
 
 .. index::
    single: startup process
@@ -38,7 +38,14 @@ Here's a high-level time-ordered overview of what happens when you press
    begin to run and serve an application using the information contained
    within the ``development.ini`` file.
 
-#. The framework finds a section named either ``[app:main]``,
+#. ``pserve`` passes the ``development.ini`` path to :term:`plaster` which
+   finds an available configuration loader that recognizes the ``ini`` format.
+
+#. :term:`plaster` finds the ``plaster_pastedeploy`` library which binds
+   the :term:`PasteDeploy` library and returns a parser that can understand
+   the format.
+
+#. The :term:`PasteDeploy` finds a section named either ``[app:main]``,
    ``[pipeline:main]``, or ``[composite:main]`` in the ``.ini`` file.  This
    section represents the configuration of a :term:`WSGI` application that will
    be served.  If you're using a simple application (e.g., ``[app:main]``), the
@@ -132,8 +139,8 @@ Here's a high-level time-ordered overview of what happens when you press
 #. ``pserve`` starts the WSGI *server* defined within the ``[server:main]``
    section.  In our case, this is the Waitress server (``use =
    egg:waitress#main``), and it will listen on all interfaces on port 6543
-   for both IPv4 and IPv6 (``listen = 127.0.0.1:6543 [::1]:6543``). The server
-   code itself is what prints ``serving on http://127.0.0.1:6543``. The server
+   for both IPv4 and IPv6 (``listen = localhost:6543``). The server
+   code itself is what prints ``Serving on http://localhost:6543``. The server
    serves the application, and the application is running, waiting to receive requests.
 
 .. seealso::

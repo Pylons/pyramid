@@ -44,6 +44,9 @@ Other Interfaces
   .. autointerface:: IRoutePregenerator
      :members:
 
+  .. autointerface:: ICSRFStoragePolicy
+     :members:
+
   .. autointerface:: ISession
      :members:
 
@@ -63,6 +66,9 @@ Other Interfaces
      :members:
 
   .. autointerface:: IResponseFactory
+     :members:
+
+  .. autointerface:: IRouter
      :members:
 
   .. autointerface:: IViewMapperFactory

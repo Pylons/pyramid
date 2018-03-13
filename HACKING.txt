@@ -51,11 +51,6 @@ repo, from which you can submit a pull request.
   To use the instructions in the steps that follow literally, use the
   ``export VENV=~/hack-on-pyramid/env`` command.
 
-- Install ``setuptools-git`` into the virtual environment (for good measure, as
-  we're using git to do version control):
-
-    $ $VENV/bin/pip install setuptools-git
-
 - Install Pyramid from the checkout into the virtual environment, where the
   current working directory is the ``pyramid`` checkout directory. We will
   install Pyramid in editable (development) mode as well as its testing
@@ -140,7 +135,7 @@ Coding Style
 
 - PEP8 compliance.  Whitespace rules are relaxed: not necessary to put two
   newlines between classes.  But 79-column lines, in particular, are mandatory.
-  See http://docs.pylonsproject.org/en/latest/community/codestyle.html for more
+  See https://pylonsproject.org/community-coding-style-standards.html for more
   information.
 
 - Please do not remove trailing whitespace.  Configure your editor to reduce

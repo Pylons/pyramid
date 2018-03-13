@@ -51,10 +51,10 @@ Python comes pre-installed on Mac OS X, but due to Apple's release cycle, it is
 often out of date. Unless you have a need for a specific earlier version, it is
 recommended to install the latest 3.x version of Python.
 
-You can install the latest verion of Python for Mac OS X from the binaries on
+You can install the latest version of Python for Mac OS X from the binaries on
 `python.org <https://www.python.org/downloads/mac-osx/>`_.
 
-Alternatively, you can use the `homebrew <http://brew.sh/>`_ package manager.
+Alternatively, you can use the `homebrew <https://brew.sh/>`_ package manager.
 
 .. code-block:: text
 
@@ -157,7 +157,7 @@ application, rather than being installed system wide.
 
 .. seealso:: See the Python Packaging Authority's (PyPA) documention
    `Requirements for Installing Packages
-   <https://packaging.python.org/en/latest/installing/#requirements-for-installing-packages>`_
+   <https://packaging.python.org/tutorials/installing-packages/#requirements-for-installing-packages>`_
    for full details.
 
 
@@ -206,9 +206,7 @@ After installing Python as described previously in :ref:`for-mac-os-x-users` or
    ``$VENV/bin/pip`` clearly specifies that ``pip`` is run from within the
    virtual environment and not at the system level.
 
-   ``activate`` drops turds into the user's shell environment, leaving them
-   vulnerable to executing commands in the wrong context. ``deactivate`` might
-   not correctly restore previous shell environment variables.
+   ``activate`` makes changes to the user's shell environment which can often be convenient. However, in the context of long-form documentation, environment configuration can easily be forgotten. By keeping each snippet explicit we can reduce copy / paste errors by users in which commands are executed against the wrong Python environment. Also, ``deactivate`` might not correctly restore previous shell environment variables. Avoiding ``activate`` keeps the environment more reproducible.
 
    Although using ``source bin/activate``, then ``pip``, requires fewer key
    strokes to issue commands once invoked, there are other things to consider.

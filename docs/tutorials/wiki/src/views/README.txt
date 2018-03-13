@@ -1,12 +1,12 @@
 myproj
-===============================
+======
 
 Getting Started
 ---------------
 
 - Change directory into your newly created project.
 
-    cd myproj
+    cd tutorial
 
 - Create a Python virtual environment.
 

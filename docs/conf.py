@@ -62,25 +62,26 @@ extensions = [
 
 # Looks for objects in external projects
 intersphinx_mapping = {
-    'colander': ('http://docs.pylonsproject.org/projects/colander/en/latest', None),
-    'cookbook': ('http://docs.pylonsproject.org/projects/pyramid-cookbook/en/latest/', None),
+    'colander': ('https://docs.pylonsproject.org/projects/colander/en/latest', None),
+    'cookbook': ('https://docs.pylonsproject.org/projects/pyramid-cookbook/en/latest/', None),
     'cookiecutter': ('https://cookiecutter.readthedocs.io/en/latest/', None),
-    'deform': ('http://docs.pylonsproject.org/projects/deform/en/latest', None),
-    'jinja2': ('http://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/', None),
-    'pylonswebframework': ('http://docs.pylonsproject.org/projects/pylons-webframework/en/latest/', None),
+    'deform': ('https://docs.pylonsproject.org/projects/deform/en/latest', None),
+    'jinja2': ('https://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/', None),
+    'plaster': ('https://docs.pylonsproject.org/projects/plaster/en/latest/', None),
+    'pylonswebframework': ('https://docs.pylonsproject.org/projects/pylons-webframework/en/latest/', None),
     'python': ('https://docs.python.org/3', None),
-    'pytest': ('http://pytest.org/latest/', None),
+    'pytest': ('https://docs.pytest.org/en/latest/', None),
     'sphinx': ('http://www.sphinx-doc.org/en/latest', None),
     'sqla': ('http://docs.sqlalchemy.org/en/latest', None),
-    'tm': ('http://docs.pylonsproject.org/projects/pyramid-tm/en/latest/', None),
-    'toolbar': ('http://docs.pylonsproject.org/projects/pyramid-debugtoolbar/en/latest', None),
-    'tstring': ('http://docs.pylonsproject.org/projects/translationstring/en/latest', None),
-    'tutorials': ('http://docs.pylonsproject.org/projects/pyramid-tutorials/en/latest/', None),
-    'venusian': ('http://docs.pylonsproject.org/projects/venusian/en/latest', None),
-    'webob': ('http://docs.webob.org/en/latest', None),
+    'tm': ('https://docs.pylonsproject.org/projects/pyramid-tm/en/latest/', None),
+    'toolbar': ('https://docs.pylonsproject.org/projects/pyramid-debugtoolbar/en/latest', None),
+    'tstring': ('https://docs.pylonsproject.org/projects/translationstring/en/latest', None),
+    'tutorials': ('https://docs.pylonsproject.org/projects/pyramid-tutorials/en/latest/', None),
+    'venusian': ('https://docs.pylonsproject.org/projects/venusian/en/latest', None),
+    'webob': ('https://docs.pylonsproject.org/projects/webob/en/latest/', None),
     'webtest': ('http://webtest.pythonpaste.org/en/latest', None),
-    'who': ('http://repozewho.readthedocs.org/en/latest', None),
-    'zcml': ('http://docs.pylonsproject.org/projects/pyramid-zcml/en/latest', None),
+    'who': ('http://repozewho.readthedocs.io/en/latest', None),
+    'zcml': ('https://docs.pylonsproject.org/projects/pyramid-zcml/en/latest', None),
     'zcomponent': ('http://zopecomponent.readthedocs.io/en/latest/', None),
     'zinterface': ('http://zopeinterface.readthedocs.io/en/latest/', None),
 }
@@ -135,7 +136,7 @@ if book:
 # -----------------------
 # enable pylons_sphinx_latesturl when this branch is no longer "latest"
 # pylons_sphinx_latesturl_base = (
-#     'http://docs.pylonsproject.org/projects/pyramid/en/latest/')
+#     'https://docs.pylonsproject.org/projects/pyramid/en/latest/')
 # pylons_sphinx_latesturl_pagename_overrides = {
 #     # map old pagename -> new pagename
 #     'whatsnew-1.0': 'index',
@@ -147,6 +148,7 @@ if book:
 #     'whatsnew-1.6': 'index',
 #     'whatsnew-1.7': 'index',
 #     'whatsnew-1.8': 'index',
+#     'whatsnew-1.9': 'index',
 #     'tutorials/gae/index': 'index',
 #     'api/chameleon_text': 'api',
 #     'api/chameleon_zpt': 'api',
@@ -171,9 +173,10 @@ html_title = 'The Pyramid Web Framework v%s' % release
 # using the given strftime format.
 html_last_updated_fmt = '%b %d, %Y'
 
-# If true, SmartyPants will be used to convert quotes and dashes to
-# typographically correct entities.
-html_use_smartypants = False # people use cutnpaste in some places
+# Do not use smart quotes.
+smartquotes = False
+# Remove next line when RTD goes to Sphinx==1.6.6
+html_use_smartypants = False
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'pyramid'

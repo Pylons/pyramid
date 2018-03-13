@@ -1,6 +1,6 @@
 ###
 # app configuration
-# http://docs.pylonsproject.org/projects/pyramid/en/{{pyramid_docs_branch}}/narr/environment.html
+# https://docs.pylonsproject.org/projects/pyramid/en/{{pyramid_docs_branch}}/narr/environment.html
 ###
 
 [app:main]
@@ -26,11 +26,11 @@ sqlalchemy.url = sqlite:///%(here)s/{{project}}.sqlite
 
 [server:main]
 use = egg:waitress#main
-listen = 127.0.0.1:6543 [::1]:6543
+listen = localhost:6543
 
 ###
 # logging configuration
-# http://docs.pylonsproject.org/projects/pyramid/en/{{pyramid_docs_branch}}/narr/logging.html
+# https://docs.pylonsproject.org/projects/pyramid/en/{{pyramid_docs_branch}}/narr/logging.html
 ###
 
 [loggers]

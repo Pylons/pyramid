@@ -3,9 +3,9 @@ Contributing
 
 All projects under the Pylons Projects, including this one, follow the
 guidelines established at [How to
-Contribute](http://www.pylonsproject.org/community/how-to-contribute) and
+Contribute](https://pylonsproject.org/community-how-to-contribute.html) and
 [Coding Style and
-Standards](http://docs.pylonsproject.org/en/latest/community/codestyle.html).
+Standards](https://pylonsproject.org/community-coding-style-standards.html).
 
 You can contribute to this project in several ways.
 
@@ -26,9 +26,9 @@ listed below.
 
 * [master](https://github.com/Pylons/pyramid/) - The branch on which further
   development takes place. The default branch on GitHub.
-* [1.8-branch](https://github.com/Pylons/pyramid/tree/1.8-branch) - The branch
+* [1.9-branch](https://github.com/Pylons/pyramid/tree/1.9-branch) - The branch
   classified as "stable" or "latest".
-* [1.7-branch](https://github.com/Pylons/pyramid/tree/1.7-branch) - The oldest
+* [1.8-branch](https://github.com/Pylons/pyramid/tree/1.8-branch) - The oldest
   actively maintained and stable branch.
 
 Older branches are not actively maintained. In general, two stable branches and
@@ -49,7 +49,7 @@ Building documentation for a Pylons Project project
 improve the process for Windows users are welcome by submitting an issue or a
 pull request. Windows users may find it helpful to follow the guide [Installing
 Pyramid on a Windows
-System](http://docs.pylonsproject.org/projects/pyramid/en/latest/narr/install.html#installing-pyramid-on-a-windows-system).
+System](https://docs.pylonsproject.org/projects/pyramid/en/latest/narr/install.html#installing-pyramid-on-a-windows-system).
 
 1.  Fork the repo on GitHub by clicking the [Fork] button.
 2.  Clone your fork into a workspace on your local machine.

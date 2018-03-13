@@ -291,4 +291,28 @@ Contributors
 
 - Mikko Ohtamaa, 2016/12/6
 
+- Jure Cerjak, 2016/12/7
+
 - Martin Frlin, 2016/12/7
+
+- Kirill Kuzminykh, 2017/03/01
+
+- Aleph Melo, 2017/04/16
+
+- Jeremy(Ching-Rui) Chen, 2017/04/19
+
+- Russell Ballestrini, 2017/05/06
+
+- Fang-Pen Lin, 2017/05/22
+
+- Volker Diels-Grabsch, 2017/06/09
+
+- Denis Rykov, 2017/06/15
+
+- Tosh Lyons, 2017/06/27
+
+- Lars Blumberg, 2017/08/14
+
+- Deneys Maartens, 2017/11/03
+
+- Heron Rossi, 2018/03/08

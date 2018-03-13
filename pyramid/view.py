@@ -16,6 +16,7 @@ from pyramid.interfaces import (
     )
 
 from pyramid.compat import decode_path_info
+from pyramid.compat import reraise as reraise_
 
 from pyramid.exceptions import (
     ConfigurationError,
@@ -28,7 +29,11 @@ from pyramid.httpexceptions import (
     default_exceptionresponse_view,
     )
 
-from pyramid.threadlocal import get_current_registry
+from pyramid.threadlocal import (
+    get_current_registry,
+    manager,
+    )
+
 from pyramid.util import hide_attrs
 
 _marker = object()
@@ -180,14 +185,22 @@ class view_config(object):
     :meth:`pyramid.config.Configurator.add_view`.  If any argument is left
     out, its default will be the equivalent ``add_view`` default.
 
-    An additional keyword argument named ``_depth`` is provided for people who
-    wish to reuse this class from another decorator.  The default value is
-    ``0`` and should be specified relative to the ``view_config`` invocation.
-    It will be passed in to the :term:`venusian` ``attach`` function as the
-    depth of the callstack when Venusian checks if the decorator is being used
-    in a class or module context.  It's not often used, but it can be useful
-    in this circumstance.  See the ``attach`` function in Venusian for more
-    information.
+    Two additional keyword arguments which will be passed to the
+    :term:`venusian` ``attach`` function are ``_depth`` and ``_category``.
+
+    ``_depth`` is provided for people who wish to reuse this class from another
+    decorator. The default value is ``0`` and should be specified relative to
+    the ``view_config`` invocation. It will be passed in to the
+    :term:`venusian` ``attach`` function as the depth of the callstack when
+    Venusian checks if the decorator is being used in a class or module
+    context. It's not often used, but it can be useful in this circumstance.
+
+    ``_category`` sets the decorator category name. It can be useful in
+    combination with the ``category`` argument of ``scan`` to control which
+    views should be processed.
+
+    See the :py:func:`venusian.attach` function in Venusian for more
+    information about the ``_depth`` and ``_category`` arguments.
     
     .. seealso::
     
@@ -210,12 +223,13 @@ class view_config(object):
     def __call__(self, wrapped):
         settings = self.__dict__.copy()
         depth = settings.pop('_depth', 0)
+        category = settings.pop('_category', 'pyramid')
 
         def callback(context, name, ob):
             config = context.config.with_package(info.module)
             config.add_view(view=ob, **settings)
 
-        info = self.venusian.attach(wrapped, callback, category='pyramid',
+        info = self.venusian.attach(wrapped, callback, category=category,
                                     depth=depth + 1)
 
         if info.scope == 'class':
@@ -382,9 +396,10 @@ class notfound_view_config(object):
     being used, :class:`~pyramid.httpexceptions.HTTPMovedPermanently will
     be used` for the redirect response if a slash-appended route is found.
 
-    .. versionchanged:: 1.6
-
     See :ref:`changing_the_notfound_view` for detailed usage information.
+
+    .. versionchanged:: 1.9.1
+       Added the ``_depth`` and ``_category`` arguments.
 
     """
 
@@ -395,12 +410,15 @@ class notfound_view_config(object):
 
     def __call__(self, wrapped):
         settings = self.__dict__.copy()
+        depth = settings.pop('_depth', 0)
+        category = settings.pop('_category', 'pyramid')
 
         def callback(context, name, ob):
             config = context.config.with_package(info.module)
             config.add_notfound_view(view=ob, **settings)
 
-        info = self.venusian.attach(wrapped, callback, category='pyramid')
+        info = self.venusian.attach(wrapped, callback, category=category,
+                                    depth=depth + 1)
 
         if info.scope == 'class':
             # if the decorator was attached to a method in a class, or
@@ -442,6 +460,9 @@ class forbidden_view_config(object):
 
     See :ref:`changing_the_forbidden_view` for detailed usage information.
 
+    .. versionchanged:: 1.9.1
+       Added the ``_depth`` and ``_category`` arguments.
+
     """
 
     venusian = venusian
@@ -451,12 +472,15 @@ class forbidden_view_config(object):
 
     def __call__(self, wrapped):
         settings = self.__dict__.copy()
+        depth = settings.pop('_depth', 0)
+        category = settings.pop('_category', 'pyramid')
 
         def callback(context, name, ob):
             config = context.config.with_package(info.module)
             config.add_forbidden_view(view=ob, **settings)
 
-        info = self.venusian.attach(wrapped, callback, category='pyramid')
+        info = self.venusian.attach(wrapped, callback, category=category,
+                                    depth=depth + 1)
 
         if info.scope == 'class':
             # if the decorator was attached to a method in a class, or
@@ -498,6 +522,9 @@ class exception_view_config(object):
     :meth:`pyramid.view.view_config`, and each predicate argument restricts
     the set of circumstances under which this exception view will be invoked.
 
+    .. versionchanged:: 1.9.1
+       Added the ``_depth`` and ``_category`` arguments.
+
     """
     venusian = venusian
 
@@ -511,12 +538,15 @@ class exception_view_config(object):
 
     def __call__(self, wrapped):
         settings = self.__dict__.copy()
+        depth = settings.pop('_depth', 0)
+        category = settings.pop('_category', 'pyramid')
 
         def callback(context, name, ob):
             config = context.config.with_package(info.module)
             config.add_exception_view(view=ob, **settings)
 
-        info = self.venusian.attach(wrapped, callback, category='pyramid')
+        info = self.venusian.attach(wrapped, callback, category=category,
+                                    depth=depth + 1)
 
         if info.scope == 'class':
             # if the decorator was attached to a method in a class, or
@@ -626,8 +656,9 @@ class ViewMethodsMixin(object):
         self,
         exc_info=None,
         request=None,
-        secure=True
-        ):
+        secure=True,
+        reraise=False,
+    ):
         """ Executes an exception view related to the request it's called upon.
         The arguments it takes are these:
 
@@ -650,22 +681,40 @@ class ViewMethodsMixin(object):
             does not have the appropriate permission, this should be ``True``.
             Default: ``True``.
 
-        If called with no arguments, it uses the global exception information
-        returned by ``sys.exc_info()`` as ``exc_info``, the request
-        object that this method is attached to as the ``request``, and
-        ``True`` for ``secure``.
+        ``reraise``
 
-        This method returns a :term:`response` object or raises
-        :class:`pyramid.httpexceptions.HTTPNotFound` if a matching view cannot
-        be found."""
+            A boolean indicating whether the original error should be reraised
+            if a :term:`response` object could not be created. If ``False``
+            then an :class:`pyramid.httpexceptions.HTTPNotFound`` exception
+            will be raised. Default: ``False``.
 
+        If a response is generated then ``request.exception`` and
+        ``request.exc_info`` will be left at the values used to render the
+        response. Otherwise the previous values for ``request.exception`` and
+        ``request.exc_info`` will be restored.
+
+        .. versionadded:: 1.7
+
+        .. versionchanged:: 1.9
+           The ``request.exception`` and ``request.exc_info`` properties will
+           reflect the exception used to render the response where previously
+           they were reset to the values prior to invoking the method.
+
+           Also added the ``reraise`` argument.
+
+        """
         if request is None:
             request = self
         registry = getattr(request, 'registry', None)
         if registry is None:
             registry = get_current_registry()
+
+        if registry is None:
+            raise RuntimeError("Unable to retrieve registry")
+
         if exc_info is None:
             exc_info = sys.exc_info()
+
         exc = exc_info[1]
         attrs = request.__dict__
         context_iface = providedBy(exc)
@@ -673,23 +722,40 @@ class ViewMethodsMixin(object):
         # clear old generated request.response, if any; it may
         # have been mutated by the view, and its state is not
         # sane (e.g. caching headers)
-        with hide_attrs(request, 'exception', 'exc_info', 'response'):
+        with hide_attrs(request, 'response', 'exc_info', 'exception'):
             attrs['exception'] = exc
             attrs['exc_info'] = exc_info
             # we use .get instead of .__getitem__ below due to
             # https://github.com/Pylons/pyramid/issues/700
             request_iface = attrs.get('request_iface', IRequest)
-            response = _call_view(
-                registry,
-                request,
-                exc,
-                context_iface,
-                '',
-                view_types=None,
-                view_classifier=IExceptionViewClassifier,
-                secure=secure,
-                request_iface=request_iface.combined,
-                )
-            if response is None:
-                raise HTTPNotFound
-            return response
+
+            manager.push({'request': request, 'registry': registry})
+
+            try:
+                response = _call_view(
+                    registry,
+                    request,
+                    exc,
+                    context_iface,
+                    '',
+                    view_types=None,
+                    view_classifier=IExceptionViewClassifier,
+                    secure=secure,
+                    request_iface=request_iface.combined,
+                    )
+            except Exception:
+                if reraise:
+                    reraise_(*exc_info)
+                raise
+            finally:
+                manager.pop()
+
+        if response is None:
+            if reraise:
+                reraise_(*exc_info)
+            raise HTTPNotFound
+
+        # successful response, overwrite exception/exc_info
+        attrs['exception'] = exc
+        attrs['exc_info'] = exc_info
+        return response

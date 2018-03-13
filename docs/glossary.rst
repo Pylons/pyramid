@@ -321,7 +321,7 @@ Glossary
      :term:`principal` (or principals) associated with a request.
 
    WSGI
-     `Web Server Gateway Interface <http://wsgi.readthedocs.org/en/latest/>`_.
+     `Web Server Gateway Interface <https://wsgi.readthedocs.io/en/latest/>`_.
      This is a Python standard for connecting web applications to web servers,
      similar to the concept of Java Servlets.  :app:`Pyramid` requires that
      your application be served as a WSGI application.
@@ -330,8 +330,8 @@ Glossary
      *Middleware* is a :term:`WSGI` concept.  It is a WSGI component
      that acts both as a server and an application.  Interesting uses
      for middleware exist, such as caching, content-transport
-     encoding, and other functions.  See `WSGI.org
-     <http://wsgi.readthedocs.org/en/latest/>`_ or `PyPI
+     encoding, and other functions.  See `WSGI documentation
+     <https://wsgi.readthedocs.io/en/latest/>`_ or `PyPI
      <https://pypi.python.org/pypi>`_ to find middleware for your application.
 
    pipeline
@@ -339,7 +339,7 @@ Glossary
      server, a WSGI application, with a set of :term:`middleware` in-between.
 
    Zope
-     `The Z Object Publishing Framework <http://zope.org>`_, a
+     `The Z Object Publishing Framework <http://www.zope.org/en/latest/>`_, a
      full-featured Python web framework.
 
    Grok
@@ -349,7 +349,7 @@ Glossary
      `A full-featured Python web framework <https://www.djangoproject.com/>`_.
 
    Pylons
-     `A lightweight Python web framework <http://docs.pylonsproject.org/projects/pylons-webframework/en/latest/>`_
+     `A lightweight Python web framework <https://docs.pylonsproject.org/projects/pylons-webframework/en/latest/>`_
      and a predecessor of Pyramid.
 
    ZODB
@@ -357,17 +357,25 @@ Glossary
       Python object store.
 
    WebOb
-     `WebOb <http://webob.org>`_ is a WSGI request/response
+     `WebOb <https://webob.org>`_ is a WSGI request/response
      library created by Ian Bicking.
 
    PasteDeploy
-     `PasteDeploy <http://pythonpaste.org/deploy/>`_ is a library used by
+     `PasteDeploy <https://pastedeploy.readthedocs.io/en/latest/>`_ is a library used by
      :app:`Pyramid` which makes it possible to configure
      :term:`WSGI` components together declaratively within an ``.ini``
      file.  It was developed by Ian Bicking.
 
+   plaster
+     `plaster <https://docs.pylonsproject.org/projects/plaster/en/latest/>`_ is
+     a library used by :app:`Pyramid` which acts as an abstraction between
+     command-line scripts and the file format used to load the :term:`WSGI`
+     components and application settings. By default :app:`Pyramid` ships
+     with the ``plaster_pastedeploy`` library installed which provides
+     integrated support for loading a :term:`PasteDeploy` INI file.
+
    Chameleon
-     `chameleon <https://chameleon.readthedocs.org/en/latest/>`_ is an
+     `chameleon <https://chameleon.readthedocs.io/en/latest/>`_ is an
      attribute language template compiler which supports the :term:`ZPT`
      templating specification. It is written and maintained by Malthe Borch. It
      has several extensions, such as the ability to use bracketed (Mako-style)
@@ -393,7 +401,7 @@ Glossary
      A `text templating language <http://jinja.pocoo.org/>`_ by Armin Ronacher.
 
    Routes
-     A `system by Ben Bangert <http://routes.readthedocs.org/en/latest/>`_
+     A `system by Ben Bangert <https://routes.readthedocs.io/en/latest/>`_
      which parses URLs and compares them against a number of user defined
      mappings. The URL pattern matching syntax in :app:`Pyramid` is inspired by
      the Routes syntax (which was inspired by Ruby On Rails pattern syntax).
@@ -492,7 +500,7 @@ Glossary
      information.
 
    repoze.who
-     `Authentication middleware <http://repozewho.readthedocs.org/en/latest/>`_
+     `Authentication middleware <https://repozewho.readthedocs.io/en/latest/>`_
      for :term:`WSGI` applications.  It can be used by :app:`Pyramid` to
      provide authentication information.
 
@@ -568,7 +576,7 @@ Glossary
      :ref:`adding_and_overriding_renderers` for more information.
 
    mod_wsgi
-     `mod_wsgi <https://modwsgi.readthedocs.io>`_ is an Apache
+     `mod_wsgi <https://modwsgi.readthedocs.io/en/develop/>`_ is an Apache
      module developed by Graham Dumpleton.  It allows :term:`WSGI` applications
      (such as applications developed using :app:`Pyramid`) to be served using
      the Apache web server.
@@ -743,7 +751,7 @@ Glossary
      :ref:`Venusian` is a library which
      allows framework authors to defer decorator actions.  Instead of
      taking actions when a function (or class) decorator is executed
-     at import time, the action usually taken by the decorator is
+     at :term:`import time`, the action usually taken by the decorator is
      deferred until a separate "scan" phase.  :app:`Pyramid` relies
      on Venusian to provide a basis for its :term:`scan` feature.
 
@@ -891,6 +899,11 @@ Glossary
       :meth:`pyramid.config.Configurator.set_session_factory` for more
       information.
 
+   CSRF storage policy
+      A utility that implements :class:`pyramid.interfaces.ICSRFStoragePolicy`
+      which is responsible for allocating CSRF tokens to a user and verifying
+      that a provided token is acceptable.
+
    Mako
      `Mako <http://www.makotemplates.org/>`_ is a template language
      which refines the familiar ideas of componentized layout and inheritance
@@ -941,16 +954,16 @@ Glossary
    pyramid_handlers
      An add-on package which allows :app:`Pyramid` users to create classes
      that are analogues of Pylons 1 "controllers".  See
-     http://docs.pylonsproject.org/projects/pyramid_handlers/en/latest/.
+     https://docs.pylonsproject.org/projects/pyramid_handlers/en/latest/.
 
    pyramid_jinja2
      :term:`Jinja2` templating system bindings for Pyramid, documented at
-     http://docs.pylonsproject.org/projects/pyramid_jinja2/en/latest/.  This
+     https://docs.pylonsproject.org/projects/pyramid_jinja2/en/latest/.  This
      package also includes a scaffold named ``pyramid_jinja2_starter``, which
      creates an application package based on the Jinja2 templating system.
 
    Akhet
-     `Akhet <http://docs.pylonsproject.org/projects/akhet/en/latest/>`_ is a 
+     `Akhet <https://docs.pylonsproject.org/projects/akhet/en/latest/>`_ is a
      Pyramid library and demo application with a Pylons-like feel.
      It's most known for its former application scaffold, which helped 
      users transition from Pylons and those preferring a more Pylons-like API.
@@ -993,7 +1006,7 @@ Glossary
      database information.  :mod:`pyramid_debugtoolbar` is configured into
      the ``development.ini`` of all applications which use a Pyramid
      :term:`cookiecutter`.  For more information, see
-     http://docs.pylonsproject.org/projects/pyramid_debugtoolbar/en/latest/.
+     https://docs.pylonsproject.org/projects/pyramid_debugtoolbar/en/latest/.
 
    scaffold
      A project template that generates some of the major parts of a Pyramid
@@ -1010,7 +1023,7 @@ Glossary
      used in production applications, because the logger can be configured to
      log to a file, to UNIX syslog, to the Windows Event Log, or even to
      email. See its `documentation
-     <http://docs.pylonsproject.org/projects/pyramid_exclog/en/latest/>`_.
+     <https://docs.pylonsproject.org/projects/pyramid_exclog/en/latest/>`_.
 
    console script
      A script written to the ``bin`` (on UNIX, or ``Scripts`` on Windows)
@@ -1065,7 +1078,7 @@ Glossary
       A :term:`WSGI` server that runs on UNIX and Windows under Python 2.7+
       and Python 3.3+.  Projects generated via Pyramid cookiecutters use
       Waitress as a WGSI server.  See
-      http://docs.pylonsproject.org/projects/waitress/en/latest/ for detailed
+      https://docs.pylonsproject.org/projects/waitress/en/latest/ for detailed
       information.
 
    Green Unicorn
@@ -1117,7 +1130,7 @@ Glossary
       The :term:`Python Packaging Authority` formerly recommended using the
       ``pyvenv`` command for `creating virtual environments on Python 3.4 and
       3.5
-      <https://packaging.python.org/en/latest/installing/#creating-virtual-environments>`_,
+      <https://packaging.python.org/tutorials/installing-packages/#creating-virtual-environments>`_,
       but it was deprecated in 3.6 in favor of ``python3 -m venv`` on UNIX or
       ``python -m venv`` on Windows, which is backward compatible on Python
       3.3 and greater.
@@ -1154,3 +1167,42 @@ Glossary
 
    coverage
       A measurement of code coverage, usually expressed as a percentage of which lines of code have been executed over which lines are executable, typically run during test execution.
+
+   execution policy
+      A policy which wraps the :term:`router` by creating the request object
+      and sending it through the request pipeline.
+      See :class:`pyramid.config.Configurator.set_execution_policy`.
+
+   singleton
+      A singleton is a class which will only ever have one instance.
+      As there is only one, it is shared by all other code.
+      This makes it an example of :term:`global state`.
+
+      Using a singleton is `considered a poor design choice. <https://softwareengineering.stackexchange.com/questions/148108/why-is-global-state-so-evil>`_
+      As :term:`mutable` global state, it can be changed by any other code,
+      and so the values it represents cannot be reasoned about or tested properly.
+
+   global state
+      A set of values that are available to the entirety of a program.
+
+   mutable
+      In Python, a value is mutable if it can be changed *in place*.
+      The Python ``list`` and ``dict`` types are mutable.
+      When a value is added to or removed from an instance of either, the original object remains.
+      The opposite of mutable is :term:`immutable`.
+
+   immutable
+      In Python, a value is immutable if it cannot be changed.
+      The Python ``str``, ``int``, and ``tuple`` data types are all ``immutable``.
+
+   import time
+      In Python, the moment when a module is referred to in an ``import`` statement.
+      At this moment, all statements in that module at the module scope (at the left margin) are executed.
+      It is a bad design decision to put statements in a Python module that have :term:`side effect`\ s at import time.
+
+   side effect
+      A statement or function has a side effect when it changes a value outside its own scope.
+      Put another way, if one can observe the change made by a function from outside that function, it has a side effect.
+
+   context manager
+      A context manager is an object that defines the runtime context to be established when executing a :ref:`with <python:with>` statement in Python. The context manager handles the entry into, and the exit from, the desired runtime context for the execution of the block of code. Context managers are normally invoked using the ``with`` statement, but can also be used by directly invoking their methods. Pyramid adds context managers for :class:`pyramid.config.Configurator`, :meth:`pyramid.interfaces.IRouter.request_context`, :func:`pyramid.paster.bootstrap`, :func:`pyramid.scripting.prepare`, and :func:`pyramid.testing.testConfig`. See also the Python documentation for :ref:`With Statement Context Managers <python:context-managers>` and :pep:`343`.

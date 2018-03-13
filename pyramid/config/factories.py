@@ -3,6 +3,7 @@ from zope.interface import implementer
 
 from pyramid.interfaces import (
     IDefaultRootFactory,
+    IExecutionPolicy,
     IRequestFactory,
     IResponseFactory,
     IRequestExtensions,
@@ -10,6 +11,7 @@ from pyramid.interfaces import (
     ISessionFactory,
     )
 
+from pyramid.router import default_execution_policy
 from pyramid.traversal import DefaultRootFactory
 
 from pyramid.util import (
@@ -142,9 +144,10 @@ class FactoriesConfiguratorMixin(object):
 
         When adding a property to the request, ``callable`` can either
         be a callable that accepts the request as its single positional
-        parameter, or it can be a property descriptor. If ``name`` is
-        ``None``, the name of the property will be computed from the
-        name of the ``callable``.
+        parameter, or it can be a property descriptor. If ``callable`` is
+        a property descriptor, it has to be an instance of a class which is
+        a subclass of ``property``. If ``name`` is ``None``, the name of
+        the property will be computed from the name of the ``callable``.
 
         If the ``callable`` is a property descriptor a ``ValueError``
         will be raised if ``name`` is ``None`` or ``reify`` is ``True``.
@@ -230,6 +233,29 @@ class FactoriesConfiguratorMixin(object):
         set_request_property,
         'set_request_propery() is deprecated as of Pyramid 1.5; use '
         'add_request_method() with the property=True argument instead')
+
+    @action_method
+    def set_execution_policy(self, policy):
+        """
+        Override the :app:`Pyramid` :term:`execution policy` in the
+        current configuration.  The ``policy`` argument must be an instance
+        of an :class:`pyramid.interfaces.IExecutionPolicy` or a
+        :term:`dotted Python name` that points at an instance of an
+        execution policy.
+
+        """
+        policy = self.maybe_dotted(policy)
+        if policy is None:
+            policy = default_execution_policy
+
+        def register():
+            self.registry.registerUtility(policy, IExecutionPolicy)
+
+        intr = self.introspectable('execution policy', None,
+                                   self.object_description(policy),
+                                   'execution policy')
+        intr['policy'] = policy
+        self.action(IExecutionPolicy, register, introspectables=(intr,))
 
 
 @implementer(IRequestExtensions)

@@ -121,4 +121,4 @@ Extra credit
    result that you expected?
 
 .. seealso:: `Weird Stuff You Can Do With URL Dispatch
-   <http://www.plope.com/weird_pyramid_urldispatch>`_
+   <https://web.archive.org/web/20170131192830/http://www.plope.com/weird_pyramid_urldispatch>`_
