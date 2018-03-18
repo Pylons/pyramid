@@ -141,7 +141,7 @@ def BaseCookieSessionFactory(
     ):
     """
     .. versionadded:: 1.5
-    
+
     Configure a :term:`session factory` which will provide cookie-based
     sessions.  The return value of this function is a :term:`session factory`,
     which may be provided as the ``session_factory`` argument of a
@@ -393,7 +393,7 @@ def UnencryptedCookieSessionFactoryConfig(
         compatible with cookies generated using
         ``UnencryptedCookieSessionFactory``, so existing user session data
         will be destroyed if you switch to it.
-    
+
     Configure a :term:`session factory` which will provide unencrypted
     (but signed) cookie-based sessions.  The return value of this
     function is a :term:`session factory`, which may be provided as
@@ -452,7 +452,7 @@ def UnencryptedCookieSessionFactoryConfig(
     class SerializerWrapper(object):
         def __init__(self, secret):
             self.secret = secret
-            
+
         def loads(self, bstruct):
             return signed_deserialize(bstruct, secret)
 
@@ -500,7 +500,7 @@ def SignedCookieSessionFactory(
     ):
     """
     .. versionadded:: 1.5
-    
+
     Configure a :term:`session factory` which will provide signed
     cookie-based sessions.  The return value of this
     function is a :term:`session factory`, which may be provided as
@@ -519,7 +519,7 @@ def SignedCookieSessionFactory(
     ``secret``
       A string which is used to sign the cookie. The secret should be at
       least as long as the block size of the selected hash algorithm. For
-      ``sha512`` this would mean a 128 bit (64 character) secret.  It should
+      ``sha512`` this would mean a 512 bit (64 character) secret.  It should
       be unique within the set of secret values provided to Pyramid for
       its various subsystems (see :ref:`admonishment_against_secret_sharing`).
 
