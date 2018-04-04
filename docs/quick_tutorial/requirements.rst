@@ -210,7 +210,7 @@ tutorial.
     # Mac and Linux
     $ $VENV/bin/pip install webtest pytest pytest-cov deform sqlalchemy \
       pyramid_chameleon pyramid_debugtoolbar pyramid_jinja2 waitress \
-      pyramid_tm zope.sqlalchemy
+      pyramid_tm zope.sqlalchemy bcrypt
 
 .. code-block:: doscon
 
