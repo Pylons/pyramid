@@ -283,6 +283,17 @@ class TestHTTPException(unittest.TestCase):
             if header[0] == 'Content-Type':
                 self.assertEqual(header[1], 'application/json')
 
+    def test__content_type_invalid(self):
+        cls = self._getTargetSubclass()
+        exc = cls()
+        environ = _makeEnviron()
+        environ['HTTP_ACCEPT'] = 'invalid'
+        start_response = DummyStartResponse()
+        exc(environ, start_response)
+        for header in start_response.headerlist:
+            if header[0] == 'Content-Type':
+                self.assertEqual(header[1], 'text/html; charset=UTF-8')
+
     def test__default_app_iter_with_comment_ampersand(self):
         cls = self._getTargetSubclass()
         exc = cls(comment='comment & comment')
