@@ -38,6 +38,11 @@ Bug Fixes
   error code.
   See https://github.com/Pylons/pyramid/pull/3280
 
+- Replace ``webob.acceptparse.MIMEAccept`` from WebOb with
+  ``webob.acceptparse.create_accept_header`` in the HTTP exception handling
+  code. The old ``MIMEAccept`` has been deprecated. The new methods follow the
+  RFC's more closely. See https://github.com/Pylons/pyramid/pull/3251
+
 Deprecations
 ------------
 
