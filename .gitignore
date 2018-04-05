@@ -27,3 +27,4 @@ jyenv/
 pypyenv/
 env*/
 venv/
+.cache/
