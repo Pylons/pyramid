@@ -244,7 +244,7 @@ class IResponse(Interface):
         """ Gets and sets and deletes the Server header. For more information
         on Server see RFC216 section 14.38. """)
 
-    def set_cookie(key, value='', max_age=None, path='/', domain=None,
+    def set_cookie(name, value='', max_age=None, path='/', domain=None,
                    secure=False, httponly=False, comment=None, expires=None,
                    overwrite=False):
         """ Set (add) a cookie for the response """
