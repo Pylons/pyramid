@@ -259,7 +259,7 @@ class IResponse(Interface):
         """ Get/set the unicode value of the body (using the charset of
         the Content-Type)""")
 
-    def unset_cookie(key, strict=True):
+    def unset_cookie(name, strict=True):
         """ Unset a cookie with the given name (remove it from the
         response)."""
 

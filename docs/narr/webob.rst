@@ -412,7 +412,7 @@ Here are some highlights:
     (you may also use a timedelta object).  The ``Expires`` key will also be
     set based on the value of ``max_age``.
 
-``response.delete_cookie(key, path='/', domain=None)``
+``response.delete_cookie(name, path='/', domain=None)``
     Delete a cookie from the client.  This sets ``max_age`` to 0 and the cookie
     value to ``''``.
 
