@@ -180,7 +180,7 @@ class IResponse(Interface):
         """Gets and sets and deletes the Date header. For more information on
         Date see RFC 2616 section 14.18. Converts using HTTP date.""")
 
-    def delete_cookie(key, path='/', domain=None):
+    def delete_cookie(name, path='/', domain=None):
         """ Delete a cookie from the client. Note that path and domain must
         match how the cookie was originally set.  This sets the cookie to the
         empty string, and max_age=0 so that it should expire immediately. """
