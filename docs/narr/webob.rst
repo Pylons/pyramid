@@ -406,13 +406,13 @@ Here are some highlights:
     ``response.text``. ``response.content_type_params`` is a dictionary of all
     the parameters.
 
-``response.set_cookie(key, value, max_age=None, path='/', ...)``
+``response.set_cookie(name, value, max_age=None, path='/', ...)``
     Set a cookie.  The keyword arguments control the various cookie parameters.
     The ``max_age`` argument is the length for the cookie to live in seconds
     (you may also use a timedelta object).  The ``Expires`` key will also be
     set based on the value of ``max_age``.
 
-``response.delete_cookie(key, path='/', domain=None)``
+``response.delete_cookie(name, path='/', domain=None)``
     Delete a cookie from the client.  This sets ``max_age`` to 0 and the cookie
     value to ``''``.
 

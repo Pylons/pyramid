@@ -180,7 +180,7 @@ class IResponse(Interface):
         """Gets and sets and deletes the Date header. For more information on
         Date see RFC 2616 section 14.18. Converts using HTTP date.""")
 
-    def delete_cookie(key, path='/', domain=None):
+    def delete_cookie(name, path='/', domain=None):
         """ Delete a cookie from the client. Note that path and domain must
         match how the cookie was originally set.  This sets the cookie to the
         empty string, and max_age=0 so that it should expire immediately. """
@@ -244,7 +244,7 @@ class IResponse(Interface):
         """ Gets and sets and deletes the Server header. For more information
         on Server see RFC216 section 14.38. """)
 
-    def set_cookie(key, value='', max_age=None, path='/', domain=None,
+    def set_cookie(name, value='', max_age=None, path='/', domain=None,
                    secure=False, httponly=False, comment=None, expires=None,
                    overwrite=False):
         """ Set (add) a cookie for the response """
@@ -259,7 +259,7 @@ class IResponse(Interface):
         """ Get/set the unicode value of the body (using the charset of
         the Content-Type)""")
 
-    def unset_cookie(key, strict=True):
+    def unset_cookie(name, strict=True):
         """ Unset a cookie with the given name (remove it from the
         response)."""
 
