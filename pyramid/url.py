@@ -162,15 +162,14 @@ class URLMethodsMixin(object):
         ``*remainder`` replacement value, it is tacked on to the URL
         after being URL-quoted-except-for-embedded-slashes.
 
-        If no ``_query`` keyword argument is provided, the request query string
-        will be returned in the URL. If it is present, it will be used to
-        compose a query string that will be tacked on to the end of the URL,
-        replacing any request query string.  The value of ``_query`` may be a
-        sequence of two-tuples *or* a data structure with an ``.items()``
-        method that returns a sequence of two-tuples (presumably a dictionary).
-        This data structure will be turned into a query string per the
-        documentation of :func:`pyramid.url.urlencode` function.  This will
-        produce a query string in the ``x-www-form-urlencoded`` format.  A
+        If ``_query`` is provided, it will be used to compose a query string
+        that will be tacked on to the end of the URL.  The value of ``_query``
+        may be a sequence of two-tuples *or* a data structure with an
+        ``.items()`` method that returns a sequence of two-tuples
+        (presumably a dictionary). This data structure will be turned into
+        a query string per the documentation of the
+        :func:`pyramid.url.urlencode` function.  This will produce a query
+        string in the ``x-www-form-urlencoded`` format.  A
         non-``x-www-form-urlencoded`` query string may be used by passing a
         *string* value as ``_query`` in which case it will be URL-quoted
         (e.g. query="foo bar" will become "foo%20bar").  However, the result
@@ -354,20 +353,21 @@ class URLMethodsMixin(object):
                      ``elements`` are used, the generated URL will *not*
                      end in a trailing slash.
 
-        If a keyword argument ``query`` is present, it will be used to compose
-        a query string that will be tacked on to the end of the URL.  The value
-        of ``query`` may be a sequence of two-tuples *or* a data structure with
-        an ``.items()`` method that returns a sequence of two-tuples
-        (presumably a dictionary).  This data structure will be turned into a
-        query string per the documentation of :func:`pyramid.url.urlencode`
-        function.  This will produce a query string in the
-        ``x-www-form-urlencoded`` encoding.  A non-``x-www-form-urlencoded``
-        query string may be used by passing a *string* value as ``query`` in
-        which case it will be URL-quoted (e.g. query="foo bar" will become
-        "foo%20bar").  However, the result will not need to be in ``k=v`` form
-        as required by ``x-www-form-urlencoded``.  After the query data is
-        turned into a query string, a leading ``?`` is prepended, and the
-        resulting string is appended to the generated URL.
+        If ``query`` is provided, it will be used to compose a query string
+        that will be tacked on to the end of the URL.  The value of ``query``
+        may be a sequence of two-tuples *or* a data structure with an
+        ``.items()`` method that returns a sequence of two-tuples
+        (presumably a dictionary). This data structure will be turned into
+        a query string per the documentation of the
+        :func:`pyramid.url.urlencode` function.  This will produce a query
+        string in the ``x-www-form-urlencoded`` format.  A
+        non-``x-www-form-urlencoded`` query string may be used by passing a
+        *string* value as ``query`` in which case it will be URL-quoted
+        (e.g. query="foo bar" will become "foo%20bar").  However, the result
+        will not need to be in ``k=v`` form as required by
+        ``x-www-form-urlencoded``.  After the query data is turned into a query
+        string, a leading ``?`` is prepended, and the resulting string is
+        appended to the generated URL.
 
         .. note::
 
