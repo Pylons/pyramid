@@ -235,7 +235,7 @@ Windows PowerShell
 
 #. Make a :term:`virtual environment` workspace:
 
-   .. code-block:: powershell
+   .. code-block:: text
 
       c:\> cd \
       c:\> set $env:VENV=c:\env
