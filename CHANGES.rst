@@ -42,3 +42,5 @@ Backward Incompatibilities
 Documentation Changes
 ---------------------
 
+- Add PowerShell instructions for Windows commands. See
+  https://github.com/Pylons/pyramid/pull/3266

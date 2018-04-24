@@ -71,7 +71,14 @@ On UNIX:
    $ cd tutorial
    $ $VENV/bin/pip install -e .
 
-On Windows:
+On Windows PowerShell:
+
+.. code-block:: text
+
+   c:\> cd tutorial
+   c:\tutorial> $env:VENV\Scripts\pip install -e .
+
+On Windows Command Prompt (cmd.exe):
 
 .. code-block:: doscon
 

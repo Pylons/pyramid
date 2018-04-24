@@ -15,7 +15,13 @@ On UNIX:
 
    $ $VENV/bin/python setup.py sdist
 
-On Windows:
+On Windows PowerShell:
+
+.. code-block:: text
+
+   c:\tutorial> $env:VENV\Scripts\python setup.py sdist
+
+On Windows Command Prompt (cmd.exe):
 
 .. code-block:: doscon
 

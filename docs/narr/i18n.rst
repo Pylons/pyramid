@@ -289,8 +289,16 @@ compile it yourself. Make sure the installation path is added to your
 
 Installing Lingua is done with the Python packaging tools. If the
 :term:`virtual environment` into which you've installed your :app:`Pyramid`
-application lives at the environment variable ``%VENV%``, you can install
+application lives at the environment variable ``$env:VENV`` or ``%VENV%``, you can install
 Lingua like so:
+
+Windows PowerShell:
+
+.. code-block:: text
+
+   c:\> $env:VENV\Scripts\pip install lingua
+
+Windows Command Prompt (cmd.exe):
 
 .. code-block:: doscon
 

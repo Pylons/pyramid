@@ -160,7 +160,7 @@ Glossary
      :term:`venv` is the preferred tool.
 
      Note: whenever you encounter commands prefixed with ``$VENV`` (Unix)
-     or ``%VENV`` (Windows), know that that is the environment variable whose
+     ``$env:VENV`` (Windows PowerShell), or ``%VENV`` (Windows Command Prompt (cmd.exe)), know that that is the environment variable whose
      value is the root of the virtual environment in question.
 
    resource
@@ -1144,7 +1144,7 @@ Glossary
       virtual environments on Python 3.3 and greater.
 
       Note: whenever you encounter commands prefixed with ``$VENV`` (Unix)
-      or ``%VENV`` (Windows), know that that is the environment variable whose
+     ``$env:VENV`` (Windows PowerShell), or ``%VENV`` (Windows Command Prompt (cmd.exe)), know that that is the environment variable whose
       value is the root of the virtual environment in question.
 
    Python Packaging Authority

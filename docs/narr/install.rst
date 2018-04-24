@@ -229,6 +229,40 @@ After installing Python as described previously in
 :ref:`if-you-don-t-yet-have-a-python-interpreter-windows`, and satisfying the
 :ref:`requirements-for-installing-packages`, you can now install Pyramid.
 
+
+Windows PowerShell
+~~~~~~~~~~~~~~~~~~
+
+#. Make a :term:`virtual environment` workspace:
+
+   .. code-block:: text
+
+      c:\> cd \
+      c:\> $env:VENV="c:\env"
+      c:\> python -m venv $env:VENV
+      c:\> cd $env:VENV
+
+   You can either follow the use of the environment variable ``$env:VENV``, or
+   replace it with the root directory of the virtual environment. If you choose
+   the former approach, ensure that ``$env:VENV`` is an absolute path. In the
+   latter case, the ``set`` command can be skipped.
+
+#. (Optional) Consider using ``$env:VENV\Scripts\activate.bat`` to make your shell
+   environment wired to use the virtual environment.
+
+#. Use ``pip`` to get :app:`Pyramid` and its direct dependencies installed:
+
+   .. parsed-literal::
+
+      c:\\> $env:VENV\\Scripts\\pip install "pyramid==\ |release|\ "
+
+.. note:: See the note above for :ref:`Why use $VENV/bin/pip instead of source
+   bin/activate, then pip <venv-bin-pip-vs-source-bin-activate>`.
+
+
+Windows Command Prompt (cmd.exe)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 #. Make a :term:`virtual environment` workspace:
 
    .. code-block:: doscon

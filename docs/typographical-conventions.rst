@@ -79,7 +79,15 @@ Unix shell commands are prefixed with a ``$`` character. (See :term:`venv` for t
 
     $ $VENV/bin/pip install -e .
 
-Windows commands are prefixed with a drive letter with an optional directory name. (See :term:`venv` for the meaning of ``%VENV%``.)
+Windows commands are prefixed with a drive letter with an optional directory name. (See :term:`venv` for the meaning of ``$env:VENV`` and ``%VENV%``.)
+
+Windows PowerShell:
+
+.. code-block:: text
+
+    c:\> $env:VENV\Scripts\pserve development.ini
+
+Windows Command Prompt (cmd.exe):
 
 .. code-block:: doscon
 

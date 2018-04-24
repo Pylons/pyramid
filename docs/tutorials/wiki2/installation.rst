@@ -94,8 +94,15 @@ On UNIX
 
     $ export VENV=~/tutorial
 
-On Windows
-^^^^^^^^^^
+On Windows PowerShell
+^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: text
+
+    c:\tutorial> $env:VENV="c:\tutorial"
+
+On Windows Command Prompt (cmd.exe)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: doscon
 
@@ -117,13 +124,25 @@ On Windows
 
 Each version of Python uses different paths, so you will need to adjust the path to the command for your Python version. Recent versions of the Python 3 installer for Windows now install a Python launcher.
 
-Python 2.7:
+Python 2.7, Windows PowerShell:
+
+.. code-block:: text
+
+    c:\tutorial> c:\Python27\Scripts\virtualenv $env:VENV
+
+Python 2.7, Windows Command Prompt (cmd.exe):
 
 .. code-block:: doscon
 
     c:\tutorial> c:\Python27\Scripts\virtualenv %VENV%
 
-Python 3.6:
+Python 3.6, Windows PowerShell:
+
+.. code-block:: text
+
+    c:\tutorial> python -m venv $env:VENV
+
+Python 3.6, Windows Command Prompt (cmd.exe):
 
 .. code-block:: doscon
 
@@ -140,8 +159,15 @@ On UNIX
 
     $ $VENV/bin/pip install --upgrade pip setuptools
 
-On Windows
-^^^^^^^^^^
+On Windows PowerShell
+^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: text
+
+    c:\tutorial> $env:VENV\Scripts\pip install --upgrade pip setuptools
+
+On Windows Command Prompt (cmd.exe)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: doscon
 
@@ -162,8 +188,15 @@ On UNIX
 
     $ $VENV/bin/pip install -e ".[testing]"
 
-On Windows
-^^^^^^^^^^
+On Windows PowerShell
+^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: text
+
+    c:\tutorial> $env:VENV\Scripts\pip install -e ".[testing]"
+
+On Windows Command Prompt (cmd.exe)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: doscon
 
@@ -213,14 +246,21 @@ On UNIX
 
 .. code-block:: bash
 
-   $ $VENV/bin/py.test -q
+    $ $VENV/bin/py.test -q
 
-On Windows
-^^^^^^^^^^
+On Windows PowerShell
+^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: text
+
+    c:\tutorial> $env:VENV\Scripts\py.test -q
+
+On Windows Command Prompt (cmd.exe)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: doscon
 
-   c:\tutorial> %VENV%\Scripts\py.test -q
+    c:\tutorial> %VENV%\Scripts\py.test -q
 
 For a successful test run, you should see output that ends like this:
 
@@ -246,14 +286,21 @@ On UNIX
 
 .. code-block:: bash
 
-   $ $VENV/bin/py.test --cov --cov-report=term-missing
+    $ $VENV/bin/py.test --cov --cov-report=term-missing
 
-On Windows
-^^^^^^^^^^
+On Windows PowerShell
+^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: text
+
+    c:\tutorial> $env:VENV\Scripts\py.test --cov --cov-report=term-missing
+
+On Windows Command Prompt (cmd.exe)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: doscon
 
-   c:\tutorial> %VENV%\Scripts\py.test --cov --cov-report=term-missing
+    c:\tutorial> %VENV%\Scripts\py.test --cov --cov-report=term-missing
 
 If successful, you will see output something like this:
 
@@ -301,14 +348,21 @@ On UNIX
 
 .. code-block:: bash
 
-   $ $VENV/bin/py.test --cov=tutorial tutorial/tests.py -q
+    $ $VENV/bin/py.test --cov=tutorial tutorial/tests.py -q
 
-On Windows
-^^^^^^^^^^
+On Windows PowerShell
+^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: text
+
+    c:\tutorial> $env:VENV\Scripts\py.test --cov=tutorial tutorial\tests.py -q
+
+On Windows Command Prompt (cmd.exe)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: doscon
 
-   c:\tutorial> %VENV%\Scripts\py.test --cov=tutorial tutorial\tests.py -q
+    c:\tutorial> %VENV%\Scripts\py.test --cov=tutorial tutorial\tests.py -q
 
 py.test follows :ref:`conventions for Python test discovery
 <pytest:test discovery>`, and the configuration defaults from the cookiecutter
@@ -342,14 +396,21 @@ On UNIX
 
 .. code-block:: bash
 
-   $ $VENV/bin/initialize_tutorial_db development.ini
+    $ $VENV/bin/initialize_tutorial_db development.ini
 
-On Windows
-^^^^^^^^^^
+On Windows PowerShell
+^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: text
+
+    c:\tutorial> $env:VENV\Scripts\initialize_tutorial_db development.ini
+
+On Windows Command Prompt (cmd.exe)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: doscon
 
-   c:\tutorial> %VENV%\Scripts\initialize_tutorial_db development.ini
+    c:\tutorial> %VENV%\Scripts\initialize_tutorial_db development.ini
 
 The output to your console should be something like this:
 
@@ -399,12 +460,19 @@ On UNIX
 
    $ $VENV/bin/pserve development.ini --reload
 
-On Windows
-^^^^^^^^^^
+On Windows PowerShell
+^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: text
+
+    c:\tutorial> $env:VENV\Scripts\pserve development.ini --reload
+
+On Windows Command Prompt (cmd.exe)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: doscon
 
-   c:\tutorial> %VENV%\Scripts\pserve development.ini --reload
+    c:\tutorial> %VENV%\Scripts\pserve development.ini --reload
 
 .. note::
 

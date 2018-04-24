@@ -31,7 +31,13 @@ On UNIX:
 
    $ $VENV/bin/python helloworld.py
 
-On Windows:
+On Windows PowerShell:
+
+.. code-block:: text
+
+   c:\> $env:VENV\Scripts\python helloworld.py
+
+On Windows Command Prompt (cmd.exe):
 
 .. code-block:: doscon
 
