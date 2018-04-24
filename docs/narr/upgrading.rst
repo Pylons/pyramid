@@ -201,14 +201,23 @@ On UNIX, you can do that via:
 
 .. code-block:: bash
 
-   $ PYTHONWARNINGS=default $VENV/bin/pserve development.ini
+    $ PYTHONWARNINGS=default $VENV/bin/pserve development.ini
 
-On Windows, you need to issue two commands:
+On Windows, you need to issue two commands.
+
+On Windows PowerShell:
+
+.. code-block:: text
+
+    c:\> $env:PYTHONWARNINGS=default
+    c:\> Scripts\pserve development.ini
+
+On Windows Command Prompt (cmd.exe):
 
 .. code-block:: doscon
 
-   c:\> set PYTHONWARNINGS=default
-   c:\> Scripts\pserve development.ini
+    c:\> set PYTHONWARNINGS=default
+    c:\> Scripts\pserve development.ini
 
 At this point, it's ensured that deprecation warnings will be printed to the
 console whenever a codepath is hit that generates one.  You can then click
