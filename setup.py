@@ -25,7 +25,7 @@ install_requires = [
     'WebOb >= 1.7.0', # Response.has_body
     'zope.interface >= 3.8.0',  # has zope.interface.registry
     'zope.deprecation >= 3.5.0', # py3 compat
-    'venusian >= 1.0a3', # ``ignore``
+    'venusian >= 1.0', # ``ignore``
     'translationstring >= 0.4', # py3 compat
     'PasteDeploy >= 1.5.0', # py3 compat
     'plaster',
