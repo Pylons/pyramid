@@ -8,7 +8,7 @@ from pyramid.interfaces import (
 from pyramid.request import Request
 from pyramid.request import apply_request_extensions
 
-from pyramid.threadlocal import manager as threadlocal_manager
+from pyramid.threadlocal import RequestContext
 from pyramid.traversal import DefaultRootFactory
 
 def get_root(app, request=None):
@@ -26,10 +26,11 @@ def get_root(app, request=None):
     registry = app.registry
     if request is None:
         request = _make_request('/', registry)
-    threadlocals = {'registry':registry, 'request':request}
-    app.threadlocal_manager.push(threadlocals)
-    def closer(request=request): # keep request alive via this function default
-        app.threadlocal_manager.pop()
+    request.registry = registry
+    ctx = RequestContext(request)
+    ctx.begin()
+    def closer():
+        ctx.end()
     root = app.root_factory(request)
     return root, closer
 
@@ -87,12 +88,12 @@ def prepare(request=None, registry=None):
     # NB: even though _make_request might have already set registry on
     # request, we reset it in case someone has passed in their own
     # request.
-    request.registry = registry 
-    threadlocals = {'registry':registry, 'request':request}
-    threadlocal_manager.push(threadlocals)
+    request.registry = registry
+    ctx = RequestContext(request)
+    ctx.begin()
     apply_request_extensions(request)
     def closer():
-        threadlocal_manager.pop()
+        ctx.end()
     root_factory = registry.queryUtility(IRootFactory,
                                          default=DefaultRootFactory)
     root = root_factory(request)
