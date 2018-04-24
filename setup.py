@@ -22,7 +22,7 @@ CHANGES = readfile('CHANGES.rst')
 
 install_requires = [
     'setuptools',
-    'WebOb >= 1.7.0rc2', # Response.has_body
+    'WebOb >= 1.7.0', # Response.has_body
     'zope.interface >= 3.8.0',  # has zope.interface.registry
     'zope.deprecation >= 3.5.0', # py3 compat
     'venusian >= 1.0a3', # ``ignore``
