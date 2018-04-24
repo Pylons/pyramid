@@ -132,9 +132,14 @@ environment`. We set an environment variable to save typing later.
     # Mac and Linux
     $ export VENV=~/projects/quick_tutorial/env
 
+.. code-block:: text
+
+    # Windows PowerShell
+    c:\> $env:VENV="c:\projects\quick_tutorial\env"
+
 .. code-block:: doscon
 
-    # Windows
+    # Windows Command Prompt (cmd.exe)
     c:\> set VENV=c:\projects\quick_tutorial\env
 
 
@@ -153,9 +158,14 @@ environment variable.
     # Mac and Linux
     $ python3 -m venv $VENV
 
+.. code-block:: text
+
+    # Windows PowerShell
+    c:\> python -m venv $env:VENV
+
 .. code-block:: doscon
 
-    # Windows
+    # Windows Command Prompt (cmd.exe)
     c:\> python -m venv %VENV%
 
 .. seealso:: See also Python 3's :mod:`venv module <python:venv>` and Python
@@ -174,9 +184,14 @@ time of its release.
     # Mac and Linux
     $ $VENV/bin/pip install --upgrade pip setuptools
 
+.. code-block:: text
+
+    # Windows PowerShell
+    c:\> $env:VENV\Scripts\pip install --upgrade pip setuptools
+
 .. code-block:: doscon
 
-    # Windows
+    # Windows Command Prompt (cmd.exe)
     c:\> %VENV%\Scripts\pip install --upgrade pip setuptools
 
 .. seealso:: See also :ref:`Why use $VENV/bin/pip instead of source
@@ -196,7 +211,10 @@ part is pretty easy. We'll also install a WSGI server, Waitress.
     # Mac and Linux
     $ $VENV/bin/pip install "pyramid==\ |release|\ " waitress
 
-    # Windows
+    # Windows PowerShell
+    c:\\> $env:VENV\\Scripts\\pip install "pyramid==\ |release|\ " waitress
+
+    # Windows Command Prompt (cmd.exe)
     c:\\> %VENV%\\Scripts\\pip install "pyramid==\ |release|\ " waitress
 
 Our Python virtual environment now has the Pyramid software available
@@ -212,7 +230,12 @@ tutorial.
       pyramid_chameleon pyramid_debugtoolbar pyramid_jinja2 waitress \
       pyramid_tm zope.sqlalchemy
 
+.. code-block:: text
+
+    # Windows PowerShell
+    c:\> $env:VENV\Scripts\pip install webtest pytest pytest-cov deform sqlalchemy pyramid_chameleon pyramid_debugtoolbar pyramid_jinja2 waitress pyramid_tm zope.sqlalchemy
+
 .. code-block:: doscon
 
-    # Windows
+    # Windows Command Prompt (cmd.exe)
     c:\> %VENV%\Scripts\pip install webtest pytest pytest-cov deform sqlalchemy pyramid_chameleon pyramid_debugtoolbar pyramid_jinja2 waitress pyramid_tm zope.sqlalchemy
