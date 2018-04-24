@@ -238,7 +238,7 @@ Windows PowerShell
    .. code-block:: text
 
       c:\> cd \
-      c:\> set $env:VENV="c:\env"
+      c:\> $env:VENV="c:\env"
       c:\> python -m venv $env:VENV
       c:\> cd $env:VENV
 
