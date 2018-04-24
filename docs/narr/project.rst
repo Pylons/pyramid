@@ -116,7 +116,20 @@ On UNIX:
     # ...where we upgrade packaging tools.
     $ env/bin/pip install --upgrade pip setuptools
 
-Or on Windows:
+On Windows PowerShell:
+
+.. code-block:: text
+
+    # Reset our environment variable for a new virtual environment.
+    c:\> $env:VENV="c:\env\myproject\env"
+    # Change directory into your newly created project.
+    c:\> cd myproject
+    # Create a new virtual environment...
+    c:\myproject> python -m venv $env:VENV
+    # ...where we upgrade packaging tools.
+    c:\myproject> $env:VENV\Scripts\pip install --upgrade pip setuptools
+
+On Windows Command Prompt (cmd.exe):
 
 .. code-block:: doscon
 
@@ -194,7 +207,13 @@ On UNIX:
 
     $ $VENV/bin/pip install -e .
 
-Or on Windows:
+On Windows PowerShell:
+
+.. code-block:: text
+
+    c:\env\myproject> $env:VENV\Scripts\pip install -e .
+
+On Windows Command Prompt (cmd.exe):
 
 .. code-block:: doscon
 
@@ -230,13 +249,19 @@ On UNIX:
 
 .. code-block:: bash
 
-   $ $VENV/bin/pip install -e ".[testing]"
+    $ $VENV/bin/pip install -e ".[testing]"
 
-On Windows:
+On Windows PowerShell:
+
+.. code-block:: text
+
+    c:\env\myproject> $env:VENV\Scripts\pip install -e ".[testing]"
+
+On Windows Command Prompt (cmd.exe):
 
 .. code-block:: doscon
 
-   c:\env\myproject> %VENV%\Scripts\pip install -e ".[testing]"
+    c:\env\myproject> %VENV%\Scripts\pip install -e ".[testing]"
 
 Once the testing requirements are installed, then you can run the tests using
 the ``py.test`` command that was just installed in the ``bin`` directory of
@@ -248,7 +273,13 @@ On UNIX:
 
    $ $VENV/bin/py.test -q
 
-On Windows:
+On Windows PowerShell:
+
+.. code-block:: text
+
+    c:\env\myproject> $env:VENV\Scripts\py.test -q
+
+On Windows Command Prompt (cmd.exe):
 
 .. code-block:: doscon
 
@@ -313,7 +344,13 @@ On UNIX:
 
    $ $VENV/bin/pserve development.ini
 
-On Windows:
+On Windows PowerShell:
+
+.. code-block:: text
+
+    c:\env\myproject> $env:VENV\Scripts\pserve development.ini
+
+On Windows Command Prompt (cmd.exe):
 
 .. code-block:: doscon
 
