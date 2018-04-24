@@ -1,3 +1,10 @@
+unreleased
+==========
+
+- Fix ``pyramid.scripting.get_root`` which was broken by the execution policy
+  feature added in the 1.9 release.
+  See https://github.com/Pylons/pyramid/pull/3265
+
 .. _changes_1.9.1:
 
 1.9.1 (2017-07-13)
