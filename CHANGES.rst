@@ -42,5 +42,3 @@ Backward Incompatibilities
 Documentation Changes
 ---------------------
 
-- Added PowerShell instructions and syntax to all existing Windows commands.
-  See 
