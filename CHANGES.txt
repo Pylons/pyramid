@@ -1,5 +1,7 @@
-unreleased
-==========
+.. _changes_1.9.2:
+
+1.9.2 (2018-04-23)
+==================
 
 - Pin to ``webob >= 1.7.0`` instead of ``1.7.0rc2`` to avoid accidentally
   opting users into pre-releases because a downstream dependency allowed it.
