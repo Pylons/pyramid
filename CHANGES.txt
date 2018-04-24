@@ -1,6 +1,10 @@
 unreleased
 ==========
 
+- Pin to ``webob >= 1.7.0`` instead of ``1.7.0rc2`` to avoid accidentally
+  opting users into pre-releases because a downstream dependency allowed it.
+  See https://github.com/Pylons/pyramid/issues/3220
+
 - Fix ``pyramid.scripting.get_root`` which was broken by the execution policy
   feature added in the 1.9 release.
   See https://github.com/Pylons/pyramid/pull/3265
