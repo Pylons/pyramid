@@ -332,7 +332,7 @@ Glossary
      for middleware exist, such as caching, content-transport
      encoding, and other functions.  See `WSGI documentation
      <https://wsgi.readthedocs.io/en/latest/>`_ or `PyPI
-     <https://pypi.python.org/pypi>`_ to find middleware for your application.
+     <https://pypi.org/>`_ to find middleware for your application.
 
    pipeline
      The :term:`PasteDeploy` term for a single configuration of a WSGI
@@ -394,7 +394,7 @@ Glossary
      between templates.
 
    Genshi
-     An `XML templating language <https://pypi.python.org/pypi/Genshi/>`_
+     An `XML templating language <https://pypi.org/project/Genshi/>`_
      by Christopher Lenz.
 
    Jinja2
@@ -449,7 +449,7 @@ Glossary
      subpath.  See :ref:`star_subpath` for more information.
 
    interface
-     A `Zope interface <https://pypi.python.org/pypi/zope.interface>`_
+     A `Zope interface <https://pypi.org/project/zope.interface/>`_
      object.  In :app:`Pyramid`, an interface may be attached to a
      :term:`resource` object or a :term:`request` object in order to
      identify that the object is "of a type".  Interfaces are used
@@ -495,7 +495,7 @@ Glossary
 
    repoze.catalog
      An indexing and search facility (fielded and full-text) based on
-     `zope.index <https://pypi.python.org/pypi/zope.index>`_.  See `the
+     `zope.index <https://pypi.org/project/zope.index/>`_.  See `the
      documentation <http://docs.repoze.org/catalog>`_ for more
      information.
 
@@ -707,7 +707,7 @@ Glossary
      :ref:`multidict_narr` and :class:`pyramid.interfaces.IMultiDict`.
 
    PyPI
-     `The Python Package Index <https://pypi.python.org/pypi>`_, a collection
+     `The Python Package Index <https://pypi.org/>`_, a collection
      of software available for Python.
 
    Agendaless Consulting
@@ -1100,7 +1100,7 @@ Glossary
    pyramid_redis_sessions
       A package by Eric Rasmussen which allows you to store Pyramid session 
       data in a Redis database.  See 
-      https://pypi.python.org/pypi/pyramid_redis_sessions for more information.
+      https://pypi.org/project/pyramid_redis_sessions/ for more information.
 
    cache busting
       A technique used when serving a cacheable static asset in order to force
