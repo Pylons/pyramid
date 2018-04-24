@@ -73,7 +73,7 @@ On UNIX:
 
 On Windows PowerShell:
 
-.. code-block:: doscon
+.. code-block:: text
 
    c:\> cd tutorial
    c:\tutorial> $env:VENV\Scripts\pip install -e .
