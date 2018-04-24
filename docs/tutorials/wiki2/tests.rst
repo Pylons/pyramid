@@ -102,7 +102,14 @@ On UNIX:
    $ rm tutorial.sqlite
    $ $VENV/bin/py.test -q
 
-On Windows:
+On Windows PowerShell:
+
+.. code-block:: text
+
+   c:\tutorial> del tutorial.sqlite
+   c:\tutorial> $env:VENV\Scripts\py.test -q
+
+On Windows Command Prompt (cmd.exe):
 
 .. code-block:: doscon
 
