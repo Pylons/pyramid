@@ -236,14 +236,21 @@ On UNIX
 
 .. code-block:: bash
 
-   $ $VENV/bin/py.test -q
+    $ $VENV/bin/py.test -q
 
-On Windows
-^^^^^^^^^^
+On Windows PowerShell
+^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: text
+
+    c:\tutorial> $env:VENV\Scripts\py.test -q
+
+On Windows Command Prompt (cmd.exe)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: doscon
 
-   c:\tutorial> %VENV%\Scripts\py.test -q
+    c:\tutorial> %VENV%\Scripts\py.test -q
 
 For a successful test run, you should see output that ends like this:
 
