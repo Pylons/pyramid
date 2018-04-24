@@ -39,7 +39,20 @@ As an example, for Python 3.6+ on Linux:
     # or for a specific released version
     $ $VENV/bin/pip install "pyramid==\ |release|\ "
 
-For Windows:
+For Windows PowerShell
+
+.. parsed-literal::
+
+    # set an environment variable to where you want your virtual environment
+    c:\\> $env:VENV="c:\\env"
+    # create the virtual environment
+    c:\\> python -m venv $env:VENV
+    # install pyramid
+    c:\\> $env:VENV\\Scripts\\pip install pyramid
+    # or for a specific released version
+    c:\\> $env:VENV\\Scripts\\pip install "pyramid==\ |release|\ "
+
+For Windows Command Prompt (cmd.exe):
 
 .. parsed-literal::
 
