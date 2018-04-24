@@ -8,38 +8,35 @@ class Test_get_root(unittest.TestCase):
     def _makeRegistry(self):
         return DummyRegistry([DummyFactory])
 
+    def setUp(self):
+        from pyramid.threadlocal import manager
+        self.manager = manager
+        self.default = manager.get()
+
     def test_it_norequest(self):
         registry = self._makeRegistry()
         app = DummyApp(registry=registry)
         root, closer = self._callFUT(app)
-        self.assertEqual(len(app.threadlocal_manager.pushed), 1)
-        pushed = app.threadlocal_manager.pushed[0]
+        self.assertEqual(dummy_root, root)
+        pushed = self.manager.get()
         self.assertEqual(pushed['registry'], registry)
-        self.assertEqual(pushed['request'].registry, app.registry)
-        self.assertEqual(len(app.threadlocal_manager.popped), 0)
+        self.assertEqual(pushed['request'].registry, registry)
+        self.assertEqual(pushed['request'].environ['path'], '/')
         closer()
-        self.assertEqual(len(app.threadlocal_manager.popped), 1)
+        self.assertEqual(self.default, self.manager.get())
 
     def test_it_withrequest(self):
         registry = self._makeRegistry()
         app = DummyApp(registry=registry)
         request = DummyRequest({})
         root, closer = self._callFUT(app, request)
-        self.assertEqual(len(app.threadlocal_manager.pushed), 1)
-        pushed = app.threadlocal_manager.pushed[0]
+        self.assertEqual(dummy_root, root)
+        pushed = self.manager.get()
         self.assertEqual(pushed['registry'], registry)
         self.assertEqual(pushed['request'], request)
-        self.assertEqual(len(app.threadlocal_manager.popped), 0)
+        self.assertEqual(pushed['request'].registry, registry)
         closer()
-        self.assertEqual(len(app.threadlocal_manager.popped), 1)
-
-    def test_it_requestfactory_overridden(self):
-        registry = self._makeRegistry()
-        app = DummyApp(registry=registry)
-        root, closer = self._callFUT(app)
-        self.assertEqual(len(app.threadlocal_manager.pushed), 1)
-        pushed = app.threadlocal_manager.pushed[0]
-        self.assertEqual(pushed['request'].environ['path'], '/')
+        self.assertEqual(self.default, self.manager.get())
 
 class Test_prepare(unittest.TestCase):
     def _callFUT(self, request=None, registry=None):
@@ -206,24 +203,12 @@ class DummyRegistry(object):
 
 class DummyApp:
     def __init__(self, registry=None):
-        self.threadlocal_manager = DummyThreadLocalManager()
         if registry:
             self.registry = registry
 
     def root_factory(self, environ):
         return dummy_root
 
-class DummyThreadLocalManager:
-    def __init__(self):
-        self.pushed = []
-        self.popped = []
-        
-    def push(self, item):
-        self.pushed.append(item)
-
-    def pop(self):
-        self.popped.append(True)
-        
 class DummyRequest(object):
     matchdict = None
     matched_route = None
