@@ -139,7 +139,7 @@ Marketing and communications
 Pyramid 1.x released.
 
 PyPI
-https://pypi.python.org/pypi/pyramid/1.x
+https://pypi.org/project/pyramid/1.x/
 
 === One time only for new version, first pre-release ===
 What's New

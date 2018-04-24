@@ -43,7 +43,7 @@ Access control
 Add dependencies
 ~~~~~~~~~~~~~~~~
 
-Just like in :ref:`wiki_defining_views`, we need a new dependency. We need to add the `bcrypt <https://pypi.python.org/pypi/bcrypt>`_ package, to our tutorial package's ``setup.py`` file by assigning this dependency to the ``requires`` parameter in the ``setup()`` function.
+Just like in :ref:`wiki_defining_views`, we need a new dependency. We need to add the `bcrypt <https://pypi.org/project/bcrypt/>`_ package, to our tutorial package's ``setup.py`` file by assigning this dependency to the ``requires`` parameter in the ``setup()`` function.
 
 Open ``setup.py`` and edit it to look like the following:
 

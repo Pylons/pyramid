@@ -35,6 +35,6 @@ Note that this command creates a tarball in the "dist" subdirectory named
 ``tutorial-0.0.tar.gz``.  You can send this file to your friends to show them
 your cool new application.  They should be able to install it by pointing the
 ``pip install`` command directly at it. Or you can upload it to `PyPI
-<https://pypi.python.org/pypi>`_ and share it with the rest of the world, where
+<https://pypi.org/>`_ and share it with the rest of the world, where
 it can be downloaded via ``pip install`` remotely like any other package people
 download from PyPI.
