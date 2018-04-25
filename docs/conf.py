@@ -223,6 +223,17 @@ latex_domain_indices = False
 _PREAMBLE = r"""
 \usepackage[]{geometry}
 \geometry{bindingoffset=0.45in,textheight=7.25in,hdivide={0.5in,*,0.75in},vdivide={1in,7.25in,1in},papersize={7.5in,9.25in}}
+
+%XeLaTeX packages
+\usepackage{xltxtra}
+\usepackage{fontspec} %Font package
+\usepackage{xunicode}
+
+%Select fonts
+\setmainfont[Mapping=tex-text]{nimbusserif}
+\setsansfont[Mapping=tex-text]{nimbussans}
+\setmonofont{nimbusmono}
+
 \hypersetup{
     colorlinks=true,
     linkcolor=black,

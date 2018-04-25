@@ -12,7 +12,7 @@ PAPEROPT_a4     = -D latex_paper_size=a4
 PAPEROPT_letter = -D latex_paper_size=letter
 ALLSPHINXOPTS   = -d $(BUILDDIR)/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
 
-.PHONY: help clean html text web pickle htmlhelp latex latexpdf changes linkcheck epub doctest
+.PHONY: help clean html text web pickle htmlhelp latex latexpdf changes linkcheck epub doctest xelatexpdf
 
 help:
 	@echo "Please use \`make <target>' where <target> is one of"
@@ -29,6 +29,12 @@ help:
 
 clean:
 	-rm -rf $(BUILDDIR)/*
+
+xelatexpdf:
+	$(SPHINXBUILD) -b latex $(ALLSPHINXOPTS) $(BUILDDIR)/latex
+	@echo "Running LaTeX files through xelatex..."
+	$(MAKE) PDFLATEX=xelatex -C $(BUILDDIR)/latex all-pdf
+	@echo "xelatex finished; the PDF files are in $(BUILDDIR)/latex."
 
 html:
 	mkdir -p $(BUILDDIR)/html $(BUILDDIR)/doctrees
