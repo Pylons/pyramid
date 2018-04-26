@@ -71,9 +71,15 @@ Prepare new release branch
 
 - Change setup.py version to the release version number.
 
+- Make sure PyPI long description renders (requires ``readme_renderer``
+  installed into your Python)::
+
+  $ python setup.py check -r -s -m
+
 - Create a release tag.
 
-- Build and publish to PyPI::
+- Make sure your Python has ``setuptools-git``, ``twine``, and ``wheel``
+  installed and release to PyPI::
 
   $ python setup.py sdist bdist_wheel
   $ twine upload dist/pyramid-X.X-*
