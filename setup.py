@@ -27,7 +27,6 @@ install_requires = [
     'zope.deprecation >= 3.5.0', # py3 compat
     'venusian >= 1.0', # ``ignore``
     'translationstring >= 0.4', # py3 compat
-    'PasteDeploy >= 1.5.0', # py3 compat
     'plaster',
     'plaster_pastedeploy',
     'hupper',
