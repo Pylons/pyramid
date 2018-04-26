@@ -139,13 +139,15 @@ Marketing and communications
 
 - Edit `https://en.wikipedia.org/wiki/Pylons_project <https://en.wikipedia.org/wiki/Pylons_project>`_.
 
+- Edit `https://en.wikipedia.org/wiki/Comparison_of_web_frameworks <https://en.wikipedia.org/wiki/Comparison_of_web_frameworks>`_.
+
 - Announce to Twitter.
 
 ```
 Pyramid 1.x released.
 
 PyPI
-https://pypi.python.org/pypi/pyramid/1.x
+https://pypi.org/project/pyramid/1.x/
 
 === One time only for new version, first pre-release ===
 What's New
@@ -163,9 +165,8 @@ https://github.com/Pylons/pyramid/issues
 ```
 Pyramid 1.X.X has been released.
 
-Here are the changes:
-
-<<changes>>
+The full changelog is here:
+https://docs.pylonsproject.org/projects/pyramid/en/1.X-branch/changes.html
 
 What's New In Pyramid 1.X:
 https://docs.pylonsproject.org/projects/pyramid/en/1.X-branch/whatsnew-1.X.html
