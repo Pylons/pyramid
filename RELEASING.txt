@@ -133,6 +133,8 @@ Marketing and communications
 
 - Edit `https://en.wikipedia.org/wiki/Pylons_project <https://en.wikipedia.org/wiki/Pylons_project>`_.
 
+- Edit `https://en.wikipedia.org/wiki/Comparison_of_web_frameworks <https://en.wikipedia.org/wiki/Comparison_of_web_frameworks>`_.
+
 - Announce to Twitter.
 
 ```
