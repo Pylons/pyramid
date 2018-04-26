@@ -42,3 +42,8 @@ Backward Incompatibilities
 Documentation Changes
 ---------------------
 
+- Bump Sphinx to >= 1.7.4 in setup.py to support ``emphasize-lines`` in PDFs
+  and to pave the way for xelatex support.  See
+  https://github.com/Pylons/pyramid/pull/3271,
+  https://github.com/Pylons/pyramid/issues/667, and
+  https://github.com/Pylons/pyramid/issues/2572
