@@ -2,8 +2,9 @@ from setuptools import setup
 
 requires = [
     'pyramid',
+    'pyramid_chameleon',
     'waitress',
-    'pyramid_chameleon'
+
 ]
 
 setup(name='tutorial',
