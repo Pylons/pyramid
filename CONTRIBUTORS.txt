@@ -316,3 +316,7 @@ Contributors
 - Deneys Maartens, 2017/11/03
 
 - Heron Rossi, 2018/03/08
+
+- Hunter Senft-Grupp, 2018/05/14
+
+- Junhak Lee, 2018/05/14
