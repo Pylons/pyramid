@@ -41,7 +41,7 @@ Steps
    pulls in Colander as a dependency:
 
    .. literalinclude:: forms/setup.py
-    :emphasize-lines: 7
+    :emphasize-lines: 4
     :linenos:
 
 #. We can now install our project in development mode:
