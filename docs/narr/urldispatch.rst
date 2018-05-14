@@ -1045,6 +1045,24 @@ may be added in the future.  For example:
        config = Configurator()
        config.include(users_include, route_prefix='/users')
 
+A convenience context manager exists to set the route prefix for any
+:meth:`pyramid.config.Configurator.add_route` or
+:meth:`pyramid.config.Configurator.include` calls within the context.
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.config import Configurator
+
+   def timing_include(config):
+      config.add_route('timing.show_times', '/times')
+
+   def main(global_config, **settings)
+      config = Configurator()
+      with config.route_prefix_context('/timing'):
+         config.include(timing_include)
+         config.add_route('timing.average', '/average')
+
 .. index::
    single: route predicates (custom)
 

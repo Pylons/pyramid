@@ -790,21 +790,6 @@ class Configurator(
 
         action_state = self.action_state
 
-        if route_prefix is None:
-            route_prefix = ''
-
-        old_route_prefix = self.route_prefix
-        if old_route_prefix is None:
-            old_route_prefix = ''
-
-        route_prefix = '%s/%s' % (
-            old_route_prefix.rstrip('/'),
-            route_prefix.lstrip('/')
-            )
-        route_prefix = route_prefix.strip('/')
-        if not route_prefix:
-            route_prefix = None
-
         c = self.maybe_dotted(callable)
         module = self.inspect.getmodule(c)
         if module is c:
@@ -825,20 +810,22 @@ class Configurator(
             
 
         if action_state.processSpec(spec):
-            configurator = self.__class__(
-                registry=self.registry,
-                package=package_of(module),
-                root_package=self.root_package,
-                autocommit=self.autocommit,
-                route_prefix=route_prefix,
-                )
-            configurator.basepath = os.path.dirname(sourcefile)
-            configurator.includepath = self.includepath + (spec,)
-            self.begin()
-            try:
-                c(configurator)
-            finally:
-                self.end()
+            with self.route_prefix_context(route_prefix):
+                configurator = self.__class__(
+                    registry=self.registry,
+                    package=package_of(module),
+                    root_package=self.root_package,
+                    autocommit=self.autocommit,
+                    route_prefix=self.route_prefix,
+                    )
+                configurator.basepath = os.path.dirname(sourcefile)
+                configurator.includepath = self.includepath + (spec,)
+
+                self.begin()
+                try:
+                    c(configurator)
+                finally:
+                    self.end()
 
     def add_directive(self, name, directive, action_wrap=True):
         """
