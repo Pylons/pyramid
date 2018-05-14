@@ -202,17 +202,3 @@ part is pretty easy. We'll also install a WSGI server, Waitress.
 Our Python virtual environment now has the Pyramid software available
 as well as the ``waitress`` package.
 
-You can optionally install some of the extra Python packages used in this
-tutorial.
-
-.. code-block:: bash
-
-    # Mac and Linux
-    $ $VENV/bin/pip install webtest pytest pytest-cov deform sqlalchemy \
-      pyramid_chameleon pyramid_debugtoolbar pyramid_jinja2 waitress \
-      pyramid_tm zope.sqlalchemy
-
-.. code-block:: doscon
-
-    # Windows
-    c:\> %VENV%\Scripts\pip install webtest pytest pytest-cov deform sqlalchemy pyramid_chameleon pyramid_debugtoolbar pyramid_jinja2 waitress pyramid_tm zope.sqlalchemy
