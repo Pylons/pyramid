@@ -1156,6 +1156,7 @@ for name, value in list(globals().items()):
     if (
             isinstance(value, class_types) and
             issubclass(value, HTTPException) and
+            value not in [HTTPClientError, HTTPServerError] and
             not name.startswith('_')
     ):
         code = getattr(value, 'code', None)
