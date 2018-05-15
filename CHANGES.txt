@@ -8,6 +8,8 @@
   error code.
   See https://github.com/Pylons/pyramid/pull/3280
 
+.. _changes_1.9.2:
+
 1.9.2 (2018-04-23)
 ==================
 
