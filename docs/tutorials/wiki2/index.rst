@@ -8,7 +8,7 @@ This tutorial introduces an :term:`SQLAlchemy` and :term:`URL dispatch`-based
 application with authentication and authorization.
 
 For cut and paste purposes, the source code for all stages of this tutorial can
-be browsed on `GitHub <https://github.com/Pylons/pyramid/>`_,
+be browsed on `GitHub <https://github.com/Pylons/pyramid/blob/master/docs/tutorials/wiki2/src/>`_,
 which corresponds to the same location if you have Pyramid sources.
 
 .. toctree::
