@@ -5,7 +5,6 @@ requires = [
     'pyramid',
     'pyramid_chameleon',
     'waitress',
-
 ]
 
 setup(name='tutorial',
