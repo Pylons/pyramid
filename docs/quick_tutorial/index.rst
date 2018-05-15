@@ -11,6 +11,10 @@ This hands-on tutorial covers "a little about a lot": practical introductions
 to the most common facilities. Fun, fast-paced, and most certainly not aimed at
 experts of the Pyramid web framework.
 
+For cut and paste purposes, the source code for all stages of this tutorial can
+be browsed on `GitHub <https://github.com/Pylons/pyramid/>`_,
+which corresponds to the same location if you have Pyramid sources.
+
 Contents
 ========
 
