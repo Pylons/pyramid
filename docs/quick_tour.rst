@@ -10,6 +10,7 @@ for those who want to evaluate Pyramid, whether you are new to Python web
 frameworks, or a pro in a hurry. For more detailed treatment of each topic,
 give the :ref:`quick_tutorial` a try.
 
+If you would prefer to cut and paste the example code in this tour you may browse the source code located in the `Pyramid repository in the directory "docs/quick_tour" <https://github.com/Pylons/pyramid/>`. If you have downloaded the source code, you will find the tour in the same location.
 
 Installation
 ============
