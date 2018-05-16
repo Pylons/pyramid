@@ -1,3 +1,4 @@
+import contextlib
 import warnings
 
 from pyramid.compat import urlparse
@@ -467,3 +468,53 @@ class RoutesConfiguratorMixin(object):
             self.registry.registerUtility(mapper, IRoutesMapper)
         return mapper
 
+    @contextlib.contextmanager
+    def route_prefix_context(self, route_prefix):
+        """ Return this configurator with the
+        :attr:`pyramid.config.Configurator.route_prefix` attribute mutated to
+        include the new ``route_prefix``.
+
+        When the context exits, the ``route_prefix`` is reset to the original.
+
+        Example Usage:
+
+        >>> config = Configurator()
+        >>> with config.route_prefix_context('foo'):
+        ...     config.add_route('bar', '/bar')
+
+        Arguments
+
+        route_prefix
+
+          A string suitable to be used as a route prefix, or ``None``.
+
+        .. versionadded:: 1.10
+        """
+
+        original_route_prefix = self.route_prefix
+
+        if route_prefix is None:
+            route_prefix = ''
+
+        old_route_prefix = self.route_prefix
+        if old_route_prefix is None:
+            old_route_prefix = ''
+
+        route_prefix = '{}/{}'.format(
+            old_route_prefix.rstrip('/'),
+            route_prefix.lstrip('/'),
+        )
+
+        route_prefix = route_prefix.strip('/')
+
+        if not route_prefix:
+            route_prefix = None
+
+        self.begin()
+        try:
+            self.route_prefix = route_prefix
+            yield
+
+        finally:
+            self.route_prefix = original_route_prefix
+            self.end()

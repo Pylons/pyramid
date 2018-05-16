@@ -25,6 +25,11 @@ Features
   imports from `cherrypy.wsgiserver`.
   See https://github.com/Pylons/pyramid/pull/3235
 
+- Add a context manager ``route_prefix_context`` to the
+  ``pyramid.config.Configurator`` to allow for convenient setting of the
+  route_prefix for ``include`` and ``add_route`` calls inside the context.
+  See https://github.com/Pylons/pyramid/pull/3279
+
 Bug Fixes
 ---------
 
