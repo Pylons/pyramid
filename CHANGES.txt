@@ -1,3 +1,13 @@
+.. _changes_1.8.6:
+
+1.8.6 (Unreleased)
+==================
+
+- Set appropriate ``code`` and ``title`` attributes on the ``HTTPClientError`` and
+  ``HTTPServerError`` exception classes. This prevents inadvertently returning a 520
+  error code.
+  See https://github.com/Pylons/pyramid/pull/3280
+
 .. _changes_1.8.5:
 
 1.8.5 (2017-07-13)

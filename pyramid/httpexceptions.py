@@ -606,7 +606,8 @@ class HTTPClientError(HTTPError):
     a bug.  A server-side traceback is not warranted.  Unless specialized,
     this is a '400 Bad Request'
     """
-    pass
+    code = 400
+    title = 'Bad Request'
 
 class HTTPBadRequest(HTTPClientError):
     """
@@ -617,8 +618,6 @@ class HTTPBadRequest(HTTPClientError):
 
     code: 400, title: Bad Request
     """
-    code = 400
-    title = 'Bad Request'
     explanation = ('The server could not comply with the request since '
                    'it is either malformed or otherwise incorrect.')
 
@@ -1032,11 +1031,18 @@ class HTTPServerError(HTTPError):
     This is an error condition in which the server is presumed to be
     in-error.  Unless specialized, this is a '500 Internal Server Error'.
     """
-    pass
-
-class HTTPInternalServerError(HTTPServerError):
     code = 500
     title = 'Internal Server Error'
+
+class HTTPInternalServerError(HTTPServerError):
+    """
+    subclass of :class:`~HTTPServerError`
+
+    This indicates that the server encountered an unexpected condition
+    which prevented it from fulfilling the request.
+
+    code: 500, title: Internal Server Error
+    """
     explanation = (
         'The server has either erred or is incapable of performing '
         'the requested operation.')
@@ -1150,6 +1156,7 @@ for name, value in list(globals().items()):
     if (
             isinstance(value, class_types) and
             issubclass(value, HTTPException) and
+            value not in {HTTPClientError, HTTPServerError} and
             not name.startswith('_')
     ):
         code = getattr(value, 'code', None)
