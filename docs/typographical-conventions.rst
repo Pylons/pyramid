@@ -217,18 +217,6 @@ The version in which a feature is deprecated in a project is displayed as follow
     Use the ``require_csrf`` option or read :ref:`auto_csrf_checking` instead to have :class:`pyramid.exceptions.BadCSRFToken` exceptions raised.
 
 
-.. _typographical-conventions-danger:
-
-Danger
-------
-
-Danger represents critical information related to a topic or concept, and should recommend to the user "don't do this dangerous thing".
-
-.. danger::
-
-    This is danger or an error.
-
-
 .. _typographical-conventions-warnings:
 
 Warnings
@@ -263,18 +251,6 @@ See also
 .. seealso::
 
     See :ref:`Quick Tutorial section on Requirements <qtut_requirements>`.
-
-
-.. _typographical-conventions-todo:
-
-Todo
-----
-
-Todo items designated tasks that require further work.
-
-.. todo::
-
-    This is a todo item.
 
 
 .. _typographical-conventions-cross-references:

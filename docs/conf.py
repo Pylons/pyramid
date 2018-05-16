@@ -190,7 +190,10 @@ latex_paper_size = 'letter'
 # The font size ('10pt', '11pt' or '12pt').
 latex_font_size = '10pt'
 
-latex_additional_files = ['_static/latex-note.png', '_static/latex-warning.png']
+latex_additional_files = [
+    '_static/latex-note.png',
+    '_static/latex-warning.png',
+]
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, document class [howto/manual]).
@@ -276,28 +279,30 @@ _PREAMBLE = r"""
 \definecolor{VerbatimColor}{rgb}{1,1,1}
 \definecolor{VerbatimBorderColor}{rgb}{1,1,1}
 
-\makeatletter
-\renewcommand{\py@noticestart@warning}{\py@heavybox}
-\renewcommand{\py@noticeend@warning}{\py@endheavybox}
-\renewcommand{\py@noticestart@note}{\py@heavybox}
-\renewcommand{\py@noticeend@note}{\py@endheavybox}
-\makeatother
+% mcdonc commented as part of lazy pdf fixing (pdf_rendering_fixes branch)
+% \makeatletter
+% \renewcommand{\py@noticestart@warning}{\py@heavybox}
+% \renewcommand{\py@noticeend@warning}{\py@endheavybox}
+% \renewcommand{\py@noticestart@note}{\py@heavybox}
+% \renewcommand{\py@noticeend@note}{\py@endheavybox}
+% \makeatother
 
 % icons in note and warning boxes
 \usepackage{ifthen}
-% Keep a copy of the original notice environment
-\let\origbeginnotice\notice
-\let\origendnotice\endnotice
 
-% Redefine the notice environment so we can add our own code to it
-\renewenvironment{notice}[2]{%
-  \origbeginnotice{#1}{}% equivalent to original \begin{notice}{#1}{#2}
+% Keep a copy of the original sphinxadmonition environment
+\let\origbeginadmon\sphinxadmonition
+\let\origendadmon\endsphinxadmonition
+
+% Redefine the sphinxadmonition environment so we can add our own code to it
+\renewenvironment{sphinxadmonition}[2]{%
+  \origbeginadmon{#1}{}% equivalent to original \begin{sphinxadmonition}{#1}{#2}
   % load graphics
   \ifthenelse{\equal{#1}{warning}}{\includegraphics{latex-warning.png}}{}
   \ifthenelse{\equal{#1}{note}}{\includegraphics{latex-note.png}}{}
   % etc.
-}{%
-  \origendnotice% equivalent to original \end{notice}
+  }{%
+\origendadmon % equivalent to original \end{sphinxadmonition}
 }
 
 % try to prevent code-block boxes from splitting across pages
@@ -318,7 +323,8 @@ _PREAMBLE = r"""
 
 latex_elements = {
     'preamble': _PREAMBLE,
-    'wrapperclass': 'book',
+#     mcdonc commented as part of lazy pdf fixing (pdf_rendering_fixes branch)
+#    'wrapperclass': 'book',
     'date': '',
     'releasename': 'Version',
     'title': r'The Pyramid Web Framework',
@@ -343,15 +349,16 @@ def frontmatter(name, arguments, options, content, lineno,
     return [nodes.raw(
         '',
         r"""
-\frontmatter
+% mcdonc commented as part of lazy pdf fixing (pdf_rendering_fixes branch)
+% \frontmatter
 % prevent part/chapter/section numbering
-\setcounter{secnumdepth}{-2}
+% \setcounter{secnumdepth}{-2}
 % suppress headers
-\pagestyle{plain}
+% \pagestyle{plain}
 % reset page counter
-\setcounter{page}{1}
+% \setcounter{page}{1}
 % suppress first toc pagenum
-\addtocontents{toc}{\protect\thispagestyle{empty}}
+% \addtocontents{toc}{\protect\thispagestyle{empty}}
 """,
         format='latex')]
 
@@ -361,25 +368,32 @@ def mainmatter(name, arguments, options, content, lineno,
     return [nodes.raw(
         '',
         r"""
-\mainmatter
+% mcdonc commented as part of lazy pdf fixing (pdf_rendering_fixes branch)
+% \mainmatter
 % allow part/chapter/section numbering
-\setcounter{secnumdepth}{2}
+% \setcounter{secnumdepth}{2}
 % get headers back
-\pagestyle{fancy}
-\fancyhf{}
-\renewcommand{\headrulewidth}{0.5pt}
-\renewcommand{\footrulewidth}{0pt}
-\fancyfoot[C]{\thepage}
-\fancyhead[RO]{\rightmark}
-\fancyhead[LE]{\leftmark}
+% \pagestyle{fancy}
+% \fancyhf{}
+% \renewcommand{\headrulewidth}{0.5pt}
+% \renewcommand{\footrulewidth}{0pt}
+% \fancyfoot[C]{\thepage}
+% \fancyhead[RO]{\rightmark}
+% \fancyhead[LE]{\leftmark}
 """,
         format='latex')]
 
 
 def backmatter(name, arguments, options, content, lineno,
               content_offset, block_text, state, state_machine):
-    return [nodes.raw('', '\\backmatter\n\\setcounter{secnumdepth}{-1}\n',
-                      format='latex')]
+    return [nodes.raw(
+        '',
+        r"""
+% mcdonc commented as part of lazy pdf fixing (pdf_rendering_fixes branch)
+% \backmatter
+% \setcounter{secnumdepth}{-1}
+        """,
+        format='latex')]
 
 
 def app_role(role, rawtext, text, lineno, inliner, options={}, content=[]):
