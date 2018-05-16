@@ -488,7 +488,7 @@ class RoutesConfiguratorMixin(object):
 
           A string suitable to be used as a route prefix, or ``None``.
 
-        .. versionadded:: 1.9.10
+        .. versionadded:: 1.10
         """
 
         original_route_prefix = self.route_prefix
