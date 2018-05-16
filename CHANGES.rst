@@ -28,6 +28,11 @@ Features
 Bug Fixes
 ---------
 
+- Set appropriate ``code`` and ``title`` attributes on the ``HTTPClientError`` and
+  ``HTTPServerError`` exception classes. This prevents inadvertently returning a 520
+  error code.
+  See https://github.com/Pylons/pyramid/pull/3280
+
 Deprecations
 ------------
 
