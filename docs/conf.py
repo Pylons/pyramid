@@ -53,7 +53,6 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
-    'sphinx.ext.todo',
     'sphinx.ext.viewcode',
     'sphinxcontrib.autoprogram',
     # enable pylons_sphinx_latesturl when this branch is no longer "latest"
@@ -123,9 +122,6 @@ exclude_patterns = ['_themes/README.rst', ]
 # If true, the current module name will be prepended to all description
 # unit titles (such as .. function::).
 add_module_names = False
-
-# Add support for todo items
-todo_include_todos = True
 
 # The name of the Pygments (syntax highlighting) style to use.
 #pygments_style = book and 'bw' or 'tango'
@@ -223,6 +219,17 @@ latex_domain_indices = False
 _PREAMBLE = r"""
 \usepackage[]{geometry}
 \geometry{bindingoffset=0.45in,textheight=7.25in,hdivide={0.5in,*,0.75in},vdivide={1in,7.25in,1in},papersize={7.5in,9.25in}}
+
+%XeLaTeX packages
+\usepackage{xltxtra}
+\usepackage{fontspec} %Font package
+\usepackage{xunicode}
+
+%Select fonts
+\setmainfont[Mapping=tex-text]{nimbusserif}
+\setsansfont[Mapping=tex-text]{nimbussans}
+\setmonofont{nimbusmono}
+
 \hypersetup{
     colorlinks=true,
     linkcolor=black,
@@ -279,14 +286,6 @@ _PREAMBLE = r"""
 \definecolor{VerbatimColor}{rgb}{1,1,1}
 \definecolor{VerbatimBorderColor}{rgb}{1,1,1}
 
-% mcdonc commented as part of lazy pdf fixing (pdf_rendering_fixes branch)
-% \makeatletter
-% \renewcommand{\py@noticestart@warning}{\py@heavybox}
-% \renewcommand{\py@noticeend@warning}{\py@endheavybox}
-% \renewcommand{\py@noticestart@note}{\py@heavybox}
-% \renewcommand{\py@noticeend@note}{\py@endheavybox}
-% \makeatother
-
 % icons in note and warning boxes
 \usepackage{ifthen}
 
@@ -323,8 +322,6 @@ _PREAMBLE = r"""
 
 latex_elements = {
     'preamble': _PREAMBLE,
-#     mcdonc commented as part of lazy pdf fixing (pdf_rendering_fixes branch)
-#    'wrapperclass': 'book',
     'date': '',
     'releasename': 'Version',
     'title': r'The Pyramid Web Framework',
@@ -348,18 +345,6 @@ def frontmatter(name, arguments, options, content, lineno,
                 content_offset, block_text, state, state_machine):
     return [nodes.raw(
         '',
-        r"""
-% mcdonc commented as part of lazy pdf fixing (pdf_rendering_fixes branch)
-% \frontmatter
-% prevent part/chapter/section numbering
-% \setcounter{secnumdepth}{-2}
-% suppress headers
-% \pagestyle{plain}
-% reset page counter
-% \setcounter{page}{1}
-% suppress first toc pagenum
-% \addtocontents{toc}{\protect\thispagestyle{empty}}
-""",
         format='latex')]
 
 
@@ -367,20 +352,6 @@ def mainmatter(name, arguments, options, content, lineno,
                content_offset, block_text, state, state_machine):
     return [nodes.raw(
         '',
-        r"""
-% mcdonc commented as part of lazy pdf fixing (pdf_rendering_fixes branch)
-% \mainmatter
-% allow part/chapter/section numbering
-% \setcounter{secnumdepth}{2}
-% get headers back
-% \pagestyle{fancy}
-% \fancyhf{}
-% \renewcommand{\headrulewidth}{0.5pt}
-% \renewcommand{\footrulewidth}{0pt}
-% \fancyfoot[C]{\thepage}
-% \fancyhead[RO]{\rightmark}
-% \fancyhead[LE]{\leftmark}
-""",
         format='latex')]
 
 
@@ -388,11 +359,6 @@ def backmatter(name, arguments, options, content, lineno,
               content_offset, block_text, state, state_machine):
     return [nodes.raw(
         '',
-        r"""
-% mcdonc commented as part of lazy pdf fixing (pdf_rendering_fixes branch)
-% \backmatter
-% \setcounter{secnumdepth}{-1}
-        """,
         format='latex')]
 
 

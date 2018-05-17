@@ -23,14 +23,14 @@ below:
 .. code-block:: text
 
     quick_tutorial
-        │── env
-        `── request_response
-            `── tutorial
-            │   │── __init__.py
-            │   │── tests.py
-            │   `── views.py
-            │── development.ini
-            `── setup.py
+    ├── env
+    └── request_response
+        ├── tutorial
+        │   ├── __init__.py
+        │   ├── tests.py
+        │   └── views.py
+        ├── development.ini
+        └── setup.py
 
 Each of the directories in our ``quick_tutorial`` workspace (e.g., ``request_response``) is a *Python
 project* (except as noted for the ``hello_world`` step). The ``tutorial``
