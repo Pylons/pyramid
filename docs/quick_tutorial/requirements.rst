@@ -79,15 +79,15 @@ will reside as we proceed through the tutorial:
 
 .. code-block:: text
 
-    `── ~
-        `── projects
-            `── quick_tutorial
-                │── env
-                `── step_one
-                    │── intro
-                    │   │── __init__.py
-                    │   `── app.py
-                    `── setup.py
+    ~
+    └── projects
+        └── quick_tutorial
+            ├── env
+            └── step_one
+                ├── intro
+                │   ├── __init__.py
+                │   └── app.py
+                └── setup.py
 
 For Linux, the commands to do so are as follows:
 
