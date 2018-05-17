@@ -53,7 +53,6 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
-    'sphinx.ext.todo',
     'sphinx.ext.viewcode',
     'sphinxcontrib.autoprogram',
     # enable pylons_sphinx_latesturl when this branch is no longer "latest"
@@ -123,9 +122,6 @@ exclude_patterns = ['_themes/README.rst', ]
 # If true, the current module name will be prepended to all description
 # unit titles (such as .. function::).
 add_module_names = False
-
-# Add support for todo items
-todo_include_todos = True
 
 # The name of the Pygments (syntax highlighting) style to use.
 #pygments_style = book and 'bw' or 'tango'
