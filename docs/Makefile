@@ -12,7 +12,7 @@ PAPEROPT_a4     = -D latex_paper_size=a4
 PAPEROPT_letter = -D latex_paper_size=letter
 ALLSPHINXOPTS   = -d $(BUILDDIR)/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
 
-.PHONY: help clean html text web pickle htmlhelp latex latexpdf changes linkcheck epub doctest xelatexpdf
+.PHONY: help clean html text web pickle htmlhelp latex latexpdf xelatexpdf changes linkcheck epub doctest
 
 help:
 	@echo "Please use \`make <target>' where <target> is one of"
@@ -22,6 +22,7 @@ help:
 	@echo "  htmlhelp   to make HTML files and a HTML help project"
 	@echo "  latex      to make LaTeX files, you can set PAPER=a4 or PAPER=letter"
 	@echo "  latexpdf   to make LaTeX files and run them through pdflatex"
+	@echo "  xelatexpdf to make LaTeX files and run them through xelatex"
 	@echo "  changes    to make an overview over all changed/added/deprecated items"
 	@echo "  linkcheck  to check all external links for integrity"
 	@echo "  epub       to make an epub"
@@ -74,7 +75,7 @@ latex:
 	cp _static/latex-note.png $(BUILDDIR)/latex
 	@echo
 	@echo "Build finished; the LaTeX files are in $(BUILDDIR)/latex."
-	@echo "Run \`make latexpdf' to build a PDF file from them."
+	@echo "Run \`make xelatexpdf' to build a PDF file from them."
 
 latexpdf:
 	$(SPHINXBUILD) -b latex $(ALLSPHINXOPTS) $(BUILDDIR)/latex
