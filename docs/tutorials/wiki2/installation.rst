@@ -468,7 +468,7 @@ assumptions:
    https://docs.pylonsproject.org/projects/pyramid-tm/en/latest/
 
 .. _zope.sqlalchemy:
-   https://pypi.python.org/pypi/zope.sqlalchemy
+   https://pypi.org/project/zope.sqlalchemy/
 
 .. _transaction:
    http://zodb.readthedocs.org/en/latest/transactions.html

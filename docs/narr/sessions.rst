@@ -171,13 +171,13 @@ pyramid_beaker_         Beaker_ Session factory for Pyramid
                                 sessioning system.
 ======================= ======= =============================
 
-.. _pyramid_nacl_session: https://pypi.python.org/pypi/pyramid_nacl_session
+.. _pyramid_nacl_session: https://pypi.org/project/pyramid_nacl_session/
 .. _PyNaCl: https://pynacl.readthedocs.io/en/latest/secret/
 
-.. _pyramid_redis_sessions: https://pypi.python.org/pypi/pyramid_redis_sessions
+.. _pyramid_redis_sessions: https://pypi.org/project/pyramid_redis_sessions/
 .. _Redis: http://redis.io/
 
-.. _pyramid_beaker: https://pypi.python.org/pypi/pyramid_beaker
+.. _pyramid_beaker: https://pypi.org/project/pyramid_beaker/
 .. _Beaker: http://beaker.readthedocs.org/en/latest/
 
 .. index::
