@@ -763,7 +763,7 @@ field.  The version number is specified in the ``version`` value.  A short
 description is provided in the ``description`` field.  The ``long_description``
 is conventionally the content of the ``README`` and ``CHANGES`` files appended
 together. The ``classifiers`` field is a list of `Trove classifiers
-<https://pypi.python.org/pypi?%3Aaction=list_classifiers>`_ describing your
+<https://pypi.org/pypi?%3Aaction=list_classifiers>`_ describing your
 application.  ``author`` and ``author_email`` are text fields which probably
 don't need any description. ``url`` is a field that should point at your
 application project's URL (if any). ``packages=find_packages()`` causes all

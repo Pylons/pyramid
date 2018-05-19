@@ -166,7 +166,7 @@ Running Tests
     $ $VENV/bin/nosetests pyramid.tests.test_module:ClassName
 
   Optionally you can install a nose plugin, `nose-selecttests
-  <https://pypi.python.org/pypi/nose-selecttests/>`_, and use a regular
+  <https://pypi.org/project/nose-selecttests/>`_, and use a regular
   expression with the ``-t`` parameter to run tests.
 
     # run a single test
