@@ -1,13 +1,13 @@
 from setuptools import setup
 
 requires = [
-    'pyramid',
-    'waitress',
-    'pyramid_chameleon',
     'deform',
-    'sqlalchemy',
+    'pyramid',
+    'pyramid_chameleon',
     'pyramid_tm',
-    'zope.sqlalchemy'
+    'sqlalchemy',
+    'waitress',
+    'zope.sqlalchemy',
 ]
 
 setup(name='tutorial',

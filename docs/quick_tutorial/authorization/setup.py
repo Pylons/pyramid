@@ -1,10 +1,10 @@
 from setuptools import setup
 
 requires = [
+    'bcrypt',
     'pyramid',
-    'waitress',
     'pyramid_chameleon',
-    'bcrypt'
+    'waitress',
 ]
 
 setup(name='tutorial',
