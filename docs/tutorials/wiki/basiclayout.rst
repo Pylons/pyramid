@@ -44,7 +44,7 @@ Open ``tutorial/__init__.py``.  It should already contain the following:
 #. *Line 15*.  Include support for the :term:`Chameleon` template rendering
    bindings, allowing us to use the ``.pt`` templates.
 
-#. *Line 16*.  Include support for ``pyramid_tm``, allowing Pyramid requests to join the active transaction as provided by the `transaction <https://pypi.python.org/pypi/transaction>`_ package.
+#. *Line 16*.  Include support for ``pyramid_tm``, allowing Pyramid requests to join the active transaction as provided by the `transaction <https://pypi.org/project/transaction/>`_ package.
 
 #. *Line 17*.  Include support for ``pyramid_zodbconn``, providing integration between :term:`ZODB` and a Pyramid application.
 

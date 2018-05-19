@@ -152,4 +152,4 @@ Extra credit
 
 .. seealso:: See also :ref:`security_chapter`,
    :ref:`AuthTktAuthenticationPolicy <authentication_module>`, `bcrypt
-   <https://pypi.python.org/pypi/bcrypt>`_
+   <https://pypi.org/project/bcrypt/>`_
