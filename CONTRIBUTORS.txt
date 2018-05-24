@@ -320,3 +320,5 @@ Contributors
 - Hunter Senft-Grupp, 2018/05/14
 
 - Junhak Lee, 2018/05/14
+
+- Alex Gaynor, 2018/05/24
