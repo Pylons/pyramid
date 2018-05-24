@@ -135,7 +135,7 @@ def BaseCookieSessionFactory(
     domain=None,
     secure=False,
     httponly=False,
-    samesite='Lax',
+    samesite=b'Lax',
     timeout=1200,
     reissue_time=0,
     set_on_exception=True,
@@ -189,7 +189,7 @@ def BaseCookieSessionFactory(
       session cookie. Default: ``False``.
 
     ``samesite``
-      The 'samesite' option of the session cookie. Default ``'Lax'``.
+      The 'samesite' option of the session cookie. Default ``b'Lax'``.
 
     ``timeout``
       A number of seconds of inactivity before a session times out. If
@@ -388,7 +388,7 @@ def UnencryptedCookieSessionFactoryConfig(
     cookie_domain=None,
     cookie_secure=False,
     cookie_httponly=False,
-    cookie_samesite='Lax',
+    cookie_samesite=b'Lax',
     cookie_on_exception=True,
     signed_serialize=signed_serialize,
     signed_deserialize=signed_deserialize,
@@ -442,7 +442,7 @@ def UnencryptedCookieSessionFactoryConfig(
       The 'httpOnly' flag of the session cookie.
 
     ``cookie_samesite``
-      The 'samesite' option of the session cookie.  Default: ``'Lax'``.
+      The 'samesite' option of the session cookie.  Default: ``b'Lax'``.
 
     ``cookie_on_exception``
       If ``True``, set a session cookie even if an exception occurs
@@ -502,7 +502,7 @@ def SignedCookieSessionFactory(
     domain=None,
     secure=False,
     httponly=False,
-    samesite='Lax',
+    samesite=b'Lax',
     set_on_exception=True,
     timeout=1200,
     reissue_time=0,
@@ -566,7 +566,7 @@ def SignedCookieSessionFactory(
       session cookie. Default: ``False``.
 
     ``samesite``
-      The 'samesite' option of the session cookie.  Default: ``'Lax'``.
+      The 'samesite' option of the session cookie.  Default: ``b'Lax'``.
 
     ``timeout``
       A number of seconds of inactivity before a session times out. If
