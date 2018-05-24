@@ -135,6 +135,7 @@ def BaseCookieSessionFactory(
     domain=None,
     secure=False,
     httponly=False,
+    samesite='Lax',
     timeout=1200,
     reissue_time=0,
     set_on_exception=True,
@@ -187,6 +188,9 @@ def BaseCookieSessionFactory(
       Hide the cookie from Javascript by setting the 'HttpOnly' flag of the
       session cookie. Default: ``False``.
 
+    ``samesite``
+      The 'samesite' option of the session cookie. Default ``'Lax'``.
+
     ``timeout``
       A number of seconds of inactivity before a session times out. If
       ``None`` then the cookie never expires. This lifetime only applies
@@ -229,6 +233,7 @@ def BaseCookieSessionFactory(
         _cookie_domain = domain
         _cookie_secure = secure
         _cookie_httponly = httponly
+        _cookie_samesite = samesite
         _cookie_on_exception = set_on_exception
         _timeout = timeout if timeout is None else int(timeout)
         _reissue_time = reissue_time if reissue_time is None else int(reissue_time)
@@ -367,6 +372,7 @@ def BaseCookieSessionFactory(
                 domain=self._cookie_domain,
                 secure=self._cookie_secure,
                 httponly=self._cookie_httponly,
+                samesite=self._cookie_samesite,
                 )
             return True
 
@@ -382,6 +388,7 @@ def UnencryptedCookieSessionFactoryConfig(
     cookie_domain=None,
     cookie_secure=False,
     cookie_httponly=False,
+    cookie_samesite='Lax',
     cookie_on_exception=True,
     signed_serialize=signed_serialize,
     signed_deserialize=signed_deserialize,
@@ -434,6 +441,9 @@ def UnencryptedCookieSessionFactoryConfig(
     ``cookie_httponly``
       The 'httpOnly' flag of the session cookie.
 
+    ``cookie_samesite``
+      The 'samesite' option of the session cookie.  Default: ``'Lax'``.
+
     ``cookie_on_exception``
       If ``True``, set a session cookie even if an exception occurs
       while rendering a view.
@@ -469,6 +479,7 @@ def UnencryptedCookieSessionFactoryConfig(
         domain=cookie_domain,
         secure=cookie_secure,
         httponly=cookie_httponly,
+        samesite=cookie_samesite,
         timeout=timeout,
         reissue_time=0, # to keep session.accessed == session.renewed
         set_on_exception=cookie_on_exception,
@@ -491,6 +502,7 @@ def SignedCookieSessionFactory(
     domain=None,
     secure=False,
     httponly=False,
+    samesite='Lax',
     set_on_exception=True,
     timeout=1200,
     reissue_time=0,
@@ -553,6 +565,9 @@ def SignedCookieSessionFactory(
       Hide the cookie from Javascript by setting the 'HttpOnly' flag of the
       session cookie. Default: ``False``.
 
+    ``samesite``
+      The 'samesite' option of the session cookie.  Default: ``'Lax'``.
+
     ``timeout``
       A number of seconds of inactivity before a session times out. If
       ``None`` then the cookie never expires. This lifetime only applies
@@ -608,6 +623,7 @@ def SignedCookieSessionFactory(
         domain=domain,
         secure=secure,
         httponly=httponly,
+        samesite=samesite,
         timeout=timeout,
         reissue_time=reissue_time,
         set_on_exception=set_on_exception,
