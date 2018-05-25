@@ -24,7 +24,6 @@ class RoutesConfiguratorMixin(object):
     def add_route(self,
                   name,
                   pattern=None,
-                  permission=None,
                   factory=None,
                   for_=None,
                   header=None,
