@@ -504,7 +504,7 @@ class TestUnencryptedCookieSession(SharedCookieSessionTests, unittest.TestCase):
         expected_cookieval = dummy_signed_serialize(
             (session.accessed, session.created, {'key': 'value'}), secret)
         response = Response()
-        response.set_cookie('session', expected_cookieval, samesite=b'Lax')
+        response.set_cookie('session', expected_cookieval, samesite='Lax')
         expected_cookie = response.headerlist[-1][1]
         self.assertEqual(cookie, expected_cookie)
 
