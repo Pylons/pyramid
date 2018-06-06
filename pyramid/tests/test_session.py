@@ -145,13 +145,14 @@ class SharedCookieSessionTests(object):
         response = Response()
         self.assertEqual(session._set_cookie(response), True)
         cookieval = response.headerlist[-1][1]
-        val, domain, path, secure, httponly = [x.strip() for x in
-                                               cookieval.split(';')]
+        val, domain, path, secure, httponly, samesite = [x.strip() for x in
+                                                         cookieval.split(';')]
         self.assertTrue(val.startswith('abc='))
         self.assertEqual(domain, 'Domain=localhost')
         self.assertEqual(path, 'Path=/foo')
         self.assertEqual(secure, 'secure')
         self.assertEqual(httponly, 'HttpOnly')
+        self.assertEqual(samesite, 'SameSite=Lax')
 
     def test_flash_default(self):
         request = testing.DummyRequest()
@@ -503,7 +504,7 @@ class TestUnencryptedCookieSession(SharedCookieSessionTests, unittest.TestCase):
         expected_cookieval = dummy_signed_serialize(
             (session.accessed, session.created, {'key': 'value'}), secret)
         response = Response()
-        response.set_cookie('session', expected_cookieval)
+        response.set_cookie('session', expected_cookieval, samesite=b'Lax')
         expected_cookie = response.headerlist[-1][1]
         self.assertEqual(cookie, expected_cookie)
 
