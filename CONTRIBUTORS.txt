@@ -322,3 +322,5 @@ Contributors
 - Junhak Lee, 2018/05/14
 
 - Alex Gaynor, 2018/05/24
+
+- Jason Williams, 2018/06/11
