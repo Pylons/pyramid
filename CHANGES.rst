@@ -21,14 +21,21 @@ Features
   instead of ``pyramid.util.Request``.
   See https://github.com/Pylons/pyramid/pull/3129
 
-- In ``cherrypy_server_runner``, prefer imports from the ``cheroot`` package over the legacy
-  imports from `cherrypy.wsgiserver`.
+- In ``cherrypy_server_runner``, prefer imports from the ``cheroot`` package
+  over the legacy imports from `cherrypy.wsgiserver`.
   See https://github.com/Pylons/pyramid/pull/3235
 
 - Add a context manager ``route_prefix_context`` to the
   ``pyramid.config.Configurator`` to allow for convenient setting of the
   route_prefix for ``include`` and ``add_route`` calls inside the context.
   See https://github.com/Pylons/pyramid/pull/3279
+
+- Modify the builtin session implementations to support SameSite options on
+  cookies and set the default to ``'Lax'``. This affects
+  ``pyramid.session.BaseCookieSessionFactory``,
+  ``pyramid.session.SignedCookieSessionFactory``, and
+  ``pyramid.session.UnencryptedCookieSessionFactoryConfig``.
+  See https://github.com/Pylons/pyramid/pull/3300
 
 Bug Fixes
 ---------
@@ -53,6 +60,12 @@ Backward Incompatibilities
   this package directly in your apps you should make sure that you are
   depending on it directly within your project.
   See https://github.com/Pylons/pyramid/pull/3140
+
+- Modify the builtin session implementations to set ``SameSite='Lax'`` on
+  cookies. This affects ``pyramid.session.BaseCookieSessionFactory``,
+  ``pyramid.session.SignedCookieSessionFactory``, and
+  ``pyramid.session.UnencryptedCookieSessionFactoryConfig``.
+  See https://github.com/Pylons/pyramid/pull/3300
 
 Documentation Changes
 ---------------------
