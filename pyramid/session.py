@@ -189,7 +189,8 @@ def BaseCookieSessionFactory(
       session cookie. Default: ``False``.
 
     ``samesite``
-      The 'samesite' option of the session cookie. Default ``'Lax'``.
+      The 'samesite' option of the session cookie. Set the value to ``None``
+      to turn off the samesite option.  Default: ``'Lax'``.
 
     ``timeout``
       A number of seconds of inactivity before a session times out. If
@@ -220,6 +221,10 @@ def BaseCookieSessionFactory(
       while rendering a view. Default: ``True``.
 
     .. versionadded: 1.5a3
+
+    .. versionchanged: 1.10
+
+       Added the ``samesite`` option and made the default ``'Lax'``.
     """
 
     @implementer(ISession)
@@ -442,7 +447,8 @@ def UnencryptedCookieSessionFactoryConfig(
       The 'httpOnly' flag of the session cookie.
 
     ``cookie_samesite``
-      The 'samesite' option of the session cookie.  Default: ``'Lax'``.
+      The 'samesite' option of the session cookie. Set the value to ``None``
+      to turn off the samesite option.  Default: ``'Lax'``.
 
     ``cookie_on_exception``
       If ``True``, set a session cookie even if an exception occurs
@@ -457,6 +463,10 @@ def UnencryptedCookieSessionFactoryConfig(
       A callable which takes a signed and serialized data structure in bytes
       and a secret and returns the original data structure if the signature
       is valid. Default: ``signed_deserialize`` (using pickle).
+
+    .. versionchanged: 1.10
+
+       Added the ``samesite`` option and made the default ``'Lax'``.
     """
 
     class SerializerWrapper(object):
@@ -566,7 +576,8 @@ def SignedCookieSessionFactory(
       session cookie. Default: ``False``.
 
     ``samesite``
-      The 'samesite' option of the session cookie.  Default: ``'Lax'``.
+      The 'samesite' option of the session cookie. Set the value to ``None``
+      to turn off the samesite option.  Default: ``'Lax'``.
 
     ``timeout``
       A number of seconds of inactivity before a session times out. If
@@ -604,6 +615,10 @@ def SignedCookieSessionFactory(
       the :class:`pyramid.session.PickleSerializer` serializer will be used.
 
     .. versionadded: 1.5a3
+
+    .. versionchanged: 1.10
+
+       Added the ``samesite`` option and made the default ``Lax``.
     """
     if serializer is None:
         serializer = PickleSerializer()
