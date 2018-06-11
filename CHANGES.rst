@@ -40,9 +40,9 @@ Features
 Bug Fixes
 ---------
 
-- Set appropriate ``code`` and ``title`` attributes on the ``HTTPClientError`` and
-  ``HTTPServerError`` exception classes. This prevents inadvertently returning a 520
-  error code.
+- Set appropriate ``code`` and ``title`` attributes on the ``HTTPClientError``
+  and ``HTTPServerError`` exception classes. This prevents inadvertently
+  returning a 520 error code.
   See https://github.com/Pylons/pyramid/pull/3280
 
 - Replace ``webob.acceptparse.MIMEAccept`` from WebOb with
@@ -60,6 +60,11 @@ Backward Incompatibilities
   this package directly in your apps you should make sure that you are
   depending on it directly within your project.
   See https://github.com/Pylons/pyramid/pull/3140
+
+- Remove the ``permission`` argument from
+  ``pyramid.config.Configurator.add_route``. This was an argument left over
+  from a feature removed in Pyramid 1.5 and has had no effect since then.
+  See https://github.com/Pylons/pyramid/pull/3299
 
 - Modify the builtin session implementations to set ``SameSite='Lax'`` on
   cookies. This affects ``pyramid.session.BaseCookieSessionFactory``,
