@@ -30,6 +30,13 @@ Features
   route_prefix for ``include`` and ``add_route`` calls inside the context.
   See https://github.com/Pylons/pyramid/pull/3279
 
+- Modify the builtin session implementations to support SameSite options on
+  cookies and set the default to ``'Lax'``. This affects
+  ``pyramid.session.BaseCookieSessionFactory``,
+  ``pyramid.session.SignedCookieSessionFactory``, and
+  ``pyramid.session.UnencryptedCookieSessionFactoryConfig``.
+  See https://github.com/Pylons/pyramid/pull/3300
+
 Bug Fixes
 ---------
 
@@ -58,6 +65,12 @@ Backward Incompatibilities
   ``pyramid.config.Configurator.add_route``. This was an argument left over
   from a feature removed in Pyramid 1.5 and has had no effect since then.
   See https://github.com/Pylons/pyramid/pull/3299
+
+- Modify the builtin session implementations to set ``SameSite='Lax'`` on
+  cookies. This affects ``pyramid.session.BaseCookieSessionFactory``,
+  ``pyramid.session.SignedCookieSessionFactory``, and
+  ``pyramid.session.UnencryptedCookieSessionFactoryConfig``.
+  See https://github.com/Pylons/pyramid/pull/3300
 
 Documentation Changes
 ---------------------
