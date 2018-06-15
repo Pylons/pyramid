@@ -7,7 +7,7 @@ single HTTP status code.  Each class is a subclass of the
 :class:`~HTTPException`.  Each exception class is also a :term:`response`
 object.
 
-Each exception class has a status code according to :rfc:`2068`:
+Each exception class has a status code according to :rfc:`2068` or :rfc:`7538`:
 codes with 100-300 are not really errors; 400s are client errors,
 and 500s are server errors.
 
@@ -29,6 +29,7 @@ Exception
       * 304 - HTTPNotModified
       * 305 - HTTPUseProxy
       * 307 - HTTPTemporaryRedirect
+      * 308 - HTTPPermanentRedirect
     HTTPError
       HTTPClientError
         * 400 - HTTPBadRequest
@@ -121,10 +122,11 @@ passed to the exception's constructor.
 
 The subclasses of :class:`~_HTTPMove`
 (:class:`~HTTPMultipleChoices`, :class:`~HTTPMovedPermanently`,
-:class:`~HTTPFound`, :class:`~HTTPSeeOther`, :class:`~HTTPUseProxy` and
-:class:`~HTTPTemporaryRedirect`) are redirections that require a ``Location``
-field. Reflecting this, these subclasses have one additional keyword argument:
-``location``, which indicates the location to which to redirect.
+:class:`~HTTPFound`, :class:`~HTTPSeeOther`, :class:`~HTTPUseProxy`,
+:class:`~HTTPTemporaryRedirect`, and :class: `~HTTPPermanentRedirect) are
+redirections that require a ``Location`` field. Reflecting this, these
+subclasses have one additional keyword argument: ``location``,
+which indicates the location to which to redirect.
 """
 import json
 
@@ -594,6 +596,19 @@ class HTTPTemporaryRedirect(_HTTPMove):
     """
     code = 307
     title = 'Temporary Redirect'
+
+class HTTPPermanentRedirect(_HTTPMove):
+    """
+    subclass of :class:`~_HTTPMove`
+
+    This indicates that the requested resource resides permanently
+    under a different URI and that the request method must not be
+    changed.
+
+    code: 308, title: Permanent Redirect
+    """
+    code = 308
+    title = 'Permanent Redirect'
 
 ############################################################
 ## 4xx client error
