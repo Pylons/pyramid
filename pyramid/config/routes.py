@@ -198,9 +198,9 @@ class RoutesConfiguratorMixin(object):
 
         request_param
 
-          This value can be any string.  A view declaration with this
-          argument ensures that the associated route will only match
-          when the request has a key in the ``request.params``
+          This value can be any string or an iterable of strings.  A view
+          declaration with this argument ensures that the associated route will
+          only match when the request has a key in the ``request.params``
           dictionary (an HTTP ``GET`` or ``POST`` variable) that has a
           name which matches the supplied value.  If the value
           supplied as the argument has a ``=`` sign in it,

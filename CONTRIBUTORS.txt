@@ -324,3 +324,5 @@ Contributors
 - Alex Gaynor, 2018/05/24
 
 - Jason Williams, 2018/06/11
+
+- Benjamin Gmurczyk, 2018/06/14
