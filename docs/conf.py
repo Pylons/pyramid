@@ -171,8 +171,6 @@ html_last_updated_fmt = '%b %d, %Y'
 
 # Do not use smart quotes.
 smartquotes = False
-# Remove next line when RTD goes to Sphinx==1.6.6
-html_use_smartypants = False
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'pyramid'
