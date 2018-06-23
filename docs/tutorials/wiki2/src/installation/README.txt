@@ -20,9 +20,19 @@ Getting Started
 
     env/bin/pip install -e ".[testing]"
 
-- Configure the database.
+- Initialize the database using Alembic.
 
-    env/bin/initialize_tutorial_db development.ini
+    - Generate your first revision.
+
+        env/bin/alembic -c development.ini revision --autogenerate -m "init"
+
+    - Upgrade to that revision.
+
+        env/bin/alembic -c development.ini upgrade head
+
+    - Load default data.
+
+        env/bin/initialize_tutorial_db development.ini
 
 - Run your project's tests.
 
