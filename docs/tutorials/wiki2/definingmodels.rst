@@ -158,11 +158,11 @@ the following:
 Here we align our imports with the names of the models, ``Page`` and ``User``.
 
 
-Edit ``scripts/initializedb.py``
-================================
+Edit ``scripts/initialize_db.py``
+=================================
 
 We haven't looked at the details of this file yet, but within the ``scripts``
-directory of your ``tutorial`` package is a file named ``initializedb.py``.
+directory of your ``tutorial`` package is a file named ``initialize_db.py``.
 Code in this file is executed whenever we run the ``initialize_tutorial_db``
 command, as we did in the installation step of this tutorial.
 
@@ -171,15 +171,15 @@ command, as we did in the installation step of this tutorial.
     The command is named ``initialize_tutorial_db`` because of the mapping defined in the ``[console_scripts]`` entry point of our project's ``setup.py`` file.
 
 Since we've changed our model, we need to make changes to our
-``initializedb.py`` script.  In particular, we'll replace our import of
+``initialize_db.py`` script.  In particular, we'll replace our import of
 ``MyModel`` with those of ``User`` and ``Page``. We'll also change the very end
 of the script to create two ``User`` objects (``basic`` and ``editor``) as well
 as a ``Page``, rather than a ``MyModel``, and add them to our ``dbsession``.
 
-Open ``tutorial/scripts/initializedb.py`` and edit it to look like the
+Open ``tutorial/scripts/initialize_db.py`` and edit it to look like the
 following:
 
-.. literalinclude:: src/models/tutorial/scripts/initializedb.py
+.. literalinclude:: src/models/tutorial/scripts/initialize_db.py
    :linenos:
    :language: python
    :emphasize-lines: 18,44-57
@@ -192,7 +192,7 @@ Installing the project and re-initializing the database
 
 Because our model has changed, and in order to reinitialize the database, we
 need to rerun the ``initialize_tutorial_db`` command to pick up the changes
-we've made to both the models.py file and to the initializedb.py file. See
+we've made to both the models.py file and to the initialize_db.py file. See
 :ref:`initialize_db_wiki2` for instructions.
 
 Success will look something like this:
