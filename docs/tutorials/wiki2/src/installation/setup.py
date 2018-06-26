@@ -11,7 +11,7 @@ with open(os.path.join(here, 'CHANGES.txt')) as f:
 requires = [
     'alembic',
     'plaster_pastedeploy',
-    'pyramid >= 1.9a',
+    'pyramid >= 1.9',
     'pyramid_debugtoolbar',
     'pyramid_jinja2',
     'pyramid_retry',

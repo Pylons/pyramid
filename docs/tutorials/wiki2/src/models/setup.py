@@ -12,7 +12,7 @@ requires = [
     'alembic',
     'bcrypt',
     'plaster_pastedeploy',
-    'pyramid >= 1.9a',
+    'pyramid >= 1.9',
     'pyramid_debugtoolbar',
     'pyramid_jinja2',
     'pyramid_retry',
