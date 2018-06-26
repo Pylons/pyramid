@@ -9,6 +9,7 @@ with open(os.path.join(here, 'CHANGES.txt')) as f:
     CHANGES = f.read()
 
 requires = [
+    'alembic',
     'bcrypt',
     'plaster_pastedeploy',
     'pyramid >= 1.9a',
@@ -55,7 +56,7 @@ setup(
             'main = tutorial:main',
         ],
         'console_scripts': [
-            'initialize_tutorial_db = tutorial.scripts.initializedb:main',
+            'initialize_tutorial_db = tutorial.scripts.initialize_db:main',
         ],
     },
 )

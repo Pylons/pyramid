@@ -33,7 +33,7 @@ Open ``tutorial/setup.py`` and edit it to look like the following:
 
 .. literalinclude:: src/models/setup.py
    :linenos:
-   :emphasize-lines: 12
+   :emphasize-lines: 13
    :language: python
 
 Only the highlighted line needs to be added.
@@ -70,7 +70,7 @@ like the following.
 
 .. code-block:: text
 
-    Successfully installed bcrypt-3.1.2 cffi-1.9.1 pycparser-2.17 tutorial
+    Successfully installed bcrypt-3.1.4 cffi-1.11.5 pycparser-2.18 tutorial
 
 
 Remove ``mymodel.py``
