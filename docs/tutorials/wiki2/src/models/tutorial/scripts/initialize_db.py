@@ -1,57 +1,56 @@
 import os
 import sys
-import transaction
 
-from pyramid.paster import (
-    get_appsettings,
-    setup_logging,
-    )
+from pyramid.paster import bootstrap, setup_logging
+from sqlalchemy.exc import OperationalError
 
-from pyramid.scripts.common import parse_vars
-
-from ..models.meta import Base
-from ..models import (
-    get_engine,
-    get_session_factory,
-    get_tm_session,
-    )
 from ..models import Page, User
+
+
+def setup_models(dbsession):
+    editor = User(name='editor', role='editor')
+    editor.set_password('editor')
+    dbsession.add(editor)
+
+    basic = User(name='basic', role='basic')
+    basic.set_password('basic')
+    dbsession.add(basic)
+
+    page = Page(
+        name='FrontPage',
+        creator=editor,
+        data='This is the front page',
+    )
+    dbsession.add(page)
 
 
 def usage(argv):
     cmd = os.path.basename(argv[0])
-    print('usage: %s <config_uri> [var=value]\n'
+    print('usage: %s <config_uri>\n'
           '(example: "%s development.ini")' % (cmd, cmd))
     sys.exit(1)
 
 
 def main(argv=sys.argv):
-    if len(argv) < 2:
+    if len(argv) != 2:
         usage(argv)
     config_uri = argv[1]
-    options = parse_vars(argv[2:])
     setup_logging(config_uri)
-    settings = get_appsettings(config_uri, options=options)
+    env = bootstrap(config_uri)
 
-    engine = get_engine(settings)
-    Base.metadata.create_all(engine)
+    try:
+        with env['request'].tm:
+            dbsession = env['request'].dbsession
+            setup_models(dbsession)
+    except OperationalError:
+        print('''
+Pyramid is having a problem using your SQL database.  The problem
+might be caused by one of the following things:
 
-    session_factory = get_session_factory(engine)
+1.  You may need to initialize your database tables with `alembic`.
+    Check your README.txt for description and try to run it.
 
-    with transaction.manager:
-        dbsession = get_tm_session(session_factory, transaction.manager)
-
-        editor = User(name='editor', role='editor')
-        editor.set_password('editor')
-        dbsession.add(editor)
-
-        basic = User(name='basic', role='basic')
-        basic.set_password('basic')
-        dbsession.add(basic)
-
-        page = Page(
-            name='FrontPage',
-            creator=editor,
-            data='This is the front page',
-        )
-        dbsession.add(page)
+2.  Your database server may not be running.  Check that the
+    database server referred to by the "sqlalchemy.url" setting in
+    your "development.ini" file is running.
+            ''')
