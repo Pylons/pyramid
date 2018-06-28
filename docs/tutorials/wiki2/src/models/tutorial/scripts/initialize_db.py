@@ -4,19 +4,19 @@ import sys
 from pyramid.paster import bootstrap, setup_logging
 from sqlalchemy.exc import OperationalError
 
-from ..models import Page, User
+from .. import models
 
 
 def setup_models(dbsession):
-    editor = User(name='editor', role='editor')
+    editor = models.User(name='editor', role='editor')
     editor.set_password('editor')
     dbsession.add(editor)
 
-    basic = User(name='basic', role='basic')
+    basic = models.User(name='basic', role='basic')
     basic.set_password('basic')
     dbsession.add(basic)
 
-    page = Page(
+    page = models.Page(
         name='FrontPage',
         creator=editor,
         data='This is the front page',
