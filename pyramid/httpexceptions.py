@@ -186,7 +186,7 @@ class HTTPException(Response, Exception):
     #   2.6.5+ access of Exception.message
     #
     # - its base class of HTTPException is no longer a Python 2.4 compatibility
-    #   shim; it's purely a base class that inherits from Exception.  This
+    #   shiv; it's purely a base class that inherits from Exception.  This
     #   implies that this class' ``exception`` property always returns
     #   ``self`` (it exists only for bw compat at this point).
     #

@@ -4136,7 +4136,7 @@ Bug fixes
 Bug Fixes
 ---------
 
-- 1.1a1 broke Akhet by not providing a backwards compatibility import shim
+- 1.1a1 broke Akhet by not providing a backwards compatibility import shiv
   for ``pyramid.paster.PyramidTemplate``.  Now one has been added, although a
   deprecation warning is emitted when Akhet imports it.
 
@@ -4738,7 +4738,7 @@ Deprecations
 -------------
 
 - Using the ``pyramid.view.bfg_view`` alias for ``pyramid.view.view_config``
-  (a backwards compatibility shim) now issues a deprecation warning.
+  (a backwards compatibility shiv) now issues a deprecation warning.
 
 Backwards Incompatibilities
 ---------------------------
@@ -5178,7 +5178,7 @@ Terminology Changes
   - Positional argument names of various APIs have been changed from
     ``model`` to ``resource``.
 
-  Backwards compatibility shims have been left in place in all cases.  They
+  Backwards compatibility shivs have been left in place in all cases.  They
   will continue to work "forever".
 
 - The Pyramid concept previously known as "resource" is now known as "asset".
@@ -5205,7 +5205,7 @@ Terminology Changes
     ``reload_resources`` (config file) is now known, respectively, as
     ``PYRAMID_RELOAD_ASSETS`` and ``reload_assets``.
 
-  Backwards compatibility shims have been left in place in all cases.  They
+  Backwards compatibility shivs have been left in place in all cases.  They
   will continue to work "forever".
 
 Bug Fixes
@@ -5560,7 +5560,7 @@ Deprecations
 - Obtaining the ``settings`` object via
   ``registry.{get|query}Utility(ISettings)`` is now deprecated.  Instead,
   obtain the ``settings`` object via the ``registry.settings`` attribute.  A
-  backwards compatibility shim was added to the registry object to register
+  backwards compatibility shiv was added to the registry object to register
   the settings object as an ISettings utility when ``setattr(registry,
   'settings', foo)`` is called, but it will be removed in a later release.
 

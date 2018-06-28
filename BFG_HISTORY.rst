@@ -4281,7 +4281,7 @@ Deprecations
 
 - The name ``repoze.bfg.registry.registry_manager`` was never an API,
   but scripts in the wild were using it to set up an environment for
-  use under a debug shell.  A backwards compatibility shim has been
+  use under a debug shell.  A backwards compatibility shiv has been
   added for this purpose, but the feature is deprecated.
 
 0.9a1 (2009-5-27)

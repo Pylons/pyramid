@@ -125,7 +125,7 @@ Terminology Changes
 
 - The Pyramid concept previously known as "model" is now known as "resource".
   As a result, the following API renames have been made.  Backwards
-  compatibility shims for the old names have been left in place in all cases::
+  compatibility shivs for the old names have been left in place in all cases::
 
       pyramid.url.model_url -> 
                         pyramid.url.resource_url
@@ -162,7 +162,7 @@ Terminology Changes
 
 - The Pyramid concept previously known as "resource" is now known as "asset".
   As a result, the following API changes were made.  Backwards compatibility
-  shims have been left in place as necessary::
+  shivs have been left in place as necessary::
 
       pyramid.config.Configurator.absolute_resource_spec ->
                         pyramid.config.Configurator.absolute_asset_spec
@@ -516,7 +516,7 @@ Deprecations and Behavior Differences
 - Obtaining the ``settings`` object via
   ``registry.{get|query}Utility(ISettings)`` is now deprecated.  Instead,
   obtain the ``settings`` object via the ``registry.settings`` attribute.  A
-  backwards compatibility shim was added to the registry object to register
+  backwards compatibility shiv was added to the registry object to register
   the settings object as an ISettings utility when ``setattr(registry,
   'settings', foo)`` is called, but it will be removed in a later release.
 

@@ -1,4 +1,4 @@
-""" Backwards compatibility shim module (forever). """
+""" Backwards compatibility shiv module (forever). """
 from pyramid.asset import * # b/w compat
 resolve_resource_spec = resolve_asset_spec
 resource_spec_from_abspath = asset_spec_from_abspath
