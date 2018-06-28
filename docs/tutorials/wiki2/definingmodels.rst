@@ -301,8 +301,7 @@ command, as we did in the installation step of this tutorial.
 
 Since we've changed our model, we need to make changes to our
 ``initialize_db.py`` script.  In particular, we'll replace our import of
-``MyModel`` with those of ``User`` and ``Page``. We'll also change the very end
-of the script to create two ``User`` objects (``basic`` and ``editor``) as well
+``MyModel`` with those of ``User`` and ``Page``. We'll also change the the script to create two ``User`` objects (``basic`` and ``editor``) as well
 as a ``Page``, rather than a ``MyModel``, and add them to our ``dbsession``.
 
 Open ``tutorial/scripts/initialize_db.py`` and edit it to look like the
@@ -316,61 +315,18 @@ following:
 Only the highlighted lines need to be changed.
 
 
-Installing the project and re-initializing the database
-=======================================================
+Populating the database
+=======================
 
-Because our model has changed, and in order to reinitialize the database, we
+Because our model has changed, and to repopulate the database, we
 need to rerun the ``initialize_tutorial_db`` command to pick up the changes
-we've made to both the models.py file and to the initialize_db.py file. See
-:ref:`initialize_db_wiki2` for instructions.
+we've made to the initialize_db.py file. See :ref:`initialize_db_wiki2` for instructions.
 
 Success will look something like this:
 
-.. code-block:: bash
+.. code-block:: text
 
-    2016-12-20 02:51:11,195 INFO  [sqlalchemy.engine.base.Engine:1235][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
-    2016-12-20 02:51:11,195 INFO  [sqlalchemy.engine.base.Engine:1236][MainThread] ()
-    2016-12-20 02:51:11,195 INFO  [sqlalchemy.engine.base.Engine:1235][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
-    2016-12-20 02:51:11,195 INFO  [sqlalchemy.engine.base.Engine:1236][MainThread] ()
-    2016-12-20 02:51:11,196 INFO  [sqlalchemy.engine.base.Engine:1140][MainThread] PRAGMA table_info("pages")
-    2016-12-20 02:51:11,196 INFO  [sqlalchemy.engine.base.Engine:1143][MainThread] ()
-    2016-12-20 02:51:11,196 INFO  [sqlalchemy.engine.base.Engine:1140][MainThread] PRAGMA table_info("users")
-    2016-12-20 02:51:11,197 INFO  [sqlalchemy.engine.base.Engine:1143][MainThread] ()
-    2016-12-20 02:51:11,197 INFO  [sqlalchemy.engine.base.Engine:1140][MainThread]
-    CREATE TABLE users (
-            id INTEGER NOT NULL,
-            name TEXT NOT NULL,
-            role TEXT NOT NULL,
-            password_hash TEXT,
-            CONSTRAINT pk_users PRIMARY KEY (id),
-            CONSTRAINT uq_users_name UNIQUE (name)
-    )
-
-
-    2016-12-20 02:51:11,197 INFO  [sqlalchemy.engine.base.Engine:1143][MainThread] ()
-    2016-12-20 02:51:11,198 INFO  [sqlalchemy.engine.base.Engine:719][MainThread] COMMIT
-    2016-12-20 02:51:11,199 INFO  [sqlalchemy.engine.base.Engine:1140][MainThread]
-    CREATE TABLE pages (
-            id INTEGER NOT NULL,
-            name TEXT NOT NULL,
-            data TEXT NOT NULL,
-            creator_id INTEGER NOT NULL,
-            CONSTRAINT pk_pages PRIMARY KEY (id),
-            CONSTRAINT uq_pages_name UNIQUE (name),
-            CONSTRAINT fk_pages_creator_id_users FOREIGN KEY(creator_id) REFERENCES users (id)
-    )
-
-
-    2016-12-20 02:51:11,199 INFO  [sqlalchemy.engine.base.Engine:1143][MainThread] ()
-    2016-12-20 02:51:11,200 INFO  [sqlalchemy.engine.base.Engine:719][MainThread] COMMIT
-    2016-12-20 02:51:11,755 INFO  [sqlalchemy.engine.base.Engine:679][MainThread] BEGIN (implicit)
-    2016-12-20 02:51:11,755 INFO  [sqlalchemy.engine.base.Engine:1140][MainThread] INSERT INTO users (name, role, password_hash) VALUES (?, ?, ?)
-    2016-12-20 02:51:11,755 INFO  [sqlalchemy.engine.base.Engine:1143][MainThread] ('editor', 'editor', '$2b$12$ds7h2Zb7.l6TEFup5h8f4ekA9GRfEpE1yQGDRvT9PConw73kKuupG')
-    2016-12-20 02:51:11,756 INFO  [sqlalchemy.engine.base.Engine:1140][MainThread] INSERT INTO users (name, role, password_hash) VALUES (?, ?, ?)
-    2016-12-20 02:51:11,756 INFO  [sqlalchemy.engine.base.Engine:1143][MainThread] ('basic', 'basic', '$2b$12$KgruXP5Vv7rikr6dGB3TF.flGXYpiE0Li9K583EVomjY.SYmQOsyi')
-    2016-12-20 02:51:11,757 INFO  [sqlalchemy.engine.base.Engine:1140][MainThread] INSERT INTO pages (name, data, creator_id) VALUES (?, ?, ?)
-    2016-12-20 02:51:11,757 INFO  [sqlalchemy.engine.base.Engine:1143][MainThread] ('FrontPage', 'This is the front page', 1)
-    2016-12-20 02:51:11,757 INFO  [sqlalchemy.engine.base.Engine:719][MainThread] COMMIT
+    Output goes here, once I figure out how to get the script to run.
 
 
 View the application in a browser
