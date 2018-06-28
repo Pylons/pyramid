@@ -158,6 +158,135 @@ the following:
 Here we align our imports with the names of the models, ``Page`` and ``User``.
 
 
+.. _wiki2_migrate_database_alembic:
+
+Migrate the database with Alembic
+=================================
+
+Now that we have written our models, we need to modify the database schema to reflect the changes to our code. Let's generate a new revision, then upgrade the database to the latest revision (head).
+
+On UNIX:
+
+.. code-block:: bash
+
+    $ $VENV/bin/alembic -c development.ini revision --autogenerate \
+          -m "use new models Page and User"
+    $ $VENV/bin/alembic -c development.ini upgrade head
+
+On Windows:
+
+.. code-block:: doscon
+
+    c:\tutorial> %VENV%\Scripts\alembic -c development.ini revision \
+         --autogenerate -m "use new models Page and User"
+    c:\tutorial> %VENV%\Scripts\alembic -c development.ini upgrade head
+
+Success executing these commands will generate output similar to the following.
+
+.. code-block:: text
+
+    2018-06-28 00:43:15,609 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
+    2018-06-28 00:43:15,609 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
+    2018-06-28 00:43:15,610 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
+    2018-06-28 00:43:15,610 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
+    2018-06-28 00:43:15,612 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA table_info("alembic_version")
+    2018-06-28 00:43:15,612 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-28 00:43:15,613 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] SELECT alembic_version.version_num
+    FROM alembic_version
+    2018-06-28 00:43:15,613 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-28 00:43:15,620 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] SELECT name FROM sqlite_master WHERE type='table' ORDER BY name
+    2018-06-28 00:43:15,620 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-28 00:43:15,622 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA table_info("models")
+    2018-06-28 00:43:15,622 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-28 00:43:15,623 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = 'models' AND type = 'table'
+    2018-06-28 00:43:15,623 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-28 00:43:15,624 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA foreign_key_list("models")
+    2018-06-28 00:43:15,624 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-28 00:43:15,624 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = 'models' AND type = 'table'
+    2018-06-28 00:43:15,624 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-28 00:43:15,625 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA index_list("models")
+    2018-06-28 00:43:15,625 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-28 00:43:15,625 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA index_info("my_index")
+    2018-06-28 00:43:15,626 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-28 00:43:15,626 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA index_list("models")
+    2018-06-28 00:43:15,626 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-28 00:43:15,626 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA index_info("my_index")
+    2018-06-28 00:43:15,626 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-28 00:43:15,626 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = 'models' AND type = 'table'
+    2018-06-28 00:43:15,627 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+     Generating /<somepath>/tutorial/tutorial/alembic/versions/20180628_9451789ab7d6.py ... done
+
+.. code-block:: text
+
+    2018-06-28 00:46:18,152 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
+    2018-06-28 00:46:18,153 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
+    2018-06-28 00:46:18,153 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
+    2018-06-28 00:46:18,153 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
+    2018-06-28 00:46:18,155 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA table_info("alembic_version")
+    2018-06-28 00:46:18,155 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-28 00:46:18,155 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] SELECT alembic_version.version_num
+    FROM alembic_version
+    2018-06-28 00:46:18,155 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-28 00:46:18,159 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread]
+    CREATE TABLE users (
+           id INTEGER NOT NULL,
+           name TEXT NOT NULL,
+           role TEXT NOT NULL,
+           password_hash TEXT,
+           CONSTRAINT pk_users PRIMARY KEY (id),
+           CONSTRAINT uq_users_name UNIQUE (name)
+    )
+
+
+    2018-06-28 00:46:18,159 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-28 00:46:18,160 INFO  [sqlalchemy.engine.base.Engine:722][MainThread] COMMIT
+    2018-06-28 00:46:18,161 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread]
+    CREATE TABLE pages (
+           id INTEGER NOT NULL,
+           name TEXT NOT NULL,
+           data TEXT NOT NULL,
+           creator_id INTEGER NOT NULL,
+           CONSTRAINT pk_pages PRIMARY KEY (id),
+           CONSTRAINT fk_pages_creator_id_users FOREIGN KEY(creator_id) REFERENCES users (id),
+           CONSTRAINT uq_pages_name UNIQUE (name)
+    )
+
+
+    2018-06-28 00:46:18,161 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-28 00:46:18,162 INFO  [sqlalchemy.engine.base.Engine:722][MainThread] COMMIT
+    2018-06-28 00:46:18,163 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread]
+    DROP INDEX my_index
+    2018-06-28 00:46:18,163 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-28 00:46:18,164 INFO  [sqlalchemy.engine.base.Engine:722][MainThread] COMMIT
+    2018-06-28 00:46:18,164 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread]
+    DROP TABLE models
+    2018-06-28 00:46:18,164 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-28 00:46:18,165 INFO  [sqlalchemy.engine.base.Engine:722][MainThread] COMMIT
+    2018-06-28 00:46:18,166 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] UPDATE alembic_version SET version_num='9451789ab7d6' WHERE alembic_version.version_num = 'd2f465a83563'
+    2018-06-28 00:46:18,166 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-28 00:46:18,166 INFO  [sqlalchemy.engine.base.Engine:722][MainThread] COMMIT
+
+
+.. _wiki2_alembic_overview:
+
+Alembic overview
+----------------
+
+Let's briefly discuss our configuration for Alembic.
+
+In the alchemy cookiecutter's ``development.ini`` file, the setting for ``script_location`` configures Alembic to look for the migration script in the directory ``tutorial/alembic``.
+By default Alembic stores the migration files one level deeper in ``tutorial/alembic/versions``.
+These files are generated by Alembic, then executed when we run upgrade or downgrade migrations.
+The setting ``file_template`` provides the format for each migration's file name.
+We've configured the ``file_template`` setting to make it somewhat easy to find migrations by file name.
+
+At this point in this tutorial, we have two migration files.
+Examine them to see what Alembic will do when you upgrade or downgrade the database to a specific revision.
+Notice the revision identifiers and how they relate to one another in a chained sequence.
+
+.. seealso:: For further information, see the `Alembic documentation <http://alembic.zzzcomputing.com/en/latest/>`_.
+
+
 Edit ``scripts/initialize_db.py``
 =================================
 
