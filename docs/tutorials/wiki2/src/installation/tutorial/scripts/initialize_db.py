@@ -8,7 +8,7 @@ from .. import models
 
 
 def setup_models(dbsession):
-    model = models.MyModel(name='one', value=1)
+    model = models.mymodel.MyModel(name='one', value=1)
     dbsession.add(model)
 
 
