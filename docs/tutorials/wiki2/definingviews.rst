@@ -126,7 +126,7 @@ edit it to look like the following:
 .. literalinclude:: src/views/tutorial/views/default.py
    :linenos:
    :language: python
-   :emphasize-lines: 1-9,12-
+   :emphasize-lines: 1-9,14-
 
 The highlighted lines need to be added or edited.
 
