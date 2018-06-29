@@ -185,86 +185,86 @@ Success executing these commands will generate output similar to the following.
 
 .. code-block:: text
 
-    2018-06-28 00:43:15,609 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
-    2018-06-28 00:43:15,609 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
-    2018-06-28 00:43:15,610 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
-    2018-06-28 00:43:15,610 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
-    2018-06-28 00:43:15,612 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA table_info("alembic_version")
-    2018-06-28 00:43:15,612 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-    2018-06-28 00:43:15,613 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] SELECT alembic_version.version_num
+    2018-06-29 01:28:42,407 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
+    2018-06-29 01:28:42,407 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
+    2018-06-29 01:28:42,408 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
+    2018-06-29 01:28:42,408 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
+    2018-06-29 01:28:42,409 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA table_info("alembic_version")
+    2018-06-29 01:28:42,409 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-29 01:28:42,410 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] SELECT alembic_version.version_num
     FROM alembic_version
-    2018-06-28 00:43:15,613 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-    2018-06-28 00:43:15,620 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] SELECT name FROM sqlite_master WHERE type='table' ORDER BY name
-    2018-06-28 00:43:15,620 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-    2018-06-28 00:43:15,622 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA table_info("models")
-    2018-06-28 00:43:15,622 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-    2018-06-28 00:43:15,623 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = 'models' AND type = 'table'
-    2018-06-28 00:43:15,623 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-    2018-06-28 00:43:15,624 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA foreign_key_list("models")
-    2018-06-28 00:43:15,624 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-    2018-06-28 00:43:15,624 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = 'models' AND type = 'table'
-    2018-06-28 00:43:15,624 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-    2018-06-28 00:43:15,625 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA index_list("models")
-    2018-06-28 00:43:15,625 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-    2018-06-28 00:43:15,625 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA index_info("my_index")
-    2018-06-28 00:43:15,626 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-    2018-06-28 00:43:15,626 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA index_list("models")
-    2018-06-28 00:43:15,626 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-    2018-06-28 00:43:15,626 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA index_info("my_index")
-    2018-06-28 00:43:15,626 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-    2018-06-28 00:43:15,626 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = 'models' AND type = 'table'
-    2018-06-28 00:43:15,627 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-     Generating /<somepath>/tutorial/tutorial/alembic/versions/20180628_9451789ab7d6.py ... done
+    2018-06-29 01:28:42,410 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-29 01:28:42,411 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] SELECT name FROM sqlite_master WHERE type='table' ORDER BY name
+    2018-06-29 01:28:42,412 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-29 01:28:42,413 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA table_info("models")
+    2018-06-29 01:28:42,413 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-29 01:28:42,414 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = 'models' AND type = 'table'
+    2018-06-29 01:28:42,414 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-29 01:28:42,414 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA foreign_key_list("models")
+    2018-06-29 01:28:42,414 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-29 01:28:42,414 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = 'models' AND type = 'table'
+    2018-06-29 01:28:42,415 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-29 01:28:42,416 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA index_list("models")
+    2018-06-29 01:28:42,416 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-29 01:28:42,416 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA index_info("my_index")
+    2018-06-29 01:28:42,416 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-29 01:28:42,417 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA index_list("models")
+    2018-06-29 01:28:42,417 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-29 01:28:42,417 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA index_info("my_index")
+    2018-06-29 01:28:42,417 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-29 01:28:42,417 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = 'models' AND type = 'table'
+    2018-06-29 01:28:42,417 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+      Generating /<somepath>/tutorial/tutorial/alembic/versions/20180629_23e9f8eb6c28.py ... done
 
 .. code-block:: text
 
-    2018-06-28 00:46:18,152 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
-    2018-06-28 00:46:18,153 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
-    2018-06-28 00:46:18,153 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
-    2018-06-28 00:46:18,153 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
-    2018-06-28 00:46:18,155 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA table_info("alembic_version")
-    2018-06-28 00:46:18,155 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-    2018-06-28 00:46:18,155 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] SELECT alembic_version.version_num
+    2018-06-29 01:29:37,957 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
+    2018-06-29 01:29:37,958 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
+    2018-06-29 01:29:37,958 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
+    2018-06-29 01:29:37,958 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
+    2018-06-29 01:29:37,960 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA table_info("alembic_version")
+    2018-06-29 01:29:37,960 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-29 01:29:37,960 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] SELECT alembic_version.version_num
     FROM alembic_version
-    2018-06-28 00:46:18,155 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-    2018-06-28 00:46:18,159 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread]
+    2018-06-29 01:29:37,960 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-29 01:29:37,963 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread]
     CREATE TABLE users (
-           id INTEGER NOT NULL,
-           name TEXT NOT NULL,
-           role TEXT NOT NULL,
-           password_hash TEXT,
-           CONSTRAINT pk_users PRIMARY KEY (id),
-           CONSTRAINT uq_users_name UNIQUE (name)
+            id INTEGER NOT NULL,
+            name TEXT NOT NULL,
+            role TEXT NOT NULL,
+            password_hash TEXT,
+            CONSTRAINT pk_users PRIMARY KEY (id),
+            CONSTRAINT uq_users_name UNIQUE (name)
     )
 
 
-    2018-06-28 00:46:18,159 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-    2018-06-28 00:46:18,160 INFO  [sqlalchemy.engine.base.Engine:722][MainThread] COMMIT
-    2018-06-28 00:46:18,161 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread]
+    2018-06-29 01:29:37,963 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-29 01:29:37,966 INFO  [sqlalchemy.engine.base.Engine:722][MainThread] COMMIT
+    2018-06-29 01:29:37,968 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread]
     CREATE TABLE pages (
-           id INTEGER NOT NULL,
-           name TEXT NOT NULL,
-           data TEXT NOT NULL,
-           creator_id INTEGER NOT NULL,
-           CONSTRAINT pk_pages PRIMARY KEY (id),
-           CONSTRAINT fk_pages_creator_id_users FOREIGN KEY(creator_id) REFERENCES users (id),
-           CONSTRAINT uq_pages_name UNIQUE (name)
+            id INTEGER NOT NULL,
+            name TEXT NOT NULL,
+            data TEXT NOT NULL,
+            creator_id INTEGER NOT NULL,
+            CONSTRAINT pk_pages PRIMARY KEY (id),
+            CONSTRAINT fk_pages_creator_id_users FOREIGN KEY(creator_id) REFERENCES users (id),
+            CONSTRAINT uq_pages_name UNIQUE (name)
     )
 
 
-    2018-06-28 00:46:18,161 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-    2018-06-28 00:46:18,162 INFO  [sqlalchemy.engine.base.Engine:722][MainThread] COMMIT
-    2018-06-28 00:46:18,163 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread]
+    2018-06-29 01:29:37,968 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-29 01:29:37,969 INFO  [sqlalchemy.engine.base.Engine:722][MainThread] COMMIT
+    2018-06-29 01:29:37,969 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread]
     DROP INDEX my_index
-    2018-06-28 00:46:18,163 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-    2018-06-28 00:46:18,164 INFO  [sqlalchemy.engine.base.Engine:722][MainThread] COMMIT
-    2018-06-28 00:46:18,164 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread]
+    2018-06-29 01:29:37,969 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-29 01:29:37,970 INFO  [sqlalchemy.engine.base.Engine:722][MainThread] COMMIT
+    2018-06-29 01:29:37,970 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread]
     DROP TABLE models
-    2018-06-28 00:46:18,164 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-    2018-06-28 00:46:18,165 INFO  [sqlalchemy.engine.base.Engine:722][MainThread] COMMIT
-    2018-06-28 00:46:18,166 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] UPDATE alembic_version SET version_num='9451789ab7d6' WHERE alembic_version.version_num = 'd2f465a83563'
-    2018-06-28 00:46:18,166 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-    2018-06-28 00:46:18,166 INFO  [sqlalchemy.engine.base.Engine:722][MainThread] COMMIT
+    2018-06-29 01:29:37,970 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-29 01:29:37,971 INFO  [sqlalchemy.engine.base.Engine:722][MainThread] COMMIT
+    2018-06-29 01:29:37,972 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] UPDATE alembic_version SET version_num='23e9f8eb6c28' WHERE alembic_version.version_num = 'b6b22ae3e628'
+    2018-06-29 01:29:37,972 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-29 01:29:37,972 INFO  [sqlalchemy.engine.base.Engine:722][MainThread] COMMIT
 
 
 .. _wiki2_alembic_overview:
@@ -310,7 +310,7 @@ following:
 .. literalinclude:: src/models/tutorial/scripts/initialize_db.py
    :linenos:
    :language: python
-   :emphasize-lines: 18,44-57
+   :emphasize-lines: 11-24
 
 Only the highlighted lines need to be changed.
 
@@ -326,7 +326,18 @@ Success will look something like this:
 
 .. code-block:: text
 
-    Output goes here, once I figure out how to get the script to run.
+    2018-06-29 01:30:39,326 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
+    2018-06-29 01:30:39,326 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
+    2018-06-29 01:30:39,327 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
+    2018-06-29 01:30:39,327 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
+    2018-06-29 01:30:39,328 INFO  [sqlalchemy.engine.base.Engine:682][MainThread] BEGIN (implicit)
+    2018-06-29 01:30:39,329 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] INSERT INTO users (name, role, password_hash) VALUES (?, ?, ?)
+    2018-06-29 01:30:39,329 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ('editor', 'editor', '$2b$12$PlaJSN7goVbyx8OFs8yAju9n5gHGdI6PZ2QRJGM2jDCiEU4ItUNxy')
+    2018-06-29 01:30:39,330 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] INSERT INTO users (name, role, password_hash) VALUES (?, ?, ?)
+    2018-06-29 01:30:39,330 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ('basic', 'basic', '$2b$12$MvXdM8jlkbjEyPZ6uXzRg.yatZZK8jCwfPaM7kFkmVJiJjRoCCvmW')
+    2018-06-29 01:30:39,331 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] INSERT INTO pages (name, data, creator_id) VALUES (?, ?, ?)
+    2018-06-29 01:30:39,331 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ('FrontPage', 'This is the front page', 1)
+    2018-06-29 01:30:39,332 INFO  [sqlalchemy.engine.base.Engine:722][MainThread] COMMIT
 
 
 View the application in a browser
@@ -335,11 +346,11 @@ View the application in a browser
 We can't.  At this point, our system is in a "non-runnable" state; we'll need
 to change view-related files in the next chapter to be able to start the
 application successfully.  If you try to start the application (see
-:ref:`wiki2-start-the-application`), you'll wind up with a Python traceback on
+:ref:`wiki2-start-the-application`) and visit http://localhost:6543, you'll wind up with a Python traceback on
 your console that ends with this exception:
 
 .. code-block:: text
 
-   ImportError: cannot import name MyModel
+   AttributeError: module 'tutorial.models' has no attribute 'MyModel'
 
 This will also happen if you attempt to run the tests.
