@@ -15,7 +15,7 @@ This "Getting Started" tutorial is broken into independent steps, starting with
 the smallest possible "single file WSGI app" example. Each of these steps
 introduces a topic and a very small set of concepts via working code. The steps
 each correspond to a directory in our workspace, where each step's directory is
-a Python package.
+a Python package. Source code used in this tutorial is located in the `Pyramid repository in the directory "docs/quick_tutorial" <https://github.com/Pylons/pyramid/>`_. You may ``git clone`` the repository, download, or copy-paste the source code. If you do so, then make sure you use the same branch as this documentation.
 
 As we develop our tutorial, our directory tree will resemble the structure
 below:
@@ -23,14 +23,14 @@ below:
 .. code-block:: text
 
     quick_tutorial
-        │── env
-        `── request_response
-            `── tutorial
-            │   │── __init__.py
-            │   │── tests.py
-            │   `── views.py
-            │── development.ini
-            `── setup.py
+    ├── env
+    └── request_response
+        ├── tutorial
+        │   ├── __init__.py
+        │   ├── tests.py
+        │   └── views.py
+        ├── development.ini
+        └── setup.py
 
 Each of the directories in our ``quick_tutorial`` workspace (e.g., ``request_response``) is a *Python
 project* (except as noted for the ``hello_world`` step). The ``tutorial``

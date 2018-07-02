@@ -21,12 +21,38 @@ Features
   instead of ``pyramid.util.Request``.
   See https://github.com/Pylons/pyramid/pull/3129
 
-- In ``cherrypy_server_runner``, prefer imports from the ``cheroot`` package over the legacy
-  imports from `cherrypy.wsgiserver`.
+- In ``cherrypy_server_runner``, prefer imports from the ``cheroot`` package
+  over the legacy imports from `cherrypy.wsgiserver`.
   See https://github.com/Pylons/pyramid/pull/3235
+
+- Add a context manager ``route_prefix_context`` to the
+  ``pyramid.config.Configurator`` to allow for convenient setting of the
+  route_prefix for ``include`` and ``add_route`` calls inside the context.
+  See https://github.com/Pylons/pyramid/pull/3279
+
+- Modify the builtin session implementations to support SameSite options on
+  cookies and set the default to ``'Lax'``. This affects
+  ``pyramid.session.BaseCookieSessionFactory``,
+  ``pyramid.session.SignedCookieSessionFactory``, and
+  ``pyramid.session.UnencryptedCookieSessionFactoryConfig``.
+  See https://github.com/Pylons/pyramid/pull/3300
+
+- Added new ``pyramid.httpexceptions.HTTPPermanentRedirect``
+  exception/response object for a HTTP 308 redirect.
+  See https://github.com/Pylons/pyramid/pull/3302
 
 Bug Fixes
 ---------
+
+- Set appropriate ``code`` and ``title`` attributes on the ``HTTPClientError``
+  and ``HTTPServerError`` exception classes. This prevents inadvertently
+  returning a 520 error code.
+  See https://github.com/Pylons/pyramid/pull/3280
+
+- Replace ``webob.acceptparse.MIMEAccept`` from WebOb with
+  ``webob.acceptparse.create_accept_header`` in the HTTP exception handling
+  code. The old ``MIMEAccept`` has been deprecated. The new methods follow the
+  RFC's more closely. See https://github.com/Pylons/pyramid/pull/3251
 
 Deprecations
 ------------
@@ -39,6 +65,22 @@ Backward Incompatibilities
   depending on it directly within your project.
   See https://github.com/Pylons/pyramid/pull/3140
 
+- Remove the ``permission`` argument from
+  ``pyramid.config.Configurator.add_route``. This was an argument left over
+  from a feature removed in Pyramid 1.5 and has had no effect since then.
+  See https://github.com/Pylons/pyramid/pull/3299
+
+- Modify the builtin session implementations to set ``SameSite='Lax'`` on
+  cookies. This affects ``pyramid.session.BaseCookieSessionFactory``,
+  ``pyramid.session.SignedCookieSessionFactory``, and
+  ``pyramid.session.UnencryptedCookieSessionFactoryConfig``.
+  See https://github.com/Pylons/pyramid/pull/3300
+
 Documentation Changes
 ---------------------
 
+- Bump Sphinx to >= 1.7.4 in setup.py to support ``emphasize-lines`` in PDFs
+  and to pave the way for xelatex support.  See
+  https://github.com/Pylons/pyramid/pull/3271,
+  https://github.com/Pylons/pyramid/issues/667, and
+  https://github.com/Pylons/pyramid/issues/2572

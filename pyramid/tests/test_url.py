@@ -1251,6 +1251,70 @@ class Test_external_static_url_integration(unittest.TestCase):
             request.route_url('acme', foo='bar'),
             'http://acme.org/bar')
 
+class Test_with_route_prefix(unittest.TestCase):
+
+    def setUp(self):
+        self.config = testing.setUp()
+
+    def tearDown(self):
+        testing.tearDown()
+
+    def _makeRequest(self, route):
+        from pyramid.request import Request
+        return Request.blank(route)
+
+    def test_old_route_is_preserved(self):
+        self.config.route_prefix = 'old_prefix'
+        with self.config.route_prefix_context('new_addon'):
+            assert 'new_addon' in self.config.route_prefix
+
+        assert 'old_prefix' == self.config.route_prefix
+
+    def test_route_prefix_none(self):
+        self.config.route_prefix = 'old_prefix'
+        with self.config.route_prefix_context(None):
+            assert 'old_prefix' == self.config.route_prefix
+
+        assert 'old_prefix' == self.config.route_prefix
+
+    def test_route_prefix_empty(self):
+        self.config.route_prefix = 'old_prefix'
+        with self.config.route_prefix_context(''):
+            assert 'old_prefix' == self.config.route_prefix
+
+        assert 'old_prefix' == self.config.route_prefix
+
+    def test_route_has_prefix(self):
+        with self.config.route_prefix_context('bar'):
+            self.config.add_route('acme', '/foo')
+        request = self._makeRequest('/')
+        self.assertEqual(
+            request.route_url('acme'),
+            'http://localhost/bar/foo',
+        )
+
+    def test_route_does_not_have_prefix(self):
+        with self.config.route_prefix_context('bar'):
+            pass
+
+        self.config.add_route('acme', '/foo')
+        request = self._makeRequest('/')
+        self.assertEqual(
+            request.route_url('acme'),
+            'http://localhost/foo',
+        )
+
+    def test_error_reset_prefix(self):
+        self.config.route_prefix = 'old_prefix'
+
+        try:
+            with self.config.route_prefix_context('new_prefix'):
+                raise RuntimeError
+        except RuntimeError:
+            pass
+
+        assert self.config.route_prefix == 'old_prefix'
+
 class DummyContext(object):
     def __init__(self, next=None):
         self.next = next

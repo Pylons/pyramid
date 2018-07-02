@@ -1,10 +1,10 @@
 from setuptools import setup
 
 requires = [
+    'deform',
     'pyramid',
-    'waitress',
     'pyramid_chameleon',
-    'deform'
+    'waitress',
 ]
 
 setup(name='tutorial',

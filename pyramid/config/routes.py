@@ -1,3 +1,4 @@
+import contextlib
 import warnings
 
 from pyramid.compat import urlparse
@@ -23,7 +24,6 @@ class RoutesConfiguratorMixin(object):
     def add_route(self,
                   name,
                   pattern=None,
-                  permission=None,
                   factory=None,
                   for_=None,
                   header=None,
@@ -198,9 +198,9 @@ class RoutesConfiguratorMixin(object):
 
         request_param
 
-          This value can be any string.  A view declaration with this
-          argument ensures that the associated route will only match
-          when the request has a key in the ``request.params``
+          This value can be any string or an iterable of strings.  A view
+          declaration with this argument ensures that the associated route will
+          only match when the request has a key in the ``request.params``
           dictionary (an HTTP ``GET`` or ``POST`` variable) that has a
           name which matches the supplied value.  If the value
           supplied as the argument has a ``=`` sign in it,
@@ -467,3 +467,53 @@ class RoutesConfiguratorMixin(object):
             self.registry.registerUtility(mapper, IRoutesMapper)
         return mapper
 
+    @contextlib.contextmanager
+    def route_prefix_context(self, route_prefix):
+        """ Return this configurator with the
+        :attr:`pyramid.config.Configurator.route_prefix` attribute mutated to
+        include the new ``route_prefix``.
+
+        When the context exits, the ``route_prefix`` is reset to the original.
+
+        Example Usage:
+
+        >>> config = Configurator()
+        >>> with config.route_prefix_context('foo'):
+        ...     config.add_route('bar', '/bar')
+
+        Arguments
+
+        route_prefix
+
+          A string suitable to be used as a route prefix, or ``None``.
+
+        .. versionadded:: 1.10
+        """
+
+        original_route_prefix = self.route_prefix
+
+        if route_prefix is None:
+            route_prefix = ''
+
+        old_route_prefix = self.route_prefix
+        if old_route_prefix is None:
+            old_route_prefix = ''
+
+        route_prefix = '{}/{}'.format(
+            old_route_prefix.rstrip('/'),
+            route_prefix.lstrip('/'),
+        )
+
+        route_prefix = route_prefix.strip('/')
+
+        if not route_prefix:
+            route_prefix = None
+
+        self.begin()
+        try:
+            self.route_prefix = route_prefix
+            yield
+
+        finally:
+            self.route_prefix = original_route_prefix
+            self.end()

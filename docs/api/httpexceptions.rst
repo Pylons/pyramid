@@ -51,6 +51,8 @@
 
   .. autoexception:: HTTPTemporaryRedirect
 
+  .. autoexception:: HTTPPermanentRedirect
+
   .. autoexception:: HTTPBadRequest
 
   .. autoexception:: HTTPUnauthorized

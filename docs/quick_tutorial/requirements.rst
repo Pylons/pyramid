@@ -79,15 +79,15 @@ will reside as we proceed through the tutorial:
 
 .. code-block:: text
 
-    `── ~
-        `── projects
-            `── quick_tutorial
-                │── env
-                `── step_one
-                    │── intro
-                    │   │── __init__.py
-                    │   `── app.py
-                    `── setup.py
+    ~
+    └── projects
+        └── quick_tutorial
+            ├── env
+            └── step_one
+                ├── intro
+                │   ├── __init__.py
+                │   └── app.py
+                └── setup.py
 
 For Linux, the commands to do so are as follows:
 
@@ -202,17 +202,3 @@ part is pretty easy. We'll also install a WSGI server, Waitress.
 Our Python virtual environment now has the Pyramid software available
 as well as the ``waitress`` package.
 
-You can optionally install some of the extra Python packages used in this
-tutorial.
-
-.. code-block:: bash
-
-    # Mac and Linux
-    $ $VENV/bin/pip install webtest pytest pytest-cov deform sqlalchemy \
-      pyramid_chameleon pyramid_debugtoolbar pyramid_jinja2 waitress \
-      pyramid_tm zope.sqlalchemy
-
-.. code-block:: doscon
-
-    # Windows
-    c:\> %VENV%\Scripts\pip install webtest pytest pytest-cov deform sqlalchemy pyramid_chameleon pyramid_debugtoolbar pyramid_jinja2 waitress pyramid_tm zope.sqlalchemy

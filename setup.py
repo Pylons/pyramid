@@ -11,48 +11,49 @@
 # FITNESS FOR A PARTICULAR PURPOSE
 #
 ##############################################################################
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
+
 
 def readfile(name):
     with open(name) as f:
         return f.read()
 
+
 README = readfile('README.rst')
 CHANGES = readfile('CHANGES.rst')
 
 install_requires = [
-    'setuptools',
-    'WebOb >= 1.7.0', # Response.has_body
-    'zope.interface >= 3.8.0',  # has zope.interface.registry
-    'zope.deprecation >= 3.5.0', # py3 compat
-    'venusian >= 1.0', # ``ignore``
-    'translationstring >= 0.4', # py3 compat
-    'PasteDeploy >= 1.5.0', # py3 compat
+    'hupper',
     'plaster',
     'plaster_pastedeploy',
-    'hupper',
-    ]
+    'setuptools',
+    'translationstring >= 0.4',  # py3 compat
+    'venusian >= 1.0',  # ``ignore``
+    'webob >= 1.8.2',  # cookies.make_cookie allows non-bytes samesite
+    'zope.deprecation >= 3.5.0',  # py3 compat
+    'zope.interface >= 3.8.0',  # has zope.interface.registry
+]
 
 tests_require = [
-    'WebTest >= 1.3.1', # py3 compat
-    'zope.component >= 4.0', # py3 compat
-    ]
+    'webtest >= 1.3.1',  # py3 compat
+    'zope.component >= 4.0',  # py3 compat
+]
 
 
 docs_extras = [
-    'Sphinx >= 1.3.5, != 1.7.3',
+    'Sphinx >= 1.7.4',
     'docutils',
-    'repoze.sphinx.autointerface',
-    'pylons_sphinx_latesturl',
     'pylons-sphinx-themes',
+    'pylons_sphinx_latesturl',
+    'repoze.sphinx.autointerface',
     'sphinxcontrib-autoprogram',
-    ]
+]
 
 testing_extras = tests_require + [
-    'nose',
     'coverage',
+    'nose',
     'virtualenv',  # for scaffolding tests
-    ]
+]
 
 setup(name='pyramid',
       version='1.10.dev0',
@@ -88,7 +89,7 @@ setup(name='pyramid',
           ':python_version<"3.2"': ['repoze.lru >= 0.4'],
           'testing': testing_extras,
           'docs': docs_extras,
-          },
+      },
       tests_require=tests_require,
       test_suite="pyramid.tests",
       entry_points="""\

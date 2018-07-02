@@ -71,9 +71,15 @@ Prepare new release branch
 
 - Change setup.py version to the release version number.
 
+- Make sure PyPI long description renders (requires ``readme_renderer``
+  installed into your Python)::
+
+  $ python setup.py check -r -s -m
+
 - Create a release tag.
 
-- Build and publish to PyPI::
+- Make sure your Python has ``setuptools-git``, ``twine``, and ``wheel``
+  installed and release to PyPI::
 
   $ python setup.py sdist bdist_wheel
   $ twine upload dist/pyramid-X.X-*
@@ -132,6 +138,8 @@ Marketing and communications
   <http://wiki.python.org/moin/WebFrameworks>`_.
 
 - Edit `https://en.wikipedia.org/wiki/Pylons_project <https://en.wikipedia.org/wiki/Pylons_project>`_.
+
+- Edit `https://en.wikipedia.org/wiki/Comparison_of_web_frameworks <https://en.wikipedia.org/wiki/Comparison_of_web_frameworks>`_.
 
 - Announce to Twitter.
 

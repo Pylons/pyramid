@@ -242,7 +242,7 @@ or adds the feature.  To build and review docs, use the following steps.
 Change Log
 ----------
 
-- Feature additions and bugfixes must be added to the ``CHANGES.txt``
+- Feature additions and bugfixes must be added to the ``CHANGES.rst``
   file in the prevailing style.  Changelog entries should be long and
   descriptive, not cryptic.  Other developers should be able to know
   what your changelog entry means.
