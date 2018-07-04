@@ -8,8 +8,8 @@ Invoking a Subrequest
 
 .. versionadded:: 1.4
 
-:app:`Pyramid` allows you to invoke a subrequest at any point during the
-processing of a request.  Invoking a subrequest allows you to obtain a
+:app:`Pyramid` allows you to invoke a :term:`subrequest` at any point during
+the processing of a request.  Invoking a subrequest allows you to obtain a
 :term:`response` object from a view callable within your :app:`Pyramid`
 application while you're executing a different view callable within the same
 application.

@@ -2233,28 +2233,44 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         self.assertRaises(ConfigurationError,
                           config.add_notfound_view, for_='foo')
 
-    def test_add_notfound_view_append_slash(self):
+    def test_add_notfound_view_append_slash_use_subrequest(self):
         from pyramid.response import Response
         from pyramid.renderers import null_renderer
         from zope.interface import implementedBy
         from pyramid.interfaces import IRequest
-        from pyramid.httpexceptions import HTTPFound, HTTPNotFound
+        from pyramid.httpexceptions import HTTPNotFound
+        from pyramid.view import UseSubrequest
         config = self._makeOne(autocommit=True)
         config.add_route('foo', '/foo/')
         def view(request): return Response('OK')
-        config.add_notfound_view(view, renderer=null_renderer,append_slash=True)
+        config.add_notfound_view(
+            view,
+            renderer=null_renderer,
+            append_slash=UseSubrequest,
+        )
         request = self._makeRequest(config)
         request.environ['PATH_INFO'] = '/foo'
         request.query_string = 'a=1&b=2'
         request.path = '/scriptname/foo'
+        def copy():
+            request.copied = True
+            return request
+        request.copy = copy
+        resp = Response()
+        def invoke_subrequest(req, **kw):
+            self.assertEqual(req.path_info, '/scriptname/foo/')
+            self.assertEqual(req.query_string, 'a=1&b=2')
+            self.assertEqual(kw, {'use_tweens':True})
+            return resp
+        request.invoke_subrequest = invoke_subrequest
         view = self._getViewCallable(config,
                                      exc_iface=implementedBy(HTTPNotFound),
                                      request_iface=IRequest)
         result = view(None, request)
-        self.assertTrue(isinstance(result, HTTPFound))
-        self.assertEqual(result.location, '/scriptname/foo/?a=1&b=2')
+        self.assertTrue(request.copied)
+        self.assertEqual(result, resp)
 
-    def test_add_notfound_view_append_slash_custom_response(self):
+    def test_add_notfound_view_append_slash_using_redirect(self):
         from pyramid.response import Response
         from pyramid.renderers import null_renderer
         from zope.interface import implementedBy

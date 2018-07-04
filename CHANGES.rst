@@ -4,6 +4,11 @@ unreleased
 Features
 --------
 
+- Allow the ``append_slash`` argument of ``config.add_notfound_view`` to be
+  the special value ``pyramid.view.UseSubrequest``, which will cause
+  Pyramid to do a subrequest rather than a redirect when a slash-appended
+  route is found associated with a view, rather than a redirect.
+
 - Add a ``_depth`` and ``_category`` arguments to all of the venusian
   decorators. The ``_category`` argument can be used to affect which actions
   are registered when performing a ``config.scan(..., category=...)`` with a

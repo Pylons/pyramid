@@ -64,7 +64,10 @@ from pyramid.static import static_view
 
 from pyramid.url import parse_url_overrides
 
-from pyramid.view import AppendSlashNotFoundViewFactory
+from pyramid.view import (
+    AppendSlashNotFoundViewFactory,
+    UseSubrequest,
+    )
 
 import pyramid.util
 from pyramid.util import (
@@ -1635,7 +1638,8 @@ class ViewsConfiguratorMixin(object):
         settings.update(view_options)
         if append_slash:
             view = self._derive_view(view, attr=attr, renderer=renderer)
-            if IResponse.implementedBy(append_slash):
+            if (append_slash is UseSubrequest or
+                IResponse.implementedBy(append_slash)):
                 view = AppendSlashNotFoundViewFactory(
                     view, redirect_class=append_slash,
                 )
