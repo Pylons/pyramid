@@ -916,7 +916,7 @@ if the argument supplied as ``append_slash`` is the special object
 instead of a redirect.  This makes it possible to successfully invoke a
 slash-appended URL without losing the HTTP verb, POST data, or any other
 information contained in the original request.  Instead of returning a redirect
-response when a slash-appended route is detected during the not-found
+response when a slash-appended route is detected during the notfound
 processing, Pyramid will call the view associated with the slash-appended route
 "under the hood" and will return whatever response is returned by that view.
 This has the potential downside that both URLs (the slash-appended and the
