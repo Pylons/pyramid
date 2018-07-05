@@ -908,12 +908,28 @@ exactly the same job:
        config.add_route('hasslash', 'has_slash/')
        config.scan()
 
-.. warning::
+You **should not** rely on the default mechanism to redirect ``POST`` requests.
+The redirect of the slash-appending :term:`Not Found View` will turn a ``POST``
+request into a ``GET``, losing any ``POST`` data in the original request.  But
+if the argument supplied as ``append_slash`` is the special object
+:attr:`~pyramid.views.UseSubrequest`, a :term:`subrequest` will be issued
+instead of a redirect.  This makes it possible to successfully invoke a
+slash-appended URL without losing the HTTP verb, POST data, or any other
+information contained in the original request.  Instead of returning a redirect
+response when a slash-appended route is detected during the notfound
+processing, Pyramid will call the view associated with the slash-appended route
+"under the hood" and will return whatever response is returned by that view.
+This has the potential downside that both URLs (the slash-appended and the
+non-slash-appended URLs) in an application will be "canonical" to clients; they
+will behave exactly the same, and the client will never be notified that the
+slash-appended URL is "better than" the non-slash-appended URL by virtue of a
+redirect.  It, however, has the upside that a POST request with a body can be
+handled successfully with an append-slash during notfound processing.
 
-   You **should not** rely on this mechanism to redirect ``POST`` requests.
-   The redirect  of the slash-appending :term:`Not Found View` will turn a
-   ``POST`` request into a ``GET``, losing any ``POST`` data in the original
-   request.
+.. versionchanged:: 1.10
+   Added the functionality to use a subrequest rather than a redirect by
+   using :class:`~pyramid.views.UseSubrequest` as an argument to
+   ``append_slash``.
 
 See :ref:`view_module` and :ref:`changing_the_notfound_view` for a more
 general description of how to configure a view and/or a :term:`Not Found View`.

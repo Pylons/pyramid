@@ -26,3 +26,8 @@
   .. autoclass:: exception_view_config
      :members:
 
+  .. attribute:: UseSubrequest
+
+     Object passed to :meth:`pyramid.config.Configurator.add_notfound_view` as
+     the value to ``append_slash`` if you wish to cause a :term:`subrequest`
+     rather than a redirect.

@@ -396,6 +396,8 @@ class TestNotFoundView(IntegrationBase, unittest.TestCase):
         self.assertTrue(b'OK foo2' in res.body)
         res = self.testapp.get('/baz', status=200)
         self.assertTrue(b'baz_notfound' in res.body)
+        res = self.testapp.get('/wiz', status=200) # uses subrequest
+        self.assertTrue(b'OK wiz2' in res.body)
 
 class TestForbiddenView(IntegrationBase, unittest.TestCase):
     package = 'pyramid.tests.pkgs.forbiddenview'

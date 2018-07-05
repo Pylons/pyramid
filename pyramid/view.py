@@ -38,6 +38,13 @@ from pyramid.util import hide_attrs
 
 _marker = object()
 
+class _UseSubrequest(object):
+    """ Object passed to :meth:`pyramid.config.Configurator.add_notfound_view`
+    as the value to ``append_slash`` if you wish to cause a subrequest
+    rather than a redirect """
+
+UseSubrequest = _UseSubrequest() # singleton
+
 def render_view_to_response(context, request, name='', secure=True):
     """ Call the :term:`view callable` configured with a :term:`view
     configuration` that matches the :term:`view name` ``name``
@@ -289,8 +296,6 @@ class AppendSlashNotFoundViewFactory(object):
     view callable calling convention of ``(context, request)``
     (``context`` will be the exception object).
 
-    .. deprecated:: 1.3
-
     """
     def __init__(self, notfound_view=None, redirect_class=HTTPFound):
         if notfound_view is None:
@@ -306,10 +311,21 @@ class AppendSlashNotFoundViewFactory(object):
             slashpath = path + '/'
             for route in mapper.get_routes():
                 if route.match(slashpath) is not None:
-                    qs = request.query_string
-                    if qs:
-                        qs = '?' + qs
-                    return self.redirect_class(location=request.path + '/' + qs)
+                    if self.redirect_class is UseSubrequest:
+                        subreq = request.copy()
+                        subreq.path_info = request.path + '/'
+                        return request.invoke_subrequest(
+                            subreq,
+                            use_tweens=True
+                        )
+                    else:
+                        qs = request.query_string
+                        if qs:
+                            qs = '?' + qs
+                        return self.redirect_class(
+                            location=request.path + '/' + qs
+                        )
+
         return self.notfound_view(context, request)
 
 append_slash_notfound_view = AppendSlashNotFoundViewFactory()
@@ -396,10 +412,31 @@ class notfound_view_config(object):
     being used, :class:`~pyramid.httpexceptions.HTTPMovedPermanently will
     be used` for the redirect response if a slash-appended route is found.
 
+    If the argument supplied as ``append_slash`` is the special object
+    :attr:`~pyramid.views.UseSubrequest`, a :term:`subrequest` will be issued
+    instead of a redirect.  This makes it possible to successfully invoke a
+    slash-appended URL without losing the HTTP verb, POST data, or any other
+    information contained in the original request.  Instead of returning a
+    redirect response when a slash-appended route is detected during the
+    notfound processing, Pyramid will call the view associated with the
+    slash-appended route "under the hood" and will return whatever response is
+    returned by that view.  This has the potential downside that both URLs (the
+    slash-appended and the non-slash-appended URLs) in an application will be
+    "canonical" to clients; they will behave exactly the same, and the client
+    will never be notified that the slash-appended URL is "better than" the
+    non-slash-appended URL by virtue of a redirect.  It, however, has the
+    upside that a POST request with a body can be handled successfully
+    with an append-slash during notfound processing.
+
     See :ref:`changing_the_notfound_view` for detailed usage information.
 
     .. versionchanged:: 1.9.1
        Added the ``_depth`` and ``_category`` arguments.
+
+    .. versionchanged:: 1.10
+       Added the functionality to use a subrequest rather than a redirect by
+       using :class:`~pyramid.views.UseSubrequest` as an argument to
+       ``append_slash``.
 
     """
 
