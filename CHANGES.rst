@@ -37,6 +37,10 @@ Features
   ``pyramid.session.UnencryptedCookieSessionFactoryConfig``.
   See https://github.com/Pylons/pyramid/pull/3300
 
+- Modify ``pyramid.authentication.AuthTktAuthenticationPolicy`` and
+  ``pyramid.csrf.CookieCSRFStoragePolicy`` to support the SameSite option on
+  cookies.  See https://github.com/Pylons/pyramid/pull/3319
+
 - Added new ``pyramid.httpexceptions.HTTPPermanentRedirect``
   exception/response object for a HTTP 308 redirect.
   See https://github.com/Pylons/pyramid/pull/3302

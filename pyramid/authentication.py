@@ -565,8 +565,16 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
         steps.  The output from debugging is useful for reporting to maillist
         or IRC channels when asking for support.
 
+    ``samesite``
+
+        Default: ``'Lax'``.  The 'samesite' option of the session cookie. Set
+        the value to ``None`` to turn off the samesite option.
+
+        This option is available as of :app:`Pyramid` 1.10.
+
     Objects of this class implement the interface described by
     :class:`pyramid.interfaces.IAuthenticationPolicy`.
+
     """
 
     def __init__(self,
@@ -585,6 +593,7 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
                  hashalg='sha512',
                  parent_domain=False,
                  domain=None,
+                 samesite='Lax',
                  ):
         self.cookie = AuthTktCookieHelper(
             secret,
@@ -600,6 +609,7 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
             hashalg=hashalg,
             parent_domain=parent_domain,
             domain=domain,
+            samesite=samesite,
             )
         self.callback = callback
         self.debug = debug
@@ -792,10 +802,22 @@ class AuthTktCookieHelper(object):
         binary_type: ('b64str', lambda x: b64encode(x)),
         }
 
-    def __init__(self, secret, cookie_name='auth_tkt', secure=False,
-                 include_ip=False, timeout=None, reissue_time=None,
-                 max_age=None, http_only=False, path="/", wild_domain=True,
-                 hashalg='md5', parent_domain=False, domain=None):
+    def __init__(self,
+                 secret,
+                 cookie_name='auth_tkt',
+                 secure=False,
+                 include_ip=False,
+                 timeout=None,
+                 reissue_time=None,
+                 max_age=None,
+                 http_only=False,
+                 path="/",
+                 wild_domain=True,
+                 hashalg='md5',
+                 parent_domain=False,
+                 domain=None,
+                 samesite='Lax',
+                 ):
 
         serializer = _SimpleSerializer()
 
@@ -805,7 +827,8 @@ class AuthTktCookieHelper(object):
             max_age=max_age,
             httponly=http_only,
             path=path,
-            serializer=serializer
+            serializer=serializer,
+            samesite=samesite,
         )
 
         self.secret = secret
