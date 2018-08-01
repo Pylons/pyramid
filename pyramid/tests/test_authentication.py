@@ -1191,7 +1191,7 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         request = self._makeRequest()
         result = helper.remember(request, 'userid')
         self.assertEqual(len(result), 3)
-`
+
         self.assertEqual(result[0][0], 'Set-Cookie')
         cookieval = result[0][1]
         self.assertTrue('SameSite=Strict' in
