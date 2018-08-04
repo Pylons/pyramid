@@ -226,6 +226,33 @@ class TestPShellCommand(unittest.TestCase):
         self.assertTrue(self.bootstrap.closer.called)
         self.assertTrue(shell.help)
 
+    def test_command_setup_generator(self):
+        command = self._makeOne()
+        did_resume_after_yield = {}
+        def setup(env):
+            env['a'] = 1
+            env['root'] = 'root override'
+            env['none'] = None
+            request = env['request']
+            yield
+            did_resume_after_yield['result'] = True
+            self.assertEqual(request.dummy_attr, 1)
+        self.loader.settings = {'pshell': {'setup': setup}}
+        shell = dummy.DummyShell()
+        command.run(shell)
+        self.assertEqual(self.bootstrap.a[0], '/foo/bar/myapp.ini#myapp')
+        self.assertEqual(shell.env, {
+            'app':self.bootstrap.app, 'root':'root override',
+            'registry':self.bootstrap.registry,
+            'request':self.bootstrap.request,
+            'root_factory':self.bootstrap.root_factory,
+            'a':1,
+            'none': None,
+        })
+        self.assertTrue(did_resume_after_yield['result'])
+        self.assertTrue(self.bootstrap.closer.called)
+        self.assertTrue(shell.help)
+
     def test_command_default_shell_option(self):
         command = self._makeOne()
         ipshell = dummy.DummyShell()
@@ -259,7 +286,7 @@ class TestPShellCommand(unittest.TestCase):
             'registry':self.bootstrap.registry,
             'request':self.bootstrap.request,
             'root_factory':self.bootstrap.root_factory,
-            'a':1, 'm':model,
+            'a':1, 'm':'model override',
         })
         self.assertTrue(self.bootstrap.closer.called)
         self.assertTrue(shell.help)

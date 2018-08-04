@@ -1,4 +1,5 @@
 from code import interact
+from contextlib import contextmanager
 import argparse
 import os
 import sys
@@ -7,6 +8,7 @@ import pkg_resources
 
 from pyramid.compat import exec_
 from pyramid.util import DottedNameResolver
+from pyramid.util import make_contextmanager
 from pyramid.paster import bootstrap
 
 from pyramid.settings import aslist
@@ -85,6 +87,7 @@ class PShellCommand(object):
     preferred_shells = []
     setup = None
     pystartup = os.environ.get('PYTHONSTARTUP')
+    resolver = DottedNameResolver(None)
 
     def __init__(self, argv, quiet=False):
         self.quiet = quiet
@@ -92,7 +95,6 @@ class PShellCommand(object):
 
     def pshell_file_config(self, loader, defaults):
         settings = loader.get_settings('pshell', defaults)
-        resolver = DottedNameResolver(None)
         self.loaded_objects = {}
         self.object_help = {}
         self.setup = None
@@ -102,7 +104,7 @@ class PShellCommand(object):
             elif k == 'default_shell':
                 self.preferred_shells = [x.lower() for x in aslist(v)]
             else:
-                self.loaded_objects[k] = resolver.maybe_resolve(v)
+                self.loaded_objects[k] = self.resolver.maybe_resolve(v)
                 self.object_help[k] = v
 
     def out(self, msg): # pragma: no cover
@@ -115,18 +117,36 @@ class PShellCommand(object):
         if not self.args.config_uri:
             self.out('Requires a config file argument')
             return 2
+
         config_uri = self.args.config_uri
         config_vars = parse_vars(self.args.config_vars)
         loader = self.get_config_loader(config_uri)
         loader.setup_logging(config_vars)
         self.pshell_file_config(loader, config_vars)
 
-        env = self.bootstrap(config_uri, options=config_vars)
+        self.env = self.bootstrap(config_uri, options=config_vars)
 
         # remove the closer from the env
-        self.closer = env.pop('closer')
+        self.closer = self.env.pop('closer')
 
+        try:
+            if shell is None:
+                try:
+                    shell = self.make_shell()
+                except ValueError as e:
+                    self.out(str(e))
+                    return 1
+
+            with self.setup_env():
+                shell(self.env, self.help)
+
+        finally:
+            self.closer()
+
+    @contextmanager
+    def setup_env(self):
         # setup help text for default environment
+        env = self.env
         env_help = dict(env)
         env_help['app'] = 'The WSGI application.'
         env_help['root'] = 'Root of the default resource tree.'
@@ -134,27 +154,6 @@ class PShellCommand(object):
         env_help['request'] = 'Active request object.'
         env_help['root_factory'] = (
             'Default root factory used to create `root`.')
-
-        # override use_script with command-line options
-        if self.args.setup:
-            self.setup = self.args.setup
-
-        if self.setup:
-            # store the env before muddling it with the script
-            orig_env = env.copy()
-
-            # call the setup callable
-            resolver = DottedNameResolver(None)
-            setup = resolver.maybe_resolve(self.setup)
-            setup(env)
-
-            # remove any objects from default help that were overidden
-            for k, v in env.items():
-                if k not in orig_env or env[k] != orig_env[k]:
-                    if getattr(v, '__doc__', False):
-                        env_help[k] = v.__doc__.replace("\n", " ")
-                    else:
-                        env_help[k] = v
 
         # load the pshell section of the ini file
         env.update(self.loaded_objects)
@@ -164,36 +163,47 @@ class PShellCommand(object):
             if k in env_help:
                 del env_help[k]
 
-        # generate help text
-        help = ''
-        if env_help:
-            help += 'Environment:'
-            for var in sorted(env_help.keys()):
-                help += '\n  %-12s %s' % (var, env_help[var])
+        # override use_script with command-line options
+        if self.args.setup:
+            self.setup = self.args.setup
 
-        if self.object_help:
-            help += '\n\nCustom Variables:'
-            for var in sorted(self.object_help.keys()):
-                help += '\n  %-12s %s' % (var, self.object_help[var])
+        if self.setup:
+            # call the setup callable
+            self.setup = self.resolver.maybe_resolve(self.setup)
 
-        if shell is None:
-            try:
-                shell = self.make_shell()
-            except ValueError as e:
-                self.out(str(e))
-                self.closer()
-                return 1
+        # store the env before muddling it with the script
+        orig_env = env.copy()
+        setup_manager = make_contextmanager(self.setup)
+        with setup_manager(env):
+            # remove any objects from default help that were overidden
+            for k, v in env.items():
+                if k not in orig_env or v != orig_env[k]:
+                    if getattr(v, '__doc__', False):
+                        env_help[k] = v.__doc__.replace("\n", " ")
+                    else:
+                        env_help[k] = v
+            del orig_env
 
-        if self.pystartup and os.path.isfile(self.pystartup):
-            with open(self.pystartup, 'rb') as fp:
-                exec_(fp.read().decode('utf-8'), env)
-            if '__builtins__' in env:
-                del env['__builtins__']
+            # generate help text
+            help = ''
+            if env_help:
+                help += 'Environment:'
+                for var in sorted(env_help.keys()):
+                    help += '\n  %-12s %s' % (var, env_help[var])
 
-        try:
-            shell(env, help)
-        finally:
-            self.closer()
+            if self.object_help:
+                help += '\n\nCustom Variables:'
+                for var in sorted(self.object_help.keys()):
+                    help += '\n  %-12s %s' % (var, self.object_help[var])
+
+            if self.pystartup and os.path.isfile(self.pystartup):
+                with open(self.pystartup, 'rb') as fp:
+                    exec_(fp.read().decode('utf-8'), env)
+                if '__builtins__' in env:
+                    del env['__builtins__']
+
+            self.help = help.strip()
+            yield
 
     def show_shells(self):
         shells = self.find_all_shells()

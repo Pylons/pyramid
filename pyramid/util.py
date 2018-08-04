@@ -1,4 +1,4 @@
-import contextlib
+from contextlib import contextmanager
 import functools
 try:
     # py2.7.7+ and py3.3+ have native comparison support
@@ -613,7 +613,7 @@ def get_callable_name(name):
         )
         raise ConfigurationError(msg % name)
 
-@contextlib.contextmanager
+@contextmanager
 def hide_attrs(obj, *attrs):
     """
     Temporarily delete object attrs and restore afterward.
@@ -648,3 +648,17 @@ def is_same_domain(host, pattern):
     return (pattern[0] == "." and
             (host.endswith(pattern) or host == pattern[1:]) or
             pattern == host)
+
+
+def make_contextmanager(fn):
+    if inspect.isgeneratorfunction(fn):
+        return contextmanager(fn)
+
+    if fn is None:
+        fn = lambda *a, **kw: None
+
+    @contextmanager
+    @functools.wraps(fn)
+    def wrapper(*a, **kw):
+        yield fn(*a, **kw)
+    return wrapper

@@ -889,3 +889,41 @@ class Test_is_same_domain(unittest.TestCase):
         self.assertTrue(self._callFUT("example.com:8080", "example.com:8080"))
         self.assertFalse(self._callFUT("example.com:8080", "example.com"))
         self.assertFalse(self._callFUT("example.com", "example.com:8080"))
+
+
+class Test_make_contextmanager(unittest.TestCase):
+    def _callFUT(self, *args, **kw):
+        from pyramid.util import make_contextmanager
+        return make_contextmanager(*args, **kw)
+
+    def test_with_None(self):
+        mgr = self._callFUT(None)
+        with mgr() as ctx:
+            self.assertIsNone(ctx)
+
+    def test_with_generator(self):
+        def mygen(ctx):
+            yield ctx
+        mgr = self._callFUT(mygen)
+        with mgr('a') as ctx:
+            self.assertEqual(ctx, 'a')
+
+    def test_with_multiple_yield_generator(self):
+        def mygen():
+            yield 'a'
+            yield 'b'
+        mgr = self._callFUT(mygen)
+        try:
+            with mgr() as ctx:
+                self.assertEqual(ctx, 'a')
+        except RuntimeError:
+            pass
+        else:  # pragma: no cover
+            raise AssertionError('expected raise from multiple yields')
+
+    def test_with_regular_fn(self):
+        def mygen():
+            return 'a'
+        mgr = self._callFUT(mygen)
+        with mgr() as ctx:
+            self.assertEqual(ctx, 'a')

@@ -41,6 +41,14 @@ Features
   exception/response object for a HTTP 308 redirect.
   See https://github.com/Pylons/pyramid/pull/3302
 
+- Within ``pshell``, allow the user-defined ``setup`` function to be a
+  generator, in which case it may wrap the command's lifecycle.
+  See https://github.com/Pylons/pyramid/pull/3318
+
+- Within ``pshell``, variables defined by the ``[pshell]`` settings are
+  available within the user-defined ``setup`` function.
+  See https://github.com/Pylons/pyramid/pull/3318
+
 Bug Fixes
 ---------
 
@@ -75,6 +83,10 @@ Backward Incompatibilities
   ``pyramid.session.SignedCookieSessionFactory``, and
   ``pyramid.session.UnencryptedCookieSessionFactoryConfig``.
   See https://github.com/Pylons/pyramid/pull/3300
+
+- Variables defined in the ``[pshell]`` section of the settings will no
+  longer override those set by the ``setup`` function.
+  See https://github.com/Pylons/pyramid/pull/3318
 
 Documentation Changes
 ---------------------
