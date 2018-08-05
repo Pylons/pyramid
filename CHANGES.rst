@@ -30,8 +30,8 @@ Features
   route_prefix for ``include`` and ``add_route`` calls inside the context.
   See https://github.com/Pylons/pyramid/pull/3279
 
-- Modify the builtin session implementations to support SameSite options on
-  cookies and set the default to ``'Lax'``. This affects
+- Modify the builtin session implementations to support ``SameSite`` options
+  on cookies and set the default to ``'Lax'``. This affects
   ``pyramid.session.BaseCookieSessionFactory``,
   ``pyramid.session.SignedCookieSessionFactory``, and
   ``pyramid.session.UnencryptedCookieSessionFactoryConfig``.
