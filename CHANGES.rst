@@ -91,6 +91,11 @@ Backward Incompatibilities
 Documentation Changes
 ---------------------
 
+- Add support for alembic to the pyramid-cookiecutter-alchemy cookiecutter
+  and update the wiki2 tutorial to explain how it works.
+  See https://github.com/Pylons/pyramid/pull/3307 and
+  https://github.com/Pylons/pyramid-cookiecutter-alchemy/pull/7
+
 - Bump Sphinx to >= 1.7.4 in setup.py to support ``emphasize-lines`` in PDFs
   and to pave the way for xelatex support.  See
   https://github.com/Pylons/pyramid/pull/3271,
