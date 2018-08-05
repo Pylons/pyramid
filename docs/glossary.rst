@@ -1206,3 +1206,6 @@ Glossary
 
    context manager
       A context manager is an object that defines the runtime context to be established when executing a :ref:`with <python:with>` statement in Python. The context manager handles the entry into, and the exit from, the desired runtime context for the execution of the block of code. Context managers are normally invoked using the ``with`` statement, but can also be used by directly invoking their methods. Pyramid adds context managers for :class:`pyramid.config.Configurator`, :meth:`pyramid.interfaces.IRouter.request_context`, :func:`pyramid.paster.bootstrap`, :func:`pyramid.scripting.prepare`, and :func:`pyramid.testing.testConfig`. See also the Python documentation for :ref:`With Statement Context Managers <python:context-managers>` and :pep:`343`.
+
+   Alembic
+      `Alembic <http://alembic.zzzcomputing.com/en/latest/>`_ is a lightweight database migration tool for usage with the SQLAlchemy Database Toolkit for Python.

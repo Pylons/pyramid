@@ -33,7 +33,7 @@ Open ``tutorial/setup.py`` and edit it to look like the following:
 
 .. literalinclude:: src/models/setup.py
    :linenos:
-   :emphasize-lines: 12
+   :emphasize-lines: 13
    :language: python
 
 Only the highlighted line needs to be added.
@@ -70,7 +70,7 @@ like the following.
 
 .. code-block:: text
 
-    Successfully installed bcrypt-3.1.2 cffi-1.9.1 pycparser-2.17 tutorial
+    Successfully installed bcrypt-3.1.4 cffi-1.11.5 pycparser-2.18 tutorial
 
 
 Remove ``mymodel.py``
@@ -158,56 +158,76 @@ the following:
 Here we align our imports with the names of the models, ``Page`` and ``User``.
 
 
-Edit ``scripts/initializedb.py``
-================================
+.. _wiki2_migrate_database_alembic:
 
-We haven't looked at the details of this file yet, but within the ``scripts``
-directory of your ``tutorial`` package is a file named ``initializedb.py``.
-Code in this file is executed whenever we run the ``initialize_tutorial_db``
-command, as we did in the installation step of this tutorial.
+Migrate the database with Alembic
+=================================
 
-.. note::
+Now that we have written our models, we need to modify the database schema to reflect the changes to our code. Let's generate a new revision, then upgrade the database to the latest revision (head).
 
-    The command is named ``initialize_tutorial_db`` because of the mapping defined in the ``[console_scripts]`` entry point of our project's ``setup.py`` file.
-
-Since we've changed our model, we need to make changes to our
-``initializedb.py`` script.  In particular, we'll replace our import of
-``MyModel`` with those of ``User`` and ``Page``. We'll also change the very end
-of the script to create two ``User`` objects (``basic`` and ``editor``) as well
-as a ``Page``, rather than a ``MyModel``, and add them to our ``dbsession``.
-
-Open ``tutorial/scripts/initializedb.py`` and edit it to look like the
-following:
-
-.. literalinclude:: src/models/tutorial/scripts/initializedb.py
-   :linenos:
-   :language: python
-   :emphasize-lines: 18,44-57
-
-Only the highlighted lines need to be changed.
-
-
-Installing the project and re-initializing the database
-=======================================================
-
-Because our model has changed, and in order to reinitialize the database, we
-need to rerun the ``initialize_tutorial_db`` command to pick up the changes
-we've made to both the models.py file and to the initializedb.py file. See
-:ref:`initialize_db_wiki2` for instructions.
-
-Success will look something like this:
+On UNIX:
 
 .. code-block:: bash
 
-    2016-12-20 02:51:11,195 INFO  [sqlalchemy.engine.base.Engine:1235][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
-    2016-12-20 02:51:11,195 INFO  [sqlalchemy.engine.base.Engine:1236][MainThread] ()
-    2016-12-20 02:51:11,195 INFO  [sqlalchemy.engine.base.Engine:1235][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
-    2016-12-20 02:51:11,195 INFO  [sqlalchemy.engine.base.Engine:1236][MainThread] ()
-    2016-12-20 02:51:11,196 INFO  [sqlalchemy.engine.base.Engine:1140][MainThread] PRAGMA table_info("pages")
-    2016-12-20 02:51:11,196 INFO  [sqlalchemy.engine.base.Engine:1143][MainThread] ()
-    2016-12-20 02:51:11,196 INFO  [sqlalchemy.engine.base.Engine:1140][MainThread] PRAGMA table_info("users")
-    2016-12-20 02:51:11,197 INFO  [sqlalchemy.engine.base.Engine:1143][MainThread] ()
-    2016-12-20 02:51:11,197 INFO  [sqlalchemy.engine.base.Engine:1140][MainThread]
+    $ $VENV/bin/alembic -c development.ini revision --autogenerate \
+          -m "use new models Page and User"
+    $ $VENV/bin/alembic -c development.ini upgrade head
+
+On Windows:
+
+.. code-block:: doscon
+
+    c:\tutorial> %VENV%\Scripts\alembic -c development.ini revision \
+         --autogenerate -m "use new models Page and User"
+    c:\tutorial> %VENV%\Scripts\alembic -c development.ini upgrade head
+
+Success executing these commands will generate output similar to the following.
+
+.. code-block:: text
+
+    2018-06-29 01:28:42,407 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
+    2018-06-29 01:28:42,407 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
+    2018-06-29 01:28:42,408 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
+    2018-06-29 01:28:42,408 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
+    2018-06-29 01:28:42,409 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA table_info("alembic_version")
+    2018-06-29 01:28:42,409 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-29 01:28:42,410 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] SELECT alembic_version.version_num
+    FROM alembic_version
+    2018-06-29 01:28:42,410 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-29 01:28:42,411 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] SELECT name FROM sqlite_master WHERE type='table' ORDER BY name
+    2018-06-29 01:28:42,412 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-29 01:28:42,413 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA table_info("models")
+    2018-06-29 01:28:42,413 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-29 01:28:42,414 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = 'models' AND type = 'table'
+    2018-06-29 01:28:42,414 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-29 01:28:42,414 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA foreign_key_list("models")
+    2018-06-29 01:28:42,414 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-29 01:28:42,414 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = 'models' AND type = 'table'
+    2018-06-29 01:28:42,415 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-29 01:28:42,416 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA index_list("models")
+    2018-06-29 01:28:42,416 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-29 01:28:42,416 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA index_info("my_index")
+    2018-06-29 01:28:42,416 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-29 01:28:42,417 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA index_list("models")
+    2018-06-29 01:28:42,417 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-29 01:28:42,417 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA index_info("my_index")
+    2018-06-29 01:28:42,417 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-29 01:28:42,417 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = 'models' AND type = 'table'
+    2018-06-29 01:28:42,417 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+      Generating /<somepath>/tutorial/tutorial/alembic/versions/20180629_23e9f8eb6c28.py ... done
+
+.. code-block:: text
+
+    2018-06-29 01:29:37,957 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
+    2018-06-29 01:29:37,958 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
+    2018-06-29 01:29:37,958 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
+    2018-06-29 01:29:37,958 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
+    2018-06-29 01:29:37,960 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA table_info("alembic_version")
+    2018-06-29 01:29:37,960 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-29 01:29:37,960 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] SELECT alembic_version.version_num
+    FROM alembic_version
+    2018-06-29 01:29:37,960 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-29 01:29:37,963 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread]
     CREATE TABLE users (
             id INTEGER NOT NULL,
             name TEXT NOT NULL,
@@ -218,30 +238,106 @@ Success will look something like this:
     )
 
 
-    2016-12-20 02:51:11,197 INFO  [sqlalchemy.engine.base.Engine:1143][MainThread] ()
-    2016-12-20 02:51:11,198 INFO  [sqlalchemy.engine.base.Engine:719][MainThread] COMMIT
-    2016-12-20 02:51:11,199 INFO  [sqlalchemy.engine.base.Engine:1140][MainThread]
+    2018-06-29 01:29:37,963 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-29 01:29:37,966 INFO  [sqlalchemy.engine.base.Engine:722][MainThread] COMMIT
+    2018-06-29 01:29:37,968 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread]
     CREATE TABLE pages (
             id INTEGER NOT NULL,
             name TEXT NOT NULL,
             data TEXT NOT NULL,
             creator_id INTEGER NOT NULL,
             CONSTRAINT pk_pages PRIMARY KEY (id),
-            CONSTRAINT uq_pages_name UNIQUE (name),
-            CONSTRAINT fk_pages_creator_id_users FOREIGN KEY(creator_id) REFERENCES users (id)
+            CONSTRAINT fk_pages_creator_id_users FOREIGN KEY(creator_id) REFERENCES users (id),
+            CONSTRAINT uq_pages_name UNIQUE (name)
     )
 
 
-    2016-12-20 02:51:11,199 INFO  [sqlalchemy.engine.base.Engine:1143][MainThread] ()
-    2016-12-20 02:51:11,200 INFO  [sqlalchemy.engine.base.Engine:719][MainThread] COMMIT
-    2016-12-20 02:51:11,755 INFO  [sqlalchemy.engine.base.Engine:679][MainThread] BEGIN (implicit)
-    2016-12-20 02:51:11,755 INFO  [sqlalchemy.engine.base.Engine:1140][MainThread] INSERT INTO users (name, role, password_hash) VALUES (?, ?, ?)
-    2016-12-20 02:51:11,755 INFO  [sqlalchemy.engine.base.Engine:1143][MainThread] ('editor', 'editor', '$2b$12$ds7h2Zb7.l6TEFup5h8f4ekA9GRfEpE1yQGDRvT9PConw73kKuupG')
-    2016-12-20 02:51:11,756 INFO  [sqlalchemy.engine.base.Engine:1140][MainThread] INSERT INTO users (name, role, password_hash) VALUES (?, ?, ?)
-    2016-12-20 02:51:11,756 INFO  [sqlalchemy.engine.base.Engine:1143][MainThread] ('basic', 'basic', '$2b$12$KgruXP5Vv7rikr6dGB3TF.flGXYpiE0Li9K583EVomjY.SYmQOsyi')
-    2016-12-20 02:51:11,757 INFO  [sqlalchemy.engine.base.Engine:1140][MainThread] INSERT INTO pages (name, data, creator_id) VALUES (?, ?, ?)
-    2016-12-20 02:51:11,757 INFO  [sqlalchemy.engine.base.Engine:1143][MainThread] ('FrontPage', 'This is the front page', 1)
-    2016-12-20 02:51:11,757 INFO  [sqlalchemy.engine.base.Engine:719][MainThread] COMMIT
+    2018-06-29 01:29:37,968 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-29 01:29:37,969 INFO  [sqlalchemy.engine.base.Engine:722][MainThread] COMMIT
+    2018-06-29 01:29:37,969 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread]
+    DROP INDEX my_index
+    2018-06-29 01:29:37,969 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-29 01:29:37,970 INFO  [sqlalchemy.engine.base.Engine:722][MainThread] COMMIT
+    2018-06-29 01:29:37,970 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread]
+    DROP TABLE models
+    2018-06-29 01:29:37,970 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-29 01:29:37,971 INFO  [sqlalchemy.engine.base.Engine:722][MainThread] COMMIT
+    2018-06-29 01:29:37,972 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] UPDATE alembic_version SET version_num='23e9f8eb6c28' WHERE alembic_version.version_num = 'b6b22ae3e628'
+    2018-06-29 01:29:37,972 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-29 01:29:37,972 INFO  [sqlalchemy.engine.base.Engine:722][MainThread] COMMIT
+
+
+.. _wiki2_alembic_overview:
+
+Alembic overview
+----------------
+
+Let's briefly discuss our configuration for Alembic.
+
+In the alchemy cookiecutter's ``development.ini`` file, the setting for ``script_location`` configures Alembic to look for the migration script in the directory ``tutorial/alembic``.
+By default Alembic stores the migration files one level deeper in ``tutorial/alembic/versions``.
+These files are generated by Alembic, then executed when we run upgrade or downgrade migrations.
+The setting ``file_template`` provides the format for each migration's file name.
+We've configured the ``file_template`` setting to make it somewhat easy to find migrations by file name.
+
+At this point in this tutorial, we have two migration files.
+Examine them to see what Alembic will do when you upgrade or downgrade the database to a specific revision.
+Notice the revision identifiers and how they relate to one another in a chained sequence.
+
+.. seealso:: For further information, see the `Alembic documentation <http://alembic.zzzcomputing.com/en/latest/>`_.
+
+
+Edit ``scripts/initialize_db.py``
+=================================
+
+We haven't looked at the details of this file yet, but within the ``scripts``
+directory of your ``tutorial`` package is a file named ``initialize_db.py``.
+Code in this file is executed whenever we run the ``initialize_tutorial_db``
+command, as we did in the installation step of this tutorial.
+
+.. note::
+
+    The command is named ``initialize_tutorial_db`` because of the mapping defined in the ``[console_scripts]`` entry point of our project's ``setup.py`` file.
+
+Since we've changed our model, we need to make changes to our
+``initialize_db.py`` script.  In particular, we'll replace our import of
+``MyModel`` with those of ``User`` and ``Page``. We'll also change the the script to create two ``User`` objects (``basic`` and ``editor``) as well
+as a ``Page``, rather than a ``MyModel``, and add them to our ``dbsession``.
+
+Open ``tutorial/scripts/initialize_db.py`` and edit it to look like the
+following:
+
+.. literalinclude:: src/models/tutorial/scripts/initialize_db.py
+   :linenos:
+   :language: python
+   :emphasize-lines: 11-24
+
+Only the highlighted lines need to be changed.
+
+
+Populating the database
+=======================
+
+Because our model has changed, and to repopulate the database, we
+need to rerun the ``initialize_tutorial_db`` command to pick up the changes
+we've made to the initialize_db.py file. See :ref:`initialize_db_wiki2` for instructions.
+
+Success will look something like this:
+
+.. code-block:: text
+
+    2018-06-29 01:30:39,326 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
+    2018-06-29 01:30:39,326 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
+    2018-06-29 01:30:39,327 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
+    2018-06-29 01:30:39,327 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
+    2018-06-29 01:30:39,328 INFO  [sqlalchemy.engine.base.Engine:682][MainThread] BEGIN (implicit)
+    2018-06-29 01:30:39,329 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] INSERT INTO users (name, role, password_hash) VALUES (?, ?, ?)
+    2018-06-29 01:30:39,329 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ('editor', 'editor', '$2b$12$PlaJSN7goVbyx8OFs8yAju9n5gHGdI6PZ2QRJGM2jDCiEU4ItUNxy')
+    2018-06-29 01:30:39,330 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] INSERT INTO users (name, role, password_hash) VALUES (?, ?, ?)
+    2018-06-29 01:30:39,330 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ('basic', 'basic', '$2b$12$MvXdM8jlkbjEyPZ6uXzRg.yatZZK8jCwfPaM7kFkmVJiJjRoCCvmW')
+    2018-06-29 01:30:39,331 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] INSERT INTO pages (name, data, creator_id) VALUES (?, ?, ?)
+    2018-06-29 01:30:39,331 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ('FrontPage', 'This is the front page', 1)
+    2018-06-29 01:30:39,332 INFO  [sqlalchemy.engine.base.Engine:722][MainThread] COMMIT
 
 
 View the application in a browser
@@ -250,11 +346,11 @@ View the application in a browser
 We can't.  At this point, our system is in a "non-runnable" state; we'll need
 to change view-related files in the next chapter to be able to start the
 application successfully.  If you try to start the application (see
-:ref:`wiki2-start-the-application`), you'll wind up with a Python traceback on
+:ref:`wiki2-start-the-application`) and visit http://localhost:6543, you'll wind up with a Python traceback on
 your console that ends with this exception:
 
 .. code-block:: text
 
-   ImportError: cannot import name MyModel
+   AttributeError: module 'tutorial.models' has no attribute 'MyModel'
 
 This will also happen if you attempt to run the tests.

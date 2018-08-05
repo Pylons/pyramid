@@ -122,15 +122,15 @@ Remember our goals:
 * Only allow ``editor`` users and the page creator (possibly a ``basic`` user)
   to edit pages.
 
-Open the file ``tutorial/views/default.py`` and fix the following imports:
+Open the file ``tutorial/views/default.py`` and fix the following import:
 
 .. literalinclude:: src/authentication/tutorial/views/default.py
-   :lines: 5-13
+   :lines: 5-9
    :lineno-match:
-   :emphasize-lines: 2,9
+   :emphasize-lines: 2
    :language: python
 
-Change the two highlighted lines.
+Change the highlighted line.
 
 In the same file, now edit the ``edit_page`` view function:
 

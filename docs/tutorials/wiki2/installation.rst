@@ -198,6 +198,143 @@ Testing requirements are defined in our project's ``setup.py`` file, in the ``te
    :lines: 48-50
 
 
+.. _initialize_db_wiki2:
+
+Initialize and upgrade the database using Alembic
+-------------------------------------------------
+
+We use :term:`Alembic` to manage our database initialization and migrations.
+
+Generate your first revision.
+
+On UNIX
+^^^^^^^
+
+.. code-block:: bash
+
+    $ $VENV/bin/alembic -c development.ini revision --autogenerate -m "init"
+
+On Windows
+^^^^^^^^^^
+
+.. code-block:: doscon
+
+    c:\tutorial> %VENV%\Scripts\alembic -c development.ini revision --autogenerate -m "init"
+
+The output to your console should be something like this:
+
+.. code-block:: text
+
+   2018-06-22 17:57:31,587 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
+   2018-06-22 17:57:31,587 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
+   2018-06-22 17:57:31,588 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
+   2018-06-22 17:57:31,588 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
+   2018-06-22 17:57:31,589 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA table_info("alembic_version")
+   2018-06-22 17:57:31,589 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+   2018-06-22 17:57:31,590 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA table_info("alembic_version")
+   2018-06-22 17:57:31,590 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+   2018-06-22 17:57:31,590 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread]
+   CREATE TABLE alembic_version (
+           version_num VARCHAR(32) NOT NULL,
+           CONSTRAINT alembic_version_pkc PRIMARY KEY (version_num)
+   )
+
+
+   2018-06-22 17:57:31,591 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+   2018-06-22 17:57:31,591 INFO  [sqlalchemy.engine.base.Engine:722][MainThread] COMMIT
+   2018-06-22 17:57:31,594 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] SELECT name FROM sqlite_master WHERE type='table' ORDER BY name
+   2018-06-22 17:57:31,594 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+     Generating /<somepath>/tutorial/alembic/versions/20180622_bab5a278ce04.py ... done
+
+Upgrade to that revision.
+
+On UNIX
+^^^^^^^
+
+.. code-block:: bash
+
+    $ $VENV/bin/alembic -c development.ini upgrade head
+
+On Windows
+^^^^^^^^^^
+
+.. code-block:: doscon
+
+    c:\tutorial> %VENV%\Scripts\alembic -c development.ini upgrade head
+
+The output to your console should be something like this:
+
+.. code-block:: text
+
+   2018-06-22 17:57:37,814 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
+   2018-06-22 17:57:37,814 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
+   2018-06-22 17:57:37,814 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
+   2018-06-22 17:57:37,814 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
+   2018-06-22 17:57:37,816 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA table_info("alembic_version")
+   2018-06-22 17:57:37,816 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+   2018-06-22 17:57:37,817 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] SELECT alembic_version.version_num
+   FROM alembic_version
+   2018-06-22 17:57:37,817 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+   2018-06-22 17:57:37,817 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA table_info("alembic_version")
+   2018-06-22 17:57:37,817 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+   2018-06-22 17:57:37,819 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread]
+   CREATE TABLE models (
+           id INTEGER NOT NULL,
+           name TEXT,
+           value INTEGER,
+           CONSTRAINT pk_models PRIMARY KEY (id)
+   )
+
+
+   2018-06-22 17:57:37,820 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+   2018-06-22 17:57:37,822 INFO  [sqlalchemy.engine.base.Engine:722][MainThread] COMMIT
+   2018-06-22 17:57:37,824 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] CREATE UNIQUE INDEX my_index ON models (name)
+   2018-06-22 17:57:37,824 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+   2018-06-22 17:57:37,825 INFO  [sqlalchemy.engine.base.Engine:722][MainThread] COMMIT
+   2018-06-22 17:57:37,825 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] INSERT INTO alembic_version (version_num) VALUES ('bab5a278ce04')
+   2018-06-22 17:57:37,825 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+   2018-06-22 17:57:37,825 INFO  [sqlalchemy.engine.base.Engine:722][MainThread] COMMIT
+
+
+.. _load_data_wiki2:
+
+Load default data
+-----------------
+
+Load default data into the database using a :term:`console script`. Type the following command, making sure you are still in the ``tutorial`` directory (the directory with a ``development.ini`` in it):
+
+On UNIX
+^^^^^^^
+
+.. code-block:: bash
+
+   $ $VENV/bin/initialize_tutorial_db development.ini
+
+On Windows
+^^^^^^^^^^
+
+.. code-block:: doscon
+
+   c:\tutorial> %VENV%\Scripts\initialize_tutorial_db development.ini
+
+The output to your console should be something like this:
+
+.. code-block:: bash
+
+   2018-06-22 17:57:46,241 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
+   2018-06-22 17:57:46,241 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
+   2018-06-22 17:57:46,242 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
+   2018-06-22 17:57:46,242 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
+   2018-06-22 17:57:46,243 INFO  [sqlalchemy.engine.base.Engine:682][MainThread] BEGIN (implicit)
+   2018-06-22 17:57:46,244 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] INSERT INTO models (name, value) VALUES (?, ?)
+   2018-06-22 17:57:46,245 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ('one', 1)
+   2018-06-22 17:57:46,246 INFO  [sqlalchemy.engine.base.Engine:722][MainThread] COMMIT
+
+Success!  You should now have a ``tutorial.sqlite`` file in your current
+working directory. This is an SQLite database with a single table defined in it
+(``models``) and single record inside of that.
+
+
 .. _sql_running_tests:
 
 Run the tests
@@ -260,27 +397,28 @@ If successful, you will see output something like this:
 .. code-block:: bash
 
     ======================== test session starts ========================
-    platform Python 3.6.0, pytest-3.0.5, py-1.4.31, pluggy-0.4.0
-    rootdir: /Users/stevepiercy/tutorial, inifile:
-    plugins: cov-2.4.0
+    platform Python 3.6.5, pytest-3.6.2, py-1.5.3, pluggy-0.6.0
+    rootdir: /<somepath>/tutorial, inifile: pytest.ini
+    plugins: cov-2.5.1
     collected 2 items
 
     tutorial/tests.py ..
-    ------------------ coverage: platform Python 3.6.0 ------------------
-    Name                               Stmts   Miss  Cover   Missing
-    ----------------------------------------------------------------
-    tutorial/__init__.py                   8      6    25%   7-12
-    tutorial/models/__init__.py           22      0   100%
-    tutorial/models/meta.py                5      0   100%
-    tutorial/models/mymodel.py             8      0   100%
-    tutorial/routes.py                     3      2    33%   2-3
-    tutorial/scripts/__init__.py           0      0   100%
-    tutorial/scripts/initializedb.py      26     16    38%   22-25, 29-45
-    tutorial/views/__init__.py             0      0   100%
-    tutorial/views/default.py             12      0   100%
-    tutorial/views/notfound.py             4      2    50%   6-7
-    ----------------------------------------------------------------
-    TOTAL                                 88     26    70%
+    ------------------ coverage: platform Python 3.6.5 ------------------
+   Name                                Stmts   Miss  Cover   Missing
+   -----------------------------------------------------------------
+   tutorial/__init__.py                    8      6    25%   7-12
+   tutorial/models/__init__.py            24      0   100%
+   tutorial/models/meta.py                 5      0   100%
+   tutorial/models/mymodel.py              8      0   100%
+   tutorial/routes.py                      3      3     0%   1-3
+   tutorial/scripts/__init__.py            0      0   100%
+   tutorial/scripts/initialize_db.py      24     24     0%   1-34
+   tutorial/views/__init__.py              0      0   100%
+   tutorial/views/default.py              12      0   100%
+   tutorial/views/notfound.py              4      4     0%   1-7
+   -----------------------------------------------------------------
+   TOTAL                                  88     37    58%
+
     ===================== 2 passed in 0.57 seconds ======================
 
 Our package doesn't quite have 100% test coverage.
@@ -318,71 +456,6 @@ coverage.
 .. seealso:: See py.test's documentation for :ref:`pytest:usage` or invoke
    ``py.test -h`` to see its full set of options.
 
-
-.. _initialize_db_wiki2:
-
-Initializing the database
--------------------------
-
-We need to use the ``initialize_tutorial_db`` :term:`console script` to
-initialize our database.
-
-.. note::
-
-   The ``initialize_tutorial_db`` command does not perform a migration, but
-   rather it simply creates missing tables and adds some dummy data. If you
-   already have a database, you should delete it before running
-   ``initialize_tutorial_db`` again.
-
-Type the following command, making sure you are still in the ``tutorial``
-directory (the directory with a ``development.ini`` in it):
-
-On UNIX
-^^^^^^^
-
-.. code-block:: bash
-
-   $ $VENV/bin/initialize_tutorial_db development.ini
-
-On Windows
-^^^^^^^^^^
-
-.. code-block:: doscon
-
-   c:\tutorial> %VENV%\Scripts\initialize_tutorial_db development.ini
-
-The output to your console should be something like this:
-
-.. code-block:: bash
-
-    2016-12-18 21:30:08,675 INFO  [sqlalchemy.engine.base.Engine:1235][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
-    2016-12-18 21:30:08,675 INFO  [sqlalchemy.engine.base.Engine:1236][MainThread] ()
-    2016-12-18 21:30:08,676 INFO  [sqlalchemy.engine.base.Engine:1235][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
-    2016-12-18 21:30:08,676 INFO  [sqlalchemy.engine.base.Engine:1236][MainThread] ()
-    2016-12-18 21:30:08,676 INFO  [sqlalchemy.engine.base.Engine:1140][MainThread] PRAGMA table_info("models")
-    2016-12-18 21:30:08,676 INFO  [sqlalchemy.engine.base.Engine:1143][MainThread] ()
-    2016-12-18 21:30:08,677 INFO  [sqlalchemy.engine.base.Engine:1140][MainThread]
-    CREATE TABLE models (
-            id INTEGER NOT NULL,
-            name TEXT,
-            value INTEGER,
-            CONSTRAINT pk_models PRIMARY KEY (id)
-    )
-
-
-    2016-12-18 21:30:08,677 INFO  [sqlalchemy.engine.base.Engine:1143][MainThread] ()
-    2016-12-18 21:30:08,678 INFO  [sqlalchemy.engine.base.Engine:719][MainThread] COMMIT
-    2016-12-18 21:30:08,679 INFO  [sqlalchemy.engine.base.Engine:1140][MainThread] CREATE UNIQUE INDEX my_index ON models (name)
-    2016-12-18 21:30:08,679 INFO  [sqlalchemy.engine.base.Engine:1143][MainThread] ()
-    2016-12-18 21:30:08,679 INFO  [sqlalchemy.engine.base.Engine:719][MainThread] COMMIT
-    2016-12-18 21:30:08,681 INFO  [sqlalchemy.engine.base.Engine:679][MainThread] BEGIN (implicit)
-    2016-12-18 21:30:08,682 INFO  [sqlalchemy.engine.base.Engine:1140][MainThread] INSERT INTO models (name, value) VALUES (?, ?)
-    2016-12-18 21:30:08,682 INFO  [sqlalchemy.engine.base.Engine:1143][MainThread] ('one', 1)
-    2016-12-18 21:30:08,682 INFO  [sqlalchemy.engine.base.Engine:719][MainThread] COMMIT
-
-Success!  You should now have a ``tutorial.sqlite`` file in your current
-working directory. This is an SQLite database with a single table defined in it
-(``models``).
 
 .. _wiki2-start-the-application:
 
@@ -444,6 +517,10 @@ assumptions:
 - You are willing to use SQLite for persistent storage, although almost any SQL database could be used with SQLAlchemy.
 
 - You are willing to use :term:`SQLAlchemy` for a database access tool.
+
+- You are willing to use :term:`Alembic` for a database migrations tool.
+
+- You are willing to use a :term:`console script` for a data loading tool.
 
 - You are willing to use :term:`URL dispatch` to map URLs to code.
 
