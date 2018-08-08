@@ -586,6 +586,13 @@ class IRouteRequest(Interface):
     """ *internal only* interface used as in a utility lookup to find
     route-specific interfaces.  Not an API."""
 
+class IAcceptOrder(Interface):
+    """
+    Marker interface for a list of accept headers with the most important
+    first.
+
+    """
+
 class IStaticURLInfo(Interface):
     """ A policy for generating URLs to static assets """
     def add(config, name, spec, **extra):

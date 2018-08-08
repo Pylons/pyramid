@@ -474,7 +474,9 @@ def setUp(registry=None, request=None, hook_zca=True, autocommit=True,
         # someone may be passing us an esoteric "dummy" registry, and
         # the below won't succeed if it doesn't have a registerUtility
         # method.
+        config.add_default_response_adapters()
         config.add_default_renderers()
+        config.add_default_accept_view_order()
         config.add_default_view_predicates()
         config.add_default_view_derivers()
         config.add_default_route_predicates()

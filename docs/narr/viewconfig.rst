@@ -285,6 +285,17 @@ Non-Predicate Arguments
   are just developing stock Pyramid applications. Pay no attention to the man
   behind the curtain.
 
+``exception_only``
+
+  When this value is ``True``, the ``context`` argument must be a subclass of
+  ``Exception``. This flag indicates that only an :term:`exception view` should
+  be created, and that this view should not match if the traversal
+  :term:`context` matches the ``context`` argument. If the ``context`` is a
+  subclass of ``Exception`` and this value is ``False`` (the default), then a
+  view will be registered to match the traversal :term:`context` as well.
+
+  .. versionadded:: 1.8
+
 Predicate Arguments
 +++++++++++++++++++
 
@@ -317,17 +328,6 @@ configured view.
   If ``context`` is not supplied, the value ``None``, which matches any
   resource, is used.
 
-``exception_only``
-
-  When this value is ``True``, the ``context`` argument must be a subclass of
-  ``Exception``. This flag indicates that only an :term:`exception view` should
-  be created, and that this view should not match if the traversal
-  :term:`context` matches the ``context`` argument. If the ``context`` is a
-  subclass of ``Exception`` and this value is ``False`` (the default), then a
-  view will be registered to match the traversal :term:`context` as well.
-
-  .. versionadded:: 1.8
-
 ``route_name``
   If ``route_name`` is supplied, the view callable will be invoked only when
   the named route has matched.
@@ -343,6 +343,20 @@ configured view.
   of being invoked if no other route was matched. This is when the
   request/context pair found via :term:`resource location` does not indicate it
   matched any configured route.
+
+``accept``
+  A :term:`media type` that will be matched against the ``Accept`` HTTP request header.
+  If this value is specified, it must be a specific media type, such as ``text/html``.
+  If the media type is acceptable by the ``Accept`` header of the request, or if the ``Accept`` header isn't set at all in the request, this predicate will match.
+  If this does not match the ``Accept`` header of the request, view matching continues.
+
+  If ``accept`` is not specified, the ``HTTP_ACCEPT`` HTTP header is not taken into consideration when deciding whether or not to invoke the associated view callable.
+
+  See :ref:`accept_content_negotation` for more information.
+
+  .. versionchanged:: 1.10
+      Media ranges such as ``text/*`` will now raise :class:`pyramid.exceptions.ConfigurationError`.
+      Previously these values had undefined behavior based on the version of WebOb being used and was never fully supported.
 
 ``request_type``
   This value should be an :term:`interface` that the :term:`request` must
@@ -423,19 +437,6 @@ configured view.
   If ``xhr`` is not specified, the ``HTTP_X_REQUESTED_WITH`` HTTP header is not
   taken into consideration when deciding whether or not to invoke the
   associated view callable.
-
-``accept``
-  The value of this argument represents a match query for one or more mimetypes
-  in the ``Accept`` HTTP request header.  If this value is specified, it must
-  be in one of the following forms: a mimetype match token in the form
-  ``text/plain``, a wildcard mimetype match token in the form ``text/*``, or a
-  match-all wildcard mimetype match token in the form ``*/*``.  If any of the
-  forms matches the ``Accept`` header of the request, this predicate will be
-  true.
-
-  If ``accept`` is not specified, the ``HTTP_ACCEPT`` HTTP header is not taken
-  into consideration when deciding whether or not to invoke the associated view
-  callable.
 
 ``header``
   This value represents an HTTP header name or a header name/value pair.
@@ -1027,6 +1028,64 @@ these values.
 
 .. index::
    single: HTTP caching
+
+.. _accept_content_negotation:
+
+Accept Header Content Negotiation
+---------------------------------
+
+The ``accept`` argument to :meth:`pyramid.config.Configurator.add_view` can be used to control :term:`view lookup` by dispatching to different views based on the HTTP ``Accept`` request header.
+Consider the below example in which there are two views, sharing the same view callable.
+Each view specifies uses the accept header to trigger the appropriate response renderer.
+
+.. code-block:: python
+
+    from pyramid.view import view_config
+
+    @view_config(accept='application/json', renderer='json')
+    @view_config(accept='text/html', renderer='templates/hello.jinja2')
+    def myview(request):
+        return {
+            'name': request.GET.get('name', 'bob'),
+        }
+
+Wildcard Accept header
+++++++++++++++++++++++
+
+The appropriate view is selected here when the client specifies an unambiguous header such as ``Accept: text/*`` or ``Accept: application/json``.
+However, by default, if a client specifies ``Accept: */*``, the ordering is undefined.
+This can be fixed by telling :app:`Pyramid` what the preferred relative ordering is between various accept mimetypes by using :meth:`pyramid.config.Configurator.add_accept_view_option`.
+For example:
+
+.. code-block:: python
+
+    from pyramid.config import Configurator
+
+    def main(global_config, **settings):
+        config = Configurator(settings=settings)
+        config.add_accept_view_option('text/html')
+        config.add_accept_view_option(
+            'application/json',
+            weighs_more_than='text/html',
+        )
+        config.scan()
+        return config.make_wsgi_app()
+
+Missing Accept header
++++++++++++++++++++++
+
+The above example will not match any view if the ``Accept`` header is not specified by the client.
+This can be solved by adding a fallback view without an ``accept`` predicate.
+For example, below the html response will be returned in all cases unless ``application/json`` is requested specifically.
+
+.. code-block:: python
+
+    @view_config(accept='application/json', renderer='json')
+    @view_config(renderer='templates/hello.jinja2')
+    def myview(request):
+        return {
+            'name': request.GET.get('name', 'bob'),
+        }
 
 .. _influencing_http_caching:
 

@@ -139,18 +139,6 @@ class RoutesConfiguratorMixin(object):
 
           .. versionadded:: 1.1
 
-        accept
-
-          This value represents a match query for one or more mimetypes in the
-          ``Accept`` HTTP request header.  If this value is specified, it must
-          be in one of the following forms: a mimetype match token in the form
-          ``text/plain``, a wildcard mimetype match token in the form
-          ``text/*`` or a match-all wildcard mimetype match token in the form
-          ``*/*``.  If any of the forms matches the ``Accept`` header of the
-          request, or if the ``Accept`` header isn't set at all in the request,
-          this will match the current route. If this does not match the
-          ``Accept`` header of the request, route matching continues.
-
         Predicate Arguments
 
         pattern
@@ -233,6 +221,27 @@ class RoutesConfiguratorMixin(object):
           case of the header name is not significant.  If this
           predicate returns ``False``, route matching continues.
 
+        accept
+
+          A media type that will be matched against the ``Accept`` HTTP
+          request header.  If this value is specified, it must be a specific
+          media type, such as ``text/html``.  If the media type is acceptable
+          by the ``Accept`` header of the request, or if the ``Accept`` header
+          isn't set at all in the request, this predicate will match. If this
+          does not match the ``Accept`` header of the request, route matching
+          continues.
+
+          If ``accept`` is not specified, the ``HTTP_ACCEPT`` HTTP header is
+          not taken into consideration when deciding whether or not to select
+          the route.
+
+
+          .. versionchanged:: 1.10
+              Media ranges such as ``text/*`` will now raise
+              :class:`pyramid.exceptions.ConfigurationError`. Previously,
+              these values had undefined behavior based on the version of
+              WebOb being used and was never fully supported.
+
         effective_principals
 
           If specified, this value should be a :term:`principal` identifier or
@@ -289,6 +298,10 @@ class RoutesConfiguratorMixin(object):
                 DeprecationWarning,
                 stacklevel=3
                 )
+
+        if accept is not None:
+            accept = accept.lower()
+
         # these are route predicates; if they do not match, the next route
         # in the routelist will be tried
         if request_method is not None:

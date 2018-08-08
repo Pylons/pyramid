@@ -255,6 +255,7 @@ Pre-defined Phases
 
 :const:`pyramid.config.PHASE1_CONFIG`
 
+- :meth:`pyramid.config.Configurator.add_accept_view_option`
 - :meth:`pyramid.config.Configurator.add_renderer`
 - :meth:`pyramid.config.Configurator.add_route_predicate`
 - :meth:`pyramid.config.Configurator.add_subscriber_predicate`

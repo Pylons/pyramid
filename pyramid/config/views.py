@@ -13,6 +13,7 @@ from zope.interface import (
 from zope.interface.interfaces import IInterface
 
 from pyramid.interfaces import (
+    IAcceptOrder,
     IExceptionViewClassifier,
     IException,
     IMultiView,
@@ -115,14 +116,14 @@ class MultiView(object):
         view = self.match(context, request)
         return view.__discriminator__(context, request)
 
-    def add(self, view, order, accept=None, phash=None):
+    def add(self, view, order, accept=None, phash=None, accept_order=None):
         if phash is not None:
             for i, (s, v, h) in enumerate(list(self.views)):
                 if phash == h:
                     self.views[i] = (order, view, phash)
                     return
 
-        if accept is None or '*' in accept:
+        if accept is None:
             self.views.append((order, view, phash))
             self.views.sort(key=operator.itemgetter(0))
         else:
@@ -134,21 +135,24 @@ class MultiView(object):
             else:
                 subset.append((order, view, phash))
                 subset.sort(key=operator.itemgetter(0))
+            # dedupe accepts and sort appropriately
             accepts = set(self.accepts)
             accepts.add(accept)
-            self.accepts = list(accepts) # dedupe
+            if accept_order is not None:
+                sorted_accepts = []
+                for accept in accept_order.sorted():
+                    if accept in accepts:
+                        sorted_accepts.append(accept)
+                        accepts.remove(accept)
+                sorted_accepts.extend(accepts)
+                accepts = sorted_accepts
+            self.accepts = list(accepts)
 
     def get_views(self, request):
         if self.accepts and hasattr(request, 'accept'):
-            accepts = self.accepts[:]
             views = []
-            while accepts:
-                match = request.accept.best_match(accepts)
-                if match is None:
-                    break
-                subset = self.media_views[match]
-                views.extend(subset)
-                accepts.remove(match)
+            for offer, _ in request.accept.acceptable_offers(self.accepts):
+                views.extend(self.media_views[offer])
             views.extend(self.views)
             return views
         return self.views
@@ -533,17 +537,17 @@ class ViewsConfiguratorMixin(object):
           very useful for 'civilians' who are just developing stock Pyramid
           applications. Pay no attention to the man behind the curtain.
 
-        accept
+        exception_only
 
-          This value represents a match query for one or more mimetypes in the
-          ``Accept`` HTTP request header.  If this value is specified, it must
-          be in one of the following forms: a mimetype match token in the form
-          ``text/plain``, a wildcard mimetype match token in the form
-          ``text/*`` or a match-all wildcard mimetype match token in the form
-          ``*/*``.  If any of the forms matches the ``Accept`` header of the
-          request, or if the ``Accept`` header isn't set at all in the request,
-          this will match the current view. If this does not match the
-          ``Accept`` header of the request, view matching continues.
+          .. versionadded:: 1.8
+
+          When this value is ``True``, the ``context`` argument must be
+          a subclass of ``Exception``. This flag indicates that only an
+          :term:`exception view` should be created, and that this view should
+          not match if the traversal :term:`context` matches the ``context``
+          argument. If the ``context`` is a subclass of ``Exception`` and
+          this value is ``False`` (the default), then a view will be
+          registered to match the traversal :term:`context` as well.
 
         Predicate Arguments
 
@@ -565,18 +569,6 @@ class ViewsConfiguratorMixin(object):
           to ``add_view`` as ``for_`` (an older, still-supported
           spelling). If the view should *only* match when handling
           exceptions, then set the ``exception_only`` to ``True``.
-
-        exception_only
-
-          .. versionadded:: 1.8
-
-          When this value is ``True``, the ``context`` argument must be
-          a subclass of ``Exception``. This flag indicates that only an
-          :term:`exception view` should be created, and that this view should
-          not match if the traversal :term:`context` matches the ``context``
-          argument. If the ``context`` is a subclass of ``Exception`` and
-          this value is ``False`` (the default), then a view will be
-          registered to match the traversal :term:`context` as well.
 
         route_name
 
@@ -676,6 +668,28 @@ class ViewsConfiguratorMixin(object):
           value must match the header value.  Whether or not the value
           represents a header name or a header name/value pair, the
           case of the header name is not significant.
+
+        accept
+
+          A :term:`media type` that will be matched against the ``Accept``
+          HTTP request header.  If this value is specified, it must be a
+          specific media type, such as ``text/html``.  If the media type is
+          acceptable by the ``Accept`` header of the request, or if the
+          ``Accept`` header isn't set at all in the request, this predicate
+          will match. If this does not match the ``Accept`` header of the
+          request, view matching continues.
+
+          If ``accept`` is not specified, the ``HTTP_ACCEPT`` HTTP header is
+          not taken into consideration when deciding whether or not to invoke
+          the associated view callable.
+
+          See :ref:`accept_content_negotation` for more information.
+
+          .. versionchanged:: 1.10
+              Media ranges such as ``text/*`` will now raise
+              :class:`pyramid.exceptions.ConfigurationError`. Previously,
+              these values had undefined behavior based on the version of
+              WebOb being used and was never fully supported.
 
         path_info
 
@@ -804,6 +818,9 @@ class ViewsConfiguratorMixin(object):
                 stacklevel=4,
                 )
 
+        if accept is not None:
+            accept = accept.lower()
+
         view = self.maybe_dotted(view)
         context = self.maybe_dotted(context)
         for_ = self.maybe_dotted(for_)
@@ -856,9 +873,6 @@ class ViewsConfiguratorMixin(object):
             renderer = renderers.RendererHelper(
                 name=renderer, package=self.package,
                 registry=self.registry)
-
-        if accept is not None:
-            accept = accept.lower()
 
         introspectables = []
         ovals = view_options.copy()
@@ -1104,8 +1118,11 @@ class ViewsConfiguratorMixin(object):
                     multiview = MultiView(name)
                     old_accept = getattr(old_view, '__accept__', None)
                     old_order = getattr(old_view, '__order__', MAX_ORDER)
+                    # don't bother passing accept_order here as we know we're
+                    # adding another one right after which will re-sort
                     multiview.add(old_view, old_order, old_accept, old_phash)
-                multiview.add(derived_view, order, accept, phash)
+                accept_order = self.registry.queryUtility(IAcceptOrder)
+                multiview.add(derived_view, order, accept, phash, accept_order)
                 for view_type in (IView, ISecuredView):
                     # unregister any existing views
                     self.registry.adapters.unregister(
@@ -1221,6 +1238,66 @@ class ViewsConfiguratorMixin(object):
             ('custom', p.CustomPredicate),
             ):
             self.add_view_predicate(name, factory)
+
+    def add_default_accept_view_order(self):
+        for accept in (
+            'text/html',
+            'application/xhtml+xml',
+            'application/xml',
+            'text/xml',
+            'application/json',
+        ):
+            self.add_accept_view_order(accept)
+
+    @action_method
+    def add_accept_view_order(
+        self,
+        value,
+        weighs_more_than=None,
+        weighs_less_than=None,
+    ):
+        """
+        Specify an ordering preference for the ``accept`` view option used
+        during :term:`view lookup`.
+
+        By default, if two views have different ``accept`` options and a
+        request specifies ``Accept: */*`` or omits the header entirely then
+        it is random which view will be selected. This method provides a way
+        to specify a server-side, relative ordering between accept media types.
+
+        ``value`` should be a :term:`media type` as specified by
+        :rfc:`7231#section-5.3.2`. For example, ``text/plain``,
+        ``application/json`` or ``text/html``.
+
+        ``weighs_more_than`` and ``weighs_less_than`` control the ordering
+        of media types. Each value may be a string or a list of strings.
+
+        See :ref:`accept_content_negotation` for more information.
+
+        .. versionadded:: 1.10
+
+        """
+        discriminator = ('accept view order', value)
+        intr = self.introspectable(
+            'accept view order',
+            value,
+            value,
+            'accept view order')
+        intr['value'] = value
+        intr['weighs_more_than'] = weighs_more_than
+        intr['weighs_less_than'] = weighs_less_than
+        def register():
+            sorter = self.registry.queryUtility(IAcceptOrder)
+            if sorter is None:
+                sorter = TopologicalSorter()
+                self.registry.registerUtility(sorter, IAcceptOrder)
+            sorter.add(
+                value, value,
+                after=weighs_more_than,
+                before=weighs_less_than,
+            )
+        self.action(discriminator, register, introspectables=(intr,),
+                    order=PHASE1_CONFIG) # must be registered before add_view
 
     @action_method
     def add_view_deriver(self, deriver, name=None, under=None, over=None):
