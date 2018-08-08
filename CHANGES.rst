@@ -62,6 +62,12 @@ Bug Fixes
   code. The old ``MIMEAccept`` has been deprecated. The new methods follow the
   RFC's more closely. See https://github.com/Pylons/pyramid/pull/3251
 
+- Catch extra errors like ``AttributeError`` when unpickling "trusted"
+  session cookies with bad pickle data in them. This would occur when sharing
+  a secret between projects that shouldn't actually share session cookies,
+  like when reusing secrets between projects in development.
+  See https://github.com/Pylons/pyramid/pull/3325
+
 Deprecations
 ------------
 
