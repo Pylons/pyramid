@@ -6,10 +6,7 @@ try:
 except ImportError:  # pragma: no cover
     compare_digest = None
 import inspect
-import traceback
 import weakref
-
-from zope.interface import implementer
 
 from pyramid.exceptions import (
     ConfigurationError,
@@ -17,15 +14,17 @@ from pyramid.exceptions import (
     )
 
 from pyramid.compat import (
+    getargspec,
+    im_func,
     is_nonstr_iter,
     integer_types,
     string_types,
+    bytes_,
     text_,
     PY2,
     native_
     )
 
-from pyramid.interfaces import IActionInfo
 from pyramid.path import DottedNameResolver as _DottedNameResolver
 
 _marker = object()
@@ -528,76 +527,6 @@ class TopologicalSorter(object):
 
         return result
 
-def viewdefaults(wrapped):
-    """ Decorator for add_view-like methods which takes into account
-    __view_defaults__ attached to view it is passed.  Not a documented API but
-    used by some external systems."""
-    def wrapper(self, *arg, **kw):
-        defaults = {}
-        if arg:
-            view = arg[0]
-        else:
-            view = kw.get('view')
-        view = self.maybe_dotted(view)
-        if inspect.isclass(view):
-            defaults = getattr(view, '__view_defaults__', {}).copy()
-        if '_backframes' not in kw:
-            kw['_backframes'] = 1 # for action_method
-        defaults.update(kw)
-        return wrapped(self, *arg, **defaults)
-    return functools.wraps(wrapped)(wrapper)
-
-@implementer(IActionInfo)
-class ActionInfo(object):
-    def __init__(self, file, line, function, src):
-        self.file = file
-        self.line = line
-        self.function = function
-        self.src = src
-
-    def __str__(self):
-        srclines = self.src.split('\n')
-        src = '\n'.join('    %s' % x for x in srclines)
-        return 'Line %s of file %s:\n%s' % (self.line, self.file, src)
-
-def action_method(wrapped):
-    """ Wrapper to provide the right conflict info report data when a method
-    that calls Configurator.action calls another that does the same.  Not a
-    documented API but used by some external systems."""
-    def wrapper(self, *arg, **kw):
-        if self._ainfo is None:
-            self._ainfo = []
-        info = kw.pop('_info', None)
-        # backframes for outer decorators to actionmethods
-        backframes = kw.pop('_backframes', 0) + 2
-        if is_nonstr_iter(info) and len(info) == 4:
-            # _info permitted as extract_stack tuple
-            info = ActionInfo(*info)
-        if info is None:
-            try:
-                f = traceback.extract_stack(limit=4)
-
-                # Work around a Python 3.5 issue whereby it would insert an
-                # extra stack frame. This should no longer be necessary in
-                # Python 3.5.1
-                last_frame = ActionInfo(*f[-1])
-                if last_frame.function == 'extract_stack': # pragma: no cover
-                    f.pop()
-                info = ActionInfo(*f[-backframes])
-            except Exception: # pragma: no cover
-                info = ActionInfo(None, 0, '', '')
-        self._ainfo.append(info)
-        try:
-            result = wrapped(self, *arg, **kw)
-        finally:
-            self._ainfo.pop()
-        return result
-
-    if hasattr(wrapped, '__name__'):
-        functools.update_wrapper(wrapper, wrapped)
-    wrapper.__docobj__ = wrapped
-    return wrapper
-
 
 def get_callable_name(name):
     """
@@ -662,3 +591,61 @@ def make_contextmanager(fn):
     def wrapper(*a, **kw):
         yield fn(*a, **kw)
     return wrapper
+
+
+def takes_one_arg(callee, attr=None, argname=None):
+    ismethod = False
+    if attr is None:
+        attr = '__call__'
+    if inspect.isroutine(callee):
+        fn = callee
+    elif inspect.isclass(callee):
+        try:
+            fn = callee.__init__
+        except AttributeError:
+            return False
+        ismethod = hasattr(fn, '__call__')
+    else:
+        try:
+            fn = getattr(callee, attr)
+        except AttributeError:
+            return False
+
+    try:
+        argspec = getargspec(fn)
+    except TypeError:
+        return False
+
+    args = argspec[0]
+
+    if hasattr(fn, im_func) or ismethod:
+        # it's an instance method (or unbound method on py2)
+        if not args:
+            return False
+        args = args[1:]
+
+    if not args:
+        return False
+
+    if len(args) == 1:
+        return True
+
+    if argname:
+
+        defaults = argspec[3]
+        if defaults is None:
+            defaults = ()
+
+        if args[0] == argname:
+            if len(args) - len(defaults) == 1:
+                return True
+
+    return False
+
+
+class SimpleSerializer(object):
+    def loads(self, bstruct):
+        return native_(bstruct)
+
+    def dumps(self, appstruct):
+        return bytes_(appstruct)

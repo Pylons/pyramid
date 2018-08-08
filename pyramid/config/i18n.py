@@ -5,7 +5,8 @@ from pyramid.interfaces import (
 
 from pyramid.exceptions import ConfigurationError
 from pyramid.path import AssetResolver
-from pyramid.util import action_method
+
+from pyramid.config.util import action_method
 
 class I18NConfiguratorMixin(object):
     @action_method

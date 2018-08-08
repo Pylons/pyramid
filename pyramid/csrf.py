@@ -4,8 +4,6 @@ from webob.cookies import CookieProfile
 from zope.interface import implementer
 
 
-from pyramid.authentication import _SimpleSerializer
-
 from pyramid.compat import (
     bytes_,
     urlparse,
@@ -18,6 +16,7 @@ from pyramid.exceptions import (
 from pyramid.interfaces import ICSRFStoragePolicy
 from pyramid.settings import aslist
 from pyramid.util import (
+    SimpleSerializer,
     is_same_domain,
     strings_differ
 )
@@ -112,7 +111,7 @@ class CookieCSRFStoragePolicy(object):
 
     def __init__(self, cookie_name='csrf_token', secure=False, httponly=False,
                  domain=None, max_age=None, path='/'):
-        serializer = _SimpleSerializer()
+        serializer = SimpleSerializer()
         self.cookie_profile = CookieProfile(
             cookie_name=cookie_name,
             secure=secure,

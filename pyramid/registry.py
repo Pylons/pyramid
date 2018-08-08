@@ -2,7 +2,6 @@ import operator
 import threading
 
 from zope.interface import implementer
-
 from zope.interface.registry import Components
 
 from pyramid.compat import text_
@@ -294,6 +293,5 @@ def undefer(v):
 
 class predvalseq(tuple):
     """ A subtype of tuple used to represent a sequence of predicate values """
-    pass
 
 global_registry = Registry('global')

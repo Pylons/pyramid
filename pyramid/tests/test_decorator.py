@@ -21,13 +21,6 @@ class TestReify(unittest.TestCase):
         result = decorator.__get__(None)
         self.assertEqual(result, decorator)
 
-    def test_dunder_attrs_copied(self):
-        from pyramid.util import viewdefaults
-        decorator = self._makeOne(viewdefaults)
-        self.assertEqual(decorator.__doc__, viewdefaults.__doc__)
-        self.assertEqual(decorator.__name__, viewdefaults.__name__)
-        self.assertEqual(decorator.__module__, viewdefaults.__module__)
-
 
 class Dummy(object):
     pass

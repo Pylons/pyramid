@@ -514,13 +514,43 @@ class Test_EffectivePrincipalsPredicate(unittest.TestCase):
         context = Dummy()
         self.assertFalse(inst(context, request))
 
+
+class TestNotted(unittest.TestCase):
+    def _makeOne(self, predicate):
+        from pyramid.predicates import Notted
+        return Notted(predicate)
+
+    def test_it_with_phash_val(self):
+        pred = DummyPredicate('val')
+        inst = self._makeOne(pred)
+        self.assertEqual(inst.text(), '!val')
+        self.assertEqual(inst.phash(), '!val')
+        self.assertEqual(inst(None, None), False)
+
+    def test_it_without_phash_val(self):
+        pred = DummyPredicate('')
+        inst = self._makeOne(pred)
+        self.assertEqual(inst.text(), '')
+        self.assertEqual(inst.phash(), '')
+        self.assertEqual(inst(None, None), True)
+
 class predicate(object):
     def __repr__(self):
         return 'predicate'
     def __hash__(self):
         return 1
-    
+
 class Dummy(object):
-    def __init__(self, **kw):
-        self.__dict__.update(**kw)
-        
+    pass
+
+class DummyPredicate(object):
+    def __init__(self, result):
+        self.result = result
+
+    def text(self):
+        return self.result
+
+    phash = text
+
+    def __call__(self, context, request):
+        return True

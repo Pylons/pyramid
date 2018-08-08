@@ -542,8 +542,8 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         self.assertEqual(wrapper(None, request), 'OK')
 
     def test_add_view_default_phash_overrides_default_phash(self):
-        from pyramid.renderers import null_renderer
         from pyramid.config.util import DEFAULT_PHASH
+        from pyramid.renderers import null_renderer
         from zope.interface import Interface
         from pyramid.interfaces import IRequest
         from pyramid.interfaces import IView
@@ -564,8 +564,8 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         self.assertEqual(wrapper(None, request), 'OK')
 
     def test_add_view_exc_default_phash_overrides_default_phash(self):
-        from pyramid.renderers import null_renderer
         from pyramid.config.util import DEFAULT_PHASH
+        from pyramid.renderers import null_renderer
         from zope.interface import implementedBy
         from pyramid.interfaces import IRequest
         from pyramid.interfaces import IView
@@ -3384,6 +3384,18 @@ class Test_view_description(unittest.TestCase):
         result = self._callFUT(view)
         self.assertEqual(result,
                          'function pyramid.tests.test_config.test_views.view')
+
+class Test_viewdefaults(unittest.TestCase):
+    def _makeOne(self, wrapped):
+        from pyramid.decorator import reify
+        return reify(wrapped)
+
+    def test_dunder_attrs_copied(self):
+        from pyramid.config.views import viewdefaults
+        decorator = self._makeOne(viewdefaults)
+        self.assertEqual(decorator.__doc__, viewdefaults.__doc__)
+        self.assertEqual(decorator.__name__, viewdefaults.__name__)
+        self.assertEqual(decorator.__module__, viewdefaults.__module__)
 
 
 class DummyRegistry:

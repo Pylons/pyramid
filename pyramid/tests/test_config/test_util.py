@@ -1,5 +1,37 @@
 import unittest
+
 from pyramid.compat import text_
+
+class TestActionInfo(unittest.TestCase):
+    def _getTargetClass(self):
+        from pyramid.config.util import ActionInfo
+        return ActionInfo
+
+    def _makeOne(self, filename, lineno, function, linerepr):
+        return self._getTargetClass()(filename, lineno, function, linerepr)
+
+    def test_class_conforms(self):
+        from zope.interface.verify import verifyClass
+        from pyramid.interfaces import IActionInfo
+        verifyClass(IActionInfo, self._getTargetClass())
+
+    def test_instance_conforms(self):
+        from zope.interface.verify import verifyObject
+        from pyramid.interfaces import IActionInfo
+        verifyObject(IActionInfo, self._makeOne('f', 0, 'f', 'f'))
+
+    def test_ctor(self):
+        inst = self._makeOne('filename', 10, 'function', 'src')
+        self.assertEqual(inst.file, 'filename')
+        self.assertEqual(inst.line, 10)
+        self.assertEqual(inst.function, 'function')
+        self.assertEqual(inst.src, 'src')
+
+    def test___str__(self):
+        inst = self._makeOne('filename', 0, 'function', '   linerepr  ')
+        self.assertEqual(str(inst),
+                         "Line 0 of file filename:\n       linerepr  ")
+
 
 class TestPredicateList(unittest.TestCase):
 
@@ -391,220 +423,6 @@ class TestPredicateList(unittest.TestCase):
         self.assertEqual(predicates[1](None, request), True)
         self.assertEqual(predicates[2](None, request), True)
 
-
-class Test_takes_one_arg(unittest.TestCase):
-    def _callFUT(self, view, attr=None, argname=None):
-        from pyramid.config.util import takes_one_arg
-        return takes_one_arg(view, attr=attr, argname=argname)
-
-    def test_requestonly_newstyle_class_no_init(self):
-        class foo(object):
-            """ """
-        self.assertFalse(self._callFUT(foo))
-
-    def test_requestonly_newstyle_class_init_toomanyargs(self):
-        class foo(object):
-            def __init__(self, context, request):
-                """ """
-        self.assertFalse(self._callFUT(foo))
-
-    def test_requestonly_newstyle_class_init_onearg_named_request(self):
-        class foo(object):
-            def __init__(self, request):
-                """ """
-        self.assertTrue(self._callFUT(foo))
-
-    def test_newstyle_class_init_onearg_named_somethingelse(self):
-        class foo(object):
-            def __init__(self, req):
-                """ """
-        self.assertTrue(self._callFUT(foo))
-
-    def test_newstyle_class_init_defaultargs_firstname_not_request(self):
-        class foo(object):
-            def __init__(self, context, request=None):
-                """ """
-        self.assertFalse(self._callFUT(foo))
-
-    def test_newstyle_class_init_defaultargs_firstname_request(self):
-        class foo(object):
-            def __init__(self, request, foo=1, bar=2):
-                """ """
-        self.assertTrue(self._callFUT(foo, argname='request'))
-
-    def test_newstyle_class_init_firstname_request_with_secondname(self):
-        class foo(object):
-            def __init__(self, request, two):
-                """ """
-        self.assertFalse(self._callFUT(foo))
-
-    def test_newstyle_class_init_noargs(self):
-        class foo(object):
-            def __init__():
-                """ """
-        self.assertFalse(self._callFUT(foo))
-
-    def test_oldstyle_class_no_init(self):
-        class foo:
-            """ """
-        self.assertFalse(self._callFUT(foo))
-
-    def test_oldstyle_class_init_toomanyargs(self):
-        class foo:
-            def __init__(self, context, request):
-                """ """
-        self.assertFalse(self._callFUT(foo))
-
-    def test_oldstyle_class_init_onearg_named_request(self):
-        class foo:
-            def __init__(self, request):
-                """ """
-        self.assertTrue(self._callFUT(foo))
-
-    def test_oldstyle_class_init_onearg_named_somethingelse(self):
-        class foo:
-            def __init__(self, req):
-                """ """
-        self.assertTrue(self._callFUT(foo))
-
-    def test_oldstyle_class_init_defaultargs_firstname_not_request(self):
-        class foo:
-            def __init__(self, context, request=None):
-                """ """
-        self.assertFalse(self._callFUT(foo))
-
-    def test_oldstyle_class_init_defaultargs_firstname_request(self):
-        class foo:
-            def __init__(self, request, foo=1, bar=2):
-                """ """
-        self.assertTrue(self._callFUT(foo, argname='request'), True)
-
-    def test_oldstyle_class_init_noargs(self):
-        class foo:
-            def __init__():
-                """ """
-        self.assertFalse(self._callFUT(foo))
-
-    def test_function_toomanyargs(self):
-        def foo(context, request):
-            """ """
-        self.assertFalse(self._callFUT(foo))
-
-    def test_function_with_attr_false(self):
-        def bar(context, request):
-            """ """
-        def foo(context, request):
-            """ """
-        foo.bar = bar
-        self.assertFalse(self._callFUT(foo, 'bar'))
-
-    def test_function_with_attr_true(self):
-        def bar(context, request):
-            """ """
-        def foo(request):
-            """ """
-        foo.bar = bar
-        self.assertTrue(self._callFUT(foo, 'bar'))
-
-    def test_function_onearg_named_request(self):
-        def foo(request):
-            """ """
-        self.assertTrue(self._callFUT(foo))
-
-    def test_function_onearg_named_somethingelse(self):
-        def foo(req):
-            """ """
-        self.assertTrue(self._callFUT(foo))
-
-    def test_function_defaultargs_firstname_not_request(self):
-        def foo(context, request=None):
-            """ """
-        self.assertFalse(self._callFUT(foo))
-
-    def test_function_defaultargs_firstname_request(self):
-        def foo(request, foo=1, bar=2):
-            """ """
-        self.assertTrue(self._callFUT(foo, argname='request'))
-
-    def test_function_noargs(self):
-        def foo():
-            """ """
-        self.assertFalse(self._callFUT(foo))
-
-    def test_instance_toomanyargs(self):
-        class Foo:
-            def __call__(self, context, request):
-                """ """
-        foo = Foo()
-        self.assertFalse(self._callFUT(foo))
-
-    def test_instance_defaultargs_onearg_named_request(self):
-        class Foo:
-            def __call__(self, request):
-                """ """
-        foo = Foo()
-        self.assertTrue(self._callFUT(foo))
-
-    def test_instance_defaultargs_onearg_named_somethingelse(self):
-        class Foo:
-            def __call__(self, req):
-                """ """
-        foo = Foo()
-        self.assertTrue(self._callFUT(foo))
-
-    def test_instance_defaultargs_firstname_not_request(self):
-        class Foo:
-            def __call__(self, context, request=None):
-                """ """
-        foo = Foo()
-        self.assertFalse(self._callFUT(foo))
-
-    def test_instance_defaultargs_firstname_request(self):
-        class Foo:
-            def __call__(self, request, foo=1, bar=2):
-                """ """
-        foo = Foo()
-        self.assertTrue(self._callFUT(foo, argname='request'), True)
-
-    def test_instance_nocall(self):
-        class Foo: pass
-        foo = Foo()
-        self.assertFalse(self._callFUT(foo))
-
-    def test_method_onearg_named_request(self):
-        class Foo:
-            def method(self, request):
-                """ """
-        foo = Foo()
-        self.assertTrue(self._callFUT(foo.method))
-
-    def test_function_annotations(self):
-        def foo(bar):
-            """ """
-        # avoid SyntaxErrors in python2, this if effectively nop
-        getattr(foo, '__annotations__', {}).update({'bar': 'baz'})
-        self.assertTrue(self._callFUT(foo))
-
-class TestNotted(unittest.TestCase):
-    def _makeOne(self, predicate):
-        from pyramid.config.util import Notted
-        return Notted(predicate)
-
-    def test_it_with_phash_val(self):
-        pred = DummyPredicate('val')
-        inst = self._makeOne(pred)
-        self.assertEqual(inst.text(), '!val')
-        self.assertEqual(inst.phash(), '!val')
-        self.assertEqual(inst(None, None), False)
-
-    def test_it_without_phash_val(self):
-        pred = DummyPredicate('')
-        inst = self._makeOne(pred)
-        self.assertEqual(inst.text(), '')
-        self.assertEqual(inst.phash(), '')
-        self.assertEqual(inst(None, None), True)
-
-
 class TestDeprecatedPredicates(unittest.TestCase):
     def test_it(self):
         import warnings
@@ -612,18 +430,6 @@ class TestDeprecatedPredicates(unittest.TestCase):
             warnings.filterwarnings('always')
             from pyramid.config.predicates import XHRPredicate
             self.assertEqual(len(w), 1)
-
-class DummyPredicate(object):
-    def __init__(self, result):
-        self.result = result
-
-    def text(self):
-        return self.result
-
-    phash = text
-
-    def __call__(self, context, request):
-        return True
 
 class DummyCustomPredicate(object):
     def __init__(self):
@@ -636,8 +442,9 @@ class DummyCustomPredicate(object):
     @classmethod
     def classmethod_predicate_no_text(*args): pass # pragma: no cover
 
-class Dummy:
-    pass
+class Dummy(object):
+    def __init__(self, **kw):
+        self.__dict__.update(**kw)
 
 class DummyRequest:
     subpath = ()
@@ -652,4 +459,3 @@ class DummyRequest:
 class DummyConfigurator(object):
     def maybe_dotted(self, thing):
         return thing
-

@@ -1549,21 +1549,6 @@ class TestExtractHTTPBasicCredentials(unittest.TestCase):
 
         self.assertEqual(result.username, 'chrisr')
         self.assertEqual(result.password, 'pass')
-
-
-
-class TestSimpleSerializer(unittest.TestCase):
-    def _makeOne(self):
-        from pyramid.authentication import _SimpleSerializer
-        return _SimpleSerializer()
-
-    def test_loads(self):
-        inst = self._makeOne()
-        self.assertEqual(inst.loads(b'abc'), text_('abc'))
-
-    def test_dumps(self):
-        inst = self._makeOne()
-        self.assertEqual(inst.dumps('abc'), bytes_('abc'))
         
 class DummyContext:
     pass
