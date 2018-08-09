@@ -56,6 +56,17 @@ Steps
    .. literalinclude:: hello_world/app.py
     :linenos:
 
+The following tree diagram shows the current structure.
+
+   .. code-block:: text
+
+    `──/path/to/project/
+        `── projects
+            `── quick_tutorial
+                │── env
+                `── hello_world
+                       `── app.py
+
 #. Run the application:
 
    .. code-block:: bash
