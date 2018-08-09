@@ -531,16 +531,12 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
        option.
        Optional.
 
-       This option is available as of :app:`Pyramid` 1.5.
-
     ``domain``
 
        Default: ``None``. If provided the auth_tkt cookie will only be
        set for this domain. This option is not compatible with ``wild_domain``
        and ``parent_domain``.
        Optional.
-
-       This option is available as of :app:`Pyramid` 1.5.
 
     ``hashalg``
 
@@ -553,8 +549,6 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
        using different ``hashalg`` options are not compatible. Switching the
        ``hashalg`` will imply that all existing users with a valid cookie will
        be required to re-login.
-
-       This option is available as of :app:`Pyramid` 1.4.
 
        Optional.
 
@@ -572,6 +566,20 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
 
         This option is available as of :app:`Pyramid` 1.10.
 
+    .. versionchanged:: 1.4
+
+       Added the ``hashalg`` option, defaulting to ``sha512``.
+
+    .. versionchanged:: 1.5
+
+       Added the ``domain`` option.
+
+       Added the ``parent_domain`` option.
+
+    .. versionchanged:: 1.10
+
+       Added the ``samesite`` option and made the default ``'Lax'``.
+    
     Objects of this class implement the interface described by
     :class:`pyramid.interfaces.IAuthenticationPolicy`.
 
