@@ -2,6 +2,7 @@ import base64
 import json
 import unittest
 from pyramid import testing
+from pyramid.compat import pickle
 
 class SharedCookieSessionTests(object):
 
@@ -462,6 +463,24 @@ class TestSignedCookieSession(SharedCookieSessionTests, unittest.TestCase):
         self.assertEqual(result, None)
         self.assertTrue('Set-Cookie' in dict(response.headerlist))
 
+    def test_bad_pickle(self):
+        import base64
+        import hashlib
+        import hmac
+
+        digestmod = lambda: hashlib.new('sha512')
+        # generated from dumping an object that cannot be found anymore, eg:
+        # class Foo: pass
+        # print(pickle.dumps(Foo()))
+        cstruct = b'(i__main__\nFoo\np0\n(dp1\nb.'
+        sig = hmac.new(b'pyramid.session.secret', cstruct, digestmod).digest()
+        cookieval = base64.urlsafe_b64encode(sig + cstruct).rstrip(b'=')
+
+        request = testing.DummyRequest()
+        request.cookies['session'] = cookieval
+        session = self._makeOne(request, secret='secret')
+        self.assertEqual(session, {})
+
 class TestUnencryptedCookieSession(SharedCookieSessionTests, unittest.TestCase):
     def setUp(self):
         super(TestUnencryptedCookieSession, self).setUp()
@@ -659,6 +678,44 @@ class Test_signed_deserialize(unittest.TestCase):
         serialized = serialize('123', secret)
         result = self._callFUT(serialized, secret.decode('latin-1'))
         self.assertEqual(result, '123')
+
+
+class TestPickleSerializer(unittest.TestCase):
+    def _makeOne(self):
+        from pyramid.session import PickleSerializer
+        return PickleSerializer()
+
+    def test_loads(self):
+        # generated from dumping Dummy() using protocol=2
+        cstruct = b'\x80\x02cpyramid.tests.test_session\nDummy\nq\x00)\x81q\x01.'
+        serializer = self._makeOne()
+        result = serializer.loads(cstruct)
+        self.assertIsInstance(result, Dummy)
+
+    def test_loads_raises_ValueError_on_invalid_data(self):
+        cstruct = b'not pickled'
+        serializer = self._makeOne()
+        self.assertRaises(ValueError, serializer.loads, cstruct)
+
+    def test_loads_raises_ValueError_on_bad_import(self):
+        # generated from dumping an object that cannot be found anymore, eg:
+        # class Foo: pass
+        # print(pickle.dumps(Foo()))
+        cstruct = b'(i__main__\nFoo\np0\n(dp1\nb.'
+        serializer = self._makeOne()
+        self.assertRaises(ValueError, serializer.loads, cstruct)
+
+    def test_dumps(self):
+        obj = Dummy()
+        serializer = self._makeOne()
+        result = serializer.dumps(obj)
+        expected_result = pickle.dumps(obj, protocol=pickle.HIGHEST_PROTOCOL)
+        self.assertEqual(result, expected_result)
+        self.assertIsInstance(result, bytes)
+
+
+class Dummy(object):
+    pass
 
 
 class DummySerializer(object):

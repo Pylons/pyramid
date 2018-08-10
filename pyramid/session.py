@@ -121,7 +121,11 @@ class PickleSerializer(object):
 
     def loads(self, bstruct):
         """Accept bytes and return a Python object."""
-        return pickle.loads(bstruct)
+        try:
+            return pickle.loads(bstruct)
+        # at least ValueError, AttributeError, ImportError but more to be safe
+        except Exception:
+            raise ValueError
 
     def dumps(self, appstruct):
         """Accept a Python object and return bytes."""
