@@ -85,11 +85,11 @@ the trunk via ``git``, use either command:
 
 .. code-block:: text
 
-  # If you have SSH keys configured on GitHub:
-  git clone git@github.com:Pylons/pyramid.git
-  
-  # Otherwise, HTTPS will work, using your GitHub login:
-  git clone https://github.com/Pylons/pyramid.git
+    # If you have SSH keys configured on GitHub:
+    git clone git@github.com:Pylons/pyramid.git
+
+    # Otherwise, HTTPS will work, using your GitHub login:
+    git clone https://github.com/Pylons/pyramid.git
 
 To find out how to become a contributor to :app:`Pyramid`, please see `How to Contribute Source Code and Documentation <https://pylonsproject.org/community-how-to-contribute.html>`_.
 
