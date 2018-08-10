@@ -106,11 +106,15 @@ class CookieCSRFStoragePolicy(object):
 
     .. versionadded:: 1.9
 
+    .. versionchanged: 1.10
+
+       Added the ``samesite`` option and made the default ``'Lax'``.
+
     """
     _token_factory = staticmethod(lambda: text_(uuid.uuid4().hex))
 
     def __init__(self, cookie_name='csrf_token', secure=False, httponly=False,
-                 domain=None, max_age=None, path='/'):
+                 domain=None, max_age=None, path='/', samesite='Lax'):
         serializer = SimpleSerializer()
         self.cookie_profile = CookieProfile(
             cookie_name=cookie_name,
@@ -119,7 +123,8 @@ class CookieCSRFStoragePolicy(object):
             httponly=httponly,
             path=path,
             domains=[domain],
-            serializer=serializer
+            serializer=serializer,
+            samesite=samesite,
         )
         self.cookie_name = cookie_name
 

@@ -532,16 +532,12 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
        option.
        Optional.
 
-       This option is available as of :app:`Pyramid` 1.5.
-
     ``domain``
 
        Default: ``None``. If provided the auth_tkt cookie will only be
        set for this domain. This option is not compatible with ``wild_domain``
        and ``parent_domain``.
        Optional.
-
-       This option is available as of :app:`Pyramid` 1.5.
 
     ``hashalg``
 
@@ -555,8 +551,6 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
        ``hashalg`` will imply that all existing users with a valid cookie will
        be required to re-login.
 
-       This option is available as of :app:`Pyramid` 1.4.
-
        Optional.
 
     ``debug``
@@ -566,8 +560,30 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
         steps.  The output from debugging is useful for reporting to maillist
         or IRC channels when asking for support.
 
+    ``samesite``
+
+        Default: ``'Lax'``.  The 'samesite' option of the session cookie. Set
+        the value to ``None`` to turn off the samesite option.
+
+        This option is available as of :app:`Pyramid` 1.10.
+
+    .. versionchanged:: 1.4
+
+       Added the ``hashalg`` option, defaulting to ``sha512``.
+
+    .. versionchanged:: 1.5
+
+       Added the ``domain`` option.
+
+       Added the ``parent_domain`` option.
+
+    .. versionchanged:: 1.10
+
+       Added the ``samesite`` option and made the default ``'Lax'``.
+    
     Objects of this class implement the interface described by
     :class:`pyramid.interfaces.IAuthenticationPolicy`.
+
     """
 
     def __init__(self,
@@ -586,6 +602,7 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
                  hashalg='sha512',
                  parent_domain=False,
                  domain=None,
+                 samesite='Lax',
                  ):
         self.cookie = AuthTktCookieHelper(
             secret,
@@ -601,6 +618,7 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
             hashalg=hashalg,
             parent_domain=parent_domain,
             domain=domain,
+            samesite=samesite,
             )
         self.callback = callback
         self.debug = debug
@@ -793,10 +811,22 @@ class AuthTktCookieHelper(object):
         binary_type: ('b64str', lambda x: b64encode(x)),
         }
 
-    def __init__(self, secret, cookie_name='auth_tkt', secure=False,
-                 include_ip=False, timeout=None, reissue_time=None,
-                 max_age=None, http_only=False, path="/", wild_domain=True,
-                 hashalg='md5', parent_domain=False, domain=None):
+    def __init__(self,
+                 secret,
+                 cookie_name='auth_tkt',
+                 secure=False,
+                 include_ip=False,
+                 timeout=None,
+                 reissue_time=None,
+                 max_age=None,
+                 http_only=False,
+                 path="/",
+                 wild_domain=True,
+                 hashalg='md5',
+                 parent_domain=False,
+                 domain=None,
+                 samesite='Lax',
+                 ):
 
         serializer = SimpleSerializer()
 
@@ -806,7 +836,8 @@ class AuthTktCookieHelper(object):
             max_age=max_age,
             httponly=http_only,
             path=path,
-            serializer=serializer
+            serializer=serializer,
+            samesite=samesite,
         )
 
         self.secret = secret
